@@ -80,6 +80,8 @@ def parse(elf):
             break
         tags[tag] = value
         multi[tag].append(value)
+    else:
+        raise ValueError('unterminated PT_DYNAMIC segment')
     blob = span(elf, lib_ph['offset'], lib_ph['filesz'])
     strings = span(blob, tags[DT_SCE['STRTAB']], tags[DT_SCE['STRSZ']])
 

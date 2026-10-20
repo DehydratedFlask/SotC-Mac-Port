@@ -150,6 +150,18 @@ class Tests(unittest.TestCase):
         with self.assertRaises(ValueError):
             d.parse(bytes(elf))
 
+    def test_parse_rejects_pt_dynamic_without_dt_null(self):
+        elf, _ = dynamic_import_elf_fixture()
+        elf = bytearray(elf)
+        # PT_DYNAMIC is the first program header (offset 64); p_filesz/p_memsz are at +32/+40.
+        for field_offset in (64 + 32, 64 + 40):
+            size = struct.unpack_from('<Q', elf, field_offset)[0]
+            struct.pack_into('<Q', elf, field_offset, size - 16)
+
+        with self.assertRaises(ValueError) as error:
+            d.parse(bytes(elf))
+        self.assertEqual(str(error.exception), 'unterminated PT_DYNAMIC segment')
+
     def test_parse_rejects_relocation_table_sizes_not_multiple_of_24(self):
         dynamic_offset = 64 + 2 * 56
         cases = (
