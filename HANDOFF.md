@@ -1,6 +1,6 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:09 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:10 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
 ## CURRENT CHECKPOINT — 2026-10-19 23:09 CDT, /root — APP-01 lifecycle fixture published; AUD-01-XFF-01 claimed; CPU-01d `0xcdc760` verified
@@ -145,7 +145,12 @@ At 2026-10-19 23:08 CDT, APP-01 commit `8b10c09` was pushed to `origin main`. Be
 passed, `python3 -I scripts/audit_publish_paths.py` passed the 8 staged paths,
 `python3 -I scripts/audit_publish_paths.py --all` passed all 566 tracked paths, and
 `git diff --cached --check` passed. `git fetch origin main` found no divergence before commit.
-The current AUD-01-XFF-01 claim is being recorded before implementation begins.
+AUD-01-XFF-01 was then recorded before implementation and published in `b17ffe2` at 23:10 CDT.
+Before that commit, `python3 scripts/project_index.py --check` reported 4,123 folders current,
+`git diff --check`, staged `python3 -I scripts/audit_publish_paths.py` (5 paths),
+`python3 -I scripts/audit_publish_paths.py --all` (567 paths), and `git diff --cached --check`
+passed. `git fetch origin main` found no divergence. `/root/audio_asset_survey` was assigned the
+two claimed scripts files after this push; it must not modify shared docs or commit/push.
 
 ## PRIOR CHECKPOINT — 2026-10-19 22:41 CDT, /root — CPU-01d `0xce7300` metadata correction — FIXTURE_VERIFIED
 

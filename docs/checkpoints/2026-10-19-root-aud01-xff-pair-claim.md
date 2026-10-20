@@ -55,3 +55,13 @@ header/data index relation beyond its common prefix; exact format, codec, and us
 Next exact action: implementation owner cross-checks the pair bytes, adds the scoped parser and
 fixture, and returns command outputs/log paths to the integrator. The integrator updates shared
 documents and HANDOFF.
+
+## Claim publication — 2026-10-19 23:10 CDT
+
+- Commit `b17ffe2` (`docs: claim XFF sound bank structure slice`) was pushed from `8b10c09` to
+  `origin main` before implementation began.
+- `python3 scripts/project_index.py --check` reported 4,123 folders current; `git diff --check`
+  passed; the staged path audit passed 5 files; the full tracked-path audit passed 567 files;
+  `git diff --cached --check` passed; `git fetch origin main` showed no divergence.
+- Root sent `/root/audio_asset_survey` the implementation assignment after the push. The worker
+  owns only the two scripts listed above; the integrator owns all shared-document updates.
