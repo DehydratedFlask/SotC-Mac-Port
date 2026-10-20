@@ -18,6 +18,7 @@ add_library(sotc_core STATIC
   core/allocator_region.cpp
   core/host_map.cpp
   core/free_list_carve.cpp
+  core/region_split.cpp
   core/vec_neg036.cpp
   core/xyz_mask_copy.cpp
   core/vec_dd41e0.cpp
@@ -192,3 +193,6 @@ add_test(NAME vec_db7e60 COMMAND test_vec_db7e60)
 add_executable(test_vec_db3960 tests/test_vec_db3960.cpp)
 target_link_libraries(test_vec_db3960 sotc_core)
 add_test(NAME vec_db3960 COMMAND test_vec_db3960)
+add_executable(test_region_split tests/test_region_split.cpp)
+target_link_libraries(test_region_split sotc_core)
+add_test(NAME region_split COMMAND test_region_split)
