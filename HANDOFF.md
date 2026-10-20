@@ -1,7 +1,22 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:29 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:31 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:19 CDT, worker bc-81763e53 (CPU-01d) — 0xdbb280 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdbb280** (survey index 71).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_dbb280.{hpp,cpp}`, `native/tests/test_vec_dbb280.cpp`,
+`tools/lift/check_fdbb280.py`, `native/CMakeLists.txt` (+vec_dbb280 only; origin/main base keeps peer vec_db3a70).
+Private dump (not published): `local/re/work/cdbb280.bin`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV carve/`host_map`, peer `0xdb3a70`/`0xdbfa60`.
+Checkpoint (2026-10-19 20:19 CDT, bc-81763e53):
+- OBS: unguarded vmovups copy; src=0x130dbb0 dst=0x3352c90 bits=~0,~0,~0,0; index 71; distinct cells.
+- Commands: ctest -R '^vec_dbb280$' Passed; `python3 -I tools/lift/check_fdbb280.py` OK.
+- Logs: `/tmp/ctest_dbb280.log`, `/tmp/check_dbb280.log`.
+- Store: Project `internal/worker-claim-dbb280.md`.
+- Push: (pending this commit).
 
 ## ACTIVE CLAIM — 2026-10-19 20:29 CDT, worker bc-9aa0fe88 (SRV-01 mem split) — IN PROGRESS
 
@@ -30,6 +45,7 @@ Checkpoint (2026-10-19 20:30 CDT, bc-02397584):
 - Logs: `/tmp/ctest_db3a70.log`, `/tmp/check_db3a70.log`.
 - CMake: origin/main base + vec_db3a70 only.
 - Store: Project `internal/worker-claim-db3a70.md`.
+- Push: `4177079` on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 20:23 CDT, worker bc-73721c8d (CPU-01d) — 0xdc4180 — COMPLETE
 
