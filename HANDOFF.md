@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:29 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:33 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:29 CDT, /root — CPU prefix pushed; three bounded follow-ups claimed
+## CURRENT CHECKPOINT — 2026-10-19 23:33 CDT, /root — constructor metadata fixture verified; two analyses active
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -15,9 +15,10 @@ and reports the unresolved original slot 10 at RVA `0xf09e60`. A private hash-bo
 reran the build, focused CTest (1/1), checker, and whitespace check successfully; worker logs are
 under `local/validation/20261019T2321-cpu-01-ctor-prefix-01/`. This proves runner bookkeeping only.
 Constructor 10 semantics, a runtime initialization chain, and G1 remain unproven. The prefix batch
-is pushed as `b26768a`. Three follow-ups are claimed before dispatch: read-only REA/Ghidra analysis
-of constructor `0xf09e60`; metadata correction for the two relocated constructor indices; and a
-byte-level comparison of the two `sound/shadow/bridge.sxd` variants.
+is pushed as `b26768a`. The follow-up correction for two leaf-fixture constructor indices is now
+fixture verified locally; its source and evidence changes are being published. Read-only
+REA/Ghidra analysis of constructor `0xf09e60` and byte-level comparison of the two
+`sound/shadow/bridge.sxd` variants remain in progress.
 
 ### DATA-02 — pakN archive identity
 
@@ -267,7 +268,7 @@ write native replacement code.
   implementation. G1 remains NOT PASSED. Root integrates shared docs and refreshes the project
   index after all parallel private reports are delivered.
 
-### CPU-01-CTOR-METADATA-01 — correct original indices in leaf fixtures — ACTIVE CLAIM
+### CPU-01-CTOR-METADATA-01 — correct original indices in leaf fixtures — FIXTURE_VERIFIED
 
 Integrator `/root` claims the narrow metadata follow-up in `/root/cpu_ctor_metadata`. The slot
 checker proves that `0xd32720` and `0xd2ffe0` occupy original constructor indices 119 and 120, while
@@ -280,8 +281,14 @@ identified the four stale metadata locations.
 - Update only original-index metadata to 119/120. Preserve function semantics, test behavior,
   vector-copy positions and survey/manifests positions. Acceptance: build both test targets, run
   their focused CTests, run both private ELF checkers, and rerun `check_ctor_slots.py`. Failed tries: 0.
-- This corrects provenance only and does not alter function behavior or pass G1. Root integrates
-  documentation and publishes the batch.
+- Result: worker and root independently built both test targets, passed focused CTest (2/2), ran
+  both private ELF checkers (indices 119 and 120), reran `check_ctor_slots.py` (103 pairs; slot 10
+  remains the blocker), and passed `git diff --check`. Worker logs are under
+  `local/validation/20261019T2321-cpu-01-ctor-prefix-01/ctor-metadata-{build,ctest,check-fd32720,check-fd2ffe0,check-ctor-slots}.log`.
+  Root's reruns were direct and not separately logged. No behavior, addresses, vector positions, or
+  function semantics changed. This corrects provenance only and does not pass G1. Failed tries: 0.
+  Exact next action: record E41, run project/Graft/publication gates, then commit and push the six
+  owned files and documentation.
 
 ### DATA-02-BRIDGE-SXD-01 — compare cachedFiles bridge members — ACTIVE CLAIM
 
@@ -305,9 +312,9 @@ Prerequisite: DATA-01 identities and E25 classify exactly two `.sxd` members wit
 See [the parallel claims dispatch checkpoint](docs/checkpoints/2026-10-19-root-parallel-claims-dispatched.md).
 Both earlier claims were pushed before assignment; workers own distinct paths and do not edit shared
 docs or commit/push. RE-02-DYNLINK-01 is fixture verified and published in `b2a5b6f`;
-CPU-01-CTOR-PREFIX-01 is fixture verified and pushed in `b26768a`. Three new bounded claims above
-are ready for assignment; their current exact action is private analysis and metadata verification,
-with root retaining integration and publication ownership.
+CPU-01-CTOR-PREFIX-01 is fixture verified and pushed in `b26768a`. The metadata claim above is
+fixture verified; its exact correction is being published. The CPU slot-10 and bridge-member
+analyses are assigned and active, with root retaining integration and publication ownership.
 
 ### Current publication checkpoint
 

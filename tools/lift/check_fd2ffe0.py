@@ -34,9 +34,9 @@ exe = ROOT / 'local/build/native/test_vec_d2ffe0'
 native = json.loads(subprocess.run([str(exe), '--dump'], check=True, capture_output=True, text=True).stdout)
 assert native['bits'] == bits
 assert native['source'] == src and native['value'] == dst
-assert native['rva'] == A and native['index'] == 116
+assert native['rva'] == A and native['index'] == 120
 dump = ROOT / 'local/re/work/cd2ffe0.bin'
 if dump.is_file():
     assert dump.read_bytes() == bytes(body)
 print(f'OK: 0xd2ffe0 unguarded vec copy; src={src:#x} dst={dst:#x} bits=~0,~0,~0,0; '
-      f'index 116; native dump matches; distinct sibling cells')
+      f'index 120; native dump matches; distinct sibling cells')

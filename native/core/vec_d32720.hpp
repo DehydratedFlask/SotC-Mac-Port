@@ -1,4 +1,4 @@
-// Native recovery of original ctor RVA 0xd32720 (index 115; ELF sha256 d0723afb...5861d3),
+// Native recovery of original ctor RVA 0xd32720 (index 119; ELF sha256 d0723afb...5861d3),
 // task CPU-01d (bc-02397584). Unguarded 16-byte copy of {~0,~0,~0,0} from rodata @0x1300ba0 into
 // BSS @0x3351ed0. Same bit pattern as sibling mask copies, but distinct cells — do not merge.
 #pragma once
