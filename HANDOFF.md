@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:19 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:22 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:19 CDT, /root — two bounded agents dispatched after published claims
+## CURRENT CHECKPOINT — 2026-10-19 23:22 CDT, /root — RE-02 dynlink fixture verified; CPU constructor gate in progress
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -160,7 +160,7 @@ semantics. Do not claim a codec, NGS2 contract, gameplay use, or playback.
   copy behavior covered by 95 existing fixtures, so root deferred it for low marginal semantic
   coverage. This was task selection only, not a failed implementation try.
 
-### RE-02-DYNLINK-01 — synthetic dynamic-link parse fixture — ACTIVE CLAIM
+### RE-02-DYNLINK-01 — synthetic dynamic-link parse fixture — FIXTURE_VERIFIED
 
 Integrator `/root` claims a test-only RE-02 slice for `/root/re02_triage`; implementation owns only
 `scripts/test_ps4_dynlink.py`. Existing `scripts/ps4_dynlink.py` remains a read-only dependency.
@@ -174,10 +174,15 @@ Claim record: [RE-02-DYNLINK-01 checkpoint](docs/checkpoints/2026-10-19-root-re0
   `JMPREL` relocation. Assert parsed module/library encodings, symbol NID, relocation table/type,
   symbol index, target, and signed addend. Do not change the parser unless the new fixture exposes
   a concrete defect; stop and report before widening owned paths.
-- Exact acceptance command: `python3 -I scripts/test_ps4_dynlink.py`. Fixture success establishes
-  parser behavior for these bytes only; it does not establish loader execution, ABI behavior, or
-  runtime addend semantics. Failed tries: 0. At 23:19 CDT, `/root/re02_triage` was assigned the
-  test-only implementation.
+- Exact acceptance command: `python3 -I scripts/test_ps4_dynlink.py`. `/root/re02_triage` and root
+  independently passed all seven tests. Worker log: `local/validation/re02-dynlink-01-test_ps4_dynlink.log`;
+  root log and command record: `local/validation/20261019-2320-root-re02-dynlink-verification/`.
+  `git diff --check -- scripts/test_ps4_dynlink.py` passed. `graft grep "parse(" --in scripts/`
+  returned an invalid-regex error; corrected query `graft grep "JMPREL" --in scripts/` refreshed
+  one file and found the parser and new fixture. Task status FIXTURE_VERIFIED; failed tries 0.
+  This parser fixture does not establish loader execution, ABI behavior, or runtime addend
+  semantics; it covers one JMPREL row and not RELA. The next exact action is to publish this test
+  and its evidence while the independent CPU constructor gate remains active.
 
 ### CPU-01-CTOR-PREFIX-01 — fail-fast original constructor prefix — ACTIVE CLAIM
 
@@ -213,8 +218,9 @@ Claim record: [CPU-01-CTOR-PREFIX-01 checkpoint](docs/checkpoints/2026-10-19-roo
 
 See [the parallel claims dispatch checkpoint](docs/checkpoints/2026-10-19-root-parallel-claims-dispatched.md).
 Both claims were pushed before assignment; workers own distinct paths and do not edit shared docs
-or commit/push. Current exact action: collect both bounded results, verify each acceptance command
-and evidence log, then update task/evidence status without implying runtime behavior.
+or commit/push. RE-02-DYNLINK-01 is now fixture verified; CPU-01-CTOR-PREFIX-01 remains in
+progress. Current exact action: publish the verified RE fixture, then collect and verify the CPU
+runner result before closing that bounded task.
 
 ### Current publication checkpoint
 
