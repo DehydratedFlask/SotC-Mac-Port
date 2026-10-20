@@ -28,6 +28,10 @@
 #include "vec_dfd5f0.hpp"
 #include "vec_ddab00.hpp"
 #include "vec_dda990.hpp"
+#include "vec_b52110.hpp"
+#include "vec_b743c0.hpp"
+#include "vec_dc2d50.hpp"
+#include "vec_dc4180.hpp"
 #include "vec_dddc90.hpp"
 
 namespace sotc {
@@ -61,6 +65,10 @@ struct StartupState {
     VecDddc90 vec_dddc90{};   // idx 61
     VecDdab00 vec_ddab00{};   // idx 62
     VecDda990 vec_dda990{};   // idx 63
+    VecDc4180 vec_dc4180{};   // idx 68
+    VecDc2d50 vec_dc2d50{};   // idx 69
+    VecB743c0 vec_b743c0{};   // idx 282
+    VecB52110 vec_b52110{};   // idx 290
     std::array<std::byte, kScratchBytes> scratch{};
     std::atomic<std::uint64_t> scratch_slot{0};
     std::atomic<std::uint32_t> flag32{0};
