@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:14 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:17 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:14 CDT, /root — Ghidra body returned; raw verification pending
+## CURRENT CHECKPOINT — 2026-10-20 01:17 CDT, /root — audio byte pair verified; app-main raw verification pending
 
 ### RE-02-APPMAIN-25A8D0-01 — ACTIVE, private analysis underway
 
@@ -59,7 +59,15 @@ including vtable slot `0x15c8cf0`. Callee relationship coverage is PARTIAL. Thes
 observations until raw PT_LOAD/body/reference verification passes. The independent command
 `xcrun llvm-objdump -d --x86-asm-syntax=intel --start-address=0x25a8d0 --stop-address=0x25b200 "/Volumes/Extra/SoC Mac Native/local/re/eboot.elf"` exited `0`; its window is wider than the claimed body and does not itself establish the function end. Exact REA command, JSON, exit status, stderr and LLVM disassembly are preserved under `local/re/evidence/re02-appmain-25a8d0/`. Root's next action: independently rerun the worker's PT_LOAD/body/call/data/vtable verifier after it is written. No class contract or runtime reachability is inferred.
 
-### AUD-01-STS-BYTE-PROBE-01 — ACTIVE, private asset-byte analysis underway
+At 01:15, the app-main worker noted a raw-format mapping issue now included in its pending verifier:
+the function body maps to PT_LOAD #0, while incoming pointer words (including `0x15c8cf0`) fall
+outside PT_LOAD and inside file-backed program header #1 (`p_type=0x61000010`, `p_vaddr=0x1594000`,
+`p_offset=0x1598000`, `p_filesz=0x6d190`, `p_memsz=0x70000`). The ELF has no section-header table
+(`e_shnum=0`). Root has not yet checked these values against the raw ELF; PHDR1's meaning remains
+unclassified. Exact next action remains to review and independently run the worker's completed
+verifier, which must derive file offsets from unique program-header coverage.
+
+### AUD-01-STS-BYTE-PROBE-01 — ARTIFACT_VERIFIED, one pair only
 
 Parent AUD-01, prerequisites DATA-01 and `AUD-01-STS-IDENTITY-01`. The probe is limited to the
 paired asset `cp3shadow/sound/test_adpcm/b_info_01.sts_cp3`, read in memory from both verified
@@ -92,16 +100,18 @@ at `e51b60edc638ed056bdfcfe00073a6b2a9ea5bbd`, divergence `0 0`. Follow-up check
 post-push tree is clean and HEAD equals `origin/main` at
 `452b55ab9fb9365b6c6b25c1dc01323ff2c5b94f`, divergence `0 0`. Worker `/root/aud01_sts_byte_probe`
 (`gpt-6-luna`, Extra High) is dispatched for an in-memory pair probe; it will use Graft on the
-`Psarc.read()` source before verifying the live reader. At 01:11, root ran
-`shasum -a 256 local/validation/aud01-sts-identity-01.json local/extracted/CUSA08809/cachedFiles.psarc local/extracted/CUSA08809-patch/cachedfiles.psarc` (exit `0`) and checked
-`layers.base.archive.sha256` and `layers.patch.archive.sha256` from the identity JSON (exit `0`);
-both live archive hashes match the artifact. The task claim had a transcription error
-in the base hash (`...a6a05...`); the corrected digest is `...a66b05...`. Root saved command output
-to `local/validation/aud01-sts-base-digest-recheck-2026-10-20.log` and corrected the claim below.
-Commit `46e7b8d` (`docs: update active analysis handoff`) was pushed successfully; fetch and
-post-push status were clean/aligned at divergence `0 0`. Exact next action: receive the worker's
-private report/verifier and independently rerun checks. Root keeps shared-doc ownership. No game
-execution or audio playback. G1 NOT PASSED; both analyses remain ACTIVE with 0 failed hypotheses.
+`Psarc.read()` source before verifying the live reader. Root independently ran
+`python3 -I local/re/evidence/aud01-sts-byte-probe-01/verify.py > local/re/evidence/aud01-sts-byte-probe-01/root-verification.json 2> local/re/evidence/aud01-sts-byte-probe-01/root-verification.stderr.log`; exit `0`, stderr empty, and the root JSON SHA-256
+`5fae4da501c239e8583bd13effb7d4d5ca68df77932b2e65d819621eabff2471` matches the worker output
+byte-for-byte. It confirms the corrected base archive digest and patch identity, manifest locators,
+live member IDs/hashes, and byte comparison: 39 equal / 305 different aligned positions, 4-byte
+prefix, 2-byte suffix, 101 shifted exact spans of at least 4 bytes (longest 47 bytes). The report
+SHA is `76ba1c935ba33282c1a59a1a0ba6b434a8f6688623628c6672a5bf0908c1ebe3`; verifier SHA is
+`4deea41d8f63928ec049b61244667a279a1b4e857927d95eb8f6bb1ca1cfed2b`. Task
+`AUD-01-STS-BYTE-PROBE-01` is ARTIFACT_VERIFIED, with format/schema/codec/runtime/playback
+unclassified. Root added E55 and updated `docs/ASSETS.md` and `docs/TASKS.md`; no asset payloads
+were written or emitted. Exact next action: finish root verification of the independent app-main
+function dossier. No game execution or audio playback. G1 NOT PASSED.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 01:01 CDT, /root — two bounded analyses published
 

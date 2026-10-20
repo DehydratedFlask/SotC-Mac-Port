@@ -107,6 +107,17 @@ tables and per-member identifiers/hashes are private in
 the two worker logs. These are identity and byte observations only: the directory/extension names
 do not establish an ADPCM codec, schema, gameplay use, NGS2 behavior, or playback.
 
+One paired byte-layout probe (2026-10-20) examined only
+`cp3shadow/sound/test_adpcm/b_info_01.sts_cp3`, in memory through the live `Psarc.read()` API. The
+base member is 344 bytes; the patch member is 561 bytes. At equal absolute offsets, 39 positions
+match and 305 differ; the common prefix is 4 bytes and suffix is 2 bytes. An exhaustive maximal
+substring comparison found 101 exact spans of at least 4 bytes at shifted offsets; the longest is
+47 bytes at base `[228,275)` / patch `[382,429)`. The replayable report and root verification are
+private under `local/re/evidence/aud01-sts-byte-probe-01/`; see E55 and the
+[completion checkpoint](checkpoints/2026-10-20-root-aud01-sts-byte-probe-complete.md). These byte
+ranges do not establish record boundaries or a schema. Format and codec remain UNKNOWN; there is no
+NGS2, runtime-use, patch-precedence, or playback conclusion.
+
 Correction vs earlier note: pakN sound members do **not** all begin `8c0a`. zlib/xz probes on
 sampled heads do not yield meaningful payloads (trivial 1-byte inflate rejected). Next: recover
 the game's own reader (RE-02/Fios/ULT), not codec guessing.
