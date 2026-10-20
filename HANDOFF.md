@@ -1,20 +1,22 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 02:08 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 02:15 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 02:08 CDT, /root — system and rack paths verified; VoiceControl query running
+## CURRENT CHECKPOINT — 2026-10-20 02:15 CDT, /root — three call paths verified; two follow-up probes claimed
 
-Two bounded AUD-02 call paths are root-verified: `AUD-02-NGS2-SYSCREATE-01` for
-`sceNgs2SystemCreateWithAllocator` and `AUD-02-NGS2-RACKCREATE-01` for `sceNgs2RackCreate`.
-`AUD-02-NGS2-VOICE-CONTROL-01` for `sceNgs2VoiceControl` has one observed slot-reference address;
-REA function analysis at `0xf91460` is running and the caller path remains unresolved. Root is the
-sole shared-document integrator. Claims and boundaries:
+Three bounded AUD-02 import-to-call paths are root-verified:
+`AUD-02-NGS2-SYSCREATE-01` (`sceNgs2SystemCreateWithAllocator`),
+`AUD-02-NGS2-RACKCREATE-01` (`sceNgs2RackCreate`), and
+`AUD-02-NGS2-VOICE-CONTROL-01` (`sceNgs2VoiceControl`). Two independent static caller probes are
+claimed for `sceNgs2SystemRender` and `sceNgs2VoiceGetState`; dispatch follows publication of this
+claim. AUD-02 remains ACTIVE because parameter semantics, audio behavior, and runtime use are
+unclassified. Root is the sole shared-document integrator. Claims and boundaries:
 [checkpoint](docs/checkpoints/2026-10-20-root-aud02-ngs2-callsite-claims.md).
 
-The prior root-review checkpoint was committed as `357ed0c` (`docs: record NGS2 probe verification`)
-and pushed from `4e177f6`; staged/full publish audits passed 4/600 paths, and `origin/main` had no
-divergence.
+The prior system-create checkpoint was committed as `85fec59`
+(`docs: verify NGS2 system-create path`) and pushed from `357ed0c`; staged/full publish audits
+passed 4/600 paths, and `origin/main` had no divergence.
 
 Input identity: `local/re/eboot.elf` SHA-256
 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; import manifest
@@ -115,6 +117,55 @@ staged.
   files updated: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, and this checkpoint file.
   `INSTALL_LOG.md` unchanged. Exact next action: finish the in-flight VoiceControl function query
   at `0xf91460`; if it fails, it is the third unsuccessful targeted try and requires escalation.
+
+### VoiceControl root review — 2026-10-20 02:13 CDT, `/root`
+
+- Task: `AUD-02-NGS2-VOICE-CONTROL-01`; bounded status `STATIC_PATH_BYTE_VERIFIED`; failed provider
+  attempts remain 2 (the earlier MCP timeout and CLI configuration failure); failed analysis
+  hypotheses 0. Both later CLI queries and the root byte verifier succeeded.
+- The configured xref query for `0x1601020` exited 0 after 368,841 ms. It returned
+  `0xf91460` (Evidence ID `ev_6a01174bbe75c6fd1ee3aab2a3c6e3f9f05ff63a84cb77ee9d9d9423635ac22c`).
+  REA `function` at `0xf91460` exited 0 after 364,994 ms and reported 126 incoming references
+  across 22 caller functions; result JSON SHA-256
+  `9a0f4d55f19cf441dbedeb61eff6d45bf804dbb3da6d646fa075b548709861a6`, Evidence ID
+  `ev_87eece642729f1ee3dcea0bb20a8601d59b5ae3f6c0af3be617c37e6109bb3ac`. The exact function
+  command is preserved in `local/re/evidence/aud02-ngs2-voice-control-01/root-function-attempt1.command.txt`.
+- Root byte verifier `python3 -I
+  local/re/evidence/aud02-ngs2-voice-control-01/verify.py` exited 0 with
+  `STATIC_PATH_BYTE_VERIFIED`; SHA256SUMS verification passed 17/17 entries. Verifier SHA-256
+  `8dd9d5a6308247bc04628c3f24ef1d9e4120a078b8af3c705e414d7108f2e7de`, output SHA-256
+  `ca3a24f2795f2312062b946ca6d017d6d211dded2f65ec85ef68dd79e1db0e2e`; dossier report SHA-256
+  `cfcd998e0817970168054dacf4e0a36ca3514b369c09b04d209ac15e992f2a16`.
+- Byte-checked path: import slot `0x1601020`, symbol index 243 / NID `uu94irFOGpA`; thunk bytes at
+  `0xf91460` are `ff25bafb6600` and decode to the slot; caller `FUN_009485a0` has a direct call at
+  `0x9496d9`, bytes `e8827d6400`, decoding back to the thunk. Selected call-preparation range
+  `[0x9496ad,0x9496de)` is 49 bytes, SHA-256
+  `485a817c02f7641cb0062cce59e2dbb88b3832a6243b0cce5885025e0cb225b7`. The caller function
+  Evidence ID `ev_3c328e924109833a20ed5f3ccb54b5395b4aa0561ab1974c4e77ff97a457385f` is shared with
+  the system-create dossier; root verifier confirms this same call edge and exact ELF hash.
+- Limits: the thunk's raw instruction jumps through the slot, but the slot's runtime binding and
+  callee remain unknown. Ghidra labels the six-byte procedure `thunk_FUN_00f91466` and also emits a
+  computed-jump edge to adjacent address `0xf91466`; both observations are preserved. No argument
+  roles, ABI, NGS2 meaning, call reachability, runtime behavior, or audio output inferred.
+- Shared files updated: HANDOFF, TASKS, EVIDENCE, this checkpoint. Private dossier is under
+  `local/re/evidence/aud02-ngs2-voice-control-01/`. `INSTALL_LOG.md` unchanged. Next exact action:
+  dispatch the two newly claimed probes after this checkpoint is published.
+- `python3 scripts/project_index.py` exited 0 and reported 4,145 folders indexed; log
+  `local/checkpoints/2026-10-20-root-aud02-voice-project-index.log` SHA-256
+  `4455cc1f3a80e3d44a602e9447ed0f93c9b9aeece8300fc9c4d7fe367a25bff8`; generated
+  `docs/FOLDERS.md` has no content diff.
+
+### Follow-up import probe claims — 2026-10-20 02:13 CDT, `/root`
+
+- Tasks: `AUD-02-NGS2-SYSRENDER-01` claims one static path for `sceNgs2SystemRender`, symbol index
+  242, NID `i0VnXM-C9fc`, slot `0x1601018`; `AUD-02-NGS2-VOICE-GETSTATE-01` claims one static path
+  for `sceNgs2VoiceGetState`, symbol index 244, NID `-TOuuAQ-buE`, slot `0x1601028`.
+- Owners: `/root/aud02_sysrender` and `/root/aud02_voicestate`, to be dispatched after publication
+  on separate private evidence paths. Each must resolve slot → thunk → direct caller from the pinned
+  ELF, use the existing parser, preserve unresolved edges, and avoid ABI or runtime inference.
+- At claim time both tasks have 0 failed tries and no analysis started. No code, binaries, or game
+  data changed. Exact next action: dispatch both workers with `gpt-6-luna`, Extra High; root remains
+  the sole integrator. G1 remains NOT PASSED.
 
 ### Dispatch checkpoint — 2026-10-20 01:40 CDT, `/root`
 

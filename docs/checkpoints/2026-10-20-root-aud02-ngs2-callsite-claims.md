@@ -195,6 +195,55 @@ assignment. Publication: commit `3e5ecea` (`docs: record NGS2 probe assignments`
   action: complete the in-flight VoiceControl function query at `0xf91460`; a failure would be its
   third unsuccessful targeted try and would require escalation.
 
+## VoiceControl root review — 2026-10-20 02:13 CDT, `/root`
+
+- Task: `AUD-02-NGS2-VOICE-CONTROL-01`; bounded status `STATIC_PATH_BYTE_VERIFIED`. Failed provider
+  attempts remain 2 (MCP timeout and missing CLI `GHIDRA_INSTALL_DIR`); failed analysis hypotheses
+  0. Both later CLI queries and root byte verification succeeded.
+- REA slot-xref query at `0x1601020` exited 0 after 368,841 ms and returned `0xf91460`; Evidence ID
+  `ev_6a01174bbe75c6fd1ee3aab2a3c6e3f9f05ff63a84cb77ee9d9d9423635ac22c`; JSON SHA-256
+  `1e92beb96166045a5400d31b8c26bf3fe0c9023f988fb87b5c7fb27e493857a7`. The subsequent REA
+  `function` analysis of `0xf91460` exited 0 after 364,994 ms; Evidence ID
+  `ev_87eece642729f1ee3dcea0bb20a8601d59b5ae3f6c0af3be617c37e6109bb3ac`; JSON SHA-256
+  `9a0f4d55f19cf441dbedeb61eff6d45bf804dbb3da6d646fa075b548709861a6`; stderr empty. The thunk
+  query reports 126 incoming references over 22 caller functions. Its Ghidra entry classification
+  is `thunk_FUN_00f91466`, with an adjacent computed-jump edge; a separate indirection edge targets
+  slot `0x1601020`.
+- Exact byte verifier `python3 -I
+  local/re/evidence/aud02-ngs2-voice-control-01/verify.py` exited 0 with
+  `STATIC_PATH_BYTE_VERIFIED`; output SHA-256
+  `ca3a24f2795f2312062b946ca6d017d6d211dded2f65ec85ef68dd79e1db0e2e`; stderr empty. The 17-file
+  dossier manifest check exited 0; root checksum log SHA-256
+  `7d578b54f337ec33aedb72d91691a4e56d11966431790b7d0d97fd5e6dd0277e`. Report SHA-256
+  `cfcd998e0817970168054dacf4e0a36ca3514b369c09b04d209ac15e992f2a16`; verifier SHA-256
+  `8dd9d5a6308247bc04628c3f24ef1d9e4120a078b8af3c705e414d7108f2e7de`.
+- Observation: manifest symbol index 243 / NID `uu94irFOGpA` maps through `R_X86_64_JUMP_SLOT`
+  `0x1601020`; thunk bytes `ff25bafb6600` at `0xf91460` decode to that slot. A direct call at
+  `0x9496d9` in `FUN_009485a0` has bytes `e8827d6400` and decodes to the thunk. The 49-byte
+  pre-call range `[0x9496ad,0x9496de)` hashes to
+  `485a817c02f7641cb0062cce59e2dbb88b3832a6243b0cce5885025e0cb225b7`. Its visible register and
+  stack writes are recorded in the private report without assigning argument roles.
+- Limits: runtime binding/callee and call reachability unknown; the adjacent computed-jump edge is
+  inconsistent with the six raw thunk bytes and remains documented as a Ghidra boundary issue. No
+  ABI, NGS2 semantics, or runtime behavior inferred. No game execution.
+- Files changed: private report, recipe, verifier and result files under
+  `local/re/evidence/aud02-ngs2-voice-control-01/`, plus HANDOFF, TASKS, EVIDENCE and this
+  checkpoint. `INSTALL_LOG.md` unchanged. The previous system-create publication was commit
+  `85fec59` (`docs: verify NGS2 system-create path`), pushed from `357ed0c`.
+- After creating the private report/checker files, `python3 scripts/project_index.py` exited 0 and
+  reported 4,145 folders indexed. Log SHA-256
+  `4455cc1f3a80e3d44a602e9447ed0f93c9b9aeece8300fc9c4d7fe367a25bff8`; `docs/FOLDERS.md` content
+  is unchanged.
+
+## Follow-up callpath claims — 2026-10-20 02:13 CDT, `/root`
+
+- Claimed `AUD-02-NGS2-SYSRENDER-01` for symbol index 242 / NID `i0VnXM-C9fc` / slot `0x1601018`,
+  and `AUD-02-NGS2-VOICE-GETSTATE-01` for symbol index 244 / NID `-TOuuAQ-buE` / slot `0x1601028`.
+- Planned owners `/root/aud02_sysrender` and `/root/aud02_voicestate`; separate private evidence
+  directories. Both tasks have zero failed tries and no analysis started.
+- Next exact action after this claim is published: dispatch both with `gpt-6-luna`, Extra High.
+  Root retains integration and publication ownership. No source, executable, or game files changed.
+
 ## Packet boundaries
 
 Each packet must report the exact imported symbol/NID and relocation slot, how the caller was
