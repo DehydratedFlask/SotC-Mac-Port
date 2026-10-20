@@ -110,6 +110,15 @@ class Tests(unittest.TestCase):
         with self.assertRaisesRegex(psarc.PsarcError, '^truncated block$'):
             self.open(build([('a', b'A' * 64)])[:-1]).read(1)
 
+    def test_corrupt_zlib_block_rejected(self):
+        def corrupt_last_block(data):
+            data = bytearray(data)
+            data[-1] ^= 0xFF                      # last byte = adler32 tail of final zlib block
+            return bytes(data)
+        a = self.open(build([('a', b'A' * 64)], tamper=corrupt_last_block))
+        with self.assertRaisesRegex(psarc.PsarcError, '^block 4 has corrupt zlib data$'):
+            a.read(1)
+
     def test_sha256_file_reads_multiple_bounded_chunks(self):
         data = bytes(range(251))
         with tempfile.TemporaryDirectory() as tmp:

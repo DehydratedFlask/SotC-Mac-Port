@@ -248,7 +248,13 @@ class Psarc:
                 if len(raw) != csize:
                     raise PsarcError('truncated block')
                 # PSARC rule: a block whose stored size equals its decoded size is raw
-                chunk = raw if csize == full else zlib.decompress(raw)
+                if csize == full:
+                    chunk = raw
+                else:
+                    try:
+                        chunk = zlib.decompress(raw)
+                    except zlib.error:
+                        raise PsarcError(f'block {blk} has corrupt zlib data') from None
                 pos += csize
             if len(chunk) != full:
                 raise PsarcError(f'block {blk} decoded to {len(chunk)} bytes, expected {full}')
