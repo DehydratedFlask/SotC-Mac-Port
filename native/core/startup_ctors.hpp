@@ -22,6 +22,8 @@
 #include "vec_e05320.hpp"
 #include "vec_e026b0.hpp"
 #include "vec_de1ad0.hpp"
+#include "vec_ddef00.hpp"
+#include "vec_de7fb0.hpp"
 #include "vec_de6d20.hpp"
 #include "vec_dfd5f0.hpp"
 
@@ -49,8 +51,10 @@ struct StartupState {
     VecE05320 vec_e05320{};   // idx 52
     VecE026b0 vec_e026b0{};   // idx 53
     VecDfd5f0 vec_dfd5f0{};   // idx 54
+    VecDe7fb0 vec_de7fb0{};   // idx 56
     VecDe6d20 vec_de6d20{};   // idx 57
     VecDe1ad0 vec_de1ad0{};   // idx 58
+    VecDdef00 vec_ddef00{};   // idx 60
     std::array<std::byte, kScratchBytes> scratch{};
     std::atomic<std::uint64_t> scratch_slot{0};
     std::atomic<std::uint32_t> flag32{0};
