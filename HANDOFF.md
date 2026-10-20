@@ -1,7 +1,22 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:17 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:13 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:13 CDT, worker bc-effcf5dc (CPU-01d) — 0xddab00 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xddab00** (survey index 62).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_ddab00.{hpp,cpp}`, `native/tests/test_vec_ddab00.cpp`,
+`tools/lift/check_fddab00.py`, `native/CMakeLists.txt` (+vec_ddab00 only; origin/main base).
+Private dump (not published): `local/re/work/cddab00.bin`.
+Did NOT edit: `startup_ctors.*`, SRV `host_map`, peer `0xdddc90` WIP.
+Checkpoint (2026-10-19 20:13 CDT, bc-effcf5dc):
+- OBS: unguarded vmovups copy; src=0x130f090 dst=0x3352eb0 bits=~0,~0,~0,0; index 62; distinct cells.
+- Commands: ctest -R '^vec_ddab00$' Passed; `python3 -I tools/lift/check_fddab00.py` OK.
+- Logs: `/tmp/ctest_ddab00.log`, `/tmp/check_ddab00.log`.
+- Prior: `0xde7fb0` pushed `d0afd8c`. Store: `internal/worker-claim-ddab00.md`.
+- Push: (pending this commit).
 
 ## ACTIVE CLAIM — 2026-10-19 20:17 CDT, worker bc-02397584 (CPU-01d) — 0xddab00 — IN PROGRESS
 
@@ -37,7 +52,7 @@ Checkpoint (2026-10-19 20:12 CDT, bc-effcf5dc):
 - Commands: ctest -R '^vec_de7fb0$' Passed; `python3 -I tools/lift/check_fde7fb0.py` OK.
 - Logs: `/tmp/ctest_de7fb0.log`, `/tmp/check_de7fb0.log`.
 - Store: Project `internal/worker-claim-de7fb0.md`.
-- Push: (pending this commit).
+- Push: `d0afd8c` on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 20:15 CDT, worker bc-73721c8d (CPU-01d) — 0xdddc90 — COMPLETE
 
