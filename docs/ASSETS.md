@@ -95,6 +95,18 @@ reporting the XFF magic, opaque bytes 4..19 and the u32le@0x14 decoded-length ma
 acceptance logs are in `local/validation/20261019-2315-root-aud01-xff-verification/`. This is
 fixture and offline asset evidence only; it does not establish runtime decoding or playback.
 
+Private `.sts_cp3` identity comparison (2026-10-19):
+`local/validation/aud01-sts-identity-01.py` re-reads all 290 exact paths from each base/patch
+`cachedFiles` layer through `Psarc.read()`, checking archive summary identity and member ID/path/
+offset/first-block/decoded-size locators against the private manifests. The path sets match exactly;
+all 290 decoded SHA-256 hashes differ and 285 sizes change (5 sizes match). Base/patch decoded
+totals are 242,310 / 241,080 bytes; each layer ranges from 0–3,060 bytes. The full size-frequency
+tables and per-member identifiers/hashes are private in
+`local/validation/aud01-sts-identity-01.json` (SHA-256
+`566275c3c104dfc473f8cb3c227641a16b10e2b0da7ffb2811e22b00f877e654`). Root's repeat log matched
+the two worker logs. These are identity and byte observations only: the directory/extension names
+do not establish an ADPCM codec, schema, gameplay use, NGS2 behavior, or playback.
+
 Correction vs earlier note: pakN sound members do **not** all begin `8c0a`. zlib/xz probes on
 sampled heads do not yield meaningful payloads (trivial 1-byte inflate rejected). Next: recover
 the game's own reader (RE-02/Fios/ULT), not codec guessing.
