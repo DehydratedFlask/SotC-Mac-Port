@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:15 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:16 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:15 CDT, /root — page-map dossier root-verified; launcher import fix pushed
+## CURRENT CHECKPOINT — 2026-10-20 00:16 CDT, /root — page-map dossier root-verified and published; launcher import fix pushed
 
 Task APP-01-IMPORTER-ERROR-01: `launcher/Sources/SoCLauncher/ContentView.swift` now presents the
 localized error in a system alert for import failures and leaves the prior folder/readiness intact;
@@ -53,6 +53,11 @@ the existing task checkpoint; `local/re/evidence/rea-19660/` is private. No inst
 INSTALL_LOG unchanged. Next exact action: choose a new bounded SRV/CPU task only from source/data
 evidence; page-map and Fios semantics remain open and SRV-01 stays ACTIVE.
 
+Publication: staged audit `python3 -I scripts/audit_publish_paths.py` accepted 4 paths; full audit
+`python3 -I scripts/audit_publish_paths.py --all` accepted 581. `git fetch origin main` and staged
+whitespace check passed; pre-commit divergence was `0 0`. Commit `5d3d262` pushed successfully
+(`f48e512..5d3d262 main -> main`). No private REA or root-verifier outputs were staged.
+
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
 archive, manifest, test logs and build outputs stay under ignored `local/`.
@@ -68,8 +73,9 @@ A read-only AUD-01 survey verified exact identities and bytes for paired test_ad
 APP-01 static UI/accessibility review is recorded, and folder-import failure feedback now builds.
 Runtime constructor
 behavior, helper contracts, audio format/use, game startup, and G1 remain unproven. Recent commits:
-`f48e512` (publication checkpoint), `5c2e093` (launcher importer feedback), and `19cd2a2` (STS
-completion); prior evidence commits include `bda7289`, `545f08f`, `b26768a`, `fc1b278`, and `e40a2a4`.
+`5d3d262` (page-map dossier), `f48e512` (launcher publication checkpoint), `5c2e093` (launcher
+importer feedback), and `19cd2a2` (STS completion); prior evidence commits include `bda7289`,
+`545f08f`, `b26768a`, `fc1b278`, and `e40a2a4`.
 
 ### AUD-01-STS-IDENTITY-01 — paired cachedFiles test_adpcm identity survey — FIXTURE VERIFIED; parent active
 
