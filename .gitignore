@@ -1,0 +1,81 @@
+# === Public publish deny-list (SotC-Mac-Port) ===
+# Never stage game/Sony content, private analysis, or third-party checkouts.
+# Agents: run `python3 -I scripts/audit_publish_paths.py` before every push.
+
+# Original user game inputs (PKGs, metadata, images) — private, read-only.
+/Shadow of the Colossus/
+**/Shadow of the Colossus/
+*.pkg
+*.PKG
+*.psarc
+*.PSARC
+eboot.bin
+EBOOT.BIN
+**/eboot.bin
+boot.bin
+boot-linked.bin
+*.self
+*.SELF
+*.sprx
+*.SPRX
+libSce*.sprx
+libSce*.SPRX
+
+# Private extracted assets, builds, RE dumps, manifests tied to the title.
+/local/
+**/local/
+*.elf
+*.ELF
+*.bin
+*.BIN
+
+# Upstream emulator/game reference checkouts — separate Git identities.
+/reference/
+
+# Command/install/build logs and caches.
+/logs/
+.DS_Store
+**/.DS_Store
+__pycache__/
+*.pyc
+*.pyo
+.Python
+*.o
+*.a
+*.dylib
+*.so
+*.dSYM/
+build/
+DerivedData/
+.swiftpm/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# Graft graph cache — regenerable (`graft build`); large generated noise.
+/graft/
+/.graft/
+
+# Accidental RE scratch at workspace root.
+/*.s
+/*.o
+/*.i64
+/*.idb
+/*.gpk
+/*.rep
+
+# Secrets / credentials / agent stores (never publish).
+.env
+.env.*
+*.pem
+*.key
+*credentials*
+*secret*
+AgentStores/
+.cursor/
+**/cursor_agent_stores/
+
+# Editor / OS noise.
+.idea/
+.vscode/
+*.swp
+*~

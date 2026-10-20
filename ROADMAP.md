@@ -1,0 +1,111 @@
+# Shadow of the Colossus — native Apple Silicon / Metal roadmap
+
+Baseline: 2026-10-19, MacBook Pro M4 Pro (12 CPU cores, 48 GB), macOS 27.0.1,
+Xcode 27.1 (27A9275). This deliverable is an evidence-backed implementation plan, not a
+completed port. The game has not yet been booted on this Mac.
+
+## What success means
+
+A SwiftUI/AppKit launcher starts an ARM64 Mach-O game core. The core renders through Metal,
+plays the actual game's music/dialogue/effects, accepts input, and saves/reloads meaningful
+progress after process exit. It uses the locally owned game's assets but never loads its
+original executable or Sony executable modules. No guest CPU, PS4 GPU execution environment,
+Rosetta, Wine, JIT/interpreter, Unicorn, QEMU, or Vulkan/MoltenVK runtime is accepted.
+
+The user explicitly approved offline analysis of local eboot.bin and requested documentation
+and indexing for every project folder. Keep these constraints across all agents and sessions.
+
+## The critical finding
+
+The [SoTC reference](https://github.com/AjncSystem/ShadowOfTheColossus-PC) and
+[Bloodborne reference](https://github.com/Supermedo/bloodborne_pc) directly execute PS4 x86-64
+machine code on an x86 PC and translate graphics into Vulkan. Their architecture does not
+supply native ARM64 game logic. The SoTC fallback NGS2 implementation renders zeros. A
+Metal backend or Swift launcher alone cannot produce the requested game.
+
+This requires recovering/recompiling game and used middleware semantics into ordinary native
+functions, replacing platform services and audio processing, and building a native rendering
+boundary. There is no demonstrated automated full-game conversion pipeline here. Treat CPU
+recovery, used NGS2 behavior, and graphics wave semantics as feasibility gates, not chores
+with assumed solutions. Exact pinned-source evidence is in [REFERENCE_AUDIT](docs/REFERENCE_AUDIT.md).
+
+## Read by role
+
+| Need | Document |
+|---|---|
+| Resume work safely | [HANDOFF](HANDOFF.md), [AGENTS](AGENTS.md) |
+| Ordered, assignable task cards | [TASKS](docs/TASKS.md) |
+| Package extraction / executable identity | [EXTRACTION](docs/EXTRACTION.md) |
+| Ghidra recovery method, manifests and boot graph | [REVERSE_ENGINEERING](docs/REVERSE_ENGINEERING.md) |
+| ARM64, Metal, audio, saving, Swift design | [PLATFORM](docs/PLATFORM.md) |
+| Pass/fail acceptance gates | [VALIDATION](docs/VALIDATION.md) |
+| Current evidence and explicit unknowns | [EVIDENCE](docs/EVIDENCE.md) |
+| Navigation, source pins, folder ownership | [INDEX](docs/INDEX.md), [FOLDERS](docs/FOLDERS.md) |
+| Every dependency/download/build | [INSTALL_LOG](INSTALL_LOG.md) |
+
+## Milestones in dependency order
+
+| Milestone | Required deliverable | Exit gate | Parallel work allowed |
+|---|---|---|---|
+| M0: reproducible inputs | Base/update/DLC inventory; plaintext ELF identity; repeatable extraction and REA evidence | G0 | Environment/tool docs |
+| M1: native-code feasibility | Recovered startup slice with native calls/data, relocations and required service contracts; no original CPU execution | G1 | Asset/audio format inventory, Swift shell, Metal fixtures |
+| M2: working native foundations | Job/TLS/fiber semantics, checked pointer schemas, assets, save transactions, decoded/mixed audio fixtures | G2 | Independent services, decoding, render fixtures |
+| M3: native graphics slice | Offline material/shader manifests; direct Metal frame from a real recovered scene path; validated resource ordering | G3 | Launcher, audio event integration |
+| M4: native launcher | Finder-launchable Swift UI with actual core lifecycle and honest readiness/error states | G4 | Input and packaging checks |
+| M5: actual game vertical slice | Original title/menu to controllable world; authentic audio events; save, quit, reopen, load | G5 | Scene coverage after shared semantics stabilized |
+| M6: completion / performance | Gameplay coverage, all required effects/codecs/saves, robust restart; signed staging audit and measured optimization | G6 | Profile-driven optimizations |
+
+Gates are defined in [VALIDATION](docs/VALIDATION.md). A synthetic fixture passing does not
+promote a real-game gate. Every milestone retains separate implemented / build / fixture /
+real-game evidence. No frame-rate or completion-date promise is justified at this stage.
+
+## First executable work sequence
+
+1. Finish extraction and record hashes, file counts, base/update SFO identities, archive index,
+   and module list. Base and update stay separate. Never assume updating means replacing eboot.
+2. Reconstruct the plaintext SELF with the pinned `prepare.py` reader, retain missing-segment
+   declarations, and analyze the unchanged reconstructed ELF using REA's Ghidra provider.
+3. Export REA evidence and a reproducible persistent Ghidra recipe. Recover the entry and
+   initialization chain, dynamic imports/relocations, native call targets, vtables, TLS and
+   global state. Produce function and unresolved-edge manifests.
+4. Prove one small nontrivial native recovered function, then a startup call chain. Match its
+   behavior against independent input/output fixtures and exact binary semantics. Do not
+   start a wholesale pseudocode rewrite before this feasibility experiment works.
+5. Implement only services reached by that chain. In parallel, identify PSARC asset readers,
+   used audio banks/codecs, save serializer entry points and shaders/materials.
+6. Extend to actual scene initialization and one frame, then native input/update, game-driven
+   audio, save/relaunch/load. Maintain explicit coverage for every missing subsystem.
+
+## Bloodborne lessons to use carefully
+
+Study its command preparation, pipeline caches, batching, readback precision and A/B profiling.
+SoTC's own notes record black boot, stale state/device loss and hangs when particular
+Bloodborne synchronization changes were copied. Preserve a correct SoTC baseline, then
+change one measured variable. Existing PC FPS reports use different hardware/scenes and are
+not evidence of Mac performance. Do not copy an x86 loader, Windows UI, Vulkan dependency,
+or unwanted network subsystem into the native target.
+
+## Public remote (durable)
+
+- **GitHub repository:** https://github.com/DehydratedFlask/SotC-Mac-Port
+- Display name: SotC Mac Port. This remote holds the Mac native port + launcher + port docs/tooling only.
+- Users must supply their own legally obtained game files. No Sony assets ship in the repo.
+- At **every** HANDOFF checkpoint / completed task claim: commit allowlisted changes with a clear
+  message and `git push origin main` (default branch). Never force-push; rebase/pull if peers pushed.
+- Never stage forbidden paths (`Shadow of the Colossus/`, `local/`, `reference/`, `logs/`, game
+  PKG/PSARC/eboot/SELF/ELF dumps, secrets). Before push: `git status`, then
+  `python3 -I scripts/audit_publish_paths.py` on the staged set and `--all` on tracked files.
+- See `.gitignore` and [AGENTS](AGENTS.md) for the full allow/deny lists.
+
+## Agent execution contract
+
+Use one task card with a bounded output, prerequisites, owned files and acceptance check.
+Update [HANDOFF](HANDOFF.md) at every checkpoint, including failed experiments and exit.
+Record distinct failed tries across agents. At three failures mark `NEEDS_PRINCIPAL`, attach
+the [escalation template](docs/escalations/TEMPLATE.md), stop that task, and return it to the
+principal. Do not relax the target, fabricate successful imports, or substitute silence.
+
+Shared documents have one integrator. Workers provide evidence and checkpoint records; the
+integrator merges them before the worker exits. Refresh folder indexes and Graft, retain
+source pins, and leave exact next commands so the next agent can resume without chat history.
+After each checkpoint merge, push allowlisted tree changes to the public remote above.
