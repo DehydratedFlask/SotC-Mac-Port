@@ -1,13 +1,13 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:34 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:35 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:34 CDT, `/root` — dynamic string terminator fixture claimed
+## CURRENT CHECKPOINT — 2026-10-20 05:35 CDT, `/root` — dynamic string terminator fixture claim published
 
-`RE-02-DYNLINK-STRING-TERMINATOR-01` is claimed by root; the planned worker
-`/root/re02_dynlink_terminator` may edit only `scripts/test_ps4_dynlink.py` after the claim is
-published. Root owns shared records and Git. Parent `RE-02-DYNLINK-01` is `FIXTURE_VERIFIED` and
+`RE-02-DYNLINK-STRING-TERMINATOR-01` is claimed by root; `/root/re02_dynlink_terminator` will edit
+only `scripts/test_ps4_dynlink.py` after dispatch. Root owns shared records and Git. Parent
+`RE-02-DYNLINK-01` is `FIXTURE_VERIFIED` and
 the new test task was not previously registered. The one test will mutate only the synthetic
 fixture's `DT_SCE_STRSZ`, shortening it to omit the final symbol-name NUL, and assert that
 `d.parse()` rejects the unterminated name with `ValueError`. Production parser changes are out of
@@ -40,8 +40,12 @@ SHA-256 `a6d103c4f38a1a76d799927468b7a36dd3f7127d0ad9ec3af911a247f185561b`); ful
 `local/checkpoints/root-2026-10-20-re02-dynlink-string-terminator-claim-publish-audit-all.log`,
 SHA-256 `6f16ef84096320705be9e98fe44da6581008ae232ae87ca4549f5e9bb431d739`). `git diff --cached
 --check` exited 0 (empty log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). `git fetch
-origin` exited 0 with divergence 0/0 at `ddd8585`. Next exact action: commit and push this claim,
-then dispatch the test-only worker.
+origin` exited 0 with divergence 0/0 at `ddd8585`. Claim commit `f8de17e` (`docs: claim dynamic
+string terminator fixture`) was pushed (exit 0); post-push fetch confirmed `HEAD` and `origin/main`
+at `f8de17e` with 0/0 divergence (empty log
+`local/checkpoints/root-2026-10-20-re02-dynlink-string-terminator-claim-post-push-fetch.log`, SHA-256
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). Next exact action:
+dispatch the test-only worker.
 
 ## PRIOR CHECKPOINT — 2026-10-20 05:32 CDT, `/root` — short-prefix audio classifier fixture published
 
