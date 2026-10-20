@@ -1,7 +1,22 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:38 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:25 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:25 CDT, worker bc-81763e53 (CPU-01d) — 0xd853a0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd853a0** (survey index 83).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d853a0.{hpp,cpp}`, `native/tests/test_vec_d853a0.cpp`,
+`tools/lift/check_fd853a0.py`, `native/CMakeLists.txt` (+vec_d853a0 only; origin/main base).
+Private dump (not published): `local/re/work/cd853a0.bin`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV, peer `0xdac410`/`0xd85490`.
+Checkpoint (2026-10-19 20:25 CDT, bc-81763e53):
+- OBS: unguarded vmovups copy; src=0x130a720 dst=0x3352a80 bits=~0,~0,~0,0; index 83; distinct cells.
+- Commands: ctest -R '^vec_d853a0$' Passed; `python3 -I tools/lift/check_fd853a0.py` OK.
+- Logs: `/tmp/ctest_d853a0.log`, `/tmp/check_d853a0.log`.
+- Store: Project `internal/worker-claim-d853a0.md`.
+- Push: (pending this commit).
 
 ## ACTIVE CLAIM — 2026-10-19 20:55 CDT, worker bc-201701f2 (Drive / CPU-01e) — 0xd85490 + registry 78/79/82 — COMPLETE
 
