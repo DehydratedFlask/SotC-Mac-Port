@@ -1,49 +1,53 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 02:32 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 02:48 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 02:32 CDT, /root — three call paths verified; three follow-up probes active
+## CURRENT CHECKPOINT — 2026-10-20 02:48 CDT, /root — three additional NGS2 call paths root-replayed
 
-Three bounded AUD-02 import-to-call paths are root-verified:
+Six bounded AUD-02 import-to-call paths are root-verified:
 `AUD-02-NGS2-SYSCREATE-01` (`sceNgs2SystemCreateWithAllocator`),
-`AUD-02-NGS2-RACKCREATE-01` (`sceNgs2RackCreate`), and
-`AUD-02-NGS2-VOICE-CONTROL-01` (`sceNgs2VoiceControl`). Two independent static caller probes are
-claimed for `sceNgs2SystemRender` and `sceNgs2VoiceGetState`; all three follow-up probes are now
-active. All three slot-xref queries succeeded and returned worker-reported thunk candidates:
-SystemRender `0xf91450`, VoiceGetState `0xf91470`, SystemDestroy `0xf91440`. The SystemRender raw
-byte scan also proposes a caller instruction at `0x95383c` (`e80fdc6300`), pending root replay.
-No new caller edges are accepted yet. SystemRender's thunk xrefs returned the same candidate as the
-raw scan and function attribution remains outstanding; VoiceGetState's thunk query reports caller
-function `FUN_0094a200` and call candidate `0x94a27d`; SystemDestroy's thunk query and all three root
-replays remain outstanding.
-The SystemDestroy claim was pushed in `19e2a43`; dispatch details are in the linked checkpoint.
-AUD-02 remains ACTIVE
-because parameter semantics, audio behavior, and runtime use are unclassified. Root is the sole
-shared-document integrator. Claims and boundaries:
+`AUD-02-NGS2-RACKCREATE-01` (`sceNgs2RackCreate`),
+`AUD-02-NGS2-VOICE-CONTROL-01` (`sceNgs2VoiceControl`), and
+`AUD-02-NGS2-SYSRENDER-01` (`sceNgs2SystemRender`),
+`AUD-02-NGS2-VOICE-GETSTATE-01` (`sceNgs2VoiceGetState`), and
+`AUD-02-NGS2-SYSDESTROY-01` (`sceNgs2SystemDestroy`). All three new dossiers passed root checksum
+and verifier replay against the pinned ELF. SystemRender verifies slot `0x1601018` → thunk
+`0xf91450` → call `0x95383c` in `FUN_009536d0`; Ghidra reports partial callee coverage, including
+six omitted or unresolved call targets. VoiceGetState verifies slot `0x1601028` → thunk
+`0xf91470` → call `0x94a27d` in `FUN_0094a200`; the second Ghidra edge at `0x94a440` was not
+byte-checked, and Ghidra's adjacent-boundary label at `0xf91476` differs from the byte-verified
+target. SystemDestroy verifies slot `0x1601010` → thunk `0xf91440` → call `0x9489d2` in
+`FUN_009485a0`; secondary caller `0x94a055` remains untraced and the thunk's adjacent computed
+jump/indirection observations remain unresolved. Each task has zero failed targeted tries.
+AUD-02 remains ACTIVE: the six call paths establish no command/parameter semantics, runtime
+binding, reachability, actual audio behavior, or use. Root is the sole shared-document integrator.
+Evidence and claims:
 [NGS2 callsite checkpoint](docs/checkpoints/2026-10-20-root-aud02-ngs2-callsite-claims.md) and
-[SystemDestroy claim](docs/checkpoints/2026-10-20-root-aud02-system-destroy-claim.md).
+[SystemDestroy claim](docs/checkpoints/2026-10-20-root-aud02-system-destroy-claim.md),
+[SystemRender root replay](docs/checkpoints/2026-10-20-root-aud02-sysrender-complete.md),
+[VoiceGetState root replay](docs/checkpoints/2026-10-20-root-aud02-voice-getstate-complete.md), and
+[SystemDestroy root replay](docs/checkpoints/2026-10-20-root-aud02-system-destroy-complete.md).
 
-Claim-preparation checks: the pinned ELF and import manifest hashes were rechecked; the exact
-`sceNgs2SystemDestroy` manifest tuple was found with the expected slot and one relocation site.
-`python3 scripts/project_index.py` exited 0 (4,147 folders), `graft check` passed wiring freshness
-(deep layer unbuilt, 1,225 nodes pending), and `git diff --check` passed. The claim was published
-as `19e2a43`, then dispatched to `/root/aud02_sysdestroy`; audit and publication evidence is in
-the linked claim checkpoint. The pre-existing untracked `tools/graft/` cache remains unstaged.
+Root check logs and command corrections are private under each task's `local/re/evidence/*-root-*`
+files. The source hashes match ELF `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`
+and import manifest `78caaaae139b7c5d4d2618abab2e50e9f6918ea3cec73a90b81e0005c83b6744`. Root's
+first SystemRender checksum replay used repository-root CWD and was corrected to the dossier
+directory. A VoiceGetState verifier call initially omitted required arguments and was rerun with
+the exact ELF, manifest, thunk, callsite, and range. A SystemDestroy redirection command omitted
+shell quoting around a path with spaces and wrote a verifier JSON to `/Volumes/Extra/SoC`; its
+hash matched the expected output, the generated file was removed, and the verifier was rerun to
+the intended root log paths. These were bookkeeping/setup errors, not failed analysis or provider
+tries. Current `python3 scripts/project_index.py` and `graft check` results are in the new root
+checkpoints; `tools/graft/` remains unstaged.
 
-Interim worker checkpoints: `sceNgs2SystemRender` slot-xref result is EID
-`ev_90786a1998b746a670a1e01d847201edaddc9751c589406f0126cfb6edd7c421`, JSON SHA-256
-`e9883e93780635a6e221a60ee7cd77630378a6f5f1f504f1bf2881073fedc4fc`; raw byte scan proposes
-call `0x95383c` to the thunk, with incoming thunk refs still running. `sceNgs2VoiceGetState`
-slot-xref result is EID
-`ev_d97708e1afeaa1bfd6ffb28334a35ce08d4c195d9f0947fddb5769210cdac4a1`, output SHA-256
-`3e96d3476b6af8d68d560802d4a567ce23ed17a7e13beb58a9d4a05bf422de15`; `sceNgs2SystemDestroy`
-slot-xref result is EID `ev_37ba3af33cc684de727dfb407d145e99b12d646a8d3f3fe219a31b2c07fbd6d1`,
-output SHA-256 `6da0467ea24486330ac90799353446bd816c6a7198aa52927e1a1098002fe49b`. Both response
-the SystemRender/VoiceGetState xrefs output omit reference kind, so address lists alone do not
-establish call edges. VoiceGetState's thunk-function result is now available but needs caller bytes.
-The static observations and exact next actions are captured in their respective checkpoints; all
-three root replays remain pending.
+Next exact action: inspect the eleven-entry NGS2 import set and Stage 3 requirements, choose two
+unclaimed bounded static callpath probes, claim them in shared docs, then dispatch separate
+`gpt-6-luna`, Extra High workers. No command contract or audio behavior will be inferred from the
+static paths. Pre-publication checks for this checkpoint passed: project index 4,148 folders /
+48 checkpoint files; Graft wiring check passed (deep layer remains unbuilt, 1,225 nodes pending);
+staged path audit accepted seven allowlisted documentation paths, full path audit accepted 604
+tracked paths, cached diff check passed, and `origin/main` divergence was 0/0.
 
 The prior system-create checkpoint was committed as `85fec59`
 (`docs: verify NGS2 system-create path`) and pushed from `357ed0c`; staged/full publish audits
