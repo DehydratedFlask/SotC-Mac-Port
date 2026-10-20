@@ -48,13 +48,58 @@ The live command must report the manifest-matched archive/member identities and 
 structure only. A parser/fixture pass does not establish NGS2 semantics, codec, gameplay use, or
 playback.
 
+## Cross-check checkpoint — XFF length field observed
+
+- Date/time: 2026-10-19 23:12 CDT; agent `/root/audio_asset_survey`; task AUD-01-XFF-01.
+- Private files: `local/validation/20261019-231219-audio-bank-header-crosscheck/pair_crosscheck.py`,
+  `pair_crosscheck.command.txt`, and `pair_crosscheck.log`. No public implementation source had
+  changed at this checkpoint.
+- Exact command: `PYTHONDONTWRITEBYTECODE=1 python3 -I local/validation/20261019-231219-audio-bank-header-crosscheck/pair_crosscheck.py`;
+  exit 0. Invocation and output are preserved in the run directory.
+- Observation: 25 pair groups / 50 live decoded members matched manifest paths, entry locators and
+  hashes. Of 22 XFF pairs, the u32 little-endian word at offset `0x14` equals decoded size in
+  44/44 members, with zero mismatches. First-16-byte prefixes have two observed variants; bytes
+  4..19 remain opaque. An exploratory invocation first had a Python one-line syntax typo; this
+  corrected reproducible command passed and was not a failed implementation hypothesis.
+- Remaining risk: only XFF magic and the repeated length relation are identified. Codec and other
+  field meanings remain unknown; no NGS2, gameplay or playback claim follows.
+- Next exact action: implement and test a parser using only the XFF magic and verified length word,
+  then run the claimed live pair check. Task ACTIVE; implementation attempts remain 0.
+
 ## Status
 
-ACTIVE, implementation try count 0. Remaining uncertainties: whether the pair contains a validated
-header/data index relation beyond its common prefix; exact format, codec, and use are unknown.
-Next exact action: implementation owner cross-checks the pair bytes, adds the scoped parser and
-fixture, and returns command outputs/log paths to the integrator. The integrator updates shared
-documents and HANDOFF.
+FIXTURE_VERIFIED for this bounded slice, implementation try count 0. The pair has an observed
+decoded-length word, but no header/data index relation beyond that has been validated. Exact format,
+codec, NGS2 use and playback remain unknown.
+
+## Implementation checkpoint — 2026-10-19 23:15 CDT
+
+- Agent ID: `/root` (integrator); task ID: AUD-01-XFF-01; implementation owner:
+  `/root/audio_asset_survey`.
+- Files changed by the agent: `scripts/audio_bank_header.py`,
+  `scripts/test_audio_bank_header.py`. Integrator changed `HANDOFF.md`, `docs/TASKS.md`,
+  `docs/ASSETS.md`, `docs/EVIDENCE.md`, `docs/FOLDERS.md`, and this checkpoint.
+- Exact acceptance commands:
+  `python3 -I scripts/test_audio_bank_header.py` (exit 0, 6/6; log
+  `local/validation/20261019-2315-root-aud01-xff-verification/test_audio_bank_header.log`);
+  `python3 -I scripts/audio_bank_header.py --archive local/extracted/CUSA08809/pak2.psarc --member cp3shadow/sound/se/com_sys.hd --member cp3shadow/sound/se/com_sys.bd`
+  (exit 0; live output log
+  `local/validation/20261019-2315-root-aud01-xff-verification/audio_bank_header.log`).
+- Additional checks: `graft grep "parse_xff_member"` found the parser and its tests; `graft check`
+  exited 0, wiring graph in sync, deep meaning layer unbuilt. `python3 scripts/project_index.py`
+  refreshed 4,126 folders; `python3 scripts/project_index.py --check` then passed. Initial index
+  check exited 1 after the private verification directory was created; this was corrected by the
+  refresh and was not an implementation hypothesis failure. `git diff --check` and
+  `git diff --cached --check` passed. Logs are under
+  `local/validation/20261019-2315-root-aud01-xff-verification/`.
+- Observation: the pair command matched the archive summary and both private member identity rows.
+  The report contains observed magic, opaque bytes 4..19, and the u32le@0x14 length equality only.
+  No runtime decoder, gameplay use, or playback behavior was exercised.
+- Remaining risk: codec, other field meanings, NGS2 contract and runtime consumption are unknown.
+  Task status FIXTURE_VERIFIED; failed implementation tries: 0.
+- Next exact action: stage only allowlisted source/docs, run both publication-path audits, check
+  remote divergence, then commit and push `origin main`. After publication, claim the independent
+  synthetic ELF parser fixture task before delegating it.
 
 ## Claim publication — 2026-10-19 23:10 CDT
 

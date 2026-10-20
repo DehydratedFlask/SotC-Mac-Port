@@ -78,6 +78,23 @@ classifier/test scripts under `scripts/` may be published (see `scripts/audit_pu
 | `sxd-ascii-80AE` | `.sxd` | 3 | ASCII `80AE` | 6.98–7.28 | e.g. `boss02.sxd`, `boss24.sxd`, `sotc_buss.sxd` |
 | other singletons | `.sxd`/`.sxd1` | 2 | `00020000…`, `00050000…` | 4.11 / 7.61 | `com_sys.sxd`; `str_boss.sxd1` embeds path-like ASCII |
 
+Private pair-structure cross-check (2026-10-19): all 25 `.hd`/`.bd` pair groups (50 members)
+matched manifest paths, PSARC locators and full hashes. The 22 `xff\0` pairs (44 members) all
+store their decoded member size as little-endian u32 at byte offset `0x14` (44/44, zero
+mismatches). The prefix has two observed variants; the byte at offset 12 varies, so bytes 4..19
+remain opaque. Reproduction:
+`PYTHONDONTWRITEBYTECODE=1 python3 -I local/validation/20261019-231219-audio-bank-header-crosscheck/pair_crosscheck.py`;
+log: `local/validation/20261019-231219-audio-bank-header-crosscheck/pair_crosscheck.log`.
+This establishes a repeated length relation only; codec, bank semantics, NGS2 behavior and game use
+remain UNKNOWN.
+
+Bounded reader: [`scripts/audio_bank_header.py`](../scripts/audio_bank_header.py), with six
+synthetic fixtures in [`scripts/test_audio_bank_header.py`](../scripts/test_audio_bank_header.py).
+The reader verifies the archive summary, exact member paths, manifest locators and hashes before
+reporting the XFF magic, opaque bytes 4..19 and the u32le@0x14 decoded-length match. Root's
+acceptance logs are in `local/validation/20261019-2315-root-aud01-xff-verification/`. This is
+fixture and offline asset evidence only; it does not establish runtime decoding or playback.
+
 Correction vs earlier note: pakN sound members do **not** all begin `8c0a`. zlib/xz probes on
 sampled heads do not yield meaningful payloads (trivial 1-byte inflate rejected). Next: recover
 the game's own reader (RE-02/Fios/ULT), not codec guessing.
