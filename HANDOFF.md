@@ -1,9 +1,31 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:07 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:09 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:07 CDT, `/root` — APP-01 termination classifier verified
+## CURRENT CHECKPOINT — 2026-10-20 05:09 CDT, `/root` — PSARC truncated-block fixture claimed
+
+`DATA-02-PSARC-TRUNCATED-COMPRESSED-BLOCK-01` is claimed by root with `/root/app01_readiness`
+as the test-only implementation worker. The worker owns only `scripts/test_psarc.py`; root owns
+the shared docs and Git. The bounded regression will build a valid synthetic archive with an
+intact header/TOC, truncate its compressed payload block by one byte, and assert the reader raises
+`PsarcError("truncated block")`. No parser change is expected.
+
+Baseline `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_psarc.py` exited 0 with 12 tests.
+Log: `local/checkpoints/root-2026-10-20-psarc-truncation-claim-baseline.log`, SHA-256
+`7c4ce78e536c0c2cdb85730c9c8381839f365b3a2b9d77c5cc9eaede9427b0df`. Baseline source hashes:
+`scripts/psarc.py` `3bef8a66705c34ab43c321b688ec675cc3cd7aa0e07ec3afdb0f956e3e80cdc9` and
+`scripts/test_psarc.py` `6fab97c9fda00081bf40414d363882ed10dd4191e9f95a6fcc371ac814b85434`.
+No implementation attempt has started; cumulative failed tries remain zero.
+
+The required project index ran successfully with 4,166 folders (`local/checkpoints/root-2026-10-20-psarc-truncation-claim-project-index.log`); `graft check` passed at 1,255 nodes / 530 source files, with the optional deep meaning layer still unbuilt (`local/checkpoints/root-2026-10-20-psarc-truncation-claim-graft-check.log`). `git diff --check` passed. `docs/FOLDERS.md` now reflects the new checkpoint file.
+
+The test can establish only that the parser rejects this synthetic short block at its exact-length
+guard. It does not establish behavior for live archives or any asset/runtime/game gate. No install
+or dependency change. Claim publication precedes worker edits; next exact action is to dispatch the
+worker, review the single-file diff and run the targeted suite, then complete/publish the checkpoint.
+
+## PRIOR CHECKPOINT — 2026-10-20 05:07 CDT, `/root` — APP-01 termination classifier verified
 
 `APP-01-TERMINATION-CLASSIFIER-01` is `FIXTURE_VERIFIED`. `/root/app01_termination` added
 `LauncherLifecycle.classifyTermination(stopWasRequested:reason:status:)` in LauncherCore and
