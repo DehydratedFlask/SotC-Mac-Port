@@ -7,6 +7,6 @@ Three REA 6.7.0 / Ghidra 12.1.4 `function` queries (08A: 378.63 s and 364.64 s s
 - All bodies are contiguous and exactly match the heuristic intervals; no mismatches in any heuristic-vs-Ghidra comparison across the whole series.
 
 ## Final tally for `sceNgs2RackGetVoiceHandle` thunk `0xf91410`
-All 104 raw `E8 rel32` candidates are now Ghidra-confirmed (7 + 97 -> 104; 0 heuristic-only, 0 unattributed). The earlier 8-function heuristic scanner never disagreed with Ghidra in 30+ intervals.
+All 104 raw `E8 rel32` candidates are now Ghidra-confirmed (7 + 97 -> 104; 0 heuristic-only, 0 unattributed). Across the series, every heuristic interval that was queried matched its Ghidra body exactly (23 distinct Ghidra function bodies cover the 104 candidates).
 
 Not established: reachability, runtime slot binding, ABI/NGS2 semantics; provider callers (`0x945a80`, `0x945c80`, `0x945e30` etc.) are observations only; Ghidra body completeness is the provider's result. G0 PARTIAL, G1 NOT PASSED, G2-G6 NOT RUN.
