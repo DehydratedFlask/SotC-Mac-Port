@@ -19,7 +19,7 @@ Checkpoint (2026-10-19 20:31 CDT, bc-81763e53):
 - Commands: ctest -R '^vec_d7c9d0$' Passed; `python3 -I tools/lift/check_fd7c9d0.py` OK.
 - Logs: `/tmp/ctest_d7c9d0.log`, `/tmp/check_d7c9d0.log`.
 - Store: Project `internal/worker-claim-d7c9d0.md`.
-- Push: (pending this commit).
+- Push: `8ce468b` on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 20:29 CDT, worker bc-81763e53 (CPU-01d) — 0xd7e640 — COMPLETE
 
