@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — RackQuery callsite attributed; XFF edge test verified
+
+`AUD-02-NGS2-RACKQUERY-BUFFERSIZE-01`: callsite `0x94ebc2` -> thunk `0xf91420`, inside `FUN_0094ea10` (`0x94ea10`, 7554 bytes); one REA query succeeded (361.9 s), root replayed the verifier (exit 0) and SHA256SUMS. 14 other candidates still unattributed; no reachability/runtime/ABI claim. `AUD-01-XFF-EDGE-01` `FIXTURE_VERIFIED` (9 tests). Details: `docs/checkpoints/2026-10-20-root-rackquery-callsite-and-xff-edge-complete.md`. G0 PARTIAL, G1-G6 NOT RUN; failed tries 0.
+
+Next exact action: the AUD-02 VOICEHANDLE probe (prior Ghidra xrefs timeout) or attributing remaining RackQuery candidates, each needing a fresh claim.
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — nested-path audit and PSARC zlib handling verified
 
 `AUD-PUBLISH-NESTED-01` and `DATA-02-PSARC-ZLIB-CORRUPT-01` are `FIXTURE_VERIFIED` (6 and 16 tests pass, `--all` audit exit 0). Details and hashes: `docs/checkpoints/2026-10-20-root-audit-nested-psarc-zlib-complete.md`. Prior edge-fixture batch published as `8be3aa1`. Synthetic only; G0 PARTIAL, G1-G6 NOT RUN; failed tries 0.
