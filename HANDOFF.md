@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:22 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:23 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:22 CDT, /root — RE-02 dynlink fixture verified; CPU constructor gate in progress
+## CURRENT CHECKPOINT — 2026-10-19 23:23 CDT, /root — RE-02 dynlink fixture published; CPU constructor gate in progress
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -181,8 +181,9 @@ Claim record: [RE-02-DYNLINK-01 checkpoint](docs/checkpoints/2026-10-19-root-re0
   returned an invalid-regex error; corrected query `graft grep "JMPREL" --in scripts/` refreshed
   one file and found the parser and new fixture. Task status FIXTURE_VERIFIED; failed tries 0.
   This parser fixture does not establish loader execution, ABI behavior, or runtime addend
-  semantics; it covers one JMPREL row and not RELA. The next exact action is to publish this test
-  and its evidence while the independent CPU constructor gate remains active.
+  semantics; it covers one JMPREL row and not RELA. The fixture and evidence were pushed in
+  `b2a5b6f`. Next exact action: collect and verify the independent CPU constructor gate while
+  keeping RE-02's runtime loader limits explicit.
 
 ### CPU-01-CTOR-PREFIX-01 — fail-fast original constructor prefix — ACTIVE CLAIM
 
@@ -218,9 +219,9 @@ Claim record: [CPU-01-CTOR-PREFIX-01 checkpoint](docs/checkpoints/2026-10-19-roo
 
 See [the parallel claims dispatch checkpoint](docs/checkpoints/2026-10-19-root-parallel-claims-dispatched.md).
 Both claims were pushed before assignment; workers own distinct paths and do not edit shared docs
-or commit/push. RE-02-DYNLINK-01 is now fixture verified; CPU-01-CTOR-PREFIX-01 remains in
-progress. Current exact action: publish the verified RE fixture, then collect and verify the CPU
-runner result before closing that bounded task.
+or commit/push. RE-02-DYNLINK-01 is fixture verified and published in `b2a5b6f`;
+CPU-01-CTOR-PREFIX-01 remains in progress. Current exact action: collect and verify the CPU runner
+result before closing that bounded task.
 
 ### Current publication checkpoint
 

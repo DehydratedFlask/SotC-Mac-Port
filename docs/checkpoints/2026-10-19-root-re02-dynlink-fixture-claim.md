@@ -63,3 +63,16 @@ exact command result and private log path.
   Task status FIXTURE_VERIFIED; failed implementation tries 0.
 - Next exact action: stage only the RE test and its shared docs/evidence, run publish-path audits,
   check divergence, then commit and push `origin main`. Keep the concurrent CPU files unstaged.
+
+## Publication checkpoint — 2026-10-19 23:23 CDT
+
+- Agent ID: `/root` (integrator); task RE-02-DYNLINK-01; status FIXTURE_VERIFIED; failed
+  implementation tries 0.
+- Commit `b2a5b6f` (`test: cover synthetic PS4 dynlink import relocations`) was pushed to
+  `origin main`. The staged audit passed 5 paths; `--all` passed 572 tracked paths; staged diff
+  check passed and the fetched remote was even with HEAD (`0 0`) before commit.
+- Published files: `scripts/test_ps4_dynlink.py`, `HANDOFF.md`, `docs/TASKS.md`,
+  `docs/EVIDENCE.md`, and this checkpoint. The independent CPU source/test/checker changes were not
+  staged. Its generated `docs/FOLDERS.md` count is left for the CPU publication checkpoint.
+- Next exact action: continue the independent CPU-01-CTOR-PREFIX-01 task; do not promote this parser
+  fixture to evidence of runtime loader behavior.
