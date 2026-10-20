@@ -110,3 +110,22 @@ codec, NGS2 use and playback remain unknown.
   `git diff --cached --check` passed; `git fetch origin main` showed no divergence.
 - Root sent `/root/audio_asset_survey` the implementation assignment after the push. The worker
   owns only the two scripts listed above; the integrator owns all shared-document updates.
+
+## Publication checkpoint — 2026-10-19 23:16 CDT
+
+- Agent ID: `/root` (integrator); task ID: AUD-01-XFF-01; status FIXTURE_VERIFIED; failed
+  implementation tries: 0.
+- Files in the published batch: `scripts/audio_bank_header.py`,
+  `scripts/test_audio_bank_header.py`, `HANDOFF.md`, `docs/ASSETS.md`, `docs/EVIDENCE.md`,
+  `docs/FOLDERS.md`, `docs/TASKS.md`, and this checkpoint.
+- Commit `7b2747b` (`feat: add bounded XFF bank header reader`) was pushed to `origin main`.
+  The staged publish-path audit passed 8 files; `--all` passed 569 tracked paths; staged diff
+  check passed; fetched remote showed no divergence before commit.
+- Acceptance logs: six synthetic tests passed and the live `com_sys` pair matched archive summary
+  plus both member manifest identities. Logs and exact commands remain under
+  `local/validation/20261019-2315-root-aud01-xff-verification/`.
+- Observation vs inference: only `xff\0`, opaque bytes 4..19, and the repeated u32le@0x14 decoded
+  length relation are reported. Codec, NGS2 semantics, gameplay consumption and playback are not
+  established.
+- Next exact action: work from the newly published RE-02-DYNLINK-01 and
+  CPU-01-CTOR-PREFIX-01 claims, with separate script/test and native constructor file ownership.

@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:15 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:16 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:15 CDT, /root — APP-01 lifecycle fixture published; AUD-01-XFF-01 bounded reader/fixture verified
+## CURRENT CHECKPOINT — 2026-10-19 23:16 CDT, /root — XFF reader published; RE-02 and CPU-01 bounded claims prepared
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -153,12 +153,61 @@ semantics. Do not claim a codec, NGS2 contract, gameplay use, or playback.
   hypothesis failure.
 - Observation: the parser reports only XFF magic, opaque bytes 4..19, and the length word.
   Remaining risk: other field meanings, codec, NGS2 behavior, gameplay use, and playback stay
-  UNKNOWN. Task status FIXTURE_VERIFIED (bounded slice), failed implementation tries 0. Next exact
-  action: publish this allowlisted source/evidence batch, then claim the synthetic ELF parse fixture
-  as a separate bounded RE-02 task.
+  UNKNOWN. Task status FIXTURE_VERIFIED (bounded slice), failed implementation tries 0. The
+  allowlisted source/evidence batch was pushed in `7b2747b`. Next exact action: publish the two
+  independent bounded task claims below, then assign their distinct files to the named agents.
 - A separate read-only CPU survey proposed RVA `0xcc5a10`; it decodes to the same 16-byte constant
   copy behavior covered by 95 existing fixtures, so root deferred it for low marginal semantic
   coverage. This was task selection only, not a failed implementation try.
+
+### RE-02-DYNLINK-01 — synthetic dynamic-link parse fixture — ACTIVE CLAIM
+
+Integrator `/root` claims a test-only RE-02 slice for `/root/re02_triage`; implementation owns only
+`scripts/test_ps4_dynlink.py`. Existing `scripts/ps4_dynlink.py` remains a read-only dependency.
+Claim record: [RE-02-DYNLINK-01 checkpoint](docs/checkpoints/2026-10-19-root-re02-dynlink-fixture-claim.md).
+
+- Graft navigation: `graft skeleton scripts/ps4_dynlink.py` located `parse(elf)` and the `Image`
+  API; its source parse result fields were reviewed before defining this test task. The read-only
+  survey found six tests for NID hashing, ID widths, thunk lookup, constructor walking, and bounds,
+  but no end-to-end `parse()` fixture.
+- Build one small synthetic ELF with a module/library declaration, one imported symbol, and one
+  `JMPREL` relocation. Assert parsed module/library encodings, symbol NID, relocation table/type,
+  symbol index, target, and signed addend. Do not change the parser unless the new fixture exposes
+  a concrete defect; stop and report before widening owned paths.
+- Exact acceptance command: `python3 -I scripts/test_ps4_dynlink.py`. Fixture success establishes
+  parser behavior for these bytes only; it does not establish loader execution, ABI behavior, or
+  runtime addend semantics. Failed tries: 0. The next action after claim publication is to assign
+  the test file and request the exact result/log path.
+
+### CPU-01-CTOR-PREFIX-01 — fail-fast original constructor prefix — ACTIVE CLAIM
+
+Integrator `/root` claims a bounded CPU-01 runner correctness slice for `/root/cpu_leaf_survey`.
+Owned files: `native/core/startup_ctors.hpp`, `native/core/startup_ctors.cpp`,
+`native/tests/test_startup_ctors.cpp`, and `tools/lift/check_ctor_slots.py`.
+Claim record: [CPU-01-CTOR-PREFIX-01 checkpoint](docs/checkpoints/2026-10-19-root-cpu01-ctor-prefix-claim.md).
+
+- Graft: `graft callers run_constructors --depth all` reported ambiguous duplicate definitions and
+  no reliable cross-file callers. Follow-up `graft grep "run_constructors"` found the two
+  definitions and three invocations in `native/tests/test_startup_ctors.cpp`; no other indexed
+  uses were returned.
+- Offline source identity: ELF SHA-256
+  `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; original constructor
+  table has 573 entries at `0x2dd70e0`, sentinel at `0x2dd5ef8`, and the extracted table-word SHA-256
+  is `5917cb85db190e9ef93ce5e06d5b6596d40b6c3623166e37ed7c6c3c3cd3ab28`. First unresolved original
+  entry is index 10, slot RVA `0x2dd7090` targeting `0xf09e60`. Its 255-byte body hash is
+  `fde1ac223a4c084da0a1a9d04804bee8ba8e12be0ac46e1a8e98a925ac4ffcc7`.
+- Make original slot gaps explicit and stop the runner at index 10 after exactly ten recovered
+  callbacks, reporting `blocked_on_rva == 0xf09e60`; correct the registered indices for
+  `0xd32720` and `0xd2ffe0` to 119 and 120. A hash-bound private-input checker must verify every
+  registered RVA/index against the original table. Do not implement the slot-10 service graph or
+  claim progress beyond it. Disassembly suggests allocator/atexit/callback dependencies, but their
+  complete semantics remain unproven.
+- Exact acceptance commands:
+  `cmake --build local/build/native --target test_startup_ctors`;
+  `ctest --test-dir local/build/native -R '^startup_ctors$' --output-on-failure`;
+  `python3 -I tools/lift/check_ctor_slots.py`. This gate verifies native runner bookkeeping only;
+  it does not establish startup reachability or G1. Failed tries: 0. Assign only after this claim
+  and its pre-implementation checkpoint are pushed.
 
 ### Current publication checkpoint
 
@@ -177,8 +226,11 @@ docs or commit/push. Its cross-check of all XFF length words passed before parse
 At 23:15 CDT, root independently reran the XFF unit and live-pair commands (both exit 0), refreshed
 the project index after the private verification run directory made it stale (4,126 folders; check
 current), and confirmed `graft check` and diff whitespace checks. The corresponding private logs
-are under `local/validation/20261019-2315-root-aud01-xff-verification/`; the source/evidence batch
-is ready for staged-path audit and publication.
+are under `local/validation/20261019-2315-root-aud01-xff-verification/`. The source/evidence batch
+was pushed as `7b2747b` (`feat: add bounded XFF bank header reader`); before commit, the staged
+path audit passed 8 paths, the full tracked-path audit passed 569 paths, staged whitespace check
+passed, and `git fetch origin main` plus `git rev-list --left-right --count origin/main...HEAD`
+showed no divergence (`0 0`).
 
 ## PRIOR CHECKPOINT — 2026-10-19 22:41 CDT, /root — CPU-01d `0xce7300` metadata correction — FIXTURE_VERIFIED
 
