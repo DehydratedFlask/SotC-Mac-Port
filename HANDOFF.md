@@ -47,6 +47,7 @@ Owned: `native/core/free_list_carve.{hpp,cpp}`, `native/tests/test_free_list_car
 Blocked alternative (documented): MAP_FIXED — `0x479c2` rdi is object context, not preferred VA.
 Checkpoint: ctest free_list_carve Passed; check_f1a800_carve.py OK; check_host_map_calls.py OK.
 Store: Project `internal/worker-claim-srv01-carve.md`.
+Push (code): pending docs follow-up after `9d773cc`.
 
 
 ## ACTIVE CLAIM — 2026-10-19 20:18 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 61/62 — COMPLETE
