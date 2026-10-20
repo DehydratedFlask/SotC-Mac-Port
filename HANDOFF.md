@@ -1,10 +1,21 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:31 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:32 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-<<<<<<< Updated upstream
-=======
+## ACTIVE CLAIM — 2026-10-19 20:32 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 84/86/87/88/89 — COMPLETE
+
+Task: CPU-01e — register peer FIXTURE_VERIFIED `0xd84ee0` (84), `0xd7fe90` (86),
+`0xd7fe40` (87), `0xd7e640` (88), `0xd7c9d0` (89) into `startup_ctors`
+(77 `0xdac410` + 85 `0xd80e60` already at `55240a3`).
+Skipped gap 10–19, idx 50, SRV. Cleaned accidental conflict markers in this file.
+Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
+Checkpoint: ctest -R 'startup_ctors|vec_d84ee0|vec_d7fe90|vec_d7fe40|vec_d7e640|vec_d7c9d0|vec_dac410|vec_d80e60' OK;
+binary checks OK; registry **47**.
+Owned: `startup_ctors.*`, `test_startup_ctors.cpp`, `HANDOFF.md`. CMake: origin as-is.
+Did NOT edit: peer leaf sources (left local `vec_d85490` WIP unstaged), SRV.
+Store: Project `internal/worker-claim-drive.md`.
+
 ## ACTIVE CLAIM — 2026-10-19 20:31 CDT, worker bc-81763e53 (CPU-01d) — 0xd7c9d0 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd7c9d0** (survey index 89).
@@ -37,7 +48,6 @@ Checkpoint (2026-10-19 20:29 CDT, bc-81763e53):
 - Store: Project `internal/worker-claim-d7e640.md`.
 - Push: `159b654` on origin/main.
 
->>>>>>> Stashed changes
 ## ACTIVE CLAIM — 2026-10-19 20:28 CDT, worker bc-81763e53 (CPU-01d) — 0xd7fe90 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd7fe90** (survey index 86).
