@@ -1,7 +1,22 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:51 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:53 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 21:53 CDT, worker bc-81763e53 (CPU-01d) — 0xd47420 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd47420** (survey index 106).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d47420.{hpp,cpp}`, `native/tests/test_vec_d47420.cpp`,
+`tools/lift/check_fd47420.py`, `native/CMakeLists.txt` (+vec_d47420 only; origin/main base).
+Private dump (not published): `local/re/work/cd47420.bin`.
+Skipped: 95; peer 102 `6dc3218`; A 105 `0xd47880`=`ee12add`/`28c9083`; done 104.
+Did NOT edit Drive / SRV / `startup_ctors.*` / `local/`.
+Checkpoint (2026-10-19 21:53 CDT, bc-81763e53):
+- OBS: unguarded vmovups; src=0x1302bc0 dst=0x3352100 bits=~0,~0,~0,0; index 106.
+- Commands: ctest -R '^vec_d47420$' Passed; `python3 -I tools/lift/check_fd47420.py` OK.
+- Store: Project `internal/worker-claim-d47420.md`.
+- Push: (this commit).
 
 ## ACTIVE CLAIM — 2026-10-19 21:51 CDT, worker bc-73721c8d (CPU-01d) — 0xd47880 — COMPLETE
 
