@@ -5,7 +5,7 @@ No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
 `SAV-01-SAVEDATA-INITIALIZE3-01` `STATIC_PATH_BYTE_VERIFIED` (callsite `0xa4d295` in `FUN_00a4d250`; root replayed verifier and checksums): `docs/checkpoints/2026-10-20-root-savedata-initialize3-complete.md`. Native suite last verified 155/155 (batch 12, pushed `07eac0d`). G0 PARTIAL, G1-G6 NOT RUN.
 
-OPEN: worker for `SAV-01-SAVEDATA-UMOUNTWITHBACKUP-01` was still running when the usage limit hit; its result is unreviewed. Exact next action: check `local/re/evidence/sav01-savedata-umountwithbackup-01/`, replay its verifier and `shasum -c`, then record or discard. Next constructor candidate: manifest position 132 `0xc64060`. Other unprobed imports: `sceSaveDataDirNameSearch`, `sceAudio3d*`, three remaining `sceAudioOutOutput` callsites.
+RESOLVED after the limit notice: `SAV-01-SAVEDATA-UMOUNTWITHBACKUP-01` finished, was replayed by root (verifier exit 0, checksums OK) and is `STATIC_PATH_BYTE_VERIFIED` (`0xa48db9` in `FUN_00a48280`): `docs/checkpoints/2026-10-20-root-savedata-umountwithbackup-complete.md`. No workers remain open. Next constructor candidate: manifest position 132 `0xc64060`. Other unprobed imports: `sceSaveDataDirNameSearch`, `sceAudio3d*`, three remaining `sceAudioOutOutput` callsites.
 
 
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors 0xc686e0, 0xc66580, 0xc65f80, 0xc65da0 lifted
