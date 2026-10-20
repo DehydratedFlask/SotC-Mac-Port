@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 03:09 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 03:14 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 03:09 CDT, /root — NGS2 provider timeout recorded; RackCreate query underway
+## CURRENT CHECKPOINT — 2026-10-20 03:14 CDT, /root — RackCreate slot-xrefs replayed; caller query next
 
 Six bounded AUD-02 import-to-call paths are root-verified:
 `AUD-02-NGS2-SYSCREATE-01` (`sceNgs2SystemCreateWithAllocator`),
@@ -29,9 +29,10 @@ claims:
 [SystemRender root replay](docs/checkpoints/2026-10-20-root-aud02-sysrender-complete.md),
 [VoiceGetState root replay](docs/checkpoints/2026-10-20-root-aud02-voice-getstate-complete.md), and
 [SystemDestroy root replay](docs/checkpoints/2026-10-20-root-aud02-system-destroy-complete.md),
-[next three probe claims](docs/checkpoints/2026-10-20-root-aud02-next-three-claims.md), and
+[next three probe claims](docs/checkpoints/2026-10-20-root-aud02-next-three-claims.md),
 [next three offline-prep checkpoint](docs/checkpoints/2026-10-20-root-aud02-next-three-offline-prep.md),
-and [provider timeout and root replay](docs/checkpoints/2026-10-20-root-aud02-next-three-provider-replay.md).
+[provider timeout replay](docs/checkpoints/2026-10-20-root-aud02-next-three-provider-replay.md),
+and [RackCreate slot-xrefs replay](docs/checkpoints/2026-10-20-root-aud02-rackcreate-slot-xrefs-replay.md).
 
 Root check logs and command corrections are private under each task's `local/re/evidence/*-root-*`
 files. The source hashes match ELF `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`
@@ -59,10 +60,12 @@ Root replayed the typed timeout summary and recorded that the transient Ghidra l
 already gone. RackQuery has a root-replayed offline `objdump` slice: `0x94fc2d` decodes as a direct
 call to `0xf91420`; the tool reported no overlapping section for the requested range, so it remains
 a candidate without a Ghidra edge/function boundary. Root verifier remains `PARTIAL_PRE_REA`.
-RackCreate owns the serialized provider slot now; its slot query is running with an 8G headless heap
-and 1200-second startup deadline after principal reassessment. The worker is preserving logs,
-duration, RSS and a snapshot. Root verified its current 61-file offline manifest; no selected
-caller is accepted. RackQuery waits for RackCreate to return. Two imports remain unclaimed:
+RackCreate's serialized slot-xrefs query succeeded under the reassessed 8G/1200-second plan.
+Ghidra returned only reference address `0xf913f0` for slot `0x1600fe8`; the address-only projection
+does not expose reference kind or caller. Root replay passed the response/snapshot binding and all
+78 current dossier manifest entries. The next single provider operation is a function query for
+byte-pattern candidate `0x9493f8`; no call path is yet accepted. RackQuery waits for the query and
+root replay. Two imports remain unclaimed:
 RackDestroy and VoiceGetStateFlags. No command contract, audio behavior, ABI, or runtime binding is
 inferred from these scans.
 
@@ -71,11 +74,10 @@ The task claims are committed as `4d690d6` and pushed; dispatch was recorded in 
 `/root/aud02_rackquery_buffersize`, and `/root/aud02_rack_voicehandle` with `gpt-6-luna` at Extra
 High reasoning. Exact evidence and limits are in the linked claim and offline-prep checkpoints.
 
-Next exact action: wait for RackCreate's single slot-xrefs operation, root-replay its saved output,
-then decide whether the changed 8G/1200-second plan is suitable for one RackQuery query. Keep
-VoiceHandle paused until root has evidence that a Ghidra analysis can be reused or authorizes another
-changed plan. No provider calls may overlap. Root replays final checksums and byte verifiers before
-integrating any accepted path. The two remaining imports are
+Next exact action: allow exactly one RackCreate function query at candidate `0x9493f8`, capture and
+root-replay it, then serialize the provider slot to RackQuery. Keep VoiceHandle paused; do not
+overlap REA/Ghidra calls. Root replays final checksums and byte verifiers before integrating any
+accepted path. The two remaining imports are
 `sceNgs2RackDestroy` and `sceNgs2VoiceGetStateFlags`. No source implementation is authorized by
 these bounded static probes. G1 remains NOT PASSED.
 
