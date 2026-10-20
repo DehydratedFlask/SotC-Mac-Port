@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — Audio3d PortAdvance and ObjectReserve callsites verified
+
+`sceAudio3dPortAdvance` sole callsite `0x953a7c` (in `FUN_009536d0`) and `sceAudio3dObjectReserve` callsite `0x94a6b8` (in `FUN_0094a510`; 8 of 9 candidates unattributed) are byte- and REA-verified (2 provider successes on pristine snapshot copies; root replayed both verifiers and checksums). Details: `docs/checkpoints/2026-10-20-root-audio3d-portadvance-and-objectreserve-complete.md`. Static only. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 175/175 (batch 16, pushed `29a9fb7`).
+
+Next exact action: remaining Audio3d imports (`ObjectUnreserve`, `PortGetQueueLevel`, `PortClose`, `PortSetAttribute`, `Terminate`), the eight `0x99b5xx..0x99b6xx` ObjectReserve candidates (probably one function), SaveData dialog imports, or constructor batch 17 (next 152 `0xc37020`).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors batch 16 (0xc451d0 .. 0xc3cf00) lifted
 
 `CPU-01-LEAF-CTOR-BATCH-16` `FIXTURE_VERIFIED`; root replay 175/175 ctest pass, five checkers exit 0. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-16-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending workers: `AUD-02-AUDIO3D-PORTADVANCE-01` (`local/re/evidence/aud02-audio3d-portadvance-01/`) and `AUD-02-AUDIO3D-OBJECTRESERVE-01` (`local/re/evidence/aud02-audio3d-objectreserve-01/`), one REA query each.
