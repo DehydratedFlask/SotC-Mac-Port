@@ -1,7 +1,32 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:19 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:16 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:16 CDT, worker bc-effcf5dc (CPU-01d) — 0xdc2d50 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdc2d50** (survey index 69).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_dc2d50.{hpp,cpp}`, `native/tests/test_vec_dc2d50.cpp`,
+`tools/lift/check_fdc2d50.py`, `native/CMakeLists.txt` (+vec_dc2d50 only; origin/main base).
+Private dump (not published): `local/re/work/cdc2d50.bin`.
+Did NOT edit: `startup_ctors.*`, SRV `host_map`/`free_list_carve`, peer `0xdc4180`/`0xdddc90`.
+Checkpoint (2026-10-19 20:16 CDT, bc-effcf5dc):
+- OBS: unguarded vmovups copy; src=0x130e010 dst=0x3352cb0 bits=~0,~0,~0,0; index 69; distinct cells.
+- Commands: ctest -R '^vec_dc2d50$' Passed; `python3 -I tools/lift/check_fdc2d50.py` OK.
+- Logs: `/tmp/ctest_dc2d50.log`, `/tmp/check_dc2d50.log`.
+- Prior: `0xde7fb0`=`d0afd8c`, `0xddab00`=`4ce4fec`. Store: `internal/worker-claim-dc2d50.md`.
+- Push: (pending this commit).
+
+## ACTIVE CLAIM — 2026-10-19 20:23 CDT, worker bc-02397584 (CPU-01d) — 0xdc2d50 — IN PROGRESS
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdc2d50** (survey index 69).
+Failed tries: 0. Status: CLAIMED / lifting.
+Owned: `native/core/vec_dc2d50.{hpp,cpp}`, `native/tests/test_vec_dc2d50.cpp`,
+`tools/lift/check_fdc2d50.py`, `native/CMakeLists.txt` (+vec_dc2d50 only; origin/main base).
+Private dump (not published): `local/re/work/cdc2d50.bin`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV carve/`host_map`, peer `0xdc4180`/`0xdda990`.
+Store: Project `internal/worker-claim-dc2d50.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:20 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 63 — COMPLETE
 
