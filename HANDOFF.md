@@ -1,6 +1,6 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:13 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:18 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
 ## ACTIVE CLAIM — 2026-10-19 20:13 CDT, worker bc-effcf5dc (CPU-01d) — 0xddab00 — COMPLETE
@@ -18,15 +18,21 @@ Checkpoint (2026-10-19 20:13 CDT, bc-effcf5dc):
 - Prior: `0xde7fb0` pushed `d0afd8c`. Store: `internal/worker-claim-ddab00.md`.
 - Push: (pending this commit).
 
-## ACTIVE CLAIM — 2026-10-19 20:17 CDT, worker bc-02397584 (CPU-01d) — 0xddab00 — IN PROGRESS
+## ACTIVE CLAIM — 2026-10-19 20:17 CDT, worker bc-02397584 (CPU-01d) — 0xddab00 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xddab00** (survey index 62).
-Failed tries: 0. Status: CLAIMED / lifting.
+Failed tries: 0. Status: FIXTURE_VERIFIED.
 Owned: `native/core/vec_ddab00.{hpp,cpp}`, `native/tests/test_vec_ddab00.cpp`,
 `tools/lift/check_fddab00.py`, `native/CMakeLists.txt` (+vec_ddab00 only; origin/main base).
 Private dump (not published): `local/re/work/cddab00.bin`.
 Did NOT edit: `startup_ctors.*`, Drive, SRV `host_map`, peer `0xdddc90`/`0xddef00`/`0xde7fb0`.
-Store: Project `internal/worker-claim-ddab00.md`.
+
+Checkpoint (2026-10-19 20:18 CDT, bc-02397584):
+- OBS: unguarded vmovups copy; src=0x130f090 dst=0x3352eb0 bits=~0,~0,~0,0; index 62; distinct cells.
+- Commands: ctest -R '^vec_ddab00$' Passed; `python3 -I tools/lift/check_fddab00.py` OK.
+- Logs: `/tmp/ctest_ddab00.log`, `/tmp/check_ddab00.log`.
+- CMake: origin/main base + vec_ddab00 only.
+- Store: Project `internal/worker-claim-ddab00.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:16 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 56/60 — COMPLETE
 
