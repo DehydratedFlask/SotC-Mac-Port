@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:21 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:30 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:21 CDT, /root — slot-10 computed-call follow-up dispatched; claim published
+## CURRENT CHECKPOINT — 2026-10-20 00:30 CDT, /root — slot-10 branch verified; next direct helper claimed
 
 Task APP-01-IMPORTER-ERROR-01: `launcher/Sources/SoCLauncher/ContentView.swift` now presents the
 localized error in a system alert for import failures and leaves the prior folder/readiness intact;
@@ -57,16 +57,40 @@ Publication: staged audit `python3 -I scripts/audit_publish_paths.py` accepted 4
 whitespace check passed; pre-commit divergence was `0 0`. Commit `5d3d262` pushed successfully
 (`f48e512..5d3d262 main -> main`). No private REA or root-verifier outputs were staged.
 
-### CPU-01-CTOR10-INDIRECT-01 — bound slot-10 call target at `0xf09efb` — CLAIMED
+### CPU-01-CTOR10-INDIRECT-01 — slot-10 call dataflow at `0xf09efb` — STATIC ANALYSIS VERIFIED; TARGET UNRESOLVED
 
-Dispatched to `/root/srv01_page_map_19660` after its completed page-map task was reused. Scope: call-reaching branch, `RAX` feeding
-`[RAX+0xc0]`, and whether pinned code/data determine a unique target. Reuse E43/E46 first; if REA is
-needed, use `local/re/rea-f09efb-snapshot.json` and private evidence under
-`local/re/evidence/rea-f09efb/`. The prior zero-guard result applies only to that observed path. No
-code, runtime, ABI, or constructor-reachability claim; failed hypotheses/tries 0. Claim commit
-`4cfc51b` was pushed before dispatch. The analyst is to start with E43/E46, keep any unsupported
-target unresolved, and send private evidence/results to root without shared-doc edits. The claim is in
-[CPU-01-CTOR10-INDIRECT-01](docs/checkpoints/2026-10-20-root-cpu01-ctor10-indirect-claim.md).
+The analyst reused E43/E46; no new REA pass was needed. Its private report is
+`local/re/evidence/cpu01-ctor10-indirect-01/report.md`, SHA-256
+`8e89a42839c9185043b1823bdeec10bdb8670f88e84a6c34f0682919fe107155`. Root reran the byte and PS4
+relocation verifier at
+`python3 -I local/re/evidence/cpu01-ctor10-indirect-01/verify.py > local/re/evidence/cpu01-ctor10-indirect-01/root-verification.json 2> local/re/evidence/cpu01-ctor10-indirect-01/root-verification.stderr.log`;
+it exited 0, with JSON SHA-256 `2f01ccb78d20316a42709b99af563c0c5d32edc40656c3444ae45ce114c8f0d2`
+matching the analyst output. Root also ran the independent raw-byte check in
+`local/re/evidence/cpu01-ctor10-indirect-01/root-raw-recheck.py` (script SHA-256
+`0f7dea2a010bbd0653536e76ecc71d4ae86887a92455040eefe43e599353a6d4`); it exited 0 and confirmed
+the 260-byte `0xf09e60..0xf09f63` body hash `22204129cd9b4997ae893d5d078a9bf8b0409114bb122fab2324956b5039a3c4`,
+the `vxorps` zeroing at `0xf09e80`, the subsequent zeroed guard store, and the VMA-0 qword.
+
+The function's byte-backed setup zeroes YMM0, stores it over both guard fields, then tests them; this
+setup skips the computed call. The helper also stores zero in the caller-local pointer field read at
+`0xf09ef3`. If a hypothetical call-reaching state retains that zero, the next load reads file-backed
+VMA 0 (`/libexec` bytes), making `[RAX+0xc0]` point to `0x6365786562696cef`, outside either PT_LOAD.
+The PS4 relocation parser finds no relocation covering VMA 0 or that operand address. The constructor
+slot's `R_X86_64_RELATIVE` relocation identifies only the entry `0xf09e60`. Keep `0xf09efb` unresolved:
+static evidence does not establish external process mappings, constructor execution, or a service
+contract. Failed analysis hypotheses: 0; G1 remains NOT PASSED. Tool issues and exact commands are in
+the [completion checkpoint](docs/checkpoints/2026-10-20-root-cpu01-ctor10-indirect-claim.md).
+
+### CPU-01-CTOR10-E1EDE0-01 — direct helper at `0xe1ede0` — CLAIMED
+
+The next bounded CPU-01 slice is the direct constructor call `0xf09f04 -> 0xe1ede0` already recorded
+in E43. `/root/srv01_page_map_19660` owns the private static characterization: exact callee range,
+bytes, callers/callees, caller argument values, and only byte-supported effects. Graft
+`graft grep "e1ede0" --in native/` exited 0 with no hits in 369 indexed files. If existing E43
+artifacts do not contain a callee body, use a separate `local/re/rea-e1ede0-snapshot.json` and
+private output under `local/re/evidence/rea-e1ede0/`. No service/ABI, runtime, constructor
+reachability, or G1 claim. Full claim:
+[CPU-01-CTOR10-E1EDE0-01](docs/checkpoints/2026-10-20-root-cpu01-ctor10-e1ede0-claim.md).
 
 Graft coverage limitation: `graft grep "f09efb" --in native/` found no native indexed occurrences;
 `graft ask` for `reference/ShadowOfTheColossus-PC/` returned exit 1 (`nothing indexed under` that
