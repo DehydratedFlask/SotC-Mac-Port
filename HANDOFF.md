@@ -1,9 +1,19 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 04:37 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 04:41 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 04:34 CDT, `/root` — DATA-02 audit replay and RackQuery slot-to-thunk review
+## CURRENT CHECKPOINT — 2026-10-20 04:39 CDT, `/root` — parallel DATA-02 and RELA fixture claims
+
+Two independent provider-free tasks are claimed for parallel work. `/root/data02_overlap_map` owns `DATA-02-ARCHIVE-OVERLAP-MAP-01`: a deterministic exact-path overlap and TOC-declared-size relation report across the seven existing member manifests and 21 archive pairs, with synthetic comparison tests. It will read metadata only and cannot establish byte equality, loader behavior, patch priority, mount order or game use. `/root/rela_fixture` owns `RE-02-DYNLINK-RELA-FIXTURE-01`: extend only the synthetic `scripts/test_ps4_dynlink.py` fixture with a nonempty RELA row and assertions for table, target, type, symbol index and signed addend. Existing parser already enumerates JMPREL and RELA; no production parser change is planned unless a real defect is independently demonstrated. The one RackQuery follow-up xrefs query at `0xf91420` was separately authorized by the pushed 91c9752 checkpoint and is running as the only provider operation.
+
+Claim-time navigation: Graft `ask` confirmed the fixture has `RELA=0` / `RELASZ=0` today and the parser enumerates both tables; Graft `callers dynamic_import_elf_fixture --depth all` found one test caller. Graft also identified the existing exact-path overlay test/API, but the new DATA audit will not call overlay policy code or infer precedence. `python3 scripts/project_index.py` exited 0 (4,159 folders; `local/checkpoints/root-parallel-claims-project-index.*`); `graft check` exited 0 (graph synced; deep layer unbuilt, 1,225 nodes pending; `local/checkpoints/root-parallel-claims-graft-check.*`); `git diff --check` passed. Root owns all shared docs and integration. Workers must not edit shared docs, source pins, private game inputs or Git state.
+
+The previous 04:37 checkpoint is preserved below. Its DATA-02 path audit is complete, RackQuery slot-to-thunk evidence was root-replayed, and the public checkpoint is `91c9752` on `origin/main`. The single follow-up REA xrefs operation at `0xf91420` is now running in `/root/rackquery_slot_xrefs` in its own private dossier; no other provider operation is in flight.
+
+Next exact action: stage and publish the four allowlisted claim/index docs after staged and full path audits and a zero-divergence fetch. Then dispatch `/root/data02_overlap_map` and `/root/rela_fixture` with disjoint file ownership while the existing single RackQuery query finishes. Root must replay every result before accepting task status changes.
+
+## PRIOR CHECKPOINT — 2026-10-20 04:37 CDT, `/root` — DATA-02 audit replay and RackQuery slot-to-thunk review
 
 `DATA-02-ARCHIVE-PATH-CASE-01` is now `ARTIFACT_VERIFIED`. Root verified all 32 entries in the worker checksum manifest, reran the metadata-only checker, and byte-compared the result against both worker runs. The seven manifests contain 170,451 records across 21 archive pairs: zero exact duplicate path groups, zero within-manifest Unicode `casefold()` groups, and zero differently spelled cross-archive equivalent pairs. Root verification JSON: `local/validation/data02-archive-path-case-01-root-review/verification.json`, SHA-256 `b706b935c28ed3915ac9c860d3fd2160a63c23ddba93ed765f499e3a5c054019`. The worker's zsh `status` variable capture error and root's initial wrong-working-directory checksum attempt were both corrected; neither was a failed analysis hypothesis. This does not establish Fios, filesystem, overlay, mount-order, title-loader, or runtime behavior.
 
