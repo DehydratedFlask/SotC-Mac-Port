@@ -54,7 +54,8 @@ add_library(sotc_core STATIC
   core/vec_db5dd0.cpp
   core/vec_db7e60.cpp
   core/vec_db3960.cpp
-  core/vec_d90310.cpp)
+  core/vec_d90310.cpp
+  core/vec_d94cb0.cpp)
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()
 add_executable(test_math_constants tests/test_math_constants.cpp)
@@ -201,3 +202,6 @@ add_test(NAME region_split COMMAND test_region_split)
 add_executable(test_vec_d90310 tests/test_vec_d90310.cpp)
 target_link_libraries(test_vec_d90310 sotc_core)
 add_test(NAME vec_d90310 COMMAND test_vec_d90310)
+add_executable(test_vec_d94cb0 tests/test_vec_d94cb0.cpp)
+target_link_libraries(test_vec_d94cb0 sotc_core)
+add_test(NAME vec_d94cb0 COMMAND test_vec_d94cb0)
