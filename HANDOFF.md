@@ -3,17 +3,22 @@
 Updated: 2026-10-19 22:05 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## ACTIVE CLAIM — 2026-10-19 22:05 CDT, worker bc-02397584 (CPU-01d) — 0xd19bb0 — COMPLETE
+## ACTIVE CLAIM — 2026-10-19 22:05 CDT, worker bc-effcf5dc (CPU-01d) — 0xd19af0 — COMPLETE
 
-Task: CPU-01d — unguarded vec-copy ctor RVA **0xd19bb0** (survey index 120).
-Failed tries: 0. Status: FIXTURE_VERIFIED (`1177ca3`); restore peer `vec_d20590` CMake lines.
-Owned this push: `native/CMakeLists.txt` (+`vec_d20590`), `HANDOFF.md`.
-Sources on origin: `1177ca3`. Never touched `startup_ctors.*`.
-Checkpoint (2026-10-19 22:05 CDT, bc-02397584):
-- OBS: src=0x12fedc0 dst=0x3351e80 bits=~0,~0,~0,0; index 120.
-- ctest/check OK. Store: `internal/worker-claim-d19bb0.md`.
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd19af0** (ctor-survey.json index **67**).
+Note: Drive registry idx 121 is already `0xd2cb30` — this leaf uses ctor-survey.json index 67, not 121.
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d19af0.{hpp,cpp}`, `native/tests/test_vec_d19af0.cpp`,
+`tools/lift/check_fd19af0.py`, `native/CMakeLists.txt` (+vec_d19af0 only; origin/main base).
+Private dump (not published): `local/re/work/cd19af0.bin`.
+Prior: 99 `e568b51`, 101 `cac53b7`, 116 `4beae8e`. Skipped 95; busy `0xd2c7e0`/`0xd20590`/`0xd19bb0`.
+Did NOT edit Drive / SRV / `startup_ctors.*` / peer WIP / `local/`. No `git reset --hard`.
+Checkpoint (2026-10-19 22:05 CDT, bc-effcf5dc):
+- OBS: unguarded vmovups copy; src=0x12fec00 dst=0x3351e70 bits=~0,~0,~0,0; ctor-survey index 67.
+- Commands: ctest -R '^vec_d19af0$' Passed; `python3 -I tools/lift/check_fd19af0.py` OK.
+- Logs: `/tmp/ctest_d19af0.log`, `/tmp/check_fd19af0.log`.
+- Store: Project `internal/worker-claim-d19af0.md`.
 - Push: (this commit).
-
 
 ## ACTIVE CLAIM — 2026-10-19 22:03 CDT, worker bc-02397584 (CPU-01d) — 0xd19bb0 — COMPLETE
 
