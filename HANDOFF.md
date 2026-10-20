@@ -1,7 +1,23 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:52 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:54 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 21:54 CDT, worker bc-81763e53 (CPU-01d) — 0xd42b60 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd42b60** (survey index 108).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d42b60.{hpp,cpp}`, `native/tests/test_vec_d42b60.cpp`,
+`tools/lift/check_fd42b60.py`, `native/CMakeLists.txt` (+vec_d42b60 only; origin/main base).
+Private dump (not published): `local/re/work/cd42b60.bin`.
+Skipped: 95; A `0xd47270`=`eec9fbd`; D `0xd47420`=`64b1662`; busy C/B peers.
+Did NOT edit Drive / SRV / `startup_ctors.*` / `local/`.
+Checkpoint (2026-10-19 21:54 CDT, bc-81763e53):
+- OBS: unguarded vmovups copy; src=0x1302650 dst=0x33520e0 bits=~0,~0,~0,0; index 108; distinct cells.
+- Commands: ctest -R '^vec_d42b60$' Passed; `python3 -I tools/lift/check_fd42b60.py` OK.
+- Logs: `/tmp/ctest_d42b60.log`, `/tmp/check_fd42b60.log`.
+- Store: Project `internal/worker-claim-d42b60.md`.
+- Push: (this commit).
 
 ## ACTIVE CLAIM — 2026-10-19 21:52 CDT, worker bc-9aa0fe88 (SRV-01 mem exact-fit) — COMPLETE
 
