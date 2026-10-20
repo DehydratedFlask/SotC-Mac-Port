@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 06:03 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 06:04 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 06:03 CDT, `/root` — PSARC block-table boundary claim published
+## CURRENT CHECKPOINT — 2026-10-20 06:04 CDT, `/root` — PSARC block-table test worker dispatched
 
 `DATA-02-PSARC-BLOCK-TABLE-RANGE-01` is claimed by root; worker `/root/data02_psarc_block_table_range` may edit only `scripts/test_psarc.py`, and root owns shared docs and Git. It adds one synthetic archive fixture: set entry 1's big-endian first-block field at bytes `78:82` to `0xffffffff`, then assert `Psarc(...)` rejects it with `entry references blocks outside the block table`. Parent DATA-02 is active; sibling `DATA-02-PSARC-TRUNCATED-COMPRESSED-BLOCK-01` is already verified. Claim was based on `docs/TASKS.md` DATA-02 and `docs/ASSETS.md` PSARC reader notes.
 
@@ -19,7 +19,9 @@ The prior XFF completion was published as `05b3e52`; its post-push checkpoint sy
 
 Claim commit `72f3a232ef1730b964ef794d13ab4076c01a80b8` (`docs: claim PSARC block-table boundary fixture`) was pushed. Post-push fetch confirmed `HEAD` and `origin/main` match at `72f3a232ef1730b964ef794d13ab4076c01a80b8`, 0/0 divergence (log SHA-256 `d8c73fd39e5b18a4dd8aafd7162274f3a8368796713868969ff11299fed5c572`).
 
-Exact next action: publish this post-push checkpoint sync, then dispatch the bounded test-only worker. Generated/untracked `tools/graft/` stays excluded.
+Claim sync commit `bfb5ab540a7e355ce0d30645d1cc43e2ba3c57c2` (`docs: record PSARC claim publication`) was pushed; post-push fetch confirmed 0/0 at that commit (log SHA-256 `b68b4e699d7b244c284fedd3a8b511baa885b8e806d3c1ccfc74963b3329ffe4`). Worker `/root/data02_psarc_block_table_range` is now dispatched and may change only `scripts/test_psarc.py`; root owns review, evidence and Git.
+
+Exact next action: review the worker's one-test diff and replay the targeted suite; also assess independent launcher tasks from the read-only scout. Generated/untracked `tools/graft/` stays excluded.
 
 ## PRIOR CHECKPOINT — 2026-10-20 05:46 CDT, `/root` — truncated ELF PHDR fixture verified
 
