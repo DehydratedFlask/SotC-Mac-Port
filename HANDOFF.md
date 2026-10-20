@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:20 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:21 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:20 CDT, /root — slot-10 computed-call follow-up claimed; prior work published
+## CURRENT CHECKPOINT — 2026-10-20 00:21 CDT, /root — slot-10 computed-call follow-up dispatched; claim published
 
 Task APP-01-IMPORTER-ERROR-01: `launcher/Sources/SoCLauncher/ContentView.swift` now presents the
 localized error in a system alert for import failures and leaves the prior folder/readiness intact;
@@ -59,11 +59,13 @@ whitespace check passed; pre-commit divergence was `0 0`. Commit `5d3d262` pushe
 
 ### CPU-01-CTOR10-INDIRECT-01 — bound slot-10 call target at `0xf09efb` — CLAIMED
 
-Claimed to `/root/srv01_page_map_19660`. Scope: call-reaching branch, `RAX` feeding
+Dispatched to `/root/srv01_page_map_19660` after its completed page-map task was reused. Scope: call-reaching branch, `RAX` feeding
 `[RAX+0xc0]`, and whether pinned code/data determine a unique target. Reuse E43/E46 first; if REA is
 needed, use `local/re/rea-f09efb-snapshot.json` and private evidence under
 `local/re/evidence/rea-f09efb/`. The prior zero-guard result applies only to that observed path. No
-code, runtime, ABI, or constructor-reachability claim; failed hypotheses/tries 0. The claim is in
+code, runtime, ABI, or constructor-reachability claim; failed hypotheses/tries 0. Claim commit
+`4cfc51b` was pushed before dispatch. The analyst is to start with E43/E46, keep any unsupported
+target unresolved, and send private evidence/results to root without shared-doc edits. The claim is in
 [CPU-01-CTOR10-INDIRECT-01](docs/checkpoints/2026-10-20-root-cpu01-ctor10-indirect-claim.md).
 
 Graft coverage limitation: `graft grep "f09efb" --in native/` found no native indexed occurrences;
