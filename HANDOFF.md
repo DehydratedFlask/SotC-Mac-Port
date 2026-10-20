@@ -1,34 +1,28 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 22:30 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 22:37 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 22:30 CDT, /root — parallel CPU-01d / SRV-01 claims — ACTIVE
+## CURRENT CHECKPOINT — 2026-10-19 22:37 CDT, /root — SRV-01 + CPU-01d fixture batch — FIXTURE_VERIFIED
 
-Three isolated implementation claims are now active. Root owns `HANDOFF.md`, `docs/TASKS.md`,
-`docs/EVIDENCE.md`, `docs/POINTERS.md`, `native/README.md`, `native/CMakeLists.txt`, startup-ctor
-registration, and all checkpoint/integration work. Claim details and current inventory/index results
-are in [the parallel fixture checkpoint](docs/checkpoints/2026-10-19-root-cpu01d-parallel.md).
+Root reviewed and integrated three isolated, fixture-only slices. The complete command/evidence
+record is in [the native fixture batch checkpoint](docs/checkpoints/2026-10-19-root-native-fixture-batch.md).
 
-- `/root/arena_accounting` continues the fixture slice for `FUN_00019e00`, block `0x1a123–0x1a15a`,
-  ELF SHA256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`. Ghidra 12.1.4
-  evidence E28 is recorded below. Own files only: `native/core/arena_accounting.{hpp,cpp}`,
-  `native/tests/test_arena_accounting.cpp`, and `tools/lift/check_f19e00_accounting.py`. One failed
-  target hypothesis remains recorded. The existing `arena_high_water` helper covers the distinct
-  `0x1a9bb` path; this work uses raw offsets `+0x80`, `+0x88`, and conditional `+0x90` only.
-- `/root/cpu01d_ce57b0` lifts unguarded vector-copy constructor RVA `0xce57b0` (private survey list
-  position 153, 17 bytes, no direct or indirect calls). Own files only: `native/core/vec_ce57b0.{hpp,cpp}`,
-  `native/tests/test_vec_ce57b0.cpp`, and `tools/lift/check_fce57b0.py`. Failed tries: 0.
-- `/root/cpu01d_ce0890` lifts unguarded vector-copy constructor RVA `0xce0890` (private survey list
-  position 155, 17 bytes, no direct or indirect calls). Own files only: `native/core/vec_ce0890.{hpp,cpp}`,
-  `native/tests/test_vec_ce0890.cpp`, and `tools/lift/check_fce0890.py`. Failed tries: 0.
+- SRV-01 `FUN_00019e00`, block `0x1a123–0x1a15a`: raw-offset helper, exact and short span checks,
+  sanitizer CMake target, and E28 byte/instruction checker pass. One earlier failed function-target
+  hypothesis remains in the count. No allocator runtime wiring; meanings of `+0x80/+0x88/+0x90`
+  remain unknown.
+- CPU-01d RVA `0xce57b0` (survey position 153) and `0xce0890` (position 155): both native leaves,
+  separate test targets, and ELF hash-bound checkers pass. Both source/destination cell pairs are
+  distinct. Reviewers found no blockers; a stale survey comment for `0xce57b0` is explicitly not
+  used as evidence because the checker decodes its signed displacements from the hash-pinned ELF.
+- `python3 scripts/project_index.py` indexed 4,114 folders. Graft was rebuilt with
+  `scripts`, `tools`, `reference`, `native`, `launcher`, and `tests`; the three new symbols are
+  queryable and `graft check` passes. The meaning/deep layer is still unbuilt.
 
-No worker edits `native/CMakeLists.txt`, `startup_ctors.*`, or shared docs. These are fixture/code
-tasks only; no runtime allocator integration or G1 claim. Pre-existing unstaged changes in
-`native/core/vec_ce7300.hpp`, `native/tests/test_vec_ce7300.cpp`, and `tools/lift/check_fce7300.py`
-remain preserved and are excluded from current staging.
-Pre-existing unstaged changes in `native/core/vec_ce7300.hpp`, `native/tests/test_vec_ce7300.cpp`,
-and `tools/lift/check_fce7300.py` are preserved and not included in this checkpoint.
+These are fixture/code checkpoints only: no startup-ctor registration, engine boot, actual game
+audio, real save/load, or G1 evidence. G2–G6 remain NOT RUN. Pre-existing unstaged
+`0xce7300` edits are preserved and excluded from this batch. Root owns any follow-up cleanup.
 
 ## ACTIVE CLAIM — 2026-10-19 22:20 CDT, worker bc-73721c8d (CPU-01d) — 0xce67b0 — COMPLETE
 

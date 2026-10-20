@@ -17,10 +17,13 @@ private `local/re/functions.jsonl` records (ELF sha256 d0723afb...c25861d3).
 | `core/region_split.{hpp,cpp}` | SRV-01 mem: OBS split surgery `0x1a8b6..0x1a8fa` after node pop; `0x19660` replenish OPEN |
 | `core/region_list.{hpp,cpp}` | SRV-01 mem: OBS list surgery `0x1a902`/`0x1a974` + arena free-count `@+0x48` |
 | `core/arena_high_water.{hpp,cpp}` | SRV-01 mem: OBS used-byte high-water `0x1a9bb` (`+0x80/+0x90` + peaks) |
+| `core/arena_accounting.{hpp,cpp}` | SRV-01 fixture for `0x19e00` block `0x1a123–0x1a15a`; API `apply_f19e00_accounting(span, requested_bytes, mode)` models raw qword offsets `+0x80/+0x88/+0x90`; test `ctest --test-dir local/build/native -R '^arena_accounting$'`; not wired into allocator runtime |
 | `core/exact_fit_finalize.{hpp,cpp}` | SRV-01 mem: OBS exact-fit consume finalize `0x1aada` |
 | `core/arena_page_debit.{hpp,cpp}` | SRV-01 mem: OBS free-path page debit `+0x70` + idle-pool insert helpers |
 | `core/vec_neg036.{hpp,cpp}` | Native form of original RVA `0xf4b510` (ctor index 7): guarded splat of `0xbeb851ea` (~−0.36f)×4 |
 | `core/xyz_mask_copy.{hpp,cpp}` | Native form of original RVA `0xf30460` (ctor index 9): unguarded `{~0,~0,~0,0}` copy to its own BSS cell |
+| `core/vec_ce57b0.{hpp,cpp}` | Native form of original RVA `0xce57b0` (ctor survey index 153); API `init_vec_ce57b0`; test `ctest --test-dir local/build/native -R '^vec_ce57b0$'`; unguarded 16-byte mask copy to its own destination cell |
+| `core/vec_ce0890.{hpp,cpp}` | Native form of original RVA `0xce0890` (ctor survey index 155); API `init_vec_ce0890`; test `ctest --test-dir local/build/native -R '^vec_ce0890$'`; unguarded 16-byte mask copy to its own destination cell |
 | `core/clear_flag32.{hpp,cpp}` | Native form of original RVA `0x196c90` (ctor index 520): seq_cst clear of a u32 cell via `xchg` |
 | `core/startup_ctors.{hpp,cpp}` | Replacement for the CRT ctor runner: runs recovered slots in original order and blocks visibly (no stub success) at an unrecovered one |
 | `tests/test_math_constants.cpp` | Independent IEEE oracles + guard-semantics checks; `--dump` mode feeds the binary tie check |
@@ -29,6 +32,6 @@ Build and test (ARM64, ASan+UBSan):
 
     cmake -S native -B local/build/native -G Ninja && cmake --build local/build/native && ctest --test-dir local/build/native --output-on-failure
 
-Binary-vs-native ties (private, need local/re/eboot.elf): `python3 -I tools/lift/check_f6cad0.py` and `check_f125990.py`, `check_fe10490.py`, `check_fe0e140.py`, `check_f66dec0.py`, `check_heap_window.py`, `check_f19ae0.py`, `check_ff4b510.py`, `check_ff30460.py`, `check_f196c90.py`.
+Binary-vs-native ties (private, need local/re/eboot.elf): `python3 -I tools/lift/check_f6cad0.py` and `check_f125990.py`, `check_fe10490.py`, `check_fe0e140.py`, `check_f66dec0.py`, `check_heap_window.py`, `check_f19ae0.py`, `check_f19e00_accounting.py`, `check_fce57b0.py`, `check_fce0890.py`, `check_ff4b510.py`, `check_ff30460.py`, `check_f196c90.py`.
 Threading check (not in ctest): `clang++ -std=c++20 -fsanitize=thread -Inative native/core/scratch_reset.cpp native/tests/test_scratch_reset.cpp`.
 Status: FIXTURE only (Drive registry: 6 of 573 ctors; allocator region contract typed; peer may add more). Not wired to any engine startup; G1 is not passed.

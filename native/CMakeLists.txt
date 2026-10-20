@@ -21,6 +21,7 @@ add_library(sotc_core STATIC
   core/region_split.cpp
   core/region_list.cpp
   core/arena_high_water.cpp
+  core/arena_accounting.cpp
   core/exact_fit_finalize.cpp
   core/arena_page_debit.cpp
   core/vec_neg036.cpp
@@ -122,6 +123,8 @@ add_library(sotc_core STATIC
   core/vec_ce99c0.cpp
   core/vec_ce74a0.cpp
   core/vec_ce7300.cpp
+  core/vec_ce57b0.cpp
+  core/vec_ce0890.cpp
   core/vec_ce6fb0.cpp
   core/vec_ce8440.cpp
   core/vec_ce67b0.cpp
@@ -149,6 +152,9 @@ add_test(NAME addr COMMAND test_addr)
 add_executable(test_allocator_region tests/test_allocator_region.cpp)
 target_link_libraries(test_allocator_region sotc_core)
 add_test(NAME allocator_region COMMAND test_allocator_region)
+add_executable(test_arena_accounting tests/test_arena_accounting.cpp)
+target_link_libraries(test_arena_accounting sotc_core)
+add_test(NAME arena_accounting COMMAND test_arena_accounting)
 add_executable(test_vec_neg036 tests/test_vec_neg036.cpp)
 target_link_libraries(test_vec_neg036 sotc_core)
 add_test(NAME vec_neg036 COMMAND test_vec_neg036)
@@ -530,6 +536,14 @@ add_test(NAME vec_ce74a0 COMMAND test_vec_ce74a0)
 add_executable(test_vec_ce7300 tests/test_vec_ce7300.cpp)
 target_link_libraries(test_vec_ce7300 sotc_core)
 add_test(NAME vec_ce7300 COMMAND test_vec_ce7300)
+
+add_executable(test_vec_ce57b0 tests/test_vec_ce57b0.cpp)
+target_link_libraries(test_vec_ce57b0 sotc_core)
+add_test(NAME vec_ce57b0 COMMAND test_vec_ce57b0)
+
+add_executable(test_vec_ce0890 tests/test_vec_ce0890.cpp)
+target_link_libraries(test_vec_ce0890 sotc_core)
+add_test(NAME vec_ce0890 COMMAND test_vec_ce0890)
 
 add_executable(test_vec_ce6fb0 tests/test_vec_ce6fb0.cpp)
 target_link_libraries(test_vec_ce6fb0 sotc_core)
