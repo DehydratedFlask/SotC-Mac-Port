@@ -37,6 +37,21 @@ class PublishPathTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertTrue(audit.violations([path]), path)
 
+    def test_dotdot_traversal_into_forbidden_roots_rejected(self):
+        # An allowlisted top component must not launder a path that resolves
+        # into a forbidden root (or out of the repo) via "..".
+        cases = [
+            "docs/../local/manifests/x.json",
+            "tools/../reference/shadPS4/README.md",
+            "scripts/../Shadow of the Colossus/asset.dat",
+            "./docs/../logs/extract.log",
+            "docs\\..\\local\\x.json",
+            "../outside.txt",
+        ]
+        for path in cases:
+            with self.subTest(path=path):
+                self.assertTrue(audit.violations([path]), path)
+
 
 if __name__ == "__main__":
     unittest.main()

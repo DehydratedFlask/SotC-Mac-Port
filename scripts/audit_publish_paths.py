@@ -81,6 +81,9 @@ def violations(paths: list[str]) -> list[str]:
             p = p[2:]
         if not p:
             continue
+        if ".." in p.split("/"):
+            bad.append(f"path traversal: {p}")
+            continue
         top = p.split("/", 1)[0]
         if top not in ALLOWED_TOP and p not in ALLOWED_TOP:
             bad.append(f"outside allowlist: {p}")
