@@ -1,7 +1,23 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:33 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:34 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:34 CDT, worker bc-73721c8d (CPU-01d) — 0xd7c380 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd7c380** (survey index 91).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d7c380.{hpp,cpp}`, `native/tests/test_vec_d7c380.cpp`,
+`tools/lift/check_fd7c380.py`, `native/CMakeLists.txt` (+vec_d7c380 only; origin/main base).
+Private dump (not published): `local/re/work/cd7c380.bin`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV, peer `0xd7c4d0`/`0xd7be60`.
+Skipped: `0xd7fe40` (C), `0xd7e640`/`0xd7fe90` (D), `0xd7c9d0`/`0xd7c4d0` (B).
+Checkpoint (2026-10-19 20:34 CDT, bc-73721c8d):
+- OBS: unguarded vmovups copy; src=0x1306b90 dst=0x3352a00 bits=~0,~0,~0,0; index 91; distinct cells.
+- Commands: ctest -R '^vec_d7c380$' Passed; `python3 -I tools/lift/check_fd7c380.py` OK.
+- Logs: `/tmp/ctest_d7c380.log`, `/tmp/check_d7c380.log`.
+- Store: Project `internal/worker-claim-d7c380.md`.
+- Push: `be64c6d` on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 20:33 CDT, worker bc-02397584 (CPU-01d) — 0xd7c4d0 — COMPLETE
 
@@ -132,10 +148,10 @@ Checkpoint (2026-10-19 20:27 CDT, bc-81763e53):
 - Store: Project `internal/worker-claim-d80e60.md`.
 - Push:  on origin/main.
 
-## ACTIVE CLAIM — 2026-10-19 20:40 CDT, worker bc-73721c8d (CPU-01d) — 0xd84ee0 — IN PROGRESS
+## ACTIVE CLAIM — 2026-10-19 20:40 CDT, worker bc-73721c8d (CPU-01d) — 0xd84ee0 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd84ee0** (survey index 84).
-Failed tries: 0. Status: CLAIMED / lifting.
+Failed tries: 0. Status: FIXTURE_VERIFIED; on origin/main.
 Owned: `native/core/vec_d84ee0.{hpp,cpp}`, `native/tests/test_vec_d84ee0.cpp`,
 `tools/lift/check_fd84ee0.py`, `native/CMakeLists.txt` (+vec_d84ee0 only; origin/main base).
 Private dump (not published): `local/re/work/cd84ee0.bin`.
