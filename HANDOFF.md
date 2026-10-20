@@ -14,17 +14,29 @@ No native game executable exists. G1 NOT PASSED.
   and [AGENTS.md](AGENTS.md) / [ROADMAP.md](ROADMAP.md).
 - Users must supply their own legally obtained game files; none ship in the repo.
 
+## ACTIVE CLAIM — 2026-10-19 19:55 CDT, worker bc-cb8d07c2 (CPU-01f)
+
+Task: CPU-01f — leaf ctors `0xa3ade0` (store u32 0) + `0x5777a0` (vxorps/store xmm).
+Failed tries: 0. Status: IN PROGRESS.
+Owned (new core only): native/core/store_zero32.*, zero_xmm16.*, tests, check_fa3ade0.py,
+check_f5777a0.py, CMakeLists (+targets), local/re/work/c{a3ade0,5777a0}.bin.
+Does NOT edit: startup_ctors.*, Drive clear_flag32/vec_neg036/xyz_mask_copy, peer vec_b52110.
+Exact check: ctest + both binary ties.
+Skipped: owned Drive/Claim-2b RVAs.
+
 ## ACTIVE CLAIM — 2026-10-19 19:54 CDT, worker bc-dc141fdf (GitHub publish) — COMPLETE
 
 Task: Create public GitHub repo SotC-Mac-Port + allowlisted first commit/push + durable checkpoint rule.
-Failed tries: 0. Status: COMPLETE (push SHA recorded below after push).
+Failed tries: 0. Status: COMPLETE.
 Owned: `.gitignore`, `README.md`, `ROADMAP.md`, `AGENTS.md`, `HANDOFF.md` (this claim),
 `scripts/audit_publish_paths.py`; Project store `docs/github-publish.md`.
 Did NOT invent LICENSE (none pre-chosen). Skipped `graft/` (regenerable ~277M noise).
 Exact check: staged + `--all` path audit OK; `git push -u origin main`.
+**First push SHA:** `0138c79313cb2161dd26a99d4ad0c5c9e23d27a9` — https://github.com/DehydratedFlask/SotC-Mac-Port
 Note: `gh api user` login is **DehydratedFlask** (John Wang); `gh auth status` also shows
 Johnnywang2001 keyring label — canonical owner/URL uses DehydratedFlask.
 Peer bc-24e5fd45 help claim: remote now exists; no need to recreate.
+Path audit: `python3 -I scripts/audit_publish_paths.py --all` → OK (110 paths); no eboot/PKG/psarc/local/reference.
 
 ## ACTIVE CLAIM — 2026-10-19 19:53 CDT, worker bc-24e5fd45 (GitHub repo help) — SUPERSEDED
 
