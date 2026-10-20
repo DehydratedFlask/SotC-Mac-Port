@@ -31,8 +31,12 @@ The previous dynamic-string task is complete and pushed as `38fad54`, with docum
 0/0 divergence. Staged audit accepted 4 paths (log SHA-256
 `e0855adcdc747b2080484ec7216aa2bdd94b4c3d39e99b07b8f07466451c79e3`); full audit accepted 643 paths
 (log SHA-256 `8da1317b279da0ddbae311beac43039d38c0a750d552e532712eed17a3003671`). Precommit fetch
-exited 0, divergence 0/0 at `49fc041`. Claim commit/push remains pending. Next exact action: publish
-this claim, then dispatch the test-only worker. Generated/untracked `tools/graft/` remains excluded.
+exited 0, divergence 0/0 at `49fc041`. Claim commit `232daaf` was pushed to `origin main`
+(exit 0). Post-push fetch exited 0; `HEAD` and `origin/main` both resolve to
+`232daaf42a2895f9d1c51461db89f8dc26a533e6`, divergence 0/0 (log
+`local/checkpoints/root-2026-10-20-re01-elf-phdr-truncation-claim-post-push-fetch.log`, SHA-256
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). Next exact action: finish
+documentation sync, then dispatch the test-only worker. Generated/untracked `tools/graft/` remains excluded.
 
 ## PRIOR CHECKPOINT — 2026-10-20 05:39 CDT, `/root` — dynamic string terminator fixture verified
 
