@@ -12,6 +12,9 @@
 #include "vec_neg036.hpp"
 #include "xyz_mask_copy.hpp"
 #include "clear_flag32.hpp"
+#include "init_f4fd40.hpp"
+#include "init_f4eba0.hpp"
+#include "init_f4b540.hpp"
 
 namespace sotc {
 
@@ -27,6 +30,9 @@ struct StartupState {
     VecNeg036 neg036{};
     XyzMaskCopy xyz_mask_copy{};
     XyzMaskCopy xyz_mask_b{};
+    InitF4fd40 f4fd40{};
+    InitF4eba0 f4eba0{};
+    InitF4b540 f4b540{};
     std::array<std::byte, kScratchBytes> scratch{};
     std::atomic<std::uint64_t> scratch_slot{0};
     std::atomic<std::uint32_t> flag32{0};

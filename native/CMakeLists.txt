@@ -25,10 +25,12 @@ add_library(sotc_core STATIC
   core/vec_b743c0.cpp
   core/vec_ef85e0.cpp
   core/vec_e085e0.cpp
-  core/vec_e094e0.cpp
   core/store_zero32.cpp
   core/zero_xmm16.cpp
-  core/zero_xmm_qword.cpp)
+  core/zero_xmm_qword.cpp
+  core/init_f4fd40.cpp
+  core/init_f4eba0.cpp
+  core/init_f4b540.cpp)
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()
 add_executable(test_math_constants tests/test_math_constants.cpp)
@@ -79,15 +81,21 @@ add_test(NAME vec_ef85e0 COMMAND test_vec_ef85e0)
 add_executable(test_vec_e085e0 tests/test_vec_e085e0.cpp)
 target_link_libraries(test_vec_e085e0 sotc_core)
 add_test(NAME vec_e085e0 COMMAND test_vec_e085e0)
-add_executable(test_vec_e094e0 tests/test_vec_e094e0.cpp)
-target_link_libraries(test_vec_e094e0 sotc_core)
-add_test(NAME vec_e094e0 COMMAND test_vec_e094e0)
 add_executable(test_store_zero32 tests/test_store_zero32.cpp)
 target_link_libraries(test_store_zero32 sotc_core)
 add_test(NAME store_zero32 COMMAND test_store_zero32)
 add_executable(test_zero_xmm16 tests/test_zero_xmm16.cpp)
 target_link_libraries(test_zero_xmm16 sotc_core)
 add_test(NAME zero_xmm16 COMMAND test_zero_xmm16)
+add_executable(test_init_f4fd40 tests/test_init_f4fd40.cpp)
+target_link_libraries(test_init_f4fd40 sotc_core)
+add_test(NAME init_f4fd40 COMMAND test_init_f4fd40)
+add_executable(test_init_f4eba0 tests/test_init_f4eba0.cpp)
+target_link_libraries(test_init_f4eba0 sotc_core)
+add_test(NAME init_f4eba0 COMMAND test_init_f4eba0)
+add_executable(test_init_f4b540 tests/test_init_f4b540.cpp)
+target_link_libraries(test_init_f4b540 sotc_core)
+add_test(NAME init_f4b540 COMMAND test_init_f4b540)
 add_executable(test_zero_xmm_qword tests/test_zero_xmm_qword.cpp)
 target_link_libraries(test_zero_xmm_qword sotc_core)
 add_test(NAME zero_xmm_qword COMMAND test_zero_xmm_qword)
