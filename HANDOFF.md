@@ -1,19 +1,31 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:25 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:34 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:25 CDT, /root — app-main verified; importer fix and PHDR8 audit active
+## CURRENT CHECKPOINT — 2026-10-20 01:34 CDT, /root — importer checks pass; PHDR8 audit verified
 
 ### Publication record — preceding checkpoint
 
-The app-main completion, escalation record, and APP-01 importer cancellation claim were committed
-as `41d9b41` (`docs: verify app-main and claim importer cancellation fix`) and pushed to
-`origin/main` (`f07cfde..41d9b41`). `python3 scripts/project_index.py` exited `0` (4,137 folders
-indexed); `graft check` exited `0` (wiring graph in sync; meaning layer unbuilt, 1,219 nodes
-pending); `git diff --cached --check` passed; staged path audit accepted 7 paths; full path audit
-accepted 598; `git fetch origin main` succeeded and divergence was `0 0`. No tracked folder-index
-diff remained after regeneration.
+The PHDR8 source-audit claim and regenerated folder index were committed as `e60fe1e`
+(`docs: claim PHDR8 source audit`) and pushed (`41d9b41..e60fe1e`). Before publication,
+`python3 scripts/project_index.py` exited `0` (4,137 folders indexed); `graft check` exited `0`
+(wiring graph in sync; meaning layer unbuilt, 1,225 nodes pending); `git diff --cached --check`
+passed; staged path audit accepted four allowlisted paths; full path audit accepted 599; fetch
+succeeded and divergence was `0 0`. Commit changed only HANDOFF.md, docs/FOLDERS.md, docs/TASKS.md,
+and the PHDR8 claim checkpoint. Earlier app-main publication remains `41d9b41`.
+
+After the importer worker started Swift tests, root reran `python3 scripts/project_index.py`; it
+exited `0` but indexed 5,211 folders and generated 1,074 extra lines for `launcher/.build`. Root
+restored `docs/FOLDERS.md` to the artifact-free version at `e60fe1e`; no build output was staged.
+The worker later reran the index at 5,212 folders with the same 1,074 build-cache lines. It checked
+`lsof -nP +D launcher/.build` (no open files), removed only the test-created build tree, and
+regenerated the index: `python3 scripts/project_index.py` exited `0` with 4,139 folders. Root then
+removed its own test cache using a guarded Python `shutil.rmtree` on `launcher/.build` after
+`lsof -nP +D launcher/.build` returned no open files, and reran `python3 scripts/project_index.py`
+(exit `0`, 4,139 folders). `docs/FOLDERS.md` has no diff from the committed index and
+`launcher/.build` is absent. Worker/root test logs are under `local/validation/`; the root
+index-cache recovery log is `local/checkpoints/2026-10-20-root-index-build-artifact.log`.
 
 ### RE-02-APPMAIN-25A8D0-01 — STATIC_ANALYSIS_VERIFIED
 
@@ -61,28 +73,55 @@ unit cases. Preserve selection/readiness on import failure. No app runtime inter
 tested. Failed tries: 0. Claim details:
 [checkpoint](docs/checkpoints/2026-10-20-root-app01-importer-error-reclaim.md).
 
-Worker `/root/app01_import_cancel` (`gpt-6-luna`, Extra High) is implementing the helper and
-focused tests in launcher source/tests only. Root owns shared docs. Exact next action: review the
-worker diff, independently run `swift test` from `launcher/`, then update task/evidence and
-checkpoint. No game files, binary, executable modules, or runtime were opened or modified for the
-importer claim. G1 remains NOT PASSED.
+Worker `/root/app01_import_cancel` (`gpt-6-luna`, Extra High) added the helper and focused tests in
+launcher source/tests only. Its first `swift test` attempt failed while compiling the test target:
+Foundation names (`NSError`, `NSCocoaErrorDomain`, `NSUserCancelledError`, and
+`NSLocalizedDescriptionKey`) were out of scope because the test file lacked an explicit Foundation
+import. This is a build failure, not evidence of application behavior. The second `swift test` run
+passed all 14 tests across three suites, including cancellation and localized-error cases.
+`graft check` and `git diff --check` also passed, the working tree has no build cache, and the
+worker changed only the two launcher source files plus focused tests. Root independently ran
+`swift test > ../local/validation/app01-importer-error-01-root-swift-test.log 2>&1; result_code=$?; printf 'exit status: %s\n' "$result_code" >> ../local/validation/app01-importer-error-01-root-swift-test.log; exit "$result_code"`
+from `launcher/`; exit `0`, all 14 tests across three suites passed, and the root log SHA-256 is
+`d1492ba66cccfc3e5f5c2536be8c4f40e4f55260295bff1ecbebf07e38b55705`. Failed tries: 1. Native
+alert interaction remains NOT RUN. No game files,
+binary, executable modules, or runtime were opened or modified for this claim. G1 remains NOT
+PASSED.
 
-### RE-02-PHDR8-SOURCE-AUDIT-01 — ACTIVE, claim ready for dispatch
+### RE-02-PHDR8-SOURCE-AUDIT-01 — ARTIFACT_VERIFIED
 
 The app-main verifier found program header #8 at raw type `0x61000000`, with file-backed range
 `p_offset=0x2ddb100`, `p_vaddr=0`, `p_filesz=0x1055ab0`, and `p_memsz=0`. It overlaps the function
-at `0x25a8d0` through a second file view but is not used for executable-byte validation. This
-header's meaning and loader role remain UNCLASSIFIED. The reference pin is shadPS4 commit
-`0ebea15c24253b60f514fc37a348dabc8d0bcb90`; the Graft query
-`graft ask "Which named PS4/Sony program-header types are handled in the pinned shadPS4 source, especially numeric type 0x61000000, and where are their semantics stated?" --source --in reference/shadPS4/`
-exited `1` because no files are indexed under that prefix. The audit will verify the live pin and
-search only attributable source material; an open-source emulator's naming is not authoritative
-Sony semantics. If no first-party mapping is found, preserve UNCLASSIFIED. Failed tries: 0. Claim
-details: [checkpoint](docs/checkpoints/2026-10-20-root-re02-phdr8-source-audit-claim.md).
+at `0x25a8d0` through a second file view but is not used for executable-byte validation. The live
+`reference/shadPS4` checkout is clean at pinned commit
+`0ebea15c24253b60f514fc37a348dabc8d0bcb90`. That source calls the value `PT_SCE_DYNLIBDATA`, maps
+it to “SCE Dynamic Library Data,” and copies its `p_filesz` into an emulator dynamic-data buffer.
+Those are shadPS4 implementation observations only. OpenOrbis community notes use the same name.
+Root searched `site:playstation.com "0x61000000" ELF`,
+`site:developer.playstation.net "PT_SCE_DYNLIBDATA"`, `site:sony.com
+"PT_SCE_DYNLIBDATA"`, and the generic ELF program-header range. No attributable first-party Sony
+mapping appeared. The [ELF ABI](https://gabi.xinuos.com/elf/07-pheader.html) reserves
+`PT_LOOS..PT_HIOS` for OS-specific semantics, which includes this value but does not provide Sony
+semantics. The Sony-specific type name and PHDR #8 loader/runtime role remain UNCLASSIFIED. Search
+coverage is bounded and gated SDK documentation was not accessed. Failed analysis tries: 0.
+Worker report SHA-256 `e6e459202dc4f14263f2aed24ad5e29bcc448662634a2e46f7714e980a0c60e6`; root review
+SHA-256 `13115545b0a898c4521d9234e5f0d7625c4f180aa39b44ce08662c049af04a61` under
+`local/re/evidence/re02-phdr8-source-audit/`. See [checkpoint](docs/checkpoints/2026-10-20-root-re02-phdr8-source-audit-claim.md).
 
-Exact next action: dispatch a read-only public-source audit to a separate worker after this claim
-checkpoint is published. No changes to reference clones, binaries, firmware, or original game
-inputs. G1 remains NOT PASSED.
+This checkpoint was recorded 2026-10-20 01:34 CDT by `/root`. APP-01-IMPORTER-ERROR-01 passed
+the worker's and root's `swift test` runs (14 tests, three suites); one corrected compile failure
+is retained, UI interaction remains NOT RUN. PHDR8 audit is ARTIFACT_VERIFIED with official meaning
+and loader role still UNCLASSIFIED. Files changed: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`,
+the existing PHDR8 claim checkpoint, the existing importer claim checkpoint, and three launcher
+files. Private evidence/logs: `local/re/evidence/re02-phdr8-source-audit/`,
+`local/validation/app01-importer-error-01-{swift-test,root-swift-test}.log`, and
+`local/checkpoints/2026-10-20-root-index-build-artifact.log`. Exact root validation commands:
+`swift test` from `launcher/` (exit 0, 14 tests passed), guarded removal of the test cache followed
+by `python3 scripts/project_index.py` (exit 0, 4,139 folders), `graft check` (exit 0; wiring graph
+synced, deep layer unbuilt with 1,225 nodes pending), `git diff --check` (exit 0), and root evidence
+hash verification (all four manifest files passed). Next exact action: stage allowlisted paths,
+rerun publish audits, commit, and push `origin/main`. Risks: no UI interaction or real game runtime
+validation; G1 remains NOT PASSED.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 01:17 CDT, /root — audio byte pair verified; app-main raw verification pending
 

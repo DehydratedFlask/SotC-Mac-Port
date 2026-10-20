@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import LauncherCore
 
@@ -30,5 +31,24 @@ struct LauncherLifecycleTests {
         #expect(!LauncherLifecycle.canStart(readinessAllowsStart: false, from: .failed("retryable")))
         #expect(!LauncherLifecycle.canStart(readinessAllowsStart: true, from: .idle))
         #expect(!LauncherLifecycle.canStart(readinessAllowsStart: true, from: .running))
+    }
+}
+
+struct FolderImportErrorClassifierTests {
+    @Test func cancellationDoesNotProduceAlertText() {
+        let cocoaCancellation = NSError(domain: NSCocoaErrorDomain, code: NSUserCancelledError)
+
+        #expect(FolderImportErrorClassifier.alertMessage(for: cocoaCancellation) == nil)
+        #expect(FolderImportErrorClassifier.alertMessage(for: CancellationError()) == nil)
+    }
+
+    @Test func ordinaryFailureUsesLocalizedDescription() {
+        let failure = NSError(
+            domain: "FolderImporterTests",
+            code: 1,
+            userInfo: [NSLocalizedDescriptionKey: "The selected folder could not be read."]
+        )
+
+        #expect(FolderImportErrorClassifier.alertMessage(for: failure) == "The selected folder could not be read.")
     }
 }
