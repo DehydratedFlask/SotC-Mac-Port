@@ -11,7 +11,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `.graft` | 1 | Project folder; add a contract to docs/INDEX.md |
 | `Shadow of the Colossus` | 2 | Original user game inputs; read-only and private |
 | `docs` | 11 | Plans, task/evidence registries, checkpoint and escalation documentation |
-| `docs/checkpoints` | 24 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs/checkpoints` | 25 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/escalations` | 2 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/schemas` | 1 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `graft` | 1 | Regenerable source graph; internal cache directories summarized |

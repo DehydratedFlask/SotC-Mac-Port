@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:59 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:01 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:59 CDT, /root — STS, launcher UI review, and slot-10 helper slices recorded
+## CURRENT CHECKPOINT — 2026-10-20 00:01 CDT, /root — STS, launcher UI and slot-10 helper recorded; page-map analysis claimed
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -51,6 +51,17 @@ tests/builds were made. VoiceOver, Accessibility Inspector, Finder launch, nativ
 Full Keyboard Access, and process cleanup at app quit remain NOT RUN; G4 remains NOT PASSED.
 Evidence and primary Apple references are in [E45](docs/EVIDENCE.md) and the
 [review checkpoint](docs/checkpoints/2026-10-19-root-app01-ui-review-claim.md).
+
+### SRV-01-PAGE-MAP-19660-01 — characterize pinned function at `0x19660` — CLAIMED
+
+`/root/srv01_page_map_19660` owns a read-only REA/Ghidra characterization of the pinned local ELF
+at `0x19660`, the next open SRV-01 page-map target. Graft confirms no native lift for this address
+exists; this claim does not assume its purpose from nearby comments. Keep the baseline REA snapshot
+unchanged, use a distinct snapshot and private evidence under `local/re/evidence/`, and report exact
+range/hash/calls/data references, coverage, and raw-byte limits. No game execution, installation,
+native replacement, or publication of game-derived binaries. Next exact action: export and verify
+the static dossier, then stop for root integration. Claim:
+[SRV-01-PAGE-MAP-19660-01](docs/checkpoints/2026-10-20-root-srv01-page-map-claim.md).
 
 ### DATA-02 — pakN archive identity
 
