@@ -1,28 +1,23 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:56 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 06:01 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:56 CDT, `/root` — bytes-like XFF claim published
+## CURRENT CHECKPOINT — 2026-10-20 06:01 CDT, `/root` — XFF bytes-like completion checks passed
 
-`AUD-01-XFF-BYTES-LIKE-INPUT-01` is claimed and published; planned worker `/root/aud01_xff_bytes_like` may edit only `scripts/test_audio_bank_header.py`; root owns shared docs and Git. Parent `AUD-01-XFF-01` and the declared-shorter XFF fixture are `FIXTURE_VERIFIED`.
+`AUD-01-XFF-BYTES-LIKE-INPUT-01` is `FIXTURE_VERIFIED`; worker `/root/aud01_xff_bytes_like` changed only `scripts/test_audio_bank_header.py`. One valid synthetic XFF fixture passed as `bytes`, `bytearray`, and `memoryview` yields identical reports and confirms the declared-length match. Worker and root each passed 8 tests with `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_bank_header.py`.
 
-Graft located parser normalization at `scripts/audio_bank_header.py:L33-L68` and successful XFF tests at `scripts/test_audio_bank_header.py:L20-L69`. Live review confirms successful cases currently pass `bytes`, while parser accepts and normalizes `bytes`, `bytearray`, and `memoryview`. Baseline `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_bank_header.py` exited 0 with 7 tests; test SHA-256 `250f829edfaa4cc6a7f74dd557f617cfa25228105b062adddf2cfce4e2d75531`; parser SHA-256 `bdad7d192b0ecdb929daf5147a139e7545fd5c546f01ed4ffb4005f2cea9f9c0`; baseline log SHA-256 `fe836cbecd3b6b4f70bec51b58d30c3e45ad72ae7fb3cb63421a0f7337e651ae`.
+Test SHA-256 `67ac6b8b97f9c0be6b80ab97772176e8aefd6017a784493b5167ca368d511066`; unchanged parser SHA-256 `bdad7d192b0ecdb929daf5147a139e7545fd5c546f01ed4ffb4005f2cea9f9c0`; worker/root log SHA-256 `f8f7b0ac7f2b53ac4e96000f166430c488f2c37e059ad5502b09d60f29d363b8`. The worker capture wrapper first errored after the test on zsh variable assignment and was corrected; the rerun passed. No implementation hypothesis failed.
 
-The single planned test compares reports for one valid fixture passed as all three container types and checks the declared-length match. This is synthetic input normalization only; no codec, NGS2, runtime, or playback behavior is inferred. Failed implementation tries: 0; G1 NOT PASSED; G2 NOT RUN.
+This covers synthetic bytes-like input normalization only. No archive, codec, NGS2, runtime use, actual game audio, or playback behavior is inferred. Failed implementation tries: 0; G1 NOT PASSED; G2 NOT RUN. Full checkpoint: [XFF bytes-like fixture completion](docs/checkpoints/2026-10-20-root-aud01-xff-bytes-like-complete.md).
 
-The preceding `RE-02-DYNLINK-RELOC-SIZE-ALIGNMENT-01` completion is published in commit `7d72036`; post-push fetch confirmed `HEAD` and `origin/main` at `7d720361b5238c2fd8d2b75f8fc4dfe398f34ac8`, divergence 0/0 (log SHA-256 `f3aeace67d8c7f000a283d48246aca9b3649a0a442dfb1fc6ea49e43ed30d425`). See [completion checkpoint](docs/checkpoints/2026-10-20-root-re02-dynlink-reloc-size-complete.md).
+The claim and its sync are published as `ebed0ee` and `3941f8f`; both post-push fetches confirmed 0/0 divergence. `graft check` reports the wiring graph in sync at 1,263 nodes / 530 source files, with the optional deep layer unbuilt (log SHA-256 `9b9666c8729209c73e8a2f33fd17a0007f652a0dc8425595992447c55bb0157c`).
 
-`python3 scripts/project_index.py` exited 0 and indexed 4,166 folders (log SHA-256
-`f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`). Cached diff check passed
-(empty SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`); staged audit
-accepted 5 paths (SHA-256 `c3bf3148c29ac70a4bb4269d7a3589b5a5f01791d5eacfc751660ff837aa8e8d`); full audit
-accepted 647 paths (SHA-256 `5c3136e02b605f6080e8239655570674ab637272e8d1728f63d2088fc5a8eff1`). Precommit
-fetch confirmed 0/0 divergence at `7d720361b5238c2fd8d2b75f8fc4dfe398f34ac8`. Claim `ebed0ee`
-was pushed; post-push fetch confirmed `HEAD` and `origin/main` at
-`ebed0eed4d453f981d3b8f696d14369c3bd226e4`, divergence 0/0 (log SHA-256
-`09ed622bd9d7903eef4911f2730d0e70dcc1a8ab559f0dd8946b6487f23dd6fc`). Exact next action: dispatch
-the test-only worker and review its single-file diff. Generated/untracked `tools/graft/` stays excluded.
+`python3 scripts/project_index.py` exited 0 and indexed 4,166 folders (log `local/checkpoints/root-2026-10-20-aud01-xff-bytes-like-complete-project-index.log`, SHA-256 `f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`).
+
+`git diff --check` and `git diff --cached --check` exited 0 (empty-log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). The staged audit accepted 6 paths (log SHA-256 `077d2a8bab7548fbf73b9b6b3c8aee1cb9a6a96697d7d81e37ce9e48177c7892`); the full audit accepted 648 paths (log SHA-256 `bb5b1d6afeeb44c41a7748b5a50ff1549317085b97ef5b4892001953e1992597`). Precommit fetch confirmed 0/0 divergence at `3941f8f9fe25a9aa4a269fde8441496950088bad` (log SHA-256 `239cb8d281a104c9c61678eca788f9756028f6424db33b220fdf526f5bebe500`).
+
+Exact next action: commit and push the six allowlisted paths; afterward record post-push synchronization and claim the independent PSARC block-table boundary fixture. Generated/untracked `tools/graft/` stays excluded.
 
 ## PRIOR CHECKPOINT — 2026-10-20 05:46 CDT, `/root` — truncated ELF PHDR fixture verified
 

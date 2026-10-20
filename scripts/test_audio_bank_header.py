@@ -38,6 +38,18 @@ class XffMemberTests(unittest.TestCase):
         self.assertEqual(len(member), abh.XFF_MIN_MEMBER_SIZE)
         self.assertEqual(abh.parse_xff_member(member)['u32le_at_0x14'], len(member))
 
+    def test_reports_are_equal_for_bytes_like_inputs(self):
+        member = make_member()
+        reports = [
+            abh.parse_xff_member(member),
+            abh.parse_xff_member(bytearray(member)),
+            abh.parse_xff_member(memoryview(member)),
+        ]
+
+        self.assertEqual(reports[1], reports[0])
+        self.assertEqual(reports[2], reports[0])
+        self.assertTrue(reports[0]['u32le_at_0x14_matches_decoded_length'])
+
     def test_rejects_truncated_before_size_word(self):
         with self.assertRaisesRegex(abh.AudioBankFormatError, 'need at least'):
             abh.parse_xff_member(abh.XFF_MAGIC + bytes(abh.XFF_MIN_MEMBER_SIZE - 5))
