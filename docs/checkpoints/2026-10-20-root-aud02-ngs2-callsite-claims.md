@@ -282,10 +282,18 @@ Sony modules. Root independently verifies each accepted dossier before adding a 
   updated snapshot SHA-256 `33a1cda725208f6438e113dbae67425b65fc81439ca1090f8cea0ed92d8e096f`.
 - Evidence ID `ev_d97708e1afeaa1bfd6ffb28334a35ce08d4c195d9f0947fddb5769210cdac4a1` returned one
   reference at `0xf91470`. As with the other xrefs result, the response omits reference kind; no
-  caller is claimed. The worker's query at `0xf91470` was running at this checkpoint.
-- Exact next action: finish the function query, resolve a direct caller path if available, then
-  prepare a private byte verifier and manifest for root replay. No NGS2 API/audio/runtime semantics
-  are inferred.
+  caller was claimed at that time.
+- The follow-up REA 6.7.0 function query at `0xf91470` then exited 0 after 379.217 s. Exact argv
+  is in `local/re/evidence/aud02-ngs2-voice-getstate-01/rea-thunk-function.command.json`; output
+  `rea-thunk-function.stdout.txt` SHA-256
+  `38566d0e03ebd63f58a93640050ad65ddd81438e7907c37a8a75d048d04f7999`; stderr empty; Evidence ID
+  `ev_5217b06df0de0cec23cf13c060f5a3687aee147d75b5d928ffb3c57ed634e0e0`. Worker-reported output
+  shows `JMP qword ptr [0x01601028]` and one incoming reference classified
+  `UNCONDITIONAL_CALL` at `0x94a27d` in `FUN_0094a200`; post-query snapshot SHA-256
+  `96a4d11b6904085fee939b07b4f50a58cd3953995c0c3facc1e1784a7e9d26ef`.
+- Exact next action: query `FUN_0094a200`, preserve the instruction bytes/window and unresolved
+  edges, and complete the private byte verifier and manifest for root replay. No NGS2
+  API/audio/runtime semantics are inferred.
 
 ## Interim SystemRender slot/caller candidate checkpoint — 2026-10-20 02:30 CDT, worker `/root/aud02_sysrender`
 

@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 02:30 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 02:32 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 02:30 CDT, /root — three call paths verified; three follow-up probes active
+## CURRENT CHECKPOINT — 2026-10-20 02:32 CDT, /root — three call paths verified; three follow-up probes active
 
 Three bounded AUD-02 import-to-call paths are root-verified:
 `AUD-02-NGS2-SYSCREATE-01` (`sceNgs2SystemCreateWithAllocator`),
@@ -13,8 +13,9 @@ claimed for `sceNgs2SystemRender` and `sceNgs2VoiceGetState`; all three follow-u
 active. All three slot-xref queries succeeded and returned worker-reported thunk candidates:
 SystemRender `0xf91450`, VoiceGetState `0xf91470`, SystemDestroy `0xf91440`. The SystemRender raw
 byte scan also proposes a caller instruction at `0x95383c` (`e80fdc6300`), pending root replay.
-No caller edges are accepted yet; SystemRender's thunk query returned the same candidate as the raw
-scan, and a function query remains; VoiceGetState/SystemDestroy function queries and all root
+No new caller edges are accepted yet. SystemRender's thunk xrefs returned the same candidate as the
+raw scan and function attribution remains outstanding; VoiceGetState's thunk query reports caller
+function `FUN_0094a200` and call candidate `0x94a27d`; SystemDestroy's thunk query and all three root
 replays remain outstanding.
 The SystemDestroy claim was pushed in `19e2a43`; dispatch details are in the linked checkpoint.
 AUD-02 remains ACTIVE
@@ -39,9 +40,10 @@ slot-xref result is EID
 `3e96d3476b6af8d68d560802d4a567ce23ed17a7e13beb58a9d4a05bf422de15`; `sceNgs2SystemDestroy`
 slot-xref result is EID `ev_37ba3af33cc684de727dfb407d145e99b12d646a8d3f3fe219a31b2c07fbd6d1`,
 output SHA-256 `6da0467ea24486330ac90799353446bd816c6a7198aa52927e1a1098002fe49b`. Both response
-types omit reference kind, so these xref results do not by themselves establish caller edges. The
-static observations and exact next actions are captured in their respective checkpoints. All
-caller-function attribution and root replays remain pending.
+the SystemRender/VoiceGetState xrefs output omit reference kind, so address lists alone do not
+establish call edges. VoiceGetState's thunk-function result is now available but needs caller bytes.
+The static observations and exact next actions are captured in their respective checkpoints; all
+three root replays remain pending.
 
 The prior system-create checkpoint was committed as `85fec59`
 (`docs: verify NGS2 system-create path`) and pushed from `357ed0c`; staged/full publish audits
