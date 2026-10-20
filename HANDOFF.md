@@ -3,6 +3,22 @@
 Updated: 2026-10-19 22:15 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 22:15 CDT, worker bc-81763e53 (CPU-01d) — 0xceb1c0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xceb1c0** (survey index 144).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_ceb1c0.{hpp,cpp}`, `native/tests/test_vec_ceb1c0.cpp`,
+`tools/lift/check_fceb1c0.py`, `native/CMakeLists.txt` (+vec_ceb1c0 only; origin/main base).
+Private dump (not published): `local/re/work/cceb1c0.bin`.
+Skipped: 95; busy `0xceb2c0`; prior D `0xceb890`=`94794b4`.
+Did NOT edit Drive / SRV / `startup_ctors.*` / `local/`.
+Checkpoint (2026-10-19 22:15 CDT, bc-81763e53):
+- OBS: unguarded vmovups copy; src=0x12f97d0 dst=0x3351d40 bits=~0,~0,~0,0; index 144; distinct cells.
+- Commands: ctest -R '^vec_ceb1c0$' Passed; `python3 -I tools/lift/check_fceb1c0.py` OK.
+- Logs: `/tmp/ctest_ceb1c0.log`, `/tmp/check_fceb1c0.log`.
+- Store: Project `internal/worker-claim-ceb1c0.md`.
+- Push: (this commit).
+
 ## ACTIVE CLAIM — 2026-10-19 22:15 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry +0xcfcc60/+0xcfcbc0/+0xcf44a0 — COMPLETE
 
 Task: CPU-01e — register (ctor-survey.json; skip 95):
