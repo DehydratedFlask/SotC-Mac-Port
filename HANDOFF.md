@@ -34,7 +34,7 @@ Checkpoint (2026-10-19 20:36 CDT, bc-9aa0fe88):
   `python3 -I tools/lift/check_f1a902_list.py` OK.
 - Logs: `/tmp/ctest_free_count.log`, `/tmp/check_f1a902_list.log`.
 - Store: Project `internal/worker-claim-srv01-free-count.md`.
-- Push: docs `8c2fb72`; code follow-up this commit (`region_list` free-count API).
+- Push: docs `8c2fb72`; code (this commit) — `region_list` free-count API landed.
 
 ## ACTIVE CLAIM — 2026-10-19 20:38 CDT, worker bc-73721c8d (CPU-01d) — 0xd71f60 — ABANDONED / STOPPED
 
