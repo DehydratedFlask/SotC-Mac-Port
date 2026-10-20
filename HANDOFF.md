@@ -3,6 +3,13 @@
 Updated: 2026-10-19 20:27 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 21:02 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 77 + CMake dac410 — IN PROGRESS
+
+Task: CPU-01e — CMake-link peer `0xdac410` (sources `7cb0e83`) and register idx **77** into `startup_ctors`.
+Skipped peer IN PROGRESS `0xd84ee0` (84), absent `0xd85490` (82), gap 10–19, idx 50, SRV.
+Failed tries: 0. Status: CLAIMED.
+Owned: `startup_ctors.*`, `test_startup_ctors.cpp`, CMake Drive lines for `vec_dac410`, `HANDOFF.md`.
+
 ## ACTIVE CLAIM — 2026-10-19 20:27 CDT, worker bc-81763e53 (CPU-01d) — 0xd80e60 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd80e60** (survey index 85).
@@ -16,7 +23,7 @@ Checkpoint (2026-10-19 20:27 CDT, bc-81763e53):
 - Commands: ctest -R '^vec_d80e60$' Passed; `python3 -I tools/lift/check_fd80e60.py` OK.
 - Logs: `/tmp/ctest_d80e60.log`, `/tmp/check_d80e60.log`.
 - Store: Project `internal/worker-claim-d80e60.md`.
-- Push: (pending this commit).
+- Push:  on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 20:40 CDT, worker bc-73721c8d (CPU-01d) — 0xd84ee0 — IN PROGRESS
 
