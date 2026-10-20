@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 06:02 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 06:03 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 06:02 CDT, `/root` — PSARC block-table boundary fixture claimed
+## CURRENT CHECKPOINT — 2026-10-20 06:03 CDT, `/root` — PSARC block-table boundary claim published
 
 `DATA-02-PSARC-BLOCK-TABLE-RANGE-01` is claimed by root; worker `/root/data02_psarc_block_table_range` may edit only `scripts/test_psarc.py`, and root owns shared docs and Git. It adds one synthetic archive fixture: set entry 1's big-endian first-block field at bytes `78:82` to `0xffffffff`, then assert `Psarc(...)` rejects it with `entry references blocks outside the block table`. Parent DATA-02 is active; sibling `DATA-02-PSARC-TRUNCATED-COMPRESSED-BLOCK-01` is already verified. Claim was based on `docs/TASKS.md` DATA-02 and `docs/ASSETS.md` PSARC reader notes.
 
@@ -17,7 +17,9 @@ The prior XFF completion was published as `05b3e52`; its post-push checkpoint sy
 
 `git diff --check` and `git diff --cached --check` exited 0 (empty-log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). The staged audit accepted 5 allowlisted paths (log SHA-256 `2c98eba23e809aa2a4a4cea2a7deee52317bd9309b94e08fe4f4957c91fdae1e`); the full audit accepted 649 paths (log SHA-256 `5056e7b4ff84547ae592effc3ef2371d15654c85876a1aea0eb0832fc03bfd03`). Precommit fetch confirmed 0/0 divergence at `379db69873e638d587b9311b2f089e557a59411d` (log SHA-256 `9a2c2be2bf72c014d29c79efe26a33f7c2b1d5b3368bb7a0c39b9d7c3c55122f`).
 
-Exact next action: commit and push the claim, then dispatch the bounded test-only worker. Generated/untracked `tools/graft/` stays excluded.
+Claim commit `72f3a232ef1730b964ef794d13ab4076c01a80b8` (`docs: claim PSARC block-table boundary fixture`) was pushed. Post-push fetch confirmed `HEAD` and `origin/main` match at `72f3a232ef1730b964ef794d13ab4076c01a80b8`, 0/0 divergence (log SHA-256 `d8c73fd39e5b18a4dd8aafd7162274f3a8368796713868969ff11299fed5c572`).
+
+Exact next action: publish this post-push checkpoint sync, then dispatch the bounded test-only worker. Generated/untracked `tools/graft/` stays excluded.
 
 ## PRIOR CHECKPOINT — 2026-10-20 05:46 CDT, `/root` — truncated ELF PHDR fixture verified
 
