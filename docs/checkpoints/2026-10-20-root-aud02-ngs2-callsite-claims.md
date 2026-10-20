@@ -44,6 +44,16 @@
 - HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF, TASKS and generated
   `docs/FOLDERS.md` updated; EVIDENCE and INSTALL_LOG unchanged.
 
+## Dispatch checkpoint — 2026-10-20 01:40 CDT, `/root`
+
+`/root/aud02_syscreate` (gpt-6-luna, Extra High) owns system-creation probe;
+`/root/aud02_rackcreate` (gpt-6-luna, Extra High) owns rack-creation probe. Each uses its own
+private evidence directory and process-local REA CLI; neither may change shared documentation or
+publish. Root remains the integrator and owns the VoiceControl probe. No binary analysis had begun
+at dispatch; task failed-try counters remain zero. `HANDOFF.md` and `docs/TASKS.md` record this
+assignment. Exact next action: publish this dispatch checkpoint, then root begins the bounded
+VoiceControl analysis and verifies worker evidence as it arrives.
+
 ## Packet boundaries
 
 Each packet must report the exact imported symbol/NID and relocation slot, how the caller was

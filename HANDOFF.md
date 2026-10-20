@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:39 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:40 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:39 CDT, /root — NGS2 callsite packets claimed and published
+## CURRENT CHECKPOINT — 2026-10-20 01:40 CDT, /root — NGS2 callsite packets dispatched
 
 Three bounded AUD-02 static packets are now claimed: `AUD-02-NGS2-SYSCREATE-01` for
 `sceNgs2SystemCreateWithAllocator`, `AUD-02-NGS2-RACKCREATE-01` for `sceNgs2RackCreate`, and
@@ -31,10 +31,20 @@ folders indexed, `graft check` passed the wiring freshness check (deep layer rem
 accepted four allowlisted documentation paths, full audit accepted 600 tracked paths, and fetch
 showed divergence `0 0`. `git status --short` showed only those four staged documentation paths
 plus the pre-existing untracked `tools/graft/.cache/telemetry-repo-id.json`; the latter was not
-staged. Exact next action: assign `AUD-02-NGS2-SYSCREATE-01` to `/root/aud02_syscreate` and
-`AUD-02-NGS2-RACKCREATE-01` to `/root/aud02_rackcreate`, while root probes
-`AUD-02-NGS2-VOICE-CONTROL-01`. Keep each worker in its separate private evidence directory;
-root reviews and reproduces each accepted byte/hash check. Initial failed-try counts are zero.
+staged.
+
+### Dispatch checkpoint — 2026-10-20 01:40 CDT, `/root`
+
+`AUD-02-NGS2-SYSCREATE-01` is assigned to `/root/aud02_syscreate`;
+`AUD-02-NGS2-RACKCREATE-01` is assigned to `/root/aud02_rackcreate`. Both agents were dispatched
+with `gpt-6-luna`, Extra High, on separate private evidence paths and a process-local REA CLI
+requirement (no shared MCP REA session). Root owns `AUD-02-NGS2-VOICE-CONTROL-01`. They may not
+edit shared docs or publish; root is the sole integrator and will independently review/verify
+evidence. Task-specific prompts and paths are in the
+[claim checkpoint](docs/checkpoints/2026-10-20-root-aud02-ngs2-callsite-claims.md). No analysis
+attempt has started yet; failed-try counts remain zero. Files changed: HANDOFF/TASKS and the
+claim checkpoint only. Exact next action: publish this dispatch/owner checkpoint, then root
+starts the byte-bound VoiceControl probe while workers proceed independently.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 01:35 CDT, /root — importer and PHDR8 checkpoints published
 
