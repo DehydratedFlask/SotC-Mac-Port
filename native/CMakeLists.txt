@@ -32,7 +32,8 @@ add_library(sotc_core STATIC
   core/init_f4eba0.cpp
   core/init_f4b540.cpp
   core/init_ea52f0.cpp
-  core/vec_e026b0.cpp)
+  core/vec_e026b0.cpp
+  core/vec_de6d20.cpp)
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()
 add_executable(test_math_constants tests/test_math_constants.cpp)
@@ -107,3 +108,6 @@ add_test(NAME zero_xmm_qword COMMAND test_zero_xmm_qword)
 add_executable(test_vec_e026b0 tests/test_vec_e026b0.cpp)
 target_link_libraries(test_vec_e026b0 sotc_core)
 add_test(NAME vec_e026b0 COMMAND test_vec_e026b0)
+add_executable(test_vec_de6d20 tests/test_vec_de6d20.cpp)
+target_link_libraries(test_vec_de6d20 sotc_core)
+add_test(NAME vec_de6d20 COMMAND test_vec_de6d20)
