@@ -1,6 +1,11 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors batch 20 (0xc060a0 .. 0xbd7a80) lifted
+
+`CPU-01-LEAF-CTOR-BATCH-20` `FIXTURE_VERIFIED`; root replay on a fresh build 198/198 ctest pass, six checkers exit 0; manifest position 169 (`0xc060a0`) had been missed by batch 19 and is now covered. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-20-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending workers: `STRAGGLERS-01` (`local/re/evidence/stragglers-*-01/`, 3 REA queries) and `SAV-01-REGION-DOSSIER-01` (`local/re/evidence/sav01-region-dossier-01/`, ≤2 REA queries).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — SaveData imports have verified callsites
 
 Ten more `libSceSaveData` imports are byte-verified (1 new REA success for `sceSaveDataTerminate`, 9 reuses; root replayed all verifiers and checksums). Most callsites cluster in `FUN_00a48280`, `FUN_00a4a940`, `FUN_00a4ab90` (save-data mount/dialog/icon code region `0xa47d60..0xa4d326`). Details: `docs/checkpoints/2026-10-20-root-savedata-remaining-imports-complete.md`. Static only — no reachability/runtime/ABI/save-format claim. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 192/192 (batch 19, pushed `1443b27`).
