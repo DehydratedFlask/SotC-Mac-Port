@@ -84,9 +84,12 @@
 
 - CPU claim docs were already pushed: `1494700` (`docs: claim cdc760 native fixture`) and `54de3cf`
   (`docs: record cdc760 claim publication`).
-- The implementation and completion-doc batch is ready for staged-path audit and publication.
-  Exact commit/push results will be appended after publishing; no game-derived file is allowlisted
-  or staged.
-- Next action: commit the reviewed allowlisted implementation/docs, then select and claim the next
-  bounded task. Cold boot, audible in-game content, real save/reload, Metal scene validation, and
-  forbidden-runtime absence have not been demonstrated.
+- The implementation/completion-doc batch was explicitly staged in 16 allowlisted paths. The
+  staged publication audit passed 16 paths; the `--all` audit passed 563 paths; staged
+  `git diff --check` passed. `git commit -m "feat: add archive hashes and cdc760 fixture"` created
+  commit `3370386`; `git push origin main` exited 0 and advanced `main` from `54de3cf`.
+  No game-derived file was staged or published.
+- Publication record update: 2026-10-19 23:01 CDT, `/root`. Source/docs status is pushed and
+  checkpointed. Next action: select and claim the next bounded, dependency-valid task. Cold boot,
+  audible in-game content, real save/reload, Metal scene validation, and forbidden-runtime absence
+  have not been demonstrated.
