@@ -3,6 +3,23 @@
 Updated: 2026-10-19 22:01 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 22:01 CDT, worker bc-02397584 (CPU-01d) — 0xd32720 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd32720** (survey index 115).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d32720.{hpp,cpp}`, `native/tests/test_vec_d32720.cpp`,
+`tools/lift/check_fd32720.py`, `native/CMakeLists.txt` (+vec_d32720 only; origin/main base).
+Private dump (not published): `local/re/work/cd32720.bin`.
+Skipped: 95; busy `0xd3a6d0`/`0xd32b70`; prior 103 `0604100`. Never touched `startup_ctors.*`.
+Did NOT edit Drive / SRV / peer untracked; no `git reset --hard` / broad stash.
+Checkpoint (2026-10-19 22:01 CDT, bc-02397584):
+- OBS: unguarded vmovups; src=0x1300ba0 dst=0x3351ed0 bits=~0,~0,~0,0; index 115; distinct cells.
+- Commands: ctest -R '^vec_d32720$' Passed; `python3 -I tools/lift/check_fd32720.py` OK.
+- Logs: `/tmp/ctest_d32720.log`, `/tmp/check_fd32720.log`.
+- Store: Project `internal/worker-claim-d32720.md`.
+- Push: (this commit).
+
+
 ## ACTIVE CLAIM — 2026-10-19 22:01 CDT, worker bc-effcf5dc (CPU-01d) — 0xd2ffe0 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd2ffe0** (survey index 116).
