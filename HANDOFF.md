@@ -1,7 +1,23 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 22:20 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 22:28 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## CURRENT CHECKPOINT — 2026-10-19 22:28 CDT, /root — SRV-01 arena accounting — ACTIVE
+
+Resuming the bounded fixture slice claimed below; one failed target hypothesis remains recorded.
+Ghidra 12.1.4 evidence E28 confirms `FUN_00019e00` contains the accounting sequence at
+`0x1a123–0x1a15a` for ELF SHA256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+The existing `arena_high_water` helper covers the distinct `0x1a9bb` path; this claim keeps the
+`0x1a123` behavior separate and uses only raw offsets `+0x80`, `+0x88`, and conditional `+0x90`.
+Root owns `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/POINTERS.md`, `native/README.md`,
+`native/CMakeLists.txt`, and the checkpoint. Planned worker `/root/arena_accounting` owns only
+`native/core/arena_accounting.{hpp,cpp}`, `native/tests/test_arena_accounting.cpp`, and
+`tools/lift/check_f19e00_accounting.py`. No runtime allocator integration or G1 claim.
+Exact action after this claim is published: dispatch the worker to implement/test the byte-offset
+helper and private-ELF checker; then review, integrate CMake/docs, run focused checks and audits.
+Pre-existing unstaged changes in `native/core/vec_ce7300.hpp`, `native/tests/test_vec_ce7300.cpp`,
+and `tools/lift/check_fce7300.py` are preserved and not included in this checkpoint.
 
 ## ACTIVE CLAIM — 2026-10-19 22:20 CDT, worker bc-73721c8d (CPU-01d) — 0xce67b0 — COMPLETE
 
@@ -1103,7 +1119,7 @@ Checkpoint (2026-10-19 21:45 CDT, bc-81763e53):
 - Store: Project `internal/worker-claim-d6e0f0.md`.
 - Push: (this commit).
 
-## CURRENT CHECKPOINT — 2026-10-19 21:23 CDT, root — SRV-01 arena accounting — ACTIVE
+## PRIOR CHECKPOINT — 2026-10-19 21:23 CDT, root — SRV-01 arena accounting — ACTIVE
 
 Claim and bounded plan: [SRV-01 arena-accounting checkpoint](docs/checkpoints/2026-10-19-root-srv01-accounting.md).
 Ghidra confirmed that `FUN_00019e00` contains `0x1a123–0x1a15a`: qword add/store at `+0x80`,
