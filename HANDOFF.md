@@ -1,67 +1,56 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:23 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:26 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:23 CDT, `/root` — invalid UTF-8 manifest fixture published
+## CURRENT CHECKPOINT — 2026-10-20 05:26 CDT, `/root` — short-prefix audio classifier claim ready to publish
 
-`DATA-02-ARCHIVE-MANIFEST-INVALID-UTF8-01` is `FIXTURE_VERIFIED`. `/root/next_fixture_scout`
-changed only `scripts/test_archive_overlap_map.py`; root owns shared docs and Git. The synthetic
-regression calls `parse_manifest_bytes("synthetic", b"\xff")` and asserts `ManifestError` with the
-exact `manifest is not UTF-8` message. The parser is unchanged. The parent task
-`DATA-02-ARCHIVE-OVERLAP-MAP-01` remains `ARTIFACT_VERIFIED`.
+`AUD-01-CLASSIFIER-SHORT-LE-PREFIX-01` is claimed by root; `/root/aud01_short_prefix` will own
+only `scripts/test_audio_headers.py`; root owns shared docs and Git. Parent `AUD-01` remains ACTIVE.
+The linked [ASSETS spec](docs/ASSETS.md#L59) labels the classifier output as prefix observations
+and keeps codecs UNKNOWN. `family_of` only assigns `sxd-le-small-ints` when at least 8 bytes are
+available for two complete little-endian words. The bounded fixture will pass seven bytes
+`01000000000000` and assert fallback label `other-01000000`; classifier behavior will not change.
 
-The 11-test baseline exited 0 before the worker edit; its log is
-`local/checkpoints/root-2026-10-20-manifest-invalid-utf8-claim-baseline.log`, SHA-256
-`125933e1e7e2e18e36f6fded21c56b4de02add30203872c9228d401855150e90`. Worker and root each ran
-`PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_archive_overlap_map.py`; both exited 0 with 12
-tests. Worker log `local/checkpoints/data02-manifest-invalid-utf8-test.log` and root replay log
-`local/checkpoints/root-2026-10-20-manifest-invalid-utf8-review.log` have identical SHA-256
-`b17a9f00ab66bc954b472082f0a458d1a1a3ff368d521a83bd8a3669c9b4e99e`. Test SHA-256 is
-`9de9f0084ce829d0e5bb386f5cdf4bf15a5ac625b64eb597755d3e69590e10d9`; unchanged parser
-`scripts/audit_archive_overlap_map.py` SHA-256 is
-`28330049faf0c7366159e7439ce80b8f4354413908c98bd3d7c95c6addbc7bf7`. Failed implementation
-tries: zero.
-
-One independent fixture scout found no indexed reference candidate. Its `graft map` regenerated
-ignored files under `graft/.graph/` and `graft/.cache/`; these remain private and are not staged.
-No reference source or implementation file was changed by that scout.
+Baseline `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_headers.py` exited 0 with 12
+tests. Log `local/checkpoints/root-2026-10-20-aud01-classifier-short-prefix-claim-baseline.log`,
+SHA-256 `72f09eca554e87a45b7156c6109520cf15e8b6ec157dc5c033610649b49b8698`. Classifier SHA-256
+`a7dd214317b4797c31961a6055ec0e73a3c738c8282f35f3a309ef5db085a2bf`; test SHA-256
+`37226b294bbeb4b2add57e938a3cc88ebe4395a18555c11b9881850e57027b9f`. `graft grep "family_of"`
+maps `scripts/classify_audio_headers.py:L47-L69` and current family fixtures in
+`scripts/test_audio_headers.py:L17-L43`. Failed implementation tries: zero.
 
 `python3 scripts/project_index.py` exited 0 at 4,166 folders; log
-`local/checkpoints/root-2026-10-20-manifest-invalid-utf8-complete-project-index.log`, SHA-256
+`local/checkpoints/root-2026-10-20-aud01-classifier-short-prefix-claim-project-index.log`, SHA-256
 `f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`. `graft check` exited 0 with
-the graph in sync at 1,258 nodes; the optional deep meaning layer remains unbuilt. Log
-`local/checkpoints/root-2026-10-20-manifest-invalid-utf8-complete-graft-check.log`, SHA-256
-`b01a0073eeb6d43d739dd026eaf37725a4be48cb2a96c5582cb72340bdd96680`. `git diff --check` exited 0;
-its empty log is `local/checkpoints/root-2026-10-20-manifest-invalid-utf8-complete-diff-check.log`.
-`docs/FOLDERS.md` now lists 80 checkpoint files. `python3 -I scripts/audit_publish_paths.py`
-passed for the six staged paths; log `local/checkpoints/root-2026-10-20-manifest-invalid-utf8-complete-publish-audit-staged.log`, SHA-256
-`98b70418e64e8cfa4f569c04d48114e4da43d521a483ba243348623fcf94455e`. The `--all` audit passed
-for 638 tracked paths; log `local/checkpoints/root-2026-10-20-manifest-invalid-utf8-complete-publish-audit-all.log`, SHA-256
-`97f579edf358380283ad37c51bf10d49eb6c105f337aa2aecb6af65b15627696`. `git diff --cached --check`
-exited 0; empty log `local/checkpoints/root-2026-10-20-manifest-invalid-utf8-complete-diff-cached-check.log`.
-`git fetch origin` exited 0; `git rev-list --left-right --count origin/main...HEAD` returned `0 0`.
-Commit `1a31774` (`test: reject invalid UTF-8 manifests`) was pushed with `git push origin main`
-(exit 0). A post-push fetch confirmed `origin/main` at `1a31774`, with 0/0 divergence. The only
-remaining untracked path is `tools/graft/`; it was not staged or changed by this task. No
-install/dependency change. This test establishes rejection of one synthetic invalid-byte sequence
-only; it does not prove live manifest/archive behavior, payload semantics, or any game gate. G1
-NOT PASSED and G2 NOT RUN. Next exact action: select and claim another independent bounded task
-before dispatching any worker.
+the graph in sync at 1,258 nodes; its optional deep meaning layer remains unbuilt. Log
+`local/checkpoints/root-2026-10-20-aud01-classifier-short-prefix-claim-graft-check.log`, SHA-256
+`b01a0073eeb6d43d739dd026eaf37725a4be48cb2a96c5582cb72340bdd96680`. `git diff --check` exited 0
+(empty log `local/checkpoints/root-2026-10-20-aud01-classifier-short-prefix-claim-diff-check.log`).
+`docs/FOLDERS.md` lists 81 checkpoint files. No install/dependency change. Staged/full publish-path
+audits passed: `python3 -I scripts/audit_publish_paths.py` accepted the 4 staged paths (log
+`local/checkpoints/root-2026-10-20-aud01-classifier-short-prefix-claim-publish-audit-staged.log`,
+SHA-256 `6ee697a796bbe20e4b91487826c6cfa2dee55f74fb80277639402e09a134ed55`); `--all` accepted 639
+paths (log `local/checkpoints/root-2026-10-20-aud01-classifier-short-prefix-claim-publish-audit-all.log`,
+SHA-256 `7697ade7ea7a8bd5ef2191bc207b3eb35d57e5bb408a7a881f5b8f027f2cfe0a`).
+`git diff --cached --check` exited 0 (empty log
+`local/checkpoints/root-2026-10-20-aud01-classifier-short-prefix-claim-diff-cached-check.log`).
+Fetch/divergence check remains. Next exact action: fetch and verify branch divergence, commit and push
+the claim, then dispatch the worker before any source edit.
 
-## PRIOR CHECKPOINT — 2026-10-20 05:17 CDT, `/root` — invalid UTF-8 manifest test claimed
+This is one synthetic prefix-boundary assertion only; it does not identify a codec or establish
+runtime/audio behavior. G1 NOT PASSED, G2 NOT RUN; no dependency change. The claim checkpoint
+records the pre-edit scope and next exact action: publish the claim, then dispatch the worker.
 
-`DATA-02-ARCHIVE-MANIFEST-INVALID-UTF8-01` was claimed by root with `/root/next_fixture_scout` as
-the test-only implementation worker. The worker owned only `scripts/test_archive_overlap_map.py`;
-root owned shared docs and Git. The planned regression called
-`parse_manifest_bytes("synthetic", b"\xff")` and asserted `ManifestError` with
-`manifest is not UTF-8`. The existing parser already converted `UnicodeDecodeError` to that
-exception. The 11-test baseline passed; baseline log and hashes are recorded in the completion
-checkpoint and the claim commit. The task was published before worker implementation. Failed
-implementation tries: zero.
+## PRIOR CHECKPOINT — 2026-10-20 05:23 CDT, `/root` — invalid UTF-8 manifest fixture published
 
-The claim checkpoint passed project-index and Graft checks, `git diff --check`, staged/full
-publish-path audits, and a 0/0 divergence check. Its next action was to dispatch the worker.
+`DATA-02-ARCHIVE-MANIFEST-INVALID-UTF8-01` is `FIXTURE_VERIFIED` and was published in commit
+`1a31774` (`test: reject invalid UTF-8 manifests`), followed by documentation-sync commit
+`a187a90`. Worker and root replay passed 12 tests; the parser is unchanged and coverage is
+synthetic-only. Details, hashes and audit logs are recorded in
+[`docs/checkpoints/2026-10-20-root-data02-manifest-invalid-utf8-complete.md`](docs/checkpoints/2026-10-20-root-data02-manifest-invalid-utf8-complete.md).
+Post-push fetch confirmed `origin/main` at `a187a90`, 0/0 divergence. Untracked `tools/graft/`
+remains untouched and unstaged.
 
 ## PRIOR CHECKPOINT — 2026-10-20 05:17 CDT, `/root` — XFF short declared-length fixture verified
 
