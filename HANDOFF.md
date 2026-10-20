@@ -1,6 +1,11 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors batch 14 (0xc5c040 .. 0xc54d20) lifted
+
+`CPU-01-LEAF-CTOR-BATCH-14` `FIXTURE_VERIFIED`; root replay 165/165 ctest pass, five checkers exit 0. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-14-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending workers: `AUD-02-AUDIO3D-PORTOPEN-01` (`local/re/evidence/aud02-audio3d-portopen-01/`) and `AUD-02-AUDIO3D-PORTPUSH-01` (`local/re/evidence/aud02-audio3d-portpush-01/`), one REA query each.
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — DirNameSearch callsite and all AudioOutOutput callsites verified
 
 `sceSaveDataDirNameSearch` sole callsite `0xa47f58` (in `FUN_00a47d60`) and all 5 `sceAudioOutOutput` callsites (`FUN_009ab360`, `FUN_009abed0`, `FUN_009aca40`) are byte- and REA-verified (3 provider successes; root replayed verifiers and checksums). Caveat: the DirNameSearch run used a modified snapshot copy (hash recorded). Details: `docs/checkpoints/2026-10-20-root-savedata-dirnamesearch-and-audioout-output-02-complete.md`. Static only. G0 PARTIAL, G1-G6 NOT RUN.
