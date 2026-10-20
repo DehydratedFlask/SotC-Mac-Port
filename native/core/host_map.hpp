@@ -48,7 +48,8 @@ void unmap(HostMapping& mapping) noexcept;
 
 // Fulfill an AllocatorRegionRequest via host mmap when preferred_base==0.
 // region.size = req.size (OBS store at 0x19fd9); region.start = mapped VA.
-// Nonzero preferred_base → nullopt (MAP_FIXED policy not adopted this slice).
+// Nonzero preferred_base → nullopt: OBS non-zero rdi at 0x479c2 is an object
+// context pointer, not a preferred VA — MAP_FIXED would be the wrong contract.
 std::optional<MappedRegion> map_region(const AllocatorRegionRequest& req) noexcept;
 
 }  // namespace sotc
