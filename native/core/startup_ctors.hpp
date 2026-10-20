@@ -71,7 +71,9 @@
 #include "vec_d17c10.hpp"
 #include "vec_d13300.hpp"
 #include "vec_d0bde0.hpp"
+#include "vec_d0bcd0.hpp"
 #include "vec_d0a250.hpp"
+#include "vec_d09160.hpp"
 #include "vec_d082e0.hpp"
 #include "vec_d7c380.hpp"
 #include "vec_d7c4d0.hpp"
@@ -173,7 +175,9 @@ struct StartupState {
     VecD17c10 vec_d17c10{};   // 0xd17c10 idx 127
     VecD13300 vec_d13300{};   // 0xd13300 idx 128
     VecD0bde0 vec_d0bde0{};   // 0xd0bde0 idx 129
+    VecD0bcd0 vec_d0bcd0{};   // 0xd0bcd0 idx 130
     VecD0a250 vec_d0a250{};   // 0xd0a250 idx 131
+    VecD09160 vec_d09160{};   // 0xd09160 idx 132
     VecD082e0 vec_d082e0{};   // 0xd082e0 idx 133
     VecB743c0 vec_b743c0{};   // idx 282
     VecB52110 vec_b52110{};   // idx 290
