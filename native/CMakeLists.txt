@@ -17,6 +17,7 @@ add_library(sotc_core STATIC
   core/addr.cpp
   core/allocator_region.cpp
   core/host_map.cpp
+  core/free_list_carve.cpp
   core/vec_neg036.cpp
   core/xyz_mask_copy.cpp
   core/vec_dd41e0.cpp
@@ -156,3 +157,6 @@ add_test(NAME vec_dda990 COMMAND test_vec_dda990)
 add_executable(test_vec_dc4180 tests/test_vec_dc4180.cpp)
 target_link_libraries(test_vec_dc4180 sotc_core)
 add_test(NAME vec_dc4180 COMMAND test_vec_dc4180)
+add_executable(test_free_list_carve tests/test_free_list_carve.cpp)
+target_link_libraries(test_free_list_carve sotc_core)
+add_test(NAME free_list_carve COMMAND test_free_list_carve)
