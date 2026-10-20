@@ -1,7 +1,39 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:56 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:57 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 21:57 CDT, worker bc-02397584 (CPU-01d) — 0xd623c0 — COMPLETE
+
+Task: CPU-01d — unguarded vec-copy ctor RVA **0xd623c0** (survey index 103).
+Failed tries: 0. Status: FIXTURE_VERIFIED on origin; restore peer `vec_d62b00` lib line dropped in `ac233cb`.
+Owned this push: `native/CMakeLists.txt` (+`vec_d62b00` restore + keep `vec_d623c0`), `HANDOFF.md`.
+Sources: `0604100` (`vec_d623c0.*`, `check_fd623c0.py`).
+Private dump (not published): `local/re/work/cd623c0.bin`.
+Did NOT touch Drive / SRV / peer untracked WIP.
+Checkpoint (2026-10-19 21:57 CDT, bc-02397584):
+- OBS: src=0x1303e90 dst=0x3352940 bits=~0,~0,~0,0; index 103.
+- Commands: ctest -R '^vec_d623c0$' Passed; check_fd623c0.py OK.
+- Store: Project `internal/worker-claim-d623c0.md`.
+- Push: sources **`9dfacf2`**; CMake follow-up this commit (wire `arena_page_debit`; restore peer `vec_d40010` link accidentally dropped). Repair: re-add `core/vec_d62b00.cpp` to sotc_core.
+
+## ACTIVE CLAIM — 2026-10-19 21:56 CDT, worker bc-effcf5dc (CPU-01d) — 0xd62b00 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd62b00** (survey index 101).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d62b00.{hpp,cpp}`, `native/tests/test_vec_d62b00.cpp`,
+`tools/lift/check_fd62b00.py`, `native/CMakeLists.txt` (+vec_d62b00 source; test already on origin).
+Private dump (not published): `local/re/work/cd62b00.bin`.
+Prior: idx 99 `0xd6d280` = `e568b51` on origin.
+Skipped: 95; D 100/102; B 103; peer busy leaves. No `git reset --hard`.
+Did NOT edit Drive / SRV / peer untracked WIP / `local/`.
+Checkpoint (2026-10-19 21:56 CDT, bc-effcf5dc):
+- OBS: unguarded vmovups copy; src=0x1304610 dst=0x3352960 bits=~0,~0,~0,0; index 101.
+- Commands: ctest -R '^vec_d62b00$' Passed; `python3 -I tools/lift/check_fd62b00.py` OK.
+- Logs: `/tmp/ctest_d62b00.log`, `/tmp/check_fd62b00.log`.
+- Store: Project `internal/worker-claim-d62b00.md`.
+- Push: (this commit).
+
 
 ## ACTIVE CLAIM — 2026-10-19 21:56 CDT, worker bc-81763e53 (CPU-01d) — 0xd3b790 — COMPLETE
 
