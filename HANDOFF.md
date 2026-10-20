@@ -1,9 +1,48 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:00 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:07 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:02 CDT, `/root` — APP-01 termination classifier claim
+## CURRENT CHECKPOINT — 2026-10-20 05:07 CDT, `/root` — APP-01 termination classifier verified
+
+`APP-01-TERMINATION-CLASSIFIER-01` is `FIXTURE_VERIFIED`. `/root/app01_termination` added
+`LauncherLifecycle.classifyTermination(stopWasRequested:reason:status:)` in LauncherCore and
+changed `LauncherModel.processEnded` to delegate to it. Requested Stop has precedence; only
+Foundation `.exit` with status 0 maps to `.cleanExit`; all other outcomes retain the unexpected
+status. Four tests cover Stop precedence, normal zero exit, nonzero exit, and signal termination.
+Root reviewed the three-file diff and Graft references (6 hits across 3 files; the helper has one
+production caller and four tests).
+
+Worker and root filtered command
+`swift test --package-path launcher --scratch-path local/build/launcher --filter LauncherLifecycleTests`
+both exited 0 with 11 tests across 2 suites. Root full command
+`swift test --package-path launcher --scratch-path local/build/launcher` exited 0 with all 18 tests
+across 3 suites on `arm64e-apple-macos14.0`. Logs: worker
+`local/checkpoints/app01-termination-classifier-test.log`; root filtered
+`local/checkpoints/root-2026-10-20-app01-termination-root-review.log`; root full suite
+`local/checkpoints/root-2026-10-20-app01-termination-full-suite.log`. Source hashes and log hashes
+are recorded in E80 and [the completion checkpoint](docs/checkpoints/2026-10-20-root-app01-termination-classifier-complete.md).
+
+`graft check` and `git diff --check` passed; the wiring graph is current at 1,255 nodes / 530
+source files, optional deep meaning layer unbuilt. `python3 scripts/project_index.py` exited 0 at
+4,166 folders; log `local/checkpoints/root-2026-10-20-app01-termination-complete-project-index.log`.
+The classification tests do not exercise an actual process launch, signal delivery, Stop request,
+Finder app, sandbox, quit lifetime, or any game gate. No implementation failures; G1 NOT PASSED and
+G2 NOT RUN.
+
+Read-only scout `/root/app01_readiness` identified a separate candidate:
+`DATA-02-PSARC-TRUNCATED-COMPRESSED-BLOCK-01`, a synthetic test in `scripts/test_psarc.py` for an
+intact TOC with a short final compressed payload block. Existing code has an exact-length guard but
+current tests cover only header truncation; the candidate is unclaimed, no code/test run occurred,
+and attempt count is unchanged. The scout and its evidence/limits are recorded in the completion
+checkpoint.
+
+Files recorded in this checkpoint are `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`,
+`docs/FOLDERS.md`, the completion checkpoint, and the three APP-01 source/test files. No install or
+dependency change. Next exact action after publication: claim the PSARC fixture candidate in its
+own checkpoint before any edit.
+
+## PRIOR CHECKPOINT — 2026-10-20 05:02 CDT, `/root` — APP-01 termination classifier claim
 
 `APP-01-TERMINATION-CLASSIFIER-01` is claimed by root with `/root/app01_termination` as the
 implementation worker. The user selected a pure, testable `LauncherCore` helper. Graft mapped the
@@ -33,9 +72,8 @@ local/build/launcher --filter LauncherLifecycleTests`. No failed implementation 
 baseline has run. App/Finder behavior, actual child termination, sandbox distribution, and quit
 lifetime remain outside this slice; G1 is NOT PASSED and G2 is NOT RUN.
 
-Claim checkpoint was published before source edits. Next exact action: dispatch the worker for only
-its three owned code/test files, review the diff, rerun the acceptance command, then record and
-publish the result.
+Claim checkpoint was published as commit `d4c0e69` before source edits. Implementation and root
+acceptance are now complete; see the current checkpoint above.
 
 ## PRIOR CHECKPOINT — 2026-10-20 05:00 CDT, `/root` — overlap guard final replay and publication readiness
 
