@@ -16,7 +16,7 @@ Checkpoint (2026-10-19 20:28 CDT, bc-81763e53):
 - Commands: ctest -R '^vec_d7fe90$' Passed; `python3 -I tools/lift/check_fd7fe90.py` OK.
 - Logs: `/tmp/ctest_d7fe90.log`, `/tmp/check_d7fe90.log`.
 - Store: Project `internal/worker-claim-d7fe90.md`.
-- Push: (pending this commit).
+- Push: `d7174df` on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 20:28 CDT, worker bc-02397584 (CPU-01d) — 0xdac410 CMake restore — COMPLETE
 
