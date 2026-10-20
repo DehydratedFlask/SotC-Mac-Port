@@ -28,6 +28,7 @@
 #include "vec_dfd5f0.hpp"
 #include "vec_ddab00.hpp"
 #include "vec_dda990.hpp"
+#include "vec_dd41e0.hpp"
 #include "vec_b52110.hpp"
 #include "vec_b743c0.hpp"
 #include "vec_dc2d50.hpp"
@@ -39,6 +40,8 @@
 #include "vec_db3960.hpp"
 #include "vec_d7be60.hpp"
 #include "vec_d7bc60.hpp"
+#include "vec_d7b930.hpp"
+#include "vec_d6e0f0.hpp"
 #include "vec_d7c380.hpp"
 #include "vec_d7c4d0.hpp"
 #include "vec_d7c9d0.hpp"
@@ -85,6 +88,7 @@ struct StartupState {
     VecDddc90 vec_dddc90{};   // idx 61
     VecDdab00 vec_ddab00{};   // idx 62
     VecDda990 vec_dda990{};   // idx 63
+    VecDd41e0 vec_dd41e0{};   // idx 67
     VecDc4180 vec_dc4180{};   // idx 68
     VecDc2d50 vec_dc2d50{};   // idx 69
     VecDbb280 vec_dbb280{};   // idx 71
@@ -107,6 +111,8 @@ struct StartupState {
     VecD7c380 vec_d7c380{};   // idx 91
     VecD7be60 vec_d7be60{};   // idx 92
     VecD7bc60 vec_d7bc60{};   // idx 93
+    VecD7b930 vec_d7b930{};   // idx 94
+    VecD6e0f0 vec_d6e0f0{};   // idx 96
     VecB743c0 vec_b743c0{};   // idx 282
     VecB52110 vec_b52110{};   // idx 290
     std::array<std::byte, kScratchBytes> scratch{};

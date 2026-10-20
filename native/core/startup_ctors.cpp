@@ -46,7 +46,8 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xdddc90, 61, [](StartupState& s) noexcept { init_vec_dddc90(s.vec_dddc90); }},
         {0xddab00, 62, [](StartupState& s) noexcept { init_vec_ddab00(s.vec_ddab00); }},
         {0xdda990, 63, [](StartupState& s) noexcept { init_vec_dda990(s.vec_dda990); }},
-        // Gap idx 64–67 (0xdd41e0 incomplete API on origin).
+        // Gap idx 64–66.
+        {0xdd41e0, 67, [](StartupState& s) noexcept { init_vec_dd41e0(s.vec_dd41e0); }},
         {0xdc4180, 68, [](StartupState& s) noexcept { init_vec_dc4180(s.vec_dc4180); }},
         {0xdc2d50, 69, [](StartupState& s) noexcept { init_vec_dc2d50(s.vec_dc2d50); }},
         // Gap idx 70 (peer lifting 0xdbfa60).
@@ -71,6 +72,9 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xd7c380, 91, [](StartupState& s) noexcept { init_vec_d7c380(s.vec_d7c380); }},
         {0xd7be60, 92, [](StartupState& s) noexcept { init_vec_d7be60(s.vec_d7be60); }},
         {0xd7bc60, 93, [](StartupState& s) noexcept { init_vec_d7bc60(s.vec_d7bc60); }},
+        {0xd7b930, 94, [](StartupState& s) noexcept { init_vec_d7b930(s.vec_d7b930); }},
+        // Gap idx 95 (0xd71f60) — NEEDS_PRINCIPAL.
+        {0xd6e0f0, 96, [](StartupState& s) noexcept { init_vec_d6e0f0(s.vec_d6e0f0); }},
         {0xb743c0, 282, [](StartupState& s) noexcept { init_vec_b743c0(s.vec_b743c0); }},
         {0xb52110, 290, [](StartupState& s) noexcept { init_vec_b52110(s.vec_b52110); }},
         {0x196c90, 520, [](StartupState& s) noexcept { clear_flag32(s.flag32); }},
