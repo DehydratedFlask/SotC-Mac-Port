@@ -1,19 +1,53 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 19:55 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 19:58 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## ACTIVE CLAIM — 2026-10-19 19:56 CDT, worker bc-3fe140af (CPU-01d) — 0xb747f0
+## ACTIVE CLAIM — 2026-10-19 19:58 CDT, worker bc-dc141fdf (CPU-01d) — 0xef85e0
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xef85e0** (index 20).
+Failed tries: 0. Status: IN PROGRESS.
+Owned (new only): `native/core/vec_ef85e0.{hpp,cpp}`, `native/tests/test_vec_ef85e0.cpp`,
+`tools/lift/check_fef85e0.py`, `native/CMakeLists.txt` (+vec_ef85e0 target only).
+Private dump (not published): `local/re/work/cef85e0.bin`.
+**Does NOT edit:** `startup_ctors.*`, peer vec_e085e0/vec_b747f0/zero_xmm_qword/Drive files.
+Avoided: `0xe085e0`, `0xb747f0`, `0xb743c0`, `0xb52110`, `0xf30460`, `0xf4b510`, `0xdd41e0`,
+`0x3bd70`, `0xa3ade0`, `0x5777a0`, `0x58bd10`, `0xf4fd40`.
+Exact check: ctest + `python3 -I tools/lift/check_fef85e0.py`; allowlisted push.
+
+## ACTIVE CLAIM — 2026-10-19 19:58 CDT, worker bc-cb8d07c2 (CPU-01g) — COMPLETE
+
+Task: CPU-01g — leaf ctor `0x58bd10` → `zero_xmm_qword` (xmm@0x2f4e4b0 + qword@0x2f4e4d0).
+Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
+Owned: native/core/zero_xmm_qword.*, tests/test_zero_xmm_qword.cpp, check_f58bd10.py, CMakeLists (+target).
+Did NOT edit startup_ctors.* / peer WIP sources.
+Checkpoint: ctest 18/18; `python3 -I tools/lift/check_f58bd10.py` OK. Store: internal/worker-claim-3d.md.
+
+## ACTIVE CLAIM — 2026-10-19 19:57 CDT, worker bc-24e5fd45 (CPU-01d) — 0xe085e0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xe085e0** (index 51).
+Failed tries: 0. Status: FIXTURE_VERIFIED.
+Owned: `native/core/vec_e085e0.{hpp,cpp}`, `native/tests/test_vec_e085e0.cpp`,
+`tools/lift/check_fe085e0.py`, `native/CMakeLists.txt` (+vec_e085e0 only).
+Private dump (not published): `local/re/work/ce085e0.bin`.
+Checkpoint: ctest **19/19** (incl. `vec_e085e0`); `python3 -I tools/lift/check_fe085e0.py` OK
+(src=0x1313740 dst=0x3353370 bits=~0,~0,~0,0). Store: `internal/worker-claim-e085e0.md`.
+Did NOT edit `startup_ctors.*` or peer lifts.
+
+## ACTIVE CLAIM — 2026-10-19 19:56 CDT, worker bc-3fe140af (CPU-01d) — 0xb747f0 COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xb747f0** (index 281).
-Failed tries: 0. Status: IN PROGRESS.
+Failed tries: 0. Status: FIXTURE_VERIFIED.
 Owned (new only): `native/core/vec_b747f0.{hpp,cpp}`, `native/tests/test_vec_b747f0.cpp`,
 `tools/lift/check_fb747f0.py`, `native/CMakeLists.txt` (+target only).
 Private dump (not published): `local/re/work/cb747f0.bin`.
-**Does NOT edit:** `startup_ctors.*`, peer vec/addr/allocator/clear_flag*, ASSETS.
+**Did NOT edit:** `startup_ctors.*`, peer vec/addr/allocator/clear_flag*, ASSETS.
 Avoided: Drive `0xf4b510`/`0xf30460`/`0x196c90`, Claim-3 `0xdd41e0`, claim-2b `0xb52110`,
 claim-2c `0xb743c0`, CPU-01e `0x3bd70`, CPU-01f `0xa3ade0`/`0x5777a0`, `0xf4fd40`.
-Exact check: rebuild + ctest + `python3 -I tools/lift/check_fb747f0.py`.
+Checkpoint (2026-10-19 19:57 CDT): ctest **18/18**; `python3 -I tools/lift/check_fb747f0.py` OK
+(src=0x12d9100 dst=0x3350dc0 bits=~0,~0,~0,0; distinct from sibling mask cells).
+GitHub already pushed (assist not needed); this commit is allowlisted lift only.
+Store: Project `internal/worker-claim-b747f0.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 19:55 CDT, worker bc-cd298177 (claim-2c) — COMPLETE
 
