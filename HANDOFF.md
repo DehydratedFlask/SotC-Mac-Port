@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:30 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:31 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:30 CDT, /root — slot-10 branch verified; next direct helper claimed
+## CURRENT CHECKPOINT — 2026-10-20 00:31 CDT, /root — slot-10 evidence and next helper claim published; analysis dispatched
 
 Task APP-01-IMPORTER-ERROR-01: `launcher/Sources/SoCLauncher/ContentView.swift` now presents the
 localized error in a system alert for import failures and leaves the prior folder/readiness intact;
@@ -81,10 +81,10 @@ static evidence does not establish external process mappings, constructor execut
 contract. Failed analysis hypotheses: 0; G1 remains NOT PASSED. Tool issues and exact commands are in
 the [completion checkpoint](docs/checkpoints/2026-10-20-root-cpu01-ctor10-indirect-claim.md).
 
-### CPU-01-CTOR10-E1EDE0-01 — direct helper at `0xe1ede0` — CLAIMED
+### CPU-01-CTOR10-E1EDE0-01 — direct helper at `0xe1ede0` — DISPATCHED
 
 The next bounded CPU-01 slice is the direct constructor call `0xf09f04 -> 0xe1ede0` already recorded
-in E43. `/root/srv01_page_map_19660` owns the private static characterization: exact callee range,
+in E43. `/root/srv01_page_map_19660` is working on the private static characterization: exact callee range,
 bytes, callers/callees, caller argument values, and only byte-supported effects. Graft
 `graft grep "e1ede0" --in native/` exited 0 with no hits in 369 indexed files. If existing E43
 artifacts do not contain a callee body, use a separate `local/re/rea-e1ede0-snapshot.json` and

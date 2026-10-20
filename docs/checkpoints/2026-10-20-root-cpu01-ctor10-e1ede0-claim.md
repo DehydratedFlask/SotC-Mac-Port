@@ -49,4 +49,20 @@ document why and still provide an independent hash/address-bound raw-byte verifi
 - Exact next action: inspect existing E43/REA records for `0xe1ede0`, then export or reuse the
   bounded callee evidence and independently check its range/call/dataflow against the pinned ELF.
   Send only the private report to root; root owns shared docs, index refresh, audits, commit and push.
-- Status: CLAIMED; 0 failed hypotheses/tries.
+- Status: DISPATCHED; 0 failed hypotheses/tries.
+
+## Dispatch checkpoint
+
+- Date/time: 2026-10-20 00:31 CDT (America/Chicago); integrator `/root`.
+- Task ID: `CPU-01-CTOR10-E1EDE0-01`; files changed: `HANDOFF.md`, this claim, and shared task/index
+  documentation in commit `0e62162`.
+- Exact dispatch: after pushing the claim, root sent `collaboration.followup_task` to
+  `/root/srv01_page_map_19660` with the bounded scope above, directing it to inspect existing E43/REA
+  artifacts first, use only the distinct REA snapshot/private output if needed, independently verify
+  the callee against the unchanged ELF, avoid ABI/runtime guesses, and report without shared-doc edits.
+- Result: dispatch accepted; analysis in progress. No callee result is inferred from the dispatch.
+- Remaining risks: callee behavior and argument/dataflow are unknown; constructor reachability and G1
+  remain unproven.
+- Next exact action: review the private analyst report, rerun its hash/address-bound verifier, then
+  integrate shared evidence and publication record.
+- Failed hypotheses/tries: 0.
