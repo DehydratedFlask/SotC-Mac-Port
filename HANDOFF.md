@@ -1,22 +1,30 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:34 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:36 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:34 CDT, /root — G0 environment baseline claimed; execution pending
+## CURRENT CHECKPOINT — 2026-10-20 00:36 CDT, /root — G0 environment baseline artifact verified
 
-Task `G0-ENV-BASELINE-01` is claimed by `/root` as a read-only local toolchain inventory slice.
-The task checkpoint is [here](docs/checkpoints/2026-10-20-root-g0-env-baseline-claim.md). The
-claim checkpoint file was initially created without its matching task-registry and current-handoff
-records; this correction adds both before any baseline command runs. `python3 scripts/project_index.py`
-exited 0 and reported 4,131 folders indexed, updating the generated checkpoint count from 28 to 29.
-No baseline probe has run yet; no machine/tool result is inferred. G0 stays PARTIAL. Exact next
-action: audit, commit and push the allowlisted claim bundle, then run the six exact commands
-separately and retain stdout, stderr, exit status and duration under
-`local/validation/g0-env-baseline-20261020/`.
+Task `G0-ENV-BASELINE-01` ran the six read-only commands in `docs/VALIDATION.md` separately through
+`python3 -I local/validation/g0-env-baseline-20261020/capture.py`; wrapper exit 0. All six inner
+commands exited 0 with empty stderr. Structured private capture is
+`local/validation/g0-env-baseline-20261020/capture.json`, SHA-256
+`cea524d435eeef15e02d506744969dab872990e4812d6621d6b256f042e475b0`. It records each argv, local
+start/end, elapsed seconds, exit code, and per-command stdout/stderr files. Observed machine: arm64,
+Apple M4 Pro, 12 CPU cores, 51,539,607,552 bytes RAM (48 GiB); macOS 27.0.1 build 26A434; Xcode
+27.1 build 27A9275; Metal compiler at
+`/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/metal`;
+macOS SDK 27.0. These values match the prior dated machine baseline and extend it with direct
+architecture/tool-path/SDK observations. No Metal compilation or game/runtime operation was tested.
+The evidence row is E50; the task checkpoint is
+[here](docs/checkpoints/2026-10-20-root-g0-env-baseline-complete.md). G0 remains PARTIAL. Exact
+`python3 scripts/project_index.py` exited 0 and reported 4,132 folders indexed. `graft check` exited
+0: wiring graph in sync; optional deep meaning layer remains 0% (1,219 nodes pending).
+`git diff --check` passed. Exact next action: run both path audits, fetch/check divergence, then
+commit and push the completion record.
 
-Concurrent task `CPU-01-CTOR10-E1EDE0-01` remains assigned to `/root/srv01_page_map_19660`; root has
-requested its current phase while completing the independent G0 baseline claim.
+Concurrent task `CPU-01-CTOR10-E1EDE0-01` remains assigned to `/root/srv01_page_map_19660`; its
+REA/Ghidra function query is running and the initial independent raw disassembly is complete.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 00:31 CDT, /root — slot-10 evidence and next helper claim published; analysis dispatched
 
