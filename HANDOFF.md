@@ -1,16 +1,20 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 02:01 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 02:08 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 02:01 CDT, /root — rack path verified; VoiceControl caller unresolved
+## CURRENT CHECKPOINT — 2026-10-20 02:08 CDT, /root — system and rack paths verified; VoiceControl query running
 
-Three bounded AUD-02 static packets are tracked: `AUD-02-NGS2-SYSCREATE-01` for
-`sceNgs2SystemCreateWithAllocator` remains with worker `/root/aud02_syscreate`;
-`AUD-02-NGS2-RACKCREATE-01` for `sceNgs2RackCreate` has one root-verified static path; and
-`AUD-02-NGS2-VOICE-CONTROL-01` for `sceNgs2VoiceControl` has one observed slot-reference address,
-but its caller is unresolved. Root is the sole shared-document integrator. Claims and boundaries:
+Two bounded AUD-02 call paths are root-verified: `AUD-02-NGS2-SYSCREATE-01` for
+`sceNgs2SystemCreateWithAllocator` and `AUD-02-NGS2-RACKCREATE-01` for `sceNgs2RackCreate`.
+`AUD-02-NGS2-VOICE-CONTROL-01` for `sceNgs2VoiceControl` has one observed slot-reference address;
+REA function analysis at `0xf91460` is running and the caller path remains unresolved. Root is the
+sole shared-document integrator. Claims and boundaries:
 [checkpoint](docs/checkpoints/2026-10-20-root-aud02-ngs2-callsite-claims.md).
+
+The prior root-review checkpoint was committed as `357ed0c` (`docs: record NGS2 probe verification`)
+and pushed from `4e177f6`; staged/full publish audits passed 4/600 paths, and `origin/main` had no
+divergence.
 
 Input identity: `local/re/eboot.elf` SHA-256
 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; import manifest
@@ -84,6 +88,33 @@ staged.
   `AUD-02-NGS2-VOICE-CONTROL-01` under AGENTS.md.
 - No source or game bytes changed. Shared files updated: `HANDOFF.md`, `docs/TASKS.md`,
   `docs/EVIDENCE.md`, and this checkpoint file. `INSTALL_LOG.md` unchanged.
+
+### System-create root review — 2026-10-20 02:08 CDT, `/root`
+
+- Task: `AUD-02-NGS2-SYSCREATE-01`; bounded status `STATIC_PATH_BYTE_VERIFIED`; failed
+  hypothesis-driven tries 0. Worker’s optional `inspect-binary-layout` capability check returned
+  unsupported for its Linux-x64-only profile and was not used in the analysis.
+- Exact root commands from `local/re/evidence/aud02-ngs2-syscreate-01/`: `shasum -a 256 -c
+  SHA256SUMS` (exit 0; 26 entries); `python3 -I verify.py` (exit 0; JSON `result=PASS`). Root log
+  hashes: checksum output `16d6c9a282536ea7b28fa73056eb7ec470ef3cae22e543c8f675ec58905d1b65`, verification
+  JSON `135ced0d0c69bd6148b15742d98748802d803d5a9222da822cc9a6050b359807`, stderr empty.
+- Observation: the exact ELF/import manifest bytes verify the path from slot `0x1601008` (JMPREL
+  `R_X86_64_JUMP_SLOT`, symbol index 240 / NID `mPYgU4oYpuY`) through thunk `0xf91430` to a direct
+  caller instruction at `0x94932e` in `FUN_009485a0`. Checked pre-call range `0x949307..0x949332`
+  (44 bytes), SHA-256 `99e458a9170b402ead55f3b0444dc66758a1e425325a65ffc8ad39d0e4f94887`. REA Evidence
+  IDs: `ev_4b730eb76f6268025a4a4435ddc14dc9ec2b474bda906a67ee269b4cfd06192b`,
+  `ev_3dcf38cb48579627b09c576918571f0b2fef7efd747306dea1b01b2616affab0`,
+  `ev_3c328e924109833a20ed5f3ccb54b5395b4aa0561ab1974c4e77ff97a457385f`. Private report
+  `local/re/evidence/aud02-ngs2-syscreate-01/REPORT.md` SHA-256
+  `a8021ebd058884f8de5df9e58b7fcf31a582d7513d9ea59babe9a68d53f94e4d`.
+- Limits: runtime slot binding and callee remain unresolved; the loaded EAX value from
+  `[RBP-0x5fc]` has no resolved reaching definition; Ghidra caller high-p-code has at least one
+  omitted operation and 729 omitted edges. No argument roles, ABI, NGS2 contract, runtime use, or
+  game behavior is inferred.
+- Root review files are private under `local/re/evidence/aud02-ngs2-syscreate-01-root-*`; shared
+  files updated: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, and this checkpoint file.
+  `INSTALL_LOG.md` unchanged. Exact next action: finish the in-flight VoiceControl function query
+  at `0xf91460`; if it fails, it is the third unsuccessful targeted try and requires escalation.
 
 ### Dispatch checkpoint — 2026-10-20 01:40 CDT, `/root`
 
