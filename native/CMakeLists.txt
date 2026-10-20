@@ -42,7 +42,8 @@ add_library(sotc_core STATIC
   core/vec_ddef00.cpp
   core/vec_de7fb0.cpp
   core/vec_ddab00.cpp
-  core/vec_dddc90.cpp)
+  core/vec_dddc90.cpp
+  core/vec_dda990.cpp)
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()
 add_executable(test_math_constants tests/test_math_constants.cpp)
@@ -148,3 +149,6 @@ add_test(NAME vec_dddc90 COMMAND test_vec_dddc90)
 add_executable(test_vec_ddab00 tests/test_vec_ddab00.cpp)
 target_link_libraries(test_vec_ddab00 sotc_core)
 add_test(NAME vec_ddab00 COMMAND test_vec_ddab00)
+add_executable(test_vec_dda990 tests/test_vec_dda990.cpp)
+target_link_libraries(test_vec_dda990 sotc_core)
+add_test(NAME vec_dda990 COMMAND test_vec_dda990)
