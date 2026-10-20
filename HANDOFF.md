@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — SaveData Initialize3 verified; usage limit reached
+
+`SAV-01-SAVEDATA-INITIALIZE3-01` `STATIC_PATH_BYTE_VERIFIED` (callsite `0xa4d295` in `FUN_00a4d250`; root replayed verifier and checksums): `docs/checkpoints/2026-10-20-root-savedata-initialize3-complete.md`. Native suite last verified 155/155 (batch 12, pushed `07eac0d`). G0 PARTIAL, G1-G6 NOT RUN.
+
+OPEN: worker for `SAV-01-SAVEDATA-UMOUNTWITHBACKUP-01` was still running when the usage limit hit; its result is unreviewed. Exact next action: check `local/re/evidence/sav01-savedata-umountwithbackup-01/`, replay its verifier and `shasum -c`, then record or discard. Next constructor candidate: manifest position 132 `0xc64060`. Other unprobed imports: `sceSaveDataDirNameSearch`, `sceAudio3d*`, three remaining `sceAudioOutOutput` callsites.
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors 0xc686e0, 0xc66580, 0xc65f80, 0xc65da0 lifted
 
 `CPU-01-LEAF-CTOR-BATCH-12` `FIXTURE_VERIFIED`; root replay 155/155 ctest pass, four checkers exit 0. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-12-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending: `SAV-01-SAVEDATA-INITIALIZE3-01` and `SAV-01-SAVEDATA-UMOUNTWITHBACKUP-01` workers (one REA query each; evidence under `local/re/evidence/sav01-savedata-initialize3-01/` and `local/re/evidence/sav01-savedata-umountwithbackup-01/`).
