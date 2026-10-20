@@ -146,6 +146,9 @@ add_library(sotc_core STATIC
   core/vec_cae740.cpp
   core/vec_cae240.cpp
   core/vec_cad450.cpp
+  core/vec_ca4dc0.cpp
+  core/vec_c9e8e0.cpp
+  core/vec_c91b10.cpp
 )
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()
@@ -646,3 +649,15 @@ add_test(NAME vec_cae240 COMMAND test_vec_cae240)
 add_executable(test_vec_cad450 tests/test_vec_cad450.cpp)
 target_link_libraries(test_vec_cad450 sotc_core)
 add_test(NAME vec_cad450 COMMAND test_vec_cad450)
+
+add_executable(test_vec_ca4dc0 tests/test_vec_ca4dc0.cpp)
+target_link_libraries(test_vec_ca4dc0 sotc_core)
+add_test(NAME vec_ca4dc0 COMMAND test_vec_ca4dc0)
+
+add_executable(test_vec_c9e8e0 tests/test_vec_c9e8e0.cpp)
+target_link_libraries(test_vec_c9e8e0 sotc_core)
+add_test(NAME vec_c9e8e0 COMMAND test_vec_c9e8e0)
+
+add_executable(test_vec_c91b10 tests/test_vec_c91b10.cpp)
+target_link_libraries(test_vec_c91b10 sotc_core)
+add_test(NAME vec_c91b10 COMMAND test_vec_c91b10)
