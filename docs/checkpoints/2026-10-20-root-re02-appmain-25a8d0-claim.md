@@ -1,6 +1,7 @@
 # RE-02-APPMAIN-25A8D0-01 claim — 2026-10-20 01:03 CDT
 
-- **Agent:** `/root` (integrator); private analysis worker to be assigned after claim publication.
+- **Agent:** `/root` (integrator); private analysis worker `/root/appmain_25a8d0`, `gpt-6-luna`
+  Extra High.
 - **Task:** `RE-02-APPMAIN-25A8D0-01`, parent tasks `RE-02` and `CPU-01`.
 - **Status / attempt count:** ACTIVE, claim prepared; 0 failed analysis hypotheses.
 - **Prerequisites:** RE-01 identity record; existing byte-level app-main notes at
@@ -39,9 +40,18 @@
   pre-commit divergence was `0 0`. Commit `a7904b9` (`docs: claim app-main function analysis`)
   pushed successfully (`ba7b431..a7904b9`). Post-push tree was clean, HEAD equals `origin/main` at
   `a7904b959a0329db3404f75e490f1c1b4a739b21`, divergence `0 0`.
-- **Next exact action:** dispatch one `gpt-6-luna` Extra High worker for private analysis only under
-  `local/re/evidence/re02-appmain-25a8d0/`. Root will review and rerun its verifier before recording
-  completion evidence.
+- **Worker preflight:** required project docs were read. The query
+  `graft ask "Does any reference code establish the app-main meaning of vtable slot 0x15c8cf0?"
+  --source --in reference/ShadowOfTheColossus-PC` exited `1` because no files under that reference
+  prefix are indexed. The task concerns local ELF bytes; this is a Graft scope/tool limitation, not
+  a failed analysis hypothesis. The worker reports no file changes and is proceeding with
+  process-local REA/Ghidra CLI. Attempts remain 0.
+- **Next exact action:** review the private report/verifier under
+  `local/re/evidence/re02-appmain-25a8d0/`; independently rerun it before recording completion
+  evidence.
 - **Follow-up record publication:** commit `addc714` (`docs: record app-main claim publication`)
   was pushed. The tree was clean with HEAD equal to `origin/main` at
   `addc714b0e4a4fbf0ef8369943f1d7a1cd7052e1`, divergence `0 0`.
+- **Latest shared checkpoint publication:** commit `5008163` (`docs: record claim publication
+  state`) was pushed (`addc714..5008163`); it recorded the clean post-push state at
+  `5008163a4b29129125785b5f1f6763eea7874c8e`, divergence `0 0`.

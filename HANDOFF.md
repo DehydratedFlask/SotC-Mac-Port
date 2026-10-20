@@ -1,11 +1,11 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:03 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:08 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:03 CDT, /root — app-main target characterization claimed
+## CURRENT CHECKPOINT — 2026-10-20 01:08 CDT, /root — app-main analysis active; independent audio probe claimed
 
-### RE-02-APPMAIN-25A8D0-01 — ACTIVE, claim published; worker dispatch pending
+### RE-02-APPMAIN-25A8D0-01 — ACTIVE, private analysis underway
 
 Parent CPU-01 and RE-02 remain ACTIVE. Prerequisites are the pinned RE-01 ELF identity and the
 existing app-main dossier `local/re/work/app-main-re02.{md,json}`. The ELF SHA-256 is
@@ -34,10 +34,46 @@ Publication checks: `python3 scripts/project_index.py` exited `0` (`4,135 folder
 accepted 4 allowlisted paths; full audit accepted 593; `git fetch origin main` succeeded and
 pre-commit divergence was `0 0`. Commit `a7904b9` (`docs: claim app-main function analysis`) pushed
 successfully (`ba7b431..a7904b9`). This publication record was then pushed in `addc714` (`docs:
-record app-main claim publication`, `a7904b9..addc714`). Post-push tree is clean, HEAD equals
-origin/main at `addc714b0e4a4fbf0ef8369943f1d7a1cd7052e1`, divergence `0 0`. Exact next action:
-dispatch one `gpt-6-luna` Extra High worker to the private `0x25a8d0` static characterization.
-No source or reference file changes, game execution, install, or download. G1 NOT PASSED.
+record app-main claim publication`, `a7904b9..addc714`). The subsequent checkpoint-record commit
+`5008163` (`docs: record claim publication state`) was pushed (`addc714..5008163`). Post-push tree
+is clean, HEAD equals origin/main at `5008163a4b29129125785b5f1f6763eea7874c8e`, divergence `0 0`.
+
+`/root/appmain_25a8d0` (`gpt-6-luna`, Extra High) has read its task docs and is using process-local
+REA/Ghidra CLI. Its preflight Graft query for `reference/ShadowOfTheColossus-PC/` exited `1` because
+that prefix has no indexed files; this is a graph-scope limitation for a local ELF task, not an
+analysis failure. Worker reports fresh read-only Ghidra 12.1.4 analysis underway through REA 6.7.0;
+at about 2 minutes there was no function Evidence yet. The copied log reports generic function-body
+overlap-repair failures and decompiler p-code warnings; applicability to target `0x25a8d0` remains
+unresolved, and the worker is preserving the log and continuing byte-level checks. No files changed;
+failed analysis hypotheses remain 0. Exact next action: root-review the report/verifier and confirm
+whether warnings affect the target before marking evidence. No source or reference changes, game
+execution, install, or download. G1 NOT PASSED.
+
+### AUD-01-STS-BYTE-PROBE-01 — ACTIVE, claim prepared; private worker dispatch pending publication
+
+Parent AUD-01, prerequisites DATA-01 and `AUD-01-STS-IDENTITY-01`. The probe is limited to the
+paired asset `cp3shadow/sound/test_adpcm/b_info_01.sts_cp3`, read in memory from both verified
+cachedFiles archives through `Psarc.read()`. The identity artifact is
+`local/validation/aud01-sts-identity-01.json`, SHA-256
+`566275c3c104dfc473f8cb3c227641a16b10e2b0da7ffb2811e22b00f877e654`; base archive SHA-256
+`373828b9a6e5c689a6a05a01aa14b295026976438aa7796e9baa789ae03dda0`, member ID `10472`, size
+`344`, member SHA-256 `d6d74c4ca3cfae66db345551dc22670604d155475a99aa40d6f3a12463056ee7`; patch archive
+SHA-256 `656d6870a159013921d036d0b7cf18c679bfc62fe5862b31332c459ff7da05d0`, same member ID `10472`,
+size `561`, member SHA-256 `42eb5a005793f67c3dcd2761ec75ad33f3e83a2d863a30daaf79513ebbe0eb86`. Goal is a
+bounded private byte-layout characterization and independent verification of any observed
+offsets/boundaries. Do not infer codec from directory/extension names, patch-wins runtime behavior,
+NGS2 behavior, game use, or playback; if bytes do not establish a schema, leave format
+`UNCLASSIFIED`. Do not extract to disk or publish payload bytes. Outputs remain under
+`local/re/evidence/aud01-sts-byte-probe-01/`. Failed analysis hypotheses: 0. Claim:
+[AUD-01-STS-BYTE-PROBE-01](docs/checkpoints/2026-10-20-root-aud01-sts-byte-probe-claim.md).
+
+Pre-claim selection used the verified identity JSON, choosing the lexicographically first
+hash-different pair where both decoded sizes are at least 256 bytes; the identity artifact SHA was
+rechecked at 01:06 CDT. An exploratory listing script used a nonexistent `layers.*.members` key
+and exited `1`; inspecting `comparison.paired_members` corrected the lookup. No format hypothesis
+or byte extraction was attempted. Exact next action: update the folder index, run Graft freshness
+and publication checks, push the allowlisted claim, then dispatch one independent `gpt-6-luna`
+Extra High audio worker. Root retains shared-document ownership.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 01:01 CDT, /root — two bounded analyses published
 
