@@ -22,7 +22,8 @@ Gates and test evidence take precedence over a status label. Integrator owns thi
 | SRV-01 | Native platform services / asset I/O | RE-02, DATA-02 | ACTIVE (partial: host_map + carve + split + list + free-count `@+0x48` + high-water `0x1a9bb` + exact-fit `0x1aada` + page-debit `0x1ae67` FIXTURE slices bc-9aa0fe88; distinct `0x19e00` block `0x1a123–0x1a15a` now FIXTURE_VERIFIED with CMake test and E28 byte checker, 1 earlier failed target hypothesis; page bitmap / `0x19660` / Fios open) / principal+bc-9aa0fe88+root | 0 |
 | CPU-04 | Native startup and first world | CPU-01..03, SRV-01 | WAITING_FOR_DEPENDENCY | 0 |
 | CPU-05 | Gameplay recovery batches | CPU-04 | WAITING_FOR_DEPENDENCY | 0 |
-| AUD-01 | Audio assets/codec inventory | DATA-01 | ACTIVE (partial: 86 `.sxd`/`.hd`/`.bd` members now have verified full-member hashes and PSARC entry locators in the private manifest; codec UNKNOWN; music/dialogue location open) / bc-71956f82+root | 0 |
+| AUD-01 | Audio assets/codec inventory | DATA-01 | ACTIVE (partial: 86 `.sxd`/`.hd`/`.bd` members now have verified full-member hashes and PSARC entry locators in the private manifest; AUD-01-XFF-01 characterizes one paired bank; codec UNKNOWN; music/dialogue location open) / bc-71956f82+root+/root/audio_asset_survey | 0 |
+| AUD-01-XFF-01 | Characterize one paired XFF sound bank | AUD-01 | ACTIVE (bounds-checked structural reader/fixture for `com_sys.hd` + `.bd`; only byte-supported fields) / root+/root/audio_asset_survey | 0 |
 | AUD-02 | Recover used voice/rack contracts | RE-02, AUD-01 | WAITING_FOR_DEPENDENCY | 0 |
 | AUD-03 | Decoder/mixer/effect fixtures | AUD-02 | WAITING_FOR_DEPENDENCY | 0 |
 | AUD-04 | Actual game audio integration | AUD-03, CPU-04 | WAITING_FOR_DEPENDENCY | 0 |
