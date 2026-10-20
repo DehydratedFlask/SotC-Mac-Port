@@ -1,6 +1,7 @@
 # AUD-01-STS-BYTE-PROBE-01 claim — 2026-10-20 01:07 CDT
 
-- **Agent:** `/root` (integrator); private worker to be assigned after claim publication.
+- **Agent:** `/root` (integrator); private worker `/root/aud01_sts_byte_probe`, `gpt-6-luna`
+  Extra High.
 - **Task:** `AUD-01-STS-BYTE-PROBE-01`, parent `AUD-01`; prerequisites DATA-01 and
   `AUD-01-STS-IDENTITY-01`.
 - **Status / attempt count:** ACTIVE, claim prepared; 0 failed analysis hypotheses.
@@ -62,5 +63,8 @@
   fetch succeeded with pre-commit divergence `0 0`. Commit `e51b60e` (`docs: claim paired audio
   format probe`) pushed (`5008163..e51b60e`). Post-push tree was clean and HEAD equaled `origin/main`
   at `e51b60edc638ed056bdfcfe00073a6b2a9ea5bbd`, divergence `0 0`.
-- **Next exact action:** dispatch one `gpt-6-luna` Extra High audio worker; root will independently
-  rerun its verifier before changing the task status.
+- **Next exact action:** receive the private report/verifier under
+  `local/re/evidence/aud01-sts-byte-probe-01/`; root will independently rerun it before changing
+  the task status.
+- **Dispatch checkpoint:** the worker was dispatched after publication commit `e51b60e` and
+  follow-up record `452b55a`. Its task is independent of the local ELF/REA analysis.

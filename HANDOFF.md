@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:09 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:10 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:09 CDT, /root — app-main analysis active; independent audio probe published
+## CURRENT CHECKPOINT — 2026-10-20 01:10 CDT, /root — two private analyses underway
 
 ### RE-02-APPMAIN-25A8D0-01 — ACTIVE, private analysis underway
 
@@ -44,12 +44,13 @@ that prefix has no indexed files; this is a graph-scope limitation for a local E
 analysis failure. Worker reports fresh read-only Ghidra 12.1.4 analysis underway through REA 6.7.0;
 at about 2 minutes there was no function Evidence yet. The copied log reports generic function-body
 overlap-repair failures and decompiler p-code warnings; applicability to target `0x25a8d0` remains
-unresolved, and the worker is preserving the log and continuing byte-level checks. No files changed;
-failed analysis hypotheses remain 0. Exact next action: root-review the report/verifier and confirm
-whether warnings affect the target before marking evidence. No source or reference changes, game
-execution, install, or download. G1 NOT PASSED.
+unresolved, and the worker is preserving the log and continuing byte-level checks. A later
+address-specific log query found no `0x25a8d0` match; this is not enough to prove a complete or
+healthy Ghidra body. No files changed; failed analysis hypotheses remain 0. Exact next action:
+review its exported Evidence/report and independently verify body/range and xrefs. No source or
+reference changes, game execution, install, or download. G1 NOT PASSED.
 
-### AUD-01-STS-BYTE-PROBE-01 — ACTIVE, claim published; private worker dispatch pending
+### AUD-01-STS-BYTE-PROBE-01 — ACTIVE, private asset-byte analysis underway
 
 Parent AUD-01, prerequisites DATA-01 and `AUD-01-STS-IDENTITY-01`. The probe is limited to the
 paired asset `cp3shadow/sound/test_adpcm/b_info_01.sts_cp3`, read in memory from both verified
@@ -77,9 +78,14 @@ meaning layer unbuilt, 1,219 nodes pending); `git diff --check` and `git diff --
 passed; staged path audit accepted 5 paths; full audit accepted 594; `git fetch origin main`
 succeeded and pre-commit divergence was `0 0`. Commit `e51b60e` (`docs: claim paired audio format
 probe`) pushed successfully (`5008163..e51b60e`). Post-push tree is clean, HEAD equals `origin/main`
-at `e51b60edc638ed056bdfcfe00073a6b2a9ea5bbd`, divergence `0 0`. Exact next action: dispatch one
-independent `gpt-6-luna` Extra High worker for this audio-only byte probe. Root retains shared-doc
-ownership and will independently rerun the worker's verifier.
+at `e51b60edc638ed056bdfcfe00073a6b2a9ea5bbd`, divergence `0 0`. Follow-up checkpoint commit
+`452b55a` (`docs: record audio probe claim publication`) was then pushed (`e51b60e..452b55a`);
+post-push tree is clean and HEAD equals `origin/main` at
+`452b55ab9fb9365b6c6b25c1dc01323ff2c5b94f`, divergence `0 0`. Worker `/root/aud01_sts_byte_probe`
+(`gpt-6-luna`, Extra High) is dispatched for an in-memory pair probe; it will use Graft on the
+`Psarc.read()` source before verifying the live reader. Exact next action: receive its private
+report/verifier and independently rerun checks. Root keeps shared-doc ownership. No game execution
+or audio playback. G1 NOT PASSED.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 01:01 CDT, /root — two bounded analyses published
 
