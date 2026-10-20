@@ -1,7 +1,22 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:00 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:01 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:00 CDT, worker bc-dc141fdf (CPU-01d) — 0xe05320 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xe05320** (index 52).
+Failed tries: 0. Status: FIXTURE_VERIFIED.
+Owned: `native/core/vec_e05320.{hpp,cpp}`, `native/tests/test_vec_e05320.cpp`,
+`tools/lift/check_fe05320.py`, `native/CMakeLists.txt` (+vec_e05320 only).
+Private dump (not published): `local/re/work/ce05320.bin`.
+Did NOT edit: `startup_ctors.*`, peer WIP, Drive `0xf4eba0`/`0xf4b540`.
+
+Checkpoint (2026-10-19 20:01 CDT, bc-dc141fdf):
+- OBS: unguarded vmovups copy; src=0x13132d0 dst=0x3353360 bits=~0,~0,~0,0; distinct cells.
+- Commands: ctest -R vec_e05320 Passed; `python3 -I tools/lift/check_fe05320.py` OK.
+- Push: pending this checkpoint.
+- Store: Project `internal/worker-claim-e05320.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:00 CDT, worker bc-24e5fd45 (CPU-01d) — 0xe094e0
 
@@ -16,15 +31,24 @@ Avoided: Drive `0xf4eba0`/`0xf4b540` and peers `0xe085e0`/`0xb747f0`/`0xb743c0`/
 `0xef85e0`/`0xe0b180`/`0xb76950`.
 Exact check: ctest + `python3 -I tools/lift/check_fe094e0.py`; allowlisted push.
 
-## ACTIVE CLAIM — 2026-10-19 19:59 CDT, worker bc-cd298177 (claim-b76950) — CPU-01d
+## ACTIVE CLAIM — 2026-10-19 20:00 CDT, worker bc-cb8d07c2 (CPU-01h) — COMPLETE
+
+Task: CPU-01h — leaf ctor `0x24ebf0` → `zero_struct12` (cell @0x2eebc48).
+Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
+Owned: native/core/zero_struct12.*, tests/test_zero_struct12.cpp, check_f24ebf0.py, CMakeLists (+target).
+Checkpoint: ctest zero_struct12 Passed; `python3 -I tools/lift/check_f24ebf0.py` OK.
+Store: Project `internal/worker-claim-3e.md`.
+
+## ACTIVE CLAIM — 2026-10-19 19:59 CDT, worker bc-cd298177 (claim-b76950) — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xb76950** (index 280).
-Failed tries: 0. Status: IN PROGRESS.
-Owned (new only): `native/core/vec_b76950.{hpp,cpp}`, `native/tests/test_vec_b76950.cpp`,
-`tools/lift/check_fb76950.py`, `native/CMakeLists.txt` (+target only).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_b76950.{hpp,cpp}`, `native/tests/test_vec_b76950.cpp`,
+`tools/lift/check_fb76950.py`, `native/CMakeLists.txt` (+vec_b76950 only).
 Private dump (not published): `local/re/work/cb76950.bin`.
-**Does NOT edit:** `startup_ctors.*`. Avoid Drive `0xf4eba0`/`0xf4b540` and peer in-flight RVAs.
-Exact check: rebuild + ctest + `python3 -I tools/lift/check_fb76950.py`.
+Did NOT edit `startup_ctors.*`. Avoided Drive `0xf4eba0`/`0xf4b540` and peer in-flight RVAs.
+Checkpoint: ctest `vec_b76950` Passed; `python3 -I tools/lift/check_fb76950.py` OK
+(src=0x12d9350 dst=0x3350dd0 bits=~0,~0,~0,0). Store: `internal/worker-claim-b76950.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 19:58 CDT, worker bc-71956f82 (CPU-01d) — 0xe0b180 — COMPLETE
 
