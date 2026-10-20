@@ -54,6 +54,8 @@ Classifier: [`scripts/classify_audio_headers.py`](../scripts/classify_audio_head
 (tests: `scripts/test_audio_headers.py`). Output:
 `local/manifests/assets/audio-headers.json` (86 members across cachedFiles / patch
 cachedfiles / pak2 / pak3 / pakN). **Codec = UNKNOWN for every member. No NGS2 inference.**
+**Publish boundary:** the JSON is game-derived and stays under gitignored `local/`; the
+classifier/test scripts under `scripts/` may be published (see `scripts/audit_publish_paths.py`).
 
 | Family (OBS label) | Exts | Count | Magic (first bytes) | Entropy (bits/byte, 4 KiB sample) | Notes |
 |---|---|---|---|---|---|

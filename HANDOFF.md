@@ -25,6 +25,18 @@ Exact check: rebuild + ctest + `python3 -I tools/lift/check_fb743c0.py`.
   and [AGENTS.md](AGENTS.md) / [ROADMAP.md](ROADMAP.md).
 - Users must supply their own legally obtained game files; none ship in the repo.
 
+## ACTIVE CLAIM — 2026-10-19 19:55 CDT, worker bc-71956f82 (publish-boundary assist)
+
+Task: Assist publish after AUD-01 — keep `local/manifests/assets/audio-headers.json`
+gitignored/audit-denied; publish classifier scripts under `scripts/`.
+Failed tries: 0. Status: IN PROGRESS → commit/push allowlisted delta.
+Owned: `.gitignore` (comment under `/local/` only), `scripts/test_audit_publish_paths.py` (new),
+`docs/ASSETS.md` (publish-boundary sentence), plus untracked AUD-01
+`scripts/classify_audio_headers.py` / `scripts/test_audio_headers.py` if not yet on remote.
+Does NOT claim CPU-01 lifts (CPU-01f in flight). Exact check:
+`git check-ignore -v local/manifests/assets/audio-headers.json` +
+`python3 -W error -I scripts/test_audit_publish_paths.py` + staged path audit.
+
 ## ACTIVE CLAIM — 2026-10-19 19:55 CDT, worker bc-cb8d07c2 (CPU-01f)
 
 Task: CPU-01f — leaf ctors `0xa3ade0` (store u32 0) + `0x5777a0` (vxorps/store xmm).
