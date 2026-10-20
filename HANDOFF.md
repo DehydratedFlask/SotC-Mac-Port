@@ -3,6 +3,22 @@
 Updated: 2026-10-19 21:53 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 21:53 CDT, worker bc-73721c8d (CPU-01d) — 0xd47270 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd47270** (survey index 108).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: native/core/vec_d47270.hpp/cpp, native/tests/test_vec_d47270.cpp,
+tools/lift/check_fd47270.py, native/CMakeLists.txt (+vec_d47270 only; origin/main base).
+Private dump (not published): local/re/work/cd47270.bin.
+Did NOT edit: startup_ctors, Drive, SRV, peer vec_d47420 / arena_* / exact_fit_*.
+Skipped: 95; busy 107 0xd47420. Prior: 0xd47880 = ee12add / 28c9083.
+Checkpoint (2026-10-19 21:53 CDT, bc-73721c8d):
+- OBS: unguarded vmovups copy; src=0x1302a20 dst=0x33520f0 bits=~0,~0,~0,0; index 108; distinct cells.
+- Commands: ctest -R vec_d47270 Passed; python3 -I tools/lift/check_fd47270.py OK.
+- Logs: /tmp/ctest_d47270.log, /tmp/check_d47270.log.
+- Store: Project internal/worker-claim-d47270.md.
+- Push: eec9fbd on origin/main.
+
 ## ACTIVE CLAIM — 2026-10-19 21:53 CDT, worker bc-81763e53 (CPU-01d) — 0xd47420 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd47420** (survey index 106).
