@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 02:54 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 02:58 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 02:54 CDT, /root — three NGS2 paths published; next three probes dispatched
+## CURRENT CHECKPOINT — 2026-10-20 02:58 CDT, /root — three offline NGS2 scans checkpointed; REA access serialized
 
 Six bounded AUD-02 import-to-call paths are root-verified:
 `AUD-02-NGS2-SYSCREATE-01` (`sceNgs2SystemCreateWithAllocator`),
@@ -28,8 +28,9 @@ claims:
 [SystemDestroy claim](docs/checkpoints/2026-10-20-root-aud02-system-destroy-claim.md),
 [SystemRender root replay](docs/checkpoints/2026-10-20-root-aud02-sysrender-complete.md),
 [VoiceGetState root replay](docs/checkpoints/2026-10-20-root-aud02-voice-getstate-complete.md), and
-[SystemDestroy root replay](docs/checkpoints/2026-10-20-root-aud02-system-destroy-complete.md), and
-[next three probe claims](docs/checkpoints/2026-10-20-root-aud02-next-three-claims.md).
+[SystemDestroy root replay](docs/checkpoints/2026-10-20-root-aud02-system-destroy-complete.md),
+[next three probe claims](docs/checkpoints/2026-10-20-root-aud02-next-three-claims.md), and
+[next three offline-prep checkpoint](docs/checkpoints/2026-10-20-root-aud02-next-three-offline-prep.md).
 
 Root check logs and command corrections are private under each task's `local/re/evidence/*-root-*`
 files. The source hashes match ELF `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`
@@ -47,15 +48,24 @@ The current claim checkpoint covers `AUD-02-NGS2-RACKCREATE-ALLOC-01` (symbol in
 `U546k6orxQo`, slot `0x1600fe8`), `AUD-02-NGS2-RACKQUERY-BUFFERSIZE-01` (index 239, NID
 `0eFLVCfWVds`, slot `0x1601000`), and `AUD-02-NGS2-RACK-VOICEHANDLE-01` (index 238, NID
 `MwmHz8pAdAo`, slot `0x1600ff8`). All three are ACTIVE with zero failed targeted tries and have
-separate private evidence folders. Two imports remain unclaimed: RackDestroy and VoiceGetStateFlags.
-No command contract, audio behavior, ABI, or runtime binding will be inferred from these static
-paths. The claim checkpoint is committed as `4d690d6` and pushed to `origin/main` from `6673495`.
-The three private dossiers are dispatched to `/root/aud02_rackcreate_allocator`,
-`/root/aud02_rackquery_buffersize`, and `/root/aud02_rack_voicehandle` with `gpt-6-luna` at Extra
-High reasoning. Exact audit logs and remote divergence are recorded in the linked claim checkpoint.
+separate private evidence folders. Offline scans found one candidate `FF 25` thunk each:
+RackCreateWithAllocator `0xf913f0`, RackQueryBufferSize `0xf91420`, and RackGetVoiceHandle
+`0xf91410`. Raw `E8` patterns (5, 15, and 104 respectively) remain candidates only; no call edge
+or function attribution is accepted without REA corroboration. VoiceHandle currently owns the
+serialized REA slot: `open_binary` succeeded and its slot-xrefs query for `0x1600ff8` is running.
+RackCreateWithAllocator and RackQueryBufferSize are preparing in parallel and waiting for the
+slot. Root verified the VoiceHandle and RackQuery prep hashes and replayed RackCreate's 32-file
+manifest. Two imports remain unclaimed: RackDestroy and VoiceGetStateFlags. No command contract,
+audio behavior, ABI, or runtime binding is inferred from these scans.
 
-Next exact action: wait for each bounded report, root-replay its checksums and byte verifier, and
-integrate only independently confirmed static paths. The two remaining imports are
+The task claims are committed as `4d690d6` and pushed; dispatch was recorded in `89233ef` on
+`origin/main`. The three dossiers are owned by `/root/aud02_rackcreate_allocator`,
+`/root/aud02_rackquery_buffersize`, and `/root/aud02_rack_voicehandle` with `gpt-6-luna` at Extra
+High reasoning. Exact evidence and limits are in the linked claim and offline-prep checkpoints.
+
+Next exact action: finish VoiceHandle's slot-xrefs operation and release REA; then grant the slot
+serially to RackCreateWithAllocator and RackQueryBufferSize. Root will replay final checksums and
+byte verifiers before integrating any accepted path. The two remaining imports are
 `sceNgs2RackDestroy` and `sceNgs2VoiceGetStateFlags`. No source implementation is authorized by
 these bounded static probes. G1 remains NOT PASSED.
 
