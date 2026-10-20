@@ -1,6 +1,11 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors batch 13 (0xc64060 .. 0xc5c1a0) lifted
+
+`CPU-01-LEAF-CTOR-BATCH-13` `FIXTURE_VERIFIED`; root replay 160/160 ctest pass, five checkers exit 0. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-13-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending workers: `SAV-01-SAVEDATA-DIRNAMESEARCH-01` (`local/re/evidence/sav01-savedata-dirnamesearch-01/`) and `AUD-02-AUDIOOUT-OUTPUT-02` (`local/re/evidence/aud02-audioout-output-02/`), up to 3 REA queries total.
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — SaveData Initialize3 verified; usage limit reached
 
 `SAV-01-SAVEDATA-INITIALIZE3-01` `STATIC_PATH_BYTE_VERIFIED` (callsite `0xa4d295` in `FUN_00a4d250`; root replayed verifier and checksums): `docs/checkpoints/2026-10-20-root-savedata-initialize3-complete.md`. Native suite last verified 155/155 (batch 12, pushed `07eac0d`). G0 PARTIAL, G1-G6 NOT RUN.
