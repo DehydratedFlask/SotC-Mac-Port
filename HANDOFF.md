@@ -1,7 +1,23 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:59 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 22:00 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 21:59 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry batch 97–113 — COMPLETE
+
+Task: CPU-01e — register peer FIXTURE_VERIFIED vec-copy ctors into `startup_ctors` by RVA
+(survey index from `local/re/work/ctor-survey.json`; skip contested leaf header indices).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted Drive push **`8c0c7cf`**.
+Wired (skip 95 `0xd71f60`, gap 105 `0xd5a280`):
+97 `0xd6dbf0`, 98 `0xd6d890`, 99 `0xd6d280`=`e568b51`, 100 `0xd6a520`,
+101 `0xd62b00`=`cac53b7`, 102 `0xd62690`, 103 `0xd623c0`, 104 `0xd5fbe0`,
+106 `0xd47880`, 107 `0xd47420`, 108 `0xd47270`, 109 `0xd42b60`,
+110 `0xd40ea0`, 111 `0xd405a0`=`21491b6`, 112 `0xd40010`=`627d251`/`61393e8`,
+113 `0xd3b790`=`c9d9731`.
+Owned: `startup_ctors.*`, `test_startup_ctors.cpp`, `HANDOFF.md`. CMake tip as-is.
+Registry size **70**. Evidence: ctest `startup_ctors` Passed; check_fd6d280/fd62b00/fd40010/fd3b790/fd405a0/fd6d890 OK.
+Store: Project `internal/worker-claim-drive.md` + `internal/drive-wip/`.
+Push: **`8c0c7cf`** on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 21:59 CDT, worker bc-81763e53 (CPU-01d) — 0xd3a6d0 — COMPLETE
 
