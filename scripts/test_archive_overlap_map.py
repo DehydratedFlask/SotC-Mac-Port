@@ -37,6 +37,10 @@ class ParseManifestTests(unittest.TestCase):
         with self.assertRaisesRegex(ManifestError, "malformed JSONL record"):
             parse_manifest_bytes("synthetic", b'{"path":"broken.bin","size":1\n')
 
+    def test_rejects_non_utf8_manifest(self) -> None:
+        with self.assertRaisesRegex(ManifestError, "manifest is not UTF-8"):
+            parse_manifest_bytes("synthetic", b"\xff")
+
     def test_rejects_invalid_record_shape_and_size(self) -> None:
         for raw in (
             b'[]\n',
