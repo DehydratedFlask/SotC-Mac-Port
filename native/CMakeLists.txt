@@ -21,6 +21,7 @@ add_library(sotc_core STATIC
   core/region_split.cpp
   core/region_list.cpp
   core/arena_high_water.cpp
+  core/exact_fit_finalize.cpp
   core/vec_neg036.cpp
   core/xyz_mask_copy.cpp
   core/vec_dd41e0.cpp
@@ -77,8 +78,7 @@ add_library(sotc_core STATIC
   core/vec_d62690.cpp
   core/vec_d5fbe0.cpp
   core/vec_d47880.cpp
-  core/vec_d47420.cpp
-  core/vec_d47270.cpp)
+  core/vec_d47420.cpp)
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()
 add_executable(test_math_constants tests/test_math_constants.cpp)
@@ -239,6 +239,10 @@ add_test(NAME region_list COMMAND test_region_list)
 add_executable(test_arena_high_water tests/test_arena_high_water.cpp)
 target_link_libraries(test_arena_high_water sotc_core)
 add_test(NAME arena_high_water COMMAND test_arena_high_water)
+
+add_executable(test_exact_fit_finalize tests/test_exact_fit_finalize.cpp)
+target_link_libraries(test_exact_fit_finalize sotc_core)
+add_test(NAME exact_fit_finalize COMMAND test_exact_fit_finalize)
 add_executable(test_vec_d80e60 tests/test_vec_d80e60.cpp)
 target_link_libraries(test_vec_d80e60 sotc_core)
 add_test(NAME vec_d80e60 COMMAND test_vec_d80e60)
@@ -314,7 +318,3 @@ add_test(NAME vec_d47880 COMMAND test_vec_d47880)
 add_executable(test_vec_d47420 tests/test_vec_d47420.cpp)
 target_link_libraries(test_vec_d47420 sotc_core)
 add_test(NAME vec_d47420 COMMAND test_vec_d47420)
-
-add_executable(test_vec_d47270 tests/test_vec_d47270.cpp)
-target_link_libraries(test_vec_d47270 sotc_core)
-add_test(NAME vec_d47270 COMMAND test_vec_d47270)

@@ -17,6 +17,7 @@ private `local/re/functions.jsonl` records (ELF sha256 d0723afb...c25861d3).
 | `core/region_split.{hpp,cpp}` | SRV-01 mem: OBS split surgery `0x1a8b6..0x1a8fa` after node pop; `0x19660` replenish OPEN |
 | `core/region_list.{hpp,cpp}` | SRV-01 mem: OBS list surgery `0x1a902`/`0x1a974` + arena free-count `@+0x48` |
 | `core/arena_high_water.{hpp,cpp}` | SRV-01 mem: OBS used-byte high-water `0x1a9bb` (`+0x80/+0x90` + peaks) |
+| `core/exact_fit_finalize.{hpp,cpp}` | SRV-01 mem: OBS exact-fit consume finalize `0x1aada` |
 | `core/vec_neg036.{hpp,cpp}` | Native form of original RVA `0xf4b510` (ctor index 7): guarded splat of `0xbeb851ea` (~−0.36f)×4 |
 | `core/xyz_mask_copy.{hpp,cpp}` | Native form of original RVA `0xf30460` (ctor index 9): unguarded `{~0,~0,~0,0}` copy to its own BSS cell |
 | `core/clear_flag32.{hpp,cpp}` | Native form of original RVA `0x196c90` (ctor index 520): seq_cst clear of a u32 cell via `xchg` |

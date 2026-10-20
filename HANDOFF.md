@@ -1,7 +1,19 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:53 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:52 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 21:52 CDT, worker bc-9aa0fe88 (SRV-01 mem exact-fit) — COMPLETE
+
+Task: SRV-01 mem — exact-fit consume finalize OBS **0x1aada..0x1aaf3** (size/flags/sentinel; skips `0x19660`).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/exact_fit_finalize.{hpp,cpp}`, `native/tests/test_exact_fit_finalize.cpp`,
+`tools/lift/check_f1aada_exact_fit.py`, `native/CMakeLists.txt` (+exact_fit_finalize only),
+`docs/POINTERS.md`, `native/README.md`, `docs/TASKS.md`, `HANDOFF.md`.
+**Kept:** host_map / carve / split / list / free-count / high-water.
+**Did NOT:** `0x19660`, page-map `0x1ab08`, root `arena_accounting`, peer vec_*, Drive.
+Checkpoint: ctest 6/6; `check_f1aada_exact_fit.py` OK. Store: `internal/worker-claim-srv01-exact-fit.md`.
+Push: (this commit).
 
 ## ACTIVE CLAIM — 2026-10-19 21:53 CDT, worker bc-73721c8d (CPU-01d) — 0xd47270 — COMPLETE
 
