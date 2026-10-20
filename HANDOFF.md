@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — Audio3d Initialize and ObjectSetAttributes callsites verified
+
+`sceAudio3dInitialize` sole callsite `0x948db4` (in `FUN_009485a0`, shared with PortOpen and six NGS2 VoiceHandle callsites) and `sceAudio3dObjectSetAttributes` callsite `0x94da39` (in `FUN_0094d900`; 2 of 3 candidates still unattributed) are byte-verified; 1 new REA success; root replayed both verifiers and checksums. Details: `docs/checkpoints/2026-10-20-root-audio3d-initialize-and-objectsetattributes-complete.md`. Static only. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 170/170 (batch 15, pushed `d88f529`).
+
+Next exact action: remaining Audio3d imports (`PortAdvance`, `ObjectReserve`, `ObjectUnreserve`, `PortGetQueueLevel`, `PortClose`, `PortSetAttribute`, `Terminate`), SaveData dialog imports, or constructor batch 16 (next 147 `0xc451d0`).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors batch 15 (0xc54830 .. 0xc47e00) lifted
 
 `CPU-01-LEAF-CTOR-BATCH-15` `FIXTURE_VERIFIED`; root replay 170/170 ctest pass, five checkers exit 0. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-15-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending workers: `AUD-02-AUDIO3D-INITIALIZE-01` (`local/re/evidence/aud02-audio3d-initialize-01/`) and `AUD-02-AUDIO3D-OBJECTSETATTRIBUTES-01` (`local/re/evidence/aud02-audio3d-objectsetattributes-01/`), one REA query each.
