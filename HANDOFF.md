@@ -1,7 +1,19 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:57 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:55 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 21:55 CDT, worker bc-9aa0fe88 (SRV-01 mem page-debit) — COMPLETE
+
+Task: SRV-01 mem — free-path **`[arena+0x70]` page debit** (`0x1ae67`) + idle-pool insert helpers (`0x1aecd`; reuses `list_insert_at_head`).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/arena_page_debit.{hpp,cpp}`, `native/tests/test_arena_page_debit.cpp`,
+`tools/lift/check_f1ae67_page_debit.py`, `native/CMakeLists.txt` (+arena_page_debit only),
+docs POINTERS/README/TASKS, `HANDOFF.md`.
+**Kept:** host_map/carve/split/list/free-count/high-water/exact-fit.
+**Did NOT:** `0x19660`, page-map tables `0x1ab08`, root `arena_accounting`, Drive/`startup_ctors`, peer vec_*.
+Store: Project `internal/worker-claim-srv01-page-debit.md`.
+Push: (this commit).
 
 ## ACTIVE CLAIM — 2026-10-19 21:57 CDT, worker bc-73721c8d (CPU-01d) — 0xd40010 — COMPLETE
 
