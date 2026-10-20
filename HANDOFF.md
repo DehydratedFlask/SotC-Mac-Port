@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:11 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:14 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:11 CDT, /root — archive digest transcription corrected
+## CURRENT CHECKPOINT — 2026-10-20 01:14 CDT, /root — Ghidra body returned; raw verification pending
 
 ### RE-02-APPMAIN-25A8D0-01 — ACTIVE, private analysis underway
 
@@ -49,6 +49,15 @@ address-specific log query found no `0x25a8d0` match; this is not enough to prov
 healthy Ghidra body. No files changed; failed analysis hypotheses remain 0. Exact next action:
 review its exported Evidence/report and independently verify body/range and xrefs. No source or
 reference changes, game execution, install, or download. G1 NOT PASSED.
+
+At 01:14, worker `/root/appmain_25a8d0` reports that REA/Ghidra returned successfully (exit `0`,
+stderr empty), Evidence ID `ev_167b8234fc082d63d7a17a8ea4ee218ff0b8559c2397945ae599ba0c657b72ba`.
+The returned function record provisionally gives a contiguous body `0x25a8d0..0x25accc`
+inclusive (1,021 bytes), 218 assembly entries, 24 basic blocks, 24 call sites, 11 unique resolved
+callees, two targetless indirect calls (`0x25aa06`, `0x25ac9f`), and three incoming data references,
+including vtable slot `0x15c8cf0`. Callee relationship coverage is PARTIAL. These remain Ghidra
+observations until raw PT_LOAD/body/reference verification passes. The independent command
+`xcrun llvm-objdump -d --x86-asm-syntax=intel --start-address=0x25a8d0 --stop-address=0x25b200 "/Volumes/Extra/SoC Mac Native/local/re/eboot.elf"` exited `0`; its window is wider than the claimed body and does not itself establish the function end. Exact REA command, JSON, exit status, stderr and LLVM disassembly are preserved under `local/re/evidence/re02-appmain-25a8d0/`. Root's next action: independently rerun the worker's PT_LOAD/body/call/data/vtable verifier after it is written. No class contract or runtime reachability is inferred.
 
 ### AUD-01-STS-BYTE-PROBE-01 — ACTIVE, private asset-byte analysis underway
 
