@@ -34,9 +34,9 @@ exe = ROOT / 'local/build/native/test_vec_d32720'
 native = json.loads(subprocess.run([str(exe), '--dump'], check=True, capture_output=True, text=True).stdout)
 assert native['bits'] == bits
 assert native['source'] == src and native['value'] == dst
-assert native['rva'] == A and native['index'] == 115
+assert native['rva'] == A and native['index'] == 119
 dump = ROOT / 'local/re/work/cd32720.bin'
 if dump.is_file():
     assert dump.read_bytes() == bytes(body)
 print(f'OK: 0xd32720 unguarded vec copy; src={src:#x} dst={dst:#x} bits=~0,~0,~0,0; '
-      f'index 115; native dump matches; distinct sibling cells')
+      f'index 119; native dump matches; distinct sibling cells')

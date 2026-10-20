@@ -1,10 +1,10 @@
 # CPU-01-CTOR-METADATA-01 — constructor index provenance correction claim
 
-- Date/time: 2026-10-19 23:29 CDT (America/Chicago).
+- Date/time: claim 2026-10-19 23:29 CDT; completion 2026-10-19 23:33 CDT (America/Chicago).
 - Integrator: `/root`; assigned owner: `/root/cpu_ctor_metadata`.
 - Task ID: CPU-01-CTOR-METADATA-01; parent CPU-01-CTOR-PREFIX-01.
-- Files changed in claim: `HANDOFF.md`, `docs/TASKS.md`, and this checkpoint. No implementation
-  files have been edited yet.
+- Files changed for claim: `HANDOFF.md`, `docs/TASKS.md`, and this checkpoint. Completion changes
+  are listed below.
 - Failed tries: 0.
 
 ## Prerequisite evidence and bounded scope
@@ -30,4 +30,30 @@ Build `test_vec_d32720` and `test_vec_d2ffe0`, run focused CTests
 
 This is a provenance correction only. It does not change either recovered function, establish
 startup execution, or pass G1. Root verifies the results and integrates shared docs before commit.
-Current status: ACTIVE; next action: make the exact metadata edits and run the listed checks.
+## Completion checkpoint
+
+- Agent ID: `/root/cpu_ctor_metadata`; integrator verification: `/root`.
+- Files changed: the six owned files listed above, plus `HANDOFF.md`, `docs/TASKS.md`,
+  `docs/EVIDENCE.md`, and this checkpoint.
+- Worker commands and logs:
+  - `cmake --build local/build/native --target test_vec_d32720 test_vec_d2ffe0` — passed;
+    `local/validation/20261019T2321-cpu-01-ctor-prefix-01/ctor-metadata-build.log`.
+  - `ctest --test-dir local/build/native -R '^(vec_d32720|vec_d2ffe0)$' --output-on-failure` —
+    2/2 passed; `.../ctor-metadata-ctest.log`.
+  - `python3 -I tools/lift/check_fd32720.py` — passed, index 119;
+    `.../ctor-metadata-check-fd32720.log`.
+  - `python3 -I tools/lift/check_fd2ffe0.py` — passed, index 120;
+    `.../ctor-metadata-check-fd2ffe0.log`.
+  - `python3 -I tools/lift/check_ctor_slots.py` — passed, 103 pairs;
+    `.../ctor-metadata-check-ctor-slots.log`.
+  - `git diff --check` — passed.
+- Root independently reran the build, focused CTest, all three checkers, and whitespace check after
+  the worker; each passed. Root's rerun output was not redirected to a log.
+- Observation: six original-index metadata values changed from 115/116 to table-derived 119/120;
+  both leaf tests and hash-bound checkers pass. Inference: the standalone fixture provenance now
+  agrees with the original constructor table. No startup or runtime behavior is established.
+- Risks: slot 10 at RVA `0xf09e60` remains unresolved; the prefix test validates bookkeeping only;
+  G1 remains NOT PASSED. Failed tries: 0.
+- Exact next action: run `python3 scripts/project_index.py --check`, `graft check`, publication path
+  audits and remote divergence checks; then commit and push the six source files and four docs paths.
+- Task status: FIXTURE_VERIFIED locally; publication pending.

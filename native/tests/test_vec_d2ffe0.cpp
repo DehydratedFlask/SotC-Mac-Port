@@ -18,7 +18,7 @@ int main(int argc, char**) {
     if (argc > 1) {
         std::printf("{\"bits\":[%u,%u,%u,%u],\"source\":%llu,\"value\":%llu,\"rva\":%llu,\"index\":%u}\n",
                     kVecD2ffe0Bits[0], kVecD2ffe0Bits[1], kVecD2ffe0Bits[2], kVecD2ffe0Bits[3],
-                    0x13009a0ull, 0x3351ec0ull, 0xd2ffe0ull, 116u);
+                    0x13009a0ull, 0x3351ec0ull, 0xd2ffe0ull, 120u);
     } else {
         std::puts("vec_d2ffe0: all checks passed");
     }
