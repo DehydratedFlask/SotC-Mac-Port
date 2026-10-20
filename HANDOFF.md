@@ -6,17 +6,16 @@ No native game executable exists. G1 NOT PASSED.
 ## ACTIVE CLAIM — 2026-10-19 20:24 CDT, worker bc-81763e53 (CPU-01d) — 0xd90310 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd90310** (survey index 79).
-Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
-Owned: `native/core/vec_d90310.{hpp,cpp}`, `native/tests/test_vec_d90310.cpp`,
-`tools/lift/check_fd90310.py`, `native/CMakeLists.txt` (+vec_d90310 only; origin/main base).
+Failed tries: 0. Status: FIXTURE_VERIFIED; CMake link push this checkpoint.
+Owned: `native/CMakeLists.txt` (+vec_d90310 only). Sources already on origin via peer bundle `277ef68` (with `0xd94cb0`); this commit adds CMake.
 Private dump (not published): `local/re/work/cd90310.bin`.
-Did NOT edit: `startup_ctors.*`, Drive, SRV, peer `0xdac410`/`0xd94cb0`/`0xdb7e60`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV, peer `0xdac410`/`0xd94cb0` sources.
 Checkpoint (2026-10-19 20:24 CDT, bc-81763e53):
 - OBS: unguarded vmovups copy; src=0x130b1a0 dst=0x3352c10 bits=~0,~0,~0,0; index 79; distinct cells.
 - Commands: ctest -R '^vec_d90310$' Passed; `python3 -I tools/lift/check_fd90310.py` OK.
 - Logs: `/tmp/ctest_d90310.log`, `/tmp/check_d90310.log`.
+- Sources on origin: `277ef68` (bundled). CMake: (pending this commit).
 - Store: Project `internal/worker-claim-d90310.md`.
-- Push:  on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 20:33 CDT, worker bc-9aa0fe88 (SRV-01 mem split) — COMPLETE
 
