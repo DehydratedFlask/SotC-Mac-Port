@@ -1,23 +1,31 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 22:39 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 22:41 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 22:39 CDT, /root — CPU-01d `0xce7300` metadata correction — ACTIVE
+## CURRENT CHECKPOINT — 2026-10-19 22:41 CDT, /root — CPU-01d `0xce7300` metadata correction — FIXTURE_VERIFIED
 
-Root claims only `native/core/vec_ce7300.hpp`, `native/tests/test_vec_ce7300.cpp`, and
-`tools/lift/check_fce7300.py` to reconcile provenance and manifest positions. The active source
-claim and exact read-only evidence are in [the ce7300 claim checkpoint](docs/checkpoints/2026-10-19-root-ce7300-label-claim.md).
+Root completed the bounded provenance/manifest correction in `native/core/vec_ce7300.hpp`,
+`native/tests/test_vec_ce7300.cpp`, and `tools/lift/check_fce7300.py`. Claim evidence is preserved
+in [the ce7300 claim checkpoint](docs/checkpoints/2026-10-19-root-ce7300-label-claim.md); build,
+test, checker and Graft results are in [the completion checkpoint](docs/checkpoints/2026-10-19-root-ce7300-label-complete.md).
 
 - Live Graft wiring shows `init_vec_ce7300` registered in `startup_ctors.cpp` at survey position
   149. The private constructor survey also identifies RVA `0xce7300` at list position 149, while
   `ctor-vec-copies.json` identifies it at vector-copy manifest position 91.
-- The original lift attribution is worker `bc-effcf5dc`. The carried unstaged diff incorrectly
-  changed the header attribution to `bc-02397584` and the checker output calls vector-copy position
-  91 a constructor-survey position. Root will fix only provenance/labels and improve the checker to
-  verify both positions; function behavior remains out of scope.
-- Failed tries: 0. Next exact action: update the three claimed files, run `ctest -R '^vec_ce7300$'`
-  and `python3 -I tools/lift/check_fce7300.py`, then publish the result.
+- The header attribution now matches original lift worker `bc-effcf5dc`; the checker verifies both
+  list positions and no longer calls position 91 a constructor-survey index. Function behavior and
+  startup registration were unchanged. Independent review found no blockers. Failed tries: 0.
+- Exact validation: `cmake --build local/build/native --target test_vec_ce7300`,
+  `ctest --test-dir local/build/native -R '^vec_ce7300$' --output-on-failure`, and
+  `python3 -I tools/lift/check_fce7300.py` all passed. Graft was rebuilt after source edits and its
+  freshness check passed; the deep/meaning layer remains unbuilt. G1 remains NOT PASSED.
+- Next exact action: select one bounded, unblocked native recovery task from CPU-01/SRV-01, verify
+  its address/hash and dependencies, then claim it before editing.
+
+## PRIOR CHECKPOINT — 2026-10-19 22:39 CDT, /root — CPU-01d `0xce7300` metadata correction — ACTIVE CLAIM
+
+The initial claim and read-only evidence are recorded in [the ce7300 claim checkpoint](docs/checkpoints/2026-10-19-root-ce7300-label-claim.md).
 
 ## PRIOR CHECKPOINT — 2026-10-19 22:37 CDT, /root — SRV-01 + CPU-01d fixture batch — FIXTURE_VERIFIED
 

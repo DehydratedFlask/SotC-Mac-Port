@@ -1,5 +1,6 @@
-// Native recovery of original ctor RVA 0xce7300 (ctor-survey.json index 91; ELF sha256 d0723afb...5861d3),
-// task CPU-01d (bc-effcf5dc). Unguarded 16-byte copy of {~0,~0,~0,0} from rodata @0x12f8bb0 into
+// Native recovery of original ctor RVA 0xce7300 (ctor survey position 149; vector-copy manifest
+// position 91; ELF SHA256 d0723afb...5861d3), task CPU-01d (bc-effcf5dc). Unguarded 16-byte copy
+// of {~0,~0,~0,0} from rodata @0x12f8bb0 into
 // BSS @0x3351cf0. Same bit pattern as sibling mask copies, but distinct cells — do not merge.
 #pragma once
 #include <array>
