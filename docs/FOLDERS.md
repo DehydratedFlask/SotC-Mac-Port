@@ -17,10 +17,10 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `graft` | 1 | Regenerable source graph; internal cache directories summarized |
 | `launcher` | 2 | Native Swift macOS launcher |
 | `launcher/Sources` | 0 | Native Swift macOS launcher |
-| `launcher/Sources/LauncherCore` | 5 | Native Swift macOS launcher |
+| `launcher/Sources/LauncherCore` | 6 | Native Swift macOS launcher |
 | `launcher/Sources/SoCLauncher` | 4 | Native Swift macOS launcher |
 | `launcher/Tests` | 0 | Native Swift macOS launcher |
-| `launcher/Tests/LauncherCoreTests` | 1 | Native Swift macOS launcher |
+| `launcher/Tests/LauncherCoreTests` | 2 | Native Swift macOS launcher |
 | `local` | 0 | Private extracted assets, binary analysis, manifests, builds and evidence |
 | `logs` | 30 | Private command/build/install/extraction logs |
 | `native` | 2 | Native game implementation; verify module README and task ownership |
