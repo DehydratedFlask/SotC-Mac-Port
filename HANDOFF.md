@@ -1,9 +1,42 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:09 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:12 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:09 CDT, `/root` — PSARC truncated-block fixture claimed
+## CURRENT CHECKPOINT — 2026-10-20 05:12 CDT, `/root` — PSARC truncated-block fixture verified
+
+`DATA-02-PSARC-TRUNCATED-COMPRESSED-BLOCK-01` is `FIXTURE_VERIFIED`. Worker
+`/root/app01_readiness` added one test in `scripts/test_psarc.py` only: a valid synthetic archive
+with an intact header/TOC and a final compressed payload shortened by one byte must raise exactly
+`PsarcError("truncated block")` on read. The parser was not changed. Worker and root acceptance
+command `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_psarc.py` each exited 0 with 13 tests.
+Worker log `local/checkpoints/data02-psarc-truncated-compressed-block-test.log` has SHA-256
+`2f7b850c977121d8774a5cdcc47ed550746f0edb17a5b087b7ace1ccd82a6307`; root replay
+`local/checkpoints/root-2026-10-20-psarc-truncated-compressed-block-review.log` has SHA-256
+`26e4fc70ea6b6384bf46375bf00ad2ce38024aabcad5482770bd95e72ba6bbc6`.
+
+Test SHA-256 is `0ef9ee140c70f0be835170e60b1d3e728c39ecd3e78ec2cb75701128e964b179`; parser SHA-256
+remains `3bef8a66705c34ab43c321b688ec675cc3cd7aa0e07ec3afdb0f956e3e80cdc9`. Graft finds the new
+test at `scripts/test_psarc.py:L93-L95`. This proves only synthetic exact-length rejection, not
+live-archive behavior, asset semantics, runtime behavior, or any game gate. No failed tries, install,
+or dependency change. G1 NOT PASSED; G2 NOT RUN. See [completion checkpoint](docs/checkpoints/2026-10-20-root-data02-psarc-truncation-complete.md).
+
+The claim checkpoint was published before implementation in commit `4f60856`. Root acceptance and
+review are complete. `python3 scripts/project_index.py` exited 0 at 4,166 folders;
+`graft check` passed at 1,256 nodes / 530 source files (optional deep meaning layer unbuilt), and
+`git diff --check` passed. Logs are `local/checkpoints/root-2026-10-20-psarc-truncation-complete-project-index.log`
+and `local/checkpoints/root-2026-10-20-psarc-truncation-complete-graft-check.log`. E81 and the
+completion checkpoint are recorded; generated `docs/FOLDERS.md` now lists 76 checkpoint files.
+The worker verified this checkpoint in the shared tree before exiting. Publication checks pass:
+`python3 -I scripts/audit_publish_paths.py` accepted the 6 staged paths (log
+`local/checkpoints/root-2026-10-20-psarc-truncation-complete-publish-audit-staged.log`, SHA-256
+`fff4a49e546d1ff8277a1fcdaba8760f367ff09ebe73ae03f6b856e4b19ae41c`); the `--all` audit accepted
+634 tracked paths (log `local/checkpoints/root-2026-10-20-psarc-truncation-complete-publish-audit-all.log`,
+SHA-256 `d7167ea915aa99fedda659d059347e3994f149f025a0f75cc9204a1ed56d19de`). Branch divergence
+was 0/0 before commit. Next exact action: commit and push the completion checkpoint, then claim a
+separate unblocked task.
+
+## PRIOR CHECKPOINT — 2026-10-20 05:09 CDT, `/root` — PSARC truncated-block fixture claimed
 
 `DATA-02-PSARC-TRUNCATED-COMPRESSED-BLOCK-01` is claimed by root with `/root/app01_readiness`
 as the test-only implementation worker. The worker owns only `scripts/test_psarc.py`; root owns

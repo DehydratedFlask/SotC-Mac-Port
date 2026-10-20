@@ -90,6 +90,10 @@ class Tests(unittest.TestCase):
         with self.assertRaises(psarc.PsarcError):
             self.open(build([('a', b'1' * 64)])[:20])
 
+    def test_truncated_compressed_block_rejected(self):
+        with self.assertRaisesRegex(psarc.PsarcError, '^truncated block$'):
+            self.open(build([('a', b'A' * 64)])[:-1]).read(1)
+
     def test_sha256_file_reads_multiple_bounded_chunks(self):
         data = bytes(range(251))
         with tempfile.TemporaryDirectory() as tmp:
