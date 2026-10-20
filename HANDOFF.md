@@ -13,17 +13,21 @@ Owned: `native/core/startup_ctors.*`, `native/tests/test_startup_ctors.cpp`,
 `native/CMakeLists.txt` (+vec_e0b180/+vec_e05320 link lines only; sources already on origin).
 Store: Project `internal/worker-claim-drive.md`.
 
-## ACTIVE CLAIM — 2026-10-19 20:09 CDT, worker bc-9aa0fe88 (SRV-01 mem) — IN PROGRESS
+## ACTIVE CLAIM — 2026-10-19 20:09 CDT, worker bc-9aa0fe88 (SRV-01 mem) — COMPLETE
 
 Task: SRV-01 mem — Darwin host mapping behind verified allocator region API `0x19ae0`.
-Failed tries: 0. Status: IN PROGRESS.
+Failed tries: 0. Status: FIXTURE_VERIFIED.
 Owned (new only): `native/core/host_map.{hpp,cpp}`, `native/tests/test_host_map.cpp`,
 `tools/lift/check_host_map_calls.py`, `native/CMakeLists.txt` (+host_map only; from origin/main),
 `docs/POINTERS.md` (mapping-path row), `docs/TASKS.md` (SRV-01 register note).
-**Does NOT edit:** `allocator_region.*`, `startup_ctors.*`, Drive `0xf4eba0`/`0xf4b540`,
-peer vec WIP (`0xde6d20`/`0xde7fb0`/…).
-Exact check: ctest -R host_map; `python3 -I tools/lift/check_host_map_calls.py`;
-`python3 -I tools/lift/check_f19ae0.py` still OK. Store: Project `internal/worker-claim-srv01.md`.
+**Did NOT edit:** `allocator_region.*`, `startup_ctors.*`, Drive `0xf4eba0`/`0xf4b540`, peer vec WIP.
+
+Checkpoint (2026-10-19 20:10 CDT, bc-9aa0fe88):
+- OBS: ReserveVirtual@0x19891/0x19fb2 → PLT 0xf8f5b0; MapFlexible@0x198b1 → 0xf8f5a0; align≥1MiB;
+  native `map_region` preferred_base==0 only (Shadow site).
+- Commands: ctest -R '^host_map$' Passed; `check_host_map_calls.py` OK; `check_f19ae0.py` OK;
+  Mach-O arm64.
+- Store: Project `internal/worker-claim-srv01.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:08 CDT, worker bc-02397584 (CPU-01d) — 0xde6d20 — COMPLETE
 
