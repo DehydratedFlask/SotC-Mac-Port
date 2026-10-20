@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:46 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:50 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:46 CDT, /root — slot-10 dossier verified; initializer dataflow follow-up claimed
+## CURRENT CHECKPOINT — 2026-10-19 23:50 CDT, /root — slot-10 initializer follow-up active; paired STS sample identity survey claimed
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -15,10 +15,25 @@ and reports the unresolved original slot 10 at RVA `0xf09e60`. A private hash-bo
 reran the build, focused CTest (1/1), checker, and whitespace check successfully; worker logs are
 under `local/validation/20261019T2321-cpu-01-ctor-prefix-01/`. This proves runner bookkeeping only.
 The prefix runner bookkeeping, two leaf-fixture index annotations, bridge member identities, and
-the static slot-10 dossier are now verified and published. A bounded follow-up is claimed to
-characterize the local initializer called by slot 10 before its unresolved computed call. Runtime
-constructor behavior, helper contracts, game startup, and G1 remain unproven. Commits:
+the static slot-10 dossier are now verified and published. A bounded follow-up is active to
+characterize the local initializer called by slot 10 before its unresolved computed call. A
+separate read-only AUD-01 survey is claimed for the two cachedFiles layers' test_adpcm STS members.
+Runtime constructor behavior, helper contracts, audio format/use, game startup, and G1 remain
+unproven. Commits:
 `b26768a` (prefix fixture), `fc1b278` (leaf metadata), and `e40a2a4` (bridge comparison evidence).
+
+### AUD-01-STS-IDENTITY-01 — paired cachedFiles test_adpcm identity survey — CLAIMED
+
+`/root/aud01_sts_cp3_identity` owns only a reproducible private report/script in the existing
+`local/validation/` directory. It will read the exact 290 base and 290 patch members named
+`cp3shadow/sound/test_adpcm/*.sts_cp3` through `Psarc.read()`, verify archive/member locators
+against the private manifests, hash decoded bytes, and compare exact-path layer identities and
+size distributions. Paths, hashes, prefixes, and size patterns remain observations only; no ADPCM
+codec/schema, gameplay usage, or runtime audio claim is in scope. Root owns shared documentation.
+Acceptance command: `PYTHONDONTWRITEBYTECODE=1 python3 -I local/validation/aud01-sts-identity-01.py`.
+Claim record:
+[AUD-01-STS-IDENTITY-01](docs/checkpoints/2026-10-19-root-aud01-sts-identity-claim.md).
+The current audio findings and limits remain in [ASSETS](docs/ASSETS.md).
 
 ### DATA-02 — pakN archive identity
 
