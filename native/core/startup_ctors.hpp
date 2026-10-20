@@ -17,6 +17,10 @@
 #include "init_f4b540.hpp"
 #include "vec_ef85e0.hpp"
 #include "init_ea52f0.hpp"
+#include "vec_e0b180.hpp"
+#include "vec_e085e0.hpp"
+#include "vec_e05320.hpp"
+#include "vec_e026b0.hpp"
 
 namespace sotc {
 
@@ -37,6 +41,10 @@ struct StartupState {
     InitF4b540 f4b540{};
     VecEf85e0 vec_ef85e0{};   // idx 20 (peer lift; registered here)
     InitEa52f0 ea52f0{};      // idx 22
+    VecE0b180 vec_e0b180{};   // idx 49
+    VecE085e0 vec_e085e0{};   // idx 51
+    VecE05320 vec_e05320{};   // idx 52
+    VecE026b0 vec_e026b0{};   // idx 53
     std::array<std::byte, kScratchBytes> scratch{};
     std::atomic<std::uint64_t> scratch_slot{0};
     std::atomic<std::uint32_t> flag32{0};
@@ -56,8 +64,7 @@ struct CtorRunResult {
 
 CtorRunResult run_constructors(std::span<const CtorSlot> in_order, StartupState& state) noexcept;
 
-// The recovered subset in original relative order. NOT a startup: 537 unrecovered constructors run between
-// its two entries in the original, so a faithful run needs every slot between them filled first.
+// Recovered subset in original index order. Gaps (incl. 10–19 malloc, 21, 50) remain visible blockers.
 std::span<const CtorSlot> recovered_constructors() noexcept;
 
 }  // namespace sotc
