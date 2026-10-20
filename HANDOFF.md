@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 06:13 CDT (America/Chicago). Principal: `/root`.
+Updated: 2026-10-20 06:17 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 06:13 CDT, `/root` — DATA-02 manifest NUL-path fixture claimed
+## CURRENT CHECKPOINT — 2026-10-20 06:17 CDT, `/root` — DATA-02 manifest NUL-path claim published
 
 `DATA-02-ARCHIVE-MANIFEST-NUL-PATH-01` is `CLAIMED` by root with worker `/root/data02_manifest_nul`. Worker scope is only `scripts/test_archive_overlap_map.py`: add one synthetic JSONL record whose `path` contains an escaped NUL, and assert the exact existing `ManifestError` for the invalid path. The production parser at `scripts/audit_archive_overlap_map.py` already rejects paths containing the U+0000 code point; this task adds regression coverage only.
 
@@ -13,9 +13,11 @@ The preceding PSARC documentation-sync commit `94ffe62e474e5e7da855c5e3d6b09511f
 
 `python3 scripts/project_index.py` exited 0 with 4,166 folders; `docs/FOLDERS.md` lists 93 checkpoint files (log `local/checkpoints/root-2026-10-20-data02-manifest-nul-claim-project-index.log`, SHA-256 `f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`; index SHA-256 `0c704cd8cc46d76061b0d8ce20d6b9dba3fb67b5a6635034d37320d11724da30`). `graft check` exited 0 at 1,264 nodes / 530 files; the optional deep layer remains unbuilt (log `local/checkpoints/root-2026-10-20-data02-manifest-nul-claim-graft-check.log`, SHA-256 `ad8d3b2b0627d128724863ef8fcc38c6a36e6bbf986356a66ebf10abd9a099b2`). Source lookup `graft grep "parse_manifest_bytes" --in scripts/` exited 0 and found 10 hits in 2 files, including the parser and all current tests (log `local/checkpoints/root-2026-10-20-data02-manifest-nul-claim-graft-grep.log`, SHA-256 `6296f5ff07a65c27ea52ffd6f3a49833c084a681dd2a09aeb3896db71bd46354`; ~3,437 tokens saved). `git diff --check` exited 0.
 
+Claim publication: the staged audit accepted 4 allowlisted paths (log SHA-256 `5a9e644866088593e900087bcab4228c6fde5c817e0410038242dd2906ace04d`); the full audit accepted 651 paths (log SHA-256 `df5c9ca8e77e9e498824aa06265675ce8bac1dbe06ab1d2773597fb0551bc2aa`). Cached and worktree diff checks both exited 0 (empty-log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). Precommit fetch showed 0/0 at `94ffe62`; log SHA-256 `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d0247050325e7c5a3b2b3271c`. Commit `061a0de04d2b82102fe16661ff4834fe96e77434` (`docs: claim manifest NUL path fixture`) was pushed to `origin main`; post-push fetch confirmed 0/0 with `HEAD` and `origin/main` at that commit (log SHA-256 `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d0247050325e7c5a3b2b3271c`).
+
 Observation: existing tests do not exercise the NUL guard; the baseline only confirms the remaining 12 cases pass. Inference: JSON's escaped NUL decodes into a Python string containing NUL and should hit the existing path-field rejection. This remains synthetic parser coverage only; it says nothing about archive payloads, path traversal, loaders, or game use. Failed implementation tries: 0; no install/dependency change. `docs/EVIDENCE.md` remains unchanged until the new regression passes.
 
-Exact next action: stage only HANDOFF.md, docs/TASKS.md, docs/FOLDERS.md, and this claim record; pass staged and full publish-path audits; fetch and confirm zero divergence; commit and push. Then send the worker its start signal. Root will review the one-method diff and independently replay the targeted suite before completion. Graft's local cache and `tools/graft/` stay unstaged.
+Exact next action: send `/root/data02_manifest_nul` the start signal. After its one-test change, inspect the diff and independently replay the targeted suite, then update task/evidence/checkpoint records and publish the completion. Root will review the one-method diff and independently replay the targeted suite before completion. Graft's local cache and `tools/graft/` stay unstaged.
 
 ## PRIOR CHECKPOINT — 2026-10-20 06:09 CDT, `/root` — PSARC block-table fixture published
 
