@@ -3,23 +3,21 @@
 Updated: 2026-10-20 06:02 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 06:02 CDT, `/root` — XFF bytes-like fixture published
+## CURRENT CHECKPOINT — 2026-10-20 06:02 CDT, `/root` — PSARC block-table boundary fixture claimed
 
-`AUD-01-XFF-BYTES-LIKE-INPUT-01` is `FIXTURE_VERIFIED`; worker `/root/aud01_xff_bytes_like` changed only `scripts/test_audio_bank_header.py`. One valid synthetic XFF fixture passed as `bytes`, `bytearray`, and `memoryview` yields identical reports and confirms the declared-length match. Worker and root each passed 8 tests with `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_bank_header.py`.
+`DATA-02-PSARC-BLOCK-TABLE-RANGE-01` is claimed by root; worker `/root/data02_psarc_block_table_range` may edit only `scripts/test_psarc.py`, and root owns shared docs and Git. It adds one synthetic archive fixture: set entry 1's big-endian first-block field at bytes `78:82` to `0xffffffff`, then assert `Psarc(...)` rejects it with `entry references blocks outside the block table`. Parent DATA-02 is active; sibling `DATA-02-PSARC-TRUNCATED-COMPRESSED-BLOCK-01` is already verified. Claim was based on `docs/TASKS.md` DATA-02 and `docs/ASSETS.md` PSARC reader notes.
 
-Test SHA-256 `67ac6b8b97f9c0be6b80ab97772176e8aefd6017a784493b5167ca368d511066`; unchanged parser SHA-256 `bdad7d192b0ecdb929daf5147a139e7545fd5c546f01ed4ffb4005f2cea9f9c0`; worker/root log SHA-256 `f8f7b0ac7f2b53ac4e96000f166430c488f2c37e059ad5502b09d60f29d363b8`. The worker capture wrapper first errored after the test on zsh variable assignment and was corrected; the rerun passed. No implementation hypothesis failed.
+The PSARC baseline `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_psarc.py` exited 0 with 13 tests (log SHA-256 `cac5b565578e1b31f6787112c1d12a0e79d4751c7f652d4b10f39d4362432419`); parser SHA-256 `3bef8a66705c34ab43c321b688ec675cc3cd7aa0e07ec3afdb0f956e3e80cdc9`, test SHA-256 `0ef9ee140c70f0be835170e60b1d3e728c39ecd3e78ec2cb75701128e964b179`. Graft identified `Psarc._load`'s first-block bounds guard; live source confirms it raises the exact expected message. No implementation hypotheses attempted yet.
 
-This covers synthetic bytes-like input normalization only. No archive, codec, NGS2, runtime use, actual game audio, or playback behavior is inferred. Failed implementation tries: 0; G1 NOT PASSED; G2 NOT RUN. Full checkpoint: [XFF bytes-like fixture completion](docs/checkpoints/2026-10-20-root-aud01-xff-bytes-like-complete.md).
+Coverage will be limited to synthetic TOC/block-table validation; no live archive, runtime, or game behavior is inferred. Failed implementation tries: 0; G1 NOT PASSED; G2 NOT RUN. Full claim checkpoint: [PSARC block-table boundary claim](docs/checkpoints/2026-10-20-root-data02-psarc-block-table-range-claim.md).
 
-The claim and its sync are published as `ebed0ee` and `3941f8f`; both post-push fetches confirmed 0/0 divergence. `graft check` reports the wiring graph in sync at 1,263 nodes / 530 source files, with the optional deep layer unbuilt (log SHA-256 `9b9666c8729209c73e8a2f33fd17a0007f652a0dc8425595992447c55bb0157c`).
+The prior XFF completion was published as `05b3e52`; its post-push checkpoint sync is `379db69873e638d587b9311b2f089e557a59411d`, and fetch confirmed `HEAD`/`origin/main` match, 0/0 (log SHA-256 `9a2c2be2bf72c014d29c79efe26a33f7c2b1d5b3368bb7a0c39b9d7c3c55122f`).
 
-`python3 scripts/project_index.py` exited 0 and indexed 4,166 folders (log `local/checkpoints/root-2026-10-20-aud01-xff-bytes-like-complete-project-index.log`, SHA-256 `f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`).
+`python3 scripts/project_index.py` exited 0 and indexed 4,166 folders, updating `docs/FOLDERS.md` to list 91 checkpoint files (log `local/checkpoints/root-2026-10-20-data02-psarc-block-table-range-claim-project-index.log`, SHA-256 `f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`).
 
-`git diff --check` and `git diff --cached --check` exited 0 (empty-log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). The staged audit accepted 6 paths (log SHA-256 `077d2a8bab7548fbf73b9b6b3c8aee1cb9a6a96697d7d81e37ce9e48177c7892`); the full audit accepted 648 paths (log SHA-256 `bb5b1d6afeeb44c41a7748b5a50ff1549317085b97ef5b4892001953e1992597`). Precommit fetch confirmed 0/0 divergence at `3941f8f9fe25a9aa4a269fde8441496950088bad` (log SHA-256 `239cb8d281a104c9c61678eca788f9756028f6424db33b220fdf526f5bebe500`).
+`git diff --check` and `git diff --cached --check` exited 0 (empty-log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). The staged audit accepted 5 allowlisted paths (log SHA-256 `2c98eba23e809aa2a4a4cea2a7deee52317bd9309b94e08fe4f4957c91fdae1e`); the full audit accepted 649 paths (log SHA-256 `5056e7b4ff84547ae592effc3ef2371d15654c85876a1aea0eb0832fc03bfd03`). Precommit fetch confirmed 0/0 divergence at `379db69873e638d587b9311b2f089e557a59411d` (log SHA-256 `9a2c2be2bf72c014d29c79efe26a33f7c2b1d5b3368bb7a0c39b9d7c3c55122f`).
 
-Completion commit `05b3e52dda61a488732c08853a66c42c57e61fd4` (`test: cover XFF bytes-like inputs`) was pushed successfully. Post-push fetch confirmed `HEAD` and `origin/main` match at `05b3e52dda61a488732c08853a66c42c57e61fd4`, 0/0 divergence (log SHA-256 `778a32f121e4ae9457f7d2d70abda29ad863fe67ad9dda390adf722ebe47152f`).
-
-Exact next action: publish this post-push checkpoint sync, then claim the independent PSARC block-table boundary fixture. Generated/untracked `tools/graft/` stays excluded.
+Exact next action: commit and push the claim, then dispatch the bounded test-only worker. Generated/untracked `tools/graft/` stays excluded.
 
 ## PRIOR CHECKPOINT — 2026-10-20 05:46 CDT, `/root` — truncated ELF PHDR fixture verified
 
