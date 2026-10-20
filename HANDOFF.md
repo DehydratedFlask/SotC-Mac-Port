@@ -1,23 +1,25 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:03 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:09 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 21:03 CDT, root — CPU-01d leaf 95 Ghidra headless attempt — ACTIVE
+## CURRENT CHECKPOINT — 2026-10-19 21:09 CDT, root — CPU-01d leaf 95 Ghidra headless attempt — ACTIVE
 
 Claim and exact try plan: [CPU-01d leaf 95 checkpoint](docs/checkpoints/2026-10-19-root-cpu01d-d71f60.md).
 The earlier REA query timed out at 330,000 ms with no Evidence ID (details in the CPU-02 checkpoint).
-Try baseline remains 1. This bounded recovery attempt is try 2: use local Ghidra headless with
-`GHIDRA_HEADLESS_MAXMEM=8G` and `-analysisTimeoutPerFile 1800`; export the exact function body,
-instructions, references, and decompiler result for the hash-pinned ELF before writing the native
-leaf. Next exact action: create the private one-function exporter and run the pinned local analysis.
+The manual Ghidra exporter attempt hit a Java API type mismatch on its targeted `javac` check:
+`getReferencesFrom(Address)` returns `Reference[]`, not `ReferenceIterator`. This is failed try 2
+for leaf 95. The import process remains active. Next exact action: change the private exporter to
+iterate the returned array, compile it against the installed Ghidra 12.1.4 jars, then let the
+hash-pinned headless import/export complete as try 3. If this focused attempt fails, stop and
+escalate; do not try a fourth time without principal reassessment.
 
 ## ACTIVE CLAIM — 2026-10-19 21:03 CDT, root (CPU-01d leaf 95) — `0xd71f60` — ACTIVE
 
 Task: recover the 17-byte unguarded vector-copy leaf at survey index 95, then add a native
 fixture/test/checker if Ghidra confirms it. Exact ELF SHA256:
 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
-Baseline failed tries: 1; this is the second distinct hypothesis, not a reset. Owned private
+Baseline failed tries: 2; the current repaired exporter/import is the third and final try. Owned private
 analysis files: `local/re/work/ghidra-scripts/ExportD71F60.java` and
 `local/re/evidence/ghidra-d71f60.txt`. If evidence succeeds, the leaf/test/checker files listed in
 the linked checkpoint become root-owned, with root integrating `native/CMakeLists.txt` and docs.
