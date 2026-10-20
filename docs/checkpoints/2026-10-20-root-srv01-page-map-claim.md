@@ -99,3 +99,20 @@ and references support it. Do not write replacement source or change any Ghidra/
 - Status: STATIC_ANALYSIS_VERIFIED; parent SRV-01 remains ACTIVE, page-bitmap/Fios semantics open.
   Next exact action: select a distinct bounded source/data-supported task; do not infer a native
   allocator or service contract from this function's name, neighboring comments, or stride alone.
+
+## Publication checkpoint — 2026-10-20 00:16 CDT
+
+- Agent/task: `/root`, SRV-01-PAGE-MAP-19660-01; root owns integration and publication.
+- Tracked change set: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, and this checkpoint; private
+  ELF/REA/root-verifier artifacts stayed under ignored `local/re/` and were not staged.
+- Exact checks/results: `git diff --cached --check` exited 0. Staged audit
+  `python3 -I scripts/audit_publish_paths.py` exited 0 and accepted 4 paths; full audit
+  `python3 -I scripts/audit_publish_paths.py --all` exited 0 and accepted 581 paths.
+  `git fetch origin main` exited 0; `git rev-list --left-right --count origin/main...HEAD` returned
+  `0 0` immediately before commit. `git commit -m "docs: verify SRV-01 page-map analysis"` created
+  `5d3d262`; `git push origin main` exited 0 (`f48e512..5d3d262 main -> main`).
+- Observation versus inference: root evidence and task status are published; this remains static-only
+  and does not advance G1 or establish allocator/service semantics.
+- Status: STATIC_ANALYSIS_VERIFIED; failed analysis hypotheses/tries 0. Parent SRV-01 remains ACTIVE.
+  Next exact action: select a new bounded task that advances a source/data-backed critical-path
+  question, then record its claim before implementation or analysis.
