@@ -1,9 +1,19 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:22 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:25 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:22 CDT, /root — app-main static evidence verified; launcher import task reclaimed
+## CURRENT CHECKPOINT — 2026-10-20 01:25 CDT, /root — app-main verified; importer fix and PHDR8 audit active
+
+### Publication record — preceding checkpoint
+
+The app-main completion, escalation record, and APP-01 importer cancellation claim were committed
+as `41d9b41` (`docs: verify app-main and claim importer cancellation fix`) and pushed to
+`origin/main` (`f07cfde..41d9b41`). `python3 scripts/project_index.py` exited `0` (4,137 folders
+indexed); `graft check` exited `0` (wiring graph in sync; meaning layer unbuilt, 1,219 nodes
+pending); `git diff --cached --check` passed; staged path audit accepted 7 paths; full path audit
+accepted 598; `git fetch origin main` succeeded and divergence was `0 0`. No tracked folder-index
+diff remained after regeneration.
 
 ### RE-02-APPMAIN-25A8D0-01 — STATIC_ANALYSIS_VERIFIED
 
@@ -51,10 +61,28 @@ unit cases. Preserve selection/readiness on import failure. No app runtime inter
 tested. Failed tries: 0. Claim details:
 [checkpoint](docs/checkpoints/2026-10-20-root-app01-importer-error-reclaim.md).
 
-Exact next action: implement the helper and focused tests in the launcher, run `swift test` from
-`launcher/`, then update task/evidence and checkpoint before any further task. No game files,
-binary, executable modules, or runtime were opened or modified for the importer claim. G1 remains
-NOT PASSED.
+Worker `/root/app01_import_cancel` (`gpt-6-luna`, Extra High) is implementing the helper and
+focused tests in launcher source/tests only. Root owns shared docs. Exact next action: review the
+worker diff, independently run `swift test` from `launcher/`, then update task/evidence and
+checkpoint. No game files, binary, executable modules, or runtime were opened or modified for the
+importer claim. G1 remains NOT PASSED.
+
+### RE-02-PHDR8-SOURCE-AUDIT-01 — ACTIVE, claim ready for dispatch
+
+The app-main verifier found program header #8 at raw type `0x61000000`, with file-backed range
+`p_offset=0x2ddb100`, `p_vaddr=0`, `p_filesz=0x1055ab0`, and `p_memsz=0`. It overlaps the function
+at `0x25a8d0` through a second file view but is not used for executable-byte validation. This
+header's meaning and loader role remain UNCLASSIFIED. The reference pin is shadPS4 commit
+`0ebea15c24253b60f514fc37a348dabc8d0bcb90`; the Graft query
+`graft ask "Which named PS4/Sony program-header types are handled in the pinned shadPS4 source, especially numeric type 0x61000000, and where are their semantics stated?" --source --in reference/shadPS4/`
+exited `1` because no files are indexed under that prefix. The audit will verify the live pin and
+search only attributable source material; an open-source emulator's naming is not authoritative
+Sony semantics. If no first-party mapping is found, preserve UNCLASSIFIED. Failed tries: 0. Claim
+details: [checkpoint](docs/checkpoints/2026-10-20-root-re02-phdr8-source-audit-claim.md).
+
+Exact next action: dispatch a read-only public-source audit to a separate worker after this claim
+checkpoint is published. No changes to reference clones, binaries, firmware, or original game
+inputs. G1 remains NOT PASSED.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 01:17 CDT, /root — audio byte pair verified; app-main raw verification pending
 
