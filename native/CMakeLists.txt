@@ -22,6 +22,7 @@ add_library(sotc_core STATIC
   core/region_list.cpp
   core/arena_high_water.cpp
   core/exact_fit_finalize.cpp
+  core/arena_page_debit.cpp
   core/vec_neg036.cpp
   core/xyz_mask_copy.cpp
   core/vec_dd41e0.cpp
@@ -74,15 +75,22 @@ add_library(sotc_core STATIC
   core/vec_d7b930.cpp
   core/vec_d6e0f0.cpp
   core/vec_d6dbf0.cpp
+  core/vec_d6d890.cpp
+  core/vec_d6d280.cpp
   core/vec_d6a520.cpp
+  core/vec_d62b00.cpp
   core/vec_d62690.cpp
+  core/vec_d623c0.cpp
   core/vec_d5fbe0.cpp
   core/vec_d47880.cpp
   core/vec_d47420.cpp
+  core/vec_d47270.cpp
   core/vec_d42b60.cpp
   core/vec_d40ea0.cpp
-  core/vec_d623c0.cpp
-  core/vec_d3b790.cpp)
+  core/vec_d405a0.cpp
+  core/vec_d3b790.cpp
+  core/vec_d40010.cpp
+)
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()
 add_executable(test_math_constants tests/test_math_constants.cpp)
@@ -247,6 +255,10 @@ add_test(NAME arena_high_water COMMAND test_arena_high_water)
 add_executable(test_exact_fit_finalize tests/test_exact_fit_finalize.cpp)
 target_link_libraries(test_exact_fit_finalize sotc_core)
 add_test(NAME exact_fit_finalize COMMAND test_exact_fit_finalize)
+
+add_executable(test_arena_page_debit tests/test_arena_page_debit.cpp)
+target_link_libraries(test_arena_page_debit sotc_core)
+add_test(NAME arena_page_debit COMMAND test_arena_page_debit)
 add_executable(test_vec_d80e60 tests/test_vec_d80e60.cpp)
 target_link_libraries(test_vec_d80e60 sotc_core)
 add_test(NAME vec_d80e60 COMMAND test_vec_d80e60)
@@ -299,6 +311,14 @@ add_executable(test_vec_d6dbf0 tests/test_vec_d6dbf0.cpp)
 target_link_libraries(test_vec_d6dbf0 sotc_core)
 add_test(NAME vec_d6dbf0 COMMAND test_vec_d6dbf0)
 
+add_executable(test_vec_d6d890 tests/test_vec_d6d890.cpp)
+target_link_libraries(test_vec_d6d890 sotc_core)
+add_test(NAME vec_d6d890 COMMAND test_vec_d6d890)
+
+add_executable(test_vec_d6d280 tests/test_vec_d6d280.cpp)
+target_link_libraries(test_vec_d6d280 sotc_core)
+add_test(NAME vec_d6d280 COMMAND test_vec_d6d280)
+
 add_executable(test_vec_d6a520 tests/test_vec_d6a520.cpp)
 target_link_libraries(test_vec_d6a520 sotc_core)
 add_test(NAME vec_d6a520 COMMAND test_vec_d6a520)
@@ -323,6 +343,10 @@ add_executable(test_vec_d47420 tests/test_vec_d47420.cpp)
 target_link_libraries(test_vec_d47420 sotc_core)
 add_test(NAME vec_d47420 COMMAND test_vec_d47420)
 
+add_executable(test_vec_d47270 tests/test_vec_d47270.cpp)
+target_link_libraries(test_vec_d47270 sotc_core)
+add_test(NAME vec_d47270 COMMAND test_vec_d47270)
+
 add_executable(test_vec_d42b60 tests/test_vec_d42b60.cpp)
 target_link_libraries(test_vec_d42b60 sotc_core)
 add_test(NAME vec_d42b60 COMMAND test_vec_d42b60)
@@ -331,6 +355,10 @@ add_executable(test_vec_d40ea0 tests/test_vec_d40ea0.cpp)
 target_link_libraries(test_vec_d40ea0 sotc_core)
 add_test(NAME vec_d40ea0 COMMAND test_vec_d40ea0)
 
+add_executable(test_vec_d405a0 tests/test_vec_d405a0.cpp)
+target_link_libraries(test_vec_d405a0 sotc_core)
+add_test(NAME vec_d405a0 COMMAND test_vec_d405a0)
+
 add_executable(test_vec_d623c0 tests/test_vec_d623c0.cpp)
 target_link_libraries(test_vec_d623c0 sotc_core)
 add_test(NAME vec_d623c0 COMMAND test_vec_d623c0)
@@ -338,3 +366,7 @@ add_test(NAME vec_d623c0 COMMAND test_vec_d623c0)
 add_executable(test_vec_d3b790 tests/test_vec_d3b790.cpp)
 target_link_libraries(test_vec_d3b790 sotc_core)
 add_test(NAME vec_d3b790 COMMAND test_vec_d3b790)
+
+add_executable(test_vec_d40010 tests/test_vec_d40010.cpp)
+target_link_libraries(test_vec_d40010 sotc_core)
+add_test(NAME vec_d40010 COMMAND test_vec_d40010)
