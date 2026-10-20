@@ -3,6 +3,21 @@
 Updated: 2026-10-19 20:28 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 20:28 CDT, worker bc-81763e53 (CPU-01d) — 0xd7fe90 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd7fe90** (survey index 86).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d7fe90.{hpp,cpp}`, `native/tests/test_vec_d7fe90.cpp`,
+`tools/lift/check_fd7fe90.py`, `native/CMakeLists.txt` (+vec_d7fe90 only; origin/main base).
+Private dump (not published): `local/re/work/cd7fe90.bin`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV, peer `0xd84ee0`/`0xdac410`/`0xd85490`.
+Checkpoint (2026-10-19 20:28 CDT, bc-81763e53):
+- OBS: unguarded vmovups copy; src=0x1307dc0 dst=0x3352a50 bits=~0,~0,~0,0; index 86; distinct cells.
+- Commands: ctest -R '^vec_d7fe90$' Passed; `python3 -I tools/lift/check_fd7fe90.py` OK.
+- Logs: `/tmp/ctest_d7fe90.log`, `/tmp/check_d7fe90.log`.
+- Store: Project `internal/worker-claim-d7fe90.md`.
+- Push: (pending this commit).
+
 ## ACTIVE CLAIM — 2026-10-19 20:28 CDT, worker bc-02397584 (CPU-01d) — 0xdac410 CMake restore — COMPLETE
 
 Task: CPU-01d — restore peer `vec_d80e60` CMake link accidentally dropped while wiring `vec_dac410`.
@@ -18,7 +33,8 @@ Store: Project `internal/worker-claim-dac410.md`.
 
 Task: CPU-01e — CMake-link peer `0xdac410` (sources `7cb0e83`) and register idx **77** into `startup_ctors`.
 Skipped peer IN PROGRESS `0xd84ee0` (84), absent `0xd85490` (82), gap 10–19, idx 50, SRV.
-Failed tries: 0. Status: CLAIMED.
+Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
+Checkpoint: ctest OK; check_fdac410 + check_fd80e60 OK; registry **42** (+77 `0xdac410`, +85 `0xd80e60` / `d446092`).
 Owned: `startup_ctors.*`, `test_startup_ctors.cpp`, CMake Drive lines for `vec_dac410`, `HANDOFF.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:27 CDT, worker bc-81763e53 (CPU-01d) — 0xd80e60 — COMPLETE
