@@ -1,43 +1,36 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:41 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:45 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:41 CDT, `/root` — truncated ELF PHDR fixture claimed
+## CURRENT CHECKPOINT — 2026-10-20 05:45 CDT, `/root` — truncated ELF PHDR fixture verified
 
-`RE-01-ELF-PHDR-TRUNCATION-FIXTURE-01` is claimed by root; planned worker `/root/re01_phdr_truncation`
-may edit only `scripts/test_project_tools.py`. The parent RE-01 static-analysis prerequisite is
-verified. Graft located `unwrap()` in `scripts/unwrap_self.py:L10-L28` and the synthetic tool test
-at `scripts/test_project_tools.py:L20-L39`; the reference source is not represented in the current
-Graft result, so its pinned implementation was checked directly. The pin is clean at
-`70bb43859cd7ff181a6d409540b757866184d60d`, with `prepare.py` SHA-256
-`9459d439056e9ca61758ad8f3023f0c1e46b085dd1524644446af00374856890`.
+`RE-01-ELF-PHDR-TRUNCATION-FIXTURE-01` is `FIXTURE_VERIFIED`. Worker `/root/re01_phdr_truncation`
+changed only `scripts/test_project_tools.py`; root reviewed the one-test diff and replayed
+`PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_project_tools.py`. Worker and root each passed 4 tests.
+The regression sets `e_phnum=2` in the 128-byte synthetic ELF; `unwrap()` rejects the truncated
+second header before creating the output or `.identity.json`. Test SHA-256
+`6310c5fa44959697aebe8b34c51836712e61e2f052dc78bf8ebb0d7b00930328`; wrapper SHA-256 remains
+`d1da0676720ffdcff8dbb10765e70b2eae1309735fb4bcb822d3977209d234a4`; pinned reference parser at
+`70bb43859cd7ff181a6d409540b757866184d60d` remains unchanged (SHA-256
+`9459d439056e9ca61758ad8f3023f0c1e46b085dd1524644446af00374856890`). Worker log
+`local/checkpoints/re01-elf-phdr-truncation-test.log`, SHA-256
+`0292b91377e3f5de5fc72b83a91ddacbecbc2c226b761793f9b4babe85f7ad63`; root replay log
+`local/checkpoints/root-2026-10-20-re01-elf-phdr-truncation-review.log`, SHA-256
+`dcf0a7fc200cab9ab36e5d3037278eb791f53b95cc73af6040c74a0a911416bc`.
 
-The baseline `PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_project_tools.py` exited 0 with 3 tests
-(log SHA-256 `7f651a454b7b284efe70fac28605ab5d9c389d39a8b6c9aae1f2193f021e78e2`). A private temp-dir
-probe changed `e_phnum` to 2 in a 128-byte synthetic ELF; `unwrap()` raised
-`ValueError: out of bounds: 0x78+0x38 / 0x80`, and neither output ELF nor `.identity.json` was
-written (log SHA-256 `150dd8818a39ab9d5fe111aae9934dc18608d32a6121dbfd1f338efa3e35cd47`). This is a
-synthetic parse boundary only. No source changed for this task; failed tries: 0; G1 NOT PASSED; G2
-NOT RUN. Full claim details are in [the checkpoint](docs/checkpoints/2026-10-20-root-re01-elf-phdr-truncation-claim.md).
+Coverage is one malformed direct synthetic ELF only; it does not establish game SELF parsing,
+loader/runtime behavior, or any game gate. G1 NOT PASSED; G2 NOT RUN. Failed tries: 0; no dependency
+or install change. Full record: [completion checkpoint](docs/checkpoints/2026-10-20-root-re01-elf-phdr-truncation-complete.md).
 
-`python3 scripts/project_index.py` exited 0 at 4,166 folders (log SHA-256
-`f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`); `graft check` exited 0 with
-the graph current at 1,260 nodes (optional deep layer unbuilt; log SHA-256
-`a4d55100d0ac4eda3f43b8c4a3e931bb916a6e2d10bfe3469707e7aac7c943f6`); `git diff --check` passed.
-
-The previous dynamic-string task is complete and pushed as `38fad54`, with documentation sync
-`49fc041`; post-push fetch confirmed `HEAD` and `origin/main` at `49fc0410977d7bd85b5fc9f3b4fee8a69f4668d2`,
-0/0 divergence. Staged audit accepted 4 paths (log SHA-256
-`e0855adcdc747b2080484ec7216aa2bdd94b4c3d39e99b07b8f07466451c79e3`); full audit accepted 643 paths
-(log SHA-256 `8da1317b279da0ddbae311beac43039d38c0a750d552e532712eed17a3003671`). Precommit fetch
-exited 0, divergence 0/0 at `49fc041`. Claim commit `232daaf` was pushed to `origin main`
-(exit 0). Post-push fetch exited 0; `HEAD` and `origin/main` both resolve to
-`232daaf42a2895f9d1c51461db89f8dc26a533e6`, divergence 0/0 (log
-`local/checkpoints/root-2026-10-20-re01-elf-phdr-truncation-claim-post-push-fetch.log`, SHA-256
-`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). Next exact action: finish
-documentation sync, then dispatch the test-only worker. Generated/untracked `tools/graft/` remains excluded.
-
+Project index exited 0 at 4,166 folders; `graft check` passed with 1,261 nodes / 530 source files
+(the optional deep meaning layer is unbuilt); `git diff --check` passed. `python3 -I scripts/audit_publish_paths.py` accepted 7 staged paths (log SHA-256
+`e24b27fa1a7ed3a8200ffbf399966fb65d2d790e359cfbbe8398aae56386f57e`); `--all` accepted 644 paths
+(log SHA-256 `156548cff16b1b17dc9a087d263c28f6f1c3997b7a758581ba20381d591dd371`). Precommit fetch
+exited 0, divergence 0/0 at `dd616e7`. Next exact action: commit and push this verified task, then
+choose the next unclaimed bounded task. `/root/fixture_scout_after_phdr` is doing read-only candidate
+discovery. Generated and
+untracked `tools/graft/` remains excluded from publication.
 ## PRIOR CHECKPOINT — 2026-10-20 05:39 CDT, `/root` — dynamic string terminator fixture verified
 
 `RE-02-DYNLINK-STRING-TERMINATOR-01` is `FIXTURE_VERIFIED`. Worker `/root/re02_dynlink_terminator`
