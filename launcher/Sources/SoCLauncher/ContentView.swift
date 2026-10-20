@@ -4,6 +4,7 @@ import SwiftUI
 struct ContentView: View {
     @Environment(LauncherModel.self) private var model
     @State private var isChoosingFolder = false
+    @State private var folderImportError: String?
 
     var body: some View {
         @Bindable var model = model
@@ -46,10 +47,21 @@ struct ContentView: View {
         }
         .formStyle(.grouped)
         .fileImporter(isPresented: $isChoosingFolder, allowedContentTypes: [.folder]) { result in
-            if case .success(let url) = result {
+            switch result {
+            case .success(let url):
                 model.assetsDirectory = url
                 Task { await model.validate() }
+            case .failure(let error):
+                folderImportError = error.localizedDescription
             }
+        }
+        .alert("Couldn’t Open Folder", isPresented: Binding(
+            get: { folderImportError != nil },
+            set: { if !$0 { folderImportError = nil } }
+        )) {
+            Button("OK", role: .cancel) { folderImportError = nil }
+        } message: {
+            Text(folderImportError ?? "")
         }
         .task { await model.validate() }
     }

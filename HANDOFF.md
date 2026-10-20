@@ -1,9 +1,26 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:06 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:09 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:06 CDT, /root — page-map analysis active; launcher import-error fix claimed
+## CURRENT CHECKPOINT — 2026-10-20 00:09 CDT, /root — launcher import-error fix build verified; audits pending; page-map analysis active
+
+Task APP-01-IMPORTER-ERROR-01: `launcher/Sources/SoCLauncher/ContentView.swift` now presents the
+localized error in a system alert for import failures and leaves the prior folder/readiness intact;
+the user selected a system alert and silent cancellation. Exact build command
+`swift build --package-path launcher --scratch-path local/build/launcher` exited 0; log
+`local/build/app01-import-error-build.log` SHA-256
+`fa020037fa18385f827a2d9e5dc2adfce29d4db1df3258784166f65959b3741d`. `git diff --check` passed.
+`python3 scripts/project_index.py` exited 0 (4,129 folders indexed). Source SHA-256
+`f472a514645881d189e4397a4d8704a60dd2c78505d4e61205ba93d1855695f1`. Graft refresh/build/check
+passed and `folderImportError` is queryable. These establish compilation and static wiring only;
+native alert interaction, cancellation, real failure text, and sandbox access were not exercised.
+Files in the pending publish: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`,
+`docs/checkpoints/2026-10-20-root-app01-import-error-claim.md`, and the launcher source above.
+Status: STATIC_ANALYSIS_VERIFIED, failed tries 0; APP-01 active, G4 and G1 NOT PASSED. Next exact
+action: stage only those five allowlisted paths, run staged and full publish audits, verify branch
+divergence, then commit/push. The separate SRV-01-PAGE-MAP-19660-01 worker remains CLAIMED and is
+read-only; integrate its dossier only after it returns.
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -17,7 +34,8 @@ under `local/validation/20261019T2321-cpu-01-ctor-prefix-01/`. This proves runne
 The prefix runner bookkeeping, two leaf-fixture index annotations, bridge member identities, the
 static slot-10 dossier, and its caller-local initializer dataflow slice are verified and published.
 A read-only AUD-01 survey verified exact identities and bytes for paired test_adpcm STS members; the
-APP-01 static UI/accessibility review is recorded with runtime follow-ups. Runtime constructor
+APP-01 static UI/accessibility review is recorded, and folder-import failure feedback now builds.
+Runtime constructor
 behavior, helper contracts, audio format/use, game startup, and G1 remain unproven. Recent commits:
 `19cd2a2` (STS completion), `bda7289` (UI review claim), and `545f08f` (STS claim); prior evidence
 commits include `b26768a`, `fc1b278`, and `e40a2a4`.
@@ -52,14 +70,15 @@ Full Keyboard Access, and process cleanup at app quit remain NOT RUN; G4 remains
 Evidence and primary Apple references are in [E45](docs/EVIDENCE.md) and the
 [review checkpoint](docs/checkpoints/2026-10-19-root-app01-ui-review-claim.md).
 
-### APP-01-IMPORTER-ERROR-01 — report folder-import failures — CLAIMED
+### APP-01-IMPORTER-ERROR-01 — report folder-import failures — BUILD VERIFIED; UI RUN NOT DONE
 
-After the static UI review (E45), the user selected a system alert for actual folder-import errors;
-cancellation stays silent. Root owns the small `ContentView` follow-up. It will preserve readiness and
-the previously chosen folder on failure and only surface the localized error. Do not modify sandbox
-scope/bookmark flow or child-process ownership in this task. No test suite changes are planned.
-Exact next action: implement the `.failure` branch and alert, then run the launcher package build.
-Claim: [APP-01-IMPORTER-ERROR-01](docs/checkpoints/2026-10-20-root-app01-import-error-claim.md).
+`ContentView` now keeps the previous folder/readiness on failure and presents the localized error in a
+system alert. The user's selected behavior is honored. For the current single-folder `fileImporter`
+overload, Apple documents that cancellation does not call `onCompletion`; cancellation remains
+silent. Build command `swift build --package-path launcher --scratch-path local/build/launcher`
+passed; log is `local/build/app01-import-error-build.log`. No test suite was added or run; no native
+alert interaction was performed. Sandbox/bookmark and child-process ownership findings from E45
+remain open. Full record: [APP-01-IMPORTER-ERROR-01](docs/checkpoints/2026-10-20-root-app01-import-error-claim.md).
 
 ### SRV-01-PAGE-MAP-19660-01 — characterize pinned function at `0x19660` — CLAIMED
 

@@ -41,9 +41,9 @@ Gates and test evidence take precedence over a status label. Integrator owns thi
 | GPU-02 | Prove GCN-to-MSL semantics | GPU-01 | WAITING_FOR_DEPENDENCY | 0 |
 | GPU-03 | Metal resources/render graph | CPU-02, GPU-02 | WAITING_FOR_DEPENDENCY | 0 |
 | GPU-04 | Real scene feature coverage | GPU-03, CPU-04 | WAITING_FOR_DEPENDENCY | 0 |
-| APP-01 | Native Swift launcher | Documented native-core ABI | ACTIVE (shell builds; 12 launcher unit tests pass including 5 lifecycle cases; smoke-run 4 s; testable clean-exit/requested-Stop helper confirmed by user; one compile failure corrected; static UI review recorded with policy/runtime follow-ups; no core ABI or bundle) / principal+root | 1 |
+| APP-01 | Native Swift launcher | Documented native-core ABI | ACTIVE (shell builds; 12 launcher unit tests pass including 5 lifecycle cases; smoke-run 4 s; testable clean-exit/requested-Stop helper confirmed by user; one compile failure corrected; static UI review recorded; folder-import error alert builds but has no runtime exercise; sandbox/child-lifetime follow-ups remain; no core ABI or bundle) / principal+root | 1 |
 | APP-01-UI-A11Y-REVIEW-01 | Static macOS launcher UI/accessibility review | APP-01 | STATIC_ANALYSIS_VERIFIED (source paths and interaction findings recorded in E45; runtime UI, sandbox access, process-exit behavior, VoiceOver and keyboard validation excluded) / root+/root/app01_ui_review | 0 |
-| APP-01-IMPORTER-ERROR-01 | Surface file-import errors in a system alert; keep cancellation silent | APP-01 | CLAIMED (localized import failure alert; preserve folder/readiness state; UI runtime validation excluded) / root | 0 |
+| APP-01-IMPORTER-ERROR-01 | Surface file-import errors in a system alert; keep cancellation silent | APP-01 | STATIC_ANALYSIS_VERIFIED (localized error alert; failure preserves prior folder/readiness; Swift package build passes; native alert interaction NOT RUN) / root | 0 |
 | INT-01 | Actual menu -> controllable world | CPU-04, GPU-04, APP-01 | WAITING_FOR_DEPENDENCY | 0 |
 | INT-02 | Real audio/save/restart route | INT-01, AUD-04, SAV-02 | WAITING_FOR_DEPENDENCY | 0 |
 | REL-01 | Assets-only, native-only package | INT-02 | WAITING_FOR_DEPENDENCY | 0 |
