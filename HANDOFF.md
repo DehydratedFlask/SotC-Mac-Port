@@ -1,16 +1,34 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:12 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:15 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 21:12 CDT, root — CPU-01d leaf 95 — NEEDS_PRINCIPAL
+## CURRENT CHECKPOINT — 2026-10-19 21:15 CDT, root — SRV-01 arena accounting — ACTIVE
 
-Claim and three-try record: [CPU-01d leaf 95 checkpoint](docs/checkpoints/2026-10-19-root-cpu01d-d71f60.md);
-[escalation](docs/escalations/CPU-01d-d71f60.md). Ghidra 12.1.4 headless analysis/import succeeded
-for the exact ELF, but the target script returned `function_found=false` at `0xd71f60`. No function
-body or native fixture was recovered. This leaf is stopped after three failed tries and requires
-principal reassessment before any fourth try. Next independent action: claim the SRV-01 arena
-accounting slice around `0x1a123–0x1a15a`.
+Claim and bounded plan: [SRV-01 arena-accounting checkpoint](docs/checkpoints/2026-10-19-root-srv01-accounting.md).
+The independent slice covers only the observed accounting instructions around `0x1a123–0x1a15a`
+inside `0x19ae0`; field meanings remain unnamed. Next exact action: export the target function from
+the existing hash-pinned Ghidra project, verify its instructions and callers, then implement a pure
+offset-based native helper if Ghidra confirms the byte survey.
+
+## STOPPED CLAIM — 2026-10-19 21:12 CDT, root — CPU-01d leaf 95 — NEEDS_PRINCIPAL
+
+Three-try escalation: [CPU-01d leaf 95](docs/escalations/CPU-01d-d71f60.md); [checkpoint](docs/checkpoints/2026-10-19-root-cpu01d-d71f60.md).
+Ghidra 12.1.4 analysis/import succeeded for the exact ELF, but the target script returned
+`function_found=false` at `0xd71f60`. No function body or native fixture was recovered. No fourth
+try without a written principal reassessment.
+
+## ACTIVE CLAIM — 2026-10-19 21:15 CDT, root (SRV-01 arena accounting) — `0x19ae0` — ACTIVE
+
+Task: recover only the arena accounting block at `0x1a123–0x1a15a` and add a fixture-level native
+helper for raw fields at `+0x80`, `+0x88`, and conditional `+0x90`, without naming unknown fields
+or integrating them into allocator behavior. Claim uses the existing Ghidra project for the exact
+ELF `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`. Failed tries: 0.
+Root owns `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/POINTERS.md`, `native/README.md`,
+`native/CMakeLists.txt`, and the task checkpoint. Planned worker-owned files after Ghidra confirms
+the block: `native/core/arena_accounting.{hpp,cpp}`, `native/tests/test_arena_accounting.cpp`, and
+`tools/lift/check_f19ae0_accounting.py`. Private exporter/output remain under `local/re/`.
+Do not edit `allocator_region.*`, free-list/list/bitmap code, or `0x19660`; do not claim G1.
 
 ## CLAIM — 2026-10-19 21:03 CDT, root (CPU-01d leaf 95) — `0xd71f60` — NEEDS_PRINCIPAL
 
