@@ -169,6 +169,32 @@ assignment. Publication: commit `3e5ecea` (`docs: record NGS2 probe assignments`
 - Files changed: HANDOFF, TASKS, EVIDENCE, this checkpoint. No code, binary, or install change;
   `INSTALL_LOG.md` unchanged. G1 remains NOT PASSED.
 
+## System-create root review — 2026-10-20 02:08 CDT, `/root`
+
+- Task: `AUD-02-NGS2-SYSCREATE-01`; bounded status `STATIC_PATH_BYTE_VERIFIED`; failed
+  hypothesis-driven tries 0. Worker’s optional `inspect-binary-layout` capability check returned
+  unsupported for its Linux-x64-only profile and was not used in the analysis.
+- Exact root commands from `local/re/evidence/aud02-ngs2-syscreate-01/`: `shasum -a 256 -c
+  SHA256SUMS` (exit 0; 26 entries); `python3 -I verify.py` (exit 0; JSON `result=PASS`). Root
+  checksum output SHA-256 `16d6c9a282536ea7b28fa73056eb7ec470ef3cae22e543c8f675ec58905d1b65`; root
+  verification JSON SHA-256 `135ced0d0c69bd6148b15742d98748802d803d5a9222da822cc9a6050b359807`; stderr
+  empty.
+- Observation: exact ELF/import manifest bytes verify slot `0x1601008` (`JMPREL`
+  `R_X86_64_JUMP_SLOT`, symbol index 240 / NID `mPYgU4oYpuY`) → thunk `0xf91430` → direct call at
+  `0x94932e` in `FUN_009485a0`. The checked 44-byte pre-call window `0x949307..0x949332` has
+  SHA-256 `99e458a9170b402ead55f3b0444dc66758a1e425325a65ffc8ad39d0e4f94887`. REA Evidence IDs:
+  `ev_4b730eb76f6268025a4a4435ddc14dc9ec2b474bda906a67ee269b4cfd06192b`,
+  `ev_3dcf38cb48579627b09c576918571f0b2fef7efd747306dea1b01b2616affab0`,
+  `ev_3c328e924109833a20ed5f3ccb54b5395b4aa0561ab1974c4e77ff97a457385f`. Worker report
+  `REPORT.md` SHA-256 `a8021ebd058884f8de5df9e58b7fcf31a582d7513d9ea59babe9a68d53f94e4d`.
+- Limits: runtime slot binding and callee unresolved; the loaded EAX value from `[RBP-0x5fc]`
+  lacks a resolved reaching definition; high-p-code is truncated, with at least one omitted
+  operation and 729 known omitted edges. No argument roles, ABI, NGS2 behavior, runtime use, or
+  game behavior inferred.
+- Files changed: HANDOFF, TASKS, EVIDENCE, this checkpoint. `INSTALL_LOG.md` unchanged. Next exact
+  action: complete the in-flight VoiceControl function query at `0xf91460`; a failure would be its
+  third unsuccessful targeted try and would require escalation.
+
 ## Packet boundaries
 
 Each packet must report the exact imported symbol/NID and relocation slot, how the caller was
