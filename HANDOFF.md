@@ -1,6 +1,6 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:12 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:15 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
 ## ACTIVE CLAIM — 2026-10-19 20:12 CDT, worker bc-9aa0fe88 (SRV-01 mem) — COMPLETE
@@ -14,15 +14,21 @@ Owned (new only): `native/core/host_map.{hpp,cpp}`, `native/tests/test_host_map.
 Checkpoint: ctest -R host_map Passed; check_host_map_calls.py OK; check_f19ae0.py OK; arm64.
 Store: Project `internal/worker-claim-srv01.md`.
 
-## ACTIVE CLAIM — 2026-10-19 20:14 CDT, worker bc-02397584 (CPU-01d) — 0xddef00 — IN PROGRESS
+## ACTIVE CLAIM — 2026-10-19 20:14 CDT, worker bc-02397584 (CPU-01d) — 0xddef00 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xddef00** (survey index 60).
-Failed tries: 0. Status: CLAIMED / lifting.
+Failed tries: 0. Status: FIXTURE_VERIFIED.
 Owned: `native/core/vec_ddef00.{hpp,cpp}`, `native/tests/test_vec_ddef00.cpp`,
 `tools/lift/check_fddef00.py`, `native/CMakeLists.txt` (+vec_ddef00 only; origin/main base).
 Private dump (not published): `local/re/work/cddef00.bin`.
 Did NOT edit: `startup_ctors.*`, Drive, SRV `host_map`, peer `0xdfd5f0`/`0xde7fb0`.
-Store: Project `internal/worker-claim-ddef00.md`.
+
+Checkpoint (2026-10-19 20:15 CDT, bc-02397584):
+- OBS: unguarded vmovups copy; src=0x130f540 dst=0x3352ed0 bits=~0,~0,~0,0; index 60; distinct cells.
+- Commands: ctest -R '^vec_ddef00$' Passed; `python3 -I tools/lift/check_fddef00.py` OK.
+- Logs: `/tmp/ctest_ddef00.log`, `/tmp/check_ddef00.log`.
+- CMake: origin/main base + vec_ddef00 only.
+- Store: Project `internal/worker-claim-ddef00.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:12 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 54/57/58 — COMPLETE
 
