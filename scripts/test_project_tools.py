@@ -38,6 +38,18 @@ class ToolChecks(unittest.TestCase):
                 unwrap(source, output)
             self.assertEqual(output.read_bytes(), elf)
 
+    def test_truncated_program_header_table_does_not_create_outputs(self):
+        elf = bytearray(fixture_elf())
+        struct.pack_into("<H", elf, 56, 2)
+        with tempfile.TemporaryDirectory() as folder:
+            source, output = Path(folder) / "input.elf", Path(folder) / "out.elf"
+            identity = Path(folder) / "out.identity.json"
+            source.write_bytes(elf)
+            with self.assertRaisesRegex(ValueError, "out of bounds"):
+                unwrap(source, output)
+            self.assertFalse(output.exists())
+            self.assertFalse(identity.exists())
+
     def test_refuse_overwrite_of_other_artifact(self):
         with tempfile.TemporaryDirectory() as folder:
             source, output = Path(folder) / "input.elf", Path(folder) / "out.elf"
