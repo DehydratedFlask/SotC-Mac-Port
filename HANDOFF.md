@@ -1,7 +1,60 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:07 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:09 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:09 CDT, worker bc-9aa0fe88 (SRV-01 mem) — IN PROGRESS
+
+Task: SRV-01 mem — Darwin host mapping behind verified allocator region API `0x19ae0`.
+Failed tries: 0. Status: IN PROGRESS.
+Owned (new only): `native/core/host_map.{hpp,cpp}`, `native/tests/test_host_map.cpp`,
+`tools/lift/check_host_map_calls.py`, `native/CMakeLists.txt` (+host_map only; from origin/main),
+`docs/POINTERS.md` (mapping-path row), `docs/TASKS.md` (SRV-01 register note).
+**Does NOT edit:** `allocator_region.*`, `startup_ctors.*`, Drive `0xf4eba0`/`0xf4b540`,
+peer vec WIP (`0xde6d20`/`0xde7fb0`/…).
+Exact check: ctest -R host_map; `python3 -I tools/lift/check_host_map_calls.py`;
+`python3 -I tools/lift/check_f19ae0.py` still OK. Store: Project `internal/worker-claim-srv01.md`.
+
+## ACTIVE CLAIM — 2026-10-19 20:08 CDT, worker bc-02397584 (CPU-01d) — 0xde6d20 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xde6d20** (survey index 57).
+Failed tries: 0. Status: FIXTURE_VERIFIED.
+Owned: `native/core/vec_de6d20.{hpp,cpp}`, `native/tests/test_vec_de6d20.cpp`,
+`tools/lift/check_fde6d20.py`, `native/CMakeLists.txt` (+vec_de6d20 only; origin/main base).
+Private dump (not published): `local/re/work/cde6d20.bin`.
+Did NOT edit: `startup_ctors.*`, Drive `0xea52f0`, SRV-01 `host_map`, peer `0xdfd5f0`/`0xde7fb0`.
+
+Checkpoint (2026-10-19 20:09 CDT, bc-02397584):
+- OBS: unguarded vmovups copy; src=0x1310350 dst=0x3353310 bits=~0,~0,~0,0; index 57; distinct cells.
+- Commands: ctest -R '^vec_de6d20$' Passed; `python3 -I tools/lift/check_fde6d20.py` OK.
+- Logs: `/tmp/ctest_de6d20.log`, `/tmp/check_de6d20.log`.
+- CMake: origin/main base + vec_de6d20 only (diff verified clean of peer/host_map).
+- Store: Project `internal/worker-claim-de6d20.md`.
+
+## ACTIVE CLAIM — 2026-10-19 20:07 CDT, worker bc-effcf5dc (CPU-01d) — 0xde7fb0 — IN PROGRESS
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xde7fb0** (survey index 56).
+Failed tries: 0. Status: CLAIMED / lifting.
+Owned: `native/core/vec_de7fb0.{hpp,cpp}`, `native/tests/test_vec_de7fb0.cpp`,
+`tools/lift/check_fde7fb0.py`, `native/CMakeLists.txt` (+vec_de7fb0 only; origin/main base).
+Private dump (not published): `local/re/work/cde7fb0.bin`.
+Did NOT edit: `startup_ctors.*`, peer `0xdfd5f0` (bc-73721c8d), Drive, `0xe026b0`.
+Skipped push of `0xe0b180` — already on origin/main as `aa53115`.
+Store: Project `internal/worker-claim-de7fb0.md`.
+
+## ACTIVE CLAIM — 2026-10-19 20:08 CDT, worker bc-73721c8d (CPU-01d) — 0xdfd5f0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdfd5f0** (survey index 54).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_dfd5f0.{hpp,cpp}`, `native/tests/test_vec_dfd5f0.cpp`,
+`tools/lift/check_fdfd5f0.py`, `native/CMakeLists.txt` (+vec_dfd5f0 only on origin/main base).
+Private dump (not published): `local/re/work/cdfd5f0.bin`.
+Did NOT edit: `startup_ctors.*`, peer `vec_e026b0.*`, Drive `init_ea52f0.*` / early registry.
+Checkpoint (2026-10-19 20:09 CDT, bc-73721c8d):
+- OBS: unguarded vmovups copy; src=0x13124a0 dst=0x3353340 bits=~0,~0,~0,0; index 54; distinct cells.
+- Commands: ctest -R vec_dfd5f0 Passed; `python3 -I tools/lift/check_fdfd5f0.py` OK.
+- Logs: `/tmp/ctest_dfd5.log`, `/tmp/check_dfd5.log`.
+- Store: Project `internal/worker-claim-dfd5f0.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:07 CDT, worker bc-201701f2 (Drive / CPU-01e) — 0xea52f0 + registry idx 20 — COMPLETE
 
