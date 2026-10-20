@@ -6,6 +6,7 @@ No native game executable exists. G1 NOT PASSED.
 ## CURRENT CHECKPOINT — 2026-10-19 20:55 CDT, root — CPU-02 dispatcher behavior coverage — ACTIVE
 
 Claim and complete record: [checkpoint](docs/checkpoints/2026-10-19-root-cpu02-dispatch-claim.md).
+Claim checkpoint pushed as `2d237c2` to `origin/main`.
 Task slice: add behavior coverage for all 13 observed `0x66dec0` dispatch types; dispatcher worker
 owns only `native/tests/test_addr.cpp`; root integrates docs and handoff. Failed tries: 0 for this
 slice. Next exact action: finish the already-running focused Ghidra query for `0xd71f60`, then
