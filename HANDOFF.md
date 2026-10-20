@@ -1,7 +1,23 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 22:13 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 22:14 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 22:14 CDT, worker bc-02397584 (CPU-01d) — 0xcee8a0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xcee8a0** (survey index 137).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_cee8a0.{hpp,cpp}`, `native/tests/test_vec_cee8a0.cpp`,
+`tools/lift/check_fcee8a0.py`, `native/CMakeLists.txt` (+vec_cee8a0 only; origin/main base).
+Private dump (not published): `local/re/work/ccee8a0.bin`.
+Skipped: 95; busy `0xd04ce0`; prior `0xd06dd0`=`a621f1c`/`754fbe4`. Never touched `startup_ctors.*`.
+Checkpoint (2026-10-19 22:14 CDT, bc-02397584):
+- OBS: unguarded vmovups; src=0x12f9ec0 dst=0x3351d70 bits=~0,~0,~0,0; index 137.
+- Commands: ctest -R '^vec_cee8a0$' Passed; check_fcee8a0.py OK.
+- Logs: `/tmp/ctest_cee8a0.log`, `/tmp/check_fcee8a0.log`.
+- Store: Project `internal/worker-claim-cee8a0.md`.
+- Push: (this commit).
+
 
 ## ACTIVE CLAIM — 2026-10-19 22:14 CDT, worker bc-81763e53 (CPU-01d) — 0xcf44a0 — COMPLETE
 
