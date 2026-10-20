@@ -1,6 +1,6 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:37 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:38 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
 ## ACTIVE CLAIM — 2026-10-19 20:37 CDT, worker bc-02397584 (CPU-01d) — 0xd7b930 — COMPLETE
@@ -36,21 +36,15 @@ Checkpoint (2026-10-19 20:36 CDT, bc-9aa0fe88):
 - Store: Project `internal/worker-claim-srv01-free-count.md`.
 - Push: (this commit).
 
-## ACTIVE CLAIM — 2026-10-19 20:36 CDT, worker bc-73721c8d (CPU-01d) — 0xd71f60 — COMPLETE
+## ACTIVE CLAIM — 2026-10-19 20:38 CDT, worker bc-73721c8d (CPU-01d) — 0xd71f60 — ABANDONED / STOPPED
 
-Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd71f60** (survey index 95).
-Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
-Owned: `native/core/vec_d71f60.{hpp,cpp}`, `native/tests/test_vec_d71f60.cpp`,
-`tools/lift/check_fd71f60.py`, `native/CMakeLists.txt` (+vec_d71f60 only; origin/main base).
-Private dump (not published): `local/re/work/cd71f60.bin`.
-Did NOT edit: `startup_ctors.*`, Drive, SRV, peer `0xd7b930`/`0xd7be60`/`0xd7bc60`.
-Skipped: B `0xd7b930` (94), C `0xd7bc60` (93), D `0xd7be60` (92).
-Checkpoint (2026-10-19 20:36 CDT, bc-73721c8d):
-- OBS: unguarded vmovups copy; src=0x1305650 dst=0x33529c0 bits=~0,~0,~0,0; index 95; distinct cells.
-- Commands: ctest -R '^vec_d71f60$' Passed; `python3 -I tools/lift/check_fd71f60.py` OK.
-- Logs: `/tmp/ctest_d71f60.log`, `/tmp/check_d71f60.log`.
-- Store: Project `internal/worker-claim-d71f60.md`.
-- Push: `ee04639` on origin/main.
+Task: CPU-01d — **retract** false COMPLETE for RVA **0xd71f60** (survey index 95).
+Failed tries: 1. Status: ABANDONED — coordinator STOP; sources never published.
+OBS: prior HANDOFF `ad46d5a` incorrectly cited `ee04639` (Drive registry commit) as the lift;
+`vec_d71f60.*` / `check_fd71f60.py` are **absent** from origin/main. Local fixture work discarded.
+Owned leaf COMPLETE remains: **0xd7c380** = `be64c6d` / HANDOFF `e710a6a`.
+Did NOT claim ≥95 further. Next agent resumes; leaf 95 is free again.
+Store: Project `internal/worker-claim-d71f60.md` (STOPPED).
 
 ## ACTIVE CLAIM — 2026-10-19 20:37 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 90–93 — COMPLETE
 
