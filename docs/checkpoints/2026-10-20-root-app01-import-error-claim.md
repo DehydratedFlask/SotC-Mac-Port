@@ -62,3 +62,22 @@
 - Status: STATIC_ANALYSIS_VERIFIED; failed tries 0. Staged and full publication audits are pending.
   Next exact action: stage only the five allowlisted files listed above, run both path audits, check
   remote divergence, then commit and push `main`.
+
+## Publication checkpoint — 2026-10-20 00:11 CDT
+
+- Agent/task: `/root`, APP-01-IMPORTER-ERROR-01.
+- Files changed for this documentation checkpoint: `HANDOFF.md` and this checkpoint. Product source,
+  task status and evidence are already in pushed commit `5c2e093`.
+- Exact publication commands/results: staged audit `python3 -I scripts/audit_publish_paths.py`
+  exited 0 and accepted 5 paths; full audit `python3 -I scripts/audit_publish_paths.py --all`
+  exited 0 and accepted 581 paths. `git fetch origin main` exited 0; immediately before commit,
+  `git rev-list --left-right --count origin/main...HEAD` returned `0 0`.
+  `git commit -m "fix(launcher): report folder import errors"` created `5c2e093`; `git push origin main` exited 0
+  (`4387463..5c2e093 main -> main`). Post-push `git status --short --branch` was clean at
+  `## main...origin/main`.
+- Observation versus inference: publication/path checks passed and the repository reports the same
+  commit as its origin. This confirms source and documentation are pushed; it does not add runtime
+  UI evidence. Native alert behavior remains NOT RUN and G4/G1 remain NOT PASSED.
+- Status: STATIC_ANALYSIS_VERIFIED; failed tries 0. APP-01 remains ACTIVE. Next exact action: await
+  and independently review the private SRV-01-PAGE-MAP-19660-01 dossier; its worker owns no shared
+  docs or source edits.
