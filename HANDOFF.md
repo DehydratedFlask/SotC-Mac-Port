@@ -1,24 +1,24 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:54 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:55 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## ACTIVE CLAIM — 2026-10-19 21:54 CDT, worker bc-02397584 (CPU-01d) — 0xd623c0 — COMPLETE
+## ACTIVE CLAIM — 2026-10-19 21:55 CDT, worker bc-effcf5dc (CPU-01d) — 0xd6d280 — COMPLETE
 
-Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd623c0** (survey index 103).
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd6d280** (survey index 99).
 Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
-Owned: `native/core/vec_d623c0.{hpp,cpp}`, `native/tests/test_vec_d623c0.cpp`,
-`tools/lift/check_fd623c0.py`, `native/CMakeLists.txt` (+vec_d623c0 only; origin/main base).
-Private dump (not published): `local/re/work/cd623c0.bin`.
-Skipped: 95 escalated; peers on 97–102/104/106+; peer WIP left on disk.
-Did NOT edit Drive / SRV / `startup_ctors.*` / `local/` / peer untracked files.
-Checkpoint (2026-10-19 21:54 CDT, bc-02397584):
-- OBS: unguarded vmovups copy; src=0x1303e90 dst=0x3352940 bits=~0,~0,~0,0; index 103; distinct cells.
-- Commands: ctest -R '^vec_d623c0$' Passed; `python3 -I tools/lift/check_fd623c0.py` OK.
-- Logs: `/tmp/ctest_d623c0.log`, `/tmp/check_fd623c0.log`.
-- Store: Project `internal/worker-claim-d623c0.md`.
+Owned: `native/core/vec_d6d280.{hpp,cpp}`, `native/tests/test_vec_d6d280.cpp`,
+`tools/lift/check_fd6d280.py`, `native/CMakeLists.txt` (+vec_d6d280 only; origin/main base).
+Private dump (not published): `local/re/work/cd6d280.bin`.
+Skipped: idx 95; D 100/102; B 103; peer busy leaves. No `git reset --hard`.
+Did NOT edit Drive / SRV / `startup_ctors.*` / peer untracked WIP / `local/`.
+B abandoned idx 99 for C; finished from retained local WIP.
+Checkpoint (2026-10-19 21:55 CDT, bc-effcf5dc):
+- OBS: unguarded vmovups copy; src=0x1304cf0 dst=0x3352980 bits=~0,~0,~0,0; index 99.
+- Commands: ctest -R '^vec_d6d280$' Passed; `python3 -I tools/lift/check_fd6d280.py` OK.
+- Logs: `/tmp/ctest_d6d280.log`, `/tmp/check_fd6d280.log`.
+- Store: Project `internal/worker-claim-d6d280.md`.
 - Push: (this commit).
-
 
 ## ACTIVE CLAIM — 2026-10-19 21:54 CDT, worker bc-81763e53 (CPU-01d) — 0xd42b60 — COMPLETE
 
