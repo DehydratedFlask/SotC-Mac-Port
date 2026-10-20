@@ -86,6 +86,14 @@ class Tests(unittest.TestCase):
         with self.assertRaises(psarc.PsarcError):
             self.open(bytes(data))
 
+    def test_rejects_first_block_outside_block_table(self):
+        data = bytearray(build([('a', b'1')]))
+        struct.pack_into('>I', data, 32 + 30 + 16, 0xffffffff)
+
+        with self.assertRaises(psarc.PsarcError) as error:
+            self.open(bytes(data))
+        self.assertEqual(str(error.exception), 'entry references blocks outside the block table')
+
     def test_truncated_archive_rejected(self):
         with self.assertRaises(psarc.PsarcError):
             self.open(build([('a', b'1' * 64)])[:20])

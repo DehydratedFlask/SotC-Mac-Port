@@ -1,27 +1,25 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 06:04 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 06:07 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 06:04 CDT, `/root` — PSARC block-table test worker dispatched
+## CURRENT CHECKPOINT — 2026-10-20 06:07 CDT, `/root` — PSARC block-table fixture verified
 
-`DATA-02-PSARC-BLOCK-TABLE-RANGE-01` is claimed by root; worker `/root/data02_psarc_block_table_range` may edit only `scripts/test_psarc.py`, and root owns shared docs and Git. It adds one synthetic archive fixture: set entry 1's big-endian first-block field at bytes `78:82` to `0xffffffff`, then assert `Psarc(...)` rejects it with `entry references blocks outside the block table`. Parent DATA-02 is active; sibling `DATA-02-PSARC-TRUNCATED-COMPRESSED-BLOCK-01` is already verified. Claim was based on `docs/TASKS.md` DATA-02 and `docs/ASSETS.md` PSARC reader notes.
+`DATA-02-PSARC-BLOCK-TABLE-RANGE-01` is `FIXTURE_VERIFIED`. Worker `/root/data02_psarc_block_table_range` changed only `scripts/test_psarc.py`, adding one test that sets entry 1's first-block field at bytes `78:82` to `0xffffffff` and asserts the exact `PsarcError('entry references blocks outside the block table')`.
 
-The PSARC baseline `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_psarc.py` exited 0 with 13 tests (log SHA-256 `cac5b565578e1b31f6787112c1d12a0e79d4751c7f652d4b10f39d4362432419`); parser SHA-256 `3bef8a66705c34ab43c321b688ec675cc3cd7aa0e07ec3afdb0f956e3e80cdc9`, test SHA-256 `0ef9ee140c70f0be835170e60b1d3e728c39ecd3e78ec2cb75701128e964b179`. Graft identified `Psarc._load`'s first-block bounds guard; live source confirms it raises the exact expected message. No implementation hypotheses attempted yet.
+Worker and root each ran `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_psarc.py`; both exited 0 with 14 tests. Test SHA-256 `66c0a732287614b897ea8a08eb35f114329f92d3e7dc88f780c6d1586fb881d4`; unchanged parser SHA-256 `3bef8a66705c34ab43c321b688ec675cc3cd7aa0e07ec3afdb0f956e3e80cdc9`. Worker log SHA-256 `62e6bd3a77554540929dd26eab6204ab86056dc07bacce00a71e4482e9f4bcb8`; root replay log SHA-256 `0fa6e9196f096183c02cc2acc9c66c1dc944647981973bb5cc84a89647a36d1e`; outputs match apart from elapsed time (`0.005s` vs `0.006s`).
 
-Coverage will be limited to synthetic TOC/block-table validation; no live archive, runtime, or game behavior is inferred. Failed implementation tries: 0; G1 NOT PASSED; G2 NOT RUN. Full claim checkpoint: [PSARC block-table boundary claim](docs/checkpoints/2026-10-20-root-data02-psarc-block-table-range-claim.md).
+Graft initially reported the graph stale for this new method; `graft build` exited 0, refreshed one changed file (529 cached), and `graft check` then passed at 1,264 nodes / 530 files. `graft grep` finds the new test at `scripts/test_psarc.py:L89-L95`; the optional deep meaning layer remains unbuilt. No install or dependency changes.
 
-The prior XFF completion was published as `05b3e52`; its post-push checkpoint sync is `379db69873e638d587b9311b2f089e557a59411d`, and fetch confirmed `HEAD`/`origin/main` match, 0/0 (log SHA-256 `9a2c2be2bf72c014d29c79efe26a33f7c2b1d5b3368bb7a0c39b9d7c3c55122f`).
+This verifies synthetic TOC/block-table range rejection only. No live archive, loader/runtime, game use, or G1/G2 behavior is inferred. Failed implementation tries: 0; G1 NOT PASSED; G2 NOT RUN. Full checkpoint: [PSARC block-table boundary fixture](docs/checkpoints/2026-10-20-root-data02-psarc-block-table-range-complete.md).
 
-`python3 scripts/project_index.py` exited 0 and indexed 4,166 folders, updating `docs/FOLDERS.md` to list 91 checkpoint files (log `local/checkpoints/root-2026-10-20-data02-psarc-block-table-range-claim-project-index.log`, SHA-256 `f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`).
+Claim commit `72f3a23` and dispatch checkpoint syncs `bfb5ab5` / `dc02551` were pushed. The latest post-push fetch confirmed `HEAD` and `origin/main` match at `dc02551c046f53af459afcca428a267668cb5f24`, 0/0 divergence (log SHA-256 `0fd968c619e597674fff78231aafdead9076559e2f97885a338ac2e887499ddf`).
 
-`git diff --check` and `git diff --cached --check` exited 0 (empty-log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). The staged audit accepted 5 allowlisted paths (log SHA-256 `2c98eba23e809aa2a4a4cea2a7deee52317bd9309b94e08fe4f4957c91fdae1e`); the full audit accepted 649 paths (log SHA-256 `5056e7b4ff84547ae592effc3ef2371d15654c85876a1aea0eb0832fc03bfd03`). Precommit fetch confirmed 0/0 divergence at `379db69873e638d587b9311b2f089e557a59411d` (log SHA-256 `9a2c2be2bf72c014d29c79efe26a33f7c2b1d5b3368bb7a0c39b9d7c3c55122f`).
+`python3 scripts/project_index.py` exited 0 and indexed 4,166 folders; `docs/FOLDERS.md` lists 92 checkpoint files (log `local/checkpoints/root-2026-10-20-data02-psarc-block-table-range-complete-project-index.log`, SHA-256 `f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`).
 
-Claim commit `72f3a232ef1730b964ef794d13ab4076c01a80b8` (`docs: claim PSARC block-table boundary fixture`) was pushed. Post-push fetch confirmed `HEAD` and `origin/main` match at `72f3a232ef1730b964ef794d13ab4076c01a80b8`, 0/0 divergence (log SHA-256 `d8c73fd39e5b18a4dd8aafd7162274f3a8368796713868969ff11299fed5c572`).
+`git diff --check` and `git diff --cached --check` exited 0 (empty-log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). Staged audit accepted 7 allowlisted paths (log SHA-256 `3077d5e9fc639fef603ad0a4ceb35433356800711e93f47143edefad14f54253`); full audit accepted 650 paths (log SHA-256 `9b6fa4bea4256f9da19a4d59dfb76ad6c6a7f3a437aa1888a35936ce018ee20e`). Precommit fetch confirmed 0/0 at `dc02551c046f53af459afcca428a267668cb5f24` (log SHA-256 `0fd968c619e597674fff78231aafdead9076559e2f97885a338ac2e887499ddf`).
 
-Claim sync commit `bfb5ab540a7e355ce0d30645d1cc43e2ba3c57c2` (`docs: record PSARC claim publication`) was pushed; post-push fetch confirmed 0/0 at that commit (log SHA-256 `b68b4e699d7b244c284fedd3a8b511baa885b8e806d3c1ccfc74963b3329ffe4`). Worker `/root/data02_psarc_block_table_range` is now dispatched and may change only `scripts/test_psarc.py`; root owns review, evidence and Git.
-
-Exact next action: review the worker's one-test diff and replay the targeted suite; also assess independent launcher tasks from the read-only scout. Generated/untracked `tools/graft/` stays excluded.
+Exact next action: commit and push the verified fixture. Generated/untracked `tools/graft/` stays excluded.
 
 ## PRIOR CHECKPOINT — 2026-10-20 05:46 CDT, `/root` — truncated ELF PHDR fixture verified
 
