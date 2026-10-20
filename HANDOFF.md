@@ -1,18 +1,29 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 02:15 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 02:19 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 02:15 CDT, /root — three call paths verified; two follow-up probes claimed
+## CURRENT CHECKPOINT — 2026-10-20 02:19 CDT, /root — three call paths verified; three follow-up probes claimed
 
 Three bounded AUD-02 import-to-call paths are root-verified:
 `AUD-02-NGS2-SYSCREATE-01` (`sceNgs2SystemCreateWithAllocator`),
 `AUD-02-NGS2-RACKCREATE-01` (`sceNgs2RackCreate`), and
 `AUD-02-NGS2-VOICE-CONTROL-01` (`sceNgs2VoiceControl`). Two independent static caller probes are
-claimed for `sceNgs2SystemRender` and `sceNgs2VoiceGetState`; dispatch follows publication of this
-claim. AUD-02 remains ACTIVE because parameter semantics, audio behavior, and runtime use are
-unclassified. Root is the sole shared-document integrator. Claims and boundaries:
-[checkpoint](docs/checkpoints/2026-10-20-root-aud02-ngs2-callsite-claims.md).
+claimed for `sceNgs2SystemRender` and `sceNgs2VoiceGetState`; workers are running. One additional
+bounded static caller probe is claimed for `sceNgs2SystemDestroy` (slot `0x1601010`, symbol 241,
+NID `u-WrYDaJA3k`) and will be dispatched after this claim is published. AUD-02 remains ACTIVE
+because parameter semantics, audio behavior, and runtime use are unclassified. Root is the sole
+shared-document integrator. Claims and boundaries:
+[NGS2 callsite checkpoint](docs/checkpoints/2026-10-20-root-aud02-ngs2-callsite-claims.md) and
+[SystemDestroy claim](docs/checkpoints/2026-10-20-root-aud02-system-destroy-claim.md).
+
+Claim-preparation checks: the pinned ELF and import manifest hashes were rechecked; the exact
+`sceNgs2SystemDestroy` manifest tuple was found with the expected slot and one relocation site.
+`python3 scripts/project_index.py` exited 0 (4,147 folders), `graft check` passed wiring freshness
+(deep layer unbuilt, 1,225 nodes pending), and `git diff --check` passed. Exact next action: stage
+only HANDOFF/TASKS/FOLDERS and the new claim checkpoint, run staged and full publication audits,
+fetch/check remote divergence, commit and push, then dispatch the third independent worker. The
+pre-existing untracked `tools/graft/` cache remains unstaged.
 
 The prior system-create checkpoint was committed as `85fec59`
 (`docs: verify NGS2 system-create path`) and pushed from `357ed0c`; staged/full publish audits
