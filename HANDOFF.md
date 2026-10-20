@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:38 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:39 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:38 CDT, /root — NGS2 callsite packets claimed
+## CURRENT CHECKPOINT — 2026-10-20 01:39 CDT, /root — NGS2 callsite packets claimed and published
 
 Three bounded AUD-02 static packets are now claimed: `AUD-02-NGS2-SYSCREATE-01` for
 `sceNgs2SystemCreateWithAllocator`, `AUD-02-NGS2-RACKCREATE-01` for `sceNgs2RackCreate`, and
@@ -24,11 +24,17 @@ and indirect edges retained. No NGS2 command contract, audio format, playback, A
 behavior is inferred. Prerequisites are the existing RE-02 import manifest, AUD-01 inventory and
 Stage 3 instructions in `docs/REVERSE_ENGINEERING.md`; G1 remains NOT PASSED.
 
-This claim checkpoint has not yet been published. Exact next action: regenerate the project
-folder index, run the Graft freshness and staged/full publication audits, then commit and push only
-allowlisted documentation. After publication dispatch two workers on disjoint private evidence
-directories, root probes VoiceControl, and the integrator reviews all reports and reproduces the
-byte/hash verification. Initial failed-try counts are zero for all three packets.
+The claim checkpoint was committed as `e71c55a` (`docs: claim NGS2 callsite probes`) and pushed
+from `45223f6` to `e71c55a`. Before commit, `python3 scripts/project_index.py` exited 0 with 4,141
+folders indexed, `graft check` passed the wiring freshness check (deep layer remains unbuilt,
+1,225 nodes pending), `git diff --check` and `git diff --cached --check` passed, staged path audit
+accepted four allowlisted documentation paths, full audit accepted 600 tracked paths, and fetch
+showed divergence `0 0`. `git status --short` showed only those four staged documentation paths
+plus the pre-existing untracked `tools/graft/.cache/telemetry-repo-id.json`; the latter was not
+staged. Exact next action: assign `AUD-02-NGS2-SYSCREATE-01` to `/root/aud02_syscreate` and
+`AUD-02-NGS2-RACKCREATE-01` to `/root/aud02_rackcreate`, while root probes
+`AUD-02-NGS2-VOICE-CONTROL-01`. Keep each worker in its separate private evidence directory;
+root reviews and reproduces each accepted byte/hash check. Initial failed-try counts are zero.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 01:35 CDT, /root — importer and PHDR8 checkpoints published
 

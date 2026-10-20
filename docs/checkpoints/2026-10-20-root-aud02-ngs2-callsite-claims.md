@@ -31,11 +31,18 @@
 - Cumulative failed tries and distinct hypotheses: 0 for each task; claim only.
 - Remaining risks / blockers: the import's caller and pointer provenance may remain unresolved;
   no first-party Sony contract is assumed. All binary evidence remains private.
-- Next exact action: regenerate `docs/FOLDERS.md`, run `graft check`, audit staged and tracked
-  publication paths, commit/push this claim, then dispatch workers for system/rack creation while
-  root probes voice control.
-- HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF and TASKS updated;
-  EVIDENCE and INSTALL_LOG unchanged; `docs/FOLDERS.md` regeneration pending.
+- Publication checkpoint — 2026-10-20 01:39 CDT, `/root`: commit `e71c55a`
+  (`docs: claim NGS2 callsite probes`) pushed
+  `45223f6..e71c55a`. Exact checks: `python3 scripts/project_index.py` exited 0 (4,141 folders);
+  `graft check` passed wiring freshness with 1,225 meaning nodes pending; `git diff --check` and
+  `git diff --cached --check` passed; `python3 -I scripts/audit_publish_paths.py` accepted four
+  staged paths; `python3 -I scripts/audit_publish_paths.py --all` accepted 600 tracked paths;
+  `git fetch origin main` succeeded with divergence `0 0`. The only untracked path shown was
+  `tools/graft/.cache/telemetry-repo-id.json`; it was not staged.
+- Next exact action: dispatch `/root/aud02_syscreate` and `/root/aud02_rackcreate` on the first two
+  tasks in separate private evidence directories; root probes VoiceControl and verifies all reports.
+- HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF, TASKS and generated
+  `docs/FOLDERS.md` updated; EVIDENCE and INSTALL_LOG unchanged.
 
 ## Packet boundaries
 
