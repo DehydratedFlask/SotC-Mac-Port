@@ -1,9 +1,30 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:41 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:46 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:41 CDT, /root — PHDR10 verifier dispatched; CPU helper dossier under root review
+## CURRENT CHECKPOINT — 2026-10-20 00:46 CDT, /root — PHDR10 parser slice and CPU helper dossier root-verified
+
+The three supplied LLM Wiki digests were reviewed as operational checkpoints; the project index at
+`topics/projects/_index.md` confirms that live repository files remain authoritative. No digest was
+promoted as canonical topic knowledge. User-selected launcher decisions from the live task context
+remain: clean-exit/Stop logic uses a testable `LauncherCore` helper, and folder-import failures use a
+system alert with silent cancellation.
+
+### RE-02-MISSING-PHDR10-01 — STATIC_ANALYSIS_VERIFIED for parser/coverage slice
+
+Root reviewed and reran `/root/phdr10`'s private hash-bound verifier. Exact root command:
+`PYTHONDONTWRITEBYTECODE=1 python3 -I local/re/evidence/re02-phdr10/verify.py > local/re/evidence/re02-phdr10/root-verification.json 2> local/re/evidence/re02-phdr10/root-verification.stderr.log`; exit `0`, JSON `PASS`, stderr empty. Root and worker verification JSON SHA-256 match at `7f3a873b450f5fda12508bde8125564f50863b0924d887802affc69b439bf259`; verifier hash is `c6146a03d6f7695d8744c61269fbcb67c2e7d4c779d4553472e97fb3399581f5`; report hash is `8041add6304969dc84e5494ed368e5b73c1a89a3430c089b7109acc9d0b41491`. It validates the SELF/ELF hashes, pinned clean reference at `70bb43859cd7ff181a6d409540b757866184d60d`, all 11 program headers, 10 descriptors, every copied interval, and `parse_self` returning `missing=[10]`. PHDR10 is `0x6fffff01`, `p_offset=65,211,380`, `p_filesz=2,928`, `p_memsz=0`; it has no active descriptor, and the pinned reader tolerates it because it is absent from the parser's four required types. This is parser/byte behavior only: platform type meaning, other loaders, and runtime relevance remain unclassified. Completion evidence is E51 and [checkpoint](docs/checkpoints/2026-10-20-root-re02-missing-phdr10-complete.md). Failed analysis hypotheses: 0; RE-02/G0/G1 remain open/not passed.
+
+### CPU-01-CTOR10-E1EDE0-01 — STATIC_ANALYSIS_VERIFIED
+
+`/root/srv01_page_map_19660` completed the private REA 6.7.0/Ghidra 12.1.4 query (Evidence ID `ev_a78fb082a6584d31cebf0c320fc036205741f7093569f68e8355e90ce8237e0c`; exact command, exit `0`, and empty stderr are recorded under `local/re/evidence/rea-e1ede0/analysis.command.txt`). Root reviewed the private report and reran `PYTHONDONTWRITEBYTECODE=1 python3 -I local/re/evidence/rea-e1ede0/verify.py > local/re/evidence/rea-e1ede0/root-verification.stdout.log 2> local/re/evidence/rea-e1ede0/root-verification.stderr.log`; root exit `0`, stderr empty. Root stdout SHA matches worker JSON `08e9f42004ad18be5599f5c9dfce903b7f71e992e70cedf23b37430d52a8e412`. Function `0xe1ede0..0xe1ee45` is 102 bytes (SHA `fe902c0318c3b14913f6c88d21e54d96a55bc56f1f4c78c3a9648922450add1d`). The verifier checks 92 incoming xrefs (58 E8 calls, 34 E9 tail transfers), body bytes, and `0xf09f04` argument provenance. Two indirect calls and PT_LOAD-gap data remain unresolved; two call refs lack Ghidra caller-function records and relationship coverage is partial. The exact report SHA is `fdbedbaaf50acbfcb16ef8e563ecd21fce126d06002d0de70e6007f0d39b37d2`, verifier SHA `3550ae5c97202fd0c8e4ca86b86c60a00b2c7c6f16b4293683da710b22637b21`. No service/ABI or runtime role is inferred. See E52 and [checkpoint](docs/checkpoints/2026-10-20-root-cpu01-ctor10-e1ede0-complete.md). Failed analysis hypotheses: 0; two verifier assertions were corrected as tool assumptions. Parent CPU-01 remains ACTIVE and G1 NOT PASSED.
+
+Root updated `docs/TASKS.md`, `docs/EVIDENCE.md`, added both completion checkpoints, and regenerated `docs/FOLDERS.md` (checkpoint directory count 33). Exact `python3 scripts/project_index.py` exited `0` (`4133 folders indexed; written`); `graft check` exited `0` (wiring graph synchronized; deep meaning tier remains 0%, 1,219 nodes pending); `git diff --check` passed. These changes are allowlisted documentation only; local reports, verifiers and game-derived bytes remain private under ignored `local/`. Path audits, fetch/divergence, commit and push are still pending.
+
+Exact next action: stage only `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/FOLDERS.md`, and the two named `docs/checkpoints/*-complete.md` files; run staged and full publication audits, `git diff --cached --check`, fetch/check divergence, then commit and push. Update this handoff with the publication result before ending the turn. Both bounded tasks are `STATIC_ANALYSIS_VERIFIED`; failed analysis hypotheses/tries are 0.
+
+## PREVIOUS CHECKPOINT — 2026-10-20 00:41 CDT, /root — PHDR10 verifier dispatched; CPU helper dossier under root review
 
 Task `RE-02-MISSING-PHDR10-01` is claimed as a read-only, hash-bound examination of the one
 unclassified SELF/ELF program header. The pinned reader is
