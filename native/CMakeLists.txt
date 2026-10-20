@@ -16,6 +16,7 @@ add_library(sotc_core STATIC
   core/trig_constants.cpp
   core/addr.cpp
   core/allocator_region.cpp
+  core/host_map.cpp
   core/vec_neg036.cpp
   core/xyz_mask_copy.cpp
   core/vec_dd41e0.cpp
@@ -127,3 +128,6 @@ add_test(NAME vec_dfd5f0 COMMAND test_vec_dfd5f0)
 add_executable(test_vec_de1ad0 tests/test_vec_de1ad0.cpp)
 target_link_libraries(test_vec_de1ad0 sotc_core)
 add_test(NAME vec_de1ad0 COMMAND test_vec_de1ad0)
+add_executable(test_host_map tests/test_host_map.cpp)
+target_link_libraries(test_host_map sotc_core)
+add_test(NAME host_map COMMAND test_host_map)
