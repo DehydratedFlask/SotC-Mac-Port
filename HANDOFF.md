@@ -1,9 +1,25 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 22:37 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 22:39 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 22:37 CDT, /root — SRV-01 + CPU-01d fixture batch — FIXTURE_VERIFIED
+## CURRENT CHECKPOINT — 2026-10-19 22:39 CDT, /root — CPU-01d `0xce7300` metadata correction — ACTIVE
+
+Root claims only `native/core/vec_ce7300.hpp`, `native/tests/test_vec_ce7300.cpp`, and
+`tools/lift/check_fce7300.py` to reconcile provenance and manifest positions. The active source
+claim and exact read-only evidence are in [the ce7300 claim checkpoint](docs/checkpoints/2026-10-19-root-ce7300-label-claim.md).
+
+- Live Graft wiring shows `init_vec_ce7300` registered in `startup_ctors.cpp` at survey position
+  149. The private constructor survey also identifies RVA `0xce7300` at list position 149, while
+  `ctor-vec-copies.json` identifies it at vector-copy manifest position 91.
+- The original lift attribution is worker `bc-effcf5dc`. The carried unstaged diff incorrectly
+  changed the header attribution to `bc-02397584` and the checker output calls vector-copy position
+  91 a constructor-survey position. Root will fix only provenance/labels and improve the checker to
+  verify both positions; function behavior remains out of scope.
+- Failed tries: 0. Next exact action: update the three claimed files, run `ctest -R '^vec_ce7300$'`
+  and `python3 -I tools/lift/check_fce7300.py`, then publish the result.
+
+## PRIOR CHECKPOINT — 2026-10-19 22:37 CDT, /root — SRV-01 + CPU-01d fixture batch — FIXTURE_VERIFIED
 
 Root reviewed and integrated three isolated, fixture-only slices. The complete command/evidence
 record is in [the native fixture batch checkpoint](docs/checkpoints/2026-10-19-root-native-fixture-batch.md).
