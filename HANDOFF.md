@@ -1,9 +1,62 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:17 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:22 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:17 CDT, /root — audio byte pair verified; app-main raw verification pending
+## CURRENT CHECKPOINT — 2026-10-20 01:22 CDT, /root — app-main static evidence verified; launcher import task reclaimed
+
+### RE-02-APPMAIN-25A8D0-01 — STATIC_ANALYSIS_VERIFIED
+
+Worker `/root/appmain_25a8d0` completed the private dossier under
+`local/re/evidence/re02-appmain-25a8d0/`. Its exact pinned input is
+`local/re/eboot.elf`, SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+REA 6.7.0/Ghidra 12.1.4 Evidence ID is
+`ev_167b8234fc082d63d7a17a8ea4ee218ff0b8559c2397945ae599ba0c657b72ba`. Worker report SHA-256
+is `f8634cf2eca0b4bd1fcfcba4d8fa96ce628170743d9be6e50f1124519edf20c3`; verifier SHA-256 is
+`45fa51c850e3aba9a91bf6ca8d0d2f5fd403e5430639da79f165ad2985f6d85b`.
+
+Root independently ran
+`python3 -I local/re/evidence/re02-appmain-25a8d0/verify.py > local/re/evidence/re02-appmain-25a8d0/root-verification.json 2> local/re/evidence/re02-appmain-25a8d0/root-verification.stderr.log; result_code=$?; printf '%s\n' "$result_code" > local/re/evidence/re02-appmain-25a8d0/root-verification.exit.txt; exit "$result_code"`;
+it exited `0`, stderr is empty, and root output is byte-identical to worker output (SHA-256
+`173a22dab0846535c1947627942087e98fe1a09c535b5db0615d6bdfa9b356cd`). The verifier checks the
+1,021-byte `0x25a8d0..0x25accc` body through PT_LOAD #0 (file offset `0x25e8d0`, SHA-256
+`8d23572ada7de95be980c85cfa0faa873efe69c1226c141f01c02f19b1fffb08`), 218 instruction bytes,
+24 direct calls/11 callees, 15 branches, 70 data references, and three incoming pointer words.
+Static app-main code sets RSI to `-1` then calls slot `+0x18`; the constructed vtable word at
+`0x15c8cf0` points to `0x25a8d0`. Two calls at `0x25aa06` and `0x25ac9f` remain unresolved.
+PHDR #8 (`p_type=0x61000000`) overlaps the function with an alternate file view; its meaning is
+unclassified and the verifier uses only PT_LOAD #0 for executable bytes. Strings are literal
+observations only. No runtime reachability, class/ABI contract, native implementation, or G1
+claim follows. See [E56](docs/EVIDENCE.md) and the
+[completion checkpoint](docs/checkpoints/2026-10-20-root-re02-appmain-25a8d0-complete.md).
+
+Three verifier assumptions failed during the task: requiring file bytes for a zero-fill reference,
+requiring unique raw file offsets across overlapping headers, and requiring a unique all-header
+mapping for the body. These were verifier-coverage failures, not failed analysis hypotheses. The
+third failure reached the escalation threshold; as principal, root reviewed the corrected rule
+(unique PT_LOAD for code, prefer PT_LOAD for data, use a unique non-PT_LOAD mapping only when no
+PT_LOAD covers the reference) and authorized one final independent replay. That replay passed.
+The [escalation record](docs/escalations/RE-02-APPMAIN-25A8D0-01.md) preserves all attempts and
+the limit on further scope. Failed verifier tries: 3; failed analysis hypotheses: 0.
+
+### APP-01-IMPORTER-ERROR-01 — ACTIVE, cancellation behavior needs a focused fix
+
+The user chose a system alert for folder-import errors and silent cancellation. Graft located
+`launcher/Sources/SoCLauncher/ContentView.swift:L52-L65`; live code sets the alert message for every
+`.failure`, without classifying user cancellation. This does not yet establish that every picker
+cancellation reaches that branch, so the exact error identity must be covered. Root claims a
+bounded fix: put Cocoa cancellation/error classification in a testable `LauncherCore` helper,
+keep localized alerts for operational failures, wire the helper into `ContentView`, and add focused
+unit cases. Preserve selection/readiness on import failure. No app runtime interaction has been
+tested. Failed tries: 0. Claim details:
+[checkpoint](docs/checkpoints/2026-10-20-root-app01-importer-error-reclaim.md).
+
+Exact next action: implement the helper and focused tests in the launcher, run `swift test` from
+`launcher/`, then update task/evidence and checkpoint before any further task. No game files,
+binary, executable modules, or runtime were opened or modified for the importer claim. G1 remains
+NOT PASSED.
+
+## PREVIOUS CHECKPOINT — 2026-10-20 01:17 CDT, /root — audio byte pair verified; app-main raw verification pending
 
 ### RE-02-APPMAIN-25A8D0-01 — ACTIVE, private analysis underway
 
