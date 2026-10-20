@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — Audio3d ObjectReserve fully attributed; ObjectUnreserve callsite verified
+
+All nine `sceAudio3dObjectReserve` candidates are in Ghidra bodies (eight in `FUN_0099b400` from existing evidence); `sceAudio3dObjectUnreserve` callsite `0x949e58` is in `FUN_00949dc0` (also holds NGS2 VoiceHandle callsite `0x949df4`; `0x99b880` unattributed). 1 new REA success; root replayed both verifiers and checksums. Details: `docs/checkpoints/2026-10-20-root-audio3d-objectreserve-02-and-objectunreserve-complete.md`. Static only. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 180/180 (batch 17, pushed `2163b26`).
+
+Next exact action: remaining Audio3d imports (`PortGetQueueLevel`, `PortClose`, `PortSetAttribute`, `Terminate`), `0x99b880`, SaveData dialog imports, or constructor batch 18 (next 157 `0xc1a9a0`).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors batch 17 (0xc37020 .. 0xc20710) lifted
 
 `CPU-01-LEAF-CTOR-BATCH-17` `FIXTURE_VERIFIED`; root replay 180/180 ctest pass, five checkers exit 0. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-17-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending workers: `AUD-02-AUDIO3D-OBJECTRESERVE-02` (`local/re/evidence/aud02-audio3d-objectreserve-02/`) and `AUD-02-AUDIO3D-OBJECTUNRESERVE-01` (`local/re/evidence/aud02-audio3d-objectunreserve-01/`).
