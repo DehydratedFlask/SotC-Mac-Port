@@ -3,6 +3,14 @@
 Updated: 2026-10-19 20:22 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 20:50 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 76 — COMPLETE
+
+Task: CPU-01e — register peer FIXTURE_VERIFIED `0xdb3960` (idx 76) into `startup_ctors`.
+Skipped peer-owned `0xdac410` (IN PROGRESS), gap 10–19, idx 50, SRV.
+Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
+Checkpoint: ctest 44/44; check_fdb3960 OK; registry size **37** (+76 `0xdb3960` / `6c869f3`).
+Owned: `startup_ctors.*`, `test_startup_ctors.cpp`, `HANDOFF.md`. CMake: origin as-is.
+
 ## ACTIVE CLAIM — 2026-10-19 20:22 CDT, worker bc-81763e53 (CPU-01d) — 0xdb3960 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdb3960** (survey index 76).
