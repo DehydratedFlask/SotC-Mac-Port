@@ -51,5 +51,11 @@ save, or a G0 pass. No install, download, build, or game/runtime command ran.
 - `graft check` exited 0: wiring graph is in sync; optional deep meaning layer remains 0% with 1,219
   nodes pending. No source files changed in this task.
 - `git diff --check` passed.
-- Exact next action: run staged and full publish-path audits; fetch and check divergence; commit and
-  push the allowlisted completion documentation. G0 stays PARTIAL.
+- Publication: staged audit `python3 -I scripts/audit_publish_paths.py` accepted 6 paths; full audit
+  `python3 -I scripts/audit_publish_paths.py --all` accepted 585 paths; `git diff --cached --check`
+  passed; `git fetch origin main` succeeded and pre-commit divergence was `0 0`. Commit `a4c40f5`
+  (`docs: verify G0 environment baseline`) pushed successfully (`8d5af9d..a4c40f5`). Post-push
+  `git status --short` was empty; `HEAD` equals `origin/main` at
+  `a4c40f566b8f31b168a409f6d3bec42d53d0dd1e`; divergence `0 0`.
+- Exact next action: continue root integration of active `CPU-01-CTOR10-E1EDE0-01` when its analyst
+  returns. G0 stays PARTIAL.

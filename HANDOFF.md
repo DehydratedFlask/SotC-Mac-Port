@@ -20,8 +20,13 @@ The evidence row is E50; the task checkpoint is
 [here](docs/checkpoints/2026-10-20-root-g0-env-baseline-complete.md). G0 remains PARTIAL. Exact
 `python3 scripts/project_index.py` exited 0 and reported 4,132 folders indexed. `graft check` exited
 0: wiring graph in sync; optional deep meaning layer remains 0% (1,219 nodes pending).
-`git diff --check` passed. Exact next action: run both path audits, fetch/check divergence, then
-commit and push the completion record.
+`git diff --check` passed. Publication checkpoint: staged path audit accepted 6 paths; full audit
+accepted 585 paths; `git diff --cached --check` passed; `git fetch origin main` succeeded; pre-commit
+divergence was `0 0`. Commit `a4c40f5` (`docs: verify G0 environment baseline`) pushed successfully
+(`8d5af9d..a4c40f5`). Post-push `git status --short` was empty, `HEAD` equals `origin/main` at
+`a4c40f566b8f31b168a409f6d3bec42d53d0dd1e`, and divergence was `0 0`. Exact next action: continue
+root integration of the active `CPU-01-CTOR10-E1EDE0-01` dossier when its analyst returns; do not
+promote G0 from PARTIAL based on this inventory slice.
 
 Concurrent task `CPU-01-CTOR10-E1EDE0-01` remains assigned to `/root/srv01_page_map_19660`; its
 REA/Ghidra function query is running and the initial independent raw disassembly is complete.
