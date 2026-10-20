@@ -136,3 +136,20 @@ proof that all paths skip it.
 - Next exact action: keep `0xf09efb` unresolved and select the next bounded CPU-01/RE-02 startup
   question from the documented task graph; do not promote G1 or treat the constructor slot as
   runtime-reachable. Task status: `STATIC_ANALYSIS_VERIFIED`; 0 failed analysis hypotheses.
+
+### Publication checkpoint — 2026-10-20 00:31 CDT
+
+- Exact pre-commit checks: `python3 scripts/project_index.py` exited 0 (4,130 folders);
+  `graft check` exited 0 (wiring graph in sync, deep meaning 0% / 1,219 nodes pending);
+  `git diff --check` passed. Generated `docs/FOLDERS.md` changed the immediate `docs/checkpoints`
+  file count from 27 to 28.
+- Publication command: `python3 -I scripts/audit_publish_paths.py` accepted 6 staged paths;
+  `python3 -I scripts/audit_publish_paths.py --all` accepted 583 tracked paths;
+  `git fetch origin main` succeeded and `git rev-list --left-right --count origin/main...HEAD`
+  returned `0 0` before commit.
+- Commit `0e62162` pushed successfully from `4a0f8e2` (`main -> main`). Only allowlisted docs and
+  folder index were staged; no private `local/` evidence or source binaries were published.
+- This commit also published the bounded `CPU-01-CTOR10-E1EDE0-01` claim. Root dispatched it to
+  `/root/srv01_page_map_19660` after push; see that task's dispatch checkpoint.
+- No G1 promotion. Status for this task remains `STATIC_ANALYSIS_VERIFIED`; the computed edge remains
+  unresolved.
