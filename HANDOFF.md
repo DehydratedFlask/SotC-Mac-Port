@@ -1,9 +1,39 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:01 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:03 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:01 CDT, /root — two bounded analyses published
+## CURRENT CHECKPOINT — 2026-10-20 01:03 CDT, /root — app-main target characterization claimed
+
+### RE-02-APPMAIN-25A8D0-01 — ACTIVE, claim prepared; worker dispatch pending publication
+
+Parent CPU-01 and RE-02 remain ACTIVE. Prerequisites are the pinned RE-01 ELF identity and the
+existing app-main dossier `local/re/work/app-main-re02.{md,json}`. The ELF SHA-256 is
+`d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; its existing notes record
+the byte-level vtable slot `0x15c8cf0 -> 0x25a8d0` and the `0x536730` call passing `RSI=-1`.
+The incomplete disassembly currently ends at an undecoded instruction near `0x25aacc`. Those are
+static-source observations; no runtime call is claimed. Scope is one bounded characterization of
+the full function body, exact byte range/hash, direct call/data references, incoming vtable/caller
+linkage, and unresolved edges/coverage. String evidence must not be promoted into a proven C++
+class or `BPE_HANDLE` contract. Worker outputs are private under
+`local/re/evidence/re02-appmain-25a8d0/`; root owns shared documentation and must independently
+rerun the byte/reference verifier before recording evidence. Acceptance: verifier exits 0 against
+the exact ELF and all reported ranges/calls/data references match PT_LOAD-backed bytes; report,
+verifier, exact REA/Ghidra recipe/Evidence ID and coverage limits are retained. No reachability,
+runtime, native implementation, or G1 claim. Failed analysis hypotheses: 0.
+
+Pre-claim identity check command:
+`date '+%Y-%m-%d %H:%M:%S %Z' && git status --short --branch && sha256sum local/re/eboot.elf local/re/work/app-main-re02.md local/re/work/app-main-re02.json local/re/work/a25a8d0.dis && sed -n '1,200p' local/re/work/app-main-re02.md && cat local/re/work/app-main-re02.json && tail -30 local/re/work/a25a8d0.dis`
+exited `0` at 2026-10-20 01:03 CDT; tree was clean at `ba7b4319f1ae0226a587ac04151b1d992f2941dd`.
+Observed hashes: ELF `d0723afb...61d3`, app-main note `cb70fff5...286b6`, structured dossier
+`cdfea58a...1ca48`, partial disassembly `09fa7535...7509fb`. Claim details:
+[RE-02-APPMAIN-25A8D0-01](docs/checkpoints/2026-10-20-root-re02-appmain-25a8d0-claim.md).
+Exact next action: run `python3 scripts/project_index.py`, `graft check`, staged/full publication
+audits, whitespace check, fetch/divergence check; publish the claim, then dispatch one
+`gpt-6-luna` Extra High worker. No source or reference file changes, game execution, install, or
+download. G1 NOT PASSED.
+
+## PREVIOUS CHECKPOINT — 2026-10-20 01:01 CDT, /root — two bounded analyses published
 
 ### CPU-01-CTOR10-CALLER-STATE-01 — STATIC_ANALYSIS_VERIFIED
 
@@ -15,7 +45,7 @@ Worker `/root/ctor10_caller_state`'s private report is hash-bound to ELF SHA
 
 Worker `/root/phdr10_source_audit`'s private report SHA-256 is `c1572f6181ece3d0e31b4210150240504ded1b100284a9496cadf16575a14e5b`; root independently reopened its cited official SIE and generic ELF sources and saved a review under `local/re/evidence/re02-phdr10-source-audit/root-review.md`. No attributable first-party mapping was found in the bounded public search. The generic ELF ABI only puts this numeric value within the OS-specific range. Partner-only documentation was not accessed; no absence-of-meaning or runtime conclusion is drawn. See E54 and [checkpoint](docs/checkpoints/2026-10-20-root-re02-phdr10-source-audit-complete.md).
 
-Exact next action: choose and claim the next small CPU-01/RE-02 slice only after checking its prerequisites; do not infer a native startup chain from these static results. `CPU-01-CTOR10-CALLER-STATE-01` has 0 failed analysis hypotheses; `RE-02-PHDR10-SOURCE-AUDIT-01` has 0; parent CPU-01 and RE-02 remain ACTIVE. No code or reference files changed; no install/download or game execution. G1 NOT PASSED.
+Exact next action at that checkpoint: choose and claim the next small CPU-01/RE-02 slice only after checking its prerequisites; do not infer a native startup chain from these static results. `CPU-01-CTOR10-CALLER-STATE-01` has 0 failed analysis hypotheses; `RE-02-PHDR10-SOURCE-AUDIT-01` has 0; parent CPU-01 and RE-02 remain ACTIVE. No code or reference files changed; no install/download or game execution. G1 NOT PASSED.
 
 Shared files changed in this result checkpoint: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`,
 generated `docs/FOLDERS.md`, and the two linked completion checkpoints. Root verifier output and the
