@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:09 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:11 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:09 CDT, /root — launcher import-error fix build verified; audits pending; page-map analysis active
+## CURRENT CHECKPOINT — 2026-10-20 00:11 CDT, /root — launcher import-error fix pushed; page-map analysis active
 
 Task APP-01-IMPORTER-ERROR-01: `launcher/Sources/SoCLauncher/ContentView.swift` now presents the
 localized error in a system alert for import failures and leaves the prior folder/readiness intact;
@@ -15,12 +15,15 @@ the user selected a system alert and silent cancellation. Exact build command
 `f472a514645881d189e4397a4d8704a60dd2c78505d4e61205ba93d1855695f1`. Graft refresh/build/check
 passed and `folderImportError` is queryable. These establish compilation and static wiring only;
 native alert interaction, cancellation, real failure text, and sandbox access were not exercised.
-Files in the pending publish: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`,
+The published change set in `5c2e093` contains `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`,
 `docs/checkpoints/2026-10-20-root-app01-import-error-claim.md`, and the launcher source above.
-Status: STATIC_ANALYSIS_VERIFIED, failed tries 0; APP-01 active, G4 and G1 NOT PASSED. Next exact
-action: stage only those five allowlisted paths, run staged and full publish audits, verify branch
-divergence, then commit/push. The separate SRV-01-PAGE-MAP-19660-01 worker remains CLAIMED and is
-read-only; integrate its dossier only after it returns.
+Publication gate passed: `python3 -I scripts/audit_publish_paths.py` accepted all 5 staged paths;
+`python3 -I scripts/audit_publish_paths.py --all` accepted 581 repository paths. `git fetch origin main`
+succeeded, pre-push divergence was `0 0`, commit `5c2e093` was pushed to `origin main`, and
+post-push `git status --short --branch` showed a clean `main...origin/main`. Status:
+STATIC_ANALYSIS_VERIFIED, failed tries 0; APP-01 active, G4 and G1 NOT PASSED. Next exact action:
+integrate the read-only SRV-01-PAGE-MAP-19660-01 worker's dossier if it passes root review; it
+remains CLAIMED and has no shared-doc edits yet.
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
