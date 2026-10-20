@@ -1,9 +1,23 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 06:09 CDT (America/Chicago). Principal: root agent of this planning chat.
-No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
+Updated: 2026-10-20 06:13 CDT (America/Chicago). Principal: `/root`.
+No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 06:09 CDT, `/root` — PSARC block-table fixture published
+## CURRENT CHECKPOINT — 2026-10-20 06:13 CDT, `/root` — DATA-02 manifest NUL-path fixture claimed
+
+`DATA-02-ARCHIVE-MANIFEST-NUL-PATH-01` is `CLAIMED` by root with worker `/root/data02_manifest_nul`. Worker scope is only `scripts/test_archive_overlap_map.py`: add one synthetic JSONL record whose `path` contains an escaped NUL, and assert the exact existing `ManifestError` for the invalid path. The production parser at `scripts/audit_archive_overlap_map.py` already rejects paths containing the U+0000 code point; this task adds regression coverage only.
+
+Baseline from `/Volumes/Extra/SoC Mac Native`: `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_archive_overlap_map.py` exited 0 with 12 tests. Log `local/checkpoints/root-2026-10-20-data02-manifest-nul-claim-baseline.log`, SHA-256 `e912336b9a2279cf34b06f205b51b3eb28c54d31e6a078047b5b6fe0fa0f6617`. Baseline test SHA-256 `9de9f0084ce829d0e5bb386f5cdf4bf15a5ac625b64eb597755d3e69590e10d9`; unchanged parser SHA-256 `28330049faf0c7366159e7439ce80b8f4354413908c98bd3d7c95c6addbc7bf7`.
+
+The preceding PSARC documentation-sync commit `94ffe62e474e5e7da855c5e3d6b09511f1a3155d` is on `origin/main`; pre-claim fetch showed 0/0 divergence. Post-push fetch log `local/checkpoints/root-2026-10-20-data02-psarc-block-table-range-complete-sync-post-push-fetch.log`, SHA-256 `a23af920707591b7eab0ff84a9ea33d5a0afff1cbf9e96324f1918ef9a5f84a3`.
+
+`python3 scripts/project_index.py` exited 0 with 4,166 folders; `docs/FOLDERS.md` lists 93 checkpoint files (log `local/checkpoints/root-2026-10-20-data02-manifest-nul-claim-project-index.log`, SHA-256 `f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`; index SHA-256 `0c704cd8cc46d76061b0d8ce20d6b9dba3fb67b5a6635034d37320d11724da30`). `graft check` exited 0 at 1,264 nodes / 530 files; the optional deep layer remains unbuilt (log `local/checkpoints/root-2026-10-20-data02-manifest-nul-claim-graft-check.log`, SHA-256 `ad8d3b2b0627d128724863ef8fcc38c6a36e6bbf986356a66ebf10abd9a099b2`). Source lookup `graft grep "parse_manifest_bytes" --in scripts/` exited 0 and found 10 hits in 2 files, including the parser and all current tests (log `local/checkpoints/root-2026-10-20-data02-manifest-nul-claim-graft-grep.log`, SHA-256 `6296f5ff07a65c27ea52ffd6f3a49833c084a681dd2a09aeb3896db71bd46354`; ~3,437 tokens saved). `git diff --check` exited 0.
+
+Observation: existing tests do not exercise the NUL guard; the baseline only confirms the remaining 12 cases pass. Inference: JSON's escaped NUL decodes into a Python string containing NUL and should hit the existing path-field rejection. This remains synthetic parser coverage only; it says nothing about archive payloads, path traversal, loaders, or game use. Failed implementation tries: 0; no install/dependency change. `docs/EVIDENCE.md` remains unchanged until the new regression passes.
+
+Exact next action: stage only HANDOFF.md, docs/TASKS.md, docs/FOLDERS.md, and this claim record; pass staged and full publish-path audits; fetch and confirm zero divergence; commit and push. Then send the worker its start signal. Root will review the one-method diff and independently replay the targeted suite before completion. Graft's local cache and `tools/graft/` stay unstaged.
+
+## PRIOR CHECKPOINT — 2026-10-20 06:09 CDT, `/root` — PSARC block-table fixture published
 
 `DATA-02-PSARC-BLOCK-TABLE-RANGE-01` is `FIXTURE_VERIFIED`. Worker `/root/data02_psarc_block_table_range` changed only `scripts/test_psarc.py`, adding one test that sets entry 1's first-block field at bytes `78:82` to `0xffffffff` and asserts the exact `PsarcError('entry references blocks outside the block table')`.
 
