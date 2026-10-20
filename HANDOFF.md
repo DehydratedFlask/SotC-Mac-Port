@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:44 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:46 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:44 CDT, /root — constructor metadata, bridge comparison, and slot-10 dossier verified
+## CURRENT CHECKPOINT — 2026-10-19 23:46 CDT, /root — slot-10 dossier verified; initializer dataflow follow-up claimed
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -15,8 +15,9 @@ and reports the unresolved original slot 10 at RVA `0xf09e60`. A private hash-bo
 reran the build, focused CTest (1/1), checker, and whitespace check successfully; worker logs are
 under `local/validation/20261019T2321-cpu-01-ctor-prefix-01/`. This proves runner bookkeeping only.
 The prefix runner bookkeeping, two leaf-fixture index annotations, bridge member identities, and
-the static slot-10 dossier are now verified and published. Runtime constructor behavior, the
-computed call at `0xf09efb`, helper contracts, game startup, and G1 remain unproven. Commits:
+the static slot-10 dossier are now verified and published. A bounded follow-up is claimed to
+characterize the local initializer called by slot 10 before its unresolved computed call. Runtime
+constructor behavior, helper contracts, game startup, and G1 remain unproven. Commits:
 `b26768a` (prefix fixture), `fc1b278` (leaf metadata), and `e40a2a4` (bridge comparison evidence).
 
 ### DATA-02 — pakN archive identity
@@ -284,6 +285,30 @@ write native replacement code.
 - Task exit: static blocker characterization complete; no replacement code. Exact next action: resolve
   the indirect-call target and local helper contracts only if a separate bounded task is claimed;
   keep CPU-01 and G1 open until runtime startup and required gates are demonstrated.
+
+### CPU-01-CTOR10-INIT-HELPER-01 — characterize caller-local initializer effects — ACTIVE CLAIM
+
+Integrator `/root` claims a read-only, hash-bound follow-up for `/root/cpu_ctor10_init_helper`.
+REA/Ghidra's caller dossier shows a call at `0xf09ec7` to `0xe1eda0` with a stack-object pointer and
+scalar arguments; caller code then checks stack fields at `RSP+0xa8` and `RSP+0xa0` before the
+unresolved computed call at `0xf09efb`. This claim verifies whether and how the callee writes those
+fields; it does not assume that the indirect call is dead or reachable.
+
+- Use only the pinned local ELF and process-local REA/Ghidra install. Do not run the game, install
+  tools, modify the baseline REA snapshot, or write native replacement code.
+- Deliver exact ELF digest/image base, tool versions, Evidence ID, function range/body hash, direct
+  calls/data references/unresolved flows and coverage for `0xe1eda0`. Independently disassemble the
+  relevant callee and caller byte ranges, map callee writes through its argument pointer to the
+  caller's two tested stack fields, and report whether static bytes justify any conclusion about the
+  `0xf09efb` guard. Preserve observation versus inference; if aliasing or function boundaries prevent
+  a conclusion, leave it unresolved.
+- Exact command: use the pinned REA CLI with Ghidra and a distinct output snapshot
+  `local/re/rea-e1eda0-snapshot.json`; save command, analysis JSON, stderr, verifier and output under
+  existing `local/re/evidence/`. Verify the source ELF SHA against
+  `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; leave baseline
+  `local/re/rea-snapshot.json` unchanged. Failed tries: 0.
+- Root integrates shared docs and publication. G1 stays NOT PASSED; static guard characterization
+  cannot establish execution or native ABI compatibility.
 
 ### CPU-01-CTOR-METADATA-01 — correct original indices in leaf fixtures — FIXTURE_VERIFIED
 
