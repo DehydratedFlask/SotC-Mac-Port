@@ -1,17 +1,16 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:09 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:10 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 21:09 CDT, root — CPU-01d leaf 95 Ghidra headless attempt — ACTIVE
+## CURRENT CHECKPOINT — 2026-10-19 21:10 CDT, root — CPU-01d leaf 95 Ghidra headless attempt — ACTIVE
 
 Claim and exact try plan: [CPU-01d leaf 95 checkpoint](docs/checkpoints/2026-10-19-root-cpu01d-d71f60.md).
 The earlier REA query timed out at 330,000 ms with no Evidence ID (details in the CPU-02 checkpoint).
-The manual Ghidra exporter attempt hit a Java API type mismatch on its targeted `javac` check:
-`getReferencesFrom(Address)` returns `Reference[]`, not `ReferenceIterator`. This is failed try 2
-for leaf 95. The import process remains active. Next exact action: change the private exporter to
-iterate the returned array, compile it against the installed Ghidra 12.1.4 jars, then let the
-hash-pinned headless import/export complete as try 3. If this focused attempt fails, stop and
+The first exporter compile found the `getReferencesFrom(Address)` array return type; the private
+script now iterates that array and its JDK 25/Ghidra 12.1.4 `javac` check passes. Failed tries remain
+2; the headless import/export is try 3. The import process remains active. Next exact action: let
+the hash-pinned import finish and inspect the target export. If this focused attempt fails, stop and
 escalate; do not try a fourth time without principal reassessment.
 
 ## ACTIVE CLAIM — 2026-10-19 21:03 CDT, root (CPU-01d leaf 95) — `0xd71f60` — ACTIVE
