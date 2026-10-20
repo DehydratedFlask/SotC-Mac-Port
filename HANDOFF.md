@@ -3,6 +3,22 @@
 Updated: 2026-10-19 22:11 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 22:12 CDT, worker bc-81763e53 (CPU-01d) — 0xd00600 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd00600** (survey index 137).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d00600.{hpp,cpp}`, `native/tests/test_vec_d00600.cpp`,
+`tools/lift/check_fd00600.py`, `native/CMakeLists.txt` (+vec_d00600 only; origin/main base).
+Private dump (not published): `local/re/work/cd00600.bin`.
+Skipped: 95; busy peers; prior D `0xd06dd0`=`a621f1c`.
+Did NOT edit Drive / SRV / `startup_ctors.*` / `local/`.
+Checkpoint (2026-10-19 22:12 CDT, bc-81763e53):
+- OBS: unguarded vmovups copy; src=0x12fb8a0 dst=0x3351db0 bits=~0,~0,~0,0; index 137; distinct cells.
+- Commands: ctest -R '^vec_d00600$' Passed; `python3 -I tools/lift/check_fd00600.py` OK.
+- Logs: `/tmp/ctest_d00600.log`, `/tmp/check_fd00600.log`.
+- Store: Project `internal/worker-claim-d00600.md`.
+- Push: (this commit).
+
 ## ACTIVE CLAIM — 2026-10-19 22:11 CDT, worker bc-201701f2 (Drive / CPU-01e) — backlog 126-133 continuous — COMPLETE
 
 Task: CPU-01e — register (ctor-survey.json; skip 95):
