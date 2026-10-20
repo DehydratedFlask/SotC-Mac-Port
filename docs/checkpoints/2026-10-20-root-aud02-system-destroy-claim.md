@@ -54,3 +54,29 @@
   3 allowlisted docs paths; full audit accepted 601 tracked paths; fetch showed divergence `0 0`.
   Exact next action: review the worker's dossier and report when ready; preserve all
   ABI/runtime/semantic limits stated in the claim.
+
+## Interim slot-to-thunk checkpoint — 2026-10-20 02:28 CDT, worker `/root/aud02_sysdestroy`
+
+- Worker-reported progress pending root replay; task remains ACTIVE; failed targeted tries remain
+  0. The existing parser command
+  `python3 -I scripts/ps4_dynlink.py local/re/eboot.elf --out
+  local/re/evidence/aud02-ngs2-system-destroy-01/imports.reparsed.json` exited 0 and matched the
+  unique slot `0x1601010` to symbol 241 / NID `u-WrYDaJA3k`. Parser stdout SHA-256
+  `f8994eafed26db78a1289c62ceec9179c41aee83f38179e6c30aa898dd5fe03f`; stderr empty.
+- Independent raw scan `python3 -I
+  local/re/evidence/aud02-ngs2-system-destroy-01/scan_ff25_target.py` reported one `FF 25` match
+  at `0xf91440`, bytes `ff25cafb6600`, targeting the claimed slot; stdout SHA-256
+  `877edc78540d6371fffd0580a088cd61e5f2411a28a961e7decbde21e7217c09`.
+  `python3 -I scripts/ps4_dynlink.py local/re/eboot.elf --out
+  local/re/evidence/aud02-ngs2-system-destroy-01/imports.with-thunk.json --thunk 0xf91440` exited
+  0 and independently mapped that thunk to the JUMP_SLOT, symbol 241, and matching NID; target
+  JSON SHA-256 `87b93b1196f0d55067ba6b353c1d2b55539fbad2ee9ab52a33e514bd689ea8af`.
+- REA 6.7.0 / Ghidra 12.1.4 slot query at `0x1601010`, using the exact pinned ELF and private
+  snapshot with 8 GB heap / 1,200,000 ms deadline, exited 0 after about 6 minutes. Full JSON
+  `local/re/evidence/aud02-ngs2-system-destroy-01/slot-xrefs.json` SHA-256
+  `6da0467ea24486330ac90799353446bd816c6a7198aa52927e1a1098002fe49b`; stderr empty; Evidence ID
+  `ev_37ba3af33cc684de727dfb407d145e99b12d646a8d3f3fe219a31b2c07fbd6d1`. It returns address
+  `0xf91440`; xrefs output omits reference kind and has not identified a direct caller.
+- Exact next action: finish the targeted REA function query at `0xf91440`, preserve results and
+  unresolved edges, then byte-check a direct caller if one is found. No NGS2 meaning, ABI, runtime
+  binding, call reachability, or audio behavior is inferred.
