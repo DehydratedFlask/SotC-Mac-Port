@@ -1,7 +1,27 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:12 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:17 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:17 CDT, worker bc-02397584 (CPU-01d) — 0xddab00 — IN PROGRESS
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xddab00** (survey index 62).
+Failed tries: 0. Status: CLAIMED / lifting.
+Owned: `native/core/vec_ddab00.{hpp,cpp}`, `native/tests/test_vec_ddab00.cpp`,
+`tools/lift/check_fddab00.py`, `native/CMakeLists.txt` (+vec_ddab00 only; origin/main base).
+Private dump (not published): `local/re/work/cddab00.bin`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV `host_map`, peer `0xdddc90`/`0xddef00`/`0xde7fb0`.
+Store: Project `internal/worker-claim-ddab00.md`.
+
+## ACTIVE CLAIM — 2026-10-19 20:16 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 56/60 — COMPLETE
+
+Task: CPU-01e — register peer FIXTURE_VERIFIED vec-copy ctors into `startup_ctors`:
+**56** `0xde7fb0`, **60** `0xddef00` (both now on origin/main with CMake links).
+Skipped gap 10–19, idx 50 (`vec_e094e0` absent), SRV `host_map`.
+Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
+Checkpoint: ctest 32/32; check_fde7fb0 + check_fddef00 OK; registry size **24** (+56 `0xde7fb0`, +60 `0xddef00` / `99ce863`).
+Owned: `native/core/startup_ctors.*`, `native/tests/test_startup_ctors.cpp`, `HANDOFF.md`.
+CMake: origin/main as-is (already links both). Store: Project `internal/worker-claim-drive.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:12 CDT, worker bc-effcf5dc (CPU-01d) — 0xde7fb0 — COMPLETE
 
@@ -19,15 +39,19 @@ Checkpoint (2026-10-19 20:12 CDT, bc-effcf5dc):
 - Store: Project `internal/worker-claim-de7fb0.md`.
 - Push: (pending this commit).
 
-## ACTIVE CLAIM — 2026-10-19 20:15 CDT, worker bc-73721c8d (CPU-01d) — 0xdddc90 — IN PROGRESS
+## ACTIVE CLAIM — 2026-10-19 20:15 CDT, worker bc-73721c8d (CPU-01d) — 0xdddc90 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdddc90** (survey index 61).
-Failed tries: 0. Status: CLAIMED / lifting.
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
 Owned: `native/core/vec_dddc90.{hpp,cpp}`, `native/tests/test_vec_dddc90.cpp`,
 `tools/lift/check_fdddc90.py`, `native/CMakeLists.txt` (+vec_dddc90 only; origin/main base).
 Private dump (not published): `local/re/work/cdddc90.bin`.
 Did NOT edit: `startup_ctors.*`, SRV `host_map`, peer `0xddef00`/`0xde7fb0`/`0xde1ad0`.
-Store: Project `internal/worker-claim-dddc90.md`.
+Checkpoint (2026-10-19 20:16 CDT, bc-73721c8d):
+- OBS: unguarded vmovups copy; src=0x130f350 dst=0x3352ec0 bits=~0,~0,~0,0; index 61; distinct cells.
+- Commands: ctest -R '^vec_dddc90$' Passed; `python3 -I tools/lift/check_fdddc90.py` OK.
+- Logs: `/tmp/ctest_dddc.log`, `/tmp/check_dddc.log`.
+- Store: Project `internal/worker-claim-dddc90.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:12 CDT, worker bc-9aa0fe88 (SRV-01 mem) — COMPLETE
 
