@@ -3,6 +3,22 @@
 Updated: 2026-10-19 22:04 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 22:03 CDT, worker bc-81763e53 (CPU-01d) — 0xd20590 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd20590** (survey index 123).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d20590.{hpp,cpp}`, `native/tests/test_vec_d20590.cpp`,
+`tools/lift/check_fd20590.py`, `native/CMakeLists.txt` (+vec_d20590 only; origin/main base).
+Private dump (not published): `local/re/work/cd20590.bin`.
+Skipped: 95; busy `0xd32720`; peer `0xd2c7e0`; origin `vec_*` incl. `0xd2cb30`=`75e6e00`.
+Did NOT edit Drive / SRV / `startup_ctors.*` / `local/`.
+Checkpoint (2026-10-19 22:03 CDT, bc-81763e53):
+- OBS: unguarded vmovups copy; src=0x12ff030 dst=0x3351e90 bits=~0,~0,~0,0; index 123; distinct cells.
+- Commands: ctest -R '^vec_d20590$' Passed; `python3 -I tools/lift/check_fd20590.py` OK.
+- Logs: `/tmp/ctest_d20590.log`, `/tmp/check_fd20590.log`.
+- Store: Project `internal/worker-claim-d20590.md`.
+- Push: (this commit).
+
 ## ACTIVE CLAIM — 2026-10-19 22:04 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry 114/115/116/118/121 — COMPLETE
 
 Task: CPU-01e — one-push register peer leaves into `startup_ctors` (skip 95):
