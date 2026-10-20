@@ -3,6 +3,17 @@
 Updated: 2026-10-19 22:09 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 22:09 CDT, worker bc-effcf5dc (CPU-01d) — 0xd09160 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd09160** (ctor-survey.json index **74**).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d09160.{hpp,cpp}`, `native/tests/test_vec_d09160.cpp`,
+`tools/lift/check_fd09160.py`, `native/CMakeLists.txt` (+vec_d09160 only; origin/main base).
+Private dump (not published): `local/re/work/cd09160.bin`.
+Prior: 71/`0xd0bde0` `df0b694`, 67/`0xd19af0` `40c8c64`, 116 `4beae8e`.
+Skipped 95 + busy peers. Did NOT edit `startup_ctors.*`. No `git reset --hard`.
+Checkpoint: ctest/check OK. Store: `internal/worker-claim-d09160.md`. Push: (this commit).
+
 ## ACTIVE CLAIM — 2026-10-19 22:09 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry +0xd19930/+0xd13300 — COMPLETE
 
 Task: CPU-01e — register (ctor-survey.json; skip 95):
