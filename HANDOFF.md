@@ -1,6 +1,11 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — VoiceHandle interval 0x950850 confirmed
+
+`FUN_00950850` (`0x950850..0x951deb`) Ghidra-confirmed; 27 heuristic candidates upgraded (35 heuristic-only remain across 17 intervals, largest `0x951df0..0x952e01`). 1 REA success; root replayed verifier and checksums. Details: `docs/checkpoints/2026-10-20-root-ngs2-voicehandle-interval-950850-complete.md`. Static only. G0 PARTIAL, G1-G6 NOT RUN.
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctor 0xce38d0 lifted
 
 `CPU-01-LEAF-CTOR-NEXT-02` `FIXTURE_VERIFIED`: `native/core/vec_ce38d0.*`, test, `tools/lift/check_fce38d0.py`; root replay 122/122 ctest pass, checker exit 0; README now documents `0xce6fb0`/`0xce67b0` too. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-ce38d0-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending: VoiceHandle interval `0x950850..0x951deb` REA worker.
