@@ -70,6 +70,22 @@
   `0 0`. The staged set is exactly `HANDOFF.md`, `docs/FOLDERS.md`, `docs/TASKS.md`, and this
   checkpoint; `tools/graft/` remains untracked and unstaged. Commit and push details will be added
   before worker dispatch.
-- Exact next action: dispatch the three private dossiers to separate `gpt-6-luna` agents at Extra
-  High reasoning; wait for each bounded report; root-replay checksums and byte verifiers before
-  updating any task status.
+- Publication and dispatch: `git commit -m "docs: claim three NGS2 import probes"` exited 0 and
+  created `4d690d6`; `git push origin main` exited 0 and pushed `6673495..4d690d6`. Three workers
+  were dispatched after push: `/root/aud02_rackcreate_allocator`,
+  `/root/aud02_rackquery_buffersize`, and `/root/aud02_rack_voicehandle`, each on `gpt-6-luna` at
+  Extra High reasoning. They own only distinct private dossier folders; root retains shared docs,
+  Git, and replay.
+- Publication-record follow-up from repository root: `git diff --check` and
+  `git diff --cached --check` each exited 0 (empty logs). The staged path audit exited 0 for two
+  allowlisted docs; log `local/checkpoints/2026-10-20-root-aud02-next-three-publication-staged-audit.log`,
+  SHA-256 `64db7394796611228a3dbb157c40588bd951a6bd0ec986e0c81c1d665ff17fd8`. The `--all` audit
+  exited 0 for 605 tracked paths; log
+  `local/checkpoints/2026-10-20-root-aud02-next-three-publication-full-audit.log`, SHA-256
+  `7a9ef96ac3a56fca1f92583cd859dd1bd66af5caf15480a9c015b9ed820f3026`. Both diff logs are empty
+  with SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. Fetch exited 0 and
+  `git rev-list --left-right --count HEAD...origin/main` returned `0 0`. This follow-up only records
+  publication metadata; the task claim itself is the already-pushed commit `4d690d6`.
+- Exact next action: wait for each bounded report; root-replay checksums and byte verifiers before
+  updating any task status. Then claim the two remaining imports if capacity and evidence quality
+  permit.

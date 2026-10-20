@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 02:51 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 02:54 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 02:51 CDT, /root — three NGS2 paths published; next three probes claimed
+## CURRENT CHECKPOINT — 2026-10-20 02:54 CDT, /root — three NGS2 paths published; next three probes dispatched
 
 Six bounded AUD-02 import-to-call paths are root-verified:
 `AUD-02-NGS2-SYSCREATE-01` (`sceNgs2SystemCreateWithAllocator`),
@@ -49,13 +49,15 @@ The current claim checkpoint covers `AUD-02-NGS2-RACKCREATE-ALLOC-01` (symbol in
 `MwmHz8pAdAo`, slot `0x1600ff8`). All three are ACTIVE with zero failed targeted tries and have
 separate private evidence folders. Two imports remain unclaimed: RackDestroy and VoiceGetStateFlags.
 No command contract, audio behavior, ABI, or runtime binding will be inferred from these static
-paths. The claim checkpoint is fully staged and passes the four-path allowlist; worker dispatch
-waits until its publication commit is pushed. Exact audit logs and remote divergence are recorded
-in the linked claim checkpoint.
+paths. The claim checkpoint is committed as `4d690d6` and pushed to `origin/main` from `6673495`.
+The three private dossiers are dispatched to `/root/aud02_rackcreate_allocator`,
+`/root/aud02_rackquery_buffersize`, and `/root/aud02_rack_voicehandle` with `gpt-6-luna` at Extra
+High reasoning. Exact audit logs and remote divergence are recorded in the linked claim checkpoint.
 
-Next exact action: complete and root-replay the three active probes; then claim the remaining two
-unclaimed NGS2 imports if capacity and evidence quality permit. No source implementation is
-authorized by these bounded static probes. G1 remains NOT PASSED.
+Next exact action: wait for each bounded report, root-replay its checksums and byte verifier, and
+integrate only independently confirmed static paths. The two remaining imports are
+`sceNgs2RackDestroy` and `sceNgs2VoiceGetStateFlags`. No source implementation is authorized by
+these bounded static probes. G1 remains NOT PASSED.
 
 The three-callpath root-replay checkpoint was committed as `6673495`
 (`docs: root-verify three NGS2 call paths`) and pushed to `origin/main` from `d552ad5`. Pre-push
