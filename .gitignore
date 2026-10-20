@@ -22,6 +22,8 @@ libSce*.sprx
 libSce*.SPRX
 
 # Private extracted assets, builds, RE dumps, manifests tied to the title.
+# Includes game-derived inventories such as local/manifests/assets/audio-headers.json
+# (AUD-01). Classifier *scripts* under scripts/ are publishable; their JSON output is not.
 /local/
 **/local/
 *.elf
