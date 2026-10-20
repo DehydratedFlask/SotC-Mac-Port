@@ -1,7 +1,20 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:35 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:37 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:37 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 90–93 — COMPLETE
+
+Task: CPU-01e — register peer FIXTURE_VERIFIED `0xd7c4d0` (90), `0xd7c380` (91),
+`0xd7be60` (92), `0xd7bc60` (93) into `startup_ctors`.
+Also CMake-link missing `vec_d7c380` into `sotc_core` (tests were present; library line absent).
+Provenance: 90=`79b9159`/`5adcc89`; 91=`be64c6d`; 92=`4a0705c`/`530987d`; 93=`4a026d6`.
+Skipped 94 `0xd7b930` (not on origin with CMake). Gap 10–19, idx 50, SRV.
+Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
+Checkpoint: ctest OK; check_fd7c4d0/fd7c380/fd7be60/fd7bc60 OK; registry **51**.
+Owned: `startup_ctors.*`, `test_startup_ctors.cpp`, `native/CMakeLists.txt` (+vec_d7c380 library only), `HANDOFF.md`.
+Did NOT edit: peer leaf sources (left local `vec_d7b930` WIP unstaged), SRV/`region_list.*`.
+Store: Project `internal/worker-claim-drive.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:35 CDT, worker bc-81763e53 (CPU-01d) — 0xd7be60 — COMPLETE
 
