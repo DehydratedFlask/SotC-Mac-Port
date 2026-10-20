@@ -1,7 +1,14 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:22 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:24 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:20 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 63 — IN PROGRESS
+
+Task: CPU-01e — register peer FIXTURE_VERIFIED `0xdda990` (idx 63) into `startup_ctors`.
+Skipped gap 10–19, idx 50, SRV `host_map`.
+Failed tries: 0. Status: CLAIMED.
+Owned: `native/core/startup_ctors.*`, `native/tests/test_startup_ctors.cpp`, `HANDOFF.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:18 CDT, worker bc-9aa0fe88 (SRV-01 mem carve) — IN PROGRESS
 
