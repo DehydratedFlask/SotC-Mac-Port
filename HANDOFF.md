@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:45 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:46 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:45 CDT, `/root` — truncated ELF PHDR fixture verified
+## CURRENT CHECKPOINT — 2026-10-20 05:46 CDT, `/root` — truncated ELF PHDR fixture verified
 
 `RE-01-ELF-PHDR-TRUNCATION-FIXTURE-01` is `FIXTURE_VERIFIED`. Worker `/root/re01_phdr_truncation`
 changed only `scripts/test_project_tools.py`; root reviewed the one-test diff and replayed
@@ -23,14 +23,12 @@ Coverage is one malformed direct synthetic ELF only; it does not establish game 
 loader/runtime behavior, or any game gate. G1 NOT PASSED; G2 NOT RUN. Failed tries: 0; no dependency
 or install change. Full record: [completion checkpoint](docs/checkpoints/2026-10-20-root-re01-elf-phdr-truncation-complete.md).
 
-Project index exited 0 at 4,166 folders; `graft check` passed with 1,261 nodes / 530 source files
-(the optional deep meaning layer is unbuilt); `git diff --check` passed. `python3 -I scripts/audit_publish_paths.py` accepted 7 staged paths (log SHA-256
-`e24b27fa1a7ed3a8200ffbf399966fb65d2d790e359cfbbe8398aae56386f57e`); `--all` accepted 644 paths
-(log SHA-256 `156548cff16b1b17dc9a087d263c28f6f1c3997b7a758581ba20381d591dd371`). Precommit fetch
-exited 0, divergence 0/0 at `dd616e7`. Next exact action: commit and push this verified task, then
-choose the next unclaimed bounded task. `/root/fixture_scout_after_phdr` is doing read-only candidate
-discovery. Generated and
-untracked `tools/graft/` remains excluded from publication.
+Project index passed at 4,166 folders; Graft check passed at 1,261 nodes / 530 source files with the
+optional deep meaning layer unbuilt; `git diff --check` passed. Staged and full audits accepted 7 and
+644 paths (SHA-256 `e24b27fa1a7ed3a8200ffbf399966fb65d2d790e359cfbbe8398aae56386f57e` and
+`156548cff16b1b17dc9a087d263c28f6f1c3997b7a758581ba20381d591dd371`). Precommit fetch exited 0, divergence 0/0 at `dd616e7`. Completion commit `6b25210` was pushed to `origin main` (exit 0); post-push fetch confirmed `HEAD` and `origin/main` at `6b25210ea54f175f016ea3dbb9814a301cc4fd23`, divergence 0/0 (log `local/checkpoints/root-2026-10-20-re01-elf-phdr-truncation-complete-post-push-fetch.log`, SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). A subsequent 2-path staged documentation-sync audit passed (log SHA-256 `f4ef65f312cbfa4eb09f6a0af18585d607ca4bb808c311f52a55c4d979fa3bcf`); full audit accepted 644 paths. Documentation sync remains pending. `/root/fixture_scout_after_phdr` returned read-only candidate `RE-02-DYNLINK-RELOC-SIZE-ALIGNMENT-01` for a synthetic malformed relocation-table-size fixture; it has not been verified or claimed.
+
+Next exact action: publish this documentation sync, then verify the relocation-size candidate with Graft and live files before claiming it. Generated/untracked `tools/graft/` remains excluded.
 ## PRIOR CHECKPOINT — 2026-10-20 05:39 CDT, `/root` — dynamic string terminator fixture verified
 
 `RE-02-DYNLINK-STRING-TERMINATOR-01` is `FIXTURE_VERIFIED`. Worker `/root/re02_dynlink_terminator`
