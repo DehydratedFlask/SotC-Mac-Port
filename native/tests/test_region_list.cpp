@@ -34,17 +34,19 @@ int main() {
     CHECK(sizeof(IntrusiveLinks) == 24);
     CHECK(offsetof(IntrusiveLinks, prev) == 8 && offsetof(IntrusiveLinks, next) == 16);
 
-    // Unlink middle of A-B-C (OBS 0x1a974..0x1a98f).
+    // Unlink middle of A-B-C (OBS 0x1a974..0x1a98f) + dec free_count (0x1a993).
     {
         RegionNode a{}, b{}, c{};
         wire_chain(a, b, c);
-        list_unlink(b);
+        std::uint32_t free_count = 3;
+        list_unlink(b, &free_count);
         CHECK(region_links(a)->next == region_links(c));
         CHECK(region_links(c)->prev == region_links(a));
         CHECK(region_links(b)->next == region_links(b));  // self-loop
+        CHECK(free_count == 2);
     }
 
-    // Insert neu before successor (OBS 0x1a913..0x1a92f).
+    // Insert neu before successor (OBS 0x1a913..0x1a92f) + inc free_count (0x1a933).
     {
         RegionNode succ{}, neu{};
         auto* ls = region_links(succ);
@@ -52,14 +54,16 @@ int main() {
         ls->prev = nullptr;
         ls->next = nullptr;
         void* owner = reinterpret_cast<void*>(static_cast<std::uintptr_t>(0xDEAD));
-        list_insert_before(neu, succ, owner);
+        std::uint32_t free_count = 1;
+        list_insert_before(neu, succ, owner, &free_count);
         CHECK(region_links(neu)->identity == &neu);
         CHECK(region_links(neu)->next == region_links(succ));
         CHECK(region_links(succ)->prev == region_links(neu));
         CHECK(region_owner(neu) == owner);
+        CHECK(free_count == 2);
     }
 
-    // Insert into 3-node chain before C → A-B-neu-C.
+    // Insert into 3-node chain before C → A-B-neu-C (nullptr free_count ok).
     {
         RegionNode a{}, b{}, c{}, neu{};
         wire_chain(a, b, c);
@@ -87,6 +91,20 @@ int main() {
         CHECK(region_links(neu)->prev == reinterpret_cast<IntrusiveLinks*>(arena));
         CHECK(region_owner(neu) == arena);
         CHECK(alloc_count == 8);
+    }
+
+    // arena_free_count helper offset (OBS +0x48).
+    {
+        alignas(8) unsigned char buf[0x50]{};
+        arena_free_count(buf) = 9;
+        CHECK(*reinterpret_cast<std::uint32_t*>(buf + 0x48) == 9);
+        std::uint32_t& cell = arena_free_count(buf);
+        RegionNode a{}, b{}, c{};
+        wire_chain(a, b, c);
+        list_unlink(b, &cell);
+        CHECK(cell == 8);
+        list_insert_before(b, c, nullptr, &cell);
+        CHECK(cell == 9);
     }
 
     std::puts("region_list: all checks passed");
