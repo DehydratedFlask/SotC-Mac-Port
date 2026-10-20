@@ -1,12 +1,13 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:35 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:37 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:35 CDT, `/root` — dynamic string terminator fixture claim published
+## CURRENT CHECKPOINT — 2026-10-20 05:37 CDT, `/root` — dynamic string terminator fixture worker dispatched
 
-`RE-02-DYNLINK-STRING-TERMINATOR-01` is claimed by root; `/root/re02_dynlink_terminator` will edit
-only `scripts/test_ps4_dynlink.py` after dispatch. Root owns shared records and Git. Parent
+`RE-02-DYNLINK-STRING-TERMINATOR-01` is claimed by root; worker `/root/re02_dynlink_terminator`
+was dispatched after publication and owns only `scripts/test_ps4_dynlink.py`. Root owns shared
+records and Git. Parent
 `RE-02-DYNLINK-01` is `FIXTURE_VERIFIED` and
 the new test task was not previously registered. The one test will mutate only the synthetic
 fixture's `DT_SCE_STRSZ`, shortening it to omit the final symbol-name NUL, and assert that
@@ -44,8 +45,10 @@ origin` exited 0 with divergence 0/0 at `ddd8585`. Claim commit `f8de17e` (`docs
 string terminator fixture`) was pushed (exit 0); post-push fetch confirmed `HEAD` and `origin/main`
 at `f8de17e` with 0/0 divergence (empty log
 `local/checkpoints/root-2026-10-20-re02-dynlink-string-terminator-claim-post-push-fetch.log`, SHA-256
-`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). Next exact action:
-dispatch the test-only worker.
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). Documentation sync
+`3c614bb` was pushed and its post-push fetch confirmed `HEAD`/`origin/main` at `3c614bb`, 0/0
+divergence. Next exact action: review the worker's single-file diff and replay the targeted suite,
+then update evidence and the completion checkpoint.
 
 ## PRIOR CHECKPOINT — 2026-10-20 05:32 CDT, `/root` — short-prefix audio classifier fixture published
 
