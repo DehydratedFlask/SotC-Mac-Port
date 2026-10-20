@@ -1,7 +1,12 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 22:17 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 22:16 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 22:16 CDT, worker bc-effcf5dc (CPU-01d) — 0xce7300 — COMPLETE
+
+Task: CPU-01d — lift **0xce7300** (ctor-survey.json index **91**). FIXTURE_VERIFIED.
+Owned: vec_ce7300 + check + CMake (+only) + HANDOFF. No startup_ctors. Push: (this commit).
 
 ## ACTIVE CLAIM — 2026-10-19 22:17 CDT, worker bc-81763e53 (CPU-01d) — 0xce74a0 — COMPLETE
 
