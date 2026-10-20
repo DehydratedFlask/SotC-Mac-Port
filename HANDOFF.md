@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:11 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:15 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:11 CDT, /root — launcher import-error fix pushed; page-map analysis active
+## CURRENT CHECKPOINT — 2026-10-20 00:15 CDT, /root — page-map dossier root-verified; launcher import fix pushed
 
 Task APP-01-IMPORTER-ERROR-01: `launcher/Sources/SoCLauncher/ContentView.swift` now presents the
 localized error in a system alert for import failures and leaves the prior folder/readiness intact;
@@ -15,15 +15,43 @@ the user selected a system alert and silent cancellation. Exact build command
 `f472a514645881d189e4397a4d8704a60dd2c78505d4e61205ba93d1855695f1`. Graft refresh/build/check
 passed and `folderImportError` is queryable. These establish compilation and static wiring only;
 native alert interaction, cancellation, real failure text, and sandbox access were not exercised.
-The published change set in `5c2e093` contains `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`,
-`docs/checkpoints/2026-10-20-root-app01-import-error-claim.md`, and the launcher source above.
-Publication gate passed: `python3 -I scripts/audit_publish_paths.py` accepted all 5 staged paths;
-`python3 -I scripts/audit_publish_paths.py --all` accepted 581 repository paths. `git fetch origin main`
-succeeded, pre-push divergence was `0 0`, commit `5c2e093` was pushed to `origin main`, and
-post-push `git status --short --branch` showed a clean `main...origin/main`. Status:
-STATIC_ANALYSIS_VERIFIED, failed tries 0; APP-01 active, G4 and G1 NOT PASSED. Next exact action:
-integrate the read-only SRV-01-PAGE-MAP-19660-01 worker's dossier if it passes root review; it
-remains CLAIMED and has no shared-doc edits yet.
+The source and task evidence were published in `5c2e093`; a follow-up publication checkpoint is
+`f48e512`. For `5c2e093`, the staged audit accepted 5 paths and full audit accepted 581; fetch and
+pre-commit divergence check passed at `0 0`, push advanced `4387463..5c2e093`, and post-push status
+was clean. The follow-up doc commit also passed audits (2 staged / 581 full) and pushed
+`5c2e093..f48e512`; status was clean at that checkpoint. APP task status is
+STATIC_ANALYSIS_VERIFIED, failed tries 0; native alert interaction NOT RUN; APP-01 active, G4 and
+G1 NOT PASSED.
+
+### SRV-01-PAGE-MAP-19660-01 — pinned function `0x19660` — STATIC ANALYSIS VERIFIED
+
+Worker `/root/srv01_page_map_19660` completed read-only REA 6.7.0 / Ghidra 12.1.4 analysis; root
+independently verified the private dossier with
+`PYTHONDONTWRITEBYTECODE=1 python3 -I local/re/evidence/rea-19660/root-verify.py` (exit 0; result
+`local/re/evidence/rea-19660/root-verification.json`, SHA-256
+`edd138e0caf9786ad77c104923bbd908b37c21eede685fc08f59081249726c4d`; verifier SHA-256
+`08215b3dd940154d38f699069e1329c723bbe9506a11d5ea1e9916e74d3c33f3`). It validates the pinned
+ELF and unchanged baseline hash, maps the range through PT_LOAD to file offset `0x1d660`, confirms
+the 357 raw function bytes/hash and Ghidra JSON range/call sites, and confirms independent disassembly
+ends at `retq` `0x197c4`. The private REA summary and full exact command are in
+[the task checkpoint](docs/checkpoints/2026-10-20-root-srv01-page-map-claim.md); report SHA-256
+`943cdd6b3067192140b4570c37d97962ec1690fce732981173d50264fc1855bc`; Evidence ID
+`ev_be5ca8d1f70434e1b56f9300aba0db39aa895878e4e311c026ed8d9d99a53359`.
+
+Static observation: `FUN_00019660` spans `0x19660..0x197c4`; six resolved incoming call sites
+across four callers and one direct call `0x196f8 -> 0x19e00`. Byte patterns include pointer/list-like
+writes, a counter branch and record initialization with `0x70` stride. No source-level allocator or
+page-bitmap role is assigned; no bitmap-bit update appears in this function. REA's `complete` coverage
+is limited to resolved Ghidra references; indirect/computed flow remains unknown. No runtime,
+reachability, service contract, native implementation or G1 proof. Tool discovery/retained-log
+issues (REA/readelf missing from PATH, absent LLVM read tools, and an ephemeral Ghidra log deleted
+after exit) are documented separately; failed analysis hypotheses/tries: 0. `python3 scripts/project_index.py`
+exited 0 (4,129 folders indexed); `graft check` exited 0 (wiring graph synchronized; deep meaning
+tier remains unbuilt). Status:
+STATIC_ANALYSIS_VERIFIED. Files root changed: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, and
+the existing task checkpoint; `local/re/evidence/rea-19660/` is private. No install or download;
+INSTALL_LOG unchanged. Next exact action: choose a new bounded SRV/CPU task only from source/data
+evidence; page-map and Fios semantics remain open and SRV-01 stays ACTIVE.
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -40,8 +68,8 @@ A read-only AUD-01 survey verified exact identities and bytes for paired test_ad
 APP-01 static UI/accessibility review is recorded, and folder-import failure feedback now builds.
 Runtime constructor
 behavior, helper contracts, audio format/use, game startup, and G1 remain unproven. Recent commits:
-`19cd2a2` (STS completion), `bda7289` (UI review claim), and `545f08f` (STS claim); prior evidence
-commits include `b26768a`, `fc1b278`, and `e40a2a4`.
+`f48e512` (publication checkpoint), `5c2e093` (launcher importer feedback), and `19cd2a2` (STS
+completion); prior evidence commits include `bda7289`, `545f08f`, `b26768a`, `fc1b278`, and `e40a2a4`.
 
 ### AUD-01-STS-IDENTITY-01 — paired cachedFiles test_adpcm identity survey — FIXTURE VERIFIED; parent active
 
