@@ -42,6 +42,22 @@
 #include "vec_d7bc60.hpp"
 #include "vec_d7b930.hpp"
 #include "vec_d6e0f0.hpp"
+#include "vec_d6dbf0.hpp"
+#include "vec_d6d890.hpp"
+#include "vec_d6d280.hpp"
+#include "vec_d6a520.hpp"
+#include "vec_d62b00.hpp"
+#include "vec_d62690.hpp"
+#include "vec_d623c0.hpp"
+#include "vec_d5fbe0.hpp"
+#include "vec_d47880.hpp"
+#include "vec_d47420.hpp"
+#include "vec_d47270.hpp"
+#include "vec_d42b60.hpp"
+#include "vec_d40ea0.hpp"
+#include "vec_d405a0.hpp"
+#include "vec_d40010.hpp"
+#include "vec_d3b790.hpp"
 #include "vec_d7c380.hpp"
 #include "vec_d7c4d0.hpp"
 #include "vec_d7c9d0.hpp"
@@ -113,6 +129,22 @@ struct StartupState {
     VecD7bc60 vec_d7bc60{};   // idx 93
     VecD7b930 vec_d7b930{};   // idx 94
     VecD6e0f0 vec_d6e0f0{};   // idx 96
+    VecD6dbf0 vec_d6dbf0{};   // 0xd6dbf0 idx 97
+    VecD6d890 vec_d6d890{};   // 0xd6d890 idx 98
+    VecD6d280 vec_d6d280{};   // 0xd6d280 idx 99
+    VecD6a520 vec_d6a520{};   // 0xd6a520 idx 100
+    VecD62b00 vec_d62b00{};   // 0xd62b00 idx 101
+    VecD62690 vec_d62690{};   // 0xd62690 idx 102
+    VecD623c0 vec_d623c0{};   // 0xd623c0 idx 103
+    VecD5fbe0 vec_d5fbe0{};   // 0xd5fbe0 idx 104
+    VecD47880 vec_d47880{};   // 0xd47880 idx 106
+    VecD47420 vec_d47420{};   // 0xd47420 idx 107
+    VecD47270 vec_d47270{};   // 0xd47270 idx 108
+    VecD42b60 vec_d42b60{};   // 0xd42b60 idx 109
+    VecD40ea0 vec_d40ea0{};   // 0xd40ea0 idx 110
+    VecD405a0 vec_d405a0{};   // 0xd405a0 idx 111
+    VecD40010 vec_d40010{};   // 0xd40010 idx 112
+    VecD3b790 vec_d3b790{};   // 0xd3b790 idx 113
     VecB743c0 vec_b743c0{};   // idx 282
     VecB52110 vec_b52110{};   // idx 290
     std::array<std::byte, kScratchBytes> scratch{};
