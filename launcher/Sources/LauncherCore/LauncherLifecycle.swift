@@ -1,3 +1,5 @@
+import Foundation
+
 /// Outcome of a native child process ending.
 public enum LauncherProcessOutcome: Equatable, Sendable {
     case requestedStop
@@ -30,5 +32,20 @@ public enum LauncherLifecycle {
         case .unexpectedExit(let status):
             .failed("Game core exited unexpectedly (status \(status))")
         }
+    }
+}
+
+/// Converts folder-import errors into alert text while keeping user cancellation silent.
+public enum FolderImportErrorClassifier {
+    public static func alertMessage(for error: any Error) -> String? {
+        guard !isCancellation(error) else { return nil }
+        return error.localizedDescription
+    }
+
+    private static func isCancellation(_ error: any Error) -> Bool {
+        if error is CancellationError { return true }
+
+        let cocoaError = error as NSError
+        return cocoaError.domain == NSCocoaErrorDomain && cocoaError.code == NSUserCancelledError
     }
 }

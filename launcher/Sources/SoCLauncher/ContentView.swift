@@ -52,7 +52,7 @@ struct ContentView: View {
                 model.assetsDirectory = url
                 Task { await model.validate() }
             case .failure(let error):
-                folderImportError = error.localizedDescription
+                folderImportError = FolderImportErrorClassifier.alertMessage(for: error)
             }
         }
         .alert("Couldn’t Open Folder", isPresented: Binding(
