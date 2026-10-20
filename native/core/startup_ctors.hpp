@@ -82,6 +82,8 @@
 #include "vec_cfcc60.hpp"
 #include "vec_cfcbc0.hpp"
 #include "vec_cf44a0.hpp"
+#include "vec_cee8a0.hpp"
+#include "vec_ceb890.hpp"
 #include "vec_d7c380.hpp"
 #include "vec_d7c4d0.hpp"
 #include "vec_d7c9d0.hpp"
@@ -193,6 +195,8 @@ struct StartupState {
     VecCfcc60 vec_cfcc60{};   // 0xcfcc60 idx 138
     VecCfcbc0 vec_cfcbc0{};   // 0xcfcbc0 idx 139
     VecCf44a0 vec_cf44a0{};   // 0xcf44a0 idx 140
+    VecCee8a0 vec_cee8a0{};   // 0xcee8a0 idx 141
+    VecCeb890 vec_ceb890{};   // 0xceb890 idx 142
     VecB743c0 vec_b743c0{};   // idx 282
     VecB52110 vec_b52110{};   // idx 290
     std::array<std::byte, kScratchBytes> scratch{};

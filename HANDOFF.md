@@ -1,7 +1,19 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 22:15 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 22:16 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 22:16 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry +0xcee8a0/+0xceb890 — COMPLETE
+
+Task: CPU-01e — register (ctor-survey.json; skip 95):
+| idx | RVA | provenance |
+|---|---|---|
+| 141 | 0xcee8a0 | ef90adf (survey 141; B contested 137 ignored) |
+| 142 | 0xceb890 | 94794b4 |
+Base 4c866df (94) → **96** slots.
+Owned: startup_ctors.*, test_startup_ctors.cpp, HANDOFF.md. CMake tip as-is.
+Store: Project internal/worker-claim-drive.md + internal/drive-wip/.
+Push: (this commit).
 
 ## ACTIVE CLAIM — 2026-10-19 22:15 CDT, worker bc-81763e53 (CPU-01d) — 0xceb1c0 — COMPLETE
 
