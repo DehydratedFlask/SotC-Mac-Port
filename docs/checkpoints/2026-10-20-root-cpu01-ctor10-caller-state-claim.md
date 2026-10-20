@@ -40,3 +40,14 @@ Claim commit includes `HANDOFF.md`, `docs/TASKS.md`, generated `docs/FOLDERS.md`
 Exact next action: publish the claim, then dispatch the bounded static analysis to a GPT-6 Luna
 subagent at Extra High reasoning; root reviews the private report and independently reruns its verifier.
 Failed hypotheses/tries: 0.
+
+## Dispatch checkpoint
+
+- Date/time: 2026-10-20 00:51 CDT (America/Chicago); integrator `/root`.
+- Task ID: `CPU-01-CTOR10-CALLER-STATE-01`; analyst `/root/ctor10_caller_state` (`gpt-6-luna`, Extra High).
+- Claim publication: `python3 scripts/project_index.py` exit 0 (4,133 folders; checkpoint directory count 34); `graft check` exit 0 (wiring graph synchronized; optional deep layer 0%, 1,219 nodes pending); `git diff --check` and staged check passed. Staged audit accepted 4 paths; full audit accepted 589; fetch succeeded and pre-commit divergence was `0 0`. Commit `d9d4d70` (`docs: claim slot-10 caller state analysis`) pushed (`411a45b..d9d4d70`). Post-push tree clean, `HEAD` and `origin/main` both `d9d4d701ff3bb0c9804aba968e5bba6d9b2fb7fe`, divergence `0 0`.
+- Dispatch: after the claim was pushed, root sent the bounded request to `/root/ctor10_caller_state`, explicitly permitting only private analysis files under `local/re/`; no shared-doc/source/reference changes allowed.
+- Result: dispatch accepted; analysis is in progress. No field value, branch result, or runtime behavior is inferred from dispatch.
+- Remaining risks: caller stack values can be affected by earlier calls; any unverified side effect must stay unknown. Constructor reachability and G1 remain unproven.
+- Exact next action: inspect the private static report and verifier when returned; independently rerun the checker, then integrate shared evidence and publication.
+- Failed analysis hypotheses/tries: 0.

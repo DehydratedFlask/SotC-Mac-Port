@@ -1,9 +1,28 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:50 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:51 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:50 CDT, /root — slot-10 caller-state analysis claimed
+## CURRENT CHECKPOINT — 2026-10-20 00:51 CDT, /root — slot-10 caller-state analysis dispatched
+
+Claim publication: `python3 scripts/project_index.py` exited 0 (4,133 folders; `docs/checkpoints`
+count 34); `graft check` exited 0 (wiring graph synchronized; optional meaning layer 0%, 1,219
+nodes pending); `git diff --check` passed. Staged audit accepted 4 paths, full audit 589; fetch
+succeeded and pre-commit divergence was `0 0`. Commit `d9d4d70` (`docs: claim slot-10 caller state
+analysis`) pushed (`411a45b..d9d4d70`). Post-push status clean, `HEAD` and `origin/main` both
+`d9d4d701ff3bb0c9804aba968e5bba6d9b2fb7fe`, divergence `0 0`.
+
+After publication, `/root/ctor10_caller_state` (`gpt-6-luna`, Extra High) was dispatched for
+`CPU-01-CTOR10-CALLER-STATE-01`. Scope is limited to the four caller stack fields read by the
+`0xe1ede0` gates. The analyst must preserve unknown helper effects as unknown and may only write
+private artifacts under `local/re/`. No analysis result is inferred from dispatch. Claim and exact
+scope are in [the checkpoint](docs/checkpoints/2026-10-20-root-cpu01-ctor10-caller-state-claim.md).
+Failed analysis hypotheses/tries: 0.
+
+Exact next action: review the private report/verifier when returned, independently rerun its byte
+checks, then update EVIDENCE/TASKS/HANDOFF and publish root integration.
+
+## PREVIOUS CHECKPOINT — 2026-10-20 00:50 CDT, /root — slot-10 caller-state analysis claimed
 
 Follow-up publication commit `411a45b` (`docs: record PHDR10 and helper publication`) pushed after
 `0e16b9a`; verified post-push tree clean, `HEAD` equals `origin/main` at
