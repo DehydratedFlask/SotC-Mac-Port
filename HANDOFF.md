@@ -24,12 +24,14 @@ Private dump (not published): `local/re/work/cddef00.bin`.
 Did NOT edit: `startup_ctors.*`, Drive, SRV `host_map`, peer `0xdfd5f0`/`0xde7fb0`.
 Store: Project `internal/worker-claim-ddef00.md`.
 
-## ACTIVE CLAIM — 2026-10-19 20:12 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 54/57/58 — IN PROGRESS
+## ACTIVE CLAIM — 2026-10-19 20:12 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 54/57/58 — COMPLETE
 
 Task: CPU-01e — register peer FIXTURE_VERIFIED vec-copy ctors into `startup_ctors`:
 **54** `0xdfd5f0`, **57** `0xde6d20`, **58** `0xde1ad0`. Skip `0xde7fb0` (not on origin yet),
 idx 50 / gap 10–19. CMake already links these on origin/main — Drive owns registry only.
-Failed tries: 0. Status: CLAIMED.
+Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
+Checkpoint: ctest 29/29; check_fdfd5f0/fde6d20/fde1ad0 OK; registry size 22 (+54/57/58; de7fb0 skipped if absent on origin).
+Includes **0xdfd5f0** idx 54 (sources 8921252, CMake 56aca61).
 Owned: `native/core/startup_ctors.*`, `native/tests/test_startup_ctors.cpp`, `HANDOFF.md`.
 Did NOT edit: peer vec sources, SRV `host_map`, CMake (no new lines needed).
 Store: Project `internal/worker-claim-drive.md`.
