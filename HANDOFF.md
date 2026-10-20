@@ -1,6 +1,6 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:28 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:43 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
 ## ACTIVE CLAIM — 2026-10-19 20:28 CDT, worker bc-81763e53 (CPU-01d) — 0xd7fe90 — COMPLETE
@@ -61,6 +61,7 @@ Owned: `native/core/vec_d84ee0.{hpp,cpp}`, `native/tests/test_vec_d84ee0.cpp`,
 Private dump (not published): `local/re/work/cd84ee0.bin`.
 Did NOT edit: `startup_ctors.*`, SRV, peer `0xdac410`/`0xd85490`/`0xd853a0`.
 Store: Project `internal/worker-claim-d84ee0.md`.
+- Push: `4e802b7` on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 20:58 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 78/79/83 — COMPLETE
 
