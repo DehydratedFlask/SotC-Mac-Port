@@ -9,6 +9,16 @@ public enum LauncherProcessOutcome: Equatable, Sendable {
 
 /// Pure launcher state transitions that can be verified without launching a child process.
 public enum LauncherLifecycle {
+    public static func classifyTermination(
+        stopWasRequested: Bool,
+        reason: Process.TerminationReason,
+        status: Int32
+    ) -> LauncherProcessOutcome {
+        if stopWasRequested { return .requestedStop }
+        if reason == .exit && status == 0 { return .cleanExit }
+        return .unexpectedExit(status: status)
+    }
+
     public static func canStart(
         readinessAllowsStart: Bool,
         from state: LauncherState

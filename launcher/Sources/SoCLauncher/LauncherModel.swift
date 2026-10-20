@@ -69,16 +69,12 @@ final class LauncherModel {
     }
 
     private func processEnded(status: Int32, reason: Process.TerminationReason) {
-        let wasStopping = state == .stopping
+        let outcome = LauncherLifecycle.classifyTermination(
+            stopWasRequested: state == .stopping,
+            reason: reason,
+            status: status
+        )
         process = nil
-        let outcome: LauncherProcessOutcome
-        if wasStopping {
-            outcome = .requestedStop
-        } else if reason == .exit && status == 0 {
-            outcome = .cleanExit
-        } else {
-            outcome = .unexpectedExit(status: status)
-        }
         state = LauncherLifecycle.state(
             after: outcome,
             readinessAllowsStart: report?.canStart == true

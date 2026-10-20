@@ -3,6 +3,46 @@ import Testing
 @testable import LauncherCore
 
 struct LauncherLifecycleTests {
+    @Test func requestedStopTakesPrecedenceOverTerminationReasonAndStatus() {
+        let outcome = LauncherLifecycle.classifyTermination(
+            stopWasRequested: true,
+            reason: .uncaughtSignal,
+            status: 9
+        )
+
+        #expect(outcome == .requestedStop)
+    }
+
+    @Test func normalZeroExitIsClean() {
+        #expect(
+            LauncherLifecycle.classifyTermination(
+                stopWasRequested: false,
+                reason: .exit,
+                status: 0
+            ) == .cleanExit
+        )
+    }
+
+    @Test func nonzeroExitIsUnexpected() {
+        #expect(
+            LauncherLifecycle.classifyTermination(
+                stopWasRequested: false,
+                reason: .exit,
+                status: 17
+            ) == .unexpectedExit(status: 17)
+        )
+    }
+
+    @Test func signalTerminationIsUnexpected() {
+        #expect(
+            LauncherLifecycle.classifyTermination(
+                stopWasRequested: false,
+                reason: .uncaughtSignal,
+                status: 9
+            ) == .unexpectedExit(status: 9)
+        )
+    }
+
     @Test func cleanExitRestoresReadyStateWhenReadinessStillAllowsStart() {
         let state = LauncherLifecycle.state(after: .cleanExit, readinessAllowsStart: true)
         #expect(state == .ready)
