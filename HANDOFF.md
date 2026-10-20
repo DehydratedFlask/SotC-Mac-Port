@@ -1,7 +1,23 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 22:00 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 22:01 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 22:01 CDT, worker bc-effcf5dc (CPU-01d) — 0xd2ffe0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd2ffe0** (survey index 116).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d2ffe0.{hpp,cpp}`, `native/tests/test_vec_d2ffe0.cpp`,
+`tools/lift/check_fd2ffe0.py`, `native/CMakeLists.txt` (+vec_d2ffe0 only; origin/main base).
+Private dump (not published): `local/re/work/cd2ffe0.bin`.
+Prior: 99 `e568b51`, 101 `cac53b7`. Skipped 95; 113–115 busy (D/peer/B).
+Did NOT edit Drive / SRV / `startup_ctors.*` / peer WIP / `local/`. No `git reset --hard`.
+Checkpoint (2026-10-19 22:01 CDT, bc-effcf5dc):
+- OBS: unguarded vmovups copy; src=0x13009a0 dst=0x3351ec0 bits=~0,~0,~0,0; index 116.
+- Commands: ctest -R '^vec_d2ffe0$' Passed; `python3 -I tools/lift/check_fd2ffe0.py` OK.
+- Logs: `/tmp/ctest_d2ffe0.log`, `/tmp/check_fd2ffe0.log`.
+- Store: Project `internal/worker-claim-d2ffe0.md`.
+- Push: (this commit).
 
 ## ACTIVE CLAIM — 2026-10-19 22:00 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry +0xd32b70 — COMPLETE
 
