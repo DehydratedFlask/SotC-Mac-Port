@@ -10,7 +10,7 @@ Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
 Owned: `native/core/vec_db3960.{hpp,cpp}`, `native/tests/test_vec_db3960.cpp`,
 `tools/lift/check_fdb3960.py`, `native/CMakeLists.txt` (+vec_db3960 only; origin/main base).
 Private dump (not published): `local/re/work/cdb3960.bin`.
-Did NOT edit: `startup_ctors.*`, Drive, SRV, peer `0xdb7e60`/`0xdb5dd0`/`0xdb93a0`/`0xdb3a70`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV, peer `0xdb7e60`/`0xdb5dd0`/`0xdac410`.
 Checkpoint (2026-10-19 20:22 CDT, bc-81763e53):
 - OBS: unguarded vmovups copy; src=0x130d050 dst=0x3352c40 bits=~0,~0,~0,0; index 76; distinct cells.
 - Commands: ctest -R '^vec_db3960$' Passed; `python3 -I tools/lift/check_fdb3960.py` OK.
