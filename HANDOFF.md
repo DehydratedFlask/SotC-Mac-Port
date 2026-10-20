@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:38 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:41 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:38 CDT, /root — RE-02 missing program header 10 claimed
+## CURRENT CHECKPOINT — 2026-10-20 00:41 CDT, /root — PHDR10 verifier dispatched; CPU helper dossier under root review
 
 Task `RE-02-MISSING-PHDR10-01` is claimed as a read-only, hash-bound examination of the one
 unclassified SELF/ELF program header. The pinned reader is
@@ -15,9 +15,13 @@ unavailable headers for four listed types; index 10 is not in that list, which e
 behavior only, not the ELF type's platform meaning. Claim:
 [RE-02-MISSING-PHDR10-01](docs/checkpoints/2026-10-20-root-re02-missing-phdr10-claim.md).
 `python3 scripts/project_index.py` exited 0 with 4,132 folders indexed; `git diff --check` passed.
-Exact next action: audit and publish this bounded claim, then dispatch the read-only verifier to
-`/root/phdr10` while `/root/srv01_page_map_19660` finishes the independent slot-10 helper analysis.
-Preserve the source ELF, original SELF, and pinned reference clone.
+Claim commit `de3fa65` pushed after staged audit accepted 4 paths/full audit 586 paths; pre-commit
+divergence `0 0`; post-push tree clean and `HEAD`/`origin/main` aligned. `/root/phdr10` was dispatched
+to build a private hash-bound verifier/report; no shared-doc edits permitted. In parallel,
+`/root/srv01_page_map_19660` completed its REA/Ghidra query for `0xe1ede0` (exit 0, empty stderr)
+and is extracting function/reference details and independently verifying bytes. Exact next action:
+review each private result, independently verify the byte-backed findings, then update shared
+evidence/checkpoints. Original inputs/reference remain read-only.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 00:36 CDT, /root — G0 environment baseline artifact verified
 

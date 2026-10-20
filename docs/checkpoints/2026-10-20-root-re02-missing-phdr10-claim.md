@@ -35,6 +35,10 @@ memory size 0, alignment 16, and `missing_segments: [10]`. The pinned reference 
 - Files: `HANDOFF.md`, `docs/TASKS.md`, generated `docs/FOLDERS.md`, and this checkpoint.
 - `python3 scripts/project_index.py` exited 0 with `4132 folders indexed; written`;
   `git diff --check` passed.
-- Exact next action: audit the allowlisted claim bundle, fetch/check divergence, commit/push, then
-  delegate the private static verifier.
+- Claim publication: staged audit accepted 4 paths and full audit 586; staged whitespace check
+  passed; fetch succeeded; pre-commit divergence `0 0`. Commit `de3fa65` pushed successfully from
+  `755c8d0`. Post-push tree clean, local/remote aligned at `de3fa65`, divergence `0 0`.
+- Dispatch: `/root/phdr10` received the private verifier task after claim publication. Exact next
+  action: independently review its report and verifier; update EVIDENCE/TASKS/HANDOFF only after
+  root verifies the byte checks.
 - Status: CLAIMED; 0 failed analysis hypotheses/tries.
