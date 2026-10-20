@@ -58,6 +58,7 @@ add_library(sotc_core STATIC
   core/vec_d90310.cpp
   core/vec_d94cb0.cpp
   core/vec_d853a0.cpp
+  core/vec_d80e60.cpp
   core/vec_dac410.cpp)
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()
@@ -215,6 +216,9 @@ add_test(NAME vec_d853a0 COMMAND test_vec_d853a0)
 add_executable(test_region_list tests/test_region_list.cpp)
 target_link_libraries(test_region_list sotc_core)
 add_test(NAME region_list COMMAND test_region_list)
+add_executable(test_vec_d80e60 tests/test_vec_d80e60.cpp)
+target_link_libraries(test_vec_d80e60 sotc_core)
+add_test(NAME vec_d80e60 COMMAND test_vec_d80e60)
 add_executable(test_vec_dac410 tests/test_vec_dac410.cpp)
 target_link_libraries(test_vec_dac410 sotc_core)
 add_test(NAME vec_dac410 COMMAND test_vec_dac410)
