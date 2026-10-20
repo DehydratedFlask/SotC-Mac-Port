@@ -1,7 +1,33 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:13 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:12 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:12 CDT, worker bc-effcf5dc (CPU-01d) — 0xde7fb0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xde7fb0** (survey index 56).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_de7fb0.{hpp,cpp}`, `native/tests/test_vec_de7fb0.cpp`,
+`tools/lift/check_fde7fb0.py`, `native/CMakeLists.txt` (+vec_de7fb0 only; origin/main base).
+Private dump (not published): `local/re/work/cde7fb0.bin`.
+Did NOT edit: `startup_ctors.*`, peer lifts, Drive, SRV host_map.
+Skipped push of `0xe0b180` — already on origin/main as `aa53115`.
+Checkpoint (2026-10-19 20:12 CDT, bc-effcf5dc):
+- OBS: unguarded vmovups copy; src=0x1310c90 dst=0x3353320 bits=~0,~0,~0,0; index 56; distinct cells.
+- Commands: ctest -R '^vec_de7fb0$' Passed; `python3 -I tools/lift/check_fde7fb0.py` OK.
+- Logs: `/tmp/ctest_de7fb0.log`, `/tmp/check_de7fb0.log`.
+- Store: Project `internal/worker-claim-de7fb0.md`.
+- Push: (pending this commit).
+
+## ACTIVE CLAIM — 2026-10-19 20:15 CDT, worker bc-73721c8d (CPU-01d) — 0xdddc90 — IN PROGRESS
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdddc90** (survey index 61).
+Failed tries: 0. Status: CLAIMED / lifting.
+Owned: `native/core/vec_dddc90.{hpp,cpp}`, `native/tests/test_vec_dddc90.cpp`,
+`tools/lift/check_fdddc90.py`, `native/CMakeLists.txt` (+vec_dddc90 only; origin/main base).
+Private dump (not published): `local/re/work/cdddc90.bin`.
+Did NOT edit: `startup_ctors.*`, SRV `host_map`, peer `0xddef00`/`0xde7fb0`/`0xde1ad0`.
+Store: Project `internal/worker-claim-dddc90.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:12 CDT, worker bc-9aa0fe88 (SRV-01 mem) — COMPLETE
 
@@ -44,21 +70,6 @@ Includes **0xdfd5f0** idx 54 (sources 8921252, CMake 56aca61).
 Owned: `native/core/startup_ctors.*`, `native/tests/test_startup_ctors.cpp`, `HANDOFF.md`.
 Did NOT edit: peer vec sources, SRV `host_map`, CMake (no new lines needed).
 Store: Project `internal/worker-claim-drive.md`.
-
-## ACTIVE CLAIM — 2026-10-19 20:09 CDT, worker bc-effcf5dc (CPU-01d) — 0xde7fb0 — COMPLETE
-
-Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xde7fb0** (survey index 56).
-Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
-Owned: `native/core/vec_de7fb0.{hpp,cpp}`, `native/tests/test_vec_de7fb0.cpp`,
-`tools/lift/check_fde7fb0.py`, `native/CMakeLists.txt` (+vec_de7fb0 only; origin/main base).
-Private dump (not published): `local/re/work/cde7fb0.bin`.
-Did NOT edit: `startup_ctors.*`, peer `0xdfd5f0`/`0xde6d20`, Drive, SRV host_map.
-Skipped push of `0xe0b180` — already on origin/main as `aa53115`.
-Checkpoint (2026-10-19 20:09 CDT, bc-effcf5dc):
-- OBS: unguarded vmovups copy; src=0x1310c90 dst=0x3353320 bits=~0,~0,~0,0; index 56; distinct cells.
-- Commands: ctest -R '^vec_de7fb0$' Passed; `python3 -I tools/lift/check_fde7fb0.py` OK.
-- Logs: `/tmp/ctest_de7fb0.log`, `/tmp/check_de7fb0.log`.
-- Store: Project `internal/worker-claim-de7fb0.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:11 CDT, worker bc-02397584 (CPU-01d) — 0xde1ad0 — COMPLETE
 
