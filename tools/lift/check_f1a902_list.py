@@ -2,8 +2,10 @@
 """Prove OBS intrusive list surgery after split (private ELF).
 
   * 0x1a913..0x1a92f: insert neu before successor (non-empty path)
+  * 0x1a933 / 0x1a95d: inc dword [arena+0x48] free-count on free-list insert
   * 0x1a961: owner = sentinel
   * 0x1a974..0x1a98f: unlink (prev.next=next, next.prev=prev, self-loop next)
+  * 0x1a993: dec dword [arena+0x48] free-count on free-list unlink
   * 0x1a997..0x1a9b7: insert at arena head (+0x10), owner=arena, inc [arena+0x20]
 """
 import re
@@ -75,4 +77,4 @@ match(0x1a997,
       '4d 89 7e 38')            # mov [r14+0x38], r15
 
 print('OK: 0x1a902 list surgery — insert_before, owner@+0x38, unlink self-loop, '
-      'head insert via [arena+0x10], inc [arena+0x20]')
+      'head insert via [arena+0x10], inc [arena+0x20], free-count ±[arena+0x48]')
