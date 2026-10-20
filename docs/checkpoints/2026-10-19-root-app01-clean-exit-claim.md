@@ -41,9 +41,9 @@ Planned implementation paths:
 - `launcher/Tests/LauncherCoreTests/LauncherLifecycleTests.swift`
 - `launcher/Sources/SoCLauncher/LauncherModel.swift`
 
-The earlier optional preference question about using a testable helper had no reply. Proceeding
-with the recommended LauncherCore helper is a bounded assumption. No process ownership, core ABI,
-bundle or GUI redesign is included.
+At claim creation the optional preference question about a testable helper had no reply. The user
+confirmed “Testable LauncherCore helper (Recommended)” at 2026-10-19 23:05 CDT, so the chosen
+approach is now explicit. No process ownership, core ABI, bundle or GUI redesign is included.
 
 ## Verification and limits
 
@@ -51,8 +51,9 @@ bundle or GUI redesign is included.
 - At claim creation no implementation attempt had run; the current failed try 1 is recorded below.
 - This test can validate transition mapping only. It cannot prove GUI child-process lifecycle, G4
   acceptance, an available native game core, or G1. G1 remains NOT PASSED; G2-G6 remain NOT RUN.
-- Next exact action: implement the helper and model call site, run the focused Swift package suite,
-  inspect the diff, then update TASKS/EVIDENCE/HANDOFF and publish only audited allowlisted paths.
+- Next exact action at claim creation: implement the helper and model call site, run the focused
+  Swift package suite, inspect the diff, then update TASKS/EVIDENCE/HANDOFF and publish only
+  audited allowlisted paths.
 
 ## Implementation checkpoint — failed try 1
 
@@ -69,3 +70,37 @@ bundle or GUI redesign is included.
   returns. This is failed implementation try 1; no escalation threshold reached.
 - Next exact action: add explicit return behavior to `canStart`, then rerun
   `swift test --package-path launcher --scratch-path local/build/launcher` and preserve the log.
+
+## User-confirmation checkpoint — 2026-10-19 23:06 CDT
+
+- Agent: `/root`; task APP-01; implementation attempt count remains 1.
+- Files changed: `HANDOFF.md`, `docs/TASKS.md`, this checkpoint. No source edits or test runs in
+  this documentation checkpoint.
+- Exact evidence: user reply to the pending design question was “Testable LauncherCore helper
+  (Recommended)”. Result: the previously assumed approach is confirmed.
+- Observation: this settles the design preference only. It does not establish lifecycle test or G4
+  acceptance results.
+- Remaining risk: `LauncherLifecycle.canStart` still has the recorded missing-return compile error;
+  no tests ran on that source version.
+- Next exact action: add explicit return behavior to `canStart`, then rerun
+  `swift test --package-path launcher --scratch-path local/build/launcher` and preserve the log.
+- Status: ACTIVE; first implementation try failed to compile; no escalation threshold reached.
+
+## Implementation checkpoint — correction passed
+
+- Date/time: 2026-10-19 23:07 CDT; agent `/root`; task APP-01; failed try 1 corrected.
+- Files changed: `launcher/Sources/LauncherCore/LauncherLifecycle.swift`,
+  `launcher/Sources/SoCLauncher/LauncherModel.swift`,
+  `launcher/Tests/LauncherCoreTests/LauncherLifecycleTests.swift`; generated `docs/FOLDERS.md`;
+  updated `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, and this checkpoint.
+- Exact command: `swift test --package-path launcher --scratch-path local/build/launcher`;
+  exit 0, all 12 tests passed. Log:
+  `local/validation/20261019T2307-root-app01-lifecycle-try1/swift-test.log`.
+- Additional checks: `python3 scripts/project_index.py` completed (4,123 folders indexed),
+  `graft check` passed the wiring freshness check, and `git diff --check` exited 0.
+- Observation: explicit returns fixed the sole compile error. Five focused lifecycle cases pass.
+  Inference remains limited to pure transition behavior; no GUI/process lifecycle was run.
+- Remaining risks: G4 matrix, Finder launch, a real native-core ABI/bundle, and native game start
+  remain unverified. G1 is NOT PASSED; G2-G6 are NOT RUN.
+- Next exact action: finish publication audits, commit and push this allowlisted checkpoint, then
+  select a next bounded independent task. APP-01 remains ACTIVE; failed implementation tries: 1.

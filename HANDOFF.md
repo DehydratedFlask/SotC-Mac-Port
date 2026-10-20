@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:04 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:07 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:04 CDT, /root — DATA-02, AUD-01, CPU-01d `0xcdc760` verified; APP-01 readiness helper — ACTIVE, FAILED TRY 1 RECORDED
+## CURRENT CHECKPOINT — 2026-10-19 23:07 CDT, /root — DATA-02, AUD-01, CPU-01d `0xcdc760` verified; APP-01 lifecycle helper fixture verified — ACTIVE, FAILED TRY 1 RECORDED
 
 Three bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -90,15 +90,20 @@ Agent `/root/app01_probe` previously identified this behavior; root owns impleme
   changes are part of the claim.
 - Exact verification: `swift test --package-path launcher --scratch-path local/build/launcher`.
   This validates only model mapping, not a real GUI child lifecycle or G4 acceptance.
-- The recommended LauncherCore-helper option was used after the earlier design-preference question
-  had no reply. An initial helper/model version passed the package tests (11 tests), but its output
-  was overwritten by the next run. Adding an explicit `canStart` transition helper and direct
-  predicate tests then made the same command fail to compile (exit 1): Swift reported the Boolean
-  switch literals unused and “missing return in static method expected to return 'Bool'.” Log:
-  `local/build/launcher-lifecycle-tests-20261019.log`. This is failed implementation try 1. The
-  expected correction is an explicit `return switch` or branch returns, followed by the same test.
-  No third-party or external state is involved. Remaining risk: G4 lifecycle matrix, UI behavior
-  and actual native-core start are unverified. G1 NOT PASSED; G2-G6 NOT RUN.
+- User confirmed the testable LauncherCore helper at 2026-10-19 23:05 CDT. An initial
+  helper/model version passed the package tests (11 tests), but its output was overwritten by the
+  next run. Adding `canStart` and direct predicate tests then failed to compile because its switch
+  cases lacked explicit returns; this remains failed implementation try 1. The correction adds
+  explicit returns. `swift test --package-path launcher --scratch-path local/build/launcher`
+  now passes all 12 tests (5 lifecycle cases plus 7 existing readiness tests); log:
+  `local/validation/20261019T2307-root-app01-lifecycle-try1/swift-test.log`.
+- `python3 scripts/project_index.py` completed and updated the LauncherCore and test folder counts
+  in `docs/FOLDERS.md`. `graft check` reports the wiring graph in sync; its deep meaning layer is
+  still 0% built. The refreshed graph can query `LauncherLifecycle`. `git diff --check` passed.
+  G4 remains NOT RUN: this pure helper suite does not exercise Finder launch, visible UI, or a
+  native game core. G1 remains NOT PASSED; G2-G6 remain NOT RUN.
+- The helper, model call-site, and tests are locally modified/untracked pending the audited
+  checkpoint commit. No third-party or external state is involved.
 - Prior checkpoint with completed archive/audio identity and `0xcdc760` fixture slices is
   [recorded here](docs/checkpoints/2026-10-19-root-data02-aud01-cpu-cdc760-complete.md), published
   through `f59500e`. Next exact action: fix the missing return in

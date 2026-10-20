@@ -14,7 +14,7 @@ final class LauncherModel {
     private var process: Process?
 
     var canStart: Bool {
-        report?.canStart == true && (state == .ready || isFailed)
+        LauncherLifecycle.canStart(readinessAllowsStart: report?.canStart == true, from: state)
     }
 
     var isFailed: Bool {
@@ -71,11 +71,18 @@ final class LauncherModel {
     private func processEnded(status: Int32, reason: Process.TerminationReason) {
         let wasStopping = state == .stopping
         process = nil
-        if wasStopping || (reason == .exit && status == 0) {
-            state = .idle
+        let outcome: LauncherProcessOutcome
+        if wasStopping {
+            outcome = .requestedStop
+        } else if reason == .exit && status == 0 {
+            outcome = .cleanExit
         } else {
-            state = .failed("Game core exited unexpectedly (status \(status))")
+            outcome = .unexpectedExit(status: status)
         }
+        state = LauncherLifecycle.state(
+            after: outcome,
+            readinessAllowsStart: report?.canStart == true
+        )
     }
 
     private static func bundledCoreURL() -> URL? {
