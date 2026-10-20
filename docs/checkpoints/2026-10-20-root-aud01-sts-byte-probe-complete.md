@@ -52,8 +52,9 @@
   staged path audit accepted 7 allowlisted documentation paths and full audit accepted 595 paths.
   `git fetch origin main` exited `0`; pre-commit divergence was `0 0`. The preceding shared-doc
   commit was `ecd5938` (`docs: record app-main Ghidra result`), already pushed. Private artifacts
-  remain excluded. This checkpoint's commit/push and post-push state will be added after
-  publication.
+  remain excluded. Commit `ed3db01` (`docs: verify paired STS byte layout`) pushed successfully
+  (`ecd5938..ed3db01`). Post-push `git status --short` was empty; HEAD and `origin/main` both resolve
+  to `ed3db01348a20d6e33154068b4f05b1b49c1fac5`, divergence `0 0`.
 - **Next exact action:** continue the independent raw-byte/PT_LOAD verification of
   `RE-02-APPMAIN-25A8D0-01`; after its result, update `docs/EVIDENCE.md`, `docs/TASKS.md`, and
   `HANDOFF.md`. G1 remains NOT PASSED.
