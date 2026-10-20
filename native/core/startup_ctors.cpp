@@ -52,7 +52,8 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         // Gap idx 70 (peer lifting 0xdbfa60).
         {0xdbb280, 71, [](StartupState& s) noexcept { init_vec_dbb280(s.vec_dbb280); }},
         {0xdb93a0, 72, [](StartupState& s) noexcept { init_vec_db93a0(s.vec_db93a0); }},
-        // Gap idx 73–74.
+        {0xdb7e60, 73, [](StartupState& s) noexcept { init_vec_db7e60(s.vec_db7e60); }},
+        {0xdb5dd0, 74, [](StartupState& s) noexcept { init_vec_db5dd0(s.vec_db5dd0); }},
         {0xdb3a70, 75, [](StartupState& s) noexcept { init_vec_db3a70(s.vec_db3a70); }},
         {0xb743c0, 282, [](StartupState& s) noexcept { init_vec_b743c0(s.vec_b743c0); }},
         {0xb52110, 290, [](StartupState& s) noexcept { init_vec_b52110(s.vec_b52110); }},
