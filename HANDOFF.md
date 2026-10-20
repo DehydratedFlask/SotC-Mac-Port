@@ -1,7 +1,23 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:57 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:59 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 21:59 CDT, worker bc-73721c8d (CPU-01d) — 0xd32b70 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd32b70** (survey index 118).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: native/core/vec_d32b70.hpp/cpp, native/tests/test_vec_d32b70.cpp,
+tools/lift/check_fd32b70.py, native/CMakeLists.txt (+vec_d32b70 only; origin/main base).
+Private dump (not published): local/re/work/cd32b70.bin.
+Did NOT edit: startup_ctors, Drive, SRV, peer d3a6d0 / arena_*.
+Skipped: 95; D 0xd3b790 (c9d9731); busy 114 0xd3a6d0. Prior: 0xd40010 = 627d251 / 61393e8.
+Checkpoint (2026-10-19 21:59 CDT, bc-73721c8d):
+- OBS: unguarded vmovups copy; src=0x1300d30 dst=0x3351ee0 bits=~0,~0,~0,0; index 118; distinct cells.
+- Commands: ctest -R vec_d32b70 Passed; python3 -I tools/lift/check_fd32b70.py OK.
+- Logs: /tmp/ctest_d32b70.log, /tmp/check_d32b70.log.
+- Store: Project internal/worker-claim-d32b70.md.
+- Push: 2a8a42a on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 21:57 CDT, worker bc-02397584 (CPU-01d) — 0xd623c0 — COMPLETE
 
