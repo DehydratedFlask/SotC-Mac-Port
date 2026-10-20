@@ -1,7 +1,18 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:20 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:21 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:18 CDT, worker bc-9aa0fe88 (SRV-01 mem carve) — IN PROGRESS
+
+Task: SRV-01 mem — lift pure free-list carve-fit math from RVA **0x1a800** (fit/align only).
+Failed tries: 0. Status: IN PROGRESS.
+Owned (new only): `native/core/free_list_carve.{hpp,cpp}`, `native/tests/test_free_list_carve.cpp`,
+`tools/lift/check_f1a800_carve.py`, `native/CMakeLists.txt` (+free_list_carve only; keep host_map),
+`docs/POINTERS.md` (carve row). Store: Project `internal/worker-claim-srv01-carve.md`.
+**Does NOT edit:** `allocator_region.*`, `startup_ctors.*`, Drive gaps, peer vec WIP.
+Blocked alternative: MAP_FIXED for preferred_base≠0 — OBS at 0x479c2 passes object context in rdi, not a VA.
+Exact check: ctest -R free_list_carve; `python3 -I tools/lift/check_f1a800_carve.py`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:18 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 61/62 — COMPLETE
 
@@ -13,16 +24,22 @@ Checkpoint: ctest 34/34; check_fdddc90 + check_fddab00 OK; registry size **26** 
 Owned: `native/core/startup_ctors.*`, `native/tests/test_startup_ctors.cpp`, `HANDOFF.md`.
 CMake: origin/main as-is. Store: Project `internal/worker-claim-drive.md`.
 
-## ACTIVE CLAIM — 2026-10-19 20:20 CDT, worker bc-02397584 (CPU-01d) — 0xdda990 — IN PROGRESS
+## ACTIVE CLAIM — 2026-10-19 20:20 CDT, worker bc-02397584 (CPU-01d) — 0xdda990 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdda990** (survey index 63).
-Failed tries: 0. Status: CLAIMED / lifting.
+Failed tries: 0. Status: FIXTURE_VERIFIED.
 Owned: `native/core/vec_dda990.{hpp,cpp}`, `native/tests/test_vec_dda990.cpp`,
 `tools/lift/check_fdda990.py`, `native/CMakeLists.txt` (+vec_dda990 only; origin/main base).
 Private dump (not published): `local/re/work/cdda990.bin`.
 Did NOT edit: `startup_ctors.*`, Drive, SRV `host_map`, peer `0xddab00`/`0xdddc90`.
 Note: skipped `0xddab00` after peer race (`4ce4fec`).
-Store: Project `internal/worker-claim-dda990.md`.
+
+Checkpoint (2026-10-19 20:21 CDT, bc-02397584):
+- OBS: unguarded vmovups copy; src=0x130eee0 dst=0x3352ea0 bits=~0,~0,~0,0; index 63; distinct cells.
+- Commands: ctest -R '^vec_dda990$' Passed; `python3 -I tools/lift/check_fdda990.py` OK.
+- Logs: `/tmp/ctest_dda990.log`, `/tmp/check_dda990.log`.
+- CMake: origin/main base + vec_dda990 only.
+- Store: Project `internal/worker-claim-dda990.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:13 CDT, worker bc-effcf5dc (CPU-01d) — 0xddab00 — COMPLETE
 
