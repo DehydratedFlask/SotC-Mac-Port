@@ -1,7 +1,17 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:09 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:10 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:09 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 49/51/52/53 — IN PROGRESS
+
+Task: CPU-01e — register already FIXTURE_VERIFIED peer vec-copy ctors into `startup_ctors`:
+indices **49** (`0xe0b180`), **51** (`0xe085e0`), **52** (`0xe05320`), **53** (`0xe026b0`).
+Skipped SRV-01/`host_map`, gap 10–19, idx 50 (sources not on origin), peer WIP `de7fb0`/`dfd5f0`/`de6d20`.
+Failed tries: 0. Status: CLAIMED.
+Owned: `native/core/startup_ctors.*`, `native/tests/test_startup_ctors.cpp`,
+`native/CMakeLists.txt` (+vec_e0b180/+vec_e05320 link lines only; sources already on origin).
+Store: Project `internal/worker-claim-drive.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:09 CDT, worker bc-9aa0fe88 (SRV-01 mem) — IN PROGRESS
 
@@ -30,6 +40,7 @@ Checkpoint (2026-10-19 20:09 CDT, bc-02397584):
 - Logs: `/tmp/ctest_de6d20.log`, `/tmp/check_de6d20.log`.
 - CMake: origin/main base + vec_de6d20 only (diff verified clean of peer/host_map).
 - Store: Project `internal/worker-claim-de6d20.md`.
+- Push: `89984fa` (lift) + `74103e4` (CMake wire) on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 20:07 CDT, worker bc-effcf5dc (CPU-01d) — 0xde7fb0 — IN PROGRESS
 
