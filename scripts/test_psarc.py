@@ -94,6 +94,14 @@ class Tests(unittest.TestCase):
             self.open(bytes(data))
         self.assertEqual(str(error.exception), 'entry references blocks outside the block table')
 
+    def test_rejects_zero_entry_archive_without_manifest(self):
+        data = bytearray(build([('a', b'1')]))
+        struct.pack_into('>I', data, 12, 32)          # toc_size: header only
+        struct.pack_into('>I', data, 20, 0)           # entry_count 0 -> no manifest entry
+        with self.assertRaises(psarc.PsarcError) as error:
+            self.open(bytes(data)).paths()
+        self.assertEqual(str(error.exception), 'archive has no manifest entry')
+
     def test_truncated_archive_rejected(self):
         with self.assertRaises(psarc.PsarcError):
             self.open(build([('a', b'1' * 64)])[:20])
