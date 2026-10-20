@@ -28,6 +28,12 @@ class ParseManifestTests(unittest.TestCase):
         parsed = parse_manifest_bytes("synthetic", '{"path":"dir/line\u2028break","size":9}\n'.encode())
         self.assertEqual(parsed, {"dir/line\u2028break": 9})
 
+    def test_rejects_nul_in_path(self) -> None:
+        raw = b'{"path":"dir\\u0000item.bin","size":1}\n'
+        with self.assertRaises(ManifestError) as context:
+            parse_manifest_bytes("synthetic", raw)
+        self.assertEqual(str(context.exception), "synthetic: invalid path field at line 1")
+
     def test_rejects_duplicate_exact_path(self) -> None:
         raw = b'{"path":"same.bin","size":1}\n{"path":"same.bin","size":2}\n'
         with self.assertRaisesRegex(ManifestError, "duplicate exact path"):
