@@ -1,7 +1,15 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 07:18 CDT, `/root` — RE-02 claim published; goal paused
+## CURRENT CHECKPOINT — 2026-10-20 (session resumed), `/root` — RE-02 PT_DYNAMIC terminator verified
+
+`RE-02-DYNLINK-PT-DYNAMIC-TERMINATOR-01` is `FIXTURE_VERIFIED`. Root made the change directly (prior worker unreachable): `parse()` in `scripts/ps4_dynlink.py` rejects a `PT_DYNAMIC` span with no `DT_NULL` (`ValueError('unterminated PT_DYNAMIC segment')`); one new test in `scripts/test_ps4_dynlink.py`. `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py` exit 0, 10 tests; new test fails with the parser change stashed. Log SHA-256 `643c7cfc3921e5830e047bed28578bc933677c101c9c5a9f6610b6207052d03c`. Details: `docs/checkpoints/2026-10-20-root-re02-pt-dynamic-terminator-complete.md`. Synthetic only; G0 PARTIAL, G1-G6 NOT RUN. Failed tries: 0.
+
+Next exact action: pick the next unowned bounded task from `docs/TASKS.md`.
+
+## PRIOR CHECKPOINT (superseded header) — RE-02 claim published; goal paused
+
+(07:18 CDT, `/root`)
 
 `RE-02-DYNLINK-PT-DYNAMIC-TERMINATOR-01` is claimed by `/root`; worker `/root/re02_pt_dynamic_terminator` owns only `scripts/ps4_dynlink.py` and `scripts/test_ps4_dynlink.py`. The bounded change is for `parse()` to reject a `PT_DYNAMIC` declared span that contains no `DT_NULL` tag, with a synthetic fixture shortening both `p_filesz` and `p_memsz` by 16 bytes. Expected error: `ValueError('unterminated PT_DYNAMIC segment')`. The ELF gABI defines `DT_NULL` as the dynamic-array terminator and ignores its value: https://refspecs.linuxfoundation.org/elf/gabi4%2B/ch5.dynamic.html. The linked project instructions are in `docs/REVERSE_ENGINEERING.md`, Stage 1, which requires validating dynamic-table lengths/offsets and rejecting malformed data.
 
