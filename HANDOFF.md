@@ -1,9 +1,24 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:31 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:34 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:31 CDT, /root — slot-10 evidence and next helper claim published; analysis dispatched
+## CURRENT CHECKPOINT — 2026-10-20 00:34 CDT, /root — G0 environment baseline claimed; execution pending
+
+Task `G0-ENV-BASELINE-01` is claimed by `/root` as a read-only local toolchain inventory slice.
+The task checkpoint is [here](docs/checkpoints/2026-10-20-root-g0-env-baseline-claim.md). The
+claim checkpoint file was initially created without its matching task-registry and current-handoff
+records; this correction adds both before any baseline command runs. `python3 scripts/project_index.py`
+exited 0 and reported 4,131 folders indexed, updating the generated checkpoint count from 28 to 29.
+No baseline probe has run yet; no machine/tool result is inferred. G0 stays PARTIAL. Exact next
+action: audit, commit and push the allowlisted claim bundle, then run the six exact commands
+separately and retain stdout, stderr, exit status and duration under
+`local/validation/g0-env-baseline-20261020/`.
+
+Concurrent task `CPU-01-CTOR10-E1EDE0-01` remains assigned to `/root/srv01_page_map_19660`; root has
+requested its current phase while completing the independent G0 baseline claim.
+
+## PREVIOUS CHECKPOINT — 2026-10-20 00:31 CDT, /root — slot-10 evidence and next helper claim published; analysis dispatched
 
 Task APP-01-IMPORTER-ERROR-01: `launcher/Sources/SoCLauncher/ContentView.swift` now presents the
 localized error in a system alert for import failures and leaves the prior folder/readiness intact;
