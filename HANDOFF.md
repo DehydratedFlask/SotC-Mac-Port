@@ -3,6 +3,16 @@
 Updated: 2026-10-19 22:00 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 22:00 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry +0xd32b70 — COMPLETE
+
+Task: CPU-01e — register `0xd32b70` (survey idx **118**, `2a8a42a`/`3ae7e3a`) into `startup_ctors`.
+103 `0xd623c0` already in batch `8c0c7cf`. Skip 95. Failed tries: 0.
+Owned: `startup_ctors.*`, `test_startup_ctors.cpp`, `HANDOFF.md`. CMake tip as-is (+vec_d32b70).
+Registry size **71**. Evidence: ctest `startup_ctors` Passed; `check_fd32b70.py` OK.
+Did NOT restore `startup_ctors.*` from tip mid-flight; left peer untracked WIP unstaged.
+Store: Project `internal/worker-claim-drive.md` + `internal/drive-wip/`.
+Push: (this commit).
+
 ## ACTIVE CLAIM — 2026-10-19 21:59 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry batch 97–113 — COMPLETE
 
 Task: CPU-01e — register peer FIXTURE_VERIFIED vec-copy ctors into `startup_ctors` by RVA
