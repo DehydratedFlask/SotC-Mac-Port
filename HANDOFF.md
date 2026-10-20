@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:00 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:01 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:00 CDT, /root — DATA-02, AUD-01, CPU-01d `0xcdc760` — FIXTURE_VERIFIED SLICES
+## CURRENT CHECKPOINT — 2026-10-19 23:01 CDT, /root — DATA-02, AUD-01, CPU-01d `0xcdc760` — FIXTURE_VERIFIED SLICES
 
 Three bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -61,8 +61,12 @@ archive, manifest, test logs and build outputs stay under ignored `local/`.
   RUN. Next exact action: select one more bounded, dependency-valid task and claim before editing.
 
 Publication: claim docs for `0xcdc760` are on `main` in `1494700`, with the follow-up publication
-record in `54de3cf`. The current implementation/docs batch is not yet committed. Root will stage
-only allowlisted paths, run staged and `--all` publication audits, commit and push after review.
+record in `54de3cf`. The implementation/docs batch is commit `3370386` (`feat: add archive hashes
+and cdc760 fixture`), pushed to `origin main`. Before commit, `git diff --cached --check` passed;
+`python3 -I scripts/audit_publish_paths.py` passed 16 staged paths and
+`python3 -I scripts/audit_publish_paths.py --all` passed 563 paths. No private `local/` outputs
+were staged. Next exact action: select and claim another bounded, dependency-valid task before
+editing; cold boot/audio/save/Metal and G1 remain unproven.
 
 ## PRIOR CHECKPOINT — 2026-10-19 22:41 CDT, /root — CPU-01d `0xce7300` metadata correction — FIXTURE_VERIFIED
 
