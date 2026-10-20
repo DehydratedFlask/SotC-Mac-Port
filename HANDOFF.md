@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — Audio3d PortOpen and PortPush callsites verified
+
+`sceAudio3dPortOpen` sole callsite `0x948e09` (in `FUN_009485a0`, which also holds six `sceNgs2RackGetVoiceHandle` callsites) and `sceAudio3dPortPush` sole callsite `0x949f95` (in `FUN_00949f80`) are byte- and REA-verified (2 provider successes on pristine snapshot copies; root replayed both verifiers and all checksum sets). Details: `docs/checkpoints/2026-10-20-root-audio3d-portopen-and-portpush-complete.md`. Static only. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 165/165 (batch 14, pushed `c03c24a`).
+
+Next exact action: remaining Audio3d imports (`sceAudio3dInitialize`, `PortAdvance`, `ObjectReserve`, `ObjectSetAttributes`, ...), SaveData dialog imports, or constructor batch 15 (next 142 `0xc54830`).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors batch 14 (0xc5c040 .. 0xc54d20) lifted
 
 `CPU-01-LEAF-CTOR-BATCH-14` `FIXTURE_VERIFIED`; root replay 165/165 ctest pass, five checkers exit 0. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-14-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending workers: `AUD-02-AUDIO3D-PORTOPEN-01` (`local/re/evidence/aud02-audio3d-portopen-01/`) and `AUD-02-AUDIO3D-PORTPUSH-01` (`local/re/evidence/aud02-audio3d-portpush-01/`), one REA query each.
