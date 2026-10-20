@@ -27,6 +27,9 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xf4b510, 7, [](StartupState& s) noexcept { init_vec_neg036(s.neg036); }},
         {0xf3d9d0, 8, [](StartupState& s) noexcept { init_math_constants(s.math_d); }},
         {0xf30460, 9, [](StartupState& s) noexcept { init_xyz_mask_copy(s.xyz_mask_copy); }},
+        // Gap 10–19: heap/atexit wrappers (need native malloc contract; not stubbed).
+        {0xef85e0, 20, [](StartupState& s) noexcept { init_vec_ef85e0(s.vec_ef85e0); }},
+        {0xea52f0, 22, [](StartupState& s) noexcept { init_ea52f0(s.ea52f0); }},
         {0xe10490, 48, [](StartupState& s) noexcept { init_trig_constants(s.trig); }},
         {0x196c90, 520, [](StartupState& s) noexcept { clear_flag32(s.flag32); }},
         {0x125990, 538, [](StartupState& s) noexcept { reset_scratch(s.scratch, s.scratch_slot); }},

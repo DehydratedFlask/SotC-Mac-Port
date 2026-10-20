@@ -15,6 +15,8 @@
 #include "init_f4fd40.hpp"
 #include "init_f4eba0.hpp"
 #include "init_f4b540.hpp"
+#include "vec_ef85e0.hpp"
+#include "init_ea52f0.hpp"
 
 namespace sotc {
 
@@ -33,6 +35,8 @@ struct StartupState {
     InitF4fd40 f4fd40{};
     InitF4eba0 f4eba0{};
     InitF4b540 f4b540{};
+    VecEf85e0 vec_ef85e0{};   // idx 20 (peer lift; registered here)
+    InitEa52f0 ea52f0{};      // idx 22
     std::array<std::byte, kScratchBytes> scratch{};
     std::atomic<std::uint64_t> scratch_slot{0};
     std::atomic<std::uint32_t> flag32{0};
