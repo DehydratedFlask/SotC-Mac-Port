@@ -1,7 +1,136 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 04:41 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:00 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
+
+## CURRENT CHECKPOINT — 2026-10-20 05:00 CDT, `/root` — overlap guard final replay and publication readiness
+
+The RackQuery thunk xrefs root replay is recorded below and remains `ACTIVE/PARTIAL`; it accepts
+no caller/callsite. A parallel read-only review by `/root/review_recent_fixtures` found two
+incomplete output-path guard hypotheses: repository containment alone missed symlinks to another
+in-repo folder, and comparing resolved configured/expected paths missed a symlink at the configured
+task path. The final `_output_path` guard compares resolved `PRIVATE_OUTPUT_DIR` with the lexical
+`EXPECTED_PRIVATE_OUTPUT_DIR`, then checks the configured path under `ROOT.resolve()`.
+`OutputPathTests.test_rejects_symlinked_private_output_root_before_build_or_write` patches `ROOT`
+and both path constants to a temporary repository and rejects configured-root symlinks to both an
+outside directory and in-repo `scripts/` before invoking `build_report` or creating output.
+
+Verification: `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_archive_overlap_map.py` exited 0
+(11 tests; current replay captured in `local/checkpoints/root-2026-10-20-publication-overlap-tests.log`).
+`PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py` exited 0 (7 tests; captured
+in `local/checkpoints/root-2026-10-20-publication-rela-tests.log`).
+Both exact report commands exited 0:
+`PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/audit_archive_overlap_map.py --out local/validation/data02-archive-overlap-map-01/root-review/final-run1.json`
+and the same command with `final-run2.json`; all three `cmp` checks (root runs together and each
+against worker runs) exited 0. Report SHA-256 remains
+`d2d9a7a05f53cff142979578030c5f55b4720654d32e3ff12b38651ad5d641a3`. Final audit script
+SHA-256 is `28330049faf0c7366159e7439ce80b8f4354413908c98bd3d7c95c6addbc7bf7`; test script
+SHA-256 is `6f13a329f1572716107639691b36f9f488ab66b665e59ed37e4074f8377110a1`; updated root
+verification JSON SHA-256 is `0b56e401e1a61ef89f24feed7fbcbc77b13d44c247cc5e2d12a4531f2af5c7d1`.
+
+`python3 scripts/project_index.py` exited 0 (4,165 folders). After the source corrections, `graft
+check` reported STALE as expected; root rebuilt with all five configured source scopes using
+`graft build --follow-nested-repos --only-dir scripts --only-dir tools --only-dir native --only-dir launcher --only-dir reference`.
+The rebuilt graph has 1,250 nodes / 530 source files; `graft check` now reports OK, and `graft
+skeleton scripts/test_archive_overlap_map.py` confirms the symlink regression test is indexed.
+The optional deep meaning layer remains unbuilt. `python3 scripts/project_index.py` exited 0 with
+4,165 folders indexed; log: `local/checkpoints/root-2026-10-20-publication-project-index.log`.
+`git diff --check` passed. No private or generated Graft files will be staged.
+
+Parallel `/root/app01_readiness` read-only scout confirmed the already-user-approved lifecycle
+helper and system-alert importer slices are present in `HEAD`; prior launcher tests passed, native
+alert interaction remains NOT RUN. No files changed and no tests ran in that scout. A narrower
+possible follow-up is to move process termination reason/status/Stop-request classification into
+LauncherCore and test the input classification; sandbox distribution, child-process lifetime on
+quit, and unlocked-Mac VoiceOver validation remain unresolved. See current task rows and prior
+APP-01 checkpoint; no dependent policy was inferred.
+
+Pending publication includes `HANDOFF.md`, `docs/ASSETS.md`, `docs/EVIDENCE.md`, `docs/FOLDERS.md`,
+`docs/TASKS.md`, three checkpoint records, `scripts/audit_archive_overlap_map.py`,
+`scripts/test_archive_overlap_map.py`, and `scripts/test_ps4_dynlink.py`. DATA overlap counts and
+report bytes are unchanged; E77 records both incomplete/superseded guard hypotheses and the final
+11-test replay. No test or provider operation failed. G1 NOT PASSED; G2 NOT RUN.
+
+Next exact action: run final `git diff --check`, stage only allowlisted paths, run staged and full
+publish-path audits, fetch `origin/main`, verify zero divergence, then commit and push. After
+publication, claim the next independent bounded task before any further edits.
+
+## PRIOR CHECKPOINT — 2026-10-20 04:50 CDT, `/root` — RackQuery thunk xrefs root replay
+
+`AUD-02-NGS2-RACKQUERY-BUFFERSIZE-01` remains `ACTIVE/PARTIAL`. The one authorized REA 6.7.0 /
+Ghidra 12.1.4 query (`rea xrefs local/re/eboot.elf 0xf91420 --provider ghidra --snapshot
+local/re/evidence/aud02-ngs2-rackquery-thunk-xrefs-01/rea-snapshot-thunk-query.json --format
+json --full-output`) exited 0 after 360.800293 s, Evidence ID
+`ev_5e06a3c5d3b5cce415bd1770751f626f9e1b08fd1182190a95114347ca0c868a`; raw stdout SHA-256
+`f2fbba372830fa89772956d26489d00d67c82f0c442c6759d2b8863b29d94f50`, stderr empty. Root
+independently verified the 16-file capture manifest, pinned ELF/import hashes, shared snapshot
+unchanged, private snapshot provenance, provider envelope, and redacted environment (2 verifying-
+identity variables, both redacted). Root replay report:
+`local/re/evidence/aud02-ngs2-rackquery-thunk-xrefs-01/root-review/verification.json`, SHA-256
+`23ea86375a90f818386ae75777f5716d646e19a5ff5c0b5555253f63b99aa4b3`; manifest SHA-256
+`c58b4845463aecc18460c226a8d81d9be9bbd33a6a1757b8bca0e2c3ec84b720`.
+
+The provider returned 15 addresses, exactly matching the prior 15 raw `E8 rel32` candidates.
+Root independently parsed the pinned ELF's file-backed `PT_LOAD` ranges and confirmed each
+address begins with `E8` and its signed displacement targets `0xf91420`. The address-only xrefs
+projection does not provide reference kinds; raw bytes do not establish instruction boundaries
+or caller/function attribution. No caller/callsite is accepted and no runtime binding, reachability,
+ABI, NGS2 behavior, or audio behavior is established. No additional REA operation was made.
+
+The first root verifier run exposed a checker assertion comparing only the ELF/import input hashes
+against a dictionary that also contained the shared-snapshot hash. Root corrected that assertion
+and reran `PYTHONDONTWRITEBYTECODE=1 python3 -I
+local/re/evidence/aud02-ngs2-rackquery-thunk-xrefs-01/root-review/verify_thunk_xrefs.py`; it
+exited 0 with `ROOT_REPLAY_PASS_XREFS_CAPTURED_NO_CALLER_KIND`. This was a verifier correction,
+not a failed analysis hypothesis or provider operation. No source/game input changed.
+
+Files changed for this checkpoint: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`,
+`docs/FOLDERS.md`, and the new checkpoint record. Private replay artifacts and the verifier remain
+under excluded `local/`; the earlier DATA overlap and RELA fixture changes are recorded below.
+`python3 scripts/project_index.py` and `graft check` remain to be refreshed for this checkpoint.
+
+Next exact action: run project-index/Graft and diff checks, stage only allowlisted source/docs,
+run staged and full publication audits, verify zero branch divergence, then commit and push. After
+that, continue with a separately claimed bounded task; G1 remains NOT PASSED and G2 NOT RUN.
+
+## PRIOR CHECKPOINT — 2026-10-20 04:45 CDT, `/root` — overlap map and RELA fixture root replay
+
+`DATA-02-ARCHIVE-OVERLAP-MAP-01` is root-replayed and ready to record as `ARTIFACT_VERIFIED`.
+The final checker reads only the seven named member JSONL manifests. Worker checksum manifest
+verified 12/12 entries; root reran the synthetic suite (10 tests), reran the report twice, and
+compared both root runs and the worker report byte-for-byte. The result covers 170,451 records,
+21 archive pairs, and 40,216 exact-path pair occurrences: 4,704 have equal and 35,512 different
+PSARC TOC-declared sizes. Root report SHA-256 is
+`d2d9a7a05f53cff142979578030c5f55b4720654d32e3ff12b38651ad5d641a3`; root verification JSON is
+`local/validation/data02-archive-overlap-map-01/root-review/verification.json` (SHA-256
+`1a6f7adbd72578ff65ae669074e946ce473879ef839e4da38a36103ed0c7a448`). Equal size does not
+establish equal contents. No archive/member payload, Fios, overlay, mount-order, precedence, or
+runtime claim is made. The checker and tests are new scripts under `scripts/`.
+
+`RE-02-DYNLINK-RELA-FIXTURE-01` is root-replayed and ready to record as `FIXTURE_VERIFIED`.
+`scripts/test_ps4_dynlink.py` now gives the synthetic ELF one JMPREL and one nonempty RELA row;
+both rows' table, target, relocation type, symbol index and signed addend are asserted. Root's
+`PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py` exited 0 (7 tests); source
+SHA-256 is `7d487b19736d12e9d7f1e23eb269cde15bbf920bd77abc1b65ecc42a0c6e76af`. Root verification
+is `local/validation/re-02-dynlink-rela-fixture-01/root-review/verification.json` (SHA-256
+`f1677ac1aa610afd27f7da3d705aa046b87c7757707c14d8874115d7ab0af1c5`). This is synthetic parser
+coverage only, not relocation application or runtime loader evidence.
+
+`python3 scripts/project_index.py` exited 0 with 4,162 folders indexed. Graft initially reported
+STALE after a scope rebuild that omitted `native/` and `launcher/`; root immediately rebuilt with
+all configured scopes (`scripts`, `tools`, `native`, `launcher`, `reference`), then `graft check`
+reported OK. Graft skeleton confirms the new archive audit script is indexed. Its optional deep
+meaning layer remains unbuilt. The generated `graft/` cache and existing untracked `tools/graft/`
+are not staged.
+
+At this checkpoint the single already-authorized RackQuery xrefs query at thunk `0xf91420` had
+completed on the worker and root replay was pending; see the next checkpoint above for the replay
+and limitations. No follow-on query was released. APP-01 sandbox distribution, child-process
+lifetime on quit, and the locked-Mac VoiceOver check remain open.
+
+Next exact action: refresh the folder index after the new checkpoint, run `git diff --check`,
+verify Graft freshness, stage only allowlisted source/documentation paths, run staged and full
+publish-path audits, confirm zero divergence, then commit and push this checkpoint.
 
 ## CURRENT CHECKPOINT — 2026-10-20 04:39 CDT, `/root` — parallel DATA-02 and RELA fixture claims
 

@@ -16,7 +16,7 @@ def image(vaddr, payload):
 
 
 def dynamic_import_elf_fixture():
-    """Build a minimal PS4 ELF with one module, library, import and JMPREL row."""
+    """Build a minimal PS4 ELF with one import and JMPREL/RELA rows."""
     module_id, library_id = 0x1234, 0x56
     module_name, library_name = b'FixtureModule', b'libFixture'
     nid = d.nid('sceFixtureFunction')
@@ -41,15 +41,22 @@ def dynamic_import_elf_fixture():
     target = 0x612340
     addend = -0x2a
     symbol_index = 1
+    rela_target = 0x612348
+    rela_type = 6
+    rela_addend = -0x123
     symbol_table = (
         struct.pack('<IBBHQQ', 0, 0, 0, 0, 0, 0) +
         struct.pack('<IBBHQQ', symbol_name_offset, 0x12, 0, 0, 0, 0)
     )
     jump_relocation = struct.pack('<QQq', target, (symbol_index << 32) | 7, addend)
-    dynlib = bytearray(relocation_offset + len(jump_relocation))
+    rela_offset = align8(relocation_offset + len(jump_relocation))
+    rela_relocation = struct.pack('<QQq', rela_target,
+                                  (symbol_index << 32) | rela_type, rela_addend)
+    dynlib = bytearray(rela_offset + len(rela_relocation))
     dynlib[:len(strings)] = strings
     dynlib[symbol_table_offset:symbol_table_offset + len(symbol_table)] = symbol_table
     dynlib[relocation_offset:relocation_offset + len(jump_relocation)] = jump_relocation
+    dynlib[rela_offset:rela_offset + len(rela_relocation)] = rela_relocation
 
     dynamic_tags = [
         (d.DT_SCE['NEEDED_MODULE'], (module_id << 48) | (1 << 40) | (2 << 32) | module_name_offset),
@@ -61,8 +68,8 @@ def dynamic_import_elf_fixture():
         (d.DT_SCE['SYMTABSZ'], len(symbol_table)),
         (d.DT_SCE['JMPREL'], relocation_offset),
         (d.DT_SCE['PLTRELSZ'], len(jump_relocation)),
-        (d.DT_SCE['RELA'], 0),
-        (d.DT_SCE['RELASZ'], 0),
+        (d.DT_SCE['RELA'], rela_offset),
+        (d.DT_SCE['RELASZ'], len(rela_relocation)),
         (0, 0),
     ]
     dynamic = b''.join(struct.pack('<QQ', tag, value) for tag, value in dynamic_tags)
@@ -83,7 +90,8 @@ def dynamic_import_elf_fixture():
     return (header + program_headers + dynamic + dynlib,
             dict(module_id=module_id, library_id=library_id, nid=nid,
                  module_enc=module_enc, library_enc=library_enc,
-                 symbol_index=symbol_index, target=target, addend=addend))
+                 symbol_index=symbol_index, target=target, addend=addend,
+                 rela_target=rela_target, rela_type=rela_type, rela_addend=rela_addend))
 
 
 class Tests(unittest.TestCase):
@@ -112,14 +120,22 @@ class Tests(unittest.TestCase):
                          f"{expected['nid']}#{expected['library_enc']}#{expected['module_enc']}")
         self.assertFalse(symbol['defined'])
 
-        self.assertEqual(len(parsed['relocs']), 1)
-        relocation = parsed['relocs'][0]
-        self.assertEqual(relocation['table'], 'JMPREL')
-        self.assertEqual(relocation['type'], 7)
-        self.assertEqual(d.RELOC_NAMES[relocation['type']], 'R_X86_64_JUMP_SLOT')
-        self.assertEqual(relocation['symbol'], expected['symbol_index'])
-        self.assertEqual(relocation['target'], expected['target'])
-        self.assertEqual(relocation['addend'], expected['addend'])
+        self.assertEqual(len(parsed['relocs']), 2)
+        jmprel = next(r for r in parsed['relocs'] if r['table'] == 'JMPREL')
+        self.assertEqual(jmprel['table'], 'JMPREL')
+        self.assertEqual(jmprel['type'], 7)
+        self.assertEqual(d.RELOC_NAMES[jmprel['type']], 'R_X86_64_JUMP_SLOT')
+        self.assertEqual(jmprel['symbol'], expected['symbol_index'])
+        self.assertEqual(jmprel['target'], expected['target'])
+        self.assertEqual(jmprel['addend'], expected['addend'])
+
+        rela = next(r for r in parsed['relocs'] if r['table'] == 'RELA')
+        self.assertEqual(rela['table'], 'RELA')
+        self.assertEqual(rela['type'], expected['rela_type'])
+        self.assertEqual(d.RELOC_NAMES[rela['type']], 'R_X86_64_GLOB_DAT')
+        self.assertEqual(rela['symbol'], expected['symbol_index'])
+        self.assertEqual(rela['target'], expected['rela_target'])
+        self.assertEqual(rela['addend'], expected['rela_addend'])
 
     def test_encode_id_widths(self):
         self.assertEqual([d.encode_id(v) for v in (0, 63, 64, 0xfff, 0x1000)],
