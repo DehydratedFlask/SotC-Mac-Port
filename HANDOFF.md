@@ -1,100 +1,22 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 03:29 CDT (America/Chicago). Principal: root agent of this planning chat.
-No native game executable exists. G1 NOT PASSED.
+Updated: 2026-10-20 03:44 CDT (America/Chicago). Principal: root agent of this planning chat.
+No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 03:30 CDT, /root — RackCreate path replayed; next serialized probe queued
+## CURRENT CHECKPOINT — 2026-10-20 03:44 CDT, `/root` — RackDestroy xrefs replayed; next bounded function query pending
 
-Seven bounded AUD-02 import-to-call paths are root-verified:
-`AUD-02-NGS2-SYSCREATE-01` (`sceNgs2SystemCreateWithAllocator`),
-`AUD-02-NGS2-RACKCREATE-01` (`sceNgs2RackCreate`),
-`AUD-02-NGS2-RACKCREATE-ALLOC-01` (`sceNgs2RackCreateWithAllocator`),
-`AUD-02-NGS2-VOICE-CONTROL-01` (`sceNgs2VoiceControl`), and
-`AUD-02-NGS2-SYSRENDER-01` (`sceNgs2SystemRender`),
-`AUD-02-NGS2-VOICE-GETSTATE-01` (`sceNgs2VoiceGetState`), and
-`AUD-02-NGS2-SYSDESTROY-01` (`sceNgs2SystemDestroy`). The three prior new dossiers passed root
-checksum and verifier replay against the pinned ELF. SystemRender verifies slot `0x1601018` → thunk
-`0xf91450` → call `0x95383c` in `FUN_009536d0`; Ghidra reports partial callee coverage, including
-six omitted or unresolved call targets. VoiceGetState verifies slot `0x1601028` → thunk
-`0xf91470` → call `0x94a27d` in `FUN_0094a200`; the second Ghidra edge at `0x94a440` was not
-byte-checked, and Ghidra's adjacent-boundary label at `0xf91476` differs from the byte-verified
-target. SystemDestroy verifies slot `0x1601010` → thunk `0xf91440` → call `0x9489d2` in
-`FUN_009485a0`; secondary caller `0x94a055` remains untraced and the thunk's adjacent computed
-jump/indirection observations remain unresolved. RackCreateWithAllocator verifies slot
-`0x1600fe8` → thunk `0xf913f0` → direct call `0x9493f8` in `FUN_009485a0`; its additional call
-edges are retained, with no argument roles inferred. RackCreateWithAllocator has zero failed
-targeted analysis/provider tries.
-AUD-02 remains ACTIVE: the seven call paths establish no command/parameter semantics, runtime
-binding, reachability, actual audio behavior, or use. Root replays and logs are
-summarized in the linked checkpoints. Root is the sole shared-document integrator. Evidence and
-claims:
-[NGS2 callsite checkpoint](docs/checkpoints/2026-10-20-root-aud02-ngs2-callsite-claims.md) and
-[SystemDestroy claim](docs/checkpoints/2026-10-20-root-aud02-system-destroy-claim.md),
-[SystemRender root replay](docs/checkpoints/2026-10-20-root-aud02-sysrender-complete.md),
-[VoiceGetState root replay](docs/checkpoints/2026-10-20-root-aud02-voice-getstate-complete.md), and
-[SystemDestroy root replay](docs/checkpoints/2026-10-20-root-aud02-system-destroy-complete.md),
-[next three probe claims](docs/checkpoints/2026-10-20-root-aud02-next-three-claims.md),
-[next three offline-prep checkpoint](docs/checkpoints/2026-10-20-root-aud02-next-three-offline-prep.md),
-[provider timeout replay](docs/checkpoints/2026-10-20-root-aud02-next-three-provider-replay.md),
-[RackCreate slot-xrefs replay](docs/checkpoints/2026-10-20-root-aud02-rackcreate-slot-xrefs-replay.md),
-and [claims for the remaining two imports](docs/checkpoints/2026-10-20-root-aud02-last-two-imports-claim.md).
-The subsequent dispatch record is in
-[the remaining-imports worker checkpoint](docs/checkpoints/2026-10-20-root-aud02-last-two-imports-dispatched.md).
-Root independently replayed the two offline packets in
-[the final-two offline replay checkpoint](docs/checkpoints/2026-10-20-root-aud02-last-two-offline-replay.md),
-which also contains the RackCreateWithAllocator root replay.
-Root refreshed `docs/FOLDERS.md` after adding that checkpoint: `python3 scripts/project_index.py`
-exited 0 and indexed 4,153 folders. `graft check` exited 0 with the wiring graph in sync; its
-deep meaning layer is not built and 1,225 nodes remain pending. Private logs are
-`local/checkpoints/2026-10-20-root-aud02-last-two-offline-replay-project-index.log`
-(SHA-256 `918116aa9871335a97c4e0af6050770e434086ef9c71156dc6593e9d99258549`) and
-`local/checkpoints/2026-10-20-root-aud02-last-two-offline-replay-graft-check.log`
-(SHA-256 `f6496628c6608d20c699a233b45e90bafc20f298616a0926f2bf4d2b576a8fdf`).
+Seven AUD-02 import-to-call paths remain root-verified. The just-completed RackDestroy xrefs operation is address-only and does not add an eighth path. Root replay passed all 58 entries in the private dossier manifest and the saved-evidence verifier: slot `0x1600ff0` returned only `0xf91400` (Evidence ID `ev_bf1d4dc66179c44215ce55bea3b845b93bb0952f7aeb86d2a2484453bd3826a8`); raw thunk bytes at `0xf91400` are `ff25eafb6600` and resolve to the slot. No reference kind or caller was returned. Full command, hashes, resource record, root replay results, limitations, and next exact action are in [the RackDestroy xrefs root-replay checkpoint](docs/checkpoints/2026-10-20-root-aud02-rackdestroy-xrefs-replay.md).
 
-Root check logs and command corrections are private under each task's `local/re/evidence/*-root-*`
-files. The source hashes match ELF `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`
-and import manifest `78caaaae139b7c5d4d2618abab2e50e9f6918ea3cec73a90b81e0005c83b6744`. Root's
-first SystemRender checksum replay used repository-root CWD and was corrected to the dossier
-directory. A VoiceGetState verifier call initially omitted required arguments and was rerun with
-the exact ELF, manifest, thunk, callsite, and range. A SystemDestroy redirection command omitted
-shell quoting around a path with spaces and wrote a verifier JSON to `/Volumes/Extra/SoC`; its
-hash matched the expected output, the generated file was removed, and the verifier was rerun to
-the intended root log paths. These were bookkeeping/setup errors, not failed analysis or provider
-tries. Current `python3 scripts/project_index.py` and `graft check` results are in the new root
-checkpoints; `tools/graft/` remains unstaged.
+`AUD-02-NGS2-RACKDESTROY-01` remains ACTIVE/PARTIAL, failed analysis hypotheses 0, failed provider operations 0. Its offline checker remains `PARTIAL_PRE_REA`; no call path is accepted. Next exact action after this checkpoint is committed and pushed: one serialized REA `function` query at candidate address `0x94a01f` using the pinned ELF and the same Ghidra profile. Root must replay the provider response and byte-check any proposed edge. RackQuery, VoiceHandle, and VoiceGetStateFlags remain active; VoiceHandle stays paused after its earlier xrefs timeout. No REA/Ghidra calls may overlap.
 
-The four currently open probes are `AUD-02-NGS2-RACKQUERY-BUFFERSIZE-01` (symbol 239 /
-`0eFLVCfWVds` / `0x1601000`), `AUD-02-NGS2-RACK-VOICEHANDLE-01` (238 / `MwmHz8pAdAo` /
-`0x1600ff8`), `AUD-02-NGS2-RACKDESTROY-01` (237 / `lCqD7oycmIM` / `0x1600ff0`), and
-`AUD-02-NGS2-VOICE-GETSTATEFLAGS-01` (245 / `rEh728kXk3w` / `0x1601030`). RackQuery,
-VoiceHandle, and RackDestroy have private byte scans; VoiceGetStateFlags has one raw thunk and one
-call-pattern candidate. Patterns are candidates only. VoiceHandle's slot-xrefs query timed out at
-330 seconds and produced no Evidence ID/result;
-this is one provider timeout and zero failed analysis hypotheses. Its transient logs/process were
-gone at root replay. RackQuery's selected offline slice `0x94fc2d` decodes as a candidate direct
-call to `0xf91420`, but objdump reported no overlapping section and no function attribution is
-accepted. RackCreateWithAllocator's one slot-xrefs and one function query both succeeded under the
-8G/1200-second plan; root replay verified a selected call at `0x9493f8`, but the remaining command
-and parameter meaning is unresolved. RackDestroy offline prep remains `PARTIAL_PRE_REA` and
-VoiceGetStateFlags is `PASS_OFFLINE_CHECKS`; neither has yet received Ghidra caller attribution.
-No command contract, audio behavior, ABI, or runtime binding is inferred.
+AUD-02 overall remains ACTIVE with seven static paths and four bounded probes still open. No command/parameter semantics, runtime binding, reachability, ABI, actual audio behavior, or game use has been established. Root is the sole shared-document integrator. No source implementation is authorized by these bounded probes. G1 remains NOT PASSED and G2 NOT RUN.
 
-The task claims are committed as `4d690d6` and pushed; dispatch was recorded in `89233ef` on
-`origin/main`. The original three dossiers are owned by `/root/aud02_rackcreate_allocator`,
-`/root/aud02_rackquery_buffersize`, and `/root/aud02_rack_voicehandle` with `gpt-6-luna` at Extra
-High reasoning; the last-two offline packets were prepared by `/root/aud02_rackquery_buffersize`
-and `/root/aud02_voiceflags_offline`. The latest RackCreateWithAllocator function query has been
-independently replayed: slot `0x1600fe8` → thunk `0xf913f0` → direct call `0x9493f8` in `FUN_009485a0`; see
-[the root replay checkpoint](docs/checkpoints/2026-10-20-root-aud02-last-two-offline-replay.md).
-The two final offline packets were also root-replayed there. Exact evidence and limits remain in
-the linked claim and offline-prep checkpoints.
+Root replay logs are private under `local/checkpoints/2026-10-20-root-aud02-rackdestroy-xrefs-*`; worker output and snapshot remain in `local/re/evidence/aud02-ngs2-rackdestroy-01/`. The xrefs dossier's 58-file checksum replay and saved-Evidence verifier passed. `python3 scripts/project_index.py` exited 0 and indexed 4,153 folders; log SHA-256 `918116aa9871335a97c4e0af6050770e434086ef9c71156dc6593e9d99258549`. `graft check` exited 0 with the wiring graph in sync; the deep meaning layer remains unbuilt with 1,225 nodes pending; log SHA-256 `f6496628c6608d20c699a233b45e90bafc20f298616a0926f2bf4d2b576a8fdf`. `tools/graft/` remains unstaged.
 
-Next exact action: commit and push the current root replay checkpoint after the passing audits, then
-authorize exactly one REA/Ghidra slot-xrefs operation for RackDestroy at `0x1600ff0` under the
-serialized provider slot. After root replay, choose any follow-up only from the returned evidence;
-keep VoiceHandle paused. No REA/Ghidra calls may overlap. Root byte-checks any candidate path before
-accepting it. No source implementation is authorized by these bounded static probes. G1 remains
-NOT PASSED.
+Prior related checkpoints: [RackDestroy and VoiceGetStateFlags offline/root replay](docs/checkpoints/2026-10-20-root-aud02-last-two-offline-replay.md), [RackCreateWithAllocator slot-xrefs replay](docs/checkpoints/2026-10-20-root-aud02-rackcreate-slot-xrefs-replay.md), and the earlier AUD-02 claim/provider checkpoints below and in `docs/checkpoints/`.
+
+## Archived handoff history
+
 The three-callpath root-replay checkpoint was committed as `6673495`
 (`docs: root-verify three NGS2 call paths`) and pushed to `origin/main` from `d552ad5`. Pre-push
 checks passed: staged path audit accepted seven documentation paths, full audit accepted 604
