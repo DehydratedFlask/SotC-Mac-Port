@@ -1,18 +1,22 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 02:19 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 02:30 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 02:19 CDT, /root — three call paths verified; three follow-up probes claimed
+## CURRENT CHECKPOINT — 2026-10-20 02:30 CDT, /root — three call paths verified; three follow-up probes active
 
 Three bounded AUD-02 import-to-call paths are root-verified:
 `AUD-02-NGS2-SYSCREATE-01` (`sceNgs2SystemCreateWithAllocator`),
 `AUD-02-NGS2-RACKCREATE-01` (`sceNgs2RackCreate`), and
 `AUD-02-NGS2-VOICE-CONTROL-01` (`sceNgs2VoiceControl`). Two independent static caller probes are
-claimed for `sceNgs2SystemRender` and `sceNgs2VoiceGetState`; workers are running. A third bounded
-static caller probe is claimed and dispatched for `sceNgs2SystemDestroy` (slot `0x1601010`, symbol
-241, NID `u-WrYDaJA3k`) to `/root/aud02_sysdestroy` (`gpt-6-luna`, Extra High) in its own private
-dossier. The claim was pushed in `19e2a43`; dispatch details are in the linked checkpoint.
+claimed for `sceNgs2SystemRender` and `sceNgs2VoiceGetState`; all three follow-up probes are now
+active. All three slot-xref queries succeeded and returned worker-reported thunk candidates:
+SystemRender `0xf91450`, VoiceGetState `0xf91470`, SystemDestroy `0xf91440`. The SystemRender raw
+byte scan also proposes a caller instruction at `0x95383c` (`e80fdc6300`), pending root replay.
+No caller edges are accepted yet; SystemRender's thunk query returned the same candidate as the raw
+scan, and a function query remains; VoiceGetState/SystemDestroy function queries and all root
+replays remain outstanding.
+The SystemDestroy claim was pushed in `19e2a43`; dispatch details are in the linked checkpoint.
 AUD-02 remains ACTIVE
 because parameter semantics, audio behavior, and runtime use are unclassified. Root is the sole
 shared-document integrator. Claims and boundaries:
@@ -25,6 +29,19 @@ Claim-preparation checks: the pinned ELF and import manifest hashes were recheck
 (deep layer unbuilt, 1,225 nodes pending), and `git diff --check` passed. The claim was published
 as `19e2a43`, then dispatched to `/root/aud02_sysdestroy`; audit and publication evidence is in
 the linked claim checkpoint. The pre-existing untracked `tools/graft/` cache remains unstaged.
+
+Interim worker checkpoints: `sceNgs2SystemRender` slot-xref result is EID
+`ev_90786a1998b746a670a1e01d847201edaddc9751c589406f0126cfb6edd7c421`, JSON SHA-256
+`e9883e93780635a6e221a60ee7cd77630378a6f5f1f504f1bf2881073fedc4fc`; raw byte scan proposes
+call `0x95383c` to the thunk, with incoming thunk refs still running. `sceNgs2VoiceGetState`
+slot-xref result is EID
+`ev_d97708e1afeaa1bfd6ffb28334a35ce08d4c195d9f0947fddb5769210cdac4a1`, output SHA-256
+`3e96d3476b6af8d68d560802d4a567ce23ed17a7e13beb58a9d4a05bf422de15`; `sceNgs2SystemDestroy`
+slot-xref result is EID `ev_37ba3af33cc684de727dfb407d145e99b12d646a8d3f3fe219a31b2c07fbd6d1`,
+output SHA-256 `6da0467ea24486330ac90799353446bd816c6a7198aa52927e1a1098002fe49b`. Both response
+types omit reference kind, so these xref results do not by themselves establish caller edges. The
+static observations and exact next actions are captured in their respective checkpoints. All
+caller-function attribution and root replays remain pending.
 
 The prior system-create checkpoint was committed as `85fec59`
 (`docs: verify NGS2 system-create path`) and pushed from `357ed0c`; staged/full publish audits

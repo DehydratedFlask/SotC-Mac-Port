@@ -252,3 +252,64 @@ visible register/stack writes at the call boundary, unresolved points, and a rep
 verification recipe. Do not infer semantic parameter names or function contracts from register
 position, strings, community headers, or imported symbol names. Do not execute the game or load
 Sony modules. Root independently verifies each accepted dossier before adding a public evidence row.
+
+## Interim VoiceGetState slot-xref checkpoint — 2026-10-20 02:28 CDT, worker `/root/aud02_voicestate`
+
+- Worker-reported provider success; root replay pending; `AUD-02-NGS2-VOICE-GETSTATE-01` remains
+  ACTIVE with 0 failed targeted tries. The exact input ELF/import-manifest hashes match the claim.
+- The parser command argv is in
+  `local/re/evidence/aud02-ngs2-voice-getstate-01/parser-with-contracts.command.json`; exact target:
+  `python3 -I scripts/ps4_dynlink.py local/re/eboot.elf --contracts
+  reference/shadPS4/src/core/libraries --out
+  local/re/evidence/aud02-ngs2-voice-getstate-01/imports.contracts.json`. Exit 0; captured stdout
+  `parser-with-contracts.stdout.txt` SHA-256
+  `4fa19b75352a27db8b01bd33377a68227496591a4ce4b8f65ac887f5ff2d663c`; stderr empty; output JSON
+  SHA-256 `0066e845b6469e42344bfcb5caadeb934c7d6ba6047f433aee64ab4763842083`.
+- Independent verifier argv is in `local/re/evidence/aud02-ngs2-voice-getstate-01/import-bytecheck.command.json`;
+  exact target: `python3 -I local/re/evidence/aud02-ngs2-voice-getstate-01/verify_path.py --elf
+  local/re/eboot.elf --manifest local/re/imports.json`. Exit 0; output SHA-256
+  `13580cc84cf3bca99a27238a200d144282abb70c4765de932c375e9af6d2b555`; stderr empty. It reports
+  JMPREL entry 526 at file offset `0x2de48b8`, raw 24-byte record
+  `281060010000000007000000f40000000000000000000000`, targeting slot `0x1601028` with relocation
+  type 7, symbol index 244, addend 0.
+- From repository root, REA 6.7.0 `xrefs` queried slot `0x1601028` with Ghidra 12.1.4, the private
+  snapshot, `GHIDRA_HEADLESS_MAXMEM=8G`, and
+  `REA_GHIDRA_STARTUP_TIMEOUT_MS=1200000`; exit 0 after 371.425 s. Exact argv is in
+  `local/re/evidence/aud02-ngs2-voice-getstate-01/rea-slot-xrefs.command.json`; output
+  `rea-slot-xrefs.stdout.txt` SHA-256
+  `3e96d3476b6af8d68d560802d4a567ce23ed17a7e13beb58a9d4a05bf422de15`; stderr empty; exit record
+  says 0. Input snapshot SHA-256 `d80232c4fe22d7e75654eade8db44af093507a94723f80dd5ce67605dd382354`;
+  updated snapshot SHA-256 `33a1cda725208f6438e113dbae67425b65fc81439ca1090f8cea0ed92d8e096f`.
+- Evidence ID `ev_d97708e1afeaa1bfd6ffb28334a35ce08d4c195d9f0947fddb5769210cdac4a1` returned one
+  reference at `0xf91470`. As with the other xrefs result, the response omits reference kind; no
+  caller is claimed. The worker's query at `0xf91470` was running at this checkpoint.
+- Exact next action: finish the function query, resolve a direct caller path if available, then
+  prepare a private byte verifier and manifest for root replay. No NGS2 API/audio/runtime semantics
+  are inferred.
+
+## Interim SystemRender slot/caller candidate checkpoint — 2026-10-20 02:30 CDT, worker `/root/aud02_sysrender`
+
+- Worker-reported progress pending root replay; `AUD-02-NGS2-SYSRENDER-01` remains ACTIVE; failed
+  targeted tries 0. Slot `0x1601018` xrefs exited 0 and returned `0xf91450`, Evidence ID
+  `ev_90786a1998b746a670a1e01d847201edaddc9751c589406f0126cfb6edd7c421`; JSON
+  `local/re/evidence/aud02-ngs2-sysrender-01/rea-xrefs-slot.stdout.json` SHA-256
+  `e9883e93780635a6e221a60ee7cd77630378a6f5f1f504f1bf2881073fedc4fc`; stderr empty; exact argv,
+  exit and stderr records are in `rea-xrefs-slot.command.txt`, `.exit.txt` and `.stderr.log`.
+- Raw call scan command `python3 -I
+  local/re/evidence/aud02-ngs2-sysrender-01/raw-call-scan.py` exited 0; script SHA-256
+  `9185a47e06e601b979906f314888cd11f0de1f4326026dcd81b8337544062a77`, JSON result SHA-256
+  `6c95726ca28a2ce4fe21111bdbbabf0d4e4a9c7892316b65f80f612bdb361ba2`; it proposes one direct-call
+  candidate at `0x95383c`, bytes `e80fdc6300`. `objdump -D -M intel --start-address=0x953800
+  --stop-address=0x953850 local/re/eboot.elf` exited 0 with output SHA-256
+  `ae9f57f5b098030158f2cc75899a1e7996e1c95d62eb71e3b36a22824789765a`; a separate thunk disassembly
+  from `0xf91440` through `0xf91470` exited 0 with output SHA-256
+  `e02429d1b322d3b4947df5981149a240d2accd2c40da72ba4606de514b3a229f` and a section-range warning.
+  Worker reports thunk bytes `ff25c2fb6600` at `0xf91450` targeting slot `0x1601018`.
+- The targeted incoming-reference query at thunk `0xf91450` exited 0 after 378.001 s and returned
+  `0x95383c`, Evidence ID `ev_62e509cad7286b27bc9176aeb8ad91e10f39728f6ded8009f3fdfd18947ee023`; JSON
+  `local/re/evidence/aud02-ngs2-sysrender-01/rea-xrefs-thunk.stdout.json` SHA-256
+  `e9c7a66d539b98d363cb97d24d43b0215cb53b219579f6d248938f5aec411c4a`. The xrefs response omits
+  reference kind, so the worker retains raw bytes as the basis for identifying the direct call.
+- Exact next action: run `rea function` at `0x95383c`, finish a byte verifier for the caller range,
+  and return the private dossier for root replay. No runtime binding, reachability, ABI, NGS2
+  contract, or audio behavior is inferred.
