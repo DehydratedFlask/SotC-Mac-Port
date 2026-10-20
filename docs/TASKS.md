@@ -47,7 +47,7 @@ Gates and test evidence take precedence over a status label. Integrator owns thi
 | AUD-02-NGS2-VOICE-CONTROL-01 | Byte-check one callsite/dataflow path for `sceNgs2VoiceControl` | RE-02, AUD-01 | STATIC_PATH_BYTE_VERIFIED (root replay: 17/17 dossier checksums and byte verifier PASS; direct caller-to-thunk path; runtime binding and Ghidra adjacent-boundary edge remain unresolved) / root | 2 (MCP startup timeout; CLI provider not configured; 0 failed analysis hypotheses) |
 | AUD-02-NGS2-SYSRENDER-01 | Byte-check one callsite/dataflow path for `sceNgs2SystemRender` | RE-02, AUD-01 | ACTIVE (claim published; analysis not started) / `/root/aud02_sysrender` | 0 |
 | AUD-02-NGS2-VOICE-GETSTATE-01 | Byte-check one callsite/dataflow path for `sceNgs2VoiceGetState` | RE-02, AUD-01 | ACTIVE (claim published; analysis not started) / `/root/aud02_voicestate` | 0 |
-| AUD-02-NGS2-SYSDESTROY-01 | Byte-check one callsite/dataflow path for `sceNgs2SystemDestroy` | RE-02, AUD-01 | ACTIVE (claim published; awaiting worker dispatch) / root | 0 |
+| AUD-02-NGS2-SYSDESTROY-01 | Byte-check one callsite/dataflow path for `sceNgs2SystemDestroy` | RE-02, AUD-01 | ACTIVE (claim published; analysis dispatched) / `/root/aud02_sysdestroy` | 0 |
 | AUD-03 | Decoder/mixer/effect fixtures | AUD-02 | WAITING_FOR_DEPENDENCY | 0 |
 | AUD-04 | Actual game audio integration | AUD-03, CPU-04 | WAITING_FOR_DEPENDENCY | 0 |
 | SAV-01 | Recover game serializer/checksums | RE-02 | WAITING_FOR_DEPENDENCY | 0 |

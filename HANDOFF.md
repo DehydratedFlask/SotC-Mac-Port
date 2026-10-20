@@ -9,9 +9,11 @@ Three bounded AUD-02 import-to-call paths are root-verified:
 `AUD-02-NGS2-SYSCREATE-01` (`sceNgs2SystemCreateWithAllocator`),
 `AUD-02-NGS2-RACKCREATE-01` (`sceNgs2RackCreate`), and
 `AUD-02-NGS2-VOICE-CONTROL-01` (`sceNgs2VoiceControl`). Two independent static caller probes are
-claimed for `sceNgs2SystemRender` and `sceNgs2VoiceGetState`; workers are running. One additional
-bounded static caller probe is claimed for `sceNgs2SystemDestroy` (slot `0x1601010`, symbol 241,
-NID `u-WrYDaJA3k`) and will be dispatched after this claim is published. AUD-02 remains ACTIVE
+claimed for `sceNgs2SystemRender` and `sceNgs2VoiceGetState`; workers are running. A third bounded
+static caller probe is claimed and dispatched for `sceNgs2SystemDestroy` (slot `0x1601010`, symbol
+241, NID `u-WrYDaJA3k`) to `/root/aud02_sysdestroy` (`gpt-6-luna`, Extra High) in its own private
+dossier. The claim was pushed in `19e2a43`; dispatch details are in the linked checkpoint.
+AUD-02 remains ACTIVE
 because parameter semantics, audio behavior, and runtime use are unclassified. Root is the sole
 shared-document integrator. Claims and boundaries:
 [NGS2 callsite checkpoint](docs/checkpoints/2026-10-20-root-aud02-ngs2-callsite-claims.md) and
@@ -20,10 +22,9 @@ shared-document integrator. Claims and boundaries:
 Claim-preparation checks: the pinned ELF and import manifest hashes were rechecked; the exact
 `sceNgs2SystemDestroy` manifest tuple was found with the expected slot and one relocation site.
 `python3 scripts/project_index.py` exited 0 (4,147 folders), `graft check` passed wiring freshness
-(deep layer unbuilt, 1,225 nodes pending), and `git diff --check` passed. Exact next action: stage
-only HANDOFF/TASKS/FOLDERS and the new claim checkpoint, run staged and full publication audits,
-fetch/check remote divergence, commit and push, then dispatch the third independent worker. The
-pre-existing untracked `tools/graft/` cache remains unstaged.
+(deep layer unbuilt, 1,225 nodes pending), and `git diff --check` passed. The claim was published
+as `19e2a43`, then dispatched to `/root/aud02_sysdestroy`; audit and publication evidence is in
+the linked claim checkpoint. The pre-existing untracked `tools/graft/` cache remains unstaged.
 
 The prior system-create checkpoint was committed as `85fec59`
 (`docs: verify NGS2 system-create path`) and pushed from `357ed0c`; staged/full publish audits

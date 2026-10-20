@@ -34,3 +34,23 @@
 - Files changed: `HANDOFF.md`, `docs/TASKS.md`, this checkpoint. `docs/EVIDENCE.md` and
   `INSTALL_LOG.md` are unchanged pending verified output; no source files changed. G1 remains NOT
   PASSED.
+
+## Dispatch checkpoint — 2026-10-20 02:19 CDT, `/root`
+
+- Claim publication: commit `19e2a43` (`docs: claim NGS2 system-destroy callpath probe`) pushed
+  `873b62c..19e2a43` to `origin main`. Before commit, `git diff --cached --check` passed; staged
+  path audit accepted the 4 allowlisted docs files; full audit accepted 601 tracked paths; fetch
+  showed divergence `0 0`. The pre-existing untracked `tools/graft/` cache was not staged.
+- Worker dispatched with `collaboration.spawn_agent`: name `aud02_sysdestroy`, model
+  `gpt-6-luna`, reasoning effort `xhigh`, private output
+  `local/re/evidence/aud02-ngs2-system-destroy-01/`. Tool returned agent `/root/aud02_sysdestroy`;
+  analysis had just started and no result was available at dispatch.
+- Worker may edit only its private dossier. Root retains shared-doc integration and will replay the
+  checksum manifest and verifier before changing task status or public evidence. Failed tries at
+  dispatch: 0.
+- Post-dispatch checkpoint checks: `python3 scripts/project_index.py` exited 0 (4,147 folders; no
+  `docs/FOLDERS.md` content change); `graft check` exited 0 (wiring graph in sync, deep meaning
+  layer remains unbuilt with 1,225 nodes pending); `git diff --check` passed. Staged audit accepted
+  3 allowlisted docs paths; full audit accepted 601 tracked paths; fetch showed divergence `0 0`.
+  Exact next action: review the worker's dossier and report when ready; preserve all
+  ABI/runtime/semantic limits stated in the claim.
