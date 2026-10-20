@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — stragglers: 2 attributed, 1 provider failure
+
+`0x954726` → `FUN_00954680`, `0xa4a903` → `FUN_00a4a600` (2 REA successes; root replayed verifiers and checksums). `0xa4bddb` (SaveData Delete): REA exit 1 "No procedure exists" (address lies in a gap of `FUN_00a4ab90`); one provider failure, not retried; offline inference only. Details: `docs/checkpoints/2026-10-20-root-stragglers-complete.md`. Static only. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 198/198.
+
+Next exact action: SAV-01 producer-of-body/header step (caller of `FUN_00a51180`); remaining dialog helper imports; constructor batch 21 (next 175 `0xbd7950`). `0xa4bddb` would need a different provider operation (e.g. a function-creation-free disassembly window), not a retry of the same query.
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — SAV-01 region dossier verified
 
 First function-level save-region characterization: dispatcher `FUN_00a4d330` (task dword → `FUN_00a47d60` / `FUN_00a4ab90` / `FUN_00a48280`), load/save call orders, and hash helper `FUN_00161f50` (FNV-1a 32-bit form, offset basis passed by both load and save). 2 REA successes; root replayed verifier and checksums. Details (strings kept private): `docs/checkpoints/2026-10-20-root-sav01-region-dossier-complete.md`. Header layout and hash coverage are inference only; no save works. SAV-01 → ACTIVE. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 198/198 (batch 20, pushed `0d2b855`).
