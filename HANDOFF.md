@@ -1,31 +1,63 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:17 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:20 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:17 CDT, `/root` — invalid UTF-8 manifest test claimed
+## CURRENT CHECKPOINT — 2026-10-20 05:20 CDT, `/root` — invalid UTF-8 manifest fixture verified
 
-`DATA-02-ARCHIVE-MANIFEST-INVALID-UTF8-01` is claimed by root with `/root/next_fixture_scout` as
-the test-only implementation worker. The worker owns only `scripts/test_archive_overlap_map.py`;
-root owns shared docs and Git. The bounded regression will call
-`parse_manifest_bytes("synthetic", b"\xff")` and assert `ManifestError` with `manifest is not UTF-8`.
-The existing parser already converts `UnicodeDecodeError` to that exception; no parser change is
-expected. The parent task `DATA-02-ARCHIVE-OVERLAP-MAP-01` is `ARTIFACT_VERIFIED`.
+`DATA-02-ARCHIVE-MANIFEST-INVALID-UTF8-01` is `FIXTURE_VERIFIED`. `/root/next_fixture_scout`
+changed only `scripts/test_archive_overlap_map.py`; root owns shared docs and Git. The synthetic
+regression calls `parse_manifest_bytes("synthetic", b"\xff")` and asserts `ManifestError` with the
+exact `manifest is not UTF-8` message. The parser is unchanged. The parent task
+`DATA-02-ARCHIVE-OVERLAP-MAP-01` remains `ARTIFACT_VERIFIED`.
 
-Baseline `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_archive_overlap_map.py` exited 0 with
-11 tests. Log `local/checkpoints/root-2026-10-20-manifest-invalid-utf8-claim-baseline.log`, SHA-256
-`125933e1e7e2e18e36f6fded21c56b4de02add30203872c9228d401855150e90`. Baseline hashes:
-`scripts/audit_archive_overlap_map.py` `28330049faf0c7366159e7439ce80b8f4354413908c98bd3d7c95c6addbc7bf7`;
-`scripts/test_archive_overlap_map.py` `6f13a329f1572716107639691b36f9f488ab66b665e59ed37e4074f8377110a1`.
-Graft maps the parser to L54-L93 and current manifest tests to L21-L52; the exact live code converts
-invalid UTF-8 to the expected error. Failed implementation tries: zero.
+The 11-test baseline exited 0 before the worker edit; its log is
+`local/checkpoints/root-2026-10-20-manifest-invalid-utf8-claim-baseline.log`, SHA-256
+`125933e1e7e2e18e36f6fded21c56b4de02add30203872c9228d401855150e90`. Worker and root each ran
+`PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_archive_overlap_map.py`; both exited 0 with 12
+tests. Worker log `local/checkpoints/data02-manifest-invalid-utf8-test.log` and root replay log
+`local/checkpoints/root-2026-10-20-manifest-invalid-utf8-review.log` have identical SHA-256
+`b17a9f00ab66bc954b472082f0a458d1a1a3ff368d521a83bd8a3669c9b4e99e`. Test SHA-256 is
+`9de9f0084ce829d0e5bb386f5cdf4bf15a5ac625b64eb597755d3e69590e10d9`; unchanged parser
+`scripts/audit_archive_overlap_map.py` SHA-256 is
+`28330049faf0c7366159e7439ce80b8f4354413908c98bd3d7c95c6addbc7bf7`. Failed implementation
+tries: zero.
 
-`python3 scripts/project_index.py` exited 0 at 4,166 folders (`local/checkpoints/root-2026-10-20-manifest-invalid-utf8-claim-project-index.log`); `graft check` passed at 1,257 nodes / 530 source files with optional deep meaning layer unbuilt (`local/checkpoints/root-2026-10-20-manifest-invalid-utf8-claim-graft-check.log`); `git diff --check` passed. `docs/FOLDERS.md` lists 79 checkpoint files. Staged audit passed for 4 paths (log `local/checkpoints/root-2026-10-20-manifest-invalid-utf8-claim-publish-audit-staged.log`, SHA-256 `68a38548f7309cae385cfc0f9f886da8f91f1cfca31112350e1942a7a9ada8a9`); full audit passed for 637 tracked paths (log `local/checkpoints/root-2026-10-20-manifest-invalid-utf8-claim-publish-audit-all.log`, SHA-256 `33c82ebbb734b4bd2b852d06590f3dac5391afb8b026eb032fc5f536c79c57d3`); fetch showed 0/0 divergence. Next exact action: commit and push the claim, then dispatch worker.
+One independent fixture scout found no indexed reference candidate. Its `graft map` regenerated
+ignored files under `graft/.graph/` and `graft/.cache/`; these remain private and are not staged.
+No reference source or implementation file was changed by that scout.
 
-This test would establish rejection of one synthetic invalid-byte sequence only. It does not prove
-live manifest or archive behavior, payload semantics, or any game gate. No install/dependency
-change; G1 NOT PASSED and G2 NOT RUN. Next exact action is to run index/Graft/diff checks, publish
-this claim, then dispatch the worker.
+`python3 scripts/project_index.py` exited 0 at 4,166 folders; log
+`local/checkpoints/root-2026-10-20-manifest-invalid-utf8-complete-project-index.log`, SHA-256
+`f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`. `graft check` exited 0 with
+the graph in sync at 1,258 nodes; the optional deep meaning layer remains unbuilt. Log
+`local/checkpoints/root-2026-10-20-manifest-invalid-utf8-complete-graft-check.log`, SHA-256
+`b01a0073eeb6d43d739dd026eaf37725a4be48cb2a96c5582cb72340bdd96680`. `git diff --check` exited 0;
+its empty log is `local/checkpoints/root-2026-10-20-manifest-invalid-utf8-complete-diff-check.log`.
+`docs/FOLDERS.md` now lists 80 checkpoint files. `python3 -I scripts/audit_publish_paths.py`
+passed for the six staged paths; log `local/checkpoints/root-2026-10-20-manifest-invalid-utf8-complete-publish-audit-staged.log`, SHA-256
+`98b70418e64e8cfa4f569c04d48114e4da43d521a483ba243348623fcf94455e`. The `--all` audit passed
+for 638 tracked paths; log `local/checkpoints/root-2026-10-20-manifest-invalid-utf8-complete-publish-audit-all.log`, SHA-256
+`97f579edf358380283ad37c51bf10d49eb6c105f337aa2aecb6af65b15627696`. `git diff --cached --check`
+exited 0; empty log `local/checkpoints/root-2026-10-20-manifest-invalid-utf8-complete-diff-cached-check.log`.
+`git fetch origin` exited 0; `git rev-list --left-right --count origin/main...HEAD` returned `0 0`.
+No install/dependency change. This test establishes rejection of one synthetic invalid-byte
+sequence only; it does not prove live manifest/archive behavior, payload semantics, or any game
+gate. G1 NOT PASSED and G2 NOT RUN. Next exact action: commit and push the six allowlisted paths.
+
+## PRIOR CHECKPOINT — 2026-10-20 05:17 CDT, `/root` — invalid UTF-8 manifest test claimed
+
+`DATA-02-ARCHIVE-MANIFEST-INVALID-UTF8-01` was claimed by root with `/root/next_fixture_scout` as
+the test-only implementation worker. The worker owned only `scripts/test_archive_overlap_map.py`;
+root owned shared docs and Git. The planned regression called
+`parse_manifest_bytes("synthetic", b"\xff")` and asserted `ManifestError` with
+`manifest is not UTF-8`. The existing parser already converted `UnicodeDecodeError` to that
+exception. The 11-test baseline passed; baseline log and hashes are recorded in the completion
+checkpoint and the claim commit. The task was published before worker implementation. Failed
+implementation tries: zero.
+
+The claim checkpoint passed project-index and Graft checks, `git diff --check`, staged/full
+publish-path audits, and a 0/0 divergence check. Its next action was to dispatch the worker.
 
 ## PRIOR CHECKPOINT — 2026-10-20 05:17 CDT, `/root` — XFF short declared-length fixture verified
 
