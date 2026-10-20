@@ -48,7 +48,7 @@ Checkpoint (2026-10-19 21:48 CDT, bc-81763e53):
 - Commands: ctest -R '^vec_d6a520$' Passed; `python3 -I tools/lift/check_fd6a520.py` OK.
 - Logs: `/tmp/ctest_d6a520.log`, `/tmp/check_fd6a520.log`.
 - Store: Project `internal/worker-claim-d6a520.md`.
-- Push: (this commit).
+- Push: code **`1206f62`**; HANDOFF **`ee062e1`**; docs this commit.
 
 ## ACTIVE CLAIM — 2026-10-19 21:47 CDT, worker bc-81763e53 (CPU-01d) — 0xd6d890 — COMPLETE
 
