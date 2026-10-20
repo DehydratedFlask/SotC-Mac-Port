@@ -54,6 +54,33 @@
 - **Next exact action:** review the private report/verifier under
   `local/re/evidence/re02-appmain-25a8d0/`; independently rerun it before recording completion
   evidence.
+
+## 2026-10-20 01:14 CDT checkpoint — Ghidra function result returned
+
+- **Agent / task / status:** `/root`; `RE-02-APPMAIN-25A8D0-01`; ACTIVE, 0 failed analysis
+  hypotheses. Worker `/root/appmain_25a8d0` reports successful REA/Ghidra completion; root has not
+  yet validated the function range against raw ELF bytes.
+- **Private files changed by worker:** artifacts under
+  `local/re/evidence/re02-appmain-25a8d0/`, including `rea-function.json`,
+  `rea-function.exit.txt`, `rea-function.stderr.log`, `rea-command.txt`, and the completed
+  `objdump-window.txt` / `objdump-window.command.txt` / `objdump-window.exit.txt`. Root changed
+  only this checkpoint and `HANDOFF.md`.
+- **Exact command / result:** the exact REA invocation is preserved in
+  `local/re/evidence/re02-appmain-25a8d0/rea-command.txt`; its exit file contains `0`, and stderr
+  is 0 bytes. The returned Evidence ID is
+  `ev_167b8234fc082d63d7a17a8ea4ee218ff0b8559c2397945ae599ba0c657b72ba`.
+  `xcrun llvm-objdump -d --x86-asm-syntax=intel --start-address=0x25a8d0 --stop-address=0x25b200 "/Volumes/Extra/SoC Mac Native/local/re/eboot.elf"`
+  exited `0`; exact output and command are stored beside the REA result.
+- **Worker-observed fields:** Ghidra reports one contiguous body from `0x25a8d0` through
+  `0x25accc` inclusive, 1,021 bytes, 218 assembly entries and 24 basic blocks. It lists 24 call
+  sites / 11 unique resolved callees, two targetless indirect calls at `0x25aa06` and `0x25ac9f`,
+  and 3 incoming data references to the entry, including vtable slot `0x15c8cf0`. Callee
+  relationship coverage is PARTIAL. These are tool observations pending raw-byte/reference review;
+  no class contract, caller reachability, or runtime behavior follows.
+- **Remaining risks / next exact action:** target-specific body bytes, terminal instruction,
+  reference targets, vtable linkage, and unresolved-call coverage remain unverified. Receive the
+  worker's completed verifier, rerun it independently against the pinned ELF, and inspect preserved
+  logs before updating EVIDENCE or task status. G1 remains NOT PASSED.
 - **Follow-up record publication:** commit `addc714` (`docs: record app-main claim publication`)
   was pushed. The tree was clean with HEAD equal to `origin/main` at
   `addc714b0e4a4fbf0ef8369943f1d7a1cd7052e1`, divergence `0 0`.
