@@ -1,7 +1,21 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:16 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:25 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:23 CDT, worker bc-73721c8d (CPU-01d) — 0xdc4180 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdc4180** (survey index 68).
+Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
+Owned: `native/core/vec_dc4180.{hpp,cpp}`, `native/tests/test_vec_dc4180.cpp`,
+`tools/lift/check_fdc4180.py`, `native/CMakeLists.txt` (+vec_dc4180 only; origin/main base).
+Private dump (not published): `local/re/work/cdc4180.bin`.
+Did NOT edit: `startup_ctors.*`, SRV `host_map`/`free_list_carve`, peer vec WIP.
+Checkpoint (2026-10-19 20:24 CDT, bc-73721c8d):
+- OBS: unguarded vmovups copy; src=0x130e220 dst=0x3352cc0 bits=~0,~0,~0,0; index 68; distinct cells.
+- Commands: ctest -R '^vec_dc4180$' Passed; `python3 -I tools/lift/check_fdc4180.py` OK.
+- Store: Project `internal/worker-claim-dc4180.md`.
+- Push: `9fa5222` on origin/main (CMake restored later by peer `8d3554e` if raced).
 
 ## ACTIVE CLAIM — 2026-10-19 20:16 CDT, worker bc-effcf5dc (CPU-01d) — 0xdc2d50 — COMPLETE
 
