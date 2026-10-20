@@ -1,7 +1,18 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:27 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:28 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:28 CDT, worker bc-02397584 (CPU-01d) — 0xdac410 CMake restore — COMPLETE
+
+Task: CPU-01d — restore peer `vec_d80e60` CMake link accidentally dropped while wiring `vec_dac410`.
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted CMake push this checkpoint.
+Owned: `native/CMakeLists.txt` (keep `vec_d80e60` + `vec_dac410`), `HANDOFF.md`.
+Sources: `0xdac410`=`7cb0e83`; prior CMake race `96712b5` dropped `d80e60` — restored here.
+Did NOT edit: peer sources, Drive, SRV.
+Checkpoint: ctest -R 'vec_dac410|vec_d80e60' Passed.
+Store: Project `internal/worker-claim-dac410.md`.
+
 
 ## ACTIVE CLAIM — 2026-10-19 21:02 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 77 + CMake dac410 — IN PROGRESS
 
@@ -57,7 +68,7 @@ Checkpoint (2026-10-19 20:26 CDT, bc-02397584):
 - Commands: ctest -R '^vec_dac410$' Passed; `python3 -I tools/lift/check_fdac410.py` OK.
 - Logs: `/tmp/ctest_dac410.log`, `/tmp/check_fdac410.log`.
 - Store: Project `internal/worker-claim-dac410.md`.
-- Push: (this commit).
+- Push: sources `7cb0e83`; CMake `96712b5`/`(restore this commit)`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:25 CDT, worker bc-81763e53 (CPU-01d) — 0xd853a0 — COMPLETE
 
