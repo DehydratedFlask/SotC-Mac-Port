@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:01 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:03 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:01 CDT, /root — DATA-02, AUD-01, CPU-01d `0xcdc760` — FIXTURE_VERIFIED SLICES
+## CURRENT CHECKPOINT — 2026-10-19 23:03 CDT, /root — DATA-02, AUD-01, CPU-01d `0xcdc760` verified; APP-01 readiness claim — ACTIVE
 
 Three bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -66,7 +66,38 @@ and cdc760 fixture`), pushed to `origin main`. Before commit, `git diff --cached
 `python3 -I scripts/audit_publish_paths.py` passed 16 staged paths and
 `python3 -I scripts/audit_publish_paths.py --all` passed 563 paths. No private `local/` outputs
 were staged. Next exact action: select and claim another bounded, dependency-valid task before
-editing; cold boot/audio/save/Metal and G1 remain unproven.
+editing; the APP-01 claim below now defines the next exact action. Cold boot/audio/save/Metal and
+G1 remain unproven.
+
+### APP-01 — clean-exit and requested-Stop readiness — ACTIVE CLAIM
+
+Root claims a bounded launcher lifecycle fix. In `launcher/Sources/SoCLauncher/LauncherModel.swift`,
+`processEnded` returns to `.idle` after a requested Stop or a zero-status normal exit. `canStart`
+only accepts `.ready` or a failed state, so when the retained readiness report remains startable the
+Play button becomes disabled and status says “Not ready to play.” Implement a testable lifecycle
+transition in `LauncherCore`: requested Stop and successful exit return to `.ready` only when the
+current report permits start, otherwise `.idle`; unexpected exit preserves the failed status.
+Agent `/root/app01_probe` previously identified this behavior; root owns implementation/docs.
+
+- Graft evidence this claim: `graft callers canStart --depth all` found no indexed symbol; switched
+  to `graft grep "canStart"` (10 hits across four files; ~2,579 tokens saved). `graft callers
+  LauncherModel.validate --depth all` reported no indexed callers (~632 tokens saved). Live spans
+  were checked in `LauncherModel.swift`, `LauncherState.swift`, `ContentView.swift`, the LauncherCore
+  tests, and G4 in `docs/VALIDATION.md`.
+- Planned files: `launcher/Sources/LauncherCore/LauncherLifecycle.swift`,
+  `launcher/Tests/LauncherCoreTests/LauncherLifecycleTests.swift`, and the focused
+  `LauncherModel.swift` call-site update. No process ownership, executable selection, or core API
+  changes are part of the claim.
+- Exact verification: `swift test --package-path launcher --scratch-path local/build/launcher`.
+  This validates only model mapping, not a real GUI child lifecycle or G4 acceptance.
+- Reasonable design assumption: the earlier preference question about a testable LauncherCore
+  helper had no reply; proceed with that recommended bounded option. No code attempt has run;
+  failed tries: 0. Remaining risk: G4 lifecycle matrix, UI behavior and actual native-core start are
+  unverified. G1 NOT PASSED; G2-G6 NOT RUN.
+- Prior checkpoint with completed archive/audio identity and `0xcdc760` fixture slices is
+  [recorded here](docs/checkpoints/2026-10-19-root-data02-aud01-cpu-cdc760-complete.md), published
+  through `f59500e`. Next exact action: claim this APP-01 slice in `docs/TASKS.md`, then implement
+  only the helper/model transition and unit tests.
 
 ## PRIOR CHECKPOINT — 2026-10-19 22:41 CDT, /root — CPU-01d `0xce7300` metadata correction — FIXTURE_VERIFIED
 
