@@ -25,27 +25,30 @@ Exact check: rebuild + ctest + `python3 -I tools/lift/check_fb743c0.py`.
   and [AGENTS.md](AGENTS.md) / [ROADMAP.md](ROADMAP.md).
 - Users must supply their own legally obtained game files; none ship in the repo.
 
-## ACTIVE CLAIM — 2026-10-19 19:55 CDT, worker bc-71956f82 (publish-boundary assist)
+## ACTIVE CLAIM — 2026-10-19 19:55 CDT, worker bc-71956f82 (publish-boundary assist) — COMPLETE
 
 Task: Assist publish after AUD-01 — keep `local/manifests/assets/audio-headers.json`
 gitignored/audit-denied; publish classifier scripts under `scripts/`.
-Failed tries: 0. Status: IN PROGRESS → commit/push allowlisted delta.
+Failed tries: 0. Status: COMPLETE.
 Owned: `.gitignore` (comment under `/local/` only), `scripts/test_audit_publish_paths.py` (new),
-`docs/ASSETS.md` (publish-boundary sentence), plus untracked AUD-01
-`scripts/classify_audio_headers.py` / `scripts/test_audio_headers.py` if not yet on remote.
-Does NOT claim CPU-01 lifts (CPU-01f in flight). Exact check:
-`git check-ignore -v local/manifests/assets/audio-headers.json` +
-`python3 -W error -I scripts/test_audit_publish_paths.py` + staged path audit.
+`docs/ASSETS.md` (publish-boundary sentence). Classifiers already on remote from earlier push.
+Did NOT claim CPU-01 lifts. Store: Project `internal/worker-assist-publish-aud01.md`.
+Checkpoint: `git check-ignore` → `**/local/`; audit denies JSON / allows scripts;
+`test_audit_publish_paths.py` 3/3; pushed `f1cd257` to `origin/main`.
 
-## ACTIVE CLAIM — 2026-10-19 19:55 CDT, worker bc-cb8d07c2 (CPU-01f)
+## ACTIVE CLAIM — 2026-10-19 19:55 CDT, worker bc-cb8d07c2 (CPU-01f) — COMPLETE
 
 Task: CPU-01f — leaf ctors `0xa3ade0` (store u32 0) + `0x5777a0` (vxorps/store xmm).
-Failed tries: 0. Status: IN PROGRESS.
-Owned (new core only): native/core/store_zero32.*, zero_xmm16.*, tests, check_fa3ade0.py,
-check_f5777a0.py, CMakeLists (+targets), local/re/work/c{a3ade0,5777a0}.bin.
-Does NOT edit: startup_ctors.*, Drive clear_flag32/vec_neg036/xyz_mask_copy, peer vec_b52110.
-Exact check: ctest + both binary ties.
-Skipped: owned Drive/Claim-2b RVAs.
+Failed tries: 0. Status: FIXTURE_VERIFIED.
+Owned: native/core/store_zero32.*, zero_xmm16.*, tests, check_fa3ade0.py, check_f5777a0.py,
+CMakeLists (+targets; also linked peer `vec_b743c0.cpp` into sotc_core when missing), 
+local/re/work/c{a3ade0,5777a0}.bin.
+Did NOT edit: startup_ctors.*, Drive clear_flag32/vec_neg036/xyz_mask_copy.
+
+Checkpoint (2026-10-19 19:56 CDT, bc-cb8d07c2):
+- OBS: 0xa3ade0 → cell 0x32f5980; 0x5777a0 → xmm cell 0x2f295b8.
+- Commands: ctest **16/16** Passed; both binary ties OK.
+- Store: Project `internal/worker-claim-3c.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 19:54 CDT, worker bc-dc141fdf (GitHub publish) — COMPLETE
 
