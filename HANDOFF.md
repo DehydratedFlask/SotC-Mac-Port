@@ -110,8 +110,11 @@ SHA is `76ba1c935ba33282c1a59a1a0ba6b434a8f6688623628c6672a5bf0908c1ebe3`; verif
 `4deea41d8f63928ec049b61244667a279a1b4e857927d95eb8f6bb1ca1cfed2b`. Task
 `AUD-01-STS-BYTE-PROBE-01` is ARTIFACT_VERIFIED, with format/schema/codec/runtime/playback
 unclassified. Root added E55 and updated `docs/ASSETS.md` and `docs/TASKS.md`; no asset payloads
-were written or emitted. Exact next action: finish root verification of the independent app-main
-function dossier. No game execution or audio playback. G1 NOT PASSED.
+were written or emitted. Commit `ed3db01` (`docs: verify paired STS byte layout`) was pushed;
+post-push tree is clean and `HEAD` equals `origin/main` at
+`ed3db01348a20d6e33154068b4f05b1b49c1fac5`, divergence `0 0`. Exact next action: finish root
+verification of the independent app-main function dossier. No game execution or audio playback.
+G1 NOT PASSED.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 01:01 CDT, /root — two bounded analyses published
 
