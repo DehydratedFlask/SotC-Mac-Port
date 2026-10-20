@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 06:07 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 06:09 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 06:07 CDT, `/root` — PSARC block-table fixture verified
+## CURRENT CHECKPOINT — 2026-10-20 06:09 CDT, `/root` — PSARC block-table fixture published
 
 `DATA-02-PSARC-BLOCK-TABLE-RANGE-01` is `FIXTURE_VERIFIED`. Worker `/root/data02_psarc_block_table_range` changed only `scripts/test_psarc.py`, adding one test that sets entry 1's first-block field at bytes `78:82` to `0xffffffff` and asserts the exact `PsarcError('entry references blocks outside the block table')`.
 
@@ -19,7 +19,9 @@ Claim commit `72f3a23` and dispatch checkpoint syncs `bfb5ab5` / `dc02551` were 
 
 `git diff --check` and `git diff --cached --check` exited 0 (empty-log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). Staged audit accepted 7 allowlisted paths (log SHA-256 `3077d5e9fc639fef603ad0a4ceb35433356800711e93f47143edefad14f54253`); full audit accepted 650 paths (log SHA-256 `9b6fa4bea4256f9da19a4d59dfb76ad6c6a7f3a437aa1888a35936ce018ee20e`). Precommit fetch confirmed 0/0 at `dc02551c046f53af459afcca428a267668cb5f24` (log SHA-256 `0fd968c619e597674fff78231aafdead9076559e2f97885a338ac2e887499ddf`).
 
-Exact next action: commit and push the verified fixture. Generated/untracked `tools/graft/` stays excluded.
+Completion commit `9fc588fcb38e549dd01194852a0e8df62da1db46` (`test: reject PSARC block indices beyond table`) was pushed. Post-push fetch confirmed `HEAD` and `origin/main` match at that commit, 0/0 divergence (log SHA-256 `669d7f4c28f681c87d4ddc5d582c3c479e2c3218b9e112e1a3b6a83700ade705`).
+
+Exact next action: evaluate the read-only scout's independent fixture candidates and claim the next unowned task. Generated/untracked `tools/graft/` stays excluded.
 
 ## PRIOR CHECKPOINT — 2026-10-20 05:46 CDT, `/root` — truncated ELF PHDR fixture verified
 
