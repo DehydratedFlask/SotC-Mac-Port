@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:54 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:59 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:54 CDT, /root — STS identity slice verified; slot-10 and launcher UI reviews active
+## CURRENT CHECKPOINT — 2026-10-19 23:59 CDT, /root — STS, launcher UI review, and slot-10 helper slices recorded
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -14,14 +14,13 @@ and reports the unresolved original slot 10 at RVA `0xf09e60`. A private hash-bo
 103 registered RVA/index pairs against the pinned ELF and constructor table. Root independently
 reran the build, focused CTest (1/1), checker, and whitespace check successfully; worker logs are
 under `local/validation/20261019T2321-cpu-01-ctor-prefix-01/`. This proves runner bookkeeping only.
-The prefix runner bookkeeping, two leaf-fixture index annotations, bridge member identities, and
-the static slot-10 dossier are now verified and published. A bounded follow-up is active to
-characterize the local initializer called by slot 10 before its unresolved computed call. A
-read-only AUD-01 survey verified exact identities and bytes for paired test_adpcm STS members; a
-static APP-01 UI/accessibility review is active and does not verify runtime behavior. Runtime
-constructor behavior, helper contracts, audio format/use, game startup, and G1 remain unproven.
-Recent claim commits: `545f08f` (STS survey), `bda7289` (UI review); prior evidence commits include
-`b26768a`, `fc1b278`, and `e40a2a4`.
+The prefix runner bookkeeping, two leaf-fixture index annotations, bridge member identities, the
+static slot-10 dossier, and its caller-local initializer dataflow slice are verified and published.
+A read-only AUD-01 survey verified exact identities and bytes for paired test_adpcm STS members; the
+APP-01 static UI/accessibility review is recorded with runtime follow-ups. Runtime constructor
+behavior, helper contracts, audio format/use, game startup, and G1 remain unproven. Recent commits:
+`19cd2a2` (STS completion), `bda7289` (UI review claim), and `545f08f` (STS claim); prior evidence
+commits include `b26768a`, `fc1b278`, and `e40a2a4`.
 
 ### AUD-01-STS-IDENTITY-01 — paired cachedFiles test_adpcm identity survey — FIXTURE VERIFIED; parent active
 
@@ -41,14 +40,17 @@ Failed tries: 0. Exact evidence is in E44 and
 Next exact action: recover the game's own asset/audio reader through the open RE-02/Fios/ULT work;
 do not guess a codec from `.sts_cp3` names or bytes.
 
-### APP-01-UI-A11Y-REVIEW-01 — static macOS launcher UI/accessibility review — CLAIMED
+### APP-01-UI-A11Y-REVIEW-01 — static macOS launcher UI/accessibility review — STATIC REVIEW COMPLETE
 
-`/root/app01_ui_review` reviews `SoCLauncherApp`, `ContentView`, `ReadinessRow`, and the file
-import/process handoff against current Apple macOS and accessibility guidance. This is a static
-source review only: no VoiceOver/Accessibility Inspector, native window, Finder launch, display,
-controller, or focus behavior has been exercised. The worker changes no shared/source files and
-returns line-specific findings with primary-source links; root integrates the outcome. Claim:
-[APP-01-UI-A11Y-REVIEW-01](docs/checkpoints/2026-10-19-root-app01-ui-review-claim.md).
+`/root/app01_ui_review` completed a read-only review of `SoCLauncherApp`, `ContentView`,
+`ReadinessRow`, and the file-import/process handoff. It found conditional security-scoped URL and
+child-process-lifetime risks, silent importer-error handling, and a VoiceOver announcement check
+to perform. These remain bounded follow-ups, not confirmed runtime defects: sandbox/distribution
+policy is undecided, and UI behavior has not been exercised in a built app. No source changes or
+tests/builds were made. VoiceOver, Accessibility Inspector, Finder launch, native window behavior,
+Full Keyboard Access, and process cleanup at app quit remain NOT RUN; G4 remains NOT PASSED.
+Evidence and primary Apple references are in [E45](docs/EVIDENCE.md) and the
+[review checkpoint](docs/checkpoints/2026-10-19-root-app01-ui-review-claim.md).
 
 ### DATA-02 — pakN archive identity
 
@@ -316,29 +318,28 @@ write native replacement code.
   the indirect-call target and local helper contracts only if a separate bounded task is claimed;
   keep CPU-01 and G1 open until runtime startup and required gates are demonstrated.
 
-### CPU-01-CTOR10-INIT-HELPER-01 — characterize caller-local initializer effects — ACTIVE CLAIM
+### CPU-01-CTOR10-INIT-HELPER-01 — characterize caller-local initializer effects — STATIC_ANALYSIS_VERIFIED
 
-Integrator `/root` claims a read-only, hash-bound follow-up for `/root/cpu_ctor10_init_helper`.
-REA/Ghidra's caller dossier shows a call at `0xf09ec7` to `0xe1eda0` with a stack-object pointer and
-scalar arguments; caller code then checks stack fields at `RSP+0xa8` and `RSP+0xa0` before the
-unresolved computed call at `0xf09efb`. This claim verifies whether and how the callee writes those
-fields; it does not assume that the indirect call is dead or reachable.
+`/root/cpu_ctor10_init_helper` completed a read-only REA/Ghidra analysis of `0xe1eda0`; root reviewed
+the private verifier and reran it. ELF SHA-256 is
+`d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; Evidence ID
+`ev_9b111492162042c8bdb212bc83c30eda2370d34b6d4bb2cec357d83bff0d437d`. Helper range
+`0xe1eda0..0xe1eddd` is 62 bytes, SHA-256 `d51c6f9bf6d0197e16ed629e6f6c0f2e450511aa3c16f1a2c475b60352f1f559`.
+The caller sets `RDI=RSP+8`, `RSI=0`, `RDX=0x10`, `RCX=0x10`. For those arguments, helper writes
+four qwords at RSP-relative spans `[0x8,0x10)`, `[0x10,0x18)`, `[0x28,0x30)`, and `[0x30,0x38)`,
+which do not overlap either checked guard field. Before the call, caller zeros `[RSP+0x98,RSP+0xb8)`;
+the byte at `RSP+0xa8` is still zero when tested, so `je 0xf09f01` skips the indirect call at
+`0xf09efb` on this static path. This does not establish that constructor `0xf09e60` is reachable or
+runs, nor resolve the computed target. Full result and checker evidence are in E46 and
+[the completion checkpoint](docs/checkpoints/2026-10-19-root-cpu01-ctor10-init-helper-claim.md).
 
-- Use only the pinned local ELF and process-local REA/Ghidra install. Do not run the game, install
-  tools, modify the baseline REA snapshot, or write native replacement code.
-- Deliver exact ELF digest/image base, tool versions, Evidence ID, function range/body hash, direct
-  calls/data references/unresolved flows and coverage for `0xe1eda0`. Independently disassemble the
-  relevant callee and caller byte ranges, map callee writes through its argument pointer to the
-  caller's two tested stack fields, and report whether static bytes justify any conclusion about the
-  `0xf09efb` guard. Preserve observation versus inference; if aliasing or function boundaries prevent
-  a conclusion, leave it unresolved.
-- Exact command: use the pinned REA CLI with Ghidra and a distinct output snapshot
-  `local/re/rea-e1eda0-snapshot.json`; save command, analysis JSON, stderr, verifier and output under
-  existing `local/re/evidence/`. Verify the source ELF SHA against
-  `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; leave baseline
-  `local/re/rea-snapshot.json` unchanged. Failed tries: 0.
-- Root integrates shared docs and publication. G1 stays NOT PASSED; static guard characterization
-  cannot establish execution or native ABI compatibility.
+Private REA, snapshot, disassembly and verifier artifacts remain under `local/re/evidence/` and
+`local/re/`; the baseline snapshot hash is unchanged. Root's verifier output matched the worker's
+byte-for-byte. One first checker shell wrapper failed because zsh reserves `status`; the corrected
+wrapper passed. Failed REA invocations: 0; failed analysis hypotheses: 0; failed command wrappers: 1.
+Next exact action: if continuing CPU-01, claim a separate bounded task to resolve the computed call
+or remaining helper contract; do not infer constructor reachability or runtime behavior. G1 remains
+NOT PASSED.
 
 ### CPU-01-CTOR-METADATA-01 — correct original indices in leaf fixtures — FIXTURE_VERIFIED
 
