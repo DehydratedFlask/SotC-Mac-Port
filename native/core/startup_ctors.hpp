@@ -21,6 +21,9 @@
 #include "vec_e085e0.hpp"
 #include "vec_e05320.hpp"
 #include "vec_e026b0.hpp"
+#include "vec_de1ad0.hpp"
+#include "vec_de6d20.hpp"
+#include "vec_dfd5f0.hpp"
 
 namespace sotc {
 
@@ -45,6 +48,9 @@ struct StartupState {
     VecE085e0 vec_e085e0{};   // idx 51
     VecE05320 vec_e05320{};   // idx 52
     VecE026b0 vec_e026b0{};   // idx 53
+    VecDfd5f0 vec_dfd5f0{};   // idx 54
+    VecDe6d20 vec_de6d20{};   // idx 57
+    VecDe1ad0 vec_de1ad0{};   // idx 58
     std::array<std::byte, kScratchBytes> scratch{};
     std::atomic<std::uint64_t> scratch_slot{0};
     std::atomic<std::uint32_t> flag32{0};
