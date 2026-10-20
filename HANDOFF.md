@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:34 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:35 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:34 CDT, /root — importer checks pass; PHDR8 audit verified
+## CURRENT CHECKPOINT — 2026-10-20 01:35 CDT, /root — importer and PHDR8 checkpoints published
 
 ### Publication record — preceding checkpoint
 
@@ -26,6 +26,13 @@ removed its own test cache using a guarded Python `shutil.rmtree` on `launcher/.
 (exit `0`, 4,139 folders). `docs/FOLDERS.md` has no diff from the committed index and
 `launcher/.build` is absent. Worker/root test logs are under `local/validation/`; the root
 index-cache recovery log is `local/checkpoints/2026-10-20-root-index-build-artifact.log`.
+
+The combined APP-01 importer fix and PHDR8 audit result were committed as `524de07`
+(`fix: classify launcher folder import cancellation`) and pushed (`e60fe1e..524de07`). Staged
+path audit accepted eight allowlisted paths; full audit accepted 599; `git diff --cached --check`
+passed; `git fetch origin main` succeeded with divergence `0 0`. This includes E57/E58, both task
+status updates, completion checkpoints, and the three launcher source/test changes. The prior
+claim-only commit was `e60fe1e`.
 
 ### RE-02-APPMAIN-25A8D0-01 — STATIC_ANALYSIS_VERIFIED
 
@@ -108,7 +115,7 @@ Worker report SHA-256 `e6e459202dc4f14263f2aed24ad5e29bcc448662634a2e46f7714e980
 SHA-256 `13115545b0a898c4521d9234e5f0d7625c4f180aa39b44ce08662c049af04a61` under
 `local/re/evidence/re02-phdr8-source-audit/`. See [checkpoint](docs/checkpoints/2026-10-20-root-re02-phdr8-source-audit-claim.md).
 
-This checkpoint was recorded 2026-10-20 01:34 CDT by `/root`. APP-01-IMPORTER-ERROR-01 passed
+This checkpoint was recorded 2026-10-20 01:35 CDT by `/root`. APP-01-IMPORTER-ERROR-01 passed
 the worker's and root's `swift test` runs (14 tests, three suites); one corrected compile failure
 is retained, UI interaction remains NOT RUN. PHDR8 audit is ARTIFACT_VERIFIED with official meaning
 and loader role still UNCLASSIFIED. Files changed: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`,
@@ -119,9 +126,11 @@ files. Private evidence/logs: `local/re/evidence/re02-phdr8-source-audit/`,
 `swift test` from `launcher/` (exit 0, 14 tests passed), guarded removal of the test cache followed
 by `python3 scripts/project_index.py` (exit 0, 4,139 folders), `graft check` (exit 0; wiring graph
 synced, deep layer unbuilt with 1,225 nodes pending), `git diff --check` (exit 0), and root evidence
-hash verification (all four manifest files passed). Next exact action: stage allowlisted paths,
-rerun publish audits, commit, and push `origin/main`. Risks: no UI interaction or real game runtime
-validation; G1 remains NOT PASSED.
+hash verification (all four manifest files passed). The changes are published in `524de07` and
+pushed to `origin/main`; the post-push fetch showed no divergence. Next exact action: select the
+next independent task from the live roadmap/task register, read its specification, and claim it in
+HANDOFF/TASKS before dispatch or edits. Risks: no UI interaction or real game runtime validation;
+G1 remains NOT PASSED.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 01:17 CDT, /root — audio byte pair verified; app-main raw verification pending
 
