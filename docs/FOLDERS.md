@@ -11,7 +11,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `.graft` | 1 | Project folder; add a contract to docs/INDEX.md |
 | `Shadow of the Colossus` | 2 | Original user game inputs; read-only and private |
 | `docs` | 11 | Plans, task/evidence registries, checkpoint and escalation documentation |
-| `docs/checkpoints` | 5 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs/checkpoints` | 6 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/escalations` | 2 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/schemas` | 1 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `graft` | 1 | Regenerable source graph; internal cache directories summarized |
@@ -24,8 +24,8 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `local` | 0 | Private extracted assets, binary analysis, manifests, builds and evidence |
 | `logs` | 30 | Private command/build/install/extraction logs |
 | `native` | 2 | Native game implementation; verify module README and task ownership |
-| `native/core` | 128 | Native game implementation; verify module README and task ownership |
-| `native/tests` | 64 | Native game implementation; verify module README and task ownership |
+| `native/core` | 238 | Native game implementation; verify module README and task ownership |
+| `native/tests` | 119 | Native game implementation; verify module README and task ownership |
 | `reference` | 0 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC` | 12 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC/docs` | 10 | Pinned upstream source; read-only; symbols indexed by Graft |
@@ -586,7 +586,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `reference/shadPS4Plus-pkg/src/video_core/texture_cache` | 18 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `scripts` | 13 | Small project and offline analysis helpers |
 | `tools` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
-| `tools/lift` | 72 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/lift` | 127 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/pkg-extractor` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
 
 Private recursive inventory: `local/indexes/folders.json` (excluded from publication).
