@@ -1,6 +1,11 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors 0xc891e0, 0xc7de60, 0xc7c310 lifted
+
+`CPU-01-LEAF-CTOR-BATCH-09` `FIXTURE_VERIFIED`; root replay 143/143 ctest pass, three checkers exit 0. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-09-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending: two VoiceHandle final-interval workers (9a, 9b; 3 REA queries).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — VoiceHandle intervals 07A/07B confirmed
 
 Four more Ghidra bodies confirmed (`FUN_00949dc0`, `FUN_00949f00`, `FUN_00953220`, `FUN_00952e10`; 4 REA successes; root replayed both verifiers and checksum sets). 101 of 104 candidates Ghidra-confirmed; 3 heuristic-only (`0x95338e, 0x95341e, 0x9534be`). Details: `docs/checkpoints/2026-10-20-root-ngs2-voicehandle-intervals-07-complete.md`. Static only. G0 PARTIAL, G1-G6 NOT RUN.
