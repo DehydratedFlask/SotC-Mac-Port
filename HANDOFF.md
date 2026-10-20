@@ -1,9 +1,24 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:54 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:55 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:54 CDT, /root — PHDR10 claim published; source-search dispatch pending
+## CURRENT CHECKPOINT — 2026-10-20 00:55 CDT, /root — PHDR10 public-source search dispatched
+
+`RE-02-PHDR10-SOURCE-AUDIT-01` is assigned to `/root/phdr10_source_audit` (`gpt-6-luna`, Extra
+High). The worker is restricted to public, attributable Sony/PlayStation sources and generic ELF
+specification limits; it may create private evidence only under
+`local/re/evidence/re02-phdr10-source-audit/`. No source meaning is inferred from the dispatch.
+Claim `54d12b7` and publication confirmation `15d208c` are pushed. Caller-state task
+`CPU-01-CTOR10-CALLER-STATE-01` remains active with `/root/ctor10_caller_state`.
+
+Files changed at this dispatch checkpoint: `HANDOFF.md`, `docs/TASKS.md`. Exact next action: review
+the worker's report and sources when returned; independently verify any claimed mapping and preserve
+`UNCLASSIFIED` if no first-party evidence names the exact value. In parallel, review and independently
+verify the caller-state worker's byte checks when it returns. The PHDR task has 0 failed hypotheses;
+RE-02 remains active and G1 NOT PASSED.
+
+## PREVIOUS CHECKPOINT — 2026-10-20 00:54 CDT, /root — PHDR10 claim published; source-search dispatch pending
 
 The caller-state dispatch record was published in commit `75f936d` (`docs: record slot-10 caller-state
 dispatch`) after `d9d4d70`; post-push tree was clean and `HEAD`/`origin/main` aligned at
@@ -26,10 +41,9 @@ post-push status is clean, HEAD equals `origin/main` at
 `54d12b71eaed5b78745effde0eef52e79ed6e13f`, divergence `0 0`. Exact command/exit/output record:
 `local/re/evidence/re02-phdr10/claim-publication.log`. The source-search agent is not yet dispatched.
 
-Exact next action: dispatch the read-only public first-party source search to a GPT-6 Luna agent at
-Extra High reasoning. Then update `HANDOFF.md` and `docs/TASKS.md` with the agent ID and exact scope,
-run the required docs/index/audit checks, and publish the dispatch checkpoint. Failed
-hypotheses/tries on the new task: 0.
+Exact command/exit/output record: `local/re/evidence/re02-phdr10/claim-publication.log`.
+Exact next action at that checkpoint was to dispatch the read-only first-party source search.
+Failed hypotheses/tries on the task: 0.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 00:51 CDT, /root — slot-10 caller-state analysis dispatched
 
