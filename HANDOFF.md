@@ -3,6 +3,25 @@
 Updated: 2026-10-19 20:43 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+<<<<<<< Updated upstream
+=======
+## ACTIVE CLAIM — 2026-10-19 20:29 CDT, worker bc-81763e53 (CPU-01d) — 0xd7e640 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd7e640** (survey index 88).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d7e640.{hpp,cpp}`, `native/tests/test_vec_d7e640.cpp`,
+`tools/lift/check_fd7e640.py`, `native/CMakeLists.txt` (+vec_d7e640 only; origin/main base).
+Private dump (not published): `local/re/work/cd7e640.bin`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV, peer `0xd84ee0`/`0xd7fe40`/`0xdac410`.
+Prior: `0xd7fe90` sources `d7174df`, CMake `b1ab361`.
+Checkpoint (2026-10-19 20:29 CDT, bc-81763e53):
+- OBS: unguarded vmovups copy; src=0x1307200 dst=0x3352a30 bits=~0,~0,~0,0; index 88; distinct cells.
+- Commands: ctest -R '^vec_d7e640$' Passed; `python3 -I tools/lift/check_fd7e640.py` OK.
+- Logs: `/tmp/ctest_d7e640.log`, `/tmp/check_d7e640.log`.
+- Store: Project `internal/worker-claim-d7e640.md`.
+- Push: (pending this commit).
+
+>>>>>>> Stashed changes
 ## ACTIVE CLAIM — 2026-10-19 20:28 CDT, worker bc-81763e53 (CPU-01d) — 0xd7fe90 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd7fe90** (survey index 86).
