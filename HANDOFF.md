@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:10 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:11 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:10 CDT, /root — two private analyses underway
+## CURRENT CHECKPOINT — 2026-10-20 01:11 CDT, /root — archive digest transcription corrected
 
 ### RE-02-APPMAIN-25A8D0-01 — ACTIVE, private analysis underway
 
@@ -57,7 +57,7 @@ paired asset `cp3shadow/sound/test_adpcm/b_info_01.sts_cp3`, read in memory from
 cachedFiles archives through `Psarc.read()`. The identity artifact is
 `local/validation/aud01-sts-identity-01.json`, SHA-256
 `566275c3c104dfc473f8cb3c227641a16b10e2b0da7ffb2811e22b00f877e654`; base archive SHA-256
-`373828b9a6e5c689a6a05a01aa14b295026976438aa7796e9baa789ae03dda0`, member ID `10472`, size
+`373828b9a6e5c689a66b05a01aa14b295026976438aa7796e9baa789ae03dda0`, member ID `10472`, size
 `344`, member SHA-256 `d6d74c4ca3cfae66db345551dc22670604d155475a99aa40d6f3a12463056ee7`; patch archive
 SHA-256 `656d6870a159013921d036d0b7cf18c679bfc62fe5862b31332c459ff7da05d0`, same member ID `10472`,
 size `561`, member SHA-256 `42eb5a005793f67c3dcd2761ec75ad33f3e83a2d863a30daaf79513ebbe0eb86`. Goal is a
@@ -83,9 +83,16 @@ at `e51b60edc638ed056bdfcfe00073a6b2a9ea5bbd`, divergence `0 0`. Follow-up check
 post-push tree is clean and HEAD equals `origin/main` at
 `452b55ab9fb9365b6c6b25c1dc01323ff2c5b94f`, divergence `0 0`. Worker `/root/aud01_sts_byte_probe`
 (`gpt-6-luna`, Extra High) is dispatched for an in-memory pair probe; it will use Graft on the
-`Psarc.read()` source before verifying the live reader. Exact next action: receive its private
-report/verifier and independently rerun checks. Root keeps shared-doc ownership. No game execution
-or audio playback. G1 NOT PASSED.
+`Psarc.read()` source before verifying the live reader. At 01:11, root ran
+`shasum -a 256 local/validation/aud01-sts-identity-01.json local/extracted/CUSA08809/cachedFiles.psarc local/extracted/CUSA08809-patch/cachedfiles.psarc` (exit `0`) and checked
+`layers.base.archive.sha256` and `layers.patch.archive.sha256` from the identity JSON (exit `0`);
+both live archive hashes match the artifact. The task claim had a transcription error
+in the base hash (`...a6a05...`); the corrected digest is `...a66b05...`. Root saved command output
+to `local/validation/aud01-sts-base-digest-recheck-2026-10-20.log` and corrected the claim below.
+Commit `46e7b8d` (`docs: update active analysis handoff`) was pushed successfully; fetch and
+post-push status were clean/aligned at divergence `0 0`. Exact next action: receive the worker's
+private report/verifier and independently rerun checks. Root keeps shared-doc ownership. No game
+execution or audio playback. G1 NOT PASSED; both analyses remain ACTIVE with 0 failed hypotheses.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 01:01 CDT, /root — two bounded analyses published
 
