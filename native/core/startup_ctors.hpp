@@ -77,6 +77,7 @@
 #include "vec_d082e0.hpp"
 #include "vec_d08240.hpp"
 #include "vec_d06dd0.hpp"
+#include "vec_d00600.hpp"
 #include "vec_d7c380.hpp"
 #include "vec_d7c4d0.hpp"
 #include "vec_d7c9d0.hpp"
@@ -183,6 +184,7 @@ struct StartupState {
     VecD082e0 vec_d082e0{};   // 0xd082e0 idx 133
     VecD08240 vec_d08240{};   // 0xd08240 idx 134
     VecD06dd0 vec_d06dd0{};   // 0xd06dd0 idx 135
+    VecD00600 vec_d00600{};   // 0xd00600 idx 137
     VecB743c0 vec_b743c0{};   // idx 282
     VecB52110 vec_b52110{};   // idx 290
     std::array<std::byte, kScratchBytes> scratch{};
