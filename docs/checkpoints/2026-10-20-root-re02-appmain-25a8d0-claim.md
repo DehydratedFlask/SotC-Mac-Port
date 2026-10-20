@@ -87,3 +87,22 @@
 - **Latest shared checkpoint publication:** commit `5008163` (`docs: record claim publication
   state`) was pushed (`addc714..5008163`); it recorded the clean post-push state at
   `5008163a4b29129125785b5f1f6763eea7874c8e`, divergence `0 0`.
+
+## 2026-10-20 01:15 CDT checkpoint — distinct program-header mapping
+
+- **Agent / task / status:** `/root`; `RE-02-APPMAIN-25A8D0-01`; ACTIVE, 0 failed analysis
+  hypotheses. Worker `/root/appmain_25a8d0` reports an additional mapping nuance for the pending
+  raw verifier. Root has not yet independently checked these program-header values.
+- **Worker observation:** target function bytes map to PT_LOAD #0 (`p_offset=0x4000`,
+  `p_vaddr=0`). Incoming pointer words, including `0x15c8cf0`, lie outside PT_LOAD coverage but
+  within file-backed program header #1, whose raw values are `p_type=0x61000010`,
+  `p_vaddr=0x1594000`, `p_offset=0x1598000`, `p_filesz=0x6d190`, `p_memsz=0x70000`. The ELF has
+  `e_shnum=0`, so a section-header fallback is unavailable. The program-header type is left
+  uninterpreted; these are worker-reported byte mappings, not proof of the segment's semantics.
+- **Files / tools:** no source or reference file changed. Worker preserves its REA JSON, Ghidra logs,
+  and forthcoming verifier under `local/re/evidence/re02-appmain-25a8d0/`; shared integrator record
+  is this checkpoint and `HANDOFF.md`.
+- **Next exact action / risks:** receive the verifier, confirm unique file-backed mapping from raw
+  program headers for every claimed range/reference, and independently rerun it against the pinned
+  ELF. Keep partial relationship coverage and unresolved calls explicit. No additional analysis
+  attempt has occurred; no class, runtime, or reachability claim is made. G1 remains NOT PASSED.
