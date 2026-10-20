@@ -13,7 +13,7 @@ int main() {
         st.scratch_slot = 5;
         st.flag32 = 0xA5A5A5A5u;
         auto r = run_constructors(recovered_constructors(), st);
-        CHECK(r.ok() && r.completed == 79);
+        CHECK(r.ok() && r.completed == 81);
         CHECK(st.trig.cos_3_degrees > 0.9986f);
         CHECK(st.neg036.guard == 1 && st.neg036.lanes[0] == kNeg036Bits);
         CHECK(st.xyz_mask_copy == kXyzMaskBits && st.xyz_mask_b == kXyzMaskBits);
@@ -84,6 +84,8 @@ int main() {
         CHECK(st.vec_d20590 == kVecD20590Bits);
         CHECK(st.vec_d19bb0 == kVecD19bb0Bits);
         CHECK(st.vec_d19af0 == kVecD19af0Bits);
+        CHECK(st.vec_d19930 == kVecD19930Bits);
+        CHECK(st.vec_d13300 == kVecD13300Bits);
         CHECK(st.vec_b743c0 == kVecB743c0Bits);
         CHECK(st.vec_b52110 == kVecB52110Bits);
         CHECK(st.math.pi_guard == 1 && st.math_b.pi_guard == 1 && st.math_c.pi_guard == 1 && st.math_d.pi_guard == 1);
@@ -108,9 +110,9 @@ int main() {
     const std::uint32_t expect[] = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20, 22, 48, 49, 51, 52, 53, 54, 56, 57, 58, 60, 61, 62, 63,
         67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 96,
-        97, 98, 99, 100, 101, 102, 103, 104, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 118, 121, 122, 123, 124, 125, 282, 290, 520, 538};
-    CHECK(recovered_constructors().size() == 79);
-    for (std::size_t i = 0; i < 79; ++i)
+        97, 98, 99, 100, 101, 102, 103, 104, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 118, 121, 122, 123, 124, 125, 126, 128, 282, 290, 520, 538};
+    CHECK(recovered_constructors().size() == 81);
+    for (std::size_t i = 0; i < 81; ++i)
         CHECK(recovered_constructors()[i].original_index == expect[i]);
     for (std::size_t i = 1; i < recovered_constructors().size(); ++i)
         CHECK(recovered_constructors()[i - 1].original_index < recovered_constructors()[i].original_index);
