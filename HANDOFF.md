@@ -1,9 +1,21 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 04:28 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 04:37 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 04:28 CDT, `/root` — DATA-02 command-capture wrapper correction
+## CURRENT CHECKPOINT — 2026-10-20 04:34 CDT, `/root` — DATA-02 audit replay and RackQuery slot-to-thunk review
+
+`DATA-02-ARCHIVE-PATH-CASE-01` is now `ARTIFACT_VERIFIED`. Root verified all 32 entries in the worker checksum manifest, reran the metadata-only checker, and byte-compared the result against both worker runs. The seven manifests contain 170,451 records across 21 archive pairs: zero exact duplicate path groups, zero within-manifest Unicode `casefold()` groups, and zero differently spelled cross-archive equivalent pairs. Root verification JSON: `local/validation/data02-archive-path-case-01-root-review/verification.json`, SHA-256 `b706b935c28ed3915ac9c860d3fd2160a63c23ddba93ed765f499e3a5c054019`. The worker's zsh `status` variable capture error and root's initial wrong-working-directory checksum attempt were both corrected; neither was a failed analysis hypothesis. This does not establish Fios, filesystem, overlay, mount-order, title-loader, or runtime behavior.
+
+`AUD-02-NGS2-RACKQUERY-BUFFERSIZE-01`'s single authorized REA xrefs query completed successfully (REA 6.7.0 / Ghidra 12.1.4; 357.771501 s; Evidence ID `ev_0a6ab20e10665242c44f9ad982d80cc7dd87e4af4729fbda2cc985b413d4dcd1`). It queried slot `0x1601000` and returned only address `0xf91420`. Root replay passed 17/17 capture checks; offline byte verifier exited 0 and independently confirmed thunk bytes `ff25dafb6600` resolve from `0xf91420` to slot `0x1601000`. The provider's address-only xrefs projection omits reference kind. Fifteen raw `E8` byte-pattern candidates remain; `0x94fc2d` is still only a candidate from a disassembly slice with a section-boundary warning. No caller/callsite is accepted. A second read-only review agreed. It found two opaque `*_VERIFYING_IDENTITY` values missed by the worker's redactor; root replaced both values in the private environment capture and then built and verified a 143-file checksum manifest. No original identity value is retained. Root records: `local/re/evidence/aud02-ngs2-rackquery-buffersize-01/root-review/provider-replay.json` (SHA-256 `2543c5ab730c61a45c9960ffe8865b391786fdcd3fb849c20f07724bd136d994`) and `root-review/offline-verifier.json` (SHA-256 `4da98060c3e2bd2741615958296e2b5f254b9fb2596d7e0b23df8f4b6432e340d`).
+
+APP-01 choices already made remain: testable `LauncherCore` lifecycle helper and a system alert for non-cancellation import errors. Sandbox distribution and child-process lifetime choices remain unanswered, so no dependent code change is claimed. The initial-readiness VoiceOver check remains waiting because the Mac was locked; no app was opened. G1 is NOT PASSED and G2 is NOT RUN.
+
+The prior recorded root Graft tally was approximately 389,919 tokens across 14 calls; `graft check` remains wiring-synced, with the deep layer unbuilt and 1,225 nodes pending. `python3 scripts/project_index.py` exited 0 with 4,159 folders indexed; `graft check` exited 0 (wiring graph in sync); `git diff --check` passed. Logs are `local/checkpoints/root-data02-rackquery-project-index.*` and `root-data02-rackquery-graft-check.*`.
+
+Next exact action: finish the documentation checkpoint, refresh the folder index and Graft check, run staged and full publish-path audits, fetch and verify zero divergence, then commit and push allowlisted docs. Only after that checkpoint is public, authorize exactly one REA xrefs query for thunk address `0xf91420` to enumerate references. Do not issue any additional provider operation until that query is root-reviewed.
+
+## PREVIOUS CHECKPOINT — 2026-10-20 04:28 CDT, `/root` — DATA-02 command-capture wrapper correction
 
 The last claim checkpoint was pushed as `7560229` (`docs: claim all-archive path case audit`). AUD-02 has nine root-verified static import-to-call paths; RackQueryBufferSize and RackGetVoiceHandle remain partial, with no command semantics, runtime binding, reachability, ABI, audio behavior, or game use established. G1 is NOT PASSED and G2 is NOT RUN.
 
