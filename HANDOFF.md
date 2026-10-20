@@ -18,18 +18,20 @@ Checkpoint (2026-10-19 20:01 CDT, bc-dc141fdf):
 - Push: pending this checkpoint.
 - Store: Project `internal/worker-claim-e05320.md`.
 
-## ACTIVE CLAIM — 2026-10-19 20:00 CDT, worker bc-24e5fd45 (CPU-01d) — 0xe094e0
+## ACTIVE CLAIM — 2026-10-19 20:01 CDT, worker bc-24e5fd45 (CPU-01d) — 0xe094e0 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xe094e0** (survey index 50).
-Failed tries: 0. Status: IN PROGRESS.
-Owned (new only): `native/core/vec_e094e0.{hpp,cpp}`, `native/tests/test_vec_e094e0.cpp`,
+Failed tries: 0. Status: FIXTURE_VERIFIED.
+Owned: `native/core/vec_e094e0.{hpp,cpp}`, `native/tests/test_vec_e094e0.cpp`,
 `tools/lift/check_fe094e0.py`, `native/CMakeLists.txt` (+vec_e094e0; restore +vec_e085e0
 dropped by peer race; drop broken remote `init_f4fd40` refs again).
 Private dump (not published): `local/re/work/ce094e0.bin`.
-**Does NOT edit:** `startup_ctors.*`, peer WIP (b76950/e0b180/Drive).
-Avoided: Drive `0xf4eba0`/`0xf4b540` and peers `0xe085e0`/`0xb747f0`/`0xb743c0`/
-`0xef85e0`/`0xe0b180`/`0xb76950`.
-Exact check: ctest + `python3 -I tools/lift/check_fe094e0.py`; allowlisted push.
+Did NOT edit: `startup_ctors.*`, peer WIP / Drive files.
+Checkpoint (2026-10-19 20:01 CDT, bc-24e5fd45):
+- OBS: unguarded vmovups copy; src=0x1313e20 dst=0x3353380 bits=~0,~0,~0,0; index 50; distinct cells.
+- Commands: ctest --test-dir local/build/native → **20/20**; `python3 -I tools/lift/check_fe094e0.py` OK.
+- Logs: `/tmp/ctest_e094.log`, `/tmp/check_e094.log`.
+- Next: allowlisted push; store `internal/worker-claim-e094e0.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:00 CDT, worker bc-cb8d07c2 (CPU-01h) — COMPLETE
 
