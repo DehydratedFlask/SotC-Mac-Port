@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — NGS2 VoiceHandle and RackQuery second callsites verified
+
+VoiceHandle callsite `0x9496a8` -> thunk `0xf91410` in `FUN_009485a0` and RackQuery outlier `0x99fb7b` -> `0xf91420` in `FUN_0099f9d0` are byte- and REA-verified (2 provider successes, 0 failures; root replayed both verifiers and checksums). All 15 RackQuery candidates are now statically accounted for. Details: `docs/checkpoints/2026-10-20-root-ngs2-voicehandle-and-rackquery-second-callsite-complete.md`. Static only; no reachability/runtime/ABI claim. G0 PARTIAL, G1-G6 NOT RUN; failed tries 0.
+
+Next exact action: remaining AUD-02 bounded probes (98 unattributed VoiceHandle candidates) or other READY work; each needs a fresh claim.
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — RackQuery callsite attributed; XFF edge test verified
 
 `AUD-02-NGS2-RACKQUERY-BUFFERSIZE-01`: callsite `0x94ebc2` -> thunk `0xf91420`, inside `FUN_0094ea10` (`0x94ea10`, 7554 bytes); one REA query succeeded (361.9 s), root replayed the verifier (exit 0) and SHA256SUMS. 14 other candidates still unattributed; no reachability/runtime/ABI claim. `AUD-01-XFF-EDGE-01` `FIXTURE_VERIFIED` (9 tests). Details: `docs/checkpoints/2026-10-20-root-rackquery-callsite-and-xff-edge-complete.md`. G0 PARTIAL, G1-G6 NOT RUN; failed tries 0.
