@@ -1,9 +1,49 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:32 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:34 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:32 CDT, `/root` — short-prefix audio classifier fixture published
+## CURRENT CHECKPOINT — 2026-10-20 05:34 CDT, `/root` — dynamic string terminator fixture claimed
+
+`RE-02-DYNLINK-STRING-TERMINATOR-01` is claimed by root; the planned worker
+`/root/re02_dynlink_terminator` may edit only `scripts/test_ps4_dynlink.py` after the claim is
+published. Root owns shared records and Git. Parent `RE-02-DYNLINK-01` is `FIXTURE_VERIFIED` and
+the new test task was not previously registered. The one test will mutate only the synthetic
+fixture's `DT_SCE_STRSZ`, shortening it to omit the final symbol-name NUL, and assert that
+`d.parse()` rejects the unterminated name with `ValueError`. Production parser changes are out of
+scope unless the test exposes an independently demonstrated defect.
+
+Baseline `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py` exited 0 with 7 tests;
+log `local/checkpoints/root-2026-10-20-re02-dynlink-string-terminator-claim-baseline.log`, SHA-256
+`83166b089fbcb82fac63f22522fa6ae99bb5e46368cd35d756277fd463dd6346`. Parser SHA-256 is
+`3de247fcd7f42f0358c00fb4beb58bc005ae89aeb54c12707793cbf8f8afd701`; test SHA-256 is
+`7d487b19736d12e9d7f1e23eb269cde15bbf920bd77abc1b65ecc42a0c6e76af`. Graft finds the fixture at
+`scripts/test_ps4_dynlink.py:L18-L94`, its existing importer test at `L102-L138`, and `parse()` at
+`scripts/ps4_dynlink.py:L72-L120`, where the nested string reader searches for NUL with
+`strings.index(0, off)`. Failed implementation tries: zero.
+
+Coverage is one synthetic ELF string-table boundary only; no live ELF, loader/runtime semantics,
+game reachability, or G1/G2 behavior is inferred. No dependency change. Prior short-prefix audio
+fixture was published in `3be02ec`, with documentation sync `ddd8585`; post-push fetch confirmed
+`origin/main` at `ddd8585`, 0/0 divergence. `python3 scripts/project_index.py` exited 0 at 4,166
+folders (log `local/checkpoints/root-2026-10-20-re02-dynlink-string-terminator-claim-project-index.log`,
+SHA-256 `f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`); `graft check` exited
+0 at 1,259 nodes (log
+`local/checkpoints/root-2026-10-20-re02-dynlink-string-terminator-claim-graft-check.log`, SHA-256
+`e15e6d217bbb31ada46d24290684c83a073816c320d047ffe187fe0433e3e1ec`; optional deep layer
+unbuilt); `git diff --check` exited 0 (empty log SHA-256
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). `docs/FOLDERS.md` lists
+83 checkpoint files. Staged publish audit accepted 4 paths (log
+`local/checkpoints/root-2026-10-20-re02-dynlink-string-terminator-claim-publish-audit-staged.log`,
+SHA-256 `a6d103c4f38a1a76d799927468b7a36dd3f7127d0ad9ec3af911a247f185561b`); full audit accepted
+641 paths (log
+`local/checkpoints/root-2026-10-20-re02-dynlink-string-terminator-claim-publish-audit-all.log`,
+SHA-256 `6f16ef84096320705be9e98fe44da6581008ae232ae87ca4549f5e9bb431d739`). `git diff --cached
+--check` exited 0 (empty log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). `git fetch
+origin` exited 0 with divergence 0/0 at `ddd8585`. Next exact action: commit and push this claim,
+then dispatch the test-only worker.
+
+## PRIOR CHECKPOINT — 2026-10-20 05:32 CDT, `/root` — short-prefix audio classifier fixture published
 
 `AUD-01-CLASSIFIER-SHORT-LE-PREFIX-01` is `FIXTURE_VERIFIED`; `/root/aud01_short_prefix` changed
 only `scripts/test_audio_headers.py`, and root owns shared docs and Git. Parent `AUD-01` remains
