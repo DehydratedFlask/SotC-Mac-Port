@@ -1,93 +1,68 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 22:56 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:00 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 22:56 CDT, /root — DATA-02 + AUD-01 identity slices and CPU-01d `0xcdc760` — ACTIVE CLAIMS
+## CURRENT CHECKPOINT — 2026-10-19 23:00 CDT, /root — DATA-02, AUD-01, CPU-01d `0xcdc760` — FIXTURE_VERIFIED SLICES
 
-Root claims one archive-identity gap: stream-hash the 12,838,532,222-byte private
-`local/extracted/CUSA08809/pakN.psarc` and populate its private PSARC summary. The current
-summary `local/manifests/assets/CUSA08809-pakN.summary.json` records `sha256: null`; live
-`scripts/psarc.py` only hashes archives under 1 GiB and currently uses `Path.read_bytes()` for
-those smaller inputs. The bounded code task is in `scripts/psarc.py` with a synthetic streaming
-hash test in `scripts/test_psarc.py`. Worker `/root/data02_probe` owns those files and the private
-pakN summary/member outputs; root is the sole HANDOFF integrator. No source/game bytes are edited
-or published.
+Three bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
+tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
+archive, manifest, test logs and build outputs stay under ignored `local/`.
 
-- OBS: the local archive exists at the stated path and the summary omits its digest; the generator
-  has a size cutoff. Inference: hashing once in chunks should fill the required archive identity
-  without changing PSARC parsing or member semantics. No member format, TOC digest, or `pakN`
-  encoding is inferred. Attempt count: 0; no failed try.
-- Claim commands/evidence: `graft ask "How does the PSARC summary generator decide whether to
-  compute an archive SHA-256, and where can that policy be changed safely?" --source --in scripts/`
-  (exit 0; 11,062 tokens saved), `graft skeleton scripts/psarc.py` (exit 0; 2,964 saved), and
-  `sed -n '230,300p' scripts/psarc.py` (exit 0). Live evidence path:
-  `local/manifests/assets/CUSA08809-pakN.summary.json`. No implementation check has run yet.
-- Planned verification: `python3 -I scripts/test_psarc.py`; regenerate only the pakN private
-  summary/member listing with `python3 -I scripts/psarc.py local/extracted/CUSA08809/pakN.psarc
-  --out local/manifests/assets`; compare the JSON digest with `shasum -a 256
-  local/extracted/CUSA08809/pakN.psarc` and confirm the exact byte count. Logs will be kept under
-  `local/` and summarized in the completion checkpoint.
-- Remaining risk: one sequential read of the 12.8 GB private archive; member-content hashes and
-  formats remain open. G1 NOT PASSED; G2-G6 NOT RUN. Next exact action: delegate the claimed
-  stream-hash implementation, review its diff, run the bounded fixture and independent digest
-  check, then update DATA-02 evidence and push allowlisted changes.
+### DATA-02 — pakN archive identity
 
-Root also claims an independent AUD-01 inventory slice: add SHA-256 and PSARC entry locators
-(entry ID, byte offset, first block) for each of the 86 already-classified audio members in the
-private `local/manifests/assets/audio-headers.json`. The probe read all 86 through `Psarc.read()`
-without extracting or interpreting them (3,726,760 total member bytes, exit 0). Worker
-`/root/aud01_probe` owns `scripts/classify_audio_headers.py`, `scripts/test_audio_headers.py`, and
-the private audio manifest; root remains the sole HANDOFF integrator. Codec stays UNKNOWN and no
-NGS2 semantics are inferred.
+- OBS: `local/extracted/CUSA08809/pakN.psarc` is 12,838,532,222 bytes. Updated
+  `scripts/psarc.py` hashes in 1 MiB bounded reads and detects observed path/descriptor replacement,
+  truncation, growth, or metadata changes. `scripts/test_psarc.py` covers bounded multi-chunk reads
+  and path replacement. `python3 -I scripts/test_psarc.py` passed 12/12; root log:
+  `local/build/psarc-tests-20261019-root.log`.
+- The private summary records SHA-256
+  `559f7a3fa66bc652d36c5f1a885b351e4aeb17dadbba06a0006520bfd325be73`; independent
+  `shasum -a 256 local/extracted/CUSA08809/pakN.psarc` and a size/summary assertion passed.
+  Root log: `local/build/pakN-sha256-20261019-root.log`. Summary:
+  `local/manifests/assets/CUSA08809-pakN.summary.json`. The generation pass used a cleaned
+  temporary output directory under `local/build/`; its exact path and command are in the completion
+  checkpoint.
+- Observation: archive identity is verified. Inference: this does not establish member schemas,
+  TOC digest meaning, `pakN` member encoding, or mount order. Task remains ACTIVE/partial; failed
+  implementation tries: 0. Next exact action: keep DATA-02 open for member-format/schema work.
 
-- Claim evidence: `graft ask "AUD-01: locate code that inspects PSARC member bytes, audio header
-  classification for .sxd/.hd/.bd, and any existing sound bank/archive readers" --source`
-  (worker report: exit 0, approximately 7,842 tokens saved). Read-only command
-  `python3 -I - <<'PY' ... Psarc.read() ... PY` (worker report: exit 0 in 0.4 s, 86 members /
-  3,726,760 bytes; exact script in `docs/checkpoints/2026-10-19-root-aud01-member-identity-claim.md`). Existing evidence:
-  `docs/ASSETS.md` and `local/manifests/assets/audio-headers.json`. No implementation check has
-  run yet; failed tries: 0.
-- Planned verification: `python3 -I -m unittest scripts/test_audio_headers.py`; regenerate the
-  private manifest with `python3 -I scripts/classify_audio_headers.py --out
-  local/manifests/assets/audio-headers.json`; independently recompute all recorded member hashes
-  through `Psarc.read()` and require 86 rows with entry IDs/offsets/blocks. Keep all game-derived
-  output under `local/`.
-- Remaining risk: identities only; compression/codec/framing and actual audio playback remain
-  unknown. G1 NOT PASSED; G2-G6 NOT RUN. Next exact action: implement the independent per-member
-  digest/locator slice in parallel with DATA-02, review both diffs, record evidence and publish
-  only allowlisted source/docs.
+### AUD-01 — 86 audio member identities
 
-Root also claims one independent CPU-01d leaf: recover the unguarded vector-copy constructor at
-RVA `0xcdc760` as an ordinary native function and fixture, without registering it in the startup
-chain. The hash-pinned private ELF is `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
-The survey row is position 157 and the vector-copy manifest row is position 99 (both zero-based).
-The exact body is `c5 f8 10 05 d8 ac 61 00 c5 f8 11 05 00 55 67 02 c3`; signed RIP displacements
-resolve source `0x12f7440` and destination `0x3351c70`, with source words `ffffffff ffffffff
-ffffffff 00000000`. The source/destination pair is unique in the copy manifest and disjoint from
-other source/destination cells. Worker `/root/cpu01d_probe` owns
-`native/core/vec_cdc760.{hpp,cpp}`, `native/tests/test_vec_cdc760.cpp`,
-`tools/lift/check_fcdc760.py`, the focused CMake target and `native/README.md`; root owns all
-checkpoint/docs integration. Failed tries: 0.
+- `scripts/classify_audio_headers.py` now hashes each full decoded member and records its PSARC
+  entry ID, offset and first block; header family/entropy remain prefix observations. The private
+  `local/manifests/assets/audio-headers.json` has 86 rows across 5 archives (3,726,760 decoded
+  bytes). `python3 -I scripts/test_audio_headers.py` passed 12/12 at
+  `local/build/audio-headers-tests-20261019-root.log`; independent per-row hash/locator validation
+  passed at `local/build/audio-identities-verify-20261019-root.log`.
+- An initial `python3 -I -m unittest scripts/test_audio_headers.py` invocation exited 1 because
+  isolated mode omitted the cwd from import resolution (`ModuleNotFoundError: scripts`). Running
+  the test file directly passed; this was a command invocation issue, not a failing assertion or
+  implementation hypothesis. Codec remains UNKNOWN; no NGS2 or playback claim. Task ACTIVE/partial;
+  failed implementation tries: 0. Next exact action: inspect actual bank readers and format evidence.
 
-- Exact checks planned: `cmake --build local/build/native --target test_vec_cdc760`,
-  `ctest --test-dir local/build/native -R '^vec_cdc760$' --output-on-failure`, and
-  `python3 -I tools/lift/check_fcdc760.py`. The checker must verify the ELF digest, instruction
-  template, signed displacements, source words, survey/copy-manifest positions and native dump.
-- Graft claim evidence (three successful calls; approximately 7,202 tokens saved): the worker's
-  CPU-01d fixture-pattern `graft ask`, `graft grep "init_vec_ce7300"`, and
-  `graft skeleton tools/lift/check_fce7300.py`. Its exact binary extraction command and printed
-  rows are archived in `docs/checkpoints/2026-10-19-root-cpu01d-cdc760-claim.md`.
-- Remaining risk: leaf fixture only; no startup reachability, engine chain, or G1 evidence. The
-  separate `0xd71f60` escalation remains untouched. Next exact action: after claim publication,
-  implement the fixture/checker, verify its focused target and preserve all private binary data.
-  G1 NOT PASSED; G2-G6 NOT RUN.
-- Claim publication checkpoint: `git add HANDOFF.md docs/TASKS.md docs/FOLDERS.md
-  docs/checkpoints/2026-10-19-root-cpu01d-cdc760-claim.md`, `python3 -I
-  scripts/audit_publish_paths.py` (exit 0, 4 staged paths), `python3 -I
-  scripts/audit_publish_paths.py --all` (exit 0, 558 paths), `git commit -m "docs: claim cdc760
-  native fixture"` (commit `1494700`), and `git push origin main` (exit 0, updated `main`).
-  All CPU claim docs are now public; game-derived data and implementation edits are not staged.
+### CPU-01d — unguarded vector-copy leaf `0xcdc760`
+
+- Hash-pinned ELF `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`: body
+  `c5 f8 10 05 d8 ac 61 00 c5 f8 11 05 00 55 67 02 c3`; source `0x12f7440`, destination
+  `0x3351c70`, lanes `{~0,~0,~0,0}`; constructor survey position 157 and copy-manifest position 99.
+  Native implementation/test/checker passed. CMake target build log:
+  `local/build/native/cdc760-build.log`; focused CTest 1/1:
+  `local/build/native/cdc760-ctest.log`; byte/hash/manifest/native-dump checker:
+  `local/build/native/cdc760-checker.log`.
+- First target build returned 2 because the existing Make tree did not yet have the target rule;
+  `cmake -S native -B local/build/native` regenerated it, then the same target passed. The initial
+  transient output was not retained separately; configure/build logs capture the successful
+  recovery. No code hypothesis failed; failed tries: 0. `graft grep "init_vec_cdc760"` finds 4
+  hits across implementation/header/test; `graft check` reports the wiring graph in sync, with
+  deep meaning tier unbuilt; `python3 scripts/project_index.py` indexed 4,116 folders.
+- This is a plain leaf fixture, not startup registration or engine reachability. The separate
+  `0xd71f60` escalation remains untouched. Task slice FIXTURE_VERIFIED; G1 NOT PASSED, G2-G6 NOT
+  RUN. Next exact action: select one more bounded, dependency-valid task and claim before editing.
+
+Publication: claim docs for `0xcdc760` are on `main` in `1494700`, with the follow-up publication
+record in `54de3cf`. The current implementation/docs batch is not yet committed. Root will stage
+only allowlisted paths, run staged and `--all` publication audits, commit and push after review.
 
 ## PRIOR CHECKPOINT — 2026-10-19 22:41 CDT, /root — CPU-01d `0xce7300` metadata correction — FIXTURE_VERIFIED
 

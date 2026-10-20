@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
-"""AUD-01 header classification: .sxd/.sxd1/.sxd2/.hd/.bd magic + Shannon entropy.
+"""AUD-01 audio inventory: member identity plus prefix/entropy observations.
 
-Read-only. Uses scripts/psarc.py to decode the first N bytes of each matching member.
-Does NOT identify codecs, invent NGS2 semantics, or extract members to disk.
+Read-only. Uses scripts/psarc.py to decode each matching member in memory. SHA-256 covers
+the complete decoded member; the observed family and entropy use its first N bytes. PSARC
+entry IDs are table indices (entry 0 is the path manifest). Does NOT identify codecs, invent
+NGS2 semantics, or extract members to disk.
 """
 from __future__ import annotations
 
 import argparse
 import collections
+import hashlib
 import json
 import math
 import posixpath
@@ -125,15 +128,20 @@ def classify_archives(archives: list[Path], sample: int = SAMPLE) -> dict:
                 ext = posixpath.splitext(name)[1].lower()
                 if ext not in AUDIO_EXTS:
                     continue
-                size = a.entries[i]['size']
-                head = a.read(i, min(sample, size)) if size else b''
+                entry = a.entries[i]
+                member = a.read(i)
+                head = member[:sample]
                 family = family_of(head)
                 row = {
                     'archive': str(apath),
                     'archive_stem': apath.name,
+                    'entry_id': i,
+                    'entry_offset': entry['offset'],
+                    'first_block': entry['block'],
                     'path': name,
                     'ext': ext,
-                    'size': size,
+                    'size': entry['size'],
+                    'member_sha256': hashlib.sha256(member).hexdigest(),
                     'magic8': head[:8].hex(),
                     'magic16': head[:16].hex(),
                     'ascii16': ascii_preview(head, 16),

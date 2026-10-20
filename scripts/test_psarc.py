@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Synthetic PSARC fixtures (no game data): stored/zlib blocks, bounds and path rejection."""
+import hashlib
 import json
+import os
 import struct
 import sys
 import tempfile
 import unittest
 import zlib
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import psarc
@@ -86,6 +89,83 @@ class Tests(unittest.TestCase):
     def test_truncated_archive_rejected(self):
         with self.assertRaises(psarc.PsarcError):
             self.open(build([('a', b'1' * 64)])[:20])
+
+    def test_sha256_file_reads_multiple_bounded_chunks(self):
+        data = bytes(range(251))
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'sample.bin'
+            path.write_bytes(data)
+            read_sizes = []
+            original_open = Path.open
+
+            class ReadSpy:
+                def __init__(self, stream):
+                    self.stream = stream
+
+                def __enter__(self):
+                    self.stream.__enter__()
+                    return self
+
+                def __exit__(self, *args):
+                    return self.stream.__exit__(*args)
+
+                def fileno(self):
+                    return self.stream.fileno()
+
+                def read(self, size=-1):
+                    read_sizes.append(size)
+                    return self.stream.read(size)
+
+            def traced_open(target, *args, **kwargs):
+                stream = original_open(target, *args, **kwargs)
+                return ReadSpy(stream) if target == path else stream
+
+            with mock.patch.object(Path, 'open', new=traced_open):
+                actual = psarc._sha256_file(path, chunk_size=64)
+
+        self.assertEqual(actual, hashlib.sha256(data).hexdigest())
+        self.assertGreater(len(read_sizes), 2)
+        self.assertTrue(all(0 < size <= 64 for size in read_sizes))
+
+    def test_sha256_file_rejects_path_replacement_during_hash(self):
+        data = b'original archive bytes' * 8
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'sample.bin'
+            replacement = Path(tmp) / 'replacement.bin'
+            path.write_bytes(data)
+            original_open = Path.open
+
+            class ReplacingReader:
+                def __init__(self, stream):
+                    self.stream = stream
+                    self.replaced = False
+
+                def __enter__(self):
+                    self.stream.__enter__()
+                    return self
+
+                def __exit__(self, *args):
+                    return self.stream.__exit__(*args)
+
+                def fileno(self):
+                    return self.stream.fileno()
+
+                def read(self, size=-1):
+                    chunk = self.stream.read(size)
+                    if not self.replaced:
+                        with open(replacement, 'wb') as out:
+                            out.write(data)
+                        os.replace(replacement, path)
+                        self.replaced = True
+                    return chunk
+
+            def replacing_open(target, *args, **kwargs):
+                stream = original_open(target, *args, **kwargs)
+                return ReplacingReader(stream) if target == path else stream
+
+            with mock.patch.object(Path, 'open', new=replacing_open):
+                with self.assertRaisesRegex(psarc.PsarcError, 'changed while hashing'):
+                    psarc._sha256_file(path, chunk_size=16)
 
     def test_overlay_patch_wins_exact_path(self):
         base = {'a/x.bin': dict(path='a/x.bin', md5='aa', size=1),
