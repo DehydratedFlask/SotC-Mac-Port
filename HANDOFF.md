@@ -1,9 +1,32 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:47 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:50 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:46 CDT, /root — PHDR10 parser slice and CPU helper dossier root-verified
+## CURRENT CHECKPOINT — 2026-10-20 00:50 CDT, /root — slot-10 caller-state analysis claimed
+
+Follow-up publication commit `411a45b` (`docs: record PHDR10 and helper publication`) pushed after
+`0e16b9a`; verified post-push tree clean, `HEAD` equals `origin/main` at
+`411a45b0d25a20cf83961277f01703176cbd80e9`, divergence `0 0`.
+
+New bounded task `CPU-01-CTOR10-CALLER-STATE-01` is claimed. It traces the four stack fields the
+verified helper at `0xe1ede0` reads at its callsite `0xf09f04`, which maps to caller offsets
+`RSP+0x38`, `RSP+0x40`, `RSP+0x49`, and `RSP+0x4a`. The claim limits analysis to byte-backed writes,
+reads and previously verified helper effects before that call; unknown call effects stay unknown.
+No type/ABI/lifecycle inference or claim that the helper's computed calls are unreachable is allowed
+without every guard value and path being established. Root owns `HANDOFF.md`; the analyst may edit
+only private artifacts under `local/re/`. Claim:
+[CPU-01-CTOR10-CALLER-STATE-01](docs/checkpoints/2026-10-20-root-cpu01-ctor10-caller-state-claim.md).
+Task row and claim are in the working tree. `python3 scripts/project_index.py` exited `0` with
+`4133 folders indexed; written` and checkpoint directory count 34. `graft check` exited `0` with
+the wiring graph in sync; the optional deep meaning layer remains 0% (1,219 nodes pending).
+`git diff --check` passed. Failed analysis hypotheses: 0.
+
+Exact next action: stage only `HANDOFF.md`, `docs/TASKS.md`, `docs/FOLDERS.md`, and this claim file;
+run staged/full publication audits and staged whitespace check, fetch/check divergence, then commit
+and push. Dispatch the analyst only after the claim commit is published.
+
+## PREVIOUS CHECKPOINT — 2026-10-20 00:46 CDT, /root — PHDR10 parser slice and CPU helper dossier root-verified
 
 The three supplied LLM Wiki digests were reviewed as operational checkpoints; the project index at
 `topics/projects/_index.md` confirms that live repository files remain authoritative. No digest was
