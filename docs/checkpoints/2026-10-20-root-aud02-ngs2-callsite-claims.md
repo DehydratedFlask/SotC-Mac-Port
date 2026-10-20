@@ -115,6 +115,11 @@ assignment. Publication: commit `3e5ecea` (`docs: record NGS2 probe assignments`
 - Next exact action: retry once with that absolute path in `GHIDRA_INSTALL_DIR` plus the existing
   heap/deadline values. This is the third provider attempt; if it fails, stop and escalate under
   AGENTS.md. Do not reset the failed attempt count.
+- Publication: commit `d7cc85d` (`docs: record NGS2 CLI config failure`) pushed
+  `d78fd8c..d7cc85d`; staged path audit passed three allowlisted paths, full audit passed 600,
+  `git diff --cached --check` passed, fetch showed divergence `0 0`. Full audit log is
+  `local/checkpoints/2026-10-20-root-aud02-cli-config-publish-all.log`, SHA-256
+  `8f022f03c0f875d7113c9cd175501ae1b25edf7b6cb184065982160db56df4d4`.
 
 ## Packet boundaries
 

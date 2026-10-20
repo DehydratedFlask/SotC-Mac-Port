@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:51 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:52 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:51 CDT, /root — VoiceControl CLI provider config failure recorded
+## CURRENT CHECKPOINT — 2026-10-20 01:52 CDT, /root — provider failures published; third CLI attempt next
 
 Three bounded AUD-02 static packets are in progress: `AUD-02-NGS2-SYSCREATE-01` for
 `sceNgs2SystemCreateWithAllocator` (worker `/root/aud02_syscreate`),
@@ -98,8 +98,11 @@ source. This is the second failed provider invocation for the task; failed analy
 remain 0.
 
 The already-installed Ghidra path from REA's live session inventory is
-`/Users/dehydratedflask/Applications/ghidra_12.1.4_PUBLIC`. No install/download is needed. Exact
-next action: make one CLI invocation with `GHIDRA_INSTALL_DIR` set to that path, preserving the
+`/Users/dehydratedflask/Applications/ghidra_12.1.4_PUBLIC`. No install/download is needed. The
+failure checkpoint was committed as `d7cc85d` (`docs: record NGS2 CLI config failure`) and pushed
+from `d78fd8c` to `d7cc85d`; staged path audit accepted three allowlisted paths, full audit
+accepted 600, `git diff --cached --check` passed, and fetch showed divergence `0 0`. Exact next
+action: make one CLI invocation with `GHIDRA_INSTALL_DIR` set to that path, preserving the
 existing 8 GB/1,200,000 ms limits and private stdout/stderr. This is provider attempt three; if it
 fails, stop this task and escalate as required. The CLI config change does not reset prior failures.
 Workers continue their independent system/rack packets.
