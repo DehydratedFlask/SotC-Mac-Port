@@ -1,7 +1,41 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:25 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:40 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:40 CDT, worker bc-73721c8d (CPU-01d) — 0xd84ee0 — IN PROGRESS
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd84ee0** (survey index 84).
+Failed tries: 0. Status: CLAIMED / lifting.
+Owned: `native/core/vec_d84ee0.{hpp,cpp}`, `native/tests/test_vec_d84ee0.cpp`,
+`tools/lift/check_fd84ee0.py`, `native/CMakeLists.txt` (+vec_d84ee0 only; origin/main base).
+Private dump (not published): `local/re/work/cd84ee0.bin`.
+Did NOT edit: `startup_ctors.*`, SRV, peer `0xdac410`/`0xd85490`/`0xd853a0`.
+Store: Project `internal/worker-claim-d84ee0.md`.
+
+## ACTIVE CLAIM — 2026-10-19 20:58 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 78/79/83 — COMPLETE
+
+Task: CPU-01e — register peer FIXTURE_VERIFIED `0xd94cb0` (78), `0xd90310` (79), `0xd853a0` (83).
+Skipped `0xdac410` (not on origin), gap 10–19, idx 50, SRV. Mid-lift `0xd85490` deferred.
+Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
+Checkpoint: ctest OK; check_fd94cb0/fd90310/fd853a0 OK; registry **40** (+78/+79/+83). `0xdac410` still absent.
+Owned: `startup_ctors.*`, `test_startup_ctors.cpp`, `HANDOFF.md`. CMake: origin as-is.
+
+## ACTIVE CLAIM — 2026-10-19 20:26 CDT, worker bc-02397584 (CPU-01d) — 0xdac410 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdac410** (survey index 77).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_dac410.{hpp,cpp}`, `native/tests/test_vec_dac410.cpp`,
+`tools/lift/check_fdac410.py`, `native/CMakeLists.txt` (+vec_dac410 only; origin/main base).
+Private dump (not published): `local/re/work/cdac410.bin`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV, peer `0xd85490`/`0xd853a0`/`region_list`.
+Abandoned leaf: Survey C store claim `0xdb7e60` (already on origin); did not take that leaf.
+Checkpoint (2026-10-19 20:26 CDT, bc-02397584):
+- OBS: unguarded vmovups copy; src=0x130ca00 dst=0x3352c30 bits=~0,~0,~0,0; index 77; distinct cells.
+- Commands: ctest -R '^vec_dac410$' Passed; `python3 -I tools/lift/check_fdac410.py` OK.
+- Logs: `/tmp/ctest_dac410.log`, `/tmp/check_fdac410.log`.
+- Store: Project `internal/worker-claim-dac410.md`.
+- Push: (this commit).
 
 ## ACTIVE CLAIM — 2026-10-19 20:25 CDT, worker bc-81763e53 (CPU-01d) — 0xd853a0 — COMPLETE
 
@@ -105,15 +139,9 @@ Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
 Checkpoint: ctest 43/43; check_fdb7e60 + check_fdb5dd0 OK; registry size **36** (+73 `0xdb7e60`, +74 `0xdb5dd0`).
 Owned: `startup_ctors.*`, `test_startup_ctors.cpp`, `HANDOFF.md`. CMake: origin as-is.
 
-## ACTIVE CLAIM — 2026-10-19 20:35 CDT, worker bc-02397584 (CPU-01d) — 0xdac410 — IN PROGRESS
+## ACTIVE CLAIM — 2026-10-19 20:35 CDT, worker bc-02397584 (CPU-01d) — 0xdac410 — COMPLETE (see tip)
 
-Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdac410** (survey index 77).
-Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
-Owned: `native/core/vec_dac410.{hpp,cpp}`, `native/tests/test_vec_dac410.cpp`,
-`tools/lift/check_fdac410.py`, `native/CMakeLists.txt` (+vec_dac410 only; origin/main base).
-Private dump (not published): `local/re/work/cdac410.bin`.
-Did NOT edit: `startup_ctors.*`, Drive, SRV, peer `0xdb7e60`/`0xdb5dd0`/`0xdb93a0`/`0xdbb280`.
-Store: Project `internal/worker-claim-dac410.md`.
+Superseded by tip COMPLETE checkpoint for the same leaf (2026-10-19 20:26 CDT).
 
 ## ACTIVE CLAIM — 2026-10-19 20:33 CDT, worker bc-73721c8d (CPU-01d) — 0xdb5dd0 — COMPLETE
 
