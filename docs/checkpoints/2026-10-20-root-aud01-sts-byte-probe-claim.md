@@ -56,3 +56,11 @@
 - **Next exact action:** regenerate the project folder index; run Graft freshness check; run staged
   and full publication path audits, whitespace checks and fetch/divergence check; commit and push
   these allowlisted claim files; then dispatch one `gpt-6-luna` Extra High worker.
+- **Publication result:** project index exited `0` (`4,136 folders indexed; written`); Graft check
+  exited `0` (wiring graph synchronized, meaning tier unbuilt with 1,219 nodes pending); staged and
+  cached whitespace checks passed; staged audit accepted 5 paths; full audit accepted 594 paths;
+  fetch succeeded with pre-commit divergence `0 0`. Commit `e51b60e` (`docs: claim paired audio
+  format probe`) pushed (`5008163..e51b60e`). Post-push tree was clean and HEAD equaled `origin/main`
+  at `e51b60edc638ed056bdfcfe00073a6b2a9ea5bbd`, divergence `0 0`.
+- **Next exact action:** dispatch one `gpt-6-luna` Extra High audio worker; root will independently
+  rerun its verifier before changing the task status.

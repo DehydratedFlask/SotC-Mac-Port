@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:08 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:09 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:08 CDT, /root — app-main analysis active; independent audio probe claimed
+## CURRENT CHECKPOINT — 2026-10-20 01:09 CDT, /root — app-main analysis active; independent audio probe published
 
 ### RE-02-APPMAIN-25A8D0-01 — ACTIVE, private analysis underway
 
@@ -49,7 +49,7 @@ failed analysis hypotheses remain 0. Exact next action: root-review the report/v
 whether warnings affect the target before marking evidence. No source or reference changes, game
 execution, install, or download. G1 NOT PASSED.
 
-### AUD-01-STS-BYTE-PROBE-01 — ACTIVE, claim prepared; private worker dispatch pending publication
+### AUD-01-STS-BYTE-PROBE-01 — ACTIVE, claim published; private worker dispatch pending
 
 Parent AUD-01, prerequisites DATA-01 and `AUD-01-STS-IDENTITY-01`. The probe is limited to the
 paired asset `cp3shadow/sound/test_adpcm/b_info_01.sts_cp3`, read in memory from both verified
@@ -71,9 +71,15 @@ Pre-claim selection used the verified identity JSON, choosing the lexicographica
 hash-different pair where both decoded sizes are at least 256 bytes; the identity artifact SHA was
 rechecked at 01:06 CDT. An exploratory listing script used a nonexistent `layers.*.members` key
 and exited `1`; inspecting `comparison.paired_members` corrected the lookup. No format hypothesis
-or byte extraction was attempted. Exact next action: update the folder index, run Graft freshness
-and publication checks, push the allowlisted claim, then dispatch one independent `gpt-6-luna`
-Extra High audio worker. Root retains shared-document ownership.
+or byte extraction was attempted. Publication checks: `python3 scripts/project_index.py` exited
+`0` (`4,136 folders indexed; written`); `graft check` exited `0` (wiring graph synchronized; deep
+meaning layer unbuilt, 1,219 nodes pending); `git diff --check` and `git diff --cached --check`
+passed; staged path audit accepted 5 paths; full audit accepted 594; `git fetch origin main`
+succeeded and pre-commit divergence was `0 0`. Commit `e51b60e` (`docs: claim paired audio format
+probe`) pushed successfully (`5008163..e51b60e`). Post-push tree is clean, HEAD equals `origin/main`
+at `e51b60edc638ed056bdfcfe00073a6b2a9ea5bbd`, divergence `0 0`. Exact next action: dispatch one
+independent `gpt-6-luna` Extra High worker for this audio-only byte probe. Root retains shared-doc
+ownership and will independently rerun the worker's verifier.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 01:01 CDT, /root — two bounded analyses published
 
