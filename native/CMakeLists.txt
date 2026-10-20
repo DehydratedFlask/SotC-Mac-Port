@@ -22,8 +22,10 @@ add_library(sotc_core STATIC
   core/clear_flag32.cpp
   core/clear_flag64.cpp
   core/vec_b52110.cpp
+  core/vec_b743c0.cpp
   core/store_zero32.cpp
-  core/zero_xmm16.cpp)
+  core/zero_xmm16.cpp
+  core/init_f4fd40.cpp)
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()
 add_executable(test_math_constants tests/test_math_constants.cpp)
@@ -65,9 +67,15 @@ add_test(NAME clear_flag64 COMMAND test_clear_flag64)
 add_executable(test_vec_b52110 tests/test_vec_b52110.cpp)
 target_link_libraries(test_vec_b52110 sotc_core)
 add_test(NAME vec_b52110 COMMAND test_vec_b52110)
+add_executable(test_vec_b743c0 tests/test_vec_b743c0.cpp)
+target_link_libraries(test_vec_b743c0 sotc_core)
+add_test(NAME vec_b743c0 COMMAND test_vec_b743c0)
 add_executable(test_store_zero32 tests/test_store_zero32.cpp)
 target_link_libraries(test_store_zero32 sotc_core)
 add_test(NAME store_zero32 COMMAND test_store_zero32)
 add_executable(test_zero_xmm16 tests/test_zero_xmm16.cpp)
 target_link_libraries(test_zero_xmm16 sotc_core)
 add_test(NAME zero_xmm16 COMMAND test_zero_xmm16)
+add_executable(test_init_f4fd40 tests/test_init_f4fd40.cpp)
+target_link_libraries(test_init_f4fd40 sotc_core)
+add_test(NAME init_f4fd40 COMMAND test_init_f4fd40)
