@@ -76,7 +76,8 @@ add_library(sotc_core STATIC
   core/vec_d6a520.cpp
   core/vec_d62690.cpp
   core/vec_d5fbe0.cpp
-  core/vec_d47880.cpp)
+  core/vec_d47880.cpp
+  core/vec_d47420.cpp)
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()
 add_executable(test_math_constants tests/test_math_constants.cpp)
@@ -308,3 +309,7 @@ add_test(NAME vec_d5fbe0 COMMAND test_vec_d5fbe0)
 add_executable(test_vec_d47880 tests/test_vec_d47880.cpp)
 target_link_libraries(test_vec_d47880 sotc_core)
 add_test(NAME vec_d47880 COMMAND test_vec_d47880)
+
+add_executable(test_vec_d47420 tests/test_vec_d47420.cpp)
+target_link_libraries(test_vec_d47420 sotc_core)
+add_test(NAME vec_d47420 COMMAND test_vec_d47420)
