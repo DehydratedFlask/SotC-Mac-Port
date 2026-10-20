@@ -1,9 +1,41 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:12 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:14 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:12 CDT, `/root` — PSARC truncated-block fixture verified
+## CURRENT CHECKPOINT — 2026-10-20 05:14 CDT, `/root` — XFF short declared-length test claimed
+
+`AUD-01-XFF-DECLARED-LENGTH-SHORTER-01` is claimed by root with `/root/app01_readiness` as the
+test-only implementation worker. The worker owns only `scripts/test_audio_bank_header.py`; root
+owns shared docs and Git. The bounded regression will give `parse_xff_member` a valid `xff\0`
+member whose u32le declared length at offset `0x14` is smaller than the full buffer, and assert it
+raises `AudioBankFormatError`. Existing parser logic already requires declared length to equal the
+member length; no parser change is expected.
+
+Baseline `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_bank_header.py` exited 0 with
+6 tests. Log: `local/checkpoints/root-2026-10-20-xff-short-length-claim-baseline.log`, SHA-256
+`dcd2147edfda2291b456dfb6d9f3021f0fed07760d5a1c8869fc5446f30e28fe`. Baseline hashes:
+`scripts/audio_bank_header.py` `bdad7d192b0ecdb929daf5147a139e7545fd5c546f01ed4ffb4005f2cea9f9c0`;
+`scripts/test_audio_bank_header.py` `cffef962db441ef64c8435b53205b9106e5fb3af6360d14e26a751df5a1fcb4c`.
+Graft evidence from the read-only scout places the parser at L33-L68 and synthetic tests at L20-L62;
+the existing suite covers an oversized length and wrong byte order, not a smaller length word.
+Failed implementation tries: zero.
+
+`python3 scripts/project_index.py` exited 0 with 4,166 folders (`local/checkpoints/root-2026-10-20-xff-short-length-claim-project-index.log`); `graft check` passed with 1,256 nodes / 530 source files, optional deep meaning layer unbuilt (`local/checkpoints/root-2026-10-20-xff-short-length-claim-graft-check.log`); and `git diff --check` passed. `docs/FOLDERS.md` lists 77 checkpoint files.
+
+Publication preflight passed: the staged-path audit accepted 4 paths (log
+`local/checkpoints/root-2026-10-20-xff-short-length-claim-publish-audit-staged.log`, SHA-256
+`bf0cd63a37385613169f23d20b945f577a08420aeac746f86fb2844bf160f313`); the full audit accepted 635
+tracked paths (log `local/checkpoints/root-2026-10-20-xff-short-length-claim-publish-audit-all.log`,
+SHA-256 `1e5d538c25e2e8d8141a2c31cf2208fb2ff2abea74c7595e229a348ce5c16728`). Fetch showed branch
+divergence 0/0. Next exact action: commit and push the claim, then dispatch the worker.
+
+This fixture can prove rejection of one malformed synthetic length field only; it does not establish
+codec, audio playback, runtime use, or any game gate. No install/dependency change. Next exact
+action after claim publication is to dispatch the worker, review the one-file diff, and rerun the
+acceptance command. G1 NOT PASSED; G2 NOT RUN.
+
+## PRIOR CHECKPOINT — 2026-10-20 05:12 CDT, `/root` — PSARC truncated-block fixture verified
 
 `DATA-02-PSARC-TRUNCATED-COMPRESSED-BLOCK-01` is `FIXTURE_VERIFIED`. Worker
 `/root/app01_readiness` added one test in `scripts/test_psarc.py` only: a valid synthetic archive
