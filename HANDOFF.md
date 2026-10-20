@@ -1,18 +1,20 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:16 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:13 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
 ## ACTIVE CLAIM — 2026-10-19 20:12 CDT, worker bc-9aa0fe88 (SRV-01 mem) — COMPLETE
 
 Task: SRV-01 mem — Darwin host mapping behind verified allocator region API `0x19ae0`.
-Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
-Owned (new only): `native/core/host_map.{hpp,cpp}`, `native/tests/test_host_map.cpp`,
-`tools/lift/check_host_map_calls.py`, `native/CMakeLists.txt` (+host_map only; from origin/main),
+Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
+Owned: `native/core/host_map.{hpp,cpp}`, `native/tests/test_host_map.cpp`,
+`tools/lift/check_host_map_calls.py`, `native/CMakeLists.txt` (+host_map only),
 `docs/POINTERS.md`, `docs/TASKS.md`, `native/README.md`.
-**Did NOT edit:** `allocator_region.*`, `startup_ctors.*`, Drive `0xf4eba0`/`0xf4b540`, peer vec WIP.
-Checkpoint: ctest -R host_map Passed; check_host_map_calls.py OK; check_f19ae0.py OK; arm64.
+**Did NOT edit:** `allocator_region.*`, `startup_ctors.*`, Drive gaps, peer vec WIP.
+Checkpoint: ctest host_map Passed; check_host_map_calls.py OK; check_f19ae0.py OK.
+Push (code): `f68caf3` on origin/main. Docs follow-up this commit.
 Store: Project `internal/worker-claim-srv01.md`.
+
 
 ## ACTIVE CLAIM — 2026-10-19 20:14 CDT, worker bc-02397584 (CPU-01d) — 0xddef00 — COMPLETE
 
