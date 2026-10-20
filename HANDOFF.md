@@ -1,7 +1,21 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:48 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:49 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 21:49 CDT, worker bc-81763e53 (CPU-01d) — 0xd6a520 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd6a520** (survey index 100).
+Failed tries: 0. Status: FIXTURE_VERIFIED; sources+CMake on origin.
+Owned: `native/core/vec_d6a520.{hpp,cpp}`, `native/tests/test_vec_d6a520.cpp`,
+`tools/lift/check_fd6a520.py`, `native/CMakeLists.txt` (+vec_d6a520).
+Private dump (not published): `local/re/work/cd6a520.bin`.
+Skipped: 95 `0xd71f60`; A 97 `0xd6dbf0`; C 99 `0xd6d280`; done 98 `adaa4dd`.
+Checkpoint (2026-10-19 21:49 CDT, bc-81763e53):
+- OBS: unguarded vmovups; src=0x1304990 dst=0x3352970 bits=~0,~0,~0,0; index 100.
+- Commands: ctest -R '^vec_d6a520$' Passed; `python3 -I tools/lift/check_fd6a520.py` OK.
+- Store: Project `internal/worker-claim-d6a520.md`.
+- Push: **`38aea70`** on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 21:45 CDT, worker bc-9aa0fe88 (SRV-01 mem high-water) — COMPLETE
 
