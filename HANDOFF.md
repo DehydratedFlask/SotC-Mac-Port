@@ -1,7 +1,20 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:31 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:29 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:27 CDT, worker bc-73721c8d (CPU-01d) — 0xdb93a0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdb93a0** (survey index 72).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_db93a0.{hpp,cpp}`, `native/tests/test_vec_db93a0.cpp`,
+`tools/lift/check_fdb93a0.py`, `native/CMakeLists.txt` (+vec_db93a0; may already be linked).
+Private dump (not published): `local/re/work/cdb93a0.bin`.
+Did NOT edit: `startup_ctors.*`, SRV carve/`host_map`, peer `0xdbb280`/`0xdbfa60`/`0xdb3a70`.
+Checkpoint (2026-10-19 20:29 CDT, bc-73721c8d):
+- OBS: unguarded vmovups copy; src=0x130d940 dst=0x3352c80 bits=~0,~0,~0,0; index 72; distinct cells.
+- Commands: ctest -R '^vec_db93a0$' Passed; `python3 -I tools/lift/check_fdb93a0.py` OK.
+- Store: Project `internal/worker-claim-db93a0.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:19 CDT, worker bc-81763e53 (CPU-01d) — 0xdbb280 — COMPLETE
 
