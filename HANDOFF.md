@@ -1,7 +1,21 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:20 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:34 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:33 CDT, worker bc-73721c8d (CPU-01d) — 0xdb5dd0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdb5dd0** (survey index 74).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_db5dd0.{hpp,cpp}`, `native/tests/test_vec_db5dd0.cpp`,
+`tools/lift/check_fdb5dd0.py`, `native/CMakeLists.txt` (+vec_db5dd0 only; origin/main base).
+Private dump (not published): `local/re/work/cdb5dd0.bin`.
+Did NOT edit: `startup_ctors.*`, SRV split/carve/`host_map`, peer `0xdb7e60`/`0xdb93a0`/`0xdbb280`.
+Abandoned: `0xdb93a0` (Survey C / bc-effcf5dc store claim).
+Checkpoint (2026-10-19 20:34 CDT, bc-73721c8d):
+- OBS: unguarded vmovups copy; src=0x130d380 dst=0x3352c60 bits=~0,~0,~0,0; index 74; distinct cells.
+- Commands: ctest -R '^vec_db5dd0$' Passed; `python3 -I tools/lift/check_fdb5dd0.py` OK.
+- Store: Project `internal/worker-claim-db5dd0.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:36 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 72/75 + CMake dbb280 — COMPLETE
 
