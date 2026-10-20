@@ -17,7 +17,7 @@ Gates and test evidence take precedence over a status label. Integrator owns thi
 | RE-01 | SELF/ELF identity + Ghidra seed | DATA-01 | STATIC_ANALYSIS_VERIFIED / principal | 1 (resolved resource limit) |
 | RE-02 | Imports, relocations, boot graph | RE-01 | ACTIVE (partial: imports/relocs/entry chain done; ctor + app-main internals open) / principal | 0 |
 | CPU-01 | Native recovery feasibility slice | RE-02 | ACTIVE (many leaf ctors FIXTURE_VERIFIED incl. bc-cb8d07c2: 0xdd41e0, 0x3bd70, 0xa3ade0, 0x5777a0; runner partial; engine chain not started) / principal+workers | 0 |
-| CPU-02 | Packed data/pointer schemas | RE-01 | ACTIVE (Tagged31 decode+retag+0x66dec0 13-arm dispatcher FIXTURE_VERIFIED; heap cells OBS; static-address meaning, asset structs, type names open) / principal+bc-cb8d07c2 | 0 |
+| CPU-02 | Packed data/pointer schemas | RE-01 | ACTIVE (Tagged31 decode+retag+0x66dec0 mapping FIXTURE_VERIFIED; all-arm behavior coverage claimed by root; heap cells OBS; static-address meaning, asset structs, type names open) / principal+bc-cb8d07c2+root | 0 |
 | CPU-03 | Native jobs/fibers/TLS | CPU-01, CPU-02 | WAITING_FOR_DEPENDENCY | 0 |
 | SRV-01 | Native platform services / asset I/O | RE-02, DATA-02 | ACTIVE (partial: host_map + carve + split + list + free-count `@+0x48` FIXTURE slices bc-9aa0fe88; page bitmap / high-water / `0x19660` / Fios open) / principal+bc-9aa0fe88 | 0 |
 | CPU-04 | Native startup and first world | CPU-01..03, SRV-01 | WAITING_FOR_DEPENDENCY | 0 |

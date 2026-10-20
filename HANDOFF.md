@@ -1,7 +1,25 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:38 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:55 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## CURRENT CHECKPOINT — 2026-10-19 20:55 CDT, root — CPU-02 dispatcher behavior coverage — ACTIVE
+
+Claim and complete record: [checkpoint](docs/checkpoints/2026-10-19-root-cpu02-dispatch-claim.md).
+Task slice: add behavior coverage for all 13 observed `0x66dec0` dispatch types; dispatcher worker
+owns only `native/tests/test_addr.cpp`; root integrates docs and handoff. Failed tries: 0 for this
+slice. Next exact action: finish the already-running focused Ghidra query for `0xd71f60`, then
+receive the dispatch test change, run its fixture/build checks, reconcile E23, and checkpoint.
+
+## ACTIVE CLAIM — 2026-10-19 20:55 CDT, root (CPU-02 supplemental) — `0x66dec0` all-arm behavior — ACTIVE
+
+Task: CPU-02 — exercise every observed dispatcher arm and ensure unsupported/no-op cases leave
+object bytes unchanged. Prerequisite: E23, `check_f66dec0.py`, `check_f66dec0_dispatch.py`, and
+`native/core/addr.*` already record the 13-arm map. Failed tries: 0 for this bounded test slice.
+Owned: dispatcher worker `native/tests/test_addr.cpp`; root `docs/TASKS.md`, `docs/EVIDENCE.md`,
+`HANDOFF.md`. No dispatcher implementation or type-name/layout claim is included.
+Checkpoint: claim-only; no source/test command run yet. Full checkpoint and query cancellations are
+recorded in `docs/checkpoints/2026-10-19-root-cpu02-dispatch-claim.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:37 CDT, worker bc-02397584 (CPU-01d) — 0xd7b930 — COMPLETE
 
