@@ -3,6 +3,22 @@
 Updated: 2026-10-19 21:59 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 21:59 CDT, worker bc-81763e53 (CPU-01d) — 0xd3a6d0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd3a6d0** (survey index 113).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d3a6d0.{hpp,cpp}`, `native/tests/test_vec_d3a6d0.cpp`,
+`tools/lift/check_fd3a6d0.py`, `native/CMakeLists.txt` (+vec_d3a6d0 only; origin/main base).
+Private dump (not published): `local/re/work/cd3a6d0.bin`.
+Skipped: 95; D `0xd3b790`=`c9d9731`; peer `0xd32b70`=`2a8a42a`; busy peers.
+Did NOT edit Drive / SRV / `startup_ctors.*` / `local/`.
+Checkpoint (2026-10-19 21:59 CDT, bc-81763e53):
+- OBS: unguarded vmovups copy; src=0x13016d0 dst=0x3352090 bits=~0,~0,~0,0; index 113; distinct cells.
+- Commands: ctest -R '^vec_d3a6d0$' Passed; `python3 -I tools/lift/check_fd3a6d0.py` OK.
+- Logs: `/tmp/ctest_d3a6d0.log`, `/tmp/check_fd3a6d0.log`.
+- Store: Project `internal/worker-claim-d3a6d0.md`.
+- Push: (this commit).
+
 ## ACTIVE CLAIM — 2026-10-19 21:59 CDT, worker bc-73721c8d (CPU-01d) — 0xd32b70 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd32b70** (survey index 118).
