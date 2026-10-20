@@ -137,6 +137,19 @@ class Tests(unittest.TestCase):
         self.assertEqual(rela['target'], expected['rela_target'])
         self.assertEqual(rela['addend'], expected['rela_addend'])
 
+    def test_parse_rejects_unterminated_final_symbol_name(self):
+        elf, _ = dynamic_import_elf_fixture()
+        elf = bytearray(elf)
+        # This fixture's dynamic table follows its two 56-byte program headers;
+        # DT_SCE_STRSZ is the fifth 16-byte dynamic entry.
+        dynamic_offset = 64 + 2 * 56
+        strsz_value_offset = dynamic_offset + 4 * 16 + 8
+        strsz = struct.unpack_from('<Q', elf, strsz_value_offset)[0]
+        struct.pack_into('<Q', elf, strsz_value_offset, strsz - 1)
+
+        with self.assertRaises(ValueError):
+            d.parse(bytes(elf))
+
     def test_encode_id_widths(self):
         self.assertEqual([d.encode_id(v) for v in (0, 63, 64, 0xfff, 0x1000)],
                          ['A', '-', 'BA', '--', 'BAA'])
