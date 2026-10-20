@@ -3,6 +3,22 @@
 Updated: 2026-10-19 22:16 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 22:16 CDT, worker bc-81763e53 (CPU-01d) — 0xce99c0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xce99c0** (survey index 146).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_ce99c0.{hpp,cpp}`, `native/tests/test_vec_ce99c0.cpp`,
+`tools/lift/check_fce99c0.py`, `native/CMakeLists.txt` (+vec_ce99c0 only; origin/main base).
+Private dump (not published): `local/re/work/cce99c0.bin`.
+Skipped: 95; busy peers `0xceb2c0`/`0xceb070`; prior D `0xceb1c0`=`05f0326`.
+Did NOT edit Drive / SRV / `startup_ctors.*` / `local/`.
+Checkpoint (2026-10-19 22:16 CDT, bc-81763e53):
+- OBS: unguarded vmovups copy; src=0x12f9370 dst=0x3351d20 bits=~0,~0,~0,0; index 146; distinct cells.
+- Commands: ctest -R '^vec_ce99c0$' Passed; `python3 -I tools/lift/check_fce99c0.py` OK.
+- Logs: `/tmp/ctest_ce99c0.log`, `/tmp/check_fce99c0.log`.
+- Store: Project `internal/worker-claim-ce99c0.md`.
+- Push: (this commit).
+
 ## ACTIVE CLAIM — 2026-10-19 22:16 CDT, worker bc-73721c8d (CPU-01d) — 0xceb070 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xceb070** (survey index 145).
