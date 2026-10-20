@@ -1,6 +1,11 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — all 104 VoiceHandle candidates Ghidra-confirmed
+
+Last three heuristic candidates confirmed (`FUN_00953340`, `FUN_009533d0`, `FUN_00953470`; 3 REA successes; root replayed both verifiers and checksum sets). The `sceNgs2RackGetVoiceHandle` thunk `0xf91410` candidate list is statically complete: 104 of 104 Ghidra-confirmed. Details: `docs/checkpoints/2026-10-20-root-ngs2-voicehandle-intervals-08-complete.md`. Static only — no reachability/runtime/ABI claim. G0 PARTIAL, G1-G6 NOT RUN.
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors 0xc891e0, 0xc7de60, 0xc7c310 lifted
 
 `CPU-01-LEAF-CTOR-BATCH-09` `FIXTURE_VERIFIED`; root replay 143/143 ctest pass, three checkers exit 0. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-09-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending: two VoiceHandle final-interval workers (9a, 9b; 3 REA queries).
