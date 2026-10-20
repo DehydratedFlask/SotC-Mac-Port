@@ -15,7 +15,7 @@ Did NOT edit: `startup_ctors.*`, peer WIP, Drive `0xf4eba0`/`0xf4b540`.
 Checkpoint (2026-10-19 20:01 CDT, bc-dc141fdf):
 - OBS: unguarded vmovups copy; src=0x13132d0 dst=0x3353360 bits=~0,~0,~0,0; distinct cells.
 - Commands: ctest -R vec_e05320 Passed; `python3 -I tools/lift/check_fe05320.py` OK.
-- Push: pending this checkpoint.
+- Push: `79ba84b` on origin/main (tip later advanced).
 - Store: Project `internal/worker-claim-e05320.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:01 CDT, worker bc-24e5fd45 (CPU-01d) — 0xe094e0 — COMPLETE
