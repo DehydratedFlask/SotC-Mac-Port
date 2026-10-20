@@ -1,7 +1,16 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:00 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:01 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## CURRENT CHECKPOINT — 2026-10-19 21:01 CDT, root — REA/Ghidra startup timeout — RECORDED
+
+The focused `mcp__rea__analyze_function({procedure:"0xd71f60"})` request ended with
+`provider_timeout` after REA's fixed 330,000 ms startup deadline; it produced no Evidence ID and
+no function dossier. This is not a CPU-01 implementation try. Details and Ghidra run/log paths are
+in [checkpoint](docs/checkpoints/2026-10-19-root-cpu02-dispatch-claim.md). Next exact action:
+inspect installed Ghidra headless options for a private offline analysis run that can exceed the
+REA timeout; do not repeat REA's import until its startup timeout can be raised.
 
 ## CURRENT CHECKPOINT — 2026-10-19 20:59 CDT, root — CPU-02 dispatcher behavior coverage — COMPLETE
 
@@ -11,7 +20,7 @@ Completion checkpoint `d5f6ff9` is pushed to `origin/main`.
 Task slice: all 13 observed `0x66dec0` dispatch types now have byte-matched behavior coverage;
 dispatcher worker owned only `native/tests/test_addr.cpp`; root integrated docs and handoff.
 Failed tries: 0. Focused build/CTest and the 13-arm ELF checker passed. Current next exact action:
-finish the already-running focused Ghidra query for `0xd71f60`; do not cancel/reimport it.
+inspect the installed Ghidra headless options for a longer-deadline offline analysis of `0xd71f60`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:55 CDT, root (CPU-02 supplemental) — `0x66dec0` all-arm behavior — COMPLETE (FIXTURE_VERIFIED)
 
