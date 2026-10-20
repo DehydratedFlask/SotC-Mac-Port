@@ -584,7 +584,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `reference/shadPS4Plus-pkg/src/video_core/renderer_vulkan` | 32 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/shadPS4Plus-pkg/src/video_core/renderer_vulkan/host_passes` | 4 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/shadPS4Plus-pkg/src/video_core/texture_cache` | 18 | Pinned upstream source; read-only; symbols indexed by Graft |
-| `scripts` | 13 | Small project and offline analysis helpers |
+| `scripts` | 15 | Small project and offline analysis helpers |
 | `tools` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/lift` | 131 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/pkg-extractor` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |

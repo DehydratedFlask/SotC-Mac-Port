@@ -1,11 +1,11 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:10 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:15 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:09 CDT, /root — APP-01 lifecycle fixture published; AUD-01-XFF-01 claimed; CPU-01d `0xcdc760` verified
+## CURRENT CHECKPOINT — 2026-10-19 23:15 CDT, /root — APP-01 lifecycle fixture published; AUD-01-XFF-01 bounded reader/fixture verified
 
-Four bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
+Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
 archive, manifest, test logs and build outputs stay under ignored `local/`.
 
@@ -110,7 +110,7 @@ Agent `/root/app01_probe` previously identified this behavior; root owns impleme
   through `f59500e`. Failed implementation tries: 1; the compile failure was corrected within
   the same bounded hypothesis. APP-01 remains ACTIVE; G4 is NOT RUN.
 
-### AUD-01-XFF-01 — characterize one paired XFF sound bank — ACTIVE CLAIM
+### AUD-01-XFF-01 — characterize one paired XFF sound bank — FIXTURE_VERIFIED
 
 Integrator `/root` claims a bounded AUD-01 slice for `/root/audio_asset_survey`, which owns only
 `scripts/audio_bank_header.py` and `scripts/test_audio_bank_header.py`. Inspect the `.hd`/`.bd`
@@ -131,9 +131,31 @@ semantics. Do not claim a codec, NGS2 contract, gameplay use, or playback.
 - Exact acceptance commands: `python3 -I scripts/test_audio_bank_header.py`; then
   `python3 -I scripts/audio_bank_header.py --archive local/extracted/CUSA08809/pak2.psarc --member cp3shadow/sound/se/com_sys.hd --member cp3shadow/sound/se/com_sys.bd`.
   The latter must confirm live locators/hashes and report only supported structural facts.
-- Remaining risk: the common prefix does not establish field meanings or codec; a single bank pair
-  does not prove gameplay use. Task status ACTIVE, failed tries 0. The next exact action is for the
-  agent to cross-check the pair's byte layout and implement the scoped reader/fixture.
+- Cross-check checkpoint: a reproducible private scan of 25 `.hd`/`.bd` pair groups (50 live
+  decoded members) matched every manifest path/locator/hash. Of 22 `xff\0` pairs, the little-endian
+  u32 at offset `0x14` equals decoded member size in all 44 members (44/44, zero mismatches).
+  Prefixes have two observed variants; `boss01.bd` shows the byte-12 word is not universal, so
+  bytes 4..19 remain opaque. Exact command:
+  `PYTHONDONTWRITEBYTECODE=1 python3 -I local/validation/20261019-231219-audio-bank-header-crosscheck/pair_crosscheck.py`;
+  exit 0; output `local/validation/20261019-231219-audio-bank-header-crosscheck/pair_crosscheck.log`.
+- `/root/audio_asset_survey` implemented only the claimed two scripts. Six synthetic tests cover
+  the observed prefix/length rule, minimum bound, truncation, prefix rejection, inconsistent
+  length, and byte-order mismatch. Root reran both acceptance commands successfully; private logs
+  and command list are in `local/validation/20261019-2315-root-aud01-xff-verification/`.
+  `python3 -I scripts/test_audio_bank_header.py` passed 6/6. The live pair command exited 0 and
+  matched archive summary identity plus both manifest locators/hashes; each member reports
+  `xff\0` and u32le@0x14 equal to decoded size. `graft grep "parse_xff_member"` resolves the parser
+  and tests; `graft check` reports the wiring graph in sync, with deep meaning tier unbuilt.
+- Initial `python3 scripts/project_index.py --check` exited 1 after the verification directory was
+  added; `python3 scripts/project_index.py` refreshed 4,126 folders and the subsequent check passed.
+  Logs: `project_index_refresh.log`, `project_index_check.log`; `git diff --check` and
+  `git diff --cached --check` passed. This index freshness correction was not an implementation
+  hypothesis failure.
+- Observation: the parser reports only XFF magic, opaque bytes 4..19, and the length word.
+  Remaining risk: other field meanings, codec, NGS2 behavior, gameplay use, and playback stay
+  UNKNOWN. Task status FIXTURE_VERIFIED (bounded slice), failed implementation tries 0. Next exact
+  action: publish this allowlisted source/evidence batch, then claim the synthetic ELF parse fixture
+  as a separate bounded RE-02 task.
 - A separate read-only CPU survey proposed RVA `0xcc5a10`; it decodes to the same 16-byte constant
   copy behavior covered by 95 existing fixtures, so root deferred it for low marginal semantic
   coverage. This was task selection only, not a failed implementation try.
@@ -149,8 +171,14 @@ AUD-01-XFF-01 was then recorded before implementation and published in `b17ffe2`
 Before that commit, `python3 scripts/project_index.py --check` reported 4,123 folders current,
 `git diff --check`, staged `python3 -I scripts/audit_publish_paths.py` (5 paths),
 `python3 -I scripts/audit_publish_paths.py --all` (567 paths), and `git diff --cached --check`
-passed. `git fetch origin main` found no divergence. `/root/audio_asset_survey` was assigned the
-two claimed scripts files after this push; it must not modify shared docs or commit/push.
+passed. `git fetch origin main` found no divergence. The publication record was pushed in
+`a323bf3`. `/root/audio_asset_survey` owns the two claimed scripts files and does not modify shared
+docs or commit/push. Its cross-check of all XFF length words passed before parser implementation.
+At 23:15 CDT, root independently reran the XFF unit and live-pair commands (both exit 0), refreshed
+the project index after the private verification run directory made it stale (4,126 folders; check
+current), and confirmed `graft check` and diff whitespace checks. The corresponding private logs
+are under `local/validation/20261019-2315-root-aud01-xff-verification/`; the source/evidence batch
+is ready for staged-path audit and publication.
 
 ## PRIOR CHECKPOINT — 2026-10-19 22:41 CDT, /root — CPU-01d `0xce7300` metadata correction — FIXTURE_VERIFIED
 
