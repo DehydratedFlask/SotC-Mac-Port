@@ -3,7 +3,41 @@
 Updated: 2026-10-20 05:00 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:00 CDT, `/root` — overlap guard final replay and publication readiness
+## CURRENT CHECKPOINT — 2026-10-20 05:02 CDT, `/root` — APP-01 termination classifier claim
+
+`APP-01-TERMINATION-CLASSIFIER-01` is claimed by root with `/root/app01_termination` as the
+implementation worker. The user selected a pure, testable `LauncherCore` helper. Graft mapped the
+only `processEnded` caller to `LauncherModel.start`; `LauncherCore` already owns
+`LauncherProcessOutcome` and `LauncherLifecycle.state`. The bounded implementation will add
+classification from Stop-request state, Foundation termination reason and status, call it from
+`LauncherModel.processEnded`, and test requested Stop precedence, normal zero exit, nonzero exit,
+and signal termination.
+
+Baseline command `swift test --package-path launcher --scratch-path local/build/launcher
+--filter LauncherLifecycleTests` exited 0: 7 tests in 2 suites passed on `arm64e-apple-macos14.0`.
+Log: `local/checkpoints/root-2026-10-20-app01-termination-baseline.log`. Pre-change SHA-256:
+`LauncherModel.swift` `d452846b54e6cc28e1726f6db1e017b1290a36f3fe554db948221cc0763fc848`,
+`LauncherLifecycle.swift` `6b0007a38fecac6645911b2e848328b3821c97eb426caa61dbbbaca9e23f31fb`, and
+`LauncherLifecycleTests.swift` `666f35a315fc81394435428d80207c6e8c633824099895e861a73aa1844293f3`.
+
+`python3 scripts/project_index.py` exited 0 with 4,166 folders indexed; log:
+`local/checkpoints/root-2026-10-20-app01-termination-claim-project-index.log`. `graft check` and
+`git diff --check` exited 0. The wiring graph is current at 1,250 nodes / 530 source files; the
+optional deep meaning layer remains unbuilt.
+
+Worker-owned files are `launcher/Sources/LauncherCore/LauncherLifecycle.swift`,
+`launcher/Sources/SoCLauncher/LauncherModel.swift`, and
+`launcher/Tests/LauncherCoreTests/LauncherLifecycleTests.swift`; root owns shared documentation
+and Git. Acceptance command: `swift test --package-path launcher --scratch-path
+local/build/launcher --filter LauncherLifecycleTests`. No failed implementation tries; only the
+baseline has run. App/Finder behavior, actual child termination, sandbox distribution, and quit
+lifetime remain outside this slice; G1 is NOT PASSED and G2 is NOT RUN.
+
+Claim checkpoint was published before source edits. Next exact action: dispatch the worker for only
+its three owned code/test files, review the diff, rerun the acceptance command, then record and
+publish the result.
+
+## PRIOR CHECKPOINT — 2026-10-20 05:00 CDT, `/root` — overlap guard final replay and publication readiness
 
 The RackQuery thunk xrefs root replay is recorded below and remains `ACTIVE/PARTIAL`; it accepts
 no caller/callsite. A parallel read-only review by `/root/review_recent_fixtures` found two
@@ -51,9 +85,8 @@ Pending publication includes `HANDOFF.md`, `docs/ASSETS.md`, `docs/EVIDENCE.md`,
 report bytes are unchanged; E77 records both incomplete/superseded guard hypotheses and the final
 11-test replay. No test or provider operation failed. G1 NOT PASSED; G2 NOT RUN.
 
-Next exact action: run final `git diff --check`, stage only allowlisted paths, run staged and full
-publish-path audits, fetch `origin/main`, verify zero divergence, then commit and push. After
-publication, claim the next independent bounded task before any further edits.
+Published as commit `5aa7dfa` (`feat: add metadata-only archive overlap audit`) and pushed to
+`origin/main`; post-push divergence was zero. The current APP-01 claim is recorded above.
 
 ## PRIOR CHECKPOINT — 2026-10-20 04:50 CDT, `/root` — RackQuery thunk xrefs root replay
 
