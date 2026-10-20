@@ -61,6 +61,8 @@
 #include "vec_d3a6d0.hpp"
 #include "vec_d32b70.hpp"
 #include "vec_d32720.hpp"
+#include "vec_d2ffe0.hpp"
+#include "vec_d2cb30.hpp"
 #include "vec_d7c380.hpp"
 #include "vec_d7c4d0.hpp"
 #include "vec_d7c9d0.hpp"
@@ -149,8 +151,10 @@ struct StartupState {
     VecD40010 vec_d40010{};   // 0xd40010 idx 112
     VecD3b790 vec_d3b790{};   // 0xd3b790 idx 113
     VecD3a6d0 vec_d3a6d0{};   // 0xd3a6d0 idx 114
+    VecD32720 vec_d32720{};   // 0xd32720 idx 115
+    VecD2ffe0 vec_d2ffe0{};   // 0xd2ffe0 idx 116
     VecD32b70 vec_d32b70{};   // 0xd32b70 idx 118
-    VecD32720 vec_d32720{};   // 0xd32720 idx 119
+    VecD2cb30 vec_d2cb30{};   // 0xd2cb30 idx 121
     VecB743c0 vec_b743c0{};   // idx 282
     VecB52110 vec_b52110{};   // idx 290
     std::array<std::byte, kScratchBytes> scratch{};
