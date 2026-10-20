@@ -2,8 +2,15 @@
 
 Current checkpoint: G0 PARTIAL; G1-G6 NOT RUN. This is a plan, not a game execution report.
 Artifact/tool/source evidence is recorded in EVIDENCE.md; full asset/linkage schemas remain open.
-Baseline supplied by the coordinating agent: 2026-10-19, America/Chicago; M4 Pro, 12 CPU cores,
-48 GB unified memory, macOS 27.0.1, Xcode 27.1. Re-record actual versions for every evidence run.
+Baseline supplied by the coordinating agent on 2026-10-19, America/Chicago: M4 Pro, 12 CPU cores,
+48 GB unified memory, macOS 27.0.1, Xcode 27.1. Read-only machine/toolchain capture on 2026-10-20
+00:34 CDT matched those values and additionally recorded arm64, macOS build 26A434, Xcode build
+27A9275, Metal compiler path, and macOS SDK 27.0. All six candidate baseline commands exited 0
+with empty stderr; exact per-command outputs, durations, and statuses are private under
+`local/validation/g0-env-baseline-20261020/` (capture JSON SHA-256
+`cea524d435eeef15e02d506744969dab872990e4812d6621d6b256f042e475b0`; evidence E50). Re-record
+actual versions for every evidence run. This is toolchain inventory only, not a Metal compile or G0
+pass.
 Follow [AGENTS.md](../AGENTS.md), [PLATFORM.md](PLATFORM.md), [ROADMAP.md](../ROADMAP.md),
 [task registry](TASKS.md), [evidence registry](EVIDENCE.md), and [HANDOFF.md](../HANDOFF.md).
 
