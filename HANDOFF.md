@@ -3,6 +3,23 @@
 Updated: 2026-10-19 20:36 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 20:36 CDT, worker bc-9aa0fe88 (SRV-01 mem free-count) — COMPLETE
+
+Task: SRV-01 mem — arena free-count dword at **+0x48** (OBS with list surgery).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/region_list.{hpp,cpp}` (extend only), `native/tests/test_region_list.cpp`,
+`tools/lift/check_f1a902_list.py`, `docs/POINTERS.md`, `native/README.md`, `docs/TASKS.md`, `HANDOFF.md`.
+**Kept:** host_map / free_list_carve / region_split / region_list modules. **No CMake change.**
+**Did NOT edit:** `allocator_region.*`, `startup_ctors.*`, Drive, peer vec_*, `0x19660`.
+Page bitmap: OPEN (no `bt*` in `0x18000..0x22000`). High-water `@+0x80/+0x90` deferred to next agent.
+Checkpoint (2026-10-19 20:36 CDT, bc-9aa0fe88):
+- OBS: `inc [r15+0x48]` @`0x1a933`/`0x1a95d` (insert_before); `dec [r15+0x48]` @`0x1a993` (unlink).
+- Commands: ctest -R '^(region_list|region_split|free_list_carve|host_map)$' 4/4 Passed;
+  `python3 -I tools/lift/check_f1a902_list.py` OK.
+- Logs: `/tmp/ctest_free_count.log`, `/tmp/check_f1a902_list.log`.
+- Store: Project `internal/worker-claim-srv01-free-count.md`.
+- Push: (this commit).
+
 ## ACTIVE CLAIM — 2026-10-19 20:36 CDT, worker bc-73721c8d (CPU-01d) — 0xd71f60 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd71f60** (survey index 95).
