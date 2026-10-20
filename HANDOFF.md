@@ -1,7 +1,18 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:45 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:46 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 21:46 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 67/94/96 — COMPLETE
+
+Task: CPU-01e — register peer FIXTURE_VERIFIED `0xdd41e0` (67), `0xd7b930` (94), `0xd6e0f0` (96)
+into `startup_ctors`. 94=`56e4a68`+CMake; 96 on tip; 67 cmake-linked (stale gap cleared).
+Skipped gap 10–19, idx 50, idx 95 `0xd71f60` NEEDS_PRINCIPAL, SRV.
+Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
+Checkpoint: ctest OK; check_fdd41e0/fd7b930/fd6e0f0 OK; registry **54**.
+Owned: `startup_ctors.*`, `test_startup_ctors.cpp`, `HANDOFF.md`. CMake: origin as-is.
+Did NOT edit: peer leaf sources / SRV WIP (`arena_accounting*`).
+Store: Project `internal/worker-claim-drive.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 21:45 CDT, worker bc-81763e53 (CPU-01d) — 0xd6e0f0 — COMPLETE
 
