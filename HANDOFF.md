@@ -1,9 +1,64 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 22:41 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 22:47 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 22:41 CDT, /root — CPU-01d `0xce7300` metadata correction — FIXTURE_VERIFIED
+## CURRENT CHECKPOINT — 2026-10-19 22:48 CDT, /root — DATA-02 pakN SHA-256 + AUD-01 member identities — ACTIVE CLAIMS
+
+Root claims one archive-identity gap: stream-hash the 12,838,532,222-byte private
+`local/extracted/CUSA08809/pakN.psarc` and populate its private PSARC summary. The current
+summary `local/manifests/assets/CUSA08809-pakN.summary.json` records `sha256: null`; live
+`scripts/psarc.py` only hashes archives under 1 GiB and currently uses `Path.read_bytes()` for
+those smaller inputs. The bounded code task is in `scripts/psarc.py` with a synthetic streaming
+hash test in `scripts/test_psarc.py`. Worker `/root/data02_probe` owns those files and the private
+pakN summary/member outputs; root is the sole HANDOFF integrator. No source/game bytes are edited
+or published.
+
+- OBS: the local archive exists at the stated path and the summary omits its digest; the generator
+  has a size cutoff. Inference: hashing once in chunks should fill the required archive identity
+  without changing PSARC parsing or member semantics. No member format, TOC digest, or `pakN`
+  encoding is inferred. Attempt count: 0; no failed try.
+- Claim commands/evidence: `graft ask "How does the PSARC summary generator decide whether to
+  compute an archive SHA-256, and where can that policy be changed safely?" --source --in scripts/`
+  (exit 0; 11,062 tokens saved), `graft skeleton scripts/psarc.py` (exit 0; 2,964 saved), and
+  `sed -n '230,300p' scripts/psarc.py` (exit 0). Live evidence path:
+  `local/manifests/assets/CUSA08809-pakN.summary.json`. No implementation check has run yet.
+- Planned verification: `python3 -I scripts/test_psarc.py`; regenerate only the pakN private
+  summary/member listing with `python3 -I scripts/psarc.py local/extracted/CUSA08809/pakN.psarc
+  --out local/manifests/assets`; compare the JSON digest with `shasum -a 256
+  local/extracted/CUSA08809/pakN.psarc` and confirm the exact byte count. Logs will be kept under
+  `local/` and summarized in the completion checkpoint.
+- Remaining risk: one sequential read of the 12.8 GB private archive; member-content hashes and
+  formats remain open. G1 NOT PASSED; G2-G6 NOT RUN. Next exact action: delegate the claimed
+  stream-hash implementation, review its diff, run the bounded fixture and independent digest
+  check, then update DATA-02 evidence and push allowlisted changes.
+
+Root also claims an independent AUD-01 inventory slice: add SHA-256 and PSARC entry locators
+(entry ID, byte offset, first block) for each of the 86 already-classified audio members in the
+private `local/manifests/assets/audio-headers.json`. The probe read all 86 through `Psarc.read()`
+without extracting or interpreting them (3,726,760 total member bytes, exit 0). Worker
+`/root/aud01_probe` owns `scripts/classify_audio_headers.py`, `scripts/test_audio_headers.py`, and
+the private audio manifest; root remains the sole HANDOFF integrator. Codec stays UNKNOWN and no
+NGS2 semantics are inferred.
+
+- Claim evidence: `graft ask "AUD-01: locate code that inspects PSARC member bytes, audio header
+  classification for .sxd/.hd/.bd, and any existing sound bank/archive readers" --source`
+  (worker report: exit 0, approximately 7,842 tokens saved). Read-only command
+  `python3 -I - <<'PY' ... Psarc.read() ... PY` (worker report: exit 0 in 0.4 s, 86 members /
+  3,726,760 bytes; exact script in `docs/checkpoints/2026-10-19-root-aud01-member-identity-claim.md`). Existing evidence:
+  `docs/ASSETS.md` and `local/manifests/assets/audio-headers.json`. No implementation check has
+  run yet; failed tries: 0.
+- Planned verification: `python3 -I -m unittest scripts/test_audio_headers.py`; regenerate the
+  private manifest with `python3 -I scripts/classify_audio_headers.py --out
+  local/manifests/assets/audio-headers.json`; independently recompute all recorded member hashes
+  through `Psarc.read()` and require 86 rows with entry IDs/offsets/blocks. Keep all game-derived
+  output under `local/`.
+- Remaining risk: identities only; compression/codec/framing and actual audio playback remain
+  unknown. G1 NOT PASSED; G2-G6 NOT RUN. Next exact action: implement the independent per-member
+  digest/locator slice in parallel with DATA-02, review both diffs, record evidence and publish
+  only allowlisted source/docs.
+
+## PRIOR CHECKPOINT — 2026-10-19 22:41 CDT, /root — CPU-01d `0xce7300` metadata correction — FIXTURE_VERIFIED
 
 Root completed the bounded provenance/manifest correction in `native/core/vec_ce7300.hpp`,
 `native/tests/test_vec_ce7300.cpp`, and `tools/lift/check_fce7300.py`. Claim evidence is preserved

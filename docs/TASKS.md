@@ -13,7 +13,7 @@ Gates and test evidence take precedence over a status label. Integrator owns thi
 | DOC-VALIDATION | Acceptance specification | Source audit | DONE_DOC / native_plan_review | 0 |
 | SETUP-01 | Native PKG extractor | Xcode, Crypto++ | FIXTURE_VERIFIED / principal | 1 (resolved) |
 | DATA-01 | Extract/hash all local packages | SETUP-01 | ARTIFACT_VERIFIED / principal | 0 |
-| DATA-02 | Archive/asset schema and overlay map | DATA-01 | ACTIVE (partial: TOCs done; overlay+case policy PROVISIONAL_OBS for cachedFiles pair via bc-cd298177; member formats, TOC digest, pakN encoding open) / principal+claim-2 | 0 |
+| DATA-02 | Archive/asset schema and overlay map | DATA-01 | ACTIVE (partial: TOCs done; overlay+case policy PROVISIONAL_OBS for cachedFiles pair via bc-cd298177; member formats, TOC digest, pakN encoding open; root claimed stream-hashing the pakN archive identity) / principal+claim-2+root | 0 |
 | RE-01 | SELF/ELF identity + Ghidra seed | DATA-01 | STATIC_ANALYSIS_VERIFIED / principal | 1 (resolved resource limit) |
 | RE-02 | Imports, relocations, boot graph | RE-01 | ACTIVE (partial: imports/relocs/entry chain done; ctor + app-main internals open) / principal | 0 |
 | CPU-01 | Native recovery feasibility slice | RE-02 | ACTIVE (many leaf ctors FIXTURE_VERIFIED incl. bc-cb8d07c2: 0xdd41e0, 0x3bd70, 0xa3ade0, 0x5777a0; runner partial; engine chain not started; leaf 95 `0xd71f60` NEEDS_PRINCIPAL after 3 failed tries; `0xce7300`, `0xce57b0`, and `0xce0890` fixture/checker slices verified; no startup chain/G1) / principal+root | 0 |
@@ -22,7 +22,7 @@ Gates and test evidence take precedence over a status label. Integrator owns thi
 | SRV-01 | Native platform services / asset I/O | RE-02, DATA-02 | ACTIVE (partial: host_map + carve + split + list + free-count `@+0x48` + high-water `0x1a9bb` + exact-fit `0x1aada` + page-debit `0x1ae67` FIXTURE slices bc-9aa0fe88; distinct `0x19e00` block `0x1a123–0x1a15a` now FIXTURE_VERIFIED with CMake test and E28 byte checker, 1 earlier failed target hypothesis; page bitmap / `0x19660` / Fios open) / principal+bc-9aa0fe88+root | 0 |
 | CPU-04 | Native startup and first world | CPU-01..03, SRV-01 | WAITING_FOR_DEPENDENCY | 0 |
 | CPU-05 | Gameplay recovery batches | CPU-04 | WAITING_FOR_DEPENDENCY | 0 |
-| AUD-01 | Audio assets/codec inventory | DATA-01 | ACTIVE (partial: header magic+entropy classified for 86 `.sxd`/`.hd`/`.bd` members → `local/manifests/assets/audio-headers.json`; codec UNKNOWN; music/dialogue location open) / bc-71956f82 headers slice | 0 |
+| AUD-01 | Audio assets/codec inventory | DATA-01 | ACTIVE (partial: header magic+entropy classified for 86 `.sxd`/`.hd`/`.bd` members → `local/manifests/assets/audio-headers.json`; codec UNKNOWN; root claimed per-member hashes and PSARC entry locators; music/dialogue location open) / bc-71956f82+root | 0 |
 | AUD-02 | Recover used voice/rack contracts | RE-02, AUD-01 | WAITING_FOR_DEPENDENCY | 0 |
 | AUD-03 | Decoder/mixer/effect fixtures | AUD-02 | WAITING_FOR_DEPENDENCY | 0 |
 | AUD-04 | Actual game audio integration | AUD-03, CPU-04 | WAITING_FOR_DEPENDENCY | 0 |
