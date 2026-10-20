@@ -1,17 +1,16 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:19 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:23 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 21:19 CDT, root — SRV-01 arena accounting — ACTIVE
+## CURRENT CHECKPOINT — 2026-10-19 21:23 CDT, root — SRV-01 arena accounting — ACTIVE
 
 Claim and bounded plan: [SRV-01 arena-accounting checkpoint](docs/checkpoints/2026-10-19-root-srv01-accounting.md).
-The independent slice covers only the accounting instructions around `0x1a123–0x1a15a` in inner
-allocator candidate `0x19e00`; saved disassembly shows add at `+0x80`, unsigned max update at
-`+0x88`, and a mode-2 subtract at `+0x90`. Ghidra confirmed `0x19ae0` is a 372-byte wrapper whose
-call at `0x19b71` targets `0x19e00`; this is failed try 1 for the accounting slice. Next exact
-action: retarget the private exporter to `0x19e00` and check whether its body contains the block.
-These are survey observations pending that check; field meanings remain unnamed.
+Ghidra confirmed that `FUN_00019e00` contains `0x1a123–0x1a15a`: qword add/store at `+0x80`,
+unsigned greater-than update at `+0x88`, and mode-2 subtract at `+0x90`. The earlier `0x19ae0`
+wrapper query remains failed try 1; target confirmation is try 2. No native code exists yet. Next
+exact action: dispatch only the new raw-offset helper, focused test, and exact-byte checker to the
+allocator survey worker; root will integrate CMake and docs after review.
 
 ## STOPPED CLAIM — 2026-10-19 21:12 CDT, root — CPU-01d leaf 95 — NEEDS_PRINCIPAL
 
@@ -22,11 +21,11 @@ try without a written principal reassessment.
 
 ## ACTIVE CLAIM — 2026-10-19 21:15 CDT, root (SRV-01 arena accounting) — `0x19e00` — ACTIVE
 
-Task: recover only the arena accounting block at `0x1a123–0x1a15a` in inner allocator candidate
-`0x19e00` and add a fixture-level native helper for raw fields at `+0x80`, `+0x88`, and conditional
-`+0x90`, without naming unknown fields or integrating them into allocator behavior. Claim uses the
-existing Ghidra project for the exact ELF `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
-Failed tries: 1; target query `0x19ae0` found only the wrapper, not the accounting block.
+Task: recover only the arena accounting block at `0x1a123–0x1a15a` in inner allocator `0x19e00`
+and add a fixture-level native helper for raw fields at `+0x80`, `+0x88`, and conditional `+0x90`,
+without naming unknown fields or integrating them into allocator behavior. Claim uses the existing
+Ghidra project for ELF `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`. Failed
+tries: 1; try 2 confirmed the target block. The earlier `0x19ae0` query found only the wrapper.
 Root owns `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/POINTERS.md`, `native/README.md`,
 `native/CMakeLists.txt`, and the task checkpoint. Planned worker-owned files after Ghidra confirms
 the block: `native/core/arena_accounting.{hpp,cpp}`, `native/tests/test_arena_accounting.cpp`, and
