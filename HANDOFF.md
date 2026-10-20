@@ -3,6 +3,18 @@
 Updated: 2026-10-19 22:09 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 22:09 CDT, worker bc-02397584 (CPU-01d) — 0xd0bcd0 — COMPLETE
+
+Task: CPU-01d — re-link CMake for unguarded vec-copy ctor RVA **0xd0bcd0** (survey index 126).
+Failed tries: 0. Status: FIXTURE_VERIFIED; sources `4d474c6`; CMake lines restored.
+Owned this push: `native/CMakeLists.txt` (+vec_d0bcd0 only), `HANDOFF.md`.
+Never touched `startup_ctors.*`. Peer untracked left alone.
+Checkpoint (2026-10-19 22:09 CDT, bc-02397584):
+- OBS: src=0x12fd870 dst=0x3351e20 bits=~0,~0,~0,0; index 126.
+- ctest/check OK. Store: `internal/worker-claim-d0bcd0.md`.
+- Push: (this commit).
+
+
 ## ACTIVE CLAIM — 2026-10-19 22:10 CDT, worker bc-81763e53 (CPU-01d) — 0xd082e0 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd082e0** (survey index 133).
