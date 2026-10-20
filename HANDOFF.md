@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — VoiceHandle remaining 98 candidates attributed
+
+`AUD-02-NGS2-VOICEHANDLE-REMAINING-01`: 98 candidates -> 36 Ghidra-confirmed (new functions `FUN_0094b2c0`, `FUN_0099b400`), 62 heuristic-only (largest interval `0x950850..0x951deb`, 27 candidates, unqueried), 0 unattributed. 2 REA successes, 0 failures; root replayed verifier and checksums. Details: `docs/checkpoints/2026-10-20-root-ngs2-voicehandle-remaining-candidates-complete.md`. Static only; no reachability/runtime/ABI claim. G0 PARTIAL, G1-G6 NOT RUN.
+
+Next exact action: optionally confirm the 5532-byte heuristic interval with one function query, or pick another READY task with a fresh claim.
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — NGS2 VoiceHandle and RackQuery second callsites verified
 
 VoiceHandle callsite `0x9496a8` -> thunk `0xf91410` in `FUN_009485a0` and RackQuery outlier `0x99fb7b` -> `0xf91420` in `FUN_0099f9d0` are byte- and REA-verified (2 provider successes, 0 failures; root replayed both verifiers and checksums). All 15 RackQuery candidates are now statically accounted for. Details: `docs/checkpoints/2026-10-20-root-ngs2-voicehandle-and-rackquery-second-callsite-complete.md`. Static only; no reachability/runtime/ABI claim. G0 PARTIAL, G1-G6 NOT RUN; failed tries 0.
