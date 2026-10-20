@@ -3,12 +3,12 @@
 Updated: 2026-10-19 20:10 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## ACTIVE CLAIM — 2026-10-19 20:09 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 49/51/52/53 — IN PROGRESS
+## ACTIVE CLAIM — 2026-10-19 20:09 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 49/51/52/53 — COMPLETE
 
 Task: CPU-01e — register already FIXTURE_VERIFIED peer vec-copy ctors into `startup_ctors`:
 indices **49** (`0xe0b180`), **51** (`0xe085e0`), **52** (`0xe05320`), **53** (`0xe026b0`).
 Skipped SRV-01/`host_map`, gap 10–19, idx 50 (sources not on origin), peer WIP `de7fb0`/`dfd5f0`/`de6d20`.
-Failed tries: 0. Status: CLAIMED.
+Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
 Owned: `native/core/startup_ctors.*`, `native/tests/test_startup_ctors.cpp`,
 `native/CMakeLists.txt` (+vec_e0b180/+vec_e05320 link lines only; sources already on origin).
 Store: Project `internal/worker-claim-drive.md`.

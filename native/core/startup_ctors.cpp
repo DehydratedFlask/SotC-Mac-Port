@@ -31,6 +31,11 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xef85e0, 20, [](StartupState& s) noexcept { init_vec_ef85e0(s.vec_ef85e0); }},
         {0xea52f0, 22, [](StartupState& s) noexcept { init_ea52f0(s.ea52f0); }},
         {0xe10490, 48, [](StartupState& s) noexcept { init_trig_constants(s.trig); }},
+        {0xe0b180, 49, [](StartupState& s) noexcept { init_vec_e0b180(s.vec_e0b180); }},
+        // Gap idx 50 (0xe094e0): peer-complete historically but sources not on origin/main yet.
+        {0xe085e0, 51, [](StartupState& s) noexcept { init_vec_e085e0(s.vec_e085e0); }},
+        {0xe05320, 52, [](StartupState& s) noexcept { init_vec_e05320(s.vec_e05320); }},
+        {0xe026b0, 53, [](StartupState& s) noexcept { init_vec_e026b0(s.vec_e026b0); }},
         {0x196c90, 520, [](StartupState& s) noexcept { clear_flag32(s.flag32); }},
         {0x125990, 538, [](StartupState& s) noexcept { reset_scratch(s.scratch, s.scratch_slot); }},
     };
