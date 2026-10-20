@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — all Audio3d imports have a verified callsite
+
+`PortSetAttribute` (`0x948e79`), `Terminate` (`0x948e16`), `PortGetQueueLevel` (`0x953a68`), `PortClose` (`0x94a11e` in `FUN_00949fe0`) and the second `ObjectUnreserve` callsite (`0x99b880` in `FUN_0099b850`) are byte-verified (2 new REA successes, 3 reuses; root replayed all verifiers and checksums). Details: `docs/checkpoints/2026-10-20-root-audio3d-remaining-imports-complete.md`. Static only — no reachability/runtime/ABI claim. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 186/186 (batch 18, pushed `4320b2e`).
+
+Next exact action: SaveData dialog imports (`sceSaveDataDialog*`, `sceSaveDataSaveIcon`, `sceSaveDataGetMountInfo`, `sceSaveDataCheckBackupData`, `sceSaveDataDelete`, `sceSaveDataRestoreBackupData`, `sceSaveDataTerminate`), remaining unattributed Audio3d candidates (`0x954726`), or constructor batch 19 (next 163 `0xc0bea0`).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors batch 18 (0xc1a9a0 .. 0xc0d720) lifted
 
 `CPU-01-LEAF-CTOR-BATCH-18` `FIXTURE_VERIFIED`; root replay 186/186 ctest pass, six checkers exit 0. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-18-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending workers: Audio3d `PortGetQueueLevel`/`PortClose`/`ObjectUnreserve-02` (`local/re/evidence/aud02-audio3d-portgetqueuelevel-01/`, `-portclose-01/`, `-objectunreserve-02/`) and `PortSetAttribute`/`Terminate` (`-portsetattribute-01/`, `-terminate-01/`).
