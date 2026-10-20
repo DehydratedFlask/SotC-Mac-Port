@@ -1,7 +1,24 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:32 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:33 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:33 CDT, worker bc-02397584 (CPU-01d) — 0xd7c4d0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd7c4d0** (survey index 90).
+Failed tries: 0. Status: FIXTURE_VERIFIED; sources on origin; CMake/HANDOFF this checkpoint.
+Owned: `native/core/vec_d7c4d0.{hpp,cpp}`, `native/tests/test_vec_d7c4d0.cpp`,
+`tools/lift/check_fd7c4d0.py`, `native/CMakeLists.txt` (+vec_d7c4d0 only; origin/main base).
+Private dump (not published): `local/re/work/cd7c4d0.bin`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV, peer `0xd7c9d0`/`0xd7fe40`/`0xd7c380`/`0xd7be60`.
+Abandoned local race on `0xd7c9d0` (Survey D `8ce468b`).
+Checkpoint (2026-10-19 20:33 CDT, bc-02397584):
+- OBS: unguarded vmovups copy; src=0x1306d20 dst=0x3352a10 bits=~0,~0,~0,0; index 90; distinct cells.
+- Commands: ctest -R '^vec_d7c4d0$' Passed; `python3 -I tools/lift/check_fd7c4d0.py` OK.
+- Logs: `/tmp/ctest_d7c4d0.log`, `/tmp/check_fd7c4d0.log`.
+- Store: Project `internal/worker-claim-d7c4d0.md`.
+- Push: sources `79b9159`; CMake/HANDOFF (this commit).
+
 
 ## ACTIVE CLAIM — 2026-10-19 20:28 CDT, worker bc-9aa0fe88 (SRV-01 mem list) — COMPLETE
 
