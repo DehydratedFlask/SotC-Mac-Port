@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 02:58 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 03:09 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 02:58 CDT, /root — three offline NGS2 scans checkpointed; REA access serialized
+## CURRENT CHECKPOINT — 2026-10-20 03:09 CDT, /root — NGS2 provider timeout recorded; RackCreate query underway
 
 Six bounded AUD-02 import-to-call paths are root-verified:
 `AUD-02-NGS2-SYSCREATE-01` (`sceNgs2SystemCreateWithAllocator`),
@@ -30,7 +30,8 @@ claims:
 [VoiceGetState root replay](docs/checkpoints/2026-10-20-root-aud02-voice-getstate-complete.md), and
 [SystemDestroy root replay](docs/checkpoints/2026-10-20-root-aud02-system-destroy-complete.md),
 [next three probe claims](docs/checkpoints/2026-10-20-root-aud02-next-three-claims.md), and
-[next three offline-prep checkpoint](docs/checkpoints/2026-10-20-root-aud02-next-three-offline-prep.md).
+[next three offline-prep checkpoint](docs/checkpoints/2026-10-20-root-aud02-next-three-offline-prep.md),
+and [provider timeout and root replay](docs/checkpoints/2026-10-20-root-aud02-next-three-provider-replay.md).
 
 Root check logs and command corrections are private under each task's `local/re/evidence/*-root-*`
 files. The source hashes match ELF `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`
@@ -51,21 +52,30 @@ The current claim checkpoint covers `AUD-02-NGS2-RACKCREATE-ALLOC-01` (symbol in
 separate private evidence folders. Offline scans found one candidate `FF 25` thunk each:
 RackCreateWithAllocator `0xf913f0`, RackQueryBufferSize `0xf91420`, and RackGetVoiceHandle
 `0xf91410`. Raw `E8` patterns (5, 15, and 104 respectively) remain candidates only; no call edge
-or function attribution is accepted without REA corroboration. VoiceHandle currently owns the
-serialized REA slot: `open_binary` succeeded and its slot-xrefs query for `0x1600ff8` is running.
-RackCreateWithAllocator and RackQueryBufferSize are preparing in parallel and waiting for the
-slot. Root verified the VoiceHandle and RackQuery prep hashes and replayed RackCreate's 32-file
-manifest. Two imports remain unclaimed: RackDestroy and VoiceGetStateFlags. No command contract,
-audio behavior, ABI, or runtime binding is inferred from these scans.
+or function attribution is accepted without REA corroboration. The VoiceHandle slot-xrefs query
+timed out during Ghidra 12.1.4 startup at 330 seconds; no Evidence ID/result was produced, and raw
+responses were not saved. Its failure is one provider timeout and zero failed analysis hypotheses.
+Root replayed the typed timeout summary and recorded that the transient Ghidra logs/process were
+already gone. RackQuery has a root-replayed offline `objdump` slice: `0x94fc2d` decodes as a direct
+call to `0xf91420`; the tool reported no overlapping section for the requested range, so it remains
+a candidate without a Ghidra edge/function boundary. Root verifier remains `PARTIAL_PRE_REA`.
+RackCreate owns the serialized provider slot now; its slot query is running with an 8G headless heap
+and 1200-second startup deadline after principal reassessment. The worker is preserving logs,
+duration, RSS and a snapshot. Root verified its current 61-file offline manifest; no selected
+caller is accepted. RackQuery waits for RackCreate to return. Two imports remain unclaimed:
+RackDestroy and VoiceGetStateFlags. No command contract, audio behavior, ABI, or runtime binding is
+inferred from these scans.
 
 The task claims are committed as `4d690d6` and pushed; dispatch was recorded in `89233ef` on
 `origin/main`. The three dossiers are owned by `/root/aud02_rackcreate_allocator`,
 `/root/aud02_rackquery_buffersize`, and `/root/aud02_rack_voicehandle` with `gpt-6-luna` at Extra
 High reasoning. Exact evidence and limits are in the linked claim and offline-prep checkpoints.
 
-Next exact action: finish VoiceHandle's slot-xrefs operation and release REA; then grant the slot
-serially to RackCreateWithAllocator and RackQueryBufferSize. Root will replay final checksums and
-byte verifiers before integrating any accepted path. The two remaining imports are
+Next exact action: wait for RackCreate's single slot-xrefs operation, root-replay its saved output,
+then decide whether the changed 8G/1200-second plan is suitable for one RackQuery query. Keep
+VoiceHandle paused until root has evidence that a Ghidra analysis can be reused or authorizes another
+changed plan. No provider calls may overlap. Root replays final checksums and byte verifiers before
+integrating any accepted path. The two remaining imports are
 `sceNgs2RackDestroy` and `sceNgs2VoiceGetStateFlags`. No source implementation is authorized by
 these bounded static probes. G1 remains NOT PASSED.
 
