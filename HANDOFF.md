@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:50 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:51 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:50 CDT, /root — VoiceControl timeout recorded; CLI recovery prepared
+## CURRENT CHECKPOINT — 2026-10-20 01:51 CDT, /root — VoiceControl CLI provider config failure recorded
 
 Three bounded AUD-02 static packets are in progress: `AUD-02-NGS2-SYSCREATE-01` for
 `sceNgs2SystemCreateWithAllocator` (worker `/root/aud02_syscreate`),
@@ -77,12 +77,32 @@ existing server binary at `/Users/dehydratedflask/.npm/_npx/a1722018f28f9df2/nod
 is REA 6.7.0 and its `--help` plus `xrefs --help` both exited 0. Existing private
 `local/re/rea-snapshot.json` exactly matches the target SHA above and Ghidra 12.1.4 profile digest
 `769518a8e9b57f953dd241adbb63672f0f486bb3d66359b9deef7c5e088ca7aa` (one cached entry); its SHA-256
-is `d80232c4fe22d7e75654eade8db44af093507a94723f80dd5ce67605dd382354`. Next exact action: copy
-that matching snapshot into the VoiceControl dossier, then invoke absolute-path
-`rea xrefs local/re/eboot.elf 0x1601020 --provider ghidra --snapshot <private-copy> --format json`
-with `GHIDRA_HEADLESS_MAXMEM=8G` and `REA_GHIDRA_STARTUP_TIMEOUT_MS=1200000`, preserving stdout,
-stderr and exit status. This is the documented CLI resource recovery; failed provider count remains
-1 until its result is known.
+is `d80232c4fe22d7e75654eade8db44af093507a94723f80dd5ce67605dd382354`. Root copied it to
+`local/re/evidence/aud02-ngs2-voice-control-01/rea-snapshot.json`; both hashes matched. The first
+absolute-path CLI query then failed before analysis because its standalone environment lacked
+`GHIDRA_INSTALL_DIR`; details follow.
+
+### CLI provider-configuration failure — 2026-10-20 01:51 CDT, `/root`
+
+Exact command used `GHIDRA_HEADLESS_MAXMEM=8G` and `REA_GHIDRA_STARTUP_TIMEOUT_MS=1200000` with
+`/Users/dehydratedflask/.npm/_npx/a1722018f28f9df2/node_modules/.bin/rea xrefs
+"/Volumes/Extra/SoC Mac Native/local/re/eboot.elf" 0x1601020 --provider ghidra --snapshot
+"/Volumes/Extra/SoC Mac Native/local/re/evidence/aud02-ngs2-voice-control-01/rea-snapshot.json"
+--format json --full-output`; exit 1 in 1.48 s. Stdout is retained as
+`local/re/evidence/aud02-ngs2-voice-control-01/root-cli-xrefs.json` (SHA-256
+`d5767fb41ab4ad16791bc31155b1b50b73d0fa604da59f260478e35d6442966f`); stderr is empty (SHA-256
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). REA returned
+`provider_unavailable` / `not_configured`: `GHIDRA_INSTALL_DIR` was not set. No Ghidra process,
+caller result or Evidence ID was produced. The copied snapshot remained byte-identical to its
+source. This is the second failed provider invocation for the task; failed analysis hypotheses
+remain 0.
+
+The already-installed Ghidra path from REA's live session inventory is
+`/Users/dehydratedflask/Applications/ghidra_12.1.4_PUBLIC`. No install/download is needed. Exact
+next action: make one CLI invocation with `GHIDRA_INSTALL_DIR` set to that path, preserving the
+existing 8 GB/1,200,000 ms limits and private stdout/stderr. This is provider attempt three; if it
+fails, stop this task and escalate as required. The CLI config change does not reset prior failures.
+Workers continue their independent system/rack packets.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 01:35 CDT, /root — importer and PHDR8 checkpoints published
 

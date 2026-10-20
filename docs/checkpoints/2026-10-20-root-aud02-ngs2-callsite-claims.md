@@ -94,6 +94,28 @@ assignment. Publication: commit `3e5ecea` (`docs: record NGS2 probe assignments`
   `REA_GHIDRA_STARTUP_TIMEOUT_MS=1200000`; preserve complete JSON, stderr and exit code. The first
   provider attempt remains one timeout; do not count the help/close operations as new attempts.
 
+## CLI provider-configuration failure — 2026-10-20 01:51 CDT, `/root`
+
+- Task: `AUD-02-NGS2-VOICE-CONTROL-01`; failed provider invocations: 2; failed analysis hypotheses:
+  0. This configuration error is not a negative xref result.
+- Root copied the exact matching `local/re/rea-snapshot.json` to
+  `local/re/evidence/aud02-ngs2-voice-control-01/rea-snapshot.json`; both SHA-256 values remain
+  `d80232c4fe22d7e75654eade8db44af093507a94723f80dd5ce67605dd382354`.
+- Exact CLI command: `env GHIDRA_HEADLESS_MAXMEM=8G REA_GHIDRA_STARTUP_TIMEOUT_MS=1200000
+  /Users/dehydratedflask/.npm/_npx/a1722018f28f9df2/node_modules/.bin/rea xrefs
+  "/Volumes/Extra/SoC Mac Native/local/re/eboot.elf" 0x1601020 --provider ghidra --snapshot
+  "/Volumes/Extra/SoC Mac Native/local/re/evidence/aud02-ngs2-voice-control-01/rea-snapshot.json"
+  --format json --full-output`, from repo root. Exit 1 in 1.48 seconds, stdout file SHA-256
+  `d5767fb41ab4ad16791bc31155b1b50b73d0fa604da59f260478e35d6442966f`, stderr empty (SHA-256
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). REA returned
+  `provider_unavailable/not_configured` because CLI environment lacked `GHIDRA_INSTALL_DIR`; no
+  Ghidra process or xref Evidence was created.
+- The CLI path does not change the task input or analysis hypothesis. Existing Ghidra path from
+  REA's live session inventory is `/Users/dehydratedflask/Applications/ghidra_12.1.4_PUBLIC`.
+- Next exact action: retry once with that absolute path in `GHIDRA_INSTALL_DIR` plus the existing
+  heap/deadline values. This is the third provider attempt; if it fails, stop and escalate under
+  AGENTS.md. Do not reset the failed attempt count.
+
 ## Packet boundaries
 
 Each packet must report the exact imported symbol/NID and relocation slot, how the caller was
