@@ -1,7 +1,18 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:30 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:29 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:29 CDT, worker bc-9aa0fe88 (SRV-01 mem split) — IN PROGRESS
+
+Task: SRV-01 mem — free-list region split surgery OBS at **0x1a8b6..0x1a8fa** (after `0x19660` pop).
+Failed tries: 0. Status: IN PROGRESS.
+Owned (new only): `native/core/region_split.{hpp,cpp}`, `native/tests/test_region_split.cpp`,
+`tools/lift/check_f1a8b6_split.py`, `native/CMakeLists.txt` (+region_split only; keep host_map/carve).
+Store: Project `internal/worker-claim-srv01-split.md`.
+**Does NOT edit:** `allocator_region.*`, `startup_ctors.*`, Drive, peer vec WIP.
+Deferred: full `0x19660` — replenish path calls `0x19e00` (circular); pop/unlink+refill left OPEN.
+Exact check: ctest -R region_split; `python3 -I tools/lift/check_f1a8b6_split.py`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:30 CDT, worker bc-02397584 (CPU-01d) — 0xdb3a70 — COMPLETE
 
