@@ -1,21 +1,32 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 22:28 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 22:30 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 22:28 CDT, /root — SRV-01 arena accounting — ACTIVE
+## CURRENT CHECKPOINT — 2026-10-19 22:30 CDT, /root — parallel CPU-01d / SRV-01 claims — ACTIVE
 
-Resuming the bounded fixture slice claimed below; one failed target hypothesis remains recorded.
-Ghidra 12.1.4 evidence E28 confirms `FUN_00019e00` contains the accounting sequence at
-`0x1a123–0x1a15a` for ELF SHA256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
-The existing `arena_high_water` helper covers the distinct `0x1a9bb` path; this claim keeps the
-`0x1a123` behavior separate and uses only raw offsets `+0x80`, `+0x88`, and conditional `+0x90`.
-Root owns `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/POINTERS.md`, `native/README.md`,
-`native/CMakeLists.txt`, and the checkpoint. Planned worker `/root/arena_accounting` owns only
-`native/core/arena_accounting.{hpp,cpp}`, `native/tests/test_arena_accounting.cpp`, and
-`tools/lift/check_f19e00_accounting.py`. No runtime allocator integration or G1 claim.
-Exact action after this claim is published: dispatch the worker to implement/test the byte-offset
-helper and private-ELF checker; then review, integrate CMake/docs, run focused checks and audits.
+Three isolated implementation claims are now active. Root owns `HANDOFF.md`, `docs/TASKS.md`,
+`docs/EVIDENCE.md`, `docs/POINTERS.md`, `native/README.md`, `native/CMakeLists.txt`, startup-ctor
+registration, and all checkpoint/integration work. Claim details and current inventory/index results
+are in [the parallel fixture checkpoint](docs/checkpoints/2026-10-19-root-cpu01d-parallel.md).
+
+- `/root/arena_accounting` continues the fixture slice for `FUN_00019e00`, block `0x1a123–0x1a15a`,
+  ELF SHA256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`. Ghidra 12.1.4
+  evidence E28 is recorded below. Own files only: `native/core/arena_accounting.{hpp,cpp}`,
+  `native/tests/test_arena_accounting.cpp`, and `tools/lift/check_f19e00_accounting.py`. One failed
+  target hypothesis remains recorded. The existing `arena_high_water` helper covers the distinct
+  `0x1a9bb` path; this work uses raw offsets `+0x80`, `+0x88`, and conditional `+0x90` only.
+- `/root/cpu01d_ce57b0` lifts unguarded vector-copy constructor RVA `0xce57b0` (private survey list
+  position 153, 17 bytes, no direct or indirect calls). Own files only: `native/core/vec_ce57b0.{hpp,cpp}`,
+  `native/tests/test_vec_ce57b0.cpp`, and `tools/lift/check_fce57b0.py`. Failed tries: 0.
+- `/root/cpu01d_ce0890` lifts unguarded vector-copy constructor RVA `0xce0890` (private survey list
+  position 155, 17 bytes, no direct or indirect calls). Own files only: `native/core/vec_ce0890.{hpp,cpp}`,
+  `native/tests/test_vec_ce0890.cpp`, and `tools/lift/check_fce0890.py`. Failed tries: 0.
+
+No worker edits `native/CMakeLists.txt`, `startup_ctors.*`, or shared docs. These are fixture/code
+tasks only; no runtime allocator integration or G1 claim. Pre-existing unstaged changes in
+`native/core/vec_ce7300.hpp`, `native/tests/test_vec_ce7300.cpp`, and `tools/lift/check_fce7300.py`
+remain preserved and are excluded from current staging.
 Pre-existing unstaged changes in `native/core/vec_ce7300.hpp`, `native/tests/test_vec_ce7300.cpp`,
 and `tools/lift/check_fce7300.py` are preserved and not included in this checkpoint.
 
@@ -1118,6 +1129,10 @@ Checkpoint (2026-10-19 21:45 CDT, bc-81763e53):
 - Logs: `/tmp/ctest_d6e0f0.log`, `/tmp/check_fd6e0f0.log`.
 - Store: Project `internal/worker-claim-d6e0f0.md`.
 - Push: (this commit).
+
+## PRIOR CHECKPOINT — 2026-10-19 22:28 CDT, /root — SRV-01 arena accounting — ACTIVE
+
+The 22:28 claim and repo-state record are archived in [the SRV-01 checkpoint](docs/checkpoints/2026-10-19-root-srv01-accounting.md).
 
 ## PRIOR CHECKPOINT — 2026-10-19 21:23 CDT, root — SRV-01 arena accounting — ACTIVE
 
