@@ -1,0 +1,47 @@
+# Checkpoint: AUD-02 NGS2 callsite packets — three bounded claims
+
+- Time / timezone: 2026-10-20 01:38 CDT (America/Chicago).
+- Agent and integrator: `/root`; sole shared-document integrator.
+- Task / gate / status: `AUD-02-NGS2-SYSCREATE-01`, `AUD-02-NGS2-RACKCREATE-01`, and
+  `AUD-02-NGS2-VOICE-CONTROL-01`; G2 remains NOT RUN; all three claims ACTIVE.
+- Prerequisite evidence / input and source hashes: `local/re/eboot.elf` SHA-256
+  `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; imported-symbol
+  manifest `local/re/imports.json` SHA-256
+  `78caaaae139b7c5d4d2618abab2e50e9f6918ea3cec73a90b81e0005c83b6744`; existing RE-02 and
+  AUD-01 evidence; `docs/REVERSE_ENGINEERING.md` Stage 3 scope.
+- Owned / changed files: claim only; `HANDOFF.md`, `docs/TASKS.md`, this checkpoint, generated
+  `docs/FOLDERS.md`. No private evidence or source code changed yet.
+- Hypothesis and expected result: resolve one statically identifiable caller/dataflow path for
+  each import `sceNgs2SystemCreateWithAllocator`, `sceNgs2RackCreate`, and
+  `sceNgs2VoiceControl`; anchor all claimed instruction/data bytes to the exact ELF hash and
+  retain unresolved indirect references. The manifest's `first_site` values are import slots,
+  not caller addresses.
+- Exact command, CWD and nonsecret environment: from repository root,
+  `git fetch origin main`; `git rev-list --left-right --count HEAD...origin/main` returned `0 0`;
+  `sha256sum local/re/eboot.elf local/re/imports.json` returned the hashes above. `date
+  '+%Y-%m-%d %H:%M:%S %Z'` returned `2026-10-20 01:38:22 CDT`.
+- Exit / observed result: claim established; no implementation or analysis command run yet.
+  The imported-symbol manifest contains 11 NGS2 entries. This is an inventory observation only.
+- Log, capture and REA evidence paths/IDs: none yet; workers must keep private dossiers under
+  separate `local/re/evidence/aud02-ngs2-{syscreate,rackcreate,voice-control}-01/` directories.
+- Observation versus inference / coverage limitations: imported names are labels in a local
+  manifest; they do not establish callsite reachability, PS4 parameter ABI, command meaning,
+  rack/voice lifecycle, audio playback, or runtime semantics. A bounded static callsite probe is
+  useful to AUD-02 but cannot pass G2 or G5.
+- Cumulative failed tries and distinct hypotheses: 0 for each task; claim only.
+- Remaining risks / blockers: the import's caller and pointer provenance may remain unresolved;
+  no first-party Sony contract is assumed. All binary evidence remains private.
+- Next exact action: regenerate `docs/FOLDERS.md`, run `graft check`, audit staged and tracked
+  publication paths, commit/push this claim, then dispatch workers for system/rack creation while
+  root probes voice control.
+- HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF and TASKS updated;
+  EVIDENCE and INSTALL_LOG unchanged; `docs/FOLDERS.md` regeneration pending.
+
+## Packet boundaries
+
+Each packet must report the exact imported symbol/NID and relocation slot, how the caller was
+resolved, an instruction/data byte range and hash for the selected caller, caller-to-thunk edge,
+visible register/stack writes at the call boundary, unresolved points, and a reproducible private
+verification recipe. Do not infer semantic parameter names or function contracts from register
+position, strings, community headers, or imported symbol names. Do not execute the game or load
+Sony modules. Root independently verifies each accepted dossier before adding a public evidence row.

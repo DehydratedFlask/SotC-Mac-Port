@@ -41,7 +41,10 @@ Gates and test evidence take precedence over a status label. Integrator owns thi
 | AUD-01-XFF-01 | Characterize one paired XFF sound bank | AUD-01 | FIXTURE_VERIFIED (25 pair groups/50 members matched manifest identity; 44/44 XFF length words at 0x14 match decoded size; bounded reader + 6 synthetic tests pass; runtime use/codec UNKNOWN) / root+/root/audio_asset_survey | 0 |
 | AUD-01-STS-IDENTITY-01 | Identify paired test_adpcm STS members | AUD-01, DATA-01 | FIXTURE_VERIFIED (290 exact paths in each cachedFiles layer; all locators checked and decoded hashes differ; no format or runtime claim) / root+/root/aud01_sts_cp3_identity | 0 |
 | DATA-02-BRIDGE-SXD-01 | Compare the two cachedFiles `sound/shadow/bridge.sxd` members | DATA-01, DATA-02 | ARTIFACT_VERIFIED (private script validates exact archive/member identities and hashes and repeats byte-offset comparison; 619 aligned bytes, 152 equal/467 different, 19-byte patch suffix; no schema/override meaning; one corrected report-construction defect) / root+/root/data02_bridge_sxd | 1 |
-| AUD-02 | Recover used voice/rack contracts | RE-02, AUD-01 | WAITING_FOR_DEPENDENCY | 0 |
+| AUD-02 | Recover used voice/rack contracts | RE-02, AUD-01 | ACTIVE (partial: three bounded imported-callsite/dataflow packets claimed for system creation, rack creation and voice control; parameter semantics, audio behavior and runtime remain unclassified) / root | 0 |
+| AUD-02-NGS2-SYSCREATE-01 | Byte-check one callsite/dataflow path for `sceNgs2SystemCreateWithAllocator` | RE-02, AUD-01 | ACTIVE (claim-only; exact-ELF static dossier pending) / root | 0 |
+| AUD-02-NGS2-RACKCREATE-01 | Byte-check one callsite/dataflow path for `sceNgs2RackCreate` | RE-02, AUD-01 | ACTIVE (claim-only; exact-ELF static dossier pending) / root | 0 |
+| AUD-02-NGS2-VOICE-CONTROL-01 | Byte-check one callsite/dataflow path for `sceNgs2VoiceControl` | RE-02, AUD-01 | ACTIVE (claim-only; exact-ELF static dossier pending) / root | 0 |
 | AUD-03 | Decoder/mixer/effect fixtures | AUD-02 | WAITING_FOR_DEPENDENCY | 0 |
 | AUD-04 | Actual game audio integration | AUD-03, CPU-04 | WAITING_FOR_DEPENDENCY | 0 |
 | SAV-01 | Recover game serializer/checksums | RE-02 | WAITING_FOR_DEPENDENCY | 0 |
