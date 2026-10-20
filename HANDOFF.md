@@ -3,6 +3,39 @@
 Updated: 2026-10-19 21:48 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 21:45 CDT, worker bc-9aa0fe88 (SRV-01 mem high-water) — COMPLETE
+
+Task: SRV-01 mem — arena used-byte high-water OBS **0x1a9bb..0x1a9fc** (`+0x80/+0x90` + peaks `+0x88/+0x98`).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/arena_high_water.{hpp,cpp}`, `native/tests/test_arena_high_water.cpp`,
+`tools/lift/check_f1a9bb_high_water.py`, `native/CMakeLists.txt` (+arena_high_water only; origin/main base),
+`docs/POINTERS.md`, `native/README.md`, `docs/TASKS.md`, `HANDOFF.md`.
+**Kept:** host_map / free_list_carve / region_split / region_list / free-count.
+**Did NOT edit:** `arena_accounting.*` (root `0x1a123` slice), `allocator_region.*`, Drive, peer vec_*, `0x19660`.
+Page bitmap: OPEN. Distinct from root arena_accounting mode-2 block.
+Checkpoint (2026-10-19 21:45 CDT, bc-9aa0fe88):
+- OBS: used90+=rbx / peak98; used80+=rbx / peak88; unsigned jbe; precedes call `0x19660` @`0x1aa0f`.
+- Commands: ctest 5/5 Passed; `python3 -I tools/lift/check_f1a9bb_high_water.py` OK.
+- Logs: `/tmp/ctest_hw.log`, `/tmp/check_hw.log`.
+- Store: Project `internal/worker-claim-srv01-high-water.md`.
+- Push: **`1206f62`** on origin/main (sources+checker); docs follow-up this commit.
+
+## ACTIVE CLAIM — 2026-10-19 21:48 CDT, worker bc-81763e53 (CPU-01d) — 0xd6a520 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd6a520** (survey index 100).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d6a520.{hpp,cpp}`, `native/tests/test_vec_d6a520.cpp`,
+`tools/lift/check_fd6a520.py`, `native/CMakeLists.txt` (+vec_d6a520 only; origin/main base).
+Private dump (not published): `local/re/work/cd6a520.bin`.
+Skipped: 95 `0xd71f60` (escalated); A 97 `0xd6dbf0` (`ed2a3dc`); C 99 `0xd6d280`; done 98 `adaa4dd`.
+Did NOT edit Drive / SRV / `startup_ctors.*` / peer `arena_*` / `local/`.
+Checkpoint (2026-10-19 21:48 CDT, bc-81763e53):
+- OBS: unguarded vmovups copy; src=0x1304990 dst=0x3352970 bits=~0,~0,~0,0; index 100; distinct cells.
+- Commands: ctest -R '^vec_d6a520$' Passed; `python3 -I tools/lift/check_fd6a520.py` OK.
+- Logs: `/tmp/ctest_d6a520.log`, `/tmp/check_fd6a520.log`.
+- Store: Project `internal/worker-claim-d6a520.md`.
+- Push: (this commit).
+
 ## ACTIVE CLAIM — 2026-10-19 21:47 CDT, worker bc-81763e53 (CPU-01d) — 0xd6d890 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd6d890** (survey index 98).
