@@ -23,6 +23,7 @@ add_library(sotc_core STATIC
   core/clear_flag64.cpp
   core/vec_b52110.cpp
   core/vec_b743c0.cpp
+  core/vec_ef85e0.cpp
   core/store_zero32.cpp
   core/zero_xmm16.cpp
   core/zero_xmm_qword.cpp
@@ -71,6 +72,9 @@ add_test(NAME vec_b52110 COMMAND test_vec_b52110)
 add_executable(test_vec_b743c0 tests/test_vec_b743c0.cpp)
 target_link_libraries(test_vec_b743c0 sotc_core)
 add_test(NAME vec_b743c0 COMMAND test_vec_b743c0)
+add_executable(test_vec_ef85e0 tests/test_vec_ef85e0.cpp)
+target_link_libraries(test_vec_ef85e0 sotc_core)
+add_test(NAME vec_ef85e0 COMMAND test_vec_ef85e0)
 add_executable(test_store_zero32 tests/test_store_zero32.cpp)
 target_link_libraries(test_store_zero32 sotc_core)
 add_test(NAME store_zero32 COMMAND test_store_zero32)
