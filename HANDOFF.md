@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 22:47 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 22:54 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 22:48 CDT, /root — DATA-02 pakN SHA-256 + AUD-01 member identities — ACTIVE CLAIMS
+## CURRENT CHECKPOINT — 2026-10-19 22:54 CDT, /root — DATA-02 + AUD-01 identity slices and CPU-01d `0xcdc760` — ACTIVE CLAIMS
 
 Root claims one archive-identity gap: stream-hash the 12,838,532,222-byte private
 `local/extracted/CUSA08809/pakN.psarc` and populate its private PSARC summary. The current
@@ -57,6 +57,31 @@ NGS2 semantics are inferred.
   unknown. G1 NOT PASSED; G2-G6 NOT RUN. Next exact action: implement the independent per-member
   digest/locator slice in parallel with DATA-02, review both diffs, record evidence and publish
   only allowlisted source/docs.
+
+Root also claims one independent CPU-01d leaf: recover the unguarded vector-copy constructor at
+RVA `0xcdc760` as an ordinary native function and fixture, without registering it in the startup
+chain. The hash-pinned private ELF is `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+The survey row is position 157 and the vector-copy manifest row is position 99 (both zero-based).
+The exact body is `c5 f8 10 05 d8 ac 61 00 c5 f8 11 05 00 55 67 02 c3`; signed RIP displacements
+resolve source `0x12f7440` and destination `0x3351c70`, with source words `ffffffff ffffffff
+ffffffff 00000000`. The source/destination pair is unique in the copy manifest and disjoint from
+other source/destination cells. Worker `/root/cpu01d_probe` owns
+`native/core/vec_cdc760.{hpp,cpp}`, `native/tests/test_vec_cdc760.cpp`,
+`tools/lift/check_fcdc760.py`, the focused CMake target and `native/README.md`; root owns all
+checkpoint/docs integration. Failed tries: 0.
+
+- Exact checks planned: `cmake --build local/build/native --target test_vec_cdc760`,
+  `ctest --test-dir local/build/native -R '^vec_cdc760$' --output-on-failure`, and
+  `python3 -I tools/lift/check_fcdc760.py`. The checker must verify the ELF digest, instruction
+  template, signed displacements, source words, survey/copy-manifest positions and native dump.
+- Graft claim evidence (three successful calls; approximately 7,202 tokens saved): the worker's
+  CPU-01d fixture-pattern `graft ask`, `graft grep "init_vec_ce7300"`, and
+  `graft skeleton tools/lift/check_fce7300.py`. Its exact binary extraction command and printed
+  rows are archived in `docs/checkpoints/2026-10-19-root-cpu01d-cdc760-claim.md`.
+- Remaining risk: leaf fixture only; no startup reachability, engine chain, or G1 evidence. The
+  separate `0xd71f60` escalation remains untouched. Next exact action: after claim publication,
+  implement the fixture/checker, verify its focused target and preserve all private binary data.
+  G1 NOT PASSED; G2-G6 NOT RUN.
 
 ## PRIOR CHECKPOINT — 2026-10-19 22:41 CDT, /root — CPU-01d `0xce7300` metadata correction — FIXTURE_VERIFIED
 
