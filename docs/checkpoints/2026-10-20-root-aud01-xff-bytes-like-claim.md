@@ -1,8 +1,8 @@
 # Checkpoint: AUD-01-XFF-BYTES-LIKE-INPUT-01 — bounded fixture claimed
 
-- Time / timezone: 2026-10-20 05:55 CDT (America/Chicago)
+- Time / timezone: 2026-10-20 05:56 CDT (America/Chicago)
 - Agent and integrator: `/root`; planned test-only worker `/root/aud01_xff_bytes_like`; root owns shared records and Git
-- Task / gate / status: `AUD-01-XFF-BYTES-LIKE-INPUT-01`; AUD-01 synthetic parser fixture; claim pending publication
+- Task / gate / status: `AUD-01-XFF-BYTES-LIKE-INPUT-01`; AUD-01 synthetic parser fixture; claim published, worker not yet dispatched
 - Prerequisite evidence / input and source hashes: `AUD-01-XFF-01` and `AUD-01-XFF-DECLARED-LENGTH-SHORTER-01` are `FIXTURE_VERIFIED`; parser `scripts/audio_bank_header.py` SHA-256 `bdad7d192b0ecdb929daf5147a139e7545fd5c546f01ed4ffb4005f2cea9f9c0`; test `scripts/test_audio_bank_header.py` SHA-256 `250f829edfaa4cc6a7f74dd557f617cfa25228105b062adddf2cfce4e2d75531`.
 - Owned / changed files: planned worker may edit only `scripts/test_audio_bank_header.py`; root owns HANDOFF, TASKS, this checkpoint, generated `docs/FOLDERS.md`, and Git. No implementation change has been made.
 - Hypothesis and expected result: a valid synthetic XFF member passed as `bytes`, `bytearray`, or `memoryview` yields identical observed reports, including the declared-length match. No parser change is expected.
@@ -13,6 +13,6 @@
 - Cumulative failed tries and distinct hypotheses: zero failed implementation tries; baseline is not an implementation try.
 - Remaining risks / blockers: no codec, NGS2 behavior, runtime use, or playback claim; no dependency/install change.
 - Exact precommit checks: `git diff --cached --check` exited 0 (empty log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`); `python3 -I scripts/audit_publish_paths.py` exited 0 and accepted 5 staged paths (log SHA-256 `c3bf3148c29ac70a4bb4269d7a3589b5a5f01791d5eacfc751660ff837aa8e8d`); `python3 -I scripts/audit_publish_paths.py --all` exited 0 and accepted 647 tracked paths (log SHA-256 `5c3136e02b605f6080e8239655570674ab637272e8d1728f63d2088fc5a8eff1`). `git fetch origin` exited 0 with 0/0 divergence at `7d720361b5238c2fd8d2b75f8fc4dfe398f34ac8`.
-- Commit and push results will be recorded before worker dispatch.
-- Next exact action: publish this claim, verify post-push 0/0 state, then dispatch the worker to edit only `scripts/test_audio_bank_header.py`.
+- Exact publication result: claim commit `ebed0eed4d453f981d3b8f696d14369c3bd226e4` (`docs: claim XFF input container fixture`) and push exited 0. Post-push fetch confirmed `HEAD` and `origin/main` at that commit, 0/0 divergence (log `local/checkpoints/root-2026-10-20-aud01-xff-bytes-like-claim-post-push-fetch.log`, SHA-256 `09ed622bd9d7903eef4911f2730d0e70dcc1a8ab559f0dd8946b6487f23dd6fc`).
+- Next exact action: dispatch the worker to edit only `scripts/test_audio_bank_header.py`; then review its one-file diff and replay the test.
 - HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF, TASKS, this claim record and generated `docs/FOLDERS.md` updated; EVIDENCE awaits test result; no install facts changed. Prior task `RE-02-DYNLINK-RELOC-SIZE-ALIGNMENT-01` is published as `7d72036`, with its checkpoint commit/push details in the completion record. `python3 scripts/project_index.py` exited 0 and indexed 4,166 folders (log `local/checkpoints/root-2026-10-20-aud01-xff-bytes-like-claim-project-index.log`, SHA-256 `f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`).
