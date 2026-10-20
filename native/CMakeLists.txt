@@ -113,6 +113,7 @@ add_library(sotc_core STATIC
   core/vec_cfcc60.cpp
   core/vec_cfcbc0.cpp
   core/vec_d04ce0.cpp
+  core/vec_cf44a0.cpp
 )
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()
@@ -483,3 +484,7 @@ add_test(NAME vec_cfcbc0 COMMAND test_vec_cfcbc0)
 add_executable(test_vec_d04ce0 tests/test_vec_d04ce0.cpp)
 target_link_libraries(test_vec_d04ce0 sotc_core)
 add_test(NAME vec_d04ce0 COMMAND test_vec_d04ce0)
+
+add_executable(test_vec_cf44a0 tests/test_vec_cf44a0.cpp)
+target_link_libraries(test_vec_cf44a0 sotc_core)
+add_test(NAME vec_cf44a0 COMMAND test_vec_cf44a0)
