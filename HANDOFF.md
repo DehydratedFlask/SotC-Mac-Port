@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:01 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:06 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:01 CDT, /root — STS, launcher UI and slot-10 helper recorded; page-map analysis claimed
+## CURRENT CHECKPOINT — 2026-10-20 00:06 CDT, /root — page-map analysis active; launcher import-error fix claimed
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -51,6 +51,15 @@ tests/builds were made. VoiceOver, Accessibility Inspector, Finder launch, nativ
 Full Keyboard Access, and process cleanup at app quit remain NOT RUN; G4 remains NOT PASSED.
 Evidence and primary Apple references are in [E45](docs/EVIDENCE.md) and the
 [review checkpoint](docs/checkpoints/2026-10-19-root-app01-ui-review-claim.md).
+
+### APP-01-IMPORTER-ERROR-01 — report folder-import failures — CLAIMED
+
+After the static UI review (E45), the user selected a system alert for actual folder-import errors;
+cancellation stays silent. Root owns the small `ContentView` follow-up. It will preserve readiness and
+the previously chosen folder on failure and only surface the localized error. Do not modify sandbox
+scope/bookmark flow or child-process ownership in this task. No test suite changes are planned.
+Exact next action: implement the `.failure` branch and alert, then run the launcher package build.
+Claim: [APP-01-IMPORTER-ERROR-01](docs/checkpoints/2026-10-20-root-app01-import-error-claim.md).
 
 ### SRV-01-PAGE-MAP-19660-01 — characterize pinned function at `0x19660` — CLAIMED
 
