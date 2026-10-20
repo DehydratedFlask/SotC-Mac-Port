@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:33 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:35 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:33 CDT, /root — constructor metadata fixture verified; two analyses active
+## CURRENT CHECKPOINT — 2026-10-19 23:35 CDT, /root — constructor metadata and bridge comparison published; CPU analysis active
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -15,10 +15,10 @@ and reports the unresolved original slot 10 at RVA `0xf09e60`. A private hash-bo
 reran the build, focused CTest (1/1), checker, and whitespace check successfully; worker logs are
 under `local/validation/20261019T2321-cpu-01-ctor-prefix-01/`. This proves runner bookkeeping only.
 Constructor 10 semantics, a runtime initialization chain, and G1 remain unproven. The prefix batch
-is pushed as `b26768a`. The follow-up correction for two leaf-fixture constructor indices is now
-fixture verified locally; its source and evidence changes are being published. Read-only
-REA/Ghidra analysis of constructor `0xf09e60` and byte-level comparison of the two
-`sound/shadow/bridge.sxd` variants remain in progress.
+is pushed as `b26768a`. The follow-up correction for two leaf-fixture constructor indices is
+fixture verified and pushed as `fc1b278`. A read-only, repeatable comparison of the two
+`sound/shadow/bridge.sxd` variants is artifact verified and recorded below. It does not establish a
+schema. Read-only REA/Ghidra analysis of constructor `0xf09e60` remains active.
 
 ### DATA-02 — pakN archive identity
 
@@ -287,10 +287,12 @@ identified the four stale metadata locations.
   `local/validation/20261019T2321-cpu-01-ctor-prefix-01/ctor-metadata-{build,ctest,check-fd32720,check-fd2ffe0,check-ctor-slots}.log`.
   Root's reruns were direct and not separately logged. No behavior, addresses, vector positions, or
   function semantics changed. This corrects provenance only and does not pass G1. Failed tries: 0.
-  Exact next action: record E41, run project/Graft/publication gates, then commit and push the six
-  owned files and documentation.
+  Project index check (4,128 folders), `graft check`, staged/all publication audits (10/576 paths),
+  and staged whitespace check passed; fetched `origin/main` had 0/0 divergence. Commit `fc1b278`
+  pushed the six owned files and four documentation files to `origin/main`. Exact next action:
+  finish CPU slot-10 and bridge-member private analyses, then integrate each result separately.
 
-### DATA-02-BRIDGE-SXD-01 — compare cachedFiles bridge members — ACTIVE CLAIM
+### DATA-02-BRIDGE-SXD-01 — compare cachedFiles bridge members — ARTIFACT_VERIFIED
 
 Integrator `/root` claims a read-only DATA-02 format characterization for `/root/data02_bridge_sxd`.
 Prerequisite: DATA-01 identities and E25 classify exactly two `.sxd` members with observed prefix
@@ -301,11 +303,28 @@ Prerequisite: DATA-01 identities and E25 classify exactly two `.sxd` members wit
   boundaries corroborated by raw bytes and a repeatable structural rule. Do not infer engine use or
   semantics from the path or magic. Do not edit shared source or docs; root integrates the result.
   If no schema is established, report that evidence boundary without a permissive parser stub.
-- Exact acceptance: a reproducible private script in existing `local/validation/` re-reads both
-  named members, verifies manifest locators/hashes, and emits a bounded comparison report. No game
-  binaries or raw member data enter Git. Failed tries: 0.
-- DATA-02 remains ACTIVE until selected-scene asset resolution is established. Root refreshes the
-  project index and integrates final evidence after workers finish.
+- Result (observation): private script `local/validation/data02-bridge-sxd-01.py` re-reads both exact
+  members via `Psarc.read()`, verifies summary and member manifests, and emits the report
+  `local/validation/data02-bridge-sxd-01.json`. Base archive SHA-256
+  `373828b9a6e5c689a66b05a01aa14b295026976438aa7796e9baa789ae03dda0`, entry 40079, stored span
+  `[28218302,28218921)`, decoded length 619, member SHA-256
+  `81a635460b7da1979052478b2e7324e1cdef0e3402c096d22565d03b9790d2b8`. Patch archive SHA-256
+  `656d6870a159013921d036d0b7cf18c679bfc62fe5862b31332c459ff7da05d0`, entry 40079, stored span
+  `[29830538,29831176)`, decoded length 638, member SHA-256
+  `0dd7a8f06d54b471e06dd9cd4f25fe3db904c3497d47daeb5deaa7c1c122bd78`. The members share prefix
+  `fbad9897`; at 619 aligned offsets there are 152 equal and 467 different bytes in 29 runs each;
+  patch has a 19-byte suffix `[619,638)`.
+- Verification: the worker ran the script twice and `cmp` matched; root reran it to
+  `local/validation/data02-bridge-sxd-01-root.log`, which matched `run1.log`. The JSON and all three
+  stdout logs hash to `0340b13e1c0bc1f4baf1ae2cb1194a23bce23b57edbfc85447adee024eaf90b3`. Exact
+  commands are recorded in the task checkpoint. No member bytes or reports entered Git.
+- Inference/limit: two changed versions do not prove record boundaries, field meanings, codec,
+  reader behavior, patch semantics or runtime use. One report-construction defect was found and
+  corrected before the repeatable final report; count 1 failed reporting try, 0 failed schema
+  hypotheses. DATA-02 remains ACTIVE; selected-scene asset resolution is not established.
+- Exact next action: continue the CPU slot-10 static analysis. For a future schema slice, identify
+  one independently named cachedFiles `.sxd` with the same observed prefix and validate its exact
+  manifest locator/hash before making a three-way offset comparison.
 
 ### Parallel dispatch checkpoint — 2026-10-19 23:19 CDT
 
@@ -313,8 +332,9 @@ See [the parallel claims dispatch checkpoint](docs/checkpoints/2026-10-19-root-p
 Both earlier claims were pushed before assignment; workers own distinct paths and do not edit shared
 docs or commit/push. RE-02-DYNLINK-01 is fixture verified and published in `b2a5b6f`;
 CPU-01-CTOR-PREFIX-01 is fixture verified and pushed in `b26768a`. The metadata claim above is
-fixture verified; its exact correction is being published. The CPU slot-10 and bridge-member
-analyses are assigned and active, with root retaining integration and publication ownership.
+fixture verified and pushed in `fc1b278`. The bridge-member comparison is artifact verified;
+CPU slot-10 static analysis remains assigned and active, with root retaining integration and
+publication ownership.
 
 ### Current publication checkpoint
 
