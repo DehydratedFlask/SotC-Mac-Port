@@ -1,7 +1,28 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:18 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:20 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:18 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 61/62 — COMPLETE
+
+Task: CPU-01e — register peer FIXTURE_VERIFIED vec-copy ctors into `startup_ctors`:
+**61** `0xdddc90`, **62** `0xddab00` (both on origin/main with CMake).
+Skipped gap 10–19, idx 50 (`vec_e094e0` absent), SRV `host_map`, incomplete `0xdd41e0`.
+Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
+Checkpoint: ctest 34/34; check_fdddc90 + check_fddab00 OK; registry size **26** (+61 `0xdddc90`, +62 `0xddab00`).
+Owned: `native/core/startup_ctors.*`, `native/tests/test_startup_ctors.cpp`, `HANDOFF.md`.
+CMake: origin/main as-is. Store: Project `internal/worker-claim-drive.md`.
+
+## ACTIVE CLAIM — 2026-10-19 20:20 CDT, worker bc-02397584 (CPU-01d) — 0xdda990 — IN PROGRESS
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdda990** (survey index 63).
+Failed tries: 0. Status: CLAIMED / lifting.
+Owned: `native/core/vec_dda990.{hpp,cpp}`, `native/tests/test_vec_dda990.cpp`,
+`tools/lift/check_fdda990.py`, `native/CMakeLists.txt` (+vec_dda990 only; origin/main base).
+Private dump (not published): `local/re/work/cdda990.bin`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV `host_map`, peer `0xddab00`/`0xdddc90`.
+Note: skipped `0xddab00` after peer race (`4ce4fec`).
+Store: Project `internal/worker-claim-dda990.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:13 CDT, worker bc-effcf5dc (CPU-01d) — 0xddab00 — COMPLETE
 
@@ -16,7 +37,7 @@ Checkpoint (2026-10-19 20:13 CDT, bc-effcf5dc):
 - Commands: ctest -R '^vec_ddab00$' Passed; `python3 -I tools/lift/check_fddab00.py` OK.
 - Logs: `/tmp/ctest_ddab00.log`, `/tmp/check_ddab00.log`.
 - Prior: `0xde7fb0` pushed `d0afd8c`. Store: `internal/worker-claim-ddab00.md`.
-- Push: (pending this commit).
+- Push: `b428a2c` on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 20:17 CDT, worker bc-02397584 (CPU-01d) — 0xddab00 — COMPLETE
 
