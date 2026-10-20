@@ -3,6 +3,23 @@
 Updated: 2026-10-19 22:16 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 22:16 CDT, worker bc-73721c8d (CPU-01d) — 0xceb070 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xceb070** (survey index 145).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: native/core/vec_ceb070.hpp/cpp, native/tests/test_vec_ceb070.cpp,
+tools/lift/check_fceb070.py, native/CMakeLists.txt (+vec_ceb070 only; origin/main base).
+Private dump (not published): local/re/work/cceb070.bin.
+Did NOT edit: startup_ctors.*, Drive, SRV, peer WIP.
+Skipped: 95; raced 0xceb890 (94794b4). Prior: 0xd04ce0 = 79b10b7 (Drive cb211c7).
+Checkpoint (2026-10-19 22:16 CDT, bc-73721c8d):
+- OBS: unguarded vmovups copy; src=0x12f95c0 dst=0x3351d30 bits=~0,~0,~0,0; index 145; distinct cells.
+- Commands: ctest -R '^vec_ceb070$' Passed; python3 -I tools/lift/check_fceb070.py OK.
+- Logs: /tmp/ctest_ceb070.log, /tmp/check_ceb070.log.
+- Store: Project internal/worker-claim-ceb070.md.
+- Push: (this commit).
+
+
 ## ACTIVE CLAIM — 2026-10-19 22:16 CDT, worker bc-9aa0fe88 (CPU-01d) — 0xceb2c0 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xceb2c0** (survey index 143).
