@@ -52,6 +52,39 @@ class PublishPathTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertTrue(audit.violations([path]), path)
 
+    def test_nested_forbidden_under_allowlisted_dirs_rejected(self):
+        # Forbidden dirs/dumps must be caught at any depth, not only at the top.
+        cases = [
+            "docs/Shadow of the Colossus/x.dat",
+            "tools/a/b/Shadow of the Colossus/x.dat",
+            "native/local/x",
+            "launcher/sub/local/x.json",
+            "tools/AgentStores/state.json",
+            "docs/.graft/index.db",
+            "tools/foo/eboot.bin",
+            "scripts/x.sprx",
+            "native/libSceFoo.sprx",
+            "docs/dump.self",
+            "tools/x/dump.elf",
+            "docs/game.pkg",
+            "native/data/game.psarc",
+            "docs/EBOOT.BIN",
+        ]
+        for path in cases:
+            with self.subTest(path=path):
+                self.assertTrue(audit.violations([path]), path)
+
+    def test_nested_lookalike_names_still_allowed(self):
+        cases = [
+            "tools/lift/xref_rip.py",
+            "tools/pkg-extractor/CMakeLists.txt",
+            "docs/localization.md",
+            "native/local_tests/a.c",
+            "tools/graft/README.md",
+            "docs/Shadow of the Colossus notes.md",
+        ]
+        self.assertEqual(audit.violations(cases), [])
+
 
 if __name__ == "__main__":
     unittest.main()
