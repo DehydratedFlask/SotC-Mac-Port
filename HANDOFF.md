@@ -1,6 +1,6 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:15 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:16 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
 ## ACTIVE CLAIM — 2026-10-19 20:12 CDT, worker bc-9aa0fe88 (SRV-01 mem) — COMPLETE
@@ -29,6 +29,7 @@ Checkpoint (2026-10-19 20:15 CDT, bc-02397584):
 - Logs: `/tmp/ctest_ddef00.log`, `/tmp/check_ddef00.log`.
 - CMake: origin/main base + vec_ddef00 only.
 - Store: Project `internal/worker-claim-ddef00.md`.
+- Push: `99ce863` on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 20:12 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 54/57/58 — COMPLETE
 
