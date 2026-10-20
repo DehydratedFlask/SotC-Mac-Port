@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:35 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:44 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:35 CDT, /root — constructor metadata and bridge comparison published; CPU analysis active
+## CURRENT CHECKPOINT — 2026-10-19 23:44 CDT, /root — constructor metadata, bridge comparison, and slot-10 dossier verified
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -14,11 +14,10 @@ and reports the unresolved original slot 10 at RVA `0xf09e60`. A private hash-bo
 103 registered RVA/index pairs against the pinned ELF and constructor table. Root independently
 reran the build, focused CTest (1/1), checker, and whitespace check successfully; worker logs are
 under `local/validation/20261019T2321-cpu-01-ctor-prefix-01/`. This proves runner bookkeeping only.
-Constructor 10 semantics, a runtime initialization chain, and G1 remain unproven. The prefix batch
-is pushed as `b26768a`. The follow-up correction for two leaf-fixture constructor indices is
-fixture verified and pushed as `fc1b278`. A read-only, repeatable comparison of the two
-`sound/shadow/bridge.sxd` variants is artifact verified and recorded below. It does not establish a
-schema. Read-only REA/Ghidra analysis of constructor `0xf09e60` remains active.
+The prefix runner bookkeeping, two leaf-fixture index annotations, bridge member identities, and
+the static slot-10 dossier are now verified and published. Runtime constructor behavior, the
+computed call at `0xf09efb`, helper contracts, game startup, and G1 remain unproven. Commits:
+`b26768a` (prefix fixture), `fc1b278` (leaf metadata), and `e40a2a4` (bridge comparison evidence).
 
 ### DATA-02 — pakN archive identity
 
@@ -248,25 +247,43 @@ Claim record: [CPU-01-CTOR-PREFIX-01 checkpoint](docs/checkpoints/2026-10-19-roo
   remote divergence was `0 0`. Next exact action: investigate RVA `0xf09e60` offline; do not code a
   replacement until its behavior and required native contract are established.
 
-### CPU-01-CTOR10-ANALYSIS-01 — characterize first unresolved constructor — ACTIVE CLAIM
+### CPU-01-CTOR10-ANALYSIS-01 — characterize first unresolved constructor — STATIC_ANALYSIS_VERIFIED
 
 Integrator `/root` claims a read-only, hash-bound REA/Ghidra analysis for `/root/cpu_slot10_analysis`.
 Prerequisite: CPU-01-CTOR-PREFIX-01 is fixture verified and the exact ELF/table identities are in
 its checkpoint. Use only the existing local ELF; do not run the game, install/download modules, or
 write native replacement code.
 
-- Graft `grep "f09e60"` finds only the explicit null registration, its fixture assertion, and the
-  hash-bound slot checker; it finds no body analysis. The private claim notes a 255-byte body hash,
-  but its call/data semantics remain to be corroborated.
+- Graft `grep "f09e60"` found the explicit null registration, fixture assertion, and table checker;
+  it did not find a body analysis. The private REA/Ghidra dossier is now independently checked.
 - Deliver a private evidence record for RVA `0xf09e60`: exact ELF digest/image base, REA and Ghidra
   versions, Evidence ID, function range/body hash and analysis coverage; direct calls and resolved
   import identities; data references; unresolved computed calls; and observation/inference split.
   If a body or references cannot be established, state that limitation without relabeling the slot.
   Preserve a reproducible analysis recipe and export evidence before closing any temporary project.
-- Exact acceptance: `rea function local/re/eboot.elf 0xf09e60 --provider ghidra --snapshot local/re/rea-f09e60-snapshot.json --format json` plus an independent private byte/hash and reference check. Save logs/evidence under existing `local/re/evidence/` or `local/validation/`; do not alter the baseline entry snapshot. Failed tries: 0.
-- Exit: static description of the first blocker and unresolved service contracts, not a native
-  implementation. G1 remains NOT PASSED. Root integrates shared docs and refreshes the project
-  index after all parallel private reports are delivered.
+- Tool/input identity: REA 6.7.0, Ghidra 12.1.4, OpenJDK 25.0.4.1, x86:LE:64:default:gcc; ELF SHA-256
+  `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; image-base observation 0;
+  Evidence ID `ev_054b2f190852ca75b5f92898208d4f8e554fbcfe6ab6416b0c018242902d7921`. New snapshot
+  SHA-256 `cb35935424cae5121c34741b73453d545a49bd61c65b68727ffcf6b9c8333352`; baseline snapshot
+  remained `d80232c4fe22d7e75654eade8db44af093507a94723f80dd5ce67605dd382354`.
+- Observation: `FUN_00f09e60` is a Ghidra-assigned inclusive range `0xf09e60..0xf09f63` (260 bytes),
+  body SHA-256 `22204129cd9b4997ae893d5d078a9bf8b0409114bb122fab2324956b5039a3c4`. The earlier 255-byte
+  hash `fde1ac223a4c084da0a1a9d04804bee8ba8e12be0ac46e1a8e98a925ac4ffcc7` covers through RET and
+  excludes the five-byte terminal call at `0xf09f5f..0xf09f63`. Seven direct calls are byte-verified:
+  `f09ec7→e1eda0`, `f09f04→e1ede0`, `f09f13→b30a10`, `f09f1a→f90210`, `f09f2c→b30950`,
+  `f09f42→f8f390`, `f09f5f→f8f3a0`. Thunks resolve through same-ELF import slots to `malloc` and
+  `__cxa_atexit` (`name-by-nid-hash-only`) and `__stack_chk_fail` (`contract-declared`); those labels
+  do not prove native ABI contracts. The computed call at `0xf09efb` (`[RAX+0xc0]`) remains unresolved.
+  Non-stack data targets: `0x15fb7b0`, `0x15fb7c0`, `0x15fe518`, `0x1604218`, `0x3356678`,
+  `0x3356688`, `0xe44a10`. REA relationship coverage is partial and limited to callees.
+- Independent root verification: `python3 -I local/re/evidence/rea-f09e60-verify.py > local/re/evidence/rea-f09e60-root-verification.json` exited 0; `cmp` against worker verification output passed. Root hashes of ELF, baseline snapshot, new snapshot and analysis output match the values above; baseline snapshot was not altered.
+- Inference/risks: code flow suggests global allocation and cleanup registration, but helper functions and callback contracts remain unknown. Ghidra reported unrelated overlapping-body repairs at `0xb30a00` and `0xb30c20` near target `0xb30a10`, so that local boundary remains cautious; Ghidra's global warnings elsewhere are not target evidence. No runtime behavior/reachability or native ABI was proven; G1 remains NOT PASSED. One verifier attempt used the wrong snapshot key (`id` rather than `evidence_id`) and was corrected; failed task tries: 1 checker correction, 0 failed REA invocations.
+- Private artifacts: `local/re/evidence/rea-f09e60-summary.md`, analysis JSON/stderr, distinct snapshot,
+  command recipe, progress log, independent objdump/thunk checks, verifier script/output and root
+  verifier output. No game-code bytes are copied into public docs.
+- Task exit: static blocker characterization complete; no replacement code. Exact next action: resolve
+  the indirect-call target and local helper contracts only if a separate bounded task is claimed;
+  keep CPU-01 and G1 open until runtime startup and required gates are demonstrated.
 
 ### CPU-01-CTOR-METADATA-01 — correct original indices in leaf fixtures — FIXTURE_VERIFIED
 
