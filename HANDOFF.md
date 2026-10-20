@@ -3,6 +3,17 @@
 Updated: 2026-10-19 19:55 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 19:55 CDT, worker bc-cd298177 (claim-2c) — CPU-01d
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xb743c0** (index 282).
+Failed tries: 0. Status: IN PROGRESS.
+Owned (new only): `native/core/vec_b743c0.{hpp,cpp}`, `native/tests/test_vec_b743c0.cpp`,
+`tools/lift/check_fb743c0.py`, `native/CMakeLists.txt` (+target only).
+Private dump (not published): `local/re/work/cb743c0.bin`.
+**Does NOT edit:** `startup_ctors.*` (Drive registry), peer vec/addr/allocator/clear_flag*.
+Avoided: Drive `0xf4b510`/`0xf30460`/`0x196c90`, Claim-3 `0xdd41e0`, claim-2b `0xb52110`.
+Exact check: rebuild + ctest + `python3 -I tools/lift/check_fb743c0.py`.
+
 ## Public remote (durable)
 
 - **GitHub:** https://github.com/DehydratedFlask/SotC-Mac-Port (`main`)
@@ -38,11 +49,13 @@ Johnnywang2001 keyring label — canonical owner/URL uses DehydratedFlask.
 Peer bc-24e5fd45 help claim: remote now exists; no need to recreate.
 Path audit: `python3 -I scripts/audit_publish_paths.py --all` → OK (110 paths); no eboot/PKG/psarc/local/reference.
 
-## ACTIVE CLAIM — 2026-10-19 19:53 CDT, worker bc-24e5fd45 (GitHub repo help) — SUPERSEDED
+## ACTIVE CLAIM — 2026-10-19 19:53 CDT, worker bc-24e5fd45 (GitHub repo help) — COMPLETE
 
-Task: Finish public repo create/push (peer assist). Status: SUPERSEDED by bc-dc141fdf —
-repo created at https://github.com/DehydratedFlask/SotC-Mac-Port; first allowlisted push owned
-by bc-dc141fdf. Do not force-push or re-init `.git`.
+Task: Peer assist on SotC-Mac-Port — allowlisted stage/audit/first push + HANDOFF public-remote block.
+Failed tries: 0. Status: COMPLETE (coordinated with bc-dc141fdf).
+Pushed root commit `0138c79` (110 files) then HANDOFF note `2cfa87f` to
+https://github.com/DehydratedFlask/SotC-Mac-Port. Path audit OK; **no** `local/` dumps.
+Store: `internal/worker-claim-github.md`. No competing CPU-01d lift.
 
 ## ACTIVE CLAIM — 2026-10-19 19:52 CDT, worker bc-cd298177 (claim-2b) — COMPLETE
 
