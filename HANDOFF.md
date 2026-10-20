@@ -1,15 +1,17 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:15 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:16 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 21:15 CDT, root — SRV-01 arena accounting — ACTIVE
+## CURRENT CHECKPOINT — 2026-10-19 21:16 CDT, root — SRV-01 arena accounting — ACTIVE
 
 Claim and bounded plan: [SRV-01 arena-accounting checkpoint](docs/checkpoints/2026-10-19-root-srv01-accounting.md).
 The independent slice covers only the observed accounting instructions around `0x1a123–0x1a15a`
-inside `0x19ae0`; field meanings remain unnamed. Next exact action: export the target function from
-the existing hash-pinned Ghidra project, verify its instructions and callers, then implement a pure
-offset-based native helper if Ghidra confirms the byte survey.
+inside `0x19ae0`; saved disassembly shows add at `+0x80`, unsigned max update at `+0x88`, and a
+mode-2 subtract at `+0x90`. These are survey observations pending Ghidra confirmation; field meanings
+remain unnamed. Next exact action: export the target function from the existing hash-pinned Ghidra
+project, verify its instructions and callers, then implement a pure offset-based native helper if
+Ghidra confirms the byte survey.
 
 ## STOPPED CLAIM — 2026-10-19 21:12 CDT, root — CPU-01d leaf 95 — NEEDS_PRINCIPAL
 
