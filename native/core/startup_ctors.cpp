@@ -118,6 +118,8 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xcfcc60, 138, [](StartupState& s) noexcept { init_vec_cfcc60(s.vec_cfcc60); }},
         {0xcfcbc0, 139, [](StartupState& s) noexcept { init_vec_cfcbc0(s.vec_cfcbc0); }},
         {0xcf44a0, 140, [](StartupState& s) noexcept { init_vec_cf44a0(s.vec_cf44a0); }},
+        {0xcee8a0, 141, [](StartupState& s) noexcept { init_vec_cee8a0(s.vec_cee8a0); }},
+        {0xceb890, 142, [](StartupState& s) noexcept { init_vec_ceb890(s.vec_ceb890); }},
         {0xb743c0, 282, [](StartupState& s) noexcept { init_vec_b743c0(s.vec_b743c0); }},
         {0xb52110, 290, [](StartupState& s) noexcept { init_vec_b52110(s.vec_b52110); }},
         {0x196c90, 520, [](StartupState& s) noexcept { clear_flag32(s.flag32); }},
