@@ -80,6 +80,14 @@ class XffMemberTests(unittest.TestCase):
         with self.assertRaisesRegex(abh.AudioBankFormatError, 'decoded member length'):
             abh.parse_xff_member(member)
 
+    def test_rejects_non_bytes_like_input_with_type_error(self):
+        # A str of the exact valid member length must not be coerced or accepted.
+        member_text = 'xff\0' + 'a' * (abh.XFF_MIN_MEMBER_SIZE - len(abh.XFF_MAGIC))
+        self.assertEqual(len(member_text), abh.XFF_MIN_MEMBER_SIZE)
+        with self.assertRaises(TypeError) as ctx:
+            abh.parse_xff_member(member_text)
+        self.assertEqual(str(ctx.exception), 'member data must be bytes-like')
+
 
 if __name__ == '__main__':
     unittest.main()
