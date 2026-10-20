@@ -1,7 +1,23 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:49 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:50 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 21:50 CDT, worker bc-73721c8d (CPU-01d) — 0xd62690 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd62690** (survey index 102).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: native/core/vec_d62690.hpp/cpp, native/tests/test_vec_d62690.cpp,
+tools/lift/check_fd62690.py, native/CMakeLists.txt (+vec_d62690 only; origin/main base).
+Private dump (not published): local/re/work/cd62690.bin.
+Did NOT edit: startup_ctors, Drive, SRV, peer vec_d6d280 / vec_d62b00 / arena_*.
+Skipped: 95 0xd71f60 NEEDS_PRINCIPAL; B 99 0xd6d280; D 100 0xd6a520; C 101 0xd62b00.
+Checkpoint (2026-10-19 21:50 CDT, bc-73721c8d):
+- OBS: unguarded vmovups copy; src=0x1304380 dst=0x3352950 bits=~0,~0,~0,0; index 102; distinct cells.
+- Commands: ctest -R vec_d62690 Passed; python3 -I tools/lift/check_fd62690.py OK.
+- Logs: /tmp/ctest_d62690.log, /tmp/check_d62690.log.
+- Store: Project internal/worker-claim-d62690.md.
+- Push: 6dc3218 on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 21:49 CDT, worker bc-81763e53 (CPU-01d) — 0xd62690 — COMPLETE
 
