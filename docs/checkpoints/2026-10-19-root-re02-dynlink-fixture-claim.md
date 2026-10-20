@@ -74,5 +74,6 @@ exact command result and private log path.
 - Published files: `scripts/test_ps4_dynlink.py`, `HANDOFF.md`, `docs/TASKS.md`,
   `docs/EVIDENCE.md`, and this checkpoint. The independent CPU source/test/checker changes were not
   staged. Its generated `docs/FOLDERS.md` count is left for the CPU publication checkpoint.
+- The follow-up publication record was added in docs commit `205630b` and pushed to `origin main`.
 - Next exact action: continue the independent CPU-01-CTOR-PREFIX-01 task; do not promote this parser
   fixture to evidence of runtime loader behavior.

@@ -1,13 +1,21 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:23 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:26 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:23 CDT, /root — RE-02 dynlink fixture published; CPU constructor gate in progress
+## CURRENT CHECKPOINT — 2026-10-19 23:26 CDT, /root — CPU constructor runner boundary fixture verified; G1 remains blocked
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
 archive, manifest, test logs and build outputs stay under ignored `local/`.
+
+Latest bounded result: CPU-01-CTOR-PREFIX-01 now stops after the ten recovered constructor callbacks
+and reports the unresolved original slot 10 at RVA `0xf09e60`. A private hash-bound checker verifies
+103 registered RVA/index pairs against the pinned ELF and constructor table. Root independently
+reran the build, focused CTest (1/1), checker, and whitespace check successfully; worker logs are
+under `local/validation/20261019T2321-cpu-01-ctor-prefix-01/`. This proves runner bookkeeping only.
+Constructor 10 semantics, a runtime initialization chain, and G1 remain unproven. Next: claim a
+separate offline analysis of constructor `0xf09e60` before attempting any native implementation.
 
 ### DATA-02 — pakN archive identity
 
@@ -185,7 +193,7 @@ Claim record: [RE-02-DYNLINK-01 checkpoint](docs/checkpoints/2026-10-19-root-re0
   `b2a5b6f`. Next exact action: collect and verify the independent CPU constructor gate while
   keeping RE-02's runtime loader limits explicit.
 
-### CPU-01-CTOR-PREFIX-01 — fail-fast original constructor prefix — ACTIVE CLAIM
+### CPU-01-CTOR-PREFIX-01 — fail-fast original constructor prefix — FIXTURE_VERIFIED
 
 Integrator `/root` claims a bounded CPU-01 runner correctness slice for `/root/cpu_leaf_survey`.
 Owned files: `native/core/startup_ctors.hpp`, `native/core/startup_ctors.cpp`,
@@ -215,13 +223,31 @@ Claim record: [CPU-01-CTOR-PREFIX-01 checkpoint](docs/checkpoints/2026-10-19-roo
   it does not establish startup reachability or G1. Failed tries: 0. At 23:19 CDT,
   `/root/cpu_leaf_survey` was assigned the four claimed implementation paths.
 
+- Completion checkpoint — 2026-10-19 23:26 CDT. Agent `/root/cpu_leaf_survey` completed the four
+  claimed files; integrator `/root` independently reran all three acceptance commands and
+  `git diff --check`. All exited 0; focused CTest passed 1/1. The checker matched ELF SHA-256
+  `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, table start `0x2dd70e0`,
+  573 entries, and table SHA-256 `5917cb85db190e9ef93ce5e06d5b6596d40b6c3623166e37ed7c6c3c3cd3ab28`; it
+  verified 103 registered RVA/index pairs and identifies index 10 / `0xf09e60` as the first
+  unresolved slot. Worker logs: `local/validation/20261019T2321-cpu-01-ctor-prefix-01/01-cmake-build.log`,
+  `02-ctest.log`, `03-check-ctor-slots.log`, and `commands.txt`. Project index refresh and final
+  check reported 4,128 folders/current; `graft check` reported the wiring graph in sync; the new
+  checker is queryable. The earlier stale-index check outputs are retained and explained in
+  `commands.txt`; they were caused by logs added after a refresh, not an implementation failure.
+- Observation: the prefix runner stops after ten registered callbacks; `0xd32720` and `0xd2ffe0`
+  now carry original indices 119 and 120. Inference: fail-fast bookkeeping prevents the fixture
+  runner from silently skipping the first unresolved constructor. The slot's service semantics and
+  execution in the game are still unknown. Failed implementation tries: 0. Task status:
+  FIXTURE_VERIFIED. G1 remains NOT PASSED; G2-G6 remain NOT RUN. Next exact action: claim a bounded
+  offline analysis of RVA `0xf09e60`; do not code its replacement until its contract is established.
+
 ### Parallel dispatch checkpoint — 2026-10-19 23:19 CDT
 
 See [the parallel claims dispatch checkpoint](docs/checkpoints/2026-10-19-root-parallel-claims-dispatched.md).
 Both claims were pushed before assignment; workers own distinct paths and do not edit shared docs
 or commit/push. RE-02-DYNLINK-01 is fixture verified and published in `b2a5b6f`;
-CPU-01-CTOR-PREFIX-01 remains in progress. Current exact action: collect and verify the CPU runner
-result before closing that bounded task.
+CPU-01-CTOR-PREFIX-01 is now fixture verified after independent reruns. Current exact action:
+publish its bounded source/test/checker and evidence, then assess the unresolved constructor body.
 
 ### Current publication checkpoint
 
@@ -245,6 +271,11 @@ was pushed as `7b2747b` (`feat: add bounded XFF bank header reader`); before com
 path audit passed 8 paths, the full tracked-path audit passed 569 paths, staged whitespace check
 passed, and `git fetch origin main` plus `git rev-list --left-right --count origin/main...HEAD`
 showed no divergence (`0 0`).
+The RE-02-DYNLINK-01 fixture was pushed in `b2a5b6f` (`test: cover synthetic PS4 dynlink import
+relocations`); its staged path audit passed 5 files, the full tracked-path audit passed 572 paths,
+and `git fetch origin main` plus the divergence count showed `0 0`. The follow-up publication
+record was pushed in `205630b`; its 2 staged docs paths passed the staged audit, `--all` passed
+572 tracked paths, and the fetched remote was even with HEAD.
 
 ## PRIOR CHECKPOINT — 2026-10-19 22:41 CDT, /root — CPU-01d `0xce7300` metadata correction — FIXTURE_VERIFIED
 

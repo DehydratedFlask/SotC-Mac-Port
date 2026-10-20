@@ -586,7 +586,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `reference/shadPS4Plus-pkg/src/video_core/texture_cache` | 18 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `scripts` | 15 | Small project and offline analysis helpers |
 | `tools` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
-| `tools/lift` | 131 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/lift` | 132 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/pkg-extractor` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
 
 Private recursive inventory: `local/indexes/folders.json` (excluded from publication).

@@ -27,7 +27,8 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xf4b510, 7, [](StartupState& s) noexcept { init_vec_neg036(s.neg036); }},
         {0xf3d9d0, 8, [](StartupState& s) noexcept { init_math_constants(s.math_d); }},
         {0xf30460, 9, [](StartupState& s) noexcept { init_xyz_mask_copy(s.xyz_mask_copy); }},
-        // Gap 10–19: heap/atexit wrappers (need native malloc contract; not stubbed).
+        {0xf09e60, 10, nullptr},
+        // Slots 11–19 remain unrecovered; their semantics are unknown.
         {0xef85e0, 20, [](StartupState& s) noexcept { init_vec_ef85e0(s.vec_ef85e0); }},
         {0xea52f0, 22, [](StartupState& s) noexcept { init_ea52f0(s.ea52f0); }},
         {0xe10490, 48, [](StartupState& s) noexcept { init_trig_constants(s.trig); }},
@@ -93,11 +94,10 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xd40010, 112, [](StartupState& s) noexcept { init_vec_d40010(s.vec_d40010); }},
         {0xd3b790, 113, [](StartupState& s) noexcept { init_vec_d3b790(s.vec_d3b790); }},
         {0xd3a6d0, 114, [](StartupState& s) noexcept { init_vec_d3a6d0(s.vec_d3a6d0); }},
-        {0xd32720, 115, [](StartupState& s) noexcept { init_vec_d32720(s.vec_d32720); }},
-        {0xd2ffe0, 116, [](StartupState& s) noexcept { init_vec_d2ffe0(s.vec_d2ffe0); }},
         // Gap idx 117.
         {0xd32b70, 118, [](StartupState& s) noexcept { init_vec_d32b70(s.vec_d32b70); }},
-        // Gap idx 119–120.
+        {0xd32720, 119, [](StartupState& s) noexcept { init_vec_d32720(s.vec_d32720); }},
+        {0xd2ffe0, 120, [](StartupState& s) noexcept { init_vec_d2ffe0(s.vec_d2ffe0); }},
         {0xd2cb30, 121, [](StartupState& s) noexcept { init_vec_d2cb30(s.vec_d2cb30); }},
         {0xd2c7e0, 122, [](StartupState& s) noexcept { init_vec_d2c7e0(s.vec_d2c7e0); }},
         {0xd20590, 123, [](StartupState& s) noexcept { init_vec_d20590(s.vec_d20590); }},

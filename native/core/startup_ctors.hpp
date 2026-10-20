@@ -178,8 +178,8 @@ struct StartupState {
     VecD40010 vec_d40010{};   // 0xd40010 idx 112
     VecD3b790 vec_d3b790{};   // 0xd3b790 idx 113
     VecD3a6d0 vec_d3a6d0{};   // 0xd3a6d0 idx 114
-    VecD32720 vec_d32720{};   // 0xd32720 idx 115
-    VecD2ffe0 vec_d2ffe0{};   // 0xd2ffe0 idx 116
+    VecD32720 vec_d32720{};   // 0xd32720 idx 119
+    VecD2ffe0 vec_d2ffe0{};   // 0xd2ffe0 idx 120
     VecD32b70 vec_d32b70{};   // 0xd32b70 idx 118
     VecD2cb30 vec_d2cb30{};   // 0xd2cb30 idx 121
     VecD2c7e0 vec_d2c7e0{};   // 0xd2c7e0 idx 122
@@ -230,7 +230,7 @@ struct CtorRunResult {
 
 CtorRunResult run_constructors(std::span<const CtorSlot> in_order, StartupState& state) noexcept;
 
-// Recovered subset in original index order. Gaps (incl. 10–19 malloc, 21, 50) remain visible blockers.
+// Recovered subset in original index order. The first unresolved original slot is explicit with a null callback.
 std::span<const CtorSlot> recovered_constructors() noexcept;
 
 }  // namespace sotc
