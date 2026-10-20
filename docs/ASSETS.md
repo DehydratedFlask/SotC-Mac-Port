@@ -1,4 +1,4 @@
-# Asset archive findings (DATA-02, partial) — 2026-10-19
+# Asset archive findings (DATA-02, partial) — 2026-10-20
 
 Reader: [`scripts/psarc.py`](../scripts/psarc.py) (read-only, bounds-checked, tests in
 `scripts/test_psarc.py`). Private outputs: `local/manifests/assets/*.summary.json` and
@@ -43,6 +43,7 @@ Observed on this title (from members.jsonl, no re-extract):
   `text/common/_cmn/ui.ar.ctxt`, `text/shadow/_cmn/story.ar.ctxt`,
   `text/shadow/_cmn/system.ar.ctxt`
 - TOC digest differs on 35,734 shared paths; casefold collisions within/across layers: **0**
+- The E75 audit of all seven member manifests found **0** exact duplicate path groups, **0** within-manifest `casefold()` collision groups and **0** differently spelled cross-archive pairs across all 21 archive pairs. This covers only these manifests; it does not prove filesystem/Fios case behavior or mount order.
 - Status: **PROVISIONAL_OBS**. Patch contains every base path, so a patch-wins overlay is
   consistent with the TOC data; engine Fios/loader mount order is still **unproven** (RE/CPU).
 
