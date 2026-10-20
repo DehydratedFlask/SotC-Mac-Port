@@ -1,16 +1,15 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:40 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:49 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:40 CDT, /root — NGS2 callsite packets dispatched
+## CURRENT CHECKPOINT — 2026-10-20 01:49 CDT, /root — VoiceControl timeout recorded; CLI recovery pending
 
-Three bounded AUD-02 static packets are now claimed: `AUD-02-NGS2-SYSCREATE-01` for
-`sceNgs2SystemCreateWithAllocator`, `AUD-02-NGS2-RACKCREATE-01` for `sceNgs2RackCreate`, and
-`AUD-02-NGS2-VOICE-CONTROL-01` for `sceNgs2VoiceControl`. Root is the sole shared-document
-integrator and initially owns all three claims; separate workers will be assigned to system and
-rack creation after this claim checkpoint is published. The static voice-control packet remains
-root-owned. Claims and boundaries:
+Three bounded AUD-02 static packets are in progress: `AUD-02-NGS2-SYSCREATE-01` for
+`sceNgs2SystemCreateWithAllocator` (worker `/root/aud02_syscreate`),
+`AUD-02-NGS2-RACKCREATE-01` for `sceNgs2RackCreate` (worker `/root/aud02_rackcreate`), and
+`AUD-02-NGS2-VOICE-CONTROL-01` for `sceNgs2VoiceControl` (root). Root is the sole shared-document
+integrator. Claims and boundaries:
 [checkpoint](docs/checkpoints/2026-10-20-root-aud02-ngs2-callsite-claims.md).
 
 Input identity: `local/re/eboot.elf` SHA-256
@@ -41,10 +40,34 @@ with `gpt-6-luna`, Extra High, on separate private evidence paths and a process-
 requirement (no shared MCP REA session). Root owns `AUD-02-NGS2-VOICE-CONTROL-01`. They may not
 edit shared docs or publish; root is the sole integrator and will independently review/verify
 evidence. Task-specific prompts and paths are in the
-[claim checkpoint](docs/checkpoints/2026-10-20-root-aud02-ngs2-callsite-claims.md). No analysis
-attempt has started yet; failed-try counts remain zero. Files changed: HANDOFF/TASKS and the
-claim checkpoint only. Exact next action: publish this dispatch/owner checkpoint, then root
-starts the byte-bound VoiceControl probe while workers proceed independently.
+[claim checkpoint](docs/checkpoints/2026-10-20-root-aud02-ngs2-callsite-claims.md). At dispatch,
+analysis had not started and all failed-try counts were zero. Files changed in that checkpoint:
+HANDOFF/TASKS and the claim checkpoint only. The dispatch checkpoint was committed as `3e5ecea` (`docs: record NGS2
+probe assignments`) and pushed from `d243989` to `3e5ecea`; staged path audit passed three allowlisted
+paths, full audit passed 600, `git diff --cached --check` passed, fetch showed divergence `0 0`.
+
+### VoiceControl timeout checkpoint — 2026-10-20 01:47 CDT, `/root`
+
+Root opened `local/re/eboot.elf` through REA with exact SHA-256
+`d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; Ghidra 12.1.4 was
+selected on ARM64. The first `mcp__rea__xrefs({address:"0x1601020"})` request failed with
+`provider_timeout` after the 330,000 ms startup deadline; configured heap was 2 GB and no xref
+result/Evidence ID was returned. Run ID `ae5b3b78-9f1a-4d73-aea9-33c5719e55c4`, PID 56090.
+The provider reported global function-overlap repair and decompiler warnings, but none were tied
+to this slot. Temporary runtime paths under `/var/folders/.../rea-ghidra-CkuzlE/` were removed
+before they could be copied. Private diagnostic summary:
+`local/re/evidence/aud02-ngs2-voice-control-01/root-mcp-xrefs-timeout.json` (SHA-256
+`4a51b441a28a1968948f0ee3f066f02b346615f3643673854bd1719e0c99f9ef`).
+
+Observation: the targeted xref query did not finish because whole-image Ghidra import/analysis
+exceeded the MCP startup deadline. It supplies no evidence for or against a VoiceControl caller.
+Failed provider attempts for this task: 1; failed binary-analysis hypotheses: 0. This remains a
+single recorded resource failure; a new agent/model or larger timeout will not erase the count.
+Exact next action: use the existing process-local REA CLI with the previously documented
+`GHIDRA_HEADLESS_MAXMEM=8G` and `REA_GHIDRA_STARTUP_TIMEOUT_MS=1200000` recovery, preserving a
+fresh private snapshot/log. Keep the scope to one byte-checked caller path and retain all unresolved
+edges. Workers continue their separate system/rack probes. No code, game payload, reference, or
+runtime behavior was changed or tested; G1 NOT PASSED.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 01:35 CDT, /root — importer and PHDR8 checkpoints published
 

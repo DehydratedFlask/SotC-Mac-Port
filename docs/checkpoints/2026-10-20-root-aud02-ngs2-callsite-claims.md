@@ -9,8 +9,8 @@
   manifest `local/re/imports.json` SHA-256
   `78caaaae139b7c5d4d2618abab2e50e9f6918ea3cec73a90b81e0005c83b6744`; existing RE-02 and
   AUD-01 evidence; `docs/REVERSE_ENGINEERING.md` Stage 3 scope.
-- Owned / changed files: claim only; `HANDOFF.md`, `docs/TASKS.md`, this checkpoint, generated
-  `docs/FOLDERS.md`. No private evidence or source code changed yet.
+- Owned / changed files at claim creation: `HANDOFF.md`, `docs/TASKS.md`, this checkpoint, and
+  generated `docs/FOLDERS.md`; no private evidence or source code changed at that time.
 - Hypothesis and expected result: resolve one statically identifiable caller/dataflow path for
   each import `sceNgs2SystemCreateWithAllocator`, `sceNgs2RackCreate`, and
   `sceNgs2VoiceControl`; anchor all claimed instruction/data bytes to the exact ELF hash and
@@ -28,7 +28,8 @@
   manifest; they do not establish callsite reachability, PS4 parameter ABI, command meaning,
   rack/voice lifecycle, audio playback, or runtime semantics. A bounded static callsite probe is
   useful to AUD-02 but cannot pass G2 or G5.
-- Cumulative failed tries and distinct hypotheses: 0 for each task; claim only.
+- Cumulative failed tries at claim creation: 0 for each task. The root VoiceControl task later
+  had one MCP startup timeout; see the dedicated failure checkpoint below.
 - Remaining risks / blockers: the import's caller and pointer provenance may remain unresolved;
   no first-party Sony contract is assumed. All binary evidence remains private.
 - Publication checkpoint — 2026-10-20 01:39 CDT, `/root`: commit `e71c55a`
@@ -39,8 +40,9 @@
   staged paths; `python3 -I scripts/audit_publish_paths.py --all` accepted 600 tracked paths;
   `git fetch origin main` succeeded with divergence `0 0`. The only untracked path shown was
   `tools/graft/.cache/telemetry-repo-id.json`; it was not staged.
-- Next exact action: dispatch `/root/aud02_syscreate` and `/root/aud02_rackcreate` on the first two
-  tasks in separate private evidence directories; root probes VoiceControl and verifies all reports.
+- Next exact action at claim creation: dispatch separate system/rack workers after publishing the
+  claim, while root probes VoiceControl. Current assignments and failure/recovery state are in the
+  dispatch and VoiceControl checkpoints below.
 - HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF, TASKS and generated
   `docs/FOLDERS.md` updated; EVIDENCE and INSTALL_LOG unchanged.
 
@@ -51,8 +53,31 @@
 private evidence directory and process-local REA CLI; neither may change shared documentation or
 publish. Root remains the integrator and owns the VoiceControl probe. No binary analysis had begun
 at dispatch; task failed-try counters remain zero. `HANDOFF.md` and `docs/TASKS.md` record this
-assignment. Exact next action: publish this dispatch checkpoint, then root begins the bounded
-VoiceControl analysis and verifies worker evidence as it arrives.
+assignment. Publication: commit `3e5ecea` (`docs: record NGS2 probe assignments`) pushed
+`d243989..3e5ecea`; staged path audit accepted three allowlisted paths, full audit accepted 600,
+`git diff --cached --check` passed, fetch showed divergence `0 0`.
+
+## VoiceControl probe checkpoint — 2026-10-20 01:47 CDT, `/root`
+
+- Task: `AUD-02-NGS2-VOICE-CONTROL-01`; status ACTIVE; failed provider attempts: 1; failed
+  analysis hypotheses: 0.
+- Exact input: `local/re/eboot.elf`, SHA-256
+  `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; Ghidra 12.1.4 on
+  ARM64. REA `open_binary` returned the same hash and x86_64 format.
+- Exact targeted check: `mcp__rea__xrefs({address:"0x1601020"})` after opening that ELF through
+  REA; it ended with `provider_timeout`, Ghidra startup deadline 330,000 ms, 2 GB configured heap,
+  no caller result and no Evidence ID. Run ID `ae5b3b78-9f1a-4d73-aea9-33c5719e55c4`, PID 56090.
+- The returned partial diagnostic showed whole-image import and non-target-specific overlap/p-code
+  warnings. Temporary Ghidra logs under `/var/folders/.../rea-ghidra-CkuzlE/` were no longer
+  present when checked. A private normalized record is
+  `local/re/evidence/aud02-ngs2-voice-control-01/root-mcp-xrefs-timeout.json`.
+- Observation versus inference: startup exceeded the MCP tool's limit; this is not evidence that
+  no caller exists. No analysis hypothesis has been disproved, and no NGS2 contract is inferred.
+- Next exact action: retry using the existing REA CLI and the documented 8 GB/1,200,000 ms
+  environment; save a fresh private log/snapshot and resolve at most one caller path. A larger
+  timeout or agent/model change does not reset the failed-provider counter.
+- Shared docs changed: HANDOFF and TASKS; EVIDENCE/INSTALL_LOG unchanged. Publication of this
+  checkpoint precedes the CLI recovery attempt.
 
 ## Packet boundaries
 
