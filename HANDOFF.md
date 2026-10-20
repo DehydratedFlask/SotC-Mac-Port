@@ -1,7 +1,22 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:01 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:06 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:05 CDT, worker bc-02397584 (CPU-01d) — 0xe026b0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xe026b0** (survey index 53).
+Failed tries: 0. Status: FIXTURE_VERIFIED.
+Owned: `native/core/vec_e026b0.{hpp,cpp}`, `native/tests/test_vec_e026b0.cpp`,
+`tools/lift/check_fe026b0.py`, `native/CMakeLists.txt` (+vec_e026b0 only; origin/main base).
+Private dump (not published): `local/re/work/ce026b0.bin`.
+Did NOT edit: `startup_ctors.*`, peer WIP, Drive `0xf4eba0`/`0xf4b540`/`0xf4fd40`.
+
+Checkpoint (2026-10-19 20:06 CDT, bc-02397584):
+- OBS: unguarded vmovups copy; src=0x1312f10 dst=0x3353350 bits=~0,~0,~0,0; index 53; distinct cells.
+- Commands: ctest -R '^vec_e026b0$' Passed; `python3 -I tools/lift/check_fe026b0.py` OK.
+- Logs: `/tmp/ctest_e026b0.log`, `/tmp/check_e026b0.log`.
+- Next: allowlisted push; store `internal/worker-claim-e026b0.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:00 CDT, worker bc-dc141fdf (CPU-01d) — 0xe05320 — COMPLETE
 
