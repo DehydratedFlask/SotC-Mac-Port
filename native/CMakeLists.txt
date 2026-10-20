@@ -196,6 +196,12 @@ add_library(sotc_core STATIC
   core/vec_c14f60.cpp
   core/vec_c0d720.cpp
   core/vec_c0bea0.cpp
+  core/vec_bd7a80.cpp
+  core/vec_be4ff0.cpp
+  core/vec_be50a0.cpp
+  core/vec_be5270.cpp
+  core/vec_be5410.cpp
+  core/vec_c060a0.cpp
   core/vec_c0bbd0.cpp
   core/vec_c0bb00.cpp
   core/vec_c0baa0.cpp
@@ -921,3 +927,27 @@ add_test(NAME vec_c0aae0 COMMAND test_vec_c0aae0)
 add_executable(test_vec_c09070 tests/test_vec_c09070.cpp)
 target_link_libraries(test_vec_c09070 sotc_core)
 add_test(NAME vec_c09070 COMMAND test_vec_c09070)
+
+add_executable(test_vec_c060a0 tests/test_vec_c060a0.cpp)
+target_link_libraries(test_vec_c060a0 sotc_core)
+add_test(NAME vec_c060a0 COMMAND test_vec_c060a0)
+
+add_executable(test_vec_be5410 tests/test_vec_be5410.cpp)
+target_link_libraries(test_vec_be5410 sotc_core)
+add_test(NAME vec_be5410 COMMAND test_vec_be5410)
+
+add_executable(test_vec_be5270 tests/test_vec_be5270.cpp)
+target_link_libraries(test_vec_be5270 sotc_core)
+add_test(NAME vec_be5270 COMMAND test_vec_be5270)
+
+add_executable(test_vec_be50a0 tests/test_vec_be50a0.cpp)
+target_link_libraries(test_vec_be50a0 sotc_core)
+add_test(NAME vec_be50a0 COMMAND test_vec_be50a0)
+
+add_executable(test_vec_be4ff0 tests/test_vec_be4ff0.cpp)
+target_link_libraries(test_vec_be4ff0 sotc_core)
+add_test(NAME vec_be4ff0 COMMAND test_vec_be4ff0)
+
+add_executable(test_vec_bd7a80 tests/test_vec_bd7a80.cpp)
+target_link_libraries(test_vec_bd7a80 sotc_core)
+add_test(NAME vec_bd7a80 COMMAND test_vec_bd7a80)
