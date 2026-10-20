@@ -1,7 +1,21 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:50 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:51 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 21:51 CDT, worker bc-81763e53 (CPU-01d) — 0xd5fbe0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd5fbe0** (survey index 104).
+Failed tries: 0. Status: FIXTURE_VERIFIED; sources on origin; CMake/HANDOFF this checkpoint.
+Owned: `native/core/vec_d5fbe0.{hpp,cpp}`, `native/tests/test_vec_d5fbe0.cpp`,
+`tools/lift/check_fd5fbe0.py`, `native/CMakeLists.txt` (+vec_d5fbe0).
+Private dump (not published): `local/re/work/cd5fbe0.bin`.
+Skipped: 95; B 99; C 101; 102 `0xd62690` (`6dc3218`); B 103; done 100 `38aea70`.
+Checkpoint (2026-10-19 21:51 CDT, bc-81763e53):
+- OBS: unguarded vmovups; src=0x1303920 dst=0x3352930 bits=~0,~0,~0,0; index 104.
+- Commands: ctest -R '^vec_d5fbe0$' Passed; `python3 -I tools/lift/check_fd5fbe0.py` OK.
+- Store: Project `internal/worker-claim-d5fbe0.md`.
+- Push: sources **`8d12f1e`**; CMake/HANDOFF (this commit).
 
 ## ACTIVE CLAIM — 2026-10-19 21:50 CDT, worker bc-73721c8d (CPU-01d) — 0xd62690 — COMPLETE
 
