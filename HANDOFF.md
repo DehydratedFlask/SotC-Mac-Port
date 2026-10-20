@@ -3,16 +3,28 @@
 Updated: 2026-10-19 19:55 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## ACTIVE CLAIM — 2026-10-19 19:55 CDT, worker bc-cd298177 (claim-2c) — CPU-01d
+## ACTIVE CLAIM — 2026-10-19 19:56 CDT, worker bc-3fe140af (CPU-01d) — 0xb747f0
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xb747f0** (index 281).
+Failed tries: 0. Status: IN PROGRESS.
+Owned (new only): `native/core/vec_b747f0.{hpp,cpp}`, `native/tests/test_vec_b747f0.cpp`,
+`tools/lift/check_fb747f0.py`, `native/CMakeLists.txt` (+target only).
+Private dump (not published): `local/re/work/cb747f0.bin`.
+**Does NOT edit:** `startup_ctors.*`, peer vec/addr/allocator/clear_flag*, ASSETS.
+Avoided: Drive `0xf4b510`/`0xf30460`/`0x196c90`, Claim-3 `0xdd41e0`, claim-2b `0xb52110`,
+claim-2c `0xb743c0`, CPU-01e `0x3bd70`, CPU-01f `0xa3ade0`/`0x5777a0`, `0xf4fd40`.
+Exact check: rebuild + ctest + `python3 -I tools/lift/check_fb747f0.py`.
+
+## ACTIVE CLAIM — 2026-10-19 19:55 CDT, worker bc-cd298177 (claim-2c) — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xb743c0** (index 282).
-Failed tries: 0. Status: IN PROGRESS.
-Owned (new only): `native/core/vec_b743c0.{hpp,cpp}`, `native/tests/test_vec_b743c0.cpp`,
-`tools/lift/check_fb743c0.py`, `native/CMakeLists.txt` (+target only).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push pending/done this checkpoint.
+Owned: `native/core/vec_b743c0.{hpp,cpp}`, `native/tests/test_vec_b743c0.cpp`,
+`tools/lift/check_fb743c0.py`, `native/CMakeLists.txt` (+vec_b743c0 only).
 Private dump (not published): `local/re/work/cb743c0.bin`.
-**Does NOT edit:** `startup_ctors.*` (Drive registry), peer vec/addr/allocator/clear_flag*.
-Avoided: Drive `0xf4b510`/`0xf30460`/`0x196c90`, Claim-3 `0xdd41e0`, claim-2b `0xb52110`.
-Exact check: rebuild + ctest + `python3 -I tools/lift/check_fb743c0.py`.
+Did NOT edit `startup_ctors.*`. Avoided Drive/Claim-3/claim-2b RVAs.
+Checkpoint: ctest includes `vec_b743c0` Passed; `python3 -I tools/lift/check_fb743c0.py` OK
+(src=0x12d8d90 dst=0x3350db0 bits=~0,~0,~0,0). Store: `internal/worker-claim-2c.md`.
 
 ## Public remote (durable)
 

@@ -16,7 +16,7 @@ Gates and test evidence take precedence over a status label. Integrator owns thi
 | DATA-02 | Archive/asset schema and overlay map | DATA-01 | ACTIVE (partial: TOCs done; overlay+case policy PROVISIONAL_OBS for cachedFiles pair via bc-cd298177; member formats, TOC digest, pakN encoding open) / principal+claim-2 | 0 |
 | RE-01 | SELF/ELF identity + Ghidra seed | DATA-01 | STATIC_ANALYSIS_VERIFIED / principal | 1 (resolved resource limit) |
 | RE-02 | Imports, relocations, boot graph | RE-01 | ACTIVE (partial: imports/relocs/entry chain done; ctor + app-main internals open) / principal | 0 |
-| CPU-01 | Native recovery feasibility slice | RE-02 | ACTIVE (ctors FIXTURE_VERIFIED incl. 0xdd41e0 + 0x3bd70/clear_flag64 by bc-cb8d07c2; Drive: f4b510/f30460/196c90; runner partial; engine chain not started) / principal+workers | 0 |
+| CPU-01 | Native recovery feasibility slice | RE-02 | ACTIVE (many leaf ctors FIXTURE_VERIFIED incl. bc-cb8d07c2: 0xdd41e0, 0x3bd70, 0xa3ade0, 0x5777a0; runner partial; engine chain not started) / principal+workers | 0 |
 | CPU-02 | Packed data/pointer schemas | RE-01 | ACTIVE (Tagged31 decode+retag+0x66dec0 13-arm dispatcher FIXTURE_VERIFIED; heap cells OBS; static-address meaning, asset structs, type names open) / principal+bc-cb8d07c2 | 0 |
 | CPU-03 | Native jobs/fibers/TLS | CPU-01, CPU-02 | WAITING_FOR_DEPENDENCY | 0 |
 | SRV-01 | Native platform services / asset I/O | RE-02, DATA-02 | WAITING_FOR_DEPENDENCY | 0 |
