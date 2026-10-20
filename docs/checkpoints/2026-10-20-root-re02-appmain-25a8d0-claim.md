@@ -46,6 +46,11 @@
   prefix are indexed. The task concerns local ELF bytes; this is a Graft scope/tool limitation, not
   a failed analysis hypothesis. The worker reports no file changes and is proceeding with
   process-local REA/Ghidra CLI. Attempts remain 0.
+- **Progress update:** the worker reports fresh REA 6.7.0 / Ghidra 12.1.4 analysis in progress.
+  The preserved Ghidra log has generic body-overlap repair failures and p-code warnings elsewhere;
+  its address-specific search had no `0x25a8d0` match. No target-specific conclusion follows from
+  that absence; function Evidence has not yet been exported. The worker is continuing with
+  raw-byte/PT_LOAD checks. Failed analysis hypotheses remain 0.
 - **Next exact action:** review the private report/verifier under
   `local/re/evidence/re02-appmain-25a8d0/`; independently rerun it before recording completion
   evidence.
