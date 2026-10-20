@@ -42,3 +42,6 @@
 - **Next exact action:** dispatch one `gpt-6-luna` Extra High worker for private analysis only under
   `local/re/evidence/re02-appmain-25a8d0/`. Root will review and rerun its verifier before recording
   completion evidence.
+- **Follow-up record publication:** commit `addc714` (`docs: record app-main claim publication`)
+  was pushed. The tree was clean with HEAD equal to `origin/main` at
+  `addc714b0e4a4fbf0ef8369943f1d7a1cd7052e1`, divergence `0 0`.

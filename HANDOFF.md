@@ -33,10 +33,11 @@ Publication checks: `python3 scripts/project_index.py` exited `0` (`4,135 folder
 1,219 nodes pending); `git diff --check` and `git diff --cached --check` passed; staged path audit
 accepted 4 allowlisted paths; full audit accepted 593; `git fetch origin main` succeeded and
 pre-commit divergence was `0 0`. Commit `a7904b9` (`docs: claim app-main function analysis`) pushed
-successfully (`ba7b431..a7904b9`). Post-push tree is clean, HEAD equals origin/main at
-`a7904b959a0329db3404f75e490f1c1b4a739b21`, divergence `0 0`. Exact next action: dispatch one
-`gpt-6-luna` Extra High worker to the private `0x25a8d0` static characterization. No source or
-reference file changes, game execution, install, or download. G1 NOT PASSED.
+successfully (`ba7b431..a7904b9`). This publication record was then pushed in `addc714` (`docs:
+record app-main claim publication`, `a7904b9..addc714`). Post-push tree is clean, HEAD equals
+origin/main at `addc714b0e4a4fbf0ef8369943f1d7a1cd7052e1`, divergence `0 0`. Exact next action:
+dispatch one `gpt-6-luna` Extra High worker to the private `0x25a8d0` static characterization.
+No source or reference file changes, game execution, install, or download. G1 NOT PASSED.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 01:01 CDT, /root — two bounded analyses published
 
