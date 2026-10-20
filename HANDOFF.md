@@ -1,8 +1,19 @@
 # SoC Mac Native — agent handoff
-Updated: 2026-10-19 22:05 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 22:06 CDT (America/Chicago). Principal: root agent of this planning chat.
 
 Updated: 2026-10-19 22:05 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 22:06 CDT, worker bc-02397584 (CPU-01d) — 0xd19bb0 — COMPLETE
+
+Task: CPU-01d — unguarded vec-copy ctor RVA **0xd19bb0** (survey index 120).
+Failed tries: 0. Status: FIXTURE_VERIFIED (`1177ca3`); re-restore peer `vec_d20590` CMake after later leaf rebuild.
+Owned this push: `native/CMakeLists.txt` (+`vec_d20590`), `HANDOFF.md`.
+Never touched `startup_ctors.*`.
+Checkpoint (2026-10-19 22:06 CDT, bc-02397584):
+- OBS: src=0x12fedc0 dst=0x3351e80; index 120; ctest/check OK.
+- Store: `internal/worker-claim-d19bb0.md`. Push: (this commit).
+
 
 ## ACTIVE CLAIM — 2026-10-19 22:05 CDT, worker bc-9aa0fe88 (CPU-01d) — 0xd2c7e0 — COMPLETE
 
