@@ -20,6 +20,7 @@ add_library(sotc_core STATIC
   core/free_list_carve.cpp
   core/region_split.cpp
   core/region_list.cpp
+  core/arena_high_water.cpp
   core/vec_neg036.cpp
   core/xyz_mask_copy.cpp
   core/vec_dd41e0.cpp
@@ -227,6 +228,10 @@ add_test(NAME vec_d853a0 COMMAND test_vec_d853a0)
 add_executable(test_region_list tests/test_region_list.cpp)
 target_link_libraries(test_region_list sotc_core)
 add_test(NAME region_list COMMAND test_region_list)
+
+add_executable(test_arena_high_water tests/test_arena_high_water.cpp)
+target_link_libraries(test_arena_high_water sotc_core)
+add_test(NAME arena_high_water COMMAND test_arena_high_water)
 add_executable(test_vec_d80e60 tests/test_vec_d80e60.cpp)
 target_link_libraries(test_vec_d80e60 sotc_core)
 add_test(NAME vec_d80e60 COMMAND test_vec_d80e60)
