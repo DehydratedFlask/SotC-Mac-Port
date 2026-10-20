@@ -1,11 +1,11 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:07 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:09 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:07 CDT, /root — DATA-02, AUD-01, CPU-01d `0xcdc760` verified; APP-01 lifecycle helper fixture verified — ACTIVE, FAILED TRY 1 RECORDED
+## CURRENT CHECKPOINT — 2026-10-19 23:09 CDT, /root — APP-01 lifecycle fixture published; AUD-01-XFF-01 claimed; CPU-01d `0xcdc760` verified
 
-Three bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
+Four bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
 archive, manifest, test logs and build outputs stay under ignored `local/`.
 
@@ -69,9 +69,9 @@ were staged. Next exact action: select and claim another bounded, dependency-val
 editing; the APP-01 claim below now defines the next exact action. Cold boot/audio/save/Metal and
 G1 remain unproven.
 
-### APP-01 — clean-exit and requested-Stop readiness — ACTIVE CLAIM
+### APP-01 — clean-exit and requested-Stop readiness — SLICE FIXTURE-VERIFIED, PARENT ACTIVE
 
-Root claims a bounded launcher lifecycle fix. In `launcher/Sources/SoCLauncher/LauncherModel.swift`,
+Root delivered a bounded launcher lifecycle fix. In `launcher/Sources/SoCLauncher/LauncherModel.swift`,
 `processEnded` returns to `.idle` after a requested Stop or a zero-status normal exit. `canStart`
 only accepts `.ready` or a failed state, so when the retained readiness report remains startable the
 Play button becomes disabled and status says “Not ready to play.” Implement a testable lifecycle
@@ -102,12 +102,50 @@ Agent `/root/app01_probe` previously identified this behavior; root owns impleme
   still 0% built. The refreshed graph can query `LauncherLifecycle`. `git diff --check` passed.
   G4 remains NOT RUN: this pure helper suite does not exercise Finder launch, visible UI, or a
   native game core. G1 remains NOT PASSED; G2-G6 remain NOT RUN.
-- The helper, model call-site, and tests are locally modified/untracked pending the audited
-  checkpoint commit. No third-party or external state is involved.
+- The lifecycle helper, model call-site and tests were published in commit `8b10c09` and pushed to
+  `origin main` at 2026-10-19 23:08 CDT. The staged path audit passed 8 paths; the full tracked
+  path audit passed 566 paths. No private `local/` outputs were staged.
 - Prior checkpoint with completed archive/audio identity and `0xcdc760` fixture slices is
   [recorded here](docs/checkpoints/2026-10-19-root-data02-aud01-cpu-cdc760-complete.md), published
-  through `f59500e`. Next exact action: fix the missing return in
-  `LauncherLifecycle.canStart` and rerun the focused Swift package tests.
+  through `f59500e`. Failed implementation tries: 1; the compile failure was corrected within
+  the same bounded hypothesis. APP-01 remains ACTIVE; G4 is NOT RUN.
+
+### AUD-01-XFF-01 — characterize one paired XFF sound bank — ACTIVE CLAIM
+
+Integrator `/root` claims a bounded AUD-01 slice for `/root/audio_asset_survey`, which owns only
+`scripts/audio_bank_header.py` and `scripts/test_audio_bank_header.py`. Inspect the `.hd`/`.bd`
+pair `cp3shadow/sound/se/com_sys.hd` and `cp3shadow/sound/se/com_sys.bd` in the private
+`local/extracted/CUSA08809/pak2.psarc`. Add a small bounds-checked structural reader and synthetic
+tests for only fields justified by repeated byte layouts and byte spans. If no field beyond the
+magic/length boundary is established, retain that uncertainty instead of assigning guessed
+semantics. Do not claim a codec, NGS2 contract, gameplay use, or playback.
+
+- Agent-reported live identity: archive size 16,557,548 bytes, SHA-256
+  `9c655de637baba5f2c35250a2a7024f405f2f95c19fb4739ff084fa95cbdf0b5`. `.bd` is entry 1310,
+  offset 6,989,994, first block 664, decoded size 3,672, SHA-256
+  `137e64c118ada84b4dd9bd73bf9e4b7e9e1ef061fa2574dc304d5f7cdd1ebd81`; `.hd` is entry 1311,
+  offset 7,884,070, first block 825, decoded size 1,908, SHA-256
+  `39ebb27c1d469853e12ffc439b17e8641d6258f9cc0f1029303c92bb9683ffe3`. Both begin with the
+  observed bytes `78 66 66 00 00 00 00 00 00 00 00 00 01 00 00 00` (`xff\0` plus unknown fields).
+- Root Graft query: `graft ask "What existing PSARC APIs can safely read a named sound-bank member and what bounds checks are already established?" --source --in scripts/` returned `Psarc.read` and its block/decompressed-length checks. Approximate saving: 8,994 tokens. The deep Graft meaning layer remains unbuilt.
+- Exact acceptance commands: `python3 -I scripts/test_audio_bank_header.py`; then
+  `python3 -I scripts/audio_bank_header.py --archive local/extracted/CUSA08809/pak2.psarc --member cp3shadow/sound/se/com_sys.hd --member cp3shadow/sound/se/com_sys.bd`.
+  The latter must confirm live locators/hashes and report only supported structural facts.
+- Remaining risk: the common prefix does not establish field meanings or codec; a single bank pair
+  does not prove gameplay use. Task status ACTIVE, failed tries 0. The next exact action is for the
+  agent to cross-check the pair's byte layout and implement the scoped reader/fixture.
+- A separate read-only CPU survey proposed RVA `0xcc5a10`; it decodes to the same 16-byte constant
+  copy behavior covered by 95 existing fixtures, so root deferred it for low marginal semantic
+  coverage. This was task selection only, not a failed implementation try.
+
+### Current publication checkpoint
+
+At 2026-10-19 23:08 CDT, APP-01 commit `8b10c09` was pushed to `origin main`. Before commit,
+`python3 scripts/project_index.py --check` reported 4,123 folders current, `git diff --check`
+passed, `python3 -I scripts/audit_publish_paths.py` passed the 8 staged paths,
+`python3 -I scripts/audit_publish_paths.py --all` passed all 566 tracked paths, and
+`git diff --cached --check` passed. `git fetch origin main` found no divergence before commit.
+The current AUD-01-XFF-01 claim is being recorded before implementation begins.
 
 ## PRIOR CHECKPOINT — 2026-10-19 22:41 CDT, /root — CPU-01d `0xce7300` metadata correction — FIXTURE_VERIFIED
 

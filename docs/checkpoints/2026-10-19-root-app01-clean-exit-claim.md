@@ -104,3 +104,19 @@ approach is now explicit. No process ownership, core ABI, bundle or GUI redesign
   remain unverified. G1 is NOT PASSED; G2-G6 are NOT RUN.
 - Next exact action: finish publication audits, commit and push this allowlisted checkpoint, then
   select a next bounded independent task. APP-01 remains ACTIVE; failed implementation tries: 1.
+
+## Publication checkpoint — 2026-10-19 23:08 CDT
+
+- Agent: `/root`; task APP-01. Commit `8b10c09` (`fix: preserve launcher readiness after child
+  exit`) was pushed to `origin main`.
+- Exact pre-publication commands and results: `python3 scripts/project_index.py --check` reported
+  4,123 folders current; `git diff --check` passed; `python3 -I scripts/audit_publish_paths.py`
+  passed all 8 staged paths; `python3 -I scripts/audit_publish_paths.py --all` passed all 566
+  tracked paths; `git diff --cached --check` passed; `git fetch origin main` found no divergence.
+- Exact publication commands: `git commit -m "fix: preserve launcher readiness after child exit"`
+  created `8b10c09`; `git push origin main` advanced `main` from `37dc1dd` to `8b10c09`.
+- Observation: the local commit is present on the public remote. No private `local/` outputs were
+  staged. The task remains ACTIVE because the launcher shell still has no game-core ABI/bundle and
+  the G4 GUI lifecycle matrix is NOT RUN.
+- Next exact action: root claims and records AUD-01-XFF-01 before assigning its independent script
+  files to `/root/audio_asset_survey`. Failed implementation tries remain 1 for APP-01.
