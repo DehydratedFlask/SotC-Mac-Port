@@ -1,7 +1,24 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 22:12 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 22:13 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 22:13 CDT, worker bc-73721c8d (CPU-01d) — 0xd04ce0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd04ce0** (survey index 136).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: native/core/vec_d04ce0.hpp/cpp, native/tests/test_vec_d04ce0.cpp,
+tools/lift/check_fd04ce0.py, native/CMakeLists.txt (+vec_d04ce0 only; origin/main base).
+Private dump (not published): local/re/work/cd04ce0.bin.
+Did NOT edit: startup_ctors.*, Drive, SRV, peer WIP.
+Skipped: 95; busy peers through 0xd00600/0xd06dd0/0xd08240. Prior: 0xd19930 = 0b1eef8 / bb02b62.
+Checkpoint (2026-10-19 22:13 CDT, bc-73721c8d):
+- OBS: unguarded vmovups copy; src=0x12fc350 dst=0x3351dc0 bits=~0,~0,~0,0; index 136; distinct cells.
+- Commands: ctest -R '^vec_d04ce0$' Passed; python3 -I tools/lift/check_fd04ce0.py OK.
+- Logs: /tmp/ctest_d04ce0.log, /tmp/check_d04ce0.log.
+- Store: Project internal/worker-claim-d04ce0.md.
+- Push: (this commit).
+
 
 ## ACTIVE CLAIM — 2026-10-19 22:13 CDT, worker bc-81763e53 (CPU-01d) — 0xcfcbc0 — COMPLETE
 
