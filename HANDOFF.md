@@ -1,7 +1,22 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:40 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:27 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:27 CDT, worker bc-81763e53 (CPU-01d) — 0xd80e60 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd80e60** (survey index 85).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d80e60.{hpp,cpp}`, `native/tests/test_vec_d80e60.cpp`,
+`tools/lift/check_fd80e60.py`, `native/CMakeLists.txt` (+vec_d80e60 only; origin/main base).
+Private dump (not published): `local/re/work/cd80e60.bin`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV, peer `0xdac410`/`0xd85490`/`0xd84ee0`.
+Checkpoint (2026-10-19 20:27 CDT, bc-81763e53):
+- OBS: unguarded vmovups copy; src=0x1307f70 dst=0x3352a60 bits=~0,~0,~0,0; index 85; distinct cells.
+- Commands: ctest -R '^vec_d80e60$' Passed; `python3 -I tools/lift/check_fd80e60.py` OK.
+- Logs: `/tmp/ctest_d80e60.log`, `/tmp/check_d80e60.log`.
+- Store: Project `internal/worker-claim-d80e60.md`.
+- Push: (pending this commit).
 
 ## ACTIVE CLAIM — 2026-10-19 20:40 CDT, worker bc-73721c8d (CPU-01d) — 0xd84ee0 — IN PROGRESS
 
