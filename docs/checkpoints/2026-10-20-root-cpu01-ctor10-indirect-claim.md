@@ -64,5 +64,22 @@ proof that all paths skip it.
   `graft check` still exited 0 for the current wiring graph, demonstrating that this check does not
   prove the reference subtree is in scope. This missing scope is recorded in HANDOFF; raw source
   search is allowed only for that genuinely unindexed subtree.
-- Status: CLAIMED; 0 failed analysis hypotheses/tries. The existing slot-10 call/guard dossier is
-  context, not a claim that this new target question is solved.
+- Status: DISPATCHED; 0 failed analysis hypotheses/tries. The existing slot-10 call/guard dossier
+  is context, not a claim that this new target question is solved.
+
+## Dispatch checkpoint
+
+- Date/time: 2026-10-20 00:21 CDT (America/Chicago); agent ID `/root`.
+- Task ID: CPU-01-CTOR10-INDIRECT-01; files changed: `HANDOFF.md` and this checkpoint.
+- Exact action: pushed claim commit `4cfc51b` to `origin/main`, then sent
+  `collaboration.followup_task` to `/root/srv01_page_map_19660`, directing it to reuse E43/E46,
+  create the specified separate REA snapshot only if needed, independently verify raw bytes and
+  target provenance, keep unsupported target unresolved, and return evidence without editing shared
+  docs or implementation.
+- Result: dispatch accepted; task is in progress. No new command log or analysis evidence yet.
+- Observation: the worker had completed the previous page-map task and was reused; no task result is
+  inferred from the dispatch.
+- Remaining risk: call-reaching `RAX` provenance and unique-target question remain unresolved.
+- Next exact action: review the worker report and independently rerun the specified byte/reference
+  checks before changing shared evidence/status.
+- Failed tries: 0; status: IN_PROGRESS.
