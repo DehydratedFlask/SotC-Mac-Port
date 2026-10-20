@@ -31,6 +31,7 @@ add_library(sotc_core STATIC
   core/init_f4fd40.cpp
   core/init_f4eba0.cpp
   core/init_f4b540.cpp
+  core/init_ea52f0.cpp
   core/vec_e026b0.cpp)
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()

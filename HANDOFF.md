@@ -3,6 +3,19 @@
 Updated: 2026-10-19 20:07 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 20:07 CDT, worker bc-201701f2 (Drive / CPU-01e) — 0xea52f0 + registry idx 20 — COMPLETE
+
+Task: CPU-01e — lift pure data ctor RVA **0xea52f0** (index 22); register already-lifted idx **20**
+(`0xef85e0` / `vec_ef85e0`) into `startup_ctors`. Skipped SRV-01 (bc-9aa0fe88). Skipped idx 10–19
+(heap/atexit wrappers need native malloc).
+Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
+Owned: `native/core/init_ea52f0.*`, `native/tests/test_init_ea52f0.cpp`,
+`tools/lift/check_fea52f0.py`, `native/core/startup_ctors.*`, `native/tests/test_startup_ctors.cpp`,
+`native/CMakeLists.txt` (+init_ea52f0 only).
+Did NOT edit: peer `vec_e026b0.*`, `addr.*`, SRV platform.
+Checkpoint: ctest 24/24; `check_fea52f0` / `check_fef85e0` OK. Registry size 15 (0–9,20,22,48,520,538).
+Store: Project `internal/worker-claim-drive.md`.
+
 ## ACTIVE CLAIM — 2026-10-19 20:05 CDT, worker bc-02397584 (CPU-01d) — 0xe026b0 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xe026b0** (survey index 53).
