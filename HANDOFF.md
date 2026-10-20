@@ -1,10 +1,26 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:30 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:31 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
 <<<<<<< Updated upstream
 =======
+## ACTIVE CLAIM — 2026-10-19 20:31 CDT, worker bc-81763e53 (CPU-01d) — 0xd7c9d0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd7c9d0** (survey index 89).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d7c9d0.{hpp,cpp}`, `native/tests/test_vec_d7c9d0.cpp`,
+`tools/lift/check_fd7c9d0.py`, `native/CMakeLists.txt` (+vec_d7c9d0 only; origin/main base).
+Private dump (not published): `local/re/work/cd7c9d0.bin`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV, peer `0xd84ee0`/`0xd7fe40`/`0xd85490`.
+Prior: `0xd7e640`=`159b654`/`9a731ef`.
+Checkpoint (2026-10-19 20:31 CDT, bc-81763e53):
+- OBS: unguarded vmovups copy; src=0x1306eb0 dst=0x3352a20 bits=~0,~0,~0,0; index 89; distinct cells.
+- Commands: ctest -R '^vec_d7c9d0$' Passed; `python3 -I tools/lift/check_fd7c9d0.py` OK.
+- Logs: `/tmp/ctest_d7c9d0.log`, `/tmp/check_d7c9d0.log`.
+- Store: Project `internal/worker-claim-d7c9d0.md`.
+- Push: (pending this commit).
+
 ## ACTIVE CLAIM — 2026-10-19 20:29 CDT, worker bc-81763e53 (CPU-01d) — 0xd7e640 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd7e640** (survey index 88).
@@ -48,12 +64,13 @@ Checkpoint: ctest -R 'vec_dac410|vec_d80e60' Passed.
 Store: Project `internal/worker-claim-dac410.md`.
 
 
-## ACTIVE CLAIM — 2026-10-19 21:02 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 77 + CMake dac410 — IN PROGRESS
+## ACTIVE CLAIM — 2026-10-19 21:02 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 77 + CMake dac410 — COMPLETE
 
 Task: CPU-01e — CMake-link peer `0xdac410` (sources `7cb0e83`) and register idx **77** into `startup_ctors`.
 Skipped peer IN PROGRESS `0xd84ee0` (84), absent `0xd85490` (82), gap 10–19, idx 50, SRV.
 Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
 Checkpoint: ctest OK; check_fdac410 + check_fd80e60 OK; registry **42** (+77 `0xdac410`, +85 `0xd80e60` / `d446092`).
+Push: `55240a3` on origin/main. Superseded by registry 84/86/88 slice above.
 Owned: `startup_ctors.*`, `test_startup_ctors.cpp`, CMake Drive lines for `vec_dac410`, `HANDOFF.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:27 CDT, worker bc-81763e53 (CPU-01d) — 0xd80e60 — COMPLETE
