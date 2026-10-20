@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 02:48 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 02:51 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 02:48 CDT, /root — three additional NGS2 call paths root-replayed
+## CURRENT CHECKPOINT — 2026-10-20 02:51 CDT, /root — three NGS2 paths published; next three probes claimed
 
 Six bounded AUD-02 import-to-call paths are root-verified:
 `AUD-02-NGS2-SYSCREATE-01` (`sceNgs2SystemCreateWithAllocator`),
@@ -21,13 +21,15 @@ target. SystemDestroy verifies slot `0x1601010` → thunk `0xf91440` → call `0
 `FUN_009485a0`; secondary caller `0x94a055` remains untraced and the thunk's adjacent computed
 jump/indirection observations remain unresolved. Each task has zero failed targeted tries.
 AUD-02 remains ACTIVE: the six call paths establish no command/parameter semantics, runtime
-binding, reachability, actual audio behavior, or use. Root is the sole shared-document integrator.
-Evidence and claims:
+binding, reachability, actual audio behavior, or use. The three root replays and root logs are
+summarized in the linked checkpoints. Root is the sole shared-document integrator. Evidence and
+claims:
 [NGS2 callsite checkpoint](docs/checkpoints/2026-10-20-root-aud02-ngs2-callsite-claims.md) and
 [SystemDestroy claim](docs/checkpoints/2026-10-20-root-aud02-system-destroy-claim.md),
 [SystemRender root replay](docs/checkpoints/2026-10-20-root-aud02-sysrender-complete.md),
 [VoiceGetState root replay](docs/checkpoints/2026-10-20-root-aud02-voice-getstate-complete.md), and
-[SystemDestroy root replay](docs/checkpoints/2026-10-20-root-aud02-system-destroy-complete.md).
+[SystemDestroy root replay](docs/checkpoints/2026-10-20-root-aud02-system-destroy-complete.md), and
+[next three probe claims](docs/checkpoints/2026-10-20-root-aud02-next-three-claims.md).
 
 Root check logs and command corrections are private under each task's `local/re/evidence/*-root-*`
 files. The source hashes match ELF `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`
@@ -41,15 +43,24 @@ the intended root log paths. These were bookkeeping/setup errors, not failed ana
 tries. Current `python3 scripts/project_index.py` and `graft check` results are in the new root
 checkpoints; `tools/graft/` remains unstaged.
 
-Next exact action: inspect the eleven-entry NGS2 import set and Stage 3 requirements, choose two
-unclaimed bounded static callpath probes, claim them in shared docs, then dispatch separate
-`gpt-6-luna`, Extra High workers. No command contract or audio behavior will be inferred from the
-static paths. Pre-publication checks for this checkpoint passed: project index 4,148 folders /
-48 checkpoint files; Graft wiring check passed (deep layer remains unbuilt, 1,225 nodes pending);
-staged path audit accepted seven allowlisted documentation paths, full path audit accepted 604
-tracked paths, cached diff check passed, and `origin/main` divergence was 0/0.
+The current claim checkpoint covers `AUD-02-NGS2-RACKCREATE-ALLOC-01` (symbol index 236, NID
+`U546k6orxQo`, slot `0x1600fe8`), `AUD-02-NGS2-RACKQUERY-BUFFERSIZE-01` (index 239, NID
+`0eFLVCfWVds`, slot `0x1601000`), and `AUD-02-NGS2-RACK-VOICEHANDLE-01` (index 238, NID
+`MwmHz8pAdAo`, slot `0x1600ff8`). All three are ACTIVE with zero failed targeted tries and have
+separate private evidence folders. Two imports remain unclaimed: RackDestroy and VoiceGetStateFlags.
+No command contract, audio behavior, ABI, or runtime binding will be inferred from these static
+paths. The claim checkpoint is fully staged and passes the four-path allowlist; worker dispatch
+waits until its publication commit is pushed. Exact audit logs and remote divergence are recorded
+in the linked claim checkpoint.
 
-The prior system-create checkpoint was committed as `85fec59`
+Next exact action: complete and root-replay the three active probes; then claim the remaining two
+unclaimed NGS2 imports if capacity and evidence quality permit. No source implementation is
+authorized by these bounded static probes. G1 remains NOT PASSED.
+
+The three-callpath root-replay checkpoint was committed as `6673495`
+(`docs: root-verify three NGS2 call paths`) and pushed to `origin/main` from `d552ad5`. Pre-push
+checks passed: staged path audit accepted seven documentation paths, full audit accepted 604
+tracked paths, both diff checks passed, and fetch showed `0 0` divergence. The earlier system-create checkpoint was committed as `85fec59`
 (`docs: verify NGS2 system-create path`) and pushed from `357ed0c`; staged/full publish audits
 passed 4/600 paths, and `origin/main` had no divergence.
 
