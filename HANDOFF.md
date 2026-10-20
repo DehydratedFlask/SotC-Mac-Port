@@ -3,6 +3,15 @@
 Updated: 2026-10-19 22:08 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 22:08 CDT, worker bc-81763e53 (CPU-01d) — 0xd13300 CMake-link — COMPLETE
+
+Task: CPU-01d — CMake-link `vec_d13300` after sources landed in `dc80e0c` (survey index 128).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/CMakeLists.txt` (+vec_d13300 only; origin/main base), `HANDOFF.md`.
+Prior sources push: `dc80e0c`. Did NOT edit Drive / SRV / `startup_ctors.*`.
+Checkpoint: ctest `vec_d13300` Passed; `check_fd13300.py` OK. Store: `internal/worker-claim-d13300.md`.
+Push: (this commit).
+
 ## ACTIVE CLAIM — 2026-10-19 22:08 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry 122–125 — COMPLETE
 
 Task: CPU-01e — one-push register peer leaves (ctor-survey.json indices; skip 95):
