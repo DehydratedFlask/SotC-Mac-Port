@@ -3,6 +3,15 @@
 Updated: 2026-10-19 20:20 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 20:36 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 72/75 + CMake dbb280 — COMPLETE
+
+Task: CPU-01e — register origin peer leaves `0xdb93a0` (72) and `0xdb3a70` (75); ensure CMake links
+already-registered `0xdbb280` (71; Survey D leaf claim respected — Drive owns registry only).
+Skipped gap 10–19, idx 50.
+Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
+Checkpoint: ctest 41/41; check_fdb3a70/fdb93a0/fdbb280 OK; registry **34** (+72/+75; CMake links dbb280). Survey D leaf ownership noted.
+Owned: `startup_ctors.*`, `test_startup_ctors.cpp`, CMake Drive lines for `vec_dbb280`, `HANDOFF.md`.
+
 ## ACTIVE CLAIM — 2026-10-19 20:20 CDT, worker bc-81763e53 (CPU-01d) — 0xdbb280 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdbb280** (survey index 71).
