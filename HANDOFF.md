@@ -3,6 +3,17 @@
 Updated: 2026-10-19 22:18 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 22:18 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry +0xce7300 — COMPLETE
+
+Task: CPU-01e — register (ctor-survey.json; skip 95):
+| idx | RVA | provenance |
+|---|---|---|
+| 149 | 0xce7300 | 5e5a6d0 |
+Gap 147 0xce8440 still open. Base eea8da6 (101) → **102** slots.
+Owned: startup_ctors.*, test_startup_ctors.cpp, HANDOFF.md. CMake tip as-is.
+Store: Project internal/worker-claim-drive.md + internal/drive-wip/.
+Push: (this commit).
+
 ## ACTIVE CLAIM — 2026-10-19 22:18 CDT, worker bc-81763e53 (CPU-01d) — 0xce6fb0 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xce6fb0** (survey index 150).
