@@ -3,6 +3,22 @@
 Updated: 2026-10-19 22:13 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 22:13 CDT, worker bc-9aa0fe88 (CPU-01d) — 0xcfcc60 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xcfcc60** (survey index 138).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_cfcc60.{hpp,cpp}`, `native/tests/test_vec_cfcc60.cpp`,
+`tools/lift/check_fcfcc60.py`, `native/CMakeLists.txt` (+vec_cfcc60 only; origin/main base).
+Private dump (not published): `local/re/work/ccfcc60.bin`.
+Prior: 0xd17c10=`9ecf79f`. Skipped: 95; peer 0xd08240=`07ab9da`; busy through 0xd00600/0xd04ce0.
+Did NOT edit Drive / SRV / `startup_ctors.*` / peer untracked; no `git reset --hard`.
+Checkpoint (2026-10-19 22:13 CDT, bc-9aa0fe88):
+- OBS: unguarded vmovups copy; src=0x12fb6b0 dst=0x3351da0 bits=~0,~0,~0,0; index 138; distinct cells.
+- Commands: ctest -R '^vec_cfcc60$' Passed; `python3 -I tools/lift/check_fcfcc60.py` OK.
+- Logs: `/tmp/ctest_cfcc60.log`, `/tmp/check_fcfcc60.log`.
+- Store: Project `internal/worker-claim-cfcc60.md`.
+- Push: (this commit).
+
 ## ACTIVE CLAIM — 2026-10-19 22:13 CDT, worker bc-73721c8d (CPU-01d) — 0xd04ce0 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd04ce0** (survey index 136).
