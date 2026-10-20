@@ -3,6 +3,22 @@
 Updated: 2026-10-19 21:51 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 21:51 CDT, worker bc-73721c8d (CPU-01d) — 0xd47880 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd47880** (survey index 106).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: native/core/vec_d47880.hpp/cpp, native/tests/test_vec_d47880.cpp,
+tools/lift/check_fd47880.py, native/CMakeLists.txt (+vec_d47880 only; origin/main base).
+Private dump (not published): local/re/work/cd47880.bin.
+Did NOT edit: startup_ctors, Drive, SRV, peer busy leaves / arena_*.
+Skipped: 95; 99 0xd6d280; 101 0xd62b00; 102 0xd62690; 103 0xd623c0; 104 0xd5fbe0.
+Checkpoint (2026-10-19 21:51 CDT, bc-73721c8d):
+- OBS: unguarded vmovups copy; src=0x1302d80 dst=0x3352110 bits=~0,~0,~0,0; index 106; distinct cells.
+- Commands: ctest -R vec_d47880 Passed; python3 -I tools/lift/check_fd47880.py OK.
+- Logs: /tmp/ctest_d47880.log, /tmp/check_d47880.log.
+- Store: Project internal/worker-claim-d47880.md.
+- Push: ee12add on origin/main.
+
 ## ACTIVE CLAIM — 2026-10-19 21:51 CDT, worker bc-81763e53 (CPU-01d) — 0xd5fbe0 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd5fbe0** (survey index 104).
