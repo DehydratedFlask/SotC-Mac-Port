@@ -156,6 +156,10 @@ add_library(sotc_core STATIC
   core/vec_c77070.cpp
   core/vec_c741c0.cpp
   core/vec_c70e20.cpp
+  core/vec_c6fdf0.cpp
+  core/vec_c6d910.cpp
+  core/vec_c6bad0.cpp
+  core/vec_c69f70.cpp
 )
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()
@@ -696,3 +700,19 @@ add_test(NAME vec_c741c0 COMMAND test_vec_c741c0)
 add_executable(test_vec_c70e20 tests/test_vec_c70e20.cpp)
 target_link_libraries(test_vec_c70e20 sotc_core)
 add_test(NAME vec_c70e20 COMMAND test_vec_c70e20)
+
+add_executable(test_vec_c6fdf0 tests/test_vec_c6fdf0.cpp)
+target_link_libraries(test_vec_c6fdf0 sotc_core)
+add_test(NAME vec_c6fdf0 COMMAND test_vec_c6fdf0)
+
+add_executable(test_vec_c6d910 tests/test_vec_c6d910.cpp)
+target_link_libraries(test_vec_c6d910 sotc_core)
+add_test(NAME vec_c6d910 COMMAND test_vec_c6d910)
+
+add_executable(test_vec_c6bad0 tests/test_vec_c6bad0.cpp)
+target_link_libraries(test_vec_c6bad0 sotc_core)
+add_test(NAME vec_c6bad0 COMMAND test_vec_c6bad0)
+
+add_executable(test_vec_c69f70 tests/test_vec_c69f70.cpp)
+target_link_libraries(test_vec_c69f70 sotc_core)
+add_test(NAME vec_c69f70 COMMAND test_vec_c69f70)
