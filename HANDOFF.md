@@ -1,7 +1,38 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:13 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:12 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:12 CDT, worker bc-9aa0fe88 (SRV-01 mem) — COMPLETE
+
+Task: SRV-01 mem — Darwin host mapping behind verified allocator region API `0x19ae0`.
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned (new only): `native/core/host_map.{hpp,cpp}`, `native/tests/test_host_map.cpp`,
+`tools/lift/check_host_map_calls.py`, `native/CMakeLists.txt` (+host_map only; from origin/main),
+`docs/POINTERS.md`, `docs/TASKS.md`, `native/README.md`.
+**Did NOT edit:** `allocator_region.*`, `startup_ctors.*`, Drive `0xf4eba0`/`0xf4b540`, peer vec WIP.
+Checkpoint: ctest -R host_map Passed; check_host_map_calls.py OK; check_f19ae0.py OK; arm64.
+Store: Project `internal/worker-claim-srv01.md`.
+
+## ACTIVE CLAIM — 2026-10-19 20:14 CDT, worker bc-02397584 (CPU-01d) — 0xddef00 — IN PROGRESS
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xddef00** (survey index 60).
+Failed tries: 0. Status: CLAIMED / lifting.
+Owned: `native/core/vec_ddef00.{hpp,cpp}`, `native/tests/test_vec_ddef00.cpp`,
+`tools/lift/check_fddef00.py`, `native/CMakeLists.txt` (+vec_ddef00 only; origin/main base).
+Private dump (not published): `local/re/work/cddef00.bin`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV `host_map`, peer `0xdfd5f0`/`0xde7fb0`.
+Store: Project `internal/worker-claim-ddef00.md`.
+
+## ACTIVE CLAIM — 2026-10-19 20:12 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 54/57/58 — IN PROGRESS
+
+Task: CPU-01e — register peer FIXTURE_VERIFIED vec-copy ctors into `startup_ctors`:
+**54** `0xdfd5f0`, **57** `0xde6d20`, **58** `0xde1ad0`. Skip `0xde7fb0` (not on origin yet),
+idx 50 / gap 10–19. CMake already links these on origin/main — Drive owns registry only.
+Failed tries: 0. Status: CLAIMED.
+Owned: `native/core/startup_ctors.*`, `native/tests/test_startup_ctors.cpp`, `HANDOFF.md`.
+Did NOT edit: peer vec sources, SRV `host_map`, CMake (no new lines needed).
+Store: Project `internal/worker-claim-drive.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:09 CDT, worker bc-effcf5dc (CPU-01d) — 0xde7fb0 — COMPLETE
 
@@ -45,21 +76,6 @@ Owned: `native/core/startup_ctors.*`, `native/tests/test_startup_ctors.cpp`,
 `native/CMakeLists.txt` (+vec_e0b180/+vec_e05320 link lines only; sources already on origin).
 Store: Project `internal/worker-claim-drive.md`.
 
-## ACTIVE CLAIM — 2026-10-19 20:09 CDT, worker bc-9aa0fe88 (SRV-01 mem) — COMPLETE
-
-Task: SRV-01 mem — Darwin host mapping behind verified allocator region API `0x19ae0`.
-Failed tries: 0. Status: FIXTURE_VERIFIED.
-Owned (new only): `native/core/host_map.{hpp,cpp}`, `native/tests/test_host_map.cpp`,
-`tools/lift/check_host_map_calls.py`, `native/CMakeLists.txt` (+host_map only; from origin/main),
-`docs/POINTERS.md` (mapping-path row), `docs/TASKS.md` (SRV-01 register note).
-**Did NOT edit:** `allocator_region.*`, `startup_ctors.*`, Drive `0xf4eba0`/`0xf4b540`, peer vec WIP.
-
-Checkpoint (2026-10-19 20:10 CDT, bc-9aa0fe88):
-- OBS: ReserveVirtual@0x19891/0x19fb2 → PLT 0xf8f5b0; MapFlexible@0x198b1 → 0xf8f5a0; align≥1MiB;
-  native `map_region` preferred_base==0 only (Shadow site).
-- Commands: ctest -R '^host_map$' Passed; `check_host_map_calls.py` OK; `check_f19ae0.py` OK;
-  Mach-O arm64.
-- Store: Project `internal/worker-claim-srv01.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:08 CDT, worker bc-02397584 (CPU-01d) — 0xde6d20 — COMPLETE
 
