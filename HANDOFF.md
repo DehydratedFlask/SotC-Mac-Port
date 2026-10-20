@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:50 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:53 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:50 CDT, /root — slot-10 initializer follow-up active; paired STS sample identity survey claimed
+## CURRENT CHECKPOINT — 2026-10-19 23:53 CDT, /root — slot-10 initializer active; audio identity and launcher UI reviews claimed
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -18,8 +18,8 @@ The prefix runner bookkeeping, two leaf-fixture index annotations, bridge member
 the static slot-10 dossier are now verified and published. A bounded follow-up is active to
 characterize the local initializer called by slot 10 before its unresolved computed call. A
 separate read-only AUD-01 survey is claimed for the two cachedFiles layers' test_adpcm STS members.
-Runtime constructor behavior, helper contracts, audio format/use, game startup, and G1 remain
-unproven. Commits:
+A static APP-01 UI/accessibility review is also claimed; it does not verify runtime behavior. Runtime
+constructor behavior, helper contracts, audio format/use, game startup, and G1 remain unproven. Commits:
 `b26768a` (prefix fixture), `fc1b278` (leaf metadata), and `e40a2a4` (bridge comparison evidence).
 
 ### AUD-01-STS-IDENTITY-01 — paired cachedFiles test_adpcm identity survey — CLAIMED
@@ -34,6 +34,15 @@ Acceptance command: `PYTHONDONTWRITEBYTECODE=1 python3 -I local/validation/aud01
 Claim record:
 [AUD-01-STS-IDENTITY-01](docs/checkpoints/2026-10-19-root-aud01-sts-identity-claim.md).
 The current audio findings and limits remain in [ASSETS](docs/ASSETS.md).
+
+### APP-01-UI-A11Y-REVIEW-01 — static macOS launcher UI/accessibility review — CLAIMED
+
+`/root/app01_ui_review` reviews `SoCLauncherApp`, `ContentView`, `ReadinessRow`, and the file
+import/process handoff against current Apple macOS and accessibility guidance. This is a static
+source review only: no VoiceOver/Accessibility Inspector, native window, Finder launch, display,
+controller, or focus behavior has been exercised. The worker changes no shared/source files and
+returns line-specific findings with primary-source links; root integrates the outcome. Claim:
+[APP-01-UI-A11Y-REVIEW-01](docs/checkpoints/2026-10-19-root-app01-ui-review-claim.md).
 
 ### DATA-02 — pakN archive identity
 

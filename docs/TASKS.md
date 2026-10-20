@@ -41,6 +41,7 @@ Gates and test evidence take precedence over a status label. Integrator owns thi
 | GPU-03 | Metal resources/render graph | CPU-02, GPU-02 | WAITING_FOR_DEPENDENCY | 0 |
 | GPU-04 | Real scene feature coverage | GPU-03, CPU-04 | WAITING_FOR_DEPENDENCY | 0 |
 | APP-01 | Native Swift launcher | Documented native-core ABI | ACTIVE (shell builds; 12 launcher unit tests pass including 5 lifecycle cases; smoke-run 4 s; testable clean-exit/requested-Stop helper confirmed by user; one compile failure corrected; no core ABI, no bundle, no UI/a11y review) / principal+root | 1 |
+| APP-01-UI-A11Y-REVIEW-01 | Static macOS launcher UI/accessibility review | APP-01 | CLAIMED (read-only review; runtime UI and assistive-technology validation excluded) / root+/root/app01_ui_review | 0 |
 | INT-01 | Actual menu -> controllable world | CPU-04, GPU-04, APP-01 | WAITING_FOR_DEPENDENCY | 0 |
 | INT-02 | Real audio/save/restart route | INT-01, AUD-04, SAV-02 | WAITING_FOR_DEPENDENCY | 0 |
 | REL-01 | Assets-only, native-only package | INT-02 | WAITING_FOR_DEPENDENCY | 0 |
