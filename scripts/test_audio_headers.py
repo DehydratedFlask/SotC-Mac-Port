@@ -36,6 +36,12 @@ class FamilyTests(unittest.TestCase):
             'sxd-le-small-ints',
         )
 
+    def test_le_small_ints_short_prefix(self):
+        self.assertEqual(
+            cah.family_of(bytes.fromhex("01000000000000")),
+            'other-01000000',
+        )
+
     def test_near_empty(self):
         self.assertEqual(
             cah.family_of(bytes.fromhex('3ebe7b0000000000') + b'\x00' * 24),
