@@ -1,7 +1,23 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:34 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:35 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:35 CDT, worker bc-81763e53 (CPU-01d) — 0xd7be60 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd7be60** (survey index 92).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d7be60.{hpp,cpp}`, `native/tests/test_vec_d7be60.cpp`,
+`tools/lift/check_fd7be60.py`, `native/CMakeLists.txt` (+vec_d7be60 only; origin/main base).
+Private dump (not published): `local/re/work/cd7be60.bin`.
+Skipped: `0xd7c380` (A `be64c6d`/`e710a6a`), `0xd7bc60` (B/C `4a026d6`), `0xd7c4d0` (B).
+Did NOT stage peer WIP (`vec_d7b930*`, `startup_ctors.*`).
+Checkpoint (2026-10-19 20:35 CDT, bc-81763e53):
+- OBS: unguarded vmovups copy; src=0x1306a00 dst=0x33529f0 bits=~0,~0,~0,0; index 92; distinct cells.
+- Commands: ctest -R '^vec_d7be60$' Passed; `python3 -I tools/lift/check_fd7be60.py` OK.
+- Logs: `/tmp/ctest_d7be60.log`, `/tmp/check_fd7be60.log`.
+- Store: Project `internal/worker-claim-d7be60.md`.
+- Push: (this commit).
 
 ## ACTIVE CLAIM — 2026-10-19 20:34 CDT, worker bc-effcf5dc (CPU-01d) — 0xd7bc60 — COMPLETE
 
@@ -16,22 +32,6 @@ Checkpoint (2026-10-19 20:34 CDT, bc-effcf5dc):
 - Commands: ctest -R '^vec_d7bc60$' Passed; `python3 -I tools/lift/check_fd7bc60.py` OK.
 - Store: `internal/worker-claim-d7bc60.md`.
 - Push: (pending this commit).
-
-## ACTIVE CLAIM — 2026-10-19 20:34 CDT, worker bc-81763e53 (CPU-01d) — 0xd7be60 — COMPLETE
-
-Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd7be60** (survey index 92).
-Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
-Owned: `native/core/vec_d7be60.{hpp,cpp}`, `native/tests/test_vec_d7be60.cpp`,
-`tools/lift/check_fd7be60.py`, `native/CMakeLists.txt` (+vec_d7be60 only; origin/main base).
-Private dump (not published): `local/re/work/cd7be60.bin`.
-Skipped: `0xd7c380` (A `be64c6d`), `0xd7c4d0` (B `79b9159`/`5adcc89`), `0xd7bc60` (C idx 93).
-Did NOT stage peer WIP (`vec_d7bc60*`).
-Checkpoint (2026-10-19 20:34 CDT, bc-81763e53):
-- OBS: unguarded vmovups copy; src=0x1306a00 dst=0x33529f0 bits=~0,~0,~0,0; index 92; distinct cells.
-- Commands: ctest -R '^vec_d7be60$' Passed; `python3 -I tools/lift/check_fd7be60.py` OK.
-- Logs: `/tmp/ctest_d7be60.log`, `/tmp/check_fd7be60.log`.
-- Store: Project `internal/worker-claim-d7be60.md`.
-- Push: (this commit).
 
 ## ACTIVE CLAIM — 2026-10-19 20:34 CDT, worker bc-73721c8d (CPU-01d) — 0xd7c380 — COMPLETE
 
