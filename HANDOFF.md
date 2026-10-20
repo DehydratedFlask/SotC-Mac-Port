@@ -3,6 +3,22 @@
 Updated: 2026-10-19 22:18 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 22:19 CDT, worker bc-9aa0fe88 (CPU-01d) — 0xce8440 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xce8440** (survey index 147).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_ce8440.{hpp,cpp}`, `native/tests/test_vec_ce8440.cpp`,
+`tools/lift/check_fce8440.py`, `native/CMakeLists.txt` (+vec_ce8440 only; origin/main base).
+Private dump (not published): `local/re/work/cce8440.bin`.
+Prior: 0xceb2c0=`dbcff4f`. Skipped: 95; busy peers. HANDOFF STOP after this push.
+Did NOT edit Drive / SRV / `startup_ctors.*` / peer untracked; no `git reset --hard`.
+Checkpoint (2026-10-19 22:19 CDT, bc-9aa0fe88):
+- OBS: unguarded vmovups copy; src=0x12f9100 dst=0x3351d10 bits=~0,~0,~0,0; index 147; distinct cells.
+- Commands: ctest -R '^vec_ce8440$' Passed; `python3 -I tools/lift/check_fce8440.py` OK.
+- Logs: `/tmp/ctest_ce8440.log`, `/tmp/check_fce8440.log`.
+- Store: Project `internal/worker-claim-ce8440.md`.
+- Push: (this commit). STOP.
+
 ## ACTIVE CLAIM — 2026-10-19 22:18 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry +0xce7300 — COMPLETE
 
 Task: CPU-01e — register (ctor-survey.json; skip 95):
