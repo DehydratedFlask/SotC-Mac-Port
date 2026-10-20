@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:26 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:29 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:26 CDT, /root — CPU constructor runner boundary fixture verified; G1 remains blocked
+## CURRENT CHECKPOINT — 2026-10-19 23:29 CDT, /root — CPU prefix pushed; three bounded follow-ups claimed
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -14,8 +14,10 @@ and reports the unresolved original slot 10 at RVA `0xf09e60`. A private hash-bo
 103 registered RVA/index pairs against the pinned ELF and constructor table. Root independently
 reran the build, focused CTest (1/1), checker, and whitespace check successfully; worker logs are
 under `local/validation/20261019T2321-cpu-01-ctor-prefix-01/`. This proves runner bookkeeping only.
-Constructor 10 semantics, a runtime initialization chain, and G1 remain unproven. Next: claim a
-separate offline analysis of constructor `0xf09e60` before attempting any native implementation.
+Constructor 10 semantics, a runtime initialization chain, and G1 remain unproven. The prefix batch
+is pushed as `b26768a`. Three follow-ups are claimed before dispatch: read-only REA/Ghidra analysis
+of constructor `0xf09e60`; metadata correction for the two relocated constructor indices; and a
+byte-level comparison of the two `sound/shadow/bridge.sxd` variants.
 
 ### DATA-02 — pakN archive identity
 
@@ -238,16 +240,74 @@ Claim record: [CPU-01-CTOR-PREFIX-01 checkpoint](docs/checkpoints/2026-10-19-roo
   now carry original indices 119 and 120. Inference: fail-fast bookkeeping prevents the fixture
   runner from silently skipping the first unresolved constructor. The slot's service semantics and
   execution in the game are still unknown. Failed implementation tries: 0. Task status:
-  FIXTURE_VERIFIED. G1 remains NOT PASSED; G2-G6 remain NOT RUN. Next exact action: claim a bounded
-  offline analysis of RVA `0xf09e60`; do not code its replacement until its contract is established.
+  FIXTURE_VERIFIED. G1 remains NOT PASSED; G2-G6 remain NOT RUN. The source/test/checker batch was
+  pushed as `b26768a` (`test: enforce constructor prefix blocker`) at 23:26 CDT. Before commit, the
+  staged path audit passed 10 paths, `--all` passed 573 tracked paths, staged whitespace check
+  passed, project index reported 4,128 folders current, Graft wiring check passed, and fetched
+  remote divergence was `0 0`. Next exact action: investigate RVA `0xf09e60` offline; do not code a
+  replacement until its behavior and required native contract are established.
+
+### CPU-01-CTOR10-ANALYSIS-01 — characterize first unresolved constructor — ACTIVE CLAIM
+
+Integrator `/root` claims a read-only, hash-bound REA/Ghidra analysis for `/root/cpu_slot10_analysis`.
+Prerequisite: CPU-01-CTOR-PREFIX-01 is fixture verified and the exact ELF/table identities are in
+its checkpoint. Use only the existing local ELF; do not run the game, install/download modules, or
+write native replacement code.
+
+- Graft `grep "f09e60"` finds only the explicit null registration, its fixture assertion, and the
+  hash-bound slot checker; it finds no body analysis. The private claim notes a 255-byte body hash,
+  but its call/data semantics remain to be corroborated.
+- Deliver a private evidence record for RVA `0xf09e60`: exact ELF digest/image base, REA and Ghidra
+  versions, Evidence ID, function range/body hash and analysis coverage; direct calls and resolved
+  import identities; data references; unresolved computed calls; and observation/inference split.
+  If a body or references cannot be established, state that limitation without relabeling the slot.
+  Preserve a reproducible analysis recipe and export evidence before closing any temporary project.
+- Exact acceptance: `rea function local/re/eboot.elf 0xf09e60 --provider ghidra --snapshot local/re/rea-f09e60-snapshot.json --format json` plus an independent private byte/hash and reference check. Save logs/evidence under existing `local/re/evidence/` or `local/validation/`; do not alter the baseline entry snapshot. Failed tries: 0.
+- Exit: static description of the first blocker and unresolved service contracts, not a native
+  implementation. G1 remains NOT PASSED. Root integrates shared docs and refreshes the project
+  index after all parallel private reports are delivered.
+
+### CPU-01-CTOR-METADATA-01 — correct original indices in leaf fixtures — ACTIVE CLAIM
+
+Integrator `/root` claims the narrow metadata follow-up in `/root/cpu_ctor_metadata`. The slot
+checker proves that `0xd32720` and `0xd2ffe0` occupy original constructor indices 119 and 120, while
+their standalone headers, JSON dumps and private checkers still assert 115 and 116. Graft queries
+identified the four stale metadata locations.
+
+- Owned files: `native/core/vec_d32720.hpp`, `native/core/vec_d2ffe0.hpp`,
+  `native/tests/test_vec_d32720.cpp`, `native/tests/test_vec_d2ffe0.cpp`,
+  `tools/lift/check_fd32720.py`, and `tools/lift/check_fd2ffe0.py`.
+- Update only original-index metadata to 119/120. Preserve function semantics, test behavior,
+  vector-copy positions and survey/manifests positions. Acceptance: build both test targets, run
+  their focused CTests, run both private ELF checkers, and rerun `check_ctor_slots.py`. Failed tries: 0.
+- This corrects provenance only and does not alter function behavior or pass G1. Root integrates
+  documentation and publishes the batch.
+
+### DATA-02-BRIDGE-SXD-01 — compare cachedFiles bridge members — ACTIVE CLAIM
+
+Integrator `/root` claims a read-only DATA-02 format characterization for `/root/data02_bridge_sxd`.
+Prerequisite: DATA-01 identities and E25 classify exactly two `.sxd` members with observed prefix
+`fbad9897`, both named `sound/shadow/bridge.sxd` in base and patch cachedFiles archives.
+
+- Use exact archive/member identities, entry IDs, spans, decoded lengths and full hashes from the
+  private manifest and `Psarc.read()`. Compare both variants by byte offset; report only field/record
+  boundaries corroborated by raw bytes and a repeatable structural rule. Do not infer engine use or
+  semantics from the path or magic. Do not edit shared source or docs; root integrates the result.
+  If no schema is established, report that evidence boundary without a permissive parser stub.
+- Exact acceptance: a reproducible private script in existing `local/validation/` re-reads both
+  named members, verifies manifest locators/hashes, and emits a bounded comparison report. No game
+  binaries or raw member data enter Git. Failed tries: 0.
+- DATA-02 remains ACTIVE until selected-scene asset resolution is established. Root refreshes the
+  project index and integrates final evidence after workers finish.
 
 ### Parallel dispatch checkpoint — 2026-10-19 23:19 CDT
 
 See [the parallel claims dispatch checkpoint](docs/checkpoints/2026-10-19-root-parallel-claims-dispatched.md).
-Both claims were pushed before assignment; workers own distinct paths and do not edit shared docs
-or commit/push. RE-02-DYNLINK-01 is fixture verified and published in `b2a5b6f`;
-CPU-01-CTOR-PREFIX-01 is now fixture verified after independent reruns. Current exact action:
-publish its bounded source/test/checker and evidence, then assess the unresolved constructor body.
+Both earlier claims were pushed before assignment; workers own distinct paths and do not edit shared
+docs or commit/push. RE-02-DYNLINK-01 is fixture verified and published in `b2a5b6f`;
+CPU-01-CTOR-PREFIX-01 is fixture verified and pushed in `b26768a`. Three new bounded claims above
+are ready for assignment; their current exact action is private analysis and metadata verification,
+with root retaining integration and publication ownership.
 
 ### Current publication checkpoint
 
