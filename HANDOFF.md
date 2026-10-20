@@ -1,7 +1,34 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:22 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:36 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:24 CDT, worker bc-81763e53 (CPU-01d) — 0xd90310 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd90310** (survey index 79).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d90310.{hpp,cpp}`, `native/tests/test_vec_d90310.cpp`,
+`tools/lift/check_fd90310.py`, `native/CMakeLists.txt` (+vec_d90310 only; origin/main base).
+Private dump (not published): `local/re/work/cd90310.bin`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV, peer `0xdac410`/`0xd94cb0`/`0xdb7e60`.
+Checkpoint (2026-10-19 20:24 CDT, bc-81763e53):
+- OBS: unguarded vmovups copy; src=0x130b1a0 dst=0x3352c10 bits=~0,~0,~0,0; index 79; distinct cells.
+- Commands: ctest -R '^vec_d90310$' Passed; `python3 -I tools/lift/check_fd90310.py` OK.
+- Logs: `/tmp/ctest_d90310.log`, `/tmp/check_d90310.log`.
+- Store: Project `internal/worker-claim-d90310.md`.
+- Push: (pending this commit).
+
+## ACTIVE CLAIM — 2026-10-19 20:33 CDT, worker bc-9aa0fe88 (SRV-01 mem split) — COMPLETE
+
+Task: SRV-01 mem — free-list region split surgery OBS at **0x1a8b6..0x1a8fa** (after `0x19660` pop).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/region_split.{hpp,cpp}`, `native/tests/test_region_split.cpp`,
+`tools/lift/check_f1a8b6_split.py`, `native/CMakeLists.txt` (+region_split only; keep host_map/carve),
+`docs/POINTERS.md`, `native/README.md`.
+**Did NOT edit:** `allocator_region.*`, `startup_ctors.*`, Drive, peer vec WIP.
+Deferred: full `0x19660` replenish via `0x19e00`.
+Checkpoint: ctest region_split Passed; check_f1a8b6_split.py OK.
+Store: Project `internal/worker-claim-srv01-split.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:50 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 76 — COMPLETE
 
@@ -24,7 +51,7 @@ Checkpoint (2026-10-19 20:22 CDT, bc-81763e53):
 - Commands: ctest -R '^vec_db3960$' Passed; `python3 -I tools/lift/check_fdb3960.py` OK.
 - Logs: `/tmp/ctest_db3960.log`, `/tmp/check_db3960.log`.
 - Store: Project `internal/worker-claim-db3960.md`.
-- Push: (pending this commit).
+- Push: sources `f443aaf`, CMake/HANDOFF `6c869f3` on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 20:22 CDT, worker bc-81763e53 (CPU-01d) — 0xdbb280 — COMPLETE
 
@@ -45,7 +72,7 @@ Owned: `startup_ctors.*`, `test_startup_ctors.cpp`, `HANDOFF.md`. CMake: origin 
 ## ACTIVE CLAIM — 2026-10-19 20:35 CDT, worker bc-02397584 (CPU-01d) — 0xdac410 — IN PROGRESS
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdac410** (survey index 77).
-Failed tries: 0. Status: CLAIMED / lifting.
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
 Owned: `native/core/vec_dac410.{hpp,cpp}`, `native/tests/test_vec_dac410.cpp`,
 `tools/lift/check_fdac410.py`, `native/CMakeLists.txt` (+vec_dac410 only; origin/main base).
 Private dump (not published): `local/re/work/cdac410.bin`.
@@ -89,16 +116,6 @@ Checkpoint (2026-10-19 20:29 CDT, bc-73721c8d):
 - Store: Project `internal/worker-claim-db93a0.md`.
 - Push: `cd5f125` on origin/main.
 
-## ACTIVE CLAIM — 2026-10-19 20:29 CDT, worker bc-9aa0fe88 (SRV-01 mem split) — IN PROGRESS
-
-Task: SRV-01 mem — free-list region split surgery OBS at **0x1a8b6..0x1a8fa** (after `0x19660` pop).
-Failed tries: 0. Status: IN PROGRESS.
-Owned (new only): `native/core/region_split.{hpp,cpp}`, `native/tests/test_region_split.cpp`,
-`tools/lift/check_f1a8b6_split.py`, `native/CMakeLists.txt` (+region_split only; keep host_map/carve).
-Store: Project `internal/worker-claim-srv01-split.md`.
-**Does NOT edit:** `allocator_region.*`, `startup_ctors.*`, Drive, peer vec WIP.
-Deferred: full `0x19660` — replenish path calls `0x19e00` (circular); pop/unlink+refill left OPEN.
-Exact check: ctest -R region_split; `python3 -I tools/lift/check_f1a8b6_split.py`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:30 CDT, worker bc-02397584 (CPU-01d) — 0xdb3a70 — COMPLETE
 
