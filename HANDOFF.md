@@ -1,22 +1,44 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:55 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:00 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:55 CDT, /root — PHDR10 public-source search dispatched
+## CURRENT CHECKPOINT — 2026-10-20 01:00 CDT, /root — two bounded analyses root-verified; publication pending
 
-`RE-02-PHDR10-SOURCE-AUDIT-01` is assigned to `/root/phdr10_source_audit` (`gpt-6-luna`, Extra
-High). The worker is restricted to public, attributable Sony/PlayStation sources and generic ELF
-specification limits; it may create private evidence only under
-`local/re/evidence/re02-phdr10-source-audit/`. No source meaning is inferred from the dispatch.
-Claim `54d12b7` and publication confirmation `15d208c` are pushed. Caller-state task
-`CPU-01-CTOR10-CALLER-STATE-01` remains active with `/root/ctor10_caller_state`.
+### CPU-01-CTOR10-CALLER-STATE-01 — STATIC_ANALYSIS_VERIFIED
 
-Files changed at this dispatch checkpoint: `HANDOFF.md`, `docs/TASKS.md`. Exact next action: review
-the worker's report and sources when returned; independently verify any claimed mapping and preserve
-`UNCLASSIFIED` if no first-party evidence names the exact value. In parallel, review and independently
-verify the caller-state worker's byte checks when it returns. The PHDR task has 0 failed hypotheses;
-RE-02 remains active and G1 NOT PASSED.
+Worker `/root/ctor10_caller_state`'s private report is hash-bound to ELF SHA
+`d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`. Root reran
+`python3 -I local/re/evidence/cpu01-ctor10-caller-state-01/verify.py > local/re/evidence/cpu01-ctor10-caller-state-01/root-verification.stdout.log 2> local/re/evidence/cpu01-ctor10-caller-state-01/root-verification.stderr.log; result_code=$?; printf '%s\n' "$result_code" > local/re/evidence/cpu01-ctor10-caller-state-01/root-verification.exit.txt; exit "$result_code"`; exit `0`, stderr empty, and root JSON SHA `2695197686a62e0fbbc298aa661db7753f678eb7580c77dadbcd4f3d274bead2` matches the worker verification JSON. The four callee gate fields are byte-zero on the examined path; the caller's separate guard skips unresolved call `0xf09efb`, and helper `0xe1ede0`'s qword gates skip its computed calls for these inputs. No constructor reachability, other-state effects, or runtime behavior is inferred. Report and root logs remain private; see E53 and [checkpoint](docs/checkpoints/2026-10-20-root-cpu01-ctor10-caller-state-complete.md).
+
+### RE-02-PHDR10-SOURCE-AUDIT-01 — ARTIFACT_VERIFIED, meaning UNCLASSIFIED
+
+Worker `/root/phdr10_source_audit`'s private report SHA-256 is `c1572f6181ece3d0e31b4210150240504ded1b100284a9496cadf16575a14e5b`; root independently reopened its cited official SIE and generic ELF sources and saved a review under `local/re/evidence/re02-phdr10-source-audit/root-review.md`. No attributable first-party mapping was found in the bounded public search. The generic ELF ABI only puts this numeric value within the OS-specific range. Partner-only documentation was not accessed; no absence-of-meaning or runtime conclusion is drawn. See E54 and [checkpoint](docs/checkpoints/2026-10-20-root-re02-phdr10-source-audit-complete.md).
+
+Exact next action: choose and claim the next small CPU-01/RE-02 slice only after checking its prerequisites; do not infer a native startup chain from these static results. `CPU-01-CTOR10-CALLER-STATE-01` has 0 failed analysis hypotheses; `RE-02-PHDR10-SOURCE-AUDIT-01` has 0; parent CPU-01 and RE-02 remain ACTIVE. No code or reference files changed; no install/download or game execution. G1 NOT PASSED.
+
+Shared files changed in this result checkpoint: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`,
+generated `docs/FOLDERS.md`, and the two linked completion checkpoints. Root verifier output and the
+source review remain private under `local/re/`.
+
+Prepublication checks: `python3 scripts/project_index.py` exited `0` (`4,135 folders indexed; written`);
+generated `docs/FOLDERS.md` records 37 checkpoint files. The last source-graph check at 00:54 exited
+`0` with wiring synchronized; no source files changed since then. Root source pages and exact search
+queries are captured in the linked private root review. Exact next action: run `git diff --check`,
+stage only the six allowlisted documentation files, run staged/full publication audits and staged
+whitespace check, fetch/check divergence, then commit and push. Failed hypotheses: 0 for both slices.
+
+## PREVIOUS CHECKPOINT — 2026-10-20 00:55 CDT, /root — PHDR10 public-source search dispatched
+
+`/root/phdr10_source_audit` (`gpt-6-luna`, Extra High) completed the read-only public first-party
+source search. The dispatch scope and no-inference boundary are in the published claim checkpoint.
+Claim commit `54d12b7`, publication confirmation `15d208c`, and dispatch record `f0889da` are pushed.
+Dispatch-record checks: `git diff --check` and `git diff --cached --check` passed; staged audit
+accepted 2 paths, full audit accepted 590; fetch succeeded and divergence was `0 0`; commit
+`f0889da` pushed (`15d208c..f0889da`). Post-push status was clean at `f0889da41529e1a9e52cd4cff6917043226e7ac2`,
+aligned with `origin/main` and divergence `0 0`. Worker report is at
+`local/re/evidence/re02-phdr10-source-audit/report.md`; it was then independently reviewed as
+recorded in the current checkpoint. Failed hypotheses: 0.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 00:54 CDT, /root — PHDR10 claim published; source-search dispatch pending
 
