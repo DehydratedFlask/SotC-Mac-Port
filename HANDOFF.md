@@ -1,6 +1,6 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:11 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:12 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
 ## ACTIVE CLAIM — 2026-10-19 20:09 CDT, worker bc-effcf5dc (CPU-01d) — 0xde7fb0 — COMPLETE
@@ -18,15 +18,21 @@ Checkpoint (2026-10-19 20:09 CDT, bc-effcf5dc):
 - Logs: `/tmp/ctest_de7fb0.log`, `/tmp/check_de7fb0.log`.
 - Store: Project `internal/worker-claim-de7fb0.md`.
 
-## ACTIVE CLAIM — 2026-10-19 20:11 CDT, worker bc-02397584 (CPU-01d) — 0xde1ad0 — IN PROGRESS
+## ACTIVE CLAIM — 2026-10-19 20:11 CDT, worker bc-02397584 (CPU-01d) — 0xde1ad0 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xde1ad0** (survey index 58).
-Failed tries: 0. Status: CLAIMED / lifting.
+Failed tries: 0. Status: FIXTURE_VERIFIED.
 Owned: `native/core/vec_de1ad0.{hpp,cpp}`, `native/tests/test_vec_de1ad0.cpp`,
 `tools/lift/check_fde1ad0.py`, `native/CMakeLists.txt` (+vec_de1ad0 only; origin/main base).
 Private dump (not published): `local/re/work/cde1ad0.bin`.
 Did NOT edit: `startup_ctors.*`, Drive, SRV-01 `host_map`, peer `0xdfd5f0`/`0xde7fb0`/`0xde6d20`.
-Store: Project `internal/worker-claim-de1ad0.md`.
+
+Checkpoint (2026-10-19 20:12 CDT, bc-02397584):
+- OBS: unguarded vmovups copy; src=0x130fd00 dst=0x3353300 bits=~0,~0,~0,0; index 58; distinct cells.
+- Commands: ctest -R '^vec_de1ad0$' Passed; `python3 -I tools/lift/check_fde1ad0.py` OK.
+- Logs: `/tmp/ctest_de1ad0.log`, `/tmp/check_de1ad0.log`.
+- CMake: origin/main base + vec_de1ad0 only (diff verified clean).
+- Store: Project `internal/worker-claim-de1ad0.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:09 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 49/51/52/53 — COMPLETE
 
@@ -84,7 +90,7 @@ Checkpoint (2026-10-19 20:09 CDT, bc-73721c8d):
 - Commands: ctest -R vec_dfd5f0 Passed; `python3 -I tools/lift/check_fdfd5f0.py` OK.
 - Logs: `/tmp/ctest_dfd5.log`, `/tmp/check_dfd5.log`.
 - Store: Project `internal/worker-claim-dfd5f0.md`.
-- Push: sources on `8921252`; CMake wire-up follow-up this checkpoint (origin lacked `vec_dfd5f0` target).
+- Push: sources `8921252`; CMake wire-up `56aca61` (`56aca617800e`) on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 20:07 CDT, worker bc-201701f2 (Drive / CPU-01e) — 0xea52f0 + registry idx 20 — COMPLETE
 
