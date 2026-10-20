@@ -1,9 +1,35 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:51 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:54 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:51 CDT, /root — slot-10 caller-state analysis dispatched
+## CURRENT CHECKPOINT — 2026-10-20 00:54 CDT, /root — PHDR10 claim checks passed; publication pending
+
+The caller-state dispatch record was published in commit `75f936d` (`docs: record slot-10 caller-state
+dispatch`) after `d9d4d70`; post-push tree was clean and `HEAD`/`origin/main` aligned at
+`75f936db4e3fe8a6d8e5e78735910a9f16268d2d`, divergence `0 0`. `/root/ctor10_caller_state`
+(`gpt-6-luna`, Extra High) remains active on the bounded slot-10 pre-call field-state analysis.
+
+New task `RE-02-PHDR10-SOURCE-AUDIT-01` is claimed to seek an authoritative public first-party source
+for ELF type `0x6fffff01`, with E51 as the local byte/parser anchor. The exact-literal Graft search
+already returned no hits in 528 indexed files; it must not be repeated. Only public, attributable
+Sony/PlayStation material or generic ELF specifications may support claims. If no primary mapping is
+available, preserve `UNCLASSIFIED`; do not turn community names or absence of search results into a
+semantic conclusion. Claim:
+[RE-02-PHDR10-SOURCE-AUDIT-01](docs/checkpoints/2026-10-20-root-re02-phdr10-source-audit-claim.md).
+The claim's prepublication checks passed: `python3 scripts/project_index.py` exited `0` and
+regenerated `docs/FOLDERS.md` with 4,134 folders and 35 checkpoint files; `graft check` exited `0`
+(wiring graph synchronized; optional deep meaning layer remains 0%, 1,219 nodes pending); and
+`git diff --check` passed. The worktree contains only `HANDOFF.md`, `docs/TASKS.md`, regenerated
+`docs/FOLDERS.md`, and the new claim file. The claim is not yet published and the research agent is
+not yet dispatched.
+
+Exact next action: stage only the new claim, task row, folder index, and `HANDOFF.md`; run staged/full
+publication audits and staged whitespace check, fetch/check divergence, then commit and push. Only
+after publication, dispatch a GPT-6 Luna Extra High research agent. Failed hypotheses/tries on the
+new task: 0.
+
+## PREVIOUS CHECKPOINT — 2026-10-20 00:51 CDT, /root — slot-10 caller-state analysis dispatched
 
 Claim publication: `python3 scripts/project_index.py` exited 0 (4,133 folders; `docs/checkpoints`
 count 34); `graft check` exited 0 (wiring graph synchronized; optional meaning layer 0%, 1,219
