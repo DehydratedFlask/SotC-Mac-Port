@@ -66,6 +66,7 @@ add_library(sotc_core STATIC
   core/vec_d7fe40.cpp
   core/vec_d7c9d0.cpp
   core/vec_d7c4d0.cpp
+  core/vec_d7c380.cpp
   core/vec_d7bc60.cpp
   core/vec_d7be60.cpp)
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
