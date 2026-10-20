@@ -1,7 +1,23 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:36 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:37 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:37 CDT, worker bc-02397584 (CPU-01d) — 0xd7b930 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd7b930** (survey index 94).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d7b930.{hpp,cpp}`, `native/tests/test_vec_d7b930.cpp`,
+`tools/lift/check_fd7b930.py`, `native/CMakeLists.txt` (+vec_d7b930 only; origin/main base).
+Private dump (not published): `local/re/work/cd7b930.bin`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV, peer `0xd7be60`/`0xd7bc60`/`0xd7c380`.
+Checkpoint (2026-10-19 20:37 CDT, bc-02397584):
+- OBS: unguarded vmovups copy; src=0x1306100 dst=0x33529d0 bits=~0,~0,~0,0; index 94; distinct cells.
+- Commands: ctest -R '^vec_d7b930$' Passed; `python3 -I tools/lift/check_fd7b930.py` OK.
+- Logs: `/tmp/ctest_d7b930.log`, `/tmp/check_fd7b930.log`.
+- Store: Project `internal/worker-claim-d7b930.md`.
+- Push: (this commit).
+
 
 ## ACTIVE CLAIM — 2026-10-19 20:36 CDT, worker bc-9aa0fe88 (SRV-01 mem free-count) — COMPLETE
 
