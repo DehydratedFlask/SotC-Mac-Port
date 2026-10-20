@@ -13,6 +13,12 @@ Reader: [`scripts/psarc.py`](../scripts/psarc.py) (read-only, bounds-checked, te
 | pak0 / pak1 / pak2 / pak3 | 6,918 / 5,630 / 1,313 / 12,053 | shaders, meshes, textures; pak2/pak3 hold `cp3shadow/` anim/model/sound-bank data |
 | pakN | 64,108 | 12.79 GB uncompressed; 3 paths also appear in the patch archive |
 
+Archive identity for the private 12,838,532,222-byte `pakN.psarc` was verified by a bounded
+1 MiB streaming SHA-256 pass: `559f7a3fa66bc652d36c5f1a885b351e4aeb17dadbba06a0006520bfd325be73`.
+The summary under `local/manifests/assets/` records the byte count and digest. The stream reader
+checks file identity/size/timestamps before and after hashing and rejects observed replacement,
+truncation, or growth; synthetic checks are in `scripts/test_psarc.py`.
+
 - Format: v1.4, `zlib`, 30-byte entries, 64 KiB blocks, flags 0xc, manifest = NUL-separated paths
   (entry 0). A block whose stored size equals its decoded size is raw (rule needed for pak0).
 - The TOC 16-byte value is neither MD5(path variants tried) nor MD5(content) on 39 sampled pak2
@@ -40,7 +46,7 @@ Observed on this title (from members.jsonl, no re-extract):
 - Status: **PROVISIONAL_OBS**. Patch contains every base path, so a patch-wins overlay is
   consistent with the TOC data; engine Fios/loader mount order is still **unproven** (RE/CPU).
 
-## Audio-relevant members (AUD-01 input; none decoded yet)
+## Audio-relevant members (AUD-01 input; codecs not identified)
 
 `sound/shadow/{boss*,com_*,edp*}.sxd`, `music.sxd1/.sxd2`, `str_{amb,bgm,boss,event}.sxd1/.sxd2`
 (pakN, ~1 MB total), `cp3shadow/sound/se/*.hd|.bd` (25 pairs, ~2.7 MB), `cp3shadow/sound/test_adpcm/*.sts_cp3`
@@ -48,12 +54,15 @@ Observed on this title (from members.jsonl, no re-extract):
 No `.at9`, `.wav`, `.ogg` or similar member exists. Total identifiable sound-container bytes are far
 too small to be the whole soundtrack, so music/dialogue streams are NOT yet located.
 
-## AUD-01 header classification (magic + entropy only; codec UNKNOWN)
+## AUD-01 header classification and member identity (codec UNKNOWN)
 
 Classifier: [`scripts/classify_audio_headers.py`](../scripts/classify_audio_headers.py)
 (tests: `scripts/test_audio_headers.py`). Output:
 `local/manifests/assets/audio-headers.json` (86 members across cachedFiles / patch
-cachedfiles / pak2 / pak3 / pakN). **Codec = UNKNOWN for every member. No NGS2 inference.**
+cachedfiles / pak2 / pak3 / pakN). Each row includes the full decoded-member SHA-256 and PSARC
+entry ID, byte offset and first block, independently checked against `Psarc.read()`; the sample
+magic and entropy remain prefix observations. **Codec = UNKNOWN for every member. No NGS2
+inference.** Tests: `python3 -I scripts/test_audio_headers.py` (12 pass).
 **Publish boundary:** the JSON is game-derived and stays under gitignored `local/`; the
 classifier/test scripts under `scripts/` may be published (see `scripts/audit_publish_paths.py`).
 

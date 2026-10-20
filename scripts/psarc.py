@@ -21,6 +21,7 @@ import argparse
 import collections
 import hashlib
 import json
+import os
 from pathlib import Path
 import posixpath
 import zlib
@@ -36,6 +37,45 @@ CACHEDFILES_MOUNT_ORDER = ('base', 'patch')  # low -> high priority
 
 class PsarcError(ValueError):
     pass
+
+
+def _stat_signature(st):
+    return (st.st_dev, st.st_ino, st.st_size, st.st_mtime_ns, st.st_ctime_ns)
+
+
+def _sha256_file(path, *, chunk_size=1 << 20):
+    """Hash a file with bounded reads and reject changes observed during the pass."""
+    path = Path(path)
+    if chunk_size <= 0:
+        raise ValueError('chunk_size must be positive')
+
+    path_before = path.stat()
+    signature = _stat_signature(path_before)
+    digest = hashlib.sha256()
+    total = 0
+    with path.open('rb') as stream:
+        fd_before = os.fstat(stream.fileno())
+        if _stat_signature(fd_before) != signature:
+            raise PsarcError(f'file changed while hashing: {path}')
+
+        remaining = fd_before.st_size
+        while remaining:
+            chunk = stream.read(min(chunk_size, remaining))
+            if not chunk:
+                raise PsarcError(f'file truncated while hashing: {path}')
+            digest.update(chunk)
+            total += len(chunk)
+            remaining -= len(chunk)
+        if stream.read(1):
+            raise PsarcError(f'file grew while hashing: {path}')
+
+        fd_after = os.fstat(stream.fileno())
+    path_after = path.stat()
+    if any(_stat_signature(st) != signature for st in (fd_before, fd_after, path_after)):
+        raise PsarcError(f'file changed while hashing: {path}')
+    if total != path_before.st_size:
+        raise PsarcError(f'hash read {total} bytes, expected {path_before.st_size}: {path}')
+    return digest.hexdigest()
 
 
 def be(data, pos, n):
@@ -287,8 +327,7 @@ def main():
     args.out.mkdir(parents=True, exist_ok=True)
     for path in args.archive:
         a, names, summary = summarize(path)
-        digest = hashlib.sha256(path.read_bytes()).hexdigest() if path.stat().st_size < 1 << 30 else None
-        summary['sha256'] = digest
+        summary['sha256'] = _sha256_file(path)
         stem = f"{path.parent.name}-{path.stem}"
         (args.out / f'{stem}.summary.json').write_text(json.dumps(summary, indent=1) + '\n')
         with (args.out / f'{stem}.members.jsonl').open('w') as f:

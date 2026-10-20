@@ -13,16 +13,16 @@ Gates and test evidence take precedence over a status label. Integrator owns thi
 | DOC-VALIDATION | Acceptance specification | Source audit | DONE_DOC / native_plan_review | 0 |
 | SETUP-01 | Native PKG extractor | Xcode, Crypto++ | FIXTURE_VERIFIED / principal | 1 (resolved) |
 | DATA-01 | Extract/hash all local packages | SETUP-01 | ARTIFACT_VERIFIED / principal | 0 |
-| DATA-02 | Archive/asset schema and overlay map | DATA-01 | ACTIVE (partial: TOCs done; overlay+case policy PROVISIONAL_OBS for cachedFiles pair via bc-cd298177; member formats, TOC digest, pakN encoding open; root claimed stream-hashing the pakN archive identity) / principal+claim-2+root | 0 |
+| DATA-02 | Archive/asset schema and overlay map | DATA-01 | ACTIVE (partial: TOCs done; overlay+case policy PROVISIONAL_OBS for cachedFiles pair via bc-cd298177; pakN archive SHA-256 now streamed and independently verified; member formats, TOC digest, pakN encoding open) / principal+claim-2+root | 0 |
 | RE-01 | SELF/ELF identity + Ghidra seed | DATA-01 | STATIC_ANALYSIS_VERIFIED / principal | 1 (resolved resource limit) |
 | RE-02 | Imports, relocations, boot graph | RE-01 | ACTIVE (partial: imports/relocs/entry chain done; ctor + app-main internals open) / principal | 0 |
-| CPU-01 | Native recovery feasibility slice | RE-02 | ACTIVE (many leaf ctors FIXTURE_VERIFIED incl. bc-cb8d07c2: 0xdd41e0, 0x3bd70, 0xa3ade0, 0x5777a0; runner partial; engine chain not started; leaf 95 `0xd71f60` NEEDS_PRINCIPAL after 3 failed tries; `0xce7300`, `0xce57b0`, and `0xce0890` fixture/checker slices verified; root claimed leaf `0xcdc760`; no startup chain/G1) / principal+root | 0 |
+| CPU-01 | Native recovery feasibility slice | RE-02 | ACTIVE (many leaf ctors FIXTURE_VERIFIED incl. bc-cb8d07c2: 0xdd41e0, 0x3bd70, 0xa3ade0, 0x5777a0; runner partial; engine chain not started; leaf 95 `0xd71f60` NEEDS_PRINCIPAL after 3 failed tries; `0xce7300`, `0xce57b0`, `0xce0890`, and `0xcdc760` fixture/checker slices verified; no startup chain/G1) / principal+root | 0 |
 | CPU-02 | Packed data/pointer schemas | RE-01 | ACTIVE (Tagged31 decode+retag+0x66dec0 mapping and all 13 behavior arms FIXTURE_VERIFIED; heap cells OBS; static-address meaning, asset structs, type names open) / principal+bc-cb8d07c2+root | 0 |
 | CPU-03 | Native jobs/fibers/TLS | CPU-01, CPU-02 | WAITING_FOR_DEPENDENCY | 0 |
 | SRV-01 | Native platform services / asset I/O | RE-02, DATA-02 | ACTIVE (partial: host_map + carve + split + list + free-count `@+0x48` + high-water `0x1a9bb` + exact-fit `0x1aada` + page-debit `0x1ae67` FIXTURE slices bc-9aa0fe88; distinct `0x19e00` block `0x1a123–0x1a15a` now FIXTURE_VERIFIED with CMake test and E28 byte checker, 1 earlier failed target hypothesis; page bitmap / `0x19660` / Fios open) / principal+bc-9aa0fe88+root | 0 |
 | CPU-04 | Native startup and first world | CPU-01..03, SRV-01 | WAITING_FOR_DEPENDENCY | 0 |
 | CPU-05 | Gameplay recovery batches | CPU-04 | WAITING_FOR_DEPENDENCY | 0 |
-| AUD-01 | Audio assets/codec inventory | DATA-01 | ACTIVE (partial: header magic+entropy classified for 86 `.sxd`/`.hd`/`.bd` members → `local/manifests/assets/audio-headers.json`; codec UNKNOWN; root claimed per-member hashes and PSARC entry locators; music/dialogue location open) / bc-71956f82+root | 0 |
+| AUD-01 | Audio assets/codec inventory | DATA-01 | ACTIVE (partial: 86 `.sxd`/`.hd`/`.bd` members now have verified full-member hashes and PSARC entry locators in the private manifest; codec UNKNOWN; music/dialogue location open) / bc-71956f82+root | 0 |
 | AUD-02 | Recover used voice/rack contracts | RE-02, AUD-01 | WAITING_FOR_DEPENDENCY | 0 |
 | AUD-03 | Decoder/mixer/effect fixtures | AUD-02 | WAITING_FOR_DEPENDENCY | 0 |
 | AUD-04 | Actual game audio integration | AUD-03, CPU-04 | WAITING_FOR_DEPENDENCY | 0 |
@@ -72,6 +72,10 @@ Deliver a local asset manifest with archive hash, member ID/path, byte span, con
 parser version, schema confidence, override source and unresolved formats. Add one minimal
 parser fixture for each admitted format. Reject out-of-range lengths, path traversal and
 unknown compression explicitly. Exit: selected scene's required assets resolvable repeatably.
+
+Verified slice (2026-10-19): the private `pakN.psarc` identity now records its streamed SHA-256
+and exact archive byte count. This closes only archive identity; per-member schemas, TOC digest
+meaning, `pakN` encoding, and selected-scene resolution remain open.
 
 ## RE-01 / RE-02 — seed analysis and native boot dependency graph
 
@@ -158,6 +162,10 @@ asset, not proof of gameplay codec coverage. Identify actual bank/stream headers
 framing/configuration, channel layouts, rate, loops, seek state, event IDs and language variants.
 Deliver a hash-bound audio inventory with at least one validated representative of every used
 codec/container; state unparsed members. Do not infer NGS2 graph semantics from PCM output.
+
+Verified slice (2026-10-19): all 86 classified members now carry full decoded-member SHA-256 and
+PSARC entry ID/offset/first-block locators. Codec/container meaning, gameplay use, and
+music/dialogue coverage remain open.
 
 AUD-02 starts at imported sceNgs2 calls and their callers: system/rack creation, parameter
 buffer construction, voice allocation/patching/control, render invocations and callbacks.

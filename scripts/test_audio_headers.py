@@ -2,10 +2,12 @@
 """Unit tests for AUD-01 audio header classification (no live archives required)."""
 from __future__ import annotations
 
+import hashlib
 import sys
 import unittest
 import zlib
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import classify_audio_headers as cah
@@ -69,6 +71,51 @@ class ClassifyFixtureTests(unittest.TestCase):
         self.assertEqual(payload['member_count'], 0)
         self.assertEqual(payload['classes'], [])
         self.assertIn('codec intentionally UNKNOWN', ' '.join(payload['limitations']))
+
+    def test_full_member_hash_and_psarc_entry_locator(self):
+        member = bytes(range(256)) * 20 + b'tail'
+
+        class SyntheticPsarc:
+            def __init__(self, _path):
+                self.entries = [
+                    {'size': 0, 'offset': 0, 'block': 0},
+                    {'size': len(member), 'offset': 0x1234, 'block': 17},
+                ]
+                self.read_calls = []
+                self.closed = False
+
+            def paths(self):
+                return ['sound/fixture.sxd']
+
+            def read(self, index, limit=None):
+                self.read_calls.append((index, limit))
+                return member if limit is None else member[:limit]
+
+            def close(self):
+                self.closed = True
+
+        instances = []
+
+        def open_synthetic(path):
+            archive = SyntheticPsarc(path)
+            instances.append(archive)
+            return archive
+
+        with patch.object(cah, 'Psarc', side_effect=open_synthetic):
+            payload = cah.classify_archives([Path('synthetic.psarc')])
+
+        self.assertEqual(payload['member_count'], 1)
+        row = payload['members'][0]
+        self.assertEqual(row['member_sha256'], hashlib.sha256(member).hexdigest())
+        self.assertNotEqual(row['member_sha256'], hashlib.sha256(member[:cah.SAMPLE]).hexdigest())
+        self.assertEqual(row['entry_id'], 1)
+        self.assertEqual(row['entry_offset'], 0x1234)
+        self.assertEqual(row['first_block'], 17)
+        self.assertEqual(row['size'], len(member))
+        self.assertEqual(row['sample_bytes'], cah.SAMPLE)
+        self.assertEqual(instances[0].read_calls, [(1, None)])
+        self.assertTrue(instances[0].closed)
+        self.assertEqual(row['codec'], 'UNKNOWN')
 
 
 if __name__ == '__main__':
