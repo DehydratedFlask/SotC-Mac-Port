@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:49 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:50 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:49 CDT, /root — VoiceControl timeout recorded; CLI recovery pending
+## CURRENT CHECKPOINT — 2026-10-20 01:50 CDT, /root — VoiceControl timeout recorded; CLI recovery prepared
 
 Three bounded AUD-02 static packets are in progress: `AUD-02-NGS2-SYSCREATE-01` for
 `sceNgs2SystemCreateWithAllocator` (worker `/root/aud02_syscreate`),
@@ -68,6 +68,21 @@ Exact next action: use the existing process-local REA CLI with the previously do
 fresh private snapshot/log. Keep the scope to one byte-checked caller path and retain all unresolved
 edges. Workers continue their separate system/rack probes. No code, game payload, reference, or
 runtime behavior was changed or tested; G1 NOT PASSED.
+
+### CLI recovery preparation — 2026-10-20 01:50 CDT, `/root`
+
+After the timeout, `mcp__rea__close_binary({})` returned `result: null`; there was no successful
+query Evidence to export. `rea` is not on this shell's PATH (`rea --help` exited 127), but the
+existing server binary at `/Users/dehydratedflask/.npm/_npx/a1722018f28f9df2/node_modules/.bin/rea`
+is REA 6.7.0 and its `--help` plus `xrefs --help` both exited 0. Existing private
+`local/re/rea-snapshot.json` exactly matches the target SHA above and Ghidra 12.1.4 profile digest
+`769518a8e9b57f953dd241adbb63672f0f486bb3d66359b9deef7c5e088ca7aa` (one cached entry); its SHA-256
+is `d80232c4fe22d7e75654eade8db44af093507a94723f80dd5ce67605dd382354`. Next exact action: copy
+that matching snapshot into the VoiceControl dossier, then invoke absolute-path
+`rea xrefs local/re/eboot.elf 0x1601020 --provider ghidra --snapshot <private-copy> --format json`
+with `GHIDRA_HEADLESS_MAXMEM=8G` and `REA_GHIDRA_STARTUP_TIMEOUT_MS=1200000`, preserving stdout,
+stderr and exit status. This is the documented CLI resource recovery; failed provider count remains
+1 until its result is known.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 01:35 CDT, /root — importer and PHDR8 checkpoints published
 

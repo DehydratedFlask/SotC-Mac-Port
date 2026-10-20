@@ -79,6 +79,21 @@ assignment. Publication: commit `3e5ecea` (`docs: record NGS2 probe assignments`
 - Shared docs changed: HANDOFF and TASKS; EVIDENCE/INSTALL_LOG unchanged. Publication of this
   checkpoint precedes the CLI recovery attempt.
 
+## CLI recovery preparation checkpoint — 2026-10-20 01:50 CDT, `/root`
+
+- `mcp__rea__close_binary({})` completed with `result: null`; no successful query Evidence existed
+  to export. The provider timeout did not establish caller presence/absence.
+- `rea` is not on PATH (`rea --help` exited 127). The existing absolute CLI path
+  `/Users/dehydratedflask/.npm/_npx/a1722018f28f9df2/node_modules/.bin/rea` reports version 6.7.0;
+  its `--help` and `xrefs --help` commands exited 0.
+- Existing `local/re/rea-snapshot.json` targets the same ELF SHA-256 and Ghidra 12.1.4 profile
+  digest `769518a8e9b57f953dd241adbb63672f0f486bb3d66359b9deef7c5e088ca7aa`; file SHA-256
+  `d80232c4fe22d7e75654eade8db44af093507a94723f80dd5ce67605dd382354`, one existing cached entry.
+- Next exact action: copy this snapshot into this task's private evidence directory; run the absolute
+  CLI `xrefs` command with `GHIDRA_HEADLESS_MAXMEM=8G` and
+  `REA_GHIDRA_STARTUP_TIMEOUT_MS=1200000`; preserve complete JSON, stderr and exit code. The first
+  provider attempt remains one timeout; do not count the help/close operations as new attempts.
+
 ## Packet boundaries
 
 Each packet must report the exact imported symbol/NID and relocation slot, how the caller was
