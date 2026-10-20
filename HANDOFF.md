@@ -1,9 +1,42 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:37 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:39 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:37 CDT, `/root` — dynamic string terminator fixture worker dispatched
+## CURRENT CHECKPOINT — 2026-10-20 05:39 CDT, `/root` — dynamic string terminator fixture verified
+
+`RE-02-DYNLINK-STRING-TERMINATOR-01` is `FIXTURE_VERIFIED`. Worker `/root/re02_dynlink_terminator`
+changed only `scripts/test_ps4_dynlink.py`; root reviewed the exact one-test diff and independently
+replayed `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py`. Worker and root each
+passed 8 tests. The fixture shortens `DT_SCE_STRSZ` by one byte, omitting the final symbol-name NUL;
+`parse()` raises `ValueError`. Test SHA-256 `5802c92c056b876ea91f857431c2084108c8d418c1831aaf345d69ad0f343fa1`; unchanged parser
+SHA-256 `3de247fcd7f42f0358c00fb4beb58bc005ae89aeb54c12707793cbf8f8afd701`. Worker log
+`local/checkpoints/re02-dynlink-string-terminator-test.log`, SHA-256
+`698d16d7b93c4bd9707d3cfacda6fb1e0fea99ed0cda6e69bedc42772940540a`; root replay log
+`local/checkpoints/root-2026-10-20-re02-dynlink-string-terminator-review.log`, SHA-256
+`75ff54e727b57e4bd7b88956ed0c92c4b9a416e6f0976707e8fb54aa385ac0bd`.
+
+`python3 scripts/project_index.py` exited 0 at 4,166 folders (log
+`local/checkpoints/root-2026-10-20-re02-dynlink-string-terminator-complete-project-index.log`, SHA-256
+`f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`); `graft check` exited 0,
+graph synced at 1,260 nodes (optional deep meaning layer unbuilt; log
+`local/checkpoints/root-2026-10-20-re02-dynlink-string-terminator-complete-graft-check.log`, SHA-256
+`a4d55100d0ac4eda3f43b8c4a3e931bb916a6e2d10bfe3469707e7aac7c943f6`); `git diff --check` exited 0.
+Completion details are in [the checkpoint](docs/checkpoints/2026-10-20-root-re02-dynlink-string-terminator-complete.md).
+This synthetic string-table fixture does not establish live ELF, loader/runtime, relocation application,
+or game behavior; parent RE-02 remains active. Failed implementation tries: 0; install/dependencies
+unchanged; G1 NOT PASSED; G2 NOT RUN.
+
+`git diff --check` and cached diff check passed. `python3 -I scripts/audit_publish_paths.py` accepted
+the 6 staged paths (log SHA-256 `59db525646a3c5ba8e2c0a8994248d9690ea171f43b0b201f197121bc766e904`);
+`--all` accepted 642 paths (log SHA-256 `124219623ff31ea9616737f28b6ea701e4edcfc6205cd740a9341d849e182994`).
+`git fetch origin` exited 0, divergence 0/0 at `595ca47`. Commit and push remain pending.
+
+Next exact action: commit and push the verified test plus completion records, then claim the independent
+truncated-PHDR fixture. Changed paths are limited to the test and allowlisted port docs;
+generated/untracked `tools/graft/` is excluded.
+
+## PRIOR CHECKPOINT — 2026-10-20 05:37 CDT, `/root` — dynamic string terminator fixture worker dispatched
 
 `RE-02-DYNLINK-STRING-TERMINATOR-01` is claimed by root; worker `/root/re02_dynlink_terminator`
 was dispatched after publication and owns only `scripts/test_ps4_dynlink.py`. Root owns shared
