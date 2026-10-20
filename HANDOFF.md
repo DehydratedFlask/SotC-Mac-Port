@@ -28,6 +28,7 @@ Checkpoint (2026-10-19 19:59 CDT, bc-dc141fdf):
 - OBS: unguarded vmovups copy; src=0x1324f80 dst=0x3354180 bits=~0,~0,~0,0; distinct cells.
 - Commands: ctest -R vec_ef85e0 Passed; `python3 -I tools/lift/check_fef85e0.py` OK.
 - Next: allowlisted push to origin/main.
+- Push: pending this checkpoint (bc-dc141fdf 0xef85e0).
 - Store: Project `internal/worker-claim-cpu01-ef85e0.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 19:58 CDT, worker bc-cb8d07c2 (CPU-01g) — COMPLETE
