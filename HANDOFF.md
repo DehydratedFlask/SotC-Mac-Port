@@ -1,17 +1,17 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:16 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:19 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 21:16 CDT, root — SRV-01 arena accounting — ACTIVE
+## CURRENT CHECKPOINT — 2026-10-19 21:19 CDT, root — SRV-01 arena accounting — ACTIVE
 
 Claim and bounded plan: [SRV-01 arena-accounting checkpoint](docs/checkpoints/2026-10-19-root-srv01-accounting.md).
-The independent slice covers only the observed accounting instructions around `0x1a123–0x1a15a`
-inside `0x19ae0`; saved disassembly shows add at `+0x80`, unsigned max update at `+0x88`, and a
-mode-2 subtract at `+0x90`. These are survey observations pending Ghidra confirmation; field meanings
-remain unnamed. Next exact action: export the target function from the existing hash-pinned Ghidra
-project, verify its instructions and callers, then implement a pure offset-based native helper if
-Ghidra confirms the byte survey.
+The independent slice covers only the accounting instructions around `0x1a123–0x1a15a` in inner
+allocator candidate `0x19e00`; saved disassembly shows add at `+0x80`, unsigned max update at
+`+0x88`, and a mode-2 subtract at `+0x90`. Ghidra confirmed `0x19ae0` is a 372-byte wrapper whose
+call at `0x19b71` targets `0x19e00`; this is failed try 1 for the accounting slice. Next exact
+action: retarget the private exporter to `0x19e00` and check whether its body contains the block.
+These are survey observations pending that check; field meanings remain unnamed.
 
 ## STOPPED CLAIM — 2026-10-19 21:12 CDT, root — CPU-01d leaf 95 — NEEDS_PRINCIPAL
 
@@ -20,16 +20,17 @@ Ghidra 12.1.4 analysis/import succeeded for the exact ELF, but the target script
 `function_found=false` at `0xd71f60`. No function body or native fixture was recovered. No fourth
 try without a written principal reassessment.
 
-## ACTIVE CLAIM — 2026-10-19 21:15 CDT, root (SRV-01 arena accounting) — `0x19ae0` — ACTIVE
+## ACTIVE CLAIM — 2026-10-19 21:15 CDT, root (SRV-01 arena accounting) — `0x19e00` — ACTIVE
 
-Task: recover only the arena accounting block at `0x1a123–0x1a15a` and add a fixture-level native
-helper for raw fields at `+0x80`, `+0x88`, and conditional `+0x90`, without naming unknown fields
-or integrating them into allocator behavior. Claim uses the existing Ghidra project for the exact
-ELF `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`. Failed tries: 0.
+Task: recover only the arena accounting block at `0x1a123–0x1a15a` in inner allocator candidate
+`0x19e00` and add a fixture-level native helper for raw fields at `+0x80`, `+0x88`, and conditional
+`+0x90`, without naming unknown fields or integrating them into allocator behavior. Claim uses the
+existing Ghidra project for the exact ELF `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+Failed tries: 1; target query `0x19ae0` found only the wrapper, not the accounting block.
 Root owns `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/POINTERS.md`, `native/README.md`,
 `native/CMakeLists.txt`, and the task checkpoint. Planned worker-owned files after Ghidra confirms
 the block: `native/core/arena_accounting.{hpp,cpp}`, `native/tests/test_arena_accounting.cpp`, and
-`tools/lift/check_f19ae0_accounting.py`. Private exporter/output remain under `local/re/`.
+`tools/lift/check_f19e00_accounting.py`. Private exporter/output remain under `local/re/`.
 Do not edit `allocator_region.*`, free-list/list/bitmap code, or `0x19660`; do not claim G1.
 
 ## CLAIM — 2026-10-19 21:03 CDT, root (CPU-01d leaf 95) — `0xd71f60` — NEEDS_PRINCIPAL
