@@ -1,12 +1,13 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:59 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:00 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
 ## CURRENT CHECKPOINT — 2026-10-19 20:59 CDT, root — CPU-02 dispatcher behavior coverage — COMPLETE
 
 Claim and complete record: [checkpoint](docs/checkpoints/2026-10-19-root-cpu02-dispatch-claim.md).
 Claim checkpoint pushed as `2d237c2` and claim-publication note `5723b07` to `origin/main`.
+Completion checkpoint `d5f6ff9` is pushed to `origin/main`.
 Task slice: all 13 observed `0x66dec0` dispatch types now have byte-matched behavior coverage;
 dispatcher worker owned only `native/tests/test_addr.cpp`; root integrated docs and handoff.
 Failed tries: 0. Focused build/CTest and the 13-arm ELF checker passed. Current next exact action:
