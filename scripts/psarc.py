@@ -206,6 +206,8 @@ class Psarc:
             raise PsarcError('lzma blocks not implemented (explicitly unsupported)')
         if self.entry_size != 30 or not 0 < self.block_size <= 1 << 24:
             raise PsarcError('unsupported entry/block size')
+        if self.count < 1:
+            raise PsarcError('archive has no manifest entry')
         if not HEADER + self.entry_size * self.count <= self.toc_size <= self.size:
             raise PsarcError('TOC size inconsistent with entry count/file size')
         toc = self.f.read(self.toc_size - HEADER)

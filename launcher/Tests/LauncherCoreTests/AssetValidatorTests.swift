@@ -43,6 +43,20 @@ struct AssetValidatorTests {
         #expect(message.contains("pak0.psarc is not a PSARC archive"))
     }
 
+    @Test func rejectsDirectoryPresentedAsArchive() throws {
+        var files = Dictionary(uniqueKeysWithValues: AssetValidator.requiredArchives.map { ($0, Data("PSAR....".utf8)) })
+        files["pak1.psarc"] = nil
+        let dir = try makeDirectory(files)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try FileManager.default.createDirectory(
+            at: dir.appending(path: "pak1.psarc", directoryHint: .isDirectory), withIntermediateDirectories: false)
+        guard case .missing(let message) = AssetValidator().validate(directory: dir) else {
+            Issue.record("expected .missing")
+            return
+        }
+        #expect(message.contains("pak1.psarc not found"))
+    }
+
     @Test func nativeCoreIsNeverFaked() {
         #expect(SystemChecks.nativeCore(executable: nil) != .ready)
         #expect(SystemChecks.nativeCore(executable: URL(filePath: "/nonexistent/core")) != .ready)

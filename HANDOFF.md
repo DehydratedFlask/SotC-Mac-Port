@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — three edge fixtures verified (2 defects fixed)
+
+AUD-PUBLISH-EDGE-01 (audit now rejects `..` traversal), DATA-02-PSARC-EDGE-01 (zero-entry archive -> `PsarcError`), APP-01-ASSET-VALIDATOR-EDGE-01 (directory-as-archive test) are `FIXTURE_VERIFIED`; root re-ran all three suites (4, 15, 19 tests pass). Hashes/logs in `docs/checkpoints/2026-10-20-root-edge-fixtures-complete.md`. Synthetic only; G0 PARTIAL, G1-G6 NOT RUN; failed tries 0. Open follow-ups: nested forbidden dir under allowlisted top passes audit; corrupt zlib block raises `zlib.error`.
+
+Next exact action: pick further bounded tasks (e.g. the two open follow-ups above, AUD-02 partial NGS2 probes).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20 (session resumed), `/root` — RE-02 PT_DYNAMIC terminator verified
 
 `RE-02-DYNLINK-PT-DYNAMIC-TERMINATOR-01` is `FIXTURE_VERIFIED`. Root made the change directly (prior worker unreachable): `parse()` in `scripts/ps4_dynlink.py` rejects a `PT_DYNAMIC` span with no `DT_NULL` (`ValueError('unterminated PT_DYNAMIC segment')`); one new test in `scripts/test_ps4_dynlink.py`. `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py` exit 0, 10 tests; new test fails with the parser change stashed. Log SHA-256 `643c7cfc3921e5830e047bed28578bc933677c101c9c5a9f6610b6207052d03c`. Details: `docs/checkpoints/2026-10-20-root-re02-pt-dynamic-terminator-complete.md`. Synthetic only; G0 PARTIAL, G1-G6 NOT RUN. Failed tries: 0.
