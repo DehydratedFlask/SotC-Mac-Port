@@ -1,16 +1,16 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:26 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:30 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:26 CDT, `/root` — short-prefix audio classifier claim ready to publish
+## CURRENT CHECKPOINT — 2026-10-20 05:30 CDT, `/root` — short-prefix audio classifier fixture verified; publish checks pending
 
-`AUD-01-CLASSIFIER-SHORT-LE-PREFIX-01` is claimed by root; `/root/aud01_short_prefix` will own
-only `scripts/test_audio_headers.py`; root owns shared docs and Git. Parent `AUD-01` remains ACTIVE.
-The linked [ASSETS spec](docs/ASSETS.md#L59) labels the classifier output as prefix observations
-and keeps codecs UNKNOWN. `family_of` only assigns `sxd-le-small-ints` when at least 8 bytes are
-available for two complete little-endian words. The bounded fixture will pass seven bytes
-`01000000000000` and assert fallback label `other-01000000`; classifier behavior will not change.
+`AUD-01-CLASSIFIER-SHORT-LE-PREFIX-01` is `FIXTURE_VERIFIED`; `/root/aud01_short_prefix` changed
+only `scripts/test_audio_headers.py`, and root owns shared docs and Git. Parent `AUD-01` remains
+ACTIVE. The linked [ASSETS spec](docs/ASSETS.md#L59) labels classifier output as prefix observations
+and keeps codecs UNKNOWN. `FamilyTests.test_le_small_ints_short_prefix` passes seven bytes
+`01000000000000` to `family_of` and asserts fallback label `other-01000000`. The classifier is
+unchanged.
 
 Baseline `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_headers.py` exited 0 with 12
 tests. Log `local/checkpoints/root-2026-10-20-aud01-classifier-short-prefix-claim-baseline.log`,
@@ -35,12 +35,45 @@ paths (log `local/checkpoints/root-2026-10-20-aud01-classifier-short-prefix-clai
 SHA-256 `7697ade7ea7a8bd5ef2191bc207b3eb35d57e5bb408a7a881f5b8f027f2cfe0a`).
 `git diff --cached --check` exited 0 (empty log
 `local/checkpoints/root-2026-10-20-aud01-classifier-short-prefix-claim-diff-cached-check.log`).
-Fetch/divergence check remains. Next exact action: fetch and verify branch divergence, commit and push
-the claim, then dispatch the worker before any source edit.
+Before publication, `git fetch origin` exited 0 and divergence was 0/0. Claim commit `d150661`
+(`docs: claim audio prefix boundary fixture`) was pushed with `git push origin main` (exit 0);
+post-push fetch confirmed both `HEAD` and `origin/main` at `d150661`, with 0/0 divergence. Only
+after publication, `/root/aud01_short_prefix` was dispatched to edit
+`scripts/test_audio_headers.py` only. `/root/fixture_scout_data` is doing read-only discovery in a
+different test area and may not edit or claim work. Next exact action: review the worker's test
+diff and replay result, then update the completion evidence/checkpoint.
+
+Worker and root each ran `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_headers.py`; both
+exited 0 with 13 tests. Worker log `local/checkpoints/aud01-classifier-short-le-prefix-test.log`
+and root replay log `local/checkpoints/root-2026-10-20-aud01-classifier-short-prefix-review.log`
+have identical SHA-256 `b986091cdd4d7aeb1185de9a51d74065913d71702d10fa5dada3e4c584a2ddd7`. Test
+SHA-256 is `abd12598c65183a3de54865b298f0ae1d0ad806ddf7714be3515399d5e7d9217`; unchanged classifier
+`scripts/classify_audio_headers.py` SHA-256 is
+`a7dd214317b4797c31961a6055ec0e73a3c738c8282f35f3a309ef5db085a2bf`. The exact diff adds one
+assertion and no implementation change. Failed implementation tries: zero.
 
 This is one synthetic prefix-boundary assertion only; it does not identify a codec or establish
-runtime/audio behavior. G1 NOT PASSED, G2 NOT RUN; no dependency change. The claim checkpoint
-records the pre-edit scope and next exact action: publish the claim, then dispatch the worker.
+runtime/audio behavior. G1 NOT PASSED, G2 NOT RUN; no dependency change. The claim scope and
+pre-edit baseline are recorded in [the claim checkpoint](docs/checkpoints/2026-10-20-root-aud01-classifier-short-prefix-claim.md).
+Completion record: `python3 scripts/project_index.py` exited 0 at 4,166 folders (log
+`local/checkpoints/root-2026-10-20-aud01-classifier-short-prefix-complete-project-index.log`,
+SHA-256 `f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`); `graft check` exited
+0 at 1,259 nodes (log
+`local/checkpoints/root-2026-10-20-aud01-classifier-short-prefix-complete-graft-check.log`,
+SHA-256 `e15e6d217bbb31ada46d24290684c83a073816c320d047ffe187fe0433e3e1ec`); `git diff --check`
+exited 0 (empty log `local/checkpoints/root-2026-10-20-aud01-classifier-short-prefix-complete-diff-check.log`,
+SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). `docs/FOLDERS.md`
+lists 82 checkpoint files. Graft's optional deep meaning layer remains unbuilt. Staged publish-path
+audit accepted 7 allowlisted paths (log
+`local/checkpoints/root-2026-10-20-aud01-classifier-short-prefix-complete-publish-audit-staged.log`,
+SHA-256 `30393f3fe0641e875ca71ed54e51eb360b8fd51a4addbdde074d8a512be9c56c`); full audit accepted
+640 paths (log
+`local/checkpoints/root-2026-10-20-aud01-classifier-short-prefix-complete-publish-audit-all.log`,
+SHA-256 `594d67310f7bcf44774461fc9e611195fc925d4299e4bb0489270c8a7640d240`). Cached diff check
+exited 0 (empty log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). `git fetch
+origin` exited 0; precommit divergence was 0/0 (`HEAD` `d150661` and `origin/main` `d150661`).
+Next exact action: commit the allowlisted completion files, push `main`, and record post-push
+verification before claiming the next task.
 
 ## PRIOR CHECKPOINT — 2026-10-20 05:23 CDT, `/root` — invalid UTF-8 manifest fixture published
 
