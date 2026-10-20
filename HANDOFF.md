@@ -1,9 +1,40 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:40 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:41 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:39 CDT, `/root` — dynamic string terminator fixture verified
+## CURRENT CHECKPOINT — 2026-10-20 05:41 CDT, `/root` — truncated ELF PHDR fixture claimed
+
+`RE-01-ELF-PHDR-TRUNCATION-FIXTURE-01` is claimed by root; planned worker `/root/re01_phdr_truncation`
+may edit only `scripts/test_project_tools.py`. The parent RE-01 static-analysis prerequisite is
+verified. Graft located `unwrap()` in `scripts/unwrap_self.py:L10-L28` and the synthetic tool test
+at `scripts/test_project_tools.py:L20-L39`; the reference source is not represented in the current
+Graft result, so its pinned implementation was checked directly. The pin is clean at
+`70bb43859cd7ff181a6d409540b757866184d60d`, with `prepare.py` SHA-256
+`9459d439056e9ca61758ad8f3023f0c1e46b085dd1524644446af00374856890`.
+
+The baseline `PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_project_tools.py` exited 0 with 3 tests
+(log SHA-256 `7f651a454b7b284efe70fac28605ab5d9c389d39a8b6c9aae1f2193f021e78e2`). A private temp-dir
+probe changed `e_phnum` to 2 in a 128-byte synthetic ELF; `unwrap()` raised
+`ValueError: out of bounds: 0x78+0x38 / 0x80`, and neither output ELF nor `.identity.json` was
+written (log SHA-256 `150dd8818a39ab9d5fe111aae9934dc18608d32a6121dbfd1f338efa3e35cd47`). This is a
+synthetic parse boundary only. No source changed for this task; failed tries: 0; G1 NOT PASSED; G2
+NOT RUN. Full claim details are in [the checkpoint](docs/checkpoints/2026-10-20-root-re01-elf-phdr-truncation-claim.md).
+
+`python3 scripts/project_index.py` exited 0 at 4,166 folders (log SHA-256
+`f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`); `graft check` exited 0 with
+the graph current at 1,260 nodes (optional deep layer unbuilt; log SHA-256
+`a4d55100d0ac4eda3f43b8c4a3e931bb916a6e2d10bfe3469707e7aac7c943f6`); `git diff --check` passed.
+
+The previous dynamic-string task is complete and pushed as `38fad54`, with documentation sync
+`49fc041`; post-push fetch confirmed `HEAD` and `origin/main` at `49fc0410977d7bd85b5fc9f3b4fee8a69f4668d2`,
+0/0 divergence. Staged audit accepted 4 paths (log SHA-256
+`e0855adcdc747b2080484ec7216aa2bdd94b4c3d39e99b07b8f07466451c79e3`); full audit accepted 643 paths
+(log SHA-256 `8da1317b279da0ddbae311beac43039d38c0a750d552e532712eed17a3003671`). Precommit fetch
+exited 0, divergence 0/0 at `49fc041`. Claim commit/push remains pending. Next exact action: publish
+this claim, then dispatch the test-only worker. Generated/untracked `tools/graft/` remains excluded.
+
+## PRIOR CHECKPOINT — 2026-10-20 05:39 CDT, `/root` — dynamic string terminator fixture verified
 
 `RE-02-DYNLINK-STRING-TERMINATOR-01` is `FIXTURE_VERIFIED`. Worker `/root/re02_dynlink_terminator`
 changed only `scripts/test_ps4_dynlink.py`; root reviewed the exact one-test diff and independently
