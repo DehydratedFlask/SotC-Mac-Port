@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — nested-path audit and PSARC zlib handling verified
+
+`AUD-PUBLISH-NESTED-01` and `DATA-02-PSARC-ZLIB-CORRUPT-01` are `FIXTURE_VERIFIED` (6 and 16 tests pass, `--all` audit exit 0). Details and hashes: `docs/checkpoints/2026-10-20-root-audit-nested-psarc-zlib-complete.md`. Prior edge-fixture batch published as `8be3aa1`. Synthetic only; G0 PARTIAL, G1-G6 NOT RUN; failed tries 0.
+
+Next exact action: choose further bounded tasks (e.g. AUD-02 partial NGS2 probes need live REA/Ghidra and a fresh claim).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — three edge fixtures verified (2 defects fixed)
 
 AUD-PUBLISH-EDGE-01 (audit now rejects `..` traversal), DATA-02-PSARC-EDGE-01 (zero-entry archive -> `PsarcError`), APP-01-ASSET-VALIDATOR-EDGE-01 (directory-as-archive test) are `FIXTURE_VERIFIED`; root re-ran all three suites (4, 15, 19 tests pass). Hashes/logs in `docs/checkpoints/2026-10-20-root-edge-fixtures-complete.md`. Synthetic only; G0 PARTIAL, G1-G6 NOT RUN; failed tries 0. Open follow-ups: nested forbidden dir under allowlisted top passes audit; corrupt zlib block raises `zlib.error`.

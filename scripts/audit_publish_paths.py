@@ -41,6 +41,16 @@ FORBIDDEN_NAME_RE = re.compile(
     r")"
 )
 
+# Directory names forbidden at ANY depth (case-insensitive component match).
+FORBIDDEN_DIR_COMPONENTS = frozenset(
+    {
+        "shadow of the colossus",
+        "local",
+        "agentstores",
+        ".graft",
+    }
+)
+
 # Allowlisted top-level roots for a publish tree.
 ALLOWED_TOP = frozenset(
     {
@@ -87,6 +97,13 @@ def violations(paths: list[str]) -> list[str]:
         top = p.split("/", 1)[0]
         if top not in ALLOWED_TOP and p not in ALLOWED_TOP:
             bad.append(f"outside allowlist: {p}")
+            continue
+        nested = next(
+            (c for c in p.split("/")[:-1] if c.lower() in FORBIDDEN_DIR_COMPONENTS),
+            None,
+        )
+        if nested is not None:
+            bad.append(f"forbidden nested directory {nested!r}: {p}")
             continue
         for pref in FORBIDDEN_PREFIXES:
             if p == pref.rstrip("/") or p.startswith(pref):
