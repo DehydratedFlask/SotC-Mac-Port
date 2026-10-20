@@ -1,9 +1,40 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:14 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:17 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:14 CDT, `/root` — XFF short declared-length test claimed
+## CURRENT CHECKPOINT — 2026-10-20 05:17 CDT, `/root` — XFF short declared-length fixture verified
+
+`AUD-01-XFF-DECLARED-LENGTH-SHORTER-01` is `FIXTURE_VERIFIED`. Worker `/root/app01_readiness`
+added one test in `scripts/test_audio_bank_header.py` only. It starts from the valid XFF fixture,
+writes `len(member) - 1` into the little-endian declared-size word at offset `0x14`, and confirms
+`AudioBankFormatError` with the existing `decoded member length` message. Parser unchanged.
+Worker and root `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_bank_header.py` each exited
+0 with 7 tests. Worker log `local/checkpoints/aud01-xff-declared-length-shorter-test.log` SHA-256
+`fe836cbecd3b6b4f70bec51b58d30c3e45ad72ae7fb3cb63421a0f7337e651ae`; root log
+`local/checkpoints/root-2026-10-20-xff-short-length-review.log` has the same SHA-256.
+
+Test SHA-256 `250f829edfaa4cc6a7f74dd557f617cfa25228105b062adddf2cfce4e2d75531`; parser SHA-256
+remains `bdad7d192b0ecdb929daf5147a139e7545fd5c546f01ed4ffb4005f2cea9f9c0`. Graft finds the test
+at `scripts/test_audio_bank_header.py:L58-L63`; code graph check passes at 1,257 nodes / 530 source
+files, with optional deep meaning layer unbuilt. This establishes synthetic length-word rejection
+only, not codec, game audio, runtime use, or any game gate. No failed tries or dependency change.
+G1 NOT PASSED; G2 NOT RUN. See [completion checkpoint](docs/checkpoints/2026-10-20-root-aud01-xff-short-length-complete.md).
+
+The claim was published before the edit in commit `290c5c6`. Root review and worker verification
+are complete; the worker confirmed this checkpoint before exiting. `python3 scripts/project_index.py` exited 0 at 4,166 folders; `graft check` passed at
+1,257 nodes / 530 source files with the optional deep layer unbuilt; `git diff --check` passed.
+Logs are `local/checkpoints/root-2026-10-20-xff-short-length-complete-project-index.log` and
+`local/checkpoints/root-2026-10-20-xff-short-length-complete-graft-check.log`. E82 and the
+completion checkpoint are recorded; `docs/FOLDERS.md` lists 78 checkpoint files. Staged audit
+passed for 6 paths (log `local/checkpoints/root-2026-10-20-xff-short-length-complete-publish-audit-staged.log`,
+SHA-256 `7efd305835931509aad51b357bc3875bf875a47a808016d3a0689af75f959e9b`); full audit passed
+for 636 tracked paths (log `local/checkpoints/root-2026-10-20-xff-short-length-complete-publish-audit-all.log`,
+SHA-256 `e3d3d32b2a7830e4ee979c790b7a247b4d6100605f1c3a2b8974a71abe5031ac`). Fetch showed 0/0
+divergence. Next exact action: publish completion, then claim
+`DATA-02-ARCHIVE-MANIFEST-INVALID-UTF8-01` if still unclaimed.
+
+## PRIOR CHECKPOINT — 2026-10-20 05:14 CDT, `/root` — XFF short declared-length test claimed
 
 `AUD-01-XFF-DECLARED-LENGTH-SHORTER-01` is claimed by root with `/root/app01_readiness` as the
 test-only implementation worker. The worker owns only `scripts/test_audio_bank_header.py`; root

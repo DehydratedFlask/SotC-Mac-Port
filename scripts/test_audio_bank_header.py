@@ -55,6 +55,13 @@ class XffMemberTests(unittest.TestCase):
         with self.assertRaisesRegex(abh.AudioBankFormatError, 'decoded member length'):
             abh.parse_xff_member(member)
 
+    def test_rejects_size_word_shorter_than_decoded_span(self):
+        member = bytearray(make_member())
+        member[abh.XFF_SIZE_WORD_OFFSET:abh.XFF_MIN_MEMBER_SIZE] = (
+            (len(member) - 1).to_bytes(4, 'little'))
+        with self.assertRaisesRegex(abh.AudioBankFormatError, 'decoded member length'):
+            abh.parse_xff_member(member)
+
     def test_rejects_wrong_byte_order_size_word(self):
         member = bytearray(make_member())
         member[abh.XFF_SIZE_WORD_OFFSET:abh.XFF_MIN_MEMBER_SIZE] = len(member).to_bytes(4, 'big')

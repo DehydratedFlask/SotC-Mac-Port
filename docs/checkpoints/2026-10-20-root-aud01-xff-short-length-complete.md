@@ -1,0 +1,17 @@
+# Checkpoint: AUD-01-XFF-DECLARED-LENGTH-SHORTER-01 — fixture verified
+
+- Time / timezone: 2026-10-20 05:16 CDT
+- Agent and integrator: implementation `/root/app01_readiness`; review, shared docs and Git `/root`
+- Task / gate / status: `AUD-01-XFF-DECLARED-LENGTH-SHORTER-01`; `FIXTURE_VERIFIED`; no game gate implication
+- Prerequisite evidence / input and source hashes: `AUD-01-XFF-01` is fixture-verified; baseline parser SHA-256 `bdad7d192b0ecdb929daf5147a139e7545fd5c546f01ed4ffb4005f2cea9f9c0`; baseline test SHA-256 `cffef962db441ef64c8435b53205b9106e5fb3af6360d14e26a751df5a1fcb4c`; claim commit `290c5c6`
+- Owned / changed files: implementation changed only `scripts/test_audio_bank_header.py`; integrator updated `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/FOLDERS.md`, and this checkpoint
+- Hypothesis and expected result: a valid synthetic XFF member with a u32le declared size one byte smaller than the complete member length is rejected with the parser's length mismatch error
+- Exact command, CWD and nonsecret environment: from `/Volumes/Extra/SoC Mac Native`, `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_bank_header.py`
+- Exit / observed result: worker and root replay each exited 0; 7 tests pass
+- Log, capture and REA evidence paths/IDs: worker log `local/checkpoints/aud01-xff-declared-length-shorter-test.log`, SHA-256 `fe836cbecd3b6b4f70bec51b58d30c3e45ad72ae7fb3cb63421a0f7337e651ae`; root replay log `local/checkpoints/root-2026-10-20-xff-short-length-review.log`, SHA-256 `fe836cbecd3b6b4f70bec51b58d30c3e45ad72ae7fb3cb63421a0f7337e651ae`
+- Observation versus inference / coverage limitations: the fixture mutates offset `0x14` to `len(member) - 1`; the existing parser rejects it. Parser code did not change. This establishes only one synthetic malformed length case, not codec meaning, playback, or runtime use
+- Cumulative failed tries and distinct hypotheses: 0
+- Remaining risks / blockers: XFF codec and audio-engine behavior remain unknown; G1 NOT PASSED; G2 NOT RUN
+- Publication checks: `python3 -I scripts/audit_publish_paths.py` exited 0 for 6 staged paths; log `local/checkpoints/root-2026-10-20-xff-short-length-complete-publish-audit-staged.log`, SHA-256 `7efd305835931509aad51b357bc3875bf875a47a808016d3a0689af75f959e9b`; `python3 -I scripts/audit_publish_paths.py --all` exited 0 for 636 tracked paths; log `local/checkpoints/root-2026-10-20-xff-short-length-complete-publish-audit-all.log`, SHA-256 `e3d3d32b2a7830e4ee979c790b7a247b4d6100605f1c3a2b8974a71abe5031ac`; `git fetch origin` showed 0/0 divergence
+- Next exact action: commit and push the completion checkpoint, then verify the separate manifest UTF-8 candidate before claiming it
+- HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF, TASKS and EVIDENCE updated; E82 appended; INSTALL_LOG unchanged; `python3 scripts/project_index.py` exited 0 with 4,166 folders (`local/checkpoints/root-2026-10-20-xff-short-length-complete-project-index.log`, SHA-256 `f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`); generated `docs/FOLDERS.md` lists 78 checkpoint files; `graft check` exited 0 at 1,257 nodes / 530 source files, optional deep meaning layer unbuilt (`local/checkpoints/root-2026-10-20-xff-short-length-complete-graft-check.log`, SHA-256 `618ddc43b260a735660b1be6e0de2fa68cbdc86bfe54031aaaae53b1d09287ab`); `git diff --check` passed
