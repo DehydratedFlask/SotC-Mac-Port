@@ -1,16 +1,27 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:01 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:03 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 21:01 CDT, root — REA/Ghidra startup timeout — RECORDED
+## CURRENT CHECKPOINT — 2026-10-19 21:03 CDT, root — CPU-01d leaf 95 Ghidra headless attempt — ACTIVE
 
-The focused `mcp__rea__analyze_function({procedure:"0xd71f60"})` request ended with
-`provider_timeout` after REA's fixed 330,000 ms startup deadline; it produced no Evidence ID and
-no function dossier. This is not a CPU-01 implementation try. Details and Ghidra run/log paths are
-in [checkpoint](docs/checkpoints/2026-10-19-root-cpu02-dispatch-claim.md). Next exact action:
-inspect installed Ghidra headless options for a private offline analysis run that can exceed the
-REA timeout; do not repeat REA's import until its startup timeout can be raised.
+Claim and exact try plan: [CPU-01d leaf 95 checkpoint](docs/checkpoints/2026-10-19-root-cpu01d-d71f60.md).
+The earlier REA query timed out at 330,000 ms with no Evidence ID (details in the CPU-02 checkpoint).
+Try baseline remains 1. This bounded recovery attempt is try 2: use local Ghidra headless with
+`GHIDRA_HEADLESS_MAXMEM=8G` and `-analysisTimeoutPerFile 1800`; export the exact function body,
+instructions, references, and decompiler result for the hash-pinned ELF before writing the native
+leaf. Next exact action: create the private one-function exporter and run the pinned local analysis.
+
+## ACTIVE CLAIM — 2026-10-19 21:03 CDT, root (CPU-01d leaf 95) — `0xd71f60` — ACTIVE
+
+Task: recover the 17-byte unguarded vector-copy leaf at survey index 95, then add a native
+fixture/test/checker if Ghidra confirms it. Exact ELF SHA256:
+`d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+Baseline failed tries: 1; this is the second distinct hypothesis, not a reset. Owned private
+analysis files: `local/re/work/ghidra-scripts/ExportD71F60.java` and
+`local/re/evidence/ghidra-d71f60.txt`. If evidence succeeds, the leaf/test/checker files listed in
+the linked checkpoint become root-owned, with root integrating `native/CMakeLists.txt` and docs.
+`startup_ctors.*` remains out of scope. No native source edited yet.
 
 ## CURRENT CHECKPOINT — 2026-10-19 20:59 CDT, root — CPU-02 dispatcher behavior coverage — COMPLETE
 
