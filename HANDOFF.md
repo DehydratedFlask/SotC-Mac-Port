@@ -1,6 +1,6 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:24 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:19 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
 ## ACTIVE CLAIM — 2026-10-19 20:20 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 63 — COMPLETE
@@ -11,16 +11,18 @@ Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
 Checkpoint: ctest 35/35; check_fdda990 OK; registry size **27** (+63 `0xdda990` / `f83ba81`).
 Owned: `native/core/startup_ctors.*`, `native/tests/test_startup_ctors.cpp`, `HANDOFF.md`.
 
-## ACTIVE CLAIM — 2026-10-19 20:18 CDT, worker bc-9aa0fe88 (SRV-01 mem carve) — IN PROGRESS
+## ACTIVE CLAIM — 2026-10-19 20:18 CDT, worker bc-9aa0fe88 (SRV-01 mem carve) — COMPLETE
 
 Task: SRV-01 mem — lift pure free-list carve-fit math from RVA **0x1a800** (fit/align only).
-Failed tries: 0. Status: IN PROGRESS.
-Owned (new only): `native/core/free_list_carve.{hpp,cpp}`, `native/tests/test_free_list_carve.cpp`,
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/free_list_carve.{hpp,cpp}`, `native/tests/test_free_list_carve.cpp`,
 `tools/lift/check_f1a800_carve.py`, `native/CMakeLists.txt` (+free_list_carve only; keep host_map),
-`docs/POINTERS.md` (carve row). Store: Project `internal/worker-claim-srv01-carve.md`.
-**Does NOT edit:** `allocator_region.*`, `startup_ctors.*`, Drive gaps, peer vec WIP.
-Blocked alternative: MAP_FIXED for preferred_base≠0 — OBS at 0x479c2 passes object context in rdi, not a VA.
-Exact check: ctest -R free_list_carve; `python3 -I tools/lift/check_f1a800_carve.py`.
+`docs/POINTERS.md`, `native/README.md`, `native/core/host_map.hpp` (MAP_FIXED blocker comment).
+**Did NOT edit:** `allocator_region.*`, `startup_ctors.*`, Drive gaps, peer vec WIP.
+Blocked alternative (documented): MAP_FIXED — `0x479c2` rdi is object context, not preferred VA.
+Checkpoint: ctest free_list_carve Passed; check_f1a800_carve.py OK; check_host_map_calls.py OK.
+Store: Project `internal/worker-claim-srv01-carve.md`.
+
 
 ## ACTIVE CLAIM — 2026-10-19 20:18 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 61/62 — COMPLETE
 
