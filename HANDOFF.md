@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:48 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:50 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:48 CDT, `/root` — dynamic relocation-size fixture claimed
+## CURRENT CHECKPOINT — 2026-10-20 05:50 CDT, `/root` — dynamic relocation-size fixture claim published
 
 `RE-02-DYNLINK-RELOC-SIZE-ALIGNMENT-01` is claimed by root; planned worker `/root/re02_reloc_size`
 may edit only `scripts/test_ps4_dynlink.py`. Parent `RE-02-DYNLINK-01` is `FIXTURE_VERIFIED`. Graft
@@ -32,8 +32,11 @@ Staged publish audit accepted 5 paths (log SHA-256
 `b67b54402ee8f7164c3289c8b12a1e265d6b970170a5820d0ed70f6ecb6d28a8`); full audit accepted 645
 paths (log SHA-256 `0a112a0a7f6223bf9d658059d9eb8391491e08b092e3d435912b98ba0ff5989f`). Before the
 claim commit, `git fetch origin` confirmed 0/0 divergence at `c2e64072b893c1cda1190ffbcab0f1c2196c9728`.
-Next exact action: commit and push this claim, verify post-push 0/0 state, then dispatch the
-test-only worker. Generated/untracked `tools/graft/` stays excluded.
+Claim commit `1d9fd51` was pushed; post-push fetch confirmed `HEAD` and `origin/main` at
+`1d9fd510b6689d00c2d532ca348ab14ee7ca0c9d`, 0/0 divergence (log SHA-256
+`963474beb458a10798e3bf6eacf9e00adf190c4cabe995d251625c4c8a48ae1e`). Next exact action:
+dispatch the test-only worker, review its single-file diff, and replay the targeted suite.
+Generated/untracked `tools/graft/` stays excluded.
 ## PRIOR CHECKPOINT — 2026-10-20 05:46 CDT, `/root` — truncated ELF PHDR fixture verified
 
 `RE-01-ELF-PHDR-TRUNCATION-FIXTURE-01` is `FIXTURE_VERIFIED`. Worker `/root/re01_phdr_truncation`
