@@ -1,6 +1,11 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctor 0xce6130 lifted
+
+`CPU-01-LEAF-CTOR-NEXT-01` `FIXTURE_VERIFIED`: `native/core/vec_ce6130.*`, test, and `tools/lift/check_fce6130.py`; root replay 121/121 ctest pass, checker exit 0. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-ce6130-complete.md`. Not registered in `startup_ctors`; no runtime claim. G0 PARTIAL, G1-G6 NOT RUN. Pending: worker for VoiceHandle interval `0x950850..0x951deb` (one REA query).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — VoiceHandle remaining 98 candidates attributed
 
 `AUD-02-NGS2-VOICEHANDLE-REMAINING-01`: 98 candidates -> 36 Ghidra-confirmed (new functions `FUN_0094b2c0`, `FUN_0099b400`), 62 heuristic-only (largest interval `0x950850..0x951deb`, 27 candidates, unqueried), 0 unattributed. 2 REA successes, 0 failures; root replayed verifier and checksums. Details: `docs/checkpoints/2026-10-20-root-ngs2-voicehandle-remaining-candidates-complete.md`. Static only; no reachability/runtime/ABI claim. G0 PARTIAL, G1-G6 NOT RUN.
