@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — SAV-01 region dossier verified
+
+First function-level save-region characterization: dispatcher `FUN_00a4d330` (task dword → `FUN_00a47d60` / `FUN_00a4ab90` / `FUN_00a48280`), load/save call orders, and hash helper `FUN_00161f50` (FNV-1a 32-bit form, offset basis passed by both load and save). 2 REA successes; root replayed verifier and checksums. Details (strings kept private): `docs/checkpoints/2026-10-20-root-sav01-region-dossier-complete.md`. Header layout and hash coverage are inference only; no save works. SAV-01 → ACTIVE. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 198/198 (batch 20, pushed `0d2b855`).
+
+Next exact action: producer-of-body/header step (caller of buffer-object constructor `FUN_00a51180`, one REA query + byte verification); pending `STRAGGLERS-01` worker (`local/re/evidence/stragglers-*-01/`).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors batch 20 (0xc060a0 .. 0xbd7a80) lifted
 
 `CPU-01-LEAF-CTOR-BATCH-20` `FIXTURE_VERIFIED`; root replay on a fresh build 198/198 ctest pass, six checkers exit 0; manifest position 169 (`0xc060a0`) had been missed by batch 19 and is now covered. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-20-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending workers: `STRAGGLERS-01` (`local/re/evidence/stragglers-*-01/`, 3 REA queries) and `SAV-01-REGION-DOSSIER-01` (`local/re/evidence/sav01-region-dossier-01/`, ≤2 REA queries).
