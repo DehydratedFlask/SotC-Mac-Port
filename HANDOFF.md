@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 06:01 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 06:02 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 06:01 CDT, `/root` — XFF bytes-like completion checks passed
+## CURRENT CHECKPOINT — 2026-10-20 06:02 CDT, `/root` — XFF bytes-like fixture published
 
 `AUD-01-XFF-BYTES-LIKE-INPUT-01` is `FIXTURE_VERIFIED`; worker `/root/aud01_xff_bytes_like` changed only `scripts/test_audio_bank_header.py`. One valid synthetic XFF fixture passed as `bytes`, `bytearray`, and `memoryview` yields identical reports and confirms the declared-length match. Worker and root each passed 8 tests with `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_bank_header.py`.
 
@@ -17,7 +17,9 @@ The claim and its sync are published as `ebed0ee` and `3941f8f`; both post-push 
 
 `git diff --check` and `git diff --cached --check` exited 0 (empty-log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). The staged audit accepted 6 paths (log SHA-256 `077d2a8bab7548fbf73b9b6b3c8aee1cb9a6a96697d7d81e37ce9e48177c7892`); the full audit accepted 648 paths (log SHA-256 `bb5b1d6afeeb44c41a7748b5a50ff1549317085b97ef5b4892001953e1992597`). Precommit fetch confirmed 0/0 divergence at `3941f8f9fe25a9aa4a269fde8441496950088bad` (log SHA-256 `239cb8d281a104c9c61678eca788f9756028f6424db33b220fdf526f5bebe500`).
 
-Exact next action: commit and push the six allowlisted paths; afterward record post-push synchronization and claim the independent PSARC block-table boundary fixture. Generated/untracked `tools/graft/` stays excluded.
+Completion commit `05b3e52dda61a488732c08853a66c42c57e61fd4` (`test: cover XFF bytes-like inputs`) was pushed successfully. Post-push fetch confirmed `HEAD` and `origin/main` match at `05b3e52dda61a488732c08853a66c42c57e61fd4`, 0/0 divergence (log SHA-256 `778a32f121e4ae9457f7d2d70abda29ad863fe67ad9dda390adf722ebe47152f`).
+
+Exact next action: publish this post-push checkpoint sync, then claim the independent PSARC block-table boundary fixture. Generated/untracked `tools/graft/` stays excluded.
 
 ## PRIOR CHECKPOINT — 2026-10-20 05:46 CDT, `/root` — truncated ELF PHDR fixture verified
 
