@@ -44,7 +44,7 @@ Gates and test evidence take precedence over a status label. Integrator owns thi
 | AUD-02 | Recover used voice/rack contracts | RE-02, AUD-01 | ACTIVE (partial: three bounded imported-callsite/dataflow packets claimed for system creation, rack creation and voice control; parameter semantics, audio behavior and runtime remain unclassified) / root+workers | 0 |
 | AUD-02-NGS2-SYSCREATE-01 | Byte-check one callsite/dataflow path for `sceNgs2SystemCreateWithAllocator` | RE-02, AUD-01 | ACTIVE (claim published; static probe underway) / `/root/aud02_syscreate` | 0 |
 | AUD-02-NGS2-RACKCREATE-01 | Byte-check one callsite/dataflow path for `sceNgs2RackCreate` | RE-02, AUD-01 | ACTIVE (claim published; static probe underway) / `/root/aud02_rackcreate` | 0 |
-| AUD-02-NGS2-VOICE-CONTROL-01 | Byte-check one callsite/dataflow path for `sceNgs2VoiceControl` | RE-02, AUD-01 | ACTIVE (claim published; root probe pending) / root | 0 |
+| AUD-02-NGS2-VOICE-CONTROL-01 | Byte-check one callsite/dataflow path for `sceNgs2VoiceControl` | RE-02, AUD-01 | ACTIVE (first MCP xref timed out before analysis result; process-local CLI recovery pending; 0 analysis hypotheses tested) / root | 1 (Ghidra MCP startup timeout; no xref result) |
 | AUD-03 | Decoder/mixer/effect fixtures | AUD-02 | WAITING_FOR_DEPENDENCY | 0 |
 | AUD-04 | Actual game audio integration | AUD-03, CPU-04 | WAITING_FOR_DEPENDENCY | 0 |
 | SAV-01 | Recover game serializer/checksums | RE-02 | WAITING_FOR_DEPENDENCY | 0 |
