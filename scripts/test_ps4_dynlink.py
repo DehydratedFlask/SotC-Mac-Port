@@ -150,6 +150,27 @@ class Tests(unittest.TestCase):
         with self.assertRaises(ValueError):
             d.parse(bytes(elf))
 
+    def test_parse_rejects_relocation_table_sizes_not_multiple_of_24(self):
+        dynamic_offset = 64 + 2 * 56
+        cases = (
+            ('PLTRELSZ', 'bad JMPREL size'),
+            ('RELASZ', 'bad RELA size'),
+        )
+        for tag_name, expected_message in cases:
+            with self.subTest(tag=tag_name):
+                elf, _ = dynamic_import_elf_fixture()
+                elf = bytearray(elf)
+                tag_offset = next(
+                    offset
+                    for offset in range(dynamic_offset, dynamic_offset + 12 * 16, 16)
+                    if struct.unpack_from('<Q', elf, offset)[0] == d.DT_SCE[tag_name]
+                )
+                struct.pack_into('<Q', elf, tag_offset + 8, 23)
+
+                with self.assertRaises(ValueError) as error:
+                    d.parse(bytes(elf))
+                self.assertEqual(str(error.exception), expected_message)
+
     def test_encode_id_widths(self):
         self.assertEqual([d.encode_id(v) for v in (0, 63, 64, 0xfff, 0x1000)],
                          ['A', '-', 'BA', '--', 'BAA'])

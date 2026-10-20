@@ -1,42 +1,37 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:50 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:52 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:50 CDT, `/root` — dynamic relocation-size fixture claim published
+## CURRENT CHECKPOINT — 2026-10-20 05:52 CDT, `/root` — relocation-size fixture verified
 
-`RE-02-DYNLINK-RELOC-SIZE-ALIGNMENT-01` is claimed by root; planned worker `/root/re02_reloc_size`
-may edit only `scripts/test_ps4_dynlink.py`. Parent `RE-02-DYNLINK-01` is `FIXTURE_VERIFIED`. Graft
-found the synthetic fixture at `scripts/test_ps4_dynlink.py:L18-L94`, relocation-size checks in
-`scripts/ps4_dynlink.py:L111-L119`, and the test class at `scripts/test_ps4_dynlink.py:L97-L182`.
+`RE-02-DYNLINK-RELOC-SIZE-ALIGNMENT-01` is `FIXTURE_VERIFIED`; worker `/root/re02_reloc_size`
+changed only `scripts/test_ps4_dynlink.py`. The test separately creates fresh dynamic-import
+fixtures with `DT_SCE_PLTRELSZ=23` and `DT_SCE_RELASZ=23`, asserting the exact `bad JMPREL size`
+and `bad RELA size` errors. Worker and root each passed 9 tests using
+`PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py`. Test SHA-256
+`24c3f839f15dcf8c0842e8c2d523e61884ee982411cd68a3bedea918ce52ce62`; unchanged parser SHA-256
+`3de247fcd7f42f0358c00fb4beb58bc005ae89aeb54c12707793cbf8f8afd701`; worker/root log SHA-256
+`d9d734ee1c2de67b748aeef1c4126433aa438ad8375ca953916f12b1df11414d`.
 
-Baseline `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py` exited 0 with 8 tests
-(log SHA-256 `75ff54e727b57e4bd7b88956ed0c92c4b9a416e6f0976707e8fb54aa385ac0bd`). Direct probes set
-`DT_SCE_PLTRELSZ` at offset 312 and `DT_SCE_RELASZ` at offset 344 to 23; both raised their matching
-`ValueError` (probe log SHA-256 `d6b5ac7cb91be096195ee8f9629c37b0d5a4399d00e0809f7ac956efd8304877`). Test SHA-256 is
-`5802c92c056b876ea91f857431c2084108c8d418c1831aaf345d69ad0f343fa1`; parser SHA-256 remains
-`3de247fcd7f42f0358c00fb4beb58bc005ae89aeb54c12707793cbf8f8afd701`. No source code has changed
-for this task. Coverage is two malformed synthetic sizes only; no relocation application, live
-loader/runtime, or game behavior is inferred. Failed tries: 0; G1 NOT PASSED; G2 NOT RUN.
+This is synthetic parser coverage only. It establishes no real relocation application, live
+loader/runtime behavior, game import reachability, or game acceptance gate. Failed tries: 0;
+G1 NOT PASSED; G2 NOT RUN. Full checkpoint: [relocation-size fixture completion](docs/checkpoints/2026-10-20-root-re02-dynlink-reloc-size-complete.md).
 
-The preceding PHDR fixture completion is pushed as `6b25210`; documentation sync `c2e6407` is also
-pushed, and post-push fetch confirmed `HEAD` and `origin/main` at
-`c2e64072b893c1cda1190ffbcab0f1c2196c9728`, 0/0 divergence. Full PHDR result:
-[checkpoint](docs/checkpoints/2026-10-20-root-re01-elf-phdr-truncation-complete.md).
+Claim `1d9fd51` and claim-publication sync `b47b261` are pushed. Post-push fetch verified the sync
+at `b47b261b847c69efbac63a55ac64879b711a73df`, with `HEAD` and `origin/main` equal and 0/0
+divergence (log SHA-256 `0b552e9b6402dc697adc6e293a33f60bd5b80ece0c4bb9cb129690dcd7ee5ed3`). `graft check`
+exited 0 with the wiring graph in sync at 1,262 nodes / 530 source files; optional deep layer
+remains unbuilt (log SHA-256 `4d71ed6a4ffb4191e8d496618d7e1b8546575627f07a92c04175d23fb85f4479`).
 
-`python3 scripts/project_index.py` exited 0 at 4,166 folders (log SHA-256
-`f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`); `graft check` passed at
-1,261 nodes / 530 source files with the optional deep layer unbuilt (log SHA-256
-`aee730338a7d5b56fc470a890a84002f6a85cc96cb0fa3ef7572fdb751c3ca60`); `git diff --check` passed.
-Staged publish audit accepted 5 paths (log SHA-256
-`b67b54402ee8f7164c3289c8b12a1e265d6b970170a5820d0ed70f6ecb6d28a8`); full audit accepted 645
-paths (log SHA-256 `0a112a0a7f6223bf9d658059d9eb8391491e08b092e3d435912b98ba0ff5989f`). Before the
-claim commit, `git fetch origin` confirmed 0/0 divergence at `c2e64072b893c1cda1190ffbcab0f1c2196c9728`.
-Claim commit `1d9fd51` was pushed; post-push fetch confirmed `HEAD` and `origin/main` at
-`1d9fd510b6689d00c2d532ca348ab14ee7ca0c9d`, 0/0 divergence (log SHA-256
-`963474beb458a10798e3bf6eacf9e00adf190c4cabe995d251625c4c8a48ae1e`). Next exact action:
-dispatch the test-only worker, review its single-file diff, and replay the targeted suite.
-Generated/untracked `tools/graft/` stays excluded.
+`python3 scripts/project_index.py` exited 0 and indexed 4,166 folders (log SHA-256
+`f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`). Cached diff check passed
+(empty SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`); staged audit
+accepted 6 paths (SHA-256 `1a9f7a6556130744d67e24b28fa4022f001706f137121031a3abef5db09fe6fe`); full audit
+accepted 646 paths (SHA-256 `eaf4ec3c27cbe73e2e047a4cbf7195a33e913e45b77e56fa6661b8e328884fe8`). Precommit
+fetch confirmed 0/0 divergence at `b47b261b847c69efbac63a55ac64879b711a73df`. Exact next action: commit
+and push this completion record with the test. Generated/untracked `tools/graft/` stays excluded.
+
 ## PRIOR CHECKPOINT — 2026-10-20 05:46 CDT, `/root` — truncated ELF PHDR fixture verified
 
 `RE-01-ELF-PHDR-TRUNCATION-FIXTURE-01` is `FIXTURE_VERIFIED`. Worker `/root/re01_phdr_truncation`
