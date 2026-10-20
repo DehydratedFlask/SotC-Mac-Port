@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:16 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:19 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:16 CDT, /root — XFF reader published; RE-02 and CPU-01 bounded claims prepared
+## CURRENT CHECKPOINT — 2026-10-19 23:19 CDT, /root — two bounded agents dispatched after published claims
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -154,8 +154,8 @@ semantics. Do not claim a codec, NGS2 contract, gameplay use, or playback.
 - Observation: the parser reports only XFF magic, opaque bytes 4..19, and the length word.
   Remaining risk: other field meanings, codec, NGS2 behavior, gameplay use, and playback stay
   UNKNOWN. Task status FIXTURE_VERIFIED (bounded slice), failed implementation tries 0. The
-  allowlisted source/evidence batch was pushed in `7b2747b`. Next exact action: publish the two
-  independent bounded task claims below, then assign their distinct files to the named agents.
+  allowlisted source/evidence batch was pushed in `7b2747b`. The two independent task claims below
+  were published in `00844f9` and dispatched to agents with distinct owned files.
 - A separate read-only CPU survey proposed RVA `0xcc5a10`; it decodes to the same 16-byte constant
   copy behavior covered by 95 existing fixtures, so root deferred it for low marginal semantic
   coverage. This was task selection only, not a failed implementation try.
@@ -176,8 +176,8 @@ Claim record: [RE-02-DYNLINK-01 checkpoint](docs/checkpoints/2026-10-19-root-re0
   a concrete defect; stop and report before widening owned paths.
 - Exact acceptance command: `python3 -I scripts/test_ps4_dynlink.py`. Fixture success establishes
   parser behavior for these bytes only; it does not establish loader execution, ABI behavior, or
-  runtime addend semantics. Failed tries: 0. The next action after claim publication is to assign
-  the test file and request the exact result/log path.
+  runtime addend semantics. Failed tries: 0. At 23:19 CDT, `/root/re02_triage` was assigned the
+  test-only implementation.
 
 ### CPU-01-CTOR-PREFIX-01 — fail-fast original constructor prefix — ACTIVE CLAIM
 
@@ -206,8 +206,15 @@ Claim record: [CPU-01-CTOR-PREFIX-01 checkpoint](docs/checkpoints/2026-10-19-roo
   `cmake --build local/build/native --target test_startup_ctors`;
   `ctest --test-dir local/build/native -R '^startup_ctors$' --output-on-failure`;
   `python3 -I tools/lift/check_ctor_slots.py`. This gate verifies native runner bookkeeping only;
-  it does not establish startup reachability or G1. Failed tries: 0. Assign only after this claim
-  and its pre-implementation checkpoint are pushed.
+  it does not establish startup reachability or G1. Failed tries: 0. At 23:19 CDT,
+  `/root/cpu_leaf_survey` was assigned the four claimed implementation paths.
+
+### Parallel dispatch checkpoint — 2026-10-19 23:19 CDT
+
+See [the parallel claims dispatch checkpoint](docs/checkpoints/2026-10-19-root-parallel-claims-dispatched.md).
+Both claims were pushed before assignment; workers own distinct paths and do not edit shared docs
+or commit/push. Current exact action: collect both bounded results, verify each acceptance command
+and evidence log, then update task/evidence status without implying runtime behavior.
 
 ### Current publication checkpoint
 
