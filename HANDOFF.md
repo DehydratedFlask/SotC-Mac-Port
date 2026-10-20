@@ -1,28 +1,26 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:10 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:12 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 21:10 CDT, root — CPU-01d leaf 95 Ghidra headless attempt — ACTIVE
+## CURRENT CHECKPOINT — 2026-10-19 21:12 CDT, root — CPU-01d leaf 95 — NEEDS_PRINCIPAL
 
-Claim and exact try plan: [CPU-01d leaf 95 checkpoint](docs/checkpoints/2026-10-19-root-cpu01d-d71f60.md).
-The earlier REA query timed out at 330,000 ms with no Evidence ID (details in the CPU-02 checkpoint).
-The first exporter compile found the `getReferencesFrom(Address)` array return type; the private
-script now iterates that array and its JDK 25/Ghidra 12.1.4 `javac` check passes. Failed tries remain
-2; the headless import/export is try 3. The import process remains active. Next exact action: let
-the hash-pinned import finish and inspect the target export. If this focused attempt fails, stop and
-escalate; do not try a fourth time without principal reassessment.
+Claim and three-try record: [CPU-01d leaf 95 checkpoint](docs/checkpoints/2026-10-19-root-cpu01d-d71f60.md);
+[escalation](docs/escalations/CPU-01d-d71f60.md). Ghidra 12.1.4 headless analysis/import succeeded
+for the exact ELF, but the target script returned `function_found=false` at `0xd71f60`. No function
+body or native fixture was recovered. This leaf is stopped after three failed tries and requires
+principal reassessment before any fourth try. Next independent action: claim the SRV-01 arena
+accounting slice around `0x1a123–0x1a15a`.
 
-## ACTIVE CLAIM — 2026-10-19 21:03 CDT, root (CPU-01d leaf 95) — `0xd71f60` — ACTIVE
+## CLAIM — 2026-10-19 21:03 CDT, root (CPU-01d leaf 95) — `0xd71f60` — NEEDS_PRINCIPAL
 
 Task: recover the 17-byte unguarded vector-copy leaf at survey index 95, then add a native
 fixture/test/checker if Ghidra confirms it. Exact ELF SHA256:
 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
-Baseline failed tries: 2; the current repaired exporter/import is the third and final try. Owned private
-analysis files: `local/re/work/ghidra-scripts/ExportD71F60.java` and
-`local/re/evidence/ghidra-d71f60.txt`. If evidence succeeds, the leaf/test/checker files listed in
-the linked checkpoint become root-owned, with root integrating `native/CMakeLists.txt` and docs.
-`startup_ctors.*` remains out of scope. No native source edited yet.
+Failed tries: 3; no fourth try without a principal reassessment. Private analysis files:
+`local/re/work/ghidra-scripts/ExportD71F60.java`, `local/re/evidence/ghidra-d71f60.txt`, and the
+headless import/script logs. The target function was not defined at the requested address in the
+imported Ghidra program. No native source was edited. `startup_ctors.*` remains out of scope.
 
 ## CURRENT CHECKPOINT — 2026-10-19 20:59 CDT, root — CPU-02 dispatcher behavior coverage — COMPLETE
 
