@@ -1,9 +1,25 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:36 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:38 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:36 CDT, /root — G0 environment baseline artifact verified
+## CURRENT CHECKPOINT — 2026-10-20 00:38 CDT, /root — RE-02 missing program header 10 claimed
+
+Task `RE-02-MISSING-PHDR10-01` is claimed as a read-only, hash-bound examination of the one
+unclassified SELF/ELF program header. The pinned reader is
+`reference/ShadowOfTheColossus-PC/scripts/prepare.py` at commit
+`70bb43859cd7ff181a6d409540b757866184d60d`; its working tree was clean. The local identity record
+reports program-header index 10 as type `0x6fffff01`, `p_offset=65,211,380`, `p_filesz=2,928`,
+`p_memsz=0`, alignment 16, and `missing_segments=[10]`. The pinned reader's code only rejects
+unavailable headers for four listed types; index 10 is not in that list, which establishes parser
+behavior only, not the ELF type's platform meaning. Claim:
+[RE-02-MISSING-PHDR10-01](docs/checkpoints/2026-10-20-root-re02-missing-phdr10-claim.md).
+`python3 scripts/project_index.py` exited 0 with 4,132 folders indexed; `git diff --check` passed.
+Exact next action: audit and publish this bounded claim, then dispatch the read-only verifier to
+`/root/phdr10` while `/root/srv01_page_map_19660` finishes the independent slot-10 helper analysis.
+Preserve the source ELF, original SELF, and pinned reference clone.
+
+## PREVIOUS CHECKPOINT — 2026-10-20 00:36 CDT, /root — G0 environment baseline artifact verified
 
 Task `G0-ENV-BASELINE-01` ran the six read-only commands in `docs/VALIDATION.md` separately through
 `python3 -I local/validation/g0-env-baseline-20261020/capture.py`; wrapper exit 0. All six inner
