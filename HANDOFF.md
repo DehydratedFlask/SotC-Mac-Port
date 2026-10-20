@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:00 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:01 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:00 CDT, /root — two bounded analyses root-verified; publication pending
+## CURRENT CHECKPOINT — 2026-10-20 01:01 CDT, /root — two bounded analyses published
 
 ### CPU-01-CTOR10-CALLER-STATE-01 — STATIC_ANALYSIS_VERIFIED
 
@@ -24,9 +24,17 @@ source review remain private under `local/re/`.
 Prepublication checks: `python3 scripts/project_index.py` exited `0` (`4,135 folders indexed; written`);
 generated `docs/FOLDERS.md` records 37 checkpoint files. The last source-graph check at 00:54 exited
 `0` with wiring synchronized; no source files changed since then. Root source pages and exact search
-queries are captured in the linked private root review. Exact next action: run `git diff --check`,
-stage only the six allowlisted documentation files, run staged/full publication audits and staged
-whitespace check, fetch/check divergence, then commit and push. Failed hypotheses: 0 for both slices.
+queries are captured in the linked private root review. At the prepublication checkpoint, the exact
+next action was to stage only the six allowlisted documentation files, run staged/full publication
+audits and staged whitespace check, fetch/check divergence, then commit and push. Failed hypotheses:
+0 for both slices.
+
+Publication succeeded in commit `f6d0944` (`docs: verify caller guards and PHDR10 source audit`).
+Staged audit accepted 6 paths; full audit accepted 592; `git diff --cached --check` passed; fetch
+succeeded and pre-commit divergence was `0 0`. Push advanced `f0889da..f6d0944`. Post-push status
+is clean, HEAD equals origin/main at `f6d09449eaa07ac38cce1cbaa7e31f550b82a5f4`, divergence `0 0`.
+Exact next action: identify and claim the next small, independent CPU-01/RE-02 slice after checking
+its prerequisites and linked specification. Parent CPU-01 and RE-02 remain ACTIVE; G1 NOT PASSED.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 00:55 CDT, /root — PHDR10 public-source search dispatched
 
