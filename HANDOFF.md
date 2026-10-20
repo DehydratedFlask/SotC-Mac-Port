@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 05:20 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 05:23 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED; G2 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 05:20 CDT, `/root` — invalid UTF-8 manifest fixture verified
+## CURRENT CHECKPOINT — 2026-10-20 05:23 CDT, `/root` — invalid UTF-8 manifest fixture published
 
 `DATA-02-ARCHIVE-MANIFEST-INVALID-UTF8-01` is `FIXTURE_VERIFIED`. `/root/next_fixture_scout`
 changed only `scripts/test_archive_overlap_map.py`; root owns shared docs and Git. The synthetic
@@ -41,9 +41,13 @@ for 638 tracked paths; log `local/checkpoints/root-2026-10-20-manifest-invalid-u
 `97f579edf358380283ad37c51bf10d49eb6c105f337aa2aecb6af65b15627696`. `git diff --cached --check`
 exited 0; empty log `local/checkpoints/root-2026-10-20-manifest-invalid-utf8-complete-diff-cached-check.log`.
 `git fetch origin` exited 0; `git rev-list --left-right --count origin/main...HEAD` returned `0 0`.
-No install/dependency change. This test establishes rejection of one synthetic invalid-byte
-sequence only; it does not prove live manifest/archive behavior, payload semantics, or any game
-gate. G1 NOT PASSED and G2 NOT RUN. Next exact action: commit and push the six allowlisted paths.
+Commit `1a31774` (`test: reject invalid UTF-8 manifests`) was pushed with `git push origin main`
+(exit 0). A post-push fetch confirmed `origin/main` at `1a31774`, with 0/0 divergence. The only
+remaining untracked path is `tools/graft/`; it was not staged or changed by this task. No
+install/dependency change. This test establishes rejection of one synthetic invalid-byte sequence
+only; it does not prove live manifest/archive behavior, payload semantics, or any game gate. G1
+NOT PASSED and G2 NOT RUN. Next exact action: select and claim another independent bounded task
+before dispatching any worker.
 
 ## PRIOR CHECKPOINT — 2026-10-20 05:17 CDT, `/root` — invalid UTF-8 manifest test claimed
 
