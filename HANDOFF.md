@@ -3,6 +3,22 @@
 Updated: 2026-10-19 22:14 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 22:15 CDT, worker bc-81763e53 (CPU-01d) — 0xceb890 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xceb890** (survey index 142).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_ceb890.{hpp,cpp}`, `native/tests/test_vec_ceb890.cpp`,
+`tools/lift/check_fceb890.py`, `native/CMakeLists.txt` (+vec_ceb890 only; origin/main base).
+Private dump (not published): `local/re/work/cceb890.bin`.
+Skipped: 95; busy `0xcee8a0`; prior D `0xcf44a0`=`52f309f`.
+Did NOT edit Drive / SRV / `startup_ctors.*` / `local/`.
+Checkpoint (2026-10-19 22:15 CDT, bc-81763e53):
+- OBS: unguarded vmovups copy; src=0x12f9b60 dst=0x3351d60 bits=~0,~0,~0,0; index 142; distinct cells.
+- Commands: ctest -R '^vec_ceb890$' Passed; `python3 -I tools/lift/check_fceb890.py` OK.
+- Logs: `/tmp/ctest_ceb890.log`, `/tmp/check_fceb890.log`.
+- Store: Project `internal/worker-claim-ceb890.md`.
+- Push: (this commit).
+
 ## ACTIVE CLAIM — 2026-10-19 22:14 CDT, worker bc-02397584 (CPU-01d) — 0xcee8a0 — COMPLETE
 
 Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xcee8a0** (survey index 137).
