@@ -3,6 +3,23 @@
 Updated: 2026-10-19 20:32 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
+## ACTIVE CLAIM — 2026-10-19 20:28 CDT, worker bc-9aa0fe88 (SRV-01 mem list) — COMPLETE
+
+Task: SRV-01 mem — intrusive list surgery OBS after split at **0x1a902..0x1a961** / **0x1a974..0x1a9b7**.
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/region_list.{hpp,cpp}`, `native/tests/test_region_list.cpp`,
+`tools/lift/check_f1a902_list.py`, `native/CMakeLists.txt` (+region_list only; keep host_map/carve/split),
+`docs/POINTERS.md`, `native/README.md`, `docs/TASKS.md`.
+**Did NOT edit:** `allocator_region.*`, `startup_ctors.*`, Drive, peer vec WIP.
+Deferred: full `0x19660` replenish via `0x19e00`.
+Checkpoint (2026-10-19 20:28 CDT, bc-9aa0fe88):
+- OBS: links @+0x20 (identity/prev/next); owner @+0x38; unlink self-loop; head via `[arena+0x10]`; inc `[arena+0x20]`.
+- Commands: ctest -R '^(region_list|region_split|free_list_carve|host_map)$' 4/4 Passed;
+  `python3 -I tools/lift/check_f1a902_list.py` OK; split/carve ties OK.
+- Logs: `/tmp/ctest_region_list.log`, `/tmp/check_f1a902_list.log`.
+- Store: Project `internal/worker-claim-srv01-list.md`.
+- Push: **`94b8332`** on origin/main (code+CMake+POINTERS/README); docs follow-up this commit.
+
 ## ACTIVE CLAIM — 2026-10-19 20:32 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 84/86/87/88/89 — COMPLETE
 
 Task: CPU-01e — register peer FIXTURE_VERIFIED `0xd84ee0` (84), `0xd7fe90` (86),
