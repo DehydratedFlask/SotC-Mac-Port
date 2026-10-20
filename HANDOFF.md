@@ -1,9 +1,36 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:35 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 01:38 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:35 CDT, /root — importer and PHDR8 checkpoints published
+## CURRENT CHECKPOINT — 2026-10-20 01:38 CDT, /root — NGS2 callsite packets claimed
+
+Three bounded AUD-02 static packets are now claimed: `AUD-02-NGS2-SYSCREATE-01` for
+`sceNgs2SystemCreateWithAllocator`, `AUD-02-NGS2-RACKCREATE-01` for `sceNgs2RackCreate`, and
+`AUD-02-NGS2-VOICE-CONTROL-01` for `sceNgs2VoiceControl`. Root is the sole shared-document
+integrator and initially owns all three claims; separate workers will be assigned to system and
+rack creation after this claim checkpoint is published. The static voice-control packet remains
+root-owned. Claims and boundaries:
+[checkpoint](docs/checkpoints/2026-10-20-root-aud02-ngs2-callsite-claims.md).
+
+Input identity: `local/re/eboot.elf` SHA-256
+`d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; import manifest
+`local/re/imports.json` SHA-256
+`78caaaae139b7c5d4d2618abab2e50e9f6918ea3cec73a90b81e0005c83b6744`. The manifest contains 11
+NGS2 import records. `first_site` is an import relocation/slot address, not a game callsite; each
+packet must resolve the import chain and byte-check any chosen caller against the exact ELF.
+Acceptance is limited to static callsite/argument-dataflow observations with unresolved pointers
+and indirect edges retained. No NGS2 command contract, audio format, playback, ABI, or runtime
+behavior is inferred. Prerequisites are the existing RE-02 import manifest, AUD-01 inventory and
+Stage 3 instructions in `docs/REVERSE_ENGINEERING.md`; G1 remains NOT PASSED.
+
+This claim checkpoint has not yet been published. Exact next action: regenerate the project
+folder index, run the Graft freshness and staged/full publication audits, then commit and push only
+allowlisted documentation. After publication dispatch two workers on disjoint private evidence
+directories, root probes VoiceControl, and the integrator reviews all reports and reproduces the
+byte/hash verification. Initial failed-try counts are zero for all three packets.
+
+## PREVIOUS CHECKPOINT — 2026-10-20 01:35 CDT, /root — importer and PHDR8 checkpoints published
 
 ### Publication record — preceding checkpoint
 
