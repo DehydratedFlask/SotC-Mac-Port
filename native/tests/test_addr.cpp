@@ -107,6 +107,81 @@ int main() {
         CHECK(v == 0x80000800);
     }
 
+    // Exercise every 0x66dec0 jump-table arm through the native behavior, with
+    // a full-buffer comparison so no neighboring field or padding may change.
+    {
+        struct DispatchArm {
+            std::uint32_t type;
+            std::int32_t field_offset;  // -1 denotes a no-op arm
+        };
+        constexpr DispatchArm arms[] = {
+            {2, 0x0c}, {3, 0x20}, {4, 0x20}, {5, 0x20}, {6, 0x20},
+            {7, -1}, {8, -1}, {9, -1}, {10, -1}, {11, -1},
+            {12, 0x18}, {13, 0x14}, {14, 0x18},
+        };
+        constexpr std::uint32_t field_offsets[] = {0x0c, 0x14, 0x18, 0x20};
+        const Tagged31 object_ref{0x80000100};
+
+        auto seed_object = [&](std::uint8_t (&object)[0x28]) {
+            for (std::size_t i = 0; i < sizeof(object); ++i) {
+                object[i] = static_cast<std::uint8_t>(0x35u + i * 13u);
+            }
+            for (std::size_t i = 0; i < sizeof(field_offsets) / sizeof(field_offsets[0]); ++i) {
+                const std::uint32_t value = 0x800u + static_cast<std::uint32_t>(i) * 0x10u;
+                std::memcpy(object + field_offsets[i], &value, sizeof(value));
+            }
+        };
+
+        for (const DispatchArm& arm : arms) {
+            alignas(4) std::uint8_t object[0x28];
+            alignas(4) std::uint8_t expected[sizeof(object)];
+            seed_object(object);
+            std::memcpy(expected, object, sizeof(object));
+
+            const bool should_change = arm.field_offset >= 0;
+            if (should_change) {
+                std::uint32_t value = 0;
+                std::memcpy(&value, expected + arm.field_offset, sizeof(value));
+                CHECK((value & Tagged31::kTag) == 0);
+                value |= Tagged31::kTag;
+                std::memcpy(expected + arm.field_offset, &value, sizeof(value));
+            }
+
+            CHECK(dispatch_retag(arm.type, object_ref, object, heap) == should_change);
+            CHECK(std::memcmp(object, expected, sizeof(object)) == 0);
+        }
+
+        auto check_unchanged = [&](std::uint32_t type, Tagged31 ref) {
+            alignas(4) std::uint8_t object[0x28];
+            alignas(4) std::uint8_t before[sizeof(object)];
+            seed_object(object);
+            std::memcpy(before, object, sizeof(object));
+            CHECK(!dispatch_retag(type, ref, object, heap));
+            CHECK(std::memcmp(object, before, sizeof(object)) == 0);
+        };
+
+        check_unchanged(0, object_ref);
+        check_unchanged(1, object_ref);
+        check_unchanged(15, object_ref);
+        check_unchanged(std::numeric_limits<std::uint32_t>::max(), object_ref);
+        check_unchanged(2, Tagged31{0});
+
+        CHECK(!dispatch_retag(2, object_ref, nullptr, heap));
+
+        auto check_unsuccessful_field = [&](std::uint32_t value) {
+            alignas(4) std::uint8_t object[0x28];
+            alignas(4) std::uint8_t before[sizeof(object)];
+            seed_object(object);
+            std::memcpy(object + 0x0c, &value, sizeof(value));
+            std::memcpy(before, object, sizeof(object));
+            CHECK(!dispatch_retag(2, object_ref, object, heap));
+            CHECK(std::memcmp(object, before, sizeof(object)) == 0);
+        };
+        check_unsuccessful_field(0);             // null field
+        check_unsuccessful_field(0x1000);        // exactly at the exclusive heap limit
+        check_unsuccessful_field(0x80000800);    // already tagged
+    }
+
     std::puts("addr: all checks passed");
     return 0;
 }
