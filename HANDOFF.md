@@ -1,6 +1,11 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors 0xc686e0, 0xc66580, 0xc65f80, 0xc65da0 lifted
+
+`CPU-01-LEAF-CTOR-BATCH-12` `FIXTURE_VERIFIED`; root replay 155/155 ctest pass, four checkers exit 0. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-12-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending: `SAV-01-SAVEDATA-INITIALIZE3-01` and `SAV-01-SAVEDATA-UMOUNTWITHBACKUP-01` workers (one REA query each; evidence under `local/re/evidence/sav01-savedata-initialize3-01/` and `local/re/evidence/sav01-savedata-umountwithbackup-01/`).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — AudioOutOpen and SaveDataSetParam callsites verified
 
 `sceAudioOutOpen` sole callsite `0x9ac2dd` (in `FUN_009ac1f0`) and `sceSaveDataSetParam` sole callsite `0xa4bcb1` (in `FUN_00a4ab90`) are byte- and REA-verified (2 provider successes; root replayed both verifiers and all checksum sets). Details: `docs/checkpoints/2026-10-20-root-audioout-open-and-savedata-setparam-complete.md`. Static only. G0 PARTIAL, G1-G6 NOT RUN.
