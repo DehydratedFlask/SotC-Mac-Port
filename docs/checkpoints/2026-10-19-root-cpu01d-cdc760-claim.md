@@ -46,3 +46,12 @@
 - Remaining risks: leaf fixture only; no engine chain, startup reachability, or G1 evidence. Keep original ELF private and read-only. The escalated `0xd71f60` remains untouched.
 - Next exact action: implement only the native leaf, its fixture, checker, and build/docs mapping; verify before closing the task.
 - Task status: ACTIVE CLAIM; failed tries: 0.
+- Publication update — 2026-10-19 22:56 CDT, `/root`: allowlisted claim docs were staged via
+  `git add HANDOFF.md docs/TASKS.md docs/FOLDERS.md
+  docs/checkpoints/2026-10-19-root-cpu01d-cdc760-claim.md`; the staged audit passed 4 paths and
+  `python3 -I scripts/audit_publish_paths.py --all` passed 558 paths. `git commit -m "docs: claim
+  cdc760 native fixture"` created `1494700`; `git push origin main` exited 0 and advanced `main`
+  from `c87fc87`. DATA-02/AUD-01 script edits remained unstaged. Observation: claim evidence and
+  bounded scope are public. Inference unchanged: no startup reachability or game behavior proven.
+  Next exact action: implement and verify the native fixture/checker; task remains ACTIVE CLAIM,
+  attempt count 0.

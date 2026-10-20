@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 22:54 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 22:56 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 22:54 CDT, /root — DATA-02 + AUD-01 identity slices and CPU-01d `0xcdc760` — ACTIVE CLAIMS
+## CURRENT CHECKPOINT — 2026-10-19 22:56 CDT, /root — DATA-02 + AUD-01 identity slices and CPU-01d `0xcdc760` — ACTIVE CLAIMS
 
 Root claims one archive-identity gap: stream-hash the 12,838,532,222-byte private
 `local/extracted/CUSA08809/pakN.psarc` and populate its private PSARC summary. The current
@@ -82,6 +82,12 @@ checkpoint/docs integration. Failed tries: 0.
   separate `0xd71f60` escalation remains untouched. Next exact action: after claim publication,
   implement the fixture/checker, verify its focused target and preserve all private binary data.
   G1 NOT PASSED; G2-G6 NOT RUN.
+- Claim publication checkpoint: `git add HANDOFF.md docs/TASKS.md docs/FOLDERS.md
+  docs/checkpoints/2026-10-19-root-cpu01d-cdc760-claim.md`, `python3 -I
+  scripts/audit_publish_paths.py` (exit 0, 4 staged paths), `python3 -I
+  scripts/audit_publish_paths.py --all` (exit 0, 558 paths), `git commit -m "docs: claim cdc760
+  native fixture"` (commit `1494700`), and `git push origin main` (exit 0, updated `main`).
+  All CPU claim docs are now public; game-derived data and implementation edits are not staged.
 
 ## PRIOR CHECKPOINT — 2026-10-19 22:41 CDT, /root — CPU-01d `0xce7300` metadata correction — FIXTURE_VERIFIED
 
