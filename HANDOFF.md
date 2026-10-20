@@ -1,15 +1,15 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 01:52 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 02:01 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 01:52 CDT, /root — provider failures published; third CLI attempt next
+## CURRENT CHECKPOINT — 2026-10-20 02:01 CDT, /root — rack path verified; VoiceControl caller unresolved
 
-Three bounded AUD-02 static packets are in progress: `AUD-02-NGS2-SYSCREATE-01` for
-`sceNgs2SystemCreateWithAllocator` (worker `/root/aud02_syscreate`),
-`AUD-02-NGS2-RACKCREATE-01` for `sceNgs2RackCreate` (worker `/root/aud02_rackcreate`), and
-`AUD-02-NGS2-VOICE-CONTROL-01` for `sceNgs2VoiceControl` (root). Root is the sole shared-document
-integrator. Claims and boundaries:
+Three bounded AUD-02 static packets are tracked: `AUD-02-NGS2-SYSCREATE-01` for
+`sceNgs2SystemCreateWithAllocator` remains with worker `/root/aud02_syscreate`;
+`AUD-02-NGS2-RACKCREATE-01` for `sceNgs2RackCreate` has one root-verified static path; and
+`AUD-02-NGS2-VOICE-CONTROL-01` for `sceNgs2VoiceControl` has one observed slot-reference address,
+but its caller is unresolved. Root is the sole shared-document integrator. Claims and boundaries:
 [checkpoint](docs/checkpoints/2026-10-20-root-aud02-ngs2-callsite-claims.md).
 
 Input identity: `local/re/eboot.elf` SHA-256
@@ -31,6 +31,59 @@ accepted four allowlisted documentation paths, full audit accepted 600 tracked p
 showed divergence `0 0`. `git status --short` showed only those four staged documentation paths
 plus the pre-existing untracked `tools/graft/.cache/telemetry-repo-id.json`; the latter was not
 staged.
+
+### Rack-create root review — 2026-10-20 02:01 CDT, `/root`
+
+- Task: `AUD-02-NGS2-RACKCREATE-01`; bounded status: `STATIC_PATH_BYTE_VERIFIED`; worker analysis
+  recorded one checker correction failure and zero failed analysis hypotheses. Root independently
+  checked all 45 dossier manifest entries and replayed the byte verifier.
+- Exact commands, from `local/re/evidence/aud02-ngs2-rackcreate-01/`: `shasum -a 256 -c
+  SHA256SUMS.txt` (exit 0); `python3 -I relocation_probe.py` (exit 0, JSON `status=PASS`). Root
+  records are outside the worker dossier: `local/re/evidence/aud02-ngs2-rackcreate-01-root-review.command.txt`,
+  `.exit.txt`, `-root-checksums.log` (SHA-256
+  `f69469305e050a01078d2608eec06897fa62a7e6aa3989c4c79bf85be8f1f7cd`), and
+  `-root-verification.json` (SHA-256
+  `9c4dc2ecdffd331f165cd4b51cc25876531ca8a7077213c4016f3499a778ce29`; stderr empty).
+- Observation: exact bytes verify the path `FUN_0099f9d0` → direct call `0x99fbda` → thunk
+  `0xf913e0` → import slot `0x1600fe0` → symbol index 235 / NID `cLV4aiT9JpA`. Ghidra Evidence IDs
+  are `ev_a9e34cdb3a950ac6383904cc81900d855e237014bcce91559c6ab3c3ed33700b` and
+  `ev_2deb0a5ce856ce8e4a229183e5ab1a5819498ebe9398990d786bcb62f2f95e8b`; the private report is
+  `local/re/evidence/aud02-ngs2-rackcreate-01/report.md` (SHA-256
+  `75d2acf0c42524de299d4ae1216bc9af2ed6c83d3740068aab53789c4b13e86c`).
+- Limits: unresolved `CALL RAX` at `0x99fa67`, runtime import binding, reachability, ABI, NGS2
+  meaning, and runtime behavior. No inference beyond static bytes. No game execution.
+- Shared files updated: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, and this checkpoint
+  file. `INSTALL_LOG.md` unchanged. Next: continue independent `sceNgs2SystemCreateWithAllocator`
+  work; no further rack-create implementation is needed for this bounded packet.
+
+### VoiceControl slot-reference checkpoint — 2026-10-20 02:01 CDT, `/root`
+
+- Task: `AUD-02-NGS2-VOICE-CONTROL-01`; status ACTIVE; failed provider attempts remain 2 (MCP
+  timeout and CLI missing `GHIDRA_INSTALL_DIR`); failed analysis hypotheses 0. The third provider
+  invocation succeeded, so it does not increment the failed-try count.
+- Exact check: `env GHIDRA_INSTALL_DIR=/Users/dehydratedflask/Applications/ghidra_12.1.4_PUBLIC
+  GHIDRA_HEADLESS_MAXMEM=8G REA_GHIDRA_STARTUP_TIMEOUT_MS=1200000
+  /Users/dehydratedflask/.npm/_npx/a1722018f28f9df2/node_modules/.bin/rea xrefs
+  "/Volumes/Extra/SoC Mac Native/local/re/eboot.elf" 0x1601020 --provider ghidra --snapshot
+  "/Volumes/Extra/SoC Mac Native/local/re/evidence/aud02-ngs2-voice-control-01/rea-snapshot.json"
+  --format json --full-output`, with stdout redirected to
+  `local/re/evidence/aud02-ngs2-voice-control-01/root-cli-xrefs-attempt3.json` and stderr to
+  `root-cli-xrefs-attempt3.stderr.log`. Exit 0 after 368,841 ms. REA 6.7.0/Ghidra 12.1.4; input
+  ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; profile digest
+  `769518a8e9b57f953dd241adbb63672f0f486bb3d66359b9deef7c5e088ca7aa`; result SHA-256
+  `1e92beb96166045a5400d31b8c26bf3fe0c9023f988fb87b5c7fb27e493857a7`; stderr empty. Snapshot
+  SHA-256 after the query: `a9be5c00599247ba1d1141f4b1b05434485727106f493a26af5f4eb1dd3eb9c5`.
+- REA Evidence ID `ev_6a01174bbe75c6fd1ee3aab2a3c6e3f9f05ff63a84cb77ee9d9d9423635ac22c`; query
+  address `0x1601020` returned the single reference address `0xf91460`, with observed confidence.
+  This address-only xrefs result does not expose the reference kind or identify the callsite or
+  caller; it is not a VoiceControl path yet.
+- Remaining risks: no caller, function, argument bytes, NGS2 behavior, ABI, or runtime binding has
+  been established. Exact next action: use REA CLI `function` on `0xf91460` with the same ELF,
+  Ghidra configuration, and private snapshot; retain complete output and unresolved edges. If that
+  next targeted provider check fails, the third unsuccessful try requires stopping and escalating
+  `AUD-02-NGS2-VOICE-CONTROL-01` under AGENTS.md.
+- No source or game bytes changed. Shared files updated: `HANDOFF.md`, `docs/TASKS.md`,
+  `docs/EVIDENCE.md`, and this checkpoint file. `INSTALL_LOG.md` unchanged.
 
 ### Dispatch checkpoint — 2026-10-20 01:40 CDT, `/root`
 

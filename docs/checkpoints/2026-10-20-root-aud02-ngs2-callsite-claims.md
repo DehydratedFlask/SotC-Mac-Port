@@ -121,6 +121,54 @@ assignment. Publication: commit `3e5ecea` (`docs: record NGS2 probe assignments`
   `local/checkpoints/2026-10-20-root-aud02-cli-config-publish-all.log`, SHA-256
   `8f022f03c0f875d7113c9cd175501ae1b25edf7b6cb184065982160db56df4d4`.
 
+## Rack-create root review — 2026-10-20 02:01 CDT, `/root`
+
+- Task: `AUD-02-NGS2-RACKCREATE-01`; bounded status `STATIC_PATH_BYTE_VERIFIED`; worker recorded
+  one checker correction failure and zero failed analysis hypotheses. Root independently replayed
+  the dossier checksum manifest and byte verifier.
+- Exact commands from `local/re/evidence/aud02-ngs2-rackcreate-01/`: `shasum -a 256 -c
+  SHA256SUMS.txt` (exit 0); `python3 -I relocation_probe.py` (exit 0; JSON `status=PASS`). Root
+  outputs: checksum log SHA-256
+  `f69469305e050a01078d2608eec06897fa62a7e6aa3989c4c79bf85be8f1f7cd`; verifier JSON SHA-256
+  `9c4dc2ecdffd331f165cd4b51cc25876531ca8a7077213c4016f3499a778ce29`; verifier stderr empty.
+- Observation: bytes verify `FUN_0099f9d0` → direct call `0x99fbda` → thunk `0xf913e0` → import
+  slot `0x1600fe0` → symbol index 235 / NID `cLV4aiT9JpA`. Evidence IDs are
+  `ev_a9e34cdb3a950ac6383904cc81900d855e237014bcce91559c6ab3c3ed33700b` (slot xrefs) and
+  `ev_2deb0a5ce856ce8e4a229183e5ab1a5819498ebe9398990d786bcb62f2f95e8b` (caller function).
+- Limitations: targetless `CALL RAX` at `0x99fa67`, runtime import binding and reachability remain
+  unresolved. No ABI, command meaning, NGS2 behavior, or runtime claim. No game execution.
+- Files changed: HANDOFF, TASKS, EVIDENCE, this checkpoint. `INSTALL_LOG.md` unchanged. Next exact
+  action: continue independent system-creation work; no more rack analysis is needed for this
+  bounded packet.
+
+## VoiceControl slot-reference checkpoint — 2026-10-20 02:01 CDT, `/root`
+
+- Task: `AUD-02-NGS2-VOICE-CONTROL-01`; status ACTIVE; failed provider attempts 2 (MCP startup
+  timeout; CLI missing `GHIDRA_INSTALL_DIR`); failed binary-analysis hypotheses 0. Third provider
+  invocation succeeded and does not increase the failed-try count.
+- Exact check: `env GHIDRA_INSTALL_DIR=/Users/dehydratedflask/Applications/ghidra_12.1.4_PUBLIC
+  GHIDRA_HEADLESS_MAXMEM=8G REA_GHIDRA_STARTUP_TIMEOUT_MS=1200000
+  /Users/dehydratedflask/.npm/_npx/a1722018f28f9df2/node_modules/.bin/rea xrefs
+  "/Volumes/Extra/SoC Mac Native/local/re/eboot.elf" 0x1601020 --provider ghidra --snapshot
+  "/Volumes/Extra/SoC Mac Native/local/re/evidence/aud02-ngs2-voice-control-01/rea-snapshot.json"
+  --format json --full-output`, stdout `local/re/evidence/aud02-ngs2-voice-control-01/root-cli-xrefs-attempt3.json`,
+  stderr `root-cli-xrefs-attempt3.stderr.log`. Exit 0 after 368,841 ms; result SHA-256
+  `1e92beb96166045a5400d31b8c26bf3fe0c9023f988fb87b5c7fb27e493857a7`; stderr empty. ELF SHA-256
+  `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; REA 6.7.0/Ghidra
+  12.1.4; profile digest `769518a8e9b57f953dd241adbb63672f0f486bb3d66359b9deef7c5e088ca7aa`.
+- Evidence ID `ev_6a01174bbe75c6fd1ee3aab2a3c6e3f9f05ff63a84cb77ee9d9d9423635ac22c`; slot query
+  `0x1601020` returned one reference address `0xf91460`, confidence `observed`. The xrefs result
+  omits reference kind and does not yet identify a caller or callsite.
+- Observation versus inference: one address is an observed static reference result. It does not
+  show that a VoiceControl call executes or identify function arguments, ABI, runtime import
+  binding, or NGS2 behavior.
+- Remaining risk / next exact action: run REA CLI `function` on `0xf91460` with the same ELF,
+  Ghidra settings, and private snapshot; preserve JSON, stderr, and exit. The next failed targeted
+  provider check would be the third unsuccessful try and requires stopping and escalating this
+  task under AGENTS.md.
+- Files changed: HANDOFF, TASKS, EVIDENCE, this checkpoint. No code, binary, or install change;
+  `INSTALL_LOG.md` unchanged. G1 remains NOT PASSED.
+
 ## Packet boundaries
 
 Each packet must report the exact imported symbol/NID and relocation slot, how the caller was
