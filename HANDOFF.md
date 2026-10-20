@@ -1,6 +1,6 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:37 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:24 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
 ## ACTIVE CLAIM — 2026-10-19 20:36 CDT, worker bc-73721c8d (CPU-01d) — 0xd94cb0 — COMPLETE
@@ -29,7 +29,7 @@ Checkpoint (2026-10-19 20:24 CDT, bc-81763e53):
 - OBS: unguarded vmovups copy; src=0x130b1a0 dst=0x3352c10 bits=~0,~0,~0,0; index 79; distinct cells.
 - Commands: ctest -R '^vec_d90310$' Passed; `python3 -I tools/lift/check_fd90310.py` OK.
 - Logs: `/tmp/ctest_d90310.log`, `/tmp/check_d90310.log`.
-- Sources on origin: `277ef68` (bundled). CMake: (pending this commit).
+- Sources on origin: `277ef68` (bundled with peer d94cb0). CMake: `b980851` on origin/main.
 - Store: Project `internal/worker-claim-d90310.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:33 CDT, worker bc-9aa0fe88 (SRV-01 mem split) — COMPLETE
