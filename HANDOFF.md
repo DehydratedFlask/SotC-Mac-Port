@@ -1,9 +1,25 @@
-# SoC Mac Native — agent handoff
-
-Updated: 2026-10-20 06:20 CDT (America/Chicago). Principal: `/root`.
+Updated: 2026-10-20 07:17 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 06:20 CDT, `/root` — DATA-02 manifest NUL-path fixture verified
+## CURRENT CHECKPOINT — 2026-10-20 07:17 CDT, `/root` — RE-02 claim published; goal paused
+
+`RE-02-DYNLINK-PT-DYNAMIC-TERMINATOR-01` is claimed by `/root`; worker `/root/re02_pt_dynamic_terminator` owns only `scripts/ps4_dynlink.py` and `scripts/test_ps4_dynlink.py`. The bounded change is for `parse()` to reject a `PT_DYNAMIC` declared span that contains no `DT_NULL` tag, with a synthetic fixture shortening both `p_filesz` and `p_memsz` by 16 bytes. Expected error: `ValueError('unterminated PT_DYNAMIC segment')`. The ELF gABI defines `DT_NULL` as the dynamic-array terminator and ignores its value: https://refspecs.linuxfoundation.org/elf/gabi4%2B/ch5.dynamic.html. The linked project instructions are in `docs/REVERSE_ENGINEERING.md`, Stage 1, which requires validating dynamic-table lengths/offsets and rejecting malformed data.
+
+Baseline `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py` exited 0 with 9 tests, log `local/checkpoints/root-2026-10-20-re02-pt-dynamic-terminator-claim-baseline.log`, SHA-256 `d9d734ee1c2de67b748aeef1c4126433aa438ad8375ca953916f12b1df11414d`. Baseline parser SHA-256 `3de247fcd7f42f0358c00fb4beb58bc005ae89aeb54c12707793cbf8f8afd701`; test SHA-256 `24c3f839f15dcf8c0842e8c2d523e61884ee982411cd68a3bedea918ce52ce62`. A root preclaim probe shortened `p_filesz`/`p_memsz` at bytes 96/104 and confirmed the current parser accepts the malformed span (1 module, 2 relocation rows), log SHA-256 `7f71a671e182e3b3ad44674de33b07e716f99c37e6b21a377e3bc4b5953e40c9`. The initial probe printer asked for a missing `imports` result field and raised `KeyError`; it was corrected without changing the parser or hypothesis, log SHA-256 `7eb90e2bfcda83640c37bc2e354a2fe3d0e21121836fa7a93faa9a17b285f172`. Failed implementation hypotheses: 0.
+
+Before the symbol change, `graft callers parse --depth all --in scripts/` exited 0 and found callers `build`, `main`, and the module-level caller; Graft refreshed one changed source card. Log `local/checkpoints/root-2026-10-20-re02-pt-dynamic-terminator-callers.log`, SHA-256 `aab33e8f9705e0ba779189edfb8a1e69b5ef76fb85c5709b81779d7ad04bb5fd`. Pinned `reference/ShadowOfTheColossus-PC` is at `70bb43859cd7ff181a6d409540b757866184d60d` and clean. Its `prepare.py` and `link_modules.py` recognize the zero tag but do not enforce that one occurs; hashes are `9459d439056e9ca61758ad8f3023f0c1e46b085dd1524644446af00374856890` and `c68d123aea4f1eab5598ee9fd84cfe2e12bd2d9027b1ec3970eefd6c5092d8f0`.
+
+`python3 scripts/project_index.py` exited 0 and indexed 4,166 folders; `docs/FOLDERS.md` lists 95 checkpoint files (log `local/checkpoints/root-2026-10-20-re02-pt-dynamic-terminator-claim-project-index.log`, SHA-256 `f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`; index SHA-256 `7e0114b551f15ad1106ee771513a10f0a703bf75fee9afec5c733c256f797dd9`). `graft check` exited 0 with the graph in sync at 1,265 nodes / 530 files; optional deep meaning layer remains unbuilt (log `local/checkpoints/root-2026-10-20-re02-pt-dynamic-terminator-claim-graft-check.log`, SHA-256 `f3c5f7d91083bcb9d4b8b2b338a9ac6e5702e754c8f43f89a53f1017f7fa77d1`). `git diff --check` exited 0 (log `local/checkpoints/root-2026-10-20-re02-pt-dynamic-terminator-claim-diff-check.log`, SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`).
+
+Stop-checkpoint publication prep: staged and full path audits passed (5 staged paths, log SHA-256 `5abbb0b1376a432dc926abc55a95a11f57fd946d84788a3497a17579e93ca47e`; 653 tracked paths, log SHA-256 `f2d1c3e18db303cf2cd3a809eaaf5e9c1528cc722c327607e6e181b9bd61e2b8`). Worktree and cached diff checks passed with empty logs (both SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). `git fetch origin` exited 0; precommit divergence was 0/0 at `b45bb2ce483c30e3df574ab75bfa7923483a6499` (fetch log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`; divergence log SHA-256 `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d02470525e7c5a3b2b3271c`).
+
+The preceding NUL manifest fixture completion is published as `b45bb2ce483c30e3df574ab75bfa7923483a6499`; post-push fetch confirmed `HEAD` and `origin/main` match with 0/0 divergence. Completion details are in `docs/checkpoints/2026-10-20-root-data02-manifest-nul-path-complete.md`. No dependency/install facts changed. This claim is synthetic parser work only; it does not establish live ELF or loader behavior, game reachability, or G1. G0 remains PARTIAL; G1-G6 remain NOT RUN.
+
+At the user's request, work stopped before the worker was dispatched. `/root/re02_pt_dynamic_terminator` was interrupted while idle; no parser or test source changed. The independent read-only scout `/root/next_fixture_scout` could not complete because its usage limit was reached; it made no repository changes.
+
+Exact next action when this goal is resumed: send `/root/re02_pt_dynamic_terminator` the start signal, then inspect its two-file diff and independently replay the targeted suite. Do not claim fixture completion before that evidence exists.
+
+## PRIOR CHECKPOINT — 2026-10-20 06:20 CDT, `/root` — DATA-02 manifest NUL-path fixture verified
 
 `DATA-02-ARCHIVE-MANIFEST-NUL-PATH-01` is `FIXTURE_VERIFIED`. Worker `/root/data02_manifest_nul` added one test to `scripts/test_archive_overlap_map.py`; root reviewed the one-method diff and independently replayed the suite. Worker and root each ran `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_archive_overlap_map.py` and exited 0 with 13 tests. Logs `local/checkpoints/data02-manifest-nul-path-test.log` and `local/checkpoints/root-2026-10-20-data02-manifest-nul-path-review.log` are byte-identical, SHA-256 `ef4919956bf4bad821df68eb69871efbf1af9027b43ba8733ffe627dfb248155`. Test SHA-256 `571faf8d212ffe7095041155783f6d8ae80511bcbd1ad78eee1c633394a2b781`; unchanged parser `scripts/audit_archive_overlap_map.py` SHA-256 `28330049faf0c7366159e7439ce80b8f4354413908c98bd3d7c95c6addbc7bf7`.
 
@@ -15,7 +31,9 @@ Publication checks: cached diff check exited 0 (empty-log SHA-256 `e3b0c44298fc1
 
 The earlier NUL claim checkpoint remains below. No dependency/install facts changed. Failed implementation tries: 0. G0 remains PARTIAL; G1-G6 remain NOT RUN.
 
-Exact next action: commit the six audited paths as `test: reject NUL paths in archive manifests`, push `origin main`, and verify zero divergence; then separately publish the RE-02 PT_DYNAMIC claim before dispatching the parser/test worker.
+Completion publication: the six audited paths were committed as `b45bb2ce483c30e3df574ab75bfa7923483a6499` (`test: reject NUL paths in archive manifests`) and pushed to `origin main` (push log `local/checkpoints/root-2026-10-20-data02-manifest-nul-complete-push.log`, SHA-256 `abe53366d0e90738b0e611a2c8d4667b65fafaa933eefc32391e10fb2a0f9482`). Post-push `git fetch origin` exited 0; `git rev-list --left-right --count HEAD...origin/main` reported 0/0 at that commit. Fetch log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`; divergence log `local/checkpoints/root-2026-10-20-data02-manifest-nul-complete-post-push-divergence.log`, SHA-256 `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d0247050325e7c5a3b2b3271c`.
+
+Exact next action: publish and dispatch the RE-02 PT_DYNAMIC missing-terminator parser/test task.
 
 ## PRIOR CHECKPOINT — 2026-10-20 06:17 CDT, `/root` — DATA-02 manifest NUL-path claim published
 
