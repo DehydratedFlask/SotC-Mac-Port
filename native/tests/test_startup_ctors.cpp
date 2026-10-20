@@ -13,7 +13,7 @@ int main() {
         st.scratch_slot = 5;
         st.flag32 = 0xA5A5A5A5u;
         auto r = run_constructors(recovered_constructors(), st);
-        CHECK(r.ok() && r.completed == 54);
+        CHECK(r.ok() && r.completed == 70);
         CHECK(st.trig.cos_3_degrees > 0.9986f);
         CHECK(st.neg036.guard == 1 && st.neg036.lanes[0] == kNeg036Bits);
         CHECK(st.xyz_mask_copy == kXyzMaskBits && st.xyz_mask_b == kXyzMaskBits);
@@ -59,6 +59,22 @@ int main() {
         CHECK(st.vec_d7bc60 == kVecD7bc60Bits);
         CHECK(st.vec_d7b930 == kVecD7b930Bits);
         CHECK(st.vec_d6e0f0 == kVecD6e0f0Bits);
+        CHECK(st.vec_d6dbf0 == kVecD6dbf0Bits);
+        CHECK(st.vec_d6d890 == kVecD6d890Bits);
+        CHECK(st.vec_d6d280 == kVecD6d280Bits);
+        CHECK(st.vec_d6a520 == kVecD6a520Bits);
+        CHECK(st.vec_d62b00 == kVecD62b00Bits);
+        CHECK(st.vec_d62690 == kVecD62690Bits);
+        CHECK(st.vec_d623c0 == kVecD623c0Bits);
+        CHECK(st.vec_d5fbe0 == kVecD5fbe0Bits);
+        CHECK(st.vec_d47880 == kVecD47880Bits);
+        CHECK(st.vec_d47420 == kVecD47420Bits);
+        CHECK(st.vec_d47270 == kVecD47270Bits);
+        CHECK(st.vec_d42b60 == kVecD42b60Bits);
+        CHECK(st.vec_d40ea0 == kVecD40ea0Bits);
+        CHECK(st.vec_d405a0 == kVecD405a0Bits);
+        CHECK(st.vec_d40010 == kVecD40010Bits);
+        CHECK(st.vec_d3b790 == kVecD3b790Bits);
         CHECK(st.vec_b743c0 == kVecB743c0Bits);
         CHECK(st.vec_b52110 == kVecB52110Bits);
         CHECK(st.math.pi_guard == 1 && st.math_b.pi_guard == 1 && st.math_c.pi_guard == 1 && st.math_d.pi_guard == 1);
@@ -82,9 +98,10 @@ int main() {
     }
     const std::uint32_t expect[] = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20, 22, 48, 49, 51, 52, 53, 54, 56, 57, 58, 60, 61, 62, 63,
-        67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 96, 282, 290, 520, 538};
-    CHECK(recovered_constructors().size() == 54);
-    for (std::size_t i = 0; i < 54; ++i)
+        67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 96,
+        97, 98, 99, 100, 101, 102, 103, 104, 106, 107, 108, 109, 110, 111, 112, 113, 282, 290, 520, 538};
+    CHECK(recovered_constructors().size() == 70);
+    for (std::size_t i = 0; i < 70; ++i)
         CHECK(recovered_constructors()[i].original_index == expect[i]);
     for (std::size_t i = 1; i < recovered_constructors().size(); ++i)
         CHECK(recovered_constructors()[i - 1].original_index < recovered_constructors()[i].original_index);
