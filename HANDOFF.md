@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 00:16 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-20 00:20 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:16 CDT, /root — page-map dossier root-verified and published; launcher import fix pushed
+## CURRENT CHECKPOINT — 2026-10-20 00:20 CDT, /root — slot-10 computed-call follow-up claimed; prior work published
 
 Task APP-01-IMPORTER-ERROR-01: `launcher/Sources/SoCLauncher/ContentView.swift` now presents the
 localized error in a system alert for import failures and leaves the prior folder/readiness intact;
@@ -50,13 +50,30 @@ exited 0 (4,129 folders indexed); `graft check` exited 0 (wiring graph synchroni
 tier remains unbuilt). Status:
 STATIC_ANALYSIS_VERIFIED. Files root changed: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, and
 the existing task checkpoint; `local/re/evidence/rea-19660/` is private. No install or download;
-INSTALL_LOG unchanged. Next exact action: choose a new bounded SRV/CPU task only from source/data
-evidence; page-map and Fios semantics remain open and SRV-01 stays ACTIVE.
+INSTALL_LOG unchanged. Page-map and Fios semantics remain open and SRV-01 stays ACTIVE.
 
 Publication: staged audit `python3 -I scripts/audit_publish_paths.py` accepted 4 paths; full audit
 `python3 -I scripts/audit_publish_paths.py --all` accepted 581. `git fetch origin main` and staged
 whitespace check passed; pre-commit divergence was `0 0`. Commit `5d3d262` pushed successfully
 (`f48e512..5d3d262 main -> main`). No private REA or root-verifier outputs were staged.
+
+### CPU-01-CTOR10-INDIRECT-01 — bound slot-10 call target at `0xf09efb` — CLAIMED
+
+Claimed to `/root/srv01_page_map_19660`. Scope: call-reaching branch, `RAX` feeding
+`[RAX+0xc0]`, and whether pinned code/data determine a unique target. Reuse E43/E46 first; if REA is
+needed, use `local/re/rea-f09efb-snapshot.json` and private evidence under
+`local/re/evidence/rea-f09efb/`. The prior zero-guard result applies only to that observed path. No
+code, runtime, ABI, or constructor-reachability claim; failed hypotheses/tries 0. The claim is in
+[CPU-01-CTOR10-INDIRECT-01](docs/checkpoints/2026-10-20-root-cpu01-ctor10-indirect-claim.md).
+
+Graft coverage limitation: `graft grep "f09efb" --in native/` found no native indexed occurrences;
+`graft ask` for `reference/ShadowOfTheColossus-PC/` returned exit 1 (`nothing indexed under` that
+subtree). The documented nested rebuild exited 0 but replayed only 528 cached root files and did not
+index the pinned nested reference source. `graft check` still exited 0 for the current wiring graph,
+so it does not prove that subtree is in scope. `python3 scripts/project_index.py` also exited 0 with
+4,129 folders and updated the `docs/checkpoints` count in generated `docs/FOLDERS.md` from 26 to 27.
+The exact missing-scope commands and outputs
+are recorded in the claim checkpoint; prove queryability before relying on Graft coverage there.
 
 Several bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -73,9 +90,9 @@ A read-only AUD-01 survey verified exact identities and bytes for paired test_ad
 APP-01 static UI/accessibility review is recorded, and folder-import failure feedback now builds.
 Runtime constructor
 behavior, helper contracts, audio format/use, game startup, and G1 remain unproven. Recent commits:
-`5d3d262` (page-map dossier), `f48e512` (launcher publication checkpoint), `5c2e093` (launcher
-importer feedback), and `19cd2a2` (STS completion); prior evidence commits include `bda7289`,
-`545f08f`, `b26768a`, `fc1b278`, and `e40a2a4`.
+`7c2626b` (page-map publication record), `5d3d262` (page-map dossier), `f48e512` (launcher
+publication checkpoint), `5c2e093` (launcher importer feedback), and `19cd2a2` (STS completion);
+prior evidence commits include `bda7289`, `545f08f`, `b26768a`, `fc1b278`, and `e40a2a4`.
 
 ### AUD-01-STS-IDENTITY-01 — paired cachedFiles test_adpcm identity survey — FIXTURE VERIFIED; parent active
 
