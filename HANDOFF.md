@@ -1,18 +1,24 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:26 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:30 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## ACTIVE CLAIM — 2026-10-19 20:26 CDT, worker bc-02397584 (CPU-01d) — 0xdbfa60 — IN PROGRESS
+## ACTIVE CLAIM — 2026-10-19 20:30 CDT, worker bc-02397584 (CPU-01d) — 0xdb3a70 — COMPLETE
 
-Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdbfa60** (survey index 70).
-Failed tries: 0. Status: CLAIMED / lifting.
-Owned: `native/core/vec_dbfa60.{hpp,cpp}`, `native/tests/test_vec_dbfa60.cpp`,
-`tools/lift/check_fdbfa60.py`, `native/CMakeLists.txt` (+vec_dbfa60 only; origin/main base).
-Private dump (not published): `local/re/work/cdbfa60.bin`.
-Did NOT edit: `startup_ctors.*`, Drive, SRV carve/`host_map`, peer `0xdc2d50`/`0xdc4180`.
-Note: abandoned race on `0xdc2d50` (peer `13bc22c`).
-Store: Project `internal/worker-claim-dbfa60.md`.
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xdb3a70** (survey index 75).
+Failed tries: 0. Status: FIXTURE_VERIFIED.
+Owned: `native/core/vec_db3a70.{hpp,cpp}`, `native/tests/test_vec_db3a70.cpp`,
+`tools/lift/check_fdb3a70.py`, `native/CMakeLists.txt` (+vec_db3a70 only; origin/main base).
+Private dump (not published): `local/re/work/cdb3a70.bin`.
+Did NOT edit: `startup_ctors.*`, Drive, SRV carve/`host_map`, peer sequential WIP.
+Note: skipped raced `0xdc2d50`/`0xdbfa60` (stale claim withdrawn).
+
+Checkpoint (2026-10-19 20:30 CDT, bc-02397584):
+- OBS: unguarded vmovups copy; src=0x130d1e0 dst=0x3352c50 bits=~0,~0,~0,0; index 75; distinct cells.
+- Commands: ctest -R '^vec_db3a70$' Passed; `python3 -I tools/lift/check_fdb3a70.py` OK.
+- Logs: `/tmp/ctest_db3a70.log`, `/tmp/check_db3a70.log`.
+- CMake: origin/main base + vec_db3a70 only.
+- Store: Project `internal/worker-claim-db3a70.md`.
 
 ## ACTIVE CLAIM — 2026-10-19 20:23 CDT, worker bc-73721c8d (CPU-01d) — 0xdc4180 — COMPLETE
 
