@@ -1,7 +1,22 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:24 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:37 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:36 CDT, worker bc-73721c8d (CPU-01d) — 0xd94cb0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd94cb0** (survey index 78).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: `native/core/vec_d94cb0.{hpp,cpp}`, `native/tests/test_vec_d94cb0.cpp`,
+`tools/lift/check_fd94cb0.py`, `native/CMakeLists.txt` (+vec_d94cb0 only; origin/main base).
+Private dump (not published): `local/re/work/cd94cb0.bin`.
+Did NOT edit: `startup_ctors.*`, SRV, peer `0xdac410`/`0xdb3960`/`0xdb7e60`.
+Note: commit `277ef68` also carried unrelated peer-ready `vec_d90310` sources (not claimed here).
+Checkpoint (2026-10-19 20:36 CDT, bc-73721c8d):
+- OBS: unguarded vmovups copy; src=0x130b660 dst=0x3352c20 bits=~0,~0,~0,0; index 78; distinct cells.
+- Commands: ctest -R '^vec_d94cb0$' Passed; `python3 -I tools/lift/check_fd94cb0.py` OK.
+- Store: Project `internal/worker-claim-d94cb0.md`.
+- Push: sources `277ef68`; CMake wire-up this follow-up.
 
 ## ACTIVE CLAIM — 2026-10-19 20:24 CDT, worker bc-81763e53 (CPU-01d) — 0xd90310 — COMPLETE
 
