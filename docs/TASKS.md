@@ -10,7 +10,7 @@ Gates and test evidence take precedence over a status label. Integrator owns thi
 |---|---|---|---|---|
 | G0-ENV-BASELINE-01 | Capture dated local architecture, OS, Xcode, Metal compiler path, and macOS SDK baseline | G0 | ARTIFACT_VERIFIED (six read-only commands exit 0; stdout/stderr/status/duration retained privately; matches dated machine baseline; G0 remains PARTIAL) / root | 0 |
 | RE-02-MISSING-PHDR10-01 | Classify the omitted type `0x6fffff01` program-header record in the pinned SELF reconstruction | RE-02 | STATIC_ANALYSIS_VERIFIED (hash-bound SELF/ELF/header/descriptor verification and pinned `parse_self` behavior; semantic type/platform role remains unclassified) / root+phdr10 | 0 |
-| RE-02-PHDR10-SOURCE-AUDIT-01 | Search primary public sources for an authoritative name/meaning for PHDR10 type `0x6fffff01` | RE-02-MISSING-PHDR10-01 | ACTIVE (claimed; seek Sony/first-party documentation or SDK header; do not assign meaning without pinned/local corroboration) / root; dispatch pending | 0 |
+| RE-02-PHDR10-SOURCE-AUDIT-01 | Search primary public sources for an authoritative name/meaning for PHDR10 type `0x6fffff01` | RE-02-MISSING-PHDR10-01 | ACTIVE (claim published in `54d12b7`; seek Sony/first-party documentation or SDK header; do not assign meaning without pinned/local corroboration) / root; dispatch pending | 0 |
 | DOC-REFERENCE-AUDIT | Pinned source audit | Source pins | DONE_DOC / reference_audit | 0 |
 | DOC-PLATFORM | Native subsystem specification | Source audit | DONE_DOC / native_plan_review | 0 |
 | DOC-VALIDATION | Acceptance specification | Source audit | DONE_DOC / native_plan_review | 0 |

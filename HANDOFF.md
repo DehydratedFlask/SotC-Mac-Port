@@ -3,7 +3,7 @@
 Updated: 2026-10-20 00:54 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-20 00:54 CDT, /root — PHDR10 claim checks passed; publication pending
+## CURRENT CHECKPOINT — 2026-10-20 00:54 CDT, /root — PHDR10 claim published; source-search dispatch pending
 
 The caller-state dispatch record was published in commit `75f936d` (`docs: record slot-10 caller-state
 dispatch`) after `d9d4d70`; post-push tree was clean and `HEAD`/`origin/main` aligned at
@@ -17,17 +17,19 @@ Sony/PlayStation material or generic ELF specifications may support claims. If n
 available, preserve `UNCLASSIFIED`; do not turn community names or absence of search results into a
 semantic conclusion. Claim:
 [RE-02-PHDR10-SOURCE-AUDIT-01](docs/checkpoints/2026-10-20-root-re02-phdr10-source-audit-claim.md).
-The claim's prepublication checks passed: `python3 scripts/project_index.py` exited `0` and
-regenerated `docs/FOLDERS.md` with 4,134 folders and 35 checkpoint files; `graft check` exited `0`
-(wiring graph synchronized; optional deep meaning layer remains 0%, 1,219 nodes pending); and
-`git diff --check` passed. The worktree contains only `HANDOFF.md`, `docs/TASKS.md`, regenerated
-`docs/FOLDERS.md`, and the new claim file. The claim is not yet published and the research agent is
-not yet dispatched.
+The claim was published in `54d12b7` (`docs: claim PHDR10 source audit`) after `python3 scripts/project_index.py`
+exited `0` (4,134 folders; 35 checkpoints), `graft check` exited `0` (wiring graph synchronized;
+optional deep meaning layer 0%, 1,219 nodes pending), and `git diff --check` passed. Staged path
+audit accepted 4 paths; full audit accepted 590; `git diff --cached --check` passed; `git fetch origin
+main` succeeded; pre-commit divergence was `0 0`. Commit and push succeeded (`75f936d..54d12b7`);
+post-push status is clean, HEAD equals `origin/main` at
+`54d12b71eaed5b78745effde0eef52e79ed6e13f`, divergence `0 0`. Exact command/exit/output record:
+`local/re/evidence/re02-phdr10/claim-publication.log`. The source-search agent is not yet dispatched.
 
-Exact next action: stage only the new claim, task row, folder index, and `HANDOFF.md`; run staged/full
-publication audits and staged whitespace check, fetch/check divergence, then commit and push. Only
-after publication, dispatch a GPT-6 Luna Extra High research agent. Failed hypotheses/tries on the
-new task: 0.
+Exact next action: dispatch the read-only public first-party source search to a GPT-6 Luna agent at
+Extra High reasoning. Then update `HANDOFF.md` and `docs/TASKS.md` with the agent ID and exact scope,
+run the required docs/index/audit checks, and publish the dispatch checkpoint. Failed
+hypotheses/tries on the new task: 0.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 00:51 CDT, /root — slot-10 caller-state analysis dispatched
 
