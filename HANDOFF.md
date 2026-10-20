@@ -16,6 +16,7 @@ Checkpoint (2026-10-19 20:34 CDT, bc-73721c8d):
 - OBS: unguarded vmovups copy; src=0x130d380 dst=0x3352c60 bits=~0,~0,~0,0; index 74; distinct cells.
 - Commands: ctest -R '^vec_db5dd0$' Passed; `python3 -I tools/lift/check_fdb5dd0.py` OK.
 - Store: Project `internal/worker-claim-db5dd0.md`.
+- Push:  on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 20:36 CDT, worker bc-201701f2 (Drive / CPU-01e) — registry idx 72/75 + CMake dbb280 — COMPLETE
 
