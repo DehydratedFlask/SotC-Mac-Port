@@ -1,9 +1,9 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 23:03 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 23:04 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## CURRENT CHECKPOINT — 2026-10-19 23:03 CDT, /root — DATA-02, AUD-01, CPU-01d `0xcdc760` verified; APP-01 readiness claim — ACTIVE
+## CURRENT CHECKPOINT — 2026-10-19 23:04 CDT, /root — DATA-02, AUD-01, CPU-01d `0xcdc760` verified; APP-01 readiness helper — ACTIVE, FAILED TRY 1 RECORDED
 
 Three bounded slices have passed their local checks. DATA-02 and AUD-01 remain partial inventory
 tasks; CPU-01d remains a leaf fixture only. The principal agent integrated all docs; private
@@ -90,14 +90,19 @@ Agent `/root/app01_probe` previously identified this behavior; root owns impleme
   changes are part of the claim.
 - Exact verification: `swift test --package-path launcher --scratch-path local/build/launcher`.
   This validates only model mapping, not a real GUI child lifecycle or G4 acceptance.
-- Reasonable design assumption: the earlier preference question about a testable LauncherCore
-  helper had no reply; proceed with that recommended bounded option. No code attempt has run;
-  failed tries: 0. Remaining risk: G4 lifecycle matrix, UI behavior and actual native-core start are
-  unverified. G1 NOT PASSED; G2-G6 NOT RUN.
+- The recommended LauncherCore-helper option was used after the earlier design-preference question
+  had no reply. An initial helper/model version passed the package tests (11 tests), but its output
+  was overwritten by the next run. Adding an explicit `canStart` transition helper and direct
+  predicate tests then made the same command fail to compile (exit 1): Swift reported the Boolean
+  switch literals unused and “missing return in static method expected to return 'Bool'.” Log:
+  `local/build/launcher-lifecycle-tests-20261019.log`. This is failed implementation try 1. The
+  expected correction is an explicit `return switch` or branch returns, followed by the same test.
+  No third-party or external state is involved. Remaining risk: G4 lifecycle matrix, UI behavior
+  and actual native-core start are unverified. G1 NOT PASSED; G2-G6 NOT RUN.
 - Prior checkpoint with completed archive/audio identity and `0xcdc760` fixture slices is
   [recorded here](docs/checkpoints/2026-10-19-root-data02-aud01-cpu-cdc760-complete.md), published
-  through `f59500e`. Next exact action: claim this APP-01 slice in `docs/TASKS.md`, then implement
-  only the helper/model transition and unit tests.
+  through `f59500e`. Next exact action: fix the missing return in
+  `LauncherLifecycle.canStart` and rerun the focused Swift package tests.
 
 ## PRIOR CHECKPOINT — 2026-10-19 22:41 CDT, /root — CPU-01d `0xce7300` metadata correction — FIXTURE_VERIFIED
 

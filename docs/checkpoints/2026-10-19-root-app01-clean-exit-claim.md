@@ -48,8 +48,24 @@ bundle or GUI redesign is included.
 ## Verification and limits
 
 - Exact planned command: `swift test --package-path launcher --scratch-path local/build/launcher`.
-- No implementation attempt has run; failed tries: 0.
+- At claim creation no implementation attempt had run; the current failed try 1 is recorded below.
 - This test can validate transition mapping only. It cannot prove GUI child-process lifecycle, G4
   acceptance, an available native game core, or G1. G1 remains NOT PASSED; G2-G6 remain NOT RUN.
 - Next exact action: implement the helper and model call site, run the focused Swift package suite,
   inspect the diff, then update TASKS/EVIDENCE/HANDOFF and publish only audited allowlisted paths.
+
+## Implementation checkpoint — failed try 1
+
+- Date/time: 2026-10-19 23:04 CDT; agent `/root`; task APP-01.
+- The first version of the lifecycle outcome helper, `processEnded` mapping, and four tests passed
+  `swift test --package-path launcher --scratch-path local/build/launcher` (11 tests), but that
+  output file was overwritten by the next test run.
+- A follow-up change added `LauncherLifecycle.canStart` and predicate coverage so the tests can
+  assert that `.ready` after clean exit/Stop actually permits Play. The same exact test command
+  then exited 1. Log: `local/build/launcher-lifecycle-tests-20261019.log`. Swift reported unused
+  `true`/`false` switch literals and `missing return in static method expected to return 'Bool'`.
+- Observation: compilation stops in `LauncherLifecycle.canStart`; no test assertion ran on this
+  source version. The helper needs an explicit returned switch expression or explicit branch
+  returns. This is failed implementation try 1; no escalation threshold reached.
+- Next exact action: add explicit return behavior to `canStart`, then rerun
+  `swift test --package-path launcher --scratch-path local/build/launcher` and preserve the log.
