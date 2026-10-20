@@ -13,7 +13,7 @@
   `local/validation/aud01-sts-identity-01.json`, SHA-256
   `566275c3c104dfc473f8cb3c227641a16b10e2b0da7ffb2811e22b00f877e654`.
   Base `local/extracted/CUSA08809/cachedFiles.psarc`, SHA-256
-  `373828b9a6e5c689a6a05a01aa14b295026976438aa7796e9baa789ae03dda0`, member ID `10472`,
+  `373828b9a6e5c689a66b05a01aa14b295026976438aa7796e9baa789ae03dda0`, member ID `10472`,
   decoded length `344`, member SHA-256
   `d6d74c4ca3cfae66db345551dc22670604d155475a99aa40d6f3a12463056ee7`. Patch
   `local/extracted/CUSA08809-patch/cachedfiles.psarc`, SHA-256
@@ -68,3 +68,32 @@
   the task status.
 - **Dispatch checkpoint:** the worker was dispatched after publication commit `e51b60e` and
   follow-up record `452b55a`. Its task is independent of the local ELF/REA analysis.
+
+## 2026-10-20 01:11 CDT checkpoint — base archive digest correction
+
+- **Agent / task / status:** `/root`; `AUD-01-STS-BYTE-PROBE-01`; ACTIVE, 0 failed analysis
+  hypotheses. The earlier claim text contained a base archive SHA-256 transcription error; it is
+  corrected above. The original text said `373828b9a6e5c689a6a05a01aa14b295026976438aa7796e9baa789ae03dda0`;
+  the verified value is `373828b9a6e5c689a66b05a01aa14b295026976438aa7796e9baa789ae03dda0`.
+- **Files changed:** `HANDOFF.md` and this shared checkpoint. No source/reference/game inputs
+  changed. Root's private output is
+  `local/validation/aud01-sts-base-digest-recheck-2026-10-20.log`.
+- **Exact checks:**
+  `shasum -a 256 local/validation/aud01-sts-identity-01.json local/extracted/CUSA08809/cachedFiles.psarc local/extracted/CUSA08809-patch/cachedfiles.psarc`
+  exited `0`; the identity JSON and both live archives hashed to the values recorded above. A
+  targeted JSON read using
+  `python3 -c "import json; d=json.load(open('local/validation/aud01-sts-identity-01.json')); print('Identity JSON archive hashes:'); print('base', d['layers']['base']['archive']['sha256']); print('patch', d['layers']['patch']['archive']['sha256'])"`
+  also exited `0` and matched both live archive digests. See the private log for the digest output.
+- **Observation vs inference:** the verified identity JSON and current archive bytes agree on the
+  corrected base digest. This corrects the pin used by the probe; it says nothing about the
+  `.sts_cp3` format or runtime behavior. The worker's probe remains in progress and no payload bytes
+  were written to disk.
+- **Publication state:** before this correction root regenerated `docs/FOLDERS.md` with
+  `python3 scripts/project_index.py` (exit `0`, `4,136 folders indexed; written`), fetched
+  `origin main` (exit `0`), and verified `HEAD...origin/main` divergence `0 0` at `46e7b8d`.
+  Commit `46e7b8d` (`docs: update active analysis handoff`) was already pushed and the tree was
+  clean. This checkpoint's documentation edits still require path audits, commit, push, and
+  post-push verification.
+- **Risks / next exact action:** no analysis hypothesis failed. Continue the worker's in-memory
+  `Psarc.read()` probe using the corrected archive identity; root independently reruns its verifier
+  before recording evidence or changing task status. G1 remains NOT PASSED.
