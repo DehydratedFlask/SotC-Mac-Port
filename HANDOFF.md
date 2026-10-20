@@ -3,22 +3,21 @@
 Updated: 2026-10-19 22:08 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
 
-## ACTIVE CLAIM — 2026-10-19 22:08 CDT, worker bc-02397584 (CPU-01d) — 0xd0bcd0 — COMPLETE
+## ACTIVE CLAIM — 2026-10-19 22:09 CDT, worker bc-9aa0fe88 (CPU-01d) — 0xd17c10 — COMPLETE
 
-Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd0bcd0** (survey index 126).
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd17c10** (survey index 127).
 Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
-Owned: `native/core/vec_d0bcd0.{hpp,cpp}`, `native/tests/test_vec_d0bcd0.cpp`,
-`tools/lift/check_fd0bcd0.py`, `native/CMakeLists.txt` (+vec_d0bcd0 only; origin/main base).
-Private dump (not published): `local/re/work/cd0bcd0.bin`.
-Skipped: 95; busy peers incl. C `0xd0bde0`; prior 120 done. Never touched `startup_ctors.*`.
-Did NOT edit Drive / SRV / peer untracked; no `git reset --hard` / broad stash.
-Checkpoint (2026-10-19 22:08 CDT, bc-02397584):
-- OBS: unguarded vmovups; src=0x12fd870 dst=0x3351e20 bits=~0,~0,~0,0; index 126; distinct cells.
-- Commands: ctest -R '^vec_d0bcd0$' Passed; `python3 -I tools/lift/check_fd0bcd0.py` OK.
-- Logs: `/tmp/ctest_d0bcd0.log`, `/tmp/check_fd0bcd0.log`.
-- Store: Project `internal/worker-claim-d0bcd0.md`.
+Owned: `native/core/vec_d17c10.{hpp,cpp}`, `native/tests/test_vec_d17c10.cpp`,
+`tools/lift/check_fd17c10.py`, `native/CMakeLists.txt` (+vec_d17c10 only; origin/main base).
+Private dump (not published): `local/re/work/cd17c10.bin`.
+Prior: 0xd2c7e0 = `fc277e0`. Skipped: 95; busy peers `0xd13300`/`0xd0bde0`/`0xd0bcd0`.
+Did NOT edit Drive / SRV / `startup_ctors.*` / peer untracked; no `git reset --hard`.
+Checkpoint (2026-10-19 22:09 CDT, bc-9aa0fe88):
+- OBS: unguarded vmovups copy; src=0x12fe4b0 dst=0x3351e50 bits=~0,~0,~0,0; index 127; distinct cells.
+- Commands: ctest -R '^vec_d17c10$' Passed; `python3 -I tools/lift/check_fd17c10.py` OK.
+- Logs: `/tmp/ctest_d17c10.log`, `/tmp/check_fd17c10.log`.
+- Store: Project `internal/worker-claim-d17c10.md`.
 - Push: (this commit).
-
 
 ## ACTIVE CLAIM — 2026-10-19 22:08 CDT, worker bc-73721c8d (CPU-01d) — 0xd19930 — COMPLETE
 
