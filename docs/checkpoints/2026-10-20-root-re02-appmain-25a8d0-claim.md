@@ -32,6 +32,13 @@
 - **Result:** exit `0`, local time `2026-10-20 01:03:40 CDT`; clean tree before edits at
   `ba7b4319f1ae0226a587ac04151b1d992f2941dd`. Hashes and observed/open distinctions are recorded
   in the current `HANDOFF.md` checkpoint.
-- **Next exact action:** regenerate project folder index; run Graft freshness check; run staged and
-  full publication path audits and whitespace checks; fetch/check divergence; commit and push the
-  allowlisted claim. Dispatch one `gpt-6-luna` Extra High worker only after publication succeeds.
+- **Publication result:** `python3 scripts/project_index.py` exited `0` (`4,135 folders indexed;
+  written`); `graft check` exited `0` (wiring graph synchronized; deep meaning layer unbuilt,
+  1,219 nodes pending); `git diff --check` and `git diff --cached --check` passed; staged path
+  audit accepted 4 paths; full audit accepted 593 paths; `git fetch origin main` succeeded and
+  pre-commit divergence was `0 0`. Commit `a7904b9` (`docs: claim app-main function analysis`)
+  pushed successfully (`ba7b431..a7904b9`). Post-push tree was clean, HEAD equals `origin/main` at
+  `a7904b959a0329db3404f75e490f1c1b4a739b21`, divergence `0 0`.
+- **Next exact action:** dispatch one `gpt-6-luna` Extra High worker for private analysis only under
+  `local/re/evidence/re02-appmain-25a8d0/`. Root will review and rerun its verifier before recording
+  completion evidence.

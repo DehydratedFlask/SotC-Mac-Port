@@ -5,7 +5,7 @@ No native game executable exists. G1 NOT PASSED.
 
 ## CURRENT CHECKPOINT — 2026-10-20 01:03 CDT, /root — app-main target characterization claimed
 
-### RE-02-APPMAIN-25A8D0-01 — ACTIVE, claim prepared; worker dispatch pending publication
+### RE-02-APPMAIN-25A8D0-01 — ACTIVE, claim published; worker dispatch pending
 
 Parent CPU-01 and RE-02 remain ACTIVE. Prerequisites are the pinned RE-01 ELF identity and the
 existing app-main dossier `local/re/work/app-main-re02.{md,json}`. The ELF SHA-256 is
@@ -28,10 +28,15 @@ exited `0` at 2026-10-20 01:03 CDT; tree was clean at `ba7b4319f1ae0226a587ac041
 Observed hashes: ELF `d0723afb...61d3`, app-main note `cb70fff5...286b6`, structured dossier
 `cdfea58a...1ca48`, partial disassembly `09fa7535...7509fb`. Claim details:
 [RE-02-APPMAIN-25A8D0-01](docs/checkpoints/2026-10-20-root-re02-appmain-25a8d0-claim.md).
-Exact next action: run `python3 scripts/project_index.py`, `graft check`, staged/full publication
-audits, whitespace check, fetch/divergence check; publish the claim, then dispatch one
-`gpt-6-luna` Extra High worker. No source or reference file changes, game execution, install, or
-download. G1 NOT PASSED.
+Publication checks: `python3 scripts/project_index.py` exited `0` (`4,135 folders indexed; written`);
+`graft check` exited `0` (wiring graph synchronized; optional deep meaning layer remains unbuilt,
+1,219 nodes pending); `git diff --check` and `git diff --cached --check` passed; staged path audit
+accepted 4 allowlisted paths; full audit accepted 593; `git fetch origin main` succeeded and
+pre-commit divergence was `0 0`. Commit `a7904b9` (`docs: claim app-main function analysis`) pushed
+successfully (`ba7b431..a7904b9`). Post-push tree is clean, HEAD equals origin/main at
+`a7904b959a0329db3404f75e490f1c1b4a739b21`, divergence `0 0`. Exact next action: dispatch one
+`gpt-6-luna` Extra High worker to the private `0x25a8d0` static characterization. No source or
+reference file changes, game execution, install, or download. G1 NOT PASSED.
 
 ## PREVIOUS CHECKPOINT — 2026-10-20 01:01 CDT, /root — two bounded analyses published
 
