@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — SaveData imports have verified callsites
+
+Ten more `libSceSaveData` imports are byte-verified (1 new REA success for `sceSaveDataTerminate`, 9 reuses; root replayed all verifiers and checksums). Most callsites cluster in `FUN_00a48280`, `FUN_00a4a940`, `FUN_00a4ab90` (save-data mount/dialog/icon code region `0xa47d60..0xa4d326`). Details: `docs/checkpoints/2026-10-20-root-savedata-remaining-imports-complete.md`. Static only — no reachability/runtime/ABI/save-format claim. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 192/192 (batch 19, pushed `1443b27`).
+
+Next exact action: constructor batch 20 (next 169 `0xbe5410`), unattributed stragglers (`0x954726`, `0xa4a903`, `0xa4bddb`), remaining dialog helpers (`sceSaveDataDialogClose/GetStatus/IsReadyToDisplay/ProgressBarSetValue/Terminate`), or the SAV-01 serializer/checksum recovery that these callsite bodies now make approachable (needs a fresh claim and function-level decompilation).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors batch 19 (0xc0bea0 .. 0xc09070) lifted; README rows fixed
 
 `CPU-01-LEAF-CTOR-BATCH-19` `FIXTURE_VERIFIED`; root replay 192/192 ctest pass, six checkers exit 0. Also corrected five wrong batch-18 README rows (code/tests were fine). Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-19-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending workers: SaveData dialog-import probes (`local/re/evidence/sav01-savedata-dialog*-01/` etc.) and SaveData misc-import probes (`getmountinfo`, `saveicon`, `delete`, `terminate`, `checkbackupdata`, `restorebackupdata`), up to 3 REA queries each.
