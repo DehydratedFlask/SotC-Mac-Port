@@ -1,7 +1,23 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 21:55 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 21:57 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 21:57 CDT, worker bc-73721c8d (CPU-01d) — 0xd40010 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xd40010** (survey index 112).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: native/core/vec_d40010.hpp/cpp, native/tests/test_vec_d40010.cpp,
+tools/lift/check_fd40010.py, native/CMakeLists.txt (+vec_d40010 only; origin/main base).
+Private dump (not published): local/re/work/cd40010.bin.
+Did NOT edit: startup_ctors, Drive, SRV, peer arena_* / vec_d405a0.
+Skipped: 95; owned 111 0xd405a0. Prior: 0xd40ea0 = 567f70c / c73820f.
+Checkpoint (2026-10-19 21:57 CDT, bc-73721c8d):
+- OBS: unguarded vmovups copy; src=0x1301e30 dst=0x33520b0 bits=~0,~0,~0,0; index 112; distinct cells.
+- Commands: ctest -R vec_d40010 Passed; python3 -I tools/lift/check_fd40010.py OK.
+- Logs: /tmp/ctest_d40010.log, /tmp/check_d40010.log.
+- Store: Project internal/worker-claim-d40010.md.
+- Push: 627d251 on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 21:55 CDT, worker bc-02397584 (CPU-01d) — 0xd623c0 — COMPLETE
 
