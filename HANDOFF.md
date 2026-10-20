@@ -1,7 +1,24 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 22:18 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 22:20 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 22:20 CDT, worker bc-73721c8d (CPU-01d) — 0xce67b0 — COMPLETE
+
+Task: CPU-01d — lift unguarded vec-copy ctor RVA **0xce67b0** (survey index 151).
+Failed tries: 0. Status: FIXTURE_VERIFIED; allowlisted push this checkpoint.
+Owned: native/core/vec_ce67b0.hpp/cpp, native/tests/test_vec_ce67b0.cpp,
+tools/lift/check_fce67b0.py, native/CMakeLists.txt (+vec_ce67b0 only; origin/main base).
+Private dump (not published): local/re/work/cce67b0.bin.
+Did NOT edit: startup_ctors.*, Drive, SRV. Coordinator HANDOFF STOP after this mid-push finish.
+Skipped: 95; busy 0xce8440/0xce74a0; peer CLAIMED 0xce7300. Prior: 0xceb070 = 38760a3.
+Checkpoint (2026-10-19 22:20 CDT, bc-73721c8d):
+- OBS: unguarded vmovups copy; src=0x12f8790 dst=0x3351cd0 bits=~0,~0,~0,0; index 151; distinct cells.
+- Commands: ctest -R '^vec_ce67b0$' Passed; python3 -I tools/lift/check_fce67b0.py OK.
+- Logs: /tmp/ctest_ce67b0.log, /tmp/check_ce67b0.log.
+- Store: Project internal/worker-claim-ce67b0.md.
+- Push: (this commit). STOP — no new RVA claims.
+
 
 ## ACTIVE CLAIM — 2026-10-19 22:19 CDT, worker bc-9aa0fe88 (CPU-01d) — 0xce8440 — COMPLETE
 
