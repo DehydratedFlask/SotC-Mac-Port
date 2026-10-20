@@ -50,3 +50,14 @@
 - Remaining risks: larger function context may contain caller-dependent assumptions outside this block; field semantics are unknown; no runtime or G1 behavior has been shown.
 - Next exact action: after this evidence checkpoint is committed, dispatch only `native/core/arena_accounting.{hpp,cpp}`, `native/tests/test_arena_accounting.cpp`, and `tools/lift/check_f19e00_accounting.py` to the allocator survey worker. Root owns CMake and documentation integration.
 - Docs/index state: `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md` updated with E28; `INSTALL_LOG.md` unchanged; no public folder created or moved.
+
+## Checkpoint update — 2026-10-19 22:28 CDT (America/Chicago)
+
+- Time / agent / task / status: 2026-10-19 22:28 CDT; `/root` integrator; SRV-01 arena-accounting slice `0x1a123–0x1a15a`; resumed ACTIVE, failed tries 1; G1 remains NOT PASSED.
+- Files changed: `HANDOFF.md`, `docs/TASKS.md`, this checkpoint. No implementation files changed in this checkpoint. Existing unstaged `0xce7300` edits remain untouched.
+- Exact commands / results: `graft ask "How are native allocator region contracts and raw arena offsets represented before adding the SRV-01 accounting fixture?" --source --in native/` exited 0; `graft grep "arena_add_used_high_water"` exited 0; `graft grep "0x1a9bb"` exited 0; `git status --short --branch` showed only the three preserved `0xce7300` edits before this documentation update. The Graft `0x1a9bb` result points to `arena_high_water.hpp`, which explicitly marks that helper as distinct from the `0x1a123` accounting block.
+- Prerequisite evidence: existing E28 in `docs/EVIDENCE.md` and `local/re/evidence/ghidra-arena-accounting.txt` bind the block to ELF SHA256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0, Ghidra 12.1.4. No fresh binary execution or runtime test was performed.
+- Observation versus inference: distinct function locations and the observed raw-offset updates are recorded. No names are assigned to offsets; `+0x90` semantics outside mode 2 remain unknown. The fixture helper must not be wired into production allocator behavior.
+- Remaining risks: the bounded helper represents only one machine-code region from a larger allocator function; callers and runtime state are not recovered; no G1 evidence.
+- Next exact action: dispatch `/root/arena_accounting` to add only the four claimed implementation/fixture files; root reviews and owns `native/CMakeLists.txt` and project docs.
+- HANDOFF / TASKS / EVIDENCE / INSTALL_LOG / indexes: `HANDOFF.md` and `docs/TASKS.md` updated; E28 unchanged; `INSTALL_LOG.md` and folder index unchanged; no directory created or moved.
