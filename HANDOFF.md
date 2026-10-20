@@ -1,7 +1,14 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-19 20:24 CDT (America/Chicago). Principal: root agent of this planning chat.
+Updated: 2026-10-19 20:38 CDT (America/Chicago). Principal: root agent of this planning chat.
 No native game executable exists. G1 NOT PASSED.
+
+## ACTIVE CLAIM — 2026-10-19 20:55 CDT, worker bc-201701f2 (Drive / CPU-01e) — 0xd85490 + registry 78/79/82 — COMPLETE
+
+Task: CPU-01d/e — lift **0xd85490** (idx 82); register peer **78** `0xd94cb0` / **79** `0xd90310` into `startup_ctors`.
+Skipped **77** `0xdac410` (not on origin), gap 10–19, idx 50, SRV region_split.
+Failed tries: 0. Status: FIXTURE_VERIFIED + allowlisted push.
+Checkpoint: ctest 48/48; check_fd85490 + fd94cb0 + fd90310 OK; registry size **40**.
 
 ## ACTIVE CLAIM — 2026-10-19 20:36 CDT, worker bc-73721c8d (CPU-01d) — 0xd94cb0 — COMPLETE
 
@@ -16,7 +23,7 @@ Checkpoint (2026-10-19 20:36 CDT, bc-73721c8d):
 - OBS: unguarded vmovups copy; src=0x130b660 dst=0x3352c20 bits=~0,~0,~0,0; index 78; distinct cells.
 - Commands: ctest -R '^vec_d94cb0$' Passed; `python3 -I tools/lift/check_fd94cb0.py` OK.
 - Store: Project `internal/worker-claim-d94cb0.md`.
-- Push: sources `277ef68`; CMake wire-up this follow-up.
+- Push: sources `277ef68`; CMake wire-up `74dc5d5` on origin/main.
 
 ## ACTIVE CLAIM — 2026-10-19 20:24 CDT, worker bc-81763e53 (CPU-01d) — 0xd90310 — COMPLETE
 
