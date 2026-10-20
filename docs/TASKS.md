@@ -13,7 +13,7 @@ Gates and test evidence take precedence over a status label. Integrator owns thi
 | DOC-VALIDATION | Acceptance specification | Source audit | DONE_DOC / native_plan_review | 0 |
 | SETUP-01 | Native PKG extractor | Xcode, Crypto++ | FIXTURE_VERIFIED / principal | 1 (resolved) |
 | DATA-01 | Extract/hash all local packages | SETUP-01 | ARTIFACT_VERIFIED / principal | 0 |
-| DATA-02 | Archive/asset schema and overlay map | DATA-01 | ACTIVE (partial: TOCs done; overlay+case policy PROVISIONAL_OBS for cachedFiles pair via bc-cd298177; pakN archive SHA-256 now streamed and independently verified; member formats, TOC digest, pakN encoding open) / principal+claim-2+root | 0 |
+| DATA-02 | Archive/asset schema and overlay map | DATA-01 | ACTIVE (partial: TOCs done; overlay+case policy PROVISIONAL_OBS for cachedFiles pair via bc-cd298177; pakN archive SHA-256 streamed and independently verified; exact `bridge.sxd` base/patch comparison ARTIFACT_VERIFIED in E42 but no schema; member formats, TOC digest, pakN encoding and selected-scene resolution open) / principal+claim-2+root | 0 |
 | RE-01 | SELF/ELF identity + Ghidra seed | DATA-01 | STATIC_ANALYSIS_VERIFIED / principal | 1 (resolved resource limit) |
 | RE-02 | Imports, relocations, boot graph | RE-01 | ACTIVE (partial: imports/relocs/entry chain done; ctor + app-main internals open; one synthetic parser path now FIXTURE_VERIFIED) / principal+root | 0 |
 | RE-02-DYNLINK-01 | Synthetic ELF fixture for `parse()` import/relocation path | RE-02 | FIXTURE_VERIFIED (one module/library, imported symbol and JMPREL row; 7 tests pass; runtime loader semantics remain unproven) / root+/root/re02_triage | 0 |
@@ -28,7 +28,7 @@ Gates and test evidence take precedence over a status label. Integrator owns thi
 | CPU-05 | Gameplay recovery batches | CPU-04 | WAITING_FOR_DEPENDENCY | 0 |
 | AUD-01 | Audio assets/codec inventory | DATA-01 | ACTIVE (partial: 86 `.sxd`/`.hd`/`.bd` members have verified hashes/locators; AUD-01-XFF-01 fixture verified magic/length observations across 44 XFF members; codec UNKNOWN; music/dialogue location open) / bc-71956f82+root+/root/audio_asset_survey | 0 |
 | AUD-01-XFF-01 | Characterize one paired XFF sound bank | AUD-01 | FIXTURE_VERIFIED (25 pair groups/50 members matched manifest identity; 44/44 XFF length words at 0x14 match decoded size; bounded reader + 6 synthetic tests pass; runtime use/codec UNKNOWN) / root+/root/audio_asset_survey | 0 |
-| DATA-02-BRIDGE-SXD-01 | Compare the two cachedFiles `sound/shadow/bridge.sxd` members | DATA-01, DATA-02 | ACTIVE (two `fbad9897` members identified; exact schema/override meaning unknown; read-only byte/locator/hash comparison claimed) / root+/root/data02_bridge_sxd | 0 |
+| DATA-02-BRIDGE-SXD-01 | Compare the two cachedFiles `sound/shadow/bridge.sxd` members | DATA-01, DATA-02 | ARTIFACT_VERIFIED (private script validates exact archive/member identities and hashes and repeats byte-offset comparison; 619 aligned bytes, 152 equal/467 different, 19-byte patch suffix; no schema/override meaning; one corrected report-construction defect) / root+/root/data02_bridge_sxd | 1 |
 | AUD-02 | Recover used voice/rack contracts | RE-02, AUD-01 | WAITING_FOR_DEPENDENCY | 0 |
 | AUD-03 | Decoder/mixer/effect fixtures | AUD-02 | WAITING_FOR_DEPENDENCY | 0 |
 | AUD-04 | Actual game audio integration | AUD-03, CPU-04 | WAITING_FOR_DEPENDENCY | 0 |

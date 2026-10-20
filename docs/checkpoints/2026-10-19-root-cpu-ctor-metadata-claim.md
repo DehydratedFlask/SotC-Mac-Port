@@ -1,6 +1,6 @@
 # CPU-01-CTOR-METADATA-01 — constructor index provenance correction claim
 
-- Date/time: claim 2026-10-19 23:29 CDT; completion 2026-10-19 23:33 CDT (America/Chicago).
+- Date/time: claim 2026-10-19 23:29 CDT; completion 2026-10-19 23:34 CDT (America/Chicago).
 - Integrator: `/root`; assigned owner: `/root/cpu_ctor_metadata`.
 - Task ID: CPU-01-CTOR-METADATA-01; parent CPU-01-CTOR-PREFIX-01.
 - Files changed for claim: `HANDOFF.md`, `docs/TASKS.md`, and this checkpoint. Completion changes
@@ -54,6 +54,14 @@ startup execution, or pass G1. Root verifies the results and integrates shared d
   agrees with the original constructor table. No startup or runtime behavior is established.
 - Risks: slot 10 at RVA `0xf09e60` remains unresolved; the prefix test validates bookkeeping only;
   G1 remains NOT PASSED. Failed tries: 0.
-- Exact next action: run `python3 scripts/project_index.py --check`, `graft check`, publication path
-  audits and remote divergence checks; then commit and push the six source files and four docs paths.
-- Task status: FIXTURE_VERIFIED locally; publication pending.
+- Publication gates: `python3 scripts/project_index.py --check` passed (4,128 folders), `graft check`
+  passed (wiring graph in sync), staged/all path audits passed (10/576 paths), `git diff --cached
+  --check` passed, and `git fetch origin main` plus `git rev-list --left-right --count
+  HEAD...origin/main` reported `0 0`.
+- Exact publication action/result: `git commit -m "fix: correct leaf constructor indices"` created
+  `fc1b278`; `git push origin main` succeeded (`fa859cf..fc1b278`).
+- Observation vs inference: the metadata correction and its evidence are present on public `main`.
+  This does not establish startup behavior or pass G1. Failed tries: 0.
+- Exact next action: finish CPU slot-10 and bridge-member private analyses, then integrate those
+  results independently.
+- Task status: FIXTURE_VERIFIED and published.
