@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 09:48 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 09:51 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -81,19 +81,21 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   error (`block 4 decoded to 16 bytes, expected 15`) is asserted; `python3 -I scripts/test_psarc.py`
   passed 27/27. Parser behavior is unchanged; see E124 and the
   [completion checkpoint](docs/checkpoints/2026-10-21-root-data02-psarc-decoded-length-complete.md).
-- Claimed `DATA-02-TOC-VALUE-DISTINCT-PATH-REUSE-01`, ACTIVE, attempt 0, for an aggregate-only
-  metadata audit across the seven E75/E77 manifests. Count TOC values occurring on multiple exact
-  paths separately from same-path cross-archive repeats; never emit paths or values. Root owns
-  public records; `launcher_review` owns new private validation files. Claim checkpoint:
-  [DATA-02 TOC distinct-path reuse](docs/checkpoints/2026-10-21-root-data02-toc-distinct-path-reuse-claim.md).
+- `DATA-02-TOC-VALUE-DISTINCT-PATH-REUSE-01` is ARTIFACT_VERIFIED: root independently replayed the
+  aggregate across seven hash-bound manifests (170,451 rows). Of 130,235 distinct values, 35,737
+  occur on multiple exact paths (71,474 row associations); 4,479 exact-path/value associations
+  repeat across archives (8,958 rows), matching E123. Worker runs and identities match byte-for-byte;
+  aggregate reports contain no identifiers. Semantics remain UNKNOWN; see E126 and the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-data02-toc-distinct-path-reuse-complete.md).
 - `DATA-02-MANIFEST-JSON-SYNTAX-01` is FIXTURE_VERIFIED: malformed nonblank JSONL now raises
   `PsarcError` with the file and 1-based line. The old parser produced the expected two
   `JSONDecodeError` test errors; the fixed parser passed 29/29, including a blank-line test preserving
   the previous behavior. Root replay passed; see E125 and the
   [completion checkpoint](docs/checkpoints/2026-10-21-root-data02-manifest-json-syntax-complete.md).
-- Next exact action: root independently replay the seven-manifest TOC value/path aggregate; require
-  aggregate-only reports, unchanged input identities, and outputs byte-identical to the worker's
-  run before recording E126.
+- Next exact action: continue `CPU-01-SLOT23-CONSUMERS-01` with a bounded name-free trace of the
+  `0xe70af0` indirect targets and object/vtable source. Preserve unresolved targets and do not
+  import original strings or register slot 23 without the principal's decision. The PSARC
+  negative-limit behavior question remains open; do not change that API behavior yet.
 - After reconfigure, `test_registration_thunks_ahead` built and its focused CTest passed 1/1.
   The host library and child executable build. The first host target build failed at line 508
   because `WIFEXITED` received temporary `reap(unused)`; storing status in a local made the target
