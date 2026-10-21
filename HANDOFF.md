@@ -49,6 +49,28 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   available. Preserve the slot-23/Ghidra blocker, three-try host escalation, and all game/runtime
   acceptance gates.
 
+## Session addendum 2026-10-21 round 12 (`/root`)
+
+- Published round 11's three synthetic test-only completions: overlap-map JSON constants, XFF exact
+  path cardinality, and folder-index symlink exclusion. Commit `219f261ce102aabe6050a3ffa63ff1e4f7114856`
+  is on `origin/main`; root replay counts were 19/19, 18/18, and 7/7. E134-E136 and the three
+  completion checkpoints record private logs and hashes. No production behavior or game gate changed.
+- Graft located `name_by_hash()` at `scripts/ps4_dynlink.py:155-170` and its `build()` call at
+  `:212`. The live function hashes identifier-like tokens from selected text files; the caller uses
+  results only to label unresolved import spellings. `scripts/test_ps4_dynlink.py` tests `nid()` and
+  synthetic ELF parsing but has no `name_by_hash()` coverage.
+- Claimed `RE-02-DYNLINK-NID-NAME-HASH-FIXTURE-01`, ACTIVE with zero failed implementation tries.
+  Bounded scope is a synthetic temporary text tree and direct assertions that a requested known NID
+  resolves to its token while an absent NID is omitted. Test-only edit to
+  `scripts/test_ps4_dynlink.py`; no parser/build changes or real source-tree/game behavior claim.
+- Claim checkpoint: [name-by-hash fixture](docs/checkpoints/2026-10-21-root-re02-dynlink-name-by-hash-claim.md).
+  Prerequisite `RE-02-DYNLINK-01` is FIXTURE_VERIFIED. Acceptance command:
+  `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py`.
+- Claim publication: pending. Next exact action after claim publication is assign only
+  `scripts/test_ps4_dynlink.py` to `launcher_review`, independently replay the focused suite, record
+  the fixture result, and publish completion. Keep `native/api/CMakeLists.txt` and `native/api/host/`
+  excluded; preserve all emulation/module and real game acceptance gates.
+
 ## Session addendum 2026-10-21 round 10 (`/root`)
 
 - `RE-01-UNWRAP-INPUT-SIDECAR-COLLISION-01` is FIXTURE_VERIFIED with zero failed implementation
