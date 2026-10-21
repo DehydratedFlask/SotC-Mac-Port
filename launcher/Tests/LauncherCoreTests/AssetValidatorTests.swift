@@ -81,6 +81,21 @@ struct AssetValidatorTests {
         #expect(message == "NOT BUILT: SoCGameCore is a directory, not an executable. Play disabled until a native SoCGameCore exists")
     }
 
+    @Test func nativeCoreRejectsNonExecutableFile() throws {
+        let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString, directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let executable = root.appending(path: "SoCGameCore", directoryHint: .notDirectory)
+        try Data("synthetic non-executable core".utf8).write(to: executable)
+        try FileManager.default.setAttributes([.posixPermissions: 0o644], ofItemAtPath: executable.path(percentEncoded: false))
+
+        guard case .notBuilt(let message) = SystemChecks.nativeCore(executable: executable) else {
+            Issue.record("expected .notBuilt for non-executable core file")
+            return
+        }
+        #expect(message == "NOT BUILT: SoCGameCore is not executable. Play disabled until a native SoCGameCore exists")
+    }
+
     @Test func nativeCoreRejectsScriptStub() throws {
         let dir = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString, directoryHint: .isDirectory)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)

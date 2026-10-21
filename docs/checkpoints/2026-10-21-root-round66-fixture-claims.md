@@ -77,11 +77,11 @@ real save/reload, Metal rendering, or any G0–G6 runtime gate. Existing user-ow
   The user-owned `native/api/CMakeLists.txt` modification and untracked `native/api/host/` remain
   unstaged and excluded.
 
-## Task status and next action
+## Task status at claim publication
 
-All three rows are `ACTIVE`; attempts: 0 implementation and 0 failed for each. Exact next action:
-the claim commit has been pushed and matched `origin/main`; dispatch each worker its exact one-file
-task and fixed private log path after publishing this post-push record.
+At claim publication, all three rows were `ACTIVE`; attempts: 0 implementation and 0 failed for each.
+The next action at that checkpoint was to publish the post-push claim record and dispatch each
+worker its exact one-file task and fixed private log path.
 
 ## Claim publication
 
@@ -95,5 +95,19 @@ task and fixed private log path after publishing this post-push record.
   retains only the user-owned `native/api/CMakeLists.txt` modification and untracked `native/api/host/`.
   State log `local/validation/root-round66-scout/state.log`, SHA-256
   `463e5fd3e38487ff1738ad0b900f55ca480b229461c59e15e54f93a0de74ccec`.
-- No implementation prompt has been sent yet. Exact next action: publish this post-push record and
-  then dispatch the three scoped workers.
+- At the time this claim-publication record was first written, no implementation prompt had been
+  sent. The later dispatch and results are recorded below.
+
+## Worker dispatch
+
+At 15:08 CDT, after confirming the published claim and post-push record, root dispatched
+`/root/launcher_review` for APP-01, `/root/review_host_proto` for RE-02, and
+`/root/slot23_raw_xrefs` for SRV-01. Each worker changed only its claimed existing test file.
+Production code and build files were unchanged; root reviewed the exact diffs, independently replayed
+all focused commands, and confirmed production hashes match claim-time values. Worker and root
+results, hashes, and limits are in [the completion checkpoint](2026-10-21-root-round66-fixtures-complete.md)
+and E196–E198. All three fixtures are `FIXTURE_VERIFIED`, each with one successful implementation
+attempt and zero failed tries. Project-index generation and `--check` pass; the first stale JSON
+report and clean rerun are recorded in the completion checkpoint. Staged and full publication
+audits passed, remote is synchronized, and only the 9 allowlisted test/documentation paths are
+staged. Exact next action: commit and push these paths, then begin fresh Round67 scouting.

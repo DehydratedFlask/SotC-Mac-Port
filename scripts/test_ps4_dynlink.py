@@ -200,6 +200,22 @@ class Tests(unittest.TestCase):
         with self.assertRaises(ValueError):
             d.parse(bytes(elf))
 
+    def test_parse_rejects_symbol_name_offset_past_string_table(self):
+        elf, _ = dynamic_import_elf_fixture()
+        elf = bytearray(elf)
+        dynamic_offset = 64 + 2 * 56
+        dynamic_size = struct.unpack_from('<Q', elf, 64 + 32)[0]
+        dynlib_offset = dynamic_offset + dynamic_size
+        strsz = struct.unpack_from('<Q', elf, dynamic_offset + 4 * 16 + 8)[0]
+        symtab_offset = struct.unpack_from('<Q', elf, dynamic_offset + 5 * 16 + 8)[0]
+        # Symbol 1's st_name field follows the null symbol's 24-byte entry.
+        struct.pack_into('<I', elf, dynlib_offset + symtab_offset + 24, strsz)
+
+        with self.assertRaises(ValueError) as error:
+            d.parse(bytes(elf))
+        self.assertEqual(
+            str(error.exception), f'out of bounds: {strsz:#x}+0x1 / {strsz:#x}')
+
     def test_parse_rejects_pt_dynamic_without_dt_null(self):
         elf, _ = dynamic_import_elf_fixture()
         elf = bytearray(elf)
