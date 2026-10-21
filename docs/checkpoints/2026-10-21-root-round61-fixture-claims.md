@@ -8,8 +8,8 @@
   Source and test files match the hashes below. Each owner may modify only its named test file; root
   owns shared docs and will independently replay each command. No production source is claimed for
   modification.
-- Status: three tasks claimed; each has 0 failed fixture attempts. Changes are pending claim
-  publication; no implementation work is authorized before that commit is pushed.
+- Status: three tasks claimed; each has 0 failed fixture attempts. Claim commit
+  `4cbd478180cb983c52b711e8a69cca2e732ea4f6` was pushed before implementation work.
 
 ## APP-01-CORE-ABI-PACKED-UINT16-MAX-ROUNDTRIP-FIXTURE-01
 
@@ -93,5 +93,5 @@
   `e232b1f79f408e3c45dfd50e12db52acbbe2ffdf9bc482f96bee56aa17db36c1`. Cached and working diff
   checks passed; only five allowlisted documentation paths are staged. Existing `native/api` user
   changes remain unstaged.
-- Exact next action: fetch `origin/main`, commit and push these claim/docs paths if the remote has
-  not advanced, then dispatch the three single-file workers.
+- Exact next action: publish `docs/checkpoints/2026-10-21-root-round61-workers-dispatched.md`, then
+  send the three single-file worker prompts.
