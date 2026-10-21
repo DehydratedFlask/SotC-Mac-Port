@@ -4,6 +4,17 @@ Claim checkpoint time: 2026-10-21 16:27 CDT (America/Chicago). Integrator: `/roo
 desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Claim base: commit
 `73f9a979fffa1e5f87942a2db547994708714c91` (`origin/main`).
 
+Claim publication update: 2026-10-21 16:28 CDT. Commit
+`bb1f58628a85dbea0331e8195d792a49193d02d8` (`docs: claim Round 71 fixture tasks`) is pushed to
+`origin/main`; after `git fetch origin`, `HEAD == origin/main` and divergence is `0 0`. The only
+remaining worktree changes are the pre-existing user-owned `native/api/CMakeLists.txt` and
+untracked `native/api/host/`, both excluded from the commit. The commit and push logs are
+`local/validation/root-round71-scout/claim-commit.log` SHA-256
+`3576f69429ef94e088c33e2b785b0374865a3116aa823063f1977981fe6f999a` and `claim-push.log`
+SHA-256 `786cb3ee024ac313d78e970b7e556f18602707cbf26f172c51848eadc9c9f716`; fetch log SHA-256 is
+the empty-output hash `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`; post-push
+state log SHA-256 is `e700f3d1a45ff2ecd8c7070635e7b561d4cbba773f9add8563317e2e31536ffe`.
+
 Three independent bounded tasks are claimed before implementation. No code or test file has been
 edited. `docs/TASKS.md` assigns one test file to each worker; `/root` is the sole integrator for
 `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, generated indexes, and checkpoints.
@@ -46,6 +57,12 @@ save/reload, or Metal behavior. Existing user-owned `native/api/CMakeLists.txt` 
 `native/api/host/` are unchanged and excluded from publication.
 
 At claim time, G0 remains PARTIAL and G1–G6 remain NOT RUN. No install/dependency fact changed.
-Implementation and claim publication are pending. Next action: regenerate/check the project index,
-run staged/full path audits, commit only these allowlisted docs/index files, push `origin main`,
-record the resulting commit/state, and then dispatch the three single-file edits.
+Implementation has not started. Claim publication checks: `python3 -I scripts/project_index.py`
+and `--check` exited 0 at 14,466 folders (log hashes `7a011c9c98b920104871e7cee6a0c371391892a025c329d853d8c830c2ca0d99` and
+`cfda4d504c8a996ed5e632aa4f3299497abf52178d627dc583bd192c496e3886`); staged audit accepted 4
+paths (log SHA-256 `fc3f0976acf9a7c706f563af96e66a47fc29eb33d6eaeb413f6c9a9c40fd5f0b`); full audit
+accepted 1,646 paths (log SHA-256 `0fa611c7c1b08cf42e9741cfc5ae40739623789425835c717691c4440aff658a`);
+`git diff --cached --check` exited 0 (empty log hash
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). Next exact action: dispatch
+the three single-file edits, independently review and replay them, record E213–E215 and a completion
+checkpoint, refresh Trail after source changes, audit allowlisted paths, and push completion.
