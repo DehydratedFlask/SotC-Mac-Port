@@ -1,12 +1,29 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 12:02 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 12:04 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 36 (`/root`)
+
+- Published `AUD-PUBLISH-GIT-NUL-FILENAME-FIXTURE-01` completion in commit
+  `e9b1a15526e247401bb1622cfd077853ba9b7a31` (`test: preserve newlines in staged path audit
+  names`); push succeeded and HEAD matches `origin/main`. See the
+  [round 34 publication checkpoint](docs/checkpoints/2026-10-21-root-round34-publication.md).
+- Corrected the stale `docs/TASKS.md` status for `AUD-01-CLASSIFIER-RAW-INFLATE-OFFSET-00-FIXTURE-01`:
+  E145 and its completion checkpoint already recorded `FIXTURE_VERIFIED`, while the task row still
+  said `ACTIVE`. This is a documentation reconciliation; no code or test result changed.
+- `/root/slot23_raw_xrefs` is scouting another bounded test-only task in a distinct module. No
+  implementation begins until root checks the candidate and publishes a claim.
+- Pre-push checks for the prior commit passed: folder index current at 14,235; source graph current
+  at 3,537 nodes; staged audit accepted 7 paths and full audit accepted 1,544 paths. Only the
+  pre-existing `native/api/CMakeLists.txt` modification and untracked `native/api/host/` remain.
+- Actual game acceptance gates remain open.
+- Exact next action: review the scout's candidate and claim one unowned, bounded task if available.
 
 ## Session addendum 2026-10-21 round 35 (`/root`)
 
