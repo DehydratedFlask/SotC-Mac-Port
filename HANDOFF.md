@@ -86,9 +86,14 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   paths separately from same-path cross-archive repeats; never emit paths or values. Root owns
   public records; `launcher_review` owns new private validation files. Claim checkpoint:
   [DATA-02 TOC distinct-path reuse](docs/checkpoints/2026-10-21-root-data02-toc-distinct-path-reuse-claim.md).
-- Next exact action: have `launcher_review` bind the seven manifest identities and run the private
-  aggregate twice, confirming byte-identical output and all 170,451 rows. Root will independently
-  replay the report before recording E125.
+- Claimed `DATA-02-MANIFEST-JSON-SYNTAX-01`, ACTIVE, attempt 0, for `load_members_jsonl` malformed
+  nonblank JSON diagnostics. `slot23_raw_xrefs` owns only `scripts/psarc.py` and
+  `scripts/test_psarc.py`; root integrates public records. Require file + 1-based line in `PsarcError`,
+  preserve blank-line behavior, and prove new tests fail on old code. Claim:
+  [manifest JSON syntax checkpoint](docs/checkpoints/2026-10-21-root-data02-manifest-json-syntax-claim.md).
+- Next exact action: finish the private seven-manifest aggregate with `launcher_review`, and have
+  `slot23_raw_xrefs` add failing-before malformed-JSON fixtures and a narrow diagnostic fix. Root
+  independently replays both results before recording completion evidence.
 - After reconfigure, `test_registration_thunks_ahead` built and its focused CTest passed 1/1.
   The host library and child executable build. The first host target build failed at line 508
   because `WIFEXITED` received temporary `reap(unused)`; storing status in a local made the target
