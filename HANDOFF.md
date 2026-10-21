@@ -1,6 +1,11 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors batch 22 (0xbd32f0 .. 0xbcc960) lifted
+
+`CPU-01-LEAF-CTOR-BATCH-22` `FIXTURE_VERIFIED`; root replay 210/210 ctest pass, six checkers exit 0. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-22-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending workers: `SAV-01-SERIALIZER-01` (`local/re/evidence/sav01-serializer-01/`) and `AUD-02-REGION-DOSSIER-01` (`local/re/evidence/aud02-region-dossier-01/`). Next constructor position 184 `0xbcc4e0`.
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — SAV-01 header/hash semantics established statically
 
 Save/Load paths traced: 16-byte header {1, FNV-1a-form hash of body only, body size ≤ `0x6400000`, dword 3 from `[[this+8]]`}; Load checks version, size cap and body hash; header/body producers `FUN_00a56080` / `FUN_00a55450`. 1 REA success; root replayed verifier (27/27 mutations caught per worker) and checksums. Details: `docs/checkpoints/2026-10-20-root-sav01-producer-complete.md`. Body serializer is the vtable slot `+0x50` target — unresolved; no native serializer, no save works. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 204/204 (batch 21, pushed `5abd813`).
