@@ -45,6 +45,24 @@ allocator integration, executable behavior, game boot/audio/save, or Metal rende
 PARTIAL; G1–G6 remain NOT RUN. No install/dependency facts changed. Existing user-owned
 `native/api/CMakeLists.txt` and `native/api/host/` remain untouched and excluded.
 
-Claim publication and project-index refresh are pending. Next exact action: regenerate/check the
-project index, commit and push only allowlisted claim docs/index plus the completed Round71 checkpoint
-sync, verify `HEAD == origin/main`, then dispatch the three single-file tasks.
+## Claim publication checkpoint
+
+At 2026-10-21 16:39 CDT, claim docs and the Round71 checkpoint sync were published as
+`df1af7d60f48c4b51222f6fb7705f93fa7eaae1c` (`docs: claim Round 72 fixture tasks`). Before commit,
+`git diff --cached --check`, the staged path audit (exactly the five allowlisted docs paths shown
+above in the commit), and the full path audit (1,648 allowlisted paths) passed. The claim commit and
+push logs are `local/validation/root-round72-scout/claim-commit.log` (SHA-256
+`a095f0a223c0c6a8b75597dacc4b67b8afbfc435fee514853f4646a8b4ae928c`) and
+`claim-push.log` (SHA-256 `5d98261ae24b6c0582404f99eaa365a55e2d3f8b0d11e0ae014da08544f44de2`).
+Project index regeneration and check both passed at 14,467 folders; logs are
+`claim-index-generate.log` (SHA-256
+`1c39b93eb3985f6f6f4972ccd3fcdf293b5ee79108366233397a5adc813ce328`) and
+`claim-index-check.log` (SHA-256
+`91c2a7d757519063ca3a43308f042f15372887ed7c2e1641a11ae64b1c789561`). After push,
+`HEAD == origin/main == df1af7d60f48c4b51222f6fb7705f93fa7eaae1c` (divergence 0/0); exact command
+`git rev-parse HEAD origin/main`. These observations verify only documentation publication and path
+hygiene, not any fixture implementation or game acceptance gate.
+
+Next exact action: dispatch the three claimed test-only edits to their single-file owners, review
+each diff, and independently replay each focused check. Status remains ACTIVE; zero implementation
+attempts and zero failed tries.

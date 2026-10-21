@@ -83,6 +83,6 @@ exited 0; push log SHA-256 `c14c88915525a59d6939e02d7ca7e8289c2b9a8e9bbdde3af04d
 changes are `native/api/CMakeLists.txt` and `native/api/host/`, preserved as user-owned state and
 excluded from publication.
 
-Next exact action: publish the three bounded Round72 claims recorded in
-`docs/TASKS.md` and [their claim checkpoint](2026-10-21-root-round72-fixture-claims.md), then dispatch
-the single-file tasks. Round71 fixtures do not advance a game acceptance gate.
+The bounded Round72 claims in `docs/TASKS.md` and [their claim checkpoint](2026-10-21-root-round72-fixture-claims.md)
+were published before implementation in `df1af7d60f48c4b51222f6fb7705f93fa7eaae1c`. Next exact
+action: dispatch the three single-file tasks. Round71 fixtures do not advance a game acceptance gate.

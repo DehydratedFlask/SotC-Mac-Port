@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 16:37 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 16:39 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -17,9 +17,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Owners: `/root + review_host_proto` owns only `scripts/test_psarc.py`; `/root + launcher_review`
   owns only `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift`; `/root + round68_native_scout`
   owns only `native/tests/test_free_list_carve.cpp`. `/root` remains sole integrator for shared docs.
-- Implementation has not started. Next exact action: publish these claims with the Round71
-  checkpoint sync, then dispatch each single-file edit. User-owned `native/api/CMakeLists.txt` and
-  untracked `native/api/host/` remain untouched and excluded.
+- Claim commit `df1af7d60f48c4b51222f6fb7705f93fa7eaae1c` is pushed to `origin/main` after the
+  staged and full path audits passed. The Round71 checkpoint sync and Round72 claim checkpoint
+  record the publication. Implementation has not started. Next exact action: dispatch each
+  single-file edit. User-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain
+  untouched and excluded.
 
 ## Round 71 fixtures verified (/root)
 
