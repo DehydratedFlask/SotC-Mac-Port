@@ -13,7 +13,11 @@ int main() {
         st.scratch_slot = 5;
         st.flag32 = 0xA5A5A5A5u;
         auto r = run_constructors(recovered_constructors(), st);
-        CHECK(!r.ok() && r.completed == 10 && r.blocked_on_rva == 0xf09e60);
+        CHECK(!r.ok() && r.completed == 11 && r.blocked_on_rva == 0xf09160);
+        CHECK(!r.callback_failed);
+        CHECK(st.descriptor == &kClothingPreviewParamDescriptor);
+        CHECK(st.descriptor_mutex_initialized && !st.init_failed);
+        CHECK(st.descriptor->object_size == ClothingPreviewParam::kObjectSize);
 
         // Preserve leaf-fixture coverage independently of the fail-fast runner boundary.
         for (const CtorSlot& slot : recovered_constructors())
@@ -133,8 +137,18 @@ int main() {
         auto r = run_constructors({}, st);
         CHECK(r.ok() && r.completed == 0);
     }
+    {
+        // A recovered callback that reports a visible failure stops the runner at that slot.
+        StartupState st;
+        const CtorSlot order[] = {
+            {0x111111, 0, [](StartupState& s) noexcept { s.init_failed = true; }},
+            {0x222222, 1, [](StartupState&) noexcept {}},
+        };
+        auto r = run_constructors(order, st);
+        CHECK(!r.ok() && r.completed == 0 && r.callback_failed && r.blocked_on_rva == 0x111111);
+    }
     const std::uint32_t expect[] = {
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 22, 48, 49, 51, 52, 53, 54, 56, 57, 58, 60, 61, 62, 63,
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 20, 22, 48, 49, 51, 52, 53, 54, 56, 57, 58, 60, 61, 62, 63,
         67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94,
         96, 97, 98, 99, 100, 101, 102, 103, 104, 106, 107, 108, 109, 110, 111, 112, 113, 114, 118, 119,
         120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139,

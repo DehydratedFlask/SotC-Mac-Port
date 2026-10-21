@@ -4,8 +4,8 @@
 
 1. Read `HANDOFF.md`, `docs/INDEX.md`, `ROADMAP.md`, then your task's linked specification.
 2. Check `docs/TASKS.md` and claim a bounded task in `HANDOFF.md` before editing shared files.
-3. Use Graft before searching source: `graft ask "question" --source --in reference/ShadowOfTheColossus-PC/`.
-   Known symbol: `graft grep "symbol"`; before a symbol change: `graft callers symbol --depth all`.
+3. Use trail before searching source: `trail ask "question" --source --in reference/ShadowOfTheColossus-PC/`.
+   Known symbol: `trail grep "symbol"`; before a symbol change: `trail callers symbol --depth all`.
 4. Verify live files and pinned commits; indexes, upstream READMEs, and previous agents are evidence, not proof of execution.
 
 ## Non-negotiable target
@@ -77,8 +77,8 @@ recorded in the escalation; it must not happen automatically.
 - Record every install/download/build, version/commit, location, command, purpose, and removal
   boundary in `INSTALL_LOG.md`. Existing Unicorn/MoltenVK installs are not permission to use them.
 - Run `python3 scripts/project_index.py` after creating/moving files and before handoff.
-  Use `graft check` for the source graph; document stale or missing scopes explicitly.
-- Graft currently persists `onlyDirs = [scripts, tools, reference]`. Its check can pass while
+  Use `trail build --check` for the source graph; document stale or missing scopes explicitly.
+- trail currently persists `onlyDirs = [scripts, tools, reference]`. Its check can pass while
   a newly created directory is excluded. Add future native/launcher/tests scopes explicitly
   without dropping the current ones, rebuild, and prove the new file is queryable.
 - Workspace root is the public Git repo for SotC-Mac-Port; each `reference/` checkout stays

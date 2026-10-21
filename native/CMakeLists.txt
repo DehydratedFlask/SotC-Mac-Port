@@ -15,6 +15,7 @@ add_library(sotc_core STATIC
   core/save_checksum.cpp
   core/recursive_mutex.cpp
   core/startup_ctors.cpp
+  core/clothing_preview_param.cpp
   core/trig_constants.cpp
   core/addr.cpp
   core/allocator_region.cpp
@@ -233,6 +234,33 @@ add_library(sotc_core STATIC
   core/vec_bbd5e0.cpp
   core/vec_bbba10.cpp
   core/vec_bb9740.cpp
+  core/vec_bb82d0.cpp
+  core/vec_bb7990.cpp
+  core/vec_bacfb0.cpp
+  core/vec_bace80.cpp
+  core/vec_bace50.cpp
+  core/vec_bacb30.cpp
+  core/vec_bab950.cpp
+  core/vec_ba3ef0.cpp
+  core/vec_b950e0.cpp
+  core/vec_b8d170.cpp
+  core/vec_b89eb0.cpp
+  core/vec_b84580.cpp
+  core/vec_b7b270.cpp
+  core/vec_b77e90.cpp
+  core/vec_b77910.cpp
+  core/vec_b77740.cpp
+  core/vec_b71f80.cpp
+  core/vec_b6e6d0.cpp
+  core/vec_b67a70.cpp
+  core/vec_b5ecf0.cpp
+  core/vec_b58690.cpp
+  core/vec_b57360.cpp
+  core/vec_b4ef70.cpp
+  core/vec_b494d0.cpp
+  core/vec_b47100.cpp
+  core/vec_b44580.cpp
+  core/vec_b33bd0.cpp
 )
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()
@@ -245,6 +273,10 @@ add_test(NAME scratch_reset COMMAND test_scratch_reset)
 add_executable(test_startup_ctors tests/test_startup_ctors.cpp)
 target_link_libraries(test_startup_ctors sotc_core)
 add_test(NAME startup_ctors COMMAND test_startup_ctors)
+
+add_executable(test_clothing_preview_param tests/test_clothing_preview_param.cpp)
+target_link_libraries(test_clothing_preview_param sotc_core)
+add_test(NAME clothing_preview_param COMMAND test_clothing_preview_param)
 add_executable(test_trig_constants tests/test_trig_constants.cpp)
 target_link_libraries(test_trig_constants sotc_core)
 add_test(NAME trig_constants COMMAND test_trig_constants)
@@ -1081,3 +1113,111 @@ add_test(NAME save_checksum COMMAND test_save_checksum)
 add_executable(test_recursive_mutex tests/test_recursive_mutex.cpp)
 target_link_libraries(test_recursive_mutex sotc_core)
 add_test(NAME recursive_mutex COMMAND test_recursive_mutex)
+
+add_executable(test_vec_bb82d0 tests/test_vec_bb82d0.cpp)
+target_link_libraries(test_vec_bb82d0 sotc_core)
+add_test(NAME vec_bb82d0 COMMAND test_vec_bb82d0)
+
+add_executable(test_vec_bb7990 tests/test_vec_bb7990.cpp)
+target_link_libraries(test_vec_bb7990 sotc_core)
+add_test(NAME vec_bb7990 COMMAND test_vec_bb7990)
+
+add_executable(test_vec_bacfb0 tests/test_vec_bacfb0.cpp)
+target_link_libraries(test_vec_bacfb0 sotc_core)
+add_test(NAME vec_bacfb0 COMMAND test_vec_bacfb0)
+
+add_executable(test_vec_bace80 tests/test_vec_bace80.cpp)
+target_link_libraries(test_vec_bace80 sotc_core)
+add_test(NAME vec_bace80 COMMAND test_vec_bace80)
+
+add_executable(test_vec_bace50 tests/test_vec_bace50.cpp)
+target_link_libraries(test_vec_bace50 sotc_core)
+add_test(NAME vec_bace50 COMMAND test_vec_bace50)
+
+add_executable(test_vec_bacb30 tests/test_vec_bacb30.cpp)
+target_link_libraries(test_vec_bacb30 sotc_core)
+add_test(NAME vec_bacb30 COMMAND test_vec_bacb30)
+
+add_executable(test_vec_bab950 tests/test_vec_bab950.cpp)
+target_link_libraries(test_vec_bab950 sotc_core)
+add_test(NAME vec_bab950 COMMAND test_vec_bab950)
+
+add_executable(test_vec_ba3ef0 tests/test_vec_ba3ef0.cpp)
+target_link_libraries(test_vec_ba3ef0 sotc_core)
+add_test(NAME vec_ba3ef0 COMMAND test_vec_ba3ef0)
+
+add_executable(test_vec_b950e0 tests/test_vec_b950e0.cpp)
+target_link_libraries(test_vec_b950e0 sotc_core)
+add_test(NAME vec_b950e0 COMMAND test_vec_b950e0)
+
+add_executable(test_vec_b8d170 tests/test_vec_b8d170.cpp)
+target_link_libraries(test_vec_b8d170 sotc_core)
+add_test(NAME vec_b8d170 COMMAND test_vec_b8d170)
+
+add_executable(test_vec_b89eb0 tests/test_vec_b89eb0.cpp)
+target_link_libraries(test_vec_b89eb0 sotc_core)
+add_test(NAME vec_b89eb0 COMMAND test_vec_b89eb0)
+
+add_executable(test_vec_b84580 tests/test_vec_b84580.cpp)
+target_link_libraries(test_vec_b84580 sotc_core)
+add_test(NAME vec_b84580 COMMAND test_vec_b84580)
+
+add_executable(test_vec_b7b270 tests/test_vec_b7b270.cpp)
+target_link_libraries(test_vec_b7b270 sotc_core)
+add_test(NAME vec_b7b270 COMMAND test_vec_b7b270)
+
+add_executable(test_vec_b77e90 tests/test_vec_b77e90.cpp)
+target_link_libraries(test_vec_b77e90 sotc_core)
+add_test(NAME vec_b77e90 COMMAND test_vec_b77e90)
+
+add_executable(test_vec_b77910 tests/test_vec_b77910.cpp)
+target_link_libraries(test_vec_b77910 sotc_core)
+add_test(NAME vec_b77910 COMMAND test_vec_b77910)
+
+add_executable(test_vec_b77740 tests/test_vec_b77740.cpp)
+target_link_libraries(test_vec_b77740 sotc_core)
+add_test(NAME vec_b77740 COMMAND test_vec_b77740)
+
+add_executable(test_vec_b71f80 tests/test_vec_b71f80.cpp)
+target_link_libraries(test_vec_b71f80 sotc_core)
+add_test(NAME vec_b71f80 COMMAND test_vec_b71f80)
+
+add_executable(test_vec_b6e6d0 tests/test_vec_b6e6d0.cpp)
+target_link_libraries(test_vec_b6e6d0 sotc_core)
+add_test(NAME vec_b6e6d0 COMMAND test_vec_b6e6d0)
+
+add_executable(test_vec_b67a70 tests/test_vec_b67a70.cpp)
+target_link_libraries(test_vec_b67a70 sotc_core)
+add_test(NAME vec_b67a70 COMMAND test_vec_b67a70)
+
+add_executable(test_vec_b5ecf0 tests/test_vec_b5ecf0.cpp)
+target_link_libraries(test_vec_b5ecf0 sotc_core)
+add_test(NAME vec_b5ecf0 COMMAND test_vec_b5ecf0)
+
+add_executable(test_vec_b58690 tests/test_vec_b58690.cpp)
+target_link_libraries(test_vec_b58690 sotc_core)
+add_test(NAME vec_b58690 COMMAND test_vec_b58690)
+
+add_executable(test_vec_b57360 tests/test_vec_b57360.cpp)
+target_link_libraries(test_vec_b57360 sotc_core)
+add_test(NAME vec_b57360 COMMAND test_vec_b57360)
+
+add_executable(test_vec_b4ef70 tests/test_vec_b4ef70.cpp)
+target_link_libraries(test_vec_b4ef70 sotc_core)
+add_test(NAME vec_b4ef70 COMMAND test_vec_b4ef70)
+
+add_executable(test_vec_b494d0 tests/test_vec_b494d0.cpp)
+target_link_libraries(test_vec_b494d0 sotc_core)
+add_test(NAME vec_b494d0 COMMAND test_vec_b494d0)
+
+add_executable(test_vec_b47100 tests/test_vec_b47100.cpp)
+target_link_libraries(test_vec_b47100 sotc_core)
+add_test(NAME vec_b47100 COMMAND test_vec_b47100)
+
+add_executable(test_vec_b44580 tests/test_vec_b44580.cpp)
+target_link_libraries(test_vec_b44580 sotc_core)
+add_test(NAME vec_b44580 COMMAND test_vec_b44580)
+
+add_executable(test_vec_b33bd0 tests/test_vec_b33bd0.cpp)
+target_link_libraries(test_vec_b33bd0 sotc_core)
+add_test(NAME vec_b33bd0 COMMAND test_vec_b33bd0)
