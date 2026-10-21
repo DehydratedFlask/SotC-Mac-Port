@@ -1,6 +1,6 @@
 # Round 71 fixtures complete
 
-Checkpoint time: 2026-10-21 16:30 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Checkpoint time: 2026-10-21 16:34 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). The claims were published before dispatch in commits
 `bb1f58628a85dbea0331e8195d792a49193d02d8` and claim-doc sync `3a866fa106f43d7cc4bff3ec46fc1dac3cd6cbcc`.
 
@@ -70,6 +70,19 @@ At 2026-10-21 16:33 CDT, the staged path audit accepted exactly 9 allowlisted pa
 
 These checks include only the three test files, task/evidence/handoff/index documents, and Round71
 checkpoints. The pre-existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/`
-are unstaged and excluded. Exact next action: commit the staged allowlisted files, push `origin
-main`, fetch, and verify `HEAD == origin/main`; append commit and state log hashes here before
-considering this checkpoint complete.
+were unstaged and excluded.
+
+Completion commit `6e517b91a849c48a2775edce346c9539abb8c7e6` (`test: verify Round 71 launcher,
+dynlink, and split fixtures`) exited 0; commit log SHA-256
+`27d961e2e807dcef4fe01f46083836ae02829113421f102b34ac458246ff39a2`. `git push origin main`
+exited 0; push log SHA-256 `c14c88915525a59d6939e02d7ca7e8289c2b9a8e9bbdde3af04dde8605d9bcc5`. After
+`git fetch origin`, `HEAD == origin/main == 6e517b91a849c48a2775edce346c9539abb8c7e6`, divergence
+`0 0`; fetch log is empty (SHA-256
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`), and state log SHA-256 is
+`623d3494bdff76f2d1d74ee46fa94c13148c567ea0c9d651bd042cac5f1e3562`. The only remaining worktree
+changes are `native/api/CMakeLists.txt` and `native/api/host/`, preserved as user-owned state and
+excluded from publication.
+
+Next exact action: publish the three bounded Round72 claims recorded in
+`docs/TASKS.md` and [their claim checkpoint](2026-10-21-root-round72-fixture-claims.md), then dispatch
+the single-file tasks. Round71 fixtures do not advance a game acceptance gate.

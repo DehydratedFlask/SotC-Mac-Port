@@ -1,12 +1,25 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 16:30 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 16:37 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Round 72 fixture claims (active)
+
+- Claimed three independent, test-only tasks: reading an empty synthetic PSARC member, including
+  `.stopping` in launcher core diagnostics, and rejecting a carve lead larger than the free region.
+  Claim-time code/test identities and passing root baselines are in the
+  [claim checkpoint](docs/checkpoints/2026-10-21-root-round72-fixture-claims.md).
+- Owners: `/root + review_host_proto` owns only `scripts/test_psarc.py`; `/root + launcher_review`
+  owns only `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift`; `/root + round68_native_scout`
+  owns only `native/tests/test_free_list_carve.cpp`. `/root` remains sole integrator for shared docs.
+- Implementation has not started. Next exact action: publish these claims with the Round71
+  checkpoint sync, then dispatch each single-file edit. User-owned `native/api/CMakeLists.txt` and
+  untracked `native/api/host/` remain untouched and excluded.
 
 ## Round 71 fixtures verified (/root)
 
@@ -24,6 +37,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Claim commit `bb1f58628a85dbea0331e8195d792a49193d02d8` and claim-doc sync
   `3a866fa106f43d7cc4bff3ec46fc1dac3cd6cbcc` are pushed; completion publication is recorded in
   the [completion checkpoint](docs/checkpoints/2026-10-21-root-round71-fixtures-complete.md).
+- Completion commit `6e517b91a849c48a2775edce346c9539abb8c7e6` (`test: verify Round 71 launcher,
+  dynlink, and split fixtures`) is pushed to `origin/main`; `HEAD == origin/main`, divergence `0 0`.
+  Only the pre-existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/`
+  remain in the worktree and are excluded.
 - Existing user-owned `native/api/CMakeLists.txt` and `native/api/host/` remain untouched and
   excluded. Next exact action after publication: identify additional independent bounded tasks;
   do not change any acceptance gate based on these fixtures.
