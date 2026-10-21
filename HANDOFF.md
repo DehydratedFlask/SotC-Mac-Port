@@ -1,12 +1,58 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 12:23 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 12:29 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 45 (`/root`)
+
+- Completed `APP-01-LAUNCHER-PRESENTATION-IDLE-TONE-FIXTURE-01`: worker and root each pass
+  82 launcher tests across 12 suites. The idle model now asserts `.neutral`; production is
+  unchanged. E153 and the [completion checkpoint](docs/checkpoints/2026-10-21-root-app01-idle-tone-complete.md)
+  record log hashes.
+- Completed `CPU-01-LEAF-CTOR-DECODER-FAIL-CLOSED-FIXTURE-01`: worker and root each pass the
+  synthetic NOP `DecodeError` test; the decoder is unchanged. E154 and the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-cpu01-leaf-ctor-decode-fail-closed-complete.md)
+  record evidence.
+- Completed `SRV-01-REGION-SPLIT-OVERFLOW-FIXTURE-01`: worker and root each pass focused CTest
+  1/1; root rebuilt the test target before replay. The overflow is rejected without mutation.
+  E155 and the [completion checkpoint](docs/checkpoints/2026-10-21-root-srv01-region-split-overflow-complete.md)
+  record evidence.
+- Regenerated the folder index to 14,382 folders. The first `trail build --check` after the test
+  edits reported the region test change and new decoder test as stale; `trail build` rebuilt the
+  graph to 3,544 nodes / 4,774 edges, and the follow-up check passed. The graph cache is ignored.
+- See the [round 43 publication checkpoint](docs/checkpoints/2026-10-21-root-round43-publication.md)
+  for publication of the claims. Existing `native/api/CMakeLists.txt` and `native/api/host/`
+  remain untouched and unpublished. G0 is still PARTIAL; G1–G6 remain NOT RUN.
+- Exact next action: stage only the three verified test files, evidence/task/handoff updates,
+  folder index, and completion checkpoints; run staged/full audits, commit, and push. Then select
+  another unclaimed bounded task if the goal remains active.
+
+## Session addendum 2026-10-21 round 44 (`/root`)
+
+- Published the save-header fixture completion and three independent test-only claims in commit
+  `ba0075db83b663821567b65d4a0af8c947e7295f` (`test: verify trailing save chunk header fields`);
+  push succeeded and `HEAD` matches `origin/main`. See the
+  [round 43 publication checkpoint](docs/checkpoints/2026-10-21-root-round43-publication.md).
+- The commit passed `python3 scripts/project_index.py` and `--check` at 14,379 folders,
+  `trail build --check` at 3,539 nodes, staged path audit (10 paths), and full path audit
+  (1,561 paths). Only allowlisted documentation and `native/tests/test_save_chunk_header.cpp`
+  were committed.
+- Workers now own separate files: `/root/launcher_review` has
+  `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift`, `/root/review_host_proto` has the
+  new `tools/lift/test_leaf_ctor_decode.py`, and `/root/slot23_raw_xrefs` has
+  `native/tests/test_region_split.cpp`. All three tasks are `ACTIVE`, zero failed tries; tests
+  have not yet been independently replayed by root.
+- `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and unpublished.
+  Actual boot, authentic audio, real save/reload, Metal, and forbidden-runtime/module gates remain
+  open.
+- Exact next action: review each worker's isolated diff, replay the focused acceptance command,
+  capture root logs and hashes, then publish verified outcomes and this commit's publication
+  record.
 
 ## Session addendum 2026-10-21 round 43 (`/root`)
 

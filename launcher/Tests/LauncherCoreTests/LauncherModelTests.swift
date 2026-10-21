@@ -445,6 +445,7 @@ struct LauncherPresentationTests {
         let presentation = LauncherPresentation.make(state: .idle, blockedReason: "NOT BUILT: x", failureCode: nil)
         #expect(presentation.status == "NOT BUILT: x")
         #expect(presentation.accessibilityValue == "Not ready. NOT BUILT: x")
+        #expect(presentation.tone == .neutral)
         #expect(LauncherPresentation.make(state: .idle, blockedReason: nil, failureCode: nil).status == "Not ready to play.")
     }
 
