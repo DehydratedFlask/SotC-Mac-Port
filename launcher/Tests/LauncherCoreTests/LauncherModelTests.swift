@@ -453,6 +453,7 @@ struct LauncherPresentationTests {
         let unavailable = LauncherPresentation.make(state: .failed("x"), blockedReason: nil, failureCode: .engineNotImplemented)
         #expect(unavailable.tone == .unavailable)
         #expect(unavailable.hint != nil)
+        #expect(unavailable.accessibilityValue == "Unavailable. Not running. Unavailable: the native game engine is not implemented yet, so the game cannot start.")
         let other = LauncherPresentation.make(state: .failed("boom"), blockedReason: nil, failureCode: .internalError)
         #expect(other.tone == .failure)
         #expect(other.status == "Failed: boom")
