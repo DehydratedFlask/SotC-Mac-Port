@@ -115,3 +115,7 @@ need explicit added scopes; do not accidentally replace the existing scope list.
 ## 2026-10-19 — RE-02/DATA-02 session (claude-sonnet-5-5)
 
 No downloads or installs. Created stdlib-only helpers scripts/ps4_dynlink.py, psarc.py, disasm_range.sh (uses Xcode's llvm-objdump + clang assembler on dumped bytes in local/re/work; remove local/re/work to clean). Graft rebuilt: logs/graft-build-2.log.
+
+## 2026-10-20 21:18 CDT — REA ownership-helper build blocked by sandbox (CPU-01-CTOR10-OBJECT-INIT-01)
+
+Existing REA CLI 6.7.0/Ghidra12.1.4 offline function query at `0xb30950` spawned its Swift ownership-preparation helper and failed before target analysis (exit1, 4.9s): compiler could not write `/Users/dehydratedflask/.cache/clang/ModuleCache/Swift-7JL1KBZ3A6V3.swiftmodule`, then could not load arm64-macOS27 standard library. Exact command/JSON/hashes: `docs/checkpoints/2026-10-20-root-cpu01-ctor10-provider-cache-failure.md`; private captures `local/re/evidence/cpu01-ctor10-object-init-01/rea-b30950.*`. No tool was installed/upgraded and no dependency/config was replaced. Purpose: prepare offline Ghidra analysis ownership. Removal boundary: task-local private captures/caches; preserve shared installed tools/compiler cache. Principal authorized an access-scoped retry after checkpoint publication, preserving the original failed evidence. Compiler version was not separately recaptured for this failed helper preparation; do not treat it as a successful build or analysis.
