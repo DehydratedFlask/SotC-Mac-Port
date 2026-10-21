@@ -93,6 +93,7 @@ struct CoreClientTests {
         #expect(CoreArchiveCheck.Status(code: 9) == .unknown(9))
         #expect(CoreSubsystem.Status(code: 3) == .notLinked)
         #expect(CoreSubsystem.Status(code: 2) == .implemented)
+        #expect(CoreSubsystem.Status(code: 99) == .unknown(99))
     }
 
     @Test func nativeCoreRowIsNotBuiltWhileEngineIsNotReady() async throws {
