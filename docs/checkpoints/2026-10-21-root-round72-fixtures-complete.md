@@ -67,7 +67,26 @@ reading, synthetic diagnostics formatting, and pure carve-fit math. None advance
 G0 remains PARTIAL; G1–G6 remain NOT RUN. No install or dependency facts changed. User-owned
 `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and excluded.
 
-Next exact action: finish project-index and Trail refresh/checks, audit only allowlisted changes,
-commit and push the three tests plus E216–E218, task status, handoff, and this checkpoint. Then scout
-the next independent bounded tasks. Status: all three fixtures `FIXTURE_VERIFIED`; one successful
-attempt and zero failed tries each.
+## Completion publication checkpoint
+
+At 2026-10-21 16:45 CDT, `/root` published the three test files, E216–E218, task status, handoff,
+generated folder index, and this checkpoint in commit
+`be687574e57b6626851406fc86fea5508b90a026` (`test: verify Round 72 fixtures`). Before commit,
+`git diff --cached --check` passed; the staged path audit accepted exactly 9 allowlisted paths and
+the full audit accepted 1,649 paths. Audit logs: `complete-audit-staged.log` SHA-256
+`b5bbc16558b5bc18a64d77fd6843e9cf9d6b9cb7401c2a2f1d67f39362e23343`, `complete-audit-all.log`
+SHA-256 `a5b26fcc95c7b1fb5c799f69b80295f9062ec2983e86cbecf4344986564c0931`; cached diff check
+`complete-diff-check.log` is empty (SHA-256
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). `git fetch origin` exited
+0; the commit log SHA-256 is `e444ffce91e5541bc4a6782dd4d2cb012af2c29ac9e8ddb1e545e1135c47eaed` and push log
+SHA-256 is `31e1f89594293149da46f1d413fa2f2e962939817b2dd334dafaa4fd8a3d05cc`. The push advanced
+`963adb5..be68757`. After another fetch, `git rev-parse HEAD origin/main` returned
+`be687574e57b6626851406fc86fea5508b90a026` for both refs; `git rev-list --left-right --count
+HEAD...origin/main` returned `0 0`. Post-push state log `complete-state.log` SHA-256
+`bafebe0544ec1663fc5c60d5555079052f1efbe617d7957be47744c6262d25c7` records only the pre-existing
+user-owned `native/api/CMakeLists.txt` modification and untracked `native/api/host/`; both remain
+untouched and excluded.
+
+Status: all three Round72 fixtures are `FIXTURE_VERIFIED`, one successful attempt and zero failed
+tries each. G0 remains PARTIAL; G1–G6 remain NOT RUN. Next exact action: scout new independent,
+bounded tasks and publish claims before implementation.
