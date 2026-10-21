@@ -71,6 +71,9 @@ struct LauncherLifecycleTests {
         #expect(!LauncherLifecycle.canStart(readinessAllowsStart: false, from: .failed("retryable")))
         #expect(!LauncherLifecycle.canStart(readinessAllowsStart: true, from: .idle))
         #expect(!LauncherLifecycle.canStart(readinessAllowsStart: true, from: .running))
+        #expect(!LauncherLifecycle.canStart(readinessAllowsStart: true, from: .validating))
+        #expect(!LauncherLifecycle.canStart(readinessAllowsStart: true, from: .starting))
+        #expect(!LauncherLifecycle.canStart(readinessAllowsStart: true, from: .stopping))
     }
 }
 

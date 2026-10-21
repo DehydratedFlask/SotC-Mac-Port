@@ -24,6 +24,10 @@ class ParseManifestTests(unittest.TestCase):
         )
         self.assertEqual(parsed, {"dir/item.bin": 17})
 
+    def test_parses_zero_byte_member_size(self) -> None:
+        parsed = parse_manifest_bytes("synthetic", b'{"path":"empty.bin","size":0}\n')
+        self.assertEqual(parsed, {"empty.bin": 0})
+
     def test_parses_final_record_without_trailing_newline(self) -> None:
         parsed = parse_manifest_bytes("synthetic", b'{"path":"final.bin","size":29}')
         self.assertEqual(parsed, {"final.bin": 29})

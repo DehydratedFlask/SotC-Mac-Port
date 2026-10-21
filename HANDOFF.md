@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 15:27 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 15:33 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,29 +8,14 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Round 67 fixture claims published (/root)
+## Round 67 fixtures verified (/root)
 
-- Five bounded test-only fixtures are claimed in `docs/TASKS.md`: two launcher assertions, one
-  zero-byte synthetic manifest record, one direct zero-size host-map helper assertion, and one
-  project-index stale-output identification case. Exact owners, prerequisites, target files,
-  baseline commands/results/log hashes, file hashes, limits, and next actions are in the
-  [Round 67 claim checkpoint](docs/checkpoints/2026-10-21-root-round67-fixture-claims.md).
-- Claim commit `ca9e20fedad3fa2e8d73091bb7a06ec78f7f2621` is pushed. The push log is
-  `local/validation/root-round66-scout/round67-claim-push.log`, SHA-256
-  `9fc55f37222b69d2cb1a20bd0a36d5b3a9eb14d3324af5dcacb2171329b18ede`; after push,
-  `HEAD == origin/main == ca9e20fedad3fa2e8d73091bb7a06ec78f7f2621`.
-- Baselines were clean at claim time. By 15:28 CDT, workers reported passing attempts for the two
-  launcher assertions (8 and 11 filtered tests), zero-byte manifest parsing (24 tests), and direct
-  host-map zero-size rejection (build exit 0; CTest 1/1). Worker logs and hashes are in the claim
-  checkpoint. Root review and independent replay remain pending. Root owns
-  `scripts/test_project_tools.py`.
-- Round66's latest docs-only publication record is commit
-  `11a904ec2dfcc8aaeb1061b23db4f721a7272046`; before these claim edits, `HEAD == origin/main` at
-  that commit. Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/`
-  remain untouched, unstaged, and excluded.
-- Exact next action: record this dispatch checkpoint, implement the claimed project-index fixture,
-  then review each worker diff and independently replay its focused command. Root retains shared
-  docs, root replay, evidence IDs E199–E203, and the completion record.
+- Five bounded test-only fixtures are recorded in `docs/TASKS.md` and `docs/EVIDENCE.md` (E199–E203): two launcher assertions, one zero-byte synthetic manifest record, one direct zero-size host-map helper assertion, and one project-index stale-output identification case. All worker and root checks passed; task rows are `FIXTURE_VERIFIED` with one successful implementation attempt and zero failed tries. Commands, source/test hashes, logs, limits, and observations are in the [completion checkpoint](docs/checkpoints/2026-10-21-root-round67-fixtures-complete.md). The earlier claim and dispatch commits remain recorded there and in the [claim checkpoint](docs/checkpoints/2026-10-21-root-round67-fixture-claims.md).
+- The launcher focused runs pass 8 and 11 tests; the archive-overlap parser passes 24; host-map target builds exit 0 with focused CTest 1/1; project-tools passes 9. Each is a bounded fixture only and establishes no native-game behavior.
+- Source graph refreshed with scopes `scripts`, `tools`, `reference`, `native`, `launcher`, and `tests`: 3,566 nodes / 4,824 edges; `trail build --check` passes. The project index refresh and check results are recorded in the completion checkpoint. Optional meaning layer remains unbuilt.
+- This fixture batch does not advance game gates: G0 remains PARTIAL; G1–G6 remain NOT RUN. No game executable, cold boot, actual game audio, real save/reload, or Metal gameplay is demonstrated.
+- Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and excluded from this publication.
+- Exact next action: complete allowlist audits, publish the fixture/docs checkpoint to `origin/main`, verify the remote ref, then scout and claim the next bounded batch from the live repository.
 
 ## Round 66 bounded fixtures verified (/root)
 
