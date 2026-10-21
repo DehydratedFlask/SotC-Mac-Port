@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 16:16 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 16:22 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,23 +8,32 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Round 70 claims published (/root)
+## Round 70 fixtures verified (/root)
 
-- Three bounded tasks are claimed in `docs/TASKS.md`: one project-index check-mode edge fix, one
-  synthetic dynlink span bounds fixture, and one launcher presentation-model assertion. Baselines,
-  ownership, exact checks and limits are in the
-  [Round 70 claim checkpoint](docs/checkpoints/2026-10-21-root-round70-fixture-claims.md).
-- Implementation has not started. Dispatch the two test-only tasks after verifying the claim
-  commit is public; root owns the indexer fix and shared documentation.
-- `docs/FOLDERS.md` and the private folder inventory are refreshed and `--check` passes at 14,465
-  folders. `trail build --check` reports the wiring graph in sync (3,568 nodes / 4,829 edges / 943
-  cards); its optional meaning layer remains unbuilt. The claim checkpoint retains an earlier
-  stale-index check caused by adding a private validation log after generation, followed by the
-  passing refresh/check.
-- Claim commit `099136c56e4de5101b97112d634b5d86864c7425` is pushed; after fetch,
-  `HEAD == origin/main` with divergence `0 0`. Push and state log hashes are in the claim checkpoint.
-- Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched.
-- Exact next action: dispatch the two claimed test-file tasks and implement the root indexer task.
+- The three published Round70 claims are now `FIXTURE_VERIFIED` in `docs/TASKS.md`; E210–E212 and
+  the [completion checkpoint](docs/checkpoints/2026-10-21-root-round70-fixtures-complete.md)
+  record exact commands, hashes, logs, and limits. Root reviewed each diff and independently
+  replayed all three checks.
+- `DOC-FOLDER-INDEX-CHECK-DIRECTORY-OUTPUT-01` changes check mode to report a directory at an
+  output path as stale. The focused project-tools suite passes 10 tests. The first root run failed
+  because the new test expected the public docs index to stale when the private `local/` JSON path
+  became a directory; the docs renderer intentionally omits nested private paths. The corrected
+  expectation passes and the indexer no longer raises `IsADirectoryError`.
+- `RE-02-DYNLINK-SPAN-NEGATIVE-OFFSET-SIZE-FIXTURE-01` pins exact errors for a negative offset and
+  a negative length; worker and root each pass 25 tests. The task
+  `APP-01-PRESENTATION-IDLE-HINT-ABSENCE-FIXTURE-01` asserts the idle launcher presentation has no
+  recovery hint; worker and root each pass all 3 focused presentation tests.
+- These fixtures establish temporary-root index reporting, synthetic byte-span validation, and a
+  pure launcher presentation-model value only. They do not establish ELF loading, game startup,
+  runtime UI behavior, actual game audio, save/reload, or Metal rendering. G0 remains PARTIAL;
+  G1–G6 remain NOT RUN. No install or dependency facts changed.
+- Claim commit `099136c56e4de5101b97112d634b5d86864c7425` and claim documentation sync
+  `bf96db6ebbaa897b9916f7b4bd5ebd4d57d634ed` are pushed to `origin/main`. Completion publication
+  state will be appended after the completion commit.
+- Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched
+  and excluded.
+- Exact next action: use read-only scouts and the live task register to identify independent
+  Round71 candidates; verify their contracts before publishing bounded claims.
 
 ## Round 69 fixtures verified (/root)
 
