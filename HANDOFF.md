@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 13:58 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 14:02 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -19,7 +19,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   region-split build plus CTest 1/1. Production source and test-file claim-time hashes are recorded
   in the checkpoint. Each task has 0 failed fixture attempts and a separate worker owner.
 - `python3 scripts/project_index.py` exited 0 and indexed 14,417 folders; `docs/FOLDERS.md` lists
-  356 checkpoint files. Log `local/validation/root-round61-baseline/project-index.log`, SHA-256
+  357 checkpoint files. Log `local/validation/root-round61-baseline/project-index.log`, SHA-256
   `39bf43672c493802900b5ff2ada9ee28bb1d1d50c8c4546146075a4c09be1283`.
 - `python3 scripts/project_index.py --check` first reported a stale local folder index; after
   regeneration it reports `14417 folders indexed; current`. `trail build --check` exits 0 with the
@@ -27,9 +27,15 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Before publication, the staged path audit accepted 5 documentation paths and the full audit
   accepted 1,623 paths. Logs and hashes are in the claim checkpoint; cached and working
   `git diff --check` passed. User-owned `native/api` work remains unstaged.
-- Exact next action: fetch `origin/main`, commit and push the claim/docs checkpoint if the branch is
-  unchanged, then dispatch the workers to their respective test files only; root owns shared docs
-  and independent replay.
+- Claim commit `4cbd478180cb983c52b711e8a69cca2e732ea4f6` is pushed. A confirming no-op push reports
+  `Everything up-to-date`; `HEAD` and `origin/main` match. Push and ref logs are recorded in the
+  dispatch checkpoint.
+- The Round 61 dispatch checkpoint records exact owners, test-only file boundaries, commands, and
+  baseline evidence. Its staged audit accepts 4 paths and the full audit accepts 1,624 paths; exact
+  audit hashes and diff-check status are in that checkpoint. User-owned `native/api` work remains
+  unstaged.
+- Exact next action: fetch `origin/main`, commit and push the dispatch checkpoint if the branch is
+  unchanged, then send the three worker prompts; root owns shared docs and independent replay.
 
 ## Session addendum 2026-10-21 Round 60 fixtures verified (/root)
 
