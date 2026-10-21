@@ -1,12 +1,32 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 13:05 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 13:08 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 57 claim (`/root`)
+
+- Claimed three distinct synthetic fixture tasks with zero failed tries before implementation:
+  `APP-01-CORE-READINESS-QUERY-FAILURE-NOT-BUILT-FIXTURE-01` pins the failed-query mapping when
+  validation and coverage are absent; `RE-02-DYNLINK-UNMAPPED-SYMBOL-TYPE-FIXTURE-01` pins the
+  numeric-string fallback for an unknown ELF symbol type; `SRV-01-HOST-MAP-ROUNDUP-OVERFLOW-FIXTURE-01`
+  pins rejection of a size that overflows page rounding before mapping.
+- Claim details and focused commands are in
+  [round 57 fixture claims](docs/checkpoints/2026-10-21-root-round57-fixture-claims.md). Each task
+  has an existing, registered test file; workers own separate files and root owns shared docs.
+- Source observations: `CoreReadiness.nativeCoreStatus` has a distinct `.notBuilt` branch for a
+  query failure with nil validation/coverage; `parse` falls back to the decimal string for an
+  unknown symbol type; `map_anonymous_aligned` detects wrapped page rounding before calling
+  `mmap`. All evidence is synthetic/pure code.
+- Claim-time state: `main` at `4439751`, matching `origin/main`; only the pre-existing
+  `native/api/CMakeLists.txt` modification and untracked `native/api/host/` are dirty. They remain
+  untouched and excluded.
+- Exact next action: publish these claims and their task rows, then assign the three distinct test
+  files and independently replay their focused verification commands.
 
 ## Session addendum 2026-10-21 round 56 completion (`/root`)
 
