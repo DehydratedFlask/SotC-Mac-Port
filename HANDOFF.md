@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — SAV-01 serializer container format decoded statically
+
+The save body is a tagged-chunk stream (12-byte chunk headers: name hash u32 / `0xBEEF` / tag u16 / back-patched length u32; FNV-1a-32 over uppercased field names). Two concrete save-object classes resolved (vtables `0x15c97a8`, `0x15c9830`; slot `+0x50` targets `0x543f40`, `0x548d30`). 2 REA successes; root replayed verifier (55/55 worker mutations caught) and checksums. Details (field names private): `docs/checkpoints/2026-10-20-root-sav01-serializer-complete.md`. Blob contents unknown; no native serializer; no save works. G0 PARTIAL, G1-G6 NOT RUN.
+
+Next exact action: game-data blob producer `0x7e5bb0` and stream flush slot `[vtable+0x10]` of vtable `0x15d2450`; AUD-02 callers of `FUN_00997700`; constructor batch 23 (next position 184 `0xbcc4e0`).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — AUD-02 audio region dossier verified
 
 Audio call graph (36 functions, 26 direct edges; byte scan = Ghidra): init `FUN_009485a0` / shutdown `FUN_00949fe0`, an Audio3d push thread (`FUN_00949f80`), a mixer tick (`FUN_009536d0`: SystemRender + queue level + advance) driven by an AudioOut thread (`FUN_009ac390`) and a second driver `FUN_00997700`. Roles are inference. 2 REA successes; root replayed verifier and checksums. Details (strings private): `docs/checkpoints/2026-10-20-root-aud02-region-dossier-complete.md`. No decoder/mixer, no audio. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 210/210 (batch 22, pushed `19bdb6c`).
