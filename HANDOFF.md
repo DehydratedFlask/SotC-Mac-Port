@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 08:47 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 08:49 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -51,6 +51,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   now passes and Graft resolves the new ahead-table test file. Next explicitly reconfigure this
   build and run the constructor and host focused tests. See
   [the failed-build checkpoint](docs/checkpoints/2026-10-21-root-cpu01-slot24-47-build-target-failure.md).
+- After reconfigure, `test_registration_thunks_ahead` built and its focused CTest passed 1/1.
+  The host library and child executable build, but its test target fails at line 508 because
+  `WIFEXITED` receives the temporary `reap(unused)` expression. Host try 1 is recorded; store the
+  status in a local, rebuild, and run the focused host CTest. See
+  [the host build checkpoint](docs/checkpoints/2026-10-21-root-app01-core-host-build-failure.md).
 
 ## Session addendum 2026-10-21 round 2 (orchestrator)
 
