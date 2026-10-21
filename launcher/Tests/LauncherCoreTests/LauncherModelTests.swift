@@ -518,6 +518,20 @@ struct CoreReadinessTests {
             .hasPrefix("No readiness check has run yet."))
     }
 
+    @Test func coreSectionReportsQueryAndLastRequestFailuresInOrder() {
+        let queryFailure = CoreFailure(code: .io, message: "synthetic query failure")
+        let lastFailure = CoreFailure(code: .badState, message: "synthetic request failure")
+
+        #expect(CoreDiagnostics.coreSection(
+            coverage: nil, status: nil, lastFailure: lastFailure, queryFailure: queryFailure
+        ) == [
+            "Core report:",
+            "  Core query failed: synthetic query failure (IO)",
+            "  Coverage: NOT REPORTED",
+            "  Last core answer to a request: BAD_STATE — synthetic request failure",
+        ])
+    }
+
     @Test func unknownCoreErrorCodeKeepsItsRawValueInDiagnostics() {
         #expect(CoreDiagnostics.code(.unknown(99)) == "UNKNOWN(99)")
     }

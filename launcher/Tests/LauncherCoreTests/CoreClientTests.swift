@@ -234,6 +234,8 @@ struct CoreClientTests {
     @Test func failureTextCoversTheErrorsTheLauncherCanSee() {
         #expect(CoreClientMapping.failureText(for: .engineNotImplemented).contains("not implemented"))
         #expect(CoreClientMapping.failureText(for: .assetsNotReady).contains("validation"))
+        #expect(CoreClientMapping.failureText(for: .io) == "The chosen assets folder cannot be used.")
+        #expect(CoreClientMapping.failureText(for: .badState) == "The game core is not in a state that allows that action.")
         #expect(CoreClientMapping.failureText(for: .abiMismatch) == "The game core was built for a different interface version.")
         #expect(CoreClientMapping.failureText(for: .unknown(5)) == CoreClientMapping.failureText(for: .internalError))
     }

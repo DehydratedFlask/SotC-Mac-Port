@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 17:13 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 17:20 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,25 +8,27 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Round 74 fixture claims (/root)
+## Round 74 fixtures verified (/root)
 
-- Five independent test-only tasks are claimed and awaiting publication: two parser fixtures
-  (`scripts/test_psarc.py`, `scripts/test_ps4_dynlink.py`), two launcher mapping/formatting fixtures
-  (`LauncherModelTests.swift`, `CoreClientTests.swift`), and one native list-helper fixture
-  (`native/tests/test_region_list.cpp`). No production file is assigned for change.
+- All five claimed test-only tasks are now `FIXTURE_VERIFIED`: PSARC TOC upper bound, relocated
+  constructor sentinel, ordered launcher diagnostics failures, `.io`/`.badState` failure copy, and
+  singleton region-list unlink. Evidence E222–E226 records focused results and scope limits; logs,
+  hashes, exact commands, and observations are in the [Round74 completion checkpoint](docs/checkpoints/2026-10-21-root-round74-fixtures-complete.md).
 - Owners: `/root/review_host_proto` owns the PSARC and dynlink test files; `/root/launcher_review`
   owns the two distinct launcher test files; `/root/round68_native_scout` owns only
   `native/tests/test_region_list.cpp`. `/root` remains sole integrator for shared docs.
-- Claim-time baselines pass: 36 PSARC tests, 26 dynlink tests, 3 CoreReadiness tests, 13 CoreClient
-  tests, and native `test_region_list` build plus CTest 1/1. Code/test hashes, exact commands, logs,
-  and bounded acceptance criteria are in the
-  [Round74 claim checkpoint](docs/checkpoints/2026-10-21-root-round74-fixture-claims.md).
-- No implementation attempt has started. G0 remains PARTIAL; G1–G6 remain NOT RUN. Next exact
-  action: dispatch the five file-isolated fixtures after the claim publication sync is pushed.
-  Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched
-  and excluded.
-- Claim commit `820bb128adfb3c9a03271c33a704a3ae2682aed1` (`docs: claim Round 74 fixture tasks`) is pushed to `origin/main`; fetch
-  verification and the publication-record sync are captured in the
+- Worker and root results: PSARC 37 tests; dynlink 27; CoreReadiness 4; CoreClient 22 (9
+  native-client + 13 core-client); native `test_region_list` build exit 0 and focused CTest 1/1.
+  Each task has one successful attempt and zero failed tries. Production files are unchanged.
+- G0 remains PARTIAL; G1–G6 remain NOT RUN. Index checks passed at 14,468 folders and 386 checkpoint
+  documents; the Trail wiring graph is synced at 3,575 nodes. Staged/full publication audits pass
+  for 10 staged and 1,653 total paths; HEAD and `origin/main` match at `8bea844`. Full logs are in
+  the completion checkpoint. Existing user-owned `native/api/CMakeLists.txt` and untracked
+  `native/api/host/` remain untouched and excluded. Next exact action: commit/push only the five test
+  files and allowlisted documentation, verify the remote tip, then scout the next independent task.
+- Claim commit `820bb128adfb3c9a03271c33a704a3ae2682aed1` (`docs: claim Round 74 fixture tasks`) and
+  publication-record sync `8bea84495265e2f1d504221f2831c9a2527659fd` (`docs: record Round 74 claim
+  publication`) are pushed to `origin/main`; fetch verification is captured in the
   [Round74 claim checkpoint](docs/checkpoints/2026-10-21-root-round74-fixture-claims.md).
 
 ## Round 73 fixtures verified (/root)

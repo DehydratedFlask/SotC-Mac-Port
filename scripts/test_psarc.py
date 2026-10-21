@@ -131,6 +131,17 @@ class Tests(unittest.TestCase):
         with self.assertRaises(psarc.PsarcError):
             self.open(bytes(data))
 
+    def test_rejects_toc_size_beyond_archive_file(self):
+        data = bytearray(build([('a', b'1')]))
+        struct.pack_into('>I', data, 12, len(data) + 1)
+
+        with self.assertRaises(psarc.PsarcError) as error:
+            self.open(bytes(data))
+        self.assertEqual(
+            str(error.exception),
+            'TOC size inconsistent with entry count/file size',
+        )
+
     def test_rejects_first_block_outside_block_table(self):
         data = bytearray(build([('a', b'1')]))
         struct.pack_into('>I', data, 32 + 30 + 16, 0xffffffff)
