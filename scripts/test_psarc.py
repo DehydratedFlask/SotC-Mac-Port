@@ -85,6 +85,16 @@ class Tests(unittest.TestCase):
         self.assertEqual(a.blocks[a.entries[1]['block']], 256)
         self.assertEqual(a.read(1), payload)
 
+    def test_rejects_block_size_outside_supported_range(self):
+        valid = build([('a', b'1')])
+        for block_size in (0, (1 << 24) + 1):
+            with self.subTest(block_size=block_size):
+                data = bytearray(valid)
+                struct.pack_into('>I', data, 24, block_size)
+                with self.assertRaises(psarc.PsarcError) as error:
+                    self.open(bytes(data))
+                self.assertEqual(str(error.exception), 'unsupported entry/block size')
+
     def test_newline_manifest_accepted(self):
         a = self.open(build([('p/q', b'1'), ('r', b'2')], manifest_sep=b'\n'))
         self.assertEqual(a.paths(), ['p/q', 'r'])
