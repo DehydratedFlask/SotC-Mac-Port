@@ -44,7 +44,7 @@ def program_header(ptype=d.PT_LOAD, vaddr=0x1000, filesz=8, memsz=8):
     return struct.pack('<IIQQQQQQ', ptype, 5, 0, vaddr, vaddr, filesz, memsz, 8)
 
 
-def dynamic_import_elf_fixture():
+def dynamic_import_elf_fixture(symbol_type=2):
     """Build a minimal PS4 ELF with one import and JMPREL/RELA rows."""
     module_id, library_id = 0x1234, 0x56
     module_name, library_name = b'FixtureModule', b'libFixture'
@@ -75,7 +75,7 @@ def dynamic_import_elf_fixture():
     rela_addend = -0x123
     symbol_table = (
         struct.pack('<IBBHQQ', 0, 0, 0, 0, 0, 0) +
-        struct.pack('<IBBHQQ', symbol_name_offset, 0x12, 0, 0, 0, 0)
+        struct.pack('<IBBHQQ', symbol_name_offset, 0x10 | symbol_type, 0, 0, 0, 0)
     )
     jump_relocation = struct.pack('<QQq', target, (symbol_index << 32) | 7, addend)
     rela_offset = align8(relocation_offset + len(jump_relocation))
@@ -158,6 +158,8 @@ class Tests(unittest.TestCase):
         self.assertEqual(symbol['mod_enc'], module['enc'])
         self.assertEqual(symbol['raw'],
                          f"{expected['nid']}#{expected['library_enc']}#{expected['module_enc']}")
+        self.assertEqual(symbol['type'], 'FUNC')
+        self.assertEqual(symbol['bind'], 1)
         self.assertFalse(symbol['defined'])
 
         self.assertEqual(len(parsed['relocs']), 2)
@@ -176,6 +178,14 @@ class Tests(unittest.TestCase):
         self.assertEqual(rela['symbol'], expected['symbol_index'])
         self.assertEqual(rela['target'], expected['rela_target'])
         self.assertEqual(rela['addend'], expected['rela_addend'])
+
+    def test_parse_unmapped_symbol_type_as_decimal_string(self):
+        elf, expected = dynamic_import_elf_fixture(symbol_type=3)
+        parsed = d.parse(elf)
+
+        symbol = parsed['symbols'][expected['symbol_index']]
+        self.assertEqual(symbol['type'], '3')
+        self.assertEqual(symbol['bind'], 1)
 
     def test_parse_rejects_unterminated_final_symbol_name(self):
         elf, _ = dynamic_import_elf_fixture()
