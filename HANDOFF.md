@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 15:51 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 15:52 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -27,6 +27,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   are in the [completion checkpoint](docs/checkpoints/2026-10-21-root-round68-fixtures-complete.md).
 - The claim was published before worker edits in `7afe5fcb699137eaff4c557ba30151b5231234d0`.
   Dispatch and post-push refs are recorded in the [claim checkpoint](docs/checkpoints/2026-10-21-root-round68-fixture-claims.md).
+- Verification commit `6e6db1d4b8d9bcae9d778d099ee22dcef3aa683c` is pushed; after fetch,
+  `HEAD == origin/main` and divergence is zero. Only the pre-existing user-owned `native/api`
+  changes remain outside the commit. Post-push logs are in the completion checkpoint.
 - The fixtures cover a pure Swift lifecycle value, a synthetic ELF table guard, and synthetic
   host-map cleanup state. They do not establish live process behavior, ELF loading, allocator
   integration, game execution, or an acceptance gate. G0 remains PARTIAL; G1–G6 remain NOT RUN.
@@ -40,8 +43,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   completion checkpoint.
 - The separate PSARC invalid-UTF-8 candidate remains unclaimed pending the user's choice between
   `PsarcError` normalization and preserving `UnicodeDecodeError`.
-- Exact next action: push the verified fixtures and checkpoint; then scout and claim another
-  bounded batch if independent work remains.
+- Exact next action: scout independent Round69 candidates, preserve the pending PSARC preference,
+  and publish any new bounded claims before implementation.
 
 ## Round 66 bounded fixtures verified (/root)
 
