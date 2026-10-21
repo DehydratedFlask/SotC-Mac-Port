@@ -1,12 +1,31 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 10:23 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 10:28 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 8 (`/root`)
+
+- `DATA-02-PSARC-STORED-BLOCK-TRUNCATION-01` completion was committed and pushed as `fb28481`.
+  This updates the completion checkpoint's previous next-action entry; E130 and the synthetic-only
+  limits remain as recorded.
+- Claimed `DOC-FOLDER-INDEX-ADMIN-DIR-01`, ACTIVE with zero failed tries. Add one temp-root test in
+  `scripts/test_project_tools.py` proving nested `.git` and `__pycache__` trees do not make
+  `docs/FOLDERS.md` stale. No source/index behavior change or live index regeneration is in scope.
+  Claim: [docs/checkpoints/2026-10-21-root-doc-folder-index-admin-dir-claim.md](docs/checkpoints/2026-10-21-root-doc-folder-index-admin-dir-claim.md).
+- Graft located the ignored-directory pruning in `scripts/project_index.py:27-40` and check mode
+  in `:59-77`; the existing stability test covers `.DS_Store` and new folders but not these
+  administrative directories. Prerequisite: none.
+- Acceptance command: `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py`. No test
+  has run for this task yet. After claim publication, `slot23_raw_xrefs` owns only that test file;
+  root remains the sole `HANDOFF.md` integrator.
+- Next exact action: publish the claim, then assign the worker to add the temp-root fixture and
+  record its focused result. Keep escalated `native/api/CMakeLists.txt` and `native/api/host/`
+  outside this task and all commits.
 
 ## Session addendum 2026-10-21 round 7 (`/root`)
 
@@ -43,8 +62,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Root reviewed the test-only diff and independently replayed
   `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_psarc.py`: exit 0, 30/30. E130 and exact
   private log hashes are recorded in the completion checkpoint. No real archive/payload claim.
-- Next exact action: refresh indexes, audit the staged source/test/docs and tracked publish set,
-  then commit and push this test-only completion.
+- Publication follow-up: the completion files were committed as `fb28481` and pushed to
+  `origin/main`; current HEAD and `origin/main` both resolve to that commit. The commit included
+  the test, E130, task/handoff updates, generated folder index, and completion checkpoint.
 
 ## Session addendum 2026-10-21 round 6 (`/root`)
 
