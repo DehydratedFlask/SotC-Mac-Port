@@ -1,12 +1,28 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 11:56 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 11:57 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 32 (`/root`)
+
+- Published `DATA-02-PSARC-BLOCK-SIZE-RANGE-01` completion in commit
+  `cf5096b0c775104739f871c40da8b698618219b6` (`test: cover PSARC block-size validation bounds`);
+  `git push origin main` succeeded and HEAD matches `origin/main`. See the
+  [round 31 publication checkpoint](docs/checkpoints/2026-10-21-root-round31-publication.md).
+- Pre-push checks passed: `python3 scripts/project_index.py --check` reports 14,234 folders
+  current; `trail build --check` reports 3,536 nodes in sync; `git diff --check` passes; the staged
+  path audit accepted 7 paths and the full tracked-path audit accepted 1,539 paths.
+- The worktree retains only the pre-existing `native/api/CMakeLists.txt` modification and untracked
+  `native/api/host/`. Actual game acceptance gates remain open.
+- `/root/review_host_proto` is scouting one additional test-only task in a disjoint module; it is
+  read-only and must not edit before a bounded claim is recorded and published.
+- Exact next action: review the scout's candidate against Graft, live source, and `docs/TASKS.md`,
+  then claim one bounded task before assigning any edit.
 
 ## Session addendum 2026-10-21 round 31 (`/root`)
 
