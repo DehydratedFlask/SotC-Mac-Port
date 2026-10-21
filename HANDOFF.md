@@ -1,12 +1,27 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 10:06 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 10:09 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 6 (`/root`)
+
+- Completed and published `AUD-01-XFF-READER-IDENTITY-FIXTURE-01`: commits `14fcc86` and
+  `1260c96` are on `origin/main`; worker and root both pass 16/16 synthetic tests; E127 records
+  the test-only path expectation correction and unchanged parser hash.
+- Claimed `RE-02-DYNLINK-PHDR-ENTRY-SIZE-01`, ACTIVE, attempt 0: reject ELF64 program headers
+  whose `e_phentsize` is not 56 and add one synthetic regression. Worker owns
+  `scripts/ps4_dynlink.py` and `scripts/test_ps4_dynlink.py`; claim record:
+  [docs/checkpoints/2026-10-21-root-re02-phdr-entsize-claim.md](docs/checkpoints/2026-10-21-root-re02-phdr-entsize-claim.md).
+- Graft located `program_headers` at `scripts/ps4_dynlink.py:46-52`; it decodes records with a
+  56-byte stride but does not check ELF header `e_phentsize`. Its callers are parser → build → main.
+  Existing synthetic tests cover class/data/machine and truncated tables, but not this field.
+- Next exact action: publish this claim, then delegate the test-first regression and narrow parser
+  guard. No live ELF/loader behavior or game milestone is implied.
 
 ## Session addendum 2026-10-21 round 5 (`/root`)
 
