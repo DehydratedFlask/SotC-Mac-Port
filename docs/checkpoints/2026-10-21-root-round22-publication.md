@@ -1,0 +1,12 @@
+# Checkpoint: round 22 publication
+
+- Local date/time: 2026-10-21 11:43 CDT.
+- Agent ID: `/root` (integrator).
+- Task IDs: `DATA-02-ARCHIVE-MANIFEST-CRLF-01` completion and `RE-02-DYNLINK-RELRO-IMAGE-FIXTURE-01` claim.
+- Published paths: `HANDOFF.md`, `docs/EVIDENCE.md`, `docs/FOLDERS.md`, `docs/TASKS.md`, two task checkpoints, and `scripts/test_archive_overlap_map.py`. Commit `91d58a255b0e94dc271de24d43a1fd2ec0bc76c0` (`test: verify CRLF manifest records and claim RELRO coverage`) was pushed by `git push origin main`; exit 0. `git rev-parse HEAD origin/main` returned the same hash for both.
+- Exact pre-commit checks and results: `python3 scripts/project_index.py` exit 0 (14,230 folders indexed; written); `python3 scripts/project_index.py --check` exit 0 (14,230 folders indexed; current); `trail build --check` exit 0 (3,533 nodes in sync; deep meaning layer not built); `git diff --check` exit 0; `git diff --cached --check` exit 0; `python3 -I scripts/audit_publish_paths.py` exit 0 (7 staged paths); `python3 -I scripts/audit_publish_paths.py --all` exit 0 (1,528 paths).
+- Test evidence: worker and root each ran `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_archive_overlap_map.py`, exit 0 (20/20). Worker log `local/validation/data02-manifest-crlf/attempt-2.log`, SHA256 `109f6825b3e6c989206be6039d76e08bf389f466230df5704b39b0bac429ce72`; root log `local/validation/data02-manifest-crlf/root-replay.log`, SHA256 `4b6cb9b947f6b57ddba7c60f6f4c261cefeaa69be7e4c782d1dadd4248b7eb3d`. Test SHA256 `07ab59c0500a99ad13d3d0c15d63e525a06061ccef34fe734ab5e76b796665b7`; parser unchanged SHA256 `25889f7ff85db9154ba209bed4913b1bb9e1a627e8a984ef7c11580b24e982d1`.
+- Post-push status command: `git status --short --branch`; exit 0, `main` synchronized with `origin/main`. The only remaining worktree state is the pre-existing `native/api/CMakeLists.txt` modification and untracked `native/api/host/`; neither was staged or published.
+- Observation: the CRLF test verifies only synthetic JSONL record handling. The RELRO task is a separate synthetic test claim and has not run. Inference limit: no live archive or ELF, loader, runtime, or gameplay behavior is established.
+- Remaining risks: cold boot, audible game content, real save/reload, direct Metal validation, and forbidden-runtime/module absence remain unproven. The native host protocol task remains under its existing principal escalation.
+- Next exact action: review the `launcher_review` change in `scripts/test_ps4_dynlink.py`, root replay the focused suite, then publish the completion evidence.
