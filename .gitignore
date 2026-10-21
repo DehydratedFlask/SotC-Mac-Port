@@ -56,6 +56,8 @@ DerivedData/
 # Graft graph cache — regenerable (`graft build`); large generated noise.
 /graft/
 /.graft/
+# Stray graft/trail cache written when a tool runs from tools/ (never publishable).
+/tools/graft/
 
 # Accidental RE scratch at workspace root.
 /*.s
