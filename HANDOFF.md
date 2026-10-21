@@ -21,8 +21,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - All three are `ACTIVE`, with 0 failed tries and 0 implementation attempts. Claim docs and task
   rows are published before implementation prompts. These remain unit fixtures and do not advance
   G0–G6. Existing user-owned `native/api` paths stay untouched and excluded.
-- Exact next action: confirm the Round66 claim commit is pushed and matches `origin/main`, then send
-  each worker its single-file scope, exact fixture, and pre-created private log path.
+- Claim commit `9bb85cc4299134fb230165a70891dfc135034aa1` (`docs: claim Round66 launcher,
+  dynlink, arena fixtures`) is pushed; post-push `HEAD == origin/main` is recorded in the
+  [Round66 claim checkpoint](docs/checkpoints/2026-10-21-root-round66-fixture-claims.md).
+- Exact next action: dispatch each worker its single-file scope, exact fixture, and pre-created
+  private log path. Keep production code and shared documentation under root ownership.
 
 ## Round 65 bounded test-only fixtures verified (/root)
 
