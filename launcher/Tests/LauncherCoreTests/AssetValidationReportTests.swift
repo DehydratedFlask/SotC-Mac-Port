@@ -46,6 +46,18 @@ struct AssetValidationReportTests {
         #expect(report.status == .missing("pak0.psarc is not a PSARC archive"))
     }
 
+    @Test func shortMagicHeaderIsNotMissingButIsNotPsarc() throws {
+        let dir = try makeDirectory()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try write(AssetValidator.requiredArchives, into: dir)
+        try Data("PS".utf8).write(to: dir.appending(path: "pak0.psarc", directoryHint: .notDirectory))
+
+        let report = AssetValidator().report(directory: dir)
+
+        #expect(report.problems == ["pak0.psarc is not a PSARC archive"])
+        #expect(report.missingArchives.isEmpty)
+    }
+
     @Test func completeValidSetIsReadyWithNoProblems() throws {
         let dir = try makeDirectory()
         defer { try? FileManager.default.removeItem(at: dir) }
