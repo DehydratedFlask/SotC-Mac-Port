@@ -1,6 +1,11 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors batch 23 lifted; four more README rows fixed
+
+`CPU-01-LEAF-CTOR-BATCH-23` (`0xbcc4e0` .. `0xbc2800`) `FIXTURE_VERIFIED`; root replay 216/216 ctest pass, six checkers exit 0. All `vec_*` README rows were cross-checked against the ELF; four batch-14 rows had wrong src/dst and are fixed (code/tests were fine). Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-23-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending workers: `SAV-01-BLOB-FLUSH-01` (`local/re/evidence/sav01-blob-flush-01/`) and `AUD-02-TICKDRIVER-CALLERS-01` (`local/re/evidence/aud02-tickdriver-callers-01/`). Next constructor position 190 `0xbc07f0`.
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — SAV-01 serializer container format decoded statically
 
 The save body is a tagged-chunk stream (12-byte chunk headers: name hash u32 / `0xBEEF` / tag u16 / back-patched length u32; FNV-1a-32 over uppercased field names). Two concrete save-object classes resolved (vtables `0x15c97a8`, `0x15c9830`; slot `+0x50` targets `0x543f40`, `0x548d30`). 2 REA successes; root replayed verifier (55/55 worker mutations caught) and checksums. Details (field names private): `docs/checkpoints/2026-10-20-root-sav01-serializer-complete.md`. Blob contents unknown; no native serializer; no save works. G0 PARTIAL, G1-G6 NOT RUN.
