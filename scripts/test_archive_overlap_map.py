@@ -43,6 +43,17 @@ class ParseManifestTests(unittest.TestCase):
         with self.assertRaisesRegex(ManifestError, "malformed JSONL record"):
             parse_manifest_bytes("synthetic", b'{"path":"broken.bin","size":1\n')
 
+    def test_rejects_nonstandard_json_numeric_constants(self) -> None:
+        for constant in (b"NaN", b"Infinity", b"-Infinity"):
+            raw = b'{"path":"fixture.bin","size":' + constant + b'}\n'
+            with self.subTest(constant=constant):
+                with self.assertRaises(ManifestError) as context:
+                    parse_manifest_bytes("synthetic", raw)
+                self.assertEqual(
+                    str(context.exception),
+                    "synthetic: malformed JSONL record at line 1",
+                )
+
     def test_rejects_non_utf8_manifest(self) -> None:
         with self.assertRaisesRegex(ManifestError, "manifest is not UTF-8"):
             parse_manifest_bytes("synthetic", b"\xff")
