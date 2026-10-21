@@ -1,5 +1,6 @@
 """Small stdlib checks for private artifact reconstruction and deterministic folder indexing."""
 import hashlib
+import json
 from pathlib import Path
 import struct
 import sys
@@ -121,6 +122,21 @@ class ToolChecks(unittest.TestCase):
             (cache_dir / "marker.pyc").write_bytes(b"python cache")
 
             generate(root, check=True)
+
+    def test_index_does_not_follow_directory_symlinks(self):
+        with tempfile.TemporaryDirectory() as folder, tempfile.TemporaryDirectory() as outside_folder:
+            root = Path(folder)
+            outside = Path(outside_folder)
+            (outside / "child").mkdir()
+            link = root / "outside-link"
+            link.symlink_to(outside, target_is_directory=True)
+
+            generate(root)
+
+            index_path = root / "local/indexes/folders.json"
+            paths = {row["path"] for row in json.loads(index_path.read_text())["folders"]}
+            self.assertNotIn(link.name, paths)
+            self.assertNotIn(f"{link.name}/child", paths)
 
 
 if __name__ == "__main__":
