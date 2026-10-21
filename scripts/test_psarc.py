@@ -168,6 +168,24 @@ class Tests(unittest.TestCase):
                 self.assertEqual(a.read(1, len(full)), a.read(1))        # equals full read
         self.assertEqual(compressed.read(1, 20), b'A' * 20)              # crosses a block
 
+    def test_compressed_block_decoded_length_mismatch_rejected(self):
+        def declare_one_byte_less(data):
+            data = bytearray(data)
+            member_entry_offset = 32 + 30             # entry 1 follows the manifest entry
+            size_offset = member_entry_offset + 20    # 16-byte digest + u32 block + 5-byte size
+            declared = int.from_bytes(data[size_offset:size_offset + 5], 'big')
+            data[size_offset:size_offset + 5] = (declared - 1).to_bytes(5, 'big')
+            return bytes(data)
+
+        archive = self.open(
+            build([('c', b'A' * 64)], tamper=declare_one_byte_less)
+        )
+        with self.assertRaisesRegex(
+            psarc.PsarcError,
+            '^block 4 decoded to 16 bytes, expected 15$',
+        ):
+            archive.read(1)
+
     def test_overlay_requires_a_layer(self):
         with self.assertRaises(psarc.PsarcError) as error:
             psarc.build_overlay([])
