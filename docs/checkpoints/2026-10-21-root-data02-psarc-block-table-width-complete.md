@@ -20,5 +20,12 @@
 - This fixture covers synthetic block-table serialization and parser roundtrip only. No real PSARC, game asset, codec behavior beyond the synthetic raw member, or gameplay is validated.
 - No implementation try failed; no production parser changed.
 - Remaining risk: other widths and values may have distinct issues; the claim covers one two-byte value only.
-- Project-index result, staged/full path audit, commit, and push will be recorded after this checkpoint and evidence are staged.
-- Next exact action: complete publication gates and publish the completion record.
+- Publication command/result: `git push origin main` exited 0 and advanced `c0a2df6..42af4f2`;
+  commit `42af4f281e2d310024bd2ce1f99a3784bae2371e` is now on `origin/main`, and root verified HEAD
+  equals `origin/main`.
+- Publication checks: staged audit accepted eight allowlisted paths; full tracked-path audit accepted
+  1,518 paths; `git diff --cached --check` exited 0. `python3 scripts/project_index.py` and
+  `--check` report 14,222 folders current. The final `trail build --check` passes at 3,530 nodes /
+  4,746 edges; the deep meaning layer remains unbuilt. The stale graph check and rebuild are recorded
+  above. Command logs are in `local/checkpoints/root-round13-claims/`.
+- Next exact action: continue with the next independent unclaimed task.
