@@ -1,12 +1,39 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 02:00 CDT (America/Chicago). Integrator: orchestrator session
-(`deepseek-v4.1-flash-1017`). Previous transfer record:
+Updated: 2026-10-21 08:36 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+`01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 3 (`/root`)
+
+- Claimed `CPU-01-NATIVE-SLOT24-47-01`, status ACTIVE, attempt 0. Review and verify the existing
+  uncommitted native counterpart for constructor slots 24–47, with a test-only ahead table that
+  cannot bypass unresolved production slot 23. Claim record:
+  [docs/checkpoints/2026-10-21-root-cpu01-native-slot24-47-claim.md](docs/checkpoints/2026-10-21-root-cpu01-native-slot24-47-claim.md).
+- Starting checkout: `main` at `57a5282`, matching `origin/main`. An unfinished native diff was
+  already present before this task: changes under `native/core/`, CMake registrations, a new ahead
+  constructor fixture, and a separate untracked `native/api/host/` protocol implementation. Root
+  has not changed those implementation files yet. The host protocol is outside this task until
+  separately claimed.
+- Graft located the ahead-table symbol in `native/core/startup_ctors.{hpp,cpp}`, its state in
+  `registration_thunks.hpp`, and the new focused test. The code comments keep it outside the
+  production constructor list; this claim has not yet run the test or checker.
+- Next exact action: inspect the focused fixture and checker contract, build/run the ahead-table
+  test, replay `tools/lift/check_ctor_slots.py`, and prove the production runner still stops at
+  index 23. Record results before any code commit. Slot 23 and G1 remain unresolved.
+- Also claimed `APP-01-CORE-HOST-01`, status ACTIVE, attempt 0, for the existing native host
+  protocol. A parallel read-only audit found the hello limit can disagree with its configured
+  parser limit, input errors are returned as clean EOF, the closed-stdout test accepts the wrong
+  exit code, and the parent test writer can receive SIGPIPE. Worker owns only `native/api/host/`
+  sources/tests; root remains the sole integrator for handoff/task/evidence files. Record:
+  [docs/checkpoints/2026-10-21-root-app01-core-host-claim.md](docs/checkpoints/2026-10-21-root-app01-core-host-claim.md).
+- Host task's next exact action: fix those protocol and pipe-test defects, then return a concise
+  checkpoint with exact changed files and the suggested focused CMake/CTest command. `start` still
+  returns `ENGINE_NOT_IMPLEMENTED`; this work is not launcher IPC integration or G4 evidence.
 
 ## Session addendum 2026-10-21 round 2 (orchestrator)
 
