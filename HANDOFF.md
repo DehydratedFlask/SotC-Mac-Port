@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 10:20 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 10:21 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -36,8 +36,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Graft confirms `Psarc.read` has an existing raw block-size check after `f.read(block_size)` and
   existing tests cover compressed truncation only. The fixture should assert the exact decoded-size
   mismatch on a truncated raw block; no parser source change is in scope.
-- Next exact action: publish the claim, then delegate the single test file. No real archive or
-  payload claim is implied.
+- Claim commit `f41b202` is pushed to `origin/main`; `slot23_raw_xrefs` now owns only
+  `scripts/test_psarc.py` for the synthetic raw-block truncation fixture. Worker result is pending.
+- Next exact action: review the fixture and log, independently replay the focused PSARC suite, then
+  record evidence and publish the completion. No real archive or payload claim is implied.
 
 ## Session addendum 2026-10-21 round 6 (`/root`)
 

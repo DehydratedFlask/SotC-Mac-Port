@@ -21,4 +21,13 @@
 - Remaining risks: fixture only. No real game archive or payload is read; no member-format or runtime claim is made. Keep private logs under `local/validation/data02-psarc-stored-block-truncation/`.
 - Files changed to claim: `HANDOFF.md`, `docs/TASKS.md`, generated `docs/FOLDERS.md` (checkpoint count 232→233), the prior overlap-map completion checkpoint's push record, and this claim checkpoint. No test/source code changed.
 - Publication gates: `python3 -I scripts/audit_publish_paths.py` exited 0 for five staged allowlisted paths; `python3 -I scripts/audit_publish_paths.py --all` exited 0 for 1,499 allowed tracked paths; `git diff --cached --check` exited 0. Only the claim/handoff/index paths are staged; escalated host-protocol files remain unstaged.
-- Next exact action: commit and push the claim, then assign only `scripts/test_psarc.py` to `slot23_raw_xrefs`.
+
+## Claim publication and assignment checkpoint
+
+- Local date/time: 2026-10-21 10:21 CDT (America/Chicago). Integrator: `/root`; worker: `slot23_raw_xrefs`.
+- Task: `DATA-02-PSARC-STORED-BLOCK-TRUNCATION-01`; worker owns only `scripts/test_psarc.py`. No test has run for this task yet; no code changes have been integrated.
+- Exact command: `git push origin main`; exit 0, advanced `c0c7177..f41b202`. The claim is published.
+- Observation: the fixture will remove the last byte of a synthetic 16-byte raw member and assert the existing exact decoded-length error. The worker is not changing parser behavior.
+- Assignment-update gates: `python3 -I scripts/audit_publish_paths.py` exited 0 for two staged allowlisted paths; `python3 -I scripts/audit_publish_paths.py --all` exited 0 for 1,499 allowed tracked paths; `git diff --cached --check` exited 0. The worker-owned test file is unstaged and not part of this documentation commit.
+- Remaining risks: no acceptance evidence exists yet; no real archive or payload is in scope.
+- Next exact action: review worker's test-only diff, run `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_psarc.py` independently, and then either complete or record the result. Task remains ACTIVE; 0 failed implementation tries.
