@@ -120,12 +120,19 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   continue with the independent scout's candidate if still unclaimed. All real game acceptance gates
   remain unchanged.
 
+## Session addendum 2026-10-21 round 28 (`/root`)
+
+- Published the round 27 raw-DEFLATE fixture and zero-length mapped-range claim in commit `fd601388d2205cf7403e3796260d6fa7d51b40fd` (`test: cover raw inflate offset zero and claim empty range`); `git push origin main` exited 0 and both `HEAD` and `origin/main` resolve to that commit. See [publication checkpoint](docs/checkpoints/2026-10-21-root-round27-publication.md).
+- Pre-commit checks passed: `python3 scripts/project_index.py` and `python3 scripts/project_index.py --check` (14,232 folders current); `trail build --check` (3,535 nodes in sync; deep meaning layer not built); `git diff --check`; `git diff --cached --check`; `python3 -I scripts/audit_publish_paths.py` (8 staged allowlisted paths); and `python3 -I scripts/audit_publish_paths.py --all` (1,534 paths). Post-push `git status --short --branch` showed `main` synchronized; only the pre-existing native host worktree paths remain outside the commit.
+- `AUD-01-CLASSIFIER-RAW-INFLATE-OFFSET-00-FIXTURE-01` is `FIXTURE_VERIFIED`; `RE-02-DYNLINK-MAPPED-ZERO-LENGTH-01` is `ACTIVE`. Both have zero failed tries. Actual game acceptance gates remain open.
+- `launcher_review` now owns only `scripts/test_ps4_dynlink.py` for the zero-length boundary fixture. `slot23_raw_xrefs` has been asked to scout one more distinct test module. Next exact action: review the dynlink test patch, root-replay `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py`, and record the result.
+
 ## Session addendum 2026-10-21 round 27 (`/root`)
 
 - Completed `AUD-01-CLASSIFIER-RAW-INFLATE-OFFSET-00-FIXTURE-01`, `FIXTURE_VERIFIED` with zero failed tries. Worker and root each pass `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_headers.py` (21/21). A 64-byte synthetic payload compressed with raw DEFLATE selects `raw_inflate_offset0` and decodes to 64 bytes; test SHA256 `accbc01ef1b55b7f832d84c0ece73eb2bab97200bdb05f305c35604be8e8c7c1`; classifier unchanged at `624a51336859bab8aef2e7e7880b16d1282c9e883f459de05c8e3c1c4320cd77`. E145 and the [completion checkpoint](docs/checkpoints/2026-10-21-root-aud01-classifier-raw-inflate-offset0-complete.md) record both log hashes.
 - Claimed `RE-02-DYNLINK-MAPPED-ZERO-LENGTH-01`, `ACTIVE` with zero failed tries. Graft and live source review confirm that `Image.mapped()` includes a zero-length range at the first segment's one-past-end address `0x1010`; no existing test pins this. Add one synthetic assertion in `scripts/test_ps4_dynlink.py`, without changing parser behavior. Claim: [zero-length mapped range](docs/checkpoints/2026-10-21-root-re02-dynlink-mapped-zero-length-claim.md).
 - `slot23_raw_xrefs` completed only `scripts/test_audio_headers.py`; `launcher_review` will own only `scripts/test_ps4_dynlink.py` after this claim is published. Root owns shared documentation.
-- Next exact action: publish E145 and the zero-length claim, then dispatch `launcher_review` and root-replay the dynlink suite.
+- At this checkpoint the next action was to publish E145 and the zero-length claim; publication and worker assignment completed in round 28 above.
 
 ## Session addendum 2026-10-21 round 26 (`/root`)
 
