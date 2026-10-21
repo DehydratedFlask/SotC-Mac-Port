@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 14:06 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 14:09 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -41,8 +41,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Synthetic fixture results do not advance game gates: G0 remains PARTIAL; G1–G6 remain NOT RUN.
   No runtime behavior, real asset classification, C ABI interoperability, allocator integration,
   cold boot, actual game audio, save/reload, or Metal gameplay is established.
-- Exact next action: commit `test: verify round 61 synthetic fixtures`, push `origin main`, verify
-  the published refs, then scout and claim independent Round 62 tasks.
+- Completion commit `741174232d44236e7c674f92c106992d6613e0e9` (`test: verify round 61 synthetic
+  fixtures`) is pushed to `origin/main`; `HEAD` and `origin/main` match. Push and ref log hashes are
+  in the completion checkpoint. The working tree now contains only the pre-existing, excluded
+  `native/api` changes.
+- Exact next action: use Graft to scout independent Round 62 tasks, verify their candidates and
+  baselines against live files, then publish claims before implementation edits.
 
 ## Session addendum 2026-10-21 Round 60 fixtures verified (/root)
 
