@@ -11,6 +11,13 @@ struct LauncherLifecycleTests {
         )
 
         #expect(outcome == .requestedStop)
+        #expect(
+            LauncherLifecycle.classifyTermination(
+                stopWasRequested: true,
+                reason: .exit,
+                status: 0
+            ) == .requestedStop
+        )
     }
 
     @Test func normalZeroExitIsClean() {

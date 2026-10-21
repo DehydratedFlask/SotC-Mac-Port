@@ -118,6 +118,30 @@ is the next action.
 - The staged publish audit accepted the four claim paths; the full audit accepted 1,642 paths.
   `git diff --cached --check`, `git diff --check`, and the final project-index check all exited 0.
   Their logs and hashes are listed in the preflight section above.
+- A documentation sync recorded the claim publication and the decision not to claim the native
+  free-list edge. `git commit -m "docs: sync Round 69 claim checkpoint"` created
+  `e669b7c35dd0fa155e962a57957a5da686be87e2` (paths: `HANDOFF.md` and this checkpoint), then
+  `git push origin main` exited 0 and advanced `4fabeb0..e669b7c`. Commit/push logs are
+  `local/validation/root-round69-scout/claim-sync-commit.log` (SHA-256
+  `02d29971077ee20d2d62f67ba9f494f54af596eb6d68f34e3b4bf2cd3cd063da`) and
+  `claim-sync-push.log` (SHA-256
+  `6e35cef96418277cc98ee8e3dc332ef583d723322e3f412128e6d5c9153cd5f3`).
+- Sync preflight: project-index generation and check passed at 14,464 folders; staged publish audit
+  accepted 2 paths; full audit accepted 1,642; cached and working diff checks passed. Logs:
+  `claim-sync-project-index.log` and `claim-sync-project-index-check.log` (each SHA-256
+  `d50f1e79e0646836436a43040406e5720bad32092b6cfd2c86a8278065bfe400` and
+  `d5e6cc672715890d5e489357e2e1b56a23d94cb7fa5cb5bd68717f5613fe72bd`),
+  `claim-sync-audit-staged.log` (SHA-256
+  `9044b5550a4c756ceb50fd6b03108d27c5f89aa54ed17d4d9d50bb39518750fd`),
+  `claim-sync-audit-all.log` (SHA-256
+  `43946cd74d58eb2f9ddcd6a11c4ea930d90c9d9caddf972f9b48244bb63288fb`), and
+  `claim-sync-diff-check.log` (empty, SHA-256
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`).
+- After fetching, `HEAD == origin/main == e669b7c35dd0fa155e962a57957a5da686be87e2`, divergence
+  was `0 0`, and status still showed only the excluded user-owned `native/api` paths. Fetch, ref,
+  and status records are in `claim-sync-fetch.log`, `claim-sync-publish-state.log` (SHA-256
+  `5e6746cc2b6ea420d86418571fe2f55cb9e710f1f85f67d68b78d01694b433ad`), and
+  `claim-sync-git-status.log`.
 
 **Next exact action:** Send the three already-bounded single-file test assignments to the named
 workers. Root remains responsible for diff review, independent test replay, E207–E209, and the

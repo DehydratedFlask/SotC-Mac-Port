@@ -200,6 +200,13 @@ class Tests(unittest.TestCase):
                 self.assertEqual(a.read(1, len(full)), a.read(1))        # equals full read
         self.assertEqual(compressed.read(1, 20), b'A' * 20)              # crosses a block
 
+    def test_prefix_read_ignores_truncated_later_block(self):
+        archive = self.open(build([('c', b'A' * 48)])[:-1])
+        self.assertEqual(archive.read(1, 5), b'A' * 5)
+        with self.assertRaises(psarc.PsarcError) as error:
+            archive.read(1)
+        self.assertEqual(str(error.exception), 'truncated block')
+
     def test_mixed_compressed_and_stored_blocks_in_one_member(self):
         payload = b'A' * 16 + bytes(range(16))
         archive = self.open(build([('mixed.bin', payload)], block_size=16))
