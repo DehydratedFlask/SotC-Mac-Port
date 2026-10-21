@@ -92,5 +92,10 @@
   `322a13abb3705f2f0c788325df60bdfe47284dd5a3a9ee1b32386f77cde60faa`. Staged and working
   `git diff --check` passed. Only the three claimed tests and five documentation/index files are
   staged; user-owned `native/api` changes remain unstaged.
-- Exact next action: run staged and full publication audits, then commit and push only allowlisted
-  changes; afterwards record the published commit in HANDOFF.
+- Completion commit `40a08252cee4d16bec4a1ff57df6da72b3a67334` was published with `git push origin
+  main`; push exited 0 (`2c30005..40a0825 main -> main`). Push log
+  `local/validation/root-round62-replay/push-main.log`, SHA-256
+  `af03d97be76c36f17610d49f8bcb547944e43fc3965d55bc9805284aaa9c622c`; `git rev-parse HEAD
+  origin/main` matched at the completion commit, recorded in `publication-state.log`, SHA-256
+  `5fb39cee8eed007120abb6138bcac9c9fb1ddc45e98f9869b0316573ed58c1fc`.
+- Exact next action: publish this handoff update, then scout the next independent fixture batch.

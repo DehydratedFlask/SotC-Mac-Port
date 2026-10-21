@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 14:16 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 14:19 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -27,6 +27,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   boot, actual game audio, save/reload, or Metal gameplay is established.
 - Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched
   and excluded from publication.
+- Completion commit `40a08252cee4d16bec4a1ff57df6da72b3a67334` is pushed to `origin/main`; `HEAD` and
+  `origin/main` match. Push log `local/validation/root-round62-replay/push-main.log` SHA-256
+  `af03d97be76c36f17610d49f8bcb547944e43fc3965d55bc9805284aaa9c622c`; publication-state log
+  SHA-256 `5fb39cee8eed007120abb6138bcac9c9fb1ddc45e98f9869b0316573ed58c1fc`.
 - Exact next action: after publishing this completion checkpoint, use Graft and read-only scouts to
   identify the next three independent synthetic fixture gaps, verify live files and baselines, and
   publish claims before implementation prompts.
