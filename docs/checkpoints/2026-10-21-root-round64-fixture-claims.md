@@ -89,10 +89,8 @@ exited 0; log `local/validation/root-round64-scout/push.log`, SHA-256
 paths were included. User-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain
 untouched and excluded.
 
-Exact next action: dispatch the three one-file test tasks to `/root/launcher_review`,
-`/root/review_host_proto`, and `/root/slot23_raw_xrefs`. After workers finish, root must review each
-diff and file hash, independently replay the focused command, build/check the source graph, update
-E190–E192 and all registries, then audit and publish the completion checkpoint.
+The claim is published and the workers have been dispatched. Root verification and final publication
+are recorded below and in the linked completion checkpoint.
 
 At 2026-10-21 14:40 CDT, after recording the first publication, root reran
 `python3 scripts/project_index.py` and `python3 scripts/project_index.py --check`. Both exited 0;
@@ -103,3 +101,24 @@ At 2026-10-21 14:40 CDT, after recording the first publication, root reran
 `167cc599d17d3d700959dd0fd55b102102b74b54411b96b37b8d9fccda4a0a33`). The generated folder
 index remains unchanged. This updates the shared HANDOFF and claim checkpoint after the first
 publication; the claim itself was already pushed before any worker prompt.
+
+## Worker dispatch
+
+At 2026-10-21 14:40 CDT, after claim commit `218ce2134fa8e1af05c6e5e6e419cb30ceaa7310` was
+confirmed on `origin/main`, root dispatched the three test-only tasks:
+
+- `/root/launcher_review` owns only `launcher/Tests/LauncherCoreTests/CoreClientTests.swift` for
+  APP-01; acceptance: `swift test --package-path launcher --scratch-path local/build/launcher
+  --filter CoreClientTests`.
+- `/root/review_host_proto` owns only `scripts/test_archive_overlap_map.py` for DATA-02; acceptance:
+  `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_archive_overlap_map.py`.
+- `/root/slot23_raw_xrefs` owns only `native/tests/test_host_map.cpp` for SRV-01; acceptance:
+  `cmake --build local/build/native --target test_host_map`, then
+  `ctest --test-dir local/build/native -R '^host_map$'`.
+
+Prompts prohibit production/shared-doc edits and commits. Each worker reported one passing attempt
+and 0 failures. Root reviewed the exact one-file diffs, verified the production files remain at
+claim-time hashes, independently replayed each focused command, and refreshed the source graph.
+E190–E192 and acceptance limits are in
+[the Round 64 completion checkpoint](2026-10-21-root-round64-fixtures-complete.md). All three tasks
+are `FIXTURE_VERIFIED`; this does not advance a game runtime gate.

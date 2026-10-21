@@ -207,3 +207,21 @@ runtime behavior is established. Exact commands, output hashes, and removal boun
 `docs/checkpoints/2026-10-21-root-round64-fixture-claims.md`. Build products stay under
 `local/build/`; baseline logs are under `local/validation/root-round64-scout/`. No dependency or
 installation removal boundary was created.
+
+## 2026-10-21 14:44 CDT — Round 64 fixture verification and source-index refresh
+
+Existing Apple Swift 6.4 / swift-driver 1.168.6, Xcode 27.1 (27A9275), CMake 4.4.4, Apple clang
+21.0.0, Python 3.15.0, macOS 27.0.1, and Graft CLI 0.21.1 were reused. No install, download,
+dependency, or configuration replacement occurred. Root independently ran
+`swift test --package-path launcher --scratch-path local/build/launcher --filter CoreClientTests`
+(exit 0, 22 tests across 2 suites), `PYTHONDONTWRITEBYTECODE=1 python3 -I
+scripts/test_archive_overlap_map.py` (exit 0, 23 tests), `cmake --build local/build/native --target
+test_host_map` (exit 0), and `ctest --test-dir local/build/native -R '^host_map$'` (exit 0, 1/1).
+The existing source graph was rebuilt with `trail build --follow-nested-repos --only-dir scripts
+--only-dir tools --only-dir reference --only-dir native --only-dir launcher --only-dir tests`
+(exit 0, 3,561 nodes / 4,813 edges / 1,236 indexed files) and verified with `trail build --check`
+(exit 0). Project indexing via `python3 scripts/project_index.py` and `--check` exited 0; 14,441
+folders were indexed. Exact replay logs and hashes are in
+`docs/checkpoints/2026-10-21-root-round64-fixtures-complete.md`. Purpose: verify synthetic test
+fixtures and source-index freshness only. Build products remain under `local/build/`; validation
+logs remain under `local/validation/root-round64-replay/`; no new removal boundary was created.
