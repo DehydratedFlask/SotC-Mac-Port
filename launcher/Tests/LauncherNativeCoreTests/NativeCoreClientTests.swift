@@ -139,4 +139,27 @@ struct NativeCoreClientTests {
         }
         #expect(message.contains("Play disabled"))
     }
+
+    @MainActor
+    @Test func launcherModelOverTheRealCoreNeverPlaysAndShowsCoverage() async throws {
+        let dir = try makeDirectory(completeSet())
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let model = LauncherModel(
+            client: try NativeCoreClient(),
+            hostChecks: HostChecks(metal: { .ready }, audio: { .ready }),
+            pollInterval: .milliseconds(5)
+        )
+        model.assetsDirectory = dir
+        await model.validate()
+
+        #expect(model.state == .idle)
+        #expect(!model.canStart)
+        #expect(model.report?.items.first { $0.kind == .assets }?.status == .ready)
+        #expect(model.presentation.status.contains("NOT BUILT"))
+        await model.startCore()  // gated: must not reach the core nor change state
+        #expect(model.state == .idle)
+        #expect(model.diagnosticsText.contains("Engine implemented: NO"))
+        #expect(model.diagnosticsText.contains("Subsystem engine_boot: NOT IMPLEMENTED"))
+        #expect(model.diagnosticsText.contains("Constructor prefix: NOT LINKED in this build"))
+    }
 }

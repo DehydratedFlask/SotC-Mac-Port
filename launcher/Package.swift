@@ -15,7 +15,9 @@ let package = Package(
         .target(name: "LauncherCore", path: "Sources/LauncherCore"),
         // Swift wrapper over the C ABI. Kept apart so LauncherCore stays free of native code.
         .target(name: "LauncherNativeCore", dependencies: ["LauncherCore", "CSotcCore"], path: "Sources/LauncherNativeCore"),
-        .executableTarget(name: "SoCLauncher", dependencies: ["LauncherCore"], path: "Sources/SoCLauncher"),
+        .executableTarget(
+            name: "SoCLauncher", dependencies: ["LauncherCore", "LauncherNativeCore"], path: "Sources/SoCLauncher"
+        ),
         .testTarget(name: "LauncherCoreTests", dependencies: ["LauncherCore"], path: "Tests/LauncherCoreTests"),
         .testTarget(
             name: "LauncherNativeCoreTests",

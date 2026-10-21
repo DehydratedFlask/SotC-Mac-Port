@@ -71,11 +71,34 @@ for rva, index, is_blocker, line_number in rows:
     seen_rvas.add(rva)
     previous_index = index
 
-prefix = [row for row in rows if row[1] <= 11]
-assert [row[1] for row in prefix] == list(range(12)), "indices 0–11 must be represented contiguously"
-assert all(not row[2] for row in prefix[:11]), "indices 0–10 must have callbacks"
+prefix = [row for row in rows if row[1] <= 23]
+assert [row[1] for row in prefix] == list(range(24)), "indices 0–23 must be represented contiguously"
+assert all(not row[2] for row in prefix[:23]), "indices 0–22 must have callbacks"
 assert prefix[10][:3] == (0xf09e60, 10, False), "index 10 RVA 0xf09e60 must be recovered"
-assert prefix[11][:3] == (0xf09160, 11, True), "index 11 must be the explicit unresolved blocker"
+assert prefix[11][:3] == (0xf09160, 11, False), "index 11 RVA 0xf09160 must be recovered"
+assert prefix[23][:3] == (0xe71990, 23, True), "index 23 must be the explicit unresolved blocker"
+# The first null callback in original order is the one the runner stops at, and it is the ONLY null
+# row before index 48, so the runner can never silently skip 23-47.
+first_blocker = next(row for row in rows if row[2])
+assert first_blocker[:2] == (0xe71990, 23), f"first blocker must be index 23, got {first_blocker[:2]}"
+assert [row[:2] for row in rows if row[2]] == [(0xe71990, 23)], "only index 23 may be an explicit blocker row"
+# Indices 24-47 (descriptor + mutex + atexit family, run 24-47) are not recovered and must not be registered.
+assert not [row for row in rows if 24 <= row[1] <= 47], "indices 24-47 must stay unregistered"
+# Row 11 must be the real slot-11 callback, not an empty lambda.
+slot11_lines = [l for l in array_match.group(1).splitlines() if re.match(r"^\s*\{\s*0xf09160\s*,\s*11\s*,", l)]
+assert len(slot11_lines) == 1 and "init_clothing_physical_mesh_descriptor(s)" in slot11_lines[0], (
+    "slot 11 must call init_clothing_physical_mesh_descriptor")
+# Slots 12-19 must call the registration helper with their own index; slot 21 the const-table lift.
+source_lines = array_match.group(1).splitlines()
+THUNKS = {12: 0xf06340, 13: 0xf058f0, 14: 0xf02ff0, 15: 0xf01100, 16: 0xf00090, 17: 0xefe320,
+          18: 0xefd020, 19: 0xefacd0}
+for thunk_index, thunk_rva in THUNKS.items():
+    lines = [l for l in source_lines if re.match(rf"^\s*\{{\s*{thunk_rva:#x}\s*,\s*{thunk_index}\s*,", l)]
+    assert len(lines) == 1 and f"init_registration_thunk(s, {thunk_index})" in lines[0], (
+        f"slot {thunk_index} must call init_registration_thunk(s, {thunk_index})")
+slot21_lines = [l for l in source_lines if re.match(r"^\s*\{\s*0xee1130\s*,\s*21\s*,", l)]
+assert len(slot21_lines) == 1 and "init_const_table_ee1130(s.const_table_ee1130)" in slot21_lines[0], (
+    "slot 21 must call init_const_table_ee1130")
 assert [(rva, index) for rva, index, _, _ in rows if rva in (0xd32720, 0xd2ffe0)] == [
     (0xd32720, 119),
     (0xd2ffe0, 120),
@@ -89,8 +112,80 @@ for rva, index in ((0xe094e0, 50), (0xdbfa60, 70), (0xd85490, 82), (0xce8440, 14
         f'lifted constructor {rva:#x} (index {index}) is no longer registered')
 
 
+# ---- byte anchors for slot 11 (ClothingPhysicalMeshParameters) against the pinned ELF ----
+BODY_SHA256 = {
+    0xf09160: (281, "adb91b08884c8fc861cc37b1653e2496a0aaf8efa883222e2d602e8e6d444ef0"),   # slot 11
+    0xf06410: (1021, "086c93ce9f3d9ae834aea2d1641bc6e791d5824427002a81176c8d46ee57a5d5"),  # class ctor
+    0xf069f0: (44, "d2e9246d8ca47ea76b9b46e68c1e9942e0a0a9d9dccf6fd7666d6d5d0a894e3c"),   # slot-0 dtor
+    # Slots 12-19 registration thunks (full traced-effect proof: tools/lift/check_ctor_thunks.py).
+    0xf06340: (205, "a16f79f44e9fa082e8e7a25d300210dd6538aa4f5f1341d66a6e30769b3dcb53"),  # slot 12
+    0xf058f0: (79, "d021c860c421a25ee64f18d6007daa897d963d4a9be62d51928061b0eee6675b"),   # slot 13
+    0xf02ff0: (239, "0c803e076d6f24f81b7cb9cab7deca5e633c4e24f9041350455f87a88f83b7fa"),  # slot 14
+    0xf01100: (226, "006d8ef333df1b54dde77fcd144deec4277711d05567fe36b20cc31804be7d24"),  # slot 15
+    0xf00090: (284, "aed062395020b9ce82f5c04c640cd1b42ba83a844c84ac9bdbbfda9fbc2ca5a0"),  # slot 16
+    0xefe320: (239, "d157e4bf9c9e7f3900051edb9659906cca7c45c454af68a29d05c73ec9b2a612"),  # slot 17
+    0xefd020: (281, "a14f6aa8db166697a1cc3eb0ad2feb49c15c482e725864333c748335b9492638"),  # slot 18
+    0xefacd0: (79, "2750b1530f9edd2b561c213b7c6be699443617bbc464e0769bfc1910bfa51f6e"),   # slot 19
+    0xe71990: (337, "3932fb85b759ae53dd1675142ffda4b449be725f241cfeefdb40a07a2beaf774"),  # slot 23 (blocker)
+}
+for body_rva, (body_size, body_digest) in BODY_SHA256.items():
+    got = hashlib.sha256(image.read(body_rva, body_size)).hexdigest()
+    assert got == body_digest, f"body {body_rva:#x} sha256 {got} != {body_digest}"
+
+# The native header's block offsets/strides must equal the original constructor stores.
+header = (ROOT / "native/core/clothing_physical_mesh_parameters.hpp").read_text()
+
+
+def header_array(name):
+    match = re.search(name + r"\[kBlockCount\]\s*=\s*\{(.*?)\};", header, re.DOTALL)
+    assert match, f"cannot find {name} in clothing_physical_mesh_parameters.hpp"
+    return [int(tok, 0) for tok in re.findall(r"0x[0-9a-fA-F]+|\d+", match.group(1))]
+
+
+EXPECTED_OFFSETS = [0x60, 0x78, 0x90, 0xa8, 0xc0, 0xd8, 0xf0, 0x110, 0x140, 0x158, 0x178, 0x190]
+EXPECTED_STRIDES = [12, 12, 12, 12, 2, 4, 1, 4, 40, 52, 40, 52]
+assert header_array("kBlockOffsets") == EXPECTED_OFFSETS, "native block offsets differ from the verified list"
+assert header_array("kBlockStrides") == EXPECTED_STRIDES, "native block strides differ from the verified list"
+
+
+def has_store(body, op, disp, imm, imm_len):
+    """Find `mov [rbx+disp], imm` in either disp8 or disp32 form (rbx = this)."""
+    encodings = []
+    if disp < 0x80:
+        encodings.append(bytes([op, 0x43, disp]) + imm.to_bytes(imm_len, "little"))
+    encodings.append(bytes([op, 0x83]) + disp.to_bytes(4, "little") + imm.to_bytes(imm_len, "little"))
+    return any(enc in body for enc in encodings)
+
+
+def block_stores_ok(body, label):
+    for index, (offset, stride) in enumerate(zip(EXPECTED_OFFSETS, EXPECTED_STRIDES)):
+        assert has_store(body, 0xc6, offset + 8, 1, 1), f"{label}: block {index} owns=1 store missing"
+        if index == len(EXPECTED_OFFSETS) - 1:
+            # The last block writes stride and count with one REX.W qword store (count = high dword = 0).
+            qword = b"\x48\xc7\x83" + (offset + 0x0c).to_bytes(4, "little") + stride.to_bytes(4, "little")
+            assert qword in body, f"{label}: block {index} qword stride/count store missing"
+        else:
+            assert has_store(body, 0xc7, offset + 0x0c, stride, 4), f"{label}: block {index} stride {stride} store missing"
+            assert has_store(body, 0xc7, offset + 0x10, 0, 4), f"{label}: block {index} count=0 store missing"
+
+
+# The native registration table must carry the ELF constructor-table RVA for each of its indices.
+thunk_header = (ROOT / "native/core/registration_thunks.hpp").read_text()
+thunk_rows = re.findall(r"\{\s*(\d+)\s*,\s*(0x[0-9a-fA-F]+)\s*,\s*0x[0-9a-fA-F]+\s*,\s*0x[0-9a-fA-F]+\s*,"
+                        r"\s*RegistrationProbeShape::\w+\s*\}", thunk_header)
+assert [int(i) for i, _ in thunk_rows] == list(THUNKS), "registration_thunks.hpp must list indices 12-19 in order"
+for i, rva in thunk_rows:
+    assert int(rva, 16) == original_rvas[int(i)] == THUNKS[int(i)], (
+        f"registration_thunks.hpp row {i}: {rva} != ELF table {original_rvas[int(i)]:#x}")
+
+block_stores_ok(image.read(0xf06410, 1021), "ctor 0xf06410")
+block_stores_ok(image.read(0xf08f00, 556), "reset 0xf08f00")
+
+
 print(
     f"OK: ELF sha256={elf_digest}; constructor table start={TABLE_START:#x} "
     f"count={TABLE_COUNT} sha256={table_digest}; verified {len(rows)} registered RVA/index pairs; "
-    "slots 0-10 are recovered; first unresolved slot is index 11 RVA 0xf09160"
+    "slots 0-22 are recovered (slot 11 byte anchors + 12 array block offsets/strides; slots 12-19 body "
+    "digests + ELF-table RVAs for the native registration table); "
+    "first unresolved slot is index 23 RVA 0xe71990"
 )

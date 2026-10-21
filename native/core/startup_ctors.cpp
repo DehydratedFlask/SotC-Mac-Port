@@ -37,11 +37,29 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         // once-guarded recursive + priority-inherit mutex. Verified from the constructor body and
         // its consumers; see docs/checkpoints/2026-10-20-root-cpu01-ctor10-descriptor-consumer-*.md.
         {0xf09e60, 10, [](StartupState& s) noexcept { (void)init_clothing_preview_descriptor(s); }},
-        // Slot 11 / RVA 0x00f09160 remains unrecovered. This explicit null keeps the runner in
-        // strict original order instead of jumping from 10 to 20.
-        {0xf09160, 11, nullptr},
+        // Slot 11 / RVA 0x00f09160: publishes the ClothingPhysicalMeshParameters descriptor and
+        // creates its recursive mutex (DescriptorRegistration). The 74-record reflection schema is NOT
+        // built (lazy; see docs/checkpoints/2026-10-21-agentG-ctor11-reflection-scope.md).
+        {0xf09160, 11, [](StartupState& s) noexcept { (void)init_clothing_physical_mesh_descriptor(s); }},
+        // Slots 12-19: registration thunks of unidentified classes (descriptor + heap mutex + atexit).
+        // Only the registration is modelled; each body was replayed from the ELF bytes by
+        // tools/lift/check_ctor_thunks.py. See core/registration_thunks.hpp for what the original also does.
+        {0xf06340, 12, [](StartupState& s) noexcept { (void)init_registration_thunk(s, 12); }},
+        {0xf058f0, 13, [](StartupState& s) noexcept { (void)init_registration_thunk(s, 13); }},
+        {0xf02ff0, 14, [](StartupState& s) noexcept { (void)init_registration_thunk(s, 14); }},
+        {0xf01100, 15, [](StartupState& s) noexcept { (void)init_registration_thunk(s, 15); }},
+        {0xf00090, 16, [](StartupState& s) noexcept { (void)init_registration_thunk(s, 16); }},
+        {0xefe320, 17, [](StartupState& s) noexcept { (void)init_registration_thunk(s, 17); }},
+        {0xefd020, 18, [](StartupState& s) noexcept { (void)init_registration_thunk(s, 18); }},
+        {0xefacd0, 19, [](StartupState& s) noexcept { (void)init_registration_thunk(s, 19); }},
         {0xef85e0, 20, [](StartupState& s) noexcept { init_vec_ef85e0(s.vec_ef85e0); }},
+        {0xee1130, 21, [](StartupState& s) noexcept { init_const_table_ee1130(s.const_table_ee1130); }},
         {0xea52f0, 22, [](StartupState& s) noexcept { init_ea52f0(s.ea52f0); }},
+        // Slot 23 / RVA 0x00e71990 is the first unrecovered slot: it needs the djb2-XOR name hash
+        // (0xe70aa0, native name_hash) AND the 14 original name strings, whose import as data is an
+        // open decision. This explicit null stops the runner here instead of silently skipping
+        // 23-47 to slot 48. Indices 24-47 (descriptor + mutex + atexit family) are not claimed.
+        {0xe71990, 23, nullptr},
         {0xe10490, 48, [](StartupState& s) noexcept { init_trig_constants(s.trig); }},
         {0xe0b180, 49, [](StartupState& s) noexcept { init_vec_e0b180(s.vec_e0b180); }},
         {0xe094e0, 50, [](StartupState& s) noexcept { init_vec_e094e0(s.vec_e094e0); }},
