@@ -89,3 +89,34 @@ is staged; the user-owned API changes are excluded.
 All root baselines above pass; no code acceptance claim is made before dispatch. Next exact action:
 commit and push the four allowlisted claim paths, verify the fetched remote tip, then dispatch the
 five isolated test-file tasks.
+
+## Claim publication checkpoint
+
+Checkpoint time: 2026-10-21 17:13 CDT (America/Chicago). Agent: `/root`. Claim commit
+`820bb128adfb3c9a03271c33a704a3ae2682aed1` (`docs: claim Round 74 fixture tasks`) pushed successfully, moving `main` from
+`f7e1cf9` to `820bb12`. `git fetch origin` exited 0. Post-fetch `HEAD` and `origin/main` both equal
+`820bb128adfb3c9a03271c33a704a3ae2682aed1`; divergence is `0 0`. A second `git push origin main` exited 0 with `Everything
+up-to-date`.
+
+- Fetch log `local/validation/root-round73-scout/pubsync-fetch.log`, SHA-256
+  `8051da3aaf5ed31b3c200f7693a6133f151dc4acede082e677690f7918b918d8`.
+- Post-fetch state log `pubsync-state.log`, SHA-256
+  `17d7a401ee7e40b2831681a65ccb186d25fa616e5e4fc8143e0c2346958c562b`; divergence log
+  `pubsync-divergence.log`, SHA-256
+  `231d953f3e206b69f61bb624fcd69294244ee7ad6bf019bfa1f8f965c5328f82`.
+- Confirmation push log `pubsync-final-push.log`, SHA-256
+  `6a296371679d55bc9e67c365fd337f2114bb1b68e3e56f995601143a8d29c005`; commit log
+  `pubsync-commit.log`, SHA-256 `dd8fce92c706d5973e95a865fd3ac943fcf98ba4ae15eefb710fd80e5b6409df`.
+- Post-push status log `pubsync-status.log`, SHA-256
+  `e0335ec91a749d2e476cb33be39e2b906e147877be8468e0ce4758917953e836`, shows only the pre-existing
+  user-owned `native/api/CMakeLists.txt` modification and `native/api/host/` untracked path.
+- `python3 -I scripts/project_index.py --check`: exit 0, 14,468 folders. `trail build --check`:
+  exit 0, wiring graph in sync. Logs `pubsync-index-final-check.log` and `pubsync-trail-check.log`,
+  SHA-256 `82a06e9d8c3e42e0a5d6e750144f973f757db4f956b5dd4d3ef97bc50a0e8ccb` and
+  `bc77b1c82984f85ace632af8382d9800cc4015579fe1bea7373a8bcb082499f3`.
+
+Observation: the published claim commit is the fetched remote tip and the worktree contains no
+claimed source/test edits. Inference: none. All five tasks remain ACTIVE with zero implementation
+attempts and zero failed tries. Next exact action: dispatch the two script tests, two launcher tests,
+and native region-list test to their assigned owners; each agent must remain within its single test
+file.
