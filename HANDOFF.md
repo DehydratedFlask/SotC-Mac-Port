@@ -1,12 +1,36 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 13:01 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 13:04 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 56 completion (`/root`)
+
+- Completed all three claimed synthetic fixtures: APP-01 error-code formatting (E165), AUD-01 stale
+  archive-summary byte identity (E166), and SRV-01 exact-fit finalization (E167). Each worker and
+  root replay passed; completion checkpoints hold source/test/log hashes and limitations.
+- The launcher filter passed 29 tests across four suites; the Python XFF suite passed 19 tests; the
+  native target built and focused CTest passed 1/1. Production files are unchanged. Root replay logs
+  are `logs/root-round56-app01-diagnostics-unknown-code.log` (SHA256
+  `c80d1fa28a438e5c58054952d2510d56ce0089ef46e8f2ce13d890aefeecb1a6`),
+  `logs/root-round56-aud01-summary-byte-identity.log` (SHA256
+  `d604d5b4a307d14f9b407f9dc4ec3c155113ee4ba72b98ed71fc618e7f6974db`), and native build/CTest
+  logs (SHA256 `35b39ff164f5cdb62d0d42ba7dd6d6c084ddb6d1b30b0fd5d944818ff834b81b` and
+  `a93bfa23ef4ae5f34326c7324f8768932560026f3149f70aefd79b5ce61cf44d`).
+- The initial graph check during worker edits reported their two in-flight test symbols as stale.
+  Once files stabilized, `python3 scripts/project_index.py` recorded 14,395 folders and `trail
+  build` rebuilt 3,549 nodes / 4,785 edges; follow-up `trail build --check` passed. The optional
+  deep concept layer remains unbuilt. `native/api/CMakeLists.txt` and `native/api/host/` remain
+  untouched, unstaged, and unpublished.
+- These fixtures add no boot, audio playback, real save/load, Metal gameplay, or packaging evidence;
+  acceptance gates remain G0 PARTIAL and G1–G6 NOT RUN.
+- Exact next action: stage only the three test files and their allowlisted documentation, run both
+  publication audits, commit/push the verified fixtures, then record publication and scout the next
+  independent bounded tasks.
 
 ## Session addendum 2026-10-21 round 56 claim (`/root`)
 
@@ -29,8 +53,14 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Claim publication: commit `68e2779` is pushed to `origin/main`; staged and full path audits passed
   for 4 paths and 1,596 paths. The publication record is
   [round 56 claims published](docs/checkpoints/2026-10-21-root-round56-claims-published.md).
-- Exact next action: assign the three distinct test files, review each isolated diff, and
-  independently replay the focused commands.
+- Dispatched after publication: `/root/launcher_review` owns only
+  `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift`; `/root/review_host_proto` owns only
+  `scripts/test_audio_bank_header.py`; `/root/slot23_raw_xrefs` owns only
+  `native/tests/test_exact_fit_finalize.cpp`. Exact commands and private log paths are in the
+  [dispatch checkpoint](docs/checkpoints/2026-10-21-root-round56-workers-dispatched.md). Shared
+  documentation remains root-owned.
+- Exact next action: inspect each worker's isolated diff, rerun its focused command independently,
+  then update EVIDENCE/TASKS/HANDOFF and publish verified completions.
 
 ## Session addendum 2026-10-21 round 55 (`/root`)
 
