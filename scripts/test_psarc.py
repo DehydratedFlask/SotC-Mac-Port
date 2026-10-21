@@ -106,6 +106,11 @@ class Tests(unittest.TestCase):
         self.assertIn(b'\0', archive.read(0))
         self.assertEqual(archive.paths(), member_paths)
 
+    def test_nul_manifest_accepts_one_terminal_nul(self):
+        archive = self.open(build([('one.bin', b'1')], manifest_paths=['one.bin', '']))
+        self.assertEqual(archive.read(0), b'one.bin\0')
+        self.assertEqual(archive.paths(), ['one.bin'])
+
     def test_rejects_traversal_and_absolute(self):
         for bad in ('../x', 'a/../../x', '/etc/passwd'):
             with self.assertRaises(psarc.PsarcError):
