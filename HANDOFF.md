@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 13:16 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 13:18 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -43,13 +43,28 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `84c6f44dd225ea334970a4c48e6d59dd385e4a3db6d0332c1323684788684ced`. The full audit passed all
   1,608 paths; `logs/root-round57-audit-all.log`, SHA256
   `dc8e89770b8177aebdb6c00a57ae87ebb0ffcdde71fa4bfc7f27355fb54be4a3`.
-- Exact next action: stage only `INSTALL_LOG.md`, the three test files, `HANDOFF.md`,
-  `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/FOLDERS.md`, the three completion checkpoints, and the
-  round 57 dispatch checkpoint; run `python3 -I scripts/audit_publish_paths.py` on staged paths and
-  then `python3 -I scripts/audit_publish_paths.py --all` after this handoff refresh; commit with
-  `test: pin core readiness, dynlink and host-map edge cases` and push `origin main`. Keep
-  `native/api/CMakeLists.txt` and `native/api/host/` unstaged. After publication, record the
-  publication checkpoint, then claim the next independent bounded tasks.
+- Completion commit `406eb4e` (`test: pin core readiness, dynlink and host-map edge cases`) is
+  pushed; `main` and `origin/main` both resolve to `406eb4e`. The publication record is
+  [round 57 completion publication](docs/checkpoints/2026-10-21-root-round57-completion-publication.md).
+- After adding the publication record, `python3 scripts/project_index.py` exited 0 and refreshed
+  `docs/FOLDERS.md` (14,401 folders; `docs/checkpoints` lists 342 and `logs` 89); log
+  `logs/root-round57-publication-project-index.log`, SHA256
+  `1fce09b08a087681b67949e46317690178e639d219ac20fbf6999c6e81c8e6f9`. `trail build --check`
+  exited 0 with the wiring graph in sync at 3,551 nodes / 4,790 edges; log
+  `logs/root-round57-publication-trail-check.log`, SHA256
+  `1d6a8b7368552c48cb7630dfe051bb32e14cd65ebc74330bcb42255d15f9027f`. The optional deep concept
+  layer remains unbuilt. `git diff --check` exited 0.
+- The publication-record staged audit accepted all 3 staged paths; log
+  `logs/root-round57-publication-audit-staged.log`, SHA256
+  `4b70d819180336381c93f9ad4282c601ec8c520b07d7c3be6b43deb334a60b69`. The full audit accepted
+  1,609 paths; log `logs/root-round57-publication-audit-all.log`, SHA256
+  `8c0c88bd09b02d6ca6a2a43760bd2ff4b3b12dc0a5c4480725e4492173a165b6`. Cached and working diff
+  checks both exited 0.
+- Exact next action: restage `HANDOFF.md` after this update, rerun staged and full
+  `python3 -I scripts/audit_publish_paths.py` checks, then commit with
+  `docs: record round 57 fixture publication` and push `origin main`. Keep
+  `native/api/CMakeLists.txt` and `native/api/host/` unstaged. After publication, review the three
+  read-only scout reports and claim the next independent bounded tasks before any implementation.
 
 ## Session addendum 2026-10-21 round 57 claim (`/root`)
 
