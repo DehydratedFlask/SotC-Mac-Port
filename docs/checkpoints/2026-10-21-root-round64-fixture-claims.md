@@ -79,5 +79,27 @@ and accepted 1,632 paths; log `local/validation/root-round64-scout/audit-all.log
 preexisting `native/api/CMakeLists.txt` modification and untracked `native/api/host/` remain
 unstaged and excluded.
 
-Commit and push are pending. Record the commit ID, push log and hash, and post-push refs here before
-dispatching workers.
+At 2026-10-21 14:39 CDT, commit
+`218ce2134fa8e1af05c6e5e6e419cb30ceaa7310` (`docs: claim round 64 fixture tasks`) was created and
+pushed to `origin main`. The commit command exited 0; its captured log before the later checkpoint
+update was SHA-256 `0634e1bec7bb6ceb083291f6ac0fa21a9ef6a1f8637802b142446c47ddfd6198`. The push
+exited 0; log `local/validation/root-round64-scout/push.log`, SHA-256
+`5ec1fa737dba74a71d51b23fc57a97dc65216ba7681523d767a6fed4d289d3d5`. After push,
+`HEAD == origin/main == 218ce2134fa8e1af05c6e5e6e419cb30ceaa7310`. Only the five audited allowlisted
+paths were included. User-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain
+untouched and excluded.
+
+Exact next action: dispatch the three one-file test tasks to `/root/launcher_review`,
+`/root/review_host_proto`, and `/root/slot23_raw_xrefs`. After workers finish, root must review each
+diff and file hash, independently replay the focused command, build/check the source graph, update
+E190–E192 and all registries, then audit and publish the completion checkpoint.
+
+At 2026-10-21 14:40 CDT, after recording the first publication, root reran
+`python3 scripts/project_index.py` and `python3 scripts/project_index.py --check`. Both exited 0;
+14,437 folders were indexed and the result is current. Logs are
+`local/validation/root-round64-scout/project-index-final.log` (SHA-256
+`7fa0579f463474d6f5b4e0903258a2fa8128bda7b3d9bf9b8f4f18b95fe1ba5c`) and
+`local/validation/root-round64-scout/project-index-check-final.log` (SHA-256
+`167cc599d17d3d700959dd0fd55b102102b74b54411b96b37b8d9fccda4a0a33`). The generated folder
+index remains unchanged. This updates the shared HANDOFF and claim checkpoint after the first
+publication; the claim itself was already pushed before any worker prompt.
