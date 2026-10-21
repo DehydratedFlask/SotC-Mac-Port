@@ -2,9 +2,13 @@
 """Synthetic fixtures for the bounded XFF audio-bank header observations."""
 from __future__ import annotations
 
+import hashlib
+import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audio_bank_header as abh
@@ -162,6 +166,126 @@ class XffMemberTests(unittest.TestCase):
         with self.assertRaises(TypeError) as ctx:
             abh.parse_xff_member(member_text)
         self.assertEqual(str(ctx.exception), 'member data must be bytes-like')
+
+
+class SyntheticPsarc:
+    def __init__(self, member_path: str, member: bytes, offset: int, block: int):
+        self._member_path = member_path
+        self._member = member
+        self.entries = [
+            {'size': 0, 'offset': 0, 'block': 0},
+            {'size': len(member), 'offset': offset, 'block': block},
+        ]
+        self.read_calls: list[int] = []
+        self.closed = False
+
+    def paths(self) -> list[str]:
+        return [self._member_path]
+
+    def read(self, entry_id: int) -> bytes:
+        self.read_calls.append(entry_id)
+        if entry_id != 1:
+            raise AssertionError(f'unexpected synthetic entry id {entry_id}')
+        return self._member
+
+    def close(self) -> None:
+        self.closed = True
+
+
+class InspectMembersTests(unittest.TestCase):
+    def _fixture(self, *, manifest_member_sha256: str | None = None):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        root = Path(temp.name)
+        archive_path = root / 'fixture.psarc'
+        archive_bytes = b'synthetic archive identity bytes'
+        archive_path.write_bytes(archive_bytes)
+
+        summary_path = root / 'fixture.summary.json'
+        archive_sha256 = hashlib.sha256(archive_bytes).hexdigest()
+        summary_path.write_text(json.dumps({
+            'bytes': len(archive_bytes),
+            'sha256': archive_sha256,
+        }))
+
+        member_path = 'sound/fixture.hd'
+        member = make_member(b'synthetic member payload')
+        member_sha256 = hashlib.sha256(member).hexdigest()
+        reader = SyntheticPsarc(member_path, member, offset=0x1234, block=7)
+        manifest_path = root / 'audio.json'
+        manifest_path.write_text(json.dumps({
+            'members': [{
+                'archive': str(archive_path.resolve()),
+                'path': member_path,
+                'entry_id': 1,
+                'entry_offset': 0x1234,
+                'first_block': 7,
+                'size': len(member),
+                'member_sha256': manifest_member_sha256 or member_sha256,
+            }],
+        }))
+
+        return {
+            'archive_path': archive_path,
+            'archive_bytes': archive_bytes,
+            'archive_sha256': archive_sha256,
+            'summary_path': summary_path,
+            'manifest_path': manifest_path,
+            'member_path': member_path,
+            'member': member,
+            'member_sha256': member_sha256,
+            'reader': reader,
+        }
+
+    def test_inspect_members_accepts_full_archive_and_member_identity(self):
+        fixture = self._fixture()
+        with patch.object(abh, 'Psarc', return_value=fixture['reader']) as psarc:
+            report = abh.inspect_members(
+                fixture['archive_path'],
+                [fixture['member_path']],
+                fixture['manifest_path'],
+                fixture['summary_path'],
+            )
+
+        psarc.assert_called_once_with(fixture['archive_path'].resolve())
+        self.assertEqual(fixture['reader'].read_calls, [1])
+        self.assertTrue(fixture['reader'].closed)
+        self.assertEqual(report['schema_version'], 1)
+        self.assertEqual(report['task'], 'AUD-01-XFF-01')
+        self.assertEqual(report['archive'], {
+            'path': str(fixture['archive_path'].resolve()),
+            'bytes': len(fixture['archive_bytes']),
+            'sha256': fixture['archive_sha256'],
+            'summary_path': str(fixture['summary_path']),
+            'summary_identity_match': True,
+        })
+        self.assertEqual(report['members'], [{
+            'path': fixture['member_path'],
+            'psarc_entry_id': 1,
+            'archive_offset': 0x1234,
+            'first_block': 7,
+            'decoded_member_bytes': len(fixture['member']),
+            'decoded_member_sha256': fixture['member_sha256'],
+            'manifest_locator_and_hash_match': True,
+            'observations': abh.parse_xff_member(fixture['member']),
+        }])
+
+    def test_inspect_members_closes_reader_after_manifest_identity_mismatch(self):
+        fixture = self._fixture(manifest_member_sha256='0' * 64)
+        with patch.object(abh, 'Psarc', return_value=fixture['reader']) as psarc:
+            with self.assertRaisesRegex(
+                    abh.AudioBankFormatError,
+                    'manifest member_sha256 mismatch for sound/fixture\\.hd'):
+                abh.inspect_members(
+                    fixture['archive_path'],
+                    [fixture['member_path']],
+                    fixture['manifest_path'],
+                    fixture['summary_path'],
+                )
+
+        psarc.assert_called_once_with(fixture['archive_path'].resolve())
+        self.assertEqual(fixture['reader'].read_calls, [1])
+        self.assertTrue(fixture['reader'].closed)
 
 
 if __name__ == '__main__':
