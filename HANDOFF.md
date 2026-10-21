@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 12:20 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 12:23 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,24 +8,33 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Session addendum 2026-10-21 round 42 (`/root`)
+## Session addendum 2026-10-21 round 43 (`/root`)
 
-- Published the round-40 task results and checkpoint in commit
-  `f9c241b276f025b30be8fd7574771f0e4e84b7b9` (`docs: record round 40 publication verification`);
-  push succeeded and `HEAD` matched `origin/main`. See the
-  [round 41 publication checkpoint](docs/checkpoints/2026-10-21-root-round41-publication.md).
-- Claimed `SAV-01-CHUNK-HEADER-TRAILING-FIELDS-FIXTURE-01`, `ACTIVE`, zero failed tries. Extend
-  the existing payload-bearing parse check in `native/tests/test_save_chunk_header.cpp` so
-  `parsed_long.header.name_hash`, `.tag`, and `.payload_length` all match the source header.
-  Claim:
-  [save header trailing fields](docs/checkpoints/2026-10-21-root-sav01-chunk-header-trailing-fields-claim.md).
-- `/root/slot23_raw_xrefs` may edit only `test_save_chunk_header.cpp` after the claim is
-  published. Root will run `ctest --test-dir local/build/native -R '^save_chunk_header$'`.
-- The change is synthetic save-header codec coverage; it does not establish real-save
-  compatibility or change G2. Actual boot, audio, save/load, Metal, and forbidden-runtime gates
-  remain open. Existing `native/api/CMakeLists.txt` and `native/api/host/` remain untouched.
-- Exact next action: regenerate/check indexes and the source graph, path-audit and publish the
-  claim and round-41 publication checkpoint, then release the one test file to its owner.
+- Published claim `SAV-01-CHUNK-HEADER-TRAILING-FIELDS-FIXTURE-01` in commit
+  `92189ffa4171b789be76a4da2890fb7c86d46d1f` (`docs: claim trailing payload header assertions`);
+  push succeeded. See the [round 42 publication checkpoint](docs/checkpoints/2026-10-21-root-round42-publication.md).
+- Completed the save-header fixture. Worker and root each pass
+  `ctest --test-dir local/build/native -R '^save_chunk_header$'` (1/1); only
+  `native/tests/test_save_chunk_header.cpp` changed, and the parser is unchanged. E152 and the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-sav01-chunk-header-trailing-fields-complete.md)
+  record both logs and hashes.
+- Claimed `APP-01-LAUNCHER-PRESENTATION-IDLE-TONE-FIXTURE-01`, `ACTIVE`, zero failed tries:
+  assert `.neutral` on the existing idle presentation fixture. Claim:
+  [idle presentation tone](docs/checkpoints/2026-10-21-root-app01-idle-tone-claim.md).
+- Claimed `CPU-01-LEAF-CTOR-DECODER-FAIL-CLOSED-FIXTURE-01`, `ACTIVE`, zero failed tries:
+  add a synthetic unsupported-NOP fixture that requires `DecodeError` at RVA `0x4000`, without
+  changing the decoder. Claim:
+  [leaf decoder fail-closed fixture](docs/checkpoints/2026-10-21-root-cpu01-leaf-ctor-decode-fail-closed-claim.md).
+- Claimed `SRV-01-REGION-SPLIT-OVERFLOW-FIXTURE-01`, `ACTIVE`, zero failed tries:
+  assert an overflowing synthetic lead address is rejected without modifying either node.
+  Claim: [region split overflow](docs/checkpoints/2026-10-21-root-srv01-region-split-overflow-claim.md).
+- The three claims have distinct test files and workers. Actual boot, authentic game audio,
+  real save/load, Metal gameplay, and forbidden-runtime/module gates remain open. Existing
+  `native/api/CMakeLists.txt` and `native/api/host/` remain untouched and unpublished.
+- Exact next action: after this claim publication, assign `LauncherModelTests.swift` only to
+  `/root/launcher_review`, the new `tools/lift/test_leaf_ctor_decode.py` only to
+  `/root/review_host_proto`, and `native/tests/test_region_split.cpp` only to
+  `/root/slot23_raw_xrefs`; then replay each acceptance command and record results.
 
 ## Session addendum 2026-10-21 round 41 (`/root`)
 
