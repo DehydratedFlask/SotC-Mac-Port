@@ -1,12 +1,31 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 12:17 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 12:20 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 42 (`/root`)
+
+- Published the round-40 task results and checkpoint in commit
+  `f9c241b276f025b30be8fd7574771f0e4e84b7b9` (`docs: record round 40 publication verification`);
+  push succeeded and `HEAD` matched `origin/main`. See the
+  [round 41 publication checkpoint](docs/checkpoints/2026-10-21-root-round41-publication.md).
+- Claimed `SAV-01-CHUNK-HEADER-TRAILING-FIELDS-FIXTURE-01`, `ACTIVE`, zero failed tries. Extend
+  the existing payload-bearing parse check in `native/tests/test_save_chunk_header.cpp` so
+  `parsed_long.header.name_hash`, `.tag`, and `.payload_length` all match the source header.
+  Claim:
+  [save header trailing fields](docs/checkpoints/2026-10-21-root-sav01-chunk-header-trailing-fields-claim.md).
+- `/root/slot23_raw_xrefs` may edit only `test_save_chunk_header.cpp` after the claim is
+  published. Root will run `ctest --test-dir local/build/native -R '^save_chunk_header$'`.
+- The change is synthetic save-header codec coverage; it does not establish real-save
+  compatibility or change G2. Actual boot, audio, save/load, Metal, and forbidden-runtime gates
+  remain open. Existing `native/api/CMakeLists.txt` and `native/api/host/` remain untouched.
+- Exact next action: regenerate/check indexes and the source graph, path-audit and publish the
+  claim and round-41 publication checkpoint, then release the one test file to its owner.
 
 ## Session addendum 2026-10-21 round 41 (`/root`)
 
