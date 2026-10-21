@@ -46,6 +46,16 @@ int main() {
         CHECK(free_count == 2);
     }
 
+    // Unlink middle of A-B-C without an optional free_count pointer.
+    {
+        RegionNode a{}, b{}, c{};
+        wire_chain(a, b, c);
+        list_unlink(b);
+        CHECK(region_links(a)->next == region_links(c));
+        CHECK(region_links(c)->prev == region_links(a));
+        CHECK(region_links(b)->next == region_links(b));
+    }
+
     // Unlink head of A-B-C: new head has no predecessor.
     {
         RegionNode a{}, b{}, c{};

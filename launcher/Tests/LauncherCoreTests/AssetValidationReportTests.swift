@@ -91,6 +91,22 @@ struct AssetValidationReportTests {
         #expect(AssetValidator().validate(directory: dir) == .missing("cachedFiles.psarc not found"))
     }
 
+    @Test func symlinkToDirectoryNamedLikeArchiveIsNotAcceptedAsAFile() throws {
+        let dir = try makeDirectory()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try write(AssetValidator.requiredArchives.filter { $0 != "pak0.psarc" }, into: dir)
+
+        let target = dir.appending(path: "symlink-target", directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: target, withIntermediateDirectories: false)
+        let archive = dir.appending(path: "pak0.psarc", directoryHint: .notDirectory)
+        try FileManager.default.createSymbolicLink(at: archive, withDestinationURL: target)
+
+        let report = AssetValidator().report(directory: dir)
+
+        #expect(report.problems == ["pak0.psarc not found"])
+        #expect(report.missingArchives == ["pak0.psarc"])
+    }
+
     @Test func unreadableArchiveIsReportedAsNotReadable() throws {
         let dir = try makeDirectory()
         defer { try? FileManager.default.removeItem(at: dir) }

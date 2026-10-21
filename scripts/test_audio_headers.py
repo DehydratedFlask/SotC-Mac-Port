@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import lzma
 import sys
 import unittest
 import zlib
@@ -169,6 +170,13 @@ class EntropyAndProbeTests(unittest.TestCase):
         probe = cah.decompress_probe(wrapped)
         self.assertTrue(probe['raw_inflate_offset2']['ok'])
         self.assertEqual(probe['raw_inflate_offset2']['out_len'], 64)
+
+    def test_lzma_accepted_after_four_byte_prefix(self):
+        payload = b'E' * 64
+        wrapped = b'\x00\x01\x02\x03' + lzma.compress(payload)
+        probe = cah.decompress_probe(wrapped)
+        self.assertTrue(probe['lzma_offset4']['ok'])
+        self.assertEqual(probe['lzma_offset4']['out_len'], 64)
 
 
 class ClassifyFixtureTests(unittest.TestCase):
