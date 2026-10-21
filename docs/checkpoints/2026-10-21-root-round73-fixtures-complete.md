@@ -93,3 +93,65 @@ Observation: the staged audit contains no forbidden path, and no user-owned API 
 Inference: none. All three tasks are `FIXTURE_VERIFIED`, each with one successful implementation
 attempt and zero failed tries. Next exact action: commit and push this allowlisted set, fetch again,
 and verify HEAD matches `origin/main`.
+
+## Post-push publication checkpoint
+
+Checkpoint time: 2026-10-21 17:01 CDT (America/Chicago). Agent: `/root`. Completion commit
+`e5d3e40c308679a356998e506441eba2c013e17a` (`test: verify Round 73 export, ABI, and split
+fixtures`) contains the eight allowlisted paths listed above. `git push origin main` completed
+successfully; push log SHA-256 `47fd26c3d7597f2280dcca24e0770c3a0b5a37b1c0482ba6f5368f31f7798b62`.
+Commit display log SHA-256 `16943abd04d0d97a137453276012968084fe92f8ae05453a4ba85674c4c28d62`.
+
+- `git fetch origin`: exit 0; fetch log SHA-256
+  `be87f0e1cb8b7e9cc5faeaeb535f1c7436d2a516681757485b7f9903e5bad082`.
+- Post-push `git status --short --branch` and `git rev-parse HEAD origin/main` report both at
+  `e5d3e40c308679a356998e506441eba2c013e17a`, divergence `0 0`; state log SHA-256
+  `084b5f9ef97b98ba1ae143c7f5efbae77c34b19b8e509a157238d8283febd96e`.
+- The only remaining worktree entries are the pre-existing user-owned `native/api/CMakeLists.txt`
+  modification and untracked `native/api/host/`; both remain untouched and excluded.
+
+Observation: the published completion commit is the fetched remote tip and the worktree's only
+non-project entries are the same user-owned API changes. Inference: none. All Round73 tasks remain
+`FIXTURE_VERIFIED`; G0 remains PARTIAL and G1–G6 remain NOT RUN. Next exact action: scout independent
+Round74 fixture candidates from the live task register and Graft source graph, then publish bounded
+claims before implementation.
+
+## Publication-record sync pre-push checkpoint
+
+Checkpoint time: 2026-10-21 17:03 CDT (America/Chicago). Agent: `/root`. Staged paths are only
+`HANDOFF.md` and this completion checkpoint; Round73 code and task status do not change.
+
+- `git diff --cached --check && git diff --check`: exit 0. Log
+  `local/validation/root-round73-scout/pubsync-diff-check.log`, SHA-256
+  `8051da3aaf5ed31b3c200f7693a6133f151dc4acede082e677690f7918b918d8`.
+- `python3 -I scripts/audit_publish_paths.py`: exit 0, both staged paths accepted. Log
+  `local/validation/root-round73-scout/pubsync-audit-staged.log`, SHA-256
+  `048c125e781dcc057b488025ffb7ebe1728125bb8895bb6ad3ec809b7348235c`.
+- `python3 -I scripts/audit_publish_paths.py --all`: exit 0, 1,651 tracked paths accepted. Log
+  `local/validation/root-round73-scout/pubsync-audit-all.log`, SHA-256
+  `ca1d0c4d76717454cecedc3459f6da14bdc0317a6a5b8bc1027be17abb4ac6d5`.
+- `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/project_index.py --check` first returned exit 1
+  because newly captured private logs changed the indexed file count. After all log files were
+  present, `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/project_index.py` returned exit 0 and
+  rewrote only the excluded private inventory; final `... project_index.py --check` returned exit
+  0 at 14,468 folders. Logs `pubsync-index-check.log`, `pubsync-index-generate.log`, and
+  `pubsync-index-final-check.log` have SHA-256 `143ff08d424879bb92a4b2bfe16518225ba8501c4b6358c40a21e72abce1df5f`,
+  `c0c4d7d50babd839833e54a1f7374e4ac76ebb16eec2555cce6ae22512464bec`, and
+  `82a06e9d8c3e42e0a5d6e750144f973f757db4f956b5dd4d3ef97bc50a0e8ccb` respectively.
+- `trail build --check`: exit 0; wiring graph in sync at 3,572 nodes, 4,837 edges and 943 cards;
+  deep meaning layer remains unbuilt. Log `pubsync-trail-check.log`, SHA-256
+  `bc77b1c82984f85ace632af8382d9800cc4015579fe1bea7373a8bcb082499f3`.
+- `git fetch origin`: exit 0. Before this docs-only sync, `HEAD` and `origin/main` both equal
+  `e5d3e40c308679a356998e506441eba2c013e17a`, divergence `0 0`. Logs `pubsync-fetch.log`,
+  `pubsync-state.log`, and `pubsync-divergence.log` SHA-256 `8051da3aaf5ed31b3c200f7693a6133f151dc4acede082e677690f7918b918d8`,
+  `cd03b266fe41ec4b19e03929c09be9ee43c26b17efca54d8e2a74dc6ea4c0ca9`, and
+  `231d953f3e206b69f61bb624fcd69294244ee7ad6bf019bfa1f8f965c5328f82`.
+- Status log `pubsync-status.log`, SHA-256
+  `e3afb40b96bbf2634779387fab03f5db9c2bfa8ae812b148d41d2c53b17be8a3`, confirms only the two
+  staged docs plus the excluded pre-existing user-owned `native/api/CMakeLists.txt` and untracked
+  `native/api/host/`.
+
+Observation: both required path audits pass and no user-owned API path is staged. Inference: none.
+Round73 tasks remain `FIXTURE_VERIFIED`, G0 remains PARTIAL and G1–G6 remain NOT RUN. Next exact
+action: commit and push this two-document publication record, fetch and verify the new remote tip,
+then begin independent Round74 scouting.
