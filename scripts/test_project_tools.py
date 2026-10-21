@@ -35,6 +35,7 @@ class ToolChecks(unittest.TestCase):
             source.write_bytes(data)
             record = unwrap(source, output)
             self.assertEqual(output.read_bytes(), elf)
+            self.assertEqual(json.loads(output.with_suffix(".identity.json").read_text()), record)
             self.assertEqual(record["elf_sha256"], hashlib.sha256(elf).hexdigest())
             self.assertEqual(record["missing_segments"], [])
             struct.pack_into("<Q", data, 32, 0x802)
