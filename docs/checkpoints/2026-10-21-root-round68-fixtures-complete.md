@@ -73,6 +73,41 @@ The separate PSARC invalid-UTF-8 candidate remains unclaimed because the user's 
   existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` are unstaged and
   excluded.
 
-**Next exact action:** Re-stage the updated checkpoint and handoff, repeat diff and publish audits,
-commit and push the verified fixtures, then scout another independent fixture batch. G0 remains
-PARTIAL; G1–G6 remain NOT RUN.
+**Pre-push next exact action (completed):** Re-stage the updated checkpoint and handoff, repeat
+diff and publish audits, then commit and push the verified fixtures. G0 remains PARTIAL; G1–G6
+remain NOT RUN.
+
+## Completion publication and handoff
+
+**Checkpoint update:** 2026-10-21 15:52 CDT (America/Chicago); integrator `/root`.
+
+- The verified fixture and documentation paths were committed as
+  `6e6db1d4b8d9bcae9d778d099ee22dcef3aa683c` and pushed to `origin/main`. The push advanced
+  `7afe5fc..6e6db1d`; a subsequent confirmation push exited 0 with `Everything up-to-date`. Log
+  `local/validation/root-round68-scout/completion-push.log`, SHA-256
+  `f003da496397b96e83a1edab0fe86cd9f391566234246c3cc64fac197ef7c8f2`.
+- `git fetch origin` exited 0; log `completion-fetch.log`, SHA-256
+  `19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061`. The post-push state log
+  `completion-publish-state.log`, SHA-256
+  `c3416ff26f1e091770adf2c9944cf70fedc795192cb92575d789c64e8d623a49`, records
+  `HEAD == origin/main == 6e6db1d4b8d9bcae9d778d099ee22dcef3aa683c`, zero divergence, and only
+  the excluded `native/api/CMakeLists.txt` modification plus untracked `native/api/host/`.
+- The index remains current at 14,463 folders after precreating the next checkpoint's private
+  validation logs. `python3 scripts/project_index.py` log `completion-sync-project-index.log`,
+  SHA-256 `d7e246a26edd98fbd9fd5cd8e2c85d0eca151928bd02d25836cf2aaf5cf29b76`; its `--check` log
+  SHA-256 `7fdb9addb96ef2ae7ed7113ef2ae6ac697879561966b45e9be365994df9a31a5`.
+- The handoff synchronization itself passes `git diff --cached --check` and `git diff --check`;
+  the staged audit accepts 2 allowlisted documentation paths and the full audit accepts 1,641
+  paths. Log hashes: `completion-sync-diff-check.log`
+  `b2528bb04ae87649a0953cc7640eea99e8a43739e03d03e8810aff065cae4365`,
+  `completion-sync-audit-staged.log`
+  `e5bf79877a7e82bc21da0b02f614afca83b38b99981c1d99cbd93fb050bcdca1`, and
+  `completion-sync-audit-all.log`
+  `6800431f0cb9c0e58a6316fadd208049344e63e222cfac298969185f36ebfddd`.
+- Before this sync commit, `git fetch origin` exited 0 and both refs were
+  `6e6db1d4b8d9bcae9d778d099ee22dcef3aa683c`, with zero divergence.
+
+**Next exact action:** Use Graft and the live repository to scout independent Round69 fixtures;
+keep the PSARC invalid-UTF-8 choice unclaimed until the user answers. The Round68 tests and task
+records are published. Publish this handoff synchronization before the next claim checkpoint. G0
+remains PARTIAL and G1–G6 remain NOT RUN.
