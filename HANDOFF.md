@@ -1,5 +1,23 @@
-Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
-No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
+# SoC Mac Native — agent handoff
+
+Updated: 2026-10-20 21:13 CDT (America/Chicago). Principal: `/root`.
+No native game executable exists. Validation: G0 PARTIAL; G1-G6 NOT RUN.
+
+## CURRENT CHECKPOINT — 2026-10-20 21:13 CDT, `/root` — resume at the native startup blocker
+
+`CPU-01-CTOR10-OBJECT-INIT-01` is CLAIMED by root with worker `/root/startup_critical_path_resume`. Worker owns only private `local/re/evidence/cpu01-ctor10-object-init-01/`; root owns shared records and Git. Characterize initializer `0xb30950`, allocation-size pointer helper `0xb30a10` and cleanup callback `0xe44a10` for original constructor slot 10. Existing evidence shows the examined zero-state path skips the unresolved computed calls, but object initialization and native ownership remain unestablished. The runner still stops after callbacks 0-9 at `{0xf09e60, 10, nullptr}`; later leaf fixtures do not advance that prefix. Do not register slot 10 until every required effect on this path is recovered. At most two distinct REA/Ghidra queries (`0xb30950`, `0xe44a10`), after the existing SAV query terminates; no automatic same-target retry. Specification: CPU-01 work packet and REVERSE_ENGINEERING Stage 2. No failed analysis hypotheses for this new task; inherited slot-10 verifier correction remains recorded. Escalated `0xd71f60` stays untouched.
+
+`SAV-01-LOADER-01` is ACTIVE under root integration with worker `/root/sav01_loader_resume_audit`. q1 (`0xa81180`) has a saved successful provider record, but no loader report/checker/checksum manifest exists yet. q2 (`0x542880`) was confirmed live at 21:10:51 CDT: wrapper PID 17959, runner 21478, REA children 21480/21481; exact `pgrep -alf 'aud02-waitloop-01|sav01-loader-01|run_rea_function.py|run_q1_q2.sh'` capture is `local/checkpoints/root-20261020-resume-processes.log`, SHA-256 `874c5ffa12cb03b35af6071c6e5da2d7d3b01f29d6ff6acabf27e1f233b03258`. This is a verified wait, not a failure or permission to restart. Worker will complete only private semantic evidence after the run ends; root must inspect and replay it before accepting claims. No new provider queries for the save task.
+
+Root subsequently inspected q2's terminal `run.json` and shell-exit record: exit 0, valid JSON, no timeout, 376.068 s, finished 21:12:38 CDT, Evidence `ev_8f5eed1f8c9e216017843e816dfff6c4ff7d0ebc2f53faa13642d0d9627bc9b0`. Run-record SHA-256 `8dec300cc1da0fcee24b38b451c9af1adc104d81fc5c17191aad023a530a296d`; stdout SHA-256 `9a6c62af293b9eba44944de5cb938c334e39646cc003f2999fdc68aba0725ed0`. The saved run is terminal, so the CPU provider permit can be released after claim publication. Save semantics remain unaccepted until the worker's checker is reviewed and root-replayed.
+
+`python3 scripts/project_index.py` exited 0 (5,584 folders; 153 checkpoint files; log `local/checkpoints/root-20261020-resume-index.log`, SHA-256 `fc0f4ab584dfdd19c3fd0ea786425d8fa325af16b427b620d1839194eaf93e5f`). `graft check` exited 0, wiring graph in sync at 1,988 nodes; deep layer remains unbuilt (log SHA-256 `c74d5fe747cf7de34cc2fd604ea1b7b31a9bf004024dc8729ae033ddf8c3891c`). `git diff --check` exited 0 (empty-log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`).
+
+`AUD-02-WAITLOOP-01` has only a copied helper and no report/verifier/provider capture; no task-specific process was found by the same live process query, and REA MCP reports no open target/cleanup. It is READY for a later bounded claim; no completion or provider-failure count is inferred from missing artifacts.
+
+Current source: `fe87a20c0e2a9355c9e94c1f6b8a4432bbf1d354`, clean tracked tree before this claim; pre-existing `tools/graft/` remains unstaged. `git fetch origin` exited 0; divergence 0/0. Root `sha256sum local/re/eboot.elf` matched `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`. No install/dependency changes and no code/runtime result. Previous goal turn was progress (fixture and pause checkpoint published); this continuation has revalidated the live state and selected the remaining startup dependency. Full claim: `docs/checkpoints/2026-10-20-root-critical-path-resume-claim.md`.
+
+Exact next action: index/check/audit and publish these claims, then authorize the save-evidence worker; release the CPU provider permit only after the existing save process has a terminal record. Independently replay returned checkers, publish the results, then decide the native slot-10 implementation boundary.
 
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors batch 24 (0xbc07f0 .. 0xbb9740) lifted
 
