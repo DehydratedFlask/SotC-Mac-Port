@@ -20,5 +20,13 @@
 - This is synthetic spelling lookup only. It does not validate real source trees, NID collisions, imports, module/version/signature metadata, an executable loader, or game behavior.
 - No code attempt failed. No production implementation changed. No game data was read.
 - Remaining risk: the truncated NID is only a strong spelling hint as documented by the source; this fixture says nothing about whether a symbol's semantics or ABI match.
-- Exact publication command, commit, path audits, final index result, and source-graph result will be recorded after this completion record is staged and published.
-- Next exact action: finish project-index and publication checks, publish allowlisted completion records, then continue with another independent task while preserving the escalated and blocked work boundaries.
+- Exact publication command/result: `git push origin main` exited 0 and advanced
+  `3a9c553..cfebea9`. Commit `cfebea9848583ed1df9124a869e99379e65f988a` is on `origin/main`, and
+  root verified HEAD equals `origin/main`.
+- Publication checks: staged audit accepted six allowlisted files; full tracked-path audit accepted
+  1,514 files; `git diff --cached --check` exited 0. `python3 scripts/project_index.py` indexed
+  14,219 folders, and `python3 scripts/project_index.py --check` reports current. `trail build
+  --check` reports the graph in sync at 3,528 nodes (deep meaning layer remains unbuilt). Command
+  logs are in `local/checkpoints/root-round12-dynlink-claim/`.
+- Next exact action: select and claim another independent bounded task while preserving the escalated
+  and blocked work boundaries.
