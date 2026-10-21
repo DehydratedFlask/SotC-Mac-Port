@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 18:02 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 18:04 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -15,7 +15,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - These fixtures assert pure Swift mappings/formatter output, synthetic PSARC headers, and the current stub ABI report. They prove no launcher UI, live archive, native game core, or game behavior. G0 remains PARTIAL; G1–G6 remain NOT RUN.
 - Project folder index is current at 19,268 folders; Trail's wiring graph is current at 3,580 nodes. The deep semantic layer remains unbuilt; exact check logs are in the Round77 completion checkpoint.
 - The native API check used the existing user-owned `native/api/CMakeLists.txt` (SHA256 `aa04d19b5fde7c32ae4f30d28bcf781f0a65a337c75c96ad63c29e320bb402de`). That file and untracked `native/api/host/` remain untouched and excluded from publication.
-- Claim commit `84706a333356aab9d45b3c8355b15835da96a70c` and publication-record sync `cb45ea030424882f1fd924323dd7fecc4e139f97` are pushed and fetch-verified at `origin/main`; the completion publication is recorded in the linked checkpoint.
+- Claim commit `84706a333356aab9d45b3c8355b15835da96a70c` and publication-record sync `cb45ea030424882f1fd924323dd7fecc4e139f97` are pushed and fetch-verified. Round77 completion is published in `b6ada6cb27bb858a5b935ed667516078214eaf2f`; push succeeded and a subsequent fetch confirmed `HEAD == origin/main` with 0/0 divergence. The preflight and push logs are in the [Round77 completion checkpoint](docs/checkpoints/2026-10-21-root-round77-fixtures-complete.md).
 - Exact next action: select the next independent bounded task from `docs/TASKS.md` using the live source graph, publish its claim before implementation, and dispatch separate files to available workers.
 
 ## Round 76 fixtures verified (/root)
