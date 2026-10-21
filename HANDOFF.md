@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 09:56 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 09:58 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -16,10 +16,13 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - The existing launcher checkpoint records 89 passing Swift tests and an app-process smoke start,
   but no observed window, VoiceOver, Finder launch, or signed bundle. The executable currently
   exists at `local/build/launcher-agent-e/out/Products/Debug/SoCLauncher`.
-- Next exact action: launch that binary in the native UI, inspect the visible readiness/state and
-  available accessibility text, and attempt a bounded VoiceOver read-through if the current host
-  state permits. Close the launcher afterward. Do not interpret the UI as game boot, audio, saving,
-  or G4 evidence.
+- The first native UI inventory was blocked: `cua.getState()` reports the Mac is locked and needs
+  manual unlock. No app was launched and no UI state was captured. The user has been asked to
+  unlock it; the task remains PARTIAL with no failed implementation tries. Private result:
+  `local/checkpoints/root-app01-launcher-ui-cua-blocked.log`.
+- Next exact action after the user unlocks the Mac: bind the existing executable with CUA, capture
+  its AX state and screenshot, and inspect visible readiness/state. Do not interpret the UI as game
+  boot, audio, saving, or G4 evidence. VoiceOver, Finder launch, and signing remain NOT RUN.
 
 ## Session addendum 2026-10-21 round 3 (`/root`)
 

@@ -1,6 +1,6 @@
-# Claim: APP-01-LAUNCHER-CORECLIENT-01 — inspect the built launcher UI
+# Checkpoint: APP-01-LAUNCHER-CORECLIENT-01 — inspect the built launcher UI
 
-- Local time: 2026-10-21 09:56 CDT (America/Chicago).
+- Local time: 2026-10-21 09:58 CDT (America/Chicago).
 - Agent: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`).
 - Task: `APP-01-LAUNCHER-CORECLIENT-01`, ACTIVE continuation; 0 failed tries.
 - Bounded scope: launch the already-built Mac launcher and inspect its visible readiness/state
@@ -35,3 +35,24 @@
 Launch the existing executable in the native Mac UI, capture the window and accessibility state,
 attempt the bounded VoiceOver read-through if feasible, then close the launcher and record the
 actual command, result, evidence paths, observations, remaining limits, and task status.
+
+## UI access checkpoint
+
+- Local time: 2026-10-21 09:58 CDT (America/Chicago).
+- Agent: `/root`; task: `APP-01-LAUNCHER-CORECLIENT-01`; status: PARTIAL / awaiting user unlock;
+  0 failed implementation tries.
+- Files changed: this checkpoint, `HANDOFF.md`, `docs/TASKS.md`, and private
+  `local/checkpoints/root-app01-launcher-ui-cua-blocked.log`.
+- Exact command: `await cua.getState();` via `mcp__cua_repl.js`; result reports
+  `Native apps: Error: The Mac is locked and automatic unlock could not unlock it. Ask the user
+  to unlock the Mac manually before continuing.` No launcher process was started; no screenshot or
+  AX tree was captured. The private result record is
+  `local/checkpoints/root-app01-launcher-ui-cua-blocked.log`.
+- Observation: CUA reports a locked Mac. Inference: this UI-only subtask cannot continue until the
+  user unlocks the session. No UI or VoiceOver behavior is established.
+- Remaining risks: native window, AX values, VoiceOver speech, Finder launch, and signing are all
+  NOT RUN; the underlying launcher task remains PARTIAL.
+- Next exact action: after the user confirms unlock, call
+  `cua.getApp("/Volumes/Extra/SoC Mac Native/local/build/launcher-agent-e/out/Products/Debug/SoCLauncher")`,
+  then inspect a fresh `getAXStateAndScreenshot()`. Leave VoiceOver/Finder claims unverified
+  unless they are observed directly.
