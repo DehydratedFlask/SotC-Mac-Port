@@ -77,6 +77,22 @@ class ToolChecks(unittest.TestCase):
             generate(root, check=True)
             self.assertIn("new-module", (root / "docs/FOLDERS.md").read_text())
 
+    def test_index_ignores_nested_admin_directories(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            nested = root / "nested"
+            nested.mkdir()
+            generate(root)
+
+            git_dir = nested / ".git"
+            git_dir.mkdir()
+            (git_dir / "marker").write_text("repository metadata")
+            cache_dir = nested / "__pycache__"
+            cache_dir.mkdir()
+            (cache_dir / "marker.pyc").write_bytes(b"python cache")
+
+            generate(root, check=True)
+
 
 if __name__ == "__main__":
     unittest.main()

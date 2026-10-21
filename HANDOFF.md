@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 10:28 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 10:30 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -20,12 +20,24 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Graft located the ignored-directory pruning in `scripts/project_index.py:27-40` and check mode
   in `:59-77`; the existing stability test covers `.DS_Store` and new folders but not these
   administrative directories. Prerequisite: none.
-- Acceptance command: `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py`. No test
-  has run for this task yet. After claim publication, `slot23_raw_xrefs` owns only that test file;
-  root remains the sole `HANDOFF.md` integrator.
-- Next exact action: publish the claim, then assign the worker to add the temp-root fixture and
-  record its focused result. Keep escalated `native/api/CMakeLists.txt` and `native/api/host/`
-  outside this task and all commits.
+- Acceptance command: `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py`. Worker and
+  root each pass 5/5. E131 and the completion checkpoint record the exact log hashes and test-only
+  limits. `slot23_raw_xrefs` owned only `scripts/test_project_tools.py`; root remained the sole
+  `HANDOFF.md` integrator.
+- Claim commit `51f6549` is pushed to `origin/main`; `git push origin main` exited 0 and advanced
+  `fb28481..51f6549`. Root verified `HEAD` and `origin/main` both resolve to
+  `51f654923eb76ba2d10c6fcf88f222089ded84e9`. `slot23_raw_xrefs` is now assigned only
+  `scripts/test_project_tools.py`; implementation and acceptance result are pending.
+- During implementation, `trail build --check` reported the expected stale graph after the test file
+  gained its new test symbol. `trail build` then exited 0 and the subsequent check passed; the graph
+  remains in sync. No production code changed. Keep escalated `native/api/CMakeLists.txt` and
+  `native/api/host/` outside this task and all commits.
+- Final folder index after adding the completion checkpoint: `python3 scripts/project_index.py`
+  exited 0 with 14,208 folders; `docs/checkpoints` now reports 236 files. `trail build --check`
+  exited 0 with the wiring graph in sync (deep layer remains unbuilt).
+- Publication gates pass: the staged path audit accepts 7 allowlisted files; the full tracked path
+  audit accepts 1,502 paths; `git diff --cached --check` is clean. Escalated host files remain
+  unstaged. Next exact action: commit and push the completion.
 
 ## Session addendum 2026-10-21 round 7 (`/root`)
 
