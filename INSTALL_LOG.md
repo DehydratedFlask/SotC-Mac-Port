@@ -164,3 +164,17 @@ Purpose: synthetic launcher mapping, ELF-symbol parser, and host-map overflow fi
 no game execution/runtime evidence. Build products remain in `local/build/launcher` and
 `local/build/native`; private test logs remain under `local/validation/` and `logs/`. No tool or
 project dependency was installed.
+
+## 2026-10-21 13:25 CDT — round 58 focused fixture verification
+
+Existing Apple Swift 6.4.0, Python 3.15.0, CMake 4.4.4, Apple clang 21.0.0 and macOS 27.0.1 were
+reused; no install, download, dependency, or configuration change. Worker and root commands:
+swift test --package-path launcher --scratch-path local/build/launcher --filter LauncherStatusCopyTests
+(exit 0, 7 tests in 1 suite),
+PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_archive_overlap_map.py (exit 0, 22 tests),
+cmake --build local/build/native --target test_region_list (exit 0), and
+ctest --test-dir local/build/native -R '^region_list$' (exit 0, 1/1). Exact private logs and
+hashes are recorded in the three Round 58 completion checkpoints. These commands verify synthetic
+copy, archive-map validation, and intrusive-list behavior only; they add no game boot/audio/save or
+Metal gameplay evidence. Build products remain under local/build/; validation output stays in
+local/validation/. No dependency was installed.
