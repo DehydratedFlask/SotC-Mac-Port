@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 08:36 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 08:47 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -25,6 +25,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Next exact action: inspect the focused fixture and checker contract, build/run the ahead-table
   test, replay `tools/lift/check_ctor_slots.py`, and prove the production runner still stops at
   index 23. Record results before any code commit. Slot 23 and G1 remain unresolved.
+- Progress checkpoint: `check_ctor_slots.py`, `verify_ctor_family.py`, and `check_ctor_thunks.py`
+  exited 0. The focused build command exited 2 before compilation because Make has no rule for
+  `test_registration_thunks_ahead`; count this as failed try 1, with no native test run. Inspect
+  `local/build/native/CMakeCache.txt`, then explicitly reconfigure the same ARM64/sanitizer build if
+  it points to this checkout. See
+  [the checkpoint](docs/checkpoints/2026-10-21-root-cpu01-slot24-47-build-target-failure.md).
 - Also claimed `APP-01-CORE-HOST-01`, status ACTIVE, attempt 0, for the existing native host
   protocol. A parallel read-only audit found the hello limit can disagree with its configured
   parser limit, input errors are returned as clean EOF, the closed-stdout test accepts the wrong
@@ -34,6 +40,17 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Host task's next exact action: fix those protocol and pipe-test defects, then return a concise
   checkpoint with exact changed files and the suggested focused CMake/CTest command. `start` still
   returns `ENGINE_NOT_IMPLEMENTED`; this work is not launcher IPC integration or G4 evidence.
+- Host worker implementation is now ready in the four assigned `native/api/host/` files. It adds
+  configured hello limits, distinguishes stream read errors from EOF, tightens the exit-code check,
+  and handles SIGPIPE/EPIPE in the parent pipe writer. No build or test has run; root will verify it
+  after checking the native build configuration. See
+  [the implementation checkpoint](docs/checkpoints/2026-10-21-root-app01-core-host-implementation.md).
+- Current CMake cache is confirmed to be this `native/` tree, Unix Makefiles, arm64, and
+  `SOTC_SANITIZE=ON`; the missing target is from stale generation. The source graph was rebuilt
+  with the original scopes preserved plus `native`, `launcher`, and `tests`; `trail build --check`
+  now passes and Graft resolves the new ahead-table test file. Next explicitly reconfigure this
+  build and run the constructor and host focused tests. See
+  [the failed-build checkpoint](docs/checkpoints/2026-10-21-root-cpu01-slot24-47-build-target-failure.md).
 
 ## Session addendum 2026-10-21 round 2 (orchestrator)
 
