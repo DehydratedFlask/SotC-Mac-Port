@@ -7,12 +7,27 @@ auxiliary executables), so the launcher stays responsive if the core fails. No s
 | Target | Role |
 |---|---|
 | `LauncherCore` | Pure checks: `AssetValidator` (six archives, PSAR magic, ordered `AssetValidationReport`), `SystemChecks` (Metal Apple7 family, default audio output, native-core presence), `ReadinessReport` (runs off the main actor), `ReadinessAccessibility`, `DiagnosticsSummary`, `LauncherStatusCopy` |
+| `CoreClient` (in `LauncherCore`) | `CoreClient` protocol (`validate/start/stop/status/coverage`, async, throws `CoreFailure`), value models mirroring the native C ABI (`CoreModels.swift`) and `CoreClientMapping` (core facts -> `ReadinessItem.Status` / `LauncherState`). No native code. |
+| `CSotcCore` | C++ SwiftPM target whose `sotc_core.cpp` and `include/sotc_core.h` are **symlinks into `native/api/`** (single source), built with `SOTC_API_WITH_CORE_LIB=0` |
+| `LauncherNativeCore` | `NativeCoreClient`: `CoreClient` over the in-process C ABI. Not used by the app yet |
 | `SoCLauncher` | SwiftUI app: `LauncherModel` (@Observable lifecycle idle/validating/ready/starting/running/stopping/failed), views |
 
 Honest states: "Native game core" reports **NOT BUILT** (and Play stays disabled) until a real
 Mach-O `SoCGameCore` auxiliary executable exists. Shell scripts/stubs are rejected. A readiness
 row and status line both carry the NOT BUILT / Play disabled wording — never fake success.
 This shell cannot pass G4 or boot the game.
+
+## Core ABI client (APP-01-CORE-ABI-01)
+
+ABI: [native/api/README.md](../native/api/README.md). `NativeCoreClient().start()` throws
+`CoreFailure(.engineNotImplemented)` and `status().state` becomes `.failed`, never `.running`;
+`CoreClientMapping.launcherState` additionally turns `running` without `engineImplemented` into `.failed`.
+Tests: `LauncherCoreTests/CoreClientTests` (scripted test double `FakeCoreClient`, deliberately test-only)
+and `LauncherNativeCoreTests` (real C ABI, including parity with `AssetValidator`).
+
+Not done: `SoCLauncher`/`LauncherModel` still use `SystemChecks.nativeCore` and `Process`; swapping them to
+`CoreClient` is the next step. The in-process facade is the ABI stub only; the real core will run as the
+`SoCGameCore` child process (link `sotc_api` + `sotc_core` there) behind a child-process `CoreClient`.
 
 ## Stable copy (LauncherCore, unit-tested strings)
 

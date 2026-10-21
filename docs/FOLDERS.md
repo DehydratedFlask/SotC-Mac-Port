@@ -11,7 +11,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `.graft` | 1 | Project folder; add a contract to docs/INDEX.md |
 | `Shadow of the Colossus` | 2 | Original user game inputs; read-only and private |
 | `docs` | 12 | Plans, task/evidence registries, checkpoint and escalation documentation |
-| `docs/checkpoints` | 196 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs/checkpoints` | 200 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/escalations` | 3 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/schemas` | 1 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `graft` | 1 | Regenerable source graph; internal cache directories summarized |
@@ -1084,15 +1084,22 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/v5/units` | 114 | Native Swift macOS launcher |
 | `launcher/.build/repositories` | 0 | Native Swift macOS launcher |
 | `launcher/Sources` | 0 | Native Swift macOS launcher |
-| `launcher/Sources/LauncherCore` | 9 | Native Swift macOS launcher |
+| `launcher/Sources/CSotcCore` | 1 | Native Swift macOS launcher |
+| `launcher/Sources/CSotcCore/include` | 1 | Native Swift macOS launcher |
+| `launcher/Sources/LauncherCore` | 11 | Native Swift macOS launcher |
+| `launcher/Sources/LauncherNativeCore` | 1 | Native Swift macOS launcher |
 | `launcher/Sources/SoCLauncher` | 4 | Native Swift macOS launcher |
 | `launcher/Tests` | 0 | Native Swift macOS launcher |
-| `launcher/Tests/LauncherCoreTests` | 6 | Native Swift macOS launcher |
+| `launcher/Tests/LauncherCoreTests` | 7 | Native Swift macOS launcher |
+| `launcher/Tests/LauncherNativeCoreTests` | 1 | Native Swift macOS launcher |
 | `local` | 0 | Private extracted assets, binary analysis, manifests, builds and evidence |
 | `logs` | 72 | Private command/build/install/extraction logs |
 | `native` | 2 | Native game implementation; verify module README and task ownership |
-| `native/core` | 534 | Native game implementation; verify module README and task ownership |
-| `native/tests` | 268 | Native game implementation; verify module README and task ownership |
+| `native/api` | 4 | Native game implementation; verify module README and task ownership |
+| `native/api/standalone` | 1 | Native game implementation; verify module README and task ownership |
+| `native/api/tests` | 2 | Native game implementation; verify module README and task ownership |
+| `native/core` | 562 | Native game implementation; verify module README and task ownership |
+| `native/tests` | 283 | Native game implementation; verify module README and task ownership |
 | `reference` | 0 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC` | 12 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC/docs` | 10 | Pinned upstream source; read-only; symbols indexed by Graft |
@@ -1655,7 +1662,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `tools` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft/.cache` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
-| `tools/lift` | 278 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/lift` | 292 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/pkg-extractor` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
 
 Private recursive inventory: `local/indexes/folders.json` (excluded from publication).
