@@ -31,6 +31,9 @@
   1,516 files; `git diff --cached --check` exited 0. `python3 scripts/project_index.py` indexed
   14,222 folders and `--check` reports current. `trail build --check` reports the graph in sync at
   3,528 nodes (deep meaning layer remains unbuilt). Logs are in `local/checkpoints/root-round13-claims/`.
+- Publication-record follow-up: `git push origin main` exited 0 and advanced `f427b2b..95642f0`.
+  Commit `95642f017d58c2fccaf1cd2398a32077230a5d8d` records both claim-publication results; HEAD
+  equals `origin/main`.
 - Observation: worker scope is only `scripts/test_psarc.py`; no test has run for this task.
 - Remaining risks: test fixture only; no real PSARC or game asset validation.
 - Next exact action: assign the test file, then review the worker's diff and log and independently replay the acceptance command.
