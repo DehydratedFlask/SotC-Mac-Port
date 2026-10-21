@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 14:38 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 14:40 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,7 +8,7 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Round 64 test-only claims recorded / publish next
+## Round 64 test-only claims published / dispatch next
 
 - Three distinct candidates were checked against live test and production files, task/evidence
   registries, and focused baselines. Exact assertions, claim-time digests, commands, outputs, and
@@ -22,8 +22,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   1/1. Implementation has not started; failed attempts remain 0. No project runtime gate advances.
 - `python3 scripts/project_index.py` indexed 14,437 folders; `--check` reports current. Exact log
   hashes are recorded in the Round 64 claim checkpoint.
-- Exact next action: finish staged/full publication audits, commit and push the claim docs/index,
-  then dispatch one-file test edits. Root will review/replay each change before recording E190–E192.
+- Claim commit `218ce2134fa8e1af05c6e5e6e419cb30ceaa7310` is pushed; `HEAD` and `origin/main`
+  match. Push evidence is in the Round 64 claim checkpoint.
+- Exact next action: dispatch each one-file test edit to its named worker. Root will review and
+  independently replay the three focused commands before recording E190–E192.
 
 ## Round 63 test-only tasks verified (/root)
 
