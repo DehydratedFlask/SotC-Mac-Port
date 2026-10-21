@@ -1,12 +1,40 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 13:46 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 13:50 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 Round 60 workers dispatched (/root)
+
+- Round 60 claims were published before worker edits in commit `4e5779a`. `/root/launcher_review`
+  owns only `launcher/Tests/LauncherCoreTests/AssetValidationReportTests.swift` for the symlinked
+  required-archive path fixture; `/root/review_host_proto` owns only `scripts/test_audio_headers.py`
+  for LZMA offset 4; `/root/slot23_raw_xrefs` owns only `native/tests/test_region_list.cpp` for
+  unlink with the optional count pointer omitted. Exact assertions, claim-time file hashes and
+  focused commands are in the claim checkpoint.
+- Workers were asked to make test-only changes, run their focused command, report log/file hashes,
+  and not edit shared docs or commit. All three tasks remain ACTIVE with 0 failed tries pending
+  root review and replay.
+- `python3 scripts/project_index.py` exited 0 and refreshed `docs/FOLDERS.md` for 14,415 folders;
+  log `local/validation/root-round60-dispatch/project-index.log`, SHA-256
+  `c2e27c54c58f4eb9ecf508e31834abb7be3e189e49b23e1376681c3fc7d0f666`. The first
+  `trail build --check` exited 1 (`STALE`) while worker edits were still arriving: six existing
+  graph nodes changed and two test-method nodes were added. Log
+  `local/validation/root-round60-dispatch/trail-check.log`, SHA-256
+  `fb5887c0c35ce94f58fb8ad09770a7285750583980b8bdf63cbedcbc7b2c87b1`. This is a graph freshness
+  result, not a fixture failure. Exact next action: publish this dispatch checkpoint, root-replay
+  all three focused commands from stable diffs, then rebuild/check trail before marking tasks.
+- Dispatch-doc publication audits passed: staged 3 paths (log
+  `local/validation/root-round60-dispatch/audit-staged.log`, SHA-256
+  `84dac959477de3004b6eba701143ea3d8da546ca29c1d069a64a6ba370b707b9`) and full 1,621 paths
+  (log `local/validation/root-round60-dispatch/audit-all.log`, SHA-256
+  `92783414bf65602e32ae84af85cec98d5e87ae43ba99cfb25f623b3d194effe4`); cached and working
+  `git diff --check` both exited 0. Only `HANDOFF.md`, `docs/FOLDERS.md`, and the dispatch
+  checkpoint are staged; worker test files and existing `native/api` user work remain unstaged.
 
 ## Session addendum 2026-10-21 Round 60 fixture claims (/root)
 
