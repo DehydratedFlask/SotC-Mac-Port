@@ -1,6 +1,6 @@
 # Round 64 fixture verification complete
 
-Checkpoint: 2026-10-21 14:44 CDT (America/Chicago)
+Checkpoint: 2026-10-21 14:50 CDT (America/Chicago)
 Integrator: `/root`
 Task: complete and independently verify three Round64 test-only fixtures
 Files changed: `launcher/Tests/LauncherCoreTests/CoreClientTests.swift`,
@@ -75,5 +75,52 @@ included in the current staged change.
 - The 10 staged allowlisted paths are `HANDOFF.md`, `INSTALL_LOG.md`, `docs/EVIDENCE.md`,
   `docs/FOLDERS.md`, `docs/TASKS.md`, both Round64 checkpoint files, and the three claimed test
   files. The modified user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` are
-  excluded. Exact next action: commit and push these audited paths, record post-push refs, then
-  continue with Round65 bounded-task scouting.
+  excluded.
+
+## Publication completion addendum
+
+At 14:48 CDT, command `git status --short && git rev-parse HEAD && git rev-parse origin/main`
+reported only the pre-existing user-owned ` M native/api/CMakeLists.txt` and `?? native/api/host/`;
+both refs were `941011b08a3bb445747c8a49385bbba0b2ad982a`. This is the completion commit
+`test: verify round 64 synthetic fixtures`, which contains the three test files and Round64
+completion records. Commit output is recorded at
+`local/validation/root-round64-replay/commit-record.log` (SHA-256
+`a0ef82784d039da54400c4841f72b502d1d4726ad89f02d782a66d28de2a0b91`); `git push origin main`
+exited 0, with output in `local/validation/root-round64-replay/push-record.log` (SHA-256
+`957cc7280787c0d50946e5e598402aa84e2895704943c598a1c391206b1da784`). The post-push ref check
+again reported `HEAD == origin/main == 941011b08a3bb445747c8a49385bbba0b2ad982a`; see
+`local/validation/root-round64-replay/state-record.log`.
+
+Observation: the allowlisted fixture and documentation commit is on the public remote. Inference:
+the three fixtures cover only the synthetic behaviors in E190–E192; no project runtime gate changed.
+The two user-owned `native/api` paths remain untouched and excluded. Attempts remain 0 failed for
+each of the three tasks.
+
+## Finalization docs-only addendum preflight
+
+Integrator staged only `HANDOFF.md` and this checkpoint with `git add -- HANDOFF.md
+docs/checkpoints/2026-10-21-root-round64-fixtures-complete.md`. `git status --short && git diff
+--cached --name-only` confirmed those two staged allowlisted files plus the untouched user-owned
+`native/api/CMakeLists.txt` modification and untracked `native/api/host/` directory.
+
+- `python3 -I scripts/audit_publish_paths.py`: exit 0, 2 staged paths; log
+  `local/validation/root-round64-replay/audit-staged-final.log`, SHA-256
+  `68712ba64959c2bfdb5c0dc8c8445d4897591c40b0c6079f7711e725bf0b2dd2`.
+- `python3 -I scripts/audit_publish_paths.py --all`: exit 0, 1,633 paths; log
+  `local/validation/root-round64-replay/audit-all-final.log`, SHA-256
+  `20e779f2cb3a935ec263ccfad8297a68f5c8831be92f32bba4b09fad9ddde217`.
+- `git diff --cached --check` and `git diff --check`: exit 0; both logs are empty, SHA-256
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`, at `diff-check-final.log`
+  and `working-diff-check-final.log`.
+- `git fetch origin main`: exit 0; log `local/validation/root-round64-replay/remote-ref-final.log`,
+  SHA-256 `58e4bb2ebd9bd713bf3332d4cad1251aeb0b51fb26a8b06f30b3aaa431df79b3`. Before this docs-only
+  addendum, `HEAD == origin/main == 941011b08a3bb445747c8a49385bbba0b2ad982a`.
+
+Observation: only the two allowlisted documents are staged; both `native/api` paths are unstaged
+and excluded. No source behavior or test result changed. Status: Round64 `FIXTURE_VERIFIED`; 0
+failed tries.
+
+Next exact action: re-run staged/full path audits and diff checks for this docs-only addendum,
+commit and push it, then use Graft to scout distinct Round65 bounded test tasks and verify their
+source and test baselines against the live checkout before publishing claims. Round65 scouting is
+in progress read-only.
