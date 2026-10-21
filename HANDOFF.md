@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 14:14 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 14:16 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,26 +8,28 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Round 62 test-only tasks claimed (/root)
+## Session addendum 2026-10-21 Round 62 fixtures verified (/root)
 
-- Three read-only scouts identified distinct candidates; root checked the live code and tests, found
-  no duplicate task IDs, and ran each focused baseline before claiming. The exact tasks, hashes,
-  commands, results, and owner boundaries are in
-  [the Round 62 claim checkpoint](docs/checkpoints/2026-10-21-root-round62-fixture-claims.md).
-- APP-01 will assert the exact `.notBuilt` message for an existing directory used as the core
-  executable path (8 baseline tests). AUD-01 will assert the exact wrapped PSARC read error and
-  reader closure (19 baseline tests). SRV-01 will assert `align_size_up_64k(0x10001) == 0x20000`
-  (target build and CTest 1/1).
-- Owners are `/root/launcher_review`, `/root/review_host_proto`, and `/root/slot23_raw_xrefs`; each
-  may edit only its claimed existing test file and may not commit. Root owns shared docs and replay.
-  No implementation prompts have been sent before publishing the claim checkpoint.
-- `python3 scripts/project_index.py` reports 14,422 folders; `docs/FOLDERS.md` lists 360 checkpoint
-  files. `python3 scripts/project_index.py --check` reports current. Logs and hashes are in the
-  claim checkpoint.
-- Staged path audit accepts 5 documentation paths and full audit accepts 1,627; both cached and
-  working diff checks pass. Exact audit hashes are in the claim checkpoint.
-- Exact next action: commit and push the Round 62 claims, then dispatch each worker its one-file
-  assignment.
+- The three test-only Round 62 claims were published in `2c30005` before implementation prompts.
+  `/root/launcher_review`, `/root/review_host_proto`, and `/root/slot23_raw_xrefs` each changed only
+  its assigned test file and reported 0 failed attempts. Root reviewed the diffs and replayed all
+  focused commands; full evidence, digests, and limitations are in
+  [the Round 62 completion checkpoint](docs/checkpoints/2026-10-21-root-round62-fixtures-complete.md).
+- APP-01 pins the exact `.notBuilt` message for a directory at the core executable path; worker and
+  root each pass 9 tests. AUD-01 pins the wrapped synthetic PSARC read error and reader cleanup;
+  worker and root each pass 20 tests. SRV-01 pins rounding of `0x10001` to `0x20000`; worker and
+  root builds pass and focused CTest is 1/1. Production sources match their claim-time hashes.
+- Worker logs remain under `local/validation/{app01-system-checks-core-directory-path,
+  aud01-xff-psarc-read-failure-cleanup,srv01-allocator-size-align-second-64k-boundary}/`; root replay
+  logs are under `local/validation/root-round62-replay/`. E184–E186 record both log hashes and
+  synthetic-only limits. No dependency or install facts changed.
+- The fixtures do not advance runtime gates: G0 remains PARTIAL; G1–G6 remain NOT RUN. No native
+  boot, actual game audio, save/reload, or Metal gameplay is established.
+- Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched
+  and excluded from publication.
+- Exact next action: after publishing this completion checkpoint, use Graft and read-only scouts to
+  identify the next three independent synthetic fixture gaps, verify live files and baselines, and
+  publish claims before implementation prompts.
 
 ## Session addendum 2026-10-21 Round 61 fixtures verified (/root)
 
