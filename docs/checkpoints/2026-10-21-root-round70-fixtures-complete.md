@@ -1,6 +1,6 @@
 # Round 70 fixtures complete
 
-Checkpoint time: 2026-10-21 16:22 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Checkpoint time: 2026-10-21 16:23 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Claims were published in commit
 `099136c56e4de5101b97112d634b5d86864c7425`; claim-doc synchronization commit
 `bf96db6ebbaa897b9916f7b4bd5ebd4d57d634ed` is on `origin/main`.
@@ -76,6 +76,10 @@ cases report stale outputs without raising an OS read exception.
   `1a9a21d51e9ee96151bcc69b5e2f7c8002ec16088f14bbac447803156dd29b0d`) and
   `completion-index-check.log` (SHA-256
   `320c1c3b2c1d30d1937ddb7cba788ebe4633c25b8bd0619bba564b65acf66296`).
+- The folder index was refreshed and checked again after creating the sync-publication log paths;
+  both commands exit 0 at 14,465 folders. Logs `completion-sync-index-generate.log` and
+  `completion-sync-index-check.log` each have SHA-256 `1a9a21d51e9ee96151bcc69b5e2f7c8002ec16088f14bbac447803156dd29b0d`
+  and `320c1c3b2c1d30d1937ddb7cba788ebe4633c25b8bd0619bba564b65acf66296` respectively.
 - `trail build` exits 0 with 3,570 nodes / 4,832 edges / 943 cards; it parsed 4 of 1,236 files and
   replayed 1,232 cached files. `trail build --check` exits 0 and reports the wiring graph in sync;
   the optional meaning layer remains unbuilt. Logs `completion-trail-build.log` and
@@ -89,9 +93,22 @@ cases report stale outputs without raising an OS read exception.
   `--all` accepts 1,645 paths (log SHA-256
   `5ae6fe8cfe64099e1a5c0640cefc94f64551573231d27c5dab4d2cb6922b82c0`). The staged set excludes
   both user-owned native/API changes.
-- Source/test and documentation changes are staged as explicit allowlisted paths only. The
-  completion commit and post-push `HEAD == origin/main` verification remain to be recorded after
-  publication.
+- `git commit -m "fix: handle directory index outputs and add Round70 fixtures"` exits 0 and
+  creates commit `5a2e8341d9432639609c18f639f49cb1d1155106`; command log
+  `local/validation/root-round70-scout/completion-commit.log` has SHA-256
+  `57d4e21c2d59df5caeab98588e94a735d3bd39909df6694bc92bcb2d8f34cd92`.
+- `git push origin main` exits 0; push log SHA-256
+  `b046e9a558bbcb7483b4da6b51cddf43454c832b87855fb568740b095e6cb60a`. Then `git fetch origin`
+  exits 0 (empty output). The captured post-push commands report `HEAD` and `origin/main` both
+  `5a2e8341d9432639609c18f639f49cb1d1155106`, divergence `0 0`, and only the user-owned native/API
+  changes remain in the worktree. State log SHA-256
+  `ab55f80110225d059f77f72e00d59d066a799f1cc7516c25a2945d2c6fbe6f28`.
+- Fetch log `local/validation/root-round70-scout/completion-fetch.log` SHA-256
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`; staged audit log
+  `completion-audit-staged.log` SHA-256
+  `a348e5e2bf95acd4f0a2a259fa7b9c693bdffa5c68b376a7bce78ccffe9ba1f5`; full audit log
+  `completion-audit-all.log` SHA-256
+  `5ae6fe8cfe64099e1a5c0640cefc94f64551573231d27c5dab4d2cb6922b82c0`.
 - Next task after publication: use read-only Graft scouts and the live task register to identify
   independent Round71 candidates; verify their contracts, then publish bounded claims before
   implementation.
