@@ -22,4 +22,13 @@
 - Remaining risks: synthetic helper-input validation only; it does not change manifest parsing (which already rejects invalid sizes), archive contents, overlap semantics, or game behavior. Keep private logs under `local/validation/data02-overlap-map-unshared-size/`.
 - Files changed to claim: `HANDOFF.md`, `docs/TASKS.md`, generated `docs/FOLDERS.md` (checkpoint file count 230→231), the completed ELF checkpoint's push record, and this claim checkpoint. No source/test code changed.
 - Publication gates: `python3 -I scripts/audit_publish_paths.py` exited 0 for five staged allowlisted paths; `python3 -I scripts/audit_publish_paths.py --all` exited 0 for 1,497 allowed tracked paths; `git diff --cached --check` exited 0. Only these claim/handoff/index paths are staged; escalated host-protocol files remain unstaged.
-- Next exact action: commit and push this claim, then assign the two owned files to `launcher_review`.
+
+## Claim publication and assignment checkpoint
+
+- Local date/time: 2026-10-21 10:16 CDT (America/Chicago). Integrator: `/root`; worker: `launcher_review`.
+- Task: `DATA-02-OVERLAP-MAP-UNSHARED-SIZE-VALIDATION-01`; worker's source edits have not been reviewed or integrated. No acceptance command has run yet.
+- Exact command: `git push origin main`; exit 0, advanced `35370fc..f1a98c5`. The task claim is published.
+- Observation: worker owns only `scripts/audit_archive_overlap_map.py` and `scripts/test_archive_overlap_map.py`; pre-guard failure and post-guard pass will be logged under `local/validation/data02-overlap-map-unshared-size/`.
+- Assignment-update gates: `python3 -I scripts/audit_publish_paths.py` exited 0 for two staged allowlisted paths; `python3 -I scripts/audit_publish_paths.py --all` exited 0 for 1,497 allowed tracked paths; `git diff --cached --check` exited 0.
+- Remaining risks: no validation fix exists yet; scope covers synthetic helper input only.
+- Next exact action: review the worker's red/green logs and diff, then independently replay `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_archive_overlap_map.py`. Task remains ACTIVE; 0 failed implementation tries.
