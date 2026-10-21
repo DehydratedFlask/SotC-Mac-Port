@@ -1,12 +1,30 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 15:15 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 15:21 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Round 67 fixture claims prepared (/root)
+
+- Five bounded test-only fixtures are claimed in `docs/TASKS.md`: two launcher assertions, one
+  zero-byte synthetic manifest record, one direct zero-size host-map helper assertion, and one
+  project-index stale-output identification case. Exact owners, prerequisites, target files,
+  baseline commands/results/log hashes, file hashes, limits, and next actions are in the
+  [Round 67 claim checkpoint](docs/checkpoints/2026-10-21-root-round67-fixture-claims.md).
+- The baselines are clean: launcher model 8 tests, launcher lifecycle 11 tests across 2 suites,
+  manifest parser 23 tests, host-map target build plus CTest 1/1, and project tools 8 tests. No
+  implementation edits have been dispatched yet. Claims must be pushed before worker prompts.
+- Round66's latest docs-only publication record is commit
+  `11a904ec2dfcc8aaeb1061b23db4f721a7272046`; before these claim edits, `HEAD == origin/main` at
+  that commit. Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/`
+  remain untouched, unstaged, and excluded.
+- Exact next action: refresh the project index for the new checkpoint, run the trail freshness
+  check, audit and push the allowlisted claim docs, then dispatch the four bounded owners. Root
+  retains ownership of shared docs, root replay, evidence IDs E199–E203, and the completion record.
 
 ## Round 66 bounded fixtures verified (/root)
 
@@ -30,9 +48,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Fetch and remote comparison passed (`HEAD...origin/main` = `0 0`). Staged and full publish audits
   passed for 9 and 1,637 paths, respectively. `git diff --cached --check` and `git diff --check`
   passed; logs and hashes are in the completion checkpoint.
-- Completion commit `ed97b75ab47b656abf3e42861e341c2486a3409a` and docs-only publication-record
-  commit `6184e32941ef791366f9162f79c76cc96bee8a00` are pushed. After the docs-only push,
-  `HEAD == origin/main == 6184e32941ef791366f9162f79c76cc96bee8a00`; only the pre-existing
+- Completion commit `ed97b75ab47b656abf3e42861e341c2486a3409a`, docs-only publication-record commit
+  `6184e32941ef791366f9162f79c76cc96bee8a00`, and final docs sync commit
+  `11a904ec2dfcc8aaeb1061b23db4f721a7272046` are pushed. After the last push,
+  `HEAD == origin/main == 11a904ec2dfcc8aaeb1061b23db4f721a7272046`; only the pre-existing
   user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain. Logs are in the
   completion checkpoint.
 - Exact next action: start fresh Round67 scouting with Graft and the live repository; claim and
