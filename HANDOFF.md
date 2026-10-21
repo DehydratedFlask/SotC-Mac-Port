@@ -8,23 +8,27 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Round 67 fixture claims prepared (/root)
+## Round 67 fixture claims published (/root)
 
 - Five bounded test-only fixtures are claimed in `docs/TASKS.md`: two launcher assertions, one
   zero-byte synthetic manifest record, one direct zero-size host-map helper assertion, and one
   project-index stale-output identification case. Exact owners, prerequisites, target files,
   baseline commands/results/log hashes, file hashes, limits, and next actions are in the
   [Round 67 claim checkpoint](docs/checkpoints/2026-10-21-root-round67-fixture-claims.md).
+- Claim commit `ca9e20fedad3fa2e8d73091bb7a06ec78f7f2621` is pushed. The push log is
+  `local/validation/root-round66-scout/round67-claim-push.log`, SHA-256
+  `9fc55f37222b69d2cb1a20bd0a36d5b3a9eb14d3324af5dcacb2171329b18ede`; after push,
+  `HEAD == origin/main == ca9e20fedad3fa2e8d73091bb7a06ec78f7f2621`.
 - The baselines are clean: launcher model 8 tests, launcher lifecycle 11 tests across 2 suites,
   manifest parser 23 tests, host-map target build plus CTest 1/1, and project tools 8 tests. No
-  implementation edits have been dispatched yet. Claims must be pushed before worker prompts.
+  implementation edits have been dispatched yet.
 - Round66's latest docs-only publication record is commit
   `11a904ec2dfcc8aaeb1061b23db4f721a7272046`; before these claim edits, `HEAD == origin/main` at
   that commit. Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/`
   remain untouched, unstaged, and excluded.
-- Exact next action: refresh the project index for the new checkpoint, run the trail freshness
-  check, audit and push the allowlisted claim docs, then dispatch the four bounded owners. Root
-  retains ownership of shared docs, root replay, evidence IDs E199–E203, and the completion record.
+- Exact next action: send the four bounded implementation prompts with one-test-file ownership,
+  then record dispatch status in `HANDOFF.md` and a checkpoint. Root retains shared docs, the
+  project-index test, root replay, evidence IDs E199–E203, and the completion record.
 
 ## Round 66 bounded fixtures verified (/root)
 
