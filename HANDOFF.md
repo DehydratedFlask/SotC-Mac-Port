@@ -1,12 +1,52 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 11:53 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 11:56 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 31 (`/root`)
+
+- Completed `DATA-02-PSARC-BLOCK-SIZE-RANGE-01`, `FIXTURE_VERIFIED` with zero failed tries.
+  `slot23_raw_xrefs` and root each pass `PYTHONDONTWRITEBYTECODE=1 python3 -I
+  scripts/test_psarc.py` (32/32). Starting from a valid synthetic PSARC, the fixture mutates
+  header bytes 24–27 to `0` and `16,777,217`; both are rejected with the exact
+  `PsarcError('unsupported entry/block size')`. Test SHA256 is
+  `0a922203a17cfe7454cbf5f1f8e5787413511320d6bd4a54415c205360263dfc`; parser
+  `scripts/psarc.py` is unchanged at
+  `39f2c748db013637aba8144205dc60b7e5b1eb49ee0f641960783a1e2c140485`. E147 and the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-data02-psarc-block-size-range-complete.md)
+  record the worker/root log hashes and synthetic-only limit.
+- The prior publication is recorded at [round 29](docs/checkpoints/2026-10-21-root-round29-publication.md).
+  `trail build` parsed the changed test and rebuilt 3,536 nodes / 4,756 edges; subsequent
+  `trail build --check` passed. The project folder index became stale after the root test log was
+  created; regenerate and check it before the next push.
+- The only excluded worktree paths remain the pre-existing `native/api/CMakeLists.txt` modification
+  and untracked `native/api/host/`. Actual game acceptance gates remain open.
+- Exact next action: run `python3 scripts/project_index.py`, verify it with `python3 scripts/project_index.py --check`, then stage only the PSARC test and its task/evidence/checkpoint records, audit, commit, and push.
+
+## Session addendum 2026-10-21 round 30 (`/root`)
+
+- Published the zero-length mapping fixture and the bounded PSARC block-size claim in commit
+  `13b1b3ab64ed29ee4c3992d6edf27e85a8646ff9` (`test: pin dynlink empty ranges and claim PSARC
+  size bounds`) to `origin/main`; the remote accepted the push and HEAD matches origin/main.
+  See [publication checkpoint](docs/checkpoints/2026-10-21-root-round29-publication.md).
+- Before the push, `python3 scripts/project_index.py` wrote 14,233 folder entries;
+  `python3 scripts/project_index.py --check` reported them current; `trail build --check` reported
+  3,535 nodes in sync; and `git diff --check` passed. `python3 -I scripts/audit_publish_paths.py`
+  accepted all 7 staged paths, and `python3 -I scripts/audit_publish_paths.py --all` accepted
+  1,537 paths. The new checkpoint and task claim are now published.
+- `DATA-02-PSARC-BLOCK-SIZE-RANGE-01` remains `ACTIVE`, with `/root/slot23_raw_xrefs` assigned
+  only `scripts/test_psarc.py`; the worker has been asked to add the two synthetic invalid-header
+  cases, run the focused suite, and save a private log. Root owns shared docs and will replay the
+  focused suite before marking completion.
+- Only the pre-existing `native/api/CMakeLists.txt` modification and untracked `native/api/host/`
+  remain in the worktree outside the commit. No actual game acceptance gate advanced.
+- Exact next action: review the worker's `scripts/test_psarc.py` diff and independently run
+  `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_psarc.py`.
 
 ## Session addendum 2026-10-21 round 29 (`/root`)
 
