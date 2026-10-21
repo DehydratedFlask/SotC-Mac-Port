@@ -179,6 +179,29 @@ class Tests(unittest.TestCase):
         self.assertEqual(rela['target'], expected['rela_target'])
         self.assertEqual(rela['addend'], expected['rela_addend'])
 
+    def test_parse_multiple_needed_module_records(self):
+        elf, expected = dynamic_import_elf_fixture()
+        elf = bytearray(elf)
+        dynamic_offset = 64 + 2 * 56
+        first_module_value = struct.unpack_from('<Q', elf, dynamic_offset + 8)[0]
+        module_name_offset = first_module_value & 0xffffffff
+        second_module_id = 0x2345
+        second_module_value = (
+            (second_module_id << 48) | (3 << 40) | (4 << 32) | module_name_offset
+        )
+        # The fixture's third dynamic entry is unused EXPORT_LIB; use it for
+        # a second needed module while keeping the surrounding ELF layout intact.
+        struct.pack_into(
+            '<QQ', elf, dynamic_offset + 2 * 16,
+            d.DT_SCE['NEEDED_MODULE'], second_module_value,
+        )
+
+        parsed = d.parse(bytes(elf))
+        self.assertEqual(
+            set(parsed['modules']), {expected['module_id'], second_module_id}
+        )
+        self.assertEqual(parsed['modules'][second_module_id]['version'], [3, 4])
+
     def test_parse_unmapped_symbol_type_as_decimal_string(self):
         elf, expected = dynamic_import_elf_fixture(symbol_type=3)
         parsed = d.parse(elf)
