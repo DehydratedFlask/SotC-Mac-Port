@@ -1,9 +1,15 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 21:43 CDT (America/Chicago). Principal: `/root`.
+Updated: 2026-10-20 21:48 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation: G0 PARTIAL; G1-G6 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 21:43 CDT, `/root` — completion request resumed
+## CURRENT CHECKPOINT — 2026-10-20 21:48 CDT, `/root` — checksum fixture and loader static map verified
+
+`SAV-01-NATIVE-CHECKSUM-01` FIXTURE_VERIFIED: root integrated CMake/README,223/223 ASan+UBSan CTest pass, source-bound checker passes and rejects wrong input, Mach-O arm64 confirmed; independent Luna review approved. `SAV-01-LOADER-01` STATIC_ANALYSIS_VERIFIED for the bounded byte/call map:28/28 checksums and root replay pass, identical output SHA64a6dac7…30548. Two failed checker attempts remain counted. This proves no serializer, actual save/load or game behavior. Details/commands/limits:[checkpoint](docs/checkpoints/2026-10-20-root-checksum-loader-complete.md).
+
+`CPU-01-MUTEX-CONTRACT-01` CLAIMED by root/Luna worker: private Darwin pthread configuration probe only. CPU worker is running the sole authorized cleanup query; slot10 remains blocked. No constructor leaf batches. Graft wiring refreshed/sync2002nodes; reference coverage missing/deep layer unbuilt. G0 PARTIAL; G1-G6 NOT RUN. Exact next action:publish checkpoint, release mutex probe, then root review callback results and native ownership before registering any startup slot.
+
+## PRIOR CHECKPOINT — 2026-10-20 21:43 CDT, `/root` — completion request resumed
 
 The user requested completing the project, revoking the pause. Root is integrating/reviewing `SAV-01-NATIVE-CHECKSUM-01`, worker `/root/sav01_loader_resume_audit` finishes only the saved loader report/manifest, and `/root/startup_critical_path_resume` recovers only the slot10 object cleanup/initializer evidence. `/root/aud02_waitloop_resume_audit` independently reviews the checksum without editing it. Full ownership, cumulative attempts and one narrowly authorized callback-query continuation: [resume claim](docs/checkpoints/2026-10-20-root-completion-resume-claim.md). No leaf-constructor batching is assigned. G0 PARTIAL; G1-G6 NOT RUN.
 

@@ -6,6 +6,7 @@ private `local/re/functions.jsonl` records (ELF sha256 d0723afb...c25861d3).
 
 | Path | Contents |
 |---|---|
+| `core/save_checksum.{hpp,cpp}` | Native raw-byte FNV-1a-32 helper from RVA `0x161f50`, explicit seed; `ctest --test-dir local/build/native -R '^save_checksum$'`; source binding: `python3 -I tools/lift/check_f161f50.py`. Save/Load use seed `0x811c9dc5` over the body. Original negative signed lengths are outside the span API; verified callers supply nonnegative dword lengths. This primitive does not implement serialization or prove save compatibility. |
 | `core/math_constants.{hpp,cpp}` | Native form of original RVA 0xf6cad0 (first global constructor): guarded float/mask constants |
 | `core/scratch_reset.{hpp,cpp}` | Native form of original RVA 0x125990 (ctor index 538): memset 8 KiB + seq_cst zero store; first recovered function with a service call |
 | `core/trig_constants.{hpp,cpp}`, `core/libm_policy.hpp` | Native form of original RVA 0xe10490 (ctor index 48): vector copy + `_FSin` result; libm policy L1 (double eval, round once, <=1 ULP fixtures, no bit-exactness claim) |
