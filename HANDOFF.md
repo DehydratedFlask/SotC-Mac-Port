@@ -1,12 +1,30 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 12:29 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 12:30 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 46 (`/root`)
+
+- Published the launcher-tone, decoder-fail-closed, and region-overflow fixture completions in
+  `a7ad0f9b01ca50f3b45f024a87b13ff108a22492` (`test: cover idle tone, decoder, and split
+  overflow`); push succeeded and `HEAD` matches `origin/main`. See the
+  [round 44 publication checkpoint](docs/checkpoints/2026-10-21-root-round44-publication.md).
+- Pre-push checks: folder index current at 14,382; trail graph rebuilt to 3,544 nodes / 4,774
+  edges and `trail build --check` passed; staged audit accepted 11 paths; full audit accepted
+  1,566 paths; staged diff check passed.
+- Worker and root evidence is recorded in E153–E155. These three tasks are `FIXTURE_VERIFIED`
+  with zero failed tries; no production code changed. The shared handoff and task registries keep
+  actual-game gates open.
+- `/root/launcher_review`, `/root/review_host_proto`, and `/root/slot23_raw_xrefs` are scouting
+  the next clean test-only candidate in separate launcher, Python, and native modules. No new
+  task is claimed yet.
+- Exact next action: review all scout results against the live tree and task registry, publish a
+  bounded claim, then assign separate files after its claim commit is pushed.
 
 ## Session addendum 2026-10-21 round 45 (`/root`)
 
