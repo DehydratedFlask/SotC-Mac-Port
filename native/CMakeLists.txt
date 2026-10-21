@@ -12,6 +12,7 @@ endif()
 add_library(sotc_core STATIC
   core/math_constants.cpp
   core/scratch_reset.cpp
+  core/save_checksum.cpp
   core/startup_ctors.cpp
   core/trig_constants.cpp
   core/addr.cpp
@@ -1071,3 +1072,7 @@ add_test(NAME vec_bbba10 COMMAND test_vec_bbba10)
 add_executable(test_vec_bb9740 tests/test_vec_bb9740.cpp)
 target_link_libraries(test_vec_bb9740 sotc_core)
 add_test(NAME vec_bb9740 COMMAND test_vec_bb9740)
+
+add_executable(test_save_checksum tests/test_save_checksum.cpp)
+target_link_libraries(test_save_checksum sotc_core)
+add_test(NAME save_checksum COMMAND test_save_checksum)
