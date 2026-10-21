@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 08:51 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 08:56 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -37,9 +37,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   exit code, and the parent test writer can receive SIGPIPE. Worker owns only `native/api/host/`
   sources/tests; root remains the sole integrator for handoff/task/evidence files. Record:
   [docs/checkpoints/2026-10-21-root-app01-core-host-claim.md](docs/checkpoints/2026-10-21-root-app01-core-host-claim.md).
-- Host task's next exact action: fix the failing closed-output test fixture, rerun focused CTest,
-  then review the child-process cases. `start` still returns `ENGINE_NOT_IMPLEMENTED`; this is not
-  launcher IPC integration or G4 evidence.
+- Host task is now `NEEDS_PRINCIPAL` after three failed targeted tries. Do not change or rerun the
+  host task until the principal records a reassessment; see
+  [the escalation](docs/escalations/APP-01-CORE-HOST-01.md). `start` still returns
+  `ENGINE_NOT_IMPLEMENTED`; G4 remains NOT RUN.
 - Host worker implementation is now ready in the four assigned `native/api/host/` files. It adds
   configured hello limits, distinguishes stream read errors from EOF, tightens the exit-code check,
   and handles SIGPIPE/EPIPE in the parent pipe writer. The initial implementation checkpoint was
@@ -53,11 +54,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   The host library and child executable build. The first host target build failed at line 508
   because `WIFEXITED` received temporary `reap(unused)`; storing status in a local made the target
   compile. Focused CTest then failed at line 333 because the output-failure fixture did not make the
-  stream fail. Host try 2 is recorded; make the flush fail deterministically and run focused CTest
-  as try 3. See
+  stream fail. After making flush fail deterministically, try 3 reached the bad-stdin process test,
+  which did not exit with expected code 4. The actual wait status was not printed; the task is
+  escalated and must not be retried without principal reassessment. See
   [the host build checkpoint](docs/checkpoints/2026-10-21-root-app01-core-host-build-failure.md)
   and [the output-fixture checkpoint](docs/checkpoints/2026-10-21-root-app01-core-host-output-test-failure.md),
-  which records the current failure and stop threshold.
+  plus [the escalation](docs/escalations/APP-01-CORE-HOST-01.md).
 
 ## Session addendum 2026-10-21 round 2 (orchestrator)
 
