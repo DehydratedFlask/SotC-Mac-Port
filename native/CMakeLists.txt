@@ -32,16 +32,27 @@ add_library(sotc_core STATIC
   core/leaf_a816d0.cpp
   core/leaf_3ca7c0.cpp
   core/leaf_c0d380.cpp
+  core/leaf_c675f0.cpp
+  core/leaf_c16b30.cpp
+  core/leaf_8f3d90.cpp
+  core/leaf_163a40.cpp
+  core/leaf_9b75a0.cpp
+  core/leaf_575d40.cpp
+  core/leaf_99350.cpp
   core/scratch_reset.cpp
   core/save_checksum.cpp
   core/name_hash.cpp
   core/save_chunk_header.cpp
   core/save_stream.cpp
+  core/save_chunk_codec.cpp
   core/descriptor_registration.cpp
   core/const_table_ee1130.cpp
   core/recursive_mutex.cpp
   core/startup_ctors.cpp
   core/clothing_preview_param.cpp
+  core/lazy_param_def_tree.cpp
+  core/clothing_physical_mesh_parameters.cpp
+  core/registration_thunks.cpp
   core/trig_constants.cpp
   core/addr.cpp
   core/allocator_region.cpp
@@ -60,6 +71,8 @@ add_library(sotc_core STATIC
   core/clear_flag64.cpp
   core/vec_b52110.cpp
   core/vec_b743c0.cpp
+  core/vec_b747f0.cpp
+  core/vec_b76950.cpp
   core/vec_ef85e0.cpp
   core/vec_e0b180.cpp
   core/vec_e085e0.cpp
@@ -303,6 +316,15 @@ add_test(NAME startup_ctors COMMAND test_startup_ctors)
 add_executable(test_clothing_preview_param tests/test_clothing_preview_param.cpp)
 target_link_libraries(test_clothing_preview_param sotc_core)
 add_test(NAME clothing_preview_param COMMAND test_clothing_preview_param)
+add_executable(test_lazy_param_def_tree tests/test_lazy_param_def_tree.cpp)
+target_link_libraries(test_lazy_param_def_tree sotc_core)
+add_test(NAME lazy_param_def_tree COMMAND test_lazy_param_def_tree)
+add_executable(test_clothing_physical_mesh_parameters tests/test_clothing_physical_mesh_parameters.cpp)
+target_link_libraries(test_clothing_physical_mesh_parameters sotc_core)
+add_test(NAME clothing_physical_mesh_parameters COMMAND test_clothing_physical_mesh_parameters)
+add_executable(test_registration_thunks tests/test_registration_thunks.cpp)
+target_link_libraries(test_registration_thunks sotc_core)
+add_test(NAME registration_thunks COMMAND test_registration_thunks)
 add_executable(test_trig_constants tests/test_trig_constants.cpp)
 target_link_libraries(test_trig_constants sotc_core)
 add_test(NAME trig_constants COMMAND test_trig_constants)
@@ -339,6 +361,12 @@ add_test(NAME vec_b52110 COMMAND test_vec_b52110)
 add_executable(test_vec_b743c0 tests/test_vec_b743c0.cpp)
 target_link_libraries(test_vec_b743c0 sotc_core)
 add_test(NAME vec_b743c0 COMMAND test_vec_b743c0)
+add_executable(test_vec_b747f0 tests/test_vec_b747f0.cpp)
+target_link_libraries(test_vec_b747f0 sotc_core)
+add_test(NAME vec_b747f0 COMMAND test_vec_b747f0)
+add_executable(test_vec_b76950 tests/test_vec_b76950.cpp)
+target_link_libraries(test_vec_b76950 sotc_core)
+add_test(NAME vec_b76950 COMMAND test_vec_b76950)
 add_executable(test_vec_ef85e0 tests/test_vec_ef85e0.cpp)
 target_link_libraries(test_vec_ef85e0 sotc_core)
 add_test(NAME vec_ef85e0 COMMAND test_vec_ef85e0)
@@ -1331,6 +1359,34 @@ add_test(NAME leaf_3ca7c0 COMMAND test_leaf_3ca7c0)
 add_executable(test_leaf_c0d380 tests/test_leaf_c0d380.cpp)
 target_link_libraries(test_leaf_c0d380 sotc_core)
 add_test(NAME leaf_c0d380 COMMAND test_leaf_c0d380)
+
+add_executable(test_leaf_c675f0 tests/test_leaf_c675f0.cpp)
+target_link_libraries(test_leaf_c675f0 sotc_core)
+add_test(NAME leaf_c675f0 COMMAND test_leaf_c675f0)
+
+add_executable(test_leaf_c16b30 tests/test_leaf_c16b30.cpp)
+target_link_libraries(test_leaf_c16b30 sotc_core)
+add_test(NAME leaf_c16b30 COMMAND test_leaf_c16b30)
+
+add_executable(test_leaf_8f3d90 tests/test_leaf_8f3d90.cpp)
+target_link_libraries(test_leaf_8f3d90 sotc_core)
+add_test(NAME leaf_8f3d90 COMMAND test_leaf_8f3d90)
+
+add_executable(test_leaf_163a40 tests/test_leaf_163a40.cpp)
+target_link_libraries(test_leaf_163a40 sotc_core)
+add_test(NAME leaf_163a40 COMMAND test_leaf_163a40)
+
+add_executable(test_leaf_9b75a0 tests/test_leaf_9b75a0.cpp)
+target_link_libraries(test_leaf_9b75a0 sotc_core)
+add_test(NAME leaf_9b75a0 COMMAND test_leaf_9b75a0)
+
+add_executable(test_leaf_575d40 tests/test_leaf_575d40.cpp)
+target_link_libraries(test_leaf_575d40 sotc_core)
+add_test(NAME leaf_575d40 COMMAND test_leaf_575d40)
+
+add_executable(test_leaf_99350 tests/test_leaf_99350.cpp)
+target_link_libraries(test_leaf_99350 sotc_core)
+add_test(NAME leaf_99350 COMMAND test_leaf_99350)
 add_executable(test_const_table_ee1130 tests/test_const_table_ee1130.cpp)
 target_link_libraries(test_const_table_ee1130 sotc_core)
 add_test(NAME const_table_ee1130 COMMAND test_const_table_ee1130)
@@ -1358,5 +1414,9 @@ add_test(NAME save_stream COMMAND test_save_stream)
 add_executable(test_save_stream_file tests/test_save_stream_file.cpp)
 target_link_libraries(test_save_stream_file sotc_core)
 add_test(NAME save_stream_file COMMAND test_save_stream_file)
+
+add_executable(test_save_chunk_codec tests/test_save_chunk_codec.cpp)
+target_link_libraries(test_save_chunk_codec sotc_core)
+add_test(NAME save_chunk_codec COMMAND test_save_chunk_codec)
 
 add_subdirectory(api)

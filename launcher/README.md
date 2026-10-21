@@ -9,8 +9,8 @@ auxiliary executables), so the launcher stays responsive if the core fails. No s
 | `LauncherCore` | Pure checks: `AssetValidator` (six archives, PSAR magic, ordered `AssetValidationReport`), `SystemChecks` (Metal Apple7 family, default audio output, native-core presence), `ReadinessReport` (runs off the main actor), `ReadinessAccessibility`, `DiagnosticsSummary`, `LauncherStatusCopy` |
 | `CoreClient` (in `LauncherCore`) | `CoreClient` protocol (`validate/start/stop/status/coverage`, async, throws `CoreFailure`), value models mirroring the native C ABI (`CoreModels.swift`) and `CoreClientMapping` (core facts -> `ReadinessItem.Status` / `LauncherState`). No native code. |
 | `CSotcCore` | C++ SwiftPM target whose `sotc_core.cpp` and `include/sotc_core.h` are **symlinks into `native/api/`** (single source), built with `SOTC_API_WITH_CORE_LIB=0` |
-| `LauncherNativeCore` | `NativeCoreClient`: `CoreClient` over the in-process C ABI. Not used by the app yet |
-| `SoCLauncher` | SwiftUI app: `LauncherModel` (@Observable lifecycle idle/validating/ready/starting/running/stopping/failed), views |
+| `LauncherNativeCore` | `NativeCoreClient`: `CoreClient` over the in-process C ABI. Wired into the app by `SoCLauncherApp` |
+| `SoCLauncher` | SwiftUI app: views + wiring only. `LauncherModel` (now in `LauncherCore`, `@MainActor @Observable`) routes validate/start/stop/status/coverage through an injected `CoreClient` |
 
 Honest states: "Native game core" reports **NOT BUILT** (and Play stays disabled) until a real
 Mach-O `SoCGameCore` auxiliary executable exists. Shell scripts/stubs are rejected. A readiness
@@ -25,9 +25,26 @@ ABI: [native/api/README.md](../native/api/README.md). `NativeCoreClient().start(
 Tests: `LauncherCoreTests/CoreClientTests` (scripted test double `FakeCoreClient`, deliberately test-only)
 and `LauncherNativeCoreTests` (real C ABI, including parity with `AssetValidator`).
 
-Not done: `SoCLauncher`/`LauncherModel` still use `SystemChecks.nativeCore` and `Process`; swapping them to
-`CoreClient` is the next step. The in-process facade is the ABI stub only; the real core will run as the
-`SoCGameCore` child process (link `sotc_api` + `sotc_core` there) behind a child-process `CoreClient`.
+## LauncherModel over CoreClient (APP-01-LAUNCHER-CORECLIENT-01)
+
+`LauncherModel(client:hostChecks:pollInterval:)` lives in `LauncherCore` so tests inject fakes; the app injects
+`NativeCoreClient` (or `UnavailableCoreClient` carrying the handshake failure; it can never validate or run).
+`SystemChecks.nativeCore`/`Process` are no longer used by the model. Metal/audio stay host probes (`HostChecks`).
+
+- validate: assets row = `CoreClient.validate` verdict (no folder -> no core call); native-core row =
+  `CoreClientMapping.nativeCoreStatus` (a failed query is NOT BUILT); all core calls run in `Task.detached`.
+- start: gated by `canStart`. Success is never trusted: the model asks `status()` and only
+  `state == .running && engineImplemented` becomes `.running`; success followed by any other status is `.failed`.
+  A refusal is `.failed`; `ENGINE_NOT_IMPLEMENTED` renders `LauncherPresentation` tone `.unavailable`
+  ("Unavailable: the native game engine is not implemented yet, so the game cannot start."), spoken value starts
+  `Unavailable. Not running.`, and is never followed by polling or running.
+- status polling (`starting`/`running`/`stopping`) is a detached task; late answers cannot move a settled state;
+  a core that stops/fails/vanishes on its own becomes `.failed`.
+- diagnostics text = `DiagnosticsSummary` + `CoreDiagnostics` core section (ABI, engine implemented, ctor prefix,
+  each subsystem status, core state/last error, last refused request), shown in a copyable Diagnostics section.
+
+Real core today: Play is always disabled (engine row NOT BUILT), so the unavailable-start state is exercised by tests
+with a scripted client that lets `validate` claim readiness; the UI never reaches it with `NativeCoreClient`.
 
 ## Stable copy (LauncherCore, unit-tested strings)
 
