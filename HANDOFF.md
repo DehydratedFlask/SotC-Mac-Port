@@ -1,12 +1,27 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 14:09 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 14:11 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Round 62 task scout in progress (/root)
+
+- Round 61 fixture task and completion commits are published. Root ran
+  `trail ask "Identify small isolated synthetic fixture gaps in the current launcher Swift model,
+  audio-header classifier, and native region helpers; name exact source/test files and boundary
+  behaviors suitable for separate test-only tasks" --source`. The lexical results included
+  `LauncherModelTests.swift`, `LauncherLifecycleTests.swift`, `scripts/test_audio_bank_header.py`,
+  and adjacent code; these are candidate areas only, not proof of missing coverage.
+- Read-only candidate reviews are assigned to `/root/launcher_review` (launcher),
+  `/root/review_host_proto` (audio), and `/root/slot23_raw_xrefs` (native region/allocator). No
+  implementation task IDs have been claimed and no code edits are authorized until root verifies
+  candidate coverage, baselines, and publishes claims.
+- Exact next action: collect scout reports, verify each candidate against live source/tests and
+  `docs/TASKS.md`, then claim and publish only distinct tasks with clean focused baselines.
 
 ## Session addendum 2026-10-21 Round 61 fixtures verified (/root)
 
