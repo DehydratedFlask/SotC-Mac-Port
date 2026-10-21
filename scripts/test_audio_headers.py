@@ -146,6 +146,13 @@ class EntropyAndProbeTests(unittest.TestCase):
         self.assertTrue(probe['zlib_offset0']['ok'])
         self.assertEqual(probe['zlib_offset0']['out_len'], 64)
 
+    def test_real_zlib_accepted_after_two_byte_prefix(self):
+        payload = b'B' * 64
+        wrapped = b'\x00\x01' + zlib.compress(payload)
+        probe = cah.decompress_probe(wrapped)
+        self.assertTrue(probe['zlib_offset2']['ok'])
+        self.assertEqual(probe['zlib_offset2']['out_len'], len(payload))
+
 
 class ClassifyFixtureTests(unittest.TestCase):
     def test_codec_always_unknown_on_empty_set(self):
