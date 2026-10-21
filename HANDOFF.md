@@ -8,6 +8,19 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## Round 73 fixture claims (active)
+
+- Three independent test-only tasks are claimed: synthetic `DT_SCE_EXPORT_LIB` metadata, exact
+  launcher copy for ABI mismatch, and zero-lead splitter rejection with byte-preservation. Their
+  task IDs, current hashes, and passing baselines are in the
+  [claim checkpoint](docs/checkpoints/2026-10-21-root-round73-fixture-claims.md).
+- Owners are `/root + review_host_proto` on `scripts/test_ps4_dynlink.py`, `/root + launcher_review`
+  on `launcher/Tests/LauncherCoreTests/CoreClientTests.swift`, and `/root + round68_native_scout` on
+  `native/tests/test_region_split.cpp`. `/root` remains sole integrator for shared docs.
+- Claims are prepared and baselines passed; implementation has not started. Next exact action: publish
+  the claim checkpoint and task rows, then dispatch each single-file edit. User-owned
+  `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and excluded.
+
 ## Round 72 fixtures verified (/root)
 
 - Claimed three independent, test-only tasks: reading an empty synthetic PSARC member, including
