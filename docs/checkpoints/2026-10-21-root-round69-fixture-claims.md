@@ -96,5 +96,29 @@ test task; review the diff and independently replay all three focused suites.
 
 ## Claim publication and dispatch
 
-Publication and dispatch are pending at this checkpoint. Append the commit/ref state and exact
-worker dispatch results before the next handoff.
+**Updated:** 2026-10-21 16:00 CDT (America/Chicago). Claim publication is complete; worker dispatch
+is the next action.
+
+- The four allowlisted claim paths were committed as
+  `4fabeb0ebbc759a3d9bec424e8f39d48893fc83e` (`docs: claim Round 69 fixture batch`) and pushed to
+  `origin/main`. Push exited 0 and advanced `c15b27a..4fabeb0`; log
+  `local/validation/root-round69-scout/claim-push.log`, SHA-256
+  `651366b515a95f42e0bf612957fdfe517e56fcd6f009f55cd64ad18978a94ebd`.
+- Commit log `local/validation/root-round69-scout/claim-commit.log` SHA-256
+  `894e68bc87c4ee4983393fdf7820945e6294172f8c364a43435b86765d241429`; it records the claim
+  commit and four documentation paths.
+- After `git fetch origin` exited 0, `HEAD == origin/main ==
+  4fabeb0ebbc759a3d9bec424e8f39d48893fc83e` and `git rev-list --left-right --count
+  HEAD...origin/main` returned `0 0`. Publication-state log SHA-256
+  `7577b4fb22909d284634d7d1f8778db997be81006691eae840edd11400e09cdb`.
+- Post-push status log `local/validation/root-round69-scout/claim-git-status.log` SHA-256
+  `bafebe0544ec1663fc5c60d5555079052f1efbe617d7957be47744c6262d25c7` shows only the pre-existing
+  user-owned `native/api/CMakeLists.txt` modification and untracked `native/api/host/`; neither was
+  staged, modified, or included in the claim commit.
+- The staged publish audit accepted the four claim paths; the full audit accepted 1,642 paths.
+  `git diff --cached --check`, `git diff --check`, and the final project-index check all exited 0.
+  Their logs and hashes are listed in the preflight section above.
+
+**Next exact action:** Send the three already-bounded single-file test assignments to the named
+workers. Root remains responsible for diff review, independent test replay, E207–E209, and the
+completion publication.
