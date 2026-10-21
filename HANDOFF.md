@@ -1,6 +1,11 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors batch 24 (0xbc07f0 .. 0xbb9740) lifted
+
+`CPU-01-LEAF-CTOR-BATCH-24` `FIXTURE_VERIFIED`; root replay 222/222 ctest pass, six checkers exit 0; README-vs-ELF cross-check over all vec rows: 0 mismatches. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-24-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending workers: `SAV-01-LOADER-01` (`local/re/evidence/sav01-loader-01/`) and `AUD-02-WAITLOOP-01` (`local/re/evidence/aud02-waitloop-01/`). Next constructor position 196 `0xbb82d0`.
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — AUD-02 second tick driver characterized
 
 `FUN_00997700` is a request-driven pull entry (guarded API wrapper `FUN_009975f0` with no static callers; tick call `FUN_009536d0` only when leftover count is zero); `FUN_00997970` pumps the tick inside a wait loop in `FUN_00986a50`. Roles inference; it is unknown whether the second driver ever runs. 2 REA successes; root replayed verifier (38/38 worker mutants rejected) and checksums. Details: `docs/checkpoints/2026-10-20-root-aud02-tickdriver-callers-complete.md`. No audio. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 216/216 (pushed `d7f42cd`).
