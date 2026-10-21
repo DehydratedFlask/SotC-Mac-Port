@@ -48,13 +48,12 @@ struct LauncherStatusCopyTests {
     @Test func unexpectedExitIsNotDescribedAsSuccessAndCarriesAHint() {
         let copy = LauncherStatusCopy.for(LauncherProcessOutcome.unexpectedExit(status: 9))
 
-        #expect(copy.status.contains("unexpectedly"))
-        #expect(copy.status.contains("9"))
+        #expect(copy.status == "Game core ended unexpectedly (status 9).")
         let lowered = copy.status.lowercased()
         #expect(!lowered.contains("success"))
         #expect(!lowered.contains("completed"))
         #expect(!lowered.contains("normally"))
-        #expect(copy.recoveryHint?.isEmpty == false)
+        #expect(copy.recoveryHint == "Press Play to retry. If it ends the same way, open Diagnostics and include the report with a bug report.")
     }
 
     @Test func everyStateHasNonEmptyDistinctStatus() {
