@@ -1,12 +1,34 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 13:23 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 13:34 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 59 fixture claims (/root)
+
+- Claimed three independent, test-only fixtures after Round 58 completion was published. APP-01
+  pins the exact accessibility value for a synthetic engine-not-implemented failure; DATA-02 pins
+  newline preservation within a NUL-separated synthetic PSARC member path; SRV-01 pins valid
+  representable values immediately below 64 KiB and 1 MiB rounding boundaries.
+- Claims, worker assignments, exact commands, and claim-time hashes are in
+  [Round 59 fixture claims](docs/checkpoints/2026-10-21-root-round59-fixture-claims.md). The
+  existing presentation, PSARC, and allocator-region implementation paths remain unchanged.
+- Target test files were clean at claim time and task IDs are new. Each owner has one test file;
+  root owns shared docs and will independently replay each command after files stabilize. The
+  rejected alignment-overflow candidate is not part of this claim.
+- Claim-time main and origin/main match at 451530b. The existing native/api/CMakeLists.txt
+  modification and native/api/host/ remain user-owned, untouched, and excluded.
+- python3 scripts/project_index.py exited 0 and refreshed docs/FOLDERS.md for 14,405 folders
+  (349 checkpoint files). trail build --check exited 0 with the wiring graph in sync at
+  3,552 nodes / 4,792 edges; the optional deep concept layer remains unbuilt. Logs and hashes are
+  recorded in the Round 59 claim checkpoint.
+- Staged and full publish-path audits passed for 4 and 1,616 paths, and cached/working diff checks
+  passed. Exact log paths and hashes are in the Round 59 claim checkpoint.
+- Exact next action: commit and push the claim, then dispatch the three workers.
 
 ## Session addendum 2026-10-21 round 58 completion (/root)
 
