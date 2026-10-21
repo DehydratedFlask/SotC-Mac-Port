@@ -138,6 +138,29 @@ class ToolChecks(unittest.TestCase):
                     f"Stale indexes: {stale_name}",
                 )
 
+    def test_index_check_reports_directory_at_output_paths_as_stale(self):
+        for output_name in ("docs/FOLDERS.md", "local/indexes/folders.json"):
+            with self.subTest(path=output_name), tempfile.TemporaryDirectory() as folder:
+                root = Path(folder)
+                generate(root)
+                output_path = root / output_name
+                output_path.unlink()
+                output_path.mkdir()
+
+                with self.assertRaises(ValueError) as ctx:
+                    generate(root, check=True)
+
+                expected = (
+                    "Stale indexes: docs/FOLDERS.md, local/indexes/folders.json"
+                    if output_name == "docs/FOLDERS.md"
+                    else "Stale indexes: local/indexes/folders.json"
+                )
+                self.assertEqual(
+                    str(ctx.exception),
+                    expected,
+                )
+                self.assertTrue(output_path.is_dir())
+
     def test_index_ignores_nested_admin_directories(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

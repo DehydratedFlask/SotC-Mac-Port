@@ -291,6 +291,17 @@ class Tests(unittest.TestCase):
         with self.assertRaises(ValueError):
             d.span(b'abc', 2, 5)
 
+    def test_span_rejects_negative_offset_and_size(self):
+        cases = (
+            (-1, 1, 'out of bounds: -0x1+0x1 / 0x3'),
+            (0, -1, 'out of bounds: 0x0+-0x1 / 0x3'),
+        )
+        for offset, size, expected in cases:
+            with self.subTest(offset=offset, size=size):
+                with self.assertRaises(ValueError) as error:
+                    d.span(b'abc', offset, size)
+                self.assertEqual(str(error.exception), expected)
+
     def test_image_read_inside_one_file_backed_segment(self):
         img = two_segment_image()
         self.assertEqual(img.read(0x1000, 4), bytes(range(4)))

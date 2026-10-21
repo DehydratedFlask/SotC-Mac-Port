@@ -68,7 +68,7 @@ def generate(root, check=False):
     for name, content in outputs.items():
         path = root / name
         if check:
-            if not path.exists() or path.read_text() != content:
+            if not path.is_file() or path.read_text() != content:
                 stale.append(name)
         else:
             path.write_text(content)
