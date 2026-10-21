@@ -46,6 +46,23 @@ int main() {
         CHECK(free_count == 2);
     }
 
+    // Unlink the only free-list node from its sentinel.
+    {
+        RegionNode only{};
+        IntrusiveLinks sentinel{};
+        auto* link = region_links(only);
+        link->identity = &only;
+        sentinel.next = link;
+        link->prev = &sentinel;
+        link->next = nullptr;
+        std::uint32_t free_count = 1;
+        list_unlink(only, &free_count);
+        CHECK(sentinel.next == nullptr);
+        CHECK(link->next == link);
+        CHECK(link->prev == &sentinel);
+        CHECK(free_count == 0);
+    }
+
     // Unlink middle of A-B-C without an optional free_count pointer.
     {
         RegionNode a{}, b{}, c{};

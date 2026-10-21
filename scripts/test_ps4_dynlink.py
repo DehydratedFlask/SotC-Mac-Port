@@ -311,6 +311,21 @@ class Tests(unittest.TestCase):
         self.assertEqual([e['target'] for e in out['entries']], ['0x4242'])
         self.assertEqual(out['sentinel'], '0x1000')
 
+    def test_ctor_walk_emits_relocated_all_ones_before_sentinel(self):
+        payload = struct.pack('<2Q', 0xffffffffffffffff, 0xffffffffffffffff)
+        img = image(0x1000, payload)
+        relocs = [dict(type=8, target=0x1008, addend=0x4242)]
+
+        out = d.walk_ctors(img, relocs, 0x1008)
+        self.assertEqual(
+            out,
+            dict(
+                start='0x1008',
+                sentinel='0x1000',
+                entries=[dict(slot='0x1008', target='0x4242', relocated=True)],
+            ),
+        )
+
     def test_ctor_walk_unterminated_is_error(self):
         with self.assertRaises(ValueError):
             d.walk_ctors(image(0x1000, struct.pack('<2Q', 1, 2)), [], 0x1008, limit=1)
