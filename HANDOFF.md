@@ -1,9 +1,15 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 21:48 CDT (America/Chicago). Principal: `/root`.
+Updated: 2026-10-20 21:55 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation: G0 PARTIAL; G1-G6 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 21:48 CDT, `/root` — checksum fixture and loader static map verified
+## CURRENT CHECKPOINT — 2026-10-20 21:55 CDT, `/root` — host mutex API verified; slot10 descriptor remains open
+
+Root replayed Darwin recursive/priority-inherit API probe,exit0,byte-identical output; scheduler semantics remain NOT TESTED. `CPU-01-MUTEX-CONTRACT-01` API_CONFIGURATION_VERIFIED. Claim `SRV-01-RECURSIVE-MUTEX-01` for native pthread resource owner/check, and `CPU-01-CTOR10-DESCRIPTOR-01` for private offline table/publication evidence; ownership/commands/attempts:[checkpoint](docs/checkpoints/2026-10-20-root-mutex-contract-and-descriptor-claims.md). Native slot10 remains unregistered: ctor also publishes vptr0x15fb7c0 toglobal0x3356678, with no typed counterpart yet. Next original slot11 is RVAf09160; preserve that blocker before any later leaves if slot10 advances.
+
+Cleanup provider query completed successfully, report/replay pending. Explicit all-scope Graft build still omitted reference sources; second ineffective coverage attempt recorded, no more variants assigned. Native/launcher/tools/scripts graph is queryable/sync; reference fallback direct clean pinned source. G0 PARTIAL; G1-G6 NOT RUN. Next exact action:publish claims, release workers, review/replay cleanup evidence and native mutex; do not register incomplete descriptor state.
+
+## PRIOR CHECKPOINT — 2026-10-20 21:48 CDT, `/root` — checksum fixture and loader static map verified
 
 `SAV-01-NATIVE-CHECKSUM-01` FIXTURE_VERIFIED: root integrated CMake/README,223/223 ASan+UBSan CTest pass, source-bound checker passes and rejects wrong input, Mach-O arm64 confirmed; independent Luna review approved. `SAV-01-LOADER-01` STATIC_ANALYSIS_VERIFIED for the bounded byte/call map:28/28 checksums and root replay pass, identical output SHA64a6dac7…30548. Two failed checker attempts remain counted. This proves no serializer, actual save/load or game behavior. Details/commands/limits:[checkpoint](docs/checkpoints/2026-10-20-root-checksum-loader-complete.md).
 
