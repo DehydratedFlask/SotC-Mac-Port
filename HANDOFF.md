@@ -1,12 +1,37 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 13:38 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 13:42 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 Round 59 fixtures verified (/root)
+
+- Completed three single-file synthetic fixtures. APP-01 exact unavailable-engine accessibility
+  copy passed in the worker and root runs (3 tests, 1 suite each; production mapping unchanged;
+  E175). DATA-02's initial one-path fixture failure is preserved in E174; corrected two-path NUL
+  manifest passed 33 PSARC tests on root with the parser unchanged (E176; one failed fixture
+  construction hypothesis). SRV-01 valid `0xffff` / `0xfffff` alignment boundaries built and passed
+  focused CTest 1/1 on both worker and root (implementation unchanged; E177).
+- Exact commands, log and file hashes, attempt accounting, observations and test limits are in
+  [the Round 59 completion checkpoint](docs/checkpoints/2026-10-21-root-round59-fixtures-complete.md).
+  Only the three claimed test files changed; no task claims live launcher/VoiceOver, archive/runtime,
+  allocator integration, game boot/audio/save/load, or Metal gameplay.
+- `python3 scripts/project_index.py` exited 0 and indexed 14,410 folders (352 checkpoint files);
+  log `local/validation/root-round59-replay/project-index.log`, SHA-256
+  `bff35dfce43fadd9cf3ebcbdec9bc876b225f99a61243b5a4db2bd79cda2305c`.
+- Pre-push audit accepted 8 staged paths and 1,619 full paths; both cached and working diff checks
+  passed. Exact audit log hashes are in the Round 59 completion checkpoint. User-owned `native/api`
+  changes remain unstaged.
+- After the PSARC test edit, `trail build --check` reported STALE for that test file; `trail build`
+  exited 0 and the follow-up check passed at 3,553 nodes / 4,795 edges. The optional deep layer is
+  not built. G0 remains PARTIAL; G1-G6 remain NOT RUN. Existing user-owned `native/api` changes stay
+  untouched and excluded.
+- Exact next action: claim the next bounded independent fixture tasks in `docs/TASKS.md` and record
+  Round 60 ownership/commands in `HANDOFF.md` before dispatch.
 
 ## Session addendum 2026-10-21 Round 59 DATA-02 first attempt (/root)
 
