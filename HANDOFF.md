@@ -81,9 +81,14 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   error (`block 4 decoded to 16 bytes, expected 15`) is asserted; `python3 -I scripts/test_psarc.py`
   passed 27/27. Parser behavior is unchanged; see E124 and the
   [completion checkpoint](docs/checkpoints/2026-10-21-root-data02-psarc-decoded-length-complete.md).
-- Next exact action: claim `DATA-02-TOC-VALUE-DISTINCT-PATH-REUSE-01` for a metadata-only aggregate
-  of opaque TOC values reused across distinct member paths in the seven existing manifests. Report
-  aggregate counts only; preserve digest meaning and content identity as UNKNOWN.
+- Claimed `DATA-02-TOC-VALUE-DISTINCT-PATH-REUSE-01`, ACTIVE, attempt 0, for an aggregate-only
+  metadata audit across the seven E75/E77 manifests. Count TOC values occurring on multiple exact
+  paths separately from same-path cross-archive repeats; never emit paths or values. Root owns
+  public records; `launcher_review` owns new private validation files. Claim checkpoint:
+  [DATA-02 TOC distinct-path reuse](docs/checkpoints/2026-10-21-root-data02-toc-distinct-path-reuse-claim.md).
+- Next exact action: have `launcher_review` bind the seven manifest identities and run the private
+  aggregate twice, confirming byte-identical output and all 170,451 rows. Root will independently
+  replay the report before recording E125.
 - After reconfigure, `test_registration_thunks_ahead` built and its focused CTest passed 1/1.
   The host library and child executable build. The first host target build failed at line 508
   because `WIFEXITED` received temporary `reap(unused)`; storing status in a local made the target
