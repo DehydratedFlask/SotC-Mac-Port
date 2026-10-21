@@ -192,3 +192,18 @@ synthetic test fixtures, not game runtime behavior. Logs and source hashes are i
 Build products remain under `local/build/launcher` and `local/build/native`; validation logs remain
 under `local/validation/root-round63-replay/`. Preserve evidence until no longer needed; no new
 dependency or install removal boundary was created.
+
+## 2026-10-21 14:37 CDT — Round 64 focused fixture baselines
+
+Existing Apple Swift 6.4 / swift-driver 1.168.6, Xcode 27.1 (27A9275), CMake 4.4.4, Apple clang
+21.0.0, Python 3.15.0, and macOS 27.0.1 were reused; no install, download, dependency, or
+configuration change. Commands from the repository root:
+`swift test --package-path launcher --scratch-path local/build/launcher --filter CoreClientTests`
+(exit 0, 22 tests across 2 suites), `PYTHONDONTWRITEBYTECODE=1 python3 -I
+scripts/test_archive_overlap_map.py` (exit 0, 22 tests), `cmake --build local/build/native --target
+test_host_map` (exit 0), and `ctest --test-dir local/build/native -R '^host_map$'` (exit 0, 1/1).
+Purpose: establish clean synthetic-fixture baselines before test-only edits; no game execution or
+runtime behavior is established. Exact commands, output hashes, and removal boundaries:
+`docs/checkpoints/2026-10-21-root-round64-fixture-claims.md`. Build products stay under
+`local/build/`; baseline logs are under `local/validation/root-round64-scout/`. No dependency or
+installation removal boundary was created.

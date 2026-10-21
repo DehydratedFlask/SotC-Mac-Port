@@ -1,12 +1,29 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 14:36 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 14:38 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Round 64 test-only claims recorded / publish next
+
+- Three distinct candidates were checked against live test and production files, task/evidence
+  registries, and focused baselines. Exact assertions, claim-time digests, commands, outputs, and
+  synthetic-only limits are in
+  [the Round 64 claim checkpoint](docs/checkpoints/2026-10-21-root-round64-fixture-claims.md).
+- APP-01 covers the exact `CoreClient` failure copy when status is `running` without an engine;
+  DATA-02 covers a valid one-record JSONL payload without a trailing newline; SRV-01 covers
+  `reserve_alignment(0x100001u) == 0x200000u`. Each worker may edit only its assigned test file and
+  may not edit shared docs or commit. Root owns shared docs, review, and independent replay.
+- Focused baselines pass: APP 22 tests across 2 suites, DATA 22 tests, SRV target build and CTest
+  1/1. Implementation has not started; failed attempts remain 0. No project runtime gate advances.
+- `python3 scripts/project_index.py` indexed 14,437 folders; `--check` reports current. Exact log
+  hashes are recorded in the Round 64 claim checkpoint.
+- Exact next action: finish staged/full publication audits, commit and push the claim docs/index,
+  then dispatch one-file test edits. Root will review/replay each change before recording E190–E192.
 
 ## Round 63 test-only tasks verified (/root)
 
@@ -39,9 +56,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and excluded.
 - Completion commit `a6e5afa08d33133804768fe4f10804bd2a7b603a` is pushed to `origin/main`; post-push
   `HEAD` and `origin/main` match. Push log and state log hashes are in the completion checkpoint.
-- Exact next action: review the three read-only Round64 scout reports, verify each candidate with
-  Graft and live files, check registry uniqueness and focused baselines, then publish bounded claims
-  before dispatching any test edits.
+- Round 64 claims above supersede this earlier scouting action.
 
 ## Session addendum 2026-10-21 Round 62 fixtures verified (/root)
 
