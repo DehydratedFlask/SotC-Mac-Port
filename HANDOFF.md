@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 09:35 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 09:40 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -76,13 +76,14 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   values and 35,737 different values. These are metadata comparisons; digest meaning, content
   equality, overlay precedence and runtime use remain UNKNOWN. See E123 and the
   [completion checkpoint](docs/checkpoints/2026-10-21-root-data02-overlap-toc-digest-complete.md).
-- Next exact action: inspect the remaining open DATA-02 work packets for another bounded task and
-  record its claim before changing files. Keep parent archive/asset schema and selected-scene gates
-  open until supported by evidence.
-- Claimed `DATA-02-PSARC-DECODED-LENGTH-MISMATCH-01`, status ACTIVE, attempt 0: add a synthetic
-  compressed-block regression for the existing decoded-length guard in `Psarc.read`, without
-  changing parser behavior or using a real archive. The exact error and focused suite must pass;
-  see the [claim checkpoint](docs/checkpoints/2026-10-21-root-data02-psarc-decoded-length-claim.md).
+- `DATA-02-PSARC-DECODED-LENGTH-MISMATCH-01` is FIXTURE_VERIFIED: added a synthetic compressed
+  member whose declared length is one byte shorter than its decoded final block. The exact existing
+  error (`block 4 decoded to 16 bytes, expected 15`) is asserted; `python3 -I scripts/test_psarc.py`
+  passed 27/27. Parser behavior is unchanged; see E124 and the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-data02-psarc-decoded-length-complete.md).
+- Next exact action: claim `DATA-02-TOC-VALUE-DISTINCT-PATH-REUSE-01` for a metadata-only aggregate
+  of opaque TOC values reused across distinct member paths in the seven existing manifests. Report
+  aggregate counts only; preserve digest meaning and content identity as UNKNOWN.
 - After reconfigure, `test_registration_thunks_ahead` built and its focused CTest passed 1/1.
   The host library and child executable build. The first host target build failed at line 508
   because `WIFEXITED` received temporary `reap(unused)`; storing status in a local made the target
