@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 13:34 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 13:35 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -23,12 +23,24 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Claim-time main and origin/main match at 451530b. The existing native/api/CMakeLists.txt
   modification and native/api/host/ remain user-owned, untouched, and excluded.
 - python3 scripts/project_index.py exited 0 and refreshed docs/FOLDERS.md for 14,405 folders
-  (349 checkpoint files). trail build --check exited 0 with the wiring graph in sync at
-  3,552 nodes / 4,792 edges; the optional deep concept layer remains unbuilt. Logs and hashes are
-  recorded in the Round 59 claim checkpoint.
+  (350 checkpoint files). Log local/validation/root-round59-dispatch-project-index.log, SHA-256
+  f6c5c13cb05cedfc697bbb8ac1be428467d25356e4de4454d70dad499e887566. trail build --check exited
+  0 with the wiring graph in sync at 3,552 nodes / 4,792 edges; the optional deep concept layer
+  remains unbuilt. Log local/validation/root-round59-dispatch-trail-check.log, SHA-256
+  fe0e8f6183c356799cde0f4919e1268085909678b5839242d7617facbea22cdb.
 - Staged and full publish-path audits passed for 4 and 1,616 paths, and cached/working diff checks
   passed. Exact log paths and hashes are in the Round 59 claim checkpoint.
-- Exact next action: commit and push the claim, then dispatch the three workers.
+- Claim commit 78d232f (docs: claim round 59 synthetic fixtures) was pushed to origin/main; both
+  branch refs matched afterward. The staged audit accepted 4 paths and the full audit accepted
+  1,616 paths; cached/working diff checks passed. Logs are recorded in the claim checkpoint.
+- Pre-push staged path audit accepted 3 paths; log
+  local/validation/root-round59-dispatch-audit-staged.log, SHA-256
+  7ac8aeb3e1f29f0a997c41e851e9c207ac130b7b82485d0565961974aedb3845. The full audit accepted
+  1,617 paths; log local/validation/root-round59-dispatch-audit-all.log, SHA-256
+  e40d9016da33b7f642dcfea8833b82b53682d0fb80f544cd8020ec5073a6eefe. Cached and working diff
+  checks exited 0.
+- Exact next action: commit and push the worker-dispatch checkpoint, then send the three single-file
+  tasks.
 
 ## Session addendum 2026-10-21 round 58 completion (/root)
 
