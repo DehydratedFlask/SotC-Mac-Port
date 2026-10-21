@@ -269,6 +269,12 @@ class Tests(unittest.TestCase):
         self.assertEqual(str(error.exception),
                          'vaddr 0x100c+8 not file-backed in a loadable segment')
 
+    def test_image_mapped_requires_range_inside_one_segment(self):
+        img = two_segment_image()
+        self.assertTrue(img.mapped(0x1000, 16))
+        self.assertFalse(img.mapped(0x100c, 8))                         # crosses segment end into gap
+        self.assertFalse(img.mapped(0x1010, 1))                         # nonzero range starts in gap
+
     def test_image_read_past_filesz_into_bss_tail_rejected(self):
         img = two_segment_image()
         self.assertTrue(img.mapped(0x3010, 4))                         # mapped via memsz
