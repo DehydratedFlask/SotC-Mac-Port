@@ -120,12 +120,26 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   continue with the independent scout's candidate if still unclaimed. All real game acceptance gates
   remain unchanged.
 
+## Session addendum 2026-10-21 round 27 (`/root`)
+
+- Completed `AUD-01-CLASSIFIER-RAW-INFLATE-OFFSET-00-FIXTURE-01`, `FIXTURE_VERIFIED` with zero failed tries. Worker and root each pass `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_headers.py` (21/21). A 64-byte synthetic payload compressed with raw DEFLATE selects `raw_inflate_offset0` and decodes to 64 bytes; test SHA256 `accbc01ef1b55b7f832d84c0ece73eb2bab97200bdb05f305c35604be8e8c7c1`; classifier unchanged at `624a51336859bab8aef2e7e7880b16d1282c9e883f459de05c8e3c1c4320cd77`. E145 and the [completion checkpoint](docs/checkpoints/2026-10-21-root-aud01-classifier-raw-inflate-offset0-complete.md) record both log hashes.
+- Claimed `RE-02-DYNLINK-MAPPED-ZERO-LENGTH-01`, `ACTIVE` with zero failed tries. Graft and live source review confirm that `Image.mapped()` includes a zero-length range at the first segment's one-past-end address `0x1010`; no existing test pins this. Add one synthetic assertion in `scripts/test_ps4_dynlink.py`, without changing parser behavior. Claim: [zero-length mapped range](docs/checkpoints/2026-10-21-root-re02-dynlink-mapped-zero-length-claim.md).
+- `slot23_raw_xrefs` completed only `scripts/test_audio_headers.py`; `launcher_review` will own only `scripts/test_ps4_dynlink.py` after this claim is published. Root owns shared documentation.
+- Next exact action: publish E145 and the zero-length claim, then dispatch `launcher_review` and root-replay the dynlink suite.
+
+## Session addendum 2026-10-21 round 26 (`/root`)
+
+- Published the round 25 RELRO fixture and raw-DEFLATE claim in commit `62e2b677eee5ae4136d9c9bc672eff6e2e825566` (`test: verify RELRO image reads and claim raw inflate branch`); `git push origin main` exited 0 and both `HEAD` and `origin/main` resolve to that commit. See [publication checkpoint](docs/checkpoints/2026-10-21-root-round25-publication.md).
+- Pre-commit checks passed: `python3 scripts/project_index.py` and `python3 scripts/project_index.py --check` (14,231 folders current); `trail build --check` (3,534 nodes in sync; deep meaning layer not built); `git diff --check`; `git diff --cached --check`; `python3 -I scripts/audit_publish_paths.py` (7 staged allowlisted paths); and `python3 -I scripts/audit_publish_paths.py --all` (1,531 paths). The post-push `git status --short --branch` showed `main` synchronized; only the pre-existing `native/api/CMakeLists.txt` modification and untracked `native/api/host/` remain outside the commit.
+- `RE-02-DYNLINK-RELRO-IMAGE-FIXTURE-01` is `FIXTURE_VERIFIED`; `AUD-01-CLASSIFIER-RAW-INFLATE-OFFSET-00-FIXTURE-01` is `ACTIVE`. Both have zero failed tries. All actual game acceptance gates remain open.
+- At this checkpoint the next action was to review and replay the raw-DEFLATE fixture; this completed in round 27 above.
+
 ## Session addendum 2026-10-21 round 25 (`/root`)
 
 - Completed `RE-02-DYNLINK-RELRO-IMAGE-FIXTURE-01`, `FIXTURE_VERIFIED` with zero failed tries. Worker and root each pass `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py` (21/21). The synthetic `PT_SCE_RELRO` segment maps and reads its exact bytes; test SHA256 `dbac8eeb97a1fe98e7c9e5c3a16bfe4b133127214f5da5eda1849aa3ccb3efec`; parser unchanged at `28c53257a6f2bd58522f123098d41ca0d884222330a1bf18ce9f8935fb45eff9`. E144 and the [completion checkpoint](docs/checkpoints/2026-10-21-root-re02-dynlink-relro-image-complete.md) record both log hashes.
 - Claimed `AUD-01-CLASSIFIER-RAW-INFLATE-OFFSET-00-FIXTURE-01`, `ACTIVE` with zero failed tries. Graft located the raw DEFLATE offset-0 probe branch with no matching test. Add one synthetic `wbits=-15` success fixture in `scripts/test_audio_headers.py`; codec identity and playback remain out of scope. Claim: [raw DEFLATE offset-0 fixture](docs/checkpoints/2026-10-21-root-aud01-classifier-raw-inflate-offset0-claim.md).
 - `launcher_review` completed only `scripts/test_ps4_dynlink.py`; `slot23_raw_xrefs` will own only `scripts/test_audio_headers.py` after claim publication. Root owns the shared documentation.
-- Next exact action: publish E144 and the new claim, then dispatch `slot23_raw_xrefs` and root-replay its focused suite.
+- At this checkpoint the next action was to publish E144 and the new claim; publication and worker assignment completed in round 26 above.
 
 ## Session addendum 2026-10-21 round 23 (`/root`)
 

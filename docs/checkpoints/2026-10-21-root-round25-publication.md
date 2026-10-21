@@ -1,0 +1,12 @@
+# Checkpoint: round 25 publication
+
+- Local date/time: 2026-10-21 11:47 CDT.
+- Agent ID: `/root` (integrator).
+- Task IDs: `RE-02-DYNLINK-RELRO-IMAGE-FIXTURE-01` completion and `AUD-01-CLASSIFIER-RAW-INFLATE-OFFSET-00-FIXTURE-01` claim.
+- Published paths: `HANDOFF.md`, `docs/EVIDENCE.md`, `docs/FOLDERS.md`, `docs/TASKS.md`, two task checkpoints, and `scripts/test_ps4_dynlink.py`. Commit `62e2b677eee5ae4136d9c9bc672eff6e2e825566` (`test: verify RELRO image reads and claim raw inflate branch`) was pushed by `git push origin main`; exit 0. `git rev-parse HEAD origin/main` returned the same hash for both.
+- Exact pre-commit checks and results: `python3 scripts/project_index.py` exit 0 (14,231 folders indexed; written); `python3 scripts/project_index.py --check` exit 0 (14,231 folders indexed; current); `trail build --check` exit 0 (3,534 nodes in sync; deep meaning layer not built); `git diff --check` exit 0; `git diff --cached --check` exit 0; `python3 -I scripts/audit_publish_paths.py` exit 0 (7 staged paths); `python3 -I scripts/audit_publish_paths.py --all` exit 0 (1,531 paths).
+- Test evidence: worker and root each ran `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py`, exit 0 (21/21). Worker log `local/validation/re02-dynlink-relro-image/attempt-1.log`, SHA256 `2b390ad0ecc0187ae4c9907c4b66fcd5cf984adc11b10becfdaa3a91cfef8ccd`; root log `local/validation/re02-dynlink-relro-image/root-replay.log`, SHA256 `ee092db8946b567b25c5d37ae8c6a0a366d0b7302e1ae4e336b3587aefa2a67e`. Test SHA256 `dbac8eeb97a1fe98e7c9e5c3a16bfe4b133127214f5da5eda1849aa3ccb3efec`; parser unchanged SHA256 `28c53257a6f2bd58522f123098d41ca0d884222330a1bf18ce9f8935fb45eff9`.
+- Post-push status command: `git status --short --branch`; exit 0, `main` synchronized with `origin/main`. The only remaining worktree state is the pre-existing `native/api/CMakeLists.txt` modification and untracked `native/api/host/`; neither was staged or published.
+- Observation: the RELRO fixture covers only the synthetic segment filter and byte read. The raw-DEFLATE task is a claim and has not run. Inference limit: no live ELF, loader, codec, audio asset, runtime, or gameplay behavior is established.
+- Remaining risks: cold boot, audible game content, real save/reload, direct Metal validation, and forbidden-runtime/module absence remain unproven. The native host protocol task remains under its existing principal escalation.
+- Next exact action: review `slot23_raw_xrefs`'s raw-DEFLATE fixture, root replay the focused audio-header suite, and publish completion evidence.
