@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 10:09 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 10:10 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -20,8 +20,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Graft located `program_headers` at `scripts/ps4_dynlink.py:46-52`; it decodes records with a
   56-byte stride but does not check ELF header `e_phentsize`. Its callers are parser → build → main.
   Existing synthetic tests cover class/data/machine and truncated tables, but not this field.
-- Next exact action: publish this claim, then delegate the test-first regression and narrow parser
-  guard. No live ELF/loader behavior or game milestone is implied.
+- Claim commit `bad72a6` was pushed to `origin/main`; `slot23_raw_xrefs` owns the two claimed
+  source/test files. The worker is adding a synthetic test, recording the pre-guard failure, then
+  adding the narrow check and rerunning the focused suite. No code result is integrated yet.
+- Next exact action: review the worker's diff and logs, independently replay the acceptance command,
+  then record E128 and publish only the two source/test files plus task docs. No live ELF/loader
+  behavior or game milestone is implied.
 
 ## Session addendum 2026-10-21 round 5 (`/root`)
 
