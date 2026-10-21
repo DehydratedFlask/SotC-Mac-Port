@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 14:26 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 14:31 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,16 +8,17 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Round 63 test-only tasks active (/root)
+## Round 63 test-only tasks verified (/root)
 
 - Three read-only scouts identified distinct synthetic fixtures; root verified each candidate against
   live production and test files and ran the focused baselines. Claims, exact assertions, digests,
   commands, log hashes, and evidence limits are in
   [the Round 63 claim checkpoint](docs/checkpoints/2026-10-21-root-round63-fixture-claims.md).
-- APP-01 will assert that an explicit failed-status message overrides the mapped error fallback
-  (22 Swift tests across two suites). DATA-02 will combine a compressed block and a stored block in
-  one 32-byte synthetic PSARC member (33 Python tests). SRV-01 will pin an exact post-alignment
-  remainder fit in the free-list carve helper (target build and CTest 1/1).
+- APP-01 asserts that an explicit failed-status message overrides the mapped error fallback
+  (worker and root: 22 Swift tests across two suites). DATA-02 combines compressed and stored blocks
+  in one 32-byte synthetic PSARC member (worker and root: 34 Python tests). SRV-01 pins an exact
+  post-alignment remainder fit in the free-list carve helper (worker and root target build; CTest
+  1/1).
 - Owners are `/root/launcher_review`, `/root/review_host_proto`, and `/root/slot23_raw_xrefs`; each
   may edit only its claimed existing test file and may not commit. Root owns shared docs and replay.
 - Claims were published before implementation prompts in commit
@@ -29,9 +30,15 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   2 suites, DATA-02 34 parser tests, and SRV-01 target build plus CTest 1/1. Worker logs, test and
   production hashes are in
   [the Round 63 dispatch checkpoint](docs/checkpoints/2026-10-21-root-round63-workers-dispatched.md).
-- All three claimed test files now have worker edits. Root diff review and replay are pending; tasks
-  remain `ACTIVE` with 0 failed attempts. Exact next action: review each diff, root-replay all three
-  focused commands, then publish the completion record.
+- Root reviewed each single-file diff and independently replayed every focused command. The three
+  tasks are `FIXTURE_VERIFIED`, with 0 failed attempts; source/test hashes, worker/root log hashes,
+  exact results and limitations are in
+  [the Round 63 completion checkpoint](docs/checkpoints/2026-10-21-root-round63-fixtures-complete.md)
+  and evidence E187–E189. `trail build` and `trail build --check` pass; optional meaning layer stays
+  unbuilt. Synthetic fixtures do not advance G0–G6 runtime gates. Existing user-owned
+  `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and excluded.
+- Exact next action: scout three distinct Round64 test-only fixtures with Graft, verify candidates
+  and focused baselines against live files, then claim and publish the tasks before dispatch.
 
 ## Session addendum 2026-10-21 Round 62 fixtures verified (/root)
 

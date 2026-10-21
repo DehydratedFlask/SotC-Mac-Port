@@ -178,3 +178,17 @@ hashes are recorded in the three Round 58 completion checkpoints. These commands
 copy, archive-map validation, and intrusive-list behavior only; they add no game boot/audio/save or
 Metal gameplay evidence. Build products remain under local/build/; validation output stays in
 local/validation/. No dependency was installed.
+## 2026-10-21 14:31 CDT — Round 63 focused fixture verification
+
+Existing Apple Swift 6.4.0 (`swift-driver` 1.168.6), Xcode 27.1 (27A9275), CMake 4.4.4,
+Apple clang 21.0.0, Python 3.15.0, and macOS 27.0.1 were reused; no install, download, dependency,
+or configuration change. Commands from the repository root:
+`swift test --package-path launcher --scratch-path local/build/launcher --filter CoreClientTests`
+(root exit 0, 22 tests across 2 suites), `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_psarc.py`
+(exit 0, 34 tests), `cmake --build local/build/native --target test_free_list_carve` (exit 0), and
+`ctest --test-dir local/build/native -R '^free_list_carve$'` (exit 0, 1/1). Purpose: replay three
+synthetic test fixtures, not game runtime behavior. Logs and source hashes are in
+[the Round 63 completion checkpoint](docs/checkpoints/2026-10-21-root-round63-fixtures-complete.md).
+Build products remain under `local/build/launcher` and `local/build/native`; validation logs remain
+under `local/validation/root-round63-replay/`. Preserve evidence until no longer needed; no new
+dependency or install removal boundary was created.

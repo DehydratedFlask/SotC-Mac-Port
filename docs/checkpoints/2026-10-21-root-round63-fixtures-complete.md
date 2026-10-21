@@ -1,0 +1,37 @@
+# Checkpoint: Round 63 fixtures — root verified
+
+- **Time / timezone:** 2026-10-21 14:32 CDT (America/Chicago).
+- **Agent and integrator:** `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`).
+- **Task / gate / status:** APP-01 launcher mapping, DATA-02 PSARC member decoding, and SRV-01 free-list carve fixtures; all three `FIXTURE_VERIFIED`. G0 remains PARTIAL; G1–G6 remain NOT RUN.
+- **Prerequisite evidence / inputs:** Round63 claims and worker dispatch are in [claim checkpoint](2026-10-21-root-round63-fixture-claims.md) and [dispatch checkpoint](2026-10-21-root-round63-workers-dispatched.md). Root replay base was `8740b7dbef298460abf4ac49f25d11a4f8d20e09`, equal to `origin/main` before this completion.
+- **Changed files:** `launcher/Tests/LauncherCoreTests/CoreClientTests.swift` SHA-256 `964d5de91efb269b85c899236bb2aa2c3afb660dcbd95b763bdf605cc1109f7e`; `scripts/test_psarc.py` SHA-256 `90cabb77649f9607409705f47dc92ef76bbc7dc081c053bda694a0dc00bb8794`; `native/tests/test_free_list_carve.cpp` SHA-256 `58c7f6a88eea2801050b00a345ea5b9478be9823be51317a7ce263782fed2f56`; this checkpoint; `HANDOFF.md`; `docs/TASKS.md`; `docs/EVIDENCE.md`; `INSTALL_LOG.md`; generated `docs/FOLDERS.md`.
+- **Hypotheses and expected results:** An explicit failed-status message overrides the fallback; one synthetic PSARC member can contain both compressed and stored blocks and read back exactly; a free-list carve fits when aligned remainder capacity equals the request.
+- **Exact commands / CWD / environment:** From `/Volumes/Extra/SoC Mac Native`: `swift test --package-path launcher --scratch-path local/build/launcher --filter CoreClientTests`; `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_psarc.py`; `cmake --build local/build/native --target test_free_list_carve`; `ctest --test-dir local/build/native -R '^free_list_carve$'`. Reused Apple Swift 6.4 (`swift-driver 1.168.6`), Xcode 27.1 build 27A9275, CMake 4.4.4, Apple clang 21.0.0, Python 3.15.0, arm64 macOS 27.0.1. No dependency/configuration change.
+- **Exit / observed result:** All commands exited 0. Swift reported 22 passing tests across `NativeCoreClientTests` (9) and `CoreClientTests` (13); PSARC reported 34 passing tests; native target built and focused CTest passed 1/1. Swift's build/test output reported 0.21 s build and 0.003 s suite runs; Python reported 0.012 s; CTest reported 0.02 s. The CMake build output did not report a duration.
+- **Production source identities:** unchanged `launcher/Sources/LauncherCore/CoreClient.swift` SHA-256 `9f2b214486f8c3ed81ead6a237f86e494c52ccd89a33c15a9fed60de533b73f5`; unchanged `scripts/psarc.py` SHA-256 `39f2c748db013637aba8144205dc60b7e5b1eb49ee0f641960783a1e2c140485`; unchanged `native/core/free_list_carve.cpp` SHA-256 `a5d0d660cb49b73499c27b42724afc6d57a8735a01ce07017d11599b3e8b1630`.
+- **Logs / evidence:** worker and root test/build log hashes are recorded in E187–E189 and below. Root logs: `local/validation/root-round63-replay/app01.log` SHA-256 `1124aa69e879f88e2b2fa1bb0ee8a6cfacbb9692d12a975cea3441268bb00037`; `data02.log` `e655c37670ad55513f246bd83fb0807cb6b335e4abf0c77a9c6e8eb6f4a2adc9`; `srv01-build.log` `864e6f0bdf507d73c1178c9078acbe53c24725d2383621db31416c2de9c14544`; `srv01-ctest.log` `ab3e6543c136f87cacced81e4b9f9fb2a77d1bc49c60491bf74d0163d5beb5a2`.
+- **Index evidence:** `python3 scripts/project_index.py` exited 0 for 14,436 folders; `python3 scripts/project_index.py --check` exited 0 and reported current. Logs `local/validation/root-round63-replay/project-index.log` SHA-256 `766dfa4387b9bc718b179653ff25b436f0e69456351d468866b01cb6d48428f9` and `project-index-check.log` `e74ab43d2292b855605e28eeea3b0accde851f89310a6f967f28cc55d748e989`. `trail build` exited 0 at 3,560 nodes / 4,811 edges; `trail build --check` exited 0 and reported the wiring graph current. The optional meaning layer remains unbuilt. Logs: `local/validation/root-round63-replay/trail-build.log` SHA-256 `1a0dc5805b11dfdc0e572ea6deddd980b8321cf4cb9828978ab780fc9a6eb369`; `trail-check.log` `890fc0002bc6638e16b968bc203bf870ba8a44b8b061d966624708a28d306a4a`.
+- **Publication checks:** `git fetch origin main` exited 0; `HEAD` and `origin/main` both remained `8740b7dbef298460abf4ac49f25d11a4f8d20e09` before this checkpoint (logs `fetch.log` SHA-256 `58e4bb2ebd9bd713bf3332d4cad1251aeb0b51fb26a8b06f30b3aaa431df79b3`, `remote-ref.log` `b6fb14d27f6059b9d0b58f42fa66552647fc30d5d276e228c32d1375f5568fda`). Staged path audit exited 0 with 9 paths (log `audit-staged.log` SHA-256 `0dc495970ae5f3cd1c98533bbb14c33647593bdbe5e3fdcab8a4572af48c4d88`); full tracked-path audit exited 0 with 1,631 paths (`audit-all.log` `39fd17be653c690e5f0584bfe7dd399fbf5f21471e7e1bacdd69a5d529c229f9`). `git diff --cached --check` and `git diff --check` both exited 0. Only the nine allowlisted paths shown in the audit are staged; the user-owned `native/api` changes remain unstaged.
+- **Observations versus inference / limits:** The new assertions pass in synthetic Swift mapping, synthetic PSARC bytes, and a native arithmetic helper. Production files are hash-identical to claim time. This provides no evidence of a running core, real archive, allocator integration, game boot/audio/save-load, or Metal gameplay. A local Graft refresh also parsed excluded, user-owned `native/api/host/` files; they were not edited or staged.
+- **Cumulative failed tries:** 0 for each Round63 task; worker and root runs passed.
+- **Remaining risks / blockers:** No game runtime behavior is established. The existing user-owned modification to `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and excluded from publication.
+- **Next exact action:** Use Graft to scout three new, independent test-only fixture gaps (launcher, data/audio parser, native helper); verify live source/test files and focused baselines, then publish the next bounded claims before any worker edits.
+- **HANDOFF / TASKS / EVIDENCE / INSTALL_LOG / indexes:** Updated for this checkpoint; `docs/FOLDERS.md` refreshed and checked before publication.
+
+## Task evidence
+
+### APP-01 — failure-message override
+
+- Assertion: a failed status supplied with `failureMessage: "synthetic status detail"` maps to `.failed("synthetic status detail")`.
+- Worker command passed 22 tests across 2 suites; worker log `local/validation/app01-coreclient-failure-override/attempt-1.log` SHA-256 `dbf45a79c73d0b81355d71c8e284989cb31104d6064a690d1ebe690c71d94f74`.
+- Root command above passed 22 tests across 2 suites; root log SHA-256 as listed above.
+
+### DATA-02 — mixed compressed/stored PSARC blocks
+
+- A deterministic 32-byte synthetic member at block size 16 has a nonzero compressed marker for block one, zero stored marker for block two, and exact full-member readback.
+- Worker log `local/validation/data02-psarc-mixed-compressed-stored-member/attempt-1.log` SHA-256 `4e254478c9e8efaaede73996c0eb3c05ebaa2692d6430304ae9ccda156a7c574`; worker and root each pass all 34 parser tests.
+
+### SRV-01 — exact remainder fit
+
+- `try_carve_fit(0x20001000, 0x1f000, 0x10000, 0x10000)` yields a fit, `exact_node == false`, lead `0xf000`, allocated start `0x20010000`, and allocated size `0x10000`.
+- Worker build/CTest log hashes: `2a8cc4e37fa84a48b9e6ffe94aa21b4c89362d2eaad928ebc97d7e99046f6ee7` / `5835fd895752a87b8a45038f96450052e6019508c222351ed87f3d3a90d778a1`. Root build/CTest log hashes are listed above. Both CTest runs pass 1/1.
