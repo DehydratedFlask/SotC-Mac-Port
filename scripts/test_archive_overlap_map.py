@@ -24,6 +24,14 @@ class ParseManifestTests(unittest.TestCase):
         )
         self.assertEqual(parsed, {"dir/item.bin": 17})
 
+    def test_parses_two_crlf_delimited_records(self) -> None:
+        parsed = parse_manifest_bytes(
+            "synthetic",
+            b'{"path":"first.bin","size":17}\r\n'
+            b'{"path":"nested/second.bin","size":29}\r\n',
+        )
+        self.assertEqual(parsed, {"first.bin": 17, "nested/second.bin": 29})
+
     def test_preserves_unicode_line_separator_in_exact_path(self) -> None:
         parsed = parse_manifest_bytes("synthetic", '{"path":"dir/line\u2028break","size":9}\n'.encode())
         self.assertEqual(parsed, {"dir/line\u2028break": 9})
