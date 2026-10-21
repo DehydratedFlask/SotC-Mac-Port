@@ -120,6 +120,18 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   continue with the independent scout's candidate if still unclaimed. All real game acceptance gates
   remain unchanged.
 
+## Session addendum 2026-10-21 round 18 (`/root`)
+
+- Claimed `RE-02-DYNLINK-MAPPED-RANGE-FIXTURE-01`, ACTIVE with zero failed tries. The scout's Graft query `trail grep "mapped" --in scripts/` found `Image.mapped()` and only one existing direct test assertion, for a mapped BSS-tail range. `two_segment_image()` already supports checking a range contained in one segment, a range crossing its end into a gap, and a nonzero range beginning in the gap. Add test-only assertions in `scripts/test_ps4_dynlink.py`; do not change parser/runtime behavior. Dependencies `RE-02-DYNLINK-01` and `RE-02-DYNLINK-SEGMENT-SPAN-01` are FIXTURE_VERIFIED. Claim: [mapped-range fixture](docs/checkpoints/2026-10-21-root-re02-dynlink-mapped-range-claim.md).
+- Claimed `DOC-ASSETS-AUD-01-XFF-COVERAGE-COUNT-01`, ACTIVE with zero failed tries. `docs/ASSETS.md` says “six synthetic fixtures,” while `scripts/test_audio_bank_header.py` currently has 18 test methods (`rg -c '^    def test_' ...` → 18). Correct the prose to “18 synthetic test methods” in `docs/ASSETS.md` only. XFF characterization, reader identity, and exact-path-cardinality dependencies are FIXTURE_VERIFIED. Claim: [XFF test-count documentation correction](docs/checkpoints/2026-10-21-root-doc-assets-aud01-xff-count-claim.md).
+- Both claim tasks are file-disjoint from each other and the completed audio-header fixture. After this claim publication, `launcher_review` will own only `scripts/test_ps4_dynlink.py`; `slot23_raw_xrefs` will own only `docs/ASSETS.md`. Root retains sole ownership of `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, and checkpoints. Their acceptance commands and no-runtime-claim boundaries are recorded in the claim files.
+- Next exact action: publish the two claims with the completed E140 record, then dispatch both workers and root-replay their scoped checks.
+
+## Session addendum 2026-10-21 round 17 (`/root`)
+
+- Completed `AUD-01-CLASSIFIER-ZLIB-OFFSET-02-FIXTURE-01`, FIXTURE_VERIFIED with zero failed tries. `scripts/test_audio_headers.py` adds a 64-byte synthetic payload compressed with zlib and prefixed with `b'\x00\x01'`; it asserts successful `zlib_offset2` selection and exact decoded length. Worker and root each pass `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_headers.py` (20/20); test SHA256 `888a6abcf077d6a3d9f861bf7d80acb163540fbf873d7b288b6fb45beaca8c45`; classifier source unchanged at SHA256 `624a51336859bab8aef2e7e7880b16d1282c9e883f459de05c8e3c1c4320cd77`. E140 and [completion checkpoint](docs/checkpoints/2026-10-21-root-aud01-classifier-zlib-offset2-complete.md) record both log hashes. Synthetic branch behavior only; no real codec, game asset, or playback claim.
+- Next exact action: complete the next independent bounded task after confirming no file-ownership overlap; all game-level audio and playback gates remain open.
+
 ## Session addendum 2026-10-21 round 16 (`/root`)
 
 - Claimed `AUD-01-CLASSIFIER-ZLIB-OFFSET-02-FIXTURE-01`, ACTIVE with zero failed tries. Graft found `decompress_probe()`'s `zlib_offset2` branch in `scripts/classify_audio_headers.py:81-127`; live test coverage accepts zlib at offset 0 but has no offset-2 regression. Add one synthetic prefixed-zlib fixture to `scripts/test_audio_headers.py`; production code and real archive interpretation are out of scope. The root independently checked that no matching task row existed before the claim.
