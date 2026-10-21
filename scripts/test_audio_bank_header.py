@@ -270,6 +270,27 @@ class InspectMembersTests(unittest.TestCase):
             'observations': abh.parse_xff_member(fixture['member']),
         }])
 
+    def test_inspect_members_rejects_stale_archive_summary_before_open(self):
+        fixture = self._fixture()
+        summary = json.loads(fixture['summary_path'].read_text())
+        summary['bytes'] -= 1
+        fixture['summary_path'].write_text(json.dumps(summary))
+
+        with patch.object(abh, 'Psarc') as psarc:
+            with self.assertRaises(abh.AudioBankFormatError) as context:
+                abh.inspect_members(
+                    fixture['archive_path'],
+                    [fixture['member_path']],
+                    fixture['manifest_path'],
+                    fixture['summary_path'],
+                )
+
+        psarc.assert_not_called()
+        self.assertEqual(
+            str(context.exception),
+            f"archive summary byte count {summary['bytes']} != live {len(fixture['archive_bytes'])}",
+        )
+
     def test_inspect_members_closes_reader_after_manifest_identity_mismatch(self):
         fixture = self._fixture(manifest_member_sha256='0' * 64)
         with patch.object(abh, 'Psarc', return_value=fixture['reader']) as psarc:
