@@ -1,12 +1,35 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 13:42 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 13:46 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 Round 60 fixture claims (/root)
+
+- Round 59 completion was pushed as `7f9ce03` after the failed DATA-02 fixture checkpoint commit
+  `0653bce`; both are on `origin/main`. Round 60 claims three independent synthetic tests:
+  APP-01 validates a required archive path that is a symlink to a directory; AUD-01 validates the
+  existing LZMA probe at offset 4 with a synthetic payload; SRV-01 validates unlinking a middle node
+  while the optional free-count pointer is null. Exact owner, file, branch, command, claim-time
+  hashes and limitations are in
+  [the Round 60 claim checkpoint](docs/checkpoints/2026-10-21-root-round60-fixture-claims.md).
+- Target tests were clean at claim time; production sources remain unchanged. Root owns shared docs
+  and will independently replay all commands. Existing user-owned `native/api/CMakeLists.txt` and
+  `native/api/host/` work remains excluded.
+- `python3 scripts/project_index.py` exited 0 for 14,411 folders (353 checkpoint files), log
+  `local/validation/root-round60-claims/project-index.log`, SHA-256
+  `aa66db4a28246681bb51bd2b3d670bd0b926ece1103d0c04c13fc9c721637a0f`. `trail build --check`
+  exited 0 with 3,553 nodes / 4,795 edges in sync; optional deep layer remains unbuilt. Log
+  `local/validation/root-round60-claims/trail-check.log`, SHA-256
+  `edd294377abf28693b2f71cccac3065592d98729c855c751af91b8e78c547973`.
+- Pre-push audit accepted 4 staged paths and 1,620 full paths; cached and working diff checks passed.
+  Exact audit log hashes are in the Round 60 claim checkpoint. Only claim/docs paths are staged.
+- Exact next action: publish the Round 60 claim checkpoint, then dispatch the three single-file
+  worker tasks.
 
 ## Session addendum 2026-10-21 Round 59 fixtures verified (/root)
 
