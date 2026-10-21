@@ -15,4 +15,5 @@
 - Observation: the ELF64 header advertises the record size in `e_phentsize`; the parser had decoded entries using a fixed 56-byte stride without checking that field. Inference: rejecting a conflicting size prevents silently interpreting the wrong table layout.
 - Remaining limits: synthetic parser fixture only. No live ELF or game executable was read, no loader behavior was tested, and no runtime or G1 claim is made.
 - Index/check results: `python3 scripts/project_index.py` exited 0 and reported 14,204 folders indexed; `trail build --check` exited 0 with the wiring graph in sync, deep layer not built, and 3,518 meaning-tier nodes pending. Generated `docs/FOLDERS.md` increments its checkpoint-directory count 229→230.
-- Next exact action: run staged and all-path publication audits, then commit and push the allowlisted source/test/docs paths. Do not stage the unrelated escalated `native/api/CMakeLists.txt` or `native/api/host/`.
+- Publication: commit `35370fc` (`fix(elf): validate program header entry size`) was pushed to `origin/main`; `git push origin main` exited 0 and advanced `0a335e0..35370fc`.
+- Next exact action: proceed with the independent `DATA-02-OVERLAP-MAP-UNSHARED-SIZE-VALIDATION-01` claim. Do not interpret this fixture as live ELF or game behavior.
