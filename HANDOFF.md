@@ -1,12 +1,28 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 15:02 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 15:06 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Round 66 bounded fixture claims (/root)
+
+- Round65 fixture work is published in `061d8d530d4a84213372d03289e72535f9be6102`; the final
+  publication record is also pushed. Current `HEAD == origin/main == 0a7f5b0671c5f878edf15569bd409de099265c02`.
+- Root and scouts verified three independent, existing-test-only tasks against Graft, the live
+  source, task/evidence registries, and focused baselines. Details, hashes, commands, logs, and
+  limits are in [the Round66 claim checkpoint](docs/checkpoints/2026-10-21-root-round66-fixture-claims.md).
+- APP-01 covers an existing `SoCGameCore` file with mode `0644`; RE-02 covers a synthetic symbol
+  name offset equal to `DT_SCE_STRSZ`; SRV-01 checks the two arena used/peak counter pairs update
+  independently. Only one existing test file is assigned per task; no production files may change.
+- All three are `ACTIVE`, with 0 failed tries and 0 implementation attempts. Claim docs and task
+  rows are published before implementation prompts. These remain unit fixtures and do not advance
+  G0–G6. Existing user-owned `native/api` paths stay untouched and excluded.
+- Exact next action: confirm the Round66 claim commit is pushed and matches `origin/main`, then send
+  each worker its single-file scope, exact fixture, and pre-created private log path.
 
 ## Round 65 bounded test-only fixtures verified (/root)
 
