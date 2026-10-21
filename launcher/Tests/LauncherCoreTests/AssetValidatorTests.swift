@@ -120,8 +120,7 @@ struct AssetValidatorTests {
             Issue.record("expected .notBuilt for shell stub")
             return
         }
-        #expect(message.contains("NOT BUILT"))
-        #expect(message.contains("Mach-O") || message.contains("Play disabled"))
+        #expect(message == "NOT BUILT: SoCGameCore is not a Mach-O executable (refusing scripts/stubs). Play disabled until a native SoCGameCore exists")
     }
 
     @Test func reportCannotStartWithoutAssetsOrCore() async {
