@@ -1,12 +1,43 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 13:35 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 13:38 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 Round 59 DATA-02 first attempt (/root)
+
+- DATA-02-PSARC-MANIFEST-NUL-PRECEDENCE-FIXTURE-01 attempt 1 failed in the test fixture, not
+  production code. With one member path, the requested NUL separator is not emitted; the parser
+  therefore chooses newline splitting and raises `PsarcError: manifest has 2 paths for 1 members`
+  for the embedded newline path. Worker log
+  `local/validation/data02-psarc-manifest-nul-precedence/attempt-1.log` SHA-256
+  `3b252197ce74415027f60684da4838940c86e576fb39bde6d5c3fd3851a0282a`; failed test file SHA-256
+  `fc0f0cf8c6b73484ddcee2c0e5fca4b7aa740ad6b08578e95154adb3c19718a4`; parser SHA-256 remains
+  `39f2c748db013637aba8144205dc60b7e5b1eb49ee0f641960783a1e2c140485`. The failure and exact
+  next action are recorded in
+  [the attempt 1 checkpoint](docs/checkpoints/2026-10-21-root-round59-data02-attempt1-failed.md)
+  and E174. Failed fixture hypotheses: 1. No implementation defect has been demonstrated.
+- Attempt 2 will use at least two paths, with a newline in the first path, ensuring the raw
+  manifest contains an actual NUL delimiter. Root owns the corrected fixture and will run
+  `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_psarc.py` before acceptance.
+- `/root/launcher_review` reports APP-01's focused suite passed (3 tests); `/root/slot23_raw_xrefs`
+  reports SRV-01 build and focused CTest passed (1/1). Root replay and review remain pending. Existing
+  `native/api/CMakeLists.txt` and `native/api/host/` user work remains excluded.
+- `python3 scripts/project_index.py` exited 0 and indexed 14,409 folders (351 checkpoint files);
+  log `local/validation/root-round59-data02-failure/project-index.log`, SHA-256
+  `a8d712e8af762dda25bc1f8d83ba259485ceac1a7e70b7512b6b7a5ffb446ea9`. `trail build --check`
+  exited 0 with the wiring graph in sync at 3,553 nodes; optional deep layer remains unbuilt. Log
+  `local/validation/root-round59-data02-failure/trail-check.log`, SHA-256
+  `edd294377abf28693b2f71cccac3065592d98729c855c751af91b8e78c547973`.
+- The pre-push staged path audit accepted 5 paths and the full audit accepted 1,618 paths; exact
+  log hashes are in the attempt 1 checkpoint. Cached and working diff checks passed. Only docs are
+  staged; the three test-file edits and existing user-owned native/api paths are unstaged.
+- Exact next action: publish this failure checkpoint with docs-only staging, then correct the
+  two-path fixture and root-replay all three Round 59 commands.
 
 ## Session addendum 2026-10-21 round 59 fixture claims (/root)
 
