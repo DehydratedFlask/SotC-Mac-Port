@@ -518,6 +518,16 @@ struct CoreReadinessTests {
             .hasPrefix("No readiness check has run yet."))
     }
 
+    @Test func emptySubsystemCoverageReportsNoSubsystems() {
+        let coverage = CoreCoverageReport(
+            abiVersion: CoreABIVersion(major: 1, minor: 0), engineImplemented: false,
+            ctor: .notLinked, subsystems: []
+        )
+        let lines = CoreDiagnostics.coreSection(coverage: coverage, status: nil, lastFailure: nil, queryFailure: nil)
+
+        #expect(lines.contains("  Subsystems: none reported"))
+    }
+
     @Test func coreSectionReportsQueryAndLastRequestFailuresInOrder() {
         let queryFailure = CoreFailure(code: .io, message: "synthetic query failure")
         let lastFailure = CoreFailure(code: .badState, message: "synthetic request failure")
