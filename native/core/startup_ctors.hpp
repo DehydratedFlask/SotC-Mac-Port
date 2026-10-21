@@ -15,6 +15,8 @@
 #include "init_f4fd40.hpp"
 #include "init_f4eba0.hpp"
 #include "init_f4b540.hpp"
+#include "recursive_mutex.hpp"
+#include "clothing_preview_param.hpp"
 #include "vec_ef85e0.hpp"
 #include "init_ea52f0.hpp"
 #include "vec_e0b180.hpp"
@@ -214,6 +216,14 @@ struct StartupState {
     std::array<std::byte, kScratchBytes> scratch{};
     std::atomic<std::uint64_t> scratch_slot{0};
     std::atomic<std::uint32_t> flag32{0};
+
+    // Slot 10 / RVA 0x00f09e60 effects. The original published a vtable address point at global
+    // 0x3356678 and created a once-guarded recursive + priority-inherit mutex. The user chose
+    // StartupState RAII ownership for that mutex; the descriptor is an ordinary native pointer.
+    RecursiveMutex descriptor_mutex{};
+    bool descriptor_mutex_initialized = false;
+    const ClothingPreviewParamDescriptor* descriptor = nullptr;
+    bool init_failed = false;
 };
 
 struct CtorSlot {
@@ -225,7 +235,8 @@ struct CtorSlot {
 struct CtorRunResult {
     std::size_t completed = 0;
     std::uint32_t blocked_on_rva = 0;         // 0 when every slot ran
-    bool ok() const noexcept { return blocked_on_rva == 0; }
+    bool callback_failed = false;             // a recovered callback reported a visible failure
+    bool ok() const noexcept { return blocked_on_rva == 0 && !callback_failed; }
 };
 
 CtorRunResult run_constructors(std::span<const CtorSlot> in_order, StartupState& state) noexcept;

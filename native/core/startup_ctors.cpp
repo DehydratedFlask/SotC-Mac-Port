@@ -10,6 +10,12 @@ CtorRunResult run_constructors(std::span<const CtorSlot> in_order, StartupState&
             return result;
         }
         slot.run(state);
+        if (state.init_failed) {
+            // Propagate a callback's visible initialization failure instead of continuing.
+            result.blocked_on_rva = slot.original_rva;
+            result.callback_failed = true;
+            return result;
+        }
         ++result.completed;
     }
     return result;
@@ -27,8 +33,13 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xf4b510, 7, [](StartupState& s) noexcept { init_vec_neg036(s.neg036); }},
         {0xf3d9d0, 8, [](StartupState& s) noexcept { init_math_constants(s.math_d); }},
         {0xf30460, 9, [](StartupState& s) noexcept { init_xyz_mask_copy(s.xyz_mask_copy); }},
-        {0xf09e60, 10, nullptr},
-        // Slots 11–19 remain unrecovered; their semantics are unknown.
+        // Slot 10 / RVA 0x00f09e60: publishes the ClothingPreviewParam descriptor and creates the
+        // once-guarded recursive + priority-inherit mutex. Verified from the constructor body and
+        // its consumers; see docs/checkpoints/2026-10-20-root-cpu01-ctor10-descriptor-consumer-*.md.
+        {0xf09e60, 10, [](StartupState& s) noexcept { (void)init_clothing_preview_descriptor(s); }},
+        // Slot 11 / RVA 0x00f09160 remains unrecovered. This explicit null keeps the runner in
+        // strict original order instead of jumping from 10 to 20.
+        {0xf09160, 11, nullptr},
         {0xef85e0, 20, [](StartupState& s) noexcept { init_vec_ef85e0(s.vec_ef85e0); }},
         {0xea52f0, 22, [](StartupState& s) noexcept { init_ea52f0(s.ea52f0); }},
         {0xe10490, 48, [](StartupState& s) noexcept { init_trig_constants(s.trig); }},
