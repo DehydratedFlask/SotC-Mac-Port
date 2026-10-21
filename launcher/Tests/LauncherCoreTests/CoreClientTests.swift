@@ -213,10 +213,11 @@ struct CoreClientTests {
             state: .running, lastError: .ok, assetsValidated: true, assetsReady: true,
             engineImplemented: false, ctor: .notLinked
         )
-        guard case .failed = CoreClientMapping.launcherState(for: impossible) else {
+        guard case .failed(let message) = CoreClientMapping.launcherState(for: impossible) else {
             Issue.record("a core claiming running without an engine must not reach the UI as running")
             return
         }
+        #expect(message == "Core reported running without an engine")
     }
 
     @Test func aFutureEngineWouldBeReportedRunningOnlyBecauseTheCoreSaidSo() async throws {
