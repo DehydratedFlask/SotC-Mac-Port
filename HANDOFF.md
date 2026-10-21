@@ -1,12 +1,27 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 14:19 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 14:23 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Round 63 test-only tasks claimed (/root)
+
+- Three read-only scouts identified distinct synthetic fixtures; root verified each candidate against
+  live production and test files and ran the focused baselines. Claims, exact assertions, digests,
+  commands, log hashes, and evidence limits are in
+  [the Round 63 claim checkpoint](docs/checkpoints/2026-10-21-root-round63-fixture-claims.md).
+- APP-01 will assert that an explicit failed-status message overrides the mapped error fallback
+  (22 Swift tests across two suites). DATA-02 will combine a compressed block and a stored block in
+  one 32-byte synthetic PSARC member (33 Python tests). SRV-01 will pin an exact post-alignment
+  remainder fit in the free-list carve helper (target build and CTest 1/1).
+- Owners are `/root/launcher_review`, `/root/review_host_proto`, and `/root/slot23_raw_xrefs`; each
+  may edit only its claimed existing test file and may not commit. Root owns shared docs and replay.
+- Exact next action: publish the Round 63 claims, then send each owner its one-file fixture prompt.
+  Failed attempts: 0 for all three tasks.
 
 ## Session addendum 2026-10-21 Round 62 fixtures verified (/root)
 
@@ -31,9 +46,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `origin/main` match. Push log `local/validation/root-round62-replay/push-main.log` SHA-256
   `af03d97be76c36f17610d49f8bcb547944e43fc3965d55bc9805284aaa9c622c`; publication-state log
   SHA-256 `5fb39cee8eed007120abb6138bcac9c9fb1ddc45e98f9869b0316573ed58c1fc`.
-- Exact next action: after publishing this completion checkpoint, use Graft and read-only scouts to
-  identify the next three independent synthetic fixture gaps, verify live files and baselines, and
-  publish claims before implementation prompts.
+- The Round 62 completion checkpoint and published commit are linked above in the session history.
 
 ## Session addendum 2026-10-21 Round 61 fixtures verified (/root)
 
