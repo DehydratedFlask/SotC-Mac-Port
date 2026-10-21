@@ -115,6 +115,20 @@ int main() {
         CHECK(alloc_count == 8);
     }
 
+    // First allocated-list head insert starts from an empty slot.
+    {
+        RegionNode neu{};
+        IntrusiveLinks* slot = nullptr;
+        std::uint32_t alloc_count = 0;
+        void* arena = reinterpret_cast<void*>(static_cast<std::uintptr_t>(0xA11E));
+        list_insert_at_head(neu, &slot, arena, &alloc_count);
+        CHECK(slot == region_links(neu));
+        CHECK(region_links(neu)->next == nullptr);
+        CHECK(region_links(neu)->prev == reinterpret_cast<IntrusiveLinks*>(arena));
+        CHECK(region_owner(neu) == arena);
+        CHECK(alloc_count == 1);
+    }
+
     // arena_free_count helper offset (OBS +0x48).
     {
         alignas(8) unsigned char buf[0x50]{};

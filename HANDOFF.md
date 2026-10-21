@@ -8,6 +8,40 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## Session addendum 2026-10-21 round 58 completion (/root)
+
+- Completed all three Round 58 synthetic fixture tasks after the claim commit a7c6e67 and dispatch
+  commit b8bd38d had been published. APP-01 exact unexpected-exit status and recovery-hint copy
+  passed 7 tests in one suite; DATA-02 duplicate archive identifiers passed 22 tests; SRV-01
+  empty-head region-list insertion built and passed focused CTest 1/1. Each worker result was
+  independently replayed by root, and git diff --check passed.
+- Changed only the three existing test files; the launcher mapping, archive-map helper, and region
+  list implementation stayed byte-identical to claim-time hashes. Evidence E171–E173 and the three
+  completion checkpoints record exact commands, file/log hashes, observations, limits, and zero
+  failed tries.
+- All results are synthetic unit/fixture coverage. They establish no live launcher process behavior,
+  real archive or overlay behavior, allocator integration, game boot/audio/save/load, or Metal
+  gameplay. Acceptance gates remain G0 PARTIAL and G1–G6 NOT RUN.
+- python3 scripts/project_index.py exited 0 and indexed 14,405 folders; docs/checkpoints lists
+  347 entries. Log local/validation/root-round58-replay/project-index.log, SHA-256
+  f6c5c13cb05cedfc697bbb8ac1be428467d25356e4de4454d70dad499e887566.
+  trail build exited 0 and refreshed the wiring graph to 3,552 nodes / 4,792 edges after parsing
+  2 of 1,236 files; log local/validation/root-round58-replay/trail-build.log, SHA-256
+  25439c52ad4aa53faa88a3d6caa12d1922617b42e37069ff71f625bd267ed8f4.
+  trail build --check exited 0; wiring graph is in sync. The optional deep concept layer is not
+  built. Check log SHA-256 fe0e8f6183c356799cde0f4919e1268085909678b5839242d7617facbea22cdb.
+- The existing user-owned native/api/CMakeLists.txt modification and untracked native/api/host/
+  remain untouched and excluded from publication.
+- Pre-push staged path audit accepted all 12 paths; log
+  local/validation/root-round58-replay/audit-staged.log, SHA-256
+  cd108b30a26db323c470796fe77e8b13330b9cfd73ccb0e73795ac4e4fc69611. Full audit accepted 1,614
+  paths; log local/validation/root-round58-replay/audit-all.log, SHA-256
+  ec667deb72eb61d9b5a0a1b7b7f32a555ded2f26aca69a5a638b50c91e5069c7. Both cached and working
+  diff checks exited 0.
+- Exact next action: commit the 12 staged allowlisted paths and push to origin/main, keeping
+  native/api/CMakeLists.txt and native/api/host/ excluded. Then scout and claim another bounded set
+  before implementation.
+
 ## Session addendum 2026-10-21 round 58 fixture claims (`/root`)
 
 - Claimed three independent synthetic fixture tasks with zero failed tries before implementation:

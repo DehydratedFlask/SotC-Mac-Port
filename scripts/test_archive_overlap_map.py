@@ -142,6 +142,11 @@ class ParseManifestTests(unittest.TestCase):
 
 
 class CompareMemberMapsTests(unittest.TestCase):
+    def test_rejects_duplicate_archive_identifiers(self) -> None:
+        with self.assertRaises(ValueError) as context:
+            compare_member_maps(("base", "base"), {"base": {"item.bin": 1}})
+        self.assertEqual(str(context.exception), "archive identifiers must be unique")
+
     def test_rejects_archive_identifiers_that_do_not_match_member_map_keys(self) -> None:
         with self.assertRaises(ValueError) as context:
             compare_member_maps(("base", "patch"), {"base": {}})
