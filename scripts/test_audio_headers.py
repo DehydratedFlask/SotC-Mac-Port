@@ -149,6 +149,14 @@ class EntropyAndProbeTests(unittest.TestCase):
             'rejected_trivial': True,
         })
 
+    def test_trivial_zlib_probe_output_rejected(self):
+        probe = cah.decompress_probe(zlib.compress(b'X'))
+        self.assertEqual(probe['zlib_offset0'], {
+            'ok': False,
+            'out_len': 1,
+            'rejected_trivial': True,
+        })
+
     def test_real_zlib_accepted(self):
         payload = b'A' * 64
         wrapped = zlib.compress(payload)
