@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — SAV-01 flush path and game-data blob structure decoded
+
+Stream flush = three-class chain (slot `[vtbl+0x10]` → `0x4d420`, staging buffer `0x1000`, growable vector, length back-patch, verbatim memcpy into `[obj+0x60]`). Game-data blob producer `0x7e5bb0` is a 14-byte accessor (`.bss` `0x3260bb8`, `0x3cd8` bytes); chunk = tag `0xd` + u64 len + raw bytes (15596 B total); 48 bool chunks precede it. 2 REA successes; root replayed verifier (127/127 worker mutations caught) and checksums. Details: `docs/checkpoints/2026-10-20-root-sav01-blob-flush-complete.md`. Blob semantics unknown; no native serializer; no save works. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 216/216 (batch 23, pushed `d7f42cd`).
+
+Next exact action: bool-chunk reader `0xa81180`, profile chunk writers (`0x548d30`..), load-side deserializer `0x5435f0`; pending `AUD-02-TICKDRIVER-CALLERS-01` worker; constructor batch 24 (next position 190 `0xbc07f0`).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors batch 23 lifted; four more README rows fixed
 
 `CPU-01-LEAF-CTOR-BATCH-23` (`0xbcc4e0` .. `0xbc2800`) `FIXTURE_VERIFIED`; root replay 216/216 ctest pass, six checkers exit 0. All `vec_*` README rows were cross-checked against the ELF; four batch-14 rows had wrong src/dst and are fixed (code/tests were fine). Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-23-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending workers: `SAV-01-BLOB-FLUSH-01` (`local/re/evidence/sav01-blob-flush-01/`) and `AUD-02-TICKDRIVER-CALLERS-01` (`local/re/evidence/aud02-tickdriver-callers-01/`). Next constructor position 190 `0xbc07f0`.
