@@ -22,4 +22,12 @@
 - Remaining risks: synthetic test proves a local parser contract only; it does not validate a real ELF, dynamic loader, or game behavior. Keep any failed attempt and private logs in `local/validation/re02-dynlink-phdr-entsize/`.
 - Files changed to claim: `HANDOFF.md`, `docs/TASKS.md`, generated `docs/FOLDERS.md` (checkpoint count incremented 228→229), and this claim checkpoint. No parser/test source changed.
 - Publication gates: `python3 -I scripts/audit_publish_paths.py` exited 0 for four staged allowlisted paths; `python3 -I scripts/audit_publish_paths.py --all` exited 0 for 1,495 allowed tracked paths; `git diff --cached --check` exited 0. Only the four claim paths are staged; pre-existing escalated host-protocol paths remain unstaged and excluded.
-- Next exact action: commit and push the claim, then assign the two owned files to `slot23_raw_xrefs` for the test-first fixture and guard.
+
+## Claim publication and assignment checkpoint
+
+- Local date/time: 2026-10-21 10:10 CDT (America/Chicago). Integrator: `/root`; worker: `slot23_raw_xrefs`.
+- Task: `RE-02-DYNLINK-PHDR-ENTRY-SIZE-01`; files changed since claim: only `HANDOFF.md` and this checkpoint. Worker code edits have not been integrated or reviewed yet.
+- Exact command: `git push origin main`; exit 0, advanced `1260c96..bad72a6`. The claim is now public.
+- Observation: the worker owns only `scripts/ps4_dynlink.py` and `scripts/test_ps4_dynlink.py`; their work is test-first and logged under `local/validation/re02-dynlink-phdr-entsize/`. No test has yet been run for this task.
+- Remaining risks: no parser guard/test result exists yet; all live ELF and loader behavior remains unverified.
+- Next exact action: wait for the worker's red/green focused-suite logs, review the two-file diff and hashes, and independently replay the acceptance command. Task remains ACTIVE; 0 failed implementation tries.
