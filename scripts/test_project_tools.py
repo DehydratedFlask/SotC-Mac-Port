@@ -107,6 +107,20 @@ class ToolChecks(unittest.TestCase):
             generate(root, check=True)
             self.assertIn("new-module", (root / "docs/FOLDERS.md").read_text())
 
+    def test_index_check_does_not_create_missing_output_directories(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            with self.assertRaises(ValueError) as ctx:
+                generate(root, check=True)
+
+            self.assertIs(type(ctx.exception), ValueError)
+            self.assertEqual(
+                str(ctx.exception),
+                "Stale indexes: docs/FOLDERS.md, local/indexes/folders.json",
+            )
+            self.assertFalse((root / "docs").exists())
+            self.assertFalse((root / "local").exists())
+
     def test_index_ignores_nested_admin_directories(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

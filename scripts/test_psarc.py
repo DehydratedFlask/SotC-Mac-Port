@@ -17,8 +17,9 @@ import psarc
 BS = 16
 
 
-def build(members, comp='zlib', manifest_sep=b'\0', tamper=None, manifest_paths=None):
-    """members: list of (path, bytes). Block size 16 -> 1-byte block table widths.
+def build(members, comp='zlib', manifest_sep=b'\0', tamper=None, manifest_paths=None,
+          block_size=BS):
+    """members: list of (path, bytes). Block-table width follows block_size.
 
     manifest_paths overrides the manifest text only (payload list stays `members`), so a
     structurally valid archive can declare a manifest path count that differs from count - 1.
@@ -30,22 +31,24 @@ def build(members, comp='zlib', manifest_sep=b'\0', tamper=None, manifest_paths=
     for data in payloads:
         first = len(blocks)
         entries.append((first, len(data), len(body)))
-        for i in range(0, len(data), BS):
-            chunk = data[i:i + BS]
+        for i in range(0, len(data), block_size):
+            chunk = data[i:i + block_size]
             z = zlib.compress(chunk)
             stored = chunk if len(z) >= len(chunk) else z      # raw when not smaller
-            blocks.append(len(stored) if len(stored) != BS else 0)
+            blocks.append(len(stored) if len(stored) != block_size else 0)
             body += stored
+    width = max(1, ((block_size - 1).bit_length() + 7) // 8)
+    block_table = b''.join(value.to_bytes(width, 'big') for value in blocks)
     toc = b''
     for first, size, off in entries:
         toc += bytes(16) + struct.pack('>I', first) + size.to_bytes(5, 'big') + off.to_bytes(5, 'big')
-    toc += bytes(blocks)
+    toc += block_table
     toc_size = 32 + len(toc)
     entries2 = b''
     for first, size, off in entries:
         entries2 += bytes(16) + struct.pack('>I', first) + size.to_bytes(5, 'big') + (off + toc_size).to_bytes(5, 'big')
-    toc = entries2 + bytes(blocks)
-    head = b'PSAR' + struct.pack('>HH4sIIIII', 1, 4, comp.encode(), toc_size, 30, len(payloads), BS, 12)
+    toc = entries2 + block_table
+    head = b'PSAR' + struct.pack('>HH4sIIIII', 1, 4, comp.encode(), toc_size, 30, len(payloads), block_size, 12)
     data = head + toc + body
     return tamper(data) if tamper else data
 
@@ -74,6 +77,13 @@ class Tests(unittest.TestCase):
         self.assertEqual(a.read(1), b'A' * 100)
         self.assertEqual(a.read(2), bytes(range(40)))
         self.assertEqual(a.read(1, 5), b'AAAAA')
+
+    def test_block_table_values_use_width_from_block_size(self):
+        payload = bytes(range(256))
+        a = self.open(build([('a', payload)], block_size=257))
+        self.assertEqual(a.width, 2)
+        self.assertEqual(a.blocks[a.entries[1]['block']], 256)
+        self.assertEqual(a.read(1), payload)
 
     def test_newline_manifest_accepted(self):
         a = self.open(build([('p/q', b'1'), ('r', b'2')], manifest_sep=b'\n'))
