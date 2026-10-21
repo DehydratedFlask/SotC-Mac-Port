@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 17:44 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 17:45 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -13,9 +13,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - All three claimed test-only tasks are `FIXTURE_VERIFIED`: empty-subsystem diagnostics text, malformed partial-width PSARC table rejection, and exact maximum save-stream file-size boundary. Evidence E230–E232 records the changes, worker/root results, hashes, and limitations in the [Round76 completion checkpoint](docs/checkpoints/2026-10-21-root-round76-fixtures-complete.md); pre-change baselines and claims are in the [claim checkpoint](docs/checkpoints/2026-10-21-root-round76-fixture-claims.md).
 - Owners and sole test files: `/root/launcher_review` — `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift`; `/root/review_host_proto` — `scripts/test_psarc.py`; `/root/round68_native_scout` — `native/tests/test_save_stream_file.cpp`. Worker and root checks each pass: 5 `CoreReadinessTests`, 38 PSARC tests, and native target build plus focused CTest 1/1. Each task has one successful implementation attempt and zero failed tries; production hashes are unchanged.
 - The batch is synthetic-only: formatter output, malformed synthetic TOC width, and an invalid sparse zero-version file that passes the exact size boundary. The last fixture reads about 100 MiB. No game save, real archive, launcher UI, or game behavior is claimed. G0 remains PARTIAL; G1–G6 remain NOT RUN. Project index is current at 14,475 folders; Trail wiring is synced at 3,578 nodes. The graph cache is local and ignored.
-- Completion preflight passes: staged path audit accepts 9 allowlisted paths, full tracked-path audit accepts 1,657 paths, and `git diff --cached --check` exits 0. Publication evidence is in the completion checkpoint; the completion commit/push is next.
+- Round76 completion is published as `7bc6dff58aae425db3b5ffcdafcc1fae143e40a0`; `git push origin main` succeeded and a subsequent `git fetch origin main` confirmed `HEAD == origin/main` with 0/0 divergence. Preflight accepted 9 staged paths and 1,657 full-tree paths; details are in the [Round76 completion checkpoint](docs/checkpoints/2026-10-21-root-round76-fixtures-complete.md).
 - Claim commit `ec88e14f829f2079758a7873a38bc468d081660f` is pushed and fetch-verified at `origin/main`; publication and dispatch evidence is in the [claim checkpoint](docs/checkpoints/2026-10-21-root-round76-fixture-claims.md). Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and excluded.
-- Exact next action: finish staged/full path audits and publish/fetch-verify the Round76 completion checkpoint, then scout the next independent bounded tasks from `docs/TASKS.md` and the live Trail graph.
+- Exact next action: scout the next independent bounded tasks from `docs/TASKS.md` and the live Trail graph, claim them, and continue implementation.
 
 ## Round 75 fixtures verified (/root)
 
