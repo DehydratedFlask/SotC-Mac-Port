@@ -1,12 +1,46 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 11:59 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 12:02 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 35 (`/root`)
+
+- Completed `AUD-PUBLISH-GIT-NUL-FILENAME-FIXTURE-01`, `FIXTURE_VERIFIED` with zero failed tries.
+  `/root/review_host_proto` and root each pass `PYTHONDONTWRITEBYTECODE=1 python3 -I
+  scripts/test_audit_publish_paths.py` (8/8). A mocked staged Git result containing one embedded
+  newline is returned as one path; the fixture also asserts `git diff --cached --name-only -z`
+  and `cwd=audit.ROOT`. Test SHA256 is
+  `2759f5b9f554388ca7fd95ab2ee6457d16af995d3f0e86bbe85458422e65d2ac`; production audit
+  `scripts/audit_publish_paths.py` is unchanged at
+  `2ea984cfb38329f4a9ec0b46300b0513998a1a642d224572906cee531653bba3`. E148 and the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-aud-publish-git-nul-filename-complete.md)
+  record worker/root logs and hashes.
+- The claim publication for this task is recorded at [round 33](docs/checkpoints/2026-10-21-root-round33-publication.md).
+  `trail build` parsed the test and rebuilt 3,537 nodes / 4,758 edges; `trail build --check` passed.
+- Actual game acceptance gates remain open. Only the pre-existing `native/api/CMakeLists.txt`
+  modification and untracked `native/api/host/` remain outside the task.
+- Exact next action: update and check the folder index, then path-audit, commit, and push the fixture
+  completion and publication record.
+
+## Session addendum 2026-10-21 round 34 (`/root`)
+
+- Published the claim for `AUD-PUBLISH-GIT-NUL-FILENAME-FIXTURE-01` in commit
+  `c640c20b9bf48f720a5e4e8d87e82bd45d798e59` (`docs: claim NUL-safe audit filename fixture`);
+  the push succeeded and HEAD matches `origin/main`. See the
+  [round 33 publication checkpoint](docs/checkpoints/2026-10-21-root-round33-publication.md).
+- The task remains `ACTIVE` with zero failed tries. `/root/review_host_proto` now owns only
+  `scripts/test_audit_publish_paths.py`; root owns shared docs and will replay the focused test.
+- Pre-push checks passed: project index current at 14,234 folders; source graph current at 3,536
+  nodes; staged-path audit accepted 5 paths and full-path audit accepted 1,542 paths. The only
+  unrelated dirty paths remain the pre-existing `native/api/CMakeLists.txt` and `native/api/host/`.
+- Actual game acceptance gates remain open.
+- Exact next action: review the worker diff and root-replay
+  `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audit_publish_paths.py`.
 
 ## Session addendum 2026-10-21 round 33 (`/root`)
 
