@@ -76,6 +76,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(a.paths(), ['a/x.bin', 'b/y.bin', 'z'])
         self.assertEqual(a.read(1), b'A' * 100)
         self.assertEqual(a.read(2), bytes(range(40)))
+        self.assertEqual(a.read(3), b'')
         self.assertEqual(a.read(1, 5), b'AAAAA')
 
     def test_block_table_values_use_width_from_block_size(self):

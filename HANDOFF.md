@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 16:39 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 16:44 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,7 +8,7 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Round 72 fixture claims (active)
+## Round 72 fixtures verified (/root)
 
 - Claimed three independent, test-only tasks: reading an empty synthetic PSARC member, including
   `.stopping` in launcher core diagnostics, and rejecting a carve lead larger than the free region.
@@ -17,11 +17,24 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Owners: `/root + review_host_proto` owns only `scripts/test_psarc.py`; `/root + launcher_review`
   owns only `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift`; `/root + round68_native_scout`
   owns only `native/tests/test_free_list_carve.cpp`. `/root` remains sole integrator for shared docs.
-- Claim commit `df1af7d60f48c4b51222f6fb7705f93fa7eaae1c` is pushed to `origin/main` after the
-  staged and full path audits passed. The Round71 checkpoint sync and Round72 claim checkpoint
-  record the publication. Implementation has not started. Next exact action: dispatch each
-  single-file edit. User-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain
-  untouched and excluded.
+- Three tasks are `FIXTURE_VERIFIED` with one successful implementation attempt and zero failed
+  tries. E216–E218 and the [completion checkpoint](docs/checkpoints/2026-10-21-root-round72-fixtures-complete.md)
+  record the exact worker/root commands, log hashes, production/test hashes, observations, and limits.
+  Each edit is confined to its claimed test file; production files are unchanged.
+- Worker and root checks pass: 36 PSARC tests, 3 `CoreReadinessTests`, and the free-list-carve
+  target build plus focused CTest 1/1. The fixtures cover an empty synthetic archive member, a
+  synthetic diagnostic formatter value, and pure carve-fit arithmetic only. They do not establish
+  real archive behavior, runtime diagnostics, allocator integration, or any game acceptance gate.
+- Claim commit `df1af7d60f48c4b51222f6fb7705f93fa7eaae1c` and docs sync commit
+  `963adb58cfbaab654d1d11b663cbfb6405768073` are pushed; the claim and completion checkpoints
+  record the claim publication. User-owned `native/api/CMakeLists.txt` and untracked
+  `native/api/host/` remain untouched and excluded.
+- Folder index is current at 14,467 folders. Trail was refreshed to 3,572 nodes / 4,837 edges /
+  943 cards; `trail build --check` passes. An initial folder-index check was stale because a new
+  private log path was created after generation; precreating the log paths and regenerating made
+  the check current. The attempted fixtures themselves had no failed runs. Next exact action: run
+  staged/full path audits, commit, and push this completion. The user-owned `native/api` changes
+  remain untouched and excluded.
 
 ## Round 71 fixtures verified (/root)
 
