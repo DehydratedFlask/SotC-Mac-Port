@@ -47,6 +47,7 @@ Observed on this title (from members.jsonl, no re-extract):
 - TOC digest differs on 35,734 shared paths; casefold collisions within/across layers: **0**
 - The E75 audit of all seven member manifests found **0** exact duplicate path groups, **0** within-manifest `casefold()` collision groups and **0** differently spelled cross-archive pairs across all 21 archive pairs. This covers only these manifests; it does not prove filesystem/Fios case behavior or mount order.
 - The E77 exact-path overlap inventory covers the same seven manifests and all 21 unordered pairs: **40,216** shared-path pair occurrences, with **4,704** equal and **35,512** different TOC-declared-size comparisons. Equal declared sizes do not prove equal member bytes; this is path/size metadata only and says nothing about archive payloads, overlay priority, Fios, mount order, or game use.
+- The E123 TOC-field comparison covers those same 40,216 exact-path pair occurrences: **4,479** pairs have equal 16-byte values and **35,737** differ. This is an opaque metadata comparison; it does not prove content equality, digest semantics, overlay precedence, mount order, or game use.
 - Status: **PROVISIONAL_OBS**. Patch contains every base path, so a patch-wins overlay is
   consistent with the TOC data; engine Fios/loader mount order is still **unproven** (RE/CPU).
 
