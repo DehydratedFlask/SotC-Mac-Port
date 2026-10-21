@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 09:26 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 09:29 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -61,11 +61,15 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   unknown. No names, native data, or registration were added. See
   [the claim](docs/checkpoints/2026-10-21-root-cpu01-slot23-consumers-claim.md) and
   [the partial checkpoint](docs/checkpoints/2026-10-21-root-cpu01-slot23-consumers-partial.md).
-- Also claimed `DATA-02-PAKN-TOC-DIGEST-UNIQUENESS-01`, a metadata-only count of the 16-byte TOC
-  field exported as `md5` in pakN's private member manifest. Input SHA256 is
-  `ee7c927e8ae3b28b20d61bb460c0c3c6c783cf0a7242df366f968949d5d21075`; the count will not infer
-  digest semantics or read payloads/paths. See
-  [the claim](docs/checkpoints/2026-10-21-root-data02-pakn-toc-digest-claim.md).
+- `DATA-02-PAKN-TOC-DIGEST-UNIQUENESS-01` is ARTIFACT_VERIFIED: a root-owned metadata aggregate
+  over the pakN manifest found 64,108 rows and 64,108 unique TOC values, with no repeated value
+  groups. Two executions were byte-identical; input SHA256 remained
+  `ee7c927e8ae3b28b20d61bb460c0c3c6c783cf0a7242df366f968949d5d21075`. This establishes
+  uniqueness in this manifest only; digest semantics remain UNKNOWN. See E122 and the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-data02-pakn-toc-digest-complete.md).
+- Next exact action: claim `DATA-02-ARCHIVE-OVERLAP-TOC-DIGEST-01` for a separate aggregate of
+  TOC-value equality across exact-path overlaps in the seven existing manifests, then independently
+  replay it from root. Preserve only aggregate counts; no payload or digest-semantics claim.
 - After reconfigure, `test_registration_thunks_ahead` built and its focused CTest passed 1/1.
   The host library and child executable build. The first host target build failed at line 508
   because `WIFEXITED` received temporary `reap(unused)`; storing status in a local made the target
