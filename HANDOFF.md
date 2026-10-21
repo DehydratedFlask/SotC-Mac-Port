@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 14:44 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 14:50 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -14,6 +14,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   handoff/index finalization commit `7593e52cc87b413b968f2ee75aa81e58bad30cf3` is also on
   `origin/main`. Exact claims and dispatch are in
   [the Round 64 claim checkpoint](docs/checkpoints/2026-10-21-root-round64-fixture-claims.md).
+- Completion commit `941011b08a3bb445747c8a49385bbba0b2ad982a` is pushed to `origin/main`.
+  Post-push state is recorded in the completion checkpoint; this final docs-only update records
+  that publication and moves the next action to Round65 scouting.
 - APP-01 pins the exact failed-state copy; DATA-02 parses a synthetic final JSONL record without a
   newline; SRV-01 pins host-map alignment just above 1 MiB. Root reviewed each one-file diff and
   independently replayed every focused command. Worker and root results pass; E190–E192 and
