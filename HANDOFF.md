@@ -1,9 +1,20 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 21:24 CDT (America/Chicago). Principal: `/root`.
+Updated: 2026-10-20 21:32 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation: G0 PARTIAL; G1-G6 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 21:24 CDT, `/root` — native save-body checksum claimed
+## CURRENT CHECKPOINT — 2026-10-20 21:32 CDT, `/root` — user-directed stop
+
+The user explicitly requested stopping. All workers are stopped and no task-owned REA/Ghidra process remains. Goal is PAUSED; resume only on a new user request. Full checkpoint: [user-stop record](docs/checkpoints/2026-10-20-root-user-stop-checkpoint.md). Public checksum files are preserved as unintegrated WIP; worker standalone checks passed, root replay/CMake/README/CTest acceptance remain pending. Do not count this as a completed task or game gate.
+
+- `SAV-01-NATIVE-CHECKSUM-01`: PAUSED, four files preserved;0 failed implementation tries. No serializer or actual-save claim.
+- `CPU-01-CTOR10-OBJECT-INIT-01`: PAUSED, `0xb30950` retry exit0 (Evidence `ev_5244df9c0cdd09628007481ae7de7c3d4adf109c3e1e1956257103fe018e264e`); `0xe44a10` interrupted by user stop, partial capture unaccepted.1 infrastructure failed try,0 rejected analysis hypotheses,1 separately recorded user interruption. No native slot10 registration.
+- `SAV-01-LOADER-01`: PAUSED,2 failed checker tries followed by successful worker try3; report/manifest/root review/replay pending. q1/q2 captures preserved; no provider rerun.
+- `AUD-02-WAITLOOP-01`: READY, not started beyond copied helper.
+
+Graft reports STALE (14 new WIP nodes), explicitly deferred at user stop; reference coverage missing. Rebuild/prove new files queryable upon resumption. G0 PARTIAL; G1-G6 NOT RUN. Full private identity manifest SHA `a30b8792204b5b7ae7f514cfb55176bd7e9dbbc5e10f749a386f35cec4a851f8`; files/commands/results/limits and exact next actions are in the checkpoint. Pre-existing `tools/graft/` remains unstaged. Final action is checkpoint-only index/audit/commit/push, then stop.
+
+## PRIOR CHECKPOINT — 2026-10-20 21:24 CDT, `/root` — native save-body checksum claimed
 
 `SAV-01-NATIVE-CHECKSUM-01` is CLAIMED; worker `/root/aud02_waitloop_resume_audit` owns new `native/core/save_checksum.{hpp,cpp}`, `native/tests/test_save_checksum.cpp`, and `tools/lift/check_f161f50.py`. Root owns CMake/README and shared records/Git. Implement only `fnv1a32(span<const byte>, uint32_t seed)` as ordinary native C++ for the nonnegative raw-byte domain used by verified Save/Load callers; keep seed explicit. The original `0x161f50` helper zero-extends each byte, XORs with the 32-bit state and multiplies by `0x01000193` modulo 2^32; empty input returns seed. Save/Load use `0x811c9dc5` over body only. Chunk-name uppercasing belongs to a different helper and is outside this primitive.
 
