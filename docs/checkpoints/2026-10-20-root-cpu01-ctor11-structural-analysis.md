@@ -18,8 +18,12 @@ published vptr and its misalignment branch formats that class name at RVA `0x132
 `0x3356080`, creator `FUN_00f06cd0`), exactly mirroring slot 10's accessor shape.
 
 The class constructor `FUN_00f06410` is 1,021 bytes and initializes many small records through
-`FUN_00f06a40`; it is materially more complex than `ClothingPreviewParam`. Registering slot 11
-without that contract would require an opaque placeholder, which the project forbids.
+`FUN_00f06a40`; it is materially more complex than `ClothingPreviewParam`.
+
+The singleton creator `FUN_00f06cd0` allocates `0x2bf0` bytes = **74 records of `0x98` bytes** and
+fills them with a PhysX-style reflection schema (`FUN_00e1de80` per record, then `FUN_00e1df60`
+named attributes `STRUCT`/`physicalMesh`/`numVertices`/…/`vertices`/`normals`). Registering slot 11
+natively would therefore require the reflection/attributes subsystem, not just a mutex.
 
 ## Files
 
