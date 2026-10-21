@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 15:56 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 16:00 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -16,6 +16,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   and a PSARC prefix read when only a later compressed block is truncated. Baselines pass 11 Swift,
   24 dynlink, and 35 PSARC tests, respectively; the claim checkpoint records commands, hashes,
   logs, and scope limits.
+- Claim commit `4fabeb0ebbc759a3d9bec424e8f39d48893fc83e` is pushed to `origin/main`; post-push
+  `HEAD == origin/main`, with zero divergence. The completion of publication is recorded in the
+  checkpoint's publication addendum.
 - Claims have zero failed tries and zero implementation attempts. Root owns shared documentation;
   `/root/launcher_review`, `/root/review_host_proto`, and `/root/round68_data_scout` own only their
   respective existing test files after claim publication. No production change is proposed.
@@ -24,8 +27,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - The native scouts found no claim for this round: `region_list` already has the proposed cases;
   a nonaligned free-list page-budget fixture was deferred because E164 covers a related partial-page
   edge and the helper has no production caller establishing that direct input as a contract.
-- Exact next action: verify the claim commit is on `origin/main`, dispatch the three single-file
-  fixture tasks, review each diff, and independently replay its focused suite before completion.
+- Exact next action: dispatch the three single-file fixture tasks, review each diff, and
+  independently replay its focused suite before completion.
 
 ## Round 67 fixtures verified (/root)
 
