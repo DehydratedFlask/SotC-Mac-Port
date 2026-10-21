@@ -20,11 +20,14 @@ int main() {
     CHECK(reserve_alignment(0x10000) == 0x100000u);
     CHECK(reserve_alignment(0x100000) == 0x100000u);
     CHECK(reserve_alignment(0x100001u) == 0x200000u);
+    CHECK(reserve_alignment(0x300000u) == 0x300000u);
     CHECK(reserve_alignment(0x20000000) == 0x20000000u);  // Shadow edx
 
     // Maximum size wraps during page rounding and must be rejected before mmap.
     CHECK(!map_anonymous_aligned(~std::uint64_t{0}, 0x100000).has_value());
     CHECK(!map_anonymous_aligned(0, 0x100000u).has_value());
+    // A rounded 3 MiB alignment is not a power of two and is rejected before mmap.
+    CHECK(!map_anonymous_aligned(0x1000u, 0x300000u).has_value());
 
     // Small aligned map: RW + alignment + heap_window derivation.
     {
