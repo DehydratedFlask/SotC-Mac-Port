@@ -81,6 +81,8 @@ int main() {
     with_payload[12] = std::byte{0xAA};
     const auto parsed_long = parse_save_chunk_header(with_payload);
     CHECK(parsed_long.error == ChunkParseError::none);
+    CHECK(parsed_long.header.name_hash == header.name_hash);
+    CHECK(parsed_long.header.tag == header.tag);
     CHECK(parsed_long.header.payload_length == header.payload_length);
 
     // --- truncation at every length 0..11 ----------------------------------------------------
