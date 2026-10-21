@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 08:49 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 08:51 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -14,18 +14,18 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   uncommitted native counterpart for constructor slots 24–47, with a test-only ahead table that
   cannot bypass unresolved production slot 23. Claim record:
   [docs/checkpoints/2026-10-21-root-cpu01-native-slot24-47-claim.md](docs/checkpoints/2026-10-21-root-cpu01-native-slot24-47-claim.md).
-- Starting checkout: `main` at `57a5282`, matching `origin/main`. An unfinished native diff was
-  already present before this task: changes under `native/core/`, CMake registrations, a new ahead
-  constructor fixture, and a separate untracked `native/api/host/` protocol implementation. Root
-  has not changed those implementation files yet. The host protocol is outside this task until
-  separately claimed.
+- Claim-time checkout: `main` at `57a5282`, matching `origin/main`. An unfinished native diff was
+  already present before this task under `native/core/`, CMake registrations, a new ahead
+  constructor fixture, and a separate `native/api/host/` implementation. Root has since reviewed
+  and corrected comments/test scope and the slot-table checker; host protocol work was separately
+  claimed below.
 - Graft located the ahead-table symbol in `native/core/startup_ctors.{hpp,cpp}`, its state in
-  `registration_thunks.hpp`, and the new focused test. The code comments keep it outside the
-  production constructor list; this claim has not yet run the test or checker.
-- Next exact action: inspect the focused fixture and checker contract, build/run the ahead-table
-  test, replay `tools/lift/check_ctor_slots.py`, and prove the production runner still stops at
-  index 23. Record results before any code commit. Slot 23 and G1 remain unresolved.
-- Progress checkpoint: `check_ctor_slots.py`, `verify_ctor_family.py`, and `check_ctor_thunks.py`
+  `registration_thunks.hpp`, and the focused test. The test-only range is kept outside production.
+- Current CPU-01 result: `check_ctor_slots.py`, `verify_ctor_family.py`, and `check_ctor_thunks.py`
+  exited 0; `test_registration_thunks_ahead` built and focused CTest passed 1/1 under the ARM64
+  ASan/UBSan build. The test asserts production stops at index 23; no G1 or game startup claim.
+  The first missing-target build failure and CMake recovery are recorded in the linked checkpoint.
+- First-build checkpoint: `check_ctor_slots.py`, `verify_ctor_family.py`, and `check_ctor_thunks.py`
   exited 0. The focused build command exited 2 before compilation because Make has no rule for
   `test_registration_thunks_ahead`; count this as failed try 1, with no native test run. Inspect
   `local/build/native/CMakeCache.txt`, then explicitly reconfigure the same ARM64/sanitizer build if
@@ -37,25 +37,27 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   exit code, and the parent test writer can receive SIGPIPE. Worker owns only `native/api/host/`
   sources/tests; root remains the sole integrator for handoff/task/evidence files. Record:
   [docs/checkpoints/2026-10-21-root-app01-core-host-claim.md](docs/checkpoints/2026-10-21-root-app01-core-host-claim.md).
-- Host task's next exact action: fix those protocol and pipe-test defects, then return a concise
-  checkpoint with exact changed files and the suggested focused CMake/CTest command. `start` still
-  returns `ENGINE_NOT_IMPLEMENTED`; this work is not launcher IPC integration or G4 evidence.
+- Host task's next exact action: fix the failing closed-output test fixture, rerun focused CTest,
+  then review the child-process cases. `start` still returns `ENGINE_NOT_IMPLEMENTED`; this is not
+  launcher IPC integration or G4 evidence.
 - Host worker implementation is now ready in the four assigned `native/api/host/` files. It adds
   configured hello limits, distinguishes stream read errors from EOF, tightens the exit-code check,
-  and handles SIGPIPE/EPIPE in the parent pipe writer. No build or test has run; root will verify it
-  after checking the native build configuration. See
+  and handles SIGPIPE/EPIPE in the parent pipe writer. The initial implementation checkpoint was
+  written before root's build verification. See
   [the implementation checkpoint](docs/checkpoints/2026-10-21-root-app01-core-host-implementation.md).
-- Current CMake cache is confirmed to be this `native/` tree, Unix Makefiles, arm64, and
-  `SOTC_SANITIZE=ON`; the missing target is from stale generation. The source graph was rebuilt
-  with the original scopes preserved plus `native`, `launcher`, and `tests`; `trail build --check`
-  now passes and Graft resolves the new ahead-table test file. Next explicitly reconfigure this
-  build and run the constructor and host focused tests. See
+- CMake was reconfigured for this `native/` tree with Unix Makefiles, arm64, and `SOTC_SANITIZE=ON`.
+  The source graph was rebuilt with the original scopes preserved plus `native`, `launcher`, and
+  `tests`; `trail build --check` passes and Graft resolves the new ahead-table test file. See
   [the failed-build checkpoint](docs/checkpoints/2026-10-21-root-cpu01-slot24-47-build-target-failure.md).
 - After reconfigure, `test_registration_thunks_ahead` built and its focused CTest passed 1/1.
-  The host library and child executable build, but its test target fails at line 508 because
-  `WIFEXITED` receives the temporary `reap(unused)` expression. Host try 1 is recorded; store the
-  status in a local, rebuild, and run the focused host CTest. See
-  [the host build checkpoint](docs/checkpoints/2026-10-21-root-app01-core-host-build-failure.md).
+  The host library and child executable build. The first host target build failed at line 508
+  because `WIFEXITED` received temporary `reap(unused)`; storing status in a local made the target
+  compile. Focused CTest then failed at line 333 because the output-failure fixture did not make the
+  stream fail. Host try 2 is recorded; make the flush fail deterministically and run focused CTest
+  as try 3. See
+  [the host build checkpoint](docs/checkpoints/2026-10-21-root-app01-core-host-build-failure.md)
+  and [the output-fixture checkpoint](docs/checkpoints/2026-10-21-root-app01-core-host-output-test-failure.md),
+  which records the current failure and stop threshold.
 
 ## Session addendum 2026-10-21 round 2 (orchestrator)
 
