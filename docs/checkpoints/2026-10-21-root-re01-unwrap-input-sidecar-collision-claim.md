@@ -2,7 +2,7 @@
 
 - Local time: 2026-10-21 10:37 CDT (America/Chicago).
 - Agent / integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`); worker after claim publication: `slot23_raw_xrefs`.
-- Task status / attempts: ACTIVE; zero failed implementation tries. The planned pre-guard failing regression is test-first evidence, not an unsuccessful implementation try.
+- Task status / attempts: FIXTURE_VERIFIED; zero failed implementation tries. The planned pre-guard failing regression is test-first evidence, not an unsuccessful implementation try.
 - Bounded scope: make `scripts/unwrap_self.py` reject before any output write when the derived `destination.with_suffix(".identity.json")` path refers to the same file as the SELF input. Add one synthetic regression using the existing fixture helpers in `scripts/test_project_tools.py`; assert rejection, unchanged input bytes, and no ELF output. Worker owns only those two files. Root owns task/handoff/evidence records.
 - Prerequisites: `RE-01` is STATIC_ANALYSIS_VERIFIED and `RE-01-ELF-PHDR-TRUNCATION-FIXTURE-01` is FIXTURE_VERIFIED.
 
@@ -18,15 +18,17 @@
 
 - Expected pre-guard check: add the regression and run `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py`; the assertion must fail because the current wrapper overwrites the source with sidecar JSON. Save it as `local/validation/re01-unwrap-input-sidecar-collision/attempt-1.log`.
 - Acceptance command after the narrow guard: `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py`.
-- Exact commands/results so far: no task test has run; status NOT RUN. No code or test changes have been made. No task log exists yet.
+- Exact commands/results: the test-first regression failed before the guard as expected, showing `source_overwritten=True` and `elf_output_created=True`; log `local/validation/re01-unwrap-input-sidecar-collision/attempt-1.log`, SHA-256 `893f32e3c6289aad3ef5a0ff342322bbf6126db0d66b6b40e3b483c4eddcfcad`. Worker acceptance command `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py` exited 0 with 6/6; log `attempt-2.log`, SHA-256 `c7898f18dd249b374a1833944d38eeddf70146cd940bf3f3e855c78d64db67d1`. Root independently replayed the same command, exit 0 with 6/6; `root-replay.log` has the same SHA-256. The final guard rejects the alias before reads or writes, and the fixture verifies unchanged source bytes and no ELF output.
 - Claim-index command `python3 scripts/project_index.py` exited 0 and reported 14,209 folders indexed; `docs/FOLDERS.md` now includes this claim checkpoint. Log: `local/checkpoints/root-re01-unwrap-input-sidecar-collision-claim/project-index.log`.
 - Claim graph command `trail build --check` exited 0 with the wiring graph in sync; deep layer remains unbuilt. Log: `local/checkpoints/root-re01-unwrap-input-sidecar-collision-claim/trail-check.log`.
-- Files changed to claim: `HANDOFF.md`, `docs/TASKS.md`, generated `docs/FOLDERS.md`, and this claim checkpoint. No source/test changes.
+- Final source hashes: `scripts/unwrap_self.py` `165333d29aaab4fb2529a796bdaa796574402245e65579b85ecabee3784fc0d8`; `scripts/test_project_tools.py` `e0edd276090e436377d2bf74dc6b852ca5aa742b0172906f8fa069a72058b51a`.
+- After the worker edit, `trail build` exited 0 and `trail build --check` exited 0 (wiring graph in sync; deep layer remains unbuilt). Logs are under `local/checkpoints/root-re01-unwrap-input-sidecar-collision-claim/`.
+- Files changed: `HANDOFF.md`, `docs/TASKS.md`, generated `docs/FOLDERS.md`, this claim checkpoint, `scripts/unwrap_self.py`, and `scripts/test_project_tools.py`. E132 and a separate completion checkpoint now record the verified result.
 - Claim publication gates: `python3 -I scripts/audit_publish_paths.py` exited 0 for 4 staged allowlisted paths; `python3 -I scripts/audit_publish_paths.py --all` exited 0 for 1,503 allowed tracked paths; `git diff --cached --check` exited 0. Logs: `local/checkpoints/root-re01-unwrap-input-sidecar-collision-claim/{audit-staged.log,audit-all.log,cached-check.log}`. Escalated host files remain unstaged.
 - Observation: the sidecar writer can target the input path. Inference: a same-file check before creating/writing outputs prevents this exact destructive collision.
-- Remaining limits: synthetic plaintext SELF fixture only; no original game input, executable, firmware, or game runtime is read or used. No G1/G2/game gate claim follows. Keep worker logs under `local/validation/re01-unwrap-input-sidecar-collision/`.
+- Remaining limits: synthetic plaintext SELF fixture only; no original game input, executable, firmware, or game runtime is read or used. No G1/G2/game gate claim follows.
 - Claim publication checkpoint:
   - Local time: 2026-10-21 10:39 CDT (America/Chicago). Integrator: `/root`; task `RE-01-UNWRAP-INPUT-SIDECAR-COLLISION-01`; ACTIVE, zero failed implementation tries.
   - Exact command: `git push origin main`; exit 0, advanced `6811f52..90a5d99`. `git rev-parse HEAD` and `git rev-parse origin/main` both returned `90a5d99413dfe53236828f3f963121ac7045186c`. Push output was not saved separately.
-  - Observation: the task claim and acceptance boundary are published; no implementation or test result exists yet.
-  - Next exact action: dispatch the two owned files to `slot23_raw_xrefs`, requiring the pre-guard failure and post-guard focused pass. Root will review and independently replay.
+  - Observation: the task claim and acceptance boundary are published; implementation is now independently replayed and FIXTURE_VERIFIED.
+  - Next exact action: publish E132, the updated task row and completion checkpoint. Then continue the separately claimed audit filename fixture.

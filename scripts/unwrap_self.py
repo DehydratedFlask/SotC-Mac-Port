@@ -8,6 +8,9 @@ import runpy
 
 
 def unwrap(source, destination):
+    identity_path = destination.with_suffix(".identity.json")
+    if identity_path.exists() and source.samefile(identity_path):
+        raise ValueError(f"identity sidecar would overwrite source: {source}")
     reader = Path(__file__).resolve().parents[1] / "reference/ShadowOfTheColossus-PC/scripts/prepare.py"
     data = source.read_bytes()
     elf, header, programs, segments, missing = runpy.run_path(str(reader), run_name="sotc_reader")["parse_self"](data)
@@ -24,7 +27,7 @@ def unwrap(source, destination):
         "program_headers": programs, "self_segments": segments, "missing_segments": missing,
         "reader": str(reader), "limitation": "Plaintext segment reconstruction only; no code execution or source recovery."
     }
-    destination.with_suffix(".identity.json").write_text(json.dumps(record, indent=2) + "\n")
+    identity_path.write_text(json.dumps(record, indent=2) + "\n")
     return record
 
 
