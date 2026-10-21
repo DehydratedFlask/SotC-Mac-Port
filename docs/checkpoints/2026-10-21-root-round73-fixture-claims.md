@@ -84,3 +84,67 @@ these fixtures advances a game acceptance gate. Remaining risks are limited to t
 scope until implementation and independent replay. Current status is ACTIVE for each task, 0
 implementation attempts, 0 failed tries. Next exact action: publish this documentation sync, then
 dispatch each worker to edit only its claimed test file and run the focused check.
+
+## Post-claim documentation sync checkpoint
+
+Checkpoint time: 2026-10-21 16:53 CDT (America/Chicago). Agent: `/root`. Task IDs: all three Round73
+fixture claims. Files changed in this sync: `HANDOFF.md` and this checkpoint; the task rows, folder
+index, and initial claims remain in the preceding published commit. No test or production file
+changed.
+
+- `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/project_index.py --check`: exit 0, 14,468 folders
+  indexed and current; log SHA-256 `f13eeff12b22e2aa01a70e27c6f29f138992718cb3930a53033129c3f47e7d21`.
+- `trail build --check`: exit 0, wiring graph in sync at 3,572 nodes / 4,837 edges / 943 cards;
+  deep meaning layer remains unbuilt; log SHA-256
+  `99342face5580b625b2480268e4e5b63ecfebc573b79c791cf004539b078027b`.
+- `git diff --cached --check` and `git diff --check`: exit 0. Staged audit passed 2 allowlisted
+  paths; full audit passed 1,650 paths. Logs: staged audit
+  `746df8fcc69acc411a5f568a1778ea6e0db466c42db10faa6b0e53af94d83ba2`, full audit
+  `18ae020dfedd6f77c515205cfd74f0d1502898ed1d7fe2ae89a31cabe2d711d3`, diff
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+- `git fetch origin` succeeded; pre-commit divergence was `0 0`. Commit
+  `20683aae7cb0e99a14e0358a5580d295f68e1676` (`docs: record Round 73 claim publication`) pushed
+  successfully. A post-push fetch confirmed `HEAD == origin/main` and divergence `0 0`. Fetch,
+  state, commit, and push log hashes: `be87f0e1cb8b7e9cc5faeaeb535f1c7436d2a516681757485b7f9903e5bad082`,
+  `9708e3ab58922f71b8c55b26e92aa7137c607030845e12605203b16196ceb1b7`,
+  `cc45ffc010423ef3a51d4c1f87db4e43c58e4624cdd493bca2360bef8058007c`, and
+  `790e766af8aeefb66f14f842d6742c937ef36059c78fc6701457fe448745942a`.
+
+Observation: both claim commits are public, and the only remaining worktree changes are the
+pre-existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/`. Inference:
+none. Remaining risks are the unimplemented fixture assertions and their declared scope limits.
+All three tasks remain ACTIVE with 0 implementation attempts and 0 failed tries. Next exact action:
+dispatch each worker to edit only its claimed test file and run the focused command; `/root` will
+review diffs and independently replay all checks.
+
+## Pre-dispatch checkpoint
+
+Checkpoint time: 2026-10-21 16:53 CDT (America/Chicago). Agent: `/root`. Tasks: all three Round73
+fixture IDs. Claim base: `20683aae7cb0e99a14e0358a5580d295f68e1676`. This checkpoint updates only
+`HANDOFF.md` and this document; no test or production file is changed. Each worker remains limited
+to its separate claimed test file.
+
+- `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/project_index.py`: exit 0, 14,468 folders indexed;
+  `--check` exit 0 and current. Logs `dispatch-index-generate.log` SHA-256
+  `b8fde651bc090b143c0607ec67613ca52b902f336993b7fd221e7fd61a641f36` and
+  `dispatch-index-check.log` SHA-256
+  `f13eeff12b22e2aa01a70e27c6f29f138992718cb3930a53033129c3f47e7d21`.
+- `trail build --check`: exit 0, wiring graph in sync at 3,572 nodes / 4,837 edges / 943 cards;
+  deep meaning layer remains unbuilt. Log SHA-256
+  `99342face5580b625b2480268e4e5b63ecfebc573b79c791cf004539b078027b`.
+- `git diff --cached --check` and `git diff --check`: exit 0. `python3 -I
+  scripts/audit_publish_paths.py` accepted the 2 staged paths; `python3 -I
+  scripts/audit_publish_paths.py --all` accepted 1,650 tracked paths. Staged/full/diff log hashes:
+  `746df8fcc69acc411a5f568a1778ea6e0db466c42db10faa6b0e53af94d83ba2`,
+  `18ae020dfedd6f77c515205cfd74f0d1502898ed1d7fe2ae89a31cabe2d711d3`, and
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+- `git fetch origin` succeeded; `git rev-list --left-right --count HEAD...origin/main` returned
+  `0 0` at `20683aae7cb0e99a14e0358a5580d295f68e1676`. Fetch/state log hashes:
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` and
+  `aa02721cddfbf2f54bcf2dcc241dd6887cb477eb0345bf5e793ff513fe218824`.
+
+Observation: the documentation tree is current, the allowed publication set contains only the
+handoff and checkpoint, and the remote has no divergence. Inference: none. Risks remain confined to
+the unimplemented synthetic test assertions. All tasks are ACTIVE, with 0 implementation attempts
+and 0 failed tries. Next exact action: commit/push this pre-dispatch checkpoint, then dispatch the
+three workers in parallel; root will validate their edits and replay their focused checks.
