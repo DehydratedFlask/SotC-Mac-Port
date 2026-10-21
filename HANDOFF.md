@@ -1,12 +1,51 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 13:18 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 13:20 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 58 fixture claims (`/root`)
+
+- Claimed three independent synthetic fixture tasks with zero failed tries before implementation:
+  `APP-01-LIFECYCLE-UNEXPECTED-EXIT-EXACT-COPY-FIXTURE-01` adds exact status/recovery-hint assertions
+  to the existing launcher status-copy test; `DATA-02-OVERLAP-MAP-DUPLICATE-ARCHIVE-IDENTIFIERS-FIXTURE-01`
+  pins the existing duplicate-ID guard; `SRV-01-REGION-LIST-EMPTY-HEAD-INSERT-FIXTURE-01` covers
+  insertion into an empty synthetic list.
+- Claims and source/test hashes are in
+  [round 58 claim checkpoint](docs/checkpoints/2026-10-21-root-round58-fixture-claims.md). Each task
+  has an existing test file, a focused command, unchanged production code, and a separate owner.
+- Live source observations: the launcher currently checks only partial unexpected-exit copy and a
+  nonempty recovery hint; `compare_member_maps` checks duplicate archive IDs before key-set parity,
+  while its existing fixture covers a different key-set guard; `list_insert_at_head` handles a null
+  old head, while the existing head-insertion fixture covers only a nonempty list. All three cases
+  remain synthetic and do not prove runtime/game behavior.
+- Claim-time state: `main` and `origin/main` match at `21b0ac4`; the only pre-existing local work is
+  the user-owned `native/api/CMakeLists.txt` modification and untracked `native/api/host/`. They
+  remain untouched and excluded.
+- Planned dispatch after claim publication: `/root/launcher_review` owns only
+  `launcher/Tests/LauncherCoreTests/LauncherStatusCopyTests.swift`;
+  `/root/review_host_proto` owns only `scripts/test_archive_overlap_map.py`; `/root/slot23_raw_xrefs`
+  owns only `native/tests/test_region_list.cpp`. Root owns shared docs and independent replay.
+- `python3 scripts/project_index.py` exited 0 and regenerated the folder index for 14,401 folders;
+  `docs/checkpoints` lists 343 and `logs` lists 93. Log `logs/root-round58-claim-project-index.log`,
+  SHA256 `1fce09b08a087681b67949e46317690178e639d219ac20fbf6999c6e81c8e6f9`. `trail build --check`
+  exited 0 with the wiring graph in sync at 3,551 nodes / 4,790 edges; log
+  `logs/root-round58-claim-trail-check.log`, SHA256
+  `1d6a8b7368552c48cb7630dfe051bb32e14cd65ebc74330bcb42255d15f9027f`. The optional deep concept
+  layer is not built. `git diff --check` exited 0.
+- Pre-push audit accepted all 4 staged paths; log `logs/root-round58-claim-audit-staged.log`, SHA256
+  `41386acd7ce72037de0a3d7dcfc4167adc0185ffe83c4cf256500f9d1e39dbe5`. Full path audit accepted
+  1,610 paths; log `logs/root-round58-claim-audit-all.log`, SHA256
+  `585781946f40998853916242d1376e8a33dcdb4fbc014b1882dcaa7201dbec8e`. `git diff --cached --check`
+  and `git diff --check` both exited 0.
+- Exact next action: restage only `HANDOFF.md`, `docs/TASKS.md`, `docs/FOLDERS.md`, and the round 58
+  claim checkpoint after this handoff edit; rerun staged/full audits, commit with
+  `docs: claim round 58 synthetic edge fixtures`, and push `origin main`; only then dispatch the
+  three owners.
 
 ## Session addendum 2026-10-21 round 57 completion (`/root`)
 
