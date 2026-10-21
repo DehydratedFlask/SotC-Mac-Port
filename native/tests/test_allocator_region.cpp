@@ -39,6 +39,8 @@ int main() {
     }
     CHECK(!make_region_view(0, 0).has_value());
     CHECK(!make_region_view(~0ull - 8, 100).has_value());
+    auto end = make_region_view(~0ull - 15, 15);
+    CHECK(end && end->end() == ~0ull);
 
     std::puts("allocator_region: all checks passed");
     return 0;
