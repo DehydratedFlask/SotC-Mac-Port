@@ -161,6 +161,15 @@ class EntropyAndProbeTests(unittest.TestCase):
         self.assertTrue(probe['raw_inflate_offset0']['ok'])
         self.assertEqual(probe['raw_inflate_offset0']['out_len'], len(payload))
 
+    def test_raw_deflate_accepted_after_two_byte_prefix(self):
+        payload = b'D' * 64
+        compressor = zlib.compressobj(wbits=-15)
+        raw_stream = compressor.compress(payload) + compressor.flush()
+        wrapped = b'\x00\x01' + raw_stream
+        probe = cah.decompress_probe(wrapped)
+        self.assertTrue(probe['raw_inflate_offset2']['ok'])
+        self.assertEqual(probe['raw_inflate_offset2']['out_len'], 64)
+
 
 class ClassifyFixtureTests(unittest.TestCase):
     def test_codec_always_unknown_on_empty_set(self):
