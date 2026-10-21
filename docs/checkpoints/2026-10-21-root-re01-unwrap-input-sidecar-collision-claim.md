@@ -25,4 +25,8 @@
 - Claim publication gates: `python3 -I scripts/audit_publish_paths.py` exited 0 for 4 staged allowlisted paths; `python3 -I scripts/audit_publish_paths.py --all` exited 0 for 1,503 allowed tracked paths; `git diff --cached --check` exited 0. Logs: `local/checkpoints/root-re01-unwrap-input-sidecar-collision-claim/{audit-staged.log,audit-all.log,cached-check.log}`. Escalated host files remain unstaged.
 - Observation: the sidecar writer can target the input path. Inference: a same-file check before creating/writing outputs prevents this exact destructive collision.
 - Remaining limits: synthetic plaintext SELF fixture only; no original game input, executable, firmware, or game runtime is read or used. No G1/G2/game gate claim follows. Keep worker logs under `local/validation/re01-unwrap-input-sidecar-collision/`.
-- Next exact action after claim publication: assign the two owned files to `slot23_raw_xrefs`; require pre-guard failure evidence, then a passing focused suite. Root will review and independently replay the result.
+- Claim publication checkpoint:
+  - Local time: 2026-10-21 10:39 CDT (America/Chicago). Integrator: `/root`; task `RE-01-UNWRAP-INPUT-SIDECAR-COLLISION-01`; ACTIVE, zero failed implementation tries.
+  - Exact command: `git push origin main`; exit 0, advanced `6811f52..90a5d99`. `git rev-parse HEAD` and `git rev-parse origin/main` both returned `90a5d99413dfe53236828f3f963121ac7045186c`. Push output was not saved separately.
+  - Observation: the task claim and acceptance boundary are published; no implementation or test result exists yet.
+  - Next exact action: dispatch the two owned files to `slot23_raw_xrefs`, requiring the pre-guard failure and post-guard focused pass. Root will review and independently replay.
