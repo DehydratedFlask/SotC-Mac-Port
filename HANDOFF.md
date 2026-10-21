@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 10:52 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 10:53 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -13,16 +13,16 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - `RE-01-UNWRAP-INPUT-SIDECAR-COLLISION-01` is FIXTURE_VERIFIED with zero failed implementation
   tries. Worker and root each pass 6/6; E132 records the expected pre-guard failure, both passing
   logs and source hashes. Completion and claim records were pushed in `c8dd0b3`; no game gate advanced.
-- AUD-PUBLISH-SECRET-NAME-FIXTURE-01 is FIXTURE_VERIFIED with zero failed tries. The worker and
-  root each pass 7/7, recorded as E133. The test-only cases cover nested .ENV.local and
-  CREDENTIALS.txt names; production audit behavior did not change.
+- AUD-PUBLISH-SECRET-NAME-FIXTURE-01 is FIXTURE_VERIFIED with zero failed tries. Worker and
+  root each pass 7/7 (E133); the test-only cases cover nested .ENV.local and CREDENTIALS.txt
+  names. Completion and evidence were pushed in 8d463ab; the production audit stayed unchanged.
 - Graft confirmed the deny regex in `scripts/audit_publish_paths.py:30-42`; current tests cover
   nested forbidden components and file extensions but no `.env` or `credentials` names. Both
   prerequisite audit tasks are FIXTURE_VERIFIED.
 - Acceptance command: PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audit_publish_paths.py.
   Worker and root each pass 7/7; source graph is rebuilt and in sync after the new test method.
   The completion checkpoint records private log and source hashes.
-- Next exact action: publish the Task B evidence and completion record, then claim another bounded, non-escalated task.
+- Next exact action: select and claim another bounded, non-escalated task. Preserve escalated host paths and the slot-23 blocker.
   then record E133 and publish the Task B completion checkpoint. Escalated host paths remain out.
 - The secret-name claim checkpoint was reviewed, contains no credentials, and is published in c8dd0b3 despite the .gitignore:76 *secret* rule. The worker's test-only scope is now complete.
   `c8dd0b3` despite the `.gitignore:76` `*secret*` rule. The test-only work is assigned to
