@@ -120,6 +120,13 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   continue with the independent scout's candidate if still unclaimed. All real game acceptance gates
   remain unchanged.
 
+## Session addendum 2026-10-21 round 22 (`/root`)
+
+- Completed `DATA-02-ARCHIVE-MANIFEST-CRLF-01`, `FIXTURE_VERIFIED` with zero failed tries. Worker and root each pass `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_archive_overlap_map.py` (20/20). The synthetic two-record CRLF fixture preserves exact paths and sizes; test SHA256 `07ab59c0500a99ad13d3d0c15d63e525a06061ccef34fe734ab5e76b796665b7`; parser unchanged at `25889f7ff85db9154ba209bed4913b1bb9e1a627e8a984ef7c11580b24e982d1`. E143 and [completion checkpoint](docs/checkpoints/2026-10-21-root-data02-manifest-crlf-complete.md) record both logs.
+- Claimed `RE-02-DYNLINK-RELRO-IMAGE-FIXTURE-01`, `ACTIVE` with zero failed tries. Scout's Graft search found the `PT_SCE_RELRO` constant/header filter but no matching test. Add one synthetic `Image` fixture that checks mapped/read on a `PT_SCE_RELRO` segment; do not change parser behavior. Claim: [RELRO image fixture](docs/checkpoints/2026-10-21-root-re02-dynlink-relro-image-claim.md).
+- `review_host_proto` completed the CRLF test file; `launcher_review` will own only `scripts/test_ps4_dynlink.py` after this claim is published. Root owns all task/evidence/handoff documentation.
+- Next exact action: publish E143 and the RELRO claim, then dispatch `launcher_review` and root-replay its focused dynlink suite.
+
 ## Session addendum 2026-10-21 round 21 (`/root`)
 
 - Published the round 20 batch in commit `d19067e952736880d643b9d521d9eaaa5316b455` (`test: record mapped-range fixture and manifest CRLF claim`); `git push origin main` exited 0 and both `HEAD` and `origin/main` resolve to that commit. See [publication checkpoint](docs/checkpoints/2026-10-21-root-round20-publication.md).
