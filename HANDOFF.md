@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 16:06 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 16:07 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -28,8 +28,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   and excluded. `INSTALL_LOG.md` did not change.
 - Project index is current at 14,464 folders. Trail was refreshed to 3,568 nodes / 4,829 edges /
   943 cards, and `trail build --check` passes; the optional meaning layer remains unbuilt.
-- Exact next action: commit and push the verified Round 69 batch, verify `HEAD == origin/main`,
-  then scout and claim the next bounded batch.
+- Completion commit `9e38191f70c2a3e5f44f2d1c3daf9676378a1593` (`test: verify Round 69 lifecycle and
+  parser fixtures`) is pushed. After `git fetch origin`, `HEAD == origin/main` and divergence is
+  `0 0`; push and state log hashes are in the completion checkpoint.
+- Exact next action: scout Round 70 with Graft and the live task register, then publish bounded
+  claims before implementation.
 
 ## Round 67 fixtures verified (/root)
 
