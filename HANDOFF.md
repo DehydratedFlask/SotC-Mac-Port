@@ -1,9 +1,15 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 21:55 CDT (America/Chicago). Principal: `/root`.
+Updated: 2026-10-20 22:05 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation: G0 PARTIAL; G1-G6 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 21:55 CDT, `/root` — host mutex API verified; slot10 descriptor remains open
+## CURRENT CHECKPOINT — 2026-10-20 22:05 CDT, `/root` — native mutex fixture verified; persistent analysis claimed
+
+`SRV-01-RECURSIVE-MUTEX-01` FIXTURE_VERIFIED: native pthread RAII owner integrated; root3/3 focused sanitizer tests pass, arm64 confirmed. Two failed harness attempts retained (unsupported LSan option, scratch include path);0 product failures. User selected StartupState RAII ownership; settled decision, wiring waits on descriptor semantics. Full commands/limits:[checkpoint](docs/checkpoints/2026-10-20-root-native-mutex-and-persistent-claim.md).
+
+CPU object dossier has2 root review corrections pending; descriptor dossier is in progress,2 inspection-command failures retained. Slot10 remains blocked; next original blocker after it is11/f09160. `RE-01-PERSISTENT-01` CLAIMED by root for private saved Ghidra import/reopen, no overwrites or tool installs;0 task failures at claim. No further REA query assigned. Exact next action:publish checkpoint, start saved analysis, finish/replay CPU and descriptor evidence before choosing next semantics. G0 PARTIAL; G1-G6 NOT RUN.
+
+## PRIOR CHECKPOINT — 2026-10-20 21:55 CDT, `/root` — host mutex API verified; slot10 descriptor remains open
 
 Root replayed Darwin recursive/priority-inherit API probe,exit0,byte-identical output; scheduler semantics remain NOT TESTED. `CPU-01-MUTEX-CONTRACT-01` API_CONFIGURATION_VERIFIED. Claim `SRV-01-RECURSIVE-MUTEX-01` for native pthread resource owner/check, and `CPU-01-CTOR10-DESCRIPTOR-01` for private offline table/publication evidence; ownership/commands/attempts:[checkpoint](docs/checkpoints/2026-10-20-root-mutex-contract-and-descriptor-claims.md). Native slot10 remains unregistered: ctor also publishes vptr0x15fb7c0 toglobal0x3356678, with no typed counterpart yet. Next original slot11 is RVAf09160; preserve that blocker before any later leaves if slot10 advances.
 
