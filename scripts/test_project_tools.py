@@ -63,6 +63,35 @@ class ToolChecks(unittest.TestCase):
                 unwrap(source, output)
             self.assertEqual(output.read_bytes(), b"preserve me")
 
+    def test_identity_sidecar_collision_does_not_overwrite_source(self):
+        elf = fixture_elf()
+        data = bytearray(512 + len(elf))
+        data[:4] = b"O\x15=\x1d"
+        struct.pack_into("<H", data, 24, 1)
+        struct.pack_into("<QQQQ", data, 32, 0x800, 512, len(elf), len(elf))
+        data[64:184] = elf[:120]
+        data[512:] = elf
+
+        with tempfile.TemporaryDirectory() as folder:
+            source = Path(folder) / "input.identity.json"
+            destination = Path(folder) / "input.elf"
+            source.write_bytes(data)
+            original_source = source.read_bytes()
+
+            try:
+                unwrap(source, destination)
+            except ValueError as error:
+                self.assertIn("identity sidecar would overwrite source", str(error))
+            else:
+                self.fail(
+                    "expected identity-sidecar collision rejection; "
+                    f"source_overwritten={source.read_bytes() != original_source}, "
+                    f"elf_output_created={destination.exists()}"
+                )
+
+            self.assertEqual(source.read_bytes(), original_source)
+            self.assertFalse(destination.exists())
+
     def test_index_is_stable_and_detects_a_new_folder(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
