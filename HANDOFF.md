@@ -1,12 +1,49 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 12:31 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 12:35 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 49 (`/root`)
+
+- Completed `APP-01-LIFECYCLE-CLEAN-EXIT-EXACT-COPY-FIXTURE-01`: the pure launcher value test
+  asserts the exact clean-exit text; worker and root each pass 82 tests across 12 suites. E156
+  and the [completion checkpoint](docs/checkpoints/2026-10-21-root-app01-clean-exit-copy-complete.md)
+  record hashes and logs.
+- Completed `AUD-01-CLASSIFIER-RAW-INFLATE-OFFSET2-FIXTURE-01`: the synthetic raw-DEFLATE stream
+  after a two-byte prefix succeeds with 64 output bytes; worker and root each pass 22 tests. E157
+  and the [completion checkpoint](docs/checkpoints/2026-10-21-root-aud01-raw-inflate-offset2-complete.md)
+  record hashes and logs.
+- Completed `SRV-01-REGION-LIST-ENDPOINT-UNLINK-FIXTURE-01`: synthetic head/tail removal from a
+  three-node list verifies endpoint links, removed-node self-loop, and free-count decrements.
+  Worker and root each build the test target and pass focused CTest 1/1. E158 and the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-srv01-region-list-endpoints-complete.md)
+  record hashes and logs.
+- Regenerated project indexes and source graph after the source additions; actual-game gates remain
+  open. `native/api/CMakeLists.txt` and untracked `native/api/host/` are pre-existing local work and
+  remain untouched and unpublished.
+- Exact next action: run index/graph checks, path audits, and commit/push only the allowlisted
+  fixture, evidence, task, handoff, folder-index, and checkpoint files.
+
+## Session addendum 2026-10-21 round 48 (`/root`)
+
+- Published the clean-exit copy, raw-inflate offset-2, and region-list endpoint claims in commit
+  `65af615e38202eb5026f9b11808430ea73127fa9` (`docs: claim clean-exit and raw-offset-two
+  fixtures`); push succeeded and `HEAD` matches `origin/main`. See the
+  [round 46 publication checkpoint](docs/checkpoints/2026-10-21-root-round46-publication.md).
+- Pre-push checks passed: folder index current at 14,382; trail graph current at 3,544 nodes;
+  staged audit accepted 7 paths; full audit accepted 1,571 paths; staged diff check passed.
+- `/root/launcher_review`, `/root/review_host_proto`, and `/root/slot23_raw_xrefs` own separate
+  test files for the three claims. Their changes and tests are in progress; root has not replayed
+  them yet.
+- Actual-game gates remain open. `native/api/CMakeLists.txt` and `native/api/host/` remain
+  untouched and unpublished.
+- Exact next action: review worker diffs, replay the Swift and Python suites and rebuild/replay the
+  native list test, then record the outcomes and publish.
 
 ## Session addendum 2026-10-21 round 47 (`/root`)
 
