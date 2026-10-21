@@ -94,8 +94,8 @@ log: `local/validation/20261019-231219-audio-bank-header-crosscheck/pair_crossch
 This establishes a repeated length relation only; codec, bank semantics, NGS2 behavior and game use
 remain UNKNOWN.
 
-Bounded reader: [`scripts/audio_bank_header.py`](../scripts/audio_bank_header.py), with six
-synthetic fixtures in [`scripts/test_audio_bank_header.py`](../scripts/test_audio_bank_header.py).
+Bounded reader: [`scripts/audio_bank_header.py`](../scripts/audio_bank_header.py), with 18
+synthetic test methods in [`scripts/test_audio_bank_header.py`](../scripts/test_audio_bank_header.py).
 The reader verifies the archive summary, exact member paths, manifest locators and hashes before
 reporting the XFF magic, opaque bytes 4..19 and the u32le@0x14 decoded-length match. Root's
 acceptance logs are in `local/validation/20261019-2315-root-aud01-xff-verification/`. This is
