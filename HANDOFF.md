@@ -1,12 +1,31 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 12:04 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 12:06 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 37 (`/root`)
+
+- Recorded publication of the NUL-filename completion and the raw-DEFLATE task-status correction
+  in commit `ae2ee8d8daf8330a461cc5e1330309c2c80c7e24` (`docs: reconcile published fixture task
+  states`); push succeeded and HEAD matched `origin/main`. See the
+  [round 35 publication checkpoint](docs/checkpoints/2026-10-21-root-round35-publication.md).
+- Claimed `APP-01-ASSET-VALIDATOR-SHORT-MAGIC-FIXTURE-01`, `ACTIVE` with zero failed tries. Add
+  one test in `launcher/Tests/LauncherCoreTests/AssetValidationReportTests.swift`: create the
+  existing six-file valid fixture, replace `pak0.psarc` with `Data("PS".utf8)`, and assert the
+  sole problem is `pak0.psarc is not a PSARC archive` while `missingArchives` remains empty. No
+  production code changes or real archive data. Claim:
+  [short PSARC magic](docs/checkpoints/2026-10-21-root-app01-asset-validator-short-magic-claim.md).
+- `/root/slot23_raw_xrefs` may edit only the test file after this claim is published. Root owns
+  shared docs and will run `swift test --package-path launcher --filter AssetValidationReportTests`.
+- Actual game acceptance gates remain open. Existing host-runtime worktree paths remain untouched
+  and unpublished.
+- Exact next action: run `python3 scripts/project_index.py`, verify indexes, path-audit, then commit
+  and push the round 35 publication record and short-magic claim.
 
 ## Session addendum 2026-10-21 round 36 (`/root`)
 
