@@ -280,6 +280,7 @@ class Tests(unittest.TestCase):
     def test_image_mapped_requires_range_inside_one_segment(self):
         img = two_segment_image()
         self.assertTrue(img.mapped(0x1000, 16))
+        self.assertTrue(two_segment_image().mapped(0x1010, 0))           # one-past-end empty range
         self.assertFalse(img.mapped(0x100c, 8))                         # crosses segment end into gap
         self.assertFalse(img.mapped(0x1010, 1))                         # nonzero range starts in gap
 
