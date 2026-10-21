@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 15:45 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 15:51 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -19,28 +19,29 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and excluded from this publication.
 - Exact next action: scout and claim the next bounded batch from the live repository before implementation.
 
-## Round 68 bounded fixture claims (/root)
+## Round 68 fixtures verified (/root)
 
-- Three independent, test-only tasks are claimed in `docs/TASKS.md` and recorded in the
-  [claim checkpoint](docs/checkpoints/2026-10-21-root-round68-fixture-claims.md). They cover the
-  unexpected-exit state with readiness false, malformed synthetic `DT_SCE_SYMTABSZ` byte count,
-  and canonical host-map state after repeated unmapping. Claims are assigned to
-  `/root/launcher_review`, `/root/review_host_proto`, and `/root/slot23_raw_xrefs` respectively;
-  root retains sole ownership of shared documentation and replay.
-- The existing test baselines pass: LauncherLifecycleTests (11 tests / 2 suites), dynlink parser
-  (23 tests), and host-map build plus focused CTest (exit 0 / 1 of 1). Their exact commands, source
-  and test hashes, results, and fixture limits are in the claim checkpoint. No worker edits have
-  started.
-- These claims add no runtime evidence and do not advance gates: G0 remains PARTIAL; G1–G6 remain
-  NOT RUN. No native game executable, boot, actual game audio, real save/reload, or Metal gameplay
-  is demonstrated.
-- The separate PSARC invalid-UTF-8 candidate is held unclaimed pending the user's choice on error
-  normalization versus preserving `UnicodeDecodeError`.
-- `python3 scripts/project_index.py` and `--check` pass at 14,463 folders. `trail build --check`
-  passes with the 3,566-node / 4,824-edge wiring graph in sync; the optional deep meaning layer
-  remains unbuilt. Exact output and hashes are in the claim checkpoint.
-- Exact next action: publish the claim checkpoint, then dispatch the three one-file test changes;
-  root reviews each diff and replays each focused command before marking any task verified.
+- Three test-only tasks are `FIXTURE_VERIFIED` with one passing implementation attempt and zero
+  failed tries. Workers changed only their assigned test files; root reviewed each diff and
+  independently replayed the focused command. Evidence E204–E206 and full source/test/log hashes
+  are in the [completion checkpoint](docs/checkpoints/2026-10-21-root-round68-fixtures-complete.md).
+- The claim was published before worker edits in `7afe5fcb699137eaff4c557ba30151b5231234d0`.
+  Dispatch and post-push refs are recorded in the [claim checkpoint](docs/checkpoints/2026-10-21-root-round68-fixture-claims.md).
+- The fixtures cover a pure Swift lifecycle value, a synthetic ELF table guard, and synthetic
+  host-map cleanup state. They do not establish live process behavior, ELF loading, allocator
+  integration, game execution, or an acceptance gate. G0 remains PARTIAL; G1–G6 remain NOT RUN.
+- `python3 scripts/project_index.py` and `--check` pass at 14,463 folders. The configured wiring
+  graph was refreshed to 3,567 nodes / 4,826 edges / 943 cards and `trail build --check` passes;
+  the optional deep meaning layer remains unbuilt. The first graph check correctly reported the
+  three edited test files as stale; both outcomes are retained in the completion logs.
+- Pre-push checks pass: `git diff --cached --check` and `git diff --check` exit 0; the staged audit
+  accepts 9 allowlisted paths and the full audit accepts 1,641 paths. `HEAD` and `origin/main` both
+  remain at the published claim commit before this completion push. Log hashes are in the
+  completion checkpoint.
+- The separate PSARC invalid-UTF-8 candidate remains unclaimed pending the user's choice between
+  `PsarcError` normalization and preserving `UnicodeDecodeError`.
+- Exact next action: push the verified fixtures and checkpoint; then scout and claim another
+  bounded batch if independent work remains.
 
 ## Round 66 bounded fixtures verified (/root)
 

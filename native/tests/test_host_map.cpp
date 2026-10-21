@@ -43,6 +43,15 @@ int main() {
         CHECK(w && w->base == (view->start & ~0x7fffffffull) && w->limit == view->end());
         unmap(*m);
         CHECK(m->empty());
+        CHECK(m->ptr == nullptr);
+        CHECK(m->size == 0);
+        CHECK(m->raw == nullptr);
+        CHECK(m->raw_size == 0);
+        unmap(*m);
+        CHECK(m->ptr == nullptr);
+        CHECK(m->size == 0);
+        CHECK(m->raw == nullptr);
+        CHECK(m->raw_size == 0);
     }
 
     // Shadow request constants with reduced size (ASan-friendly); 512 MiB align retained.

@@ -64,6 +64,7 @@ struct LauncherLifecycleTests {
         let state = LauncherLifecycle.state(after: .unexpectedExit(status: 17), readinessAllowsStart: true)
         #expect(state == .failed("Game core exited unexpectedly (status 17)"))
         #expect(LauncherLifecycle.canStart(readinessAllowsStart: true, from: state))
+        #expect(LauncherLifecycle.state(after: .unexpectedExit(status: 17), readinessAllowsStart: false) == .failed("Game core exited unexpectedly (status 17)"))
     }
 
     @Test func readinessIsRequiredEvenWhenStateWouldPermitStart() {
