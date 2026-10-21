@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 16:14 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 16:16 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -21,9 +21,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   cards); its optional meaning layer remains unbuilt. The claim checkpoint retains an earlier
   stale-index check caused by adding a private validation log after generation, followed by the
   passing refresh/check.
+- Claim commit `099136c56e4de5101b97112d634b5d86864c7425` is pushed; after fetch,
+  `HEAD == origin/main` with divergence `0 0`. Push and state log hashes are in the claim checkpoint.
 - Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched.
-- Exact next action: run the claim publication audits, commit and push the Round70 claims, then
-  dispatch the two test-file tasks and implement the root indexer task.
+- Exact next action: dispatch the two claimed test-file tasks and implement the root indexer task.
 
 ## Round 69 fixtures verified (/root)
 
