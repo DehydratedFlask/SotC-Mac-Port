@@ -19,11 +19,26 @@ int main() {
 
     // Carve exact_node math alone does not set flag_b/ptr/sentinel — finalize does.
     {
-        auto fit = try_carve_fit(/*free_start=*/0x100000, /*free_size=*/0x20000,
-                                 /*req_size=*/0x20000, /*alignment=*/0x10000);
+        constexpr std::uint64_t exact_request = 0x20000;
+        auto fit = try_carve_fit(/*free_start=*/0x100000, /*free_size=*/exact_request,
+                                 /*req_size=*/exact_request, /*alignment=*/0x10000);
         CHECK(fit.has_value());
         CHECK(fit->exact_node);
         CHECK(fit->lead == 0);
+
+        RegionNode exact{};
+        exact.set_start(0x100000);
+        exact.set_size(exact_request);
+        exact.set_capacity(exact_request);
+        exact_fit_finalize(exact, exact_request, /*arena_flag=*/0x3C,
+                           /*ctx=*/0xDEADBEEFULL);
+        CHECK(exact.start() == 0x100000);
+        CHECK(exact.capacity() == exact_request);
+        CHECK(exact.size() == exact_request);
+        CHECK(exact.flag_a() == 0x3C);
+        CHECK(exact.flag_b() == 1);
+        CHECK(exact.ptr_field() == 0xDEADBEEFULL);
+        CHECK(exact.sentinel() == 0xffffffffu);
     }
 
     RegionNode n{};

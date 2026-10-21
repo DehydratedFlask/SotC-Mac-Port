@@ -507,4 +507,8 @@ struct CoreReadinessTests {
         #expect(CoreDiagnostics.text(report: nil, coverage: nil, status: nil, lastFailure: nil, queryFailure: nil)
             .hasPrefix("No readiness check has run yet."))
     }
+
+    @Test func unknownCoreErrorCodeKeepsItsRawValueInDiagnostics() {
+        #expect(CoreDiagnostics.code(.unknown(99)) == "UNKNOWN(99)")
+    }
 }
