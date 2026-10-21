@@ -24,7 +24,15 @@
 ## Claim publication and assignment checkpoint
 
 - Local date/time: 2026-10-21 11:10 CDT (America/Chicago). Integrator: `/root`; worker: `launcher_review` after publication.
-- Exact claim publication command/result and commit: pending.
+- Exact publication command/result: `git push origin main` exited 0 and advanced
+  `219f261..fe7446f`. Commit `fe7446f58d87bad444c3cec18196d9ac09442184` is now on `origin/main`;
+  root verified HEAD equals `origin/main`.
+- Publication checks: `python3 scripts/project_index.py` exited 0 and indexed 14,218 folders;
+  `python3 scripts/project_index.py --check` exited 0 and reports current; `trail build --check`
+  exited 0 with the wiring graph in sync (3,527 nodes / 4,739 edges; deep meaning layer unbuilt);
+  `git diff --cached --check` exited 0; staged path audit accepted four allowlisted files; full
+  tracked-path audit accepted 1,513 files. Logs: `local/checkpoints/root-round12-dynlink-claim/`.
 - Observation: worker scope is only `scripts/test_ps4_dynlink.py`; root owns task and handoff records. No fixture has run yet for this task.
 - Remaining risks: NID-to-name is a spelling hint only; no real ELF or import behavior is validated.
-- Next exact action: publish the claim, assign the test-only file, review its diff and private log/hash, replay the acceptance command, then record and publish completion.
+- Files changed since the claim draft: only `HANDOFF.md` and this checkpoint. No test source has been edited.
+- Next exact action: assign the test-only file to `launcher_review`, review the diff and private log/hash, replay the acceptance command, then record and publish completion.
