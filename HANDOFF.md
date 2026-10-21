@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 17:03 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 17:04 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -27,6 +27,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   and split fixtures`) is pushed and verified at `origin/main`; `HEAD == origin/main`, divergence
   `0 0`. Post-push evidence is recorded in the
   [completion checkpoint](docs/checkpoints/2026-10-21-root-round73-fixtures-complete.md).
+- Publication-record sync commit `4e7d0fc84a491b746b0efe54a2ec87def8903790` (`docs: record Round 73
+  publication`) is also pushed and verified at `origin/main`; its fetch, state, and index evidence
+  is in the same completion checkpoint.
 - Owners are `/root + review_host_proto` on `scripts/test_ps4_dynlink.py`, `/root + launcher_review`
   on `launcher/Tests/LauncherCoreTests/CoreClientTests.swift`, and `/root + round68_native_scout` on
   `native/tests/test_region_split.cpp`. `/root` remains sole integrator for shared docs.
