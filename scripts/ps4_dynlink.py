@@ -47,6 +47,8 @@ def program_headers(elf):
     header = unpack('<16sHHIQQQIHHHHHH', elf, 0)
     if header[0][:7] != b'\x7fELF\x02\x01\x01' or header[2] != 62:
         raise ValueError('expected little-endian x86-64 ELF')
+    if header[9] != 56:
+        raise ValueError('expected ELF64 program header size 56')
     keys = ('type', 'flags', 'offset', 'vaddr', 'paddr', 'filesz', 'memsz', 'align')
     ph = [dict(zip(keys, unpack('<IIQQQQQQ', elf, header[5] + i * 56))) for i in range(header[10])]
     return header[4], ph

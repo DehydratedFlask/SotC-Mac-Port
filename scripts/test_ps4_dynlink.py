@@ -32,10 +32,11 @@ def two_segment_image():
     return d.Image(bytes(elf), ph)
 
 
-def elf_header(ident=b'\x7fELF\x02\x01\x01' + b'\0' * 9, machine=62, phnum=1):
+def elf_header(ident=b'\x7fELF\x02\x01\x01' + b'\0' * 9, machine=62, phnum=1,
+               phentsize=56):
     """Little-endian x86-64 ELF64 header; phoff is fixed at 64."""
     return struct.pack('<16sHHIQQQIHHHHHH', ident, 2, machine, 1, 0, 64, 0, 0,
-                       64, 56, phnum, 0, 0, 0)
+                       64, phentsize, phnum, 0, 0, 0)
 
 
 def program_header(ptype=d.PT_LOAD, vaddr=0x1000, filesz=8, memsz=8):
@@ -283,6 +284,12 @@ class Tests(unittest.TestCase):
         self.assertEqual(len(ph), 1)
         self.assertEqual(ph[0]['vaddr'], 0x1000)
         self.assertEqual(ph[0]['memsz'], 8)
+
+    def test_program_headers_rejects_wrong_program_header_entry_size(self):
+        elf = elf_header(phentsize=55) + program_header()
+        with self.assertRaises(ValueError) as error:
+            d.program_headers(elf)
+        self.assertEqual(str(error.exception), 'expected ELF64 program header size 56')
 
     def test_program_headers_rejects_wrong_class_data_and_machine(self):
         cases = (
