@@ -1,9 +1,19 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 21:13 CDT (America/Chicago). Principal: `/root`.
+Updated: 2026-10-20 21:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation: G0 PARTIAL; G1-G6 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 21:13 CDT, `/root` — resume at the native startup blocker
+## CURRENT CHECKPOINT — 2026-10-20 21:18 CDT, `/root` — slot-10 provider preparation failed; scoped remedy approved
+
+`CPU-01-CTOR10-OBJECT-INIT-01` remains CLAIMED. First `rea function ... 0xb30950` invocation exited 1 in 4.9 s before target analysis: nested Ghidra stage `ownership_preparation` could not write the existing Swift module cache at `/Users/dehydratedflask/.cache/clang/ModuleCache/Swift-7JL1KBZ3A6V3.swiftmodule` (`Operation not permitted`), then could not load the arm64 macOS 27 standard library. Error says `execution_failure`, `retryable:false`; no snapshot or target Evidence ID was produced. This is one infrastructure failed try and zero failed analysis hypotheses. Exact command/capture hashes and remedy are in `docs/checkpoints/2026-10-20-root-cpu01-ctor10-provider-cache-failure.md` and private `local/re/evidence/cpu01-ctor10-object-init-01/rea-b30950.*`.
+
+Principal reassessment: an unchanged sandbox retry cannot succeed. After this checkpoint is published, authorize one access-scoped retry using `exec_command` with `sandbox_permissions=require_escalated`, a separate verified pristine snapshot copy and `--full-output`; this directly addresses the observed cache denial. No installation, upgrade or tool configuration change. Preserve the failed capture; do not spend the second distinct function query on the same preparation failure. A further infrastructure failure must be recorded and reassessed before another query; the third unsuccessful distinct try triggers the project escalation rule.
+
+Offline bytes already bind allocation size 16 and the initializer/cleanup call operands, but the helper/import contracts remain unresolved; no native slot-10 implementation/registration is permitted yet. The save worker continues private report/verifier construction from completed q1/q2 captures; it has no provider permit. G0 PARTIAL; G1-G6 NOT RUN.
+
+Exact next action: index/check/audit and publish this failure checkpoint, then send CPU worker REMEDIATION START; independently review/replay all successful returned evidence before choosing a native implementation.
+
+## PRIOR CHECKPOINT — 2026-10-20 21:13 CDT, `/root` — resume at the native startup blocker
 
 `CPU-01-CTOR10-OBJECT-INIT-01` is CLAIMED by root with worker `/root/startup_critical_path_resume`. Worker owns only private `local/re/evidence/cpu01-ctor10-object-init-01/`; root owns shared records and Git. Characterize initializer `0xb30950`, allocation-size pointer helper `0xb30a10` and cleanup callback `0xe44a10` for original constructor slot 10. Existing evidence shows the examined zero-state path skips the unresolved computed calls, but object initialization and native ownership remain unestablished. The runner still stops after callbacks 0-9 at `{0xf09e60, 10, nullptr}`; later leaf fixtures do not advance that prefix. Do not register slot 10 until every required effect on this path is recovered. At most two distinct REA/Ghidra queries (`0xb30950`, `0xe44a10`), after the existing SAV query terminates; no automatic same-target retry. Specification: CPU-01 work packet and REVERSE_ENGINEERING Stage 2. No failed analysis hypotheses for this new task; inherited slot-10 verifier correction remains recorded. Escalated `0xd71f60` stays untouched.
 
