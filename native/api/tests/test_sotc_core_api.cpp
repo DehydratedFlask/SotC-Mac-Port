@@ -340,9 +340,15 @@ void test_coverage() {
   CHECK(cov.struct_size == sizeof cov && cov.abi_version == SOTC_CORE_ABI_VERSION);
   CHECK(cov.engine_implemented == 0);
   CHECK(cov.subsystem_count == SOTC_SUBSYSTEM_COUNT);
+  const char* const expected_subsystem_names[] = {
+      "startup_constructors", "engine_boot", "metal_renderer", "audio", "save_load"};
+  const uint32_t expected_subsystem_count =
+      sizeof(expected_subsystem_names) / sizeof(expected_subsystem_names[0]);
+  CHECK(cov.subsystem_count == expected_subsystem_count);
   bool saw_engine = false;
-  for (uint32_t i = 0; i < cov.subsystem_count; ++i) {
+  for (uint32_t i = 0; i < cov.subsystem_count && i < expected_subsystem_count; ++i) {
     const sotc_subsystem_report& s = cov.subsystems[i];
+    CHECK(std::strcmp(s.name, expected_subsystem_names[i]) == 0);
     CHECK(s.name[0] != '\0' && s.detail[0] != '\0');
     CHECK(s.status != SOTC_SUBSYSTEM_IMPLEMENTED);  // nothing may claim to be finished
     if (std::strcmp(s.name, "engine_boot") == 0) {

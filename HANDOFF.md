@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 17:54 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 18:02 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,15 +8,15 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Round 77 tasks claimed (/root)
+## Round 77 fixtures verified (/root)
 
-- Four bounded test-only tasks are claimed with clean baselines: numeric `CoreState` code coverage, diagnostics text for every core state, unsupported PSARC entry-size rejection, and the ordered native ABI subsystem-name list. Exact commands, source hashes, baseline logs, task ownership, and constraints are in the [Round77 claim checkpoint](docs/checkpoints/2026-10-21-root-round77-fixture-claims.md).
-- Owners and sole files: `/root/launcher_review` — `launcher/Tests/LauncherCoreTests/CoreClientTests.swift`; `/root/scout_launcher_queue` — `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift`; `/root/review_host_proto` — `scripts/test_psarc.py`; `/root/round68_native_scout` — `native/api/tests/test_sotc_core_api.cpp`. Attempts: zero for all four.
-- Baselines pass: 22 launcher CoreClient tests across two suites, 5 CoreReadiness tests, 38 PSARC tests, and native target build plus CTest 1/1. No production source is planned to change. All results will remain fixture-only; G0 stays PARTIAL and G1–G6 stay NOT RUN.
-- The native ABI baseline used the existing user-owned `native/api/CMakeLists.txt` (SHA256 `aa04d19b5fde7c32ae4f30d28bcf781f0a65a337c75c96ad63c29e320bb402de`). That file and untracked `native/api/host/` remain excluded from our changes and publication.
-- The claim is published as `84706a333356aab9d45b3c8355b15835da96a70c`; push succeeded and a subsequent fetch confirmed `HEAD == origin/main` with 0/0 divergence. Preflight accepted 5 staged paths and 1,658 full-tree paths; details and logs are in the [Round77 claim checkpoint](docs/checkpoints/2026-10-21-root-round77-fixture-claims.md).
-- The claim's publication record is committed as `cb45ea030424882f1fd924323dd7fecc4e139f97`; push succeeded and fetch confirmed `HEAD == origin/main` with 0/0 divergence.
-- Exact next action: dispatch the four workers to add only their claimed assertions; root independently replays each targeted check and records the completion evidence.
+- All four claimed test-only tasks are `FIXTURE_VERIFIED`: all numeric `CoreState` values and unknown codes; exact diagnostic state text; PSARC unsupported entry-size rejection; ordered native ABI subsystem names. Evidence E233–E236, exact source/log hashes, commands, observations and limits are in the [Round77 completion checkpoint](docs/checkpoints/2026-10-21-root-round77-fixtures-complete.md); claim baselines are in the [claim checkpoint](docs/checkpoints/2026-10-21-root-round77-fixture-claims.md).
+- Sole test files and owners: `/root/launcher_review` — `launcher/Tests/LauncherCoreTests/CoreClientTests.swift`; `/root/scout_launcher_queue` — `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift`; `/root` — `scripts/test_psarc.py`; `/root/round68_native_scout` — `native/api/tests/test_sotc_core_api.cpp`. Worker and root checks pass: 22 CoreClient tests across 2 suites, 6 CoreReadiness tests, 39 PSARC tests, and native target build plus focused CTest 1/1. Each task has 1 successful implementation attempt and 0 failed tries; production sources are unchanged.
+- These fixtures assert pure Swift mappings/formatter output, synthetic PSARC headers, and the current stub ABI report. They prove no launcher UI, live archive, native game core, or game behavior. G0 remains PARTIAL; G1–G6 remain NOT RUN.
+- Project folder index is current at 19,268 folders; Trail's wiring graph is current at 3,580 nodes. The deep semantic layer remains unbuilt; exact check logs are in the Round77 completion checkpoint.
+- The native API check used the existing user-owned `native/api/CMakeLists.txt` (SHA256 `aa04d19b5fde7c32ae4f30d28bcf781f0a65a337c75c96ad63c29e320bb402de`). That file and untracked `native/api/host/` remain untouched and excluded from publication.
+- Claim commit `84706a333356aab9d45b3c8355b15835da96a70c` and publication-record sync `cb45ea030424882f1fd924323dd7fecc4e139f97` are pushed and fetch-verified at `origin/main`; the completion publication is recorded in the linked checkpoint.
+- Exact next action: select the next independent bounded task from `docs/TASKS.md` using the live source graph, publish its claim before implementation, and dispatch separate files to available workers.
 
 ## Round 76 fixtures verified (/root)
 

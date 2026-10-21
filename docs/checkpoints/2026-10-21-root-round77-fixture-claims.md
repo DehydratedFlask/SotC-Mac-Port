@@ -1,6 +1,6 @@
 # Round 77 fixture claims and baselines
 
-- Local time / timezone: 2026-10-21 17:54 CDT (America/Chicago).
+- Local time / timezone: 2026-10-21 17:55 CDT (America/Chicago).
 - Agent / integrator: `/root`; Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`.
 - Base: `HEAD` and `origin/main` were `701235f9f8bd5d6d1bb2876372fefa9d0495d948` when tasks were selected.
 - Tasks / status / tries: all four tasks below are `ACTIVE`; each has zero implementation attempts and zero failed tries.
@@ -13,7 +13,7 @@
 |---|---|---|---|
 | `APP-01-CORE-STATE-NUMERIC-CODE-ALL-VALUES-FIXTURE-01` | `/root/launcher_review` | `launcher/Tests/LauncherCoreTests/CoreClientTests.swift` | Pin codes 0–6 to each corresponding `CoreState` case and pin unknown-code rejection. |
 | `APP-01-CORE-DIAGNOSTICS-ALL-STATE-TEXT-FIXTURE-01` | `/root/scout_launcher_queue` | `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift` | Pin the exact diagnostic state row for idle, validating, ready, starting, running, stopping, and failed. |
-| `DATA-02-PSARC-ENTRY-SIZE-FIXTURE-01` | `/root/review_host_proto` | `scripts/test_psarc.py` | Mutate the synthetic PSARC header entry size away from 30 and assert exact `unsupported entry/block size` rejection. |
+| `DATA-02-PSARC-ENTRY-SIZE-FIXTURE-01` | `/root` | `scripts/test_psarc.py` | Mutate the synthetic PSARC header entry size away from 30 and assert exact `unsupported entry/block size` rejection. |
 | `APP-01-CORE-COVERAGE-SUBSYSTEM-NAMES-FIXTURE-01` | `/root/round68_native_scout` | `native/api/tests/test_sotc_core_api.cpp` | Pin the ordered ABI subsystem names `startup_constructors`, `engine_boot`, `metal_renderer`, `audio`, `save_load`. |
 
 ## Baselines
@@ -41,4 +41,5 @@
 - Post-claim publication-record preflight: `python3 scripts/project_index.py --check` exited 0/current at 14,476 folders (log SHA256 `dd521ed333daf4f08a151a33e43b1dfc54e9606b13238180a62059352b0a622b`); `trail build --check` exited 0/current at 3,578 nodes / 4,853 edges (log SHA256 `917fd3379dd8f9b7f28554937c4f2c7fe32ae174de616cf772d60de1cc8886e7`); `git diff --cached --check` exited 0. Staged audit accepts the two documentation paths (log `local/validation/root-round77-claims/audit-staged-publication.log`, SHA256 `67e31965ef1d972b2906c9070cd4d3672b4dd6a88e1989887c8e50e560e8061d`); `--all` accepts 1,658 paths (log `local/validation/root-round77-claims/audit-all-claim.log`, SHA256 `afbd16a5a7965426f2d319b79b6a5bd68e1f06fda56c4c1f15f82858b4f6a8de`).
 - Publication: `git fetch origin main` before commit showed 0/0 divergence. `git commit -m "docs: claim Round 77 fixture tasks"` exited 0 and created `84706a333356aab9d45b3c8355b15835da96a70c` from five allowlisted paths. `git push origin main` exited 0 and advanced `main` from `701235f` to `84706a3`. Subsequent `git fetch origin main` exited 0; `git rev-parse HEAD` and `git rev-parse origin/main` both returned `84706a333356aab9d45b3c8355b15835da96a70c`, and `git rev-list --left-right --count HEAD...origin/main` returned `0 0`. Evidence: this checkpoint, `HANDOFF.md`, and the published Git commit/ref.
 - Publication-record sync: `git commit -m "docs: record Round 77 claim publication"` exited 0 and created `cb45ea030424882f1fd924323dd7fecc4e139f97` from two documentation paths. `git push origin main` exited 0 and advanced `main` from `84706a3` to `cb45ea0`. Subsequent `git fetch origin main` exited 0; `git rev-parse HEAD` and `git rev-parse origin/main` both returned `cb45ea030424882f1fd924323dd7fecc4e139f97`, and `git rev-list --left-right --count HEAD...origin/main` returned `0 0`.
-- Exact next action: dispatch the four owners, review their diffs, independently replay the exact targeted commands, update evidence/status, and publish only the allowlisted completion files.
+- Dispatch: at 2026-10-21 17:55 CDT, `/root/launcher_review` owns `CoreClientTests.swift`, `/root/scout_launcher_queue` owns `LauncherModelTests.swift`, and `/root/round68_native_scout` owns `native/api/tests/test_sotc_core_api.cpp`; root owns `scripts/test_psarc.py`. Each worker received the exact target command and private log location. No implementation result is reported yet.
+- Exact next action: implement the PSARC entry-size assertion, then review the three worker diffs, independently replay the exact targeted commands, update evidence/status, and publish only the allowlisted test files and docs.
