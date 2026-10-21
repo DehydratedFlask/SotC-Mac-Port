@@ -8,6 +8,21 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## Session addendum 2026-10-21 round 41 (`/root`)
+
+- Published the duplicate-readiness and unknown-subsystem-code fixture completions in commit
+  `ca6bcd3302e672dcb0b6126ae125f5362b609576` (`test: cover duplicate readiness and unknown
+  subsystem codes`); push succeeded and `HEAD` matched `origin/main`. See the
+  [round 40 publication checkpoint](docs/checkpoints/2026-10-21-root-round40-publication.md).
+- Pre-push checks passed: folder index current at 14,378 entries; trail graph current at 3,539
+  nodes after rebuilding for the two changed Swift test files; staged audit accepted 9 paths;
+  full audit accepted 1,553 paths.
+- The short-magic, conflicting-duplicate, and unknown-subsystem fixtures are `FIXTURE_VERIFIED`.
+  These synthetic tests do not change the actual-game acceptance gates.
+- Existing `native/api/CMakeLists.txt` and `native/api/host/` remain untouched and unpublished.
+- Exact next action: review the scout's next independent fixture candidate, check its prerequisite
+  status, then publish a bounded claim if it is still unowned.
+
 ## Session addendum 2026-10-21 round 40 (`/root`)
 
 - Completed `APP-01-DIAGNOSTICS-CONFLICTING-DUPLICATE-01`; worker and root each pass 7/7 focused
