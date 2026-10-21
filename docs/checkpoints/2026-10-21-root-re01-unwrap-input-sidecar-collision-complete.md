@@ -18,4 +18,4 @@
 - After commit, the staged audit had no staged paths (exit 2); the explicit-path audit of the same 9 committed files passed (exit 0), log local/checkpoints/root-re01-unwrap-input-sidecar-collision-complete/pre-push-explicit-path-audit.log SHA-256 5a14277938021de8734ae083aebf622e7b1a223dc92134c7afa78941336f6f22. The full --all audit passed 1,505 paths.
 - Task status / attempt count: `FIXTURE_VERIFIED`; zero failed implementation tries.
 - Folder-index command python3 scripts/project_index.py exited 0 and reported 14,212 folders indexed; log local/checkpoints/root-re01-unwrap-input-sidecar-collision-complete/project-index.log. This count includes the private checkpoint directory created for these logs.
-- Next exact action: continue the published AUD-PUBLISH-SECRET-NAME-FIXTURE-01 with launcher_review; review its result and independently replay the focused command.
+- Next exact action: Task A is complete and published. The next task AUD-PUBLISH-SECRET-NAME-FIXTURE-01 was completed and published in 8d463ab; choose the next bounded, unblocked task.
