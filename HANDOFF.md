@@ -66,10 +66,16 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Claim checkpoint: [name-by-hash fixture](docs/checkpoints/2026-10-21-root-re02-dynlink-name-by-hash-claim.md).
   Prerequisite `RE-02-DYNLINK-01` is FIXTURE_VERIFIED. Acceptance command:
   `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py`.
-- Claim publication: pending. Next exact action after claim publication is assign only
-  `scripts/test_ps4_dynlink.py` to `launcher_review`, independently replay the focused suite, record
-  the fixture result, and publish completion. Keep `native/api/CMakeLists.txt` and `native/api/host/`
-  excluded; preserve all emulation/module and real game acceptance gates.
+- Claim publication: commit `fe7446f58d87bad444c3cec18196d9ac09442184` is pushed to `origin/main`;
+  staged audit accepted four paths, full tracked-path audit accepted 1,513 paths, and root verified
+  HEAD equals `origin/main`. `python3 scripts/project_index.py --check` reports 14,218 folders
+  current; `trail build --check` reports the wiring graph in sync (3,527 nodes / 4,739 edges), with
+  the deep meaning layer still unbuilt. Private command logs are in
+  `local/checkpoints/root-round12-dynlink-claim/`.
+- Next exact action: assign only `scripts/test_ps4_dynlink.py` to `launcher_review`, independently
+  replay the focused suite, record the fixture result, and publish completion. Keep
+  `native/api/CMakeLists.txt` and `native/api/host/` excluded; preserve all emulation/module and real
+  game acceptance gates.
 
 ## Session addendum 2026-10-21 round 10 (`/root`)
 
