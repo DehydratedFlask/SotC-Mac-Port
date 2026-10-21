@@ -8,6 +8,19 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## Session addendum 2026-10-21 round 53 (`/root`)
+
+- Published round-52 completions and E159–E161 in commit
+  `30f063e6e15999f05efb1ae9dbd1b3dd9ca3a900` (`test: cover launcher ABI sidecar and carve
+  boundaries`); push succeeded. See the [round 50 publication checkpoint](docs/checkpoints/2026-10-21-root-round50-publication.md).
+- Pre-push checks passed: folder index current at 14,388; the first graph check found three changed
+  test files and a new Swift test symbol; `trail build` rebuilt 3,546 nodes / 4,779 edges and the
+  follow-up check passed; staged audit accepted 11 paths and full audit accepted 1,584 paths.
+- Actual-game gates remain open. `native/api/CMakeLists.txt` and untracked `native/api/host/`
+  remain untouched and unpublished.
+- Exact next action: scout the next independent bounded tasks, verify their live evidence and
+  registry entries, and publish claims before assigning implementation.
+
 ## Session addendum 2026-10-21 round 52 (`/root`)
 
 - Published the three claims in `e8207987476db2072c4b4a52c7fe2b7ac0d6ab02` before implementation.
