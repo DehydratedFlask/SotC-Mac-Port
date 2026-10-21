@@ -1,0 +1,19 @@
+# Completion: RE-01-UNWRAP-INPUT-SIDECAR-COLLISION-01
+
+- Local time: 2026-10-21 10:47 CDT (America/Chicago).
+- Agent / integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`).
+- Task ID: `RE-01-UNWRAP-INPUT-SIDECAR-COLLISION-01`.
+- Files changed: `scripts/unwrap_self.py`, `scripts/test_project_tools.py`, `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, generated `docs/FOLDERS.md`, the claim checkpoint, and this completion checkpoint.
+- Exact command: `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py`.
+- Result: worker and root replay each exit 0, **6/6 tests**. Worker log `local/validation/re01-unwrap-input-sidecar-collision/attempt-2.log` and root replay `.../root-replay.log` both have SHA-256 `c7898f18dd249b374a1833944d38eeddf70146cd940bf3f3e855c78d64db67d1`.
+- Test-first evidence: the new collision fixture failed before the guard as expected, reporting `source_overwritten=True` and `elf_output_created=True`; `attempt-1.log` SHA-256 `893f32e3c6289aad3ef5a0ff342322bbf6126db0d66b6b40e3b483c4eddcfcad`. This was the intended red baseline, not a failed implementation try.
+- Source hashes: `scripts/unwrap_self.py` `165333d29aaab4fb2529a796bdaa796574402245e65579b85ecabee3784fc0d8`; `scripts/test_project_tools.py` `e0edd276090e436377d2bf74dc6b852ca5aa742b0172906f8fa069a72058b51a`.
+- Graph command: trail build exited 0 and trail build --check exited 0 after the worker changed source; the wiring graph is in sync and the deep layer remains unbuilt. Logs: local/checkpoints/root-re01-unwrap-input-sidecar-collision-claim/trail-build-after-worker.log and trail-check-after-worker.log. Final publication check trail build --check also exited 0; log local/checkpoints/root-re01-unwrap-input-sidecar-collision-complete/trail-check.log.
+- Observation: `unwrap()` rejects a derived identity sidecar that resolves to the SELF input before reading input or writing either output. The fixture verifies rejection, byte-for-byte source preservation, and absence of ELF output.
+- Inference: `Path.samefile` covers a sidecar path resolving to the same existing file on the current filesystem. Concurrent filesystem mutation is outside this fixture.
+- Remaining risks: synthetic plaintext SELF only; no original game file or runtime was used. No G1/G2/game gate passed. The existing remote claim commits are `90a5d99` and `de94278`; this completion record still requires allowlist audit, commit, and push.
+- Publication gates: python3 -I scripts/audit_publish_paths.py exited 0 for 9 staged allowlisted paths; log local/checkpoints/root-re01-unwrap-input-sidecar-collision-complete/audit-staged.log SHA-256 5a14277938021de8734ae083aebf622e7b1a223dc92134c7afa78941336f6f22. The --all audit exited 0 for 1,505 paths; audit-all.log SHA-256 f8ac33df1059e8afafbfbce89e0367064f685e3325b8d00f4cac5fd0526cd14a. git diff --cached --check exited 0; cached-check.log is empty (SHA-256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855).
+- Index/graph log hashes: project-index.log cbc54299be2ecfcc3ea50b4b93fe68e937a2eaf96d48d23e1b3467ab2563d8f7; trail-check.log 265ec5b43199b4f471606042ea8a8fe4acc08261954ac766a12f0e88cd14320a.
+- Task status / attempt count: `FIXTURE_VERIFIED`; zero failed implementation tries.
+- Folder-index command python3 scripts/project_index.py exited 0 and reported 14,212 folders indexed; log local/checkpoints/root-re01-unwrap-input-sidecar-collision-complete/project-index.log. This count includes the private checkpoint directory created for these logs.
+- Next exact action: commit the audited allowlisted files and push origin main. Confirm HEAD equals origin/main, then assign the audit filename test to launcher_review.

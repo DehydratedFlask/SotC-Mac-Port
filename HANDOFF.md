@@ -1,12 +1,31 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 10:39 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 10:47 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 10 (`/root`)
+
+- `RE-01-UNWRAP-INPUT-SIDECAR-COLLISION-01` is FIXTURE_VERIFIED with zero failed implementation
+  tries. The worker and root replay each pass 6/6; the expected pre-guard failure showed the
+  source would be overwritten and ELF output created. E132 and the completion checkpoint record
+  log and source hashes. The source graph was rebuilt and checked after the worker edit.
+- Claimed `AUD-PUBLISH-SECRET-NAME-FIXTURE-01`, ACTIVE with zero failed tries. Add synthetic
+  coverage for nested case-insensitive `.env` and `credentials` filename rules in
+  `scripts/test_audit_publish_paths.py`; no production audit change. Claim:
+  [docs/checkpoints/2026-10-21-root-aud-publish-secret-name-claim.md](docs/checkpoints/2026-10-21-root-aud-publish-secret-name-claim.md).
+- Graft confirmed the deny regex in `scripts/audit_publish_paths.py:30-42`; current tests cover
+  nested forbidden components and file extensions but no `.env` or `credentials` names. Both
+  prerequisite audit tasks are FIXTURE_VERIFIED.
+- Acceptance command: `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audit_publish_paths.py`.
+  No test has run for this task. After claim publication, `launcher_review` owns only this test file;
+  root remains the documentation integrator.
+- The secret-name claim checkpoint is ignored by .gitignore:76 (*secret*). I reviewed it and confirmed it contains no credentials or sensitive values; force-add only this allowlisted documentation file with the Task A completion publication. It is not assigned yet.
+- Next exact action: stage the allowlisted Task A completion and Task B claim paths, run the staged/all path audits, commit, and push. After origin confirms the claim, dispatch the one test file. Preserve escalated host paths; no game gate advanced from Task A.
 
 ## Session addendum 2026-10-21 round 9 (`/root`)
 
