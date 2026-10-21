@@ -105,7 +105,12 @@ def load_members_jsonl(path):
     out = {}
     with Path(path).open() as f:
         for lineno, line in enumerate(f, 1):
-            rec = json.loads(line)
+            try:
+                rec = json.loads(line)
+            except json.JSONDecodeError as exc:
+                if not line.strip():
+                    raise
+                raise PsarcError(f'{path}:{lineno}: malformed JSONL record') from exc
             if not isinstance(rec, dict):
                 raise PsarcError(f'{path}:{lineno}: member record must be a JSON object, '
                                  f'got {type(rec).__name__}')
