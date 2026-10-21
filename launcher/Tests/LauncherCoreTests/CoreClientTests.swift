@@ -234,6 +234,7 @@ struct CoreClientTests {
     @Test func failureTextCoversTheErrorsTheLauncherCanSee() {
         #expect(CoreClientMapping.failureText(for: .engineNotImplemented).contains("not implemented"))
         #expect(CoreClientMapping.failureText(for: .assetsNotReady).contains("validation"))
+        #expect(CoreClientMapping.failureText(for: .abiMismatch) == "The game core was built for a different interface version.")
         #expect(CoreClientMapping.failureText(for: .unknown(5)) == CoreClientMapping.failureText(for: .internalError))
     }
 }

@@ -47,6 +47,7 @@ def program_header(ptype=d.PT_LOAD, vaddr=0x1000, filesz=8, memsz=8):
 def dynamic_import_elf_fixture(symbol_type=2):
     """Build a minimal PS4 ELF with one import and JMPREL/RELA rows."""
     module_id, library_id = 0x1234, 0x56
+    export_id = 0x789
     module_name, library_name = b'FixtureModule', b'libFixture'
     nid = d.nid('sceFixtureFunction')
     module_enc, library_enc = d.encode_id(module_id), d.encode_id(library_id)
@@ -90,7 +91,7 @@ def dynamic_import_elf_fixture(symbol_type=2):
     dynamic_tags = [
         (d.DT_SCE['NEEDED_MODULE'], (module_id << 48) | (1 << 40) | (2 << 32) | module_name_offset),
         (d.DT_SCE['IMPORT_LIB'], (library_id << 48) | (0x102 << 32) | library_name_offset),
-        (d.DT_SCE['EXPORT_LIB'], 0),
+        (d.DT_SCE['EXPORT_LIB'], (export_id << 48) | library_name_offset),
         (d.DT_SCE['STRTAB'], 0),
         (d.DT_SCE['STRSZ'], len(strings)),
         (d.DT_SCE['SYMTAB'], symbol_table_offset),
@@ -119,6 +120,7 @@ def dynamic_import_elf_fixture(symbol_type=2):
     return (header + program_headers + dynamic + dynlib,
             dict(module_id=module_id, library_id=library_id, nid=nid,
                  module_enc=module_enc, library_enc=library_enc,
+                 export_id=export_id,
                  symbol_index=symbol_index, target=target, addend=addend,
                  rela_target=rela_target, rela_type=rela_type, rela_addend=rela_addend))
 
@@ -151,6 +153,11 @@ class Tests(unittest.TestCase):
         self.assertEqual(library['name'], 'libFixture')
         self.assertEqual(library['enc'], expected['library_enc'])
         self.assertEqual(library['version'], 0x102)
+        self.assertEqual(
+            parsed['exports'][expected['export_id']],
+            dict(name='libFixture', id=expected['export_id'],
+                 enc=d.encode_id(expected['export_id'])),
+        )
 
         symbol = parsed['symbols'][expected['symbol_index']]
         self.assertEqual(symbol['nid'], expected['nid'])

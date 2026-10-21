@@ -30,7 +30,16 @@ int main() {
     }
     {
         RegionNode a{}, b{};
+        std::memset(a.raw, 0xA5, sizeof(a.raw));
+        std::memset(b.raw, 0x5A, sizeof(b.raw));
+        std::uint8_t a_before[RegionNode::kBytes];
+        std::uint8_t b_before[RegionNode::kBytes];
+        std::memcpy(a_before, a.raw, sizeof(a.raw));
+        std::memcpy(b_before, b.raw, sizeof(b.raw));
+
         CHECK(!split_free_at_lead(a, b, 0));
+        CHECK(std::memcmp(a.raw, a_before, sizeof(a.raw)) == 0);
+        CHECK(std::memcmp(b.raw, b_before, sizeof(b.raw)) == 0);
     }
     {
         RegionNode free{};
