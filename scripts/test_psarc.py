@@ -217,6 +217,12 @@ class Tests(unittest.TestCase):
         with self.assertRaisesRegex(psarc.PsarcError, '^truncated block$'):
             self.open(build([('a', b'A' * 64)])[:-1]).read(1)
 
+    def test_truncated_stored_block_rejected(self):
+        with self.assertRaisesRegex(
+            psarc.PsarcError, '^block 1 decoded to 15 bytes, expected 16$'
+        ):
+            self.open(build([('a', bytes(range(16)))])[:-1]).read(1)
+
     def test_corrupt_zlib_block_rejected(self):
         def corrupt_last_block(data):
             data = bytearray(data)
