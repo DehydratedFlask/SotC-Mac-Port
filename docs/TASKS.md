@@ -441,3 +441,13 @@ M4 frame rate from upstream RTX/RADV numbers or synthetic scenes.
 `native/save/` serializer/services; `launcher/` Swift app; `tests/` fixtures/integration routes.
 Create a directory only when its first task is claimed. Keep original source addresses and
 artifact identities in local manifests; publishable code must not include original code blobs.
+
+## Orchestrator session 2026-10-21 additions
+
+| ID | Task | Depends on | Status / owner | Failed tries |
+|---|---|---|---|---|
+| CPU-01-LEAF-CTOR-BATCH-34 | Lift 12 call-free leaf ctors (idx 172/174/176/179/187/188/229/237/285/304/321/466) | CPU-01 | FIXTURE_VERIFIED (12 byte checkers + strict decoder `tools/lift/leaf_ctor_decode.py`; 281/281 CTest; unregistered; 6 tail-call bodies and 7 true leaves remain; see `docs/checkpoints/2026-10-21-agentA-native-batch-34.md`) / subagent A | 0 |
+| SAV-01-NATIVE-STREAM-01 | Native tagged-chunk save container with outer header, hash and atomic file I/O | SAV-01-NATIVE-CHECKSUM-01 | FIXTURE_VERIFIED (`native/core/save_stream`; 6 mutations caught; payload semantics UNKNOWN; no real-save compatibility; see `docs/checkpoints/2026-10-21-agentD-sav01-native-stream.md`) / subagent D | 0 |
+| APP-01-CORE-ABI-01 | Versioned C ABI for the native core plus Swift `CoreClient` | APP-01 | PARTIAL (`native/api`; `start()` = ENGINE_NOT_IMPLEMENTED, never running; ctest `sotc_core` 2/2; launcher not yet routed through CoreClient; G4 NOT PASSED; see `docs/checkpoints/2026-10-21-agentC-app01-core-abi.md`) / subagent C | 0 |
+| CPU-01-NAMEHASH-E71990-01 | Identify the name hash behind ctor `0xe71990` | CPU-01 | STATIC_ANALYSIS_VERIFIED (`0xe70aa0` djb2-XOR, 0 remapped to 1; 13/13 constants recomputed; native `name_hash` tested; ctor has no call, premise corrected; see `docs/checkpoints/2026-10-21-agentB-namehash-e71990.md`) / subagent B | 0 |
+| CPU-01-VTABLE-15F9EF0-01 | Map vtable `0x15f9ef0` (slot 12 class) | CPU-01-CTOR11-01 | STATIC_ANALYSIS_VERIFIED (point `0x15f9f00`, 222 slots, slot 12 = `0xf06330`; class identity is inference; 36 checks) / subagent B | 0 |

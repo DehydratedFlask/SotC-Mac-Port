@@ -20,9 +20,23 @@ add_library(sotc_core STATIC
   core/avx_d8fa40.cpp
   core/avx_d86ed0.cpp
   core/avx_d5a280.cpp
+  core/leaf_cab080.cpp
+  core/leaf_ca18d0.cpp
+  core/leaf_c94ae0.cpp
+  core/leaf_b692a0.cpp
+  core/leaf_c811b0.cpp
+  core/leaf_8a0440.cpp
+  core/leaf_c05980.cpp
+  core/leaf_c6f520.cpp
+  core/leaf_c6e9d0.cpp
+  core/leaf_a816d0.cpp
+  core/leaf_3ca7c0.cpp
+  core/leaf_c0d380.cpp
   core/scratch_reset.cpp
   core/save_checksum.cpp
+  core/name_hash.cpp
   core/save_chunk_header.cpp
+  core/save_stream.cpp
   core/descriptor_registration.cpp
   core/const_table_ee1130.cpp
   core/recursive_mutex.cpp
@@ -1270,6 +1284,53 @@ add_executable(test_avx_d5a280 tests/test_avx_d5a280.cpp)
 target_link_libraries(test_avx_d5a280 sotc_core)
 add_test(NAME avx_d5a280 COMMAND test_avx_d5a280)
 
+add_executable(test_leaf_cab080 tests/test_leaf_cab080.cpp)
+target_link_libraries(test_leaf_cab080 sotc_core)
+add_test(NAME leaf_cab080 COMMAND test_leaf_cab080)
+
+add_executable(test_leaf_ca18d0 tests/test_leaf_ca18d0.cpp)
+target_link_libraries(test_leaf_ca18d0 sotc_core)
+add_test(NAME leaf_ca18d0 COMMAND test_leaf_ca18d0)
+
+add_executable(test_leaf_c94ae0 tests/test_leaf_c94ae0.cpp)
+target_link_libraries(test_leaf_c94ae0 sotc_core)
+add_test(NAME leaf_c94ae0 COMMAND test_leaf_c94ae0)
+
+add_executable(test_leaf_b692a0 tests/test_leaf_b692a0.cpp)
+target_link_libraries(test_leaf_b692a0 sotc_core)
+add_test(NAME leaf_b692a0 COMMAND test_leaf_b692a0)
+
+add_executable(test_leaf_c811b0 tests/test_leaf_c811b0.cpp)
+target_link_libraries(test_leaf_c811b0 sotc_core)
+add_test(NAME leaf_c811b0 COMMAND test_leaf_c811b0)
+
+add_executable(test_leaf_8a0440 tests/test_leaf_8a0440.cpp)
+target_link_libraries(test_leaf_8a0440 sotc_core)
+add_test(NAME leaf_8a0440 COMMAND test_leaf_8a0440)
+
+add_executable(test_leaf_c05980 tests/test_leaf_c05980.cpp)
+target_link_libraries(test_leaf_c05980 sotc_core)
+add_test(NAME leaf_c05980 COMMAND test_leaf_c05980)
+
+add_executable(test_leaf_c6f520 tests/test_leaf_c6f520.cpp)
+target_link_libraries(test_leaf_c6f520 sotc_core)
+add_test(NAME leaf_c6f520 COMMAND test_leaf_c6f520)
+
+add_executable(test_leaf_c6e9d0 tests/test_leaf_c6e9d0.cpp)
+target_link_libraries(test_leaf_c6e9d0 sotc_core)
+add_test(NAME leaf_c6e9d0 COMMAND test_leaf_c6e9d0)
+
+add_executable(test_leaf_a816d0 tests/test_leaf_a816d0.cpp)
+target_link_libraries(test_leaf_a816d0 sotc_core)
+add_test(NAME leaf_a816d0 COMMAND test_leaf_a816d0)
+
+add_executable(test_leaf_3ca7c0 tests/test_leaf_3ca7c0.cpp)
+target_link_libraries(test_leaf_3ca7c0 sotc_core)
+add_test(NAME leaf_3ca7c0 COMMAND test_leaf_3ca7c0)
+
+add_executable(test_leaf_c0d380 tests/test_leaf_c0d380.cpp)
+target_link_libraries(test_leaf_c0d380 sotc_core)
+add_test(NAME leaf_c0d380 COMMAND test_leaf_c0d380)
 add_executable(test_const_table_ee1130 tests/test_const_table_ee1130.cpp)
 target_link_libraries(test_const_table_ee1130 sotc_core)
 add_test(NAME const_table_ee1130 COMMAND test_const_table_ee1130)
@@ -1285,3 +1346,17 @@ add_test(NAME save_chunk_header COMMAND test_save_chunk_header)
 add_executable(test_save_checksum_edges tests/test_save_checksum_edges.cpp)
 target_link_libraries(test_save_checksum_edges sotc_core)
 add_test(NAME save_checksum_edges COMMAND test_save_checksum_edges)
+
+add_executable(test_name_hash tests/test_name_hash.cpp)
+target_link_libraries(test_name_hash sotc_core)
+add_test(NAME name_hash COMMAND test_name_hash)
+
+add_executable(test_save_stream tests/test_save_stream.cpp)
+target_link_libraries(test_save_stream sotc_core)
+add_test(NAME save_stream COMMAND test_save_stream)
+
+add_executable(test_save_stream_file tests/test_save_stream_file.cpp)
+target_link_libraries(test_save_stream_file sotc_core)
+add_test(NAME save_stream_file COMMAND test_save_stream_file)
+
+add_subdirectory(api)

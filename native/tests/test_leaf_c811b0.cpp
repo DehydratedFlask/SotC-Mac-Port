@@ -1,0 +1,72 @@
+// The recovered cells are compared with the exact bytes the original stores, lane by lane against
+// an independent oracle, and with a poisoned buffer to prove that bytes no store covers are never
+// written. --dump feeds tools/lift/check_fc811b0.py (binary-vs-native tie).
+#include <array>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
+#include "core/leaf_c811b0.hpp"
+
+#define CHECK(c) do { if (!(c)) { std::fprintf(stderr, "FAIL %s:%d %s\n", __FILE__, __LINE__, #c); std::exit(1); } } while (0)
+
+namespace {
+constexpr std::size_t kSize = 32;
+constexpr std::array<std::uint8_t, kSize> kCells = {
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x80,
+};
+// 1 where some store of the original covers the byte, 0 where the cell is never written.
+constexpr std::array<std::uint8_t, kSize> kCovered = {
+    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+};
+constexpr std::uint8_t kPoison = 0xAA;
+
+template <std::size_t N>
+std::array<std::uint32_t, N> lanes(const std::array<std::uint8_t, kSize>& cells, std::size_t offset) {
+    std::array<std::uint32_t, N> out{};
+    std::memcpy(out.data(), cells.data() + offset, N * 4);
+    return out;
+}
+}  // namespace
+
+int main(int argc, char**) {
+    using namespace sotc;
+    LeafC811b0 g{};
+    init_leaf_c811b0(g);
+    CHECK(g.cells == kCells);
+    // Per-store lane oracle (independent of the 64-bit chunks used by the implementation).
+    CHECK(lanes<4>(g.cells, 0x000) == (std::array<std::uint32_t, 4>{0xffffffffu, 0xffffffffu, 0xffffffffu, 0x00000000u}));
+    CHECK(lanes<4>(g.cells, 0x010) == (std::array<std::uint32_t, 4>{0x80000000u, 0x80000000u, 0x80000000u, 0x80000000u}));
+
+    // Unguarded: a second call over a poisoned buffer rewrites every covered byte to the same
+    // value and leaves every uncovered byte untouched.
+    LeafC811b0 p{};
+    p.cells.fill(kPoison);
+    init_leaf_c811b0(p);
+    std::size_t covered = 0;
+    for (std::size_t i = 0; i != kSize; ++i) {
+        if (kCovered[i]) {
+            CHECK(p.cells[i] == kCells[i]);
+            ++covered;
+        } else {
+            CHECK(p.cells[i] == kPoison);
+        }
+    }
+    CHECK(covered == 32);
+    init_leaf_c811b0(p);   // idempotent
+    for (std::size_t i = 0; i != kSize; ++i) CHECK(p.cells[i] == (kCovered[i] ? kCells[i] : kPoison));
+
+    if (argc > 1) {
+        std::printf("{\"rva\":%u,\"body_length\":%u,\"base\":%llu,\"bytes\":\"",
+                    0xc811b0u, 33u, static_cast<unsigned long long>(0x3351a00ull));
+        for (auto byte : g.cells) std::printf("%02x", byte);
+        std::printf("\",\"bytes_poisoned\":\"");
+        for (auto byte : p.cells) std::printf("%02x", byte);
+        std::printf("\"}\n");
+    } else {
+        std::puts("leaf_c811b0: all checks passed");
+    }
+    return 0;
+}

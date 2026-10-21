@@ -1,0 +1,1 @@
+../../../native/api/sotc_core.cpp
