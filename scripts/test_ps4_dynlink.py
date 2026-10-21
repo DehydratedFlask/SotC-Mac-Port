@@ -357,6 +357,7 @@ class Tests(unittest.TestCase):
 
     def test_program_headers_rejects_wrong_class_data_and_machine(self):
         cases = (
+            ('magic-corrupted', b'\0ELF\x02\x01\x01' + b'\0' * 9, 62),
             ('class-32-bit', b'\x7fELF\x01\x01\x01' + b'\0' * 9, 62),
             ('data-big-endian', b'\x7fELF\x02\x02\x01' + b'\0' * 9, 62),
             ('machine-x86-32', b'\x7fELF\x02\x01\x01' + b'\0' * 9, 3),

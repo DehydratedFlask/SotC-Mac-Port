@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 16:00 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 16:06 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,27 +8,28 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Round 69 fixture claims (/root)
+## Round 69 fixtures verified (/root)
 
-- Three bounded test-only claims are recorded in `docs/TASKS.md` and the
-  [claim checkpoint](docs/checkpoints/2026-10-21-root-round69-fixture-claims.md). The targets
-  are APP requested-stop precedence over a clean zero exit, synthetic ELF magic-byte rejection,
-  and a PSARC prefix read when only a later compressed block is truncated. Baselines pass 11 Swift,
-  24 dynlink, and 35 PSARC tests, respectively; the claim checkpoint records commands, hashes,
-  logs, and scope limits.
-- Claim commit `4fabeb0ebbc759a3d9bec424e8f39d48893fc83e` is pushed to `origin/main`; post-push
-  `HEAD == origin/main`, with zero divergence. The completion of publication is recorded in the
-  checkpoint's publication addendum.
-- Claims have zero failed tries and zero implementation attempts. Root owns shared documentation;
-  `/root/launcher_review`, `/root/review_host_proto`, and `/root/round68_data_scout` own only their
-  respective existing test files after claim publication. No production change is proposed.
-- The PSARC invalid-UTF-8 exception preference remains pending and is excluded from this batch.
-  Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched.
-- The native scouts found no claim for this round: `region_list` already has the proposed cases;
-  a nonaligned free-list page-budget fixture was deferred because E164 covers a related partial-page
-  edge and the helper has no production caller establishing that direct input as a contract.
-- Exact next action: dispatch the three single-file fixture tasks, review each diff, and
-  independently replay its focused suite before completion.
+- Three test-only tasks are recorded as `FIXTURE_VERIFIED` in `docs/TASKS.md` with evidence E207–E209.
+  Workers changed only their assigned test files; root reviewed all three diffs and independently
+  replayed each focused command. Results are 11 Swift tests across 2 suites, 24 dynlink tests, and
+  36 PSARC tests. Hashes, logs, scope limits, and observations are in the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-round69-fixtures-complete.md).
+- Claim commit `4fabeb0ebbc759a3d9bec424e8f39d48893fc83e` and claim documentation sync
+  `e669b7c35dd0fa155e962a57957a5da686be87e2` are pushed. The tasks were dispatched only after the
+  claim commit was public.
+- These fixtures cover pure lifecycle classification, a synthetic ELF identity guard, and synthetic
+  PSARC prefix behavior. They establish no live child-process timing, ELF loading, real archive data,
+  game behavior, or acceptance gate. G0 remains PARTIAL; G1–G6 remain NOT RUN.
+- The invalid-UTF-8 PSARC exception preference remains pending and is excluded. Native scouting
+  found no nonredundant region-list case; a nonaligned free-list edge was deferred because E164
+  covers related arithmetic and no production caller establishes that direct input contract.
+- Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched
+  and excluded. `INSTALL_LOG.md` did not change.
+- Project index is current at 14,464 folders. Trail was refreshed to 3,568 nodes / 4,829 edges /
+  943 cards, and `trail build --check` passes; the optional meaning layer remains unbuilt.
+- Exact next action: commit and push the verified Round 69 batch, verify `HEAD == origin/main`,
+  then scout and claim the next bounded batch.
 
 ## Round 67 fixtures verified (/root)
 
