@@ -8,6 +8,32 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## Session addendum 2026-10-21 round 11 (`/root`)
+
+- Claimed three independent, synthetic test-only tasks: `DATA-02-OVERLAP-MAP-JSON-CONSTANTS-01`
+  (worker `launcher_review`, `scripts/test_archive_overlap_map.py` only),
+  `AUD-01-XFF-EXACT-PATH-CARDINALITY-01` (worker `slot23_raw_xrefs`,
+  `scripts/test_audio_bank_header.py` only), and `DOC-FOLDER-INDEX-SYMLINK-01`
+  (worker `review_host_proto`, `scripts/test_project_tools.py` only). All are ACTIVE with zero
+  failed implementation tries; root owns this handoff and the project/task records.
+- Their prerequisites are complete: the archive-overlap map artifact is verified; XFF identity
+  verification is fixture-verified; and the folder-index admin-directory fixture is fixture-verified.
+  No production parser/index code or game data is in scope.
+- Claims: [JSON constants](docs/checkpoints/2026-10-21-root-data02-overlap-map-json-constants-claim.md),
+  [XFF exact paths](docs/checkpoints/2026-10-21-root-aud01-xff-exact-path-cardinality-claim.md),
+  [folder-index symlinks](docs/checkpoints/2026-10-21-root-doc-folder-index-symlink-claim.md).
+- Acceptance commands: `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_archive_overlap_map.py`,
+  `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_bank_header.py`, and
+  `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py`, respectively. Workers must
+  save logs in private `local/validation/` paths and report exact results to root for independent
+  replay and publication.
+- Claim-time repository state: `main`, HEAD equals `origin/main` at `667a88c`; only the previously
+  escalated `native/api/CMakeLists.txt` and untracked `native/api/host/` are dirty. Those paths stay
+  outside all three tasks and all commits. No game gate advances from these fixtures.
+- Immediate next action: publish these claims, then dispatch the three file-disjoint workers. Root
+  will replay each acceptance command, record completion checkpoints/Evidence entries, update the
+  task rows and handoff, and publish only allowlisted paths.
+
 ## Session addendum 2026-10-21 round 10 (`/root`)
 
 - `RE-01-UNWRAP-INPUT-SIDECAR-COLLISION-01` is FIXTURE_VERIFIED with zero failed implementation
