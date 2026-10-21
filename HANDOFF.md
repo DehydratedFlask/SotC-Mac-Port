@@ -1,12 +1,32 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 12:40 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 12:44 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 52 (`/root`)
+
+- Published the three claims in `e8207987476db2072c4b4a52c7fe2b7ac0d6ab02` before implementation.
+- Completed `APP-01-CORE-COVERAGE-ONLY-STATUS-FIXTURE-01`: worker and root each pass 83 launcher
+  tests across 12 suites; the synthetic mapping includes the core ABI when coverage exists without
+  validation. E159 and its completion checkpoint record hashes and logs.
+- Completed `RE-01-UNWRAP-IDENTITY-SIDECAR-ROUNDTRIP-FIXTURE-01`: worker and root each pass all 8
+  project-tool tests; the saved synthetic identity JSON equals the helper's returned record. E160
+  and its completion checkpoint record hashes and logs.
+- Completed `SRV-01-FREE-LIST-CARVE-ALIGN-OVERFLOW-FIXTURE-01`: worker and root each build the
+  native test target and pass focused CTest 1/1 for uint64 align-up overflow rejection. E161 and its
+  completion checkpoint record hashes and logs.
+- All three changes are test-only. Actual-game gates remain open; `native/api/CMakeLists.txt` and
+  untracked `native/api/host/` remain untouched and unpublished.
+- Regenerated the folder index to 14,388 entries. The first source-graph check was stale for the
+  three changed test files and new launcher test symbol; `trail build` rebuilt the graph to 3,546
+  nodes / 4,779 edges, and the follow-up `trail build --check` passed. The graph cache is ignored.
+- Exact next action: stage only the three test files and the completion, evidence, task, handoff,
+  index, and publication records; rerun staged/full path audits, then commit and push.
 
 ## Session addendum 2026-10-21 round 51 (`/root`)
 
