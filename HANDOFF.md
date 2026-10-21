@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 10:00 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 10:06 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -10,16 +10,27 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 
 ## Session addendum 2026-10-21 round 5 (`/root`)
 
-- Claimed `AUD-01-XFF-READER-IDENTITY-FIXTURE-01`, ACTIVE, attempt 0: add synthetic tests for
-  `audio_bank_header.inspect_members` success and a manifest identity mismatch, including reader
-  closure on both paths. Worker owns only `scripts/test_audio_bank_header.py`; no parser change is
-  authorized by this claim. Claim record:
+- Completed `AUD-01-XFF-READER-IDENTITY-FIXTURE-01`, FIXTURE_VERIFIED with one failed fixture
+  attempt: synthetic tests cover full summary/archive/member identity, manifest mismatch, and reader
+  closure on success/error. Worker changed only `scripts/test_audio_bank_header.py`; parser source
+  was unchanged. Worker retry 2 and root replay each passed 16/16. Completion record:
   [docs/checkpoints/2026-10-21-root-aud01-xff-reader-identity-claim.md](docs/checkpoints/2026-10-21-root-aud01-xff-reader-identity-claim.md).
+- The worker's first focused run, `python3 -I scripts/test_audio_bank_header.py`, failed 1 of 16
+  tests because the success fixture expected a resolved summary path, while `inspect_members`
+  preserves the supplied summary path verbatim. The mismatch/error cleanup test passed. Evidence:
+  `local/validation/aud01-xff-reader-identity-fixture-01/attempt-1.log`; the incorrect expected
+  value was test-only. The one-line fixture correction passed 16/16 on worker retry 2; root replay
+  is pending. No parser source changed.
 - Graft located the reader identity checks at `scripts/audio_bank_header.py:101-198`; its only
   indexed references are the definition and CLI call. The accepted fixture will mock `Psarc` and
   use temporary archive/summary/manifest files, so it does not read a game archive or invoke zlib.
-- Next exact action: delegate the bounded test-file edit; root reviews the diff and runs
-  `python3 -I scripts/test_audio_bank_header.py` before integrating the result.
+- Root reviewed the diff and replayed `python3 -I scripts/test_audio_bank_header.py`: exit 0,
+  16/16, log `local/validation/aud01-xff-reader-identity-fixture-01/root-replay.log` (SHA256
+  `40e7e701b0fb7520dec152943e03896c5835fbb8b2ebe4c5ca0e04b62aeaeb2b`). Test SHA256
+  `c5a09bccf054d0cd186144a22b602cb2777993857cd87d5ad3846cc04e230912`; parser SHA256 remains
+  `bdad7d192b0ecdb929daf5147a139e7545fd5c546f01ed4ffb4005f2cea9f9c0`.
+- Next exact action: run project index and trail checks, audit the allowlisted staged/all paths,
+  commit and push this completed fixture task. No real archive, codec, playback, or G1 claim.
 
 ## Session addendum 2026-10-21 round 4 (`/root`)
 
