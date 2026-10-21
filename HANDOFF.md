@@ -1,12 +1,21 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 17:45 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 17:51 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Round 77 tasks claimed (/root)
+
+- Four bounded test-only tasks are claimed with clean baselines: numeric `CoreState` code coverage, diagnostics text for every core state, unsupported PSARC entry-size rejection, and the ordered native ABI subsystem-name list. Exact commands, source hashes, baseline logs, task ownership, and constraints are in the [Round77 claim checkpoint](docs/checkpoints/2026-10-21-root-round77-fixture-claims.md).
+- Owners and sole files: `/root/launcher_review` — `launcher/Tests/LauncherCoreTests/CoreClientTests.swift`; `/root/scout_launcher_queue` — `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift`; `/root/review_host_proto` — `scripts/test_psarc.py`; `/root/round68_native_scout` — `native/api/tests/test_sotc_core_api.cpp`. Attempts: zero for all four.
+- Baselines pass: 22 launcher CoreClient tests across two suites, 5 CoreReadiness tests, 38 PSARC tests, and native target build plus CTest 1/1. No production source is planned to change. All results will remain fixture-only; G0 stays PARTIAL and G1–G6 stay NOT RUN.
+- The native ABI baseline used the existing user-owned `native/api/CMakeLists.txt` (SHA256 `aa04d19b5fde7c32ae4f30d28bcf781f0a65a337c75c96ad63c29e320bb402de`). That file and untracked `native/api/host/` remain excluded from our changes and publication.
+- Claim preflight passes: index 14,476 folders current, Trail wiring graph 3,578 nodes / 4,853 edges current, staged audit accepts 5 paths, and full audit accepts 1,658 paths. Completion and publication records remain pending.
+- Exact next action: commit and push the Round77 claim, fetch-verify `origin/main`, then dispatch the four workers to add only their claimed assertions; root independently replays each targeted check and records the completion evidence.
 
 ## Round 76 fixtures verified (/root)
 
@@ -15,7 +24,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - The batch is synthetic-only: formatter output, malformed synthetic TOC width, and an invalid sparse zero-version file that passes the exact size boundary. The last fixture reads about 100 MiB. No game save, real archive, launcher UI, or game behavior is claimed. G0 remains PARTIAL; G1–G6 remain NOT RUN. Project index is current at 14,475 folders; Trail wiring is synced at 3,578 nodes. The graph cache is local and ignored.
 - Round76 completion is published as `7bc6dff58aae425db3b5ffcdafcc1fae143e40a0`; `git push origin main` succeeded and a subsequent `git fetch origin main` confirmed `HEAD == origin/main` with 0/0 divergence. Preflight accepted 9 staged paths and 1,657 full-tree paths; details are in the [Round76 completion checkpoint](docs/checkpoints/2026-10-21-root-round76-fixtures-complete.md).
 - Claim commit `ec88e14f829f2079758a7873a38bc468d081660f` is pushed and fetch-verified at `origin/main`; publication and dispatch evidence is in the [claim checkpoint](docs/checkpoints/2026-10-21-root-round76-fixture-claims.md). Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and excluded.
-- Exact next action: scout the next independent bounded tasks from `docs/TASKS.md` and the live Trail graph, claim them, and continue implementation.
+- Exact next action: finish the four claimed Round77 fixtures, independently replay them, then update the project index and publish allowlisted changes.
 
 ## Round 75 fixtures verified (/root)
 
