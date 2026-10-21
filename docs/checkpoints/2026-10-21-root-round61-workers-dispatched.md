@@ -1,6 +1,6 @@
 # Checkpoint: Round 61 workers dispatched
 
-- Local date/time: 2026-10-21 14:02 CDT (America/Chicago).
+- Local date/time: 2026-10-21 14:05 CDT (America/Chicago); dispatch record closed at this checkpoint.
 - Agent ID: `/root` (integrator); assigned `/root/launcher_review`, `/root/review_host_proto`, and
   `/root/slot23_raw_xrefs`.
 - Task claim checkpoint: `docs/checkpoints/2026-10-21-root-round61-fixture-claims.md`.
@@ -30,9 +30,11 @@
   Root owns `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`, reviews diffs, and independently
   replays all commands.
 - Baselines were clean at claim time: 12 Swift tests, 23 audio-header tests, and region-split target
-  build plus focused CTest 1/1. Exact hashes and baseline logs are in the claim checkpoint. Tasks
-  remain ACTIVE with 0 failed fixture attempts; implementation prompts will be sent after this
-  assignment checkpoint is published.
+  build plus focused CTest 1/1. Exact hashes and baseline logs are in the claim checkpoint. At
+  14:02 CDT, root sent all three implementation prompts after this assignment checkpoint was
+  pushed. `collaboration.list_agents` then reported all three owners running. Workers completed
+  their claimed single-file fixtures with 0 failed attempts, and root independently replayed each
+  command; results are in `docs/checkpoints/2026-10-21-root-round61-fixtures-complete.md`.
 - `python3 scripts/project_index.py` exited 0 and indexed 14,417 folders; `docs/FOLDERS.md` lists
   357 checkpoint files. Log `local/validation/root-round61-baseline/project-index.log`, SHA-256
   `39bf43672c493802900b5ff2ada9ee28bb1d1d50c8c4546146075a4c09be1283`. The follow-up
@@ -47,5 +49,5 @@
   paths; log `local/validation/root-round61-baseline/audit-all.log`, SHA-256
   `8180bb290d1705abf013b4706118e3f32447cdf19b89ac09f8fd1b25588b8c5e`. Cached and working
   `git diff --check` exited 0. Only four allowlisted documentation paths are staged.
-- Exact next action: fetch `origin/main`, commit and push the dispatch checkpoint if the branch has
-  not advanced, then send the worker prompts and wait for stable diffs.
+- Exact next action: continue with the Round 62 task-selection checkpoint recorded in the current
+  `HANDOFF.md` after publishing the Round 61 completion record.

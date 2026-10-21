@@ -140,6 +140,15 @@ class EntropyAndProbeTests(unittest.TestCase):
         self.assertTrue(probe['raw_inflate_offset2'].get('rejected_trivial')
                         or probe['raw_inflate_offset2'].get('err'))
 
+    def test_trivial_lzma_probe_output_rejected(self):
+        payload = b'X'
+        probe = cah.decompress_probe(lzma.compress(payload))
+        self.assertEqual(probe['lzma_offset0'], {
+            'ok': False,
+            'out_len': 1,
+            'rejected_trivial': True,
+        })
+
     def test_real_zlib_accepted(self):
         payload = b'A' * 64
         wrapped = zlib.compress(payload)
