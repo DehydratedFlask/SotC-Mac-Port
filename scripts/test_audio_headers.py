@@ -153,6 +153,14 @@ class EntropyAndProbeTests(unittest.TestCase):
         self.assertTrue(probe['zlib_offset2']['ok'])
         self.assertEqual(probe['zlib_offset2']['out_len'], len(payload))
 
+    def test_raw_deflate_accepted_at_offset_zero(self):
+        payload = b'C' * 64
+        compressor = zlib.compressobj(wbits=-15)
+        wrapped = compressor.compress(payload) + compressor.flush()
+        probe = cah.decompress_probe(wrapped)
+        self.assertTrue(probe['raw_inflate_offset0']['ok'])
+        self.assertEqual(probe['raw_inflate_offset0']['out_len'], len(payload))
+
 
 class ClassifyFixtureTests(unittest.TestCase):
     def test_codec_always_unknown_on_empty_set(self):
