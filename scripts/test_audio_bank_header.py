@@ -308,6 +308,28 @@ class InspectMembersTests(unittest.TestCase):
         self.assertEqual(fixture['reader'].read_calls, [1])
         self.assertTrue(fixture['reader'].closed)
 
+    def test_inspect_members_wraps_psarc_read_error_and_closes_reader(self):
+        fixture = self._fixture()
+        reader = fixture['reader']
+        with patch.object(
+                reader, 'read', side_effect=abh.PsarcError('synthetic read failure')) as read, \
+                patch.object(abh, 'Psarc', return_value=reader) as psarc:
+            with self.assertRaises(abh.AudioBankFormatError) as context:
+                abh.inspect_members(
+                    fixture['archive_path'],
+                    [fixture['member_path']],
+                    fixture['manifest_path'],
+                    fixture['summary_path'],
+                )
+
+        psarc.assert_called_once_with(fixture['archive_path'].resolve())
+        read.assert_called_once_with(1)
+        self.assertEqual(
+            str(context.exception),
+            'cannot read PSARC entry 1 (sound/fixture.hd): synthetic read failure',
+        )
+        self.assertTrue(reader.closed)
+
     def test_inspect_members_rejects_zero_exact_path_matches_and_closes_reader(self):
         fixture = self._fixture()
         reader = fixture['reader']

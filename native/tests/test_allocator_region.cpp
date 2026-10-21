@@ -25,6 +25,7 @@ int main() {
     CHECK(align_size_up_64k(1) == 0x10000ull);
     CHECK(align_size_up_64k(0x10000) == 0x10000ull);
     CHECK(align_size_up_64k(0x6400000) == 0x6400000ull);
+    CHECK(align_size_up_64k(0x10001ull) == 0x20000ull);
 
     // Region view → HeapWindow (same rule as HeapWindow::from_region).
     {
