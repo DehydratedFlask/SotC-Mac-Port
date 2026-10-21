@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 15:36 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 15:45 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -18,6 +18,29 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Documentation sync commit `d86d5db6fd67a114cc2054a078b72ac1c6d60fa8` is also pushed; its combined push/state log `local/validation/root-round66-scout/round67-sync-push.log` (SHA-256 `6d578babaf8f510af1baab27a848d2255c0d75b270c94d56f4d7acd2c1c6ffb4`) verifies `HEAD == origin/main` at that commit.
 - Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and excluded from this publication.
 - Exact next action: scout and claim the next bounded batch from the live repository before implementation.
+
+## Round 68 bounded fixture claims (/root)
+
+- Three independent, test-only tasks are claimed in `docs/TASKS.md` and recorded in the
+  [claim checkpoint](docs/checkpoints/2026-10-21-root-round68-fixture-claims.md). They cover the
+  unexpected-exit state with readiness false, malformed synthetic `DT_SCE_SYMTABSZ` byte count,
+  and canonical host-map state after repeated unmapping. Claims are assigned to
+  `/root/launcher_review`, `/root/review_host_proto`, and `/root/slot23_raw_xrefs` respectively;
+  root retains sole ownership of shared documentation and replay.
+- The existing test baselines pass: LauncherLifecycleTests (11 tests / 2 suites), dynlink parser
+  (23 tests), and host-map build plus focused CTest (exit 0 / 1 of 1). Their exact commands, source
+  and test hashes, results, and fixture limits are in the claim checkpoint. No worker edits have
+  started.
+- These claims add no runtime evidence and do not advance gates: G0 remains PARTIAL; G1–G6 remain
+  NOT RUN. No native game executable, boot, actual game audio, real save/reload, or Metal gameplay
+  is demonstrated.
+- The separate PSARC invalid-UTF-8 candidate is held unclaimed pending the user's choice on error
+  normalization versus preserving `UnicodeDecodeError`.
+- `python3 scripts/project_index.py` and `--check` pass at 14,463 folders. `trail build --check`
+  passes with the 3,566-node / 4,824-edge wiring graph in sync; the optional deep meaning layer
+  remains unbuilt. Exact output and hashes are in the claim checkpoint.
+- Exact next action: publish the claim checkpoint, then dispatch the three one-file test changes;
+  root reviews each diff and replays each focused command before marking any task verified.
 
 ## Round 66 bounded fixtures verified (/root)
 
