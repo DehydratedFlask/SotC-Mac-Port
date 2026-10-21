@@ -30,7 +30,14 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Claim-time repository state: `main`, HEAD equals `origin/main` at `667a88c`; only the previously
   escalated `native/api/CMakeLists.txt` and untracked `native/api/host/` are dirty. Those paths stay
   outside all three tasks and all commits. No game gate advances from these fixtures.
-- Immediate next action: publish these claims, then dispatch the three file-disjoint workers. Root
+- Claim publication: commit `8723be0eba56ba3ed675dc73b7379edc6f2391eb` is pushed to `origin/main`;
+  staged and full path audits passed for 6 staged paths and 1,509 tracked paths. Root verified
+  HEAD equals `origin/main`; only the excluded host escalation paths remain dirty.
+- Checkpoint-index correction: after private checkpoint logs were added, two
+  `python3 scripts/project_index.py --check` runs reported stale `local/indexes/folders.json`;
+  the index was regenerated after all log paths existed, and the final check passes with 14,214
+  folders. This affects only the private index; `docs/FOLDERS.md` remains current.
+- Immediate next action: dispatch the three file-disjoint workers. Root
   will replay each acceptance command, record completion checkpoints/Evidence entries, update the
   task rows and handoff, and publish only allowlisted paths.
 
