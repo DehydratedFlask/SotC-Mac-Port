@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — AUD-02 second tick driver characterized
+
+`FUN_00997700` is a request-driven pull entry (guarded API wrapper `FUN_009975f0` with no static callers; tick call `FUN_009536d0` only when leftover count is zero); `FUN_00997970` pumps the tick inside a wait loop in `FUN_00986a50`. Roles inference; it is unknown whether the second driver ever runs. 2 REA successes; root replayed verifier (38/38 worker mutants rejected) and checksums. Details: `docs/checkpoints/2026-10-20-root-aud02-tickdriver-callers-complete.md`. No audio. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 216/216 (pushed `d7f42cd`).
+
+Next exact action: `FUN_00986a50`'s callers (`0x986e1c`, `0x989556`) or the guard-counter initializer; SAV-01 bool-chunk reader `0xa81180`/profile writers/load deserializer `0x5435f0`; constructor batch 24 (next position 190 `0xbc07f0`).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — SAV-01 flush path and game-data blob structure decoded
 
 Stream flush = three-class chain (slot `[vtbl+0x10]` → `0x4d420`, staging buffer `0x1000`, growable vector, length back-patch, verbatim memcpy into `[obj+0x60]`). Game-data blob producer `0x7e5bb0` is a 14-byte accessor (`.bss` `0x3260bb8`, `0x3cd8` bytes); chunk = tag `0xd` + u64 len + raw bytes (15596 B total); 48 bool chunks precede it. 2 REA successes; root replayed verifier (127/127 worker mutations caught) and checksums. Details: `docs/checkpoints/2026-10-20-root-sav01-blob-flush-complete.md`. Blob semantics unknown; no native serializer; no save works. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 216/216 (batch 23, pushed `d7f42cd`).
