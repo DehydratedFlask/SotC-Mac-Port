@@ -1,0 +1,12 @@
+# Checkpoint: round 20 publication
+
+- Local date/time: 2026-10-21 11:40 CDT.
+- Agent ID: `/root` (integrator).
+- Task IDs: `RE-02-DYNLINK-MAPPED-RANGE-FIXTURE-01`, `DOC-ASSETS-AUD-01-XFF-COVERAGE-COUNT-01`, and `DATA-02-ARCHIVE-MANIFEST-CRLF-01` publication.
+- Status: the two fixture tasks are `FIXTURE_VERIFIED`; the CRLF fixture task is `ACTIVE`; all have zero failed tries.
+- Published paths: `HANDOFF.md`, `docs/ASSETS.md`, `docs/EVIDENCE.md`, `docs/FOLDERS.md`, `docs/TASKS.md`, three task checkpoints, and `scripts/test_ps4_dynlink.py`. Commit `d19067e952736880d643b9d521d9eaaa5316b455` (`test: record mapped-range fixture and manifest CRLF claim`) was pushed by `git push origin main`; exit 0. `git rev-parse HEAD origin/main` returned the same hash for both.
+- Exact pre-commit checks and results: `python3 scripts/project_index.py` exit 0 (14,230 folders indexed; written); `python3 scripts/project_index.py --check` exit 0 (14,230 folders indexed; current); `trail build --check` exit 0 (wiring graph in sync; deep meaning layer not built); `git diff --cached --check` exit 0; `python3 -I scripts/audit_publish_paths.py` exit 0 (9 staged paths); `python3 -I scripts/audit_publish_paths.py --all` exit 0 (1,525 paths). Logs: `local/checkpoints/root-round20-claim/{project-index.log,project-index-published.log,trail-check-final.log,staged-diff-check.log,audit-staged.log,audit-all.log}`. A final direct `python3 scripts/project_index.py --check` replay exited 0 after the private log set was stable.
+- Post-push status command: `git status --short --branch`; exit 0, `main` synchronized with `origin/main`. Remaining worktree state is the pre-existing modification `native/api/CMakeLists.txt` and untracked `native/api/host/`; neither path was staged or published. The post-commit staged audit has no paths and exits 2; the staged audit before commit passed.
+- Observation: published tests and evidence cover synthetic fixtures and a documentation count correction only. Inference limit: no live ELF, archive, asset, codec, launcher, or game-runtime behavior is established by this batch.
+- Remaining risks: cold boot, audible game content, real save/reload, direct Metal validation, and forbidden-runtime/module absence are still unproven. Native host implementation remains under its separate pre-existing escalation and outside this batch.
+- Next exact action: review `review_host_proto`'s fixture in `scripts/test_archive_overlap_map.py`, root replay the acceptance command, and preserve both logs before updating evidence and handoff.

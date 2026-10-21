@@ -120,12 +120,20 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   continue with the independent scout's candidate if still unclaimed. All real game acceptance gates
   remain unchanged.
 
+## Session addendum 2026-10-21 round 21 (`/root`)
+
+- Published the round 20 batch in commit `d19067e952736880d643b9d521d9eaaa5316b455` (`test: record mapped-range fixture and manifest CRLF claim`); `git push origin main` exited 0 and both `HEAD` and `origin/main` resolve to that commit. See [publication checkpoint](docs/checkpoints/2026-10-21-root-round20-publication.md).
+- Pre-commit checks: `python3 scripts/project_index.py` and `python3 scripts/project_index.py --check` exited 0 (14,230 folders indexed/current); `trail build --check` exited 0 (wiring graph in sync; the optional deep layer is not built); `git diff --cached --check` exited 0; `python3 -I scripts/audit_publish_paths.py` exited 0 for 9 staged allowlisted paths; `python3 -I scripts/audit_publish_paths.py --all` exited 0 for 1,525 paths. Logs are under `local/checkpoints/root-round20-claim/`.
+- Post-commit `git status --short --branch` showed `main` synchronized with `origin/main`. The only remaining changes are the pre-existing `native/api/CMakeLists.txt` modification and untracked `native/api/host/`; neither was staged or published. A post-commit staged audit reported no staged files (exit 2); the staged audit immediately before commit passed.
+- `RE-02-DYNLINK-MAPPED-RANGE-FIXTURE-01` and `DOC-ASSETS-AUD-01-XFF-COVERAGE-COUNT-01` are `FIXTURE_VERIFIED`; `DATA-02-ARCHIVE-MANIFEST-CRLF-01` is claimed `ACTIVE`. All have zero failed tries. Actual game boot/audio/save-load/Metal acceptance gates remain open.
+- `review_host_proto` now owns only `scripts/test_archive_overlap_map.py` for the claimed CRLF fixture. Next exact action: review its patch, root-replay `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_archive_overlap_map.py`, and record the result.
+
 ## Session addendum 2026-10-21 round 20 (`/root`)
 
 - Completed `RE-02-DYNLINK-MAPPED-RANGE-FIXTURE-01`, FIXTURE_VERIFIED with zero failed tries. The synthetic two-segment fixture asserts a contained mapped range is true, while a range crossing the first segment end and a nonzero range starting in the gap are false. Worker and root each pass `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py` (20/20); test SHA256 `f779cc8f7983c20efed84f2c17f35415f8daa718f8a812599986747b3b261695`; production parser unchanged at `28c53257a6f2bd58522f123098d41ca0d884222330a1bf18ce9f8935fb45eff9`. E141 and [completion checkpoint](docs/checkpoints/2026-10-21-root-re02-dynlink-mapped-range-complete.md) record both log hashes. No live ELF or loader claim.
 - Completed `DOC-ASSETS-AUD-01-XFF-COVERAGE-COUNT-01`, FIXTURE_VERIFIED with zero failed tries. `docs/ASSETS.md` now accurately says “18 synthetic test methods”; the count command returns 18 and the test suite passes 18/18. `docs/ASSETS.md` SHA256 `ca0e0e495ef02a88a56a52589dda8d790c018162ff009d9ee5463558e9b85f87`; E142 and [completion checkpoint](docs/checkpoints/2026-10-21-root-doc-assets-aud01-xff-count-complete.md) record worker/root logs. This is a documentation count correction only; no codec or playback claim.
 - Claimed `DATA-02-ARCHIVE-MANIFEST-CRLF-01`, ACTIVE with zero failed tries. The parser has an explicit CRLF strip at `scripts/audit_archive_overlap_map.py:66`; current tests cover LF and blank records but not CRLF. Add one synthetic two-record CRLF fixture to `scripts/test_archive_overlap_map.py`. Claim: [CRLF manifest fixture](docs/checkpoints/2026-10-21-root-data02-manifest-crlf-claim.md). After its claim publication, `review_host_proto` will own only that test file; root owns all documentation.
-- Next exact action: publish E141/E142 and the CRLF claim, then dispatch `review_host_proto` and root-replay its focused test suite.
+- At this checkpoint the next action was to publish E141/E142 and the CRLF claim; publication completed in round 21 above.
 
 ## Session addendum 2026-10-21 round 19 (`/root`)
 
