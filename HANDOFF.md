@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 14:58 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 15:02 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -30,8 +30,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched
   and excluded. No installation or dependency facts changed. G0 remains PARTIAL; G1–G6 remain NOT
   RUN.
-- Exact next action: finish the allowlisted publication audit and push, then use Graft to scout
-  independent bounded tasks and publish their claims before assigning any implementation.
+- Completion commit `061d8d530d4a84213372d03289e72535f9be6102` (`test: cover Round65 launcher,
+  archive, allocator fixtures`) is pushed to `origin/main`; push log and the state showing
+  `HEAD == origin/main` are recorded in the [completion checkpoint](docs/checkpoints/2026-10-21-root-round65-fixtures-complete.md).
+- Exact next action: review the read-only Round66 scouting results, verify candidate source behavior
+  and prerequisites with Graft/live files, then claim and publish bounded independent tasks before
+  assigning implementation.
 
 ## Round 64 test-only fixtures verified (/root)
 
