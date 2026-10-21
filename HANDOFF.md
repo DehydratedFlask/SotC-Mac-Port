@@ -15,8 +15,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Baselines pass: 22 launcher CoreClient tests across two suites, 5 CoreReadiness tests, 38 PSARC tests, and native target build plus CTest 1/1. No production source is planned to change. All results will remain fixture-only; G0 stays PARTIAL and G1–G6 stay NOT RUN.
 - The native ABI baseline used the existing user-owned `native/api/CMakeLists.txt` (SHA256 `aa04d19b5fde7c32ae4f30d28bcf781f0a65a337c75c96ad63c29e320bb402de`). That file and untracked `native/api/host/` remain excluded from our changes and publication.
 - The claim is published as `84706a333356aab9d45b3c8355b15835da96a70c`; push succeeded and a subsequent fetch confirmed `HEAD == origin/main` with 0/0 divergence. Preflight accepted 5 staged paths and 1,658 full-tree paths; details and logs are in the [Round77 claim checkpoint](docs/checkpoints/2026-10-21-root-round77-fixture-claims.md).
-- The post-claim publication record is being finalized after a docs-only audit pass; its staged set contains only `HANDOFF.md` and the Round77 claim checkpoint.
-- Exact next action: publish the post-claim record update, then dispatch the four workers to add only their claimed assertions; root independently replays each targeted check and records the completion evidence.
+- The claim's publication record is committed as `cb45ea030424882f1fd924323dd7fecc4e139f97`; push succeeded and fetch confirmed `HEAD == origin/main` with 0/0 divergence.
+- Exact next action: dispatch the four workers to add only their claimed assertions; root independently replays each targeted check and records the completion evidence.
 
 ## Round 76 fixtures verified (/root)
 
