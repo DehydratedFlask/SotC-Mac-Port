@@ -1,12 +1,25 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 09:58 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 10:00 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 5 (`/root`)
+
+- Claimed `AUD-01-XFF-READER-IDENTITY-FIXTURE-01`, ACTIVE, attempt 0: add synthetic tests for
+  `audio_bank_header.inspect_members` success and a manifest identity mismatch, including reader
+  closure on both paths. Worker owns only `scripts/test_audio_bank_header.py`; no parser change is
+  authorized by this claim. Claim record:
+  [docs/checkpoints/2026-10-21-root-aud01-xff-reader-identity-claim.md](docs/checkpoints/2026-10-21-root-aud01-xff-reader-identity-claim.md).
+- Graft located the reader identity checks at `scripts/audio_bank_header.py:101-198`; its only
+  indexed references are the definition and CLI call. The accepted fixture will mock `Psarc` and
+  use temporary archive/summary/manifest files, so it does not read a game archive or invoke zlib.
+- Next exact action: delegate the bounded test-file edit; root reviews the diff and runs
+  `python3 -I scripts/test_audio_bank_header.py` before integrating the result.
 
 ## Session addendum 2026-10-21 round 4 (`/root`)
 
