@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 14:31 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 14:36 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -37,8 +37,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   and evidence E187–E189. `trail build` and `trail build --check` pass; optional meaning layer stays
   unbuilt. Synthetic fixtures do not advance G0–G6 runtime gates. Existing user-owned
   `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and excluded.
-- Exact next action: scout three distinct Round64 test-only fixtures with Graft, verify candidates
-  and focused baselines against live files, then claim and publish the tasks before dispatch.
+- Completion commit `a6e5afa08d33133804768fe4f10804bd2a7b603a` is pushed to `origin/main`; post-push
+  `HEAD` and `origin/main` match. Push log and state log hashes are in the completion checkpoint.
+- Exact next action: review the three read-only Round64 scout reports, verify each candidate with
+  Graft and live files, check registry uniqueness and focused baselines, then publish bounded claims
+  before dispatching any test edits.
 
 ## Session addendum 2026-10-21 Round 62 fixtures verified (/root)
 
