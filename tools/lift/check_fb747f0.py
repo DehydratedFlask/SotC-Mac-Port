@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Tie native/core/vec_b747f0 to original RVA 0xb747f0 (private; needs the ELF)."""
 import json
+import os
 import struct
 import subprocess
 import sys
@@ -30,7 +31,7 @@ assert (src, dst) != (0x1329570, 0x33567d0)  # 0xf30460
 assert (src, dst) != (0x12d6b20, 0x3350ce0)  # 0xb52110
 assert (src, dst) != (0x12d8d90, 0x3350db0)  # 0xb743c0
 
-exe = ROOT / 'local/build/native/test_vec_b747f0'
+exe = ROOT / os.environ.get('SOTC_NATIVE_BUILD', 'local/build/native') / 'test_vec_b747f0'
 native = json.loads(subprocess.run([str(exe), '--dump'], check=True, capture_output=True, text=True).stdout)
 assert native['bits'] == bits
 assert native['source'] == src and native['value'] == dst

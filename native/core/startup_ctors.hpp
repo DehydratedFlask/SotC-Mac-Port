@@ -17,6 +17,11 @@
 #include "init_f4b540.hpp"
 #include "recursive_mutex.hpp"
 #include "clothing_preview_param.hpp"
+#include "descriptor_registration.hpp"
+#include "lazy_param_def_tree.hpp"
+#include "clothing_physical_mesh_parameters.hpp"
+#include "registration_thunks.hpp"
+#include "const_table_ee1130.hpp"
 #include "vec_ef85e0.hpp"
 #include "init_ea52f0.hpp"
 #include "vec_e0b180.hpp"
@@ -232,6 +237,22 @@ struct StartupState {
     bool descriptor_mutex_initialized = false;
     const ClothingPreviewParamDescriptor* descriptor = nullptr;
     bool init_failed = false;
+
+    // Slot 11 / RVA 0x00f09160 effects (ClothingPhysicalMeshParameters). The original published a vptr
+    // at global 0x3356068 and created a once-guarded recursive mutex at 0x3356078; DescriptorRegistration
+    // owns both here. The lazy schema tree (original flag/table 0x3356070/0x3356080) stays unbuilt and
+    // reports schema_not_available. Declaration order matters: the tree borrows the registration's mutex.
+    DescriptorRegistration physmesh_registration{};
+    LazyParamDefTree physmesh_tree{physmesh_registration.mutex(), &build_clothing_physical_mesh_schema};
+
+    // Slots 12-19 / RVAs 0xf06340 ... 0xefacd0 (registration thunks of unidentified classes). Entry
+    // [i] is constructor-table index 12 + i: one published opaque descriptor and its owned recursive +
+    // priority-inherit mutex (the original: two adjacent .bss globals, a malloc(0x10) mutex block and
+    // an atexit cleanup). See registration_thunks.hpp for what is and is not modelled.
+    std::array<DescriptorRegistration, kRegistrationThunkCount> thunk_registrations{};
+
+    // Slot 21 / RVA 0x00ee1130: byte-exact 128-byte constant table (cell meanings unknown).
+    ConstTableEe1130 const_table_ee1130{};
 };
 
 struct CtorSlot {

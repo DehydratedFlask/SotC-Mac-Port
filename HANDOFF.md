@@ -8,6 +8,18 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## Session addendum 2026-10-21 round 2 (orchestrator)
+
+- Native tests **294/294**; all **287** `tools/lift` checkers pass; launcher **80+9** tests pass.
+- **Slot 11 is no longer the blocker.** Reflection scope showed the 74-record tree is lazy (vtable getters only);
+  slot 11 registered with `LazyParamDefTree` returning `schema_not_available`. Slots 12–19 and 21 registered
+  (registration-only). Checker verifies **118** RVA/index pairs. **First unresolved: index 23, RVA `0xe71990`**
+  (needs original name strings; hash is djb2-XOR, see native `name_hash`) — open decision: import original names as data?
+- Save: `save_chunk_codec` typed codec; profile-chunk facts in `docs/checkpoints/2026-10-21-agentH-sav01-profile-chunks.md`.
+  Unresolved: tag 4 vs 8; case-folding in name hash is inference.
+- `LauncherModel` now routes through `CoreClient`; no runtime UI proof yet.
+- Next: decide slot-23 name-string import; slots 24–47 family (descriptor_mutex_atexit); 6 tail-call leaf bodies; child-process core client.
+
 ## Session addendum 2026-10-21 (orchestrator, 4 parallel workers)
 
 - Batch 34: 12 more call-free leaf ctors lifted (unregistered). Native tests now **281/281**.
