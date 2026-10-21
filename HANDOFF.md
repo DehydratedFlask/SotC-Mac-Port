@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — AUD-02 audio region dossier verified
+
+Audio call graph (36 functions, 26 direct edges; byte scan = Ghidra): init `FUN_009485a0` / shutdown `FUN_00949fe0`, an Audio3d push thread (`FUN_00949f80`), a mixer tick (`FUN_009536d0`: SystemRender + queue level + advance) driven by an AudioOut thread (`FUN_009ac390`) and a second driver `FUN_00997700`. Roles are inference. 2 REA successes; root replayed verifier and checksums. Details (strings private): `docs/checkpoints/2026-10-20-root-aud02-region-dossier-complete.md`. No decoder/mixer, no audio. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 210/210 (batch 22, pushed `19bdb6c`).
+
+Next exact action: record `FUN_009975f0`/`FUN_009979af` (callers of `FUN_00997700`) or the 8 unrecorded audio callsites; pending `SAV-01-SERIALIZER-01` worker (`local/re/evidence/sav01-serializer-01/`); constructor batch 23 (next position 184 `0xbcc4e0`).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors batch 22 (0xbd32f0 .. 0xbcc960) lifted
 
 `CPU-01-LEAF-CTOR-BATCH-22` `FIXTURE_VERIFIED`; root replay 210/210 ctest pass, six checkers exit 0. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-22-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN. Pending workers: `SAV-01-SERIALIZER-01` (`local/re/evidence/sav01-serializer-01/`) and `AUD-02-REGION-DOSSIER-01` (`local/re/evidence/aud02-region-dossier-01/`). Next constructor position 184 `0xbcc4e0`.
