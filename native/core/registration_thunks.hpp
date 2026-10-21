@@ -65,12 +65,61 @@ inline constexpr std::array<RegistrationThunkDescriptor, kRegistrationThunkCount
     {19, 0xefacd0, 0x15f4448, 0x3354190, RegistrationProbeShape::callee_inline},
 }};
 
-constexpr bool registration_thunk_table_is_consistent() noexcept {
-    for (std::size_t i = 0; i < kRegistrationThunkDescriptors.size(); ++i) {
-        const RegistrationThunkDescriptor& d = kRegistrationThunkDescriptors[i];
-        if (d.ctor_index != kFirstRegistrationThunkIndex + i) return false;
+// ---------------------------------------------------------------------------------------------------
+// REGISTERED-AHEAD slots 24-47 (CPU-01-NATIVE-SLOT24-47-01). Same contract, same descriptor type.
+//
+// These 24 further members of the 34-slot family (docs/CTOR_CLASSES.md) have native registration
+// metadata, but are deliberately NOT part of the production constructor table (`recovered_constructors()`):
+// constructor slot 23 (0xe71990) still needs the original name strings (open principal decision) and is
+// the explicit blocker, so the production runner must keep stopping there. The focused test exercises
+// the ahead table directly; `tools/lift/verify_ctor_family.py` replays the 34-slot body family, while
+// `tools/lift/check_ctor_thunks.py` performs its detailed side-effect trace for slots 12-19. The
+// `check_ctor_slots.py` checker validates the production list and ELF row identities; it does not scan
+// the whole source tree for references. These rows are never part of the product startup path.
+//
+// Probe-shape census (all replayed from the bytes): base_only 19 (26, 29-46), callee_inline 3 (24, 25,
+// 27), vslot0_dtor 2 (28, 47). Slot 47's virtual slot-0 destructor makes one extra direct call (0xe44cd0)
+// that the tracer shows to be effect-free; no slot deviates from the family contract.
+// ---------------------------------------------------------------------------------------------------
+inline constexpr std::size_t kFirstAheadRegistrationIndex = 24;
+inline constexpr std::size_t kAheadRegistrationCount = 24;
+
+// Rows are parsed by tools/lift/check_ctor_thunks.py: keep the exact `{index, thunk, V, A, shape}` form.
+inline constexpr std::array<RegistrationThunkDescriptor, kAheadRegistrationCount> kAheadRegistrationDescriptors = {{
+    {24, 0xe56b70, 0x15ef440, 0x3353ec0, RegistrationProbeShape::callee_inline},
+    {25, 0xe55f10, 0x15eeb90, 0x3353d90, RegistrationProbeShape::callee_inline},
+    {26, 0xe55240, 0x15ee368, 0x3353ce8, RegistrationProbeShape::base_only},
+    {27, 0xe54a30, 0x15edb20, 0x3353bf0, RegistrationProbeShape::callee_inline},
+    {28, 0xe53a10, 0x15ed2b0, 0x3353b20, RegistrationProbeShape::vslot0_dtor},
+    {29, 0xe52a20, 0x15ecad0, 0x3353ac8, RegistrationProbeShape::base_only},
+    {30, 0xe52150, 0x15ec310, 0x3353a80, RegistrationProbeShape::base_only},
+    {31, 0xe518e0, 0x15ebb70, 0x3353a40, RegistrationProbeShape::base_only},
+    {32, 0xe510e0, 0x15eb410, 0x3353a10, RegistrationProbeShape::base_only},
+    {33, 0xe50980, 0x15eac30, 0x33539b8, RegistrationProbeShape::base_only},
+    {34, 0xe500b0, 0x15ea470, 0x3353970, RegistrationProbeShape::base_only},
+    {35, 0xe4f840, 0x15e9cd0, 0x3353930, RegistrationProbeShape::base_only},
+    {36, 0xe4f040, 0x15e9570, 0x3353900, RegistrationProbeShape::base_only},
+    {37, 0xe4e8e0, 0x15e8d90, 0x33538a8, RegistrationProbeShape::base_only},
+    {38, 0xe4e010, 0x15e85d0, 0x3353860, RegistrationProbeShape::base_only},
+    {39, 0xe4d7a0, 0x15e7e30, 0x3353820, RegistrationProbeShape::base_only},
+    {40, 0xe4cfa0, 0x15e76d0, 0x33537f0, RegistrationProbeShape::base_only},
+    {41, 0xe4c840, 0x15e6ef0, 0x33537a0, RegistrationProbeShape::base_only},
+    {42, 0xe4bf10, 0x15e6790, 0x3353770, RegistrationProbeShape::base_only},
+    {43, 0xe4b7b0, 0x15e5ff0, 0x3353730, RegistrationProbeShape::base_only},
+    {44, 0xe4afb0, 0x15e5888, 0x3353700, RegistrationProbeShape::base_only},
+    {45, 0xe47670, 0x15e4c70, 0x33535c0, RegistrationProbeShape::base_only},
+    {46, 0xe467e0, 0x15e40d0, 0x3353478, RegistrationProbeShape::base_only},
+    {47, 0xe459e0, 0x15e37a8, 0x33533c8, RegistrationProbeShape::vslot0_dtor},
+}};
+
+template <std::size_t N>
+constexpr bool registration_table_is_consistent(const std::array<RegistrationThunkDescriptor, N>& table,
+                                                std::size_t first_index) noexcept {
+    for (std::size_t i = 0; i < table.size(); ++i) {
+        const RegistrationThunkDescriptor& d = table[i];
+        if (d.ctor_index != first_index + i) return false;
         for (std::size_t j = 0; j < i; ++j) {
-            const RegistrationThunkDescriptor& e = kRegistrationThunkDescriptors[j];
+            const RegistrationThunkDescriptor& e = table[j];
             if (d.original_thunk_rva == e.original_thunk_rva || d.original_vtable_rva == e.original_vtable_rva ||
                 d.original_global_rva == e.original_global_rva)
                 return false;
@@ -78,7 +127,26 @@ constexpr bool registration_thunk_table_is_consistent() noexcept {
     }
     return true;
 }
+
+// No thunk, vtable or global is shared between the two tables either.
+constexpr bool registration_tables_are_disjoint() noexcept {
+    for (const RegistrationThunkDescriptor& a : kRegistrationThunkDescriptors)
+        for (const RegistrationThunkDescriptor& b : kAheadRegistrationDescriptors)
+            if (a.original_thunk_rva == b.original_thunk_rva || a.original_vtable_rva == b.original_vtable_rva ||
+                a.original_global_rva == b.original_global_rva)
+                return false;
+    return true;
+}
+
+constexpr bool registration_thunk_table_is_consistent() noexcept {
+    return registration_table_is_consistent(kRegistrationThunkDescriptors, kFirstRegistrationThunkIndex);
+}
+constexpr bool ahead_registration_table_is_consistent() noexcept {
+    return registration_table_is_consistent(kAheadRegistrationDescriptors, kFirstAheadRegistrationIndex);
+}
 static_assert(registration_thunk_table_is_consistent());
+static_assert(ahead_registration_table_is_consistent());
+static_assert(registration_tables_are_disjoint());
 
 // Runs the native counterpart of constructor-table slot `ctor_index` (12..19): the shared base-object
 // probe, then DescriptorRegistration::publish(&kRegistrationThunkDescriptors[ctor_index - 12]) on
@@ -86,5 +154,11 @@ static_assert(registration_thunk_table_is_consistent());
 // and sets state.init_failed when `ctor_index` is outside 12..19, when a different descriptor already
 // occupies the registration, or when the owned mutex cannot be initialised.
 [[nodiscard]] bool init_registration_thunk(StartupState& state, std::uint32_t ctor_index) noexcept;
+
+// Registered-ahead counterpart for slots 24..47 (see the block above): same shared base-object probe and
+// DescriptorRegistration::publish(&kAheadRegistrationDescriptors[ctor_index - 24]) on
+// StartupState::ahead_registrations. Same idempotence / failure contract as init_registration_thunk.
+// NOT reachable from the production runner (slot 23 blocks it first).
+[[nodiscard]] bool init_registration_thunk_ahead(StartupState& state, std::uint32_t ctor_index) noexcept;
 
 }  // namespace sotc

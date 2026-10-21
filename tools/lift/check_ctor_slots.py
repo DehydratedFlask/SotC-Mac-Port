@@ -169,14 +169,33 @@ def block_stores_ok(body, label):
             assert has_store(body, 0xc7, offset + 0x10, 0, 4), f"{label}: block {index} count=0 store missing"
 
 
-# The native registration table must carry the ELF constructor-table RVA for each of its indices.
+# The native production and test-only registration tables must carry the ELF constructor-table RVA
+# for each of their indices. Parse them separately so ahead rows cannot satisfy or contaminate the
+# 12-19 production helper assertion.
 thunk_header = (ROOT / "native/core/registration_thunks.hpp").read_text()
-thunk_rows = re.findall(r"\{\s*(\d+)\s*,\s*(0x[0-9a-fA-F]+)\s*,\s*0x[0-9a-fA-F]+\s*,\s*0x[0-9a-fA-F]+\s*,"
-                        r"\s*RegistrationProbeShape::\w+\s*\}", thunk_header)
-assert [int(i) for i, _ in thunk_rows] == list(THUNKS), "registration_thunks.hpp must list indices 12-19 in order"
+row_pattern = (r"\{\s*(\d+)\s*,\s*(0x[0-9a-fA-F]+)\s*,\s*0x[0-9a-fA-F]+\s*,\s*0x[0-9a-fA-F]+\s*,"
+               r"\s*RegistrationProbeShape::\w+\s*\}")
+
+
+def thunk_rows_for(table_name):
+    match = re.search(rf"{re.escape(table_name)}\s*=\s*\{{\{{(.*?)\}}\}};", thunk_header, re.DOTALL)
+    assert match, f"cannot find {table_name} in registration_thunks.hpp"
+    return re.findall(row_pattern, match.group(1))
+
+
+thunk_rows = thunk_rows_for("kRegistrationThunkDescriptors")
+assert [int(i) for i, _ in thunk_rows] == list(THUNKS), "production registration table must list indices 12-19 in order"
 for i, rva in thunk_rows:
     assert int(rva, 16) == original_rvas[int(i)] == THUNKS[int(i)], (
         f"registration_thunks.hpp row {i}: {rva} != ELF table {original_rvas[int(i)]:#x}")
+
+ahead_rows = thunk_rows_for("kAheadRegistrationDescriptors")
+assert [int(i) for i, _ in ahead_rows] == list(range(24, 48)), (
+    "test-only ahead registration table must list indices 24-47 in order")
+for i, rva in ahead_rows:
+    index = int(i)
+    assert int(rva, 16) == original_rvas[index], (
+        f"ahead registration row {index}: {rva} != ELF table {original_rvas[index]:#x}")
 
 block_stores_ok(image.read(0xf06410, 1021), "ctor 0xf06410")
 block_stores_ok(image.read(0xf08f00, 556), "reset 0xf08f00")

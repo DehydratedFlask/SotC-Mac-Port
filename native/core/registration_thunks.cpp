@@ -6,14 +6,11 @@
 
 namespace sotc {
 
-bool init_registration_thunk(StartupState& state, std::uint32_t ctor_index) noexcept {
-    if (ctor_index < kFirstRegistrationThunkIndex ||
-        ctor_index >= kFirstRegistrationThunkIndex + kRegistrationThunkCount) {
-        state.init_failed = true;
-        return false;
-    }
-    const std::size_t slot = ctor_index - kFirstRegistrationThunkIndex;
+namespace {
 
+// Shared by both tables: the shared base-object probe, then one-shot publication of the row's descriptor.
+bool run_registration(StartupState& state, const RegistrationThunkDescriptor& row,
+                      DescriptorRegistration& registration) noexcept {
     // Every original thunk builds and destroys a stack-local object with owner = null and
     // field20 = field28 = 0x10 before publishing; slots 12 and 15 do exactly base ctor + base dtor.
     {
@@ -21,8 +18,7 @@ bool init_registration_thunk(StartupState& state, std::uint32_t ctor_index) noex
         (void)probe;
     }
 
-    const RegistrationThunkDescriptor* descriptor = &kRegistrationThunkDescriptors[slot];
-    DescriptorRegistration& registration = state.thunk_registrations[slot];
+    const RegistrationThunkDescriptor* descriptor = &row;
     const DescriptorPublishError error = registration.publish(descriptor);
     if (error == DescriptorPublishError::none) return true;
     if (error == DescriptorPublishError::already_published && registration.descriptor() == descriptor) {
@@ -30,6 +26,28 @@ bool init_registration_thunk(StartupState& state, std::uint32_t ctor_index) noex
     }
     state.init_failed = true;
     return false;
+}
+
+}  // namespace
+
+bool init_registration_thunk(StartupState& state, std::uint32_t ctor_index) noexcept {
+    if (ctor_index < kFirstRegistrationThunkIndex ||
+        ctor_index >= kFirstRegistrationThunkIndex + kRegistrationThunkCount) {
+        state.init_failed = true;
+        return false;
+    }
+    const std::size_t slot = ctor_index - kFirstRegistrationThunkIndex;
+    return run_registration(state, kRegistrationThunkDescriptors[slot], state.thunk_registrations[slot]);
+}
+
+bool init_registration_thunk_ahead(StartupState& state, std::uint32_t ctor_index) noexcept {
+    if (ctor_index < kFirstAheadRegistrationIndex ||
+        ctor_index >= kFirstAheadRegistrationIndex + kAheadRegistrationCount) {
+        state.init_failed = true;
+        return false;
+    }
+    const std::size_t slot = ctor_index - kFirstAheadRegistrationIndex;
+    return run_registration(state, kAheadRegistrationDescriptors[slot], state.ahead_registrations[slot]);
 }
 
 }  // namespace sotc

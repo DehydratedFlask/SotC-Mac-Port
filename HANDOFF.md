@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 08:56 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 08:58 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -27,9 +27,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   The first missing-target build failure and CMake recovery are recorded in the linked checkpoint.
 - First-build checkpoint: `check_ctor_slots.py`, `verify_ctor_family.py`, and `check_ctor_thunks.py`
   exited 0. The focused build command exited 2 before compilation because Make has no rule for
-  `test_registration_thunks_ahead`; count this as failed try 1, with no native test run. Inspect
-  `local/build/native/CMakeCache.txt`, then explicitly reconfigure the same ARM64/sanitizer build if
-  it points to this checkout. See
+  `test_registration_thunks_ahead`; this was failed try 1, with no native test run. The cache was
+  then confirmed to point to this checkout and explicitly reconfigured as recorded below. See
   [the checkpoint](docs/checkpoints/2026-10-21-root-cpu01-slot24-47-build-target-failure.md).
 - Also claimed `APP-01-CORE-HOST-01`, status ACTIVE, attempt 0, for the existing native host
   protocol. A parallel read-only audit found the hello limit can disagree with its configured
@@ -50,6 +49,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   The source graph was rebuilt with the original scopes preserved plus `native`, `launcher`, and
   `tests`; `trail build --check` passes and Graft resolves the new ahead-table test file. See
   [the failed-build checkpoint](docs/checkpoints/2026-10-21-root-cpu01-slot24-47-build-target-failure.md).
+- `CPU-01-NATIVE-SLOT24-47-01` is now FIXTURE_VERIFIED. Full native build exited 0 and 295/295
+  CTests passed with only the escalated `sotc_host_protocol` test excluded. See
+  [the completion checkpoint](docs/checkpoints/2026-10-21-root-cpu01-slot24-47-complete.md) and
+  evidence row E120. Slot 23 remains the production blocker; G1 is unchanged.
 - After reconfigure, `test_registration_thunks_ahead` built and its focused CTest passed 1/1.
   The host library and child executable build. The first host target build failed at line 508
   because `WIFEXITED` received temporary `reap(unused)`; storing status in a local made the target
