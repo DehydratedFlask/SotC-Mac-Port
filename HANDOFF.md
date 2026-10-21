@@ -1,12 +1,35 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 12:06 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 12:11 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 38 (`/root`)
+
+- Completed `APP-01-ASSET-VALIDATOR-SHORT-MAGIC-FIXTURE-01`. Worker and root each pass the
+  focused launcher suite (6/6); only `AssetValidationReportTests.swift` changed, while
+  `AssetValidator.swift` stayed unchanged. E149 and the completion checkpoint record both logs
+  and hashes.
+- Claimed `APP-01-DIAGNOSTICS-CONFLICTING-DUPLICATE-01`, `ACTIVE`, zero failed tries. Add a
+  synthetic `ReadinessReport` with the four required subsystem rows READY plus a later duplicate
+  assets row marked missing; assert the report is not startable and the summary does not claim
+  Play is ready. Claim:
+  [conflicting duplicate diagnostics](docs/checkpoints/2026-10-21-root-app01-diagnostics-conflicting-duplicate-claim.md).
+- Claimed `APP-01-CORE-SUBSYSTEM-UNKNOWN-CODE-FIXTURE-01`, `ACTIVE`, zero failed tries. Add the
+  missing pure-Swift fallback assertion `CoreSubsystem.Status(code: 99) == .unknown(99)` in
+  `CoreClientTests.swift`. Claim:
+  [unknown subsystem code](docs/checkpoints/2026-10-21-root-app01-core-subsystem-unknown-code-claim.md).
+- `/root/review_host_proto` owns only `DiagnosticsSummaryTests.swift`; `/root/launcher_review`
+  owns only `CoreClientTests.swift`. Both changes begin after these claims are published. Root
+  will replay the focused suites.
+- No actual game acceptance gate changed. Existing `native/api/CMakeLists.txt` and untracked
+  `native/api/host/` remain untouched and unpublished.
+- Exact next action: regenerate/check indexes, path-audit the exact documentation publication,
+  push the short-magic completion and both claims, then release the two test files to their owners.
 
 ## Session addendum 2026-10-21 round 37 (`/root`)
 
