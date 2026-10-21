@@ -5,12 +5,27 @@ from __future__ import annotations
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_publish_paths as audit
 
 
 class PublishPathTests(unittest.TestCase):
+    def test_git_names_keeps_newline_inside_nul_delimited_staged_path(self):
+        with patch.object(
+            audit.subprocess,
+            "check_output",
+            return_value=b"scripts/name\nwith-newline.py\0",
+        ) as check_output:
+            self.assertEqual(
+                audit.git_names("staged"), ["scripts/name\nwith-newline.py"]
+            )
+
+        check_output.assert_called_once_with(
+            ["git", "diff", "--cached", "--name-only", "-z"], cwd=audit.ROOT
+        )
+
     def test_audio_headers_json_forbidden(self):
         bad = audit.violations(["local/manifests/assets/audio-headers.json"])
         self.assertTrue(bad, "game-derived audio-headers.json must fail audit")
