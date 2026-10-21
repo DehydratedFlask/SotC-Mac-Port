@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 15:13 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 15:14 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -30,8 +30,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Fetch and remote comparison passed (`HEAD...origin/main` = `0 0`). Staged and full publish audits
   passed for 9 and 1,637 paths, respectively. `git diff --cached --check` and `git diff --check`
   passed; logs and hashes are in the completion checkpoint.
-- Exact next action: commit and push the audited allowlisted files, confirm `HEAD == origin/main`,
-  then begin fresh Round67 scouting with Graft and the live repository.
+- Completion commit `ed97b75ab47b656abf3e42861e341c2486a3409a` is pushed. Post-push
+  `HEAD == origin/main`; only the pre-existing user-owned `native/api/CMakeLists.txt` and untracked
+  `native/api/host/` remain. Commit/push logs and evidence are in the completion checkpoint.
+- Exact next action: start fresh Round67 scouting with Graft and the live repository; claim and
+  publish disjoint work before dispatching implementation.
 
 ## Round 65 bounded test-only fixtures verified (/root)
 

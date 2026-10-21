@@ -109,5 +109,5 @@ results, hashes, and limits are in [the completion checkpoint](2026-10-21-root-r
 and E196–E198. All three fixtures are `FIXTURE_VERIFIED`, each with one successful implementation
 attempt and zero failed tries. Project-index generation and `--check` pass; the first stale JSON
 report and clean rerun are recorded in the completion checkpoint. Staged and full publication
-audits passed, remote is synchronized, and only the 9 allowlisted test/documentation paths are
-staged. Exact next action: commit and push these paths, then begin fresh Round67 scouting.
+audits passed; commit `ed97b75ab47b656abf3e42861e341c2486a3409a` is pushed and `HEAD == origin/main`.
+Exact next action: begin fresh Round67 scouting and publish new disjoint claims before dispatch.

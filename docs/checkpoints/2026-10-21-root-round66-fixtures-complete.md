@@ -8,6 +8,24 @@
 - Status: all three `FIXTURE_VERIFIED`; each has 1 successful implementation attempt and 0 failed
   tries.
 
+## Publication record
+
+- `git commit -m "test: verify Round66 readiness, dynlink, and arena fixtures"` exited 0 and created
+  `ed97b75ab47b656abf3e42861e341c2486a3409a`. Commit log
+  `local/validation/root-round66-scout/commit-completion.log` SHA-256
+  `39b17ad0b5c890206c221f093453371959a7f4dd43b62f1bef6a93c3f13b5456`.
+- `git push origin main` exited 0. Push log `local/validation/root-round66-scout/push-completion.log`
+  SHA-256 `4045ddde33aa74ffbec50187641a83b9edd88bd42911c16ba06e9d43ac2e0c5a`.
+- Post-push `HEAD == origin/main == ed97b75ab47b656abf3e42861e341c2486a3409a`. The only remaining
+  worktree changes are the pre-existing user-owned `native/api/CMakeLists.txt` modification and
+  untracked `native/api/host/`; both remain untouched and unpublished.
+- Before publishing this post-push handoff record, `git diff --cached --check` and `git diff
+  --check` passed; the staged audit passed for 3 documentation paths and the full audit passed for
+  1,637 paths. Logs: `local/validation/root-round66-scout/audit-staged.log` SHA-256
+  `216d4e15bc538e4867526c1d0a89a4f7408d014f59588353a9039b41b25f9613` and
+  `.../audit-all.log` SHA-256
+  `edf08d8fae4fa788a00b91f99ffd048889b0552de9f8319525c509b6065ea166`.
+
 ## Scope and changes
 
 The workers changed only the three previously claimed test files:
@@ -91,6 +109,5 @@ untracked `native/api/host/` remain untouched, unstaged, and excluded from publi
 dependency, or runtime facts changed. Evidence entries E196–E198 and the task rows record the
 fixture results.
 
-Exact next action: commit and push the audited allowlisted files, record the resulting synchronized
-state, then scout new disjoint fixture-sized tasks from Graft and the live repo; do not reuse these
-task IDs.
+Exact next action: scout new disjoint fixture-sized tasks from Graft and the live repo; do not reuse
+these task IDs. Publish each new claim before dispatching workers.
