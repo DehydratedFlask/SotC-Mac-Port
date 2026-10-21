@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 15:21 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 15:27 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -19,16 +19,18 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `local/validation/root-round66-scout/round67-claim-push.log`, SHA-256
   `9fc55f37222b69d2cb1a20bd0a36d5b3a9eb14d3324af5dcacb2171329b18ede`; after push,
   `HEAD == origin/main == ca9e20fedad3fa2e8d73091bb7a06ec78f7f2621`.
-- The baselines are clean: launcher model 8 tests, launcher lifecycle 11 tests across 2 suites,
-  manifest parser 23 tests, host-map target build plus CTest 1/1, and project tools 8 tests. No
-  implementation edits have been dispatched yet.
+- Baselines were clean at claim time. By 15:28 CDT, workers reported passing attempts for the two
+  launcher assertions (8 and 11 filtered tests), zero-byte manifest parsing (24 tests), and direct
+  host-map zero-size rejection (build exit 0; CTest 1/1). Worker logs and hashes are in the claim
+  checkpoint. Root review and independent replay remain pending. Root owns
+  `scripts/test_project_tools.py`.
 - Round66's latest docs-only publication record is commit
   `11a904ec2dfcc8aaeb1061b23db4f721a7272046`; before these claim edits, `HEAD == origin/main` at
   that commit. Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/`
   remain untouched, unstaged, and excluded.
-- Exact next action: send the four bounded implementation prompts with one-test-file ownership,
-  then record dispatch status in `HANDOFF.md` and a checkpoint. Root retains shared docs, the
-  project-index test, root replay, evidence IDs E199–E203, and the completion record.
+- Exact next action: record this dispatch checkpoint, implement the claimed project-index fixture,
+  then review each worker diff and independently replay its focused command. Root retains shared
+  docs, root replay, evidence IDs E199–E203, and the completion record.
 
 ## Round 66 bounded fixtures verified (/root)
 
