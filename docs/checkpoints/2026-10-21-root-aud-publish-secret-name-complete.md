@@ -1,0 +1,19 @@
+# Completion: AUD-PUBLISH-SECRET-NAME-FIXTURE-01
+
+- Local time: 2026-10-21 10:52 CDT (America/Chicago).
+- Agent / integrator: /root (Codex desktop task 01a15eab-88d5-7a83-a23b-cc55dc002eb6).
+- Task ID: AUD-PUBLISH-SECRET-NAME-FIXTURE-01.
+- Files changed: scripts/test_audit_publish_paths.py, HANDOFF.md, docs/TASKS.md, docs/EVIDENCE.md, docs/FOLDERS.md, the claim checkpoint, and this completion checkpoint. The regenerated folder index changed docs/checkpoints from 239 to 240; this checkpoint filename matches the .gitignore secret pattern and will be force-added as reviewed documentation with no sensitive data.
+- Worker scope: scripts/test_audit_publish_paths.py only; no production rule or documentation edits. Root independently inspected the diff and replayed the acceptance command.
+- Exact command: PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audit_publish_paths.py.
+- Result: worker and root each exit 0 with 7 tests, OK. Worker log local/validation/aud-publish-secret-name/attempt-1.log SHA-256 83166b089fbcb82fac63f22522fa6ae99bb5e46368cd35d756277fd463dd6346; root replay log local/validation/aud-publish-secret-name/root-replay.log SHA-256 77ecdaf76b0a4f9f157b08dc741287943417847cdfae17660c5fea600de76490.
+- Test file SHA-256: a7538439b97fd18f2b03ec5d6cc20b4d9db26e3bc12f68dce082e1e9880fe3e2.
+- Diff check: git diff --check -- scripts/test_audit_publish_paths.py exited 0; root-diff-check.log is empty (SHA-256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855).
+- Graph: initial trail build --check exited 1 STALE, identifying only the changed test file and the new test method; log local/checkpoints/root-re01-unwrap-input-sidecar-collision-complete/trail-check-after-audit-test.log SHA-256 cf7c9cf3fb6d09c3d0fe63c58808e1bb2a2d9c6fb666f74966f2347a5b10cb76. trail build exited 0; log trail-build-after-audit-test.log SHA-256 5709657d2438af98ac78f9918756649100579b8e11ee1012e9be4dadde0ec420. Subsequent trail build --check exited 0 and reported wiring graph in sync; log trail-check-after-audit-test-rebuild.log SHA-256 095ad208f40fafa619814bf84eaf69ce48d03a0dcb44bb2adeba39edc911918c. The deep layer remains unbuilt; regenerated graft/ is ignored and was not staged.
+- Final documentation index: python3 scripts/project_index.py exited 0 and reported 14,213 folders indexed; log local/checkpoints/root-re01-unwrap-input-sidecar-collision-complete/project-index-after-b.log SHA-256 741f74fdfa3d4f9228d8a95d7d3188703f79f275b00c0d48ebc8d077865debfb. Final trail build --check exited 0 with the wiring graph in sync; log trail-check-final.log SHA-256 095ad208f40fafa619814bf84eaf69ce48d03a0dcb44bb2adeba39edc911918c.
+- Observation: both nested uppercase filename examples produce violations under the current case-insensitive deny rule.
+- Inference: these fixtures pin path-list matching for the tested variants; they do not establish file-content scanning, symlink-target inspection, or broader secret detection.
+- Remaining risks: synthetic path strings only. No contents, credentials, game data, or live publication were inspected; no game gate advanced.
+- Publication gates: python3 -I scripts/audit_publish_paths.py exited 0 for 8 staged allowlisted paths; local/validation/aud-publish-secret-name/audit-staged.log SHA-256 b0cae9998e235f361b815baf6fe5210e6df6fa3021f8df8c1fe75ed944a9fb19. The --all audit exited 0 for 1,506 paths; audit-all.log SHA-256 19b135b6b7aae1e5859b12fa1f036ebf623e0ad0eacd43abd297e50b703c8677. git diff --cached --check exited 0; cached-check.log is empty (SHA-256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855).
+- Task status / attempt count: FIXTURE_VERIFIED; zero failed tries.
+- Next exact action: commit the audited allowlisted files, push origin main, and confirm HEAD equals origin/main.

@@ -74,6 +74,15 @@ class PublishPathTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertTrue(audit.violations([path]), path)
 
+    def test_nested_case_insensitive_secret_names_forbidden(self):
+        cases = [
+            "tools/build/.ENV.local",
+            "docs/private/CREDENTIALS.txt",
+        ]
+        for path in cases:
+            with self.subTest(path=path):
+                self.assertTrue(audit.violations([path]), path)
+
     def test_nested_lookalike_names_still_allowed(self):
         cases = [
             "tools/lift/xref_rip.py",
