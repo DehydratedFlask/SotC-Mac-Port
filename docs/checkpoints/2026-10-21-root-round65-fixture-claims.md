@@ -98,3 +98,27 @@ untracked `native/api/host/` remain unstaged and excluded.
 
 Exact next action: commit and push the four audited claim paths, verify `HEAD == origin/main`, then
 dispatch the three test-only workers with their pre-created private log destinations.
+
+## Claim publication and worker dispatch
+
+At 14:56 CDT, root committed the four audited paths in
+`756e9f4cd2ddfa2a2ff2cc39915f3f705651a3ef` (`docs: claim Round65 fixture tasks`). Commit output:
+`local/validation/root-round65-scout/commit.log`, SHA-256
+`173cc077051f067b699700589c007ba00c013144cd295e0b5242ea2f5b20eed9`. `git push origin main`
+exited 0; output `local/validation/root-round65-scout/push.log`, SHA-256
+`e9c49b1786c416cf8b6c997a95cea9c25004b36d076bb6470a2fb3b1ded65225`. Post-push `HEAD` and
+`origin/main` both resolved to `756e9f4cd2ddfa2a2ff2cc39915f3f705651a3ef`. The captured status is
+`local/validation/root-round65-scout/state.log`, SHA-256
+`b059a208717e65564d7e6f4519f93cd90fdebcd4c63111bf975651139d0f8745`; it preserves the
+user-owned API changes as unstaged.
+
+After remote confirmation, root dispatched `/root/launcher_review` for APP-01,
+`/root/review_host_proto` for DATA-02, and `/root/slot23_raw_xrefs` for SRV-01. They own disjoint
+existing test files and the fixed private log destinations listed in their task prompts. At the
+first post-dispatch status snapshot, the APP test file was modified; task acceptance results remain
+pending. Status: all three claims `ACTIVE`, 0 failed tries, implementation attempts in progress.
+
+At this claim-time checkpoint, the next action was to review each worker's one-file diff and replay
+the focused commands. That work is complete; see the
+[Round 65 completion checkpoint](2026-10-21-root-round65-fixtures-complete.md) for results, root
+replays, indexes, and evidence limits.

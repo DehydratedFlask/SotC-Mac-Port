@@ -79,6 +79,7 @@ struct CoreClientTests {
         #expect(CoreABIVersion(packed: 0x0001_0002) == version)
         #expect(version.description == "1.2")
         #expect(CoreABIVersion(major: 1, minor: 9) < CoreABIVersion(major: 2, minor: 0))
+        #expect(CoreABIVersion(major: 1, minor: 2) < CoreABIVersion(major: 1, minor: 3))
     }
 
     @Test func abiVersionMaximumFieldsPackAndRoundTrip() {
