@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 10:21 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 10:23 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -30,16 +30,21 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   behavior is in scope.
 - Commit `c0c7177` is pushed to `origin/main`; it includes the whole-map validation, two synthetic
   unshared-size cases, and E129. No real manifest/archive behavior is claimed.
-- Claimed `DATA-02-PSARC-STORED-BLOCK-TRUNCATION-01`, ACTIVE, attempt 0: add a test-only fixture
-  for truncation of a full raw PSARC block. Worker owns `scripts/test_psarc.py`; claim record:
-  [docs/checkpoints/2026-10-21-root-data02-psarc-stored-block-truncation-claim.md](docs/checkpoints/2026-10-21-root-data02-psarc-stored-block-truncation-claim.md).
+- Completed `DATA-02-PSARC-STORED-BLOCK-TRUNCATION-01`, FIXTURE_VERIFIED: a 16-byte synthetic raw
+  block truncated by one byte raises the exact decoded-size `PsarcError`. Worker and root each pass
+  the full PSARC suite 30/30; parser source is unchanged. Claim and completion records:
+  [claim](docs/checkpoints/2026-10-21-root-data02-psarc-stored-block-truncation-claim.md),
+  [completion](docs/checkpoints/2026-10-21-root-data02-psarc-stored-block-truncation-complete.md).
 - Graft confirms `Psarc.read` has an existing raw block-size check after `f.read(block_size)` and
   existing tests cover compressed truncation only. The fixture should assert the exact decoded-size
   mismatch on a truncated raw block; no parser source change is in scope.
 - Claim commit `f41b202` is pushed to `origin/main`; `slot23_raw_xrefs` now owns only
   `scripts/test_psarc.py` for the synthetic raw-block truncation fixture. Worker result is pending.
-- Next exact action: review the fixture and log, independently replay the focused PSARC suite, then
-  record evidence and publish the completion. No real archive or payload claim is implied.
+- Root reviewed the test-only diff and independently replayed
+  `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_psarc.py`: exit 0, 30/30. E130 and exact
+  private log hashes are recorded in the completion checkpoint. No real archive/payload claim.
+- Next exact action: refresh indexes, audit the staged source/test/docs and tracked publish set,
+  then commit and push this test-only completion.
 
 ## Session addendum 2026-10-21 round 6 (`/root`)
 
