@@ -12,6 +12,11 @@ calls the vtable-slot-0 destructor, publishes the vptr into global `0x3356068`, 
 mutex at `0x3356078` with the same recursive/priority-inherit attributes, and registers the same
 `FUN_00e44a10` cleanup through `FUN_00f8f390`.
 
+The published class is **`ClothingPhysicalMeshParameters`**: consumer `FUN_00ed5880` installs the
+published vptr and its misalignment branch formats that class name at RVA `0x1322b23`.
+`FUN_00f08bc0` is the get-or-create accessor (mutex `0x3356078`, flag `0x3356070`, singleton
+`0x3356080`, creator `FUN_00f06cd0`), exactly mirroring slot 10's accessor shape.
+
 The class constructor `FUN_00f06410` is 1,021 bytes and initializes many small records through
 `FUN_00f06a40`; it is materially more complex than `ClothingPreviewParam`. Registering slot 11
 without that contract would require an opaque placeholder, which the project forbids.
@@ -19,7 +24,7 @@ without that contract would require an opaque placeholder, which the project for
 ## Files
 
 - Private packet: `local/re/evidence/cpu01-ctor11-01/` (`report.md`, `verify.py`,
-  `verification.json` 39/39, `ghidra-slot11.txt`, `ghidra-slot11-class.txt`, `SHA256SUMS`).
+  `verification.json` 48/48, `ghidra-slot11.txt`, `ghidra-slot11-class.txt`, `ghidra-refs.txt`, `ghidra-slot11-consumers.txt`, `SHA256SUMS`).
 - Private script: `local/re/work/ghidra-scripts/Slot11Analysis.java`.
 - Logs: `local/checkpoints/root-20261020-slot11-console.log`,
   `root-20261020-slot11class-console.log`.
@@ -28,7 +33,7 @@ without that contract would require an opaque placeholder, which the project for
 
 ```sh
 PYTHONDONTWRITEBYTECODE=1 python3 -I local/re/evidence/cpu01-ctor11-01/verify.py
-# exit 0, 39/39 assertions
+# exit 0, 48/48 assertions
 ```
 
 Byte anchors checked: body hashes for `0xf09160`, `0xf06410`, `0xf06340`; LEA targets
@@ -47,8 +52,8 @@ observation).
 
 ## Remaining risks
 
-- `FUN_00f06410` class identity, record layout and virtual surface are unrecovered.
-- No runtime reachability or consumer of `0x3356068` is established.
+- `FUN_00f06410` record layout, field meanings and virtual surface are unrecovered (the class name is known).
+- The static consumer `FUN_00ed5880` exists, but runtime reachability and ordering are unknown.
 - Existing `0xd71f60` NEEDS_PRINCIPAL remains untouched.
 
 ## Next exact action
