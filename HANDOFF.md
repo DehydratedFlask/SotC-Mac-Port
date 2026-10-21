@@ -1,12 +1,37 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 12:30 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 12:31 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 47 (`/root`)
+
+- Published the round-44 publication record for commit
+  `454ef8213e352d54eb831e6fa563e81ba37fe8e0` (`docs: record fixture publication round 44`);
+  push succeeded. Checkpoint:
+  [round 45 publication](docs/checkpoints/2026-10-21-root-round45-publication.md).
+- Claimed `APP-01-LIFECYCLE-CLEAN-EXIT-EXACT-COPY-FIXTURE-01`, `ACTIVE`, zero failed tries:
+  assert the exact clean-exit status value in the existing pure-model fixture. Claim:
+  [clean-exit copy](docs/checkpoints/2026-10-21-root-app01-clean-exit-copy-claim.md).
+- Claimed `AUD-01-CLASSIFIER-RAW-INFLATE-OFFSET2-FIXTURE-01`, `ACTIVE`, zero failed tries:
+  prove a synthetic raw DEFLATE stream after a two-byte prefix succeeds in the offset-2 probe.
+  Claim:
+  [raw-inflate offset 2](docs/checkpoints/2026-10-21-root-aud01-raw-inflate-offset2-claim.md).
+- Claimed `SRV-01-REGION-LIST-ENDPOINT-UNLINK-FIXTURE-01`, `ACTIVE`, zero failed tries:
+  cover unlinking the head and tail of a synthetic three-node chain. Claim:
+  [region-list endpoints](docs/checkpoints/2026-10-21-root-srv01-region-list-endpoints-claim.md).
+- The three claims use clean, distinct test files. `/root/launcher_review`,
+  `/root/review_host_proto`, and `/root/slot23_raw_xrefs` may start only after the claim commit is
+  pushed. Actual-game acceptance gates remain open; `native/api/CMakeLists.txt` and
+  `native/api/host/` stay untouched.
+- Exact next action: publish the claim and prior-publication checkpoints, then assign
+  `LauncherStatusCopyTests.swift` to `/root/launcher_review`, `test_audio_headers.py` to
+  `/root/review_host_proto`, and `test_region_list.cpp` to `/root/slot23_raw_xrefs`; root will
+  replay all acceptance commands.
 
 ## Session addendum 2026-10-21 round 46 (`/root`)
 
