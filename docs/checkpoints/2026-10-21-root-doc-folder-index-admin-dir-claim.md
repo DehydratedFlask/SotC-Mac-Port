@@ -23,3 +23,18 @@
 - Source graph command `trail build --check` exited 0 and reported the wiring graph in sync. The deep layer is not built and 3,520 meaning-tier nodes remain pending; this task changes no source symbols. Log: `local/checkpoints/root-doc-folder-index-admin-dir-claim/trail-check.log`.
 - Claim commit gates: `python3 -I scripts/audit_publish_paths.py` exited 0 for 5 staged allowlisted paths; `python3 -I scripts/audit_publish_paths.py --all` exited 0 for 1,501 allowed tracked paths; `git diff --cached --check` exited 0. Logs are `local/checkpoints/root-doc-folder-index-admin-dir-claim/{audit-staged.log,audit-all.log,cached-check.log}`. Staged paths are limited to the claim, task/handoff/index documentation, and the PSARC publication follow-up. Escalated host files remain unstaged.
 - Next exact action after claim publication: assign only `scripts/test_project_tools.py` to the worker; review its diff and rerun the acceptance command independently, then record the result and refresh project/source indexes.
+
+## Claim publication and assignment checkpoint
+
+- Local time: 2026-10-21 10:30 CDT (America/Chicago). Integrator: `/root`; worker: `slot23_raw_xrefs`.
+- Task: `DOC-FOLDER-INDEX-ADMIN-DIR-01`; status ACTIVE, zero failed tries. The worker owns only `scripts/test_project_tools.py`; no test/source changes have been integrated and acceptance remains NOT RUN.
+- Exact publication command: `git push origin main`; exit 0, advanced `fb28481..51f6549`. `git rev-parse HEAD` and `git rev-parse origin/main` both returned `51f654923eb76ba2d10c6fcf88f222089ded84e9`. No persistent push-output log was saved; live command output and commit are the evidence.
+- Observation: the bounded test-only claim is public. No implementation or test result is implied.
+- Remaining risks: the proposed fixture and focused test remain unimplemented. Escalated host-protocol paths remain outside the task and unstaged.
+- Next exact action: review the worker's one-file diff and attempt log, then independently run `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py` and record the outcome.
+
+## Completion follow-up
+
+- Local time: 2026-10-21 10:33 CDT (America/Chicago). Integrator: `/root`; worker: `slot23_raw_xrefs`.
+- Task status: FIXTURE_VERIFIED; zero failed tries. The worker and root each ran `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py` and passed 5/5. Logs, SHA256 values, the graph freshness recovery, and remaining limits are recorded in [the completion checkpoint](2026-10-21-root-doc-folder-index-admin-dir-complete.md) and E131.
+- Exact next action: publish the allowlisted completion files after staged-path and full tracked-path audits.
