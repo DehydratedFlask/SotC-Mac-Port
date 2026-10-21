@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 16:59 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 17:03 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -23,13 +23,18 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Pre-dispatch checkpoint `a1fa566838fbeed6caa71dc53eed499302cbc3a0` is also pushed. Worker and root runs pass 26 dynlink tests,
   22 launcher tests, and native target build plus focused CTest 1/1. All implementation changes are
   limited to those three test files; production hashes are unchanged.
+- Completion commit `e5d3e40c308679a356998e506441eba2c013e17a` (`test: verify Round 73 export, ABI,
+  and split fixtures`) is pushed and verified at `origin/main`; `HEAD == origin/main`, divergence
+  `0 0`. Post-push evidence is recorded in the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-round73-fixtures-complete.md).
 - Owners are `/root + review_host_proto` on `scripts/test_ps4_dynlink.py`, `/root + launcher_review`
   on `launcher/Tests/LauncherCoreTests/CoreClientTests.swift`, and `/root + round68_native_scout` on
   `native/tests/test_region_split.cpp`. `/root` remains sole integrator for shared docs.
 - Each task has 1 successful implementation attempt and 0 failed tries. These synthetic fixtures do
   not establish loader behavior, live ABI handling, allocator integration, or any game gate. G0
-  remains PARTIAL; G1–G6 remain NOT RUN. Next exact action: finish path audits and publish the
-  verified batch, then scout independent Round74 tasks. User-owned
+  remains PARTIAL; G1–G6 remain NOT RUN. Next exact action: inspect `docs/TASKS.md` for independent
+  bounded fixtures, query relevant source through Graft, then publish Round74 claims before
+  delegating implementation. User-owned
   `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and excluded.
 
 ## Round 72 fixtures verified (/root)
