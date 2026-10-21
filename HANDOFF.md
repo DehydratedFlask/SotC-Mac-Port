@@ -77,6 +77,23 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `native/api/CMakeLists.txt` and `native/api/host/` excluded; preserve all emulation/module and real
   game acceptance gates.
 
+## Session addendum 2026-10-21 round 13 (`/root`)
+
+- Completed `RE-02-DYNLINK-NID-NAME-HASH-FIXTURE-01`, now FIXTURE_VERIFIED with zero failed
+  implementation tries. Worker `launcher_review` and root each pass
+  `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py` (19/19). The test creates a
+  temporary `fixture.cpp` containing `synthetic_export_name`, asserts the requested NID resolves to
+  that token, and asserts an absent requested NID is omitted. E137 and
+  [the completion checkpoint](docs/checkpoints/2026-10-21-root-re02-dynlink-name-by-hash-complete.md)
+  retain log/test/source hashes and the spelling-only boundary.
+- Only `scripts/test_ps4_dynlink.py` changed in the worker implementation; production
+  `scripts/ps4_dynlink.py` is unchanged. `trail build --check` passes with the new test indexed
+  (3,528 nodes; deep meaning layer remains unbuilt). No import semantics, loader, or game gate is
+  established.
+- Completion publication is pending. Next exact action: publish the test/evidence/checkpoint/index
+  update, then continue with a bounded unclaimed task from the independent scouts. Keep the existing
+  host escalation and slot-23/Ghidra blocker unchanged.
+
 ## Session addendum 2026-10-21 round 10 (`/root`)
 
 - `RE-01-UNWRAP-INPUT-SIDECAR-COLLISION-01` is FIXTURE_VERIFIED with zero failed implementation
