@@ -1,12 +1,31 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 15:52 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 15:56 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Round 69 fixture claims (/root)
+
+- Three bounded test-only claims are recorded in `docs/TASKS.md` and the
+  [claim checkpoint](docs/checkpoints/2026-10-21-root-round69-fixture-claims.md). The targets
+  are APP requested-stop precedence over a clean zero exit, synthetic ELF magic-byte rejection,
+  and a PSARC prefix read when only a later compressed block is truncated. Baselines pass 11 Swift,
+  24 dynlink, and 35 PSARC tests, respectively; the claim checkpoint records commands, hashes,
+  logs, and scope limits.
+- Claims have zero failed tries and zero implementation attempts. Root owns shared documentation;
+  `/root/launcher_review`, `/root/review_host_proto`, and `/root/round68_data_scout` own only their
+  respective existing test files after claim publication. No production change is proposed.
+- The PSARC invalid-UTF-8 exception preference remains pending and is excluded from this batch.
+  Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched.
+- The native scouts found no claim for this round: `region_list` already has the proposed cases;
+  a nonaligned free-list page-budget fixture was deferred because E164 covers a related partial-page
+  edge and the helper has no production caller establishing that direct input as a contract.
+- Exact next action: verify the claim commit is on `origin/main`, dispatch the three single-file
+  fixture tasks, review each diff, and independently replay its focused suite before completion.
 
 ## Round 67 fixtures verified (/root)
 
