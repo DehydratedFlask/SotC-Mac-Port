@@ -37,9 +37,10 @@ then the latest checkpoints:
 ## Blocker
 
 Slot 11 / RVA `0x00f09160` is the next unresolved original constructor. It is **the same
-descriptor+mutex+atexit pattern as slot 10** (class ctor `0xf06410`, vptr `0x15fa770`, globals
-`0x3356068`/`0x3356078`), but its 1,021-byte constructor contract is unrecovered, so it is
-deliberately not registered. See
+descriptor+mutex+atexit pattern as slot 10** for class `ClothingPhysicalMeshParameters` (ctor
+`0xf06410`, vptr `0x15fa770`, globals `0x3356068`/`0x3356078`, consumer `0xed5880`, accessor
+`0xf08bc0`), but its 1,021-byte constructor layout is unrecovered, so it is deliberately not
+registered. See
 [docs/checkpoints/2026-10-20-root-cpu01-ctor11-structural-analysis.md](docs/checkpoints/2026-10-20-root-cpu01-ctor11-structural-analysis.md).
 Slots 12/13 are `0xf06340`/`0xf058f0`. Do not claim engine startup or G1 from slot-10 registration.
 
