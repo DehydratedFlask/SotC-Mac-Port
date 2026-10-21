@@ -27,8 +27,12 @@
 - Production files must remain unchanged. The two pre-existing user-owned paths `native/api/CMakeLists.txt` (modified) and `native/api/host/` (untracked) are outside every claim and must remain untouched and unstaged.
 - G0 remains PARTIAL; G1–G6 remain NOT RUN. No audio, launcher runtime, mapping integration, or game behavior is established.
 
-## Claim files and next action
+## Claim publication
 
-- Claim files: `HANDOFF.md`, `docs/TASKS.md`, this checkpoint, and the generated `docs/FOLDERS.md` index.
-- Current attempt counts: all three 0 implementation attempts, 0 failed tries.
-- Next exact action: run `python3 scripts/project_index.py` and its `--check`, run `trail build --check`, stage only the claim documents, run staged and `--all` publication audits, commit/push the claim, fetch and verify `HEAD == origin/main`, record the publication state, then dispatch the single-file implementation tasks.
+- Claim files: `HANDOFF.md`, `docs/TASKS.md`, this checkpoint, and generated `docs/FOLDERS.md`.
+- `python3 scripts/project_index.py` exits 0 and reports 14,469 folders written; `python3 scripts/project_index.py --check` exits 0 and reports 14,469 current. Logs: `local/validation/root-round75-claims/project-index.log` SHA-256 `24c4ccaf66a0f7f573f30de8d121de6a0bf32caffd58902620fc86d216970b5d`; `project-index-check.log` SHA-256 `63fe1479cc1ecdce638619cf4ddcf9dd2bef6944974db4cf3ecac042da981dc7`.
+- `trail build --check` exits 0 and reports the wiring graph in sync at 3,575 nodes; its optional meaning/deep tier remains unbuilt at 0%. Log `local/validation/root-round75-claims/trail-build-check.log` SHA-256 `142a3dfe26a2b17c6e16f283347ffd935e48b9428d9233a8e71ee7e8844daefd`.
+- `python3 -I scripts/audit_publish_paths.py` passes for the 4 staged paths; `python3 -I scripts/audit_publish_paths.py --all` passes for 1,654 paths. `git diff --cached --check` passes. Only the four claim documents were staged; the existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain unstaged and unchanged.
+- Claim commit `f931b7925fc23d7fb9e2230073f9a40610ffe6c7` (`docs: claim Round 75 fixture tasks`) was pushed to `origin/main`. After `git fetch origin main`, `HEAD == origin/main == f931b7925fc23d7fb9e2230073f9a40610ffe6c7`, divergence 0/0. The push and fetch commands both exited 0.
+- Current task status remains ACTIVE for all three; implementation attempts 0, failed tries 0. No worker has been dispatched before claim publication.
+- Next exact action: dispatch each task to its named owner with the one-file boundary and proposed assertion, collect worker logs, root-replay the focused commands, review test diffs and production hashes, then add completion evidence and publish the completion checkpoint.
