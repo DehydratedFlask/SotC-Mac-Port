@@ -63,8 +63,22 @@ implementation attempt.
 
 ## Task status and next action
 
-All three tasks are `FIXTURE_VERIFIED`; attempts: 1 passing, 0 failed for each. Files changed so far:
-the three test files, `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, this checkpoint, and generated
-`docs/FOLDERS.md` after indexing. Exact next action: commit and push the 9 audited allowlisted test
-and documentation paths, then record the commit and post-push HEAD/remote equality. Preserve the
-unrelated user-owned native API paths.
+All three tasks are `FIXTURE_VERIFIED`; attempts: 1 passing, 0 failed for each. Files changed:
+the three test files, `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, this checkpoint, the claim
+checkpoint addendum, and generated `docs/FOLDERS.md` after indexing. The unrelated user-owned native
+API paths remain unstaged and unpublished.
+
+## Publication
+
+- `git commit -m "test: cover Round65 launcher, archive, allocator fixtures"` exited 0 and created
+  `061d8d530d4a84213372d03289e72535f9be6102`. Commit output:
+  `local/validation/root-round65-scout/commit-complete.log`, SHA-256
+  `b6927548505e8e5e4e72a9bb2259fc0ccbe81f79d23893cd60ced9a9b34901f1`.
+- `git push origin main` exited 0; push log `local/validation/root-round65-scout/push-complete.log`,
+  SHA-256 `ea878be0ba64a486cf372d984ddd1d26059d54d473ad45fd6f39875bee28fdff`.
+- Post-push status recorded unstaged user-owned `native/api/CMakeLists.txt` and untracked
+  `native/api/host/`; `HEAD == origin/main == 061d8d530d4a84213372d03289e72535f9be6102`.
+  State log `local/validation/root-round65-scout/state-complete.log`, SHA-256
+  `9df6193665622ab645d8888d6249eb7ca18cb26a26da29414d8505cd569ad4a1`.
+- Exact next action: review read-only Round66 scouts, independently verify a bounded candidate with
+  Graft and live files, claim/publish it, then dispatch implementation only after publication.
