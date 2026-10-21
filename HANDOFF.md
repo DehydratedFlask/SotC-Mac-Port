@@ -1,12 +1,32 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 12:44 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 12:50 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 54 (`/root`)
+
+- Claimed three independent synthetic fixture tasks, each `ACTIVE` with zero failed tries:
+  `APP-01-CORE-DIAGNOSTICS-UNKNOWN-SUBSYSTEM-FIXTURE-01` pins preservation of an unknown subsystem
+  code in the diagnostics text; `DATA-02-OVERLAP-MAP-IDENTIFIER-KEYSET-FIXTURE-01` pins the exact
+  error for archive IDs that do not match member-map keys; and
+  `SRV-01-ARENA-PAGE-DEBIT-WHOLE-PAGE-ROUNDING-FIXTURE-01` pins one-page debit for a `0x1ffff` byte
+  request. Claim checkpoints are linked in `docs/TASKS.md`.
+- `/root/launcher_review`, `/root/review_host_proto`, and `/root/slot23_raw_xrefs` own distinct test
+  files for these claims. No implementation begins until this claim checkpoint is pushed.
+- The candidates exercise existing, live, synthetic/pure-code branches and do not require production
+  changes. Actual-game gates remain open; `native/api/CMakeLists.txt` and `native/api/host/` remain
+  untouched and unpublished.
+- The first folder-index check was stale because the validation commands had just added private log
+  files after generation; the index was regenerated after the log set stabilized and the follow-up
+  index check passed. Full validation output is in `logs/root-round54-claim-project-index.log`;
+  the first stale result is retained in `logs/root-round54-claim-project-index-check.log`.
+- Exact next action: regenerate/check indexes, audit and publish only the claim documents, then
+  assign the fixtures and replay their focused commands.
 
 ## Session addendum 2026-10-21 round 53 (`/root`)
 
