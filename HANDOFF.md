@@ -1,12 +1,29 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 16:23 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 16:27 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Round 71 fixture claims (active)
+
+- Claimed three independent test-only tasks before dispatch: launcher missing-core path copy,
+  repeated synthetic `DT_SCE_NEEDED_MODULE` parsing, and oversized region-split rejection with
+  input preservation. Claim-time source/test hashes, baseline commands and logs are in
+  [claim checkpoint](docs/checkpoints/2026-10-21-root-round71-fixture-claims.md).
+- Root replayed the launcher baseline (10 tests), dynlink baseline (25 tests), and native
+  region-split build plus focused CTest (1/1); all exited 0. These tests cover pure path
+  classification, a synthetic ELF parser, and synthetic node arithmetic only.
+- Current owners: `/root + launcher_review` owns only `launcher/Tests/LauncherCoreTests/AssetValidatorTests.swift`;
+  `/root + review_host_proto` owns only `scripts/test_ps4_dynlink.py`; `/root + round68_native_scout`
+  owns only `native/tests/test_region_split.cpp`. Integrator retains ownership of shared docs.
+- Next exact action: publish claim docs and generated folder index to `origin/main`, then dispatch
+  each single-file fixture. Root will review and replay, record E213–E215 and checkpoint results,
+  refresh Trail after source changes, audit allowlisted paths, and push completion. User-owned
+  `native/api/CMakeLists.txt` and `native/api/host/` remain untouched and excluded.
 
 ## Round 70 fixtures verified (/root)
 
