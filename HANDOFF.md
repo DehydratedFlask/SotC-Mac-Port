@@ -120,6 +120,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   continue with the independent scout's candidate if still unclaimed. All real game acceptance gates
   remain unchanged.
 
+## Session addendum 2026-10-21 round 16 (`/root`)
+
+- Claimed `AUD-01-CLASSIFIER-ZLIB-OFFSET-02-FIXTURE-01`, ACTIVE with zero failed tries. Graft found `decompress_probe()`'s `zlib_offset2` branch in `scripts/classify_audio_headers.py:81-127`; live test coverage accepts zlib at offset 0 but has no offset-2 regression. Add one synthetic prefixed-zlib fixture to `scripts/test_audio_headers.py`; production code and real archive interpretation are out of scope. The root independently checked that no matching task row existed before the claim.
+- Acceptance command: `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_headers.py`. Expected assertion: a two-byte prefix followed by `zlib.compress(payload)` is reported as `zlib_offset2` and returns the expected decoded length. No test has run at claim time. Claim checkpoint: [zlib offset-2 fixture](docs/checkpoints/2026-10-21-root-aud01-classifier-zlib-offset2-claim.md). Root retains sole ownership of `HANDOFF.md`, `docs/TASKS.md`, and evidence records; `review_host_proto` will own only `scripts/test_audio_headers.py` after claim publication. The fixture demonstrates synthetic classifier behavior only, not codec identity, game asset use, or playback.
+
 ## Session addendum 2026-10-21 round 10 (`/root`)
 
 - `RE-01-UNWRAP-INPUT-SIDECAR-COLLISION-01` is FIXTURE_VERIFIED with zero failed implementation
