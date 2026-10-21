@@ -23,7 +23,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   real archive or overlay behavior, allocator integration, game boot/audio/save/load, or Metal
   gameplay. Acceptance gates remain G0 PARTIAL and G1–G6 NOT RUN.
 - python3 scripts/project_index.py exited 0 and indexed 14,405 folders; docs/checkpoints lists
-  347 entries. Log local/validation/root-round58-replay/project-index.log, SHA-256
+  348 entries. Log local/validation/root-round58-replay/project-index-publication.log, SHA-256
   f6c5c13cb05cedfc697bbb8ac1be428467d25356e4de4454d70dad499e887566.
   trail build exited 0 and refreshed the wiring graph to 3,552 nodes / 4,792 edges after parsing
   2 of 1,236 files; log local/validation/root-round58-replay/trail-build.log, SHA-256
@@ -38,9 +38,19 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   paths; log local/validation/root-round58-replay/audit-all.log, SHA-256
   ec667deb72eb61d9b5a0a1b7b7f32a555ded2f26aca69a5a638b50c91e5069c7. Both cached and working
   diff checks exited 0.
-- Exact next action: commit the 12 staged allowlisted paths and push to origin/main, keeping
-  native/api/CMakeLists.txt and native/api/host/ excluded. Then scout and claim another bounded set
-  before implementation.
+- Completion commit 6f649e8 (test: pin launcher exit copy, archive IDs, and empty-list insertion)
+  was pushed to origin/main; the remote branch matched after push. Publication record:
+  [Round 58 completion publication](docs/checkpoints/2026-10-21-root-round58-completion-publication.md).
+- The publication-record staged audit accepted 3 paths; log
+  local/validation/root-round58-replay/audit-publication-staged.log, SHA-256
+  852a05cae74c891f18e0649f386ca6818ac81595f2da73aa23b5dee9b3d5d15e. The full audit accepted
+  1,615 paths; log local/validation/root-round58-replay/audit-publication-all.log, SHA-256
+  02a032840c5295cb19dd5c533578697c3aa4bcf55d9eb4b0262e79d1a686acff. Cached and working diff
+  checks exited 0.
+- The existing user-owned native/api/CMakeLists.txt modification and untracked native/api/host/
+  remain untouched, unstaged, and unpublished.
+- Exact next action: scout independent bounded tasks in launcher, DATA-02 tooling, and native
+  fixtures; claim suitable tasks in docs/TASKS.md and HANDOFF.md before implementation.
 
 ## Session addendum 2026-10-21 round 58 fixture claims (`/root`)
 
