@@ -5,7 +5,7 @@ No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
 Batch 21 (`0xe094e0`, `0xdbfa60`, `0xd85490`, `0xbd7950`, `0xbd60a0`, `0xbd4dd0`) `FIXTURE_VERIFIED`; root replay on a fresh build 204/204 ctest pass, six checkers exit 0. Gap audit: earlier manifest gaps 4/18/28 now lifted; 41 (`0xd71f60`) stays `NEEDS_PRINCIPAL`. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-21-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN.
 
-Session limit hit mid-round: workers for `SAV-01-PRODUCER-01` (`local/re/evidence/sav01-producer-01/`) and the five SaveData dialog helpers (`local/re/evidence/sav01-savedata-dialog{close,getstatus,isreadytodisplay,progressbarsetvalue,terminate}-01/`) were resumed and are unreviewed — their evidence must be replayed before any claim. Next constructor candidate: position 178 `0xbd32f0`.
+Session limit hit mid-round; workers resumed. The five SaveData dialog helpers are now root-replayed and verified (`docs/checkpoints/2026-10-20-root-savedata-dialog-helpers-complete.md`; every SaveData import has a verified callsite). `SAV-01-PRODUCER-01` (`local/re/evidence/sav01-producer-01/`) is still unreviewed — replay its verifier before any claim. Next constructor candidate: position 178 `0xbd32f0`.
 
 
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — stragglers: 2 attributed, 1 provider failure
