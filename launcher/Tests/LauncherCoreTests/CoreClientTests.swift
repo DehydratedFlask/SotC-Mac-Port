@@ -81,6 +81,13 @@ struct CoreClientTests {
         #expect(CoreABIVersion(major: 1, minor: 9) < CoreABIVersion(major: 2, minor: 0))
     }
 
+    @Test func abiVersionMaximumFieldsPackAndRoundTrip() {
+        let maximum = CoreABIVersion(major: .max, minor: .max)
+
+        #expect(maximum.packed == UInt32.max)
+        #expect(CoreABIVersion(packed: UInt32.max) == maximum)
+    }
+
     @Test func numericCodesMapToTypedValues() {
         #expect(CoreState(code: 0) == .idle)
         #expect(CoreState(code: 4) == .running)

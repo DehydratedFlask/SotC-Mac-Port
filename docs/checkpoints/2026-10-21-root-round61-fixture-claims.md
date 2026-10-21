@@ -93,5 +93,6 @@
   `e232b1f79f408e3c45dfd50e12db52acbbe2ffdf9bc482f96bee56aa17db36c1`. Cached and working diff
   checks passed; only five allowlisted documentation paths are staged. Existing `native/api` user
   changes remain unstaged.
-- Exact next action: publish `docs/checkpoints/2026-10-21-root-round61-workers-dispatched.md`, then
-  send the three single-file worker prompts.
+- All three claims were completed and root-replayed; see
+  `docs/checkpoints/2026-10-21-root-round61-fixtures-complete.md` for final test results, evidence,
+  publication checks, and the next exact action.
