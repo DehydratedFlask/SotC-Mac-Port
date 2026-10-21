@@ -1,12 +1,33 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 12:55 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 13:00 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 56 claim (`/root`)
+
+- Claimed three independent synthetic fixture tasks with zero failed tries before implementation:
+  `APP-01-DIAGNOSTICS-UNKNOWN-ERROR-CODE-FORMAT-FIXTURE-01` pins the public error-code formatter's
+  unknown raw value; `AUD-01-XFF-ARCHIVE-SUMMARY-BYTE-IDENTITY-FIXTURE-01` pins rejection of a stale
+  summary byte count before opening PSARC; `SRV-01-EXACT-FIT-CONSUME-FINALIZE-FIXTURE-01` passes an
+  exact carve result through the existing finalizer and checks the synthetic node fields.
+- The claim checkpoint is
+  [round 56 fixture claims](docs/checkpoints/2026-10-21-root-round56-fixture-claims.md). The live
+  task register has no duplicate claim. Each worker owns a separate existing test file; root owns
+  shared documentation and independent replay.
+- Source observations: `CoreDiagnostics.code` returns `UNKNOWN(raw)` for `.unknown(raw)`;
+  `inspect_members` checks `summary['bytes']` against the current file size before constructing
+  `Psarc`; the exact-fit helper and finalizer have separate coverage, while this task adds their
+  combined synthetic path. These fixtures add no actual-game evidence.
+- Current task status is `ACTIVE` for all three; implementation and focused verification are NOT
+  RUN. The pre-existing `native/api/CMakeLists.txt` modification and untracked `native/api/host/`
+  remain untouched and excluded.
+- Exact next action: publish this claim checkpoint, then assign the three distinct test files and
+  independently replay their focused commands.
 
 ## Session addendum 2026-10-21 round 55 (`/root`)
 
