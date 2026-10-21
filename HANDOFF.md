@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 08:58 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 09:04 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -53,6 +53,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   CTests passed with only the escalated `sotc_host_protocol` test excluded. See
   [the completion checkpoint](docs/checkpoints/2026-10-21-root-cpu01-slot24-47-complete.md) and
   evidence row E120. Slot 23 remains the production blocker; G1 is unchanged.
+- Claimed `CPU-01-SLOT23-CONSUMERS-01`, ACTIVE, attempt 0: offline static dataflow analysis of
+  the table at `0x3353f40` and its accessors/consumers, to learn whether original strings are
+  necessary before any data import decision. No name strings or code are being published in this
+  analysis task. See
+  [the claim](docs/checkpoints/2026-10-21-root-cpu01-slot23-consumers-claim.md).
 - After reconfigure, `test_registration_thunks_ahead` built and its focused CTest passed 1/1.
   The host library and child executable build. The first host target build failed at line 508
   because `WIFEXITED` received temporary `reap(unused)`; storing status in a local made the target
@@ -179,35 +184,34 @@ Tooling correctness (do not repeat these mistakes):
 - `scripts/disasm_range.sh` uses `--adjust-vma`, so its `#` target comments are wrong; re-derive
   targets from the raw displacement bytes.
 
-## Blocker
+## Current blocker
 
-Slot 11 / RVA `0x00f09160` is still the first unresolved original constructor
-(`ClothingPhysicalMeshParameters`; ctor `0xf06410`, vptr `0x15fa770`, globals
-`0x3356068`/`0x3356078`, consumer `0xed5880`, accessor `0xf08bc0`). Its singleton creator allocates
-`0x2bf0` bytes of 74×`0x98` PhysX reflection records, so registration still needs that subsystem.
-See [its checkpoint](docs/checkpoints/2026-10-20-root-cpu01-ctor11-structural-analysis.md).
-Do not claim engine startup or G1 from slot-10 registration.
+Slot 23 / RVA `0x00e71990` is now the first unresolved production constructor. It writes a 14-row
+name/hash registry at `0x3353f40`; 13 row hashes reproduce with the verified routine at `0xe70aa0`,
+and one hash-zero row is a sentinel. The original data strings remain private and consumers at
+`0xe5cd78` / `0xe715d0` have not yet been fully traced. Slot 11 now has a native fixture
+(`LazyParamDefTree`); its 74 reflection records are intentionally not modelled. See the slot-23
+analysis checkpoints and the current consumer-trace claim above. Do not claim startup or G1.
 
 ## Settled decisions (do not re-ask)
 
 - `StartupState` RAII ownership for the slot-10 mutex — implemented.
 - Testable `LauncherCore` lifecycle helper and a system alert for folder-import errors — keep.
 - Offline analysis of the local `eboot.bin` is allowed; no original/Sony executable may ship or run.
-- One shared native helper type is the intended shape for the 34-slot family, but it must stay
-  unregistered until slot 11 is resolved; the family verifier is the guard against shape drift.
+- The shared descriptor helper models the 34-slot family; slots 24–47 remain in a test-only ahead
+  table outside `recovered_constructors()` until production reaches and resolves slot 23.
 
 ## Next exact work
 
-1. Slot 11 (`0xf09160`): bound the reflection/attributes subsystem it needs, or escalate back to
-   the principal with the smallest missing contract. Do not register slots 12+ first.
+1. Complete `CPU-01-SLOT23-CONSUMERS-01`; if original strings are required, return the concrete
+   import/regeneration choice to the principal before changing native code.
 2. Identify the class/interface behind vtable `0x15f9ef0` (slot 12) and the forwarding callees
    `0xf011f0`, `0xefe410`, `0xefd140`, `0xefad20`, `0xef8600`, `0xf030e0` (slots 13–19).
-3. Resolve the `0xe71990` name-hash function, which blocks lifting the 14 record pairs.
-4. Keep `0xd71f60` NEEDS_PRINCIPAL (3 failed tries) and do not retry without principal
+3. Preserve `0xd71f60` NEEDS_PRINCIPAL (3 failed tries) and do not retry without principal
    reassessment.
-5. Any new native module needs a README row, a test, and CMake registration; any new parser fixture
+4. Any new native module needs a README row, a test, and CMake registration; any new parser fixture
    needs a failing-before proof where it claims a defect fix.
-6. Before publishing: `python3 scripts/project_index.py`, `trail build --check`,
+5. Before publishing: `python3 scripts/project_index.py`, `trail build --check`,
    `python3 -I scripts/audit_publish_paths.py --all`, then commit allowlisted paths and
    `git push origin main`.
 
