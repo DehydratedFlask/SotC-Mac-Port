@@ -1,6 +1,13 @@
 Updated: 2026-10-20 07:18 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation status: G0 PARTIAL; G1-G6 NOT RUN.
 
+## CURRENT CHECKPOINT — 2026-10-20, `/root` — SAV-01 header/hash semantics established statically
+
+Save/Load paths traced: 16-byte header {1, FNV-1a-form hash of body only, body size ≤ `0x6400000`, dword 3 from `[[this+8]]`}; Load checks version, size cap and body hash; header/body producers `FUN_00a56080` / `FUN_00a55450`. 1 REA success; root replayed verifier (27/27 mutations caught per worker) and checksums. Details: `docs/checkpoints/2026-10-20-root-sav01-producer-complete.md`. Body serializer is the vtable slot `+0x50` target — unresolved; no native serializer, no save works. G0 PARTIAL, G1-G6 NOT RUN. Native suite last verified 204/204 (batch 21, pushed `5abd813`).
+
+Next exact action: resolve the vtable holding slots `+0x40/+0x50` for `this` at `FUN_00a56080`'s callers (`0x5400f3`, `0x5452d3`, `0x54b4c4`), then one REA query on the slot `+0x50` target; constructor batch 22 (next 178 `0xbd32f0`).
+
+
 ## CURRENT CHECKPOINT — 2026-10-20, `/root` — leaf ctors batch 21 lifted; three session-limit interruptions recovered
 
 Batch 21 (`0xe094e0`, `0xdbfa60`, `0xd85490`, `0xbd7950`, `0xbd60a0`, `0xbd4dd0`) `FIXTURE_VERIFIED`; root replay on a fresh build 204/204 ctest pass, six checkers exit 0. Gap audit: earlier manifest gaps 4/18/28 now lifted; 41 (`0xd71f60`) stays `NEEDS_PRINCIPAL`. Details: `docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batch-21-complete.md`. No runtime claim; G0 PARTIAL, G1-G6 NOT RUN.
