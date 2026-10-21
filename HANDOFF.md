@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 12:54 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 12:55 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -26,12 +26,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `logs/root-round54-completion-validation.log` (SHA256
   `c2c7afd349ccdc979c3638e3ae328ea46b990106b12bb440541138fecd8b7f60`). Folder index is current at
   14,391; the source graph was rebuilt to 3,547 nodes / 4,781 edges and its follow-up check passed.
-  Completion records are in the working tree and await publication audit, commit, and push.
+  Completion records and all three fixtures were published in `36cdbb8`.
 - The round-54 claim publication is documented in
   [round 55 publication](docs/checkpoints/2026-10-21-root-round55-publication.md). Existing
   `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and unpublished.
-- Actual-game gates remain open. Exact next action: stage only the three test files and documentation,
-  pass staged/full path audits, then commit and push the verified fixtures.
+- Actual-game gates remain open. Exact next action: record the completion publication, then scout
+  the next independent bounded tasks and publish claims before assigning implementation.
 
 ## Session addendum 2026-10-21 round 54 (`/root`)
 
