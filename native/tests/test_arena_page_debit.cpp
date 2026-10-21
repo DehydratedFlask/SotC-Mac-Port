@@ -22,6 +22,8 @@ int main() {
     CHECK(arena_page_count(arena) == 97);
     arena_debit_pages(arena, 0xffff);  // 0 pages
     CHECK(arena_page_count(arena) == 97);
+    arena_debit_pages(arena, 0x1ffff);  // one full page + a partial page
+    CHECK(arena_page_count(arena) == 96);
     arena_debit_pages(nullptr, 0x10000);  // no-op
 
     // Idle pool insert reuses list_insert_at_head offsets.
