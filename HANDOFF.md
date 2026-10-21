@@ -1,12 +1,27 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 12:35 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 12:38 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 50 (`/root`)
+
+- Published round-49 fixture completions and E156–E158 in commit
+  `97a180f376b626098fdc7bb49378207460dcc907` (`test: verify clean exit raw offset and list
+  endpoints`); push succeeded. See the [round 47 publication checkpoint](docs/checkpoints/2026-10-21-root-round47-publication.md).
+- Pre-push checks passed: folder index current at 14,385; source graph check passed at 3,545 nodes;
+  staged audit accepted 11 paths; full audit accepted 1,575 paths; staged diff check passed.
+- `/root/launcher_review`, `/root/review_host_proto`, and `/root/slot23_raw_xrefs` are scouting
+  one candidate each in separate launcher, Python, and native test areas. No new task is claimed;
+  do not edit until a bounded claim is recorded and pushed.
+- Actual-game gates remain open. `native/api/CMakeLists.txt` and untracked `native/api/host/`
+  remain untouched and unpublished.
+- Exact next action: review the three scout findings against current files and task registry, then
+  claim and publish suitable independent fixture tasks before assigning implementation.
 
 ## Session addendum 2026-10-21 round 49 (`/root`)
 
