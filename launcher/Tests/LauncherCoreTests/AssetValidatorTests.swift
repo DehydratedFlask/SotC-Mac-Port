@@ -68,6 +68,19 @@ struct AssetValidatorTests {
         #expect(message.contains("Play disabled"))
     }
 
+    @Test func nativeCoreReportsMissingExecutablePath() throws {
+        let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString, directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let executable = root.appending(path: "SoCGameCore", directoryHint: .notDirectory)
+
+        guard case .notBuilt(let message) = SystemChecks.nativeCore(executable: executable) else {
+            Issue.record("expected .notBuilt for missing core path")
+            return
+        }
+        #expect(message == "NOT BUILT: SoCGameCore not found — native recovery incomplete. Play disabled until a native SoCGameCore exists")
+    }
+
     @Test func nativeCoreRejectsDirectoryExecutable() throws {
         let root = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString, directoryHint: .isDirectory)
         let executable = root.appending(path: "SoCGameCore", directoryHint: .isDirectory)
