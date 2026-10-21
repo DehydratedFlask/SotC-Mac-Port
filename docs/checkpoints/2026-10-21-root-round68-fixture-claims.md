@@ -80,5 +80,24 @@ data, runtime mapping, launcher UI, game boot/audio/save behavior, or Metal game
   `516e9f4c6648bd7e273521cf22742e1f8fdc9920`; `git rev-list --left-right --count HEAD...origin/main`
   returned `0 0`.
 
-**Next exact action:** Commit and push the four allowlisted claim paths; record the commit and
-post-push refs before dispatching any worker.
+## Claim publication and dispatch
+
+- The four allowlisted claim paths were committed as
+  `7afe5fcb699137eaff4c557ba30151b5231234d0` and pushed to `origin/main` before worker edits.
+  The initial `git push origin main` exited 0 and advanced `516e9f4..7afe5fc`; a subsequent
+  confirmation push exited 0 with `Everything up-to-date`. Confirmation log
+  `local/validation/root-round68-scout/claim-push.log`, SHA-256
+  `f003da496397b96e83a1edab0fe86cd9f391566234246c3cc64fac197ef7c8f2`.
+- `git fetch origin` exited 0; its log is `local/validation/root-round68-scout/claim-fetch.log`,
+  SHA-256 `19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061`. The publication
+  state log `local/validation/root-round68-scout/claim-publish-state.log`, SHA-256
+  `4e8ec4af8adf6a3ad722dead8d3a1006bfa859c877be5a3a0e651c5d3bdd06ac`, records
+  `HEAD == origin/main == 7afe5fcb699137eaff4c557ba30151b5231234d0` and zero divergence.
+- After publication, the three test-file assignments were sent to `/root/launcher_review`,
+  `/root/review_host_proto`, and `/root/slot23_raw_xrefs`. No worker was authorized to edit shared
+  documentation or commit. The first captured post-dispatch status showed the APP test edit in
+  progress, with the RE and SRV edits not yet present; later results are in the completion
+  checkpoint.
+
+**Next exact action:** Review each worker's one-file diff, independently replay the focused checks,
+record E204–E206, refresh project indexes, and publish completion.
