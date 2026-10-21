@@ -142,6 +142,14 @@ class ParseManifestTests(unittest.TestCase):
 
 
 class CompareMemberMapsTests(unittest.TestCase):
+    def test_rejects_archive_identifiers_that_do_not_match_member_map_keys(self) -> None:
+        with self.assertRaises(ValueError) as context:
+            compare_member_maps(("base", "patch"), {"base": {}})
+        self.assertEqual(
+            str(context.exception),
+            "archive identifiers must match member-map keys",
+        )
+
     def test_disjoint_sets_report_zero_overlap(self) -> None:
         pairs = compare_member_maps(
             ("a", "b"), {"a": {"a.bin": 1}, "b": {"b.bin": 2}}
