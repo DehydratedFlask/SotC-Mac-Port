@@ -1,12 +1,35 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 13:54 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 13:58 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 Round 61 fixture claims (/root)
+
+- Selected three independent test-only tasks on distinct files: APP-01 maximum packed ABI-version
+  round-trip in `CoreClientTests.swift`; AUD-01 LZMA trivial-output rejection in
+  `scripts/test_audio_headers.py`; SRV-01 `lead == free_size` rejection and node preservation in
+  `native/tests/test_region_split.cpp`. Scout reports and exact assertions are in
+  [the Round 61 claim checkpoint](docs/checkpoints/2026-10-21-root-round61-fixture-claims.md).
+- Focused baselines pass before edits: CoreClientTests 12 tests, audio-header suite 23 tests, and
+  region-split build plus CTest 1/1. Production source and test-file claim-time hashes are recorded
+  in the checkpoint. Each task has 0 failed fixture attempts and a separate worker owner.
+- `python3 scripts/project_index.py` exited 0 and indexed 14,417 folders; `docs/FOLDERS.md` lists
+  356 checkpoint files. Log `local/validation/root-round61-baseline/project-index.log`, SHA-256
+  `39bf43672c493802900b5ff2ada9ee28bb1d1d50c8c4546146075a4c09be1283`.
+- `python3 scripts/project_index.py --check` first reported a stale local folder index; after
+  regeneration it reports `14417 folders indexed; current`. `trail build --check` exits 0 with the
+  wiring graph current at 3,555 nodes. Exact output and limits are in the Round 61 claim checkpoint.
+- Before publication, the staged path audit accepted 5 documentation paths and the full audit
+  accepted 1,623 paths. Logs and hashes are in the claim checkpoint; cached and working
+  `git diff --check` passed. User-owned `native/api` work remains unstaged.
+- Exact next action: fetch `origin/main`, commit and push the claim/docs checkpoint if the branch is
+  unchanged, then dispatch the workers to their respective test files only; root owns shared docs
+  and independent replay.
 
 ## Session addendum 2026-10-21 Round 60 fixtures verified (/root)
 
@@ -32,8 +55,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `eb127a95a8c8da17da30c013461297031bea680cbeb45ada7610bf30102bd993`). Cached and working
   `git diff --check` passed; only claimed tests and docs are staged, while existing `native/api`
   user work remains unstaged.
-- Exact next action: fetch `origin/main`, then commit and push if the remote has not advanced; once
-  published, claim and dispatch the next bounded fixture tasks.
+- Completion commit `4ede1c9` is pushed; `HEAD` and `origin/main` match. A confirming no-op push
+  returned `Everything up-to-date`, with state and push evidence in the Round 60 completion
+  checkpoint. Existing user-owned `native/api` work remains excluded.
+- Exact next action: review Round 61 scout reports, claim three distinct one-file synthetic fixtures
+  in the task and handoff registries, publish those claims, then dispatch.
 
 ## Session addendum 2026-10-21 Round 60 workers dispatched (/root)
 

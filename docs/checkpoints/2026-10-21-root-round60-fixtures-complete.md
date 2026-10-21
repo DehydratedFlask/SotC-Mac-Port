@@ -1,6 +1,6 @@
 # Checkpoint: Round 60 synthetic fixtures verified
 
-- Local date/time: 2026-10-21 13:54 CDT (America/Chicago).
+- Local date/time: 2026-10-21 13:56 CDT (America/Chicago).
 - Agent ID: `/root` (integrator); worker reports from `/root/launcher_review`,
   `/root/review_host_proto`, and `/root/slot23_raw_xrefs`.
 - Claims were published in `4e5779a`; worker-dispatch checkpoint was published in `beea437`.
@@ -85,5 +85,14 @@
   `eb127a95a8c8da17da30c013461297031bea680cbeb45ada7610bf30102bd993`. Cached and working
   `git diff --check` exited 0. Only the three claimed test files and five docs paths are staged;
   user-owned `native/api` work is unstaged.
-- Exact next action: fetch `origin/main`; if it has not advanced, commit the allowlisted paths and
-  push `main`.
+- Completion commit `4ede1c9d92ba324ca12eee5ca3fac7e0bda20d36` (`test: verify round 60 synthetic
+  fixtures`) was pushed to `origin/main`. `git push origin main` subsequently returned
+  `Everything up-to-date`; log `local/validation/root-round60-replay/push.log`, SHA-256
+  `47e930bfa8547af0e275fdc8f30ee4b5eded740e9615307434258197298b0ea5`. `git rev-parse HEAD
+  origin/main` reports both refs at the same commit; log
+  `local/validation/root-round60-replay/publication-state.log`, SHA-256
+  `6e54cc8a8b3f3f3486e1e4cffcfa236d940defe528a3f39846c5763431ba0a0f`.
+- The dispatch and completion checkpoints are durable on `origin/main`. Existing user-owned
+  `native/api/CMakeLists.txt` and `native/api/host/` remain modified/untracked and unpublished.
+- Exact next action: publish the Round 61 fixture claims in
+  `docs/checkpoints/2026-10-21-root-round61-fixture-claims.md`, then dispatch each one-file task.
