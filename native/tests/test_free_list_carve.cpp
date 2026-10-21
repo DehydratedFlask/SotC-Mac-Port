@@ -59,6 +59,8 @@ int main() {
 
     // free_size < req_size
     CHECK(!try_carve_fit(0x20000000ull, 0x1000ull, 0x2000ull, 0x1000u).has_value());
+    // The aligned lead alone exceeds the free node, although the request fits its size.
+    CHECK(!try_carve_fit(0x20001000ull, 0x1000ull, 1ull, 0x10000u).has_value());
     // Align-up addition wraps near UINT64_MAX and must reject the fit.
     CHECK(!try_carve_fit(0xfffffffffffffff8ull, 7ull, 1ull, 16u).has_value());
     // bad alignment

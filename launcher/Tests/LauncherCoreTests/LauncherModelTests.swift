@@ -508,6 +508,12 @@ struct CoreReadinessTests {
         ])
         #expect(CoreDiagnostics.coreSection(coverage: nil, status: nil, lastFailure: nil, queryFailure: nil)
             == ["Core report:", "  Coverage: NOT REPORTED"])
+        let stopping = CoreStatus(
+            state: .stopping, lastError: .ok, assetsValidated: false, assetsReady: false,
+            engineImplemented: false, ctor: .notLinked
+        )
+        #expect(CoreDiagnostics.coreSection(coverage: nil, status: stopping, lastFailure: nil, queryFailure: nil)
+            .contains("  Core state: stopping; last error: OK"))
         #expect(CoreDiagnostics.text(report: nil, coverage: nil, status: nil, lastFailure: nil, queryFailure: nil)
             .hasPrefix("No readiness check has run yet."))
     }
