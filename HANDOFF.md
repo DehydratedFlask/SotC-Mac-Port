@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 14:23 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 14:26 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,7 +8,7 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Round 63 test-only tasks claimed (/root)
+## Round 63 test-only tasks active (/root)
 
 - Three read-only scouts identified distinct synthetic fixtures; root verified each candidate against
   live production and test files and ran the focused baselines. Claims, exact assertions, digests,
@@ -20,8 +20,18 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   remainder fit in the free-list carve helper (target build and CTest 1/1).
 - Owners are `/root/launcher_review`, `/root/review_host_proto`, and `/root/slot23_raw_xrefs`; each
   may edit only its claimed existing test file and may not commit. Root owns shared docs and replay.
-- Exact next action: publish the Round 63 claims, then send each owner its one-file fixture prompt.
-  Failed attempts: 0 for all three tasks.
+- Claims were published before implementation prompts in commit
+  `3a79b5318beb437011384ca6c250c5f56b12ead9`; `HEAD` and `origin/main` matched. Push log
+  `local/validation/root-round63-claims/push-claims.log` SHA-256
+  `9ac94a0929fcf694f749680b1a93f761736a99497aaabeb959b59e04fdd4417d`; publication-state log
+  SHA-256 `009237c394683aedd262a2d22db3a1f964cd5af54f9ace71df27380705292b91`.
+- At 14:24 CDT, prompts were sent to all three owners. Worker attempts passed: APP 22 tests across
+  2 suites, DATA-02 34 parser tests, and SRV-01 target build plus CTest 1/1. Worker logs, test and
+  production hashes are in
+  [the Round 63 dispatch checkpoint](docs/checkpoints/2026-10-21-root-round63-workers-dispatched.md).
+- All three claimed test files now have worker edits. Root diff review and replay are pending; tasks
+  remain `ACTIVE` with 0 failed attempts. Exact next action: review each diff, root-replay all three
+  focused commands, then publish the completion record.
 
 ## Session addendum 2026-10-21 Round 62 fixtures verified (/root)
 
