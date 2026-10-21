@@ -86,6 +86,16 @@ class Tests(unittest.TestCase):
         self.assertEqual(a.blocks[a.entries[1]['block']], 256)
         self.assertEqual(a.read(1), payload)
 
+    def test_rejects_block_table_with_partial_width_entry(self):
+        data = bytearray(build([('a', bytes(range(256)))], block_size=257))
+        toc_size = int.from_bytes(data[12:16], 'big')
+        struct.pack_into('>I', data, 12, toc_size + 1)
+
+        with self.assertRaisesRegex(
+            psarc.PsarcError, '^block table not a multiple of width$'
+        ):
+            self.open(bytes(data))
+
     def test_rejects_block_size_outside_supported_range(self):
         valid = build([('a', b'1')])
         for block_size in (0, (1 << 24) + 1):

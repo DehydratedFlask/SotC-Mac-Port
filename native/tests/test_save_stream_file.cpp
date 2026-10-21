@@ -186,6 +186,15 @@ void test_oversize_file() {
     CHECK(::ftruncate(fd, static_cast<off_t>(16 + sotc::kSaveStreamMaxBodySize + 1)) == 0);
     ::close(fd);
     CHECK_ERR(sotc::read_save_stream_file(path).error, SaveStreamError::file_too_large);
+
+    // The exact maximum passes the inclusive file-size gate; zero version bytes fail parsing next.
+    const std::string exact_path = g_dir + "/exact-limit.sav";
+    const int exact_fd = ::open(exact_path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    CHECK(exact_fd >= 0);
+    CHECK(::ftruncate(exact_fd, static_cast<off_t>(
+        sotc::kSaveStreamHeaderSize + sotc::kSaveStreamMaxBodySize)) == 0);
+    ::close(exact_fd);
+    CHECK_ERR(sotc::read_save_stream_file(exact_path).error, SaveStreamError::bad_version);
 }
 
 void test_duplicate_policy_via_file() {
