@@ -51,6 +51,23 @@ int main() {
     }
     {
         RegionNode free{};
+        free.set_start(0x20001000ull);
+        free.set_size(0x10000ull);
+        free.set_capacity(0x10000ull);
+        free.set_flag_a(0xAB);
+        RegionNode neu{};
+        std::memset(neu.raw, 0xCC, sizeof(neu.raw));
+        std::uint8_t free_before[RegionNode::kBytes];
+        std::uint8_t neu_before[RegionNode::kBytes];
+        std::memcpy(free_before, free.raw, sizeof(free.raw));
+        std::memcpy(neu_before, neu.raw, sizeof(neu.raw));
+
+        CHECK(!split_free_at_lead(free, neu, 0x10001ull));
+        CHECK(std::memcmp(free.raw, free_before, sizeof(free.raw)) == 0);
+        CHECK(std::memcmp(neu.raw, neu_before, sizeof(neu.raw)) == 0);
+    }
+    {
+        RegionNode free{};
         free.set_start(std::numeric_limits<std::uint64_t>::max() - 3);
         free.set_size(16);
         free.set_capacity(16);

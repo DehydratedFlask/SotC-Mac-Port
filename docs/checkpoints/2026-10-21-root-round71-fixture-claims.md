@@ -14,6 +14,12 @@ untracked `native/api/host/`, both excluded from the commit. The commit and push
 SHA-256 `786cb3ee024ac313d78e970b7e556f18602707cbf26f172c51848eadc9c9f716`; fetch log SHA-256 is
 the empty-output hash `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`; post-push
 state log SHA-256 is `e700f3d1a45ff2ecd8c7070635e7b561d4cbba773f9add8563317e2e31536ffe`.
+The checkpoint update was synchronized in commit `3a866fa106f43d7cc4bff3ec46fc1dac3cd6cbcc`
+(`docs: sync Round 71 claim publication`), also pushed; its post-fetch state log confirms
+`HEAD == origin/main`, divergence `0 0` (SHA-256
+`b0b933d1e406e54ece4bab8f6578e276589014b81e8ce31ec6ed62e7295b901e`). Sync commit and push log
+SHA-256 values: `73870835b789e046ab7229d2bdf88ef146171f0f15abaff08e7205b08ef977e4` and
+`635c3494e489b28bfc7df40d722dc34d76125867bf78fed76408d82dd54cf6f0`.
 
 Three independent bounded tasks are claimed before implementation. No code or test file has been
 edited. `docs/TASKS.md` assigns one test file to each worker; `/root` is the sole integrator for
@@ -57,12 +63,23 @@ save/reload, or Metal behavior. Existing user-owned `native/api/CMakeLists.txt` 
 `native/api/host/` are unchanged and excluded from publication.
 
 At claim time, G0 remains PARTIAL and G1–G6 remain NOT RUN. No install/dependency fact changed.
-Implementation has not started. Claim publication checks: `python3 -I scripts/project_index.py`
+Claim publication checks: `python3 -I scripts/project_index.py`
 and `--check` exited 0 at 14,466 folders (log hashes `7a011c9c98b920104871e7cee6a0c371391892a025c329d853d8c830c2ca0d99` and
 `cfda4d504c8a996ed5e632aa4f3299497abf52178d627dc583bd192c496e3886`); staged audit accepted 4
 paths (log SHA-256 `fc3f0976acf9a7c706f563af96e66a47fc29eb33d6eaeb413f6c9a9c40fd5f0b`); full audit
 accepted 1,646 paths (log SHA-256 `0fa611c7c1b08cf42e9741cfc5ae40739623789425835c717691c4440aff658a`);
 `git diff --cached --check` exited 0 (empty log hash
-`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). Next exact action: dispatch
-the three single-file edits, independently review and replay them, record E213–E215 and a completion
-checkpoint, refresh Trail after source changes, audit allowlisted paths, and push completion.
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). A later sync index check
+first exited 1 because more private validation log paths had been added after generation; retained
+log `claim-sync-index-check.log` SHA-256 `31dad00ffd5208458ee89a329fea70b0fa13494e525ddd8a7e837c7614a2266b`.
+After all claim-sync log paths existed, regeneration and a second check both exited 0 at 14,466
+folders (log hashes `7a011c9c98b920104871e7cee6a0c371391892a025c329d853d8c830c2ca0d99` and
+`cfda4d504c8a996ed5e632aa4f3299497abf52178d627dc583bd192c496e3886`). This was private index
+freshness only, not a failed test or implementation hypothesis.
+
+All three implementations and root replays are now complete and recorded as `FIXTURE_VERIFIED`;
+E213–E215 and the [Round71 completion checkpoint](2026-10-21-root-round71-fixtures-complete.md)
+contain results and limits. Trail is refreshed to 3,572 nodes, 4,836 edges, and 943 cards;
+`trail build --check` reports the wiring graph in sync, with the meaning layer not built. Next exact
+action after completion publication: identify independent bounded Round72 tasks; these fixtures do
+not advance any game acceptance gate.
