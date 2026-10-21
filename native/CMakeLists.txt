@@ -11,8 +11,18 @@ if(SOTC_SANITIZE)
 endif()
 add_library(sotc_core STATIC
   core/math_constants.cpp
+  core/guarded_dd91b0.cpp
+  core/guarded_dd7e30.cpp
+  core/guarded_dd4210.cpp
+  core/guarded_d39b00.cpp
+  core/guarded_d366d0.cpp
+  core/guarded_d33b50.cpp
+  core/avx_d8fa40.cpp
+  core/avx_d86ed0.cpp
+  core/avx_d5a280.cpp
   core/scratch_reset.cpp
   core/save_checksum.cpp
+  core/save_chunk_header.cpp
   core/recursive_mutex.cpp
   core/startup_ctors.cpp
   core/clothing_preview_param.cpp
@@ -1221,3 +1231,47 @@ add_test(NAME vec_b44580 COMMAND test_vec_b44580)
 add_executable(test_vec_b33bd0 tests/test_vec_b33bd0.cpp)
 target_link_libraries(test_vec_b33bd0 sotc_core)
 add_test(NAME vec_b33bd0 COMMAND test_vec_b33bd0)
+
+add_executable(test_guarded_dd91b0 tests/test_guarded_dd91b0.cpp)
+target_link_libraries(test_guarded_dd91b0 sotc_core)
+add_test(NAME guarded_dd91b0 COMMAND test_guarded_dd91b0)
+
+add_executable(test_guarded_dd7e30 tests/test_guarded_dd7e30.cpp)
+target_link_libraries(test_guarded_dd7e30 sotc_core)
+add_test(NAME guarded_dd7e30 COMMAND test_guarded_dd7e30)
+
+add_executable(test_guarded_dd4210 tests/test_guarded_dd4210.cpp)
+target_link_libraries(test_guarded_dd4210 sotc_core)
+add_test(NAME guarded_dd4210 COMMAND test_guarded_dd4210)
+
+add_executable(test_guarded_d39b00 tests/test_guarded_d39b00.cpp)
+target_link_libraries(test_guarded_d39b00 sotc_core)
+add_test(NAME guarded_d39b00 COMMAND test_guarded_d39b00)
+
+add_executable(test_guarded_d366d0 tests/test_guarded_d366d0.cpp)
+target_link_libraries(test_guarded_d366d0 sotc_core)
+add_test(NAME guarded_d366d0 COMMAND test_guarded_d366d0)
+
+add_executable(test_guarded_d33b50 tests/test_guarded_d33b50.cpp)
+target_link_libraries(test_guarded_d33b50 sotc_core)
+add_test(NAME guarded_d33b50 COMMAND test_guarded_d33b50)
+
+add_executable(test_avx_d8fa40 tests/test_avx_d8fa40.cpp)
+target_link_libraries(test_avx_d8fa40 sotc_core)
+add_test(NAME avx_d8fa40 COMMAND test_avx_d8fa40)
+
+add_executable(test_avx_d86ed0 tests/test_avx_d86ed0.cpp)
+target_link_libraries(test_avx_d86ed0 sotc_core)
+add_test(NAME avx_d86ed0 COMMAND test_avx_d86ed0)
+
+add_executable(test_avx_d5a280 tests/test_avx_d5a280.cpp)
+target_link_libraries(test_avx_d5a280 sotc_core)
+add_test(NAME avx_d5a280 COMMAND test_avx_d5a280)
+
+add_executable(test_save_chunk_header tests/test_save_chunk_header.cpp)
+target_link_libraries(test_save_chunk_header sotc_core)
+add_test(NAME save_chunk_header COMMAND test_save_chunk_header)
+
+add_executable(test_save_checksum_edges tests/test_save_checksum_edges.cpp)
+target_link_libraries(test_save_checksum_edges sotc_core)
+add_test(NAME save_checksum_edges COMMAND test_save_checksum_edges)

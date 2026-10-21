@@ -49,6 +49,82 @@ class FamilyTests(unittest.TestCase):
         )
 
 
+class FamilyBoundaryTests(unittest.TestCase):
+    """Prefix-anchoring boundaries: empty, too short, one byte short, two families.
+
+    Every fixed signature is matched at offset 0 only (``startswith``/``head[:2]``);
+    the classifier never scans for a signature at a later offset. The fixed
+    signatures also have distinct first bytes, so no buffer can satisfy two of them
+    at offset 0 and the branch order in ``family_of`` is defensive, not observable.
+    """
+
+    def test_empty_buffer_is_the_empty_family(self):
+        self.assertEqual(cah.family_of(b''), 'empty')
+        # An empty bytes-like value is still "empty", never the hex fallback.
+        self.assertEqual(cah.family_of(bytearray()), 'empty')
+        self.assertEqual(cah.family_of(memoryview(b'')), 'empty')
+
+    def test_buffers_shorter_than_every_signature_fall_back_to_hex(self):
+        # No observed signature is shorter than two bytes, and the 2-byte 8c0x
+        # family needs both bytes, so single truncated lead bytes are unmatched.
+        self.assertEqual(cah.family_of(b'\xfb'), 'other-fb')
+        self.assertEqual(cah.family_of(b'\x8c'), 'other-8c')
+        self.assertEqual(cah.family_of(b'\x8c\x00'), 'other-8c00')
+        # 3-byte ASCII fragments of the 4-byte qath / 80AE signatures.
+        self.assertEqual(cah.family_of(b'qat'), 'other-716174')
+        self.assertEqual(cah.family_of(b'80A'), 'other-383041')
+        # A 3-byte fragment of the 4-byte fbad9897 signature is not that family.
+        self.assertEqual(cah.family_of(b'\xfb\xad\x98'), 'other-fbad98')
+
+    def test_xff_prefix_one_byte_short_is_not_the_xff_family(self):
+        # b'xff\x00' is the complete 4-byte signature; b'xff' is one byte short.
+        self.assertEqual(cah.family_of(b'xff\x00'), 'hd-bd-ascii-xff')
+        self.assertEqual(cah.family_of(b'xff'), 'other-786666')
+        # The ASCII signature compare is case-sensitive (upper-case is not xff).
+        self.assertEqual(cah.family_of(b'xFF\x00'), 'other-78464600')
+
+    def test_offset_zero_family_wins_over_a_later_family_signature(self):
+        # Second-family signature at a nonzero offset is ignored, not scanned for.
+        qath_at_2 = b'\x8c\x0aqath'
+        self.assertEqual(qath_at_2.index(b'qath'), 2)
+        self.assertEqual(cah.family_of(qath_at_2), 'sxd-high-entropy-8c0x')
+
+        xff_at_4 = bytes.fromhex('fbad9897') + b'xff\x00'
+        self.assertEqual(xff_at_4.index(b'xff\x00'), 4)
+        self.assertEqual(cah.family_of(xff_at_4), 'sxd-fbad9897')
+
+        qath_at_4 = b'80AEqath'
+        self.assertEqual(qath_at_4.index(b'qath'), 4)
+        self.assertEqual(cah.family_of(qath_at_4), 'sxd-ascii-80AE')
+
+    def test_non_bytes_input_raises_descriptive_type_error(self):
+        # Before this guard existed, None and '' were silently labelled 'empty'
+        # and other non-bytes leaked AttributeError from .startswith.
+        for value, type_name in (
+            (None, 'NoneType'),
+            ('', 'str'),
+            ('qath', 'str'),
+            (5, 'int'),
+            (['x'], 'list'),
+            (True, 'bool'),
+        ):
+            with self.subTest(value=value):
+                with self.assertRaises(TypeError) as ctx:
+                    cah.family_of(value)
+                self.assertEqual(
+                    str(ctx.exception),
+                    f'family_of expects bytes-like input, got {type_name}',
+                )
+
+    def test_bytes_like_inputs_classify_identically(self):
+        raw = b'\x00qath' + b'\x00' * 12
+        windowed = memoryview(raw)[1:]
+        self.assertEqual(cah.family_of(bytes(raw[1:])), 'bd-ascii-qath')
+        self.assertEqual(cah.family_of(bytearray(raw[1:])), 'bd-ascii-qath')
+        self.assertEqual(cah.family_of(memoryview(raw[1:])), 'bd-ascii-qath')
+        self.assertEqual(cah.family_of(windowed), 'bd-ascii-qath')
+
+
 class EntropyAndProbeTests(unittest.TestCase):
     def test_shannon_bounds(self):
         self.assertEqual(cah.shannon(b''), 0.0)

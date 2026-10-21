@@ -15,6 +15,33 @@ def image(vaddr, payload):
     return d.Image(bytes(payload), ph)
 
 
+def two_segment_image():
+    """File-backed segments at 0x1000/0x2000 with a vaddr gap, plus a filesz < memsz tail."""
+    elf = bytearray(0x400)
+    elf[0x100:0x110] = bytes(range(16))
+    elf[0x200:0x210] = bytes(range(0x80, 0x90))
+    elf[0x300:0x308] = b'\xaa' * 8
+    ph = [
+        dict(type=d.PT_LOAD, flags=5, offset=0x100, vaddr=0x1000, paddr=0x1000,
+             filesz=16, memsz=16, align=8),
+        dict(type=d.PT_LOAD, flags=5, offset=0x200, vaddr=0x2000, paddr=0x2000,
+             filesz=16, memsz=16, align=8),
+        dict(type=d.PT_LOAD, flags=6, offset=0x300, vaddr=0x3000, paddr=0x3000,
+             filesz=8, memsz=32, align=8),
+    ]
+    return d.Image(bytes(elf), ph)
+
+
+def elf_header(ident=b'\x7fELF\x02\x01\x01' + b'\0' * 9, machine=62, phnum=1):
+    """Little-endian x86-64 ELF64 header; phoff is fixed at 64."""
+    return struct.pack('<16sHHIQQQIHHHHHH', ident, 2, machine, 1, 0, 64, 0, 0,
+                       64, 56, phnum, 0, 0, 0)
+
+
+def program_header(ptype=d.PT_LOAD, vaddr=0x1000, filesz=8, memsz=8):
+    return struct.pack('<IIQQQQQQ', ptype, 5, 0, vaddr, vaddr, filesz, memsz, 8)
+
+
 def dynamic_import_elf_fixture():
     """Build a minimal PS4 ELF with one import and JMPREL/RELA rows."""
     module_id, library_id = 0x1234, 0x56
@@ -213,6 +240,78 @@ class Tests(unittest.TestCase):
             image(0, b'\0' * 8).read(4, 8)
         with self.assertRaises(ValueError):
             d.span(b'abc', 2, 5)
+
+    def test_image_read_inside_one_file_backed_segment(self):
+        img = two_segment_image()
+        self.assertEqual(img.read(0x1000, 4), bytes(range(4)))
+        self.assertEqual(img.read(0x1004, 12), bytes(range(4, 16)))
+        self.assertEqual(img.read(0x2000, 16), bytes(range(0x80, 0x90)))
+        self.assertEqual(img.read(0x1000, 16), bytes(range(16)))       # whole segment
+        self.assertEqual(img.read(0x1008, 0), b'')                     # zero size inside
+
+    def test_image_read_crossing_a_segment_gap_rejected(self):
+        img = two_segment_image()
+        with self.assertRaises(ValueError) as error:
+            img.read(0x100c, 8)                                        # 0x100c..0x1014 spans the gap
+        self.assertEqual(str(error.exception),
+                         'vaddr 0x100c+8 not file-backed in a loadable segment')
+
+    def test_image_read_past_filesz_into_bss_tail_rejected(self):
+        img = two_segment_image()
+        self.assertTrue(img.mapped(0x3010, 4))                         # mapped via memsz
+        with self.assertRaises(ValueError) as error:
+            img.read(0x3010, 4)
+        self.assertEqual(str(error.exception),
+                         'vaddr 0x3010+4 not file-backed in a loadable segment')
+
+    def test_image_read_zero_size_at_end_of_file_backed_segment(self):
+        # Documented behaviour: the containment test is vaddr + size <= vaddr + filesz, so a
+        # zero-length read exactly at the end of a file-backed segment succeeds with b''.
+        img = two_segment_image()
+        self.assertEqual(img.read(0x1010, 0), b'')
+        # The same zero-length read past the file-backed extent is still rejected, so the
+        # allowance follows filesz (not memsz) and is not a general "any address" escape.
+        for vaddr in (0x1020, 0x3020):
+            with self.subTest(vaddr=hex(vaddr)):
+                with self.assertRaises(ValueError):
+                    img.read(vaddr, 0)
+
+    def test_program_headers_accepts_little_endian_x86_64(self):
+        elf = elf_header() + program_header()
+        entry, ph = d.program_headers(elf)
+        self.assertEqual(entry, 0)
+        self.assertEqual(len(ph), 1)
+        self.assertEqual(ph[0]['vaddr'], 0x1000)
+        self.assertEqual(ph[0]['memsz'], 8)
+
+    def test_program_headers_rejects_wrong_class_data_and_machine(self):
+        cases = (
+            ('class-32-bit', b'\x7fELF\x01\x01\x01' + b'\0' * 9, 62),
+            ('data-big-endian', b'\x7fELF\x02\x02\x01' + b'\0' * 9, 62),
+            ('machine-x86-32', b'\x7fELF\x02\x01\x01' + b'\0' * 9, 3),
+        )
+        for label, ident, machine in cases:
+            with self.subTest(case=label):
+                elf = elf_header(ident=ident, machine=machine) + program_header()
+                with self.assertRaises(ValueError) as error:
+                    d.program_headers(elf)
+                self.assertEqual(str(error.exception), 'expected little-endian x86-64 ELF')
+
+    def test_program_headers_rejects_truncated_header_and_phdr_table(self):
+        full = elf_header(phnum=2) + program_header() + program_header()
+        for cut in (0, 32, 63):
+            with self.subTest(cut=cut):
+                with self.assertRaises(ValueError) as error:
+                    d.program_headers(full[:cut])
+                self.assertTrue(str(error.exception).startswith('out of bounds: '))
+        # Header is intact but the declared phdr table is cut off mid-entry.
+        with self.assertRaises(ValueError) as error:
+            d.program_headers(full[:-8])
+        self.assertTrue(str(error.exception).startswith('out of bounds: '))
+        # An absurd e_phnum must fail on the first out-of-range entry, not index past the buffer.
+        with self.assertRaises(ValueError) as error:
+            d.program_headers(elf_header(phnum=0xffff) + program_header())
+        self.assertTrue(str(error.exception).startswith('out of bounds: '))
 
 
 if __name__ == '__main__':

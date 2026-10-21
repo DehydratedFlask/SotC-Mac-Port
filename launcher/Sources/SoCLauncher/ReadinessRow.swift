@@ -14,6 +14,8 @@ struct ReadinessRow: View {
                 .foregroundStyle(tint)
         }
         .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text(item.accessibilityLabel))
+        .accessibilityValue(Text(item.accessibilityValue))
     }
 
     private var detail: String {

@@ -80,6 +80,81 @@ class XffMemberTests(unittest.TestCase):
         with self.assertRaisesRegex(abh.AudioBankFormatError, 'decoded member length'):
             abh.parse_xff_member(member)
 
+    def test_rejects_declared_length_zero(self):
+        # A zero word can never match a >=24-byte member, so it is always a reject.
+        member = bytearray(make_member(b''))
+        member[abh.XFF_SIZE_WORD_OFFSET:abh.XFF_MIN_MEMBER_SIZE] = (0).to_bytes(4, 'little')
+        with self.assertRaises(abh.AudioBankFormatError) as ctx:
+            abh.parse_xff_member(member)
+        self.assertIs(type(ctx.exception), abh.AudioBankFormatError)
+        self.assertEqual(
+            str(ctx.exception),
+            'u32le at 0x14 is 0, but decoded member length is 24',
+        )
+
+    def test_declared_length_is_read_as_unsigned_32_bit(self):
+        # 0xffffffff is a plausible "unknown length" sentinel and 0x80000000 would
+        # be negative under a signed read; both must be reported as u32 values.
+        for word, expected in (
+            (0xFFFFFFFF, 'u32le at 0x14 is 4294967295, but decoded member length is 24'),
+            (0x80000000, 'u32le at 0x14 is 2147483648, but decoded member length is 24'),
+        ):
+            with self.subTest(word=hex(word)):
+                member = bytearray(make_member(b''))
+                member[abh.XFF_SIZE_WORD_OFFSET:abh.XFF_MIN_MEMBER_SIZE] = (
+                    word.to_bytes(4, 'little'))
+                with self.assertRaises(abh.AudioBankFormatError) as ctx:
+                    abh.parse_xff_member(member)
+                self.assertIs(type(ctx.exception), abh.AudioBankFormatError)
+                self.assertEqual(str(ctx.exception), expected)
+
+    def test_rejects_header_only_length_declared_inside_a_longer_buffer(self):
+        # 24 is the header-only span, i.e. a declared length inside the buffer but
+        # four bytes smaller than the buffer itself.
+        member = bytearray(make_member(b'    '))
+        self.assertEqual(len(member), abh.XFF_MIN_MEMBER_SIZE + 4)
+        member[abh.XFF_SIZE_WORD_OFFSET:abh.XFF_MIN_MEMBER_SIZE] = (
+            abh.XFF_MIN_MEMBER_SIZE.to_bytes(4, 'little'))
+        with self.assertRaises(abh.AudioBankFormatError) as ctx:
+            abh.parse_xff_member(member)
+        self.assertIs(type(ctx.exception), abh.AudioBankFormatError)
+        self.assertEqual(
+            str(ctx.exception),
+            'u32le at 0x14 is 24, but decoded member length is 28',
+        )
+
+    def test_accepts_declared_length_above_16_bit_range(self):
+        # Guards against a 16-bit truncation of either the word or the comparison.
+        payload = b'\x5a' * 70000
+        member = make_member(payload)
+        self.assertEqual(len(member), 70024)
+        self.assertGreater(len(member), 0xFFFF)
+        report = abh.parse_xff_member(member)
+        self.assertEqual(report['u32le_at_0x14'], 70024)
+        self.assertEqual(report['decoded_member_bytes'], 70024)
+        self.assertTrue(report['u32le_at_0x14_matches_decoded_length'])
+        self.assertEqual(report['magic_hex'], abh.XFF_MAGIC.hex())
+        self.assertEqual(report['opaque_0x04_0x13_hex'], bytes(range(16)).hex())
+        self.assertEqual(report['field_meanings'],
+                         'UNKNOWN except for the observed length match')
+        self.assertEqual(report['codec'], 'UNKNOWN')
+
+    def test_reports_exact_shortfall_when_the_size_word_is_cut_off(self):
+        # The header word is the final four bytes of the minimum member, so a
+        # 20- or 23-byte buffer holds only a fragment of it.
+        for length in (20, 23):
+            with self.subTest(length=length):
+                truncated = abh.XFF_MAGIC + bytes(length - len(abh.XFF_MAGIC))
+                self.assertEqual(len(truncated), length)
+                with self.assertRaises(abh.AudioBankFormatError) as ctx:
+                    abh.parse_xff_member(truncated)
+                self.assertIs(type(ctx.exception), abh.AudioBankFormatError)
+                self.assertEqual(
+                    str(ctx.exception),
+                    f'member is {length} bytes; need at least 24 bytes to '
+                    'inspect the observed size word',
+                )
+
     def test_rejects_non_bytes_like_input_with_type_error(self):
         # A str of the exact valid member length must not be coerced or accepted.
         member_text = 'xff\0' + 'a' * (abh.XFF_MIN_MEMBER_SIZE - len(abh.XFF_MAGIC))

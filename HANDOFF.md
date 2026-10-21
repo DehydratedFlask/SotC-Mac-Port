@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-20 23:55 CDT (America/Chicago). Integrator: orchestrator session
+Updated: 2026-10-21 00:45 CDT (America/Chicago). Integrator: orchestrator session
 (`deepseek-v4.1-flash-1017`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -11,67 +11,119 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 ## Start here
 
 Read [INDEX](docs/INDEX.md), [ROADMAP](ROADMAP.md), [TASKS](docs/TASKS.md), [EVIDENCE](docs/EVIDENCE.md),
-then the latest checkpoints:
-- [Slot-10 descriptor consumer + native slot 10](docs/checkpoints/2026-10-20-root-cpu01-ctor10-descriptor-consumer-complete.md)
-- [Leaf ctor batches 25–29](docs/checkpoints/2026-10-20-root-cpu01-leaf-ctor-batches-25-29-complete.md)
+[CTOR_CLASSES](docs/CTOR_CLASSES.md), then the latest checkpoints:
+- [Constructor family map (573 slots)](docs/checkpoints/2026-10-21-root-cpu01-ctor-family-map.md)
+- [Slot 10–47 family verification](docs/checkpoints/2026-10-21-root-cpu01-slot10-47-family.md)
+- [Slot 12 structure](docs/checkpoints/2026-10-21-root-cpu01-slot12-struct.md),
+  [slot 13](docs/checkpoints/2026-10-21-root-cpu01-slot13-struct.md),
+  [slots 14–19](docs/checkpoints/2026-10-21-root-cpu01-slot14-19-family.md)
+- Native batches [30](docs/checkpoints/2026-10-21-root-native-batch-30.md),
+  [31](docs/checkpoints/2026-10-21-root-native-batch-31.md),
+  [32](docs/checkpoints/2026-10-21-root-native-batch-32.md),
+  [33 (analysis-only)](docs/checkpoints/2026-10-21-root-native-batch-33.md),
+  [SAV chunk header](docs/checkpoints/2026-10-21-root-native-batch-sav01-chunk-header-01.md),
+  [SAV checksum edges](docs/checkpoints/2026-10-21-root-native-batch-sav01-checksum-edge-01.md)
 
 ## Current verified state
 
-- Native tests: **252/252 pass** (`cmake --build local/build/native -j 8 && ctest --test-dir
+- Native tests: **263/263 pass** (`cmake --build local/build/native -j 8 && ctest --test-dir
   local/build/native --output-on-failure`), ASan+UBSan on, Mach-O arm64.
-- Constructor-table checker: `python3 -I tools/lift/check_ctor_slots.py` verifies **104**
-  RVA/index pairs; slots 0–10 are recovered; slot 11 is the explicit blocker.
-- Launcher: 19 Swift tests pass (`swift test --package-path launcher --scratch-path
-  local/build/launcher`). Python tool tests pass except `test_project_tools.py`, which needs to be
-  run from `scripts/` (pre-existing `-I` import behavior, not a regression).
-- RE-01-PERSISTENT-01: the saved Ghidra baseline reopens read-only `-noanalysis` (38,845
-  functions, 9 blocks). See `local/checkpoints/root-20261020-reopen-baseline.txt`.
-- Slot 10 / RVA `0xf09e60` now has demonstrated semantics: it publishes the `ClothingPreviewParam`
-  vtable address point `0x15fb7c0` into global `0x3356678`, constructs/destroys a stack-local
-  instance, creates a recursive + priority-inherit mutex, and registers its cleanup. Consumer
-  `FUN_00ed5a90` installs the published pointer as an object vptr; factory `FUN_00ed59a0`
-  allocates `0xb0` bytes at alignment 8.
-- Native counterpart: `native/core/clothing_preview_param.{hpp,cpp}` plus a slot-10 callback and
-  `StartupState`-owned `RecursiveMutex`. `run_constructors` now propagates `callback_failed`.
+- Constructor-table checker: `python3 -I tools/lift/check_ctor_slots.py` verifies **108**
+  RVA/index pairs; slots 0–10 are recovered; slot 11 is the explicit blocker. Lifted-but-unregistered
+  gaps 50/70/82/147 are now registered and asserted.
+- Launcher: **42 Swift tests / 7 suites** (`swift test --package-path launcher --scratch-path
+  local/build/launcher`); adds tested accessibility copy, diagnostics text, ordered asset problems
+  and lifecycle copy. Still no core ABI, no runtime UI/VoiceOver/Finder proof, G4 NOT PASSED.
+- Project scripts: **103 Python tests** (`cd scripts && python3 -I -m unittest discover -s . -p
+  'test_*.py'`). `python3 -I -m unittest <module>` cannot import on this interpreter — use
+  `discover -s .` or the direct script path.
+- RE-01-PERSISTENT-01: the saved Ghidra baseline still reopens read-only `-noanalysis`
+  (38,845 functions, 9 blocks). See `local/checkpoints/root-20261020-reopen-baseline.txt`.
+
+## What changed in this session (28 bounded tasks)
+
+Constructor structure (all offline, all replayed by a verifier):
+- **`docs/CTOR_CLASSES.md`** classifies all 573 table entries by reachable body: 227
+  `leaf_vec_copy`, 12 `guarded_const`, **34 `descriptor_mutex_atexit` in contiguous runs 10–19 and
+  24–47**, 300 `other`, 0 `undecoded`.
+- Every one of the 34 family slots publishes **two `.bss` globals 0x10 apart**, one `malloc(0x10)`
+  sized from `[0x12d2d1c]`, one mutex init through `0xb30950`
+  (`pthread_mutexattr_init/settype/setprotocol/init/attr_destroy`), and exactly one
+  `__cxa_atexit(0xe44a10, &global, 0x1604218)`; `0xe44a10` is `pthread_mutex_destroy` + `free`.
+- Slots 12–19 are *registration thunks*, not class constructors. Slot 12's 205-byte body ends at
+  `0xf0640d`; the slot-11 class constructor `0xf06410` starts immediately after and is never called
+  by it.
+- Six guarded-constant constructors (`0xdd91b0`, `0xdd7e30`, `0xdd4210`, `0xd39b00`, `0xd366d0`,
+  `0xd33b50`) are now lifted with all 9 guarded cells and their unguarded tails; they share one
+  guarded cell range, so only one of them can do meaningful work at runtime.
+- Three AVX ctors (`0xd8fa40`, `0xd86ed0`, `0xd5a280`) are lifted; `0xd5a280` fills a **2048-byte**
+  int32 identity table (the loop counter counts dwords).
+- Batch 33 (`0xe71990`, `0xdf94c0`, `0xde0160`) is analysis-only on purpose: `0xe71990` needs the
+  unknown name-hash function and original strings; `0xdf94c0` and `0xde0160` call `_FSin`/`memset`
+  and a `ret`-stub `__cxa_atexit` cleanup.
+
+Services/parsers:
+- New native `core/save_chunk_header.{hpp,cpp}` models the 12-byte tagged-chunk header with exact
+  wire bytes and truncation/magic errors; new checksum edge vectors (one case NOT RUN by design).
+- 11 new synthetic parser fixtures across PSARC, overlay/manifest JSONL, PS4 dynlink, audio header
+  classification and XFF; two real defects fixed (`psarc.load_members_jsonl` error type/line number;
+  `classify_audio_headers.family_of` input handling).
+
+Tooling correctness (do not repeat these mistakes):
+- A fixed-window byte scan over-reported 49 family slots; `0xf53de0`'s reachable body has no calls.
+- A linear sweep ran from `0xf06340` into the next function because a `__stack_chk_fail` block falls
+  through into padding.
+- An `objdump` line parser that assumes a trailing space drops any instruction whose bytes fill the
+  byte column, silently truncating the rest of the block (`0xdd7e30` 319 vs 396 bytes,
+  `0xdd4210` 334 vs 486). Split on the tab.
+- `scripts/disasm_range.sh` uses `--adjust-vma`, so its `#` target comments are wrong; re-derive
+  targets from the raw displacement bytes.
 
 ## Blocker
 
-Slot 11 / RVA `0x00f09160` is the next unresolved original constructor. It is **the same
-descriptor+mutex+atexit pattern as slot 10** for class `ClothingPhysicalMeshParameters` (ctor
-`0xf06410`, vptr `0x15fa770`, globals `0x3356068`/`0x3356078`, consumer `0xed5880`, accessor
-`0xf08bc0`), but its 1,021-byte constructor layout is unrecovered, so it is deliberately not
-registered. See
-[docs/checkpoints/2026-10-20-root-cpu01-ctor11-structural-analysis.md](docs/checkpoints/2026-10-20-root-cpu01-ctor11-structural-analysis.md).
-Slots 12/13 are `0xf06340`/`0xf058f0`. Do not claim engine startup or G1 from slot-10 registration.
+Slot 11 / RVA `0x00f09160` is still the first unresolved original constructor
+(`ClothingPhysicalMeshParameters`; ctor `0xf06410`, vptr `0x15fa770`, globals
+`0x3356068`/`0x3356078`, consumer `0xed5880`, accessor `0xf08bc0`). Its singleton creator allocates
+`0x2bf0` bytes of 74×`0x98` PhysX reflection records, so registration still needs that subsystem.
+See [its checkpoint](docs/checkpoints/2026-10-20-root-cpu01-ctor11-structural-analysis.md).
+Do not claim engine startup or G1 from slot-10 registration.
 
 ## Settled decisions (do not re-ask)
 
 - `StartupState` RAII ownership for the slot-10 mutex — implemented.
 - Testable `LauncherCore` lifecycle helper and a system alert for folder-import errors — keep.
 - Offline analysis of the local `eboot.bin` is allowed; no original/Sony executable may ship or run.
+- One shared native helper type is the intended shape for the 34-slot family, but it must stay
+  unregistered until slot 11 is resolved; the family verifier is the guard against shape drift.
 
 ## Next exact work
 
-1. Claim bounded slot-11 recovery (`0x00f09160`) using the saved read-only Ghidra baseline and
-   `tools/lift/check_ctor_slots.py`; or continue AUD-02/SAV-01 static tracks.
-2. Keep `0xd71f60` NEEDS_PRINCIPAL (3 failed tries) and do not retry without principal
+1. Slot 11 (`0xf09160`): bound the reflection/attributes subsystem it needs, or escalate back to
+   the principal with the smallest missing contract. Do not register slots 12+ first.
+2. Identify the class/interface behind vtable `0x15f9ef0` (slot 12) and the forwarding callees
+   `0xf011f0`, `0xefe410`, `0xefd140`, `0xefad20`, `0xef8600`, `0xf030e0` (slots 13–19).
+3. Resolve the `0xe71990` name-hash function, which blocks lifting the 14 record pairs.
+4. Keep `0xd71f60` NEEDS_PRINCIPAL (3 failed tries) and do not retry without principal
    reassessment.
-3. Any new native module needs a README row, a test, and CMake registration.
-4. Before publishing: `python3 scripts/project_index.py`, `trail build --check`,
+5. Any new native module needs a README row, a test, and CMake registration; any new parser fixture
+   needs a failing-before proof where it claims a defect fix.
+6. Before publishing: `python3 scripts/project_index.py`, `trail build --check`,
    `python3 -I scripts/audit_publish_paths.py --all`, then commit allowlisted paths and
    `git push origin main`.
 
 ## Parallel-agent state
 
-- A leaf-ctor subagent completed batches 25–29 (27/27, all manifest entries now disposed).
-- The AUD-02-WAITLOOP-01 subagent completed: `FUN_00997700` has **no** blocking wait; it is a
-  frame-count top-up loop with one static caller. See
-  [its checkpoint](docs/checkpoints/2026-10-20-root-aud02-waitloop-01-complete.md).
+- Native worker completed batches 30–33 plus the two SAV-01 C++ fixtures (263/263, nine checkers,
+  `local/build/native-agent-a` scratch tree remains private/regenerable).
+- Parser worker completed 8 DATA-02/RE-02 fixtures; audio/archive worker completed 3 AUD-01/DATA-02
+  fixtures (103 tests total).
+- Launcher worker completed 4 APP-01 fixtures (42 tests / 7 suites).
 - The persistent Ghidra project `local/ghidra/persistent-20261020` must never be re-imported or
   overwritten while in use; read-only `-noanalysis` reopening is the supported path.
 
 ## Private evidence pointers
 
+- Family manifest: `local/re/work/ctor-classes.json` (per-slot span, digest, calls, class).
 - Consumer packet: `local/re/evidence/cpu01-ctor10-descriptor-consumer-01/`
   (`report.md`, `verify.py`, `verification.json` 45/45, `ghidra-*.txt`, `SHA256SUMS`).
 - Reopen log: `local/checkpoints/root-20261020-reopen-console.log`.
