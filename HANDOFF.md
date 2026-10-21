@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 10:37 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 10:39 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -23,10 +23,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Acceptance command: `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py`. Worker
   will first record a pre-guard failing collision assertion, then add the guard and rerun; the
   expected red fixture is not counted as a failed implementation try. No test has run for this task.
-- Next exact action: publish this claim, then assign `scripts/unwrap_self.py` and
-  `scripts/test_project_tools.py` to `slot23_raw_xrefs`. Root remains the sole integrator for
-  handoff/task/evidence documentation. Keep all user game files read-only and host escalation files
-  unstaged.
+- Claim commit `90a5d99` is pushed to `origin/main`; `git push origin main` exited 0 and advanced
+  `6811f52..90a5d99`. Root verified `HEAD` and `origin/main` both resolve to
+  `90a5d99413dfe53236828f3f963121ac7045186c`. Next exact action: assign
+  `scripts/unwrap_self.py` and `scripts/test_project_tools.py` to `slot23_raw_xrefs`. Root remains
+  the sole integrator for handoff/task/evidence documentation. Keep all user game files read-only
+  and host escalation files unstaged.
 
 ## Session addendum 2026-10-21 round 8 (`/root`)
 
