@@ -2,8 +2,12 @@
 import hashlib
 from pathlib import Path
 import struct
+import sys
 import tempfile
 import unittest
+
+# `python3 -I` removes the script directory from sys.path; keep the sibling imports explicit.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from project_index import generate
 from unwrap_self import unwrap
