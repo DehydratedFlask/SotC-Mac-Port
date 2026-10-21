@@ -97,6 +97,17 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   task from the independent scouts. Keep the existing host escalation and slot-23/Ghidra blocker
   unchanged.
 
+## Session addendum 2026-10-21 round 14 (`/root`)
+
+- Claimed two independent synthetic test-only tasks: `DATA-02-PSARC-BLOCK-TABLE-WIDTH-01` and
+  `DOC-FOLDER-INDEX-CHECK-READONLY-01`, both ACTIVE with zero failed implementation tries. Claims
+  and dependencies are recorded in `docs/TASKS.md`; detailed evidence is in the two claim
+  checkpoints named below.
+- Graft confirms `Psarc._load()` computes `self.width = max(1, ((self.block_size - 1).bit_length() + 7) // 8)` and decodes fixed-width big-endian block entries. The synthetic PSARC builder in `scripts/test_psarc.py` fixes `BS = 16` and serializes `blocks` with `bytes(blocks)`, so existing fixtures exercise only one-byte entries. Planned fixture uses block size 257 and a 256-byte raw payload whose table value is 256 (`0x0100`), asserting width 2 and successful roundtrip.
+- `project_index.generate(root, check=True)` skips directory creation, checks both generated files, and raises `ValueError` when either is missing. Existing test coverage calls `generate(root)` first, so it does not prove the empty-root check avoids writes. Planned test asserts exact stale-index error and confirms neither `docs/` nor `local/` is created.
+- Claim checkpoints: [PSARC block width](docs/checkpoints/2026-10-21-root-data02-psarc-block-table-width-claim.md) and [folder-index check mode](docs/checkpoints/2026-10-21-root-doc-folder-index-check-readonly-claim.md). Dependencies: `DATA-02-PSARC-PARTIAL-READ-01` is FIXTURE_VERIFIED; folder-index task has no prerequisite. Acceptance commands are `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_psarc.py` and `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py`.
+- Worker assignments after claim publication: `launcher_review` owns only `scripts/test_psarc.py`; `slot23_raw_xrefs` owns only `scripts/test_project_tools.py`. Root retains sole ownership of handoff/task/evidence records. Claim publication is pending. Preserve the escalated native host paths outside both tasks and commits.
+
 ## Session addendum 2026-10-21 round 10 (`/root`)
 
 - `RE-01-UNWRAP-INPUT-SIDECAR-COLLISION-01` is FIXTURE_VERIFIED with zero failed implementation
