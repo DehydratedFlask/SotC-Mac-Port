@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 14:11 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 14:14 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,20 +8,26 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Round 62 task scout in progress (/root)
+## Round 62 test-only tasks claimed (/root)
 
-- Round 61 fixture task and completion commits are published. Root ran
-  `trail ask "Identify small isolated synthetic fixture gaps in the current launcher Swift model,
-  audio-header classifier, and native region helpers; name exact source/test files and boundary
-  behaviors suitable for separate test-only tasks" --source`. The lexical results included
-  `LauncherModelTests.swift`, `LauncherLifecycleTests.swift`, `scripts/test_audio_bank_header.py`,
-  and adjacent code; these are candidate areas only, not proof of missing coverage.
-- Read-only candidate reviews are assigned to `/root/launcher_review` (launcher),
-  `/root/review_host_proto` (audio), and `/root/slot23_raw_xrefs` (native region/allocator). No
-  implementation task IDs have been claimed and no code edits are authorized until root verifies
-  candidate coverage, baselines, and publishes claims.
-- Exact next action: collect scout reports, verify each candidate against live source/tests and
-  `docs/TASKS.md`, then claim and publish only distinct tasks with clean focused baselines.
+- Three read-only scouts identified distinct candidates; root checked the live code and tests, found
+  no duplicate task IDs, and ran each focused baseline before claiming. The exact tasks, hashes,
+  commands, results, and owner boundaries are in
+  [the Round 62 claim checkpoint](docs/checkpoints/2026-10-21-root-round62-fixture-claims.md).
+- APP-01 will assert the exact `.notBuilt` message for an existing directory used as the core
+  executable path (8 baseline tests). AUD-01 will assert the exact wrapped PSARC read error and
+  reader closure (19 baseline tests). SRV-01 will assert `align_size_up_64k(0x10001) == 0x20000`
+  (target build and CTest 1/1).
+- Owners are `/root/launcher_review`, `/root/review_host_proto`, and `/root/slot23_raw_xrefs`; each
+  may edit only its claimed existing test file and may not commit. Root owns shared docs and replay.
+  No implementation prompts have been sent before publishing the claim checkpoint.
+- `python3 scripts/project_index.py` reports 14,422 folders; `docs/FOLDERS.md` lists 360 checkpoint
+  files. `python3 scripts/project_index.py --check` reports current. Logs and hashes are in the
+  claim checkpoint.
+- Staged path audit accepts 5 documentation paths and full audit accepts 1,627; both cached and
+  working diff checks pass. Exact audit hashes are in the claim checkpoint.
+- Exact next action: commit and push the Round 62 claims, then dispatch each worker its one-file
+  assignment.
 
 ## Session addendum 2026-10-21 Round 61 fixtures verified (/root)
 
