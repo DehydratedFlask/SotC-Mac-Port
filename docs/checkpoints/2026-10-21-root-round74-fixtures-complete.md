@@ -12,8 +12,8 @@
 - Observation versus inference / coverage limitations: Each assertion covers synthetic parser/helper output or pure Swift mapping. The observations do not establish Sony format authority, live ELF loading, ABI/runtime behavior, allocator integration, game boot, authentic game audio, save/reload, or Metal gameplay. No executable or user API file was changed.
 - Cumulative failed tries and distinct hypotheses: Zero failed tries across the five tasks. Each task had one successful implementation attempt; no failure hypothesis.
 - Remaining risks / blockers: The overall native game acceptance gates remain open. Existing user-owned `native/api/CMakeLists.txt` is modified and `native/api/host/` is untracked; both remain untouched and excluded.
-- Next exact action: Commit and push only the five test files and allowlisted docs, fetch and verify the new remote tip, then scout another independent bounded task.
-- HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: `HANDOFF.md` records Round74 completion; `docs/TASKS.md` marks five tasks `FIXTURE_VERIFIED`; `docs/EVIDENCE.md` adds E222–E226. No install facts changed. Run `python3 -I scripts/project_index.py` after adding this checkpoint.
+- Next exact action: Use the available workers to scout the next independent bounded tasks from the live task register and source graph; claim before implementation.
+- HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: `HANDOFF.md` records Round74 completion; `docs/TASKS.md` marks five tasks `FIXTURE_VERIFIED`; `docs/EVIDENCE.md` adds E222–E226. No install facts changed. `python3 -I scripts/project_index.py` and `--check` were rerun after adding the checkpoint and post-push logs.
 
 ## Index and source graph refresh
 
@@ -32,9 +32,30 @@ Checkpoint time: 2026-10-21 17:20 CDT (America/Chicago). Agent: `/root`. Only 10
 - `python3 -I scripts/audit_publish_paths.py --all`: exit 0; all 1,653 paths accepted. Log `round74-audit-all.log`, SHA256 `947b9c1fc8b409f81bfa66c51f1dee5658671e959de6a0723031d48530bc4edb`.
 - `git fetch origin`: exit 0; log `round74-fetch-precommit.log`, SHA256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. `git status --short --branch`, `git rev-parse HEAD origin/main`, and `git rev-list --left-right --count HEAD...origin/main` show only the intended staged changes plus the excluded user API changes, HEAD and `origin/main` both `8bea84495265e2f1d504221f2831c9a2527659fd`, and divergence `0 0`. State log `round74-state-precommit.log`, SHA256 `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d0247050325e7c5a3b2b3271c`.
 
-Observation: staged and full publication audits pass; no forbidden paths are staged. The claim sync commit is the current remote tip before the completion commit. Next exact action: commit these 10 paths with a fixture-specific message, push `main`, fetch, and confirm `HEAD == origin/main` with zero divergence.
+Observation at pre-push: staged and full publication audits passed; no forbidden paths were staged. The claim sync commit was the current remote tip before completion. The commit, push, fetch, and verification results are in the following post-push checkpoint.
+
+## Post-push publication checkpoint
+
+Checkpoint time: 2026-10-21 17:21 CDT (America/Chicago). Completion commit `9c0d96c9a23fd3b452f678ed0e47f85666586606` (`test: cover Round 74 fixture gaps`) contains the 10 allowlisted staged paths above and was pushed to `origin/main`.
+
+- `git push origin main`: exit 0; log `local/validation/root-round73-scout/round74-push.log`, SHA256 `be072f3153fe018540cd5ac3b9b23d2459706d63a348b5a41b15e9c4f8c7a6b4`.
+- `git fetch origin`: exit 0; log `round74-fetch-postpush.log`, SHA256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. `git rev-parse HEAD origin/main` reports both `9c0d96c9a23fd3b452f678ed0e47f85666586606`; divergence is `0 0`. Divergence log `round74-divergence-postpush.log`, SHA256 `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d0247050325e7c5a3b2b3271c`.
+- Post-push `git status --short --branch` reports only the pre-existing user-owned `native/api/CMakeLists.txt` modification and untracked `native/api/host/`; both remain untouched. Status log `round74-status-postpush.log`, SHA256 `bafebe0544ec1663fc5c60d5555079052f1efbe617d7957be47744c6262d25c7`.
+
+Observation: fetched remote tip matches the published commit and no claimed fixture or project documentation remains unstaged. The two excluded user API paths are the only worktree entries. Inference: none. Next exact action: scout and claim another independent bounded task set.
 
 ## Claim publication history
 
 - Claim commit `820bb128adfb3c9a03271c33a704a3ae2682aed1` (`docs: claim Round 74 fixture tasks`) was pushed to `origin/main`.
 - Publication-record sync commit `8bea84495265e2f1d504221f2831c9a2527659fd` (`docs: record Round 74 claim publication`) was pushed to `origin/main` and fetch-verified before implementation.
+
+## Post-push documentation sync pre-push checkpoint
+
+Checkpoint time: 2026-10-21 17:22 CDT (America/Chicago). Agent: `/root`. This two-path docs-only sync records the Round74 completion push and final scouting handoff. Staged paths are only `HANDOFF.md` and this completion checkpoint; user-owned API paths remain unstaged.
+
+- `git diff --cached --check` plus `git diff --check`: exit 0; log `local/validation/root-round73-scout/round74-sync-diff-check.log`, SHA256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+- `python3 -I scripts/audit_publish_paths.py`: exit 0; both staged paths accepted. Log `round74-sync-audit-staged.log`, SHA256 `1192a036e5f41900b5c895da3c799702ea2e820fae66e32ced61e6b3cc1422e0`.
+- `python3 -I scripts/audit_publish_paths.py --all`: exit 0; all 1,653 paths accepted. Log `round74-sync-audit-all.log`, SHA256 `947b9c1fc8b409f81bfa66c51f1dee5658671e959de6a0723031d48530bc4edb`.
+- `git fetch origin`: exit 0; log `round74-sync-fetch.log`, SHA256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`. HEAD and `origin/main` both equal `9c0d96c9a23fd3b452f678ed0e47f85666586606`, divergence `0 0`; state log `round74-sync-state.log`, SHA256 `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d0247050325e7c5a3b2b3271c`.
+
+Observation: both publication audits pass and only the two documentation paths are staged. Next exact action: publish this docs-only sync, verify the remote tip, then continue Round75 scouting.
