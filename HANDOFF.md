@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 13:04 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 13:05 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -26,11 +26,14 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   build` rebuilt 3,549 nodes / 4,785 edges; follow-up `trail build --check` passed. The optional
   deep concept layer remains unbuilt. `native/api/CMakeLists.txt` and `native/api/host/` remain
   untouched, unstaged, and unpublished.
+- Completion commit `5c46167` is pushed to `origin/main`. Staged/full path audits passed for 11 and
+  1,601 paths. E165–E167, the three task rows, and completion checkpoints were published with the
+  synthetic test files. Publication record:
+  [round 56 completion publication](docs/checkpoints/2026-10-21-root-round56-completion-publication.md).
 - These fixtures add no boot, audio playback, real save/load, Metal gameplay, or packaging evidence;
   acceptance gates remain G0 PARTIAL and G1–G6 NOT RUN.
-- Exact next action: stage only the three test files and their allowlisted documentation, run both
-  publication audits, commit/push the verified fixtures, then record publication and scout the next
-  independent bounded tasks.
+- Exact next action: record this publication, then scout the next independent bounded tasks without
+  touching the existing `native/api/` work.
 
 ## Session addendum 2026-10-21 round 56 claim (`/root`)
 
