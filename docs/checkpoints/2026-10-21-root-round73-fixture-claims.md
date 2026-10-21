@@ -45,5 +45,42 @@ ABI mismatch, allocator integration, game execution, or game acceptance gate. G0
 G1–G6 remain NOT RUN. No install/dependency facts changed. User-owned `native/api/CMakeLists.txt`
 and `native/api/host/` remain untouched and excluded.
 
-Next exact action: refresh/check the folder index, publish these claims, verify `HEAD == origin/main`,
-then dispatch the three single-file edits. Status is ACTIVE for each task; 0 failed tries.
+The claim commit is published and verified below. Next exact action: publish the post-claim
+documentation sync, then dispatch the three single-file edits. Status is ACTIVE for each task; 0
+failed tries.
+
+## Claim publication checkpoint
+
+Checkpoint time: 2026-10-21 16:52 CDT (America/Chicago). Agent: `/root`. Task IDs: the three
+Round73 IDs above. Files changed and published: `HANDOFF.md`, `docs/FOLDERS.md`, `docs/TASKS.md`,
+and this checkpoint. No source or test file has changed; the user-owned `native/api/CMakeLists.txt`
+and untracked `native/api/host/` remain untouched.
+
+- `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/project_index.py`: exit 0, 14,468 folders indexed;
+  generated index updated. Log `local/validation/root-round73-scout/claim-index-generate.log`,
+  SHA-256 `b8fde651bc090b143c0607ec67613ca52b902f336993b7fd221e7fd61a641f36`.
+- `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/project_index.py --check`: exit 0, 14,468 folders
+  indexed and current. Log SHA-256 `f13eeff12b22e2aa01a70e27c6f29f138992718cb3930a53033129c3f47e7d21`.
+- `trail build --check`: exit 0, wiring graph in sync at 3,572 nodes / 4,837 edges / 943 cards;
+  deep meaning layer remains unbuilt. Log SHA-256
+  `99342face5580b625b2480268e4e5b63ecfebc573b79c791cf004539b078027b`.
+- `git diff --cached --check` and `git diff --check`: exit 0. The staged publish-path audit passed
+  exactly 4 allowlisted paths; the full audit passed 1,650 paths. Log hashes: staged
+  `e790379bfbd7f2fa92bc8b663f59ffb600074cc1c05e501c8dc2df9b92380fd6`, full
+  `18ae020dfedd6f77c515205cfd74f0d1502898ed1d7fe2ae89a31cabe2d711d3`, diff
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+- Before commit, `git fetch origin` succeeded and `git rev-list --left-right --count
+  HEAD...origin/main` returned `0 0`. Claim commit `01e683bcc2e172e409f9d65fd06f6e54ff6f8acf`
+  was pushed to `origin/main`. Post-push fetch succeeded; the state log records matching HEAD and
+  origin refs with divergence `0 0`. Fetch/state/commit/push log hashes:
+  `be87f0e1cb8b7e9cc5faeaeb535f1c7436d2a516681757485b7f9903e5bad082`,
+  `ba3abf892a1b48512313670b3c7628cc4608e4a9fa5c769dbcb0e6bb7d5a0a98`,
+  `6565bf483c28d03234650965f1ca47277ef334e11b1b4c46f4b2b0b07334a473`, and
+  `0dc59667638fc78ebbca2f9b638bffdc909e4ed68ee7d7ca69abcfb976f8b649` respectively.
+
+Observation: repository/task/evidence state contains no duplicate claim for these three synthetic
+fixtures; each baseline passed and only the claim/documentation paths were staged. Inference: none of
+these fixtures advances a game acceptance gate. Remaining risks are limited to the declared fixture
+scope until implementation and independent replay. Current status is ACTIVE for each task, 0
+implementation attempts, 0 failed tries. Next exact action: publish this documentation sync, then
+dispatch each worker to edit only its claimed test file and run the focused check.
