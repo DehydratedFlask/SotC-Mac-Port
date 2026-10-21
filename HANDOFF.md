@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 16:44 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 16:45 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -32,9 +32,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Folder index is current at 14,467 folders. Trail was refreshed to 3,572 nodes / 4,837 edges /
   943 cards; `trail build --check` passes. An initial folder-index check was stale because a new
   private log path was created after generation; precreating the log paths and regenerating made
-  the check current. The attempted fixtures themselves had no failed runs. Next exact action: run
-  staged/full path audits, commit, and push this completion. The user-owned `native/api` changes
-  remain untouched and excluded.
+  the check current. The attempted fixtures themselves had no failed runs. Completion commit
+  `be687574e57b6626851406fc86fea5508b90a026` (`test: verify Round 72 fixtures`) is pushed; after
+  fetch, `HEAD == origin/main`, divergence 0/0. Only the pre-existing user-owned `native/api`
+  changes remain outside the commit. Next exact action: scout the next independent bounded fixture
+  tasks and publish claims before implementation.
 
 ## Round 71 fixtures verified (/root)
 
