@@ -155,3 +155,33 @@ Observation: both required path audits pass and no user-owned API path is staged
 Round73 tasks remain `FIXTURE_VERIFIED`, G0 remains PARTIAL and G1–G6 remain NOT RUN. Next exact
 action: commit and push this two-document publication record, fetch and verify the new remote tip,
 then begin independent Round74 scouting.
+
+## Publication-record sync post-push checkpoint
+
+Checkpoint time: 2026-10-21 17:04 CDT (America/Chicago). Agent: `/root`. Commit
+`4e7d0fc84a491b746b0efe54a2ec87def8903790` (`docs: record Round 73 publication`) pushed the
+two-document sync. The first push exited 0 and moved `main` from `e5d3e40` to `4e7d0fc`; a
+post-fetch `git push origin main` also exited 0 with `Everything up-to-date`. Confirmation log
+`local/validation/root-round73-scout/pubsync-final-push.log`, SHA-256
+`6a296371679d55bc9e67c365fd337f2114bb1b68e3e56f995601143a8d29c005`.
+
+- `git fetch origin`: exit 0. Post-push `git rev-parse HEAD origin/main` reports both
+  `4e7d0fc84a491b746b0efe54a2ec87def8903790`; divergence is `0 0`. Logs
+  `pubsync-state.log` and `pubsync-divergence.log`, SHA-256
+  `405f83e20b2d50e755dff5da8b9619dbc0e488baac8bfcbca066d79cb4e8225f` and
+  `231d953f3e206b69f61bb624fcd69294244ee7ad6bf019bfa1f8f965c5328f82`.
+- `git status --short --branch`: only pre-existing user-owned `native/api/CMakeLists.txt` and
+  untracked `native/api/host/` remain. Log `pubsync-status.log`, SHA-256
+  `e0335ec91a749d2e476cb33be39e2b906e147877be8468e0ce4758917953e836`.
+- After all local logs were present, `python3 -I scripts/project_index.py` exited 0 and
+  `python3 -I scripts/project_index.py --check` exited 0 at 14,468 folders. Logs
+  `pubsync-final-index-generate.log` and `pubsync-final-index-check.log`, SHA-256
+  `b8fde651bc090b143c0607ec67613ca52b902f336993b7fd221e7fd61a641f36` and
+  `f13eeff12b22e2aa01a70e27c6f29f138992718cb3930a53033129c3f47e7d21`.
+- The docs sync was limited to `HANDOFF.md` and this checkpoint. It changed no source or test file;
+  Round73 statuses and all gate labels remain unchanged.
+
+Observation: `4e7d0fc` is the fetched remote tip; only the same user-owned API changes remain in the
+worktree. Inference: none. Round73 is published and all three tasks remain `FIXTURE_VERIFIED`; G0
+remains PARTIAL and G1–G6 remain NOT RUN. Next exact action: inspect unclaimed task rows and use Graft
+to scout separate fixture candidates before publishing bounded Round74 claims.
