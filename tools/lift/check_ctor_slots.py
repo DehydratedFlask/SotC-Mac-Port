@@ -71,10 +71,11 @@ for rva, index, is_blocker, line_number in rows:
     seen_rvas.add(rva)
     previous_index = index
 
-prefix = [row for row in rows if row[1] <= 10]
-assert [row[1] for row in prefix] == list(range(11)), "indices 0–10 must be represented contiguously"
-assert all(not row[2] for row in prefix[:10]), "the first ten constructor entries must have callbacks"
-assert prefix[10][:3] == (0xf09e60, 10, True), "index 10 must be the explicit unresolved blocker"
+prefix = [row for row in rows if row[1] <= 11]
+assert [row[1] for row in prefix] == list(range(12)), "indices 0–11 must be represented contiguously"
+assert all(not row[2] for row in prefix[:11]), "indices 0–10 must have callbacks"
+assert prefix[10][:3] == (0xf09e60, 10, False), "index 10 RVA 0xf09e60 must be recovered"
+assert prefix[11][:3] == (0xf09160, 11, True), "index 11 must be the explicit unresolved blocker"
 assert [(rva, index) for rva, index, _, _ in rows if rva in (0xd32720, 0xd2ffe0)] == [
     (0xd32720, 119),
     (0xd2ffe0, 120),
@@ -83,5 +84,5 @@ assert [(rva, index) for rva, index, _, _ in rows if rva in (0xd32720, 0xd2ffe0)
 print(
     f"OK: ELF sha256={elf_digest}; constructor table start={TABLE_START:#x} "
     f"count={TABLE_COUNT} sha256={table_digest}; verified {len(rows)} registered RVA/index pairs; "
-    "first unresolved slot is index 10 RVA 0xf09e60 (semantics unknown)"
+    "slots 0-10 are recovered; first unresolved slot is index 11 RVA 0xf09160"
 )
