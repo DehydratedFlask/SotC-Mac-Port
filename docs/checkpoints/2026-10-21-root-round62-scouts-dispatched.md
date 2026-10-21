@@ -1,10 +1,10 @@
 # Checkpoint: Round 62 read-only task scouts dispatched
 
-- Local date/time: 2026-10-21 14:11 CDT (America/Chicago).
+- Local date/time: 2026-10-21 14:11 CDT (America/Chicago); scout phase closed after root verification.
 - Agent ID: `/root` (integrator); read-only scouts `/root/launcher_review`, `/root/review_host_proto`,
   and `/root/slot23_raw_xrefs`.
-- Current task IDs: none yet. This is candidate discovery only; 0 implementation attempts and no
-  code files changed. Root owns `HANDOFF.md` and this checkpoint.
+- Candidate discovery had 0 implementation attempts and no code files changed. Root owns
+  `HANDOFF.md` and this checkpoint.
 - Round 61 completion commit `741174232d44236e7c674f92c106992d6613e0e9` is published; the later
   publication note is in `12929a5`. `HEAD` and `origin/main` matched before this scout checkpoint.
 
@@ -34,6 +34,7 @@
   test code, native API files, or user data has been edited in this scouting step.
 - Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched
   and excluded from publication. Game gates remain G0 PARTIAL and G1–G6 NOT RUN.
-- Exact next action: receive all three reports, independently confirm test gaps and baseline
-  commands, select unique bounded IDs, update `docs/TASKS.md`, and publish claims before any worker
-  changes code.
+- All three reports were received. Root confirmed the gaps and unique task IDs against live source,
+  tests, and the task register, then ran clean focused baselines. The selected bounded tasks and
+  claim-time hashes are in `docs/checkpoints/2026-10-21-root-round62-fixture-claims.md`.
+- Exact next action: publish that claim checkpoint before sending implementation prompts.
