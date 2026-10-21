@@ -92,6 +92,19 @@ struct DiagnosticsSummaryTests {
         #expect(lines.last?.hasPrefix("Play is disabled: ") == true)
     }
 
+    @Test func laterConflictingDuplicateCannotMakeReadyReportStartable() {
+        let conflicting = report([
+            (.assets, .ready),
+            (.nativeCore, .ready),
+            (.metal, .ready),
+            (.audio, .ready),
+            (.assets, .missing("bad magic")),
+        ])
+
+        #expect(!DiagnosticsSummary.isStartable(conflicting))
+        #expect(DiagnosticsSummary.lines(for: conflicting).last?.hasPrefix("Play is disabled: ") == true)
+    }
+
     @Test func textJoinsLinesWithSingleNewlines() {
         let mixed = report([
             (.assets, .ready),

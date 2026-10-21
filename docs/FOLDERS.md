@@ -11,7 +11,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `.graft` | 1 | Project folder; add a contract to docs/INDEX.md |
 | `Shadow of the Colossus` | 2 | Original user game inputs; read-only and private |
 | `docs` | 12 | Plans, task/evidence registries, checkpoint and escalation documentation |
-| `docs/checkpoints` | 284 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs/checkpoints` | 287 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/escalations` | 4 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/schemas` | 1 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `graft` | 1 | Regenerable source graph; internal cache directories summarized |
@@ -503,7 +503,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/v5/records/D3` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/D4` | 5 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/D5` | 2 | Native Swift macOS launcher |
-| `launcher/.build/out/v5/records/D6` | 4 | Native Swift macOS launcher |
+| `launcher/.build/out/v5/records/D6` | 5 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/D8` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/D9` | 3 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/DA` | 2 | Native Swift macOS launcher |
@@ -529,7 +529,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/v5/records/DY` | 5 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/DZ` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/E0` | 5 | Native Swift macOS launcher |
-| `launcher/.build/out/v5/records/E1` | 2 | Native Swift macOS launcher |
+| `launcher/.build/out/v5/records/E1` | 3 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/E2` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/E3` | 4 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/E4` | 1 | Native Swift macOS launcher |

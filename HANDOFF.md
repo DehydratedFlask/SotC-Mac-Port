@@ -1,12 +1,43 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 12:11 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 12:17 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 40 (`/root`)
+
+- Completed `APP-01-DIAGNOSTICS-CONFLICTING-DUPLICATE-01`; worker and root each pass 7/7 focused
+  tests. The fixture proves a later missing duplicate cannot make an all-ready report startable.
+  E150 and its completion checkpoint record both logs and hashes.
+- Completed `APP-01-CORE-SUBSYSTEM-UNKNOWN-CODE-FIXTURE-01`; worker and root each pass 82 tests
+  across 12 suites. The unknown-code assertion is test-only; `CoreModels.swift` is unchanged.
+  E151 and its completion checkpoint record both logs and hashes.
+- The three launcher fixtures from rounds 38–40 are synthetic test coverage. No real game
+  acceptance gate changed. Existing `native/api/CMakeLists.txt` and `native/api/host/` remain
+  untouched and unpublished.
+- Exact next action: regenerate/check indexes and the source graph, publish the two fixture
+  completions and round-38 publication record, then select another bounded unowned task.
+
+## Session addendum 2026-10-21 round 39 (`/root`)
+
+- Published short-magic fixture completion, E149, and two separate fixture claims in commit
+  `d7f471fca29bf7ddd380d44efa5cea6d47d8c628` (`test: cover short PSARC magic in launcher report`);
+  push succeeded and `HEAD` matched `origin/main`. See the
+  [round 38 publication checkpoint](docs/checkpoints/2026-10-21-root-round38-publication.md).
+- Pre-push verification passed: project index current at 14,372 folders; trail graph current at
+  3,538 nodes; staged audit accepted 8 paths; full audit accepted 1,550 paths; staged diff check
+  passed. Only allowlisted documentation and the short-magic Swift test were committed.
+- `APP-01-ASSET-VALIDATOR-SHORT-MAGIC-FIXTURE-01` is `FIXTURE_VERIFIED`; the diagnostics
+  conflicting-duplicate and unknown-subsystem-code tasks are `ACTIVE`, each with zero failed
+  tries and a distinct test-file owner.
+- Actual game acceptance gates remain open. Existing `native/api/CMakeLists.txt` and
+  `native/api/host/` remain untouched and unpublished.
+- Exact next action: receive both workers' results, review their distinct diffs, replay each
+  focused test suite, and publish accurate outcomes.
 
 ## Session addendum 2026-10-21 round 38 (`/root`)
 
