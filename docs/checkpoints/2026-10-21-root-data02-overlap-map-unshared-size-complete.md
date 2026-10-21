@@ -16,4 +16,5 @@
 - Remaining limits: synthetic helper-input validation only; manifest parsing, archive contents, payloads, overlays, and game behavior were not changed or tested.
 - Index/check results: `python3 scripts/project_index.py` exited 0 and reported 14,205 folders indexed; `trail build --check` exited 0 with the wiring graph in sync, deep layer not built, and 3,519 meaning-tier nodes pending. Generated `docs/FOLDERS.md` increments the checkpoint-directory file count 231→232.
 - Publication gates: `python3 -I scripts/audit_publish_paths.py` exited 0 for seven staged allowlisted paths; `python3 -I scripts/audit_publish_paths.py --all` exited 0 for 1,498 allowed tracked paths; `git diff --cached --check` exited 0. Escalated `native/api/CMakeLists.txt` and `native/api/host/` remain unstaged and excluded.
-- Next exact action: commit and push only the allowlisted files for this task.
+- Publication: commit `c0c7177` (`fix(data): validate all overlap map sizes`) was pushed to `origin/main`; `git push origin main` exited 0 and advanced `1fbd746..c0c7177`.
+- Next exact action: proceed with the independent `DATA-02-PSARC-STORED-BLOCK-TRUNCATION-01` test-only claim.
