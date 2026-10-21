@@ -29,8 +29,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `40e7e701b0fb7520dec152943e03896c5835fbb8b2ebe4c5ca0e04b62aeaeb2b`). Test SHA256
   `c5a09bccf054d0cd186144a22b602cb2777993857cd87d5ad3846cc04e230912`; parser SHA256 remains
   `bdad7d192b0ecdb929daf5147a139e7545fd5c546f01ed4ffb4005f2cea9f9c0`.
-- Next exact action: run project index and trail checks, audit the allowlisted staged/all paths,
-  commit and push this completed fixture task. No real archive, codec, playback, or G1 claim.
+- Commit `14fcc86` (`test(audio): verify inspect_members identity and cleanup`) was pushed to
+  `origin/main`; this checkpoint's final documentation update will be committed and pushed
+  separately. The task is FIXTURE_VERIFIED with no real archive, codec, playback, or G1 claim.
+- Next exact action: claim `RE-02-DYNLINK-PHDR-ENTRY-SIZE-01` as a bounded synthetic parser guard
+  and regression fixture, then delegate its two owned files after the claim is published.
 
 ## Session addendum 2026-10-21 round 4 (`/root`)
 
