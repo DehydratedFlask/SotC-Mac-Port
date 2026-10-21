@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 17:28 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 17:31 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -13,8 +13,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - All three claimed test-only tasks are `FIXTURE_VERIFIED`: reject a one-byte synthetic zlib result at offset zero, assert the exact launcher script-stub refusal copy, and reject preserved 3 MiB host-map reserve alignment. Evidence E227–E229, exact hashes/commands/logs, observations, and scope boundaries are in the [Round75 completion checkpoint](docs/checkpoints/2026-10-21-root-round75-fixtures-complete.md); claim and pre-change baselines are in the [claim checkpoint](docs/checkpoints/2026-10-21-root-round75-fixture-claims.md).
 - Owners and sole files: `/root/review_host_proto` — `scripts/test_audio_headers.py`; `/root/launcher_review` — `launcher/Tests/LauncherCoreTests/AssetValidatorTests.swift`; `/root/round68_native_scout` — `native/tests/test_host_map.cpp`. Worker and root checks pass: 25 audio tests, 11 `AssetValidatorTests`, native target build exit 0 and focused CTest 1/1. Each task has one successful implementation attempt and zero failed tries; production hashes are unchanged.
 - The completion batch remains synthetic-only: no codec/playback, launcher runtime, successful mapping, allocator integration, or game behavior is claimed. G0 remains PARTIAL; G1–G6 remain NOT RUN.
-- Claim commit `f931b7925fc23d7fb9e2230073f9a40610ffe6c7` is pushed and fetch-verified. Claim publication recorded in `682477a4198c47fd754e942a3e18a675c81bdf93`; `HEAD == origin/main` after fetch and divergence is 0/0. Completion publication is in progress.
-- Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and excluded. Next exact action: finish the completion checkpoint, regenerate/check indexes, audit only the three fixture files and allowlisted docs, then commit/push and verify `origin/main` before scouting the next bounded tasks.
+- Claim commit `f931b7925fc23d7fb9e2230073f9a40610ffe6c7` is pushed and fetch-verified. Claim publication recorded in `682477a4198c47fd754e942a3e18a675c81bdf93`; completion commit `0eb59a9aed89f95d61042ae27a441437147798f0` is also pushed and verified with `HEAD == origin/main`, divergence 0/0. Staged/full publication audits pass at 8/1,655 paths; indexes report 14,470 folders and a synced 3,576-node Trail wiring graph. Details are in the [completion checkpoint](docs/checkpoints/2026-10-21-root-round75-fixtures-complete.md).
+- Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and excluded. Next exact action: scout the next independent bounded tasks from `docs/TASKS.md` and the live Trail graph, check for duplicates, publish claims before editing, then continue with isolated worker ownership.
 
 ## Round 74 fixtures verified (/root)
 
