@@ -59,6 +59,17 @@ int main() {
     CHECK(load(arena, kArenaOffPeak98) == 0x1200);
     CHECK(load(arena, kArenaOffPeak88) == 0x1200);
 
+    // Distinct initial values verify the two counter/peak pairs stay independent.
+    store(arena, kArenaOffUsed90, 0x100);
+    store(arena, kArenaOffPeak98, 0x105);
+    store(arena, kArenaOffUsed80, 0x200);
+    store(arena, kArenaOffPeak88, 0x300);
+    sotc::arena_add_used_high_water(arena, 0x10);
+    CHECK(load(arena, kArenaOffUsed90) == 0x110);
+    CHECK(load(arena, kArenaOffPeak98) == 0x110);
+    CHECK(load(arena, kArenaOffUsed80) == 0x210);
+    CHECK(load(arena, kArenaOffPeak88) == 0x300);
+
     // Null arena is a no-op.
     sotc::arena_add_used_high_water(nullptr, 1);
 

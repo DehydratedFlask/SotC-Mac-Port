@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 15:06 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 15:13 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,24 +8,30 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Round 66 bounded fixture claims (/root)
+## Round 66 bounded fixtures verified (/root)
 
-- Round65 fixture work is published in `061d8d530d4a84213372d03289e72535f9be6102`; the final
-  publication record is also pushed. Current `HEAD == origin/main == 0a7f5b0671c5f878edf15569bd409de099265c02`.
-- Root and scouts verified three independent, existing-test-only tasks against Graft, the live
-  source, task/evidence registries, and focused baselines. Details, hashes, commands, logs, and
-  limits are in [the Round66 claim checkpoint](docs/checkpoints/2026-10-21-root-round66-fixture-claims.md).
-- APP-01 covers an existing `SoCGameCore` file with mode `0644`; RE-02 covers a synthetic symbol
-  name offset equal to `DT_SCE_STRSZ`; SRV-01 checks the two arena used/peak counter pairs update
-  independently. Only one existing test file is assigned per task; no production files may change.
-- All three are `ACTIVE`, with 0 failed tries and 0 implementation attempts. Claim docs and task
-  rows are published before implementation prompts. These remain unit fixtures and do not advance
-  G0–G6. Existing user-owned `native/api` paths stay untouched and excluded.
-- Claim commit `9bb85cc4299134fb230165a70891dfc135034aa1` (`docs: claim Round66 launcher,
-  dynlink, arena fixtures`) is pushed; post-push `HEAD == origin/main` is recorded in the
-  [Round66 claim checkpoint](docs/checkpoints/2026-10-21-root-round66-fixture-claims.md).
-- Exact next action: dispatch each worker its single-file scope, exact fixture, and pre-created
-  private log path. Keep production code and shared documentation under root ownership.
+- Round65 fixture work and Round66 claims are published. Round66 claim commit
+  `9bb85cc4299134fb230165a70891dfc135034aa1` is pushed; the post-claim docs record at
+  `273b4419007c1e0fc16fc9caca1a4c4414afe7ff` was the starting `HEAD == origin/main` for this batch.
+- All three workers changed only their claimed existing test files. Root reviewed each exact diff,
+  replayed every focused check, and confirmed unchanged production hashes. APP-01 passes 10 Swift
+  tests, RE-02 passes 23 dynlink tests, and SRV-01's target builds and focused CTest pass 1/1.
+  Details, hashes, commands, logs, and limits are in [the Round66 claim checkpoint](docs/checkpoints/2026-10-21-root-round66-fixture-claims.md),
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-round66-fixtures-complete.md), and E196–E198.
+- Each task is `FIXTURE_VERIFIED`, with one successful implementation attempt and zero failed
+  tries. These are synthetic/unit fixtures; they do not advance the game acceptance gates. G0
+  remains PARTIAL; G1–G6 remain NOT RUN.
+- Source graph refreshed with scopes `scripts`, `tools`, `reference`, `native`, `launcher`, and
+  `tests`: 3,564 nodes / 4,820 edges; `trail build --check` passes. Optional meaning layer remains
+  unbuilt. `python3 scripts/project_index.py` and its `--check` now pass at 14,458 folders; the
+  initial stale JSON report and subsequent clean refresh are recorded in the completion checkpoint.
+- Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched,
+  unstaged, and excluded.
+- Fetch and remote comparison passed (`HEAD...origin/main` = `0 0`). Staged and full publish audits
+  passed for 9 and 1,637 paths, respectively. `git diff --cached --check` and `git diff --check`
+  passed; logs and hashes are in the completion checkpoint.
+- Exact next action: commit and push the audited allowlisted files, confirm `HEAD == origin/main`,
+  then begin fresh Round67 scouting with Graft and the live repository.
 
 ## Round 65 bounded test-only fixtures verified (/root)
 
