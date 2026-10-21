@@ -53,11 +53,14 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   CTests passed with only the escalated `sotc_host_protocol` test excluded. See
   [the completion checkpoint](docs/checkpoints/2026-10-21-root-cpu01-slot24-47-complete.md) and
   evidence row E120. Slot 23 remains the production blocker; G1 is unchanged.
-- Claimed `CPU-01-SLOT23-CONSUMERS-01`, ACTIVE, attempt 0: offline static dataflow analysis of
-  the table at `0x3353f40` and its accessors/consumers, to learn whether original strings are
-  necessary before any data import decision. No name strings or code are being published in this
-  analysis task. See
-  [the claim](docs/checkpoints/2026-10-21-root-cpu01-slot23-consumers-claim.md).
+- Claimed `CPU-01-SLOT23-CONSUMERS-01` for a name-free trace of the slot-23 table and consumers.
+  Current status is PARTIAL: a decoded pointer path passes a table pointer to `0xe70af0`, while a
+  separate reachable path hashes an object-row pointer and scans a per-object hash list. The
+  pointer consumer has 31 unresolved indirect transfers, and Ghidra 12.1.4 timed out during
+  whole-program auto-analysis at 330 seconds, so string necessity and function ownership remain
+  unknown. No names, native data, or registration were added. See
+  [the claim](docs/checkpoints/2026-10-21-root-cpu01-slot23-consumers-claim.md) and
+  [the partial checkpoint](docs/checkpoints/2026-10-21-root-cpu01-slot23-consumers-partial.md).
 - After reconfigure, `test_registration_thunks_ahead` built and its focused CTest passed 1/1.
   The host library and child executable build. The first host target build failed at line 508
   because `WIFEXITED` received temporary `reap(unused)`; storing status in a local made the target
@@ -186,12 +189,14 @@ Tooling correctness (do not repeat these mistakes):
 
 ## Current blocker
 
-Slot 23 / RVA `0x00e71990` is now the first unresolved production constructor. It writes a 14-row
-name/hash registry at `0x3353f40`; 13 row hashes reproduce with the verified routine at `0xe70aa0`,
-and one hash-zero row is a sentinel. The original data strings remain private and consumers at
-`0xe5cd78` / `0xe715d0` have not yet been fully traced. Slot 11 now has a native fixture
-(`LazyParamDefTree`); its 74 reflection records are intentionally not modelled. See the slot-23
-analysis checkpoints and the current consumer-trace claim above. Do not claim startup or G1.
+Slot 23 / RVA `0x00e71990` remains the first unresolved production constructor. It writes a 14-row
+name/hash registry at `0x3353f40`; the accessors accept 0–12 and row 13 is a hash-zero sentinel. A
+decoded call sequence passes a pointer from `0xe70a60` to `0xe70af0`, while the reachable
+`0xe5cd78` path hashes an object-row pointer and scans per-object hashes in `0xe715d0`. Ghidra
+timed out before function evidence was available; `0xe70af0` still has 31 unresolved indirect
+transfers, so the string consumer's semantics and reachability remain open. Keep original strings
+private and do not register slot 23 or claim startup/G1. Slot 11's fixture is unchanged.
+See [the partial slot-23 checkpoint](docs/checkpoints/2026-10-21-root-cpu01-slot23-consumers-partial.md).
 
 ## Settled decisions (do not re-ask)
 
@@ -203,8 +208,10 @@ analysis checkpoints and the current consumer-trace claim above. Do not claim st
 
 ## Next exact work
 
-1. Complete `CPU-01-SLOT23-CONSUMERS-01`; if original strings are required, return the concrete
-   import/regeneration choice to the principal before changing native code.
+1. Continue `CPU-01-SLOT23-CONSUMERS-01` with a bounded, name-free trace of `0xe70af0`'s indirect
+   calls and object/vtable source. Ghidra 12.1.4's 330-second startup timeout is recorded; do not
+   treat the local decoder as equivalent Ghidra evidence. Once semantics are understood, take the
+   data-only import choice to the principal before changing native code.
 2. Identify the class/interface behind vtable `0x15f9ef0` (slot 12) and the forwarding callees
    `0xf011f0`, `0xefe410`, `0xefd140`, `0xefad20`, `0xef8600`, `0xf030e0` (slots 13–19).
 3. Preserve `0xd71f60` NEEDS_PRINCIPAL (3 failed tries) and do not retry without principal
