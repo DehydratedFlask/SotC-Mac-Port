@@ -1,12 +1,34 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 10:53 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 11:53 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 29 (`/root`)
+
+- Completed `RE-02-DYNLINK-MAPPED-ZERO-LENGTH-01`, `FIXTURE_VERIFIED` with zero failed tries.
+  `launcher_review` and root each pass `PYTHONDONTWRITEBYTECODE=1 python3 -I
+  scripts/test_ps4_dynlink.py` (21/21). The new synthetic assertion confirms that an empty range
+  at `0x1010`, the first segment's one-past-end address, is considered mapped. Test SHA256 is
+  `75f971b5834fd95f2b16b92133aa999d3f77211e73d74834b6f88da6dfe12e07`; parser
+  `scripts/ps4_dynlink.py` is unchanged at
+  `28c53257a6f2bd58522f123098d41ca0d884222330a1bf18ce9f8935fb45eff9`. E146 and the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-re02-dynlink-mapped-zero-length-complete.md)
+  record the worker/root log hashes and synthetic-only limit.
+- Claimed `DATA-02-PSARC-BLOCK-SIZE-RANGE-01`, `ACTIVE` with zero failed tries. The scoped test
+  mutates the block-size field in a valid synthetic archive to `0` and `16,777,217`, then asserts
+  the exact `PsarcError('unsupported entry/block size')` for both invalid bounds. Only
+  `scripts/test_psarc.py` may change; production parser and game archives are out of scope. Claim:
+  [PSARC block-size range](docs/checkpoints/2026-10-21-root-data02-psarc-block-size-range-claim.md).
+- Root owns shared documentation. After this claim checkpoint is published, assign only
+  `scripts/test_psarc.py` to `slot23_raw_xrefs`; worker and root must save separate logs in the
+  private validation folder. Actual game acceptance gates remain open.
+- Exact next action: run `python3 scripts/project_index.py`, verify folder and source indexes, then
+  path-audit, commit, and push the zero-length completion plus the new bounded claim.
 
 ## Session addendum 2026-10-21 round 11 (`/root`)
 
