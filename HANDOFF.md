@@ -1,12 +1,19 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 17:31 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 17:37 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Round 76 fixture claims (/root)
+
+- Three isolated test-only tasks are claimed ACTIVE with zero failed implementation tries: an empty-subsystem diagnostics row (`launcher/Tests/LauncherCoreTests/LauncherModelTests.swift`), partial-width PSARC block-table rejection (`scripts/test_psarc.py`), and the exact maximum save-stream file-size boundary (`native/tests/test_save_stream_file.cpp`). Their pre-change baselines passed: 4 `CoreReadinessTests`, 37 PSARC tests, and native build plus focused CTest 1/1. Evidence E230–E232 and hashes/logs are in the [Round76 claim checkpoint](docs/checkpoints/2026-10-21-root-round76-fixture-claims.md).
+- Sole owners after claim publication: `/root/launcher_review`, `/root/review_host_proto`, and `/root/round68_native_scout`, one distinct test file each. Production files are out of scope. The native boundary fixture allocates/reads a sparse ~100 MiB file and must remain strictly a file-size validation claim.
+- No test file has been changed for Round76 yet. No acceptance gate advanced: G0 remains PARTIAL; G1–G6 remain NOT RUN. Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and excluded.
+- Exact next action: finish claim publication/fetch verification, assign the three bounded test files, then independently review and replay each worker result before recording completion.
 
 ## Round 75 fixtures verified (/root)
 
