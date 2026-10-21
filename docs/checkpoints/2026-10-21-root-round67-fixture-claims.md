@@ -68,6 +68,20 @@ and shared documentation.
   `round67-claim-fetch.log` is empty (SHA-256
   `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`).
 
+## Claim commit and publication
+
+- The allowlisted claim files were committed as
+  `ca9e20fedad3fa2e8d73091bb7a06ec78f7f2621` (`docs: claim Round67 fixture tasks`) and pushed to
+  `origin/main`. Push log `local/validation/root-round66-scout/round67-claim-push.log`, SHA-256
+  `9fc55f37222b69d2cb1a20bd0a36d5b3a9eb14d3324af5dcacb2171329b18ede`.
+- After push, `HEAD == origin/main == ca9e20fedad3fa2e8d73091bb7a06ec78f7f2621`. `git status`
+  contains only the pre-existing user-owned `native/api/CMakeLists.txt` and untracked
+  `native/api/host/`, neither staged nor published.
+- **Next exact action:** Send the implementation prompts to `/root/launcher_review`,
+  `/root/review_host_proto`, and `/root/slot23_raw_xrefs`; root implements the project-index fixture.
+  Each owner may edit only the claimed test file(s), run the exact focused command, and report log
+  path/hash and resulting test count. Workers must not edit shared docs or commit.
+
 ## Claims
 
 ### APP-01-LAUNCHER-NO-FOLDER-CORE-QUERY-FIXTURE-01
