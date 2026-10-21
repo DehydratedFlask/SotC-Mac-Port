@@ -262,6 +262,14 @@ class Tests(unittest.TestCase):
         self.assertEqual(img.read(0x1000, 16), bytes(range(16)))       # whole segment
         self.assertEqual(img.read(0x1008, 0), b'')                     # zero size inside
 
+    def test_image_reads_sce_relro_segment(self):
+        payload = b'relro-fixture'
+        img = d.Image(payload, [dict(type=d.PT_SCE_RELRO, flags=4, offset=0,
+                                     vaddr=0x4000, paddr=0x4000,
+                                     filesz=len(payload), memsz=len(payload), align=8)])
+        self.assertTrue(img.mapped(0x4000, len(payload)))
+        self.assertEqual(img.read(0x4000, len(payload)), payload)
+
     def test_image_read_crossing_a_segment_gap_rejected(self):
         img = two_segment_image()
         with self.assertRaises(ValueError) as error:
