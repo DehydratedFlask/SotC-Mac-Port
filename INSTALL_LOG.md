@@ -145,3 +145,22 @@ Existing Apple clang21.0.0, SDK27.0, CMake4.4.4 reused; no install/download. Wor
 Existing Ghidra12.1.4 and OpenJDK25.0.4.1 reused; no install/download. Created only private `local/ghidra/persistent-20261020/`, project SotC/program `/eboot.elf`. Original pinned ELF imported with heap8G,max4 CPUs,analysis timeout1200s; exit0 in360.619s,analysis/save/import success logged. Read-only `-process eboot.elf -noanalysis -readOnly` reopen exit0 in2.997s. Exact argv, environment, timestamps, diagnostics and hashes:[next-agent checkpoint](docs/checkpoints/2026-10-20-root-next-agent-handoff.md) and private root persistent-run/reopen JSON/logs. Ordinary default headless profile is separate from REA; overlap/repair and unresolved-decompiler warnings retained. No original code executed.
 
 Removal boundary: only this generated project directory and task-local logs if deliberately no longer needed; preserve them for the next agent now. Do not remove original inputs, existing tools/caches, references or other projects. All import/reopen sessions are terminal. Archived previous HANDOFF content under docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md before replacing the current file with concise next-agent instructions. No durable memory/wiki update.
+
+## 2026-10-21 13:14 CDT — round 57 focused fixture verification
+
+Existing Apple Swift 6.4.0 (swift-driver 1.168.6), Apple clang 21.0.0, CMake 4.4.4, Python 3.15.0,
+and macOS 27.0.1 were reused; no install, download, dependency, or configuration change. Commands:
+`swift test --package-path launcher --scratch-path local/build/launcher --filter CoreClientTests`
+(worker and root exit 0, 21 tests across 2 suites),
+`PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py` (root exit 0, 22 tests),
+`cmake --build local/build/native --target test_host_map` (worker/root exit 0), and
+`ctest --test-dir local/build/native -R '^host_map$'` (worker/root exit 0, 1/1). The worker's Python
+test output reported `OK`; its zsh wrapper returned 1 only after test completion when it attempted
+to assign the read-only `status` variable. Detailed commands, hashes, and limitations: [APP-01
+checkpoint](docs/checkpoints/2026-10-21-root-app01-core-readiness-query-failure-complete.md),
+[RE-02 checkpoint](docs/checkpoints/2026-10-21-root-re02-dynlink-unmapped-symbol-type-complete.md),
+and [SRV-01 checkpoint](docs/checkpoints/2026-10-21-root-srv01-host-map-roundup-overflow-complete.md).
+Purpose: synthetic launcher mapping, ELF-symbol parser, and host-map overflow fixture coverage only;
+no game execution/runtime evidence. Build products remain in `local/build/launcher` and
+`local/build/native`; private test logs remain under `local/validation/` and `logs/`. No tool or
+project dependency was installed.

@@ -118,6 +118,18 @@ struct CoreClientTests {
         #expect(message.contains("Play disabled"))
     }
 
+    @Test func failedCoreQueryWithoutValidationOrCoverageIsNotBuilt() {
+        let failure = CoreFailure(code: .io, message: "status request failed")
+        guard case .notBuilt(let message) = CoreReadiness.nativeCoreStatus(
+            validation: nil, coverage: nil, queryFailure: failure
+        ) else {
+            Issue.record("expected .notBuilt")
+            return
+        }
+
+        #expect(message == "NOT BUILT: the native core could not be queried (status request failed). Play disabled until a native SoCGameCore exists")
+    }
+
     @Test func coverageWithoutValidationIncludesCoreABIVersion() {
         let coverage = CoreCoverageReport(
             abiVersion: CoreABIVersion(major: 1, minor: 2), engineImplemented: false,
