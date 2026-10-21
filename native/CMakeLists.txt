@@ -24,6 +24,7 @@ add_library(sotc_core STATIC
   core/save_checksum.cpp
   core/save_chunk_header.cpp
   core/descriptor_registration.cpp
+  core/const_table_ee1130.cpp
   core/recursive_mutex.cpp
   core/startup_ctors.cpp
   core/clothing_preview_param.cpp
@@ -1268,6 +1269,10 @@ add_test(NAME avx_d86ed0 COMMAND test_avx_d86ed0)
 add_executable(test_avx_d5a280 tests/test_avx_d5a280.cpp)
 target_link_libraries(test_avx_d5a280 sotc_core)
 add_test(NAME avx_d5a280 COMMAND test_avx_d5a280)
+
+add_executable(test_const_table_ee1130 tests/test_const_table_ee1130.cpp)
+target_link_libraries(test_const_table_ee1130 sotc_core)
+add_test(NAME const_table_ee1130 COMMAND test_const_table_ee1130)
 
 add_executable(test_descriptor_registration tests/test_descriptor_registration.cpp)
 target_link_libraries(test_descriptor_registration sotc_core)
