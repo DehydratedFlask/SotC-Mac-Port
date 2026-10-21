@@ -22,10 +22,9 @@ remain outside the claims.
 limited to its synthetic helper or test client. They establish no game behavior or acceptance gate.
 **Remaining risks:** Baselines do not exercise a native core, game assets, launcher UI, real archive
 manifests, runtime mapping, or generated-index use by downstream consumers.
-**Next exact action:** Record the log hashes, stage only the four claim-doc paths, run staged and full
-publish audits and diff checks, fetch and compare origin, then commit and push. Only after that push,
-send the four implementation prompts with one-test-file ownership. Root owns the project-index test
-and shared documentation.
+**Current next exact action:** Root adds the claimed project-index fixture to
+`scripts/test_project_tools.py`, then reviews and replays worker changes. The claim and dispatch
+history follows below.
 
 ## Claim publication preflight
 
@@ -77,10 +76,69 @@ and shared documentation.
 - After push, `HEAD == origin/main == ca9e20fedad3fa2e8d73091bb7a06ec78f7f2621`. `git status`
   contains only the pre-existing user-owned `native/api/CMakeLists.txt` and untracked
   `native/api/host/`, neither staged nor published.
-- **Next exact action:** Send the implementation prompts to `/root/launcher_review`,
-  `/root/review_host_proto`, and `/root/slot23_raw_xrefs`; root implements the project-index fixture.
-  Each owner may edit only the claimed test file(s), run the exact focused command, and report log
-  path/hash and resulting test count. Workers must not edit shared docs or commit.
+- At publication time, the next action was to send the implementation prompts to the three listed
+  workers. That dispatch is recorded below. Root's current next action is implementing and checking
+  the project-index test.
+
+## Worker dispatch
+
+- **Checkpoint:** 2026-10-21 15:27 CDT (America/Chicago), `/root`.
+- The claim set and publication record are pushed. Three implementation assignments were sent:
+  - `/root/launcher_review`: only `LauncherModelTests.swift` and `LauncherLifecycleTests.swift`,
+    each with its claim-scoped assertions and corresponding `swift test` filter.
+  - `/root/review_host_proto`: only `scripts/test_archive_overlap_map.py`, with the claimed direct
+    zero-byte manifest parse and focused Python test command.
+  - `/root/slot23_raw_xrefs`: only `native/tests/test_host_map.cpp`, with the claimed direct
+    zero-size helper check, target build, and focused CTest command.
+- All three were instructed not to change production/shared documentation or commit, and to return
+  exact results, log hashes, changed test hashes, and unchanged production hashes. No implementation
+  result has been reviewed yet; task attempt counts remain 0.
+- Root owns only `scripts/test_project_tools.py` for the fifth claimed fixture, plus shared docs and
+  review. **Next exact action:** add separate temporary-root cases identifying stale `docs/FOLDERS.md`
+  and stale `local/indexes/folders.json`, then run
+  `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py`.
+
+## Worker attempt results reported; root review pending
+
+**Checkpoint:** 2026-10-21 15:28 CDT (America/Chicago), `/root`. The following are worker reports,
+not yet root-verified results. Each task has one successful worker attempt and zero failed tries.
+
+- `/root/launcher_review` reports only the two claimed launcher test files changed. The no-folder
+  query fixture passes 8 tests; log
+  `local/validation/round67-launcher-no-folder-core-queries/attempt-1.log`, SHA-256
+  `54bd7085315224ab176880da4949a1632368b1964946d8625ad76599c2929f30`. The lifecycle fixture
+  passes 11 tests across 2 suites; log
+  `local/validation/round67-lifecycle-canstart-transitions/attempt-1.log`, SHA-256
+  `e63353699625140e5c91065219f6ca5c8365ca1b3eb908f32fb8647ae5e66845`. Test hashes are
+  `LauncherModelTests.swift` `51f1f531998316a91cc52a86f4695a43285d277eed3d19b35299abdf6742d0cc`
+  and `LauncherLifecycleTests.swift` `f4cacf8fd80c73842184d8f44888e83565d86c8b8f5f0cec8b28f87b70eb1ee3`.
+  Production hashes reportedly remain at claim values.
+- `/root/review_host_proto` reports only `scripts/test_archive_overlap_map.py` changed; the direct
+  zero-byte member parse passes 24 tests. Log
+  `local/validation/data02-manifest-zero-byte-member-size/attempt-1.log`, SHA-256
+  `c0346c60690daa52884ca1114c4cae2bc20614b9cc61f89502b71ae3d4e8ed8b`. Test SHA-256
+  `fc472fb7a1fb9b1bd7f0d635cc6b200ccbdf870c149a6ffc0bb09fd9756d6ebe`; parser hash reportedly
+  unchanged at the claim value.
+- `/root/slot23_raw_xrefs` reports only `native/tests/test_host_map.cpp` changed; target build exits
+  0 and focused CTest passes 1/1. Build log
+  `local/validation/round67-scout-host-map-zero-size/build-attempt-1.log`, SHA-256
+  `0524da2e8cc2458ec343a44bc4b73f53179647b2df39031b43c2b170235a77a1`; CTest log
+  `local/validation/round67-scout-host-map-zero-size/attempt-1.log`, SHA-256
+  `d84681f951406b360a27f32c8aa141b3a7c7d73a32a4049a7576ce9545a86f84`. Test SHA-256
+  `90124f68bc8a57aa35eb8ed0c9800da37bf09fb81bd9416c1ea25b44edc35afd`; production and header
+  hashes reportedly remain at claim values.
+
+All worker claims remain `ACTIVE` until root verifies exact diffs and independently replays each
+focused command. Their coverage remains synthetic/test-client-only.
+
+## Dispatch-record formatting check
+
+- A staged whitespace check during this update exited 2 for two trailing spaces in the checkpoint
+  sentence `history follows below.`. The formatting was stripped; the staged and worktree checks
+  now both exit 0. Failed log `local/validation/root-round66-scout/round67-claim-diff-check-dispatch-failed.log`,
+  SHA-256 `3fa3bc24fee5064480d2fb1232befc4723ef12e8360fc4a774ac3fcfcd701d3d`; passing log
+  `round67-claim-diff-check.log`, SHA-256
+  `7b95a935833431420b42941a093b4235d46bba6d9c4aaf7ad4e8b88db4881440`.
 
 ## Claims
 
