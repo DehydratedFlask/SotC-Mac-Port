@@ -187,6 +187,17 @@ class Tests(unittest.TestCase):
         self.assertEqual(symbol['type'], '3')
         self.assertEqual(symbol['bind'], 1)
 
+    def test_parse_rejects_symbol_table_size_not_multiple_of_24(self):
+        elf, _ = dynamic_import_elf_fixture()
+        elf = bytearray(elf)
+        dynamic_offset = 64 + 2 * 56
+        symtabsz_value_offset = dynamic_offset + 6 * 16 + 8
+        struct.pack_into('<Q', elf, symtabsz_value_offset, 47)
+
+        with self.assertRaises(ValueError) as error:
+            d.parse(bytes(elf))
+        self.assertEqual(str(error.exception), 'bad symbol table size')
+
     def test_parse_rejects_unterminated_final_symbol_name(self):
         elf, _ = dynamic_import_elf_fixture()
         elf = bytearray(elf)
