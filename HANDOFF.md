@@ -1,12 +1,19 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 17:22 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 17:25 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Round 75 fixture claims (/root)
+
+- Three bounded test-only tasks are claimed with one-file ownership: `AUD-01-CLASSIFIER-ZLIB-TRIVIAL-OUTPUT-REJECT-FIXTURE-01` (`scripts/test_audio_headers.py`, `/root/review_host_proto`), `APP-01-SYSTEM-CHECKS-CORE-SCRIPT-STUB-EXACT-COPY-FIXTURE-01` (`launcher/Tests/LauncherCoreTests/AssetValidatorTests.swift`, `/root/launcher_review`), and `SRV-01-HOST-MAP-ROUNDED-NONPOWER-ALIGNMENT-FIXTURE-01` (`native/tests/test_host_map.cpp`, `/root/round68_native_scout`).
+- Pre-change root baselines pass: audio header suite 24 tests; filtered `AssetValidatorTests` 11 tests; `test_host_map` target build exit 0 and focused CTest 1/1. Exact commands, file hashes, logs, expected assertions, and scope limits are in the [Round75 claim checkpoint](docs/checkpoints/2026-10-21-root-round75-fixture-claims.md). Production sources are unchanged; each task begins at attempt 0.
+- The audio fixture pins rejection of a one-byte synthetic zlib result at offset zero; the launcher fixture pins the exact not-built refusal copy for a script stub; the native fixture pins rejection of preserved 3 MiB alignment after rounding. These tests establish no codec/playback, launcher runtime, successful mapping, allocator, or game behavior.
+- G0 remains PARTIAL; G1–G6 remain NOT RUN. Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and excluded. Next exact action: complete index and publication audits, commit/push the claim docs, verify `origin/main`, then dispatch the three single-file implementations.
 
 ## Round 74 fixtures verified (/root)
 
