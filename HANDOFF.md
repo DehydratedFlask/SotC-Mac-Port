@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 17:11 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 17:13 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -22,9 +22,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   and bounded acceptance criteria are in the
   [Round74 claim checkpoint](docs/checkpoints/2026-10-21-root-round74-fixture-claims.md).
 - No implementation attempt has started. G0 remains PARTIAL; G1–G6 remain NOT RUN. Next exact
-  action: publish the claim checkpoint and task rows, verify `origin/main`, then dispatch the five
-  file-isolated fixtures. Existing user-owned `native/api/CMakeLists.txt` and untracked
-  `native/api/host/` remain untouched and excluded.
+  action: dispatch the five file-isolated fixtures after the claim publication sync is pushed.
+  Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched
+  and excluded.
+- Claim commit `820bb128adfb3c9a03271c33a704a3ae2682aed1` (`docs: claim Round 74 fixture tasks`) is pushed to `origin/main`; fetch
+  verification and the publication-record sync are captured in the
+  [Round74 claim checkpoint](docs/checkpoints/2026-10-21-root-round74-fixture-claims.md).
 
 ## Round 73 fixtures verified (/root)
 
