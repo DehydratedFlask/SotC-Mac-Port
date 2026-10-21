@@ -113,7 +113,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Completed `DATA-02-PSARC-BLOCK-TABLE-WIDTH-01`, FIXTURE_VERIFIED: the builder now emits width-sized table entries for configurable block size; the synthetic block-size-257 fixture uses `bytes(range(256))`, asserts width 2 and parsed value 256 (`0x0100`), then verifies exact readback. Worker and root each pass `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_psarc.py` (31/31). E138 and [completion checkpoint](docs/checkpoints/2026-10-21-root-data02-psarc-block-table-width-complete.md) record hashes/logs. Production `scripts/psarc.py` is unchanged.
 - Completed `DOC-FOLDER-INDEX-CHECK-READONLY-01`, FIXTURE_VERIFIED: an empty temporary root in check mode raises the exact two-output stale-index error and creates neither `docs/` nor `local/`. Worker and root each pass `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py` (8/8). E139 and [completion checkpoint](docs/checkpoints/2026-10-21-root-doc-folder-index-check-readonly-complete.md) record hashes/logs. Production `scripts/project_index.py` is unchanged.
 - Graph checkpoint: `trail build --check` first reported stale after these two new test methods; `trail build` exited 0 and rebuilt 3,530 nodes / 4,746 edges; subsequent `trail build --check` exited 0. Deep meaning layer remains unbuilt. Stale output, build, and passing check are under `local/checkpoints/root-round13-claims/`.
-- Completion publication is pending. Next exact action: regenerate/check the project index, run publication audits, publish both fixture completions, then continue with the independent scout's candidate if it remains unclaimed. All real game acceptance gates remain unchanged.
+- Completion publication: commit `42af4f281e2d310024bd2ce1f99a3784bae2371e` is on `origin/main`;
+  staged audit accepted eight paths and the full tracked-path audit accepted 1,518 paths. Root
+  verified HEAD equals `origin/main`. `python3 scripts/project_index.py --check` reports 14,222
+  folders current; `trail build --check` passes with 3,530 nodes / 4,746 edges. Next exact action:
+  continue with the independent scout's candidate if still unclaimed. All real game acceptance gates
+  remain unchanged.
 
 ## Session addendum 2026-10-21 round 10 (`/root`)
 
