@@ -64,7 +64,9 @@ Slots 12/13 are `0xf06340`/`0xf058f0`. Do not claim engine startup or G1 from sl
 ## Parallel-agent state
 
 - A leaf-ctor subagent completed batches 25–29 (27/27, all manifest entries now disposed).
-- An AUD-02-WAITLOOP-01 subagent is running; treat its checkpoint as pending until it reports.
+- The AUD-02-WAITLOOP-01 subagent completed: `FUN_00997700` has **no** blocking wait; it is a
+  frame-count top-up loop with one static caller. See
+  [its checkpoint](docs/checkpoints/2026-10-20-root-aud02-waitloop-01-complete.md).
 - The persistent Ghidra project `local/ghidra/persistent-20261020` must never be re-imported or
   overwritten while in use; read-only `-noanalysis` reopening is the supported path.
 
