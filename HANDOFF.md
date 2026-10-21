@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 10:18 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 10:20 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -28,8 +28,16 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_archive_overlap_map.py`: exit 0, 18/18.
   E129 and private log hashes are recorded in the completion checkpoint. No archive data or game
   behavior is in scope.
-- Next exact action: refresh indexes, audit the staged paths and tracked publish set, then commit
-  and push the task completion.
+- Commit `c0c7177` is pushed to `origin/main`; it includes the whole-map validation, two synthetic
+  unshared-size cases, and E129. No real manifest/archive behavior is claimed.
+- Claimed `DATA-02-PSARC-STORED-BLOCK-TRUNCATION-01`, ACTIVE, attempt 0: add a test-only fixture
+  for truncation of a full raw PSARC block. Worker owns `scripts/test_psarc.py`; claim record:
+  [docs/checkpoints/2026-10-21-root-data02-psarc-stored-block-truncation-claim.md](docs/checkpoints/2026-10-21-root-data02-psarc-stored-block-truncation-claim.md).
+- Graft confirms `Psarc.read` has an existing raw block-size check after `f.read(block_size)` and
+  existing tests cover compressed truncation only. The fixture should assert the exact decoded-size
+  mismatch on a truncated raw block; no parser source change is in scope.
+- Next exact action: publish the claim, then delegate the single test file. No real archive or
+  payload claim is implied.
 
 ## Session addendum 2026-10-21 round 6 (`/root`)
 
