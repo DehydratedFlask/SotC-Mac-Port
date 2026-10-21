@@ -95,6 +95,14 @@
   `55d95c999812c05fa3081484f675761e19a96b012cf8416e99bb4a53e25c5ee3`. Cached and working
   `git diff --check` both exited 0. The staged list is exactly the three tests and seven allowlisted
   docs; user-owned `native/api` changes are unstaged.
-- Remaining: commit and push the audited Round 61 completion record, then record the published ref.
-- Exact next action: commit as `test: verify round 61 synthetic fixtures`, push `origin main`, and
-  verify `HEAD` matches `origin/main`.
+- Completion commit `741174232d44236e7c674f92c106992d6613e0e9` (`test: verify round 61 synthetic
+  fixtures`) was pushed to `origin/main`; the push updated `main` from `0d4aa90` to `7411742`.
+  `git rev-parse HEAD origin/main` reports both refs at the full commit above. Push log
+  `local/validation/root-round61-replay/push.log`, SHA-256
+  `7b05194e02460c351cc9e30bc13b1e954e3d98c4faa0916a28834b697c347f4a`; ref log
+  `local/validation/root-round61-replay/publication-state.log`, SHA-256
+  `2c372581f11d407caeae59473f195567275650f9b06e9a2b94451c889eac3d2b`.
+- Final working tree has only the pre-existing user-owned `native/api/CMakeLists.txt` modification
+  and untracked `native/api/host/`; neither path was staged or published.
+- Exact next action: use Graft to scout a new set of independent Round 62 tasks, verify candidates
+  and baselines against live files, then publish bounded claims before implementation edits.
