@@ -1,9 +1,21 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 21:18 CDT (America/Chicago). Principal: `/root`.
+Updated: 2026-10-20 21:24 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation: G0 PARTIAL; G1-G6 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 21:18 CDT, `/root` — slot-10 provider preparation failed; scoped remedy approved
+## CURRENT CHECKPOINT — 2026-10-20 21:24 CDT, `/root` — native save-body checksum claimed
+
+`SAV-01-NATIVE-CHECKSUM-01` is CLAIMED; worker `/root/aud02_waitloop_resume_audit` owns new `native/core/save_checksum.{hpp,cpp}`, `native/tests/test_save_checksum.cpp`, and `tools/lift/check_f161f50.py`. Root owns CMake/README and shared records/Git. Implement only `fnv1a32(span<const byte>, uint32_t seed)` as ordinary native C++ for the nonnegative raw-byte domain used by verified Save/Load callers; keep seed explicit. The original `0x161f50` helper zero-extends each byte, XORs with the 32-bit state and multiplies by `0x01000193` modulo 2^32; empty input returns seed. Save/Load use `0x811c9dc5` over body only. Chunk-name uppercasing belongs to a different helper and is outside this primitive.
+
+Root reviewed the complete 38-byte helper assembly in retained REA Evidence `ev_34c436d7a66cc52871efcb9461acf9c5001062556f07f5fd8f562c87dafe103c` and replayed `PYTHONDONTWRITEBYTECODE=1 python3 -I local/re/evidence/sav01-producer-01/verify_producer.py --out local/checkpoints/root-20261020-save-checksum-producer.json` (exit0). Output matches the prior verification SHA-256 `442f3bbb438b4cdcf1826b442847e51e5916d413221bc60ec0d2c8a25284e838`; stdout log SHA-256 `56d399228d20f9b14daec28a2f287e9bca295ea479d104edc7032dc078b7c1c4`. Graft native search found no existing checksum implementation. No new provider query is assigned for this task. Failed implementation tries:0.
+
+Acceptance: one runnable native test with independent known answers and raw high-bit/NUL/custom-seed/empty/split-update checks; original body/callsite source checker must reject wrong source input; root reviews the diff, builds ARM64 with ASan/UBSan, verifies the test binary architecture and runs appropriate CTest coverage. No complete serializer, save compatibility, startup-prefix, game or gate claim follows. G0 PARTIAL; G1-G6 NOT RUN.
+
+CPU worker now owns the sole provider permit for the access-scoped `0xb30950` retry; the original permission failure is preserved in checkpoint `26d5282`. Save-loader worker continues private evidence construction. Reference-source Graft queries reported no indexed reference files; direct pinned-source verification was used and the 1,988-node sync result does not prove reference coverage. No dependency/install change for this checksum claim.
+
+Exact next action: index/check/audit and publish this claim, then START the checksum worker. Root integrates CMake/README after reviewing the four new files and records real build/check outcomes before task completion.
+
+## PRIOR CHECKPOINT — 2026-10-20 21:18 CDT, `/root` — slot-10 provider preparation failed; scoped remedy approved
 
 `CPU-01-CTOR10-OBJECT-INIT-01` remains CLAIMED. First `rea function ... 0xb30950` invocation exited 1 in 4.9 s before target analysis: nested Ghidra stage `ownership_preparation` could not write the existing Swift module cache at `/Users/dehydratedflask/.cache/clang/ModuleCache/Swift-7JL1KBZ3A6V3.swiftmodule` (`Operation not permitted`), then could not load the arm64 macOS 27 standard library. Error says `execution_failure`, `retryable:false`; no snapshot or target Evidence ID was produced. This is one infrastructure failed try and zero failed analysis hypotheses. Exact command/capture hashes and remedy are in `docs/checkpoints/2026-10-20-root-cpu01-ctor10-provider-cache-failure.md` and private `local/re/evidence/cpu01-ctor10-object-init-01/rea-b30950.*`.
 
