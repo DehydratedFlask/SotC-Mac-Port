@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 16:27 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 16:28 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -17,6 +17,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Root replayed the launcher baseline (10 tests), dynlink baseline (25 tests), and native
   region-split build plus focused CTest (1/1); all exited 0. These tests cover pure path
   classification, a synthetic ELF parser, and synthetic node arithmetic only.
+- Claim commit `bb1f58628a85dbea0331e8195d792a49193d02d8` (`docs: claim Round 71 fixture tasks`)
+  is pushed to `origin/main`; the project index reports 14,466 folders and is current. Publication
+  audits accepted 4 staged paths and 1,646 full-tree paths. The post-push state log confirms
+  `HEAD == origin/main`, divergence `0 0`; exact log hashes are in the claim checkpoint.
 - Current owners: `/root + launcher_review` owns only `launcher/Tests/LauncherCoreTests/AssetValidatorTests.swift`;
   `/root + review_host_proto` owns only `scripts/test_ps4_dynlink.py`; `/root + round68_native_scout`
   owns only `native/tests/test_region_split.cpp`. Integrator retains ownership of shared docs.
