@@ -1,0 +1,41 @@
+# Round 77 fixture claims and baselines
+
+- Local time / timezone: 2026-10-21 17:52 CDT (America/Chicago).
+- Agent / integrator: `/root`; Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`.
+- Base: `HEAD` and `origin/main` were `701235f9f8bd5d6d1bb2876372fefa9d0495d948` when tasks were selected.
+- Tasks / status / tries: all four tasks below are `ACTIVE`; each has zero implementation attempts and zero failed tries.
+- Gates: G0 remains `PARTIAL`; G1–G6 remain `NOT RUN`. These tasks add synthetic/test-only assertions; no production behavior or game behavior is claimed.
+- Files changed for claim: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, and this checkpoint. Implementation files were unchanged at baseline.
+
+## Claims
+
+| Task | Owner | Sole file | Acceptance intent |
+|---|---|---|---|
+| `APP-01-CORE-STATE-NUMERIC-CODE-ALL-VALUES-FIXTURE-01` | `/root/launcher_review` | `launcher/Tests/LauncherCoreTests/CoreClientTests.swift` | Pin codes 0–6 to each corresponding `CoreState` case and pin unknown-code rejection. |
+| `APP-01-CORE-DIAGNOSTICS-ALL-STATE-TEXT-FIXTURE-01` | `/root/scout_launcher_queue` | `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift` | Pin the exact diagnostic state row for idle, validating, ready, starting, running, stopping, and failed. |
+| `DATA-02-PSARC-ENTRY-SIZE-FIXTURE-01` | `/root/review_host_proto` | `scripts/test_psarc.py` | Mutate the synthetic PSARC header entry size away from 30 and assert exact `unsupported entry/block size` rejection. |
+| `APP-01-CORE-COVERAGE-SUBSYSTEM-NAMES-FIXTURE-01` | `/root/round68_native_scout` | `native/api/tests/test_sotc_core_api.cpp` | Pin the ordered ABI subsystem names `startup_constructors`, `engine_boot`, `metal_renderer`, `audio`, `save_load`. |
+
+## Baselines
+
+| Task | Exact command(s) and result | Baseline log / SHA256 | Baseline source hashes |
+|---|---|---|---|
+| `APP-01-CORE-STATE-NUMERIC-CODE-ALL-VALUES-FIXTURE-01` | `swift test --package-path launcher --scratch-path local/build/launcher --filter CoreClientTests` — exit 0; 22 tests across 2 suites (13 CoreClient, 9 NativeCoreClient). | `local/validation/root-round77-claims/core-client-baseline.log` — `2817b37aa9fe28dbd213938fdb3716c359c02695a5fdab7572093d469648bf04` | Test `CoreClientTests.swift`: `0230e928c3f40ccf900e867903f2c56bdf637f5e49a96655e400f80a82707a68`; unchanged `CoreModels.swift`: `183d681e8566cf2d8c19b2a484f6e4163869ec3eb34c231f92ed91314b824eda`. |
+| `APP-01-CORE-DIAGNOSTICS-ALL-STATE-TEXT-FIXTURE-01` | `swift test --package-path launcher --scratch-path local/build/launcher --filter CoreReadinessTests` — exit 0; 5 tests in 1 suite. | `local/validation/root-round77-claims/core-readiness-baseline.log` — `a5f58669f9d2013ee96032ac7afdbfa118121fd109e64f2d197a5a49793eeb2d` | Test `LauncherModelTests.swift`: `66160fdeb49b79762e2c3141c7e0877fd840873e1710584decc9710ee27eb3c0`; unchanged `CoreReadiness.swift`: `fea0fec1c0635b8d6ab3978db2a817a1dd47d0a8d87045aada68f820ce64e2eb`. |
+| `DATA-02-PSARC-ENTRY-SIZE-FIXTURE-01` | `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_psarc.py` — exit 0; 38 tests. | `local/validation/root-round77-claims/psarc-baseline.log` — `817ad2ebd987d75401355630946ab1d446b38885cd47693ed4e0bc98f293471b` | Test `scripts/test_psarc.py`: `1339ea4676ebba9b21bafe0dd857867738a4589c452184713b97d3dd4fb0789f`; unchanged parser `scripts/psarc.py`: `39f2c748db013637aba8144205dc60b7e5b1eb49ee0f641783a1e2c140485`. |
+| `APP-01-CORE-COVERAGE-SUBSYSTEM-NAMES-FIXTURE-01` | `cmake --build local/build/native --target test_sotc_core_api` — exit 0; `ctest --test-dir local/build/native -R '^sotc_core_api$' --output-on-failure` — exit 0, 1/1 passed. | Build `local/validation/root-round77-claims/native-core-api-build-baseline.log` — `9fddcb7aa476098f6c21d3d9497f4f0e5c4cef94b13f35388c0ecb43f6107ef6`; CTest `local/validation/root-round77-claims/native-core-api-ctest-baseline.log` — `f1f484f397c0762c8e5e112e7abe344717da4142f7b1dde89e481c2f83ef2970`. | Test `native/api/tests/test_sotc_core_api.cpp`: `ef32679bcd77112b5a49a9a7fdcb952903c8a84e8ec3c508889aeb9687b0b61f`. The pre-existing user-owned `native/api/CMakeLists.txt` hash is `aa04d19b5fde7c32ae4f30d28bcf781f0a65a337c75c96ad63c29e320bb402de`; it was used read-only for this baseline. |
+
+## Graft and live-source evidence
+
+- `graft grep "numericCodesMapToTypedValues" --in launcher/` located the sparse numeric-code fixture in `CoreClientTests.swift`; `graft grep "CoreState" --in launcher/` showed the seven-state enum and a separate launcher-state mapping test.
+- `graft grep "stateName" --in launcher/` located the formatter switch; `graft grep "Core state:" --in launcher/` showed current diagnostics tests pin only ready and stopping rows.
+- `graft grep "entry_size" --in scripts/` located the fixed-width guard in `Psarc._load`; `graft grep "test_rejects_block_size_outside_supported_range" --in scripts/` showed neighboring test coverage changes only block-size header bytes.
+- `graft grep "test_coverage" --in native/api/` located the ABI fixture; live source confirms it currently checks individual subsystem presence/status, not the full ordered names.
+- The native API build and CTest ran while the existing user-owned `native/api/CMakeLists.txt` was modified and `native/api/host/` was untracked. Neither path was changed, staged, or claimed by these tasks.
+
+## Remaining risk and next action
+
+- All four tasks are additive fixtures with independent source files. PSARC uses a synthetic archive; launcher assertions cover pure Swift mappings/formatting; the native assertion covers the current stub ABI names. No real archive, native game core, UI, or game behavior is exercised.
+- No dependency or installation changed; `INSTALL_LOG.md` remains unchanged.
+- Preflight: `python3 scripts/project_index.py` exited 0 with 14,476 folders; the initial `python3 scripts/project_index.py --check` exited 1 because the staged/full audit logs were created after that generation (`local/validation/root-round77-claims/project-index-check-initial-stale.log`, SHA256 `9260ff3845555dc6dda4d0af40f810eaa924584cb664308dab97625de40c8932`). The index was regenerated after the log set stabilized; final `--check` exited 0/current, log `local/validation/root-round77-claims/project-index-check.log`, SHA256 `dd521ed333daf4f08a151a33e43b1dfc54e9606b13238180a62059352b0a622b`. `trail build --check` exited 0/current at 3,578 nodes and 4,853 edges; the deep meaning layer remains unbuilt; log `local/validation/root-round77-claims/trail-check.log`, SHA256 `917fd3379dd8f9b7f28554937c4f2c7fe32ae174de616cf772d60de1cc8886e7`. `git diff --cached --check` exited 0. `python3 -I scripts/audit_publish_paths.py` exited 0 and accepted 5 staged paths (log `local/validation/root-round77-claims/audit-staged-claim.log`, SHA256 `6d7406e3e5763e932f928530d7125d31707f3f5b5130a33c967d0a79c930592f`); `python3 -I scripts/audit_publish_paths.py --all` exited 0 and accepted 1,658 paths (log `local/validation/root-round77-claims/audit-all-claim.log`, SHA256 `afbd16a5a7965426f2d319b79b6a5bd68e1f06fda56c4c1f15f82858b4f6a8de`). Existing user-owned native API files remain unstaged.
+- Exact next action: commit the five staged allowlisted claim paths, push `origin main`, fetch and confirm `HEAD == origin/main`; then dispatch the four owners, review their diffs, independently replay the exact targeted commands, update evidence/status, and publish only the allowlisted completion files.
