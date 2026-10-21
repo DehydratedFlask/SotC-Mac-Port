@@ -1,10 +1,18 @@
 # Round 70 fixture and edge-fix claims
 
-**Checkpoint:** 2026-10-21 16:14 CDT (America/Chicago)
+**Checkpoint:** 2026-10-21 16:16 CDT (America/Chicago)
 **Integrator:** `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`)
 **Starting revision:** `2f75c173efeda74ec0f1ccd272a9f43e2cfae9cb` (Round69 publication sync; `HEAD == origin/main`).
 **Files changed for claims:** `HANDOFF.md`, `docs/TASKS.md`, `docs/FOLDERS.md`, and this checkpoint.
 **Implementation status:** No source or test implementation has started. All three tasks have zero failed tries.
+
+Claim commit `099136c56e4de5101b97112d634b5d86864c7425` (`docs: claim Round 70 fixture and index
+tasks`) is pushed. After `git fetch origin` exited 0, `HEAD == origin/main ==
+099136c56e4de5101b97112d634b5d86864c7425`, with divergence `0 0`. Push log
+`claim-push.log`, SHA-256 `e62ab693123eed87d4c74d345d7a9bed0b1e76ccb000fc6b10df5ed37e5e7843`; state
+log `claim-publish-state.log`, SHA-256
+`632ab1f2ce354ec20ade17a4239a70d1e6d7e31121c5f5a6eada2227a6ca39b4`. Existing user-owned
+`native/api/CMakeLists.txt` and untracked `native/api/host/` were not staged.
 
 ## Claimed tasks and owners
 
@@ -90,5 +98,5 @@
 - These fixtures and the project-index check-mode fix do not advance runtime gates. G0 remains
   PARTIAL; G1-G6 remain NOT RUN. No live launcher UI, native game behavior, ELF loading, real
   archive, game audio, save/reload, or Metal gameplay is established.
-- Exact next action: commit and push this claim checkpoint and `docs/TASKS.md`/`HANDOFF.md` updates,
-  then dispatch the two test-file tasks and implement the root-owned indexer case.
+- Exact next action: dispatch the two claimed test-file tasks and implement the root-owned indexer
+  case.
