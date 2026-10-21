@@ -518,6 +518,32 @@ struct CoreReadinessTests {
             .hasPrefix("No readiness check has run yet."))
     }
 
+    @Test func coreSectionReportsExactTextForEveryCoreState() {
+        let cases: [(CoreState, String)] = [
+            (.idle, "idle"),
+            (.validating, "validating"),
+            (.ready, "ready"),
+            (.starting, "starting"),
+            (.running, "running"),
+            (.stopping, "stopping"),
+            (.failed, "failed"),
+        ]
+
+        for (state, expectedName) in cases {
+            let status = CoreStatus(
+                state: state, lastError: .ok, assetsValidated: false, assetsReady: false,
+                engineImplemented: false, ctor: .notLinked
+            )
+            #expect(CoreDiagnostics.coreSection(
+                coverage: nil, status: status, lastFailure: nil, queryFailure: nil
+            ) == [
+                "Core report:",
+                "  Coverage: NOT REPORTED",
+                "  Core state: \(expectedName); last error: OK",
+            ])
+        }
+    }
+
     @Test func emptySubsystemCoverageReportsNoSubsystems() {
         let coverage = CoreCoverageReport(
             abiVersion: CoreABIVersion(major: 1, minor: 0), engineImplemented: false,

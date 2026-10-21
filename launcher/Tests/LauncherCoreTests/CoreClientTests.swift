@@ -91,9 +91,14 @@ struct CoreClientTests {
 
     @Test func numericCodesMapToTypedValues() {
         #expect(CoreState(code: 0) == .idle)
+        #expect(CoreState(code: 1) == .validating)
+        #expect(CoreState(code: 2) == .ready)
+        #expect(CoreState(code: 3) == .starting)
         #expect(CoreState(code: 4) == .running)
+        #expect(CoreState(code: 5) == .stopping)
         #expect(CoreState(code: 6) == .failed)
         #expect(CoreState(code: 7) == nil)
+        #expect(CoreState(code: UInt32.max) == nil)
         #expect(CoreErrorCode(code: 4) == .engineNotImplemented)
         #expect(CoreErrorCode(code: 3) == .assetsNotReady)
         #expect(CoreErrorCode(code: 99) == .unknown(99))
