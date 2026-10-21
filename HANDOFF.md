@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 13:20 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 13:23 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -26,10 +26,13 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Claim-time state: `main` and `origin/main` match at `21b0ac4`; the only pre-existing local work is
   the user-owned `native/api/CMakeLists.txt` modification and untracked `native/api/host/`. They
   remain untouched and excluded.
-- Planned dispatch after claim publication: `/root/launcher_review` owns only
-  `launcher/Tests/LauncherCoreTests/LauncherStatusCopyTests.swift`;
-  `/root/review_host_proto` owns only `scripts/test_archive_overlap_map.py`; `/root/slot23_raw_xrefs`
-  owns only `native/tests/test_region_list.cpp`. Root owns shared docs and independent replay.
+- Claim commit `a7c6e67` (`docs: claim round 58 synthetic edge fixtures`) is pushed to
+  `origin/main`. The exact owner assignments and focused commands are in
+  [round 58 dispatch checkpoint](docs/checkpoints/2026-10-21-root-round58-workers-dispatched.md).
+- `/root/launcher_review` owns only `launcher/Tests/LauncherCoreTests/LauncherStatusCopyTests.swift`;
+  `/root/review_host_proto` owns only `scripts/test_archive_overlap_map.py`;
+  `/root/slot23_raw_xrefs` owns only `native/tests/test_region_list.cpp`. Root owns shared docs and
+  independent replay. Implementation begins only after dispatch documentation is published.
 - `python3 scripts/project_index.py` exited 0 and regenerated the folder index for 14,401 folders;
   `docs/checkpoints` lists 343 and `logs` lists 93. Log `logs/root-round58-claim-project-index.log`,
   SHA256 `1fce09b08a087681b67949e46317690178e639d219ac20fbf6999c6e81c8e6f9`. `trail build --check`
@@ -42,10 +45,21 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   1,610 paths; log `logs/root-round58-claim-audit-all.log`, SHA256
   `585781946f40998853916242d1376e8a33dcdb4fbc014b1882dcaa7201dbec8e`. `git diff --cached --check`
   and `git diff --check` both exited 0.
-- Exact next action: restage only `HANDOFF.md`, `docs/TASKS.md`, `docs/FOLDERS.md`, and the round 58
-  claim checkpoint after this handoff edit; rerun staged/full audits, commit with
-  `docs: claim round 58 synthetic edge fixtures`, and push `origin main`; only then dispatch the
-  three owners.
+- `python3 scripts/project_index.py` exited 0 and refreshed `docs/FOLDERS.md` for 14,401 folders;
+  `docs/checkpoints` lists 344 and `logs` lists 97. Log `logs/root-round58-dispatch-project-index.log`,
+  SHA256 `1fce09b08a087681b67949e46317690178e639d219ac20fbf6999c6e81c8e6f9`. `trail build --check`
+  exited 0 with the wiring graph in sync at 3,551 nodes / 4,790 edges; log
+  `logs/root-round58-dispatch-trail-check.log`, SHA256
+  `1d6a8b7368552c48cb7630dfe051bb32e14cd65ebc74330bcb42255d15f9027f`. The optional deep concept
+  layer is not built; `git diff --check` exited 0.
+- Pre-push staged path audit accepted 4 paths; log `logs/root-round58-dispatch-audit-staged.log`,
+  SHA256 `5dff47839ee41befc61dbd1bf1f57e1b7206249867d3fab6977283f9cd06f144`. Full path audit
+  accepted 1,611 paths; log `logs/root-round58-dispatch-audit-all.log`, SHA256
+  `d19c1d0532caa61fce3db62db77a82ae6f79ca0c83afa8f3c458e1da3d066aee`. Cached and working diff
+  checks both exited 0.
+- Exact next action: restage the four allowlisted files after this handoff update; rerun staged/full
+  path audits, commit with `docs: record round 58 worker dispatch`, and push `origin main`. Then
+  send each owner its single-file task.
 
 ## Session addendum 2026-10-21 round 57 completion (`/root`)
 
