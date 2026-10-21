@@ -10,31 +10,31 @@ No native game executable exists. Validation: G0 PARTIAL; G1-G6 NOT RUN.
 
 ## CURRENT CHECKPOINT — 2026-10-20 22:05 CDT, `/root` — native mutex fixture verified; persistent analysis claimed
 
-`SRV-01-RECURSIVE-MUTEX-01` FIXTURE_VERIFIED: native pthread RAII owner integrated; root3/3 focused sanitizer tests pass, arm64 confirmed. Two failed harness attempts retained (unsupported LSan option, scratch include path);0 product failures. User selected StartupState RAII ownership; settled decision, wiring waits on descriptor semantics. Full commands/limits:[checkpoint](docs/checkpoints/2026-10-20-root-native-mutex-and-persistent-claim.md).
+`SRV-01-RECURSIVE-MUTEX-01` FIXTURE_VERIFIED: native pthread RAII owner integrated; root3/3 focused sanitizer tests pass, arm64 confirmed. Two failed harness attempts retained (unsupported LSan option, scratch include path);0 product failures. User selected StartupState RAII ownership; settled decision, wiring waits on descriptor semantics. Full commands/limits:[checkpoint](../../docs/checkpoints/2026-10-20-root-native-mutex-and-persistent-claim.md).
 
 CPU object dossier has2 root review corrections pending; descriptor dossier is in progress,2 inspection-command failures retained. Slot10 remains blocked; next original blocker after it is11/f09160. `RE-01-PERSISTENT-01` CLAIMED by root for private saved Ghidra import/reopen, no overwrites or tool installs;0 task failures at claim. No further REA query assigned. Exact next action:publish checkpoint, start saved analysis, finish/replay CPU and descriptor evidence before choosing next semantics. G0 PARTIAL; G1-G6 NOT RUN.
 
 ## PRIOR CHECKPOINT — 2026-10-20 21:55 CDT, `/root` — host mutex API verified; slot10 descriptor remains open
 
-Root replayed Darwin recursive/priority-inherit API probe,exit0,byte-identical output; scheduler semantics remain NOT TESTED. `CPU-01-MUTEX-CONTRACT-01` API_CONFIGURATION_VERIFIED. Claim `SRV-01-RECURSIVE-MUTEX-01` for native pthread resource owner/check, and `CPU-01-CTOR10-DESCRIPTOR-01` for private offline table/publication evidence; ownership/commands/attempts:[checkpoint](docs/checkpoints/2026-10-20-root-mutex-contract-and-descriptor-claims.md). Native slot10 remains unregistered: ctor also publishes vptr0x15fb7c0 toglobal0x3356678, with no typed counterpart yet. Next original slot11 is RVAf09160; preserve that blocker before any later leaves if slot10 advances.
+Root replayed Darwin recursive/priority-inherit API probe,exit0,byte-identical output; scheduler semantics remain NOT TESTED. `CPU-01-MUTEX-CONTRACT-01` API_CONFIGURATION_VERIFIED. Claim `SRV-01-RECURSIVE-MUTEX-01` for native pthread resource owner/check, and `CPU-01-CTOR10-DESCRIPTOR-01` for private offline table/publication evidence; ownership/commands/attempts:[checkpoint](../../docs/checkpoints/2026-10-20-root-mutex-contract-and-descriptor-claims.md). Native slot10 remains unregistered: ctor also publishes vptr0x15fb7c0 toglobal0x3356678, with no typed counterpart yet. Next original slot11 is RVAf09160; preserve that blocker before any later leaves if slot10 advances.
 
 Cleanup provider query completed successfully, report/replay pending. Explicit all-scope Graft build still omitted reference sources; second ineffective coverage attempt recorded, no more variants assigned. Native/launcher/tools/scripts graph is queryable/sync; reference fallback direct clean pinned source. G0 PARTIAL; G1-G6 NOT RUN. Next exact action:publish claims, release workers, review/replay cleanup evidence and native mutex; do not register incomplete descriptor state.
 
 ## PRIOR CHECKPOINT — 2026-10-20 21:48 CDT, `/root` — checksum fixture and loader static map verified
 
-`SAV-01-NATIVE-CHECKSUM-01` FIXTURE_VERIFIED: root integrated CMake/README,223/223 ASan+UBSan CTest pass, source-bound checker passes and rejects wrong input, Mach-O arm64 confirmed; independent Luna review approved. `SAV-01-LOADER-01` STATIC_ANALYSIS_VERIFIED for the bounded byte/call map:28/28 checksums and root replay pass, identical output SHA64a6dac7…30548. Two failed checker attempts remain counted. This proves no serializer, actual save/load or game behavior. Details/commands/limits:[checkpoint](docs/checkpoints/2026-10-20-root-checksum-loader-complete.md).
+`SAV-01-NATIVE-CHECKSUM-01` FIXTURE_VERIFIED: root integrated CMake/README,223/223 ASan+UBSan CTest pass, source-bound checker passes and rejects wrong input, Mach-O arm64 confirmed; independent Luna review approved. `SAV-01-LOADER-01` STATIC_ANALYSIS_VERIFIED for the bounded byte/call map:28/28 checksums and root replay pass, identical output SHA64a6dac7…30548. Two failed checker attempts remain counted. This proves no serializer, actual save/load or game behavior. Details/commands/limits:[checkpoint](../../docs/checkpoints/2026-10-20-root-checksum-loader-complete.md).
 
 `CPU-01-MUTEX-CONTRACT-01` CLAIMED by root/Luna worker: private Darwin pthread configuration probe only. CPU worker is running the sole authorized cleanup query; slot10 remains blocked. No constructor leaf batches. Graft wiring refreshed/sync2002nodes; reference coverage missing/deep layer unbuilt. G0 PARTIAL; G1-G6 NOT RUN. Exact next action:publish checkpoint, release mutex probe, then root review callback results and native ownership before registering any startup slot.
 
 ## PRIOR CHECKPOINT — 2026-10-20 21:43 CDT, `/root` — completion request resumed
 
-The user requested completing the project, revoking the pause. Root is integrating/reviewing `SAV-01-NATIVE-CHECKSUM-01`, worker `/root/sav01_loader_resume_audit` finishes only the saved loader report/manifest, and `/root/startup_critical_path_resume` recovers only the slot10 object cleanup/initializer evidence. `/root/aud02_waitloop_resume_audit` independently reviews the checksum without editing it. Full ownership, cumulative attempts and one narrowly authorized callback-query continuation: [resume claim](docs/checkpoints/2026-10-20-root-completion-resume-claim.md). No leaf-constructor batching is assigned. G0 PARTIAL; G1-G6 NOT RUN.
+The user requested completing the project, revoking the pause. Root is integrating/reviewing `SAV-01-NATIVE-CHECKSUM-01`, worker `/root/sav01_loader_resume_audit` finishes only the saved loader report/manifest, and `/root/startup_critical_path_resume` recovers only the slot10 object cleanup/initializer evidence. `/root/aud02_waitloop_resume_audit` independently reviews the checksum without editing it. Full ownership, cumulative attempts and one narrowly authorized callback-query continuation: [resume claim](../../docs/checkpoints/2026-10-20-root-completion-resume-claim.md). No leaf-constructor batching is assigned. G0 PARTIAL; G1-G6 NOT RUN.
 
 Exact next action: publish this claim, release workers, integrate the checksum after independent review, then implement only recovered startup dependencies. No full-game completion claim until all actual gates pass.
 
 ## PRIOR CHECKPOINT — 2026-10-20 21:32 CDT, `/root` — user-directed stop
 
-The user explicitly requested stopping. All workers are stopped and no task-owned REA/Ghidra process remains. Goal is PAUSED; resume only on a new user request. Full checkpoint: [user-stop record](docs/checkpoints/2026-10-20-root-user-stop-checkpoint.md). Public checksum files are preserved as unintegrated WIP; worker standalone checks passed, root replay/CMake/README/CTest acceptance remain pending. Do not count this as a completed task or game gate.
+The user explicitly requested stopping. All workers are stopped and no task-owned REA/Ghidra process remains. Goal is PAUSED; resume only on a new user request. Full checkpoint: [user-stop record](../../docs/checkpoints/2026-10-20-root-user-stop-checkpoint.md). Public checksum files are preserved as unintegrated WIP; worker standalone checks passed, root replay/CMake/README/CTest acceptance remain pending. Do not count this as a completed task or game gate.
 
 - `SAV-01-NATIVE-CHECKSUM-01`: PAUSED, four files preserved;0 failed implementation tries. No serializer or actual-save claim.
 - `CPU-01-CTOR10-OBJECT-INIT-01`: PAUSED, `0xb30950` retry exit0 (Evidence `ev_5244df9c0cdd09628007481ae7de7c3d4adf109c3e1e1956257103fe018e264e`); `0xe44a10` interrupted by user stop, partial capture unaccepted.1 infrastructure failed try,0 rejected analysis hypotheses,1 separately recorded user interruption. No native slot10 registration.
@@ -453,7 +453,7 @@ Worker and root each ran `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_psar
 
 Graft initially reported the graph stale for this new method; `graft build` exited 0, refreshed one changed file (529 cached), and `graft check` then passed at 1,264 nodes / 530 files. `graft grep` finds the new test at `scripts/test_psarc.py:L89-L95`; the optional deep meaning layer remains unbuilt. No install or dependency changes.
 
-This verifies synthetic TOC/block-table range rejection only. No live archive, loader/runtime, game use, or G1/G2 behavior is inferred. Failed implementation tries: 0; G1 NOT PASSED; G2 NOT RUN. Full checkpoint: [PSARC block-table boundary fixture](docs/checkpoints/2026-10-20-root-data02-psarc-block-table-range-complete.md).
+This verifies synthetic TOC/block-table range rejection only. No live archive, loader/runtime, game use, or G1/G2 behavior is inferred. Failed implementation tries: 0; G1 NOT PASSED; G2 NOT RUN. Full checkpoint: [PSARC block-table boundary fixture](../../docs/checkpoints/2026-10-20-root-data02-psarc-block-table-range-complete.md).
 
 Claim commit `72f3a23` and dispatch checkpoint syncs `bfb5ab5` / `dc02551` were pushed. The latest post-push fetch confirmed `HEAD` and `origin/main` match at `dc02551c046f53af459afcca428a267668cb5f24`, 0/0 divergence (log SHA-256 `0fd968c619e597674fff78231aafdead9076559e2f97885a338ac2e887499ddf`).
 
@@ -495,7 +495,7 @@ SHA-256 `3de247fcd7f42f0358c00fb4beb58bc005ae89aeb54c12707793cbf8f8afd701`. Work
 graph synced at 1,260 nodes (optional deep meaning layer unbuilt; log
 `local/checkpoints/root-2026-10-20-re02-dynlink-string-terminator-complete-graft-check.log`, SHA-256
 `a4d55100d0ac4eda3f43b8c4a3e931bb916a6e2d10bfe3469707e7aac7c943f6`); `git diff --check` exited 0.
-Completion details are in [the checkpoint](docs/checkpoints/2026-10-20-root-re02-dynlink-string-terminator-complete.md).
+Completion details are in [the checkpoint](../../docs/checkpoints/2026-10-20-root-re02-dynlink-string-terminator-complete.md).
 This synthetic string-table fixture does not establish live ELF, loader/runtime, relocation application,
 or game behavior; parent RE-02 remains active. Failed implementation tries: 0; install/dependencies
 unchanged; G1 NOT PASSED; G2 NOT RUN.
@@ -564,7 +564,7 @@ then update evidence and the completion checkpoint.
 
 `AUD-01-CLASSIFIER-SHORT-LE-PREFIX-01` is `FIXTURE_VERIFIED`; `/root/aud01_short_prefix` changed
 only `scripts/test_audio_headers.py`, and root owns shared docs and Git. Parent `AUD-01` remains
-ACTIVE. The linked [ASSETS spec](docs/ASSETS.md#L59) labels classifier output as prefix observations
+ACTIVE. The linked [ASSETS spec](../../docs/ASSETS.md)#L59 labels classifier output as prefix observations
 and keeps codecs UNKNOWN. `FamilyTests.test_le_small_ints_short_prefix` passes seven bytes
 `01000000000000` to `family_of` and asserts fallback label `other-01000000`. The classifier is
 unchanged.
@@ -611,7 +611,7 @@ assertion and no implementation change. Failed implementation tries: zero.
 
 This is one synthetic prefix-boundary assertion only; it does not identify a codec or establish
 runtime/audio behavior. G1 NOT PASSED, G2 NOT RUN; no dependency change. The claim scope and
-pre-edit baseline are recorded in [the claim checkpoint](docs/checkpoints/2026-10-20-root-aud01-classifier-short-prefix-claim.md).
+pre-edit baseline are recorded in [the claim checkpoint](../../docs/checkpoints/2026-10-20-root-aud01-classifier-short-prefix-claim.md).
 Completion record: `python3 scripts/project_index.py` exited 0 at 4,166 folders (log
 `local/checkpoints/root-2026-10-20-aud01-classifier-short-prefix-complete-project-index.log`,
 SHA-256 `f5e40539e482e9841a3f5631ca3e0e53f76cea9afef85423aaf910c0a8ba55aa`); `graft check` exited
@@ -642,7 +642,7 @@ then publish its claim before dispatching the test-only worker.
 `1a31774` (`test: reject invalid UTF-8 manifests`), followed by documentation-sync commit
 `a187a90`. Worker and root replay passed 12 tests; the parser is unchanged and coverage is
 synthetic-only. Details, hashes and audit logs are recorded in
-[`docs/checkpoints/2026-10-20-root-data02-manifest-invalid-utf8-complete.md`](docs/checkpoints/2026-10-20-root-data02-manifest-invalid-utf8-complete.md).
+[`docs/checkpoints/2026-10-20-root-data02-manifest-invalid-utf8-complete.md`](../../docs/checkpoints/2026-10-20-root-data02-manifest-invalid-utf8-complete.md).
 Post-push fetch confirmed `origin/main` at `a187a90`, 0/0 divergence. Untracked `tools/graft/`
 remains untouched and unstaged.
 
@@ -662,7 +662,7 @@ remains `bdad7d192b0ecdb929daf5147a139e7545fd5c546f01ed4ffb4005f2cea9f9c0`. Graf
 at `scripts/test_audio_bank_header.py:L58-L63`; code graph check passes at 1,257 nodes / 530 source
 files, with optional deep meaning layer unbuilt. This establishes synthetic length-word rejection
 only, not codec, game audio, runtime use, or any game gate. No failed tries or dependency change.
-G1 NOT PASSED; G2 NOT RUN. See [completion checkpoint](docs/checkpoints/2026-10-20-root-aud01-xff-short-length-complete.md).
+G1 NOT PASSED; G2 NOT RUN. See [completion checkpoint](../../docs/checkpoints/2026-10-20-root-aud01-xff-short-length-complete.md).
 
 The claim was published before the edit in commit `290c5c6`. Root review and worker verification
 are complete; the worker confirmed this checkpoint before exiting. `python3 scripts/project_index.py` exited 0 at 4,166 folders; `graft check` passed at
@@ -725,7 +725,7 @@ Test SHA-256 is `0ef9ee140c70f0be835170e60b1d3e728c39ecd3e78ec2cb75701128e964b17
 remains `3bef8a66705c34ab43c321b688ec675cc3cd7aa0e07ec3afdb0f956e3e80cdc9`. Graft finds the new
 test at `scripts/test_psarc.py:L93-L95`. This proves only synthetic exact-length rejection, not
 live-archive behavior, asset semantics, runtime behavior, or any game gate. No failed tries, install,
-or dependency change. G1 NOT PASSED; G2 NOT RUN. See [completion checkpoint](docs/checkpoints/2026-10-20-root-data02-psarc-truncation-complete.md).
+or dependency change. G1 NOT PASSED; G2 NOT RUN. See [completion checkpoint](../../docs/checkpoints/2026-10-20-root-data02-psarc-truncation-complete.md).
 
 The claim checkpoint was published before implementation in commit `4f60856`. Root acceptance and
 review are complete. `python3 scripts/project_index.py` exited 0 at 4,166 folders;
@@ -782,7 +782,7 @@ across 3 suites on `arm64e-apple-macos14.0`. Logs: worker
 `local/checkpoints/app01-termination-classifier-test.log`; root filtered
 `local/checkpoints/root-2026-10-20-app01-termination-root-review.log`; root full suite
 `local/checkpoints/root-2026-10-20-app01-termination-full-suite.log`. Source hashes and log hashes
-are recorded in E80 and [the completion checkpoint](docs/checkpoints/2026-10-20-root-app01-termination-classifier-complete.md).
+are recorded in E80 and [the completion checkpoint](../../docs/checkpoints/2026-10-20-root-app01-termination-classifier-complete.md).
 
 `graft check` and `git diff --check` passed; the wiring graph is current at 1,255 nodes / 530
 source files, optional deep meaning layer unbuilt. `python3 scripts/project_index.py` exited 0 at
@@ -992,17 +992,17 @@ The last claim checkpoint was pushed as `7560229` (`docs: claim all-archive path
 
 `AUD-02-NGS2-VOICE-GETSTATEFLAGS-01` completed one serialized REA function query at `0x9534cb`, exit 0, Evidence ID `ev_3f98dc6164521a74e7e9c2ff6f3a389c3945923ba312b1287343c59ba2298b99`. Root verified 56/56 worker dossier checksums and independently replayed the function and bytes: register setup at `0x9534c3`/`0x9534c7`, direct call `0x9534cb -> 0xf91480`, thunk `0xf91480 -> 0x1601030`, and symbol 245 / NID `rEh728kXk3w` `R_X86_64_JUMP_SLOT` in file-backed `PT_SCE_RELRO`. This remains static evidence only. Exactly one RackQueryBufferSize xrefs query was released to `/root/rackquery_slot_xrefs` for slot `0x1601000`. Preflight confirmed the pinned ELF/import hashes and no REA CLI/headless operation in flight, then found the existing dossier snapshot differed from the shared baseline. The worker is preparing a fresh private copy; query result/status is pending. No second provider query is authorized. RackVoiceHandle remains partial after one prior xrefs timeout; no retry is released.
 
-`AUD-01-METADATA-SIDECAR-IDENTITY-01` completed: two corrected runs were byte-identical (`cmp` exit 0; report SHA-256 `2ce90160cdc38a883d459e66d96be2673a66b264da468ba47b1d69e750ea33c0`). Three archive identities, nine member IDs/paths/TOC locators, decoded lengths and payload hashes were verified; base/patch differ for all three cachedFiles members. See [the completion checkpoint](docs/checkpoints/2026-10-20-root-aud01-sound-metadata-identity-complete.md). No schema, codec, overlay, runtime or audio claim was made.
+`AUD-01-METADATA-SIDECAR-IDENTITY-01` completed: two corrected runs were byte-identical (`cmp` exit 0; report SHA-256 `2ce90160cdc38a883d459e66d96be2673a66b264da468ba47b1d69e750ea33c0`). Three archive identities, nine member IDs/paths/TOC locators, decoded lengths and payload hashes were verified; base/patch differ for all three cachedFiles members. See [the completion checkpoint](../../docs/checkpoints/2026-10-20-root-aud01-sound-metadata-identity-complete.md). No schema, codec, overlay, runtime or audio claim was made.
 
-`DATA-02-ARCHIVE-PATH-CASE-01` audits exact and Unicode-casefold duplicate paths across all seven extracted archive member manifests; current `docs/ASSETS.md` covers only the cachedFiles pair. Worker `/root/data02_archive_path_case` confirmed seven inputs and Python 3.15.0 and started a private checker in `local/validation/data02-archive-path-case-01/`. One shell-wrapper error occurred while recording `python3 --version`: zsh rejected assignment to its reserved `status` variable after the version command ran. The worker is preserving that error and rerunning with a non-reserved variable; no audit hypothesis or targeted check has failed. It reads metadata paths only, not archive payloads, and cannot prove Fios, mount order or runtime behavior. See [the claim checkpoint](docs/checkpoints/2026-10-20-root-data02-archive-path-case-claim.md).
+`DATA-02-ARCHIVE-PATH-CASE-01` audits exact and Unicode-casefold duplicate paths across all seven extracted archive member manifests; current `docs/ASSETS.md` covers only the cachedFiles pair. Worker `/root/data02_archive_path_case` confirmed seven inputs and Python 3.15.0 and started a private checker in `local/validation/data02-archive-path-case-01/`. One shell-wrapper error occurred while recording `python3 --version`: zsh rejected assignment to its reserved `status` variable after the version command ran. The worker is preserving that error and rerunning with a non-reserved variable; no audit hypothesis or targeted check has failed. It reads metadata paths only, not archive payloads, and cannot prove Fios, mount order or runtime behavior. See [the claim checkpoint](../../docs/checkpoints/2026-10-20-root-data02-archive-path-case-claim.md).
 
-APP-01 has no new source change because sandbox distribution and child-process-on-quit choices remain unanswered; root asked the user for those choices. The initial-readiness VoiceOver check is waiting for an unlocked Mac: CUA explicitly reported it locked and automatic unlock failed. No app was opened. See [the environment checkpoint](docs/checkpoints/2026-10-20-root-app01-voiceover-environment-pending.md). User-selected testable `LauncherCore` lifecycle helper and system alert for non-cancellation import errors are reflected in existing artifacts; the 14 launcher unit tests and short smoke run passed in the earlier checkpoint. Native alert interaction was not exercised.
+APP-01 has no new source change because sandbox distribution and child-process-on-quit choices remain unanswered; root asked the user for those choices. The initial-readiness VoiceOver check is waiting for an unlocked Mac: CUA explicitly reported it locked and automatic unlock failed. No app was opened. See [the environment checkpoint](../../docs/checkpoints/2026-10-20-root-app01-voiceover-environment-pending.md). User-selected testable `LauncherCore` lifecycle helper and system alert for non-cancellation import errors are reflected in existing artifacts; the 14 launcher unit tests and short smoke run passed in the earlier checkpoint. Native alert interaction was not exercised.
 
 The recorded Graft total remains approximately 389,919 tokens across 14 calls; no price is inferred. The wrapper-correction checkpoint `python3 scripts/project_index.py` exited 0 (4,157 folders) and `graft check` exited 0 (wiring synced; deep layer unbuilt, 1,225 nodes pending); `git diff --check` passed. Logs: `logs/root-data02-case-wrapper-*.log`. The prior claim's staged audit passed 4 paths, full audit passed 623 tracked paths, diff check passed and fetch/divergence was `0 0`. Wrapper checkpoint pre-push checks passed: staged diff check, staged path audit for 3 allowlisted docs paths, full audit for 623 tracked paths, and fetch/divergence `0 0`; logs are `logs/root-data02-case-wrapper-*.log`. Its staged paths are HANDOFF, FOLDERS and the updated claim checkpoint. `tools/graft/` remains unstaged.
 
 Next exact action: commit and push this wrapper-correction checkpoint, then await both bounded workers' outputs. Root will independently verify hashes and replay results before updating shared evidence. RackQuery remains the sole serialized provider operation. APP-01 sandbox/quit decisions and the locked-Mac VoiceOver check remain pending user/environment input.
 
-Prior related checkpoints: [RackDestroy function root replay](docs/checkpoints/2026-10-20-root-aud02-rackdestroy-function-replay.md), [VoiceHandle offline root replay](docs/checkpoints/2026-10-20-root-aud02-voicehandle-offline-replay.md), [RackDestroy xrefs root replay](docs/checkpoints/2026-10-20-root-aud02-rackdestroy-xrefs-replay.md), and [RackCreateWithAllocator/root offline replay](docs/checkpoints/2026-10-20-root-aud02-last-two-offline-replay.md).
+Prior related checkpoints: [RackDestroy function root replay](../../docs/checkpoints/2026-10-20-root-aud02-rackdestroy-function-replay.md), [VoiceHandle offline root replay](../../docs/checkpoints/2026-10-20-root-aud02-voicehandle-offline-replay.md), [RackDestroy xrefs root replay](../../docs/checkpoints/2026-10-20-root-aud02-rackdestroy-xrefs-replay.md), and [RackCreateWithAllocator/root offline replay](../../docs/checkpoints/2026-10-20-root-aud02-last-two-offline-replay.md).
 
 ## Archived handoff history
 
@@ -1170,7 +1170,7 @@ with `gpt-6-luna`, Extra High, on separate private evidence paths and a process-
 requirement (no shared MCP REA session). Root owns `AUD-02-NGS2-VOICE-CONTROL-01`. They may not
 edit shared docs or publish; root is the sole integrator and will independently review/verify
 evidence. Task-specific prompts and paths are in the
-[claim checkpoint](docs/checkpoints/2026-10-20-root-aud02-ngs2-callsite-claims.md). At dispatch,
+[claim checkpoint](../../docs/checkpoints/2026-10-20-root-aud02-ngs2-callsite-claims.md). At dispatch,
 analysis had not started and all failed-try counts were zero. Files changed in that checkpoint:
 HANDOFF/TASKS and the claim checkpoint only. The dispatch checkpoint was committed as `3e5ecea` (`docs: record NGS2
 probe assignments`) and pushed from `d243989` to `3e5ecea`; staged path audit passed three allowlisted
@@ -1290,8 +1290,8 @@ Static app-main code sets RSI to `-1` then calls slot `+0x18`; the constructed v
 PHDR #8 (`p_type=0x61000000`) overlaps the function with an alternate file view; its meaning is
 unclassified and the verifier uses only PT_LOAD #0 for executable bytes. Strings are literal
 observations only. No runtime reachability, class/ABI contract, native implementation, or G1
-claim follows. See [E56](docs/EVIDENCE.md) and the
-[completion checkpoint](docs/checkpoints/2026-10-20-root-re02-appmain-25a8d0-complete.md).
+claim follows. See [E56](../../docs/EVIDENCE.md) and the
+[completion checkpoint](../../docs/checkpoints/2026-10-20-root-re02-appmain-25a8d0-complete.md).
 
 Three verifier assumptions failed during the task: requiring file bytes for a zero-fill reference,
 requiring unique raw file offsets across overlapping headers, and requiring a unique all-header
@@ -1299,7 +1299,7 @@ mapping for the body. These were verifier-coverage failures, not failed analysis
 third failure reached the escalation threshold; as principal, root reviewed the corrected rule
 (unique PT_LOAD for code, prefer PT_LOAD for data, use a unique non-PT_LOAD mapping only when no
 PT_LOAD covers the reference) and authorized one final independent replay. That replay passed.
-The [escalation record](docs/escalations/RE-02-APPMAIN-25A8D0-01.md) preserves all attempts and
+The [escalation record](../../docs/escalations/RE-02-APPMAIN-25A8D0-01.md) preserves all attempts and
 the limit on further scope. Failed verifier tries: 3; failed analysis hypotheses: 0.
 
 ### APP-01-IMPORTER-ERROR-01 — ACTIVE, cancellation behavior needs a focused fix
@@ -1312,7 +1312,7 @@ bounded fix: put Cocoa cancellation/error classification in a testable `Launcher
 keep localized alerts for operational failures, wire the helper into `ContentView`, and add focused
 unit cases. Preserve selection/readiness on import failure. No app runtime interaction has been
 tested. Failed tries: 0. Claim details:
-[checkpoint](docs/checkpoints/2026-10-20-root-app01-importer-error-reclaim.md).
+[checkpoint](../../docs/checkpoints/2026-10-20-root-app01-importer-error-reclaim.md).
 
 Worker `/root/app01_import_cancel` (`gpt-6-luna`, Extra High) added the helper and focused tests in
 launcher source/tests only. Its first `swift test` attempt failed while compiling the test target:
@@ -1347,7 +1347,7 @@ semantics. The Sony-specific type name and PHDR #8 loader/runtime role remain UN
 coverage is bounded and gated SDK documentation was not accessed. Failed analysis tries: 0.
 Worker report SHA-256 `e6e459202dc4f14263f2aed24ad5e29bcc448662634a2e46f7714e980a0c60e6`; root review
 SHA-256 `13115545b0a898c4521d9234e5f0d7625c4f180aa39b44ce08662c049af04a61` under
-`local/re/evidence/re02-phdr8-source-audit/`. See [checkpoint](docs/checkpoints/2026-10-20-root-re02-phdr8-source-audit-claim.md).
+`local/re/evidence/re02-phdr8-source-audit/`. See [checkpoint](../../docs/checkpoints/2026-10-20-root-re02-phdr8-source-audit-claim.md).
 
 This checkpoint was recorded 2026-10-20 01:35 CDT by `/root`. APP-01-IMPORTER-ERROR-01 passed
 the worker's and root's `swift test` runs (14 tests, three suites); one corrected compile failure
@@ -1390,7 +1390,7 @@ Pre-claim identity check command:
 exited `0` at 2026-10-20 01:03 CDT; tree was clean at `ba7b4319f1ae0226a587ac04151b1d992f2941dd`.
 Observed hashes: ELF `d0723afb...61d3`, app-main note `cb70fff5...286b6`, structured dossier
 `cdfea58a...1ca48`, partial disassembly `09fa7535...7509fb`. Claim details:
-[RE-02-APPMAIN-25A8D0-01](docs/checkpoints/2026-10-20-root-re02-appmain-25a8d0-claim.md).
+[RE-02-APPMAIN-25A8D0-01](../../docs/checkpoints/2026-10-20-root-re02-appmain-25a8d0-claim.md).
 Publication checks: `python3 scripts/project_index.py` exited `0` (`4,135 folders indexed; written`);
 `graft check` exited `0` (wiring graph synchronized; optional deep meaning layer remains unbuilt,
 1,219 nodes pending); `git diff --check` and `git diff --cached --check` passed; staged path audit
@@ -1446,7 +1446,7 @@ offsets/boundaries. Do not infer codec from directory/extension names, patch-win
 NGS2 behavior, game use, or playback; if bytes do not establish a schema, leave format
 `UNCLASSIFIED`. Do not extract to disk or publish payload bytes. Outputs remain under
 `local/re/evidence/aud01-sts-byte-probe-01/`. Failed analysis hypotheses: 0. Claim:
-[AUD-01-STS-BYTE-PROBE-01](docs/checkpoints/2026-10-20-root-aud01-sts-byte-probe-claim.md).
+[AUD-01-STS-BYTE-PROBE-01](../../docs/checkpoints/2026-10-20-root-aud01-sts-byte-probe-claim.md).
 
 Pre-claim selection used the verified identity JSON, choosing the lexicographically first
 hash-different pair where both decoded sizes are at least 256 bytes; the identity artifact SHA was
@@ -1485,11 +1485,11 @@ G1 NOT PASSED.
 
 Worker `/root/ctor10_caller_state`'s private report is hash-bound to ELF SHA
 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`. Root reran
-`python3 -I local/re/evidence/cpu01-ctor10-caller-state-01/verify.py > local/re/evidence/cpu01-ctor10-caller-state-01/root-verification.stdout.log 2> local/re/evidence/cpu01-ctor10-caller-state-01/root-verification.stderr.log; result_code=$?; printf '%s\n' "$result_code" > local/re/evidence/cpu01-ctor10-caller-state-01/root-verification.exit.txt; exit "$result_code"`; exit `0`, stderr empty, and root JSON SHA `2695197686a62e0fbbc298aa661db7753f678eb7580c77dadbcd4f3d274bead2` matches the worker verification JSON. The four callee gate fields are byte-zero on the examined path; the caller's separate guard skips unresolved call `0xf09efb`, and helper `0xe1ede0`'s qword gates skip its computed calls for these inputs. No constructor reachability, other-state effects, or runtime behavior is inferred. Report and root logs remain private; see E53 and [checkpoint](docs/checkpoints/2026-10-20-root-cpu01-ctor10-caller-state-complete.md).
+`python3 -I local/re/evidence/cpu01-ctor10-caller-state-01/verify.py > local/re/evidence/cpu01-ctor10-caller-state-01/root-verification.stdout.log 2> local/re/evidence/cpu01-ctor10-caller-state-01/root-verification.stderr.log; result_code=$?; printf '%s\n' "$result_code" > local/re/evidence/cpu01-ctor10-caller-state-01/root-verification.exit.txt; exit "$result_code"`; exit `0`, stderr empty, and root JSON SHA `2695197686a62e0fbbc298aa661db7753f678eb7580c77dadbcd4f3d274bead2` matches the worker verification JSON. The four callee gate fields are byte-zero on the examined path; the caller's separate guard skips unresolved call `0xf09efb`, and helper `0xe1ede0`'s qword gates skip its computed calls for these inputs. No constructor reachability, other-state effects, or runtime behavior is inferred. Report and root logs remain private; see E53 and [checkpoint](../../docs/checkpoints/2026-10-20-root-cpu01-ctor10-caller-state-complete.md).
 
 ### RE-02-PHDR10-SOURCE-AUDIT-01 — ARTIFACT_VERIFIED, meaning UNCLASSIFIED
 
-Worker `/root/phdr10_source_audit`'s private report SHA-256 is `c1572f6181ece3d0e31b4210150240504ded1b100284a9496cadf16575a14e5b`; root independently reopened its cited official SIE and generic ELF sources and saved a review under `local/re/evidence/re02-phdr10-source-audit/root-review.md`. No attributable first-party mapping was found in the bounded public search. The generic ELF ABI only puts this numeric value within the OS-specific range. Partner-only documentation was not accessed; no absence-of-meaning or runtime conclusion is drawn. See E54 and [checkpoint](docs/checkpoints/2026-10-20-root-re02-phdr10-source-audit-complete.md).
+Worker `/root/phdr10_source_audit`'s private report SHA-256 is `c1572f6181ece3d0e31b4210150240504ded1b100284a9496cadf16575a14e5b`; root independently reopened its cited official SIE and generic ELF sources and saved a review under `local/re/evidence/re02-phdr10-source-audit/root-review.md`. No attributable first-party mapping was found in the bounded public search. The generic ELF ABI only puts this numeric value within the OS-specific range. Partner-only documentation was not accessed; no absence-of-meaning or runtime conclusion is drawn. See E54 and [checkpoint](../../docs/checkpoints/2026-10-20-root-re02-phdr10-source-audit-complete.md).
 
 Exact next action at that checkpoint: choose and claim the next small CPU-01/RE-02 slice only after checking its prerequisites; do not infer a native startup chain from these static results. `CPU-01-CTOR10-CALLER-STATE-01` has 0 failed analysis hypotheses; `RE-02-PHDR10-SOURCE-AUDIT-01` has 0; parent CPU-01 and RE-02 remain ACTIVE. No code or reference files changed; no install/download or game execution. G1 NOT PASSED.
 
@@ -1537,7 +1537,7 @@ already returned no hits in 528 indexed files; it must not be repeated. Only pub
 Sony/PlayStation material or generic ELF specifications may support claims. If no primary mapping is
 available, preserve `UNCLASSIFIED`; do not turn community names or absence of search results into a
 semantic conclusion. Claim:
-[RE-02-PHDR10-SOURCE-AUDIT-01](docs/checkpoints/2026-10-20-root-re02-phdr10-source-audit-claim.md).
+[RE-02-PHDR10-SOURCE-AUDIT-01](../../docs/checkpoints/2026-10-20-root-re02-phdr10-source-audit-claim.md).
 The claim was published in `54d12b7` (`docs: claim PHDR10 source audit`) after `python3 scripts/project_index.py`
 exited `0` (4,134 folders; 35 checkpoints), `graft check` exited `0` (wiring graph synchronized;
 optional deep meaning layer 0%, 1,219 nodes pending), and `git diff --check` passed. Staged path
@@ -1564,7 +1564,7 @@ After publication, `/root/ctor10_caller_state` (`gpt-6-luna`, Extra High) was di
 `CPU-01-CTOR10-CALLER-STATE-01`. Scope is limited to the four caller stack fields read by the
 `0xe1ede0` gates. The analyst must preserve unknown helper effects as unknown and may only write
 private artifacts under `local/re/`. No analysis result is inferred from dispatch. Claim and exact
-scope are in [the checkpoint](docs/checkpoints/2026-10-20-root-cpu01-ctor10-caller-state-claim.md).
+scope are in [the checkpoint](../../docs/checkpoints/2026-10-20-root-cpu01-ctor10-caller-state-claim.md).
 Failed analysis hypotheses/tries: 0.
 
 Exact next action: review the private report/verifier when returned, independently rerun its byte
@@ -1583,7 +1583,7 @@ reads and previously verified helper effects before that call; unknown call effe
 No type/ABI/lifecycle inference or claim that the helper's computed calls are unreachable is allowed
 without every guard value and path being established. Root owns `HANDOFF.md`; the analyst may edit
 only private artifacts under `local/re/`. Claim:
-[CPU-01-CTOR10-CALLER-STATE-01](docs/checkpoints/2026-10-20-root-cpu01-ctor10-caller-state-claim.md).
+[CPU-01-CTOR10-CALLER-STATE-01](../../docs/checkpoints/2026-10-20-root-cpu01-ctor10-caller-state-claim.md).
 Task row and claim are in the working tree. `python3 scripts/project_index.py` exited `0` with
 `4133 folders indexed; written` and checkpoint directory count 34. `graft check` exited `0` with
 the wiring graph in sync; the optional deep meaning layer remains 0% (1,219 nodes pending).
@@ -1604,11 +1604,11 @@ system alert with silent cancellation.
 ### RE-02-MISSING-PHDR10-01 — STATIC_ANALYSIS_VERIFIED for parser/coverage slice
 
 Root reviewed and reran `/root/phdr10`'s private hash-bound verifier. Exact root command:
-`PYTHONDONTWRITEBYTECODE=1 python3 -I local/re/evidence/re02-phdr10/verify.py > local/re/evidence/re02-phdr10/root-verification.json 2> local/re/evidence/re02-phdr10/root-verification.stderr.log`; exit `0`, JSON `PASS`, stderr empty. Root and worker verification JSON SHA-256 match at `7f3a873b450f5fda12508bde8125564f50863b0924d887802affc69b439bf259`; verifier hash is `c6146a03d6f7695d8744c61269fbcb67c2e7d4c779d4553472e97fb3399581f5`; report hash is `8041add6304969dc84e5494ed368e5b73c1a89a3430c089b7109acc9d0b41491`. It validates the SELF/ELF hashes, pinned clean reference at `70bb43859cd7ff181a6d409540b757866184d60d`, all 11 program headers, 10 descriptors, every copied interval, and `parse_self` returning `missing=[10]`. PHDR10 is `0x6fffff01`, `p_offset=65,211,380`, `p_filesz=2,928`, `p_memsz=0`; it has no active descriptor, and the pinned reader tolerates it because it is absent from the parser's four required types. This is parser/byte behavior only: platform type meaning, other loaders, and runtime relevance remain unclassified. Completion evidence is E51 and [checkpoint](docs/checkpoints/2026-10-20-root-re02-missing-phdr10-complete.md). Failed analysis hypotheses: 0; RE-02/G0/G1 remain open/not passed.
+`PYTHONDONTWRITEBYTECODE=1 python3 -I local/re/evidence/re02-phdr10/verify.py > local/re/evidence/re02-phdr10/root-verification.json 2> local/re/evidence/re02-phdr10/root-verification.stderr.log`; exit `0`, JSON `PASS`, stderr empty. Root and worker verification JSON SHA-256 match at `7f3a873b450f5fda12508bde8125564f50863b0924d887802affc69b439bf259`; verifier hash is `c6146a03d6f7695d8744c61269fbcb67c2e7d4c779d4553472e97fb3399581f5`; report hash is `8041add6304969dc84e5494ed368e5b73c1a89a3430c089b7109acc9d0b41491`. It validates the SELF/ELF hashes, pinned clean reference at `70bb43859cd7ff181a6d409540b757866184d60d`, all 11 program headers, 10 descriptors, every copied interval, and `parse_self` returning `missing=[10]`. PHDR10 is `0x6fffff01`, `p_offset=65,211,380`, `p_filesz=2,928`, `p_memsz=0`; it has no active descriptor, and the pinned reader tolerates it because it is absent from the parser's four required types. This is parser/byte behavior only: platform type meaning, other loaders, and runtime relevance remain unclassified. Completion evidence is E51 and [checkpoint](../../docs/checkpoints/2026-10-20-root-re02-missing-phdr10-complete.md). Failed analysis hypotheses: 0; RE-02/G0/G1 remain open/not passed.
 
 ### CPU-01-CTOR10-E1EDE0-01 — STATIC_ANALYSIS_VERIFIED
 
-`/root/srv01_page_map_19660` completed the private REA 6.7.0/Ghidra 12.1.4 query (Evidence ID `ev_a78fb082a6584d31cebf0c320fc036205741f7093569f68e8355e90ce8237e0c`; exact command, exit `0`, and empty stderr are recorded under `local/re/evidence/rea-e1ede0/analysis.command.txt`). Root reviewed the private report and reran `PYTHONDONTWRITEBYTECODE=1 python3 -I local/re/evidence/rea-e1ede0/verify.py > local/re/evidence/rea-e1ede0/root-verification.stdout.log 2> local/re/evidence/rea-e1ede0/root-verification.stderr.log`; root exit `0`, stderr empty. Root stdout SHA matches worker JSON `08e9f42004ad18be5599f5c9dfce903b7f71e992e70cedf23b37430d52a8e412`. Function `0xe1ede0..0xe1ee45` is 102 bytes (SHA `fe902c0318c3b14913f6c88d21e54d96a55bc56f1f4c78c3a9648922450add1d`). The verifier checks 92 incoming xrefs (58 E8 calls, 34 E9 tail transfers), body bytes, and `0xf09f04` argument provenance. Two indirect calls and PT_LOAD-gap data remain unresolved; two call refs lack Ghidra caller-function records and relationship coverage is partial. The exact report SHA is `fdbedbaaf50acbfcb16ef8e563ecd21fce126d06002d0de70e6007f0d39b37d2`, verifier SHA `3550ae5c97202fd0c8e4ca86b86c60a00b2c7c6f16b4293683da710b22637b21`. No service/ABI or runtime role is inferred. See E52 and [checkpoint](docs/checkpoints/2026-10-20-root-cpu01-ctor10-e1ede0-complete.md). Failed analysis hypotheses: 0; two verifier assertions were corrected as tool assumptions. Parent CPU-01 remains ACTIVE and G1 NOT PASSED.
+`/root/srv01_page_map_19660` completed the private REA 6.7.0/Ghidra 12.1.4 query (Evidence ID `ev_a78fb082a6584d31cebf0c320fc036205741f7093569f68e8355e90ce8237e0c`; exact command, exit `0`, and empty stderr are recorded under `local/re/evidence/rea-e1ede0/analysis.command.txt`). Root reviewed the private report and reran `PYTHONDONTWRITEBYTECODE=1 python3 -I local/re/evidence/rea-e1ede0/verify.py > local/re/evidence/rea-e1ede0/root-verification.stdout.log 2> local/re/evidence/rea-e1ede0/root-verification.stderr.log`; root exit `0`, stderr empty. Root stdout SHA matches worker JSON `08e9f42004ad18be5599f5c9dfce903b7f71e992e70cedf23b37430d52a8e412`. Function `0xe1ede0..0xe1ee45` is 102 bytes (SHA `fe902c0318c3b14913f6c88d21e54d96a55bc56f1f4c78c3a9648922450add1d`). The verifier checks 92 incoming xrefs (58 E8 calls, 34 E9 tail transfers), body bytes, and `0xf09f04` argument provenance. Two indirect calls and PT_LOAD-gap data remain unresolved; two call refs lack Ghidra caller-function records and relationship coverage is partial. The exact report SHA is `fdbedbaaf50acbfcb16ef8e563ecd21fce126d06002d0de70e6007f0d39b37d2`, verifier SHA `3550ae5c97202fd0c8e4ca86b86c60a00b2c7c6f16b4293683da710b22637b21`. No service/ABI or runtime role is inferred. See E52 and [checkpoint](../../docs/checkpoints/2026-10-20-root-cpu01-ctor10-e1ede0-complete.md). Failed analysis hypotheses: 0; two verifier assertions were corrected as tool assumptions. Parent CPU-01 remains ACTIVE and G1 NOT PASSED.
 
 Root updated `docs/TASKS.md`, `docs/EVIDENCE.md`, added both completion checkpoints, and regenerated `docs/FOLDERS.md` (checkpoint directory count 33). Exact `python3 scripts/project_index.py` exited `0` (`4133 folders indexed; written`); `graft check` exited `0` (wiring graph synchronized; deep meaning tier remains 0%, 1,219 nodes pending); `git diff --check` passed. These changes are allowlisted documentation only; local reports, verifiers and game-derived bytes remain private under ignored `local/`.
 
@@ -1626,7 +1626,7 @@ reports program-header index 10 as type `0x6fffff01`, `p_offset=65,211,380`, `p_
 `p_memsz=0`, alignment 16, and `missing_segments=[10]`. The pinned reader's code only rejects
 unavailable headers for four listed types; index 10 is not in that list, which establishes parser
 behavior only, not the ELF type's platform meaning. Claim:
-[RE-02-MISSING-PHDR10-01](docs/checkpoints/2026-10-20-root-re02-missing-phdr10-claim.md).
+[RE-02-MISSING-PHDR10-01](../../docs/checkpoints/2026-10-20-root-re02-missing-phdr10-claim.md).
 `python3 scripts/project_index.py` exited 0 with 4,132 folders indexed; `git diff --check` passed.
 Claim commit `de3fa65` pushed after staged audit accepted 4 paths/full audit 586 paths; pre-commit
 divergence `0 0`; post-push tree clean and `HEAD`/`origin/main` aligned. `/root/phdr10` was dispatched
@@ -1650,7 +1650,7 @@ Apple M4 Pro, 12 CPU cores, 51,539,607,552 bytes RAM (48 GiB); macOS 27.0.1 buil
 macOS SDK 27.0. These values match the prior dated machine baseline and extend it with direct
 architecture/tool-path/SDK observations. No Metal compilation or game/runtime operation was tested.
 The evidence row is E50; the task checkpoint is
-[here](docs/checkpoints/2026-10-20-root-g0-env-baseline-complete.md). G0 remains PARTIAL. Exact
+[here](../../docs/checkpoints/2026-10-20-root-g0-env-baseline-complete.md). G0 remains PARTIAL. Exact
 `python3 scripts/project_index.py` exited 0 and reported 4,132 folders indexed. `graft check` exited
 0: wiring graph in sync; optional deep meaning layer remains 0% (1,219 nodes pending).
 `git diff --check` passed. Publication checkpoint: staged path audit accepted 6 paths; full audit
@@ -1695,7 +1695,7 @@ independently verified the private dossier with
 ELF and unchanged baseline hash, maps the range through PT_LOAD to file offset `0x1d660`, confirms
 the 357 raw function bytes/hash and Ghidra JSON range/call sites, and confirms independent disassembly
 ends at `retq` `0x197c4`. The private REA summary and full exact command are in
-[the task checkpoint](docs/checkpoints/2026-10-20-root-srv01-page-map-claim.md); report SHA-256
+[the task checkpoint](../../docs/checkpoints/2026-10-20-root-srv01-page-map-claim.md); report SHA-256
 `943cdd6b3067192140b4570c37d97962ec1690fce732981173d50264fc1855bc`; Evidence ID
 `ev_be5ca8d1f70434e1b56f9300aba0db39aa895878e4e311c026ed8d9d99a53359`.
 
@@ -1740,7 +1740,7 @@ The PS4 relocation parser finds no relocation covering VMA 0 or that operand add
 slot's `R_X86_64_RELATIVE` relocation identifies only the entry `0xf09e60`. Keep `0xf09efb` unresolved:
 static evidence does not establish external process mappings, constructor execution, or a service
 contract. Failed analysis hypotheses: 0; G1 remains NOT PASSED. Tool issues and exact commands are in
-the [completion checkpoint](docs/checkpoints/2026-10-20-root-cpu01-ctor10-indirect-claim.md).
+the [completion checkpoint](../../docs/checkpoints/2026-10-20-root-cpu01-ctor10-indirect-claim.md).
 
 ### CPU-01-CTOR10-E1EDE0-01 — direct helper at `0xe1ede0` — DISPATCHED
 
@@ -1751,7 +1751,7 @@ bytes, callers/callees, caller argument values, and only byte-supported effects.
 artifacts do not contain a callee body, use a separate `local/re/rea-e1ede0-snapshot.json` and
 private output under `local/re/evidence/rea-e1ede0/`. No service/ABI, runtime, constructor
 reachability, or G1 claim. Full claim:
-[CPU-01-CTOR10-E1EDE0-01](docs/checkpoints/2026-10-20-root-cpu01-ctor10-e1ede0-claim.md).
+[CPU-01-CTOR10-E1EDE0-01](../../docs/checkpoints/2026-10-20-root-cpu01-ctor10-e1ede0-claim.md).
 
 Graft coverage limitation: `graft grep "f09efb" --in native/` found no native indexed occurrences;
 `graft ask` for `reference/ShadowOfTheColossus-PC/` returned exit 1 (`nothing indexed under` that
@@ -1794,8 +1794,8 @@ locators. The exact path sets match; all 290 decoded hashes differ and 285 membe
 Both archive summary identities matched before and after the read. Observation only: this identifies
 per-layer bytes/sizes. No codec, file schema, gameplay use, NGS2 behavior, or playback is established.
 Failed tries: 0. Exact evidence is in E44 and
-[ASSETS](docs/ASSETS.md). The full claim/completion record is:
-[AUD-01-STS-IDENTITY-01](docs/checkpoints/2026-10-19-root-aud01-sts-identity-claim.md).
+[ASSETS](../../docs/ASSETS.md). The full claim/completion record is:
+[AUD-01-STS-IDENTITY-01](../../docs/checkpoints/2026-10-19-root-aud01-sts-identity-claim.md).
 Next exact action: recover the game's own asset/audio reader through the open RE-02/Fios/ULT work;
 do not guess a codec from `.sts_cp3` names or bytes.
 
@@ -1808,8 +1808,8 @@ to perform. These remain bounded follow-ups, not confirmed runtime defects: sand
 policy is undecided, and UI behavior has not been exercised in a built app. No source changes or
 tests/builds were made. VoiceOver, Accessibility Inspector, Finder launch, native window behavior,
 Full Keyboard Access, and process cleanup at app quit remain NOT RUN; G4 remains NOT PASSED.
-Evidence and primary Apple references are in [E45](docs/EVIDENCE.md) and the
-[review checkpoint](docs/checkpoints/2026-10-19-root-app01-ui-review-claim.md).
+Evidence and primary Apple references are in [E45](../../docs/EVIDENCE.md) and the
+[review checkpoint](../../docs/checkpoints/2026-10-19-root-app01-ui-review-claim.md).
 
 ### APP-01-IMPORTER-ERROR-01 — report folder-import failures — BUILD VERIFIED; UI RUN NOT DONE
 
@@ -1819,7 +1819,7 @@ overload, Apple documents that cancellation does not call `onCompletion`; cancel
 silent. Build command `swift build --package-path launcher --scratch-path local/build/launcher`
 passed; log is `local/build/app01-import-error-build.log`. No test suite was added or run; no native
 alert interaction was performed. Sandbox/bookmark and child-process ownership findings from E45
-remain open. Full record: [APP-01-IMPORTER-ERROR-01](docs/checkpoints/2026-10-20-root-app01-import-error-claim.md).
+remain open. Full record: [APP-01-IMPORTER-ERROR-01](../../docs/checkpoints/2026-10-20-root-app01-import-error-claim.md).
 
 ### SRV-01-PAGE-MAP-19660-01 — characterize pinned function at `0x19660` — CLAIMED
 
@@ -1830,7 +1830,7 @@ unchanged, use a distinct snapshot and private evidence under `local/re/evidence
 range/hash/calls/data references, coverage, and raw-byte limits. No game execution, installation,
 native replacement, or publication of game-derived binaries. Next exact action: export and verify
 the static dossier, then stop for root integration. Claim:
-[SRV-01-PAGE-MAP-19660-01](docs/checkpoints/2026-10-20-root-srv01-page-map-claim.md).
+[SRV-01-PAGE-MAP-19660-01](../../docs/checkpoints/2026-10-20-root-srv01-page-map-claim.md).
 
 ### DATA-02 — pakN archive identity
 
@@ -1929,7 +1929,7 @@ Agent `/root/app01_probe` previously identified this behavior; root owns impleme
   `origin main` at 2026-10-19 23:08 CDT. The staged path audit passed 8 paths; the full tracked
   path audit passed 566 paths. No private `local/` outputs were staged.
 - Prior checkpoint with completed archive/audio identity and `0xcdc760` fixture slices is
-  [recorded here](docs/checkpoints/2026-10-19-root-data02-aud01-cpu-cdc760-complete.md), published
+  [recorded here](../../docs/checkpoints/2026-10-19-root-data02-aud01-cpu-cdc760-complete.md), published
   through `f59500e`. Failed implementation tries: 1; the compile failure was corrected within
   the same bounded hypothesis. APP-01 remains ACTIVE; G4 is NOT RUN.
 
@@ -1987,7 +1987,7 @@ semantics. Do not claim a codec, NGS2 contract, gameplay use, or playback.
 
 Integrator `/root` claims a test-only RE-02 slice for `/root/re02_triage`; implementation owns only
 `scripts/test_ps4_dynlink.py`. Existing `scripts/ps4_dynlink.py` remains a read-only dependency.
-Claim record: [RE-02-DYNLINK-01 checkpoint](docs/checkpoints/2026-10-19-root-re02-dynlink-fixture-claim.md).
+Claim record: [RE-02-DYNLINK-01 checkpoint](../../docs/checkpoints/2026-10-19-root-re02-dynlink-fixture-claim.md).
 
 - Graft navigation: `graft skeleton scripts/ps4_dynlink.py` located `parse(elf)` and the `Image`
   API; its source parse result fields were reviewed before defining this test task. The read-only
@@ -2013,7 +2013,7 @@ Claim record: [RE-02-DYNLINK-01 checkpoint](docs/checkpoints/2026-10-19-root-re0
 Integrator `/root` claims a bounded CPU-01 runner correctness slice for `/root/cpu_leaf_survey`.
 Owned files: `native/core/startup_ctors.hpp`, `native/core/startup_ctors.cpp`,
 `native/tests/test_startup_ctors.cpp`, and `tools/lift/check_ctor_slots.py`.
-Claim record: [CPU-01-CTOR-PREFIX-01 checkpoint](docs/checkpoints/2026-10-19-root-cpu01-ctor-prefix-claim.md).
+Claim record: [CPU-01-CTOR-PREFIX-01 checkpoint](../../docs/checkpoints/2026-10-19-root-cpu01-ctor-prefix-claim.md).
 
 - Graft: `graft callers run_constructors --depth all` reported ambiguous duplicate definitions and
   no reliable cross-file callers. Follow-up `graft grep "run_constructors"` found the two
@@ -2111,7 +2111,7 @@ which do not overlap either checked guard field. Before the call, caller zeros `
 the byte at `RSP+0xa8` is still zero when tested, so `je 0xf09f01` skips the indirect call at
 `0xf09efb` on this static path. This does not establish that constructor `0xf09e60` is reachable or
 runs, nor resolve the computed target. Full result and checker evidence are in E46 and
-[the completion checkpoint](docs/checkpoints/2026-10-19-root-cpu01-ctor10-init-helper-claim.md).
+[the completion checkpoint](../../docs/checkpoints/2026-10-19-root-cpu01-ctor10-init-helper-claim.md).
 
 Private REA, snapshot, disassembly and verifier artifacts remain under `local/re/evidence/` and
 `local/re/`; the baseline snapshot hash is unchanged. Root's verifier output matched the worker's
@@ -2181,7 +2181,7 @@ Prerequisite: DATA-01 identities and E25 classify exactly two `.sxd` members wit
 
 ### Parallel dispatch checkpoint — 2026-10-19 23:19 CDT
 
-See [the parallel claims dispatch checkpoint](docs/checkpoints/2026-10-19-root-parallel-claims-dispatched.md).
+See [the parallel claims dispatch checkpoint](../../docs/checkpoints/2026-10-19-root-parallel-claims-dispatched.md).
 Both earlier claims were pushed before assignment; workers own distinct paths and do not edit shared
 docs or commit/push. RE-02-DYNLINK-01 is fixture verified and published in `b2a5b6f`;
 CPU-01-CTOR-PREFIX-01 is fixture verified and pushed in `b26768a`. The metadata claim above is
@@ -2221,8 +2221,8 @@ record was pushed in `205630b`; its 2 staged docs paths passed the staged audit,
 
 Root completed the bounded provenance/manifest correction in `native/core/vec_ce7300.hpp`,
 `native/tests/test_vec_ce7300.cpp`, and `tools/lift/check_fce7300.py`. Claim evidence is preserved
-in [the ce7300 claim checkpoint](docs/checkpoints/2026-10-19-root-ce7300-label-claim.md); build,
-test, checker and Graft results are in [the completion checkpoint](docs/checkpoints/2026-10-19-root-ce7300-label-complete.md).
+in [the ce7300 claim checkpoint](../../docs/checkpoints/2026-10-19-root-ce7300-label-claim.md); build,
+test, checker and Graft results are in [the completion checkpoint](../../docs/checkpoints/2026-10-19-root-ce7300-label-complete.md).
 
 - Live Graft wiring shows `init_vec_ce7300` registered in `startup_ctors.cpp` at survey position
   149. The private constructor survey also identifies RVA `0xce7300` at list position 149, while
@@ -2239,12 +2239,12 @@ test, checker and Graft results are in [the completion checkpoint](docs/checkpoi
 
 ## PRIOR CHECKPOINT — 2026-10-19 22:39 CDT, /root — CPU-01d `0xce7300` metadata correction — ACTIVE CLAIM
 
-The initial claim and read-only evidence are recorded in [the ce7300 claim checkpoint](docs/checkpoints/2026-10-19-root-ce7300-label-claim.md).
+The initial claim and read-only evidence are recorded in [the ce7300 claim checkpoint](../../docs/checkpoints/2026-10-19-root-ce7300-label-claim.md).
 
 ## PRIOR CHECKPOINT — 2026-10-19 22:37 CDT, /root — SRV-01 + CPU-01d fixture batch — FIXTURE_VERIFIED
 
 Root reviewed and integrated three isolated, fixture-only slices. The complete command/evidence
-record is in [the native fixture batch checkpoint](docs/checkpoints/2026-10-19-root-native-fixture-batch.md).
+record is in [the native fixture batch checkpoint](../../docs/checkpoints/2026-10-19-root-native-fixture-batch.md).
 
 - SRV-01 `FUN_00019e00`, block `0x1a123–0x1a15a`: raw-offset helper, exact and short span checks,
   sanitizer CMake target, and E28 byte/instruction checker pass. One earlier failed function-target
@@ -3364,11 +3364,11 @@ Checkpoint (2026-10-19 21:45 CDT, bc-81763e53):
 
 ## PRIOR CHECKPOINT — 2026-10-19 22:28 CDT, /root — SRV-01 arena accounting — ACTIVE
 
-The 22:28 claim and repo-state record are archived in [the SRV-01 checkpoint](docs/checkpoints/2026-10-19-root-srv01-accounting.md).
+The 22:28 claim and repo-state record are archived in [the SRV-01 checkpoint](../../docs/checkpoints/2026-10-19-root-srv01-accounting.md).
 
 ## PRIOR CHECKPOINT — 2026-10-19 21:23 CDT, root — SRV-01 arena accounting — ACTIVE
 
-Claim and bounded plan: [SRV-01 arena-accounting checkpoint](docs/checkpoints/2026-10-19-root-srv01-accounting.md).
+Claim and bounded plan: [SRV-01 arena-accounting checkpoint](../../docs/checkpoints/2026-10-19-root-srv01-accounting.md).
 Ghidra confirmed that `FUN_00019e00` contains `0x1a123–0x1a15a`: qword add/store at `+0x80`,
 unsigned greater-than update at `+0x88`, and mode-2 subtract at `+0x90`. The earlier `0x19ae0`
 wrapper query remains failed try 1; target confirmation is try 2. No native code exists yet. Next
@@ -3377,7 +3377,7 @@ allocator survey worker; root will integrate CMake and docs after review.
 
 ## STOPPED CLAIM — 2026-10-19 21:12 CDT, root — CPU-01d leaf 95 — NEEDS_PRINCIPAL
 
-Three-try escalation: [CPU-01d leaf 95](docs/escalations/CPU-01d-d71f60.md); [checkpoint](docs/checkpoints/2026-10-19-root-cpu01d-d71f60.md).
+Three-try escalation: [CPU-01d leaf 95](../../docs/escalations/CPU-01d-d71f60.md); [checkpoint](../../docs/checkpoints/2026-10-19-root-cpu01d-d71f60.md).
 Ghidra 12.1.4 analysis/import succeeded for the exact ELF, but the target script returned
 `function_found=false` at `0xd71f60`. No function body or native fixture was recovered. No fourth
 try without a written principal reassessment.
@@ -3407,7 +3407,7 @@ imported Ghidra program. No native source was edited. `startup_ctors.*` remains 
 
 ## CURRENT CHECKPOINT — 2026-10-19 20:59 CDT, root — CPU-02 dispatcher behavior coverage — COMPLETE
 
-Claim and complete record: [checkpoint](docs/checkpoints/2026-10-19-root-cpu02-dispatch-claim.md).
+Claim and complete record: [checkpoint](../../docs/checkpoints/2026-10-19-root-cpu02-dispatch-claim.md).
 Claim checkpoint pushed as `2d237c2` and claim-publication note `5723b07` to `origin/main`.
 Completion checkpoint `d5f6ff9` is pushed to `origin/main`.
 Task slice: all 13 observed `0x66dec0` dispatch types now have byte-matched behavior coverage;
@@ -4276,7 +4276,7 @@ Checkpoint: ctest includes `vec_b743c0` Passed; `python3 -I tools/lift/check_fb7
 - Before push: `git status` + `python3 -I scripts/audit_publish_paths.py` (staged) and `--all`.
 - **Never commit:** `Shadow of the Colossus/`, `local/` (incl. game dumps / `eboot.elf`),
   `reference/`, `logs/`, PKG/PSARC/eboot/SELF/ELF/sprx, secrets, AgentStores. See `.gitignore`
-  and [AGENTS.md](AGENTS.md) / [ROADMAP.md](ROADMAP.md).
+  and [AGENTS.md](../../AGENTS.md) / [ROADMAP.md](../../ROADMAP.md).
 - Users must supply their own legally obtained game files; none ship in the repo.
 
 ## ACTIVE CLAIM — 2026-10-19 19:55 CDT, worker bc-71956f82 (publish-boundary assist) — COMPLETE
@@ -4601,11 +4601,11 @@ Checkpoint 9 (2026-10-19, claude-sonnet-5-5) — heap window cell writers traced
 
 ## Mandatory first read
 
-Read [AGENTS](AGENTS.md), [ROADMAP](ROADMAP.md), [INDEX](docs/INDEX.md),
-[TASKS](docs/TASKS.md), [EVIDENCE](docs/EVIDENCE.md), then your task specification.
+Read [AGENTS](../../AGENTS.md), [ROADMAP](../../ROADMAP.md), [INDEX](../../docs/INDEX.md),
+[TASKS](../../docs/TASKS.md), [EVIDENCE](../../docs/EVIDENCE.md), then your task specification.
 Update this HANDOFF at EVERY checkpoint, failed experiment, context handoff and turn end.
 After three failed distinct tries across agents, mark NEEDS_PRINCIPAL and stop that task.
-Use the [checkpoint](docs/checkpoints/TEMPLATE.md) and [escalation](docs/escalations/TEMPLATE.md) templates.
+Use the [checkpoint](../../docs/checkpoints/TEMPLATE.md) and [escalation](../../docs/escalations/TEMPLATE.md) templates.
 
 ## Settled user requirements
 
@@ -4701,7 +4701,7 @@ explicitly without dropping existing scopes, rebuild and verify queryability. A 
 does not reveal an excluded new directory.
 Preserve private Evidence and original hashes when switching agents; a snapshot is not a Ghidra project.
 
-Earlier checkpoint chronology: [planning archive](docs/checkpoints/2026-10-19-roadmap-session.md).
+Earlier checkpoint chronology: [planning archive](../../docs/checkpoints/2026-10-19-roadmap-session.md).
 
 ## Final checkpoint — 2026-10-19 00:51 CDT, principal
 

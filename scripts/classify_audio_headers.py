@@ -44,8 +44,17 @@ def ascii_preview(data: bytes, n: int = 16) -> str:
     return ''.join(chr(b) if 32 <= b < 127 else '.' for b in data[:n])
 
 
-def family_of(head: bytes) -> str:
+def family_of(head: bytes | bytearray | memoryview) -> str:
     """Label by observed prefix only. Labels are OBS, not codec IDs."""
+    # Prefix matching is anchored at offset 0 and never scans, so the input must
+    # already be bytes-like. Reject anything else before the falsy test: without
+    # this guard ``None`` and ``''`` fell into the '' -> 'empty' label and other
+    # non-bytes leaked AttributeError from ``.startswith``.
+    if isinstance(head, memoryview):
+        head = head.tobytes()
+    elif not isinstance(head, (bytes, bytearray)):
+        raise TypeError(
+            f'family_of expects bytes-like input, got {type(head).__name__}')
     if not head:
         return 'empty'
     if head.startswith(b'\xfb\xad\x98\x97'):

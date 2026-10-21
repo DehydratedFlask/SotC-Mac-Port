@@ -81,6 +81,14 @@ assert [(rva, index) for rva, index, _, _ in rows if rva in (0xd32720, 0xd2ffe0)
     (0xd2ffe0, 120),
 ], "registered indices for 0xd32720 and 0xd2ffe0 must be 119 and 120"
 
+# Gaps that were previously documented as "lifted but not registered" must stay registered: the
+# native sources exist and are byte-verified by their own checkers, so a regression here means the
+# runner silently skipped a recovered constructor.
+for rva, index in ((0xe094e0, 50), (0xdbfa60, 70), (0xd85490, 82), (0xce8440, 147)):
+    assert (rva, index) in [(r[0], r[1]) for r in rows], (
+        f'lifted constructor {rva:#x} (index {index}) is no longer registered')
+
+
 print(
     f"OK: ELF sha256={elf_digest}; constructor table start={TABLE_START:#x} "
     f"count={TABLE_COUNT} sha256={table_digest}; verified {len(rows)} registered RVA/index pairs; "
