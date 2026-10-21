@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 00:45 CDT (America/Chicago). Integrator: orchestrator session
+Updated: 2026-10-21 02:00 CDT (America/Chicago). Integrator: orchestrator session
 (`deepseek-v4.1-flash-1017`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -22,11 +22,14 @@ Read [INDEX](docs/INDEX.md), [ROADMAP](ROADMAP.md), [TASKS](docs/TASKS.md), [EVI
   [32](docs/checkpoints/2026-10-21-root-native-batch-32.md),
   [33 (analysis-only)](docs/checkpoints/2026-10-21-root-native-batch-33.md),
   [SAV chunk header](docs/checkpoints/2026-10-21-root-native-batch-sav01-chunk-header-01.md),
-  [SAV checksum edges](docs/checkpoints/2026-10-21-root-native-batch-sav01-checksum-edge-01.md)
+  [SAV checksum edges](docs/checkpoints/2026-10-21-root-native-batch-sav01-checksum-edge-01.md),
+  [slot 21 constant table](docs/checkpoints/2026-10-21-root-cpu01-ctor21-const-table.md),
+  [static-cleanup thunks](docs/checkpoints/2026-10-21-root-cpu01-static-cleanup-thunks.md),
+  [family native helper](docs/checkpoints/2026-10-21-root-cpu01-family-native-helper.md)
 
 ## Current verified state
 
-- Native tests: **263/263 pass** (`cmake --build local/build/native -j 8 && ctest --test-dir
+- Native tests: **265/265 pass** (`cmake --build local/build/native -j 8 && ctest --test-dir
   local/build/native --output-on-failure`), ASan+UBSan on, Mach-O arm64.
 - Constructor-table checker: `python3 -I tools/lift/check_ctor_slots.py` verifies **108**
   RVA/index pairs; slots 0–10 are recovered; slot 11 is the explicit blocker. Lifted-but-unregistered
@@ -40,7 +43,7 @@ Read [INDEX](docs/INDEX.md), [ROADMAP](ROADMAP.md), [TASKS](docs/TASKS.md), [EVI
 - RE-01-PERSISTENT-01: the saved Ghidra baseline still reopens read-only `-noanalysis`
   (38,845 functions, 9 blocks). See `local/checkpoints/root-20261020-reopen-baseline.txt`.
 
-## What changed in this session (28 bounded tasks)
+## What changed in this session (31 bounded tasks)
 
 Constructor structure (all offline, all replayed by a verifier):
 - **`docs/CTOR_CLASSES.md`** classifies all 573 table entries by reachable body: 227
@@ -61,6 +64,22 @@ Constructor structure (all offline, all replayed by a verifier):
 - Batch 33 (`0xe71990`, `0xdf94c0`, `0xde0160`) is analysis-only on purpose: `0xe71990` needs the
   unknown name-hash function and original strings; `0xdf94c0` and `0xde0160` call `_FSin`/`memset`
   and a `ret`-stub `__cxa_atexit` cleanup.
+- Slot 21 (`0xee1130`) is lifted as a byte-exact 128-byte constant table (15 stores into
+  `0x33540f0..0x3354170`; the checker models four register/vector reloads). Cell meanings are
+  unknown, so the table stays untyped.
+- **15 further entries (515, 522, 523, 525, 527, 528, 531, 533, 542, 546, 547, 549, 551, 564, 565)
+  are 33-byte static-destructor registration thunks**: zero one `.bss` cell, then tail-call
+  `__cxa_atexit(cell, destructor, 0x1604218)`. Verified as a family; not lifted because the
+  destructors are unresolved (`0x1bdae0` alone calls `0x1bede0` and tail-jumps `0x170b0`).
+- `DescriptorRegistration` is the tested native lifetime model for the 34-slot family (one-shot
+  publish, owned recursive+PI mutex, explicit errors) — deliberately not the original heap block or
+  atexit ordering, and not registered.
+
+Coverage statement: **every constructor-table index 0–149 now has a native lift or a documented
+dossier**, and slots 21/515/522/523/525/527/528/531/533/542/546/547/549/551/564/565 are covered by
+the two families above. Outside that prefix, 54 call-free `other` bodies remain unlifted (several
+are the same 16-byte copy or YMM-store idioms already lifted in batches 32/33) plus the ~240 `other`
+bodies that contain calls.
 
 Services/parsers:
 - New native `core/save_chunk_header.{hpp,cpp}` models the 12-byte tagged-chunk header with exact
