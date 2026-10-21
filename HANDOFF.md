@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 17:20 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 17:22 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -30,6 +30,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   publication-record sync `8bea84495265e2f1d504221f2831c9a2527659fd` (`docs: record Round 74 claim
   publication`) are pushed to `origin/main`; fetch verification is captured in the
   [Round74 claim checkpoint](docs/checkpoints/2026-10-21-root-round74-fixture-claims.md).
+- Completion commit `9c0d96c9a23fd3b452f678ed0e47f85666586606` (`test: cover Round 74 fixture gaps`)
+  is pushed and fetch-verified at `origin/main`; `HEAD == origin/main`, divergence `0 0`. Push and
+  post-push evidence is recorded in the [Round74 completion checkpoint](docs/checkpoints/2026-10-21-root-round74-fixtures-complete.md).
+- Next exact action: use workers to scout the next independent bounded tasks from `docs/TASKS.md`
+  and the live Trail graph, verify no duplicate task, claim in HANDOFF/TASKS/checkpoint, then assign
+  file-isolated work.
 
 ## Round 73 fixtures verified (/root)
 
