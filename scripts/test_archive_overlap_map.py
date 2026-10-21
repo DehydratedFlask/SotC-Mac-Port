@@ -153,6 +153,17 @@ class CompareMemberMapsTests(unittest.TestCase):
         self.assertEqual(pair["different_declared_size_count"], 1)
         self.assertEqual(pair["shared_paths"][0]["declared_size_relation"], "different")
 
+    def test_rejects_invalid_sizes_on_unshared_paths(self) -> None:
+        for path, invalid_size in (("negative.bin", -1), ("boolean.bin", True)):
+            with self.subTest(path=path, invalid_size=invalid_size):
+                with self.assertRaisesRegex(
+                    ValueError, "member maps must contain non-negative integer sizes"
+                ):
+                    compare_member_maps(
+                        ("a", "b"),
+                        {"a": {path: invalid_size}, "b": {"other.bin": 1}},
+                    )
+
     def test_reports_all_unordered_pairs_in_input_order(self) -> None:
         pairs = compare_member_maps(
             ("a", "b", "c"), {"a": {}, "b": {}, "c": {}}
