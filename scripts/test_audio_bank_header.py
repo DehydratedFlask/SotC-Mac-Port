@@ -287,6 +287,51 @@ class InspectMembersTests(unittest.TestCase):
         self.assertEqual(fixture['reader'].read_calls, [1])
         self.assertTrue(fixture['reader'].closed)
 
+    def test_inspect_members_rejects_zero_exact_path_matches_and_closes_reader(self):
+        fixture = self._fixture()
+        reader = fixture['reader']
+        with patch.object(reader, 'paths', return_value=[]), \
+                patch.object(abh, 'Psarc', return_value=reader) as psarc:
+            with self.assertRaises(abh.AudioBankFormatError) as ctx:
+                abh.inspect_members(
+                    fixture['archive_path'],
+                    [fixture['member_path']],
+                    fixture['manifest_path'],
+                    fixture['summary_path'],
+                )
+
+        psarc.assert_called_once_with(fixture['archive_path'].resolve())
+        self.assertEqual(
+            str(ctx.exception),
+            "expected one exact PSARC path for 'sound/fixture.hd', found 0",
+        )
+        self.assertEqual(reader.read_calls, [])
+        self.assertTrue(reader.closed)
+
+    def test_inspect_members_rejects_duplicate_exact_path_matches_and_closes_reader(self):
+        fixture = self._fixture()
+        reader = fixture['reader']
+        with patch.object(
+                reader,
+                'paths',
+                return_value=[fixture['member_path'], fixture['member_path']]), \
+                patch.object(abh, 'Psarc', return_value=reader) as psarc:
+            with self.assertRaises(abh.AudioBankFormatError) as ctx:
+                abh.inspect_members(
+                    fixture['archive_path'],
+                    [fixture['member_path']],
+                    fixture['manifest_path'],
+                    fixture['summary_path'],
+                )
+
+        psarc.assert_called_once_with(fixture['archive_path'].resolve())
+        self.assertEqual(
+            str(ctx.exception),
+            "expected one exact PSARC path for 'sound/fixture.hd', found 2",
+        )
+        self.assertEqual(reader.read_calls, [])
+        self.assertTrue(reader.closed)
+
 
 if __name__ == '__main__':
     unittest.main()

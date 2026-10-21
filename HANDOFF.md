@@ -10,12 +10,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 
 ## Session addendum 2026-10-21 round 11 (`/root`)
 
-- Claimed three independent, synthetic test-only tasks: `DATA-02-OVERLAP-MAP-JSON-CONSTANTS-01`
+- Completed three independent, synthetic test-only tasks: `DATA-02-OVERLAP-MAP-JSON-CONSTANTS-01`
   (worker `launcher_review`, `scripts/test_archive_overlap_map.py` only),
   `AUD-01-XFF-EXACT-PATH-CARDINALITY-01` (worker `slot23_raw_xrefs`,
   `scripts/test_audio_bank_header.py` only), and `DOC-FOLDER-INDEX-SYMLINK-01`
-  (worker `review_host_proto`, `scripts/test_project_tools.py` only). All are ACTIVE with zero
-  failed implementation tries; root owns this handoff and the project/task records.
+  (worker `review_host_proto`, `scripts/test_project_tools.py` only). All are FIXTURE_VERIFIED with
+  zero failed tries; root owns this handoff and the project/task records.
 - Their prerequisites are complete: the archive-overlap map artifact is verified; XFF identity
   verification is fixture-verified; and the folder-index admin-directory fixture is fixture-verified.
   No production parser/index code or game data is in scope.
@@ -25,8 +25,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Acceptance commands: `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_archive_overlap_map.py`,
   `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_bank_header.py`, and
   `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py`, respectively. Workers must
-  save logs in private `local/validation/` paths and report exact results to root for independent
-  replay and publication.
+  save logs in private `local/validation/` paths; root independently replayed them. Worker/root
+  results are 19/19, 18/18, and 7/7; E134-E136 and three completion checkpoints record hashes,
+  logs, observations, and synthetic-only limits.
 - Claim-time repository state: `main`, HEAD equals `origin/main` at `667a88c`; only the previously
   escalated `native/api/CMakeLists.txt` and untracked `native/api/host/` are dirty. Those paths stay
   outside all three tasks and all commits. No game gate advances from these fixtures.
@@ -37,9 +38,16 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `python3 scripts/project_index.py --check` runs reported stale `local/indexes/folders.json`;
   the index was regenerated after all log paths existed, and the final check passes with 14,214
   folders. This affects only the private index; `docs/FOLDERS.md` remains current.
-- Immediate next action: dispatch the three file-disjoint workers. Root
-  will replay each acceptance command, record completion checkpoints/Evidence entries, update the
-  task rows and handoff, and publish only allowlisted paths.
+- Source-graph checkpoint: `trail build` exited 0 and parsed the changed source; `trail build --check`
+  exited 0 with wiring graph in sync (3,527 nodes / 4,739 edges). The deep meaning layer remains
+  unbuilt (0% complete); see private logs in `local/checkpoints/root-round11-claims/`.
+- Final folder-index checkpoint: `python3 scripts/project_index.py` and
+  `python3 scripts/project_index.py --check` both exited 0 with 14,217 folders; generated
+  `docs/FOLDERS.md` includes the three completion records, and the private recursive index is current.
+  Logs: `local/checkpoints/root-round11-claims/{index-final.log,index-final-check.log}`.
+- Immediate next action: continue with another bounded unclaimed task from the read-only scout, if
+  available. Preserve the slot-23/Ghidra blocker, three-try host escalation, and all game/runtime
+  acceptance gates.
 
 ## Session addendum 2026-10-21 round 10 (`/root`)
 
