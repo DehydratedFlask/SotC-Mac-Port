@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 09:29 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 09:31 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -70,6 +70,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Next exact action: claim `DATA-02-ARCHIVE-OVERLAP-TOC-DIGEST-01` for a separate aggregate of
   TOC-value equality across exact-path overlaps in the seven existing manifests, then independently
   replay it from root. Preserve only aggregate counts; no payload or digest-semantics claim.
+- Claimed `DATA-02-ARCHIVE-OVERLAP-TOC-DIGEST-01`, status ACTIVE, attempt 0: compare the opaque
+  TOC field values only across exact-path overlap occurrences in the seven private manifests.
+  Acceptance requires root replay, unchanged manifest hashes, and an overlap total consistent with
+  E77; the field's digest meaning and all loader/overlay behavior remain UNKNOWN. See the
+  [claim checkpoint](docs/checkpoints/2026-10-21-root-data02-overlap-toc-digest-claim.md).
 - After reconfigure, `test_registration_thunks_ahead` built and its focused CTest passed 1/1.
   The host library and child executable build. The first host target build failed at line 508
   because `WIFEXITED` received temporary `reap(unused)`; storing status in a local made the target
