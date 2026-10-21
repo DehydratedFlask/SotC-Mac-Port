@@ -251,6 +251,11 @@ struct StartupState {
     // an atexit cleanup). See registration_thunks.hpp for what is and is not modelled.
     std::array<DescriptorRegistration, kRegistrationThunkCount> thunk_registrations{};
 
+    // Slots 24-47 REGISTERED-AHEAD (CPU-01-NATIVE-SLOT24-47-01): entry [i] is constructor-table index
+    // 24 + i. Only registered_ahead_constructors() / init_registration_thunk_ahead() touch this array;
+    // the production runner stops at slot 23 first, so in a production run every entry stays unpublished.
+    std::array<DescriptorRegistration, kAheadRegistrationCount> ahead_registrations{};
+
     // Slot 21 / RVA 0x00ee1130: byte-exact 128-byte constant table (cell meanings unknown).
     ConstTableEe1130 const_table_ee1130{};
 };
@@ -272,5 +277,18 @@ CtorRunResult run_constructors(std::span<const CtorSlot> in_order, StartupState&
 
 // Recovered subset in original index order. The first unresolved original slot is explicit with a null callback.
 std::span<const CtorSlot> recovered_constructors() noexcept;
+
+// REGISTERED-AHEAD table: constructor-table indices 24..47 (the remaining 24 members of the 34-slot
+// descriptor + mutex + atexit family), all with real registration callbacks, in original order.
+//
+// TEST / CHECKER USE ONLY. Slot 23 (0xe71990) is an explicit unresolved blocker in
+// recovered_constructors() because it needs the original name strings (open principal decision); the
+// production startup path must keep using recovered_constructors() and therefore keeps stopping at 23.
+// Running this table directly exercises 24..47 WITHOUT passing through 23, which is exactly why it is
+// kept out of the production table: it proves the registrations are implemented, not that startup works.
+// The focused test checks that recovered_constructors() contains no 24-47 row and that its runner
+// stops at slot 23. tools/lift/check_ctor_slots.py enforces the production-list boundary; it is not a
+// repo-wide source-reference scanner.
+std::span<const CtorSlot> registered_ahead_constructors() noexcept;
 
 }  // namespace sotc
