@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 16:22 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 16:23 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -27,11 +27,19 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   pure launcher presentation-model value only. They do not establish ELF loading, game startup,
   runtime UI behavior, actual game audio, save/reload, or Metal rendering. G0 remains PARTIAL;
   G1–G6 remain NOT RUN. No install or dependency facts changed.
+- The folder index check passes at 14,465 folders. Trail wiring graph is current at 3,570 nodes,
+  4,832 edges, and 943 cards; `trail build --check` passes. Its optional meaning layer remains
+  unbuilt.
 - Claim commit `099136c56e4de5101b97112d634b5d86864c7425` and claim documentation sync
-  `bf96db6ebbaa897b9916f7b4bd5ebd4d57d634ed` are pushed to `origin/main`. Completion publication
-  state will be appended after the completion commit.
+  `bf96db6ebbaa897b9916f7b4bd5ebd4d57d634ed` are pushed to `origin/main`. Completion commit
+  `5a2e8341d9432639609c18f639f49cb1d1155106` (`fix: handle directory index outputs and add Round70
+  fixtures`) is pushed. After `git fetch origin`, `HEAD == origin/main` and divergence is `0 0`;
+  state log SHA-256 `ab55f80110225d059f77f72e00d59d066a799f1cc7516c25a2945d2c6fbe6f28` is in the
+  completion checkpoint.
 - Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched
   and excluded.
+- Those native/API edits are the only remaining worktree changes and are excluded from the Round70
+  completion commit.
 - Exact next action: use read-only scouts and the live task register to identify independent
   Round71 candidates; verify their contracts before publishing bounded claims.
 
