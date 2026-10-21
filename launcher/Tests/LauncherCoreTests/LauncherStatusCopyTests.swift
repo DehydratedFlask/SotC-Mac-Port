@@ -39,6 +39,7 @@ struct LauncherStatusCopyTests {
     @Test func cleanExitIsNotDescribedAsAFailureAndHasNoHint() {
         let copy = LauncherStatusCopy.for(LauncherProcessOutcome.cleanExit)
 
+        #expect(copy.status == "Game core exited normally (status 0).")
         #expect(copy.recoveryHint == nil)
         #expect(!copy.status.lowercased().contains("unexpected"))
         #expect(!copy.status.lowercased().contains("crash"))

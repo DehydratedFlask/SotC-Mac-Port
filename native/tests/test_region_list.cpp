@@ -46,6 +46,28 @@ int main() {
         CHECK(free_count == 2);
     }
 
+    // Unlink head of A-B-C: new head has no predecessor.
+    {
+        RegionNode a{}, b{}, c{};
+        wire_chain(a, b, c);
+        std::uint32_t free_count = 3;
+        list_unlink(a, &free_count);
+        CHECK(region_links(b)->prev == nullptr);
+        CHECK(region_links(a)->next == region_links(a));
+        CHECK(free_count == 2);
+    }
+
+    // Unlink tail of A-B-C: new tail has no successor.
+    {
+        RegionNode a{}, b{}, c{};
+        wire_chain(a, b, c);
+        std::uint32_t free_count = 3;
+        list_unlink(c, &free_count);
+        CHECK(region_links(b)->next == nullptr);
+        CHECK(region_links(c)->next == region_links(c));
+        CHECK(free_count == 2);
+    }
+
     // Insert neu before successor (OBS 0x1a913..0x1a92f) + inc free_count (0x1a933).
     {
         RegionNode succ{}, neu{};
