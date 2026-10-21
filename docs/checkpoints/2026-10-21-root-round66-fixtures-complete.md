@@ -19,6 +19,16 @@
 - Post-push `HEAD == origin/main == ed97b75ab47b656abf3e42861e341c2486a3409a`. The only remaining
   worktree changes are the pre-existing user-owned `native/api/CMakeLists.txt` modification and
   untracked `native/api/host/`; both remain untouched and unpublished.
+- The docs-only follow-up `git commit -m "docs: record Round66 fixture publication"` exited 0 and
+  created `6184e32941ef791366f9162f79c76cc96bee8a00`. Fetch log
+  `local/validation/root-round66-scout/fetch-final-docs.log` SHA-256
+  `58e4bb2ebd9bd713bf3332d4cad1251aeb0b51fb26a8b06f30b3aaa431df79b3`; commit log
+  `.../commit-publication.log` SHA-256
+  `af9dab2e4b0889e0b4ccaabf9a077edb9917d823a544a9792e61d2609ed6b3d7`.
+- `git push origin main` exited 0; push log `.../push-publication.log` SHA-256
+  `99f1e56d784ff9df03564daef6943a8f7b8b65c5469fb4cce68e92141236cd5f`. After this push,
+  `HEAD == origin/main == 6184e32941ef791366f9162f79c76cc96bee8a00`; only the user-owned `native/api`
+  paths remain outside the index.
 - Before publishing this post-push handoff record, `git diff --cached --check` and `git diff
   --check` passed; the staged audit passed for 3 documentation paths and the full audit passed for
   1,637 paths. Logs: `local/validation/root-round66-scout/audit-staged.log` SHA-256
