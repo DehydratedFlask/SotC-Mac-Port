@@ -17,9 +17,14 @@ import psarc
 BS = 16
 
 
-def build(members, comp='zlib', manifest_sep=b'\0', tamper=None):
-    """members: list of (path, bytes). Block size 16 -> 1-byte block table widths."""
-    names = manifest_sep.join(p.encode() for p, _ in members)
+def build(members, comp='zlib', manifest_sep=b'\0', tamper=None, manifest_paths=None):
+    """members: list of (path, bytes). Block size 16 -> 1-byte block table widths.
+
+    manifest_paths overrides the manifest text only (payload list stays `members`), so a
+    structurally valid archive can declare a manifest path count that differs from count - 1.
+    """
+    manifest_names = [p for p, _ in members] if manifest_paths is None else list(manifest_paths)
+    names = manifest_sep.join(p.encode() for p in manifest_names)
     payloads = [names] + [d for _, d in members]
     blocks, body, entries = [], b'', []
     for data in payloads:
@@ -54,6 +59,13 @@ class Tests(unittest.TestCase):
         a = psarc.Psarc(p)
         self.addCleanup(a.close)
         return a
+
+    def write_jsonl(self, lines):
+        d = tempfile.TemporaryDirectory()
+        self.addCleanup(d.cleanup)
+        p = Path(d.name) / 'members.jsonl'
+        p.write_text('\n'.join(lines) + '\n')
+        return p
 
     def test_roundtrip_compressible_and_incompressible(self):
         files = [('a/x.bin', b'A' * 100), ('b/y.bin', bytes(range(40))), ('z', b'')]
@@ -101,6 +113,83 @@ class Tests(unittest.TestCase):
         with self.assertRaises(psarc.PsarcError) as error:
             self.open(bytes(data)).paths()
         self.assertEqual(str(error.exception), 'archive has no manifest entry')
+
+    def test_rejects_entry_offset_beyond_archive(self):
+        data = bytearray(build([('a', b'1'), ('b', b'2')]))
+        self.assertEqual(self.open(bytes(data)).paths(), ['a', 'b'])   # baseline is valid
+        # Entry 1 starts at 32 + 30 and its 5-byte offset field is at +25.
+        data[32 + 30 + 25:32 + 30 + 30] = (len(data) + 1).to_bytes(5, 'big')
+
+        with self.assertRaises(psarc.PsarcError) as error:
+            self.open(bytes(data))
+        self.assertEqual(str(error.exception), 'entry 1 offset beyond archive')
+
+    def test_rejects_manifest_path_count_mismatch(self):
+        cases = (
+            ('one-too-many', ['a', 'b'], [('a', b'1')], 'manifest has 2 paths for 1 members'),
+            ('one-too-few', ['a'], [('a', b'1'), ('b', b'2')], 'manifest has 1 paths for 2 members'),
+        )
+        for label, manifest_paths, members, message in cases:
+            with self.subTest(case=label):
+                a = self.open(build(members, manifest_paths=manifest_paths))
+                with self.assertRaises(psarc.PsarcError) as error:
+                    a.paths()
+                self.assertEqual(str(error.exception), message)
+
+    def test_be_bounds(self):
+        self.assertEqual(psarc.be(b'\x01\x02', 0, 2), 0x0102)
+        self.assertEqual(psarc.be(b'\x01\x02', 1, 1), 0x02)          # ends exactly at len
+        self.assertEqual(psarc.be(b'\x01\x02', 2, 0), 0)             # n == 0 at the end
+        self.assertEqual(psarc.be(b'', 0, 0), 0)
+        with self.assertRaises(psarc.PsarcError) as error:
+            psarc.be(b'\x01\x02', 1, 2)                              # one byte past the end
+        self.assertEqual(str(error.exception), 'out of bounds: 0x1+2')
+        with self.assertRaises(psarc.PsarcError) as error:
+            psarc.be(b'\x01\x02', -1, 1)                             # negative position
+        self.assertEqual(str(error.exception), 'out of bounds: -0x1+1')
+        with self.assertRaises(psarc.PsarcError) as error:
+            psarc.be(b'\x01\x02', 3, 0)                              # zero length past the end
+        self.assertEqual(str(error.exception), 'out of bounds: 0x3+0')
+
+    def test_read_limit_parameter(self):
+        stored_payload = bytes(range(16))                # zlib expands it -> stored raw block
+        compressed_payload = b'A' * 48                   # zlib shrinks it -> compressed blocks
+        stored = self.open(build([('s', stored_payload)]))
+        compressed = self.open(build([('c', compressed_payload)]))
+        self.assertEqual(stored.blocks[stored.entries[1]['block']], 0)
+        self.assertNotEqual(compressed.blocks[compressed.entries[1]['block']], 0)
+
+        for a, full in ((stored, stored_payload), (compressed, compressed_payload)):
+            with self.subTest(kind='stored' if a is stored else 'compressed'):
+                self.assertEqual(a.read(1, 0), b'')                      # limit 0
+                self.assertEqual(a.read(1, 5), full[:5])                 # partial
+                self.assertEqual(a.read(1, len(full)), full)             # limit == size
+                self.assertEqual(a.read(1, len(full) + 99), full)        # clamped to size
+                self.assertEqual(a.read(1, len(full)), a.read(1))        # equals full read
+        self.assertEqual(compressed.read(1, 20), b'A' * 20)              # crosses a block
+
+    def test_overlay_requires_a_layer(self):
+        with self.assertRaises(psarc.PsarcError) as error:
+            psarc.build_overlay([])
+        self.assertEqual(str(error.exception), 'overlay requires at least one layer')
+
+    def test_load_members_jsonl_rejects_duplicate_exact_path(self):
+        p = self.write_jsonl([json.dumps(dict(id=1, path='same', md5='1', size=1)),
+                              json.dumps(dict(id=2, path='same', md5='2', size=2))])
+        with self.assertRaises(psarc.PsarcError) as error:
+            psarc.load_members_jsonl(p)
+        self.assertEqual(str(error.exception), f'duplicate exact path in {p}: \'same\'')
+
+    def test_overlay_single_layer_stats_and_resolve(self):
+        ov = psarc.build_overlay([('base', {'only/one': dict(path='only/one', md5='1', size=1)})])
+        self.assertEqual(ov['members'], 1)
+        self.assertEqual(ov['added'], 1)
+        self.assertEqual(ov['overrides'], 0)
+        self.assertEqual(dict(ov['sources']), {'base': 1})
+        self.assertEqual(psarc.resolve_path(ov, 'only/one'),
+                         dict(path='only/one', md5='1', size=1, source_layer='base'))
+        self.assertIsNone(psarc.resolve_path(ov, 'ONLY/one'))
+        self.assertIsNone(psarc.resolve_path(ov, 'only/on'))
 
     def test_truncated_archive_rejected(self):
         with self.assertRaises(psarc.PsarcError):
@@ -227,6 +316,28 @@ class Tests(unittest.TestCase):
             psarc.archive_basename_key('cachedfiles.psarc'))
         self.assertEqual(psarc.ARCHIVE_BASENAME_MATCH, 'exact')
         self.assertEqual(psarc.CACHEDFILES_MOUNT_ORDER, ('base', 'patch'))
+
+    def test_load_members_jsonl_rejects_non_object_record(self):
+        for text, kind in (('[]', 'list'), ('"x"', 'str'), ('5', 'int')):
+            with self.subTest(value=text):
+                p = self.write_jsonl([json.dumps(dict(id=1, path='ok', md5='1', size=1)), text])
+                with self.assertRaises(psarc.PsarcError) as error:
+                    psarc.load_members_jsonl(p)
+                self.assertEqual(str(error.exception),
+                                 f'{p}:2: member record must be a JSON object, got {kind}')
+
+    def test_load_members_jsonl_rejects_record_without_path(self):
+        p = self.write_jsonl([json.dumps(dict(id=1, md5='1', size=1))])
+        with self.assertRaises(psarc.PsarcError) as error:
+            psarc.load_members_jsonl(p)
+        self.assertEqual(str(error.exception), f'{p}:1: member record has no "path"')
+
+    def test_load_members_jsonl_rejects_non_string_path(self):
+        p = self.write_jsonl([json.dumps(dict(id=1, path='ok', md5='1', size=1)),
+                              json.dumps(dict(id=2, path=5, md5='2', size=2))])
+        with self.assertRaises(psarc.PsarcError) as error:
+            psarc.load_members_jsonl(p)
+        self.assertEqual(str(error.exception), f'{p}:2: member path must be a string, got int')
 
     def test_overlay_from_member_jsonls_roundtrip(self):
         d = tempfile.TemporaryDirectory()

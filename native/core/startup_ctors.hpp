@@ -22,6 +22,7 @@
 #include "vec_e0b180.hpp"
 #include "vec_e085e0.hpp"
 #include "vec_e05320.hpp"
+#include "vec_e094e0.hpp"
 #include "vec_e026b0.hpp"
 #include "vec_de1ad0.hpp"
 #include "vec_ddef00.hpp"
@@ -34,6 +35,7 @@
 #include "vec_b52110.hpp"
 #include "vec_b743c0.hpp"
 #include "vec_dc2d50.hpp"
+#include "vec_dbfa60.hpp"
 #include "vec_dbb280.hpp"
 #include "vec_db93a0.hpp"
 #include "vec_db5dd0.hpp"
@@ -90,6 +92,7 @@
 #include "vec_ceb1c0.hpp"
 #include "vec_ceb070.hpp"
 #include "vec_ce99c0.hpp"
+#include "vec_ce8440.hpp"
 #include "vec_ce74a0.hpp"
 #include "vec_ce7300.hpp"
 #include "vec_d7c380.hpp"
@@ -103,6 +106,7 @@
 #include "vec_dac410.hpp"
 #include "vec_d853a0.hpp"
 #include "vec_d90310.hpp"
+#include "vec_d85490.hpp"
 #include "vec_d94cb0.hpp"
 #include "vec_dc4180.hpp"
 #include "vec_dddc90.hpp"
@@ -129,6 +133,7 @@ struct StartupState {
     VecE0b180 vec_e0b180{};   // idx 49
     VecE085e0 vec_e085e0{};   // idx 51
     VecE05320 vec_e05320{};   // idx 52
+    VecE094E0 vec_e094e0{};   // idx 50
     VecE026b0 vec_e026b0{};   // idx 53
     VecDfd5f0 vec_dfd5f0{};   // idx 54
     VecDe7fb0 vec_de7fb0{};   // idx 56
@@ -141,6 +146,7 @@ struct StartupState {
     VecDd41e0 vec_dd41e0{};   // idx 67
     VecDc4180 vec_dc4180{};   // idx 68
     VecDc2d50 vec_dc2d50{};   // idx 69
+    VecDBFA60 vec_dbfa60{};   // idx 70
     VecDbb280 vec_dbb280{};   // idx 71
     VecDb93a0 vec_db93a0{};   // idx 72
     VecDb7e60 vec_db7e60{};   // idx 73
@@ -150,6 +156,7 @@ struct StartupState {
     VecDac410 vec_dac410{};   // idx 77
     VecD94cb0 vec_d94cb0{};   // idx 78
     VecD90310 vec_d90310{};   // idx 79
+    VecD85490 vec_d85490{};   // idx 82
     VecD853a0 vec_d853a0{};   // idx 83
     VecD84ee0 vec_d84ee0{};   // idx 84
     VecD80e60 vec_d80e60{};   // idx 85
@@ -209,6 +216,7 @@ struct StartupState {
     VecCeb1c0 vec_ceb1c0{};   // 0xceb1c0 idx 144
     VecCeb070 vec_ceb070{};   // 0xceb070 idx 145
     VecCe99c0 vec_ce99c0{};   // 0xce99c0 idx 146
+    VecCe8440 vec_ce8440{};   // 0xce8440 idx 147
     VecCe74a0 vec_ce74a0{};   // 0xce74a0 idx 148
     VecCe7300 vec_ce7300{};   // 0xce7300 idx 149
     VecB743c0 vec_b743c0{};   // idx 282

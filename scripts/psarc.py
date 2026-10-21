@@ -97,12 +97,24 @@ def archive_basename_key(name):
 
 
 def load_members_jsonl(path):
-    """Load a members.jsonl produced by summarize/main into {exact_path: record}."""
+    """Load a members.jsonl produced by summarize/main into {exact_path: record}.
+
+    Malformed records are rejected with the file and 1-based line number so a bad line can be
+    located without guessing; the record must be a JSON object with a string `path`.
+    """
     out = {}
     with Path(path).open() as f:
-        for line in f:
+        for lineno, line in enumerate(f, 1):
             rec = json.loads(line)
+            if not isinstance(rec, dict):
+                raise PsarcError(f'{path}:{lineno}: member record must be a JSON object, '
+                                 f'got {type(rec).__name__}')
+            if 'path' not in rec:
+                raise PsarcError(f'{path}:{lineno}: member record has no "path"')
             p = rec['path']
+            if not isinstance(p, str):
+                raise PsarcError(f'{path}:{lineno}: member path must be a string, '
+                                 f'got {type(p).__name__}')
             if p in out:
                 raise PsarcError(f'duplicate exact path in {path}: {p!r}')
             out[p] = rec

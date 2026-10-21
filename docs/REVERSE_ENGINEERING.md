@@ -130,6 +130,39 @@ and a small reviewed boot graph (original RVA -> native task -> required contrac
 Use [function record schema](schemas/function.example.json); never populate it with guessed
 native symbols or pretend all discovered functions are reachable game code.
 
+### Constructor-body analysis without Ghidra
+
+Three offline tools (`tools/lift/`) bound a constructor body from the pinned ELF alone. Use them
+before spending a Ghidra/REA query:
+
+- `analyze_slot_struct.py <rva>` — *reachability* walk from the entry: fallthrough and direct
+  branch targets are followed, indirect jumps stop the walk, indirect calls still follow their
+  fallthrough, and `ret`/`ud2` plus calls to a noreturn import end a path. Reports body span,
+  body SHA-256, instruction count, direct calls (with import-thunk resolution), indirect edges and
+  RIP-relative references, distinguishing `.bss` globals from file-backed data.
+- `classify_ctors.py` — runs the same walk over all 573 constructor-table entries and writes
+  `local/re/work/ctor-classes.json` (`leaf_vec_copy`, `guarded_const`,
+  `descriptor_mutex_atexit`, `mutex_only`, `other`, `undecoded`).
+- `verify_*.py` — replay a published dossier and assert its exact spans/digests/calls.
+
+Do **not** bound a body with a fixed-size window or a plain linear sweep over `objdump` output:
+both errors produced false results here (a byte scan found a mutex-init `call` in `0xf53de0`, whose
+reachable body has no calls at all; a linear sweep ran from `0xf06340` into the next function
+because a `__stack_chk_fail` block falls through into padding). Also parse `objdump` lines by
+splitting on the tab: an instruction whose bytes exactly fill the byte column has no trailing space,
+and a `(?:[0-9a-f]{2} )+` pattern drops it — which silently truncates every block reachable through
+that instruction (it turned `0xdd7e30` into 319 instead of 396 bytes). Publish only reachability
+results, and state when a slot is `undecoded`.
+
+The first classification pass (2026-10-21) found: 227 `leaf_vec_copy`, 12 `guarded_const`,
+297 `other`, 3 `undecoded`, and **34 `descriptor_mutex_atexit` slots in two contiguous runs,
+indices 10–19 and 24–47**. Those 34 all publish one or two `.bss` pointers, `malloc` a 16-byte
+block whose size comes from `[0x12d2d1c]`, initialize a recursive + priority-inherit pthread mutex
+through `0xb30950`, and register the shared `pthread_mutex_destroy`+`free` destructor `0xe44a10`
+via `__cxa_atexit(dtor, &global, 0x1604218)`. Slot 11 is still the first unresolved entry, so the
+family is analysed but not registered.
+
+
 ## Stage 2 — per-function recovery protocol
 
 For each bounded native function task:

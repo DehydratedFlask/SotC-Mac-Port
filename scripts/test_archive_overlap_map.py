@@ -61,6 +61,66 @@ class ParseManifestTests(unittest.TestCase):
         with self.assertRaisesRegex(ManifestError, "malformed JSONL record"):
             parse_manifest_bytes("synthetic", b'{"path":"a","path":"b","size":1}\n')
 
+    def test_empty_manifest_is_a_blank_record_not_zero_records(self) -> None:
+        # Honest result: the parser does NOT treat a zero-byte file as "zero
+        # records". A JSONL file with no records is indistinguishable from a
+        # missing or truncated one, so the blank-record guard fires on line 1.
+        with self.assertRaises(ManifestError) as context:
+            parse_manifest_bytes("synthetic", b"")
+        self.assertEqual(
+            str(context.exception), "synthetic: blank JSONL record at line 1"
+        )
+
+    def test_blank_line_only_manifest_names_the_first_blank_line(self) -> None:
+        for raw, line in (
+            (b"\n", 1),
+            (b"\n\n", 1),
+            (b"   \n", 1),
+            (b"\t \n", 1),
+            (b'{"path":"a.bin","size":1}\n\n', 2),
+        ):
+            with self.subTest(raw=raw):
+                with self.assertRaises(ManifestError) as context:
+                    parse_manifest_bytes("synthetic", raw)
+                self.assertEqual(
+                    str(context.exception),
+                    f"synthetic: blank JSONL record at line {line}",
+                )
+
+    def test_rejects_empty_string_path(self) -> None:
+        for raw in (b'{"path":"","size":1}\n', b'{"path":"","size":1}'):
+            with self.subTest(raw=raw):
+                with self.assertRaises(ManifestError) as context:
+                    parse_manifest_bytes("synthetic", raw)
+                self.assertEqual(
+                    str(context.exception), "synthetic: invalid path field at line 1"
+                )
+
+    def test_accepts_backslash_path_verbatim(self) -> None:
+        # A backslash is an ordinary filename character on POSIX, not a separator,
+        # and this audit only intersects exact strings; it never opens a manifest
+        # path. Backslashes and ".." segments are therefore accepted unnormalized
+        # and reported verbatim instead of being silently rewritten.
+        self.assertEqual(
+            parse_manifest_bytes("synthetic", b'{"path":"dir\\\\item.bin","size":5}\n'),
+            {"dir\\item.bin": 5},
+        )
+        self.assertEqual(
+            parse_manifest_bytes(
+                "synthetic", b'{"path":"..\\\\..\\\\etc\\\\passwd","size":7}\n'
+            ),
+            {"..\\..\\etc\\passwd": 7},
+        )
+        # Forward-slash and dot segments are likewise preserved exactly, so two
+        # differently spelled paths stay distinct records rather than colliding.
+        self.assertEqual(
+            parse_manifest_bytes(
+                "synthetic",
+                b'{"path":"a/./b/../c.bin","size":1}\n{"path":"a/c.bin","size":2}\n',
+            ),
+            {"a/./b/../c.bin": 1, "a/c.bin": 2},
+        )
+
 
 class CompareMemberMapsTests(unittest.TestCase):
     def test_disjoint_sets_report_zero_overlap(self) -> None:
