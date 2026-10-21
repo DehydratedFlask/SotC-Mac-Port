@@ -21,6 +21,9 @@ int main() {
     CHECK(reserve_alignment(0x100000) == 0x100000u);
     CHECK(reserve_alignment(0x20000000) == 0x20000000u);  // Shadow edx
 
+    // Maximum size wraps during page rounding and must be rejected before mmap.
+    CHECK(!map_anonymous_aligned(~std::uint64_t{0}, 0x100000).has_value());
+
     // Small aligned map: RW + alignment + heap_window derivation.
     {
         constexpr std::uint64_t kSize = 0x100000ull;  // 1 MiB

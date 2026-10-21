@@ -1,12 +1,55 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 13:09 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 13:16 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 57 completion (`/root`)
+
+- Completed three test-only fixtures claimed in the round 57 claim checkpoint. APP-01 pins the
+  pure Swift `.notBuilt` mapping after a failed core query with nil validation/coverage (worker and
+  root each pass 21 tests across two suites; E168). RE-02 pins the numeric-string fallback for
+  synthetic ELF symbol type 3 while preserving global binding (Python output and root direct replay
+  each report 22 tests OK; E169). SRV-01 pins rejection of `UINT64_MAX` before host mapping
+  (worker/root each build `test_host_map` and pass focused CTest 1/1; E170).
+- Completion checkpoints record commands, source/test hashes, private logs, observations and limits:
+  [APP-01](docs/checkpoints/2026-10-21-root-app01-core-readiness-query-failure-complete.md),
+  [RE-02](docs/checkpoints/2026-10-21-root-re02-dynlink-unmapped-symbol-type-complete.md), and
+  [SRV-01](docs/checkpoints/2026-10-21-root-srv01-host-map-roundup-overflow-complete.md).
+- RE-02 worker's zsh wrapper returned 1 after the Python test process finished with `OK`, because
+  its wrapper attempted to assign the reserved read-only variable `status`. Root independently ran
+  `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py` and got exit 0 / 22 tests. This
+  is recorded as a wrapper issue; there are zero failed test hypotheses.
+- Production files are unchanged. These results establish only pure mapping, synthetic ELF parsing,
+  and the pre-mapping arithmetic guard. They add no actual-game execution evidence. `native/api/`
+  remains user-owned local work and is excluded.
+- Task rows and evidence E168–E170 are updated. `python3 scripts/project_index.py` exited 0 and
+  regenerated `docs/FOLDERS.md` for 14,401 folders; log `logs/root-round57-project-index.log`,
+  SHA256 `1fce09b08a087681b67949e46317690178e639d219ac20fbf6999c6e81c8e6f9`. `trail build` exited
+  0 and rebuilt 3,551 nodes / 4,790 edges; log `logs/root-round57-trail-build.log`, SHA256
+  `00c81bf0855864d2341b87a9c4d6941dd9a390522979b9622e3fc872d42a44e8`. `trail build --check`
+  exited 0 with the wiring graph in sync; log `logs/root-round57-trail-check.log`, SHA256
+  `1d6a8b7368552c48cb7630dfe051bb32e14cd65ebc74330bcb42255d15f9027f`. The optional deep concept
+  layer remains unbuilt; the wiring graph is the source of truth. `git diff --check` exited 0.
+- The required build/test environment and commands were recorded in `INSTALL_LOG.md`; existing
+  Swift 6.4.0, Apple clang 21.0.0, CMake 4.4.4, Python 3.15.0, and macOS 27.0.1 were reused with no
+  install or dependency change.
+- Pre-push `git diff --check` and `git diff --cached --check` exited 0. The staged path audit passed
+  all 12 paths; `logs/root-round57-audit-staged.log`, SHA256
+  `84c6f44dd225ea334970a4c48e6d59dd385e4a3db6d0332c1323684788684ced`. The full audit passed all
+  1,608 paths; `logs/root-round57-audit-all.log`, SHA256
+  `dc8e89770b8177aebdb6c00a57ae87ebb0ffcdde71fa4bfc7f27355fb54be4a3`.
+- Exact next action: stage only `INSTALL_LOG.md`, the three test files, `HANDOFF.md`,
+  `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/FOLDERS.md`, the three completion checkpoints, and the
+  round 57 dispatch checkpoint; run `python3 -I scripts/audit_publish_paths.py` on staged paths and
+  then `python3 -I scripts/audit_publish_paths.py --all` after this handoff refresh; commit with
+  `test: pin core readiness, dynlink and host-map edge cases` and push `origin main`. Keep
+  `native/api/CMakeLists.txt` and `native/api/host/` unstaged. After publication, record the
+  publication checkpoint, then claim the next independent bounded tasks.
 
 ## Session addendum 2026-10-21 round 57 claim (`/root`)
 
@@ -28,8 +71,18 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Claim publication: commit `8b53498` is pushed to `origin/main`; staged and full path audits passed
   for 4 and 1,603 paths. The publication record is
   [round 57 claims published](docs/checkpoints/2026-10-21-root-round57-claims-published.md).
-- Exact next action: assign the three distinct test files and independently replay their focused
-  verification commands.
+- Dispatched after publication: `/root/launcher_review` owns only
+  `launcher/Tests/LauncherCoreTests/CoreClientTests.swift`; `/root/review_host_proto` owns only
+  `scripts/test_ps4_dynlink.py`; `/root/slot23_raw_xrefs` owns only
+  `native/tests/test_host_map.cpp`. Commands and private log paths are in the
+  [dispatch checkpoint](docs/checkpoints/2026-10-21-root-round57-workers-dispatched.md). Shared
+  documentation remains root-owned.
+- Interim graph check: `trail build --check` exited 1 while workers edited their files; it reported
+  changes to `CoreClientTests.swift` and `test_host_map.cpp`. Output is saved at
+  `local/validation/round57-dispatch/trail-check-during-edit.log`. Rebuild only after all three files
+  stabilize.
+- Exact next action: inspect each isolated diff and independently replay the focused command(s),
+  rebuild/check the source graph, then update EVIDENCE/TASKS/HANDOFF and publish verified completions.
 
 ## Session addendum 2026-10-21 round 56 completion (`/root`)
 
