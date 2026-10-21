@@ -24,7 +24,13 @@
 ## Claim publication and assignment checkpoint
 
 - Local date/time: 2026-10-21 11:16 CDT (America/Chicago). Integrator: `/root`; worker after publication: `launcher_review`.
-- Exact publication command/result and commit: pending.
+- Exact publication command/result: `git push origin main` exited 0 and advanced
+  `7028abe..f427b2b`. Commit `f427b2bb412379a54feb7e5f3af27420420a31da` is on `origin/main`; root
+  verified HEAD equals `origin/main`.
+- Publication checks: staged audit accepted five allowlisted files; full tracked-path audit accepted
+  1,516 files; `git diff --cached --check` exited 0. `python3 scripts/project_index.py` indexed
+  14,222 folders and `--check` reports current. `trail build --check` reports the graph in sync at
+  3,528 nodes (deep meaning layer remains unbuilt). Logs are in `local/checkpoints/root-round13-claims/`.
 - Observation: worker scope is only `scripts/test_psarc.py`; no test has run for this task.
 - Remaining risks: test fixture only; no real PSARC or game asset validation.
-- Next exact action: publish the claim and assign the test file, then review the worker's diff and log and independently replay the acceptance command.
+- Next exact action: assign the test file, then review the worker's diff and log and independently replay the acceptance command.
