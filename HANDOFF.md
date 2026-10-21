@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 13:00 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 13:01 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -26,8 +26,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Current task status is `ACTIVE` for all three; implementation and focused verification are NOT
   RUN. The pre-existing `native/api/CMakeLists.txt` modification and untracked `native/api/host/`
   remain untouched and excluded.
-- Exact next action: publish this claim checkpoint, then assign the three distinct test files and
-  independently replay their focused commands.
+- Claim publication: commit `68e2779` is pushed to `origin/main`; staged and full path audits passed
+  for 4 paths and 1,596 paths. The publication record is
+  [round 56 claims published](docs/checkpoints/2026-10-21-root-round56-claims-published.md).
+- Exact next action: assign the three distinct test files, review each isolated diff, and
+  independently replay the focused commands.
 
 ## Session addendum 2026-10-21 round 55 (`/root`)
 
