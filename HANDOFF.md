@@ -1,12 +1,32 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 10:33 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 10:37 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 9 (`/root`)
+
+- Completed and pushed `DOC-FOLDER-INDEX-ADMIN-DIR-01` in commits `94a8cbc` and `6811f52`.
+  Worker and root each pass the synthetic nested `.git`/`__pycache__` check 5/5; E131 records the
+  log hashes. No source behavior or live inventory changed.
+- Claimed `RE-01-UNWRAP-INPUT-SIDECAR-COLLISION-01`, ACTIVE with zero failed implementation tries.
+  `unwrap()` can write `destination.with_suffix(".identity.json")` over the source if that sidecar
+  aliases the input; the task adds a pre-write same-file guard and a synthetic regression.
+  Claim: [docs/checkpoints/2026-10-21-root-re01-unwrap-input-sidecar-collision-claim.md](docs/checkpoints/2026-10-21-root-re01-unwrap-input-sidecar-collision-claim.md).
+- Graft located the unguarded sidecar write at `scripts/unwrap_self.py:27` and showed callers from
+  the three existing wrapper tests plus the CLI. Prerequisites `RE-01` and
+  `RE-01-ELF-PHDR-TRUNCATION-FIXTURE-01` are satisfied.
+- Acceptance command: `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py`. Worker
+  will first record a pre-guard failing collision assertion, then add the guard and rerun; the
+  expected red fixture is not counted as a failed implementation try. No test has run for this task.
+- Next exact action: publish this claim, then assign `scripts/unwrap_self.py` and
+  `scripts/test_project_tools.py` to `slot23_raw_xrefs`. Root remains the sole integrator for
+  handoff/task/evidence documentation. Keep all user game files read-only and host escalation files
+  unstaged.
 
 ## Session addendum 2026-10-21 round 8 (`/root`)
 
