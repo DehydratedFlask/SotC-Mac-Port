@@ -1,12 +1,39 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 13:50 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 13:54 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 Round 60 fixtures verified (/root)
+
+- Root reviewed and replayed all three single-file test changes after worker completion. APP-01
+  symlink-to-directory fixture passes 7 tests in one suite; AUD-01 LZMA offset-4 fixture passes 23
+  tests; SRV-01 uncounted region-list unlink builds and passes focused CTest 1/1. Production sources
+  match claim-time hashes; failed fixture attempts remain 0. Evidence E178–E180 and exact logs,
+  hashes, commands and limits are in
+  [the Round 60 completion checkpoint](docs/checkpoints/2026-10-21-root-round60-fixtures-complete.md).
+- `trail build` exited 0 and refreshed the wiring graph to 3,555 nodes / 4,801 edges;
+  `trail build --check` exited 0. Only the wiring tier is in scope; the optional deep concept layer
+  remains unbuilt. The dispatch checkpoint records the earlier stale check while workers were
+  editing.
+- User-owned `native/api/CMakeLists.txt` and `native/api/host/` remain untouched and excluded.
+  Synthetic tests do not advance game gates: G0 stays PARTIAL and G1–G6 stay NOT RUN.
+- `python3 scripts/project_index.py` exited 0 and indexed 14,416 folders; `docs/FOLDERS.md` lists
+  355 checkpoint files. Log `local/validation/root-round60-replay/project-index.log`, SHA-256
+  `07954259c59a360103bc473829a9fef45d72b51c242fc87544c76506b1d3e44f`.
+- Pre-push audit accepted 8 staged paths and 1,622 full paths. Logs
+  `local/validation/root-round60-replay/audit-staged.log` (SHA-256
+  `0447dc488d329d4c4b55286a29d73c02e87971a5d6618503f9c214b578758f4e`) and
+  `local/validation/root-round60-replay/audit-all.log` (SHA-256
+  `eb127a95a8c8da17da30c013461297031bea680cbeb45ada7610bf30102bd993`). Cached and working
+  `git diff --check` passed; only claimed tests and docs are staged, while existing `native/api`
+  user work remains unstaged.
+- Exact next action: fetch `origin/main`, then commit and push if the remote has not advanced; once
+  published, claim and dispatch the next bounded fixture tasks.
 
 ## Session addendum 2026-10-21 Round 60 workers dispatched (/root)
 
