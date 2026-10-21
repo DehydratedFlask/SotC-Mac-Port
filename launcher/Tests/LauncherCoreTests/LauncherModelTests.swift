@@ -448,6 +448,7 @@ struct LauncherPresentationTests {
         #expect(presentation.status == "NOT BUILT: x")
         #expect(presentation.accessibilityValue == "Not ready. NOT BUILT: x")
         #expect(presentation.tone == .neutral)
+        #expect(presentation.hint == nil)
         #expect(LauncherPresentation.make(state: .idle, blockedReason: nil, failureCode: nil).status == "Not ready to play.")
     }
 
