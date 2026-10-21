@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 10:16 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
+Updated: 2026-10-21 10:18 CDT (America/Chicago). Integrator: `/root` (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -13,19 +13,23 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Completed and pushed `RE-02-DYNLINK-PHDR-ENTRY-SIZE-01` in commit `35370fc`. The test-first
   `e_phentsize=55` fixture failed before the guard; worker and root focused runs pass 18/18 after
   it. E128 and the completion checkpoint record synthetic-only limits.
-- Claimed `DATA-02-OVERLAP-MAP-UNSHARED-SIZE-VALIDATION-01`, ACTIVE, attempt 0: make
-  `compare_member_maps` reject negative and boolean sizes even when their paths are unshared.
-  Worker will own `scripts/audit_archive_overlap_map.py` and
-  `scripts/test_archive_overlap_map.py`; claim record:
-  [docs/checkpoints/2026-10-21-root-data02-overlap-map-unshared-size-claim.md](docs/checkpoints/2026-10-21-root-data02-overlap-map-unshared-size-claim.md).
+- Completed `DATA-02-OVERLAP-MAP-UNSHARED-SIZE-VALIDATION-01`, FIXTURE_VERIFIED: all member-map
+  values must be exact nonnegative integers, including unshared paths. The `-1` and `True` cases
+  failed before the change; worker and root each pass 18/18 after it. Claim and completion records:
+  [claim](docs/checkpoints/2026-10-21-root-data02-overlap-map-unshared-size-claim.md),
+  [completion](docs/checkpoints/2026-10-21-root-data02-overlap-map-unshared-size-complete.md).
 - Graft located the size check inside only the shared-path loop at
   `scripts/audit_archive_overlap_map.py:96-138`; callers are `build_report`, synthetic tests, then
   `main`. Existing contract says exact nonnegative integers, but unshared values bypass it.
 - Claim commit `f1a98c5` is pushed to `origin/main`; worker `launcher_review` now owns the two claimed
   files for a test-first unshared negative/bool fixture and whole-map validation. No implementation
   result is integrated yet.
-- Next exact action: review worker logs/diff and independently replay the focused command, then
-  record the evidence and publish the task completion. No archive data or game behavior is in scope.
+- Root reviewed the two-file diff and independently replayed
+  `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_archive_overlap_map.py`: exit 0, 18/18.
+  E129 and private log hashes are recorded in the completion checkpoint. No archive data or game
+  behavior is in scope.
+- Next exact action: refresh indexes, audit the staged paths and tracked publish set, then commit
+  and push the task completion.
 
 ## Session addendum 2026-10-21 round 6 (`/root`)
 

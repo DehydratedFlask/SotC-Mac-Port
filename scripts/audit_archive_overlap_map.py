@@ -103,6 +103,11 @@ def compare_member_maps(
     if set(ids) != set(member_maps):
         raise ValueError("archive identifiers must match member-map keys")
 
+    for member_map in member_maps.values():
+        for size in member_map.values():
+            if type(size) is not int or size < 0:
+                raise ValueError("member maps must contain non-negative integer sizes")
+
     pairs: list[dict[str, Any]] = []
     for archive_a, archive_b in combinations(ids, 2):
         map_a = member_maps[archive_a]
@@ -114,8 +119,6 @@ def compare_member_maps(
         for path in shared_paths:
             size_a = map_a[path]
             size_b = map_b[path]
-            if type(size_a) is not int or size_a < 0 or type(size_b) is not int or size_b < 0:
-                raise ValueError("member maps must contain non-negative integer sizes")
             relation = "equal" if size_a == size_b else "different"
             if relation == "equal":
                 equal_count += 1
