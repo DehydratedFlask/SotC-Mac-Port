@@ -99,6 +99,13 @@ class Tests(unittest.TestCase):
         a = self.open(build([('p/q', b'1'), ('r', b'2')], manifest_sep=b'\n'))
         self.assertEqual(a.paths(), ['p/q', 'r'])
 
+    def test_nul_manifest_preserves_newline_in_member_path(self):
+        member_paths = ['line\nbreak.bin', 'other.bin']
+        members = [(member_paths[0], b'1'), (member_paths[1], b'2')]
+        archive = self.open(build(members, manifest_sep=b'\0'))
+        self.assertIn(b'\0', archive.read(0))
+        self.assertEqual(archive.paths(), member_paths)
+
     def test_rejects_traversal_and_absolute(self):
         for bad in ('../x', 'a/../../x', '/etc/passwd'):
             with self.assertRaises(psarc.PsarcError):
