@@ -118,6 +118,18 @@ struct CoreClientTests {
         #expect(message.contains("Play disabled"))
     }
 
+    @Test func coverageWithoutValidationIncludesCoreABIVersion() {
+        let coverage = CoreCoverageReport(
+            abiVersion: CoreABIVersion(major: 1, minor: 2), engineImplemented: false,
+            ctor: .notLinked, subsystems: []
+        )
+        guard case .notBuilt(let message) = CoreClientMapping.nativeCoreStatus(validation: nil, coverage: coverage) else {
+            Issue.record("expected .notBuilt")
+            return
+        }
+        #expect(message.contains("(core ABI 1.2)"))
+    }
+
     @Test func startOnEngineLessCoreThrowsDistinctErrorAndNeverRuns() async throws {
         let core = FakeCoreClient()
         _ = try await core.validate(assetsDirectory: good)
