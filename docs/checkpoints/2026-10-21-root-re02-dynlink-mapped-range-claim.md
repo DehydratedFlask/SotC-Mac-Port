@@ -11,5 +11,7 @@
 - Acceptance command: `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_ps4_dynlink.py`.
 - Observations versus inference: the test will pin `Image.mapped()`'s single-segment range containment for this fixture. It does not establish live ELF mappings, relocation behavior, loader correctness, or game execution.
 - Log/evidence paths: `local/validation/re02-dynlink-mapped-range/{attempt-1.log,root-replay.log}`.
+- Claim/publication commands: `python3 scripts/project_index.py --check` exited 0 (14,227 current); `trail build --check` exited 0 (3,531 nodes; deep layer remains unbuilt); `git diff --check` exited 0; staged audit exited 0 (8 paths); full-path audit exited 0 (1,522 paths); `git push origin main` exited 0 and advanced `517defa..3709a5d`. Logs: `local/checkpoints/root-round18-claims/{project-index-check.log,trail-check.log,diff-check.log,path-audit-staged.log,path-audit-all.log}`.
+- Claim commit: `3709a5da33f066cbb6936935545f86ec73ccd409`; `git rev-parse HEAD` and `git rev-parse origin/main` both returned this hash. The two claim tasks and E140 are now published.
 - Remaining risks: no ELF, dynamic-linker, runtime, or game behavior claim.
-- Next exact action: after this claim is on `origin/main`, assign only `scripts/test_ps4_dynlink.py` to `launcher_review`; root will independently replay and publish results.
+- Next exact action: assign only `scripts/test_ps4_dynlink.py` to `launcher_review`; root will independently replay and publish results.
