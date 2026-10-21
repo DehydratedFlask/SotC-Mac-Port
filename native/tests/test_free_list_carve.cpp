@@ -41,6 +41,15 @@ int main() {
         CHECK(f->allocated_size >= req);
     }
 
+    // The remaining capacity exactly equals the request.
+    {
+        auto f = try_carve_fit(0x20001000ull, 0x1f000ull, 0x10000ull, 0x10000u);
+        CHECK(f && !f->exact_node);
+        CHECK(f->lead == 0xf000ull);
+        CHECK(f->allocated_start == 0x20010000ull);
+        CHECK(f->allocated_size == 0x10000ull);
+    }
+
     // lead + req does not fit → nullopt (0x1a888 ja path).
     {
         auto f = try_carve_fit(0x20001000ull, 0x10000ull, 0x10000ull, 0x10000u);

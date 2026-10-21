@@ -195,6 +195,15 @@ class Tests(unittest.TestCase):
                 self.assertEqual(a.read(1, len(full)), a.read(1))        # equals full read
         self.assertEqual(compressed.read(1, 20), b'A' * 20)              # crosses a block
 
+    def test_mixed_compressed_and_stored_blocks_in_one_member(self):
+        payload = b'A' * 16 + bytes(range(16))
+        archive = self.open(build([('mixed.bin', payload)], block_size=16))
+        first_block = archive.entries[1]['block']
+
+        self.assertGreater(archive.blocks[first_block], 0)
+        self.assertEqual(archive.blocks[first_block + 1], 0)
+        self.assertEqual(archive.read(1), payload)
+
     def test_compressed_block_decoded_length_mismatch_rejected(self):
         def declare_one_byte_less(data):
             data = bytearray(data)

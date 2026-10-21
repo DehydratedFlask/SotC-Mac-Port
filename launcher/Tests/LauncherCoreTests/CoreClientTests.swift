@@ -205,6 +205,7 @@ struct CoreClientTests {
             Issue.record("expected .failed")
             return
         }
+        #expect(CoreClientMapping.launcherState(for: status(.failed, error: .engineNotImplemented), failureMessage: "synthetic status detail") == .failed("synthetic status detail"))
     }
 
     @Test func runningWithoutAnEngineIsRejectedAsFailure() {
