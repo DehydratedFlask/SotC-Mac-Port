@@ -23,6 +23,7 @@ add_library(sotc_core STATIC
   core/scratch_reset.cpp
   core/save_checksum.cpp
   core/save_chunk_header.cpp
+  core/descriptor_registration.cpp
   core/recursive_mutex.cpp
   core/startup_ctors.cpp
   core/clothing_preview_param.cpp
@@ -1267,6 +1268,10 @@ add_test(NAME avx_d86ed0 COMMAND test_avx_d86ed0)
 add_executable(test_avx_d5a280 tests/test_avx_d5a280.cpp)
 target_link_libraries(test_avx_d5a280 sotc_core)
 add_test(NAME avx_d5a280 COMMAND test_avx_d5a280)
+
+add_executable(test_descriptor_registration tests/test_descriptor_registration.cpp)
+target_link_libraries(test_descriptor_registration sotc_core)
+add_test(NAME descriptor_registration COMMAND test_descriptor_registration)
 
 add_executable(test_save_chunk_header tests/test_save_chunk_header.cpp)
 target_link_libraries(test_save_chunk_header sotc_core)
