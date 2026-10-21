@@ -61,6 +61,16 @@ Sub-shapes: 79 B (13, 19, 24, 25, 27), 205–284 B (12, 14–18, 26, 45), 233 B 
 Slot 10 has a native callback; **slot 11 is the explicit blocker** (`NEEDS_PRINCIPAL` history in
 TASKS.md), so the family is analysed but not registered.
 
+### `static_cleanup_thunk` — 15 further slots
+
+Not a separate class in the manifest (they are inside `other`), but a complete family:
+indices **515, 522, 523, 525, 527, 528, 531, 533, 542, 546, 547, 549, 551, 564, 565**. Each body is
+exactly 33 bytes — `lea rsi,[.bss cell]`, `lea rdi,[destructor]`, `lea rdx,[0x1604218]`,
+`mov qword [rsi],0`, `jmp __cxa_atexit` — i.e. zero a global and register its destructor at static
+initialization time. No calls, no stack frame, no return. Verified by
+`tools/lift/verify_cleanup_thunks.py`, which pins each body digest, cell and destructor. The
+destructor semantics are unknown, so nothing is lifted.
+
 ## Why reachability rather than a window
 
 Two wrong results are worth remembering:
