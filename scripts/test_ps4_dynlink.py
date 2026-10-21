@@ -2,6 +2,7 @@
 """Fixture tests for ps4_dynlink using synthetic bytes only (no game data)."""
 import struct
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -126,6 +127,17 @@ class Tests(unittest.TestCase):
     def test_nid_known_values(self):
         self.assertEqual(d.nid('_init_env'), 'bzQExy189ZI')   # also derived by pinned prepare.py
         self.assertEqual(d.nid('atexit'), '8G2LB+A3rzg')
+
+    def test_name_by_hash_resolves_requested_nid_and_omits_absent(self):
+        token = 'synthetic_export_name'
+        absent_token = 'absent_export_name'
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / 'fixture.cpp').write_text(f'int {token};\n')
+
+            found = d.name_by_hash({d.nid(token), d.nid(absent_token)}, [root])
+
+        self.assertEqual(found, {d.nid(token): token})
 
     def test_parse_import_and_jmprel_provenance(self):
         elf, expected = dynamic_import_elf_fixture()
