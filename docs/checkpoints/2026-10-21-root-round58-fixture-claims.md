@@ -53,5 +53,7 @@
   accepted 1,610 paths; log `logs/root-round58-claim-audit-all.log`, SHA256
   `585781946f40998853916242d1376e8a33dcdb4fbc014b1882dcaa7201dbec8e`. Cached and working diff
   checks both exited 0.
-- Exact next action: rerun the staged and full path audits after this checkpoint refresh; publish
-  the claim record, then dispatch owners.
+- Claim publication: commit `a7c6e67` (`docs: claim round 58 synthetic edge fixtures`) was pushed to
+  `origin/main`; the dispatch checkpoint records exact owners and focused commands.
+- Exact next action: publish the dispatch checkpoint and handoff update, then send implementation
+  work to the three owners.
