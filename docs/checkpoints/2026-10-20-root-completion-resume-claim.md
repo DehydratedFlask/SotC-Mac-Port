@@ -1,0 +1,11 @@
+# Completion request — resumed critical-path claims
+
+- Time/agent: 2026-10-20 21:43 CDT, `/root`, sole shared-document/Git integrator.
+- User requested: Complete the project. This revokes the prior pause. Real completion remains ARM64/Metal boot, game audio, real progress save/relaunch/load, and forbidden-runtime/module absence per ROADMAP/VALIDATION. G0 PARTIAL; G1-G6 NOT RUN.
+- Base:72eb6e0c094cbaaf3f2bdeef545a322b0672ace3; tracked tree clean, pre-existing tools/graft/ untracked.
+- SAV-01-NATIVE-CHECKSUM-01 ACTIVE: root owns CMake/README integration and verification; Luna worker performs read-only independent review of the four WIP files.0 failed production tries.
+- SAV-01-LOADER-01 ACTIVE: Luna worker owns only local/re/evidence/sav01-loader-01/ and completes REPORT.md/SHA256SUMS from existing captures/results.2 failed checker tries, try3 passed; root independently reviews/replays before acceptance. No provider query assigned.
+- CPU-01-CTOR10-OBJECT-INIT-01 ACTIVE: Luna worker owns only local/re/evidence/cpu01-ctor10-object-init-01/. First inspect interrupted e44a10 envelope for completeness, retain it unchanged. Principal reassessment: previous Ctrl-C was user cancellation, not a provider hypothesis failure; a complete cleanup capture is required. If incomplete, authorize one clean e44a10 invocation with the same access-scoped elevation, verified pristine snapshot copied to distinct resume filenames, --full-output and existing tool versions; preserve a terminal record. Do not repeat b30950 or start any other query. On another infrastructure error stop for principal review; no automatic repeats. Prior counter1 infrastructure failure,0 rejected analysis hypotheses,1 user interruption retained. No native registration until object lifecycle and ownership are recovered.
+- Graft refresh uses existing persisted scopes, no dependency change; verify new checksum symbol queryability. Reference coverage gap/deep-layer absence remain explicit.
+- Files changed: HANDOFF.md, docs/TASKS.md, this checkpoint and regenerated docs/FOLDERS.md. No original inputs/references altered.
+- Exact next actions: index/Graft-check/audit/allowlisted commit/push claim, then release workers; root integrate reviewed checksum and independently replay returned evidence.

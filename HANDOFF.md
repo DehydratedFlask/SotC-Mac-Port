@@ -1,9 +1,15 @@
 # SoC Mac Native — agent handoff
 
-Updated: 2026-10-20 21:32 CDT (America/Chicago). Principal: `/root`.
+Updated: 2026-10-20 21:43 CDT (America/Chicago). Principal: `/root`.
 No native game executable exists. Validation: G0 PARTIAL; G1-G6 NOT RUN.
 
-## CURRENT CHECKPOINT — 2026-10-20 21:32 CDT, `/root` — user-directed stop
+## CURRENT CHECKPOINT — 2026-10-20 21:43 CDT, `/root` — completion request resumed
+
+The user requested completing the project, revoking the pause. Root is integrating/reviewing `SAV-01-NATIVE-CHECKSUM-01`, worker `/root/sav01_loader_resume_audit` finishes only the saved loader report/manifest, and `/root/startup_critical_path_resume` recovers only the slot10 object cleanup/initializer evidence. `/root/aud02_waitloop_resume_audit` independently reviews the checksum without editing it. Full ownership, cumulative attempts and one narrowly authorized callback-query continuation: [resume claim](docs/checkpoints/2026-10-20-root-completion-resume-claim.md). No leaf-constructor batching is assigned. G0 PARTIAL; G1-G6 NOT RUN.
+
+Exact next action: publish this claim, release workers, integrate the checksum after independent review, then implement only recovered startup dependencies. No full-game completion claim until all actual gates pass.
+
+## PRIOR CHECKPOINT — 2026-10-20 21:32 CDT, `/root` — user-directed stop
 
 The user explicitly requested stopping. All workers are stopped and no task-owned REA/Ghidra process remains. Goal is PAUSED; resume only on a new user request. Full checkpoint: [user-stop record](docs/checkpoints/2026-10-20-root-user-stop-checkpoint.md). Public checksum files are preserved as unintegrated WIP; worker standalone checks passed, root replay/CMake/README/CTest acceptance remain pending. Do not count this as a completed task or game gate.
 
