@@ -1,6 +1,6 @@
 # Round 67 fixtures complete
 
-**Checkpoint:** 2026-10-21 15:33 CDT (America/Chicago)
+**Checkpoint:** 2026-10-21 15:36 CDT (America/Chicago)
 **Integrator:** `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`)
 **Task status:** Five claimed synthetic fixtures pass worker and root checks; each has 1 successful
 implementation attempt and 0 failed tries.
@@ -101,8 +101,8 @@ is demonstrated.
 
 ## Publication state
 
-- Claims were published before implementation. Claim commits are documented in the prior
-  [claim checkpoint](2026-10-21-root-round67-fixture-claims.md). Completion commit and post-push
-  `HEAD == origin/main` will be recorded here after the allowlisted changes pass audit and publish.
-- Exact next action: finish project-index refresh/check, add E199–E203, mark the five task rows
-  `FIXTURE_VERIFIED`, then stage only the five tests and allowlisted docs and push `main`.
+- The five fixture changes and completion records were committed as `393d26e96e46ed1691928dc23855c7095d15487a` (`test: add Round67 launcher, archive, map, and index fixtures`) and pushed to `origin/main`. Push log `local/validation/root-round66-scout/round67-completion-push.log`, SHA-256 `3ebda6595d988d82d5b4714d152cd5cd4c20f8908041ba1f14836fc4e1e71523`. Post-push state log `local/validation/root-round66-scout/round67-completion-publish-state.log`, SHA-256 `7978964921216cee26dce84d7fa47b95936d588047451bbb1a6ad24aabc51bd1`, verified `HEAD == origin/main == 393d26e96e46ed1691928dc23855c7095d15487a` and showed only the pre-existing user-owned `native/api/CMakeLists.txt` modification and untracked `native/api/host/` outside the commit.
+- The fixture commit contained exactly 10 allowlisted paths. Staged audit passed for 10 paths (log SHA-256 `80d1e6191da0abb83c5858979daecc58a882a0b0fb8e63a3b060562621f7cf9a`); full audit passed for 1,639 paths (log SHA-256 `1403dc002af1b8e55f7312d91c75947b44d16f258f1a536854f6fe1822712b6e`). `git diff --cached --check` passed with empty output (log SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`).
+- A post-push documentation sync updates this checkpoint with the final index/audit evidence. Its first project-index check failed with `Stale indexes: local/indexes/folders.json` after private publication logs were created. The combined log `local/validation/root-round66-scout/round67-sync-index-check.log` preserves that failure, the refresh, and subsequent passing checks at 14,462 folders; SHA-256 `5408017d8505cc1de9e690dfc946f84c6cd88a4cb12e71e65fc12aea4c4ab131`.
+- The sync commit is limited to `HANDOFF.md` and this checkpoint. Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and unstaged. Staged/full audits and post-fetch state for this documentation sync will be added below before its push.
+- Exact next action: complete the documentation-sync audits, fetch and compare `origin/main`, then commit and push the two reviewed documentation paths. After that, scout the next bounded batch from the live repository; G0 remains PARTIAL and G1–G6 remain NOT RUN.

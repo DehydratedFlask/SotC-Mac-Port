@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 15:33 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 15:35 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -14,8 +14,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - The launcher focused runs pass 8 and 11 tests; the archive-overlap parser passes 24; host-map target builds exit 0 with focused CTest 1/1; project-tools passes 9. Each is a bounded fixture only and establishes no native-game behavior.
 - Source graph refreshed with scopes `scripts`, `tools`, `reference`, `native`, `launcher`, and `tests`: 3,566 nodes / 4,824 edges; `trail build --check` passes. The project index refresh and check results are recorded in the completion checkpoint. Optional meaning layer remains unbuilt.
 - This fixture batch does not advance game gates: G0 remains PARTIAL; G1–G6 remain NOT RUN. No game executable, cold boot, actual game audio, real save/reload, or Metal gameplay is demonstrated.
+- Completion commit `393d26e96e46ed1691928dc23855c7095d15487a` is pushed; after the push, `HEAD == origin/main` at that commit. Push and state logs with hashes are in the completion checkpoint.
 - Existing user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and excluded from this publication.
-- Exact next action: complete allowlist audits, publish the fixture/docs checkpoint to `origin/main`, verify the remote ref, then scout and claim the next bounded batch from the live repository.
+- Exact next action: scout and claim the next bounded batch from the live repository before implementation.
 
 ## Round 66 bounded fixtures verified (/root)
 
