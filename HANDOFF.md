@@ -1,12 +1,29 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 14:50 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 14:56 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Round 65 bounded test-only claims (/root)
+
+- Root verified three distinct fixture-only tasks and their focused baselines. Claim details,
+  claim-time hashes, exact commands, and limits are in
+  [the Round 65 claim checkpoint](docs/checkpoints/2026-10-21-root-round65-fixture-claims.md).
+- APP-01 pins ABI minor ordering with equal major values; DATA-02 pins a synthetic PSARC NUL
+  manifest ending in a separator; SRV-01 pins a non-wrapping region end at `UINT64_MAX`.
+- Owners are `/root/launcher_review`, `/root/review_host_proto`, and `/root/slot23_raw_xrefs`;
+  each owns one existing test file only. No implementation prompts are sent until this claim
+  checkpoint is committed and pushed. Production sources remain unchanged.
+- The three task rows are `ACTIVE`, with 0 failed attempts and 0 implementation attempts.
+  These checks cover pure Swift ordering, synthetic archive path parsing, and endpoint arithmetic;
+  they establish no archive convention, memory mapping, or game behavior. G0 stays PARTIAL and
+  G1–G6 stay NOT RUN.
+- Exact next action: publish the audited claim docs, then dispatch the three read-only-bounded
+  implementation prompts after confirming the claim commit on `origin/main`.
 
 ## Round 64 test-only fixtures verified (/root)
 
@@ -29,8 +46,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - All three tasks are `FIXTURE_VERIFIED`, 0 failed tries. They establish synthetic test behavior
   only. G0 remains PARTIAL; G1–G6 remain NOT RUN. Existing `native/api/CMakeLists.txt` changes and
   untracked `native/api/host/` remain user-owned and excluded.
-- Exact next action: use Graft to scout distinct Round65 bounded tasks, verify against live files,
-  and publish claims before implementation edits.
+- Round 65 claims above supersede this scouting action.
 
 ## Round 63 test-only tasks verified (/root)
 
