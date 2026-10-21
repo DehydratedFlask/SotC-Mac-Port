@@ -1,12 +1,30 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 11:57 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 11:59 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 33 (`/root`)
+
+- Recorded the prior completion publication in commit `33099216c0777f517d4087faaf68b8cb61181bc8`
+  (`docs: record PSARC bounds publication`); `git push origin main` succeeded and local HEAD
+  matches the remote. See the [round 32 publication checkpoint](docs/checkpoints/2026-10-21-root-round32-publication.md).
+- Claimed `AUD-PUBLISH-GIT-NUL-FILENAME-FIXTURE-01`, `ACTIVE` with zero failed tries. Add one
+  synthetic test in `scripts/test_audit_publish_paths.py` that mocks the staged-name Git command
+  to return `b"scripts/name\nwith-newline.py\0"`, then confirms `git_names("staged")` returns
+  exactly one path containing the embedded newline and uses `--name-only -z` from `audit.ROOT`.
+  Do not change the production audit. Claim: [NUL-delimited filename](docs/checkpoints/2026-10-21-root-aud-publish-git-nul-filename-claim.md).
+- `/root/review_host_proto` has been asked to implement only the test module after this claim is
+  published. Root owns shared docs and will independently replay
+  `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audit_publish_paths.py`.
+- Actual game acceptance gates remain open; the only unrelated dirty paths remain the pre-existing
+  `native/api/CMakeLists.txt` modification and untracked `native/api/host/`.
+- Exact next action: run `python3 scripts/project_index.py`, verify folder and source indexes,
+  path-audit the publication, then commit and push the round 32 publication record and task claim.
 
 ## Session addendum 2026-10-21 round 32 (`/root`)
 
