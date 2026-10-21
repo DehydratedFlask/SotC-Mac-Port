@@ -357,6 +357,24 @@ class Tests(unittest.TestCase):
             psarc.load_members_jsonl(p)
         self.assertEqual(str(error.exception), f'{p}:2: member path must be a string, got int')
 
+    def test_load_members_jsonl_rejects_malformed_json_with_file_and_line(self):
+        cases = (
+            (['{"path":'], 1),
+            ([json.dumps(dict(id=1, path='ok', md5='1', size=1)), '{"path":'], 2),
+        )
+        for lines, lineno in cases:
+            with self.subTest(line=lineno):
+                p = self.write_jsonl(lines)
+                with self.assertRaises(psarc.PsarcError) as error:
+                    psarc.load_members_jsonl(p)
+                self.assertEqual(str(error.exception),
+                                 f'{p}:{lineno}: malformed JSONL record')
+
+    def test_load_members_jsonl_blank_line_still_raises_json_decode_error(self):
+        p = self.write_jsonl([''])
+        with self.assertRaises(json.JSONDecodeError):
+            psarc.load_members_jsonl(p)
+
     def test_overlay_from_member_jsonls_roundtrip(self):
         d = tempfile.TemporaryDirectory()
         self.addCleanup(d.cleanup)
