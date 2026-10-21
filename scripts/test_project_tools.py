@@ -122,6 +122,22 @@ class ToolChecks(unittest.TestCase):
             self.assertFalse((root / "docs").exists())
             self.assertFalse((root / "local").exists())
 
+    def test_index_check_identifies_each_stale_output(self):
+        for stale_name in ("docs/FOLDERS.md", "local/indexes/folders.json"):
+            with self.subTest(path=stale_name), tempfile.TemporaryDirectory() as folder:
+                root = Path(folder)
+                generate(root)
+                stale_path = root / stale_name
+                stale_path.write_text(stale_path.read_text() + "stale\n")
+
+                with self.assertRaises(ValueError) as ctx:
+                    generate(root, check=True)
+
+                self.assertEqual(
+                    str(ctx.exception),
+                    f"Stale indexes: {stale_name}",
+                )
+
     def test_index_ignores_nested_admin_directories(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

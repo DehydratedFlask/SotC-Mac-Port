@@ -163,6 +163,8 @@ struct LauncherModelValidationTests {
         let model = makeModel(client, directory: nil)
         await model.validate()
         #expect(client.count("validate") == 0)
+        #expect(client.count("coverage") == 1)
+        #expect(client.count("status") == 1)
         let assets = try #require(model.report?.items.first { $0.kind == .assets })
         #expect(assets.status == .missing(CoreReadiness.chooseFolderMessage))
         #expect(model.state == .idle)
