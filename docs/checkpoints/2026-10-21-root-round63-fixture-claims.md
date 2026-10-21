@@ -62,7 +62,7 @@
   `364619f073e382e37208a01f4c1ce42e1275432e9c5b5af387ca168370f311b1`.
 - Test SHA-256 `b8cfdd95dbf7d61fe6a67a0834da6dd4ef797c501212b1abd2cbd45bca2d8313`; unchanged
   production `scripts/psarc.py` SHA-256
-  `39f2c748db013637aba8144205dc60bdfe47284dd5a3a9ee1b32386f77cde60faa`.
+  `39f2c748db013637aba8144205dc60b7e5b1eb49ee0f641960783a1e2c140485`.
 - Limit: synthetic PSARC block encoding and reads only; no live archive or game behavior claim.
 
 ## SRV-01-FREE-LIST-CARVE-EXACT-REMAINDER-FIT-FIXTURE-01
@@ -92,8 +92,9 @@
 
 - Root found all three task IDs absent from `docs/TASKS.md` and `docs/EVIDENCE.md`; all production
   implementations and test files match the hashes recorded above at claim time.
-- No dependency, install, or game-file facts changed. Game gates remain G0 PARTIAL and G1–G6 NOT
-  RUN. No test edits have been made; attempt count is 0 for every task.
+- At claim time, no test edits had been made. Worker edits and first-run outcomes after the published
+  claim are recorded in the Round 63 dispatch checkpoint. No dependency, install, or game-file facts
+  changed. Game gates remain G0 PARTIAL and G1–G6 NOT RUN.
 - `python3 scripts/project_index.py` exited 0 at 14,430 folders; `docs/FOLDERS.md` records 362
   checkpoint files. `python3 scripts/project_index.py --check` exited 0 (`current`). Logs
   `local/validation/root-round63-claims/project-index.log` and `project-index-check.log`, SHA-256
@@ -104,4 +105,13 @@
   `538d687a0f16bdc2f5201d438a2f453cd3eb923fb5c6479dae0c79546672d279` and
   `3f99d0a41a7108b79a7492ee671d3efefba4fd98436fc0e3551192a020984885`. Staged and working
   `git diff --check` passed. User-owned `native/api` changes remain unstaged.
-- Exact next action: commit and push the claim, then send each owner its one-file test-only prompt.
+- Claim commit `3a79b5318beb437011384ca6c250c5f56b12ead9` was pushed to `origin/main` before
+  prompts; push exited 0 (`136af1d..3a79b53 main -> main`). Push log
+  `local/validation/root-round63-claims/push-claims.log`, SHA-256
+  `9ac94a0929fcf694f749680b1a93f761736a99497aaabeb959b59e04fdd4417d`; `git rev-parse HEAD
+  origin/main` matched at the claim commit, recorded in `publication-state.log`, SHA-256
+  `009237c394683aedd262a2d22db3a1f964cd5af54f9ace71df27380705292b91`.
+- At 14:24 CDT, one-file implementation prompts were sent to the three owners. The worker first-run
+  results and unreviewed diffs are recorded in the Round 63 dispatch checkpoint. Task status remains
+  `ACTIVE` until root replay, with 0 failed attempts.
+- Exact claim-time next action was to publish the claims and send prompts; both are recorded above.
