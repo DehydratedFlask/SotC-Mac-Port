@@ -80,5 +80,20 @@ real save/reload, Metal rendering, or any G0–G6 runtime gate. Existing user-ow
 ## Task status and next action
 
 All three rows are `ACTIVE`; attempts: 0 implementation and 0 failed for each. Exact next action:
-commit and push only the 4 audited claim/checkpoint/index paths, confirm `HEAD` matches `origin/main`,
-then dispatch each worker its exact one-file task and fixed private log path.
+the claim commit has been pushed and matched `origin/main`; dispatch each worker its exact one-file
+task and fixed private log path after publishing this post-push record.
+
+## Claim publication
+
+- `git commit -m "docs: claim Round66 launcher, dynlink, arena fixtures"` exited 0 and created
+  `9bb85cc4299134fb230165a70891dfc135034aa1`. Commit output
+  `local/validation/root-round66-scout/commit.log`, SHA-256
+  `4d8b0f22b2b7035890cda5af39335b5f487763b1e7dd1be9a99607d62091f657`.
+- `git push origin main` exited 0; push log `local/validation/root-round66-scout/push.log`, SHA-256
+  `ccf0884f7dfa7271f94d20bb26005c6d70999a63bad49a1d55e245d72901fb09`.
+- Post-push `HEAD == origin/main == 9bb85cc4299134fb230165a70891dfc135034aa1`; worktree status
+  retains only the user-owned `native/api/CMakeLists.txt` modification and untracked `native/api/host/`.
+  State log `local/validation/root-round66-scout/state.log`, SHA-256
+  `463e5fd3e38487ff1738ad0b900f55ca480b229461c59e15e54f93a0de74ccec`.
+- No implementation prompt has been sent yet. Exact next action: publish this post-push record and
+  then dispatch the three scoped workers.
