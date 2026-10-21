@@ -488,7 +488,10 @@ struct CoreReadinessTests {
         )
         let coverage = CoreCoverageReport(
             abiVersion: CoreABIVersion(major: 1, minor: 0), engineImplemented: false, ctor: ctor,
-            subsystems: [CoreSubsystem(name: "save", status: .partial, detail: "fixture")]
+            subsystems: [
+                CoreSubsystem(name: "save", status: .partial, detail: "fixture"),
+                CoreSubsystem(name: "future", status: .unknown(99), detail: "future code"),
+            ]
         )
         let lines = CoreDiagnostics.coreSection(coverage: coverage, status: nil, lastFailure: nil, queryFailure: nil)
         #expect(lines == [
@@ -497,6 +500,7 @@ struct CoreReadinessTests {
             "  Engine implemented: NO",
             "  Constructor prefix: 12 of 40 callbacks completed (573 slots registered), run did not complete, blocked on RVA 0xf06410",
             "  Subsystem save: PARTIAL — fixture",
+            "  Subsystem future: UNKNOWN(99) — future code",
         ])
         #expect(CoreDiagnostics.coreSection(coverage: nil, status: nil, lastFailure: nil, queryFailure: nil)
             == ["Core report:", "  Coverage: NOT REPORTED"])

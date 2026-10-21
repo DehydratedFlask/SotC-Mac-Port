@@ -1,12 +1,37 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 12:51 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 12:54 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Session addendum 2026-10-21 round 55 (`/root`)
+
+- Completed `APP-01-CORE-DIAGNOSTICS-UNKNOWN-SUBSYSTEM-FIXTURE-01`: worker and root each pass 83
+  launcher tests across 12 suites; `.unknown(99)` preserves code and detail in diagnostics copy.
+  E162 and [completion checkpoint](docs/checkpoints/2026-10-21-root-app01-core-diagnostics-unknown-subsystem-complete.md)
+  record hashes and logs.
+- Completed `DATA-02-OVERLAP-MAP-IDENTIFIER-KEYSET-FIXTURE-01`: worker and root each pass all 21
+  Python tests; a synthetic map-key mismatch raises the exact guard error. E163 and
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-data02-overlap-map-identifier-keyset-complete.md)
+  record hashes and logs.
+- Completed `SRV-01-ARENA-PAGE-DEBIT-WHOLE-PAGE-ROUNDING-FIXTURE-01`: worker and root each build
+  the test target and pass focused CTest 1/1; a `0x1ffff` debit reduces page count by one. E164 and
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-srv01-arena-page-debit-rounding-complete.md)
+  record hashes and logs.
+- All three changes are test-only; production files are unchanged. Root replay output is
+  `logs/root-round54-completion-validation.log` (SHA256
+  `c2c7afd349ccdc979c3638e3ae328ea46b990106b12bb440541138fecd8b7f60`). Folder index is current at
+  14,391; the source graph was rebuilt to 3,547 nodes / 4,781 edges and its follow-up check passed.
+  Completion records are in the working tree and await publication audit, commit, and push.
+- The round-54 claim publication is documented in
+  [round 55 publication](docs/checkpoints/2026-10-21-root-round55-publication.md). Existing
+  `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched and unpublished.
+- Actual-game gates remain open. Exact next action: stage only the three test files and documentation,
+  pass staged/full path audits, then commit and push the verified fixtures.
 
 ## Session addendum 2026-10-21 round 54 (`/root`)
 
@@ -16,9 +41,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   error for archive IDs that do not match member-map keys; and
   `SRV-01-ARENA-PAGE-DEBIT-WHOLE-PAGE-ROUNDING-FIXTURE-01` pins one-page debit for a `0x1ffff` byte
   request. Claim checkpoints are linked in `docs/TASKS.md`.
-- `/root/launcher_review`, `/root/review_host_proto`, and `/root/slot23_raw_xrefs` own distinct test
-  files for these claims. The claim checkpoint was published in `a70dcc8`; no implementation
-  begins until this publication record is pushed.
+- At claim time `/root/launcher_review`, `/root/review_host_proto`, and `/root/slot23_raw_xrefs` owned
+  distinct test files. The claim checkpoint was published in `a70dcc8`, with its publication
+  record pushed in `d61f11c`; the three tasks are completed in the round-55 addendum above.
 - The candidates exercise existing, live, synthetic/pure-code branches and do not require production
   changes. Actual-game gates remain open; `native/api/CMakeLists.txt` and `native/api/host/` remain
   untouched and unpublished.
