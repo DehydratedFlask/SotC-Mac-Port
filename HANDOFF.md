@@ -1,12 +1,30 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 17:04 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 17:11 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Round 74 fixture claims (/root)
+
+- Five independent test-only tasks are claimed and awaiting publication: two parser fixtures
+  (`scripts/test_psarc.py`, `scripts/test_ps4_dynlink.py`), two launcher mapping/formatting fixtures
+  (`LauncherModelTests.swift`, `CoreClientTests.swift`), and one native list-helper fixture
+  (`native/tests/test_region_list.cpp`). No production file is assigned for change.
+- Owners: `/root/review_host_proto` owns the PSARC and dynlink test files; `/root/launcher_review`
+  owns the two distinct launcher test files; `/root/round68_native_scout` owns only
+  `native/tests/test_region_list.cpp`. `/root` remains sole integrator for shared docs.
+- Claim-time baselines pass: 36 PSARC tests, 26 dynlink tests, 3 CoreReadiness tests, 13 CoreClient
+  tests, and native `test_region_list` build plus CTest 1/1. Code/test hashes, exact commands, logs,
+  and bounded acceptance criteria are in the
+  [Round74 claim checkpoint](docs/checkpoints/2026-10-21-root-round74-fixture-claims.md).
+- No implementation attempt has started. G0 remains PARTIAL; G1–G6 remain NOT RUN. Next exact
+  action: publish the claim checkpoint and task rows, verify `origin/main`, then dispatch the five
+  file-isolated fixtures. Existing user-owned `native/api/CMakeLists.txt` and untracked
+  `native/api/host/` remain untouched and excluded.
 
 ## Round 73 fixtures verified (/root)
 
