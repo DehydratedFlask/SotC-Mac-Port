@@ -1,6 +1,6 @@
-// Measured Init path: prologue early + tail using lifted 0x3be050 header → base → registry.
+// Measured Init path: prologue early + tail using lifted 0x3be050 header+0x80 grow → base → registry.
 // Tip AllocatorFront+FakeHeap. PR #5 cite-only.
-// NOT modelled: 0x3be930 / 0x323d0 / 0x3c2f70 bodies; remainder from 0x3be0f8; debug gates.
+// NOT modelled: 0x3be930 / 0x323d0 / 0x3c2f70 / 0xf590 bodies; list walk from 0x3be1ce; debug gates.
 #pragma once
 
 #include "allocator_front.hpp"
