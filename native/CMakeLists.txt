@@ -80,6 +80,7 @@ add_library(sotc_core STATIC
   core/lookup_1fc80.cpp
   core/vslot_40_533100_post.cpp
   core/vslot_40_533100_miss.cpp
+  core/vslot_40_533100_join.cpp
   core/ctor_98a90_3be050.cpp
   core/appmain_init_prologue_slice.cpp
   core/appmain_init_prologue_tail_slice.cpp

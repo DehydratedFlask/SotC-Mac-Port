@@ -11,7 +11,7 @@
 //
 // Claimed: miss control flow + "r_fps" pin + ba40/f590 call counts.
 // NOT modelled: body of 0x21620 (449 B); vcall bodies; ba40 non-empty listeners;
-// join @ 0x533305+. PR #5 cite-only. No leaf-vec; not idx 95.
+// join @ 0x533305+ (see vslot_40_533100_join.*). PR #5 cite-only. No leaf-vec; not idx 95.
 #pragma once
 
 #include <cstddef>
