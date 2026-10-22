@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 05:36 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 05:39 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -34,8 +34,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   audit accepted 1,740 paths. E341 records the publication logs. Only user API edits and Graft
   telemetry cache files remain outside the published scope.
 - The claim-audit record commit `eea1ac4c49b6ac4f4e5a019a030f2efa515cebde` is also pushed and
-  fetch-verified at 0/0 divergence; its publication audit is recorded in E342. `docs/ASSETS.md`
-  and `docs/TASKS.md` now record the sample-only result.
+  fetch-verified at 0/0 divergence; its publication audit is in E342. The completion/next-task
+  claim commit `fdfd466c1269e786db29769a974c3e9ac2a7a84d` is pushed and fetch-verified at 0/0;
+  E344 records its path audits. `docs/ASSETS.md` and `docs/TASKS.md` record the sample-only result.
 - Exact next action: finish the claimed `SRV-01-HOST-MAP-REQUESTED-VS-PAGE-ROUNDED-SIZE-FIXTURE-01`
   test below. First record a fresh focused build baseline, then add the one synthetic mapping-size
   assertion and rerun the focused `host_map` gate.
@@ -55,6 +56,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   cases use page-aligned 1 MiB and 2 MiB sizes, so they do not distinguish the two values.
 - The claim checkpoint is
   [docs/checkpoints/2026-10-22-root-srv01-host-map-requested-vs-rounded-claim.md](docs/checkpoints/2026-10-22-root-srv01-host-map-requested-vs-rounded-claim.md).
+- This claim and the DATA-02 completion summary were published in `fdfd466c1269e786db29769a974c3e9ac2a7a84d`; E344 records the staged and full-path audits.
 - Risk boundary: synthetic `map_region`/`mmap` behavior only; it does not establish allocator
   reachability or game behavior. Keep the existing 512 MiB alignment and production code unchanged.
 
