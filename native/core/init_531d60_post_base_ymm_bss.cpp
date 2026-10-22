@@ -44,7 +44,7 @@ Init531d60PostBaseYmmBssResult init_531d60_post_base_ymm_bss(
     std::memcpy(cells.dst_1604268, &d_one, sizeof(d_one));
     ++out.store_count;
 
-    // Next: inter-cell ymm copies @ 0x531ece — NOT modelled here.
+    // Next: inter-cell ymm copies @ 0x531ece — E458; not this fragment.
     // Later: call 0x26800 / 0xf590 — NOT modelled here.
     out.ok = (out.store_count == 4);
     return out;
