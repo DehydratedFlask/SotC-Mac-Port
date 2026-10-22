@@ -1,13 +1,31 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 09:02 CDT (America/Chicago). Parallel APP-01 fixture:
-bc-8fc0a995-6e8c-59b7-8a62-c1a9cacd061f. Drive Phase B:
-bc-0ee48224-fe2b-592b-a6d8-64b454059dfc; tip includes `0bbc1a8` (slots 24–47).
-Integrator note: [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
-Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
+Updated: 2026-10-22 09:45 CDT (America/Chicago). Heap-depth worktree
+bc-492a8623-dec2-597e-8de6-73c00b0ad8a5 on branch `cursor/heap-depth-5d26`
+(base `origin/main` @ `4c83b4d`). Drive owns Init-hash / `startup_ctors.*` on main —
+this checkpoint is heap-only and does not claim main tip.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## 2026-10-22 composite allocator hierarchy (0x47e30) — verified on feature branch
+
+- Agent: bc-492a8623-dec2-597e-8de6-73c00b0ad8a5. Attempt 1 — success (0 failed tries).
+- Task: `SRV-01-COMPOSITE-ALLOCATOR-01` → `FIXTURE_VERIFIED` (branch; not merged to main).
+- Worktree: `/Volumes/Extra/SoC-Mac-heap-depth` (never edited Drive main checkout).
+- Files: `native/core/composite_allocator.{hpp,cpp}`, `native/tests/test_composite_allocator.cpp`,
+  `tools/lift/check_f47e30.py`, CMake + README + TASKS/EVIDENCE/this block. Did **not** touch
+  `startup_ctors.*`, Init-hash/FNV/registry, or idx 95.
+- Observation: bootstrap thresholds Bucket `0x400` / Heap `0x100000` / Page `~0` ELF-pinned;
+  composite allocate picks first child with `size < threshold`; +0xd0 byte counter on success;
+  no zero-fill. BucketAllocator / HeapAllocator **bodies** still not lifted.
+- Commands: `cmake -S native -B local/build/native-heap-depth -G Ninja`;
+  `ctest -R '^(composite_allocator|allocator_front|page_allocator|page_owner_map)$'` PASS 4/4;
+  `python3 -I tools/lift/check_f47e30.py` OK; `check_f17070.py` still OK.
+- Inference: not G1; not wired into startup; free still uses owner-map → child slots. Evidence **E399**
+  (Drive already used E398 for Init-hash numeric emit on a separate branch).
+- Next exact action (heap lane): lift BucketAllocator size-class pools (`0x17990` family) or
+  HeapAllocator 1 MiB page + 150 MiB cap (`0x48c70` / `0x48910`) under `IAllocator`. Goal open.
 
 ## 2026-10-22 APP-01 playBlockedSummary native-core precedence — verified
 

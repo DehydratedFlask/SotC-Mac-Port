@@ -28,6 +28,7 @@
 //   * the scope stack is one process-wide thread_local stack (original: per-thread block).
 //   * not modelled: lazy bootstrap (0x13380), TLS one-shot free-heap hint, realloc (0x12c50),
 //     get_heap (0x12a70), 5-arg 0x12950, profiling tracker.
+//   * composite / page layers: see composite_allocator.hpp + page_allocator.hpp (install as heap 1).
 // Thread safety: front-end is lock-free on the alloc path (OBS) apart from the cold OOM path.
 #pragma once
 
