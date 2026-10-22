@@ -36,9 +36,15 @@
   file offset. It does not prove malformed ELF parser policy, real ELF validity, loader behavior,
   relocation correctness, or game execution.
 - Attempt count: one successful test-only implementation attempt; 0 failed implementation tries.
+- Completion commit: `dc9f153e23551ef7333c34523eba2cbd2ab223bf`; pushed to `origin/main`. Pre-push
+  staged audit accepted 6 paths and full audit accepted 1,704. Post-push fresh fetch and divergence
+  check returned 0/0; post-push full audit accepted 1,704. Publication command output is retained
+  in `local/validation/20261022-root-fixture-baselines/re02-dynlink-image-read-file-offset-publication.log`,
+  SHA-256 `65ca9947b397c9c0311155f2f1517377385e7a75dee860995915ab26a3892946`.
+- Final `git status --short --branch`: only pre-existing user-owned `M native/api/CMakeLists.txt`
+  and `?? native/api/host/` remain; neither was staged or changed by this task.
 - Remaining risks: real ELF and loader behavior are not exercised. No subsystem gate changes.
 - Next exact action: review the read-only scout candidate
   `AUD-01-CLASSIFIER-PROBE-OFFSET-CUTOFF-FIXTURE-01` against live files and task records; claim it
   before editing if distinct.
-- Completion publication commit and post-push audit details will be appended in the docs-sync
-  checkpoint after the fixture commit is pushed.
+- Documentation sync follows the fixture commit to record its final publication evidence.
