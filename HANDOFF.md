@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 03:04 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 03:12 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -31,21 +31,23 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `SAV-01-CHUNK-CODEC-UNKNOWN-PAYLOAD-KIND-FIXTURE-01`; its baseline and ownership are now recorded
   below.
 
-## SAV-01 chunk-codec unknown payload kind fixture — active claim
+## SAV-01 chunk-codec unknown payload kind fixture — verified
 
-- `SAV-01-CHUNK-CODEC-UNKNOWN-PAYLOAD-KIND-FIXTURE-01` is scoped under
-  `SAV-01-NATIVE-STREAM-01`. Proposed scope is one assertion in
-  `native/tests/test_save_chunk_codec.cpp::test_decode_by_spec_every_kind()`: with a synthetic
-  chunk whose tag matches a spec using `static_cast<PayloadKind>(0xff)`, assert that
-  `decode_chunk_by_spec()` returns `CodecError::wrong_value_type`. No production or build changes.
-- Root fresh baseline configure/build and focused `save_chunk_codec` CTest pass; source hashes and
-  logs are in E297 and the [claim checkpoint](docs/checkpoints/2026-10-22-root-sav01-unknown-payload-kind-claim.md).
-- The live decoder checks tag equality, switches on `spec.kind`, and falls through to
-  `wrong_value_type`; the existing generic test covers each declared kind but no invalid kind.
-  This pins the current synthetic decoder fallback only; it does not establish save compatibility.
-- Claim is staged for publication; implementation has not started. After claim publication,
-  `/root/next_fixture_scout_2` will own only `native/tests/test_save_chunk_codec.cpp`, with root
-  independently replaying the focused target and CTest.
+- `SAV-01-CHUNK-CODEC-UNKNOWN-PAYLOAD-KIND-FIXTURE-01` under `SAV-01-NATIVE-STREAM-01` adds one
+  synthetic case in `native/tests/test_save_chunk_codec.cpp::test_decode_by_spec_every_kind()`:
+  a matching-tag chunk with `static_cast<PayloadKind>(0xff)` returns
+  `CodecError::wrong_value_type`. Production and build files are unchanged.
+- Worker and root fresh configure/build plus focused `save_chunk_codec` CTest pass; worker and root
+  CTest each pass 1/1. Final hashes, logs, Trail proof, and the synthetic-only limit are in E299 and
+  the [completion checkpoint](docs/checkpoints/2026-10-22-root-sav01-unknown-payload-kind-complete.md).
+  Trail resolves the test at `native/tests/test_save_chunk_codec.cpp:L828-L886` and its call at L909.
+- Status is `FIXTURE_VERIFIED`, one successful implementation attempt, zero failed tries. The
+  decoder returns `wrong_value_type` after the kind switch; the enum comment calls this a writer
+  error. This pins current synthetic decoder behavior only and makes no save-compatibility claim.
+- Claim commit `ff63a179c0c9000a6a9a71472741c5657ffee9ef` is pushed and fetch-verified at 0/0
+  divergence; publication hashes are in E298. Completion publication will be recorded in E300.
+- Next exact action: use the independent scout result to claim and baseline
+  `SRV-01-ALLOCATOR-ALIGN64K-UINT32-WRAP-FIXTURE-01` before assigning its one-file test change.
 
 ## SAV-01 stream-file symlink destination fixture — verified
 
