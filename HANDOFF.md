@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 06:48 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 06:51 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -22,9 +22,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   docs/checkpoints/2026-10-22-root-sav01-reader-borrowed-bytes-view-claim.md) records baseline hashes,
   exact commands, and the API-only boundary.
 - Both claims use baseline HEAD `34a10b530e4b5e03ad1798d7bb098690efed1b69`; each has zero
-  implementation attempts and zero failed tries. They are not dispatched until their claim rows
-  and checkpoints are published. Production code, CMake, user-owned API/Graft paths, and game inputs
-  are outside scope.
+  implementation attempts and zero failed tries. Their rows and claim checkpoints are published in
+  `b551555b13f141cbd2dd5fc812640bdbddd16792`. The workers have not been dispatched yet. Production
+  code, CMake, user-owned API/Graft paths, and game inputs are outside scope.
 - E368 records the worker/root pass for the preceding SRV-01 zero-request fixture and the review
   caveat: byte preservation is asserted for the prefix and suffix around the documented raw span;
   interior gaps are not all individually checked.
@@ -157,9 +157,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   completion checkpoint record the result.
 - The cross-tag duplicate-name reader case and borrowed-bytes reader-view case are claimed in E369
   and E370. Both are test-only and use separate test files; claim checkpoints are ready to publish.
-- E371 will record publication of the SRV-01 completion and both SAV-01 claims.
-- Exact next action: run project-index/Trail and path audits, commit and push the SRV-01 completion
-  with both SAV-01 claims, then dispatch the two workers in parallel.
+- E371 and the [publication checkpoint](
+  docs/checkpoints/2026-10-22-root-srv01-completion-sav01-claims-publication.md) record publication
+  of the SRV-01 completion and both SAV-01 claims, including index, Trail, and path-audit results.
+- Exact next action: dispatch the two workers in parallel, then replay and review each isolated test
+  change independently.
 
 ## DATA-02 pakN TOC payload-MD5 sample — verified
 
