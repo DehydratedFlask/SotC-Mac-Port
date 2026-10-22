@@ -27,6 +27,18 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Next exact action (this worker): allowlist audit → commit/push. Drive owns next production gap
   after 47 / helpers; no leaf-vec / idx 95.
 
+## 2026-10-22 register idx 105 + guarded 115–117
+
+- Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Attempt 1 — success (stash recovery after
+  parallel APP worker stashed WIP as `drive-startup-ctors-wip-do-not-touch`; reapplied on main).
+- Task: bookkeeping register of already FIXTURE_VERIFIED lifts — `avx_d5a280` (105 / `0xd5a280`)
+  and guarded `d39b00`/`d366d0`/`d33b50` (115–117). Skip idx 95. No stub; no leaf-vec.
+- Files: `startup_ctors.{hpp,cpp}`, `test_startup_ctors.cpp`, `check_ctor_slots.py` only.
+- Commands: `ctest --test-dir local/build/native-idx105 -R '^(startup_ctors|avx_d5a280|guarded_d39b00|guarded_d366d0|guarded_d33b50)$'`
+  PASS; checkers OK → **155** pairs; contiguous **0–94** (gap **95** dormant) and **96–151**.
+- Next exact action: next missing **95** (skip) then cliff at **152+** / allocator·Init toward G1.
+  Goal open.
+
 ## 2026-10-22 register AVX idx 80–81
 
 - Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Attempt 1 — success.
