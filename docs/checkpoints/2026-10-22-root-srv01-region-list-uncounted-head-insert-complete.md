@@ -50,9 +50,18 @@
   zero failed tries.
 - Remaining risks / blockers: no blocker to this fixture. Parent `SRV-01` remains partial; all
   real-game acceptance gates remain open.
-- Next exact action: run staged and full publish-path audits, commit and push the completion plus
-  the already claimed APP-01 dangling-symlink fixture, record post-push verification, then dispatch
-  only `AssetValidationReportTests.swift` to `/root/next_fixture_scout_3`.
+- Publication: commit `c434246b3ec9d3656289ac08525a452c88d065ec` pushed to `origin/main`.
+  Staged and full audits accepted 7/1,717 paths; fresh fetch showed 0/0 divergence; post-push
+  explicit and full audits accepted 7/1,717. Pre-push staged/full and post-push explicit/full log
+  hashes are `644b4d768281cc0756d4c44fcce76f71955e718c92cbe4c5d2ab06ad337c8670` /
+  `d0e6a66c34674cd00c30738c208ae2ec2d76535397443c6be86d13b90e9fbc07`; identical post-push log
+  hashes are recorded in E288.
+- Project-index/Trail recheck: the first `python3 scripts/project_index.py --check` reported stale
+  `local/indexes/folders.json`; `python3 scripts/project_index.py` regenerated it, then
+  `python3 scripts/project_index.py --check` and `trail build --check` passed. Final combined log
+  SHA256 is `0cee8324d2a2578771dba0d3f61f64553e0a832eb3fa8e1736c2b8e83208bea7`.
+- Next exact action: finish publishing the verification record, then dispatch only
+  `AssetValidationReportTests.swift` to `/root/next_fixture_scout_3`.
 - HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF, TASKS, EVIDENCE, and
   `docs/FOLDERS.md` are updated; `python3 scripts/project_index.py` and its check report 26,499
   folders including 446 checkpoint files; `trail build --check` reports 3,617 nodes / 1,240 files.
