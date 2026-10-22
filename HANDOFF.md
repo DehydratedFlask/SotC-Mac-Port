@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:22 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:24 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -120,8 +120,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Status `FIXTURE_VERIFIED`, 1 successful implementation attempt, 0 failed tries. This is a local
   Darwin mutex error-contract fixture only; it does not validate scheduler priority inheritance or
   game behavior. Existing user-owned native API edits remain untouched.
-- Claim commit `5815f97ce87576c7cf9b9348ddc0aed4a1fcd8d6` is pushed and fetch-verified. Completion
-  publication is recorded at the top of the latest handoff checkpoint.
+- Claim commit `5815f97ce87576c7cf9b9348ddc0aed4a1fcd8d6` and completion commit
+  `0ae3bcabf96cd115fdaf40cf4aa79cef6e22794e` are pushed and fetch-verified. The completion commit's
+  staged-path audit accepted 8 allowlisted paths and the full audit accepted 1,679 paths. Post-push
+  `HEAD == origin/main` with 0/0 divergence; only user-owned `native/api/CMakeLists.txt` and
+  `native/api/host/` remain outside the commit. Audit/fetch/status logs are in
+  `local/validation/app01-core-error-codes/` and the completion checkpoint.
 
 ## APP-01 CoreErrorCode numeric values — fixture verified
 
@@ -140,8 +144,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Status `FIXTURE_VERIFIED`, 1 successful implementation attempt, 0 failed tries. This test pins the
   Swift decoder against the C enum constants; it does not establish live ABI transport or engine
   behavior.
-- Claim commit `a82fe6cdd8ac98709858f7c787d7c6085e77667e` is pushed and fetch-verified. Completion
-  publication is recorded at the top of the latest handoff checkpoint.
+- Claim commit `a82fe6cdd8ac98709858f7c787d7c6085e77667e` and completion commit
+  `0ae3bcabf96cd115fdaf40cf4aa79cef6e22794e` are pushed and fetch-verified. The completion commit's
+  staged-path audit accepted 8 allowlisted paths and the full audit accepted 1,679 paths. Post-push
+  `HEAD == origin/main` with 0/0 divergence; only user-owned `native/api/CMakeLists.txt` and
+  `native/api/host/` remain outside the commit. Audit/fetch/status logs are in
+  `local/validation/app01-core-error-codes/` and the completion checkpoint.
 
 ## RE-02 app-main +0x20 virtual call — static path byte verified
 
