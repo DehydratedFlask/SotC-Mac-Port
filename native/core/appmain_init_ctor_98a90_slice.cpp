@@ -95,6 +95,7 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     hooks.vslot_40_randomevents_attach_out = &out.vslot_40_randomevents_attach;
     hooks.vslot_40_shadowbossmusic_out = &out.vslot_40_shadowbossmusic;
     hooks.vslot_40_bossmusic_attach_out = &out.vslot_40_bossmusic_attach;
+    hooks.vslot_40_cp3characters_out = &out.vslot_40_cp3characters;
     out.base_ok = base_initialize_255130(self, arg, hooks);
     if (out.early.flag_obj != nullptr) {
         std::memcpy(&out.flag_after_base,

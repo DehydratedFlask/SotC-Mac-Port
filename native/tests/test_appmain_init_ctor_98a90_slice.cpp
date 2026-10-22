@@ -36,6 +36,7 @@
 #include "core/vslot_40_533100_randomevents_attach.hpp"
 #include "core/vslot_40_533100_shadowbossmusic.hpp"
 #include "core/vslot_40_533100_bossmusic_attach.hpp"
+#include "core/vslot_40_533100_cp3characters.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -151,6 +152,9 @@ int g_v40_boss_14c2f0 = 0;
 int g_v40_boss_load = 0;
 int g_v40_boss_14ccc0 = 0;
 int g_v40_boss_attach_f590 = 0;
+int g_v40_cp3_notify = 0;
+int g_v40_cp3_14c2f0 = 0;
+int g_v40_cp3_load = 0;
 alignas(8) std::uint8_t g_shadow_asset[0x40]{};
 alignas(8) std::uint8_t g_skels_asset[0x40]{};
 alignas(8) std::uint8_t g_anims_asset[0x40]{};
@@ -158,6 +162,7 @@ alignas(8) std::uint8_t g_banks_asset[0x40]{};
 alignas(8) std::uint8_t g_streams_asset[0x40]{};
 alignas(8) std::uint8_t g_rand_asset[0x40]{};
 alignas(8) std::uint8_t g_boss_asset[0x40]{};
+alignas(8) std::uint8_t g_cp3_asset[0x40]{};
 
 void ctor_a30(void* obj) {
     ++g_ctor_a30;
@@ -309,6 +314,19 @@ void* hook_v40_boss_load(void* out_slot, void*, void*) {
 }
 void hook_v40_boss_14ccc0(void*) { ++g_v40_boss_14ccc0; }
 void hook_v40_boss_attach_f590(void*) { ++g_v40_boss_attach_f590; }
+void hook_v40_cp3_notify(void*) { ++g_v40_cp3_notify; }
+void hook_v40_cp3_14c2f0(void* dst, const char* path) {
+    ++g_v40_cp3_14c2f0;
+    CHECK(path != nullptr);
+    CHECK(std::strcmp(path, kVslot40Cp3charactersPath) == 0);
+    std::memcpy(dst, &path, sizeof(void*));
+}
+void* hook_v40_cp3_load(void* out_slot, void*, void*) {
+    ++g_v40_cp3_load;
+    void* p = g_cp3_asset;
+    std::memcpy(out_slot, &p, sizeof(void*));
+    return p;
+}
 
 void* loadp(const void* base, std::size_t off) {
     void* p = nullptr;
@@ -434,6 +452,7 @@ int main() {
     g_v40_rand_14ccc0 = g_v40_rand_attach_f590 = 0;
     g_v40_boss_notify = g_v40_boss_14c2f0 = g_v40_boss_load = 0;
     g_v40_boss_14ccc0 = g_v40_boss_attach_f590 = 0;
+    g_v40_cp3_notify = g_v40_cp3_14c2f0 = g_v40_cp3_load = 0;
     std::memset(g_shadow_asset, 0, sizeof(g_shadow_asset));
     std::memset(g_skels_asset, 0, sizeof(g_skels_asset));
     std::memset(g_anims_asset, 0, sizeof(g_anims_asset));
@@ -441,6 +460,7 @@ int main() {
     std::memset(g_streams_asset, 0, sizeof(g_streams_asset));
     std::memset(g_rand_asset, 0, sizeof(g_rand_asset));
     std::memset(g_boss_asset, 0, sizeof(g_boss_asset));
+    std::memset(g_cp3_asset, 0, sizeof(g_cp3_asset));
     vslot40_shadow_loader_cell_2ee2cf8() = nullptr;
     ctor40_cell_2ee6778() = nullptr;
     singleton_f08_cell_2efc9e0() = nullptr;
@@ -518,6 +538,9 @@ int main() {
     bh.vslot_40_shadowbossmusic_detail.load_vslot18 = hook_v40_boss_load;
     bh.vslot_40_bossmusic_attach_detail.release_14ccc0 = hook_v40_boss_14ccc0;
     bh.vslot_40_bossmusic_attach_detail.dtor_f590 = hook_v40_boss_attach_f590;
+    bh.vslot_40_cp3characters_detail.notify_95580 = hook_v40_cp3_notify;
+    bh.vslot_40_cp3characters_detail.path_14c2f0 = hook_v40_cp3_14c2f0;
+    bh.vslot_40_cp3characters_detail.load_vslot18 = hook_v40_cp3_load;
 
     SingletonF08Hooks sh{};
     sh.ctor_523bd0 = hook_f08_ctor;
@@ -714,6 +737,13 @@ int main() {
     CHECK(loadp(r.singleton.obj, 0x70) == g_boss_asset);
     CHECK(g_v40_boss_attach_f590 == 1);
     CHECK(g_v40_boss_14ccc0 == 1);
+    // E440: cp3Characters load-attempt (notify f08+0x70 + path + vcall; no 14ccb0)
+    CHECK(r.vslot_40_cp3characters.ok);
+    CHECK(g_v40_cp3_notify == 1);
+    CHECK(g_v40_cp3_14c2f0 == 1);
+    CHECK(g_v40_cp3_load == 1);
+    CHECK(r.vslot_40_cp3characters.loaded == g_cp3_asset);
+    CHECK(r.vslot_40_cp3characters.f08 == r.singleton.obj);
     CHECK(g_move == 0);
     CHECK(g_nonnull == 0);
     CHECK(g_init_tb == 1);
@@ -738,13 +768,13 @@ int main() {
         "vslot533100_header+post1fc80+miss_rfps+join_pos+gfx2ee2d00+shadowmodels+attach+"
         "shadowskels+skels_attach+shadowanims+anims_attach+shadowbanks+banks_attach+"
         "shadowstreams+streams_attach+shadowrandomevents+randomevents_attach+shadowbossmusic+"
-        "bossmusic_attach+early+tail+base+trivial+registry "
+        "bossmusic_attach+cp3characters+early+tail+base+trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
-        "anims=%p banks=%p streams=%p rand=%p boss=%p post_hit=%d miss_null=%d marker=0x%x "
-        "refc=%u fail=%d skels_refc=%u skels_fail=%d anims_refc=%u anims_fail=%d banks_refc=%u "
-        "banks_fail=%d streams_refc=%u streams_fail=%d rand_refc=%u rand_fail=%d boss_refc=%u "
-        "boss_fail=%d gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u alloc_ops=%llu "
-        "duration_us=%lld "
+        "anims=%p banks=%p streams=%p rand=%p boss=%p cp3=%p post_hit=%d miss_null=%d "
+        "marker=0x%x refc=%u fail=%d skels_refc=%u skels_fail=%d anims_refc=%u anims_fail=%d "
+        "banks_refc=%u banks_fail=%d streams_refc=%u streams_fail=%d rand_refc=%u rand_fail=%d "
+        "boss_refc=%u boss_fail=%d gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
+        "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
         "vslot533100_hit/success_atexit/next_path/14c2f0_body/6a5370_body/6abcc0_body/"
         "21620_body/2779a0_body/42390_body/525080_body/2569d0_body/26ea0/26b60/272d0/"
@@ -755,6 +785,7 @@ int main() {
         r.vslot_40_shadowskels.loaded, r.vslot_40_shadowanims.loaded,
         r.vslot_40_shadowbanks.loaded, r.vslot_40_shadowstreams.loaded,
         r.vslot_40_shadowrandomevents.loaded, r.vslot_40_shadowbossmusic.loaded,
+        r.vslot_40_cp3characters.loaded,
         r.vslot_40_post.lookup_hit ? 1 : 0, r.vslot_40_miss.find_null ? 1 : 0,
         r.vslot_40_gfx.marker_value, r.vslot_40_shadow.refcount_after,
         r.vslot_40_shadow_attach.took_fail_path ? 1 : 0,
