@@ -11,8 +11,8 @@
 // `0x532ca0` body tourism.
 //
 // Claimed: call-site control flow pin only.
-// NOT modelled: arg prep; 0x17070 body; following mov rbx,rax / 0x53fd10.
-// PR #5 cite-only.
+// NOT modelled: arg prep; 0x17070 body; following mov rbx,rax prep / 0x53fd10
+// (claimed separately as E484). PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
