@@ -1,39 +1,47 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 08:59 CDT (America/Chicago). Parallel APP-01 claim:
-bc-8fc0a995-6e8c-59b7-8a62-c1a9cacd061f. Latest Drive/slot-23:
-bc-0ee48224-fe2b-592b-a6d8-64b454059dfc; integrator note still points at
-[docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
+Updated: 2026-10-22 09:02 CDT (America/Chicago). Parallel APP-01 fixture:
+bc-8fc0a995-6e8c-59b7-8a62-c1a9cacd061f. Drive Phase B:
+bc-0ee48224-fe2b-592b-a6d8-64b454059dfc; tip includes `0bbc1a8` (slots 24–47).
+Integrator note: [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## 2026-10-22 APP-01 playBlockedSummary native-core precedence — CLAIMED
+## 2026-10-22 APP-01 playBlockedSummary native-core precedence — verified
 
-- Task: `APP-01-PLAY-BLOCKED-SUMMARY-NATIVE-CORE-PRECEDENCE-FIXTURE-01`, child of APP-01.
-- Status: CLAIMED / ACTIVE. Attempt 0. Exclusive file:
-  `launcher/Tests/LauncherCoreTests/PlayBlockedSummaryTests.swift` (new only).
-- Do not edit: `native/core/startup_ctors.*`, `native/tests/test_startup_ctors.cpp`,
-  Drive-owned ctor registration, `native/api/**`, `graft/`, contested survey leaves.
-- Scope: synthetic `ReadinessReport.playBlockedSummary` precedence + idle presentation.
-  Pin `.notBuilt` native-core over concurrent missing assets/Metal/audio so Play-disabled
-  copy stays honest NOT BUILT; assets-only when core ready; all-ready → nil.
-  Prefer test-only; production unchanged unless a failing honesty assertion requires it.
-- Not G1/G4; goal incomplete. No leaf-vec / idx 95.
-- Next exact action: implement focused Swift tests and verify with
-  `swift test --package-path launcher --filter PlayBlockedSummaryTests`.
+- Agent: bc-8fc0a995-6e8c-59b7-8a62-c1a9cacd061f. Attempt 1 — success (0 failed tries).
+- Task: `APP-01-PLAY-BLOCKED-SUMMARY-NATIVE-CORE-PRECEDENCE-FIXTURE-01` → `FIXTURE_VERIFIED`.
+- Files changed: new `launcher/Tests/LauncherCoreTests/PlayBlockedSummaryTests.swift` only
+  (plus E393 / TASKS / this checkpoint). Did not touch Drive `startup_ctors.*`.
+  Production `ReadinessReport.swift` / `LauncherPresentation.swift` unchanged
+  (SHA256 `170b03a7…982e98` / `717e18a1…f52564`).
+- Command: `swift test --package-path launcher --scratch-path local/build/native-app01-play-blocked-summary-20261022 --filter PlayBlockedSummaryTests` → exit 0; 4/4 pass.
+  Log SHA256 `06ecd16f2da0c45961acb7485e3a92d87c13642c278f720aa632cf5967a7ce27`.
+- Observation: `.notBuilt` native-core summary wins over concurrent missing assets/Metal/audio;
+  assets-only when core ready; all-ready → nil; idle presentation keeps verbatim NOT BUILT /
+  Play disabled. Synthetic values only.
+- Inference: not G4/Play launch; not engine existence. Goal incomplete.
+- Checkpoint: [docs/checkpoints/2026-10-22-app01-play-blocked-summary-complete.md](docs/checkpoints/2026-10-22-app01-play-blocked-summary-complete.md).
+- Next exact action (this worker): allowlist audit → commit/push. Drive owns next production gap
+  after 47 / helpers; no leaf-vec / idx 95.
+
+## 2026-10-22 gap 55 — register lifted `0xdf94c0`
+
+- Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Claim: wire already-lifted `leaf_df94c0`
+  (ctor index 55) into `recovered_constructors()`. Contiguous prefix becomes **0–58** with gap
+  **59** next (64–66 still open later). No new leaf-vec farming.
+- Tip after Phase B: `0bbc1a8` on `origin/main`.
 
 ## 2026-10-22 Phase B — slots 24–47 on production
 
-- Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Attempt 1.
-- Promoted already-modeled descriptor/mutex/atexit family **24–47** from
-  `registered_ahead_constructors()` into `recovered_constructors()` (same
-  `init_registration_thunk_ahead` callbacks). Contiguous recovered prefix **0–47**.
+- Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Attempt 1 — success. Tip `0bbc1a8`.
+- Promoted already-modeled descriptor/mutex/atexit family **24–47** into
+  `recovered_constructors()`. Contiguous recovered prefix **0–47**; **144** pairs.
 - Commands: focused CTest `startup_ctors` + `registration_thunks_ahead` + `slot23_names_fixture`;
-  `python3 -I tools/lift/check_ctor_slots.py`.
-- Next production gap among registered rows: first missing index after 47 (e.g. **55**), or
-  helper/allocator edges from batches 7–8. No leaf-vec fan-out. Goal incomplete; G1 NOT RUN.
+  `python3 -I tools/lift/check_ctor_slots.py` OK.
+- Goal incomplete; G1 NOT RUN.
 
 ## 2026-10-22 Phase A — slot 23 registered (private fixture)
 
