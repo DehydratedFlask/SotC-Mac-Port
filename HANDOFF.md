@@ -27,7 +27,7 @@ or Metal gameplay is demonstrated.
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-avx-bss-20261022/` (manifest
   `67b6755a…` at tip `0f2e840`; capture `13f94f73…`).
-- Observation: feat tip `0f2e840`; docs tip `f17dfa8`; measured `pbavx=2` + mid_reg=4 → 275 registry.
+- Observation: feat tip `0f2e840`; docs tip `029f028`; measured `pbavx=2` + mid_reg=4 → 275 registry.
   `0x7f7220` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_avx_bss.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
