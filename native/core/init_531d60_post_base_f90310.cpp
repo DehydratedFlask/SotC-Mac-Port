@@ -12,7 +12,7 @@ Init531d60PostBaseF90310Result init_531d60_post_base_f90310(
     }
     ++out.call_f90310_count;
 
-    // Next: vmovups ymm @ 0x531e4b — NOT modelled here.
+    // Next: vmovups ymm BSS seed @ 0x531e4b — E457; not this fragment.
     out.ok = (out.call_f90310_count == 1);
     return out;
 }
