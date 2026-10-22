@@ -22,8 +22,10 @@ or Metal gameplay is demonstrated.
 - Files: `native/core/ctor_98a90_3be050.{hpp,cpp}` (cells + head); test/checker updates;
   checkpoint `docs/checkpoints/2026-10-22-ctor-98a90-3be050-listwalk.md`; EVIDENCE E412;
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-ctor-98a90-listwalk-20261022/` (manifest `8b94d8f0…`).
-- Observation: ELF pins lea/store/je; measured self_cell=obj, head=null → 275 registry.
+  `local/validation/appmain-init-ctor-98a90-listwalk-20261022/` (manifest `900a79d0…` at tip
+  `f50264b`).
+- Observation: feat tip `f50264b`; ELF pins lea/store/je; measured self_cell=obj,
+  head=null → 275 registry.
   Non-null body (`0xf8f500` PLT / `0x3c0840`) NOT modelled.
 - Commands: `python3 -I tools/lift/check_f3be050_ctor.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
