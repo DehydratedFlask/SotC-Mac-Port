@@ -70,7 +70,8 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBaseA2ed00U5Hooks& post_base_a2ed00_u5_hooks,
     const Init531d60PostBaseF590A2ed00U9Hooks& post_base_f590_a2ed00_u9_hooks,
     const Init531d60PostBaseF590A2ed00U10Hooks& post_base_f590_a2ed00_u10_hooks,
-    const Init531d60PostBaseA2ed00U6Hooks& post_base_a2ed00_u6_hooks) {
+    const Init531d60PostBaseA2ed00U6Hooks& post_base_a2ed00_u6_hooks,
+    const Init531d60PostBaseF590A2ed00U11Hooks& post_base_f590_a2ed00_u11_hooks) {
     AppmainInitCtor98a90SliceResult out{};
     out.early = run_prologue_255180_early(alloc, early_hooks);
     if (!out.early.ok) {
@@ -478,6 +479,12 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     // E504: always-on Init continue — sixth 0xa2ed00 call-site; stack prep NOT modelled.
     out.post_base_a2ed00_u6 = init_531d60_post_base_a2ed00_u6(post_base_a2ed00_u6_hooks);
     if (!out.post_base_a2ed00_u6.ok) {
+        return out;
+    }
+    // E505: always-on Init continue — first post-a2ed00-u6 0xf590 call-site; mov-rdi prep NOT modelled.
+    out.post_base_f590_a2ed00_u11 = init_531d60_post_base_f590_a2ed00_u11(
+        post_base_f590_a2ed00_u11_hooks);
+    if (!out.post_base_f590_a2ed00_u11.ok) {
         return out;
     }
     out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,
