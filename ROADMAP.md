@@ -43,6 +43,14 @@ with assumed solutions. Exact pinned-source evidence is in [REFERENCE_AUDIT](doc
 | Navigation, source pins, folder ownership | [INDEX](docs/INDEX.md), [FOLDERS](docs/FOLDERS.md) |
 | Every dependency/download/build | [INSTALL_LOG](INSTALL_LOG.md) |
 
+## Operating plan (current)
+
+M0–M6 below remain the outer frame. Day-to-day critical path is **production startup past
+slot 23** (`0xe71990`) toward an honest **G1 PARTIAL**, not leaf-vec survey throughput. Live
+slot counts and first-null live in [HANDOFF](HANDOFF.md); the Project store operating plan with
+adopted recommendations (including the default private asset/fixture string policy for slot 23)
+is maintained outside this repo for agents — follow that plan when present, else HANDOFF.
+
 ## Milestones in dependency order
 
 | Milestone | Required deliverable | Exit gate | Parallel work allowed |

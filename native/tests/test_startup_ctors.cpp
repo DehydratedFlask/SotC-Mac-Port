@@ -130,6 +130,8 @@ int main() {
         CHECK(st.vec_ce99c0 == kVecCe99c0Bits);
         CHECK(st.vec_ce74a0 == kVecCe74a0Bits);
         CHECK(st.vec_ce7300 == kVecCe7300Bits);
+        CHECK(st.vec_ce6fb0 == kVecCe6fb0Bits);
+        CHECK(st.vec_ce67b0 == kVecCe67b0Bits);
         CHECK(st.vec_b743c0 == kVecB743c0Bits);
         CHECK(st.vec_b52110 == kVecB52110Bits);
         CHECK(st.math.pi_guard == 1 && st.math_b.pi_guard == 1 && st.math_c.pi_guard == 1 && st.math_d.pi_guard == 1);
@@ -194,7 +196,7 @@ int main() {
         93, 94,
         96, 97, 98, 99, 100, 101, 102, 103, 104, 106, 107, 108, 109, 110, 111, 112, 113, 114, 118, 119,
         120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139,
-        140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 282, 290, 520, 538};
+        140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 282, 290, 520, 538};
     CHECK(recovered_constructors().size() == sizeof(expect) / sizeof(expect[0]));
     for (std::size_t i = 0; i < sizeof(expect) / sizeof(expect[0]); ++i)
         CHECK(recovered_constructors()[i].original_index == expect[i]);
