@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <cstddef>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -39,6 +40,34 @@ int main() {
         CHECK(exact.flag_b() == 1);
         CHECK(exact.ptr_field() == 0xDEADBEEFULL);
         CHECK(exact.sentinel() == 0xffffffffu);
+    }
+
+    // Finalization may update only its five documented byte ranges.
+    {
+        RegionNode poisoned{};
+        for (std::size_t i = 0; i < RegionNode::kBytes; ++i) {
+            poisoned.raw[i] = static_cast<std::uint8_t>(0x31u + static_cast<unsigned>(i));
+        }
+        std::uint8_t before[RegionNode::kBytes];
+        std::memcpy(before, poisoned.raw, sizeof(before));
+
+        exact_fit_finalize(poisoned, /*req_size=*/0x123456789ULL, /*arena_flag=*/0x5A,
+                           /*ctx=*/0x0123456789ABCDEFULL);
+
+        const auto is_documented_write = [](std::size_t offset) {
+            return (offset >= RegionNode::kPtrOffset &&
+                    offset < RegionNode::kPtrOffset + sizeof(std::uint64_t)) ||
+                   (offset >= RegionNode::kSentinelOffset &&
+                    offset < RegionNode::kSentinelOffset + sizeof(std::uint32_t)) ||
+                   (offset >= RegionNode::kSizeOffset &&
+                    offset < RegionNode::kSizeOffset + sizeof(std::uint64_t)) ||
+                   offset == RegionNode::kFlagAOffset || offset == RegionNode::kFlagBOffset;
+        };
+        for (std::size_t i = 0; i < RegionNode::kBytes; ++i) {
+            if (!is_documented_write(i)) {
+                CHECK(poisoned.raw[i] == before[i]);
+            }
+        }
     }
 
     RegionNode n{};

@@ -280,3 +280,22 @@ local/build/native-root-sav01-dir-errno-verify-20261022 --output-on-failure -R
 `os_errno == EISDIR` reporting; no real-save compatibility or game behavior is established. Build
 products remain under `local/build/native-root-sav01-dir-errno-verify-20261022/`; logs are under
 `local/validation/sav01-native-stream-file-directory-errno/`. No removal boundary was created.
+
+## 2026-10-22 06:05 CDT — APP-01 Metal readiness fixture verification
+
+Existing Swift 6.4.0.34.1 and Xcode 27.1 (27A9275), captured in
+`local/validation/app01-metal-readiness/swift-toolchain.log`, were reused; no install, download,
+dependency, or system configuration change. From the repository root, worker command
+`swift test --package-path launcher --scratch-path local/build/native-root-app01-metal-readiness-20261022 --filter LauncherModelValidationTests`
+and independent root command
+`swift test --package-path launcher --scratch-path local/build/native-root-app01-metal-readiness-root-20261022 --filter LauncherModelValidationTests`
+both exited 0 with 9 tests passing. Logs are `local/validation/app01-metal-readiness/swift-test.log`
+and `root-replay.log`; source and toolchain hashes are recorded in E352. Purpose: verify a synthetic
+missing-Metal readiness gate. Build products remain under the two exact `local/build/` directories
+named in the commands. No removal boundary was created.
+
+## 2026-10-22 06:05 CDT — SRV-01 exact-fit write-boundary fixture verification
+
+Existing CMake 4.4.4, Ninja 1.13.2, Apple clang 21.0.0 targeting arm64-apple-darwin27.0.0, and
+macOS 27.0.1 recorded in E325 were reused; no install, download, dependency, or system configuration
+change. The worker ran `cmake -S native -B local/build/native-root-srv01-exact-fit-write-boundary-20261022 -G Ninja -DCMAKE_BUILD_TYPE=Debug`, `cmake --build local/build/native-root-srv01-exact-fit-write-boundary-20261022 --target test_exact_fit_finalize`, and `ctest --test-dir local/build/native-root-srv01-exact-fit-write-boundary-20261022 --output-on-failure -R '^exact_fit_finalize$'`. The independent root replay used the same commands with build directory `local/build/native-root-srv01-exact-fit-write-boundary-root-20261022`. All commands exited 0; focused CTest passed 1/1 in each run. Worker logs are under `local/validation/srv01-exact-fit-write-boundary/`; independent root replay logs are under its `root-replay/` subdirectory. Purpose: verify a synthetic `RegionNode` write boundary only. Build products remain under the two exact `local/build/` directories named above. No removal boundary was created.
