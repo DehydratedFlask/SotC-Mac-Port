@@ -26,7 +26,7 @@ or Metal gameplay is demonstrated.
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-7f7220-20261022/` (manifest
   `ddd9588d…` at tip `d8a041b`; capture `3059c15c…`).
-- Observation: feat tip `d8a041b`; measured `pb7f=1` + mid_reg=4 → 275 registry.
+- Observation: feat tip `d8a041b`; docs tip `39e5df1`; measured `pb7f=1` + mid_reg=4 → 275 registry.
   `0x7f7220` body / `0x56fad0` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_7f7220.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
