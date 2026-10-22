@@ -77,6 +77,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Init continue ymm inter-cell (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-ymm-intercell.md) | Init continue ymm inter-cell BSS copy; E458; G1 PARTIAL |
 | [Init continue xmm seed (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-xmm-seed.md) | Init continue xmm BSS seed (0x1014be0→BSS); E459; G1 PARTIAL |
 | [Init continue ymm reload (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-ymm-reload.md) | Init continue ymm reload (0x160430c→0x160433c); E460; G1 PARTIAL |
+| [Init continue 0x26800/0xf590 (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-26800-f590.md) | Init continue 0x26800/0xf590 call-sites; E461; G1 PARTIAL |
 | [FOLDERS](FOLDERS.md) | Generated public/source folder inventory; `scripts/project_index.py` |
 | [INSTALL_LOG](../INSTALL_LOG.md) | Existing and newly installed tools, downloads and removals |
 | [Checkpoint template](checkpoints/TEMPLATE.md) | Required record at each checkpoint |
