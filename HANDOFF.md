@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 00:24 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 00:25 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,23 +8,24 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Active claim: RE-01 identical-output SELF unwrap repeat fixture
+## RE-01 identical-output SELF unwrap repeat fixture — verified
 
-- Root claimed `RE-01-UNWRAP-IDENTICAL-ELF-REPEAT-FIXTURE-01`, child of
-  `RE-01-UNWRAP-IDENTITY-SIDECAR-ROUNDTRIP-FIXTURE-01`, after checking the live extraction spec,
-  helper, test suite, task table and pinned reference checkout. See
-  [claim checkpoint](docs/checkpoints/2026-10-22-root-re01-unwrap-repeat-claim.md).
-- Scope is one synthetic test in `scripts/test_project_tools.py`: run `unwrap()` twice with the
-  same plaintext SELF, source and destination, then assert the second result, ELF bytes and
-  identity-sidecar bytes match the first call. It does not process a real game SELF or execute code.
-- Baseline command `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py` passes
-  10 tests; source hash and log are in the claim checkpoint. Task status `CLAIMED`, 0 implementation
-  attempts and 0 failed tries. Claim commit `8020974b0d77aca07143026ab717a2c44c9f9740` is pushed
-  and fetch-verified at 0/0 divergence; staged audit accepted 4 paths and full audit accepted 1,693.
-  The one-test implementation is assigned to `/root/next_bounded_scout` after claim publication.
-- Exact next action: root will replay the full project-tools suite after the worker reports, record
-  E256, refresh project and Trail indexes, then publish completion evidence. Keep the pending
-  Mach-O CPU and PSARC negative-limit choices untouched.
+- `RE-01-UNWRAP-IDENTICAL-ELF-REPEAT-FIXTURE-01` adds one synthetic test in
+  `scripts/test_project_tools.py`: call `unwrap()` twice with the same plaintext SELF, source and
+  destination, then assert the second result, ELF bytes and identity-sidecar bytes match the first.
+  The wrapper implementation is unchanged. See E256 and the
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-re01-unwrap-repeat-complete.md).
+- Baseline suite passed 10 tests; worker and root replay each pass 11. The reference checkout stays
+  clean at pinned commit `70bb43859cd7ff181a6d409540b757866184d60d`. Project index is current at
+  24,078 folders. Trail wiring graph is in sync at 3,610 nodes / 1,240 files; its source query
+  resolves the new method. The deep meaning layer is not built.
+- Status `FIXTURE_VERIFIED`; one successful attempt, 0 failed tries. Claim commits
+  `8020974b0d77aca07143026ab717a2c44c9f9740` and `af40659` were pushed and fetch-verified before
+  implementation. Completion publication is being recorded in the checkpoint. This is synthetic
+  wrapper repeatability only; it does not process a real game SELF or execute code.
+- Exact next action: review the read-only candidate from `/root/next_independent_task_scout`, verify
+  it against live files and task rows, and claim it only if distinct. Leave the pending Mach-O CPU
+  and PSARC negative-limit choices untouched.
 
 ## SRV-01 arena-page-debit uint32 wrap fixture — verified
 

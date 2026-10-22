@@ -24,4 +24,4 @@
 - Observation: `unwrap()` allows a matching existing ELF and writes the same reconstructed bytes again. The sidecar record is derived from stable source/destination paths and content for this fixture.
 - Inference/task boundary: add a test that makes the same synthetic `unwrap()` call twice and asserts the second returned record, ELF output, and sidecar bytes match the first call. This pins wrapper repeatability only; it proves no real SELF behavior, executable loading, or code execution.
 - Remaining risks: no caller concurrency, crash recovery, real package, loader, runtime, or game behavior is covered. Production helper changes are out of scope.
-- Exact next action: root will replay `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py` after the worker report, record E256, refresh project/Trail indexes, update HANDOFF, and publish completion.
+- Implementation and root replay are complete; detailed results are in [completion checkpoint](2026-10-22-root-re01-unwrap-repeat-complete.md). The next independent action is to review `/root/next_independent_task_scout`'s read-only candidate and claim it only after live verification.

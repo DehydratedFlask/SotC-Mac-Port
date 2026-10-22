@@ -44,6 +44,28 @@ class ToolChecks(unittest.TestCase):
                 unwrap(source, output)
             self.assertEqual(output.read_bytes(), elf)
 
+    def test_identical_plaintext_self_repeat_is_stable(self):
+        elf = fixture_elf()
+        data = bytearray(512 + len(elf))
+        data[:4] = b"O\x15=\x1d"
+        struct.pack_into("<H", data, 24, 1)
+        struct.pack_into("<QQQQ", data, 32, 0x800, 512, len(elf), len(elf))
+        data[64:184] = elf[:120]
+        data[512:] = elf
+        with tempfile.TemporaryDirectory() as folder:
+            source, output = Path(folder) / "fixture.self", Path(folder) / "out.elf"
+            source.write_bytes(data)
+            identity_path = output.with_suffix(".identity.json")
+
+            first_record = unwrap(source, output)
+            first_elf = output.read_bytes()
+            first_identity = identity_path.read_bytes()
+
+            second_record = unwrap(source, output)
+            self.assertEqual(second_record, first_record)
+            self.assertEqual(output.read_bytes(), first_elf)
+            self.assertEqual(identity_path.read_bytes(), first_identity)
+
     def test_truncated_program_header_table_does_not_create_outputs(self):
         elf = bytearray(fixture_elf())
         struct.pack_into("<H", elf, 56, 2)
