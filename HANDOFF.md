@@ -23,9 +23,10 @@ or Metal gameplay is demonstrated.
 - Files: `native/core/ctor_98a90_3be050.{hpp,cpp}` (buf grow), test/checker updates;
   checkpoint `docs/checkpoints/2026-10-22-ctor-98a90-3be050-bufgrow.md`; EVIDENCE E411;
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-ctor-98a90-bufgrow-20261022/` (manifest `89593b8d…`).
-- Observation: ELF pins 0x80 alloc + store sequence; measured begin==end,
-  cap=begin+0x80 → 275 registry. List walk / heavy bodies NOT modelled.
+  `local/validation/appmain-init-ctor-98a90-bufgrow-20261022/` (manifest `c65a2e9b…` at tip
+  `6483731`).
+- Observation: feat tip `6483731`; ELF pins 0x80 alloc + store sequence; measured
+  begin==end, cap=begin+0x80 → 275 registry. List walk / heavy bodies NOT modelled.
 - Commands: `python3 -I tools/lift/check_f3be050_ctor.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
   PASS; private capture exit 0; `check_ctor_slots` still **155**.
