@@ -23,7 +23,7 @@ or Metal gameplay is demonstrated.
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-ctor-98a90-sub3be930-20261022/` (manifest `5efeba5e…` at tip
   `afede14`).
-- Observation: feat tip `afede14`; ELF pins loops/stride/leaves; measured first-slot
+- Observation: feat tip `afede14` (docs tip `2df5ce8`); ELF pins loops/stride/leaves; measured first-slot
   vtable = stand-in → 275 registry.
   Ensure migrate / non-null list / `0x1ab550` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f3be930_sub.py` OK;
