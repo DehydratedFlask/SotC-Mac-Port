@@ -8,6 +8,13 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## 2026-10-22 orchestrator batch 3 — verified
+
+- CPU-01-LEAF-CTOR-DF94C0-FSIN-01 (ctor `0xdf94c0`, `_FSin` via existing L1 wrapper): FIXTURE_VERIFIED, root 300/300. Other single-call ctors rejected because their callees have no native lift (0xa77960, 0x268d40, 0x52a990, 0x17070, 0x14d880/0x14ccb0; 0x32c70 calls a Sony import).
+- AUD-02-NGS2-RACKQUERY-ARGS-01: STATIC_PATH_BYTE_VERIFIED; all 15 candidates on instruction boundaries; arg shapes recorded; 8 rdx sources unresolved (rbx defined across a jmp). REA was unavailable, so no Ghidra confirmation this round.
+- AUD-PUBLISH main() nothing-staged test added. Open observation: a directory/gitlink path with no trailing slash passes `violations()`.
+- Next exact action: lift the callee helpers above (0x52a990 has four ctor callers) to unlock more ctors, or resume AUD-02 with REA open.
+
 ## 2026-10-22 orchestrator batch 2 — verified
 
 - CPU-01-LEAF-CTOR-BATCH-36 (`0x83d800`, `0x7ce8d0`, `0xe71990`): FIXTURE_VERIFIED, root replay 299/299 and 3 byte checkers. Remaining unlifted leaf ctors all call something or tail-jump, so further lifting needs call-edge/helper contracts, not more leaf batches. Not registered in startup_ctors.
