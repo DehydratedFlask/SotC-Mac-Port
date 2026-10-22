@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 15:00 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 15:10 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,35 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E456 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E457 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 Init continue ymm BSS seed
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-INIT-531D60-POST-BASE-YMM-BSS-01` — lift OBS ymm BSS seed (131 B) at
+  `0x531e4b..0x531ece`: `vmovups ymm0` from `0x1014a80` into BSS
+  `0x1604278`/`0x160426c`/`0x16042dc`/`0x1604268` + scalar fills; stop before
+  inter-cell ymm @ `0x531ece` and before `0x26800`/`0xf590` helpers. Prefer
+  always-on AVX-class Init continue after E456 over helper-body tourism and
+  over deepen `0x1290`/`0x5c64c0`/`0x56dcb0`/`0x499f80`/`0x140d90`/
+  `0x14c2f0`/`0x6a5370`. FakeHeap + tip AllocatorFront; PR #5 cite-only.
+- Files: `native/core/init_531d60_post_base_ymm_bss.{hpp,cpp}`; ctor slice wire;
+  `tools/lift/check_f531d60_post_base_ymm_bss.py`; checkpoint
+  `docs/checkpoints/2026-10-22-init-531d60-post-base-ymm-bss.md`; EVIDENCE E457;
+  TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-post-base-ymm-bss-20261022/` (manifest/capture
+  shas at feat tip — see docs commit).
+- Observation: measured `pbymm=4` + `pbf9=1` + mid_reg=4 → 275 registry.
+  Inter-cell ymm / `0x26800`/`0xf590` bodies NOT modelled.
+- Commands: `python3 -I tools/lift/check_f531d60_post_base_ymm_bss.py` OK;
+  `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: ymm inter-cell continue @ `0x531ece`, or bounded `0x1290` /
+  `0x5c64c0` / `0x56dcb0` / `0x499f80` / `0x140d90` / `0x14c2f0` / `0x6a5370`.
+  Goal open.
 
 ## 2026-10-22 Init continue `0xf90310` call-site (splash-hide PLT)
 
