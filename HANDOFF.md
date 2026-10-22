@@ -24,7 +24,7 @@ or Metal gameplay is demonstrated.
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-ctor-98a90-listwalk-20261022/` (manifest `900a79d0…` at tip
   `f50264b`).
-- Observation: feat tip `f50264b`; ELF pins lea/store/je; measured self_cell=obj,
+- Observation: feat tip `f50264b` (docs tip `7f13521`); ELF pins lea/store/je; measured self_cell=obj,
   head=null → 275 registry.
   Non-null body (`0xf8f500` PLT / `0x3c0840`) NOT modelled.
 - Commands: `python3 -I tools/lift/check_f3be050_ctor.py` OK;
