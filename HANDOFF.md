@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 00:06 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 00:13 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -18,8 +18,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   audio-bank-header suite passes 21/21. Production parser is unchanged, and `docs/ASSETS.md` now
   reports 21 synthetic test methods.
 - See [completion checkpoint](docs/checkpoints/2026-10-22-root-cpu02-aud01-fixtures-complete.md)
-  and E253/E254. Claim commit `8e7c307020022f03691da4bb0255226822b2ec52` is pushed and
-  fetch-verified. The final task completion checkpoint is staged for publication.
+  and E253/E254. Claim commit `8e7c307020022f03691da4bb0255226822b2ec52` and completion commit
+  `c97c1dbb957882a915a89927ef9a94a9e0eb5740` are pushed and fetch-verified at 0/0 divergence.
+  Staged audit accepted 8 allowlisted paths; full audit accepted 1,690.
 - Trail initially reported stale while both test edits were in progress. After rebuilding, the
   final wiring check passes at 3,609 nodes / 1,240 files. Project index regeneration and check pass
   at 24,078 folders. The first project-index check was stale because its own output log was created
@@ -27,8 +28,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Both tasks are `FIXTURE_VERIFIED`, 1 successful implementation attempt each and 0 failed tries.
   Evidence is synthetic only; no game/runtime acceptance gate changes. Existing user-owned
   `native/api/CMakeLists.txt` and `native/api/host/` remain untouched.
-- Exact next action: publish the staged completion checkpoint, then claim another independent
-  bounded task. Leave the pending Mach-O CPU and PSARC negative-limit choices untouched.
+- Exact next action: independently verify the read-only arena-page-debit wrap candidate, then claim
+  it only if the live spec and existing tests confirm a distinct arithmetic fixture. Leave the
+  pending Mach-O CPU and PSARC negative-limit choices untouched.
 
 ## SRV-01 HostMapping non-null / zero-size empty state — fixture verified
 
