@@ -140,6 +140,15 @@ bool base_initialize_255130(void* self, void* arg,
         if (!aar.ok) {
             return false;
         }
+        // E432: always-on shadowbanks load-attempt (stop before success atexit).
+        const Vslot40_533100ShadowbanksResult br =
+            vslot_40_533100_shadowbanks(hooks.vslot_40_shadowbanks_detail);
+        if (hooks.vslot_40_shadowbanks_out != nullptr) {
+            *hooks.vslot_40_shadowbanks_out = br;
+        }
+        if (!br.ok) {
+            return false;
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true
