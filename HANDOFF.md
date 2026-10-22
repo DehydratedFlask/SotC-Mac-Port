@@ -8,6 +8,21 @@ this checkpoint is heap-only and does not claim main tip.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## 2026-10-22 BucketAllocator size-class layer (0x17990) — verified on feature branch
+
+- Agent: bc-492a8623-dec2-597e-8de6-73c00b0ad8a5. Attempt 1 — success (0 failed tries).
+- Task: `SRV-01-BUCKET-ALLOCATOR-01` → `FIXTURE_VERIFIED` (branch `cursor/heap-depth-5d26`).
+- Worktree: `/Volumes/Extra/SoC-Mac-heap-depth`. Did **not** touch `startup_ctors.*` / Init-hash.
+- Files: `native/core/bucket_allocator.{hpp,cpp}`, `native/tests/test_bucket_allocator.cpp`,
+  `tools/lift/check_f17990.py`, CMake + README + TASKS/EVIDENCE/this block.
+- Observation: ELF-pins init `0x17990`, alloc max-gate `0x179c0` (+0x88), pool setup `0x18750`
+  (page−0x38)/class div, bootstrap classes `0x10..0x400` step `0x10` on 64 KiB pages.
+  Native size-class freelist is INF (not original chunk surgery). No zero-fill. HeapAllocator body open.
+- Commands: `ctest -R '^(bucket_allocator|composite_allocator|allocator_front|page_allocator|page_owner_map)$'`
+  PASS 5/5; `python3 -I tools/lift/check_f17990.py` OK.
+- Inference: not G1; not wired into startup. Evidence **E400**.
+- Next exact action (heap lane): HeapAllocator `0x48c70` / cap `0x48910` (1 MiB pages, 150 MiB). Goal open.
+
 ## 2026-10-22 composite allocator hierarchy (0x47e30) — verified on feature branch
 
 - Agent: bc-492a8623-dec2-597e-8de6-73c00b0ad8a5. Attempt 1 — success (0 failed tries).

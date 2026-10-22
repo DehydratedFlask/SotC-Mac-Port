@@ -92,4 +92,4 @@ require('size < threshold' in hdr or 'size <' in hdr, 'native docs size<threshol
 print('OK: composite 0x47e30 body + bootstrap thresholds '
       '(bucket 0x400 / heap 0x100000 / page ~0) + Bucket/Heap ctor immediates; '
       'native composite_allocator.hpp constants match; '
-      'BucketAllocator/HeapAllocator bodies still not lifted')
+      'HeapAllocator body still not lifted (Bucket: see check_f17990.py)')

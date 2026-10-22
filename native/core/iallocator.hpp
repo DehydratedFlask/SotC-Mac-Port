@@ -8,8 +8,8 @@
 //                  stub returning 0, so in practice reporting always runs)
 //   OBS  vt[+0xa8] deallocate(heap, ptr, &desc{kind})
 // The names, the C++ signature and the 64-bit size/align types are INF (native design).
-// PageAllocator and CompositeAllocator (threshold dispatch) implement this; BucketAllocator /
-// HeapAllocator bodies are still not lifted.
+// PageAllocator, CompositeAllocator, and BucketAllocator (size classes) implement this;
+// HeapAllocator body is still not lifted.
 #pragma once
 
 #include <cstddef>
