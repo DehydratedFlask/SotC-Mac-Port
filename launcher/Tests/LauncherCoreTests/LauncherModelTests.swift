@@ -207,12 +207,19 @@ struct LauncherModelValidationTests {
     }
 
     @Test func hostChecksStillGatePlay() async throws {
-        let model = makeModel(ScriptedCoreClient(engineReady: true), metal: .missing("No Metal device available"))
+        let client = ScriptedCoreClient(engineReady: true)
+        let model = makeModel(client, metal: .missing("No Metal device available"))
         await model.validate()
         #expect(model.state == .idle)
+        #expect(!model.canStart)
         #expect(model.presentation.status.contains("Metal"))
         let items = try #require(model.report).items
         #expect(items.first { $0.kind == .nativeCore }?.status == .ready)
+        #expect(items.first { $0.kind == .metal }?.status == .missing("No Metal device available"))
+
+        await model.startCore()
+        #expect(client.count("start") == 0)
+        #expect(model.state == .idle)
     }
 
     @Test func missingAudioOutputBlocksPlayAndNeverCallsCoreStart() async throws {

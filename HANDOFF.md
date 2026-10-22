@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 05:58 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 06:05 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,19 +8,39 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Current parallel fixture claims — active
+## Current fixture claim — active
 
-- `APP-01-METAL-READINESS-GATE-FIXTURE-01`, owned by `/root`; one test method in
-  `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift`. Pin that injected missing Metal
-  blocks `canStart` and calling `startCore()` leaves the scripted core's start count at zero.
-- `SRV-01-EXACT-FIT-FINALIZE-WRITE-BOUNDARY-FIXTURE-01`, owned by `/root`; one test-only byte
-  boundary case in `native/tests/test_exact_fit_finalize.cpp`. Seed the record with a poison pattern,
-  run `exact_fit_finalize`, and verify bytes outside its five documented writes are unchanged.
-- Both claims have zero implementation attempts and zero failed tries; no production changes are in
-  scope. Claim details and source identities are in
-  [the parallel-claims checkpoint](docs/checkpoints/2026-10-22-root-app01-metal-srv01-exact-fit-claims.md).
-- Exact next action: delegate the two separate test files for implementation and focused validation;
-  root remains the only owner of shared docs and publication.
+- `CPU-01-LAZY-PARAM-TREE-FAILED-RELEASE-PRESERVES-BUILT-FIXTURE-01`, owned by `/root` and
+  `/root/next_fixture_scout_2`; one test-only case in `native/tests/test_lazy_param_def_tree.cpp`.
+  Build a tree through `get()`, close the unlocked mutex, then pin that `release()` reports
+  `mutex_unavailable` while `built()` and the tree pointer remain intact. Baseline and exact commands
+  are in the [claim checkpoint](docs/checkpoints/2026-10-22-root-cpu01-lazy-release-preserve-claim.md).
+- The claim has zero implementation attempts and zero failed tries. Production sources, CMake,
+  unrelated user API changes, and game inputs are outside scope. Root owns shared docs and publication.
+- Exact next action: dispatch the claimed test edit and focused validation to
+  `/root/next_fixture_scout_2`; then independently replay the target and record its result.
+
+## APP-01 Metal readiness gate fixture — verified
+
+- `APP-01-METAL-READINESS-GATE-FIXTURE-01` is `FIXTURE_VERIFIED`: worker and independent root runs
+  each pass all 9 `LauncherModelValidationTests`. Missing injected Metal reports its reason, disables
+  `canStart`, and keeps `startCore()` idle without calling the scripted core's `start()`. Only the
+  existing test method changed. E352 and the
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-app01-metal-readiness-complete.md) record
+  hashes, commands, and logs.
+- This verifies a synthetic readiness gate only; physical Metal availability, rendering, and game
+  behavior are not demonstrated.
+
+## SRV-01 exact-fit finalization write-boundary fixture — verified
+
+- `SRV-01-EXACT-FIT-FINALIZE-WRITE-BOUNDARY-FIXTURE-01` is `FIXTURE_VERIFIED`: worker and
+  independent root Debug/Ninja builds pass the focused `exact_fit_finalize` CTest 1/1. A poison
+  pattern confirms all bytes outside the pointer, sentinel, size, and two flag fields remain intact.
+  Only `native/tests/test_exact_fit_finalize.cpp` changed. E353 and the
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-srv01-exact-fit-write-boundary-complete.md)
+  record hashes and logs.
+- This verifies a synthetic helper byte boundary only; allocator reachability and game behavior are
+  not demonstrated.
 
 ## DATA-02 pakN TOC payload-MD5 sample — verified
 
