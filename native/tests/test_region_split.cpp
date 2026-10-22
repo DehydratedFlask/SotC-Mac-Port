@@ -29,6 +29,25 @@ int main() {
         CHECK(neu.ptr_field() == 0 && neu.sentinel() == 0xffffffffu);
     }
     {
+        RegionNode free{};
+        std::memset(free.raw, 0xA5, sizeof(free.raw));
+        free.set_start(0x20001000ull);
+        free.set_size(0x30000ull);
+        free.set_flag_a(0xAB);
+        free.set_capacity(0x30000ull);
+        std::uint8_t free_before[RegionNode::kBytes];
+        std::memcpy(free_before, free.raw, sizeof(free.raw));
+        RegionNode neu{};
+        constexpr std::uint64_t lead = 0xf000ull;
+
+        CHECK(split_free_at_lead(free, neu, lead));
+        CHECK(free.capacity() == lead && free.size() == lead);
+        CHECK(std::memcmp(free_before, free.raw, RegionNode::kCapOffset) == 0);
+        CHECK(std::memcmp(free_before + RegionNode::kStartOffset,
+                          free.raw + RegionNode::kStartOffset,
+                          RegionNode::kBytes - RegionNode::kStartOffset) == 0);
+    }
+    {
         RegionNode a{}, b{};
         std::memset(a.raw, 0xA5, sizeof(a.raw));
         std::memset(b.raw, 0x5A, sizeof(b.raw));

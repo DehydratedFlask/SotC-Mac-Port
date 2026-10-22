@@ -2,7 +2,8 @@
 
 - Time / timezone: 2026-10-22 02:28 CDT (America/Chicago)
 - Agent and integrator: claim `/root` (Codex desktop task
-  `01a15eab-88d5-7a83-a23b-cc55dc002eb6`); planned implementation `/root/next_fixture_scout_2`.
+  `01a15eab-88d5-7a83-a23b-cc55dc002eb6`); implementation assigned to `/root/next_fixture_scout_2`
+  at 2026-10-22 02:34 CDT.
 - Task / gate / status: `SRV-01-REGION-SPLIT-SUCCESS-PRESERVE-FREE-NODE-METADATA-FIXTURE-01`,
   child of `SRV-01`; `ACTIVE`, implementation not started, zero failed tries.
 - Prerequisite evidence / input and source hashes: baseline test
@@ -46,10 +47,13 @@
   post-push explicit/full audits accepted 7/1,719. Audit log SHA256 values are
   `d5d4c08339281a22ca058b28d9e97e88560659fb680e115313700a3846ca4a4b` /
   `4379a1e23cbede0ba946693bd4327279b48e29440497fa95879e716122bc1d74` and are recorded in E291.
-- Next exact action: delegate only `native/tests/test_region_split.cpp` to
-  `/root/next_fixture_scout_2`, then independently replay the focused CTest.
+- Next exact action: receive the worker's test and focused CTest result, then independently replay
+  the focused CTest from the current shared checkout.
 - HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF, TASKS, EVIDENCE, and
   `docs/FOLDERS.md` are updated; `python3 scripts/project_index.py` and its check pass at 28,897
   folders including 448 checkpoint files; `trail build --check` passes at 3,618 nodes / 1,240
   files. Combined log `local/validation/20261022-root-fixture-baselines/app01-srv01-claim-index-trail.log`
   SHA256 `4290efc2b8ace98dfd871aed2bdca43cf65b63211257105b75183e331bcf4cd3`. No install occurred.
+- Outcome: the worker's implementation and independent root replay are complete; see
+  [completion checkpoint](2026-10-22-root-srv01-region-split-metadata-complete.md). This claim
+  checkpoint preserves the baseline and assignment state; its original next action is superseded.
