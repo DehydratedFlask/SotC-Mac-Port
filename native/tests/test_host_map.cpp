@@ -1,6 +1,8 @@
 #include <cstdio>
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <unistd.h>
 
 #include "core/host_map.hpp"
 
@@ -85,6 +87,26 @@ int main() {
         CHECK(w && (w->base & 0x7fffffffull) == 0);
         *reinterpret_cast<std::uint32_t*>(mapped->mapping.ptr) = 0x5354434fu;
         CHECK(*reinterpret_cast<std::uint32_t*>(mapped->mapping.ptr) == 0x5354434fu);
+        unmap(mapped->mapping);
+    }
+
+    // The allocator region retains the request while the host mapping rounds to a page.
+    {
+        constexpr std::uint64_t kRequestedSize = 0x200001ull;
+        AllocatorRegionRequest request = kShadowHeapRequest;
+        request.size = kRequestedSize;
+
+        const long page_result = ::sysconf(_SC_PAGESIZE);
+        const std::uint64_t page_size =
+            page_result > 0 ? static_cast<std::uint64_t>(page_result) : 16384ull;
+        const std::uint64_t expected_mapping_size =
+            (kRequestedSize + page_size - 1) & ~(page_size - 1);
+
+        auto mapped = map_region(request);
+        CHECK(mapped);
+        CHECK(mapped->region.size == kRequestedSize);
+        CHECK(mapped->mapping.size == expected_mapping_size);
+        CHECK(mapped->mapping.size > mapped->region.size);
         unmap(mapped->mapping);
     }
 
