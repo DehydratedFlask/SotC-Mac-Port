@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 22:54 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:01 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -19,19 +19,31 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   [completion checkpoint](docs/checkpoints/2026-10-21-root-data02-toc-value-size-crosstab-complete.md).
 - Status `ARTIFACT_VERIFIED`; this remains metadata-only, with no byte-identity, digest-semantics,
   loader, mount-order, or runtime claim. Parent DATA-02 remains ACTIVE / partial.
-- Claim commit `f9fc4302f1702af6677e90121a6040becc533d5e` and documentation syncs `539a6bd1cfae0f3d75f13ac460d6c3ddf851734e` / `5da4e8f37f26f3b156055a202252123b9e01a41c` are pushed and verified.
-- Exact next action: publish the crosstab result and the `RE-02-DYNLINK-REQUIRED-PHDR-01` claim
-  together; after fetch verification, dispatch the synthetic parser work to `/root/next_bounded_scout`.
+- Claim commit `f9fc4302f1702af6677e90121a6040becc533d5e`, documentation syncs
+  `539a6bd1cfae0f3d75f13ac460d6c3ddf851734e` / `5da4e8f37f26f3b156055a202252123b9e01a41c`,
+  and the crosstab-plus-parser claim commit `4fb696fe09af255c4219705c69af8b95f5f2d0fe` were pushed
+  and fetch-verified.
+- Exact next action: close the parser fixture task with its independent replay and evidence record.
 
-## RE-02 dynlink required program headers — claimed
+## RE-02 dynlink required program headers — fixture verified
 
-- Root claims `RE-02-DYNLINK-REQUIRED-PHDR-01`, child of `RE-02-DYNLINK-01`; scope and baseline
+- Root completed `RE-02-DYNLINK-REQUIRED-PHDR-01`, child of `RE-02-DYNLINK-01`; scope and baseline
   are in [the claim checkpoint](docs/checkpoints/2026-10-21-root-re02-dynlink-required-phdr-claim.md).
-- Add two synthetic missing-header cases for `PT_DYNAMIC` and `PT_SCE_DYNLIBDATA`. `parse()` must
-  raise explicit `ValueError` messages instead of leaking `StopIteration`. Keep duplicate-header
-  behavior unchanged; no live ELF/runtime-loader claim.
-- Exact next action: publish the claim, then assign `/root/next_bounded_scout` the two fixture cases
-  and bounded parser change in `scripts/ps4_dynlink.py` / `scripts/test_ps4_dynlink.py`.
+- `parse()` now raises `ValueError('missing PT_DYNAMIC program header')` and
+  `ValueError('missing PT_SCE_DYNLIBDATA program header')`; both exact messages are asserted by
+  synthetic fixtures. Worker and root each pass all 29 dynlink tests. Mutations that remove either
+  guard fail with the original `StopIteration`; a root synthetic duplicate-header replay confirms
+  first-match behavior for both required types.
+- Root's first duplicate-check comparison failed because it compared the returned `ph` list after
+  intentionally adding a header. The corrected check compares parsed tables while retaining the
+  invalid later duplicate; see both attempt logs in the private validation directory and E240.
+  This was a verification-harness correction, not a failed implementation try.
+- Status `FIXTURE_VERIFIED`; attempt count 0 failed implementation tries. No live ELF, loader,
+  runtime, or game behavior claim. See E240 and the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-re02-dynlink-required-phdr-complete.md).
+- Exact next action: delegate a read-only scout for a bounded task outside the PSARC reader files;
+  leave negative-limit behavior unclaimed pending the user's choice of invalid-error versus
+  empty-read behavior.
 
 ## RE-02 app-main +0x20 virtual call — static path byte verified
 

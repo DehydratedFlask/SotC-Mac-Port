@@ -73,8 +73,12 @@ class Image:
 
 def parse(elf):
     entry, ph = program_headers(elf)
-    dyn_ph = next(p for p in ph if p['type'] == PT_DYNAMIC)
-    lib_ph = next(p for p in ph if p['type'] == PT_SCE_DYNLIBDATA)
+    dyn_ph = next((p for p in ph if p['type'] == PT_DYNAMIC), None)
+    if dyn_ph is None:
+        raise ValueError('missing PT_DYNAMIC program header')
+    lib_ph = next((p for p in ph if p['type'] == PT_SCE_DYNLIBDATA), None)
+    if lib_ph is None:
+        raise ValueError('missing PT_SCE_DYNLIBDATA program header')
     tags, multi = {}, collections.defaultdict(list)
     for pos in range(dyn_ph['offset'], dyn_ph['offset'] + dyn_ph['filesz'], 16):
         tag, value = unpack('<QQ', elf, pos)
