@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 01:22 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 01:24 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -17,7 +17,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   source bytes, and no ELF output. No wrapper change is planned.
 - Baseline `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py` passes 11 tests;
   hashes and claim details are in [the claim checkpoint](docs/checkpoints/2026-10-22-root-re01-sidecar-symlink-claim.md)
-  and E272. Status `ACTIVE`, 0 failed implementation tries. Root owns shared docs; after claim
+  and E272. Claim commit `6cd08912d27d88f3bf4a4c9690043678c70e8ab3` is pushed; staged/full audits
+  accepted 5/1,707 paths, fresh fetch showed 0/0 divergence, and post-push full audit accepted 1,707
+  paths. Publication log SHA256 is recorded in E273. Status `ACTIVE`, 0 failed implementation
+  tries. Root owns shared docs; after claim
   publication `/root/next_fixture_scout_3` owns only the test file. Exact next action: add the one
   symlink-alias test, run the focused suite (expected 12 tests), then root replay and completion
   records. This pins synthetic filesystem behavior only.
