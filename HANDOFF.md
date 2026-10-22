@@ -8,24 +8,27 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Active claims: CPU-02 maximum Tagged31 retag and AUD-01 archive-summary SHA-256 fixtures
+## CPU-02 max-offset and AUD-01 archive-summary fixtures — verified
 
-- Root claimed `CPU-02-TAGGED31-RETAG-MAX-OFFSET-FIXTURE-01` and
-  `AUD-01-XFF-ARCHIVE-SUMMARY-SHA256-MISMATCH-FIXTURE-01`; details and baseline evidence are in
-  [the claim checkpoint](docs/checkpoints/2026-10-22-root-cpu02-aud01-fixture-claims.md).
-- Ownership is disjoint: `/root/next_bounded_scout` owns only `native/tests/test_addr.cpp`; root
-  owns only `scripts/test_audio_bank_header.py` and the test-count sentence in `docs/ASSETS.md`.
-  Root remains the sole integrator for HANDOFF, TASKS, EVIDENCE, and checkpoint records. The
-  pre-existing user-owned `native/api/CMakeLists.txt` and `native/api/host/` remain untouched.
-- Baselines pass: `test_addr` build and `addr` CTest (1/1), and the audio-bank-header suite (20/20).
-  Logs and SHA-256 hashes are in the claim checkpoint. The test-count sentence in ASSETS is stale
-  at 18; the current Python file has 20 methods, so completion should update it to 21.
-- Both tasks are `CLAIMED`, with 0 implementation attempts and 0 failed tries. These are synthetic
-  fixtures only; no production behavior or game/runtime acceptance gate changes.
-- Exact next action: publish this claim checkpoint; then implement each one-file fixture in its
-  owned test file, correct the ASSETS count with the audio fixture, run the focused checks, record
-  EVIDENCE, refresh project and Trail indexes, and publish the completed tasks. Leave the pending
-  Mach-O CPU and PSARC negative-limit choices untouched.
+- `CPU-02-TAGGED31-RETAG-MAX-OFFSET-FIXTURE-01` now pins retag/decode of `0x7fffffff` in a
+  synthetic full 2 GiB `HeapWindow`; worker and root focused builds pass and `addr` CTest passes
+  1/1. Production code is unchanged.
+- `AUD-01-XFF-ARCHIVE-SUMMARY-SHA256-MISMATCH-FIXTURE-01` keeps the summary byte count correct,
+  corrupts only its digest, and asserts the exact error before `Psarc` construction. The
+  audio-bank-header suite passes 21/21. Production parser is unchanged, and `docs/ASSETS.md` now
+  reports 21 synthetic test methods.
+- See [completion checkpoint](docs/checkpoints/2026-10-22-root-cpu02-aud01-fixtures-complete.md)
+  and E253/E254. Claim commit `8e7c307020022f03691da4bb0255226822b2ec52` is pushed and
+  fetch-verified. The final task completion checkpoint is staged for publication.
+- Trail initially reported stale while both test edits were in progress. After rebuilding, the
+  final wiring check passes at 3,609 nodes / 1,240 files. Project index regeneration and check pass
+  at 24,078 folders. The first project-index check was stale because its own output log was created
+  after generation; pre-creating both logs resolved the ordering issue.
+- Both tasks are `FIXTURE_VERIFIED`, 1 successful implementation attempt each and 0 failed tries.
+  Evidence is synthetic only; no game/runtime acceptance gate changes. Existing user-owned
+  `native/api/CMakeLists.txt` and `native/api/host/` remain untouched.
+- Exact next action: publish the staged completion checkpoint, then claim another independent
+  bounded task. Leave the pending Mach-O CPU and PSARC negative-limit choices untouched.
 
 ## SRV-01 HostMapping non-null / zero-size empty state — fixture verified
 
@@ -46,7 +49,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Completion commit `47f332e3a323312fc3f3e5bab0a282d725811c04` is pushed and fetch-verified at 0/0
   divergence; staged audit accepted 6 paths and the full audit accepted 1,688. Publication logs are
   recorded in E252. The thin Mach-O CPU policy remains pending the user's choice.
-- This 2026-10-22 claim supersedes the older next-action note below; see the active claims above.
+- Newer progress is recorded at the top of this handoff.
 
 ## SRV-01 allocator rounding zero-input fixture — fixture verified
 
