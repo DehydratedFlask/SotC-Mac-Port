@@ -8,6 +8,12 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## 2026-10-22 orchestrator batch 4 — verified
+
+- CPU-01-FNV-HELPER-52A990-01: helper `0x52a990` and four ctors lifted; root replay 302/302 + five checkers (E387). Note the helper hashes sign-extended bytes, unlike `fnv1a32`; do not unify them.
+- Open: remaining rejected-ctor callees (0xa77960, 0x268d40, 0x17070, 0x14d880/0x14ccb0), record meanings/consumers, string-data policy, startup_ctors registration.
+- Next exact action: lift 0xa77960 / 0x268d40 / 0x17070 helpers the same way, or analyse consumers of the hashed-name records.
+
 ## 2026-10-22 orchestrator batch 3 — verified
 
 - CPU-01-LEAF-CTOR-DF94C0-FSIN-01 (ctor `0xdf94c0`, `_FSin` via existing L1 wrapper): FIXTURE_VERIFIED, root 300/300. Other single-call ctors rejected because their callees have no native lift (0xa77960, 0x268d40, 0x52a990, 0x17070, 0x14d880/0x14ccb0; 0x32c70 calls a Sony import).
