@@ -116,6 +116,33 @@ class ToolChecks(unittest.TestCase):
             self.assertEqual(source.read_bytes(), original_source)
             self.assertFalse(destination.exists())
 
+    def test_identity_sidecar_symlink_collision_does_not_overwrite_source(self):
+        elf = fixture_elf()
+        data = bytearray(512 + len(elf))
+        data[:4] = b"O\x15=\x1d"
+        struct.pack_into("<H", data, 24, 1)
+        struct.pack_into("<QQQQ", data, 32, 0x800, 512, len(elf), len(elf))
+        data[64:184] = elf[:120]
+        data[512:] = elf
+
+        with tempfile.TemporaryDirectory() as folder:
+            source = Path(folder) / "input.self"
+            destination = Path(folder) / "out.elf"
+            identity_path = destination.with_suffix(".identity.json")
+            source.write_bytes(data)
+            original_source = source.read_bytes()
+            identity_path.symlink_to(source)
+
+            with self.assertRaises(ValueError) as error:
+                unwrap(source, destination)
+
+            self.assertEqual(
+                str(error.exception),
+                f"identity sidecar would overwrite source: {source}",
+            )
+            self.assertEqual(source.read_bytes(), original_source)
+            self.assertFalse(destination.exists())
+
     def test_index_is_stable_and_detects_a_new_folder(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
