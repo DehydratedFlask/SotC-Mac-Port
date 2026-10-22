@@ -11,8 +11,8 @@
 //
 // Distinct from earlier dual call-site `26800_f590` (E461).
 // Claimed: call-site control flow pin only.
-// NOT modelled: mov rdi,rbx prep; 0xf590 body; following second call 0xf590.
-// PR #5 cite-only.
+// NOT modelled: mov rdi,rbx prep; 0xf590 body; following second call 0xf590
+// (call-site claimed separately as E491; body still demoted). PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
