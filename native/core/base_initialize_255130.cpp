@@ -113,6 +113,15 @@ bool base_initialize_255130(void* self, void* arg,
         if (!kr.ok) {
             return false;
         }
+        // E429: always-on skels attach (measured fail path; install into f08+0x10).
+        const Vslot40_533100SkelsAttachResult kar = vslot_40_533100_skels_attach(
+            kr.loaded, /*success_flag=*/false, hooks.vslot_40_skels_attach_detail);
+        if (hooks.vslot_40_skels_attach_out != nullptr) {
+            *hooks.vslot_40_skels_attach_out = kar;
+        }
+        if (!kar.ok) {
+            return false;
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true
