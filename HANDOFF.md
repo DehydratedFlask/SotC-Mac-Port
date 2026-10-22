@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 01:10 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 01:13 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -18,8 +18,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Status `FIXTURE_VERIFIED`, one successful implementation attempt and 0 failed tries. Trail rebuilt
   to 3,614 nodes / 1,240 files and resolves the new method at
   `scripts/test_ps4_dynlink.py:L357-L363`; wiring check passes. Project index is current at 24,080
-  folders. Claim commit `17ff82e5b58eeb7f24aaf3597369e549e894c5cc` is pushed and fetch-verified at
-  0/0 divergence. This is a synthetic helper test only; no real ELF, loader, or runtime claim.
+  folders. Claim commit `17ff82e5b58eeb7f24aaf3597369e549e894c5cc` and completion commit
+  `dc9f153e23551ef7333c34523eba2cbd2ab223bf` are pushed. Completion staged/full audits accepted
+  6/1,704 paths; a fresh fetch confirmed 0/0 divergence and post-push full audit accepted 1,704.
+  This is a synthetic helper test only; no real ELF, loader, or runtime claim.
 - Exact next action: review the read-only scout candidate `AUD-01-CLASSIFIER-PROBE-OFFSET-CUTOFF-FIXTURE-01`
   against the live task register and source, then claim it before any edit if distinct. Leave pending
   Mach-O CPU and PSARC policy choices alone.
