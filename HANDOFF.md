@@ -23,9 +23,9 @@ or Metal gameplay is demonstrated.
   `tools/lift/check_finit_531d60_trivial_leaves.py`; CMake/README;
   checkpoint `docs/checkpoints/2026-10-22-init-531d60-trivial-leaves.md`;
   EVIDENCE E406; TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-remainder-20261022/` (manifest `98dda9d9…`).
-- Observation: ELF pins bodies/PLT; measured trivial+registry (275 entries, 3 alloc ops);
-  base Initialize `0x255130` / `0xf08` singleton / pad path NOT modelled.
+  `local/validation/appmain-init-remainder-20261022/` (manifest `03b9adca…`).
+- Observation: tip `b19b879`; ELF pins bodies/PLT; measured trivial+registry (275 entries,
+  3 alloc ops); base Initialize `0x255130` / `0xf08` singleton / pad path NOT modelled.
 - Commands: `python3 -I tools/lift/check_finit_531d60_trivial_leaves.py` OK;
   `ctest --test-dir local/build/native-init-remainder -R '^(appmain_init_remainder_slice|appmain_init_registry_slice)$'`
   PASS; private capture exit 0; `check_ctor_slots` still **155**.
