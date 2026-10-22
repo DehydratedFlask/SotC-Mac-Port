@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 10:00 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 10:06 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree):
 bc-492a8623-dec2-597e-8de6-73c00b0ad8a5 — owns `0x12820`/`0x12af0`/READY SRV; Drive keeps
 `startup_ctors.*` + Init-hash/FNV/registry exclusivity. Integrator note:
@@ -9,6 +9,23 @@ Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## 2026-10-22 Init `0x531d60` registry fragment
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-REGISTRY-INIT-531D60-01` — alloc 0x98 → fill `0x52a220` → store cell `0x2efd160`
+  (destroy previous). Prefer Init over pools for G1. No leaf-vec; no idx 95; heap untouched.
+- Files: `native/core/registry_init_531d60.{hpp,cpp}`, test, `tools/lift/check_f531d60_registry.py`;
+  CMake/HANDOFF/TASKS/EVIDENCE/README.
+- Observation: fragment at `0x532b0c..0x532bf8` calls `0x17070`/`0x54dc10`/`0x54dc20`/`0x52a220`
+  then stores into `0x2efd160`; Init body sha256 `cc36f596…`; rest of Init NOT modelled;
+  listener-slot dtors NOT walked (fill leaves +0x40 null).
+- Commands: `python3 -I tools/lift/check_f531d60_registry.py` OK;
+  `ctest --test-dir local/build/native-reginit531d60 -R '^(registry_init_531d60|registry_fill_52a220|inputtable_names_fixture)$'`
+  PASS (3/3); `check_ctor_slots` still **155** pairs.
+- Inference: not G1; pool/listener half of `0x52a220` and remainder of Init still open.
+- Next exact action: pool/listener loop after `0x52a680`, or next Init callees needed for a
+  measured startup slice. Goal open.
 
 ## 2026-10-22 registry fill `0x52a220` + private 275-name fixture
 
