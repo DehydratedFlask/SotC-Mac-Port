@@ -73,15 +73,12 @@ for rva, index, is_blocker, line_number in rows:
 
 prefix = [row for row in rows if row[1] <= 23]
 assert [row[1] for row in prefix] == list(range(24)), "indices 0–23 must be represented contiguously"
-assert all(not row[2] for row in prefix[:23]), "indices 0–22 must have callbacks"
+assert all(not row[2] for row in prefix), "indices 0–23 must have callbacks (slot 23 uses private name fixture)"
 assert prefix[10][:3] == (0xf09e60, 10, False), "index 10 RVA 0xf09e60 must be recovered"
 assert prefix[11][:3] == (0xf09160, 11, False), "index 11 RVA 0xf09160 must be recovered"
-assert prefix[23][:3] == (0xe71990, 23, True), "index 23 must be the explicit unresolved blocker"
-# The first null callback in original order is the one the runner stops at, and it is the ONLY null
-# row before index 48, so the runner can never silently skip 23-47.
-first_blocker = next(row for row in rows if row[2])
-assert first_blocker[:2] == (0xe71990, 23), f"first blocker must be index 23, got {first_blocker[:2]}"
-assert [row[:2] for row in rows if row[2]] == [(0xe71990, 23)], "only index 23 may be an explicit blocker row"
+assert prefix[23][:3] == (0xe71990, 23, False), "index 23 RVA 0xe71990 must be recovered"
+# Production table must not carry explicit null rows (fail-visible is via init_failed on missing fixture).
+assert not [row for row in rows if row[2]], "recovered_constructors() must not contain nullptr callbacks"
 # Indices 24-47 (descriptor + mutex + atexit family, run 24-47) are not recovered and must not be registered.
 assert not [row for row in rows if 24 <= row[1] <= 47], "indices 24-47 must stay unregistered"
 # Row 11 must be the real slot-11 callback, not an empty lambda.
@@ -99,6 +96,9 @@ for thunk_index, thunk_rva in THUNKS.items():
 slot21_lines = [l for l in source_lines if re.match(r"^\s*\{\s*0xee1130\s*,\s*21\s*,", l)]
 assert len(slot21_lines) == 1 and "init_const_table_ee1130(s.const_table_ee1130)" in slot21_lines[0], (
     "slot 21 must call init_const_table_ee1130")
+slot23_lines = [l for l in source_lines if re.match(r"^\s*\{\s*0xe71990\s*,\s*23\s*,", l)]
+assert len(slot23_lines) == 1 and "init_slot23_leaf_e71990(s)" in slot23_lines[0], (
+    "slot 23 must call init_slot23_leaf_e71990")
 assert [(rva, index) for rva, index, _, _ in rows if rva in (0xd32720, 0xd2ffe0)] == [
     (0xd32720, 119),
     (0xd2ffe0, 120),
@@ -126,7 +126,7 @@ BODY_SHA256 = {
     0xefe320: (239, "d157e4bf9c9e7f3900051edb9659906cca7c45c454af68a29d05c73ec9b2a612"),  # slot 17
     0xefd020: (281, "a14f6aa8db166697a1cc3eb0ad2feb49c15c482e725864333c748335b9492638"),  # slot 18
     0xefacd0: (79, "2750b1530f9edd2b561c213b7c6be699443617bbc464e0769bfc1910bfa51f6e"),   # slot 19
-    0xe71990: (337, "3932fb85b759ae53dd1675142ffda4b449be725f241cfeefdb40a07a2beaf774"),  # slot 23 (blocker)
+    0xe71990: (337, "3932fb85b759ae53dd1675142ffda4b449be725f241cfeefdb40a07a2beaf774"),  # slot 23
 }
 for body_rva, (body_size, body_digest) in BODY_SHA256.items():
     got = hashlib.sha256(image.read(body_rva, body_size)).hexdigest()
@@ -204,7 +204,7 @@ block_stores_ok(image.read(0xf08f00, 556), "reset 0xf08f00")
 print(
     f"OK: ELF sha256={elf_digest}; constructor table start={TABLE_START:#x} "
     f"count={TABLE_COUNT} sha256={table_digest}; verified {len(rows)} registered RVA/index pairs; "
-    "slots 0-22 are recovered (slot 11 byte anchors + 12 array block offsets/strides; slots 12-19 body "
-    "digests + ELF-table RVAs for the native registration table); "
-    "first unresolved slot is index 23 RVA 0xe71990"
+    "slots 0-23 are recovered (slot 11 byte anchors + 12 array block offsets/strides; slots 12-19 body "
+    "digests + ELF-table RVAs for the native registration table; slot 23 private name fixture); "
+    "indices 24-47 remain unregistered (next production gap after contiguous 0-23)"
 )
