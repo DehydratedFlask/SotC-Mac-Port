@@ -13,5 +13,6 @@
 - Expected acceptance: configure and build exit 0; focused `normal_threshold` CTest passes 1/1. These commands have not run for this claim. Root will replay them in a separate build directory after the worker result.
 - Observation versus inference / limitation: this pins synthetic floating-point comparison behavior only. The documented production consumer uses `cos(3°)`; these infinite-threshold inputs do not demonstrate game reachability or gameplay behavior.
 - Risks: keep this strictly test-only; no production consumer semantics or game relevance should be inferred from the boundary case.
-- Index/publication: worker/root build and validation directories plus publication log paths were precreated. Publish this claim with staged and full path audits before dispatching implementation.
-- Exact next action: commit and push this claim, then dispatch the two assertions and focused target to `/root/next_fixture_scout_2`.
+- Publication: claim commit `bed80c340ac33a381ad4a30a98eeb44ba6adf8c6` is pushed and fetch-verified at 0/0 divergence. E361 and the [publication checkpoint](2026-10-22-root-sav01-completion-cpu01-claim-publication.md) record the staged/full audits and post-push result.
+- Index/publication: worker/root build and validation directories plus publication log paths were precreated. The project index was generated and checked current at 53,270 folders; `trail build --check` passed at 3,618 nodes / 1,240 files with meaning tier unbuilt. Exact logs are recorded in the publication checkpoint.
+- Current status / exact next action: claim is published; implementation has zero attempts and zero failed tries. Dispatch the two assertions and focused target to `/root/next_fixture_scout_2`, then root will replay independently.
