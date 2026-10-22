@@ -128,9 +128,14 @@ Ctor98a90_3be050Result init_98a90_3be050(AllocatorFront& alloc, void* obj,
     if (hooks.sub_3be930 != nullptr) {
         hooks.sub_3be930(base + 0x68);
     }
+    // OBS 0x3be0bb..0x3be0c2: lea rdi,[obj+0x98a88]; call 0x323d0 (lifted; overrideable)
     if (hooks.store_tsc_323d0 != nullptr) {
         hooks.store_tsc_323d0(base + kCtor98a90TscOffset);
+    } else {
+        store_tsc_323d0(base + kCtor98a90TscOffset, hooks.tsc_detail);
     }
+    std::memcpy(&out.tsc_value, base + kCtor98a90TscOffset, 8);
+    out.tsc_stored = (out.tsc_value != 0);
 
     std::uint64_t end28 = 0;
     std::uint64_t begin28 = 0;

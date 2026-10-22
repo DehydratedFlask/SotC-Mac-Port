@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 10:56 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 11:02 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,30 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E412 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E413 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 TSC leaf `0x323d0` (on `0x3be050` path)
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-STORE-TSC-323D0-01` — lift 67 B leaf: cells `0x2ea4700`/`0x2ea4708`,
+  once-init, host `mach_absolute_time` → `obj+0x98a88`; `0xf8f860` PLT hooked.
+  Triage: non-null list/`0x3c0840`/`0xf590` not on measured empty path; tighter than
+  `0x3c2f70` (313 B) / `0x3be930` (826 B). FakeHeap + tip AllocatorFront; PR #5 cite-only.
+- Files: `native/core/store_tsc_323d0.{hpp,cpp}`; ctor wire; `tools/lift/check_f323d0_tsc.py`;
+  checkpoint `docs/checkpoints/2026-10-22-store-tsc-323d0.md`; EVIDENCE E413;
+  TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-ctor-98a90-tsc-20261022/` (manifest `2daa7167…`).
+- Observation: ELF pins body+cells+rdtsc+PLT; measured tsc≠0, init once → 275 registry.
+  PLT body / heavier callees NOT modelled.
+- Commands: `python3 -I tools/lift/check_f323d0_tsc.py` OK;
+  `python3 -I tools/lift/check_f3be050_ctor.py` OK;
+  `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: `0x3c2f70` or `0x3be930`, or `0x1ab550` / debug gates / vslot /
+  `0xf08`. Goal remains open.
 
 ## 2026-10-22 ctor `0x3be050` list-walk null-head cells
 
