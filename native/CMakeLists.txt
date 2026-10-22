@@ -70,6 +70,9 @@ add_library(sotc_core STATIC
   core/addr.cpp
   core/allocator_region.cpp
   core/host_map.cpp
+  core/page_owner_map.cpp
+  core/page_allocator.cpp
+  core/allocator_front.cpp
   core/free_list_carve.cpp
   core/region_split.cpp
   core/region_list.cpp
@@ -1486,5 +1489,17 @@ add_test(NAME hashed_string_14c3a0 COMMAND test_hashed_string_14c3a0)
 add_executable(test_registry_object_14c9a0 tests/test_registry_object_14c9a0.cpp)
 target_link_libraries(test_registry_object_14c9a0 sotc_core)
 add_test(NAME registry_object_14c9a0 COMMAND test_registry_object_14c9a0)
+
+add_executable(test_page_owner_map tests/test_page_owner_map.cpp)
+target_link_libraries(test_page_owner_map sotc_core)
+add_test(NAME page_owner_map COMMAND test_page_owner_map)
+
+add_executable(test_page_allocator tests/test_page_allocator.cpp)
+target_link_libraries(test_page_allocator sotc_core)
+add_test(NAME page_allocator COMMAND test_page_allocator)
+
+add_executable(test_allocator_front tests/test_allocator_front.cpp)
+target_link_libraries(test_allocator_front sotc_core)
+add_test(NAME allocator_front COMMAND test_allocator_front)
 
 add_subdirectory(api)
