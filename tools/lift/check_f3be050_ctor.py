@@ -98,13 +98,13 @@ def main() -> int:
     require("kCtor98a90ListHeadCellRva" in nh, "head cell")
     require("list_walk_nonnull_body" in nh, "nonnull hook")
     require("store_tsc_323d0" in nh, "tsc leaf wired")
+    require("ensure_capacity_3c2f70" in nh, "ensure wired")
     require("NOT modelled" in nh or "not modelled" in nh.lower(), "omission")
     require("run_appmain_init_ctor_98a90_slice" in SLICE.read_text(), "slice API")
 
     print(
-        f"OK check_f3be050_ctor: body={CTOR_SHA256[:12]}…; header+grow+list cells pinned; "
-        f"0x323d0 lifted via store_tsc_323d0; "
-        f"nonnull body/0xf8f500/0x3c0840/0x3be930/0x3c2f70/0xf590 NOT claimed"
+        f"OK check_f3be050_ctor: body={CTOR_SHA256[:12]}…; header+grow+list+tsc+ensure pinned; "
+        f"nonnull body/0x3be930/migrate/0xf590 NOT claimed"
     )
     return 0
 

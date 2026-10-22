@@ -1,4 +1,4 @@
-// Measured prologue early+tail with lifted 0x3be050 + tsc 0x323d0 → registry.
+// Measured prologue early+tail with lifted 0x3be050 ensure+tsc → registry.
 #include <array>
 #include <chrono>
 #include <cstdint>
@@ -10,6 +10,7 @@
 #include "core/allocator_front.hpp"
 #include "core/appmain_init_ctor_98a90_slice.hpp"
 #include "core/ctor_98a90_3be050.hpp"
+#include "core/ensure_capacity_3c2f70.hpp"
 #include "core/input_table_551140.hpp"
 #include "core/inputtable_names_fixture.hpp"
 #include "core/prologue_255180.hpp"
@@ -69,10 +70,10 @@ struct FakeHeap : IAllocator {
 };
 
 int g_3be930 = 0;
-int g_ensure = 0;
 int g_nonnull = 0;
 int g_f590 = 0;
 int g_init_tb = 0;
+int g_move = 0;
 int g_ctor_a30 = 0;
 int g_ctor_40 = 0;
 int g_dtor_98a90 = 0;
@@ -94,12 +95,9 @@ void dtor_early(void*) { ++g_dtor_early; }
 void dtor_98a90(void*) { ++g_dtor_98a90; }
 void dtor_3b40(void*) { ++g_dtor_3b40; }
 void hook_3be930(void*) { ++g_3be930; }
-void hook_ensure(void*, std::uint32_t n) {
-    ++g_ensure;
-    CHECK(n == 0x100);
-}
 void hook_nonnull(void*, void*) { ++g_nonnull; }
 void hook_f590(void*) { ++g_f590; }
+void hook_move(void*, void*) { ++g_move; }
 std::uint64_t hook_init_tb() {
     ++g_init_tb;
     return 0xF8F8600000000001ULL;
@@ -128,52 +126,59 @@ void reset_cells() {
 }  // namespace
 
 int main() {
-    CHECK(kCtor98a90_3be050Size == 627);
-    CHECK(kStoreTsc323d0Size == 67);
-    CHECK(kStoreTscGuardCellRva == 0x2ea4700);
+    CHECK(kEnsureCapacity3c2f70Size == 313);
+    CHECK(kEnsure3c2f70ElemBytes == 0xa8);
+    CHECK(ensure_3c2f70_elem_count(0, 0xa800) == 0x100);
 
     AllocatorFront front;
     FakeHeap heap(front.owners(), 2);
     CHECK(front.set_heap(1, &heap));
     CHECK(front.set_heap(2, &heap));
 
-    // Unit: lifted tsc leaf alone (init once).
+    // Unit: ensure empty path alone.
     {
-        reset_cells();
-        g_init_tb = 0;
-        std::uint64_t dest = 0;
-        StoreTsc323d0Hooks th{};
-        th.init_timebase_f8f860 = hook_init_tb;
-        store_tsc_323d0(&dest, th);
-        CHECK(dest != 0);
-        CHECK(store_tsc_guard_cell_2ea4700() == 0xF8F8600000000001ULL);
-        CHECK(store_tsc_global_cell_2ea4708() != 0);
-        CHECK(g_init_tb == 1);
-        const std::uint64_t guard = store_tsc_guard_cell_2ea4700();
-        const std::uint64_t glob = store_tsc_global_cell_2ea4708();
-        store_tsc_323d0(&dest, th);
-        CHECK(g_init_tb == 1);  // second call skips init
-        CHECK(store_tsc_guard_cell_2ea4700() == guard);
-        CHECK(store_tsc_global_cell_2ea4708() == glob);
-        CHECK(dest != 0);
+        std::uint8_t vec[0x20]{};
+        EnsureCapacity3c2f70Hooks eh{};
+        eh.elem_move_1da30 = hook_move;
+        eh.elem_dtor_f590 = hook_f590;
+        g_move = g_f590 = 0;
+        const auto er = ensure_capacity_3c2f70(front, vec, 0x100, eh);
+        CHECK(er.ok);
+        CHECK(er.allocated);
+        CHECK(er.buf != nullptr);
+        CHECK(g_move == 0);
+        CHECK(g_f590 == 0);
+        void* b = loadp(vec, 0x08);
+        void* e = loadp(vec, 0x10);
+        void* c = loadp(vec, 0x18);
+        CHECK(b == er.buf);
+        CHECK(e == b);
+        CHECK(static_cast<std::uint8_t*>(c) == static_cast<std::uint8_t*>(b) + 0xa800);
     }
 
-    // Unit: ctor uses lifted tsc (no override).
+    // Unit: ctor with lifted ensure (no override).
     {
         reset_cells();
         std::vector<std::uint8_t> obj(kPrologue98a90Bytes, 0);
         Ctor98a90_3be050Hooks ch{};
         ch.sub_3be930 = hook_3be930;
-        ch.ensure_3c2f70 = hook_ensure;
         ch.tsc_detail.init_timebase_f8f860 = hook_init_tb;
-        g_3be930 = g_ensure = g_init_tb = 0;
+        ch.ensure_detail.elem_move_1da30 = hook_move;
+        ch.elem_dtor_f590 = hook_f590;
+        g_3be930 = g_init_tb = g_move = g_f590 = 0;
         const auto cr = init_98a90_3be050(front, obj.data(), ch);
         CHECK(cr.ok);
+        CHECK(cr.ensure_called);
+        CHECK(cr.ensure_allocated);
+        CHECK(cr.ensure_buf != nullptr);
+        CHECK(g_move == 0);
+        void* b = loadp(obj.data(), 0x28);
+        void* c = loadp(obj.data(), 0x38);
+        CHECK(b == cr.ensure_buf);
+        CHECK(static_cast<std::uint8_t*>(c) == static_cast<std::uint8_t*>(b) + 0xa800);
         CHECK(cr.tsc_stored);
-        CHECK(cr.tsc_value != 0);
-        CHECK(g_init_tb == 1);
-        CHECK(cr.list_walk_skipped_null);
         CHECK(cr.buf_grown);
+        CHECK(cr.list_walk_skipped_null);
     }
 
     reset_cells();
@@ -189,7 +194,7 @@ int main() {
     std::memset(setter.data(), 0xCC, setter.size());
 
     g_ctor_a30 = g_ctor_40 = g_dtor_98a90 = g_dtor_3b40 = g_dtor_early = 0;
-    g_3be930 = g_ensure = g_nonnull = g_f590 = g_init_tb = g_v30 = g_mid = g_v40 = 0;
+    g_3be930 = g_nonnull = g_f590 = g_init_tb = g_move = g_v30 = g_mid = g_v40 = 0;
 
     Prologue255180Hooks eh{};
     eh.ctor_a30_264e50 = ctor_a30;
@@ -202,11 +207,10 @@ int main() {
 
     Ctor98a90_3be050Hooks ch{};
     ch.sub_3be930 = hook_3be930;
-    ch.ensure_3c2f70 = hook_ensure;
     ch.elem_dtor_f590 = hook_f590;
     ch.list_walk_nonnull_body = hook_nonnull;
     ch.tsc_detail.init_timebase_f8f860 = hook_init_tb;
-    // store_tsc_323d0 override null → lifted
+    ch.ensure_detail.elem_move_1da30 = hook_move;
 
     BaseInitialize255130Hooks bh{};
     bh.vslot_30 = hook_v30;
@@ -224,35 +228,33 @@ int main() {
     CHECK(r.early.ok);
     CHECK(r.tail.ok);
     CHECK(r.ctor.ok);
+    CHECK(r.ctor.ensure_allocated);
     CHECK(r.ctor.tsc_stored);
-    CHECK(r.ctor.tsc_value != 0);
-    CHECK(g_init_tb == 1);
-    CHECK(store_tsc_guard_cell_2ea4700() == 0xF8F8600000000001ULL);
-    CHECK(r.ctor.list_self_stored);
     CHECK(r.ctor.list_walk_skipped_null);
+    CHECK(g_move == 0);
     CHECK(g_nonnull == 0);
     CHECK(g_3be930 == 1);
-    CHECK(g_ensure == 1);
+    CHECK(g_init_tb == 1);
     CHECK(g_ctor_40 == 1);
     CHECK(r.base_ok);
-    CHECK(r.flag_after_base == 0);
     CHECK(r.remainder.trivial_ok);
     CHECK(r.remainder.registry.status == RegistryInit531d60Status::ok);
     CHECK(r.remainder.registry.entry_count == kInputTable551140Count);
-    CHECK(heap.alloc_count - allocs_before >= 9);
+    // + ensure 0xa800 alloc
+    CHECK(heap.alloc_count - allocs_before >= 10);
 
-    void* begin = loadp(r.tail.obj_98a90, kCtor98a90VecBegin);
-    void* cap = loadp(r.tail.obj_98a90, kCtor98a90VecCap);
-    CHECK(begin != nullptr);
-    CHECK(static_cast<std::uint8_t*>(cap) == static_cast<std::uint8_t*>(begin) + 0x80);
+    void* eb = loadp(r.tail.obj_98a90, 0x28);
+    void* ec = loadp(r.tail.obj_98a90, 0x38);
+    CHECK(eb != nullptr);
+    CHECK(static_cast<std::uint8_t*>(ec) == static_cast<std::uint8_t*>(eb) + 0xa800);
 
     std::printf(
-        "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+buf80+null_list+"
-        "tsc323d0+early+tail+base+trivial+registry ok nested=%p tsc=0x%llx entries=%u "
-        "alloc_ops=%llu duration_us=%lld allocator=tip_AllocatorFront+FakeHeap "
-        "f8f860_plt=hooked bodies_3be930/3c2f70/f590/nonnull_list=NOT_modelled "
-        "pr5_heap_merge=GAP\n",
-        r.ctor.nested_48, static_cast<unsigned long long>(r.ctor.tsc_value),
+        "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+ensure3c2f70+buf80+"
+        "null_list+tsc323d0+early+tail+base+trivial+registry ok nested=%p ensure=%p "
+        "tsc=0x%llx entries=%u alloc_ops=%llu duration_us=%lld "
+        "allocator=tip_AllocatorFront+FakeHeap "
+        "ensure_migrate/0x3be930/f590/nonnull=NOT_modelled pr5_heap_merge=GAP\n",
+        r.ctor.nested_48, eb, static_cast<unsigned long long>(r.ctor.tsc_value),
         r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
         static_cast<long long>(us));

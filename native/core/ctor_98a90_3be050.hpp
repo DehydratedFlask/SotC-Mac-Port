@@ -4,25 +4,20 @@
 //
 // Lifted (tip AllocatorFront):
 //   Header OBS 0x3be050..0x3be0b6 (102 B): nested 0x48 sentinel + field zeros.
-//   Ensure gate: ([+0x38]-[+0x28])>>3; if <=0xff hook 0x3c2f70(obj+0x20, 0x100).
-//   Buffer grow OBS 0x3be0f8..0x3be1cb: if ([+0x58]-[+0x48])>>5 <= 3, alloc 0x80,
-//     migrate 0x20-stride elems (elem dtor hook 0xf590), delete_ old, install
-//     begin/end/cap at +0x48/+0x50/+0x58 (cap = begin+0x80).
-//   List-walk head OBS 0x3be1ce..0x3be1e5: store obj → cell 0x2ef63f8; load head
-//     from cell 0x2ef6400; if null, skip body (measured BSS-zero path).
-//   TSC leaf 0x323d0 at obj+0x98a88 (lifted store_tsc_323d0; host mach_absolute_time).
+//   Ensure 0x3c2f70(obj+0x20, 0x100) when capacity elems <=0xff (lifted empty path).
+//   Buffer grow OBS 0x3be0f8..0x3be1cb: 0x80 vec at +0x48/+0x50/+0x58.
+//   List-walk head: cells 0x2ef63f8 / 0x2ef6400; null → skip body.
+//   TSC leaf 0x323d0 at obj+0x98a88 (host mach_absolute_time).
 //
 // Hooks (bodies NOT modelled):
-//   0x3be930(obj+0x68); 0x3c2f70; 0xf590; 0xf8f860 PLT (tsc init);
-//   non-null list body (0xf8f500 PLT / 0x3c0840 tree insert / [head+0x80] chain).
+//   0x3be930(obj+0x68); ensure migrate (0x1da30/0x170c0); 0xf590; 0xf8f860 PLT;
+//   non-null list body.
 //
-// Triage after E412: non-null list/0x3c0840 NOT on measured empty path; 0xf590 NOT on
-// empty migrate; 0x323d0 (67 B) tighter than 0x3c2f70 (313 B) / 0x3be930 (826 B).
-//
-// No leaf-vec; not idx 95; PR #5 cite-only.
+// Prefer ensure 0x3c2f70 over 0x3be930 (826 B). No leaf-vec; not idx 95; PR #5 cite-only.
 #pragma once
 
 #include "allocator_front.hpp"
+#include "ensure_capacity_3c2f70.hpp"
 #include "store_tsc_323d0.hpp"
 
 #include <cstddef>
@@ -42,15 +37,17 @@ inline constexpr std::size_t kCtor98a90TscOffset = 0x98a88;
 inline constexpr std::size_t kCtor98a90VecBegin = 0x48;
 inline constexpr std::size_t kCtor98a90VecEnd = 0x50;
 inline constexpr std::size_t kCtor98a90VecCap = 0x58;
+inline constexpr std::size_t kCtor98a90EnsureVec = 0x20;
 inline constexpr std::uint64_t kCtor98a90SelfCellRva = 0x2ef63f8;
 inline constexpr std::uint64_t kCtor98a90ListHeadCellRva = 0x2ef6400;
 
 struct Ctor98a90_3be050Hooks {
     void (*sub_3be930)(void* at_plus_68) = nullptr;
-    // If non-null, replaces lifted store_tsc_323d0 (test override).
     void (*store_tsc_323d0)(void* at_plus_98a88) = nullptr;
     StoreTsc323d0Hooks tsc_detail{};
+    // If non-null, replaces lifted ensure_capacity_3c2f70.
     void (*ensure_3c2f70)(void* at_plus_20, std::uint32_t n) = nullptr;
+    EnsureCapacity3c2f70Hooks ensure_detail{};
     void (*elem_dtor_f590)(void* elem) = nullptr;
     void (*list_walk_nonnull_body)(void* obj, void* list_head) = nullptr;
 };
@@ -59,6 +56,8 @@ struct Ctor98a90_3be050Result {
     bool ok = false;
     void* nested_48 = nullptr;
     bool ensure_called = false;
+    bool ensure_allocated = false;
+    void* ensure_buf = nullptr;
     bool buf_grown = false;
     void* buf_80 = nullptr;
     bool list_self_stored = false;
