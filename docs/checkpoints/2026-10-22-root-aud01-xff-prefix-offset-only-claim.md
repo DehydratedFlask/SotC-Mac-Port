@@ -1,0 +1,16 @@
+# Checkpoint: AUD-01-XFF-PREFIX-OFFSET-ONLY-FIXTURE-01 — claimed
+
+- Time / timezone: 2026-10-22 00:45 CDT (America/Chicago).
+- Agent and integrator: `/root/next_bounded_scout` owns only the test file; `/root` integrates HANDOFF and project docs.
+- Task / gate / status: `AUD-01-XFF-PREFIX-OFFSET-ONLY-FIXTURE-01`, parent `AUD-01-XFF-01`, AUD-01; `ACTIVE`; 0 failed implementation tries.
+- Prerequisite evidence / input and source hashes: `scripts/test_audio_bank_header.py` SHA256 `4162d392a35d6154a02de207348483bfa233f5339645785b5f323b569c4ae7f5`; unchanged `scripts/audio_bank_header.py` SHA256 `bdad7d192b0ecdb929daf5147a139e7545fd5c546f01ed4ffb4005f2cea9f9c0`; `docs/ASSETS.md` SHA256 `1c35de93ea3d60ebd1b166f39d6ea6b8a78648ea4e0131d5376b46c5f0d1110b`. The spec keeps bytes 4..19 opaque and codec UNKNOWN.
+- Owned / changed files: claim documentation only: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, this checkpoint, and the peer audit claim checkpoint. `scripts/test_audio_bank_header.py` and parser are unchanged at claim time.
+- Hypothesis and expected result: a valid-length member whose opaque bytes 4..19 contain `xff\0` but whose byte-zero prefix is `qath` is rejected for exact prefix `71617468`, expected `78666600`.
+- Exact command, CWD and nonsecret environment: baseline `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_bank_header.py`, CWD `/Volumes/Extra/SoC Mac Native`, `PYTHONDONTWRITEBYTECODE=1`.
+- Exit / observed result: baseline exit 0; 21 tests pass. Expected acceptance after implementation: 22 tests pass.
+- Log, capture and REA evidence paths/IDs: `local/validation/20261022-root-fixture-baselines/aud01-xff-prefix-offset-baseline.log` SHA256 `1d8170c6d126f7d82088a647b4863a8c5c09c279d6d63f82f2fda0ad3a747c0d`. Trail source query identifies the exact prefix check and existing opaque-span fixture; no REA evidence applies.
+- Observation versus inference / coverage limitations: the parser checks bytes 0..3 then validates the length word; existing fixtures independently cover a wrong prefix and opaque bytes, but not an interior magic decoy with a valid length. The proposed case proves synthetic prefix anchoring only.
+- Cumulative failed tries and distinct hypotheses: 0 failed implementation tries; one proposed test-only assertion.
+- Remaining risks / blockers: no real archive or codec behavior is exercised; audio codec, runtime use and playback remain UNKNOWN.
+- Next exact action: add one method beside the existing wrong-prefix case in `scripts/test_audio_bank_header.py` using a valid-sized fixture, put `xff\0` inside the opaque span, change bytes 0..3 to `qath`, assert the exact error, then run the acceptance command above.
+- HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF, TASKS, EVIDENCE, both claim checkpoints and generated `docs/FOLDERS.md` updated; INSTALL_LOG unchanged. `python3 scripts/project_index.py` and `python3 scripts/project_index.py --check` both exit 0 at 24,078 folders (log SHA256 `a79b0d25fced0d9c18dda3386413644761318dd915da578a4bbe36f239469b0c` / `2e24f86275b84b7efc28ec198e984a6698bc3584a72c960f1b280bdaa45c1b67`). `trail build --check` exits 0 with the wiring graph in sync at 3,610 nodes / 1,240 files; deep meaning layer remains unbuilt (log SHA256 `67d8530e493d39dc77e5345ccbb25ba0da7701ad12b479fa479c1d964f5979e4`).
