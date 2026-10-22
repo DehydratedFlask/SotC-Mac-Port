@@ -45,5 +45,8 @@
 - Exact next action: commit and push only allowlisted source and documentation paths, with staged
   and full publication audits; then verify the pushed revision and publish the APP-01 claim before
   delegating its test.
-- Publication status at this checkpoint: completion change is prepared for commit; publication
-  facts will be recorded in a follow-up checkpoint after push.
+- Completion commit ddcb75292a9be2fa543f756c6dfa69eda574b8cf is pushed. Staged/full audits accepted
+  8/1,713 paths; fresh fetch/divergence was 0/0; post-push explicit/full audits accepted 8/1,713.
+  Shared publication log local/validation/20261022-root-fixture-baselines/app01-core-readiness-zero-fallback-publication.log
+  SHA256 97f60b5f2e7b6ce49891d753977e4bc6902ac5f679addabea8ece099613c72f1.
+- Publication status: complete.
