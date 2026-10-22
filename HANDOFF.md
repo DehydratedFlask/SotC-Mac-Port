@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 01:24 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 01:29 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,22 +8,21 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Active bounded task — RE-01 identity sidecar symlink alias fixture
+## RE-01 identity sidecar symlink alias fixture — verified
 
-- Claimed `RE-01-UNWRAP-IDENTITY-SIDECAR-SYMLINK-ALIAS-FIXTURE-01` under verified parent
-  `RE-01-UNWRAP-INPUT-SIDECAR-COLLISION-01`. Scope is one synthetic test in
+- `RE-01-UNWRAP-IDENTITY-SIDECAR-SYMLINK-ALIAS-FIXTURE-01` under verified parent
+  `RE-01-UNWRAP-INPUT-SIDECAR-COLLISION-01` adds one synthetic test in
   `scripts/test_project_tools.py`: point the derived `out.identity.json` sidecar at the synthetic
   SELF input through a symlink, then assert the exact pre-write `Path.samefile` rejection, unchanged
   source bytes, and no ELF output. No wrapper change is planned.
-- Baseline `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py` passes 11 tests;
-  hashes and claim details are in [the claim checkpoint](docs/checkpoints/2026-10-22-root-re01-sidecar-symlink-claim.md)
-  and E272. Claim commit `6cd08912d27d88f3bf4a4c9690043678c70e8ab3` is pushed; staged/full audits
-  accepted 5/1,707 paths, fresh fetch showed 0/0 divergence, and post-push full audit accepted 1,707
-  paths. Publication log SHA256 is recorded in E273. Status `ACTIVE`, 0 failed implementation
-  tries. Root owns shared docs; after claim
-  publication `/root/next_fixture_scout_3` owns only the test file. Exact next action: add the one
-  symlink-alias test, run the focused suite (expected 12 tests), then root replay and completion
-  records. This pins synthetic filesystem behavior only.
+- Baseline passes 11 tests; worker and root focused runs pass 12. Production wrapper remains
+  unchanged. See E272/E274 and the [claim](docs/checkpoints/2026-10-22-root-re01-sidecar-symlink-claim.md)
+  and [completion checkpoint](docs/checkpoints/2026-10-22-root-re01-sidecar-symlink-complete.md).
+- Status `FIXTURE_VERIFIED`, one successful implementation attempt and 0 failed tries. The claim
+  commit is published and fetch-verified; implementation publication is being completed. Trail
+  graph check passes at 3,616 nodes / 1,240 files, and the new method resolves at
+  `scripts/test_project_tools.py:L119-L144`. This is synthetic filesystem behavior only; it says
+  nothing about live game files or execution.
 
 ## AUD-01 probe offset cutoff fixture — verified
 
@@ -41,8 +40,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   post-push full audit accepted 1,706 paths. Publication log SHA256 is recorded in E271. This is
   synthetic classifier behavior only; it establishes no asset parsing, codec identity, archive
   interpretation, or game playback.
-- The active follow-on task is recorded above. Keep pending Mach-O CPU and PSARC policy choices
-  untouched.
+- Read-only scout `/root/next_fixture_scout_2` proposed
+  `SAV-01-NATIVE-STREAM-FILE-SYMLINK-DESTINATION-FIXTURE-01` under `SAV-01-NATIVE-STREAM-01` for
+  one test in `native/tests/test_save_stream_file.cpp`. Exact next action: verify current task
+  uniqueness, parent/spec, implementation, and test target, then claim the one-file synthetic
+  fixture if still applicable. Keep pending Mach-O CPU and PSARC policy choices untouched.
 
 ## RE-02 dynamic-link image file-offset bounds fixture — verified
 
