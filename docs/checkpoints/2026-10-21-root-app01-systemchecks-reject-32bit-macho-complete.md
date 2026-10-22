@@ -3,7 +3,7 @@
 - Local date/time: 2026-10-21 23:32 CDT (America/Chicago).
 - Agent: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`), integrator.
 - Task: `APP-01-SYSTEM-CHECKS-REJECT-32BIT-MACHO-01`, child of `APP-01`.
-- Status: `FIXTURE_VERIFIED`; 1 successful implementation attempt, 0 failed implementation tries.
+- Status: `FIXTURE_VERIFIED`, published; 1 successful implementation attempt, 0 failed implementation tries.
 - Files changed: `launcher/Sources/LauncherCore/SystemChecks.swift`,
   `launcher/Tests/LauncherCoreTests/SystemChecksArchitectureTests.swift`, `HANDOFF.md`,
   `docs/TASKS.md`, `docs/EVIDENCE.md`, generated `docs/FOLDERS.md`, and this checkpoint. The prior
@@ -48,8 +48,18 @@
   diff check `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`, staged audit
   `d4be8c3a602264eea07c747ac8bd5d1bdc2a0a66ec18044c04c31420e918055c`, full audit
   `d3add3597f2d5f6af2d673f43a3f09baa5c5847d321be02d0e4f60b9949237ba`.
+- Publication checkpoint, 2026-10-21 23:35 CDT (America/Chicago), agent `/root`: completion commit
+  `ab4aeba25543e9a1e62ef85a5beae759419efa9d` pushed to `origin/main`; `git fetch origin` succeeded
+  and `git rev-list --left-right --count HEAD...origin/main` returned `0 0`. Push log
+  `completion-push.log` SHA256 `9a65dc749cea3b7144c922e6be83a4fef551bc3a476e9cbc2ce123a9bf5a3055`,
+  post-push fetch log `completion-post-push-fetch.log` SHA256
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`, and divergence log
+  `completion-post-push-status.log` SHA256
+  `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d0247050325e7c5a3b2b3271c`, all under
+  `local/validation/app01-systemchecks-arch/`. The staged audit accepted 7 paths and the full audit
+  accepted 1,682. User-owned `native/api/CMakeLists.txt` and `native/api/host/` remained unstaged.
 - Remaining risks: 64-bit non-ARM64 Mach-O files and universal slices may still pass the current
   magic-only probe. No executable was launched, and no actual core, game readiness, or G1 evidence is
   established. The native core remains a stub.
-- Next exact action: select and claim another independent bounded task outside PSARC and the current
-  launcher architecture files; keep the unanswered PSARC negative-limit choice pending.
+- Next exact action: claim `AUD-01-CLASSIFIER-SHORT-PROBE-INPUT-FIXTURE-01` after checking its linked
+  specification and task-board status; keep the unanswered PSARC negative-limit choice pending.

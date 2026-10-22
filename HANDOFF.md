@@ -170,12 +170,14 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Status `FIXTURE_VERIFIED`, 1 successful implementation attempt, 0 failed tries. This closes only
   the 32-bit magic path; 64-bit CPU type and FAT slice validation remain unimplemented. No actual
   native core or game readiness is established.
-- Claim commit `daa92c26f8972cadbe9f97e39669577b4c8daf62` is pushed and fetch-verified. The staged
-  audit accepted 6 allowlisted paths and the full audit accepted 1,680 paths; post-push `HEAD ==
-  origin/main` with 0/0 divergence. User-owned native API changes remain unstaged. Claim publication
-  logs are in `local/validation/app01-systemchecks-arch/` and the claim checkpoint.
-- Exact next action: publish the fixture and completion evidence, then claim another independent
-  bounded task outside PSARC and these launcher architecture files.
+- Claim commit `daa92c26f8972cadbe9f97e39669577b4c8daf62` and completion commit
+  `ab4aeba25543e9a1e62ef85a5beae759419efa9d` are pushed and fetch-verified. The completion staged
+  audit accepted 7 allowlisted paths and the full audit accepted 1,682 paths; post-push `HEAD ==
+  origin/main` with 0/0 divergence. User-owned native API changes remain unstaged. Completion
+  publication logs and hashes are in the completion checkpoint.
+- Exact next action: claim `AUD-01-CLASSIFIER-SHORT-PROBE-INPUT-FIXTURE-01`, a one-test fixture for
+  empty decompression-probe input, after re-reading its task-linked specification and confirming the
+  task board. Keep it independent of PSARC and the launcher architecture files.
 
 ## RE-02 app-main +0x20 virtual call — static path byte verified
 
