@@ -48,6 +48,14 @@
   (SHA256 70ca84ac33dc4816996cd0e7545093b2a08cd731fbfeabd339a13df485f73241).
 - Exact next action: delegate only native/tests/test_region_list.cpp to /root/next_fixture_scout_2
   for the one synthetic case plus targeted build/CTest. Root will independently review and replay.
-- Publication metadata checkpoint: 2026-10-22 02:10 CDT (America/Chicago), /root. The pushed
+- Publication metadata checkpoint: 2026-10-22 02:11 CDT (America/Chicago), /root. The pushed
   claim has been reconciled in HANDOFF.md, TASKS.md, and EVIDENCE.md; no source file changed.
-  These local documentation changes are ready for staged/full audits and push before delegation.
+  Follow-up documentation commit 9f7e9dd91070bda06e02a5b3415445bf35fc1c54 was pushed; staged/full
+  audits accepted 5/1,715 paths, post-push fetch showed 0/0 divergence, and post-push explicit/full
+  audits accepted 5/1,715. Pre-push log SHA256
+  4d3969d1077538f1d5abe1218b63e7b59a44377a3c6ddb0719619bdacbbba1cc, commit/push log SHA256
+  5acf04aab850a7b434e33aa2d9a656d43629d3f6a66b4ad28706fb3068fc9548, and post-push log SHA256
+  a261e48494e1c2b7ac40061e23566a45a25027fdcc180f7222aad6080c1d2732.
+  The next exact action is to delegate only native/tests/test_region_list.cpp to
+  /root/next_fixture_scout_2 for the one synthetic case plus targeted build/CTest; root will
+  independently review and replay the result.

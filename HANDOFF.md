@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 02:10 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 02:11 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -81,7 +81,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   1,240 files. Current index/trail recheck log SHA256 is in E284. Claim commit
   `57ec40a42f5be178375b7b40e73dd8ca9c74ae4e` is pushed; staged/full
   audits accepted 10/1,715 paths, fresh fetch showed 0/0 divergence, and post-push explicit/full
-  audits accepted 10/1,715. Publication log SHA256 is in E284. Status is `ACTIVE`; implementation
+  audits accepted 10/1,715. Follow-up documentation commit
+  `9f7e9dd91070bda06e02a5b3415445bf35fc1c54` is pushed and post-push verified; its audits accepted
+  5/1,715 paths and fetch showed 0/0 divergence. Pre-push, push, and post-push log hashes are in
+  the claim checkpoint. Publication log SHA256 is in E284. Status is `ACTIVE`; implementation
   attempts: 0. Delegate only `native/tests/test_region_list.cpp` to `/root/next_fixture_scout_2`,
   then review and replay at root.
 - Keep pending Mach-O CPU and PSARC policy choices untouched.
