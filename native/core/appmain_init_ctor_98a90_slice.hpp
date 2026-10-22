@@ -72,6 +72,7 @@
 #include "init_531d60_post_base_a2ed00.hpp"
 #include "init_531d60_post_base_a2ed00_u2.hpp"
 #include "init_531d60_post_base_a2ed00_u3.hpp"
+#include "init_531d60_post_base_a2ed00_u4.hpp"
 #include "init_531d60_post_base_f590_a2ed00.hpp"
 #include "init_531d60_post_base_f590_a2ed00_u2.hpp"
 #include "init_531d60_post_base_f590_a2ed00_u3.hpp"
@@ -179,6 +180,7 @@ struct AppmainInitCtor98a90SliceResult {
     Init531d60PostBaseA2ed00U3Result post_base_a2ed00_u3{};
     Init531d60PostBaseF590A2ed00U5Result post_base_f590_a2ed00_u5{};
     Init531d60PostBaseF590A2ed00U6Result post_base_f590_a2ed00_u6{};
+    Init531d60PostBaseA2ed00U4Result post_base_a2ed00_u4{};
     AppmainInitRemainderSliceResult remainder{};
 };
 
@@ -241,6 +243,7 @@ struct AppmainInitCtor98a90SliceResult {
     const Init531d60PostBaseF590A2ed00U4Hooks& post_base_f590_a2ed00_u4_hooks = {},
     const Init531d60PostBaseA2ed00U3Hooks& post_base_a2ed00_u3_hooks = {},
     const Init531d60PostBaseF590A2ed00U5Hooks& post_base_f590_a2ed00_u5_hooks = {},
-    const Init531d60PostBaseF590A2ed00U6Hooks& post_base_f590_a2ed00_u6_hooks = {});
+    const Init531d60PostBaseF590A2ed00U6Hooks& post_base_f590_a2ed00_u6_hooks = {},
+    const Init531d60PostBaseA2ed00U4Hooks& post_base_a2ed00_u4_hooks = {});
 
 }  // namespace sotc
