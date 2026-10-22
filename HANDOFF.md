@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 14:15 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 14:20 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,32 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E446 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E447 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 Init continue `0x56dcb0` call-site
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-INIT-531D60-POST-BASE-56DCB0-01` — lift OBS call-site (5 B) at
+  `0x531df4`: `call 0x56dcb0`; stop before `0x56dca0` @ `0x531df9`. Prefer
+  always-on Init continue after E446 over full `0x56dcb0` body (126 B) /
+  later `0x5c64c0` / deepen helpers. FakeHeap + tip AllocatorFront; PR #5
+  cite-only.
+- Files: `native/core/init_531d60_post_base_56dcb0.{hpp,cpp}`; ctor slice wire;
+  `tools/lift/check_f531d60_post_base_56dcb0.py`; checkpoint
+  `docs/checkpoints/2026-10-22-init-531d60-post-base-56dcb0.md`; EVIDENCE E447;
+  TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-post-base-56dcb0-20261022/` (manifest
+  `f6405fa8…` at tip `d457fdb`; capture `1e1cda5a…`).
+- Observation: feat tip `d457fdb`; measured `pb56=1` + mid_reg=4 → 275 registry.
+  `0x56dcb0` body / `0x5c64c0` NOT modelled.
+- Commands: `python3 -I tools/lift/check_f531d60_post_base_56dcb0.py` OK;
+  `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: `0x5c64c0` Init continue, or bounded `0x56dcb0` /
+  `0x499f80` / `0x140d90` / `0x14c2f0` / `0x6a5370`. Goal open.
 
 ## 2026-10-22 Init post-base `0x499f80` call-site
 
