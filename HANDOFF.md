@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 02:11 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 02:20 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -68,25 +68,40 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   explicit/full audits accepted 10/1,715. Publication log SHA256 is in E282/E285. No actual core
   validation, asset readiness, launcher runtime, game boot, or gameplay is demonstrated.
 
-## SRV-01 region-list uncounted head-insert fixture — active claim published
+## APP-01 dangling-symlink asset report — active claim
 
-- `SRV-01-REGION-LIST-UNCOUNTED-HEAD-INSERT-FIXTURE-01` is claimed under `SRV-01`. Scope is one
-  synthetic case in `native/tests/test_region_list.cpp` that inserts a node before an existing
-  head while omitting the optional allocation-counter argument, then checks the slot, forward and
-  backward links, arena predecessor, and owner.
-- Baseline target build exits 0 and focused `region_list` CTest passes 1/1. Source hashes, logs,
-  and the live gap are in E284 and the
-  [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-region-list-uncounted-head-insert-claim.md).
-  Project index generation/check pass at 25,889 folders; Trail wiring check passes at 3,617 nodes /
-  1,240 files. Current index/trail recheck log SHA256 is in E284. Claim commit
-  `57ec40a42f5be178375b7b40e73dd8ca9c74ae4e` is pushed; staged/full
-  audits accepted 10/1,715 paths, fresh fetch showed 0/0 divergence, and post-push explicit/full
-  audits accepted 10/1,715. Follow-up documentation commit
-  `9f7e9dd91070bda06e02a5b3415445bf35fc1c54` is pushed and post-push verified; its audits accepted
-  5/1,715 paths and fetch showed 0/0 divergence. Pre-push, push, and post-push log hashes are in
-  the claim checkpoint. Publication log SHA256 is in E284. Status is `ACTIVE`; implementation
-  attempts: 0. Delegate only `native/tests/test_region_list.cpp` to `/root/next_fixture_scout_2`,
-  then review and replay at root.
+- `APP-01-ASSET-VALIDATOR-BROKEN-SYMLINK-MISSING-FIXTURE-01` is scoped under verified parent
+  `APP-01-ASSET-VALIDATOR-REPORT-01`. Add one synthetic case in
+  `launcher/Tests/LauncherCoreTests/AssetValidationReportTests.swift`: point required `pak0.psarc`
+  to a nonexistent target and assert the ordered problem is `pak0.psarc not found` and
+  `missingArchives` contains only `pak0.psarc`. Production `AssetValidator.swift` remains unchanged.
+- A fresh root baseline passes 7 `AssetValidationReportTests`; test/source/package hashes, Trail
+  query, and the [claim checkpoint](docs/checkpoints/2026-10-22-root-app01-asset-report-dangling-symlink-claim.md)
+  are in E287. This covers the dangling-target classification, separate from a missing path and a
+  symlink to a directory.
+- Status is `ACTIVE`, zero implementation attempts and zero failed tries. The root baseline and
+  claim are recorded locally; publish them before delegating only the test file to
+  `/root/next_fixture_scout_3`; root will replay the focused suite.
+  The scope is synthetic filesystem classification only, with no archive-validity or game-assets
+  claim.
+
+## SRV-01 region-list uncounted head-insert fixture — verified
+
+- `SRV-01-REGION-LIST-UNCOUNTED-HEAD-INSERT-FIXTURE-01` adds one synthetic case in
+  `native/tests/test_region_list.cpp`: insert before an existing head while omitting the optional
+  allocation-counter argument, then check the slot, forward/backward links, arena predecessor, and
+  owner. The production helper and header are unchanged.
+- Worker and root builds pass; focused `region_list` CTest passes 1/1 in both. Root configured a
+  fresh Ninja build with AppleClang 21 and independently compiled the target. Final test/source
+  hashes, exact command logs, Trail query, and [completion checkpoint](docs/checkpoints/2026-10-22-root-srv01-region-list-uncounted-head-insert-complete.md)
+  are in E286. Project index generation/check pass at 26,499 folders (446 checkpoint files); Trail
+  wiring check passes at 3,617 nodes / 1,240 files. Current index/Trail log SHA256 is in E286.
+- Status is `FIXTURE_VERIFIED`, one successful implementation attempt and zero failed tries. Claim
+  commit `57ec40a42f5be178375b7b40e73dd8ca9c74ae4e` remains pushed. This fixture establishes only
+  synthetic intrusive-list behavior; parent `SRV-01` and all real-game gates remain open.
+- Exact next action: commit and push this completion plus the new asset-report claim with
+  allowlisted audits, then delegate only `AssetValidationReportTests.swift` to
+  `/root/next_fixture_scout_3`.
 - Keep pending Mach-O CPU and PSARC policy choices untouched.
 
 ## RE-01 identity sidecar symlink alias fixture — verified

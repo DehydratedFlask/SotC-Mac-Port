@@ -142,6 +142,23 @@ int main() {
         CHECK(alloc_count == 8);
     }
 
+    // Allocated-list head insert without the optional allocation counter.
+    {
+        RegionNode neu{}, already{};
+        IntrusiveLinks* head = region_links(already);
+        head->identity = &already;
+        head->prev = nullptr;
+        head->next = nullptr;
+        IntrusiveLinks* slot = head;
+        void* arena = reinterpret_cast<void*>(static_cast<std::uintptr_t>(0xA11E));
+        list_insert_at_head(neu, &slot, arena);
+        CHECK(slot == region_links(neu));
+        CHECK(region_links(neu)->next == head);
+        CHECK(head->prev == region_links(neu));
+        CHECK(region_links(neu)->prev == reinterpret_cast<IntrusiveLinks*>(arena));
+        CHECK(region_owner(neu) == arena);
+    }
+
     // First allocated-list head insert starts from an empty slot.
     {
         RegionNode neu{};
