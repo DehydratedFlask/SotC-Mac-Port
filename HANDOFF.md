@@ -27,7 +27,7 @@ or Metal gameplay is demonstrated.
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-sbj-20261022/` (manifest
   `a920e869…` at tip `44d7474`; capture `9647eceb…`).
-- Observation: feat tip `44d7474`; measured `pbsbj268=1` + `pbsbjf590=1` + `pb268=1` + mid_reg=4 → 275 registry.
+- Observation: feat tip `44d7474`; docs tip `01ef7c3`; measured `pbsbj268=1` + `pbsbjf590=1` + `pb268=1` + mid_reg=4 → 275 registry.
   Bodies / Outro pair / `0x52eb50` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_sbj.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
