@@ -40,13 +40,25 @@
   `python3 scripts/project_index.py --check` reports current. `trail build --check` passes with
   3,580 wiring nodes in sync; the optional deep meaning layer is not built. `git diff --check`
   passes. Combined capture log `local/checkpoints/round78-re02-25ac9f-index-graph.log`, SHA-256
-  `062345ae937556d3c621c9be3ea4317787cfd3c65c9bc4b1fbf665c7b5fac973`, preserves the earlier
-  stale-index check and the successful regeneration/recheck.
-- Staged/full publication audits accepted 4/1,661 paths; logs:
-  `local/checkpoints/round78-re02-25ac9f-staged-audit.log` SHA-256
+  `2a8c0b693a80959c279e5f9ffc8806f56cd0e552d40b87166e4005541f2051ae`, records regeneration
+  and the successful recheck. An earlier `--check` invocation reported `Stale indexes:
+  local/indexes/folders.json` (exit 1) after private evidence/log files were created; regeneration
+  restored the index at 19,270 folders and the next check passed. This was a private file-count
+  refresh, not a source/task failure.
+- Initial claim staged/full publication audits accepted 4/1,661 paths; logs:
+  `local/checkpoints/round78-re02-25ac9f-claim-staged-audit.log` SHA-256
   `c25b4ee488c6ba783d6b744e9b1a02cab79a24328846739a396fc33974c38827` and
   `local/checkpoints/round78-re02-25ac9f-full-audit.log` SHA-256
+  `17200d8db78d887760aa6fcbe3f30b7bd7a24542bbe7351675fceb9268505945`. The later documentation
+  sync staged/full audits accepted 2/1,661 paths; logs `local/checkpoints/round78-re02-25ac9f-sync-staged-audit.log`
+  SHA-256 `006610682336ac2a4ba91cee6e2bfec0c1754467869582cfcce9fd0e35accac6` and
+  `local/checkpoints/round78-re02-25ac9f-sync-full-audit.log` SHA-256
   `17200d8db78d887760aa6fcbe3f30b7bd7a24542bbe7351675fceb9268505945`.
+- Claim commit `7975c5c6f1d55e0efe7dc61031f8ff6d69cfe557` (`docs: claim second app-main callsite
+  analysis`) was pushed to `origin/main`; post-push fetch verifies matching tips and 0/0 divergence.
+  Private log `local/checkpoints/round78-re02-25ac9f-postpush.log` SHA-256
+  `21fa37a1319c7846fb5a87c47c199414fdcfa84dc459babda4145486ec17ab4a`. Only the pre-existing
+  user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain outside the commit.
 - Remaining risks: RAX or its vtable could be dynamically populated, and partial callee coverage
   may prevent a unique static mapping. Do not use strings or neighboring addresses as proof.
 - Next exact action: after this claim is published, assign an offline-only worker to trace
