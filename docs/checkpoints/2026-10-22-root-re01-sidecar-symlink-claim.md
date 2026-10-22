@@ -47,6 +47,11 @@
 - `git diff --check` exited 0.
 - Files changed by claim: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, this checkpoint, and
   generated `docs/FOLDERS.md`. No implementation edit has started.
+- Claim publication: commit `6cd08912d27d88f3bf4a4c9690043678c70e8ab3` was pushed to `origin/main`.
+  Staged audit accepted 5 paths, full audit accepted 1,707; fresh fetch/divergence returned 0/0 and
+  post-push full audit accepted 1,707. Output is in
+  `local/validation/20261022-root-fixture-baselines/re01-sidecar-symlink-publication.log`, SHA-256
+  `7b602866ffa74d0374c95e8c386f0f23313962157d4d11c88fb0da96347aac87`.
 - Remaining risks: symlink creation is supported in this local macOS filesystem; no live game file
   or runtime is read. The test does not establish concurrent filesystem-mutation behavior.
 - Exact next action: after publishing this claim, `/root/next_fixture_scout_3` may edit only
