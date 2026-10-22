@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 05:03 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 05:10 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -28,8 +28,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   claim/completion publication audits are in E324/E327. Only user-owned
   `native/api/CMakeLists.txt` and `native/api/host/` remain unstaged and untouched.
 - Status is `FIXTURE_VERIFIED`: one successful implementation attempt, zero failed tries. Next
-  exact action: publish the verified region-split no-fit fixture, then scout the next distinct
-  bounded task.
+  exact action: scout the next distinct bounded task.
 
 ## SRV-01 region-split no-carve-fit/no-mutation fixture — verified
 
@@ -54,8 +53,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   1,738. E336 records claim publication. The worker's test-only edit and independent root replay are
   complete; E337/E338 document the results.
 - Status is `FIXTURE_VERIFIED`: one successful implementation attempt, zero failed tries. Completion
-  source/docs are ready for allowlisted path audit and publication. Next, scout one distinct bounded
-  task without repeating existing fixture coverage.
+  commit `59c96624c47f583109ca66fec21fc1b9448a0643` is pushed and fetch-verified at 0/0 divergence.
+  Pre-push audits accepted 8 staged / 1,739 full paths; post-push full audit accepted 1,739. E339
+  records publication. Only user-owned `native/api/CMakeLists.txt` and `native/api/host/` remain
+  unstaged and untouched. Next, scout one distinct bounded task without repeating existing fixtures.
 
 ## CPU-01 math-constant mixed guard-state fixture — verified
 
