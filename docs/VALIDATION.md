@@ -1,6 +1,6 @@
 # Validation gates and evidence protocol
 
-Current checkpoint: G0 PARTIAL; G1 PARTIAL (see E404–E431 —
+Current checkpoint: G0 PARTIAL; G1 PARTIAL (see E404–E432 —
 `docs/checkpoints/2026-10-22-g1-partial-evidence-pack.md`,
 `docs/checkpoints/2026-10-22-appmain-init-registry-slice.md`,
 `docs/checkpoints/2026-10-22-init-531d60-trivial-leaves.md`,
