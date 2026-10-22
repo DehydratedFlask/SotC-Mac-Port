@@ -12,7 +12,8 @@
 //
 // Claimed: fifth-unit virtual-call control flow pin only (slot +0x18).
 // NOT modelled: stack/vtable producers; callee body; later helpers
-// (next call after this end is 0x532ed0, not another 0x532ca0). PR #5 cite-only.
+// (next call after this end is 0x532ed0, claimed separately as E476).
+// PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
