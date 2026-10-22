@@ -29,7 +29,7 @@ or Metal gameplay is demonstrated.
   EVIDENCE E493; TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-f590-a2ed00-u3-20261022/` (manifest
   `39526de6…` at tip `8b9158d`; capture `aaa69460…`).
-- Observation: feat tip `8b9158d`; docs tip `DOCS_TIP_PENDING`; measured
+- Observation: feat tip `8b9158d`; docs tip `b5fa594`; measured
   `pbf590u3=1` + `pba2edu2=1` + mid_reg=4 → 275 registry.
   Body / mov-rdi prep / following second `call 0xf590` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_f590_a2ed00_u3.py` OK;
