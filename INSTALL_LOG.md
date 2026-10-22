@@ -299,3 +299,14 @@ named in the commands. No removal boundary was created.
 Existing CMake 4.4.4, Ninja 1.13.2, Apple clang 21.0.0 targeting arm64-apple-darwin27.0.0, and
 macOS 27.0.1 recorded in E325 were reused; no install, download, dependency, or system configuration
 change. The worker ran `cmake -S native -B local/build/native-root-srv01-exact-fit-write-boundary-20261022 -G Ninja -DCMAKE_BUILD_TYPE=Debug`, `cmake --build local/build/native-root-srv01-exact-fit-write-boundary-20261022 --target test_exact_fit_finalize`, and `ctest --test-dir local/build/native-root-srv01-exact-fit-write-boundary-20261022 --output-on-failure -R '^exact_fit_finalize$'`. The independent root replay used the same commands with build directory `local/build/native-root-srv01-exact-fit-write-boundary-root-20261022`. All commands exited 0; focused CTest passed 1/1 in each run. Worker logs are under `local/validation/srv01-exact-fit-write-boundary/`; independent root replay logs are under its `root-replay/` subdirectory. Purpose: verify a synthetic `RegionNode` write boundary only. Build products remain under the two exact `local/build/` directories named above. No removal boundary was created.
+
+## 2026-10-22 06:13 CDT — CPU-01 lazy-tree failed-release fixture verification
+
+Existing CMake, Ninja, and Apple clang recorded in E325 were reused; no install, download,
+dependency, or system configuration change. Worker and independent root each ran Debug/Ninja
+configure, `test_lazy_param_def_tree` build, and focused `lazy_param_def_tree` CTest 1/1. Worker and
+root build directories are `local/build/native-worker-cpu01-lazy-release-preserve-20261022/` and
+`local/build/native-root-cpu01-lazy-release-preserve-20261022/`; logs are under
+`local/validation/cpu01-lazy-release-preserve-20261022/`. Purpose: verify synthetic cache retention
+after `release()` fails to lock a closed mutex. Build products remain in those directories; no
+removal boundary was created.

@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 06:05 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 06:11 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -10,15 +10,27 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 
 ## Current fixture claim — active
 
-- `CPU-01-LAZY-PARAM-TREE-FAILED-RELEASE-PRESERVES-BUILT-FIXTURE-01`, owned by `/root` and
-  `/root/next_fixture_scout_2`; one test-only case in `native/tests/test_lazy_param_def_tree.cpp`.
-  Build a tree through `get()`, close the unlocked mutex, then pin that `release()` reports
-  `mutex_unavailable` while `built()` and the tree pointer remain intact. Baseline and exact commands
-  are in the [claim checkpoint](docs/checkpoints/2026-10-22-root-cpu01-lazy-release-preserve-claim.md).
-- The claim has zero implementation attempts and zero failed tries. Production sources, CMake,
-  unrelated user API changes, and game inputs are outside scope. Root owns shared docs and publication.
-- Exact next action: dispatch the claimed test edit and focused validation to
-  `/root/next_fixture_scout_2`; then independently replay the target and record its result.
+- `SAV-01-CHUNK-HEADER-BAD-MAGIC-ZEROED-FIELDS-FIXTURE-01`, owned by `/root` and
+  `/root/next_candidate_scout`; one assertion-only extension in
+  `native/tests/test_save_chunk_header.cpp`. The existing wrong-magic loop pins the error and zero
+  `name_hash`; the new case will also pin zero `tag` and `payload_length`. The [claim checkpoint](
+  docs/checkpoints/2026-10-22-root-sav01-chunk-header-bad-magic-zeroed-fields-claim.md) records
+  baseline hashes, exact commands, and the synthetic-only boundary.
+- The claim is awaiting publication; implementation has zero attempts and zero failed tries. No
+  parser, header, CMake, unrelated user API, or game-input changes are in scope. Root owns shared docs.
+- Exact next action: after the claim commit is pushed, dispatch the one-file assertions and focused
+  `save_chunk_header` build/CTest to `/root/next_candidate_scout`; root will replay independently.
+
+## CPU-01 lazy parameter tree failed-release fixture — verified
+
+- `CPU-01-LAZY-PARAM-TREE-FAILED-RELEASE-PRESERVES-BUILT-FIXTURE-01` is `FIXTURE_VERIFIED` after
+  worker and independent root Debug/Ninja builds pass focused `lazy_param_def_tree` CTest 1/1 and
+  read-only review passes. The one test-only case builds/caches a tree, closes the unlocked mutex,
+  and confirms failed release retains the built tree and pointer. E356 and the
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-cpu01-lazy-release-preserve-complete.md)
+  record exact commands, hashes, and logs.
+- This is a synthetic helper/API-state case; it does not establish game reachability or the
+  unresolved parameter schema.
 
 ## APP-01 Metal readiness gate fixture — verified
 
@@ -41,6 +53,23 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   record hashes and logs.
 - This verifies a synthetic helper byte boundary only; allocator reachability and game behavior are
   not demonstrated.
+
+## 2026-10-22 publication checkpoint
+
+- APP-01 Metal readiness and SRV-01 exact-fit write-boundary fixtures are both committed in
+  `308a7394d4776122d9fad4de5c265c1d52e40f1a` and pushed to `origin/main`.
+- The CPU-01 lazy-tree failed-release fixture claim is in the same commit. E355 and
+  [the publication checkpoint](docs/checkpoints/2026-10-22-root-parallel-claims-publication.md)
+  record path audits, index checks, and the post-push 0/0 divergence result.
+- Existing user-owned `native/api/CMakeLists.txt`, `native/api/host/`, `native/graft/`, and
+  `scripts/graft/` remain unstaged and untouched.
+
+## 2026-10-22 CPU-01 completion / SAV-01 claim checkpoint
+
+- CPU-01 lazy-tree fixture is complete after worker/root focused CTest pass and independent review;
+  E356 and its checkpoint record the result.
+- SAV-01 wrong-magic zero-field fixture is the active claim. E357 and its claim checkpoint hold the
+  baseline and acceptance boundary. Publish that claim before implementation.
 
 ## DATA-02 pakN TOC payload-MD5 sample — verified
 
