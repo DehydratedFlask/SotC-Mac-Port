@@ -27,7 +27,8 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBaseYmmReloadCells& post_base_ymm_reload_cells,
     const Init531d60PostBase26800F590Hooks& post_base_26800_f590_hooks,
     const Init531d60PostBaseSbjHooks& post_base_sbj_hooks,
-    const Init531d60PostBaseSbojHooks& post_base_sboj_hooks) {
+    const Init531d60PostBaseSbojHooks& post_base_sboj_hooks,
+    const Init531d60PostBase52eb50Hooks& post_base_52eb50_hooks) {
     AppmainInitCtor98a90SliceResult out{};
     out.early = run_prologue_255180_early(alloc, early_hooks);
     if (!out.early.ok) {
@@ -217,6 +218,11 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     // E463: always-on Init continue — Outro Jump call-sites; stop before 0x52eb50.
     out.post_base_sboj = init_531d60_post_base_sboj(post_base_sboj_hooks);
     if (!out.post_base_sboj.ok) {
+        return out;
+    }
+    // E464: always-on Init continue — 0x52eb50 call-site; stop before lea rbx.
+    out.post_base_52eb50 = init_531d60_post_base_52eb50(post_base_52eb50_hooks);
+    if (!out.post_base_52eb50.ok) {
         return out;
     }
     out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,
