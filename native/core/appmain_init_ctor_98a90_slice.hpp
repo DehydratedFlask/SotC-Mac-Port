@@ -7,7 +7,8 @@
 // bossmusic-attach+cp3characters+cp3characters-attach+cp3shadowprecache+
 // cp3shadowprecache-attach+tail-140d90+stackchk) → post-base 0x499f80 call-site
 // → post-base 0x56dcb0 call-site → post-base 0x5c64c0 call-site →
-// post-base 0x1290 call-site → post-base 0x56db70 call-site (ret-nop) → registry.
+// post-base 0x1290 call-site → post-base 0x56db70 / 0x5b3d00 call-sites
+// (ret-nops) → registry.
 // Tip AllocatorFront+FakeHeap.
 // PR #5 cite-only.
 // NOT modelled: ensure migrate / heavy menu helpers / 0xf8f860 PLT / non-null list;
@@ -27,6 +28,7 @@
 #include "init_531d60_post_base_5c64c0.hpp"
 #include "init_531d60_post_base_1290.hpp"
 #include "init_531d60_post_base_56db70.hpp"
+#include "init_531d60_post_base_5b3d00.hpp"
 #include "input_table_551140.hpp"
 #include "prologue_255180.hpp"
 #include "singleton_f08_531d84.hpp"
@@ -81,6 +83,7 @@ struct AppmainInitCtor98a90SliceResult {
     Init531d60PostBase5c64c0Result post_base_5c64c0{};
     Init531d60PostBase1290Result post_base_1290{};
     Init531d60PostBase56db70Result post_base_56db70{};
+    Init531d60PostBase5b3d00Result post_base_5b3d00{};
     AppmainInitRemainderSliceResult remainder{};
 };
 
@@ -94,6 +97,7 @@ struct AppmainInitCtor98a90SliceResult {
     const Init531d60PostBase56dcb0Hooks& post_base_56dcb0_hooks = {},
     const Init531d60PostBase5c64c0Hooks& post_base_5c64c0_hooks = {},
     const Init531d60PostBase1290Hooks& post_base_1290_hooks = {},
-    const Init531d60PostBase56db70Hooks& post_base_56db70_hooks = {});
+    const Init531d60PostBase56db70Hooks& post_base_56db70_hooks = {},
+    const Init531d60PostBase5b3d00Hooks& post_base_5b3d00_hooks = {});
 
 }  // namespace sotc
