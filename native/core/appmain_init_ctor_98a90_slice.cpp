@@ -9,7 +9,8 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Prologue255180Hooks& early_hooks, const Prologue255180TailHooks& tail_hooks,
     const Ctor98a90_3be050Hooks& ctor_hooks, const BaseInitialize255130Hooks& base_hooks,
     void* setter_obj, std::uint8_t flag_in, std::uint8_t set_a, std::uint8_t set_b,
-    std::uint8_t set_c, const SingletonF08Hooks& singleton_hooks) {
+    std::uint8_t set_c, const SingletonF08Hooks& singleton_hooks,
+    const Init531d60PostBase499f80Hooks& post_base_hooks) {
     AppmainInitCtor98a90SliceResult out{};
     out.early = run_prologue_255180_early(alloc, early_hooks);
     if (!out.early.ok) {
@@ -107,6 +108,11 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
                     static_cast<std::uint8_t*>(out.early.flag_obj) + kXchgStore357f0Offset, 4);
     }
     if (!out.base_ok) {
+        return out;
+    }
+    // E446: always-on Init continue after Base Initialize — 0x499f80(self+0x3c70) call-site.
+    out.post_base_499f80 = init_531d60_post_base_499f80(self, post_base_hooks);
+    if (!out.post_base_499f80.ok) {
         return out;
     }
     out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,
