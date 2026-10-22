@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 03:45 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 03:58 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -94,27 +94,46 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Status is `FIXTURE_VERIFIED`: one successful implementation attempt and zero failed tries.
   Claim/completion commit `42331857a2212ec2f3e7c283f41b1f197da0d585` and docs audit record commit
   `c9ecd22156497404edcef5728d64e910730ef96e` are pushed and fetch-verified at 0/0 divergence; see
-  E306/E307. Completion publication is pending the root's allowlisted commit and audit.
-- Completion commit is pending after root finishes the project-index/Trail checks and publication
-  audit. `/root` owns all docs and publication; the worker made no commit and left user-owned API
-  changes untouched.
+  E306/E307. Completion commit `1400c835ff74b1744c65ded8e0139cb2051b92fa` is pushed and
+  fetch-verified at 0/0 divergence. Pre/post explicit audits accepted 8 paths and full audits
+  accepted 1,729 paths; see E310. User-owned API changes remain unstaged and untouched.
 
-## SRV-01 recursive-mutex owner reentrant try-lock fixture — active claim
+## SRV-01 recursive-mutex owner reentrant try-lock fixture — verified
 
 - `SRV-01-RECURSIVE-MUTEX-REENTRANT-TRYLOCK-FIXTURE-01` is a child of verified
   `SRV-01-RECURSIVE-MUTEX-01` and `CPU-01-MUTEX-CONTRACT-01`. It proposes two assertions in
   `native/tests/test_recursive_mutex.cpp::main()`: while the current thread already owns two
   recursive levels, `try_lock()` succeeds and one matching `unlock()` succeeds.
-- Root fresh Debug/Ninja `test_recursive_mutex` build and focused `recursive_mutex` CTest pass 1/1;
-  source and log hashes are in E309 and the [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-recursive-mutex-reentrant-trylock-claim.md).
-  Trail finds only uninitialized `EINVAL`, competing-thread `EBUSY`, and after-final-unlock success
-  checks; no owner-side recursive `try_lock` assertion exists.
+- Worker and independent root fresh Debug/Ninja builds pass; focused `recursive_mutex` CTest passes
+  1/1 in both. The only code change is a pair of balanced assertions while the current thread owns
+  two recursive levels. Final hashes, logs, Trail evidence, and limits are in E311 and the
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-srv01-recursive-mutex-reentrant-trylock-complete.md).
+- Status is `FIXTURE_VERIFIED`, one successful implementation attempt and zero failed tries. The
+  claim was published in `1400c835ff74b1744c65ded8e0139cb2051b92fa`; completion is ready to publish
+  together with a separately baselined CPU name-hash claim. This pins local Darwin mutex behavior
+  only, not priority inheritance under contention or game behavior.
+- Folder index and `trail build --check` are current: 37,436 folders and a synchronized 3,618-node /
+  1,240-file wiring graph. `git diff --check` passes. Root owns documentation and publication;
+  user-owned API changes remain unstaged.
+- Next exact action: audit/publish the test and completion docs with the CPU claim, then dispatch the
+  one-line name-hash fixture edit.
+
+## CPU-01 inline name-hash embedded-NUL fixture — active claim
+
+- `CPU-01-NAMEHASH-INLINE-EMBEDDED-NUL-FIXTURE-01` is a child of verified
+  `CPU-01-NAMEHASH-E71990-01`. It proposes one synthetic assertion in
+  `native/tests/test_name_hash.cpp`: `name_hash_inline("abc\0def") == 0x0b873285u`. Trail located
+  the inline helper and found no embedded-NUL assertion; the test currently covers ASCII, zero hash,
+  and non-ASCII inputs.
+- Root fresh Debug/Ninja `test_name_hash` build passes and focused `name_hash` CTest passes 1/1;
+  source and log hashes are in E312 and the
+  [claim checkpoint](docs/checkpoints/2026-10-22-root-cpu01-namehash-inline-embedded-nul-claim.md).
 - Status is `ACTIVE`, zero implementation attempts and zero failed tries. The claim will be
-  published with the region-list completion. `/root/next_fixture_scout_2` owns only the test-file
-  implementation after publication; `/root` owns docs, independent replay, and publication.
-- Next exact action: publish the verified region-list completion and this bounded claim, then
-  dispatch the mutex test edit. This pins local Darwin mutex behavior only, not scheduler priority
-  inheritance under contention or game behavior.
+  published with the recursive-mutex completion. `/root/next_fixture_scout_2` will own only the test
+  edit after publication; `/root` retains docs, root replay, and publication.
+- Next exact action: publish both the recursive-mutex completion and this claim, then dispatch the
+  one-line assertion. The synthetic case does not resolve whether the port needs original game-name
+  strings and makes no game behavior claim.
 
 ## SAV-01 stream-file symlink destination fixture — verified
 
