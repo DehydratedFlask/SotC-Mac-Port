@@ -164,6 +164,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `local/validation/app01-systemchecks-arch/baseline.log`, SHA256
   `f1cef398f1013d2114ddec8afec668a9751bcb8962c097319ca54f5f41ce79bc`.
 - Status `ACTIVE`, 0 failed implementation tries. Existing native API user changes remain outside scope.
+- Claim commit `daa92c26f8972cadbe9f97e39669577b4c8daf62` is pushed and fetch-verified. The staged
+  audit accepted 6 allowlisted paths and the full audit accepted 1,680 paths; post-push `HEAD ==
+  origin/main` with 0/0 divergence. User-owned native API changes remain unstaged. Claim publication
+  logs are in `local/validation/app01-systemchecks-arch/` and the claim checkpoint.
 - Exact next action: add the focused 32-bit Mach-O test in
   `launcher/Tests/LauncherCoreTests/SystemChecksArchitectureTests.swift`, remove the two 32-bit magic
   cases from `SystemChecks.swift`, then run the new fixture and existing `AssetValidatorTests`.
