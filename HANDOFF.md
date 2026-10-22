@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 22:48 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 22:54 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,18 +8,30 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## DATA-02 TOC-value / declared-size crosstab — claimed
+## DATA-02 TOC-value / declared-size crosstab — artifact verified
 
-- Root owns bounded task `DATA-02-TOC-VALUE-SIZE-CROSSTAB-01`; claim details and scope are in
+- Root completed bounded task `DATA-02-TOC-VALUE-SIZE-CROSSTAB-01`; claim details are in
   [the claim checkpoint](docs/checkpoints/2026-10-21-root-data02-toc-value-size-crosstab-claim.md).
-- Compare exact-path archive-pair occurrences from all seven private member manifests. Report only
-  the four aggregate cells for opaque TOC-value equality versus declared-size equality, and
-  reconcile row/column margins to E77 and E123. Paths and raw field values must not enter outputs.
-  This is metadata-only; no payload, digest semantics, loader, or runtime claim.
-- The claim commit `f9fc4302f1702af6677e90121a6040becc533d5e` is pushed and fetch-verified; the
-  worker was assigned after verification. Documentation sync `539a6bd1cfae0f3d75f13ac460d6c3ddf851734e`
-  is also pushed and verified. Publication details are in the
-  [claim checkpoint](docs/checkpoints/2026-10-21-root-data02-toc-value-size-crosstab-claim.md).
+- Worker and root analysis produce 4,479 equal-value/equal-size, 0 equal-value/different-size,
+  225 different-value/equal-size, and 35,512 different-value/different-size exact-path pair
+  occurrences. The 40,216 total and E77/E123 margins reconcile. Aggregate report contains no member
+  paths or raw TOC values; no archive or payload was opened. See E239 and the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-data02-toc-value-size-crosstab-complete.md).
+- Status `ARTIFACT_VERIFIED`; this remains metadata-only, with no byte-identity, digest-semantics,
+  loader, mount-order, or runtime claim. Parent DATA-02 remains ACTIVE / partial.
+- Claim commit `f9fc4302f1702af6677e90121a6040becc533d5e` and documentation syncs `539a6bd1cfae0f3d75f13ac460d6c3ddf851734e` / `5da4e8f37f26f3b156055a202252123b9e01a41c` are pushed and verified.
+- Exact next action: publish the crosstab result and the `RE-02-DYNLINK-REQUIRED-PHDR-01` claim
+  together; after fetch verification, dispatch the synthetic parser work to `/root/next_bounded_scout`.
+
+## RE-02 dynlink required program headers — claimed
+
+- Root claims `RE-02-DYNLINK-REQUIRED-PHDR-01`, child of `RE-02-DYNLINK-01`; scope and baseline
+  are in [the claim checkpoint](docs/checkpoints/2026-10-21-root-re02-dynlink-required-phdr-claim.md).
+- Add two synthetic missing-header cases for `PT_DYNAMIC` and `PT_SCE_DYNLIBDATA`. `parse()` must
+  raise explicit `ValueError` messages instead of leaking `StopIteration`. Keep duplicate-header
+  behavior unchanged; no live ELF/runtime-loader claim.
+- Exact next action: publish the claim, then assign `/root/next_bounded_scout` the two fixture cases
+  and bounded parser change in `scripts/ps4_dynlink.py` / `scripts/test_ps4_dynlink.py`.
 
 ## RE-02 app-main +0x20 virtual call — static path byte verified
 

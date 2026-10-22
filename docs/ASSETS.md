@@ -1,4 +1,4 @@
-# Asset archive findings (DATA-02, partial) — 2026-10-20
+# Asset archive findings (DATA-02, partial) — 2026-10-21
 
 Reader: [`scripts/psarc.py`](../scripts/psarc.py) (read-only, bounds-checked, tests in
 `scripts/test_psarc.py`). Private outputs: `local/manifests/assets/*.summary.json` and
@@ -48,6 +48,7 @@ Observed on this title (from members.jsonl, no re-extract):
 - The E75 audit of all seven member manifests found **0** exact duplicate path groups, **0** within-manifest `casefold()` collision groups and **0** differently spelled cross-archive pairs across all 21 archive pairs. This covers only these manifests; it does not prove filesystem/Fios case behavior or mount order.
 - The E77 exact-path overlap inventory covers the same seven manifests and all 21 unordered pairs: **40,216** shared-path pair occurrences, with **4,704** equal and **35,512** different TOC-declared-size comparisons. Equal declared sizes do not prove equal member bytes; this is path/size metadata only and says nothing about archive payloads, overlay priority, Fios, mount order, or game use.
 - The E123 TOC-field comparison covers those same 40,216 exact-path pair occurrences: **4,479** pairs have equal 16-byte values and **35,737** differ. This is an opaque metadata comparison; it does not prove content equality, digest semantics, overlay precedence, mount order, or game use.
+- The E239 cross-tab combines those same E77/E123 comparisons: **4,479** pairs have an equal TOC value and equal declared size, **0** have an equal value but different size, **225** have different values but equal size, and **35,512** differ in both. The four cells total **40,216** and reconcile to both prior margins. No member paths or raw TOC values were emitted. This remains metadata-only; it does not prove byte equality, digest meaning, overlay priority, mount order, or runtime use.
 - The E126 aggregate-only audit found **35,737** TOC values associated with multiple distinct exact paths (71,474 manifest rows). Separately, **4,479** exact-path/value associations repeat across archives (8,958 rows and 4,479 equal same-path pair occurrences, matching E123). No paths or TOC values were emitted; these opaque field relationships do not establish content identity or digest meaning.
 - Status: **PROVISIONAL_OBS**. Patch contains every base path, so a patch-wins overlay is
   consistent with the TOC data; engine Fios/loader mount order is still **unproven** (RE/CPU).
