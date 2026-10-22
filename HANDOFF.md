@@ -26,9 +26,9 @@ or Metal gameplay is demonstrated.
   `tools/lift/check_f531d60_post_base_sboj.py`; checkpoint
   `docs/checkpoints/2026-10-22-init-531d60-post-base-sboj.md`; EVIDENCE E463;
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-post-base-sboj-20261022/` (manifest pending feat tip;
-  capture `7c23acdc…`).
-- Observation: measured `pbsboj268=1` + `pbsbojf590=1` + `pbsbj268=1` + mid_reg=4 → 275 registry.
+  `local/validation/appmain-init-post-base-sboj-20261022/` (manifest
+  `3b50f2fe…` at tip `ed1e6ba`; capture `7c23acdc…`).
+- Observation: feat tip `ed1e6ba`; measured `pbsboj268=1` + `pbsbojf590=1` + `pbsbj268=1` + mid_reg=4 → 275 registry.
   Bodies / `0x52eb50` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_sboj.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
