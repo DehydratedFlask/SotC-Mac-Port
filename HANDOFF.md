@@ -22,8 +22,10 @@ or Metal gameplay is demonstrated.
 - Files: `native/core/store_tsc_323d0.{hpp,cpp}`; ctor wire; `tools/lift/check_f323d0_tsc.py`;
   checkpoint `docs/checkpoints/2026-10-22-store-tsc-323d0.md`; EVIDENCE E413;
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-ctor-98a90-tsc-20261022/` (manifest `2daa7167…`).
-- Observation: ELF pins body+cells+rdtsc+PLT; measured tsc≠0, init once → 275 registry.
+  `local/validation/appmain-init-ctor-98a90-tsc-20261022/` (manifest `8f46927b…` at tip
+  `6d8f875`).
+- Observation: feat tip `6d8f875`; ELF pins body+cells+rdtsc+PLT; measured tsc≠0,
+  init once → 275 registry.
   PLT body / heavier callees NOT modelled.
 - Commands: `python3 -I tools/lift/check_f323d0_tsc.py` OK;
   `python3 -I tools/lift/check_f3be050_ctor.py` OK;
