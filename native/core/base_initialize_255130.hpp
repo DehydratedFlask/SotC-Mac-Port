@@ -38,6 +38,7 @@
 #include "vslot_40_533100_randomevents_attach.hpp"
 #include "vslot_40_533100_shadowbossmusic.hpp"
 #include "vslot_40_533100_bossmusic_attach.hpp"
+#include "vslot_40_533100_cp3characters.hpp"
 #include "xchg_store_u32_357f0.hpp"
 
 #include <cstddef>
@@ -89,7 +90,8 @@ struct BaseInitialize255130Hooks {
     Vslot40_533100RandomeventsAttachHooks vslot_40_randomevents_attach_detail{};
     Vslot40_533100ShadowbossmusicHooks vslot_40_shadowbossmusic_detail{};
     Vslot40_533100BossmusicAttachHooks vslot_40_bossmusic_attach_detail{};
-    // Last header/post/…/bossmusic/bossmusic-attach results.
+    Vslot40_533100Cp3charactersHooks vslot_40_cp3characters_detail{};
+    // Last header/post/…/bossmusic-attach/cp3characters results.
     Vslot40_533100HeaderResult* vslot_40_out = nullptr;
     Vslot40_533100PostResult* vslot_40_post_out = nullptr;
     Vslot40_533100MissResult* vslot_40_miss_out = nullptr;
@@ -109,6 +111,7 @@ struct BaseInitialize255130Hooks {
     Vslot40_533100RandomeventsAttachResult* vslot_40_randomevents_attach_out = nullptr;
     Vslot40_533100ShadowbossmusicResult* vslot_40_shadowbossmusic_out = nullptr;
     Vslot40_533100BossmusicAttachResult* vslot_40_bossmusic_attach_out = nullptr;
+    Vslot40_533100Cp3charactersResult* vslot_40_cp3characters_out = nullptr;
 };
 
 // Process-wide cell modelling original qword @ 0x2ea4718 (points at flag object).

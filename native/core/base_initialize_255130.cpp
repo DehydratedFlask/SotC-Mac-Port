@@ -212,6 +212,15 @@ bool base_initialize_255130(void* self, void* arg,
         if (!bmar.ok) {
             return false;
         }
+        // E440: always-on cp3Characters load-attempt (stop before attach @ 0x533eac).
+        const Vslot40_533100Cp3charactersResult cpr =
+            vslot_40_533100_cp3characters(hooks.vslot_40_cp3characters_detail);
+        if (hooks.vslot_40_cp3characters_out != nullptr) {
+            *hooks.vslot_40_cp3characters_out = cpr;
+        }
+        if (!cpr.ok) {
+            return false;
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true

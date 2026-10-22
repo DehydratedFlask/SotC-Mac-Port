@@ -3,7 +3,8 @@
 //   // success path (atexit/tag) NOT modelled when flag false
 //   join @ 0x533db8: install loaded into *[f08+0x70] (replace + refcount)
 //   flag byte at f08+0x78; optional notify if success; release temps; 0xf590
-//   // stop before next path @ 0x533e54 (notify f08+0x70)
+//   // stop before cp3Characters load @ 0x533e54 (notify f08+0x70)
+//     (see vslot_40_533100_cp3characters.*)
 //
 // Always-on after E438 shadowbossmusic load-attempt. Prefer over success
 // atexit (flag-true only) and over deepen 0x14c2f0 / 0x6a5370 (already hooked).
@@ -11,7 +12,7 @@
 //
 // Claimed: fail-path + always-on install/cleanup control flow into f08+0x70.
 // NOT modelled: success atexit cluster (0xf8f3d0/0xf730/0x14c4a0/…);
-// bodies of 0x14d880/0x14d2d0/0x14ccc0/0x95580. Next path past 0x533e54.
+// bodies of 0x14d880/0x14d2d0/0x14ccc0/0x95580. Next: cp3Characters load.
 // PR #5 cite-only.
 #pragma once
 
