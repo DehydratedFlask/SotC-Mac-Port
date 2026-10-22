@@ -23,10 +23,11 @@ or Metal gameplay is demonstrated.
   `tools/lift/check_f531d84_singleton_f08.py`; checkpoint
   `docs/checkpoints/2026-10-22-singleton-f08-531d84.md`; EVIDENCE E420;
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-singleton-f08-20261022/` (manifest `bf0dde49…`;
-  capture `6bcbe4a2…`).
-- Observation: ELF pins install/size/cell/callees; measured f08 + mid_reg=4 → 275
-  registry; alloc_ops=11. Bodies of `0x523bd0`/`0x525b40` / `0x533100` NOT modelled.
+  `local/validation/appmain-init-singleton-f08-20261022/` (manifest `25c17088…` at tip
+  `0e94adb`; capture `6bcbe4a2…`).
+- Observation: feat tip `0e94adb`; ELF pins install/size/cell/callees; measured f08 +
+  mid_reg=4 → 275 registry; alloc_ops=11. Bodies of `0x523bd0`/`0x525b40` /
+  `0x533100` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d84_singleton_f08.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^(appmain_init_ctor_98a90_slice|appmain_init_base_initialize_slice)$'`
   PASS; private capture exit 0; `check_ctor_slots` still **155**.
