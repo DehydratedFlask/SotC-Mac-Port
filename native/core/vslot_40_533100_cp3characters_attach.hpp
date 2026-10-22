@@ -4,6 +4,7 @@
 //   success-flag @ [rbp-0xe8]; measured default false → skip 0x95580 notify
 //   always: release loaded 0x14ccc0; path dtor 0xf590
 //   // stop before next path (cp3shadowprecache) @ 0x533f51
+//     (see vslot_40_533100_cp3shadowprecache.*)
 //
 // Always-on after E440 cp3Characters load-attempt. Prefer over success atexit
 // (flag-true only) and over deepen 0x14c2f0 / 0x6a5370 (already hooked).
@@ -11,7 +12,7 @@
 //
 // Claimed: fail-path + always-on install/cleanup into self+0x3cb8.
 // NOT modelled: success atexit notify cluster; bodies of 0x14d880/0x14d2d0/
-// 0x14ccc0/0x95580. Next path past 0x533f51. PR #5 cite-only.
+// 0x14ccc0/0x95580. Next path: see cp3shadowprecache.*. PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
