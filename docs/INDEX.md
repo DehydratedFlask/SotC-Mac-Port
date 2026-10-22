@@ -115,6 +115,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Init continue first post-a2ed00-u3 0xf590 call-site (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u5.md) | Init continue first post-a2ed00-u3 0xf590 call-site; E496; G1 PARTIAL |
 | [Init continue second post-a2ed00-u3 0xf590 call-site (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u6.md) | Init continue second post-a2ed00-u3 0xf590 call-site; E497; G1 PARTIAL |
 | [Init continue fourth 0xa2ed00 call-site (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-a2ed00-u4.md) | Init continue fourth 0xa2ed00 call-site; E498; G1 PARTIAL |
+| [Init continue first post-a2ed00-u4 0xf590 call-site (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u7.md) | Init continue first post-a2ed00-u4 0xf590 call-site; E499; G1 PARTIAL |
 | [FOLDERS](FOLDERS.md) | Generated public/source folder inventory; `scripts/project_index.py` |
 | [INSTALL_LOG](../INSTALL_LOG.md) | Existing and newly installed tools, downloads and removals |
 | [Checkpoint template](checkpoints/TEMPLATE.md) | Required record at each checkpoint |
