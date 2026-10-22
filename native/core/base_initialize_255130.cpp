@@ -122,6 +122,15 @@ bool base_initialize_255130(void* self, void* arg,
         if (!kar.ok) {
             return false;
         }
+        // E430: always-on shadowanims load-attempt (stop before success atexit).
+        const Vslot40_533100ShadowanimsResult anr =
+            vslot_40_533100_shadowanims(hooks.vslot_40_shadowanims_detail);
+        if (hooks.vslot_40_shadowanims_out != nullptr) {
+            *hooks.vslot_40_shadowanims_out = anr;
+        }
+        if (!anr.ok) {
+            return false;
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true
