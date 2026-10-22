@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 00:13 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 00:19 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,19 +8,24 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Active claim: SRV-01 arena-page-debit uint32 wrap fixture
+## SRV-01 arena-page-debit uint32 wrap fixture — verified
 
-- Root claimed `SRV-01-ARENA-PAGE-DEBIT-UINT32-UNDERFLOW-WRAP-FIXTURE-01` after confirming the
-  observed `sub dword [arena+0x70], pages` rule and the existing fixture's gap; see
-  [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-arena-page-debit-wrap-claim.md).
-- Scope is one synthetic assertion in `native/tests/test_arena_page_debit.cpp`: seed page count 1,
-  debit two 64 KiB pages, and pin the uint32 result `UINT32_MAX`. This records helper arithmetic
-  only; it does not say valid allocator runtime state may underflow.
-- Baseline target build and focused CTest pass (1/1). Logs and hashes are in the claim checkpoint.
-  Task status `CLAIMED`, 0 implementation attempts, 0 failed tries. Root is sole integrator.
-- Exact next action: publish the claim checkpoint, then assign the one-file fixture implementation;
-  root will replay the focused checks and publish completion evidence. Keep the pending Mach-O CPU
-  and PSARC negative-limit choices untouched.
+- `SRV-01-ARENA-PAGE-DEBIT-UINT32-UNDERFLOW-WRAP-FIXTURE-01` adds one test-only helper assertion
+  in `native/tests/test_arena_page_debit.cpp`: seed the synthetic page count to 1, debit two 64 KiB
+  pages, and assert `UINT32_MAX`. This records observed uint32 helper arithmetic; it does not say a
+  valid allocator runtime may underflow. See E255 and the
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-srv01-arena-page-debit-wrap-complete.md).
+- Baseline, worker, and root target builds exit 0; focused `arena_page_debit` CTest passes 1/1 for
+  worker and root. The helper implementation is unchanged. Project index is current at 24,078
+  folders. Trail wiring graph check passes at 3,609 nodes / 1,240 files; the source query resolves
+  `native/tests/test_arena_page_debit.cpp`. Trail's deep meaning layer is not built.
+- Status `FIXTURE_VERIFIED`; one successful implementation attempt, 0 failed tries. Claim commit
+  `872f9b66ae02711bb2bf3c5dac6b47b01bda397d` is pushed and fetch-verified. Completion publication
+  is being recorded in this checkpoint. Existing user-owned `native/api/CMakeLists.txt` and
+  `native/api/host/` remain outside the task.
+- Exact next action: evaluate the read-only `RE-01-UNWRAP-IDENTICAL-ELF-REPEAT-FIXTURE-01` candidate
+  from `/root/next_independent_task_scout` against the live spec, task list, and tests; claim it only
+  if distinct and supported. Leave the pending Mach-O CPU and PSARC negative-limit choices alone.
 
 ## CPU-02 max-offset and AUD-01 archive-summary fixtures — verified
 
