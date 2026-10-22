@@ -28,6 +28,7 @@
 #include "vslot_40_533100_shadowmodels.hpp"
 #include "vslot_40_533100_shadowskels.hpp"
 #include "vslot_40_533100_skels_attach.hpp"
+#include "vslot_40_533100_shadowanims.hpp"
 #include "xchg_store_u32_357f0.hpp"
 
 #include <cstddef>
@@ -69,7 +70,8 @@ struct BaseInitialize255130Hooks {
     Vslot40_533100ShadowAttachHooks vslot_40_shadow_attach_detail{};
     Vslot40_533100ShadowskelsHooks vslot_40_shadowskels_detail{};
     Vslot40_533100SkelsAttachHooks vslot_40_skels_attach_detail{};
-    // Last header/post/miss/join/gfx/shadow/attach/skels results when lifted.
+    Vslot40_533100ShadowanimsHooks vslot_40_shadowanims_detail{};
+    // Last header/post/miss/join/gfx/shadow/attach/skels/anims results when lifted.
     Vslot40_533100HeaderResult* vslot_40_out = nullptr;
     Vslot40_533100PostResult* vslot_40_post_out = nullptr;
     Vslot40_533100MissResult* vslot_40_miss_out = nullptr;
@@ -79,6 +81,7 @@ struct BaseInitialize255130Hooks {
     Vslot40_533100ShadowAttachResult* vslot_40_shadow_attach_out = nullptr;
     Vslot40_533100ShadowskelsResult* vslot_40_shadowskels_out = nullptr;
     Vslot40_533100SkelsAttachResult* vslot_40_skels_attach_out = nullptr;
+    Vslot40_533100ShadowanimsResult* vslot_40_shadowanims_out = nullptr;
 };
 
 // Process-wide cell modelling original qword @ 0x2ea4718 (points at flag object).
