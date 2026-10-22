@@ -266,3 +266,17 @@ allocator-region size `0x200001` remains distinct from the page-rounded host map
 does not prove allocator reachability or game behavior. Build products remain under
 `local/build/native-root-srv01-map-size-verify-20261022/`; logs are under
 `local/validation/srv01-host-map-requested-vs-rounded/`. No removal boundary was created.
+
+## 2026-10-22 05:50 CDT — SAV-01 save-stream directory errno fixture verification
+
+Existing CMake 4.4.4, Ninja 1.13.2, Apple clang 21.0.0 targeting arm64-apple-darwin27.0.0, and
+macOS 27.0.1 previously recorded in E325 were reused; no install, download, dependency, or system
+configuration change. From the repository root, `cmake -S native -B
+local/build/native-root-sav01-dir-errno-verify-20261022 -G Ninja -DCMAKE_BUILD_TYPE=Debug`,
+`cmake --build local/build/native-root-sav01-dir-errno-verify-20261022 --target
+test_save_stream_file`, and `ctest --test-dir
+local/build/native-root-sav01-dir-errno-verify-20261022 --output-on-failure -R
+'^save_stream_file$'` all exited 0; the focused CTest passed 1/1. Purpose: pin synthetic directory-read
+`os_errno == EISDIR` reporting; no real-save compatibility or game behavior is established. Build
+products remain under `local/build/native-root-sav01-dir-errno-verify-20261022/`; logs are under
+`local/validation/sav01-native-stream-file-directory-errno/`. No removal boundary was created.
