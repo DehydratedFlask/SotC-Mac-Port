@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 04:32 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 04:37 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,25 +8,27 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## SRV-01 host-map alignment wrap/minimum-clamp fixture — claimed
+## SRV-01 host-map alignment wrap/minimum-clamp fixture — verified
 
-- SRV-01-HOST-MAP-ALIGNMENT-UINT32-WRAP-CLAMP-FIXTURE-01 proposes one synthetic assertion in
-  native/tests/test_host_map.cpp: reserve_alignment(0xffff0001u) returns 0x100000u after the
-  32-bit 64 KiB rounding wrap reaches the 1 MiB minimum clamp. No source edit has been made.
-- Fresh root Debug/Ninja configure/build of test_host_map passes; focused host_map CTest passes
-  1/1. Baseline hashes, Trail results, and the bounded arithmetic interpretation are in E322 and
-  the [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-host-map-align-u32-wrap-clamp-claim.md).
-- Folder index regenerated and checked current at 41,096 folders; Trail wiring graph check is
-  synchronized at 3,618 nodes / 1,240 files; `git diff --check` passes. See E323 and the refreshed
-  claim checkpoint. Trail's optional deep meaning layer remains unbuilt.
-- The helper and existing ordinary-boundary tests are at host_map.hpp:L35-L39 and
-  test_host_map.cpp:L29-L34; CMake registers test_host_map and host_map at L418-L420. The lower
-  align_up_64k overflow case already exists in allocator_region tests; this checks the wrapper's
-  subsequent minimum clamp. This does not establish that the input is a valid allocator request.
-- Claim is recorded; status ACTIVE, zero implementation attempts and zero failed tries. The test
-  edit stays blocked until the claim commit is pushed.
-- Next exact action: publish the claim and baseline, then delegate the one-line test-only edit to
-  /root/next_fixture_scout_2 and independently replay it.
+- SRV-01-HOST-MAP-ALIGNMENT-UINT32-WRAP-CLAMP-FIXTURE-01 adds one synthetic assertion at
+  `native/tests/test_host_map.cpp:32`: `reserve_alignment(0xffff0001u) == 0x100000u` after the
+  32-bit 64 KiB rounding wrap reaches the 1 MiB minimum clamp. Worker and independent root fresh
+  Debug/Ninja configure/builds pass; focused `host_map` CTest passes 1/1 in both. E325 records the
+  final test hash and worker/root command logs.
+- Project index regenerated and checked current at 42,316 folders. Trail wiring graph passes at
+  3,618 nodes / 1,240 files and resolves the new assertion; `git diff --check` passes. See E326
+  and the [claim/completion checkpoint](docs/checkpoints/2026-10-22-root-srv01-host-map-align-u32-wrap-clamp-claim.md).
+- `host_map.hpp:L35-L39` contains the helper; existing ordinary checks remain in
+  `test_host_map.cpp:L29-L35`; CMake registers `test_host_map` / CTest `host_map` at
+  `native/CMakeLists.txt:L418-L420`. The lower `align_up_64k` overflow case already exists in
+  allocator-region tests. This fixture pins wrapper arithmetic only; it does not establish that
+  the extreme input is a valid allocator request or reachable by game code.
+- Claim commit `9718f056d8851f27bf33586fad615ba3ddd8a5f5` is pushed and fetch-verified at 0/0
+  divergence; claim publication audits are in E324. Completion publication is pending. Only
+  user-owned `native/api/CMakeLists.txt` and `native/api/host/` remain unstaged and untouched.
+- Status is `FIXTURE_VERIFIED`: one successful implementation attempt, zero failed tries. Next
+  exact action: review and baseline the separate CPU-01 mixed math-constant guard-state candidate;
+  publish its claim before any source edit.
 
 ## CPU-01 store_zero32 adjacent-canary fixture — verified
 
