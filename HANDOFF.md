@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 17:05 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 17:10 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,36 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E483 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E484 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 Init continue first `0x53fd10` call-site
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-INIT-531D60-POST-BASE-53FD10-01` — lift OBS first `0x53fd10`
+  call-site (5 B) at `0x5323b9..0x5323be`; intervening prep
+  `0x5323b3..0x5323b9` (6 B: `mov rbx,rax`; `mov rdi,rbx`) demoted. Prefer
+  call-site after E483 over mov-rbx/arg-prep/`0x53fd10` body/`0x17070`/
+  `0x544fe0`/vcall tourism and over deepen `0x1290`/`0x5c64c0`/`0x56dcb0`/
+  `0x499f80`/`0x140d90`/`0x14c2f0`/`0x6a5370`. FakeHeap + tip AllocatorFront;
+  PR #5 cite-only.
+- Files: `native/core/init_531d60_post_base_53fd10.{hpp,cpp}`; ctor slice wire;
+  `tools/lift/check_f531d60_post_base_53fd10.py`; checkpoint
+  `docs/checkpoints/2026-10-22-init-531d60-post-base-53fd10.md`; EVIDENCE E484;
+  TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-post-base-53fd10-20261022/` (manifest
+  `15c5a894…` at tip `329fd78`; capture `6c7ff428…`).
+- Observation: feat tip `329fd78`; measured `pb53=1` + `pb170u2=1` + mid_reg=4 → 275 registry.
+  Body / mov-rbx prep / following `lea r14` NOT modelled.
+- Commands: `python3 -I tools/lift/check_f531d60_post_base_53fd10.py` OK;
+  `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: `lea r14` / cell-install `0x2eff448` / always-on after
+  `0x5323be`, or bounded `0x1290` / `0x5c64c0` / `0x56dcb0` / `0x499f80` /
+  `0x140d90` / `0x14c2f0` / `0x6a5370`. Prefer call-site continue over
+  bodies. Goal open.
 
 ## 2026-10-22 Init continue second `0x17070` call-site
 
