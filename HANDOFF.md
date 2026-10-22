@@ -1,12 +1,29 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 00:27 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 00:30 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## SRV-01 arena high-water uint64 wrap fixture — claimed
+
+- Claimed bounded task `SRV-01-ARENA-HIGH-WATER-UINT64-WRAP-FIXTURE-01` under `SRV-01`.
+  Scope: add one synthetic assertion in `native/tests/test_arena_high_water.cpp` that seeds both
+  used counters at `UINT64_MAX - 3`, both peaks at 10, adds 8, and checks both used values wrap to
+  4 while both peaks stay 10. Production code and checker are unchanged. See the
+  [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-arena-high-water-u64-wrap-claim.md).
+- Baseline `cmake --build local/build/native --target test_arena_high_water` exits 0; focused
+  `ctest --test-dir local/build/native -R '^arena_high_water$' --output-on-failure` passes 1/1.
+  Project index is current at 24,078 folders.
+  Existing tests cover growth, equal/decreased used values, pair independence, and null input, but
+  not uint64 addition wrap. This remains synthetic arithmetic only; it is not allocator policy or
+  runtime evidence.
+- Status `CLAIMED`, 0 implementation attempts, 0 failed tries. Next exact action: publish the
+  claim checkpoint, then add and verify this one assertion while leaving the pending Mach-O CPU and
+  PSARC negative-limit choices untouched.
 
 ## RE-01 identical-output SELF unwrap repeat fixture — verified
 
@@ -23,9 +40,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `8020974b0d77aca07143026ab717a2c44c9f9740` and `af40659`, plus completion commit `b58c301`, are
   pushed and fetch-verified at 0/0 divergence. Staged/full audits accepted 7/1,694 paths. This is
   synthetic wrapper repeatability only; it does not process a real game SELF or execute code.
-- Exact next action: review the read-only candidate from `/root/next_independent_task_scout`, verify
-  it against live files and task rows, and claim it only if distinct. Leave the pending Mach-O CPU
-  and PSARC negative-limit choices untouched.
+- This completed fixture is published; current work and its exact next action are recorded at the
+  top of this handoff.
 
 ## SRV-01 arena-page-debit uint32 wrap fixture — verified
 
