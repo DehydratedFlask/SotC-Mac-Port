@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:04 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:06 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -55,9 +55,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Exact next action: continue with the core-client fallback-copy fixture claimed below; leave PSARC
   negative-limit behavior unclaimed pending the user's choice of invalid-error versus empty-read.
 
-## APP-01 core-client internal error copy — claimed
+## APP-01 core-client internal error copy — fixture verified
 
-- Root claims `APP-01-CORECLIENT-INTERNAL-ERROR-COPY-FIXTURE-01`, child of `APP-01`. Scope is only
+- Root completed `APP-01-CORECLIENT-INTERNAL-ERROR-COPY-FIXTURE-01`, child of `APP-01`. Scope was only
   `launcher/Tests/LauncherCoreTests/CoreClientTests.swift`; assert that `.internalError` and
   `.unknown(5)` both map to the existing exact fallback text `The game core reported an error.`
 - The current suite already checks exact text for `.io`, `.badState`, and `.abiMismatch`, and checks
@@ -67,8 +67,14 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   local/build/app01-internal-error-copy --filter CoreClientTests` passed 22 tests (9 native-client,
   13 core-client), exit 0. Log SHA256 `22286765f4a240ea0890103ca94d9503186383e9635c1e245aa5e5739d38c647`;
   source/test baseline hashes are in the claim checkpoint.
-- Status `CLAIMED`; 0 attempts. Exact next action: publish this claim, then add the two exact
-  fallback assertions and rerun the focused CoreClientTests suite.
+- Root added exact assertions for both cases without changing production code. The focused suite
+  passed 22 tests; completion log SHA256 `bf2010b1150e5b5578cd4fe8c9ec65d7153d7ce96e88dbdc3cb1e5bf19eeb8bb`.
+  Status `FIXTURE_VERIFIED`; 0 failed implementation tries. No UI, runtime, ABI, core, or game
+  behavior claim. See E241 and the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-app01-coreclient-internal-error-copy-complete.md).
+- Claim docs commit `8c33c317cc5cb6863b3ab618ebfb28d36557570a` is pushed and fetch-verified.
+- Exact next action: scout another independent bounded task outside the PSARC and CoreClient files;
+  leave negative-limit behavior unclaimed pending the user's answer.
 
 ## RE-02 app-main +0x20 virtual call — static path byte verified
 
