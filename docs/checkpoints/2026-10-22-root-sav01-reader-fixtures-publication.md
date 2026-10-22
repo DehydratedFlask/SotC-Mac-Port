@@ -1,0 +1,23 @@
+# Publication checkpoint: SAV-01 reader fixtures and symlink-read claim
+
+- Local date/time: 2026-10-22 07:02 CDT (America/Chicago). Integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`).
+- Task IDs: completed `SAV-01-READER-DUPLICATE-NAME-CROSS-TAG-FIXTURE-01` and `SAV-01-CHUNK-CODEC-READER-BORROWED-BYTES-VIEW-FIXTURE-01`; published claim `SAV-01-NATIVE-STREAM-FILE-SYMLINK-SOURCE-READ-FIXTURE-01`.
+- Claim/completion publication commit: `354e450700e84557a30e109ef8f82425f5179983`, pushed to `origin/main`. The commit includes exactly these ten allowlisted paths: `HANDOFF.md`, `INSTALL_LOG.md`, `docs/EVIDENCE.md`, `docs/FOLDERS.md`, `docs/TASKS.md`, the two SAV-01 completion checkpoints, the symlink-source-read claim checkpoint, `native/tests/test_save_chunk_codec.cpp`, and `native/tests/test_save_stream.cpp`.
+- The two test fixtures passed worker and independent-root Debug/Ninja configure/build/focused CTest, and independent read-only review passed. Their evidence is E372/E373 and the individual completion checkpoints. No production source, CMake, reference clone, or user-owned API/Graft path was included.
+- The next claim is `ACTIVE`, zero implementation attempts, zero failed tries. Its baseline and acceptance commands are in E374 and `2026-10-22-root-sav01-stream-symlink-source-read-claim.md`. It must be dispatched only after this publication checkpoint is published.
+
+## Audit and push results
+
+- Exact pre-push commands: `python3 scripts/project_index.py`; `python3 scripts/project_index.py --check`; `trail build --check`; `git diff --cached --check`; `python3 -I scripts/audit_publish_paths.py`; `python3 -I scripts/audit_publish_paths.py --all`; `git fetch origin`; `git rev-list --left-right --count HEAD...origin/main`; `git commit -m 'test: pin SAV-01 reader edge behavior' -m 'Add synthetic stream coverage for duplicate names across different tags and for a nonempty borrowed payload span with cursor assertions. Record worker and independent root CTest results plus read-only review.' -m 'Publish the bounded source-symlink read fixture claim before its implementation starts, and record the task, evidence, handoff, and index updates.'`; `git push origin main`.
+- Project-index generation and check passed at 58,155 folders; generation/check log SHA256 `0f688532de200094c87e1b8bc62ec671d76df4b67e0b9b486113f4d55ab8c207` / `b7df75d739fb8673d9c4d96d4f4fff6f5587fa63949e4ff036ceb350f11a7a6e`. Trail wiring check passed at 3,619 nodes / 1,240 files, with meaning tier unbuilt (log SHA256 `93ff238697ffff5dbbabbe4ed02c7f40b264ab3825cb73c48885279486f12ac6`). Logs are in `local/validation/sav01-reader-stream-symlink-source-read-20261022/`.
+- Staged diff-check passed (empty SHA256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). Staged and full path audits passed for 10 and 1,767 paths. Staged/full audit log SHA256: `b1147de421fddc094c6d1b7801b6173cb31c93840c298d3dba16d2e455b7861d` / `a95225fe9224a743c665541caaa9bf52be24f0152afbf42cecabadd551a53465`.
+- Pre-push fetch was empty; divergence was 0/0 (log SHA256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` / `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d0247050325e7c5a3b2b3271c`). Commit and push exited 0 (log SHA256 `dffade34bb20b6cdf5640c78439f1796156e1d463faeb3e3ca25a46649d1aeb2` / `0689a151ea8d4b623d0c030bb208c151bd9492bb8e0bc6166304e968bdf95a67`).
+- Post-push fetch was empty, divergence 0/0, HEAD `354e450700e84557a30e109ef8f82425f5179983`, and full audit accepted 1,767 paths. The only remaining worktree changes are the pre-existing user-owned `native/api/CMakeLists.txt`, `native/api/host/`, `native/graft/`, and `scripts/graft/`; none was staged, edited, or published. Post-push log hashes and status are recorded in E375.
+
+## Observation, limits, and next action
+
+- Observed: the two synthetic native-reader fixtures pass their focused tests; the exact allowlisted publication reached `origin/main`; the next bounded test claim is published.
+- Not established: original-game loader behavior, real-save compatibility, game boot/audio/save-load, or gameplay behavior.
+- Risks: the symlink-source-read case has not been implemented or tested. Preserve its one-file ownership boundary and keep game assets private.
+- Exact next action: dispatch the published source-symlink-read test to `/root/next_fixture_scout_20261022`; root will independently replay and request read-only review.
+- Status: two fixtures `FIXTURE_VERIFIED` (one successful implementation attempt each); symlink-source-read claim `ACTIVE` (zero implementation attempts; zero failed tries).

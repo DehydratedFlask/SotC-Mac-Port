@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 07:00 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 07:04 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,7 +8,7 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Current fixture publication — pending
+## Current fixture claim — published
 
 - `SAV-01-READER-DUPLICATE-NAME-CROSS-TAG-FIXTURE-01` and
   `SAV-01-CHUNK-CODEC-READER-BORROWED-BYTES-VIEW-FIXTURE-01` have worker/root passes and independent
@@ -18,15 +18,17 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `/root/next_fixture_scout_20261022`, is the next one-file test claim. It reads a valid synthetic
   stream through a symlink and checks the descriptor and payload. Its
   [claim checkpoint](docs/checkpoints/2026-10-22-root-sav01-stream-symlink-source-read-claim.md)
-  records baseline hashes, commands, and the filesystem/API-only limit. It is not dispatched yet.
+  records baseline hashes, commands, and the filesystem/API-only limit. Claim and prior completions
+  are published in `354e450700e84557a30e109ef8f82425f5179983`; publication audit is in E375 and
+  [the checkpoint](docs/checkpoints/2026-10-22-root-sav01-reader-fixtures-publication.md). The
+  worker is not dispatched yet.
 - The symlink-source task uses baseline HEAD `460fc0a29f580cab9ca479ff8a658d191bec3370`; its
   `test_save_stream_file.cpp` baseline hash is pinned in E374. Production code, CMake, user-owned
   API/Graft paths, references, and game inputs are out of scope.
 - E371 and the [publication checkpoint](
   docs/checkpoints/2026-10-22-root-srv01-completion-sav01-claims-publication.md) record publication
   of the prior SRV-01 completion and two SAV-01 claims.
-- Exact next action: regenerate/check indexes, audit and publish both SAV-01 completions plus the
-  symlink-source-read claim, record the publication checkpoint, then dispatch that one-file change.
+- Exact next action: dispatch the published one-file symlink-source-read change.
 
 ## CPU-01 normal-threshold infinity fixture — verified
 
