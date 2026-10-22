@@ -39,6 +39,9 @@ add_library(sotc_core STATIC
   core/leaf_9b75a0.cpp
   core/leaf_575d40.cpp
   core/leaf_99350.cpp
+  core/leaf_83d800.cpp
+  core/leaf_7ce8d0.cpp
+  core/leaf_e71990.cpp
   core/scratch_reset.cpp
   core/save_checksum.cpp
   core/name_hash.cpp
@@ -1390,6 +1393,18 @@ add_test(NAME leaf_575d40 COMMAND test_leaf_575d40)
 add_executable(test_leaf_99350 tests/test_leaf_99350.cpp)
 target_link_libraries(test_leaf_99350 sotc_core)
 add_test(NAME leaf_99350 COMMAND test_leaf_99350)
+
+add_executable(test_leaf_83d800 tests/test_leaf_83d800.cpp)
+target_link_libraries(test_leaf_83d800 sotc_core)
+add_test(NAME leaf_83d800 COMMAND test_leaf_83d800)
+
+add_executable(test_leaf_7ce8d0 tests/test_leaf_7ce8d0.cpp)
+target_link_libraries(test_leaf_7ce8d0 sotc_core)
+add_test(NAME leaf_7ce8d0 COMMAND test_leaf_7ce8d0)
+
+add_executable(test_leaf_e71990 tests/test_leaf_e71990.cpp)
+target_link_libraries(test_leaf_e71990 sotc_core)
+add_test(NAME leaf_e71990 COMMAND test_leaf_e71990)
 add_executable(test_const_table_ee1130 tests/test_const_table_ee1130.cpp)
 target_link_libraries(test_const_table_ee1130 sotc_core)
 add_test(NAME const_table_ee1130 COMMAND test_const_table_ee1130)
