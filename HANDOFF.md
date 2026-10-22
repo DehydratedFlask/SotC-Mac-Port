@@ -27,6 +27,20 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Next exact action (this worker): allowlist audit → commit/push. Drive owns next production gap
   after 47 / helpers; no leaf-vec / idx 95.
 
+## 2026-10-22 allocator wrapper ELF tie (0x17070 family)
+
+- Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Attempt 1 — success.
+- Task: Phase B/C helper depth — ELF-pin already-modeled `AllocatorFront` wrappers (no leaf-vec;
+  no idx 95; no cliff tourism past 151 — remaining unregistered lifts there are leaf/vec only).
+- Files: new `tools/lift/check_f17070.py`; docs HANDOFF/TASKS/EVIDENCE (+ README note).
+- Observation: `0x17070`/`0x17090` are 20-byte trampolines into alloc `0x12820`; `0x170b0`/`0x170c0`
+  into free `0x12af0`; constants match native `kDefaultHeap=1`, `kDefaultAlign=8`, flags 1/2.
+- Commands: `python3 -I tools/lift/check_f17070.py` OK; ctest allocator_front/page_* PASS;
+  `check_ctor_slots` still **155** pairs.
+- Inference: not G1; `0x12820`/`0x12af0` bodies and bucket/heap layers still contract-only.
+- Next exact action: Init-hash chain depth — emit/pin 275-entry table for `0x551140` /
+  registry `0x2efd160` / Init `0x531d60`, or lift heap hierarchy under `IAllocator`. Goal open.
+
 ## 2026-10-22 register idx 105 + guarded 115–117
 
 - Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Attempt 1 — success (stash recovery after
