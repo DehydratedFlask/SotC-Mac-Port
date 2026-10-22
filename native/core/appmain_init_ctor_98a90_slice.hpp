@@ -6,12 +6,13 @@
 // streams-attach+shadowrandomevents+randomevents-attach+shadowbossmusic+
 // bossmusic-attach+cp3characters+cp3characters-attach+cp3shadowprecache+
 // cp3shadowprecache-attach+tail-140d90+stackchk) → post-base 0x499f80 call-site
-// → registry. Tip AllocatorFront+FakeHeap.
+// → post-base 0x56dcb0 call-site → registry. Tip AllocatorFront+FakeHeap.
 // PR #5 cite-only.
 // NOT modelled: ensure migrate / heavy menu helpers / 0xf8f860 PLT / non-null list;
 // PLT bodies 0xf901a0/0xf901c0; ba40 listener invoke; 0x533100 hit /
-// success atexit; 0x499f80 body; 0x14c2f0/0x6a5370/0x6abcc0/0x21620/0x2779a0/0x42390
-// bodies; bodies of 0x523bd0 / 0x525b40 / 0x493230 / 0x525080 / 0x2569d0.
+// success atexit; 0x499f80/0x56dcb0 bodies; 0x14c2f0/0x6a5370/0x6abcc0/0x21620/
+// 0x2779a0/0x42390 bodies; bodies of 0x523bd0 / 0x525b40 / 0x493230 / 0x525080 /
+// 0x2569d0.
 #pragma once
 
 #include "allocator_front.hpp"
@@ -20,6 +21,7 @@
 #include "ctor_40_1ab550.hpp"
 #include "ctor_98a90_3be050.hpp"
 #include "init_531d60_post_base_499f80.hpp"
+#include "init_531d60_post_base_56dcb0.hpp"
 #include "input_table_551140.hpp"
 #include "prologue_255180.hpp"
 #include "singleton_f08_531d84.hpp"
@@ -70,6 +72,7 @@ struct AppmainInitCtor98a90SliceResult {
     bool base_ok = false;
     std::uint32_t flag_after_base = 0;
     Init531d60PostBase499f80Result post_base_499f80{};
+    Init531d60PostBase56dcb0Result post_base_56dcb0{};
     AppmainInitRemainderSliceResult remainder{};
 };
 
@@ -79,6 +82,7 @@ struct AppmainInitCtor98a90SliceResult {
     const Ctor98a90_3be050Hooks& ctor_hooks, const BaseInitialize255130Hooks& base_hooks,
     void* setter_obj, std::uint8_t flag_in, std::uint8_t set_a, std::uint8_t set_b,
     std::uint8_t set_c, const SingletonF08Hooks& singleton_hooks = {},
-    const Init531d60PostBase499f80Hooks& post_base_hooks = {});
+    const Init531d60PostBase499f80Hooks& post_base_hooks = {},
+    const Init531d60PostBase56dcb0Hooks& post_base_56dcb0_hooks = {});
 
 }  // namespace sotc
