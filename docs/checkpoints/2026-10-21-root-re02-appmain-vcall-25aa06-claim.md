@@ -40,6 +40,29 @@
 - Remaining risks: RAX may be dynamically populated or its slot may be outside file-backed data;
   Ghidra partial callee coverage and an unresolved dynamic dispatch are possible. Stop rather than
   infer a function from strings or neighboring addresses.
+- Claim publication: staged and full path audits passed for 4 and 1,660 paths. Commit
+  `866e7bf648976bf7f0f83943884c9df65d66922b` (`docs: claim app-main vcall analysis`) was pushed to
+  `origin/main`. Post-push `git fetch origin main`, `git rev-parse HEAD origin/main`, and
+  `git rev-list --left-right --count HEAD...origin/main` confirm matching tips and 0/0 divergence.
+  Private log `local/checkpoints/round78-re02-callsite-claim-postpush.log` SHA-256
+  `bfd7aecbaae70345740d2858e5dcba5c0eaa721ddabe08fa00a0172a2dba750b`.
+- Index checks: `python3 scripts/project_index.py` exited 0 and reported 19,269 folders;
+  `python3 scripts/project_index.py --check` reports current. `trail build --check` reports the
+  3,580-node wiring graph in sync; its optional meaning layer remains unbuilt. `git diff --check`
+  passed. A later first `python3 scripts/project_index.py --check` reported stale
+  `local/indexes/folders.json` after creation of the private evidence directory; regeneration
+  reported 19,269 folders and the immediate check then passed. This was a private index count
+  update, not a source/task failure. The recovery record is
+  `local/checkpoints/round78-re02-index-recovery.log`, SHA-256
+  `2f4277881f03e3b76fc41d5827731af6eb23cecc19a8aeee87dd96862a1e3782`. Staged/full publication
+  audits at the claim accepted 4/1,660 paths. Before the publication-record sync, staged/full
+  audits accepted 2/1,660 paths; logs `local/checkpoints/round78-re02-claim-sync-staged-audit.log`
+  (`fcb26e41bea7f46348480b2cdeabecbfbb40526c82808d673cd0fcc55c5d0075`) and
+  `local/checkpoints/round78-re02-claim-sync-full-audit.log`
+  (`731980e81a08531778550a6b4dcd0dec95ddc65e32417cee5ad1a78c5510c410`). The sync `trail build
+  --check` result is in `local/checkpoints/round78-re02-claim-sync-trail-check.log`
+  (`c4d4773a1c7beda75e8c787228e9162b855526c58e5e95e811191e7c74b30015`); wiring graph current at
+  3,580 nodes, deep meaning layer not built.
 - Next exact action: build an independent byte/mapping trace for only `0x25aa06`; create the
   verifier-backed report; root will replay it and decide whether this static edge is unique or
   remains unresolved. Only then consider a follow-on native function task.
