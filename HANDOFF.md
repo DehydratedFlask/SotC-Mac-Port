@@ -1,12 +1,21 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 10:05 CDT (America/Chicago). Heap-depth worktree
+Updated: 2026-10-22 10:08 CDT (America/Chicago). Heap-depth worktree
 bc-0af80435-14f4-5088-8dc0-88b5bac5a41d on branch `cursor/heap-depth-5d26`
 (base `origin/main` @ `4c83b4d`). Drive owns Init-hash / `startup_ctors.*` on main —
 this checkpoint is heap-only and does not claim main tip.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## 2026-10-22 heap lane PAUSED (idle-ready on PR #5)
+
+- Agent: bc-0af80435-14f4-5088-8dc0-88b5bac5a41d. Checkpoint only — no code change.
+- Tip: `4d7e484` (E403 lazy latch). Worktree clean / matches origin.
+- Observation: coordinator directed pause — no further `0x110a0` / free-path latch tourism
+  until Drive lands Init `0x531d60` or asks otherwise. Drive files untouched.
+- Inference: goal remains open; lane idle-ready on draft PR #5.
+- Next exact action: stay idle; resume only on coordinator ask or post-Drive Init land.
 
 ## 2026-10-22 lazy bootstrap latch (0x2dfaaa0) — verified on feature branch
 
@@ -22,8 +31,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Commands: `ctest -R '^(allocator_lazy_latch|allocator_bootstrap|allocator_front|heap_allocator|bucket_allocator|composite_allocator|page_allocator|page_owner_map)$'`
   PASS 8/8; `python3 -I tools/lift/check_f2dfaaa0.py` OK. Evidence **E403**.
 - Inference: not G1; not wired into game startup. Goal open.
-- Next exact action (heap lane): optional free-path latch copies / `0x110a0` init body, or pause
-  for Drive. Goal open.
+- Next exact action (heap lane): **paused** — see top idle-ready checkpoint. Goal open.
 
 ## 2026-10-22 allocator bootstrap wiring (0x13380) — verified on feature branch
 
