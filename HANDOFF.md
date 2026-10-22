@@ -1,12 +1,31 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 09:53 CDT (America/Chicago). Heap-depth worktree
+Updated: 2026-10-22 10:00 CDT (America/Chicago). Heap-depth worktree
 bc-0af80435-14f4-5088-8dc0-88b5bac5a41d on branch `cursor/heap-depth-5d26`
 (base `origin/main` @ `4c83b4d`). Drive owns Init-hash / `startup_ctors.*` on main —
 this checkpoint is heap-only and does not claim main tip.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## 2026-10-22 allocator bootstrap wiring (0x13380) — verified on feature branch
+
+- Agent: bc-0af80435-14f4-5088-8dc0-88b5bac5a41d. Attempt 1 — success (0 failed tries). Goal open.
+- Task: `SRV-01-ALLOCATOR-BOOTSTRAP-01` → `FIXTURE_VERIFIED` (branch `cursor/heap-depth-5d26`).
+- Worktree: `/Volumes/Extra/SoC-Mac-heap-depth`. Did **not** touch `startup_ctors.*` / Init-hash /
+  FNV / registry / idx 95 / leaf-vec / `0x19660`.
+- Files: `native/core/allocator_bootstrap.{hpp,cpp}`, `native/tests/test_allocator_bootstrap.cpp`,
+  `tools/lift/check_f13380.py`, CMake + README/comment cross-refs + TASKS/EVIDENCE/this block.
+- Observation: ELF-pins bootstrap body `0x13380..0x136ca` (sha256 `81eca8f4…829b`), early-out,
+  composite→tbl[1], child slot scans start 1 / bound `0x100`, Bucket `0x17990` / Heap
+  `0x488f0`+`0x48910` / three `0x47dd0` registrations with thr 0x400 / 0x100000 / ~0.
+  Native: `bootstrap_allocator_hierarchy` + `first_free_heap_slot`; empty-table slots 1–4.
+  INF: no 0x18aa0 page-table build, no vt side-effects, no lazy front-end latch, no 0x17070(0x65690).
+- Commands: `ctest -R '^(allocator_bootstrap|heap_allocator|bucket_allocator|composite_allocator|allocator_front|page_allocator|page_owner_map)$'`
+  PASS 7/7; `python3 -I tools/lift/check_f13380.py` OK. Evidence **E402**.
+- Inference: not G1; not wired into startup; alloc path still does not auto-call bootstrap.
+- Next exact action (heap lane): optional lazy latch (`0x2dfaaa0`) into `AllocatorFront::alloc`,
+  or pause for Drive. Goal open.
 
 ## 2026-10-22 HeapAllocator page/cap layer (0x48c70 / 0x48910) — verified on feature branch
 
@@ -26,8 +45,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   PASS 6/6; `python3 -I tools/lift/check_f48c70.py` OK. Evidence **E401**.
 - Inference: not G1; not wired into startup. Hierarchy under `IAllocator` now has composite +
   bucket + heap + page contracts.
-- Next exact action (heap lane): optional bootstrap `0x13380` wiring / owner page-table `0x19a50`
-  depth (still under `IAllocator`; no `0x19660` tourism), or pause for Drive consumption. Goal open.
+- Next exact action (heap lane): was bootstrap `0x13380` — done as E402; see top checkpoint. Goal open.
 
 ## 2026-10-22 BucketAllocator size-class layer (0x17990) — verified on feature branch
 

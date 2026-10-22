@@ -12,7 +12,7 @@
 //   * deallocate forwards to the child that produced the pointer (original composite free 0x47f30
 //     resolves via the global page-owner table 0x19a50, then jumps to that child's deallocate).
 //   * Child list capacity is fixed (native); original grows with count at +0x80.
-//   * Not modelled: bootstrap 0x13380, page-table owner id.
+//   * Bootstrap wiring 0x13380: see allocator_bootstrap.hpp (lazy front-end latch still open).
 //   * BucketAllocator / HeapAllocator: see bucket_allocator.hpp and heap_allocator.hpp.
 #pragma once
 
