@@ -334,3 +334,19 @@ are `local/build/native-worker-cpu01-normal-threshold-infinity-20261022/` and
 negative-infinity comparisons in the synthetic normal-threshold helper. Build products remain in
 those directories; no removal boundary was created. No game reachability or gameplay behavior is
 established.
+
+## 2026-10-22 06:48 CDT — SRV-01 zero-request peak-update fixture verification
+
+Existing CMake 4.4.4, Ninja 1.13.2, Apple clang 21.0.0 targeting arm64, and macOS 27.0.1
+recorded in E325 were reused; no install, download, dependency, or system configuration change. The
+worker ran `cmake -S native -B local/build/native-worker-srv01-f19e00-zero-request-20261022 -G
+Ninja -DCMAKE_BUILD_TYPE=Debug`, `cmake --build
+local/build/native-worker-srv01-f19e00-zero-request-20261022 --target test_arena_accounting`, and
+`ctest --test-dir local/build/native-worker-srv01-f19e00-zero-request-20261022
+--output-on-failure -R '^arena_accounting$'`. Independent root replay used the corresponding
+`local/build/native-root-srv01-f19e00-zero-request-20261022/` directory. All commands exited 0; each
+focused CTest passed 1/1. Purpose: verify a synthetic zero-request high-water repair helper case;
+the byte-preservation fixture checks the prefix and suffix around the raw span but not every interior
+gap. No allocator reachability or game behavior is established. Build products remain under the two
+exact `local/build/` directories named above; logs are under
+`local/validation/srv01-f19e00-zero-request-20261022/`. No removal boundary was created.
