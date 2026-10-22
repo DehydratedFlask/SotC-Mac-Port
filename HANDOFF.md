@@ -21,8 +21,10 @@ or Metal gameplay is demonstrated.
 - Files: `native/core/ensure_capacity_3c2f70.{hpp,cpp}`; ctor wire;
   `tools/lift/check_f3c2f70_ensure.py`; checkpoint `docs/checkpoints/2026-10-22-ensure-3c2f70.md`;
   EVIDENCE E414; TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-ctor-98a90-ensure-20261022/` (manifest `db3ee75a…`).
-- Observation: ELF pins 0xa8 stride + install; measured cap=begin+0xa800 → 275 registry.
+  `local/validation/appmain-init-ctor-98a90-ensure-20261022/` (manifest `6621c0a6…` at tip
+  `e20de86`).
+- Observation: feat tip `e20de86`; ELF pins 0xa8 stride + install; measured
+  cap=begin+0xa800 → 275 registry.
   Migrate / `0x3be930` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f3c2f70_ensure.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
