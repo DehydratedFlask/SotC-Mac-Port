@@ -90,5 +90,9 @@
 - The DATA-02 claim was published in the same commit. Only after push/fetch verification, root
   assigned `/root/round78_next_task_scout` to implement the private aggregate-only analyzer. No
   manifest data was accessed before claim publication.
+- A publication-documentation sync was pushed as `539a6bd1cfae0f3d75f13ac460d6c3ddf851734e`;
+  fetch confirmed `HEAD == origin/main` with 0/0 divergence. Record
+  `/tmp/round78-docsync-postpush.log` SHA-256
+  `8de8a22d1a46763c6d1299b460d0b68d7a2e5569f2cd209bdb20bcc7df1be639`.
 - Observation versus inference: publication and fetch state are verified; this does not advance any
   game acceptance gate. The `0x25aa06` call edge remains unresolved.
