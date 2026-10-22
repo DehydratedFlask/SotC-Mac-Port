@@ -42,7 +42,8 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBaseVcall18U5Hooks& post_base_vcall18_u5_hooks,
     const Init531d60PostBase532ed0Hooks& post_base_532ed0_hooks,
     const Init531d60PostBaseVcall18532ed0Hooks& post_base_vcall18_532ed0_hooks,
-    const Init531d60PostBase532ed0U2Hooks& post_base_532ed0_u2_hooks) {
+    const Init531d60PostBase532ed0U2Hooks& post_base_532ed0_u2_hooks,
+    const Init531d60PostBaseVcall18532ed0U2Hooks& post_base_vcall18_532ed0_u2_hooks) {
     AppmainInitCtor98a90SliceResult out{};
     out.early = run_prologue_255180_early(alloc, early_hooks);
     if (!out.early.ok) {
@@ -308,6 +309,12 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     // E478: always-on Init continue — second 0x532ed0 call-site; stack prep NOT modelled.
     out.post_base_532ed0_u2 = init_531d60_post_base_532ed0_u2(post_base_532ed0_u2_hooks);
     if (!out.post_base_532ed0_u2.ok) {
+        return out;
+    }
+    // E479: always-on Init continue — second 0x532ed0-series virtual call [rax+0x18].
+    out.post_base_vcall18_532ed0_u2 =
+        init_531d60_post_base_vcall18_532ed0_u2(post_base_vcall18_532ed0_u2_hooks);
+    if (!out.post_base_vcall18_532ed0_u2.ok) {
         return out;
     }
     out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,
