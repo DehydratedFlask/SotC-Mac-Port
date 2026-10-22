@@ -34,6 +34,7 @@
 #include "vec_de7fb0.hpp"
 #include "vec_de6d20.hpp"
 #include "vec_dfd5f0.hpp"
+#include "leaf_df94c0.hpp"
 #include "vec_ddab00.hpp"
 #include "vec_dda990.hpp"
 #include "vec_dd41e0.hpp"
@@ -144,6 +145,7 @@ struct StartupState {
     VecE094E0 vec_e094e0{};   // idx 50
     VecE026b0 vec_e026b0{};   // idx 53
     VecDfd5f0 vec_dfd5f0{};   // idx 54
+    LeafDf94c0 leaf_df94c0{}; // idx 55 / 0xdf94c0
     VecDe7fb0 vec_de7fb0{};   // idx 56
     VecDe6d20 vec_de6d20{};   // idx 57
     VecDe1ad0 vec_de1ad0{};   // idx 58
