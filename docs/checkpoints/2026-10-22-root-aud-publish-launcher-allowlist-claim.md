@@ -1,0 +1,16 @@
+# Checkpoint: AUD-PUBLISH-LAUNCHER-ALLOWLIST-FIXTURE-01 — claimed
+
+- Time / timezone: 2026-10-22 00:45 CDT (America/Chicago).
+- Agent and integrator: `/root`; one integrator owns HANDOFF and project docs.
+- Task / gate / status: `AUD-PUBLISH-LAUNCHER-ALLOWLIST-FIXTURE-01`, parent `AUD-PUBLISH-EDGE-01`, G0; `ACTIVE`; 0 failed implementation tries.
+- Prerequisite evidence / input and source hashes: `scripts/test_audit_publish_paths.py` SHA256 `2759f5b9f554388ca7fd95ab2ee6457d16af995d3f0e86bbe85458422e65d2ac`; unchanged `scripts/audit_publish_paths.py` SHA256 `2ea984cfb38329f4a9ec0b46300b0513998a1a642d224572906cee531653bba3`. `ALLOWED_TOP` includes `launcher` and top-level metadata; existing positive test covers scripts but not those roots.
+- Owned / changed files: claim documentation only: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, this checkpoint, and the peer XFF claim checkpoint. `scripts/test_audit_publish_paths.py` and production code are unchanged at claim time.
+- Hypothesis and expected result: a representative `launcher/` path and top-level metadata path are accepted by the existing publish-path classifier; a new test will pin this allowlist behavior without changing policy.
+- Exact command, CWD and nonsecret environment: baseline `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audit_publish_paths.py`, CWD `/Volumes/Extra/SoC Mac Native`, `PYTHONDONTWRITEBYTECODE=1`.
+- Exit / observed result: baseline exit 0; 8 tests pass. Expected acceptance after implementation: 9 tests pass.
+- Log, capture and REA evidence paths/IDs: `local/validation/20261022-root-fixture-baselines/aud-publish-launcher-allowlist-baseline.log` SHA256 `698d16d7b93c4bd9707d3cfacda6fb1e0fea99ed0cda6e69bedc42772940540a`. Trail returned all relevant occurrences in `scripts/audit_publish_paths.py` and `scripts/test_audit_publish_paths.py`; no REA evidence applies.
+- Observation versus inference / coverage limitations: the live allowlist includes `launcher` and individual metadata filenames; existing test coverage does not assert either. The future fixture will establish only classifier results for synthetic path strings, not an audit of a real staged tree.
+- Cumulative failed tries and distinct hypotheses: 0 failed implementation tries; one proposed test-only assertion.
+- Remaining risks / blockers: no actual staged publish tree is inspected by this unit test; overall G0 remains PARTIAL.
+- Next exact action: add one test method to `scripts/test_audit_publish_paths.py`, assert `audit.violations()` returns `[]` for representative `launcher/` and metadata paths, then run the acceptance command above.
+- HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF, TASKS, EVIDENCE, both claim checkpoints and generated `docs/FOLDERS.md` updated; INSTALL_LOG unchanged. `python3 scripts/project_index.py` and `python3 scripts/project_index.py --check` both exit 0 at 24,078 folders (log SHA256 `a79b0d25fced0d9c18dda3386413644761318dd915da578a4bbe36f239469b0c` / `2e24f86275b84b7efc28ec198e984a6698bc3584a72c960f1b280bdaa45c1b67`). `trail build --check` exits 0 with the wiring graph in sync at 3,610 nodes / 1,240 files; deep meaning layer remains unbuilt (log SHA256 `67d8530e493d39dc77e5345ccbb25ba0da7701ad12b479fa479c1d964f5979e4`).

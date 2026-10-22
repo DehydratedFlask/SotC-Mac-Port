@@ -1,12 +1,29 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 00:38 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 00:47 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Active claims — two bounded regression fixtures
+
+- `AUD-PUBLISH-LAUNCHER-ALLOWLIST-FIXTURE-01` under `AUD-PUBLISH-EDGE-01`: add one test-only
+  case in `scripts/test_audit_publish_paths.py` proving representative `launcher/` and
+  top-level metadata paths are accepted. Pre-edit suite passes 8 tests. Production audit code
+  remains unchanged. Claim record:
+  [checkpoint](docs/checkpoints/2026-10-22-root-aud-publish-launcher-allowlist-claim.md).
+- `AUD-01-XFF-PREFIX-OFFSET-ONLY-FIXTURE-01` under `AUD-01-XFF-01`: add one test-only case in
+  `scripts/test_audio_bank_header.py` proving an interior `xff\0` in the opaque span cannot
+  substitute for the required byte-zero prefix. Pre-edit suite passes 21 tests. Worker
+  `/root/next_bounded_scout` owns only this test file; root integrates the docs. Claim record:
+  [checkpoint](docs/checkpoints/2026-10-22-root-aud01-xff-prefix-offset-only-claim.md).
+- Both claims are `ACTIVE`, with zero failed implementation tries. No production code or game
+  evidence changes. Exact next action: implement the two isolated assertions, run each focused
+  Python suite, independently review both diffs, then record results and publish allowlisted files.
+  Leave the pending Mach-O CPU and PSARC negative-limit choices untouched.
 
 ## SRV-01 arena high-water uint64 wrap fixture — verified
 
@@ -25,9 +42,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `b8a734c0c20b731e9f8a5de11669b2acdd9f1469` and completion commit
   `e9a6c631d0a68f4bca66a3a0ddedc5689c0f1bfd` are pushed and fetch-verified at 0/0 divergence.
   Staged/full audits accepted 7/1,696 paths; the post-commit exact-path audit also passed.
-- Exact next action: review the read-only candidate from `/root/next_independent_task_scout`, verify
-  its live file/spec/task gap, and claim only if it is distinct. Leave the pending Mach-O CPU and
-  PSARC negative-limit choices untouched.
+- Current work is listed in the active-claims section above. This completed task remains synthetic
+  arithmetic only; the pending Mach-O CPU and PSARC negative-limit choices remain untouched.
 
 ## RE-01 identical-output SELF unwrap repeat fixture — verified
 
