@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 01:40 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 01:44 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,25 +8,27 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## SAV-01 stream-file symlink destination fixture — active claim
+## SAV-01 stream-file symlink destination fixture — verified
 
 - `SAV-01-NATIVE-STREAM-FILE-SYMLINK-DESTINATION-FIXTURE-01` is claimed under verified parent
   `SAV-01-NATIVE-STREAM-01`. Scope is one synthetic test in
-  `native/tests/test_save_stream_file.cpp`: point the destination symlink at a sentinel, write a
-  synthetic stream with `write_file_atomic`, then assert the destination entry is a regular file
-  containing the new stream, the referent retains its original bytes, and `.tmp` is absent. No
-  production code change is planned. The test checks current same-volume `rename` behavior only;
-  it makes no real-save compatibility or power-loss durability claim.
-- Baseline target build and focused `save_stream_file` CTest pass. Logs and hashes are in E276 and
-  [claim checkpoint](docs/checkpoints/2026-10-22-root-sav01-native-stream-file-symlink-claim.md).
-  Claim commit `457601bde1c1f5931590a0c8fb1deb52d55e3e73` is pushed. Pre-push staged/full audits
-  accepted 5/1,709 paths; fresh fetch showed 0/0 divergence; post-push explicit/full audits accepted
-  5/1,709. The post-push staged-mode audit had no staged paths (exit 2); the explicit-path audit
-  passed. See E277 and publication-log SHA256 there. Status is `ACTIVE`; implementation attempts: 0.
-  `/root/next_fixture_scout_2` is implementing the one-file test; root will review and replay it.
-- Next independent candidate to evaluate after this task: the scout-proposed
-  `SRV-01-HOST-MAP-EMPTY-NULL-NONZERO-SIZE-FIXTURE-01`, limited to a synthetic accessor assertion
-  in `native/tests/test_host_map.cpp`. Do not combine it with this save-stream task.
+  `native/tests/test_save_stream_file.cpp`: replace a destination symlink to a sentinel with a
+  synthetic stream and assert the destination is a regular file containing the new bytes, the
+  referent retains its original bytes, and `.tmp` is absent. The production helper is unchanged.
+- Baseline and worker target builds passed; baseline, worker, and root focused `save_stream_file`
+  CTests pass 1/1. The test uses `lstat`. Status is `FIXTURE_VERIFIED`, one successful implementation
+  attempt and 0 failed tries. It pins current same-volume rename behavior only; no real-save
+  compatibility or power-loss durability claim is made. See E276/E278 and the
+  [claim](docs/checkpoints/2026-10-22-root-sav01-native-stream-file-symlink-claim.md) and
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-sav01-native-stream-file-symlink-complete.md).
+- Claim commit `457601bde1c1f5931590a0c8fb1deb52d55e3e73` is pushed. Completion publication and
+  final task status will be recorded after the path audit and push. Project index generation/check
+  pass at 24,080 folders; Trail wiring check passes at 3,617 nodes / 1,240 files, with the new
+  method queryable at `native/tests/test_save_stream_file.cpp:L104-L119` and its call at L238. The
+  completion work log SHA256 is in E278. Next independent candidate to evaluate:
+  `SRV-01-HOST-MAP-EMPTY-NULL-NONZERO-SIZE-FIXTURE-01` in
+  `native/tests/test_host_map.cpp`; it covers the null-pointer arm of `HostMapping::empty()` with
+  nonzero size. Keep pending Mach-O CPU and PSARC policy choices untouched.
 
 ## RE-01 identity sidecar symlink alias fixture — verified
 
