@@ -249,6 +249,8 @@ class Psarc:
     def read(self, index, limit=None):
         """Decompress a member (or its first `limit` bytes)."""
         e = self.entries[index]
+        if limit is not None and limit < 0:
+            raise PsarcError(f'invalid negative read limit: {limit}')
         want = e['size'] if limit is None else min(limit, e['size'])
         out, pos, blk = bytearray(), e['offset'], e['block']
         while len(out) < want:
