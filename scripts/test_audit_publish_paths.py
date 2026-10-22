@@ -2,6 +2,8 @@
 """Publish-path audit fixtures (no git required)."""
 from __future__ import annotations
 
+import contextlib
+import io
 import sys
 import unittest
 from pathlib import Path
@@ -66,6 +68,18 @@ class PublishPathTests(unittest.TestCase):
         for path in cases:
             with self.subTest(path=path):
                 self.assertTrue(audit.violations([path]), path)
+
+    def test_main_nothing_staged_fails_closed_with_exit_2(self):
+        # An empty staged set must not look like a clean audit (exit 0 / "OK").
+        out, err = io.StringIO(), io.StringIO()
+        with patch.object(audit, "git_names", return_value=[]) as names, patch.object(
+            sys, "argv", ["audit_publish_paths.py"]
+        ), contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            rc = audit.main()
+        names.assert_called_once_with("staged")
+        self.assertEqual(rc, 2)
+        self.assertNotIn("OK", out.getvalue())
+        self.assertIn("nothing staged", err.getvalue())
 
     def test_dotdot_traversal_into_forbidden_roots_rejected(self):
         # An allowlisted top component must not launder a path that resolves
