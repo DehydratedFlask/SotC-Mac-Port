@@ -25,7 +25,7 @@ Init531d60PostBaseYmmIntercellResult init_531d60_post_base_ymm_intercell(
                 kInit531d60PostBaseYmmIntercellBlockBytes);
     ++out.store_count;
 
-    // Next: vmovups xmm from 0x1014be0 @ 0x531f07 — NOT modelled here.
+    // Next: vmovups xmm from 0x1014be0 @ 0x531f07 — E459; not this fragment.
     // Later: call 0x26800 / 0xf590 — NOT modelled here.
     out.ok = (out.store_count == 2);
     return out;
