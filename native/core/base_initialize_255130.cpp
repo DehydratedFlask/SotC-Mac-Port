@@ -149,6 +149,15 @@ bool base_initialize_255130(void* self, void* arg,
         if (!br.ok) {
             return false;
         }
+        // E433: always-on banks attach (measured fail path; install into f08+0x40).
+        const Vslot40_533100BanksAttachResult bar = vslot_40_533100_banks_attach(
+            br.loaded, /*success_flag=*/false, hooks.vslot_40_banks_attach_detail);
+        if (hooks.vslot_40_banks_attach_out != nullptr) {
+            *hooks.vslot_40_banks_attach_out = bar;
+        }
+        if (!bar.ok) {
+            return false;
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true
