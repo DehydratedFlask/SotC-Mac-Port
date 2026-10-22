@@ -365,6 +365,29 @@ class InspectMembersTests(unittest.TestCase):
         )
         self.assertTrue(reader.closed)
 
+    def test_inspect_members_rejects_decoded_length_differing_from_entry_size(self):
+        # The reader returns a different byte count than the PSARC entry table
+        # declares; the guard must fire before the manifest or XFF checks, and the
+        # reader must still be closed.
+        fixture = self._fixture()
+        reader = fixture['reader']
+        declared = reader.entries[1]['size']
+        with patch.object(reader, 'read', return_value=fixture['member'] + b'\0'), \
+                patch.object(abh, 'Psarc', return_value=reader):
+            with self.assertRaises(abh.AudioBankFormatError) as ctx:
+                abh.inspect_members(
+                    fixture['archive_path'],
+                    [fixture['member_path']],
+                    fixture['manifest_path'],
+                    fixture['summary_path'],
+                )
+
+        self.assertEqual(
+            str(ctx.exception),
+            f'entry 1 decoded to {declared + 1} bytes, expected {declared}',
+        )
+        self.assertTrue(reader.closed)
+
     def test_inspect_members_rejects_zero_exact_path_matches_and_closes_reader(self):
         fixture = self._fixture()
         reader = fixture['reader']

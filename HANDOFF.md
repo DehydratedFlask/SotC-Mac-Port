@@ -8,6 +8,12 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## 2026-10-22 orchestrator batch 2 — verified
+
+- CPU-01-LEAF-CTOR-BATCH-36 (`0x83d800`, `0x7ce8d0`, `0xe71990`): FIXTURE_VERIFIED, root replay 299/299 and 3 byte checkers. Remaining unlifted leaf ctors all call something or tail-jump, so further lifting needs call-edge/helper contracts, not more leaf batches. Not registered in startup_ctors.
+- AUD-01 decoded-length guard test added (E385). User decisions all applied: thin Mach-O (E384), math four-pass (already present), PSARC limit, packaging.
+- Next exact action: pick a non-leaf ctor with a single known helper callee (see ctor-classes.json) or resume AUD-02 rack-query attribution via REA.
+
 ## 2026-10-22 orchestrator batch (4 parallel subagents) — verified
 
 - Agent: orchestrator (Claude Sonnet 5.5). Four file-disjoint tasks run in parallel, each replayed by root; E383 holds hashes/commands.
