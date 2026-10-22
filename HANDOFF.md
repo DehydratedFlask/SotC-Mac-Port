@@ -26,9 +26,9 @@ or Metal gameplay is demonstrated.
   `tools/lift/check_f531d60_post_base_ymm_bss.py`; checkpoint
   `docs/checkpoints/2026-10-22-init-531d60-post-base-ymm-bss.md`; EVIDENCE E457;
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-post-base-ymm-bss-20261022/` (manifest/capture
-  shas at feat tip — see docs commit).
-- Observation: measured `pbymm=4` + `pbf9=1` + mid_reg=4 → 275 registry.
+  `local/validation/appmain-init-post-base-ymm-bss-20261022/` (manifest
+  `7b4aa01e…` at tip `3d88d79`; capture `c679bd1a…`).
+- Observation: feat tip `3d88d79`; docs tip `dff2169`; measured `pbymm=4` + `pbf9=1` + mid_reg=4 → 275 registry.
   Inter-cell ymm / `0x26800`/`0xf590` bodies NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_ymm_bss.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
