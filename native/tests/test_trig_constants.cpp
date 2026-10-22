@@ -24,6 +24,10 @@ int main(int argc, char**) {
     sotc::init_trig_constants(g);
     const float want_cos = static_cast<float>(cosl(static_cast<long double>(x)));
     const float want_sin = static_cast<float>(sinl(static_cast<long double>(x)));
+    sotc::TrigConstants preseeded{{0x12345678u, 0x9abcdef0u, 0x13579bdfu, 0x2468ace0u}, -123.0f};
+    sotc::init_trig_constants(preseeded);
+    CHECK((preseeded.xyz_mask == std::array<std::uint32_t, 4>{~0u, ~0u, ~0u, 0}));
+    CHECK(ulp_distance(preseeded.cos_3_degrees, want_cos) <= 1);
     CHECK(ulp_distance(g.cos_3_degrees, want_cos) <= 1);
     CHECK(ulp_distance(sotc::libm::fsin(x, 0), want_sin) <= 1);
     CHECK(sotc::libm::fsin(x, 0) != sotc::libm::fsin(x, 1));

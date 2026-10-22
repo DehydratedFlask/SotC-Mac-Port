@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 07:09 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 07:30 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,30 +8,64 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Current fixture claim — ready to dispatch
+## CPU-01 trig-constants preseed fixture — verified
 
-- `SAV-01-READER-DUPLICATE-NAME-CROSS-TAG-FIXTURE-01` and
-  `SAV-01-CHUNK-CODEC-READER-BORROWED-BYTES-VIEW-FIXTURE-01` remain `FIXTURE_VERIFIED`; E372/E373
+- SAV-01-READER-DUPLICATE-NAME-CROSS-TAG-FIXTURE-01 and
+  SAV-01-CHUNK-CODEC-READER-BORROWED-BYTES-VIEW-FIXTURE-01 remain FIXTURE_VERIFIED; E372/E373
   and their completion checkpoints record worker/root passes and independent review.
-- `SAV-01-NATIVE-STREAM-FILE-SYMLINK-SOURCE-READ-FIXTURE-01` is `FIXTURE_VERIFIED`: worker and root
-  Debug/Ninja builds pass focused `save_stream_file` CTest 1/1 and independent review passed. E377
-  and its completion checkpoint record hashes and logs. The claim was corrected from `make_stream(1)`
-  to the implemented `make_stream(11)` and expected payload `{11, 2, 3}`. This is synthetic
+- SAV-01-NATIVE-STREAM-FILE-SYMLINK-SOURCE-READ-FIXTURE-01 is FIXTURE_VERIFIED: worker and root
+  Debug/Ninja builds pass focused save_stream_file CTest 1/1 and independent review passed. E377
+  and its completion checkpoint record hashes and logs. The claim was corrected from make_stream(1)
+  to the implemented make_stream(11) and expected payload {11, 2, 3}. This is synthetic
   symlink/reader behavior only. E376 and its dispatch checkpoint preserve the pre-result dispatch
   state.
-- Next claim: `CPU-01-TRIG-CONSTANTS-PRESEEDED-STATE-OVERWRITE-FIXTURE-01`, child of `CPU-01`,
-  owned by `/root` with proposed worker `/root/fixture_candidate_scout_c`. It adds one test in
-  `native/tests/test_trig_constants.cpp` to prove `init_trig_constants` overwrites preseeded mask
-  and cosine values. E378 and its claim checkpoint record Graft/live-source evidence, baseline
-  hashes, baseline CTest 1/1, exact commands, and synthetic-helper limits. Worker implementation
-  commands have not run.
-- The symlink completion and CPU-01 claim are ready for publication; once published, dispatch the
-  one-test change to `/root/fixture_candidate_scout_c`. Root owns replay and review.
-- E371 and the earlier [publication checkpoint](
-  docs/checkpoints/2026-10-22-root-srv01-completion-sav01-claims-publication.md) record publication
+- CPU-01-TRIG-CONSTANTS-PRESEEDED-STATE-OVERWRITE-FIXTURE-01 is FIXTURE_VERIFIED: worker and
+  independent root Debug/Ninja builds pass focused trig_constants CTest 1/1; an independent
+  read-only review passed. Only native/tests/test_trig_constants.cpp changed for this task. E380
+  and its completion checkpoint record commands, hashes, and limits. E379 records publication of
+  the preceding symlink completion and trig claim in commit 47d4a03259457dfc2a5b8eff46dcca5e6e3934b7.
+- This observes synthetic helper initialization from preseeded state only. It does not establish
+  constructor reachability, game startup state, or gameplay behavior.
+- E371 and the earlier publication checkpoint
+  docs/checkpoints/2026-10-22-root-srv01-completion-sav01-claims-publication.md record publication
   of the previous SRV-01 completion and SAV-01 claims.
-- Exact next action: finish index/path audits and publish the symlink completion plus CPU-01 claim,
-  then dispatch the CPU-01 test.
+
+## Next candidate — SRV-01 uncounted head unlink (unclaimed)
+
+- Candidate: SRV-01-REGION-LIST-UNCOUNTED-HEAD-UNLINK-FIXTURE-01, parent
+  SRV-01-REGION-LIST-UNCOUNTED-UNLINK-FIXTURE-01, target native/tests/test_region_list.cpp.
+  Current coverage tests uncounted middle unlink and counted head unlink separately. A single
+  synthetic A-B-C case can call list_unlink(a) with no counter, assert B.prev is null, preserve
+  B-C connectivity, and verify A.next self-links.
+- The scout made no edits and ran no tests. Root verified the candidate against live source and
+  ran the unchanged region_list baseline (CTest 1/1). Evidence and hashes are in
+  docs/checkpoints/2026-10-22-root-srv01-region-list-uncounted-head-candidate.md and
+  local/validation/srv01-region-list-uncounted-head-20261022/. This candidate is not claimed,
+  has no task row, and was not dispatched. The next agent must review and claim it in HANDOFF and
+  TASKS, then publish before editing.
+- Exact next action: another agent reads the candidate note and current repo handoff, claims a
+  bounded task if still useful, then dispatches only after its claim is published.
+
+## User decisions for queued work
+
+Apply these choices to the matching tasks; they are user decisions, not verified implementations:
+- Launcher packaging: use a packaging script plus Info.plist.
+- PSARC read(index, limit=-1): raise PsarcError for an invalid negative limit.
+- Thin Mach-O readiness: require ARM64 only.
+- Math guard fixture: use the four-pass unique guard matrix.
+
+## Project index check note
+
+- Pre-create all validation log paths under local/validation before running
+  python3 scripts/project_index.py, then run --check. The inventory counts immediate files;
+  redirecting a new check log after generation changes the inventory and makes the check stale.
+  This turn reproduced the stale check once and then passed after pre-creating all logs. E381
+  records commands and hashes.
+
+## Workspace boundary
+
+The pre-existing user-owned native/api/CMakeLists.txt modification and untracked native/api/host/,
+native/graft/, and scripts/graft/ remain unstaged and untouched.
 
 ## CPU-01 normal-threshold infinity fixture — verified
 
