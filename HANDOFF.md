@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 10:17 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 10:23 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,30 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404 + E405 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E406 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 Init trivial remainder leaves (beyond fragment)
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-INIT-531D60-TRIVIAL-LEAVES-01` — appmain-triage next Init callees after
+  registry fragment: `0x4c4950`, setters, `ret` stubs, splash no-op; measured path then
+  E405 registry. No leaf-vec; no idx 95; heap untouched (FakeHeap).
+- Files: `native/core/init_531d60_trivial_leaves.{hpp,cpp}`,
+  `native/core/appmain_init_remainder_slice.{hpp,cpp}`, test,
+  `tools/lift/check_finit_531d60_trivial_leaves.py`; CMake/README;
+  checkpoint `docs/checkpoints/2026-10-22-init-531d60-trivial-leaves.md`;
+  EVIDENCE E406; TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-remainder-20261022/` (manifest `98dda9d9…`).
+- Observation: ELF pins bodies/PLT; measured trivial+registry (275 entries, 3 alloc ops);
+  base Initialize `0x255130` / `0xf08` singleton / pad path NOT modelled.
+- Commands: `python3 -I tools/lift/check_finit_531d60_trivial_leaves.py` OK;
+  `ctest --test-dir local/build/native-init-remainder -R '^(appmain_init_remainder_slice|appmain_init_registry_slice)$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: base Initialize `0x255130` or `0xf08` singleton install toward fuller
+  early Init. Goal remains open.
 
 ## 2026-10-22 measured app-main Init→registry slice
 
