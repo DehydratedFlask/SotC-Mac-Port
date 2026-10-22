@@ -25,7 +25,7 @@ or Metal gameplay is demonstrated.
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-ctor-98a90-bufgrow-20261022/` (manifest `c65a2e9b…` at tip
   `6483731`).
-- Observation: feat tip `6483731`; ELF pins 0x80 alloc + store sequence; measured
+- Observation: feat tip `6483731` (docs tip `2d44909`); ELF pins 0x80 alloc + store sequence; measured
   begin==end, cap=begin+0x80 → 275 registry. List walk / heavy bodies NOT modelled.
 - Commands: `python3 -I tools/lift/check_f3be050_ctor.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
