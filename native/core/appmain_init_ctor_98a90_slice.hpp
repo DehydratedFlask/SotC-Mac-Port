@@ -1,8 +1,8 @@
 // Measured Init path: prologue early + tail using lifted 0x3be050 (header+0x3be930+ensure+
 // 0x80 grow+null-head list+tsc) + lifted 0x1ab550 (0x40 ctor) + debug gates 0x2552d4
-// → base → registry. Tip AllocatorFront+FakeHeap. PR #5 cite-only.
+// → base (lifted vslot 0x534130) → registry. Tip AllocatorFront+FakeHeap. PR #5 cite-only.
 // NOT modelled: ensure migrate / 0xf590 / 0xf8f860 PLT / non-null list;
-// PLT bodies 0xf901a0/0xf901c0; stack-chk; ba40 listener invoke; app vslot / 0xf08.
+// PLT bodies 0xf901a0/0xf901c0; stack-chk; ba40 listener invoke; 0x533100 / 0x255340 / 0xf08.
 #pragma once
 
 #include "allocator_front.hpp"

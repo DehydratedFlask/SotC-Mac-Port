@@ -62,6 +62,9 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
 
     BaseInitialize255130Hooks hooks = base_hooks;
     hooks.prologue_255180 = nullptr;
+    // E418: force lifted 0x534130 (override null → use_lifted).
+    hooks.vslot_30 = nullptr;
+    hooks.use_lifted_vslot_30 = true;
     out.base_ok = base_initialize_255130(self, arg, hooks);
     if (out.early.flag_obj != nullptr) {
         std::memcpy(&out.flag_after_base,
