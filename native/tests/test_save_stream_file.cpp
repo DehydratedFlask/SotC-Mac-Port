@@ -101,6 +101,23 @@ void test_overwrite_replaces() {
     CHECK(slurp(path) == a && !exists(path + ".tmp"));
 }
 
+void test_symlink_destination_replaces_link_not_referent() {
+    const std::string path = g_dir + "/slot-link.sav";
+    const std::string referent = g_dir + "/referent.sav";
+    const Bytes original = B({0x51, 0x52, 0x53});
+    const Bytes replacement = make_stream(21);
+    spit(referent, original);
+    CHECK(::symlink(referent.c_str(), path.c_str()) == 0);
+
+    CHECK_ERR(sotc::write_file_atomic(path, replacement).error, SaveStreamError::none);
+    struct stat st {};
+    CHECK(::lstat(path.c_str(), &st) == 0 && S_ISREG(st.st_mode));
+    CHECK(slurp(path) == replacement);
+    CHECK(slurp(referent) == original);
+    struct stat tmp_st {};
+    CHECK(::lstat((path + ".tmp").c_str(), &tmp_st) != 0 && errno == ENOENT);
+}
+
 void test_empty_and_zero_length() {
     const std::string path = g_dir + "/empty.bin";
     CHECK_ERR(sotc::write_file_atomic(path, {}).error, SaveStreamError::none);
@@ -218,6 +235,7 @@ int main() {
     g_dir = made;
     test_write_read_round_trip();
     test_overwrite_replaces();
+    test_symlink_destination_replaces_link_not_referent();
     test_empty_and_zero_length();
     test_missing_and_bad_targets();
     test_rename_failure_cleans_up();
