@@ -46,8 +46,22 @@
   the retained first-check log is SHA-256
   `31dad00ffd5208458ee89a329fea70b0fa13494e525ddd8a7e837c7614a2266b`. After precreating all
   expected audit logs and regenerating, the check passed.
-- Next exact action: stage only allowlisted task files and docs, run both publish-path audit
-  commands required by `AGENTS.md`, and push `origin main`.
-- `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md` have the completion status recorded;
-  `INSTALL_LOG.md` is unchanged. Publication details are to be recorded in the following docs-sync
-  checkpoint after the completion commit is pushed.
+- Publication: completion commit `a0bf2b85be868ecc5de98c17d22dccef6247aefb` was pushed to
+  `origin/main`. Precommit staged audit accepted 8 paths and full audit accepted 1,700; post-push
+  exact-path and full audits accepted 8 and 1,700. A fresh fetch and
+  `git rev-list --left-right --count HEAD...origin/main` confirmed 0/0 divergence. Post-push
+  status contains only the existing user-owned `native/api/CMakeLists.txt` change and untracked
+  `native/api/host/`.
+- Publication evidence logs under `local/validation/20261022-root-fixture-baselines/`: staged audit
+  SHA-256 `6d9fc8c780ab762e9cbccfe39fa113ca18cca52d0d798716f9058e03ab5434e1`; full audit
+  `c29a7f9bba4a9e941f8978e15671e005beaa1b5e46568683d5d94d9b516e4a14`; commit
+  `afea4abb2744c7b337ba4c347f375a30c828c1c4d0387943621cdaea3699d805`; push
+  `037adc007f98d5f1b0d4d67301c70402d164964a526ce484f2ce0979a17cef29`; fetch
+  `58e4bb2ebd9bd713bf3332d4cad1251aeb0b51fb26a8b06f30b3aaa431df79b3`; divergence
+  `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d0247050325e7c5a3b2b3271c`; post-push status
+  `bafebe0544ec1663fc5c60d5555079052f1efbe617d7957be47744c6262d25c7`. Exact-path audit log
+  matches staged-audit hash; post-push full audit log matches precommit full-audit hash.
+- `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md` record publication. `INSTALL_LOG.md` is
+  unchanged. Next exact action: review the read-only candidate from
+  `/root/next_independent_task_scout` against current task rows and live files, then claim one
+  bounded task if distinct. Keep pending Mach-O CPU and PSARC negative-limit decisions untouched.
