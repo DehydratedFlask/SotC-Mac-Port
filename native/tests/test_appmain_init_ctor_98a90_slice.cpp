@@ -236,6 +236,7 @@ int g_post_base_f590_a2ed00 = 0;
 int g_post_base_f590_a2ed00_u2 = 0;
 int g_post_base_a2ed00_u2 = 0;
 int g_post_base_f590_a2ed00_u3 = 0;
+int g_post_base_f590_a2ed00_u4 = 0;
 int g_post_base_cell_2eff450_dtor = 0;
 int g_post_base_cell_2eff448_dtor = 0;
 void* g_cell_2eff450 = nullptr;
@@ -504,6 +505,7 @@ void hook_post_base_a2ed00_u2() { ++g_post_base_a2ed00_u2; }
 void hook_post_base_f590_a2ed00() { ++g_post_base_f590_a2ed00; }
 void hook_post_base_f590_a2ed00_u2() { ++g_post_base_f590_a2ed00_u2; }
 void hook_post_base_f590_a2ed00_u3() { ++g_post_base_f590_a2ed00_u3; }
+void hook_post_base_f590_a2ed00_u4() { ++g_post_base_f590_a2ed00_u4; }
 void hook_post_base_cell_2eff450_dtor(void* /*prev*/) { ++g_post_base_cell_2eff450_dtor; }
 void hook_post_base_cell_2eff448_dtor(void* /*prev*/) { ++g_post_base_cell_2eff448_dtor; }
 
@@ -695,6 +697,7 @@ int main() {
     g_post_base_f590_a2ed00_u2 = 0;
     g_post_base_a2ed00_u2 = 0;
     g_post_base_f590_a2ed00_u3 = 0;
+    g_post_base_f590_a2ed00_u4 = 0;
     g_post_base_cell_2eff450_dtor = 0;
     g_post_base_cell_2eff448_dtor = 0;
     g_cell_2eff450 = nullptr;
@@ -961,6 +964,8 @@ int main() {
     pba2edu2.call_a2ed00 = hook_post_base_a2ed00_u2;
     Init531d60PostBaseF590A2ed00U3Hooks pbf590u3{};
     pbf590u3.call_f590 = hook_post_base_f590_a2ed00_u3;
+    Init531d60PostBaseF590A2ed00U4Hooks pbf590u4{};
+    pbf590u4.call_f590 = hook_post_base_f590_a2ed00_u4;
 
     const std::uint64_t allocs_before = heap.alloc_count;
     const auto t0 = std::chrono::steady_clock::now();
@@ -974,7 +979,7 @@ int main() {
                                                      pb532ed, pbvced, pb532edu2, pbvcedu2, pb170,
                                                      pb544, pb450c, pb450h, pb170u2, pb53, pb448c,
                                                      pb448h, pbv38, pblea, pba2, pba2ed, pbf590a,
-                                                     pbf590u2, pba2edu2, pbf590u3);
+                                                     pbf590u2, pba2edu2, pbf590u3, pbf590u4);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
@@ -1459,6 +1464,10 @@ int main() {
     CHECK(r.post_base_f590_a2ed00_u3.ok);
     CHECK(g_post_base_f590_a2ed00_u3 == 1);
     CHECK(r.post_base_f590_a2ed00_u3.call_f590_count == 1);
+    // E494: Init continue second post-a2ed00-u2 0xf590 call-site (mov-rdi prep / body NOT modelled)
+    CHECK(r.post_base_f590_a2ed00_u4.ok);
+    CHECK(g_post_base_f590_a2ed00_u4 == 1);
+    CHECK(r.post_base_f590_a2ed00_u4.call_f590_count == 1);
     CHECK(r.remainder.trivial_ok);
     CHECK(r.remainder.registry.status == RegistryInit531d60Status::ok);
     CHECK(r.remainder.registry.entry_count == kInputTable551140Count);
@@ -1495,6 +1504,7 @@ int main() {
         "post_base_vcall38+post_base_lea_32f4fe0+post_base_a2caf0+"
         "post_base_a2ed00+post_base_f590_a2ed00+post_base_f590_a2ed00_u2+"
         "post_base_a2ed00_u2+post_base_f590_a2ed00_u3+"
+        "post_base_f590_a2ed00_u4+"
         "early+tail+base+trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
         "anims=%p banks=%p streams=%p rand=%p boss=%p cp3=%p csp=%p post_hit=%d miss_null=%d "
@@ -1507,7 +1517,7 @@ int main() {
         "pb532u3=%d pbvcu3=%d pb532u4=%d pbvcu4=%d pb532u5=%d pbvcu5=%d pb532ed=%d pbvced=%d "
         "pb532edu2=%d pbvcedu2=%d pb170=%d pb544=%d pb450=%d pb170u2=%d pb53=%d "
         "pb448=%d pbv38=%d pblea=%d pba2=%d pba2ed=%d pbf590a=%d pbf590u2=%d "
-        "pba2edu2=%d pbf590u3=%d "
+        "pba2edu2=%d pbf590u3=%d pbf590u4=%d "
         "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
@@ -1596,6 +1606,7 @@ int main() {
         r.post_base_f590_a2ed00_u2.call_f590_count,
         r.post_base_a2ed00_u2.call_a2ed00_count,
         r.post_base_f590_a2ed00_u3.call_f590_count,
+        r.post_base_f590_a2ed00_u4.call_f590_count,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
