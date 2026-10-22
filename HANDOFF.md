@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 02:54 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 02:58 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -23,6 +23,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Claim commit `1f194e4ef9389d33520f57a01d2439db5535d8f6` is pushed to `origin/main`; pre/post
   staged or explicit and full audits accepted 8/1,721 paths, with 0/0 fetch divergence. Publication
   logs are in E294.
+- Completion commit `00b2d2c63f16919b9821a8fa786162c4eb239dbc` is pushed and fetch-verified at 0/0
+  divergence. Staged and post-push explicit audits accepted 6 paths; full audits accepted 1,722
+  tracked paths. User-owned `native/api/CMakeLists.txt` and `native/api/host/` remain unstaged.
+  Publication hashes and the final project-index refresh are in E296.
 - Exact next action: publish the completion record, then claim the separately scouted
   `SAV-01-CHUNK-CODEC-UNKNOWN-PAYLOAD-KIND-FIXTURE-01` only after its baseline and ownership are
   recorded.

@@ -1,6 +1,6 @@
 # Checkpoint: SAV-01-NATIVE-STREAM-ERROR-NAME-MAP-FIXTURE-01 — complete
 
-- Time / timezone: 2026-10-22 02:54 CDT (America/Chicago)
+- Time / timezone: 2026-10-22 02:58 CDT (America/Chicago)
 - Agent and integrator: implementation `/root/next_fixture_scout_2`; independent replay and docs
   `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`).
 - Task / gate / status: `SAV-01-NATIVE-STREAM-ERROR-NAME-MAP-FIXTURE-01`, child of
@@ -47,5 +47,16 @@
   compatibility remain unverified.
 - Task status and attempts: `FIXTURE_VERIFIED`; 1 successful implementation attempt, 0 failed
   tries. No install or dependency change. `INSTALL_LOG.md` unchanged.
-- Next exact action: audit and publish the allowlisted completion record, then claim the scouted
-  unknown-payload-kind fixture.
+- Publication: completion commit `00b2d2c63f16919b9821a8fa786162c4eb239dbc` is pushed to
+  `origin/main`. Staged and post-push explicit audits accepted 6 paths; full audits accepted 1,722
+  tracked paths; pre/post fetch divergence was 0/0. See E296 for audit and push log hashes. The
+  working tree retained only the pre-existing user-owned `native/api/CMakeLists.txt` change and
+  untracked `native/api/host/`, neither staged or changed.
+- After the publication record edit, the initial `python3 scripts/project_index.py --check`
+  reported `Stale indexes: local/indexes/folders.json` (exit 1). That redirection log was
+  overwritten by the successful rerun; its observed output was captured in
+  `local/validation/20261022-root-fixture-baselines/sav01-error-name-map-publication-index-initial-stale-captured.log`
+  (SHA256 `d914bb31fc7a320a7f7f25e80378318081775585eb40a1b8e50a4524105500b6`). Regeneration and
+  the repeated check passed at 30,117 folders; hashes are in E296.
+- Next exact action: prepare and publish a separate bounded claim for the scouted unknown
+  `PayloadKind` fallback fixture.
