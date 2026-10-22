@@ -350,3 +350,18 @@ the byte-preservation fixture checks the prefix and suffix around the raw span b
 gap. No allocator reachability or game behavior is established. Build products remain under the two
 exact `local/build/` directories named above; logs are under
 `local/validation/srv01-f19e00-zero-request-20261022/`. No removal boundary was created.
+## 2026-10-22 07:00 CDT — SAV-01 reader fixture verification
+
+Existing CMake, Ninja, Apple clang, and macOS toolchain versions recorded in E325 were reused; no
+install, download, dependency, or system configuration change. For
+`SAV-01-READER-DUPLICATE-NAME-CROSS-TAG-FIXTURE-01`, worker and independent root each ran Debug/Ninja
+configure, built `test_save_stream`, and passed focused `save_stream` CTest 1/1. For
+`SAV-01-CHUNK-CODEC-READER-BORROWED-BYTES-VIEW-FIXTURE-01`, worker and independent root each ran
+Debug/Ninja configure, built `test_save_chunk_codec`, and passed focused `save_chunk_codec` CTest
+1/1. Exact commands and log directories are recorded in their completion checkpoints and E372/E373;
+worker/root build products remain in the corresponding `local/build/native-worker-*` and
+`local/build/native-root-*` directories, with logs under
+`local/validation/sav01-reader-duplicate-cross-tag-20261022/` and
+`local/validation/sav01-reader-borrowed-bytes-20261022/`. These runs verify synthetic reader policy
+and borrowed-view behavior only; no real-save compatibility or game behavior is established. No
+removal boundary was created.

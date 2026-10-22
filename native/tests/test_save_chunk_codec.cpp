@@ -196,6 +196,20 @@ void test_primitives_golden() {
         CHECK(r.read_bytes(1, view) == CodecError::short_read);
         CHECK(r.read_bytes(0, view) == CodecError::none && view.empty());
     }
+    // A nonempty byte read borrows its input and advances the reader cursor.
+    {
+        const Bytes bytes = B({0xAA, 0x11, 0x22, 0xBB});
+        PayloadReader r(bytes);
+        std::uint8_t prefix = 0;
+        CHECK(r.read_u8(prefix) == CodecError::none && prefix == 0xAA);
+        std::span<const std::byte> view;
+        CHECK(r.read_bytes(2, view) == CodecError::none);
+        CHECK(view.data() == bytes.data() + 1);
+        CHECK(view.size() == 2);
+        CHECK(view[0] == std::byte{0x11} && view[1] == std::byte{0x22});
+        CHECK(r.position() == 3);
+        CHECK(r.remaining() == 1);
+    }
     // NaN payload bits survive the f32 path
     {
         const std::uint32_t nan_bits = 0x7fc12345u;
