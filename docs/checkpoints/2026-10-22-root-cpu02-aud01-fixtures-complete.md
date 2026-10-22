@@ -1,6 +1,6 @@
 # Checkpoint: CPU-02 maximum Tagged31 retag and AUD-01 summary-digest fixtures
 
-- Local date/time: 2026-10-22 00:10 CDT (America/Chicago)
+- Local date/time: 2026-10-22 00:13 CDT (America/Chicago)
 - Integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`)
 - Tasks: `CPU-02-TAGGED31-RETAG-MAX-OFFSET-FIXTURE-01` and
   `AUD-01-XFF-ARCHIVE-SUMMARY-SHA256-MISMATCH-FIXTURE-01`.
@@ -76,6 +76,18 @@
   validation directory.
 - Remaining risks: no production changes were made. The task facts are local fixtures only; no
   completion claim is made for native boot, audio, saving, Metal gameplay or performance.
-- Exact next action: stage only the allowlisted source, docs and checkpoint paths; run staged and
-  full publication audits, commit and push, then fetch and verify 0/0 divergence. Preserve the
-  pre-existing user-owned `native/api/CMakeLists.txt` and `native/api/host/` changes unstaged.
+- Completion commit `c97c1dbb957882a915a89927ef9a94a9e0eb5740` (`test: pin max Tagged31 offset and
+  archive digest`) includes 8 allowlisted paths. `git push origin main` exits 0. Staged audit
+  accepted 8 paths; full audit accepted 1,690. The pre-push and post-push fetch/divergence checks
+  report 0/0, and the post-push status confirms `main...origin/main`; only the pre-existing user-owned
+  `native/api/CMakeLists.txt` and `native/api/host/` remain modified/untracked. Commit, push and
+  post-push logs are in `local/validation/20261022-root-fixture-baselines/`: commit SHA-256
+  `accf561f717d3e36ab171d29b6e710cbbf906dd84ba2c47a3f5dc7b0db0f078f`, push
+  `76997e828eede73634873f99ea87f8b3a63fdda3fbaecc001cc889dd1d69f75d`, post-fetch (empty)
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`, post-divergence
+  `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d0247050325e7c5a3b2b3271c`, and post-status
+  `bafebe0544ec1663fc5c60d5555079052f1efbe617d7957be47744c6262d25c7`.
+- Exact next action: independently verify the read-only arena-page-debit wrap candidate against
+  Graft, the live pointer spec, implementation, existing fixture and task board; claim it only if
+  the observed unsigned wrap is a distinct fixture contract. Keep pending Mach-O CPU acceptance and
+  PSARC negative-limit semantics untouched.
