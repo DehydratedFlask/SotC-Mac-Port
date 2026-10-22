@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 18:10 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 18:14 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,40 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E499 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E500 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 Init continue second post-a2ed00-u4 `0xf590` call-site
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-INIT-531D60-POST-BASE-F590-A2ED00-U8-01` — lift OBS second
+  post-a2ed00-u4 `0xf590` call-site (5 B) at `0x5325d6..0x5325db`; intervening
+  prep `0x5325d3..0x5325d6` (3 B: `mov rdi,r15`) demoted. Prefer call-site
+  after E499 over mov-rdi-prep/`0xf590` body/`0xa2ed00` body tourism and
+  over deepen `0x1290`/`0x5c64c0`/`0x56dcb0`/`0x499f80`/`0x140d90`/
+  `0x14c2f0`/`0x6a5370`. Distinct from earlier `26800_f590`, `f590_a2ed00`
+  (E490), `f590_a2ed00_u2` (E491), `f590_a2ed00_u3` (E493),
+  `f590_a2ed00_u4` (E494), `f590_a2ed00_u5` (E496), `f590_a2ed00_u6`
+  (E497), and `f590_a2ed00_u7` (E499). FakeHeap + tip AllocatorFront; PR #5
+  cite-only.
+- Files: `native/core/init_531d60_post_base_f590_a2ed00_u8.{hpp,cpp}`; ctor
+  slice wire; `tools/lift/check_f531d60_post_base_f590_a2ed00_u8.py`;
+  checkpoint `docs/checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u8.md`;
+  EVIDENCE E500; TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-post-base-f590-a2ed00-u8-20261022/` (manifest
+  `48fc24bc…` at tip `d98dc1e`; capture `9085e5ad…`).
+- Observation: feat tip `d98dc1e`; docs tip `DOCS_TIP_PENDING`; measured
+  `pbf590u8=1` + `pbf590u7=1` + mid_reg=4 → 275 registry.
+  Body / mov-rdi prep / following stack prep / fifth `0xa2ed00` NOT modelled.
+- Commands: `python3 -I tools/lift/check_f531d60_post_base_f590_a2ed00_u8.py` OK;
+  `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: next always-on after `0x5325db` (`mov rdi,[r13]` /
+  stack prep / `call 0xa2ed00`), or bounded `0x1290` / `0x5c64c0` /
+  `0x56dcb0` / `0x499f80` / `0x140d90` / `0x14c2f0` / `0x6a5370`. Prefer
+  call-site continue over bodies. Goal open.
 
 ## 2026-10-22 Init continue first post-a2ed00-u4 `0xf590` call-site
 
