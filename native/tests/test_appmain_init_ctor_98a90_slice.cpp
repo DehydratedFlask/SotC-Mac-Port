@@ -35,6 +35,7 @@
 #include "core/vslot_40_533100_shadowrandomevents.hpp"
 #include "core/vslot_40_533100_randomevents_attach.hpp"
 #include "core/vslot_40_533100_shadowbossmusic.hpp"
+#include "core/vslot_40_533100_bossmusic_attach.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -148,6 +149,8 @@ int g_v40_rand_attach_f590 = 0;
 int g_v40_boss_notify = 0;
 int g_v40_boss_14c2f0 = 0;
 int g_v40_boss_load = 0;
+int g_v40_boss_14ccc0 = 0;
+int g_v40_boss_attach_f590 = 0;
 alignas(8) std::uint8_t g_shadow_asset[0x40]{};
 alignas(8) std::uint8_t g_skels_asset[0x40]{};
 alignas(8) std::uint8_t g_anims_asset[0x40]{};
@@ -176,9 +179,9 @@ void hook_mid_26b60(const char*) { ++g_mid_b60; }
 void hook_f08_ctor(void* obj) {
     ++g_f08_ctor;
     // Marker at +0x30 — OBS slots +0/+8 models, +0x10/+0x18 skels, +0x20/+0x28 anims,
-    // +0x40/+0x48 banks, +0x50/+0x58 streams, +0x60/+0x68 randomevents
-    // (marker sits in the gap before banks).
-    std::memset(obj, 0, 0x70);
+    // +0x40/+0x48 banks, +0x50/+0x58 streams, +0x60/+0x68 randomevents,
+    // +0x70/+0x78 bossmusic (marker sits in the gap before banks).
+    std::memset(obj, 0, 0x80);
     *reinterpret_cast<std::uint32_t*>(static_cast<std::uint8_t*>(obj) + 0x30) = 0xF08F08F0u;
 }
 void hook_f08_dtor(void*) { ++g_f08_dtor; }
@@ -304,6 +307,8 @@ void* hook_v40_boss_load(void* out_slot, void*, void*) {
     std::memcpy(out_slot, &p, sizeof(void*));
     return p;
 }
+void hook_v40_boss_14ccc0(void*) { ++g_v40_boss_14ccc0; }
+void hook_v40_boss_attach_f590(void*) { ++g_v40_boss_attach_f590; }
 
 void* loadp(const void* base, std::size_t off) {
     void* p = nullptr;
@@ -428,6 +433,7 @@ int main() {
     g_v40_rand_notify = g_v40_rand_14c2f0 = g_v40_rand_load = 0;
     g_v40_rand_14ccc0 = g_v40_rand_attach_f590 = 0;
     g_v40_boss_notify = g_v40_boss_14c2f0 = g_v40_boss_load = 0;
+    g_v40_boss_14ccc0 = g_v40_boss_attach_f590 = 0;
     std::memset(g_shadow_asset, 0, sizeof(g_shadow_asset));
     std::memset(g_skels_asset, 0, sizeof(g_skels_asset));
     std::memset(g_anims_asset, 0, sizeof(g_anims_asset));
@@ -510,6 +516,8 @@ int main() {
     bh.vslot_40_shadowbossmusic_detail.notify_95580 = hook_v40_boss_notify;
     bh.vslot_40_shadowbossmusic_detail.path_14c2f0 = hook_v40_boss_14c2f0;
     bh.vslot_40_shadowbossmusic_detail.load_vslot18 = hook_v40_boss_load;
+    bh.vslot_40_bossmusic_attach_detail.release_14ccc0 = hook_v40_boss_14ccc0;
+    bh.vslot_40_bossmusic_attach_detail.dtor_f590 = hook_v40_boss_attach_f590;
 
     SingletonF08Hooks sh{};
     sh.ctor_523bd0 = hook_f08_ctor;
@@ -698,6 +706,14 @@ int main() {
     CHECK(r.vslot_40_shadowbossmusic.refcount_bumped);
     CHECK(r.vslot_40_shadowbossmusic.refcount_after == 1);
     CHECK(r.vslot_40_shadowbossmusic.f08 == r.singleton.obj);
+    // E439: bossmusic attach fail-path + install into f08+0x70
+    CHECK(r.vslot_40_bossmusic_attach.ok);
+    CHECK(r.vslot_40_bossmusic_attach.took_fail_path);
+    CHECK(r.vslot_40_bossmusic_attach.installed);
+    CHECK(r.vslot_40_bossmusic_attach.slot_after == g_boss_asset);
+    CHECK(loadp(r.singleton.obj, 0x70) == g_boss_asset);
+    CHECK(g_v40_boss_attach_f590 == 1);
+    CHECK(g_v40_boss_14ccc0 == 1);
     CHECK(g_move == 0);
     CHECK(g_nonnull == 0);
     CHECK(g_init_tb == 1);
@@ -722,12 +738,13 @@ int main() {
         "vslot533100_header+post1fc80+miss_rfps+join_pos+gfx2ee2d00+shadowmodels+attach+"
         "shadowskels+skels_attach+shadowanims+anims_attach+shadowbanks+banks_attach+"
         "shadowstreams+streams_attach+shadowrandomevents+randomevents_attach+shadowbossmusic+"
-        "early+tail+base+trivial+registry "
+        "bossmusic_attach+early+tail+base+trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
         "anims=%p banks=%p streams=%p rand=%p boss=%p post_hit=%d miss_null=%d marker=0x%x "
         "refc=%u fail=%d skels_refc=%u skels_fail=%d anims_refc=%u anims_fail=%d banks_refc=%u "
         "banks_fail=%d streams_refc=%u streams_fail=%d rand_refc=%u rand_fail=%d boss_refc=%u "
-        "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u alloc_ops=%llu duration_us=%lld "
+        "boss_fail=%d gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u alloc_ops=%llu "
+        "duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
         "vslot533100_hit/success_atexit/next_path/14c2f0_body/6a5370_body/6abcc0_body/"
         "21620_body/2779a0_body/42390_body/525080_body/2569d0_body/26ea0/26b60/272d0/"
@@ -752,6 +769,7 @@ int main() {
         r.vslot_40_shadowrandomevents.refcount_after,
         r.vslot_40_randomevents_attach.took_fail_path ? 1 : 0,
         r.vslot_40_shadowbossmusic.refcount_after,
+        r.vslot_40_bossmusic_attach.took_fail_path ? 1 : 0,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
