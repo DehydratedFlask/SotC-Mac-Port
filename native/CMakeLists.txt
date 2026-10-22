@@ -115,6 +115,7 @@ add_library(sotc_core STATIC
   core/init_531d60_post_base_f90310.cpp
   core/init_531d60_post_base_ymm_bss.cpp
   core/init_531d60_post_base_ymm_intercell.cpp
+  core/init_531d60_post_base_xmm_seed.cpp
   core/ctor_98a90_3be050.cpp
   core/appmain_init_prologue_slice.cpp
   core/appmain_init_prologue_tail_slice.cpp
