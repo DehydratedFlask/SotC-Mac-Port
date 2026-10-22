@@ -36,6 +36,7 @@ struct AppmainInitCtor98a90SliceResult {
     AppmainInitCtor40SliceSide ctor_40{};
     SingletonF08Result singleton{};
     Vslot40_533100HeaderResult vslot_40{};
+    Vslot40_533100PostResult vslot_40_post{};
     bool base_ok = false;
     std::uint32_t flag_after_base = 0;
     AppmainInitRemainderSliceResult remainder{};
