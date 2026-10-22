@@ -12,8 +12,8 @@
 // Prefer over empty-path migrate/non-null.
 //
 // Claimed: notify + load-attempt control flow + path pin + lifted 0x14ccb0.
-// NOT modelled: success atexit; attach/install; bodies of 0x14c2f0 / 0x95580 /
-// vcall; asset I/O. PR #5 cite-only.
+// NOT modelled: success atexit; bodies of 0x14c2f0 / 0x95580 / vcall; asset I/O.
+// Attach: see vslot_40_533100_streams_attach.*. PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
