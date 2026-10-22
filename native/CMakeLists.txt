@@ -147,6 +147,7 @@ add_library(sotc_core STATIC
   core/init_531d60_post_base_a2caf0.cpp
   core/init_531d60_post_base_a2ed00.cpp
   core/init_531d60_post_base_a2ed00_u2.cpp
+  core/init_531d60_post_base_a2ed00_u3.cpp
   core/init_531d60_post_base_f590_a2ed00.cpp
   core/init_531d60_post_base_f590_a2ed00_u2.cpp
   core/init_531d60_post_base_f590_a2ed00_u3.cpp
