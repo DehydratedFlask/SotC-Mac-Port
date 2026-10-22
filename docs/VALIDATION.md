@@ -1,9 +1,10 @@
 # Validation gates and evidence protocol
 
-Current checkpoint: G0 PARTIAL; G1 PARTIAL (see E404 / E405 / E406 —
+Current checkpoint: G0 PARTIAL; G1 PARTIAL (see E404–E407 —
 `docs/checkpoints/2026-10-22-g1-partial-evidence-pack.md`,
-`docs/checkpoints/2026-10-22-appmain-init-registry-slice.md`, and
-`docs/checkpoints/2026-10-22-init-531d60-trivial-leaves.md`);
+`docs/checkpoints/2026-10-22-appmain-init-registry-slice.md`,
+`docs/checkpoints/2026-10-22-init-531d60-trivial-leaves.md`, and
+`docs/checkpoints/2026-10-22-base-initialize-255130.md`);
 G2-G6 NOT RUN. This is a plan, not a game execution report. G1 is not PASSED.
 Artifact/tool/source evidence is recorded in EVIDENCE.md; full asset/linkage schemas remain open.
 Baseline supplied by the coordinating agent on 2026-10-19, America/Chicago: M4 Pro, 12 CPU cores,
@@ -23,7 +24,7 @@ Follow [AGENTS.md](../AGENTS.md), [PLATFORM.md](PLATFORM.md), [ROADMAP.md](../RO
 | Gate | Deliverable | Current status |
 | --- | --- | --- |
 | G0 | Local inventory, provenance, toolchain, indexing | PARTIAL |
-| G1 | Pure native CPU/game-core feasibility | PARTIAL (startup harness + Init-hash fixtures + measured Init remainder trivial leaves→registry; unresolved edges in E404–E406; not PASSED) |
+| G1 | Pure native CPU/game-core feasibility | PARTIAL (startup harness + Init-hash + base Initialize orchestrator→remainder→registry; unresolved edges in E404–E407; not PASSED) |
 | G2 | Native services, audio fixtures, save fixtures | NOT RUN |
 | G3 | Direct Metal resources, shader semantics, rendering | NOT RUN |
 | G4 | Native Swift/macOS launcher and lifecycle | NOT RUN |
