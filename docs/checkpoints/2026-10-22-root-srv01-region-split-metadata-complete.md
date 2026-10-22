@@ -39,9 +39,9 @@
   bytes outside capacity/size are unchanged in this synthetic call. This is helper-level evidence
   only; it does not establish allocator-runtime behavior, a native game allocator, or game behavior.
 - Remaining risks: no allocator integration or runtime test. No blocker for this fixture.
-- Next exact action: publish the verified fixture and the claimed
-  `SAV-01-NATIVE-STREAM-ERROR-NAME-MAP-FIXTURE-01`; then implement only the mapped-error assertions
-  in `native/tests/test_save_stream.cpp` and independently replay its focused CTest.
+- Next exact action: `/root/next_fixture_scout_2` is implementing only the mapped-error assertions
+  in `native/tests/test_save_stream.cpp` under the published claim; root will independently replay
+  its focused CTest when the worker returns.
 - HANDOFF / TASKS / EVIDENCE updated. `python3 scripts/project_index.py` and its `--check` pass at
   29,507 folders. The first check reported stale `local/indexes/folders.json` because its wrapper
   created a new local log after generation; after precreating the log paths, regeneration and check
@@ -53,4 +53,8 @@
   `37f2a18c24b237dcd0e456bc8f019ff693cfb1df7b052283e2d6ac0d3d50527a`. The project-index generator
   log SHA256 is `a3df43b97c2f04ba2d6d1a579547a66bc0ec9c140c423cbf88d6e0b6077a2814`; root
   `git diff --check` log SHA256 is
-  `341255ea7f02bc87ffaa85c034fe8cab2f8f7b2ab22d31d8430620766897e847`. No install occurred.
+  `09442f290a984958f6d87d36dff2195b89c003c833523d2f182d698023f9f5c9`. No install occurred.
+- Publication: commit `1f194e4ef9389d33520f57a01d2439db5535d8f6` pushed `origin/main` with the new
+  save-stream claim. Staged/full and post-push explicit/full audits accepted 8/1,721 paths; pre- and
+  post-push fetch checks showed 0/0 divergence. See E294 for publication log hashes. User-owned
+  `native/api/CMakeLists.txt` and `native/api/host/` remained unstaged.
