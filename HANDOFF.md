@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 01:00 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 01:02 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -28,19 +28,21 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `93c693d211fadee9d16746f6be56ea5fca300bd1` is pushed and fetch-verified at 0/0; its staged and
   exact-path audits accepted 6 paths and full audit accepted 1,698.
 
-## Active claim — APP-01 audio readiness start gate
+## APP-01 audio readiness start gate — verified
 
-- `APP-01-AUDIO-READINESS-GATE-FIXTURE-01` under `APP-01`: add one test-only case in
-  `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift` that injects missing audio while all
-  other readiness rows are ready, then proves the audio row blocks Play and the scripted core's
-  `start()` is never called. Baseline `LauncherModelValidationTests` passes 8 tests. Production
-  source is unchanged. Claim record:
-  [checkpoint](docs/checkpoints/2026-10-22-root-app01-audio-readiness-gate-claim.md).
-- Status `ACTIVE`, zero failed implementation tries. Root owns this one test file; claim docs are
-  recorded and published. Exact next action: add the isolated audio readiness assertion, replay
-  `swift test --package-path launcher --scratch-path local/build/launcher --filter LauncherModelValidationTests`,
-  verify the new source node and project index, then record and publish completion. Leave the
-  pending Mach-O CPU and PSARC negative-limit choices untouched.
+- `APP-01-AUDIO-READINESS-GATE-FIXTURE-01` adds one test-only case in
+  `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift`: assets, core, and Metal are ready;
+  injected audio output is missing; the audio row names the blocker; Play stays disabled; and the
+  scripted core's `start()` is never called. Baseline `LauncherModelValidationTests` passed 8 tests;
+  the final run passed 9. Production model/readiness sources are unchanged. See the
+  [claim checkpoint](docs/checkpoints/2026-10-22-root-app01-audio-readiness-gate-claim.md) and
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-app01-audio-readiness-gate-complete.md).
+- Status `FIXTURE_VERIFIED`, one successful implementation attempt, 0 failed tries. Trail wiring
+  graph is current at 3,613 nodes / 1,240 files; the new method is queryable, and the project index
+  is current at 24,080 folders. This is only an injected host-check test, not a physical audio
+  probe or audible-content claim. Exact next action: review the separate read-only scout candidate
+  from `/root/next_independent_task_scout` and claim another bounded task only after verifying it
+  does not overlap current work. Leave pending Mach-O CPU and PSARC negative-limit choices alone.
 
 ## SRV-01 arena high-water uint64 wrap fixture — verified
 
