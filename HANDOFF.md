@@ -25,10 +25,11 @@ or Metal gameplay is demonstrated.
   `tools/lift/check_f255180_prologue_tail.py`; CMake/README;
   checkpoint `docs/checkpoints/2026-10-22-prologue-255180-tail.md`; EVIDENCE E409;
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-prologue-tail-20261022/` (manifest `e0f9445c…`).
-- Observation: ELF pins rem sha `31eeb31e…` + install sequence; fail-visible missing
-  98a90 ctor; success → 275 registry (alloc_ops=9). Debug gates after `0x2552cd` NOT
-  modelled.
+  `local/validation/appmain-init-prologue-tail-20261022/` (manifest `8772a169…` at tip
+  `b493c51`).
+- Observation: feat tip `b493c51`; ELF pins rem sha `31eeb31e…` + install sequence;
+  fail-visible missing 98a90 ctor; success → 275 registry (alloc_ops=9). Debug gates
+  after `0x2552cd` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f255180_prologue_tail.py` OK;
   `ctest --test-dir local/build/native-prologue-tail -R '^(appmain_init_prologue_tail_slice|appmain_init_prologue_slice)$'`
   PASS; private capture exit 0; `check_ctor_slots` still **155**.
