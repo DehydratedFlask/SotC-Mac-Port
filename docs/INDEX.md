@@ -50,6 +50,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Vslot 0x533100 anims attach (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-anims-attach.md) | Shadowanims attach fail-path + install f08+0x20; E431; G1 PARTIAL |
 | [Vslot 0x533100 shadowbanks (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-shadowbanks.md) | Shadowbanks load-attempt; E432; G1 PARTIAL |
 | [Vslot 0x533100 banks attach (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-banks-attach.md) | Shadowbanks attach fail-path + install f08+0x40; E433; G1 PARTIAL |
+| [Vslot 0x533100 shadowstreams (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-shadowstreams.md) | Shadowstreams load-attempt; E434; G1 PARTIAL |
 | [FOLDERS](FOLDERS.md) | Generated public/source folder inventory; `scripts/project_index.py` |
 | [INSTALL_LOG](../INSTALL_LOG.md) | Existing and newly installed tools, downloads and removals |
 | [Checkpoint template](checkpoints/TEMPLATE.md) | Required record at each checkpoint |
