@@ -27,7 +27,7 @@ or Metal gameplay is demonstrated.
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-prologue-tail-20261022/` (manifest `8772a169…` at tip
   `b493c51`).
-- Observation: feat tip `b493c51`; ELF pins rem sha `31eeb31e…` + install sequence;
+- Observation: feat tip `b493c51` (docs tip `a8e7d0b`); ELF pins rem sha `31eeb31e…` + install sequence;
   fail-visible missing 98a90 ctor; success → 275 registry (alloc_ops=9). Debug gates
   after `0x2552cd` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f255180_prologue_tail.py` OK;
