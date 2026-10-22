@@ -499,6 +499,7 @@ struct CoreReadinessTests {
         #expect(CoreReadiness.assetsStatus(directory: dir, validation: validation(ready: true, verdict: .ok, problems: 0, detail: ""), failure: nil) == .ready)
         #expect(CoreReadiness.assetsStatus(directory: dir, validation: validation(ready: false, verdict: .assetsNotReady, problems: 2, detail: "a"), failure: nil) == .missing("a"))
         #expect(CoreReadiness.assetsStatus(directory: dir, validation: validation(ready: false, verdict: .assetsNotReady, problems: 2, detail: ""), failure: nil) == .missing("2 required archive problem(s)"))
+        #expect(CoreReadiness.assetsStatus(directory: dir, validation: validation(ready: false, verdict: .assetsNotReady, problems: 0, detail: ""), failure: nil) == .missing("The game files did not pass validation."))
         // A core that says ready but also reports problems is not ready.
         #expect(CoreReadiness.assetsStatus(directory: dir, validation: validation(ready: true, verdict: .ok, problems: 1, detail: ""), failure: nil) != .ready)
         #expect(CoreReadiness.assetsStatus(directory: dir, validation: nil, failure: nil) == .missing("The game files were not checked"))

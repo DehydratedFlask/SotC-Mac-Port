@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 01:47 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 02:02 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -43,21 +43,41 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-host-map-empty-null-nonzero-claim.md)
   and [completion checkpoint](docs/checkpoints/2026-10-22-root-srv01-host-map-empty-null-nonzero-complete.md).
 - Status is `FIXTURE_VERIFIED`, one successful implementation attempt and zero failed tries.
-  Claim publication is documented in E281; completion publication details will be added after the
-  completion commit is pushed. The fixture pins only synthetic accessor behavior.
+  Claim commit `b33b4bfbb60c746853e6a2ca1bd5a983e92825c3` and completion commit
+  `ddcb75292a9be2fa543f756c6dfa69eda574b8cf` are pushed. Staged/full audits accepted 8/1,713
+  paths, fresh fetch showed 0/0 divergence, and post-push explicit/full audits accepted 8/1,713.
+  Publication log SHA256 is in E282/E283. The fixture pins only synthetic accessor behavior.
 
-## APP-01 readiness fallback-copy fixture — active claim
+## APP-01 readiness fallback-copy fixture — verified
 
-- `APP-01-CORE-READINESS-ZERO-PROBLEM-FALLBACK-FIXTURE-01` is claimed under `APP-01`. Scope is one
+- `APP-01-CORE-READINESS-ZERO-PROBLEM-FALLBACK-FIXTURE-01` under `APP-01` adds one
   assertion in `CoreReadinessTests.assetsStatusMapsEveryCase()` in
   `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift`: for a non-nil asset directory and
   synthetic validation with `assetsReady == false`, `.assetsNotReady`, `problemCount == 0`, and
   empty detail, assert `.missing("The game files did not pass validation.")`. Production code is
   unchanged; this is synthetic copy-mapping only.
-- Baseline `CoreReadinessTests` pass 6 tests. Logs, source hashes, and exact gap are in E282 and the
-  [claim checkpoint](docs/checkpoints/2026-10-22-root-app01-core-readiness-zero-fallback-claim.md).
-  Status is `ACTIVE`; implementation attempts: 0. After the claim publication, delegate only the
-  launcher test file to `/root/next_fixture_scout_3` and independently replay at root.
+- Baseline, worker, and root fresh-scratch `CoreReadinessTests` runs each pass 6 tests. The worker
+  and root changed test hashes, source hashes, logs, and Trail query are in E282/E285 and the
+  [claim checkpoint](docs/checkpoints/2026-10-22-root-app01-core-readiness-zero-fallback-claim.md)
+  and [completion checkpoint](docs/checkpoints/2026-10-22-root-app01-core-readiness-zero-fallback-complete.md).
+- Status is `FIXTURE_VERIFIED`, one successful implementation attempt and zero failed tries.
+  Claim commit `ddcb75292a9be2fa543f756c6dfa69eda574b8cf` is pushed with staged/full audits
+  accepting 8/1,713 paths; fresh fetch showed 0/0 divergence and post-push explicit/full audits
+  accepted 8/1,713. Publication log SHA256 is in E282. No actual core validation, asset readiness,
+  launcher runtime, game boot, or gameplay is demonstrated.
+
+## SRV-01 region-list uncounted head-insert fixture — active claim
+
+- `SRV-01-REGION-LIST-UNCOUNTED-HEAD-INSERT-FIXTURE-01` is claimed under `SRV-01`. Scope is one
+  synthetic case in `native/tests/test_region_list.cpp` that inserts a node before an existing
+  head while omitting the optional allocation-counter argument, then checks the slot, forward and
+  backward links, arena predecessor, and owner.
+- Baseline target build exits 0 and focused `region_list` CTest passes 1/1. Source hashes, logs,
+  and the live gap are in E284 and the
+  [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-region-list-uncounted-head-insert-claim.md).
+  Project index generation/check pass at 25,889 folders; Trail wiring check passes at 3,617 nodes /
+  1,240 files. Status is `ACTIVE`; implementation attempts: 0. After claim publication, delegate
+  only the region-list test file to `/root/next_fixture_scout_2`, then review and replay at root.
 - Keep pending Mach-O CPU and PSARC policy choices untouched.
 
 ## RE-01 identity sidecar symlink alias fixture — verified
