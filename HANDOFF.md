@@ -25,8 +25,8 @@ or Metal gameplay is demonstrated.
   wire; `tools/lift/check_f533100_vslot40_banks_attach.py`; checkpoint
   `docs/checkpoints/2026-10-22-vslot-40-533100-banks-attach.md`; EVIDENCE E433;
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-vslot40-banks-attach-20261022/` (manifest TBD
-  at tip `36ec811`; capture TBD).
+  `local/validation/appmain-init-vslot40-banks-attach-20261022/` (manifest
+  `9a06cc67…` at tip `36ec811`; capture `21dcef7c…`).
 - Observation: feat tip `36ec811`; measured `banks_fail=1` + install + mid_reg=4
   → 275 registry. Success atexit / streams / `0x14c2f0` body NOT modelled.
 - Commands: `python3 -I tools/lift/check_f533100_vslot40_banks_attach.py` OK;
