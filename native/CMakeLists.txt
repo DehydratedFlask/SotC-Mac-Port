@@ -70,6 +70,7 @@ add_library(sotc_core STATIC
   core/prologue_255180.cpp
   core/store_tsc_323d0.cpp
   core/ensure_capacity_3c2f70.cpp
+  core/init_sub_3be930.cpp
   core/ctor_98a90_3be050.cpp
   core/appmain_init_prologue_slice.cpp
   core/appmain_init_prologue_tail_slice.cpp
