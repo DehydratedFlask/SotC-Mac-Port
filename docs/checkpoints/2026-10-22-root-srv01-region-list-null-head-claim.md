@@ -1,6 +1,6 @@
 # Checkpoint: SRV-01-REGION-LIST-NULL-HEAD-SLOT-INSERT-FIXTURE-01 — claimed
 
-- Time / timezone: 2026-10-22 03:39 CDT (America/Chicago)
+- Time / timezone: 2026-10-22 03:40 CDT (America/Chicago)
 - Agent and integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`);
   proposed implementation owner `/root/native_fixture_scout` after claim publication.
 - Task / gate / status: `SRV-01-REGION-LIST-NULL-HEAD-SLOT-INSERT-FIXTURE-01`, child of verified
@@ -61,10 +61,23 @@
   audits accepted 8/1,727 paths, with log SHA256 matching the pre-push audits. The post-push status
   log SHA256 is `bafebe0544ec1663fc5c60d5555079052f1efbe617d7957be47744c6262d25c7`. All logs are
   under `local/validation/20261022-root-fixture-baselines/`.
+- Publication-audit documentation commit `c9ecd22156497404edcef5728d64e910730ef96e` is also pushed
+  and fetch-verified at 0/0 divergence. Its staged/post-push explicit audit logs SHA256
+  `db111f671a9c5629a61f4551ccdaf0da1dc735cf8043cda2e00aee5c9442b875`; full audit logs SHA256
+  `42f397bdab8ed06979a027e1a0c84823afc683e9ffa4383065e309ea2415d0b1`; pre/post fetch logs SHA256
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`; pre/post divergence logs
+  SHA256 `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d0247050325e7c5a3b2b3271c`; commit/push log SHA256
+  `024c46c18faf983e70e99f82476cabe7db563666c9f52500016400cc1b96424b` /
+  `0f66c5eaa324fb92c7bac65934a9f69b854c0325a9e7b2a32030800d07619223`; post-status log SHA256
+  `f13c4d4a5fd46489092a82ea7dca73fd6a43ebf77b44adf81abdcdfc52ab30dc`; see E307.
 - Observation vs inference: push and fresh fetch/divergence show the claim is on `origin/main` at
   0/0 divergence; the test assertions remain proposed and not yet implemented.
-- Next exact action: ask `/root/native_fixture_scout` to add only the bounded null-slot case in
-  `native/tests/test_region_list.cpp`; root owns all docs, independent replay, and publication.
+- Dispatch checkpoint: at 2026-10-22 03:40 CDT, `/root/native_fixture_scout` was assigned only
+  `native/tests/test_region_list.cpp` with exact test assertions, fresh Debug/Ninja commands, and
+  worker log paths. It must not edit docs, stage, commit, or push.
+- Next exact action: after the worker reports, root independently builds `test_region_list` in a
+  fresh Debug/Ninja directory and runs focused `region_list` CTest; root then records the final
+  attempt count and publishes completion.
 - Task status and attempt count: `ACTIVE`, zero implementation attempts and zero failed tries.
 - Other worktree state: allocator worker `/root/next_fixture_scout_3` owns only
   `native/tests/test_allocator_region.cpp`; user-owned `native/api/CMakeLists.txt` and untracked

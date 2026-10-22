@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 03:39 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 03:45 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -75,27 +75,46 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Next exact action: continue the separate null-head-slot fixture claim below. User-owned
   `native/api/CMakeLists.txt` and untracked `native/api/host/` remain outside scope.
 
-## SRV-01 region-list null head-slot insert fixture — active claim
+## SRV-01 region-list null head-slot insert fixture — verified
 
 - `SRV-01-REGION-LIST-NULL-HEAD-SLOT-INSERT-FIXTURE-01` is a child of verified
   `SRV-01-REGION-LIST-EMPTY-HEAD-INSERT-FIXTURE-01`. Proposed scope is one synthetic case in
   `native/tests/test_region_list.cpp::main()`: call
   `list_insert_at_head(neu, nullptr, arena, &alloc_count)` with count 7, then check node identity,
   null next, arena-valued prev, arena owner, and count 8. No implementation, header, or CMake change.
-- Root independently configured a fresh Debug/Ninja build, built `test_region_list`, and ran
-  focused `region_list` CTest: exit 0; 1/1 passed. Source, build, and Trail evidence are in E304
-  and the [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-region-list-null-head-claim.md).
+- Worker and independent root each configured a fresh Debug/Ninja build, built `test_region_list`,
+  and ran focused `region_list` CTest: exit 0; 1/1 passed in both. Final source hashes, logs, the
+  post-change Trail result, and the synthetic-only limit are in E308 and the
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-srv01-region-list-null-head-complete.md).
 - Trail's `list_insert_at_head` query resolved the null-slot branch at
   `native/core/region_list.cpp:L28-L39` and existing test calls at
   `native/tests/test_region_list.cpp:L136`, `L154`, and `L168`. The helper skips slot assignment
   for a null slot pointer while still initializing node fields, optional count, and owner. This
   pins helper behavior only; it does not establish an actual list-head callsite or game behavior.
-- Status is `ACTIVE`, with zero implementation attempts and zero failed tries. Claim/completion
-  commit `42331857a2212ec2f3e7c283f41b1f197da0d585` is pushed and fetch-verified at 0/0 divergence;
-  pre/post explicit audits accepted 8 paths and full audits accepted 1,727 paths. See E306 and the
-  [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-region-list-null-head-claim.md).
-- Next exact action: ask `/root/native_fixture_scout` to add the one synthetic null-slot case in
-  `native/tests/test_region_list.cpp` only; root owns all docs, independent replay, and publication.
+- Status is `FIXTURE_VERIFIED`: one successful implementation attempt and zero failed tries.
+  Claim/completion commit `42331857a2212ec2f3e7c283f41b1f197da0d585` and docs audit record commit
+  `c9ecd22156497404edcef5728d64e910730ef96e` are pushed and fetch-verified at 0/0 divergence; see
+  E306/E307. Completion publication is pending the root's allowlisted commit and audit.
+- Completion commit is pending after root finishes the project-index/Trail checks and publication
+  audit. `/root` owns all docs and publication; the worker made no commit and left user-owned API
+  changes untouched.
+
+## SRV-01 recursive-mutex owner reentrant try-lock fixture — active claim
+
+- `SRV-01-RECURSIVE-MUTEX-REENTRANT-TRYLOCK-FIXTURE-01` is a child of verified
+  `SRV-01-RECURSIVE-MUTEX-01` and `CPU-01-MUTEX-CONTRACT-01`. It proposes two assertions in
+  `native/tests/test_recursive_mutex.cpp::main()`: while the current thread already owns two
+  recursive levels, `try_lock()` succeeds and one matching `unlock()` succeeds.
+- Root fresh Debug/Ninja `test_recursive_mutex` build and focused `recursive_mutex` CTest pass 1/1;
+  source and log hashes are in E309 and the [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-recursive-mutex-reentrant-trylock-claim.md).
+  Trail finds only uninitialized `EINVAL`, competing-thread `EBUSY`, and after-final-unlock success
+  checks; no owner-side recursive `try_lock` assertion exists.
+- Status is `ACTIVE`, zero implementation attempts and zero failed tries. The claim will be
+  published with the region-list completion. `/root/next_fixture_scout_2` owns only the test-file
+  implementation after publication; `/root` owns docs, independent replay, and publication.
+- Next exact action: publish the verified region-list completion and this bounded claim, then
+  dispatch the mutex test edit. This pins local Darwin mutex behavior only, not scheduler priority
+  inheritance under contention or game behavior.
 
 ## SAV-01 stream-file symlink destination fixture — verified
 
