@@ -1,6 +1,6 @@
 # Checkpoint: SRV-01-ALLOCATOR-ALIGN64K-UINT32-WRAP-FIXTURE-01 — claimed
 
-- Time / timezone: 2026-10-22 03:22 CDT (America/Chicago)
+- Time / timezone: 2026-10-22 03:27 CDT (America/Chicago)
 - Agent and integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`);
   proposed implementation owner `/root/next_fixture_scout_3` after claim publication.
 - Task / gate / status: `SRV-01-ALLOCATOR-ALIGN64K-UINT32-WRAP-FIXTURE-01`, child of active
@@ -39,7 +39,24 @@
   `f7231c65a9ccdc9f1ec3de943e3fe9b3a2be977fdf687c86e771d1c9c416a2dc`.
   `git diff --check` exits 0; log SHA256
   `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
-- Claim publication is pending. `INSTALL_LOG.md` is unchanged. The existing user-owned
-  `native/api/CMakeLists.txt` edit and untracked `native/api/host/` are not part of this task.
-- Next exact action: finish project index / Trail checks and publish this claim using explicit
-  allowlisted paths; only then send the worker the one-file implementation task.
+- Claim publication: commit `0341cacc5273102d566a6c35b74e3fef615bd258`, pushed to `origin/main`;
+  pre-push staged/full audit logs SHA256 `c515f6e0d4be024923150543f85aa79f8bbfa5fcde15314a9006bef532dea545` /
+  `e93c6d2b8d99a2b4cdd475d6f542f3f01059903c16cc4746d93638f70311f863`; pre/post fetch logs
+  SHA256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`; pre/post divergence
+  logs SHA256 `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d0247050325e7c5a3b2b3271c`; commit/push logs
+  SHA256 `bc55576a421e45a97f6a8f54ac21cbdca4a9e35fff50656d0f3e863d75e8cc58` /
+  `366ee75bdcd6c2eebfc05649b32598c5ec58b24fc21f4d13765b3c566785ee52`; post-push explicit/full
+  audits accepted 6/1,725 paths, with log SHA256 `c515f6e0d4be024923150543f85aa79f8bbfa5fcde15314a9006bef532dea545` /
+  `e93c6d2b8d99a2b4cdd475d6f542f3f01059903c16cc4746d93638f70311f863`. All logs are under
+  `local/validation/20261022-root-fixture-baselines/`. `INSTALL_LOG.md` is unchanged. The existing
+  user-owned `native/api/CMakeLists.txt` edit and untracked `native/api/host/` are not part of this
+  task.
+- Observation vs inference: audits and fetch establish the claim commit is published with 0/0
+  divergence. The test proposal follows current helper arithmetic only; no allocator runtime or
+  game behavior is established.
+- Remaining risk: the proposed test has not yet been added or run against the changed source.
+- Next exact action: ask `/root/next_fixture_scout_3` to add only
+  `CHECK(align_up_64k(0xffff0001u) == 0u);` in the existing alignment test block; root will replay
+  the focused target and own all documentation/publication.
+- Task status and attempt count: `ACTIVE`, claim published, zero implementation attempts and zero
+  failed tries.
