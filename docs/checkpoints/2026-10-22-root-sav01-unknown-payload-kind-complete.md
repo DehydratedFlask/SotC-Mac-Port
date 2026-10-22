@@ -60,8 +60,15 @@
   that error as a writer error, while the decoder also uses it here. This pins only current
   synthetic decoder behavior; save-format compatibility and game behavior are not established.
 - Claim publication: claim commit `ff63a179c0c9000a6a9a71472741c5657ffee9ef` is on
-  `origin/main`; E298 records its 0/0 divergence and path-audit evidence. Completion publication is
-  pending and will be recorded in E300.
-- Next exact action: run staged and full publish-path audits, explicitly stage allowlisted
-  completion files, commit, and push. After publication, record commit/audit evidence and claim
-  `SRV-01-ALLOCATOR-ALIGN64K-UINT32-WRAP-FIXTURE-01` from the independent scout.
+  `origin/main`; E298 records its 0/0 divergence and path-audit evidence.
+- Completion publication checkpoint, 2026-10-22 03:15 CDT (America/Chicago): commit
+  `141146e0b12fdd0f1150ab1f5e1d199c11ff033e` pushed to `origin/main`; pre-push fetch/divergence
+  was 0/0. Staged and full pre-push audits accepted 7/1,724 paths. Post-push explicit and full
+  audits accepted 7/1,724 paths; post-push fetch/divergence was 0/0. The first post-commit
+  staged-only audit exited 2 because the index was empty; the subsequent explicit seven-path audit
+  passed. Audit, fetch/divergence, commit and push logs are indexed in E300. Post-push status leaves
+  only user-owned `native/api/CMakeLists.txt` modified and `native/api/host/` untracked; neither was
+  staged. The publication commit and logs are under
+  `local/validation/20261022-root-fixture-baselines/`.
+- Next exact action: claim and baseline `SRV-01-ALLOCATOR-ALIGN64K-UINT32-WRAP-FIXTURE-01` from
+  the independent scout before assigning its one-file test change.
