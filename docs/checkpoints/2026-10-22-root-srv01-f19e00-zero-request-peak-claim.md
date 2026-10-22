@@ -13,5 +13,5 @@
 - Expected acceptance: configure and build exit 0; focused `arena_accounting` CTest passes 1/1. These commands have not run for this claim. Root will replay in a separate build directory after the worker result.
 - Observation versus inference / limitation: this pins a synthetic zero-request high-water update in the isolated helper. It does not establish allocator integration, game reachability, or game behavior.
 - Risks: keep this strictly test-only; do not infer production allocation semantics beyond the helper's currently documented byte behavior.
-- Index/publication: worker/root build directories, validation logs, and publication logs were precreated. Publish the claim with staged and full path audits before dispatch.
-- Exact next action: publish this claim together with the CPU-01 completion, then dispatch the one-file test change to `/root/fixture_candidate_scout_c`.
+- Index/publication: worker/root build directories, validation logs, and publication logs were precreated. The claim was published with CPU-01 completion in `4bff686d91d5a014cc4df2b6c01682d6855787ec`; E367 records staged/full audits, post-push full audit, and 0/0 fetch divergence.
+- Exact next action: dispatch the one-file test change to `/root/fixture_candidate_scout_c`; root will build and run focused CTest independently.

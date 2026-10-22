@@ -10,5 +10,6 @@
 - Observation versus inference / limitation: this observes synthetic floating-point comparisons only. The documented consumer uses `cos(3°)`; this fixture does not establish game reachability or gameplay behavior.
 - Attempts: one successful implementation attempt; zero failed implementation/build/test attempts.
 - Evidence/logs: E360, E363, and `local/validation/cpu01-normal-threshold-infinity-20261022/`.
+- Publication: CPU-01 completion and the next SRV-01 claim were pushed in `4bff686d91d5a014cc4df2b6c01682d6855787ec`; E367 records audits and fetch-verified 0/0 divergence.
 - Remaining risk: synthetic threshold behavior only; no game or runtime behavior is demonstrated.
-- Exact next action: publish this completion and the claimed SRV-01 zero-request peak-update fixture; then dispatch the latter after its claim is pushed.
+- Exact next action: dispatch the published SRV-01 zero-request peak-update fixture to its worker; root will replay independently.
