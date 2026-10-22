@@ -5,10 +5,11 @@
 // skels-attach+shadowanims+anims-attach+shadowbanks+banks-attach+shadowstreams+
 // streams-attach+shadowrandomevents+randomevents-attach+shadowbossmusic+
 // bossmusic-attach+cp3characters+cp3characters-attach+cp3shadowprecache+
-// cp3shadowprecache-attach+tail-140d90) → registry. Tip AllocatorFront+FakeHeap.
+// cp3shadowprecache-attach+tail-140d90+stackchk) → registry. Tip
+// AllocatorFront+FakeHeap.
 // PR #5 cite-only.
 // NOT modelled: ensure migrate / heavy menu helpers / 0xf8f860 PLT / non-null list;
-// PLT bodies 0xf901a0/0xf901c0; stack-chk; ba40 listener invoke; 0x533100 hit /
+// PLT bodies 0xf901a0/0xf901c0; ba40 listener invoke; 0x533100 hit /
 // success atexit/next path; 0x14c2f0/0x6a5370/0x6abcc0/0x21620/0x2779a0/0x42390
 // bodies; bodies of 0x523bd0 / 0x525b40 / 0x493230 / 0x525080 / 0x2569d0.
 #pragma once
@@ -64,6 +65,7 @@ struct AppmainInitCtor98a90SliceResult {
     Vslot40_533100Cp3shadowprecacheResult vslot_40_cp3shadowprecache{};
     Vslot40_533100Cp3shadowprecacheAttachResult vslot_40_cp3shadowprecache_attach{};
     Vslot40_533100Tail140d90Result vslot_40_tail_140d90{};
+    Vslot40_533100StackchkResult vslot_40_stackchk{};
     bool base_ok = false;
     std::uint32_t flag_after_base = 0;
     AppmainInitRemainderSliceResult remainder{};

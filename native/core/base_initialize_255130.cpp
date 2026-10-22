@@ -261,6 +261,15 @@ bool base_initialize_255130(void* self, void* arg,
         if (!t140.ok) {
             return false;
         }
+        // E445: always-on stack-check success path (saved==live) through ret; stop before fail PLT.
+        const Vslot40_533100StackchkResult scr = vslot_40_533100_stackchk(
+            stack_guard_value_cell(), hooks.vslot_40_stackchk_detail);
+        if (hooks.vslot_40_stackchk_out != nullptr) {
+            *hooks.vslot_40_stackchk_out = scr;
+        }
+        if (!scr.ok) {
+            return false;
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true
