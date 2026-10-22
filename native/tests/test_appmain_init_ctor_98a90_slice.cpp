@@ -46,6 +46,7 @@
 #include "core/init_531d60_post_base_56dcb0.hpp"
 #include "core/init_531d60_post_base_5c64c0.hpp"
 #include "core/init_531d60_post_base_1290.hpp"
+#include "core/init_531d60_post_base_56db70.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -180,6 +181,7 @@ void* g_post_base_499f80_arg = nullptr;
 int g_post_base_56dcb0 = 0;
 int g_post_base_5c64c0 = 0;
 int g_post_base_1290 = 0;
+int g_post_base_56db70 = 0;
 alignas(8) std::uint8_t g_shadow_asset[0x40]{};
 alignas(8) std::uint8_t g_skels_asset[0x40]{};
 alignas(8) std::uint8_t g_anims_asset[0x40]{};
@@ -383,6 +385,7 @@ void hook_post_base_499f80(void* arg) {
 void hook_post_base_56dcb0() { ++g_post_base_56dcb0; }
 void hook_post_base_5c64c0() { ++g_post_base_5c64c0; }
 void hook_post_base_1290() { ++g_post_base_1290; }
+void hook_post_base_56db70() { ++g_post_base_56db70; }
 
 void* loadp(const void* base, std::size_t off) {
     void* p = nullptr;
@@ -534,6 +537,7 @@ int main() {
     g_post_base_56dcb0 = 0;
     g_post_base_5c64c0 = 0;
     g_post_base_1290 = 0;
+    g_post_base_56db70 = 0;
     stack_guard_value_cell() = 0xC4A4A70000000001ULL;
     std::memset(g_shadow_asset, 0, sizeof(g_shadow_asset));
     std::memset(g_skels_asset, 0, sizeof(g_skels_asset));
@@ -646,12 +650,14 @@ int main() {
     pb5c.call_5c64c0 = hook_post_base_5c64c0;
     Init531d60PostBase1290Hooks pb1290{};
     pb1290.call_1290 = hook_post_base_1290;
+    Init531d60PostBase56db70Hooks pb56db{};
+    pb56db.call_56db70 = hook_post_base_56db70;
 
     const std::uint64_t allocs_before = heap.alloc_count;
     const auto t0 = std::chrono::steady_clock::now();
     const auto r = run_appmain_init_ctor_98a90_slice(table, front, app.data(), nullptr, eh, th, ch,
                                                      bh, setter.data(), 0, 0x11, 0x22, 0x33, sh, pb,
-                                                     pb56, pb5c, pb1290);
+                                                     pb56, pb5c, pb1290, pb56db);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
@@ -905,6 +911,10 @@ int main() {
     CHECK(r.post_base_1290.ok);
     CHECK(g_post_base_1290 == 1);
     CHECK(r.post_base_1290.call_1290_count == 1);
+    // E450: Init continue 0x56db70 call-site (ret-nop); stop before 0x5b3d00
+    CHECK(r.post_base_56db70.ok);
+    CHECK(g_post_base_56db70 == 1);
+    CHECK(r.post_base_56db70.call_56db70_count == 1);
     CHECK(r.remainder.trivial_ok);
     CHECK(r.remainder.registry.status == RegistryInit531d60Status::ok);
     CHECK(r.remainder.registry.entry_count == kInputTable551140Count);
@@ -927,13 +937,13 @@ int main() {
         "shadowstreams+streams_attach+shadowrandomevents+randomevents_attach+shadowbossmusic+"
         "bossmusic_attach+cp3characters+cp3characters_attach+cp3shadowprecache+"
         "cp3shadowprecache_attach+tail_140d90+stackchk+post_base_499f80+post_base_56dcb0+"
-        "post_base_5c64c0+post_base_1290+early+tail+base+trivial+registry "
+        "post_base_5c64c0+post_base_1290+post_base_56db70+early+tail+base+trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
         "anims=%p banks=%p streams=%p rand=%p boss=%p cp3=%p csp=%p post_hit=%d miss_null=%d "
         "marker=0x%x refc=%u fail=%d skels_refc=%u skels_fail=%d anims_refc=%u anims_fail=%d "
         "banks_refc=%u banks_fail=%d streams_refc=%u streams_fail=%d rand_refc=%u rand_fail=%d "
         "boss_refc=%u boss_fail=%d cp3_fail=%d csp_fail=%d t140=%d schk=%d pb499=%d pb56=%d "
-        "pb5c=%d pb1290=%d "
+        "pb5c=%d pb1290=%d pb56db=%d "
         "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
@@ -971,6 +981,7 @@ int main() {
         r.post_base_56dcb0.call_56dcb0_count,
         r.post_base_5c64c0.call_5c64c0_count,
         r.post_base_1290.call_1290_count,
+        r.post_base_56db70.call_56db70_count,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
