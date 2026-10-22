@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 04:37 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 04:41 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -23,12 +23,34 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `native/CMakeLists.txt:L418-L420`. The lower `align_up_64k` overflow case already exists in
   allocator-region tests. This fixture pins wrapper arithmetic only; it does not establish that
   the extreme input is a valid allocator request or reachable by game code.
-- Claim commit `9718f056d8851f27bf33586fad615ba3ddd8a5f5` is pushed and fetch-verified at 0/0
-  divergence; claim publication audits are in E324. Completion publication is pending. Only
-  user-owned `native/api/CMakeLists.txt` and `native/api/host/` remain unstaged and untouched.
+- Claim commit `9718f056d8851f27bf33586fad615ba3ddd8a5f5` and completion commit
+  `11c8e06db51cbfba8c4a13978793ef0f2e9792eb` are pushed and fetch-verified at 0/0 divergence;
+  claim/completion publication audits are in E324/E327. Only user-owned
+  `native/api/CMakeLists.txt` and `native/api/host/` remain unstaged and untouched.
 - Status is `FIXTURE_VERIFIED`: one successful implementation attempt, zero failed tries. Next
-  exact action: review and baseline the separate CPU-01 mixed math-constant guard-state candidate;
-  publish its claim before any source edit.
+  exact action: publish the separate CPU-01 mixed math-constant guard-state claim and baseline
+  before any source edit.
+
+## CPU-01 math-constant mixed guard-state fixture — claimed
+
+- `CPU-01-MATH-CONSTANTS-MIXED-GUARD-STATE-FIXTURE-01` is a proposed test-only fixture under
+  `CPU-01`. Root inspected the live `MathConstants` fields and initializer: eight value/guard
+  pairs; `once` branches on the low guard byte, preserving full value+guard on nonzero and setting
+  value plus guard `1` when zero; `xyz_mask_copy` is always rewritten.
+- Fresh root Debug/Ninja configure/build of `test_math_constants` passes; focused `math_constants`
+  CTest passes 1/1. Baseline hashes and logs are in E328; folder index is current at 42,926 and
+  Trail wiring graph is synchronized at 3,618 nodes / 1,240 files (E329).
+- Proposed scope is only `native/tests/test_math_constants.cpp`: use four fresh instances with
+  distinct sentinels and unique four-bit guard signatures `1..8`, so every pair exercises both
+  paths and any guard/value pairing swap changes at least one expected branch. Low-byte-zero
+  guards keep nonzero high bytes (`0x7f00`) to test the byte-only condition. Preserve checks also
+  assert the full nonzero guard word; every instance checks the always-written `xyz_mask_copy`.
+- Current registration is live at `native/CMakeLists.txt:L306-L308`; existing test coverage only
+  mixes `half` preservation and `pi` high-byte-only reset, not all eight pairs. This remains a
+  synthetic helper fixture and makes no constructor reachability or game-runtime claim.
+- Claim is documented but its commit is pending. Status `ACTIVE`, zero implementation attempts,
+  zero failed tries. Next exact action: publish this claim and baseline, then delegate only the
+  test-file change to `/root/next_fixture_scout_2` and independently replay it.
 
 ## CPU-01 store_zero32 adjacent-canary fixture — verified
 
