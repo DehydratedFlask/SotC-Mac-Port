@@ -93,6 +93,7 @@ add_library(sotc_core STATIC
   core/vslot_40_533100_shadowstreams.cpp
   core/vslot_40_533100_streams_attach.cpp
   core/vslot_40_533100_shadowrandomevents.cpp
+  core/vslot_40_533100_randomevents_attach.cpp
   core/ctor_98a90_3be050.cpp
   core/appmain_init_prologue_slice.cpp
   core/appmain_init_prologue_tail_slice.cpp
