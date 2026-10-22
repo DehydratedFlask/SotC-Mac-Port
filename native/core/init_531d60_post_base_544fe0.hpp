@@ -12,7 +12,7 @@
 //
 // Claimed: call-site control flow pin only.
 // NOT modelled: mov rbx,rax / mov rdi,rbx prep; 0x544fe0 body; following
-// cell-install / second 0x17070. PR #5 cite-only.
+// cell-install (claimed separately as E482) / second 0x17070. PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
