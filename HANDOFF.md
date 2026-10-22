@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 03:12 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 03:15 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -45,7 +45,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   decoder returns `wrong_value_type` after the kind switch; the enum comment calls this a writer
   error. This pins current synthetic decoder behavior only and makes no save-compatibility claim.
 - Claim commit `ff63a179c0c9000a6a9a71472741c5657ffee9ef` is pushed and fetch-verified at 0/0
-  divergence; publication hashes are in E298. Completion publication will be recorded in E300.
+  divergence; publication hashes are in E298. Completion commit
+  `141146e0b12fdd0f1150ab1f5e1d199c11ff033e` is pushed and fetch-verified at 0/0 divergence.
+  Pre/post explicit audits accepted 7 paths; full audits accepted 1,724 tracked paths. See E300.
+- Only the pre-existing user-owned `native/api/CMakeLists.txt` modification and untracked
+  `native/api/host/` remain in the worktree; neither was staged or included in the commit.
 - Next exact action: use the independent scout result to claim and baseline
   `SRV-01-ALLOCATOR-ALIGN64K-UINT32-WRAP-FIXTURE-01` before assigning its one-file test change.
 
