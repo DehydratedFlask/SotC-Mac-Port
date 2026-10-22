@@ -95,7 +95,7 @@ Vslot40_533100ShadowAttachResult vslot_40_533100_shadow_attach(
     }
     ++out.dtor_f590_count;
 
-    // shadowskels @ 0x533582 — NOT modelled
+    // shadowskels @ 0x533582 — see vslot_40_533100_shadowskels.*
     out.ok = (out.dtor_f590_count == 1) && (out.installed || prev == loaded);
     return out;
 }

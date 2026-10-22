@@ -1,11 +1,11 @@
 // Measured Init path: prologue early + tail using lifted 0x3be050 (header+0x3be930+ensure+
 // 0x80 grow+null-head list+tsc) + lifted 0x1ab550 (0x40 ctor) + debug gates 0x2552d4
 // → 0xf08 singleton install → base (lifted vslot 0x534130 + mid 0x255340 +
-// bounded 0x533100 header+post+miss+join+gfx+shadowmodels+attach+shadowskels)
-// → registry. Tip AllocatorFront+FakeHeap. PR #5 cite-only.
+// bounded 0x533100 header+post+miss+join+gfx+shadowmodels+attach+shadowskels+
+// skels-attach) → registry. Tip AllocatorFront+FakeHeap. PR #5 cite-only.
 // NOT modelled: ensure migrate / heavy menu helpers / 0xf8f860 PLT / non-null list;
 // PLT bodies 0xf901a0/0xf901c0; stack-chk; ba40 listener invoke; 0x533100 hit /
-// skels attach/success atexit; 0x14c2f0/0x6a5370/0x6abcc0/0x21620/0x2779a0/0x42390
+// success atexit/next path; 0x14c2f0/0x6a5370/0x6abcc0/0x21620/0x2779a0/0x42390
 // bodies; bodies of 0x523bd0 / 0x525b40 / 0x493230 / 0x525080 / 0x2569d0.
 #pragma once
 
@@ -44,6 +44,7 @@ struct AppmainInitCtor98a90SliceResult {
     Vslot40_533100ShadowResult vslot_40_shadow{};
     Vslot40_533100ShadowAttachResult vslot_40_shadow_attach{};
     Vslot40_533100ShadowskelsResult vslot_40_shadowskels{};
+    Vslot40_533100SkelsAttachResult vslot_40_skels_attach{};
     bool base_ok = false;
     std::uint32_t flag_after_base = 0;
     AppmainInitRemainderSliceResult remainder{};
