@@ -24,6 +24,7 @@
 #include "core/vslot_40_533100_post.hpp"
 #include "core/vslot_40_533100_shadow_attach.hpp"
 #include "core/vslot_40_533100_shadowmodels.hpp"
+#include "core/vslot_40_533100_shadowskels.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -109,7 +110,11 @@ int g_v40_14c2f0 = 0;
 int g_v40_shadow_load = 0;
 int g_v40_14ccc0 = 0;
 int g_v40_attach_f590 = 0;
+int g_v40_skels_notify = 0;
+int g_v40_skels_14c2f0 = 0;
+int g_v40_skels_load = 0;
 alignas(8) std::uint8_t g_shadow_asset[0x40]{};
+alignas(8) std::uint8_t g_skels_asset[0x40]{};
 
 void ctor_a30(void* obj) {
     ++g_ctor_a30;
@@ -169,6 +174,19 @@ void* hook_v40_shadow_load(void* out_slot, void*, void*) {
 }
 void hook_v40_14ccc0(void*) { ++g_v40_14ccc0; }
 void hook_v40_attach_f590(void*) { ++g_v40_attach_f590; }
+void hook_v40_skels_notify(void*) { ++g_v40_skels_notify; }
+void hook_v40_skels_14c2f0(void* dst, const char* path) {
+    ++g_v40_skels_14c2f0;
+    CHECK(path != nullptr);
+    CHECK(std::strcmp(path, kVslot40ShadowskelsPath) == 0);
+    std::memcpy(dst, &path, sizeof(void*));
+}
+void* hook_v40_skels_load(void* out_slot, void*, void*) {
+    ++g_v40_skels_load;
+    void* p = g_skels_asset;
+    std::memcpy(out_slot, &p, sizeof(void*));
+    return p;
+}
 
 void* loadp(const void* base, std::size_t off) {
     void* p = nullptr;
@@ -282,7 +300,9 @@ int main() {
     g_v40_6a5370 = g_v40_6abcc0 = 0;
     g_v40_14c2f0 = g_v40_shadow_load = 0;
     g_v40_14ccc0 = g_v40_attach_f590 = 0;
+    g_v40_skels_notify = g_v40_skels_14c2f0 = g_v40_skels_load = 0;
     std::memset(g_shadow_asset, 0, sizeof(g_shadow_asset));
+    std::memset(g_skels_asset, 0, sizeof(g_skels_asset));
     vslot40_shadow_loader_cell_2ee2cf8() = nullptr;
     ctor40_cell_2ee6778() = nullptr;
     singleton_f08_cell_2efc9e0() = nullptr;
@@ -330,6 +350,9 @@ int main() {
     bh.vslot_40_shadow_detail.load_vslot18 = hook_v40_shadow_load;
     bh.vslot_40_shadow_attach_detail.release_14ccc0 = hook_v40_14ccc0;
     bh.vslot_40_shadow_attach_detail.dtor_f590 = hook_v40_attach_f590;
+    bh.vslot_40_shadowskels_detail.notify_95580 = hook_v40_skels_notify;
+    bh.vslot_40_shadowskels_detail.path_14c2f0 = hook_v40_skels_14c2f0;
+    bh.vslot_40_shadowskels_detail.load_vslot18 = hook_v40_skels_load;
 
     SingletonF08Hooks sh{};
     sh.ctor_523bd0 = hook_f08_ctor;
@@ -424,6 +447,15 @@ int main() {
     CHECK(loadp(r.singleton.obj, 0) == g_shadow_asset);
     CHECK(g_v40_attach_f590 == 1);
     CHECK(g_v40_14ccc0 == 1);  // release loaded after install
+    // E428: shadowskels load-attempt (notify + path + vcall + 14ccb0)
+    CHECK(r.vslot_40_shadowskels.ok);
+    CHECK(g_v40_skels_notify == 1);
+    CHECK(g_v40_skels_14c2f0 == 1);
+    CHECK(g_v40_skels_load == 1);
+    CHECK(r.vslot_40_shadowskels.loaded == g_skels_asset);
+    CHECK(r.vslot_40_shadowskels.refcount_bumped);
+    CHECK(r.vslot_40_shadowskels.refcount_after == 1);
+    CHECK(r.vslot_40_shadowskels.f08 == r.singleton.obj);
     CHECK(g_move == 0);
     CHECK(g_nonnull == 0);
     CHECK(g_init_tb == 1);
@@ -446,19 +478,22 @@ int main() {
         "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+sub3be930+ensure3c2f70+"
         "buf80+null_list+tsc323d0+ctor40_1ab550+gates2552d4+singleton_f08+vslot534130+mid255340+"
         "vslot533100_header+post1fc80+miss_rfps+join_pos+gfx2ee2d00+shadowmodels+attach+"
-        "early+tail+base+trivial+registry ok nested=%p ensure=%p obj40=%p f08=%p v40=%p "
-        "pos=%p gfx=%p shadow=%p post_hit=%d miss_null=%d marker=0x%x refc=%u fail=%d "
+        "shadowskels+early+tail+base+trivial+registry ok nested=%p ensure=%p obj40=%p "
+        "f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p post_hit=%d miss_null=%d "
+        "marker=0x%x refc=%u fail=%d skels_refc=%u "
         "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
-        "vslot533100_hit/shadowskels/success_atexit/14c2f0_body/6a5370_body/6abcc0_body/"
+        "vslot533100_hit/skels_attach/success_atexit/14c2f0_body/6a5370_body/6abcc0_body/"
         "21620_body/2779a0_body/42390_body/525080_body/2569d0_body/26ea0/26b60/272d0/"
         "255f60/stackchk/ba40_listeners/plt/ctor523bd0_body/dtor525b40_body/"
         "ctor493230_body/ensure_migrate/nonnull=NOT_modelled pr5_heap_merge=GAP\n",
         r.ctor.nested_48, eb, r.tail.obj_40, r.singleton.obj, r.vslot_40.obj,
         r.vslot_40_join.pos_obj, r.vslot_40_gfx.obj, r.vslot_40_shadow.loaded,
+        r.vslot_40_shadowskels.loaded,
         r.vslot_40_post.lookup_hit ? 1 : 0, r.vslot_40_miss.find_null ? 1 : 0,
         r.vslot_40_gfx.marker_value, r.vslot_40_shadow.refcount_after,
         r.vslot_40_shadow_attach.took_fail_path ? 1 : 0,
+        r.vslot_40_shadowskels.refcount_after,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
