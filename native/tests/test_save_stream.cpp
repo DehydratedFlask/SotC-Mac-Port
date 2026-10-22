@@ -170,12 +170,13 @@ void test_duplicate_policy() {
     // Writer default allows duplicates and keeps order.
     sotc::SaveStreamWriter allow(1);
     CHECK_ERR(allow.append_chunk("flag", 4, B({1})), SaveStreamError::none);
-    CHECK_ERR(allow.append_chunk("FLAG", 4, B({2})), SaveStreamError::none);
+    CHECK_ERR(allow.append_chunk("FLAG", 8, B({2})), SaveStreamError::none);
     const Bytes img = allow.serialize();
     const auto r = parse(img);
     CHECK_ERR(r.error, SaveStreamError::none);
     CHECK(r.stream.chunks.size() == 2 && r.stream.chunks[0].payload == B({1}) &&
           r.stream.chunks[1].payload == B({2}));
+    CHECK(r.stream.chunks[0].tag == 4 && r.stream.chunks[1].tag == 8);
     CHECK(r.stream.find_first("flag")->payload == B({1}));   // first wins
     // Reader opt-in reject.
     CHECK_ERR(parse(img, DuplicatePolicy::reject).error, SaveStreamError::reader_duplicate_name);

@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 06:51 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 07:00 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,28 +8,25 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Current fixture claims — active
+## Current fixture publication — pending
 
-- `SAV-01-READER-DUPLICATE-NAME-CROSS-TAG-FIXTURE-01`, owned by `/root` with proposed worker
-  `/root/cpu_sav_fixture_scout_22`; the one-case change in
-  `native/tests/test_save_stream.cpp` changes the second same-name chunk tag from 4 to 8 and pins
-  that the reader's reject policy still rejects duplicate name hashes. Its [claim checkpoint](
-  docs/checkpoints/2026-10-22-root-sav01-reader-duplicate-cross-tag-claim.md) records baseline hashes,
-  exact commands, and the synthetic-only boundary.
-- `SAV-01-CHUNK-CODEC-READER-BORROWED-BYTES-VIEW-FIXTURE-01`, owned by `/root` with proposed worker
-  `/root/next_bounded_fixture_scout_22`; a case in `native/tests/test_save_chunk_codec.cpp` pins a
-  nonempty `PayloadReader::read_bytes` alias and cursor movement. Its [claim checkpoint](
-  docs/checkpoints/2026-10-22-root-sav01-reader-borrowed-bytes-view-claim.md) records baseline hashes,
-  exact commands, and the API-only boundary.
-- Both claims use baseline HEAD `34a10b530e4b5e03ad1798d7bb098690efed1b69`; each has zero
-  implementation attempts and zero failed tries. Their rows and claim checkpoints are published in
-  `b551555b13f141cbd2dd5fc812640bdbddd16792`. The workers have not been dispatched yet. Production
-  code, CMake, user-owned API/Graft paths, and game inputs are outside scope.
-- E368 records the worker/root pass for the preceding SRV-01 zero-request fixture and the review
-  caveat: byte preservation is asserted for the prefix and suffix around the documented raw span;
-  interior gaps are not all individually checked.
-- Exact next action: run index/Trail and path audits, publish the SRV-01 completion plus both SAV-01
-  claims, then dispatch the two independent test files.
+- `SAV-01-READER-DUPLICATE-NAME-CROSS-TAG-FIXTURE-01` and
+  `SAV-01-CHUNK-CODEC-READER-BORROWED-BYTES-VIEW-FIXTURE-01` have worker/root passes and independent
+  review; E372/E373 and their completion checkpoints record exact results. Only their separate test
+  files changed.
+- `SAV-01-NATIVE-STREAM-FILE-SYMLINK-SOURCE-READ-FIXTURE-01`, owned by `/root` with proposed worker
+  `/root/next_fixture_scout_20261022`, is the next one-file test claim. It reads a valid synthetic
+  stream through a symlink and checks the descriptor and payload. Its
+  [claim checkpoint](docs/checkpoints/2026-10-22-root-sav01-stream-symlink-source-read-claim.md)
+  records baseline hashes, commands, and the filesystem/API-only limit. It is not dispatched yet.
+- The symlink-source task uses baseline HEAD `460fc0a29f580cab9ca479ff8a658d191bec3370`; its
+  `test_save_stream_file.cpp` baseline hash is pinned in E374. Production code, CMake, user-owned
+  API/Graft paths, references, and game inputs are out of scope.
+- E371 and the [publication checkpoint](
+  docs/checkpoints/2026-10-22-root-srv01-completion-sav01-claims-publication.md) record publication
+  of the prior SRV-01 completion and two SAV-01 claims.
+- Exact next action: regenerate/check indexes, audit and publish both SAV-01 completions plus the
+  symlink-source-read claim, record the publication checkpoint, then dispatch that one-file change.
 
 ## CPU-01 normal-threshold infinity fixture — verified
 
