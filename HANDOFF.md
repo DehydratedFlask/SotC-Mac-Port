@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 12:30 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 12:05 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,32 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E422 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E423 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 App vslot `0x533100` miss path (`r_fps`)
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-VSLOT-40-533100-MISS-01` — lift OBS miss fragment (254 B) after
+  E422 `show_areaInfo` miss: `"r_fps"`; hook `0x21620`; call `0xba40` + `0xf590`×2;
+  stop at join `0x533305`. Prefer over hit (not taken on measured) and over
+  deepening already-hooked `0x525080`/`0x2569d0`. FakeHeap + tip AllocatorFront;
+  PR #5 cite-only.
+- Files: `native/core/vslot_40_533100_miss.{hpp,cpp}`; base_initialize wire;
+  `tools/lift/check_f533100_vslot40_miss.py`; checkpoint
+  `docs/checkpoints/2026-10-22-vslot-40-533100-miss.md`; EVIDENCE E423;
+  TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-vslot40-miss-20261022/` (manifest `202b5c21…` at tip
+  `4e6d86c`; capture `5c9d2654…`).
+- Observation: feat tip `4e6d86c`; measured post_hit=0 miss_null=1 + mid_reg=4 → 275
+  registry. `0x21620` body / hit / join+ NOT modelled.
+- Commands: `python3 -I tools/lift/check_f533100_vslot40_miss.py` OK;
+  `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: join+ `@0x533305`, or bounded `0x21620`/`0x525080`/`0x2569d0`.
+  Goal open.
 
 ## 2026-10-22 App vslot `0x533100` post-header + `0x1fc80`
 
