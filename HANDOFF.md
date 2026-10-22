@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 06:27 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 06:38 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -10,18 +10,29 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 
 ## Current fixture claim — active
 
-- `CPU-01-NORMAL-THRESHOLD-INFINITY-BOUNDARY-FIXTURE-01`, owned by `/root` and
-  `/root/next_fixture_scout_2`; the bounded change adds two assertions to
-  `native/tests/test_normal_threshold.cpp` for positive and negative infinite thresholds. Its
-  [claim checkpoint](docs/checkpoints/2026-10-22-root-cpu01-normal-threshold-infinity-claim.md)
-  records baseline hashes, exact commands, and the synthetic-only boundary.
-- Claim commit `bed80c340ac33a381ad4a30a98eeb44ba6adf8c6` is pushed and fetch-verified at 0/0
-  divergence; E361 and the [publication checkpoint](
-  docs/checkpoints/2026-10-22-root-sav01-completion-cpu01-claim-publication.md) record path audits
-  and the post-push result. Implementation has zero attempts and zero failed tries. No production
-  helper, CMake, unrelated user API, or game-input changes are in scope.
-- Exact next action: dispatch the two test assertions and focused `normal_threshold` build/CTest to
-  `/root/next_fixture_scout_2`; root will replay independently.
+- `SRV-01-F19E00-ZERO-REQUEST-PEAK-UPDATE-FIXTURE-01`, owned by `/root` with proposed worker
+  `/root/fixture_candidate_scout_c`; one test-only case in
+  `native/tests/test_arena_accounting.cpp` pins peak update when requested bytes are zero. The
+  [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-f19e00-zero-request-peak-claim.md)
+  records the baseline, exact commands, and synthetic-only limit.
+- The claim is awaiting publication; implementation has zero attempts and zero failed tries. No
+  production helper/header, CMake, unrelated user API, or game-input changes are in scope.
+- E366 records the first stale folder-index check and its recovery: serial regeneration/check passed
+  at 54,491 folders; Trail wiring check passed at 3,618 nodes / 1,240 files with the meaning tier
+  unbuilt. The audit logs and exact hashes are in the evidence row.
+- Exact next action: stage only allowlisted changes, run staged/full path audits, publish CPU-01
+  completion and the SRV-01 claim, record the post-push audit, then dispatch the isolated
+  `arena_accounting` test change.
+
+## CPU-01 normal-threshold infinity fixture — verified
+
+- `CPU-01-NORMAL-THRESHOLD-INFINITY-BOUNDARY-FIXTURE-01` is `FIXTURE_VERIFIED` after worker and
+  independent root Debug/Ninja builds both passed focused `normal_threshold` CTest 1/1 and the
+  read-only reviewer passed. Only `native/tests/test_normal_threshold.cpp` changed. E363 and the
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-cpu01-normal-threshold-infinity-complete.md)
+  record the commands, hashes, logs, and limits.
+- This observes synthetic comparison behavior only; no game reachability or gameplay behavior is
+  established.
 
 ## SAV-01 bad-magic zeroed-fields fixture — verified
 
@@ -108,6 +119,18 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   check and the successful serial regeneration/check recovery. No project source changed.
 - Exact next action: dispatch the two `normal_threshold` assertions and focused check to the worker;
   root will replay independently.
+
+## 2026-10-22 CPU-01 completion / SRV-01 claim checkpoint
+
+- CPU-01 normal-threshold infinity fixture passed worker/root focused builds and CTest, plus
+  independent read-only review. E363 and its completion checkpoint record exact results.
+- SRV-01 zero-request peak-update fixture claim is in E364 and its claim checkpoint. Implementation
+  must start only after the claim is published.
+- E365 records publication of the previous pre-dispatch update; it documents the first stale
+  folder-index check and serial recovery. E366 records the later stale check and successful serial
+  regeneration/check before this publication.
+- Exact next action: stage and audit the allowlisted CPU-01 completion and SRV-01 claim, publish both,
+  then record post-push verification before dispatching `arena_accounting`.
 
 ## DATA-02 pakN TOC payload-MD5 sample — verified
 
