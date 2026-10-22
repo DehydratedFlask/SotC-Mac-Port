@@ -4,14 +4,15 @@
 //   call 0x6abcc0(*cell)
 //   call 0x147e10(*cell, 0x2a2a2a2a)  // mov dword [rdi+0x40], esi; ret
 //   // stop before shadowmodels.crmp path @ 0x533435
+//   // (see vslot_40_533100_shadowmodels.*)
 //
 // Always-on after E424 join+. Prefer over deepen 0x2779a0 / 0x21620 /
 // 0x525080 / 0x2569d0 (already hooked, not next sequential edge) and over
 // empty-path migrate/non-null.
 //
 // Claimed: prelude control flow + cell pin + lifted 0x147e10 store.
-// NOT modelled: bodies of 0x6a5370 / 0x6abcc0; shadowmodels.crmp load /
-// vcall +0x18; shadowskels. PR #5 cite-only.
+// NOT modelled: bodies of 0x6a5370 / 0x6abcc0; shadowmodels load past end;
+// shadowskels. PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
