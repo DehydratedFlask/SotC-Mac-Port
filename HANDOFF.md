@@ -1,16 +1,35 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 ~09:10 CDT (America/Chicago). Latest integrator: orchestrator (Claude Sonnet 5.5); earlier integrator /root (Codex desktop task
-`01a15eab-88d5-7a83-a23b-cc55dc002eb6`). **START HERE:** [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md) (workflow, completed work, ranked next actions, risks). Previous transfer record:
-[docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
-older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
+Updated: 2026-10-22 08:55 CDT (America/Chicago). Latest Drive/slot-23: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc;
+integrator note still points at [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
+Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## 2026-10-22 Phase A — slot 23 registered (private fixture)
+
+- Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Attempt 1 — success.
+- Private fixture (gitignored): `local/fixtures/slot23_e71990_names.bin`; recipe-only
+  `docs/SLOT23_NAMES_FIXTURE.md` + `scripts/extract_slot23_names_fixture.py` (no strings published).
+- Native: `core/slot23_names_fixture.*`, `init_slot23_leaf_e71990` wired in `recovered_constructors()`;
+  missing/corrupt fixture → `StartupState::init_failed` (fail-visible).
+- Commands: `ctest --test-dir local/build/native -R '^(startup_ctors|slot23_names_fixture)$'` PASS;
+  `python3 -I tools/lift/check_ctor_slots.py` OK (120 pairs, slots 0–23 recovered, no nullptr);
+  `python3 -I tools/lift/check_fe71990.py` OK.
+- Observation: production first-null **no longer at 23** (no nullptr rows). Next production gap:
+  unregistered indices **24–47** (still ahead-table only).
+- Inference: not G1; goal incomplete. Prior bookkeeping `ce6fb0`/`ce67b0` already on
+  `origin/main` as `be05c4a`.
+- Next exact action: claim enabling 24–47 on the production table when contracts hold, or continue
+  helper/allocator edges from batch 7–8. No leaf-vec fan-out.
+
 ## 2026-10-22 orchestrator batch 8 — verified
 
-- SRV-01-ALLOCATOR-FRONT-PAGE-01 FIXTURE_VERIFIED (E391). **Concurrent-edit warning:** at ~08:48 another actor modified uncommitted `ROADMAP.md`, `native/core/startup_ctors.{cpp,hpp}` and `native/tests/test_startup_ctors.cpp` (wiring vec ce6fb0/ce67b0, slots 150/151) — not mine, left unstaged. With those edits plus the user's `native/api` changes, sanitized `sotc_core_api` aborts (UBSan bool load 255 in recursive_mutex.cpp); clean HEAD passes. Whoever owns the startup wiring should run it under `-DSOTC_SANITIZE=ON` before committing.
+- SRV-01-ALLOCATOR-FRONT-PAGE-01 FIXTURE_VERIFIED (E391). **Concurrent-edit note (resolved for
+  startup_ctors):** vec `ce6fb0`/`ce67b0` wiring landed as `be05c4a`; slot-23 registration follows
+  in this Phase A checkpoint. Sanitized full-suite status under peer `native/api` WIP remains a
+  separate concern.
 - CPU-01-INPUTTABLE-551140-ANALYSIS-01 (E391): store region of ctor `0x551140` is pinnable; first destructor-chain lift target is `0x14d2d0`.
 - Next exact action: byte-pin `0x55141d..0x557fe4` and emit the 275-entry table as generated data (callbacks null); lift `0x14d2d0`; app-main startup-chain analysis is pending from the appmain subagent.
 

@@ -13,12 +13,13 @@ int main() {
         st.scratch_slot = 5;
         st.flag32 = 0xA5A5A5A5u;
         auto r = run_constructors(recovered_constructors(), st);
-        // Slots 0-22 run (23 rows: 0-11, thunks 12-19, 20, 21, 22); slot 23 (RVA 0xe71990) is the first
-        // unrecovered slot and blocks visibly.
-        CHECK(!r.ok() && r.completed == 23 && r.blocked_on_rva == 0xe71990);
+        // Slot 23 is recovered via private name fixture; runner completes every registered row.
+        CHECK(r.ok() && r.completed == recovered_constructors().size() && r.blocked_on_rva == 0);
         CHECK(!r.callback_failed);
         CHECK(st.descriptor == &kClothingPreviewParamDescriptor);
         CHECK(st.descriptor_mutex_initialized && !st.init_failed);
+        CHECK(st.slot23_names.loaded);
+        CHECK(st.leaf_e71990.cells[8] == static_cast<std::uint8_t>(kLeafE71990Hash[0] & 0xff));
         CHECK(st.descriptor->object_size == ClothingPreviewParam::kObjectSize);
         // Slot 11 published its descriptor and mutex; the lazy schema stays unavailable.
         CHECK(st.physmesh_registration.published());
@@ -163,8 +164,7 @@ int main() {
         auto r = run_constructors(order, st);
         CHECK(!r.ok() && r.completed == 0 && r.callback_failed && r.blocked_on_rva == 0x111111);
     }
-    // Slots 11-22 are recovered; slot 23 is the explicit blocker (null callback) and the only null row
-    // before slot 48, so the runner cannot silently skip 23-47.
+    // Slots 0-23 are recovered (23 via private fixture). Indices 24-47 stay out of production.
     {
         const auto slots = recovered_constructors();
         bool saw11 = false, saw23 = false;
@@ -183,12 +183,21 @@ int main() {
             if (slot.original_index == 21) CHECK(slot.original_rva == 0xee1130 && slot.run != nullptr);
             if (slot.original_index == 23) {
                 saw23 = true;
-                CHECK(slot.original_rva == 0xe71990 && slot.run == nullptr);
+                CHECK(slot.original_rva == 0xe71990 && slot.run != nullptr);
             }
-            if (slot.original_index < 23) CHECK(slot.run != nullptr);   // no null row before the blocker
-            if (slot.original_index > 23 && slot.original_index < 48) CHECK(false);   // 24-47 not claimed
+            CHECK(slot.run != nullptr);  // production table has no explicit null rows
+            if (slot.original_index > 23 && slot.original_index < 48) CHECK(false);  // 24-47 not claimed
         }
         CHECK(saw11 && saw23 && seen_thunks == 8);
+    }
+    // Fail-visible when the private fixture cannot be resolved.
+    {
+        CHECK(setenv(kSlot23NamesFixtureEnv, "/no/such/slot23_fixture.bin", 1) == 0);
+        StartupState st;
+        auto r = run_constructors(recovered_constructors(), st);
+        CHECK(!r.ok() && r.callback_failed && r.blocked_on_rva == 0xe71990 && r.completed == 23);
+        CHECK(st.init_failed);
+        unsetenv(kSlot23NamesFixtureEnv);
     }
     const std::uint32_t expect[] = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 48, 49, 50, 51, 52, 53, 54, 56, 57, 58, 60, 61, 62,
