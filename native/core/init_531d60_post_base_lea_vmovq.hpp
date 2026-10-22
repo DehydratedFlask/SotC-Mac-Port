@@ -9,8 +9,7 @@
 // `0x499f80` / `0x140d90` / `0x14c2f0` / `0x6a5370`.
 //
 // Claimed: rbx cell-address pin + 8 B vmovq load from 0x15ffa38.
-// NOT modelled: stack object materialization; call 0x532ca0 / later units.
-// PR #5 cite-only.
+// NOT modelled: stack prep; call 0x532ca0 (E466). PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
