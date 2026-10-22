@@ -94,7 +94,7 @@ Vslot40_533100Cp3shadowprecacheAttachResult vslot_40_533100_cp3shadowprecache_at
     }
     ++out.dtor_f590_count;
 
-    // next @ 0x53403c (0x140d90 esi=9) — NOT modelled here
+    // next @ 0x53403c (0x140d90 esi=9) — see vslot_40_533100_tail_140d90.*
     out.ok = (out.dtor_f590_count == 1) && (out.installed || prev == loaded);
     return out;
 }

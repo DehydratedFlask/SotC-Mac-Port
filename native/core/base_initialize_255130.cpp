@@ -252,6 +252,15 @@ bool base_initialize_255130(void* self, void* arg,
         if (!cspar.ok) {
             return false;
         }
+        // E444: always-on 0x140d90 call-site (slot=self+0x3cc8, arg=9) + f590; stop before stackchk.
+        const Vslot40_533100Tail140d90Result t140 =
+            vslot_40_533100_tail_140d90(self, hooks.vslot_40_tail_140d90_detail);
+        if (hooks.vslot_40_tail_140d90_out != nullptr) {
+            *hooks.vslot_40_tail_140d90_out = t140;
+        }
+        if (!t140.ok) {
+            return false;
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true
