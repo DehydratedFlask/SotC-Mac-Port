@@ -27,7 +27,7 @@ or Metal gameplay is demonstrated.
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-56fad0-20261022/` (manifest
   `ba2fdb9a…` at tip `6f6820b`; capture `358b2a63…`).
-- Observation: feat tip `6f6820b`; measured `pb56fa=1` + mid_reg=4 → 275 registry.
+- Observation: feat tip `6f6820b`; docs tip `848f835`; measured `pb56fa=1` + mid_reg=4 → 275 registry.
   `0xf90310` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_56fad0.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
