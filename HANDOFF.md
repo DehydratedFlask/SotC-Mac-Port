@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 00:47 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 00:48 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -23,7 +23,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Both claims are `ACTIVE`, with zero failed implementation tries. No production code or game
   evidence changes. Exact next action: implement the two isolated assertions, run each focused
   Python suite, independently review both diffs, then record results and publish allowlisted files.
-  Leave the pending Mach-O CPU and PSARC negative-limit choices untouched.
+  Claim commit `93c693d211fadee9d16746f6be56ea5fca300bd1` is pushed and fetch-verified at 0/0;
+  staged/exact-path audits accepted 6 paths and full audit accepted 1,698. Leave the pending
+  Mach-O CPU and PSARC negative-limit choices untouched.
 
 ## SRV-01 arena high-water uint64 wrap fixture — verified
 
