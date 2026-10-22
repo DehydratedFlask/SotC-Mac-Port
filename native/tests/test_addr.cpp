@@ -24,6 +24,16 @@ int main() {
     CHECK(Tagged31{0xffffffff}.offset() == 0x7fffffffu && Tagged31{0xffffffff}.is_heap());
     CHECK(decode({0xffffffff}, heap)->value == heap.base + 0x7fffffff);
 
+    // The maximum 31-bit offset is valid at the top of a full 2 GiB heap window.
+    const std::uint64_t full_window_base = 0x4'0000'0000ull;
+    const auto full_window = HeapWindow::from_region(full_window_base, std::uint64_t{1} << 31);
+    CHECK(full_window.has_value());
+    Tagged31 max_retag_offset{0x7fffffffu};
+    CHECK(tag_if_in_heap(max_retag_offset, *full_window));
+    CHECK(max_retag_offset.raw == 0xffffffffu);
+    const auto max_retag_decoded = decode(max_retag_offset, *full_window);
+    CHECK(max_retag_decoded && max_retag_decoded->value == full_window_base + 0x7fffffffull);
+
     // Overflow: base near 2^64 is rejected rather than wrapped.
     const HeapWindow top{std::numeric_limits<std::uint64_t>::max() - 5, std::numeric_limits<std::uint64_t>::max()};
     CHECK(!decode({0x80000010}, top).has_value());
