@@ -46,7 +46,11 @@
   files; `trail build --check` passes at 3,618 nodes / 1,240 files. Combined log
   `local/validation/20261022-root-fixture-baselines/app01-srv01-claim-index-trail.log` SHA256
   `4290efc2b8ace98dfd871aed2bdca43cf65b63211257105b75183e331bcf4cd3`.
-- Next exact action: publish this completion with the region-split metadata claim using allowlisted
-  audits, then dispatch only the region-split test file.
+- Initial next action at completion time: publish this completion with the region-split metadata
+  claim using allowlisted audits, then dispatch only the region-split test file.
+- Publication: commit `6441c02473a6c64b14246075258bf7400f3ac2bc` pushed to `origin/main` with the
+  region-split claim. Staged/full audits accepted 7/1,719 paths; fresh fetch showed 0/0 divergence;
+  post-push explicit/full audits accepted 7/1,719. Audit log SHA256 values are recorded in E291.
+- Next exact action: proceed with the published region-split metadata fixture claim.
 - HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF, TASKS, EVIDENCE, and
   `docs/FOLDERS.md` are updated. No install occurred.
