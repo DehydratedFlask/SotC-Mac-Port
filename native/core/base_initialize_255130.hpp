@@ -24,6 +24,7 @@
 #include "vslot_40_533100_join.hpp"
 #include "vslot_40_533100_miss.hpp"
 #include "vslot_40_533100_post.hpp"
+#include "vslot_40_533100_shadow_attach.hpp"
 #include "vslot_40_533100_shadowmodels.hpp"
 #include "xchg_store_u32_357f0.hpp"
 
@@ -63,13 +64,15 @@ struct BaseInitialize255130Hooks {
     Vslot40_533100JoinHooks vslot_40_join_detail{};
     Vslot40_533100GfxHooks vslot_40_gfx_detail{};
     Vslot40_533100ShadowHooks vslot_40_shadow_detail{};
-    // Last header/post/miss/join/gfx/shadow results when lifted (for measured slices).
+    Vslot40_533100ShadowAttachHooks vslot_40_shadow_attach_detail{};
+    // Last header/post/miss/join/gfx/shadow/attach results when lifted.
     Vslot40_533100HeaderResult* vslot_40_out = nullptr;
     Vslot40_533100PostResult* vslot_40_post_out = nullptr;
     Vslot40_533100MissResult* vslot_40_miss_out = nullptr;
     Vslot40_533100JoinResult* vslot_40_join_out = nullptr;
     Vslot40_533100GfxResult* vslot_40_gfx_out = nullptr;
     Vslot40_533100ShadowResult* vslot_40_shadow_out = nullptr;
+    Vslot40_533100ShadowAttachResult* vslot_40_shadow_attach_out = nullptr;
 };
 
 // Process-wide cell modelling original qword @ 0x2ea4718 (points at flag object).
