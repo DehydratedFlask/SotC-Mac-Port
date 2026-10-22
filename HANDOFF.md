@@ -8,6 +8,12 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## 2026-10-22 orchestrator batch 5 — verified
+
+- CPU-01-GUARDED-STATIC-HELPERS-01: statics + ctors `0x78c760`, `0x268ce0` lifted; root 303/303 + checkers (E388).
+- CPU-01-HELPER-CONSUMER-ANALYSIS-01 (private findings, E388): next liftable leaf is `0x14ccb0` (5-byte atomic add-ref, 819 callers); `0x17070` is an allocator wrapper (needs contract, SRV-01 area); `0x14d880` is blocked on seven helpers. Hashed-name records are consumed via binary search of two sorted tables behind global `0x2efd160` (writer not found) — a hash-keyed registry; the name pointers themselves are never read.
+- Next exact action: lift `0x14ccb0`, then ctor `0xb25470` (400 x 0x118 stride) once `0x14d880` deps exist; find the writer of `0x2efd160`.
+
 ## 2026-10-22 orchestrator batch 4 — verified
 
 - CPU-01-FNV-HELPER-52A990-01: helper `0x52a990` and four ctors lifted; root replay 302/302 + five checkers (E387). Note the helper hashes sign-extended bytes, unlike `fnv1a32`; do not unify them.
