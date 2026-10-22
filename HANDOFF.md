@@ -1,14 +1,32 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 10:06 CDT (America/Chicago). Drive Init-hash:
-bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree):
-bc-492a8623-dec2-597e-8de6-73c00b0ad8a5 — owns `0x12820`/`0x12af0`/READY SRV; Drive keeps
+Updated: 2026-10-22 10:11 CDT (America/Chicago). Drive Init-hash:
+bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
+tip `4d7e484` / E403 cited only — Drive does not edit heap worktree. Drive keeps
 `startup_ctors.*` + Init-hash/FNV/registry exclusivity. Integrator note:
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
-authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404 — not PASSED); G2–G6 NOT RUN.
+No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
+or Metal gameplay is demonstrated.
+
+## 2026-10-22 G1 PARTIAL evidence pack (Phase C)
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-G1-PARTIAL-EVIDENCE-01` — honest PARTIAL pack; no G1 COMPLETE claim.
+- Files (published): `docs/checkpoints/2026-10-22-g1-partial-evidence-pack.md`,
+  `docs/VALIDATION.md`, `docs/EVIDENCE.md` E404, `docs/TASKS.md`, this HANDOFF.
+  Private (gitignored): `local/validation/g1-partial-20261022/` (`manifest.json`
+  sha256 `fc9ac668…`, `capture.py` `4bd5f180…`).
+- Observation: tip `148f8f5`; ARM64 Mach-O harness; ctest **13/13** PASS including
+  `startup_ctors` (contiguous **0–94** w/ former blocker slot **23**, gap **95** dormant,
+  **96–151**) + Init-hash registry suite; ELF checkers OK → **155** pairs; no guest runtime.
+- Inference: G1 **PARTIAL** only — unresolved edges listed in checkpoint (pools/listeners,
+  full Init, idx 95, cliff 152+, app-main slice, PR5 heap not in tip).
+- Commands: `python3 -I local/validation/g1-partial-20261022/capture.py` exit 0.
+- Next exact action: measured app-main startup slice wiring Init-hash/allocator depth, or a
+  named unresolved edge required for that slice. Goal remains open.
 
 ## 2026-10-22 Init `0x531d60` registry fragment
 
