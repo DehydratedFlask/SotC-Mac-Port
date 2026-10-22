@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 03:15 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 03:24 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -48,10 +48,30 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   divergence; publication hashes are in E298. Completion commit
   `141146e0b12fdd0f1150ab1f5e1d199c11ff033e` is pushed and fetch-verified at 0/0 divergence.
   Pre/post explicit audits accepted 7 paths; full audits accepted 1,724 tracked paths. See E300.
+- Documentation audit record commit `724995e513d0237d2eada3fdcb98df677f8889d5` is also pushed and
+  fetch-verified at 0/0 divergence; its explicit and full audits accepted 4/1,724 paths.
 - Only the pre-existing user-owned `native/api/CMakeLists.txt` modification and untracked
   `native/api/host/` remain in the worktree; neither was staged or included in the commit.
-- Next exact action: use the independent scout result to claim and baseline
-  `SRV-01-ALLOCATOR-ALIGN64K-UINT32-WRAP-FIXTURE-01` before assigning its one-file test change.
+- Next exact action: continue the active `SRV-01-ALLOCATOR-ALIGN64K-UINT32-WRAP-FIXTURE-01`
+  claim below after its publication checkpoint.
+
+## SRV-01 allocator 64 KiB alignment overflow fixture — active claim
+
+- `SRV-01-ALLOCATOR-ALIGN64K-UINT32-WRAP-FIXTURE-01` is a child of `SRV-01`. Proposed scope is
+  one synthetic assertion in `native/tests/test_allocator_region.cpp::main()`:
+  `CHECK(align_up_64k(0xffff0001u) == 0u);`. No implementation, header, or CMake change.
+- The root independently configured a fresh Debug/Ninja build, built `test_allocator_region`, and
+  ran focused `allocator_region` CTest: exit 0; 1/1 passed. Baseline file and log hashes are in
+  E301 and the [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-align64k-uint32-wrap-claim.md).
+- The live helper performs 32-bit addition of `0xffffu` before masking with `0xffff0000u`; the
+  input `0xffff0001u` wraps that addition to zero. Existing tests cover ordinary rounding values,
+  not this overflow boundary. Trail found the helper at `native/core/allocator_region.hpp:L50-L52`
+  and existing alignment checks in `test_allocator_region.cpp:L18-L22`.
+- This records synthetic integer arithmetic only, not allocator runtime behavior or game behavior.
+  The task is `ACTIVE`, with zero implementation attempts and zero failed tries. Worker
+  `/root/next_fixture_scout_3` has not edited the test file.
+- Next exact action: finish publishing the bounded claim, then assign `/root/next_fixture_scout_3`
+  only `native/tests/test_allocator_region.cpp`; root independently replay the focused test.
 
 ## SAV-01 stream-file symlink destination fixture — verified
 
