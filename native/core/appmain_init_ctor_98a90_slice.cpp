@@ -23,7 +23,8 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBaseF90310Hooks& post_base_f90310_hooks,
     const Init531d60PostBaseYmmBssCells& post_base_ymm_bss_cells,
     const Init531d60PostBaseYmmIntercellCells& post_base_ymm_intercell_cells,
-    const Init531d60PostBaseXmmSeedCells& post_base_xmm_seed_cells) {
+    const Init531d60PostBaseXmmSeedCells& post_base_xmm_seed_cells,
+    const Init531d60PostBaseYmmReloadCells& post_base_ymm_reload_cells) {
     AppmainInitCtor98a90SliceResult out{};
     out.early = run_prologue_255180_early(alloc, early_hooks);
     if (!out.early.ok) {
@@ -193,6 +194,11 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     // E459: always-on Init continue — xmm BSS seed; stop before ymm reload / 0x26800.
     out.post_base_xmm_seed = init_531d60_post_base_xmm_seed(post_base_xmm_seed_cells);
     if (!out.post_base_xmm_seed.ok) {
+        return out;
+    }
+    // E460: always-on Init continue — ymm reload→0x160433c; stop before 0x26800.
+    out.post_base_ymm_reload = init_531d60_post_base_ymm_reload(post_base_ymm_reload_cells);
+    if (!out.post_base_ymm_reload.ok) {
         return out;
     }
     out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,
