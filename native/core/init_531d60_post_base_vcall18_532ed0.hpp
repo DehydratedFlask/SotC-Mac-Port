@@ -12,8 +12,8 @@
 // `0x140d90` / `0x14c2f0` / `0x6a5370`.
 //
 // Claimed: first 0x532ed0-series virtual-call control flow pin only (slot +0x18).
-// NOT modelled: stack/vtable producers; callee body; later 0x532ed0 units.
-// PR #5 cite-only.
+// NOT modelled: stack/vtable producers; callee body; later 0x532ed0 units
+// (second claimed separately as E478). PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
