@@ -221,6 +221,17 @@ bool base_initialize_255130(void* self, void* arg,
         if (!cpr.ok) {
             return false;
         }
+        // E441: always-on cp3Characters attach (measured fail; install into self+0x3cb8).
+        const Vslot40_533100Cp3charactersAttachResult cpar =
+            vslot_40_533100_cp3characters_attach(
+                self, cpr.loaded, /*success_flag=*/false,
+                hooks.vslot_40_cp3characters_attach_detail);
+        if (hooks.vslot_40_cp3characters_attach_out != nullptr) {
+            *hooks.vslot_40_cp3characters_attach_out = cpar;
+        }
+        if (!cpar.ok) {
+            return false;
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true
