@@ -24,8 +24,24 @@
   `.ready` when the file is executable and this helper returns true. Current status is from live source
   and the synthetic test baseline, not a real core or runtime readiness claim.
 - Files changed at claim: `HANDOFF.md`, `docs/TASKS.md`, two prior completion checkpoints' next-action
-  lines, and this checkpoint. Implementation and test files remain unchanged. Pre-existing
-  `native/api/CMakeLists.txt` and `native/api/host/` changes remain untouched and unstaged.
+-  lines, generated `docs/FOLDERS.md`, and this checkpoint. Implementation and test files remain
+  unchanged. Pre-existing `native/api/CMakeLists.txt` and `native/api/host/` changes remain untouched
+  and unstaged.
+- `python3 scripts/project_index.py` exited 0 with 24,069 folders indexed; final
+  `python3 scripts/project_index.py --check` exited 0 and reported current. The first check exited 1
+  because its output file had been created after index generation; after precreating the remaining
+  validation logs, the index was rebuilt and the final check passed. Logs `project-index.log` and
+  `project-index-check.log` SHA256 `dffbd1538d12df0acff7deb7e09ce8c1a1359d884b71022b51b0a02165663891` and
+  `ec6b6843bb6af979604b7c5e26d68ccc0759932703529c9cc2264a34d5f121c1`.
+- `git diff --cached --check` exited 0 (empty-output SHA256
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). Staged path audit exited 0
+  for 6 allowed paths (SHA256 `c8a9dc01f50942efdc7b274c6d4b85d2241b72b1e40e792d18d98537d9b8d9ad`); full audit
+  exited 0 for 1,680 allowed paths (SHA256 `17afa14daa50a2815dd86b0b19b171ef9a637f3adee7a809ded0ffc4d77d6b18`).
+- Pre-commit `git fetch origin main` exited 0 and `git rev-list --left-right --count HEAD...origin/main`
+  returned `0 0`. Claim commit `daa92c26f8972cadbe9f97e39669577b4c8daf62` was pushed; post-push fetch
+  exited 0 and divergence remained `0 0`. Push/fetch/divergence/status logs are in
+  `local/validation/app01-systemchecks-arch/`. Post-push status shows only user-owned
+  `native/api/CMakeLists.txt` and untracked `native/api/host/`.
 - Remaining risks: rejecting 32-bit magic alone does not prove ARM64. A 64-bit x86 Mach-O may still
   pass, and FAT architecture slices are not examined. The native core remains a stub.
 - Next exact action: add a test for an executable synthetic i386 Mach-O header returning `.notBuilt`,
