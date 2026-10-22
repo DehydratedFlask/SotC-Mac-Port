@@ -865,6 +865,13 @@ void test_decode_by_spec_every_kind() {
         retag.tag = static_cast<std::uint16_t>(c.tag + 1);
         CHECK(decode_chunk_by_spec(retag, specs[i]).error == CodecError::tag_mismatch);
     }
+    const ChunkSpec unknown_kind_spec{
+        0xb009u, 13, static_cast<PayloadKind>(0xff), EnumSet::none, 0};
+    const SaveStreamChunk unknown_kind_chunk =
+        make_chunk(unknown_kind_spec.tag, B({0}), unknown_kind_spec.name_hash);
+    CHECK(decode_chunk_by_spec(unknown_kind_chunk, unknown_kind_spec).error ==
+          CodecError::wrong_value_type);
+
     // the progress count/array pair: array length follows the count chunk
     SaveStreamWriter w(kProgressDescriptorId);
     const auto& prog = progress_named_chunk_specs();
