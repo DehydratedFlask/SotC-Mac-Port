@@ -21,6 +21,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [PLATFORM](PLATFORM.md) | Native architecture and subsystem requirements; native-core owner |
 | [VALIDATION](VALIDATION.md) | Measurable gates, failures, real-game proof; validation owner |
 | [G1 PARTIAL pack (2026-10-22)](checkpoints/2026-10-22-g1-partial-evidence-pack.md) | Phase C evidence; G1 PARTIAL not PASSED; E404 |
+| [App-main Init registry slice (2026-10-22)](checkpoints/2026-10-22-appmain-init-registry-slice.md) | Measured Init-hash edge via tip AllocatorFront; PR5 merge gap; E405; G1 PARTIAL |
 | [FOLDERS](FOLDERS.md) | Generated public/source folder inventory; `scripts/project_index.py` |
 | [INSTALL_LOG](../INSTALL_LOG.md) | Existing and newly installed tools, downloads and removals |
 | [Checkpoint template](checkpoints/TEMPLATE.md) | Required record at each checkpoint |
