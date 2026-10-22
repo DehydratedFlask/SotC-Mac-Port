@@ -365,3 +365,34 @@ worker/root build products remain in the corresponding `local/build/native-worke
 `local/validation/sav01-reader-borrowed-bytes-20261022/`. These runs verify synthetic reader policy
 and borrowed-view behavior only; no real-save compatibility or game behavior is established. No
 removal boundary was created.
+## 2026-10-22 07:09 CDT — SAV-01 symlink-source reader fixture verification
+
+Existing CMake, Ninja, Apple clang, and macOS versions recorded in E325 were reused; no install,
+download, dependency, or system configuration change. Worker ran:
+`cmake -S native -B local/build/native-worker-sav01-stream-symlink-source-read-20261022 -G Ninja
+-DCMAKE_BUILD_TYPE=Debug`;
+`cmake --build local/build/native-worker-sav01-stream-symlink-source-read-20261022 --target
+test_save_stream_file`;
+`ctest --test-dir local/build/native-worker-sav01-stream-symlink-source-read-20261022
+--output-on-failure -R '^save_stream_file$'`.
+Independent root replay used the same three commands with build directory
+`local/build/native-root-sav01-stream-symlink-source-read-20261022`. All commands exited 0 and each
+focused CTest passed 1/1. Logs are in
+`local/validation/sav01-reader-stream-symlink-source-read-20261022/`; E377 records hashes. Purpose:
+verify synthetic symlink-source parsing and reader behavior only. Build products remain in the two
+exact build directories. No removal boundary was created.
+
+## 2026-10-22 07:09 CDT — CPU-01 trig-constants baseline
+
+Existing CMake, Ninja, and Apple clang recorded in E325 were reused; no install, download,
+dependency, or system configuration change. Commands:
+`cmake -S native -B local/build/native-root-cpu01-trig-preseed-baseline-20261022 -G Ninja
+-DCMAKE_BUILD_TYPE=Debug`;
+`cmake --build local/build/native-root-cpu01-trig-preseed-baseline-20261022 --target
+test_trig_constants`;
+`ctest --test-dir local/build/native-root-cpu01-trig-preseed-baseline-20261022 --output-on-failure
+-R '^trig_constants$'`.
+All exited 0; baseline CTest passed 1/1. Logs are in
+`local/validation/cpu01-trig-preseed-20261022/`. Purpose: establish the existing synthetic helper
+test passes before adding a stale-state initialization case. Build products remain in the exact
+`local/build/` directory. No removal boundary was created.
