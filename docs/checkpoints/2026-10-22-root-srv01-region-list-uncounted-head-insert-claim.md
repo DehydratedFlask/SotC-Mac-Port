@@ -30,15 +30,24 @@
   local/validation/20261022-root-fixture-baselines/srv01-region-list-uncounted-head-insert-claim-query.log,
   SHA256 afc7861dc9570715501506c2b6f9dc1a7f2c5d317f562a5cc70c0c311cdef7be.
 - Project index generation/check pass at 25,889 folders. Trail wiring check passes at 3,617
-  nodes / 1,240 files; the deep meaning layer remains unbuilt. Combined current task index/Trail
-  log: local/validation/20261022-root-fixture-baselines/root-app01-region-list-claim-index-trail.log,
-  SHA256 8eed81ce91f331fa08a549b220c61ed322a9474dd6382b8487b55653efd7a475.
+  nodes / 1,240 files; the deep meaning layer remains unbuilt. Current doc-sync index/Trail log:
+  local/validation/20261022-root-fixture-baselines/root-publication-doc-sync-index-trail.log,
+  SHA256 9f5c317f03cd86bacf5458bbc94306c7a5381b68245ea9061ebba6b6efd2bab1.
 - Candidate ID was absent from TASKS.md, EVIDENCE.md, and HANDOFF.md at claim time. Related
   empty-head insertion and uncounted-unlink fixtures are already verified.
 - Observation versus inference / limits: this is defensive synthetic intrusive-list coverage.
   It does not exercise allocator runtime or game behavior.
 - Cumulative failed tries and distinct hypotheses: zero implementation attempts / zero failed tries.
 - Remaining risks / blockers: none for the bounded assertion.
-- Exact next action: publish this claim with staged/full audits, then delegate only
-  native/tests/test_region_list.cpp to /root/next_fixture_scout_2 for the one case plus targeted
-  build/CTest. Root will independently review and replay the result.
+- Claim publication: commit 57ec40a42f5be178375b7b40e73dd8ca9c74ae4e pushed. Staged/full
+  audits accepted 10/1,715 paths; post-push fetch showed 0/0 divergence and explicit/full audits
+  accepted 10/1,715. Summary log:
+  local/validation/20261022-root-fixture-baselines/app01-zero-fallback-region-list-publication.log
+  (SHA256 0f34761ffc7eaf289f6eb3d1bb5d64f6c5a7c28783105137c0e3b474886e22f1); full verification
+  log: local/validation/20261022-root-fixture-baselines/post-push-57ec40a-verification.log
+  (SHA256 70ca84ac33dc4816996cd0e7545093b2a08cd731fbfeabd339a13df485f73241).
+- Exact next action: delegate only native/tests/test_region_list.cpp to /root/next_fixture_scout_2
+  for the one synthetic case plus targeted build/CTest. Root will independently review and replay.
+- Publication metadata checkpoint: 2026-10-22 02:10 CDT (America/Chicago), /root. The pushed
+  claim has been reconciled in HANDOFF.md, TASKS.md, and EVIDENCE.md; no source file changed.
+  These local documentation changes are ready for staged/full audits and push before delegation.
