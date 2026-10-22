@@ -1,0 +1,57 @@
+// App vslot `0x533100` shadowskels attach OBS `0x5335e1..0x5336f7` (278 B):
+//   cmp success-flag [out+8]; je fail → r12=0  (measured default)
+//   // success path (atexit/tag) NOT modelled when flag false
+//   join @ 0x53365e: install loaded into *[f08+0x10] (replace + refcount)
+//   flag byte at f08+0x18; optional notify if success; release temps; 0xf590
+//   // stop before next path @ 0x5336f7
+//
+// Always-on after E428 shadowskels load-attempt. Prefer over success atexit
+// (flag-true only) and over deepen 0x14c2f0 / 0x6a5370 (already hooked).
+// Prefer over empty-path migrate/non-null.
+//
+// Claimed: fail-path + always-on install/cleanup control flow into f08+0x10.
+// NOT modelled: success atexit cluster (0xf8f3d0/0xf730/0x14c4a0/…);
+// bodies of 0x14d880/0x14d2d0/0x14ccc0/0x95580; next path past end. PR #5 cite-only.
+#pragma once
+
+#include <cstddef>
+#include <cstdint>
+
+namespace sotc {
+
+inline constexpr std::uint64_t kVslot40533100SkelsAttachRva = 0x5335e1;
+inline constexpr std::size_t kVslot40533100SkelsAttachSize = 278;
+inline constexpr std::uint64_t kVslot40SkelsAttachEndRva = 0x5336f7;
+inline constexpr std::uint64_t kVslot40SkelsAttachSlotOff = 0x10;  // *[f08+0x10]
+inline constexpr std::uint64_t kVslot40SkelsAttachFlagOff = 0x18;  // byte [f08+0x18]
+
+struct Vslot40_533100SkelsAttachHooks {
+    // Models 0x14d880() → sentinel / empty marker. Null → nullptr.
+    void* (*sentinel_14d880)() = nullptr;
+    // Models 0x14ccc0(obj) release. Null → no-op.
+    void (*release_14ccc0)(void* obj) = nullptr;
+    // Models 0x14d2d0(obj) strong release. Null → no-op.
+    void (*release_14d2d0)(void* obj) = nullptr;
+    // Models 0x95580(f08+0x10) notify on success path. Null → no-op.
+    void (*notify_95580)(void* slot_obj) = nullptr;
+    // Models 0xf590 path dtor. Null → no-op.
+    void (*dtor_f590)(void* obj) = nullptr;
+};
+
+struct Vslot40_533100SkelsAttachResult {
+    bool ok = false;
+    bool took_fail_path = false;  // measured default
+    bool installed = false;
+    void* prev_slot = nullptr;
+    void* slot_after = nullptr;
+    int release_14ccc0_count = 0;
+    int dtor_f590_count = 0;
+};
+
+// Models attach from success-flag through cleanup. Stops before next path.
+// `loaded` from E428; `success_flag` false on measured path.
+[[nodiscard]] Vslot40_533100SkelsAttachResult vslot_40_533100_skels_attach(
+    void* loaded, bool success_flag,
+    const Vslot40_533100SkelsAttachHooks& hooks = {}) noexcept;
+
+}  // namespace sotc

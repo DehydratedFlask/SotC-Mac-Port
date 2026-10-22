@@ -85,6 +85,7 @@ add_library(sotc_core STATIC
   core/vslot_40_533100_shadowmodels.cpp
   core/vslot_40_533100_shadow_attach.cpp
   core/vslot_40_533100_shadowskels.cpp
+  core/vslot_40_533100_skels_attach.cpp
   core/ctor_98a90_3be050.cpp
   core/appmain_init_prologue_slice.cpp
   core/appmain_init_prologue_tail_slice.cpp
