@@ -1,12 +1,29 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 01:31 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 01:36 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## SAV-01 stream-file symlink destination fixture — active claim
+
+- `SAV-01-NATIVE-STREAM-FILE-SYMLINK-DESTINATION-FIXTURE-01` is claimed under verified parent
+  `SAV-01-NATIVE-STREAM-01`. Scope is one synthetic test in
+  `native/tests/test_save_stream_file.cpp`: point the destination symlink at a sentinel, write a
+  synthetic stream with `write_file_atomic`, then assert the destination entry is a regular file
+  containing the new stream, the referent retains its original bytes, and `.tmp` is absent. No
+  production code change is planned. The test checks current same-volume `rename` behavior only;
+  it makes no real-save compatibility or power-loss durability claim.
+- Baseline target build and focused `save_stream_file` CTest pass. Logs and hashes are in E276 and
+  [claim checkpoint](docs/checkpoints/2026-10-22-root-sav01-native-stream-file-symlink-claim.md).
+  Status is `ACTIVE`; implementation attempts: 0. After the claim publication, delegate the
+  one-file test to `/root/next_fixture_scout_2`, then review and replay it at root.
+- Next independent candidate to evaluate after this task: the scout-proposed
+  `SRV-01-HOST-MAP-EMPTY-NULL-NONZERO-SIZE-FIXTURE-01`, limited to a synthetic accessor assertion
+  in `native/tests/test_host_map.cpp`. Do not combine it with this save-stream task.
 
 ## RE-01 identity sidecar symlink alias fixture — verified
 
@@ -41,11 +58,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   post-push full audit accepted 1,706 paths. Publication log SHA256 is recorded in E271. This is
   synthetic classifier behavior only; it establishes no asset parsing, codec identity, archive
   interpretation, or game playback.
-- Read-only scout `/root/next_fixture_scout_2` proposed
-  `SAV-01-NATIVE-STREAM-FILE-SYMLINK-DESTINATION-FIXTURE-01` under `SAV-01-NATIVE-STREAM-01` for
-  one test in `native/tests/test_save_stream_file.cpp`. Exact next action: verify current task
-  uniqueness, parent/spec, implementation, and test target, then claim the one-file synthetic
-  fixture if still applicable. Keep pending Mach-O CPU and PSARC policy choices untouched.
+- Keep pending Mach-O CPU and PSARC policy choices untouched.
 
 ## RE-02 dynamic-link image file-offset bounds fixture — verified
 
