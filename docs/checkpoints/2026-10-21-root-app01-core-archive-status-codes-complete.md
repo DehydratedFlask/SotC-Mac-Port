@@ -46,6 +46,10 @@
 - `git diff --cached --check` exited 0; empty output SHA256 is recorded at
   `local/validation/app01-core-archive-status-codes/diff-check.log`, SHA256
   `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+- Claim commit `ee7e7a906450ecf75e328d6d00c2ea4feeb1a44c` and completion commit
+  `45d0656b59a07a8595c9886f0cbe432230e82914` were pushed to `origin/main` and fetch-verified with
+  `HEAD == origin/main` and 0/0 divergence. User-owned `native/api/CMakeLists.txt` and
+  `native/api/host/` changes remained untouched and unstaged.
 - Remaining risks: the native implementation remains an incomplete stub, and no live ABI, filesystem,
   game-readiness, UI, runtime, or game behavior is demonstrated.
 - Next exact action: claim and complete another independent bounded task outside PSARC and these
