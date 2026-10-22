@@ -9,8 +9,8 @@
 // `0x14c2f0` / `0x6a5370`.
 //
 // Claimed: r13 cell-address pin for 0x32f4fe0.
-// NOT modelled: mov rdi,[r13]; call 0xa2caf0 body; following stack prep.
-// PR #5 cite-only.
+// NOT modelled: mov rdi,[r13]; call 0xa2caf0 (call-site claimed separately
+// as E488; body still demoted); following stack prep. PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
