@@ -90,7 +90,7 @@ Vslot40_533100RandomeventsAttachResult vslot_40_533100_randomevents_attach(
     }
     ++out.dtor_f590_count;
 
-    // next path @ 0x533cdb — NOT modelled
+    // shadowbossmusic @ 0x533cdb — NOT modelled here
     out.ok = (out.dtor_f590_count == 1) && (out.installed || prev == loaded);
     return out;
 }
