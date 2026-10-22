@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 11:08 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 11:13 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,27 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E414 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E415 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 sub-init `0x3be930` (on `0x3be050` path)
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-INIT-SUB-3BE930-01` — lift 826 B orchestrator + leaves `0x1d9c0`/`0xf180`
+  (0x98-stride banks at obj+0x68); host stand-in for lea `0x2dd9f78`. Prefer over
+  `0x1ab550` / debug gates / vslot / `0xf08`. FakeHeap + tip AllocatorFront; PR #5 cite-only.
+- Files: `native/core/init_sub_3be930.{hpp,cpp}`; ctor wire; `tools/lift/check_f3be930_sub.py`;
+  checkpoint `docs/checkpoints/2026-10-22-init-sub-3be930.md`; EVIDENCE E415;
+  TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-ctor-98a90-sub3be930-20261022/` (manifest `e7082f3f…`).
+- Observation: ELF pins loops/stride/leaves; measured first-slot vtable = stand-in → 275 registry.
+  Ensure migrate / non-null list / `0x1ab550` NOT modelled.
+- Commands: `python3 -I tools/lift/check_f3be930_sub.py` OK;
+  `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: `0x1ab550`, or debug gates after `0x2552cd`, or vslot / `0xf08`. Goal open.
 
 ## 2026-10-22 ensure `0x3c2f70` empty path
 

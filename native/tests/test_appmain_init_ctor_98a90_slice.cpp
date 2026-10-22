@@ -11,6 +11,7 @@
 #include "core/appmain_init_ctor_98a90_slice.hpp"
 #include "core/ctor_98a90_3be050.hpp"
 #include "core/ensure_capacity_3c2f70.hpp"
+#include "core/init_sub_3be930.hpp"
 #include "core/input_table_551140.hpp"
 #include "core/inputtable_names_fixture.hpp"
 #include "core/prologue_255180.hpp"
@@ -69,7 +70,6 @@ struct FakeHeap : IAllocator {
     std::uint64_t bytes = 0;
 };
 
-int g_3be930 = 0;
 int g_nonnull = 0;
 int g_f590 = 0;
 int g_init_tb = 0;
@@ -94,7 +94,6 @@ void ctor_40(void* obj) {
 void dtor_early(void*) { ++g_dtor_early; }
 void dtor_98a90(void*) { ++g_dtor_98a90; }
 void dtor_3b40(void*) { ++g_dtor_3b40; }
-void hook_3be930(void*) { ++g_3be930; }
 void hook_nonnull(void*, void*) { ++g_nonnull; }
 void hook_f590(void*) { ++g_f590; }
 void hook_move(void*, void*) { ++g_move; }
@@ -126,14 +125,30 @@ void reset_cells() {
 }  // namespace
 
 int main() {
+    CHECK(kInitSub3be930Size == 826);
+    CHECK(kInitBlock1d9c0Size == 73);
+    CHECK(kInitSlotF180Size == 28);
     CHECK(kEnsureCapacity3c2f70Size == 313);
-    CHECK(kEnsure3c2f70ElemBytes == 0xa8);
     CHECK(ensure_3c2f70_elem_count(0, 0xa800) == 0x100);
 
     AllocatorFront front;
     FakeHeap heap(front.owners(), 2);
     CHECK(front.set_heap(1, &heap));
     CHECK(front.set_heap(2, &heap));
+
+    // Unit: sub-init 0x3be930 alone.
+    {
+        std::vector<std::uint8_t> region(0x98a28, 0xA5);
+        init_sub_3be930(region.data());
+        CHECK(region[0] == 0);
+        void* vt = loadp(region.data(), 0x18);
+        CHECK(vt == slot_vtable_2dd9f78());
+        std::uint32_t tail_d = 0;
+        std::memcpy(&tail_d, region.data() + 0x98a10, 4);
+        CHECK(tail_d == 0);
+        void* mid = loadp(region.data(), 0x10 + 0x30);
+        CHECK(mid == region.data() + 0x10 + 0x58);
+    }
 
     // Unit: ensure empty path alone.
     {
@@ -161,13 +176,13 @@ int main() {
         reset_cells();
         std::vector<std::uint8_t> obj(kPrologue98a90Bytes, 0);
         Ctor98a90_3be050Hooks ch{};
-        ch.sub_3be930 = hook_3be930;
         ch.tsc_detail.init_timebase_f8f860 = hook_init_tb;
         ch.ensure_detail.elem_move_1da30 = hook_move;
         ch.elem_dtor_f590 = hook_f590;
-        g_3be930 = g_init_tb = g_move = g_f590 = 0;
+        g_init_tb = g_move = g_f590 = 0;
         const auto cr = init_98a90_3be050(front, obj.data(), ch);
         CHECK(cr.ok);
+        CHECK(cr.sub_3be930_ok);
         CHECK(cr.ensure_called);
         CHECK(cr.ensure_allocated);
         CHECK(cr.ensure_buf != nullptr);
@@ -194,7 +209,7 @@ int main() {
     std::memset(setter.data(), 0xCC, setter.size());
 
     g_ctor_a30 = g_ctor_40 = g_dtor_98a90 = g_dtor_3b40 = g_dtor_early = 0;
-    g_3be930 = g_nonnull = g_f590 = g_init_tb = g_move = g_v30 = g_mid = g_v40 = 0;
+    g_nonnull = g_f590 = g_init_tb = g_move = g_v30 = g_mid = g_v40 = 0;
 
     Prologue255180Hooks eh{};
     eh.ctor_a30_264e50 = ctor_a30;
@@ -206,11 +221,11 @@ int main() {
     th.dtor_vslot08_3b40 = dtor_3b40;
 
     Ctor98a90_3be050Hooks ch{};
-    ch.sub_3be930 = hook_3be930;
     ch.elem_dtor_f590 = hook_f590;
     ch.list_walk_nonnull_body = hook_nonnull;
     ch.tsc_detail.init_timebase_f8f860 = hook_init_tb;
     ch.ensure_detail.elem_move_1da30 = hook_move;
+    // sub_3be930 override null → lifted init_sub_3be930
 
     BaseInitialize255130Hooks bh{};
     bh.vslot_30 = hook_v30;
@@ -228,12 +243,12 @@ int main() {
     CHECK(r.early.ok);
     CHECK(r.tail.ok);
     CHECK(r.ctor.ok);
+    CHECK(r.ctor.sub_3be930_ok);
     CHECK(r.ctor.ensure_allocated);
     CHECK(r.ctor.tsc_stored);
     CHECK(r.ctor.list_walk_skipped_null);
     CHECK(g_move == 0);
     CHECK(g_nonnull == 0);
-    CHECK(g_3be930 == 1);
     CHECK(g_init_tb == 1);
     CHECK(g_ctor_40 == 1);
     CHECK(r.base_ok);
@@ -249,11 +264,11 @@ int main() {
     CHECK(static_cast<std::uint8_t*>(ec) == static_cast<std::uint8_t*>(eb) + 0xa800);
 
     std::printf(
-        "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+ensure3c2f70+buf80+"
-        "null_list+tsc323d0+early+tail+base+trivial+registry ok nested=%p ensure=%p "
+        "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+sub3be930+ensure3c2f70+"
+        "buf80+null_list+tsc323d0+early+tail+base+trivial+registry ok nested=%p ensure=%p "
         "tsc=0x%llx entries=%u alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
-        "ensure_migrate/0x3be930/f590/nonnull=NOT_modelled pr5_heap_merge=GAP\n",
+        "ensure_migrate/f590/nonnull=NOT_modelled pr5_heap_merge=GAP\n",
         r.ctor.nested_48, eb, static_cast<unsigned long long>(r.ctor.tsc_value),
         r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),

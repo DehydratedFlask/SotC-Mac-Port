@@ -2,22 +2,21 @@
 //
 // Full OBS body: 0x3be050..0x3be2c2 (627 B; sha f186db1c…). Next symbol at 0x3be2d0.
 //
-// Lifted (tip AllocatorFront):
+// Lifted (tip AllocatorFront where allocs apply):
 //   Header OBS 0x3be050..0x3be0b6 (102 B): nested 0x48 sentinel + field zeros.
-//   Ensure 0x3c2f70(obj+0x20, 0x100) when capacity elems <=0xff (lifted empty path).
-//   Buffer grow OBS 0x3be0f8..0x3be1cb: 0x80 vec at +0x48/+0x50/+0x58.
-//   List-walk head: cells 0x2ef63f8 / 0x2ef6400; null → skip body.
-//   TSC leaf 0x323d0 at obj+0x98a88 (host mach_absolute_time).
+//   Sub-init 0x3be930(obj+0x68) — packed 0x98-stride 0x1d9c0/0xf180 inits.
+//   Ensure 0x3c2f70(obj+0x20, 0x100) empty path; 0x80 grow; null-head list; tsc 0x323d0.
 //
 // Hooks (bodies NOT modelled):
-//   0x3be930(obj+0x68); ensure migrate (0x1da30/0x170c0); 0xf590; 0xf8f860 PLT;
-//   non-null list body.
+//   ensure migrate (0x1da30/0x170c0); 0xf590; 0xf8f860 PLT; non-null list body.
 //
-// Prefer ensure 0x3c2f70 over 0x3be930 (826 B). No leaf-vec; not idx 95; PR #5 cite-only.
+// Prefer 0x3be930 over 0x1ab550 / debug gates / vslot / 0xf08. No leaf-vec; not idx 95;
+// PR #5 cite-only.
 #pragma once
 
 #include "allocator_front.hpp"
 #include "ensure_capacity_3c2f70.hpp"
+#include "init_sub_3be930.hpp"
 #include "store_tsc_323d0.hpp"
 
 #include <cstddef>
@@ -42,10 +41,10 @@ inline constexpr std::uint64_t kCtor98a90SelfCellRva = 0x2ef63f8;
 inline constexpr std::uint64_t kCtor98a90ListHeadCellRva = 0x2ef6400;
 
 struct Ctor98a90_3be050Hooks {
+    // If non-null, replaces lifted init_sub_3be930.
     void (*sub_3be930)(void* at_plus_68) = nullptr;
     void (*store_tsc_323d0)(void* at_plus_98a88) = nullptr;
     StoreTsc323d0Hooks tsc_detail{};
-    // If non-null, replaces lifted ensure_capacity_3c2f70.
     void (*ensure_3c2f70)(void* at_plus_20, std::uint32_t n) = nullptr;
     EnsureCapacity3c2f70Hooks ensure_detail{};
     void (*elem_dtor_f590)(void* elem) = nullptr;
@@ -55,6 +54,7 @@ struct Ctor98a90_3be050Hooks {
 struct Ctor98a90_3be050Result {
     bool ok = false;
     void* nested_48 = nullptr;
+    bool sub_3be930_ok = false;
     bool ensure_called = false;
     bool ensure_allocated = false;
     void* ensure_buf = nullptr;
