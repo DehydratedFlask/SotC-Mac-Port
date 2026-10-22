@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 05:26 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 05:27 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -22,6 +22,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `local/validation/data02-pakn-toc-payload-md5-sample-01/selection-baseline.log` and E340.
   Root's live full-file SHA-256 reread passed at 12,838,532,222 bytes and matched the ASSETS
   summary: `559f7a3fa66bc652d36c5f1a885b351e4aeb17dadbba06a0006520bfd325be73` (E340).
+- Claim commit `85ad661baa087297743fdb0a3b0482c80c636961` is pushed to `origin/main` and fetch-
+  verified at 0/0 divergence. Pre-push audits accepted 5 staged / 1,740 full paths; post-push full
+  audit accepted 1,740 paths. E341 records the publication logs. Only user API edits and Graft
+  telemetry cache files remain outside the published scope.
 - No member payload comparison has run yet. Exact next action: create a private deterministic
   checker that reads all 17 complete decoded members, compares payload MD5 to the TOC value, binds
   the report to the archive/manifests, and repeats the aggregate run byte-for-byte. Keep all
