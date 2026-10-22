@@ -35,8 +35,11 @@
 - Attempt count: one successful test-only implementation attempt; 0 failed tries.
 - Claim publication: commit `6cd08912d27d88f3bf4a4c9690043678c70e8ab3` was pushed and fetch-verified
   at 0/0 divergence. Staged/full audits accepted 5/1,707 paths. See E273.
-- Completion publication: pending in this checkpoint; the fixture and evidence are ready for
-  allowlisted audit, commit, and push. Documentation sync will record post-push evidence.
+- Completion commit `0aee49f185e8162fda021f74fc4b48dc742ffd35` was pushed to `origin/main`. Staged
+  audit accepted 6 paths and full audit accepted 1,708. Fresh fetch/divergence returned 0/0 and
+  post-push full audit accepted 1,708. Publication output is retained in
+  `local/validation/20261022-root-fixture-baselines/re01-sidecar-symlink-complete-publication.log`,
+  SHA-256 `8d1bd393a6f8f77ad66b19dd339f63381ce7ee58017b11e1ecb5e3eee11a7f0c`.
 - Existing user-owned `native/api/CMakeLists.txt` and `native/api/host/` remain untouched and outside
   this task.
 - Remaining risks: local symlink support is verified in this environment; no game files or runtime
