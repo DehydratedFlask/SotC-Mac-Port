@@ -1537,4 +1537,8 @@ add_executable(test_allocator_bootstrap tests/test_allocator_bootstrap.cpp)
 target_link_libraries(test_allocator_bootstrap sotc_core)
 add_test(NAME allocator_bootstrap COMMAND test_allocator_bootstrap)
 
+add_executable(test_allocator_lazy_latch tests/test_allocator_lazy_latch.cpp)
+target_link_libraries(test_allocator_lazy_latch sotc_core)
+add_test(NAME allocator_lazy_latch COMMAND test_allocator_lazy_latch)
+
 add_subdirectory(api)
