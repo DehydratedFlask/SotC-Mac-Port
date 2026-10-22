@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 14:00 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 14:05 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,32 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E444 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E445 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 App vslot `0x533100` stack-check + success epilogue
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-VSLOT-40-533100-STACKCHK-01` — lift OBS stack-check (34 B) at
+  `0x534052`: guard cell `0x15fe518`; compare saved vs live; success through
+  `ret`; stop before `0xf8f3a0` @ `0x534074`. Prefer always-on continue after
+  E444 over full `0x140d90` body / deepen `0x14c2f0`/`0x6a5370`. FakeHeap + tip
+  AllocatorFront; PR #5 cite-only.
+- Files: `native/core/vslot_40_533100_stackchk.{hpp,cpp}`; base_initialize wire;
+  `tools/lift/check_f533100_vslot40_stackchk.py`; checkpoint
+  `docs/checkpoints/2026-10-22-vslot-40-533100-stackchk.md`; EVIDENCE E445;
+  TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-vslot40-stackchk-20261022/` (manifest
+  `d660d3ed…` at tip `15cfef7`; capture `ce91b016…`).
+- Observation: feat tip `15cfef7`; measured `schk=1` + mid_reg=4 → 275 registry.
+  Completes measured `0x533100` body. `0xf8f3a0` / `0x140d90` bodies NOT modelled.
+- Commands: `python3 -I tools/lift/check_f533100_vslot40_stackchk.py` OK;
+  `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: bounded `0x140d90` / `0x14c2f0` / `0x6a5370`, or next Init
+  edge outside completed `0x533100` body. Goal open.
 
 ## 2026-10-22 App vslot `0x533100` tail `0x140d90` call-site
 
