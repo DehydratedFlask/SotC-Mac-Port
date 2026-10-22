@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 01:18 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 01:20 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -19,10 +19,17 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Status `FIXTURE_VERIFIED`, one successful implementation attempt and 0 failed tries. Trail wiring
   graph check passes at 3,615 nodes / 1,240 files and resolves the new method at
   `scripts/test_audio_headers.py:L147-L154`. Project index check passes at 24,080 folders. Root
-  replay log SHA256 is recorded in E270. This is synthetic classifier behavior only; it establishes
-  no asset parsing, codec identity, archive interpretation, or game playback.
-- The next independent task candidate is under read-only review by `/root/next_fixture_scout_3`.
-  Keep pending Mach-O CPU and PSARC policy choices untouched.
+  replay log SHA256 is recorded in E270. Completion commit `f82942d7688f8fdc88274540ab72ebf38eeedcf6`
+  is pushed; staged/full audits accepted 6/1,706 paths, fresh fetch showed 0/0 divergence, and
+  post-push full audit accepted 1,706 paths. Publication log SHA256 is recorded in E271. This is
+  synthetic classifier behavior only; it establishes no asset parsing, codec identity, archive
+  interpretation, or game playback.
+- Read-only scout `/root/next_fixture_scout_3` proposed
+  `RE-01-UNWRAP-IDENTITY-SIDECAR-SYMLINK-ALIAS-FIXTURE-01`, under verified parent
+  `RE-01-UNWRAP-INPUT-SIDECAR-COLLISION-01`, for one synthetic symlink-alias rejection test in
+  `scripts/test_project_tools.py`. Exact next action: check uniqueness and current parent/spec/source,
+  then claim and verify the one-file fixture if still applicable. Keep pending Mach-O CPU and PSARC
+  policy choices untouched.
 
 ## RE-02 dynamic-link image file-offset bounds fixture — verified
 
