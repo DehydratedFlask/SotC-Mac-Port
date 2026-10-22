@@ -23,10 +23,10 @@ or Metal gameplay is demonstrated.
   base_initialize wire; `tools/lift/check_f533100_vslot40_post.py`; checkpoint
   `docs/checkpoints/2026-10-22-vslot-40-533100-post.md`; EVIDENCE E422;
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-vslot40-post-20261022/` (manifest `36f5a603…`;
-  capture `f38cc05a…` — re-pin after feat tip).
-- Observation: measured post_hit=0 (empty table) + mid_reg=4 → 275 registry.
-  Miss/hit bodies / `0x525080`/`0x2569d0` NOT modelled.
+  `local/validation/appmain-init-vslot40-post-20261022/` (manifest `f404e04b…` at tip
+  `824d930`; capture `f38cc05a…`).
+- Observation: feat tip `824d930`; measured post_hit=0 (empty table) + mid_reg=4 → 275
+  registry. Miss/hit bodies / `0x525080`/`0x2569d0` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f533100_vslot40_post.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
   PASS; private capture exit 0; `check_ctor_slots` still **155**.
