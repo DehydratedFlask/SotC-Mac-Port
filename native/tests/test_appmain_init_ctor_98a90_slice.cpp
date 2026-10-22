@@ -16,6 +16,7 @@
 #include "core/input_table_551140.hpp"
 #include "core/inputtable_names_fixture.hpp"
 #include "core/mid_255340.hpp"
+#include "core/singleton_f08_531d84.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -85,6 +86,8 @@ int g_dtor_early = 0;
 int g_mid_reg = 0;
 int g_mid_b60 = 0;
 int g_v40 = 0;
+int g_f08_ctor = 0;
+int g_f08_dtor = 0;
 
 void ctor_a30(void* obj) {
     ++g_ctor_a30;
@@ -104,6 +107,12 @@ std::uint64_t hook_init_tb() {
 void hook_mid_26ea0(void*, const char*, const char*) { ++g_mid_reg; }
 void hook_mid_26b60(const char*) { ++g_mid_b60; }
 void hook_v40(void*, void*) { ++g_v40; }
+void hook_f08_ctor(void* obj) {
+    ++g_f08_ctor;
+    // Marker only — full 0x523bd0 body NOT modelled.
+    *static_cast<std::uint32_t*>(obj) = 0xF08F08F0u;
+}
+void hook_f08_dtor(void*) { ++g_f08_dtor; }
 
 void* loadp(const void* base, std::size_t off) {
     void* p = nullptr;
@@ -206,7 +215,9 @@ int main() {
 
     g_ctor_a30 = g_dtor_98a90 = g_dtor_3b40 = g_dtor_early = 0;
     g_nonnull = g_f590 = g_init_tb = g_move = g_mid_reg = g_mid_b60 = g_v40 = 0;
+    g_f08_ctor = g_f08_dtor = 0;
     ctor40_cell_2ee6778() = nullptr;
+    singleton_f08_cell_2efc9e0() = nullptr;
     prologue_gate_flag_byte() = 1;  // skip vslot+0x48
     prologue_debug_state_byte() = 0;
     vslot30_cell_boss_val_325e8b4() = -1;
@@ -237,10 +248,14 @@ int main() {
     bh.mid_255340_detail.register_26b60 = hook_mid_26b60;
     bh.vslot_40 = hook_v40;
 
+    SingletonF08Hooks sh{};
+    sh.ctor_523bd0 = hook_f08_ctor;
+    sh.dtor_525b40 = hook_f08_dtor;
+
     const std::uint64_t allocs_before = heap.alloc_count;
     const auto t0 = std::chrono::steady_clock::now();
     const auto r = run_appmain_init_ctor_98a90_slice(table, front, app.data(), nullptr, eh, th, ch,
-                                                     bh, setter.data(), 0, 0x11, 0x22, 0x33);
+                                                     bh, setter.data(), 0, 0x11, 0x22, 0x33, sh);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
@@ -267,6 +282,14 @@ int main() {
     // lifted mid 0x255340: 4x26ea0 + 1x26b60
     CHECK(g_mid_reg == 4);
     CHECK(g_mid_b60 == 1);
+    // E420: 0xf08 singleton install before base
+    CHECK(r.singleton.ok);
+    CHECK(r.singleton.ctor_ran);
+    CHECK(g_f08_ctor == 1);
+    CHECK(g_f08_dtor == 0);  // first install, no previous
+    CHECK(singleton_f08_cell_2efc9e0() == r.singleton.obj);
+    CHECK(r.singleton.obj != nullptr);
+    CHECK(*static_cast<std::uint32_t*>(r.singleton.obj) == 0xF08F08F0u);
     CHECK(g_move == 0);
     CHECK(g_nonnull == 0);
     CHECK(g_init_tb == 1);
@@ -287,19 +310,20 @@ int main() {
 
     std::printf(
         "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+sub3be930+ensure3c2f70+"
-        "buf80+null_list+tsc323d0+ctor40_1ab550+gates2552d4+vslot534130+mid255340+early+tail+"
-        "base+trivial+registry ok nested=%p ensure=%p obj40=%p gate_byte=%u mid_reg=%d "
-        "tsc=0x%llx entries=%u alloc_ops=%llu duration_us=%lld "
+        "buf80+null_list+tsc323d0+ctor40_1ab550+gates2552d4+singleton_f08+vslot534130+mid255340+"
+        "early+tail+base+trivial+registry ok nested=%p ensure=%p obj40=%p f08=%p gate_byte=%u "
+        "mid_reg=%d tsc=0x%llx entries=%u alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
         "vslot533100/26ea0/26b60/272d0/255f60/1fc80/stackchk/ba40_listeners/plt/"
-        "ensure_migrate/nonnull=NOT_modelled pr5_heap_merge=GAP\n",
-        r.ctor.nested_48, eb, r.tail.obj_40, static_cast<unsigned>(r.tail.gates.gate_byte),
-        g_mid_reg, static_cast<unsigned long long>(r.ctor.tsc_value),
-        r.remainder.registry.entry_count,
+        "ctor523bd0_body/dtor525b40_body/ensure_migrate/nonnull=NOT_modelled pr5_heap_merge=GAP\n",
+        r.ctor.nested_48, eb, r.tail.obj_40, r.singleton.obj,
+        static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
+        static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
         static_cast<long long>(us));
 
     destroy_registry_at_2efd160(front);
+    destroy_singleton_f08_at_2efc9e0(front, sh);
     std::puts("appmain_init_ctor_98a90_slice: all checks passed");
     return 0;
 }

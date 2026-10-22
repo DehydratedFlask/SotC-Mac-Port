@@ -7,8 +7,15 @@ namespace sotc {
 AppmainInitBaseInitializeSliceResult run_appmain_init_base_initialize_slice(
     InputTable551140& table, AllocatorFront& alloc, void* self, void* arg,
     const BaseInitialize255130Hooks& hooks, void* flag_obj, void* setter_obj,
-    std::uint8_t flag_in, std::uint8_t set_a, std::uint8_t set_b, std::uint8_t set_c) {
+    std::uint8_t flag_in, std::uint8_t set_a, std::uint8_t set_b, std::uint8_t set_c,
+    const SingletonF08Hooks& singleton_hooks) {
     AppmainInitBaseInitializeSliceResult out{};
+
+    // OBS 0x531d84..0x531dcf before base Initialize @ 0x531dda.
+    out.singleton = install_singleton_f08_531d84(alloc, singleton_hooks);
+    if (!out.singleton.ok) {
+        return out;
+    }
 
     base_init_flag_cell_2ea4718() = flag_obj;
     std::uint32_t prev = 0;
