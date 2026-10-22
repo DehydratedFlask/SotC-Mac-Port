@@ -41,6 +41,10 @@
 #include "guarded_dd91b0.hpp"
 #include "guarded_dd7e30.hpp"
 #include "guarded_dd4210.hpp"
+#include "guarded_d39b00.hpp"
+#include "guarded_d366d0.hpp"
+#include "guarded_d33b50.hpp"
+#include "avx_d5a280.hpp"
 #include "vec_dd41e0.hpp"
 #include "vec_b52110.hpp"
 #include "vec_b743c0.hpp"
@@ -200,6 +204,7 @@ struct StartupState {
     VecD62690 vec_d62690{};   // 0xd62690 idx 102
     VecD623c0 vec_d623c0{};   // 0xd623c0 idx 103
     VecD5fbe0 vec_d5fbe0{};   // 0xd5fbe0 idx 104
+    AvxD5a280 avx_d5a280{};   // idx 105 / 0xd5a280
     VecD47880 vec_d47880{};   // 0xd47880 idx 106
     VecD47420 vec_d47420{};   // 0xd47420 idx 107
     VecD47270 vec_d47270{};   // 0xd47270 idx 108
@@ -209,6 +214,9 @@ struct StartupState {
     VecD40010 vec_d40010{};   // 0xd40010 idx 112
     VecD3b790 vec_d3b790{};   // 0xd3b790 idx 113
     VecD3a6d0 vec_d3a6d0{};   // 0xd3a6d0 idx 114
+    GuardedD39b00 guarded_d39b00{};  // idx 115 / 0xd39b00
+    GuardedD366d0 guarded_d366d0{};  // idx 116 / 0xd366d0
+    GuardedD33b50 guarded_d33b50{};  // idx 117 / 0xd33b50
     VecD32720 vec_d32720{};   // 0xd32720 idx 119
     VecD2ffe0 vec_d2ffe0{};   // 0xd2ffe0 idx 120
     VecD32b70 vec_d32b70{};   // 0xd32b70 idx 118

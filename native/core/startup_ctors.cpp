@@ -154,7 +154,8 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xd62690, 102, [](StartupState& s) noexcept { init_vec_d62690(s.vec_d62690); }},
         {0xd623c0, 103, [](StartupState& s) noexcept { init_vec_d623c0(s.vec_d623c0); }},
         {0xd5fbe0, 104, [](StartupState& s) noexcept { init_vec_d5fbe0(s.vec_d5fbe0); }},
-        // Gap idx 105.
+        // idx 105: already-lifted AVX identity-table ctor (batch 32).
+        {0xd5a280, 105, [](StartupState& s) noexcept { init_avx_d5a280(s.avx_d5a280); }},
         {0xd47880, 106, [](StartupState& s) noexcept { init_vec_d47880(s.vec_d47880); }},
         {0xd47420, 107, [](StartupState& s) noexcept { init_vec_d47420(s.vec_d47420); }},
         {0xd47270, 108, [](StartupState& s) noexcept { init_vec_d47270(s.vec_d47270); }},
@@ -164,7 +165,10 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xd40010, 112, [](StartupState& s) noexcept { init_vec_d40010(s.vec_d40010); }},
         {0xd3b790, 113, [](StartupState& s) noexcept { init_vec_d3b790(s.vec_d3b790); }},
         {0xd3a6d0, 114, [](StartupState& s) noexcept { init_vec_d3a6d0(s.vec_d3a6d0); }},
-        // Gap idx 117.
+        // idx 115–117: already-lifted guarded-constant clones (batch 30) — bookkeeping like 64–66.
+        {0xd39b00, 115, [](StartupState& s) noexcept { init_guarded_d39b00(s.guarded_d39b00); }},
+        {0xd366d0, 116, [](StartupState& s) noexcept { init_guarded_d366d0(s.guarded_d366d0); }},
+        {0xd33b50, 117, [](StartupState& s) noexcept { init_guarded_d33b50(s.guarded_d33b50); }},
         {0xd32b70, 118, [](StartupState& s) noexcept { init_vec_d32b70(s.vec_d32b70); }},
         {0xd32720, 119, [](StartupState& s) noexcept { init_vec_d32720(s.vec_d32720); }},
         {0xd2ffe0, 120, [](StartupState& s) noexcept { init_vec_d2ffe0(s.vec_d2ffe0); }},

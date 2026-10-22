@@ -107,6 +107,8 @@ int main() {
         CHECK(st.vec_d62690 == kVecD62690Bits);
         CHECK(st.vec_d623c0 == kVecD623c0Bits);
         CHECK(st.vec_d5fbe0 == kVecD5fbe0Bits);
+        CHECK(st.avx_d5a280.prefix[0] == 0xff && st.avx_d5a280.table[0] == 0 &&
+              st.avx_d5a280.table[4] == 1 && st.avx_d5a280.table[8] == 2);
         CHECK(st.vec_d47880 == kVecD47880Bits);
         CHECK(st.vec_d47420 == kVecD47420Bits);
         CHECK(st.vec_d47270 == kVecD47270Bits);
@@ -116,6 +118,8 @@ int main() {
         CHECK(st.vec_d40010 == kVecD40010Bits);
         CHECK(st.vec_d3b790 == kVecD3b790Bits);
         CHECK(st.vec_d3a6d0 == kVecD3a6d0Bits);
+        CHECK(st.guarded_d39b00.pi_guard == 1 && st.guarded_d366d0.pi_guard == 1 &&
+              st.guarded_d33b50.pi_guard == 1);
         CHECK(st.vec_d32720 == kVecD32720Bits);
         CHECK(st.vec_d2ffe0 == kVecD2ffe0Bits);
         CHECK(st.vec_d32b70 == kVecD32b70Bits);
@@ -226,7 +230,7 @@ int main() {
         48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62,
         63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92,
         93, 94,
-        96, 97, 98, 99, 100, 101, 102, 103, 104, 106, 107, 108, 109, 110, 111, 112, 113, 114, 118, 119,
+        96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119,
         120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139,
         140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 282, 290, 520, 538};
     CHECK(recovered_constructors().size() == sizeof(expect) / sizeof(expect[0]));
