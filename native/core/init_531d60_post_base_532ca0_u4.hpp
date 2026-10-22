@@ -10,7 +10,8 @@
 // `0xf590` / staffroll / vcall-callee body tourism.
 //
 // Claimed: fourth-unit call-site control flow pin only.
-// NOT modelled: stack prep; 0x532ca0 body; following virtual call. PR #5 cite-only.
+// NOT modelled: stack prep; 0x532ca0 body; following virtual call
+// (claimed separately as E473). PR #5 cite-only.
 #pragma once
 
 #include <cstddef>

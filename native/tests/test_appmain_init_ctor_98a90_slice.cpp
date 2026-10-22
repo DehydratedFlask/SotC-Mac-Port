@@ -218,6 +218,7 @@ int g_post_base_vcall18_u2 = 0;
 int g_post_base_532ca0_u3 = 0;
 int g_post_base_vcall18_u3 = 0;
 int g_post_base_532ca0_u4 = 0;
+int g_post_base_vcall18_u4 = 0;
 alignas(8) std::uint8_t g_lea_vmovq_src[8]{};
 alignas(8) std::uint8_t g_lea_vmovq_xmm0[8]{};
 void* g_lea_vmovq_rbx_cell = reinterpret_cast<void*>(static_cast<std::uintptr_t>(0x32f79a8));
@@ -460,6 +461,7 @@ void hook_post_base_vcall18_u2() { ++g_post_base_vcall18_u2; }
 void hook_post_base_532ca0_u3() { ++g_post_base_532ca0_u3; }
 void hook_post_base_vcall18_u3() { ++g_post_base_vcall18_u3; }
 void hook_post_base_532ca0_u4() { ++g_post_base_532ca0_u4; }
+void hook_post_base_vcall18_u4() { ++g_post_base_vcall18_u4; }
 
 void* loadp(const void* base, std::size_t off) {
     void* p = nullptr;
@@ -631,6 +633,7 @@ int main() {
     g_post_base_532ca0_u3 = 0;
     g_post_base_vcall18_u3 = 0;
     g_post_base_532ca0_u4 = 0;
+    g_post_base_vcall18_u4 = 0;
     g_lea_vmovq_rbx = nullptr;
     // OBS src at 0x15ffa38: packed u64 0x538530 (first qword); poison xmm dst.
     {
@@ -841,6 +844,8 @@ int main() {
     pbvcu3.call_vslot18 = hook_post_base_vcall18_u3;
     Init531d60PostBase532ca0U4Hooks pb532u4{};
     pb532u4.call_532ca0 = hook_post_base_532ca0_u4;
+    Init531d60PostBaseVcall18U4Hooks pbvcu4{};
+    pbvcu4.call_vslot18 = hook_post_base_vcall18_u4;
 
     const std::uint64_t allocs_before = heap.alloc_count;
     const auto t0 = std::chrono::steady_clock::now();
@@ -850,7 +855,7 @@ int main() {
                                                      pb_avx, pb7f, pb56fa, pbf9, pb_ymm, pb_ic,
                                                      pb_xmm, pb_yr, pb268, pbsbj, pbsboj, pb52,
                                                      pb_lv, pb532, pbvc, pb532u2, pbvcu2, pb532u3,
-                                                     pbvcu3, pb532u4);
+                                                     pbvcu3, pb532u4, pbvcu4);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
@@ -1245,6 +1250,10 @@ int main() {
     CHECK(r.post_base_532ca0_u4.ok);
     CHECK(g_post_base_532ca0_u4 == 1);
     CHECK(r.post_base_532ca0_u4.call_532ca0_count == 1);
+    // E473: Init continue fourth virtual call [rax+0x18] (callee NOT modelled)
+    CHECK(r.post_base_vcall18_u4.ok);
+    CHECK(g_post_base_vcall18_u4 == 1);
+    CHECK(r.post_base_vcall18_u4.call_vslot18_count == 1);
     CHECK(r.remainder.trivial_ok);
     CHECK(r.remainder.registry.status == RegistryInit531d60Status::ok);
     CHECK(r.remainder.registry.entry_count == kInputTable551140Count);
@@ -1273,7 +1282,7 @@ int main() {
         "post_base_ymm_reload+post_base_26800_f590+post_base_sbj+post_base_sboj+"
         "post_base_52eb50+post_base_lea_vmovq+post_base_532ca0+post_base_vcall18+"
         "post_base_532ca0_u2+post_base_vcall18_u2+post_base_532ca0_u3+"
-        "post_base_vcall18_u3+post_base_532ca0_u4+"
+        "post_base_vcall18_u3+post_base_532ca0_u4+post_base_vcall18_u4+"
         "early+tail+base+trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
         "anims=%p banks=%p streams=%p rand=%p boss=%p cp3=%p csp=%p post_hit=%d miss_null=%d "
@@ -1283,7 +1292,7 @@ int main() {
         "pb5c=%d pb1290=%d pb56db=%d pb5b3=%d pb5b3c=%d pbavx=%d pb7f=%d pb56fa=%d pbf9=%d "
         "pbymm=%d pbic=%d pbxmm=%d pbyr=%d pb268=%d pbf590=%d pbsbj268=%d pbsbjf590=%d "
         "pbsboj268=%d pbsbojf590=%d pb52=%d pblv=%d pb532=%d pbvc=%d pb532u2=%d pbvcu2=%d "
-        "pb532u3=%d pbvcu3=%d pb532u4=%d "
+        "pb532u3=%d pbvcu3=%d pb532u4=%d pbvcu4=%d "
         "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
@@ -1350,6 +1359,7 @@ int main() {
         r.post_base_532ca0_u3.call_532ca0_count,
         r.post_base_vcall18_u3.call_vslot18_count,
         r.post_base_532ca0_u4.call_532ca0_count,
+        r.post_base_vcall18_u4.call_vslot18_count,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
