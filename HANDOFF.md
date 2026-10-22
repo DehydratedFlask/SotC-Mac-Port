@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 05:27 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 05:36 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,12 +8,13 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## DATA-02 pakN TOC payload-MD5 sample — claimed, analysis pending
+## DATA-02 pakN TOC payload-MD5 sample — verified
 
-- Task ID `DATA-02-PAKN-TOC-PAYLOAD-MD5-SAMPLE-01`, owned by `/root`; status `ACTIVE`, zero
-  failed hypotheses. Scope: compare each 16-byte TOC field to MD5 of the full decoded payload for
-  exactly 17 pakN members selected from the existing `audio-headers.json` family inventory. The
-  classifier calls `8c0a` / `8c06` an offset-zero prefix observation only; it is not a codec ID.
+- Task ID `DATA-02-PAKN-TOC-PAYLOAD-MD5-SAMPLE-01`, owned by `/root`; status `ARTIFACT_VERIFIED`,
+  one successful analysis attempt, zero failed hypotheses. It compares the TOC field with MD5 of
+  the full decoded payload for exactly 17 pakN members selected from the existing
+  `audio-headers.json` family inventory. The classifier calls `8c0a` / `8c06` an offset-zero
+  prefix observation only; it is not a codec ID.
 - This does not repeat the existing 39-member TOC-vs-path/content sample: `docs/ASSETS.md` says
   that earlier sample was pak2. E25 records the 17-row pakN family. The selection preflight joins
   17/17 rows to the pakN member manifest by entry ID, exact path, declared size, offset and block;
@@ -22,17 +23,40 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `local/validation/data02-pakn-toc-payload-md5-sample-01/selection-baseline.log` and E340.
   Root's live full-file SHA-256 reread passed at 12,838,532,222 bytes and matched the ASSETS
   summary: `559f7a3fa66bc652d36c5f1a885b351e4aeb17dadbba06a0006520bfd325be73` (E340).
+- The private checker pins the archive, all manifests, `scripts/psarc.py`, and the family
+  classifier. Both full reads decoded 17/17 members and matched the audio-manifest SHA-256 values;
+  0/17 decoded-payload MD5 values matched the live TOC field. The two per-member reports are
+  byte-identical (SHA256 `026295c5122b5919a849c095fa00193f46da7606a06d46905b8ca706c1e08058`); checker
+  SHA256 `a403a8cd7d4fbda8ffd89343ffe3e8fa8719aca9c7c0f9c05c6305bd4cf206ca`. Per-member data stays
+  under `local/validation/data02-pakn-toc-payload-md5-sample-01/`; E343 records aggregate evidence.
 - Claim commit `85ad661baa087297743fdb0a3b0482c80c636961` is pushed to `origin/main` and fetch-
   verified at 0/0 divergence. Pre-push audits accepted 5 staged / 1,740 full paths; post-push full
   audit accepted 1,740 paths. E341 records the publication logs. Only user API edits and Graft
   telemetry cache files remain outside the published scope.
-- No member payload comparison has run yet. Exact next action: create a private deterministic
-  checker that reads all 17 complete decoded members, compares payload MD5 to the TOC value, binds
-  the report to the archive/manifests, and repeats the aggregate run byte-for-byte. Keep all
-  per-member output under `local/validation/`.
+- The claim-audit record commit `eea1ac4c49b6ac4f4e5a019a030f2efa515cebde` is also pushed and
+  fetch-verified at 0/0 divergence; its publication audit is recorded in E342. `docs/ASSETS.md`
+  and `docs/TASKS.md` now record the sample-only result.
+- Exact next action: finish the claimed `SRV-01-HOST-MAP-REQUESTED-VS-PAGE-ROUNDED-SIZE-FIXTURE-01`
+  test below. First record a fresh focused build baseline, then add the one synthetic mapping-size
+  assertion and rerun the focused `host_map` gate.
 - Remaining risks: any result applies only to this sample and does not establish global TOC
   semantics, integrity role, codec, runtime behavior, or game use. The native/API user changes
   and the Graft telemetry cache paths remain unmodified and outside publication.
+
+## SRV-01 host-map requested versus page-rounded size — claimed
+
+- Task ID `SRV-01-HOST-MAP-REQUESTED-VS-PAGE-ROUNDED-SIZE-FIXTURE-01`, owned by `/root`; status
+  `ACTIVE`, zero implementation attempts and zero failed tries. The bounded change is one synthetic
+  case in `native/tests/test_host_map.cpp` using request size `0x200001` bytes.
+- The test will assert `MappedRegion.region.size` preserves the requested value while
+  `HostMapping.size` equals the host-page-rounded mapping length derived from `sysconf(_SC_PAGESIZE)`
+  with the implementation's 16 KiB fallback. Live code confirms `map_region` copies `req.size`
+  into the region and `map_anonymous_aligned` rounds the host mapping. Existing successful-map
+  cases use page-aligned 1 MiB and 2 MiB sizes, so they do not distinguish the two values.
+- The claim checkpoint is
+  [docs/checkpoints/2026-10-22-root-srv01-host-map-requested-vs-rounded-claim.md](docs/checkpoints/2026-10-22-root-srv01-host-map-requested-vs-rounded-claim.md).
+- Risk boundary: synthetic `map_region`/`mmap` behavior only; it does not establish allocator
+  reachability or game behavior. Keep the existing 512 MiB alignment and production code unchanged.
 
 ## SRV-01 host-map alignment wrap/minimum-clamp fixture — verified
 
