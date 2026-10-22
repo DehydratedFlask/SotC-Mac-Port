@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 01:29 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 01:31 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -18,9 +18,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Baseline passes 11 tests; worker and root focused runs pass 12. Production wrapper remains
   unchanged. See E272/E274 and the [claim](docs/checkpoints/2026-10-22-root-re01-sidecar-symlink-claim.md)
   and [completion checkpoint](docs/checkpoints/2026-10-22-root-re01-sidecar-symlink-complete.md).
-- Status `FIXTURE_VERIFIED`, one successful implementation attempt and 0 failed tries. The claim
-  commit is published and fetch-verified; implementation publication is being completed. Trail
-  graph check passes at 3,616 nodes / 1,240 files, and the new method resolves at
+- Status `FIXTURE_VERIFIED`, one successful implementation attempt and 0 failed tries. Completion
+  commit `0aee49f185e8162fda021f74fc4b48dc742ffd35` is pushed; staged/full audits accepted 6/1,708
+  paths, fresh fetch showed 0/0 divergence, and post-push full audit accepted 1,708 paths. See E275.
+  Trail graph check passes at 3,616 nodes / 1,240 files, and the new method resolves at
   `scripts/test_project_tools.py:L119-L144`. This is synthetic filesystem behavior only; it says
   nothing about live game files or execution.
 
