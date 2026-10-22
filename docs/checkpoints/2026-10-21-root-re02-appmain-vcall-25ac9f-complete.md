@@ -70,3 +70,28 @@
 - Next exact action: no work remains on this bounded static task. Any dynamic-vptr investigation is
   a new task with a separate claim and evidence boundary; root controls all further REA use.
 - Task status: `STATIC_PATH_BYTE_VERIFIED`; G0 remains PARTIAL and G1–G6 remain NOT RUN.
+
+## Completion publication checkpoint
+
+- Time / timezone: 2026-10-21 22:40 CDT (America/Chicago); integrator `/root`.
+- Files published: the bounded verifier, E237, task status, and the claim/completion/REA-timeout
+  handoff records. The separate, in-progress `0x25aa06` verifier and user-owned native API files
+  were not staged.
+- Exact preflight: `git diff --cached --check` passed;
+  `python3 -I scripts/audit_publish_paths.py` accepted 8 staged paths;
+  `python3 -I scripts/audit_publish_paths.py --all` accepted 1,664 paths.
+- Commit/push: `git commit -m "trace unresolved app-main +0x28 callsite"` created
+  `ed15ff09811a51f5942dbd549404ddaf2c7af43e`; `git push origin main` succeeded.
+  Private post-push log `local/checkpoints/round78-re02-25ac9f-complete-postpush.log` SHA-256
+  `b14a8432a42335a7eae9464f39285a0aa7f1f19d026d410178d5b0784284436b`.
+- Fetch verification: `git fetch origin`; `git rev-parse HEAD`; `git rev-parse origin/main`;
+  `git rev-list --left-right --count HEAD...origin/main`. Result: matching tip
+  `ed15ff09811a51f5942dbd549404ddaf2c7af43e`, divergence `0 0`.
+- Audit logs: staged `local/checkpoints/round78-re02-complete-staged-audit.log` SHA-256
+  `bd9c35eacde393e8471b178bf72f93b286cfd038b19b580c333b2a8decfc50e3`; full
+  `local/checkpoints/round78-re02-complete-full-audit.log` SHA-256
+  `1371b3c20d1f58dea0147dfe614384c7e97bf5fc8930fcf9e7098e1c135e1033`.
+- Observation versus inference: the commit is on the public remote and fetch-verified. This
+  publication does not resolve the runtime target or advance a game acceptance gate.
+- Remaining work: integrate and independently replay the separate `0x25aa06` bounded result; leave
+  the runtime edge unresolved unless the object/vptr is byte-proven.
