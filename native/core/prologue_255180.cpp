@@ -98,8 +98,8 @@ Prologue255180Result run_prologue_255180_early(AllocatorFront& alloc,
 Prologue255180TailResult run_prologue_255180_tail(AllocatorFront& alloc, void* self,
                                                   const Prologue255180TailHooks& hooks) {
     Prologue255180TailResult out{};
-    if (self == nullptr || hooks.ctor_98a90_3be050 == nullptr ||
-        hooks.ctor_40_1ab550 == nullptr) {
+    const bool have_ctor = (hooks.ctor_98a90_3be050 != nullptr) || hooks.use_lifted_ctor_98a90;
+    if (self == nullptr || !have_ctor || hooks.ctor_40_1ab550 == nullptr) {
         return out;
     }
 
@@ -109,7 +109,15 @@ Prologue255180TailResult run_prologue_255180_tail(AllocatorFront& alloc, void* s
         return out;
     }
     std::memset(big, 0, kPrologue98a90Bytes);
-    hooks.ctor_98a90_3be050(big);
+    if (hooks.ctor_98a90_3be050 != nullptr) {
+        hooks.ctor_98a90_3be050(big);
+    } else {
+        const auto cr = init_98a90_3be050(alloc, big, hooks.ctor_98a90_detail);
+        if (!cr.ok) {
+            alloc.delete_(big);
+            return out;
+        }
+    }
     install_cell(app_slot(self, kPrologueAppSlot3b58), big, alloc, hooks.dtor_98a90_3be390);
     out.obj_98a90 = big;
 

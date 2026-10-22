@@ -7,17 +7,19 @@
 //   apply 0x335d0 (hook) → xchg_store_u32_357f0(flag, 1) → tls 0x35770 (hook)
 //
 // Tail fragment (OBS 0x255264..0x2552cd) — E409:
-//   alloc 0x98a90 → ctor 0x3be050 (hook) → install self+0x3b58
+//   alloc 0x98a90 → ctor 0x3be050 (lifted header E410 / or override hook) → self+0x3b58
 //     (prev: dtor 0x3be390 hook + delete_)
 //   alloc 0x40 → ctor 0x1ab550 (hook) → install self+0x3b40
 //     (prev: vslot+0x08 hook only — OBS has no delete_ on this path)
 //
-// NOT modelled: debug gates after 0x2552cd (0xba40 / stack-chk / vcalls).
+// NOT modelled: debug gates after 0x2552cd (0xba40 / stack-chk / vcalls);
+// 0x3be050 remainder from 0x3be0f8; bodies of 0x3be930/0x323d0/0x3c2f70.
 // PR #5 cite-only. No leaf-vec; not idx 95.
 #pragma once
 
 #include "allocator_front.hpp"
 #include "base_initialize_255130.hpp"
+#include "ctor_98a90_3be050.hpp"
 #include "init_flag_object_335a0.hpp"
 #include "xchg_store_u32_357f0.hpp"
 
@@ -56,7 +58,11 @@ struct Prologue255180Hooks {
 };
 
 struct Prologue255180TailHooks {
-    void (*ctor_98a90_3be050)(void* obj) = nullptr;  // required
+    // If non-null, called instead of lifted init_98a90_3be050 (E409 stub path).
+    void (*ctor_98a90_3be050)(void* obj) = nullptr;
+    // When ctor_98a90_3be050 is null and use_lifted_ctor_98a90 is true, run E410 header.
+    bool use_lifted_ctor_98a90 = false;
+    Ctor98a90_3be050Hooks ctor_98a90_detail{};
     void (*dtor_98a90_3be390)(void* obj) = nullptr;  // previous self+0x3b58
     void (*ctor_40_1ab550)(void* obj) = nullptr;     // required
     void (*dtor_vslot08_3b40)(void* obj) = nullptr;  // previous self+0x3b40 (no delete_)
