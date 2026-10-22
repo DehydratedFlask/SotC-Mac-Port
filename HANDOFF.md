@@ -22,9 +22,11 @@ or Metal gameplay is demonstrated.
 - Files: `native/core/ctor_40_1ab550.{hpp,cpp}`; prologue wire; measured slice forces null
   override; `tools/lift/check_f1ab550_ctor40.py`; checkpoint
   `docs/checkpoints/2026-10-22-ctor-40-1ab550.md`; EVIDENCE E416; TASKS/VALIDATION/INDEX/HANDOFF.
-  Private: `local/validation/appmain-init-ctor-40-1ab550-20261022/` (hashes after feat tip).
-- Observation: ELF pins body/base/vtables/cell/prologue call; measured derived vt + cell self +
-  field 0xa → 275 registry. PLT bodies / ensure migrate / non-null / debug gates NOT modelled.
+  Private: `local/validation/appmain-init-ctor-40-1ab550-20261022/` (manifest `7adbc4ab…` at tip
+  `c2e2871`).
+- Observation: feat tip `c2e2871`; ELF pins body/base/vtables/cell/prologue call; measured
+  derived vt + cell self + field 0xa → 275 registry.
+  PLT bodies / ensure migrate / non-null / debug gates NOT modelled.
 - Commands: `python3 -I tools/lift/check_f1ab550_ctor40.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
   PASS; private capture exit 0; `check_ctor_slots` still **155**.
