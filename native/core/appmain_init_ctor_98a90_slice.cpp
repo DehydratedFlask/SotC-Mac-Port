@@ -25,12 +25,14 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     if (!out.tail.ok) {
         return out;
     }
-    // Re-read ctor side effects from installed object (nested at +8).
+    // Re-read ctor side effects from installed object.
     if (out.tail.obj_98a90 != nullptr) {
-        std::memcpy(&out.ctor.nested_48, static_cast<std::uint8_t*>(out.tail.obj_98a90) + 8,
-                    sizeof(void*));
-        out.ctor.ok = (out.ctor.nested_48 != nullptr);
-        out.ctor.ensure_called = true;  // header zeros ⇒ capacity 0 ⇒ ensure path
+        auto* o = static_cast<std::uint8_t*>(out.tail.obj_98a90);
+        std::memcpy(&out.ctor.nested_48, o + 8, sizeof(void*));
+        std::memcpy(&out.ctor.buf_80, o + kCtor98a90VecBegin, sizeof(void*));
+        out.ctor.ok = (out.ctor.nested_48 != nullptr) && (out.ctor.buf_80 != nullptr);
+        out.ctor.ensure_called = true;  // header zeros ⇒ ensure path
+        out.ctor.buf_grown = (out.ctor.buf_80 != nullptr);
     }
 
     BaseInitialize255130Hooks hooks = base_hooks;
