@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 07:30 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 07:33 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -26,6 +26,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   the preceding symlink completion and trig claim in commit 47d4a03259457dfc2a5b8eff46dcca5e6e3934b7.
 - This observes synthetic helper initialization from preseeded state only. It does not establish
   constructor reachability, game startup state, or gameplay behavior.
+- Completion and handoff docs plus the test were published in
+  `d7b1ae7ae58a2c35f9c6af405481a9952e5bf957` and fetch-verified at 0/0 divergence. Staged audit
+  accepted 10 paths; full and post-push audits accepted 1,775 paths. E382 and the completion
+  checkpoint record publication logs and hashes.
 - E371 and the earlier publication checkpoint
   docs/checkpoints/2026-10-22-root-srv01-completion-sav01-claims-publication.md record publication
   of the previous SRV-01 completion and SAV-01 claims.
