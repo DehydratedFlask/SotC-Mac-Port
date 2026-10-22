@@ -3,15 +3,14 @@
 //   // success path (atexit/tag) NOT modelled when flag false
 //   join @ 0x5334f9: install loaded into *[f08+0] (replace + refcount)
 //   optional notify if success; release temps; 0xf590 path dtor
-//   // stop before shadowskels @ 0x533582
+//   // stop before shadowskels @ 0x533582 (see vslot_40_533100_shadowskels.*)
 //
-// Always-on after E426 load-attempt. Prefer over shadowskels (later) and over
-// deepen 0x14c2f0 / 0x6a5370 (already hooked earlier). Prefer over empty-path
-// migrate/non-null.
+// Always-on after E426 load-attempt. Prefer over deepen 0x14c2f0 / 0x6a5370
+// (already hooked earlier). Prefer over empty-path migrate/non-null.
 //
 // Claimed: fail-path + always-on install/cleanup control flow.
 // NOT modelled: success atexit cluster (0xf8f3d0/0xf730/0x14c4a0/…);
-// bodies of 0x14d880/0x14d2d0/0x14ccc0/0x95580; shadowskels. PR #5 cite-only.
+// bodies of 0x14d880/0x14d2d0/0x14ccc0/0x95580. PR #5 cite-only.
 #pragma once
 
 #include <cstddef>

@@ -12,7 +12,7 @@
 //
 // Claimed: load-attempt control flow + path pin + lifted 0x14ccb0.
 // NOT modelled: body of 0x14c2f0 (166 B); vcall body; attach (see
-// vslot_40_533100_shadow_attach.*); shadowskels; asset I/O. PR #5 cite-only.
+// vslot_40_533100_shadow_attach.*); asset I/O. PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
