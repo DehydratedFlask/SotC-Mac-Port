@@ -90,6 +90,7 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     hooks.vslot_40_shadowbanks_out = &out.vslot_40_shadowbanks;
     hooks.vslot_40_banks_attach_out = &out.vslot_40_banks_attach;
     hooks.vslot_40_shadowstreams_out = &out.vslot_40_shadowstreams;
+    hooks.vslot_40_streams_attach_out = &out.vslot_40_streams_attach;
     out.base_ok = base_initialize_255130(self, arg, hooks);
     if (out.early.flag_obj != nullptr) {
         std::memcpy(&out.flag_after_base,
