@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 00:56 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 01:00 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -27,8 +27,19 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   asset-decoding, playback, or game evidence changed. Claim commit
   `93c693d211fadee9d16746f6be56ea5fca300bd1` is pushed and fetch-verified at 0/0; its staged and
   exact-path audits accepted 6 paths and full audit accepted 1,698.
-  Exact next action: review the read-only candidate from `/root/next_independent_task_scout` against
-  current task rows and live files, then claim one bounded task if it is distinct. Leave the
+
+## Active claim — APP-01 audio readiness start gate
+
+- `APP-01-AUDIO-READINESS-GATE-FIXTURE-01` under `APP-01`: add one test-only case in
+  `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift` that injects missing audio while all
+  other readiness rows are ready, then proves the audio row blocks Play and the scripted core's
+  `start()` is never called. Baseline `LauncherModelValidationTests` passes 8 tests. Production
+  source is unchanged. Claim record:
+  [checkpoint](docs/checkpoints/2026-10-22-root-app01-audio-readiness-gate-claim.md).
+- Status `ACTIVE`, zero failed implementation tries. Root owns this one test file; claim docs are
+  recorded and published. Exact next action: add the isolated audio readiness assertion, replay
+  `swift test --package-path launcher --scratch-path local/build/launcher --filter LauncherModelValidationTests`,
+  verify the new source node and project index, then record and publish completion. Leave the
   pending Mach-O CPU and PSARC negative-limit choices untouched.
 
 ## SRV-01 arena high-water uint64 wrap fixture — verified
