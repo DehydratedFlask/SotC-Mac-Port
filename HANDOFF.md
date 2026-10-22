@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:10 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:14 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -25,7 +25,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   and fetch-verified.
 - Dynlink parser completion is recorded in commit `109b348b7e9d09a518d0cb78a4c7bd14a1c75284`,
   pushed to `origin/main` and fetch-verified with 0/0 divergence.
-- Exact next action: complete the archive status-code fixture claimed below; leave PSARC
+- Exact next action: claim the next independently verified task outside PSARC and these launcher test
+  files; leave PSARC
   negative-limit behavior unclaimed pending the user's answer.
 
 ## RE-02 dynlink required program headers — fixture verified
@@ -75,23 +76,28 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Claim docs commit `8c33c317cc5cb6863b3ab618ebfb28d36557570a` is pushed and fetch-verified.
 - Completion commit `2152dfbbe90699d550b07d26b90d3bfd7d18394b` is pushed and fetch-verified at
   `origin/main` with 0/0 divergence.
-- Exact next action: scout another independent bounded task outside the PSARC and CoreClient files;
+- Exact next action: claim another independent bounded task outside the PSARC and completed launcher
+  fixture files;
   leave negative-limit behavior unclaimed pending the user's answer.
 
-## APP-01 archive status codes — fixture claimed
+## APP-01 archive status codes — fixture verified
 
 - Root claimed `APP-01-CORE-ARCHIVE-STATUS-CODES-FIXTURE-01`, child of
   `APP-01-CORE-ABI-01`; see the [claim checkpoint](docs/checkpoints/2026-10-21-root-app01-core-archive-status-codes-claim.md).
-- Scope is only `launcher/Tests/LauncherNativeCoreTests/NativeCoreClientTests.swift`: assert C ABI
-  archive status values 0–3 map to `.ok`, `.missing`, `.unreadable`, `.badMagic`, and an unknown
-  value remains `.unknown(value)`. Baseline focused suite passes 9 tests. No production source changes.
-- The header constants and Swift mapping align, but current tests only cover `.badMagic` via a file
-  validation and do not pin every numeric decoder case. The new test will pin the pure mapping; it
-  does not establish a live ABI, filesystem behavior, or game readiness.
-- Status `ACTIVE`, 0 failed implementation tries. Existing `native/api/CMakeLists.txt` and
-  `native/api/host/` changes remain user-owned and excluded.
-- Exact next action: add the synthetic numeric mapping assertions, replay the focused suite, record
-  E242 and the completion checkpoint, then publish allowlisted files only.
+- Scope was only `launcher/Tests/LauncherNativeCoreTests/NativeCoreClientTests.swift`. The new
+  `archiveStatusNumericCodesMapToAbiCases` fixture asserts codes 0–3 map to `.ok`, `.missing`,
+  `.unreadable`, `.badMagic`, and codes 9 / `UInt32.max` remain `.unknown` with the original value.
+- Baseline command `swift test --package-path launcher --scratch-path
+  local/build/app01-core-archive-status-codes --filter NativeCoreClientTests` passed 9 tests; final
+  replay passed 10 tests. Logs and hashes are recorded in E242 and the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-app01-core-archive-status-codes-complete.md).
+- The C enum constants and Swift mapping align. Only the fixture test file changed; the production
+  mapper/header are unchanged. This pins a pure mapping contract, not live ABI transport, archive
+  inspection, filesystem behavior, or game readiness.
+- Status `FIXTURE_VERIFIED`, 1 successful implementation attempt, 0 failed tries. Existing
+  `native/api/CMakeLists.txt` and `native/api/host/` changes remain user-owned and excluded.
+- Exact next action: claim and complete another independent bounded task outside PSARC and these
+  launcher test files; leave negative-limit behavior unclaimed pending the user's answer.
 
 ## RE-02 app-main +0x20 virtual call — static path byte verified
 
