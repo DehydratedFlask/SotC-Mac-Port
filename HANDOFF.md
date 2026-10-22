@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 22:27 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 22:28 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -31,8 +31,15 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   post-push `HEAD == origin/main`, divergence 0/0. Log:
   `local/checkpoints/round78-re02-claim-sync-postpush.log` SHA-256
   `4e7d5e77d98fb4c48e615b108f703daacb772c84a424047a393ef25879df4e9b`.
-- Later handoff/checkpoint sync `54854c9` is the current local base for this second independent
-  callsite claim; its publication state will be verified and recorded with this claim.
+- The later first-task handoff sync `54854c9` was pushed before this second callsite claim.
+- This claim is published as `7975c5c6f1d55e0efe7dc61031f8ff6d69cfe557`; post-push fetch confirms
+  `HEAD == origin/main`, divergence 0/0. Log:
+  `local/checkpoints/round78-re02-25ac9f-postpush.log` SHA-256
+  `21fa37a1319c7846fb5a87c47c199414fdcfa84dc459babda4145486ec17ab4a`.
+- Staged/full path audits accepted 4/1,661 paths; folder index current at 19,270, Trail wiring
+  graph current at 3,580 nodes. Exact check logs are in the claim checkpoint.
+- Exact next action: assign an offline-only worker to `0x25ac9f`; keep REA exclusive to the
+  `0x25aa06` worker until that session is exported and closed.
 - A later `python3 scripts/project_index.py --check` briefly reported stale
   `local/indexes/folders.json` after the new private evidence directory was created. Regeneration
   returned 19,269 folders and the immediate recheck passed; this was a private index count update,
@@ -54,7 +61,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Its private evidence path and verifier path are separate from the `0x25aa06` task. Begin with
   offline byte/dataflow analysis; do not use the shared REA session while `/root/re02_vcall_25aa06`
   owns it.
-- Exact next action: publish this claim, then assign an offline-only worker to the `0x25ac9f` slot.
+- Exact next action: assign an offline-only worker to `0x25ac9f`; keep REA exclusive to the
+  `0x25aa06` worker until its session is exported and closed.
 
 ## Round 77 fixtures verified (/root)
 
