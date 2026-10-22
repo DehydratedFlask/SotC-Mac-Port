@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 05:49 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 05:52 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -37,9 +37,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   fetch-verified at 0/0 divergence; its publication audit is in E342. The completion/next-task
   claim commit `fdfd466c1269e786db29769a974c3e9ac2a7a84d` is pushed and fetch-verified at 0/0;
   E344 records its path audits. `docs/ASSETS.md` and `docs/TASKS.md` record the sample-only result.
-- Exact next action: complete the claimed
-  `SAV-01-NATIVE-STREAM-FILE-DIRECTORY-ERRNO-FIXTURE-01` test-only assertion and run the focused
-  `save_stream_file` target.
+- Exact next action: review the read-only scout's next-candidate report; if it identifies an
+  unclaimed bounded test-only task, verify the live source/ledger, claim it, and continue.
 - Remaining risks: any result applies only to this sample and does not establish global TOC
   semantics, integrity role, codec, runtime behavior, or game use. The native/API user changes
   and the Graft telemetry cache paths remain unmodified and outside publication.
@@ -67,16 +66,18 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Risk boundary: synthetic `map_region`/`mmap` behavior only; it does not establish allocator
   reachability or game behavior. Keep the existing 512 MiB alignment and production code unchanged.
 
-## SAV-01 native stream directory errno — claimed
+## SAV-01 native stream directory errno — verified
 
 - Task ID `SAV-01-NATIVE-STREAM-FILE-DIRECTORY-ERRNO-FIXTURE-01`, owned by `/root`; child of
-  `SAV-01-NATIVE-STREAM-01`; status `ACTIVE`, zero implementation attempts and zero failed tries.
-- The bounded change is one assertion in `native/tests/test_save_stream_file.cpp`: retain the
-  existing `io_read` check for reading `g_dir`, then assert `SaveStreamReadResult.os_errno == EISDIR`.
-  Live code returns `io_read`/`EISDIR` for a non-regular file, and the fixture currently checks only
-  `io_read`. The test already includes `<cerrno>`.
+  `SAV-01-NATIVE-STREAM-01`; status `FIXTURE_VERIFIED`, one successful implementation attempt and
+  zero failed tries. The directory-read case in `native/tests/test_save_stream_file.cpp` now asserts
+  both `io_read` and `os_errno == EISDIR`.
 - The claim checkpoint is
   [docs/checkpoints/2026-10-22-root-sav01-native-stream-file-directory-errno-claim.md](docs/checkpoints/2026-10-22-root-sav01-native-stream-file-directory-errno-claim.md).
+- Fresh Debug/Ninja configure/build passed; focused `save_stream_file` CTest passed 1/1. Test source
+  SHA256 `eef6bc0f263815d54143bd0da210fae756ee26c96c06129eac772f493ea5f04c`; production source/header
+  unchanged. E348 records the command logs and publication audit. See the
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-sav01-native-stream-file-directory-errno-complete.md).
 - Risk boundary: synthetic filesystem error reporting only; no real save compatibility, durability,
   or game behavior is claimed. Production code remains out of scope.
 
