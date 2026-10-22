@@ -1,6 +1,6 @@
 # Validation gates and evidence protocol
 
-Current checkpoint: G0 PARTIAL; G1 PARTIAL (see E404–E444 —
+Current checkpoint: G0 PARTIAL; G1 PARTIAL (see E404–E445 —
 `docs/checkpoints/2026-10-22-g1-partial-evidence-pack.md`,
 `docs/checkpoints/2026-10-22-appmain-init-registry-slice.md`,
 `docs/checkpoints/2026-10-22-init-531d60-trivial-leaves.md`,
@@ -41,7 +41,8 @@ Current checkpoint: G0 PARTIAL; G1 PARTIAL (see E404–E444 —
 `docs/checkpoints/2026-10-22-vslot-40-533100-cp3characters-attach.md`,
 `docs/checkpoints/2026-10-22-vslot-40-533100-cp3shadowprecache.md`,
 `docs/checkpoints/2026-10-22-vslot-40-533100-cp3shadowprecache-attach.md`,
-`docs/checkpoints/2026-10-22-vslot-40-533100-tail-140d90.md`);
+`docs/checkpoints/2026-10-22-vslot-40-533100-tail-140d90.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-stackchk.md`);
 G2-G6 NOT RUN. This is a plan, not a game execution report. G1 is not PASSED.
 Artifact/tool/source evidence is recorded in EVIDENCE.md; full asset/linkage schemas remain open.
 Baseline supplied by the coordinating agent on 2026-10-19, America/Chicago: M4 Pro, 12 CPU cores,
