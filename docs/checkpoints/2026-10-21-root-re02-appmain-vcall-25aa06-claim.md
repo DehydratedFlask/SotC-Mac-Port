@@ -63,6 +63,12 @@
   --check` result is in `local/checkpoints/round78-re02-claim-sync-trail-check.log`
   (`c4d4773a1c7beda75e8c787228e9162b855526c58e5e95e811191e7c74b30015`); wiring graph current at
   3,580 nodes, deep meaning layer not built.
+- Publication-record sync commit `414a0434e96885b5f028e9b2c7e9f18730955b3e` was pushed to
+  `origin/main`. Post-push fetch confirms `HEAD == origin/main`, divergence 0/0; log
+  `local/checkpoints/round78-re02-claim-sync-postpush.log` SHA-256
+  `4e7d5e77d98fb4c48e615b108f703daacb772c84a424047a393ef25879df4e9b`. Only the pre-existing
+  `native/api/CMakeLists.txt` modification and untracked `native/api/host/` remain in the worktree;
+  neither was staged or published.
 - Next exact action: build an independent byte/mapping trace for only `0x25aa06`; create the
   verifier-backed report; root will replay it and decide whether this static edge is unique or
   remains unresolved. Only then consider a follow-on native function task.
