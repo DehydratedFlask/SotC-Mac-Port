@@ -104,12 +104,16 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xde7fb0, 56, [](StartupState& s) noexcept { init_vec_de7fb0(s.vec_de7fb0); }},
         {0xde6d20, 57, [](StartupState& s) noexcept { init_vec_de6d20(s.vec_de6d20); }},
         {0xde1ad0, 58, [](StartupState& s) noexcept { init_vec_de1ad0(s.vec_de1ad0); }},
-        // Gap idx 59.
+        // Gap idx 59 / 0xde0160: allocate + zero + tail-call atexit registration — NOT lifted
+        // (needs callees 0xf8f4f0 / 0xf8f390). Do not stub-register.
         {0xddef00, 60, [](StartupState& s) noexcept { init_vec_ddef00(s.vec_ddef00); }},
         {0xdddc90, 61, [](StartupState& s) noexcept { init_vec_dddc90(s.vec_dddc90); }},
         {0xddab00, 62, [](StartupState& s) noexcept { init_vec_ddab00(s.vec_ddab00); }},
         {0xdda990, 63, [](StartupState& s) noexcept { init_vec_dda990(s.vec_dda990); }},
-        // Gap idx 64–66.
+        // idx 64–66: already-lifted guarded-constant clones (batch 30) — registered as bookkeeping.
+        {0xdd91b0, 64, [](StartupState& s) noexcept { init_guarded_dd91b0(s.guarded_dd91b0); }},
+        {0xdd7e30, 65, [](StartupState& s) noexcept { init_guarded_dd7e30(s.guarded_dd7e30); }},
+        {0xdd4210, 66, [](StartupState& s) noexcept { init_guarded_dd4210(s.guarded_dd4210); }},
         {0xdd41e0, 67, [](StartupState& s) noexcept { init_vec_dd41e0(s.vec_dd41e0); }},
         {0xdc4180, 68, [](StartupState& s) noexcept { init_vec_dc4180(s.vec_dc4180); }},
         {0xdc2d50, 69, [](StartupState& s) noexcept { init_vec_dc2d50(s.vec_dc2d50); }},

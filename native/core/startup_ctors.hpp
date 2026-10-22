@@ -37,6 +37,9 @@
 #include "leaf_df94c0.hpp"
 #include "vec_ddab00.hpp"
 #include "vec_dda990.hpp"
+#include "guarded_dd91b0.hpp"
+#include "guarded_dd7e30.hpp"
+#include "guarded_dd4210.hpp"
 #include "vec_dd41e0.hpp"
 #include "vec_b52110.hpp"
 #include "vec_b743c0.hpp"
@@ -153,6 +156,9 @@ struct StartupState {
     VecDddc90 vec_dddc90{};   // idx 61
     VecDdab00 vec_ddab00{};   // idx 62
     VecDda990 vec_dda990{};   // idx 63
+    GuardedDd91b0 guarded_dd91b0{};  // idx 64 / 0xdd91b0
+    GuardedDd7e30 guarded_dd7e30{};  // idx 65 / 0xdd7e30
+    GuardedDd4210 guarded_dd4210{};  // idx 66 / 0xdd4210
     VecDd41e0 vec_dd41e0{};   // idx 67
     VecDc4180 vec_dc4180{};   // idx 68
     VecDc2d50 vec_dc2d50{};   // idx 69
