@@ -194,6 +194,15 @@ bool base_initialize_255130(void* self, void* arg,
         if (!rar.ok) {
             return false;
         }
+        // E438: always-on shadowbossmusic load-attempt (stop before success atexit).
+        const Vslot40_533100ShadowbossmusicResult bmr =
+            vslot_40_533100_shadowbossmusic(hooks.vslot_40_shadowbossmusic_detail);
+        if (hooks.vslot_40_shadowbossmusic_out != nullptr) {
+            *hooks.vslot_40_shadowbossmusic_out = bmr;
+        }
+        if (!bmr.ok) {
+            return false;
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true
