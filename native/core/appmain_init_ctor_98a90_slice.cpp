@@ -68,11 +68,15 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
 
     BaseInitialize255130Hooks hooks = base_hooks;
     hooks.prologue_255180 = nullptr;
-    // E418/E419: force lifted 0x534130 + 0x255340.
+    // E418/E419/E421: force lifted 0x534130 + 0x255340 + 0x533100 header.
     hooks.vslot_30 = nullptr;
     hooks.use_lifted_vslot_30 = true;
     hooks.mid_255340 = nullptr;
     hooks.use_lifted_mid_255340 = true;
+    hooks.vslot_40 = nullptr;
+    hooks.use_lifted_vslot_40_header = true;
+    hooks.vslot_40_alloc = &alloc;
+    hooks.vslot_40_out = &out.vslot_40;
     out.base_ok = base_initialize_255130(self, arg, hooks);
     if (out.early.flag_obj != nullptr) {
         std::memcpy(&out.flag_after_base,

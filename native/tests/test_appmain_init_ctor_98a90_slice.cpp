@@ -17,6 +17,7 @@
 #include "core/inputtable_names_fixture.hpp"
 #include "core/mid_255340.hpp"
 #include "core/singleton_f08_531d84.hpp"
+#include "core/vslot_40_533100_header.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -85,9 +86,9 @@ int g_dtor_3b40 = 0;
 int g_dtor_early = 0;
 int g_mid_reg = 0;
 int g_mid_b60 = 0;
-int g_v40 = 0;
 int g_f08_ctor = 0;
 int g_f08_dtor = 0;
+int g_v40_ctor = 0;
 
 void ctor_a30(void* obj) {
     ++g_ctor_a30;
@@ -106,13 +107,16 @@ std::uint64_t hook_init_tb() {
 
 void hook_mid_26ea0(void*, const char*, const char*) { ++g_mid_reg; }
 void hook_mid_26b60(const char*) { ++g_mid_b60; }
-void hook_v40(void*, void*) { ++g_v40; }
 void hook_f08_ctor(void* obj) {
     ++g_f08_ctor;
     // Marker only — full 0x523bd0 body NOT modelled.
     *static_cast<std::uint32_t*>(obj) = 0xF08F08F0u;
 }
 void hook_f08_dtor(void*) { ++g_f08_dtor; }
+void hook_v40_ctor(void* obj) {
+    ++g_v40_ctor;
+    *static_cast<std::uint32_t*>(obj) = 0x53310040u;
+}
 
 void* loadp(const void* base, std::size_t off) {
     void* p = nullptr;
@@ -214,10 +218,11 @@ int main() {
     std::memset(setter.data(), 0xCC, setter.size());
 
     g_ctor_a30 = g_dtor_98a90 = g_dtor_3b40 = g_dtor_early = 0;
-    g_nonnull = g_f590 = g_init_tb = g_move = g_mid_reg = g_mid_b60 = g_v40 = 0;
-    g_f08_ctor = g_f08_dtor = 0;
+    g_nonnull = g_f590 = g_init_tb = g_move = g_mid_reg = g_mid_b60 = 0;
+    g_f08_ctor = g_f08_dtor = g_v40_ctor = 0;
     ctor40_cell_2ee6778() = nullptr;
     singleton_f08_cell_2efc9e0() = nullptr;
+    vslot40_cell_2ef8c08() = nullptr;
     prologue_gate_flag_byte() = 1;  // skip vslot+0x48
     prologue_debug_state_byte() = 0;
     vslot30_cell_boss_val_325e8b4() = -1;
@@ -243,10 +248,10 @@ int main() {
     // sub_3be930 override null → lifted init_sub_3be930
 
     BaseInitialize255130Hooks bh{};
-    // vslot_30 / mid null → slice forces lifted 0x534130 + 0x255340
+    // vslot_30 / mid / vslot_40 null → slice forces lifted 0x534130 + 0x255340 + header
     bh.mid_255340_detail.register_26ea0 = hook_mid_26ea0;
     bh.mid_255340_detail.register_26b60 = hook_mid_26b60;
-    bh.vslot_40 = hook_v40;
+    bh.vslot_40_detail.ctor_493230 = hook_v40_ctor;
 
     SingletonF08Hooks sh{};
     sh.ctor_523bd0 = hook_f08_ctor;
@@ -290,6 +295,12 @@ int main() {
     CHECK(singleton_f08_cell_2efc9e0() == r.singleton.obj);
     CHECK(r.singleton.obj != nullptr);
     CHECK(*static_cast<std::uint32_t*>(r.singleton.obj) == 0xF08F08F0u);
+    // E421: bounded 0x533100 header install
+    CHECK(r.vslot_40.ok);
+    CHECK(r.vslot_40.ctor_ran);
+    CHECK(g_v40_ctor == 1);
+    CHECK(vslot40_cell_2ef8c08() == r.vslot_40.obj);
+    CHECK(*static_cast<std::uint32_t*>(r.vslot_40.obj) == 0x53310040u);
     CHECK(g_move == 0);
     CHECK(g_nonnull == 0);
     CHECK(g_init_tb == 1);
@@ -311,12 +322,13 @@ int main() {
     std::printf(
         "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+sub3be930+ensure3c2f70+"
         "buf80+null_list+tsc323d0+ctor40_1ab550+gates2552d4+singleton_f08+vslot534130+mid255340+"
-        "early+tail+base+trivial+registry ok nested=%p ensure=%p obj40=%p f08=%p gate_byte=%u "
-        "mid_reg=%d tsc=0x%llx entries=%u alloc_ops=%llu duration_us=%lld "
-        "allocator=tip_AllocatorFront+FakeHeap "
-        "vslot533100/26ea0/26b60/272d0/255f60/1fc80/stackchk/ba40_listeners/plt/"
-        "ctor523bd0_body/dtor525b40_body/ensure_migrate/nonnull=NOT_modelled pr5_heap_merge=GAP\n",
-        r.ctor.nested_48, eb, r.tail.obj_40, r.singleton.obj,
+        "vslot533100_header+early+tail+base+trivial+registry ok nested=%p ensure=%p obj40=%p "
+        "f08=%p v40=%p gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u alloc_ops=%llu "
+        "duration_us=%lld allocator=tip_AllocatorFront+FakeHeap "
+        "vslot533100_body/26ea0/26b60/272d0/255f60/1fc80/stackchk/ba40_listeners/plt/"
+        "ctor523bd0_body/dtor525b40_body/ctor493230_body/ensure_migrate/nonnull=NOT_modelled "
+        "pr5_heap_merge=GAP\n",
+        r.ctor.nested_48, eb, r.tail.obj_40, r.singleton.obj, r.vslot_40.obj,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
@@ -324,6 +336,7 @@ int main() {
 
     destroy_registry_at_2efd160(front);
     destroy_singleton_f08_at_2efc9e0(front, sh);
+    destroy_vslot40_at_2ef8c08(front, bh.vslot_40_detail);
     std::puts("appmain_init_ctor_98a90_slice: all checks passed");
     return 0;
 }
