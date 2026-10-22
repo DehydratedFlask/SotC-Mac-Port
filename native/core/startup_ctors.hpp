@@ -102,6 +102,7 @@
 #include "vec_ce7300.hpp"
 #include "vec_ce6fb0.hpp"
 #include "vec_ce67b0.hpp"
+#include "slot23_names_fixture.hpp"
 #include "vec_d7c380.hpp"
 #include "vec_d7c4d0.hpp"
 #include "vec_d7c9d0.hpp"
@@ -257,12 +258,21 @@ struct StartupState {
 
     // Slots 24-47 REGISTERED-AHEAD (CPU-01-NATIVE-SLOT24-47-01): entry [i] is constructor-table index
     // 24 + i. Only registered_ahead_constructors() / init_registration_thunk_ahead() touch this array;
-    // the production runner stops at slot 23 first, so in a production run every entry stays unpublished.
+    // production recovered_constructors() still omits 24-47 (next family after slot 23).
     std::array<DescriptorRegistration, kAheadRegistrationCount> ahead_registrations{};
 
     // Slot 21 / RVA 0x00ee1130: byte-exact 128-byte constant table (cell meanings unknown).
     ConstTableEe1130 const_table_ee1130{};
+
+    // Slot 23 / RVA 0xe71990: private name-string fixture + filled 14-record table.
+    // Missing/corrupt fixture → init_slot23_leaf_e71990 sets init_failed (fail-visible).
+    Slot23NamesFixture slot23_names{};
+    LeafE71990 leaf_e71990{};
 };
+
+// Load private fixture, verify name_hash for records 0..12, fill leaf_e71990.
+// Returns false and sets state.init_failed on any failure.
+[[nodiscard]] bool init_slot23_leaf_e71990(StartupState& state) noexcept;
 
 struct CtorSlot {
     std::uint32_t original_rva;               // identity only; never used as an address
@@ -285,14 +295,10 @@ std::span<const CtorSlot> recovered_constructors() noexcept;
 // REGISTERED-AHEAD table: constructor-table indices 24..47 (the remaining 24 members of the 34-slot
 // descriptor + mutex + atexit family), all with real registration callbacks, in original order.
 //
-// TEST / CHECKER USE ONLY. Slot 23 (0xe71990) is an explicit unresolved blocker in
-// recovered_constructors() because it needs the original name strings (open principal decision); the
-// production startup path must keep using recovered_constructors() and therefore keeps stopping at 23.
-// Running this table directly exercises 24..47 WITHOUT passing through 23, which is exactly why it is
-// kept out of the production table: it proves the registrations are implemented, not that startup works.
-// The focused test checks that recovered_constructors() contains no 24-47 row and that its runner
-// stops at slot 23. tools/lift/check_ctor_slots.py enforces the production-list boundary; it is not a
-// repo-wide source-reference scanner.
+// TEST / CHECKER USE ONLY. Indices 24-47 remain outside recovered_constructors() until that family
+// is claimed on the production path. Slot 23 is recovered via private name fixture
+// (init_slot23_leaf_e71990). Running this ahead table exercises 24..47 without proving full startup.
+// tools/lift/check_ctor_slots.py enforces the production-list boundary.
 std::span<const CtorSlot> registered_ahead_constructors() noexcept;
 
 }  // namespace sotc

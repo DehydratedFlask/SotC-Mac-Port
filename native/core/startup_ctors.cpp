@@ -2,6 +2,15 @@
 
 namespace sotc {
 
+bool init_slot23_leaf_e71990(StartupState& state) noexcept {
+    if (!load_slot23_names_fixture_default(state.slot23_names)) {
+        state.init_failed = true;
+        return false;
+    }
+    init_leaf_e71990(state.leaf_e71990, state.slot23_names.inputs);
+    return true;
+}
+
 CtorRunResult run_constructors(std::span<const CtorSlot> in_order, StartupState& state) noexcept {
     CtorRunResult result;
     for (const CtorSlot& slot : in_order) {
@@ -55,12 +64,9 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xef85e0, 20, [](StartupState& s) noexcept { init_vec_ef85e0(s.vec_ef85e0); }},
         {0xee1130, 21, [](StartupState& s) noexcept { init_const_table_ee1130(s.const_table_ee1130); }},
         {0xea52f0, 22, [](StartupState& s) noexcept { init_ea52f0(s.ea52f0); }},
-        // Slot 23 / RVA 0x00e71990 is the first unrecovered slot: it needs the djb2-XOR name hash
-        // (0xe70aa0, native name_hash) AND the 14 original name strings, whose import as data is an
-        // open decision. This explicit null stops the runner here instead of silently skipping
-        // 23-47 to slot 48. Indices 24-47 (descriptor + mutex + atexit family) have native counterparts but
-        // live ONLY in registered_ahead_constructors() (tests/checker); they are deliberately absent here.
-        {0xe71990, 23, nullptr},
+        // Slot 23 / RVA 0x00e71990: private asset/fixture import of 14 name strings + kLeafE71990Hash.
+        // Missing fixture → init_failed (fail-visible). Indices 24-47 stay in registered_ahead only.
+        {0xe71990, 23, [](StartupState& s) noexcept { (void)init_slot23_leaf_e71990(s); }},
         {0xe10490, 48, [](StartupState& s) noexcept { init_trig_constants(s.trig); }},
         {0xe0b180, 49, [](StartupState& s) noexcept { init_vec_e0b180(s.vec_e0b180); }},
         {0xe094e0, 50, [](StartupState& s) noexcept { init_vec_e094e0(s.vec_e094e0); }},

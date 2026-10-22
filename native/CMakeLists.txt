@@ -42,6 +42,7 @@ add_library(sotc_core STATIC
   core/leaf_83d800.cpp
   core/leaf_7ce8d0.cpp
   core/leaf_e71990.cpp
+  core/slot23_names_fixture.cpp
   core/leaf_df94c0.cpp
   core/fnv_cstr_161fb0.cpp
   core/hashed_name_ctors.cpp
@@ -328,6 +329,13 @@ add_test(NAME scratch_reset COMMAND test_scratch_reset)
 add_executable(test_startup_ctors tests/test_startup_ctors.cpp)
 target_link_libraries(test_startup_ctors sotc_core)
 add_test(NAME startup_ctors COMMAND test_startup_ctors)
+set_tests_properties(startup_ctors PROPERTIES
+  ENVIRONMENT "SOTC_SLOT23_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/slot23_e71990_names.bin")
+add_executable(test_slot23_names_fixture tests/test_slot23_names_fixture.cpp)
+target_link_libraries(test_slot23_names_fixture sotc_core)
+add_test(NAME slot23_names_fixture COMMAND test_slot23_names_fixture)
+set_tests_properties(slot23_names_fixture PROPERTIES
+  ENVIRONMENT "SOTC_SLOT23_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/slot23_e71990_names.bin")
 
 add_executable(test_clothing_preview_param tests/test_clothing_preview_param.cpp)
 target_link_libraries(test_clothing_preview_param sotc_core)
