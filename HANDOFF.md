@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 10:29 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 10:34 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,34 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E407 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E408 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 prologue `0x255180` early fragment
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-PROLOGUE-255180-EARLY-01` — first honest open body of base-Initialize
+  prologue `0x255180` (OBS `0x25519b..0x25525f`): alloc `0xa30` + ctor hook; lifted
+  `0x335a0` flag object into `0x2ea4718`; `0x357f0(…,1)`; hooks for heavy
+  `0x264e50`/`0x335d0`/`0x11e70`/`0x3df40`. Measured → E407 base → E406 → E405.
+  Prefer over vslot/`0xf08` this turn. No leaf-vec; no idx 95; FakeHeap + tip
+  AllocatorFront; PR #5 cite-only.
+- Files: `native/core/prologue_255180.{hpp,cpp}`, `init_flag_object_335a0.{hpp,cpp}`,
+  `appmain_init_prologue_slice.{hpp,cpp}`, test,
+  `tools/lift/check_f255180_prologue.py`; CMake/README;
+  checkpoint `docs/checkpoints/2026-10-22-prologue-255180-early.md`; EVIDENCE E408;
+  TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-prologue-20261022/` (manifest `ad2292d8…`).
+- Observation: ELF pins 448 B body + early call sequence + leaf `0x335a0`; fail-visible
+  missing a30 ctor; success flag20=1 → base xchg→0 → 275 registry (alloc_ops=7). Tail
+  after `0x255264` NOT modelled.
+- Commands: `python3 -I tools/lift/check_f255180_prologue.py` OK;
+  `ctest --test-dir local/build/native-prologue -R '^appmain_init_prologue_slice$'` PASS;
+  private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: prologue tail after `0x255264`, or heavy callees `0x264e50`/`0x335d0`,
+  or vslot `0x534130`, or `0xf08` singleton. Goal remains open.
 
 ## 2026-10-22 base Initialize `0x255130` orchestrator
 

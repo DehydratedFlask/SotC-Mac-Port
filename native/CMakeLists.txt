@@ -66,6 +66,9 @@ add_library(sotc_core STATIC
   core/xchg_store_u32_357f0.cpp
   core/base_initialize_255130.cpp
   core/appmain_init_base_initialize_slice.cpp
+  core/init_flag_object_335a0.cpp
+  core/prologue_255180.cpp
+  core/appmain_init_prologue_slice.cpp
   core/scratch_reset.cpp
   core/save_checksum.cpp
   core/name_hash.cpp
@@ -1568,6 +1571,12 @@ add_executable(test_appmain_init_base_initialize_slice tests/test_appmain_init_b
 target_link_libraries(test_appmain_init_base_initialize_slice sotc_core)
 add_test(NAME appmain_init_base_initialize_slice COMMAND test_appmain_init_base_initialize_slice)
 set_tests_properties(appmain_init_base_initialize_slice PROPERTIES
+  ENVIRONMENT "SOTC_INPUTTABLE_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/inputtable_551140_names.bin")
+
+add_executable(test_appmain_init_prologue_slice tests/test_appmain_init_prologue_slice.cpp)
+target_link_libraries(test_appmain_init_prologue_slice sotc_core)
+add_test(NAME appmain_init_prologue_slice COMMAND test_appmain_init_prologue_slice)
+set_tests_properties(appmain_init_prologue_slice PROPERTIES
   ENVIRONMENT "SOTC_INPUTTABLE_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/inputtable_551140_names.bin")
 
 add_executable(test_page_owner_map tests/test_page_owner_map.cpp)
