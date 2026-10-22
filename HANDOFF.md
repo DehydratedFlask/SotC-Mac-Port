@@ -25,8 +25,9 @@ or Metal gameplay is demonstrated.
   checkpoint `docs/checkpoints/2026-10-22-base-initialize-255130.md`; EVIDENCE E407;
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-base-initialize-20261022/` (manifest `a4a47776…`).
-- Observation: ELF pins orchestrator/leaf/vslots; fail-visible vslot_30 path; success path
-  xchg flag→trivial→275 registry entries (3 alloc ops). Callee/vslot bodies NOT modelled.
+- Observation: tip `0ab7205`; ELF pins orchestrator/leaf/vslots; fail-visible vslot_30 path;
+  success path xchg flag→trivial→275 registry entries (3 alloc ops). Callee/vslot bodies
+  NOT modelled.
 - Commands: `python3 -I tools/lift/check_f255130_base_initialize.py` OK;
   `ctest --test-dir local/build/native-baseinit -R '^appmain_init_base_initialize_slice$'` PASS;
   private capture exit 0; `check_ctor_slots` still **155**.
