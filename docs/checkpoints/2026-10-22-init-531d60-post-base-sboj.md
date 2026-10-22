@@ -35,7 +35,7 @@ bodies; helper bodies `0x1290` / `0x5c64c0` / `0x56dcb0` / `0x499f80` /
 | --- | --- |
 | ELF | `check_f531d60_post_base_sboj.py` OK |
 | ctest | `appmain_init_ctor_98a90_slice` PASS |
-| Private | `local/validation/appmain-init-post-base-sboj-20261022/` (manifest pending; capture `7c23acdc…`) |
+| Private | `local/validation/appmain-init-post-base-sboj-20261022/` (manifest `3b50f2fe…` @ `ed1e6ba`; capture `7c23acdc…`) |
 | Pairs | still **155** |
 
 ## Measured
