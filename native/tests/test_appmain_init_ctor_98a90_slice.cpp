@@ -40,6 +40,7 @@
 #include "core/vslot_40_533100_cp3characters_attach.hpp"
 #include "core/vslot_40_533100_cp3shadowprecache.hpp"
 #include "core/vslot_40_533100_cp3shadowprecache_attach.hpp"
+#include "core/vslot_40_533100_tail_140d90.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -165,6 +166,10 @@ int g_v40_csp_14c2f0 = 0;
 int g_v40_csp_load = 0;
 int g_v40_csp_14ccc0 = 0;
 int g_v40_csp_attach_f590 = 0;
+int g_v40_tail_140d90 = 0;
+int g_v40_tail_140d90_f590 = 0;
+int g_v40_tail_140d90_arg = -1;
+void* g_v40_tail_140d90_slot = nullptr;
 alignas(8) std::uint8_t g_shadow_asset[0x40]{};
 alignas(8) std::uint8_t g_skels_asset[0x40]{};
 alignas(8) std::uint8_t g_anims_asset[0x40]{};
@@ -355,6 +360,12 @@ void* hook_v40_csp_load(void* out_slot, void*, void*) {
 }
 void hook_v40_csp_14ccc0(void*) { ++g_v40_csp_14ccc0; }
 void hook_v40_csp_attach_f590(void*) { ++g_v40_csp_attach_f590; }
+void hook_v40_tail_140d90(void* slot_obj, int arg) {
+    ++g_v40_tail_140d90;
+    g_v40_tail_140d90_slot = slot_obj;
+    g_v40_tail_140d90_arg = arg;
+}
+void hook_v40_tail_140d90_f590(void*) { ++g_v40_tail_140d90_f590; }
 
 void* loadp(const void* base, std::size_t off) {
     void* p = nullptr;
@@ -491,6 +502,9 @@ int main() {
     g_v40_cp3_14ccc0 = g_v40_cp3_attach_f590 = 0;
     g_v40_csp_notify = g_v40_csp_14c2f0 = g_v40_csp_load = 0;
     g_v40_csp_14ccc0 = g_v40_csp_attach_f590 = 0;
+    g_v40_tail_140d90 = g_v40_tail_140d90_f590 = 0;
+    g_v40_tail_140d90_arg = -1;
+    g_v40_tail_140d90_slot = nullptr;
     std::memset(g_shadow_asset, 0, sizeof(g_shadow_asset));
     std::memset(g_skels_asset, 0, sizeof(g_skels_asset));
     std::memset(g_anims_asset, 0, sizeof(g_anims_asset));
@@ -587,6 +601,8 @@ int main() {
     bh.vslot_40_cp3shadowprecache_detail.load_vslot18 = hook_v40_csp_load;
     bh.vslot_40_cp3shadowprecache_attach_detail.release_14ccc0 = hook_v40_csp_14ccc0;
     bh.vslot_40_cp3shadowprecache_attach_detail.dtor_f590 = hook_v40_csp_attach_f590;
+    bh.vslot_40_tail_140d90_detail.call_140d90 = hook_v40_tail_140d90;
+    bh.vslot_40_tail_140d90_detail.dtor_f590 = hook_v40_tail_140d90_f590;
 
     SingletonF08Hooks sh{};
     sh.ctor_523bd0 = hook_f08_ctor;
@@ -813,6 +829,14 @@ int main() {
     CHECK(loadp(app.data(), kVslot40Cp3shadowprecacheAttachSlotOff) == g_csp_asset);
     CHECK(g_v40_csp_attach_f590 == 1);
     CHECK(g_v40_csp_14ccc0 == 1);
+    // E444: 0x140d90 call-site (self+0x3cc8, arg=9) + f590; stop before stackchk
+    CHECK(r.vslot_40_tail_140d90.ok);
+    CHECK(g_v40_tail_140d90 == 1);
+    CHECK(g_v40_tail_140d90_f590 == 1);
+    CHECK(g_v40_tail_140d90_arg == kVslot40Tail140d90Arg);
+    CHECK(g_v40_tail_140d90_slot ==
+          static_cast<std::uint8_t*>(app.data()) + kVslot40Tail140d90SlotOff);
+    CHECK(r.vslot_40_tail_140d90.arg == 9);
     CHECK(g_move == 0);
     CHECK(g_nonnull == 0);
     CHECK(g_init_tb == 1);
@@ -838,13 +862,13 @@ int main() {
         "shadowskels+skels_attach+shadowanims+anims_attach+shadowbanks+banks_attach+"
         "shadowstreams+streams_attach+shadowrandomevents+randomevents_attach+shadowbossmusic+"
         "bossmusic_attach+cp3characters+cp3characters_attach+cp3shadowprecache+"
-        "cp3shadowprecache_attach+early+tail+base+trivial+registry "
+        "cp3shadowprecache_attach+tail_140d90+early+tail+base+trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
         "anims=%p banks=%p streams=%p rand=%p boss=%p cp3=%p csp=%p post_hit=%d miss_null=%d "
         "marker=0x%x refc=%u fail=%d skels_refc=%u skels_fail=%d anims_refc=%u anims_fail=%d "
         "banks_refc=%u banks_fail=%d streams_refc=%u streams_fail=%d rand_refc=%u rand_fail=%d "
-        "boss_refc=%u boss_fail=%d cp3_fail=%d csp_fail=%d gate_byte=%u mid_reg=%d tsc=0x%llx "
-        "entries=%u "
+        "boss_refc=%u boss_fail=%d cp3_fail=%d csp_fail=%d t140=%d gate_byte=%u mid_reg=%d "
+        "tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
         "vslot533100_hit/success_atexit/next_path/14c2f0_body/6a5370_body/6abcc0_body/"
@@ -874,6 +898,7 @@ int main() {
         r.vslot_40_bossmusic_attach.took_fail_path ? 1 : 0,
         r.vslot_40_cp3characters_attach.took_fail_path ? 1 : 0,
         r.vslot_40_cp3shadowprecache_attach.took_fail_path ? 1 : 0,
+        r.vslot_40_tail_140d90.call_140d90_count,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
