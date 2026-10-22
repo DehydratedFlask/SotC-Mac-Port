@@ -36,8 +36,12 @@
 - Failed tries: zero. No implementation has started.
 - Remaining risks / blockers: no blocker to the single-file assertion fixture; payload semantics and
   real-save compatibility remain unknown as documented by the parent task.
-- Next exact action: publish this claim, then send `/root/next_fixture_scout_2` only the
-  `native/tests/test_save_stream.cpp` test-file edit and focused build/CTest request.
+- Claim publication: commit `1f194e4ef9389d33520f57a01d2439db5535d8f6` pushed to `origin/main`;
+  staged/full and post-push explicit/full audits accepted 8/1,721 paths; pre/post fetch divergence
+  was 0/0. Publication log hashes are in E294.
+- Next exact action: `/root/next_fixture_scout_2` has been assigned only the
+  `native/tests/test_save_stream.cpp` test-file edit and focused build/CTest request; root will
+  independently replay after the worker returns.
 - HANDOFF / TASKS / EVIDENCE updated; `INSTALL_LOG.md` has no change. `python3 scripts/project_index.py`
   and `--check` pass at 29,507 folders. Trail was rebuilt with explicit `scripts`, `tools`,
   `reference`, `native`, `launcher`, and `tests` scopes; `trail build --check` passes at 3,618 nodes /
