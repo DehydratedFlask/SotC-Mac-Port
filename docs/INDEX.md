@@ -59,6 +59,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Vslot 0x533100 cp3Characters (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-cp3characters.md) | cp3Characters.calt load-attempt; E440; G1 PARTIAL |
 | [Vslot 0x533100 cp3Characters attach (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-cp3characters-attach.md) | cp3Characters attach fail-path + install self+0x3cb8; E441; G1 PARTIAL |
 | [Vslot 0x533100 cp3shadowprecache (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-cp3shadowprecache.md) | cp3shadowprecache.calt load-attempt; E442; G1 PARTIAL |
+| [Vslot 0x533100 cp3shadowprecache attach (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-cp3shadowprecache-attach.md) | cp3shadowprecache attach fail-path + install self+0x3cc8; E443; G1 PARTIAL |
 | [FOLDERS](FOLDERS.md) | Generated public/source folder inventory; `scripts/project_index.py` |
 | [INSTALL_LOG](../INSTALL_LOG.md) | Existing and newly installed tools, downloads and removals |
 | [Checkpoint template](checkpoints/TEMPLATE.md) | Required record at each checkpoint |
