@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:03 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:04 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -25,8 +25,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   and fetch-verified.
 - Dynlink parser completion is recorded in commit `109b348b7e9d09a518d0cb78a4c7bd14a1c75284`,
   pushed to `origin/main` and fetch-verified with 0/0 divergence.
-- Exact next action: use the active read-only scout to select the next task outside the PSARC reader
-  files; leave negative-limit behavior unclaimed pending the user's answer.
+- Exact next action: close the core-client fallback-copy fixture claimed below; leave PSARC
+  negative-limit behavior unclaimed pending the user's answer.
 
 ## RE-02 dynlink required program headers — fixture verified
 
@@ -52,9 +52,23 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `git fetch origin main` exited 0 and `git rev-list --left-right --count HEAD...origin/main`
   returned `0 0`. Commit `109b348b7e9d09a518d0cb78a4c7bd14a1c75284` was pushed; post-push fetch
   confirmed `HEAD == origin/main` and 0/0 divergence. Existing native API edits stayed unstaged.
-- Exact next action: delegate a read-only scout for a bounded task outside the PSARC reader files;
-  leave negative-limit behavior unclaimed pending the user's choice of invalid-error versus
-  empty-read behavior.
+- Exact next action: continue with the core-client fallback-copy fixture claimed below; leave PSARC
+  negative-limit behavior unclaimed pending the user's choice of invalid-error versus empty-read.
+
+## APP-01 core-client internal error copy — claimed
+
+- Root claims `APP-01-CORECLIENT-INTERNAL-ERROR-COPY-FIXTURE-01`, child of `APP-01`. Scope is only
+  `launcher/Tests/LauncherCoreTests/CoreClientTests.swift`; assert that `.internalError` and
+  `.unknown(5)` both map to the existing exact fallback text `The game core reported an error.`
+- The current suite already checks exact text for `.io`, `.badState`, and `.abiMismatch`, and checks
+  `.unknown(5)` equals `.internalError`; this task pins the matching fallback without changing
+  production wording or claiming UI/runtime behavior.
+- Baseline command `swift test --package-path launcher --scratch-path
+  local/build/app01-internal-error-copy --filter CoreClientTests` passed 22 tests (9 native-client,
+  13 core-client), exit 0. Log SHA256 `22286765f4a240ea0890103ca94d9503186383e9635c1e245aa5e5739d38c647`;
+  source/test baseline hashes are in the claim checkpoint.
+- Status `CLAIMED`; 0 attempts. Exact next action: publish this claim, then add the two exact
+  fallback assertions and rerun the focused CoreClientTests suite.
 
 ## RE-02 app-main +0x20 virtual call — static path byte verified
 
