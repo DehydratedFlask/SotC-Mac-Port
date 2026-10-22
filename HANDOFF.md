@@ -27,12 +27,20 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Next exact action (this worker): allowlist audit → commit/push. Drive owns next production gap
   after 47 / helpers; no leaf-vec / idx 95.
 
+## 2026-10-22 gaps 64–66 register; idx 59 characterized
+
+- Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc.
+- **idx 59 `0xde0160`:** NOT closed — analysis-only (batch 33): allocate + zero + tail-call
+  `0xf8f4f0` / `0xf8f390`; no native lift. Do not stub-register. Next for 59: lift those callees.
+- **idx 64–66** (`0xdd91b0` / `0xdd7e30` / `0xdd4210`): already-lifted guarded clones — registered
+  into production (trivial adjacent bookkeeping). Pairs → **148**; next missing still **59**, then
+  **80–81**.
+- Tip at start of this claim: `009d168` / gap55 `295e214`. Goal open; no leaf-vec fan-out.
+
 ## 2026-10-22 gap 55 — register lifted `0xdf94c0`
 
-- Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Claim: wire already-lifted `leaf_df94c0`
-  (ctor index 55) into `recovered_constructors()`. Contiguous prefix becomes **0–58** with gap
-  **59** next (64–66 still open later). No new leaf-vec farming.
-- Tip after Phase B: `0bbc1a8` on `origin/main`.
+- Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Done — tip `295e214` (+ checker text `009d168`).
+- Contiguous neighborhood **0–58** with gap **59** remaining.
 
 ## 2026-10-22 Phase B — slots 24–47 on production
 
