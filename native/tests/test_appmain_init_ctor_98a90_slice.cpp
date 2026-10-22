@@ -16,6 +16,7 @@
 #include "core/input_table_551140.hpp"
 #include "core/inputtable_names_fixture.hpp"
 #include "core/prologue_255180.hpp"
+#include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
 #include "core/store_tsc_323d0.hpp"
 
@@ -207,6 +208,8 @@ int main() {
     g_ctor_a30 = g_dtor_98a90 = g_dtor_3b40 = g_dtor_early = 0;
     g_nonnull = g_f590 = g_init_tb = g_move = g_v30 = g_mid = g_v40 = 0;
     ctor40_cell_2ee6778() = nullptr;
+    prologue_gate_flag_byte() = 1;  // skip vslot+0x48
+    prologue_debug_state_byte() = 0;
 
     Prologue255180Hooks eh{};
     eh.ctor_a30_264e50 = ctor_a30;
@@ -216,6 +219,7 @@ int main() {
     // ctor_40_1ab550 null → lifted init_ctor_40_1ab550 (slice also forces null)
     th.dtor_98a90_3be390 = dtor_98a90;
     th.dtor_vslot08_3b40 = dtor_3b40;
+    th.run_gates = true;  // E417 default
 
     Ctor98a90_3be050Hooks ch{};
     ch.elem_dtor_f590 = hook_f590;
@@ -248,6 +252,11 @@ int main() {
     CHECK(r.ctor_40.derived_vt);
     CHECK(r.ctor_40.cell_self);
     CHECK(r.ctor_40.field_0a);
+    CHECK(r.tail.gates.ok);
+    CHECK(r.tail.gates.gate_byte == 0);
+    CHECK(!r.tail.gates.took_vslot_48);
+    CHECK(r.tail.gates.ba40_ran);
+    CHECK(!r.tail.gates.state_updated);  // al==state==0
     CHECK(g_move == 0);
     CHECK(g_nonnull == 0);
     CHECK(g_init_tb == 1);
@@ -268,12 +277,13 @@ int main() {
 
     std::printf(
         "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+sub3be930+ensure3c2f70+"
-        "buf80+null_list+tsc323d0+ctor40_1ab550+early+tail+base+trivial+registry ok "
-        "nested=%p ensure=%p obj40=%p tsc=0x%llx entries=%u alloc_ops=%llu duration_us=%lld "
-        "allocator=tip_AllocatorFront+FakeHeap "
-        "plt_f901a0/f901c0/ensure_migrate/f590/nonnull=NOT_modelled pr5_heap_merge=GAP\n",
-        r.ctor.nested_48, eb, r.tail.obj_40, static_cast<unsigned long long>(r.ctor.tsc_value),
-        r.remainder.registry.entry_count,
+        "buf80+null_list+tsc323d0+ctor40_1ab550+gates2552d4+early+tail+base+trivial+registry ok "
+        "nested=%p ensure=%p obj40=%p gate_byte=%u tsc=0x%llx entries=%u alloc_ops=%llu "
+        "duration_us=%lld allocator=tip_AllocatorFront+FakeHeap "
+        "stackchk/ba40_listeners/plt_f901a0/f901c0/ensure_migrate/f590/nonnull=NOT_modelled "
+        "pr5_heap_merge=GAP\n",
+        r.ctor.nested_48, eb, r.tail.obj_40, static_cast<unsigned>(r.tail.gates.gate_byte),
+        static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
         static_cast<long long>(us));
 

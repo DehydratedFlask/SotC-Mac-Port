@@ -12,9 +12,12 @@
 //   alloc 0x40 → ctor 0x1ab550 (lifted E416 / or override) → install self+0x3b40
 //     (prev: vslot+0x08 hook only — OBS has no delete_ on this path)
 //
-// NOT modelled: debug gates after 0x2552cd (0xba40 / stack-chk / vcalls);
-// PLT bodies 0xf901a0 / 0xf901c0; ensure migrate; non-null list.
-// PR #5 cite-only. No leaf-vec; not idx 95.
+// Epilogue / debug gates (OBS 0x2552d4..0x255318) — E417:
+//   gate flag @ 0x2dfce70+0x60 → optional vslot+0x48 @ 0x2dfcf40 → ba40 @ 0x2eec840
+//   → a30 vslot+0x10; stack-chk NOT modelled.
+//
+// NOT modelled: stack-chk PLT; ba40 non-empty listener invoke; PLT 0xf901a0/0xf901c0;
+// ensure migrate; non-null list. PR #5 cite-only. No leaf-vec; not idx 95.
 #pragma once
 
 #include "allocator_front.hpp"
@@ -22,6 +25,7 @@
 #include "ctor_40_1ab550.hpp"
 #include "ctor_98a90_3be050.hpp"
 #include "init_flag_object_335a0.hpp"
+#include "prologue_gates_2552d4.hpp"
 #include "xchg_store_u32_357f0.hpp"
 
 #include <array>
@@ -69,6 +73,9 @@ struct Prologue255180TailHooks {
     void (*ctor_40_1ab550)(void* obj) = nullptr;
     Ctor40_1ab550Hooks ctor_40_detail{};
     void (*dtor_vslot08_3b40)(void* obj) = nullptr;  // previous self+0x3b40 (no delete_)
+    // Epilogue gates after 0x2552cd (default: run lifted empty-path).
+    bool run_gates = true;
+    PrologueGates2552d4Hooks gates_detail{};
 };
 
 struct Prologue255180Result {
@@ -82,6 +89,7 @@ struct Prologue255180TailResult {
     bool ok = false;
     void* obj_98a90 = nullptr;
     void* obj_40 = nullptr;
+    PrologueGates2552d4Result gates{};
 };
 
 // Process-wide cell modelling original qword @ 0x2dfd4b8.
