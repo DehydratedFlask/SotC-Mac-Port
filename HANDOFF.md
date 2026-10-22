@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 22:37 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 22:45 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,7 +8,18 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## RE-02 app-main +0x20 virtual call — claimed
+## DATA-02 TOC-value / declared-size crosstab — claimed
+
+- Root owns bounded task `DATA-02-TOC-VALUE-SIZE-CROSSTAB-01`; claim details and scope are in
+  [the claim checkpoint](docs/checkpoints/2026-10-21-root-data02-toc-value-size-crosstab-claim.md).
+- Compare exact-path archive-pair occurrences from all seven private member manifests. Report only
+  the four aggregate cells for opaque TOC-value equality versus declared-size equality, and
+  reconcile row/column margins to E77 and E123. Paths and raw field values must not enter outputs.
+  This is metadata-only; no payload, digest semantics, loader, or runtime claim.
+- Exact next action: root will assign `/root/round78_next_task_scout` to build and run an
+  independent deterministic private analyzer after this claim is pushed and fetch-verified.
+
+## RE-02 app-main +0x20 virtual call — static path byte verified
 
 - `/root/re02_vcall_25aa06` owns bounded task `RE-02-APPMAIN-VCALL-25AA06-01`; claim and
   baseline are in its [claim checkpoint](docs/checkpoints/2026-10-21-root-re02-appmain-vcall-25aa06-claim.md).
@@ -25,9 +36,18 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   the session closed. See the [timeout checkpoint](docs/checkpoints/2026-10-21-root-re02-appmain-vcall-25aa06-rea-timeout.md).
 - The shared REA session is closed; root controls any further REA/Ghidra use. The worker continues
   offline and must not repeat the same profile. Task attempt count is 1.
-- Exact next action: isolate reaching-register and vtable-slot evidence for `0x25aa06`, verify each
-  instruction and data mapping independently, and preserve an unresolved edge if target proof is
-  incomplete. Privately replay the byte-bound verifier before root changes task status.
+- Worker `/root/re02_vcall_25aa06` completed an offline byte/mapping verifier. Root independently ran
+  `python3 -I tools/lift/verify_appmain_vcall_25aa06.py`; exit 0 and stdout byte-matches the worker
+  output (SHA-256 `00ed6182b87b9860cc1eee41f58cba7966b70dd660e32b113cfc789c752adf86`); stderr is
+  empty. The verifier reports the constructor-linked table's `+0x20` word as `0x531d60`, while two
+  other file-backed `+0x18` references to app-main have `0x255130` in the following `+0x20` word.
+  The receiver's current table at the call is not established; edge remains unresolved.
+- Bounded status is `STATIC_PATH_BYTE_VERIFIED`; no unique target, class, ABI, runtime, or G1 claim.
+  The REA Ghidra startup timeout remains failed try 1; no same-profile retry was made. Full hashes,
+  byte observations, limits, and replay paths are in the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-re02-appmain-vcall-25aa06-complete.md).
+- Exact next action: do not start a runtime-edge investigation without a separate claim and
+  reassessment of REA use.
 
 ## RE-02 app-main +0x28 virtual call — static path byte verified
 
@@ -43,9 +63,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   byte-matches the worker output (SHA-256 `f27559dd088cfdffe126db29e21d780ab3201dd6a31bbf7d8041e1f6f9a10e62`);
   stderr is empty. Verifier SHA-256 `c0454ec60e63604952f66fda100b99eee31934e5bf92b891b35bdae6e7c3e262`.
 - Claim `7975c5c6f1d55e0efe7dc61031f8ff6d69cfe557` and documentation sync
-  `9462efc0187ca14f417fd7a33b6cc4733b5474b8` are pushed and fetch-verified. The completion
-  publication is being prepared. The shared REA session was not used by this worker; root controls
-  any future REA operation.
+  `9462efc0187ca14f417fd7a33b6cc4733b5474b8` are pushed and fetch-verified. Completion commit
+  `ed15ff09811a51f5942dbd549404ddaf2c7af43e` is also pushed and fetch-verified at `origin/main`
+  with 0/0 divergence. The shared REA session was not used by this worker; root controls any future
+  REA operation.
 - Attempt count: one bounded analysis, zero failed analysis hypotheses. Exact private report and
   probe paths, hashes, observations, and limits are in the completion checkpoint. G0 stays PARTIAL;
   G1–G6 stay NOT RUN.
