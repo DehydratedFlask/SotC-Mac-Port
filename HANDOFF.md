@@ -24,10 +24,10 @@ or Metal gameplay is demonstrated.
   checkpoint `docs/checkpoints/2026-10-22-appmain-init-registry-slice.md`;
   EVIDENCE E405; TASKS/VALIDATION/INDEX/HANDOFF. Private (gitignored):
   `local/validation/appmain-init-registry-slice-20261022/` (`manifest.json` sha256
-  `848bd7c6…`, `capture.py` `7f9dd26c…`).
-- Observation: ELF pins vtable `0x15c8cf8`→`0x531d60` and callsite `0x25aa06`; measured run
-  installs 275-entry registry via tip `AllocatorFront`+FakeHeap (alloc_ops=3, object 0x98);
-  `git merge-base --is-ancestor 4d7e484 HEAD` false — PR #5 heap modules absent on tip.
+  `d64beb03…`, `capture.py` `7f9dd26c…`).
+- Observation: tip `8bca0ad`; ELF pins vtable `0x15c8cf8`→`0x531d60` and callsite `0x25aa06`;
+  measured run installs 275-entry registry via tip `AllocatorFront`+FakeHeap (alloc_ops=3,
+  object 0x98); `git merge-base --is-ancestor 4d7e484 HEAD` false — PR #5 heap modules absent.
 - Commands: `python3 -I tools/lift/check_fappmain_init_registry_slice.py` OK;
   `ctest --test-dir local/build/native-appmain-slice -R '^(appmain_init_registry_slice|registry_init_531d60)$'`
   PASS; `python3 -I local/validation/appmain-init-registry-slice-20261022/capture.py` exit 0;
