@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 00:30 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 00:34 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,22 +8,24 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## SRV-01 arena high-water uint64 wrap fixture — claimed
+## SRV-01 arena high-water uint64 wrap fixture — verified
 
 - Claimed bounded task `SRV-01-ARENA-HIGH-WATER-UINT64-WRAP-FIXTURE-01` under `SRV-01`.
   Scope: add one synthetic assertion in `native/tests/test_arena_high_water.cpp` that seeds both
   used counters at `UINT64_MAX - 3`, both peaks at 10, adds 8, and checks both used values wrap to
   4 while both peaks stay 10. Production code and checker are unchanged. See the
   [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-arena-high-water-u64-wrap-claim.md).
-- Baseline `cmake --build local/build/native --target test_arena_high_water` exits 0; focused
-  `ctest --test-dir local/build/native -R '^arena_high_water$' --output-on-failure` passes 1/1.
-  Project index is current at 24,078 folders.
-  Existing tests cover growth, equal/decreased used values, pair independence, and null input, but
-  not uint64 addition wrap. This remains synthetic arithmetic only; it is not allocator policy or
-  runtime evidence.
-- Status `CLAIMED`, 0 implementation attempts, 0 failed tries. Next exact action: publish the
-  claim checkpoint, then add and verify this one assertion while leaving the pending Mach-O CPU and
-  PSARC negative-limit choices untouched.
+- Added one scenario to `native/tests/test_arena_high_water.cpp`. Baseline and worker/root target
+  builds exit 0; focused `arena_high_water` CTest passes 1/1 for worker and root. Test/helper/checker
+  hashes, logs, Trail results, and project-index results are in E258 and the
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-srv01-arena-high-water-u64-wrap-complete.md).
+  Production code and byte checker are unchanged.
+- Status `FIXTURE_VERIFIED`, one successful implementation attempt, 0 failed tries. The assertion
+  pins only synthetic `uint64_t` wrap and peak retention. Claim commit
+  `b8a734c0c20b731e9f8a5de11669b2acdd9f1469` is pushed and fetch-verified; completion publication
+  is being recorded.
+- Exact next action: publish the allowlisted completion checkpoint, then select another bounded
+  independent task. Leave the pending Mach-O CPU and PSARC negative-limit choices untouched.
 
 ## RE-01 identical-output SELF unwrap repeat fixture — verified
 
