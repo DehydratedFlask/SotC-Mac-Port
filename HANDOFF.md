@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:18 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:22 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -97,11 +97,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Claim commit `ee7e7a906450ecf75e328d6d00c2ea4feeb1a44c` and completion commit
   `45d0656b59a07a8595c9886f0cbe432230e82914` were pushed and fetch-verified; `HEAD == origin/main`
   with 0/0 divergence. User-owned native API changes remained unstaged.
-- Exact next action: claim and complete another independent bounded task outside PSARC and these
-  launcher test files after the mutex fixture; leave negative-limit behavior unclaimed pending the
-  user's answer.
+- Exact next action: claim `APP-01-SYSTEM-CHECKS-REJECT-32BIT-MACHO-01`, a synthetic i386 executable
+  rejection fixture in `SystemChecks`; leave negative-limit behavior unclaimed pending the user's
+  answer.
 
-## SRV-01 recursive-mutex non-owner unlock — fixture claimed
+## SRV-01 recursive-mutex non-owner unlock — fixture verified
 
 - Root claimed `SRV-01-RECURSIVE-MUTEX-NONOWNER-UNLOCK-FIXTURE-01`, child of
   `SRV-01-RECURSIVE-MUTEX-01` and `CPU-01-MUTEX-CONTRACT-01`; see the
@@ -113,13 +113,17 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Baseline build command `cmake --build local/build/native --target test_recursive_mutex` and focused
   CTest command `ctest --test-dir local/build/native -R '^recursive_mutex$' --output-on-failure`
   both pass; CTest is 1/1. Logs and hashes are in the claim checkpoint.
-- Status `ACTIVE`, 0 failed implementation tries. This is a local mutex error-contract fixture only;
-  it does not validate scheduler priority inheritance or game behavior. Existing user-owned native
-  API edits remain untouched.
-- Exact next action: add one direct non-owner unlock attempt, assert `EPERM`, and rerun the targeted
-  build/test; then root records E243 and the completion checkpoint.
+- The worker added a direct non-owner unlock attempt while the owner holds two levels; it returns
+  `EPERM`, after which the owner successfully releases both levels. Worker and root build the target
+  successfully and each pass focused CTest 1/1. Logs and hashes are in E243 and the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-srv01-recursive-mutex-nonowner-unlock-complete.md).
+- Status `FIXTURE_VERIFIED`, 1 successful implementation attempt, 0 failed tries. This is a local
+  Darwin mutex error-contract fixture only; it does not validate scheduler priority inheritance or
+  game behavior. Existing user-owned native API edits remain untouched.
+- Claim commit `5815f97ce87576c7cf9b9348ddc0aed4a1fcd8d6` is pushed and fetch-verified. Completion
+  publication is recorded at the top of the latest handoff checkpoint.
 
-## APP-01 CoreErrorCode numeric values — fixture claimed
+## APP-01 CoreErrorCode numeric values — fixture verified
 
 - Root claimed `APP-01-CORE-ERROR-NUMERIC-CODES-ALL-VALUES-FIXTURE-01`, child of
   `APP-01-CORE-ABI-01`; see the [claim checkpoint](docs/checkpoints/2026-10-21-root-app01-core-error-numeric-codes-claim.md).
@@ -130,10 +134,14 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Baseline command `swift test --package-path launcher --scratch-path
   local/build/app01-core-error-codes --filter CoreClientTests` passes 13 existing tests. The current
   `CoreClientTests.numericCodesMapToTypedValues` asserts only error codes 3, 4, and 99.
-- Status `ACTIVE`, 0 failed implementation tries. This test pins the Swift decoder against the C enum
-  constants; it does not establish live ABI transport or engine behavior.
-- Exact next action: add the standalone mapping fixture, run the new focused suite and existing
-  `CoreClientTests`, then record E244 and the completion checkpoint.
+- The standalone fixture asserts every code 0–8 and unknown values 9 / `UInt32.max`. The new suite
+  passes 1 test; the existing `CoreClientTests` suite passes 13 tests on root replay. Logs and hashes
+  are in E244 and the [completion checkpoint](docs/checkpoints/2026-10-21-root-app01-core-error-numeric-codes-complete.md).
+- Status `FIXTURE_VERIFIED`, 1 successful implementation attempt, 0 failed tries. This test pins the
+  Swift decoder against the C enum constants; it does not establish live ABI transport or engine
+  behavior.
+- Claim commit `a82fe6cdd8ac98709858f7c787d7c6085e77667e` is pushed and fetch-verified. Completion
+  publication is recorded at the top of the latest handoff checkpoint.
 
 ## RE-02 app-main +0x20 virtual call — static path byte verified
 
