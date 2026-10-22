@@ -44,6 +44,10 @@ int main() {
                 slot.run(st);
         CHECK(st.trig.cos_3_degrees > 0.9986f);
         CHECK(st.leaf_df94c0.cos_3_degrees > 0.9986f);
+        CHECK(st.leaf_de0160.fill[0] == std::byte{1} &&
+              st.leaf_de0160.fill[sotc::kLeafDe0160FillBytes - 1] == std::byte{1} &&
+              st.leaf_de0160.trailer[0] == std::byte{0} &&
+              st.leaf_de0160.trailer[15] == std::byte{0});
         CHECK(st.neg036.guard == 1 && st.neg036.lanes[0] == kNeg036Bits);
         CHECK(st.xyz_mask_copy == kXyzMaskBits && st.xyz_mask_b == kXyzMaskBits);
         CHECK(st.f4fd40.ones0 == ~0ull && st.f4fd40.epsilon_x4[0] == kEpsilonBits);
@@ -214,7 +218,7 @@ int main() {
     const std::uint32_t expect[] = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
         24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
-        48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 60, 61, 62,
+        48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62,
         63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92,
         93, 94,
         96, 97, 98, 99, 100, 101, 102, 103, 104, 106, 107, 108, 109, 110, 111, 112, 113, 114, 118, 119,

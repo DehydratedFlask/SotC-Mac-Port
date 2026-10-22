@@ -27,15 +27,29 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Next exact action (this worker): allowlist audit → commit/push. Drive owns next production gap
   after 47 / helpers; no leaf-vec / idx 95.
 
+## 2026-10-22 idx 59 `0xde0160` lifted + registered
+
+- Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Attempt 1 — success (0 failed tries).
+- Task: lift PLT callees + register ctor idx 59 (no stub).
+- Files: `native/core/leaf_de0160.{hpp,cpp}`, `native/tests/test_leaf_de0160.cpp`,
+  `tools/lift/check_ff8f4f0.py`, `check_ff8f390.py`, `check_fde0160.py`; wired
+  `startup_ctors.*`, `test_startup_ctors.cpp`, `native/CMakeLists.txt`, `check_ctor_slots.py`.
+- Observation: `0xf8f4f0` = memset (NID `8zTFvBIAIN8`); `0xf8f390` = `__cxa_atexit`
+  (`tsvEmnenz48`); body effect `memset(0x3352ee0,1,0x400)` + zero 16 @ `+0x400`; dtor
+  `0xddf980`=`ret` → atexit **omitted** (documented, peer policy).
+- Commands: `ctest --test-dir local/build/native-idx59 -R '^(leaf_de0160|startup_ctors)$'` PASS;
+  `python3 -I tools/lift/check_{ff8f4f0,ff8f390,fde0160,ctor_slots}.py` OK → **149** pairs;
+  contiguous **0–59**.
+- Inference: not G1; consumers of the BSS cells not analysed. Goal open.
+- Next exact action: optional register already-lifted **80–81**, or next real gap; no leaf-vec.
+
 ## 2026-10-22 gaps 64–66 register; idx 59 characterized
 
 - Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc.
-- **idx 59 `0xde0160`:** NOT closed — analysis-only (batch 33): allocate + zero + tail-call
-  `0xf8f4f0` / `0xf8f390`; no native lift. Do not stub-register. Next for 59: lift those callees.
+- **idx 59 `0xde0160`:** closed in checkpoint above (was analysis-only; callees lifted as PLT identity).
 - **idx 64–66** (`0xdd91b0` / `0xdd7e30` / `0xdd4210`): already-lifted guarded clones — registered
-  into production (trivial adjacent bookkeeping). Pairs → **148**; next missing still **59**, then
-  **80–81**.
-- Tip at start of this claim: `009d168` / gap55 `295e214`. Goal open; no leaf-vec fan-out.
+  into production (trivial adjacent bookkeeping). Was **148** pairs before idx 59 register.
+- Tip at start of that claim: `009d168` / gap55 `295e214`. Goal open; no leaf-vec fan-out.
 
 ## 2026-10-22 gap 55 — register lifted `0xdf94c0`
 
