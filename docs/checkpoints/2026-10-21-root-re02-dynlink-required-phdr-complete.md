@@ -43,6 +43,17 @@
   `/tmp/round78-dynlink-trail-check.log` SHA256
   `4b0aecb55c6f7700bf0861a2fa1def317d581b34ef946c1b50dfe1405c2da70b`. The folder inventory
   now lists 401 checkpoint files.
+- Publish preflight: `git diff --cached --check` exited 0; staged
+  `python3 -I scripts/audit_publish_paths.py` exited 0 with 7 allowlisted paths, log SHA256
+  `425420af1120f073fb803e1f280ab1afa6dd17141303f1165fef19e57e21f29c`; full
+  `python3 -I scripts/audit_publish_paths.py --all` exited 0 with 1,670 allowlisted paths, log
+  SHA256 `04a990ad7f752384cd56e45177d99c5723f916b29ad6eef6dca4a67fe560a382`. `git fetch origin
+  main` exited 0 and `git rev-list --left-right --count HEAD...origin/main` returned `0 0` before
+  commit. `git status --short` showed only the 7 staged allowlisted files plus the pre-existing
+  user-owned `native/api/CMakeLists.txt` and `native/api/host/` unstaged changes.
+- Publication: commit `109b348b7e9d09a518d0cb78a4c7bd14a1c75284` was pushed to `origin/main`.
+  Post-push `git fetch origin main` exited 0; `HEAD` and `origin/main` both resolve to this commit,
+  with 0/0 divergence.
 - Observed: explicit parser errors, all 29 synthetic tests pass, both reversion mutations kill the
   original defect, and duplicate-header first-match behavior passes in the synthetic replay.
   Inference: change hardens offline fixture parser input handling only. No live ELF, dynamic loader,

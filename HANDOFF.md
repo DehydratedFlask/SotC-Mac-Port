@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:01 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:03 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -23,7 +23,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `539a6bd1cfae0f3d75f13ac460d6c3ddf851734e` / `5da4e8f37f26f3b156055a202252123b9e01a41c`,
   and the crosstab-plus-parser claim commit `4fb696fe09af255c4219705c69af8b95f5f2d0fe` were pushed
   and fetch-verified.
-- Exact next action: close the parser fixture task with its independent replay and evidence record.
+- Dynlink parser completion is recorded in commit `109b348b7e9d09a518d0cb78a4c7bd14a1c75284`,
+  pushed to `origin/main` and fetch-verified with 0/0 divergence.
+- Exact next action: use the active read-only scout to select the next task outside the PSARC reader
+  files; leave negative-limit behavior unclaimed pending the user's answer.
 
 ## RE-02 dynlink required program headers — fixture verified
 
@@ -41,6 +44,14 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Status `FIXTURE_VERIFIED`; attempt count 0 failed implementation tries. No live ELF, loader,
   runtime, or game behavior claim. See E240 and the
   [completion checkpoint](docs/checkpoints/2026-10-21-root-re02-dynlink-required-phdr-complete.md).
+- Publish preflight passed: `git diff --cached --check`; staged
+  `python3 -I scripts/audit_publish_paths.py` reported 7 allowed paths (log SHA256
+  `425420af1120f073fb803e1f280ab1afa6dd17141303f1165fef19e57e21f29c`); full
+  `python3 -I scripts/audit_publish_paths.py --all` reported 1,670 allowed paths (log SHA256
+  `04a990ad7f752384cd56e45177d99c5723f916b29ad6eef6dca4a67fe560a382`). Before the commit,
+  `git fetch origin main` exited 0 and `git rev-list --left-right --count HEAD...origin/main`
+  returned `0 0`. Commit `109b348b7e9d09a518d0cb78a4c7bd14a1c75284` was pushed; post-push fetch
+  confirmed `HEAD == origin/main` and 0/0 divergence. Existing native API edits stayed unstaged.
 - Exact next action: delegate a read-only scout for a bounded task outside the PSARC reader files;
   leave negative-limit behavior unclaimed pending the user's choice of invalid-error versus
   empty-read behavior.
