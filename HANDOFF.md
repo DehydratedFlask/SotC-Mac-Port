@@ -28,7 +28,7 @@ or Metal gameplay is demonstrated.
   EVIDENCE E485; TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-cell-2eff448-20261022/` (manifest
   `8727a4a8…` at tip `ae80da5`; capture `f0018976…`).
-- Observation: feat tip `ae80da5`; measured `pb448=1` + `pb53=1` + mid_reg=4 → 275 registry.
+- Observation: feat tip `ae80da5`; docs tip `b342649`; measured `pb448=1` + `pb53=1` + mid_reg=4 → 275 registry.
   Vslot70 body / following vcall `[rax+0x38]` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_cell_2eff448.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
