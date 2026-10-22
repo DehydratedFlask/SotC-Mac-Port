@@ -49,6 +49,7 @@
 #include "core/init_531d60_post_base_56db70.hpp"
 #include "core/init_531d60_post_base_5b3d00.hpp"
 #include "core/init_531d60_post_base_5b3cf0.hpp"
+#include "core/init_531d60_post_base_avx_bss.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -186,6 +187,9 @@ int g_post_base_1290 = 0;
 int g_post_base_56db70 = 0;
 int g_post_base_5b3d00 = 0;
 int g_post_base_5b3cf0 = 0;
+alignas(16) std::uint8_t g_avx_bss_src[16]{};
+alignas(16) std::uint8_t g_avx_bss_dst0[16]{};
+alignas(16) std::uint8_t g_avx_bss_dst1[16]{};
 alignas(8) std::uint8_t g_shadow_asset[0x40]{};
 alignas(8) std::uint8_t g_skels_asset[0x40]{};
 alignas(8) std::uint8_t g_anims_asset[0x40]{};
@@ -546,6 +550,12 @@ int main() {
     g_post_base_56db70 = 0;
     g_post_base_5b3d00 = 0;
     g_post_base_5b3cf0 = 0;
+    // Distinctive src; poison destinations so the AVX BSS copy is observable.
+    for (int i = 0; i < 16; ++i) {
+        g_avx_bss_src[i] = static_cast<std::uint8_t>(0xA0 + i);
+        g_avx_bss_dst0[i] = 0x11;
+        g_avx_bss_dst1[i] = 0x22;
+    }
     stack_guard_value_cell() = 0xC4A4A70000000001ULL;
     std::memset(g_shadow_asset, 0, sizeof(g_shadow_asset));
     std::memset(g_skels_asset, 0, sizeof(g_skels_asset));
@@ -664,12 +674,17 @@ int main() {
     pb5b3.call_5b3d00 = hook_post_base_5b3d00;
     Init531d60PostBase5b3cf0Hooks pb5b3c{};
     pb5b3c.call_5b3cf0 = hook_post_base_5b3cf0;
+    Init531d60PostBaseAvxBssCells pb_avx{};
+    pb_avx.src_1b1dd40 = g_avx_bss_src;
+    pb_avx.dst_1b1dd00 = g_avx_bss_dst0;
+    pb_avx.dst_1b1dd20 = g_avx_bss_dst1;
 
     const std::uint64_t allocs_before = heap.alloc_count;
     const auto t0 = std::chrono::steady_clock::now();
     const auto r = run_appmain_init_ctor_98a90_slice(table, front, app.data(), nullptr, eh, th, ch,
                                                      bh, setter.data(), 0, 0x11, 0x22, 0x33, sh, pb,
-                                                     pb56, pb5c, pb1290, pb56db, pb5b3, pb5b3c);
+                                                     pb56, pb5c, pb1290, pb56db, pb5b3, pb5b3c,
+                                                     pb_avx);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
@@ -935,6 +950,11 @@ int main() {
     CHECK(r.post_base_5b3cf0.ok);
     CHECK(g_post_base_5b3cf0 == 1);
     CHECK(r.post_base_5b3cf0.call_5b3cf0_count == 1);
+    // E453: Init continue AVX BSS copy; stop before 0x7f7220
+    CHECK(r.post_base_avx_bss.ok);
+    CHECK(r.post_base_avx_bss.store_count == 2);
+    CHECK(std::memcmp(g_avx_bss_dst0, g_avx_bss_src, 16) == 0);
+    CHECK(std::memcmp(g_avx_bss_dst1, g_avx_bss_src, 16) == 0);
     CHECK(r.remainder.trivial_ok);
     CHECK(r.remainder.registry.status == RegistryInit531d60Status::ok);
     CHECK(r.remainder.registry.entry_count == kInputTable551140Count);
@@ -958,20 +978,22 @@ int main() {
         "bossmusic_attach+cp3characters+cp3characters_attach+cp3shadowprecache+"
         "cp3shadowprecache_attach+tail_140d90+stackchk+post_base_499f80+post_base_56dcb0+"
         "post_base_5c64c0+post_base_1290+post_base_56db70+post_base_5b3d00+post_base_5b3cf0+"
+        "post_base_avx_bss+"
         "early+tail+base+trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
         "anims=%p banks=%p streams=%p rand=%p boss=%p cp3=%p csp=%p post_hit=%d miss_null=%d "
         "marker=0x%x refc=%u fail=%d skels_refc=%u skels_fail=%d anims_refc=%u anims_fail=%d "
         "banks_refc=%u banks_fail=%d streams_refc=%u streams_fail=%d rand_refc=%u rand_fail=%d "
         "boss_refc=%u boss_fail=%d cp3_fail=%d csp_fail=%d t140=%d schk=%d pb499=%d pb56=%d "
-        "pb5c=%d pb1290=%d pb56db=%d pb5b3=%d pb5b3c=%d "
+        "pb5c=%d pb1290=%d pb56db=%d pb5b3=%d pb5b3c=%d pbavx=%d "
         "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
         "vslot533100_hit/success_atexit/499f80_body/56dcb0_body/5c64c0_body/1290_body/"
-        "14c2f0_body/6a5370_body/6abcc0_body/21620_body/2779a0_body/42390_body/525080_body/"
-        "2569d0_body/26ea0/26b60/272d0/255f60/f8f3a0_body/140d90_body/ba40_listeners/plt/"
-        "ctor523bd0_body/dtor525b40_body/ctor493230_body/ensure_migrate/nonnull=NOT_modelled "
+        "7f7220_body/14c2f0_body/6a5370_body/6abcc0_body/21620_body/2779a0_body/42390_body/"
+        "525080_body/2569d0_body/26ea0/26b60/272d0/255f60/f8f3a0_body/140d90_body/"
+        "ba40_listeners/plt/ctor523bd0_body/dtor525b40_body/ctor493230_body/"
+        "ensure_migrate/nonnull=NOT_modelled "
         "pr5_heap_merge=GAP\n",
         r.ctor.nested_48, eb, r.tail.obj_40, r.singleton.obj, r.vslot_40.obj,
         r.vslot_40_join.pos_obj, r.vslot_40_gfx.obj, r.vslot_40_shadow.loaded,
@@ -1005,6 +1027,7 @@ int main() {
         r.post_base_56db70.call_56db70_count,
         r.post_base_5b3d00.call_5b3d00_count,
         r.post_base_5b3cf0.call_5b3cf0_count,
+        r.post_base_avx_bss.store_count,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
