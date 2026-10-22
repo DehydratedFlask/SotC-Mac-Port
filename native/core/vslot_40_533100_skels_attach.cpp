@@ -94,7 +94,7 @@ Vslot40_533100SkelsAttachResult vslot_40_533100_skels_attach(
     }
     ++out.dtor_f590_count;
 
-    // next path @ 0x5336f7 — NOT modelled
+    // shadowanims @ 0x5336f7 — see vslot_40_533100_shadowanims.*
     out.ok = (out.dtor_f590_count == 1) && (out.installed || prev == loaded);
     return out;
 }

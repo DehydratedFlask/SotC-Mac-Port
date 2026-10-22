@@ -3,7 +3,7 @@
 //   // success path (atexit/tag) NOT modelled when flag false
 //   join @ 0x53365e: install loaded into *[f08+0x10] (replace + refcount)
 //   flag byte at f08+0x18; optional notify if success; release temps; 0xf590
-//   // stop before next path @ 0x5336f7
+//   // stop before shadowanims @ 0x5336f7 (see vslot_40_533100_shadowanims.*)
 //
 // Always-on after E428 shadowskels load-attempt. Prefer over success atexit
 // (flag-true only) and over deepen 0x14c2f0 / 0x6a5370 (already hooked).
@@ -11,7 +11,7 @@
 //
 // Claimed: fail-path + always-on install/cleanup control flow into f08+0x10.
 // NOT modelled: success atexit cluster (0xf8f3d0/0xf730/0x14c4a0/…);
-// bodies of 0x14d880/0x14d2d0/0x14ccc0/0x95580; next path past end. PR #5 cite-only.
+// bodies of 0x14d880/0x14d2d0/0x14ccc0/0x95580. PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
