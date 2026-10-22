@@ -44,6 +44,7 @@ add_library(sotc_core STATIC
   core/leaf_e71990.cpp
   core/slot23_names_fixture.cpp
   core/leaf_df94c0.cpp
+  core/leaf_de0160.cpp
   core/fnv_cstr_161fb0.cpp
   core/hashed_name_ctors.cpp
   core/guarded_static_helpers.cpp
@@ -1432,6 +1433,10 @@ add_test(NAME leaf_e71990 COMMAND test_leaf_e71990)
 add_executable(test_leaf_df94c0 tests/test_leaf_df94c0.cpp)
 target_link_libraries(test_leaf_df94c0 sotc_core)
 add_test(NAME leaf_df94c0 COMMAND test_leaf_df94c0)
+
+add_executable(test_leaf_de0160 tests/test_leaf_de0160.cpp)
+target_link_libraries(test_leaf_de0160 sotc_core)
+add_test(NAME leaf_de0160 COMMAND test_leaf_de0160)
 
 add_executable(test_fnv_cstr tests/test_fnv_cstr.cpp)
 target_link_libraries(test_fnv_cstr sotc_core)

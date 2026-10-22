@@ -104,8 +104,9 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xde7fb0, 56, [](StartupState& s) noexcept { init_vec_de7fb0(s.vec_de7fb0); }},
         {0xde6d20, 57, [](StartupState& s) noexcept { init_vec_de6d20(s.vec_de6d20); }},
         {0xde1ad0, 58, [](StartupState& s) noexcept { init_vec_de1ad0(s.vec_de1ad0); }},
-        // Gap idx 59 / 0xde0160: allocate + zero + tail-call atexit registration — NOT lifted
-        // (needs callees 0xf8f4f0 / 0xf8f390). Do not stub-register.
+        // idx 59 / 0xde0160: memset(buf,1,0x400) via PLT 0xf8f4f0 + zero 16 @ +0x400;
+        // __cxa_atexit via PLT 0xf8f390 with ret-stub dtor 0xddf980 is omitted (no-op).
+        {0xde0160, 59, [](StartupState& s) noexcept { init_leaf_de0160(s.leaf_de0160); }},
         {0xddef00, 60, [](StartupState& s) noexcept { init_vec_ddef00(s.vec_ddef00); }},
         {0xdddc90, 61, [](StartupState& s) noexcept { init_vec_dddc90(s.vec_dddc90); }},
         {0xddab00, 62, [](StartupState& s) noexcept { init_vec_ddab00(s.vec_ddab00); }},
