@@ -119,6 +119,8 @@
 #include "vec_dac410.hpp"
 #include "vec_d853a0.hpp"
 #include "vec_d90310.hpp"
+#include "avx_d8fa40.hpp"
+#include "avx_d86ed0.hpp"
 #include "vec_d85490.hpp"
 #include "vec_d94cb0.hpp"
 #include "vec_dc4180.hpp"
@@ -174,6 +176,8 @@ struct StartupState {
     VecDac410 vec_dac410{};   // idx 77
     VecD94cb0 vec_d94cb0{};   // idx 78
     VecD90310 vec_d90310{};   // idx 79
+    AvxD8fa40 avx_d8fa40{};   // idx 80 / 0xd8fa40
+    AvxD86ed0 avx_d86ed0{};   // idx 81 / 0xd86ed0
     VecD85490 vec_d85490{};   // idx 82
     VecD853a0 vec_d853a0{};   // idx 83
     VecD84ee0 vec_d84ee0{};   // idx 84

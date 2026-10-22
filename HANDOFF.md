@@ -27,6 +27,20 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Next exact action (this worker): allowlist audit → commit/push. Drive owns next production gap
   after 47 / helpers; no leaf-vec / idx 95.
 
+## 2026-10-22 register AVX idx 80–81
+
+- Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Attempt 1 — success.
+- Task: bookkeeping register of already FIXTURE_VERIFIED lifts `avx_d8fa40` (80 / `0xd8fa40`)
+  and `avx_d86ed0` (81 / `0xd86ed0`) — same pattern as 64–66. No stub; no leaf-vec.
+- Files: `startup_ctors.{hpp,cpp}`, `test_startup_ctors.cpp`, `check_ctor_slots.py` only
+  (lifts/CMake/tests already existed).
+- Commands: `ctest --test-dir local/build/native-idx8081 -R '^(startup_ctors|avx_d8fa40|avx_d86ed0)$'`
+  PASS; `check_ctor_slots` / `check_fd8fa40` / `check_fd86ed0` OK → **151** pairs; contiguous
+  **0–94**.
+- Observation: BSS regions abut (`0x3352aa0..0x3352bb0` then `0x3352bb0..0x3352c10`); no overlap.
+- Next exact action: next missing production index is **95** (`0xd71f60`, dormant NEEDS_PRINCIPAL)
+  — skip; then **105** (`0xd5a280`, already lifted AVX) or allocator/G1 depth. Goal open.
+
 ## 2026-10-22 idx 59 `0xde0160` lifted + registered
 
 - Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Attempt 1 — success (0 failed tries).
