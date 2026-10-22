@@ -1,6 +1,7 @@
 // Measured Init path: prologue early + tail (through app+0x3b40) → base → remainder → registry.
 // Uses tip AllocatorFront+FakeHeap. PR #5 cite-only.
-// NOT modelled: debug gates after 0x2552cd; bodies of 0x3be050/0x3be390/0x1ab550.
+// NOT modelled: debug gates after 0x2552cd; PLT bodies of 0xf901a0/0xf901c0.
+// Default hooks may still stub 0x3be050/0x1ab550; measured ctor slice uses lifts.
 #pragma once
 
 #include "allocator_front.hpp"
