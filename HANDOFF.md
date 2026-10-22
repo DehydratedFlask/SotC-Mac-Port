@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:39 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:40 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -19,10 +19,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   [completion checkpoint](docs/checkpoints/2026-10-21-root-aud01-classifier-short-probe-input-complete.md).
 - Status `FIXTURE_VERIFIED`, 1 successful implementation attempt, 0 failed tries. The probe guard
   only covers empty input; it does not characterize real archive members, codec identity, or playback.
-- Claim commit `0052594` was pushed and fetch-verified before the test edit. Existing user-owned
-  `native/api/CMakeLists.txt` and `native/api/host/` changes remain unstaged.
-- Exact next action: review the pending read-only scout report, then read the linked task spec and
-  claim the next unclaimed independent bounded task; leave PSARC negative-limit behavior pending.
+- Claim commit `0052594834883aa8186be8bc599c1b4f7af6d02e` and completion commit
+  `d1da5f14fb2bf862724d925555918b5d09024a9e` are pushed and fetch-verified at 0/0 divergence.
+  Existing user-owned `native/api/CMakeLists.txt` and `native/api/host/` changes remain unstaged.
+- Exact next action: wait for the user's thin Mach-O CPU policy choice before claiming the follow-on
+  launcher architecture task; continue scouting an independent task outside that decision.
 
 ## DATA-02 TOC-value / declared-size crosstab — artifact verified
 
@@ -191,9 +192,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   audit accepted 7 allowlisted paths and the full audit accepted 1,682 paths; post-push `HEAD ==
   origin/main` with 0/0 divergence. User-owned native API changes remain unstaged. Completion
   publication logs and hashes are in the completion checkpoint.
-- Exact next action: claim `AUD-01-CLASSIFIER-SHORT-PROBE-INPUT-FIXTURE-01`, a one-test fixture for
-  empty decompression-probe input, after re-reading its task-linked specification and confirming the
-  task board. Keep it independent of PSARC and the launcher architecture files.
+- This follow-on task is complete; see the audio-probe section at the top of this handoff.
 
 ## RE-02 app-main +0x20 virtual call — static path byte verified
 
