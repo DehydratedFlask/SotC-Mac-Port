@@ -48,12 +48,12 @@
   original game name has an embedded NUL or is required by the port.
 - Remaining risk / acceptance: deterministic helper fixture only; original game-name import and game
   runtime behavior remain separate questions.
-- Publication state: the claim is published in `eaa9e0b405175b78ac35c756155ae525c8f71f20`; this
-  completion and the `store_zero32` claim are ready for the root allowlisted audit, commit, push, and
-  fresh fetch/divergence check. User-owned `native/api/CMakeLists.txt` and `native/api/host/` remain
-  untouched.
-- Next exact action: stage only allowlisted test and root-owned documentation paths, run staged and
-  full publication audits, commit/push, verify `origin/main` at 0/0 divergence, then dispatch the
-  `store_zero32` test edit.
+- Publication state: the claim is in `eaa9e0b405175b78ac35c756155ae525c8f71f20`; completion and the
+  `store_zero32` claim are in pushed commit `cd4efb6`, fetch-verified at 0/0 divergence. Pre-push
+  staged/full audits accepted 9/1,733 paths; post-commit explicit path/full-tree audits accepted
+  9/1,733 paths. E316 records log hashes. User-owned `native/api/CMakeLists.txt` and
+  `native/api/host/` remain untouched.
+- Next exact action: publish the audit record, then dispatch and independently replay the
+  `store_zero32` fixture.
 - Task status and attempt count: `FIXTURE_VERIFIED`; one successful implementation attempt; zero
   failed tries.
