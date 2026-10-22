@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 00:25 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 00:27 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -20,9 +20,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   24,078 folders. Trail wiring graph is in sync at 3,610 nodes / 1,240 files; its source query
   resolves the new method. The deep meaning layer is not built.
 - Status `FIXTURE_VERIFIED`; one successful attempt, 0 failed tries. Claim commits
-  `8020974b0d77aca07143026ab717a2c44c9f9740` and `af40659` were pushed and fetch-verified before
-  implementation. Completion publication is being recorded in the checkpoint. This is synthetic
-  wrapper repeatability only; it does not process a real game SELF or execute code.
+  `8020974b0d77aca07143026ab717a2c44c9f9740` and `af40659`, plus completion commit `b58c301`, are
+  pushed and fetch-verified at 0/0 divergence. Staged/full audits accepted 7/1,694 paths. This is
+  synthetic wrapper repeatability only; it does not process a real game SELF or execute code.
 - Exact next action: review the read-only candidate from `/root/next_independent_task_scout`, verify
   it against live files and task rows, and claim it only if distinct. Leave the pending Mach-O CPU
   and PSARC negative-limit choices untouched.
