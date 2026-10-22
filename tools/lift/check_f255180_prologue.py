@@ -71,7 +71,7 @@ def main() -> int:
     require(call_target(0x255252, img) == 0x357F0, "0x357f0 sil=1 path")
     require(call_target(0x25525F, img) == 0x35770, "0x35770")
 
-    # Tail starts with large alloc — not modelled (LE imm 0x98a90 = 90 8a 09 00)
+    # Tail edge present (deepened separately in check_f255180_prologue_tail.py)
     require(img.read(0x255264, 5) == bytes.fromhex("bf908a0900"), "mov edi, 0x98a90 tail")
 
     leaf = img.read(LEAF_335A0, LEAF_335A0_SIZE)
@@ -81,13 +81,12 @@ def main() -> int:
     hdr = NATIVE.read_text()
     require("run_prologue_255180_early" in hdr, "API")
     require("NOT modelled" in hdr or "not modelled" in hdr.lower(), "omission")
-    require("0x255264" in hdr or "0x98a90" in hdr, "tail omission")
     require(LEAF_H.is_file() and "init_flag_object_335a0" in LEAF_H.read_text(), "335a0 API")
     require("run_appmain_init_prologue_slice" in SLICE.read_text(), "slice API")
 
     print(
         f"OK check_f255180_prologue: body={PROLOGUE_SHA256[:12]}…; early fragment through "
-        f"0x35770 pinned; 0x335a0 lifted; tail/0x264e50/0x335d0 NOT claimed"
+        f"0x35770 pinned; 0x335a0 lifted; heavy early callees NOT claimed"
     )
     return 0
 

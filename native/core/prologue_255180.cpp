@@ -22,6 +22,22 @@ void install_cell(void*& cell, void* neu, AllocatorFront& alloc,
     cell = neu;
 }
 
+// OBS 0x2552b6..0x2552cd: vslot+0x08 only (no delete_).
+void install_slot_vslot_only(void*& cell, void* neu, void (*dtor)(void*)) noexcept {
+    void* prev = cell;
+    if (prev == neu) {
+        return;
+    }
+    if (prev != nullptr && dtor != nullptr) {
+        dtor(prev);
+    }
+    cell = neu;
+}
+
+[[nodiscard]] void*& app_slot(void* self, std::size_t off) noexcept {
+    return *reinterpret_cast<void**>(static_cast<std::uint8_t*>(self) + off);
+}
+
 }  // namespace
 
 void*& prologue_a30_cell_2dfd4b8() noexcept { return g_a30_cell_2dfd4b8; }
@@ -76,6 +92,38 @@ Prologue255180Result run_prologue_255180_early(AllocatorFront& alloc,
     }
 
     out.ok = (out.flag_word_20 == 1) && (out.a30_obj != nullptr) && (out.flag_obj != nullptr);
+    return out;
+}
+
+Prologue255180TailResult run_prologue_255180_tail(AllocatorFront& alloc, void* self,
+                                                  const Prologue255180TailHooks& hooks) {
+    Prologue255180TailResult out{};
+    if (self == nullptr || hooks.ctor_98a90_3be050 == nullptr ||
+        hooks.ctor_40_1ab550 == nullptr) {
+        return out;
+    }
+
+    // OBS 0x255264..0x25529a: alloc 0x98a90 → ctor 0x3be050 → store self+0x3b58
+    void* big = alloc.new_(kPrologue98a90Bytes);
+    if (big == nullptr) {
+        return out;
+    }
+    std::memset(big, 0, kPrologue98a90Bytes);
+    hooks.ctor_98a90_3be050(big);
+    install_cell(app_slot(self, kPrologueAppSlot3b58), big, alloc, hooks.dtor_98a90_3be390);
+    out.obj_98a90 = big;
+
+    // OBS 0x2552a1..0x2552cd: alloc 0x40 → ctor 0x1ab550 → store self+0x3b40
+    void* small = alloc.new_(kPrologueTail40Bytes);
+    if (small == nullptr) {
+        return out;
+    }
+    std::memset(small, 0, kPrologueTail40Bytes);
+    hooks.ctor_40_1ab550(small);
+    install_slot_vslot_only(app_slot(self, kPrologueAppSlot3b40), small, hooks.dtor_vslot08_3b40);
+    out.obj_40 = small;
+
+    out.ok = (out.obj_98a90 != nullptr) && (out.obj_40 != nullptr);
     return out;
 }
 
