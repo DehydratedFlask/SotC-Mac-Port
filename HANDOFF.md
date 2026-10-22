@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 06:23 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 06:27 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -15,11 +15,13 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `native/tests/test_normal_threshold.cpp` for positive and negative infinite thresholds. Its
   [claim checkpoint](docs/checkpoints/2026-10-22-root-cpu01-normal-threshold-infinity-claim.md)
   records baseline hashes, exact commands, and the synthetic-only boundary.
-- This claim is being published now; implementation has zero attempts and zero failed tries. No
-  production helper, CMake, unrelated user API, or game-input changes are in scope. Root owns shared
-  docs and publication.
-- Exact next action: after the claim commit is pushed, dispatch the two test assertions and focused
-  `normal_threshold` build/CTest to `/root/next_fixture_scout_2`; root will replay independently.
+- Claim commit `bed80c340ac33a381ad4a30a98eeb44ba6adf8c6` is pushed and fetch-verified at 0/0
+  divergence; E361 and the [publication checkpoint](
+  docs/checkpoints/2026-10-22-root-sav01-completion-cpu01-claim-publication.md) record path audits
+  and the post-push result. Implementation has zero attempts and zero failed tries. No production
+  helper, CMake, unrelated user API, or game-input changes are in scope.
+- Exact next action: dispatch the two test assertions and focused `normal_threshold` build/CTest to
+  `/root/next_fixture_scout_2`; root will replay independently.
 
 ## SAV-01 bad-magic zeroed-fields fixture — verified
 
@@ -29,6 +31,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - E359 and the [completion checkpoint](
   docs/checkpoints/2026-10-22-root-sav01-chunk-header-bad-magic-zeroed-fields-complete.md) record
   exact commands, hashes, logs, and independent review.
+- Completion plus the next CPU-01 claim are published in `bed80c340ac33a381ad4a30a98eeb44ba6adf8c6`;
+  E361 records the audits and post-push result.
 - This observes a synthetic parser error result only; it does not establish real-save compatibility
   or game save/load behavior.
 
@@ -95,9 +99,15 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   CTest, with independent read-only review. E359 and its completion checkpoint record the exact
   commands and evidence.
 - CPU-01 infinite-threshold fixture claim is recorded in E360 and its claim checkpoint. Its claim
-  must be committed and pushed with path audits before implementation begins.
-- Exact next action: publish SAV-01 completion and the CPU-01 claim, then dispatch the two
-  `normal_threshold` assertions and focused check.
+  is published in `bed80c340ac33a381ad4a30a98eeb44ba6adf8c6`, before implementation begins.
+- E361 and the [publication checkpoint](
+  docs/checkpoints/2026-10-22-root-sav01-completion-cpu01-claim-publication.md) record the staged
+  and full path audits plus fetch-verified 0/0 divergence.
+- E362 and the [pre-dispatch checkpoint](
+  docs/checkpoints/2026-10-22-root-cpu01-threshold-claim-pre-dispatch.md) record one stale folder-index
+  check and the successful serial regeneration/check recovery. No project source changed.
+- Exact next action: dispatch the two `normal_threshold` assertions and focused check to the worker;
+  root will replay independently.
 
 ## DATA-02 pakN TOC payload-MD5 sample — verified
 
