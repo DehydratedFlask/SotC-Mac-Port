@@ -3,7 +3,7 @@
 //   // success path (atexit/tag) NOT modelled when flag false
 //   join @ 0x5337d7: install loaded into *[f08+0x20] (replace + refcount)
 //   flag byte at f08+0x28; optional notify if success; release temps; 0xf590
-//   // stop before next path @ 0x533870
+//   // stop before shadowbanks @ 0x533870 (see vslot_40_533100_shadowbanks.*)
 //
 // Always-on after E430 shadowanims load-attempt. Prefer over success atexit
 // (flag-true only) and over deepen 0x14c2f0 / 0x6a5370 (already hooked).
