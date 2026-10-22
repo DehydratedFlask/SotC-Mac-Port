@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 10:34 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 10:41 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,33 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E408 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E409 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 prologue `0x255180` tail (`0x98a90` / app+0x3b58)
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-PROLOGUE-255180-TAIL-01` — OBS `0x255264..0x2552cd`: alloc `0x98a90` +
+  ctor hook `0x3be050` → `self+0x3b58` (dtor `0x3be390`+delete_); alloc `0x40` + ctor
+  hook `0x1ab550` → `self+0x3b40` (vslot+0x08 only). Measured early+tail → E407 → E406 →
+  E405. Prefer over heavy callees / vslot / `0xf08` this turn. No leaf-vec; no idx 95;
+  FakeHeap + tip AllocatorFront; PR #5 cite-only.
+- Files: `native/core/prologue_255180.{hpp,cpp}` (tail API),
+  `appmain_init_prologue_tail_slice.{hpp,cpp}`, test,
+  `tools/lift/check_f255180_prologue_tail.py`; CMake/README;
+  checkpoint `docs/checkpoints/2026-10-22-prologue-255180-tail.md`; EVIDENCE E409;
+  TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-prologue-tail-20261022/` (manifest `e0f9445c…`).
+- Observation: ELF pins rem sha `31eeb31e…` + install sequence; fail-visible missing
+  98a90 ctor; success → 275 registry (alloc_ops=9). Debug gates after `0x2552cd` NOT
+  modelled.
+- Commands: `python3 -I tools/lift/check_f255180_prologue_tail.py` OK;
+  `ctest --test-dir local/build/native-prologue-tail -R '^(appmain_init_prologue_tail_slice|appmain_init_prologue_slice)$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: debug gates after `0x2552cd`, or heavy callees `0x3be050`/`0x264e50`/
+  `0x335d0`, or vslot `0x534130`, or `0xf08` singleton. Goal remains open.
 
 ## 2026-10-22 prologue `0x255180` early fragment
 
