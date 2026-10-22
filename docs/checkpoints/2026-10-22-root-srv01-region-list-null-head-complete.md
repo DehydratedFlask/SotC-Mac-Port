@@ -1,6 +1,6 @@
 # Checkpoint: SRV-01-REGION-LIST-NULL-HEAD-SLOT-INSERT-FIXTURE-01 — fixture verified
 
-- Time / timezone: 2026-10-22 03:42 CDT (America/Chicago)
+- Time / timezone: 2026-10-22 03:46 CDT (America/Chicago)
 - Agent / integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`); worker
   `/root/native_fixture_scout` owned the single test-file edit.
 - Task / gate / status: `SRV-01-REGION-LIST-NULL-HEAD-SLOT-INSERT-FIXTURE-01`, child of verified
@@ -49,11 +49,12 @@
   caller or actual game behavior.
 - Risk / acceptance: no real allocator or region-list runtime behavior is demonstrated. This fixture
   does not advance game boot, audio, saving, or Metal acceptance gates.
-- Claim/publication state: the published claim commit is `42331857a2212ec2f3e7c283f41b1f197da0d585`;
-  claim audit documentation commit `c9ecd22156497404edcef5728d64e910730ef96e` is fetch-verified.
-  Completion and the separate recursive-mutex claim are ready for root allowlisted publication.
-- Next exact action: stage only the region-list test and root-owned docs/index, audit staged and all
-  paths, fetch and check divergence, commit/push, then verify `origin/main` at 0/0 divergence. Keep
-  API work unstaged.
+- Claim/publication state: commit `1400c835ff74b1744c65ded8e0139cb2051b92fa` contains the region-list
+  completion and the separate recursive-mutex claim; it is pushed and fetch-verified at 0/0
+  divergence. Pre/post explicit audits accepted 8 paths; pre/post full audits accepted 1,729 paths.
+  Audit, fetch, commit, push, and status log hashes are in E310. User-owned API changes were not
+  staged or changed.
+- Next exact action: continue the published recursive-mutex claim; after worker results, run the
+  independent root replay and publish its completion if checks pass.
 - Task status and attempt count: `FIXTURE_VERIFIED`; 1 successful implementation attempt; 0 failed
   tries.
