@@ -82,6 +82,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Init continue Shadow Boss Outro Jump (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-sboj.md) | Init continue Shadow Boss Outro Jump call-sites; E463; G1 PARTIAL |
 | [Init continue 0x52eb50 call-site (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-52eb50.md) | Init continue 0x52eb50 call-site; E464; G1 PARTIAL |
 | [Init continue lea rbx / vmovq (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-lea-vmovq.md) | Init continue lea rbx / vmovq seed; E465; G1 PARTIAL |
+| [Init continue 0x532ca0 call-site (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-532ca0.md) | Init continue 0x532ca0 call-site; E466; G1 PARTIAL |
 | [FOLDERS](FOLDERS.md) | Generated public/source folder inventory; `scripts/project_index.py` |
 | [INSTALL_LOG](../INSTALL_LOG.md) | Existing and newly installed tools, downloads and removals |
 | [Checkpoint template](checkpoints/TEMPLATE.md) | Required record at each checkpoint |
