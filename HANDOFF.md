@@ -30,20 +30,34 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `native/tests/test_save_stream_file.cpp:L104-L119`, with its call at L238. The work log SHA256 is
   in E278.
 
-## SRV-01 HostMapping null-pointer fixture — active claim
+## SRV-01 HostMapping null-pointer fixture — verified
 
-- `SRV-01-HOST-MAP-EMPTY-NULL-NONZERO-SIZE-FIXTURE-01` is claimed under verified parent
-  `SRV-01-HOST-MAP-EMPTY-NONNULL-ZERO-SIZE-FIXTURE-01`. Scope is one synthetic assertion in
-  `native/tests/test_host_map.cpp`: construct `HostMapping` with a null pointer and nonzero size,
-  then assert `empty()`. Production code is unchanged. This covers the null-pointer arm of the
-  predicate only; it makes no OS mapping or game-runtime claim.
-- Baseline `test_host_map` target build exits 0 and focused `host_map` CTest passes 1/1. Logs,
-  hashes, and live source/test-gap evidence are in E280 and the
-  [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-host-map-empty-null-nonzero-claim.md).
-  Project index generation/check pass at 24,080 folders; Trail wiring check passes at 3,617 nodes /
-  1,240 files. The work log hash is in E280. Status is `ACTIVE`; implementation attempts: 0. After
-  the claim commit, delegate the one-file test to `/root/next_fixture_scout_2`, then review and
-  replay at root.
+- `SRV-01-HOST-MAP-EMPTY-NULL-NONZERO-SIZE-FIXTURE-01` under verified parent
+  `SRV-01-HOST-MAP-EMPTY-NONNULL-ZERO-SIZE-FIXTURE-01` adds one synthetic assertion in
+  `native/tests/test_host_map.cpp`: set a default `HostMapping` size to 1 and assert
+  `empty()`. Production code is unchanged. This covers the null-pointer arm of the predicate only;
+  it makes no OS mapping or game-runtime claim.
+- Baseline, worker, and root focused builds exit 0; their `host_map` CTests pass 1/1. Root used a
+  fresh build directory and compiled the test source independently. Test/source hashes, logs,
+  Trail query, and project-index evidence are in E280/E283 and the
+  [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-host-map-empty-null-nonzero-claim.md)
+  and [completion checkpoint](docs/checkpoints/2026-10-22-root-srv01-host-map-empty-null-nonzero-complete.md).
+- Status is `FIXTURE_VERIFIED`, one successful implementation attempt and zero failed tries.
+  Claim publication is documented in E281; completion publication details will be added after the
+  completion commit is pushed. The fixture pins only synthetic accessor behavior.
+
+## APP-01 readiness fallback-copy fixture — active claim
+
+- `APP-01-CORE-READINESS-ZERO-PROBLEM-FALLBACK-FIXTURE-01` is claimed under `APP-01`. Scope is one
+  assertion in `CoreReadinessTests.assetsStatusMapsEveryCase()` in
+  `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift`: for a non-nil asset directory and
+  synthetic validation with `assetsReady == false`, `.assetsNotReady`, `problemCount == 0`, and
+  empty detail, assert `.missing("The game files did not pass validation.")`. Production code is
+  unchanged; this is synthetic copy-mapping only.
+- Baseline `CoreReadinessTests` pass 6 tests. Logs, source hashes, and exact gap are in E282 and the
+  [claim checkpoint](docs/checkpoints/2026-10-22-root-app01-core-readiness-zero-fallback-claim.md).
+  Status is `ACTIVE`; implementation attempts: 0. After the claim publication, delegate only the
+  launcher test file to `/root/next_fixture_scout_3` and independently replay at root.
 - Keep pending Mach-O CPU and PSARC policy choices untouched.
 
 ## RE-01 identity sidecar symlink alias fixture — verified
