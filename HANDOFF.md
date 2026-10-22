@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 03:24 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 03:32 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -52,26 +52,48 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   fetch-verified at 0/0 divergence; its explicit and full audits accepted 4/1,724 paths.
 - Only the pre-existing user-owned `native/api/CMakeLists.txt` modification and untracked
   `native/api/host/` remain in the worktree; neither was staged or included in the commit.
-- Next exact action: continue the active `SRV-01-ALLOCATOR-ALIGN64K-UINT32-WRAP-FIXTURE-01`
-  claim below after its publication checkpoint.
+- Next exact action: publish the verified allocator fixture and independent region-list claim below
+  using explicit allowlisted paths, then assign the region-list test file to its worker. `/root`
+  retains `HANDOFF.md` integration and publication.
 
-## SRV-01 allocator 64 KiB alignment overflow fixture — active claim
+## SRV-01 allocator 64 KiB alignment overflow fixture — fixture verified
 
-- `SRV-01-ALLOCATOR-ALIGN64K-UINT32-WRAP-FIXTURE-01` is a child of `SRV-01`. Proposed scope is
-  one synthetic assertion in `native/tests/test_allocator_region.cpp::main()`:
+- `SRV-01-ALLOCATOR-ALIGN64K-UINT32-WRAP-FIXTURE-01` is a child of `SRV-01`. It adds one synthetic
+  assertion in `native/tests/test_allocator_region.cpp::main()`:
   `CHECK(align_up_64k(0xffff0001u) == 0u);`. No implementation, header, or CMake change.
-- The root independently configured a fresh Debug/Ninja build, built `test_allocator_region`, and
-  ran focused `allocator_region` CTest: exit 0; 1/1 passed. Baseline file and log hashes are in
-  E301 and the [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-align64k-uint32-wrap-claim.md).
+- Worker and independent root fresh builds pass; focused `allocator_region` CTest passes 1/1 in
+  both. Final test/source hashes, logs, and bounded interpretation are in E303 and the
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-srv01-align64k-uint32-wrap-complete.md).
 - The live helper performs 32-bit addition of `0xffffu` before masking with `0xffff0000u`; the
   input `0xffff0001u` wraps that addition to zero. Existing tests cover ordinary rounding values,
   not this overflow boundary. Trail found the helper at `native/core/allocator_region.hpp:L50-L52`
   and existing alignment checks in `test_allocator_region.cpp:L18-L22`.
 - This records synthetic integer arithmetic only, not allocator runtime behavior or game behavior.
-  The task is `ACTIVE`, with zero implementation attempts and zero failed tries. Worker
-  `/root/next_fixture_scout_3` has not edited the test file.
-- Next exact action: finish publishing the bounded claim, then assign `/root/next_fixture_scout_3`
-  only `native/tests/test_allocator_region.cpp`; root independently replay the focused test.
+  Status is `FIXTURE_VERIFIED`, one successful implementation attempt and zero failed tries. Claim
+  commit `0341cacc5273102d566a6c35b74e3fef615bd258` is pushed and fetch-verified at 0/0 divergence;
+  pre/post explicit audits accepted 6 paths and full audits accepted 1,725 paths. See E302.
+- Next exact action: publish the completion with explicit allowlisted paths. The user-owned
+  `native/api/CMakeLists.txt` modification and untracked `native/api/host/` remain outside scope.
+
+## SRV-01 region-list null head-slot insert fixture — active claim
+
+- `SRV-01-REGION-LIST-NULL-HEAD-SLOT-INSERT-FIXTURE-01` is a child of verified
+  `SRV-01-REGION-LIST-EMPTY-HEAD-INSERT-FIXTURE-01`. Proposed scope is one synthetic case in
+  `native/tests/test_region_list.cpp::main()`: call
+  `list_insert_at_head(neu, nullptr, arena, &alloc_count)` with count 7, then check node identity,
+  null next, arena-valued prev, arena owner, and count 8. No implementation, header, or CMake change.
+- Root independently configured a fresh Debug/Ninja build, built `test_region_list`, and ran
+  focused `region_list` CTest: exit 0; 1/1 passed. Source, build, and Trail evidence are in E304
+  and the [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-region-list-null-head-claim.md).
+- Trail's `list_insert_at_head` query resolved the null-slot branch at
+  `native/core/region_list.cpp:L28-L39` and existing test calls at
+  `native/tests/test_region_list.cpp:L136`, `L154`, and `L168`. The helper skips slot assignment
+  for a null slot pointer while still initializing node fields, optional count, and owner. This
+  pins helper behavior only; it does not establish an actual list-head callsite or game behavior.
+- Status is `ACTIVE`, with zero implementation attempts and zero failed tries. Proposed worker
+  `/root/native_fixture_scout` owns only `native/tests/test_region_list.cpp` after claim publication.
+- Next exact action: finish the project-index and Trail checks, publish this claim, then hand off the
+  single test-file change. `/root` owns all docs and publication.
 
 ## SAV-01 stream-file symlink destination fixture — verified
 

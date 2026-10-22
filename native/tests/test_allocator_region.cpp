@@ -20,6 +20,7 @@ int main() {
     CHECK(align_up_64k(0xffff) == 0x10000u);
     CHECK(align_up_64k(0x10000) == 0x10000u);
     CHECK(align_up_64k(0x20000000) == 0x20000000u);
+    CHECK(align_up_64k(0xffff0001u) == 0u);
     CHECK(align_up_1m(0) == 0u);
     CHECK(align_up_1m(1) == 0x100000u);
     CHECK(align_up_1m(0xfffff) == 0x100000u);
