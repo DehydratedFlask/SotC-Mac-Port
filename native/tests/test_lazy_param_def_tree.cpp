@@ -137,6 +137,25 @@ int main() {
         CHECK(g_build_calls.load() == 2);
     }
 
+    // A failed release lock leaves an already-built tree and its cached pointer intact.
+    {
+        RecursiveMutex mutex;
+        CHECK(mutex.initialize() == 0);
+        LazyParamDefTree tree(mutex, &build_ok);
+        g_build_calls = 0;
+        const ParamTreeResult built = tree.get();
+        CHECK(built.error == ParamTreeError::none && built.tree != nullptr);
+        CHECK(tree.built());
+
+        // get() has returned and released the lock, so close() makes future locks fail safely.
+        CHECK(mutex.close() == 0);
+        CHECK(tree.release() == ParamTreeError::mutex_unavailable);
+        CHECK(tree.built());
+        const ParamTreeResult cached = tree.get();
+        CHECK(cached.error == ParamTreeError::none && cached.tree == built.tree);
+        CHECK(g_build_calls.load() == 1);
+    }
+
     // release() on a never-built tree is a harmless no-op.
     {
         RecursiveMutex mutex;
