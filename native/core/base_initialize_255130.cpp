@@ -78,6 +78,14 @@ bool base_initialize_255130(void* self, void* arg,
         if (!jr.ok) {
             return false;
         }
+        // E425: always-on gfx-cell prelude before shadowmodels.crmp.
+        const Vslot40_533100GfxResult gr = vslot_40_533100_gfx_2ee2d00(hooks.vslot_40_gfx_detail);
+        if (hooks.vslot_40_gfx_out != nullptr) {
+            *hooks.vslot_40_gfx_out = gr;
+        }
+        if (!gr.ok) {
+            return false;
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true
