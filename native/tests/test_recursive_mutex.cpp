@@ -22,6 +22,13 @@ static CompetingTry try_from_another_thread(sotc::RecursiveMutex& mutex) {
     return result;
 }
 
+static int unlock_from_another_thread(sotc::RecursiveMutex& mutex) {
+    int unlock_rc = EINVAL;
+    std::thread competitor([&] { unlock_rc = mutex.unlock(); });
+    competitor.join();
+    return unlock_rc;
+}
+
 int main() {
     using sotc::RecursiveMutex;
 
@@ -35,6 +42,7 @@ int main() {
     CHECK(mutex.initialize() == EALREADY);
     CHECK(mutex.lock() == 0);
     CHECK(mutex.lock() == 0);
+    CHECK(unlock_from_another_thread(mutex) == EPERM);
 
     const CompetingTry while_fully_held = try_from_another_thread(mutex);
     CHECK(while_fully_held.try_rc == EBUSY);
