@@ -49,6 +49,15 @@ bool base_initialize_255130(void* self, void* arg,
         if (!hr.ok) {
             return false;
         }
+        // E422: always-on post-header fragment (stops at show_areaInfo branch).
+        const Vslot40_533100PostResult pr =
+            vslot_40_533100_post(self, arg, hooks.vslot_40_post_detail);
+        if (hooks.vslot_40_post_out != nullptr) {
+            *hooks.vslot_40_post_out = pr;
+        }
+        if (!pr.ok) {
+            return false;
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true

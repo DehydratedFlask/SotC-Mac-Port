@@ -4,7 +4,7 @@
 //   lea cell → 0x2ef8c08; cmp/swap:
 //     if prev != neu && prev: inlined destroy (list@+0x90 / 0x3b440×2 / 0x170b0)
 //     store neu → cell
-//   // remainder of 3956 B body NOT modelled (uses 0x2efc9e0, 0x525080, …)
+//   // post-header fragment: see vslot_40_533100_post.* (E422)
 //
 // Always-on on measured Base Initialize path (vcall [vt+0x40] after mid 0x255340).
 // Prefer over non-null list (measured null-head skips) and ensure migrate

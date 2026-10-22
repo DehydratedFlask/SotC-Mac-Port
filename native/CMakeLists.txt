@@ -77,6 +77,8 @@ add_library(sotc_core STATIC
   core/mid_255340.cpp
   core/singleton_f08_531d84.cpp
   core/vslot_40_533100_header.cpp
+  core/lookup_1fc80.cpp
+  core/vslot_40_533100_post.cpp
   core/ctor_98a90_3be050.cpp
   core/appmain_init_prologue_slice.cpp
   core/appmain_init_prologue_tail_slice.cpp
