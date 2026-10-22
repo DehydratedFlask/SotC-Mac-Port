@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:07 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:10 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -25,7 +25,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   and fetch-verified.
 - Dynlink parser completion is recorded in commit `109b348b7e9d09a518d0cb78a4c7bd14a1c75284`,
   pushed to `origin/main` and fetch-verified with 0/0 divergence.
-- Exact next action: close the core-client fallback-copy fixture claimed below; leave PSARC
+- Exact next action: complete the archive status-code fixture claimed below; leave PSARC
   negative-limit behavior unclaimed pending the user's answer.
 
 ## RE-02 dynlink required program headers — fixture verified
@@ -52,7 +52,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `git fetch origin main` exited 0 and `git rev-list --left-right --count HEAD...origin/main`
   returned `0 0`. Commit `109b348b7e9d09a518d0cb78a4c7bd14a1c75284` was pushed; post-push fetch
   confirmed `HEAD == origin/main` and 0/0 divergence. Existing native API edits stayed unstaged.
-- Exact next action: continue with the core-client fallback-copy fixture claimed below; leave PSARC
+- Exact next action: complete the archive status-code fixture claimed below; leave PSARC
   negative-limit behavior unclaimed pending the user's choice of invalid-error versus empty-read.
 
 ## APP-01 core-client internal error copy — fixture verified
@@ -77,6 +77,21 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `origin/main` with 0/0 divergence.
 - Exact next action: scout another independent bounded task outside the PSARC and CoreClient files;
   leave negative-limit behavior unclaimed pending the user's answer.
+
+## APP-01 archive status codes — fixture claimed
+
+- Root claimed `APP-01-CORE-ARCHIVE-STATUS-CODES-FIXTURE-01`, child of
+  `APP-01-CORE-ABI-01`; see the [claim checkpoint](docs/checkpoints/2026-10-21-root-app01-core-archive-status-codes-claim.md).
+- Scope is only `launcher/Tests/LauncherNativeCoreTests/NativeCoreClientTests.swift`: assert C ABI
+  archive status values 0–3 map to `.ok`, `.missing`, `.unreadable`, `.badMagic`, and an unknown
+  value remains `.unknown(value)`. Baseline focused suite passes 9 tests. No production source changes.
+- The header constants and Swift mapping align, but current tests only cover `.badMagic` via a file
+  validation and do not pin every numeric decoder case. The new test will pin the pure mapping; it
+  does not establish a live ABI, filesystem behavior, or game readiness.
+- Status `ACTIVE`, 0 failed implementation tries. Existing `native/api/CMakeLists.txt` and
+  `native/api/host/` changes remain user-owned and excluded.
+- Exact next action: add the synthetic numeric mapping assertions, replay the focused suite, record
+  E242 and the completion checkpoint, then publish allowlisted files only.
 
 ## RE-02 app-main +0x20 virtual call — static path byte verified
 
