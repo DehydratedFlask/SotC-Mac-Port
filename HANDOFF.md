@@ -30,7 +30,7 @@ or Metal gameplay is demonstrated.
   EVIDENCE E504; TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-a2ed00-u6-20261022/` (manifest
   `3f19bd49…` at tip `9e53d59`; capture `575ff6f4…`).
-- Observation: feat tip `9e53d59`; docs tip `DOCS_TIP_PENDING`; measured
+- Observation: feat tip `9e53d59`; docs tip `ce25c5c`; measured
   `pba2edu6=1` + `pbf590u10=1` + mid_reg=4 → 275 registry.
   Body / 94 B stack prep / following `call 0xf590` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_a2ed00_u6.py` OK;
