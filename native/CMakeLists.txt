@@ -89,6 +89,7 @@ add_library(sotc_core STATIC
   core/vslot_40_533100_shadowanims.cpp
   core/vslot_40_533100_anims_attach.cpp
   core/vslot_40_533100_shadowbanks.cpp
+  core/vslot_40_533100_banks_attach.cpp
   core/ctor_98a90_3be050.cpp
   core/appmain_init_prologue_slice.cpp
   core/appmain_init_prologue_tail_slice.cpp
