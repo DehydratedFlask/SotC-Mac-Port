@@ -322,3 +322,15 @@ and `local/build/native-root-sav01-chunk-header-bad-magic-zeroed-fields-20261022
 decoded header fields on a synthetic wrong-magic parse error. No real-save compatibility or game
 save/load behavior is established. Build products remain in those directories; no removal boundary
 was created.
+
+## 2026-10-22 06:36 CDT — CPU-01 normal-threshold infinity fixture verification
+
+Existing CMake, Ninja, and Apple clang recorded in E325 were reused; no install, download,
+dependency, or system configuration change. Worker and independent root each ran Debug/Ninja
+configure, `test_normal_threshold` build, and focused `normal_threshold` CTest 1/1. Build directories
+are `local/build/native-worker-cpu01-normal-threshold-infinity-20261022/` and
+`local/build/native-root-cpu01-normal-threshold-infinity-20261022/`; logs are under
+`local/validation/cpu01-normal-threshold-infinity-20261022/`. Purpose: verify positive- and
+negative-infinity comparisons in the synthetic normal-threshold helper. Build products remain in
+those directories; no removal boundary was created. No game reachability or gameplay behavior is
+established.

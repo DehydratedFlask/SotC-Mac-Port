@@ -33,6 +33,9 @@ int main() {
     // Edge semantics: equality is NOT exceeding; NaN is not exceeding.
     const float one[3] = {1, 0, 0};
     CHECK(!sotc::dot_exceeds(one, one, 1.0f));
+    const float infinity = std::numeric_limits<float>::infinity();
+    CHECK(!sotc::dot_exceeds(one, one, +infinity));
+    CHECK(sotc::dot_exceeds(one, one, -infinity));
     const float nan = std::numeric_limits<float>::quiet_NaN();
     const float with_nan[3] = {nan, 0, 0};
     CHECK(!sotc::dot_exceeds(with_nan, one, -1e30f));
