@@ -5,17 +5,18 @@
 //                          //   injectable hook here if not pre-run
 //   vcall [vptr+0x30]       // app vtable slot → 0x534130 (OBS @ 0x15c8d08); bool — E418 lift
 //   jz → return false
-//   call 0x255340          // mid (debug UI; large) — NOT modelled; injectable hook
+//   call 0x255340          // mid debug menus — E419 lift
 //   vcall [vptr+0x40]       // app vtable slot → 0x533100 (OBS @ 0x15c8d18); (self, arg)
 //                          //   3956 B — NOT modelled; injectable hook
 //   rdi=*0x2ea4718; sil=0; call 0x357f0  // leaf modelled (xchg_store_u32_357f0)
 //   return true
 //
-// Appmain triage: vslots 6/8 = 0x534130 / 0x533100. E418 lifts 0x534130; body of
-// 0x533100 and 0x255340 remain open. No leaf-vec; not idx 95;
+// Appmain triage: vslots 6/8 = 0x534130 / 0x533100. E418 lifts 0x534130; E419 lifts
+// 0x255340; body of 0x533100 remains open. No leaf-vec; not idx 95;
 // not in recovered_constructors(). PR #5 heap cite-only.
 #pragma once
 
+#include "mid_255340.hpp"
 #include "vslot_30_534130.hpp"
 #include "xchg_store_u32_357f0.hpp"
 
@@ -40,8 +41,10 @@ struct BaseInitialize255130Hooks {
     bool (*vslot_30)(void* self) = nullptr;
     bool use_lifted_vslot_30 = false;
     Vslot30_534130Hooks vslot_30_detail{};
-    // Models call 0x255340(self). Null → no-op.
+    // Models call 0x255340(self). If null and use_lifted_mid_255340, run E419 lift.
     void (*mid_255340)(void* self) = nullptr;
+    bool use_lifted_mid_255340 = false;
+    Mid255340Hooks mid_255340_detail{};
     // Models vcall [vptr+0x40](self, arg) → 0x533100. Null → no-op. Body NOT modelled.
     void (*vslot_40)(void* self, void* arg) = nullptr;
 };

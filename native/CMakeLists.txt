@@ -74,6 +74,7 @@ add_library(sotc_core STATIC
   core/ctor_40_1ab550.cpp
   core/prologue_gates_2552d4.cpp
   core/vslot_30_534130.cpp
+  core/mid_255340.cpp
   core/ctor_98a90_3be050.cpp
   core/appmain_init_prologue_slice.cpp
   core/appmain_init_prologue_tail_slice.cpp

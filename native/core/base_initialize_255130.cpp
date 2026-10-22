@@ -27,9 +27,11 @@ bool base_initialize_255130(void* self, void* arg,
         return false;
     }
 
-    // OBS 0x255152: call 0x255340
+    // OBS 0x255152: call 0x255340 (E419 lift when flagged)
     if (hooks.mid_255340 != nullptr) {
         hooks.mid_255340(self);
+    } else if (hooks.use_lifted_mid_255340) {
+        (void)mid_255340(self, hooks.mid_255340_detail);
     }
 
     // OBS 0x255160: call [rax+0x40] with rsi=arg
