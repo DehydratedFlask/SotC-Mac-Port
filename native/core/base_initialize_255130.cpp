@@ -58,6 +58,17 @@ bool base_initialize_255130(void* self, void* arg,
         if (!pr.ok) {
             return false;
         }
+        // E423: measured empty-table takes miss path (hit @ 0x533305 NOT modelled).
+        if (!pr.lookup_hit) {
+            const Vslot40_533100MissResult mr =
+                vslot_40_533100_miss(hooks.vslot_40_miss_detail);
+            if (hooks.vslot_40_miss_out != nullptr) {
+                *hooks.vslot_40_miss_out = mr;
+            }
+            if (!mr.ok) {
+                return false;
+            }
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true

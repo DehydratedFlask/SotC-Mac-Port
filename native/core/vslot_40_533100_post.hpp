@@ -8,8 +8,8 @@
 // list (still empty-path skipped on measured Init). Not full 3956 B body.
 //
 // Claimed: fragment control flow + name pin + 0x1fc80 lift (via lookup_1fc80).
-// NOT modelled: bodies of 0x525080 / 0x2569d0; miss path (r_fps/0x21620/ba40);
-// hit path @ 0x533305; ensure migrate; non-null list. PR #5 cite-only.
+// NOT modelled: bodies of 0x525080 / 0x2569d0; miss/hit past branch (see
+// vslot_40_533100_miss.* for miss); ensure migrate; non-null list. PR #5 cite-only.
 #pragma once
 
 #include "lookup_1fc80.hpp"
