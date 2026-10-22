@@ -186,6 +186,24 @@ class Tests(unittest.TestCase):
         self.assertEqual(rela['target'], expected['rela_target'])
         self.assertEqual(rela['addend'], expected['rela_addend'])
 
+    def test_parse_rejects_missing_pt_dynamic_program_header(self):
+        elf, _ = dynamic_import_elf_fixture()
+        elf = bytearray(elf)
+        struct.pack_into('<I', elf, 64, 0)
+
+        with self.assertRaises(ValueError) as error:
+            d.parse(bytes(elf))
+        self.assertEqual(str(error.exception), 'missing PT_DYNAMIC program header')
+
+    def test_parse_rejects_missing_pt_sce_dynlibdata_program_header(self):
+        elf, _ = dynamic_import_elf_fixture()
+        elf = bytearray(elf)
+        struct.pack_into('<I', elf, 64 + 56, 0)
+
+        with self.assertRaises(ValueError) as error:
+            d.parse(bytes(elf))
+        self.assertEqual(str(error.exception), 'missing PT_SCE_DYNLIBDATA program header')
+
     def test_parse_multiple_needed_module_records(self):
         elf, expected = dynamic_import_elf_fixture()
         elf = bytearray(elf)
