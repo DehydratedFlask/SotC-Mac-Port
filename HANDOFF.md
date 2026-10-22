@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 22:24 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 22:27 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -31,6 +31,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   post-push `HEAD == origin/main`, divergence 0/0. Log:
   `local/checkpoints/round78-re02-claim-sync-postpush.log` SHA-256
   `4e7d5e77d98fb4c48e615b108f703daacb772c84a424047a393ef25879df4e9b`.
+- Later handoff/checkpoint sync `54854c9` is the current local base for this second independent
+  callsite claim; its publication state will be verified and recorded with this claim.
 - A later `python3 scripts/project_index.py --check` briefly reported stale
   `local/indexes/folders.json` after the new private evidence directory was created. Regeneration
   returned 19,269 folders and the immediate recheck passed; this was a private index count update,
@@ -38,6 +40,21 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Exact next action: isolate reaching-register and vtable-slot evidence for `0x25aa06`; verify each
   instruction and data mapping independently, then report either a unique static target or a
   verifier-backed unresolved edge with the exact missing evidence.
+- Worker `/root/re02_vcall_25aa06` owns its private evidence directory and checker. It has exclusive
+  ownership of the shared REA binary session for the pinned ELF; do not start another REA operation
+  until it exports and closes the session.
+
+## RE-02 app-main +0x28 virtual call — claimed
+
+- `/root` owns bounded task `RE-02-APPMAIN-VCALL-25AC9F-01`; claim details and baseline are in
+  [its claim checkpoint](docs/checkpoints/2026-10-21-root-re02-appmain-vcall-25ac9f-claim.md).
+- Scope is only the second unresolved indirect call `0x25ac9f` (`call qword ptr [RAX+0x28]`): trace
+  the reaching object/vptr and slot bytes against the pinned ELF, and report a unique static target
+  or verifier-backed unresolved edge. No runtime, class, ABI, or G1 claim; no native lift.
+- Its private evidence path and verifier path are separate from the `0x25aa06` task. Begin with
+  offline byte/dataflow analysis; do not use the shared REA session while `/root/re02_vcall_25aa06`
+  owns it.
+- Exact next action: publish this claim, then assign an offline-only worker to the `0x25ac9f` slot.
 
 ## Round 77 fixtures verified (/root)
 
