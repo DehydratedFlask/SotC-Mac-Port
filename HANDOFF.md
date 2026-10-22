@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 04:22 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 04:23 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -20,9 +20,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Trail resolves the new call at native/tests/test_store_zero32.cpp:L16 and the helper at
   native/core/store_zero32.cpp:L5-L7. This confirms the helper's synthetic write boundary only;
   it does not identify a game callsite or runtime behavior.
-- Status is FIXTURE_VERIFIED, one successful implementation attempt and zero failed tries. The
-  claim was published in cd4efb68ec9def3c1a97ead595ea39b4a97e7b7e. Audit record
-  7cf4f7916bf919736d4d26e04ede1c0abbe76c3b is fetch-verified at 0/0 divergence; see E317.
+- Status is FIXTURE_VERIFIED, one successful implementation attempt and zero failed tries. Claim
+  commit cd4efb68ec9def3c1a97ead595ea39b4a97e7b7e, audit-record commit
+  7cf4f7916bf919736d4d26e04ede1c0abbe76c3b, and completion commit
+  e3c36eb23c95281da685a8788e6f8c7a166983c2 are pushed and fetch-verified at 0/0 divergence.
+  Pre-push audits accepted 6 staged / 1,734 tracked paths; post-push full audit accepted 1,734.
+  E320 records the exact logs. User API edits remain outside the published scope.
 - The worker's final turn returned a model-capacity error after the edit. The root replay is the
   verification record. The user's native/api/CMakeLists.txt change and untracked native/api/host/
   remain outside this task and untouched.
