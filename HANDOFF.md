@@ -28,7 +28,7 @@ or Metal gameplay is demonstrated.
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-532ed0-20261022/` (manifest
   `1842ba5d…` at tip `d802dc4`; capture `c5df8382…`).
-- Observation: feat tip `d802dc4`; measured `pb532ed=1` + `pbvcu5=1` + mid_reg=4 → 275 registry.
+- Observation: feat tip `d802dc4`; docs tip `c34872a`; measured `pb532ed=1` + `pbvcu5=1` + mid_reg=4 → 275 registry.
   Body / stack prep / following virtual-call NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_532ed0.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
