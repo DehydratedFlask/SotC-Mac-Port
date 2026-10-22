@@ -354,6 +354,14 @@ class Tests(unittest.TestCase):
         with self.assertRaises(ValueError):
             d.span(b'abc', 2, 5)
 
+    def test_image_read_rejects_file_offset_past_elf_buffer(self):
+        img = d.Image(b'abc', [dict(type=d.PT_LOAD, flags=5, offset=0x10,
+                                    vaddr=0x1000, paddr=0x1000,
+                                    filesz=1, memsz=1, align=8)])
+        with self.assertRaises(ValueError) as error:
+            img.read(0x1000, 1)
+        self.assertEqual(str(error.exception), 'out of bounds: 0x10+0x1 / 0x3')
+
     def test_span_rejects_negative_offset_and_size(self):
         cases = (
             (-1, 1, 'out of bounds: -0x1+0x1 / 0x3'),
