@@ -10,5 +10,16 @@
 - Project index: generation and `--check` both exit 0 with 44,756 folders current; log hashes `38ecfe575558621eb4cf8e9ecf31c7dc472077ade2a5d3db70682b720fb5d02b` / `29d98c3db84f64024040ee83b876067bc91e095ba1e91abf0617c655bfe388de`. `trail build --check` exits 0 with 3,618 nodes / 1,240 files, log SHA256 `f7231c65a9ccdc9f1ec3de943e3fe9b3a2be977fdf687c86e771d1c9c416a2dc`. Logs are under `local/validation/20261022-root-fixture-baselines/`.
 - Observation versus inference: the current wrapper returns before node splitting if the lower-level fit is absent; the proposed test would pin full-record non-mutation for one oversize no-fit input. The test would establish only synthetic helper behavior.
 - Remaining risks / limits: no allocator caller reachability or game behavior is established. The current baseline is passing and no source edits have been made.
-- Next exact action: push the bounded claim and baseline. Only after publication, assign a worker the single test-file addition and independently replay it.
+- Claim publication: commit `165cfeb9b835746fadd98cca72da2a7f6360375d` is pushed and fetch-verified at 0/0 divergence. Pre-push audits accepted 6 staged / 1,738 full paths; the post-push full audit accepted 1,738. Exact log hashes are recorded in E336.
+- Implementation assignment: `/root/next_fixture_scout_2` owns only `native/tests/test_region_split.cpp`; it may build/test but must not touch docs, production files, stage, commit, or push. Root retains independent replay and checkpoint integration.
+- Next exact action: review the worker's test-file diff and independently replay the focused `region_split` test.
 - Attempt count: zero implementation tries; zero failed tries.
+
+## Completion follow-up
+
+The proposed one-case test was implemented and verified by worker and root; the result and exact
+commands/log hashes are recorded in
+[the completion checkpoint](2026-10-22-root-srv01-region-split-no-carve-fit-complete.md). The task
+is `FIXTURE_VERIFIED` after one successful implementation attempt and zero failed tries. This claim
+file remains the historical baseline checkpoint; the fixture establishes synthetic wrapper behavior
+only.

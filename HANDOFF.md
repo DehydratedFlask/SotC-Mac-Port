@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 04:57 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 05:03 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -28,29 +28,34 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   claim/completion publication audits are in E324/E327. Only user-owned
   `native/api/CMakeLists.txt` and `native/api/host/` remain unstaged and untouched.
 - Status is `FIXTURE_VERIFIED`: one successful implementation attempt, zero failed tries. Next
-  exact action: validate the separate SRV-01 no-carve-fit candidate and its fresh baseline, then
-  publish a bounded claim before any source edit.
+  exact action: publish the verified region-split no-fit fixture, then scout the next distinct
+  bounded task.
 
-## SRV-01 region-split no-carve-fit/no-mutation fixture — claim
+## SRV-01 region-split no-carve-fit/no-mutation fixture — verified
 
-- `SRV-01-REGION-SPLIT-NO-CARVE-FIT-NO-MUTATION-FIXTURE-01` is a proposed one-case test-only
-  addition to `native/tests/test_region_split.cpp`. `split_using_carve_fit` returns immediately
-  when `try_carve_fit` reports no fit (`region_split.cpp:L30-L37`); an oversized request reaches
-  the `free_size < req_size` rejection (`free_list_carve.cpp:L10-L13`).
+- `SRV-01-REGION-SPLIT-NO-CARVE-FIT-NO-MUTATION-FIXTURE-01` is a one-case test-only addition to
+  `native/tests/test_region_split.cpp:147`. `split_using_carve_fit` returns immediately when
+  `try_carve_fit` reports no fit (`region_split.cpp:L30-L37`); an oversized request reaches the
+  `free_size < req_size` rejection (`free_list_carve.cpp:L10-L13`).
 - Existing wrapper calls cover a successful carve at `test_region_split.cpp:L120` and an exact-node
   rejection at `L132`; neither checks the no-fit branch and full node preservation. The lower-level
   `test_free_list_carve.cpp:L60-L61` checks oversized-request rejection without wrapper nodes.
-- Proposed fixture seeds distinct bytes in both 0x70-byte nodes, sets a valid free region of
-  `0x30000` bytes, requests `0x30001` at 64 KiB alignment, then asserts no fit and byte-for-byte
-  preservation of both full records. CTest `region_split` is registered at
+- The fixture seeds distinct bytes in both 0x70-byte nodes, sets a valid free region of `0x30000`
+  bytes, requests `0x30001` at 64 KiB alignment, then asserts no fit and byte-for-byte preservation
+  of both full records. CTest `region_split` is registered at
   `native/CMakeLists.txt:L468-L470`.
-- Root fresh Debug/Ninja baseline configure/build passes; focused `region_split` CTest passes
-  1/1. Live source/test/helper/CMake hashes and exact logs are in E335. Project index is current at
-  44,756 folders; Trail wiring check passes at 3,618 nodes / 1,240 files. This is synthetic helper
-  behavior only, with no allocator-runtime or game behavior claim.
-- Claim is recorded locally but must be pushed before source editing. Next exact action: publish
-  this claim/baseline with the pending math completion publication record, then assign only the
-  `test_region_split.cpp` edit to an implementation worker.
+- Baseline, worker, and independent root fresh Debug/Ninja configure/builds pass; each focused
+  `region_split` CTest passes 1/1. Exact logs and final hashes are in E335, E337, and E338. Both raw
+  node records are preserved on no-fit. Production/helper/header/CMake hashes stay unchanged. The
+  project index is current at 45,976 folders; Trail build/check is current at 3,618 nodes / 1,240
+  files and resolves the new assertion. This is synthetic helper behavior only.
+- Claim commit `165cfeb9b835746fadd98cca72da2a7f6360375d` is pushed and fetch-verified at 0/0
+  divergence. Pre-push audits accepted 6 staged / 1,738 full paths; post-push full audit accepted
+  1,738. E336 records claim publication. The worker's test-only edit and independent root replay are
+  complete; E337/E338 document the results.
+- Status is `FIXTURE_VERIFIED`: one successful implementation attempt, zero failed tries. Completion
+  source/docs are ready for allowlisted path audit and publication. Next, scout one distinct bounded
+  task without repeating existing fixture coverage.
 
 ## CPU-01 math-constant mixed guard-state fixture — verified
 
