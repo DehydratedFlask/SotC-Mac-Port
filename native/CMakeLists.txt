@@ -45,6 +45,7 @@ add_library(sotc_core STATIC
   core/leaf_df94c0.cpp
   core/fnv_cstr_161fb0.cpp
   core/hashed_name_ctors.cpp
+  core/guarded_static_helpers.cpp
   core/scratch_reset.cpp
   core/save_checksum.cpp
   core/name_hash.cpp
@@ -1420,6 +1421,10 @@ add_test(NAME fnv_cstr COMMAND test_fnv_cstr)
 add_executable(test_hashed_name_ctors tests/test_hashed_name_ctors.cpp)
 target_link_libraries(test_hashed_name_ctors sotc_core)
 add_test(NAME hashed_name_ctors COMMAND test_hashed_name_ctors)
+
+add_executable(test_guarded_static_helpers tests/test_guarded_static_helpers.cpp)
+target_link_libraries(test_guarded_static_helpers sotc_core)
+add_test(NAME guarded_static_helpers COMMAND test_guarded_static_helpers)
 add_executable(test_const_table_ee1130 tests/test_const_table_ee1130.cpp)
 target_link_libraries(test_const_table_ee1130 sotc_core)
 add_test(NAME const_table_ee1130 COMMAND test_const_table_ee1130)
