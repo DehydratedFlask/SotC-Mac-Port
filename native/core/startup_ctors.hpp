@@ -35,6 +35,7 @@
 #include "vec_de6d20.hpp"
 #include "vec_dfd5f0.hpp"
 #include "leaf_df94c0.hpp"
+#include "leaf_de0160.hpp"
 #include "vec_ddab00.hpp"
 #include "vec_dda990.hpp"
 #include "guarded_dd91b0.hpp"
@@ -152,6 +153,7 @@ struct StartupState {
     VecDe7fb0 vec_de7fb0{};   // idx 56
     VecDe6d20 vec_de6d20{};   // idx 57
     VecDe1ad0 vec_de1ad0{};   // idx 58
+    LeafDe0160 leaf_de0160{}; // idx 59 / 0xde0160 (memset-1 + zero trailer; atexit omitted)
     VecDdef00 vec_ddef00{};   // idx 60
     VecDddc90 vec_dddc90{};   // idx 61
     VecDdab00 vec_ddab00{};   // idx 62
