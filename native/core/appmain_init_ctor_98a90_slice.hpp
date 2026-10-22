@@ -4,8 +4,8 @@
 // bounded 0x533100 header+post+miss+join+gfx+shadowmodels+attach+shadowskels+
 // skels-attach+shadowanims+anims-attach+shadowbanks+banks-attach+shadowstreams+
 // streams-attach+shadowrandomevents+randomevents-attach+shadowbossmusic+
-// bossmusic-attach+cp3characters+cp3characters-attach) → registry. Tip
-// AllocatorFront+FakeHeap.
+// bossmusic-attach+cp3characters+cp3characters-attach+cp3shadowprecache) →
+// registry. Tip AllocatorFront+FakeHeap.
 // PR #5 cite-only.
 // NOT modelled: ensure migrate / heavy menu helpers / 0xf8f860 PLT / non-null list;
 // PLT bodies 0xf901a0/0xf901c0; stack-chk; ba40 listener invoke; 0x533100 hit /
@@ -61,6 +61,7 @@ struct AppmainInitCtor98a90SliceResult {
     Vslot40_533100BossmusicAttachResult vslot_40_bossmusic_attach{};
     Vslot40_533100Cp3charactersResult vslot_40_cp3characters{};
     Vslot40_533100Cp3charactersAttachResult vslot_40_cp3characters_attach{};
+    Vslot40_533100Cp3shadowprecacheResult vslot_40_cp3shadowprecache{};
     bool base_ok = false;
     std::uint32_t flag_after_base = 0;
     AppmainInitRemainderSliceResult remainder{};
