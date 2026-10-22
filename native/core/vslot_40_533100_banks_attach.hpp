@@ -3,7 +3,7 @@
 //   // success path (atexit/tag) NOT modelled when flag false
 //   join @ 0x53394d: install loaded into *[f08+0x40] (replace + refcount)
 //   flag byte at f08+0x48; optional notify if success; release temps; 0xf590
-//   // stop before shadowstreams @ 0x5339e9
+//   // stop before shadowstreams @ 0x5339e9 (see vslot_40_533100_shadowstreams.*)
 //
 // Always-on after E432 shadowbanks load-attempt. Prefer over success atexit
 // (flag-true only), over jump to shadowstreams, and over deepen 0x14c2f0 /
