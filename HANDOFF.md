@@ -1,12 +1,31 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:53 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 00:06 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Active claims: CPU-02 maximum Tagged31 retag and AUD-01 archive-summary SHA-256 fixtures
+
+- Root claimed `CPU-02-TAGGED31-RETAG-MAX-OFFSET-FIXTURE-01` and
+  `AUD-01-XFF-ARCHIVE-SUMMARY-SHA256-MISMATCH-FIXTURE-01`; details and baseline evidence are in
+  [the claim checkpoint](docs/checkpoints/2026-10-22-root-cpu02-aud01-fixture-claims.md).
+- Ownership is disjoint: `/root/next_bounded_scout` owns only `native/tests/test_addr.cpp`; root
+  owns only `scripts/test_audio_bank_header.py` and the test-count sentence in `docs/ASSETS.md`.
+  Root remains the sole integrator for HANDOFF, TASKS, EVIDENCE, and checkpoint records. The
+  pre-existing user-owned `native/api/CMakeLists.txt` and `native/api/host/` remain untouched.
+- Baselines pass: `test_addr` build and `addr` CTest (1/1), and the audio-bank-header suite (20/20).
+  Logs and SHA-256 hashes are in the claim checkpoint. The test-count sentence in ASSETS is stale
+  at 18; the current Python file has 20 methods, so completion should update it to 21.
+- Both tasks are `CLAIMED`, with 0 implementation attempts and 0 failed tries. These are synthetic
+  fixtures only; no production behavior or game/runtime acceptance gate changes.
+- Exact next action: publish this claim checkpoint; then implement each one-file fixture in its
+  owned test file, correct the ASSETS count with the audio fixture, run the focused checks, record
+  EVIDENCE, refresh project and Trail indexes, and publish the completed tasks. Leave the pending
+  Mach-O CPU and PSARC negative-limit choices untouched.
 
 ## SRV-01 HostMapping non-null / zero-size empty state — fixture verified
 
@@ -27,8 +46,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Completion commit `47f332e3a323312fc3f3e5bab0a282d725811c04` is pushed and fetch-verified at 0/0
   divergence; staged audit accepted 6 paths and the full audit accepted 1,688. Publication logs are
   recorded in E252. The thin Mach-O CPU policy remains pending the user's choice.
-- Exact next action: claim the independent escaped-Unicode duplicate-path manifest fixture; keep
-  the pending Mach-O CPU policy and PSARC negative-limit behavior untouched until the user decides.
+- This 2026-10-22 claim supersedes the older next-action note below; see the active claims above.
 
 ## SRV-01 allocator rounding zero-input fixture — fixture verified
 
