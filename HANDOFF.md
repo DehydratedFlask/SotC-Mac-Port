@@ -1,12 +1,32 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 04:23 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 04:32 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## SRV-01 host-map alignment wrap/minimum-clamp fixture — claimed
+
+- SRV-01-HOST-MAP-ALIGNMENT-UINT32-WRAP-CLAMP-FIXTURE-01 proposes one synthetic assertion in
+  native/tests/test_host_map.cpp: reserve_alignment(0xffff0001u) returns 0x100000u after the
+  32-bit 64 KiB rounding wrap reaches the 1 MiB minimum clamp. No source edit has been made.
+- Fresh root Debug/Ninja configure/build of test_host_map passes; focused host_map CTest passes
+  1/1. Baseline hashes, Trail results, and the bounded arithmetic interpretation are in E322 and
+  the [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-host-map-align-u32-wrap-clamp-claim.md).
+- Folder index regenerated and checked current at 41,096 folders; Trail wiring graph check is
+  synchronized at 3,618 nodes / 1,240 files; `git diff --check` passes. See E323 and the refreshed
+  claim checkpoint. Trail's optional deep meaning layer remains unbuilt.
+- The helper and existing ordinary-boundary tests are at host_map.hpp:L35-L39 and
+  test_host_map.cpp:L29-L34; CMake registers test_host_map and host_map at L418-L420. The lower
+  align_up_64k overflow case already exists in allocator_region tests; this checks the wrapper's
+  subsequent minimum clamp. This does not establish that the input is a valid allocator request.
+- Claim is recorded; status ACTIVE, zero implementation attempts and zero failed tries. The test
+  edit stays blocked until the claim commit is pushed.
+- Next exact action: publish the claim and baseline, then delegate the one-line test-only edit to
+  /root/next_fixture_scout_2 and independently replay it.
 
 ## CPU-01 store_zero32 adjacent-canary fixture — verified
 
@@ -29,9 +49,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - The worker's final turn returned a model-capacity error after the edit. The root replay is the
   verification record. The user's native/api/CMakeLists.txt change and untracked native/api/host/
   remain outside this task and untouched.
-- Next exact action: verify the scout's SRV-01-HOST-MAP-ALIGNMENT-UINT32-WRAP-CLAMP-FIXTURE-01
-  candidate against Trail and live files, capture the baseline, and publish its claim before edits.
-  Then dispatch the test-only change and independently replay it.
+- Next exact action: continue from the active SRV-01 candidate section above and publish its claim
+  before any source edit.
 
 ## SAV-01 native stream error-name mapping fixture — verified
 
