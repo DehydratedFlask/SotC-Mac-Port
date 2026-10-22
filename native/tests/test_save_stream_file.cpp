@@ -130,7 +130,9 @@ void test_missing_and_bad_targets() {
     const auto missing = sotc::read_save_stream_file(g_dir + "/nope.sav");
     CHECK(missing.os_errno == ENOENT);
     // Reading a directory is an io error, not a crash.
-    CHECK_ERR(sotc::read_save_stream_file(g_dir).error, SaveStreamError::io_read);
+    const auto directory = sotc::read_save_stream_file(g_dir);
+    CHECK_ERR(directory.error, SaveStreamError::io_read);
+    CHECK(directory.os_errno == EISDIR);
     // Writing into a missing directory fails at open and leaves nothing behind.
     const auto w = sotc::write_file_atomic(g_dir + "/no_such_dir/x.sav", make_stream(1));
     CHECK_ERR(w.error, SaveStreamError::io_open);
