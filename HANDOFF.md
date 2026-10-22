@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 10:41 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 10:48 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,32 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E409 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E410 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 heavy ctor `0x3be050` header (0x98a90)
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-CTOR-98A90-3BE050-01` — lift header of `0x3be050` (627 B body to ret;
+  102 B header): nested alloc `0x48` sentinel + field zeros via tip AllocatorFront;
+  hooks for `0x3be930`/`0x323d0`/`0x3c2f70`/remainder from `0x3be0f8`. Measured on
+  prologue-tail path → E407 → E406 → E405. Prefer over debug gates / `0x1ab550` /
+  vslot / `0xf08`. No leaf-vec; no idx 95; PR #5 cite-only.
+- Files: `native/core/ctor_98a90_3be050.{hpp,cpp}`,
+  `appmain_init_ctor_98a90_slice.{hpp,cpp}`, test,
+  `tools/lift/check_f3be050_ctor.py`; prologue tail lifted-ctor wiring; CMake/README;
+  checkpoint `docs/checkpoints/2026-10-22-ctor-98a90-3be050.md`; EVIDENCE E410;
+  TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-ctor-98a90-20261022/` (manifest `81c3a8f4…`).
+- Observation: ELF pins body/header; nested sentinel + ensure hook on zeroed capacity;
+  success → 275 registry. Remainder/bodies NOT modelled.
+- Commands: `python3 -I tools/lift/check_f3be050_ctor.py` OK;
+  `ctest --test-dir local/build/native-ctor98a90 -R '^(appmain_init_ctor_98a90_slice|appmain_init_prologue_tail_slice)$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: ctor remainder from `0x3be0f8`, or `0x3be930`/`0x323d0`, or
+  `0x1ab550`, or debug gates / vslot / `0xf08`. Goal remains open.
 
 ## 2026-10-22 prologue `0x255180` tail (`0x98a90` / app+0x3b58)
 
