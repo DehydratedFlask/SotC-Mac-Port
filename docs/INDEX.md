@@ -35,6 +35,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Ctor 0x1ab550 0x40 (2026-10-22)](checkpoints/2026-10-22-ctor-40-1ab550.md) | Prologue-tail 0x40 ctor + base; E416; G1 PARTIAL |
 | [Prologue gates 0x2552d4 (2026-10-22)](checkpoints/2026-10-22-prologue-gates-2552d4.md) | Debug gates + empty ba40; E417; G1 PARTIAL |
 | [Vslot 0x534130 (2026-10-22)](checkpoints/2026-10-22-vslot-30-534130.md) | Base Init +0x30 bool gate; E418; G1 PARTIAL |
+| [Mid 0x255340 (2026-10-22)](checkpoints/2026-10-22-mid-255340.md) | Base Init debug-menu mid; E419; G1 PARTIAL |
 | [FOLDERS](FOLDERS.md) | Generated public/source folder inventory; `scripts/project_index.py` |
 | [INSTALL_LOG](../INSTALL_LOG.md) | Existing and newly installed tools, downloads and removals |
 | [Checkpoint template](checkpoints/TEMPLATE.md) | Required record at each checkpoint |
