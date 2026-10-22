@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:49 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:51 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -24,11 +24,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   current at 24,075 folders.
 - Status `FIXTURE_VERIFIED`, 1 successful implementation attempt, 0 failed tries. This pins only
   synthetic integer rounding and makes no allocator integration or runtime claim. Claim commit
-  `dbad3b0e9f905293b18f76691edf7b7839536f68` is pushed and fetch-verified. The completion publication
-  record is pending in E250.
+  `dbad3b0e9f905293b18f76691edf7b7839536f68` and completion commit
+  `6481d1f124edcbdec0637fe028876aee73db430c` are pushed and fetch-verified at 0/0 divergence; see E250.
 - Existing user-owned `native/api/CMakeLists.txt` and `native/api/host/` remain outside this task.
-- Exact next action: finish the allowlisted completion commit and publication record; then continue
-  with an independent task while the thin Mach-O CPU policy remains pending.
+- Exact next action: claim another independent native fixture while the thin Mach-O CPU policy
+  remains pending; leave that launcher task untouched until the user chooses its CPU acceptance rule.
 
 ## AUD-01 empty decompression-probe input — fixture verified
 

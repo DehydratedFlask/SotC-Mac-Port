@@ -1,6 +1,6 @@
 # Checkpoint: SRV-01-ALLOCATOR-ROUNDING-ZERO-INPUT-FIXTURE-01 — fixture verified
 
-- Time / timezone: 2026-10-21 23:49 CDT (America/Chicago).
+- Time / timezone: 2026-10-21 23:51 CDT (America/Chicago).
 - Agent and integrator: `/root` (Codex task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`); root owns shared docs.
 - Task / gate / status: `SRV-01-ALLOCATOR-ROUNDING-ZERO-INPUT-FIXTURE-01`, child of `SRV-01`; synthetic fixture gate `FIXTURE_VERIFIED`.
 - Prerequisite evidence / input and source hashes: Claim commit `dbad3b0e9f905293b18f76691edf7b7839536f68` was pushed and post-fetch divergence was 0/0. Baseline test source `native/tests/test_allocator_region.cpp` SHA256 `98b885a108810d7cd8152e0630e82326dce079f6288467caae0d15c2c639dbb4`; unchanged `native/core/allocator_region.hpp` SHA256 `6bc5fc4091d6a5ce8411d0beb0020fa07e5e93d2846c9169d7081d9a03c3696a`.
@@ -17,5 +17,6 @@
 - Observation versus inference / coverage limitations: The target executes all three assertions successfully, directly pinning zero-input arithmetic results. Trail resolves the changed test file but its literal search did not surface the assertion text. This evidence covers only integer helper results, not allocations, host mapping, allocator integration, game behavior, or boot.
 - Cumulative failed tries and distinct hypotheses: 1 successful implementation attempt; 0 failed implementation tries. The initial Trail freshness check was expected to be stale after editing and was repaired by rebuilding the graph; the exact-literal query limitation is recorded separately and is not an implementation failure.
 - Remaining risks / blockers: `SRV-01` remains partial and game runtime gates remain NOT RUN. Existing user-owned `native/api/CMakeLists.txt` and `native/api/host/` were not staged or changed by this task.
-- Next exact action: Audit only allowlisted changed paths, commit and push the test/evidence checkpoint, and verify `HEAD == origin/main` with 0/0 divergence; then record publication evidence in E250.
-- HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: Handoff and task board mark this fixture verified; E249 records test and index evidence. `docs/FOLDERS.md` is regenerated for the new completion checkpoint. No installation occurred, so `INSTALL_LOG.md` is unchanged.
+- Publication result: Claim commit `dbad3b0e9f905293b18f76691edf7b7839536f68` and completion commit `6481d1f124edcbdec0637fe028876aee73db430c` are pushed. Staged audit accepted 6 paths, full audit accepted 1,686 paths, push exited 0, and post-push fetch confirmed `HEAD == origin/main` with 0/0 divergence. Audit/push/fetch logs and hashes are recorded in E250.
+- Next exact action: Claim another independent native fixture while the thin Mach-O CPU policy awaits the user's choice; do not modify that launcher task until the choice arrives.
+- HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: Handoff and task board mark this fixture verified; E249 records test/index evidence and E250 records publication. `docs/FOLDERS.md` is regenerated for the new completion checkpoint. No installation occurred, so `INSTALL_LOG.md` is unchanged.
