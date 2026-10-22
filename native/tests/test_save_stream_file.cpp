@@ -118,6 +118,19 @@ void test_symlink_destination_replaces_link_not_referent() {
     CHECK(::lstat((path + ".tmp").c_str(), &tmp_st) != 0 && errno == ENOENT);
 }
 
+void test_symlink_source_read_follows_referent() {
+    const std::string path = g_dir + "/slot-source-link.sav";
+    const std::string referent = g_dir + "/source-referent.sav";
+    spit(referent, make_stream(11));
+    CHECK(::symlink(referent.c_str(), path.c_str()) == 0);
+
+    const auto r = sotc::read_save_stream_file(path);
+    CHECK_ERR(r.error, SaveStreamError::none);
+    CHECK(r.stream.header.descriptor_id == 0xd);
+    CHECK(r.stream.chunks.size() == 2);
+    CHECK(r.stream.chunks[0].payload == B({11, 2, 3}));
+}
+
 void test_empty_and_zero_length() {
     const std::string path = g_dir + "/empty.bin";
     CHECK_ERR(sotc::write_file_atomic(path, {}).error, SaveStreamError::none);
@@ -238,6 +251,7 @@ int main() {
     test_write_read_round_trip();
     test_overwrite_replaces();
     test_symlink_destination_replaces_link_not_referent();
+    test_symlink_source_read_follows_referent();
     test_empty_and_zero_length();
     test_missing_and_bad_targets();
     test_rename_failure_cleans_up();
