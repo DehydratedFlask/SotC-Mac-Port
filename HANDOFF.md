@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 09:36 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 09:48 CDT (America/Chicago). Drive Init-hash:
 bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Parallel heap deepen (separate worktree):
 bc-492a8623-dec2-597e-8de6-73c00b0ad8a5 — owns `0x12820`/`0x12af0`/READY SRV; Drive keeps
 `startup_ctors.*` + Init-hash/FNV/registry exclusivity. Integrator note:
@@ -9,6 +9,23 @@ Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## 2026-10-22 path-FNV `0xa2ddc0`/`0x162020` + registry header `0x52a220`
+
+- Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-FNV-PATH-162020-01` + `CPU-01-REGISTRY-52A220-HEADER-01` — deepen Init-hash /
+  registry / FNV without private 275-name fixture; no leaf-vec; no idx 95; heap bodies untouched.
+- Files: `native/core/fnv_path_cstr_162020.{hpp,cpp}`, `native/core/registry_object_2efd160.{hpp,cpp}`,
+  tests, `tools/lift/check_f162020.py`, `tools/lift/check_f52a220_header.py`; CMake/HANDOFF/TASKS/EVIDENCE.
+- Observation: wrapper `0xa2ddc0` → body `0x162020` (98 B); PLT `0xf90180` NID `_Getptoupper`
+  (`rcQCUr0EaRU`); native ASCII-toupper + `\\`→`/` policy (matches save_chunk ascii_upper_and_slash);
+  registry prologue pins float `5.0f`/`60.0f` and vector-head zeros (insert loops still open).
+- Commands: `python3 -I tools/lift/check_f162020.py` OK; `check_f52a220_header.py` OK;
+  `ctest --test-dir local/build/native-initfnv162020 -R '^(fnv_path_cstr_162020|registry_object_2efd160)$'`
+  PASS; `check_ctor_slots` still **155** pairs.
+- Inference: not G1; sorted-table insert (`0x52d530`/`0x52d7e0` family) and full `0x52a220` body open.
+- Next exact action: lift registry insert/lower_bound helpers consumed by `0x52a220`, or private
+  name fixture once inserts exist. Goal open.
 
 ## 2026-10-22 Init-hash numeric deepen `0x551140` (275-entry)
 

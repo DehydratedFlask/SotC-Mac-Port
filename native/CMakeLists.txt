@@ -46,6 +46,7 @@ add_library(sotc_core STATIC
   core/leaf_df94c0.cpp
   core/leaf_de0160.cpp
   core/fnv_cstr_161fb0.cpp
+  core/fnv_path_cstr_162020.cpp
   core/hashed_name_ctors.cpp
   core/guarded_static_helpers.cpp
   core/atomic_add_ref_14ccb0.cpp
@@ -54,6 +55,7 @@ add_library(sotc_core STATIC
   core/fnv_span_161f80.cpp
   core/hashed_string_14c3a0.cpp
   core/registry_object_14c9a0.cpp
+  core/registry_object_2efd160.cpp
   core/scratch_reset.cpp
   core/save_checksum.cpp
   core/name_hash.cpp
@@ -1443,6 +1445,10 @@ add_executable(test_fnv_cstr tests/test_fnv_cstr.cpp)
 target_link_libraries(test_fnv_cstr sotc_core)
 add_test(NAME fnv_cstr COMMAND test_fnv_cstr)
 
+add_executable(test_fnv_path_cstr_162020 tests/test_fnv_path_cstr_162020.cpp)
+target_link_libraries(test_fnv_path_cstr_162020 sotc_core)
+add_test(NAME fnv_path_cstr_162020 COMMAND test_fnv_path_cstr_162020)
+
 add_executable(test_hashed_name_ctors tests/test_hashed_name_ctors.cpp)
 target_link_libraries(test_hashed_name_ctors sotc_core)
 add_test(NAME hashed_name_ctors COMMAND test_hashed_name_ctors)
@@ -1509,6 +1515,10 @@ add_test(NAME hashed_string_14c3a0 COMMAND test_hashed_string_14c3a0)
 add_executable(test_registry_object_14c9a0 tests/test_registry_object_14c9a0.cpp)
 target_link_libraries(test_registry_object_14c9a0 sotc_core)
 add_test(NAME registry_object_14c9a0 COMMAND test_registry_object_14c9a0)
+
+add_executable(test_registry_object_2efd160 tests/test_registry_object_2efd160.cpp)
+target_link_libraries(test_registry_object_2efd160 sotc_core)
+add_test(NAME registry_object_2efd160 COMMAND test_registry_object_2efd160)
 
 add_executable(test_page_owner_map tests/test_page_owner_map.cpp)
 target_link_libraries(test_page_owner_map sotc_core)
