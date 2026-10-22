@@ -8,6 +8,23 @@ this checkpoint is heap-only and does not claim main tip.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## 2026-10-22 HeapAllocator page/cap layer (0x48c70 / 0x48910) — verified on feature branch
+
+- Agent: bc-492a8623-dec2-597e-8de6-73c00b0ad8a5. Attempt 1 — success (0 failed tries).
+- Task: `SRV-01-HEAP-ALLOCATOR-01` → `FIXTURE_VERIFIED` (branch `cursor/heap-depth-5d26`).
+- Worktree: `/Volumes/Extra/SoC-Mac-heap-depth`. Did **not** touch `startup_ctors.*` / Init-hash.
+- Files: `native/core/heap_allocator.{hpp,cpp}`, `native/tests/test_heap_allocator.cpp`,
+  `tools/lift/check_f48c70.py`, CMake + README + TASKS/EVIDENCE/this block.
+- Observation: ELF-pins usable-size `0x48c70`, allocate `0x48c80` (vt+0xa0), page-set `0x488f0`
+  → `[obj+0xd0]`, reserve `0x48910`→`0x479a0` align `0x10000`, bootstrap 1 MiB / 150 MiB.
+  Native: header+payload maps, live-byte cap, 16-byte round; freelist/arena surgery INF.
+- Commands: `ctest -R '^(heap_allocator|bucket_allocator|composite_allocator|allocator_front|page_allocator|page_owner_map)$'`
+  PASS 6/6; `python3 -I tools/lift/check_f48c70.py` OK. Evidence **E401**.
+- Inference: not G1; not wired into startup. Hierarchy under `IAllocator` now has composite +
+  bucket + heap + page contracts.
+- Next exact action (heap lane): optional bootstrap `0x13380` wiring / owner page-table `0x19a50`
+  depth, or stop and let Drive consume helpers. Goal open.
+
 ## 2026-10-22 BucketAllocator size-class layer (0x17990) — verified on feature branch
 
 - Agent: bc-492a8623-dec2-597e-8de6-73c00b0ad8a5. Attempt 1 — success (0 failed tries).

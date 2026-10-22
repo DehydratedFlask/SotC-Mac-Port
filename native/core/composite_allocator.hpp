@@ -12,8 +12,8 @@
 //   * deallocate forwards to the child that produced the pointer (original composite free 0x47f30
 //     resolves via the global page-owner table 0x19a50, then jumps to that child's deallocate).
 //   * Child list capacity is fixed (native); original grows with count at +0x80.
-//   * Not modelled: bootstrap 0x13380, HeapAllocator body, page-table owner id.
-//   * BucketAllocator: see bucket_allocator.hpp (size-class layer under this composite).
+//   * Not modelled: bootstrap 0x13380, page-table owner id.
+//   * BucketAllocator / HeapAllocator: see bucket_allocator.hpp and heap_allocator.hpp.
 #pragma once
 
 #include <atomic>
@@ -32,6 +32,8 @@ inline constexpr std::uint64_t kCompositeBucketThreshold = 0x400;       // size 
 inline constexpr std::uint64_t kCompositeHeapThreshold = 0x100000;      // size < 1 MiB -> heap
 inline constexpr std::uint64_t kCompositePageThreshold = ~std::uint64_t{0};  // else -> page
 inline constexpr std::uint64_t kHeapAllocatorCapBytes = 0x9600000;      // 150 MiB (0x48910 arg)
+inline constexpr std::uint32_t kHeapPageBytes = 0x100000;               // 1 MiB (0x488f0 → +0xd0)
+inline constexpr std::uint32_t kHeapReserveAlign = 0x10000;             // OBS 0x48910 edx → 0x479a0
 inline constexpr std::uint32_t kBucketClassStep = 0x10;                 // classes 0x10..0x400
 inline constexpr std::uint32_t kBucketClassMin = 0x10;
 inline constexpr std::uint32_t kBucketPageBytes = 0x10000;              // 64 KiB pool pages

@@ -76,6 +76,7 @@ add_library(sotc_core STATIC
   core/page_allocator.cpp
   core/composite_allocator.cpp
   core/bucket_allocator.cpp
+  core/heap_allocator.cpp
   core/allocator_front.cpp
   core/free_list_carve.cpp
   core/region_split.cpp
@@ -1526,5 +1527,9 @@ add_test(NAME composite_allocator COMMAND test_composite_allocator)
 add_executable(test_bucket_allocator tests/test_bucket_allocator.cpp)
 target_link_libraries(test_bucket_allocator sotc_core)
 add_test(NAME bucket_allocator COMMAND test_bucket_allocator)
+
+add_executable(test_heap_allocator tests/test_heap_allocator.cpp)
+target_link_libraries(test_heap_allocator sotc_core)
+add_test(NAME heap_allocator COMMAND test_heap_allocator)
 
 add_subdirectory(api)
