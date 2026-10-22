@@ -38,8 +38,14 @@
 - Cumulative failed tries and distinct hypotheses: 0 implementation tries / 0 failed tries.
 - Remaining risks / blockers: this pins one defensive UI copy branch only; there is no blocker to
   the test.
-- Next exact action: publish the claim with staged/full path audits, then delegate only the test
-  file to `/root/next_fixture_scout_3` for this assertion and the focused SwiftPM suite. Root will
-  review the diff and replay the same command.
+- Claim commit `ddcb75292a9be2fa543f756c6dfa69eda574b8cf` was pushed with staged/full audits
+  accepting 8/1,713 paths; fresh fetch/divergence was 0/0 and post-push explicit/full audits
+  accepted 8/1,713. Shared publication log SHA256:
+  `97f60b5f2e7b6ce49891d753977e4bc6902ac5f679addabea8ece099613c72f1`.
+- Worker `/root/next_fixture_scout_3` added one assertion; worker suite passes 6 tests. Root used a
+  fresh scratch directory and independently passed all 6 tests. Final test hash and logs are in
+  E285 and the [completion checkpoint](2026-10-22-root-app01-core-readiness-zero-fallback-complete.md).
+- Next exact action: commit and publish the verified test/checkpoint record with staged/full path
+  audits; then continue the independent claimed region-list fixture.
 - HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF, TASKS and EVIDENCE now
   record the claim; `INSTALL_LOG.md` has no fact change. Refresh project indexes before committing.
