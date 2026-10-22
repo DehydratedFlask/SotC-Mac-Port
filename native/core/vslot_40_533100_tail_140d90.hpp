@@ -2,6 +2,7 @@
 //   mov esi, 9; mov rdi, r15 (= self+0x3cc8); call 0x140d90
 //   lea rdi, [rbp-0x70]; call 0xf590
 //   // stop before stack-check / epilogue @ 0x534052
+//     (see vslot_40_533100_stackchk.*)
 //
 // Always-on after E443 cp3shadowprecache attach. Prefer over success atexit
 // (already skipped in attach) and over deepen 0x14c2f0 / 0x6a5370 (already
@@ -9,7 +10,7 @@
 // Prefer over empty-path migrate/non-null.
 //
 // Claimed: call-site control flow + arg pin (slot=self+0x3cc8, esi=9) + f590.
-// NOT modelled: body of 0x140d90; stack-check / ret epilogue; bodies of
+// NOT modelled: body of 0x140d90. Stack-check: see stackchk.*. Bodies of
 // 0x14c2f0 / 0x6a5370. PR #5 cite-only.
 #pragma once
 
