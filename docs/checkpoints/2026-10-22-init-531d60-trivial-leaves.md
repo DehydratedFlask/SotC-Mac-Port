@@ -4,7 +4,7 @@
 - Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9 (Drive).
 - Task: `CPU-01-INIT-531D60-TRIVIAL-LEAVES-01`; gate: **G1**; status: **PARTIAL** (not PASSED).
 - Failed hypotheses/tries: 0.
-- Tip at authoring: pre-land `789ab1d`; post-land tip is this commit series on PR #4.
+- Tip: `b19b879` on `cursor/init-hash-551140-9dfc` (PR #4). Private manifest sha256 `03b9adca…`.
 
 ## Claim boundary
 
