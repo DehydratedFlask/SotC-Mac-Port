@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:16 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:18 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -118,6 +118,22 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   API edits remain untouched.
 - Exact next action: add one direct non-owner unlock attempt, assert `EPERM`, and rerun the targeted
   build/test; then root records E243 and the completion checkpoint.
+
+## APP-01 CoreErrorCode numeric values — fixture claimed
+
+- Root claimed `APP-01-CORE-ERROR-NUMERIC-CODES-ALL-VALUES-FIXTURE-01`, child of
+  `APP-01-CORE-ABI-01`; see the [claim checkpoint](docs/checkpoints/2026-10-21-root-app01-core-error-numeric-codes-claim.md).
+- Scope is a new test-only file `launcher/Tests/LauncherCoreTests/CoreErrorCodeMappingTests.swift`.
+  Assert C ABI error values 0–8 map to `.ok`, `.invalidArgument`, `.badState`, `.assetsNotReady`,
+  `.engineNotImplemented`, `.io`, `.bufferTooSmall`, `.abiMismatch`, `.internalError`; 9 and
+  `UInt32.max` remain `.unknown(value)`. Keep production code unchanged.
+- Baseline command `swift test --package-path launcher --scratch-path
+  local/build/app01-core-error-codes --filter CoreClientTests` passes 13 existing tests. The current
+  `CoreClientTests.numericCodesMapToTypedValues` asserts only error codes 3, 4, and 99.
+- Status `ACTIVE`, 0 failed implementation tries. This test pins the Swift decoder against the C enum
+  constants; it does not establish live ABI transport or engine behavior.
+- Exact next action: add the standalone mapping fixture, run the new focused suite and existing
+  `CoreClientTests`, then record E244 and the completion checkpoint.
 
 ## RE-02 app-main +0x20 virtual call — static path byte verified
 
