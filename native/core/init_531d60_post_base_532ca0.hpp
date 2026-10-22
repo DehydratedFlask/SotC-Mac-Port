@@ -10,7 +10,7 @@
 // `0xf590` / staffroll body tourism.
 //
 // Claimed: call-site control flow pin only.
-// NOT modelled: stack prep; 0x532ca0 body; later virtual call. PR #5 cite-only.
+// NOT modelled: stack prep; 0x532ca0 body; virtual call (E467). PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
