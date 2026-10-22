@@ -69,3 +69,26 @@
 - Commit/push and fetch verification will be recorded in the publication checkpoint below after
   those operations complete.
 - Task status: `STATIC_PATH_BYTE_VERIFIED`; G0 remains PARTIAL and G1–G6 remain NOT RUN.
+
+## Completion and claim publication checkpoint
+
+- Time / timezone: 2026-10-21 22:47 CDT (America/Chicago); integrator `/root`.
+- Commit: `f9fc4302f1702af6677e90121a6040becc533d5e`, message
+  `verify unresolved app-main call and claim TOC crosstab`. `git push origin main` succeeded.
+- Fetch verification: `git fetch origin`, `git rev-parse HEAD`, `git rev-parse origin/main`, and
+  `git rev-list --left-right --count HEAD...origin/main` show matching `f9fc4302f1702af6677e90121a6040becc533d5e`,
+  divergence `0 0`. Private post-push record `local/checkpoints/round78-re02-25aa06-data02-claim-postpush.log`
+  SHA-256 `7c434d2e6dff50eecac5ac952fdd14be140e42e041a373377dc9bcc8d2bb485d`.
+- Final preflight accepted 8 staged paths and 1,667 full-tree paths; `git diff --cached --check`
+  passed. Logs under `/tmp/round78-25aa06-data02-final-*.log`; exact staged/full audit hashes are
+  `8cae57e01b60218ad671ad4f23c7ab7c7bd8856d969328d6479bc004e4e55338` and
+  `a24d31532815c136fad3ea12efcb696b95197d87b38e447db5f4d1ec84d393db`. User-owned native API
+  files were not staged.
+- Project index was regenerated after adding the post-push log; `python3 scripts/project_index.py`
+  and `python3 scripts/project_index.py --check` both exit 0 at 19,273 folders. The wiring graph
+  check passes at 3,597 nodes; deep layer remains unbuilt.
+- The DATA-02 claim was published in the same commit. Only after push/fetch verification, root
+  assigned `/root/round78_next_task_scout` to implement the private aggregate-only analyzer. No
+  manifest data was accessed before claim publication.
+- Observation versus inference: publication and fetch state are verified; this does not advance any
+  game acceptance gate. The `0x25aa06` call edge remains unresolved.

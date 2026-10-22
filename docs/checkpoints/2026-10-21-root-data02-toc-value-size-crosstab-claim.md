@@ -18,3 +18,23 @@
   `/root/round78_next_task_scout` a private deterministic analyzer and independent rerun; root will
   review its code/output and reconcile all margins before status promotion.
 - Task status: `CLAIMED`; attempt count 0.
+
+## Claim publication checkpoint
+
+- Time / timezone: 2026-10-21 22:47 CDT (America/Chicago); owner/integrator `/root`.
+- Claim documentation and the separate `0x25aa06` static verifier completion were published in
+  commit `f9fc4302f1702af6677e90121a6040becc533d5e` (`verify unresolved app-main call and claim TOC
+  crosstab`). `git push origin main` succeeded; fetch confirmed `HEAD == origin/main` with 0/0
+  divergence. Post-push log:
+  `local/checkpoints/round78-re02-25aa06-data02-claim-postpush.log`, SHA-256
+  `7c434d2e6dff50eecac5ac952fdd14be140e42e041a373377dc9bcc8d2bb485d`.
+- Preflight: staged publication audit accepted 8 paths and full-tree audit accepted 1,667 paths;
+  both exited 0. `git diff --cached --check` exited 0. Native API user files were not staged. Full
+  audit SHA-256 `a24d31532815c136fad3ea12efcb696b95197d87b38e447db5f4d1ec84d393db`.
+- Worker `/root/round78_next_task_scout` was assigned only after publication verification. It owns
+  private analyzer/report/log files under a task-specific `local/` directory; it must not edit shared
+  documentation, publish, read payloads, or use REA/Ghidra. Root remains the shared-document
+  integrator.
+- Claim status remains `CLAIMED`; attempt count 0 until the bounded analysis begins. Exact next
+  action: independently review the worker's deterministic four-cell output and verify both E77/E123
+  margins before changing task status.

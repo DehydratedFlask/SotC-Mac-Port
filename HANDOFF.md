@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 22:45 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 22:47 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -17,7 +17,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   reconcile row/column margins to E77 and E123. Paths and raw field values must not enter outputs.
   This is metadata-only; no payload, digest semantics, loader, or runtime claim.
 - Exact next action: root will assign `/root/round78_next_task_scout` to build and run an
-  independent deterministic private analyzer after this claim is pushed and fetch-verified.
+  independent deterministic private analyzer. Claim commit `f9fc4302f1702af6677e90121a6040becc533d5e`
+  is pushed and fetch-verified; the worker was assigned after verification. Publication details
+  are in the [claim checkpoint](docs/checkpoints/2026-10-21-root-data02-toc-value-size-crosstab-claim.md).
 
 ## RE-02 app-main +0x20 virtual call — static path byte verified
 
@@ -46,6 +48,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   The REA Ghidra startup timeout remains failed try 1; no same-profile retry was made. Full hashes,
   byte observations, limits, and replay paths are in the
   [completion checkpoint](docs/checkpoints/2026-10-21-root-re02-appmain-vcall-25aa06-complete.md).
+- Completion record and verifier are pushed in `f9fc4302f1702af6677e90121a6040becc533d5e`,
+  fetch-verified at `origin/main` with 0/0 divergence.
 - Exact next action: do not start a runtime-edge investigation without a separate claim and
   reassessment of REA use.
 
