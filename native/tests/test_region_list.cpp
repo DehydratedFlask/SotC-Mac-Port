@@ -173,6 +173,19 @@ int main() {
         CHECK(alloc_count == 1);
     }
 
+    // A missing head-slot pointer skips list-head publication but still initializes the node.
+    {
+        RegionNode neu{};
+        std::uint32_t alloc_count = 7;
+        void* arena = reinterpret_cast<void*>(static_cast<std::uintptr_t>(0xA11E));
+        list_insert_at_head(neu, nullptr, arena, &alloc_count);
+        CHECK(region_links(neu)->identity == &neu);
+        CHECK(region_links(neu)->next == nullptr);
+        CHECK(region_links(neu)->prev == reinterpret_cast<IntrusiveLinks*>(arena));
+        CHECK(region_owner(neu) == arena);
+        CHECK(alloc_count == 8);
+    }
+
     // arena_free_count helper offset (OBS +0x48).
     {
         alignas(8) unsigned char buf[0x50]{};
