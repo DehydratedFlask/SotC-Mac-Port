@@ -27,7 +27,7 @@ or Metal gameplay is demonstrated.
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-26800-f590-20261022/` (manifest
   `c6919f50…` at tip `484fca6`; capture `1a3d01a7…`).
-- Observation: feat tip `484fca6`; docs tip `56a844f`; measured `pb268=1` + `pbf590=1` + `pbyr=1` + mid_reg=4 → 275 registry.
+- Observation: feat tip `484fca6`; docs tip `d2a74ce`; measured `pb268=1` + `pbf590=1` + `pbyr=1` + mid_reg=4 → 275 registry.
   Bodies / later string pairs NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_26800_f590.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
