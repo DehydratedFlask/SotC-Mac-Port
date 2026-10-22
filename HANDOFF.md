@@ -28,7 +28,7 @@ or Metal gameplay is demonstrated.
   EVIDENCE E490; TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-f590-a2ed00-20261022/` (manifest
   `c3b9b3de…` at tip `97dde13`; capture `262dcdba…`).
-- Observation: feat tip `97dde13`; measured `pbf590a=1` + `pba2ed=1` + mid_reg=4 → 275 registry.
+- Observation: feat tip `97dde13`; docs tip `fe150a1`; measured `pbf590a=1` + `pba2ed=1` + mid_reg=4 → 275 registry.
   Body / mov-rdi prep / following second `call 0xf590` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_f590_a2ed00.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
