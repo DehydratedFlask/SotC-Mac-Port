@@ -47,7 +47,8 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBase17070Hooks& post_base_17070_hooks,
     const Init531d60PostBase544fe0Hooks& post_base_544fe0_hooks,
     const Init531d60PostBaseCell2eff450Cells& post_base_cell_2eff450_cells,
-    const Init531d60PostBaseCell2eff450Hooks& post_base_cell_2eff450_hooks) {
+    const Init531d60PostBaseCell2eff450Hooks& post_base_cell_2eff450_hooks,
+    const Init531d60PostBase17070U2Hooks& post_base_17070_u2_hooks) {
     AppmainInitCtor98a90SliceResult out{};
     out.early = run_prologue_255180_early(alloc, early_hooks);
     if (!out.early.ok) {
@@ -335,6 +336,11 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     out.post_base_cell_2eff450 = init_531d60_post_base_cell_2eff450(
         post_base_cell_2eff450_cells, post_base_cell_2eff450_hooks);
     if (!out.post_base_cell_2eff450.ok) {
+        return out;
+    }
+    // E483: always-on Init continue — second 0x17070 call-site; arg prep NOT modelled.
+    out.post_base_17070_u2 = init_531d60_post_base_17070_u2(post_base_17070_u2_hooks);
+    if (!out.post_base_17070_u2.ok) {
         return out;
     }
     out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,
