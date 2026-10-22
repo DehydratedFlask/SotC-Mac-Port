@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 04:07 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 04:09 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -134,9 +134,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   hashes and logs are in E314 and the
   [completion checkpoint](docs/checkpoints/2026-10-22-root-cpu01-namehash-inline-embedded-nul-complete.md).
 - Status is `FIXTURE_VERIFIED`, one successful implementation attempt and zero failed tries. The
-  claim is in pushed commit `eaa9e0b405175b78ac35c756155ae525c8f71f20`; completion is ready for the
-  root allowlisted audit, commit, push, and fresh fetch/divergence check.
-- Next exact action: publish the test and completion docs with the next bounded CPU-01 fixture claim.
+  claim is in `eaa9e0b405175b78ac35c756155ae525c8f71f20`; completion and the next CPU-01 claim are in
+  pushed commit `cd4efb6`, fetch-verified at 0/0 divergence. E316 records publication audits.
+- Next exact action: publish the completion audit record, then dispatch the `store_zero32` test edit.
   The synthetic case does not resolve whether the port needs original game-name strings and makes no
   game behavior claim.
 
@@ -150,12 +150,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Root fresh Debug/Ninja baseline configure/build passes and focused `store_zero32` CTest passes 1/1.
   Source hashes, logs, and limits are in E315 and the
   [claim checkpoint](docs/checkpoints/2026-10-22-root-cpu01-store-zero32-adjacent-canary-claim.md).
-- Status is `ACTIVE`, zero implementation attempts and zero failed tries. The claim is queued for
-  the same allowlisted commit as the verified name-hash completion; worker edits must wait for that
-  claim to be pushed and fetch-verified. Root owns docs, independent replay, and publication.
-- Next exact action: finish the project-index and publication checks, push the claim, then dispatch
-  the single-file fixture edit. This pins only the local helper write boundary, not any game callsite
-  or runtime behavior.
+- Status is `ACTIVE`, zero implementation attempts and zero failed tries. The claim is in pushed
+  commit `cd4efb6`, fetch-verified at 0/0 divergence. Root owns docs and independent replay; the
+  single-file edit will be assigned after the publication audit record is pushed.
+- Next exact action: finish the completion audit record and dispatch the test edit. This pins only the
+  local helper write boundary, not any game callsite or runtime behavior.
 
 ## SAV-01 stream-file symlink destination fixture — verified
 

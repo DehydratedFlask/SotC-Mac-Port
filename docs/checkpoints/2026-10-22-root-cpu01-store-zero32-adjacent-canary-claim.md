@@ -35,9 +35,8 @@
   local write boundary; this does not show that a game callsite reaches the helper.
 - Remaining risk: this is a synthetic local helper fixture. No game callsite, game runtime behavior,
   or broader memory-safety claim is established.
-- Publication / dispatch: the claim is queued for publication alongside the verified name-hash
-  completion. Do not edit this test until that claim commit is pushed and fetch-verified. Root owns
-  docs, independent replay, and publication; user-owned `native/api` changes stay untouched.
-- Next exact action: refresh and check the project index, run allowlisted staged/full audits, publish
-  the claim, and only then dispatch the single-file test edit.
+- Publication / dispatch: the claim is in pushed commit `cd4efb6`, fetch-verified at 0/0 divergence.
+  The test remains unedited pending the root's publication audit-record commit. Root owns docs,
+  independent replay, and publication; user-owned `native/api` changes stay untouched.
+- Next exact action: push the completion audit record, then dispatch the single-file test edit.
 - Task status and attempt count: `ACTIVE`; zero implementation attempts; zero failed tries.
