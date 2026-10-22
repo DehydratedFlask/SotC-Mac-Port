@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 06:11 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 06:23 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -10,16 +10,27 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 
 ## Current fixture claim — active
 
-- `SAV-01-CHUNK-HEADER-BAD-MAGIC-ZEROED-FIELDS-FIXTURE-01`, owned by `/root` and
-  `/root/next_candidate_scout`; one assertion-only extension in
-  `native/tests/test_save_chunk_header.cpp`. The existing wrong-magic loop pins the error and zero
-  `name_hash`; the new case will also pin zero `tag` and `payload_length`. The [claim checkpoint](
-  docs/checkpoints/2026-10-22-root-sav01-chunk-header-bad-magic-zeroed-fields-claim.md) records
-  baseline hashes, exact commands, and the synthetic-only boundary.
-- The claim is awaiting publication; implementation has zero attempts and zero failed tries. No
-  parser, header, CMake, unrelated user API, or game-input changes are in scope. Root owns shared docs.
-- Exact next action: after the claim commit is pushed, dispatch the one-file assertions and focused
-  `save_chunk_header` build/CTest to `/root/next_candidate_scout`; root will replay independently.
+- `CPU-01-NORMAL-THRESHOLD-INFINITY-BOUNDARY-FIXTURE-01`, owned by `/root` and
+  `/root/next_fixture_scout_2`; the bounded change adds two assertions to
+  `native/tests/test_normal_threshold.cpp` for positive and negative infinite thresholds. Its
+  [claim checkpoint](docs/checkpoints/2026-10-22-root-cpu01-normal-threshold-infinity-claim.md)
+  records baseline hashes, exact commands, and the synthetic-only boundary.
+- This claim is being published now; implementation has zero attempts and zero failed tries. No
+  production helper, CMake, unrelated user API, or game-input changes are in scope. Root owns shared
+  docs and publication.
+- Exact next action: after the claim commit is pushed, dispatch the two test assertions and focused
+  `normal_threshold` build/CTest to `/root/next_fixture_scout_2`; root will replay independently.
+
+## SAV-01 bad-magic zeroed-fields fixture — verified
+
+- `SAV-01-CHUNK-HEADER-BAD-MAGIC-ZEROED-FIELDS-FIXTURE-01` is `FIXTURE_VERIFIED`. Worker and
+  independent root Debug/Ninja builds both pass focused `save_chunk_header` CTest 1/1. Only the
+  test file changed; two assertions now pin zero `tag` and `payload_length` for wrong-magic inputs.
+- E359 and the [completion checkpoint](
+  docs/checkpoints/2026-10-22-root-sav01-chunk-header-bad-magic-zeroed-fields-complete.md) record
+  exact commands, hashes, logs, and independent review.
+- This observes a synthetic parser error result only; it does not establish real-save compatibility
+  or game save/load behavior.
 
 ## CPU-01 lazy parameter tree failed-release fixture — verified
 
@@ -70,6 +81,23 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   E356 and its checkpoint record the result.
 - SAV-01 wrong-magic zero-field fixture is the active claim. E357 and its claim checkpoint hold the
   baseline and acceptance boundary. Publish that claim before implementation.
+
+## 2026-10-22 CPU-01 / SAV-01 publication checkpoint
+
+- CPU-01 lazy-tree completion and the SAV-01 wrong-magic claim are committed in
+  `731a36ca52c2f08d54927d140b96ee57e5592ddd` and pushed to `origin/main`.
+- E358 and the [publication checkpoint](docs/checkpoints/2026-10-22-root-cpu01-completion-sav01-claim-publication.md)
+  record the path audits, index checks, and post-push 0/0 divergence result.
+
+## 2026-10-22 SAV-01 completion / CPU-01 claim checkpoint
+
+- SAV-01 wrong-magic zeroed-fields fixture passed worker and independent root focused builds and
+  CTest, with independent read-only review. E359 and its completion checkpoint record the exact
+  commands and evidence.
+- CPU-01 infinite-threshold fixture claim is recorded in E360 and its claim checkpoint. Its claim
+  must be committed and pushed with path audits before implementation begins.
+- Exact next action: publish SAV-01 completion and the CPU-01 claim, then dispatch the two
+  `normal_threshold` assertions and focused check.
 
 ## DATA-02 pakN TOC payload-MD5 sample — verified
 

@@ -310,3 +310,15 @@ root build directories are `local/build/native-worker-cpu01-lazy-release-preserv
 `local/validation/cpu01-lazy-release-preserve-20261022/`. Purpose: verify synthetic cache retention
 after `release()` fails to lock a closed mutex. Build products remain in those directories; no
 removal boundary was created.
+
+## 2026-10-22 06:23 CDT — SAV-01 bad-magic zeroed-fields fixture verification
+
+Existing CMake, Ninja, and Apple clang recorded in E325 were reused; no install, download,
+dependency, or system configuration change. Worker and independent root each ran Debug/Ninja
+configure, `test_save_chunk_header` build, and focused `save_chunk_header` CTest 1/1. Build
+directories are `local/build/native-worker-sav01-chunk-header-bad-magic-zeroed-fields-20261022/`
+and `local/build/native-root-sav01-chunk-header-bad-magic-zeroed-fields-20261022/`; logs are under
+`local/validation/sav01-chunk-header-bad-magic-zeroed-fields-20261022/`. Purpose: verify zeroed
+decoded header fields on a synthetic wrong-magic parse error. No real-save compatibility or game
+save/load behavior is established. Build products remain in those directories; no removal boundary
+was created.

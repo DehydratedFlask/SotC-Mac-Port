@@ -9,5 +9,6 @@
 - Independent read-only review: `/root/fixture_review_app_srv` passed. It verified the exact claimed sequence against `lazy_param_def_tree.cpp` and `recursive_mutex.cpp`, confirmed the test follows existing style, and found no unrelated diff. Reviewer did not run tests.
 - Observation versus inference / limitation: synthetic test observes that the helper preserves its cached tree when `release()` cannot acquire a closed mutex. It does not establish a game callsite, production lifecycle, game reachability, or the unresolved 74-record parameter schema.
 - Attempts: one successful implementation attempt; zero failed implementation/build/test attempts.
+- Publication: completion and the next SAV-01 claim were published in `731a36ca52c2f08d54927d140b96ee57e5592ddd`; E358 records the audit.
 - Remaining risk: synthetic helper/API state only; no game or runtime behavior is demonstrated.
-- Next exact action: publish the completion and the next independently claimed bounded fixture; then implement that published claim.
+- Next exact action: independently replay the published SAV-01 `save_chunk_header` fixture after the worker result.
