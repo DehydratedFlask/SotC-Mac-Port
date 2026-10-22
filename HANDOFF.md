@@ -1,12 +1,25 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 01:04 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 01:08 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Active bounded task — RE-02 dynamic-link image file-offset bounds fixture
+
+- Claimed `RE-02-DYNLINK-IMAGE-READ-FILE-OFFSET-BOUNDS-FIXTURE-01` under the verified
+  `RE-02-DYNLINK-SEGMENT-SPAN-01` parent. The untouched dynlink suite passes 29 tests. The planned
+  single synthetic case gives `Image.read()` a virtual range contained by `filesz` but a segment
+  file offset beyond the ELF byte buffer; expect the existing `span()` bounds error. Claim details
+  and baseline hashes are in [the claim checkpoint](docs/checkpoints/2026-10-22-root-re02-dynlink-image-read-file-offset-claim.md)
+  and E266.
+- Status `ACTIVE`, 0 failed implementation tries. No parser change is planned. Exact next action:
+  add the one test in `scripts/test_ps4_dynlink.py`, run the full focused suite (expected 30 tests),
+  then update the completion checkpoint and evidence. Synthetic coverage only; no live ELF/loader
+  semantics or game execution claim.
 
 ## Completed checkpoints — two bounded regression fixtures
 
@@ -42,9 +55,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   is current at 24,080 folders. Completion commit `eab74f91afbac3d8d56183631bb834df43c9e334` is
   pushed, staged and exact-path audits accepted 6 paths, full audit accepted 1,702, and fresh fetch
   confirmed 0/0 divergence. This is only an injected host-check test, not a physical audio probe or
-  audible-content claim. Exact next action: review the separate read-only scout candidate from
-  `/root/next_independent_task_scout` and claim another bounded task only after verifying it does
-  not overlap current work. Leave pending Mach-O CPU and PSARC negative-limit choices alone.
+  audible-content claim. The independent RE-02 follow-up is recorded above. Leave pending Mach-O
+  CPU and PSARC negative-limit choices alone.
 
 ## SRV-01 arena high-water uint64 wrap fixture — verified
 
