@@ -210,21 +210,25 @@ int main() {
     CHECK(r.remainder.trivial_ok);
     CHECK(r.remainder.registry.status == RegistryInit531d60Status::ok);
     CHECK(r.remainder.registry.entry_count == kInputTable551140Count);
+    CHECK(r.tail.gates.ok);
+    CHECK(r.tail.gates.ba40_ran);
     // early: 0xa30+0x40; tail: 0x98a90+0x40; registry: object+2 tables → >= 7
     CHECK(heap.alloc_count - allocs_before >= 7);
 
     // Re-run tail replaces previous slots (dtor_98a90 + delete_; vslot-only for 3b40).
     const auto r2 = run_prologue_255180_tail(front, app.data(), th);
     CHECK(r2.ok);
+    CHECK(r2.gates.ok);
     CHECK(g_dtor_98a90 >= 1);
     CHECK(g_dtor_3b40 >= 1);
 
     std::printf(
-        "appmain_init_prologue_tail_slice: MEASURED early+tail+base+trivial+registry ok "
-        "obj98a90=%p obj40=%p flag_after_base=%u entries=%u alloc_ops=%llu "
+        "appmain_init_prologue_tail_slice: MEASURED early+tail+gates2552d4+base+trivial+registry ok "
+        "obj98a90=%p obj40=%p gate_byte=%u flag_after_base=%u entries=%u alloc_ops=%llu "
         "duration_us=%lld allocator=tip_AllocatorFront+FakeHeap "
-        "debug_gates_after_0x2552cd=NOT_modelled pr5_heap_merge=GAP\n",
-        r.tail.obj_98a90, r.tail.obj_40, r.flag_after_base, r.remainder.registry.entry_count,
+        "stackchk/ba40_listeners=NOT_modelled pr5_heap_merge=GAP\n",
+        r.tail.obj_98a90, r.tail.obj_40, static_cast<unsigned>(r.tail.gates.gate_byte),
+        r.flag_after_base, r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
         static_cast<long long>(us));
 

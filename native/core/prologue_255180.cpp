@@ -135,7 +135,13 @@ Prologue255180TailResult run_prologue_255180_tail(AllocatorFront& alloc, void* s
     install_slot_vslot_only(app_slot(self, kPrologueAppSlot3b40), small, hooks.dtor_vslot08_3b40);
     out.obj_40 = small;
 
-    out.ok = (out.obj_98a90 != nullptr) && (out.obj_40 != nullptr);
+    // OBS 0x2552d4..0x255318: debug gates + a30 vslot+0x10 (stack-chk NOT modelled)
+    if (hooks.run_gates) {
+        out.gates = run_prologue_gates_2552d4(g_a30_cell_2dfd4b8, hooks.gates_detail);
+    }
+
+    out.ok = (out.obj_98a90 != nullptr) && (out.obj_40 != nullptr) &&
+             (!hooks.run_gates || out.gates.ok);
     return out;
 }
 
