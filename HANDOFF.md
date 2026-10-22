@@ -1,12 +1,29 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 18:04 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 22:20 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## RE-02 app-main +0x20 virtual call — claimed
+
+- `/root` owns bounded task `RE-02-APPMAIN-VCALL-25AA06-01`; claim details and baseline are in
+  [its claim checkpoint](docs/checkpoints/2026-10-21-root-re02-appmain-vcall-25aa06-claim.md).
+- Scope is only the indirect call at `0x25aa06` (`call qword ptr [RAX+0x20]`): verify the reaching
+  RAX/object/vptr and slot bytes against the pinned ELF. Produce a private evidence dossier and
+  byte-bound verifier; keep the edge unresolved if the target is not unique. This task makes no
+  runtime, class, ABI, or G1 claim. No source implementation has started.
+- Prerequisites: RE-01 and completed `RE-02-APPMAIN-25A8D0-01`; the existing app-main body has two
+  unresolved indirect calls. The prior app-main body task's three verifier-mapping failures are
+  recorded there and are not new failures on this separate callsite task.
+- Claim baseline: `python3 -I local/re/evidence/re02-appmain-25a8d0/verify.py` exited 0; output
+  SHA-256 `173a22dab0846535c1947627942087e98fe1a09c535b5db0615d6bdfa9b356cd`, empty stderr.
+- Exact next action: isolate reaching-register and vtable-slot evidence for `0x25aa06`; verify each
+  instruction and data mapping independently, then report either a unique static target or a
+  verifier-backed unresolved edge with the exact missing evidence.
 
 ## Round 77 fixtures verified (/root)
 
