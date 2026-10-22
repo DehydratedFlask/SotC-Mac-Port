@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 04:51 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 04:57 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -28,12 +28,33 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   claim/completion publication audits are in E324/E327. Only user-owned
   `native/api/CMakeLists.txt` and `native/api/host/` remain unstaged and untouched.
 - Status is `FIXTURE_VERIFIED`: one successful implementation attempt, zero failed tries. Next
-  exact action: publish the separate CPU-01 mixed math-constant guard-state claim and baseline
-  before any source edit.
+  exact action: validate the separate SRV-01 no-carve-fit candidate and its fresh baseline, then
+  publish a bounded claim before any source edit.
+
+## SRV-01 region-split no-carve-fit/no-mutation fixture — claim
+
+- `SRV-01-REGION-SPLIT-NO-CARVE-FIT-NO-MUTATION-FIXTURE-01` is a proposed one-case test-only
+  addition to `native/tests/test_region_split.cpp`. `split_using_carve_fit` returns immediately
+  when `try_carve_fit` reports no fit (`region_split.cpp:L30-L37`); an oversized request reaches
+  the `free_size < req_size` rejection (`free_list_carve.cpp:L10-L13`).
+- Existing wrapper calls cover a successful carve at `test_region_split.cpp:L120` and an exact-node
+  rejection at `L132`; neither checks the no-fit branch and full node preservation. The lower-level
+  `test_free_list_carve.cpp:L60-L61` checks oversized-request rejection without wrapper nodes.
+- Proposed fixture seeds distinct bytes in both 0x70-byte nodes, sets a valid free region of
+  `0x30000` bytes, requests `0x30001` at 64 KiB alignment, then asserts no fit and byte-for-byte
+  preservation of both full records. CTest `region_split` is registered at
+  `native/CMakeLists.txt:L468-L470`.
+- Root fresh Debug/Ninja baseline configure/build passes; focused `region_split` CTest passes
+  1/1. Live source/test/helper/CMake hashes and exact logs are in E335. Project index is current at
+  44,756 folders; Trail wiring check passes at 3,618 nodes / 1,240 files. This is synthetic helper
+  behavior only, with no allocator-runtime or game behavior claim.
+- Claim is recorded locally but must be pushed before source editing. Next exact action: publish
+  this claim/baseline with the pending math completion publication record, then assign only the
+  `test_region_split.cpp` edit to an implementation worker.
 
 ## CPU-01 math-constant mixed guard-state fixture — verified
 
-- `CPU-01-MATH-CONSTANTS-MIXED-GUARD-STATE-FIXTURE-01` is a proposed test-only fixture under
+- `CPU-01-MATH-CONSTANTS-MIXED-GUARD-STATE-FIXTURE-01` is a test-only fixture under
   `CPU-01`. Root inspected the live `MathConstants` fields and initializer: eight value/guard
   pairs; `once` branches on the low guard byte, preserving full value+guard on nonzero and setting
   value plus guard `1` when zero; `xyz_mask_copy` is always rewritten.
@@ -57,8 +78,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   divergence; claim publication audits accepted 6/1,736 paths (E330). The implementation passed
   on one successful try with zero failed tries. An index check after adding private validation logs first reported only
   `local/indexes/folders.json` stale; regenerating then rechecking passed at 42,926 folders (E331).
-  Next exact action: validate the separate SRV-01 no-carve-fit candidate and its fresh baseline,
-  then publish a bounded claim before any edit.
+- Completion commit `f08e3bf6e318db7ab889b55375578d62a2506b20` is pushed and fetch-verified at 0/0
+  divergence. Pre-push audits accepted 7 staged / 1,737 full paths; the post-push full audit
+  accepted 1,737. E334 records publication. Only user-owned `native/api/CMakeLists.txt` and
+  `native/api/host/` remain outside the published scope.
 
 ## CPU-01 store_zero32 adjacent-canary fixture — verified
 
