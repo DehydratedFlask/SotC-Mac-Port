@@ -61,9 +61,44 @@
   user-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain outside the commit.
 - Remaining risks: RAX or its vtable could be dynamically populated, and partial callee coverage
   may prevent a unique static mapping. Do not use strings or neighboring addresses as proof.
-- Next exact action: after this claim is published, assign an offline-only worker to trace
-  `0x25ac9f`; avoid the shared REA binary session until the `0x25aa06` worker has exported and
-  closed it. Independently replay its byte verifier before any status change.
-- HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF and TASKS updated;
-  EVIDENCE and INSTALL_LOG unchanged because no new verified result or dependency. Refresh
-  `docs/FOLDERS.md`, run index/graph checks, audit allowlisted paths, and publish the claim.
+- The claim's documentation sync was committed as `9462efc0187ca14f417fd7a33b6cc4733b5474b8`
+  (`docs: record second callsite claim publication`) and pushed to `origin/main`. `git fetch origin`
+  followed by `git rev-parse HEAD`, `git rev-parse origin/main`, and
+  `git rev-list --left-right --count HEAD...origin/main` returned matching tips and `0 0`.
+  Private post-push log `local/checkpoints/round78-re02-25ac9f-sync-postpush.log` SHA-256
+  `85fe3be51a31fa649189e33abc6998ecfa376e1a5ed44d079996d2cfe754b3a5`.
+- Exact sync preflight commands: `git diff --cached --check`,
+  `python3 -I scripts/audit_publish_paths.py`, and
+  `python3 -I scripts/audit_publish_paths.py --all`; exit 0, 2 staged paths and 1,661 full-tree
+  paths accepted. Audit logs are `local/checkpoints/round78-re02-25ac9f-sync-staged-audit.log`
+  SHA-256 `006610682336ac2a4ba91cee6e2bfec0c1754467869582cfcce9fd0e35accac6` and
+  `local/checkpoints/round78-re02-25ac9f-sync-full-audit.log` SHA-256
+  `17200d8db78d887760aa6fcbe3f30b7bd7a24542bbe7351675fceb9268505945`.
+- Worker `/root/re02_vcall_25ac9f` now owns only the private evidence directory and dedicated
+  verifier named above. It is performing offline analysis. The shared REA session is closed and root
+  controls any future REA operation; do not run concurrent REA/Ghidra analysis.
+- Next exact action: trace the reaching object and slot offline, add a byte-bound verifier if useful,
+  and preserve the unresolved edge if evidence is not unique. Root will integrate the worker
+  checkpoint and publish it; no runtime/class/ABI/G1 claim is permitted.
+- HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes at claim time: HANDOFF and TASKS updated;
+  EVIDENCE and INSTALL_LOG unchanged because no new verified result or dependency. The folder index
+  and Trail graph passed before the claim commit; no source file was changed.
+
+## Publication sync checkpoint
+
+- Time / timezone: 2026-10-21 22:31 CDT (America/Chicago); integrator `/root`.
+- Task: `RE-02-APPMAIN-VCALL-25AC9F-01`; status remains `ACTIVE`, 0 failed tries.
+- Files changed by the sync: `HANDOFF.md` and this checkpoint. Claim row and generated
+  `docs/FOLDERS.md` were already published in the claim commit.
+- Exact commands: `git diff --cached --check`; `python3 -I scripts/audit_publish_paths.py`;
+  `python3 -I scripts/audit_publish_paths.py --all`; `git commit -m "docs: record second callsite claim publication"`;
+  `git push origin main`; `git fetch origin`; `git rev-parse HEAD`; `git rev-parse origin/main`;
+  `git rev-list --left-right --count HEAD...origin/main`.
+- Result: all preflight commands exited 0; staged/full audits accepted 2/1,661 paths; commit
+  `9462efc0187ca14f417fd7a33b6cc4733b5474b8` pushed successfully; fetched local and remote tips
+  match and divergence is 0/0. Push/fetch evidence is in the private sync log cited above.
+- Observation versus inference: publication and repository synchronization are confirmed. This
+  says nothing about the indirect call's target or runtime behavior.
+- Remaining risks: offline trace has not yet established RAX's reaching object or the `+0x28` slot.
+- Next exact action: continue the worker's offline analysis and independently replay its verifier;
+  preserve `UNRESOLVED` if target bytes or dataflow do not prove one unique callee.

@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 22:28 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 22:37 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -10,59 +10,45 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 
 ## RE-02 app-main +0x20 virtual call — claimed
 
-- `/root` owns bounded task `RE-02-APPMAIN-VCALL-25AA06-01`; claim details and baseline are in
-  [its claim checkpoint](docs/checkpoints/2026-10-21-root-re02-appmain-vcall-25aa06-claim.md).
-- Scope is only the indirect call at `0x25aa06` (`call qword ptr [RAX+0x20]`): verify the reaching
-  RAX/object/vptr and slot bytes against the pinned ELF. Produce a private evidence dossier and
-  byte-bound verifier; keep the edge unresolved if the target is not unique. This task makes no
-  runtime, class, ABI, or G1 claim. No source implementation has started.
-- Prerequisites: RE-01 and completed `RE-02-APPMAIN-25A8D0-01`; the existing app-main body has two
-  unresolved indirect calls. The prior app-main body task's three verifier-mapping failures are
-  recorded there and are not new failures on this separate callsite task.
-- Claim baseline: `python3 -I local/re/evidence/re02-appmain-25a8d0/verify.py` exited 0; output
-  SHA-256 `173a22dab0846535c1947627942087e98fe1a09c535b5db0615d6bdfa9b356cd`, empty stderr.
-- The claim is published in `866e7bf648976bf7f0f83943884c9df65d66922b`; `git push origin main`
-  succeeded. A post-push fetch confirms `HEAD == origin/main`, 0/0 divergence; log
-  `local/checkpoints/round78-re02-callsite-claim-postpush.log` SHA-256
-  `bfd7aecbaae70345740d2858e5dcba5c0eaa721ddabe08fa00a0172a2dba750b`. Staged/full path audits
-  accepted 4/1,660 paths; folder index is current at 19,269 folders and Trail wiring graph check
-  passes at 3,580 nodes.
-- The publication-record sync is also pushed as `414a0434e96885b5f028e9b2c7e9f18730955b3e`;
-  post-push `HEAD == origin/main`, divergence 0/0. Log:
-  `local/checkpoints/round78-re02-claim-sync-postpush.log` SHA-256
-  `4e7d5e77d98fb4c48e615b108f703daacb772c84a424047a393ef25879df4e9b`.
-- The later first-task handoff sync `54854c9` was pushed before this second callsite claim.
-- This claim is published as `7975c5c6f1d55e0efe7dc61031f8ff6d69cfe557`; post-push fetch confirms
-  `HEAD == origin/main`, divergence 0/0. Log:
-  `local/checkpoints/round78-re02-25ac9f-postpush.log` SHA-256
-  `21fa37a1319c7846fb5a87c47c199414fdcfa84dc459babda4145486ec17ab4a`.
-- Staged/full path audits accepted 4/1,661 paths; folder index current at 19,270, Trail wiring
-  graph current at 3,580 nodes. Exact check logs are in the claim checkpoint.
-- Exact next action: assign an offline-only worker to `0x25ac9f`; keep REA exclusive to the
-  `0x25aa06` worker until that session is exported and closed.
-- A later `python3 scripts/project_index.py --check` briefly reported stale
-  `local/indexes/folders.json` after the new private evidence directory was created. Regeneration
-  returned 19,269 folders and the immediate recheck passed; this was a private index count update,
-  not a public source or task failure.
-- Exact next action: isolate reaching-register and vtable-slot evidence for `0x25aa06`; verify each
-  instruction and data mapping independently, then report either a unique static target or a
-  verifier-backed unresolved edge with the exact missing evidence.
-- Worker `/root/re02_vcall_25aa06` owns its private evidence directory and checker. It has exclusive
-  ownership of the shared REA binary session for the pinned ELF; do not start another REA operation
-  until it exports and closes the session.
+- `/root/re02_vcall_25aa06` owns bounded task `RE-02-APPMAIN-VCALL-25AA06-01`; claim and
+  baseline are in its [claim checkpoint](docs/checkpoints/2026-10-21-root-re02-appmain-vcall-25aa06-claim.md).
+- Scope is only `0x25aa06` (`call qword ptr [RAX+0x20]`): verify the reaching RAX/object/vptr and
+  slot bytes against the pinned ELF, then report a unique static target or verifier-backed
+  unresolved edge. No runtime, class, ABI, or G1 claim; no native lift.
+- Claim `866e7bf648976bf7f0f83943884c9df65d66922b` and its publication sync
+  `414a0434e96885b5f028e9b2c7e9f18730955b3e` are pushed and fetch-verified; later first-task
+  handoff sync `54854c9` was also pushed. The exact claim baseline output is recorded in the claim
+  checkpoint. Parent-body verifier mapping failures remain assigned to the parent task.
+- REA attempt 1 called `analyze_function(0x25a8d0)` and returned `provider_timeout` after
+  330,000 ms at Ghidra 12.1.4 startup, run ID `1d30f13b-1bf7-4897-a088-b59b8e01e6d4`. The target
+  SHA matched the pinned ELF. No REA records were produced; the available bundle was exported and
+  the session closed. See the [timeout checkpoint](docs/checkpoints/2026-10-21-root-re02-appmain-vcall-25aa06-rea-timeout.md).
+- The shared REA session is closed; root controls any further REA/Ghidra use. The worker continues
+  offline and must not repeat the same profile. Task attempt count is 1.
+- Exact next action: isolate reaching-register and vtable-slot evidence for `0x25aa06`, verify each
+  instruction and data mapping independently, and preserve an unresolved edge if target proof is
+  incomplete. Privately replay the byte-bound verifier before root changes task status.
 
-## RE-02 app-main +0x28 virtual call — claimed
+## RE-02 app-main +0x28 virtual call — static path byte verified
 
-- `/root` owns bounded task `RE-02-APPMAIN-VCALL-25AC9F-01`; claim details and baseline are in
-  [its claim checkpoint](docs/checkpoints/2026-10-21-root-re02-appmain-vcall-25ac9f-claim.md).
-- Scope is only the second unresolved indirect call `0x25ac9f` (`call qword ptr [RAX+0x28]`): trace
-  the reaching object/vptr and slot bytes against the pinned ELF, and report a unique static target
-  or verifier-backed unresolved edge. No runtime, class, ABI, or G1 claim; no native lift.
-- Its private evidence path and verifier path are separate from the `0x25aa06` task. Begin with
-  offline byte/dataflow analysis; do not use the shared REA session while `/root/re02_vcall_25aa06`
-  owns it.
-- Exact next action: assign an offline-only worker to `0x25ac9f`; keep REA exclusive to the
-  `0x25aa06` worker until its session is exported and closed.
+- Task `RE-02-APPMAIN-VCALL-25AC9F-01` is bounded complete at `STATIC_PATH_BYTE_VERIFIED`; claim
+  details are in [the claim checkpoint](docs/checkpoints/2026-10-21-root-re02-appmain-vcall-25ac9f-claim.md)
+  and verification/results in [the completion checkpoint](docs/checkpoints/2026-10-21-root-re02-appmain-vcall-25ac9f-complete.md).
+- Worker `/root/re02_vcall_25ac9f` verified the call operand and reaching register sequence, plus a
+  conditional constructor-table value. At `0x25ac9f`, bytes `ff 50 28` encode `call qword ptr
+  [RAX+0x28]`; if the object still has constructor address point `0x15c8cd8`, file-backed slot
+  `0x15c8d00` contains `0x5365b0`. The object first word at the call is not proven unchanged across
+  prior calls, so the runtime call edge remains unresolved. No class, ABI, runtime, or G1 claim.
+- Root independently ran `python3 -I tools/lift/verify_appmain_vcall_25ac9f.py`; exit 0 and stdout
+  byte-matches the worker output (SHA-256 `f27559dd088cfdffe126db29e21d780ab3201dd6a31bbf7d8041e1f6f9a10e62`);
+  stderr is empty. Verifier SHA-256 `c0454ec60e63604952f66fda100b99eee31934e5bf92b891b35bdae6e7c3e262`.
+- Claim `7975c5c6f1d55e0efe7dc61031f8ff6d69cfe557` and documentation sync
+  `9462efc0187ca14f417fd7a33b6cc4733b5474b8` are pushed and fetch-verified. The completion
+  publication is being prepared. The shared REA session was not used by this worker; root controls
+  any future REA operation.
+- Attempt count: one bounded analysis, zero failed analysis hypotheses. Exact private report and
+  probe paths, hashes, observations, and limits are in the completion checkpoint. G0 stays PARTIAL;
+  G1–G6 stay NOT RUN.
 
 ## Round 77 fixtures verified (/root)
 
