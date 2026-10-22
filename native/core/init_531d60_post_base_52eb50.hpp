@@ -9,7 +9,7 @@
 // body tourism.
 //
 // Claimed: call-site control flow pin only.
-// NOT modelled: 0x52eb50 body / later Init continues. PR #5 cite-only.
+// NOT modelled: 0x52eb50 body; lea rbx / vmovq continue (E465). PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
