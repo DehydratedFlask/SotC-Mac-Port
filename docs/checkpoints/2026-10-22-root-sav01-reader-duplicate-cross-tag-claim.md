@@ -1,0 +1,16 @@
+# Claim checkpoint: SAV-01-READER-DUPLICATE-NAME-CROSS-TAG-FIXTURE-01
+
+- Local date/time: 2026-10-22 06:48 CDT (America/Chicago). Claim owner/integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`); proposed implementation worker: `/root/cpu_sav_fixture_scout_22`.
+- Task / parent / status: `SAV-01-READER-DUPLICATE-NAME-CROSS-TAG-FIXTURE-01`, child of `SAV-01-NATIVE-STREAM-01`; `ACTIVE`, zero implementation attempts and zero failed tries.
+- Bounded ownership: worker may change only `native/tests/test_save_stream.cpp`. Change the second same-name chunk's tag from 4 to 8, assert parsed tags remain 4 and 8, and retain the existing assertion that `DuplicatePolicy::reject` reports `reader_duplicate_name`. Root owns shared docs, independent replay, and publication. Production code, headers, CMake, API/Graft paths, reference clones, and game files are out of scope.
+- Baseline HEAD `34a10b530e4b5e03ad1798d7bb098690efed1b69`. Test/helper/header/CMake SHA256: `2ca3be28c02d47068cda2133041339933b9826f0e09b74663504cf432d572a68` / `7bc9763539dfa6fdd40f26d3cd9c1dd4c0d06e50bbd3af87d0c7b1f2cb1c0c7e` / `b2a0f296b850f094151e4d53ef7cf08f62268b3358cd9aa1fdfb41244a7dbe83` / `cd46d94590f58515152155658f609cd11ef58aeb9a45272f744402edcdeeb01f`.
+- Navigation and live-source evidence: Graft found `parse_save_stream` looks up duplicate `name_hash` without comparing tag; existing test uses ASCII-case variants of `flag` with the same tag. The writer already has a cross-tag duplicate rejection case, while reader cross-tag behavior is not pinned. Graft output is in `local/validation/srv01-f19e00-zero-request-20261022/root-graft-next-sav01-duplicate-policy.log` (SHA256 `e08b810d9c7a06a07bda8f1356d486562d1631f7ace987550e6a958efa5f7b99`) and `root-graft-next-sav01-duplicate-parser.log` (SHA256 `8ee9470801e7b8d8580b1ed6f075eb686a0f4e477aa93fca54f2daa198baa2eb`). CTest `save_stream` is registered for `test_save_stream`.
+- Hypothesis and expected result: two chunks with equal normalized name hashes and tags 4/8 both parse under the allow policy with those tags preserved; reject policy returns `reader_duplicate_name` even though tags differ.
+- Exact acceptance commands from repository root:
+  1. `cmake -S native -B local/build/native-worker-sav01-reader-duplicate-cross-tag-20261022 -G Ninja -DCMAKE_BUILD_TYPE=Debug`
+  2. `cmake --build local/build/native-worker-sav01-reader-duplicate-cross-tag-20261022 --target test_save_stream`
+  3. `ctest --test-dir local/build/native-worker-sav01-reader-duplicate-cross-tag-20261022 --output-on-failure -R '^save_stream$'`
+- Expected acceptance: configure/build exit 0 and focused `save_stream` CTest 1/1. At claim time, these implementation acceptance commands have not run. Root will replay them in a separate build directory after worker completion.
+- Observation versus inference / limitation: synthetic native-container duplicate-name policy only. It does not establish the original game loader's behavior, real-save compatibility, or save/load behavior.
+- Risks: keep the change test-only and preserve each test's distinct build/log paths. Claim publication must precede worker dispatch.
+- Exact next action: after publication, dispatch the one-file test change to `/root/cpu_sav_fixture_scout_22`; root will independently replay the focused target.
