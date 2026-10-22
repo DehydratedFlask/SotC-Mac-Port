@@ -28,7 +28,7 @@ or Metal gameplay is demonstrated.
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-544fe0-20261022/` (manifest
   `7fa059e6…` at tip `773a9d0`; capture `8a0ca3e0…`).
-- Observation: feat tip `773a9d0`; measured `pb544=1` + `pb170=1` + mid_reg=4 → 275 registry.
+- Observation: feat tip `773a9d0`; docs tip `9a5c3c1`; measured `pb544=1` + `pb170=1` + mid_reg=4 → 275 registry.
   Body / mov-rbx prep / following `lea r14` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_544fe0.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
