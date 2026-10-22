@@ -42,6 +42,8 @@ int main() {
     CHECK(mutex.initialize() == EALREADY);
     CHECK(mutex.lock() == 0);
     CHECK(mutex.lock() == 0);
+    CHECK(mutex.try_lock() == 0);
+    CHECK(mutex.unlock() == 0);
     CHECK(unlock_from_another_thread(mutex) == EPERM);
 
     const CompetingTry while_fully_held = try_from_another_thread(mutex);

@@ -38,8 +38,13 @@
   characterize scheduler priority inheritance under contention or game behavior.
 - Remaining risk: run the assertion on the target Darwin pthread implementation and verify the
   extra recursive acquisition is released before the existing competing-thread assertions.
-- Next exact action: after the claim and completion publication is verified on `origin/main`, dispatch
-  `/root/next_fixture_scout_2` to edit only the test file and run the focused target/build checks.
-  Root retains docs, integration, and publication ownership. Existing user-owned
-  `native/api/CMakeLists.txt` and untracked `native/api/host/` stay outside scope.
+- Publication and dispatch: commit `1400c835ff74b1744c65ded8e0139cb2051b92fa` contains this claim
+  and the verified region-list completion; it is pushed and fetch-verified at 0/0 divergence. The
+  staged/post-push explicit audits accepted 8 paths and full audits accepted 1,729 paths (E310).
+  At 2026-10-22 03:46 CDT, `/root/next_fixture_scout_2` was assigned only the test-file edit and
+  fresh focused build commands; it must not edit docs, stage, commit, or push.
+- Next exact action: after the worker reports, root independently builds `test_recursive_mutex` in
+  a fresh Debug/Ninja directory and runs focused `recursive_mutex` CTest. Root retains docs,
+  integration, and publication ownership. Existing user-owned `native/api/CMakeLists.txt` and
+  untracked `native/api/host/` stay outside scope.
 - Task status and attempt count: `ACTIVE`; zero implementation attempts and zero failed tries.
