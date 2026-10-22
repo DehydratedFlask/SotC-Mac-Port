@@ -14,10 +14,10 @@
   use. Preserve the seven inputs as private user data.
 - Files changed for claim: `HANDOFF.md`, `docs/TASKS.md`, and this checkpoint. No manifest was read
   and no analyzer was created before the claim.
-- Exact next action: after claim publication and fetch verification, assign
-  `/root/round78_next_task_scout` a private deterministic analyzer and independent rerun; root will
-  review its code/output and reconcile all margins before status promotion.
-- Task status: `CLAIMED`; attempt count 0.
+- Claim was published and fetch-verified before `/root/round78_next_task_scout` read the manifests.
+- Exact next action: see the linked completion checkpoint for root's independent replay, margin and
+  privacy verification.
+- Task status: `ARTIFACT_VERIFIED`; attempt count 0.
 
 ## Claim publication checkpoint
 
@@ -32,6 +32,10 @@
   pushed and fetch-verified with `HEAD == origin/main` and 0/0 divergence. Log
   `/tmp/round78-docsync-postpush.log` SHA-256
   `8de8a22d1a46763c6d1299b460d0b68d7a2e5569f2cd209bdb20bcc7df1be639`.
+- The current status was synced in commit `5da4e8f37f26f3b156055a202252123b9e01a41c`, also
+  pushed and fetch-verified with `HEAD == origin/main` and 0/0 divergence. Log
+  `/tmp/round78-docsync2-postpush.log` SHA-256
+  `448239257884605f1daff200d884de7b874ceefe478d7df6e6d2695653dc9d15`.
 - Preflight: staged publication audit accepted 8 paths and full-tree audit accepted 1,667 paths;
   both exited 0. `git diff --cached --check` exited 0. Native API user files were not staged. Full
   audit SHA-256 `a24d31532815c136fad3ea12efcb696b95197d87b38e447db5f4d1ec84d393db`.
