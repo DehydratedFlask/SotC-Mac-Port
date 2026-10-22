@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 00:34 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 00:38 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -22,10 +22,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   Production code and byte checker are unchanged.
 - Status `FIXTURE_VERIFIED`, one successful implementation attempt, 0 failed tries. The assertion
   pins only synthetic `uint64_t` wrap and peak retention. Claim commit
-  `b8a734c0c20b731e9f8a5de11669b2acdd9f1469` is pushed and fetch-verified; completion publication
-  is being recorded.
-- Exact next action: publish the allowlisted completion checkpoint, then select another bounded
-  independent task. Leave the pending Mach-O CPU and PSARC negative-limit choices untouched.
+  `b8a734c0c20b731e9f8a5de11669b2acdd9f1469` and completion commit
+  `e9a6c631d0a68f4bca66a3a0ddedc5689c0f1bfd` are pushed and fetch-verified at 0/0 divergence.
+  Staged/full audits accepted 7/1,696 paths; the post-commit exact-path audit also passed.
+- Exact next action: review the read-only candidate from `/root/next_independent_task_scout`, verify
+  its live file/spec/task gap, and claim only if it is distinct. Leave the pending Mach-O CPU and
+  PSARC negative-limit choices untouched.
 
 ## RE-01 identical-output SELF unwrap repeat fixture — verified
 
