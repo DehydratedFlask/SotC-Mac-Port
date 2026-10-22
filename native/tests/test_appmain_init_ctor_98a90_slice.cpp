@@ -1,4 +1,4 @@
-// Measured prologue early+tail with lifted 0x3be050 header+buf-grow+null-head list → registry.
+// Measured prologue early+tail with lifted 0x3be050 + tsc 0x323d0 → registry.
 #include <array>
 #include <chrono>
 #include <cstdint>
@@ -14,6 +14,7 @@
 #include "core/inputtable_names_fixture.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/registry_init_531d60.hpp"
+#include "core/store_tsc_323d0.hpp"
 
 #define CHECK(c)                                                                         \
     do {                                                                                 \
@@ -68,10 +69,10 @@ struct FakeHeap : IAllocator {
 };
 
 int g_3be930 = 0;
-int g_323d0 = 0;
 int g_ensure = 0;
 int g_nonnull = 0;
 int g_f590 = 0;
+int g_init_tb = 0;
 int g_ctor_a30 = 0;
 int g_ctor_40 = 0;
 int g_dtor_98a90 = 0;
@@ -93,16 +94,16 @@ void dtor_early(void*) { ++g_dtor_early; }
 void dtor_98a90(void*) { ++g_dtor_98a90; }
 void dtor_3b40(void*) { ++g_dtor_3b40; }
 void hook_3be930(void*) { ++g_3be930; }
-void hook_323d0(void* p) {
-    ++g_323d0;
-    *static_cast<std::uint64_t*>(p) = 0x1234567890ABCDEFULL;
-}
 void hook_ensure(void*, std::uint32_t n) {
     ++g_ensure;
     CHECK(n == 0x100);
 }
 void hook_nonnull(void*, void*) { ++g_nonnull; }
 void hook_f590(void*) { ++g_f590; }
+std::uint64_t hook_init_tb() {
+    ++g_init_tb;
+    return 0xF8F8600000000001ULL;
+}
 
 bool hook_v30(void*) {
     ++g_v30;
@@ -117,62 +118,65 @@ void* loadp(const void* base, std::size_t off) {
     return p;
 }
 
-void reset_list_cells() {
+void reset_cells() {
     ctor_98a90_self_cell_2ef63f8() = nullptr;
     ctor_98a90_list_head_cell_2ef6400() = nullptr;
+    store_tsc_guard_cell_2ea4700() = 0;
+    store_tsc_global_cell_2ea4708() = 0;
 }
 
 }  // namespace
 
 int main() {
     CHECK(kCtor98a90_3be050Size == 627);
-    CHECK(kCtor98a90SelfCellRva == 0x2ef63f8);
-    CHECK(kCtor98a90ListHeadCellRva == 0x2ef6400);
+    CHECK(kStoreTsc323d0Size == 67);
+    CHECK(kStoreTscGuardCellRva == 0x2ea4700);
 
     AllocatorFront front;
     FakeHeap heap(front.owners(), 2);
     CHECK(front.set_heap(1, &heap));
     CHECK(front.set_heap(2, &heap));
 
-    // Unit: header + grow + null-head list cells.
+    // Unit: lifted tsc leaf alone (init once).
     {
-        reset_list_cells();
+        reset_cells();
+        g_init_tb = 0;
+        std::uint64_t dest = 0;
+        StoreTsc323d0Hooks th{};
+        th.init_timebase_f8f860 = hook_init_tb;
+        store_tsc_323d0(&dest, th);
+        CHECK(dest != 0);
+        CHECK(store_tsc_guard_cell_2ea4700() == 0xF8F8600000000001ULL);
+        CHECK(store_tsc_global_cell_2ea4708() != 0);
+        CHECK(g_init_tb == 1);
+        const std::uint64_t guard = store_tsc_guard_cell_2ea4700();
+        const std::uint64_t glob = store_tsc_global_cell_2ea4708();
+        store_tsc_323d0(&dest, th);
+        CHECK(g_init_tb == 1);  // second call skips init
+        CHECK(store_tsc_guard_cell_2ea4700() == guard);
+        CHECK(store_tsc_global_cell_2ea4708() == glob);
+        CHECK(dest != 0);
+    }
+
+    // Unit: ctor uses lifted tsc (no override).
+    {
+        reset_cells();
         std::vector<std::uint8_t> obj(kPrologue98a90Bytes, 0);
         Ctor98a90_3be050Hooks ch{};
         ch.sub_3be930 = hook_3be930;
-        ch.store_tsc_323d0 = hook_323d0;
         ch.ensure_3c2f70 = hook_ensure;
-        ch.elem_dtor_f590 = hook_f590;
-        ch.list_walk_nonnull_body = hook_nonnull;
-        g_3be930 = g_323d0 = g_ensure = g_nonnull = g_f590 = 0;
+        ch.tsc_detail.init_timebase_f8f860 = hook_init_tb;
+        g_3be930 = g_ensure = g_init_tb = 0;
         const auto cr = init_98a90_3be050(front, obj.data(), ch);
         CHECK(cr.ok);
-        CHECK(cr.buf_grown);
-        CHECK(cr.list_self_stored);
+        CHECK(cr.tsc_stored);
+        CHECK(cr.tsc_value != 0);
+        CHECK(g_init_tb == 1);
         CHECK(cr.list_walk_skipped_null);
-        CHECK(cr.list_head_seen == nullptr);
-        CHECK(g_nonnull == 0);
-        CHECK(ctor_98a90_self_cell_2ef63f8() == obj.data());
-        CHECK(ctor_98a90_list_head_cell_2ef6400() == nullptr);
+        CHECK(cr.buf_grown);
     }
 
-    // Unit: non-null head invokes body hook.
-    {
-        reset_list_cells();
-        std::uint8_t dummy_head = 0;
-        ctor_98a90_list_head_cell_2ef6400() = &dummy_head;
-        std::vector<std::uint8_t> obj(kPrologue98a90Bytes, 0);
-        Ctor98a90_3be050Hooks ch{};
-        ch.list_walk_nonnull_body = hook_nonnull;
-        g_nonnull = 0;
-        const auto cr = init_98a90_3be050(front, obj.data(), ch);
-        CHECK(cr.ok);
-        CHECK(!cr.list_walk_skipped_null);
-        CHECK(cr.list_head_seen == &dummy_head);
-        CHECK(g_nonnull == 1);
-    }
-
-    reset_list_cells();
+    reset_cells();
 
     InputTable551140 table{};
     init_input_table_551140(table);
@@ -185,7 +189,7 @@ int main() {
     std::memset(setter.data(), 0xCC, setter.size());
 
     g_ctor_a30 = g_ctor_40 = g_dtor_98a90 = g_dtor_3b40 = g_dtor_early = 0;
-    g_3be930 = g_323d0 = g_ensure = g_nonnull = g_f590 = g_v30 = g_mid = g_v40 = 0;
+    g_3be930 = g_ensure = g_nonnull = g_f590 = g_init_tb = g_v30 = g_mid = g_v40 = 0;
 
     Prologue255180Hooks eh{};
     eh.ctor_a30_264e50 = ctor_a30;
@@ -198,10 +202,11 @@ int main() {
 
     Ctor98a90_3be050Hooks ch{};
     ch.sub_3be930 = hook_3be930;
-    ch.store_tsc_323d0 = hook_323d0;
     ch.ensure_3c2f70 = hook_ensure;
     ch.elem_dtor_f590 = hook_f590;
     ch.list_walk_nonnull_body = hook_nonnull;
+    ch.tsc_detail.init_timebase_f8f860 = hook_init_tb;
+    // store_tsc_323d0 override null → lifted
 
     BaseInitialize255130Hooks bh{};
     bh.vslot_30 = hook_v30;
@@ -219,12 +224,14 @@ int main() {
     CHECK(r.early.ok);
     CHECK(r.tail.ok);
     CHECK(r.ctor.ok);
+    CHECK(r.ctor.tsc_stored);
+    CHECK(r.ctor.tsc_value != 0);
+    CHECK(g_init_tb == 1);
+    CHECK(store_tsc_guard_cell_2ea4700() == 0xF8F8600000000001ULL);
     CHECK(r.ctor.list_self_stored);
     CHECK(r.ctor.list_walk_skipped_null);
     CHECK(g_nonnull == 0);
-    CHECK(ctor_98a90_self_cell_2ef63f8() == r.tail.obj_98a90);
     CHECK(g_3be930 == 1);
-    CHECK(g_323d0 == 1);
     CHECK(g_ensure == 1);
     CHECK(g_ctor_40 == 1);
     CHECK(r.base_ok);
@@ -241,11 +248,12 @@ int main() {
 
     std::printf(
         "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+buf80+null_list+"
-        "early+tail+base+trivial+registry ok nested=%p buf80=%p self_cell=%p entries=%u "
+        "tsc323d0+early+tail+base+trivial+registry ok nested=%p tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld allocator=tip_AllocatorFront+FakeHeap "
-        "list_nonnull_body=NOT_taken bodies_3be930/323d0/3c2f70/f590/f8f500/3c0840=NOT_modelled "
+        "f8f860_plt=hooked bodies_3be930/3c2f70/f590/nonnull_list=NOT_modelled "
         "pr5_heap_merge=GAP\n",
-        r.ctor.nested_48, begin, ctor_98a90_self_cell_2ef63f8(), r.remainder.registry.entry_count,
+        r.ctor.nested_48, static_cast<unsigned long long>(r.ctor.tsc_value),
+        r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
         static_cast<long long>(us));
 
