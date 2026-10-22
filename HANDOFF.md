@@ -28,7 +28,7 @@ or Metal gameplay is demonstrated.
   EVIDENCE E492; TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-a2ed00-u2-20261022/` (manifest
   `20d4e583…` at tip `abea876`; capture `fe51567f…`).
-- Observation: feat tip `abea876`; docs tip `DOCS_TIP_PENDING`; measured
+- Observation: feat tip `abea876`; docs tip `f92414d`; measured
   `pba2edu2=1` + `pbf590u2=1` + mid_reg=4 → 275 registry.
   Body / stack prep / following `call 0xf590` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_a2ed00_u2.py` OK;
