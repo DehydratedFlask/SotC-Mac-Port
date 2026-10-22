@@ -1,0 +1,18 @@
+# Checkpoint: SRV-01-HOST-MAP-EMPTY-NONNULL-ZERO-SIZE-FIXTURE-01 — claimed
+
+- Time / timezone: 2026-10-21 23:53 CDT (America/Chicago).
+- Agent and integrator: `/root` (Codex task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`); root owns shared docs.
+- Task / gate / status: `SRV-01-HOST-MAP-EMPTY-NONNULL-ZERO-SIZE-FIXTURE-01`, child of `SRV-01`; bounded synthetic accessor fixture; `ACTIVE`.
+- Prerequisite evidence / input and source hashes: Baseline `native/tests/test_host_map.cpp` SHA256 `396d30b4f54e76f4d1c9cd70bbb32dd1c43d57776bfc9d2fa4699cec208b3db0`; unchanged `native/core/host_map.hpp` SHA256 `283c3b8f0c98ccb48cb756e9e16ba4fd54c98babc1ea60b942f2cc2276c30bbe`. The existing task board has no matching non-null / zero-size row. Related tasks cover rejection of a zero-size mapping request and fully zeroed fields after `unmap()`.
+- Owned / changed files: Claim docs only: `HANDOFF.md`, `docs/TASKS.md`, and this checkpoint. The test source has not been edited.
+- Hypothesis and expected result: `HostMapping{&local_byte, 0, nullptr, 0}.empty()` is true because `empty()` also checks `size == 0` when `ptr` is non-null.
+- Exact command, CWD and nonsecret environment: In `/Volumes/Extra/SoC Mac Native`, run `cmake --build local/build/native --target test_host_map`.
+- Exit / observed result: Exit 0; `[100%] Built target sotc_core` and `[100%] Built target test_host_map`.
+- Exact command, CWD and nonsecret environment: In `/Volumes/Extra/SoC Mac Native`, run `ctest --test-dir local/build/native -R '^host_map$' --output-on-failure`.
+- Exit / observed result: Exit 0; `host_map` passed 1/1.
+- Log, capture and REA evidence paths/IDs: `local/validation/srv01-host-map-empty-nonnull-zero/baseline-build.log` SHA256 `c6a4b5ca13ce84a970f60a6231a0c43038e207bf62d80ce0e8e2926e5a0a94d4`; `baseline-ctest.log` SHA256 `de9eb4f574cb0434fcfaa3ee84d4bd179c1cf7f7fce61ceec299206d8ff49077`. Trail ask/grep/skeleton logs in the same private directory have SHA256 `d108f055b1bbc30c557bb753e28a2cf200bfab761aad1f1b13b74426f7e44384`, `811be4f8c39c9686f5ec5880123756ae750f03bdf1d6b5402b22b4f8ca983b3f`, and `ad2ef211942d87b0e014407660ba5f9388ca4e7178b4d40c308ac0bd2559badf`.
+- Observation versus inference / coverage limitations: Baseline target compiles and current CTest passes. `HostMapping::empty()` is `ptr == nullptr || size == 0`; current host-map tests exercise a live mapped state and a canonical all-zero post-unmap state, but not the non-null / zero-size combination. This proposed assertion tests a pure accessor state and does not call mmap.
+- Cumulative failed tries and distinct hypotheses: 0 failed implementation tries; no implementation edit attempted.
+- Remaining risks / blockers: Low-value defensive accessor state; normal mapping APIs reject zero-sized requests. It makes no OS mapping, allocator integration, or game runtime claim.
+- Next exact action: After this claim is published, delegate the one-file test assertion to the source worker; verify focused build and CTest, then record completion evidence.
+- HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: Handoff and task register now show the claim; EVIDENCE and INSTALL_LOG do not change yet. `python3 scripts/project_index.py` first exited 0 but the following check reported `Stale indexes: local/indexes/folders.json`; after a second index generation, `python3 scripts/project_index.py --check` passed. Logs are `project-index-check-initial.log` SHA256 `31dad00ffd5208458ee89a329fea70b0fa13494e525ddd8a7e837c7614a2266b`, `project-index.log` SHA256 `19aaab87087d6b5653458f3b3ed3606cadc8d33916289b5b6f90696e12e0c82a`, and final `project-index-check.log` SHA256 `053f4ec6a305a1689546fecd0138501fef7bc5bac4184faffc09bd12a6eb24e1`; final count 24,076 folders current.
