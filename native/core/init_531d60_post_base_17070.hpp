@@ -12,7 +12,8 @@
 // `0x532ed0` / `0x532ca0` body tourism.
 //
 // Claimed: call-site control flow pin only.
-// NOT modelled: arg prep; 0x17070 body; following mov rbx,rax / later helpers.
+// NOT modelled: arg prep; 0x17070 body; following mov rbx,rax prep / 0x544fe0
+// (claimed separately as E481).
 // PR #5 cite-only.
 #pragma once
 

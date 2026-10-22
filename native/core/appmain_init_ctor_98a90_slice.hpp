@@ -61,6 +61,7 @@
 #include "init_531d60_post_base_532ed0_u2.hpp"
 #include "init_531d60_post_base_vcall18_532ed0_u2.hpp"
 #include "init_531d60_post_base_17070.hpp"
+#include "init_531d60_post_base_544fe0.hpp"
 #include "input_table_551140.hpp"
 #include "prologue_255180.hpp"
 #include "singleton_f08_531d84.hpp"
@@ -145,6 +146,7 @@ struct AppmainInitCtor98a90SliceResult {
     Init531d60PostBase532ed0U2Result post_base_532ed0_u2{};
     Init531d60PostBaseVcall18532ed0U2Result post_base_vcall18_532ed0_u2{};
     Init531d60PostBase17070Result post_base_17070{};
+    Init531d60PostBase544fe0Result post_base_544fe0{};
     AppmainInitRemainderSliceResult remainder{};
 };
 
@@ -188,6 +190,7 @@ struct AppmainInitCtor98a90SliceResult {
     const Init531d60PostBaseVcall18532ed0Hooks& post_base_vcall18_532ed0_hooks = {},
     const Init531d60PostBase532ed0U2Hooks& post_base_532ed0_u2_hooks = {},
     const Init531d60PostBaseVcall18532ed0U2Hooks& post_base_vcall18_532ed0_u2_hooks = {},
-    const Init531d60PostBase17070Hooks& post_base_17070_hooks = {});
+    const Init531d60PostBase17070Hooks& post_base_17070_hooks = {},
+    const Init531d60PostBase544fe0Hooks& post_base_544fe0_hooks = {});
 
 }  // namespace sotc
