@@ -8,6 +8,17 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## 2026-10-22 orchestrator batch (4 parallel subagents) — verified
+
+- Agent: orchestrator (Claude Sonnet 5.5). Four file-disjoint tasks run in parallel, each replayed by root; E383 holds hashes/commands.
+  - SRV-01-REGION-LIST-UNCOUNTED-HEAD-UNLINK-FIXTURE-01: FIXTURE_VERIFIED (test_region_list.cpp +11 lines; region_list 1/1).
+  - DATA-02-PSARC-NEGATIVE-LIMIT-01: FIXTURE_VERIFIED (user decision applied; `limit=-1` previously truncated silently; 40/40 pass).
+  - APP-01-PACKAGE-SCRIPT-01: ARTIFACT_VERIFIED (`scripts/package_launcher.sh <out>` + `launcher/Packaging/Info.plist`; arm64 shell only, not launched, no core).
+  - APP-01-CORE-HOST-01: escalation resolved (root cause: libc++ cin hid EBADF as EOF; fd-0 streambuf fix; sotc_host_protocol 1/1). Engine still absent; G4 NOT RUN.
+- Publication: native/api/ changes remain user-owned and UNSTAGED (host fix lives there); only allowlisted files above published.
+- Remaining user decisions not yet applied: thin Mach-O ARM64-only readiness, math guard four-pass matrix.
+- Next exact action: apply those two queued user decisions (find owning tasks in TASKS), then continue CPU-01/AUD-02 recovery.
+
 ## CPU-01 trig-constants preseed fixture — verified
 
 - SAV-01-READER-DUPLICATE-NAME-CROSS-TAG-FIXTURE-01 and

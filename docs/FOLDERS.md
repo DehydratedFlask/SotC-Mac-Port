@@ -16,7 +16,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `docs/schemas` | 1 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `graft` | 1 | Regenerable source graph; internal cache directories summarized |
 | `launcher` | 2 | Native Swift macOS launcher |
-| `launcher/.build` | 5 | Native Swift macOS launcher |
+| `launcher/.build` | 6 | Native Swift macOS launcher |
 | `launcher/.build/artifacts` | 0 | Native Swift macOS launcher |
 | `launcher/.build/checkouts` | 0 | Native Swift macOS launcher |
 | `launcher/.build/out` | 0 | Native Swift macOS launcher |
@@ -26,6 +26,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/Intermediates.noindex` | 0 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/EagerLinkingTBDs` | 0 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/EagerLinkingTBDs/Debug` | 0 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/EagerLinkingTBDs/Release` | 0 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/ExplicitPrecompiledModules` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/GeneratedModuleMaps` | 5 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build` | 0 | Native Swift macOS launcher |
@@ -51,8 +52,23 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Debug/SoCLauncher-p.build/DerivedSources` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Debug/SoCLauncher-p.build/Objects-normal` | 0 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Debug/SoCLauncher-p.build/Objects-normal/arm64` | 32 | Native Swift macOS launcher |
-| `launcher/.build/out/Intermediates.noindex/SwiftExplicitPrecompiledModules` | 6 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release` | 0 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/CSotcCore-t.build` | 1 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/CSotcCore-t.build/Objects-normal` | 0 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/CSotcCore-t.build/Objects-normal/arm64` | 6 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/LauncherCore-t.build` | 1 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/LauncherCore-t.build/Objects-normal` | 0 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/LauncherCore-t.build/Objects-normal/arm64` | 31 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/LauncherNativeCore-t.build` | 1 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/LauncherNativeCore-t.build/Objects-normal` | 0 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/LauncherNativeCore-t.build/Objects-normal/arm64` | 16 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/SoCLauncher-p.build` | 0 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/SoCLauncher-p.build/Objects-normal` | 0 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/SoCLauncher-p.build/Objects-normal/arm64` | 18 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/SwiftExplicitPrecompiledModules` | 7 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/XCBuildData` | 2 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/XCBuildData/72ac7ea23d6bf8071f74ebc8e17113f8.xcbuilddata` | 5 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/XCBuildData/72ac7ea23d6bf8071f74ebc8e17113f8.xcbuilddata/attachments` | 15 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/XCBuildData/80715af41836f10516ca5fa61d0adc57.xcbuilddata` | 5 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/XCBuildData/80715af41836f10516ca5fa61d0adc57.xcbuilddata/attachments` | 14 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/XCBuildData/b87f88059692f27ff44272c349ce1382.xcbuilddata` | 5 | Native Swift macOS launcher |
@@ -64,8 +80,11 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/ModuleCache.noindex/26HPM7IERASJA` | 39 | Native Swift macOS launcher |
 | `launcher/.build/out/ModuleCache.noindex/29VD3CBDJP66C` | 38 | Native Swift macOS launcher |
 | `launcher/.build/out/ModuleCache.noindex/2QARY33CTWCN8` | 38 | Native Swift macOS launcher |
+| `launcher/.build/out/ModuleCache.noindex/2Z34GYK7HJY8C` | 67 | Native Swift macOS launcher |
 | `launcher/.build/out/ModuleCache.noindex/3081Y1Y3ZCNIP` | 38 | Native Swift macOS launcher |
+| `launcher/.build/out/ModuleCache.noindex/38M1DM187KCMB` | 39 | Native Swift macOS launcher |
 | `launcher/.build/out/ModuleCache.noindex/3JGGI8MPN8C4L` | 66 | Native Swift macOS launcher |
+| `launcher/.build/out/ModuleCache.noindex/3RWOPC8BS04HB` | 38 | Native Swift macOS launcher |
 | `launcher/.build/out/PCH` | 0 | Native Swift macOS launcher |
 | `launcher/.build/out/Products` | 0 | Native Swift macOS launcher |
 | `launcher/.build/out/Products/Debug` | 4 | Native Swift macOS launcher |
@@ -86,7 +105,17 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/Products/Debug/LauncherNativeCoreTests.xctest/Contents/MacOS` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/Products/Debug/LauncherNativeCoreTests.xctest/Contents/_CodeSignature` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/Products/Debug/PackageFrameworks` | 0 | Native Swift macOS launcher |
-| `launcher/.build/out/SDKExplicitPrecompiledModules` | 139 | Native Swift macOS launcher |
+| `launcher/.build/out/Products/Release` | 4 | Native Swift macOS launcher |
+| `launcher/.build/out/Products/Release/LauncherCore.swiftmodule` | 3 | Native Swift macOS launcher |
+| `launcher/.build/out/Products/Release/LauncherNativeCore.swiftmodule` | 3 | Native Swift macOS launcher |
+| `launcher/.build/out/Products/Release/PackageFrameworks` | 0 | Native Swift macOS launcher |
+| `launcher/.build/out/Products/Release/SoCLauncher.dSYM` | 0 | Native Swift macOS launcher |
+| `launcher/.build/out/Products/Release/SoCLauncher.dSYM/Contents` | 1 | Native Swift macOS launcher |
+| `launcher/.build/out/Products/Release/SoCLauncher.dSYM/Contents/Resources` | 0 | Native Swift macOS launcher |
+| `launcher/.build/out/Products/Release/SoCLauncher.dSYM/Contents/Resources/DWARF` | 1 | Native Swift macOS launcher |
+| `launcher/.build/out/Products/Release/SoCLauncher.dSYM/Contents/Resources/Relocations` | 0 | Native Swift macOS launcher |
+| `launcher/.build/out/Products/Release/SoCLauncher.dSYM/Contents/Resources/Relocations/aarch64` | 1 | Native Swift macOS launcher |
+| `launcher/.build/out/SDKExplicitPrecompiledModules` | 208 | Native Swift macOS launcher |
 | `launcher/.build/out/SDKStatCaches.noindex` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/v5` | 0 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records` | 0 | Native Swift macOS launcher |
@@ -1219,6 +1248,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/v5/records/ZZ` | 3 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/units` | 184 | Native Swift macOS launcher |
 | `launcher/.build/repositories` | 0 | Native Swift macOS launcher |
+| `launcher/Packaging` | 1 | Native Swift macOS launcher |
 | `launcher/Sources` | 0 | Native Swift macOS launcher |
 | `launcher/Sources/CSotcCore` | 1 | Native Swift macOS launcher |
 | `launcher/Sources/CSotcCore/include` | 1 | Native Swift macOS launcher |
@@ -1798,7 +1828,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `reference/shadPS4Plus-pkg/src/video_core/renderer_vulkan` | 32 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/shadPS4Plus-pkg/src/video_core/renderer_vulkan/host_passes` | 4 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/shadPS4Plus-pkg/src/video_core/texture_cache` | 18 | Pinned upstream source; read-only; symbols indexed by Graft |
-| `scripts` | 17 | Small project and offline analysis helpers |
+| `scripts` | 18 | Small project and offline analysis helpers |
 | `scripts/graft` | 0 | Small project and offline analysis helpers |
 | `scripts/graft/.cache` | 1 | Small project and offline analysis helpers |
 | `tools` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |

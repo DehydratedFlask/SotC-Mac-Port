@@ -232,6 +232,16 @@ class Tests(unittest.TestCase):
                 self.assertEqual(a.read(1, len(full)), a.read(1))        # equals full read
         self.assertEqual(compressed.read(1, 20), b'A' * 20)              # crosses a block
 
+    def test_read_rejects_negative_limit(self):
+        archive = self.open(build([('c', b'A' * 48)]))
+        for limit in (-1, -2, -99):
+            with self.subTest(limit=limit):
+                with self.assertRaises(psarc.PsarcError) as error:
+                    archive.read(1, limit)
+                self.assertEqual(str(error.exception), f'invalid negative read limit: {limit}')
+        self.assertEqual(archive.read(1, None), b'A' * 48)               # None stays whole-member
+        self.assertEqual(archive.read(1, 0), b'')                        # 0 stays valid
+
     def test_prefix_read_ignores_truncated_later_block(self):
         archive = self.open(build([('c', b'A' * 48)])[:-1])
         self.assertEqual(archive.read(1, 5), b'A' * 5)
