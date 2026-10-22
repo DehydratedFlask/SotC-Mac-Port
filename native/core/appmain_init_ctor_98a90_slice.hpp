@@ -1,11 +1,11 @@
 // Measured Init path: prologue early + tail using lifted 0x3be050 (header+0x3be930+ensure+
 // 0x80 grow+null-head list+tsc) + lifted 0x1ab550 (0x40 ctor) + debug gates 0x2552d4
 // → 0xf08 singleton install → base (lifted vslot 0x534130 + mid 0x255340 +
-// bounded 0x533100 header) → registry.
+// bounded 0x533100 header+post+miss) → registry.
 // Tip AllocatorFront+FakeHeap. PR #5 cite-only.
 // NOT modelled: ensure migrate / heavy menu helpers / 0xf8f860 PLT / non-null list;
-// PLT bodies 0xf901a0/0xf901c0; stack-chk; ba40 listener invoke; 0x533100 body past
-// header; bodies of 0x523bd0 / 0x525b40 / 0x493230.
+// PLT bodies 0xf901a0/0xf901c0; stack-chk; ba40 listener invoke; 0x533100 hit/join+;
+// 0x21620 body; bodies of 0x523bd0 / 0x525b40 / 0x493230 / 0x525080 / 0x2569d0.
 #pragma once
 
 #include "allocator_front.hpp"
@@ -37,6 +37,7 @@ struct AppmainInitCtor98a90SliceResult {
     SingletonF08Result singleton{};
     Vslot40_533100HeaderResult vslot_40{};
     Vslot40_533100PostResult vslot_40_post{};
+    Vslot40_533100MissResult vslot_40_miss{};
     bool base_ok = false;
     std::uint32_t flag_after_base = 0;
     AppmainInitRemainderSliceResult remainder{};
