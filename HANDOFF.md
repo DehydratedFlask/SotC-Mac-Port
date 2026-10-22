@@ -1,7 +1,7 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 07:33 CDT (America/Chicago). Integrator: /root (Codex desktop task
-`01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
+Updated: 2026-10-22 ~09:10 CDT (America/Chicago). Latest integrator: orchestrator (Claude Sonnet 5.5); earlier integrator /root (Codex desktop task
+`01a15eab-88d5-7a83-a23b-cc55dc002eb6`). **START HERE:** [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md) (workflow, completed work, ranked next actions, risks). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
@@ -89,7 +89,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   docs/checkpoints/2026-10-22-root-srv01-completion-sav01-claims-publication.md record publication
   of the previous SRV-01 completion and SAV-01 claims.
 
-## Next candidate — SRV-01 uncounted head unlink (unclaimed)
+## (Superseded) SRV-01 uncounted head unlink — completed 2026-10-22, see E383
 
 - Candidate: SRV-01-REGION-LIST-UNCOUNTED-HEAD-UNLINK-FIXTURE-01, parent
   SRV-01-REGION-LIST-UNCOUNTED-UNLINK-FIXTURE-01, target native/tests/test_region_list.cpp.
