@@ -27,7 +27,7 @@ or Metal gameplay is demonstrated.
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-vcall18-u3-20261022/` (manifest
   `6ae83587…` at tip `d547668`; capture `ea75a4d2…`).
-- Observation: feat tip `d547668`; measured `pbvcu3=1` + `pb532u3=1` + mid_reg=4 → 275 registry.
+- Observation: feat tip `d547668`; docs tip `e0f1347`; measured `pbvcu3=1` + `pb532u3=1` + mid_reg=4 → 275 registry.
   Callee body / later 0x532ca0 units NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_vcall18_u3.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
