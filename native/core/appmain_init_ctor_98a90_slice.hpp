@@ -40,6 +40,7 @@
 #include "init_531d60_post_base_ymm_bss.hpp"
 #include "init_531d60_post_base_ymm_intercell.hpp"
 #include "init_531d60_post_base_xmm_seed.hpp"
+#include "init_531d60_post_base_ymm_reload.hpp"
 #include "input_table_551140.hpp"
 #include "prologue_255180.hpp"
 #include "singleton_f08_531d84.hpp"
@@ -103,6 +104,7 @@ struct AppmainInitCtor98a90SliceResult {
     Init531d60PostBaseYmmBssResult post_base_ymm_bss{};
     Init531d60PostBaseYmmIntercellResult post_base_ymm_intercell{};
     Init531d60PostBaseXmmSeedResult post_base_xmm_seed{};
+    Init531d60PostBaseYmmReloadResult post_base_ymm_reload{};
     AppmainInitRemainderSliceResult remainder{};
 };
 
@@ -125,6 +127,7 @@ struct AppmainInitCtor98a90SliceResult {
     const Init531d60PostBaseF90310Hooks& post_base_f90310_hooks = {},
     const Init531d60PostBaseYmmBssCells& post_base_ymm_bss_cells = {},
     const Init531d60PostBaseYmmIntercellCells& post_base_ymm_intercell_cells = {},
-    const Init531d60PostBaseXmmSeedCells& post_base_xmm_seed_cells = {});
+    const Init531d60PostBaseXmmSeedCells& post_base_xmm_seed_cells = {},
+    const Init531d60PostBaseYmmReloadCells& post_base_ymm_reload_cells = {});
 
 }  // namespace sotc
