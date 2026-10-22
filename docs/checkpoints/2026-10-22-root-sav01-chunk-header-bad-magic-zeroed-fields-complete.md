@@ -11,4 +11,5 @@
 - Attempts: one successful implementation attempt; zero failed implementation/build/test attempts.
 - Evidence and logs: E359; `local/validation/sav01-chunk-header-bad-magic-zeroed-fields-20261022/`.
 - Remaining risk: synthetic parse-error state only; no game or runtime behavior is demonstrated.
-- Exact next action: verify publication and continue with the separately claimed CPU-01 infinite-threshold fixture.
+- Publication: completion and the next CPU-01 claim were published in `bed80c340ac33a381ad4a30a98eeb44ba6adf8c6`; E361 and the [publication checkpoint](2026-10-22-root-sav01-completion-cpu01-claim-publication.md) record the audits and 0/0 post-push divergence.
+- Exact next action: dispatch the published CPU-01 infinite-threshold fixture to the worker; root will independently replay it.
