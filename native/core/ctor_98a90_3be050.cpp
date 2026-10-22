@@ -5,6 +5,9 @@
 namespace sotc {
 namespace {
 
+void* g_self_cell_2ef63f8 = nullptr;
+void* g_list_head_cell_2ef6400 = nullptr;
+
 void zero_xmm(void* p) noexcept { std::memset(p, 0, 16); }
 
 [[nodiscard]] std::uint8_t* load_ptr(std::uint8_t* base, std::size_t off) noexcept {
@@ -42,7 +45,6 @@ void store_ptr(std::uint8_t* base, std::size_t off, void* p) noexcept {
                5)
             : 0;
 
-    // OBS: copy 0x20 elems begin..end into neu (vxor clear src); then dtor+delete_ if begin!=0
     if (begin != nullptr) {
         if (begin != end) {
             auto* d = dst;
@@ -72,7 +74,26 @@ void store_ptr(std::uint8_t* base, std::size_t off, void* p) noexcept {
     return true;
 }
 
+// OBS 0x3be1ce..0x3be1e5: store obj → 0x2ef63f8; head=*0x2ef6400; je skip if null.
+void list_walk_head(void* obj, const Ctor98a90_3be050Hooks& hooks,
+                    Ctor98a90_3be050Result& out) noexcept {
+    g_self_cell_2ef63f8 = obj;
+    out.list_self_stored = true;
+    void* head = g_list_head_cell_2ef6400;
+    out.list_head_seen = head;
+    if (head == nullptr) {
+        out.list_walk_skipped_null = true;
+        return;
+    }
+    if (hooks.list_walk_nonnull_body != nullptr) {
+        hooks.list_walk_nonnull_body(obj, head);
+    }
+}
+
 }  // namespace
+
+void*& ctor_98a90_self_cell_2ef63f8() noexcept { return g_self_cell_2ef63f8; }
+void*& ctor_98a90_list_head_cell_2ef6400() noexcept { return g_list_head_cell_2ef6400; }
 
 Ctor98a90_3be050Result init_98a90_3be050(AllocatorFront& alloc, void* obj,
                                          const Ctor98a90_3be050Hooks& hooks) {
@@ -82,10 +103,8 @@ Ctor98a90_3be050Result init_98a90_3be050(AllocatorFront& alloc, void* obj,
     }
     auto* base = static_cast<std::uint8_t*>(obj);
 
-    // OBS 0x3be064..0x3be06d
     zero_xmm(base + 8);
 
-    // OBS 0x3be068..0x3be093: nested 0x48 sentinel
     void* nested = alloc.new_(kCtor98a90NestedBytes);
     if (nested == nullptr) {
         return out;
@@ -100,7 +119,6 @@ Ctor98a90_3be050Result init_98a90_3be050(AllocatorFront& alloc, void* obj,
     std::memcpy(base + 8, &nested, sizeof(void*));
     out.nested_48 = nested;
 
-    // OBS 0x3be097..0x3be0b0
     base[0x18] = 0;
     zero_xmm(base + 0x28);
     std::memset(base + 0x38, 0, 8);
@@ -114,7 +132,6 @@ Ctor98a90_3be050Result init_98a90_3be050(AllocatorFront& alloc, void* obj,
         hooks.store_tsc_323d0(base + kCtor98a90TscOffset);
     }
 
-    // OBS 0x3be0c7..0x3be0f3
     std::uint64_t end28 = 0;
     std::uint64_t begin28 = 0;
     std::memcpy(&end28, base + 0x38, 8);
@@ -126,7 +143,6 @@ Ctor98a90_3be050Result init_98a90_3be050(AllocatorFront& alloc, void* obj,
         }
     }
 
-    // OBS 0x3be0f8..0x3be1cb: buffer grow (measured empty path always takes this)
     void* buf = nullptr;
     if (!grow_vec_buf_80(alloc, base, hooks, buf)) {
         return out;
@@ -136,12 +152,10 @@ Ctor98a90_3be050Result init_98a90_3be050(AllocatorFront& alloc, void* obj,
         out.buf_80 = buf;
     }
 
-    // OBS 0x3be1ce..0x3be2c2: global list walk — NOT modelled
-    if (hooks.list_walk_from_3be1ce != nullptr) {
-        hooks.list_walk_from_3be1ce(obj);
-    }
+    // OBS 0x3be1ce..: measured null-head early-out; non-null body hooked
+    list_walk_head(obj, hooks, out);
 
-    out.ok = (out.nested_48 != nullptr);
+    out.ok = (out.nested_48 != nullptr) && out.list_self_stored;
     return out;
 }
 
