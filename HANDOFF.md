@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 00:52 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 00:56 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -21,10 +21,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   [completion checkpoint](docs/checkpoints/2026-10-22-root-aud01-xff-prefix-offset-only-complete.md).
 - Both tasks are `FIXTURE_VERIFIED`, each with one successful implementation attempt and zero
   failed tries. The new methods are queryable in Trail; wiring graph is current at 3,612 nodes /
-  1,240 files and the deep meaning layer is not built. No production code, asset-decoding,
-  playback, or game evidence changed. The two completion records are ready for allowlisted
-  publication. Claim commit `93c693d211fadee9d16746f6be56ea5fca300bd1` is pushed and
-  fetch-verified at 0/0; staged/exact-path audits accepted 6 paths and full audit accepted 1,698.
+  1,240 files and the deep meaning layer is not built. The completion commit
+  `a0bf2b85be868ecc5de98c17d22dccef6247aefb` is pushed; staged and exact-path audits accepted 8
+  paths, full audit accepted 1,700, and fresh fetch confirmed 0/0 divergence. No production code,
+  asset-decoding, playback, or game evidence changed. Claim commit
+  `93c693d211fadee9d16746f6be56ea5fca300bd1` is pushed and fetch-verified at 0/0; its staged and
+  exact-path audits accepted 6 paths and full audit accepted 1,698.
   Exact next action: review the read-only candidate from `/root/next_independent_task_scout` against
   current task rows and live files, then claim one bounded task if it is distinct. Leave the
   pending Mach-O CPU and PSARC negative-limit choices untouched.
