@@ -72,6 +72,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Init continue AVX BSS (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-avx-bss.md) | Init continue AVX BSS copy (0x1b1dd40→dsts); E453; G1 PARTIAL |
 | [Init continue 0x7f7220 (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-7f7220.md) | Init continue 0x7f7220 call-site (staffroll helper); E454; G1 PARTIAL |
 | [Init continue 0x56fad0 (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-56fad0.md) | Init continue 0x56fad0 call-site (ret-nop); E455; G1 PARTIAL |
+| [Init continue 0xf90310 (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-f90310.md) | Init continue 0xf90310 call-site (splash-hide PLT); E456; G1 PARTIAL |
 | [FOLDERS](FOLDERS.md) | Generated public/source folder inventory; `scripts/project_index.py` |
 | [INSTALL_LOG](../INSTALL_LOG.md) | Existing and newly installed tools, downloads and removals |
 | [Checkpoint template](checkpoints/TEMPLATE.md) | Required record at each checkpoint |
