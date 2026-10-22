@@ -26,8 +26,9 @@ public enum SystemChecks {
         return result == noErr && device != kAudioObjectUnknown ? .ready : .missing("No default audio output device")
     }
 
-    /// Honest core presence probe. Never invents readiness: missing, non-executable, or non-Mach-O → NOT BUILT.
-    /// A real ARM64 Mach-O game core does not exist yet (G1 NOT PASSED); Play must stay disabled.
+    /// Honest core presence probe. Never invents readiness: missing, non-executable, wrong Mach-O
+    /// shape, or non-Mach-O → NOT BUILT. A real ARM64 Mach-O game core does not exist yet
+    /// (G1 NOT PASSED); Play must stay disabled.
     public static func nativeCore(executable: URL?) -> ReadinessItem.Status {
         guard let executable else {
             return .notBuilt(notBuiltMessage("no \(expectedCoreExecutableName) path (auxiliary executable absent)"))
@@ -44,29 +45,76 @@ public enum SystemChecks {
         guard FileManager.default.isExecutableFile(atPath: path) else {
             return .notBuilt(notBuiltMessage("\(executable.lastPathComponent) is not executable"))
         }
-        guard isMachOExecutable(at: executable) else {
-            return .notBuilt(notBuiltMessage("\(executable.lastPathComponent) is not a Mach-O executable (refusing scripts/stubs)"))
+        switch classifyCoreMachO(at: executable) {
+        case .accepted:
+            return .ready
+        case .rejected(let detail):
+            return .notBuilt(notBuiltMessage("\(executable.lastPathComponent) \(detail)"))
         }
-        return .ready
     }
 
     private static func notBuiltMessage(_ detail: String) -> String {
         "NOT BUILT: \(detail). Play disabled until a native SoCGameCore exists"
     }
 
+    private enum MachOClassification {
+        case accepted
+        case rejected(String)
+    }
+
     /// Lightweight header check only — does not execute the file or claim game readiness.
     /// Policy (user decision): require a thin 64-bit ARM64 Mach-O executable (MH_EXECUTE).
-    /// Fat/universal files, other CPU types, and non-executable file types are rejected.
-    private static func isMachOExecutable(at url: URL) -> Bool {
-        guard let handle = try? FileHandle(forReadingFrom: url) else { return false }
-        defer { try? handle.close() }
-        guard let header = try? handle.read(upToCount: 16), header.count >= 16 else { return false }
-        func word(_ offset: Int) -> UInt32 {
-            header.withUnsafeBytes { $0.loadUnaligned(fromByteOffset: offset, as: UInt32.self) }
+    /// Rejection copy names the real mismatch (fat / wrong CPU / wrong file type / non-Mach-O)
+    /// instead of collapsing every failure into "not a Mach-O".
+    private static func classifyCoreMachO(at url: URL) -> MachOClassification {
+        guard let handle = try? FileHandle(forReadingFrom: url) else {
+            return .rejected("is not a Mach-O executable (refusing scripts/stubs)")
         }
+        defer { try? handle.close() }
+        guard let header = try? handle.read(upToCount: 16), header.count >= 4 else {
+            return .rejected("is not a Mach-O executable (refusing scripts/stubs)")
+        }
+        func word(_ offset: Int) -> UInt32? {
+            guard header.count >= offset + 4 else { return nil }
+            return header.withUnsafeBytes { $0.loadUnaligned(fromByteOffset: offset, as: UInt32.self) }
+        }
+        guard let magic = word(0) else {
+            return .rejected("is not a Mach-O executable (refusing scripts/stubs)")
+        }
+
+        // FAT_MAGIC / FAT_CIGAM as read on little-endian (on-disk big-endian CAFEBABE → BEBAFECA).
+        let fatMagic: UInt32 = 0xCAFEBABE
+        let fatCigam: UInt32 = 0xBEBAFECA
+        if magic == fatMagic || magic == fatCigam {
+            return .rejected("is a fat/universal Mach-O, not a thin ARM64 executable")
+        }
+
+        let mhMagic: UInt32 = 0xFEEDFACE       // 32-bit LE
+        let mhCigam: UInt32 = 0xCEFAEDFE       // 32-bit swapped
+        if magic == mhMagic || magic == mhCigam {
+            return .rejected("is a 32-bit Mach-O, not a thin 64-bit ARM64 executable")
+        }
+
         let mhMagic64: UInt32 = 0xFEEDFACF     // little-endian 64-bit thin header as read on arm64
+        let mhCigam64: UInt32 = 0xCFFAEDFE
+        if magic == mhCigam64 {
+            return .rejected("is a byte-swapped 64-bit Mach-O, not a thin ARM64 executable")
+        }
+        guard magic == mhMagic64 else {
+            return .rejected("is not a Mach-O executable (refusing scripts/stubs)")
+        }
+        guard header.count >= 16, let cpuType = word(4), let fileType = word(12) else {
+            return .rejected("Mach-O header is truncated")
+        }
+
         let cpuTypeARM64: UInt32 = 0x0100000C  // CPU_TYPE_ARM64
         let mhExecute: UInt32 = 2
-        return word(0) == mhMagic64 && word(4) == cpuTypeARM64 && word(12) == mhExecute
+        if cpuType != cpuTypeARM64 {
+            return .rejected("is not a thin ARM64 Mach-O executable (wrong CPU type)")
+        }
+        if fileType != mhExecute {
+            return .rejected("is not a Mach-O executable file type (MH_EXECUTE required)")
+        }
+        return .accepted
     }
 }
