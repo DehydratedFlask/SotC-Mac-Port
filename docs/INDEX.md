@@ -88,6 +88,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Init continue second virtual-call +0x18 (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-vcall18-u2.md) | Init continue second virtual-call [rax+0x18]; E469; G1 PARTIAL |
 | [Init continue third 0x532ca0 call-site (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-532ca0-u3.md) | Init continue third 0x532ca0 call-site; E470; G1 PARTIAL |
 | [Init continue third virtual-call +0x18 (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-vcall18-u3.md) | Init continue third virtual-call [rax+0x18]; E471; G1 PARTIAL |
+| [Init continue fourth 0x532ca0 call-site (2026-10-22)](checkpoints/2026-10-22-init-531d60-post-base-532ca0-u4.md) | Init continue fourth 0x532ca0 call-site; E472; G1 PARTIAL |
 | [FOLDERS](FOLDERS.md) | Generated public/source folder inventory; `scripts/project_index.py` |
 | [INSTALL_LOG](../INSTALL_LOG.md) | Existing and newly installed tools, downloads and removals |
 | [Checkpoint template](checkpoints/TEMPLATE.md) | Required record at each checkpoint |
