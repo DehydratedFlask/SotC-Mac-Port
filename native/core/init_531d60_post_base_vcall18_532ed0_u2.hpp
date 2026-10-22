@@ -13,7 +13,8 @@
 //
 // Claimed: second 0x532ed0-series virtual-call control flow pin only (slot +0x18).
 // NOT modelled: stack/vtable producers; callee body; later helpers
-// (next call after this end is 0x17070, not another 0x532ed0). PR #5 cite-only.
+// (next call after this end is 0x17070, claimed separately as E480).
+// PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
