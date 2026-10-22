@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:15 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:16 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -25,8 +25,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   and fetch-verified.
 - Dynlink parser completion is recorded in commit `109b348b7e9d09a518d0cb78a4c7bd14a1c75284`,
   pushed to `origin/main` and fetch-verified with 0/0 divergence.
-- Exact next action: claim the next independently verified task outside PSARC and these launcher test
-  files; leave PSARC
+- Exact next action: complete the recursive-mutex non-owner unlock fixture claimed below; leave PSARC
   negative-limit behavior unclaimed pending the user's answer.
 
 ## RE-02 dynlink required program headers — fixture verified
@@ -76,8 +75,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Claim docs commit `8c33c317cc5cb6863b3ab618ebfb28d36557570a` is pushed and fetch-verified.
 - Completion commit `2152dfbbe90699d550b07d26b90d3bfd7d18394b` is pushed and fetch-verified at
   `origin/main` with 0/0 divergence.
-- Exact next action: claim another independent bounded task outside the PSARC and completed launcher
-  fixture files;
+- Exact next action: complete the recursive-mutex non-owner unlock fixture claimed below;
   leave negative-limit behavior unclaimed pending the user's answer.
 
 ## APP-01 archive status codes — fixture verified
@@ -100,7 +98,26 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `45d0656b59a07a8595c9886f0cbe432230e82914` were pushed and fetch-verified; `HEAD == origin/main`
   with 0/0 divergence. User-owned native API changes remained unstaged.
 - Exact next action: claim and complete another independent bounded task outside PSARC and these
-  launcher test files; leave negative-limit behavior unclaimed pending the user's answer.
+  launcher test files after the mutex fixture; leave negative-limit behavior unclaimed pending the
+  user's answer.
+
+## SRV-01 recursive-mutex non-owner unlock — fixture claimed
+
+- Root claimed `SRV-01-RECURSIVE-MUTEX-NONOWNER-UNLOCK-FIXTURE-01`, child of
+  `SRV-01-RECURSIVE-MUTEX-01` and `CPU-01-MUTEX-CONTRACT-01`; see the
+  [claim checkpoint](docs/checkpoints/2026-10-21-root-srv01-recursive-mutex-nonowner-unlock-claim.md).
+- Scope is test-only in `native/tests/test_recursive_mutex.cpp`: while the main thread owns two
+  recursive levels, another thread directly calls `unlock()` and must receive Darwin `EPERM`; the
+  owner must still release both levels. Apple documents `EPERM` when the current thread holds no
+  lock on the mutex. The wrapper implementation and CMake target remain unchanged.
+- Baseline build command `cmake --build local/build/native --target test_recursive_mutex` and focused
+  CTest command `ctest --test-dir local/build/native -R '^recursive_mutex$' --output-on-failure`
+  both pass; CTest is 1/1. Logs and hashes are in the claim checkpoint.
+- Status `ACTIVE`, 0 failed implementation tries. This is a local mutex error-contract fixture only;
+  it does not validate scheduler priority inheritance or game behavior. Existing user-owned native
+  API edits remain untouched.
+- Exact next action: add one direct non-owner unlock attempt, assert `EPERM`, and rerun the targeted
+  build/test; then root records E243 and the completion checkpoint.
 
 ## RE-02 app-main +0x20 virtual call — static path byte verified
 
