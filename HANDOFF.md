@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 01:08 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 01:10 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,18 +8,21 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Active bounded task — RE-02 dynamic-link image file-offset bounds fixture
+## RE-02 dynamic-link image file-offset bounds fixture — verified
 
-- Claimed `RE-02-DYNLINK-IMAGE-READ-FILE-OFFSET-BOUNDS-FIXTURE-01` under the verified
-  `RE-02-DYNLINK-SEGMENT-SPAN-01` parent. The untouched dynlink suite passes 29 tests. The planned
-  single synthetic case gives `Image.read()` a virtual range contained by `filesz` but a segment
-  file offset beyond the ELF byte buffer; expect the existing `span()` bounds error. Claim details
-  and baseline hashes are in [the claim checkpoint](docs/checkpoints/2026-10-22-root-re02-dynlink-image-read-file-offset-claim.md)
-  and E266.
-- Status `ACTIVE`, 0 failed implementation tries. No parser change is planned. Exact next action:
-  add the one test in `scripts/test_ps4_dynlink.py`, run the full focused suite (expected 30 tests),
-  then update the completion checkpoint and evidence. Synthetic coverage only; no live ELF/loader
-  semantics or game execution claim.
+- `RE-02-DYNLINK-IMAGE-READ-FILE-OFFSET-BOUNDS-FIXTURE-01` adds one synthetic case to
+  `scripts/test_ps4_dynlink.py`: virtual containment succeeds, but the segment file offset extends
+  past the 3-byte ELF buffer, so `Image.read()` raises the exact `span()` bounds error. Baseline
+  passed 29 tests; final run passed 30. Parser SHA256 is unchanged. See E266 and the
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-re02-dynlink-image-read-file-offset-complete.md).
+- Status `FIXTURE_VERIFIED`, one successful implementation attempt and 0 failed tries. Trail rebuilt
+  to 3,614 nodes / 1,240 files and resolves the new method at
+  `scripts/test_ps4_dynlink.py:L357-L363`; wiring check passes. Project index is current at 24,080
+  folders. Claim commit `17ff82e5b58eeb7f24aaf3597369e549e894c5cc` is pushed and fetch-verified at
+  0/0 divergence. This is a synthetic helper test only; no real ELF, loader, or runtime claim.
+- Exact next action: review the read-only scout candidate `AUD-01-CLASSIFIER-PROBE-OFFSET-CUTOFF-FIXTURE-01`
+  against the live task register and source, then claim it before any edit if distinct. Leave pending
+  Mach-O CPU and PSARC policy choices alone.
 
 ## Completed checkpoints — two bounded regression fixtures
 
