@@ -8,6 +8,20 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## Active claim: SRV-01 arena-page-debit uint32 wrap fixture
+
+- Root claimed `SRV-01-ARENA-PAGE-DEBIT-UINT32-UNDERFLOW-WRAP-FIXTURE-01` after confirming the
+  observed `sub dword [arena+0x70], pages` rule and the existing fixture's gap; see
+  [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-arena-page-debit-wrap-claim.md).
+- Scope is one synthetic assertion in `native/tests/test_arena_page_debit.cpp`: seed page count 1,
+  debit two 64 KiB pages, and pin the uint32 result `UINT32_MAX`. This records helper arithmetic
+  only; it does not say valid allocator runtime state may underflow.
+- Baseline target build and focused CTest pass (1/1). Logs and hashes are in the claim checkpoint.
+  Task status `CLAIMED`, 0 implementation attempts, 0 failed tries. Root is sole integrator.
+- Exact next action: publish the claim checkpoint, then assign the one-file fixture implementation;
+  root will replay the focused checks and publish completion evidence. Keep the pending Mach-O CPU
+  and PSARC negative-limit choices untouched.
+
 ## CPU-02 max-offset and AUD-01 archive-summary fixtures — verified
 
 - `CPU-02-TAGGED31-RETAG-MAX-OFFSET-FIXTURE-01` now pins retag/decode of `0x7fffffff` in a
