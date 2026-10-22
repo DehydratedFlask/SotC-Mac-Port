@@ -3,7 +3,8 @@
 //   // success path (atexit/tag) NOT modelled when flag false
 //   join @ 0x533c3f: install loaded into *[f08+0x60] (replace + refcount)
 //   flag byte at f08+0x68; optional notify if success; release temps; 0xf590
-//   // stop before next load @ 0x533cdb
+//   // stop before shadowbossmusic @ 0x533cdb
+//     (see vslot_40_533100_shadowbossmusic.*)
 //
 // Always-on after E436 shadowrandomevents load-attempt. Prefer over success
 // atexit (flag-true only) and over deepen 0x14c2f0 / 0x6a5370 (already hooked).
@@ -11,7 +12,8 @@
 //
 // Claimed: fail-path + always-on install/cleanup control flow into f08+0x60.
 // NOT modelled: success atexit cluster (0xf8f3d0/0xf730/0x14c4a0/…);
-// bodies of 0x14d880/0x14d2d0/0x14ccc0/0x95580; next path. PR #5 cite-only.
+// bodies of 0x14d880/0x14d2d0/0x14ccc0/0x95580. Next path: shadowbossmusic.
+// PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
