@@ -37,6 +37,13 @@
   staged audit passed 4 paths (log SHA256
   `4cacc72cf1a3521de490acd2890b4edbdf90f6a84b10b91eafadec93b4811719`), full audit passed 1,671
   paths (log SHA256 `b1a04a3d5a324285e6f084e6f181a1505f2d9ef090a57b09d3b070993995ff88`).
+- Completion publication: `git diff --cached --check` passed; staged
+  `python3 -I scripts/audit_publish_paths.py` passed 6 allowlisted paths (log SHA256
+  `5634be08b800d8892037718063d942af309bcee44fef5cf4bf1482903de4312f`); full audit passed 1,672
+  allowlisted paths (log SHA256 `876030b78a5d01b3b07393b278cb8823e6bcec0c27557f9541f5bbe9df19d62d`).
+  Before commit, fetch exited 0 and divergence was 0/0. Completion commit
+  `2152dfbbe90699d550b07d26b90d3bfd7d18394b` was pushed; post-push fetch verified `HEAD ==
+  origin/main` and 0/0 divergence. Existing native API edits remained unstaged.
 - Observed: exact fallback mapping is asserted for both `.internalError` and `.unknown(5)`;
   the focused suite passes. Inference: this locks down the current fallback string in the test
   suite. No UI presentation or core/game behavior is inferred.
