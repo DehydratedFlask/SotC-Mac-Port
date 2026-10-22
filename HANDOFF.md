@@ -27,7 +27,7 @@ or Metal gameplay is demonstrated.
   EVIDENCE E487; TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-lea-32f4fe0-20261022/` (manifest
   `5dc17310…` at tip `49925b3`; capture `4ed13cda…`).
-- Observation: feat tip `49925b3`; measured `pblea=1` + `pbv38=1` + mid_reg=4 → 275 registry.
+- Observation: feat tip `49925b3`; docs tip `80526cb`; measured `pblea=1` + `pbv38=1` + mid_reg=4 → 275 registry.
   Following `mov rdi,[r13]` / `call 0xa2caf0` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_lea_32f4fe0.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
