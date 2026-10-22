@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 02:28 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 02:33 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -88,7 +88,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   covers synthetic dangling-target classification only, separate from a missing path and symlink
   to a directory; it makes no archive-validity or game-assets claim.
 - Claim was published in `c434246b3ec9d3656289ac08525a452c88d065ec`; publication verification is
-  in E288. Completion is staged for publication with the region-split claim.
+  in E288. Completion was published in `6441c02473a6c64b14246075258bf7400f3ac2bc`; staged and
+  full audits accepted 7/1,719 paths, a fresh fetch showed 0/0 divergence, and post-push explicit/full
+  audits accepted 7/1,719. Publication logs are in E291.
 
 ## SRV-01 region-list uncounted head-insert fixture — verified
 
@@ -122,12 +124,15 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Root baseline `test_region_split` target build exits 0 and focused CTest passes 1/1. Test/helper/
   header/checker hashes, Trail result, and baseline log hashes are in E289 and the
   [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-region-split-metadata-claim.md).
-- Status is `ACTIVE`, implementation not started, zero failed tries. Publish this claim before
-  delegating only `native/tests/test_region_split.cpp` to `/root/next_fixture_scout_2`; root will
+- Status is `ACTIVE`, implementation not started, zero failed tries. The claim is published;
+  delegate only `native/tests/test_region_split.cpp` to `/root/next_fixture_scout_2`, then root will
   replay the focused CTest.
+- Claim published in `6441c02473a6c64b14246075258bf7400f3ac2bc`; staged/full and post-push
+  explicit/full audits accepted 7/1,719 paths, with 0/0 fetch divergence. Publication logs are in
+  E291.
 - Scope is synthetic helper behavior only; no allocator-runtime or game claim.
-- Exact next action: publish the APP-01 completion and region-split claim with allowlisted audits,
-  then delegate only `native/tests/test_region_split.cpp` to `/root/next_fixture_scout_2`.
+- Exact next action: delegate only `native/tests/test_region_split.cpp` to
+  `/root/next_fixture_scout_2`, then independently replay the focused CTest.
 
 ## RE-01 identity sidecar symlink alias fixture — verified
 
