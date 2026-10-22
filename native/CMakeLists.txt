@@ -104,6 +104,7 @@ add_library(sotc_core STATIC
   core/vslot_40_533100_stackchk.cpp
   core/init_531d60_post_base_499f80.cpp
   core/init_531d60_post_base_56dcb0.cpp
+  core/init_531d60_post_base_5c64c0.cpp
   core/ctor_98a90_3be050.cpp
   core/appmain_init_prologue_slice.cpp
   core/appmain_init_prologue_tail_slice.cpp
