@@ -10,8 +10,8 @@
 // `0x26800`/`0xf590` / staffroll / vcall-callee / `0xa2caf0` body tourism.
 //
 // Claimed: call-site control flow pin only.
-// NOT modelled: 104 B stack prep; 0xa2ed00 body; following call 0xf590.
-// PR #5 cite-only.
+// NOT modelled: 104 B stack prep; 0xa2ed00 body; following call 0xf590
+// (call-site claimed separately as E490; body still demoted). PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
