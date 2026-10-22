@@ -32,6 +32,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [TSC leaf 0x323d0 (2026-10-22)](checkpoints/2026-10-22-store-tsc-323d0.md) | Host monotonic tsc; E413; G1 PARTIAL |
 | [Ensure 0x3c2f70 (2026-10-22)](checkpoints/2026-10-22-ensure-3c2f70.md) | Empty-path 0xa800 ensure; E414; G1 PARTIAL |
 | [Sub-init 0x3be930 (2026-10-22)](checkpoints/2026-10-22-init-sub-3be930.md) | 0x98-stride banks; E415; G1 PARTIAL |
+| [Ctor 0x1ab550 0x40 (2026-10-22)](checkpoints/2026-10-22-ctor-40-1ab550.md) | Prologue-tail 0x40 ctor + base; E416; G1 PARTIAL |
 | [FOLDERS](FOLDERS.md) | Generated public/source folder inventory; `scripts/project_index.py` |
 | [INSTALL_LOG](../INSTALL_LOG.md) | Existing and newly installed tools, downloads and removals |
 | [Checkpoint template](checkpoints/TEMPLATE.md) | Required record at each checkpoint |
