@@ -106,6 +106,15 @@ struct NativeCoreClientTests {
         #expect(AssetValidator().validate(directory: dir) == .ready)
     }
 
+    @Test func archiveStatusNumericCodesMapToAbiCases() {
+        #expect(CoreArchiveCheck.Status(code: 0) == .ok)
+        #expect(CoreArchiveCheck.Status(code: 1) == .missing)
+        #expect(CoreArchiveCheck.Status(code: 2) == .unreadable)
+        #expect(CoreArchiveCheck.Status(code: 3) == .badMagic)
+        #expect(CoreArchiveCheck.Status(code: 9) == .unknown(9))
+        #expect(CoreArchiveCheck.Status(code: UInt32.max) == .unknown(UInt32.max))
+    }
+
     @Test func nonDirectoryAssetsPathIsAnIoVerdict() async throws {
         let validation = try await NativeCoreClient().validate(assetsDirectory: URL(filePath: "/nonexistent/sotc-launcher-test"))
         #expect(validation.verdict == .io)
