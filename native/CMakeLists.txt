@@ -56,6 +56,7 @@ add_library(sotc_core STATIC
   core/hashed_string_14c3a0.cpp
   core/registry_object_14c9a0.cpp
   core/registry_object_2efd160.cpp
+  core/registry_sorted_insert.cpp
   core/scratch_reset.cpp
   core/save_checksum.cpp
   core/name_hash.cpp
@@ -1519,6 +1520,10 @@ add_test(NAME registry_object_14c9a0 COMMAND test_registry_object_14c9a0)
 add_executable(test_registry_object_2efd160 tests/test_registry_object_2efd160.cpp)
 target_link_libraries(test_registry_object_2efd160 sotc_core)
 add_test(NAME registry_object_2efd160 COMMAND test_registry_object_2efd160)
+
+add_executable(test_registry_sorted_insert tests/test_registry_sorted_insert.cpp)
+target_link_libraries(test_registry_sorted_insert sotc_core)
+add_test(NAME registry_sorted_insert COMMAND test_registry_sorted_insert)
 
 add_executable(test_page_owner_map tests/test_page_owner_map.cpp)
 target_link_libraries(test_page_owner_map sotc_core)
