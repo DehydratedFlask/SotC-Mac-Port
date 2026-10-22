@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 11:13 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 11:20 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,29 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E415 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E416 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 prologue-tail 0x40 ctor `0x1ab550`
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-CTOR-40-1AB550-01` — lift 49 B ctor + 69 B base `0x1b9250`; derived vt
+  `0x1598ae0` / base vt `0x1598c30` / cell `0x2ee6778`; PLT `0xf901a0`/`0xf901c0` hooked.
+  Next measured edge after E415 (HANDOFF named `0x1ab550`; not closed). FakeHeap + tip
+  AllocatorFront; PR #5 cite-only. No leaf-vec; no idx 95.
+- Files: `native/core/ctor_40_1ab550.{hpp,cpp}`; prologue wire; measured slice forces null
+  override; `tools/lift/check_f1ab550_ctor40.py`; checkpoint
+  `docs/checkpoints/2026-10-22-ctor-40-1ab550.md`; EVIDENCE E416; TASKS/VALIDATION/INDEX/HANDOFF.
+  Private: `local/validation/appmain-init-ctor-40-1ab550-20261022/` (hashes after feat tip).
+- Observation: ELF pins body/base/vtables/cell/prologue call; measured derived vt + cell self +
+  field 0xa → 275 registry. PLT bodies / ensure migrate / non-null / debug gates NOT modelled.
+- Commands: `python3 -I tools/lift/check_f1ab550_ctor40.py` OK;
+  `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: debug gates after `0x2552cd`, or vslot / `0xf08`, or ensure migrate /
+  non-null list. Goal open.
 
 ## 2026-10-22 sub-init `0x3be930` (on `0x3be050` path)
 
