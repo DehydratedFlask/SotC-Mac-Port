@@ -14,3 +14,26 @@
 - Remaining risks / limits: no test implementation has been attempted. No constructor reachability, original runtime semantics, or game behavior is established.
 - Next exact action: publish this claim and baseline; only after the claim commit is pushed, delegate the one-file test change to `/root/next_fixture_scout_2` and independently replay it.
 - Task status / attempt count: `ACTIVE`; zero implementation attempts; zero failed tries.
+
+## Claim publication checkpoint
+
+- Time / timezone: 2026-10-22 04:45 CDT (America/Chicago).
+- Agent / integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`).
+- Task ID: `CPU-01-MATH-CONSTANTS-MIXED-GUARD-STATE-FIXTURE-01`; parent `CPU-01`; claim commit `a8a0172c6e5bfff9040d88020b81df2b4d3c3b2c`.
+- Exact publication results: pre-push staged/full audits accepted 6/1,736 paths; `git commit -m "docs: claim math constants mixed guard fixture"` created the claim; `git push origin main` exited 0; fresh fetch and `git rev-list --left-right --count main...origin/main` reported 0/0; post-push full audit accepted 1,736 paths. Exact log hashes are in E330.
+- Observation versus inference: the claim is recorded on origin/main and the local tree is even with origin at verification. Only the user-owned native API CMake change and untracked API host directory remain outside the published task scope.
+- After publication, `/root/next_fixture_scout_2` was assigned the exact four-pass, test-file-only implementation; focused result is pending. Root owns independent replay and checkpoint integration.
+- Remaining risks: synthetic helper behavior only. The fixture does not establish constructor reachability or original/game runtime behavior.
+- Next exact action: review the worker's one-file diff and independently replay its fresh Debug/Ninja focused test.
+- Task status: `ACTIVE`, claim published, implementation in progress; zero completed implementation tries and zero failed tries.
+
+## Claim-record index recovery checkpoint
+
+- Time / timezone: 2026-10-22 04:45 CDT (America/Chicago).
+- Agent / integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`).
+- Task ID: `CPU-01-MATH-CONSTANTS-MIXED-GUARD-STATE-FIXTURE-01`; status `ACTIVE`; zero completed implementation tries; zero failed tries.
+- Files affected: private `local/indexes/folders.json` was regenerated; this checkpoint, `HANDOFF.md`, and `docs/EVIDENCE.md` now record the check/recovery. No source implementation changed by root.
+- Exact commands/results: `python3 scripts/project_index.py --check` first exited 1 and reported `Stale indexes: local/indexes/folders.json`, log SHA256 `31dad00ffd5208458ee89a329fea70b0fa13494e525ddd8a7e837c7614a2266b`; `python3 scripts/project_index.py` then exited 0 and indexed 42,926 folders, log SHA256 `c74c9c657692278a5055be519fe68733726a34e908c25ceba25fe41a5a2a2fef`; repeated `--check` exited 0/current, log SHA256 `4aeef97dd97caee8c2ae078d4c56116d40859dcd88c44fd3cf2bc1b3ed580243`; `git diff --check` exited 0, empty log SHA256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+- Observation versus inference: only the private folder JSON was stale. The result is consistent with adding validation-log files since its prior generation; the cause is inferred.
+- Remaining risks: no product or test behavior risk introduced. Index will need refreshing after the worker creates its own logs/build folder.
+- Next exact action: publish the index-recovery record, then review the worker's test-file change and independently replay the focused test.
