@@ -1,7 +1,7 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 09:55 CDT (America/Chicago). Drive Init-hash:
-bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Parallel heap deepen (separate worktree):
+Updated: 2026-10-22 10:00 CDT (America/Chicago). Drive Init-hash:
+bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree):
 bc-492a8623-dec2-597e-8de6-73c00b0ad8a5 — owns `0x12820`/`0x12af0`/READY SRV; Drive keeps
 `startup_ctors.*` + Init-hash/FNV/registry exclusivity. Integrator note:
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
@@ -9,6 +9,27 @@ Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## 2026-10-22 registry fill `0x52a220` + private 275-name fixture
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-REGISTRY-FILL-52A220-01` — hash→insert fill loop of `0x52a220` over private
+  name keys (fail-visible); no leaf-vec; no idx 95; heap bodies untouched; pools/listeners omitted.
+- Files: `native/core/registry_fill_52a220.{hpp,cpp}`, `inputtable_names_fixture.{hpp,cpp}`,
+  tests, `scripts/extract_inputtable_551140_names_fixture.py`, `tools/lift/check_f52a220_fill.py`,
+  `docs/INPUTTABLE_551140_NAMES_FIXTURE.md`; CMake/HANDOFF/TASKS/EVIDENCE/README/INDEX;
+  `input_table_551140` +0x58/+0x5c renamed to `hash_a`/`hash_b`.
+- Observation: fill hashes name_a via `0x161fb0` and name_b via `0xa2ddc0`, writes entry
+  +0x58/+0x5c, inserts A/B on hash_a (val forced 0; B ptr last-wins); exact reserve(count)
+  before loop; private fixture magic `I275`, hashpair sha256 `a1aa059e…`.
+- Commands: `python3 -I scripts/extract_inputtable_551140_names_fixture.py` OK;
+  `python3 -I tools/lift/check_f52a220_fill.py` OK;
+  `ctest --test-dir local/build/native-regfill52a220 -R '^(registry_fill_52a220|inputtable_names_fixture|input_table_551140|registry_object_2efd160|registry_sorted_insert)$'`
+  PASS (5/5); `check_ctor_slots` still **155** pairs.
+- Inference: not G1; pool/listener half of `0x52a220` and Init `0x531d60` (alloc+install global)
+  still open.
+- Next exact action: deepen Init `0x531d60` registry fragment (alloc 0x98 → fill → store
+  `0x2efd160`) or pool/listener loop after `0x52a680`. Goal open.
 
 ## 2026-10-22 registry sorted insert `0x52d530`/`0x52d7e0` family
 

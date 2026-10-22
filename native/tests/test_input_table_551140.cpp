@@ -45,8 +45,8 @@ int main() {
         CHECK(e.self_or_null == nullptr);
         CHECK(e.zero_48 == 0);
         CHECK(e.f50 == row.f50);
-        CHECK(e.zero_58 == 0);
-        CHECK(e.zero_5c == 0);
+        CHECK(e.hash_a == 0);
+        CHECK(e.hash_b == 0);
         CHECK(e.a <= 5);
         CHECK(e.b <= 3);
         CHECK(e.c <= 3);
