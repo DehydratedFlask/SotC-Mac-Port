@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 01:44 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 01:47 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -21,14 +21,30 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   compatibility or power-loss durability claim is made. See E276/E278 and the
   [claim](docs/checkpoints/2026-10-22-root-sav01-native-stream-file-symlink-claim.md) and
   [completion checkpoint](docs/checkpoints/2026-10-22-root-sav01-native-stream-file-symlink-complete.md).
-- Claim commit `457601bde1c1f5931590a0c8fb1deb52d55e3e73` is pushed. Completion publication and
-  final task status will be recorded after the path audit and push. Project index generation/check
-  pass at 24,080 folders; Trail wiring check passes at 3,617 nodes / 1,240 files, with the new
-  method queryable at `native/tests/test_save_stream_file.cpp:L104-L119` and its call at L238. The
-  completion work log SHA256 is in E278. Next independent candidate to evaluate:
-  `SRV-01-HOST-MAP-EMPTY-NULL-NONZERO-SIZE-FIXTURE-01` in
-  `native/tests/test_host_map.cpp`; it covers the null-pointer arm of `HostMapping::empty()` with
-  nonzero size. Keep pending Mach-O CPU and PSARC policy choices untouched.
+- Claim commit `457601bde1c1f5931590a0c8fb1deb52d55e3e73`, claim-publication docs commit
+  `2b456ecaf93ab3570e9b9de63f50662f19b81307`, and completion commit
+  `f544acc702340fbc79e19e68e2c5050e89e4f705` are pushed. Completion staged/full audits accepted
+  7/1,710 paths; fresh fetch showed 0/0 divergence; post-push explicit/full audits accepted 7/1,710.
+  See E279 and publication-log SHA256 there. Project index generation/check pass at 24,080 folders;
+  Trail wiring check passes at 3,617 nodes / 1,240 files, and the new method is queryable at
+  `native/tests/test_save_stream_file.cpp:L104-L119`, with its call at L238. The work log SHA256 is
+  in E278.
+
+## SRV-01 HostMapping null-pointer fixture — active claim
+
+- `SRV-01-HOST-MAP-EMPTY-NULL-NONZERO-SIZE-FIXTURE-01` is claimed under verified parent
+  `SRV-01-HOST-MAP-EMPTY-NONNULL-ZERO-SIZE-FIXTURE-01`. Scope is one synthetic assertion in
+  `native/tests/test_host_map.cpp`: construct `HostMapping` with a null pointer and nonzero size,
+  then assert `empty()`. Production code is unchanged. This covers the null-pointer arm of the
+  predicate only; it makes no OS mapping or game-runtime claim.
+- Baseline `test_host_map` target build exits 0 and focused `host_map` CTest passes 1/1. Logs,
+  hashes, and live source/test-gap evidence are in E280 and the
+  [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-host-map-empty-null-nonzero-claim.md).
+  Project index generation/check pass at 24,080 folders; Trail wiring check passes at 3,617 nodes /
+  1,240 files. The work log hash is in E280. Status is `ACTIVE`; implementation attempts: 0. After
+  the claim commit, delegate the one-file test to `/root/next_fixture_scout_2`, then review and
+  replay at root.
+- Keep pending Mach-O CPU and PSARC policy choices untouched.
 
 ## RE-01 identity sidecar symlink alias fixture — verified
 
