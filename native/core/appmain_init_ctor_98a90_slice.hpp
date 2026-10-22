@@ -3,7 +3,7 @@
 // → 0xf08 singleton install → base (lifted vslot 0x534130 + mid 0x255340 +
 // bounded 0x533100 header+post+miss+join+gfx+shadowmodels+attach+shadowskels+
 // skels-attach+shadowanims+anims-attach+shadowbanks+banks-attach+shadowstreams+
-// streams-attach) → registry. Tip AllocatorFront+FakeHeap.
+// streams-attach+shadowrandomevents) → registry. Tip AllocatorFront+FakeHeap.
 // PR #5 cite-only.
 // NOT modelled: ensure migrate / heavy menu helpers / 0xf8f860 PLT / non-null list;
 // PLT bodies 0xf901a0/0xf901c0; stack-chk; ba40 listener invoke; 0x533100 hit /
@@ -53,6 +53,7 @@ struct AppmainInitCtor98a90SliceResult {
     Vslot40_533100BanksAttachResult vslot_40_banks_attach{};
     Vslot40_533100ShadowstreamsResult vslot_40_shadowstreams{};
     Vslot40_533100StreamsAttachResult vslot_40_streams_attach{};
+    Vslot40_533100ShadowrandomeventsResult vslot_40_shadowrandomevents{};
     bool base_ok = false;
     std::uint32_t flag_after_base = 0;
     AppmainInitRemainderSliceResult remainder{};
