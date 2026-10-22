@@ -44,8 +44,14 @@
   and its `main()` call at L238. Combined output is
   `local/validation/20261022-root-fixture-baselines/sav01-native-stream-file-symlink-complete-work.log`,
   SHA256 `b1d83d4c38401086e7ead9c309dcdb6748e2aa6df045053e5a395e528f1ae6f7`.
-- Next exact action: run staged/full path audits, commit the test and completion records, push, then
-  verify fresh fetch/divergence and post-push path audits.
+- Completion commit `f544acc702340fbc79e19e68e2c5050e89e4f705` is pushed. Staged/full audits accepted
+  7/1,710 paths; fresh fetch/divergence was 0/0; post-push explicit/full audits accepted 7/1,710.
+  Publication log is `local/validation/20261022-root-fixture-baselines/sav01-native-stream-file-symlink-complete-publication.log`,
+  SHA256 `019e24d5ec9e7a8314aa6a61626d82a7955226644ba74b6a4afccc07e6b851f9`. The claim-publication
+  docs sync is commit `2b456ecaf93ab3570e9b9de63f50662f19b81307`.
+- Next exact action: continue with the separately claimed
+  `SRV-01-HOST-MAP-EMPTY-NULL-NONZERO-SIZE-FIXTURE-01`; keep its implementation in its own test
+  file and preserve the pending Mach-O CPU and PSARC policy choices.
 - HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF and TASKS mark the task
   verified; E278 records test evidence. `INSTALL_LOG.md` has no change. Regenerate `docs/FOLDERS.md`
   after this checkpoint and before commit; it is regenerated and current at 24,080 folders.
