@@ -14,8 +14,8 @@
 // `0x499f80` / `0x140d90` / `0x14c2f0` / `0x6a5370`.
 //
 // Claimed: cell pin 0x2eff450 + replace/install control flow.
-// NOT modelled: vcall+0x70 callee body; following second 0x17070 /
-// 0x53fd10. PR #5 cite-only.
+// NOT modelled: vcall+0x70 callee body; following second 0x17070
+// (claimed separately as E483) / 0x53fd10. PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
