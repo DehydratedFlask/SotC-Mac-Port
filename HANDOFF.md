@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 17:10 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 17:12 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,35 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E484 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E485 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 Init continue cell-install `0x2eff448`
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-INIT-531D60-POST-BASE-CELL-2EFF448-01` — lift OBS lea r14 /
+  cell-install (29 B) at `0x5323be..0x5323db` for cell `0x2eff448`;
+  optional vcall `[rax+0x70]` destroy hooked (empty-cell measured path
+  skips). Prefer always-on after E484 over vslot70 callee / `0x53fd10` /
+  `0x17070` / `0x544fe0` / vcall tourism and over deepen `0x1290` /
+  `0x5c64c0` / `0x56dcb0` / `0x499f80` / `0x140d90` / `0x14c2f0` /
+  `0x6a5370`. FakeHeap + tip AllocatorFront; PR #5 cite-only.
+- Files: `native/core/init_531d60_post_base_cell_2eff448.{hpp,cpp}`; ctor slice
+  wire; `tools/lift/check_f531d60_post_base_cell_2eff448.py`; checkpoint
+  `docs/checkpoints/2026-10-22-init-531d60-post-base-cell-2eff448.md`;
+  EVIDENCE E485; TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-post-base-cell-2eff448-20261022/` (manifest
+  `8727a4a8…` at tip `ae80da5`; capture `f0018976…`).
+- Observation: feat tip `ae80da5`; measured `pb448=1` + `pb53=1` + mid_reg=4 → 275 registry.
+  Vslot70 body / following vcall `[rax+0x38]` NOT modelled.
+- Commands: `python3 -I tools/lift/check_f531d60_post_base_cell_2eff448.py` OK;
+  `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: vcall `[rax+0x38]` / always-on after `0x5323db`, or
+  bounded `0x1290` / `0x5c64c0` / `0x56dcb0` / `0x499f80` / `0x140d90` /
+  `0x14c2f0` / `0x6a5370`. Prefer call-site continue over bodies. Goal open.
 
 ## 2026-10-22 Init continue first `0x53fd10` call-site
 
