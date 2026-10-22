@@ -25,10 +25,10 @@ or Metal gameplay is demonstrated.
   base_initialize wire; `tools/lift/check_f533100_vslot40_cp3characters_attach.py`;
   checkpoint `docs/checkpoints/2026-10-22-vslot-40-533100-cp3characters-attach.md`;
   EVIDENCE E441; TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-vslot40-cp3characters-attach-20261022/` (re-pinned
-  at feat tip).
-- Observation: measured `cp3_fail=1` + install + mid_reg=4 → 275 registry.
-  Success atexit / next path / `0x14c2f0` body NOT modelled.
+  `local/validation/appmain-init-vslot40-cp3characters-attach-20261022/` (manifest
+  `6cec7261…` at tip `54530c8`; capture `24f8cafd…`).
+- Observation: feat tip `54530c8`; measured `cp3_fail=1` + install + mid_reg=4
+  → 275 registry. Success atexit / next path / `0x14c2f0` body NOT modelled.
 - Commands: `python3 -I tools/lift/check_f533100_vslot40_cp3characters_attach.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
   PASS; private capture exit 0; `check_ctor_slots` still **155**.

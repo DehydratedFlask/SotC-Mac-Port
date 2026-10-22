@@ -34,7 +34,7 @@ next path (`$/cp3shadow/****/cp3shadowprecache.calt`); deepen `0x14c2f0` /
 | --- | --- |
 | ELF | `check_f533100_vslot40_cp3characters_attach.py` OK |
 | ctest | `appmain_init_ctor_98a90_slice` PASS |
-| Private | `local/validation/appmain-init-vslot40-cp3characters-attach-20261022/` (re-pinned after feat tip) |
+| Private | `local/validation/appmain-init-vslot40-cp3characters-attach-20261022/` (manifest `6cec7261…` @ `54530c8`; capture `24f8cafd…`) |
 | Pairs | still **155** |
 
 ## Measured
