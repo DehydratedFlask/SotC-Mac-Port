@@ -50,5 +50,4 @@
   fixtures and their shared documentation only.
 - Remaining risks: the native core is still a stub; no live ABI, engine, launcher runtime, or game
   behavior is demonstrated. User-owned native API changes remain uncommitted and excluded.
-- Next exact action: claim `APP-01-SYSTEM-CHECKS-REJECT-32BIT-MACHO-01`, then add and run its synthetic
-  i386 classification fixture if the live task board remains clear.
+- Next exact action: complete the now-claimed `APP-01-SYSTEM-CHECKS-REJECT-32BIT-MACHO-01` fixture.

@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:24 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:27 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -97,9 +97,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Claim commit `ee7e7a906450ecf75e328d6d00c2ea4feeb1a44c` and completion commit
   `45d0656b59a07a8595c9886f0cbe432230e82914` were pushed and fetch-verified; `HEAD == origin/main`
   with 0/0 divergence. User-owned native API changes remained unstaged.
-- Exact next action: claim `APP-01-SYSTEM-CHECKS-REJECT-32BIT-MACHO-01`, a synthetic i386 executable
-  rejection fixture in `SystemChecks`; leave negative-limit behavior unclaimed pending the user's
-  answer.
+- Exact next action: complete the claimed `APP-01-SYSTEM-CHECKS-REJECT-32BIT-MACHO-01` fixture;
+  leave PSARC negative-limit behavior unclaimed pending the user's answer.
 
 ## SRV-01 recursive-mutex non-owner unlock — fixture verified
 
@@ -150,6 +149,24 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `HEAD == origin/main` with 0/0 divergence; only user-owned `native/api/CMakeLists.txt` and
   `native/api/host/` remain outside the commit. Audit/fetch/status logs are in
   `local/validation/app01-core-error-codes/` and the completion checkpoint.
+
+## APP-01 SystemChecks 32-bit Mach-O refusal — fixture claimed
+
+- Root claimed `APP-01-SYSTEM-CHECKS-REJECT-32BIT-MACHO-01`, child of APP-01; the parent launcher
+  scope is specified in [docs/TASKS.md](docs/TASKS.md#app-01--native-mac-launcher), and the platform
+  target requires an ARM64 Mach-O in [docs/PLATFORM.md](docs/PLATFORM.md#1-required-product-boundary).
+- `SystemChecks.isMachOExecutable` currently accepts both 64-bit and 32-bit magic values without
+  examining CPU type; no matching architecture fixture existed. The bounded change removes acceptance
+  of the 32-bit magic values and adds a synthetic i386-header classification fixture. It does not
+  validate CPU type in 64-bit Mach-O or inspect FAT slices; do not treat it as full ARM64 validation.
+- Baseline command `swift test --package-path launcher --scratch-path
+  local/build/app01-systemchecks-arch --filter AssetValidatorTests` passes 11 tests. Log
+  `local/validation/app01-systemchecks-arch/baseline.log`, SHA256
+  `f1cef398f1013d2114ddec8afec668a9751bcb8962c097319ca54f5f41ce79bc`.
+- Status `ACTIVE`, 0 failed implementation tries. Existing native API user changes remain outside scope.
+- Exact next action: add the focused 32-bit Mach-O test in
+  `launcher/Tests/LauncherCoreTests/SystemChecksArchitectureTests.swift`, remove the two 32-bit magic
+  cases from `SystemChecks.swift`, then run the new fixture and existing `AssetValidatorTests`.
 
 ## RE-02 app-main +0x20 virtual call — static path byte verified
 
