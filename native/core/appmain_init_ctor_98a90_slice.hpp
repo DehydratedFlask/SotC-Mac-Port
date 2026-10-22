@@ -9,13 +9,14 @@
 // → post-base 0x56dcb0 call-site → post-base 0x5c64c0 call-site →
 // post-base 0x1290 call-site → post-base 0x56db70 / 0x5b3d00 / 0x5b3cf0
 // call-sites (ret-nops) → post-base AVX BSS copy (0x1b1dd40→0x1b1dd00/0x1b1dd20)
-// → post-base 0x7f7220 call-site → registry.
+// → post-base 0x7f7220 call-site → post-base 0x56fad0 call-site (ret-nop)
+// → registry.
 // Tip AllocatorFront+FakeHeap.
 // PR #5 cite-only.
 // NOT modelled: ensure migrate / heavy menu helpers / 0xf8f860 PLT / non-null list;
 // PLT bodies 0xf901a0/0xf901c0; ba40 listener invoke; 0x533100 hit /
 // success atexit; 0x499f80/0x56dcb0/0x5c64c0/0x1290 bodies; 0x7f7220 body;
-// 0x56fad0 beyond call-site; 0x14c2f0/0x6a5370/0x6abcc0/0x21620/0x2779a0/0x42390
+// 0xf90310 beyond call-site; 0x14c2f0/0x6a5370/0x6abcc0/0x21620/0x2779a0/0x42390
 // bodies; bodies of 0x523bd0 / 0x525b40 / 0x493230 / 0x525080 / 0x2569d0.
 #pragma once
 
@@ -33,6 +34,7 @@
 #include "init_531d60_post_base_5b3cf0.hpp"
 #include "init_531d60_post_base_avx_bss.hpp"
 #include "init_531d60_post_base_7f7220.hpp"
+#include "init_531d60_post_base_56fad0.hpp"
 #include "input_table_551140.hpp"
 #include "prologue_255180.hpp"
 #include "singleton_f08_531d84.hpp"
@@ -91,6 +93,7 @@ struct AppmainInitCtor98a90SliceResult {
     Init531d60PostBase5b3cf0Result post_base_5b3cf0{};
     Init531d60PostBaseAvxBssResult post_base_avx_bss{};
     Init531d60PostBase7f7220Result post_base_7f7220{};
+    Init531d60PostBase56fad0Result post_base_56fad0{};
     AppmainInitRemainderSliceResult remainder{};
 };
 
@@ -108,6 +111,7 @@ struct AppmainInitCtor98a90SliceResult {
     const Init531d60PostBase5b3d00Hooks& post_base_5b3d00_hooks = {},
     const Init531d60PostBase5b3cf0Hooks& post_base_5b3cf0_hooks = {},
     const Init531d60PostBaseAvxBssCells& post_base_avx_bss_cells = {},
-    const Init531d60PostBase7f7220Hooks& post_base_7f7220_hooks = {});
+    const Init531d60PostBase7f7220Hooks& post_base_7f7220_hooks = {},
+    const Init531d60PostBase56fad0Hooks& post_base_56fad0_hooks = {});
 
 }  // namespace sotc

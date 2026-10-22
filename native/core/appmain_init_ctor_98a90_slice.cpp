@@ -18,7 +18,8 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBase5b3d00Hooks& post_base_5b3d00_hooks,
     const Init531d60PostBase5b3cf0Hooks& post_base_5b3cf0_hooks,
     const Init531d60PostBaseAvxBssCells& post_base_avx_bss_cells,
-    const Init531d60PostBase7f7220Hooks& post_base_7f7220_hooks) {
+    const Init531d60PostBase7f7220Hooks& post_base_7f7220_hooks,
+    const Init531d60PostBase56fad0Hooks& post_base_56fad0_hooks) {
     AppmainInitCtor98a90SliceResult out{};
     out.early = run_prologue_255180_early(alloc, early_hooks);
     if (!out.early.ok) {
@@ -162,6 +163,11 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     // E454: always-on Init continue — 0x7f7220 call-site; stop before 0x56fad0.
     out.post_base_7f7220 = init_531d60_post_base_7f7220(post_base_7f7220_hooks);
     if (!out.post_base_7f7220.ok) {
+        return out;
+    }
+    // E455: always-on Init continue — 0x56fad0 call-site (ret-nop); stop before 0xf90310.
+    out.post_base_56fad0 = init_531d60_post_base_56fad0(post_base_56fad0_hooks);
+    if (!out.post_base_56fad0.ok) {
         return out;
     }
     out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,
