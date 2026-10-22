@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 00:48 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 00:52 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,24 +8,26 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Active claims — two bounded regression fixtures
+## Completed checkpoints — two bounded regression fixtures
 
-- `AUD-PUBLISH-LAUNCHER-ALLOWLIST-FIXTURE-01` under `AUD-PUBLISH-EDGE-01`: add one test-only
-  case in `scripts/test_audit_publish_paths.py` proving representative `launcher/` and
-  top-level metadata paths are accepted. Pre-edit suite passes 8 tests. Production audit code
-  remains unchanged. Claim record:
-  [checkpoint](docs/checkpoints/2026-10-22-root-aud-publish-launcher-allowlist-claim.md).
-- `AUD-01-XFF-PREFIX-OFFSET-ONLY-FIXTURE-01` under `AUD-01-XFF-01`: add one test-only case in
-  `scripts/test_audio_bank_header.py` proving an interior `xff\0` in the opaque span cannot
-  substitute for the required byte-zero prefix. Pre-edit suite passes 21 tests. Worker
-  `/root/next_bounded_scout` owns only this test file; root integrates the docs. Claim record:
-  [checkpoint](docs/checkpoints/2026-10-22-root-aud01-xff-prefix-offset-only-claim.md).
-- Both claims are `ACTIVE`, with zero failed implementation tries. No production code or game
-  evidence changes. Exact next action: implement the two isolated assertions, run each focused
-  Python suite, independently review both diffs, then record results and publish allowlisted files.
-  Claim commit `93c693d211fadee9d16746f6be56ea5fca300bd1` is pushed and fetch-verified at 0/0;
-  staged/exact-path audits accepted 6 paths and full audit accepted 1,698. Leave the pending
-  Mach-O CPU and PSARC negative-limit choices untouched.
+- `AUD-PUBLISH-LAUNCHER-ALLOWLIST-FIXTURE-01` under `AUD-PUBLISH-EDGE-01` adds one test-only
+  assertion in `scripts/test_audit_publish_paths.py` for `launcher/Package.swift` and each current
+  allowlisted top-level metadata path. Root replay passes 9 tests; baseline passed 8. Production
+  audit code is unchanged. See the [completion checkpoint](docs/checkpoints/2026-10-22-root-aud-publish-launcher-allowlist-complete.md).
+- `AUD-01-XFF-PREFIX-OFFSET-ONLY-FIXTURE-01` under `AUD-01-XFF-01` adds one test-only case in
+  `scripts/test_audio_bank_header.py`: a synthetic member with `XFF_MAGIC` only in bytes 4..7 of
+  its opaque span and `qath` at byte zero is rejected for the byte-zero prefix. Worker and root
+  replays pass 22 tests; baseline passed 21. Production parser is unchanged. See the
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-aud01-xff-prefix-offset-only-complete.md).
+- Both tasks are `FIXTURE_VERIFIED`, each with one successful implementation attempt and zero
+  failed tries. The new methods are queryable in Trail; wiring graph is current at 3,612 nodes /
+  1,240 files and the deep meaning layer is not built. No production code, asset-decoding,
+  playback, or game evidence changed. The two completion records are ready for allowlisted
+  publication. Claim commit `93c693d211fadee9d16746f6be56ea5fca300bd1` is pushed and
+  fetch-verified at 0/0; staged/exact-path audits accepted 6 paths and full audit accepted 1,698.
+  Exact next action: review the read-only candidate from `/root/next_independent_task_scout` against
+  current task rows and live files, then claim one bounded task if it is distinct. Leave the
+  pending Mach-O CPU and PSARC negative-limit choices untouched.
 
 ## SRV-01 arena high-water uint64 wrap fixture — verified
 

@@ -64,6 +64,20 @@ class XffMemberTests(unittest.TestCase):
         with self.assertRaisesRegex(abh.AudioBankFormatError, 'unsupported member prefix'):
             abh.parse_xff_member(member)
 
+    def test_rejects_xff_magic_only_in_opaque_span(self):
+        opaque = bytearray(16)
+        opaque[4:8] = abh.XFF_MAGIC
+        member = bytearray(make_member(b'bounded body', bytes(opaque)))
+        member[:4] = b'qath'
+
+        with self.assertRaises(abh.AudioBankFormatError) as ctx:
+            abh.parse_xff_member(member)
+        self.assertIs(type(ctx.exception), abh.AudioBankFormatError)
+        self.assertEqual(
+            str(ctx.exception),
+            'unsupported member prefix 71617468; expected 78666600',
+        )
+
     def test_rejects_size_word_that_exceeds_decoded_span(self):
         member = bytearray(make_member())
         member[abh.XFF_SIZE_WORD_OFFSET:abh.XFF_MIN_MEMBER_SIZE] = (

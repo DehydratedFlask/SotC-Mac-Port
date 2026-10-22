@@ -39,6 +39,21 @@ class PublishPathTests(unittest.TestCase):
         ]
         self.assertEqual(audit.violations(paths), [])
 
+    def test_launcher_and_top_level_metadata_allowed(self):
+        paths = [
+            "launcher/Package.swift",
+            ".gitignore",
+            ".ignore",
+            "README.md",
+            "ROADMAP.md",
+            "HANDOFF.md",
+            "AGENTS.md",
+            "INSTALL_LOG.md",
+            "LICENSE",
+            "LICENSE.md",
+        ]
+        self.assertEqual(audit.violations(paths), [])
+
     def test_local_prefix_and_game_names(self):
         cases = [
             "local/re/eboot.elf",
