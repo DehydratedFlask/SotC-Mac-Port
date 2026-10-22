@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 13:05 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 13:09 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,33 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E435 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E436 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 App vslot `0x533100` shadowrandomevents load-attempt
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-VSLOT-40-533100-SHADOWRANDOMEVENTS-01` — lift OBS load-attempt (99 B) at
+  `0x533b62`: notify `0x95580(f08+0x50)`; path `shadowrandomevents.crmp`; cells
+  `0x2ee2cf8`/`0x2efc9e0`; hooks `0x14c2f0`/vcall+0x18; lift `0x14ccb0`; stop
+  before success atexit @ `0x533bc5`. Prefer always-on after E435 over success
+  atexit / deepen `0x14c2f0`/`0x6a5370`. FakeHeap + tip AllocatorFront; PR #5
+  cite-only.
+- Files: `native/core/vslot_40_533100_shadowrandomevents.{hpp,cpp}`; base_initialize
+  wire; `tools/lift/check_f533100_vslot40_shadowrandomevents.py`; checkpoint
+  `docs/checkpoints/2026-10-22-vslot-40-533100-shadowrandomevents.md`; EVIDENCE E436;
+  TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-vslot40-shadowrandomevents-20261022/` (manifest
+  `232affbe…` at tip `5988cb6`; capture `d0b9a0f6…`).
+- Observation: feat tip `5988cb6`; measured `rand_refc=1` + mid_reg=4 → 275
+  registry. Attach / success atexit / `0x14c2f0` body NOT modelled.
+- Commands: `python3 -I tools/lift/check_f533100_vslot40_shadowrandomevents.py` OK;
+  `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: randomevents attach / success atexit past `0x533bc5`, or
+  bounded `0x14c2f0`/`0x6a5370`. Goal open.
 
 ## 2026-10-22 App vslot `0x533100` shadowstreams attach
 
