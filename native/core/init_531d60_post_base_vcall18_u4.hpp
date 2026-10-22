@@ -11,8 +11,8 @@
 // `0x140d90` / `0x14c2f0` / `0x6a5370`.
 //
 // Claimed: fourth-unit virtual-call control flow pin only (slot +0x18).
-// NOT modelled: stack/vtable producers; callee body; later 0x532ca0 units.
-// PR #5 cite-only.
+// NOT modelled: stack/vtable producers; callee body; later 0x532ca0 units
+// (fifth claimed separately as E474). PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
