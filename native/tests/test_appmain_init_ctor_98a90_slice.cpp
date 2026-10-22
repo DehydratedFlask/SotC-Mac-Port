@@ -226,6 +226,7 @@ int g_post_base_vcall18_532ed0 = 0;
 int g_post_base_532ed0_u2 = 0;
 int g_post_base_vcall18_532ed0_u2 = 0;
 int g_post_base_17070 = 0;
+int g_post_base_544fe0 = 0;
 alignas(8) std::uint8_t g_lea_vmovq_src[8]{};
 alignas(8) std::uint8_t g_lea_vmovq_xmm0[8]{};
 void* g_lea_vmovq_rbx_cell = reinterpret_cast<void*>(static_cast<std::uintptr_t>(0x32f79a8));
@@ -476,6 +477,7 @@ void hook_post_base_vcall18_532ed0() { ++g_post_base_vcall18_532ed0; }
 void hook_post_base_532ed0_u2() { ++g_post_base_532ed0_u2; }
 void hook_post_base_vcall18_532ed0_u2() { ++g_post_base_vcall18_532ed0_u2; }
 void hook_post_base_17070() { ++g_post_base_17070; }
+void hook_post_base_544fe0() { ++g_post_base_544fe0; }
 
 void* loadp(const void* base, std::size_t off) {
     void* p = nullptr;
@@ -655,6 +657,7 @@ int main() {
     g_post_base_532ed0_u2 = 0;
     g_post_base_vcall18_532ed0_u2 = 0;
     g_post_base_17070 = 0;
+    g_post_base_544fe0 = 0;
     g_lea_vmovq_rbx = nullptr;
     // OBS src at 0x15ffa38: packed u64 0x538530 (first qword); poison xmm dst.
     {
@@ -881,6 +884,8 @@ int main() {
     pbvcedu2.call_vslot18 = hook_post_base_vcall18_532ed0_u2;
     Init531d60PostBase17070Hooks pb170{};
     pb170.call_17070 = hook_post_base_17070;
+    Init531d60PostBase544fe0Hooks pb544{};
+    pb544.call_544fe0 = hook_post_base_544fe0;
 
     const std::uint64_t allocs_before = heap.alloc_count;
     const auto t0 = std::chrono::steady_clock::now();
@@ -891,7 +896,8 @@ int main() {
                                                      pb_xmm, pb_yr, pb268, pbsbj, pbsboj, pb52,
                                                      pb_lv, pb532, pbvc, pb532u2, pbvcu2, pb532u3,
                                                      pbvcu3, pb532u4, pbvcu4, pb532u5, pbvcu5,
-                                                     pb532ed, pbvced, pb532edu2, pbvcedu2, pb170);
+                                                     pb532ed, pbvced, pb532edu2, pbvcedu2, pb170,
+                                                     pb544);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
@@ -1318,6 +1324,10 @@ int main() {
     CHECK(r.post_base_17070.ok);
     CHECK(g_post_base_17070 == 1);
     CHECK(r.post_base_17070.call_17070_count == 1);
+    // E481: Init continue first 0x544fe0 call-site (mov-rbx prep / body NOT modelled)
+    CHECK(r.post_base_544fe0.ok);
+    CHECK(g_post_base_544fe0 == 1);
+    CHECK(r.post_base_544fe0.call_544fe0_count == 1);
     CHECK(r.remainder.trivial_ok);
     CHECK(r.remainder.registry.status == RegistryInit531d60Status::ok);
     CHECK(r.remainder.registry.entry_count == kInputTable551140Count);
@@ -1349,7 +1359,7 @@ int main() {
         "post_base_vcall18_u3+post_base_532ca0_u4+post_base_vcall18_u4+"
         "post_base_532ca0_u5+post_base_vcall18_u5+post_base_532ed0+"
         "post_base_vcall18_532ed0+post_base_532ed0_u2+post_base_vcall18_532ed0_u2+"
-        "post_base_17070+"
+        "post_base_17070+post_base_544fe0+"
         "early+tail+base+trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
         "anims=%p banks=%p streams=%p rand=%p boss=%p cp3=%p csp=%p post_hit=%d miss_null=%d "
@@ -1360,13 +1370,13 @@ int main() {
         "pbymm=%d pbic=%d pbxmm=%d pbyr=%d pb268=%d pbf590=%d pbsbj268=%d pbsbjf590=%d "
         "pbsboj268=%d pbsbojf590=%d pb52=%d pblv=%d pb532=%d pbvc=%d pb532u2=%d pbvcu2=%d "
         "pb532u3=%d pbvcu3=%d pb532u4=%d pbvcu4=%d pb532u5=%d pbvcu5=%d pb532ed=%d pbvced=%d "
-        "pb532edu2=%d pbvcedu2=%d pb170=%d "
+        "pb532edu2=%d pbvcedu2=%d pb170=%d pb544=%d "
         "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
         "vslot533100_hit/success_atexit/499f80_body/56dcb0_body/5c64c0_body/1290_body/"
         "7f7220_body/f90310_plt_body/CP10_stack/26800_body/f590_body/52eb50_body/"
-        "532ca0_body/stack_prep/vcall18_callee/"
+        "532ca0_body/stack_prep/vcall18_callee/544fe0_body/mov_rbx_prep/17070_body/"
         "14c2f0_body/6a5370_body/6abcc0_body/"
         "21620_body/2779a0_body/42390_body/525080_body/2569d0_body/26ea0/26b60/272d0/"
         "255f60/f8f3a0_body/140d90_body/ba40_listeners/plt/ctor523bd0_body/"
@@ -1435,6 +1445,7 @@ int main() {
         r.post_base_532ed0_u2.call_532ed0_count,
         r.post_base_vcall18_532ed0_u2.call_vslot18_count,
         r.post_base_17070.call_17070_count,
+        r.post_base_544fe0.call_544fe0_count,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
