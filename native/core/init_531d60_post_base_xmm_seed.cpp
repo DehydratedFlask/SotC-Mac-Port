@@ -30,7 +30,7 @@ Init531d60PostBaseXmmSeedResult init_531d60_post_base_xmm_seed(
     std::memcpy(cells.dst_160430c + 0x1c, &q, sizeof(q));
     ++out.store_count;
 
-    // Next: mov ecx,4 / ymm reload→0x160433c / "CP10" / 0x26800 — NOT modelled.
+    // Next: mov ecx,4 / ymm reload→0x160433c — E460; not this fragment.
     out.ok = (out.store_count == 2);
     return out;
 }
