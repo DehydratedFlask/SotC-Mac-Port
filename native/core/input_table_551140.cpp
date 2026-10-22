@@ -19,8 +19,8 @@ void init_input_table_551140(InputTable551140& table) noexcept {
         e.self_or_null = nullptr;
         e.zero_48 = 0;
         e.f50 = row.f50;
-        e.zero_58 = 0;
-        e.zero_5c = 0;
+        e.hash_a = 0;
+        e.hash_b = 0;
     }
 }
 

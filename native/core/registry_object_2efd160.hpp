@@ -5,7 +5,8 @@
 // This module recovers the prologue stores of 0x52a220 (zero the three vector heads, stash the
 // input-table pointer, write float immediates 5.0f @ +0x6c and 60.0f @ +0x80). Sorted-table
 // unique-insert for tables A/B lives in registry_sorted_insert.* (0x52d530 / 0x52d7e0 family).
-// Listener vectors, pool globals 0x2efd170/190/1b0, and name hashing into +0x58/+0x5c remain open.
+// Name hash → insert fill loop lives in registry_fill_52a220.* (private name fixture required).
+// Listener vectors and pool globals 0x2efd170/190/1b0 are NOT modelled here.
 //
 // Allocator 0x17070 does not zero-fill; bytes not written by the prologue remain as left by the
 // caller (tests start from a poison pattern). Not registered into recovered_constructors().

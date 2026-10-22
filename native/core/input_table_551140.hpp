@@ -39,8 +39,9 @@ struct InputTableEntry551140 {
     void* self_or_null;       // +0x40  original: entry+0x20 when callable else 0; null here
     std::uint64_t zero_48;    // +0x48  never stored
     std::uint64_t f50;        // +0x50
-    std::uint32_t zero_58;    // +0x58  stored as 0
-    std::uint32_t zero_5c;    // +0x5c  stored as 0
+    // +0x58/+0x5c: numeric ctor stores 0; registry fill 0x52a220 overwrites with name hashes.
+    std::uint32_t hash_a;     // +0x58  fnv_cstr_52a990(name_a) after fill
+    std::uint32_t hash_b;     // +0x5c  fnv_cstr_a2ddc0(name_b) after fill
 };
 static_assert(sizeof(InputTableEntry551140) == kInputTable551140Stride);
 static_assert(offsetof(InputTableEntry551140, a) == 0x10);
