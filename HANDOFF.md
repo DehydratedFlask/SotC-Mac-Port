@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:46 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:49 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,22 +8,27 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## SRV-01 allocator rounding zero-input fixture — claimed
+## SRV-01 allocator rounding zero-input fixture — fixture verified
 
-- Root claimed bounded task `SRV-01-ALLOCATOR-ROUNDING-ZERO-INPUT-FIXTURE-01` under `SRV-01`;
-  the claim checkpoint is [here](docs/checkpoints/2026-10-21-root-srv01-allocator-rounding-zero-claim.md).
-- Baseline target build `cmake --build local/build/native --target test_allocator_region` and
-  focused CTest `ctest --test-dir local/build/native -R '^allocator_region$' --output-on-failure`
-  both exit 0; focused CTest passes 1/1. Logs are in
-  `local/validation/srv01-allocator-rounding-zero/`.
-- Planned source scope is three assertions in `native/tests/test_allocator_region.cpp`:
-  `align_up_64k(0) == 0`, `align_up_1m(0) == 0`, and `align_size_up_64k(0) == 0`. Production
-  helpers remain unchanged. This pins synthetic integer rounding only; it does not establish
-  allocator integration or runtime behavior.
-- Status `ACTIVE`, 0 failed implementation tries; no source edit has been made. Existing user-owned
-  `native/api/CMakeLists.txt` and `native/api/host/` remain outside this task and unstaged.
-- Exact next action: add the three zero-input assertions, run the focused target and CTest, then
-  update evidence and publish only allowlisted task files.
+- Root completed bounded task `SRV-01-ALLOCATOR-ROUNDING-ZERO-INPUT-FIXTURE-01` under `SRV-01`;
+  see the [claim checkpoint](docs/checkpoints/2026-10-21-root-srv01-allocator-rounding-zero-claim.md)
+  and [completion checkpoint](docs/checkpoints/2026-10-21-root-srv01-allocator-rounding-zero-complete.md).
+- Scope is three assertions in `native/tests/test_allocator_region.cpp`:
+  `align_up_64k(0) == 0`, `align_up_1m(0) == 0`, and `align_size_up_64k(0) == 0`. Baseline target
+  build and focused CTest passed; the changed target builds and focused CTest passes 1/1. Production
+  helpers are unchanged. Logs and hashes are recorded in E249.
+- Trail initially reported the edited file stale; `trail build` rebuilt the wiring graph, and the
+  final check returned `OK` for 3,608 nodes / 1,240 files. Lexical `trail ask` resolves
+  `native/tests/test_allocator_region.cpp`; literal search for `align_up_64k(0)` had no hit, so Trail
+  confirms the indexed file but does not surface that assertion text. The project folder index is
+  current at 24,075 folders.
+- Status `FIXTURE_VERIFIED`, 1 successful implementation attempt, 0 failed tries. This pins only
+  synthetic integer rounding and makes no allocator integration or runtime claim. Claim commit
+  `dbad3b0e9f905293b18f76691edf7b7839536f68` is pushed and fetch-verified. The completion publication
+  record is pending in E250.
+- Existing user-owned `native/api/CMakeLists.txt` and `native/api/host/` remain outside this task.
+- Exact next action: finish the allowlisted completion commit and publication record; then continue
+  with an independent task while the thin Mach-O CPU policy remains pending.
 
 ## AUD-01 empty decompression-probe input — fixture verified
 
