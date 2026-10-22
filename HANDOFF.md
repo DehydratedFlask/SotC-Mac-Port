@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 02:46 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 02:50 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -20,6 +20,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Status is `ACTIVE`, assigned to `/root/next_fixture_scout_2` for only
   `native/tests/test_save_stream.cpp`; zero implementation attempts and zero failed tries.
   This pins diagnostic strings only, with no save compatibility claim.
+- Claim commit `1f194e4ef9389d33520f57a01d2439db5535d8f6` is pushed to `origin/main`; pre/post
+  staged or explicit and full audits accepted 8/1,721 paths, with 0/0 fetch divergence. Publication
+  logs are in E294.
 - Exact next action: have the assigned worker add the assertions, then root independently rebuild
   and run the focused `save_stream` CTest.
 
@@ -149,9 +152,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `local/validation/20261022-root-fixture-baselines/srv01-region-split-metadata-root-ctest-wrapper-error.log`.
 - Claim published in `6441c02473a6c64b14246075258bf7400f3ac2bc`; staged/full and post-push
   explicit/full audits accepted 7/1,719 paths, with 0/0 fetch divergence. Publication logs are in
-  E291. Scope remains synthetic helper behavior only, with no allocator-runtime or game claim.
-- Exact next action: publish this completion with the new SAV-01 diagnostic-string fixture claim,
-  then work the newly assigned `test_save_stream.cpp` fixture.
+  E291. Completion commit `1f194e4ef9389d33520f57a01d2439db5535d8f6` is also pushed; its staged and
+  post-push explicit/full audits accepted 8/1,721 paths, with 0/0 fetch divergence. Scope remains
+  synthetic helper behavior only, with no allocator-runtime or game claim.
+- Exact next action: receive the assigned `test_save_stream.cpp` fixture, then independently replay
+  its focused CTest.
 
 ## RE-01 identity sidecar symlink alias fixture — verified
 
