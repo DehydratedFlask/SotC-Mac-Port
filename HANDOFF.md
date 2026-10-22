@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 02:20 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 02:23 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -79,9 +79,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   query, and the [claim checkpoint](docs/checkpoints/2026-10-22-root-app01-asset-report-dangling-symlink-claim.md)
   are in E287. This covers the dangling-target classification, separate from a missing path and a
   symlink to a directory.
-- Status is `ACTIVE`, zero implementation attempts and zero failed tries. The root baseline and
-  claim are recorded locally; publish them before delegating only the test file to
-  `/root/next_fixture_scout_3`; root will replay the focused suite.
+- Claim and region-list completion commit `c434246b3ec9d3656289ac08525a452c88d065ec` is pushed.
+  Staged and full audits accepted 7/1,717 paths; a fresh fetch showed 0/0 divergence and post-push
+  explicit/full audits accepted the same 7/1,717 paths. Audit log hashes are in E288.
+- Status is `ACTIVE`, zero implementation attempts and zero failed tries. The published claim
+  authorizes delegating only the test file to `/root/next_fixture_scout_3`; root will replay the
+  focused suite.
   The scope is synthetic filesystem classification only, with no archive-validity or game-assets
   claim.
 
@@ -99,9 +102,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Status is `FIXTURE_VERIFIED`, one successful implementation attempt and zero failed tries. Claim
   commit `57ec40a42f5be178375b7b40e73dd8ca9c74ae4e` remains pushed. This fixture establishes only
   synthetic intrusive-list behavior; parent `SRV-01` and all real-game gates remain open.
-- Exact next action: commit and push this completion plus the new asset-report claim with
-  allowlisted audits, then delegate only `AssetValidationReportTests.swift` to
-  `/root/next_fixture_scout_3`.
+- Completion and claim are published in `c434246b3ec9d3656289ac08525a452c88d065ec`; staged and
+  full audits accepted 7/1,717 paths, fresh fetch showed 0/0 divergence, and post-push explicit/full
+  audits accepted 7/1,717. Audit log hashes and the post-publication project-index/Trail recheck are
+  in E288.
+- Exact next action: finish recording this publication checkpoint and delegate only
+  `AssetValidationReportTests.swift` to `/root/next_fixture_scout_3`.
 - Keep pending Mach-O CPU and PSARC policy choices untouched.
 
 ## RE-01 identity sidecar symlink alias fixture — verified
