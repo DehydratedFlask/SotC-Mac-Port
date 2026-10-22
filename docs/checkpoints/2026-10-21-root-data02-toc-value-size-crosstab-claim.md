@@ -28,6 +28,10 @@
   divergence. Post-push log:
   `local/checkpoints/round78-re02-25aa06-data02-claim-postpush.log`, SHA-256
   `7c434d2e6dff50eecac5ac952fdd14be140e42e041a373377dc9bcc8d2bb485d`.
+- The publication record was synced in commit `539a6bd1cfae0f3d75f13ac460d6c3ddf851734e`, also
+  pushed and fetch-verified with `HEAD == origin/main` and 0/0 divergence. Log
+  `/tmp/round78-docsync-postpush.log` SHA-256
+  `8de8a22d1a46763c6d1299b460d0b68d7a2e5569f2cd209bdb20bcc7df1be639`.
 - Preflight: staged publication audit accepted 8 paths and full-tree audit accepted 1,667 paths;
   both exited 0. `git diff --cached --check` exited 0. Native API user files were not staged. Full
   audit SHA-256 `a24d31532815c136fad3ea12efcb696b95197d87b38e447db5f4d1ec84d393db`.
