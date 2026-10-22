@@ -1,12 +1,28 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 00:20 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 00:21 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Active claim: RE-01 identical-output SELF unwrap repeat fixture
+
+- Root claimed `RE-01-UNWRAP-IDENTICAL-ELF-REPEAT-FIXTURE-01`, child of
+  `RE-01-UNWRAP-IDENTITY-SIDECAR-ROUNDTRIP-FIXTURE-01`, after checking the live extraction spec,
+  helper, test suite, task table and pinned reference checkout. See
+  [claim checkpoint](docs/checkpoints/2026-10-22-root-re01-unwrap-repeat-claim.md).
+- Scope is one synthetic test in `scripts/test_project_tools.py`: run `unwrap()` twice with the
+  same plaintext SELF, source and destination, then assert the second result, ELF bytes and
+  identity-sidecar bytes match the first call. It does not process a real game SELF or execute code.
+- Baseline command `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_project_tools.py` passes
+  10 tests; source hash and log are in the claim checkpoint. Task status `CLAIMED`, 0 implementation
+  attempts and 0 failed tries. Root is sole integrator.
+- Exact next action: publish the claim checkpoint, then assign the one-test implementation to
+  `/root/next_bounded_scout`; root will independently replay the suite and publish completion
+  evidence. Keep the pending Mach-O CPU and PSARC negative-limit choices untouched.
 
 ## SRV-01 arena-page-debit uint32 wrap fixture — verified
 
