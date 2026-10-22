@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 03:58 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 04:07 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -109,16 +109,17 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   two recursive levels. Final hashes, logs, Trail evidence, and limits are in E311 and the
   [completion checkpoint](docs/checkpoints/2026-10-22-root-srv01-recursive-mutex-reentrant-trylock-complete.md).
 - Status is `FIXTURE_VERIFIED`, one successful implementation attempt and zero failed tries. The
-  claim was published in `1400c835ff74b1744c65ded8e0139cb2051b92fa`; completion is ready to publish
-  together with a separately baselined CPU name-hash claim. This pins local Darwin mutex behavior
-  only, not priority inheritance under contention or game behavior.
-- Folder index and `trail build --check` are current: 37,436 folders and a synchronized 3,618-node /
+  claim is in `1400c835ff74b1744c65ded8e0139cb2051b92fa`; completion and the CPU name-hash claim are
+  published in `eaa9e0b405175b78ac35c756155ae525c8f71f20`, pushed, and fetch-verified at 0/0
+  divergence. E313 records the publication audits. This pins local Darwin mutex behavior only, not
+  priority inheritance under contention or game behavior.
+- Folder index and `trail build --check` are current: 39,266 folders and a synchronized 3,618-node /
   1,240-file wiring graph. `git diff --check` passes. Root owns documentation and publication;
   user-owned API changes remain unstaged.
-- Next exact action: audit/publish the test and completion docs with the CPU claim, then dispatch the
-  one-line name-hash fixture edit.
+- Next exact action: independently replay the worker's name-hash test edit, then publish its
+  completion evidence.
 
-## CPU-01 inline name-hash embedded-NUL fixture — active claim
+## CPU-01 inline name-hash embedded-NUL fixture — verified
 
 - `CPU-01-NAMEHASH-INLINE-EMBEDDED-NUL-FIXTURE-01` is a child of verified
   `CPU-01-NAMEHASH-E71990-01`. It proposes one synthetic assertion in
@@ -128,12 +129,33 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Root fresh Debug/Ninja `test_name_hash` build passes and focused `name_hash` CTest passes 1/1;
   source and log hashes are in E312 and the
   [claim checkpoint](docs/checkpoints/2026-10-22-root-cpu01-namehash-inline-embedded-nul-claim.md).
-- Status is `ACTIVE`, zero implementation attempts and zero failed tries. The claim will be
-  published with the recursive-mutex completion. `/root/next_fixture_scout_2` will own only the test
-  edit after publication; `/root` retains docs, root replay, and publication.
-- Next exact action: publish both the recursive-mutex completion and this claim, then dispatch the
-  one-line assertion. The synthetic case does not resolve whether the port needs original game-name
-  strings and makes no game behavior claim.
+- Worker and independent root fresh Debug/Ninja builds pass; focused `name_hash` CTest passes 1/1
+  in both. The only code change is the proposed assertion in `native/tests/test_name_hash.cpp`; final
+  hashes and logs are in E314 and the
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-cpu01-namehash-inline-embedded-nul-complete.md).
+- Status is `FIXTURE_VERIFIED`, one successful implementation attempt and zero failed tries. The
+  claim is in pushed commit `eaa9e0b405175b78ac35c756155ae525c8f71f20`; completion is ready for the
+  root allowlisted audit, commit, push, and fresh fetch/divergence check.
+- Next exact action: publish the test and completion docs with the next bounded CPU-01 fixture claim.
+  The synthetic case does not resolve whether the port needs original game-name strings and makes no
+  game behavior claim.
+
+## CPU-01 store-zero32 adjacent-canary fixture — active claim
+
+- `CPU-01-STORE-ZERO32-ADJACENT-CANARY-FIXTURE-01` is a child of active `CPU-01`. It proposes one
+  synthetic three-word array case in `native/tests/test_store_zero32.cpp`: zero the middle word and
+  assert both neighboring canaries retain their values. Trail locates the helper at
+  `native/core/store_zero32.cpp:L5-L7` and current tests at `native/tests/test_store_zero32.cpp:L8-L17`;
+  the live CMake registration is `native/CMakeLists.txt:L385-L387`.
+- Root fresh Debug/Ninja baseline configure/build passes and focused `store_zero32` CTest passes 1/1.
+  Source hashes, logs, and limits are in E315 and the
+  [claim checkpoint](docs/checkpoints/2026-10-22-root-cpu01-store-zero32-adjacent-canary-claim.md).
+- Status is `ACTIVE`, zero implementation attempts and zero failed tries. The claim is queued for
+  the same allowlisted commit as the verified name-hash completion; worker edits must wait for that
+  claim to be pushed and fetch-verified. Root owns docs, independent replay, and publication.
+- Next exact action: finish the project-index and publication checks, push the claim, then dispatch
+  the single-file fixture edit. This pins only the local helper write boundary, not any game callsite
+  or runtime behavior.
 
 ## SAV-01 stream-file symlink destination fixture — verified
 

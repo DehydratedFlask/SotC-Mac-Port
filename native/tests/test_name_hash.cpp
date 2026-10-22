@@ -40,6 +40,7 @@ int main() {
 
     // Prefix independence from trailing bytes after the NUL.
     CHECK(name_hash("abc\0def") == name_hash("abc"));
+    CHECK(name_hash_inline("abc\0def") == 0x0b873285u);
 
     std::puts("name_hash: ok");
     return 0;
