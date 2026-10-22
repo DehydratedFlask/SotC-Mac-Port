@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:14 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:15 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -96,6 +96,9 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   inspection, filesystem behavior, or game readiness.
 - Status `FIXTURE_VERIFIED`, 1 successful implementation attempt, 0 failed tries. Existing
   `native/api/CMakeLists.txt` and `native/api/host/` changes remain user-owned and excluded.
+- Claim commit `ee7e7a906450ecf75e328d6d00c2ea4feeb1a44c` and completion commit
+  `45d0656b59a07a8595c9886f0cbe432230e82914` were pushed and fetch-verified; `HEAD == origin/main`
+  with 0/0 divergence. User-owned native API changes remained unstaged.
 - Exact next action: claim and complete another independent bounded task outside PSARC and these
   launcher test files; leave negative-limit behavior unclaimed pending the user's answer.
 
