@@ -396,3 +396,34 @@ All exited 0; baseline CTest passed 1/1. Logs are in
 `local/validation/cpu01-trig-preseed-20261022/`. Purpose: establish the existing synthetic helper
 test passes before adding a stale-state initialization case. Build products remain in the exact
 `local/build/` directory. No removal boundary was created.
+
+
+## 2026-10-22 07:25 CDT — CPU-01 trig-constants fixture verification
+
+Existing CMake, Ninja, and Apple clang recorded in E325 were reused; no install, download,
+dependency, or system configuration change. Worker commands used
+local/build/native-worker-cpu01-trig-preseed-20261022/; independent root replay used
+local/build/native-root-cpu01-trig-preseed-verify-20261022/. Each run configured Debug/Ninja,
+built target test_trig_constants, and ran focused CTest
+ctest --test-dir <build-dir> --output-on-failure -R '^trig_constants$'. All commands exited 0;
+each focused CTest passed 1/1. Logs are under
+local/validation/cpu01-trig-preseed-20261022/. Purpose: verify synthetic overwrites from
+preseeded helper state only. Build products remain in the two exact local/build/ directories.
+No removal boundary was created.
+
+## 2026-10-22 07:25 CDT — SRV-01 region-list candidate baseline
+
+Existing CMake, Ninja, and Apple clang recorded in E325 were reused; no install, download,
+dependency, or system configuration change. Candidate baseline commands:
+cmake -S native -B local/build/native-root-srv01-region-list-uncounted-head-baseline-20261022
+-G Ninja -DCMAKE_BUILD_TYPE=Debug;
+cmake --build
+local/build/native-root-srv01-region-list-uncounted-head-baseline-20261022 --target
+test_region_list;
+ctest --test-dir
+local/build/native-root-srv01-region-list-uncounted-head-baseline-20261022 --output-on-failure
+-R '^region_list$'.
+All exited 0; baseline CTest passed 1/1. Logs are under
+local/validation/srv01-region-list-uncounted-head-20261022/. Purpose: evaluate a potential
+synthetic intrusive-list head-unlink fixture. No task was claimed and no implementation changed.
+Build products remain in the exact local/build/ directory. No removal boundary was created.
