@@ -102,6 +102,8 @@ int main() {
         const auto rejected = parse_save_chunk_header(bad);
         CHECK(rejected.error == ChunkParseError::bad_magic);
         CHECK(rejected.header.name_hash == 0);
+        CHECK(rejected.header.tag == 0);
+        CHECK(rejected.header.payload_length == 0);
     }
     // A header that is both truncated and wrong-magic reports truncation first.
     auto short_bad = wire;
