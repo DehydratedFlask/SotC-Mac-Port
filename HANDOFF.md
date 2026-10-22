@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 02:50 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 02:54 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,23 +8,24 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## SAV-01 native stream error-name mapping fixture — active claim
+## SAV-01 native stream error-name mapping fixture — verified
 
 - `SAV-01-NATIVE-STREAM-ERROR-NAME-MAP-FIXTURE-01` is scoped under `SAV-01-NATIVE-STREAM-01`.
   The claim adds checks only in `native/tests/test_save_stream.cpp::test_error_names()` for the
   remaining 19 `SaveStreamError` names and the `unknown` fallback. The existing `bad_hash` and
   `none` checks stay; production and build files are out of scope.
-- Root baseline `test_save_stream` target build and focused CTest pass; the test file and unchanged
-  production/header/CMake hashes plus log hashes are in E293 and the
-  [claim checkpoint](docs/checkpoints/2026-10-22-root-sav01-stream-error-name-map-claim.md).
-- Status is `ACTIVE`, assigned to `/root/next_fixture_scout_2` for only
-  `native/tests/test_save_stream.cpp`; zero implementation attempts and zero failed tries.
+- The fixture now checks all 21 enum names plus an out-of-range `0xff` value returning `unknown`.
+  Worker and independent root fresh configure/build/focused CTest pass; only the test file changed.
+  Hashes and focused logs are recorded in E295 and the
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-sav01-stream-error-name-map-complete.md).
+- Status is `FIXTURE_VERIFIED`, one successful implementation attempt and zero failed tries.
   This pins diagnostic strings only, with no save compatibility claim.
 - Claim commit `1f194e4ef9389d33520f57a01d2439db5535d8f6` is pushed to `origin/main`; pre/post
   staged or explicit and full audits accepted 8/1,721 paths, with 0/0 fetch divergence. Publication
   logs are in E294.
-- Exact next action: have the assigned worker add the assertions, then root independently rebuild
-  and run the focused `save_stream` CTest.
+- Exact next action: publish the completion record, then claim the separately scouted
+  `SAV-01-CHUNK-CODEC-UNKNOWN-PAYLOAD-KIND-FIXTURE-01` only after its baseline and ownership are
+  recorded.
 
 ## SAV-01 stream-file symlink destination fixture — verified
 

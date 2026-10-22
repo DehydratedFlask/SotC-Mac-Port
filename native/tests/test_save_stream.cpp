@@ -364,6 +364,26 @@ void test_hash_checked_before_chunks() {
 void test_error_names() {
     CHECK(std::string(sotc::to_string(SaveStreamError::bad_hash)) == "bad_hash");
     CHECK(std::string(sotc::to_string(SaveStreamError::none)) == "none");
+    CHECK(std::string(sotc::to_string(SaveStreamError::duplicate_name)) == "duplicate_name");
+    CHECK(std::string(sotc::to_string(SaveStreamError::payload_too_large)) == "payload_too_large");
+    CHECK(std::string(sotc::to_string(SaveStreamError::body_too_large)) == "body_too_large");
+    CHECK(std::string(sotc::to_string(SaveStreamError::truncated_header)) == "truncated_header");
+    CHECK(std::string(sotc::to_string(SaveStreamError::bad_version)) == "bad_version");
+    CHECK(std::string(sotc::to_string(SaveStreamError::size_too_large)) == "size_too_large");
+    CHECK(std::string(sotc::to_string(SaveStreamError::truncated_body)) == "truncated_body");
+    CHECK(std::string(sotc::to_string(SaveStreamError::trailing_bytes)) == "trailing_bytes");
+    CHECK(std::string(sotc::to_string(SaveStreamError::truncated_chunk_header)) == "truncated_chunk_header");
+    CHECK(std::string(sotc::to_string(SaveStreamError::bad_chunk_magic)) == "bad_chunk_magic");
+    CHECK(std::string(sotc::to_string(SaveStreamError::chunk_overrun)) == "chunk_overrun");
+    CHECK(std::string(sotc::to_string(SaveStreamError::reader_duplicate_name)) == "reader_duplicate_name");
+    CHECK(std::string(sotc::to_string(SaveStreamError::file_not_found)) == "file_not_found");
+    CHECK(std::string(sotc::to_string(SaveStreamError::file_too_large)) == "file_too_large");
+    CHECK(std::string(sotc::to_string(SaveStreamError::io_open)) == "io_open");
+    CHECK(std::string(sotc::to_string(SaveStreamError::io_read)) == "io_read");
+    CHECK(std::string(sotc::to_string(SaveStreamError::io_write)) == "io_write");
+    CHECK(std::string(sotc::to_string(SaveStreamError::io_fsync)) == "io_fsync");
+    CHECK(std::string(sotc::to_string(SaveStreamError::io_rename)) == "io_rename");
+    CHECK(std::string(sotc::to_string(static_cast<SaveStreamError>(0xff))) == "unknown");
 }
 
 }  // namespace
