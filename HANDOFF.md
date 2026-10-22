@@ -24,7 +24,7 @@ or Metal gameplay is demonstrated.
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-ctor-98a90-tsc-20261022/` (manifest `8f46927b…` at tip
   `6d8f875`).
-- Observation: feat tip `6d8f875`; ELF pins body+cells+rdtsc+PLT; measured tsc≠0,
+- Observation: feat tip `6d8f875` (docs tip `4894eb9`); ELF pins body+cells+rdtsc+PLT; measured tsc≠0,
   init once → 275 registry.
   PLT body / heavier callees NOT modelled.
 - Commands: `python3 -I tools/lift/check_f323d0_tsc.py` OK;
