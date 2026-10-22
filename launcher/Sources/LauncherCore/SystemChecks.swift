@@ -55,17 +55,18 @@ public enum SystemChecks {
     }
 
     /// Lightweight header check only — does not execute the file or claim game readiness.
+    /// Policy (user decision): require a thin 64-bit ARM64 Mach-O executable (MH_EXECUTE).
+    /// Fat/universal files, other CPU types, and non-executable file types are rejected.
     private static func isMachOExecutable(at url: URL) -> Bool {
         guard let handle = try? FileHandle(forReadingFrom: url) else { return false }
         defer { try? handle.close() }
-        guard let header = try? handle.read(upToCount: 8), header.count >= 4 else { return false }
-        let magic = header.withUnsafeBytes { $0.load(as: UInt32.self) }
-        // Reject 32-bit magics; this header-only probe does not inspect CPU type or FAT slices.
-        switch magic {
-        case 0xFEEDFACF, 0xCFFAEDFE, 0xCAFEBABE, 0xBEBAFECA:
-            return true
-        default:
-            return false
+        guard let header = try? handle.read(upToCount: 16), header.count >= 16 else { return false }
+        func word(_ offset: Int) -> UInt32 {
+            header.withUnsafeBytes { $0.loadUnaligned(fromByteOffset: offset, as: UInt32.self) }
         }
+        let mhMagic64: UInt32 = 0xFEEDFACF     // little-endian 64-bit thin header as read on arm64
+        let cpuTypeARM64: UInt32 = 0x0100000C  // CPU_TYPE_ARM64
+        let mhExecute: UInt32 = 2
+        return word(0) == mhMagic64 && word(4) == cpuTypeARM64 && word(12) == mhExecute
     }
 }

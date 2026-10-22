@@ -40,7 +40,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Debug/LauncherCoreTests-p.build` | 4 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Debug/LauncherCoreTests-p.build/DerivedSources` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Debug/LauncherCoreTests-p.build/Objects-normal` | 0 | Native Swift macOS launcher |
-| `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Debug/LauncherCoreTests-p.build/Objects-normal/arm64` | 59 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Debug/LauncherCoreTests-p.build/Objects-normal/arm64` | 69 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Debug/LauncherNativeCore-t.build` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Debug/LauncherNativeCore-t.build/Objects-normal` | 0 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Debug/LauncherNativeCore-t.build/Objects-normal/arm64` | 20 | Native Swift macOS launcher |
@@ -65,8 +65,10 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/SoCLauncher-p.build` | 0 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/SoCLauncher-p.build/Objects-normal` | 0 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/SoCLauncher-p.build/Objects-normal/arm64` | 18 | Native Swift macOS launcher |
-| `launcher/.build/out/Intermediates.noindex/SwiftExplicitPrecompiledModules` | 7 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/SwiftExplicitPrecompiledModules` | 8 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/XCBuildData` | 2 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/XCBuildData/0db028a2dbecd90674bf8d3d15ef68fc.xcbuilddata` | 5 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/XCBuildData/0db028a2dbecd90674bf8d3d15ef68fc.xcbuilddata/attachments` | 25 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/XCBuildData/72ac7ea23d6bf8071f74ebc8e17113f8.xcbuilddata` | 5 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/XCBuildData/72ac7ea23d6bf8071f74ebc8e17113f8.xcbuilddata/attachments` | 15 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/XCBuildData/80715af41836f10516ca5fa61d0adc57.xcbuilddata` | 5 | Native Swift macOS launcher |
@@ -74,6 +76,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/Intermediates.noindex/XCBuildData/b87f88059692f27ff44272c349ce1382.xcbuilddata` | 5 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/XCBuildData/b87f88059692f27ff44272c349ce1382.xcbuilddata/attachments` | 25 | Native Swift macOS launcher |
 | `launcher/.build/out/ModuleCache.noindex` | 2 | Native Swift macOS launcher |
+| `launcher/.build/out/ModuleCache.noindex/14YLEEWBHFFWX` | 39 | Native Swift macOS launcher |
 | `launcher/.build/out/ModuleCache.noindex/1KN50SL538VUW` | 38 | Native Swift macOS launcher |
 | `launcher/.build/out/ModuleCache.noindex/1SQEZZX1AHSSY` | 39 | Native Swift macOS launcher |
 | `launcher/.build/out/ModuleCache.noindex/23BS29NUYHTLH` | 67 | Native Swift macOS launcher |
@@ -84,6 +87,8 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/ModuleCache.noindex/3081Y1Y3ZCNIP` | 38 | Native Swift macOS launcher |
 | `launcher/.build/out/ModuleCache.noindex/38M1DM187KCMB` | 39 | Native Swift macOS launcher |
 | `launcher/.build/out/ModuleCache.noindex/3JGGI8MPN8C4L` | 66 | Native Swift macOS launcher |
+| `launcher/.build/out/ModuleCache.noindex/3NGXC3W7U6GI4` | 39 | Native Swift macOS launcher |
+| `launcher/.build/out/ModuleCache.noindex/3QU2VTVT86JKP` | 67 | Native Swift macOS launcher |
 | `launcher/.build/out/ModuleCache.noindex/3RWOPC8BS04HB` | 38 | Native Swift macOS launcher |
 | `launcher/.build/out/PCH` | 0 | Native Swift macOS launcher |
 | `launcher/.build/out/Products` | 0 | Native Swift macOS launcher |
@@ -138,7 +143,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/v5/records/0K` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/0L` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/0M` | 4 | Native Swift macOS launcher |
-| `launcher/.build/out/v5/records/0O` | 4 | Native Swift macOS launcher |
+| `launcher/.build/out/v5/records/0O` | 5 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/0P` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/0Q` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/0R` | 3 | Native Swift macOS launcher |
@@ -291,7 +296,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/v5/records/5H` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/5I` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/5J` | 3 | Native Swift macOS launcher |
-| `launcher/.build/out/v5/records/5K` | 2 | Native Swift macOS launcher |
+| `launcher/.build/out/v5/records/5K` | 3 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/5L` | 3 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/5M` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/5N` | 2 | Native Swift macOS launcher |
@@ -348,6 +353,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/v5/records/79` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/7A` | 3 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/7B` | 2 | Native Swift macOS launcher |
+| `launcher/.build/out/v5/records/7C` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/7D` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/7E` | 3 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/7G` | 1 | Native Swift macOS launcher |
@@ -479,7 +485,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/v5/records/BE` | 3 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/BF` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/BG` | 4 | Native Swift macOS launcher |
-| `launcher/.build/out/v5/records/BH` | 2 | Native Swift macOS launcher |
+| `launcher/.build/out/v5/records/BH` | 3 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/BJ` | 5 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/BK` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/BL` | 4 | Native Swift macOS launcher |
@@ -494,7 +500,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/v5/records/BV` | 3 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/BW` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/BX` | 2 | Native Swift macOS launcher |
-| `launcher/.build/out/v5/records/BY` | 1 | Native Swift macOS launcher |
+| `launcher/.build/out/v5/records/BY` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/C0` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/C2` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/C3` | 4 | Native Swift macOS launcher |
@@ -607,7 +613,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/v5/records/FI` | 4 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/FK` | 4 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/FL` | 1 | Native Swift macOS launcher |
-| `launcher/.build/out/v5/records/FM` | 1 | Native Swift macOS launcher |
+| `launcher/.build/out/v5/records/FM` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/FN` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/FO` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/FP` | 5 | Native Swift macOS launcher |
@@ -647,7 +653,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/v5/records/GR` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/GT` | 4 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/GV` | 5 | Native Swift macOS launcher |
-| `launcher/.build/out/v5/records/GW` | 5 | Native Swift macOS launcher |
+| `launcher/.build/out/v5/records/GW` | 6 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/GX` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/GY` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/GZ` | 1 | Native Swift macOS launcher |
@@ -667,7 +673,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/v5/records/HD` | 3 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/HE` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/HF` | 1 | Native Swift macOS launcher |
-| `launcher/.build/out/v5/records/HG` | 3 | Native Swift macOS launcher |
+| `launcher/.build/out/v5/records/HG` | 4 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/HH` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/HJ` | 6 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/HK` | 1 | Native Swift macOS launcher |
@@ -930,7 +936,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/v5/records/PN` | 3 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/PO` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/PP` | 3 | Native Swift macOS launcher |
-| `launcher/.build/out/v5/records/PQ` | 1 | Native Swift macOS launcher |
+| `launcher/.build/out/v5/records/PQ` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/PS` | 4 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/PT` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/PU` | 5 | Native Swift macOS launcher |
@@ -989,7 +995,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/v5/records/RK` | 4 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/RL` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/RN` | 2 | Native Swift macOS launcher |
-| `launcher/.build/out/v5/records/RP` | 2 | Native Swift macOS launcher |
+| `launcher/.build/out/v5/records/RP` | 3 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/RQ` | 3 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/RR` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/RS` | 1 | Native Swift macOS launcher |
@@ -1246,7 +1252,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/v5/records/ZX` | 3 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/ZY` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/v5/records/ZZ` | 3 | Native Swift macOS launcher |
-| `launcher/.build/out/v5/units` | 184 | Native Swift macOS launcher |
+| `launcher/.build/out/v5/units` | 187 | Native Swift macOS launcher |
 | `launcher/.build/repositories` | 0 | Native Swift macOS launcher |
 | `launcher/Packaging` | 1 | Native Swift macOS launcher |
 | `launcher/Sources` | 0 | Native Swift macOS launcher |
