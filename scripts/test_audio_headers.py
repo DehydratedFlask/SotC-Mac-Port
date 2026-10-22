@@ -132,6 +132,18 @@ class EntropyAndProbeTests(unittest.TestCase):
         self.assertEqual(cah.shannon(b'\x00' * 100), 0.0)
         self.assertGreater(cah.shannon(bytes(range(256))), 7.9)
 
+    def test_empty_probe_input_reports_too_short_for_every_offset(self):
+        expected = {
+            'zlib_offset0': {'ok': False, 'err': 'too_short'},
+            'zlib_offset2': {'ok': False, 'err': 'too_short'},
+            'raw_inflate_offset0': {'ok': False, 'err': 'too_short'},
+            'raw_inflate_offset2': {'ok': False, 'err': 'too_short'},
+            'lzma_offset0': {'ok': False, 'err': 'too_short'},
+            'lzma_offset2': {'ok': False, 'err': 'too_short'},
+            'lzma_offset4': {'ok': False, 'err': 'too_short'},
+        }
+        self.assertEqual(cah.decompress_probe(b''), expected)
+
     def test_trivial_inflate_rejected(self):
         # Near-empty stub previously produced a 1-byte raw_inflate "success".
         data = bytes.fromhex('3ebe7b0000000000') + b'\x00' * 64
