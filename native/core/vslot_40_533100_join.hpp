@@ -3,14 +3,14 @@
 //   call 0x42390 (stack descriptor) → build "Position" → 0xf590
 //   alloc 0x20 via 0x17070 → call 0x2779a0(obj, desc, 1)
 //   replace *[self+0x3b60] (destroy previous if any)
-//   // stop before next cluster @ 0x533411 (0x6a5370 / shadowmodels…)
+//   // stop before next cluster @ 0x533411 (see vslot_40_533100_gfx_2ee2d00.*)
 //
 // Prefer over deepen 0x21620 (miss-only, pre-join) and 0x525080/0x2569d0
 // (already hooked pre-branch). Prefer over empty-path migrate/non-null.
 //
 // Claimed: join control flow + "Position" pin + alloc/store at +0x3b60.
-// NOT modelled: body of 0x2779a0; body of 0x42390 (hooked); shadowmodels /
-// 0x6a5370 cluster; hit-only side effects before join. PR #5 cite-only.
+// NOT modelled: body of 0x2779a0; body of 0x42390 (hooked); gfx/shadowmodels
+// past join; hit-only side effects before join. PR #5 cite-only.
 #pragma once
 
 #include "allocator_front.hpp"

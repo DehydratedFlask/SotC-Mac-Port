@@ -17,6 +17,7 @@
 #include "core/inputtable_names_fixture.hpp"
 #include "core/mid_255340.hpp"
 #include "core/singleton_f08_531d84.hpp"
+#include "core/vslot_40_533100_gfx_2ee2d00.hpp"
 #include "core/vslot_40_533100_header.hpp"
 #include "core/vslot_40_533100_join.hpp"
 #include "core/vslot_40_533100_miss.hpp"
@@ -100,6 +101,8 @@ int g_v40_miss_f590 = 0;
 int g_v40_42390 = 0;
 int g_v40_2779a0 = 0;
 int g_v40_join_f590 = 0;
+int g_v40_6a5370 = 0;
+int g_v40_6abcc0 = 0;
 
 void ctor_a30(void* obj) {
     ++g_ctor_a30;
@@ -142,6 +145,8 @@ void hook_v40_2779a0(void* obj, void*, int) {
     *static_cast<std::uint32_t*>(obj) = 0x2779A001u;
 }
 void hook_v40_join_f590(void*) { ++g_v40_join_f590; }
+void hook_v40_6a5370(void*) { ++g_v40_6a5370; }
+void hook_v40_6abcc0(void*) { ++g_v40_6abcc0; }
 
 void* loadp(const void* base, std::size_t off) {
     void* p = nullptr;
@@ -252,6 +257,7 @@ int main() {
     g_f08_ctor = g_f08_dtor = g_v40_ctor = g_v40_525080 = g_v40_2569d0 = 0;
     g_v40_21620 = g_v40_ba40 = g_v40_miss_f590 = 0;
     g_v40_42390 = g_v40_2779a0 = g_v40_join_f590 = 0;
+    g_v40_6a5370 = g_v40_6abcc0 = 0;
     ctor40_cell_2ee6778() = nullptr;
     singleton_f08_cell_2efc9e0() = nullptr;
     vslot40_cell_2ef8c08() = nullptr;
@@ -292,6 +298,8 @@ int main() {
     bh.vslot_40_join_detail.call_42390 = hook_v40_42390;
     bh.vslot_40_join_detail.ctor_2779a0 = hook_v40_2779a0;
     bh.vslot_40_join_detail.dtor_f590 = hook_v40_join_f590;
+    bh.vslot_40_gfx_detail.call_6a5370 = hook_v40_6a5370;
+    bh.vslot_40_gfx_detail.call_6abcc0 = hook_v40_6abcc0;
 
     SingletonF08Hooks sh{};
     sh.ctor_523bd0 = hook_f08_ctor;
@@ -362,6 +370,13 @@ int main() {
     CHECK(r.vslot_40_join.pos_obj != nullptr);
     CHECK(*static_cast<std::uint32_t*>(r.vslot_40_join.pos_obj) == 0x2779A001u);
     CHECK(loadp(app.data(), kVslot40JoinSlotOff) == r.vslot_40_join.pos_obj);
+    // E425: gfx-cell prelude on 0x2ee2d00 before shadowmodels
+    CHECK(r.vslot_40_gfx.ok);
+    CHECK(g_v40_6a5370 == 1);
+    CHECK(g_v40_6abcc0 == 1);
+    CHECK(r.vslot_40_gfx.marker_stored);
+    CHECK(r.vslot_40_gfx.marker_value == kVslot40GfxMarker);
+    CHECK(r.vslot_40_gfx.obj == vslot40_gfx_cell_2ee2d00());
     CHECK(g_move == 0);
     CHECK(g_nonnull == 0);
     CHECK(g_init_tb == 1);
@@ -383,19 +398,19 @@ int main() {
     std::printf(
         "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+sub3be930+ensure3c2f70+"
         "buf80+null_list+tsc323d0+ctor40_1ab550+gates2552d4+singleton_f08+vslot534130+mid255340+"
-        "vslot533100_header+post1fc80+miss_rfps+join_pos+early+tail+base+trivial+registry ok "
-        "nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p post_hit=%d miss_null=%d "
-        "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u alloc_ops=%llu duration_us=%lld "
-        "allocator=tip_AllocatorFront+FakeHeap "
-        "vslot533100_hit/join_shadowmodels/21620_body/2779a0_body/42390_body/525080_body/"
-        "2569d0_body/26ea0/26b60/272d0/255f60/stackchk/ba40_listeners/plt/"
-        "ctor523bd0_body/dtor525b40_body/ctor493230_body/"
+        "vslot533100_header+post1fc80+miss_rfps+join_pos+gfx2ee2d00+early+tail+base+trivial+"
+        "registry ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p post_hit=%d "
+        "miss_null=%d marker=0x%x gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
+        "alloc_ops=%llu duration_us=%lld allocator=tip_AllocatorFront+FakeHeap "
+        "vslot533100_hit/shadowmodels/6a5370_body/6abcc0_body/21620_body/2779a0_body/"
+        "42390_body/525080_body/2569d0_body/26ea0/26b60/272d0/255f60/stackchk/"
+        "ba40_listeners/plt/ctor523bd0_body/dtor525b40_body/ctor493230_body/"
         "ensure_migrate/nonnull=NOT_modelled pr5_heap_merge=GAP\n",
         r.ctor.nested_48, eb, r.tail.obj_40, r.singleton.obj, r.vslot_40.obj,
-        r.vslot_40_join.pos_obj, r.vslot_40_post.lookup_hit ? 1 : 0,
-        r.vslot_40_miss.find_null ? 1 : 0, static_cast<unsigned>(r.tail.gates.gate_byte),
-        g_mid_reg, static_cast<unsigned long long>(r.ctor.tsc_value),
-        r.remainder.registry.entry_count,
+        r.vslot_40_join.pos_obj, r.vslot_40_gfx.obj, r.vslot_40_post.lookup_hit ? 1 : 0,
+        r.vslot_40_miss.find_null ? 1 : 0, r.vslot_40_gfx.marker_value,
+        static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
+        static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
         static_cast<long long>(us));
 

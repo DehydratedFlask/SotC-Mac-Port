@@ -19,6 +19,7 @@
 #include "allocator_front.hpp"
 #include "mid_255340.hpp"
 #include "vslot_30_534130.hpp"
+#include "vslot_40_533100_gfx_2ee2d00.hpp"
 #include "vslot_40_533100_header.hpp"
 #include "vslot_40_533100_join.hpp"
 #include "vslot_40_533100_miss.hpp"
@@ -59,11 +60,13 @@ struct BaseInitialize255130Hooks {
     Vslot40_533100PostHooks vslot_40_post_detail{};
     Vslot40_533100MissHooks vslot_40_miss_detail{};
     Vslot40_533100JoinHooks vslot_40_join_detail{};
-    // Last header/post/miss/join results when lifted (for measured slices).
+    Vslot40_533100GfxHooks vslot_40_gfx_detail{};
+    // Last header/post/miss/join/gfx results when lifted (for measured slices).
     Vslot40_533100HeaderResult* vslot_40_out = nullptr;
     Vslot40_533100PostResult* vslot_40_post_out = nullptr;
     Vslot40_533100MissResult* vslot_40_miss_out = nullptr;
     Vslot40_533100JoinResult* vslot_40_join_out = nullptr;
+    Vslot40_533100GfxResult* vslot_40_gfx_out = nullptr;
 };
 
 // Process-wide cell modelling original qword @ 0x2ea4718 (points at flag object).
