@@ -215,6 +215,25 @@ struct LauncherModelValidationTests {
         #expect(items.first { $0.kind == .nativeCore }?.status == .ready)
     }
 
+    @Test func missingAudioOutputBlocksPlayAndNeverCallsCoreStart() async throws {
+        let client = ScriptedCoreClient(engineReady: true)
+        let model = makeModel(client, audio: .missing("No default audio output device"))
+        await model.validate()
+
+        #expect(model.state == .idle)
+        #expect(!model.canStart)
+        let items = try #require(model.report).items
+        #expect(items.first { $0.kind == .assets }?.status == .ready)
+        #expect(items.first { $0.kind == .nativeCore }?.status == .ready)
+        #expect(items.first { $0.kind == .metal }?.status == .ready)
+        #expect(items.first { $0.kind == .audio }?.status == .missing("No default audio output device"))
+        #expect(model.presentation.status.contains("Audio output"))
+
+        await model.startCore()
+        #expect(client.count("start") == 0)
+        #expect(model.state == .idle)
+    }
+
     @Test func allReadyCoreMakesTheModelReady() async {
         let model = makeModel(ScriptedCoreClient(engineReady: true))
         await model.validate()
