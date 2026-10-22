@@ -118,12 +118,12 @@ assert [(rva, index) for rva, index, _, _ in rows if rva in (0xd32720, 0xd2ffe0)
 # native sources exist and are byte-verified by their own checkers, so a regression here means the
 # runner silently skipped a recovered constructor.
 for rva, index in ((0xe094e0, 50), (0xdf94c0, 55), (0xde0160, 59), (0xdbfa60, 70),
-                   (0xd85490, 82), (0xce8440, 147)):
+                   (0xd8fa40, 80), (0xd86ed0, 81), (0xd85490, 82), (0xce8440, 147)):
     assert (rva, index) in [(r[0], r[1]) for r in rows], (
         f'lifted constructor {rva:#x} (index {index}) is no longer registered')
-# Contiguous production neighborhood through idx 59 (gap closed).
-assert [row[1] for row in rows if row[1] <= 59] == list(range(60)), (
-    'indices 0-59 must be registered contiguously after leaf_de0160')
+# Contiguous production neighborhood through idx 94 (gaps 80-81 closed; 95 still open).
+assert [row[1] for row in rows if row[1] <= 94] == list(range(95)), (
+    'indices 0-94 must be registered contiguously after avx 80-81')
 
 
 # ---- byte anchors for slot 11 (ClothingPhysicalMeshParameters) against the pinned ELF ----
@@ -218,6 +218,6 @@ block_stores_ok(image.read(0xf08f00, 556), "reset 0xf08f00")
 print(
     f"OK: ELF sha256={elf_digest}; constructor table start={TABLE_START:#x} "
     f"count={TABLE_COUNT} sha256={table_digest}; verified {len(rows)} registered RVA/index pairs; "
-    "slots 0-47 recovered; idx 55/59 leaf lifts registered; contiguous 0-59; "
+    "slots 0-47 recovered; idx 55/59/80/81 lifts registered; contiguous 0-94; "
     "later registered rows follow (see recovered_constructors for remaining gaps)"
 )

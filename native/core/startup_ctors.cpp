@@ -128,7 +128,9 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xdac410, 77, [](StartupState& s) noexcept { init_vec_dac410(s.vec_dac410); }},
         {0xd94cb0, 78, [](StartupState& s) noexcept { init_vec_d94cb0(s.vec_d94cb0); }},
         {0xd90310, 79, [](StartupState& s) noexcept { init_vec_d90310(s.vec_d90310); }},
-        // Gap idx 80 (0xd8fa40), 81 (0xd86ed0): not yet lifted.
+        // idx 80–81: already-lifted AVX constant chains (batch 32) — registered as bookkeeping.
+        {0xd8fa40, 80, [](StartupState& s) noexcept { init_avx_d8fa40(s.avx_d8fa40); }},
+        {0xd86ed0, 81, [](StartupState& s) noexcept { init_avx_d86ed0(s.avx_d86ed0); }},
         {0xd85490, 82, [](StartupState& s) noexcept { init_vec_d85490(s.vec_d85490); }},
         {0xd853a0, 83, [](StartupState& s) noexcept { init_vec_d853a0(s.vec_d853a0); }},
         {0xd84ee0, 84, [](StartupState& s) noexcept { init_vec_d84ee0(s.vec_d84ee0); }},
