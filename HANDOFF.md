@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 05:39 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 05:41 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -38,8 +38,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   claim commit `fdfd466c1269e786db29769a974c3e9ac2a7a84d` is pushed and fetch-verified at 0/0;
   E344 records its path audits. `docs/ASSETS.md` and `docs/TASKS.md` record the sample-only result.
 - Exact next action: finish the claimed `SRV-01-HOST-MAP-REQUESTED-VS-PAGE-ROUNDED-SIZE-FIXTURE-01`
-  test below. First record a fresh focused build baseline, then add the one synthetic mapping-size
-  assertion and rerun the focused `host_map` gate.
+  test below. Current source hashes match the fresh independent root build/test baseline in E325;
+  add the one synthetic mapping-size assertion, then run a fresh focused `host_map` build and CTest.
 - Remaining risks: any result applies only to this sample and does not establish global TOC
   semantics, integrity role, codec, runtime behavior, or game use. The native/API user changes
   and the Graft telemetry cache paths remain unmodified and outside publication.
@@ -47,7 +47,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 ## SRV-01 host-map requested versus page-rounded size — claimed
 
 - Task ID `SRV-01-HOST-MAP-REQUESTED-VS-PAGE-ROUNDED-SIZE-FIXTURE-01`, owned by `/root`; status
-  `ACTIVE`, zero implementation attempts and zero failed tries. The bounded change is one synthetic
+  `ACTIVE`, baseline verified by source hashes, zero implementation attempts and zero failed tries. The bounded change is one synthetic
   case in `native/tests/test_host_map.cpp` using request size `0x200001` bytes.
 - The test will assert `MappedRegion.region.size` preserves the requested value while
   `HostMapping.size` equals the host-page-rounded mapping length derived from `sysconf(_SC_PAGESIZE)`
@@ -56,6 +56,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   cases use page-aligned 1 MiB and 2 MiB sizes, so they do not distinguish the two values.
 - The claim checkpoint is
   [docs/checkpoints/2026-10-22-root-srv01-host-map-requested-vs-rounded-claim.md](docs/checkpoints/2026-10-22-root-srv01-host-map-requested-vs-rounded-claim.md).
+- Current `native/tests/test_host_map.cpp`, `native/core/host_map.cpp`, and `native/core/host_map.hpp`
+  hashes are `bc966cfaf4c3a7367008ee44209558aba2a549f356887418c1124c7d7f9210de`,
+  `0ce60c6af1e2d4f9f91f5882326bf516f20dd5e58f936f99b0efc67cbb582f72`, and
+  `283c3b8f0c98ccb48cb756e9e16ba4fd54c98babc1ea60b942f2cc2276c30bbe`. These equal E325's final
+  test/helper/header hashes; E325 includes an independent fresh Debug/Ninja build and focused CTest
+  pass 1/1. Reusing that exact-source baseline avoids a redundant pre-change build.
 - This claim and the DATA-02 completion summary were published in `fdfd466c1269e786db29769a974c3e9ac2a7a84d`; E344 records the staged and full-path audits.
 - Risk boundary: synthetic `map_region`/`mmap` behavior only; it does not establish allocator
   reachability or game behavior. Keep the existing 512 MiB alignment and production code unchanged.
