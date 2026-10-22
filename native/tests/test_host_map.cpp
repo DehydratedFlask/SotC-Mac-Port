@@ -29,6 +29,7 @@ int main() {
     CHECK(reserve_alignment(1) == 0x100000u);
     CHECK(reserve_alignment(0x10000) == 0x100000u);
     CHECK(reserve_alignment(0x100000) == 0x100000u);
+    CHECK(reserve_alignment(0xffff0001u) == 0x100000u);
     CHECK(reserve_alignment(0x100001u) == 0x200000u);
     CHECK(reserve_alignment(0x300000u) == 0x300000u);
     CHECK(reserve_alignment(0x20000000) == 0x20000000u);  // Shadow edx

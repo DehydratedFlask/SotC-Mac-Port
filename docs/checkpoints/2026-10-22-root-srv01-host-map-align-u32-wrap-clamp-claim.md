@@ -23,4 +23,29 @@
 - Observation versus inference: generated project folder inventory matches its check-mode output; the source wiring graph is synchronized. Trail reports its optional deep meaning layer unbuilt; it does not affect the successful wiring graph check.
 - Remaining risks: synthetic `reserve_alignment` arithmetic only; validity and caller reachability of the extreme input remain unknown.
 - Next exact action: stage only the allowlisted claim documents, run staged and full publication audits, then fetch/check divergence, commit, push, and verify the remote before any source edit.
-- Task status / attempt count: `ACTIVE`; zero implementation attempts; zero failed tries. The claim publication is still pending.
+- Task status / attempt count: `ACTIVE`; claim published in `9718f056`; zero implementation attempts; zero failed tries. See the publication checkpoint below.
+
+## Claim publication checkpoint
+
+- Time / timezone: 2026-10-22 04:33 CDT (America/Chicago).
+- Agent / integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`).
+- Task ID: `SRV-01-HOST-MAP-ALIGNMENT-UINT32-WRAP-CLAMP-FIXTURE-01`; implementation attempts: 0; failed tries: 0.
+- Files changed for the publication record: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, and this checkpoint. Source edit is still absent. User API CMake change and untracked host directory were not staged.
+- Exact command results: `git add HANDOFF.md docs/EVIDENCE.md docs/FOLDERS.md docs/TASKS.md docs/checkpoints/2026-10-22-root-srv01-host-map-align-u32-wrap-clamp-claim.md`; `python3 -I scripts/audit_publish_paths.py` exited 0 and accepted 5 staged paths; `python3 -I scripts/audit_publish_paths.py --all` exited 0 and accepted 1,735 paths; `git fetch origin` exited 0; `git rev-list --left-right --count main...origin/main` reported `0 0`; `git commit -m "docs: claim host map alignment wrap fixture"` created `9718f056d8851f27bf33586fad615ba3ddd8a5f5`; `git push origin main` exited 0; post-push fetch and divergence reported 0/0; post-push full audit accepted 1,735 paths. Exact log hashes are in E324.
+- Observation versus inference: remote main contains the claim commit; the 0/0 graph confirms no local/remote commit divergence at verification. Only `native/api/CMakeLists.txt` and `native/api/host/` remain in status, both user-owned and outside the publication.
+- Remaining risks: synthetic wrap/clamp assertion only; extreme-input validity and caller reachability remain unknown.
+- Next exact action at that checkpoint: assign the one-line assertion in `native/tests/test_host_map.cpp` to `/root/next_fixture_scout_2`, then independently replay its focused build and CTest before updating completion evidence.
+- Task status at that checkpoint: `ACTIVE`, claim published, implementation gate clear; zero implementation attempts and zero failed tries.
+
+## Implementation completion checkpoint
+
+- Time / timezone: 2026-10-22 04:37 CDT (America/Chicago).
+- Agent / integrator: `/root`; implementation worker `/root/next_fixture_scout_2`.
+- Task ID: `SRV-01-HOST-MAP-ALIGNMENT-UINT32-WRAP-CLAMP-FIXTURE-01`; status `FIXTURE_VERIFIED`; one successful implementation attempt; zero failed tries.
+- Files changed: worker added exactly one assertion to `native/tests/test_host_map.cpp:32`; root updated `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, generated `docs/FOLDERS.md`, and this checkpoint. No production source, header, or CMake file changed. User-owned `native/api/CMakeLists.txt` and untracked `native/api/host/` remain untouched.
+- Worker exact commands/results: `cmake -S native -B local/build/native-worker-srv01-host-map-wrap-clamp-impl-20261022 -G Ninja -DCMAKE_BUILD_TYPE=Debug` exit 0, log SHA256 `d708c279d95517818991e76dad295c662b7b307bc9519eb477986f1f19ff1577`; `cmake --build local/build/native-worker-srv01-host-map-wrap-clamp-impl-20261022 --target test_host_map` exit 0, log SHA256 `ab797650bab7a952afbcede814e5c70a001c2d19400a93fa6f665f18ec38c402`; `ctest --test-dir local/build/native-worker-srv01-host-map-wrap-clamp-impl-20261022 --output-on-failure -R '^host_map$'` exit 0, 1/1, log SHA256 `7c0d6fefbb7ce72c26c15da46cac73a9bb3d709c6dfe9a515fb4463903fadaef`; `git diff --check` exit 0, empty log SHA256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+- Independent root exact commands/results: `cmake -S native -B local/build/native-root-srv01-host-map-align-u32-wrap-clamp-verify-20261022 -G Ninja -DCMAKE_BUILD_TYPE=Debug` exit 0, log SHA256 `7880d8cf8d8957160d4401ddde2cb64a3db36f2e699f1e19fc96d0d7ca95c2ac`; `cmake --build local/build/native-root-srv01-host-map-align-u32-wrap-clamp-verify-20261022 --target test_host_map` exit 0, log SHA256 `3c84a78cda9e1b2b8e5e9b1b9c6b252229020dda197bc0eb58ac608af16818f4`; `ctest --test-dir local/build/native-root-srv01-host-map-align-u32-wrap-clamp-verify-20261022 --output-on-failure -R '^host_map$'` exit 0, 1/1, log SHA256 `92e14321593b34edc08f06c18fbc83f718422afb77dd285af06b97da5a1d23fd`; `git diff --check` exit 0, empty log SHA256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
+- Final source SHA256: `native/tests/test_host_map.cpp` `bc966cfaf4c3a7367008ee44209558aba2a549f356887418c1124c7d7f9210de`; unchanged helper/header/CMake hashes match E325. Trail `grep 'reserve_alignment' --in native/` resolves the new line at `native/tests/test_host_map.cpp:L32`, log SHA256 `e0c23c34c183c2b64e67b49b6c46c252d06a166957cdae3a93fdf0219dcb791b`. Project-index generation/check and Trail wiring-check evidence is in E326.
+- Observation versus inference: both fresh focused tests pass with the assertion. The output value is consistent with the helper's 32-bit rounding wrap and minimum clamp; input validity and caller reachability are unknown.
+- Remaining risks: synthetic arithmetic fixture only; it does not prove a valid mapping request, allocator behavior, game callsite, or game behavior.
+- Next exact action: complete path audits and publish the verified test plus E324-E326 documentation; after that, review and baseline the separate CPU-01 math-constant guard-state candidate.
