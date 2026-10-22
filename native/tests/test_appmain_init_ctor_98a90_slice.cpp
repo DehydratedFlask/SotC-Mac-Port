@@ -15,6 +15,7 @@
 #include "core/init_sub_3be930.hpp"
 #include "core/input_table_551140.hpp"
 #include "core/inputtable_names_fixture.hpp"
+#include "core/mid_255340.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -81,7 +82,8 @@ int g_ctor_a30 = 0;
 int g_dtor_98a90 = 0;
 int g_dtor_3b40 = 0;
 int g_dtor_early = 0;
-int g_mid = 0;
+int g_mid_reg = 0;
+int g_mid_b60 = 0;
 int g_v40 = 0;
 
 void ctor_a30(void* obj) {
@@ -99,7 +101,8 @@ std::uint64_t hook_init_tb() {
     return 0xF8F8600000000001ULL;
 }
 
-void hook_mid(void*) { ++g_mid; }
+void hook_mid_26ea0(void*, const char*, const char*) { ++g_mid_reg; }
+void hook_mid_26b60(const char*) { ++g_mid_b60; }
 void hook_v40(void*, void*) { ++g_v40; }
 
 void* loadp(const void* base, std::size_t off) {
@@ -202,7 +205,7 @@ int main() {
     std::memset(setter.data(), 0xCC, setter.size());
 
     g_ctor_a30 = g_dtor_98a90 = g_dtor_3b40 = g_dtor_early = 0;
-    g_nonnull = g_f590 = g_init_tb = g_move = g_mid = g_v40 = 0;
+    g_nonnull = g_f590 = g_init_tb = g_move = g_mid_reg = g_mid_b60 = g_v40 = 0;
     ctor40_cell_2ee6778() = nullptr;
     prologue_gate_flag_byte() = 1;  // skip vslot+0x48
     prologue_debug_state_byte() = 0;
@@ -229,8 +232,9 @@ int main() {
     // sub_3be930 override null → lifted init_sub_3be930
 
     BaseInitialize255130Hooks bh{};
-    // vslot_30 null → slice forces lifted 0x534130 (precheck default true; lookups miss)
-    bh.mid_255340 = hook_mid;
+    // vslot_30 / mid null → slice forces lifted 0x534130 + 0x255340
+    bh.mid_255340_detail.register_26ea0 = hook_mid_26ea0;
+    bh.mid_255340_detail.register_26b60 = hook_mid_26b60;
     bh.vslot_40 = hook_v40;
 
     const std::uint64_t allocs_before = heap.alloc_count;
@@ -260,6 +264,9 @@ int main() {
     // lifted vslot_30: lookups miss → cells untouched; still returns true
     CHECK(vslot30_cell_boss_val_325e8b4() == -1);
     CHECK(vslot30_cell_stage_2dd9578() == -1);
+    // lifted mid 0x255340: 4x26ea0 + 1x26b60
+    CHECK(g_mid_reg == 4);
+    CHECK(g_mid_b60 == 1);
     CHECK(g_move == 0);
     CHECK(g_nonnull == 0);
     CHECK(g_init_tb == 1);
@@ -280,13 +287,15 @@ int main() {
 
     std::printf(
         "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+sub3be930+ensure3c2f70+"
-        "buf80+null_list+tsc323d0+ctor40_1ab550+gates2552d4+vslot534130+early+tail+base+"
-        "trivial+registry ok nested=%p ensure=%p obj40=%p gate_byte=%u tsc=0x%llx entries=%u "
-        "alloc_ops=%llu duration_us=%lld allocator=tip_AllocatorFront+FakeHeap "
-        "vslot533100/mid255340/255f60/1fc80/stackchk/ba40_listeners/plt/ensure_migrate/"
-        "f590/nonnull=NOT_modelled pr5_heap_merge=GAP\n",
+        "buf80+null_list+tsc323d0+ctor40_1ab550+gates2552d4+vslot534130+mid255340+early+tail+"
+        "base+trivial+registry ok nested=%p ensure=%p obj40=%p gate_byte=%u mid_reg=%d "
+        "tsc=0x%llx entries=%u alloc_ops=%llu duration_us=%lld "
+        "allocator=tip_AllocatorFront+FakeHeap "
+        "vslot533100/26ea0/26b60/272d0/255f60/1fc80/stackchk/ba40_listeners/plt/"
+        "ensure_migrate/nonnull=NOT_modelled pr5_heap_merge=GAP\n",
         r.ctor.nested_48, eb, r.tail.obj_40, static_cast<unsigned>(r.tail.gates.gate_byte),
-        static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
+        g_mid_reg, static_cast<unsigned long long>(r.ctor.tsc_value),
+        r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
         static_cast<long long>(us));
 
