@@ -3,7 +3,7 @@
 - Local date/time: 2026-10-21 23:39 CDT (America/Chicago).
 - Agent: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`), integrator.
 - Task: `AUD-01-CLASSIFIER-SHORT-PROBE-INPUT-FIXTURE-01`, child of `AUD-01`.
-- Status: `FIXTURE_VERIFIED`, publication pending; 1 successful implementation attempt, 0 failed
+- Status: `FIXTURE_VERIFIED`, published; 1 successful implementation attempt, 0 failed
   tries.
 - Scope: only `scripts/test_audio_headers.py` changed. The test
   `EntropyAndProbeTests.test_empty_probe_input_reports_too_short_for_every_offset` asserts that
@@ -49,6 +49,16 @@
   `completion-all-audit.log` SHA256
   `74d16f6e9372d8ac8166d9993fec6971b4a39d1991f67b38e254fc57a57969e6`.
   User-owned `native/api/CMakeLists.txt` and `native/api/host/` remain unstaged.
-- Exact next action: publish the allowlisted fixture and evidence, then continue to the next
-  independent bounded task after the read-only scout reports; leave the PSARC negative-limit choice
-  pending.
+- Publication checkpoint, 2026-10-21 23:40 CDT (America/Chicago), agent `/root`: claim commit
+  `0052594834883aa8186be8bc599c1b4f7af6d02e` preceded the source edit. Completion commit
+  `d1da5f14fb2bf862724d925555918b5d09024a9e` pushed to `origin/main`; `git fetch origin` succeeded
+  and `git rev-list --left-right --count HEAD...origin/main` returned `0 0`. Push log
+  `completion-push.log` SHA256
+  `40c3ff085a6621f534a9e897e1e6df19aedc58ca62e0a08ac2554f10c9c7b05f`, post-push fetch log
+  `completion-post-fetch.log` SHA256
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`, and divergence log
+  `completion-post-divergence.log` SHA256
+  `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d0247050325e7c5a3b2b3271c`.
+- Exact next action: wait for the user's thin Mach-O CPU policy choice before claiming the follow-on
+  launcher architecture task; continue scouting an independent task outside that decision. Keep the
+  PSARC negative-limit choice pending.
