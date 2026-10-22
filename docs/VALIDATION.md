@@ -28,7 +28,8 @@ Current checkpoint: G0 PARTIAL; G1 PARTIAL (see E404–E432 —
 `docs/checkpoints/2026-10-22-vslot-40-533100-shadowskels.md`,
 `docs/checkpoints/2026-10-22-vslot-40-533100-skels-attach.md`,
 `docs/checkpoints/2026-10-22-vslot-40-533100-shadowanims.md`,
-`docs/checkpoints/2026-10-22-vslot-40-533100-anims-attach.md`);
+`docs/checkpoints/2026-10-22-vslot-40-533100-anims-attach.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-shadowbanks.md`);
 G2-G6 NOT RUN. This is a plan, not a game execution report. G1 is not PASSED.
 Artifact/tool/source evidence is recorded in EVIDENCE.md; full asset/linkage schemas remain open.
 Baseline supplied by the coordinating agent on 2026-10-19, America/Chicago: M4 Pro, 12 CPU cores,
