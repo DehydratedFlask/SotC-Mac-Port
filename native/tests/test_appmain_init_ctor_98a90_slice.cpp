@@ -54,6 +54,7 @@
 #include "core/init_531d60_post_base_56fad0.hpp"
 #include "core/init_531d60_post_base_f90310.hpp"
 #include "core/init_531d60_post_base_ymm_bss.hpp"
+#include "core/init_531d60_post_base_ymm_intercell.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -202,6 +203,8 @@ alignas(32) std::uint8_t g_ymm_bss_dst4278[0x30]{};
 alignas(16) std::uint8_t g_ymm_bss_dst426c[12]{};
 alignas(32) std::uint8_t g_ymm_bss_dst42dc[0x30]{};
 alignas(4) std::uint8_t g_ymm_bss_dst4268[4]{};
+alignas(32) std::uint8_t g_ymm_ic_dst42a8[0x30]{};
+alignas(32) std::uint8_t g_ymm_ic_dst430c[0x30]{};
 alignas(8) std::uint8_t g_shadow_asset[0x40]{};
 alignas(8) std::uint8_t g_skels_asset[0x40]{};
 alignas(8) std::uint8_t g_anims_asset[0x40]{};
@@ -583,6 +586,8 @@ int main() {
     std::memset(g_ymm_bss_dst426c, 0x22, sizeof(g_ymm_bss_dst426c));
     std::memset(g_ymm_bss_dst42dc, 0x33, sizeof(g_ymm_bss_dst42dc));
     std::memset(g_ymm_bss_dst4268, 0x44, sizeof(g_ymm_bss_dst4268));
+    std::memset(g_ymm_ic_dst42a8, 0x55, sizeof(g_ymm_ic_dst42a8));
+    std::memset(g_ymm_ic_dst430c, 0x66, sizeof(g_ymm_ic_dst430c));
     stack_guard_value_cell() = 0xC4A4A70000000001ULL;
     std::memset(g_shadow_asset, 0, sizeof(g_shadow_asset));
     std::memset(g_skels_asset, 0, sizeof(g_skels_asset));
@@ -717,13 +722,19 @@ int main() {
     pb_ymm.dst_160426c = g_ymm_bss_dst426c;
     pb_ymm.dst_16042dc = g_ymm_bss_dst42dc;
     pb_ymm.dst_1604268 = g_ymm_bss_dst4268;
+    Init531d60PostBaseYmmIntercellCells pb_ic{};
+    // Sources are E457 seed destinations (post-seed contents).
+    pb_ic.src_1604278 = g_ymm_bss_dst4278;
+    pb_ic.src_16042dc = g_ymm_bss_dst42dc;
+    pb_ic.dst_16042a8 = g_ymm_ic_dst42a8;
+    pb_ic.dst_160430c = g_ymm_ic_dst430c;
 
     const std::uint64_t allocs_before = heap.alloc_count;
     const auto t0 = std::chrono::steady_clock::now();
     const auto r = run_appmain_init_ctor_98a90_slice(table, front, app.data(), nullptr, eh, th, ch,
                                                      bh, setter.data(), 0, 0x11, 0x22, 0x33, sh, pb,
                                                      pb56, pb5c, pb1290, pb56db, pb5b3, pb5b3c,
-                                                     pb_avx, pb7f, pb56fa, pbf9, pb_ymm);
+                                                     pb_avx, pb7f, pb56fa, pbf9, pb_ymm, pb_ic);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
@@ -1035,6 +1046,11 @@ int main() {
         std::memcpy(&d, g_ymm_bss_dst4268, 4);
         CHECK(d == 0x3f800000u);
     }
+    // E458: Init continue ymm inter-cell copy; stop before xmm / 0x26800
+    CHECK(r.post_base_ymm_intercell.ok);
+    CHECK(r.post_base_ymm_intercell.store_count == 2);
+    CHECK(std::memcmp(g_ymm_ic_dst42a8, g_ymm_bss_dst4278, 0x30) == 0);
+    CHECK(std::memcmp(g_ymm_ic_dst430c, g_ymm_bss_dst42dc, 0x30) == 0);
     CHECK(r.remainder.trivial_ok);
     CHECK(r.remainder.registry.status == RegistryInit531d60Status::ok);
     CHECK(r.remainder.registry.entry_count == kInputTable551140Count);
@@ -1059,7 +1075,7 @@ int main() {
         "cp3shadowprecache_attach+tail_140d90+stackchk+post_base_499f80+post_base_56dcb0+"
         "post_base_5c64c0+post_base_1290+post_base_56db70+post_base_5b3d00+post_base_5b3cf0+"
         "post_base_avx_bss+post_base_7f7220+post_base_56fad0+post_base_f90310+"
-        "post_base_ymm_bss+"
+        "post_base_ymm_bss+post_base_ymm_intercell+"
         "early+tail+base+trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
         "anims=%p banks=%p streams=%p rand=%p boss=%p cp3=%p csp=%p post_hit=%d miss_null=%d "
@@ -1067,12 +1083,12 @@ int main() {
         "banks_refc=%u banks_fail=%d streams_refc=%u streams_fail=%d rand_refc=%u rand_fail=%d "
         "boss_refc=%u boss_fail=%d cp3_fail=%d csp_fail=%d t140=%d schk=%d pb499=%d pb56=%d "
         "pb5c=%d pb1290=%d pb56db=%d pb5b3=%d pb5b3c=%d pbavx=%d pb7f=%d pb56fa=%d pbf9=%d "
-        "pbymm=%d "
+        "pbymm=%d pbic=%d "
         "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
         "vslot533100_hit/success_atexit/499f80_body/56dcb0_body/5c64c0_body/1290_body/"
-        "7f7220_body/f90310_plt_body/ymm_intercell/26800_body/f590_body/14c2f0_body/"
+        "7f7220_body/f90310_plt_body/xmm_seed/26800_body/f590_body/14c2f0_body/"
         "6a5370_body/6abcc0_body/"
         "21620_body/2779a0_body/42390_body/525080_body/2569d0_body/26ea0/26b60/272d0/"
         "255f60/f8f3a0_body/140d90_body/ba40_listeners/plt/ctor523bd0_body/"
@@ -1115,6 +1131,7 @@ int main() {
         r.post_base_56fad0.call_56fad0_count,
         r.post_base_f90310.call_f90310_count,
         r.post_base_ymm_bss.store_count,
+        r.post_base_ymm_intercell.store_count,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
