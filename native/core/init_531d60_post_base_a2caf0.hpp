@@ -12,7 +12,8 @@
 //
 // Claimed: call-site control flow pin only.
 // NOT modelled: mov rdi,[r13] prep; 0xa2caf0 body; following second
-// mov rdi,[r13] / stack prep. PR #5 cite-only.
+// mov rdi,[r13] / stack prep / call 0xa2ed00 (call-site claimed separately
+// as E489; body still demoted). PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
