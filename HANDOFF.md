@@ -25,10 +25,10 @@ or Metal gameplay is demonstrated.
   `tools/lift/check_f531d60_post_base_avx_bss.py`; checkpoint
   `docs/checkpoints/2026-10-22-init-531d60-post-base-avx-bss.md`; EVIDENCE E453;
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-post-base-avx-bss-20261022/` (manifest/capture
-  hashes in docs commit).
-- Observation: measured `pbavx=2` + mid_reg=4 → 275 registry. `0x7f7220` NOT
-  modelled.
+  `local/validation/appmain-init-post-base-avx-bss-20261022/` (manifest
+  `67b6755a…` at tip `0f2e840`; capture `13f94f73…`).
+- Observation: feat tip `0f2e840`; docs tip `fcd3f75`; measured `pbavx=2` + mid_reg=4 → 275 registry.
+  `0x7f7220` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_avx_bss.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
   PASS; private capture exit 0; `check_ctor_slots` still **155**.
