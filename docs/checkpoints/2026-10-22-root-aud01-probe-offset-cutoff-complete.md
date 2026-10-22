@@ -30,11 +30,14 @@
   to offsets. They do not establish asset parsing, codec identity, archive behavior, or game
   playback.
 - Attempt count: one successful test-only implementation attempt; 0 failed implementation tries.
-- Completion publication: pending in this checkpoint; the implementation and evidence are ready
-  for allowlisted audit, commit, and push. Documentation sync will record the resulting commit and
-  post-push evidence.
+- Completion commit: `f82942d7688f8fdc88274540ab72ebf38eeedcf6`, pushed to `origin/main`. The staged
+  audit accepted 6 paths and full audit accepted 1,706. Fresh fetch/divergence returned 0/0 and
+  post-push full audit accepted 1,706. Publication output is retained in
+  `local/validation/20261022-root-fixture-baselines/aud01-probe-offset-cutoff-publication.log`,
+  SHA-256 `57a47a09232b7e9e9c8032802654962fa31e3a7a1864cdac3c5a5b22675e1aff`.
 - Working-tree boundary: existing user-owned `native/api/CMakeLists.txt` and `native/api/host/`
   remain untouched and outside this task.
 - Remaining risks: none for this synthetic fixture. No subsystem gate changes.
-- Next exact action: run staged and full publication audits for the owned test and port docs, commit
-  and push the completion checkpoint, then record the commit/fetch evidence in a docs-sync commit.
+- Next exact action: verify the scout's `RE-01-UNWRAP-IDENTITY-SIDECAR-SYMLINK-ALIAS-FIXTURE-01`
+  candidate against the live task ledger, parent specification, and wrapper source, then claim it
+  before editing if it remains distinct.
