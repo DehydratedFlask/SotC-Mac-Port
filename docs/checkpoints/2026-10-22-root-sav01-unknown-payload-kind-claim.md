@@ -1,11 +1,11 @@
 # Checkpoint: SAV-01-CHUNK-CODEC-UNKNOWN-PAYLOAD-KIND-FIXTURE-01 — claimed
 
-- Time / timezone: 2026-10-22 03:04 CDT (America/Chicago)
+- Time / timezone: 2026-10-22 03:07 CDT (America/Chicago)
 - Agent and integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`);
   implementation assigned to `/root/next_fixture_scout_2` after claim publication.
 - Task / gate / status: `SAV-01-CHUNK-CODEC-UNKNOWN-PAYLOAD-KIND-FIXTURE-01`, child of
-  `SAV-01-NATIVE-STREAM-01`; `ACTIVE`, baseline complete, implementation not started, zero failed
-  tries.
+  `SAV-01-NATIVE-STREAM-01`; `ACTIVE`, baseline complete, worker implementation in progress, zero
+  failed tries.
 - Ownership / scope: only `native/tests/test_save_chunk_codec.cpp`, inside
   `test_decode_by_spec_every_kind()`. Add a synthetic chunk whose tag matches a `ChunkSpec` with
   `kind = static_cast<PayloadKind>(0xff)` and assert `decode_chunk_by_spec()` returns
@@ -14,7 +14,7 @@
   `native/core/save_chunk_codec.cpp`, `native/core/save_chunk_codec.hpp`, and
   `native/CMakeLists.txt` hashes `e9c3f01b321377fccebc2feab24ada7238ad2ce1aa0d992277d503b97978598d`,
   `aabdd64ab2ce3cbf8d359572e1b2de958e984ddc4aac6925ec8337253a76f88a`, and
-  `cd46d94590f585151e4d53ef7cf08f62268b3358cd9aa1fdfb41244a7dbe83`.
+  `cd46d94590f58515152155658f609cd11ef58aeb9a45272f744402edcdeeb01f`.
 - Exact baseline commands, CWD `/Volumes/Extra/SoC Mac Native`, AppleClang 21 / Ninja; all exit 0:
   `cmake -S native -B local/build/native-root-sav01-unknown-payload -G Ninja -DCMAKE_BUILD_TYPE=Debug`;
   `cmake --build local/build/native-root-sav01-unknown-payload --target test_save_chunk_codec`;
@@ -43,6 +43,12 @@
 - Failed tries: zero. No implementation edits or dependency changes. `INSTALL_LOG.md` unchanged.
 - Remaining risk: no unresolved implementation choice for the one assertion; root will replay the
   changed focused target after the worker returns.
-- Next exact action: publish this allowlisted claim checkpoint, then ask
-  `/root/next_fixture_scout_2` to edit only `native/tests/test_save_chunk_codec.cpp` and run the
-  focused build and `save_chunk_codec` CTest.
+- Claim publication: commit `ff63a179c0c9000a6a9a71472741c5657ffee9ef` is pushed to `origin/main`;
+  pre/post fetch divergence was 0/0; explicit audits accepted 5 paths and full audits accepted
+  1,723 tracked paths. See E298 for hashes. User-owned `native/api/CMakeLists.txt` and
+  `native/api/host/` remain unstaged.
+- Current source state: `/root/next_fixture_scout_2` has started the one-file change in
+  `native/tests/test_save_chunk_codec.cpp`; the diff is unverified and the worker has not returned
+  its targeted check result. This is one implementation attempt in progress; failed tries remain 0.
+- Next exact action: wait for the worker's focused build and `save_chunk_codec` CTest result, then
+  independently configure/build and run the same focused CTest from a fresh root build directory.
