@@ -89,7 +89,7 @@ Vslot40_533100StreamsAttachResult vslot_40_533100_streams_attach(
     }
     ++out.dtor_f590_count;
 
-    // next path @ 0x533b62 — NOT modelled
+    // shadowrandomevents @ 0x533b62 — NOT modelled here
     out.ok = (out.dtor_f590_count == 1) && (out.installed || prev == loaded);
     return out;
 }

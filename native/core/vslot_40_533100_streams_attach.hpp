@@ -4,6 +4,7 @@
 //   join @ 0x533ac6: install loaded into *[f08+0x50] (replace + refcount)
 //   flag byte at f08+0x58; optional notify if success; release temps; 0xf590
 //   // stop before shadowrandomevents @ 0x533b62
+//     (see vslot_40_533100_shadowrandomevents.*)
 //
 // Always-on after E434 shadowstreams load-attempt. Prefer over success atexit
 // (flag-true only) and over deepen 0x14c2f0 / 0x6a5370 (already hooked).
@@ -11,7 +12,8 @@
 //
 // Claimed: fail-path + always-on install/cleanup control flow into f08+0x50.
 // NOT modelled: success atexit cluster (0xf8f3d0/0xf730/0x14c4a0/…);
-// bodies of 0x14d880/0x14d2d0/0x14ccc0/0x95580; next path. PR #5 cite-only.
+// bodies of 0x14d880/0x14d2d0/0x14ccc0/0x95580. Next path: shadowrandomevents.
+// PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
