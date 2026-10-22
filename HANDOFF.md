@@ -8,6 +8,12 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## 2026-10-22 orchestrator batch 8 — verified
+
+- SRV-01-ALLOCATOR-FRONT-PAGE-01 FIXTURE_VERIFIED (E391). **Concurrent-edit warning:** at ~08:48 another actor modified uncommitted `ROADMAP.md`, `native/core/startup_ctors.{cpp,hpp}` and `native/tests/test_startup_ctors.cpp` (wiring vec ce6fb0/ce67b0, slots 150/151) — not mine, left unstaged. With those edits plus the user's `native/api` changes, sanitized `sotc_core_api` aborts (UBSan bool load 255 in recursive_mutex.cpp); clean HEAD passes. Whoever owns the startup wiring should run it under `-DSOTC_SANITIZE=ON` before committing.
+- CPU-01-INPUTTABLE-551140-ANALYSIS-01 (E391): store region of ctor `0x551140` is pinnable; first destructor-chain lift target is `0x14d2d0`.
+- Next exact action: byte-pin `0x55141d..0x557fe4` and emit the 275-entry table as generated data (callbacks null); lift `0x14d2d0`; app-main startup-chain analysis is pending from the appmain subagent.
+
 ## 2026-10-22 orchestrator batch 7 — verified
 
 - CPU-01-14D880-CHAIN-01: seven functions lifted, root 309/309 + 8 checkers (E390). `ctor_14c9a0` supports only a null parent and aborts otherwise; four `__cxa_atexit` registrations are explicit documented omissions.
