@@ -9,7 +9,7 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Prologue255180Hooks& early_hooks, const Prologue255180TailHooks& tail_hooks,
     const Ctor98a90_3be050Hooks& ctor_hooks, const BaseInitialize255130Hooks& base_hooks,
     void* setter_obj, std::uint8_t flag_in, std::uint8_t set_a, std::uint8_t set_b,
-    std::uint8_t set_c) {
+    std::uint8_t set_c, const SingletonF08Hooks& singleton_hooks) {
     AppmainInitCtor98a90SliceResult out{};
     out.early = run_prologue_255180_early(alloc, early_hooks);
     if (!out.early.ok) {
@@ -58,6 +58,12 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
         out.ctor_40.field_0a = (s[0x0a] == 1);
         out.ctor_40.ok =
             out.ctor_40.derived_vt && out.ctor_40.cell_self && out.ctor_40.field_0a;
+    }
+
+    // E420: Init 0xf08 singleton install before base Initialize (OBS 0x531d84).
+    out.singleton = install_singleton_f08_531d84(alloc, singleton_hooks);
+    if (!out.singleton.ok) {
+        return out;
     }
 
     BaseInitialize255130Hooks hooks = base_hooks;

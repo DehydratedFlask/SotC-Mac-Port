@@ -9,7 +9,8 @@
 // flag pair + setters (0x5327a0..0x53297a) then registry fragment (0x532b0c..).
 //
 // Allocator: tip AllocatorFront + FakeHeap (same as E405). PR #5 heap E399–E403 cite-only.
-// NOT modelled: 0x255130, 0xf08 singleton, pad 0x1fc80/0x1e4c0, pools/listeners, idx 95.
+// NOT modelled: pad 0x1fc80/0x1e4c0, pools/listeners, idx 95.
+// (0xf08 singleton + 0x255130 are modelled on earlier Init slices.)
 #pragma once
 
 #include "allocator_front.hpp"

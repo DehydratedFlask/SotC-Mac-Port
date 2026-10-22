@@ -6,7 +6,7 @@
 //   byte setters: 0xa52b70 [rdi+0x01], 0xa599e0 [rdi+0x29], 0xa431e0 [rdi+0x51]
 //   splash hide PLT 0xf90310 (sceSystemServiceHideSplashScreen) → native no-op contract
 //
-// NOT modelled: base Initialize 0x255130, 0xf08 singleton install, 0x1fc80/0x1e4c0 pad path,
+// NOT modelled: 0x1fc80/0x1e4c0 pad path (0xf08 singleton + base Initialize are earlier slices),
 // pool/listener half of 0x52a220, remainder of Init. No leaf-vec; not idx 95; not in
 // recovered_constructors(). PR #5 heap untouched (cite-only).
 #pragma once
