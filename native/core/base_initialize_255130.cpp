@@ -37,6 +37,18 @@ bool base_initialize_255130(void* self, void* arg,
     // OBS 0x255160: call [rax+0x40] with rsi=arg
     if (hooks.vslot_40 != nullptr) {
         hooks.vslot_40(self, arg);
+    } else if (hooks.use_lifted_vslot_40_header) {
+        if (hooks.vslot_40_alloc == nullptr) {
+            return false;
+        }
+        const Vslot40_533100HeaderResult hr =
+            vslot_40_533100_header(*hooks.vslot_40_alloc, self, arg, hooks.vslot_40_detail);
+        if (hooks.vslot_40_out != nullptr) {
+            *hooks.vslot_40_out = hr;
+        }
+        if (!hr.ok) {
+            return false;
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true

@@ -12,12 +12,14 @@
 //   return true
 //
 // Appmain triage: vslots 6/8 = 0x534130 / 0x533100. E418 lifts 0x534130; E419 lifts
-// 0x255340; body of 0x533100 remains open. No leaf-vec; not idx 95;
+// 0x255340; E421 lifts bounded 0x533100 header (install only). No leaf-vec; not idx 95;
 // not in recovered_constructors(). PR #5 heap cite-only.
 #pragma once
 
+#include "allocator_front.hpp"
 #include "mid_255340.hpp"
 #include "vslot_30_534130.hpp"
+#include "vslot_40_533100_header.hpp"
 #include "xchg_store_u32_357f0.hpp"
 
 #include <cstddef>
@@ -45,8 +47,14 @@ struct BaseInitialize255130Hooks {
     void (*mid_255340)(void* self) = nullptr;
     bool use_lifted_mid_255340 = false;
     Mid255340Hooks mid_255340_detail{};
-    // Models vcall [vptr+0x40](self, arg) → 0x533100. Null → no-op. Body NOT modelled.
+    // Models vcall [vptr+0x40](self, arg) → 0x533100. If null and use_lifted_vslot_40_header
+    // (+ alloc), run E421 header install only. Else null → no-op.
     void (*vslot_40)(void* self, void* arg) = nullptr;
+    bool use_lifted_vslot_40_header = false;
+    AllocatorFront* vslot_40_alloc = nullptr;  // required when use_lifted_vslot_40_header
+    Vslot40_533100HeaderHooks vslot_40_detail{};
+    // Last header result when lifted (for measured slices).
+    Vslot40_533100HeaderResult* vslot_40_out = nullptr;
 };
 
 // Process-wide cell modelling original qword @ 0x2ea4718 (points at flag object).
