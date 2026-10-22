@@ -22,9 +22,11 @@ truncation, or growth; synthetic checks are in `scripts/test_psarc.py`.
 - Format: v1.4, `zlib`, 30-byte entries, 64 KiB blocks, flags 0xc, manifest = NUL-separated paths
   (entry 0). A block whose stored size equals its decoded size is raw (rule needed for pak0).
 - The TOC 16-byte value is neither MD5(path variants tried) nor MD5(content) on 39 sampled pak2
-  members; its meaning is UNKNOWN. A full pakN metadata-only count finds 64,108 unique values for
-  64,108 manifest rows, with no repeated values (E122). Uniqueness does not identify the algorithm,
-  input bytes or integrity role. Do not use it as an integrity check.
+  members; a separate full-payload sample of 17 pakN `sxd-high-entropy-8c0x` members also found
+  0/17 matches to MD5 of the complete decoded payload (E343). This is still sample-only; its
+  meaning is UNKNOWN. A full pakN metadata-only count finds 64,108 unique values for 64,108
+  manifest rows, with no repeated values (E122). Uniqueness does not identify the algorithm, input
+  bytes or integrity role. Do not use it as an integrity check.
 
 ## Overlay + case policy (DATA-02 slice, provisional)
 
