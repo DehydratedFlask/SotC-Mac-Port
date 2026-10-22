@@ -46,6 +46,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Vslot 0x533100 shadow attach (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-shadow-attach.md) | Shadowmodels attach fail-path + install; E427; G1 PARTIAL |
 | [Vslot 0x533100 shadowskels (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-shadowskels.md) | Shadowskels load-attempt; E428; G1 PARTIAL |
 | [Vslot 0x533100 skels attach (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-skels-attach.md) | Shadowskels attach fail-path + install f08+0x10; E429; G1 PARTIAL |
+| [Vslot 0x533100 shadowanims (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-shadowanims.md) | Shadowanims load-attempt; E430; G1 PARTIAL |
 | [FOLDERS](FOLDERS.md) | Generated public/source folder inventory; `scripts/project_index.py` |
 | [INSTALL_LOG](../INSTALL_LOG.md) | Existing and newly installed tools, downloads and removals |
 | [Checkpoint template](checkpoints/TEMPLATE.md) | Required record at each checkpoint |
