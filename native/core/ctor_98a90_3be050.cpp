@@ -137,14 +137,27 @@ Ctor98a90_3be050Result init_98a90_3be050(AllocatorFront& alloc, void* obj,
     std::memcpy(&out.tsc_value, base + kCtor98a90TscOffset, 8);
     out.tsc_stored = (out.tsc_value != 0);
 
-    std::uint64_t end28 = 0;
-    std::uint64_t begin28 = 0;
-    std::memcpy(&end28, base + 0x38, 8);
-    std::memcpy(&begin28, base + 0x28, 8);
-    if (((end28 - begin28) >> 3) <= 0xff) {
+    // OBS 0x3be0c7..0x3be0f3: capacity = ([+0x38]-[+0x28])/0xa8; ensure if <=0xff
+    std::uint64_t cap_ptr = 0;
+    std::uint64_t begin_ptr = 0;
+    std::memcpy(&cap_ptr, base + 0x38, 8);
+    std::memcpy(&begin_ptr, base + 0x28, 8);
+    if (ensure_3c2f70_elem_count(begin_ptr, cap_ptr) <= 0xff) {
         out.ensure_called = true;
         if (hooks.ensure_3c2f70 != nullptr) {
-            hooks.ensure_3c2f70(base + 0x20, 0x100);
+            hooks.ensure_3c2f70(base + kCtor98a90EnsureVec, 0x100);
+        } else {
+            EnsureCapacity3c2f70Hooks eh = hooks.ensure_detail;
+            if (eh.elem_dtor_f590 == nullptr) {
+                eh.elem_dtor_f590 = hooks.elem_dtor_f590;
+            }
+            const auto er =
+                ensure_capacity_3c2f70(alloc, base + kCtor98a90EnsureVec, 0x100, eh);
+            if (!er.ok) {
+                return out;
+            }
+            out.ensure_allocated = er.allocated;
+            out.ensure_buf = er.buf;
         }
     }
 
@@ -160,7 +173,7 @@ Ctor98a90_3be050Result init_98a90_3be050(AllocatorFront& alloc, void* obj,
     // OBS 0x3be1ce..: measured null-head early-out; non-null body hooked
     list_walk_head(obj, hooks, out);
 
-    out.ok = (out.nested_48 != nullptr) && out.list_self_stored;
+    out.ok = (out.nested_48 != nullptr) && out.list_self_stored && out.tsc_stored;
     return out;
 }
 
