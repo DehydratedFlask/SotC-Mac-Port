@@ -49,3 +49,12 @@
 - Observation versus inference: both fresh focused tests pass with the assertion. The output value is consistent with the helper's 32-bit rounding wrap and minimum clamp; input validity and caller reachability are unknown.
 - Remaining risks: synthetic arithmetic fixture only; it does not prove a valid mapping request, allocator behavior, game callsite, or game behavior.
 - Next exact action: complete path audits and publish the verified test plus E324-E326 documentation; after that, review and baseline the separate CPU-01 math-constant guard-state candidate.
+
+## Completion publication checkpoint
+
+- Time / timezone: 2026-10-22 04:41 CDT (America/Chicago).
+- Agent / integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`).
+- Task ID: `SRV-01-HOST-MAP-ALIGNMENT-UINT32-WRAP-CLAMP-FIXTURE-01`; status `FIXTURE_VERIFIED`; one successful implementation attempt; zero failed tries.
+- Exact publication result: commit `11c8e06db51cbfba8c4a13978793ef0f2e9792eb` was pushed with `git push origin main` (exit 0); post-push `git fetch origin` exited 0; `git rev-list --left-right --count main...origin/main` reported `0 0`; post-push `python3 -I scripts/audit_publish_paths.py --all` accepted 1,735 paths. Pre-push staged/full audits accepted 5/1,735. Complete log hashes are in E327.
+- Observation versus inference: remote main contains both the claim and completion commits; user-owned API files are the only remaining worktree changes. Publication does not strengthen the fixture beyond synthetic alignment helper arithmetic.
+- Next exact action: publish this audit record alongside the CPU-01 math-constant guard-state claim before any source edit.
