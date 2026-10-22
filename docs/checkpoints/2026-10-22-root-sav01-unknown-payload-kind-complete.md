@@ -70,5 +70,8 @@
   only user-owned `native/api/CMakeLists.txt` modified and `native/api/host/` untracked; neither was
   staged. The publication commit and logs are under
   `local/validation/20261022-root-fixture-baselines/`.
+- Follow-up documentation audit-record commit `724995e513d0237d2eada3fdcb98df677f8889d5` is
+  pushed and fetch-verified at 0/0 divergence. Its staged/full pre-push audits accepted 4/1,724
+  paths; post-push explicit/full audits accepted 4/1,724. Publication logs are recorded in E300.
 - Next exact action: claim and baseline `SRV-01-ALLOCATOR-ALIGN64K-UINT32-WRAP-FIXTURE-01` from
   the independent scout before assigning its one-file test change.
