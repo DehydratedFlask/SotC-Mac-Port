@@ -34,9 +34,15 @@
 - Cumulative failed tries and distinct hypotheses: 0 implementation tries / 0 failed tries.
 - Remaining risks / blockers: synthetic filesystem path only; parent stream payload semantics remain
   unknown; no real save compatibility claim. No blocker to the bounded test.
-- Next exact action: publish this claim checkpoint with staged and full path audits, then delegate
-  only `native/tests/test_save_stream_file.cpp` to `/root/next_fixture_scout_2` for the test and
-  target build plus focused CTest. Root reviews the diff and replays the same commands.
+- Claim commit `457601bde1c1f5931590a0c8fb1deb52d55e3e73` was pushed. Pre-push staged/full audits
+  accepted 5/1,709 paths; fresh fetch/divergence was 0/0. Post-push explicit/full audits accepted
+  5/1,709 paths. The staged-mode audit after commit returned exit 2 because the index had no staged
+  paths; the exact-path rerun passed. Publication log:
+  `local/validation/20261022-root-fixture-baselines/sav01-native-stream-file-symlink-publication.log`,
+  SHA256 `9872813b280b0a12ffe792b32f88add53c214ebba5cc4ae11c06e9255d480105`.
+- Next exact action: have `/root/next_fixture_scout_2` finish only
+  `native/tests/test_save_stream_file.cpp`, run the target build and focused CTest, and report its
+  diff and log hashes. Root reviews and independently replays the commands before task completion.
 - HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF, TASKS and EVIDENCE are
   updated; INSTALL_LOG has no fact change. `python3 scripts/project_index.py` and its `--check`
   both exited 0 at 24,080 folders. `trail build --check` exited 0 at 3,616 nodes / 1,240 files;
