@@ -1,12 +1,31 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:51 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:53 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## SRV-01 HostMapping non-null / zero-size empty state — claimed
+
+- Root claimed bounded task `SRV-01-HOST-MAP-EMPTY-NONNULL-ZERO-SIZE-FIXTURE-01` under `SRV-01`;
+  see [claim checkpoint](docs/checkpoints/2026-10-21-root-srv01-host-map-empty-nonnull-zero-claim.md).
+- The missing branch is `HostMapping::empty()` with a non-null `ptr` and `size == 0`; existing
+  fixtures cover zero-size map request rejection and the fully cleared post-unmap state. Baseline
+  `test_host_map` target build and focused CTest pass, with CTest 1/1.
+- Planned source scope is one assertion in `native/tests/test_host_map.cpp` using a local byte
+  address and zero size; it will not call mmap or alter production code. This pins the accessor
+  predicate only, not OS mapping or game behavior.
+- Status `ACTIVE`, 0 failed implementation tries; source is not edited yet. Implementation will be
+  delegated after the claim checkpoint is pushed. Existing user-owned `native/api/` changes remain
+  outside scope and unstaged.
+- Trail confirms the `HostMapping` predicate and indexes `native/tests/test_host_map.cpp` as a file
+  with `main`. The first project-index check found `local/indexes/folders.json` stale after adding
+  the checkpoint; a second `project_index.py` run and `--check` pass, with 24,076 folders indexed.
+- Exact next action: have the source worker add the assertion, then verify the focused target and
+  CTest, rebuild/check Trail, and publish only allowlisted task files.
 
 ## SRV-01 allocator rounding zero-input fixture — fixture verified
 
