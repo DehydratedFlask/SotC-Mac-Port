@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 22:20 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 22:22 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -21,6 +21,16 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   recorded there and are not new failures on this separate callsite task.
 - Claim baseline: `python3 -I local/re/evidence/re02-appmain-25a8d0/verify.py` exited 0; output
   SHA-256 `173a22dab0846535c1947627942087e98fe1a09c535b5db0615d6bdfa9b356cd`, empty stderr.
+- The claim is published in `866e7bf648976bf7f0f83943884c9df65d66922b`; `git push origin main`
+  succeeded. A post-push fetch confirms `HEAD == origin/main`, 0/0 divergence; log
+  `local/checkpoints/round78-re02-callsite-claim-postpush.log` SHA-256
+  `bfd7aecbaae70345740d2858e5dcba5c0eaa721ddabe08fa00a0172a2dba750b`. Staged/full path audits
+  accepted 4/1,660 paths; folder index is current at 19,269 folders and Trail wiring graph check
+  passes at 3,580 nodes.
+- A later `python3 scripts/project_index.py --check` briefly reported stale
+  `local/indexes/folders.json` after the new private evidence directory was created. Regeneration
+  returned 19,269 folders and the immediate recheck passed; this was a private index count update,
+  not a public source or task failure.
 - Exact next action: isolate reaching-register and vtable-slot evidence for `0x25aa06`; verify each
   instruction and data mapping independently, then report either a unique static target or a
   verifier-backed unresolved edge with the exact missing evidence.
