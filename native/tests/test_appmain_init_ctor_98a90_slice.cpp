@@ -37,6 +37,7 @@
 #include "core/vslot_40_533100_shadowbossmusic.hpp"
 #include "core/vslot_40_533100_bossmusic_attach.hpp"
 #include "core/vslot_40_533100_cp3characters.hpp"
+#include "core/vslot_40_533100_cp3characters_attach.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -155,6 +156,8 @@ int g_v40_boss_attach_f590 = 0;
 int g_v40_cp3_notify = 0;
 int g_v40_cp3_14c2f0 = 0;
 int g_v40_cp3_load = 0;
+int g_v40_cp3_14ccc0 = 0;
+int g_v40_cp3_attach_f590 = 0;
 alignas(8) std::uint8_t g_shadow_asset[0x40]{};
 alignas(8) std::uint8_t g_skels_asset[0x40]{};
 alignas(8) std::uint8_t g_anims_asset[0x40]{};
@@ -327,6 +330,8 @@ void* hook_v40_cp3_load(void* out_slot, void*, void*) {
     std::memcpy(out_slot, &p, sizeof(void*));
     return p;
 }
+void hook_v40_cp3_14ccc0(void*) { ++g_v40_cp3_14ccc0; }
+void hook_v40_cp3_attach_f590(void*) { ++g_v40_cp3_attach_f590; }
 
 void* loadp(const void* base, std::size_t off) {
     void* p = nullptr;
@@ -423,11 +428,14 @@ int main() {
     CHECK(load_inputtable_names_fixture_default(fix));
     CHECK(apply_inputtable_names_fixture(table, fix));
 
-    // Join installs at self+0x3b60; prologue min ends exactly at that offset.
+    // Join @ self+0x3b60; cp3 attach slot/flag @ self+0x3cb8/+0x3cc0.
+    constexpr std::size_t kAppBytesJoin = kVslot40JoinSlotOff + sizeof(void*);
+    constexpr std::size_t kAppBytesCp3 =
+        static_cast<std::size_t>(kVslot40Cp3charactersAttachFlagOff) + 1;
     constexpr std::size_t kAppBytes =
-        (kPrologueAppMinBytes > kVslot40JoinSlotOff + sizeof(void*))
-            ? kPrologueAppMinBytes
-            : (kVslot40JoinSlotOff + sizeof(void*));
+        (kPrologueAppMinBytes > kAppBytesJoin)
+            ? ((kPrologueAppMinBytes > kAppBytesCp3) ? kPrologueAppMinBytes : kAppBytesCp3)
+            : ((kAppBytesJoin > kAppBytesCp3) ? kAppBytesJoin : kAppBytesCp3);
     std::vector<std::uint8_t> app(kAppBytes, 0);
     std::array<std::uint8_t, 0x60> setter{};
     std::memset(setter.data(), 0xCC, setter.size());
@@ -453,6 +461,7 @@ int main() {
     g_v40_boss_notify = g_v40_boss_14c2f0 = g_v40_boss_load = 0;
     g_v40_boss_14ccc0 = g_v40_boss_attach_f590 = 0;
     g_v40_cp3_notify = g_v40_cp3_14c2f0 = g_v40_cp3_load = 0;
+    g_v40_cp3_14ccc0 = g_v40_cp3_attach_f590 = 0;
     std::memset(g_shadow_asset, 0, sizeof(g_shadow_asset));
     std::memset(g_skels_asset, 0, sizeof(g_skels_asset));
     std::memset(g_anims_asset, 0, sizeof(g_anims_asset));
@@ -541,6 +550,8 @@ int main() {
     bh.vslot_40_cp3characters_detail.notify_95580 = hook_v40_cp3_notify;
     bh.vslot_40_cp3characters_detail.path_14c2f0 = hook_v40_cp3_14c2f0;
     bh.vslot_40_cp3characters_detail.load_vslot18 = hook_v40_cp3_load;
+    bh.vslot_40_cp3characters_attach_detail.release_14ccc0 = hook_v40_cp3_14ccc0;
+    bh.vslot_40_cp3characters_attach_detail.dtor_f590 = hook_v40_cp3_attach_f590;
 
     SingletonF08Hooks sh{};
     sh.ctor_523bd0 = hook_f08_ctor;
@@ -744,6 +755,14 @@ int main() {
     CHECK(g_v40_cp3_load == 1);
     CHECK(r.vslot_40_cp3characters.loaded == g_cp3_asset);
     CHECK(r.vslot_40_cp3characters.f08 == r.singleton.obj);
+    // E441: cp3Characters attach fail-path + install into self+0x3cb8
+    CHECK(r.vslot_40_cp3characters_attach.ok);
+    CHECK(r.vslot_40_cp3characters_attach.took_fail_path);
+    CHECK(r.vslot_40_cp3characters_attach.installed);
+    CHECK(r.vslot_40_cp3characters_attach.slot_after == g_cp3_asset);
+    CHECK(loadp(app.data(), kVslot40Cp3charactersAttachSlotOff) == g_cp3_asset);
+    CHECK(g_v40_cp3_attach_f590 == 1);
+    CHECK(g_v40_cp3_14ccc0 == 1);
     CHECK(g_move == 0);
     CHECK(g_nonnull == 0);
     CHECK(g_init_tb == 1);
@@ -768,12 +787,12 @@ int main() {
         "vslot533100_header+post1fc80+miss_rfps+join_pos+gfx2ee2d00+shadowmodels+attach+"
         "shadowskels+skels_attach+shadowanims+anims_attach+shadowbanks+banks_attach+"
         "shadowstreams+streams_attach+shadowrandomevents+randomevents_attach+shadowbossmusic+"
-        "bossmusic_attach+cp3characters+early+tail+base+trivial+registry "
+        "bossmusic_attach+cp3characters+cp3characters_attach+early+tail+base+trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
         "anims=%p banks=%p streams=%p rand=%p boss=%p cp3=%p post_hit=%d miss_null=%d "
         "marker=0x%x refc=%u fail=%d skels_refc=%u skels_fail=%d anims_refc=%u anims_fail=%d "
         "banks_refc=%u banks_fail=%d streams_refc=%u streams_fail=%d rand_refc=%u rand_fail=%d "
-        "boss_refc=%u boss_fail=%d gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
+        "boss_refc=%u boss_fail=%d cp3_fail=%d gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
         "vslot533100_hit/success_atexit/next_path/14c2f0_body/6a5370_body/6abcc0_body/"
@@ -801,6 +820,7 @@ int main() {
         r.vslot_40_randomevents_attach.took_fail_path ? 1 : 0,
         r.vslot_40_shadowbossmusic.refcount_after,
         r.vslot_40_bossmusic_attach.took_fail_path ? 1 : 0,
+        r.vslot_40_cp3characters_attach.took_fail_path ? 1 : 0,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
