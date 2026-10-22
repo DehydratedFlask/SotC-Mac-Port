@@ -49,7 +49,9 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBaseCell2eff450Cells& post_base_cell_2eff450_cells,
     const Init531d60PostBaseCell2eff450Hooks& post_base_cell_2eff450_hooks,
     const Init531d60PostBase17070U2Hooks& post_base_17070_u2_hooks,
-    const Init531d60PostBase53fd10Hooks& post_base_53fd10_hooks) {
+    const Init531d60PostBase53fd10Hooks& post_base_53fd10_hooks,
+    const Init531d60PostBaseCell2eff448Cells& post_base_cell_2eff448_cells,
+    const Init531d60PostBaseCell2eff448Hooks& post_base_cell_2eff448_hooks) {
     AppmainInitCtor98a90SliceResult out{};
     out.early = run_prologue_255180_early(alloc, early_hooks);
     if (!out.early.ok) {
@@ -347,6 +349,12 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     // E484: always-on Init continue — first 0x53fd10 call-site; mov-rbx prep NOT modelled.
     out.post_base_53fd10 = init_531d60_post_base_53fd10(post_base_53fd10_hooks);
     if (!out.post_base_53fd10.ok) {
+        return out;
+    }
+    // E485: always-on Init continue — lea r14 / cell-install @ 0x2eff448.
+    out.post_base_cell_2eff448 = init_531d60_post_base_cell_2eff448(
+        post_base_cell_2eff448_cells, post_base_cell_2eff448_hooks);
+    if (!out.post_base_cell_2eff448.ok) {
         return out;
     }
     out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,
