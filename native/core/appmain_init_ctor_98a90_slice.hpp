@@ -43,6 +43,7 @@
 #include "init_531d60_post_base_ymm_reload.hpp"
 #include "init_531d60_post_base_26800_f590.hpp"
 #include "init_531d60_post_base_sbj.hpp"
+#include "init_531d60_post_base_sboj.hpp"
 #include "input_table_551140.hpp"
 #include "prologue_255180.hpp"
 #include "singleton_f08_531d84.hpp"
@@ -109,6 +110,7 @@ struct AppmainInitCtor98a90SliceResult {
     Init531d60PostBaseYmmReloadResult post_base_ymm_reload{};
     Init531d60PostBase26800F590Result post_base_26800_f590{};
     Init531d60PostBaseSbjResult post_base_sbj{};
+    Init531d60PostBaseSbojResult post_base_sboj{};
     AppmainInitRemainderSliceResult remainder{};
 };
 
@@ -134,6 +136,7 @@ struct AppmainInitCtor98a90SliceResult {
     const Init531d60PostBaseXmmSeedCells& post_base_xmm_seed_cells = {},
     const Init531d60PostBaseYmmReloadCells& post_base_ymm_reload_cells = {},
     const Init531d60PostBase26800F590Hooks& post_base_26800_f590_hooks = {},
-    const Init531d60PostBaseSbjHooks& post_base_sbj_hooks = {});
+    const Init531d60PostBaseSbjHooks& post_base_sbj_hooks = {},
+    const Init531d60PostBaseSbojHooks& post_base_sboj_hooks = {});
 
 }  // namespace sotc

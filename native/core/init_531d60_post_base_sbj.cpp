@@ -20,7 +20,7 @@ Init531d60PostBaseSbjResult init_531d60_post_base_sbj(
     }
     ++out.call_f590_count;
 
-    // Next: "Shadow Boss Outro Jump" string pair @ 0x531fe2 — NOT modelled here.
+    // Next: "Shadow Boss Outro Jump" string pair @ 0x531fe2 — E463; not this fragment.
     out.ok = (out.call_26800_count == 1) && (out.call_f590_count == 1);
     return out;
 }
