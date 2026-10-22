@@ -256,9 +256,8 @@ struct StartupState {
     // an atexit cleanup). See registration_thunks.hpp for what is and is not modelled.
     std::array<DescriptorRegistration, kRegistrationThunkCount> thunk_registrations{};
 
-    // Slots 24-47 REGISTERED-AHEAD (CPU-01-NATIVE-SLOT24-47-01): entry [i] is constructor-table index
-    // 24 + i. Only registered_ahead_constructors() / init_registration_thunk_ahead() touch this array;
-    // production recovered_constructors() still omits 24-47 (next family after slot 23).
+    // Slots 24-47 (descriptor + mutex + atexit family): entry [i] is constructor-table index 24 + i.
+    // Owned by init_registration_thunk_ahead; now on the production path after slot 23.
     std::array<DescriptorRegistration, kAheadRegistrationCount> ahead_registrations{};
 
     // Slot 21 / RVA 0x00ee1130: byte-exact 128-byte constant table (cell meanings unknown).
@@ -295,10 +294,8 @@ std::span<const CtorSlot> recovered_constructors() noexcept;
 // REGISTERED-AHEAD table: constructor-table indices 24..47 (the remaining 24 members of the 34-slot
 // descriptor + mutex + atexit family), all with real registration callbacks, in original order.
 //
-// TEST / CHECKER USE ONLY. Indices 24-47 remain outside recovered_constructors() until that family
-// is claimed on the production path. Slot 23 is recovered via private name fixture
-// (init_slot23_leaf_e71990). Running this ahead table exercises 24..47 without proving full startup.
-// tools/lift/check_ctor_slots.py enforces the production-list boundary.
+// Convenience span of indices 24-47 (also registered in recovered_constructors). Focused tests may
+// run this view alone; production path uses recovered_constructors().
 std::span<const CtorSlot> registered_ahead_constructors() noexcept;
 
 }  // namespace sotc

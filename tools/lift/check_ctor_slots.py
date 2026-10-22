@@ -79,8 +79,10 @@ assert prefix[11][:3] == (0xf09160, 11, False), "index 11 RVA 0xf09160 must be r
 assert prefix[23][:3] == (0xe71990, 23, False), "index 23 RVA 0xe71990 must be recovered"
 # Production table must not carry explicit null rows (fail-visible is via init_failed on missing fixture).
 assert not [row for row in rows if row[2]], "recovered_constructors() must not contain nullptr callbacks"
-# Indices 24-47 (descriptor + mutex + atexit family, run 24-47) are not recovered and must not be registered.
-assert not [row for row in rows if 24 <= row[1] <= 47], "indices 24-47 must stay unregistered"
+# Indices 24-47 (descriptor + mutex + atexit family) are on the production path after Phase B.
+family_24_47 = [row for row in rows if 24 <= row[1] <= 47]
+assert [row[1] for row in family_24_47] == list(range(24, 48)), "indices 24-47 must be registered contiguously"
+assert all(not row[2] for row in family_24_47), "indices 24-47 must have callbacks"
 # Row 11 must be the real slot-11 callback, not an empty lambda.
 slot11_lines = [l for l in array_match.group(1).splitlines() if re.match(r"^\s*\{\s*0xf09160\s*,\s*11\s*,", l)]
 assert len(slot11_lines) == 1 and "init_clothing_physical_mesh_descriptor(s)" in slot11_lines[0], (
@@ -99,6 +101,14 @@ assert len(slot21_lines) == 1 and "init_const_table_ee1130(s.const_table_ee1130)
 slot23_lines = [l for l in source_lines if re.match(r"^\s*\{\s*0xe71990\s*,\s*23\s*,", l)]
 assert len(slot23_lines) == 1 and "init_slot23_leaf_e71990(s)" in slot23_lines[0], (
     "slot 23 must call init_slot23_leaf_e71990")
+AHEAD = {24: 0xe56b70, 25: 0xe55f10, 26: 0xe55240, 27: 0xe54a30, 28: 0xe53a10, 29: 0xe52a20, 30: 0xe52150,
+         31: 0xe518e0, 32: 0xe510e0, 33: 0xe50980, 34: 0xe500b0, 35: 0xe4f840, 36: 0xe4f040, 37: 0xe4e8e0,
+         38: 0xe4e010, 39: 0xe4d7a0, 40: 0xe4cfa0, 41: 0xe4c840, 42: 0xe4bf10, 43: 0xe4b7b0, 44: 0xe4afb0,
+         45: 0xe47670, 46: 0xe467e0, 47: 0xe459e0}
+for ahead_index, ahead_rva in AHEAD.items():
+    lines = [l for l in source_lines if re.match(rf"^\s*\{{\s*{ahead_rva:#x}\s*,\s*{ahead_index}\s*,", l)]
+    assert len(lines) == 1 and f"init_registration_thunk_ahead(s, {ahead_index})" in lines[0], (
+        f"slot {ahead_index} must call init_registration_thunk_ahead(s, {ahead_index})")
 assert [(rva, index) for rva, index, _, _ in rows if rva in (0xd32720, 0xd2ffe0)] == [
     (0xd32720, 119),
     (0xd2ffe0, 120),
@@ -204,7 +214,7 @@ block_stores_ok(image.read(0xf08f00, 556), "reset 0xf08f00")
 print(
     f"OK: ELF sha256={elf_digest}; constructor table start={TABLE_START:#x} "
     f"count={TABLE_COUNT} sha256={table_digest}; verified {len(rows)} registered RVA/index pairs; "
-    "slots 0-23 are recovered (slot 11 byte anchors + 12 array block offsets/strides; slots 12-19 body "
-    "digests + ELF-table RVAs for the native registration table; slot 23 private name fixture); "
-    "indices 24-47 remain unregistered (next production gap after contiguous 0-23)"
+    "slots 0-47 are recovered (slot 11 byte anchors + 12 array block offsets/strides; slots 12-19 body "
+    "digests + ELF-table RVAs; slot 23 private name fixture; slots 24-47 ahead-family on production); "
+    "next production gap is the first missing index after 47 (currently 55 among later registered rows)"
 )

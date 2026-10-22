@@ -65,8 +65,34 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xee1130, 21, [](StartupState& s) noexcept { init_const_table_ee1130(s.const_table_ee1130); }},
         {0xea52f0, 22, [](StartupState& s) noexcept { init_ea52f0(s.ea52f0); }},
         // Slot 23 / RVA 0x00e71990: private asset/fixture import of 14 name strings + kLeafE71990Hash.
-        // Missing fixture → init_failed (fail-visible). Indices 24-47 stay in registered_ahead only.
+        // Missing fixture → init_failed (fail-visible).
         {0xe71990, 23, [](StartupState& s) noexcept { (void)init_slot23_leaf_e71990(s); }},
+        // Slots 24-47: descriptor + mutex + atexit family (same contract as 12-19). Promoted from the
+        // former registered-ahead table once slot 23 cleared (Phase B).
+        {0xe56b70, 24, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 24); }},
+        {0xe55f10, 25, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 25); }},
+        {0xe55240, 26, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 26); }},
+        {0xe54a30, 27, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 27); }},
+        {0xe53a10, 28, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 28); }},
+        {0xe52a20, 29, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 29); }},
+        {0xe52150, 30, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 30); }},
+        {0xe518e0, 31, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 31); }},
+        {0xe510e0, 32, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 32); }},
+        {0xe50980, 33, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 33); }},
+        {0xe500b0, 34, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 34); }},
+        {0xe4f840, 35, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 35); }},
+        {0xe4f040, 36, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 36); }},
+        {0xe4e8e0, 37, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 37); }},
+        {0xe4e010, 38, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 38); }},
+        {0xe4d7a0, 39, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 39); }},
+        {0xe4cfa0, 40, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 40); }},
+        {0xe4c840, 41, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 41); }},
+        {0xe4bf10, 42, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 42); }},
+        {0xe4b7b0, 43, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 43); }},
+        {0xe4afb0, 44, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 44); }},
+        {0xe47670, 45, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 45); }},
+        {0xe467e0, 46, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 46); }},
+        {0xe459e0, 47, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 47); }},
         {0xe10490, 48, [](StartupState& s) noexcept { init_trig_constants(s.trig); }},
         {0xe0b180, 49, [](StartupState& s) noexcept { init_vec_e0b180(s.vec_e0b180); }},
         {0xe094e0, 50, [](StartupState& s) noexcept { init_vec_e094e0(s.vec_e094e0); }},
@@ -174,8 +200,8 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
     return kSlots;
 }
 
-// REGISTERED-AHEAD: indices 24-47, test/checker use only (see startup_ctors.hpp). Never merged into the
-// production table; slot 23 above stays the explicit blocker.
+// Convenience view of indices 24-47 (also present in recovered_constructors after Phase B).
+// Focused ahead tests may run this span alone without executing 0-23.
 std::span<const CtorSlot> registered_ahead_constructors() noexcept {
     static constexpr CtorSlot kAheadSlots[] = {
         {0xe56b70, 24, [](StartupState& s) noexcept { (void)init_registration_thunk_ahead(s, 24); }},

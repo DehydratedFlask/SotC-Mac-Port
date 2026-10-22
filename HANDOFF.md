@@ -1,28 +1,50 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 08:55 CDT (America/Chicago). Latest Drive/slot-23: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc;
-integrator note still points at [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
+Updated: 2026-10-22 08:59 CDT (America/Chicago). Parallel APP-01 claim:
+bc-8fc0a995-6e8c-59b7-8a62-c1a9cacd061f. Latest Drive/slot-23:
+bc-0ee48224-fe2b-592b-a6d8-64b454059dfc; integrator note still points at
+[docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## 2026-10-22 APP-01 playBlockedSummary native-core precedence — CLAIMED
+
+- Task: `APP-01-PLAY-BLOCKED-SUMMARY-NATIVE-CORE-PRECEDENCE-FIXTURE-01`, child of APP-01.
+- Status: CLAIMED / ACTIVE. Attempt 0. Exclusive file:
+  `launcher/Tests/LauncherCoreTests/PlayBlockedSummaryTests.swift` (new only).
+- Do not edit: `native/core/startup_ctors.*`, `native/tests/test_startup_ctors.cpp`,
+  Drive-owned ctor registration, `native/api/**`, `graft/`, contested survey leaves.
+- Scope: synthetic `ReadinessReport.playBlockedSummary` precedence + idle presentation.
+  Pin `.notBuilt` native-core over concurrent missing assets/Metal/audio so Play-disabled
+  copy stays honest NOT BUILT; assets-only when core ready; all-ready → nil.
+  Prefer test-only; production unchanged unless a failing honesty assertion requires it.
+- Not G1/G4; goal incomplete. No leaf-vec / idx 95.
+- Next exact action: implement focused Swift tests and verify with
+  `swift test --package-path launcher --filter PlayBlockedSummaryTests`.
+
+## 2026-10-22 Phase B — slots 24–47 on production
+
+- Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Attempt 1.
+- Promoted already-modeled descriptor/mutex/atexit family **24–47** from
+  `registered_ahead_constructors()` into `recovered_constructors()` (same
+  `init_registration_thunk_ahead` callbacks). Contiguous recovered prefix **0–47**.
+- Commands: focused CTest `startup_ctors` + `registration_thunks_ahead` + `slot23_names_fixture`;
+  `python3 -I tools/lift/check_ctor_slots.py`.
+- Next production gap among registered rows: first missing index after 47 (e.g. **55**), or
+  helper/allocator edges from batches 7–8. No leaf-vec fan-out. Goal incomplete; G1 NOT RUN.
+
 ## 2026-10-22 Phase A — slot 23 registered (private fixture)
 
-- Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Attempt 1 — success.
+- Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Attempt 1 — success. Tip `dfdc2f6`.
 - Private fixture (gitignored): `local/fixtures/slot23_e71990_names.bin`; recipe-only
   `docs/SLOT23_NAMES_FIXTURE.md` + `scripts/extract_slot23_names_fixture.py` (no strings published).
 - Native: `core/slot23_names_fixture.*`, `init_slot23_leaf_e71990` wired in `recovered_constructors()`;
   missing/corrupt fixture → `StartupState::init_failed` (fail-visible).
 - Commands: `ctest --test-dir local/build/native -R '^(startup_ctors|slot23_names_fixture)$'` PASS;
-  `python3 -I tools/lift/check_ctor_slots.py` OK (120 pairs, slots 0–23 recovered, no nullptr);
-  `python3 -I tools/lift/check_fe71990.py` OK.
-- Observation: production first-null **no longer at 23** (no nullptr rows). Next production gap:
-  unregistered indices **24–47** (still ahead-table only).
-- Inference: not G1; goal incomplete. Prior bookkeeping `ce6fb0`/`ce67b0` already on
-  `origin/main` as `be05c4a`.
-- Next exact action: claim enabling 24–47 on the production table when contracts hold, or continue
-  helper/allocator edges from batch 7–8. No leaf-vec fan-out.
+  `python3 -I tools/lift/check_ctor_slots.py` OK; `python3 -I tools/lift/check_fe71990.py` OK.
+- Observation: production first-null cleared at 23; Phase B then took 24–47.
 
 ## 2026-10-22 orchestrator batch 8 — verified
 
