@@ -41,6 +41,7 @@
 #include "vslot_40_533100_cp3characters.hpp"
 #include "vslot_40_533100_cp3characters_attach.hpp"
 #include "vslot_40_533100_cp3shadowprecache.hpp"
+#include "vslot_40_533100_cp3shadowprecache_attach.hpp"
 #include "xchg_store_u32_357f0.hpp"
 
 #include <cstddef>
@@ -95,7 +96,8 @@ struct BaseInitialize255130Hooks {
     Vslot40_533100Cp3charactersHooks vslot_40_cp3characters_detail{};
     Vslot40_533100Cp3charactersAttachHooks vslot_40_cp3characters_attach_detail{};
     Vslot40_533100Cp3shadowprecacheHooks vslot_40_cp3shadowprecache_detail{};
-    // Last header/post/…/cp3characters-attach/cp3shadowprecache results.
+    Vslot40_533100Cp3shadowprecacheAttachHooks vslot_40_cp3shadowprecache_attach_detail{};
+    // Last header/post/…/cp3shadowprecache/cp3shadowprecache-attach results.
     Vslot40_533100HeaderResult* vslot_40_out = nullptr;
     Vslot40_533100PostResult* vslot_40_post_out = nullptr;
     Vslot40_533100MissResult* vslot_40_miss_out = nullptr;
@@ -118,6 +120,8 @@ struct BaseInitialize255130Hooks {
     Vslot40_533100Cp3charactersResult* vslot_40_cp3characters_out = nullptr;
     Vslot40_533100Cp3charactersAttachResult* vslot_40_cp3characters_attach_out = nullptr;
     Vslot40_533100Cp3shadowprecacheResult* vslot_40_cp3shadowprecache_out = nullptr;
+    Vslot40_533100Cp3shadowprecacheAttachResult* vslot_40_cp3shadowprecache_attach_out =
+        nullptr;
 };
 
 // Process-wide cell modelling original qword @ 0x2ea4718 (points at flag object).
