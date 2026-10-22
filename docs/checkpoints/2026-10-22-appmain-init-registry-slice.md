@@ -4,7 +4,7 @@
 - Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9 (Drive).
 - Task: `CPU-01-APPMAIN-INIT-REGISTRY-SLICE-01`; gate: **G1**; status: **PARTIAL** (not PASSED).
 - Failed hypotheses/tries: 0.
-- Tip at authoring: `8388227` on `cursor/init-hash-551140-9dfc` (PR #4); post-land tip is this commit.
+- Tip: `8bca0ad` on `cursor/init-hash-551140-9dfc` (PR #4). Private manifest sha256 `d64beb03…`.
 
 ## Claim boundary (honest)
 
