@@ -1,7 +1,8 @@
 // Base Initialize orchestrator `0x255130` (79 B; called from Init 0x531d60 @ 0x531dda).
 //
 // OBS control flow:
-//   call 0x255180          // prologue (448 B) — NOT modelled; injectable hook
+//   call 0x255180          // prologue (448 B) — early fragment in prologue_255180.*;
+//                          //   injectable hook here if not pre-run
 //   vcall [vptr+0x30]       // app vtable slot → 0x534130 (OBS @ 0x15c8d08); bool
 //   jz → return false
 //   call 0x255340          // mid (debug UI; large) — NOT modelled; injectable hook
@@ -9,9 +10,9 @@
 //   rdi=*0x2ea4718; sil=0; call 0x357f0  // leaf modelled (xchg_store_u32_357f0)
 //   return true
 //
-// Appmain triage: vslots 6/8 = 0x534130 / 0x533100. Bodies of those slots and of
-// 0x255180 / 0x255340 remain open. No leaf-vec; not idx 95; not in recovered_constructors().
-// PR #5 heap cite-only — this orchestrator does not allocate (prologue hook may).
+// Appmain triage: vslots 6/8 = 0x534130 / 0x533100. Bodies of those slots, of
+// 0x255340, and of prologue tail after 0x255264 remain open. No leaf-vec; not idx 95;
+// not in recovered_constructors(). PR #5 heap cite-only.
 #pragma once
 
 #include "xchg_store_u32_357f0.hpp"
