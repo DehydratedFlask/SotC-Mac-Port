@@ -53,6 +53,7 @@
 #include "core/init_531d60_post_base_7f7220.hpp"
 #include "core/init_531d60_post_base_56fad0.hpp"
 #include "core/init_531d60_post_base_f90310.hpp"
+#include "core/init_531d60_post_base_ymm_bss.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -196,6 +197,11 @@ int g_post_base_f90310 = 0;
 alignas(16) std::uint8_t g_avx_bss_src[16]{};
 alignas(16) std::uint8_t g_avx_bss_dst0[16]{};
 alignas(16) std::uint8_t g_avx_bss_dst1[16]{};
+alignas(32) std::uint8_t g_ymm_bss_src[32]{};
+alignas(32) std::uint8_t g_ymm_bss_dst4278[0x30]{};
+alignas(16) std::uint8_t g_ymm_bss_dst426c[12]{};
+alignas(32) std::uint8_t g_ymm_bss_dst42dc[0x30]{};
+alignas(4) std::uint8_t g_ymm_bss_dst4268[4]{};
 alignas(8) std::uint8_t g_shadow_asset[0x40]{};
 alignas(8) std::uint8_t g_skels_asset[0x40]{};
 alignas(8) std::uint8_t g_anims_asset[0x40]{};
@@ -568,6 +574,15 @@ int main() {
         g_avx_bss_dst0[i] = 0x11;
         g_avx_bss_dst1[i] = 0x22;
     }
+    // OBS lane at 0x1014a80: (-1,0,0,0,1,0,0,0) f32; poison destinations.
+    static const std::uint32_t kYmmLane[8] = {
+        0xbf800000u, 0, 0, 0, 0x3f800000u, 0, 0, 0,
+    };
+    std::memcpy(g_ymm_bss_src, kYmmLane, sizeof(kYmmLane));
+    std::memset(g_ymm_bss_dst4278, 0x11, sizeof(g_ymm_bss_dst4278));
+    std::memset(g_ymm_bss_dst426c, 0x22, sizeof(g_ymm_bss_dst426c));
+    std::memset(g_ymm_bss_dst42dc, 0x33, sizeof(g_ymm_bss_dst42dc));
+    std::memset(g_ymm_bss_dst4268, 0x44, sizeof(g_ymm_bss_dst4268));
     stack_guard_value_cell() = 0xC4A4A70000000001ULL;
     std::memset(g_shadow_asset, 0, sizeof(g_shadow_asset));
     std::memset(g_skels_asset, 0, sizeof(g_skels_asset));
@@ -696,13 +711,19 @@ int main() {
     pb56fa.call_56fad0 = hook_post_base_56fad0;
     Init531d60PostBaseF90310Hooks pbf9{};
     pbf9.call_f90310 = hook_post_base_f90310;
+    Init531d60PostBaseYmmBssCells pb_ymm{};
+    pb_ymm.src_1014a80 = g_ymm_bss_src;
+    pb_ymm.dst_1604278 = g_ymm_bss_dst4278;
+    pb_ymm.dst_160426c = g_ymm_bss_dst426c;
+    pb_ymm.dst_16042dc = g_ymm_bss_dst42dc;
+    pb_ymm.dst_1604268 = g_ymm_bss_dst4268;
 
     const std::uint64_t allocs_before = heap.alloc_count;
     const auto t0 = std::chrono::steady_clock::now();
     const auto r = run_appmain_init_ctor_98a90_slice(table, front, app.data(), nullptr, eh, th, ch,
                                                      bh, setter.data(), 0, 0x11, 0x22, 0x33, sh, pb,
                                                      pb56, pb5c, pb1290, pb56db, pb5b3, pb5b3c,
-                                                     pb_avx, pb7f, pb56fa, pbf9);
+                                                     pb_avx, pb7f, pb56fa, pbf9, pb_ymm);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
@@ -985,6 +1006,35 @@ int main() {
     CHECK(r.post_base_f90310.ok);
     CHECK(g_post_base_f90310 == 1);
     CHECK(r.post_base_f90310.call_f90310_count == 1);
+    // E457: Init continue ymm BSS seed; stop before inter-cell ymm / 0x26800
+    CHECK(r.post_base_ymm_bss.ok);
+    CHECK(r.post_base_ymm_bss.store_count == 4);
+    CHECK(std::memcmp(g_ymm_bss_dst4278, g_ymm_bss_src, 32) == 0);
+    {
+        std::uint64_t q = 0;
+        std::memcpy(&q, g_ymm_bss_dst4278 + 0x20, 8);
+        CHECK(q == 0x3f800000ull);
+        std::memcpy(&q, g_ymm_bss_dst4278 + 0x28, 8);
+        CHECK(q == 0);
+        std::uint32_t d = 0;
+        std::memcpy(&d, g_ymm_bss_dst426c + 0, 4);
+        CHECK(d == 0xbf800000u);
+        std::memcpy(&d, g_ymm_bss_dst426c + 4, 4);
+        CHECK(d == 0x3f800000u);
+        std::memcpy(&d, g_ymm_bss_dst426c + 8, 4);
+        CHECK(d == 0x3f800000u);
+        CHECK(std::memcmp(g_ymm_bss_dst42dc, g_ymm_bss_src, 32) == 0);
+        std::memcpy(&d, g_ymm_bss_dst42dc + 0x20, 4);
+        CHECK(d == 0x3f800000u);
+        std::memcpy(&d, g_ymm_bss_dst42dc + 0x24, 4);
+        CHECK(d == 0);
+        std::memcpy(&d, g_ymm_bss_dst42dc + 0x28, 4);
+        CHECK(d == 0);
+        std::memcpy(&d, g_ymm_bss_dst42dc + 0x2c, 4);
+        CHECK(d == 0);
+        std::memcpy(&d, g_ymm_bss_dst4268, 4);
+        CHECK(d == 0x3f800000u);
+    }
     CHECK(r.remainder.trivial_ok);
     CHECK(r.remainder.registry.status == RegistryInit531d60Status::ok);
     CHECK(r.remainder.registry.entry_count == kInputTable551140Count);
@@ -1009,6 +1059,7 @@ int main() {
         "cp3shadowprecache_attach+tail_140d90+stackchk+post_base_499f80+post_base_56dcb0+"
         "post_base_5c64c0+post_base_1290+post_base_56db70+post_base_5b3d00+post_base_5b3cf0+"
         "post_base_avx_bss+post_base_7f7220+post_base_56fad0+post_base_f90310+"
+        "post_base_ymm_bss+"
         "early+tail+base+trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
         "anims=%p banks=%p streams=%p rand=%p boss=%p cp3=%p csp=%p post_hit=%d miss_null=%d "
@@ -1016,11 +1067,13 @@ int main() {
         "banks_refc=%u banks_fail=%d streams_refc=%u streams_fail=%d rand_refc=%u rand_fail=%d "
         "boss_refc=%u boss_fail=%d cp3_fail=%d csp_fail=%d t140=%d schk=%d pb499=%d pb56=%d "
         "pb5c=%d pb1290=%d pb56db=%d pb5b3=%d pb5b3c=%d pbavx=%d pb7f=%d pb56fa=%d pbf9=%d "
+        "pbymm=%d "
         "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
         "vslot533100_hit/success_atexit/499f80_body/56dcb0_body/5c64c0_body/1290_body/"
-        "7f7220_body/f90310_plt_body/ymm_continue/14c2f0_body/6a5370_body/6abcc0_body/"
+        "7f7220_body/f90310_plt_body/ymm_intercell/26800_body/f590_body/14c2f0_body/"
+        "6a5370_body/6abcc0_body/"
         "21620_body/2779a0_body/42390_body/525080_body/2569d0_body/26ea0/26b60/272d0/"
         "255f60/f8f3a0_body/140d90_body/ba40_listeners/plt/ctor523bd0_body/"
         "dtor525b40_body/ctor493230_body/ensure_migrate/nonnull=NOT_modelled "
@@ -1061,6 +1114,7 @@ int main() {
         r.post_base_7f7220.call_7f7220_count,
         r.post_base_56fad0.call_56fad0_count,
         r.post_base_f90310.call_f90310_count,
+        r.post_base_ymm_bss.store_count,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
