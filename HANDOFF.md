@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 01:02 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 01:04 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -39,10 +39,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   [completion checkpoint](docs/checkpoints/2026-10-22-root-app01-audio-readiness-gate-complete.md).
 - Status `FIXTURE_VERIFIED`, one successful implementation attempt, 0 failed tries. Trail wiring
   graph is current at 3,613 nodes / 1,240 files; the new method is queryable, and the project index
-  is current at 24,080 folders. This is only an injected host-check test, not a physical audio
-  probe or audible-content claim. Exact next action: review the separate read-only scout candidate
-  from `/root/next_independent_task_scout` and claim another bounded task only after verifying it
-  does not overlap current work. Leave pending Mach-O CPU and PSARC negative-limit choices alone.
+  is current at 24,080 folders. Completion commit `eab74f91afbac3d8d56183631bb834df43c9e334` is
+  pushed, staged and exact-path audits accepted 6 paths, full audit accepted 1,702, and fresh fetch
+  confirmed 0/0 divergence. This is only an injected host-check test, not a physical audio probe or
+  audible-content claim. Exact next action: review the separate read-only scout candidate from
+  `/root/next_independent_task_scout` and claim another bounded task only after verifying it does
+  not overlap current work. Leave pending Mach-O CPU and PSARC negative-limit choices alone.
 
 ## SRV-01 arena high-water uint64 wrap fixture — verified
 

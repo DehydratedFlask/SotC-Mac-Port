@@ -52,7 +52,21 @@
   unchanged.
 - Failed tries / remaining risks: 0 failed implementation tries. Trail's initial stale check is a
   cache freshness result, not a failing test hypothesis; graph rebuild and verification succeeded.
-- Next exact action: rerun project-index generation/check after adding this checkpoint, then stage
-  only allowlisted task/test/doc paths, run staged and full publish audits, and push `origin main`.
-- `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md` record the completion; `INSTALL_LOG.md` is
-  unchanged. Publication details are to be added in a follow-up docs sync after the completion push.
+- Publication: completion commit `eab74f91afbac3d8d56183631bb834df43c9e334` was pushed to
+  `origin/main`. Precommit staged audit accepted 6 paths and full audit accepted 1,702; post-push
+  exact-path and full audits accepted 6 and 1,702. A fresh fetch and
+  `git rev-list --left-right --count HEAD...origin/main` confirmed 0/0 divergence. Post-push
+  status contains only the existing user-owned `native/api/CMakeLists.txt` change and untracked
+  `native/api/host/`.
+- Publication evidence logs under `local/validation/20261022-root-fixture-baselines/`: staged audit
+  SHA-256 `bfe1cdc3df9c65a64e6c203763fabc3adbce027c6500506661a4b72ba8f4797b`; full audit
+  `37a82a0b5ff80cd183766d9f0f9d5ce9e7d04fe9f4165bfc94223011c90f8166`; commit
+  `f227c5aefcbacf4de4a9335956abe88497fdf80813f34b2222e3282230099107`; push
+  `439793698c326d8808ba246e2ab656eb6593bdddbd28886817ed072af0642d1d`; fetch
+  `58e4bb2ebd9bd713bf3332d4cad1251aeb0b51fb26a8b06f30b3aaa431df79b3`; divergence
+  `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d0247050325e7c5a3b2b3271c`; post-push status
+  `bafebe0544ec1663fc5c60d5555079052f1efbe617d7957be47744c6262d25c7`. Exact-path audit log
+  matches staged-audit hash; post-push full audit log matches precommit full-audit hash.
+- `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md` record publication. `INSTALL_LOG.md` is
+  unchanged. Next exact action: review the separate read-only scout candidate from
+  `/root/next_independent_task_scout` against current files and task rows, then claim if distinct.
