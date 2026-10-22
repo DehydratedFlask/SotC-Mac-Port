@@ -21,6 +21,10 @@ int main() {
     zero_sized.size = 0;
     CHECK(zero_sized.empty());
 
+    HostMapping null_ptr_nonzero_size{};
+    null_ptr_nonzero_size.size = 1;
+    CHECK(null_ptr_nonzero_size.empty());
+
     // OBS rounding before ReserveVirtual (0x19e2d / 0x19f0d / 0x19f8a).
     CHECK(reserve_alignment(1) == 0x100000u);
     CHECK(reserve_alignment(0x10000) == 0x100000u);
