@@ -225,3 +225,30 @@ folders were indexed. Exact replay logs and hashes are in
 `docs/checkpoints/2026-10-21-root-round64-fixtures-complete.md`. Purpose: verify synthetic test
 fixtures and source-index freshness only. Build products remain under `local/build/`; validation
 logs remain under `local/validation/root-round64-replay/`; no new removal boundary was created.
+
+## 2026-10-22 05:03 CDT — SRV-01 region-split no-carve-fit fixture verification
+
+Existing CMake 4.4.4, Ninja 1.13.2, Apple clang 21.0.0 targeting arm64-apple-darwin27.0.0, and
+macOS 27.0.1 were reused; no install, download, dependency, or system configuration change. Baseline,
+worker, and independent root commands from the repository root:
+`cmake -S native -B local/build/native-root-srv01-region-split-no-fit-baseline-20261022 -G Ninja
+-DCMAKE_BUILD_TYPE=Debug`, `cmake --build
+local/build/native-root-srv01-region-split-no-fit-baseline-20261022 --target test_region_split`,
+and `ctest --test-dir local/build/native-root-srv01-region-split-no-fit-baseline-20261022
+--output-on-failure -R '^region_split$'` (all exit 0; focused CTest 1/1);
+`cmake -S native -B local/build/native-worker-srv01-region-split-no-fit-impl-20261022 -G Ninja
+-DCMAKE_BUILD_TYPE=Debug`, followed by its matching build and `ctest --test-dir
+local/build/native-worker-srv01-region-split-no-fit-impl-20261022 --output-on-failure -R
+'^region_split$'` (worker exit 0; CTest 1/1); the exact worker build was `cmake --build
+local/build/native-worker-srv01-region-split-no-fit-impl-20261022 --target test_region_split`; and
+`cmake -S native -B
+local/build/native-root-srv01-region-split-no-fit-verify-20261022 -G Ninja -DCMAKE_BUILD_TYPE=Debug`,
+`cmake --build local/build/native-root-srv01-region-split-no-fit-verify-20261022 --target
+test_region_split`, and `ctest --test-dir
+local/build/native-root-srv01-region-split-no-fit-verify-20261022 --output-on-failure -R
+'^region_split$'` (root exit 0; CTest 1/1). Detailed logs, toolchain, source hashes, and result scope
+are in E335/E337/E338 and `docs/checkpoints/2026-10-22-root-srv01-region-split-no-carve-fit-complete.md`.
+Purpose: baseline and verify one synthetic wrapper no-fit/node-preservation fixture only; no caller
+reachability or game runtime behavior is demonstrated. Build products remain in the three
+`local/build/` directories above; validation logs remain under
+`local/validation/20261022-root-fixture-baselines/`. No removal boundary was created.
