@@ -28,7 +28,7 @@ or Metal gameplay is demonstrated.
   E458; TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-ymm-intercell-20261022/` (manifest
   `6ec43158…` at tip `530b980`; capture `5a95a2b8…`).
-- Observation: feat tip `530b980`; measured `pbic=2` + `pbymm=4` + mid_reg=4 → 275 registry.
+- Observation: feat tip `530b980`; docs tip `9d84d1e`; measured `pbic=2` + `pbymm=4` + mid_reg=4 → 275 registry.
   Xmm seed / `0x26800`/`0xf590` bodies NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_ymm_intercell.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
