@@ -41,6 +41,7 @@
 #include "core/vslot_40_533100_cp3shadowprecache.hpp"
 #include "core/vslot_40_533100_cp3shadowprecache_attach.hpp"
 #include "core/vslot_40_533100_tail_140d90.hpp"
+#include "core/vslot_40_533100_stackchk.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -505,6 +506,7 @@ int main() {
     g_v40_tail_140d90 = g_v40_tail_140d90_f590 = 0;
     g_v40_tail_140d90_arg = -1;
     g_v40_tail_140d90_slot = nullptr;
+    stack_guard_value_cell() = 0xC4A4A70000000001ULL;
     std::memset(g_shadow_asset, 0, sizeof(g_shadow_asset));
     std::memset(g_skels_asset, 0, sizeof(g_skels_asset));
     std::memset(g_anims_asset, 0, sizeof(g_anims_asset));
@@ -837,6 +839,12 @@ int main() {
     CHECK(g_v40_tail_140d90_slot ==
           static_cast<std::uint8_t*>(app.data()) + kVslot40Tail140d90SlotOff);
     CHECK(r.vslot_40_tail_140d90.arg == 9);
+    // E445: stack-check success path (saved==live) through ret
+    CHECK(r.vslot_40_stackchk.ok);
+    CHECK(r.vslot_40_stackchk.returned);
+    CHECK(!r.vslot_40_stackchk.took_fail_path);
+    CHECK(r.vslot_40_stackchk.saved == stack_guard_value_cell());
+    CHECK(r.vslot_40_stackchk.live == r.vslot_40_stackchk.saved);
     CHECK(g_move == 0);
     CHECK(g_nonnull == 0);
     CHECK(g_init_tb == 1);
@@ -862,18 +870,18 @@ int main() {
         "shadowskels+skels_attach+shadowanims+anims_attach+shadowbanks+banks_attach+"
         "shadowstreams+streams_attach+shadowrandomevents+randomevents_attach+shadowbossmusic+"
         "bossmusic_attach+cp3characters+cp3characters_attach+cp3shadowprecache+"
-        "cp3shadowprecache_attach+tail_140d90+early+tail+base+trivial+registry "
+        "cp3shadowprecache_attach+tail_140d90+stackchk+early+tail+base+trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
         "anims=%p banks=%p streams=%p rand=%p boss=%p cp3=%p csp=%p post_hit=%d miss_null=%d "
         "marker=0x%x refc=%u fail=%d skels_refc=%u skels_fail=%d anims_refc=%u anims_fail=%d "
         "banks_refc=%u banks_fail=%d streams_refc=%u streams_fail=%d rand_refc=%u rand_fail=%d "
-        "boss_refc=%u boss_fail=%d cp3_fail=%d csp_fail=%d t140=%d gate_byte=%u mid_reg=%d "
-        "tsc=0x%llx entries=%u "
+        "boss_refc=%u boss_fail=%d cp3_fail=%d csp_fail=%d t140=%d schk=%d gate_byte=%u "
+        "mid_reg=%d tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
         "vslot533100_hit/success_atexit/next_path/14c2f0_body/6a5370_body/6abcc0_body/"
         "21620_body/2779a0_body/42390_body/525080_body/2569d0_body/26ea0/26b60/272d0/"
-        "255f60/stackchk/ba40_listeners/plt/ctor523bd0_body/dtor525b40_body/"
+        "255f60/f8f3a0_body/140d90_body/ba40_listeners/plt/ctor523bd0_body/dtor525b40_body/"
         "ctor493230_body/ensure_migrate/nonnull=NOT_modelled pr5_heap_merge=GAP\n",
         r.ctor.nested_48, eb, r.tail.obj_40, r.singleton.obj, r.vslot_40.obj,
         r.vslot_40_join.pos_obj, r.vslot_40_gfx.obj, r.vslot_40_shadow.loaded,
@@ -899,6 +907,7 @@ int main() {
         r.vslot_40_cp3characters_attach.took_fail_path ? 1 : 0,
         r.vslot_40_cp3shadowprecache_attach.took_fail_path ? 1 : 0,
         r.vslot_40_tail_140d90.call_140d90_count,
+        r.vslot_40_stackchk.returned ? 1 : 0,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),

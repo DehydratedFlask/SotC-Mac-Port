@@ -31,7 +31,7 @@ Vslot40_533100Tail140d90Result vslot_40_533100_tail_140d90(
     }
     ++out.dtor_f590_count;
 
-    // stack-check / epilogue @ 0x534052 — NOT modelled
+    // stack-check / epilogue @ 0x534052 — see vslot_40_533100_stackchk.*
     out.ok = (out.call_140d90_count == 1) && (out.dtor_f590_count == 1) &&
              (out.arg == kVslot40Tail140d90Arg);
     return out;
