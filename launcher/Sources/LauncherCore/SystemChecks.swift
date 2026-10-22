@@ -60,9 +60,9 @@ public enum SystemChecks {
         defer { try? handle.close() }
         guard let header = try? handle.read(upToCount: 8), header.count >= 4 else { return false }
         let magic = header.withUnsafeBytes { $0.load(as: UInt32.self) }
-        // MH_MAGIC_64, MH_CIGAM_64, FAT_MAGIC, FAT_CIGAM (incl. FAT_MAGIC_64 family via cafe babe)
+        // Reject 32-bit magics; this header-only probe does not inspect CPU type or FAT slices.
         switch magic {
-        case 0xFEEDFACF, 0xCFFAEDFE, 0xCAFEBABE, 0xBEBAFECA, 0xFEEDFACE, 0xCEFAEDFE:
+        case 0xFEEDFACF, 0xCFFAEDFE, 0xCAFEBABE, 0xBEBAFECA:
             return true
         default:
             return false

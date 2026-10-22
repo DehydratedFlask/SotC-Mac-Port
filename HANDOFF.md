@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:27 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:32 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -150,7 +150,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `native/api/host/` remain outside the commit. Audit/fetch/status logs are in
   `local/validation/app01-core-error-codes/` and the completion checkpoint.
 
-## APP-01 SystemChecks 32-bit Mach-O refusal — fixture claimed
+## APP-01 SystemChecks 32-bit Mach-O refusal — fixture verified
 
 - Root claimed `APP-01-SYSTEM-CHECKS-REJECT-32BIT-MACHO-01`, child of APP-01; the parent launcher
   scope is specified in [docs/TASKS.md](docs/TASKS.md#app-01--native-mac-launcher), and the platform
@@ -163,14 +163,19 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   local/build/app01-systemchecks-arch --filter AssetValidatorTests` passes 11 tests. Log
   `local/validation/app01-systemchecks-arch/baseline.log`, SHA256
   `f1cef398f1013d2114ddec8afec668a9751bcb8962c097319ca54f5f41ce79bc`.
-- Status `ACTIVE`, 0 failed implementation tries. Existing native API user changes remain outside scope.
+- The focused new suite passes 1 test and the existing `AssetValidatorTests` regression suite passes
+  11 tests. The 32-bit magic values are now rejected; 64-bit and universal magic acceptance remains
+  unchanged. Logs, hashes, graph checks, and limitations are in E245 and the
+  [completion checkpoint](docs/checkpoints/2026-10-21-root-app01-systemchecks-reject-32bit-macho-complete.md).
+- Status `FIXTURE_VERIFIED`, 1 successful implementation attempt, 0 failed tries. This closes only
+  the 32-bit magic path; 64-bit CPU type and FAT slice validation remain unimplemented. No actual
+  native core or game readiness is established.
 - Claim commit `daa92c26f8972cadbe9f97e39669577b4c8daf62` is pushed and fetch-verified. The staged
   audit accepted 6 allowlisted paths and the full audit accepted 1,680 paths; post-push `HEAD ==
   origin/main` with 0/0 divergence. User-owned native API changes remain unstaged. Claim publication
   logs are in `local/validation/app01-systemchecks-arch/` and the claim checkpoint.
-- Exact next action: add the focused 32-bit Mach-O test in
-  `launcher/Tests/LauncherCoreTests/SystemChecksArchitectureTests.swift`, remove the two 32-bit magic
-  cases from `SystemChecks.swift`, then run the new fixture and existing `AssetValidatorTests`.
+- Exact next action: publish the fixture and completion evidence, then claim another independent
+  bounded task outside PSARC and these launcher architecture files.
 
 ## RE-02 app-main +0x20 virtual call — static path byte verified
 
