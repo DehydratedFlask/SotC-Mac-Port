@@ -252,3 +252,17 @@ Purpose: baseline and verify one synthetic wrapper no-fit/node-preservation fixt
 reachability or game runtime behavior is demonstrated. Build products remain in the three
 `local/build/` directories above; validation logs remain under
 `local/validation/20261022-root-fixture-baselines/`. No removal boundary was created.
+
+## 2026-10-22 05:43 CDT — SRV-01 host-map requested-size fixture verification
+
+Existing CMake 4.4.4, Ninja 1.13.2, Apple clang 21.0.0 targeting arm64-apple-darwin27.0.0, and
+macOS 27.0.1 from the E325 run were reused; no install, download, dependency, or system
+configuration change. From the repository root, `cmake -S native -B
+local/build/native-root-srv01-map-size-verify-20261022 -G Ninja -DCMAKE_BUILD_TYPE=Debug`,
+`cmake --build local/build/native-root-srv01-map-size-verify-20261022 --target test_host_map`, and
+`ctest --test-dir local/build/native-root-srv01-map-size-verify-20261022 --output-on-failure -R
+'^host_map$'` all exited 0; the focused CTest passed 1/1. Purpose: verify one synthetic request where
+allocator-region size `0x200001` remains distinct from the page-rounded host mapping length; this
+does not prove allocator reachability or game behavior. Build products remain under
+`local/build/native-root-srv01-map-size-verify-20261022/`; logs are under
+`local/validation/srv01-host-map-requested-vs-rounded/`. No removal boundary was created.
