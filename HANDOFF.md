@@ -25,9 +25,9 @@ or Metal gameplay is demonstrated.
   `tools/lift/check_f531d60_post_base_52eb50.py`; checkpoint
   `docs/checkpoints/2026-10-22-init-531d60-post-base-52eb50.md`; EVIDENCE E464;
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-post-base-52eb50-20261022/` (capture
-  `1ef06f16…`; manifest re-pinned at feat tip).
-- Observation: feat tip pending push; measured `pb52=1` + `pbsboj268=1` + mid_reg=4 → 275 registry.
+  `local/validation/appmain-init-post-base-52eb50-20261022/` (manifest
+  `b1682b45…` at tip `9f79e6c`; capture `1ef06f16…`).
+- Observation: feat tip `9f79e6c`; measured `pb52=1` + `pbsboj268=1` + mid_reg=4 → 275 registry.
   Trampoline body / later lea·vmovq NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_52eb50.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
