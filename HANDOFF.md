@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 22:22 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 22:24 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -27,6 +27,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `bfd7aecbaae70345740d2858e5dcba5c0eaa721ddabe08fa00a0172a2dba750b`. Staged/full path audits
   accepted 4/1,660 paths; folder index is current at 19,269 folders and Trail wiring graph check
   passes at 3,580 nodes.
+- The publication-record sync is also pushed as `414a0434e96885b5f028e9b2c7e9f18730955b3e`;
+  post-push `HEAD == origin/main`, divergence 0/0. Log:
+  `local/checkpoints/round78-re02-claim-sync-postpush.log` SHA-256
+  `4e7d5e77d98fb4c48e615b108f703daacb772c84a424047a393ef25879df4e9b`.
 - A later `python3 scripts/project_index.py --check` briefly reported stale
   `local/indexes/folders.json` after the new private evidence directory was created. Regeneration
   returned 19,269 folders and the immediate recheck passed; this was a private index count update,
