@@ -1,12 +1,25 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 01:13 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 01:14 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Active bounded task — AUD-01 probe offset cutoff fixture
+
+- Claimed `AUD-01-CLASSIFIER-PROBE-OFFSET-CUTOFF-FIXTURE-01` under the verified
+  `AUD-01-CLASSIFIER-SHORT-PROBE-INPUT-FIXTURE-01`. The untouched audio-header suite passes 26
+  tests. The planned test covers exact short-input cutoffs: with 2 bytes, zlib/raw-DEFLATE/LZMA
+  offset-2 results are `too_short`; with 4 bytes, LZMA offset-4 is `too_short`. Claim details and
+  baseline hashes are in [the claim checkpoint](docs/checkpoints/2026-10-22-root-aud01-probe-offset-cutoff-claim.md)
+  and E269.
+- Status `ACTIVE`, 0 failed implementation tries. Root owns HANDOFF/TASKS/EVIDENCE; after claim
+  publication `/root/next_fixture_scout_2` owns only `scripts/test_audio_headers.py`. Exact next
+  action: implement one test method and run the focused audio-header suite (expected 27 tests), then
+  root replay and completion records. Synthetic probe classification only; no asset or codec claim.
 
 ## RE-02 dynamic-link image file-offset bounds fixture — verified
 
@@ -22,9 +35,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `dc9f153e23551ef7333c34523eba2cbd2ab223bf` are pushed. Completion staged/full audits accepted
   6/1,704 paths; a fresh fetch confirmed 0/0 divergence and post-push full audit accepted 1,704.
   This is a synthetic helper test only; no real ELF, loader, or runtime claim.
-- Exact next action: review the read-only scout candidate `AUD-01-CLASSIFIER-PROBE-OFFSET-CUTOFF-FIXTURE-01`
-  against the live task register and source, then claim it before any edit if distinct. Leave pending
-  Mach-O CPU and PSARC policy choices alone.
+- The follow-on AUD-01 task is claimed above. Leave pending Mach-O CPU and PSARC policy choices
+  alone.
 
 ## Completed checkpoints — two bounded regression fixtures
 
