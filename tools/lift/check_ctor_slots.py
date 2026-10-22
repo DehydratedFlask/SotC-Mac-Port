@@ -216,5 +216,5 @@ print(
     f"count={TABLE_COUNT} sha256={table_digest}; verified {len(rows)} registered RVA/index pairs; "
     "slots 0-47 are recovered (slot 11 byte anchors + 12 array block offsets/strides; slots 12-19 body "
     "digests + ELF-table RVAs; slot 23 private name fixture; slots 24-47 ahead-family on production); "
-    "next production gap is the first missing index after 47 (currently 55 among later registered rows)"
+    "contiguous prefix includes 0-47 plus later registered rows (see recovered_constructors for gaps)"
 )
