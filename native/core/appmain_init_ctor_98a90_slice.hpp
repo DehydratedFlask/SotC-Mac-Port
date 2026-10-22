@@ -48,6 +48,7 @@
 #include "init_531d60_post_base_lea_vmovq.hpp"
 #include "init_531d60_post_base_532ca0.hpp"
 #include "init_531d60_post_base_vcall18.hpp"
+#include "init_531d60_post_base_532ca0_u2.hpp"
 #include "input_table_551140.hpp"
 #include "prologue_255180.hpp"
 #include "singleton_f08_531d84.hpp"
@@ -119,6 +120,7 @@ struct AppmainInitCtor98a90SliceResult {
     Init531d60PostBaseLeaVmovqResult post_base_lea_vmovq{};
     Init531d60PostBase532ca0Result post_base_532ca0{};
     Init531d60PostBaseVcall18Result post_base_vcall18{};
+    Init531d60PostBase532ca0U2Result post_base_532ca0_u2{};
     AppmainInitRemainderSliceResult remainder{};
 };
 
@@ -149,6 +151,7 @@ struct AppmainInitCtor98a90SliceResult {
     const Init531d60PostBase52eb50Hooks& post_base_52eb50_hooks = {},
     const Init531d60PostBaseLeaVmovqCells& post_base_lea_vmovq_cells = {},
     const Init531d60PostBase532ca0Hooks& post_base_532ca0_hooks = {},
-    const Init531d60PostBaseVcall18Hooks& post_base_vcall18_hooks = {});
+    const Init531d60PostBaseVcall18Hooks& post_base_vcall18_hooks = {},
+    const Init531d60PostBase532ca0U2Hooks& post_base_532ca0_u2_hooks = {});
 
 }  // namespace sotc
