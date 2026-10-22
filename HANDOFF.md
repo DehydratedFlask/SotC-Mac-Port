@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 01:36 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 01:40 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -19,8 +19,11 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   it makes no real-save compatibility or power-loss durability claim.
 - Baseline target build and focused `save_stream_file` CTest pass. Logs and hashes are in E276 and
   [claim checkpoint](docs/checkpoints/2026-10-22-root-sav01-native-stream-file-symlink-claim.md).
-  Status is `ACTIVE`; implementation attempts: 0. After the claim publication, delegate the
-  one-file test to `/root/next_fixture_scout_2`, then review and replay it at root.
+  Claim commit `457601bde1c1f5931590a0c8fb1deb52d55e3e73` is pushed. Pre-push staged/full audits
+  accepted 5/1,709 paths; fresh fetch showed 0/0 divergence; post-push explicit/full audits accepted
+  5/1,709. The post-push staged-mode audit had no staged paths (exit 2); the explicit-path audit
+  passed. See E277 and publication-log SHA256 there. Status is `ACTIVE`; implementation attempts: 0.
+  `/root/next_fixture_scout_2` is implementing the one-file test; root will review and replay it.
 - Next independent candidate to evaluate after this task: the scout-proposed
   `SRV-01-HOST-MAP-EMPTY-NULL-NONZERO-SIZE-FIXTURE-01`, limited to a synthetic accessor assertion
   in `native/tests/test_host_map.cpp`. Do not combine it with this save-stream task.
