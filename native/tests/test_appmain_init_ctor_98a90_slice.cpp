@@ -58,6 +58,7 @@
 #include "core/init_531d60_post_base_xmm_seed.hpp"
 #include "core/init_531d60_post_base_ymm_reload.hpp"
 #include "core/init_531d60_post_base_26800_f590.hpp"
+#include "core/init_531d60_post_base_sbj.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -200,6 +201,8 @@ int g_post_base_56fad0 = 0;
 int g_post_base_f90310 = 0;
 int g_post_base_26800 = 0;
 int g_post_base_f590 = 0;
+int g_post_base_sbj_26800 = 0;
+int g_post_base_sbj_f590 = 0;
 alignas(16) std::uint8_t g_avx_bss_src[16]{};
 alignas(16) std::uint8_t g_avx_bss_dst0[16]{};
 alignas(16) std::uint8_t g_avx_bss_dst1[16]{};
@@ -426,6 +429,8 @@ void hook_post_base_56fad0() { ++g_post_base_56fad0; }
 void hook_post_base_f90310() { ++g_post_base_f90310; }
 void hook_post_base_26800() { ++g_post_base_26800; }
 void hook_post_base_f590() { ++g_post_base_f590; }
+void hook_post_base_sbj_26800() { ++g_post_base_sbj_26800; }
+void hook_post_base_sbj_f590() { ++g_post_base_sbj_f590; }
 
 void* loadp(const void* base, std::size_t off) {
     void* p = nullptr;
@@ -585,6 +590,8 @@ int main() {
     g_post_base_f90310 = 0;
     g_post_base_26800 = 0;
     g_post_base_f590 = 0;
+    g_post_base_sbj_26800 = 0;
+    g_post_base_sbj_f590 = 0;
     // Distinctive src; poison destinations so the AVX BSS copy is observable.
     for (int i = 0; i < 16; ++i) {
         g_avx_bss_src[i] = static_cast<std::uint8_t>(0xA0 + i);
@@ -761,6 +768,9 @@ int main() {
     Init531d60PostBase26800F590Hooks pb268{};
     pb268.call_26800 = hook_post_base_26800;
     pb268.call_f590 = hook_post_base_f590;
+    Init531d60PostBaseSbjHooks pbsbj{};
+    pbsbj.call_26800 = hook_post_base_sbj_26800;
+    pbsbj.call_f590 = hook_post_base_sbj_f590;
 
     const std::uint64_t allocs_before = heap.alloc_count;
     const auto t0 = std::chrono::steady_clock::now();
@@ -768,7 +778,7 @@ int main() {
                                                      bh, setter.data(), 0, 0x11, 0x22, 0x33, sh, pb,
                                                      pb56, pb5c, pb1290, pb56db, pb5b3, pb5b3c,
                                                      pb_avx, pb7f, pb56fa, pbf9, pb_ymm, pb_ic,
-                                                     pb_xmm, pb_yr, pb268);
+                                                     pb_xmm, pb_yr, pb268, pbsbj);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
@@ -1113,6 +1123,12 @@ int main() {
     CHECK(g_post_base_f590 == 1);
     CHECK(r.post_base_26800_f590.call_26800_count == 1);
     CHECK(r.post_base_26800_f590.call_f590_count == 1);
+    // E462: Init continue Shadow Boss Jump call-sites (bodies NOT modelled)
+    CHECK(r.post_base_sbj.ok);
+    CHECK(g_post_base_sbj_26800 == 1);
+    CHECK(g_post_base_sbj_f590 == 1);
+    CHECK(r.post_base_sbj.call_26800_count == 1);
+    CHECK(r.post_base_sbj.call_f590_count == 1);
     CHECK(r.remainder.trivial_ok);
     CHECK(r.remainder.registry.status == RegistryInit531d60Status::ok);
     CHECK(r.remainder.registry.entry_count == kInputTable551140Count);
@@ -1138,7 +1154,7 @@ int main() {
         "post_base_5c64c0+post_base_1290+post_base_56db70+post_base_5b3d00+post_base_5b3cf0+"
         "post_base_avx_bss+post_base_7f7220+post_base_56fad0+post_base_f90310+"
         "post_base_ymm_bss+post_base_ymm_intercell+post_base_xmm_seed+"
-        "post_base_ymm_reload+post_base_26800_f590+"
+        "post_base_ymm_reload+post_base_26800_f590+post_base_sbj+"
         "early+tail+base+trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
         "anims=%p banks=%p streams=%p rand=%p boss=%p cp3=%p csp=%p post_hit=%d miss_null=%d "
@@ -1146,7 +1162,7 @@ int main() {
         "banks_refc=%u banks_fail=%d streams_refc=%u streams_fail=%d rand_refc=%u rand_fail=%d "
         "boss_refc=%u boss_fail=%d cp3_fail=%d csp_fail=%d t140=%d schk=%d pb499=%d pb56=%d "
         "pb5c=%d pb1290=%d pb56db=%d pb5b3=%d pb5b3c=%d pbavx=%d pb7f=%d pb56fa=%d pbf9=%d "
-        "pbymm=%d pbic=%d pbxmm=%d pbyr=%d pb268=%d pbf590=%d "
+        "pbymm=%d pbic=%d pbxmm=%d pbyr=%d pb268=%d pbf590=%d pbsbj268=%d pbsbjf590=%d "
         "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
@@ -1199,6 +1215,8 @@ int main() {
         r.post_base_ymm_reload.store_count,
         r.post_base_26800_f590.call_26800_count,
         r.post_base_26800_f590.call_f590_count,
+        r.post_base_sbj.call_26800_count,
+        r.post_base_sbj.call_f590_count,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
