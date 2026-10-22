@@ -20,12 +20,15 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Status `FIXTURE_VERIFIED`, 1 successful implementation attempt, 0 failed tries. See the
   [claim checkpoint](docs/checkpoints/2026-10-21-root-srv01-host-map-empty-nonnull-zero-claim.md),
   [completion checkpoint](docs/checkpoints/2026-10-21-root-srv01-host-map-empty-nonnull-zero-complete.md),
-  and E251.
+  and E251/E252.
 - Trail wiring graph check passes with 3,608 nodes / 1,240 files. Project index is regenerated for
   the completion checkpoint. Existing user-owned `native/api/` changes remain untouched and
   unstaged.
-- Exact next action: record allowlisted publication evidence, then claim another independent task;
-  the thin Mach-O CPU policy remains pending the user's choice.
+- Completion commit `47f332e3a323312fc3f3e5bab0a282d725811c04` is pushed and fetch-verified at 0/0
+  divergence; staged audit accepted 6 paths and the full audit accepted 1,688. Publication logs are
+  recorded in E252. The thin Mach-O CPU policy remains pending the user's choice.
+- Exact next action: claim the independent escaped-Unicode duplicate-path manifest fixture; keep
+  the pending Mach-O CPU policy and PSARC negative-limit behavior untouched until the user decides.
 
 ## SRV-01 allocator rounding zero-input fixture — fixture verified
 
