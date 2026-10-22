@@ -32,8 +32,8 @@ or Metal gameplay is demonstrated.
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
   PASS; private capture exit 0; `check_ctor_slots` still **155**.
 - Inference: G1 **PARTIAL** only.
-- Next exact action: next load / success atexit past `0x533cdb`, or bounded
-  `0x14c2f0`/`0x6a5370`. Goal open.
+- Next exact action: shadowbossmusic load / success atexit past `0x533cdb`, or
+  bounded `0x14c2f0`/`0x6a5370`. Goal open.
 
 ## 2026-10-22 App vslot `0x533100` shadowrandomevents load-attempt
 

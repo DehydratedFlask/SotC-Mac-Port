@@ -42,5 +42,5 @@ AllocatorFront+FakeHeap; PR #5 merge gap.
 
 ## Risks / next
 
-Next load / success atexit past `0x533cdb`, or bounded `0x14c2f0`/`0x6a5370`.
-Goal open.
+Shadowbossmusic load / success atexit past `0x533cdb`, or bounded
+`0x14c2f0`/`0x6a5370`. Goal open.
