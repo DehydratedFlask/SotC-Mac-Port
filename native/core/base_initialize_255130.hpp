@@ -3,18 +3,20 @@
 // OBS control flow:
 //   call 0x255180          // prologue (448 B) — early fragment in prologue_255180.*;
 //                          //   injectable hook here if not pre-run
-//   vcall [vptr+0x30]       // app vtable slot → 0x534130 (OBS @ 0x15c8d08); bool
+//   vcall [vptr+0x30]       // app vtable slot → 0x534130 (OBS @ 0x15c8d08); bool — E418 lift
 //   jz → return false
 //   call 0x255340          // mid (debug UI; large) — NOT modelled; injectable hook
 //   vcall [vptr+0x40]       // app vtable slot → 0x533100 (OBS @ 0x15c8d18); (self, arg)
+//                          //   3956 B — NOT modelled; injectable hook
 //   rdi=*0x2ea4718; sil=0; call 0x357f0  // leaf modelled (xchg_store_u32_357f0)
 //   return true
 //
-// Appmain triage: vslots 6/8 = 0x534130 / 0x533100. Bodies of those slots, of
-// 0x255340, and of prologue tail after 0x255264 remain open. No leaf-vec; not idx 95;
+// Appmain triage: vslots 6/8 = 0x534130 / 0x533100. E418 lifts 0x534130; body of
+// 0x533100 and 0x255340 remain open. No leaf-vec; not idx 95;
 // not in recovered_constructors(). PR #5 heap cite-only.
 #pragma once
 
+#include "vslot_30_534130.hpp"
 #include "xchg_store_u32_357f0.hpp"
 
 #include <cstddef>
@@ -33,11 +35,14 @@ inline constexpr std::uint64_t kBaseInitFlagCellRva = 0x2ea4718;  // *cell → o
 struct BaseInitialize255130Hooks {
     // Models call 0x255180(self). Required for success path; null → treat as no-op.
     void (*prologue_255180)(void* self) = nullptr;
-    // Models vcall [vptr+0x30](self). Null → false (Init early-out).
+    // Models vcall [vptr+0x30](self). If null and use_lifted_vslot_30, run E418 lift.
+    // If both unset → false (Init early-out).
     bool (*vslot_30)(void* self) = nullptr;
+    bool use_lifted_vslot_30 = false;
+    Vslot30_534130Hooks vslot_30_detail{};
     // Models call 0x255340(self). Null → no-op.
     void (*mid_255340)(void* self) = nullptr;
-    // Models vcall [vptr+0x40](self, arg). Null → no-op.
+    // Models vcall [vptr+0x40](self, arg) → 0x533100. Null → no-op. Body NOT modelled.
     void (*vslot_40)(void* self, void* arg) = nullptr;
 };
 
