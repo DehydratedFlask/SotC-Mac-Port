@@ -8,6 +8,12 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## 2026-10-22 orchestrator batch 6 — verified
+
+- CPU-01-TINY-LEAVES-14CCB0-01: four tiny leaves lifted, root 306/306 (E389). Unlifted tiny candidates seen: getters 0x96f50/0x96f60/0x4934b0, `lea` helpers 0x79cbb0/0x5915d0, sibling 0xb30ce0.
+- CPU-01-REGISTRY-2EFD160-ANALYSIS-01 (private, E389): `0x2efd160` is an app-level hash-keyed registry (0x98 B object, FNV-1a keys via the already-lifted 0x161fb0), built by app virtual Init `0x531d60` from a 275-entry static table; content is static, so no asset dependency. The FNV in `0x161f80` is zero-extended (matches `fnv1a32`), unlike the sign-extended `0x161fb0`.
+- Next exact action: lift 0x161f80, 0x14c3a0, 0x14c4a0, 0xf730, 0x14c9a0 (null parent), then 0x14d880 and ctor 0xb25470; then 0x17070 needs an allocator contract (SRV-01).
+
 ## 2026-10-22 orchestrator batch 5 — verified
 
 - CPU-01-GUARDED-STATIC-HELPERS-01: statics + ctors `0x78c760`, `0x268ce0` lifted; root 303/303 + checkers (E388).

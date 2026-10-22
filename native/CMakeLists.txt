@@ -46,6 +46,9 @@ add_library(sotc_core STATIC
   core/fnv_cstr_161fb0.cpp
   core/hashed_name_ctors.cpp
   core/guarded_static_helpers.cpp
+  core/atomic_add_ref_14ccb0.cpp
+  core/atomic_xadd_b30cf0.cpp
+  core/store_value_clear_flag_158340.cpp
   core/scratch_reset.cpp
   core/save_checksum.cpp
   core/name_hash.cpp
@@ -1456,5 +1459,17 @@ add_test(NAME save_stream_file COMMAND test_save_stream_file)
 add_executable(test_save_chunk_codec tests/test_save_chunk_codec.cpp)
 target_link_libraries(test_save_chunk_codec sotc_core)
 add_test(NAME save_chunk_codec COMMAND test_save_chunk_codec)
+
+add_executable(test_atomic_add_ref_14ccb0 tests/test_atomic_add_ref_14ccb0.cpp)
+target_link_libraries(test_atomic_add_ref_14ccb0 sotc_core)
+add_test(NAME atomic_add_ref_14ccb0 COMMAND test_atomic_add_ref_14ccb0)
+
+add_executable(test_atomic_xadd_b30cf0 tests/test_atomic_xadd_b30cf0.cpp)
+target_link_libraries(test_atomic_xadd_b30cf0 sotc_core)
+add_test(NAME atomic_xadd_b30cf0 COMMAND test_atomic_xadd_b30cf0)
+
+add_executable(test_store_value_clear_flag_158340 tests/test_store_value_clear_flag_158340.cpp)
+target_link_libraries(test_store_value_clear_flag_158340 sotc_core)
+add_test(NAME store_value_clear_flag_158340 COMMAND test_store_value_clear_flag_158340)
 
 add_subdirectory(api)
