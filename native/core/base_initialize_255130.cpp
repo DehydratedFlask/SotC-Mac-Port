@@ -95,6 +95,15 @@ bool base_initialize_255130(void* self, void* arg,
         if (!sr.ok) {
             return false;
         }
+        // E427: always-on attach (measured takes fail path; stop before shadowskels).
+        const Vslot40_533100ShadowAttachResult ar = vslot_40_533100_shadow_attach(
+            sr.loaded, /*success_flag=*/false, hooks.vslot_40_shadow_attach_detail);
+        if (hooks.vslot_40_shadow_attach_out != nullptr) {
+            *hooks.vslot_40_shadow_attach_out = ar;
+        }
+        if (!ar.ok) {
+            return false;
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true
