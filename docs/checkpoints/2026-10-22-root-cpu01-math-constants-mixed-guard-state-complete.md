@@ -13,5 +13,5 @@
 - Final `git diff --check` exits 0, log `local/validation/20261022-root-fixture-baselines/cpu01-math-guards-root-verify-diff-check.log`, empty-log SHA256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.
 - Observation versus inference: both independent focused test runs passed, and only the test source changed. The matrix pins the current reconstructed native helper's per-pair behavior; this does not prove constructor reachability, original runtime semantics, or game behavior.
 - Remaining risks / limits: synthetic helper fixture only. Native boot, game audio, real save/reload, Metal gameplay, and forbidden runtime/module gates remain unproven.
-- Next exact action: independently verify and claim the separate `SRV-01` split wrapper's no-carve-fit/no-mutation case with a fresh baseline before any source edit.
-- Publication: implementation and completion docs are ready for allowlisted audit, commit, and push; user-owned `native/api/CMakeLists.txt` and `native/api/host/` remain excluded and untouched.
+- Next exact action: publish the independently verified `SRV-01-REGION-SPLIT-NO-CARVE-FIT-NO-MUTATION-FIXTURE-01` claim/baseline before any source edit.
+- Publication: completion commit `f08e3bf6e318db7ab889b55375578d62a2506b20` is pushed and fetch-verified at 0/0 divergence. Pre-push staged/full audits accepted 7/1,737 paths and the post-push full audit accepted 1,737; E334 records the exact log hashes. User-owned `native/api/CMakeLists.txt` and `native/api/host/` remained excluded and untouched.
