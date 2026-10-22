@@ -42,8 +42,25 @@
   `local/validation/20261022-root-fixture-baselines/srv01-host-map-empty-null-nonzero-work.log`,
   SHA256 `f316c907a52968f44209ea90e70e3fa991fc37562263ed834d97ae3cb12ff929`. `git diff --check`
   passed.
-- Next exact action: publish this claim through staged/full path audits. After that, delegate only
-  `native/tests/test_host_map.cpp` to `/root/next_fixture_scout_2` for the assertion and target build
-  plus focused CTest; root will review and replay.
+- Claim commit `b33b4bfbb60c746853e6a2ca1bd5a983e92825c3` was pushed. Staged/full audits accepted
+  6/1,711 paths; fresh fetch/divergence was 0/0; post-push explicit/full audits accepted 6/1,711.
+  Publication log is `local/validation/20261022-root-fixture-baselines/srv01-host-map-empty-null-nonzero-publication.log`,
+  SHA256 `973ec1915bf00cee11e855c9df0be06f914e869152f2355a552398aaccb05005`.
+- Worker `/root/next_fixture_scout_2` added only the planned assertion. Worker target build and
+  focused CTest exit 0, with 1/1 test passing. Worker build/CTest log SHA256 values are
+  `0524da2e8cc2458ec343a44bc4b73f53179647b2df39031b43c2b170235a77a1` /
+  `21d56d120f2115f4b5e4af45a1581c07c4d09e7d4666a3a64f1fa9a953d5c568`.
+- Root independently configured `local/build/native-root-srv01`, built target `test_host_map`
+  from source, and ran focused `host_map` CTest; all commands exit 0 and CTest passes 1/1.
+  Configure/build/CTest log SHA256 values are
+  `c410a24b362f582c3563f2028f1e7e344eb0103a64e11bbdf55b4bf220726094`,
+  `536dc48403ffe77648d3d5b5852caebeff8323ef0109907e4c1d85b47ea475f2`, and
+  `1887b4e3e5f063379c58c2553ca00650b9b9b6fcbde42031dadad0f927e0be25`.
+- Completion source hashes: test
+  `4a9f83894e5a40c3335dd2aa91520fc1f42fd36c8ea7bc0f74bedb8894130e4b`; unchanged header
+  `283c3b8f0c98ccb48cb756e9e16ba4fd54c98babc1ea60b942f2cc2276c30bbe`; unchanged implementation
+  `0ce60c6af1e2d4f9f91f5882326bf516f20dd5e58f936f99b0efc67cbb582f72`.
+- Next exact action: run staged/full path audits, commit the allowlisted completion and APP-01 claim
+  records, push, verify remote divergence/audits, then delegate the claimed APP-01 test.
 - HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF, TASKS, and EVIDENCE now
   record the claim; `INSTALL_LOG.md` has no change. `docs/FOLDERS.md` is regenerated and current.
