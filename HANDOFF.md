@@ -1,15 +1,40 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 10:11 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 10:17 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
-tip `4d7e484` / E403 cited only — Drive does not edit heap worktree. Drive keeps
+tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
+worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 `startup_ctors.*` + Init-hash/FNV/registry exclusivity. Integrator note:
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404 + E405 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 measured app-main Init→registry slice
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-APPMAIN-INIT-REGISTRY-SLICE-01` — wire Init-hash (`0x531d60` path) + tip
+  allocator depth into one measured startup edge. No leaf-vec; no idx 95; heap worktree
+  untouched.
+- Files: `native/core/appmain_init_registry_slice.{hpp,cpp}`,
+  `native/tests/test_appmain_init_registry_slice.cpp`,
+  `tools/lift/check_fappmain_init_registry_slice.py`; CMake/README;
+  checkpoint `docs/checkpoints/2026-10-22-appmain-init-registry-slice.md`;
+  EVIDENCE E405; TASKS/VALIDATION/INDEX/HANDOFF. Private (gitignored):
+  `local/validation/appmain-init-registry-slice-20261022/` (`manifest.json` sha256
+  `848bd7c6…`, `capture.py` `7f9dd26c…`).
+- Observation: ELF pins vtable `0x15c8cf8`→`0x531d60` and callsite `0x25aa06`; measured run
+  installs 275-entry registry via tip `AllocatorFront`+FakeHeap (alloc_ops=3, object 0x98);
+  `git merge-base --is-ancestor 4d7e484 HEAD` false — PR #5 heap modules absent on tip.
+- Commands: `python3 -I tools/lift/check_fappmain_init_registry_slice.py` OK;
+  `ctest --test-dir local/build/native-appmain-slice -R '^(appmain_init_registry_slice|registry_init_531d60)$'`
+  PASS; `python3 -I local/validation/appmain-init-registry-slice-20261022/capture.py` exit 0;
+  `check_ctor_slots` still **155** pairs.
+- Inference: G1 **PARTIAL** only — full Init, pools/listeners, PR5 merge, CRT wiring still open.
+- Next exact action: next named unresolved edge toward G1 PASSED (Init remainder that the
+  install depends on, or scheduled PR #5 allocator merge). Goal remains open.
 
 ## 2026-10-22 G1 PARTIAL evidence pack (Phase C)
 

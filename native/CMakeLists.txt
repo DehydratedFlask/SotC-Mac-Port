@@ -60,6 +60,7 @@ add_library(sotc_core STATIC
   core/inputtable_names_fixture.cpp
   core/registry_fill_52a220.cpp
   core/registry_init_531d60.cpp
+  core/appmain_init_registry_slice.cpp
   core/scratch_reset.cpp
   core/save_checksum.cpp
   core/name_hash.cpp
@@ -1544,6 +1545,12 @@ add_executable(test_registry_init_531d60 tests/test_registry_init_531d60.cpp)
 target_link_libraries(test_registry_init_531d60 sotc_core)
 add_test(NAME registry_init_531d60 COMMAND test_registry_init_531d60)
 set_tests_properties(registry_init_531d60 PROPERTIES
+  ENVIRONMENT "SOTC_INPUTTABLE_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/inputtable_551140_names.bin")
+
+add_executable(test_appmain_init_registry_slice tests/test_appmain_init_registry_slice.cpp)
+target_link_libraries(test_appmain_init_registry_slice sotc_core)
+add_test(NAME appmain_init_registry_slice COMMAND test_appmain_init_registry_slice)
+set_tests_properties(appmain_init_registry_slice PROPERTIES
   ENVIRONMENT "SOTC_INPUTTABLE_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/inputtable_551140_names.bin")
 
 add_executable(test_page_owner_map tests/test_page_owner_map.cpp)
