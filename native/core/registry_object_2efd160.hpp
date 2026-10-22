@@ -2,10 +2,10 @@
 // Built by Init 0x531d60 via alloc 0x17070 + ctor 0x52a220(obj, input_table_base, count=275).
 // ELF sha256 d0723afb...5861d3. Layout from offline analysis (E389); not a full body lift of 0x52a220.
 //
-// This module recovers ONLY the prologue stores of 0x52a220 (zero the three vector heads, stash the
-// input-table pointer, write float immediates 5.0f @ +0x6c and 60.0f @ +0x80). Sorted-table insert
-// loops, listener vectors, pool globals 0x2efd170/190/1b0, and name hashing into +0x58/+0x5c are
-// NOT modelled here — they need the path-FNV helper and further insert lifts.
+// This module recovers the prologue stores of 0x52a220 (zero the three vector heads, stash the
+// input-table pointer, write float immediates 5.0f @ +0x6c and 60.0f @ +0x80). Sorted-table
+// unique-insert for tables A/B lives in registry_sorted_insert.* (0x52d530 / 0x52d7e0 family).
+// Listener vectors, pool globals 0x2efd170/190/1b0, and name hashing into +0x58/+0x5c remain open.
 //
 // Allocator 0x17070 does not zero-fill; bytes not written by the prologue remain as left by the
 // caller (tests start from a poison pattern). Not registered into recovered_constructors().

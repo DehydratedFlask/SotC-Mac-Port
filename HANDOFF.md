@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 09:48 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 09:55 CDT (America/Chicago). Drive Init-hash:
 bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Parallel heap deepen (separate worktree):
 bc-492a8623-dec2-597e-8de6-73c00b0ad8a5 — owns `0x12820`/`0x12af0`/READY SRV; Drive keeps
 `startup_ctors.*` + Init-hash/FNV/registry exclusivity. Integrator note:
@@ -9,6 +9,23 @@ Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## 2026-10-22 registry sorted insert `0x52d530`/`0x52d7e0` family
+
+- Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-REGISTRY-INSERT-52D530-01` — unique lower_bound insert for tables A/B under
+  `0x52a220` (grow/shift `0x52d660`/`0x52d920` via `0x17090`/`0x170c0`). No leaf-vec; no idx 95;
+  heap bodies untouched.
+- Files: `native/core/registry_sorted_insert.{hpp,cpp}`, test, `tools/lift/check_f52d530.py`;
+  CMake/HANDOFF/TASKS/EVIDENCE/README; note in `registry_object_2efd160.hpp`.
+- Observation: 8-B / 16-B strides; duplicate key returns existing (val/ptr unchanged); empty→1 else
+  double capacity; hint-iterator fast path omitted (same unique result).
+- Commands: `python3 -I tools/lift/check_f52d530.py` OK;
+  `ctest --test-dir local/build/native-reginsert -R '^registry_sorted_insert$'` PASS;
+  `check_ctor_slots` still **155** pairs.
+- Inference: not G1; wiring inserts into full `0x52a220` / Init `0x531d60` + name keys still open.
+- Next exact action: fill loop of `0x52a220` (hash names → insert A/B) or Init slice using the
+  registry object. Goal open.
 
 ## 2026-10-22 path-FNV `0xa2ddc0`/`0x162020` + registry header `0x52a220`
 
