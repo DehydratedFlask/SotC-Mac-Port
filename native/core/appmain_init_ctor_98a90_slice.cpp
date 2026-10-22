@@ -16,11 +16,12 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
         return out;
     }
 
-    // Tail with lifted 0x3be050 (override null → use_lifted).
+    // Tail with lifted 0x3be050 + lifted 0x1ab550 (overrides null).
     Prologue255180TailHooks th = tail_hooks;
     th.ctor_98a90_3be050 = nullptr;
     th.use_lifted_ctor_98a90 = true;
     th.ctor_98a90_detail = ctor_hooks;
+    th.ctor_40_1ab550 = nullptr;  // use init_ctor_40_1ab550
     out.tail = run_prologue_255180_tail(alloc, self, th);
     if (!out.tail.ok) {
         return out;
@@ -47,6 +48,16 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
                       out.ctor.list_self_stored && out.ctor.tsc_stored &&
                       out.ctor.ensure_allocated && out.ctor.sub_3be930_ok;
         out.ctor.buf_grown = (out.ctor.buf_80 != nullptr);
+    }
+    if (out.tail.obj_40 != nullptr) {
+        auto* s = static_cast<std::uint8_t*>(out.tail.obj_40);
+        void* vt = nullptr;
+        std::memcpy(&vt, s, sizeof(void*));
+        out.ctor_40.derived_vt = (vt == ctor40_derived_vtable_1598ae0());
+        out.ctor_40.cell_self = (ctor40_cell_2ee6778() == out.tail.obj_40);
+        out.ctor_40.field_0a = (s[0x0a] == 1);
+        out.ctor_40.ok =
+            out.ctor_40.derived_vt && out.ctor_40.cell_self && out.ctor_40.field_0a;
     }
 
     BaseInitialize255130Hooks hooks = base_hooks;

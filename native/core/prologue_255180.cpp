@@ -99,7 +99,7 @@ Prologue255180TailResult run_prologue_255180_tail(AllocatorFront& alloc, void* s
                                                   const Prologue255180TailHooks& hooks) {
     Prologue255180TailResult out{};
     const bool have_ctor = (hooks.ctor_98a90_3be050 != nullptr) || hooks.use_lifted_ctor_98a90;
-    if (self == nullptr || !have_ctor || hooks.ctor_40_1ab550 == nullptr) {
+    if (self == nullptr || !have_ctor) {
         return out;
     }
 
@@ -121,13 +121,17 @@ Prologue255180TailResult run_prologue_255180_tail(AllocatorFront& alloc, void* s
     install_cell(app_slot(self, kPrologueAppSlot3b58), big, alloc, hooks.dtor_98a90_3be390);
     out.obj_98a90 = big;
 
-    // OBS 0x2552a1..0x2552cd: alloc 0x40 → ctor 0x1ab550 → store self+0x3b40
+    // OBS 0x2552a1..0x2552cd: alloc 0x40 → ctor 0x1ab550 (lifted) → store self+0x3b40
     void* small = alloc.new_(kPrologueTail40Bytes);
     if (small == nullptr) {
         return out;
     }
     std::memset(small, 0, kPrologueTail40Bytes);
-    hooks.ctor_40_1ab550(small);
+    if (hooks.ctor_40_1ab550 != nullptr) {
+        hooks.ctor_40_1ab550(small);
+    } else {
+        init_ctor_40_1ab550(small, hooks.ctor_40_detail);
+    }
     install_slot_vslot_only(app_slot(self, kPrologueAppSlot3b40), small, hooks.dtor_vslot08_3b40);
     out.obj_40 = small;
 

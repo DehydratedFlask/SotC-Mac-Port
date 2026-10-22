@@ -1,12 +1,14 @@
 // Measured Init path: prologue early + tail using lifted 0x3be050 (header+0x3be930+ensure+
-// 0x80 grow+null-head list+tsc) → base → registry. Tip AllocatorFront+FakeHeap.
-// PR #5 cite-only. NOT modelled: ensure migrate / 0xf590 / 0xf8f860 PLT / non-null list;
-// debug gates / 0x1ab550 / vslot / 0xf08.
+// 0x80 grow+null-head list+tsc) + lifted 0x1ab550 (0x40 ctor) → base → registry.
+// Tip AllocatorFront+FakeHeap. PR #5 cite-only.
+// NOT modelled: ensure migrate / 0xf590 / 0xf8f860 PLT / non-null list;
+// PLT bodies 0xf901a0/0xf901c0; debug gates / vslot / 0xf08.
 #pragma once
 
 #include "allocator_front.hpp"
 #include "appmain_init_remainder_slice.hpp"
 #include "base_initialize_255130.hpp"
+#include "ctor_40_1ab550.hpp"
 #include "ctor_98a90_3be050.hpp"
 #include "input_table_551140.hpp"
 #include "prologue_255180.hpp"
@@ -15,10 +17,18 @@
 
 namespace sotc {
 
+struct AppmainInitCtor40SliceSide {
+    bool ok = false;
+    bool derived_vt = false;
+    bool cell_self = false;
+    bool field_0a = false;
+};
+
 struct AppmainInitCtor98a90SliceResult {
     Prologue255180Result early{};
     Prologue255180TailResult tail{};
     Ctor98a90_3be050Result ctor{};
+    AppmainInitCtor40SliceSide ctor_40{};
     bool base_ok = false;
     std::uint32_t flag_after_base = 0;
     AppmainInitRemainderSliceResult remainder{};
