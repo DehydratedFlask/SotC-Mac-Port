@@ -49,6 +49,9 @@ add_library(sotc_core STATIC
   core/atomic_add_ref_14ccb0.cpp
   core/atomic_xadd_b30cf0.cpp
   core/store_value_clear_flag_158340.cpp
+  core/fnv_span_161f80.cpp
+  core/hashed_string_14c3a0.cpp
+  core/registry_object_14c9a0.cpp
   core/scratch_reset.cpp
   core/save_checksum.cpp
   core/name_hash.cpp
@@ -1471,5 +1474,17 @@ add_test(NAME atomic_xadd_b30cf0 COMMAND test_atomic_xadd_b30cf0)
 add_executable(test_store_value_clear_flag_158340 tests/test_store_value_clear_flag_158340.cpp)
 target_link_libraries(test_store_value_clear_flag_158340 sotc_core)
 add_test(NAME store_value_clear_flag_158340 COMMAND test_store_value_clear_flag_158340)
+
+add_executable(test_fnv_span_161f80 tests/test_fnv_span_161f80.cpp)
+target_link_libraries(test_fnv_span_161f80 sotc_core)
+add_test(NAME fnv_span_161f80 COMMAND test_fnv_span_161f80)
+
+add_executable(test_hashed_string_14c3a0 tests/test_hashed_string_14c3a0.cpp)
+target_link_libraries(test_hashed_string_14c3a0 sotc_core)
+add_test(NAME hashed_string_14c3a0 COMMAND test_hashed_string_14c3a0)
+
+add_executable(test_registry_object_14c9a0 tests/test_registry_object_14c9a0.cpp)
+target_link_libraries(test_registry_object_14c9a0 sotc_core)
+add_test(NAME registry_object_14c9a0 COMMAND test_registry_object_14c9a0)
 
 add_subdirectory(api)

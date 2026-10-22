@@ -8,6 +8,13 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
+## 2026-10-22 orchestrator batch 7 — verified
+
+- CPU-01-14D880-CHAIN-01: seven functions lifted, root 309/309 + 8 checkers (E390). `ctor_14c9a0` supports only a null parent and aborts otherwise; four `__cxa_atexit` registrations are explicit documented omissions.
+- SRV-01-ALLOCATOR-FRONTEND-CONTRACT-01 (private, E390): `0x17070` is `new(size, heap=1, align=8, flags=1)` over a polymorphic 3-layer heap; native replacement must not zero-fill, treat size 0 as 1, ignore free(NULL)/foreign pointers, report OOM once then trap. Gap: `host_map::map_region` rejects nonzero base but the page allocator path needs a context-aware wrapper.
+- Project status estimate given to user: months-to-years scale; G1–G6 NOT RUN.
+- Next exact action: native allocator front-end + heap hierarchy lift (SRV-01), consumers of the hashed-name registry, vtable slot 4/5 callers (app Init/Shutdown), and decoding `0x14cb70`'s callees.
+
 ## 2026-10-22 orchestrator batch 6 — verified
 
 - CPU-01-TINY-LEAVES-14CCB0-01: four tiny leaves lifted, root 306/306 (E389). Unlifted tiny candidates seen: getters 0x96f50/0x96f60/0x4934b0, `lea` helpers 0x79cbb0/0x5915d0, sibling 0xb30ce0.
