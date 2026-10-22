@@ -42,6 +42,7 @@
 #include "core/vslot_40_533100_cp3shadowprecache_attach.hpp"
 #include "core/vslot_40_533100_tail_140d90.hpp"
 #include "core/vslot_40_533100_stackchk.hpp"
+#include "core/init_531d60_post_base_499f80.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -171,6 +172,8 @@ int g_v40_tail_140d90 = 0;
 int g_v40_tail_140d90_f590 = 0;
 int g_v40_tail_140d90_arg = -1;
 void* g_v40_tail_140d90_slot = nullptr;
+int g_post_base_499f80 = 0;
+void* g_post_base_499f80_arg = nullptr;
 alignas(8) std::uint8_t g_shadow_asset[0x40]{};
 alignas(8) std::uint8_t g_skels_asset[0x40]{};
 alignas(8) std::uint8_t g_anims_asset[0x40]{};
@@ -367,6 +370,10 @@ void hook_v40_tail_140d90(void* slot_obj, int arg) {
     g_v40_tail_140d90_arg = arg;
 }
 void hook_v40_tail_140d90_f590(void*) { ++g_v40_tail_140d90_f590; }
+void hook_post_base_499f80(void* arg) {
+    ++g_post_base_499f80;
+    g_post_base_499f80_arg = arg;
+}
 
 void* loadp(const void* base, std::size_t off) {
     void* p = nullptr;
@@ -463,16 +470,23 @@ int main() {
     CHECK(load_inputtable_names_fixture_default(fix));
     CHECK(apply_inputtable_names_fixture(table, fix));
 
-    // Join @ self+0x3b60; cp3 attach @ +0x3cb8/+0x3cc0; csp attach @ +0x3cc8/+0x3cd0.
+    // Join @ self+0x3b60; cp3 attach @ +0x3cb8/+0x3cc0; csp attach @ +0x3cc8/+0x3cd0;
+    // post-base 0x499f80 arg @ +0x3c70.
     constexpr std::size_t kAppBytesJoin = kVslot40JoinSlotOff + sizeof(void*);
     constexpr std::size_t kAppBytesCp3 =
         static_cast<std::size_t>(kVslot40Cp3charactersAttachFlagOff) + 1;
     constexpr std::size_t kAppBytesCsp =
         static_cast<std::size_t>(kVslot40Cp3shadowprecacheAttachFlagOff) + 1;
+    constexpr std::size_t kAppBytesPost =
+        kInit531d60PostBase499f80ArgOff + sizeof(void*);
     constexpr std::size_t kAppBytesNeeded =
         (kAppBytesJoin > kAppBytesCp3)
-            ? ((kAppBytesJoin > kAppBytesCsp) ? kAppBytesJoin : kAppBytesCsp)
-            : ((kAppBytesCp3 > kAppBytesCsp) ? kAppBytesCp3 : kAppBytesCsp);
+            ? ((kAppBytesJoin > kAppBytesCsp)
+                   ? ((kAppBytesJoin > kAppBytesPost) ? kAppBytesJoin : kAppBytesPost)
+                   : ((kAppBytesCsp > kAppBytesPost) ? kAppBytesCsp : kAppBytesPost))
+            : ((kAppBytesCp3 > kAppBytesCsp)
+                   ? ((kAppBytesCp3 > kAppBytesPost) ? kAppBytesCp3 : kAppBytesPost)
+                   : ((kAppBytesCsp > kAppBytesPost) ? kAppBytesCsp : kAppBytesPost));
     constexpr std::size_t kAppBytes =
         (kPrologueAppMinBytes > kAppBytesNeeded) ? kPrologueAppMinBytes : kAppBytesNeeded;
     std::vector<std::uint8_t> app(kAppBytes, 0);
@@ -506,6 +520,8 @@ int main() {
     g_v40_tail_140d90 = g_v40_tail_140d90_f590 = 0;
     g_v40_tail_140d90_arg = -1;
     g_v40_tail_140d90_slot = nullptr;
+    g_post_base_499f80 = 0;
+    g_post_base_499f80_arg = nullptr;
     stack_guard_value_cell() = 0xC4A4A70000000001ULL;
     std::memset(g_shadow_asset, 0, sizeof(g_shadow_asset));
     std::memset(g_skels_asset, 0, sizeof(g_skels_asset));
@@ -610,10 +626,13 @@ int main() {
     sh.ctor_523bd0 = hook_f08_ctor;
     sh.dtor_525b40 = hook_f08_dtor;
 
+    Init531d60PostBase499f80Hooks pb{};
+    pb.call_499f80 = hook_post_base_499f80;
+
     const std::uint64_t allocs_before = heap.alloc_count;
     const auto t0 = std::chrono::steady_clock::now();
     const auto r = run_appmain_init_ctor_98a90_slice(table, front, app.data(), nullptr, eh, th, ch,
-                                                     bh, setter.data(), 0, 0x11, 0x22, 0x33, sh);
+                                                     bh, setter.data(), 0, 0x11, 0x22, 0x33, sh, pb);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
@@ -849,6 +868,12 @@ int main() {
     CHECK(g_nonnull == 0);
     CHECK(g_init_tb == 1);
     CHECK(r.base_ok);
+    // E446: Init post-base 0x499f80(self+0x3c70) call-site; stop before 0x56dcb0
+    CHECK(r.post_base_499f80.ok);
+    CHECK(g_post_base_499f80 == 1);
+    CHECK(g_post_base_499f80_arg ==
+          static_cast<std::uint8_t*>(app.data()) + kInit531d60PostBase499f80ArgOff);
+    CHECK(r.post_base_499f80.arg == g_post_base_499f80_arg);
     CHECK(r.remainder.trivial_ok);
     CHECK(r.remainder.registry.status == RegistryInit531d60Status::ok);
     CHECK(r.remainder.registry.entry_count == kInputTable551140Count);
@@ -870,16 +895,17 @@ int main() {
         "shadowskels+skels_attach+shadowanims+anims_attach+shadowbanks+banks_attach+"
         "shadowstreams+streams_attach+shadowrandomevents+randomevents_attach+shadowbossmusic+"
         "bossmusic_attach+cp3characters+cp3characters_attach+cp3shadowprecache+"
-        "cp3shadowprecache_attach+tail_140d90+stackchk+early+tail+base+trivial+registry "
+        "cp3shadowprecache_attach+tail_140d90+stackchk+post_base_499f80+early+tail+base+"
+        "trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
         "anims=%p banks=%p streams=%p rand=%p boss=%p cp3=%p csp=%p post_hit=%d miss_null=%d "
         "marker=0x%x refc=%u fail=%d skels_refc=%u skels_fail=%d anims_refc=%u anims_fail=%d "
         "banks_refc=%u banks_fail=%d streams_refc=%u streams_fail=%d rand_refc=%u rand_fail=%d "
-        "boss_refc=%u boss_fail=%d cp3_fail=%d csp_fail=%d t140=%d schk=%d gate_byte=%u "
+        "boss_refc=%u boss_fail=%d cp3_fail=%d csp_fail=%d t140=%d schk=%d pb499=%d gate_byte=%u "
         "mid_reg=%d tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
-        "vslot533100_hit/success_atexit/next_path/14c2f0_body/6a5370_body/6abcc0_body/"
+        "vslot533100_hit/success_atexit/499f80_body/14c2f0_body/6a5370_body/6abcc0_body/"
         "21620_body/2779a0_body/42390_body/525080_body/2569d0_body/26ea0/26b60/272d0/"
         "255f60/f8f3a0_body/140d90_body/ba40_listeners/plt/ctor523bd0_body/dtor525b40_body/"
         "ctor493230_body/ensure_migrate/nonnull=NOT_modelled pr5_heap_merge=GAP\n",
@@ -908,6 +934,7 @@ int main() {
         r.vslot_40_cp3shadowprecache_attach.took_fail_path ? 1 : 0,
         r.vslot_40_tail_140d90.call_140d90_count,
         r.vslot_40_stackchk.returned ? 1 : 0,
+        r.post_base_499f80.call_499f80_count,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
