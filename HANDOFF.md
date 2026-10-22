@@ -27,7 +27,7 @@ or Metal gameplay is demonstrated.
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-xmm-seed-20261022/` (manifest
   `cdbc6477…` at tip `7597ced`; capture `4249ce0a…`).
-- Observation: feat tip `7597ced`; measured `pbxmm=2` + `pbic=2` + mid_reg=4 → 275 registry.
+- Observation: feat tip `7597ced`; docs tip `09393cc`; measured `pbxmm=2` + `pbic=2` + mid_reg=4 → 275 registry.
   Ymm reload / CP10 / `0x26800`/`0xf590` bodies NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_xmm_seed.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
