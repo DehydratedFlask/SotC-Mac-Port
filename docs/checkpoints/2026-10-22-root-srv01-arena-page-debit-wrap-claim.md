@@ -1,6 +1,6 @@
 # Checkpoint: SRV-01 arena page-debit uint32 wrap claim
 
-- Local date/time: 2026-10-22 00:15 CDT (America/Chicago)
+- Local date/time: 2026-10-22 00:16 CDT (America/Chicago)
 - Integrator / agent: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`)
 - Task ID: `SRV-01-ARENA-PAGE-DEBIT-UINT32-UNDERFLOW-WRAP-FIXTURE-01`
 - Status: `CLAIMED`; 0 implementation attempts and 0 failed tries.
@@ -44,6 +44,14 @@
   reports `0 0`; logs are `srv01-wrap-claim-pre-fetch.log` (empty output) and
   `srv01-wrap-claim-pre-divergence.log` (SHA-256
   `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d0247050325e7c5a3b2b3271c`) in the same directory.
+- Claim commit `872f9b66ae02711bb2bf3c5dac6b47b01bda397d` (`docs: claim arena page debit wrap
+  fixture`) and `git push origin main` both exit 0. Staged audit accepts 4 paths; full audit accepts
+  1,691. Post-push fetch exits 0 and divergence is `0 0`. Commit/push/post-fetch/post-divergence
+  log SHA-256 values are `cbf1aaae88534675d3f5785306a50d43c0d2bed03c67f8d624b4fd0120b18732`,
+  `d9837f6909935027f5d32342060f736fb4b9d45629e08e464249cc47b200cf21`,
+  `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`, and
+  `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d0247050325e7c5a3b2b3271c`; all are under
+  `local/validation/20261022-root-fixture-baselines/`.
 - Observation: implementation performs native unsigned 32-bit subtraction after converting
   `bytes >> 16` to `uint32_t`.
 - Inference/task boundary: seeding the synthetic page counter to 1 and debiting `0x20000` bytes
