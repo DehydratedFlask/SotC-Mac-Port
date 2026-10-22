@@ -12,7 +12,8 @@
 // vcall-callee / `0x532ca0` body tourism.
 //
 // Claimed: call-site control flow pin only.
-// NOT modelled: stack prep; 0x532ed0 body; following virtual call. PR #5 cite-only.
+// NOT modelled: stack prep; 0x532ed0 body; following virtual call
+// (claimed separately as E477). PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
