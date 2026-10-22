@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 03:32 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 03:39 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -52,9 +52,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   fetch-verified at 0/0 divergence; its explicit and full audits accepted 4/1,724 paths.
 - Only the pre-existing user-owned `native/api/CMakeLists.txt` modification and untracked
   `native/api/host/` remain in the worktree; neither was staged or included in the commit.
-- Next exact action: publish the verified allocator fixture and independent region-list claim below
-  using explicit allowlisted paths, then assign the region-list test file to its worker. `/root`
-  retains `HANDOFF.md` integration and publication.
+- Next exact action: send `/root/native_fixture_scout` the single-file region-list fixture below;
+  `/root` retains `HANDOFF.md` integration and publication.
 
 ## SRV-01 allocator 64 KiB alignment overflow fixture — fixture verified
 
@@ -71,9 +70,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - This records synthetic integer arithmetic only, not allocator runtime behavior or game behavior.
   Status is `FIXTURE_VERIFIED`, one successful implementation attempt and zero failed tries. Claim
   commit `0341cacc5273102d566a6c35b74e3fef615bd258` is pushed and fetch-verified at 0/0 divergence;
-  pre/post explicit audits accepted 6 paths and full audits accepted 1,725 paths. See E302.
-- Next exact action: publish the completion with explicit allowlisted paths. The user-owned
-  `native/api/CMakeLists.txt` modification and untracked `native/api/host/` remain outside scope.
+  completion commit `42331857a2212ec2f3e7c283f41b1f197da0d585` is pushed and fetch-verified at 0/0.
+  Pre/post explicit audits accepted 8 paths and full audits accepted 1,727 paths. See E302 and E306.
+- Next exact action: continue the separate null-head-slot fixture claim below. User-owned
+  `native/api/CMakeLists.txt` and untracked `native/api/host/` remain outside scope.
 
 ## SRV-01 region-list null head-slot insert fixture — active claim
 
@@ -90,10 +90,12 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   `native/tests/test_region_list.cpp:L136`, `L154`, and `L168`. The helper skips slot assignment
   for a null slot pointer while still initializing node fields, optional count, and owner. This
   pins helper behavior only; it does not establish an actual list-head callsite or game behavior.
-- Status is `ACTIVE`, with zero implementation attempts and zero failed tries. Proposed worker
-  `/root/native_fixture_scout` owns only `native/tests/test_region_list.cpp` after claim publication.
-- Next exact action: finish the project-index and Trail checks, publish this claim, then hand off the
-  single test-file change. `/root` owns all docs and publication.
+- Status is `ACTIVE`, with zero implementation attempts and zero failed tries. Claim/completion
+  commit `42331857a2212ec2f3e7c283f41b1f197da0d585` is pushed and fetch-verified at 0/0 divergence;
+  pre/post explicit audits accepted 8 paths and full audits accepted 1,727 paths. See E306 and the
+  [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-region-list-null-head-claim.md).
+- Next exact action: ask `/root/native_fixture_scout` to add the one synthetic null-slot case in
+  `native/tests/test_region_list.cpp` only; root owns all docs, independent replay, and publication.
 
 ## SAV-01 stream-file symlink destination fixture — verified
 
