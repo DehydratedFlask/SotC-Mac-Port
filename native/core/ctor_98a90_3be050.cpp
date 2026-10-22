@@ -125,8 +125,16 @@ Ctor98a90_3be050Result init_98a90_3be050(AllocatorFront& alloc, void* obj,
     zero_xmm(base + 0x55);
     zero_xmm(base + 0x48);
 
+    // OBS 0x3be0b6: call 0x3be930(obj+0x68) — lifted; overrideable
     if (hooks.sub_3be930 != nullptr) {
-        hooks.sub_3be930(base + 0x68);
+        hooks.sub_3be930(base + kInitSub3be930OffInObj);
+    } else {
+        init_sub_3be930(base + kInitSub3be930OffInObj);
+    }
+    {
+        void* vt = nullptr;
+        std::memcpy(&vt, base + kInitSub3be930OffInObj + 0x18, sizeof(void*));
+        out.sub_3be930_ok = (vt == slot_vtable_2dd9f78());
     }
     // OBS 0x3be0bb..0x3be0c2: lea rdi,[obj+0x98a88]; call 0x323d0 (lifted; overrideable)
     if (hooks.store_tsc_323d0 != nullptr) {
@@ -173,7 +181,8 @@ Ctor98a90_3be050Result init_98a90_3be050(AllocatorFront& alloc, void* obj,
     // OBS 0x3be1ce..: measured null-head early-out; non-null body hooked
     list_walk_head(obj, hooks, out);
 
-    out.ok = (out.nested_48 != nullptr) && out.list_self_stored && out.tsc_stored;
+    out.ok = (out.nested_48 != nullptr) && out.list_self_stored && out.tsc_stored &&
+             out.sub_3be930_ok;
     return out;
 }
 
