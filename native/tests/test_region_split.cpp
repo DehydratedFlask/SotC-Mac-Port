@@ -132,6 +132,22 @@ int main() {
         CHECK(!split_using_carve_fit(free, neu, 0x100000ull, 0x100000u).has_value());
         CHECK(free.size() == 0x400000ull);
     }
+    {
+        RegionNode free{}, neu{};
+        std::memset(free.raw, 0xA5, sizeof(free.raw));
+        std::memset(neu.raw, 0x5A, sizeof(neu.raw));
+        free.set_start(0x20001000ull);
+        free.set_size(0x30000ull);
+        free.set_capacity(0x30000ull);
+        std::uint8_t free_before[RegionNode::kBytes];
+        std::uint8_t neu_before[RegionNode::kBytes];
+        std::memcpy(free_before, free.raw, sizeof(free.raw));
+        std::memcpy(neu_before, neu.raw, sizeof(neu.raw));
+
+        CHECK(!split_using_carve_fit(free, neu, 0x30001ull, 0x10000u).has_value());
+        CHECK(std::memcmp(free.raw, free_before, sizeof(free.raw)) == 0);
+        CHECK(std::memcmp(neu.raw, neu_before, sizeof(neu.raw)) == 0);
+    }
     std::puts("region_split: all checks passed");
     return 0;
 }
