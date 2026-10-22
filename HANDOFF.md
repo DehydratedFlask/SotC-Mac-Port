@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 11:20 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 11:30 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,31 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E416 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E417 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 prologue debug gates `0x2552d4`
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-PROLOGUE-GATES-2552D4-01` — lift epilogue after store `self+0x3b40`:
+  gate cells `0x2dfce70`/`0x2dfcf40`/`0x2eec840` + empty-path `0xba40`; a30 vslot+0x10
+  hooked; stack-chk NOT modelled. Prefer always-on gates over vslot/`0xf08`/migrate/
+  non-null. FakeHeap + tip AllocatorFront; PR #5 cite-only. No leaf-vec; no idx 95.
+- Files: `native/core/prologue_gates_2552d4.{hpp,cpp}`; prologue tail wire;
+  `tools/lift/check_f2552d4_gates.py`; checkpoint
+  `docs/checkpoints/2026-10-22-prologue-gates-2552d4.md`; EVIDENCE E417;
+  TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-prologue-gates-20261022/` (manifest `11416201…` at tip
+  `f5bdcb0`).
+- Observation: feat tip `f5bdcb0`; ELF pins gates/ba40/cells; measured gate_byte=0 (flag≠0) → 275 registry.
+  Stack-chk / ba40 listeners / app vslots / `0xf08` NOT modelled.
+- Commands: `python3 -I tools/lift/check_f2552d4_gates.py` OK;
+  `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: app vslot `0x534130`/`0x533100`, or `0xf08`, or ensure migrate /
+  non-null list. Goal open.
 
 ## 2026-10-22 prologue-tail 0x40 ctor `0x1ab550`
 
