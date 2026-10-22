@@ -5,14 +5,15 @@
 //   call 0x14c2f0(path_buf, path) → hashed path
 //   vcall [loader.vt+0x18](out, loader, path_buf)
 //   // stop before attach-into self+0x3cc8 @ 0x533f97 (14d880 join)
+//     (see vslot_40_533100_cp3shadowprecache_attach.*)
 //
 // Always-on after E441 cp3Characters attach. Prefer over success atexit
 // (flag-true only) and over deepen 0x14c2f0/0x6a5370 (already hooked earlier).
 // Prefer over empty-path migrate/non-null.
 //
 // Claimed: notify + load-attempt control flow + path pin.
-// NOT modelled: attach/install into self+0x3cc8; 0x14ccb0 (in attach);
-// success atexit; bodies of 0x14c2f0 / 0x95580 / vcall; asset I/O.
+// Attach/install into self+0x3cc8: see vslot_40_533100_cp3shadowprecache_attach.* (E443).
+// NOT modelled: success atexit; bodies of 0x14c2f0 / 0x95580 / vcall; asset I/O.
 // PR #5 cite-only.
 #pragma once
 

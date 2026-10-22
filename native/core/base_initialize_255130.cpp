@@ -241,6 +241,17 @@ bool base_initialize_255130(void* self, void* arg,
         if (!cspr.ok) {
             return false;
         }
+        // E443: always-on cp3shadowprecache attach (measured fail; install into self+0x3cc8).
+        const Vslot40_533100Cp3shadowprecacheAttachResult cspar =
+            vslot_40_533100_cp3shadowprecache_attach(
+                self, cspr.loaded, /*success_flag=*/false,
+                hooks.vslot_40_cp3shadowprecache_attach_detail);
+        if (hooks.vslot_40_cp3shadowprecache_attach_out != nullptr) {
+            *hooks.vslot_40_cp3shadowprecache_attach_out = cspar;
+        }
+        if (!cspar.ok) {
+            return false;
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true
