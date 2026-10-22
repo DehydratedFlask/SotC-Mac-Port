@@ -27,7 +27,7 @@ or Metal gameplay is demonstrated.
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-ymm-reload-20261022/` (manifest
   `a5240c88…` at tip `48cea50`; capture `a4a62b1b…`).
-- Observation: feat tip `48cea50`; measured `pbyr=1` + `pbxmm=2` + mid_reg=4 → 275 registry.
+- Observation: feat tip `48cea50`; docs tip `922802e`; measured `pbyr=1` + `pbxmm=2` + mid_reg=4 → 275 registry.
   CP10/stack / `0x26800`/`0xf590` bodies NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_ymm_reload.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
