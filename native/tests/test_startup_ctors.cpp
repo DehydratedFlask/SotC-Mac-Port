@@ -20,6 +20,10 @@ int main() {
         CHECK(st.descriptor_mutex_initialized && !st.init_failed);
         CHECK(st.slot23_names.loaded);
         CHECK(st.leaf_e71990.cells[8] == static_cast<std::uint8_t>(kLeafE71990Hash[0] & 0xff));
+        for (std::size_t i = 0; i < kAheadRegistrationCount; ++i) {
+            CHECK(st.ahead_registrations[i].published());
+            CHECK(st.ahead_registrations[i].descriptor() == &kAheadRegistrationDescriptors[i]);
+        }
         CHECK(st.descriptor->object_size == ClothingPreviewParam::kObjectSize);
         // Slot 11 published its descriptor and mutex; the lazy schema stays unavailable.
         CHECK(st.physmesh_registration.published());
@@ -164,11 +168,11 @@ int main() {
         auto r = run_constructors(order, st);
         CHECK(!r.ok() && r.completed == 0 && r.callback_failed && r.blocked_on_rva == 0x111111);
     }
-    // Slots 0-23 are recovered (23 via private fixture). Indices 24-47 stay out of production.
+    // Contiguous 0-47 recovered (23 via private fixture; 24-47 via ahead-family registrations).
     {
         const auto slots = recovered_constructors();
         bool saw11 = false, saw23 = false;
-        std::uint32_t seen_thunks = 0;
+        std::uint32_t seen_thunks = 0, seen_ahead = 0;
         for (const CtorSlot& slot : slots) {
             if (slot.original_index == 11) {
                 saw11 = true;
@@ -185,10 +189,15 @@ int main() {
                 saw23 = true;
                 CHECK(slot.original_rva == 0xe71990 && slot.run != nullptr);
             }
+            if (slot.original_index >= 24 && slot.original_index <= 47) {
+                CHECK(slot.run != nullptr);
+                CHECK(slot.original_rva ==
+                      kAheadRegistrationDescriptors[slot.original_index - 24].original_thunk_rva);
+                ++seen_ahead;
+            }
             CHECK(slot.run != nullptr);  // production table has no explicit null rows
-            if (slot.original_index > 23 && slot.original_index < 48) CHECK(false);  // 24-47 not claimed
         }
-        CHECK(saw11 && saw23 && seen_thunks == 8);
+        CHECK(saw11 && saw23 && seen_thunks == 8 && seen_ahead == 24);
     }
     // Fail-visible when the private fixture cannot be resolved.
     {
@@ -200,7 +209,9 @@ int main() {
         unsetenv(kSlot23NamesFixtureEnv);
     }
     const std::uint32_t expect[] = {
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 48, 49, 50, 51, 52, 53, 54, 56, 57, 58, 60, 61, 62,
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+        24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+        48, 49, 50, 51, 52, 53, 54, 56, 57, 58, 60, 61, 62,
         63, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92,
         93, 94,
         96, 97, 98, 99, 100, 101, 102, 103, 104, 106, 107, 108, 109, 110, 111, 112, 113, 114, 118, 119,

@@ -352,6 +352,8 @@ add_test(NAME registration_thunks COMMAND test_registration_thunks)
 add_executable(test_registration_thunks_ahead tests/test_registration_thunks_ahead.cpp)
 target_link_libraries(test_registration_thunks_ahead sotc_core)
 add_test(NAME registration_thunks_ahead COMMAND test_registration_thunks_ahead)
+set_tests_properties(registration_thunks_ahead PROPERTIES
+  ENVIRONMENT "SOTC_SLOT23_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/slot23_e71990_names.bin")
 add_executable(test_trig_constants tests/test_trig_constants.cpp)
 target_link_libraries(test_trig_constants sotc_core)
 add_test(NAME trig_constants COMMAND test_trig_constants)
