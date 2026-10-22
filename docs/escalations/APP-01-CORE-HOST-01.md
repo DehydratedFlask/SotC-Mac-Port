@@ -66,3 +66,11 @@
 - Principal reassessment / authorized next approach: none recorded yet. Do not make a fourth host
   change or rerun the targeted host check until the principal reviews the actual wait-status gap and
   records a new assessment here.
+
+## Principal reassessment — 2026-10-22 (RESOLVED)
+
+- Diagnostic (no behavior change): the bad-stdin child's wait status was `0x0` (`WIFEXITED=1`, `WEXITSTATUS=0`), not an ASan abort or signal.
+- Root cause: `read(2)` on a write-only fd 0 returns EBADF; libc++ `std::cin` (sync_with_stdio(false)) maps that to `eofbit|failbit` with `badbit` clear, so `run_session` correctly returned `Eof` and `main` exited 0. The iostream layer hid the read error.
+- Fix: `Fd0Buf` streambuf in `native/api/host/main.cpp` reads fd 0 via `read(2)`, retries EINTR, throws on real errors (istream -> badbit -> InputError -> exit 4). Expected assertion unchanged; test now prints wait status on failure.
+- Hashes: main.cpp `372d7fefdf150957e2f41dd2cfb9c44d9d21c6c75391f46d13ff7f4b92b78a30`; test_host_protocol.cpp `a9bfc57456f09a024b762ab1181c823dab5a8d3cde946d7cc84e632fcfc1e6d5`.
+- Root replay: fresh `cmake -S native -B local/build/root-host-verify -G Ninja -DSOTC_SANITIZE=ON`, build, `ctest -R '^sotc_host_protocol$'` 1/1 passed. Evidence E383. Host still has no engine; G4 NOT RUN.
