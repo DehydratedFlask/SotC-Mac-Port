@@ -118,12 +118,16 @@ assert [(rva, index) for rva, index, _, _ in rows if rva in (0xd32720, 0xd2ffe0)
 # native sources exist and are byte-verified by their own checkers, so a regression here means the
 # runner silently skipped a recovered constructor.
 for rva, index in ((0xe094e0, 50), (0xdf94c0, 55), (0xde0160, 59), (0xdbfa60, 70),
-                   (0xd8fa40, 80), (0xd86ed0, 81), (0xd85490, 82), (0xce8440, 147)):
+                   (0xd8fa40, 80), (0xd86ed0, 81), (0xd5a280, 105), (0xd39b00, 115),
+                   (0xd366d0, 116), (0xd33b50, 117), (0xd85490, 82), (0xce8440, 147)):
     assert (rva, index) in [(r[0], r[1]) for r in rows], (
         f'lifted constructor {rva:#x} (index {index}) is no longer registered')
-# Contiguous production neighborhood through idx 94 (gaps 80-81 closed; 95 still open).
+# Contiguous 0-94; gap 95 (dormant); contiguous 96-151 after idx 105/115-117 register.
 assert [row[1] for row in rows if row[1] <= 94] == list(range(95)), (
-    'indices 0-94 must be registered contiguously after avx 80-81')
+    'indices 0-94 must be registered contiguously')
+assert [row[1] for row in rows if 96 <= row[1] <= 151] == list(range(96, 152)), (
+    'indices 96-151 must be registered contiguously after avx/guarded bookkeeping')
+assert 95 not in [row[1] for row in rows], 'idx 95 must stay unregistered (NEEDS_PRINCIPAL)'
 
 
 # ---- byte anchors for slot 11 (ClothingPhysicalMeshParameters) against the pinned ELF ----
@@ -218,6 +222,6 @@ block_stores_ok(image.read(0xf08f00, 556), "reset 0xf08f00")
 print(
     f"OK: ELF sha256={elf_digest}; constructor table start={TABLE_START:#x} "
     f"count={TABLE_COUNT} sha256={table_digest}; verified {len(rows)} registered RVA/index pairs; "
-    "slots 0-47 recovered; idx 55/59/80/81 lifts registered; contiguous 0-94; "
-    "later registered rows follow (see recovered_constructors for remaining gaps)"
+    "slots 0-47 recovered; idx 55/59/80/81/105/115-117 registered; contiguous 0-94 "
+    "(gap 95 dormant) and 96-151; sparse later rows (282/290/520/538)"
 )
