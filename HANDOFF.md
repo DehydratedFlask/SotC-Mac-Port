@@ -28,7 +28,7 @@ or Metal gameplay is demonstrated.
   E465; TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-lea-vmovq-20261022/` (manifest
   `e154ecfd…` at tip `e8e32dd`; capture `9a9b3ee4…`).
-- Observation: feat tip `e8e32dd`; measured `pblv=1` + `pb52=1` + mid_reg=4 → 275 registry.
+- Observation: feat tip `e8e32dd`; docs tip `6ff77fd`; measured `pblv=1` + `pb52=1` + mid_reg=4 → 275 registry.
   Stack prep / `0x532ca0` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_lea_vmovq.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
