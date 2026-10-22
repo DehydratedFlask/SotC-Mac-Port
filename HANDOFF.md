@@ -25,9 +25,10 @@ or Metal gameplay is demonstrated.
   `tools/lift/check_f3be050_ctor.py`; prologue tail lifted-ctor wiring; CMake/README;
   checkpoint `docs/checkpoints/2026-10-22-ctor-98a90-3be050.md`; EVIDENCE E410;
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-ctor-98a90-20261022/` (manifest `81c3a8f4…`).
-- Observation: ELF pins body/header; nested sentinel + ensure hook on zeroed capacity;
-  success → 275 registry. Remainder/bodies NOT modelled.
+  `local/validation/appmain-init-ctor-98a90-20261022/` (manifest `17ed096c…` at tip
+  `0712be7`).
+- Observation: feat tip `0712be7`; ELF pins body/header; nested sentinel + ensure hook on
+  zeroed capacity; success → 275 registry. Remainder/bodies NOT modelled.
 - Commands: `python3 -I tools/lift/check_f3be050_ctor.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^(appmain_init_ctor_98a90_slice|appmain_init_prologue_tail_slice)$'`
   PASS; private capture exit 0; `check_ctor_slots` still **155**.
