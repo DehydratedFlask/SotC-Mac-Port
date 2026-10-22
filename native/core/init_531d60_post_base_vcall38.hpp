@@ -11,8 +11,8 @@
 // `0x14c2f0` / `0x6a5370`.
 //
 // Claimed: virtual-call control flow pin only (slot +0x38).
-// NOT modelled: r12/vtable producers; callee body; following lea r13.
-// PR #5 cite-only.
+// NOT modelled: r12/vtable producers; callee body; following lea r13
+// (claimed separately as E487). PR #5 cite-only.
 #pragma once
 
 #include <cstddef>

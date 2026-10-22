@@ -52,7 +52,8 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBase53fd10Hooks& post_base_53fd10_hooks,
     const Init531d60PostBaseCell2eff448Cells& post_base_cell_2eff448_cells,
     const Init531d60PostBaseCell2eff448Hooks& post_base_cell_2eff448_hooks,
-    const Init531d60PostBaseVcall38Hooks& post_base_vcall38_hooks) {
+    const Init531d60PostBaseVcall38Hooks& post_base_vcall38_hooks,
+    const Init531d60PostBaseLea32f4fe0Cells& post_base_lea_32f4fe0_cells) {
     AppmainInitCtor98a90SliceResult out{};
     out.early = run_prologue_255180_early(alloc, early_hooks);
     if (!out.early.ok) {
@@ -361,6 +362,11 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     // E486: always-on Init continue — virtual call [rax+0x38]; callee NOT modelled.
     out.post_base_vcall38 = init_531d60_post_base_vcall38(post_base_vcall38_hooks);
     if (!out.post_base_vcall38.ok) {
+        return out;
+    }
+    // E487: always-on Init continue — lea r13 pin @ 0x32f4fe0.
+    out.post_base_lea_32f4fe0 = init_531d60_post_base_lea_32f4fe0(post_base_lea_32f4fe0_cells);
+    if (!out.post_base_lea_32f4fe0.ok) {
         return out;
     }
     out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,
