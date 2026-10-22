@@ -144,6 +144,15 @@ class EntropyAndProbeTests(unittest.TestCase):
         }
         self.assertEqual(cah.decompress_probe(b''), expected)
 
+    def test_probe_offsets_equal_to_input_length_report_too_short(self):
+        two_byte = cah.decompress_probe(b'\x00\x01')
+        for name in ('zlib_offset2', 'raw_inflate_offset2', 'lzma_offset2'):
+            with self.subTest(name=name):
+                self.assertEqual(two_byte[name], {'ok': False, 'err': 'too_short'})
+
+        four_byte = cah.decompress_probe(b'\x00\x01\x02\x03')
+        self.assertEqual(four_byte['lzma_offset4'], {'ok': False, 'err': 'too_short'})
+
     def test_trivial_inflate_rejected(self):
         # Near-empty stub previously produced a 1-byte raw_inflate "success".
         data = bytes.fromhex('3ebe7b0000000000') + b'\x00' * 64

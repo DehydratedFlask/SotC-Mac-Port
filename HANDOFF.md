@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 01:14 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 01:18 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,18 +8,21 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Active bounded task — AUD-01 probe offset cutoff fixture
+## AUD-01 probe offset cutoff fixture — verified
 
-- Claimed `AUD-01-CLASSIFIER-PROBE-OFFSET-CUTOFF-FIXTURE-01` under the verified
-  `AUD-01-CLASSIFIER-SHORT-PROBE-INPUT-FIXTURE-01`. The untouched audio-header suite passes 26
-  tests. The planned test covers exact short-input cutoffs: with 2 bytes, zlib/raw-DEFLATE/LZMA
-  offset-2 results are `too_short`; with 4 bytes, LZMA offset-4 is `too_short`. Claim details and
-  baseline hashes are in [the claim checkpoint](docs/checkpoints/2026-10-22-root-aud01-probe-offset-cutoff-claim.md)
-  and E269.
-- Status `ACTIVE`, 0 failed implementation tries. Root owns HANDOFF/TASKS/EVIDENCE; after claim
-  publication `/root/next_fixture_scout_2` owns only `scripts/test_audio_headers.py`. Exact next
-  action: implement one test method and run the focused audio-header suite (expected 27 tests), then
-  root replay and completion records. Synthetic probe classification only; no asset or codec claim.
+- `AUD-01-CLASSIFIER-PROBE-OFFSET-CUTOFF-FIXTURE-01` adds one test method in
+  `scripts/test_audio_headers.py`. It pins `too_short` for zlib, raw-DEFLATE, and LZMA offset-2
+  probes on 2-byte input and LZMA offset-4 on 4-byte input. Worker and root audio-header suites
+  pass 27 tests; the classifier is unchanged. See E269/E270 and the
+  [claim](docs/checkpoints/2026-10-22-root-aud01-probe-offset-cutoff-claim.md) and
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-aud01-probe-offset-cutoff-complete.md).
+- Status `FIXTURE_VERIFIED`, one successful implementation attempt and 0 failed tries. Trail wiring
+  graph check passes at 3,615 nodes / 1,240 files and resolves the new method at
+  `scripts/test_audio_headers.py:L147-L154`. Project index check passes at 24,080 folders. Root
+  replay log SHA256 is recorded in E270. This is synthetic classifier behavior only; it establishes
+  no asset parsing, codec identity, archive interpretation, or game playback.
+- The next independent task candidate is under read-only review by `/root/next_fixture_scout_3`.
+  Keep pending Mach-O CPU and PSARC policy choices untouched.
 
 ## RE-02 dynamic-link image file-offset bounds fixture — verified
 
