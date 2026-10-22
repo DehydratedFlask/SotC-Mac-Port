@@ -42,6 +42,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Vslot 0x533100 miss (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-miss.md) | Miss path r_fps after show_areaInfo; E423; G1 PARTIAL |
 | [Vslot 0x533100 join (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-join.md) | Join+ Position at self+0x3b60; E424; G1 PARTIAL |
 | [Vslot 0x533100 gfx (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-gfx.md) | Post-join gfx-cell 0x2ee2d00 prelude; E425; G1 PARTIAL |
+| [Vslot 0x533100 shadow (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-shadow.md) | Shadowmodels load-attempt; E426; G1 PARTIAL |
 | [FOLDERS](FOLDERS.md) | Generated public/source folder inventory; `scripts/project_index.py` |
 | [INSTALL_LOG](../INSTALL_LOG.md) | Existing and newly installed tools, downloads and removals |
 | [Checkpoint template](checkpoints/TEMPLATE.md) | Required record at each checkpoint |
