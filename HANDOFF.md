@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 00:19 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 00:20 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -20,9 +20,10 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   folders. Trail wiring graph check passes at 3,609 nodes / 1,240 files; the source query resolves
   `native/tests/test_arena_page_debit.cpp`. Trail's deep meaning layer is not built.
 - Status `FIXTURE_VERIFIED`; one successful implementation attempt, 0 failed tries. Claim commit
-  `872f9b66ae02711bb2bf3c5dac6b47b01bda397d` is pushed and fetch-verified. Completion publication
-  is being recorded in this checkpoint. Existing user-owned `native/api/CMakeLists.txt` and
-  `native/api/host/` remain outside the task.
+  `872f9b66ae02711bb2bf3c5dac6b47b01bda397d` and completion commit
+  `a9ec99ebe7d8c1c45fb76b01b252b53794a828e9` are pushed and fetch-verified at 0/0 divergence.
+  Staged audit accepted 7 paths; full audit accepted 1,692. Existing user-owned
+  `native/api/CMakeLists.txt` and `native/api/host/` remain outside the task.
 - Exact next action: evaluate the read-only `RE-01-UNWRAP-IDENTICAL-ELF-REPEAT-FIXTURE-01` candidate
   from `/root/next_independent_task_scout` against the live spec, task list, and tests; claim it only
   if distinct and supported. Leave the pending Mach-O CPU and PSARC negative-limit choices alone.
