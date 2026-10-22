@@ -23,7 +23,7 @@ or Metal gameplay is demonstrated.
   EVIDENCE E414; TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-ctor-98a90-ensure-20261022/` (manifest `6621c0a6…` at tip
   `e20de86`).
-- Observation: feat tip `e20de86`; ELF pins 0xa8 stride + install; measured
+- Observation: feat tip `e20de86` (docs tip `53b6e47`); ELF pins 0xa8 stride + install; measured
   cap=begin+0xa800 → 275 registry.
   Migrate / `0x3be930` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f3c2f70_ensure.py` OK;
