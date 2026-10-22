@@ -16,8 +16,13 @@ bool base_initialize_255130(void* self, void* arg,
         hooks.prologue_255180(self);
     }
 
-    // OBS 0x255148: call [rax+0x30]; test al,al; jz fail
-    const bool ok30 = (hooks.vslot_30 != nullptr) ? hooks.vslot_30(self) : false;
+    // OBS 0x255148: call [rax+0x30] → 0x534130; test al,al; jz fail
+    bool ok30 = false;
+    if (hooks.vslot_30 != nullptr) {
+        ok30 = hooks.vslot_30(self);
+    } else if (hooks.use_lifted_vslot_30) {
+        ok30 = vslot_30_534130(self, hooks.vslot_30_detail).ok;
+    }
     if (!ok30) {
         return false;
     }
