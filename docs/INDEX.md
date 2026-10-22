@@ -56,6 +56,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Vslot 0x533100 randomevents attach (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-randomevents-attach.md) | Shadowrandomevents attach fail-path + install f08+0x60; E437; G1 PARTIAL |
 | [Vslot 0x533100 shadowbossmusic (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-shadowbossmusic.md) | Shadowbossmusic load-attempt; E438; G1 PARTIAL |
 | [Vslot 0x533100 bossmusic attach (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-bossmusic-attach.md) | Shadowbossmusic attach fail-path + install f08+0x70; E439; G1 PARTIAL |
+| [Vslot 0x533100 cp3Characters (2026-10-22)](checkpoints/2026-10-22-vslot-40-533100-cp3characters.md) | cp3Characters.calt load-attempt; E440; G1 PARTIAL |
 | [FOLDERS](FOLDERS.md) | Generated public/source folder inventory; `scripts/project_index.py` |
 | [INSTALL_LOG](../INSTALL_LOG.md) | Existing and newly installed tools, downloads and removals |
 | [Checkpoint template](checkpoints/TEMPLATE.md) | Required record at each checkpoint |

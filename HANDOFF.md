@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 13:25 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 13:32 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,33 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E439 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E440 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 App vslot `0x533100` cp3Characters load-attempt
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-VSLOT-40-533100-CP3CHARACTERS-01` — lift OBS load-attempt (88 B) at
+  `0x533e54`: notify `0x95580(f08+0x70)`; path `cp3Characters.calt`; cells
+  `0x2ee2cf8`/`0x2efc9e0`; hooks `0x14c2f0`/vcall+0x18; stop before attach @
+  `0x533eac` (no `0x14ccb0` in this fragment). Prefer always-on after E439 over
+  success atexit / deepen `0x14c2f0`/`0x6a5370`. FakeHeap + tip AllocatorFront;
+  PR #5 cite-only.
+- Files: `native/core/vslot_40_533100_cp3characters.{hpp,cpp}`; base_initialize
+  wire; `tools/lift/check_f533100_vslot40_cp3characters.py`; checkpoint
+  `docs/checkpoints/2026-10-22-vslot-40-533100-cp3characters.md`; EVIDENCE E440;
+  TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-vslot40-cp3characters-20261022/` (manifest
+  `f674992d…` at tip `1fec4e3`; capture `208329ae…`).
+- Observation: feat tip `1fec4e3`; measured `cp3=` stand-in + mid_reg=4 → 275
+  registry. Attach / `0x14ccb0` / success atexit / `0x14c2f0` body NOT modelled.
+- Commands: `python3 -I tools/lift/check_f533100_vslot40_cp3characters.py` OK;
+  `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: cp3Characters attach into host+`0x3cb8` / success atexit
+  past `0x533eac`, or bounded `0x14c2f0`/`0x6a5370`. Goal open.
 
 ## 2026-10-22 App vslot `0x533100` shadowbossmusic attach
 
