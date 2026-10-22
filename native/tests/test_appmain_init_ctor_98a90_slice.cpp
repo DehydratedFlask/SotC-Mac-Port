@@ -18,6 +18,7 @@
 #include "core/mid_255340.hpp"
 #include "core/singleton_f08_531d84.hpp"
 #include "core/vslot_40_533100_header.hpp"
+#include "core/vslot_40_533100_join.hpp"
 #include "core/vslot_40_533100_miss.hpp"
 #include "core/vslot_40_533100_post.hpp"
 #include "core/prologue_255180.hpp"
@@ -96,6 +97,9 @@ int g_v40_2569d0 = 0;
 int g_v40_21620 = 0;
 int g_v40_ba40 = 0;
 int g_v40_miss_f590 = 0;
+int g_v40_42390 = 0;
+int g_v40_2779a0 = 0;
+int g_v40_join_f590 = 0;
 
 void ctor_a30(void* obj) {
     ++g_ctor_a30;
@@ -132,6 +136,12 @@ void* hook_v40_21620(void*) {
 }
 void hook_v40_ba40(void*, void*, void*) { ++g_v40_ba40; }
 void hook_v40_miss_f590(void*) { ++g_v40_miss_f590; }
+void hook_v40_42390(void*) { ++g_v40_42390; }
+void hook_v40_2779a0(void* obj, void*, int) {
+    ++g_v40_2779a0;
+    *static_cast<std::uint32_t*>(obj) = 0x2779A001u;
+}
+void hook_v40_join_f590(void*) { ++g_v40_join_f590; }
 
 void* loadp(const void* base, std::size_t off) {
     void* p = nullptr;
@@ -228,7 +238,12 @@ int main() {
     CHECK(load_inputtable_names_fixture_default(fix));
     CHECK(apply_inputtable_names_fixture(table, fix));
 
-    std::vector<std::uint8_t> app(kPrologueAppMinBytes, 0);
+    // Join installs at self+0x3b60; prologue min ends exactly at that offset.
+    constexpr std::size_t kAppBytes =
+        (kPrologueAppMinBytes > kVslot40JoinSlotOff + sizeof(void*))
+            ? kPrologueAppMinBytes
+            : (kVslot40JoinSlotOff + sizeof(void*));
+    std::vector<std::uint8_t> app(kAppBytes, 0);
     std::array<std::uint8_t, 0x60> setter{};
     std::memset(setter.data(), 0xCC, setter.size());
 
@@ -236,6 +251,7 @@ int main() {
     g_nonnull = g_f590 = g_init_tb = g_move = g_mid_reg = g_mid_b60 = 0;
     g_f08_ctor = g_f08_dtor = g_v40_ctor = g_v40_525080 = g_v40_2569d0 = 0;
     g_v40_21620 = g_v40_ba40 = g_v40_miss_f590 = 0;
+    g_v40_42390 = g_v40_2779a0 = g_v40_join_f590 = 0;
     ctor40_cell_2ee6778() = nullptr;
     singleton_f08_cell_2efc9e0() = nullptr;
     vslot40_cell_2ef8c08() = nullptr;
@@ -273,6 +289,9 @@ int main() {
     bh.vslot_40_miss_detail.find_21620 = hook_v40_21620;
     bh.vslot_40_miss_detail.ba40 = hook_v40_ba40;
     bh.vslot_40_miss_detail.dtor_f590 = hook_v40_miss_f590;
+    bh.vslot_40_join_detail.call_42390 = hook_v40_42390;
+    bh.vslot_40_join_detail.ctor_2779a0 = hook_v40_2779a0;
+    bh.vslot_40_join_detail.dtor_f590 = hook_v40_join_f590;
 
     SingletonF08Hooks sh{};
     sh.ctor_523bd0 = hook_f08_ctor;
@@ -334,6 +353,15 @@ int main() {
     CHECK(g_v40_21620 == 1);
     CHECK(g_v40_ba40 == 1);
     CHECK(g_v40_miss_f590 == 2);
+    // E424: join+ Position install at self+0x3b60
+    CHECK(r.vslot_40_join.ok);
+    CHECK(r.vslot_40_join.replaced);
+    CHECK(g_v40_42390 == 1);
+    CHECK(g_v40_2779a0 == 1);
+    CHECK(g_v40_join_f590 == 1);
+    CHECK(r.vslot_40_join.pos_obj != nullptr);
+    CHECK(*static_cast<std::uint32_t*>(r.vslot_40_join.pos_obj) == 0x2779A001u);
+    CHECK(loadp(app.data(), kVslot40JoinSlotOff) == r.vslot_40_join.pos_obj);
     CHECK(g_move == 0);
     CHECK(g_nonnull == 0);
     CHECK(g_init_tb == 1);
@@ -355,17 +383,19 @@ int main() {
     std::printf(
         "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+sub3be930+ensure3c2f70+"
         "buf80+null_list+tsc323d0+ctor40_1ab550+gates2552d4+singleton_f08+vslot534130+mid255340+"
-        "vslot533100_header+post1fc80+miss_rfps+early+tail+base+trivial+registry ok nested=%p "
-        "ensure=%p obj40=%p f08=%p v40=%p post_hit=%d miss_null=%d gate_byte=%u mid_reg=%d "
-        "tsc=0x%llx entries=%u alloc_ops=%llu duration_us=%lld "
+        "vslot533100_header+post1fc80+miss_rfps+join_pos+early+tail+base+trivial+registry ok "
+        "nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p post_hit=%d miss_null=%d "
+        "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
-        "vslot533100_hit/join+/21620_body/525080_body/2569d0_body/26ea0/26b60/272d0/255f60/"
-        "stackchk/ba40_listeners/plt/ctor523bd0_body/dtor525b40_body/ctor493230_body/"
+        "vslot533100_hit/join_shadowmodels/21620_body/2779a0_body/42390_body/525080_body/"
+        "2569d0_body/26ea0/26b60/272d0/255f60/stackchk/ba40_listeners/plt/"
+        "ctor523bd0_body/dtor525b40_body/ctor493230_body/"
         "ensure_migrate/nonnull=NOT_modelled pr5_heap_merge=GAP\n",
         r.ctor.nested_48, eb, r.tail.obj_40, r.singleton.obj, r.vslot_40.obj,
-        r.vslot_40_post.lookup_hit ? 1 : 0, r.vslot_40_miss.find_null ? 1 : 0,
-        static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
-        static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
+        r.vslot_40_join.pos_obj, r.vslot_40_post.lookup_hit ? 1 : 0,
+        r.vslot_40_miss.find_null ? 1 : 0, static_cast<unsigned>(r.tail.gates.gate_byte),
+        g_mid_reg, static_cast<unsigned long long>(r.ctor.tsc_value),
+        r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
         static_cast<long long>(us));
 
