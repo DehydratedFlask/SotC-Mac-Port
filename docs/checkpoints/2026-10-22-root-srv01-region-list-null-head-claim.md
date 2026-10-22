@@ -1,6 +1,6 @@
 # Checkpoint: SRV-01-REGION-LIST-NULL-HEAD-SLOT-INSERT-FIXTURE-01 — claimed
 
-- Time / timezone: 2026-10-22 03:35 CDT (America/Chicago)
+- Time / timezone: 2026-10-22 03:39 CDT (America/Chicago)
 - Agent and integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`);
   proposed implementation owner `/root/native_fixture_scout` after claim publication.
 - Task / gate / status: `SRV-01-REGION-LIST-NULL-HEAD-SLOT-INSERT-FIXTURE-01`, child of verified
@@ -51,10 +51,20 @@
   post-change `trail grep "align_up_64k"` output, log SHA256
   `71b7745f44753f199435fe4c20868e3881a423c79bc99ebca6642495a5616370`.
 - Remaining risk: the proposed test has not yet been added or run against changed source.
-- Next exact action: after this claim is committed and pushed with the allocator fixture, ask
-  `/root/native_fixture_scout` to add
-  only the bounded case in `native/tests/test_region_list.cpp`; root owns all documentation and
-  publication.
+- Claim publication: commit `42331857a2212ec2f3e7c283f41b1f197da0d585` pushed to `origin/main`;
+  pre-push staged/full audit logs SHA256 `5041984b507d0a1be9eb02fa95adcdb21b58df0fddc77550ae64dc80ee28f1b2` /
+  `42f397bdab8ed06979a027e1a0c84823afc683e9ffa4383065e309ea2415d0b1`; pre/post fetch logs
+  SHA256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`; pre/post divergence
+  logs SHA256 `4b14c7b5549e560a68e9c4daaae3fdb8a28fe32d0247050325e7c5a3b2b3271c`; commit/push log
+  SHA256 `e71f2455bec1f8b4494e43295e3503f02961cf1da618e905e0a27cd7c3ea2ca3` /
+  `ac79d71e0a2aed76facebe686f0e0fc767fc9be16cd88788d72e95796a2ba876`; post-push explicit/full
+  audits accepted 8/1,727 paths, with log SHA256 matching the pre-push audits. The post-push status
+  log SHA256 is `bafebe0544ec1663fc5c60d5555079052f1efbe617d7957be47744c6262d25c7`. All logs are
+  under `local/validation/20261022-root-fixture-baselines/`.
+- Observation vs inference: push and fresh fetch/divergence show the claim is on `origin/main` at
+  0/0 divergence; the test assertions remain proposed and not yet implemented.
+- Next exact action: ask `/root/native_fixture_scout` to add only the bounded null-slot case in
+  `native/tests/test_region_list.cpp`; root owns all docs, independent replay, and publication.
 - Task status and attempt count: `ACTIVE`, zero implementation attempts and zero failed tries.
 - Other worktree state: allocator worker `/root/next_fixture_scout_3` owns only
   `native/tests/test_allocator_region.cpp`; user-owned `native/api/CMakeLists.txt` and untracked
