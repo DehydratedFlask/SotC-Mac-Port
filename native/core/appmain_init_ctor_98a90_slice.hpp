@@ -1,6 +1,6 @@
 // Measured Init path: prologue early + tail using lifted 0x3be050 header+0x80 grow+null-head
-// list cells → base → registry. Tip AllocatorFront+FakeHeap. PR #5 cite-only.
-// NOT modelled: 0x3be930 / 0x323d0 / 0x3c2f70 / 0xf590 / non-null list body (0xf8f500/0x3c0840);
+// list cells+tsc 0x323d0 → base → registry. Tip AllocatorFront+FakeHeap. PR #5 cite-only.
+// NOT modelled: 0x3be930 / 0x3c2f70 / 0xf590 / 0xf8f860 PLT / non-null list body;
 // debug gates.
 #pragma once
 

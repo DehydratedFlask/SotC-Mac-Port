@@ -33,8 +33,10 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
         out.ctor.list_self_stored = (ctor_98a90_self_cell_2ef63f8() == out.tail.obj_98a90);
         out.ctor.list_head_seen = ctor_98a90_list_head_cell_2ef6400();
         out.ctor.list_walk_skipped_null = (out.ctor.list_head_seen == nullptr);
+        std::memcpy(&out.ctor.tsc_value, o + kCtor98a90TscOffset, 8);
+        out.ctor.tsc_stored = (out.ctor.tsc_value != 0);
         out.ctor.ok = (out.ctor.nested_48 != nullptr) && (out.ctor.buf_80 != nullptr) &&
-                      out.ctor.list_self_stored;
+                      out.ctor.list_self_stored && out.ctor.tsc_stored;
         out.ctor.ensure_called = true;  // header zeros ⇒ ensure path
         out.ctor.buf_grown = (out.ctor.buf_80 != nullptr);
     }

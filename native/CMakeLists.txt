@@ -68,6 +68,7 @@ add_library(sotc_core STATIC
   core/appmain_init_base_initialize_slice.cpp
   core/init_flag_object_335a0.cpp
   core/prologue_255180.cpp
+  core/store_tsc_323d0.cpp
   core/ctor_98a90_3be050.cpp
   core/appmain_init_prologue_slice.cpp
   core/appmain_init_prologue_tail_slice.cpp
