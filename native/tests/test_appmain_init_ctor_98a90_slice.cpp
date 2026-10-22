@@ -1,4 +1,4 @@
-// Measured prologue early+tail with lifted 0x3be050 header → base → registry.
+// Measured prologue early+tail with lifted 0x3be050 header+buf-grow → base → registry.
 #include <array>
 #include <chrono>
 #include <cstdint>
@@ -70,7 +70,8 @@ struct FakeHeap : IAllocator {
 int g_3be930 = 0;
 int g_323d0 = 0;
 int g_ensure = 0;
-int g_remainder = 0;
+int g_list = 0;
+int g_f590 = 0;
 int g_ctor_a30 = 0;
 int g_ctor_40 = 0;
 int g_dtor_98a90 = 0;
@@ -100,7 +101,9 @@ void hook_ensure(void*, std::uint32_t n) {
     ++g_ensure;
     CHECK(n == 0x100);
 }
-void hook_remainder(void*) { ++g_remainder; }
+void hook_list(void*) { ++g_list; }
+void hook_f590(void*) { ++g_f590; }
+
 bool hook_v30(void*) {
     ++g_v30;
     return true;
@@ -108,46 +111,51 @@ bool hook_v30(void*) {
 void hook_mid(void*) { ++g_mid; }
 void hook_v40(void*, void*) { ++g_v40; }
 
+void* loadp(const void* base, std::size_t off) {
+    void* p = nullptr;
+    std::memcpy(&p, static_cast<const std::uint8_t*>(base) + off, sizeof(void*));
+    return p;
+}
+
 }  // namespace
 
 int main() {
     CHECK(kCtor98a90_3be050Size == 627);
-    CHECK(kCtor98a90_3be050HeaderSize == 102);
-    CHECK(kCtor98a90NestedBytes == 0x48);
+    CHECK(kCtor98a90BufBytes == 0x80);
+    CHECK(kCtor98a90ElemBytes == 0x20);
 
     AllocatorFront front;
     FakeHeap heap(front.owners(), 2);
     CHECK(front.set_heap(1, &heap));
     CHECK(front.set_heap(2, &heap));
 
-    // Unit: header alone.
+    // Unit: header + empty-path 0x80 grow.
     {
         std::vector<std::uint8_t> obj(kPrologue98a90Bytes, 0);
         Ctor98a90_3be050Hooks ch{};
         ch.sub_3be930 = hook_3be930;
         ch.store_tsc_323d0 = hook_323d0;
         ch.ensure_3c2f70 = hook_ensure;
-        ch.remainder_from_3be0f8 = hook_remainder;
-        g_3be930 = g_323d0 = g_ensure = g_remainder = 0;
+        ch.elem_dtor_f590 = hook_f590;
+        ch.list_walk_from_3be1ce = hook_list;
+        g_3be930 = g_323d0 = g_ensure = g_list = g_f590 = 0;
         const auto cr = init_98a90_3be050(front, obj.data(), ch);
         CHECK(cr.ok);
         CHECK(cr.nested_48 != nullptr);
         CHECK(cr.ensure_called);
+        CHECK(cr.buf_grown);
+        CHECK(cr.buf_80 != nullptr);
         CHECK(g_3be930 == 1);
         CHECK(g_323d0 == 1);
         CHECK(g_ensure == 1);
-        CHECK(g_remainder == 1);
-        void* nest = nullptr;
-        std::memcpy(&nest, obj.data() + 8, sizeof(void*));
-        CHECK(nest == cr.nested_48);
-        void* self0 = nullptr;
-        std::memcpy(&self0, nest, sizeof(void*));
-        CHECK(self0 == nest);
-        CHECK(obj[0x18] == 0);
-        CHECK(static_cast<std::uint8_t*>(nest)[0x18] == 1);
-        std::uint64_t tsc = 0;
-        std::memcpy(&tsc, obj.data() + kCtor98a90TscOffset, 8);
-        CHECK(tsc == 0x1234567890ABCDEFULL);
+        CHECK(g_list == 1);
+        CHECK(g_f590 == 0);  // empty migrate
+        void* begin = loadp(obj.data(), kCtor98a90VecBegin);
+        void* end = loadp(obj.data(), kCtor98a90VecEnd);
+        void* cap = loadp(obj.data(), kCtor98a90VecCap);
+        CHECK(begin == cr.buf_80);
+        CHECK(end == begin);
+        CHECK(static_cast<std::uint8_t*>(cap) == static_cast<std::uint8_t*>(begin) + 0x80);
     }
 
     InputTable551140 table{};
@@ -161,7 +169,7 @@ int main() {
     std::memset(setter.data(), 0xCC, setter.size());
 
     g_ctor_a30 = g_ctor_40 = g_dtor_98a90 = g_dtor_3b40 = g_dtor_early = 0;
-    g_3be930 = g_323d0 = g_ensure = g_remainder = g_v30 = g_mid = g_v40 = 0;
+    g_3be930 = g_323d0 = g_ensure = g_list = g_f590 = g_v30 = g_mid = g_v40 = 0;
 
     Prologue255180Hooks eh{};
     eh.ctor_a30_264e50 = ctor_a30;
@@ -176,7 +184,8 @@ int main() {
     ch.sub_3be930 = hook_3be930;
     ch.store_tsc_323d0 = hook_323d0;
     ch.ensure_3c2f70 = hook_ensure;
-    ch.remainder_from_3be0f8 = hook_remainder;
+    ch.elem_dtor_f590 = hook_f590;
+    ch.list_walk_from_3be1ce = hook_list;
 
     BaseInitialize255130Hooks bh{};
     bh.vslot_30 = hook_v30;
@@ -198,23 +207,28 @@ int main() {
     CHECK(g_3be930 == 1);
     CHECK(g_323d0 == 1);
     CHECK(g_ensure == 1);
-    CHECK(g_remainder == 1);
+    CHECK(g_list == 1);
     CHECK(g_ctor_40 == 1);
     CHECK(r.base_ok);
     CHECK(r.flag_after_base == 0);
     CHECK(r.remainder.trivial_ok);
     CHECK(r.remainder.registry.status == RegistryInit531d60Status::ok);
     CHECK(r.remainder.registry.entry_count == kInputTable551140Count);
-    // early 2 + tail 0x98a90 + nested 0x48 + tail 0x40 + registry 3 ≥ 8
-    CHECK(heap.alloc_count - allocs_before >= 8);
+    // early 2 + 0x98a90 + nested 0x48 + buf 0x80 + tail 0x40 + registry 3 ≥ 9
+    CHECK(heap.alloc_count - allocs_before >= 9);
+
+    void* begin = loadp(r.tail.obj_98a90, kCtor98a90VecBegin);
+    void* cap = loadp(r.tail.obj_98a90, kCtor98a90VecCap);
+    CHECK(begin != nullptr);
+    CHECK(static_cast<std::uint8_t*>(cap) == static_cast<std::uint8_t*>(begin) + 0x80);
 
     std::printf(
-        "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+early+tail+base+"
-        "trivial+registry ok nested=%p entries=%u alloc_ops=%llu duration_us=%lld "
+        "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+buf80+early+tail+base+"
+        "trivial+registry ok nested=%p buf80=%p entries=%u alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
-        "remainder_0x3be0f8=hooked bodies_3be930/323d0/3c2f70=NOT_modelled "
+        "list_walk_0x3be1ce=hooked bodies_3be930/323d0/3c2f70/f590=NOT_modelled "
         "pr5_heap_merge=GAP\n",
-        r.ctor.nested_48, r.remainder.registry.entry_count,
+        r.ctor.nested_48, begin, r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
         static_cast<long long>(us));
 
