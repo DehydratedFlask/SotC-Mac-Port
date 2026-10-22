@@ -1,12 +1,27 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 02:33 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 02:46 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## SAV-01 native stream error-name mapping fixture — active claim
+
+- `SAV-01-NATIVE-STREAM-ERROR-NAME-MAP-FIXTURE-01` is scoped under `SAV-01-NATIVE-STREAM-01`.
+  The claim adds checks only in `native/tests/test_save_stream.cpp::test_error_names()` for the
+  remaining 19 `SaveStreamError` names and the `unknown` fallback. The existing `bad_hash` and
+  `none` checks stay; production and build files are out of scope.
+- Root baseline `test_save_stream` target build and focused CTest pass; the test file and unchanged
+  production/header/CMake hashes plus log hashes are in E293 and the
+  [claim checkpoint](docs/checkpoints/2026-10-22-root-sav01-stream-error-name-map-claim.md).
+- Status is `ACTIVE`, assigned to `/root/next_fixture_scout_2` for only
+  `native/tests/test_save_stream.cpp`; zero implementation attempts and zero failed tries.
+  This pins diagnostic strings only, with no save compatibility claim.
+- Exact next action: have the assigned worker add the assertions, then root independently rebuild
+  and run the focused `save_stream` CTest.
 
 ## SAV-01 stream-file symlink destination fixture — verified
 
@@ -114,25 +129,29 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   below.
 - Keep pending Mach-O CPU and PSARC policy choices untouched.
 
-## SRV-01 region-split metadata preservation — active claim
+## SRV-01 region-split metadata preservation — verified
 
 - `SRV-01-REGION-SPLIT-SUCCESS-PRESERVE-FREE-NODE-METADATA-FIXTURE-01` is scoped under `SRV-01`.
-  The existing successful split test checks the free node's start, size, and capacity, but does not
-  seed and compare unrelated raw bytes. Proposed scope is one synthetic success-path assertion in
-  `native/tests/test_region_split.cpp` proving only the free node's capacity (`+0x50`) and size
-  (`+0x58`) change to `lead`; `region_split.cpp` remains unchanged.
-- Root baseline `test_region_split` target build exits 0 and focused CTest passes 1/1. Test/helper/
-  header/checker hashes, Trail result, and baseline log hashes are in E289 and the
-  [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-region-split-metadata-claim.md).
-- Status is `ACTIVE`, implementation not started, zero failed tries. The claim is published;
-  delegate only `native/tests/test_region_split.cpp` to `/root/next_fixture_scout_2`, then root will
-  replay the focused CTest.
+  The new synthetic success case seeds a free node, calls `split_free_at_lead` with `lead = 0xf000`,
+  asserts capacity and size become `lead`, and checks all other free-node raw bytes against the
+  snapshot. Only `native/tests/test_region_split.cpp` changed; `region_split.cpp` and its header are
+  unchanged.
+- Worker build and focused `region_split` CTest pass; root independently configured a fresh
+  AppleClang 21 / Ninja Debug tree, built the target, and passed the focused CTest 1/1. Test and log
+  hashes are in E292 and the
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-srv01-region-split-metadata-complete.md).
+- `python3 scripts/project_index.py` and `--check` pass at 29,507 folders. Trail was rebuilt with
+  explicit `scripts`, `tools`, `reference`, `native`, `launcher`, and `tests` scopes and
+  `trail build --check` passes at 3,618 nodes / 1,240 files.
+- Status is `FIXTURE_VERIFIED`, one successful implementation attempt, zero failed tries. The first
+  root CTest wrapper invocation failed before launching CTest due to a generated Python string
+  quoting error; the corrected invocation passed. Its record is in
+  `local/validation/20261022-root-fixture-baselines/srv01-region-split-metadata-root-ctest-wrapper-error.log`.
 - Claim published in `6441c02473a6c64b14246075258bf7400f3ac2bc`; staged/full and post-push
   explicit/full audits accepted 7/1,719 paths, with 0/0 fetch divergence. Publication logs are in
-  E291.
-- Scope is synthetic helper behavior only; no allocator-runtime or game claim.
-- Exact next action: delegate only `native/tests/test_region_split.cpp` to
-  `/root/next_fixture_scout_2`, then independently replay the focused CTest.
+  E291. Scope remains synthetic helper behavior only, with no allocator-runtime or game claim.
+- Exact next action: publish this completion with the new SAV-01 diagnostic-string fixture claim,
+  then work the newly assigned `test_save_stream.cpp` fixture.
 
 ## RE-01 identity sidecar symlink alias fixture — verified
 
