@@ -7,7 +7,7 @@ Private: needs local/re/eboot.elf (SHA256 pinned). Pins:
   * Bucket ctor class step/max + 64 KiB page; HeapAllocator page size + 150 MiB cap
   * native/core/composite_allocator.hpp constants match
 
-Does not claim BucketAllocator / HeapAllocator bodies are lifted.
+Bucket/Heap contract layers: see check_f17990.py / check_f48c70.py (freelist surgery INF).
 """
 import hashlib
 import re

@@ -1,7 +1,7 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 09:45 CDT (America/Chicago). Heap-depth worktree
-bc-492a8623-dec2-597e-8de6-73c00b0ad8a5 on branch `cursor/heap-depth-5d26`
+Updated: 2026-10-22 09:53 CDT (America/Chicago). Heap-depth worktree
+bc-0af80435-14f4-5088-8dc0-88b5bac5a41d on branch `cursor/heap-depth-5d26`
 (base `origin/main` @ `4c83b4d`). Drive owns Init-hash / `startup_ctors.*` on main —
 this checkpoint is heap-only and does not claim main tip.
 
@@ -10,11 +10,15 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 
 ## 2026-10-22 HeapAllocator page/cap layer (0x48c70 / 0x48910) — verified on feature branch
 
-- Agent: bc-492a8623-dec2-597e-8de6-73c00b0ad8a5. Attempt 1 — success (0 failed tries).
+- Agent: bc-0af80435-14f4-5088-8dc0-88b5bac5a41d (resume after bc-492a8623 WIP). Attempt 1 —
+  success (0 failed tries). Goal remains open.
 - Task: `SRV-01-HEAP-ALLOCATOR-01` → `FIXTURE_VERIFIED` (branch `cursor/heap-depth-5d26`).
-- Worktree: `/Volumes/Extra/SoC-Mac-heap-depth`. Did **not** touch `startup_ctors.*` / Init-hash.
+- Worktree: `/Volumes/Extra/SoC-Mac-heap-depth`. Did **not** touch `startup_ctors.*` / Init-hash /
+  FNV / registry / idx 95 / leaf-vec.
 - Files: `native/core/heap_allocator.{hpp,cpp}`, `native/tests/test_heap_allocator.cpp`,
-  `tools/lift/check_f48c70.py`, CMake + README + TASKS/EVIDENCE/this block.
+  `tools/lift/check_f48c70.py`, CMake + `native/README.md` + TASKS/EVIDENCE/this block;
+  small comment/constant updates in `composite_allocator.hpp` / `iallocator.hpp` /
+  `check_f47e30.py`.
 - Observation: ELF-pins usable-size `0x48c70`, allocate `0x48c80` (vt+0xa0), page-set `0x488f0`
   → `[obj+0xd0]`, reserve `0x48910`→`0x479a0` align `0x10000`, bootstrap 1 MiB / 150 MiB.
   Native: header+payload maps, live-byte cap, 16-byte round; freelist/arena surgery INF.
@@ -23,7 +27,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - Inference: not G1; not wired into startup. Hierarchy under `IAllocator` now has composite +
   bucket + heap + page contracts.
 - Next exact action (heap lane): optional bootstrap `0x13380` wiring / owner page-table `0x19a50`
-  depth, or stop and let Drive consume helpers. Goal open.
+  depth (still under `IAllocator`; no `0x19660` tourism), or pause for Drive consumption. Goal open.
 
 ## 2026-10-22 BucketAllocator size-class layer (0x17990) — verified on feature branch
 
