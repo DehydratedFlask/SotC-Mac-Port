@@ -1,12 +1,34 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 05:10 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 05:26 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## DATA-02 pakN TOC payload-MD5 sample — claimed, analysis pending
+
+- Task ID `DATA-02-PAKN-TOC-PAYLOAD-MD5-SAMPLE-01`, owned by `/root`; status `ACTIVE`, zero
+  failed hypotheses. Scope: compare each 16-byte TOC field to MD5 of the full decoded payload for
+  exactly 17 pakN members selected from the existing `audio-headers.json` family inventory. The
+  classifier calls `8c0a` / `8c06` an offset-zero prefix observation only; it is not a codec ID.
+- This does not repeat the existing 39-member TOC-vs-path/content sample: `docs/ASSETS.md` says
+  that earlier sample was pak2. E25 records the 17-row pakN family. The selection preflight joins
+  17/17 rows to the pakN member manifest by entry ID, exact path, declared size, offset and block;
+  total decoded payload is 955,789 bytes. No per-member paths or digests are in public notes.
+- Baseline selection output and SHA-256 are in
+  `local/validation/data02-pakn-toc-payload-md5-sample-01/selection-baseline.log` and E340.
+  Root's live full-file SHA-256 reread passed at 12,838,532,222 bytes and matched the ASSETS
+  summary: `559f7a3fa66bc652d36c5f1a885b351e4aeb17dadbba06a0006520bfd325be73` (E340).
+- No member payload comparison has run yet. Exact next action: create a private deterministic
+  checker that reads all 17 complete decoded members, compares payload MD5 to the TOC value, binds
+  the report to the archive/manifests, and repeats the aggregate run byte-for-byte. Keep all
+  per-member output under `local/validation/`.
+- Remaining risks: any result applies only to this sample and does not establish global TOC
+  semantics, integrity role, codec, runtime behavior, or game use. The native/API user changes
+  and the Graft telemetry cache paths remain unmodified and outside publication.
 
 ## SRV-01 host-map alignment wrap/minimum-clamp fixture — verified
 
@@ -56,7 +78,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   commit `59c96624c47f583109ca66fec21fc1b9448a0643` is pushed and fetch-verified at 0/0 divergence.
   Pre-push audits accepted 8 staged / 1,739 full paths; post-push full audit accepted 1,739. E339
   records publication. Only user-owned `native/api/CMakeLists.txt` and `native/api/host/` remain
-  unstaged and untouched. Next, scout one distinct bounded task without repeating existing fixtures.
+  unstaged and untouched. The next task is the claimed DATA-02 pakN payload-MD5 sample above.
 
 ## CPU-01 math-constant mixed guard-state fixture — verified
 
