@@ -107,6 +107,21 @@ struct AssetValidationReportTests {
         #expect(report.missingArchives == ["pak0.psarc"])
     }
 
+    @Test func danglingSymlinkNamedLikeArchiveIsReportedAsMissing() throws {
+        let dir = try makeDirectory()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try write(AssetValidator.requiredArchives.filter { $0 != "pak0.psarc" }, into: dir)
+
+        let archive = dir.appending(path: "pak0.psarc", directoryHint: .notDirectory)
+        let target = dir.appending(path: "missing-target", directoryHint: .notDirectory)
+        try FileManager.default.createSymbolicLink(at: archive, withDestinationURL: target)
+
+        let report = AssetValidator().report(directory: dir)
+
+        #expect(report.problems == ["pak0.psarc not found"])
+        #expect(report.missingArchives == ["pak0.psarc"])
+    }
+
     @Test func unreadableArchiveIsReportedAsNotReadable() throws {
         let dir = try makeDirectory()
         defer { try? FileManager.default.removeItem(at: dir) }
