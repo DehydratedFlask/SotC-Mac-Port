@@ -176,6 +176,15 @@ bool base_initialize_255130(void* self, void* arg,
         if (!sar.ok) {
             return false;
         }
+        // E436: always-on shadowrandomevents load-attempt (stop before success atexit).
+        const Vslot40_533100ShadowrandomeventsResult rr =
+            vslot_40_533100_shadowrandomevents(hooks.vslot_40_shadowrandomevents_detail);
+        if (hooks.vslot_40_shadowrandomevents_out != nullptr) {
+            *hooks.vslot_40_shadowrandomevents_out = rr;
+        }
+        if (!rr.ok) {
+            return false;
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true
