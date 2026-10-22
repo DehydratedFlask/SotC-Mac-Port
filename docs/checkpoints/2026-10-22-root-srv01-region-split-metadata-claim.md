@@ -38,8 +38,16 @@
   tries.
 - Remaining risks / blockers: no blocker to this narrow fixture; no runtime or allocator
   integration is exercised.
-- Next exact action: publish this claim with the APP-01 completion using allowlisted audits and push,
-  then delegate only `native/tests/test_region_split.cpp` to `/root/next_fixture_scout_2`.
+- Initial next action at claim time: publish this claim with the APP-01 completion using
+  allowlisted audits, then delegate only `native/tests/test_region_split.cpp` to
+  `/root/next_fixture_scout_2`.
+- Publication: commit `6441c02473a6c64b14246075258bf7400f3ac2bc` pushed to `origin/main` with the
+  APP-01 completion. Staged/full audits accepted 7/1,719 paths; fresh fetch showed 0/0 divergence;
+  post-push explicit/full audits accepted 7/1,719. Audit log SHA256 values are
+  `d5d4c08339281a22ca058b28d9e97e88560659fb680e115313700a3846ca4a4b` /
+  `4379a1e23cbede0ba946693bd4327279b48e29440497fa95879e716122bc1d74` and are recorded in E291.
+- Next exact action: delegate only `native/tests/test_region_split.cpp` to
+  `/root/next_fixture_scout_2`, then independently replay the focused CTest.
 - HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF, TASKS, EVIDENCE, and
   `docs/FOLDERS.md` are updated; `python3 scripts/project_index.py` and its check pass at 28,897
   folders including 448 checkpoint files; `trail build --check` passes at 3,618 nodes / 1,240
