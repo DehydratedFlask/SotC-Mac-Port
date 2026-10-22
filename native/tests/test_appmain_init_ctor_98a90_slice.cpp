@@ -33,6 +33,7 @@
 #include "core/vslot_40_533100_shadowstreams.hpp"
 #include "core/vslot_40_533100_streams_attach.hpp"
 #include "core/vslot_40_533100_shadowrandomevents.hpp"
+#include "core/vslot_40_533100_randomevents_attach.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -141,6 +142,8 @@ int g_v40_streams_attach_f590 = 0;
 int g_v40_rand_notify = 0;
 int g_v40_rand_14c2f0 = 0;
 int g_v40_rand_load = 0;
+int g_v40_rand_14ccc0 = 0;
+int g_v40_rand_attach_f590 = 0;
 alignas(8) std::uint8_t g_shadow_asset[0x40]{};
 alignas(8) std::uint8_t g_skels_asset[0x40]{};
 alignas(8) std::uint8_t g_anims_asset[0x40]{};
@@ -168,8 +171,9 @@ void hook_mid_26b60(const char*) { ++g_mid_b60; }
 void hook_f08_ctor(void* obj) {
     ++g_f08_ctor;
     // Marker at +0x30 — OBS slots +0/+8 models, +0x10/+0x18 skels, +0x20/+0x28 anims,
-    // +0x40/+0x48 banks, +0x50/+0x58 streams (marker sits in the gap before banks).
-    std::memset(obj, 0, 0x60);
+    // +0x40/+0x48 banks, +0x50/+0x58 streams, +0x60/+0x68 randomevents
+    // (marker sits in the gap before banks).
+    std::memset(obj, 0, 0x70);
     *reinterpret_cast<std::uint32_t*>(static_cast<std::uint8_t*>(obj) + 0x30) = 0xF08F08F0u;
 }
 void hook_f08_dtor(void*) { ++g_f08_dtor; }
@@ -280,6 +284,8 @@ void* hook_v40_rand_load(void* out_slot, void*, void*) {
     std::memcpy(out_slot, &p, sizeof(void*));
     return p;
 }
+void hook_v40_rand_14ccc0(void*) { ++g_v40_rand_14ccc0; }
+void hook_v40_rand_attach_f590(void*) { ++g_v40_rand_attach_f590; }
 
 void* loadp(const void* base, std::size_t off) {
     void* p = nullptr;
@@ -402,11 +408,13 @@ int main() {
     g_v40_streams_notify = g_v40_streams_14c2f0 = g_v40_streams_load = 0;
     g_v40_streams_14ccc0 = g_v40_streams_attach_f590 = 0;
     g_v40_rand_notify = g_v40_rand_14c2f0 = g_v40_rand_load = 0;
+    g_v40_rand_14ccc0 = g_v40_rand_attach_f590 = 0;
     std::memset(g_shadow_asset, 0, sizeof(g_shadow_asset));
     std::memset(g_skels_asset, 0, sizeof(g_skels_asset));
     std::memset(g_anims_asset, 0, sizeof(g_anims_asset));
     std::memset(g_banks_asset, 0, sizeof(g_banks_asset));
     std::memset(g_streams_asset, 0, sizeof(g_streams_asset));
+    std::memset(g_rand_asset, 0, sizeof(g_rand_asset));
     vslot40_shadow_loader_cell_2ee2cf8() = nullptr;
     ctor40_cell_2ee6778() = nullptr;
     singleton_f08_cell_2efc9e0() = nullptr;
@@ -477,6 +485,8 @@ int main() {
     bh.vslot_40_shadowrandomevents_detail.notify_95580 = hook_v40_rand_notify;
     bh.vslot_40_shadowrandomevents_detail.path_14c2f0 = hook_v40_rand_14c2f0;
     bh.vslot_40_shadowrandomevents_detail.load_vslot18 = hook_v40_rand_load;
+    bh.vslot_40_randomevents_attach_detail.release_14ccc0 = hook_v40_rand_14ccc0;
+    bh.vslot_40_randomevents_attach_detail.dtor_f590 = hook_v40_rand_attach_f590;
 
     SingletonF08Hooks sh{};
     sh.ctor_523bd0 = hook_f08_ctor;
@@ -648,6 +658,14 @@ int main() {
     CHECK(r.vslot_40_shadowrandomevents.refcount_bumped);
     CHECK(r.vslot_40_shadowrandomevents.refcount_after == 1);
     CHECK(r.vslot_40_shadowrandomevents.f08 == r.singleton.obj);
+    // E437: randomevents attach fail-path + install into f08+0x60
+    CHECK(r.vslot_40_randomevents_attach.ok);
+    CHECK(r.vslot_40_randomevents_attach.took_fail_path);
+    CHECK(r.vslot_40_randomevents_attach.installed);
+    CHECK(r.vslot_40_randomevents_attach.slot_after == g_rand_asset);
+    CHECK(loadp(r.singleton.obj, 0x60) == g_rand_asset);
+    CHECK(g_v40_rand_attach_f590 == 1);
+    CHECK(g_v40_rand_14ccc0 == 1);
     CHECK(g_move == 0);
     CHECK(g_nonnull == 0);
     CHECK(g_init_tb == 1);
@@ -671,11 +689,12 @@ int main() {
         "buf80+null_list+tsc323d0+ctor40_1ab550+gates2552d4+singleton_f08+vslot534130+mid255340+"
         "vslot533100_header+post1fc80+miss_rfps+join_pos+gfx2ee2d00+shadowmodels+attach+"
         "shadowskels+skels_attach+shadowanims+anims_attach+shadowbanks+banks_attach+"
-        "shadowstreams+streams_attach+shadowrandomevents+early+tail+base+trivial+registry "
+        "shadowstreams+streams_attach+shadowrandomevents+randomevents_attach+early+tail+base+"
+        "trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
         "anims=%p banks=%p streams=%p rand=%p post_hit=%d miss_null=%d marker=0x%x refc=%u "
         "fail=%d skels_refc=%u skels_fail=%d anims_refc=%u anims_fail=%d banks_refc=%u "
-        "banks_fail=%d streams_refc=%u streams_fail=%d rand_refc=%u "
+        "banks_fail=%d streams_refc=%u streams_fail=%d rand_refc=%u rand_fail=%d "
         "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
         "vslot533100_hit/success_atexit/next_path/14c2f0_body/6a5370_body/6abcc0_body/"
@@ -699,6 +718,7 @@ int main() {
         r.vslot_40_shadowstreams.refcount_after,
         r.vslot_40_streams_attach.took_fail_path ? 1 : 0,
         r.vslot_40_shadowrandomevents.refcount_after,
+        r.vslot_40_randomevents_attach.took_fail_path ? 1 : 0,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),

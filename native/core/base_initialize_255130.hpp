@@ -35,6 +35,7 @@
 #include "vslot_40_533100_shadowstreams.hpp"
 #include "vslot_40_533100_streams_attach.hpp"
 #include "vslot_40_533100_shadowrandomevents.hpp"
+#include "vslot_40_533100_randomevents_attach.hpp"
 #include "xchg_store_u32_357f0.hpp"
 
 #include <cstddef>
@@ -83,7 +84,8 @@ struct BaseInitialize255130Hooks {
     Vslot40_533100ShadowstreamsHooks vslot_40_shadowstreams_detail{};
     Vslot40_533100StreamsAttachHooks vslot_40_streams_attach_detail{};
     Vslot40_533100ShadowrandomeventsHooks vslot_40_shadowrandomevents_detail{};
-    // Last header/post/miss/join/gfx/shadow/attach/skels/anims/banks/streams/rand results.
+    Vslot40_533100RandomeventsAttachHooks vslot_40_randomevents_attach_detail{};
+    // Last header/post/…/streams/rand/rand-attach results.
     Vslot40_533100HeaderResult* vslot_40_out = nullptr;
     Vslot40_533100PostResult* vslot_40_post_out = nullptr;
     Vslot40_533100MissResult* vslot_40_miss_out = nullptr;
@@ -100,6 +102,7 @@ struct BaseInitialize255130Hooks {
     Vslot40_533100ShadowstreamsResult* vslot_40_shadowstreams_out = nullptr;
     Vslot40_533100StreamsAttachResult* vslot_40_streams_attach_out = nullptr;
     Vslot40_533100ShadowrandomeventsResult* vslot_40_shadowrandomevents_out = nullptr;
+    Vslot40_533100RandomeventsAttachResult* vslot_40_randomevents_attach_out = nullptr;
 };
 
 // Process-wide cell modelling original qword @ 0x2ea4718 (points at flag object).

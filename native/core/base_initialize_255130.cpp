@@ -185,6 +185,15 @@ bool base_initialize_255130(void* self, void* arg,
         if (!rr.ok) {
             return false;
         }
+        // E437: always-on randomevents attach (measured fail path; install into f08+0x60).
+        const Vslot40_533100RandomeventsAttachResult rar = vslot_40_533100_randomevents_attach(
+            rr.loaded, /*success_flag=*/false, hooks.vslot_40_randomevents_attach_detail);
+        if (hooks.vslot_40_randomevents_attach_out != nullptr) {
+            *hooks.vslot_40_randomevents_attach_out = rar;
+        }
+        if (!rar.ok) {
+            return false;
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true
