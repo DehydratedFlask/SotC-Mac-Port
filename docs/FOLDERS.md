@@ -7,10 +7,10 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 
 | Folder | Immediate files | Contract |
 |---|---:|---|
-| `.` | 16 | Project entry points and agent state |
+| `.` | 17 | Project entry points and agent state |
 | `.graft` | 1 | Project folder; add a contract to docs/INDEX.md |
 | `Shadow of the Colossus` | 2 | Original user game inputs; read-only and private |
-| `docs` | 13 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs` | 14 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/checkpoints` | 505 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/escalations` | 4 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/schemas` | 1 | Plans, task/evidence registries, checkpoint and escalation documentation |
@@ -1268,14 +1268,10 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `logs` | 100 | Private command/build/install/extraction logs |
 | `native` | 2 | Native game implementation; verify module README and task ownership |
 | `native/api` | 4 | Native game implementation; verify module README and task ownership |
-| `native/api/host` | 4 | Native game implementation; verify module README and task ownership |
-| `native/api/host/tests` | 1 | Native game implementation; verify module README and task ownership |
 | `native/api/standalone` | 1 | Native game implementation; verify module README and task ownership |
 | `native/api/tests` | 2 | Native game implementation; verify module README and task ownership |
-| `native/core` | 619 | Native game implementation; verify module README and task ownership |
-| `native/graft` | 0 | Native game implementation; verify module README and task ownership |
-| `native/graft/.cache` | 1 | Native game implementation; verify module README and task ownership |
-| `native/tests` | 311 | Native game implementation; verify module README and task ownership |
+| `native/core` | 624 | Native game implementation; verify module README and task ownership |
+| `native/tests` | 314 | Native game implementation; verify module README and task ownership |
 | `reference` | 0 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC` | 12 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC/docs` | 10 | Pinned upstream source; read-only; symbols indexed by Graft |
@@ -1834,13 +1830,11 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `reference/shadPS4Plus-pkg/src/video_core/renderer_vulkan` | 32 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/shadPS4Plus-pkg/src/video_core/renderer_vulkan/host_passes` | 4 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/shadPS4Plus-pkg/src/video_core/texture_cache` | 18 | Pinned upstream source; read-only; symbols indexed by Graft |
-| `scripts` | 21 | Small project and offline analysis helpers |
-| `scripts/graft` | 0 | Small project and offline analysis helpers |
-| `scripts/graft/.cache` | 1 | Small project and offline analysis helpers |
+| `scripts` | 22 | Small project and offline analysis helpers |
 | `tools` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft/.cache` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
-| `tools/lift` | 336 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/lift` | 341 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/pkg-extractor` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
 
 Private recursive inventory: `local/indexes/folders.json` (excluded from publication).

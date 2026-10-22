@@ -1,13 +1,34 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 09:02 CDT (America/Chicago). Parallel APP-01 fixture:
-bc-8fc0a995-6e8c-59b7-8a62-c1a9cacd061f. Drive Phase B:
-bc-0ee48224-fe2b-592b-a6d8-64b454059dfc; tip includes `0bbc1a8` (slots 24–47).
-Integrator note: [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
+Updated: 2026-10-22 09:36 CDT (America/Chicago). Drive Init-hash:
+bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Parallel heap deepen (separate worktree):
+bc-492a8623-dec2-597e-8de6-73c00b0ad8a5 — owns `0x12820`/`0x12af0`/READY SRV; Drive keeps
+`startup_ctors.*` + Init-hash/FNV/registry exclusivity. Integrator note:
+[docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## 2026-10-22 Init-hash numeric deepen `0x551140` (275-entry)
+
+- Agent: bc-0ee48224-fe2b-592b-a6d8-64b454059dfc. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-INPUTTABLE-551140-NUMERIC-01` — byte-pin store region + emit numeric-only
+  generated data with null callbacks/names (no stub-register; not idx 95; not cliff 152+/424).
+- Files: `native/core/input_table_551140.{hpp,cpp}`,
+  `native/core/input_table_551140_numeric.inc.hpp` (generated),
+  `native/tests/test_input_table_551140.cpp`, `scripts/extract_inputtable_551140_numeric.py`,
+  `tools/lift/check_f551140.py`, `docs/INPUTTABLE_551140.md`; CMake/HANDOFF/TASKS/EVIDENCE/INDEX.
+- Observation: region `0x55141d..0x557fe4` sha256 `5ecf2186…`; numeric payload
+  (275×`{a,b,c,f50}`) sha256 `61c85093…`; accessors `0x54dc10`→`0x2eff8e0`, `0x54dc20`→`0x113`.
+- Commands: `python3 -I scripts/extract_inputtable_551140_numeric.py` OK;
+  `python3 -I tools/lift/check_f551140.py` OK;
+  `ctest --test-dir local/build/native-inputtable551140 -R '^(input_table_551140)$'` PASS;
+  `check_ctor_slots` still **155** pairs (unchanged — not registered into production).
+- Inference: not G1; names/callbacks/pre-objects/Init `0x531d60` registry fill still open.
+  Heap body deepen is parallel worker — do not take `0x12820`/`0x12af0` files.
+- Next exact action: private name fixture for the 275 keys (slot23-style) **or** deepen
+  Init `0x531d60` callees that consume FNV/`0x2efd160` once keys exist. Goal open.
 
 ## 2026-10-22 APP-01 playBlockedSummary native-core precedence — verified
 

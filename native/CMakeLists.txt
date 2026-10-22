@@ -62,6 +62,7 @@ add_library(sotc_core STATIC
   core/save_chunk_codec.cpp
   core/descriptor_registration.cpp
   core/const_table_ee1130.cpp
+  core/input_table_551140.cpp
   core/recursive_mutex.cpp
   core/startup_ctors.cpp
   core/clothing_preview_param.cpp
@@ -1452,6 +1453,10 @@ add_test(NAME guarded_static_helpers COMMAND test_guarded_static_helpers)
 add_executable(test_const_table_ee1130 tests/test_const_table_ee1130.cpp)
 target_link_libraries(test_const_table_ee1130 sotc_core)
 add_test(NAME const_table_ee1130 COMMAND test_const_table_ee1130)
+
+add_executable(test_input_table_551140 tests/test_input_table_551140.cpp)
+target_link_libraries(test_input_table_551140 sotc_core)
+add_test(NAME input_table_551140 COMMAND test_input_table_551140)
 
 add_executable(test_descriptor_registration tests/test_descriptor_registration.cpp)
 target_link_libraries(test_descriptor_registration sotc_core)
