@@ -1,4 +1,4 @@
-// Measured prologue early+tail with lifted 0x3be050 ensure+tsc → registry.
+// Measured prologue early+tail with lifted 0x3be050 + lifted 0x1ab550 → registry.
 #include <array>
 #include <chrono>
 #include <cstdint>
@@ -9,6 +9,7 @@
 
 #include "core/allocator_front.hpp"
 #include "core/appmain_init_ctor_98a90_slice.hpp"
+#include "core/ctor_40_1ab550.hpp"
 #include "core/ctor_98a90_3be050.hpp"
 #include "core/ensure_capacity_3c2f70.hpp"
 #include "core/init_sub_3be930.hpp"
@@ -75,7 +76,6 @@ int g_f590 = 0;
 int g_init_tb = 0;
 int g_move = 0;
 int g_ctor_a30 = 0;
-int g_ctor_40 = 0;
 int g_dtor_98a90 = 0;
 int g_dtor_3b40 = 0;
 int g_dtor_early = 0;
@@ -86,10 +86,6 @@ int g_v40 = 0;
 void ctor_a30(void* obj) {
     ++g_ctor_a30;
     *static_cast<std::uint32_t*>(obj) = 0xA30A30A3u;
-}
-void ctor_40(void* obj) {
-    ++g_ctor_40;
-    *static_cast<std::uint32_t*>(obj) = 0x40404040u;
 }
 void dtor_early(void*) { ++g_dtor_early; }
 void dtor_98a90(void*) { ++g_dtor_98a90; }
@@ -208,15 +204,16 @@ int main() {
     std::array<std::uint8_t, 0x60> setter{};
     std::memset(setter.data(), 0xCC, setter.size());
 
-    g_ctor_a30 = g_ctor_40 = g_dtor_98a90 = g_dtor_3b40 = g_dtor_early = 0;
+    g_ctor_a30 = g_dtor_98a90 = g_dtor_3b40 = g_dtor_early = 0;
     g_nonnull = g_f590 = g_init_tb = g_move = g_v30 = g_mid = g_v40 = 0;
+    ctor40_cell_2ee6778() = nullptr;
 
     Prologue255180Hooks eh{};
     eh.ctor_a30_264e50 = ctor_a30;
     eh.dtor_vslot08 = dtor_early;
 
     Prologue255180TailHooks th{};
-    th.ctor_40_1ab550 = ctor_40;
+    // ctor_40_1ab550 null → lifted init_ctor_40_1ab550 (slice also forces null)
     th.dtor_98a90_3be390 = dtor_98a90;
     th.dtor_vslot08_3b40 = dtor_3b40;
 
@@ -247,10 +244,13 @@ int main() {
     CHECK(r.ctor.ensure_allocated);
     CHECK(r.ctor.tsc_stored);
     CHECK(r.ctor.list_walk_skipped_null);
+    CHECK(r.ctor_40.ok);
+    CHECK(r.ctor_40.derived_vt);
+    CHECK(r.ctor_40.cell_self);
+    CHECK(r.ctor_40.field_0a);
     CHECK(g_move == 0);
     CHECK(g_nonnull == 0);
     CHECK(g_init_tb == 1);
-    CHECK(g_ctor_40 == 1);
     CHECK(r.base_ok);
     CHECK(r.remainder.trivial_ok);
     CHECK(r.remainder.registry.status == RegistryInit531d60Status::ok);
@@ -262,14 +262,17 @@ int main() {
     void* ec = loadp(r.tail.obj_98a90, 0x38);
     CHECK(eb != nullptr);
     CHECK(static_cast<std::uint8_t*>(ec) == static_cast<std::uint8_t*>(eb) + 0xa800);
+    CHECK(r.tail.obj_40 != nullptr);
+    CHECK(loadp(r.tail.obj_40, 0) == ctor40_derived_vtable_1598ae0());
+    CHECK(ctor40_cell_2ee6778() == r.tail.obj_40);
 
     std::printf(
         "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+sub3be930+ensure3c2f70+"
-        "buf80+null_list+tsc323d0+early+tail+base+trivial+registry ok nested=%p ensure=%p "
-        "tsc=0x%llx entries=%u alloc_ops=%llu duration_us=%lld "
+        "buf80+null_list+tsc323d0+ctor40_1ab550+early+tail+base+trivial+registry ok "
+        "nested=%p ensure=%p obj40=%p tsc=0x%llx entries=%u alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
-        "ensure_migrate/f590/nonnull=NOT_modelled pr5_heap_merge=GAP\n",
-        r.ctor.nested_48, eb, static_cast<unsigned long long>(r.ctor.tsc_value),
+        "plt_f901a0/f901c0/ensure_migrate/f590/nonnull=NOT_modelled pr5_heap_merge=GAP\n",
+        r.ctor.nested_48, eb, r.tail.obj_40, static_cast<unsigned long long>(r.ctor.tsc_value),
         r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
         static_cast<long long>(us));
