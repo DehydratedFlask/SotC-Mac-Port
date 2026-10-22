@@ -1,6 +1,6 @@
 # Checkpoint: SRV-01-RECURSIVE-MUTEX-REENTRANT-TRYLOCK-FIXTURE-01 — fixture verified
 
-- Time / timezone: 2026-10-22 03:58 CDT (America/Chicago)
+- Time / timezone: 2026-10-22 04:00 CDT (America/Chicago)
 - Agent / integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`); worker
   `/root/next_fixture_scout_2` owned the single test-file edit.
 - Task / gate / status: `SRV-01-RECURSIVE-MUTEX-REENTRANT-TRYLOCK-FIXTURE-01`, child of
@@ -51,10 +51,12 @@
 - Remaining risk / acceptance: this is a deterministic local helper fixture. It makes no claim about
   game callsite reachability, scheduler policy, or game readiness.
 - Publication state: the task claim is in pushed commit
-  `1400c835ff74b1744c65ded8e0139cb2051b92fa`; completion changes and the next CPU fixture claim are
-  ready for the root allowlisted audit, commit, push, and fresh fetch/divergence check. The existing
-  API edits must remain unstaged.
-- Next exact action: stage only allowlisted test and root-owned documentation paths, run staged and
-  full publication audits, commit/push, and verify `origin/main` at 0/0 divergence.
+  `1400c835ff74b1744c65ded8e0139cb2051b92fa`; completion and the CPU name-hash claim are in pushed
+  commit `eaa9e0b405175b78ac35c756155ae525c8f71f20`. Pre-push staged/full audits accepted 9/1,731
+  paths; the post-push audit of the commit's explicit paths and the full tree accepted 9/1,731 paths;
+  fetch confirmed 0/0 divergence. The staged-only post-push audit reported nothing staged (exit 2).
+  E313 records log hashes. The existing API edits remain unstaged.
+- Next exact action: independently replay the active CPU name-hash fixture after the worker finishes,
+  then update its completion evidence and publish.
 - Task status and attempt count: `FIXTURE_VERIFIED`; one successful implementation attempt; zero
   failed tries.

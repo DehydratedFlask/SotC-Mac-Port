@@ -42,9 +42,10 @@
 - Remaining risk: verify the escaped literal and expected value in the changed test using the focused
   Darwin build and CTest. The separate question whether original game-name strings must be imported
   remains open and out of scope.
-- Publication / dispatch: the claim will be published with the recursive-mutex completion. Do not
-  edit the test until the claim commit is pushed and verified. Root owns all docs, independent replay,
+- Publication / dispatch: claim published in commit
+  `eaa9e0b405175b78ac35c756155ae525c8f71f20`, pushed and fetch-verified at 0/0 divergence. The worker
+  `/root/next_fixture_scout_2` now owns the one-line test edit; root owns all docs, independent replay,
   and publication. User-owned native API files stay untouched.
-- Next exact action: publish the verified recursive-mutex completion and this claim; then dispatch
-  the one-line test edit.
+- Next exact action: review the worker diff and run an independent fresh Debug/Ninja build and focused
+  CTest before recording completion.
 - Task status and attempt count: `ACTIVE`; zero implementation attempts and zero failed tries.
