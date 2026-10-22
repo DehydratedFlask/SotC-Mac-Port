@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:06 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:07 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -73,6 +73,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   behavior claim. See E241 and the
   [completion checkpoint](docs/checkpoints/2026-10-21-root-app01-coreclient-internal-error-copy-complete.md).
 - Claim docs commit `8c33c317cc5cb6863b3ab618ebfb28d36557570a` is pushed and fetch-verified.
+- Completion commit `2152dfbbe90699d550b07d26b90d3bfd7d18394b` is pushed and fetch-verified at
+  `origin/main` with 0/0 divergence.
 - Exact next action: scout another independent bounded task outside the PSARC and CoreClient files;
   leave negative-limit behavior unclaimed pending the user's answer.
 
