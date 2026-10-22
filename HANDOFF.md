@@ -23,10 +23,10 @@ or Metal gameplay is demonstrated.
   `tools/lift/check_f533100_vslot40_header.py`; checkpoint
   `docs/checkpoints/2026-10-22-vslot-40-533100-header.md`; EVIDENCE E421;
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-vslot40-header-20261022/` (manifest `1ae13eb0…`;
-  capture `9e32a916…` — re-pin after feat tip).
-- Observation: ELF pins header/size/cell/callees; measured v40 + mid_reg=4 → 275
-  registry; alloc_ops=12. Body past header / `0x493230` NOT modelled.
+  `local/validation/appmain-init-vslot40-header-20261022/` (manifest `97ab452c…` at tip
+  `d1f42be`; capture `9e32a916…`).
+- Observation: feat tip `d1f42be`; ELF pins header/size/cell/callees; measured v40 +
+  mid_reg=4 → 275 registry; alloc_ops=12. Body past header / `0x493230` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f533100_vslot40_header.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
   PASS; private capture exit 0; `check_ctor_slots` still **155**.
