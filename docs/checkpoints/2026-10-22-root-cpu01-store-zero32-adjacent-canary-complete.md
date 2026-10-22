@@ -1,6 +1,6 @@
 # Checkpoint: CPU-01-STORE-ZERO32-ADJACENT-CANARY-FIXTURE-01 — fixture verified
 
-- Time / timezone: 2026-10-22 04:22 CDT (America/Chicago).
+- Time / timezone: 2026-10-22 04:23 CDT (America/Chicago).
 - Agent / integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`); `/root/next_fixture_scout_3` owned the one-file test edit.
 - Task / gate / status: `CPU-01-STORE-ZERO32-ADJACENT-CANARY-FIXTURE-01`, child of `CPU-01`; `FIXTURE_VERIFIED`; one successful implementation attempt and zero failed tries.
 - Files changed by implementation: only `native/tests/test_store_zero32.cpp`. A three-word local array now checks that `store_zero32` clears the middle word without changing either adjacent canary. Production implementation, header, and CMake are unchanged.
@@ -13,6 +13,6 @@
 - Trail `trail build --check` reports the wiring graph synchronized at 3,618 nodes / 1,240 files; log SHA256 `f7231c65a9ccdc9f1ec3de943e3fe9b3a2be977fdf687c86e771d1c9c416a2dc`. `trail grep 'store_zero32' --in native/` resolves the added call at `native/tests/test_store_zero32.cpp:L16`; log SHA256 `41af5fe1907c15b254417814e4af12ffe7a66037d2a6e6c465de0320f0671b2d`.
 - Observation versus inference: the synthetic helper call leaves both adjacent local words unchanged. This tests the current helper's write boundary only; it does not prove the helper's use by the original game or any runtime behavior.
 - Remaining risks / acceptance: test-only arithmetic and memory-boundary coverage. Native executable, boot, authentic audio, save/reload, and Metal gameplay gates remain unproven. The worker's final turn returned a model-capacity error; root verification above is independent.
-- Publication: claim commit `cd4efb68ec9def3c1a97ead595ea39b4a97e7b7e` and audit-record commit `7cf4f7916bf919736d4d26e04ede1c0abbe76c3b` are pushed. The implementation completion commit is pending.
-- Next exact action: publish the allowlisted completion paths; then verify the scout's SRV-01-HOST-MAP-ALIGNMENT-UINT32-WRAP-CLAMP-FIXTURE-01 candidate against Trail and live files, capture the baseline, and publish its claim before edits.
+- Publication: claim commit `cd4efb68ec9def3c1a97ead595ea39b4a97e7b7e`, audit-record commit `7cf4f7916bf919736d4d26e04ede1c0abbe76c3b`, and completion commit `e3c36eb23c95281da685a8788e6f8c7a166983c2` are pushed and fetch-verified at 0/0 divergence. Pre-push audits accepted 6 staged / 1,734 tracked paths; post-push full audit accepted 1,734 paths. See E320 and the publication logs under `local/validation/20261022-root-fixture-baselines/`. The user's API CMake changes remain untouched.
+- Next exact action: verify the scout's SRV-01-HOST-MAP-ALIGNMENT-UINT32-WRAP-CLAMP-FIXTURE-01 candidate against Trail and live files, capture the baseline, and publish its claim before edits.
 - Task status / attempt count: `FIXTURE_VERIFIED`; one successful implementation attempt; zero failed tries.
