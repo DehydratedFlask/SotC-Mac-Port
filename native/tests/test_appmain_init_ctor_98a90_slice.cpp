@@ -1,4 +1,4 @@
-// Measured prologue early+tail with lifted 0x3be050 header+buf-grow → base → registry.
+// Measured prologue early+tail with lifted 0x3be050 header+buf-grow+null-head list → registry.
 #include <array>
 #include <chrono>
 #include <cstdint>
@@ -70,7 +70,7 @@ struct FakeHeap : IAllocator {
 int g_3be930 = 0;
 int g_323d0 = 0;
 int g_ensure = 0;
-int g_list = 0;
+int g_nonnull = 0;
 int g_f590 = 0;
 int g_ctor_a30 = 0;
 int g_ctor_40 = 0;
@@ -101,7 +101,7 @@ void hook_ensure(void*, std::uint32_t n) {
     ++g_ensure;
     CHECK(n == 0x100);
 }
-void hook_list(void*) { ++g_list; }
+void hook_nonnull(void*, void*) { ++g_nonnull; }
 void hook_f590(void*) { ++g_f590; }
 
 bool hook_v30(void*) {
@@ -117,46 +117,62 @@ void* loadp(const void* base, std::size_t off) {
     return p;
 }
 
+void reset_list_cells() {
+    ctor_98a90_self_cell_2ef63f8() = nullptr;
+    ctor_98a90_list_head_cell_2ef6400() = nullptr;
+}
+
 }  // namespace
 
 int main() {
     CHECK(kCtor98a90_3be050Size == 627);
-    CHECK(kCtor98a90BufBytes == 0x80);
-    CHECK(kCtor98a90ElemBytes == 0x20);
+    CHECK(kCtor98a90SelfCellRva == 0x2ef63f8);
+    CHECK(kCtor98a90ListHeadCellRva == 0x2ef6400);
 
     AllocatorFront front;
     FakeHeap heap(front.owners(), 2);
     CHECK(front.set_heap(1, &heap));
     CHECK(front.set_heap(2, &heap));
 
-    // Unit: header + empty-path 0x80 grow.
+    // Unit: header + grow + null-head list cells.
     {
+        reset_list_cells();
         std::vector<std::uint8_t> obj(kPrologue98a90Bytes, 0);
         Ctor98a90_3be050Hooks ch{};
         ch.sub_3be930 = hook_3be930;
         ch.store_tsc_323d0 = hook_323d0;
         ch.ensure_3c2f70 = hook_ensure;
         ch.elem_dtor_f590 = hook_f590;
-        ch.list_walk_from_3be1ce = hook_list;
-        g_3be930 = g_323d0 = g_ensure = g_list = g_f590 = 0;
+        ch.list_walk_nonnull_body = hook_nonnull;
+        g_3be930 = g_323d0 = g_ensure = g_nonnull = g_f590 = 0;
         const auto cr = init_98a90_3be050(front, obj.data(), ch);
         CHECK(cr.ok);
-        CHECK(cr.nested_48 != nullptr);
-        CHECK(cr.ensure_called);
         CHECK(cr.buf_grown);
-        CHECK(cr.buf_80 != nullptr);
-        CHECK(g_3be930 == 1);
-        CHECK(g_323d0 == 1);
-        CHECK(g_ensure == 1);
-        CHECK(g_list == 1);
-        CHECK(g_f590 == 0);  // empty migrate
-        void* begin = loadp(obj.data(), kCtor98a90VecBegin);
-        void* end = loadp(obj.data(), kCtor98a90VecEnd);
-        void* cap = loadp(obj.data(), kCtor98a90VecCap);
-        CHECK(begin == cr.buf_80);
-        CHECK(end == begin);
-        CHECK(static_cast<std::uint8_t*>(cap) == static_cast<std::uint8_t*>(begin) + 0x80);
+        CHECK(cr.list_self_stored);
+        CHECK(cr.list_walk_skipped_null);
+        CHECK(cr.list_head_seen == nullptr);
+        CHECK(g_nonnull == 0);
+        CHECK(ctor_98a90_self_cell_2ef63f8() == obj.data());
+        CHECK(ctor_98a90_list_head_cell_2ef6400() == nullptr);
     }
+
+    // Unit: non-null head invokes body hook.
+    {
+        reset_list_cells();
+        std::uint8_t dummy_head = 0;
+        ctor_98a90_list_head_cell_2ef6400() = &dummy_head;
+        std::vector<std::uint8_t> obj(kPrologue98a90Bytes, 0);
+        Ctor98a90_3be050Hooks ch{};
+        ch.list_walk_nonnull_body = hook_nonnull;
+        g_nonnull = 0;
+        const auto cr = init_98a90_3be050(front, obj.data(), ch);
+        CHECK(cr.ok);
+        CHECK(!cr.list_walk_skipped_null);
+        CHECK(cr.list_head_seen == &dummy_head);
+        CHECK(g_nonnull == 1);
+    }
+
+    reset_list_cells();
 
     InputTable551140 table{};
     init_input_table_551140(table);
@@ -169,7 +185,7 @@ int main() {
     std::memset(setter.data(), 0xCC, setter.size());
 
     g_ctor_a30 = g_ctor_40 = g_dtor_98a90 = g_dtor_3b40 = g_dtor_early = 0;
-    g_3be930 = g_323d0 = g_ensure = g_list = g_f590 = g_v30 = g_mid = g_v40 = 0;
+    g_3be930 = g_323d0 = g_ensure = g_nonnull = g_f590 = g_v30 = g_mid = g_v40 = 0;
 
     Prologue255180Hooks eh{};
     eh.ctor_a30_264e50 = ctor_a30;
@@ -185,7 +201,7 @@ int main() {
     ch.store_tsc_323d0 = hook_323d0;
     ch.ensure_3c2f70 = hook_ensure;
     ch.elem_dtor_f590 = hook_f590;
-    ch.list_walk_from_3be1ce = hook_list;
+    ch.list_walk_nonnull_body = hook_nonnull;
 
     BaseInitialize255130Hooks bh{};
     bh.vslot_30 = hook_v30;
@@ -203,18 +219,19 @@ int main() {
     CHECK(r.early.ok);
     CHECK(r.tail.ok);
     CHECK(r.ctor.ok);
-    CHECK(r.ctor.nested_48 != nullptr);
+    CHECK(r.ctor.list_self_stored);
+    CHECK(r.ctor.list_walk_skipped_null);
+    CHECK(g_nonnull == 0);
+    CHECK(ctor_98a90_self_cell_2ef63f8() == r.tail.obj_98a90);
     CHECK(g_3be930 == 1);
     CHECK(g_323d0 == 1);
     CHECK(g_ensure == 1);
-    CHECK(g_list == 1);
     CHECK(g_ctor_40 == 1);
     CHECK(r.base_ok);
     CHECK(r.flag_after_base == 0);
     CHECK(r.remainder.trivial_ok);
     CHECK(r.remainder.registry.status == RegistryInit531d60Status::ok);
     CHECK(r.remainder.registry.entry_count == kInputTable551140Count);
-    // early 2 + 0x98a90 + nested 0x48 + buf 0x80 + tail 0x40 + registry 3 ≥ 9
     CHECK(heap.alloc_count - allocs_before >= 9);
 
     void* begin = loadp(r.tail.obj_98a90, kCtor98a90VecBegin);
@@ -223,12 +240,12 @@ int main() {
     CHECK(static_cast<std::uint8_t*>(cap) == static_cast<std::uint8_t*>(begin) + 0x80);
 
     std::printf(
-        "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+buf80+early+tail+base+"
-        "trivial+registry ok nested=%p buf80=%p entries=%u alloc_ops=%llu duration_us=%lld "
-        "allocator=tip_AllocatorFront+FakeHeap "
-        "list_walk_0x3be1ce=hooked bodies_3be930/323d0/3c2f70/f590=NOT_modelled "
+        "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+buf80+null_list+"
+        "early+tail+base+trivial+registry ok nested=%p buf80=%p self_cell=%p entries=%u "
+        "alloc_ops=%llu duration_us=%lld allocator=tip_AllocatorFront+FakeHeap "
+        "list_nonnull_body=NOT_taken bodies_3be930/323d0/3c2f70/f590/f8f500/3c0840=NOT_modelled "
         "pr5_heap_merge=GAP\n",
-        r.ctor.nested_48, begin, r.remainder.registry.entry_count,
+        r.ctor.nested_48, begin, ctor_98a90_self_cell_2ef63f8(), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
         static_cast<long long>(us));
 

@@ -28,6 +28,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Prologue 0x255180 tail (2026-10-22)](checkpoints/2026-10-22-prologue-255180-tail.md) | 0x98a90 / app+0x3b58/+0x3b40; E409; G1 PARTIAL |
 | [Ctor 0x3be050 header (2026-10-22)](checkpoints/2026-10-22-ctor-98a90-3be050.md) | Nested 0x48 + hooks; E410; G1 PARTIAL |
 | [Ctor 0x3be050 buf grow (2026-10-22)](checkpoints/2026-10-22-ctor-98a90-3be050-bufgrow.md) | Empty-path 0x80 vec grow; E411; G1 PARTIAL |
+| [Ctor 0x3be050 listwalk (2026-10-22)](checkpoints/2026-10-22-ctor-98a90-3be050-listwalk.md) | Null-head cells 0x2ef63f8/0x2ef6400; E412; G1 PARTIAL |
 | [FOLDERS](FOLDERS.md) | Generated public/source folder inventory; `scripts/project_index.py` |
 | [INSTALL_LOG](../INSTALL_LOG.md) | Existing and newly installed tools, downloads and removals |
 | [Checkpoint template](checkpoints/TEMPLATE.md) | Required record at each checkpoint |

@@ -25,12 +25,16 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     if (!out.tail.ok) {
         return out;
     }
-    // Re-read ctor side effects from installed object.
+    // Re-read ctor side effects from installed object + list cells.
     if (out.tail.obj_98a90 != nullptr) {
         auto* o = static_cast<std::uint8_t*>(out.tail.obj_98a90);
         std::memcpy(&out.ctor.nested_48, o + 8, sizeof(void*));
         std::memcpy(&out.ctor.buf_80, o + kCtor98a90VecBegin, sizeof(void*));
-        out.ctor.ok = (out.ctor.nested_48 != nullptr) && (out.ctor.buf_80 != nullptr);
+        out.ctor.list_self_stored = (ctor_98a90_self_cell_2ef63f8() == out.tail.obj_98a90);
+        out.ctor.list_head_seen = ctor_98a90_list_head_cell_2ef6400();
+        out.ctor.list_walk_skipped_null = (out.ctor.list_head_seen == nullptr);
+        out.ctor.ok = (out.ctor.nested_48 != nullptr) && (out.ctor.buf_80 != nullptr) &&
+                      out.ctor.list_self_stored;
         out.ctor.ensure_called = true;  // header zeros ⇒ ensure path
         out.ctor.buf_grown = (out.ctor.buf_80 != nullptr);
     }
