@@ -11,8 +11,8 @@
 // `0x6a5370`.
 //
 // Claimed: virtual-call control flow pin only (slot +0x18).
-// NOT modelled: stack/vtable producers; callee body; later 0x532ca0 units.
-// PR #5 cite-only.
+// NOT modelled: stack/vtable producers; callee body; later 0x532ca0 units
+// (second call-site claimed separately as E468). PR #5 cite-only.
 #pragma once
 
 #include <cstddef>
