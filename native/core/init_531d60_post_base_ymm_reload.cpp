@@ -19,7 +19,7 @@ Init531d60PostBaseYmmReloadResult init_531d60_post_base_ymm_reload(
                 kInit531d60PostBaseYmmReloadBlockBytes);
     ++out.store_count;
 
-    // Next: vxorps / call 0x26800 @ 0x531f86 — NOT modelled here.
+    // Next: vxorps / call 0x26800+0xf590 @ 0x531f71 — E461; not this fragment.
     out.ok = (out.store_count == 1);
     return out;
 }
