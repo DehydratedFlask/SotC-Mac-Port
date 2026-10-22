@@ -1,4 +1,4 @@
-// Measured base Initialize 0x255130 → trivial remainder → registry (tip AllocatorFront).
+// Measured 0xf08 singleton → base Initialize 0x255130 → trivial → registry.
 #include <array>
 #include <chrono>
 #include <cstdint>
@@ -13,6 +13,7 @@
 #include "core/input_table_551140.hpp"
 #include "core/inputtable_names_fixture.hpp"
 #include "core/registry_init_531d60.hpp"
+#include "core/singleton_f08_531d84.hpp"
 #include "core/xchg_store_u32_357f0.hpp"
 
 #define CHECK(c)                                                                         \
@@ -110,16 +111,21 @@ int main() {
     std::memcpy(flag.data() + 0x20, &old, 4);
 
     // Fail-visible: vslot_30 false → no mid/v40/357f0; remainder skipped.
+    // Singleton still installs (OBS order: before base).
     g_prologue = g_mid = g_v40 = 0;
+    singleton_f08_cell_2efc9e0() = nullptr;
     BaseInitialize255130Hooks fail_hooks{};
     fail_hooks.prologue_255180 = hook_prologue;
     fail_hooks.vslot_30 = hook_v30_fail;
     fail_hooks.mid_255340 = hook_mid;
     fail_hooks.vslot_40 = hook_v40;
+    SingletonF08Hooks sh{};
     {
         const auto r = run_appmain_init_base_initialize_slice(
-            table, front, app.data(), nullptr, fail_hooks, flag.data(), setter.data(), 1, 1, 2,
-            3);
+            table, front, app.data(), nullptr, fail_hooks, flag.data(), setter.data(), 1, 1, 2, 3,
+            sh);
+        CHECK(r.singleton.ok);
+        CHECK(singleton_f08_cell_2efc9e0() == r.singleton.obj);
         CHECK(!r.base_ok);
         CHECK(r.base_fail_visible);
         CHECK(g_prologue == 1);
@@ -128,6 +134,7 @@ int main() {
         std::memcpy(&now, flag.data() + 0x20, 4);
         CHECK(now == 0xABADC0DE);  // 0x357f0 not reached
         CHECK(!r.remainder.trivial_ok);
+        destroy_singleton_f08_at_2efc9e0(front, sh);
     }
 
     InputtableNamesFixture fix;
@@ -153,11 +160,13 @@ int main() {
     const auto t0 = std::chrono::steady_clock::now();
     const auto r = run_appmain_init_base_initialize_slice(
         table, front, app.data(), reinterpret_cast<void*>(0x1), ok_hooks, flag.data(),
-        setter.data(), 0, 0x11, 0x22, 0x33);
+        setter.data(), 0, 0x11, 0x22, 0x33, sh);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 
+    CHECK(r.singleton.ok);
+    CHECK(singleton_f08_cell_2efc9e0() == r.singleton.obj);
     CHECK(r.base_ok);
     CHECK(!r.base_fail_visible);
     CHECK(g_prologue == 1);
@@ -171,16 +180,17 @@ int main() {
     CHECK(heap.alloc_count > allocs_before);
 
     std::printf(
-        "appmain_init_base_initialize_slice: MEASURED base+trivial+registry ok "
-        "flag_prev=%08x flag_after=%u entries=%u alloc_ops=%llu duration_us=%lld "
-        "hooks=(prologue/mid/v40 modelled; 0x255180/0x255340/0x534130/0x533100 bodies "
-        "NOT modelled) allocator=tip_AllocatorFront+FakeHeap "
-        "pr5_heap_merge=GAP singleton_0xf08=NOT_modelled\n",
-        r.flag_prev, r.flag_after, r.remainder.registry.entry_count,
+        "appmain_init_base_initialize_slice: MEASURED singleton_f08+base+trivial+registry ok "
+        "f08=%p flag_prev=%08x flag_after=%u entries=%u alloc_ops=%llu duration_us=%lld "
+        "hooks=(prologue/mid/v40 modelled; 0x523bd0/0x525b40/0x255180/0x255340/0x534130/"
+        "0x533100 bodies NOT modelled) allocator=tip_AllocatorFront+FakeHeap "
+        "pr5_heap_merge=GAP\n",
+        r.singleton.obj, r.flag_prev, r.flag_after, r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
         static_cast<long long>(us));
 
     destroy_registry_at_2efd160(front);
+    destroy_singleton_f08_at_2efc9e0(front, sh);
     base_init_flag_cell_2ea4718() = nullptr;
     std::puts("appmain_init_base_initialize_slice: all checks passed");
     return 0;

@@ -1,9 +1,10 @@
 // Measured Init path: prologue early + tail using lifted 0x3be050 (header+0x3be930+ensure+
 // 0x80 grow+null-head list+tsc) + lifted 0x1ab550 (0x40 ctor) + debug gates 0x2552d4
-// → base (lifted vslot 0x534130 + mid 0x255340) → registry.
+// → 0xf08 singleton install → base (lifted vslot 0x534130 + mid 0x255340) → registry.
 // Tip AllocatorFront+FakeHeap. PR #5 cite-only.
 // NOT modelled: ensure migrate / heavy menu helpers / 0xf8f860 PLT / non-null list;
-// PLT bodies 0xf901a0/0xf901c0; stack-chk; ba40 listener invoke; 0x533100 / 0xf08.
+// PLT bodies 0xf901a0/0xf901c0; stack-chk; ba40 listener invoke; 0x533100;
+// bodies of 0x523bd0 / 0x525b40.
 #pragma once
 
 #include "allocator_front.hpp"
@@ -13,6 +14,7 @@
 #include "ctor_98a90_3be050.hpp"
 #include "input_table_551140.hpp"
 #include "prologue_255180.hpp"
+#include "singleton_f08_531d84.hpp"
 
 #include <cstdint>
 
@@ -30,6 +32,7 @@ struct AppmainInitCtor98a90SliceResult {
     Prologue255180TailResult tail{};
     Ctor98a90_3be050Result ctor{};
     AppmainInitCtor40SliceSide ctor_40{};
+    SingletonF08Result singleton{};
     bool base_ok = false;
     std::uint32_t flag_after_base = 0;
     AppmainInitRemainderSliceResult remainder{};
@@ -40,6 +43,6 @@ struct AppmainInitCtor98a90SliceResult {
     const Prologue255180Hooks& early_hooks, const Prologue255180TailHooks& tail_hooks,
     const Ctor98a90_3be050Hooks& ctor_hooks, const BaseInitialize255130Hooks& base_hooks,
     void* setter_obj, std::uint8_t flag_in, std::uint8_t set_a, std::uint8_t set_b,
-    std::uint8_t set_c);
+    std::uint8_t set_c, const SingletonF08Hooks& singleton_hooks = {});
 
 }  // namespace sotc

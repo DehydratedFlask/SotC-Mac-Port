@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 11:50 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 12:00 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,31 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E419 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E420 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 Init `0xf08` singleton install `0x531d84`
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-SINGLETON-F08-531D84-01` — lift OBS install fragment (75 B) on measured
+  Init path before base Initialize: alloc `0xf08` → ctor hook `0x523bd0` → cell
+  `0x2efc9e0` → dtor/delete on replace. Prefer over ensure migrate (empty-path skips)
+  and `0x533100` header (later vslot). FakeHeap + tip AllocatorFront; PR #5 cite-only.
+- Files: `native/core/singleton_f08_531d84.{hpp,cpp}`; base + ctor_98a90 slice wire;
+  `tools/lift/check_f531d84_singleton_f08.py`; checkpoint
+  `docs/checkpoints/2026-10-22-singleton-f08-531d84.md`; EVIDENCE E420;
+  TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-singleton-f08-20261022/` (manifest `bf0dde49…`;
+  capture `6bcbe4a2…`).
+- Observation: ELF pins install/size/cell/callees; measured f08 + mid_reg=4 → 275
+  registry; alloc_ops=11. Bodies of `0x523bd0`/`0x525b40` / `0x533100` NOT modelled.
+- Commands: `python3 -I tools/lift/check_f531d84_singleton_f08.py` OK;
+  `ctest --test-dir local/build/native-ctor98a90 -R '^(appmain_init_ctor_98a90_slice|appmain_init_base_initialize_slice)$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: bounded `0x533100` header, or ensure migrate / non-null list.
+  Goal open.
 
 ## 2026-10-22 Base Init mid `0x255340`
 
