@@ -246,6 +246,7 @@ int g_post_base_f590_a2ed00_u8 = 0;
 int g_post_base_a2ed00_u5 = 0;
 int g_post_base_f590_a2ed00_u9 = 0;
 int g_post_base_f590_a2ed00_u10 = 0;
+int g_post_base_a2ed00_u6 = 0;
 int g_post_base_cell_2eff450_dtor = 0;
 int g_post_base_cell_2eff448_dtor = 0;
 void* g_cell_2eff450 = nullptr;
@@ -524,6 +525,7 @@ void hook_post_base_f590_a2ed00_u8() { ++g_post_base_f590_a2ed00_u8; }
 void hook_post_base_a2ed00_u5() { ++g_post_base_a2ed00_u5; }
 void hook_post_base_f590_a2ed00_u9() { ++g_post_base_f590_a2ed00_u9; }
 void hook_post_base_f590_a2ed00_u10() { ++g_post_base_f590_a2ed00_u10; }
+void hook_post_base_a2ed00_u6() { ++g_post_base_a2ed00_u6; }
 void hook_post_base_cell_2eff450_dtor(void* /*prev*/) { ++g_post_base_cell_2eff450_dtor; }
 void hook_post_base_cell_2eff448_dtor(void* /*prev*/) { ++g_post_base_cell_2eff448_dtor; }
 
@@ -725,6 +727,7 @@ int main() {
     g_post_base_a2ed00_u5 = 0;
     g_post_base_f590_a2ed00_u9 = 0;
     g_post_base_f590_a2ed00_u10 = 0;
+    g_post_base_a2ed00_u6 = 0;
     g_post_base_cell_2eff450_dtor = 0;
     g_post_base_cell_2eff448_dtor = 0;
     g_cell_2eff450 = nullptr;
@@ -1011,6 +1014,8 @@ int main() {
     pbf590u9.call_f590 = hook_post_base_f590_a2ed00_u9;
     Init531d60PostBaseF590A2ed00U10Hooks pbf590u10{};
     pbf590u10.call_f590 = hook_post_base_f590_a2ed00_u10;
+    Init531d60PostBaseA2ed00U6Hooks pba2edu6{};
+    pba2edu6.call_a2ed00 = hook_post_base_a2ed00_u6;
 
     const std::uint64_t allocs_before = heap.alloc_count;
     const auto t0 = std::chrono::steady_clock::now();
@@ -1027,7 +1032,7 @@ int main() {
                                                      pbf590u2, pba2edu2, pbf590u3, pbf590u4,
                                                      pba2edu3, pbf590u5, pbf590u6, pba2edu4,
                                                      pbf590u7, pbf590u8, pba2edu5, pbf590u9,
-                                                     pbf590u10);
+                                                     pbf590u10, pba2edu6);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
@@ -1552,6 +1557,10 @@ int main() {
     CHECK(r.post_base_f590_a2ed00_u10.ok);
     CHECK(g_post_base_f590_a2ed00_u10 == 1);
     CHECK(r.post_base_f590_a2ed00_u10.call_f590_count == 1);
+    // E504: Init continue sixth 0xa2ed00 call-site (stack prep / body NOT modelled)
+    CHECK(r.post_base_a2ed00_u6.ok);
+    CHECK(g_post_base_a2ed00_u6 == 1);
+    CHECK(r.post_base_a2ed00_u6.call_a2ed00_count == 1);
     CHECK(r.remainder.trivial_ok);
     CHECK(r.remainder.registry.status == RegistryInit531d60Status::ok);
     CHECK(r.remainder.registry.entry_count == kInputTable551140Count);
@@ -1593,6 +1602,7 @@ int main() {
         "post_base_a2ed00_u4+post_base_f590_a2ed00_u7+"
         "post_base_f590_a2ed00_u8+post_base_a2ed00_u5+"
         "post_base_f590_a2ed00_u9+post_base_f590_a2ed00_u10+"
+        "post_base_a2ed00_u6+"
         "early+tail+base+trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
         "anims=%p banks=%p streams=%p rand=%p boss=%p cp3=%p csp=%p post_hit=%d miss_null=%d "
@@ -1607,7 +1617,7 @@ int main() {
         "pb448=%d pbv38=%d pblea=%d pba2=%d pba2ed=%d pbf590a=%d pbf590u2=%d "
         "pba2edu2=%d pbf590u3=%d pbf590u4=%d pba2edu3=%d pbf590u5=%d pbf590u6=%d "
         "pba2edu4=%d pbf590u7=%d pbf590u8=%d pba2edu5=%d pbf590u9=%d "
-        "pbf590u10=%d "
+        "pbf590u10=%d pba2edu6=%d "
         "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
@@ -1706,6 +1716,7 @@ int main() {
         r.post_base_a2ed00_u5.call_a2ed00_count,
         r.post_base_f590_a2ed00_u9.call_f590_count,
         r.post_base_f590_a2ed00_u10.call_f590_count,
+        r.post_base_a2ed00_u6.call_a2ed00_count,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
