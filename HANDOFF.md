@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 16:39 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 16:43 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,36 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E478 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E479 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 Init continue second `0x532ed0`-series virtual-call +0x18
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-INIT-531D60-POST-BASE-VCALL18-532ED0-U2-01` — lift OBS second
+  `0x532ed0`-series virtual-call +0x18 (14 B) at `0x532369..0x532377`:
+  `mov rax,[rsp+0xa30]` / `mov rdi,r14` / `call [rax+0x18]`; stop before
+  `mov edi,0x460` / call `0x17070` @ `0x532377`. Prefer always-on after E478
+  over `0x532ed0` body/stack-prep/vcall-callee/`0x532ca0` tourism and over
+  deepen `0x1290`/`0x5c64c0`/`0x56dcb0`/`0x499f80`/`0x140d90`/`0x14c2f0`/
+  `0x6a5370`. Note: next call after this end is `0x17070` (not another
+  `0x532ed0`). FakeHeap + tip AllocatorFront; PR #5 cite-only.
+- Files: `native/core/init_531d60_post_base_vcall18_532ed0_u2.{hpp,cpp}`; ctor slice wire;
+  `tools/lift/check_f531d60_post_base_vcall18_532ed0_u2.py`; checkpoint
+  `docs/checkpoints/2026-10-22-init-531d60-post-base-vcall18-532ed0-u2.md`; EVIDENCE E479;
+  TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-post-base-vcall18-532ed0-u2-20261022/` (manifest
+  `e8b3e1e4…` at tip `c1ba3bd`; capture `4f6aec67…`).
+- Observation: feat tip `c1ba3bd`; measured `pbvcedu2=1` + `pb532edu2=1` + mid_reg=4 → 275 registry.
+  Callee body / later helpers NOT modelled.
+- Commands: `python3 -I tools/lift/check_f531d60_post_base_vcall18_532ed0_u2.py` OK;
+  `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: `0x17070` call-site / always-on after `0x532377`, or
+  bounded `0x1290` / `0x5c64c0` / `0x56dcb0` / `0x499f80` / `0x140d90` /
+  `0x14c2f0` / `0x6a5370`. Prefer call-site continue over bodies. Goal open.
 
 ## 2026-10-22 Init continue second `0x532ed0` call-site
 
