@@ -1,12 +1,26 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-21 23:32 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-21 23:37 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## AUD-01 empty decompression-probe input — claimed, baseline verified
+
+- Root claimed bounded task `AUD-01-CLASSIFIER-SHORT-PROBE-INPUT-FIXTURE-01`, child of `AUD-01`;
+  the governing audio inventory and evidence boundary are in [docs/ASSETS.md](docs/ASSETS.md#aud-01-header-classification-and-member-identity-codec-unknown).
+- Scope is one test in `scripts/test_audio_headers.py`: call
+  `cah.decompress_probe(b'')` and assert exactly seven zlib, raw-DEFLATE, and LZMA offset results,
+  each `{'ok': False, 'err': 'too_short'}`. No classifier or archive change and no codec/audio claim.
+- Baseline `PYTHONDONTWRITEBYTECODE=1 python3 -I scripts/test_audio_headers.py` passed all 25 tests.
+  Log and source hashes are in the [claim checkpoint](docs/checkpoints/2026-10-21-root-aud01-classifier-short-probe-input-claim.md).
+- Status `ACTIVE`, baseline verified, 0 failed implementation tries. The probe guard only covers
+  empty input; it does not characterize real archive members, codec identity, or playback.
+- Exact next action: add the single synthetic test, run it directly and replay the 26-test audio
+  header suite, then update the checkpoint/evidence and publish allowlisted changes.
 
 ## DATA-02 TOC-value / declared-size crosstab — artifact verified
 
