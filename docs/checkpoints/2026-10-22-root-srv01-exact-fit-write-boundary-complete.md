@@ -1,6 +1,6 @@
 # Checkpoint: SRV-01-EXACT-FIT-FINALIZE-WRITE-BOUNDARY-FIXTURE-01 — verified
 
-- Local date/time: 2026-10-22 06:05 CDT (America/Chicago). Agent/integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`); implementation worker: `/root/next_candidate_scout`.
+- Local date/time: 2026-10-22 06:11 CDT (America/Chicago). Agent/integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`); implementation worker: `/root/next_candidate_scout`.
 - Task / gate / status: `SRV-01-EXACT-FIT-FINALIZE-WRITE-BOUNDARY-FIXTURE-01`, child of SRV-01; `FIXTURE_VERIFIED`. G0 remains PARTIAL and G1–G6 remain NOT RUN.
 - Baseline: claim commit `118fe6b5d9ddc033faac9029306830b5b4f1a3da`; baseline test SHA256 `acdc2d8f9621799db22cd9b2bcc5c7564b16b5141dad63a6a2ed6083e7ef8c69`. Final `native/tests/test_exact_fit_finalize.cpp` SHA256 `dee80c2d6b9b32a68a872fdaca5c9113f37107d5fcd1c1094dfc25d9235511ca`. Helper/header/CMake hashes stayed `a49d202388d520c945b744ca6bd3a2696b12165b57c51b0477f9008b5ef5d0e4` / `16a32b55aa533a3f682ed0ea7a4f248128987503b3c6e2f9d86f06d0de8c4a5a` / `cd46d94590f58515152155658f609cd11ef58aeb9a45272f744402edcdeeb01f`.
 - Files changed: only `native/tests/test_exact_fit_finalize.cpp`. The new poison-pattern case verifies that every byte outside the documented pointer, sentinel, size, and two flag writes remains unchanged after `exact_fit_finalize`.
@@ -12,5 +12,6 @@
 - Independent read-only review: `/root/fixture_review_app_srv` passed spec compliance and code quality; it found that the five allowed write ranges match the live helper and the existing assertions cover expected written values. Review did not rerun tests.
 - Attempts: one successful implementation attempt; zero failed implementation/build/test attempts.
 - Remaining risk: behavior is limited to the helper record and documented synthetic offsets.
-- Next exact action: publish this completion with APP-01 and the CPU-01 lazy-tree claim, then implement that claim. E353 records the result; E355 will record this checkpoint commit's publication audit.
+- Publication: completion and the parallel APP-01 fixture plus CPU-01 claim were published in `308a7394d4776122d9fad4de5c265c1d52e40f1a`; E355 records the audit. See [publication checkpoint](2026-10-22-root-parallel-claims-publication.md).
+- Next exact action: independently replay the active CPU-01 lazy-tree fixture after its worker completes.
 - HANDOFF/TASKS/EVIDENCE/INSTALL_LOG updated. Folder and Trail indexes are checked in the publication checkpoint.

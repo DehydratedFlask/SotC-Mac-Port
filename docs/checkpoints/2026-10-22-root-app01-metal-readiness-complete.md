@@ -1,6 +1,6 @@
 # Checkpoint: APP-01-METAL-READINESS-GATE-FIXTURE-01 — verified
 
-- Local date/time: 2026-10-22 06:05 CDT (America/Chicago). Agent/integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`); implementation worker: `/root/next_candidate_scout_b`.
+- Local date/time: 2026-10-22 06:11 CDT (America/Chicago). Agent/integrator: `/root` (Codex desktop task `01a15eab-88d5-7a83-a23b-cc55dc002eb6`); implementation worker: `/root/next_candidate_scout_b`.
 - Task / gate / status: `APP-01-METAL-READINESS-GATE-FIXTURE-01`, child of APP-01; `FIXTURE_VERIFIED`. G0 remains PARTIAL and G1–G6 remain NOT RUN.
 - Baseline: claim commit `118fe6b5d9ddc033faac9029306830b5b4f1a3da`; baseline test source SHA256 `c06fc9379fcebba7d04303e2ae76591ae1894f6f6daf726500eca4f326a0d363`. Final `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift` SHA256 `b642e65a1c6974e45786aa2b92997a377b440ba10abae8ac46f13c9ac2091a47`. Production `LauncherModel.swift` / `ReadinessReport.swift` unchanged at `ae6ce2e1b33a83c2baae76efd63a3f2beacc0a62202c6a62ab9bb96644be6d51` / `170b03a7c24aadb3c799f364998ba81948438404e88eef3b07200ec210982e98`.
 - Files changed: only the existing `hostChecksStillGatePlay()` test method in `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift`. It now checks the injected missing-Metal row, `!canStart`, idle state after `startCore()`, and zero scripted core start calls.
@@ -11,5 +11,6 @@
 - Independent read-only review: `/root/fixture_review_app_srv` passed spec compliance and code quality; it found no unrelated change. Review was limited to the two claimed test files and did not rerun tests.
 - Attempts: one successful implementation attempt; zero failed implementation/build/test attempts.
 - Remaining risk: readiness status reflects injected test data and does not prove Metal API use or G3/G5 behavior.
-- Next exact action: publish this completion with the parallel exact-fit fixture and claim the next independent bounded test. E352 records the result; E355 will record this checkpoint commit's publication audit.
+- Publication: completion and the parallel SRV-01 fixture plus CPU-01 claim were published in `308a7394d4776122d9fad4de5c265c1d52e40f1a`; E355 records the audit. See [publication checkpoint](2026-10-22-root-parallel-claims-publication.md).
+- Next exact action: independently replay the active CPU-01 lazy-tree fixture after its worker completes.
 - HANDOFF/TASKS/EVIDENCE/INSTALL_LOG updated. Folder and Trail indexes are checked in the publication checkpoint.
