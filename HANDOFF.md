@@ -16,8 +16,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   - APP-01-PACKAGE-SCRIPT-01: ARTIFACT_VERIFIED (`scripts/package_launcher.sh <out>` + `launcher/Packaging/Info.plist`; arm64 shell only, not launched, no core).
   - APP-01-CORE-HOST-01: escalation resolved (root cause: libc++ cin hid EBADF as EOF; fd-0 streambuf fix; sotc_host_protocol 1/1). Engine still absent; G4 NOT RUN.
 - Publication: native/api/ changes remain user-owned and UNSTAGED (host fix lives there); only allowlisted files above published.
-- Remaining user decisions not yet applied: thin Mach-O ARM64-only readiness, math guard four-pass matrix.
-- Next exact action: apply those two queued user decisions (find owning tasks in TASKS), then continue CPU-01/AUD-02 recovery.
+- APP-01-THIN-MACHO-ARM64-01 FIXTURE_VERIFIED (E384): launcher requires thin ARM64 MH_EXECUTE; swift test 102/102. Math guard four-pass decision: the existing CPU-01-MATH-CONSTANTS-MIXED-GUARD-STATE-FIXTURE-01 already covers per-field guard states; a distinct four-pass matrix task is not separately defined.
+- Next exact action: continue CPU-01/AUD-02 recovery (requires REA/Ghidra); no queued user decisions remain.
 
 ## CPU-01 trig-constants preseed fixture — verified
 
