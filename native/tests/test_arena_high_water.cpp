@@ -70,6 +70,17 @@ int main() {
     CHECK(load(arena, kArenaOffUsed80) == 0x210);
     CHECK(load(arena, kArenaOffPeak88) == 0x300);
 
+    // Synthetic uint64 wrap: the lower result does not reduce either peak.
+    store(arena, kArenaOffUsed90, UINT64_MAX - 3);
+    store(arena, kArenaOffPeak98, 10);
+    store(arena, kArenaOffUsed80, UINT64_MAX - 3);
+    store(arena, kArenaOffPeak88, 10);
+    sotc::arena_add_used_high_water(arena, 8);
+    CHECK(load(arena, kArenaOffUsed90) == 4);
+    CHECK(load(arena, kArenaOffPeak98) == 10);
+    CHECK(load(arena, kArenaOffUsed80) == 4);
+    CHECK(load(arena, kArenaOffPeak88) == 10);
+
     // Null arena is a no-op.
     sotc::arena_add_used_high_water(nullptr, 1);
 
