@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 13:40 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 13:50 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,32 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E441 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E442 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 App vslot `0x533100` cp3shadowprecache load-attempt
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-VSLOT-40-533100-CP3SHADOWPRECACHE-01` — lift OBS load-attempt (70 B) at
+  `0x533f51`: notify `0x95580(self+0x3cb8)`; path `cp3shadowprecache.calt`; loader
+  `0x2ee2cf8`; hooks `0x14c2f0`/vcall+0x18; stop before attach @ `0x533f97` (no
+  `0x14ccb0` in this fragment). Prefer always-on after E441 over success atexit /
+  deepen `0x14c2f0`/`0x6a5370`. FakeHeap + tip AllocatorFront; PR #5 cite-only.
+- Files: `native/core/vslot_40_533100_cp3shadowprecache.{hpp,cpp}`; base_initialize
+  wire; `tools/lift/check_f533100_vslot40_cp3shadowprecache.py`; checkpoint
+  `docs/checkpoints/2026-10-22-vslot-40-533100-cp3shadowprecache.md`; EVIDENCE E442;
+  TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-vslot40-cp3shadowprecache-20261022/` (manifest
+  `54d200a4…` at tip `0c79bf1`; capture `8b018ad3…`).
+- Observation: feat tip `0c79bf1`; measured `csp=` stand-in + mid_reg=4 → 275
+  registry. Attach / `0x14ccb0` / success atexit / `0x14c2f0` body NOT modelled.
+- Commands: `python3 -I tools/lift/check_f533100_vslot40_cp3shadowprecache.py` OK;
+  `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
+  PASS; private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: cp3shadowprecache attach into `self+0x3cc8` / success atexit
+  past `0x533f97`, or bounded `0x14c2f0`/`0x6a5370`. Goal open.
 
 ## 2026-10-22 App vslot `0x533100` cp3Characters attach
 
