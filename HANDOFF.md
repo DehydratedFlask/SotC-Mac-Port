@@ -29,7 +29,7 @@ or Metal gameplay is demonstrated.
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-post-base-vcall18-532ed0-u2-20261022/` (manifest
   `e8b3e1e4…` at tip `c1ba3bd`; capture `4f6aec67…`).
-- Observation: feat tip `c1ba3bd`; measured `pbvcedu2=1` + `pb532edu2=1` + mid_reg=4 → 275 registry.
+- Observation: feat tip `c1ba3bd`; docs tip `72dac7d`; measured `pbvcedu2=1` + `pb532edu2=1` + mid_reg=4 → 275 registry.
   Callee body / later helpers NOT modelled.
 - Commands: `python3 -I tools/lift/check_f531d60_post_base_vcall18_532ed0_u2.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
