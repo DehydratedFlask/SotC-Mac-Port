@@ -4,15 +4,16 @@
 //   path "$/characters/shadow/****/cp3Characters.calt"
 //   call 0x14c2f0(path_buf, path) → hashed path
 //   vcall [loader.vt+0x18](out, loader, path_buf)
-//   // stop before attach-into host+0x3cb8 @ 0x533eac (14d880 join)
+//   // stop before attach-into self+0x3cb8 @ 0x533eac (14d880 join)
+//     (see vslot_40_533100_cp3characters_attach.*)
 //
 // Always-on after E439 bossmusic attach. Prefer over success atexit (flag-true
 // only at 0x533f01) and over deepen 0x14c2f0/0x6a5370 (already hooked earlier).
 // Prefer over empty-path migrate/non-null.
 //
 // Claimed: notify + load-attempt control flow + path pin.
-// NOT modelled: attach/install into host+0x3cb8; 0x14ccb0 (occurs in attach);
-// success atexit; bodies of 0x14c2f0 / 0x95580 / vcall; asset I/O.
+// Attach/install into self+0x3cb8: see vslot_40_533100_cp3characters_attach.* (E441).
+// NOT modelled: success atexit; bodies of 0x14c2f0 / 0x95580 / vcall; asset I/O.
 // PR #5 cite-only.
 #pragma once
 
