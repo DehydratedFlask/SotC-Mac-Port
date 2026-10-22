@@ -42,7 +42,16 @@
   the app UI, game boot, audio, saving, or gameplay.
 - Remaining risks / blockers: no blocker to the bounded test; all game acceptance gates remain
   open as listed in HANDOFF.md.
-- Claim and task record commit ddcb75292a9be2fa543f756c6dfa69eda574b8cf was pushed. This
-  completion checkpoint will be published with audited documentation.
-- Exact next action: stage the launcher test and this task's ledger/checkpoint updates, run staged
-  and full publication audits, commit and push, then continue the active region-list claim.
+- Claim and task record commit ddcb75292a9be2fa543f756c6dfa69eda574b8cf and completion commit
+  57ec40a42f5be178375b7b40e73dd8ca9c74ae4e were pushed. Staged/full audits accepted 10/1,715
+  paths; post-push fetch showed 0/0 divergence and explicit/full audits accepted 10/1,715. The
+  publication summary is in
+  local/validation/20261022-root-fixture-baselines/app01-zero-fallback-region-list-publication.log
+  (SHA256 0f34761ffc7eaf289f6eb3d1bb5d64f6c5a7c28783105137c0e3b474886e22f1); full output is in
+  post-push-57ec40a-verification.log (SHA256
+  70ca84ac33dc4816996cd0e7545093b2a08cd731fbfeabd339a13df485f73241).
+- Publication verification recorded in the shared handoff and evidence ledger at 2026-10-22
+  02:10 CDT (America/Chicago), /root.
+- Exact next action: continue the published active region-list claim by delegating only
+  native/tests/test_region_list.cpp to /root/next_fixture_scout_2; review and independently replay
+  its focused build and CTest at root.
