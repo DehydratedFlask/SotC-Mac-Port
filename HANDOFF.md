@@ -21,8 +21,10 @@ or Metal gameplay is demonstrated.
 - Files: `native/core/init_sub_3be930.{hpp,cpp}`; ctor wire; `tools/lift/check_f3be930_sub.py`;
   checkpoint `docs/checkpoints/2026-10-22-init-sub-3be930.md`; EVIDENCE E415;
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-ctor-98a90-sub3be930-20261022/` (manifest `e7082f3f…`).
-- Observation: ELF pins loops/stride/leaves; measured first-slot vtable = stand-in → 275 registry.
+  `local/validation/appmain-init-ctor-98a90-sub3be930-20261022/` (manifest `5efeba5e…` at tip
+  `afede14`).
+- Observation: feat tip `afede14`; ELF pins loops/stride/leaves; measured first-slot
+  vtable = stand-in → 275 registry.
   Ensure migrate / non-null list / `0x1ab550` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f3be930_sub.py` OK;
   `ctest --test-dir local/build/native-ctor98a90 -R '^appmain_init_ctor_98a90_slice$'`
