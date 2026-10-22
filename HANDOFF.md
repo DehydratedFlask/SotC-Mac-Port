@@ -28,9 +28,9 @@ or Metal gameplay is demonstrated.
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
   `local/validation/appmain-init-prologue-20261022/` (manifest `d6006cbf…` at tip
   `c4e58d8`).
-- Observation: tip `c4e58d8`; ELF pins 448 B body + early call sequence + leaf `0x335a0`;
-  fail-visible missing a30 ctor; success flag20=1 → base xchg→0 → 275 registry
-  (alloc_ops=7). Tail after `0x255264` NOT modelled.
+- Observation: feat tip `c4e58d8` (docs tip `9c54b4b`); ELF pins 448 B body + early
+  call sequence + leaf `0x335a0`; fail-visible missing a30 ctor; success flag20=1 →
+  base xchg→0 → 275 registry (alloc_ops=7). Tail after `0x255264` NOT modelled.
 - Commands: `python3 -I tools/lift/check_f255180_prologue.py` OK;
   `ctest --test-dir local/build/native-prologue -R '^appmain_init_prologue_slice$'` PASS;
   private capture exit 0; `check_ctor_slots` still **155**.
