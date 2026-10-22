@@ -15,6 +15,12 @@
 int main() {
     using namespace sotc;
 
+    unsigned char local_byte = 0;
+    HostMapping zero_sized{};
+    zero_sized.ptr = &local_byte;
+    zero_sized.size = 0;
+    CHECK(zero_sized.empty());
+
     // OBS rounding before ReserveVirtual (0x19e2d / 0x19f0d / 0x19f8a).
     CHECK(reserve_alignment(1) == 0x100000u);
     CHECK(reserve_alignment(0x10000) == 0x100000u);
