@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 06:39 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 06:48 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
@@ -8,24 +8,28 @@ older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
 
-## Current fixture claim — active
+## Current fixture claims — active
 
-- `SRV-01-F19E00-ZERO-REQUEST-PEAK-UPDATE-FIXTURE-01`, owned by `/root` with proposed worker
-  `/root/fixture_candidate_scout_c`; one test-only case in
-  `native/tests/test_arena_accounting.cpp` pins peak update when requested bytes are zero. The
-  [claim checkpoint](docs/checkpoints/2026-10-22-root-srv01-f19e00-zero-request-peak-claim.md)
-  records the baseline, exact commands, and synthetic-only limit.
-- Claim and CPU-01 completion are published in `4bff686d91d5a014cc4df2b6c01682d6855787ec`; push
-  succeeded and fetch verification is 0/0. E367 and the [publication checkpoint](
-  docs/checkpoints/2026-10-22-root-cpu01-complete-srv01-f19e00-claim-publication.md) record exact
-  audits and logs. Implementation has zero attempts and zero failed tries. No production
-  helper/header, CMake, unrelated user API, or game-input changes are in scope.
-- E366 records the first stale folder-index check and its recovery: serial regeneration/check passed
-  at 54,491 folders; Trail wiring check passed at 3,618 nodes / 1,240 files with the meaning tier
-  unbuilt. The audit logs and exact hashes are in the evidence row.
-- Exact next action: dispatch the isolated `arena_accounting` fixture to `/root/fixture_candidate_scout_c`;
-  root will replay the focused build and CTest independently. A separate read-only scout will look
-  for the next bounded fixture.
+- `SAV-01-READER-DUPLICATE-NAME-CROSS-TAG-FIXTURE-01`, owned by `/root` with proposed worker
+  `/root/cpu_sav_fixture_scout_22`; the one-case change in
+  `native/tests/test_save_stream.cpp` changes the second same-name chunk tag from 4 to 8 and pins
+  that the reader's reject policy still rejects duplicate name hashes. Its [claim checkpoint](
+  docs/checkpoints/2026-10-22-root-sav01-reader-duplicate-cross-tag-claim.md) records baseline hashes,
+  exact commands, and the synthetic-only boundary.
+- `SAV-01-CHUNK-CODEC-READER-BORROWED-BYTES-VIEW-FIXTURE-01`, owned by `/root` with proposed worker
+  `/root/next_bounded_fixture_scout_22`; a case in `native/tests/test_save_chunk_codec.cpp` pins a
+  nonempty `PayloadReader::read_bytes` alias and cursor movement. Its [claim checkpoint](
+  docs/checkpoints/2026-10-22-root-sav01-reader-borrowed-bytes-view-claim.md) records baseline hashes,
+  exact commands, and the API-only boundary.
+- Both claims use baseline HEAD `34a10b530e4b5e03ad1798d7bb098690efed1b69`; each has zero
+  implementation attempts and zero failed tries. They are not dispatched until their claim rows
+  and checkpoints are published. Production code, CMake, user-owned API/Graft paths, and game inputs
+  are outside scope.
+- E368 records the worker/root pass for the preceding SRV-01 zero-request fixture and the review
+  caveat: byte preservation is asserted for the prefix and suffix around the documented raw span;
+  interior gaps are not all individually checked.
+- Exact next action: run index/Trail and path audits, publish the SRV-01 completion plus both SAV-01
+  claims, then dispatch the two independent test files.
 
 ## CPU-01 normal-threshold infinity fixture — verified
 
@@ -36,6 +40,16 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   record the commands, hashes, logs, and limits.
 - This observes synthetic comparison behavior only; no game reachability or gameplay behavior is
   established.
+
+## SRV-01 zero-request peak-update fixture — verified
+
+- `SRV-01-F19E00-ZERO-REQUEST-PEAK-UPDATE-FIXTURE-01` is `FIXTURE_VERIFIED`: worker and independent
+  root Debug/Ninja builds pass focused `arena_accounting` CTest 1/1. Only
+  `native/tests/test_arena_accounting.cpp` changed. E368 and the
+  [completion checkpoint](docs/checkpoints/2026-10-22-root-srv01-f19e00-zero-request-peak-complete.md)
+  record exact commands, hashes, and the byte-preservation coverage caveat.
+- This observes a synthetic helper result only; allocator integration and game behavior are not
+  demonstrated.
 
 ## SAV-01 bad-magic zeroed-fields fixture — verified
 
@@ -135,6 +149,17 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
 - E367 records the staged/full path audits, push, post-push full audit, and fetch-verified 0/0
   divergence for this publication.
 - Exact next action: dispatch `arena_accounting` to the worker and replay independently.
+
+## 2026-10-22 SRV-01 completion / two SAV-01 claim checkpoint
+
+- SRV-01 zero-request peak-update fixture passed worker/root focused build and CTest, and its
+  read-only review passed with the documented prefix/suffix coverage boundary. E368 and its
+  completion checkpoint record the result.
+- The cross-tag duplicate-name reader case and borrowed-bytes reader-view case are claimed in E369
+  and E370. Both are test-only and use separate test files; claim checkpoints are ready to publish.
+- E371 will record publication of the SRV-01 completion and both SAV-01 claims.
+- Exact next action: run project-index/Trail and path audits, commit and push the SRV-01 completion
+  with both SAV-01 claims, then dispatch the two workers in parallel.
 
 ## DATA-02 pakN TOC payload-MD5 sample — verified
 

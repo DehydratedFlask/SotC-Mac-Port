@@ -97,13 +97,14 @@ void emit_case(const FixtureCase& fixture, bool last) {
 }  // namespace
 
 int main(int argc, char** argv) {
-    std::array<FixtureCase, 5> cases{
+    std::array<FixtureCase, 6> cases{
         make_case("mode2_updates", 0x10, 2, 0x20, 0x1f, 0x80),
         make_case("mode0_preserves_90", 3, 0, 100, 128, 0x1122334455667788ull),
         make_case("mode3_preserves_90", 7, 3, 0x100, 0x100, 0x8877665544332211ull),
         make_case("unsigned_high_water", 1, 0, 0x7fffffffffffffffull,
                   0x7ffffffffffffffeull, 0x123456789abcdef0ull),
         make_case("wrap_add_and_subtract", 8, 2, 0xfffffffffffffffcull, 5, 4),
+        make_case("zero_request_repairs_peak", 0, 0, 0x100, 0xff, 0x123),
     };
 
     for (auto& fixture : cases) verify_case(fixture);
