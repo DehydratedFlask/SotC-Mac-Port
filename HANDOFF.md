@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 10:23 CDT (America/Chicago). Drive Init-hash:
+Updated: 2026-10-22 10:29 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
 worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
@@ -8,9 +8,31 @@ worktree; those commits are not ancestors of this tip (merge gap). Drive keeps
 [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
 Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
 
-**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E406 — not PASSED); G2–G6 NOT RUN.
+**Project remains incomplete.** G0 PARTIAL; **G1 PARTIAL** (E404–E407 — not PASSED); G2–G6 NOT RUN.
 No native game executable cold boot, authentic game audio, real progress save/relaunch/load,
 or Metal gameplay is demonstrated.
+
+## 2026-10-22 base Initialize `0x255130` orchestrator
+
+- Agent: bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Attempt 1 — success (0 failed tries).
+- Task: `CPU-01-BASE-INITIALIZE-255130-01` — 79-byte orchestrator + leaf `0x357f0`;
+  injectable hooks for `0x255180`/`0x255340`/vslots `0x534130`/`0x533100`; measured path
+  base→E406 trivial→E405 registry. Prefer over `0xf08` singleton this turn. No leaf-vec;
+  no idx 95; heap untouched (FakeHeap for registry only).
+- Files: `native/core/base_initialize_255130.{hpp,cpp}`, `xchg_store_u32_357f0.{hpp,cpp}`,
+  `appmain_init_base_initialize_slice.{hpp,cpp}`, test,
+  `tools/lift/check_f255130_base_initialize.py`; CMake/README;
+  checkpoint `docs/checkpoints/2026-10-22-base-initialize-255130.md`; EVIDENCE E407;
+  TASKS/VALIDATION/INDEX/HANDOFF. Private:
+  `local/validation/appmain-init-base-initialize-20261022/` (manifest `1ec44e64…`).
+- Observation: ELF pins orchestrator/leaf/vslots; fail-visible vslot_30 path; success path
+  xchg flag→trivial→275 registry entries (3 alloc ops). Callee/vslot bodies NOT modelled.
+- Commands: `python3 -I tools/lift/check_f255130_base_initialize.py` OK;
+  `ctest --test-dir local/build/native-baseinit -R '^appmain_init_base_initialize_slice$'` PASS;
+  private capture exit 0; `check_ctor_slots` still **155**.
+- Inference: G1 **PARTIAL** only.
+- Next exact action: deepen `0x255180` or vslot `0x534130`, or `0xf08` singleton install.
+  Goal remains open.
 
 ## 2026-10-22 Init trivial remainder leaves (beyond fragment)
 
