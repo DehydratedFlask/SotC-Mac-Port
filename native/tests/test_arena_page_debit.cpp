@@ -24,6 +24,10 @@ int main() {
     CHECK(arena_page_count(arena) == 97);
     arena_debit_pages(arena, 0x1ffff);  // one full page + a partial page
     CHECK(arena_page_count(arena) == 96);
+    // Pin uint32 helper arithmetic only; this does not assert valid allocator runtime underflow.
+    arena_page_count(arena) = 1;
+    arena_debit_pages(arena, 0x20000);
+    CHECK(arena_page_count(arena) == UINT32_MAX);
     arena_debit_pages(nullptr, 0x10000);  // no-op
 
     // Idle pool insert reuses list_insert_at_head offsets.
