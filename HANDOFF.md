@@ -1,12 +1,26 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 05:52 CDT (America/Chicago). Integrator: /root (Codex desktop task
+Updated: 2026-10-22 05:58 CDT (America/Chicago). Integrator: /root (Codex desktop task
 `01a15eab-88d5-7a83-a23b-cc55dc002eb6`). Previous transfer record:
 [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md);
 older history: `docs/checkpoints/2026-10-20-handoff-archive-through-1f7c8e8.md`.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## Current parallel fixture claims — active
+
+- `APP-01-METAL-READINESS-GATE-FIXTURE-01`, owned by `/root`; one test method in
+  `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift`. Pin that injected missing Metal
+  blocks `canStart` and calling `startCore()` leaves the scripted core's start count at zero.
+- `SRV-01-EXACT-FIT-FINALIZE-WRITE-BOUNDARY-FIXTURE-01`, owned by `/root`; one test-only byte
+  boundary case in `native/tests/test_exact_fit_finalize.cpp`. Seed the record with a poison pattern,
+  run `exact_fit_finalize`, and verify bytes outside its five documented writes are unchanged.
+- Both claims have zero implementation attempts and zero failed tries; no production changes are in
+  scope. Claim details and source identities are in
+  [the parallel-claims checkpoint](docs/checkpoints/2026-10-22-root-app01-metal-srv01-exact-fit-claims.md).
+- Exact next action: delegate the two separate test files for implementation and focused validation;
+  root remains the only owner of shared docs and publication.
 
 ## DATA-02 pakN TOC payload-MD5 sample — verified
 
@@ -37,8 +51,7 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   fetch-verified at 0/0 divergence; its publication audit is in E342. The completion/next-task
   claim commit `fdfd466c1269e786db29769a974c3e9ac2a7a84d` is pushed and fetch-verified at 0/0;
   E344 records its path audits. `docs/ASSETS.md` and `docs/TASKS.md` record the sample-only result.
-- Exact next action: review the read-only scout's next-candidate report; if it identifies an
-  unclaimed bounded test-only task, verify the live source/ledger, claim it, and continue.
+- Exact next action: continue the two active test-only fixture claims listed above.
 - Remaining risks: any result applies only to this sample and does not establish global TOC
   semantics, integrity role, codec, runtime behavior, or game use. The native/API user changes
   and the Graft telemetry cache paths remain unmodified and outside publication.
@@ -76,7 +89,8 @@ authentic game audio, real progress save/relaunch/load, or Metal gameplay is dem
   [docs/checkpoints/2026-10-22-root-sav01-native-stream-file-directory-errno-claim.md](docs/checkpoints/2026-10-22-root-sav01-native-stream-file-directory-errno-claim.md).
 - Fresh Debug/Ninja configure/build passed; focused `save_stream_file` CTest passed 1/1. Test source
   SHA256 `eef6bc0f263815d54143bd0da210fae756ee26c96c06129eac772f493ea5f04c`; production source/header
-  unchanged. E348 records the command logs and publication audit. See the
+  unchanged. E348 records the command logs and publication audit of the claim; completion commit
+  `2b1097220c0dfd7a1312e171c7cbde49f54a7603` is pushed/fetch-verified and E349 records its audit. See the
   [completion checkpoint](docs/checkpoints/2026-10-22-root-sav01-native-stream-file-directory-errno-complete.md).
 - Risk boundary: synthetic filesystem error reporting only; no real save compatibility, durability,
   or game behavior is claimed. Production code remains out of scope.
