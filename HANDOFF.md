@@ -24,7 +24,7 @@ or Metal gameplay is demonstrated.
   `tools/lift/check_f255130_base_initialize.py`; CMake/README;
   checkpoint `docs/checkpoints/2026-10-22-base-initialize-255130.md`; EVIDENCE E407;
   TASKS/VALIDATION/INDEX/HANDOFF. Private:
-  `local/validation/appmain-init-base-initialize-20261022/` (manifest `1ec44e64…`).
+  `local/validation/appmain-init-base-initialize-20261022/` (manifest `a4a47776…`).
 - Observation: ELF pins orchestrator/leaf/vslots; fail-visible vslot_30 path; success path
   xchg flag→trivial→275 registry entries (3 alloc ops). Callee/vslot bodies NOT modelled.
 - Commands: `python3 -I tools/lift/check_f255130_base_initialize.py` OK;
