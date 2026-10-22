@@ -203,6 +203,15 @@ bool base_initialize_255130(void* self, void* arg,
         if (!bmr.ok) {
             return false;
         }
+        // E439: always-on bossmusic attach (measured fail path; install into f08+0x70).
+        const Vslot40_533100BossmusicAttachResult bmar = vslot_40_533100_bossmusic_attach(
+            bmr.loaded, /*success_flag=*/false, hooks.vslot_40_bossmusic_attach_detail);
+        if (hooks.vslot_40_bossmusic_attach_out != nullptr) {
+            *hooks.vslot_40_bossmusic_attach_out = bmar;
+        }
+        if (!bmar.ok) {
+            return false;
+        }
     }
 
     // OBS 0x255163..0x255174: rdi=*0x2ea4718; sil=0; call 0x357f0; return true
