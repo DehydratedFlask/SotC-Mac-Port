@@ -15,13 +15,16 @@ int main() {
     CHECK(kShadowHeapRequest.flags == 1u);
 
     // Alignment helpers match the original integer updates.
+    CHECK(align_up_64k(0) == 0u);
     CHECK(align_up_64k(1) == 0x10000u);
     CHECK(align_up_64k(0xffff) == 0x10000u);
     CHECK(align_up_64k(0x10000) == 0x10000u);
     CHECK(align_up_64k(0x20000000) == 0x20000000u);
+    CHECK(align_up_1m(0) == 0u);
     CHECK(align_up_1m(1) == 0x100000u);
     CHECK(align_up_1m(0xfffff) == 0x100000u);
     CHECK(align_up_1m(0x100000) == 0x100000u);
+    CHECK(align_size_up_64k(0) == 0ull);
     CHECK(align_size_up_64k(1) == 0x10000ull);
     CHECK(align_size_up_64k(0x10000) == 0x10000ull);
     CHECK(align_size_up_64k(0x6400000) == 0x6400000ull);
