@@ -2,7 +2,7 @@
 
 Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + OpenCode orchestrator round 2.
 Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
-Round-2 through round-16 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
+Round-2 through round-17 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
 
 ## 2026-10-22 Repository history rewrite — Claude attribution + hostname identity
 
@@ -35,6 +35,23 @@ Round-2 through round-16 detail are the sections immediately below; the parallel
   pushing one would reintroduce old trailers. Gate: **G1 still PARTIAL**; nothing about boot/audio/save
   changes.
 - Next exact action: unchanged — next always-on after `0x532720`, or a bounded body lift.
+
+## 2026-10-23 Orchestrator round 17 — insert uses the recovered allocator protocol (E554)
+
+- Agent: integrator.
+- Task: `CPU-01-INSERT-ALLOC-SEAM-01` (E554).
+- Observation: `Insert1beeb0Alloc` now has a context form, and `alloc_seam_via_17070(contract)`
+  adapts the recovered wrappers: allocation is `0x17070` (tag 1, align 8, flags 1) and node free is
+  `0x170c0` (tag 2) — the same tag `0x1bdeb0` uses when tearing the list down. The old simple seam
+  still works unchanged.
+- Observation: the allocator fixture builds a container with the lifted ctor, inserts through the
+  seam, and asserts the exact dispatch arguments, that the node came from the contract's buffer,
+  and that deallocation uses tag 2. **337/337** tests; checker sweep **417 passed / 20 skipped /
+  0 failed**.
+- Inference: G1 **PARTIAL**. The seam now matches the recovered protocol; the dispatch bodies
+  (`0x12820`/`0x12af0`) remain un-lifted contracts.
+- Next exact action: the owner installer `0x2569d0`, which allocates the 0x210 singleton and the
+  0x60 containers these inserts live in.
 
 ## 2026-10-23 Orchestrator round 16 — allocator wrappers + a correction (E553)
 
