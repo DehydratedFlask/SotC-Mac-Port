@@ -93,8 +93,7 @@ Round-2 through round-18 detail are the sections immediately below; the parallel
 - Task: `CPU-01-SHARED-RELEASE-F590-NATIVE-01` (E552).
 - Observation: the `call 0xf590` hook used across nearly every recovered Init slice is a
   **shared-ownership release**: `[holder+0x18]` control block, `lock xadd` decrement, and only on
-  the last reference `0x12af0(pointee)` then a tail `jmp 0x170b0(control)`. The add side is the
-  already-lifted `0x14ccb0`.
+  the last reference `0x12af0(pointee)` then a tail `jmp 0x170b0(control)`. The add side is **not** `0x14ccb0` (E557): widths and offsets differ and no qword increment site exists; the count appears seeded at construction.
 - Observation: the native model performs a real `std::atomic` decrement, reports the previous
   count, and destroys/frees only at zero; a missing hook is a visible failure while the decrement
   still happens, which the fixture asserts. **336/336** tests; checker sweep **416 passed / 20

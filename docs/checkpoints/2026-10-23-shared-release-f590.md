@@ -20,7 +20,12 @@ Body `0xf590..0xf5d9` = 73 B, sha256 `55eef47ed634…`. Sequence:
 `cmp rcx,1; jne ret` (still referenced);
 `mov rdi,[rbx]; xor esi,esi; call 0x12af0` (destroy pointee);
 `mov rdi,[rbx+0x18]; test; je ret`; `jmp 0x170b0` (free the control block).
-The add side is `0x14ccb0` (already lifted as `atomic_add_ref_14ccb0`).
+**Add side correction (E557):** `0x14ccb0` is *not* the add side. Its own header documents a
+32-bit `lock inc dword [object+0x30]`, while this release decrements a **64-bit** word at
+`[holder+0x18]`; different field and width. A whole-`.text` scan found no
+`lock inc/add/xadd qword [reg+0x18]` site either, so the count appears to be *seeded at
+construction* and only decremented afterwards. The earlier "add side is `0x14ccb0`" claim is
+withdrawn.
 
 ## Model
 
