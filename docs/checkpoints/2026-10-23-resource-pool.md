@@ -39,7 +39,15 @@ allocates a wrapper, copies the key (+1), inserts the map node and returns it. T
 only pointer identity, `+0x30` and `+0x40`. A fresh wrapper has state 11, so sites 1-8 (`priority
 13`) take the early return; site 9 (`priority 9`) writes state 9.
 
+## Attach-site detail
+
+Sites 1-8 lock their slot with priority 13, so `RequestState` early-returns (state 11 <= 13) and only
+bumps `+0x40`. Site 9 locks with priority 9 (`0x53403c mov esi,9; call 0x140d90`), which does not
+early-return: it writes `state = 9` and calls `engine->vtable[3](engine, wrapper, 9)`. Slots must
+start as `{null_wrapper, false}` because the assignment block calls `RemoveReference(old)`
+unconditionally; a null slot pointer would crash.
+
 ## Limits
 
-The `ResourceManager` delegation, the payload factory, the null wrapper singleton and the full
-`RequestState` body remain hooks/contracts.
+The `ResourceManager` delegation, the payload factory, the null wrapper singleton, the full
+`RequestState` body and the second dependency tree (`pool+0x58`) remain hooks/contracts.
