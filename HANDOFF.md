@@ -254,27 +254,31 @@ The rounds that follow the archive are in chronological order.
 
 ## Next exact work
 
-1. **Platform tag table.** Resolve `0x147e20`/`*0x2ee2d00` so the nine `0x533100` key sites can run
-   with a real `****` tag instead of stopping at the missing hook. If the tags are static, add a
-   native table; if they are runtime state, keep the hook and name the state.
-2. **ResourcePool `0x14e260`.** Model the 0x138 B pool, its hash+strcmp map, the `ResourceRef` and
-   `0x14ccb0`/`0x14ccc0` refcounts, so the attach fragments can call `GetResource` instead of the
-   `resource_pool_miss` boolean. The resource object `0x14c8a0`/`0x150360` is the next dependency.
-3. **Remaining owner ctors.** The 15 non-trivial bodies are still hooks in `owner_members`; the bag
-   derived ctor `0xa2afb0` (four 0xc88 language tables) and the `[this+0x48]`/`[this+0x58]` bodies
-   (`0xb111e0`/`0xb11210`) are the highest-value next lifts.
-4. **Camera live pose.** No static writer of the bound delegate exists (E583). The next step is a
-   full rizin decode of `0x1c0000..0x1da000`/`0x20c000..0x216800` to find the `BoundMemberFn`
-   writer; the pure `0x50ba0` math is already native.
-5. **Not started:** save/load, audio, Metal, and the launcher. `0xa56560` (stat engine) and
-   `0xa54920` (ConVar registrar) remain contracts; do not claim them.
+1. **Camera class identity.** E599 found no writer of `D+0x2e8` and showed the field behaves as an
+   intrusive-list node in `_Root`. The in-flight lane decodes `0xa68030`, finds the
+   `[element+0x18]` store and settles whether `D` is the 0x3c8 class. Do not model a native
+   `BoundMemberFn` before that verdict.
+2. **Save transaction `SAV-02-TRANSACTION-01`.** Implement the E598 contract: `ProgressV1`
+   (`0x3cd8` blob), `SaveStore`/`SaveIoOps`, `save_load`/`save_store`/backup/enumerate, header
+   `{1, FNV(body), size, 4}`, 1-based result ordinals, deterministic failure injection. No save/load
+   works claim; the real-game evidence is absent.
+3. **Next owner ctor.** `0xa5c850` is the recommended next bounded lift (~50 constant stores, two
+   mutex ctors). Rows 14/21 (`0xa597d0`, `0x4a690`) stay hooks for now.
+4. **ResourcePool production.** The nine attach sites use the real pool, but a production launcher
+   must supply the key allocator, the pool mutex model and the manager-delete delegation. The
+   screenshot seam needs a Metal capture provider before the report can carry real pixels.
+5. **Not started:** save/load execution, audio, Metal rendering, and a booting core. `0xa56560`
+   (stat engine) and `0xa54920` (ConVar registrar) remain contracts.
 6. Round end: fresh build, full `ctest`, `SOTC_NATIVE_BUILD=local/build/orch-r22
    tools/lift/run_all_checkers.sh`, `python3 -I scripts/audit_publish_paths.py --all`,
    `python3 -I scripts/check_commit_attribution.py`.
 
 ## Parallel-agent state
 
-- No workers are running. The preserved `origin/cursor/parallel-foundations-wip-20261023` content
+- Two read/code workers are live: the SaveData transaction implementation (`native/core/save_*` +
+  its CMake block) and the camera class-identity analysis (private evidence only). Workers do not
+  edit `HANDOFF.md` or commit.
+- The preserved `origin/cursor/parallel-foundations-wip-20261023` content
   (shared_str_release_f590, save_stream exclusive temp, aud02 rackquery scripts, check_ff590) is now
   **integrated** (E566); `origin/cursor/parallel-foundations-86ac55b` was its base.
 - Round 24 used six workers on disjoint files: table owner, installer semantics, 0x2569d0 mapping,
