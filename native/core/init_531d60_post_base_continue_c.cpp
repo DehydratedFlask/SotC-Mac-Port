@@ -214,6 +214,12 @@ Init531d60PostBaseContinueCResult init_531d60_post_base_continue_c(
     pin(out, ContinueCUnit::je_5329ae);
     ++out.branch_boundary_count;
     out.branch_outcome_modelled = false;  // je outcome / both successors NOT modelled
+    // E530: the merge `je 0x5329ae` tests `*(*(0x2efe340) + 0x60)` against zero; when the
+    // resolved byte is supplied the outcome is modelled (taken == byte is 0).
+    if (hooks.merge_flag_byte != nullptr) {
+        out.merge_branch_outcome_modelled = true;
+        out.merge_branch_taken = (*hooks.merge_flag_byte == 0);
+    }
 
     out.ok = (out.unit_executed == kInit531d60PostBaseContinueCUnitCount) &&
              (out.call_count == 3) && (out.vcall_count == 3) && (out.lea_count == 3) &&

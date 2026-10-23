@@ -226,3 +226,5 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Insert 0x21cd0 native (2026-10-22)](checkpoints/2026-10-22-insert-21cd0-native.md) | Bump-allocator B insert: 0x20 B entry, begin/end + grow hooks; E533; G1 PARTIAL |
 | [Container 0x1bdb10 native (2026-10-22)](checkpoints/2026-10-22-container-1bdb10-native.md) | Three-list 0x60 B container ctor, self loops + counts; E534; G1 PARTIAL |
 | [Init continue batch D (2026-10-22)](checkpoints/2026-10-22-init-531d60-continue-batch-d.md) | 17 B fall-through `0x53299d..0x5329ae`, lea `0x32f79a8`, call `0xa473b0`; E535 |
+| [Init tail 0x53299d (2026-10-22)](checkpoints/2026-10-22-init-tail-53299d.md) | Fall-through 17 B; target block 350 B; callees named (capture setter, save-data ctor); E537 |
+| [Init merge je 0x5329ae (2026-10-22)](checkpoints/2026-10-22-init-branch-5329ae.md) | Merge branch modelled from `[+0x60]` byte; taken path stops honestly; E536 |

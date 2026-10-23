@@ -541,6 +541,14 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     if (!out.post_base_continue_c.ok) {
         return out;
     }
+    // E536: the merge `je 0x5329ae` is taken when the resolved flag byte is 0. The branch
+    // target block is NOT modelled, so stop honestly instead of running the fall-through.
+    out.init_branch_5329ae_taken = out.post_base_continue_c.merge_branch_taken;
+    if (out.post_base_continue_c.merge_branch_outcome_modelled &&
+        out.post_base_continue_c.merge_branch_taken) {
+        out.init_stopped_at_5329ae = true;
+        return out;
+    }
     // Fall-through of the merge branch (je NOT taken): 17 B before 0x5329ae.
     out.post_base_continue_d = init_531d60_post_base_continue_d(post_base_continue_d_hooks);
     if (!out.post_base_continue_d.ok) {

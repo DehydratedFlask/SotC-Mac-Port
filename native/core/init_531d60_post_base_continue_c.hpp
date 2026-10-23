@@ -225,7 +225,8 @@ struct Init531d60PostBaseContinueCHooks {
     // location). null => flag unknown, sil place-holder 0, still counted.
     const std::uint8_t* flag_byte_iter1 = nullptr;  // 0x53293f; sil -> call 0xa599e0
     const std::uint8_t* flag_byte_iter2 = nullptr;  // 0x532973; sil -> call 0xa431e0
-    // iter3 flag (0x532998) feeds the je; value NOT claimed.
+    // iter3 flag (0x532998) feeds the merge `je 0x5329ae`: the branch is taken when the
+    // resolved byte is 0. Null => outcome NOT modelled.
 
     // Direct-call hooks (callee bodies NOT lifted; null => no-op):
     void (*call_a52b70)(void* rdi, std::uint8_t esi) = nullptr;
@@ -233,6 +234,8 @@ struct Init531d60PostBaseContinueCHooks {
     void (*call_a431e0)(void* rdi, std::uint8_t esi) = nullptr;
     // Indirect vtable-slot-0 dispatch (call [rax], rax = [0x2efe318]); null => no-op.
     void (*vcall_slot0)(void* rdi, std::uint8_t esi) = nullptr;
+    // Resolved [0x2efe340]+0x60 byte for the merge `je 0x5329ae` (0x532998).
+    const std::uint8_t* merge_flag_byte = nullptr;
 };
 
 struct Init531d60PostBaseContinueCResult {
@@ -257,6 +260,9 @@ struct Init531d60PostBaseContinueCResult {
     std::uint64_t end_rva = kInit531d60PostBaseContinueCEndRva;
     std::uint64_t branch_target_rva = kInit531d60PostBaseContinueCBranchTargetRva;
     bool branch_outcome_modelled = false;
+    // Merge `je 0x5329ae` (0x53299b): modelled only when merge_flag_byte is supplied.
+    bool merge_branch_outcome_modelled = false;
+    bool merge_branch_taken = false;
     // 0x5328e0..0x532904 taken-path preamble (8 units, 36 B), only when
     // enter_via_5328e0. Its sete r14b feeds the merge entry's movzx esi,r14b.
     bool preamble_ran = false;

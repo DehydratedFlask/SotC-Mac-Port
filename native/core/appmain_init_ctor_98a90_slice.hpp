@@ -221,6 +221,9 @@ struct AppmainInitCtor98a90SliceResult {
     // proven boolean; when it is taken, the 36 B 0x5328e0 preamble runs first and
     // its sete r14b becomes the merge entry's movzx esi,r14b.
     bool init_branch_5328e0_taken = false;
+    // E536: merge `je 0x5329ae` outcome (modelled only when the flag byte is supplied).
+    bool init_branch_5329ae_taken = false;
+    bool init_stopped_at_5329ae = false;
     AppmainInitRemainderSliceResult remainder{};
 };
 

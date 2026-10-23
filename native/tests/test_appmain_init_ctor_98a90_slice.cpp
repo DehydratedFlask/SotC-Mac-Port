@@ -1879,6 +1879,12 @@ int main() {
     // E511: grouped Init continue C 0x532904..0x53299d — 38 units, 3 direct calls,
     // 3 vtable slot-0 dispatches, 3 lea, 6 global loads; je8 target pinned but
     // outcome NOT modelled.
+    // E536: with no merge flag byte the outcome is unknown, so the fall-through runs and
+    // no stop flag is set.
+    CHECK(!r.post_base_continue_c.merge_branch_outcome_modelled);
+    CHECK(!r.init_branch_5329ae_taken);
+    CHECK(!r.init_stopped_at_5329ae);
+
     // Batch D: fall-through of C's je 0x5329ae — 17 B, 4 units, one call.
     CHECK(r.post_base_continue_d.ok);
     CHECK(r.post_base_continue_d.unit_executed == 4);
@@ -1989,6 +1995,27 @@ int main() {
         CHECK(c1.ok && c1.preamble_ran);
         CHECK(c1.preamble_r14b == 0);   // (byte != 0) => 0
         CHECK(c1.first_esi == 0);
+
+        // E536: merge `je 0x5329ae` is taken when the resolved flag byte is 0, and the
+        // slice must stop before the unmodelled 0x5329ae block instead of running the
+        // fall-through.
+        {
+            std::uint8_t merge_zero = 0;
+            Init531d60PostBaseContinueCHooks m{};
+            m.merge_flag_byte = &merge_zero;
+            const auto cm = init_531d60_post_base_continue_c(m);
+            CHECK(cm.ok);
+            CHECK(cm.merge_branch_outcome_modelled);
+            CHECK(cm.merge_branch_taken);
+            std::uint8_t merge_one = 1;
+            m.merge_flag_byte = &merge_one;
+            const auto cm1 = init_531d60_post_base_continue_c(m);
+            CHECK(cm1.ok && cm1.merge_branch_outcome_modelled);
+            CHECK(!cm1.merge_branch_taken);
+            Init531d60PostBaseContinueCHooks mu{};
+            const auto cmu = init_531d60_post_base_continue_c(mu);
+            CHECK(!cmu.merge_branch_outcome_modelled && !cmu.merge_branch_taken);
+        }
 
         // Missing hook data on the taken path fails visibly.
         Init531d60PostBaseContinueCHooks bad{};
