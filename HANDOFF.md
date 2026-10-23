@@ -8,8 +8,8 @@ The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **356/356** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **453 passed / 0 skipped / 0 failed** with
+- Full native suite: **357/357** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **454 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -162,6 +162,10 @@ The rounds that follow the archive are in chronological order.
   the runtime platform tag (`movbe` fourcc + `0x147e20` hook), then hashes the patched text with
   FNV-1a-32. A placeholder without a tag hook fails before allocating. The nine per-site literals
   are ready for the fragment wiring.
+- **E584** — the measured `0x1bdf30` path is composed natively: list-C dispatch then the report
+  snapshot (list-A FieldEntry, list-B Attachment, drain, clear). The fixture installs five entries
+  through the real product/Game delegates and serializes/drains all five; a dispatch failure stops
+  before serialization. The gate, screenshot query and root adoption remain contracts.
 - **E583** — the camera delegate has **no static writer**: `D` is the `_Root` node (vtable
   `0x15992b8`, ctor `0x1d6230`, 0x3c8 B), and the ctor zeroes `+0x2e8..+0x307`; an opcode-aware
   census found zero stores. The bound PMF target returns `const CameraTransform*`, but it is
