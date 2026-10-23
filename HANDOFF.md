@@ -6438,3 +6438,19 @@ See [the partial slot-23 checkpoint](docs/checkpoints/2026-10-21-root-cpu01-slot
 - Consumer packet: `local/re/evidence/cpu01-ctor10-descriptor-consumer-01/`
   (`report.md`, `verify.py`, `verification.json` 45/45, `ghidra-*.txt`, `SHA256SUMS`).
 - Reopen log: `local/checkpoints/root-20261020-reopen-console.log`.
+
+## 2026-10-23 Orchestrator round 21 — 0x1bdeb0 blocker resolved (E558)
+
+- Agent: integrator (goal resumed by explicit user command).
+- Task: `CPU-01-LIST-DTOR-1BDEB0-RESOLVE-01` (E558).
+- Observation: `0x1bdeb0` has exactly one caller, `0x25dc76`, which passes `*(0x2ee68c8)` — the same
+  singleton `0x1290` uses as the A-insert owner. `0x1bdb50` is that list's inserter and allocates
+  **0x58-byte nodes**, writing a dword flag at `+0x50` and two 0x20 B callables at `+0x10`/`+0x30`.
+  The container therefore holds two node types (0x58 flag nodes and 0x60 callable nodes), which is
+  exactly why the `+0x50` test looked contradictory.
+- Correction: E557's "count is seeded at construction" is **withdrawn** — 33 indirect
+  `lock incq (%reg)` acquire sites exist (including `0x1bdb9d`/`0x1bdbce` in `0x1bdb50`); only the
+  narrower "`0x14ccb0` is not the add side" claim stands.
+- Next exact action: lift `0x1bdeb0` over an explicitly typed 0x58 node (prev `+0x00`, next `+0x08`,
+  callables `+0x10`/`+0x30`, dword flag `+0x50`), releasing via `shared_release_f590` and freeing
+  via tag 2, with mixed-flag fixtures.

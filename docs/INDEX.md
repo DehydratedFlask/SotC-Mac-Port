@@ -242,3 +242,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Shared release 0xf590 native (2026-10-23)](checkpoints/2026-10-23-shared-release-f590.md) | 73 B shared-ownership release: atomic decrement, last-ref destroy+free; E552 |
 | [Allocator wrappers (2026-10-23)](checkpoints/2026-10-23-alloc-wrappers.md) | `0x17070`/`0x170b0`/`0x170c0` tail wrappers; `0x12af0` is tagged deallocate; E553 |
 | [List dtor 0x1bdeb0 decoded (2026-10-23)](checkpoints/2026-10-23-list-dtor-1bdeb0-decoded.md) | Erase-and-release loop decoded; not lifted (node type conflict at +0x50); E555 |
+| [List dtor 0x1bdeb0 resolved (2026-10-23)](checkpoints/2026-10-23-list-dtor-1bdeb0-resolved.md) | Two node types (0x58 flag / 0x60 callable); single caller on the 0x2ee68c8 singleton; E558 |
