@@ -73,10 +73,11 @@
 - The reconstructed ELF has **three** program headers; the older two-header map dropped `phdr 1`
   (`vaddr 0x1594000`, filesz `0x6d190`), which carries `.data.rel.ro` (the vtables). Do not assume
   the RELRO window is absent because it is outside `phdr 0`.
-- The camera `_Root` ctor `0x1d6230` zeroes the 24-byte block at `+0x2e8`; a full census (E599)
-  found no writer and no stored function pointer — in `_Root` the block behaves as an intrusive-list
-  node (`0x1d72d0` rebases the copied head). `D`'s class identity is unresolved; do not model a
-  native `BoundMemberFn` until `0xa68030` and the `[element+0x18]` store settle it.
+- The camera `D` is a Camera-typed registry object (`is_type<0x3cb0eb33>`, ctor `0x211c00`, 0xb0 B),
+  **not** `_Root` (E602). The 24-byte block is at `[D+0x18]+0x2e8`, and the only path that touches it
+  is the debug-only `bpe::ToolRemoteCommandMgr` `"SyncCameraAcrossTools"` command. `0xa68030` returns
+  `slot->value` from a 65536-entry array; there is no `element+0x18` field. Do not model a native
+  `BoundMemberFn` until the `_Root` vtable `+0x10` handle-registration question is settled.
 
 ## Tool acquisition (owner-approved)
 

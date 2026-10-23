@@ -286,3 +286,5 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [SaveData contract (2026-10-23)](checkpoints/2026-10-23-savedata-contract.md) | Flat progress blob, transaction API, 29 cases; E598 |
 | [Camera writer full (2026-10-23)](checkpoints/2026-10-23-camera-writer-full.md) | No writer; +0x2e8 is a list node in `_Root`; E599 |
 | [Screenshot contract (2026-10-23)](checkpoints/2026-10-23-screenshot-contract.md) | attach_screenshot decision table; E600 |
+| [Save transaction (2026-10-23)](checkpoints/2026-10-23-save-transaction.md) | ProgressV1, atomic store/load, golden 20,013 B; E601 |
+| [Camera class identity (2026-10-23)](checkpoints/2026-10-23-camera-class-identity.md) | D is Camera, not `_Root`; debug-only pose sync; E602 |

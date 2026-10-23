@@ -8,8 +8,8 @@ The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **365/365** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **462 passed / 0 skipped / 0 failed** with
+- Full native suite: **366/366** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **463 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -226,6 +226,13 @@ The rounds that follow the archive are in chronological order.
   (no renderer/capture failure -> synthetic `Command`; ok -> best-effort `SendFile` + list-B
   `("Screenshot","bug_screenshot.png")`, synthetic suppressed; sink result discarded). The snapshot
   block accepts the seam. The GPU encoder, surface and socket remain hooks.
+- **E601** — the SaveData transaction slice is native and fixture-verified: `ProgressV1`, the
+  `20005+4N` body, `{1, FNV(body), size, 4}` container, load/store/backup/enumerate over a
+  `SaveIoOps` seam, atomic rename and backup-before-commit. The N=2 golden is 20,013 B /
+  `0x5ce4db99`, independently reproduced. No real save exists; G2/G5 NOT RUN.
+- **E602** — `D` is a Camera-typed registry object, **not** `_Root`; the 24-byte block is at
+  `[D+0x18]+0x2e8` and the pose path is the debug-only `SyncCameraAcrossTools` tool command. The
+  `element+0x18` field does not exist (it is the next slot's value). No native BoundMemberFn.
 - **E594** — the native ResourceWrapper/ResourcePool/ResourceRef model is implemented: exact
   0x100 B wrapper, hash-then-strcmp comparator, non-owning map, hit/miss references, erase at zero,
   dependency recursion, the priority state table, and lock/unlock refs. Hooks cover allocation,
