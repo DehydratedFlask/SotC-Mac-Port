@@ -85,6 +85,8 @@ add_library(sotc_core STATIC
   core/owner_prop_bag.cpp
   core/owner_members.cpp
   core/owner_simple_ctors.cpp
+  core/owner_ctor_b111e0_slot48.cpp
+  core/owner_ctor_b11210_slot58.cpp
   core/shared_str_ctor_f1a0.cpp
   core/shared_str_resize_f3c0.cpp
   core/resource_id_14c2f0.cpp
@@ -1807,6 +1809,14 @@ add_test(NAME owner_members COMMAND test_owner_members)
 add_executable(test_owner_simple_ctors tests/test_owner_simple_ctors.cpp)
 target_link_libraries(test_owner_simple_ctors sotc_core)
 add_test(NAME owner_simple_ctors COMMAND test_owner_simple_ctors)
+
+add_executable(test_owner_ctor_b111e0_slot48 tests/test_owner_ctor_b111e0_slot48.cpp)
+target_link_libraries(test_owner_ctor_b111e0_slot48 sotc_core)
+add_test(NAME owner_ctor_b111e0_slot48 COMMAND test_owner_ctor_b111e0_slot48)
+
+add_executable(test_owner_ctor_b11210_slot58 tests/test_owner_ctor_b11210_slot58.cpp)
+target_link_libraries(test_owner_ctor_b11210_slot58 sotc_core)
+add_test(NAME owner_ctor_b11210_slot58 COMMAND test_owner_ctor_b11210_slot58)
 
 add_executable(test_shared_str_ctor_f1a0 tests/test_shared_str_ctor_f1a0.cpp)
 target_link_libraries(test_shared_str_ctor_f1a0 sotc_core)
