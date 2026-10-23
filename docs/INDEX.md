@@ -221,4 +221,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Init je 0x5328e0 branch (2026-10-22)](checkpoints/2026-10-22-init-branch-5328e0.md) | Branch modelled from `0x1e4c0` boolean; taken path stops honestly; E528; G1 PARTIAL |
 | [Init 0x5328e0 preamble (2026-10-22)](checkpoints/2026-10-22-init-branch-5328e0.md) | 36 B taken-path preamble modelled; `sete r14b` feeds the merge; E529; G1 PARTIAL |
 | [Init 0x2efe318 cells (2026-10-22)](checkpoints/2026-10-22-init-2efe318-cells.md) | `0x2efe318` = vtable-ptr global → `0x15976b0`; slot0 `0x91210` lazy bind; `0x2efe340` = `+0x28`; `sete` flag `[+0x60]`; E530 |
-| [Insert 0x1beeb0 native (2026-10-22)](checkpoints/2026-10-22-init-2efe318-cells.md) | 0x20 B descriptor copy executed: new(0x60), self-link, list links, count; E531 |
+| [Insert 0x1beeb0 native (2026-10-22)](checkpoints/2026-10-22-insert-1beeb0-native.md) | 0x20 B descriptor copy executed: new(0x60), self-link, list links, count; E531 |
