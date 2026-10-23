@@ -38,6 +38,13 @@ steps but not the cleared `+0xa4f8` release.
   event order.
 - ctest 369/369, sweep 466/0/0 (with the concurrent save-metadata slice).
 
+## Worker corrections (integrated)
+
+- The head conditional release is gated by `+0x18`; the marker checks are field values, not
+  addresses.
+- The empty drain still writes the three fields at `+0x5c80/+0x5c98/+0x5c90`.
+- The `+0x6fe8` releases run `+0x28` before `+0x00`.
+
 ## Limits
 
 - `0xb09690` does not null `[at+8]`; double-destroy is not idempotent and is documented, not fixed.
