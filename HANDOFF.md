@@ -8,8 +8,8 @@ The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **357/357** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **454 passed / 0 skipped / 0 failed** with
+- Full native suite: **359/359** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **456 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -166,6 +166,19 @@ The rounds that follow the archive are in chronological order.
   snapshot (list-A FieldEntry, list-B Attachment, drain, clear). The fixture installs five entries
   through the real product/Game delegates and serializes/drains all five; a dispatch failure stops
   before serialization. The gate, screenshot query and root adoption remain contracts.
+- **E585** — the `snapshotBugData` block is native: `0x25db56` is a block inside `0x25d8b0`, not a
+  function. It clears the debug gate before building, calls `0x1bdf30`, emits the synthetic
+  `"Command"`/`"screenshot"`/`"bug_screenshot"` entry when the screenshot flag is 0, inserts list-B
+  `("Screenshot","bug_screenshot.png")` on a successful readback, and adopts the root through the
+  Frame holder. The GPU readback, file sink and `frameNum` remain contracts.
+- **E586** — the nine rank-2 `0x533100` key sites now build the real `HashedStr` key
+  (`resource_id_ctor_14c2f0`, length-pinned literals) and release it with `shared_release_f590`;
+  the 8-byte stand-in is gone. Production requires a key allocator and platform-tag hook and fails
+  visibly without them. `resource_pool_miss` models GetResource's +1.
+- **E587** — `0xf3c0` resize/COW and `0xf6b0` terminate are native. Four paths (control null,
+  shared control, capacity sufficient, capacity short); **only the capacity-short path returns
+  true**, correcting the audit table. The fixture covers all paths, the shared-control refcount,
+  the three size classes and failure preservation.
 - **E583** — the camera delegate has **no static writer**: `D` is the `_Root` node (vtable
   `0x15992b8`, ctor `0x1d6230`, 0x3c8 B), and the ctor zeroes `+0x2e8..+0x307`; an opcode-aware
   census found zero stores. The bound PMF target returns `const CameraTransform*`, but it is

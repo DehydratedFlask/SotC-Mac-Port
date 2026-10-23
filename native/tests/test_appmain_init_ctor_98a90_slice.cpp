@@ -1,5 +1,6 @@
 // Measured prologue early+tail with lifted 0x3be050 + lifted 0x1ab550 → registry.
 #include <array>
+#include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <cstdio>
@@ -157,47 +158,48 @@ int g_v40_6abcc0 = 0;
 int g_v40_14c2f0 = 0;
 int g_v40_shadow_load = 0;
 int g_v40_14ccc0 = 0;
-int g_v40_attach_f590 = 0;
 int g_v40_skels_notify = 0;
 int g_v40_skels_14c2f0 = 0;
 int g_v40_skels_load = 0;
 int g_v40_skels_14ccc0 = 0;
-int g_v40_skels_attach_f590 = 0;
 int g_v40_anims_notify = 0;
 int g_v40_anims_14c2f0 = 0;
 int g_v40_anims_load = 0;
 int g_v40_anims_14ccc0 = 0;
-int g_v40_anims_attach_f590 = 0;
 int g_v40_banks_notify = 0;
 int g_v40_banks_14c2f0 = 0;
 int g_v40_banks_load = 0;
 int g_v40_banks_14ccc0 = 0;
-int g_v40_banks_attach_f590 = 0;
 int g_v40_streams_notify = 0;
 int g_v40_streams_14c2f0 = 0;
 int g_v40_streams_load = 0;
 int g_v40_streams_14ccc0 = 0;
-int g_v40_streams_attach_f590 = 0;
 int g_v40_rand_notify = 0;
 int g_v40_rand_14c2f0 = 0;
 int g_v40_rand_load = 0;
 int g_v40_rand_14ccc0 = 0;
-int g_v40_rand_attach_f590 = 0;
 int g_v40_boss_notify = 0;
 int g_v40_boss_14c2f0 = 0;
 int g_v40_boss_load = 0;
 int g_v40_boss_14ccc0 = 0;
-int g_v40_boss_attach_f590 = 0;
 int g_v40_cp3_notify = 0;
 int g_v40_cp3_14c2f0 = 0;
 int g_v40_cp3_load = 0;
 int g_v40_cp3_14ccc0 = 0;
-int g_v40_cp3_attach_f590 = 0;
 int g_v40_csp_notify = 0;
 int g_v40_csp_14c2f0 = 0;
 int g_v40_csp_load = 0;
 int g_v40_csp_14ccc0 = 0;
-int g_v40_csp_attach_f590 = 0;
+// 0xf1a0/0x14c2f0 key seam: tag 0 = string buffer, tag 1 = 8-byte control block.
+std::uint64_t g_key_alloc_tag0 = 0;
+std::uint64_t g_key_alloc_tag1 = 0;
+std::uint64_t g_key_free_tag0 = 0;
+std::uint64_t g_key_free_tag1 = 0;
+std::uint64_t g_key_platform_tag_calls = 0;
+std::uint64_t g_key_platform_tag_crmp = 0;
+std::uint64_t g_key_platform_tag_calt = 0;
+void* g_key_last_buffer = nullptr;
+void* g_key_last_control = nullptr;
 int g_v40_tail_140d90 = 0;
 int g_v40_tail_release_override = 0;
 int g_v40_tail_140d90_arg = -1;
@@ -428,7 +430,6 @@ void* hook_v40_shadow_load(void* out_slot, void*, void*) {
     return p;
 }
 void hook_v40_14ccc0(void*) { ++g_v40_14ccc0; }
-void hook_v40_attach_f590(void*) { ++g_v40_attach_f590; }
 void hook_v40_skels_notify(void*) { ++g_v40_skels_notify; }
 void hook_v40_skels_14c2f0(void* dst, const char* path) {
     ++g_v40_skels_14c2f0;
@@ -443,7 +444,6 @@ void* hook_v40_skels_load(void* out_slot, void*, void*) {
     return p;
 }
 void hook_v40_skels_14ccc0(void*) { ++g_v40_skels_14ccc0; }
-void hook_v40_skels_attach_f590(void*) { ++g_v40_skels_attach_f590; }
 void hook_v40_anims_notify(void*) { ++g_v40_anims_notify; }
 void hook_v40_anims_14c2f0(void* dst, const char* path) {
     ++g_v40_anims_14c2f0;
@@ -458,7 +458,6 @@ void* hook_v40_anims_load(void* out_slot, void*, void*) {
     return p;
 }
 void hook_v40_anims_14ccc0(void*) { ++g_v40_anims_14ccc0; }
-void hook_v40_anims_attach_f590(void*) { ++g_v40_anims_attach_f590; }
 void hook_v40_banks_notify(void*) { ++g_v40_banks_notify; }
 void hook_v40_banks_14c2f0(void* dst, const char* path) {
     ++g_v40_banks_14c2f0;
@@ -473,7 +472,6 @@ void* hook_v40_banks_load(void* out_slot, void*, void*) {
     return p;
 }
 void hook_v40_banks_14ccc0(void*) { ++g_v40_banks_14ccc0; }
-void hook_v40_banks_attach_f590(void*) { ++g_v40_banks_attach_f590; }
 void hook_v40_streams_notify(void*) { ++g_v40_streams_notify; }
 void hook_v40_streams_14c2f0(void* dst, const char* path) {
     ++g_v40_streams_14c2f0;
@@ -488,7 +486,6 @@ void* hook_v40_streams_load(void* out_slot, void*, void*) {
     return p;
 }
 void hook_v40_streams_14ccc0(void*) { ++g_v40_streams_14ccc0; }
-void hook_v40_streams_attach_f590(void*) { ++g_v40_streams_attach_f590; }
 void hook_v40_rand_notify(void*) { ++g_v40_rand_notify; }
 void hook_v40_rand_14c2f0(void* dst, const char* path) {
     ++g_v40_rand_14c2f0;
@@ -503,7 +500,6 @@ void* hook_v40_rand_load(void* out_slot, void*, void*) {
     return p;
 }
 void hook_v40_rand_14ccc0(void*) { ++g_v40_rand_14ccc0; }
-void hook_v40_rand_attach_f590(void*) { ++g_v40_rand_attach_f590; }
 void hook_v40_boss_notify(void*) { ++g_v40_boss_notify; }
 void hook_v40_boss_14c2f0(void* dst, const char* path) {
     ++g_v40_boss_14c2f0;
@@ -518,7 +514,6 @@ void* hook_v40_boss_load(void* out_slot, void*, void*) {
     return p;
 }
 void hook_v40_boss_14ccc0(void*) { ++g_v40_boss_14ccc0; }
-void hook_v40_boss_attach_f590(void*) { ++g_v40_boss_attach_f590; }
 void hook_v40_cp3_notify(void*) { ++g_v40_cp3_notify; }
 void hook_v40_cp3_14c2f0(void* dst, const char* path) {
     ++g_v40_cp3_14c2f0;
@@ -533,7 +528,6 @@ void* hook_v40_cp3_load(void* out_slot, void*, void*) {
     return p;
 }
 void hook_v40_cp3_14ccc0(void*) { ++g_v40_cp3_14ccc0; }
-void hook_v40_cp3_attach_f590(void*) { ++g_v40_cp3_attach_f590; }
 void hook_v40_csp_notify(void*) { ++g_v40_csp_notify; }
 void hook_v40_csp_14c2f0(void* dst, const char* path) {
     ++g_v40_csp_14c2f0;
@@ -548,7 +542,63 @@ void* hook_v40_csp_load(void* out_slot, void*, void*) {
     return p;
 }
 void hook_v40_csp_14ccc0(void*) { ++g_v40_csp_14ccc0; }
-void hook_v40_csp_attach_f590(void*) { ++g_v40_csp_attach_f590; }
+void* hook_key_alloc(std::size_t size, std::uint32_t tag, std::uint32_t, std::uint32_t) {
+    void* p = std::malloc(size);
+    CHECK(p != nullptr);
+    if (tag == 0) {
+        ++g_key_alloc_tag0;
+        g_key_last_buffer = p;
+    } else if (tag == 1) {
+        ++g_key_alloc_tag1;
+        g_key_last_control = p;
+    } else {
+        CHECK(false);
+    }
+    return p;
+}
+bool hook_key_dealloc(void* p, std::uint32_t tag) {
+    if (tag == 0) {
+        ++g_key_free_tag0;
+    } else if (tag == 1) {
+        ++g_key_free_tag1;
+    } else {
+        CHECK(false);
+    }
+    std::free(p);
+    return true;
+}
+std::uint32_t hook_key_platform_tag(std::uint32_t fourcc) {
+    ++g_key_platform_tag_calls;
+    if (fourcc == 0x63726d70u) {  // "crmp"
+        ++g_key_platform_tag_crmp;
+    } else if (fourcc == 0x63616c74u) {  // "calt"
+        ++g_key_platform_tag_calt;
+    } else {
+        CHECK(false);
+    }
+    return 0x11223344u;
+}
+void hook_key_destroy(void* p, int) { std::free(p); }
+void hook_key_free_control(void* p) { std::free(p); }
+
+template <typename Hooks>
+void install_key_hooks(Hooks& h) {
+    h.key_alloc.alloc.allocate = hook_key_alloc;
+    h.key_alloc.alloc.deallocate = hook_key_dealloc;
+    h.platform_tag = hook_key_platform_tag;
+    h.release.destroy = hook_key_destroy;
+    h.release.free_control = hook_key_free_control;
+}
+
+void check_key_release(const SharedReleaseF590Result& kr) {
+    CHECK(kr.ok);
+    CHECK(kr.had_control);
+    CHECK(kr.decremented);
+    CHECK(kr.previous == 1);
+    CHECK(kr.was_last);
+    CHECK(kr.destroyed);
+    CHECK(kr.freed);
+}
 void hook_v40_tail_140d90(void* slot_obj, int arg) {
     ++g_v40_tail_140d90;
     g_v40_tail_140d90_slot = slot_obj;
@@ -1042,23 +1092,23 @@ int main() {
     g_v40_join_element = 0;
     g_v40_6a5370 = g_v40_6abcc0 = 0;
     g_v40_14c2f0 = g_v40_shadow_load = 0;
-    g_v40_14ccc0 = g_v40_attach_f590 = 0;
+    g_v40_14ccc0 = 0;
     g_v40_skels_notify = g_v40_skels_14c2f0 = g_v40_skels_load = 0;
-    g_v40_skels_14ccc0 = g_v40_skels_attach_f590 = 0;
+    g_v40_skels_14ccc0 = 0;
     g_v40_anims_notify = g_v40_anims_14c2f0 = g_v40_anims_load = 0;
-    g_v40_anims_14ccc0 = g_v40_anims_attach_f590 = 0;
+    g_v40_anims_14ccc0 = 0;
     g_v40_banks_notify = g_v40_banks_14c2f0 = g_v40_banks_load = 0;
-    g_v40_banks_14ccc0 = g_v40_banks_attach_f590 = 0;
+    g_v40_banks_14ccc0 = 0;
     g_v40_streams_notify = g_v40_streams_14c2f0 = g_v40_streams_load = 0;
-    g_v40_streams_14ccc0 = g_v40_streams_attach_f590 = 0;
+    g_v40_streams_14ccc0 = 0;
     g_v40_rand_notify = g_v40_rand_14c2f0 = g_v40_rand_load = 0;
-    g_v40_rand_14ccc0 = g_v40_rand_attach_f590 = 0;
+    g_v40_rand_14ccc0 = 0;
     g_v40_boss_notify = g_v40_boss_14c2f0 = g_v40_boss_load = 0;
-    g_v40_boss_14ccc0 = g_v40_boss_attach_f590 = 0;
+    g_v40_boss_14ccc0 = 0;
     g_v40_cp3_notify = g_v40_cp3_14c2f0 = g_v40_cp3_load = 0;
-    g_v40_cp3_14ccc0 = g_v40_cp3_attach_f590 = 0;
+    g_v40_cp3_14ccc0 = 0;
     g_v40_csp_notify = g_v40_csp_14c2f0 = g_v40_csp_load = 0;
-    g_v40_csp_14ccc0 = g_v40_csp_attach_f590 = 0;
+    g_v40_csp_14ccc0 = 0;
     g_v40_tail_140d90 = g_v40_tail_release_override = 0;
     g_v40_tail_140d90_arg = -1;
     g_v40_tail_140d90_slot = nullptr;
@@ -1280,47 +1330,47 @@ int main() {
     bh.vslot_40_shadow_detail.path_14c2f0 = hook_v40_14c2f0;
     bh.vslot_40_shadow_detail.load_vslot18 = hook_v40_shadow_load;
     bh.vslot_40_shadow_attach_detail.release_14ccc0 = hook_v40_14ccc0;
-    bh.vslot_40_shadow_attach_detail.dtor_f590 = hook_v40_attach_f590;
+    install_key_hooks(bh.vslot_40_shadow_attach_detail);
     bh.vslot_40_shadowskels_detail.notify_95580 = hook_v40_skels_notify;
     bh.vslot_40_shadowskels_detail.path_14c2f0 = hook_v40_skels_14c2f0;
     bh.vslot_40_shadowskels_detail.load_vslot18 = hook_v40_skels_load;
     bh.vslot_40_skels_attach_detail.release_14ccc0 = hook_v40_skels_14ccc0;
-    bh.vslot_40_skels_attach_detail.dtor_f590 = hook_v40_skels_attach_f590;
+    install_key_hooks(bh.vslot_40_skels_attach_detail);
     bh.vslot_40_shadowanims_detail.notify_95580 = hook_v40_anims_notify;
     bh.vslot_40_shadowanims_detail.path_14c2f0 = hook_v40_anims_14c2f0;
     bh.vslot_40_shadowanims_detail.load_vslot18 = hook_v40_anims_load;
     bh.vslot_40_anims_attach_detail.release_14ccc0 = hook_v40_anims_14ccc0;
-    bh.vslot_40_anims_attach_detail.dtor_f590 = hook_v40_anims_attach_f590;
+    install_key_hooks(bh.vslot_40_anims_attach_detail);
     bh.vslot_40_shadowbanks_detail.notify_95580 = hook_v40_banks_notify;
     bh.vslot_40_shadowbanks_detail.path_14c2f0 = hook_v40_banks_14c2f0;
     bh.vslot_40_shadowbanks_detail.load_vslot18 = hook_v40_banks_load;
     bh.vslot_40_banks_attach_detail.release_14ccc0 = hook_v40_banks_14ccc0;
-    bh.vslot_40_banks_attach_detail.dtor_f590 = hook_v40_banks_attach_f590;
+    install_key_hooks(bh.vslot_40_banks_attach_detail);
     bh.vslot_40_shadowstreams_detail.notify_95580 = hook_v40_streams_notify;
     bh.vslot_40_shadowstreams_detail.path_14c2f0 = hook_v40_streams_14c2f0;
     bh.vslot_40_shadowstreams_detail.load_vslot18 = hook_v40_streams_load;
     bh.vslot_40_streams_attach_detail.release_14ccc0 = hook_v40_streams_14ccc0;
-    bh.vslot_40_streams_attach_detail.dtor_f590 = hook_v40_streams_attach_f590;
+    install_key_hooks(bh.vslot_40_streams_attach_detail);
     bh.vslot_40_shadowrandomevents_detail.notify_95580 = hook_v40_rand_notify;
     bh.vslot_40_shadowrandomevents_detail.path_14c2f0 = hook_v40_rand_14c2f0;
     bh.vslot_40_shadowrandomevents_detail.load_vslot18 = hook_v40_rand_load;
     bh.vslot_40_randomevents_attach_detail.release_14ccc0 = hook_v40_rand_14ccc0;
-    bh.vslot_40_randomevents_attach_detail.dtor_f590 = hook_v40_rand_attach_f590;
+    install_key_hooks(bh.vslot_40_randomevents_attach_detail);
     bh.vslot_40_shadowbossmusic_detail.notify_95580 = hook_v40_boss_notify;
     bh.vslot_40_shadowbossmusic_detail.path_14c2f0 = hook_v40_boss_14c2f0;
     bh.vslot_40_shadowbossmusic_detail.load_vslot18 = hook_v40_boss_load;
     bh.vslot_40_bossmusic_attach_detail.release_14ccc0 = hook_v40_boss_14ccc0;
-    bh.vslot_40_bossmusic_attach_detail.dtor_f590 = hook_v40_boss_attach_f590;
+    install_key_hooks(bh.vslot_40_bossmusic_attach_detail);
     bh.vslot_40_cp3characters_detail.notify_95580 = hook_v40_cp3_notify;
     bh.vslot_40_cp3characters_detail.path_14c2f0 = hook_v40_cp3_14c2f0;
     bh.vslot_40_cp3characters_detail.load_vslot18 = hook_v40_cp3_load;
     bh.vslot_40_cp3characters_attach_detail.release_14ccc0 = hook_v40_cp3_14ccc0;
-    bh.vslot_40_cp3characters_attach_detail.dtor_f590 = hook_v40_cp3_attach_f590;
+    install_key_hooks(bh.vslot_40_cp3characters_attach_detail);
     bh.vslot_40_cp3shadowprecache_detail.notify_95580 = hook_v40_csp_notify;
     bh.vslot_40_cp3shadowprecache_detail.path_14c2f0 = hook_v40_csp_14c2f0;
     bh.vslot_40_cp3shadowprecache_detail.load_vslot18 = hook_v40_csp_load;
     bh.vslot_40_cp3shadowprecache_attach_detail.release_14ccc0 = hook_v40_csp_14ccc0;
-    bh.vslot_40_cp3shadowprecache_attach_detail.dtor_f590 = hook_v40_csp_attach_f590;
+    install_key_hooks(bh.vslot_40_cp3shadowprecache_attach_detail);
     bh.vslot_40_tail_140d90_detail.call_140d90 = hook_v40_tail_140d90;
 
     SingletonF08Hooks sh{};
@@ -1644,7 +1694,11 @@ int main() {
     CHECK(r.vslot_40_shadow_attach.installed);
     CHECK(r.vslot_40_shadow_attach.slot_after == g_shadow_asset);
     CHECK(loadp(r.singleton.obj, 0) == g_shadow_asset);
-    CHECK(g_v40_attach_f590 == 1);
+    check_key_release(r.vslot_40_shadow_attach.key_release);
+    CHECK(r.vslot_40_shadow_attach.dtor_f590_count == 1);
+    CHECK(r.vslot_40_shadow_attach.key_size == 31);
+    CHECK(r.vslot_40_shadow_attach.key_capacity == 31);
+    CHECK(r.vslot_40_shadow_attach.key_hash == 0xf06f4388u);
     CHECK(g_v40_14ccc0 == 1);  // release loaded after install
     // E428: shadowskels load-attempt (notify + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowskels.ok);
@@ -1661,7 +1715,11 @@ int main() {
     CHECK(r.vslot_40_skels_attach.installed);
     CHECK(r.vslot_40_skels_attach.slot_after == g_skels_asset);
     CHECK(loadp(r.singleton.obj, 0x10) == g_skels_asset);
-    CHECK(g_v40_skels_attach_f590 == 1);
+    check_key_release(r.vslot_40_skels_attach.key_release);
+    CHECK(r.vslot_40_skels_attach.dtor_f590_count == 1);
+    CHECK(r.vslot_40_skels_attach.key_size == 30);
+    CHECK(r.vslot_40_skels_attach.key_capacity == 31);
+    CHECK(r.vslot_40_skels_attach.key_hash == 0xa9da51cau);
     CHECK(g_v40_skels_14ccc0 == 1);
     // E430: shadowanims load-attempt (notify f08+0x10 + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowanims.ok);
@@ -1678,7 +1736,11 @@ int main() {
     CHECK(r.vslot_40_anims_attach.installed);
     CHECK(r.vslot_40_anims_attach.slot_after == g_anims_asset);
     CHECK(loadp(r.singleton.obj, 0x20) == g_anims_asset);
-    CHECK(g_v40_anims_attach_f590 == 1);
+    check_key_release(r.vslot_40_anims_attach.key_release);
+    CHECK(r.vslot_40_anims_attach.dtor_f590_count == 1);
+    CHECK(r.vslot_40_anims_attach.key_size == 30);
+    CHECK(r.vslot_40_anims_attach.key_capacity == 31);
+    CHECK(r.vslot_40_anims_attach.key_hash == 0x422fd4f0u);
     CHECK(g_v40_anims_14ccc0 == 1);
     // E432: shadowbanks load-attempt (notify f08+0x20 + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowbanks.ok);
@@ -1695,7 +1757,11 @@ int main() {
     CHECK(r.vslot_40_banks_attach.installed);
     CHECK(r.vslot_40_banks_attach.slot_after == g_banks_asset);
     CHECK(loadp(r.singleton.obj, 0x40) == g_banks_asset);
-    CHECK(g_v40_banks_attach_f590 == 1);
+    check_key_release(r.vslot_40_banks_attach.key_release);
+    CHECK(r.vslot_40_banks_attach.dtor_f590_count == 1);
+    CHECK(r.vslot_40_banks_attach.key_size == 36);
+    CHECK(r.vslot_40_banks_attach.key_capacity == 39);
+    CHECK(r.vslot_40_banks_attach.key_hash == 0xfa3528fdu);
     CHECK(g_v40_banks_14ccc0 == 1);
     // E434: shadowstreams load-attempt (notify f08+0x40 + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowstreams.ok);
@@ -1712,7 +1778,11 @@ int main() {
     CHECK(r.vslot_40_streams_attach.installed);
     CHECK(r.vslot_40_streams_attach.slot_after == g_streams_asset);
     CHECK(loadp(r.singleton.obj, 0x50) == g_streams_asset);
-    CHECK(g_v40_streams_attach_f590 == 1);
+    check_key_release(r.vslot_40_streams_attach.key_release);
+    CHECK(r.vslot_40_streams_attach.dtor_f590_count == 1);
+    CHECK(r.vslot_40_streams_attach.key_size == 38);
+    CHECK(r.vslot_40_streams_attach.key_capacity == 39);
+    CHECK(r.vslot_40_streams_attach.key_hash == 0x3dbbf35bu);
     CHECK(g_v40_streams_14ccc0 == 1);
     // E436: shadowrandomevents load-attempt (notify f08+0x50 + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowrandomevents.ok);
@@ -1729,7 +1799,11 @@ int main() {
     CHECK(r.vslot_40_randomevents_attach.installed);
     CHECK(r.vslot_40_randomevents_attach.slot_after == g_rand_asset);
     CHECK(loadp(r.singleton.obj, 0x60) == g_rand_asset);
-    CHECK(g_v40_rand_attach_f590 == 1);
+    check_key_release(r.vslot_40_randomevents_attach.key_release);
+    CHECK(r.vslot_40_randomevents_attach.dtor_f590_count == 1);
+    CHECK(r.vslot_40_randomevents_attach.key_size == 43);
+    CHECK(r.vslot_40_randomevents_attach.key_capacity == 43);
+    CHECK(r.vslot_40_randomevents_attach.key_hash == 0x8a2bd936u);
     CHECK(g_v40_rand_14ccc0 == 1);
     // E438: shadowbossmusic load-attempt (notify f08+0x60 + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowbossmusic.ok);
@@ -1746,7 +1820,11 @@ int main() {
     CHECK(r.vslot_40_bossmusic_attach.installed);
     CHECK(r.vslot_40_bossmusic_attach.slot_after == g_boss_asset);
     CHECK(loadp(r.singleton.obj, 0x70) == g_boss_asset);
-    CHECK(g_v40_boss_attach_f590 == 1);
+    check_key_release(r.vslot_40_bossmusic_attach.key_release);
+    CHECK(r.vslot_40_bossmusic_attach.dtor_f590_count == 1);
+    CHECK(r.vslot_40_bossmusic_attach.key_size == 40);
+    CHECK(r.vslot_40_bossmusic_attach.key_capacity == 43);
+    CHECK(r.vslot_40_bossmusic_attach.key_hash == 0x59363638u);
     CHECK(g_v40_boss_14ccc0 == 1);
     // E440: cp3Characters load-attempt (notify f08+0x70 + path + vcall; no 14ccb0)
     CHECK(r.vslot_40_cp3characters.ok);
@@ -1761,7 +1839,11 @@ int main() {
     CHECK(r.vslot_40_cp3characters_attach.installed);
     CHECK(r.vslot_40_cp3characters_attach.slot_after == g_cp3_asset);
     CHECK(loadp(app.data(), kVslot40Cp3charactersAttachSlotOff) == g_cp3_asset);
-    CHECK(g_v40_cp3_attach_f590 == 1);
+    check_key_release(r.vslot_40_cp3characters_attach.key_release);
+    CHECK(r.vslot_40_cp3characters_attach.dtor_f590_count == 1);
+    CHECK(r.vslot_40_cp3characters_attach.key_size == 43);
+    CHECK(r.vslot_40_cp3characters_attach.key_capacity == 43);
+    CHECK(r.vslot_40_cp3characters_attach.key_hash == 0xe6070645u);
     CHECK(g_v40_cp3_14ccc0 == 1);
     // E442: cp3shadowprecache load-attempt (notify self+0x3cb8 + path + vcall; no 14ccb0)
     CHECK(r.vslot_40_cp3shadowprecache.ok);
@@ -1776,8 +1858,62 @@ int main() {
     CHECK(r.vslot_40_cp3shadowprecache_attach.installed);
     CHECK(r.vslot_40_cp3shadowprecache_attach.slot_after == g_csp_asset);
     CHECK(loadp(app.data(), kVslot40Cp3shadowprecacheAttachSlotOff) == g_csp_asset);
-    CHECK(g_v40_csp_attach_f590 == 1);
+    check_key_release(r.vslot_40_cp3shadowprecache_attach.key_release);
+    CHECK(r.vslot_40_cp3shadowprecache_attach.dtor_f590_count == 1);
+    CHECK(r.vslot_40_cp3shadowprecache_attach.key_size == 39);
+    CHECK(r.vslot_40_cp3shadowprecache_attach.key_capacity == 39);
+    CHECK(r.vslot_40_cp3shadowprecache_attach.key_hash == 0x939f143bu);
     CHECK(g_v40_csp_14ccc0 == 1);
+    // All nine 0x14c2f0 keys: one tag-0 buffer + one tag-1 control each, all released.
+    CHECK(g_key_alloc_tag0 == 9);
+    CHECK(g_key_alloc_tag1 == 9);
+    CHECK(g_key_free_tag0 == 0);  // allocator-contract frees only fire on alloc failure
+    CHECK(g_key_free_tag1 == 0);
+    CHECK(g_key_platform_tag_calls == 9);
+    CHECK(g_key_platform_tag_crmp == 7);
+    CHECK(g_key_platform_tag_calt == 2);
+
+    // 0xf590 with a ResourcePool::GetResource map miss: the pool keeps one reference to the
+    // key, so the site's release is not the last one. Release the pool copy by hand below.
+    {
+        alignas(8) std::uint8_t local_f08[0x20]{};
+        void* const saved_f08 = singleton_f08_cell_2efc9e0();
+        singleton_f08_cell_2efc9e0() = local_f08;
+        g_key_last_buffer = nullptr;
+        g_key_last_control = nullptr;
+        g_key_platform_tag_calls = 0;
+        g_key_platform_tag_crmp = 0;
+        g_key_platform_tag_calt = 0;
+
+        Vslot40_533100ShadowAttachHooks mh{};
+        install_key_hooks(mh);
+        mh.resource_pool_miss = true;
+        const auto mr = vslot_40_533100_shadow_attach(nullptr, false, mh);
+        CHECK(mr.ok);
+        CHECK(mr.key_release.ok);
+        CHECK(mr.key_release.had_control);
+        CHECK(mr.key_release.previous == 2);
+        CHECK(!mr.key_release.was_last);
+        CHECK(!mr.key_release.destroyed);
+        CHECK(!mr.key_release.freed);
+        CHECK(mr.dtor_f590_count == 1);
+        CHECK(mr.key_size == 31);
+        CHECK(mr.key_capacity == 31);
+        CHECK(mr.key_hash == 0xf06f4388u);
+        CHECK(g_key_platform_tag_calls == 1);
+        CHECK(g_key_platform_tag_crmp == 1);
+        CHECK(g_key_last_buffer != nullptr);
+        CHECK(g_key_last_control != nullptr);
+
+        auto* const ctl = static_cast<std::int64_t*>(g_key_last_control);
+        CHECK(std::atomic_ref<std::int64_t>(*ctl).load(std::memory_order_relaxed) == 1);
+        CHECK(std::atomic_ref<std::int64_t>(*ctl).fetch_sub(1, std::memory_order_relaxed) == 1);
+        std::free(g_key_last_buffer);
+        std::free(ctl);
+        g_key_last_buffer = nullptr;
+        g_key_last_control = nullptr;
+        singleton_f08_cell_2efc9e0() = saved_f08;
+    }
     // E444: 0x140d90 call-site (self+0x3cc8, arg=9) + f590; stop before stackchk
     CHECK(r.vslot_40_tail_140d90.ok);
     CHECK(g_v40_tail_140d90 == 1);

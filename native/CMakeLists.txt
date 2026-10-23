@@ -86,8 +86,10 @@ add_library(sotc_core STATIC
   core/owner_members.cpp
   core/owner_simple_ctors.cpp
   core/shared_str_ctor_f1a0.cpp
+  core/shared_str_resize_f3c0.cpp
   core/resource_id_14c2f0.cpp
   core/app_info_run.cpp
+  core/snapshot_bug_data.cpp
   core/camera_location_25a4d0.cpp
   core/list_dtor_1bdeb0.cpp
   core/insert_21cd0.cpp
@@ -1807,6 +1809,10 @@ add_executable(test_shared_str_ctor_f1a0 tests/test_shared_str_ctor_f1a0.cpp)
 target_link_libraries(test_shared_str_ctor_f1a0 sotc_core)
 add_test(NAME shared_str_ctor_f1a0 COMMAND test_shared_str_ctor_f1a0)
 
+add_executable(test_shared_str_resize_f3c0 tests/test_shared_str_resize_f3c0.cpp)
+target_link_libraries(test_shared_str_resize_f3c0 sotc_core)
+add_test(NAME shared_str_resize_f3c0 COMMAND test_shared_str_resize_f3c0)
+
 add_executable(test_resource_id_14c2f0 tests/test_resource_id_14c2f0.cpp)
 target_link_libraries(test_resource_id_14c2f0 sotc_core)
 add_test(NAME resource_id_14c2f0 COMMAND test_resource_id_14c2f0)
@@ -1814,6 +1820,10 @@ add_test(NAME resource_id_14c2f0 COMMAND test_resource_id_14c2f0)
 add_executable(test_app_info_run tests/test_app_info_run.cpp)
 target_link_libraries(test_app_info_run sotc_core)
 add_test(NAME app_info_run COMMAND test_app_info_run)
+
+add_executable(test_snapshot_bug_data tests/test_snapshot_bug_data.cpp)
+target_link_libraries(test_snapshot_bug_data sotc_core)
+add_test(NAME snapshot_bug_data COMMAND test_snapshot_bug_data)
 
 add_executable(test_camera_location_25a4d0 tests/test_camera_location_25a4d0.cpp)
 target_link_libraries(test_camera_location_25a4d0 sotc_core)

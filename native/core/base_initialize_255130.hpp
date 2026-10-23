@@ -82,6 +82,9 @@ struct BaseInitialize255130Hooks {
     Vslot40_533100JoinHooks vslot_40_join_detail{};
     Vslot40_533100GfxHooks vslot_40_gfx_detail{};
     Vslot40_533100ShadowHooks vslot_40_shadow_detail{};
+    // The nine attach fragments build their 0x14c2f0 key and release it with 0xf590. A host must
+    // set `key_alloc.alloc.allocate` and `platform_tag` in each attach detail the lifted path
+    // reaches; with the null defaults that fragment returns ok == false (no key is faked).
     Vslot40_533100ShadowAttachHooks vslot_40_shadow_attach_detail{};
     Vslot40_533100ShadowskelsHooks vslot_40_shadowskels_detail{};
     Vslot40_533100SkelsAttachHooks vslot_40_skels_attach_detail{};

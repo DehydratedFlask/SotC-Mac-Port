@@ -50,6 +50,19 @@ AppInfoSnapshotResult app_info_snapshot(AppInfoRegistry& registry, ReportItem& r
     }
     out.list_a_nodes = serialized_a.list_a_nodes;
 
+    // 0x1be236..0x1be256: synthetic "Command" entry when the screenshot flag is 0.
+    if (hooks.synthetic_command) {
+        std::unique_ptr<ReportItem> command = report_node_new("Command");
+        std::unique_ptr<ReportItem> value = report_value_new("bug_screenshot");
+        command->set_property("name", "screenshot");
+        if (command->append(std::move(value)) == nullptr) {
+            return out;
+        }
+        if (root.append(std::move(command)) == nullptr) {
+            return out;
+        }
+    }
+
     // Phase 4: list-B "Attachment" serialization (before the list-A drain).
     const AppInfoListBSerializeResult serialized_b =
         appinfo_listb_serialize(registry.container(), root);

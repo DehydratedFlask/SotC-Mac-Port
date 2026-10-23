@@ -1,16 +1,13 @@
 #include "vslot_40_533100_shadow_attach.hpp"
 
+#include "resource_id_14c2f0.hpp"
 #include "singleton_f08_531d84.hpp"
 #include "vslot_40_533100_shadowmodels.hpp"
 
+#include <atomic>
 #include <cstring>
 
 namespace sotc {
-namespace {
-
-alignas(8) std::uint8_t g_path_dtor_standin[8]{};
-
-}  // namespace
 
 Vslot40_533100ShadowAttachResult vslot_40_533100_shadow_attach(
     void* loaded, bool success_flag,
@@ -88,15 +85,35 @@ Vslot40_533100ShadowAttachResult vslot_40_533100_shadow_attach(
         ++out.release_14ccc0_count;
     }
 
-    // OBS: cleanup out-slot releases (measured: out empty after our E426 model)
-    // then 0xf590 on path stand-in
-    if (hooks.dtor_f590 != nullptr) {
-        hooks.dtor_f590(g_path_dtor_standin);
+    // OBS: cleanup out-slot releases (measured: out empty after our E426 model), then the
+    // 0xf590 release of the 0x14c2f0 key that the real path builds.
+    // 0xf1a0 + 0x14c2f0: build the ResourceId key, then release it with the shared 0xf590.
+    HashedStr key{};
+    ResourceIdCtorHooks kh{};
+    kh.str = hooks.key_alloc;
+    kh.platform_tag = hooks.platform_tag;
+    if (!resource_id_ctor_14c2f0(key, kShadowKeyLiteral, kh)) {
+        out.ok = false;
+        return out;
     }
+    // ResourcePool::GetResource ([[0x2ee2cf8]]+0x18): a map miss stores its own key copy (+1).
+    if (hooks.resource_pool_miss && key.str.ctl != nullptr) {
+        std::atomic_ref<std::int64_t>(*key.str.ctl).fetch_add(1, std::memory_order_relaxed);
+    }
+    out.key_size = key.str.size;
+    out.key_capacity = key.str.aux;
+    out.key_hash = key.hash;
+    const SharedHolderF590 holder{const_cast<std::uint8_t*>(key.str.data), nullptr, nullptr,
+                                  reinterpret_cast<std::atomic<std::uint64_t>*>(key.str.ctl)};
+    out.key_release = shared_release_f590(holder, hooks.release);
     ++out.dtor_f590_count;
+    const bool release_ok =
+        out.key_release.ok && out.key_release.had_control &&
+        (out.key_release.previous == 1 || out.key_release.previous == 2) &&
+        out.key_release.was_last == (out.key_release.previous == 1);
 
     // shadowskels @ 0x533582 — see vslot_40_533100_shadowskels.*
-    out.ok = (out.dtor_f590_count == 1) && (out.installed || prev == loaded);
+    out.ok = release_ok && (out.dtor_f590_count == 1) && (out.installed || prev == loaded);
     return out;
 }
 

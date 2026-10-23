@@ -36,6 +36,9 @@ inline constexpr const char kAppInfoListAEntryType[] = "FieldEntry";
 struct AppInfoSnapshotHooks {
     AppInfoCollectHooks list_a{};
     AppInfoListBClearHooks list_b{};
+    // `0x1be236..0x1be256`: append a synthetic "Command" node between the list-A and list-B
+    // phases when the screenshot flag is 0. Off by default.
+    bool synthetic_command = false;
 };
 
 struct AppInfoSnapshotResult {
