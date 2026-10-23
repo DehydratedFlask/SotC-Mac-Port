@@ -243,6 +243,10 @@ The rounds that follow the archive are in chronological order.
   icon is a shared resource copy, delete has three sites and no BUSY retry, and dialog status 2/3
   is corrected. `save_store` does **not** call `save_check_backup`. Implementation is the next save
   slice (`SAV-03-METADATA-01`).
+- **E605** — `_Root::vtable[+0x10]` is a 5-argument pass-through (`0x1d64e0` -> `0xa6c7d0`) invoked
+  once in the world base ctor; it does **not** attach a Camera. The camera pose consumer is the
+  debug-only `SyncCameraAcrossTools` command and is not reachable from gameplay, so a native
+  `BoundMemberFn` is not a gameplay requirement.
 - **E594** — the native ResourceWrapper/ResourcePool/ResourceRef model is implemented: exact
   0x100 B wrapper, hash-then-strcmp comparator, non-owning map, hit/miss references, erase at zero,
   dependency recursion, the priority state table, and lock/unlock refs. Hooks cover allocation,

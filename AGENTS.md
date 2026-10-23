@@ -76,8 +76,10 @@
 - The camera `D` is a Camera-typed registry object (`is_type<0x3cb0eb33>`, ctor `0x211c00`, 0xb0 B),
   **not** `_Root` (E602). The 24-byte block is at `[D+0x18]+0x2e8`, and the only path that touches it
   is the debug-only `bpe::ToolRemoteCommandMgr` `"SyncCameraAcrossTools"` command. `0xa68030` returns
-  `slot->value` from a 65536-entry array; there is no `element+0x18` field. Do not model a native
-  `BoundMemberFn` until the `_Root` vtable `+0x10` handle-registration question is settled.
+  `slot->value` from a 65536-entry array; there is no `element+0x18` field. `_Root` vtable `+0x10`
+  is a 5-argument pass-through invoked once in the world ctor; it attaches no Camera (E605). The
+  pose consumer is debug-tool-only and not gameplay-reachable, so a native `BoundMemberFn` is not a
+  gameplay requirement.
 
 ## Tool acquisition (owner-approved)
 
