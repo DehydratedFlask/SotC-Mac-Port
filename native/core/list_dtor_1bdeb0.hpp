@@ -25,6 +25,11 @@
 //     call 0x170c0(victim)                     ; tagged free, tag 2 (E553)
 //     dec dword [head+0x10]
 //
+// What the list holds (E561): an application info registry of named entries ("Game" ->
+// "Shadow of the Colossus", "Build Version", "Platform Type" -> "ps4 - NEO"/"ps4 - STA",
+// "Is Debug Memory Available" -> "True"/"False"), all inserted with flag = 1 by `0x1bdb50`. The
+// purge here therefore targets flag == 0 entries, a state no analysed path produces yet.
+//
 // NOT modelled: the bodies of the two releases and of the tag-2 free (caller-supplied hooks), the
 // singleton at `0x2ee68c8` (still created elsewhere), and whatever the flagged nodes mean (they are
 // deliberately skipped by the original). G1 PARTIAL.

@@ -6469,3 +6469,19 @@ See [the partial slot-23 checkpoint](docs/checkpoints/2026-10-21-root-cpu01-slot
 - Verification: 339/339 ctest, checker OK, sweep 419 passed / 0 failed.
 - Next exact action: find the caller of `0x1bdb50` (same `E8` scan shape as E558) and determine
   whether it sits inside `0x2569d0`, the owner installer that still gates real singletons.
+
+## 2026-10-23 Orchestrator round 23 — the 0x58 list is an application info registry (E561)
+
+- Agent: integrator.
+- Task: `CPU-01-REGISTRY-SEMANTICS-01`.
+- Observation: `0x1bdb50` has five call sites (`0xb72`, `0x25a538`, `0x25a604`, `0x25a68a`,
+  `0x25a88f`), all passing string views and `ecx = 1`. The strings name the registry:
+  `"Game"` → `"Shadow of the Colossus"`, `"Build Version"`, `"Platform Type"` →
+  `"ps4 - NEO"`/`"ps4 - STA"`, `"Is Debug Memory Available"` → `"True"`/`"False"`.
+- Container: `*(0x2ee68c8)`; its installer `0x25a4d0` has no direct caller and is installed through
+  the function-pointer slot `0x15ff080`, the fifth entry of an eight-slot table.
+- Negative: `0xa54920` never references `0x2ee68c8`, so this registry is **not** the ConVar path.
+- Flag: all observed inserts pass 1; no writer of 0 found, so the destructor's `flag == 0` purge
+  targets a state not yet located. Headers updated to say that instead of "unknown".
+- Next exact action: identify the owner of the `0x15ff060..0x15ff0a0` table, which is what constructs
+  `0x2ee68c8`.

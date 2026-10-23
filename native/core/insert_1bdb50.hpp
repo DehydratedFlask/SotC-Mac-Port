@@ -29,6 +29,18 @@
 // Node layout (shared with `list_dtor_1bdeb0`): prev +0x00, next +0x08, callable A +0x10,
 // callable B +0x30, dword flag +0x50.
 //
+// What the list actually holds (E561, from the five call sites' string constants): an **application
+// info registry** — named key/value entries such as
+//   "Game"                      -> "Shadow of the Colossus"   (0xb72)
+//   "Build Version"             -> a global functor            (0x25a538)
+//   "Platform Type"             -> "ps4 - NEO" / "ps4 - STA"   (0x25a604)
+//   "Is Debug Memory Available" -> "True" / "False"            (0x25a68a)
+//   (dynamic name)              -> value from 0x10a90          (0x25a88f)
+// Every observed insert passes flag = 1; no writer of 0 was found, so the destructor's `flag == 0`
+// purge targets a state produced by a path that has not been located. The container is the pointer
+// at `0x2ee68c8`, and its teardown is `0x1bdeb0` (E558/E559). This registry is **not** the ConVar
+// path of `0xa54920`: that function never references `0x2ee68c8`.
+//
 // NOT modelled: the 0x17090/0x12820 allocator body (contract), the 0xf590 body (contract), the
 // 0x15fe518 stack canary and 0xf8f3a0 failure path (host stack protection), and the meaning of the
 // flag. The original performs no null check on the allocation; the native model reports a visible
