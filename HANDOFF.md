@@ -210,6 +210,14 @@ The rounds that follow the archive are in chronological order.
   `GetResource` `{ptr,owned}` result and `owned` is always 0, so those branches are dead. Steady
   state `refs=1`, `deps=1`; a second attach is a hit with an idempotent lock. The appmain slice
   owns one native pool plus nine slots and frees all nine wrappers at teardown.
+- **E596** — the owner's `+0x48`/`+0x58` vtable slots are native, and the premise is corrected: they
+  are virtual methods, not constructor rows. `+0x48` ensures/activates the 0x210 capture singleton
+  (`0x32f79a8`); `+0x58` is the gated dev property insert (key 4) into the bag tree 0.
+- **E597** — the screenshot path is characterized: `0x961a0` is a PNG encoder, the report sink is a
+  socket `"SendFile"` channel (not a file), and `frameNum` reads `engine+0x70` whose writer is not
+  found. The capture/sink contract is proposed but not implemented.
+- **E598** — the SaveData contract: a flat 15,576-byte progress blob behind a `{1,hash,size,4}`
+  header with a 1-based result table. No real save exists; the transaction is designed, not built.
 - **E594** — the native ResourceWrapper/ResourcePool/ResourceRef model is implemented: exact
   0x100 B wrapper, hash-then-strcmp comparator, non-owning map, hit/miss references, erase at zero,
   dependency recursion, the priority state table, and lock/unlock refs. Hooks cover allocation,

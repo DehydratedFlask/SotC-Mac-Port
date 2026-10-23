@@ -281,3 +281,6 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [ResourcePool (2026-10-23)](checkpoints/2026-10-23-resource-pool.md) | ResourceWrapper refs/deps, non-owning map; E593 |
 | [ResourcePool native (2026-10-23)](checkpoints/2026-10-23-resource-pool-native.md) | Wrapper/refs/deps/map model; E594 |
 | [ResourcePool wiring (2026-10-23)](checkpoints/2026-10-23-resource-pool-wiring.md) | Nine attach sites on the real pool; E595 |
+| [Owner slots +0x48/+0x58 (2026-10-23)](checkpoints/2026-10-23-owner-slots-48-58.md) | Singleton ensure/activate, gated tree insert; E596 |
+| [GPU readback contract (2026-10-23)](checkpoints/2026-10-23-gpu-readback-contract.md) | PNG encoder, socket sink, frameNum blind spot; E597 |
+| [SaveData contract (2026-10-23)](checkpoints/2026-10-23-savedata-contract.md) | Flat progress blob, transaction API, 29 cases; E598 |
