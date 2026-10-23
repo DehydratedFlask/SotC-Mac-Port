@@ -243,3 +243,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Allocator wrappers (2026-10-23)](checkpoints/2026-10-23-alloc-wrappers.md) | `0x17070`/`0x170b0`/`0x170c0` tail wrappers; `0x12af0` is tagged deallocate; E553 |
 | [List dtor 0x1bdeb0 decoded (2026-10-23)](checkpoints/2026-10-23-list-dtor-1bdeb0-decoded.md) | Erase-and-release loop decoded; not lifted (node type conflict at +0x50); E555 |
 | [List dtor 0x1bdeb0 resolved (2026-10-23)](checkpoints/2026-10-23-list-dtor-1bdeb0-resolved.md) | Two node types (0x58 flag / 0x60 callable); single caller on the 0x2ee68c8 singleton; E558 |
+| [List dtor 0x1bdeb0 native (2026-10-23)](checkpoints/2026-10-23-list-dtor-1bdeb0-native.md) | 0x58 flag nodes; skip/unlink/release/free/count; E559 |
