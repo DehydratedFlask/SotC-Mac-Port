@@ -771,3 +771,4 @@ artifact identities in local manifests; publishable code must not include origin
 | CPU-01-SHARED-STR-RELEASE-F590-01 | Full release-helper semantics with external typed deallocator; plan Task 2 | ACTIVE / root | 0 attempts; 0 prior failed hypotheses |
 | AUD-02-NGS2-RACKQUERY-RDX-CFG-01 | Conservative cached-CFG argument origins; plan Task 3 | ACTIVE / root | 0 attempts; 0 prior failed hypotheses |
 | PUB-01-CLAUDE-CREDIT-CLEANUP-01 | User-requested attribution cleanup preserving source/author/committer data | ACTIVE, user approved main+Init force-with-lease; final regeneration pending / root | 1 successful preparation; 0 failed hypotheses |
+| INT-VALIDATION-PARALLEL-FOUNDATIONS-01 | Full native integration acceptance | NEEDS_PRINCIPAL; root reassessment authorizes clean-baseline isolation only / root | 3 failed verification approaches; counts retained |

@@ -436,3 +436,12 @@ in docs/checkpoints/2026-10-22-codex-save-temp-worker.md; build products and red
 evidence remain in the managed worktree local/build/task1-save-temp-20261022 and
 local/validation/task1-save-temp-20261022. No global removal boundary. LeakSanitizer unsupported;
 ASan/UBSan pass with detect_leaks=0.
+
+## 2026-10-22 22:24 CDT — integrated build and verification recovery
+
+No new install/download. Root reused clang/CMake/Ninja for managed local/build/root-parallel-foundations-20261022
+Debug ASan/UBSan full build(1082 steps). Three suite approaches and exact fixture-copy identities
+are in docs/escalations/INT-VALIDATION-PARALLEL-FOUNDATIONS-01.md; logs remain managed local/validation/root-parallel-foundations-20261022.
+Private fixtures copied read-only from original inputs to managed local/fixtures after SHA checks;
+no originals changed. Release worker reused saved Ghidra12.1.4/OpenJDK25 project readOnly/noanalysis
+(success3.807s) after one REA default-import timeout. No configuration or saved database changed.
