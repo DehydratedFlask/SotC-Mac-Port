@@ -2,7 +2,7 @@
 
 Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + OpenCode orchestrator round 2.
 Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
-Round-2 through round-5 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
+Round-2 through round-6 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
 
 ## 2026-10-22 Repository history rewrite — Claude attribution + hostname identity
 
@@ -35,6 +35,33 @@ Round-2 through round-5 detail are the sections immediately below; the parallel-
   pushing one would reintroduce old trailers. Gate: **G1 still PARTIAL**; nothing about boot/audio/save
   changes.
 - Next exact action: unchanged — next always-on after `0x532720`, or a bounded body lift.
+
+## 2026-10-23 Orchestrator round 6 — cells resolved, insert executed (E530–E532)
+
+- Agent: integrator + two worker subagents (non-Claude model). The insert-lift worker left a
+  5-vs-6-byte `vmovups` read in its checker; the integrator fixed it and replayed everything.
+- Tasks: `CPU-01-INIT-2EFE318-ANALYSIS-01` (E530), `CPU-01-INSERT-1BEEB0-NATIVE-01` (E531),
+  `CPU-01-INIT-1290-INSERT-01` (E532).
+- Observation: `0x2efe318` is a BSS global holding the vtable-pointer field of a fixed-address
+  singleton console-variable object; its single writer is `0x5389bc`, which stores `0x15976b0`.
+  `0x2efe340` is exactly `0x2efe318 + 0x28`, the object's lazily-bound sub-object pointer, set
+  only inside slot-0 method `0x91210`. All three batch-C `call [rax]` therefore reach `0x91210`,
+  a lazy resolve-and-bind accessor; the `sete` chain reads `*(*(0x2efe340) + 0x60)`, a boolean at
+  the head of the sub-object's nested settings struct, inverted and fanned into the three setters
+  and the merge `je`.
+- Observation: `0x1beeb0` is now native (`insert_1beeb0`): `new(0x60)`, node vtable `0x1598ce0`,
+  0x20 B `vmovups` copy, `fn != 0` self-link, `node[0x58] = descriptor[0x48]`, list-3 push-front,
+  `++container[0x50]`, with an allocator seam and a visible allocation-failure path. E522 is
+  corrected: `+0x48` goes to the node, `+0x40` is the vcall table and is never stored.
+- Observation: `init_1290` now executes that body for its A insert when given a real container and
+  allocator (hook remains the fallback), so the first 0x1290 effect is executed native code rather
+  than an observed hook.
+- Observation: full build and **328/328** `ctest`; both ELF checkers OK; gates clean.
+- Inference: G1 **PARTIAL**. The B insert (`0x21cd0`), the node owner ctor/dtor family and the
+  console-variable flag's producer are still unimplemented; none of this ran against the game.
+- Next exact action: lift `0x21cd0` (worker in flight) and the `0x53299d` / `0x5329ae` Init tail
+  blocks (analysis in flight); then make batch C's three slot-0 dispatches call the real
+  `0x91210` contract instead of a placeholder hook.
 
 ## 2026-10-23 Orchestrator round 5 — real branch semantics in Init (E528–E529)
 
