@@ -66,6 +66,7 @@ add_library(sotc_core STATIC
   core/init_531d60_entry_gaps.cpp
   core/stat_query_54b250.cpp
   core/insert_1beeb0.cpp
+  core/insert_1bde30.cpp
   core/insert_21cd0.cpp
   core/container_1bdb10.cpp
   core/appmain_init_remainder_slice.cpp
@@ -1713,6 +1714,10 @@ add_test(NAME init_1290 COMMAND test_init_1290)
 add_executable(test_container_1bdb10 tests/test_container_1bdb10.cpp)
 target_link_libraries(test_container_1bdb10 sotc_core)
 add_test(NAME container_1bdb10 COMMAND test_container_1bdb10)
+
+add_executable(test_insert_1bde30 tests/test_insert_1bde30.cpp)
+target_link_libraries(test_insert_1bde30 sotc_core)
+add_test(NAME insert_1bde30 COMMAND test_insert_1bde30)
 
 add_executable(test_insert_1beeb0 tests/test_insert_1beeb0.cpp)
 target_link_libraries(test_insert_1beeb0 sotc_core)

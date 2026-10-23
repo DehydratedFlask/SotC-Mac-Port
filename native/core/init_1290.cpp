@@ -29,7 +29,7 @@ Init1290Result init_1290(void* self, const Init1290Hooks& hooks) noexcept {
         }
         d.vtable = out.reg_a.table;
         d.slot_48 = out.reg_a.zero_48;
-        out.inserted_a = insert_1beeb0(*hooks.container_a, d, hooks.alloc_a);
+        out.inserted_a = insert_1bde30(*hooks.container_a, d, hooks.alloc_a);
         if (!out.inserted_a.ok) return out;  // allocation failure is visible
         out.insert_a_executed = true;
     } else {

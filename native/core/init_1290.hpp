@@ -30,6 +30,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "insert_1bde30.hpp"
 #include "insert_1beeb0.hpp"
 #include "insert_21cd0.hpp"
 
