@@ -2,7 +2,7 @@
 
 Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + OpenCode orchestrator round 2.
 Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
-Round-2 through round-17 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
+Round-2 through round-18 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
 
 ## 2026-10-22 Repository history rewrite — Claude attribution + hostname identity
 
@@ -35,6 +35,23 @@ Round-2 through round-17 detail are the sections immediately below; the parallel
   pushing one would reintroduce old trailers. Gate: **G1 still PARTIAL**; nothing about boot/audio/save
   changes.
 - Next exact action: unchanged — next always-on after `0x532720`, or a bounded body lift.
+
+## 2026-10-23 Orchestrator round 18 — `0x1bdeb0` decoded, lift deliberately deferred (E555)
+
+- Agent: integrator.
+- Task: `CPU-01-LIST-DTOR-1BDEB0-ANALYSIS-01` (E555).
+- Observation: `0x1bdeb0` is a transparent erase-while-iterating destructor: walk from `[head]`,
+  skip links whose `+0x50` dword is non-zero, recover the link to erase as `next->prev`, unlink it,
+  release the callables at `+0x30` and `+0x10` through `0xf590` (E552), free the node through
+  `0x170c0` (tag 2, E553), and decrement `[head+0x10]`.
+- **Deliberate non-lift:** the node layout conflicts with the insert node — the insert keeps its
+  callable **vtable pointer** at `+0x50`, while this loop tests a **dword flag** there. Either these
+  are different node types or the containers were mis-grouped; lifting either reading blindly would
+  free the wrong objects. The next agent must find what writes `[node+0x50]` as a dword first.
+- Inference: G1 **PARTIAL**. This is a case where "decode it" and "model it" are correctly separate.
+- Next exact action: identify the writer of `[node+0x50]` and the insert path for this list, then
+  lift `0x1bdeb0` over an explicitly typed node; otherwise continue with the owner installer
+  `0x2569d0`.
 
 ## 2026-10-23 Orchestrator round 17 — insert uses the recovered allocator protocol (E554)
 
