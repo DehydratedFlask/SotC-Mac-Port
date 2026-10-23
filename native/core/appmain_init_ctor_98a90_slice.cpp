@@ -75,7 +75,8 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBaseF590A2ed00U12Hooks& post_base_f590_a2ed00_u12_hooks,
     const Init531d60PostBaseA2ed00U7Hooks& post_base_a2ed00_u7_hooks,
     const Init531d60PostBaseF590A2ed00U13Hooks& post_base_f590_a2ed00_u13_hooks,
-    const Init531d60PostBaseContinueAHooks& post_base_continue_a_hooks) {
+    const Init531d60PostBaseContinueAHooks& post_base_continue_a_hooks,
+    const Init531d60PostBaseContinueBHooks& post_base_continue_b_hooks) {
     AppmainInitCtor98a90SliceResult out{};
     out.early = run_prologue_255180_early(alloc, early_hooks);
     if (!out.early.ok) {
@@ -512,6 +513,12 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     // callee bodies / je outcome / both successors NOT modelled.
     out.post_base_continue_a = init_531d60_post_base_continue_a(post_base_continue_a_hooks);
     if (!out.post_base_continue_a.ok) {
+        return out;
+    }
+    // E510: always-on Init continue — 14-unit fall-through 0x53277f..0x5327b1;
+    // callee bodies / je outcome / both successors NOT modelled.
+    out.post_base_continue_b = init_531d60_post_base_continue_b(post_base_continue_b_hooks);
+    if (!out.post_base_continue_b.ok) {
         return out;
     }
     out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,

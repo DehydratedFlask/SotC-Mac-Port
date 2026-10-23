@@ -90,6 +90,7 @@
 #include "init_531d60_post_base_a2ed00_u7.hpp"
 #include "init_531d60_post_base_f590_a2ed00_u13.hpp"
 #include "init_531d60_post_base_continue_a.hpp"
+#include "init_531d60_post_base_continue_b.hpp"
 #include "input_table_551140.hpp"
 #include "prologue_255180.hpp"
 #include "singleton_f08_531d84.hpp"
@@ -203,6 +204,7 @@ struct AppmainInitCtor98a90SliceResult {
     Init531d60PostBaseA2ed00U7Result post_base_a2ed00_u7{};
     Init531d60PostBaseF590A2ed00U13Result post_base_f590_a2ed00_u13{};
     Init531d60PostBaseContinueAResult post_base_continue_a{};
+    Init531d60PostBaseContinueBResult post_base_continue_b{};
     AppmainInitRemainderSliceResult remainder{};
 };
 
@@ -277,6 +279,7 @@ struct AppmainInitCtor98a90SliceResult {
     const Init531d60PostBaseF590A2ed00U12Hooks& post_base_f590_a2ed00_u12_hooks = {},
     const Init531d60PostBaseA2ed00U7Hooks& post_base_a2ed00_u7_hooks = {},
     const Init531d60PostBaseF590A2ed00U13Hooks& post_base_f590_a2ed00_u13_hooks = {},
-    const Init531d60PostBaseContinueAHooks& post_base_continue_a_hooks = {});
+    const Init531d60PostBaseContinueAHooks& post_base_continue_a_hooks = {},
+    const Init531d60PostBaseContinueBHooks& post_base_continue_b_hooks = {});
 
 }  // namespace sotc

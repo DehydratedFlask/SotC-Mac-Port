@@ -65,6 +65,7 @@
 #include "core/init_531d60_post_base_532ca0.hpp"
 #include "core/init_531d60_post_base_vcall18.hpp"
 #include "core/init_531d60_post_base_continue_a.hpp"
+#include "core/init_531d60_post_base_continue_b.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -272,6 +273,15 @@ void* g_cont_a_rsp20 = nullptr;
 alignas(8) std::uint8_t g_cont_a_obj[0x100]{};
 alignas(8) std::uint8_t g_cont_a_rdi_marker[8]{};
 alignas(8) std::uint8_t g_cont_a_rsp20_obj[0x10]{};
+// E510 grouped continue B 0x53277f..0x5327b1: per-call-site hooks + observed args.
+int g_cont_b_1e4c0 = 0;
+int g_cont_b_4c4950 = 0;
+void* g_cont_b_1e4c0_rdi = nullptr;
+int g_cont_b_1e4c0_eax = 0;
+std::uint8_t g_cont_b_4c4950_edi = 0;
+void* g_cont_b_rax = nullptr;
+void* g_cont_b_cell_32f84f8 = nullptr;
+alignas(8) std::uint8_t g_cont_b_rax_obj[8]{};
 int g_post_base_cell_2eff450_dtor = 0;
 int g_post_base_cell_2eff448_dtor = 0;
 void* g_cell_2eff450 = nullptr;
@@ -576,6 +586,17 @@ void hook_cont_a_1fc80(void* rdi, std::uintptr_t rsi_rva) {
     g_cont_a_1fc80_rdi = rdi;
     g_cont_a_1fc80_rsi_rva = rsi_rva;
 }
+int hook_cont_b_1e4c0(void* rdi) {
+    ++g_cont_b_1e4c0;
+    g_cont_b_1e4c0_rdi = rdi;
+    const int eax = 0xA6;  // host stand-in; bl = 0xA6, r12b = 0xA7
+    g_cont_b_1e4c0_eax = eax;
+    return eax;
+}
+void hook_cont_b_4c4950(std::uint8_t edi) {
+    ++g_cont_b_4c4950;
+    g_cont_b_4c4950_edi = edi;
+}
 void hook_post_base_cell_2eff450_dtor(void* /*prev*/) { ++g_post_base_cell_2eff450_dtor; }
 void hook_post_base_cell_2eff448_dtor(void* /*prev*/) { ++g_post_base_cell_2eff448_dtor; }
 
@@ -794,6 +815,13 @@ int main() {
     g_cont_a_a543b0_rsi = 0;
     g_cont_a_1fc80_rdi = nullptr;
     g_cont_a_1fc80_rsi_rva = 0;
+    g_cont_b_1e4c0 = 0;
+    g_cont_b_4c4950 = 0;
+    g_cont_b_1e4c0_rdi = nullptr;
+    g_cont_b_1e4c0_eax = 0;
+    g_cont_b_4c4950_edi = 0;
+    g_cont_b_rax = nullptr;
+    g_cont_b_cell_32f84f8 = nullptr;
     // E509 host stand-ins: *[0x32f79a8] -> 0x100 B object with u64 0x1234 @ +0xf8;
     // *[0x32f84f8] -> rdi marker; [r13] and 0x20(%rsp) -> distinct markers.
     std::memset(g_cont_a_obj, 0x5C, sizeof(g_cont_a_obj));
@@ -807,6 +835,11 @@ int main() {
     g_cont_a_cell_32f79a8 = g_cont_a_obj;
     g_cont_a_cell_32f84f8 = g_cont_a_rdi_marker;
     g_cont_a_rsp20 = g_cont_a_rsp20_obj;
+    // E510 host stand-ins: rax (incoming from 0x1fc80 NOT modelled),
+    // *[0x32f84f8] -> rdi marker, observed call args.
+    std::memset(g_cont_b_rax_obj, 0x6A, sizeof(g_cont_b_rax_obj));
+    g_cont_b_rax = g_cont_b_rax_obj;
+    g_cont_b_cell_32f84f8 = g_cont_a_rdi_marker;
     g_post_base_cell_2eff450_dtor = 0;
     g_post_base_cell_2eff448_dtor = 0;
     g_cell_2eff450 = nullptr;
@@ -1113,6 +1146,11 @@ int main() {
     pbca.call_a2e5d0 = hook_cont_a_a2e5d0;
     pbca.call_a543b0 = hook_cont_a_a543b0;
     pbca.call_1fc80 = hook_cont_a_1fc80;
+    Init531d60PostBaseContinueBHooks pbcb{};
+    pbcb.incoming_rax_standin = g_cont_b_rax;
+    pbcb.cell_32f84f8 = &g_cont_b_cell_32f84f8;
+    pbcb.call_1e4c0 = hook_cont_b_1e4c0;
+    pbcb.call_4c4950 = hook_cont_b_4c4950;
 
     const std::uint64_t allocs_before = heap.alloc_count;
     const auto t0 = std::chrono::steady_clock::now();
@@ -1130,7 +1168,7 @@ int main() {
                                                      pba2edu3, pbf590u5, pbf590u6, pba2edu4,
                                                      pbf590u7, pbf590u8, pba2edu5, pbf590u9,
                                                      pbf590u10, pba2edu6, pbf590u11, pbf590u12,
-                                                     pba2edu7, pbf590u13, pbca);
+                                                     pba2edu7, pbf590u13, pbca, pbcb);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
@@ -1708,6 +1746,31 @@ int main() {
     CHECK(g_cont_a_1fc80 == 1);
     CHECK(g_cont_a_1fc80_rsi_rva == 0x1014d69);  // pinned data RVA
     CHECK(static_cast<std::uint8_t*>(g_cont_a_1fc80_rdi) == g_cont_a_rsp20_obj + 8);
+    // E510: grouped Init continue B 0x53277f..0x5327b1 — 14 units, 2 call sites,
+    // 5 ALU ops, 1 load; je6 target pinned but outcome NOT modelled.
+    CHECK(r.post_base_continue_b.ok);
+    CHECK(r.post_base_continue_b.unit_executed ==
+          kInit531d60PostBaseContinueBUnitCount);
+    CHECK(kInit531d60PostBaseContinueBUnitCount == 14);
+    for (int i = 0; i < kInit531d60PostBaseContinueBUnitCount; ++i) {
+        CHECK(r.post_base_continue_b.unit_counts[static_cast<std::size_t>(i)] == 1);
+    }
+    CHECK(kInit531d60PostBaseContinueBUnits[0].rva == 0x53277f);
+    CHECK(kInit531d60PostBaseContinueBUnits[13].rva == 0x5327ab);
+    CHECK(r.post_base_continue_b.call_count == 2);
+    CHECK(r.post_base_continue_b.alu_count == 5);
+    CHECK(r.post_base_continue_b.load_count == 1);
+    CHECK(r.post_base_continue_b.branch_boundary_count == 1);
+    CHECK(!r.post_base_continue_b.branch_outcome_modelled);
+    CHECK(r.post_base_continue_b.end_rva == 0x5327b1);
+    CHECK(r.post_base_continue_b.branch_target_rva == 0x5328e0);
+    CHECK(g_cont_b_1e4c0 == 1);
+    CHECK(g_cont_b_1e4c0_rdi == g_cont_b_rax_obj);  // incoming rax stand-in
+    CHECK(r.post_base_continue_b.eax_known);
+    CHECK(r.post_base_continue_b.eax_from_1e4c0 == 0xA6);
+    CHECK(g_cont_b_1e4c0_eax == 0xA6);
+    CHECK(g_cont_b_4c4950 == 1);
+    CHECK(g_cont_b_4c4950_edi == 0xA7);  // bl(0xA6) xor 1
     CHECK(r.remainder.trivial_ok);
     CHECK(r.remainder.registry.status == RegistryInit531d60Status::ok);
     CHECK(r.remainder.registry.entry_count == kInputTable551140Count);
@@ -1768,7 +1831,7 @@ int main() {
         "pba2edu2=%d pbf590u3=%d pbf590u4=%d pba2edu3=%d pbf590u5=%d pbf590u6=%d "
         "pba2edu4=%d pbf590u7=%d pbf590u8=%d pba2edu5=%d pbf590u9=%d "
         "pbf590u10=%d pba2edu6=%d pbf590u11=%d pbf590u12=%d "
-        "pba2edu7=%d pbf590u13=%d pbca_units=%d "
+        "pba2edu7=%d pbf590u13=%d pbca_units=%d pbcb_units=%d "
         "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
@@ -1873,6 +1936,7 @@ int main() {
         r.post_base_a2ed00_u7.call_a2ed00_count,
         r.post_base_f590_a2ed00_u13.call_f590_count,
         r.post_base_continue_a.unit_executed,
+        r.post_base_continue_b.unit_executed,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
