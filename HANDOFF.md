@@ -4,6 +4,38 @@ Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + Ope
 Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
 Round-2 detail is the section immediately below; the parallel-foundations state that follows stays authoritative.
 
+## 2026-10-22 Repository history rewrite — Claude attribution + hostname identity
+
+- Agent: opencode / deepseek-v4.1-flash-free (integrator). Attempt 1 — success; 0 failed tries.
+- Task: principal-requested removal of Claude co-author trailers and the hostname email from all
+  git history and from GitHub. Not a ROADMAP task; no gate status touched.
+- Files: commit metadata only. **Every tree hash is unchanged** across all six branches, so no
+  file content, test, or evidence row was altered. Plus this checkpoint + repo-local git config.
+- Change: 70 commits carried `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>` (dropped);
+  1,068 committer/author entries carried `dehydratedflask@Johnnys-M4-Pro.local` (rewritten to
+  `dehydratedflask@users.noreply.github.com`). 1,088 commits preserved, linear history intact.
+- Commands: `git clone --mirror origin`; `git filter-branch -f --env-filter … --msg-filter … -- --all`;
+  per-ref `git push --force-with-lease=<ref>:<expected>` for `main` + 5 `cursor/*` branches;
+  then `git fetch --force` + `git reset --hard origin/<branch>` in each of the 4 worktrees.
+- Backups (private, gitignored): `local/backup/pre-claude-strip-20261022.bundle` (full pre-rewrite
+  history, all refs) and `local/backup/claude-strip-map-20261022.txt` (old→new SHA per branch).
+- Concurrency: a worker pushed `595eb4a3`/`308437ae` onto the **old** base mid-rewrite. The lease
+  rejected the push; those two commits were replayed onto the rewritten line as `98765a4`/`11eef3b`
+  (tree `b1285390`, identical). Work preserved, nothing dropped.
+- Identity cause: no `user.email` was ever configured, so git fell back to `login@hostname` and
+  re-leaked the hostname on every new commit. Repo-local identity is now the GitHub noreply address;
+  worktrees share that config. The separate `~/.codex` clone is not covered.
+- Observation vs inference: verified on a fresh clone straight from GitHub that all six branch tips
+  now hold 0 trailers and 0 hostname emails. Inferred/known limit: old commits are no longer branch-
+  reachable but **remain fetchable by SHA via the GitHub API**, and `refs/pull/1/merge` still carries
+  pre-rewrite history because PR #1 is conflicted (GitHub cannot recompute its test-merge).
+- Remaining risks: full purge needs a GitHub Support request or repo recreation. PR #1's conflict is
+  pre-existing (`docs/EVIDENCE.md`) — verified identical against the pre-rewrite bundle, not caused
+  here. 21 pre-existing stashes (`refs/stash`) still reference old history locally; applying and
+  pushing one would reintroduce old trailers. Gate: **G1 still PARTIAL**; nothing about boot/audio/save
+  changes.
+- Next exact action: unchanged — next always-on after `0x532720`, or a bounded body lift.
+
 ## 2026-10-22 OpenCode orchestrator round 2 — Init batch A + repo health (E516–E519)
 
 - Agent: integrator + four worker subagents (non-Claude model). Attempt 1 success for all four;
