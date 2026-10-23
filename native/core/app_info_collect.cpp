@@ -35,21 +35,15 @@ bool release_callable(const Callable1bdeb0& callable, const SharedReleaseF590Hoo
 
 }  // namespace
 
-AppInfoCollectResult collect_app_info(AppInfoRegistry& registry, AppInfoVisitor visitor, void* ctx,
-                                      const AppInfoCollectHooks& hooks) noexcept {
-    AppInfoCollectResult out{};
-    if (visitor == nullptr || hooks.free_tag2 == nullptr) {
-        return out;  // visible failure: nothing is visited or removed
+AppInfoDrainResult drain_app_info(AppInfoRegistry& registry,
+                                  const AppInfoCollectHooks& hooks) noexcept {
+    AppInfoDrainResult out{};
+    if (hooks.free_tag2 == nullptr) {
+        return out;  // visible failure: nothing is removed
     }
 
     List1bdeb0& list = registry.info_list();
     auto* const sentinel = reinterpret_cast<Node1bdeb0*>(&list);
-
-    // 0x1be14d: serialize every entry. The reader does not filter on the flag.
-    for (Node1bdeb0* node = list.prev; node != sentinel; node = node->prev) {
-        visitor(ctx, holder_view(node->callable_10), holder_view(node->callable_30));
-        ++out.visited;
-    }
 
     // 0x1be3f4: delete every node whose dword flag is exactly 1.
     for (Node1bdeb0* node = list.prev; node != sentinel;) {
@@ -71,6 +65,31 @@ AppInfoCollectResult collect_app_info(AppInfoRegistry& registry, AppInfoVisitor 
 
     out.count_after = list.count;
     out.ok = out.release_failures == 0;
+    return out;
+}
+
+AppInfoCollectResult collect_app_info(AppInfoRegistry& registry, AppInfoVisitor visitor, void* ctx,
+                                      const AppInfoCollectHooks& hooks) noexcept {
+    AppInfoCollectResult out{};
+    if (visitor == nullptr || hooks.free_tag2 == nullptr) {
+        return out;  // visible failure: nothing is visited or removed
+    }
+
+    List1bdeb0& list = registry.info_list();
+    auto* const sentinel = reinterpret_cast<Node1bdeb0*>(&list);
+
+    // 0x1be14d: serialize every entry. The reader does not filter on the flag.
+    for (Node1bdeb0* node = list.prev; node != sentinel; node = node->prev) {
+        visitor(ctx, holder_view(node->callable_10), holder_view(node->callable_30));
+        ++out.visited;
+    }
+
+    const AppInfoDrainResult drain = drain_app_info(registry, hooks);
+    out.drained = drain.drained;
+    out.releases = drain.releases;
+    out.release_failures = drain.release_failures;
+    out.count_after = drain.count_after;
+    out.ok = drain.ok;
     return out;
 }
 

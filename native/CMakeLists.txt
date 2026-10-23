@@ -78,6 +78,7 @@ add_library(sotc_core STATIC
   core/registry_slot.cpp
   core/app_info_collect.cpp
   core/appinfo_listb.cpp
+  core/app_info_snapshot.cpp
   core/report_tree.cpp
   core/insert_1bdc80.cpp
   core/owner_properties_2569d0.cpp
@@ -1772,6 +1773,10 @@ add_test(NAME app_info_collect COMMAND test_app_info_collect)
 add_executable(test_appinfo_listb tests/test_appinfo_listb.cpp)
 target_link_libraries(test_appinfo_listb sotc_core)
 add_test(NAME appinfo_listb COMMAND test_appinfo_listb)
+
+add_executable(test_app_info_snapshot tests/test_app_info_snapshot.cpp)
+target_link_libraries(test_app_info_snapshot sotc_core)
+add_test(NAME app_info_snapshot COMMAND test_app_info_snapshot)
 
 add_executable(test_insert_1bdc80 tests/test_insert_1bdc80.cpp)
 target_link_libraries(test_insert_1bdc80 sotc_core)

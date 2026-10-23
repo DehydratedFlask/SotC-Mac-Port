@@ -8,8 +8,8 @@ The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **351/351** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **448 passed / 0 skipped / 0 failed** with
+- Full native suite: **352/352** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **449 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -141,6 +141,11 @@ The rounds that follow the archive are in chronological order.
   and `OwnerPropBagSink` lets `apply_owner_properties` populate it. Gate 1 yields 122 A + 12 B
   (114 distinct A keys, two `0x7b` rows); gate 0 yields 125 + 12. The exact RB nodes/fixups and
   trees 0/1 remain contracts.
+- **E578** — the full `0x1bdf30` report path is composed natively in the recovered order:
+  list-A `"FieldEntry"` serialization, list-B `"Attachment"` serialization, list-A `flag==1`
+  drain, list-B release/free/reset. `drain_app_info` is public; `app_info_snapshot` owns the
+  composition. The fixture covers order, counts, the flag-0 survivor, deep copy and both failure
+  paths. The `snapshotBugData` gate and root adoption remain contracts.
 
 ## Settled decisions (do not re-ask)
 

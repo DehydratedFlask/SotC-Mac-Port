@@ -263,3 +263,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [List-B reader/report tree (2026-10-23)](checkpoints/2026-10-23-appinfo-listb-report.md) | FIFO `"Attachment"` serialization, deep-copy report, value-then-name clear; E575 |
 | [Owner map sinks (2026-10-23)](checkpoints/2026-10-23-owner-map-sink.md) | Consumers, not tables; B is a float range; duplicate keys; E576 |
 | [Owner property bag (2026-10-23)](checkpoints/2026-10-23-owner-prop-bag.md) | 0x178 bag, four sentinels, multimap insert_equal model; E577 |
+| [App-info snapshot path (2026-10-23)](checkpoints/2026-10-23-appinfo-snapshot.md) | Phases 2/4/5/6 composed: FieldEntry, Attachment, drain, clear; E578 |

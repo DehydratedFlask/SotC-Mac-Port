@@ -56,11 +56,24 @@ struct AppInfoCollectResult {
     std::uint32_t count_after = 0;
 };
 
+struct AppInfoDrainResult {
+    bool ok = false;
+    int drained = 0;
+    int releases = 0;          // two per drained node
+    int release_failures = 0;
+    std::uint32_t count_after = 0;
+};
+
 // Visits every list-A entry in the recovered traversal order, then drains every `flag == 1` node.
 // A null visitor or free hook is a visible failure and leaves the list untouched. A release failure
 // is reported but does not stop the drain, matching the original's unconditional unlink/free.
 [[nodiscard]] AppInfoCollectResult collect_app_info(AppInfoRegistry& registry, AppInfoVisitor visitor,
                                                     void* ctx,
                                                     const AppInfoCollectHooks& hooks) noexcept;
+
+// 0x1be3f4..0x1be456 only: delete every list-A node whose flag is exactly 1, without visiting.
+// A null free hook is a visible failure and leaves the list untouched.
+[[nodiscard]] AppInfoDrainResult drain_app_info(AppInfoRegistry& registry,
+                                                const AppInfoCollectHooks& hooks) noexcept;
 
 }  // namespace sotc
