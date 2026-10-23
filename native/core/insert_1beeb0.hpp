@@ -127,9 +127,21 @@ static_assert(offsetof(Container1beeb0, count3) == kInsert1beeb0Count3Offset);
 // caller supplies both allocation and free; a test may back this with a fixed-capacity pool.
 // `alloc` returning nullptr (or a null `alloc`) is a *visible* failure, never a fake success.
 struct Insert1beeb0Alloc {
+    // Simple form (kept for existing callers/tests).
     void* (*alloc)(std::size_t bytes) = nullptr;  // operator new(0x60)
     void  (*dealloc)(void* ptr) = nullptr;        // not used by insert; for caller/test cleanup
+
+    // Context form (E554): when `alloc_ctx` is set it takes precedence, so an allocator with
+    // state (for example the recovered 0x17070/0x170c0 protocol) can be adapted without globals.
+    void* context = nullptr;
+    void* (*alloc_ctx)(void* ctx, std::size_t bytes) = nullptr;
+    void  (*dealloc_ctx)(void* ctx, void* ptr) = nullptr;
 };
+
+// Adapter from the recovered allocator wrappers (0x17070 alloc / 0x170c0 free, tag 2) to this seam.
+// `contract` must outlive the returned seam.
+struct AllocDispatchContract;
+[[nodiscard]] Insert1beeb0Alloc alloc_seam_via_17070(const AllocDispatchContract* contract) noexcept;
 
 struct Insert1beeb0Result {
     bool ok = false;              // false iff allocation failed (list and count untouched)

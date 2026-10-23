@@ -1,5 +1,7 @@
 #include "insert_1beeb0.hpp"
 
+#include "alloc_wrappers_17070.hpp"
+
 namespace sotc {
 
 Insert1beeb0Result insert_1beeb0(Container1beeb0& container,
@@ -8,11 +10,13 @@ Insert1beeb0Result insert_1beeb0(Container1beeb0& container,
     Insert1beeb0Result out{};
 
     // Step 1 — operator new(0x60). The original uses a throwing new, so a failure unwinds
-    // before any list mutation. Modelled as: null alloc hook or null result => visible fail.
-    if (alloc.alloc == nullptr) {
-        return out;
+    // before any list mutation. Either seam form may fail visibly (null result => no insert).
+    void* raw = nullptr;
+    if (alloc.alloc_ctx != nullptr && alloc.context != nullptr) {
+        raw = alloc.alloc_ctx(alloc.context, kInsert1beeb0NodeSize);
+    } else if (alloc.alloc != nullptr) {
+        raw = alloc.alloc(kInsert1beeb0NodeSize);
     }
-    void* raw = alloc.alloc(kInsert1beeb0NodeSize);
     if (raw == nullptr) {
         return out;
     }
@@ -72,6 +76,26 @@ Insert1beeb0Result insert_1beeb0(Container1beeb0& container,
     out.next = node->next;
     out.count = container.count3;
     return out;
+}
+
+namespace {
+void* seam_alloc_ctx(void* ctx, std::size_t bytes) {
+    const auto* contract = static_cast<const AllocDispatchContract*>(ctx);
+    const AllocWrapperResult r = alloc_17070(bytes, *contract);
+    return r.ok ? r.pointer : nullptr;
+}
+void seam_dealloc_ctx(void* ctx, void* ptr) {
+    const auto* contract = static_cast<const AllocDispatchContract*>(ctx);
+    (void)free_170c0(ptr, *contract);  // tag 2 matches the node free used by 0x1bdeb0
+}
+}  // namespace
+
+Insert1beeb0Alloc alloc_seam_via_17070(const AllocDispatchContract* contract) noexcept {
+    Insert1beeb0Alloc seam{};
+    seam.context = const_cast<AllocDispatchContract*>(contract);
+    seam.alloc_ctx = seam_alloc_ctx;
+    seam.dealloc_ctx = seam_dealloc_ctx;
+    return seam;
 }
 
 }  // namespace sotc

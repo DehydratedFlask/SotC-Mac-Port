@@ -3,6 +3,8 @@
 #include <cstdlib>
 
 #include "core/alloc_wrappers_17070.hpp"
+#include "core/container_1bdb10.hpp"
+#include "core/insert_1beeb0.hpp"
 
 #define CHECK(c) do { if (!(c)) { std::fprintf(stderr, "FAIL %s:%d %s\n", __FILE__, __LINE__, #c); std::exit(1); } } while (0)
 
@@ -79,6 +81,30 @@ int main() {
         int obj = 0;
         CHECK(!alloc_17070(0x10, empty).ok);
         CHECK(!free_170b0(&obj, empty).ok);
+    }
+
+    // E554: the seam adapter drives the lifted insert through the recovered tag protocol.
+    {
+        Container1beeb0 cont{};
+        init_container_1bdb10(cont);
+        Descriptor1beeb0 d{};
+        d.fn = 0xb10;
+        d.context[2] = 0x1234;
+        g_alloc = 0;
+        AllocDispatchContract seam_contract{};
+        seam_contract.allocate = alloc_hook;
+        seam_contract.deallocate = free_hook;
+        const Insert1beeb0Alloc seam = alloc_seam_via_17070(&seam_contract);
+        const auto r = insert_1beeb0(cont, d, seam);
+        CHECK(r.ok);
+        CHECK(g_alloc == 1);
+        CHECK(g_size == 0x60 && g_tag == 1 && g_align == 8 && g_flags == 1);
+        CHECK(r.node == reinterpret_cast<Node1beeb0*>(g_buf));
+        CHECK(cont.count3 == 1);
+        // The node free uses tag 2 (0x170c0), matching the 0x1bdeb0 teardown.
+        g_free = 0;
+        seam.dealloc_ctx(seam.context, r.node);
+        CHECK(g_free == 1 && g_tag == 2);
     }
 
     std::printf("alloc_wrappers_17070: all checks passed (tag 1/2 dispatch, null no-op, visible failures)\n");
