@@ -179,6 +179,9 @@ const char* to_string(SaveStep step) noexcept {
         case SaveStep::write_data: return "write_data";
         case SaveStep::backup_check: return "backup_check";
         case SaveStep::backup_restore: return "backup_restore";
+        case SaveStep::write_meta: return "write_meta";
+        case SaveStep::write_icon: return "write_icon";
+        case SaveStep::delete_slot: return "delete_slot";
     }
     return "unknown";
 }
@@ -237,6 +240,25 @@ SaveStatus save_enumerate(const SaveStore& store, std::vector<SaveSlotInfo>& out
         const SaveStatus checked = save_check_backup(store, suffix, has_backup);
         if (!checked.ok()) return checked;
         info.has_backup = has_backup;
+
+        // USR-META is advisory: a bad magic/version or a missing file is not an enumerate error.
+        std::vector<std::byte> meta_bytes;
+        const SaveIoResult meta_read =
+            read_slot(store, defaults, suffix, kSaveMetaName, meta_bytes);
+        if (meta_read.ok()) {
+            std::uint32_t stored_hash = 0;
+            std::uint32_t descriptor = 0;
+            std::vector<std::byte> block;
+            if (decode_meta_file(meta_bytes, stored_hash, descriptor, block) ==
+                    SaveMetaFileError::none &&
+                decode_save_meta(block, info.meta) == SaveMetaError::none) {
+                info.has_meta = true;
+                info.meta_matches_data = stored_hash == info.body_hash;
+            }
+        } else if (meta_read.error != SaveIoError::not_found) {
+            return status(SaveResult::failed_generic, SaveStep::enumerate, 0,
+                          meta_read.os_errno);
+        }
         out.push_back(std::move(info));
     }
     std::sort(out.begin(), out.end(), [](const SaveSlotInfo& a, const SaveSlotInfo& b) {
@@ -299,8 +321,9 @@ SaveStatus save_load(const SaveStore& store, std::string_view suffix, ProgressV1
     return parse_image(bytes, &out);
 }
 
-SaveStatus save_store(const SaveStore& store, std::string_view suffix, const ProgressV1& object,
-                      const SaveOptions& options, const SaveUi* ui) {
+SaveStatus save_store_impl(const SaveStore& store, std::string_view suffix,
+                           const ProgressV1& object, const SaveAttachments& attachments,
+                           const SaveOptions& options, const SaveUi* ui) {
     if (store.root.empty() || !save_slot_suffix_valid(suffix)) {
         return status(SaveResult::failed_generic, SaveStep::validate);
     }
@@ -308,6 +331,19 @@ SaveStatus save_store(const SaveStore& store, std::string_view suffix, const Pro
     std::vector<std::byte> body;
     const ObjectStatus encoded = encode_progress_body(object, body);
     if (!encoded.ok()) return status(encoded.result, SaveStep::encode_body);
+
+    // Advisory attachments are validated before any I/O: a bad text or an oversized icon must not
+    // write a partial bundle.
+    std::vector<std::byte> meta_block;
+    if (attachments.meta != nullptr) {
+        const SaveMetaError meta_error = encode_save_meta(*attachments.meta, meta_block);
+        if (meta_error != SaveMetaError::none) {
+            return status(SaveResult::failed_generic, SaveStep::validate);
+        }
+    }
+    if (attachments.icon != nullptr && !save_icon_ok(*attachments.icon)) {
+        return status(SaveResult::failed_generic, SaveStep::validate);
+    }
 
     std::vector<std::byte> image(kSaveStreamHeaderSize + body.size());
     SaveStreamHeader header;
@@ -409,7 +445,46 @@ SaveStatus save_store(const SaveStore& store, std::string_view suffix, const Pro
 
     const SaveIoResult wrote = write_slot(store, options, suffix, kSaveDataName, image);
     if (!wrote.ok()) return write_failure(wrote, SaveStep::write_data);
-    return status(SaveResult::success, SaveStep::none);
+
+    // The data generation is now committed. Advisory metadata/icon failures keep this true.
+    SaveStatus committed = status(SaveResult::success, SaveStep::none);
+    committed.data_committed = true;
+
+    if (!meta_block.empty()) {
+        const std::vector<std::byte> meta_file = encode_meta_file(
+            meta_block, header.body_hash, kProgressDescriptorId);
+        if (meta_file.empty()) {
+            return status(SaveResult::failed_generic, SaveStep::write_meta);
+        }
+        const SaveIoResult meta_wrote =
+            write_slot(store, options, suffix, kSaveMetaName, meta_file);
+        if (!meta_wrote.ok()) {
+            SaveStatus failed = write_failure(meta_wrote, SaveStep::write_meta);
+            failed.data_committed = true;
+            return failed;
+        }
+    }
+    if (attachments.icon != nullptr && !attachments.icon->bytes.empty()) {
+        const SaveIoResult icon_wrote = write_slot(store, options, suffix, kSaveIconName,
+                                                   attachments.icon->bytes);
+        if (!icon_wrote.ok()) {
+            SaveStatus failed = write_failure(icon_wrote, SaveStep::write_icon);
+            failed.data_committed = true;
+            return failed;
+        }
+    }
+    return committed;
+}
+
+SaveStatus save_store(const SaveStore& store, std::string_view suffix, const ProgressV1& object,
+                      const SaveOptions& options, const SaveUi* ui) {
+    return save_store_impl(store, suffix, object, SaveAttachments{}, options, ui);
+}
+
+SaveStatus save_store(const SaveStore& store, std::string_view suffix, const ProgressV1& object,
+                      const SaveAttachments& attachments, const SaveOptions& options,
+                      const SaveUi* ui) {
+    return save_store_impl(store, suffix, object, attachments, options, ui);
 }
 
 SaveStatus save_check_backup(const SaveStore& store, std::string_view suffix, bool& has_backup) {
@@ -458,6 +533,88 @@ SaveStatus save_restore_backup(const SaveStore& store, std::string_view suffix) 
     const SaveIoResult wrote = write_slot(store, defaults, suffix, kSaveDataName, bytes);
     if (!wrote.ok()) return write_failure(wrote, SaveStep::backup_restore);
     return status(SaveResult::success, SaveStep::none);
+}
+
+SaveStatus save_delete(const SaveStore& store, std::string_view suffix,
+                       const SaveOptions& options) {
+    (void)options;
+    if (store.root.empty() || !save_slot_suffix_valid(suffix)) {
+        return status(SaveResult::failed_generic, SaveStep::validate);
+    }
+    if (store.ops.file_size == nullptr || store.ops.remove_file == nullptr) {
+        return status(SaveResult::failed_generic, SaveStep::delete_slot);
+    }
+    std::uint64_t size = 0;
+    const std::string data_path = save_store_path(store, suffix, kSaveDataName);
+    const SaveIoResult sized = store.ops.file_size(store.ops.ctx, data_path, size);
+    if (sized.error == SaveIoError::not_found) {
+        return status(SaveResult::failed_file_not_found, SaveStep::delete_slot, kSceFileNotFound);
+    }
+    if (!sized.ok()) {
+        return status(SaveResult::failed_generic, SaveStep::delete_slot,
+                      sized.error == SaveIoError::busy ? kSceBusy : 0, sized.os_errno);
+    }
+
+    // Remove the satellite files first; USR-DATA is the commit point. A BUSY is not retried
+    // (0xa4bae0..0xa4bafe), so the first busy maps to failed_generic.
+    const std::string_view satellites[] = {
+        kSaveMetaName,  // stale metadata is worse than none
+        kSaveIconName,
+    };
+    for (const std::string_view name : satellites) {
+        const std::string path = save_store_path(store, suffix, name);
+        const SaveIoResult removed = store.ops.remove_file(store.ops.ctx, path);
+        if (!removed.ok() && removed.error != SaveIoError::not_found) {
+            return status(SaveResult::failed_generic, SaveStep::delete_slot,
+                          removed.error == SaveIoError::busy ? kSceBusy : 0, removed.os_errno);
+        }
+    }
+    {
+        std::string backup_path = data_path;
+        backup_path.append(kSaveBackupSuffix);
+        const SaveIoResult removed = store.ops.remove_file(store.ops.ctx, backup_path);
+        if (!removed.ok() && removed.error != SaveIoError::not_found) {
+            return status(SaveResult::failed_generic, SaveStep::delete_slot,
+                          removed.error == SaveIoError::busy ? kSceBusy : 0, removed.os_errno);
+        }
+    }
+    {
+        std::string meta_backup_path = save_store_path(store, suffix, kSaveMetaName);
+        meta_backup_path.append(kSaveBackupSuffix);
+        const SaveIoResult removed = store.ops.remove_file(store.ops.ctx, meta_backup_path);
+        if (!removed.ok() && removed.error != SaveIoError::not_found) {
+            return status(SaveResult::failed_generic, SaveStep::delete_slot,
+                          removed.error == SaveIoError::busy ? kSceBusy : 0, removed.os_errno);
+        }
+    }
+    const SaveIoResult removed = store.ops.remove_file(store.ops.ctx, data_path);
+    if (!removed.ok()) {
+        SaveStatus failed = status(SaveResult::failed_generic, SaveStep::delete_slot,
+                                   removed.error == SaveIoError::busy ? kSceBusy : 0,
+                                   removed.os_errno);
+        return failed;
+    }
+    return status(SaveResult::success, SaveStep::none);
+}
+
+SaveResult map_sce_result(std::uint32_t raw) noexcept {
+    switch (raw) {
+        case 0x809F0004u: return SaveResult::failed_mount;
+        case 0x809F000Au: return SaveResult::failed_no_space;
+        case 0x809F000Eu: return SaveResult::failed_file_not_found;
+        case 0x809F000Fu: return SaveResult::failed_corrupt;
+        default: return SaveResult::failed_generic;
+    }
+}
+
+SaveDialogSignal classify_dialog_status(std::uint32_t raw) noexcept {
+    switch (raw) {
+        case 0: return SaveDialogSignal::poll_again;
+        case 2: return SaveDialogSignal::close_progress;
+        case 3: return SaveDialogSignal::get_result;
+        case 0x80B80008u: return SaveDialogSignal::initialize_busy;
+        default: return SaveDialogSignal::poll_again;
+    }
 }
 
 bool save_ui_active(const SaveStore& store) noexcept {

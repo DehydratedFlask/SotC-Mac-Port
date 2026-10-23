@@ -192,6 +192,9 @@ SaveIoResult memory_remove(void* ctx, std::string_view path) {
     auto& fs = *static_cast<SaveMemoryFs*>(ctx);
     ++fs.remove_calls;
     if (fs.remove_error != SaveIoError::none) return {fs.remove_error, 0};
+    if (fs.fail_remove_on_call != 0 && fs.remove_calls == fs.fail_remove_on_call) {
+        return {SaveIoError::io_write, 0};
+    }
     if (fs.files.erase(std::string(path)) == 0) return {SaveIoError::not_found, ENOENT};
     return {};
 }

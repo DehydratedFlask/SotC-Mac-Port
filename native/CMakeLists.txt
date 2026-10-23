@@ -225,6 +225,7 @@ add_library(sotc_core STATIC
   core/save_chunk_codec.cpp
   core/save_progress_object.cpp
   core/save_slot_store.cpp
+  core/save_meta.cpp
   core/save_transaction.cpp
   core/descriptor_registration.cpp
   core/const_table_ee1130.cpp
@@ -1660,6 +1661,10 @@ add_test(NAME save_chunk_codec COMMAND test_save_chunk_codec)
 add_executable(test_save_transaction tests/test_save_transaction.cpp)
 target_link_libraries(test_save_transaction sotc_core)
 add_test(NAME save_transaction COMMAND test_save_transaction)
+
+add_executable(test_save_metadata tests/test_save_metadata.cpp)
+target_link_libraries(test_save_metadata sotc_core)
+add_test(NAME save_metadata COMMAND test_save_metadata)
 
 add_executable(test_atomic_add_ref_14ccb0 tests/test_atomic_add_ref_14ccb0.cpp)
 target_link_libraries(test_atomic_add_ref_14ccb0 sotc_core)

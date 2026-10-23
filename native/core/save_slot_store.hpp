@@ -3,10 +3,12 @@
 // Layout under SaveStore::root (the only files this slice reads or writes):
 //   SAVEDATA0<suffix>/USR-DATA        exact container the game's loader opens ("%s/USR-DATA")
 //   SAVEDATA0<suffix>/USR-DATA.bak    previous committed generation (UmountWithBackup analogue)
+//   SAVEDATA0<suffix>/USR-META        native metadata wrapper (E604); the guest never opens it
+//   SAVEDATA0<suffix>/icon0.png       advisory SaveIcon bytes
 //
 // The game never opens a metadata or icon file through USR-DATA; those are separate platform calls
-// (SetParam / SaveIcon) and remain hooks in this slice. Nothing here is a claim that the game can
-// read a native file: the container is synthetic-fixture-verified only.
+// (SetParam / SaveIcon) and remain host-supplied. Nothing here is a claim that the game can read a
+// native file: the container is synthetic-fixture-verified only.
 //
 // Paths handed to SaveIoOps are already joined with SaveStore::root and use '/'. Every operation
 // pointer may be null; the transaction reports `unsupported` instead of crashing. A SaveIoOps is a
@@ -28,6 +30,8 @@ namespace sotc {
 inline constexpr std::string_view kSaveDirPrefix = "SAVEDATA0";
 inline constexpr std::string_view kSaveDataName = "USR-DATA";
 inline constexpr std::string_view kSaveBackupSuffix = ".bak";
+inline constexpr std::string_view kSaveMetaName = "USR-META";
+inline constexpr std::string_view kSaveIconName = "icon0.png";
 inline constexpr std::size_t kSaveMaxSuffixBytes = 24;
 
 enum class SaveIoError : std::uint8_t {
@@ -111,6 +115,7 @@ struct SaveMemoryFs {
     SaveIoError rename_error = SaveIoError::none;     // every atomic write's rename step
     unsigned fail_rename_on_call = 0;                 // on this 1-based call
     SaveIoError remove_error = SaveIoError::none;
+    unsigned fail_remove_on_call = 0;                 // this 1-based call returns io_write
     SaveIoError list_error = SaveIoError::none;
 
     unsigned read_calls = 0;

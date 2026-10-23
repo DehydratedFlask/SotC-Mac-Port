@@ -8,8 +8,8 @@ The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **367/367** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **464 passed / 0 skipped / 0 failed** with
+- Full native suite: **369/369** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **466 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -243,6 +243,13 @@ The rounds that follow the archive are in chronological order.
   icon is a shared resource copy, delete has three sites and no BUSY retry, and dialog status 2/3
   is corrected. `save_store` does **not** call `save_check_backup`. Implementation is the next save
   slice (`SAV-03-METADATA-01`).
+- **E606** — the metadata/icon/delete slice is native: `save_meta` (length-checked `0x530` block,
+  `USR-META` container, shared icon cap), `save_store(SaveAttachments)` with advisory failures
+  keeping `data_committed`, `save_delete` (satellites then data, no BUSY retry), enumerate metadata
+  fields and the result/dialog tables. 102-check fixture.
+- **E607** — the owner row-9 dtor `0xa5cb30` is native: 594 B, 22 calls in the recovered order,
+  event flags `+0xa510`/`+0xa500`, the vector/tree/shared releases, the drain, and the head
+  releases; 8-section fixture including ctor prefixes and double destroy.
 - **E605** — `_Root::vtable[+0x10]` is a 5-argument pass-through (`0x1d64e0` -> `0xa6c7d0`) invoked
   once in the world base ctor; it does **not** attach a Camera. The camera pose consumer is the
   debug-only `SyncCameraAcrossTools` command and is not reachable from gameplay, so a native

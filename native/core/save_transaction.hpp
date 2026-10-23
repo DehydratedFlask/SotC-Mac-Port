@@ -23,8 +23,8 @@
 //     surfaced through SaveUi; SaveUiKind::corrupt_offer_restore and progress_percent are never
 //     produced here;
 //   * sceSaveDataDirNameSearch: save_enumerate reads the native store instead;
-//   * SetParam / SaveIcon / Delete: USR-META and icon0.png are not written at all;
-//   * the 0x530 metadata block and the 15 576-byte blob's field semantics.
+//   * the platform dialog milestones and the corrupt-offer-restore flow;
+//   * the 15 576-byte blob's field semantics.
 #pragma once
 
 #include <cstdint>
@@ -32,6 +32,7 @@
 #include <string_view>
 #include <vector>
 
+#include "core/save_meta.hpp"
 #include "core/save_progress_object.hpp"
 #include "core/save_slot_store.hpp"
 
@@ -55,6 +56,9 @@ enum class SaveStep : std::uint8_t {
     write_data,        // atomic replace of USR-DATA
     backup_check,      // validate .bak
     backup_restore,    // copy .bak over USR-DATA
+    write_meta,        // advisory USR-META write after the data commit
+    write_icon,        // advisory icon0.png write after the data commit
+    delete_slot,       // USR-DATA removal (the commit point of save_delete)
 };
 [[nodiscard]] const char* to_string(SaveStep step) noexcept;
 
@@ -63,6 +67,9 @@ struct SaveStatus {
     SaveStep step = SaveStep::none;   // step that produced `result`
     std::uint32_t sce_status = 0;     // observed 0x809fxxxx for that step, else 0
     int os_errno = 0;                 // host errno when an I/O operation failed
+    // True when the new USR-DATA generation is present and loadable, even if an advisory
+    // metadata/icon write failed afterwards.
+    bool data_committed = false;
     [[nodiscard]] bool ok() const noexcept { return result == SaveResult::success; }
 };
 
@@ -88,6 +95,9 @@ struct SaveSlotInfo {
     std::uint64_t body_size = 0;         // outer header dword2, 0 when the file is too short
     std::uint32_t body_hash = 0;         // outer header dword1, 0 when the file is too short
     bool has_backup = false;             // USR-DATA.bak exists and validates
+    SaveMeta meta{};                     // decoded USR-META block; default when absent
+    bool has_meta = false;               // USR-META present and well formed
+    bool meta_matches_data = false;      // stored data_hash == the USR-DATA header hash
 };
 
 // ---- dialog hook ----------------------------------------------------------------------------
@@ -138,6 +148,33 @@ struct SaveUi {
 [[nodiscard]] SaveStatus save_store(const SaveStore& store, std::string_view suffix,
                                     const ProgressV1& object, const SaveOptions& options = {},
                                     const SaveUi* ui = nullptr);
+
+// Optional advisory files written after the data commit. A failure is reported (failed_generic +
+// step) but `data_committed` stays true: the save itself is not lost.
+struct SaveAttachments {
+    const SaveMeta* meta = nullptr;  // nullptr = write no metadata
+    const SaveIcon* icon = nullptr;  // nullptr or empty bytes = write no icon
+};
+
+[[nodiscard]] SaveStatus save_store(const SaveStore& store, std::string_view suffix,
+                                    const ProgressV1& object, const SaveAttachments& attachments,
+                                    const SaveOptions& options = {}, const SaveUi* ui = nullptr);
+
+// Removes one slot: USR-DATA.bak, USR-META/USR-META.bak, icon0.png, then USR-DATA (the commit).
+// No BUSY retry. Missing slot -> failed_file_not_found (4) with 0x809f000e.
+[[nodiscard]] SaveStatus save_delete(const SaveStore& store, std::string_view suffix,
+                                     const SaveOptions& options = {});
+
+// Byte-pinned observers: the raw sce result table (0x12c3370) and the dialog status classes.
+[[nodiscard]] SaveResult map_sce_result(std::uint32_t raw) noexcept;
+
+enum class SaveDialogSignal : std::uint32_t {
+    poll_again = 0,
+    close_progress = 2,
+    get_result = 3,
+    initialize_busy = 0x80b80008u,
+};
+[[nodiscard]] SaveDialogSignal classify_dialog_status(std::uint32_t raw) noexcept;
 
 // Missing or invalid .bak -> success with has_backup = false. A missing op or an I/O failure is a
 // visible non-success (failed_generic / backup_check).
