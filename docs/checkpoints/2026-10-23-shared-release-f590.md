@@ -31,7 +31,7 @@ decrement still happens exactly as the original does, and the fixture asserts th
 
 ## NOT modelled
 
-Bodies of `0x12af0` (pointee destruction) and `0x170b0` (operator delete); the holder's object
+Bodies of `0x12af0` and `0x170b0`. **Correction (E553):** `0x12af0` is the allocator's *tagged deallocate dispatcher*, not a destructor; `0x170b0`/`0x170c0` are its tag-1/tag-2 wrappers, so this release frees the pointee's storage with tag 0.; the holder's object
 layout beyond `[+0x00]` and `[+0x18]`; weak references (none observed).
 
 ## Verification

@@ -7,14 +7,19 @@
 //   test rax,rax ; je ret           ; no control block => nothing to release
 //   rcx = -1 ; lock xadd rcx,[rax]  ; atomically decrement, rcx = previous value
 //   cmp rcx,1 ; jne ret             ; still referenced => return
-//   rdi = [rbx] ; esi = 0 ; call 0x12af0   ; destroy the object (body NOT lifted)
+//   rdi = [rbx] ; esi = 0 ; call 0x12af0   ; tagged deallocate of the pointee (tag 0)
 //   rdi = [rbx+0x18] ; test ; je ret
 //   jmp 0x170b0                     ; operator delete on the control block (tail call)
 //
 // This is the counter used by the many `call 0xf590` sites across the recovered Init slices: a
 // release that only destroys when the last reference goes away. The add side is `0x14ccb0`.
 //
-// NOT modelled: bodies of `0x12af0` (object destroy) and `0x170b0` (operator delete); the layout
+// NOTE (E553): `0x12af0` is not a C++ destructor but the allocator's **tagged deallocate
+// dispatcher** — `0x170b0`/`0x170c0` reach the same function with tags 1 and 2. The tag-0 call here
+// therefore frees the pointee's storage; any destructor work happens inside the dispatcher and is
+// not observable from this body.
+//
+// NOT modelled: bodies of `0x12af0` and `0x170b0`; the layout
 // of the object at `[holder]`; any weak-reference semantics (none observed).
 // G1 PARTIAL — the refcount protocol is exact, the destroy/free callees are contracts.
 #pragma once

@@ -240,3 +240,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Insert callable helpers (2026-10-23)](checkpoints/2026-10-23-insert-callable-helpers.md) | Copy/move/destroy vcalls are three 20-byte helpers on a shared table; E548 |
 | [Owner dtor 0x1bdae0 native (2026-10-23)](checkpoints/2026-10-23-owner-dtor-1bdae0.md) | 46 B destroy→delete→clear with visible failures; E551 |
 | [Shared release 0xf590 native (2026-10-23)](checkpoints/2026-10-23-shared-release-f590.md) | 73 B shared-ownership release: atomic decrement, last-ref destroy+free; E552 |
+| [Allocator wrappers (2026-10-23)](checkpoints/2026-10-23-alloc-wrappers.md) | `0x17070`/`0x170b0`/`0x170c0` tail wrappers; `0x12af0` is tagged deallocate; E553 |

@@ -24,7 +24,7 @@ SharedReleaseF590Result shared_release_f590(const SharedHolderF590& holder,
     }
     out.was_last = true;
 
-    // rdi = [rbx]; esi = 0; call 0x12af0
+    // rdi = [rbx]; esi = 0; call 0x12af0 (tagged deallocate, tag 0)
     if (hooks.destroy == nullptr) {
         return out;  // visible failure: last reference but the pointee was not destroyed
     }
