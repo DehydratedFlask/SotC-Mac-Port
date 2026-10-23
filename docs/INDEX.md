@@ -216,3 +216,5 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Init insert path 0x1bde30 (2026-10-22)](checkpoints/2026-10-22-init-1bde30-insert-path.md) | 0x20 B descriptor copy at node `+0x10`; `+0x40` = list-3 sentinel; 4-slot vtable + names; no null guard; E522; G1 static |
 | [Init 0x1e4c0 contract (2026-10-22)](checkpoints/2026-10-22-init-1e4c0-contract.md) | Config-bool lookup proving `bl` ∈ {0,1}; branch rule `bl=1→0x532904`; E524; G1 static |
 | [ATTRIBUTION](ATTRIBUTION.md) | Owner-only contributor policy, pre-push attribution gate, audit state; E525 |
+| [Init continue batch C (2026-10-22)](checkpoints/2026-10-22-init-531d60-continue-batch-c.md) | 38 units / 153 B `0x532904..0x53299d`, 3 calls + 3 lea, `je->0x5329ae` pinned; E526; G1 PARTIAL |
+| [Init 0x1290 native lift (2026-10-22)](checkpoints/2026-10-22-init-1290-native-lift.md) | Ordinary native `init_1290`, 0x20 B descriptors, order + `&A+0x20` asserted; E527; G1 PARTIAL |

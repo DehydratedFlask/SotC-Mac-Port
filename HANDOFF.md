@@ -2,7 +2,7 @@
 
 Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + OpenCode orchestrator round 2.
 Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
-Round-2 and round-3 detail are the two sections immediately below; the parallel-foundations state that follows stays authoritative.
+Round-2 through round-4 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
 
 ## 2026-10-22 Repository history rewrite — Claude attribution + hostname identity
 
@@ -35,6 +35,29 @@ Round-2 and round-3 detail are the two sections immediately below; the parallel-
   pushing one would reintroduce old trailers. Gate: **G1 still PARTIAL**; nothing about boot/audio/save
   changes.
 - Next exact action: unchanged — next always-on after `0x532720`, or a bounded body lift.
+
+## 2026-10-23 Orchestrator round 4 — Init batch C and the first semantic lift (E526–E527)
+
+- Agent: integrator + one worker subagent (non-Claude model). The worker wrote batch C but stalled
+  before its own build, so the integrator completed wiring, verification and the byte replay; the
+  `0x1290` lift was integrator-authored from E516/E522.
+- Tasks: `CPU-01-INIT-531D60-CONTINUE-BATCH-03` (E526), `CPU-01-INIT-1290-NATIVE-01` (E527).
+- Observation: Init now models `0x532904..0x53299d` (153 B, **38 units**, region sha
+  `2390d483…`) — the merge block reached by both the batch-B fall-through `jmp 0x532904` and the
+  `je 0x5328e0` path, with three shared-vtable dispatches (`0xa52b70`, `0xa599e0`, `0xa431e0`),
+  lea cells `0x32f8b80`/`0x2efe318`/`0x32f6d18`, and the `je 0x5329ae` boundary unmodelled.
+- Observation: `0x1290` is no longer just a stub. `native/core/init_1290.{hpp,cpp}` is an ordinary
+  native function that builds the two 0x20 B descriptors, inserts A, calls table `0x1594060` slot 3
+  with exactly `&A+0x20`, inserts B, and fails visibly when a subsystem hook is missing. The
+  unit fixture asserts order, descriptor fields, the exact vcall argument and each stop point.
+- Observation: full build and **327/327** `ctest` (the new `init_1290` test is the 327th);
+  `check_f531d60_post_base_continue_c.py` and `check_f1290.py` both OK; constructor pairs still
+  **155**.
+- Inference: G1 **PARTIAL**. The lift is still fixture-level: the two owner singletons, the
+  insert/vcall bodies and the guard fail path are not implemented, and no game code ran.
+- Next exact action: lift `0x1beeb0` (284 B insert body) behind the `insert_1bde30` hook and give
+  the owners a native object created by the `0x533100` path; then `init_1290` can join a real
+  startup chain. Or continue Init at `0x53299d`.
 
 ## 2026-10-23 Orchestrator round 3 — Init batch B, fixture replay, insert path (E520–E523)
 
