@@ -237,3 +237,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Native 0x1290 in the slice (2026-10-23)](checkpoints/2026-10-22-init-1290-native-lift.md) | Slice executes the lifted 0x1290 with both inserts; E545 |
 | [Init entry gaps (2026-10-23)](checkpoints/2026-10-23-init-entry-gaps.md) | Four remaining spans; Init byte coverage 100% of the window; E546 |
 | [Stat query 0x54b250 native (2026-10-23)](checkpoints/2026-10-23-stat-query-54b250-native.md) | 119 B wrapper over `StatsEngine` contract; no-op slot elided; E547 |
+| [Insert callable helpers (2026-10-23)](checkpoints/2026-10-23-insert-callable-helpers.md) | Copy/move/destroy vcalls are three 20-byte helpers on a shared table; E548 |
