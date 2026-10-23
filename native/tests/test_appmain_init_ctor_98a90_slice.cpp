@@ -82,6 +82,8 @@
         }                                                                                \
     } while (0)
 
+void run_alt_5327bd_tests();
+
 using namespace sotc;
 
 namespace {
@@ -1949,6 +1951,13 @@ int main() {
     CHECK(g_cont_b_1e4c0_eax == 0xA6);
     CHECK(g_cont_b_4c4950 == 1);
     CHECK(g_cont_b_4c4950_edi == 0xA7);  // bl(0xA6) xor 1
+
+    // Batch A alt: je 0x5327bd taken path — 70-unit alt module runs when
+    // caller supplies hooks.  Not taken in the default full-slice run.
+    CHECK(!r.init_branch_5327bd_taken);
+    CHECK(!r.post_base_alt_5327bd.ok);
+    CHECK(!r.post_base_alt_5327bd.reached_via_jmp);
+    CHECK(!r.post_base_alt_5327bd.reached_via_preamble);
     // E511: grouped Init continue C 0x532904..0x53299d — 38 units, 3 direct calls,
     // 3 vtable slot-0 dispatches, 3 lea, 6 global loads; je8 target pinned but
     // outcome NOT modelled.
@@ -2362,6 +2371,212 @@ int main() {
     destroy_registry_at_2efd160(front);
     destroy_singleton_f08_at_2efc9e0(front, sh);
     destroy_vslot40_at_2ef8c08(front, bh.vslot_40_detail);
+
+    // ================================================================
+    //  Alt 5327bd standalone tests (added after main slice run)
+    // ================================================================
+
+    // alt_5327bd success path via jmp
+    {
+        Init531d60PostBaseAlt5327bdHooks h{};
+        alignas(8) std::uint8_t gate_obj[0x70]{};
+        gate_obj[0x60] = 0;
+        h.gate_2dfce70 = gate_obj;
+        std::uint8_t obj_3305568_buf[0x10]{};
+        h.obj_3305568 = obj_3305568_buf;
+        h.gate_check_supplied = true;
+        h.gate_check_result = 0;
+        h.float_compare_supplied = true;
+        h.float_below_equal = false;
+
+        auto r = init_531d60_post_base_alt_5327bd(h);
+        CHECK(r.ok);
+        CHECK(r.unit_executed == 70);
+        CHECK(r.call_direct_count == 4);
+        CHECK(r.vcall_count == 5);
+        CHECK(r.lea_rip_count == 7);
+        CHECK(r.mov_rip_count == 2);
+        CHECK(r.float_compare_count == 1);
+        CHECK(r.branch_count == 5);
+        CHECK(r.setcc_count == 1);
+        CHECK(r.reached_via_jmp);
+        CHECK(!r.reached_via_preamble);
+        CHECK(r.r12b_out == 0);
+        CHECK(r.r14b_out == 0);
+        CHECK(r.r12b_known);
+        CHECK(r.r14b_known);
+        for (int i = 0; i < 70; ++i)
+            CHECK(r.unit_counts[i] == 1);
+    }
+
+    // alt_5327bd error path via gate failure
+    {
+        Init531d60PostBaseAlt5327bdHooks h{};
+        h.gate_check_supplied = true;
+        h.gate_check_result = 1;
+        alignas(8) std::uint8_t cell340_obj[0x70]{};
+        cell340_obj[0x60] = 0;
+        h.cell_2efe340 = cell340_obj;
+
+        auto r = init_531d60_post_base_alt_5327bd(h);
+        CHECK(r.ok);
+        CHECK(r.unit_executed == 70);
+        CHECK(!r.reached_via_jmp);
+        CHECK(r.reached_via_preamble);
+        CHECK(r.r12b_out == 1);
+        CHECK(r.r14b_out == 1);
+    }
+
+    // alt_5327bd float compare fail
+    {
+        Init531d60PostBaseAlt5327bdHooks h{};
+        h.gate_check_supplied = true;
+        h.gate_check_result = 0;
+        h.float_compare_supplied = true;
+        h.float_below_equal = true;
+        alignas(8) std::uint8_t cell340_obj[0x70]{};
+        cell340_obj[0x60] = 0xFF;
+        h.cell_2efe340 = cell340_obj;
+
+        auto r = init_531d60_post_base_alt_5327bd(h);
+        CHECK(r.ok);
+        CHECK(r.reached_via_preamble);
+        CHECK(r.r14b_out == 0);
+
+        cell340_obj[0x60] = 0;
+        auto r2 = init_531d60_post_base_alt_5327bd(h);
+        CHECK(r2.ok);
+        CHECK(r2.r14b_out == 1);
+    }
+
+    // alt_5327bd empty hooks runs all 70 units
+    {
+        auto r = init_531d60_post_base_alt_5327bd();
+        CHECK(r.ok);
+        CHECK(r.unit_executed == 70);
+        CHECK(r.reached_via_jmp);
+        for (int i = 0; i < 70; ++i)
+            CHECK(r.unit_counts[i] == 1);
+    }
+
+    // alt_5327bd exit stub
+    {
+        Init531d60PostBaseAlt5327bdResult r{};
+        init_531d60_post_base_exit_5327b6(r);
+        CHECK(r.exit_stub_active);
+    }
+
+    run_alt_5327bd_tests();
     std::puts("appmain_init_ctor_98a90_slice: all checks passed");
     return 0;
+}
+
+// --- Alt 5327bd standalone tests ---
+
+void alt_case_1() {
+    Init531d60PostBaseAlt5327bdHooks h{};
+    // Gate stand-in: byte at +0x60 == 0 means gate open.
+    alignas(8) std::uint8_t gate_obj[0x70]{};
+    gate_obj[0x60] = 0;
+    h.gate_2dfce70 = gate_obj;
+
+    // Object for vtable dispatch.
+    std::uint8_t obj_3305568_buf[0x10]{};
+    h.obj_3305568 = obj_3305568_buf;
+
+    // Gate check: supplied, byte is 0 → gate open.
+    h.gate_check_supplied = true;
+    h.gate_check_result = 0;
+
+    // Float compare: above constant → path continues.
+    h.float_compare_supplied = true;
+    h.float_below_equal = false;
+
+    auto r = init_531d60_post_base_alt_5327bd(h);
+    CHECK(r.ok);
+    CHECK(r.unit_executed == 70);
+    CHECK(r.call_direct_count == 4);
+    CHECK(r.vcall_count == 5);
+    CHECK(r.lea_rip_count == 7);
+    CHECK(r.mov_rip_count == 2);
+    CHECK(r.float_compare_count == 1);
+    CHECK(r.branch_count == 5);
+    CHECK(r.setcc_count == 1);
+    CHECK(r.reached_via_jmp);
+    CHECK(!r.reached_via_preamble);
+    CHECK(r.r12b_out == 0);
+    CHECK(r.r14b_out == 0);
+    CHECK(r.r12b_known);
+    CHECK(r.r14b_known);
+    for (int i = 0; i < 70; ++i)
+        CHECK(r.unit_counts[i] == 1);
+}
+
+void alt_case_2() {
+    Init531d60PostBaseAlt5327bdHooks h{};
+    h.gate_check_supplied = true;
+    h.gate_check_result = 1;  // gate closed → jne taken → error path
+
+    // Preamble: cell_2efe340 with byte +0x60 = 0 → sete r14b = 1
+    alignas(8) std::uint8_t cell340_obj[0x70]{};
+    cell340_obj[0x60] = 0;
+    h.cell_2efe340 = cell340_obj;
+
+    auto r = init_531d60_post_base_alt_5327bd(h);
+    CHECK(r.ok);
+    CHECK(r.unit_executed == 70);
+    CHECK(!r.reached_via_jmp);
+    CHECK(r.reached_via_preamble);
+    CHECK(r.r12b_out == 1);
+    CHECK(r.r14b_out == 1);  // flag was 0 → sete = 1
+}
+
+void alt_case_3() {
+    Init531d60PostBaseAlt5327bdHooks h{};
+    h.gate_check_supplied = true;
+    h.gate_check_result = 0;     // gate open
+    h.float_compare_supplied = true;
+    h.float_below_equal = true;  // jbe taken → error path
+
+    // Preamble: flag byte != 0 → sete = 0
+    alignas(8) std::uint8_t cell340_obj[0x70]{};
+    cell340_obj[0x60] = 0xFF;
+    h.cell_2efe340 = cell340_obj;
+
+    auto r = init_531d60_post_base_alt_5327bd(h);
+    CHECK(r.ok);
+    CHECK(r.reached_via_preamble);
+    CHECK(r.r14b_out == 0);  // flag non-zero → sete = 0
+
+    // Also test: flag == 0
+    cell340_obj[0x60] = 0;
+    auto r2 = init_531d60_post_base_alt_5327bd(h);
+    CHECK(r2.ok);
+    CHECK(r2.r14b_out == 1);
+}
+
+void alt_case_4() {
+    // With no hooks supplied, all 70 units should still pin, gate_open=true
+    // (no gate check supplied), float_ok=true (no float compare supplied).
+    // The result reports success path.
+    auto r = init_531d60_post_base_alt_5327bd();
+    CHECK(r.ok);
+    CHECK(r.unit_executed == 70);
+    CHECK(r.reached_via_jmp);
+    for (int i = 0; i < 70; ++i)
+        CHECK(r.unit_counts[i] == 1);
+}
+
+void alt_case_5() {
+    Init531d60PostBaseAlt5327bdResult r{};
+    init_531d60_post_base_exit_5327b6(r);
+    CHECK(r.exit_stub_active);
+}
+
+void run_alt_5327bd_tests() {
+    alt_case_1();
+    alt_case_2();
+    alt_case_3();
+    alt_case_4();
+    alt_case_5();
 }

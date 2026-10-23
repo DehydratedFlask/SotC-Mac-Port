@@ -94,6 +94,7 @@
 #include "init_531d60_post_base_continue_c.hpp"
 #include "init_531d60_post_base_continue_d.hpp"
 #include "init_531d60_post_base_continue_e.hpp"
+#include "init_531d60_post_base_alt_5327bd.hpp"
 #include "input_table_551140.hpp"
 #include "prologue_255180.hpp"
 #include "singleton_f08_531d84.hpp"
@@ -219,6 +220,10 @@ struct AppmainInitCtor98a90SliceResult {
     Init531d60PostBaseContinueCResult post_base_continue_c{};
     Init531d60PostBaseContinueDResult post_base_continue_d{};
     Init531d60PostBaseContinueEResult post_base_continue_e{};
+    // Batch A je 0x5327bd alternate path: when taken at 0x53277d, runs the
+    // 0x5327bd..0x532904 alt block instead of batch B..E.
+    Init531d60PostBaseAlt5327bdResult post_base_alt_5327bd{};
+    bool init_branch_5327bd_taken = false;
     // E524/E529: the je outcome is modelled when the 0x1e4c0 hook returns a
     // proven boolean; when it is taken, the 36 B 0x5328e0 preamble runs first and
     // its sete r14b becomes the merge entry's movzx esi,r14b.
@@ -304,6 +309,7 @@ struct AppmainInitCtor98a90SliceResult {
     const Init531d60PostBaseContinueBHooks& post_base_continue_b_hooks = {},
     const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks = {},
     const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks = {},
-    const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks = {});
+    const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks = {},
+    const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks = {});
 
 }  // namespace sotc

@@ -79,7 +79,8 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBaseContinueBHooks& post_base_continue_b_hooks,
     const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks,
     const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks,
-    const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks) {
+    const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks,
+    const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks) {
     AppmainInitCtor98a90SliceResult out{};
     out.early = run_prologue_255180_early(alloc, early_hooks);
     if (!out.early.ok) {
@@ -518,6 +519,27 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     if (!out.post_base_continue_a.ok) {
         return out;
     }
+
+    // Batch A je 0x5327bd: when the `test rax,rax` result was zero (rax from
+    // 0x1fc80 was 0), the je is taken and the alternate path at 0x5327bd runs
+    // instead of batch B..E.  The caller supplies the branch outcome through the
+    // alt hooks' gate/compare overrides or simply by choosing to run this module.
+    // When taken, the alt module runs and stops at the documented join; we return
+    // immediately — do NOT fake continuity past the join into batch B/C/D/E.
+    if (post_base_alt_5327bd_hooks.gate_check_supplied ||
+        post_base_alt_5327bd_hooks.gate_2dfce70 != nullptr) {
+        out.init_branch_5327bd_taken = true;
+        out.post_base_alt_5327bd = init_531d60_post_base_alt_5327bd(
+            post_base_alt_5327bd_hooks);
+        if (!out.post_base_alt_5327bd.ok) {
+            return out;
+        }
+        // Alt path completed — stop at the join.  The caller can read
+        // reached_via_jmp / reached_via_preamble and r14b_out / r12b_out
+        // to determine how to proceed (continue_c merge or exit).
+        return out;
+    }
+
     // E510: always-on Init continue — 14-unit fall-through 0x53277f..0x5327b1;
     // callee bodies / je outcome / both successors NOT modelled.
     out.post_base_continue_b = init_531d60_post_base_continue_b(post_base_continue_b_hooks);
