@@ -3,9 +3,11 @@
 // (&A + 0x20) and the fail-visible behaviour when a subsystem hook is absent.
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <vector>
 
 #include "core/init_1290.hpp"
+#include "core/insert_21cd0.hpp"
 
 #define CHECK(c) do { if (!(c)) { std::fprintf(stderr, "FAIL %s:%d %s\n", __FILE__, __LINE__, #c); std::exit(1); } } while (0)
 
@@ -58,6 +60,31 @@ void* pool_alloc(std::size_t bytes) {
 }
 
 void* pool_alloc_fail(std::size_t) { return nullptr; }
+
+// Fixed pool for B-insert entries (0x20 B each, bump-allocated vector).
+alignas(Entry21cd0) unsigned char g_b_pool[sizeof(Entry21cd0) * 4];
+Container21cd0 g_cont_b{};
+
+void setup_cont_b() {
+    std::memset(&g_cont_b, 0, sizeof(g_cont_b));
+    std::memset(g_b_pool, 0, sizeof(g_b_pool));
+    g_cont_b.data = reinterpret_cast<Entry21cd0*>(g_b_pool);
+    g_cont_b.count = 0;
+    g_cont_b.capacity = 4;
+    g_cont_b.lock_handle = 0;
+    g_cont_b.sync_bump_end();
+}
+
+// No-op begin/end hooks for the B insert (the test does not need to observe them).
+void noop_begin(void*, const void*) {}
+void noop_end(void*) {}
+
+Insert21cd0Hooks b_insert_hooks() {
+    Insert21cd0Hooks h{};
+    h.begin = noop_begin;
+    h.end = noop_end;
+    return h;
+}
 
 }  // namespace
 
@@ -151,7 +178,7 @@ int main() {
 
         Init1290Hooks h = full_hooks();
         h.container_a = &cont;
-        h.alloc.alloc = pool_alloc;
+        h.alloc_a.alloc = pool_alloc;
 
         reset();
         const Init1290Result r = init_1290(&self_obj, h);
@@ -182,7 +209,7 @@ int main() {
 
         Init1290Hooks h = full_hooks();
         h.container_a = &cont;
-        h.alloc.alloc = pool_alloc_fail;
+        h.alloc_a.alloc = pool_alloc_fail;
 
         reset();
         const Init1290Result r = init_1290(&self_obj, h);
@@ -194,6 +221,50 @@ int main() {
         CHECK(g.order.empty());
     }
 
-    std::printf("init_1290: all checks passed (order A->vcall->B, 0x20 B entries, &A+0x20 vcall arg)\n");
+    // Real B-insert path: the lifted 0x21cd0 body executes the bump-allocator insert
+    // and self-link, so both A and B inserts are executed effects.
+    {
+        setup_cont_b();
+        Container1beeb0 cont_a{};
+        Node1beeb0* const sentinel_a = reinterpret_cast<Node1beeb0*>(&cont_a.list3_prev);
+        cont_a.list3_prev = sentinel_a;
+        cont_a.list3_next = sentinel_a;
+
+        Init1290Hooks h = full_hooks();
+        h.container_a = &cont_a;
+        h.alloc_a.alloc = pool_alloc;
+        h.container_b = &g_cont_b;
+        h.insert_b_hooks = b_insert_hooks();
+
+        reset();
+        const Init1290Result r = init_1290(&self_obj, h);
+        CHECK(r.ok);
+        CHECK(r.insert_a_executed);
+        CHECK(r.insert_b_executed);
+        CHECK(r.inserted_a.ok);
+        CHECK(r.inserted_b.ok);
+        // Both inserts ran the lifted bodies; neither hook was used.
+        // The A hook was not called (real path), vcall ran, B hook not called.
+        CHECK(g.order.size() == 1 && g.order[0] == 2);  // only vcall
+
+        // A insert: list-3, 0x60 B node.
+        CHECK(r.inserted_a.node != nullptr);
+        CHECK(r.inserted_a.node->invoke == 0x1a00);
+        CHECK(cont_a.count3 == 1);
+
+        // B insert: bump-allocator, 0x20 B entry, self-linked.
+        CHECK(r.inserted_b.entry != nullptr);
+        CHECK(r.inserted_b.entry == &g_cont_b.data[0]);
+        CHECK(r.inserted_b.entry->invoke == 0x1a10);
+        CHECK(r.inserted_b.entry->fn == 0xbb0);
+        CHECK(r.inserted_b.self_linked);
+        CHECK(r.inserted_b.entry->ctx ==
+              reinterpret_cast<std::uintptr_t>(&r.inserted_b.entry->ctx));
+        CHECK(g_cont_b.count == 1);
+        CHECK(r.inserted_b.count == 1);
+    }
+
+    std::printf("init_1290: all checks passed (order A->vcall->B, 0x20 B entries, &A+0x20 vcall arg, "
+                "real A insert (list-3), real B insert (bump-allocator))\n");
     return 0;
 }

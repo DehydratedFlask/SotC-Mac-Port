@@ -223,3 +223,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Init 0x2efe318 cells (2026-10-22)](checkpoints/2026-10-22-init-2efe318-cells.md) | `0x2efe318` = vtable-ptr global → `0x15976b0`; slot0 `0x91210` lazy bind; `0x2efe340` = `+0x28`; `sete` flag `[+0x60]`; E530 |
 | [Insert 0x1beeb0 native (2026-10-22)](checkpoints/2026-10-22-insert-1beeb0-native.md) | 0x20 B descriptor copy executed: new(0x60), self-link, list links, count; E531 |
 | [Insert 0x1beeb0 native (2026-10-22)](checkpoints/2026-10-22-insert-1beeb0-native.md) | 0x20 B descriptor copy executed: new(0x60), self-link, list links, count; E531/E532 |
+| [Insert 0x21cd0 native (2026-10-22)](checkpoints/2026-10-22-insert-21cd0-native.md) | Bump-allocator B insert: 0x20 B entry, begin/end + grow hooks; E533; G1 PARTIAL |

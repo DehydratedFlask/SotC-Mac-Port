@@ -16,9 +16,10 @@
 // guard check is deliberately NOT modelled: it can only abort, never change the
 // observable effect sequence, and modelling it as a fake success would be a lie.
 //
-// Optional real path (E532): when `container_a` and `alloc` are supplied, the A insert runs
-// the lifted 0x1beeb0 body (0x20 B copy + list link + count) instead of the hook. The B insert
-// (0x21cd0) has no lifted body yet and still uses its hook.
+// Optional real path (E532): when `container_a` and `alloc_a` are supplied, the A insert runs
+// the lifted 0x1beeb0 body (0x20 B copy + list link + count) instead of the hook. When
+// `container_b` is supplied, the B insert runs the lifted 0x21cd0 body (bump-allocator
+// 0x20 B copy + self-link) instead of the hook.
 //
 // NOT modelled: the two singleton owners (their allocation lives in 0x533100/0x2569d0
 // and cannot be ordered against Init statically), the bodies of 0x1bde30/0x21cd0/0xb10/
@@ -30,6 +31,7 @@
 #include <cstdint>
 
 #include "insert_1beeb0.hpp"
+#include "insert_21cd0.hpp"
 
 namespace sotc {
 
@@ -76,11 +78,17 @@ struct Init1290Hooks {
     // 0x21cd0(owner=*(0x2dfcbc8), &B). Its body is NOT lifted; the hook stays necessary.
     void (*insert_21cd0)(void* owner, const HandlerRegistration1290& reg) = nullptr;
 
-    // Optional real path for the A insert: when `container_a` and `alloc.alloc` are set,
+    // Optional real path for the A insert: when `container_a` and `alloc_a.alloc` are set,
     // the lifted 0x1beeb0 body executes the 0x20 B copy and list link instead of the
-    // `insert_1bde30` hook. The B insert has no lifted body yet, so its hook is still used.
+    // `insert_1bde30` hook.
     Container1beeb0* container_a = nullptr;
-    Insert1beeb0Alloc alloc{};
+    Insert1beeb0Alloc alloc_a{};
+
+    // Optional real path for the B insert: when `container_b` is set, the lifted 0x21cd0
+    // body executes the bump-allocator insert instead of the `insert_21cd0` hook. The
+    // container must have `data`/`count`/`capacity` initialised and `sync_bump_end()` called.
+    Container21cd0* container_b = nullptr;
+    Insert21cd0Hooks insert_b_hooks{};
 };
 
 struct Init1290Result {
@@ -94,6 +102,9 @@ struct Init1290Result {
     // True when the A insert ran the lifted 0x1beeb0 body (container + allocator path).
     bool insert_a_executed = false;
     Insert1beeb0Result inserted_a{};
+    // True when the B insert ran the lifted 0x21cd0 body (bump-allocator path).
+    bool insert_b_executed = false;
+    Insert21cd0Result inserted_b{};
 };
 
 // Runs the recovered effect sequence. `self` is the object whose address is written
