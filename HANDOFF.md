@@ -8,8 +8,8 @@ The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **361/361** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **459 passed / 0 skipped / 0 failed** with
+- Full native suite: **362/362** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **460 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -202,7 +202,11 @@ The rounds that follow the archive are in chronological order.
   ResourceWrapper*, hash-then-strcmp>`; `GetResource` returns `owned=false`, and the nine attach
   sites only use pointer identity and the two counters; sites 1-8 take the priority-13 early
   return, site 9 (priority 9) writes state 9 and notifies the engine. Slots start
-  `{null_wrapper,false}`. The native model is in flight.
+  `{null_wrapper,false}`.
+- **E594** — the native ResourceWrapper/ResourcePool/ResourceRef model is implemented: exact
+  0x100 B wrapper, hash-then-strcmp comparator, non-owning map, hit/miss references, erase at zero,
+  dependency recursion, the priority state table, and lock/unlock refs. Hooks cover allocation,
+  payloads, manager deletion and engine notification; 317 checks. It is not wired into the launcher.
 - **E583** — the camera delegate has **no static writer**: `D` is the `_Root` node (vtable
   `0x15992b8`, ctor `0x1d6230`, 0x3c8 B), and the ctor zeroes `+0x2e8..+0x307`; an opcode-aware
   census found zero stores. The bound PMF target returns `const CameraTransform*`, but it is

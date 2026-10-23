@@ -88,6 +88,7 @@ add_library(sotc_core STATIC
   core/shared_str_ctor_f1a0.cpp
   core/shared_str_resize_f3c0.cpp
   core/resource_id_14c2f0.cpp
+  core/resource_pool.cpp
   core/app_info_run.cpp
   core/snapshot_bug_data.cpp
   core/frame_root.cpp
@@ -1818,6 +1819,10 @@ add_test(NAME shared_str_resize_f3c0 COMMAND test_shared_str_resize_f3c0)
 add_executable(test_resource_id_14c2f0 tests/test_resource_id_14c2f0.cpp)
 target_link_libraries(test_resource_id_14c2f0 sotc_core)
 add_test(NAME resource_id_14c2f0 COMMAND test_resource_id_14c2f0)
+
+add_executable(test_resource_pool tests/test_resource_pool.cpp)
+target_link_libraries(test_resource_pool sotc_core)
+add_test(NAME resource_pool COMMAND test_resource_pool)
 
 add_executable(test_app_info_run tests/test_app_info_run.cpp)
 target_link_libraries(test_app_info_run sotc_core)
