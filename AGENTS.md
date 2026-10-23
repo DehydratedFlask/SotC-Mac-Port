@@ -42,8 +42,11 @@
   non-zero `fn` are identity-only `0x1290` handlers and are skipped, never called. Never execute an
   original RVA.
 - **`0x2569d0`** is 12,621 B (`sub rsp,0x1118`, 87 reachable blocks). Only its registry block,
-  `RetailBuild`/mode classification and the constant property table are native. The 20 constructor
-  rows (19 slot rows + 2 self-registered) remain open; the large bodies are blocked subsystems.
+  `RetailBuild`/mode classification and the constant property table are native. `0xac5260`/
+  `0xac5320` are `insert_equal` consumers, not tables; map A is `{i32,f32=1,u32}`, map B is
+  `{f32 lo,f32 hi,f32 v,u32}`, and 8 keys are inserted twice (the sink must allow duplicates). The
+  20 constructor rows (19 slot rows + 2 self-registered) remain open; the large bodies are blocked
+  subsystems.
 - **`0xf590`** is a 73 B shared release. The 17 Init-slice modules and the four provably-zero
   `0x533100` sites (miss `0x5332f4`/`0x533300`, join `0x533399`, tail `0x53404d`; E574) are wired as
   exact inert zero-holder releases. The nine `0x533100` key-holder sites are real releases and need

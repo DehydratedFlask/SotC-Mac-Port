@@ -131,6 +131,11 @@ The rounds that follow the archive are in chronological order.
   with tag 2, and zeroes both links and the 8-byte count. Native `report_tree` + `appinfo_listb`;
   list-B fields renamed to the recovered next/prev order and the node allocation corrected to the
   `0x17090` flags-2 wrapper. Checkers 447/0/0, ctest 350/350.
+- **E576** — `0xac5260`/`0xac5320` are `insert_equal` consumers, not tables: 236 + 23 unrolled
+  call sites, no loop, duplicate keys allowed (8 keys appear twice). Map A is
+  `{i32 i, f32 f=1.0, u32 tag}`; map B is `{f32 lo, f32 hi, f32 v, u32 tag}` — the old "u64 pair"
+  reading was a float range. The sink/table now carry `lo/hi`; the fixture pins 122 A + 12 B
+  inserts, 114 distinct A keys and two `0x7b` rows. The bag and insert bodies remain contracts.
 
 ## Settled decisions (do not re-ask)
 

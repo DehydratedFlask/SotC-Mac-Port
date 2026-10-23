@@ -18,7 +18,7 @@ import ps4_dynlink as d  # noqa: E402
 
 ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
 TABLE = ROOT / "native/core/owner_properties_2569d0_table.inc.hpp"
-TABLE_SHA256 = "ca62ba66bba2b51ce4a181ba971894497003bbf4dc2fb6b8b0f99c84d2474f5a"
+TABLE_SHA256 = "39b9f09a8c0b3a4355d98ee2c94eae4ddd2652f10072693acf66093ac78a7521"
 NATIVE_H = ROOT / "native/core/owner_properties_2569d0.hpp"
 NATIVE_C = ROOT / "native/core/owner_properties_2569d0.cpp"
 
@@ -42,11 +42,19 @@ def main() -> int:
     # The only map ctor writes mode 1: mov dword [r15+0x10],1.
     require(img.read(0xA2B143, 8) == bytes.fromhex("41c7471001000000"), "mode write 1 at 0xa2b143")
 
-    # Map A record copy: key -> +0x1c, tag -> +0x28, payload -> +0x20.
+    # The two "tables" are consumers: insert_equal on a custom RB tree, 0x30 B node, no loop.
+    for name, rva, size, sha in (
+        ("map A insert", 0xAC5260, 178, "4cb0735a7bf4bc27e64301ca7fbfd01e7c72fb2a46bcb777d13e12c2c25180ed"),
+        ("map B insert", 0xAC5320, 178, "a78c1713a9693ba36f68a2b449516b4ce9cc01fdff7bc61b706771f91093636c"),
+        ("RB fixup A", 0xAC8A90, 688, "975c87f30e2d64e8e5139af53378e81ff772506c6998794cf67ea19f790b5736"),
+        ("RB fixup B", 0xAC8D40, 688, "74472279fb55d379bc82bade08778bc2f68f48e90f913d873723d1ff1f0fc75e"),
+    ):
+        require(hashlib.sha256(img.read(rva, size)).hexdigest() == sha, f"{name} sha256")
+    require(img.read(0xAC5277, 5) == bytes.fromhex("bf30000000"), "map A node size 0x30")
     require(img.read(0xAC52B9, 3) == bytes.fromhex("89581c"), "map A key store +0x1c")
     require(img.read(0xAC52BC, 3) == bytes.fromhex("895028"), "map A tag store +0x28")
     require(img.read(0xAC52C3, 4) == bytes.fromhex("48895020"), "map A payload store +0x20")
-    # Map B record copy: vmovups [rdx] then vmovups [rax+0x20].
+    # Map B copies all 16 payload bytes, so the tag lands at +0x2c.
     require(img.read(0xAC5345, 4) == bytes.fromhex("c5f81002"), "map B 16-byte record load")
     require(img.read(0xAC5379, 3) == bytes.fromhex("89581c"), "map B key store +0x1c")
     require(img.read(0xAC537C, 5) == bytes.fromhex("c5f8114020"), "map B 16-byte value store")
@@ -66,15 +74,20 @@ def main() -> int:
         "ownerpropertysink",
         "apply_owner_properties",
         "mode2_unreachable",
+        "float lo",
+        "float hi",
+        "insert_equal",
         "not lifted",
     ):
         require(token in header, f"header token {token!r}")
+    require("uint64_t pair" not in header, "map B must not be typed as a u64 pair")
     source = NATIVE_C.read_text()
     require("retail_gate1" in source and "retail_gate0" in source, "mode dispatch")
+    require("row.lo" in source and "row.hi" in source, "map B lo/hi emission")
 
     print(
-        "OK check_fowner_properties_2569d0: RetailBuild gate, mode==1 proof, map A/B record copies, "
-        "260-row table sha=%s…, paths {2,5,130,1,120,1,1}; map inserts NOT executed"
+        "OK check_fowner_properties_2569d0: RetailBuild gate, mode==1 proof, map A/B consumer "
+        "hashes, 260-row table sha=%s…, paths {2,5,130,1,120,1,1}; map inserts NOT executed"
         % TABLE_SHA256[:12]
     )
     return 0

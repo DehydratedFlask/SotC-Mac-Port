@@ -14,7 +14,7 @@ bool emit_row(const detail::OwnerPropertyRow& row, OwnerPropertySink& sink) noex
     if (row.map == 0) {
         return sink.insert_a(row.key, row.i, row.f, row.tag);
     }
-    return sink.insert_b(row.key, row.pair, row.v, row.tag);
+    return sink.insert_b(row.key, row.lo, row.hi, row.v, row.tag);
 }
 
 bool emit_path(std::uint8_t path, OwnerPropertySink& sink, OwnerPropertiesResult& out) noexcept {

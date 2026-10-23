@@ -4,14 +4,18 @@
 //   - gate = the "RetailBuild" boolean at `*(u8*)(*(void**)(0x2dfce70+0x60))`.
 //   - mode = `dword [a2b960()+0x10]`, provably 1 at the only call site (`0x256d27`); mode 2 is
 //     unreachable from 0x2569d0 and is kept in the table as data only.
-//   - map A (`0xac5260`) record = {i32 i, f32 f, u32 tag}; f is 1.0f in every row.
-//   - map B (`0xac5320`) record = {u64 pair, f32 v, u32 tag}.
-//   - 259 rows are constants; the reachable set is gate1 head 2 + pending 1 + tail 130 + final 1
-//     (134 calls) or gate0 head 5 + pending 1 + tail 130 + final 1 (137 calls).
+//   - map A payload = {i32 i, f32 f, u32 tag}; f is 1.0f in every row.
+//   - map B payload = {f32 lo, f32 hi, f32 v, u32 tag}; the "pair" is a float range, not a u64
+//     identity (E576).
+//   - `0xac5260`/`0xac5320` are `insert_equal` consumers (custom red-black trees), not tables:
+//     236 + 23 unrolled call sites, no loop, duplicate keys allowed, 8 keys inserted twice.
+//   - 259 rows are constants; a run emits gate1 head 2 + pending 1 + tail 130 + final 1 (134
+//     inserts) or gate0 head 5 + pending 1 + tail 130 + final 1 (137 inserts). 139 of the 259
+//     sites are reachable; the 120 mode-2 rows are data only.
 //
 // The table lives in `owner_properties_2569d0_table.inc.hpp`, generated from the private symbolic
-// evidence. The sink is the only unresolved piece: the real map object and its red-black inserts
-// (`0xac5260`/`0xac5320`/`0xac8a90`/`0xac8d40`) are not lifted.
+// evidence. The bag object and its red-black insert/fixup bodies (`0xac4de0`/`0xa2afb0`/
+// `0xa2b960`, `0xac5260`/`0xac5320`, `0xac8a90`/`0xac8d40`) are not lifted.
 //
 // The shared-tail quirk is explicit: the predecessor emits a pending key (0x23 for gate1, 0x1c for
 // gate0) before the 130 shared rows; the table marks those rows separately and the driver emits
@@ -40,8 +44,8 @@ public:
     virtual ~OwnerPropertySink() = default;
     // 0xac5260: map A row {i, f, tag}.
     virtual bool insert_a(std::uint16_t key, std::int32_t i, float f, std::uint32_t tag) = 0;
-    // 0xac5320: map B row {pair, v, tag}.
-    virtual bool insert_b(std::uint16_t key, std::uint64_t pair, float v,
+    // 0xac5320: map B row {lo, hi, v, tag}. The sink must allow duplicate keys.
+    virtual bool insert_b(std::uint16_t key, float lo, float hi, float v,
                           std::uint32_t tag) = 0;
 };
 

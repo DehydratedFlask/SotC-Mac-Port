@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <algorithm>
 #include <vector>
 
 #include "core/owner_properties_2569d0.hpp"
@@ -17,7 +18,8 @@ struct Row {
     std::int32_t i;
     float f;
     std::uint32_t tag;
-    std::uint64_t pair;
+    float lo;
+    float hi;
     float v;
 };
 
@@ -35,10 +37,11 @@ struct Sink : OwnerPropertySink {
         return true;
     }
     bool insert_a(std::uint16_t key, std::int32_t i, float f, std::uint32_t tag) override {
-        return push({'A', key, i, f, tag, 0, 0.0f});
+        return push({'A', key, i, f, tag, 0.0f, 0.0f, 0.0f});
     }
-    bool insert_b(std::uint16_t key, std::uint64_t pair, float v, std::uint32_t tag) override {
-        return push({'B', key, 0, 0.0f, tag, pair, v});
+    bool insert_b(std::uint16_t key, float lo, float hi, float v,
+                  std::uint32_t tag) override {
+        return push({'B', key, 0, 0.0f, tag, lo, hi, v});
     }
 };
 }  // namespace
@@ -64,14 +67,36 @@ int main() {
         CHECK(sink.rows[2].key == 0x23 && sink.rows[2].i == 8 && sink.rows[2].tag == 6);
         CHECK(sink.rows[3].key == 0x00 && sink.rows[3].i == 15 && sink.rows[3].tag == 2);
         CHECK(sink.rows.back().map == 'B' && sink.rows.back().key == 0x9f);
-        CHECK(sink.rows.back().pair == 0x3f80000000000000ULL);
+        CHECK(sink.rows.back().lo == 0.0f);
+        CHECK(sink.rows.back().hi == 1.0f);
         CHECK(sink.rows.back().v == 1.0f);
         CHECK(sink.rows.back().tag == 5);
+        int a_rows = 0;
+        int duplicate_keys = 0;
+        std::vector<std::uint16_t> a_keys;
+        int b_rows = 0;
         for (const Row& row : sink.rows) {
             if (row.map == 'A') {
                 CHECK(row.f == 1.0f);
+                ++a_rows;
+                a_keys.push_back(row.key);
+            } else {
+                ++b_rows;
             }
         }
+        CHECK(a_rows == 122);
+        CHECK(b_rows == 12);
+        for (std::size_t i = 0; i < a_keys.size(); ++i) {
+            for (std::size_t j = i + 1; j < a_keys.size(); ++j) {
+                if (a_keys[i] == a_keys[j]) {
+                    ++duplicate_keys;
+                }
+            }
+        }
+        CHECK(duplicate_keys == 8);  // 0x7b..0x82, two nodes each
+        const auto key_7b_count = static_cast<int>(
+            std::count(a_keys.begin(), a_keys.end(), static_cast<std::uint16_t>(0x7b)));
+        CHECK(key_7b_count == 2);
     }
 
     // ---- 2. Gate0: 5 head + pending 0x1c + 130 tail + final = 137. ----
