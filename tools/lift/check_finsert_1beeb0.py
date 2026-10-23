@@ -149,6 +149,11 @@ def main() -> int:
         require(token in header, f"header token {token!r}")
     require(len(IMPL.read_text()) > 0, "impl present")
     test_src = TEST.read_text()
+    # E549: the copy-and-swap net effect is modelled as the callable value store.
+    require("callable_value" in header, "callable value field")
+    require("node->callable_value = descriptor.context[2]" in IMPL.read_text(),
+            "callable value store")
+    require("callable_value == d.context[2]" in test_src, "test asserts the callable value")
     require("slot_58 == d.slot_48" in test_src, "test asserts +0x48 -> +0x58")
     require("slot_58 != d.vtable" in test_src, "test asserts +0x40 NOT stored to +0x58")
 
@@ -156,7 +161,7 @@ def main() -> int:
         "OK check_finsert_1beeb0: extent=0x1beeb0+284B sha=" + FN_SHA256[:12] + "…; "
         "new(0x60)->0x17090; node vtable 0x1598ce0; vmovups 0x20B copy @0x1bef04/0x1bef0a; "
         "fn!=0 self-link; +0x48->node[0x58] (NOT +0x40); list-3 push-front; incq +0x50 count; "
-        "guard 0x15fe518/0xf8f3a0; vcall copy-move-destroy NOT modelled"
+        "guard 0x15fe518/0xf8f3a0; copy-and-swap helpers identified (E548/E549); callable value modelled"
     )
     return 0
 

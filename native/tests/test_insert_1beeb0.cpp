@@ -89,6 +89,7 @@ int main() {
         Node1beeb0* const sentinel = reinterpret_cast<Node1beeb0*>(&c.list3_prev);
 
         Descriptor1beeb0 d{};
+    d.context[2] = 0xCAFEF00Dull;  // E549: lands in node+0x40
         d.ctx = 0x1111111111111111ull;
         d.invoke = 0x2222222222222222ull;
         d.offset = 0x3333333333333333ull;
@@ -117,7 +118,7 @@ int main() {
 
         // Fixed field stores.
         CHECK(r.node->vtable == 0x1598ce0);   // node[0x50]
-        CHECK(r.node->zero_40 == 0);          // node[0x40]
+        CHECK(r.node->callable_value == d.context[2]);  // node[0x40] (E549 copy-and-swap)
 
         // +0x58 store = descriptor[0x48], NOT descriptor[0x40].
         CHECK(r.node->slot_58 == d.slot_48);

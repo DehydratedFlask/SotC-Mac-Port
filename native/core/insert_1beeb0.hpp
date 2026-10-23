@@ -31,8 +31,12 @@
 // `+0x48` field, NOT its `+0x40` field. `descriptor[0x40]` is the *vtable pointer* used by
 // the unmodelled vcalls (call [0x40+0x08] at 0x1bef44); it is never stored into the node.
 //
-// NOT modelled: the copy/move/destroy vcall sequence (descriptor[0x20] context copied into
-// node[0x30] via table 0x1594060 / node vtable 0x1598ce0 slots 0x19a0/0x19c0/0x19e0/0x19f0);
+// The former "copy/move/destroy vcall sequence" is now understood (E548/E549): both tables are
+// the same four-entry helper table {0x19a0 copy+set-vtable, 0x19c0 set-vtable+copy, 0x19e0 copy,
+// 0x19f0 ret}, all pure value copies, so the copy-and-swap net effect is modelled as the single
+// store `node[0x40] = descriptor[0x30]` with the vtable at `node[0x50]`.
+//
+// NOT modelled:
 // the stack-canary fail path (read-only guard, can only abort); the 0x1bdb10 ctor and
 // 0x1bdae0 dtor / 0x1bdeb0 cleanup that own the container; node[0x30..0x40) and node[0x48]
 // (never written by this function). G1 PARTIAL — fixture-level model only.
@@ -66,15 +70,18 @@ struct Node1beeb0 {
     std::uintptr_t fn;        // 0x28  descriptor[0x18]
     std::uintptr_t ctx_30;    // 0x30  NOT written by insert (vcall copy dst)
     std::uintptr_t ctx_38;    // 0x38  NOT written by insert
-    std::uintptr_t zero_40;   // 0x40  = 0
+    // 0x40  callable storage value. The insert first stores 0, then the shared copy helper
+    // 0x19a0 copies descriptor.context[2] (`[rsi+0x10]` with rsi = &descriptor[0x20]) here
+    // during the copy-and-swap sequence (E548/E549).
+    std::uintptr_t callable_value;
     std::uintptr_t uninit_48; // 0x48  NOT written by insert
-    std::uintptr_t vtable;    // 0x50  = 0x1598ce0
+    std::uintptr_t vtable;    // 0x50  = 0x1598ce0 (callable storage vtable)
     std::uintptr_t slot_58;   // 0x58  = descriptor[0x48]
 };
 static_assert(sizeof(Node1beeb0) == kInsert1beeb0NodeSize);
 static_assert(offsetof(Node1beeb0, obj) == 0x10);
 static_assert(offsetof(Node1beeb0, fn) == 0x28);
-static_assert(offsetof(Node1beeb0, zero_40) == 0x40);
+static_assert(offsetof(Node1beeb0, callable_value) == 0x40);
 static_assert(offsetof(Node1beeb0, vtable) == 0x50);
 static_assert(offsetof(Node1beeb0, slot_58) == 0x58);
 

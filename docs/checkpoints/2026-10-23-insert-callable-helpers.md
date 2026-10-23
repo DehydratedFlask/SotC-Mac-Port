@@ -44,6 +44,15 @@ only *which* word of `descriptor[0x20..0x40)` is the source value (`[rsi+0x10]` 
 `rsi = &descriptor[0x20]` implies `descriptor+0x30`), and whether the two temporaries add an
 observable effect beyond the final `node+0x30` contents.
 
+## Follow-up landed (E549)
+
+`insert_1beeb0` now models the copy-and-swap net effect: `node[0x40] = descriptor.context[2]`
+(the source the helpers read via `[rsi+0x10]` with `rsi = &descriptor[0x20]`), with the callable
+vtable at `node[0x50]`. The four helpers are pure value copies with no destructor calls, so the
+temporary chain collapses to that single store; the fixture now passes a non-zero
+`descriptor.context[2] = 0xCAFEF00D` and asserts it lands in `node+0x40`, while the existing
+zero-context cases still expect `0`.
+
 ## Next exact action
 
 Lift `0x19a0`/`0x19c0`/`0x19e0` as a `callable_storage` module, then replace the unmodelled

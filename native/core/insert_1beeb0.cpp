@@ -20,7 +20,7 @@ Insert1beeb0Result insert_1beeb0(Container1beeb0& container,
 
     // Steps 2..4 — field stores, in original order.
     node->vtable = kInsert1beeb0NodeVtable;  // node[0x50] = 0x1598ce0
-    node->zero_40 = 0;                       // node[0x40] = 0
+    node->callable_value = 0;                // node[0x40] = 0, overwritten by the copy below
     node->slot_58 = 0;                       // node[0x58] = 0 (overwritten by step 8)
 
     // Step 5 — 0x20 B copy descriptor[0x00..0x20] -> node[0x10..0x30]. The original is a single
@@ -36,6 +36,15 @@ Insert1beeb0Result insert_1beeb0(Container1beeb0& container,
     if (self_linked) {
         node->obj = reinterpret_cast<std::uintptr_t>(&node->obj);
     }
+
+    // Step 7 (E548/E549) — copy-and-swap of the type-erased callable. The original copies
+    // descriptor.context[2] (`[rsi+0x10]` with rsi = &descriptor[0x20]) through helper 0x19c0
+    // into a temp, copies that temp into a second temp, saves the old node+0x30 into a temp,
+    // writes the new value into node+0x30, then destroys the temps through slot 3 (0x19f0, a
+    // bare ret). All four helpers are pure copies that only touch {value@+0x10, vtable@+0x20}
+    // and set the vtable to 0x1594060 / 0x1598ce0, so the net effect is this single value copy.
+    node->callable_value = descriptor.context[2];
+    node->vtable = kInsert1beeb0NodeVtable;
 
     // Step 8 — "swap into node[0x58]": node[0x58] = descriptor[0x48]. (Steps 7 are the
     // unmodelled vcalls; they do not change the fields this model owns.)
