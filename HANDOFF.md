@@ -8,8 +8,8 @@ The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **364/364** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **461 passed / 0 skipped / 0 failed** with
+- Full native suite: **365/365** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **462 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -218,6 +218,14 @@ The rounds that follow the archive are in chronological order.
   found. The capture/sink contract is proposed but not implemented.
 - **E598** — the SaveData contract: a flat 15,576-byte progress blob behind a `{1,hash,size,4}`
   header with a 1-based result table. No real save exists; the transaction is designed, not built.
+- **E599** — the camera `+0x2e8` census is negative and changes the reading: no writer exists, and in
+  `_Root` the field behaves as an intrusive-list node, not a bound PMF. `0x216480` is never
+  address-taken; the pose path is debug/snapshot-only or `D` is a different class. Do not model a
+  native `BoundMemberFn` until `0xa68030` resolves `D`'s class.
+- **E600** — the screenshot seam is native: `attach_screenshot` implements the E597 decision table
+  (no renderer/capture failure -> synthetic `Command`; ok -> best-effort `SendFile` + list-B
+  `("Screenshot","bug_screenshot.png")`, synthetic suppressed; sink result discarded). The snapshot
+  block accepts the seam. The GPU encoder, surface and socket remain hooks.
 - **E594** — the native ResourceWrapper/ResourcePool/ResourceRef model is implemented: exact
   0x100 B wrapper, hash-then-strcmp comparator, non-owning map, hit/miss references, erase at zero,
   dependency recursion, the priority state table, and lock/unlock refs. Hooks cover allocation,

@@ -5,7 +5,7 @@
 //   call 0x14c2f0(path_buf, path) → hashed path
 //   vcall [loader.vt+0x18](out, loader, path_buf)
 //   call 0x14ccb0(result)  // lock inc [rdi+0x30]; ret
-//   // stop before success-flag branch @ 0x5335e1
+//   // stop before the attach join @ 0x5335e1
 //
 // Always-on after E427 shadowmodels attach. Prefer over success atexit
 // (only on flag-true path; measured fail) and over deepen 0x14c2f0/0x6a5370
@@ -50,7 +50,7 @@ struct Vslot40_533100ShadowskelsResult {
     std::uint32_t refcount_after = 0;
 };
 
-// Models shadowskels load-attempt. Stops before success-flag branch.
+// Models shadowskels load-attempt. Stops before the attach join; `[out+8]` is the GetResource `owned` byte (E595).
 [[nodiscard]] Vslot40_533100ShadowskelsResult vslot_40_533100_shadowskels(
     const Vslot40_533100ShadowskelsHooks& hooks = {}) noexcept;
 

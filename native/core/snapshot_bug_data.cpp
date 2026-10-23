@@ -14,7 +14,13 @@ SnapshotBugDataResult snapshot_bug_data(RegistryOwner& owner, ReportItem& root,
     out.gate_cleared = true;  // cleared before the build, even if the rest fails
 
     bool screenshot = false;
-    if (hooks.arg2_present && hooks.query_screenshot) {
+    if (hooks.screenshot != nullptr) {
+        const ScreenshotAttachment attachment =
+            attach_screenshot(*hooks.screenshot, hooks.screenshot_frame);
+        screenshot = attachment.attached;
+        out.screenshot_sent_to_sink = attachment.sent_to_sink;
+        out.screenshot_status = attachment.status;
+    } else if (hooks.arg2_present && hooks.query_screenshot) {
         std::vector<std::uint8_t> png;
         screenshot = hooks.query_screenshot(png);
     }

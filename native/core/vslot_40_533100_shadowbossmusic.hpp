@@ -5,7 +5,7 @@
 //   call 0x14c2f0(path_buf, path) → hashed path
 //   vcall [loader.vt+0x18](out, loader, path_buf)
 //   call 0x14ccb0(result)  // lock inc [rdi+0x30]; ret
-//   // stop before success-flag / attach @ 0x533d3e
+//   // stop before the attach join @ 0x533d3e
 //     (see vslot_40_533100_bossmusic_attach.*)
 //
 // Always-on after E437 randomevents attach. Prefer over success atexit (flag-true

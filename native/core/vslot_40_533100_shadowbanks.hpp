@@ -5,7 +5,7 @@
 //   call 0x14c2f0(path_buf, path) → hashed path
 //   vcall [loader.vt+0x18](out, loader, path_buf)
 //   call 0x14ccb0(result)  // lock inc [rdi+0x30]; ret
-//   // stop before success-flag branch @ 0x5338d3
+//   // stop before the attach join @ 0x5338d3
 //
 // Always-on after E431 anims attach. Prefer over success atexit (flag-true only;
 // measured fail) and over deepen 0x14c2f0/0x6a5370 (already hooked earlier).

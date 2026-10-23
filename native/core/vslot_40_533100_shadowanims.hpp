@@ -5,7 +5,7 @@
 //   call 0x14c2f0(path_buf, path) → hashed path
 //   vcall [loader.vt+0x18](out, loader, path_buf)
 //   call 0x14ccb0(result)  // lock inc [rdi+0x30]; ret
-//   // stop before success-flag branch @ 0x53375a
+//   // stop before the attach join @ 0x53375a
 //
 // Always-on after E429 skels attach. Prefer over success atexit (flag-true only;
 // measured fail) and over deepen 0x14c2f0/0x6a5370 (already hooked earlier).

@@ -25,6 +25,7 @@
 
 #include "app_info_run.hpp"
 #include "insert_1bdc80.hpp"
+#include "screenshot_contract.hpp"
 
 namespace sotc {
 
@@ -49,8 +50,12 @@ struct SnapshotBugDataHooks {
     bool armed = false;
     // Screenshot source presence (`*(0x2ed3670)`). Null is legal and forces the synthetic entry.
     bool arg2_present = false;
-    // Host capture. True only when a real image payload was produced; the bytes model the file
-    // sink, which the original writes and whose result it discards.
+    // Preferred E597 seam: the real capture/sink decision table. When non-null it takes precedence
+    // over `query_screenshot`; `attached` decides the synthetic entry and the list-B insert.
+    const ScreenshotHooks* screenshot = nullptr;
+    FrameImage screenshot_frame{};
+    // Legacy raw capture seam. True only when a real image payload was produced; the bytes model
+    // the file sink, whose result the original discards.
     std::function<bool(std::vector<std::uint8_t>& png)> query_screenshot;
     // Root adoption. Must append the root under the lazily-created "Frame" node and must NOT copy
     // it. Returning nullptr models "no frame root available".
@@ -71,6 +76,9 @@ struct SnapshotBugDataResult {
     bool screenshot_attached = false;  // list-B "Screenshot" inserted
     bool synthetic_command = false;    // "Command"/"screenshot"/"bug_screenshot" emitted
     bool adopted = false;              // adopt_root returned non-null
+    // E597: populated when `hooks.screenshot` is supplied.
+    bool screenshot_sent_to_sink = false;
+    ScreenshotStatus screenshot_status = ScreenshotStatus::no_surface;
     std::string error;
 };
 

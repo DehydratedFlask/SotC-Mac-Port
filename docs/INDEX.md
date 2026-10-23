@@ -284,3 +284,5 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Owner slots +0x48/+0x58 (2026-10-23)](checkpoints/2026-10-23-owner-slots-48-58.md) | Singleton ensure/activate, gated tree insert; E596 |
 | [GPU readback contract (2026-10-23)](checkpoints/2026-10-23-gpu-readback-contract.md) | PNG encoder, socket sink, frameNum blind spot; E597 |
 | [SaveData contract (2026-10-23)](checkpoints/2026-10-23-savedata-contract.md) | Flat progress blob, transaction API, 29 cases; E598 |
+| [Camera writer full (2026-10-23)](checkpoints/2026-10-23-camera-writer-full.md) | No writer; +0x2e8 is a list node in `_Root`; E599 |
+| [Screenshot contract (2026-10-23)](checkpoints/2026-10-23-screenshot-contract.md) | attach_screenshot decision table; E600 |

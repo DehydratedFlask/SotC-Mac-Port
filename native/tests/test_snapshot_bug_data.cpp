@@ -214,5 +214,67 @@ int main() {
         owner->clear_delegates();
     }
 
+    // ---- 7. E597 seam: renderer + successful capture + sink -> list-B, no synthetic entry. ----
+    {
+        auto owner = make_owner();
+        std::unique_ptr<ReportItem> root = report_node_new("BugData");
+        SnapshotBugDataHooks hooks = make_hooks();
+        hooks.armed = true;
+        int captures = 0;
+        int sends = 0;
+        ScreenshotHooks shot{};
+        shot.renderer_present = true;
+        shot.capture_frame = [&](const FrameImage&) {
+            ++captures;
+            return ScreenshotResult{ScreenshotStatus::ok, {0x89, 0x50, 0x4E, 0x47}};
+        };
+        shot.send_file = [&](std::string_view name, const std::vector<std::uint8_t>& png) {
+            ++sends;
+            CHECK(name == "bug_screenshot.png");
+            CHECK(png.size() == 4);
+            return true;
+        };
+        hooks.screenshot = &shot;
+        hooks.screenshot_frame.frame_num = 0x2A;
+        const auto result = snapshot_bug_data(*owner, *root, hooks);
+        CHECK(result.ok);
+        CHECK(result.screenshot_attached);
+        CHECK(!result.synthetic_command);
+        CHECK(result.screenshot_sent_to_sink);
+        CHECK(result.screenshot_status == ScreenshotStatus::ok);
+        CHECK(captures == 1);
+        CHECK(sends == 1);
+        owner->clear_delegates();
+    }
+
+    // ---- 8. E597 seam: no renderer -> synthetic Command, capture never called. ----
+    {
+        auto owner = make_owner();
+        std::unique_ptr<ReportItem> root = report_node_new("BugData");
+        SnapshotBugDataHooks hooks = make_hooks();
+        hooks.armed = true;
+        int captures = 0;
+        int sends = 0;
+        ScreenshotHooks shot{};
+        shot.renderer_present = false;
+        shot.capture_frame = [&](const FrameImage&) {
+            ++captures;
+            return ScreenshotResult{ScreenshotStatus::ok, {0x89}};
+        };
+        shot.send_file = [&](std::string_view, const std::vector<std::uint8_t>&) {
+            ++sends;
+            return true;
+        };
+        hooks.screenshot = &shot;
+        const auto result = snapshot_bug_data(*owner, *root, hooks);
+        CHECK(result.ok);
+        CHECK(!result.screenshot_attached);
+        CHECK(result.synthetic_command);
+        CHECK(!result.screenshot_sent_to_sink);
+        CHECK(captures == 0);
+        CHECK(sends == 0);
+        owner->clear_delegates();
+    }
+
     return 0;
 }

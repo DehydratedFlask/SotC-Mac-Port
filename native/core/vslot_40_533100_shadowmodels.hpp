@@ -4,7 +4,7 @@
 //   call 0x14c2f0(path_buf, path) → hashed path
 //   vcall [loader.vt+0x18](out, loader, path_buf)
 //   call 0x14ccb0(result)  // lock inc [rdi+0x30]; ret
-//   // stop before success-flag branch @ 0x53347f
+//   // stop before the attach join @ 0x53347f
 //
 // Always-on after E425 gfx prelude. Prefer over deepen 0x6a5370/0x6abcc0
 // (already hooked in prelude, not next sequential). Prefer over empty-path
@@ -52,7 +52,7 @@ struct Vslot40_533100ShadowResult {
 // Lifted OBS 0x14ccb0: lock inc dword [rdi+0x30]; ret.
 void refcount_inc_30_14ccb0(void* obj) noexcept;
 
-// Models shadowmodels load-attempt. Stops before success-flag branch.
+// Models shadowmodels load-attempt. Stops before the attach join; `[out+8]` is the GetResource `owned` byte (E595).
 [[nodiscard]] Vslot40_533100ShadowResult vslot_40_533100_shadowmodels(
     const Vslot40_533100ShadowHooks& hooks = {}) noexcept;
 
