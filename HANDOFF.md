@@ -20,7 +20,13 @@ Updated: 2026-10-22 21:43 CDT (America/Chicago). Integrator: /root (Codex).
 - Attribution cleanup review prepared: 70 trailers removed with all 1068 source trees/authors/
   committers unchanged; no source refs or remote branch changed. See E510 and its checkpoint.
   User explicitly approved main+Init cleanup with force-with-lease; regenerate from final tip before publishing.
-- Exact next action: root integrates/reviews the worker results and refreshes the final cleanup.
+- Full native build passed1082 steps; suite with private fixtures is325/327, FAILED.
+  INT-VALIDATION-PARALLEL-FOUNDATIONS-01 is NEEDS_PRINCIPAL after three verification
+  attempts; /root recorded a distinct clean-baseline isolation before a fourth approach (E512).
+- Save independent review approved; release direct read-only Ghidra recovery and native oracle
+  passed; audio third replay passed after two strict presentation failures. Reports/reviews pending.
+- Exact next action: baseline-isolate two constructor expectations, finish task reviews, then
+  publish accepted source and regenerate the approved attribution cleanup.
 - G0 PARTIAL; G1 PARTIAL; G2–G6 NOT RUN. No boot/audio/save-reload/Metal gameplay claim.
 
 ## Previous Drive handoff (preserved)
