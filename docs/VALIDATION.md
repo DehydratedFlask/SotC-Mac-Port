@@ -1,6 +1,10 @@
 # Validation gates and evidence protocol
 
-Current checkpoint: G0 PARTIAL; G1 PARTIAL (see E404–E508 —
+Current checkpoint: G0 PARTIAL; G1 PARTIAL (E404–E542). Measured native coverage of Init
+`0x531d60` over `0x531d60..0x532b0c` is **3104 / 3500 B = 88.69%** (E542,
+`tools/lift/report_init_coverage.py`) — claimed bytes, not proven semantics; four gaps remain
+(36 B entry frame, 16 B base-initialize call site, 5 B `call 0x56dca0`, 339 B alternate path).
+See E404–E508 —
 `docs/checkpoints/2026-10-22-g1-partial-evidence-pack.md`,
 `docs/checkpoints/2026-10-22-appmain-init-registry-slice.md`,
 `docs/checkpoints/2026-10-22-init-531d60-trivial-leaves.md`,
