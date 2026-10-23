@@ -77,6 +77,7 @@ def main() -> int:
         require(token in header, f"header token {token!r}")
     require("insert_1bde30" in header and "insert_21cd0" in header, "hook names")
     require("vcall_1594060_slot3" in header, "vcall hook")
+    require("container_a" in header and "insert_1beeb0" in header, "real insert path")
     require(len(IMPL.read_text()) > 0, "impl present")
     require("0x20" in TEST.read_text() or "0x20" in header, "0x20 entry width documented")
 

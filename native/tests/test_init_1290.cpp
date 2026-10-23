@@ -50,6 +50,15 @@ Init1290Hooks full_hooks() {
 
 void reset() { g = Recorder{}; }
 
+// Fixed-capacity pool for the 0x60 B node, so the insert body runs without a real allocator.
+alignas(16) unsigned char g_pool[0x60];
+
+void* pool_alloc(std::size_t bytes) {
+    return (bytes == 0x60) ? static_cast<void*>(g_pool) : nullptr;
+}
+
+void* pool_alloc_fail(std::size_t) { return nullptr; }
+
 }  // namespace
 
 int main() {
@@ -130,6 +139,59 @@ int main() {
         CHECK(!r.ok);
         CHECK(r.insert_1bde30_count == 1 && r.vcall_count == 1 && r.insert_21cd0_count == 0);
         CHECK(g.order.size() == 2);
+    }
+
+    // Real A-insert path: the lifted 0x1beeb0 body executes the 0x20 B copy and list link,
+    // so the insert is an executed effect rather than an observed hook.
+    {
+        Container1beeb0 cont{};
+        Node1beeb0* const sentinel = reinterpret_cast<Node1beeb0*>(&cont.list3_prev);
+        cont.list3_prev = sentinel;
+        cont.list3_next = sentinel;
+
+        Init1290Hooks h = full_hooks();
+        h.container_a = &cont;
+        h.alloc.alloc = pool_alloc;
+
+        reset();
+        const Init1290Result r = init_1290(&self_obj, h);
+        CHECK(r.ok);
+        CHECK(r.insert_a_executed);
+        CHECK(r.inserted_a.ok);
+        CHECK(r.inserted_a.node == reinterpret_cast<Node1beeb0*>(g_pool));
+        CHECK(r.inserted_a.self_linked);  // fn 0xb10 != 0
+        CHECK(r.inserted_a.node->obj ==
+              reinterpret_cast<std::uintptr_t>(&r.inserted_a.node->obj));
+        CHECK(r.inserted_a.node->invoke == 0x1a00);
+        CHECK(r.inserted_a.node->fn == 0xb10);
+        CHECK(r.inserted_a.node->vtable == 0x1598ce0);
+        CHECK(r.inserted_a.node->slot_58 == 0);  // A+0x48
+        CHECK(cont.count3 == 1);
+        CHECK(cont.list3_next == r.inserted_a.node);
+        CHECK(r.inserted_a.node->prev == sentinel);
+        // The insert hook was NOT used: only the vcall and B insert ran.
+        CHECK(g.order.size() == 2 && g.order[0] == 2 && g.order[1] == 3);
+    }
+
+    // Allocation failure is visible and leaves the list untouched.
+    {
+        Container1beeb0 cont{};
+        Node1beeb0* const sentinel = reinterpret_cast<Node1beeb0*>(&cont.list3_prev);
+        cont.list3_prev = sentinel;
+        cont.list3_next = sentinel;
+
+        Init1290Hooks h = full_hooks();
+        h.container_a = &cont;
+        h.alloc.alloc = pool_alloc_fail;
+
+        reset();
+        const Init1290Result r = init_1290(&self_obj, h);
+        CHECK(!r.ok);
+        CHECK(!r.insert_a_executed);
+        CHECK(cont.count3 == 0);
+        CHECK(cont.list3_next == sentinel);
+        CHECK(r.insert_1bde30_count == 0);
+        CHECK(g.order.empty());
     }
 
     std::printf("init_1290: all checks passed (order A->vcall->B, 0x20 B entries, &A+0x20 vcall arg)\n");

@@ -16,6 +16,10 @@
 // guard check is deliberately NOT modelled: it can only abort, never change the
 // observable effect sequence, and modelling it as a fake success would be a lie.
 //
+// Optional real path (E532): when `container_a` and `alloc` are supplied, the A insert runs
+// the lifted 0x1beeb0 body (0x20 B copy + list link + count) instead of the hook. The B insert
+// (0x21cd0) has no lifted body yet and still uses its hook.
+//
 // NOT modelled: the two singleton owners (their allocation lives in 0x533100/0x2569d0
 // and cannot be ordered against Init statically), the bodies of 0x1bde30/0x21cd0/0xb10/
 // 0xbb0, the 0x1594060 slot-3 target beyond "bare ret", and any effect on Init's result.
@@ -24,6 +28,8 @@
 
 #include <cstddef>
 #include <cstdint>
+
+#include "insert_1beeb0.hpp"
 
 namespace sotc {
 
@@ -67,8 +73,14 @@ struct Init1290Hooks {
     void (*insert_1bde30)(void* owner, const HandlerRegistration1290& reg) = nullptr;
     // 0x1594060 slot 3 (0x19f0, bare ret) called with rdi = &A + 0x20.
     void (*vcall_1594060_slot3)(void* self_arg) = nullptr;
-    // 0x21cd0(owner=*(0x2dfcbc8), &B).
+    // 0x21cd0(owner=*(0x2dfcbc8), &B). Its body is NOT lifted; the hook stays necessary.
     void (*insert_21cd0)(void* owner, const HandlerRegistration1290& reg) = nullptr;
+
+    // Optional real path for the A insert: when `container_a` and `alloc.alloc` are set,
+    // the lifted 0x1beeb0 body executes the 0x20 B copy and list link instead of the
+    // `insert_1bde30` hook. The B insert has no lifted body yet, so its hook is still used.
+    Container1beeb0* container_a = nullptr;
+    Insert1beeb0Alloc alloc{};
 };
 
 struct Init1290Result {
@@ -79,6 +91,9 @@ struct Init1290Result {
     HandlerRegistration1290 reg_a{};
     HandlerRegistration1290 reg_b{};
     void* vcall_self_arg = nullptr;
+    // True when the A insert ran the lifted 0x1beeb0 body (container + allocator path).
+    bool insert_a_executed = false;
+    Insert1beeb0Result inserted_a{};
 };
 
 // Runs the recovered effect sequence. `self` is the object whose address is written
