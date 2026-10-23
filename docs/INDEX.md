@@ -131,6 +131,11 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Escalation template](escalations/TEMPLATE.md) | Three-try handback to principal |
 | [Function schema](schemas/function.example.json) | Address-to-native-symbol recovery record |
 
+## Current parallel work
+
+- [Parallel foundations plan](checkpoints/2026-10-22-codex-parallel-foundations-plan.md)
+- [Prepared contributor cleanup](checkpoints/2026-10-22-codex-contributor-cleanup-prepared.md)
+
 ## Folder contracts
 
 | Folder | What belongs here | Index / protection |
