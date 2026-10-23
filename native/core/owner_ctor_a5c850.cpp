@@ -124,7 +124,8 @@ OwnerA5C850Result owner_ctor_a5c850(void* object, std::uint8_t* sound_record,
     write_vector_header(o, kOwnerA5C850Vectors[0]);
 
     // ---- B1: 256 records at +0x1c50, stride 0x40, 7 partial stores each (report §5.3). ----
-    // Holes per record: +0x08..+0x2b, +0x30..+0x33, +0x3c..+0x3f. Do not clear them.
+    // Holes per record: +0x08..+0x2b, +0x30..+0x33. (+0x38 is a qword store, so +0x3c..+0x3f
+    // is written too.) Do not clear them.
     for (std::size_t i = 0; i < kOwnerA5C850RecCount; ++i) {
         const std::size_t record = kOwnerA5C850RecBase + i * kOwnerA5C850RecStride;
         put<std::uint32_t>(o, record + 0x00, 0xFFFFFFFFu);
@@ -140,7 +141,7 @@ OwnerA5C850Result owner_ctor_a5c850(void* object, std::uint8_t* sound_record,
     put<std::uint32_t>(o, kOwnerA5C850LaneGroupOffset, 0u);
     {
         // 0xa5c8f4 `xchg qword [rbx+0x5c60], rax`: a sequentially consistent store whose loaded
-        // value is discarded. The original writes no lane (+0x5ca0..+0x66a0).
+        // value is discarded. The original writes no lane (+0x5ca0..+0x68a0).
         auto* const slot = reinterpret_cast<std::uint64_t*>(o + kOwnerA5C850LaneAtomicOffset);
         const std::uint64_t previous = std::atomic_ref<std::uint64_t>(*slot).exchange(
             0u, std::memory_order_seq_cst);

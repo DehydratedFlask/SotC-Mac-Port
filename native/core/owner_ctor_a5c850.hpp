@@ -22,7 +22,7 @@
 //   1. No `memset`/zero-fill. Only the characterized offsets are written; the holes of report §8
 //      stay untouched (`+0x000c..+0x000f`, `+0x0011..+0x0017`, `+0x0019..+0x001f`,
 //      `+0x0021..+0x0027`, every vector's `+0x18` slot, the six inline buffers, each record's
-//      `+0x08..+0x2b/+0x30..+0x33/+0x3c..+0x3f`, the `0x60`-stride lanes, `+0x7270` and
+//      `+0x08..+0x2b/+0x30..+0x33` (+0x38 is a qword store), the `0x60`-stride lanes, `+0x7270` and
 //      `+0xa524..+0xa530`). The original object is partially initialized; "helpful" zeroing
 //      would diverge from it.
 //   2. `+0x0010` is a one-byte store (report R1). The upper seven bytes are never touched, even
