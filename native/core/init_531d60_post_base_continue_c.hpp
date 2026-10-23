@@ -205,6 +205,12 @@ struct Init531d60PostBaseContinueCHooks {
     // r14b is 0 on the continue_b fall-through path and the `sete r14b` result on
     // the `0x5328e0` taken path; r15 is a stable init pointer from far upstream.
     std::uint8_t incoming_r14b = 0;   // movzx esi,r14b -> esi for call 0xa52b70
+    // E528/E529: when the batch-B `je 0x5328e0` is taken, the 36 B preamble
+    // 0x5328e0..0x532904 runs first and its `sete r14b` becomes incoming_r14b.
+    // The caller sets this flag; the preamble requires vcall_slot0 and
+    // preamble_flag_byte (resolved [0x2efe340]+0x60 byte), else it fails visibly.
+    bool enter_via_5328e0 = false;
+    const std::uint8_t* preamble_flag_byte = nullptr;
     const void* incoming_r15 = nullptr;  // mov rdi,r15 -> rdi for call 0xa52b70
 
     // RIP-relative global cells (addresses pinned; the pointer values they hold
@@ -251,6 +257,16 @@ struct Init531d60PostBaseContinueCResult {
     std::uint64_t end_rva = kInit531d60PostBaseContinueCEndRva;
     std::uint64_t branch_target_rva = kInit531d60PostBaseContinueCBranchTargetRva;
     bool branch_outcome_modelled = false;
+    // 0x5328e0..0x532904 taken-path preamble (8 units, 36 B), only when
+    // enter_via_5328e0. Its sete r14b feeds the merge entry's movzx esi,r14b.
+    bool preamble_ran = false;
+    int preamble_unit_executed = 0;   // expect 8
+    int preamble_call_count = 0;      // expect 1 (call [rax] slot 0)
+    bool preamble_flag_known = false;
+    std::uint8_t preamble_r14b = 0;
+    // Effective value consumed by 0x532904 movzx esi,r14b (preamble result when
+    // the taken path ran, else incoming_r14b).
+    std::uint8_t first_esi = 0;
 };
 
 // Runs the OBS `0x532904..0x53299d` unit sequence on the measured Init path.

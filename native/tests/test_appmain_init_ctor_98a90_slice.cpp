@@ -607,6 +607,10 @@ void hook_cont_a_1fc80(void* rdi, std::uintptr_t rsi_rva) {
     g_cont_a_1fc80_rdi = rdi;
     g_cont_a_1fc80_rsi_rva = rsi_rva;
 }
+int g_extra_slot0 = 0;
+
+void hook_extra_slot0(void*, std::uint8_t) { ++g_extra_slot0; }
+
 int g_cont_b_1e4c0_value = 0xA6;  // host stand-in; 0xA6 keeps the non-boolean path
 
 int hook_cont_b_1e4c0(void* rdi) {
@@ -1850,7 +1854,7 @@ int main() {
     // block still runs exactly as before (no silent branch claim).
     CHECK(!r.post_base_continue_b.branch_taken);
     CHECK(!r.init_branch_5328e0_taken);
-    CHECK(!r.init_stopped_at_5328e0);
+    CHECK(!r.post_base_continue_c.preamble_ran);
     CHECK(r.post_base_continue_b.end_rva == 0x5327b1);
     CHECK(r.post_base_continue_b.branch_target_rva == 0x5328e0);
     CHECK(g_cont_b_1e4c0 == 1);
@@ -1938,10 +1942,40 @@ int main() {
         CHECK(!bx.branch_outcome_modelled && !bx.branch_taken);
 
         // Slice-level decision: not-taken and unknown both enter the merge; a
-        // proven taken branch must stop before the unmodelled preamble.
+        // proven taken branch runs the 0x5328e0 preamble first.
         CHECK(enters_merge_after_continue_b(b1));
         CHECK(!enters_merge_after_continue_b(b0));
         CHECK(enters_merge_after_continue_b(bx));
+
+        // E529 taken-path preamble: sete r14b from the resolved flag byte, fed
+        // into the merge entry's movzx esi,r14b.
+        std::uint8_t flag_zero = 0;
+        std::uint8_t flag_one = 1;
+        Init531d60PostBaseContinueCHooks ch{};
+        ch.enter_via_5328e0 = true;
+        ch.preamble_flag_byte = &flag_zero;
+        ch.vcall_slot0 = hook_extra_slot0;
+        const auto c0 = init_531d60_post_base_continue_c(ch);
+        CHECK(c0.ok);
+        CHECK(c0.preamble_ran);
+        CHECK(c0.preamble_unit_executed == 8);
+        CHECK(c0.preamble_call_count == 1);
+        CHECK(c0.preamble_flag_known);
+        CHECK(c0.preamble_r14b == 1);   // (byte == 0) => 1
+        CHECK(c0.first_esi == 1);
+
+        ch.preamble_flag_byte = &flag_one;
+        const auto c1 = init_531d60_post_base_continue_c(ch);
+        CHECK(c1.ok && c1.preamble_ran);
+        CHECK(c1.preamble_r14b == 0);   // (byte != 0) => 0
+        CHECK(c1.first_esi == 0);
+
+        // Missing hook data on the taken path fails visibly.
+        Init531d60PostBaseContinueCHooks bad{};
+        bad.enter_via_5328e0 = true;    // no flag byte, no slot-0 hook
+        const auto cb = init_531d60_post_base_continue_c(bad);
+        CHECK(!cb.ok);
+        CHECK(!cb.preamble_ran);
     }
 
     std::printf(

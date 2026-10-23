@@ -526,14 +526,17 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     // 0x5328e0 preamble is NOT modelled, so stop honestly instead of entering
     // the merge block as if the taken path had been replayed.
     out.init_branch_5328e0_taken = out.post_base_continue_b.branch_taken;
-    if (!enters_merge_after_continue_b(out.post_base_continue_b)) {
-        out.init_stopped_at_5328e0 = true;
-        return out;
+    // E529: on a modelled taken branch, run the 36 B 0x5328e0 preamble first and
+    // feed its sete r14b into the merge entry, instead of skipping or faking it.
+    Init531d60PostBaseContinueCHooks c_hooks = post_base_continue_c_hooks;
+    if (out.post_base_continue_b.branch_outcome_modelled &&
+        out.post_base_continue_b.branch_taken) {
+        c_hooks.enter_via_5328e0 = true;
     }
     // Init continue merge — 38-unit run 0x532904..0x53299d (reached by the
     // je-not-taken fall-through); callee bodies / vtable slot-0 target / the
     // next je outcome and both of its successors NOT modelled.
-    out.post_base_continue_c = init_531d60_post_base_continue_c(post_base_continue_c_hooks);
+    out.post_base_continue_c = init_531d60_post_base_continue_c(c_hooks);
     if (!out.post_base_continue_c.ok) {
         return out;
     }

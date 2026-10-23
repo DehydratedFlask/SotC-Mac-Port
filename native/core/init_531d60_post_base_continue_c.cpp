@@ -28,9 +28,47 @@ Init531d60PostBaseContinueCResult init_531d60_post_base_continue_c(
     const Init531d60PostBaseContinueCHooks& hooks) noexcept {
     Init531d60PostBaseContinueCResult out{};
 
-    // 0x532904 movzx esi,r14b — r14b provenance upstream (0 on the fall-through
-    // path, sete r14b on the 0x5328e0 taken path), NOT modelled here.
-    const std::uint8_t esi_1 = hooks.incoming_r14b;
+    // E529: taken-path preamble 0x5328e0..0x532904 (8 units, 36 B). It polls the
+    // same vtable source and derives `sete r14b` from [0x2efe340]+0x60. Without
+    // the resolved flag byte and the slot-0 hook it fails visibly instead of
+    // inventing a branch value.
+    std::uint8_t r14b_in = hooks.incoming_r14b;
+    if (hooks.enter_via_5328e0) {
+        if (hooks.vcall_slot0 == nullptr || hooks.preamble_flag_byte == nullptr) {
+            return out;  // ok == false, nothing pinned
+        }
+        // 0x5328e0 movq 0x2efe318(%rip),%rax / 0x5328e7 leaq 0x2efe318,%rdi
+        ++out.preamble_unit_executed;
+        ++out.preamble_unit_executed;
+        // 0x5328ee xorl %esi,%esi
+        ++out.preamble_unit_executed;
+        // 0x5328f0 callq *(%rax) — slot 0 with rdi = vtable cell address, esi = 0
+        out.preamble_call_count = 0;
+        hooks.vcall_slot0(
+            const_cast<void*>(hooks.cell_2efe318 != nullptr
+                                  ? static_cast<const void*>(hooks.cell_2efe318)
+                                  : nullptr),
+            0);
+        ++out.preamble_unit_executed;
+        ++out.preamble_call_count;
+        // 0x5328f2 movq 0x2efe340(%rip),%rax
+        ++out.preamble_unit_executed;
+        // 0x5328f9 movq 0x60(%rax),%rax
+        ++out.preamble_unit_executed;
+        // 0x5328fd cmpb $0,(%rax)
+        ++out.preamble_unit_executed;
+        // 0x532900 sete %r14b — r14b = (*flag_byte == 0)
+        out.preamble_r14b = (*hooks.preamble_flag_byte == 0) ? 1 : 0;
+        out.preamble_flag_known = true;
+        ++out.preamble_unit_executed;
+        out.preamble_ran = true;
+        r14b_in = out.preamble_r14b;
+    }
+
+    // 0x532904 movzx esi,r14b — r14b is 0 on the fall-through path and the
+    // preamble's sete r14b on the 0x5328e0 taken path.
+    const std::uint8_t esi_1 = r14b_in;
+    out.first_esi = esi_1;
     pin(out, ContinueCUnit::movzx_esi_r14b);
 
     // 0x532908 mov rdi,r15 — r15 provenance upstream, NOT modelled.
