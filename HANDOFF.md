@@ -8,7 +8,7 @@ Updated: 2026-10-22 21:43 CDT (America/Chicago). Integrator: /root (Codex).
   continued publication to cursor/init-hash-551140-9dfc. Earlier main publication instruction is
   overridden for this session. Startup_ctors/Init/FNV/registry Drive ownership remains intact.
 - Plan/spec and file ownership: [parallel foundations plan](docs/checkpoints/2026-10-22-codex-parallel-foundations-plan.md).
-- SAV-01-ATOMIC-WRITER-TEMP-ISOLATION-01: claimed; user selected unique exclusive same-directory temporary files.
+- SAV-01-ATOMIC-WRITER-TEMP-ISOLATION-01: worker ASan/UBSan pass 1/1, expected red/mutation failures; independent review pending (E511). User selected unique exclusive temporary files.
 - CPU-01-SHARED-STR-RELEASE-F590-01 and AUD-02-NGS2-RACKQUERY-RDX-CFG-01: claimed;
   implementation not started; zero prior failed task hypotheses found by scouts.
 - All three scouts made no edits/tests/builds. Their findings are proposals requiring implementation
