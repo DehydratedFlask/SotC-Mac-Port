@@ -53,7 +53,9 @@ and "Game" last. Final list-A front-to-back is therefore
 - Native tie: `tools/lift/check_fapp_info_install.py` pins both extents/hashes, the five insert
   calls, the four value producers and all twelve strings; exit 0 on the pinned ELF.
 
-## Unresolved
+## Unresolved (amended by E569)
 
-Who reads list A; dispatch timing/frequency; whether a second dispatch can duplicate entries; the
-`0x2dfcf40` object identity; the camera handle chain; the `flag = 0` producer. **G1 PARTIAL.**
+The reader and drain were found inside `0x1bdf30` (E569): every list-A entry is serialized, then
+`flag == 1` nodes are deleted; the `snapshotBugData` command gates the path and re-entry cannot
+duplicate. Remaining: the report/FieldEntry type, list B, the `0x2dfcf40` object identity, the camera
+handle chain, and whether a `flag = 0` producer exists at all. **G1 PARTIAL.**

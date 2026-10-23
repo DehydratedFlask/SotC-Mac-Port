@@ -7,6 +7,7 @@
 #include "core/container_dtor_1bede0.hpp"
 #include "core/container_1bdb10.hpp"
 #include "core/insert_1bdb50.hpp"
+#include "core/insert_1bdc80.hpp"
 
 #define CHECK(c) do { if (!(c)) { std::fprintf(stderr, "FAIL %s:%d %s\n", __FILE__, __LINE__, #c); std::exit(1); } } while (0)
 
@@ -62,6 +63,10 @@ int main() {
     entry_hooks.alloc.deallocate = test_deallocate;
     Insert1beeb0Alloc delegate_alloc{};
     delegate_alloc.alloc = delegate_allocate;
+    Insert1bdc80Hooks list_b_hooks{};
+    list_b_hooks.alloc.allocate = test_allocate;
+    list_b_hooks.alloc.deallocate = test_deallocate;
+    list_b_hooks.release = entry_hooks.release;
 
     // ---- 1. Full teardown: C, B, A in order. ----
     {
@@ -78,8 +83,7 @@ int main() {
         List1bdeb0& list_a = *reinterpret_cast<List1bdeb0*>(&container.list1_prev);
         CHECK(insert_1bdb50(list_a, a, b, 1, entry_hooks).ok);
         CHECK(insert_1bdb50(list_a, a, b, 1, entry_hooks).ok);
-        List1bdeb0& list_b = *reinterpret_cast<List1bdeb0*>(&container.list2_prev);
-        CHECK(insert_1bdb50(list_b, a, b, 0, entry_hooks).ok);
+        CHECK(insert_1bdc80(container, a, b, list_b_hooks).ok);
 
         Descriptor1beeb0 descriptor{};
         descriptor.ctx = 0x3333;

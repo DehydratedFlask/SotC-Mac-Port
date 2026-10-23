@@ -254,3 +254,8 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Parallel-foundations integration (2026-10-23)](checkpoints/2026-10-23-parallel-foundations-integration.md) | Exclusive save temp, shared-string release, rackquery CFG; E566 |
 | [Owner installer 0x2569d0 (2026-10-23)](checkpoints/2026-10-23-owner-installer-2569d0.md) | 12,621 B / 87-block mapping; registry-slot native; E567 |
 | [Round 24 verification (2026-10-23)](checkpoints/2026-10-23-round-24-verification.md) | 345/345 ctest, 442/0/0 sweep, audits, new fixtures/checkers; E568 |
+| [App-info list reader (2026-10-23)](checkpoints/2026-10-23-appinfo-list-reader.md) | `0x1bdf30` serializes list A and drains flag==1; snapshotBugData gate; E569 |
+| [Owner rows 0x2569d0 (2026-10-23)](checkpoints/2026-10-23-owner-rows-2569d0.md) | RetailBuild gate, mode==1 proof, 259-row property table; E570 |
+| [List-B inserter 0x1bdc80 (2026-10-23)](checkpoints/2026-10-23-insert-1bdc80-native.md) | 0x50-node list-B insert; dtor list-B type; E571 |
+| [Camera chain (2026-10-23)](checkpoints/2026-10-23-camera-chain.md) | Euler/format pure lift; live pose chain blocked; E573 |
+| [Round 25 verification (2026-10-23)](checkpoints/2026-10-23-round-25-verification.md) | 349/349 ctest, 446/0/0 sweep; E569–E573 published |

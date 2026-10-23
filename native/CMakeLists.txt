@@ -76,6 +76,10 @@ add_library(sotc_core STATIC
   core/registry_owner.cpp
   core/container_dtor_1bede0.cpp
   core/registry_slot.cpp
+  core/app_info_collect.cpp
+  core/insert_1bdc80.cpp
+  core/owner_properties_2569d0.cpp
+  core/camera_location_25a4d0.cpp
   core/list_dtor_1bdeb0.cpp
   core/insert_21cd0.cpp
   core/container_1bdb10.cpp
@@ -1757,6 +1761,22 @@ add_test(NAME container_dtor_1bede0 COMMAND test_container_dtor_1bede0)
 add_executable(test_registry_slot tests/test_registry_slot.cpp)
 target_link_libraries(test_registry_slot sotc_core)
 add_test(NAME registry_slot COMMAND test_registry_slot)
+
+add_executable(test_app_info_collect tests/test_app_info_collect.cpp)
+target_link_libraries(test_app_info_collect sotc_core)
+add_test(NAME app_info_collect COMMAND test_app_info_collect)
+
+add_executable(test_insert_1bdc80 tests/test_insert_1bdc80.cpp)
+target_link_libraries(test_insert_1bdc80 sotc_core)
+add_test(NAME insert_1bdc80 COMMAND test_insert_1bdc80)
+
+add_executable(test_owner_properties_2569d0 tests/test_owner_properties_2569d0.cpp)
+target_link_libraries(test_owner_properties_2569d0 sotc_core)
+add_test(NAME owner_properties_2569d0 COMMAND test_owner_properties_2569d0)
+
+add_executable(test_camera_location_25a4d0 tests/test_camera_location_25a4d0.cpp)
+target_link_libraries(test_camera_location_25a4d0 sotc_core)
+add_test(NAME camera_location_25a4d0 COMMAND test_camera_location_25a4d0)
 
 add_executable(test_list_dtor_1bdeb0 tests/test_list_dtor_1bdeb0.cpp)
 target_link_libraries(test_list_dtor_1bdeb0 sotc_core)

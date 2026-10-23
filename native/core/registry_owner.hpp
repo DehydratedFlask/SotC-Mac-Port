@@ -6,10 +6,15 @@
 //   registers four callbacks. Only the fourth is a list-3 delegate: `{receiver = app object,
 //   fn = 0x25a4d0, adjust = 0}`. `0x1290` later registers `0xb10` the same way.
 //
-//   `0x1bdf30(container, ...)` walks list-3 from `sentinel.prev` and follows `node.prev` after each
-//   call (0x1bdf66 `mov rbx,[rdi+0x40]`, 0x1bdf79 `mov rbx,[rbx]`). Because `0x1beeb0` pushes at
-//   the front, `sentinel.prev` is the OLDEST node, so dispatch is FIFO in registration order.
-//   This corrects the earlier LIFO inference in the worker report.
+//   `0x1bdf30(container, ...)` walks the list-C link at `container+0x40` and then follows the node
+//   link at `node+0x00` after each call (0x1bdf66 `mov rbx,[rdi+0x40]`, 0x1bdf79 `mov rbx,[rbx]`).
+//   Because `0x1beeb0` pushes at the front, that starting link is the OLDEST node, so dispatch is
+//   FIFO in registration order. The naming of those two links as prev/next differs between the
+//   E559 header and the reader report; the byte offsets above are authoritative.
+//
+//   The same function then serializes list A and drains every flag==1 entry (`0x1be14d..0x1be456`).
+//   That half is modelled separately by `app_info_collect.hpp`; `dispatch()` here is only the
+//   list-C loop.
 //
 // This module is the native mechanism, not a full lift of either 0x2569d0 or 0x1bdf30:
 //   - it stores native function pointers (never original RVAs) in the delegate node's `invoke` slot;
@@ -22,6 +27,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "app_info_collect.hpp"
 #include "app_info_registry.hpp"
 #include "insert_1beeb0.hpp"
 
@@ -70,14 +76,21 @@ public:
     // Number of list-3 nodes (container count at +0x50).
     [[nodiscard]] std::uint64_t delegate_count() const noexcept;
 
-    // Runs the recovered list-3 traversal: oldest first, `node.prev` after each call, receiver =
+    // Runs only the recovered list-C traversal: oldest first, node+0x00 after each call, receiver =
     // node[0x10] + node[0x20]. Native delegates are tagged by `fn == 0`; a node with a non-zero
     // `fn` is an identity-only descriptor from `0x1290` (its invoke value is an original RVA) and is
     // skipped, never called. A null `invoke` on a native delegate stops the walk with ok == false.
     [[nodiscard]] RegistryOwnerDispatchResult dispatch() noexcept;
 
+    // Serializes list A and drains its flag==1 nodes (the list-A half of 0x1bdf30).
+    [[nodiscard]] AppInfoCollectResult collect(AppInfoVisitor visitor, void* ctx,
+                                               const AppInfoCollectHooks& hooks) noexcept {
+        return collect_app_info(registry_, visitor, ctx, hooks);
+    }
+
     // Frees every list-3 node through the owner's seam and reinitialises the list-3 sentinel.
-    // Test/teardown helper; the original uses the unlifted 0x1bede0 container destructor.
+    // Every node in the list must have been allocated through this same seam. Test/teardown helper;
+    // the original uses the container destructor 0x1bede0 (lifted separately).
     void clear_delegates() noexcept;
 
 private:

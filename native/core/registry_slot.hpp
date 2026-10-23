@@ -48,7 +48,9 @@ struct RegistrySlotInstallResult {
 
 // Replaces `slot` with a freshly constructed RegistryOwner. The previous owner is torn down through
 // container_dtor_1bede0 before the replacement. A missing dtor free hook or an allocation failure
-// leaves the previous owner untouched and reports ok == false.
+// leaves the previous owner untouched and reports ok == false. A release-contract failure during
+// the previous teardown still performs the replacement (matching the original's unconditional
+// store) but reports ok == false and the failure count.
 class RegistrySlot {
 public:
     RegistrySlot() noexcept = default;

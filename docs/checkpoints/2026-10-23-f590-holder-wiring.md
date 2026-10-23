@@ -57,7 +57,11 @@ the lift from `_u9.cpp` made the slice test fail (exit 1 at `rel.ok`), then was 
 
 Private evidence: `local/re/evidence/f590-callsite-holders/` (10,168-row CSV/JSON, `ctrl_slot.json`,
 `init_holder_state.json`, `verify.py` 18/18 fresh re-decodes) and
-`local/re/evidence/f590-wiring/report.md`.
+`local/re/evidence/f590-wiring/report.md`. A follow-up audit
+(`local/re/evidence/init-f590-remainder/`) proved the Init body is `0x531d60..0x532c8b` and contains
+**exactly the 17** sites, all wired; it also corrected the `0x26800` body addresses in the census
+report (real `0x26828/0x26831/0x26839/0x26841/0x26846`, +0x800 typo) and strengthened the no-op
+claim: `lock xadd` targets the control block `[*(rdi+0x18)]`, never the holder.
 
 ## Limits
 

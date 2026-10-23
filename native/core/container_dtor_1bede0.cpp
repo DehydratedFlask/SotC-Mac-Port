@@ -1,5 +1,7 @@
 #include "container_dtor_1bede0.hpp"
 
+#include "insert_1bdc80.hpp"
+
 namespace sotc {
 namespace {
 
@@ -44,12 +46,30 @@ ContainerDtor1bede0Result container_dtor_1bede0(
         container.count3 = 0;
     }
 
-    // ---- list B (+0x20) then list A (+0x00), 0x58 B flag nodes ----
-    for (int pass = 0; pass < 2; ++pass) {
-        List1bdeb0& list = pass == 0
-                               ? *reinterpret_cast<List1bdeb0*>(&container.list2_prev)
-                               : *reinterpret_cast<List1bdeb0*>(&container.list1_prev);
-        auto* const sentinel = reinterpret_cast<Node1bdeb0*>(&list);
+    // ---- list B (+0x20, 0x50 B nodes without a flag) ----
+    {
+        auto& list = *reinterpret_cast<List1bdc80*>(&container.list2_prev);
+        Node1bdc80* const sentinel = reinterpret_cast<Node1bdc80*>(&list);
+        Node1bdc80* node = list.prev;
+        while (node != sentinel) {
+            Node1bdc80* const next = node->prev;
+            release_callable(node->callable_30, hooks.release, out.releases,
+                             out.release_failures);
+            release_callable(node->callable_10, hooks.release, out.releases,
+                             out.release_failures);
+            hooks.free_tag2(node);
+            ++out.freed_b;
+            node = next;
+        }
+        list.prev = sentinel;
+        list.next = sentinel;
+        list.count = 0;
+    }
+
+    // ---- list A (+0x00, 0x58 B flag nodes) ----
+    {
+        auto& list = *reinterpret_cast<List1bdeb0*>(&container.list1_prev);
+        Node1bdeb0* const sentinel = reinterpret_cast<Node1bdeb0*>(&list);
         Node1bdeb0* node = list.prev;
         while (node != sentinel) {
             Node1bdeb0* const next = node->prev;
@@ -58,11 +78,7 @@ ContainerDtor1bede0Result container_dtor_1bede0(
             release_callable(node->callable_10, hooks.release, out.releases,
                              out.release_failures);
             hooks.free_tag2(node);
-            if (pass == 0) {
-                ++out.freed_b;
-            } else {
-                ++out.freed_a;
-            }
+            ++out.freed_a;
             node = next;
         }
         list.prev = sentinel;

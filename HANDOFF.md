@@ -1,19 +1,19 @@
 # SoC Mac Native — current handoff
 
 Updated: 2026-10-23 (America/Chicago). Integrator: OpenCode orchestrator (goal resumed by explicit
-user command). Branch `cursor/init-hash-551140-9dfc`; published tip `9a85650` (round 24).
+user command). Branch `cursor/init-hash-551140-9dfc`; round-25 tip is the commit that carries this file (round-24 code tip `9a85650`).
 Older rounds, the history-rewrite record and the full pre-tidy handoff are archived verbatim in
 [docs/checkpoints/HANDOFF-archive-2026-10-23.md](docs/checkpoints/HANDOFF-archive-2026-10-23.md).
 The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **345/345** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **442 passed / 0 skipped / 0 failed** with
+- Full native suite: **349/349** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **446 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
-- Init `0x531d60..0x532b0c`: 100% of bytes claimed by native modules
-  (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed bytes are not
-  semantics** — most of it is call-site pinning with callee hooks.
+- Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
+  native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
+  bytes are not semantics** — most of it is call-site pinning with callee hooks.
 - Publish gate: `python3 -I scripts/audit_publish_paths.py` and
   `python3 -I scripts/check_commit_attribution.py` both exit 0 at this tip.
 - **G1 PARTIAL. G2–G6 NOT RUN.** No boot, no game audio, no save/load, no Metal frame.
@@ -101,6 +101,29 @@ The rounds that follow the archive are in chronological order.
   are recorded.
 - Verification: **345/345 ctest**, sweep **442/0/0**, publish and attribution audits exit 0.
 
+## 2026-10-23 Orchestrator round 25 — list A reader/drain, list B, owner rows/properties (E569–E572)
+
+- Agent: integrator plus five workers (list reader, camera chain, owner rows, Init f590 remainder,
+  0x533100 f590 sites).
+- **E569** — the list-A reader is the second half of `0x1bdf30` (`0x1be14d..0x1be222`); it serializes
+  every entry with no lookup, then drains `flag == 1` nodes (`0x1be3f4..0x1be456`). The gate is the
+  `snapshotBugData` command, so dispatch is not per-frame and re-entry cannot duplicate. `0x1bdeb0`
+  handles `flag == 0` (none produced). Native `app_info_collect` models the serialization/drain;
+  checker `check_fapp_info_collect.py` pins the bytes.
+- **E570** — `0x2569d0` non-registry rows: 20 `0x17070` sites = 18 slot stores + 2 self-registered +
+  1 factory; three destroy idioms; gate = **RetailBuild**; mode provably **1** (mode-2 block
+  unreachable); 259 constant property rows (map A `{i,f=1,tag}`, map B `{pair,v,tag}`), 139
+  reachable. Native `owner_properties_2569d0` + 260-row generated table + `classify_owner_mode` and
+  `apply_owner_properties`; checker pins the gate/mode/record bytes and table hash.
+- **E571** — list-B inserter `0x1bdc80` lifted (417 B, `0x50` nodes, container+0x20 sentinel, count
+  +0x30, four `0xf590` hand-offs); `container_dtor_1bede0` now uses the 0x50 `Node1bdc80` for list B.
+- **E572** — round verification: **349/349 ctest**, sweep **446 passed / 0 skipped / 0 failed**,
+  publish/attribution audits exit 0.
+- **E573** — camera chain characterized; pure `0x50ba0` Euler math and the six-double `setCameraPos`
+  formatter are native (`camera_location_25a4d0`). The live pose remains blocked on engine state.
+- The 0x533100 `f590` audit is complete (14 sites: 4 provably-zero, 9 real releases, 1 unknown);
+  wiring of the 4 safe sites is a separate in-flight task and is not claimed here.
+
 ## Settled decisions (do not re-ask)
 
 - `StartupState` RAII ownership for the slot-10 mutex — implemented.
@@ -113,19 +136,24 @@ The rounds that follow the archive are in chronological order.
   that the original never owns formatted values.
 - The native list-3 dispatcher never calls an original RVA: native delegates are tagged `fn == 0`;
   nodes with non-zero `fn` (the identity-only `0x1290` handlers) are counted and skipped.
+- The owner allows downloading/using pre-existing tools for concrete tasks. Follow the
+  `AGENTS.md` tool-acquisition policy: official source, checksum, signature/architecture smoke test,
+  and an `INSTALL_LOG.md` record. Never install guest runtimes, Sony SDKs, firmware or game files.
 
 ## Next exact work
 
-1. Continue the `0x2569d0` lift beyond the registry block: model the 19 constructor rows, the
-   `[this+0x48]` / `[this+0x58]` call bodies (`0xb111e0`/`0xb11210`), the mode/gate dispatch and the
-   `0xac5260` property table as data. The registry slot, container ctor/dtor and list-3 insert are
-   already native (E564/E567).
-2. Resolve the list-A reader and dispatch timing (E563 unresolved 1–2): no read path for the
-   app-info entries has been found, and a second `0x1bdf30` dispatch would duplicate all entries.
+1. Continue the `0x2569d0` lift beyond the registry/property slices: implement the
+   `init_owner_members` driver (19 slot rows + 2 self-registered; three destroy idioms) and the
+   simple ctors `0xa1cc0`/`0xfafb0`/`0x26f820`/`0xa2b960`, then the `[this+0x48]`/`[this+0x58]`
+   bodies (`0xb111e0`/`0xb11210`). The map sink (`0xac5260`/`0xac5320`) is the next dependency for
+   `apply_owner_properties` (E570).
+2. Finish the registry lifecycle: model list B's reader/clear (`0x1be2f7..0x1be49d`) and the
+   report/FieldEntry construction (`0xab1b20`, `0xab0d40`). List A serialization/drain is native
+   (E569); list B's 0x50 B inserter is native (E571).
 3. Make the camera value native: characterize `0x1c70b0`/`0x1c0f40`/`0x216480`/`0x50ba0` and the
    `[owner+0x2668]` handle, then replace the host-supplied `camera_location` text.
-4. Convert the 8,194 P2 `0xf590` frame/global sites only after the `ctrl_slot` + callee-body check
-   from E565; the 17 P1 modules are done.
+4. Wire the safe `0x533100` `f590` sites only after the extended `+0x18` dominance check; the 17 P1
+   Init modules are done and Init has no remaining `f590` site (E565 follow-up).
 5. `0xa56560` (stat engine) and `0xa54920` (ConVar registrar) remain contracts; do not claim them.
 6. Round end: fresh build, full `ctest`, `SOTC_NATIVE_BUILD=local/build/orch-r22
    tools/lift/run_all_checkers.sh`, `python3 -I scripts/audit_publish_paths.py --all`,

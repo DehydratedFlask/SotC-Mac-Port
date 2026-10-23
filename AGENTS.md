@@ -23,6 +23,48 @@
 - Do not download game/firmware files, request uploads, or silently substitute a PS2 version.
 - Do not claim boot/audio/saving from a window, triangle, tone, mock save, or source/build success.
 
+## Current architecture contracts (round 24–25; do not re-derive)
+
+- **App-info registry.** `*(0x2ee68c8)` is the 0x60 B three-list container built by `0x1bdb10`:
+  list A at `+0x00` (0x58 B named entries, dword flag at `+0x50`), list B at `+0x20` (0x50 B,
+  no flag), list C at `+0x40` (0x60 B callable nodes). `0x25a4d0(app,registry)` writes four product
+  entries; `0xb10(registry)` writes `"Game"`; every observed write uses `flag = 1`.
+- **Dispatch and lifecycle.** `0x1bdf30` walks list C **FIFO** (start at `container+0x40`, follow
+  `node+0x00`), then serializes every list-A entry (`0x1be14d..0x1be222`) and drains `flag == 1`
+  nodes (`0x1be3f4..0x1be456`). `0x1bdeb0` purges `flag == 0`; `0x1bede0` destroys all three lists.
+  The only normal gate is the `snapshotBugData` command at `0x25db56`, so dispatch is not per-frame
+  and cannot duplicate entries. The old "LIFO" and "flag 0 producer unknown" claims are withdrawn.
+- **Native modules.** `app_info_registry`, `app_info_install`, `app_info_collect`, `registry_owner`,
+  `registry_slot`, `container_dtor_1bede0`, `insert_1bdc80`, `owner_properties_2569d0`. Their
+  headers state what is modelled and what is a hook.
+- **Native conventions.** App-info text is a **borrowed view** (`control == nullptr`) unless a module
+  explicitly owns it; callers keep it alive. Native list-C delegates are tagged `fn == 0`; nodes with
+  non-zero `fn` are identity-only `0x1290` handlers and are skipped, never called. Never execute an
+  original RVA.
+- **`0x2569d0`** is 12,621 B (`sub rsp,0x1118`, 87 reachable blocks). Only its registry block,
+  `RetailBuild`/mode classification and the constant property table are native. The 20 constructor
+  rows (19 slot rows + 2 self-registered) remain open; the large bodies are blocked subsystems.
+- **`0xf590`** is a 73 B shared release. The 17 Init-slice modules are wired as exact inert
+  zero-holder releases. Do not wire P2 frame/global sites without the `ctrl_slot` + callee-body
+  check; a last reference with a missing destroy/free contract must report `ok == false`.
+- **`0x15ff060..0x15ff0a0`** is an eight-slot `.data.rel.ro` pointer slice, not a vtable and not an
+  owned object. Do not restore the "table owner" reading; `0x2569d0` is a consumer.
+
+## Tool acquisition (owner-approved)
+
+- The owner explicitly allows downloading and using pre-existing tools when a concrete task needs
+  them. Prefer already-installed Apple/Xcode tools; add a dependency only when it removes real work.
+- Before installing: identify the official source/publisher, prefer signed/notarized or widely used
+  releases, record the exact version/commit and SHA-256, and verify the checksum after download.
+- Safety check before use: `spctl`/`codesign` where applicable, `file`/`lipo` for architecture, and
+  a smoke test in a private temp directory. Do not run an untrusted tool against game files,
+  credentials, or private evidence until it has passed.
+- Record in `INSTALL_LOG.md`: local date, purpose/task, source URL, version/commit, checksum, install
+  path, exact install/run command, safety result, and removal boundary.
+- Never install emulators, guest CPU runtimes, Sony SDKs, firmware, game files, or anything that
+  reconstructs/executes the original executable. Existing installs are not permission to use them.
+- Do not commit downloaded tool binaries. `tools/` holds recipes/adapters and attribution only.
+
 ## Checkpoints are mandatory
 
 Update `HANDOFF.md` at EVERY checkpoint: completed task or subtask, passed/failed gate,
@@ -39,11 +81,32 @@ Concurrent workers own different files/tasks. One integrator owns `HANDOFF.md` e
 workers send checkpoint content to that integrator and verify that it was recorded before exiting.
 Do not overwrite another worker's checkpoint or edit the reference clones.
 
+## Verification before publication
+
+Run these from the workspace root and record exact counts in `HANDOFF.md`/`docs/EVIDENCE.md`:
+
+```sh
+cmake -S native -B local/build/orch-r22
+cmake --build local/build/orch-r22 -j 12
+ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure
+SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh
+python3 -I scripts/audit_publish_paths.py --all
+python3 -I scripts/check_commit_attribution.py
+python3 scripts/project_index.py
+```
+
+A green build is not a gate result. Label every claim `NOT RUN`, `FAILED`, `PARTIAL`, `PASSED`,
+`FIXTURE_VERIFIED`, `STATIC_ANALYSIS_VERIFIED`, or `ARTIFACT_VERIFIED` as appropriate. Workers do
+not run `git commit`, `git tag`, or `git push`; the integrator commits under the owner identity.
+
 ## Public GitHub remote (durable)
 
-- Remote: https://github.com/DehydratedFlask/SotC-Mac-Port (`main`).
-- At every checkpoint / completed task claim: commit **allowlisted** changes only, clear message,
-  then `git push origin main`. Pull/rebase if others pushed; never force-push.
+- Remote: https://github.com/DehydratedFlask/SotC-Mac-Port.
+- Active work is published on the branch named in `HANDOFF.md` (currently
+  `cursor/init-hash-551140-9dfc`, draft PR #4). Push that branch; do **not** push directly to `main`
+  or merge/rebase the other draft PR branches without explicit owner approval. Never force-push.
+- At every checkpoint / completed task claim: commit **allowlisted** changes only with a clear
+  message, then push the active branch. Pull/rebase if peers pushed the same branch.
 - Allow: `native/`, `launcher/`, port docs (`README.md`, `ROADMAP.md`, `HANDOFF.md`, `AGENTS.md`,
   `docs/*` policy/spec), `scripts/` port tooling, `tools/` without game binaries, `.gitignore`.
 - Deny (also in `.gitignore`): `Shadow of the Colossus/`, PKG/PSARC/eboot/SELF/ELF/sprx dumps,
