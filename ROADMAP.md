@@ -103,7 +103,8 @@ or unwanted network subsystem into the native target.
 - Never stage forbidden paths (`Shadow of the Colossus/`, `local/`, `reference/`, `logs/`, game
   PKG/PSARC/eboot/SELF/ELF dumps, secrets). Before push: `git status`, then
   `python3 -I scripts/audit_publish_paths.py` on the staged set and `--all` on tracked files.
-- See `.gitignore` and [AGENTS](AGENTS.md) for the full allow/deny lists.
+- See `.gitignore` and [AGENTS](AGENTS.md) for the full allow/deny lists, and
+  [ATTRIBUTION](docs/ATTRIBUTION.md) for the contributor-identity gate.
 
 ### Commit attribution — Claude is never a contributor
 
@@ -116,9 +117,10 @@ Repository contributors must be human. On every commit, before pushing:
    If an assistant or subagent produced the change, its work is attributed to the owner only.
 3. Never write Claude/assistant names into `CONTRIBUTORS`, release notes, changelogs, PR bodies,
    or issue text. Do not let a GitHub contributor graph entry be created for an assistant.
-4. Audit before every push:
-   `git log -1 --format='%an <%ae> | %cn <%ce>'` shows the owner, and
-   `git log -1 --format=%B | grep -iE 'claude|anthropic|co-authored-by|generated with'` is empty.
+4. Audit before every push: `python3 -I scripts/check_commit_attribution.py` must exit 0
+   (identity plus every unpublished commit), and
+   `git log -1 --format='%an <%ae> | %cn <%ce>'` must show the owner identity. The full policy
+   and audit state are in [ATTRIBUTION](docs/ATTRIBUTION.md).
    Fix the message (or `git commit --amend` before pushing an unpushed commit) instead of pushing
    an assistant-attributed commit. Already-pushed history is never rewritten, except an owner-approved attribution cleanup performed
    with `--force-with-lease` on the agreed branch (see the PUB-01 cleanup task).

@@ -214,3 +214,5 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Init continue batch B (2026-10-22)](checkpoints/2026-10-22-init-531d60-continue-batch-b.md) | 14 units / 50 B `0x53277f..0x5327b1`, calls `0x1e4c0`/`0x4c4950`, `je->0x5328e0` pinned; E520; G1 PARTIAL |
 | [Fixture-suite replay (2026-10-22)](checkpoints/2026-10-22-int-validation-fixture-replay.md) | 326/326 with fixtures; "325/327 FAILED" does not reproduce; E521 |
 | [Init insert path 0x1bde30 (2026-10-22)](checkpoints/2026-10-22-init-1bde30-insert-path.md) | 0x20 B descriptor copy at node `+0x10`; `+0x40` = list-3 sentinel; 4-slot vtable + names; no null guard; E522; G1 static |
+| [Init 0x1e4c0 contract (2026-10-22)](checkpoints/2026-10-22-init-1e4c0-contract.md) | Config-bool lookup proving `bl` ∈ {0,1}; branch rule `bl=1→0x532904`; E524; G1 static |
+| [ATTRIBUTION](ATTRIBUTION.md) | Owner-only contributor policy, pre-push attribution gate, audit state; E525 |

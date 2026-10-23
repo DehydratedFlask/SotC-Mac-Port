@@ -2,7 +2,7 @@
 
 Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + OpenCode orchestrator round 2.
 Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
-Round-2 detail is the section immediately below; the parallel-foundations state that follows stays authoritative.
+Round-2 and round-3 detail are the two sections immediately below; the parallel-foundations state that follows stays authoritative.
 
 ## 2026-10-22 Repository history rewrite — Claude attribution + hostname identity
 
@@ -35,6 +35,38 @@ Round-2 detail is the section immediately below; the parallel-foundations state 
   pushing one would reintroduce old trailers. Gate: **G1 still PARTIAL**; nothing about boot/audio/save
   changes.
 - Next exact action: unchanged — next always-on after `0x532720`, or a bounded body lift.
+
+## 2026-10-23 Orchestrator round 3 — Init batch B, fixture replay, insert path (E520–E523)
+
+- Agent: integrator + three worker subagents (non-Claude model). Attempt 1 success for all three.
+- Tasks: `CPU-01-INIT-531D60-CONTINUE-BATCH-02` (E520), `INT-VALIDATION-FIXTURE-REPLAY-01` (E521),
+  `CPU-01-INIT-1BDE30-ANALYSIS-01` (E522), plus a `PUB-01` attribution audit of published
+  history (E523).
+- Files: `native/core/init_531d60_post_base_continue_b.{hpp,cpp}`, slice wire + test,
+  `tools/lift/check_f531d60_post_base_continue_b.py`, two checkpoints, EVIDENCE/TASKS/INDEX/FOLDERS,
+  and a correction note in the `0x1290` checkpoint.
+- Observation: Init now models the je-not-taken fall-through `0x53277f..0x5327b1` (50 B,
+  **14 units**, region sha `409d74e2…`): calls `0x1e4c0` and `0x4c4950`, cell read
+  `mov rdi,[r13+0]` (`r13=0x32f84f8` from batch A), boundary `je 0x5328e0` (outcome NOT
+  modelled); next instruction `0x5327b1 e9 4e 01 00 00` = `jmp 0x532904`.
+- Observation: the full suite with private fixtures is **326/326**; the parallel lane's
+  "325/327 FAILED" claim does not reproduce on this tree (326 tests exist; its two failures were
+  exactly the E518 stale expectations). 8 fail-visible tests print `SKIP` only when fixtures are
+  truly unreachable and then assert the error path.
+- Observation: the `0x1290` descriptor question is settled — `0x1beeb0` copies **0x20 B** at
+  node `+0x10` (`vmovups` pair); `+0x40` is a third list sentinel in the 0x60 B container, not
+  descriptor tail; `0x1594060` is a 4-slot vtable + 4 name pointers; the insert path has no null
+  guard and its owner (`0x2569d0`, called from `0x533100`) cannot be ordered against `0x531d60`
+  statically. The earlier `HandlerEntryA` 0x50 B sketch is explicitly superseded.
+- Observation: published history contains **0** assistant trailers across 1078 reachable commits
+  on both remote refs; a regenerated cleanup rewrites nothing. One residual main-ancestry commit
+  (`f6604a8`) is authored as `orchestrator@local`; a bounded owner-approved author rewrite is
+  proposed, not applied.
+- Inference: G1 **PARTIAL** only; five Init callee bodies and both `je` successors remain
+  unmodelled, and grouping units is still control-flow pinning, not semantics.
+- Next exact action: model the `0x532904` merge block (batch C), then lift `0x1290` natively with
+  the corrected 0x20 B descriptor and hook seams. End every round with full `ctest` +
+  `python3 -I scripts/audit_publish_paths.py --all`.
 
 ## 2026-10-22 OpenCode orchestrator round 2 — Init batch A + repo health (E516–E519)
 
