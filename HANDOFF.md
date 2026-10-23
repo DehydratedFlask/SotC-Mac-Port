@@ -1,15 +1,15 @@
 # SoC Mac Native — current handoff
 
 Updated: 2026-10-23 (America/Chicago). Integrator: OpenCode orchestrator (goal resumed by explicit
-user command). Branch `cursor/init-hash-551140-9dfc`; round-25 tips `f394fc8` (E569–E573), `1eebca2` (E574), and the commit carrying this file (E575); round-24 tip `9a85650`.
+user command). Branch `cursor/init-hash-551140-9dfc`; round-26 tip is the commit carrying this file; round-25 tips `f394fc8`/`1eebca2`/`12f0ca2`/`c01f774`, round-24 `9a85650`.
 Older rounds, the history-rewrite record and the full pre-tidy handoff are archived verbatim in
 [docs/checkpoints/HANDOFF-archive-2026-10-23.md](docs/checkpoints/HANDOFF-archive-2026-10-23.md).
 The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **360/360** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **457 passed / 0 skipped / 0 failed** with
+- Full native suite: **361/361** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **458 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -182,6 +182,11 @@ The rounds that follow the archive are in chronological order.
 - **E588** — the bug-report Frame root is native: `0xa70c30` lazily creates `"Frame"` with the
   integer `frameNum`, and `0xa70d10` adopts the report root through `0xab0d40`. `ReportItem` now
   carries integer properties. The live frame counter and the holder's `ctrl` remain contracts.
+- **E589** — the ResourceSystem platform-tag lookup is native: `0x147e20` is a 25-row
+  `fourcc -> tag` table, `crmp`/`calt` map to `_cmn`, only `cfon`/`cptx`/`cctx` map to `_ps4`, the
+  `"****"` wildcard is `_cmn`, and an unpopulated registry falls back to `_ps4`. The nine attach
+  fragments default to the real table, and the integration fixture asserts the nine derived FNV
+  key hashes.
 - **E583** — the camera delegate has **no static writer**: `D` is the `_Root` node (vtable
   `0x15992b8`, ctor `0x1d6230`, 0x3c8 B), and the ctor zeroes `+0x2e8..+0x307`; an opcode-aware
   census found zero stores. The bound PMF target returns `const CameraTransform*`, but it is
@@ -206,19 +211,20 @@ The rounds that follow the archive are in chronological order.
 
 ## Next exact work
 
-1. Continue the `0x2569d0` lift beyond the registry/property slices: implement the
-   `init_owner_members` driver (19 slot rows + 2 self-registered; three destroy idioms) and the
-   simple ctors `0xa1cc0`/`0xfafb0`/`0x26f820`/`0xa2b960`, then the `[this+0x48]`/`[this+0x58]`
-   bodies (`0xb111e0`/`0xb11210`). The map sink (`0xac5260`/`0xac5320`) is the next dependency for
-   `apply_owner_properties` (E570).
-2. Finish the registry lifecycle: model list B's reader/clear (`0x1be2f7..0x1be49d`) and the
-   report/FieldEntry construction (`0xab1b20`, `0xab0d40`). List A serialization/drain is native
-   (E569); list B's 0x50 B inserter is native (E571).
-3. Make the camera value native: characterize `0x1c70b0`/`0x1c0f40`/`0x216480`/`0x50ba0` and the
-   `[owner+0x2668]` handle, then replace the host-supplied `camera_location` text.
-4. Wire the safe `0x533100` `f590` sites only after the extended `+0x18` dominance check; the 17 P1
-   Init modules are done and Init has no remaining `f590` site (E565 follow-up).
-5. `0xa56560` (stat engine) and `0xa54920` (ConVar registrar) remain contracts; do not claim them.
+1. **Platform tag table.** Resolve `0x147e20`/`*0x2ee2d00` so the nine `0x533100` key sites can run
+   with a real `****` tag instead of stopping at the missing hook. If the tags are static, add a
+   native table; if they are runtime state, keep the hook and name the state.
+2. **ResourcePool `0x14e260`.** Model the 0x138 B pool, its hash+strcmp map, the `ResourceRef` and
+   `0x14ccb0`/`0x14ccc0` refcounts, so the attach fragments can call `GetResource` instead of the
+   `resource_pool_miss` boolean. The resource object `0x14c8a0`/`0x150360` is the next dependency.
+3. **Remaining owner ctors.** The 15 non-trivial bodies are still hooks in `owner_members`; the bag
+   derived ctor `0xa2afb0` (four 0xc88 language tables) and the `[this+0x48]`/`[this+0x58]` bodies
+   (`0xb111e0`/`0xb11210`) are the highest-value next lifts.
+4. **Camera live pose.** No static writer of the bound delegate exists (E583). The next step is a
+   full rizin decode of `0x1c0000..0x1da000`/`0x20c000..0x216800` to find the `BoundMemberFn`
+   writer; the pure `0x50ba0` math is already native.
+5. **Not started:** save/load, audio, Metal, and the launcher. `0xa56560` (stat engine) and
+   `0xa54920` (ConVar registrar) remain contracts; do not claim them.
 6. Round end: fresh build, full `ctest`, `SOTC_NATIVE_BUILD=local/build/orch-r22
    tools/lift/run_all_checkers.sh`, `python3 -I scripts/audit_publish_paths.py --all`,
    `python3 -I scripts/check_commit_attribution.py`.

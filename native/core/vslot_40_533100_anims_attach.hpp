@@ -17,6 +17,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "platform_tag_147e20.hpp"
 #include "shared_release_f590.hpp"
 #include "shared_str_ctor_f1a0.hpp"
 
@@ -42,7 +43,7 @@ struct Vslot40_533100AnimsAttachHooks {
     // report ok == false instead of faking a key.
     SharedStrCtorHooks key_alloc{};
     // 0x147e20(*0x2ee2d00, fourcc) → 4-byte platform tag for the `****` rewrite.
-    std::uint32_t (*platform_tag)(std::uint32_t fourcc) = nullptr;
+    std::uint32_t (*platform_tag)(std::uint32_t fourcc) = platform_tag_147e20_default;
     // 0xf590 callees for the key holder (0x12af0 tag-0 destroy, 0x170b0 control free).
     SharedReleaseF590Hooks release{};
     // ResourcePool::GetResource ([[0x2ee2cf8]]+0x18) takes +1 on a map miss.

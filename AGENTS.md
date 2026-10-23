@@ -57,10 +57,10 @@
   `ResourcePool::GetResource`, not a destructor, so release with `previous ∈ {1,2}`. The key is
   built by `resource_id_ctor_14c2f0` (E582): `****` is patched with the runtime tag before FNV.
   `0xf3c0` resize/COW and `0xf6b0` terminate are native (E587); only the capacity-short path
-  returns true.
+  returns true. The `"****"` tag is `_cmn` at the nine sites (`0x147e20`, E589), not `_ps4`.
   The nine sites are now wired (E586): each builds the real key and releases it; a host must supply
-  `key_alloc.alloc.allocate` and `platform_tag` in every reachable attach detail, otherwise the
-  fragment reports `ok == false`. `0x5333e3` stays a per-element hook. Do not wire P2
+  `key_alloc.alloc.allocate` in every reachable attach detail, otherwise the fragment reports
+  `ok == false`. `platform_tag` defaults to the native `_cmn` table (E589). `0x5333e3` stays a per-element hook. Do not wire P2
   frame/global sites without the `ctrl_slot` + callee-body check; a last reference with a missing
   destroy/free contract must report `ok == false`.
 - **`0x15ff060..0x15ff0a0`** is an eight-slot `.data.rel.ro` pointer slice, not a vtable and not an

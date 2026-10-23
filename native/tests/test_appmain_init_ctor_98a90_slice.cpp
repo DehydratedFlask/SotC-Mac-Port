@@ -24,6 +24,7 @@
 #include "core/vslot_40_533100_join.hpp"
 #include "core/vslot_40_533100_miss.hpp"
 #include "core/vslot_40_533100_post.hpp"
+#include "core/platform_tag_147e20.hpp"
 #include "core/vslot_40_533100_shadow_attach.hpp"
 #include "core/vslot_40_533100_shadowmodels.hpp"
 #include "core/vslot_40_533100_shadowskels.hpp"
@@ -576,7 +577,7 @@ std::uint32_t hook_key_platform_tag(std::uint32_t fourcc) {
     } else {
         CHECK(false);
     }
-    return 0x11223344u;
+    return platform_tag_147e20_default(fourcc);
 }
 void hook_key_destroy(void* p, int) { std::free(p); }
 void hook_key_free_control(void* p) { std::free(p); }
@@ -1698,7 +1699,7 @@ int main() {
     CHECK(r.vslot_40_shadow_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_shadow_attach.key_size == 31);
     CHECK(r.vslot_40_shadow_attach.key_capacity == 31);
-    CHECK(r.vslot_40_shadow_attach.key_hash == 0xf06f4388u);
+    CHECK(r.vslot_40_shadow_attach.key_hash == 0x2128cdb9u);
     CHECK(g_v40_14ccc0 == 1);  // release loaded after install
     // E428: shadowskels load-attempt (notify + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowskels.ok);
@@ -1719,7 +1720,7 @@ int main() {
     CHECK(r.vslot_40_skels_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_skels_attach.key_size == 30);
     CHECK(r.vslot_40_skels_attach.key_capacity == 31);
-    CHECK(r.vslot_40_skels_attach.key_hash == 0xa9da51cau);
+    CHECK(r.vslot_40_skels_attach.key_hash == 0xecf0a769u);
     CHECK(g_v40_skels_14ccc0 == 1);
     // E430: shadowanims load-attempt (notify f08+0x10 + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowanims.ok);
@@ -1740,7 +1741,7 @@ int main() {
     CHECK(r.vslot_40_anims_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_anims_attach.key_size == 30);
     CHECK(r.vslot_40_anims_attach.key_capacity == 31);
-    CHECK(r.vslot_40_anims_attach.key_hash == 0x422fd4f0u);
+    CHECK(r.vslot_40_anims_attach.key_hash == 0x2b44f9dbu);
     CHECK(g_v40_anims_14ccc0 == 1);
     // E432: shadowbanks load-attempt (notify f08+0x20 + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowbanks.ok);
@@ -1761,7 +1762,7 @@ int main() {
     CHECK(r.vslot_40_banks_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_banks_attach.key_size == 36);
     CHECK(r.vslot_40_banks_attach.key_capacity == 39);
-    CHECK(r.vslot_40_banks_attach.key_hash == 0xfa3528fdu);
+    CHECK(r.vslot_40_banks_attach.key_hash == 0x3b87dd56u);
     CHECK(g_v40_banks_14ccc0 == 1);
     // E434: shadowstreams load-attempt (notify f08+0x40 + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowstreams.ok);
@@ -1782,7 +1783,7 @@ int main() {
     CHECK(r.vslot_40_streams_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_streams_attach.key_size == 38);
     CHECK(r.vslot_40_streams_attach.key_capacity == 39);
-    CHECK(r.vslot_40_streams_attach.key_hash == 0x3dbbf35bu);
+    CHECK(r.vslot_40_streams_attach.key_hash == 0xf2163cc4u);
     CHECK(g_v40_streams_14ccc0 == 1);
     // E436: shadowrandomevents load-attempt (notify f08+0x50 + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowrandomevents.ok);
@@ -1803,7 +1804,7 @@ int main() {
     CHECK(r.vslot_40_randomevents_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_randomevents_attach.key_size == 43);
     CHECK(r.vslot_40_randomevents_attach.key_capacity == 43);
-    CHECK(r.vslot_40_randomevents_attach.key_hash == 0x8a2bd936u);
+    CHECK(r.vslot_40_randomevents_attach.key_hash == 0x94a8da3fu);
     CHECK(g_v40_rand_14ccc0 == 1);
     // E438: shadowbossmusic load-attempt (notify f08+0x60 + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowbossmusic.ok);
@@ -1824,7 +1825,7 @@ int main() {
     CHECK(r.vslot_40_bossmusic_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_bossmusic_attach.key_size == 40);
     CHECK(r.vslot_40_bossmusic_attach.key_capacity == 43);
-    CHECK(r.vslot_40_bossmusic_attach.key_hash == 0x59363638u);
+    CHECK(r.vslot_40_bossmusic_attach.key_hash == 0xbfa276e7u);
     CHECK(g_v40_boss_14ccc0 == 1);
     // E440: cp3Characters load-attempt (notify f08+0x70 + path + vcall; no 14ccb0)
     CHECK(r.vslot_40_cp3characters.ok);
@@ -1843,7 +1844,7 @@ int main() {
     CHECK(r.vslot_40_cp3characters_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_cp3characters_attach.key_size == 43);
     CHECK(r.vslot_40_cp3characters_attach.key_capacity == 43);
-    CHECK(r.vslot_40_cp3characters_attach.key_hash == 0xe6070645u);
+    CHECK(r.vslot_40_cp3characters_attach.key_hash == 0x99117412u);
     CHECK(g_v40_cp3_14ccc0 == 1);
     // E442: cp3shadowprecache load-attempt (notify self+0x3cb8 + path + vcall; no 14ccb0)
     CHECK(r.vslot_40_cp3shadowprecache.ok);
@@ -1862,7 +1863,7 @@ int main() {
     CHECK(r.vslot_40_cp3shadowprecache_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_cp3shadowprecache_attach.key_size == 39);
     CHECK(r.vslot_40_cp3shadowprecache_attach.key_capacity == 39);
-    CHECK(r.vslot_40_cp3shadowprecache_attach.key_hash == 0x939f143bu);
+    CHECK(r.vslot_40_cp3shadowprecache_attach.key_hash == 0x13a0d114u);
     CHECK(g_v40_csp_14ccc0 == 1);
     // All nine 0x14c2f0 keys: one tag-0 buffer + one tag-1 control each, all released.
     CHECK(g_key_alloc_tag0 == 9);
@@ -1899,7 +1900,7 @@ int main() {
         CHECK(mr.dtor_f590_count == 1);
         CHECK(mr.key_size == 31);
         CHECK(mr.key_capacity == 31);
-        CHECK(mr.key_hash == 0xf06f4388u);
+        CHECK(mr.key_hash == 0x2128cdb9u);
         CHECK(g_key_platform_tag_calls == 1);
         CHECK(g_key_platform_tag_crmp == 1);
         CHECK(g_key_last_buffer != nullptr);
