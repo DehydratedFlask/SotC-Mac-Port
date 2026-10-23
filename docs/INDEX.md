@@ -236,3 +236,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Init continue batch F (2026-10-23)](checkpoints/2026-10-23-init-531d60-continue-batch-f.md) | Alternate path 327 B / 70 units + failure exit; coverage 98.23%; E544 |
 | [Native 0x1290 in the slice (2026-10-23)](checkpoints/2026-10-22-init-1290-native-lift.md) | Slice executes the lifted 0x1290 with both inserts; E545 |
 | [Init entry gaps (2026-10-23)](checkpoints/2026-10-23-init-entry-gaps.md) | Four remaining spans; Init byte coverage 100% of the window; E546 |
+| [Stat query 0x54b250 native (2026-10-23)](checkpoints/2026-10-23-stat-query-54b250-native.md) | 119 B wrapper over `StatsEngine` contract; no-op slot elided; E547 |

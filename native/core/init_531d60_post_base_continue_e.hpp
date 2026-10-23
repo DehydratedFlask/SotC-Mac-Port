@@ -40,6 +40,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "stat_query_54b250.hpp"
+
 namespace sotc {
 
 inline constexpr std::uint64_t kInit531d60PostBaseContinueERva = 0x5329ae;
@@ -225,6 +227,9 @@ struct Init531d60PostBaseContinueEHooks {
     // 0x2eff450 cell content stand-in (host-supplied object pointer).
     // null => deref skipped, rdi=null, the rest still counted.
     void* const* cell_2eff450 = nullptr;
+    // E547: when set, the 0x54b250 dispatch executes the lifted wrapper body with
+    // (this = *cell_2eff450, 0, 2) instead of calling the raw hook.
+    const StatsEngine54b250* stat_engine = nullptr;
 };
 
 struct Init531d60PostBaseContinueEResult {
@@ -250,6 +255,10 @@ struct Init531d60PostBaseContinueEResult {
 
     // Pinned end address (constant, not measured control flow).
     std::uint64_t end_rva = kInit531d60PostBaseContinueEEndRva;
+
+    // E547: lifted 0x54b250 wrapper result (only when stat_engine was supplied).
+    bool stat_query_ran = false;
+    StatQuery54b250Result stat_query{};
 };
 
 // Runs the OBS `0x5329ae..0x532b0c` unit sequence: the branch-target block
