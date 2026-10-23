@@ -1,16 +1,17 @@
 # SoC Mac Native — current handoff
 
 Updated: 2026-10-23 (America/Chicago). Integrator: OpenCode orchestrator (goal resumed by explicit
-user command). Branch `cursor/init-hash-551140-9dfc`; published tip `2e4dfc1`.
+user command). Branch `cursor/init-hash-551140-9dfc`; round-24 tip is the commit that carries this
+file (previous published tip `31687a3`).
 Older rounds, the history-rewrite record and the full pre-tidy handoff are archived verbatim in
 [docs/checkpoints/HANDOFF-archive-2026-10-23.md](docs/checkpoints/HANDOFF-archive-2026-10-23.md).
 The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **339/339** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **419 passed / 20 skipped (need a build dir) / 0 failed**
-  (`tools/lift/run_all_checkers.sh`).
+- Full native suite: **345/345** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **442 passed / 0 skipped / 0 failed** with
+  `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init `0x531d60..0x532b0c`: 100% of bytes claimed by native modules
   (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed bytes are not
   semantics** — most of it is call-site pinning with callee hooks.
@@ -74,6 +75,33 @@ The rounds that follow the archive are in chronological order.
   targets a state not yet located. Headers updated to say that instead of "unknown".
 - Next exact action: identify the owner of the `0x15ff060..0x15ff0a0` table, which is what constructs
   `0x2ee68c8`.
+## 2026-10-23 Orchestrator round 24 — app-info registry path (E562–E567)
+
+- Agent: integrator plus six workers (three static-RE, one integration, one f590 census, one f590
+  wiring).
+- **E562** — the `0x15ff060..0x15ff0a0` window is eight `R_X86_64_RELATIVE` slots in `.data.rel.ro`,
+  not a vtable: the base is never taken, nothing writes it, slots 6/7 are data. `0x2569d0` is a
+  consumer; it constructs the registry and registers slot 4 (`0x25a4d0`) as a list-3 delegate.
+- **E563** — `0x25a4d0` is 1014 B (`12a2d0d7…`): four product entries (Build Version, Platform Type,
+  Is Debug Memory Available, Camera Location), all flag 1. `"Game"` is a separate 139 B writer
+  `0xb10`. E561's `"ps4 - STA"` and functor claims are corrected; platform is `ps4 - STANDARD`, the
+  debug predicate is always false. Byte check also corrects list-3 dispatch to **FIFO**.
+- **E564** — native registry path landed: `app_info_registry`, `app_info_install`, `registry_owner`
+  (FIFO list-3 dispatch; identity-only `fn!=0` nodes are skipped, never executed) and
+  `container_dtor_1bede0` (208 B `632451ff…`, list-C vtable slot 3 = `0x19f0` bare ret). Four new
+  fixtures plus `check_fapp_info_install.py` and `check_fcontainer_dtor_1bede0.py`.
+- **E565** — 10,168 direct `0xf590` sites classified by holder; the 17 Init hooks are all zeroed
+  32 B temporaries, so the real release is an exact no-op there. All 17 modules now call
+  `shared_release_f590` with a holder and assert `had_control == false`; mutation removing one lift
+  fails the slice test.
+- **E566** — preserved parallel-foundations commit `a49fd2a` integrated: exclusive save temp,
+  `shared_str_release_f590`, rackquery CFG tool + 20 tests, `check_ff590.py`.
+- **E567** — `0x2569d0` mapped: 12,621 B (`4ce6b5d8…`), verified `sub rsp,0x1118`, 87 reachable
+  blocks, 369 calls. Its registry block `0x256f98..0x257021` is modelled by `registry_slot`
+  (construct replacement → tear down previous → replace); the four callback installs and ordering
+  are recorded.
+- Verification: **345/345 ctest**, sweep **442/0/0**, publish and attribution audits exit 0.
+
 ## Settled decisions (do not re-ask)
 
 - `StartupState` RAII ownership for the slot-10 mutex — implemented.
@@ -81,27 +109,36 @@ The rounds that follow the archive are in chronological order.
 - Offline analysis of the local `eboot.bin` is allowed; no original/Sony executable may ship or run.
 - The shared descriptor helper models the 34-slot family; slots 24–47 remain in a test-only ahead
   table outside `recovered_constructors()` until production reaches and resolves slot 23.
+- Native app-info entries are **borrowed string views** (`control == nullptr`) by default; callers
+  keep the text alive for the registry's lifetime. This is a stated native contract, not a claim
+  that the original never owns formatted values.
+- The native list-3 dispatcher never calls an original RVA: native delegates are tagged `fn == 0`;
+  nodes with non-zero `fn` (the identity-only `0x1290` handlers) are counted and skipped.
 
 ## Next exact work
 
-1. Identify the owner of the `0x15ff060..0x15ff0a0` function-pointer table — the object that
-   constructs `0x2ee68c8` (E561). The app-info registry cannot run natively until its container
-   exists.
-2. Lift `0x2569d0` (owner installer, 0x1118-byte frame) once its frame layout is mapped, so the
-   `0x2ee68c8` / `0x2dfcbc8` singletons exist natively.
-3. Wire `shared_release_f590` into the modules still taking `call_f590` hooks — their signatures
-   need a holder parameter before they can call the lifted release.
-4. `0xa56560` (stat engine) and `0xa54920` (ConVar registrar) remain contracts; do not claim them.
-5. Round end: fresh build, full `ctest`, `tools/lift/run_all_checkers.sh`,
-   `python3 -I scripts/audit_publish_paths.py --all`,
+1. Continue the `0x2569d0` lift beyond the registry block: model the 19 constructor rows, the
+   `[this+0x48]` / `[this+0x58]` call bodies (`0xb111e0`/`0xb11210`), the mode/gate dispatch and the
+   `0xac5260` property table as data. The registry slot, container ctor/dtor and list-3 insert are
+   already native (E564/E567).
+2. Resolve the list-A reader and dispatch timing (E563 unresolved 1–2): no read path for the
+   app-info entries has been found, and a second `0x1bdf30` dispatch would duplicate all entries.
+3. Make the camera value native: characterize `0x1c70b0`/`0x1c0f40`/`0x216480`/`0x50ba0` and the
+   `[owner+0x2668]` handle, then replace the host-supplied `camera_location` text.
+4. Convert the 8,194 P2 `0xf590` frame/global sites only after the `ctrl_slot` + callee-body check
+   from E565; the 17 P1 modules are done.
+5. `0xa56560` (stat engine) and `0xa54920` (ConVar registrar) remain contracts; do not claim them.
+6. Round end: fresh build, full `ctest`, `SOTC_NATIVE_BUILD=local/build/orch-r22
+   tools/lift/run_all_checkers.sh`, `python3 -I scripts/audit_publish_paths.py --all`,
    `python3 -I scripts/check_commit_attribution.py`.
 
 ## Parallel-agent state
 
-- No workers are running; all four stale worktrees were removed after their work was pushed.
-- Preserved but **not integrated**: `origin/cursor/parallel-foundations-86ac55b` and
-  `origin/cursor/parallel-foundations-wip-20261023` (shared_str_release_f590, save_stream, aud02
-  rackquery scripts, check_ff590).
+- No workers are running. The preserved `origin/cursor/parallel-foundations-wip-20261023` content
+  (shared_str_release_f590, save_stream exclusive temp, aud02 rackquery scripts, check_ff590) is now
+  **integrated** (E566); `origin/cursor/parallel-foundations-86ac55b` was its base.
+- Round 24 used six workers on disjoint files: table owner, installer semantics, 0x2569d0 mapping,
+  f590 census, f590 wiring, and the wip integration. No worker touched `HANDOFF.md` or committed.
 - `local/build/native` is pinned by several checkers and is stale (313 tests); keep it.
   `local/build/orch-r22` is the current full-suite tree.
 - The persistent Ghidra project `local/ghidra/persistent-20261020` must never be re-imported or
@@ -112,5 +149,9 @@ The rounds that follow the archive are in chronological order.
 - Family manifest: `local/re/work/ctor-classes.json` (per-slot span, digest, calls, class).
 - Consumer packet: `local/re/evidence/cpu01-ctor10-descriptor-consumer-01/`
   (`report.md`, `verify.py`, `verification.json` 45/45, `ghidra-*.txt`, `SHA256SUMS`).
+- Round-24 evidence: `local/re/evidence/appinfo-table-owner-15ff060/`,
+  `local/re/evidence/appinfo-installer-25a4d0/`, `local/re/evidence/owner-installer-2569d0/`,
+  `local/re/evidence/f590-callsite-holders/`, `local/re/evidence/f590-wiring/`,
+  `local/re/evidence/parallel-foundations-integration/`.
 - Reopen log: `local/checkpoints/root-20261020-reopen-console.log`.
 

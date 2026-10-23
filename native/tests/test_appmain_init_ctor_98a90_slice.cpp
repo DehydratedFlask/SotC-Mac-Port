@@ -72,6 +72,7 @@
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
+#include "core/shared_release_f590.hpp"
 #include "core/store_tsc_323d0.hpp"
 #include "core/vslot_30_534130.hpp"
 
@@ -544,11 +545,61 @@ void hook_post_base_7f7220() { ++g_post_base_7f7220; }
 void hook_post_base_56fad0() { ++g_post_base_56fad0; }
 void hook_post_base_f90310() { ++g_post_base_f90310; }
 void hook_post_base_26800() { ++g_post_base_26800; }
-void hook_post_base_f590() { ++g_post_base_f590; }
+
+// The 17 Init `0xf590` sites each construct a 32 B `{ptr,len,0,0}` stack temporary whose
+// `+0x18` (control) word is zero, and the preceding callees (0x26800 / 0xa2ed00) only read
+// that word. The real lift is therefore an exact no-op; the overrides below stand in for a
+// host that supplies its own release contract.
+void check_f590_release_noop(const SharedReleaseF590Result& rel) {
+    CHECK(rel.ok);
+    CHECK(!rel.had_control);
+    CHECK(!rel.decremented);
+    CHECK(!rel.was_last);
+    CHECK(!rel.destroyed);
+    CHECK(!rel.freed);
+    CHECK(rel.previous == 0);
+}
+
+// Host override: checks the module built the measured zeroed holder, then returns a result
+// only an override can produce (a zeroed holder can never report a control block).
+SharedReleaseF590Result f590_override(SharedHolderF590& holder) {
+    CHECK(holder.object == nullptr);
+    CHECK(holder.reserved_08 == nullptr);
+    CHECK(holder.reserved_10 == nullptr);
+    CHECK(holder.control == nullptr);
+    SharedReleaseF590Result rel{};
+    rel.ok = true;
+    rel.had_control = true;
+    rel.decremented = true;
+    rel.was_last = true;
+    rel.previous = 1;
+    rel.destroyed = true;
+    rel.freed = true;
+    return rel;
+}
+
+// A single-site 0xf590 module with default hooks: one call counted, real lift a no-op.
+template <typename Result>
+void check_init_f590_defaults(const Result& r) {
+    CHECK(r.ok);
+    CHECK(r.call_f590_count == 1);
+    check_f590_release_noop(r.release);
+}
+
+SharedReleaseF590Result hook_post_base_f590(SharedHolderF590& holder) {
+    ++g_post_base_f590;
+    return f590_override(holder);
+}
 void hook_post_base_sbj_26800() { ++g_post_base_sbj_26800; }
-void hook_post_base_sbj_f590() { ++g_post_base_sbj_f590; }
+SharedReleaseF590Result hook_post_base_sbj_f590(SharedHolderF590& holder) {
+    ++g_post_base_sbj_f590;
+    return f590_override(holder);
+}
 void hook_post_base_sboj_26800() { ++g_post_base_sboj_26800; }
-void hook_post_base_sboj_f590() { ++g_post_base_sboj_f590; }
+SharedReleaseF590Result hook_post_base_sboj_f590(SharedHolderF590& holder) {
+    ++g_post_base_sboj_f590;
+    return f590_override(holder);
+}
 void hook_post_base_52eb50() { ++g_post_base_52eb50; }
 void hook_post_base_532ca0() { ++g_post_base_532ca0; }
 void hook_post_base_vcall18() { ++g_post_base_vcall18; }
@@ -572,25 +623,67 @@ void hook_post_base_vcall38() { ++g_post_base_vcall38; }
 void hook_post_base_a2caf0() { ++g_post_base_a2caf0; }
 void hook_post_base_a2ed00() { ++g_post_base_a2ed00; }
 void hook_post_base_a2ed00_u2() { ++g_post_base_a2ed00_u2; }
-void hook_post_base_f590_a2ed00() { ++g_post_base_f590_a2ed00; }
-void hook_post_base_f590_a2ed00_u2() { ++g_post_base_f590_a2ed00_u2; }
-void hook_post_base_f590_a2ed00_u3() { ++g_post_base_f590_a2ed00_u3; }
-void hook_post_base_f590_a2ed00_u4() { ++g_post_base_f590_a2ed00_u4; }
+SharedReleaseF590Result hook_post_base_f590_a2ed00(SharedHolderF590& holder) {
+    ++g_post_base_f590_a2ed00;
+    return f590_override(holder);
+}
+SharedReleaseF590Result hook_post_base_f590_a2ed00_u2(SharedHolderF590& holder) {
+    ++g_post_base_f590_a2ed00_u2;
+    return f590_override(holder);
+}
+SharedReleaseF590Result hook_post_base_f590_a2ed00_u3(SharedHolderF590& holder) {
+    ++g_post_base_f590_a2ed00_u3;
+    return f590_override(holder);
+}
+SharedReleaseF590Result hook_post_base_f590_a2ed00_u4(SharedHolderF590& holder) {
+    ++g_post_base_f590_a2ed00_u4;
+    return f590_override(holder);
+}
 void hook_post_base_a2ed00_u3() { ++g_post_base_a2ed00_u3; }
-void hook_post_base_f590_a2ed00_u5() { ++g_post_base_f590_a2ed00_u5; }
-void hook_post_base_f590_a2ed00_u6() { ++g_post_base_f590_a2ed00_u6; }
+SharedReleaseF590Result hook_post_base_f590_a2ed00_u5(SharedHolderF590& holder) {
+    ++g_post_base_f590_a2ed00_u5;
+    return f590_override(holder);
+}
+SharedReleaseF590Result hook_post_base_f590_a2ed00_u6(SharedHolderF590& holder) {
+    ++g_post_base_f590_a2ed00_u6;
+    return f590_override(holder);
+}
 void hook_post_base_a2ed00_u4() { ++g_post_base_a2ed00_u4; }
-void hook_post_base_f590_a2ed00_u7() { ++g_post_base_f590_a2ed00_u7; }
-void hook_post_base_f590_a2ed00_u8() { ++g_post_base_f590_a2ed00_u8; }
+SharedReleaseF590Result hook_post_base_f590_a2ed00_u7(SharedHolderF590& holder) {
+    ++g_post_base_f590_a2ed00_u7;
+    return f590_override(holder);
+}
+SharedReleaseF590Result hook_post_base_f590_a2ed00_u8(SharedHolderF590& holder) {
+    ++g_post_base_f590_a2ed00_u8;
+    return f590_override(holder);
+}
 void hook_post_base_a2ed00_u5() { ++g_post_base_a2ed00_u5; }
-void hook_post_base_f590_a2ed00_u9() { ++g_post_base_f590_a2ed00_u9; }
-void hook_post_base_f590_a2ed00_u10() { ++g_post_base_f590_a2ed00_u10; }
+SharedReleaseF590Result hook_post_base_f590_a2ed00_u9(SharedHolderF590& holder) {
+    ++g_post_base_f590_a2ed00_u9;
+    return f590_override(holder);
+}
+SharedReleaseF590Result hook_post_base_f590_a2ed00_u10(SharedHolderF590& holder) {
+    ++g_post_base_f590_a2ed00_u10;
+    return f590_override(holder);
+}
 void hook_post_base_a2ed00_u6() { ++g_post_base_a2ed00_u6; }
-void hook_post_base_f590_a2ed00_u11() { ++g_post_base_f590_a2ed00_u11; }
-void hook_post_base_f590_a2ed00_u12() { ++g_post_base_f590_a2ed00_u12; }
+SharedReleaseF590Result hook_post_base_f590_a2ed00_u11(SharedHolderF590& holder) {
+    ++g_post_base_f590_a2ed00_u11;
+    return f590_override(holder);
+}
+SharedReleaseF590Result hook_post_base_f590_a2ed00_u12(SharedHolderF590& holder) {
+    ++g_post_base_f590_a2ed00_u12;
+    return f590_override(holder);
+}
 void hook_post_base_a2ed00_u7() { ++g_post_base_a2ed00_u7; }
-void hook_post_base_f590_a2ed00_u13() { ++g_post_base_f590_a2ed00_u13; }
-void hook_cont_a_f590() { ++g_cont_a_f590; }
+SharedReleaseF590Result hook_post_base_f590_a2ed00_u13(SharedHolderF590& holder) {
+    ++g_post_base_f590_a2ed00_u13;
+    return f590_override(holder);
+}
+SharedReleaseF590Result hook_cont_a_f590(SharedHolderF590& holder) {
+    ++g_cont_a_f590;
+    return f590_override(holder);
+}
 int hook_cont_a_a2ea00(void* rbx) {
     ++g_cont_a_a2ea00;
     g_cont_a_a2ea00_rbx = rbx;
@@ -1711,24 +1804,39 @@ int main() {
     CHECK(r.post_base_ymm_reload.ok);
     CHECK(r.post_base_ymm_reload.store_count == 1);
     CHECK(std::memcmp(g_ymm_reload_dst433c, g_ymm_reload_src430c, 0x30) == 0);
+    // E490..E508: the 17 Init 0xf590 sites now go through the shared release contract.
+    // `f590_override` returns a result only a host override can produce, so `had_control`
+    // proves the module called the override and stored its result.
+    const auto check_f590_override = [](const SharedReleaseF590Result& rel) {
+        CHECK(rel.ok);
+        CHECK(rel.had_control);
+        CHECK(rel.decremented);
+        CHECK(rel.was_last);
+        CHECK(rel.destroyed);
+        CHECK(rel.freed);
+        CHECK(rel.previous == 1);
+    };
     // E461: Init continue 0x26800/0xf590 call-sites (bodies NOT modelled)
     CHECK(r.post_base_26800_f590.ok);
     CHECK(g_post_base_26800 == 1);
     CHECK(g_post_base_f590 == 1);
     CHECK(r.post_base_26800_f590.call_26800_count == 1);
     CHECK(r.post_base_26800_f590.call_f590_count == 1);
+    check_f590_override(r.post_base_26800_f590.release);
     // E462: Init continue Shadow Boss Jump call-sites (bodies NOT modelled)
     CHECK(r.post_base_sbj.ok);
     CHECK(g_post_base_sbj_26800 == 1);
     CHECK(g_post_base_sbj_f590 == 1);
     CHECK(r.post_base_sbj.call_26800_count == 1);
     CHECK(r.post_base_sbj.call_f590_count == 1);
+    check_f590_override(r.post_base_sbj.release);
     // E463: Init continue Outro Jump call-sites (bodies / 0x52eb50 NOT modelled)
     CHECK(r.post_base_sboj.ok);
     CHECK(g_post_base_sboj_26800 == 1);
     CHECK(g_post_base_sboj_f590 == 1);
     CHECK(r.post_base_sboj.call_26800_count == 1);
     CHECK(r.post_base_sboj.call_f590_count == 1);
+    check_f590_override(r.post_base_sboj.release);
     // E464: Init continue 0x52eb50 call-site (trampoline body NOT modelled)
     CHECK(r.post_base_52eb50.ok);
     CHECK(g_post_base_52eb50 == 1);
@@ -1845,10 +1953,12 @@ int main() {
     CHECK(r.post_base_f590_a2ed00.ok);
     CHECK(g_post_base_f590_a2ed00 == 1);
     CHECK(r.post_base_f590_a2ed00.call_f590_count == 1);
+    check_f590_override(r.post_base_f590_a2ed00.release);
     // E491: Init continue second post-a2ed00 0xf590 call-site (mov-rdi prep / body NOT modelled)
     CHECK(r.post_base_f590_a2ed00_u2.ok);
     CHECK(g_post_base_f590_a2ed00_u2 == 1);
     CHECK(r.post_base_f590_a2ed00_u2.call_f590_count == 1);
+    check_f590_override(r.post_base_f590_a2ed00_u2.release);
     // E492: Init continue second 0xa2ed00 call-site (stack prep / body NOT modelled)
     CHECK(r.post_base_a2ed00_u2.ok);
     CHECK(g_post_base_a2ed00_u2 == 1);
@@ -1857,10 +1967,12 @@ int main() {
     CHECK(r.post_base_f590_a2ed00_u3.ok);
     CHECK(g_post_base_f590_a2ed00_u3 == 1);
     CHECK(r.post_base_f590_a2ed00_u3.call_f590_count == 1);
+    check_f590_override(r.post_base_f590_a2ed00_u3.release);
     // E494: Init continue second post-a2ed00-u2 0xf590 call-site (mov-rdi prep / body NOT modelled)
     CHECK(r.post_base_f590_a2ed00_u4.ok);
     CHECK(g_post_base_f590_a2ed00_u4 == 1);
     CHECK(r.post_base_f590_a2ed00_u4.call_f590_count == 1);
+    check_f590_override(r.post_base_f590_a2ed00_u4.release);
     // E495: Init continue third 0xa2ed00 call-site (stack prep / body NOT modelled)
     CHECK(r.post_base_a2ed00_u3.ok);
     CHECK(g_post_base_a2ed00_u3 == 1);
@@ -1869,10 +1981,12 @@ int main() {
     CHECK(r.post_base_f590_a2ed00_u5.ok);
     CHECK(g_post_base_f590_a2ed00_u5 == 1);
     CHECK(r.post_base_f590_a2ed00_u5.call_f590_count == 1);
+    check_f590_override(r.post_base_f590_a2ed00_u5.release);
     // E497: Init continue second post-a2ed00-u3 0xf590 call-site (mov-rdi prep / body NOT modelled)
     CHECK(r.post_base_f590_a2ed00_u6.ok);
     CHECK(g_post_base_f590_a2ed00_u6 == 1);
     CHECK(r.post_base_f590_a2ed00_u6.call_f590_count == 1);
+    check_f590_override(r.post_base_f590_a2ed00_u6.release);
     // E498: Init continue fourth 0xa2ed00 call-site (stack prep / body NOT modelled)
     CHECK(r.post_base_a2ed00_u4.ok);
     CHECK(g_post_base_a2ed00_u4 == 1);
@@ -1881,10 +1995,12 @@ int main() {
     CHECK(r.post_base_f590_a2ed00_u7.ok);
     CHECK(g_post_base_f590_a2ed00_u7 == 1);
     CHECK(r.post_base_f590_a2ed00_u7.call_f590_count == 1);
+    check_f590_override(r.post_base_f590_a2ed00_u7.release);
     // E500: Init continue second post-a2ed00-u4 0xf590 call-site (mov-rdi prep / body NOT modelled)
     CHECK(r.post_base_f590_a2ed00_u8.ok);
     CHECK(g_post_base_f590_a2ed00_u8 == 1);
     CHECK(r.post_base_f590_a2ed00_u8.call_f590_count == 1);
+    check_f590_override(r.post_base_f590_a2ed00_u8.release);
     // E501: Init continue fifth 0xa2ed00 call-site (stack prep / body NOT modelled)
     CHECK(r.post_base_a2ed00_u5.ok);
     CHECK(g_post_base_a2ed00_u5 == 1);
@@ -1893,10 +2009,12 @@ int main() {
     CHECK(r.post_base_f590_a2ed00_u9.ok);
     CHECK(g_post_base_f590_a2ed00_u9 == 1);
     CHECK(r.post_base_f590_a2ed00_u9.call_f590_count == 1);
+    check_f590_override(r.post_base_f590_a2ed00_u9.release);
     // E503: Init continue second post-a2ed00-u5 0xf590 call-site (mov-rdi prep / body NOT modelled)
     CHECK(r.post_base_f590_a2ed00_u10.ok);
     CHECK(g_post_base_f590_a2ed00_u10 == 1);
     CHECK(r.post_base_f590_a2ed00_u10.call_f590_count == 1);
+    check_f590_override(r.post_base_f590_a2ed00_u10.release);
     // E504: Init continue sixth 0xa2ed00 call-site (stack prep / body NOT modelled)
     CHECK(r.post_base_a2ed00_u6.ok);
     CHECK(g_post_base_a2ed00_u6 == 1);
@@ -1905,10 +2023,12 @@ int main() {
     CHECK(r.post_base_f590_a2ed00_u11.ok);
     CHECK(g_post_base_f590_a2ed00_u11 == 1);
     CHECK(r.post_base_f590_a2ed00_u11.call_f590_count == 1);
+    check_f590_override(r.post_base_f590_a2ed00_u11.release);
     // E506: Init continue second post-a2ed00-u6 0xf590 call-site (mov-rdi prep / body NOT modelled)
     CHECK(r.post_base_f590_a2ed00_u12.ok);
     CHECK(g_post_base_f590_a2ed00_u12 == 1);
     CHECK(r.post_base_f590_a2ed00_u12.call_f590_count == 1);
+    check_f590_override(r.post_base_f590_a2ed00_u12.release);
     // E507: Init continue seventh 0xa2ed00 call-site (stack prep / body NOT modelled)
     CHECK(r.post_base_a2ed00_u7.ok);
     CHECK(g_post_base_a2ed00_u7 == 1);
@@ -1917,6 +2037,7 @@ int main() {
     CHECK(r.post_base_f590_a2ed00_u13.ok);
     CHECK(g_post_base_f590_a2ed00_u13 == 1);
     CHECK(r.post_base_f590_a2ed00_u13.call_f590_count == 1);
+    check_f590_override(r.post_base_f590_a2ed00_u13.release);
     // E509: grouped Init continue 0x532720..0x53277f — 22 units, 5 call sites,
     // 4 lea pins, 5 host reads; je target pinned but outcome NOT modelled.
     CHECK(r.post_base_continue_a.ok);
@@ -1937,6 +2058,7 @@ int main() {
     CHECK(r.post_base_continue_a.end_rva == 0x53277f);
     CHECK(r.post_base_continue_a.branch_target_rva == 0x5327bd);
     CHECK(g_cont_a_f590 == 1);
+    check_f590_override(r.post_base_continue_a.release);
     CHECK(g_cont_a_a2ea00 == 1);
     CHECK(g_cont_a_a2ea00_rbx == g_cont_a_obj);  // [r13] pointer
     CHECK(g_cont_a_a2e5d0 == 1);
@@ -1950,6 +2072,31 @@ int main() {
     CHECK(g_cont_a_1fc80 == 1);
     CHECK(g_cont_a_1fc80_rsi_rva == 0x1014d69);  // pinned data RVA
     CHECK(static_cast<std::uint8_t*>(g_cont_a_1fc80_rdi) == g_cont_a_rsp20_obj + 8);
+
+    // The 17 Init 0xf590 sites with default hooks: the lifted release runs on the measured
+    // zeroed 32 B holder, so each must report an exact no-op and still count one call site.
+    {
+        check_init_f590_defaults(init_531d60_post_base_26800_f590());
+        check_init_f590_defaults(init_531d60_post_base_sbj());
+        check_init_f590_defaults(init_531d60_post_base_sboj());
+        check_init_f590_defaults(init_531d60_post_base_f590_a2ed00());
+        check_init_f590_defaults(init_531d60_post_base_f590_a2ed00_u2());
+        check_init_f590_defaults(init_531d60_post_base_f590_a2ed00_u3());
+        check_init_f590_defaults(init_531d60_post_base_f590_a2ed00_u4());
+        check_init_f590_defaults(init_531d60_post_base_f590_a2ed00_u5());
+        check_init_f590_defaults(init_531d60_post_base_f590_a2ed00_u6());
+        check_init_f590_defaults(init_531d60_post_base_f590_a2ed00_u7());
+        check_init_f590_defaults(init_531d60_post_base_f590_a2ed00_u8());
+        check_init_f590_defaults(init_531d60_post_base_f590_a2ed00_u9());
+        check_init_f590_defaults(init_531d60_post_base_f590_a2ed00_u10());
+        check_init_f590_defaults(init_531d60_post_base_f590_a2ed00_u11());
+        check_init_f590_defaults(init_531d60_post_base_f590_a2ed00_u12());
+        check_init_f590_defaults(init_531d60_post_base_f590_a2ed00_u13());
+        const Init531d60PostBaseContinueAResult cont_a_default{init_531d60_post_base_continue_a()};
+        CHECK(cont_a_default.ok);
+        CHECK(cont_a_default.unit_counts[static_cast<std::size_t>(ContinueAUnit::call_f590)] == 1);
+        check_f590_release_noop(cont_a_default.release);
+    }
     // E510: grouped Init continue B 0x53277f..0x5327b1 — 14 units, 2 call sites,
     // 5 ALU ops, 1 load; je6 target pinned but outcome NOT modelled.
     CHECK(r.post_base_continue_b.ok);

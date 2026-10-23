@@ -54,6 +54,7 @@ add_library(sotc_core STATIC
   core/store_value_clear_flag_158340.cpp
   core/fnv_span_161f80.cpp
   core/hashed_string_14c3a0.cpp
+  core/shared_str_release_f590.cpp
   core/registry_object_14c9a0.cpp
   core/registry_object_2efd160.cpp
   core/registry_sorted_insert.cpp
@@ -70,6 +71,11 @@ add_library(sotc_core STATIC
   core/shared_release_f590.cpp
   core/alloc_wrappers_17070.cpp
   core/insert_1bdb50.cpp
+  core/app_info_registry.cpp
+  core/app_info_install.cpp
+  core/registry_owner.cpp
+  core/container_dtor_1bede0.cpp
+  core/registry_slot.cpp
   core/list_dtor_1bdeb0.cpp
   core/insert_21cd0.cpp
   core/container_1bdb10.cpp
@@ -1644,6 +1650,10 @@ add_executable(test_hashed_string_14c3a0 tests/test_hashed_string_14c3a0.cpp)
 target_link_libraries(test_hashed_string_14c3a0 sotc_core)
 add_test(NAME hashed_string_14c3a0 COMMAND test_hashed_string_14c3a0)
 
+add_executable(test_shared_str_release_f590 tests/test_shared_str_release_f590.cpp)
+target_link_libraries(test_shared_str_release_f590 sotc_core)
+add_test(NAME shared_str_release_f590 COMMAND test_shared_str_release_f590)
+
 add_executable(test_registry_object_14c9a0 tests/test_registry_object_14c9a0.cpp)
 target_link_libraries(test_registry_object_14c9a0 sotc_core)
 add_test(NAME registry_object_14c9a0 COMMAND test_registry_object_14c9a0)
@@ -1727,6 +1737,26 @@ add_test(NAME container_1bdb10 COMMAND test_container_1bdb10)
 add_executable(test_insert_1bdb50 tests/test_insert_1bdb50.cpp)
 target_link_libraries(test_insert_1bdb50 sotc_core)
 add_test(NAME insert_1bdb50 COMMAND test_insert_1bdb50)
+
+add_executable(test_app_info_registry tests/test_app_info_registry.cpp)
+target_link_libraries(test_app_info_registry sotc_core)
+add_test(NAME app_info_registry COMMAND test_app_info_registry)
+
+add_executable(test_app_info_install tests/test_app_info_install.cpp)
+target_link_libraries(test_app_info_install sotc_core)
+add_test(NAME app_info_install COMMAND test_app_info_install)
+
+add_executable(test_registry_owner tests/test_registry_owner.cpp)
+target_link_libraries(test_registry_owner sotc_core)
+add_test(NAME registry_owner COMMAND test_registry_owner)
+
+add_executable(test_container_dtor_1bede0 tests/test_container_dtor_1bede0.cpp)
+target_link_libraries(test_container_dtor_1bede0 sotc_core)
+add_test(NAME container_dtor_1bede0 COMMAND test_container_dtor_1bede0)
+
+add_executable(test_registry_slot tests/test_registry_slot.cpp)
+target_link_libraries(test_registry_slot sotc_core)
+add_test(NAME registry_slot COMMAND test_registry_slot)
 
 add_executable(test_list_dtor_1bdeb0 tests/test_list_dtor_1bdeb0.cpp)
 target_link_libraries(test_list_dtor_1bdeb0 sotc_core)

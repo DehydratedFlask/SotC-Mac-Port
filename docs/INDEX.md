@@ -247,3 +247,10 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Insert 0x1bdb50 native (2026-10-23)](checkpoints/2026-10-23-insert-1bdb50-native.md) | 0x58-node inserter; acquire hand-off; dtor round-trip; E560 |
 | [Registry semantics (2026-10-23)](checkpoints/2026-10-23-registry-semantics-e561.md) | The 0x58 list is an app-info registry; five sites; not the ConVar path; E561 |
 | [HANDOFF archive 2026-10-23](checkpoints/HANDOFF-archive-2026-10-23.md) | Full pre-tidy handoff preserved verbatim; live state is HANDOFF.md |
+| [App-info table owner (2026-10-23)](checkpoints/2026-10-23-appinfo-table-owner.md) | RELRO pointer-slice census; `0x2569d0` consumer; E562 |
+| [App-info installer semantics (2026-10-23)](checkpoints/2026-10-23-appinfo-installer-semantics.md) | `0x25a4d0` entries, E561 amendments, FIFO dispatch; E563 |
+| [App-info registry native (2026-10-23)](checkpoints/2026-10-23-appinfo-registry-native.md) | Native registry, installer, owner dispatch, container dtor; E564 |
+| [0xf590 holder wiring (2026-10-23)](checkpoints/2026-10-23-f590-holder-wiring.md) | 10,168-site census; 17 Init modules wired; E565 |
+| [Parallel-foundations integration (2026-10-23)](checkpoints/2026-10-23-parallel-foundations-integration.md) | Exclusive save temp, shared-string release, rackquery CFG; E566 |
+| [Owner installer 0x2569d0 (2026-10-23)](checkpoints/2026-10-23-owner-installer-2569d0.md) | 12,621 B / 87-block mapping; registry-slot native; E567 |
+| [Round 24 verification (2026-10-23)](checkpoints/2026-10-23-round-24-verification.md) | 345/345 ctest, 442/0/0 sweep, audits, new fixtures/checkers; E568 |

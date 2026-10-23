@@ -55,6 +55,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "shared_release_f590.hpp"
+
 namespace sotc {
 
 inline constexpr std::uint64_t kInit531d60PostBaseContinueARva = 0x532720;
@@ -155,8 +157,14 @@ struct Init531d60PostBaseContinueAHooks {
     // 0x20(%rsp) saved slot read at 0x532765.
     const void* const* rsp20_slot = nullptr;
 
-    // Callee bodies NOT lifted. Null => no-op, counter still advances.
-    void (*call_f590)() = nullptr;  // 0x532723
+    // 0xf590(rdi = &holder) at 0x532723. Original: 32 B stack temp at rsp+0x58 with
+    // `+0x10..0x1f` zeroed, so the release finds no control block and does nothing.
+    // Null => run the lifted release; non-null => host override, whose result is reported instead.
+    SharedReleaseF590Result (*call_f590)(SharedHolderF590&) = nullptr;
+    // 0x12af0 destroy / 0x170b0 free-control contracts; only reached with a non-null `+0x18`.
+    SharedReleaseF590Hooks release_hooks{};
+
+    // Remaining callee bodies NOT lifted. Null => no-op, counter still advances.
     // 0x532731. Return value is a host stand-in for the observed eax only.
     int (*call_a2ea00)(void* rbx) = nullptr;
     // 0x53273b; esi carries the stand-in eax (0 when the a2ea00 hook is null).
@@ -177,6 +185,8 @@ struct Init531d60PostBaseContinueAResult {
     int load_count = 0;          // host-side reads performed (expect 5)
     int alu_count = 0;           // expect 2 (add rsi,0x40 / test rax,rax)
     int branch_boundary_count = 0;  // expect 1 (je pinned, outcome NOT modelled)
+    // Measured 0xf590 effect at 0x532723: holder `+0x18` is zero, so nothing is destroyed/freed.
+    SharedReleaseF590Result release{};
     // Observed plumbing at 0x53275c: ([*0x32f79a8 + 0xf8] + 0x40) when cells set.
     std::uintptr_t rsi_at_0x532760 = 0;
     bool rsi_known = false;

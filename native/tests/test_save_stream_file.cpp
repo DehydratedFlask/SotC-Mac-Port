@@ -95,10 +95,62 @@ void test_overwrite_replaces() {
     CHECK_ERR(sotc::write_file_atomic(path, b).error, SaveStreamError::none);
     CHECK(slurp(path) == b && a != b);
     CHECK(!exists(path + ".tmp"));
-    // A stale temp from an earlier crash is overwritten, not an error.
-    spit(path + ".tmp", B({9, 9, 9}));
+    // A stale temp from an earlier invocation belongs to that invocation.
+    const Bytes stale = B({9, 9, 9});
+    spit(path + ".tmp", stale);
+    const std::size_t before = dir_entries(g_dir);
     CHECK_ERR(sotc::write_file_atomic(path, a).error, SaveStreamError::none);
-    CHECK(slurp(path) == a && !exists(path + ".tmp"));
+    CHECK(slurp(path) == a && slurp(path + ".tmp") == stale);
+    CHECK(dir_entries(g_dir) == before);
+}
+
+void test_stale_temp_alias(bool hardlink, bool aliases_original) {
+    const std::string path = g_dir + "/stale-" + (hardlink ? "hard" : "sym") +
+                             (aliases_original ? "-original.sav" : "-other.sav");
+    const std::string old_inode = path + ".previous";
+    const std::string other = path + ".other";
+    const Bytes original = make_stream(31);
+    const Bytes unrelated = B({0xa1, 0xa2, 0xa3, 0xa4});
+    const Bytes replacement = make_stream(41);
+    spit(path, original);
+    // Keep an independent name for the old save inode to detect pre-rename truncation.
+    CHECK(::link(path.c_str(), old_inode.c_str()) == 0);
+    spit(other, unrelated);
+    const std::string target = aliases_original ? path : other;
+    const std::string stale = path + ".tmp";
+    CHECK((hardlink ? ::link(target.c_str(), stale.c_str()) :
+                      ::symlink(target.c_str(), stale.c_str())) == 0);
+    struct stat before_st {};
+    CHECK(::lstat(stale.c_str(), &before_st) == 0);
+    const std::size_t before_count = dir_entries(g_dir);
+
+    CHECK_ERR(sotc::write_file_atomic(path, replacement).error, SaveStreamError::none);
+    CHECK(slurp(path) == replacement);
+    CHECK(slurp(old_inode) == original);
+    CHECK(slurp(other) == unrelated);
+    struct stat after_st {}, save_st {};
+    CHECK(::lstat(stale.c_str(), &after_st) == 0);
+    CHECK(after_st.st_dev == before_st.st_dev && after_st.st_ino == before_st.st_ino &&
+          after_st.st_mode == before_st.st_mode);
+    CHECK(::lstat(path.c_str(), &save_st) == 0 && S_ISREG(save_st.st_mode));
+    CHECK(dir_entries(g_dir) == before_count);  // invocation temp was renamed away
+    if (hardlink) CHECK(slurp(stale) == (aliases_original ? original : unrelated));
+    else {
+        std::vector<char> link_text(target.size() + 1);
+        CHECK(::readlink(stale.c_str(), link_text.data(), link_text.size()) ==
+              static_cast<ssize_t>(target.size()));
+        CHECK(std::string(link_text.data(), target.size()) == target);
+    }
+}
+
+void test_creation_respects_umask() {
+    const std::string path = g_dir + "/private-mode.sav";
+    const mode_t previous = ::umask(0077);
+    const auto w = sotc::write_file_atomic(path, make_stream(1));
+    ::umask(previous);
+    CHECK_ERR(w.error, SaveStreamError::none);
+    struct stat st {};
+    CHECK(::stat(path.c_str(), &st) == 0 && (st.st_mode & 0777) == 0600);
 }
 
 void test_symlink_destination_replaces_link_not_referent() {
@@ -157,11 +209,17 @@ void test_rename_failure_cleans_up() {
     const std::string dir = g_dir + "/blocker.sav";
     CHECK(::mkdir(dir.c_str(), 0755) == 0);
     spit(dir + "/inner", B({1}));
+    const std::string stale = dir + ".tmp";
+    const std::string unique_stale = dir + ".tmp.left-by-another-writer";
+    const Bytes preserved = B({0x71, 0x72, 0x73});
+    spit(stale, preserved);
+    spit(unique_stale, preserved);
     const std::size_t before = dir_entries(g_dir);
     const auto w = sotc::write_file_atomic(dir, make_stream(1));
     CHECK_ERR(w.error, SaveStreamError::io_rename);
     CHECK(w.os_errno != 0);
-    CHECK(!exists(dir + ".tmp"));
+    CHECK(slurp(stale) == preserved);
+    CHECK(slurp(unique_stale) == preserved);
     CHECK(dir_entries(g_dir) == before);
     CHECK(slurp(dir + "/inner") == B({1}));
 }
@@ -248,8 +306,13 @@ int main() {
     const char* made = ::mkdtemp(tmpl.data());
     CHECK(made != nullptr);
     g_dir = made;
+    test_stale_temp_alias(false, false);
+    test_stale_temp_alias(true, false);
+    test_stale_temp_alias(false, true);
+    test_stale_temp_alias(true, true);
     test_write_read_round_trip();
     test_overwrite_replaces();
+    test_creation_respects_umask();
     test_symlink_destination_replaces_link_not_referent();
     test_symlink_source_read_follows_referent();
     test_empty_and_zero_length();

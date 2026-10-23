@@ -22,6 +22,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "shared_release_f590.hpp"
+
 namespace sotc {
 
 inline constexpr std::uint64_t kInit531d60PostBaseF590A2ed00U8Rva = 0x5325d6;
@@ -32,13 +34,19 @@ inline constexpr std::uint64_t kInit531d60PostBaseF590A2ed00U8PrepRva = 0x5325d3
 inline constexpr std::size_t kInit531d60PostBaseF590A2ed00U8PrepSize = 3;
 
 struct Init531d60PostBaseF590A2ed00U8Hooks {
-    // Models call 0xf590 (callee body NOT lifted). Null → no-op.
-    void (*call_f590)() = nullptr;
+    // 0xf590(rdi = &holder) at 0x5325d6. Original: 32 B stack temp at rsp+0x118, `+0x10..0x1f`
+    // zeroed before the call, so the release finds no control block and does nothing.
+    // Null => run the lifted release; non-null => host override, whose result is reported instead.
+    SharedReleaseF590Result (*call_f590)(SharedHolderF590&) = nullptr;
+    // 0x12af0 destroy / 0x170b0 free-control contracts; only reached with a non-null `+0x18`.
+    SharedReleaseF590Hooks release_hooks{};
 };
 
 struct Init531d60PostBaseF590A2ed00U8Result {
     bool ok = false;
     int call_f590_count = 0;
+    // Measured 0xf590 effect: the holder's `+0x18` is zero, so nothing is destroyed or freed.
+    SharedReleaseF590Result release{};
 };
 
 // Models OBS 0x5325d6..0x5325db on measured Init success path.
