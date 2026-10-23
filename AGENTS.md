@@ -48,7 +48,8 @@
   `{f32 lo,f32 hi,f32 v,u32}`, and 8 keys are inserted twice (the sink must allow duplicates).
   `owner_prop_bag` models the 0x178 B bag with ordered multimaps (E577); the exact RB nodes/fixups
   and trees 0/1 remain contracts. The 20 constructor rows (19 slot rows + 2 self-registered) remain
-  open; the large bodies are blocked subsystems.
+  open as ctor hooks in `owner_members` (the 21-row driver, E579); the large bodies are blocked
+  subsystems.
 - **`0xf590`** is a 73 B shared release. The 17 Init-slice modules and the four provably-zero
   `0x533100` sites (miss `0x5332f4`/`0x533300`, join `0x533399`, tail `0x53404d`; E574) are wired as
   exact inert zero-holder releases. The nine `0x533100` key-holder sites are real releases and need

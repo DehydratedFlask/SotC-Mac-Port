@@ -8,8 +8,8 @@ The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **352/352** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **449 passed / 0 skipped / 0 failed** with
+- Full native suite: **353/353** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **450 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -146,6 +146,10 @@ The rounds that follow the archive are in chronological order.
   drain, list-B release/free/reset. `drain_app_info` is public; `app_info_snapshot` owns the
   composition. The fixture covers order, counts, the flag-0 survivor, deep copy and both failure
   paths. The `snapshotBugData` gate and root adoption remain contracts.
+- **E579** — the 21 `0x2569d0` install rows are now a native driver: 19 slot stores + 2
+  self-registered, the three destroy idioms (virtual dtor, dtor+free, row 7 no replace), row 3/17/18
+  arg dependencies, and visible stops for a missing ctor/allocator/dtor. All 18 non-trivial ctor
+  bodies remain hooks.
 
 ## Settled decisions (do not re-ask)
 

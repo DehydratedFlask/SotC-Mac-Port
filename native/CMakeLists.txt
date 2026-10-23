@@ -83,6 +83,7 @@ add_library(sotc_core STATIC
   core/insert_1bdc80.cpp
   core/owner_properties_2569d0.cpp
   core/owner_prop_bag.cpp
+  core/owner_members.cpp
   core/camera_location_25a4d0.cpp
   core/list_dtor_1bdeb0.cpp
   core/insert_21cd0.cpp
@@ -1789,6 +1790,10 @@ add_test(NAME owner_properties_2569d0 COMMAND test_owner_properties_2569d0)
 add_executable(test_owner_prop_bag tests/test_owner_prop_bag.cpp)
 target_link_libraries(test_owner_prop_bag sotc_core)
 add_test(NAME owner_prop_bag COMMAND test_owner_prop_bag)
+
+add_executable(test_owner_members tests/test_owner_members.cpp)
+target_link_libraries(test_owner_members sotc_core)
+add_test(NAME owner_members COMMAND test_owner_members)
 
 add_executable(test_camera_location_25a4d0 tests/test_camera_location_25a4d0.cpp)
 target_link_libraries(test_camera_location_25a4d0 sotc_core)
