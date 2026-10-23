@@ -6,6 +6,7 @@
 #include <cstring>
 #include <vector>
 
+#include "core/container_1bdb10.hpp"
 #include "core/init_1290.hpp"
 #include "core/insert_21cd0.hpp"
 
@@ -171,10 +172,12 @@ int main() {
     // Real A-insert path: the lifted 0x1beeb0 body executes the 0x20 B copy and list link,
     // so the insert is an executed effect rather than an observed hook.
     {
+        // The container is built by the lifted ctor 0x1bdb10 (E534), not hand-initialised.
         Container1beeb0 cont{};
+        init_container_1bdb10(cont);
         Node1beeb0* const sentinel = reinterpret_cast<Node1beeb0*>(&cont.list3_prev);
-        cont.list3_prev = sentinel;
-        cont.list3_next = sentinel;
+        CHECK(cont.list3_prev == sentinel && cont.list3_next == sentinel);
+        CHECK(cont.count3 == 0);
 
         Init1290Hooks h = full_hooks();
         h.container_a = &cont;
