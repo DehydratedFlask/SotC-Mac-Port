@@ -2,7 +2,7 @@
 
 Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + OpenCode orchestrator round 2.
 Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
-Round-2 through round-12 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
+Round-2 through round-13 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
 
 ## 2026-10-22 Repository history rewrite — Claude attribution + hostname identity
 
@@ -35,6 +35,27 @@ Round-2 through round-12 detail are the sections immediately below; the parallel
   pushing one would reintroduce old trailers. Gate: **G1 still PARTIAL**; nothing about boot/audio/save
   changes.
 - Next exact action: unchanged — next always-on after `0x532720`, or a bounded body lift.
+
+## 2026-10-23 Orchestrator round 13 — insert chain complete (E548–E550)
+
+- Agent: integrator.
+- Tasks: `CPU-01-INSERT-CALLABLE-HELPERS-ANALYSIS-01` (E548),
+  `CPU-01-INSERT-CALLABLE-01` (E549), `CPU-01-INSERT-1BDE30-NATIVE-01` (E550).
+- Observation: the insert's "copy/move/destroy vcalls" are not mysterious. `descriptor[0x40]` and
+  the node vtable are the **same** table `{0x19a0, 0x19c0, 0x19e0, 0x19f0}` and the targets are
+  20/20/9-byte pure copies plus a `ret`. With destination `node+0x30` their `+0x10`/`+0x20`
+  fields land exactly on `node+0x40`/`node+0x50`, so it is a type-erased callable copy.
+- Observation: because those helpers never call a destructor, the two-temporary chain collapses
+  to `node[0x40] = descriptor.context[2]`; the fixture now proves a non-zero context value lands
+  there (E549). This closes the last unmodelled part of `0x1beeb0`.
+- Observation: the 18-byte remarshal `0x1bde30` is now lifted too and `init_1290`'s A insert runs
+  through it, so the recovered chain `0x1290 → 0x1bde30 → 0x1beeb0` is modelled end to end with
+  the sentinel proven to be `&container+0x40` (E550).
+- Observation: **334/334** tests; checker sweep **414 passed / 20 skipped / 0 failed**.
+- Inference: G1 **PARTIAL**. The insert chain is modelled, but its callers still run against
+  host-supplied owners, and the surrounding startup still needs the real owner objects.
+- Next exact action: the owner singletons from `0x533100`/`0x2569d0`, or `0xa56560` (engine behind
+  `0x54b250`), or the ConVar registrar `0xa54920`.
 
 ## 2026-10-23 Orchestrator round 12 — stat-query wrapper native (E547)
 
