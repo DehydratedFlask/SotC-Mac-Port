@@ -2,7 +2,7 @@
 
 Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + OpenCode orchestrator round 2.
 Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
-Round-2 through round-9 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
+Round-2 through round-10 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
 
 ## 2026-10-22 Repository history rewrite — Claude attribution + hostname identity
 
@@ -35,6 +35,31 @@ Round-2 through round-9 detail are the sections immediately below; the parallel-
   pushing one would reintroduce old trailers. Gate: **G1 still PARTIAL**; nothing about boot/audio/save
   changes.
 - Next exact action: unchanged — next always-on after `0x532720`, or a bounded body lift.
+
+## 2026-10-23 Orchestrator round 10 — alternate path, native 0x1290 in the slice (E544–E545)
+
+- Agent: integrator + one worker subagent (non-Claude model). The worker left the module and test
+  mid-edit; the integrator reconciled it, fixed a wrong memory operand and two checker bugs, and
+  replayed everything.
+- Tasks: `CPU-01-INIT-531D60-CONTINUE-BATCH-06` (E544),
+  `CPU-01-INIT-1290-SLICE-WIRE-01` (E545).
+- Observation: the alternate `je 0x5327bd` path is modelled — `0x5327bd..0x532904`, **327 B /
+  70 units**, region sha `34b848a9…` — with the gate, `[0x3305568]` vtable dispatch, float compare,
+  `0x2ea5170` container pair, optional logging, both joins, and the `0x5327b6` failure exit.
+- Correction: the container operand is **`0x2ea5170`**, not `0x2efe170`; the module and its
+  checker were both wrong and are fixed. Two checker bugs (2-byte `call *(%rax)` treated as 3
+  bytes; case-sensitive header tokens) were also fixed.
+- Observation: measured Init coverage rose to **3438/3500 B = 98.23%**; four small gaps remain
+  (36 B entry frame, 16 B base-initialize call site, 5 B `call 0x56dca0`, 5 B `0x5327b1..0x5327b6`).
+- Observation: the native `0x1290` now runs **inside the slice** when a container/allocator is
+  supplied, so its A insert executes through the lifted `0x1beeb0` body during the modelled
+  startup rather than only in unit tests; the call-site stub remains the fallback.
+- Observation: full build and **331/331** `ctest`; the checker sweep is **411 passed, 20 skipped
+  (need a build dir), 0 failed**.
+- Inference: G1 **PARTIAL**. Coverage is claimed bytes, not semantics; every callee in the new
+  block is still a hook, and nothing ran against the game.
+- Next exact action: close the four small coverage gaps, then the `0xa56560` engine behind
+  `0x54b250` (stat query) and the owner singletons from `0x533100`/`0x2569d0`.
 
 ## 2026-10-23 Orchestrator round 9 — Init reaches the registry fragment, coverage measured (E540–E542)
 
