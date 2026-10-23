@@ -52,6 +52,13 @@ A second attach with the same key changes neither `deps` nor the map size.
   rewritten checkers pin the new model).
 - Nine old checkers that asserted the withdrawn success/notify reading were replaced.
 
+## Mutation
+
+- Removing `add_reference` from `LockedResourceRef::assign` aborts under ASan (the slot's only
+  reference is lost).
+- Skipping the second `RemoveReference` in the common attach fails the `refs_after == 1` check.
+- Both mutations were restored; the full suite is green again.
+
 ## Limits
 
 - The pool map is non-owning and single-threaded; the recursive mutex is not modelled.
