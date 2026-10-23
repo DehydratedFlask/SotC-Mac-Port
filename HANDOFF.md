@@ -1,6 +1,35 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 21:43 CDT (America/Chicago). Integrator: /root (Codex).
+Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + OpenCode orchestrator round 2.
+Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
+Round-2 detail is the section immediately below; the parallel-foundations state that follows stays authoritative.
+
+## 2026-10-22 OpenCode orchestrator round 2 — Init batch A + repo health (E516–E519)
+
+- Agent: integrator + four worker subagents (non-Claude model). Attempt 1 success for all four;
+  one mechanical compile fix (pointer-to-pointer const level), 0 failed hypotheses.
+- Base: `ff7b186`; rebased onto this branch after the parallel-foundations commits, so the docs rows
+  below are numbered **E516–E519** (E509–E515 belong to the parallel-foundations lane).
+- Tasks: `CPU-01-INIT-531D60-CONTINUE-BATCH-01` (E519),
+  `CPU-01-CTOR-STALE-EXPECTATION-01` (E518), `AUD-PUBLISH-GITLINK-01` (E517),
+  `CPU-01-INIT-1290-BODY-ANALYSIS-01` (E516).
+- Files: `native/core/init_531d60_post_base_continue_a.{hpp,cpp}`, Init slice wire + test,
+  `tools/lift/check_f531d60_post_base_continue_a.py`, two ctor tests,
+  `scripts/audit_publish_paths.py` + its test, three checkpoints, EVIDENCE/TASKS/INDEX/FOLDERS/ROADMAP.
+- Observation: Init now models `0x532720..0x53277f` as **22 contiguous units / 95 B** (region sha
+  `9f4c676b…`), calls `0xf590`/`0xa2ea00`/`0xa2e5d0`/`0xa543b0`/`0x1fc80`, lea targets
+  `0x32f79a8`/`0x32f84f8`/`0x1014d69`, branch `0x53277a test` + `0x53277d je 0x5327bd`
+  (outcome NOT modelled); registry still 275, ctor slots still 155. `0x1290` is now a byte-pinned
+  195 B body (fn sha `185f03d3…`) with one statically-resolvable no-op vcall and a read-only
+  `__stack_chk_guard`; no callee lifted.
+- Observation: the full suite was 324/326 at `ff7b186`; `registration_thunks` and
+  `clothing_physical_mesh_parameters` still expected a slot-23 stop that no longer exists. This is
+  the same drift the Codex lane diagnosed as E515, now fixed at the tests (table-derived
+  expectation, all coverage kept), not merely documented. Full `ctest` is green after the rebase.
+- Inference: G1 **PARTIAL** only. A green suite means fixtures and pins agree, not gate proof.
+- Next exact action: continue Init at `0x53277f` (fall-through of the pinned `je`) keeping the
+  branch outcome unmodelled, or lift `0x1bde30`→`0x1beeb0` to settle the `0x1290` descriptor width.
+  Always finish a round with full `ctest` plus `python3 -I scripts/audit_publish_paths.py --all`.
 
 ## Active Codex parallel foundations claim
 

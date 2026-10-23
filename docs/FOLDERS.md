@@ -11,8 +11,8 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `.graft` | 1 | Project folder; add a contract to docs/INDEX.md |
 | `Shadow of the Colossus` | 2 | Original user game inputs; read-only and private |
 | `docs` | 15 | Plans, task/evidence registries, checkpoint and escalation documentation |
-| `docs/checkpoints` | 564 | Plans, task/evidence registries, checkpoint and escalation documentation |
-| `docs/escalations` | 4 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs/checkpoints` | 618 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs/escalations` | 5 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/schemas` | 1 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `graft` | 1 | Regenerable source graph; internal cache directories summarized |
 | `launcher` | 2 | Native Swift macOS launcher |
@@ -1270,7 +1270,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `native/api` | 4 | Native game implementation; verify module README and task ownership |
 | `native/api/standalone` | 1 | Native game implementation; verify module README and task ownership |
 | `native/api/tests` | 2 | Native game implementation; verify module README and task ownership |
-| `native/core` | 764 | Native game implementation; verify module README and task ownership |
+| `native/core` | 856 | Native game implementation; verify module README and task ownership |
 | `native/tests` | 326 | Native game implementation; verify module README and task ownership |
 | `reference` | 0 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC` | 12 | Pinned upstream source; read-only; symbols indexed by Graft |
@@ -1834,7 +1834,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `tools` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft/.cache` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
-| `tools/lift` | 403 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/lift` | 449 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/pkg-extractor` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
 
 Private recursive inventory: `local/indexes/folders.json` (excluded from publication).

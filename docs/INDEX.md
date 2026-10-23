@@ -205,3 +205,9 @@ as fake completed components. Their first task must add a folder contract and up
 Other tools may be installed only when a concrete task needs them. Record version/source/path,
 command, architecture, purpose and removal boundary in INSTALL_LOG, then verify the live result.
 Do not install a Sony SDK, an emulator or a second analysis engine just to avoid the native task.
+| [Init 0x1290 body (2026-10-22)](checkpoints/2026-10-22-init-1290-body-analysis.md) | 195 B full body: guard read-only, `void`, one no-op vcall, two descriptor registrations; E509; G1 PARTIAL |
+| [Init continue batch A (2026-10-22)](checkpoints/2026-10-22-init-531d60-continue-batch-a.md) | 22 units / 95 B `0x532720..0x53277f`, 5 calls + 3 lea + `je` pinned; E512; G1 PARTIAL |
+| [Repo-health round (2026-10-22)](checkpoints/2026-10-22-repo-health-round.md) | Full suite 326/326 after stale ctor-test fix; publish-audit final-component gap fixed; E510/E511 |
+| [Init 0x1290 body (2026-10-22)](checkpoints/2026-10-22-init-1290-body-analysis.md) | 195 B full body: guard read-only, `void`, one no-op vcall, two descriptor registrations; E516; G1 PARTIAL |
+| [Init continue batch A (2026-10-22)](checkpoints/2026-10-22-init-531d60-continue-batch-a.md) | 22 units / 95 B `0x532720..0x53277f`, 5 calls + 3 lea + `je` pinned; E519; G1 PARTIAL |
+| [Repo-health round (2026-10-22)](checkpoints/2026-10-22-repo-health-round.md) | Full suite green after stale ctor-test fix; publish-audit final-component gap fixed; E517/E518 |
