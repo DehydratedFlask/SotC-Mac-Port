@@ -262,3 +262,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [`0xf590` rank-1 wiring (2026-10-23)](checkpoints/2026-10-23-f590-rank1-wiring.md) | Four proven-zero `0x533100` sites on the real inert release; `0x5333e3` stays a hook; E574 |
 | [List-B reader/report tree (2026-10-23)](checkpoints/2026-10-23-appinfo-listb-report.md) | FIFO `"Attachment"` serialization, deep-copy report, value-then-name clear; E575 |
 | [Owner map sinks (2026-10-23)](checkpoints/2026-10-23-owner-map-sink.md) | Consumers, not tables; B is a float range; duplicate keys; E576 |
+| [Owner property bag (2026-10-23)](checkpoints/2026-10-23-owner-prop-bag.md) | 0x178 bag, four sentinels, multimap insert_equal model; E577 |

@@ -1,0 +1,86 @@
+// Native reduction of the owner property bag (`[this+0x3b48]`, 0x178 B, E576).
+//
+// Recovered:
+//   - bag factory `0xa2b960` (`new(0x178)` + `0xa2afb0`), base ctor `0xac4de0`, vptr
+//     `0x15d1058`; the construction republishes the object to `*(0x3305568)` (last wins).
+//   - four custom red-black trees; the property writers use tree 2 (A) and tree 3 (B), handles
+//     at `+0x48` and `+0x60`, sentinels at `+0x50`/`+0x68`, counts at `+0x58`/`+0x70`.
+//   - `0xac5260`/`0xac5320` are `insert_equal` (allocate first, no equality exit, duplicates
+//     allowed), fixups `0xac8a90`/`0xac8d40`; key is a u32 enum immediate.
+//   - payload A `{i32 i, f32 f = 1.0, u32 tag}`; payload B `{f32 lo, f32 hi, f32 v, u32 tag}`.
+//
+// The native model uses ordered multimaps, which preserve duplicate keys and their insertion
+// order, and exposes lookup by key. It is a behaviour model, not the guest RB-tree ABI: trees 0/1,
+// the exact balancing/fixup order, the node layout and the `*(0x3305568)` alias remain contracts.
+// No guest code reads this memory.
+//
+// NOT modelled: `0xac4de0`/`0xa2afb0`/`0xa2b960` bodies, trees 0/1, erase (`0xac5aa0`), and the
+// scatter `0xac62e0`/`0xac6360`. G1 PARTIAL.
+#pragma once
+
+#include <cstddef>
+#include <cstdint>
+#include <map>
+
+#include "owner_properties_2569d0.hpp"
+
+namespace sotc {
+
+inline constexpr std::uint64_t kOwnerPropBagFactoryRva = 0xA2B960;
+inline constexpr std::uint64_t kOwnerPropBagBaseCtorRva = 0xAC4DE0;
+inline constexpr std::uint64_t kOwnerPropBagDerivedCtorRva = 0xA2AFB0;
+inline constexpr std::uint64_t kOwnerPropBagInsertARva = 0xAC5260;
+inline constexpr std::uint64_t kOwnerPropBagInsertBRva = 0xAC5320;
+inline constexpr std::uint64_t kOwnerPropBagFixupARva = 0xAC8A90;
+inline constexpr std::uint64_t kOwnerPropBagFixupBRva = 0xAC8D40;
+inline constexpr std::size_t kOwnerPropBagSize = 0x178;
+inline constexpr std::size_t kOwnerPropBagTreeAOffset = 0x48;
+inline constexpr std::size_t kOwnerPropBagTreeBOffset = 0x60;
+
+struct OwnerValueA {
+    std::int32_t i;
+    float f;  // 1.0f in every recovered row
+    std::uint32_t tag;
+};
+
+struct OwnerValueB {
+    float lo;
+    float hi;
+    float v;
+    std::uint32_t tag;
+};
+
+class OwnerPropBag {
+public:
+    using TreeA = std::multimap<std::uint32_t, OwnerValueA>;
+    using TreeB = std::multimap<std::uint32_t, OwnerValueB>;
+
+    // `0xac5260` / `0xac5320`: insert_equal, duplicates preserved.
+    void insert_a(std::uint32_t key, const OwnerValueA& value);
+    void insert_b(std::uint32_t key, const OwnerValueB& value);
+
+    [[nodiscard]] const TreeA& tree_a() const noexcept { return tree_a_; }
+    [[nodiscard]] const TreeB& tree_b() const noexcept { return tree_b_; }
+    [[nodiscard]] std::size_t size_a() const noexcept { return tree_a_.size(); }
+    [[nodiscard]] std::size_t size_b() const noexcept { return tree_b_.size(); }
+    [[nodiscard]] std::size_t total() const noexcept { return tree_a_.size() + tree_b_.size(); }
+
+private:
+    TreeA tree_a_;
+    TreeB tree_b_;
+};
+
+// Adapter that lets `apply_owner_properties` feed the bag directly.
+class OwnerPropBagSink final : public OwnerPropertySink {
+public:
+    explicit OwnerPropBagSink(OwnerPropBag& bag) noexcept : bag_(bag) {}
+
+    bool insert_a(std::uint16_t key, std::int32_t i, float f, std::uint32_t tag) override;
+    bool insert_b(std::uint16_t key, float lo, float hi, float v,
+                  std::uint32_t tag) override;
+
+private:
+    OwnerPropBag& bag_;
+};
+
+}  // namespace sotc

@@ -8,8 +8,8 @@ The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **350/350** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **447 passed / 0 skipped / 0 failed** with
+- Full native suite: **351/351** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **448 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -136,6 +136,11 @@ The rounds that follow the archive are in chronological order.
   `{i32 i, f32 f=1.0, u32 tag}`; map B is `{f32 lo, f32 hi, f32 v, u32 tag}` — the old "u64 pair"
   reading was a float range. The sink/table now carry `lo/hi`; the fixture pins 122 A + 12 B
   inserts, 114 distinct A keys and two `0x7b` rows. The bag and insert bodies remain contracts.
+- **E577** — the bag is now a native model: `OwnerPropBag` (0x178 B factory/base ctor, four
+  sentinels, `*(0x3305568)` republish) uses ordered multimaps so `insert_equal` duplicates survive,
+  and `OwnerPropBagSink` lets `apply_owner_properties` populate it. Gate 1 yields 122 A + 12 B
+  (114 distinct A keys, two `0x7b` rows); gate 0 yields 125 + 12. The exact RB nodes/fixups and
+  trees 0/1 remain contracts.
 
 ## Settled decisions (do not re-ask)
 

@@ -14,8 +14,8 @@
 //     sites are reachable; the 120 mode-2 rows are data only.
 //
 // The table lives in `owner_properties_2569d0_table.inc.hpp`, generated from the private symbolic
-// evidence. The bag object and its red-black insert/fixup bodies (`0xac4de0`/`0xa2afb0`/
-// `0xa2b960`, `0xac5260`/`0xac5320`, `0xac8a90`/`0xac8d40`) are not lifted.
+// evidence. The bag container is modelled by `owner_prop_bag` (E577); the exact red-black
+// insert/fixup bodies (`0xac5260`/`0xac5320`, `0xac8a90`/`0xac8d40`) and trees 0/1 are not lifted.
 //
 // The shared-tail quirk is explicit: the predecessor emits a pending key (0x23 for gate1, 0x1c for
 // gate0) before the 130 shared rows; the table marks those rows separately and the driver emits
