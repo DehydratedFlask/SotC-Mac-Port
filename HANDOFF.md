@@ -9,8 +9,12 @@ Updated: 2026-10-22 21:43 CDT (America/Chicago). Integrator: /root (Codex).
   overridden for this session. Startup_ctors/Init/FNV/registry Drive ownership remains intact.
 - Plan/spec and file ownership: [parallel foundations plan](docs/checkpoints/2026-10-22-codex-parallel-foundations-plan.md).
 - SAV-01-ATOMIC-WRITER-TEMP-ISOLATION-01: worker ASan/UBSan pass 1/1, expected red/mutation failures; independent review pending (E511). User selected unique exclusive temporary files.
-- CPU-01-SHARED-STR-RELEASE-F590-01 and AUD-02-NGS2-RACKQUERY-RDX-CFG-01: claimed;
-  implementation not started; zero prior failed task hypotheses found by scouts.
+- CPU-01-SHARED-STR-RELEASE-F590-01: worker native/Ghidra/oracle/mutant checks pass;
+  independent review pending(E513); zero failed semantic hypotheses, one observed REA timeout.
+- AUD-02-NGS2-RACKQUERY-RDX-CFG-01: worker20tests/two byte-identical replays pass;
+  independent review pending(E514); two failed strict replay hypotheses retained.
+- Constructor scout diagnosis recorded(E515); stale baseline expectations/omitted CMake fixture
+  env are proposals awaiting the principal's clean-baseline result.
 - All three scouts made no edits/tests/builds. Their findings are proposals requiring implementation
   and review. SharedStr mapping is inference; full f590 bytes are pinned; allocator body external.
 - User requested removing Claude contribution credit. Metadata inspection found zero matching

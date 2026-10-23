@@ -445,3 +445,13 @@ are in docs/escalations/INT-VALIDATION-PARALLEL-FOUNDATIONS-01.md; logs remain m
 Private fixtures copied read-only from original inputs to managed local/fixtures after SHA checks;
 no originals changed. Release worker reused saved Ghidra12.1.4/OpenJDK25 project readOnly/noanalysis
 (success3.807s) after one REA default-import timeout. No configuration or saved database changed.
+
+## 2026-10-22 22:28 CDT — release/audio worker verification
+
+No installs/downloads/config changes. Release worker reused clang21/CMake/Ninja Debug ASan/UBSan
+in managed local/build/task2-release (428steps, final2step rebuild), focused1/1 and byte-oracle
+checks plus private mutants. Ghidra12.1.4/OpenJDK25 saved-project readOnly/noanalysis export
+exit0 in3.807s; full argv/provenance retained in local/validation/task2-release. REA default
+330s import timeout and empty evidence export retained as limitations. Audio worker reused
+Python stdlib and Xcode llvm-objdump found by xcrun;20 synthetic tests and two deterministic
+private analyses pass. Exact commands/tool versions/evidence paths in worker reports/checkpoint.
