@@ -8,8 +8,8 @@ The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **362/362** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **460 passed / 0 skipped / 0 failed** with
+- Full native suite: **364/364** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **461 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -203,6 +203,13 @@ The rounds that follow the archive are in chronological order.
   sites only use pointer identity and the two counters; sites 1-8 take the priority-13 early
   return, site 9 (priority 9) writes state 9 and notifies the engine. Slots start
   `{null_wrapper,false}`.
+- **E595** — the nine `0x533100` attach fragments are wired to the real `ResourcePool`: key ->
+  `GetResource` -> `AddReference` -> persistent-slot `assign` -> two `RemoveReference` -> `0xf590`
+  key release -> `Lock(13)` (site 9 `Lock(9)` at the `0x53403c` tail). The earlier
+  `loaded`/`success_flag`/`notify_95580` reading is withdrawn: `[out]`/`[out+8]` are the
+  `GetResource` `{ptr,owned}` result and `owned` is always 0, so those branches are dead. Steady
+  state `refs=1`, `deps=1`; a second attach is a hit with an idempotent lock. The appmain slice
+  owns one native pool plus nine slots and frees all nine wrappers at teardown.
 - **E594** — the native ResourceWrapper/ResourcePool/ResourceRef model is implemented: exact
   0x100 B wrapper, hash-then-strcmp comparator, non-owning map, hit/miss references, erase at zero,
   dependency recursion, the priority state table, and lock/unlock refs. Hooks cover allocation,

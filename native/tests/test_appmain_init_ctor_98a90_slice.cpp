@@ -25,6 +25,8 @@
 #include "core/vslot_40_533100_miss.hpp"
 #include "core/vslot_40_533100_post.hpp"
 #include "core/platform_tag_147e20.hpp"
+#include "core/resource_pool.hpp"
+#include "core/vslot_40_533100_attach_common.hpp"
 #include "core/vslot_40_533100_shadow_attach.hpp"
 #include "core/vslot_40_533100_shadowmodels.hpp"
 #include "core/vslot_40_533100_shadowskels.hpp"
@@ -430,7 +432,6 @@ void* hook_v40_shadow_load(void* out_slot, void*, void*) {
     std::memcpy(out_slot, &p, sizeof(void*));
     return p;
 }
-void hook_v40_14ccc0(void*) { ++g_v40_14ccc0; }
 void hook_v40_skels_notify(void*) { ++g_v40_skels_notify; }
 void hook_v40_skels_14c2f0(void* dst, const char* path) {
     ++g_v40_skels_14c2f0;
@@ -444,7 +445,6 @@ void* hook_v40_skels_load(void* out_slot, void*, void*) {
     std::memcpy(out_slot, &p, sizeof(void*));
     return p;
 }
-void hook_v40_skels_14ccc0(void*) { ++g_v40_skels_14ccc0; }
 void hook_v40_anims_notify(void*) { ++g_v40_anims_notify; }
 void hook_v40_anims_14c2f0(void* dst, const char* path) {
     ++g_v40_anims_14c2f0;
@@ -458,7 +458,6 @@ void* hook_v40_anims_load(void* out_slot, void*, void*) {
     std::memcpy(out_slot, &p, sizeof(void*));
     return p;
 }
-void hook_v40_anims_14ccc0(void*) { ++g_v40_anims_14ccc0; }
 void hook_v40_banks_notify(void*) { ++g_v40_banks_notify; }
 void hook_v40_banks_14c2f0(void* dst, const char* path) {
     ++g_v40_banks_14c2f0;
@@ -472,7 +471,6 @@ void* hook_v40_banks_load(void* out_slot, void*, void*) {
     std::memcpy(out_slot, &p, sizeof(void*));
     return p;
 }
-void hook_v40_banks_14ccc0(void*) { ++g_v40_banks_14ccc0; }
 void hook_v40_streams_notify(void*) { ++g_v40_streams_notify; }
 void hook_v40_streams_14c2f0(void* dst, const char* path) {
     ++g_v40_streams_14c2f0;
@@ -486,7 +484,6 @@ void* hook_v40_streams_load(void* out_slot, void*, void*) {
     std::memcpy(out_slot, &p, sizeof(void*));
     return p;
 }
-void hook_v40_streams_14ccc0(void*) { ++g_v40_streams_14ccc0; }
 void hook_v40_rand_notify(void*) { ++g_v40_rand_notify; }
 void hook_v40_rand_14c2f0(void* dst, const char* path) {
     ++g_v40_rand_14c2f0;
@@ -500,7 +497,6 @@ void* hook_v40_rand_load(void* out_slot, void*, void*) {
     std::memcpy(out_slot, &p, sizeof(void*));
     return p;
 }
-void hook_v40_rand_14ccc0(void*) { ++g_v40_rand_14ccc0; }
 void hook_v40_boss_notify(void*) { ++g_v40_boss_notify; }
 void hook_v40_boss_14c2f0(void* dst, const char* path) {
     ++g_v40_boss_14c2f0;
@@ -514,7 +510,6 @@ void* hook_v40_boss_load(void* out_slot, void*, void*) {
     std::memcpy(out_slot, &p, sizeof(void*));
     return p;
 }
-void hook_v40_boss_14ccc0(void*) { ++g_v40_boss_14ccc0; }
 void hook_v40_cp3_notify(void*) { ++g_v40_cp3_notify; }
 void hook_v40_cp3_14c2f0(void* dst, const char* path) {
     ++g_v40_cp3_14c2f0;
@@ -528,7 +523,6 @@ void* hook_v40_cp3_load(void* out_slot, void*, void*) {
     std::memcpy(out_slot, &p, sizeof(void*));
     return p;
 }
-void hook_v40_cp3_14ccc0(void*) { ++g_v40_cp3_14ccc0; }
 void hook_v40_csp_notify(void*) { ++g_v40_csp_notify; }
 void hook_v40_csp_14c2f0(void* dst, const char* path) {
     ++g_v40_csp_14c2f0;
@@ -542,7 +536,6 @@ void* hook_v40_csp_load(void* out_slot, void*, void*) {
     std::memcpy(out_slot, &p, sizeof(void*));
     return p;
 }
-void hook_v40_csp_14ccc0(void*) { ++g_v40_csp_14ccc0; }
 void* hook_key_alloc(std::size_t size, std::uint32_t tag, std::uint32_t, std::uint32_t) {
     void* p = std::malloc(size);
     CHECK(p != nullptr);
@@ -582,15 +575,54 @@ std::uint32_t hook_key_platform_tag(std::uint32_t fourcc) {
 void hook_key_destroy(void* p, int) { std::free(p); }
 void hook_key_free_control(void* p) { std::free(p); }
 
-template <typename Hooks>
-void install_key_hooks(Hooks& h) {
-    h.key_alloc.alloc.allocate = hook_key_alloc;
-    h.key_alloc.alloc.deallocate = hook_key_dealloc;
-    h.platform_tag = hook_key_platform_tag;
-    h.release.destroy = hook_key_destroy;
-    h.release.free_control = hook_key_free_control;
+struct SliceKeyDeallocator final : SharedStrDeallocatorF590 {
+    void deallocate(const void* allocation, SharedStrDeallocationKindF590 kind) noexcept override {
+        if (kind == SharedStrDeallocationKindF590::data) {
+            ++g_key_free_tag0;
+        } else {
+            ++g_key_free_tag1;
+        }
+        std::free(const_cast<void*>(allocation));
+    }
+};
+SliceKeyDeallocator g_pool_key_dealloc;
+int g_pool_alloc = 0;
+int g_pool_free = 0;
+int g_pool_state_write = 0;
+void* slice_pool_allocate(std::size_t size) {
+    ++g_pool_alloc;
+    void* const p = std::malloc(size);
+    CHECK(p != nullptr);
+    return p;
+}
+bool slice_pool_deallocate(void* ptr) {
+    ++g_pool_free;
+    std::free(ptr);
+    return true;
+}
+bool slice_pool_state_write(ResourceWrapper&, std::uint32_t) {
+    ++g_pool_state_write;
+    return true;
 }
 
+template <typename Hooks>
+void install_key_hooks(Hooks& h) {
+    h.common.key_alloc.alloc.allocate = hook_key_alloc;
+    h.common.key_alloc.alloc.deallocate = hook_key_dealloc;
+    h.common.platform_tag = hook_key_platform_tag;
+    h.common.release.destroy = hook_key_destroy;
+    h.common.release.free_control = hook_key_free_control;
+}
+
+void check_key_release_miss(const SharedReleaseF590Result& kr) {
+    CHECK(kr.ok);
+    CHECK(kr.had_control);
+    CHECK(kr.decremented);
+    CHECK(kr.previous == 3);  // wrapper +0x70 copy and the pool's map-node copy
+    CHECK(!kr.was_last);
+    CHECK(!kr.destroyed);
+    CHECK(!kr.freed);
+}
 void check_key_release(const SharedReleaseF590Result& kr) {
     CHECK(kr.ok);
     CHECK(kr.had_control);
@@ -1315,6 +1347,16 @@ int main() {
     ch.ensure_detail.elem_move_1da30 = hook_move;
     // sub_3be930 override null → lifted init_sub_3be930
 
+    ResourcePool pool{&g_pool_key_dealloc};
+    ResourcePoolHooks pool_hooks{};
+    pool_hooks.allocate = slice_pool_allocate;
+    pool_hooks.deallocate = slice_pool_deallocate;
+    pool_hooks.state_write = slice_pool_state_write;
+    auto install_pool = [&](auto& detail) {
+        detail.common.pool = &pool;
+        detail.common.pool_hooks = pool_hooks;
+    };
+
     BaseInitialize255130Hooks bh{};
     // vslot_30 / mid / vslot_40 null → slice forces lifted 0x534130 + 0x255340 + header
     bh.mid_255340_detail.register_26ea0 = hook_mid_26ea0;
@@ -1330,49 +1372,52 @@ int main() {
     bh.vslot_40_gfx_detail.call_6abcc0 = hook_v40_6abcc0;
     bh.vslot_40_shadow_detail.path_14c2f0 = hook_v40_14c2f0;
     bh.vslot_40_shadow_detail.load_vslot18 = hook_v40_shadow_load;
-    bh.vslot_40_shadow_attach_detail.release_14ccc0 = hook_v40_14ccc0;
     install_key_hooks(bh.vslot_40_shadow_attach_detail);
+    install_pool(bh.vslot_40_shadow_attach_detail);
     bh.vslot_40_shadowskels_detail.notify_95580 = hook_v40_skels_notify;
     bh.vslot_40_shadowskels_detail.path_14c2f0 = hook_v40_skels_14c2f0;
     bh.vslot_40_shadowskels_detail.load_vslot18 = hook_v40_skels_load;
-    bh.vslot_40_skels_attach_detail.release_14ccc0 = hook_v40_skels_14ccc0;
     install_key_hooks(bh.vslot_40_skels_attach_detail);
+    install_pool(bh.vslot_40_skels_attach_detail);
     bh.vslot_40_shadowanims_detail.notify_95580 = hook_v40_anims_notify;
     bh.vslot_40_shadowanims_detail.path_14c2f0 = hook_v40_anims_14c2f0;
     bh.vslot_40_shadowanims_detail.load_vslot18 = hook_v40_anims_load;
-    bh.vslot_40_anims_attach_detail.release_14ccc0 = hook_v40_anims_14ccc0;
     install_key_hooks(bh.vslot_40_anims_attach_detail);
+    install_pool(bh.vslot_40_anims_attach_detail);
     bh.vslot_40_shadowbanks_detail.notify_95580 = hook_v40_banks_notify;
     bh.vslot_40_shadowbanks_detail.path_14c2f0 = hook_v40_banks_14c2f0;
     bh.vslot_40_shadowbanks_detail.load_vslot18 = hook_v40_banks_load;
-    bh.vslot_40_banks_attach_detail.release_14ccc0 = hook_v40_banks_14ccc0;
     install_key_hooks(bh.vslot_40_banks_attach_detail);
+    install_pool(bh.vslot_40_banks_attach_detail);
     bh.vslot_40_shadowstreams_detail.notify_95580 = hook_v40_streams_notify;
     bh.vslot_40_shadowstreams_detail.path_14c2f0 = hook_v40_streams_14c2f0;
     bh.vslot_40_shadowstreams_detail.load_vslot18 = hook_v40_streams_load;
-    bh.vslot_40_streams_attach_detail.release_14ccc0 = hook_v40_streams_14ccc0;
     install_key_hooks(bh.vslot_40_streams_attach_detail);
+    install_pool(bh.vslot_40_streams_attach_detail);
     bh.vslot_40_shadowrandomevents_detail.notify_95580 = hook_v40_rand_notify;
     bh.vslot_40_shadowrandomevents_detail.path_14c2f0 = hook_v40_rand_14c2f0;
     bh.vslot_40_shadowrandomevents_detail.load_vslot18 = hook_v40_rand_load;
-    bh.vslot_40_randomevents_attach_detail.release_14ccc0 = hook_v40_rand_14ccc0;
     install_key_hooks(bh.vslot_40_randomevents_attach_detail);
+    install_pool(bh.vslot_40_randomevents_attach_detail);
     bh.vslot_40_shadowbossmusic_detail.notify_95580 = hook_v40_boss_notify;
     bh.vslot_40_shadowbossmusic_detail.path_14c2f0 = hook_v40_boss_14c2f0;
     bh.vslot_40_shadowbossmusic_detail.load_vslot18 = hook_v40_boss_load;
-    bh.vslot_40_bossmusic_attach_detail.release_14ccc0 = hook_v40_boss_14ccc0;
     install_key_hooks(bh.vslot_40_bossmusic_attach_detail);
+    install_pool(bh.vslot_40_bossmusic_attach_detail);
     bh.vslot_40_cp3characters_detail.notify_95580 = hook_v40_cp3_notify;
     bh.vslot_40_cp3characters_detail.path_14c2f0 = hook_v40_cp3_14c2f0;
     bh.vslot_40_cp3characters_detail.load_vslot18 = hook_v40_cp3_load;
-    bh.vslot_40_cp3characters_attach_detail.release_14ccc0 = hook_v40_cp3_14ccc0;
     install_key_hooks(bh.vslot_40_cp3characters_attach_detail);
+    install_pool(bh.vslot_40_cp3characters_attach_detail);
     bh.vslot_40_cp3shadowprecache_detail.notify_95580 = hook_v40_csp_notify;
     bh.vslot_40_cp3shadowprecache_detail.path_14c2f0 = hook_v40_csp_14c2f0;
     bh.vslot_40_cp3shadowprecache_detail.load_vslot18 = hook_v40_csp_load;
-    bh.vslot_40_cp3shadowprecache_attach_detail.release_14ccc0 = hook_v40_csp_14ccc0;
     install_key_hooks(bh.vslot_40_cp3shadowprecache_attach_detail);
+    install_pool(bh.vslot_40_cp3shadowprecache_attach_detail);
     bh.vslot_40_tail_140d90_detail.call_140d90 = hook_v40_tail_140d90;
+    bh.vslot_40_tail_140d90_detail.slot =
+        reinterpret_cast<LockedResourceRef*>(app.data() + kVslot40Tail140d90SlotOff);
+    bh.vslot_40_tail_140d90_detail.pool_hooks = pool_hooks;
 
     SingletonF08Hooks sh{};
     sh.ctor_523bd0 = hook_f08_ctor;
@@ -1691,16 +1736,19 @@ int main() {
     CHECK(r.vslot_40_shadow.f08 == r.singleton.obj);
     // E427: attach fail-path + install into f08+0
     CHECK(r.vslot_40_shadow_attach.ok);
-    CHECK(r.vslot_40_shadow_attach.took_fail_path);
-    CHECK(r.vslot_40_shadow_attach.installed);
-    CHECK(r.vslot_40_shadow_attach.slot_after == g_shadow_asset);
-    CHECK(loadp(r.singleton.obj, 0) == g_shadow_asset);
-    check_key_release(r.vslot_40_shadow_attach.key_release);
+    CHECK(r.vslot_40_shadow_attach.get_ok);
+    CHECK(r.vslot_40_shadow_attach.slot_assigned);
+    CHECK(r.vslot_40_shadow_attach.lock_ok);
+    CHECK(r.vslot_40_shadow_attach.wrapper != nullptr);
+    CHECK(loadp(r.singleton.obj, 0) == r.vslot_40_shadow_attach.wrapper);
+    CHECK(r.vslot_40_shadow_attach.refs_after == 1);
+    CHECK(r.vslot_40_shadow_attach.deps_after == 1);
+    CHECK(r.vslot_40_shadow_attach.state_after == 11);
+    check_key_release_miss(r.vslot_40_shadow_attach.key_release);
     CHECK(r.vslot_40_shadow_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_shadow_attach.key_size == 31);
     CHECK(r.vslot_40_shadow_attach.key_capacity == 31);
     CHECK(r.vslot_40_shadow_attach.key_hash == 0x2128cdb9u);
-    CHECK(g_v40_14ccc0 == 1);  // release loaded after install
     // E428: shadowskels load-attempt (notify + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowskels.ok);
     CHECK(g_v40_skels_notify == 1);
@@ -1712,16 +1760,19 @@ int main() {
     CHECK(r.vslot_40_shadowskels.f08 == r.singleton.obj);
     // E429: skels attach fail-path + install into f08+0x10
     CHECK(r.vslot_40_skels_attach.ok);
-    CHECK(r.vslot_40_skels_attach.took_fail_path);
-    CHECK(r.vslot_40_skels_attach.installed);
-    CHECK(r.vslot_40_skels_attach.slot_after == g_skels_asset);
-    CHECK(loadp(r.singleton.obj, 0x10) == g_skels_asset);
-    check_key_release(r.vslot_40_skels_attach.key_release);
+    CHECK(r.vslot_40_skels_attach.get_ok);
+    CHECK(r.vslot_40_skels_attach.slot_assigned);
+    CHECK(r.vslot_40_skels_attach.lock_ok);
+    CHECK(r.vslot_40_skels_attach.wrapper != nullptr);
+    CHECK(loadp(r.singleton.obj, 0x10) == r.vslot_40_skels_attach.wrapper);
+    CHECK(r.vslot_40_skels_attach.refs_after == 1);
+    CHECK(r.vslot_40_skels_attach.deps_after == 1);
+    CHECK(r.vslot_40_skels_attach.state_after == 11);
+    check_key_release_miss(r.vslot_40_skels_attach.key_release);
     CHECK(r.vslot_40_skels_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_skels_attach.key_size == 30);
     CHECK(r.vslot_40_skels_attach.key_capacity == 31);
     CHECK(r.vslot_40_skels_attach.key_hash == 0xecf0a769u);
-    CHECK(g_v40_skels_14ccc0 == 1);
     // E430: shadowanims load-attempt (notify f08+0x10 + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowanims.ok);
     CHECK(g_v40_anims_notify == 1);
@@ -1733,16 +1784,19 @@ int main() {
     CHECK(r.vslot_40_shadowanims.f08 == r.singleton.obj);
     // E431: anims attach fail-path + install into f08+0x20
     CHECK(r.vslot_40_anims_attach.ok);
-    CHECK(r.vslot_40_anims_attach.took_fail_path);
-    CHECK(r.vslot_40_anims_attach.installed);
-    CHECK(r.vslot_40_anims_attach.slot_after == g_anims_asset);
-    CHECK(loadp(r.singleton.obj, 0x20) == g_anims_asset);
-    check_key_release(r.vslot_40_anims_attach.key_release);
+    CHECK(r.vslot_40_anims_attach.get_ok);
+    CHECK(r.vslot_40_anims_attach.slot_assigned);
+    CHECK(r.vslot_40_anims_attach.lock_ok);
+    CHECK(r.vslot_40_anims_attach.wrapper != nullptr);
+    CHECK(loadp(r.singleton.obj, 0x20) == r.vslot_40_anims_attach.wrapper);
+    CHECK(r.vslot_40_anims_attach.refs_after == 1);
+    CHECK(r.vslot_40_anims_attach.deps_after == 1);
+    CHECK(r.vslot_40_anims_attach.state_after == 11);
+    check_key_release_miss(r.vslot_40_anims_attach.key_release);
     CHECK(r.vslot_40_anims_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_anims_attach.key_size == 30);
     CHECK(r.vslot_40_anims_attach.key_capacity == 31);
     CHECK(r.vslot_40_anims_attach.key_hash == 0x2b44f9dbu);
-    CHECK(g_v40_anims_14ccc0 == 1);
     // E432: shadowbanks load-attempt (notify f08+0x20 + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowbanks.ok);
     CHECK(g_v40_banks_notify == 1);
@@ -1754,16 +1808,19 @@ int main() {
     CHECK(r.vslot_40_shadowbanks.f08 == r.singleton.obj);
     // E433: banks attach fail-path + install into f08+0x40
     CHECK(r.vslot_40_banks_attach.ok);
-    CHECK(r.vslot_40_banks_attach.took_fail_path);
-    CHECK(r.vslot_40_banks_attach.installed);
-    CHECK(r.vslot_40_banks_attach.slot_after == g_banks_asset);
-    CHECK(loadp(r.singleton.obj, 0x40) == g_banks_asset);
-    check_key_release(r.vslot_40_banks_attach.key_release);
+    CHECK(r.vslot_40_banks_attach.get_ok);
+    CHECK(r.vslot_40_banks_attach.slot_assigned);
+    CHECK(r.vslot_40_banks_attach.lock_ok);
+    CHECK(r.vslot_40_banks_attach.wrapper != nullptr);
+    CHECK(loadp(r.singleton.obj, 0x40) == r.vslot_40_banks_attach.wrapper);
+    CHECK(r.vslot_40_banks_attach.refs_after == 1);
+    CHECK(r.vslot_40_banks_attach.deps_after == 1);
+    CHECK(r.vslot_40_banks_attach.state_after == 11);
+    check_key_release_miss(r.vslot_40_banks_attach.key_release);
     CHECK(r.vslot_40_banks_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_banks_attach.key_size == 36);
     CHECK(r.vslot_40_banks_attach.key_capacity == 39);
     CHECK(r.vslot_40_banks_attach.key_hash == 0x3b87dd56u);
-    CHECK(g_v40_banks_14ccc0 == 1);
     // E434: shadowstreams load-attempt (notify f08+0x40 + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowstreams.ok);
     CHECK(g_v40_streams_notify == 1);
@@ -1775,16 +1832,19 @@ int main() {
     CHECK(r.vslot_40_shadowstreams.f08 == r.singleton.obj);
     // E435: streams attach fail-path + install into f08+0x50
     CHECK(r.vslot_40_streams_attach.ok);
-    CHECK(r.vslot_40_streams_attach.took_fail_path);
-    CHECK(r.vslot_40_streams_attach.installed);
-    CHECK(r.vslot_40_streams_attach.slot_after == g_streams_asset);
-    CHECK(loadp(r.singleton.obj, 0x50) == g_streams_asset);
-    check_key_release(r.vslot_40_streams_attach.key_release);
+    CHECK(r.vslot_40_streams_attach.get_ok);
+    CHECK(r.vslot_40_streams_attach.slot_assigned);
+    CHECK(r.vslot_40_streams_attach.lock_ok);
+    CHECK(r.vslot_40_streams_attach.wrapper != nullptr);
+    CHECK(loadp(r.singleton.obj, 0x50) == r.vslot_40_streams_attach.wrapper);
+    CHECK(r.vslot_40_streams_attach.refs_after == 1);
+    CHECK(r.vslot_40_streams_attach.deps_after == 1);
+    CHECK(r.vslot_40_streams_attach.state_after == 11);
+    check_key_release_miss(r.vslot_40_streams_attach.key_release);
     CHECK(r.vslot_40_streams_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_streams_attach.key_size == 38);
     CHECK(r.vslot_40_streams_attach.key_capacity == 39);
     CHECK(r.vslot_40_streams_attach.key_hash == 0xf2163cc4u);
-    CHECK(g_v40_streams_14ccc0 == 1);
     // E436: shadowrandomevents load-attempt (notify f08+0x50 + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowrandomevents.ok);
     CHECK(g_v40_rand_notify == 1);
@@ -1796,16 +1856,19 @@ int main() {
     CHECK(r.vslot_40_shadowrandomevents.f08 == r.singleton.obj);
     // E437: randomevents attach fail-path + install into f08+0x60
     CHECK(r.vslot_40_randomevents_attach.ok);
-    CHECK(r.vslot_40_randomevents_attach.took_fail_path);
-    CHECK(r.vslot_40_randomevents_attach.installed);
-    CHECK(r.vslot_40_randomevents_attach.slot_after == g_rand_asset);
-    CHECK(loadp(r.singleton.obj, 0x60) == g_rand_asset);
-    check_key_release(r.vslot_40_randomevents_attach.key_release);
+    CHECK(r.vslot_40_randomevents_attach.get_ok);
+    CHECK(r.vslot_40_randomevents_attach.slot_assigned);
+    CHECK(r.vslot_40_randomevents_attach.lock_ok);
+    CHECK(r.vslot_40_randomevents_attach.wrapper != nullptr);
+    CHECK(loadp(r.singleton.obj, 0x60) == r.vslot_40_randomevents_attach.wrapper);
+    CHECK(r.vslot_40_randomevents_attach.refs_after == 1);
+    CHECK(r.vslot_40_randomevents_attach.deps_after == 1);
+    CHECK(r.vslot_40_randomevents_attach.state_after == 11);
+    check_key_release_miss(r.vslot_40_randomevents_attach.key_release);
     CHECK(r.vslot_40_randomevents_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_randomevents_attach.key_size == 43);
     CHECK(r.vslot_40_randomevents_attach.key_capacity == 43);
     CHECK(r.vslot_40_randomevents_attach.key_hash == 0x94a8da3fu);
-    CHECK(g_v40_rand_14ccc0 == 1);
     // E438: shadowbossmusic load-attempt (notify f08+0x60 + path + vcall + 14ccb0)
     CHECK(r.vslot_40_shadowbossmusic.ok);
     CHECK(g_v40_boss_notify == 1);
@@ -1817,16 +1880,19 @@ int main() {
     CHECK(r.vslot_40_shadowbossmusic.f08 == r.singleton.obj);
     // E439: bossmusic attach fail-path + install into f08+0x70
     CHECK(r.vslot_40_bossmusic_attach.ok);
-    CHECK(r.vslot_40_bossmusic_attach.took_fail_path);
-    CHECK(r.vslot_40_bossmusic_attach.installed);
-    CHECK(r.vslot_40_bossmusic_attach.slot_after == g_boss_asset);
-    CHECK(loadp(r.singleton.obj, 0x70) == g_boss_asset);
-    check_key_release(r.vslot_40_bossmusic_attach.key_release);
+    CHECK(r.vslot_40_bossmusic_attach.get_ok);
+    CHECK(r.vslot_40_bossmusic_attach.slot_assigned);
+    CHECK(r.vslot_40_bossmusic_attach.lock_ok);
+    CHECK(r.vslot_40_bossmusic_attach.wrapper != nullptr);
+    CHECK(loadp(r.singleton.obj, 0x70) == r.vslot_40_bossmusic_attach.wrapper);
+    CHECK(r.vslot_40_bossmusic_attach.refs_after == 1);
+    CHECK(r.vslot_40_bossmusic_attach.deps_after == 1);
+    CHECK(r.vslot_40_bossmusic_attach.state_after == 11);
+    check_key_release_miss(r.vslot_40_bossmusic_attach.key_release);
     CHECK(r.vslot_40_bossmusic_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_bossmusic_attach.key_size == 40);
     CHECK(r.vslot_40_bossmusic_attach.key_capacity == 43);
     CHECK(r.vslot_40_bossmusic_attach.key_hash == 0xbfa276e7u);
-    CHECK(g_v40_boss_14ccc0 == 1);
     // E440: cp3Characters load-attempt (notify f08+0x70 + path + vcall; no 14ccb0)
     CHECK(r.vslot_40_cp3characters.ok);
     CHECK(g_v40_cp3_notify == 1);
@@ -1836,16 +1902,19 @@ int main() {
     CHECK(r.vslot_40_cp3characters.f08 == r.singleton.obj);
     // E441: cp3Characters attach fail-path + install into self+0x3cb8
     CHECK(r.vslot_40_cp3characters_attach.ok);
-    CHECK(r.vslot_40_cp3characters_attach.took_fail_path);
-    CHECK(r.vslot_40_cp3characters_attach.installed);
-    CHECK(r.vslot_40_cp3characters_attach.slot_after == g_cp3_asset);
-    CHECK(loadp(app.data(), kVslot40Cp3charactersAttachSlotOff) == g_cp3_asset);
-    check_key_release(r.vslot_40_cp3characters_attach.key_release);
+    CHECK(r.vslot_40_cp3characters_attach.get_ok);
+    CHECK(r.vslot_40_cp3characters_attach.slot_assigned);
+    CHECK(r.vslot_40_cp3characters_attach.lock_ok);
+    CHECK(r.vslot_40_cp3characters_attach.wrapper != nullptr);
+    CHECK(loadp(app.data(), kVslot40Cp3charactersAttachSlotOff) == r.vslot_40_cp3characters_attach.wrapper);
+    CHECK(r.vslot_40_cp3characters_attach.refs_after == 1);
+    CHECK(r.vslot_40_cp3characters_attach.deps_after == 1);
+    CHECK(r.vslot_40_cp3characters_attach.state_after == 11);
+    check_key_release_miss(r.vslot_40_cp3characters_attach.key_release);
     CHECK(r.vslot_40_cp3characters_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_cp3characters_attach.key_size == 43);
     CHECK(r.vslot_40_cp3characters_attach.key_capacity == 43);
     CHECK(r.vslot_40_cp3characters_attach.key_hash == 0x99117412u);
-    CHECK(g_v40_cp3_14ccc0 == 1);
     // E442: cp3shadowprecache load-attempt (notify self+0x3cb8 + path + vcall; no 14ccb0)
     CHECK(r.vslot_40_cp3shadowprecache.ok);
     CHECK(g_v40_csp_notify == 1);
@@ -1855,16 +1924,19 @@ int main() {
     CHECK(r.vslot_40_cp3shadowprecache.self == app.data());
     // E443: cp3shadowprecache attach fail-path + install into self+0x3cc8
     CHECK(r.vslot_40_cp3shadowprecache_attach.ok);
-    CHECK(r.vslot_40_cp3shadowprecache_attach.took_fail_path);
-    CHECK(r.vslot_40_cp3shadowprecache_attach.installed);
-    CHECK(r.vslot_40_cp3shadowprecache_attach.slot_after == g_csp_asset);
-    CHECK(loadp(app.data(), kVslot40Cp3shadowprecacheAttachSlotOff) == g_csp_asset);
-    check_key_release(r.vslot_40_cp3shadowprecache_attach.key_release);
+    CHECK(r.vslot_40_cp3shadowprecache_attach.get_ok);
+    CHECK(r.vslot_40_cp3shadowprecache_attach.slot_assigned);
+    CHECK(r.vslot_40_cp3shadowprecache_attach.lock_ok);
+    CHECK(r.vslot_40_cp3shadowprecache_attach.wrapper != nullptr);
+    CHECK(loadp(app.data(), kVslot40Cp3shadowprecacheAttachSlotOff) == r.vslot_40_cp3shadowprecache_attach.wrapper);
+    CHECK(r.vslot_40_cp3shadowprecache_attach.refs_after == 1);
+    CHECK(r.vslot_40_cp3shadowprecache_attach.deps_after == 0);
+    CHECK(r.vslot_40_cp3shadowprecache_attach.state_after == 11);
+    check_key_release_miss(r.vslot_40_cp3shadowprecache_attach.key_release);
     CHECK(r.vslot_40_cp3shadowprecache_attach.dtor_f590_count == 1);
     CHECK(r.vslot_40_cp3shadowprecache_attach.key_size == 39);
     CHECK(r.vslot_40_cp3shadowprecache_attach.key_capacity == 39);
     CHECK(r.vslot_40_cp3shadowprecache_attach.key_hash == 0x13a0d114u);
-    CHECK(g_v40_csp_14ccc0 == 1);
     // All nine 0x14c2f0 keys: one tag-0 buffer + one tag-1 control each, all released.
     CHECK(g_key_alloc_tag0 == 9);
     CHECK(g_key_alloc_tag1 == 9);
@@ -1874,55 +1946,33 @@ int main() {
     CHECK(g_key_platform_tag_crmp == 7);
     CHECK(g_key_platform_tag_calt == 2);
 
-    // 0xf590 with a ResourcePool::GetResource map miss: the pool keeps one reference to the
-    // key, so the site's release is not the last one. Release the pool copy by hand below.
+    // A second attach with the same key takes the GetResource hit path: the wrapper is unchanged,
+    // the slot assignment is a no-op, the caller's key is the last reference, and Lock is idempotent.
     {
-        alignas(8) std::uint8_t local_f08[0x20]{};
-        void* const saved_f08 = singleton_f08_cell_2efc9e0();
-        singleton_f08_cell_2efc9e0() = local_f08;
-        g_key_last_buffer = nullptr;
-        g_key_last_control = nullptr;
         g_key_platform_tag_calls = 0;
-        g_key_platform_tag_crmp = 0;
-        g_key_platform_tag_calt = 0;
-
         Vslot40_533100ShadowAttachHooks mh{};
         install_key_hooks(mh);
-        mh.resource_pool_miss = true;
-        const auto mr = vslot_40_533100_shadow_attach(nullptr, false, mh);
+        install_pool(mh);
+        const auto mr = vslot_40_533100_shadow_attach(mh);
         CHECK(mr.ok);
-        CHECK(mr.key_release.ok);
-        CHECK(mr.key_release.had_control);
-        CHECK(mr.key_release.previous == 2);
-        CHECK(!mr.key_release.was_last);
-        CHECK(!mr.key_release.destroyed);
-        CHECK(!mr.key_release.freed);
-        CHECK(mr.dtor_f590_count == 1);
-        CHECK(mr.key_size == 31);
-        CHECK(mr.key_capacity == 31);
-        CHECK(mr.key_hash == 0x2128cdb9u);
+        CHECK(mr.wrapper == r.vslot_40_shadow_attach.wrapper);
+        CHECK(mr.prev_slot == mr.wrapper);
+        CHECK(mr.key_release.previous == 1);
+        check_key_release(mr.key_release);
+        CHECK(mr.refs_after == 1);
+        CHECK(mr.deps_after == 1);  // Lock is idempotent
+        CHECK(mr.state_after == 11);
         CHECK(g_key_platform_tag_calls == 1);
-        CHECK(g_key_platform_tag_crmp == 1);
-        CHECK(g_key_last_buffer != nullptr);
-        CHECK(g_key_last_control != nullptr);
-
-        auto* const ctl = static_cast<std::int64_t*>(g_key_last_control);
-        CHECK(std::atomic_ref<std::int64_t>(*ctl).load(std::memory_order_relaxed) == 1);
-        CHECK(std::atomic_ref<std::int64_t>(*ctl).fetch_sub(1, std::memory_order_relaxed) == 1);
-        std::free(g_key_last_buffer);
-        std::free(ctl);
-        g_key_last_buffer = nullptr;
-        g_key_last_control = nullptr;
-        singleton_f08_cell_2efc9e0() = saved_f08;
+        CHECK(pool.size() == std::size_t{9});
     }
-    // E444: 0x140d90 call-site (self+0x3cc8, arg=9) + f590; stop before stackchk
+    // E444: 0x140d90 Lock(slot=self+0x3cc8, 9) + the inert 0xf590; stop before stackchk.
     CHECK(r.vslot_40_tail_140d90.ok);
-    CHECK(g_v40_tail_140d90 == 1);
+    CHECK(r.vslot_40_tail_140d90.lock_ok);
+    CHECK(r.vslot_40_tail_140d90.state_after == 9);
+    CHECK(r.vslot_40_tail_140d90.deps_after == 1);
+    CHECK(g_v40_tail_140d90 == 0);  // the production slot path, not the host hook
     CHECK(r.vslot_40_tail_140d90.dtor_f590_count == 1);
     check_f590_release_noop(r.vslot_40_tail_140d90.release_f590);
-    CHECK(g_v40_tail_140d90_arg == kVslot40Tail140d90Arg);
-    CHECK(g_v40_tail_140d90_slot ==
-          static_cast<std::uint8_t*>(app.data()) + kVslot40Tail140d90SlotOff);
     CHECK(r.vslot_40_tail_140d90.arg == 9);
     // E445: stack-check success path (saved==live) through ret
     CHECK(r.vslot_40_stackchk.ok);
@@ -2670,7 +2720,7 @@ int main() {
         "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
-        "vslot533100_hit/success_atexit/499f80_body/56dcb0_body/5c64c0_body/1290_body/"
+        "success_atexit/499f80_body/56dcb0_body/5c64c0_body/1290_body/"
         "7f7220_body/f90310_plt_body/CP10_stack/26800_body/f590_body/52eb50_body/"
         "532ca0_body/stack_prep/vcall18_callee/544fe0_body/mov_rbx_prep/17070_body/"
         "vslot70_callee/53fd10_body/vcall38_callee/a2caf0_body/a2ed00_body/"
@@ -2687,21 +2737,21 @@ int main() {
         r.vslot_40_cp3characters.loaded, r.vslot_40_cp3shadowprecache.loaded,
         r.vslot_40_post.lookup_hit ? 1 : 0, r.vslot_40_miss.find_null ? 1 : 0,
         r.vslot_40_gfx.marker_value, r.vslot_40_shadow.refcount_after,
-        r.vslot_40_shadow_attach.took_fail_path ? 1 : 0,
+        r.vslot_40_shadow_attach.ok ? 1 : 0,
         r.vslot_40_shadowskels.refcount_after,
-        r.vslot_40_skels_attach.took_fail_path ? 1 : 0,
+        r.vslot_40_skels_attach.ok ? 1 : 0,
         r.vslot_40_shadowanims.refcount_after,
-        r.vslot_40_anims_attach.took_fail_path ? 1 : 0,
+        r.vslot_40_anims_attach.ok ? 1 : 0,
         r.vslot_40_shadowbanks.refcount_after,
-        r.vslot_40_banks_attach.took_fail_path ? 1 : 0,
+        r.vslot_40_banks_attach.ok ? 1 : 0,
         r.vslot_40_shadowstreams.refcount_after,
-        r.vslot_40_streams_attach.took_fail_path ? 1 : 0,
+        r.vslot_40_streams_attach.ok ? 1 : 0,
         r.vslot_40_shadowrandomevents.refcount_after,
-        r.vslot_40_randomevents_attach.took_fail_path ? 1 : 0,
+        r.vslot_40_randomevents_attach.ok ? 1 : 0,
         r.vslot_40_shadowbossmusic.refcount_after,
-        r.vslot_40_bossmusic_attach.took_fail_path ? 1 : 0,
-        r.vslot_40_cp3characters_attach.took_fail_path ? 1 : 0,
-        r.vslot_40_cp3shadowprecache_attach.took_fail_path ? 1 : 0,
+        r.vslot_40_bossmusic_attach.ok ? 1 : 0,
+        r.vslot_40_cp3characters_attach.ok ? 1 : 0,
+        r.vslot_40_cp3shadowprecache_attach.ok ? 1 : 0,
         r.vslot_40_tail_140d90.call_140d90_count,
         r.vslot_40_stackchk.returned ? 1 : 0,
         r.post_base_499f80.call_499f80_count,
@@ -2777,6 +2827,31 @@ int main() {
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),
         static_cast<long long>(us));
+
+    // Release the nine persistent slots: each wrapper must die once, the map must empty, and the
+    // pool's allocation/free counts must balance.
+    {
+        void* const f08 = r.singleton.obj;
+        LockedResourceRef* const slots[9] = {
+            reinterpret_cast<LockedResourceRef*>(static_cast<std::uint8_t*>(f08) + 0x00),
+            reinterpret_cast<LockedResourceRef*>(static_cast<std::uint8_t*>(f08) + 0x10),
+            reinterpret_cast<LockedResourceRef*>(static_cast<std::uint8_t*>(f08) + 0x20),
+            reinterpret_cast<LockedResourceRef*>(static_cast<std::uint8_t*>(f08) + 0x40),
+            reinterpret_cast<LockedResourceRef*>(static_cast<std::uint8_t*>(f08) + 0x50),
+            reinterpret_cast<LockedResourceRef*>(static_cast<std::uint8_t*>(f08) + 0x60),
+            reinterpret_cast<LockedResourceRef*>(static_cast<std::uint8_t*>(f08) + 0x70),
+            reinterpret_cast<LockedResourceRef*>(app.data() + kVslot40Cp3charactersAttachSlotOff),
+            reinterpret_cast<LockedResourceRef*>(app.data() + kVslot40Cp3shadowprecacheAttachSlotOff),
+        };
+        for (LockedResourceRef* const slot : slots) {
+            CHECK(slot->release(pool_hooks));
+        }
+        CHECK(pool.size() == std::size_t{0});
+        CHECK(g_pool_alloc == 9);
+        CHECK(g_pool_free == 9);
+        CHECK(g_key_free_tag0 == 9);  // nine map-node keys through the pool deallocator
+        CHECK(g_key_free_tag1 == 9);
+    }
 
     destroy_registry_at_2efd160(front);
     destroy_singleton_f08_at_2efc9e0(front, sh);

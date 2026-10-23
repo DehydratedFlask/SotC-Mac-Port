@@ -121,6 +121,7 @@ add_library(sotc_core STATIC
   core/vslot_40_533100_join.cpp
   core/vslot_40_533100_gfx_2ee2d00.cpp
   core/vslot_40_533100_shadowmodels.cpp
+  core/vslot_40_533100_attach_common.cpp
   core/vslot_40_533100_shadow_attach.cpp
   core/vslot_40_533100_shadowskels.cpp
   core/vslot_40_533100_skels_attach.cpp

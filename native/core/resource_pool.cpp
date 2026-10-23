@@ -293,6 +293,31 @@ bool release_resource_ref(ResourceRef& ref, const ResourcePoolHooks& hooks) noex
     return ok;
 }
 
+bool LockedResourceRef::assign(ResourceWrapper& wrapper, const ResourcePoolHooks& hooks) noexcept {
+    if (ref.ptr == &wrapper) return true;
+    bool ok = true;
+    if (ref.owned && ref.ptr != nullptr) {
+        ok = release_dependency(*ref.ptr, hooks);
+        ref.owned = false;
+    }
+    ResourceWrapper* const old = ref.ptr;
+    ref.ptr = &wrapper;
+    add_reference(wrapper);
+    if (old != nullptr && old != &null_resource_wrapper()) {
+        ok = remove_reference(*old, hooks) && ok;
+    }
+    return ok;
+}
+
+bool LockedResourceRef::lock(std::uint32_t priority, const HashedStr& requester,
+                             const ResourcePoolHooks& hooks) noexcept {
+    return lock_resource_ref(ref, priority, requester, hooks);
+}
+
+bool LockedResourceRef::release(const ResourcePoolHooks& hooks) noexcept {
+    return release_resource_ref(ref, hooks);
+}
+
 ResourcePool::ResourcePool(SharedStrDeallocatorF590* key_deallocator) noexcept
     : key_deallocator_(key_deallocator) {}
 

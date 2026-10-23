@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""ELF-tie app vslot 0x533100 shadowbanks attach after load-attempt.
+"""ELF-tie app vslot 0x533100 banks attach (production model, E595).
 
-Private: needs local/re/eboot.elf. Pins 278 B fragment, fail join, f08+0x40.
-Does NOT claim success atexit cluster, helper bodies, or shadowstreams.
+Pins the site's byte extent, its key literal, the slot offset and the recovered call targets.
+The earlier success-flag/notify reading is withdrawn: `[out]`/`[out+8]` are the GetResource
+`{ptr, owned}` result and `owned` is always 0, so the RequestState/release branches are dead.
 """
 
 from __future__ import annotations
@@ -17,12 +18,15 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import ps4_dynlink as d  # noqa: E402
 
 ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
-ATTACH = 0x5338D3
-ATTACH_SIZE = 278
-ATTACH_SHA256 = "8d40d0d965218272b7e11120fa4634df31414bce7e66d27e78bc49b7604d2a29"
-END = 0x5339E9
+SITE = 0x5338d3
+SIZE = 377
+SITE_SHA256 = "2ff988f06f42c112453f0475edf88c0359f25d65945cf612373eef0491f93bee"
+END = 0x533a4c
+LITERAL = "$/sound/shadow/****/shadowbanks.crmp"
+SLOT_OFF = 0x40
+SELF_BASED = False
 NATIVE = ROOT / "native/core/vslot_40_533100_banks_attach.hpp"
-BASE = ROOT / "native/core/base_initialize_255130.hpp"
+COMMON = ROOT / "native/core/vslot_40_533100_attach_common.cpp"
 
 
 def require(cond: bool, msg: str) -> None:
@@ -30,11 +34,18 @@ def require(cond: bool, msg: str) -> None:
         raise SystemExit(f"FAIL {msg}")
 
 
-def call_target(site: int, img: d.Image) -> int:
-    b = img.read(site, 5)
-    require(b[0] == 0xE8, f"missing call at {site:#x}")
-    rel = struct.unpack("<i", b[1:5])[0]
-    return site + 5 + rel
+def calls_in(img: d.Image, start: int, end: int) -> dict[int, int]:
+    counts: dict[int, int] = {}
+    pc = start
+    while pc + 5 <= end:
+        if img.read(pc, 1)[0] == 0xE8:
+            rel = struct.unpack("<i", img.read(pc + 1, 4))[0]
+            target = pc + 5 + rel
+            counts[target] = counts.get(target, 0) + 1
+            pc += 5
+        else:
+            pc += 1
+    return counts
 
 
 def main() -> int:
@@ -43,30 +54,37 @@ def main() -> int:
     _, ph = d.program_headers(elf)
     img = d.Image(elf, ph)
 
-    require(hashlib.sha256(img.read(ATTACH, ATTACH_SIZE)).hexdigest() == ATTACH_SHA256, "sha")
-    require(img.read(0x5338D3, 2) == bytes.fromhex("80bd"), "flag cmp")
-    je = img.read(0x5338DA, 2)
-    require(je[0] == 0x74, "je")
-    fail = 0x5338DC + struct.unpack("b", bytes([je[1]]))[0]
-    require(fail == 0x53394D, f"fail join {fail:#x}")
-    require(call_target(0x533953, img) == 0x14D880, "14d880")
-    require(call_target(0x533980, img) == 0x14CCB0, "14ccb0")
-    require(call_target(0x533988, img) == 0x14CCC0, "14ccc0")
-    require(call_target(0x5339E4, img) == 0xF590, "f590")
-    require(img.read(0x53397D, 3) == bytes.fromhex("4d892f"), "store [r15]")
-    require(img.read(0x533962, 4) == bytes.fromhex("41807e48"), "flag [r14+0x48]")
+    require(hashlib.sha256(img.read(SITE, SIZE)).hexdigest() == SITE_SHA256, "site bytes")
+    require(LITERAL.encode() in elf, "literal bytes in ELF")
+    require(img.read(SITE, 1)[0] in (0x80, 0x41, 0x4C, 0x4D, 0x48, 0x49),
+            "site does not start at the recovered join")
 
-    nh = NATIVE.read_text()
-    require("vslot_40_533100_banks_attach" in nh, "API")
-    require("kVslot40BanksAttachSlotOff" in nh, "slot")
-    require("NOT modelled" in nh, "omission")
-    require("banks_attach" in BASE.read_text() or "BanksAttach" in BASE.read_text(), "wire")
+    counts = calls_in(img, SITE - 0x30, END + 0x20)
+    require(counts.get(0x14C2F0, 0) >= 1, "0x14c2f0 key")
+    require(counts.get(0x14CCB0, 0) >= 2, "0x14ccb0 AddReference x2")
+    require(counts.get(0x14CCC0, 0) >= 2, "0x14ccc0 RemoveReference x2")
+    require(counts.get(0x14D880, 0) >= 1, "0x14d880 null wrapper")
+    require(counts.get(0xF590, 0) >= 1, "0xf590 key release")
+    require(counts.get(0x95580, 0) + counts.get(0x140D90, 0) >= 1, "slot Lock")
 
-    print(
-        f"OK check_f533100_vslot40_banks_attach: attach={ATTACH_SHA256[:12]}…; "
-        f"fail@0x53394d; install/14ccb0/14ccc0/f590; end={END:#x}; "
-        f"success_atexit/shadowstreams NOT claimed"
-    )
+    text = NATIVE.read_text()
+    require("Vslot40AttachCommonHooks" in text, "common hooks")
+    require(LITERAL in text, "literal constant")
+    require(f"SlotOff = {SLOT_OFF:#X}".lower() in text.lower(), "slot offset")
+    for bad in ("took_fail_path", "success_flag", "notify_95580", "resource_pool_miss",
+                "release_14ccc0", "resource_pool_miss"):
+        require(bad not in text, f"withdrawn token {bad}")
+    common = COMMON.read_text()
+    require(common.count("remove_reference(") >= 2, "two RemoveReference calls")
+    require("slot->assign(" in common, "slot assign")
+    require("slot->lock(" in common, "slot lock")
+    require("release_site_key(" in common, "key release")
+    base = (ROOT / "native/core/base_initialize_255130.cpp").read_text()
+    require("vslot_40_533100_banks_attach(" in base or "vslot_40_533100_banks_attach(cp3_detail)" in base
+            or "vslot_40_533100_banks_attach(csp_detail)" in base, "wired in base initialize")
+
+    print(f"OK check_f533100_vslot40_banks_attach: {SIZE} B {SITE_SHA256[:12]}…; "
+          f"key/addref/remove×2/null/f590/lock; slot={SLOT_OFF:#x}; literal pinned")
     return 0
 
 

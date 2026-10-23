@@ -86,6 +86,9 @@ bool base_initialize_255130(void* self, void* arg,
         if (!gr.ok) {
             return false;
         }
+        // Host initialization of the nine persistent attach slots `{null_wrapper,false}` (the
+        // original app constructor is not lifted; see E595).
+        vslot_40_533100_init_slots(singleton_f08_cell_2efc9e0(), self);
         // E426: always-on shadowmodels load-attempt (stop before success branch).
         const Vslot40_533100ShadowResult sr =
             vslot_40_533100_shadowmodels(hooks.vslot_40_shadow_detail);
@@ -97,7 +100,7 @@ bool base_initialize_255130(void* self, void* arg,
         }
         // E427: always-on attach (measured takes fail path; stop before shadowskels).
         const Vslot40_533100ShadowAttachResult ar = vslot_40_533100_shadow_attach(
-            sr.loaded, /*success_flag=*/false, hooks.vslot_40_shadow_attach_detail);
+            hooks.vslot_40_shadow_attach_detail);
         if (hooks.vslot_40_shadow_attach_out != nullptr) {
             *hooks.vslot_40_shadow_attach_out = ar;
         }
@@ -115,7 +118,7 @@ bool base_initialize_255130(void* self, void* arg,
         }
         // E429: always-on skels attach (measured fail path; install into f08+0x10).
         const Vslot40_533100SkelsAttachResult kar = vslot_40_533100_skels_attach(
-            kr.loaded, /*success_flag=*/false, hooks.vslot_40_skels_attach_detail);
+            hooks.vslot_40_skels_attach_detail);
         if (hooks.vslot_40_skels_attach_out != nullptr) {
             *hooks.vslot_40_skels_attach_out = kar;
         }
@@ -133,7 +136,7 @@ bool base_initialize_255130(void* self, void* arg,
         }
         // E431: always-on anims attach (measured fail path; install into f08+0x20).
         const Vslot40_533100AnimsAttachResult aar = vslot_40_533100_anims_attach(
-            anr.loaded, /*success_flag=*/false, hooks.vslot_40_anims_attach_detail);
+            hooks.vslot_40_anims_attach_detail);
         if (hooks.vslot_40_anims_attach_out != nullptr) {
             *hooks.vslot_40_anims_attach_out = aar;
         }
@@ -151,7 +154,7 @@ bool base_initialize_255130(void* self, void* arg,
         }
         // E433: always-on banks attach (measured fail path; install into f08+0x40).
         const Vslot40_533100BanksAttachResult bar = vslot_40_533100_banks_attach(
-            br.loaded, /*success_flag=*/false, hooks.vslot_40_banks_attach_detail);
+            hooks.vslot_40_banks_attach_detail);
         if (hooks.vslot_40_banks_attach_out != nullptr) {
             *hooks.vslot_40_banks_attach_out = bar;
         }
@@ -169,7 +172,7 @@ bool base_initialize_255130(void* self, void* arg,
         }
         // E435: always-on streams attach (measured fail path; install into f08+0x50).
         const Vslot40_533100StreamsAttachResult sar = vslot_40_533100_streams_attach(
-            sr2.loaded, /*success_flag=*/false, hooks.vslot_40_streams_attach_detail);
+            hooks.vslot_40_streams_attach_detail);
         if (hooks.vslot_40_streams_attach_out != nullptr) {
             *hooks.vslot_40_streams_attach_out = sar;
         }
@@ -187,7 +190,7 @@ bool base_initialize_255130(void* self, void* arg,
         }
         // E437: always-on randomevents attach (measured fail path; install into f08+0x60).
         const Vslot40_533100RandomeventsAttachResult rar = vslot_40_533100_randomevents_attach(
-            rr.loaded, /*success_flag=*/false, hooks.vslot_40_randomevents_attach_detail);
+            hooks.vslot_40_randomevents_attach_detail);
         if (hooks.vslot_40_randomevents_attach_out != nullptr) {
             *hooks.vslot_40_randomevents_attach_out = rar;
         }
@@ -205,7 +208,7 @@ bool base_initialize_255130(void* self, void* arg,
         }
         // E439: always-on bossmusic attach (measured fail path; install into f08+0x70).
         const Vslot40_533100BossmusicAttachResult bmar = vslot_40_533100_bossmusic_attach(
-            bmr.loaded, /*success_flag=*/false, hooks.vslot_40_bossmusic_attach_detail);
+            hooks.vslot_40_bossmusic_attach_detail);
         if (hooks.vslot_40_bossmusic_attach_out != nullptr) {
             *hooks.vslot_40_bossmusic_attach_out = bmar;
         }
@@ -222,10 +225,10 @@ bool base_initialize_255130(void* self, void* arg,
             return false;
         }
         // E441: always-on cp3Characters attach (measured fail; install into self+0x3cb8).
+        auto cp3_detail = hooks.vslot_40_cp3characters_attach_detail;
+        cp3_detail.self = self;
         const Vslot40_533100Cp3charactersAttachResult cpar =
-            vslot_40_533100_cp3characters_attach(
-                self, cpr.loaded, /*success_flag=*/false,
-                hooks.vslot_40_cp3characters_attach_detail);
+            vslot_40_533100_cp3characters_attach(cp3_detail);
         if (hooks.vslot_40_cp3characters_attach_out != nullptr) {
             *hooks.vslot_40_cp3characters_attach_out = cpar;
         }
@@ -242,10 +245,10 @@ bool base_initialize_255130(void* self, void* arg,
             return false;
         }
         // E443: always-on cp3shadowprecache attach (measured fail; install into self+0x3cc8).
+        auto csp_detail = hooks.vslot_40_cp3shadowprecache_attach_detail;
+        csp_detail.self = self;
         const Vslot40_533100Cp3shadowprecacheAttachResult cspar =
-            vslot_40_533100_cp3shadowprecache_attach(
-                self, cspr.loaded, /*success_flag=*/false,
-                hooks.vslot_40_cp3shadowprecache_attach_detail);
+            vslot_40_533100_cp3shadowprecache_attach(csp_detail);
         if (hooks.vslot_40_cp3shadowprecache_attach_out != nullptr) {
             *hooks.vslot_40_cp3shadowprecache_attach_out = cspar;
         }

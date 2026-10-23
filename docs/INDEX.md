@@ -280,3 +280,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Bag construct (2026-10-23)](checkpoints/2026-10-23-owner-bag-construct.md) | Hooks, 1..4 selection, mode/publish; E592 |
 | [ResourcePool (2026-10-23)](checkpoints/2026-10-23-resource-pool.md) | ResourceWrapper refs/deps, non-owning map; E593 |
 | [ResourcePool native (2026-10-23)](checkpoints/2026-10-23-resource-pool-native.md) | Wrapper/refs/deps/map model; E594 |
+| [ResourcePool wiring (2026-10-23)](checkpoints/2026-10-23-resource-pool-wiring.md) | Nine attach sites on the real pool; E595 |

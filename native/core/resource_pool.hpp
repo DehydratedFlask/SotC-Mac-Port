@@ -204,6 +204,26 @@ void add_reference(ResourceWrapper& wrapper) noexcept;
 [[nodiscard]] bool release_resource_ref(ResourceRef& ref,
                                         const ResourcePoolHooks& hooks) noexcept;
 
+// The attach sites' persistent slot `{ptr, owned}` (`TLockedResourceRef`). The original keeps one
+// per site (`(*0x2efc9e0)+{0,0x10,0x20,0x40,0x50,0x60,0x70}` and `self+0x3cb8`/`+0x3cc8`) and it is
+// the only persistent owner of an attached wrapper. Slots must start `{null_resource_wrapper(),false}`.
+struct LockedResourceRef {
+    ResourceRef ref{&null_resource_wrapper(), false};
+
+    // 0x5334f9 join: if the slot already holds `wrapper` this is a no-op. Otherwise release the old
+    // dependency when owned, store the new pointer, AddReference(wrapper), RemoveReference(old).
+    // `old == null_resource_wrapper()` is skipped: the original's getter/RemoveReference pair
+    // balances, leaving the singleton's permanent reference intact.
+    [[nodiscard]] bool assign(ResourceWrapper& wrapper, const ResourcePoolHooks& hooks) noexcept;
+
+    // 0x95580 (priority 13) / 0x140d90 (any priority): idempotent `if (!owned) request_state`.
+    [[nodiscard]] bool lock(std::uint32_t priority, const HashedStr& requester,
+                            const ResourcePoolHooks& hooks) noexcept;
+
+    // Slot teardown: owned -> ReleaseDependency, then RemoveReference; clears the slot pointer.
+    [[nodiscard]] bool release(const ResourcePoolHooks& hooks) noexcept;
+};
+
 // Non-owning `std::map<HashedStr, ResourceWrapper*, ResourceIdLess>` (the original map at pool+0x10).
 // `key_deallocator` releases the node-key/own-key/owner-id control blocks through the existing 0xf590
 // lift; a null deallocator is only acceptable when no free is required.

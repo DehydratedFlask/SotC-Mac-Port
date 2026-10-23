@@ -39,7 +39,13 @@ Vslot40_533100Tail140d90Result vslot_40_533100_tail_140d90(
     // OBS: mov esi, 9; mov rdi, r15 (= self+0x3cc8); call 0x140d90
     out.slot_obj = static_cast<std::uint8_t*>(self) + kVslot40Tail140d90SlotOff;
     out.arg = kVslot40Tail140d90Arg;
-    if (hooks.call_140d90 != nullptr) {
+    if (hooks.slot != nullptr) {
+        // 0x140d90: TLockedResourceRef::Lock(slot, 9); idempotent when the slot is already locked.
+        out.lock_ok = lock_resource_ref(hooks.slot->ref, kVslot40Tail140d90Arg,
+                                        HashedStr{}, hooks.pool_hooks);
+        out.state_after = hooks.slot->ref.ptr != nullptr ? hooks.slot->ref.ptr->state : 0;
+        out.deps_after = hooks.slot->ref.ptr != nullptr ? hooks.slot->ref.ptr->deps.load() : 0;
+    } else if (hooks.call_140d90 != nullptr) {
         hooks.call_140d90(out.slot_obj, out.arg);
     }
     ++out.call_140d90_count;
@@ -67,8 +73,9 @@ Vslot40_533100Tail140d90Result vslot_40_533100_tail_140d90(
     const bool release_ok = (hooks.call_f590 != nullptr) || is_inert_release(out.release_f590);
 
     // stack-check / epilogue @ 0x534052 — see vslot_40_533100_stackchk.*
+    const bool lock_ok = hooks.slot == nullptr || out.lock_ok;
     out.ok = (out.call_140d90_count == 1) && (out.dtor_f590_count == 1) &&
-             (out.arg == kVslot40Tail140d90Arg) && release_ok;
+             (out.arg == kVslot40Tail140d90Arg) && release_ok && lock_ok;
     return out;
 }
 

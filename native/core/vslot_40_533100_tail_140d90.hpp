@@ -16,6 +16,7 @@
 // `+0x30` stay unmodelled because `0xf590` reads only `+0x00`/`+0x18`. PR #5 cite-only.
 #pragma once
 
+#include "resource_pool.hpp"
 #include "shared_release_f590.hpp"
 
 #include <cstddef>
@@ -31,6 +32,10 @@ inline constexpr int kVslot40Tail140d90Arg = 9;
 inline constexpr const char kVslot40Tail140d90NamePosition[] = "Position";
 
 struct Vslot40_533100Tail140d90Hooks {
+    // Production path: the persistent site-9 slot. When non-null the lifted `lock_resource_ref`
+    // runs with priority 9 (the `0x140d90` observable), instead of `call_140d90`.
+    LockedResourceRef* slot = nullptr;
+    ResourcePoolHooks pool_hooks{};
     // Models 0x140d90(slot_obj, arg). Null → no-op.
     void (*call_140d90)(void* slot_obj, int arg) = nullptr;
     // 0xf590(rdi = &holder) at 0x53404d. Original: 0x38 B stack temp whose first 0x20 B are
@@ -46,6 +51,9 @@ struct Vslot40_533100Tail140d90Result {
     void* slot_obj = nullptr;
     int arg = 0;
     int call_140d90_count = 0;
+    bool lock_ok = false;
+    std::uint32_t state_after = 0;
+    std::uint32_t deps_after = 0;
     int dtor_f590_count = 0;
     // Measured 0xf590 effect: the holder's `+0x18` is zero, so nothing is decremented,
     // destroyed, or freed.
