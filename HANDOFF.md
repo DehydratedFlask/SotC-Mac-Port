@@ -8,8 +8,8 @@ The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **366/366** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **463 passed / 0 skipped / 0 failed** with
+- Full native suite: **367/367** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **464 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -233,6 +233,11 @@ The rounds that follow the archive are in chronological order.
 - **E602** — `D` is a Camera-typed registry object, **not** `_Root`; the 24-byte block is at
   `[D+0x18]+0x2e8` and the pose path is the debug-only `SyncCameraAcrossTools` tool command. The
   `element+0x18` field does not exist (it is the next slot's value). No native BoundMemberFn.
+- **E603** — the owner row-9 ctor `0xa5c850` is native: 721 B, the 0xa530 object's partial
+  initialization (head scalars, six inline vectors, 256×0x40 records, the lane group, 32×1.0f,
+  `0xf180`, `0xb09650`, two event flags) and the 24 B global copy. `0x3b3d0` is
+  `sceKernelCreateEventFlag`, not a mutex, and `0x32f8ff0` is the pointer slot. The dtor
+  `0xa5cb30` remains a contract.
 - **E594** — the native ResourceWrapper/ResourcePool/ResourceRef model is implemented: exact
   0x100 B wrapper, hash-then-strcmp comparator, non-owning map, hit/miss references, erase at zero,
   dependency recursion, the priority state table, and lock/unlock refs. Hooks cover allocation,
