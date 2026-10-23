@@ -37,7 +37,7 @@ Insert1bdc80Result insert_1bdc80(Container1beeb0& container, const Callable1bdeb
     Callable1bdeb0 temp_a2 = copy_and_acquire(temp_a, out.acquires);
     Callable1bdeb0 temp_b2 = copy_and_acquire(temp_b, out.acquires);
 
-    const AllocWrapperResult alloc = alloc_17070(kInsert1bdc80NodeSize, hooks.alloc);
+    const AllocWrapperResult alloc = alloc_17090(kInsert1bdc80NodeSize, hooks.alloc);
     out.allocated = alloc.ok;
     if (!alloc.ok || alloc.pointer == nullptr) {
         const bool ok_b2 = release_again(temp_b2, hooks.release);
@@ -55,11 +55,11 @@ Insert1bdc80Result insert_1bdc80(Container1beeb0& container, const Callable1bdeb
     List1bdc80& list = *reinterpret_cast<List1bdc80*>(
         reinterpret_cast<std::byte*>(&container) + kInsert1bdc80ListOffset);
     Node1bdc80* const sentinel = reinterpret_cast<Node1bdc80*>(&list);
-    Node1bdc80* const old_head = list.next;
-    node->prev = sentinel;       // 0x1bddc0
-    node->next = old_head;       // 0x1bddce
-    old_head->prev = node;       // 0x1bddd7
-    list.next = node;            // 0x1bddda
+    Node1bdc80* const old_tail = list.prev;
+    node->next = sentinel;       // 0x1bddc0
+    node->prev = old_tail;       // 0x1bddce
+    old_tail->next = node;       // 0x1bddd7
+    list.prev = node;            // 0x1bddda
     ++list.count;                // 0x1bdddf
 
     // The two middle releases are no-ops by construction; the last two hand the acquired refs over.

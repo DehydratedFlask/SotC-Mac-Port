@@ -3,7 +3,8 @@
 // The original container is the 0x60 B three-list object built by `0x1bdb10` (E534) and stored in
 // `*(0x2ee68c8)`. Its list-1 sentinel (`+0x00`) receives the 0x58-byte named-entry nodes built by
 // `0x1bdb50` (E560); list-3 (`+0x40`) receives the 0x60-byte callable nodes inserted by `0x1beeb0`
-// through `0x1bde30`, and is the list `0x1290` uses. List-2 (`+0x20`) has no recovered writer yet.
+// through `0x1bde30`, and is the list `0x1290` uses. List-2 (`+0x20`) is written by `0x1bdc80`
+// (E571) and read/cleared by the `0x1bdf30` phases 4/6 (`appinfo_listb`, E575).
 //
 // This wrapper exists because `0x1290` cannot run natively until the singleton owner exists: the
 // A-insert needs a real `*(0x2ee68c8)` object. It provides that object, the entry-insert helper for

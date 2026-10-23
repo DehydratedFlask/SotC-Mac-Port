@@ -22,7 +22,7 @@ void* test_allocate(std::size_t size, std::uint32_t tag, std::uint32_t align, st
     CHECK(size == 0x50);
     CHECK(tag == 1);
     CHECK(align == 8);
-    CHECK(flags == 1);
+    CHECK(flags == 2);  // 0x17090: the tag-2 family, paired with the 0x170c0 free
     if (g_fail) {
         return nullptr;
     }
@@ -96,24 +96,24 @@ int main() {
     // Node owns one reference per holder (the other three were released).
     CHECK(ca->load() == 2);
     CHECK(cb->load() == 2);
-    CHECK(first.node->prev == sentinel);
     CHECK(first.node->next == sentinel);
+    CHECK(first.node->prev == sentinel);
     CHECK(sentinel->next == first.node);
     CHECK(sentinel->prev == first.node);
     CHECK(first.node->callable_10.value_00 == 0x1111);
     CHECK(first.node->callable_10.value_08 == 2);
     CHECK(first.node->callable_30.value_00 == 0x2222);
 
-    // ---- 2. Second insert becomes the new head; old head prev is updated. ----
+    // ---- 2. Second insert becomes the new tail; the first node's next is updated. ----
     Callable1bdeb0 c{};
     c.value_00 = 0x3333;
     const auto second = insert_1bdc80(container, c, b, hooks);
     CHECK(second.ok);
     CHECK(second.count_after == 2);
-    CHECK(sentinel->next == second.node);
-    CHECK(sentinel->prev == first.node);
-    CHECK(second.node->next == first.node);
-    CHECK(first.node->prev == second.node);
+    CHECK(sentinel->next == first.node);
+    CHECK(sentinel->prev == second.node);
+    CHECK(first.node->next == second.node);
+    CHECK(second.node->prev == first.node);
 
     // ---- 3. Allocation failure restores all four acquisitions. ----
     g_fail = true;
@@ -125,7 +125,7 @@ int main() {
     CHECK(failed.refs_restored);
     CHECK(failed.count_after == 0);
     CHECK(ca->load() == before_a);
-    CHECK(sentinel->next == second.node);  // list untouched
+    CHECK(sentinel->prev == second.node);  // list untouched
     g_fail = false;
 
     // Test cleanup: release the node-held refs and free the nodes.

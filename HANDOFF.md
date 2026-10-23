@@ -1,15 +1,15 @@
 # SoC Mac Native — current handoff
 
 Updated: 2026-10-23 (America/Chicago). Integrator: OpenCode orchestrator (goal resumed by explicit
-user command). Branch `cursor/init-hash-551140-9dfc`; round-25 code tip `f394fc8`; round-24 tip `9a85650`.
+user command). Branch `cursor/init-hash-551140-9dfc`; round-25 tips `f394fc8` (E569–E573), `1eebca2` (E574), and the commit carrying this file (E575); round-24 tip `9a85650`.
 Older rounds, the history-rewrite record and the full pre-tidy handoff are archived verbatim in
 [docs/checkpoints/HANDOFF-archive-2026-10-23.md](docs/checkpoints/HANDOFF-archive-2026-10-23.md).
 The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **349/349** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **446 passed / 0 skipped / 0 failed** with
+- Full native suite: **350/350** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **447 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -125,6 +125,12 @@ The rounds that follow the archive are in chronological order.
   `shared_release_f590` with real holders (`"r_fps"` ×2, `"Position"` ×2). The nine rank-2
   key-holder sites remain real refcount releases and are untouched; `0x5333e3` stays a per-element
   hook. Mutation checks fail on a non-null control and on a skipped release.
+- **E575** — list B is the screenshot-attachment channel and is **serialized, not counted**: the
+  reader (`0x1be2f7`, 239 B) walks FIFO and emits one `"Attachment"` node plus a kind-4 value child
+  per entry, copying value and name. The clear (`0x1be458`, 69 B) releases value then name, frees
+  with tag 2, and zeroes both links and the 8-byte count. Native `report_tree` + `appinfo_listb`;
+  list-B fields renamed to the recovered next/prev order and the node allocation corrected to the
+  `0x17090` flags-2 wrapper. Checkers 447/0/0, ctest 350/350.
 
 ## Settled decisions (do not re-ask)
 

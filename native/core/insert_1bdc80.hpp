@@ -13,8 +13,8 @@
 //   temp_b2 = temp_b ; acquire control                             ; 0x1bdd1e..0x1bdd60
 //   node = 0x17090(0x50)                                           ; 0x1bdd90..0x1bdd9f
 //   node[+0x10] = temp_a2 ; node[+0x30] = temp_b2                  ; 0x1bddb2 / 0x1bddbb
-//   node->prev = &container+0x20 ; node->next = old head           ; 0x1bddc0 / 0x1bddce
-//   old_head->prev = node ; container[+0x28] = node                ; 0x1bddd7 / 0x1bddda
+//   node->next = sentinel ; node->prev = old tail                  ; 0x1bddc0 / 0x1bddce
+//   old_tail->next = node ; sentinel.prev = node                   ; 0x1bddd7 / 0x1bddda
 //   incq [container+0x30]                                          ; 0x1bdddf
 //   zero temp_a2/temp_b2 ; 0xf590 each (no-ops)                    ; 0x1bddb7..0x1bddee
 //   zero temp_b/temp_a ; 0xf590 each (transfer the refs to node)   ; 0x1bddf3..0x1bde02
@@ -48,8 +48,8 @@ inline constexpr std::size_t kInsert1bdc80ListOffset = 0x20;
 inline constexpr std::size_t kInsert1bdc80CountOffset = 0x30;
 
 struct Node1bdc80 {
-    Node1bdc80* prev;             // +0x00
-    Node1bdc80* next;             // +0x08
+    Node1bdc80* next;             // +0x00  forward link (sentinel.next = head)
+    Node1bdc80* prev;             // +0x08  backward link (sentinel.prev = tail)
     Callable1bdeb0 callable_10;   // +0x10
     Callable1bdeb0 callable_30;   // +0x30
 };
@@ -58,8 +58,8 @@ static_assert(offsetof(Node1bdc80, callable_10) == 0x10);
 static_assert(offsetof(Node1bdc80, callable_30) == 0x30);
 
 struct List1bdc80 {
-    Node1bdc80* prev;      // +0x00 (container +0x20)
-    Node1bdc80* next;      // +0x08 (container +0x28)
+    Node1bdc80* next;      // +0x00 (container +0x20) sentinel.next = head
+    Node1bdc80* prev;      // +0x08 (container +0x28) sentinel.prev = tail
     std::uint64_t count;   // +0x10 (container +0x30)
     std::uint64_t pad_18;  // container +0x38
 };
@@ -80,7 +80,7 @@ struct Insert1bdc80Result {
     bool refs_restored = false;
 };
 
-// Inserts a 0x50 B node at the front of list B (sentinel at container+0x20). `container` is the
+// Inserts a 0x50 B node at the tail of list B (sentinel at container+0x20). `container` is the
 // 0x60 B three-list object. Allocation failure restores both acquired references.
 [[nodiscard]] Insert1bdc80Result insert_1bdc80(Container1beeb0& container,
                                                const Callable1bdeb0& a,

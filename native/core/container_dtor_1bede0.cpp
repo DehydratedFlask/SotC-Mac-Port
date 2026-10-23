@@ -50,9 +50,9 @@ ContainerDtor1bede0Result container_dtor_1bede0(
     {
         auto& list = *reinterpret_cast<List1bdc80*>(&container.list2_prev);
         Node1bdc80* const sentinel = reinterpret_cast<Node1bdc80*>(&list);
-        Node1bdc80* node = list.prev;
+        Node1bdc80* node = list.next;
         while (node != sentinel) {
-            Node1bdc80* const next = node->prev;
+            Node1bdc80* const next = node->next;
             release_callable(node->callable_30, hooks.release, out.releases,
                              out.release_failures);
             release_callable(node->callable_10, hooks.release, out.releases,
@@ -61,8 +61,8 @@ ContainerDtor1bede0Result container_dtor_1bede0(
             ++out.freed_b;
             node = next;
         }
-        list.prev = sentinel;
         list.next = sentinel;
+        list.prev = sentinel;
         list.count = 0;
     }
 
@@ -81,8 +81,8 @@ ContainerDtor1bede0Result container_dtor_1bede0(
             ++out.freed_a;
             node = next;
         }
-        list.prev = sentinel;
         list.next = sentinel;
+        list.prev = sentinel;
         list.count = 0;
     }
 

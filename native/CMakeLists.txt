@@ -77,6 +77,8 @@ add_library(sotc_core STATIC
   core/container_dtor_1bede0.cpp
   core/registry_slot.cpp
   core/app_info_collect.cpp
+  core/appinfo_listb.cpp
+  core/report_tree.cpp
   core/insert_1bdc80.cpp
   core/owner_properties_2569d0.cpp
   core/camera_location_25a4d0.cpp
@@ -1765,6 +1767,10 @@ add_test(NAME registry_slot COMMAND test_registry_slot)
 add_executable(test_app_info_collect tests/test_app_info_collect.cpp)
 target_link_libraries(test_app_info_collect sotc_core)
 add_test(NAME app_info_collect COMMAND test_app_info_collect)
+
+add_executable(test_appinfo_listb tests/test_appinfo_listb.cpp)
+target_link_libraries(test_appinfo_listb sotc_core)
+add_test(NAME appinfo_listb COMMAND test_appinfo_listb)
 
 add_executable(test_insert_1bdc80 tests/test_insert_1bdc80.cpp)
 target_link_libraries(test_insert_1bdc80 sotc_core)

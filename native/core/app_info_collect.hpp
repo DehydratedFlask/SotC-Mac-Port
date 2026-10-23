@@ -16,7 +16,7 @@
 // `sentinel+0x10`. Nodes with any other flag are left for the `0x1bdeb0` purge (which deletes
 // `flag == 0`).
 //
-// NOT modelled: the report/FieldEntry construction, list B insertion/read/clear, and the
+// NOT modelled here: the report/FieldEntry construction and list B (see `appinfo_listb`), and the
 // `snapshotBugData` gate at `0x25db56` (the only caller path). G1 PARTIAL.
 #pragma once
 

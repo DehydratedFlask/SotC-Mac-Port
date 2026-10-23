@@ -2,6 +2,7 @@
 //
 // ELF sha256 d0723afb…861d3. Byte-verified (all end in a rel32 `jmp`, so they are tail wrappers):
 //   0x17070 (20 B): mov esi,1 ; mov edx,8 ; mov ecx,1 ; jmp 0x12820   ; allocate(size=edi)
+//   0x17090 (20 B): mov esi,1 ; mov edx,8 ; mov ecx,2 ; jmp 0x12820   ; allocate, flags=2
 //   0x170b0 (10 B): mov esi,1 ; jmp 0x12af0                          ; free(ptr, tag 1)
 //   0x170c0 (10 B): mov esi,2 ; jmp 0x12af0                          ; free(ptr, tag 2)
 //
@@ -21,6 +22,8 @@ namespace sotc {
 
 inline constexpr std::uint64_t kAlloc17070Rva = 0x17070;
 inline constexpr std::size_t kAlloc17070Size = 20;
+inline constexpr std::uint64_t kAlloc17090Rva = 0x17090;
+inline constexpr std::size_t kAlloc17090Size = 20;
 inline constexpr std::uint64_t kFree170b0Rva = 0x170B0;
 inline constexpr std::size_t kFree170b0Size = 10;
 inline constexpr std::uint64_t kFree170c0Rva = 0x170C0;
@@ -46,6 +49,11 @@ struct AllocWrapperResult {
 
 // 0x17070: allocate(edi = size) with the recovered constants (tag 1, align 8, flags 1).
 [[nodiscard]] AllocWrapperResult alloc_17070(std::size_t size,
+                                             const AllocDispatchContract& contract) noexcept;
+
+// 0x17090: allocate(edi = size) with the recovered constants (tag 1, align 8, flags 2). The
+// differing flags select the tag-2 free family (0x170c0); this is the list-B/report-node pair.
+[[nodiscard]] AllocWrapperResult alloc_17090(std::size_t size,
                                              const AllocDispatchContract& contract) noexcept;
 
 // 0x170b0 / 0x170c0: free(ptr) through 0x12af0 with tag 1 / tag 2. Null ptr is a no-op success
