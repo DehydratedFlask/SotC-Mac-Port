@@ -63,6 +63,7 @@ add_library(sotc_core STATIC
   core/appmain_init_registry_slice.cpp
   core/init_531d60_trivial_leaves.cpp
   core/init_1290.cpp
+  core/init_531d60_entry_gaps.cpp
   core/insert_1beeb0.cpp
   core/insert_21cd0.cpp
   core/container_1bdb10.cpp
@@ -1695,6 +1696,10 @@ target_link_libraries(test_appmain_init_prologue_tail_slice sotc_core)
 add_test(NAME appmain_init_prologue_tail_slice COMMAND test_appmain_init_prologue_tail_slice)
 set_tests_properties(appmain_init_prologue_tail_slice PROPERTIES
   ENVIRONMENT "SOTC_INPUTTABLE_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/inputtable_551140_names.bin")
+
+add_executable(test_init_531d60_entry_gaps tests/test_init_531d60_entry_gaps.cpp)
+target_link_libraries(test_init_531d60_entry_gaps sotc_core)
+add_test(NAME init_531d60_entry_gaps COMMAND test_init_531d60_entry_gaps)
 
 add_executable(test_init_1290 tests/test_init_1290.cpp)
 target_link_libraries(test_init_1290 sotc_core)
