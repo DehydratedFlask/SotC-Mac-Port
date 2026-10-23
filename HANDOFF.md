@@ -1,5 +1,26 @@
 # SoC Mac Native — current handoff
 
+Updated: 2026-10-22 21:43 CDT (America/Chicago). Integrator: /root (Codex).
+
+## Active Codex parallel foundations claim
+
+- Base ff7b186; isolated managed worktree sotc-parallel-foundations. User explicitly selected
+  continued publication to cursor/init-hash-551140-9dfc. Earlier main publication instruction is
+  overridden for this session. Startup_ctors/Init/FNV/registry Drive ownership remains intact.
+- Plan/spec and file ownership: [parallel foundations plan](docs/checkpoints/2026-10-22-codex-parallel-foundations-plan.md).
+- SAV-01-ATOMIC-WRITER-TEMP-ISOLATION-01: claimed; user selected unique exclusive same-directory temporary files.
+- CPU-01-SHARED-STR-RELEASE-F590-01 and AUD-02-NGS2-RACKQUERY-RDX-CFG-01: claimed;
+  implementation not started; zero prior failed task hypotheses found by scouts.
+- All three scouts made no edits/tests/builds. Their findings are proposals requiring implementation
+  and review. SharedStr mapping is inference; full f590 bytes are pinned; allocator body external.
+- User requested removing Claude contribution credit. Metadata inspection found zero matching
+  authors/committers, zero trailers in the 299 Init-only commits, 70 in published ancestors.
+  Prepare a tree/author-preserving review artifact before resolving the no-force-push conflict.
+- Exact next action: publish claim, dispatch file-disjoint workers, root handles shared integration.
+- G0 PARTIAL; G1 PARTIAL; G2–G6 NOT RUN. No boot/audio/save-reload/Metal gameplay claim.
+
+## Previous Drive handoff (preserved)
+
 Updated: 2026-10-22 18:45 CDT (America/Chicago). Drive Init-hash:
 bc-bf254dd3-8d34-514b-a322-1684213b3fa9. Parallel heap deepen (separate worktree / PR #5):
 tip `4d7e484` / pause `0510d35` / PR #5 E399–E403 cited only — Drive does not edit heap
