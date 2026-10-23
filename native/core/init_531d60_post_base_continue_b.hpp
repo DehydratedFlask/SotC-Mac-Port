@@ -30,11 +30,17 @@
 //     continue_a at 0x532747, NOT re-pinned in this module — provenance
 //     is upstream).
 //
+// Branch outcome (E524): `0x1e4c0` is a config-value lookup that returns a
+// boolean on every path (`movb $1` / `xor` / `setne` -> eax), so when the call
+// hook supplies a value in {0,1} the `test bl,bl` / `je 0x5328e0` outcome is
+// modelled: bl == 0 => taken, bl != 0 => not taken. Any other value, or no
+// hook, leaves `branch_outcome_modelled == false`.
+//
 // NOT modelled (do not read as semantics):
 //   * bodies of 0x1e4c0 and 0x4c4950 — hooks are host stand-ins,
 //     null hook => no-op;
-//   * the `test bl,bl` flag value and the `je` outcome, plus BOTH
-//     successors (`0x5327b1` fall-through block and `0x5328e0` branch target);
+//   * BOTH successors (`0x5327b1` fall-through block and the 36 B
+//     `0x5328e0` preamble that also falls into the 0x532904 merge);
 //   * the actual non-zero rax value (return from 0x1fc80, NOT modelled);
 //   * provenance of rax, r13, and the flag computed by continue_a
 //     (r13 = [0x32f84f8] from 0x532747);
@@ -53,8 +59,8 @@ namespace sotc {
 inline constexpr std::uint64_t kInit531d60PostBaseContinueBRva = 0x53277f;
 inline constexpr std::size_t kInit531d60PostBaseContinueBSize = 50;
 inline constexpr std::uint64_t kInit531d60PostBaseContinueBEndRva = 0x5327b1;
-// Next conditional branch after the continue_a je fall-through: pinned target,
-// outcome NOT modelled.
+// Next conditional branch after the continue_a je fall-through. Target is
+// pinned; the outcome is modelled only when the 0x1e4c0 hook returns 0 or 1.
 inline constexpr std::uint64_t kInit531d60PostBaseContinueBBranchRva = 0x5327ab;
 inline constexpr std::uint64_t kInit531d60PostBaseContinueBBranchTargetRva = 0x5328e0;
 inline constexpr std::uint64_t kInit531d60PostBaseContinueBCall1e4c0Rva = 0x1e4c0;
@@ -147,6 +153,10 @@ struct Init531d60PostBaseContinueBResult {
     std::uint64_t end_rva = kInit531d60PostBaseContinueBEndRva;
     std::uint64_t branch_target_rva = kInit531d60PostBaseContinueBBranchTargetRva;
     bool branch_outcome_modelled = false;
+    // E524 rule, only meaningful when branch_outcome_modelled: je is taken
+    // when bl == 0, because 0x1e4c0 returns a boolean.
+    std::uint8_t bl = 0;
+    bool branch_taken = false;
 };
 
 // Runs the OBS `0x53277f..0x5327b1` unit sequence on the measured Init path.

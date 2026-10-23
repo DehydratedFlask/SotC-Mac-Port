@@ -79,15 +79,19 @@ Init531d60PostBaseContinueBResult init_531d60_post_base_continue_b(
     }
     pin(out, ContinueBUnit::mov_rdi_r13_load);
 
-    // 0x5327a9 test bl,bl — flags are NOT evaluated.
+    // 0x5327a9 test bl,bl — the flag is bl itself (E524: boolean by contract).
     pin(out, ContinueBUnit::test_bl_bl);
     ++out.alu_count;
 
-    // 0x5327ab je 0x5328e0 — structural boundary. Target pinned by the checker;
-    // outcome and both successor blocks (0x5327b1 / 0x5328e0) NOT modelled.
+    // 0x5327ab je 0x5328e0 — target is pinned by the checker. The outcome is
+    // modelled only when the 0x1e4c0 hook produced a proven boolean (E524);
+    // both successor blocks themselves stay unmodelled.
     pin(out, ContinueBUnit::je_5328e0);
     ++out.branch_boundary_count;
-    out.branch_outcome_modelled = false;  // je outcome / both successors NOT modelled
+    out.bl = static_cast<std::uint8_t>(eax & 0xFF);
+    const bool bl_is_boolean = out.eax_known && (eax == 0 || eax == 1);
+    out.branch_outcome_modelled = bl_is_boolean;
+    out.branch_taken = bl_is_boolean && (out.bl == 0);
 
     out.ok = (out.unit_executed == kInit531d60PostBaseContinueBUnitCount) &&
              (out.call_count == 2) && (out.alu_count == 5) && (out.load_count <= 1) &&

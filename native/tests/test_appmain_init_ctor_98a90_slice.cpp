@@ -607,10 +607,12 @@ void hook_cont_a_1fc80(void* rdi, std::uintptr_t rsi_rva) {
     g_cont_a_1fc80_rdi = rdi;
     g_cont_a_1fc80_rsi_rva = rsi_rva;
 }
+int g_cont_b_1e4c0_value = 0xA6;  // host stand-in; 0xA6 keeps the non-boolean path
+
 int hook_cont_b_1e4c0(void* rdi) {
     ++g_cont_b_1e4c0;
     g_cont_b_1e4c0_rdi = rdi;
-    const int eax = 0xA6;  // host stand-in; bl = 0xA6, r12b = 0xA7
+    const int eax = g_cont_b_1e4c0_value;
     g_cont_b_1e4c0_eax = eax;
     return eax;
 }
@@ -1844,6 +1846,11 @@ int main() {
     CHECK(r.post_base_continue_b.load_count == 1);
     CHECK(r.post_base_continue_b.branch_boundary_count == 1);
     CHECK(!r.post_base_continue_b.branch_outcome_modelled);
+    // E524: a non-boolean 0xA6 leaves the je outcome unmodelled, so the merge
+    // block still runs exactly as before (no silent branch claim).
+    CHECK(!r.post_base_continue_b.branch_taken);
+    CHECK(!r.init_branch_5328e0_taken);
+    CHECK(!r.init_stopped_at_5328e0);
     CHECK(r.post_base_continue_b.end_rva == 0x5327b1);
     CHECK(r.post_base_continue_b.branch_target_rva == 0x5328e0);
     CHECK(g_cont_b_1e4c0 == 1);
@@ -1906,6 +1913,36 @@ int main() {
     CHECK(r.tail.obj_40 != nullptr);
     CHECK(loadp(r.tail.obj_40, 0) == ctor40_derived_vtable_1598ae0());
     CHECK(ctor40_cell_2ee6778() == r.tail.obj_40);
+
+    // E524 direct coverage: the 0x1e4c0 contract makes bl a proven boolean, so
+    // the je outcome is modelled (bl == 0 => taken) and the slice stops at the
+    // unmodelled 0x5328e0 preamble instead of entering the merge block.
+    {
+        Init531d60PostBaseContinueBHooks h{};
+        h.call_1e4c0 = hook_cont_b_1e4c0;
+        g_cont_b_1e4c0_value = 1;
+        const auto b1 = init_531d60_post_base_continue_b(h);
+        CHECK(b1.ok);
+        CHECK(b1.branch_outcome_modelled);
+        CHECK(b1.bl == 1);
+        CHECK(!b1.branch_taken);
+        g_cont_b_1e4c0_value = 0;
+        const auto b0 = init_531d60_post_base_continue_b(h);
+        CHECK(b0.ok);
+        CHECK(b0.branch_outcome_modelled);
+        CHECK(b0.bl == 0);
+        CHECK(b0.branch_taken);
+        // The non-boolean default keeps the outcome unmodelled.
+        g_cont_b_1e4c0_value = 0xA6;
+        const auto bx = init_531d60_post_base_continue_b(h);
+        CHECK(!bx.branch_outcome_modelled && !bx.branch_taken);
+
+        // Slice-level decision: not-taken and unknown both enter the merge; a
+        // proven taken branch must stop before the unmodelled preamble.
+        CHECK(enters_merge_after_continue_b(b1));
+        CHECK(!enters_merge_after_continue_b(b0));
+        CHECK(enters_merge_after_continue_b(bx));
+    }
 
     std::printf(
         "appmain_init_ctor_98a90_slice: MEASURED lifted_3be050_header+sub3be930+ensure3c2f70+"

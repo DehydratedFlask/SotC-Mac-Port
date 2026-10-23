@@ -101,6 +101,14 @@
 
 namespace sotc {
 
+// E524 decision point: the 0x532904 merge block is entered only when the
+// `je 0x5328e0` outcome is unknown or not taken. A modelled taken branch stops
+// before the 36 B 0x5328e0 preamble, which is NOT modelled.
+[[nodiscard]] constexpr bool enters_merge_after_continue_b(
+    const Init531d60PostBaseContinueBResult& b) noexcept {
+    return !(b.branch_outcome_modelled && b.branch_taken);
+}
+
 struct AppmainInitCtor40SliceSide {
     bool ok = false;
     bool derived_vt = false;
@@ -207,6 +215,11 @@ struct AppmainInitCtor98a90SliceResult {
     Init531d60PostBaseContinueAResult post_base_continue_a{};
     Init531d60PostBaseContinueBResult post_base_continue_b{};
     Init531d60PostBaseContinueCResult post_base_continue_c{};
+    // E524: when the 0x1e4c0 hook returns a proven boolean and the je is taken,
+    // the 36 B 0x5328e0 preamble is NOT modelled, so the chain stops there
+    // instead of pretending the merge block was entered through it.
+    bool init_branch_5328e0_taken = false;
+    bool init_stopped_at_5328e0 = false;
     AppmainInitRemainderSliceResult remainder{};
 };
 

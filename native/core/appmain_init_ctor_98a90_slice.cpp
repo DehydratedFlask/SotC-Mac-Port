@@ -522,8 +522,17 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     if (!out.post_base_continue_b.ok) {
         return out;
     }
-    // E511: always-on Init continue — 38-unit merge run 0x532904..0x53299d;
-    // callee bodies / vtable slot-0 target / je outcome / both successors NOT modelled.
+    // E524: je 0x5328e0 is taken when the proven-boolean bl is 0. The 36 B
+    // 0x5328e0 preamble is NOT modelled, so stop honestly instead of entering
+    // the merge block as if the taken path had been replayed.
+    out.init_branch_5328e0_taken = out.post_base_continue_b.branch_taken;
+    if (!enters_merge_after_continue_b(out.post_base_continue_b)) {
+        out.init_stopped_at_5328e0 = true;
+        return out;
+    }
+    // Init continue merge — 38-unit run 0x532904..0x53299d (reached by the
+    // je-not-taken fall-through); callee bodies / vtable slot-0 target / the
+    // next je outcome and both of its successors NOT modelled.
     out.post_base_continue_c = init_531d60_post_base_continue_c(post_base_continue_c_hooks);
     if (!out.post_base_continue_c.ok) {
         return out;
