@@ -29,6 +29,7 @@
 #include "init_531d60_post_base_499f80.hpp"
 #include "init_531d60_post_base_56dcb0.hpp"
 #include "init_531d60_post_base_5c64c0.hpp"
+#include "init_1290.hpp"
 #include "init_531d60_post_base_1290.hpp"
 #include "init_531d60_post_base_56db70.hpp"
 #include "init_531d60_post_base_5b3d00.hpp"
@@ -156,6 +157,9 @@ struct AppmainInitCtor98a90SliceResult {
     Init531d60PostBase56dcb0Result post_base_56dcb0{};
     Init531d60PostBase5c64c0Result post_base_5c64c0{};
     Init531d60PostBase1290Result post_base_1290{};
+    // Set when the caller supplies a native 0x1290 configuration (E527/E532/E533).
+    bool init_1290_native = false;
+    Init1290Result init_1290{};
     Init531d60PostBase56db70Result post_base_56db70{};
     Init531d60PostBase5b3d00Result post_base_5b3d00{};
     Init531d60PostBase5b3cf0Result post_base_5b3cf0{};
@@ -310,6 +314,7 @@ struct AppmainInitCtor98a90SliceResult {
     const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks = {},
     const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks = {},
     const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks = {},
-    const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks = {});
+    const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks = {},
+    const Init1290Hooks& init_1290_hooks = {});
 
 }  // namespace sotc

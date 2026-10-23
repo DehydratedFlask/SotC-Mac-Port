@@ -234,3 +234,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Init continue batch E (2026-10-23)](checkpoints/2026-10-23-init-531d60-continue-batch-e.md) | 350 B / 53 units to the registry fragment; 3 registrars + 3 no-op vcalls; E541 |
 | [Orchestrator session 2 handoff (2026-10-23)](checkpoints/2026-10-23-orchestrator-session-2-handoff.md) | Session summary, corrections, verification commands, open work; E509–E543 |
 | [Init continue batch F (2026-10-23)](checkpoints/2026-10-23-init-531d60-continue-batch-f.md) | Alternate path 327 B / 70 units + failure exit; coverage 98.23%; E544 |
+| [Native 0x1290 in the slice (2026-10-23)](checkpoints/2026-10-22-init-1290-native-lift.md) | Slice executes the lifted 0x1290 with both inserts; E545 |

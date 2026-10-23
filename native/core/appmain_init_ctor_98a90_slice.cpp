@@ -80,7 +80,8 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks,
     const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks,
     const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks,
-    const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks) {
+    const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks,
+    const Init1290Hooks& init_1290_hooks) {
     AppmainInitCtor98a90SliceResult out{};
     out.early = run_prologue_255180_early(alloc, early_hooks);
     if (!out.early.ok) {
@@ -197,9 +198,20 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
         return out;
     }
     // E449: always-on Init continue — 0x1290 call-site; stop before 0x56db70.
-    out.post_base_1290 = init_531d60_post_base_1290(post_base_1290_hooks);
-    if (!out.post_base_1290.ok) {
-        return out;
+    // E544 follow-up: if the caller supplies a real 0x1290 configuration (containers and
+    // allocator), execute the lifted body so its A/B inserts actually run in the chain. The
+    // call-site stub stays as the fallback when no container is provided.
+    if (init_1290_hooks.container_a != nullptr || init_1290_hooks.container_b != nullptr) {
+        out.init_1290 = init_1290(self, init_1290_hooks);
+        out.init_1290_native = out.init_1290.ok;
+        if (!out.init_1290.ok) {
+            return out;
+        }
+    } else {
+        out.post_base_1290 = init_531d60_post_base_1290(post_base_1290_hooks);
+        if (!out.post_base_1290.ok) {
+            return out;
+        }
     }
     // E450: always-on Init continue — 0x56db70 call-site (ret-nop); stop before 0x5b3d00.
     out.post_base_56db70 = init_531d60_post_base_56db70(post_base_56db70_hooks);

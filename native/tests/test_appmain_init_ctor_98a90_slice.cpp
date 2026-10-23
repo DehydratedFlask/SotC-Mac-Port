@@ -9,6 +9,7 @@
 
 #include "core/allocator_front.hpp"
 #include "core/appmain_init_ctor_98a90_slice.hpp"
+#include "core/container_1bdb10.hpp"
 #include "core/ctor_40_1ab550.hpp"
 #include "core/ctor_98a90_3be050.hpp"
 #include "core/ensure_capacity_3c2f70.hpp"
@@ -637,6 +638,15 @@ void hook_cont_e_54b250(void* obj, std::uint32_t, std::uint32_t) {
     ++g_cont_e_54b250;
     g_cont_e_54b250_obj = obj;
 }
+
+alignas(16) unsigned char g_slice_1290_pool[0x60];
+int g_slice_1290_vcall = 0;
+
+void* slice_1290_alloc(std::size_t bytes) {
+    return (bytes == 0x60) ? static_cast<void*>(g_slice_1290_pool) : nullptr;
+}
+void hook_slice_1290_vcall(void*) { ++g_slice_1290_vcall; }
+void hook_slice_1290_insert_b(void*, const HandlerRegistration1290&) {}
 
 int g_cont_d_call = 0;
 void* g_cont_d_rdi = nullptr;
@@ -1326,6 +1336,16 @@ int main() {
     pbce.call_a54920 = hook_cont_e_a54920;
     pbce.call_54b250 = hook_cont_e_54b250;
     pbce.cell_2eff450 = &g_cell_2eff450_value;
+    // E545: supply a real 0x1290 configuration so the lifted body (with both insert bodies)
+    // executes at the 0x531e03 call site instead of the call-site stub.
+    Container1beeb0 init1290_cont{};
+    init_container_1bdb10(init1290_cont);
+    Init531d60PostBaseAlt5327bdHooks pbalt{};  // no gate supplied => alt path not entered
+    Init1290Hooks ih{};
+    ih.container_a = &init1290_cont;
+    ih.alloc_a.alloc = slice_1290_alloc;
+    ih.vcall_1594060_slot3 = hook_slice_1290_vcall;
+    ih.insert_21cd0 = hook_slice_1290_insert_b;
 
     const std::uint64_t allocs_before = heap.alloc_count;
     const auto t0 = std::chrono::steady_clock::now();
@@ -1343,10 +1363,18 @@ int main() {
                                                      pba2edu3, pbf590u5, pbf590u6, pba2edu4,
                                                      pbf590u7, pbf590u8, pba2edu5, pbf590u9,
                                                      pbf590u10, pba2edu6, pbf590u11, pbf590u12,
-                                                     pba2edu7, pbf590u13, pbca, pbcb, pbcc, pbcd, pbce);
+                                                     pba2edu7, pbf590u13, pbca, pbcb, pbcc, pbcd, pbce, pbalt, ih);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+
+    // E545: the native 0x1290 ran in the chain; its A insert executed through 0x1beeb0.
+    CHECK(r.init_1290_native);
+    CHECK(r.init_1290.ok);
+    CHECK(init1290_cont.count3 == 1);
+    CHECK(r.init_1290.inserted_a.ok);
+    CHECK(g_slice_1290_vcall == 1);
+    CHECK(!r.post_base_1290.ok);  // stub path not taken
 
     CHECK(r.early.ok);
     CHECK(r.tail.ok);
@@ -1593,10 +1621,11 @@ int main() {
     CHECK(r.post_base_5c64c0.ok);
     CHECK(g_post_base_5c64c0 == 1);
     CHECK(r.post_base_5c64c0.call_5c64c0_count == 1);
-    // E449: Init continue 0x1290 call-site; stop before 0x56db70
-    CHECK(r.post_base_1290.ok);
-    CHECK(g_post_base_1290 == 1);
-    CHECK(r.post_base_1290.call_1290_count == 1);
+    // E449/E545: the 0x1290 call site. When a native configuration is supplied (E545) the
+    // lifted body runs instead of the stub, so the stub counters stay zero.
+    CHECK(r.post_base_1290.ok == !r.init_1290_native);
+    CHECK(g_post_base_1290 == (r.init_1290_native ? 0 : 1));
+    CHECK(r.post_base_1290.call_1290_count == (r.init_1290_native ? 0 : 1));
     // E450: Init continue 0x56db70 call-site (ret-nop); stop before 0x5b3d00
     CHECK(r.post_base_56db70.ok);
     CHECK(g_post_base_56db70 == 1);
