@@ -6454,3 +6454,18 @@ See [the partial slot-23 checkpoint](docs/checkpoints/2026-10-21-root-cpu01-slot
 - Next exact action: lift `0x1bdeb0` over an explicitly typed 0x58 node (prev `+0x00`, next `+0x08`,
   callables `+0x10`/`+0x30`, dword flag `+0x50`), releasing via `shared_release_f590` and freeing
   via tag 2, with mixed-flag fixtures.
+
+## 2026-10-23 Orchestrator round 22 — 0x1bdb50 inserter lifted (E560)
+
+- Agent: integrator (goal resumed by explicit user command).
+- Task: `CPU-01-INSERT-1BDB50-NATIVE-01`.
+- Observation: `0x1bdb50` is 304 B (`add72de8…`), signature sentinel/A/B/flag. It acquires each live
+  control block, allocates 0x58 through `0x17090`, stores the callables at `+0x10`/`+0x30` and the
+  flag at `+0x50`, links, `incq [sentinel+0x10]`, then **zeroes and releases both temporaries**.
+- Key detail: those releases are no-ops by construction (zeroed holder + null-control early return),
+  so exactly one reference survives per callable — the acquire is transferred to the node.
+- Second detail: the original increments the count 64-bit and the destructor decrements 32-bit; equal
+  below 2^32, now documented instead of glossed.
+- Verification: 339/339 ctest, checker OK, sweep 419 passed / 0 failed.
+- Next exact action: find the caller of `0x1bdb50` (same `E8` scan shape as E558) and determine
+  whether it sits inside `0x2569d0`, the owner installer that still gates real singletons.

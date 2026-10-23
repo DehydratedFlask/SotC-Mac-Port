@@ -69,6 +69,7 @@ add_library(sotc_core STATIC
   core/insert_1bde30.cpp
   core/shared_release_f590.cpp
   core/alloc_wrappers_17070.cpp
+  core/insert_1bdb50.cpp
   core/list_dtor_1bdeb0.cpp
   core/insert_21cd0.cpp
   core/container_1bdb10.cpp
@@ -1722,6 +1723,10 @@ add_test(NAME owner_dtor_1bdae0 COMMAND test_owner_dtor_1bdae0)
 add_executable(test_container_1bdb10 tests/test_container_1bdb10.cpp)
 target_link_libraries(test_container_1bdb10 sotc_core)
 add_test(NAME container_1bdb10 COMMAND test_container_1bdb10)
+
+add_executable(test_insert_1bdb50 tests/test_insert_1bdb50.cpp)
+target_link_libraries(test_insert_1bdb50 sotc_core)
+add_test(NAME insert_1bdb50 COMMAND test_insert_1bdb50)
 
 add_executable(test_list_dtor_1bdeb0 tests/test_list_dtor_1bdeb0.cpp)
 target_link_libraries(test_list_dtor_1bdeb0 sotc_core)

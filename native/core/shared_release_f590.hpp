@@ -12,7 +12,13 @@
 //   jmp 0x170b0                     ; operator delete on the control block (tail call)
 //
 // This is the counter used by the many `call 0xf590` sites across the recovered Init slices: a
-// release that only destroys when the last reference goes away. The add side is `0x14ccb0`.
+// release that only destroys when the last reference goes away.
+//
+// The add side is **not** a single function. E557 proposed `0x14ccb0` and then withdrew it (it
+// increments a 32-bit field at `[object+0x30]`, the wrong width and offset). E558 found the real
+// shape: acquires are inline, indirect `lock incq (%reg)` on the control block — 33 sites in the
+// executable segment, e.g. `0x1bdb9d`/`0x1bdbce` inside the 0x58-node inserter `0x1bdb50`. There is
+// no add-side function to lift; each site increments in place.
 //
 // NOTE (E553): `0x12af0` is not a C++ destructor but the allocator's **tagged deallocate
 // dispatcher** — `0x170b0`/`0x170c0` reach the same function with tags 1 and 2. The tag-0 call here
