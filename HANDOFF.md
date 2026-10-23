@@ -2,7 +2,7 @@
 
 Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + OpenCode orchestrator round 2.
 Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
-Round-2 through round-6 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
+Round-2 through round-7 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
 
 ## 2026-10-22 Repository history rewrite — Claude attribution + hostname identity
 
@@ -35,6 +35,32 @@ Round-2 through round-6 detail are the sections immediately below; the parallel-
   pushing one would reintroduce old trailers. Gate: **G1 still PARTIAL**; nothing about boot/audio/save
   changes.
 - Next exact action: unchanged — next always-on after `0x532720`, or a bounded body lift.
+
+## 2026-10-23 Orchestrator round 7 — 0x1290 fully executable, Init tail modelled (E533–E537)
+
+- Agent: integrator + two worker subagents (non-Claude model).
+- Tasks: `CPU-01-INSERT-21CD0-NATIVE-01` (E533), `CPU-01-CONTAINER-1BDB10-NATIVE-01` (E534),
+  `CPU-01-INIT-531D60-CONTINUE-BATCH-04` (E535), `CPU-01-INIT-BRANCH-5329AE-01` (E536),
+  `CPU-01-INIT-TAIL-53299D-ANALYSIS-01` (E537).
+- Observation: `0x1290`'s **both** inserts now execute native bodies — A through `insert_1beeb0`
+  (E531/E532) and B through the newly lifted `insert_21cd0` (204 B bump-allocator vector insert,
+  E533) — and the container they insert into can be created by the lifted `0x1bdb10` ctor
+  (56 B, three self-referential lists, E534).
+- Observation: Init continues past the merge: batch D models `0x53299d..0x5329ae` (`17 B`, four
+  instructions, `call 0xa473b0`) — the earlier "13 B" figure was arithmetic error and is corrected
+  — and the merge `je 0x5329ae` is now modelled from the same `[0x2efe340]+0x60` boolean E530
+  identified, with an honest stop when the branch is taken.
+- Observation: the tail analysis names the callees: `0xa473b0` (134 B) is a capture/streaming
+  enable-state setter reaching screen-shot, video-recording and live-streaming imports;
+  `0xa54920` (1840 B) is a save-data subsystem constructor taking `(parent, name_struct,
+  descriptor)` by address. Three `call [rax+0x08]` in the 350 B target block resolve to bare
+  `ret`s; one indirect through `*(0x2eff450)` remains unresolved.
+- Observation: full build and **330/330** `ctest`; all checkers green; gates clean.
+- Inference: G1 **PARTIAL**. Sony imports inside `0xa473b0` are not yet native contracts, the
+  350 B branch-target block is unlifted, and nothing ran against the game.
+- Next exact action: lift `0xa473b0` with explicit (non-fake) capture service contracts and make
+  batch D execute it (worker in flight); resolve `0x32f79a8`/`0x2eff450` provenance (worker in
+  flight); then lift the 350 B `0x5329ae` block.
 
 ## 2026-10-23 Orchestrator round 6 — cells resolved, insert executed (E530–E532)
 
