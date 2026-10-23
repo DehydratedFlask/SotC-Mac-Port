@@ -52,8 +52,10 @@
   subsystems.
 - **`0xf590`** is a 73 B shared release. The 17 Init-slice modules and the four provably-zero
   `0x533100` sites (miss `0x5332f4`/`0x533300`, join `0x533399`, tail `0x53404d`; E574) are wired as
-  exact inert zero-holder releases. The nine `0x533100` key-holder sites are real releases and need
-  the 0x20 B shared-string type first; `0x5333e3` stays a per-element hook. Do not wire P2
+  exact inert zero-holder releases. The nine `0x533100` key-holder sites are real releases: the
+  0x20 B `SharedStr` ctor `0xf1a0` is native (E581) and `[[0x2ee2cf8]]+0x18` is
+  `ResourcePool::GetResource`, not a destructor, so release with `previous ∈ {1,2}`.
+  `0x5333e3` stays a per-element hook. Do not wire P2
   frame/global sites without the `ctrl_slot` + callee-body check; a last reference with a missing
   destroy/free contract must report `ok == false`.
 - **`0x15ff060..0x15ff0a0`** is an eight-slot `.data.rel.ro` pointer slice, not a vtable and not an

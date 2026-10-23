@@ -8,8 +8,8 @@ The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **353/353** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **450 passed / 0 skipped / 0 failed** with
+- Full native suite: **355/355** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **452 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -150,6 +150,14 @@ The rounds that follow the archive are in chronological order.
   self-registered, the three destroy idioms (virtual dtor, dtor+free, row 7 no replace), row 3/17/18
   arg dependencies, and visible stops for a missing ctor/allocator/dtor. All 18 non-trivial ctor
   bodies remain hooks.
+- **E580** — the three trivial `0x2569d0` ctors are native: `0xa1cc0` (no-op), `0xfafb0`
+  (0x82028-byte layout) and `0x26f820` (base/vptr/+0x18/sub-object). The guest vptrs are host
+  values, never executed.
+- **E581** — the 0x20 B `SharedStr` ctor `0xf1a0` is native (align4 capacity, data tag 0, control
+  tag 1, `*control=1`), and the key blocker is resolved: `[[0x2ee2cf8]]+0x18` is
+  `ResourcePool::GetResource`, not a destructor, so the nine `0x533100` sites need a real release
+  with `previous ∈ {1,2}`. The existing `shared_release_f590` is unchanged; the nine sites are the
+  next wiring step.
 
 ## Settled decisions (do not re-ask)
 

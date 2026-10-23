@@ -265,3 +265,5 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Owner property bag (2026-10-23)](checkpoints/2026-10-23-owner-prop-bag.md) | 0x178 bag, four sentinels, multimap insert_equal model; E577 |
 | [App-info snapshot path (2026-10-23)](checkpoints/2026-10-23-appinfo-snapshot.md) | Phases 2/4/5/6 composed: FieldEntry, Attachment, drain, clear; E578 |
 | [Owner member driver (2026-10-23)](checkpoints/2026-10-23-owner-members.md) | 21 install rows, three destroy idioms, hook-driven ctors; E579 |
+| [Simple owner ctors (2026-10-23)](checkpoints/2026-10-23-owner-simple-ctors.md) | 0xa1cc0/0xfafb0/0x26f820 native; E580 |
+| [SharedStr ctor 0xf1a0 (2026-10-23)](checkpoints/2026-10-23-shared-str-ctor.md) | 0x20 B holder, control init, GetResource vtable; E581 |
