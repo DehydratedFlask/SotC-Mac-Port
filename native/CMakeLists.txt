@@ -54,6 +54,7 @@ add_library(sotc_core STATIC
   core/store_value_clear_flag_158340.cpp
   core/fnv_span_161f80.cpp
   core/hashed_string_14c3a0.cpp
+  core/shared_str_release_f590.cpp
   core/registry_object_14c9a0.cpp
   core/registry_object_2efd160.cpp
   core/registry_sorted_insert.cpp
@@ -1624,6 +1625,10 @@ add_test(NAME fnv_span_161f80 COMMAND test_fnv_span_161f80)
 add_executable(test_hashed_string_14c3a0 tests/test_hashed_string_14c3a0.cpp)
 target_link_libraries(test_hashed_string_14c3a0 sotc_core)
 add_test(NAME hashed_string_14c3a0 COMMAND test_hashed_string_14c3a0)
+
+add_executable(test_shared_str_release_f590 tests/test_shared_str_release_f590.cpp)
+target_link_libraries(test_shared_str_release_f590 sotc_core)
+add_test(NAME shared_str_release_f590 COMMAND test_shared_str_release_f590)
 
 add_executable(test_registry_object_14c9a0 tests/test_registry_object_14c9a0.cpp)
 target_link_libraries(test_registry_object_14c9a0 sotc_core)
