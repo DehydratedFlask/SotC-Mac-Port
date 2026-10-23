@@ -2,7 +2,7 @@
 
 Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + OpenCode orchestrator round 2.
 Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
-Round-2 through round-7 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
+Round-2 through round-8 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
 
 ## 2026-10-22 Repository history rewrite — Claude attribution + hostname identity
 
@@ -35,6 +35,28 @@ Round-2 through round-7 detail are the sections immediately below; the parallel-
   pushing one would reintroduce old trailers. Gate: **G1 still PARTIAL**; nothing about boot/audio/save
   changes.
 - Next exact action: unchanged — next always-on after `0x532720`, or a bounded body lift.
+
+## 2026-10-23 Orchestrator round 8 — tail provenance + capture contracts (E538–E539)
+
+- Agent: integrator + two worker subagents (non-Claude model).
+- Tasks: `CPU-01-INIT-32F79A8-ANALYSIS-01` (E538),
+  `CPU-01-CAPTURE-A473B0-NATIVE-01` (E539).
+- Observation: the earlier "no `.text` store to `0x32f79a8`" was a false negative from scanning only
+  RIP-relative stores. All 50 references are `lea`; three register-indirect stores exist —
+  install of a 0x210-byte lazy singleton at `0x2569b3`, teardown clears at `0x2557b5` and
+  `0xa47c73`. `0xa473b0` ignores the pointer, so both states are runtime-correct.
+- Observation: `0x2eff450` is installed by the `0x544fe0` ctor with vtable `0x15c9830`; slot 1 at
+  `0x15c9838` is `0x54b250`, which resolves Init's previously-unresolved `0x532b09 call [rax+0x8]`
+  as `0x54b250(this, 0, 2)`. The object is a 0x460-byte save-data stat tracker.
+- Observation: `0xa473b0` is now native (`capture_a473b0`, 134 B): live-streaming enable,
+  screen-shot enable/disable and two video-recording set-info calls are modelled as explicit
+  `CaptureServices` contracts returning `ok|disabled|unsupported`; a missing service makes
+  `ok == false` rather than silently succeeding. Init reaches it with `enable = false`.
+- Observation: full build and **331/331** `ctest`; all checkers green.
+- Inference: G1 **PARTIAL**. `0xa54920` and the 350 B target block are still unmodelled, and the
+  capture contracts are dispatches, not platform implementations.
+- Next exact action: lift `0x5329ae..0x532b0c` (350 B, worker in flight) with `0xa54920` as a
+  visible contract and the two provable no-op vcalls elided.
 
 ## 2026-10-23 Orchestrator round 7 — 0x1290 fully executable, Init tail modelled (E533–E537)
 
