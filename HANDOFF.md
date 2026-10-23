@@ -2,7 +2,7 @@
 
 Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + OpenCode orchestrator round 2.
 Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
-Round-2 through round-8 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
+Round-2 through round-9 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
 
 ## 2026-10-22 Repository history rewrite — Claude attribution + hostname identity
 
@@ -35,6 +35,30 @@ Round-2 through round-8 detail are the sections immediately below; the parallel-
   pushing one would reintroduce old trailers. Gate: **G1 still PARTIAL**; nothing about boot/audio/save
   changes.
 - Next exact action: unchanged — next always-on after `0x532720`, or a bounded body lift.
+
+## 2026-10-23 Orchestrator round 9 — Init reaches the registry fragment, coverage measured (E540–E542)
+
+- Agent: integrator + two worker subagents (non-Claude model).
+- Tasks: `CPU-01-SAVEDATA-CALLEES-ANALYSIS-01` (E540),
+  `CPU-01-INIT-531D60-CONTINUE-BATCH-05` (E541), `CPU-01-INIT-COVERAGE-REPORT-01` (E542).
+- Observation: Init's `je 0x5329ae` taken block `0x5329ae..0x532b0c` is modelled — **350 B,
+  53 units**, region sha `2aee42e0…` — and it ends exactly where the already-recovered registry
+  fragment begins. It contains three `0xa54920` registrar calls, three `call [rax+0x18]` sites that
+  resolve to bare `ret`s (the task brief's `+0x08` was wrong; the encoding is slot 3), one
+  `0x54b250(this,0,2)` dispatch, the `0x2dcdf14` boss-flag stamp, nine RIP-relative leas and one
+  `vmovq`.
+- Observation: `0xa54920` and `0x54b250` reach **no** `sceSaveData*` import at all;
+  `0xa54920` registers `save_*` ConVar counters and `0x54b250` is a read-only stat query. The PS4
+  save-data layer lives in a disjoint subsystem. The "save-data constructor" framing is therefore
+  wrong and was corrected in the evidence.
+- Observation: coverage is now measured, not asserted: `tools/lift/report_init_coverage.py`
+  reports **3104 / 3500 B = 88.69%** over `0x531d60..0x532b0c`, with four named gaps — 36 B entry
+  frame setup, 16 B base-initialize call site, 5 B `call 0x56dca0`, and 339 B for the alternate
+  `je 0x5327bd` path.
+- Inference: G1 **PARTIAL**. 88.69% of bytes claimed is not 88.69% semantics: most of it is
+  call-site pinning with callee hooks, and the alternate path is entirely unmodelled.
+- Next exact action: lift the alternate path `0x5327b1..0x532904` (worker in flight), then close
+  the three small entry gaps so the whole `0x531d60..0x532b0c` window is at least byte-claimed.
 
 ## 2026-10-23 Orchestrator round 8 — tail provenance + capture contracts (E538–E539)
 
