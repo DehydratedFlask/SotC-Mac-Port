@@ -1,13 +1,109 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-22 09:02 CDT (America/Chicago). Parallel APP-01 fixture:
-bc-8fc0a995-6e8c-59b7-8a62-c1a9cacd061f. Drive Phase B:
-bc-0ee48224-fe2b-592b-a6d8-64b454059dfc; tip includes `0bbc1a8` (slots 24–47).
-Integrator note: [docs/checkpoints/2026-10-22-orchestrator-session-handoff.md](docs/checkpoints/2026-10-22-orchestrator-session-handoff.md).
-Previous transfer: [docs/checkpoints/2026-10-20-root-next-agent-handoff.md](docs/checkpoints/2026-10-20-root-next-agent-handoff.md).
+Updated: 2026-10-22 10:08 CDT (America/Chicago). Heap-depth worktree
+bc-0af80435-14f4-5088-8dc0-88b5bac5a41d on branch `cursor/heap-depth-5d26`
+(base `origin/main` @ `4c83b4d`). Drive owns Init-hash / `startup_ctors.*` on main —
+this checkpoint is heap-only and does not claim main tip.
 
 **Project remains incomplete.** G0 PARTIAL; G1–G6 NOT RUN. No native game executable, boot,
 authentic game audio, real progress save/relaunch/load, or Metal gameplay is demonstrated.
+
+## 2026-10-22 heap lane PAUSED (idle-ready on PR #5)
+
+- Agent: bc-0af80435-14f4-5088-8dc0-88b5bac5a41d. Checkpoint only — no code change.
+- Tip: `4d7e484` (E403 lazy latch). Worktree clean / matches origin.
+- Observation: coordinator directed pause — no further `0x110a0` / free-path latch tourism
+  until Drive lands Init `0x531d60` or asks otherwise. Drive files untouched.
+- Inference: goal remains open; lane idle-ready on draft PR #5.
+- Next exact action: stay idle; resume only on coordinator ask or post-Drive Init land.
+
+## 2026-10-22 lazy bootstrap latch (0x2dfaaa0) — verified on feature branch
+
+- Agent: bc-0af80435-14f4-5088-8dc0-88b5bac5a41d. Attempt 1 — success (0 failed tries). Goal open.
+- Task: `SRV-01-ALLOCATOR-LAZY-LATCH-01` → `FIXTURE_VERIFIED` (branch `cursor/heap-depth-5d26`).
+- Worktree: `/Volumes/Extra/SoC-Mac-heap-depth`. Did **not** touch Drive / leaf-vec / idx 95 / `0x19660`.
+- Files: `native/core/allocator_front.{hpp,cpp}` (gate + latch API), 
+  `native/tests/test_allocator_lazy_latch.cpp`, `tools/lift/check_f2dfaaa0.py`, CMake + docs.
+- Observation: ELF-pins alloc gate `0x1284a..0x12873` (sha256 `fa92c572…fed7`): latch==0 &&
+  tbl[1]==0 → call `0x13380`; then id=`[rax+0x1c]` / `tbl[id]=rax`. Latch set `$1` @ `0x110d3`,
+  clear `$0` @ `0x11f94`. Native: injectable `LazyBootstrapHooks` + `bootstrap_latch`;
+  empty-table post-boot heap id → slot 1. INF: 0x110a0/0x11e90 bodies + free-path latch copies open.
+- Commands: `ctest -R '^(allocator_lazy_latch|allocator_bootstrap|allocator_front|heap_allocator|bucket_allocator|composite_allocator|page_allocator|page_owner_map)$'`
+  PASS 8/8; `python3 -I tools/lift/check_f2dfaaa0.py` OK. Evidence **E403**.
+- Inference: not G1; not wired into game startup. Goal open.
+- Next exact action (heap lane): **paused** — see top idle-ready checkpoint. Goal open.
+
+## 2026-10-22 allocator bootstrap wiring (0x13380) — verified on feature branch
+
+- Agent: bc-0af80435-14f4-5088-8dc0-88b5bac5a41d. Attempt 1 — success (0 failed tries). Goal open.
+- Task: `SRV-01-ALLOCATOR-BOOTSTRAP-01` → `FIXTURE_VERIFIED` (branch `cursor/heap-depth-5d26`).
+- Worktree: `/Volumes/Extra/SoC-Mac-heap-depth`. Did **not** touch `startup_ctors.*` / Init-hash /
+  FNV / registry / idx 95 / leaf-vec / `0x19660`.
+- Files: `native/core/allocator_bootstrap.{hpp,cpp}`, `native/tests/test_allocator_bootstrap.cpp`,
+  `tools/lift/check_f13380.py`, CMake + README/comment cross-refs + TASKS/EVIDENCE/this block.
+- Observation: ELF-pins bootstrap body `0x13380..0x136ca` (sha256 `81eca8f4…829b`), early-out,
+  composite→tbl[1], child slot scans start 1 / bound `0x100`, Bucket `0x17990` / Heap
+  `0x488f0`+`0x48910` / three `0x47dd0` registrations with thr 0x400 / 0x100000 / ~0.
+  Native: `bootstrap_allocator_hierarchy` + `first_free_heap_slot`; empty-table slots 1–4.
+  INF: no 0x18aa0 page-table build, no vt side-effects, no lazy front-end latch, no 0x17070(0x65690).
+- Commands: `ctest -R '^(allocator_bootstrap|heap_allocator|bucket_allocator|composite_allocator|allocator_front|page_allocator|page_owner_map)$'`
+  PASS 7/7; `python3 -I tools/lift/check_f13380.py` OK. Evidence **E402**.
+- Inference: not G1; not wired into startup; alloc path still does not auto-call bootstrap.
+- Next exact action (heap lane): was lazy latch `0x2dfaaa0` — done as E403; see top checkpoint. Goal open.
+
+## 2026-10-22 HeapAllocator page/cap layer (0x48c70 / 0x48910) — verified on feature branch
+
+- Agent: bc-0af80435-14f4-5088-8dc0-88b5bac5a41d (resume after bc-492a8623 WIP). Attempt 1 —
+  success (0 failed tries). Goal remains open.
+- Task: `SRV-01-HEAP-ALLOCATOR-01` → `FIXTURE_VERIFIED` (branch `cursor/heap-depth-5d26`).
+- Worktree: `/Volumes/Extra/SoC-Mac-heap-depth`. Did **not** touch `startup_ctors.*` / Init-hash /
+  FNV / registry / idx 95 / leaf-vec.
+- Files: `native/core/heap_allocator.{hpp,cpp}`, `native/tests/test_heap_allocator.cpp`,
+  `tools/lift/check_f48c70.py`, CMake + `native/README.md` + TASKS/EVIDENCE/this block;
+  small comment/constant updates in `composite_allocator.hpp` / `iallocator.hpp` /
+  `check_f47e30.py`.
+- Observation: ELF-pins usable-size `0x48c70`, allocate `0x48c80` (vt+0xa0), page-set `0x488f0`
+  → `[obj+0xd0]`, reserve `0x48910`→`0x479a0` align `0x10000`, bootstrap 1 MiB / 150 MiB.
+  Native: header+payload maps, live-byte cap, 16-byte round; freelist/arena surgery INF.
+- Commands: `ctest -R '^(heap_allocator|bucket_allocator|composite_allocator|allocator_front|page_allocator|page_owner_map)$'`
+  PASS 6/6; `python3 -I tools/lift/check_f48c70.py` OK. Evidence **E401**.
+- Inference: not G1; not wired into startup. Hierarchy under `IAllocator` now has composite +
+  bucket + heap + page contracts.
+- Next exact action (heap lane): was bootstrap `0x13380` — done as E402; see top checkpoint. Goal open.
+
+## 2026-10-22 BucketAllocator size-class layer (0x17990) — verified on feature branch
+
+- Agent: bc-492a8623-dec2-597e-8de6-73c00b0ad8a5. Attempt 1 — success (0 failed tries).
+- Task: `SRV-01-BUCKET-ALLOCATOR-01` → `FIXTURE_VERIFIED` (branch `cursor/heap-depth-5d26`).
+- Worktree: `/Volumes/Extra/SoC-Mac-heap-depth`. Did **not** touch `startup_ctors.*` / Init-hash.
+- Files: `native/core/bucket_allocator.{hpp,cpp}`, `native/tests/test_bucket_allocator.cpp`,
+  `tools/lift/check_f17990.py`, CMake + README + TASKS/EVIDENCE/this block.
+- Observation: ELF-pins init `0x17990`, alloc max-gate `0x179c0` (+0x88), pool setup `0x18750`
+  (page−0x38)/class div, bootstrap classes `0x10..0x400` step `0x10` on 64 KiB pages.
+  Native size-class freelist is INF (not original chunk surgery). No zero-fill. HeapAllocator body open.
+- Commands: `ctest -R '^(bucket_allocator|composite_allocator|allocator_front|page_allocator|page_owner_map)$'`
+  PASS 5/5; `python3 -I tools/lift/check_f17990.py` OK.
+- Inference: not G1; not wired into startup. Evidence **E400**.
+- Next exact action (heap lane): HeapAllocator `0x48c70` / cap `0x48910` (1 MiB pages, 150 MiB). Goal open.
+
+## 2026-10-22 composite allocator hierarchy (0x47e30) — verified on feature branch
+
+- Agent: bc-492a8623-dec2-597e-8de6-73c00b0ad8a5. Attempt 1 — success (0 failed tries).
+- Task: `SRV-01-COMPOSITE-ALLOCATOR-01` → `FIXTURE_VERIFIED` (branch; not merged to main).
+- Worktree: `/Volumes/Extra/SoC-Mac-heap-depth` (never edited Drive main checkout).
+- Files: `native/core/composite_allocator.{hpp,cpp}`, `native/tests/test_composite_allocator.cpp`,
+  `tools/lift/check_f47e30.py`, CMake + README + TASKS/EVIDENCE/this block. Did **not** touch
+  `startup_ctors.*`, Init-hash/FNV/registry, or idx 95.
+- Observation: bootstrap thresholds Bucket `0x400` / Heap `0x100000` / Page `~0` ELF-pinned;
+  composite allocate picks first child with `size < threshold`; +0xd0 byte counter on success;
+  no zero-fill. BucketAllocator / HeapAllocator **bodies** still not lifted.
+- Commands: `cmake -S native -B local/build/native-heap-depth -G Ninja`;
+  `ctest -R '^(composite_allocator|allocator_front|page_allocator|page_owner_map)$'` PASS 4/4;
+  `python3 -I tools/lift/check_f47e30.py` OK; `check_f17070.py` still OK.
+- Inference: not G1; not wired into startup; free still uses owner-map → child slots. Evidence **E399**
+  (Drive already used E398 for Init-hash numeric emit on a separate branch).
+- Next exact action (heap lane): lift BucketAllocator size-class pools (`0x17990` family) or
+  HeapAllocator 1 MiB page + 150 MiB cap (`0x48c70` / `0x48910`) under `IAllocator`. Goal open.
 
 ## 2026-10-22 APP-01 playBlockedSummary native-core precedence — verified
 

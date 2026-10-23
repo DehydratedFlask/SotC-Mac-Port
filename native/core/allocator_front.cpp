@@ -38,6 +38,28 @@ void AllocatorFront::set_oom_hooks(const OomHooks& hooks) {
     hooks_ = hooks;
 }
 
+void AllocatorFront::set_lazy_bootstrap(const LazyBootstrapHooks& hooks) {
+    std::lock_guard<std::mutex> lock(hooks_mu_);
+    lazy_bootstrap_ = hooks;
+}
+
+bool AllocatorFront::maybe_lazy_bootstrap(std::uint32_t& heap_id) {
+    // OBS 0x1284a: if latch byte != 0 → skip. OBS 0x12854: if tbl[1] != 0 → skip.
+    if (bootstrap_latch_.load(std::memory_order_relaxed)) return false;
+    if (heap(kDefaultHeap) != nullptr) return false;
+
+    LazyBootstrapHooks lb;
+    {
+        std::lock_guard<std::mutex> lock(hooks_mu_);
+        lb = lazy_bootstrap_;
+    }
+    if (lb.install == nullptr) return false;
+    if (!lb.install(*this, lb.user)) return false;
+    // OBS 0x12865: heap id := returned[+0x1c]; empty-table composite lives in slot 1.
+    heap_id = kDefaultHeap;
+    return true;
+}
+
 void AllocatorFront::report_oom(const OomInfo& info) {
     OomHooks h;
     {
@@ -54,6 +76,9 @@ void AllocatorFront::report_oom(const OomInfo& info) {
 
 void* AllocatorFront::alloc(std::size_t size, std::uint32_t heap_id, std::size_t align,
                             std::uint32_t flags) {
+    // OBS 0x1284a..0x1286f before scoped-heap / table lookup.
+    (void)maybe_lazy_bootstrap(heap_id);
+
     // OBS: the scoped override applies only to heap 1 and only with a non-empty stack.
     if (heap_id == kDefaultHeap) {
         const std::uint32_t top = ScopedHeap::top();
