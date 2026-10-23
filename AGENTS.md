@@ -62,6 +62,14 @@
 - **`0x15ff060..0x15ff0a0`** is an eight-slot `.data.rel.ro` pointer slice, not a vtable and not an
   owned object. Do not restore the "table owner" reading; `0x2569d0` is a consumer.
 
+## ELF facts (verified)
+
+- The reconstructed ELF has **three** program headers; the older two-header map dropped `phdr 1`
+  (`vaddr 0x1594000`, filesz `0x6d190`), which carries `.data.rel.ro` (the vtables). Do not assume
+  the RELRO window is absent because it is outside `phdr 0`.
+- The camera `_Root` ctor `0x1d6230` zeroes the 24-byte bound delegate at `+0x2e8`; no static
+  writer exists. A pose provider needs the live delegate, not more offset scanning.
+
 ## Tool acquisition (owner-approved)
 
 - The owner explicitly allows downloading and using pre-existing tools when a concrete task needs

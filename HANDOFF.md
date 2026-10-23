@@ -162,6 +162,11 @@ The rounds that follow the archive are in chronological order.
   the runtime platform tag (`movbe` fourcc + `0x147e20` hook), then hashes the patched text with
   FNV-1a-32. A placeholder without a tag hook fails before allocating. The nine per-site literals
   are ready for the fragment wiring.
+- **E583** — the camera delegate has **no static writer**: `D` is the `_Root` node (vtable
+  `0x15992b8`, ctor `0x1d6230`, 0x3c8 B), and the ctor zeroes `+0x2e8..+0x307`; an opcode-aware
+  census found zero stores. The bound PMF target returns `const CameraTransform*`, but it is
+  unbound in this build, so the live pose remains blocked. `bpe::Camera`/`DebugCamera` were also
+  recovered, and the program-header map was corrected (phdr 1 carries `.data.rel.ro`).
 
 ## Settled decisions (do not re-ask)
 

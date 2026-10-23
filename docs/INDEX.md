@@ -268,3 +268,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Simple owner ctors (2026-10-23)](checkpoints/2026-10-23-owner-simple-ctors.md) | 0xa1cc0/0xfafb0/0x26f820 native; E580 |
 | [SharedStr ctor 0xf1a0 (2026-10-23)](checkpoints/2026-10-23-shared-str-ctor.md) | 0x20 B holder, control init, GetResource vtable; E581 |
 | [ResourceId 0x14c2f0 (2026-10-23)](checkpoints/2026-10-23-resource-id-14c2f0.md) | `****` rewrite + FNV-1a-32; E582 |
+| [Camera delegate writer (2026-10-23)](checkpoints/2026-10-23-camera-delegate-writer.md) | `_Root` zeroes the delegate; no static writer; E583 |
