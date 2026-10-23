@@ -54,7 +54,8 @@
   `0x533100` sites (miss `0x5332f4`/`0x533300`, join `0x533399`, tail `0x53404d`; E574) are wired as
   exact inert zero-holder releases. The nine `0x533100` key-holder sites are real releases: the
   0x20 B `SharedStr` ctor `0xf1a0` is native (E581) and `[[0x2ee2cf8]]+0x18` is
-  `ResourcePool::GetResource`, not a destructor, so release with `previous ∈ {1,2}`.
+  `ResourcePool::GetResource`, not a destructor, so release with `previous ∈ {1,2}`. The key is
+  built by `resource_id_ctor_14c2f0` (E582): `****` is patched with the runtime tag before FNV.
   `0x5333e3` stays a per-element hook. Do not wire P2
   frame/global sites without the `ctrl_slot` + callee-body check; a last reference with a missing
   destroy/free contract must report `ok == false`.

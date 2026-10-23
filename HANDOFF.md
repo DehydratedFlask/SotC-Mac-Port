@@ -8,8 +8,8 @@ The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **355/355** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **452 passed / 0 skipped / 0 failed** with
+- Full native suite: **356/356** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **453 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -158,6 +158,10 @@ The rounds that follow the archive are in chronological order.
   `ResourcePool::GetResource`, not a destructor, so the nine `0x533100` sites need a real release
   with `previous ∈ {1,2}`. The existing `shared_release_f590` is unchanged; the nine sites are the
   next wiring step.
+- **E582** — `0x14c2f0` is native: it builds the `SharedStr`, rewrites the `"****"` placeholder with
+  the runtime platform tag (`movbe` fourcc + `0x147e20` hook), then hashes the patched text with
+  FNV-1a-32. A placeholder without a tag hook fails before allocating. The nine per-site literals
+  are ready for the fragment wiring.
 
 ## Settled decisions (do not re-ask)
 
