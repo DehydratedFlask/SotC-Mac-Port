@@ -228,3 +228,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Init continue batch D (2026-10-22)](checkpoints/2026-10-22-init-531d60-continue-batch-d.md) | 17 B fall-through `0x53299d..0x5329ae`, lea `0x32f79a8`, call `0xa473b0`; E535 |
 | [Init tail 0x53299d (2026-10-22)](checkpoints/2026-10-22-init-tail-53299d.md) | Fall-through 17 B; target block 350 B; callees named (capture setter, save-data ctor); E537 |
 | [Init merge je 0x5329ae (2026-10-22)](checkpoints/2026-10-22-init-branch-5329ae.md) | Merge branch modelled from `[+0x60]` byte; taken path stops honestly; E536 |
+| [Init tail provenance (2026-10-23)](checkpoints/2026-10-23-init-32f79a8-2eff450-provenance.md) | `0x32f79a8` lazy singleton writers; `0x2eff450` vtable slot1 `0x54b250`; E538 |
