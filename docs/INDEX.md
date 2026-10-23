@@ -259,3 +259,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [List-B inserter 0x1bdc80 (2026-10-23)](checkpoints/2026-10-23-insert-1bdc80-native.md) | 0x50-node list-B insert; dtor list-B type; E571 |
 | [Camera chain (2026-10-23)](checkpoints/2026-10-23-camera-chain.md) | Euler/format pure lift; live pose chain blocked; E573 |
 | [Round 25 verification (2026-10-23)](checkpoints/2026-10-23-round-25-verification.md) | 349/349 ctest, 446/0/0 sweep; E569–E573 published |
+| [`0xf590` rank-1 wiring (2026-10-23)](checkpoints/2026-10-23-f590-rank1-wiring.md) | Four proven-zero `0x533100` sites on the real inert release; `0x5333e3` stays a hook; E574 |

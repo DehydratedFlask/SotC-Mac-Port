@@ -44,9 +44,12 @@
 - **`0x2569d0`** is 12,621 B (`sub rsp,0x1118`, 87 reachable blocks). Only its registry block,
   `RetailBuild`/mode classification and the constant property table are native. The 20 constructor
   rows (19 slot rows + 2 self-registered) remain open; the large bodies are blocked subsystems.
-- **`0xf590`** is a 73 B shared release. The 17 Init-slice modules are wired as exact inert
-  zero-holder releases. Do not wire P2 frame/global sites without the `ctrl_slot` + callee-body
-  check; a last reference with a missing destroy/free contract must report `ok == false`.
+- **`0xf590`** is a 73 B shared release. The 17 Init-slice modules and the four provably-zero
+  `0x533100` sites (miss `0x5332f4`/`0x533300`, join `0x533399`, tail `0x53404d`; E574) are wired as
+  exact inert zero-holder releases. The nine `0x533100` key-holder sites are real releases and need
+  the 0x20 B shared-string type first; `0x5333e3` stays a per-element hook. Do not wire P2
+  frame/global sites without the `ctrl_slot` + callee-body check; a last reference with a missing
+  destroy/free contract must report `ok == false`.
 - **`0x15ff060..0x15ff0a0`** is an eight-slot `.data.rel.ro` pointer slice, not a vtable and not an
   owned object. Do not restore the "table owner" reading; `0x2569d0` is a consumer.
 

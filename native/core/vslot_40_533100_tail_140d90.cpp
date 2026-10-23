@@ -1,11 +1,30 @@
 #include "vslot_40_533100_tail_140d90.hpp"
 
-#include <cstring>
+#include <cstddef>
 
 namespace sotc {
 namespace {
 
-alignas(8) std::uint8_t g_path_dtor_standin[8]{};
+// OBS 0x533380..0x533395: 0x38 B stack temporary.
+//   +0x00..+0x1f  `{"Position", 8, 0, 0}` (the 0x20 B holder `0xf590` reads)
+//   +0x20         1.0f (0x3f800000)
+//   +0x28/+0x30   unmodelled; `0xf590` never reads them
+struct alignas(8) TailPositionTemp {
+    SharedHolderF590 holder;
+    float value_20;
+    void* field_28;
+    void* field_30;
+};
+
+static_assert(sizeof(TailPositionTemp) == 0x38);
+static_assert(offsetof(TailPositionTemp, holder) == 0x00);
+static_assert(offsetof(TailPositionTemp, value_20) == 0x20);
+
+// The six fields the measured `0xf590` no-op must report.
+[[nodiscard]] bool is_inert_release(const SharedReleaseF590Result& r) noexcept {
+    return r.ok && !r.had_control && !r.decremented && !r.was_last && !r.destroyed && !r.freed &&
+           r.previous == 0;
+}
 
 }  // namespace
 
@@ -25,15 +44,31 @@ Vslot40_533100Tail140d90Result vslot_40_533100_tail_140d90(
     }
     ++out.call_140d90_count;
 
-    // OBS: lea rdi, [rbp-0x70]; call 0xf590
-    if (hooks.dtor_f590 != nullptr) {
-        hooks.dtor_f590(g_path_dtor_standin);
+    // OBS 0x53404d: 0xf590 on the 0x38 B stack temp built at 0x533380..0x533395.
+    TailPositionTemp temp{};
+    temp.holder.object =
+        const_cast<char*>(static_cast<const char*>(kVslot40Tail140d90NamePosition));
+    temp.holder.reserved_08 = reinterpret_cast<void*>(static_cast<std::uintptr_t>(8));
+    temp.holder.reserved_10 = nullptr;
+    temp.holder.control = nullptr;  // OBS: `+0x18` is zero (vpxor @ 0x533341)
+    temp.value_20 = 1.0f;           // OBS 0x53338a: mov dword [rbp-0x50], 0x3f800000
+    temp.field_28 = nullptr;        // unmodelled
+    temp.field_30 = nullptr;        // unmodelled
+
+    if (hooks.call_f590 != nullptr) {
+        out.release_f590 = hooks.call_f590(temp.holder);
+    } else {
+        out.release_f590 = shared_release_f590(temp.holder, hooks.release_f590);
     }
     ++out.dtor_f590_count;
 
+    // The lifted default path must be the exact inert release proven by the static audit.
+    // A host override supplies its own result and is not held to the measured shape.
+    const bool release_ok = (hooks.call_f590 != nullptr) || is_inert_release(out.release_f590);
+
     // stack-check / epilogue @ 0x534052 — see vslot_40_533100_stackchk.*
     out.ok = (out.call_140d90_count == 1) && (out.dtor_f590_count == 1) &&
-             (out.arg == kVslot40Tail140d90Arg);
+             (out.arg == kVslot40Tail140d90Arg) && release_ok;
     return out;
 }
 

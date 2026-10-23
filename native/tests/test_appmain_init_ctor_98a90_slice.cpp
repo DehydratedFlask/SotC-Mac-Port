@@ -147,10 +147,11 @@ int g_v40_525080 = 0;
 int g_v40_2569d0 = 0;
 int g_v40_21620 = 0;
 int g_v40_ba40 = 0;
-int g_v40_miss_f590 = 0;
+int g_v40_miss_release_override = 0;
 int g_v40_42390 = 0;
 int g_v40_2779a0 = 0;
-int g_v40_join_f590 = 0;
+int g_v40_join_release_override = 0;
+int g_v40_join_element = 0;
 int g_v40_6a5370 = 0;
 int g_v40_6abcc0 = 0;
 int g_v40_14c2f0 = 0;
@@ -198,7 +199,7 @@ int g_v40_csp_load = 0;
 int g_v40_csp_14ccc0 = 0;
 int g_v40_csp_attach_f590 = 0;
 int g_v40_tail_140d90 = 0;
-int g_v40_tail_140d90_f590 = 0;
+int g_v40_tail_release_override = 0;
 int g_v40_tail_140d90_arg = -1;
 void* g_v40_tail_140d90_slot = nullptr;
 int g_post_base_499f80 = 0;
@@ -382,13 +383,36 @@ void* hook_v40_21620(void*) {
     return nullptr;  // measured empty → null find
 }
 void hook_v40_ba40(void*, void*, void*) { ++g_v40_ba40; }
-void hook_v40_miss_f590(void*) { ++g_v40_miss_f590; }
+SharedReleaseF590Result hook_v40_miss_release(SharedHolderF590& holder) {
+    ++g_v40_miss_release_override;
+    CHECK(holder.object != nullptr);
+    CHECK(std::strcmp(static_cast<const char*>(holder.object), kVslot40MissNameRFps) == 0);
+    CHECK(holder.reserved_08 == reinterpret_cast<void*>(static_cast<std::uintptr_t>(5)));
+    CHECK(holder.reserved_10 == nullptr);
+    CHECK(holder.control == nullptr);
+    SharedReleaseF590Result rel{};
+    rel.ok = true;
+    return rel;
+}
 void hook_v40_42390(void*) { ++g_v40_42390; }
 void hook_v40_2779a0(void* obj, void*, int) {
     ++g_v40_2779a0;
     *static_cast<std::uint32_t*>(obj) = 0x2779A001u;
 }
-void hook_v40_join_f590(void*) { ++g_v40_join_f590; }
+SharedReleaseF590Result hook_v40_join_release(SharedHolderF590& holder) {
+    ++g_v40_join_release_override;
+    CHECK(holder.object != nullptr);
+    CHECK(std::strcmp(static_cast<const char*>(holder.object), kVslot40JoinNamePosition) == 0);
+    CHECK(holder.reserved_08 == reinterpret_cast<void*>(static_cast<std::uintptr_t>(8)));
+    CHECK(holder.reserved_10 == nullptr);
+    CHECK(holder.control == nullptr);
+    SharedReleaseF590Result rel{};
+    rel.ok = true;
+    return rel;
+}
+void hook_v40_join_element(void*) { ++g_v40_join_element; }
+void hook_v40_delete_array_noop(void*) {}
+void hook_v40_delete_noop(void*) {}
 void hook_v40_6a5370(void*) { ++g_v40_6a5370; }
 void hook_v40_6abcc0(void*) { ++g_v40_6abcc0; }
 void hook_v40_14c2f0(void* dst, const char* path) {
@@ -530,7 +554,18 @@ void hook_v40_tail_140d90(void* slot_obj, int arg) {
     g_v40_tail_140d90_slot = slot_obj;
     g_v40_tail_140d90_arg = arg;
 }
-void hook_v40_tail_140d90_f590(void*) { ++g_v40_tail_140d90_f590; }
+SharedReleaseF590Result hook_v40_tail_release(SharedHolderF590& holder) {
+    ++g_v40_tail_release_override;
+    CHECK(holder.object != nullptr);
+    CHECK(std::strcmp(static_cast<const char*>(holder.object),
+                      kVslot40Tail140d90NamePosition) == 0);
+    CHECK(holder.reserved_08 == reinterpret_cast<void*>(static_cast<std::uintptr_t>(8)));
+    CHECK(holder.reserved_10 == nullptr);
+    CHECK(holder.control == nullptr);
+    SharedReleaseF590Result rel{};
+    rel.ok = true;
+    return rel;
+}
 void hook_post_base_499f80(void* arg) {
     ++g_post_base_499f80;
     g_post_base_499f80_arg = arg;
@@ -910,6 +945,64 @@ int main() {
         CHECK(cr.list_walk_skipped_null);
     }
 
+    // Unit: the four safe 0xf590 sites use the real inert release; a host override sees the
+    // recovered holder shape (literal, length, zero capacity/control).
+    {
+        Vslot40_533100MissHooks mh{};
+        mh.call_f590 = hook_v40_miss_release;
+        g_v40_miss_release_override = 0;
+        const auto mr = vslot_40_533100_miss(mh);
+        CHECK(mr.ok);
+        CHECK(mr.dtor_f590_calls == 2);
+        CHECK(g_v40_miss_release_override == 2);
+    }
+    {
+        std::vector<std::uint8_t> join_self(kVslot40JoinSlotOff + sizeof(void*), 0);
+        Vslot40_533100JoinHooks jh{};
+        jh.call_f590 = hook_v40_join_release;
+        g_v40_join_release_override = 0;
+        const auto jr = vslot_40_533100_join(front, join_self.data(), jh);
+        CHECK(jr.ok);
+        CHECK(jr.replaced);
+        CHECK(jr.release_f590_count == 1);
+        CHECK(jr.dtor_f590_count == 1);
+        CHECK(jr.dtor_f590_element_count == 0);
+        CHECK(g_v40_join_release_override == 1);
+    }
+    {
+        // 0x5333e3 stays a per-element hook, separate from the stack-name release.
+        alignas(8) std::uint8_t elements[2 * 0x50]{};
+        alignas(8) std::uint8_t prev[0x20]{};
+        void* begin = elements;
+        void* end = elements + sizeof(elements);
+        void* prev_ptr = prev;
+        std::memcpy(prev + 0x00, &begin, sizeof(void*));
+        std::memcpy(prev + 0x08, &end, sizeof(void*));
+        std::vector<std::uint8_t> join_self(kVslot40JoinSlotOff + sizeof(void*), 0);
+        std::memcpy(join_self.data() + kVslot40JoinSlotOff, &prev_ptr, sizeof(void*));
+        Vslot40_533100JoinHooks jh{};
+        jh.dtor_f590_element = hook_v40_join_element;
+        jh.delete_array_170c0 = hook_v40_delete_array_noop;
+        jh.delete_170b0 = hook_v40_delete_noop;
+        g_v40_join_element = 0;
+        const auto jr = vslot_40_533100_join(front, join_self.data(), jh);
+        CHECK(jr.ok);
+        CHECK(jr.destroyed_prev);
+        CHECK(jr.dtor_f590_element_count == 2);
+        CHECK(jr.dtor_f590_count == 3);  // stack release + 2 elements
+        CHECK(g_v40_join_element == 2);
+    }
+    {
+        std::vector<std::uint8_t> tail_self(kVslot40Tail140d90SlotOff + 4, 0);
+        Vslot40_533100Tail140d90Hooks th{};
+        th.call_f590 = hook_v40_tail_release;
+        g_v40_tail_release_override = 0;
+        const auto tr = vslot_40_533100_tail_140d90(tail_self.data(), th);
+        CHECK(tr.ok);
+        CHECK(tr.dtor_f590_count == 1);
+        CHECK(g_v40_tail_release_override == 1);
+    }
+
     reset_cells();
 
     InputTable551140 table{};
@@ -944,8 +1037,9 @@ int main() {
     g_ctor_a30 = g_dtor_98a90 = g_dtor_3b40 = g_dtor_early = 0;
     g_nonnull = g_f590 = g_init_tb = g_move = g_mid_reg = g_mid_b60 = 0;
     g_f08_ctor = g_f08_dtor = g_v40_ctor = g_v40_525080 = g_v40_2569d0 = 0;
-    g_v40_21620 = g_v40_ba40 = g_v40_miss_f590 = 0;
-    g_v40_42390 = g_v40_2779a0 = g_v40_join_f590 = 0;
+    g_v40_21620 = g_v40_ba40 = g_v40_miss_release_override = 0;
+    g_v40_42390 = g_v40_2779a0 = g_v40_join_release_override = 0;
+    g_v40_join_element = 0;
     g_v40_6a5370 = g_v40_6abcc0 = 0;
     g_v40_14c2f0 = g_v40_shadow_load = 0;
     g_v40_14ccc0 = g_v40_attach_f590 = 0;
@@ -965,7 +1059,7 @@ int main() {
     g_v40_cp3_14ccc0 = g_v40_cp3_attach_f590 = 0;
     g_v40_csp_notify = g_v40_csp_14c2f0 = g_v40_csp_load = 0;
     g_v40_csp_14ccc0 = g_v40_csp_attach_f590 = 0;
-    g_v40_tail_140d90 = g_v40_tail_140d90_f590 = 0;
+    g_v40_tail_140d90 = g_v40_tail_release_override = 0;
     g_v40_tail_140d90_arg = -1;
     g_v40_tail_140d90_slot = nullptr;
     g_post_base_499f80 = 0;
@@ -1179,10 +1273,8 @@ int main() {
     bh.vslot_40_post_detail.call_2569d0 = hook_v40_2569d0;
     bh.vslot_40_miss_detail.find_21620 = hook_v40_21620;
     bh.vslot_40_miss_detail.ba40 = hook_v40_ba40;
-    bh.vslot_40_miss_detail.dtor_f590 = hook_v40_miss_f590;
     bh.vslot_40_join_detail.call_42390 = hook_v40_42390;
     bh.vslot_40_join_detail.ctor_2779a0 = hook_v40_2779a0;
-    bh.vslot_40_join_detail.dtor_f590 = hook_v40_join_f590;
     bh.vslot_40_gfx_detail.call_6a5370 = hook_v40_6a5370;
     bh.vslot_40_gfx_detail.call_6abcc0 = hook_v40_6abcc0;
     bh.vslot_40_shadow_detail.path_14c2f0 = hook_v40_14c2f0;
@@ -1230,7 +1322,6 @@ int main() {
     bh.vslot_40_cp3shadowprecache_attach_detail.release_14ccc0 = hook_v40_csp_14ccc0;
     bh.vslot_40_cp3shadowprecache_attach_detail.dtor_f590 = hook_v40_csp_attach_f590;
     bh.vslot_40_tail_140d90_detail.call_140d90 = hook_v40_tail_140d90;
-    bh.vslot_40_tail_140d90_detail.dtor_f590 = hook_v40_tail_140d90_f590;
 
     SingletonF08Hooks sh{};
     sh.ctor_523bd0 = hook_f08_ctor;
@@ -1517,13 +1608,18 @@ int main() {
     CHECK(r.vslot_40_miss.find_null);
     CHECK(g_v40_21620 == 1);
     CHECK(g_v40_ba40 == 1);
-    CHECK(g_v40_miss_f590 == 2);
+    CHECK(r.vslot_40_miss.dtor_f590_calls == 2);
+    check_f590_release_noop(r.vslot_40_miss.release_f590_a);
+    check_f590_release_noop(r.vslot_40_miss.release_f590_b);
     // E424: join+ Position install at self+0x3b60
     CHECK(r.vslot_40_join.ok);
     CHECK(r.vslot_40_join.replaced);
     CHECK(g_v40_42390 == 1);
     CHECK(g_v40_2779a0 == 1);
-    CHECK(g_v40_join_f590 == 1);
+    CHECK(r.vslot_40_join.release_f590_count == 1);
+    CHECK(r.vslot_40_join.dtor_f590_count == 1);
+    CHECK(r.vslot_40_join.dtor_f590_element_count == 0);
+    check_f590_release_noop(r.vslot_40_join.release_f590);
     CHECK(r.vslot_40_join.pos_obj != nullptr);
     CHECK(*static_cast<std::uint32_t*>(r.vslot_40_join.pos_obj) == 0x2779A001u);
     CHECK(loadp(app.data(), kVslot40JoinSlotOff) == r.vslot_40_join.pos_obj);
@@ -1685,7 +1781,8 @@ int main() {
     // E444: 0x140d90 call-site (self+0x3cc8, arg=9) + f590; stop before stackchk
     CHECK(r.vslot_40_tail_140d90.ok);
     CHECK(g_v40_tail_140d90 == 1);
-    CHECK(g_v40_tail_140d90_f590 == 1);
+    CHECK(r.vslot_40_tail_140d90.dtor_f590_count == 1);
+    check_f590_release_noop(r.vslot_40_tail_140d90.release_f590);
     CHECK(g_v40_tail_140d90_arg == kVslot40Tail140d90Arg);
     CHECK(g_v40_tail_140d90_slot ==
           static_cast<std::uint8_t*>(app.data()) + kVslot40Tail140d90SlotOff);

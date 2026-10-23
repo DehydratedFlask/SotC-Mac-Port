@@ -1,7 +1,7 @@
 # SoC Mac Native — current handoff
 
 Updated: 2026-10-23 (America/Chicago). Integrator: OpenCode orchestrator (goal resumed by explicit
-user command). Branch `cursor/init-hash-551140-9dfc`; round-25 tip is the commit that carries this file (round-24 code tip `9a85650`).
+user command). Branch `cursor/init-hash-551140-9dfc`; round-25 code tip `f394fc8`; round-24 tip `9a85650`.
 Older rounds, the history-rewrite record and the full pre-tidy handoff are archived verbatim in
 [docs/checkpoints/HANDOFF-archive-2026-10-23.md](docs/checkpoints/HANDOFF-archive-2026-10-23.md).
 The rounds that follow the archive are in chronological order.
@@ -121,8 +121,10 @@ The rounds that follow the archive are in chronological order.
   publish/attribution audits exit 0.
 - **E573** — camera chain characterized; pure `0x50ba0` Euler math and the six-double `setCameraPos`
   formatter are native (`camera_location_25a4d0`). The live pose remains blocked on engine state.
-- The 0x533100 `f590` audit is complete (14 sites: 4 provably-zero, 9 real releases, 1 unknown);
-  wiring of the 4 safe sites is a separate in-flight task and is not claimed here.
+- **E574** — the four provably-zero `0xf590` sites in app vslot `0x533100` now run the lifted
+  `shared_release_f590` with real holders (`"r_fps"` ×2, `"Position"` ×2). The nine rank-2
+  key-holder sites remain real refcount releases and are untouched; `0x5333e3` stays a per-element
+  hook. Mutation checks fail on a non-null control and on a skipped release.
 
 ## Settled decisions (do not re-ask)
 
