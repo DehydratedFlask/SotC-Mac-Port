@@ -231,3 +231,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Init tail provenance (2026-10-23)](checkpoints/2026-10-23-init-32f79a8-2eff450-provenance.md) | `0x32f79a8` lazy singleton writers; `0x2eff450` vtable slot1 `0x54b250`; E538 |
 | [Capture 0xa473b0 native (2026-10-23)](checkpoints/2026-10-23-capture-a473b0-native.md) | 134 B lifted over `CaptureServices` contracts; no fake success; E539 |
 | [Save-data callees (2026-10-23)](checkpoints/2026-10-23-savedata-callees.md) | `0x54b250` stat query; `0xa54920` ConVar counter registrar, no save-data imports; E540 |
+| [Init continue batch E (2026-10-23)](checkpoints/2026-10-23-init-531d60-continue-batch-e.md) | 350 B / 53 units to the registry fragment; 3 registrars + 3 no-op vcalls; E541 |

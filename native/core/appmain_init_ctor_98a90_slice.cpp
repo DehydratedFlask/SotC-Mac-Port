@@ -78,7 +78,8 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBaseContinueAHooks& post_base_continue_a_hooks,
     const Init531d60PostBaseContinueBHooks& post_base_continue_b_hooks,
     const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks,
-    const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks) {
+    const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks,
+    const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks) {
     AppmainInitCtor98a90SliceResult out{};
     out.early = run_prologue_255180_early(alloc, early_hooks);
     if (!out.early.ok) {
@@ -541,12 +542,22 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     if (!out.post_base_continue_c.ok) {
         return out;
     }
-    // E536: the merge `je 0x5329ae` is taken when the resolved flag byte is 0. The branch
-    // target block is NOT modelled, so stop honestly instead of running the fall-through.
+    // E536: the merge `je 0x5329ae` is taken when the resolved flag byte is 0.
+    // The branch-target block (0x5329ae..0x532b0c, 350 B, 53 units) is now lifted
+    // as continue_e.  When the branch is taken, run it; if it fails, stop honestly.
     out.init_branch_5329ae_taken = out.post_base_continue_c.merge_branch_taken;
     if (out.post_base_continue_c.merge_branch_outcome_modelled &&
         out.post_base_continue_c.merge_branch_taken) {
-        out.init_stopped_at_5329ae = true;
+        out.post_base_continue_e = init_531d60_post_base_continue_e(
+            post_base_continue_e_hooks);
+        if (!out.post_base_continue_e.ok) {
+            out.init_stopped_at_5329ae = true;
+            return out;
+        }
+        // The block ends at 0x532b0c = `mov edi,0x98` (registry fragment entry).
+        // Continue to the remainder slice which models the registry.
+        out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in,
+                                                         set_a, set_b, set_c);
         return out;
     }
     // Fall-through of the merge branch (je NOT taken): 17 B before 0x5329ae.

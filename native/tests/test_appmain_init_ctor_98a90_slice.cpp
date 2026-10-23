@@ -610,6 +610,32 @@ void hook_cont_a_1fc80(void* rdi, std::uintptr_t rsi_rva) {
 }
 int g_extra_slot0 = 0;
 
+// E batch (continue_e — 0x5329ae..0x532b0c, save-data ctors):
+int g_cont_e_a54920 = 0;
+int g_cont_e_54b250 = 0;
+void* g_cont_e_a54920_parent[3]{};
+void* g_cont_e_a54920_name[3]{};
+void* g_cont_e_a54920_desc[3]{};
+void* g_cont_e_54b250_obj = nullptr;
+std::uint8_t g_boss_flag_cell = 0x01;   // match E418 file value
+void* g_cell_2eff450_value = nullptr;
+void* g_cont_e_r13 = nullptr;
+
+void hook_cont_e_a54920(void* parent, void* name, void* descriptor) {
+    int n = g_cont_e_a54920;
+    if (n < 3) {
+        g_cont_e_a54920_parent[n] = parent;
+        g_cont_e_a54920_name[n] = name;
+        g_cont_e_a54920_desc[n] = descriptor;
+    }
+    ++g_cont_e_a54920;
+}
+
+void hook_cont_e_54b250(void* obj, std::uint32_t, std::uint32_t) {
+    ++g_cont_e_54b250;
+    g_cont_e_54b250_obj = obj;
+}
+
 int g_cont_d_call = 0;
 void* g_cont_d_rdi = nullptr;
 const void* g_cont_d_cell_value = reinterpret_cast<const void*>(0x11223344);
@@ -1289,6 +1315,15 @@ int main() {
     pbcd.cell_32f79a8 = &g_cont_d_cell_value;
     pbcd.call_a473b0 = hook_cont_d_call;         // fallback path (unused when services supplied)
     pbcd.capture_services = &g_capture_a473b0;  // run the lifted 0xa473b0 body
+    // continue_e hooks (only used when the je is taken; supplied as stand-in values).
+    g_cont_e_r13 = g_cont_a_rdi_marker;  // same parent stand-in as r15
+    Init531d60PostBaseContinueEHooks pbce{};
+    pbce.incoming_r13 = g_cont_e_r13;
+    pbce.incoming_r12b = 0xBB;
+    pbce.boss_flag_2dcdf14 = &g_boss_flag_cell;
+    pbce.call_a54920 = hook_cont_e_a54920;
+    pbce.call_54b250 = hook_cont_e_54b250;
+    pbce.cell_2eff450 = &g_cell_2eff450_value;
 
     const std::uint64_t allocs_before = heap.alloc_count;
     const auto t0 = std::chrono::steady_clock::now();
@@ -1306,7 +1341,7 @@ int main() {
                                                      pba2edu3, pbf590u5, pbf590u6, pba2edu4,
                                                      pbf590u7, pbf590u8, pba2edu5, pbf590u9,
                                                      pbf590u10, pba2edu6, pbf590u11, pbf590u12,
-                                                     pba2edu7, pbf590u13, pbca, pbcb, pbcc, pbcd);
+                                                     pba2edu7, pbf590u13, pbca, pbcb, pbcc, pbcd, pbce);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
@@ -1952,6 +1987,88 @@ int main() {
         CHECK(g_cont_d_call == 1);
         CHECK(g_cont_d_rdi == const_cast<void*>(g_cont_d_cell_value));
     }
+
+    // E (continue_e) direct coverage: the branch-target block 0x5329ae..0x532b0c
+    // (350 B, 53 units, three 0xa54920 save-data ctors, three elided no-op vcalls,
+    // one resolved 0x54b250 call, and the boss-flag stamp).
+    {
+        Init531d60PostBaseContinueEHooks eh{};
+        eh.incoming_r13 = g_cont_e_r13;              // parent stand-in (NOT deref'd)
+        eh.incoming_r12b = 0xAA;                     // stamp value
+        eh.boss_flag_2dcdf14 = &g_boss_flag_cell;
+        eh.call_a54920 = hook_cont_e_a54920;
+        eh.call_54b250 = hook_cont_e_54b250;
+        eh.cell_2eff450 = &g_cell_2eff450_value;
+        const auto er = init_531d60_post_base_continue_e(eh);
+        CHECK(er.ok);
+        CHECK(er.unit_executed == kInit531d60PostBaseContinueEUnitCount);
+        CHECK(kInit531d60PostBaseContinueEUnitCount == 53);
+        for (int i = 0; i < kInit531d60PostBaseContinueEUnitCount; ++i) {
+            CHECK(er.unit_counts[static_cast<std::size_t>(i)] == 1);
+        }
+        CHECK(kInit531d60PostBaseContinueEUnits[0].rva == 0x5329ae);
+        CHECK(kInit531d60PostBaseContinueEUnits[52].rva == 0x532b09);
+        CHECK(er.call_a54920_count == 3);
+        CHECK(er.vcall_noop_count == 3);
+        CHECK(er.vcall_54b250_count == 1);
+        CHECK(er.stamp_count == 1);
+        CHECK(er.lea_rip_count == 9);
+        CHECK(er.vmovq_count == 1);
+        CHECK(er.end_rva == 0x532b0c);
+        CHECK(er.a54920_hook_supplied);
+        // The three 0xa54920 calls pass the correct name-struct addresses.
+        CHECK(g_cont_e_a54920 == 3);
+        CHECK(g_cont_e_a54920_name[0] ==
+              reinterpret_cast<void*>(static_cast<std::uintptr_t>(0x2efd9a0)));
+        CHECK(g_cont_e_a54920_name[1] ==
+              reinterpret_cast<void*>(static_cast<std::uintptr_t>(0x2efd9f8)));
+        CHECK(g_cont_e_a54920_name[2] ==
+              reinterpret_cast<void*>(static_cast<std::uintptr_t>(0x2efda50)));
+        // All three share the same parent stand-in and a distinct 0x50 B descriptor.
+        CHECK(g_cont_e_a54920_parent[0] == g_cont_e_r13);
+        CHECK(g_cont_e_a54920_parent[1] == g_cont_e_r13);
+        CHECK(g_cont_e_a54920_parent[2] == g_cont_e_r13);
+        CHECK(g_cont_e_a54920_desc[0] != nullptr);
+        CHECK(g_cont_e_a54920_desc[1] != nullptr);
+        CHECK(g_cont_e_a54920_desc[2] != nullptr);
+        CHECK(g_cont_e_a54920_desc[0] != g_cont_e_a54920_desc[1]);
+        CHECK(g_cont_e_a54920_desc[1] != g_cont_e_a54920_desc[2]);
+        // Descriptor shape: vtable at +0x40, self-pointer at +0x20 (all three).
+        for (int i = 0; i < 3; ++i) {
+            const auto* dsc = static_cast<const std::uint8_t*>(g_cont_e_a54920_desc[i]);
+            void* vt = nullptr;
+            std::memcpy(&vt, dsc + 0x40, sizeof(void*));
+            CHECK(vt == reinterpret_cast<void*>(
+                             static_cast<std::uintptr_t>(i < 2 ? 0x15c8d98 : 0x15c8e18)));
+            void* sp = nullptr;
+            std::memcpy(&sp, dsc + 0x20, sizeof(void*));
+            CHECK(reinterpret_cast<std::uintptr_t>(sp) ==
+                  reinterpret_cast<std::uintptr_t>(g_cont_e_a54920_desc[i]) + 0x20);
+        }
+        // The boss flag was stamped with r12b.
+        CHECK(er.boss_flag_before == 0x01);
+        CHECK(er.boss_flag_after == 0xAA);
+        // The resolved 0x54b250 call passes the cell content (0x2eff450 object).
+        CHECK(g_cont_e_54b250 == 1);
+        CHECK(g_cont_e_54b250_obj == g_cell_2eff450_value);
+
+        // Missing hooks: the block still counts every unit (visible status) but
+        // reports no hook-supplied a54920, and the stamp is a no-op.
+        g_cont_e_a54920 = 0;
+        g_cont_e_54b250 = 0;
+        Init531d60PostBaseContinueEHooks empty{};
+        const auto er2 = init_531d60_post_base_continue_e(empty);
+        CHECK(er2.ok);
+        CHECK(er2.unit_executed == 53);
+        CHECK(er2.call_a54920_count == 3);
+        CHECK(er2.vcall_noop_count == 3);
+        CHECK(er2.vcall_54b250_count == 1);
+        CHECK(!er2.a54920_hook_supplied);
+        CHECK(g_cont_e_a54920 == 0);   // no hook dispatched
+        CHECK(g_cont_e_54b250 == 0);   // no hook dispatched
+        CHECK(er2.boss_flag_before == 0);  // no cell supplied -> no write observed
+    }
+
     CHECK(r.post_base_continue_c.ok);
     CHECK(r.post_base_continue_c.unit_executed ==
           kInit531d60PostBaseContinueCUnitCount);

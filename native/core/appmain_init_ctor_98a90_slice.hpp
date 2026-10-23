@@ -93,6 +93,7 @@
 #include "init_531d60_post_base_continue_b.hpp"
 #include "init_531d60_post_base_continue_c.hpp"
 #include "init_531d60_post_base_continue_d.hpp"
+#include "init_531d60_post_base_continue_e.hpp"
 #include "input_table_551140.hpp"
 #include "prologue_255180.hpp"
 #include "singleton_f08_531d84.hpp"
@@ -217,6 +218,7 @@ struct AppmainInitCtor98a90SliceResult {
     Init531d60PostBaseContinueBResult post_base_continue_b{};
     Init531d60PostBaseContinueCResult post_base_continue_c{};
     Init531d60PostBaseContinueDResult post_base_continue_d{};
+    Init531d60PostBaseContinueEResult post_base_continue_e{};
     // E524/E529: the je outcome is modelled when the 0x1e4c0 hook returns a
     // proven boolean; when it is taken, the 36 B 0x5328e0 preamble runs first and
     // its sete r14b becomes the merge entry's movzx esi,r14b.
@@ -301,6 +303,7 @@ struct AppmainInitCtor98a90SliceResult {
     const Init531d60PostBaseContinueAHooks& post_base_continue_a_hooks = {},
     const Init531d60PostBaseContinueBHooks& post_base_continue_b_hooks = {},
     const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks = {},
-    const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks = {});
+    const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks = {},
+    const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks = {});
 
 }  // namespace sotc
