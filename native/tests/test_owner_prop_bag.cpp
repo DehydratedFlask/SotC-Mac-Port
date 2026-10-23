@@ -97,5 +97,43 @@ int main() {
         CHECK(it->second.i == 2);
     }
 
+    // ---- 5. 0xa2afb0 user selection: initial device + login ids, cap and dedupe. ----
+    {
+        const int none[4] = {-1, -1, -1, -1};
+        auto s = select_bag_users(-1, none, false);
+        CHECK(s.count == 1 && s.user_ids[0] == -1 && !s.login_list_ok);
+
+        const int four[4] = {10, 11, 12, 13};
+        s = select_bag_users(-1, four, true);
+        CHECK(s.count == 4);  // initial -1 + 10,11,12; 13 is dropped by the cap
+        CHECK(s.user_ids[0] == -1 && s.user_ids[1] == 10 && s.user_ids[2] == 11 &&
+              s.user_ids[3] == 12);
+
+        s = select_bag_users(10, four, true);
+        CHECK(s.count == 4);  // 10 is the initial; 11,12,13 are added
+        CHECK(s.user_ids[0] == 10 && s.user_ids[1] == 11 && s.user_ids[2] == 12 &&
+              s.user_ids[3] == 13);
+
+        const int negatives[4] = {-1, 20, -3, 21};
+        s = select_bag_users(-1, negatives, true);
+        CHECK(s.count == 3);  // initial -1 + 20 + 21
+        CHECK(s.user_ids[1] == 20 && s.user_ids[2] == 21);
+
+        const int duplicates[4] = {20, 20, 21, 22};
+        s = select_bag_users(-1, duplicates, true);
+        CHECK(s.count == 4);  // no dedupe among login ids
+        CHECK(s.user_ids[1] == 20 && s.user_ids[2] == 20 && s.user_ids[3] == 21);
+
+        s = select_bag_users(-1, four, false);
+        CHECK(s.count == 1 && s.user_ids[0] == -1);
+
+        // The report's exact cap case: initial 5 + login {0,1,2,3} -> {5,0,1,2}, user 3 dropped.
+        const int cap[4] = {0, 1, 2, 3};
+        s = select_bag_users(5, cap, true);
+        CHECK(s.count == 4);
+        CHECK(s.user_ids[0] == 5 && s.user_ids[1] == 0 && s.user_ids[2] == 1 &&
+              s.user_ids[3] == 2);
+    }
+
     return 0;
 }

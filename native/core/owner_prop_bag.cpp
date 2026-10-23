@@ -2,6 +2,32 @@
 
 namespace sotc {
 
+BagUserSelection select_bag_users(int initial_user, const int login_ids[4],
+                                 bool login_list_ok) noexcept {
+    BagUserSelection out{};
+    out.user_ids[0] = initial_user;  // site A is unconditional, even for -1
+    out.count = 1;
+    out.login_list_ok = login_list_ok;
+    if (!login_list_ok) {
+        return out;
+    }
+    for (int i = 0; i < 4; ++i) {
+        const int id = login_ids[i];
+        if (id < 0 || id == initial_user) {
+            continue;
+        }
+        // Sites D/E check `r13 <= 2`; r13 == count - 1, so count == 4 is full.
+        if (i >= 2 && out.count - 1 > 2) {
+            continue;
+        }
+        if (out.count >= 4) {
+            continue;
+        }
+        out.user_ids[out.count++] = id;
+    }
+    return out;
+}
+
 void OwnerPropBag::insert_a(std::uint32_t key, const OwnerValueA& value) {
     tree_a_.emplace(key, value);  // multimap: equal keys are kept in insertion order
 }

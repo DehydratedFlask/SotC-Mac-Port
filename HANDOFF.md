@@ -9,7 +9,7 @@ The rounds that follow the archive are in chronological order.
 ## Where things stand (measured at this tip)
 
 - Full native suite: **361/361** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **458 passed / 0 skipped / 0 failed** with
+- ELF checker sweep: **459 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -191,6 +191,9 @@ The rounds that follow the archive are in chronological order.
   objects are per-user input devices, not language tables, and they do not affect
   `insert_a`/`insert_b`. The property-map path is complete; the input-device lifetime, mutex, IME
   block and vectors remain contracts.
+- **E591** — the bag's 1..4 input-device selection is native: initial device + login ids, negative
+  skips, initial-only dedupe, and the `r13 <= 2` cap. The report's exact case
+  `initial=5, login={0,1,2,3}` yields `{5,0,1,2}`. The 0xc88 device bodies remain contracts.
 - **E583** — the camera delegate has **no static writer**: `D` is the `_Root` node (vtable
   `0x15992b8`, ctor `0x1d6230`, 0x3c8 B), and the ctor zeroes `+0x2e8..+0x307`; an opcode-aware
   census found zero stores. The bound PMF target returns `const CameraTransform*`, but it is

@@ -50,6 +50,18 @@ struct OwnerValueB {
     std::uint32_t tag;
 };
 
+// `0xa2afb0` input-device user selection: one unconditional initial-user device plus up to three
+// login-id devices. Negative ids are skipped, only the initial user is deduped, and the `r13 <= 2` cap
+// drops the last of four distinct login ids. `login_list_ok == false` leaves the initial device.
+struct BagUserSelection {
+    int count = 0;
+    int user_ids[4] = {-1, -1, -1, -1};
+    bool login_list_ok = false;
+};
+
+[[nodiscard]] BagUserSelection select_bag_users(int initial_user, const int login_ids[4],
+                                                bool login_list_ok) noexcept;
+
 class OwnerPropBag {
 public:
     using TreeA = std::multimap<std::uint32_t, OwnerValueA>;
