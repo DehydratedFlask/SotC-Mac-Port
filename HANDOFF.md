@@ -2,7 +2,7 @@
 
 Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + OpenCode orchestrator round 2.
 Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
-Round-2 through round-14 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
+Round-2 through round-15 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
 
 ## 2026-10-22 Repository history rewrite — Claude attribution + hostname identity
 
@@ -35,6 +35,24 @@ Round-2 through round-14 detail are the sections immediately below; the parallel
   pushing one would reintroduce old trailers. Gate: **G1 still PARTIAL**; nothing about boot/audio/save
   changes.
 - Next exact action: unchanged — next always-on after `0x532720`, or a bounded body lift.
+
+## 2026-10-23 Orchestrator round 15 — `0xf590` is a shared-ownership release (E552)
+
+- Agent: integrator.
+- Task: `CPU-01-SHARED-RELEASE-F590-NATIVE-01` (E552).
+- Observation: the `call 0xf590` hook used across nearly every recovered Init slice is a
+  **shared-ownership release**: `[holder+0x18]` control block, `lock xadd` decrement, and only on
+  the last reference `0x12af0(pointee)` then a tail `jmp 0x170b0(control)`. The add side is the
+  already-lifted `0x14ccb0`.
+- Observation: the native model performs a real `std::atomic` decrement, reports the previous
+  count, and destroys/frees only at zero; a missing hook is a visible failure while the decrement
+  still happens, which the fixture asserts. **336/336** tests; checker sweep **416 passed / 20
+  skipped / 0 failed**.
+- Inference: G1 **PARTIAL**. Refcount protocol is exact; pointee destruction and the control-block
+  free are contracts, and no module is wired to this body yet.
+- Next exact action: replace the `call_f590` hooks in continue B/C/E and the `0x533100` attach
+  paths with this body (paired with `0x14ccb0` for acquire), so reference release is executed
+  rather than simulated.
 
 ## 2026-10-23 Orchestrator round 14 — owner teardown lifted (E551)
 

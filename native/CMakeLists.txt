@@ -67,6 +67,7 @@ add_library(sotc_core STATIC
   core/stat_query_54b250.cpp
   core/insert_1beeb0.cpp
   core/insert_1bde30.cpp
+  core/shared_release_f590.cpp
   core/insert_21cd0.cpp
   core/container_1bdb10.cpp
   core/owner_dtor_1bdae0.cpp
@@ -1719,6 +1720,10 @@ add_test(NAME owner_dtor_1bdae0 COMMAND test_owner_dtor_1bdae0)
 add_executable(test_container_1bdb10 tests/test_container_1bdb10.cpp)
 target_link_libraries(test_container_1bdb10 sotc_core)
 add_test(NAME container_1bdb10 COMMAND test_container_1bdb10)
+
+add_executable(test_shared_release_f590 tests/test_shared_release_f590.cpp)
+target_link_libraries(test_shared_release_f590 sotc_core)
+add_test(NAME shared_release_f590 COMMAND test_shared_release_f590)
 
 add_executable(test_insert_1bde30 tests/test_insert_1bde30.cpp)
 target_link_libraries(test_insert_1bde30 sotc_core)
