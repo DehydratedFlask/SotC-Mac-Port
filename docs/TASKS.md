@@ -770,4 +770,4 @@ artifact identities in local manifests; publishable code must not include origin
 | SAV-01-ATOMIC-WRITER-TEMP-ISOLATION-01 | Exclusive temporary-file ownership; parallel foundations plan Task 1 | ACTIVE, worker verified; independent review pending / root | 1 successful implementation; 0 failed hypotheses |
 | CPU-01-SHARED-STR-RELEASE-F590-01 | Full release-helper semantics with external typed deallocator; plan Task 2 | ACTIVE / root | 0 attempts; 0 prior failed hypotheses |
 | AUD-02-NGS2-RACKQUERY-RDX-CFG-01 | Conservative cached-CFG argument origins; plan Task 3 | ACTIVE / root | 0 attempts; 0 prior failed hypotheses |
-| PUB-01-CLAUDE-CREDIT-CLEANUP-01 | User-requested attribution cleanup preserving source/author/committer data | ACTIVE, review ready; publication exception pending / root | 1 successful preparation; 0 failed hypotheses |
+| PUB-01-CLAUDE-CREDIT-CLEANUP-01 | User-requested attribution cleanup preserving source/author/committer data | ACTIVE, user approved main+Init force-with-lease; final regeneration pending / root | 1 successful preparation; 0 failed hypotheses |
