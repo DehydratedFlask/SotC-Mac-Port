@@ -246,3 +246,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [List dtor 0x1bdeb0 native (2026-10-23)](checkpoints/2026-10-23-list-dtor-1bdeb0-native.md) | 0x58 flag nodes; skip/unlink/release/free/count; E559 |
 | [Insert 0x1bdb50 native (2026-10-23)](checkpoints/2026-10-23-insert-1bdb50-native.md) | 0x58-node inserter; acquire hand-off; dtor round-trip; E560 |
 | [Registry semantics (2026-10-23)](checkpoints/2026-10-23-registry-semantics-e561.md) | The 0x58 list is an app-info registry; five sites; not the ConVar path; E561 |
+| [HANDOFF archive 2026-10-23](checkpoints/HANDOFF-archive-2026-10-23.md) | Full pre-tidy handoff preserved verbatim; live state is HANDOFF.md |
