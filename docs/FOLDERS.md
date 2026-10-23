@@ -1270,7 +1270,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `native/api` | 4 | Native game implementation; verify module README and task ownership |
 | `native/api/standalone` | 1 | Native game implementation; verify module README and task ownership |
 | `native/api/tests` | 2 | Native game implementation; verify module README and task ownership |
-| `native/core` | 874 | Native game implementation; verify module README and task ownership |
+| `native/core` | 876 | Native game implementation; verify module README and task ownership |
 | `native/tests` | 331 | Native game implementation; verify module README and task ownership |
 | `reference` | 0 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC` | 12 | Pinned upstream source; read-only; symbols indexed by Graft |
