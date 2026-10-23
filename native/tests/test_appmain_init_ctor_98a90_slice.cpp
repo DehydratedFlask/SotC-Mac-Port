@@ -609,6 +609,15 @@ void hook_cont_a_1fc80(void* rdi, std::uintptr_t rsi_rva) {
 }
 int g_extra_slot0 = 0;
 
+int g_cont_d_call = 0;
+void* g_cont_d_rdi = nullptr;
+const void* g_cont_d_cell_value = reinterpret_cast<const void*>(0x11223344);
+
+void hook_cont_d_call(void* rdi) {
+    ++g_cont_d_call;
+    g_cont_d_rdi = rdi;
+}
+
 void hook_extra_slot0(void*, std::uint8_t) { ++g_extra_slot0; }
 
 int g_cont_b_1e4c0_value = 0xA6;  // host stand-in; 0xA6 keeps the non-boolean path
@@ -1239,6 +1248,9 @@ int main() {
     pbcc.call_a599e0 = hook_cont_c_a599e0;
     pbcc.call_a431e0 = hook_cont_c_a431e0;
     pbcc.vcall_slot0 = hook_cont_c_vcall;
+    Init531d60PostBaseContinueDHooks pbcd{};
+    pbcd.cell_32f79a8 = &g_cont_d_cell_value;
+    pbcd.call_a473b0 = hook_cont_d_call;
 
     const std::uint64_t allocs_before = heap.alloc_count;
     const auto t0 = std::chrono::steady_clock::now();
@@ -1256,7 +1268,7 @@ int main() {
                                                      pba2edu3, pbf590u5, pbf590u6, pba2edu4,
                                                      pbf590u7, pbf590u8, pba2edu5, pbf590u9,
                                                      pbf590u10, pba2edu6, pbf590u11, pbf590u12,
-                                                     pba2edu7, pbf590u13, pbca, pbcb, pbcc);
+                                                     pba2edu7, pbf590u13, pbca, pbcb, pbcc, pbcd);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
@@ -1867,6 +1879,14 @@ int main() {
     // E511: grouped Init continue C 0x532904..0x53299d — 38 units, 3 direct calls,
     // 3 vtable slot-0 dispatches, 3 lea, 6 global loads; je8 target pinned but
     // outcome NOT modelled.
+    // Batch D: fall-through of C's je 0x5329ae — 17 B, 4 units, one call.
+    CHECK(r.post_base_continue_d.ok);
+    CHECK(r.post_base_continue_d.unit_executed == 4);
+    CHECK(r.post_base_continue_d.call_count == 1);
+    CHECK(r.post_base_continue_d.load_count == 1);
+    CHECK(g_cont_d_call == 1);
+    CHECK(g_cont_d_rdi == const_cast<void*>(g_cont_d_cell_value));
+    CHECK(r.post_base_continue_d.end_rva == 0x5329ae);
     CHECK(r.post_base_continue_c.ok);
     CHECK(r.post_base_continue_c.unit_executed ==
           kInit531d60PostBaseContinueCUnitCount);
