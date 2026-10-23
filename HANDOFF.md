@@ -2,7 +2,7 @@
 
 Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + OpenCode orchestrator round 2.
 Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
-Round-2 through round-4 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
+Round-2 through round-5 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
 
 ## 2026-10-22 Repository history rewrite — Claude attribution + hostname identity
 
@@ -35,6 +35,25 @@ Round-2 through round-4 detail are the sections immediately below; the parallel-
   pushing one would reintroduce old trailers. Gate: **G1 still PARTIAL**; nothing about boot/audio/save
   changes.
 - Next exact action: unchanged — next always-on after `0x532720`, or a bounded body lift.
+
+## 2026-10-23 Orchestrator round 5 — real branch semantics in Init (E528–E529)
+
+- Agent: orchestrator (integrator). Worker subagents for the insert-body lift and the
+  `0x2efe318` cell analysis were still running at this checkpoint.
+- Tasks: `CPU-01-INIT-BRANCH-5328E0-01` (E528), `CPU-01-INIT-PREAMBLE-5328E0-01` (E529).
+- Observation: batch B now records `bl` and derives `branch_taken = (bl == 0)` whenever the
+  `0x1e4c0` hook returns a proven 0/1 (E524), so the `je 0x5328e0` outcome is no longer a silent
+  "never taken" assumption. A new `enters_merge_after_continue_b()` decision separates the cases.
+- Observation: the 36 B `0x5328e0..0x532904` preamble is now modelled (8 units: vtable slot-0
+  call, `[0x2efe340]+0x60` byte, `cmp`, `sete r14b`), and its result is fed into the merge entry's
+  `movzx esi,r14b` via `first_esi`. The earlier E528 "stop on taken branch" behaviour is
+  superseded: the taken path now continues into batch C. Missing flag byte/slot-0 hook fails
+  visibly instead of inventing a value.
+- Observation: full build and **327/327** `ctest`; publish-path and attribution gates clean.
+- Inference: G1 **PARTIAL**. The predicate is real but the `0x2efe340` cell's producer and the
+  slot-0 callee are still unidentified, so this is branch *mechanics*, not yet game behaviour.
+- Next exact action: lift the fall-through tail `0x53299d..0x5329ae` (13 B: `lea 0x32f79a8`,
+  `call 0xa473b0`) as batch D, and resolve `0x2efe318`/`0x2efe340` (worker in flight).
 
 ## 2026-10-23 Orchestrator round 4 — Init batch C and the first semantic lift (E526–E527)
 
