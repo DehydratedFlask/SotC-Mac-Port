@@ -427,3 +427,12 @@ All exited 0; baseline CTest passed 1/1. Logs are under
 local/validation/srv01-region-list-uncounted-head-20261022/. Purpose: evaluate a potential
 synthetic intrusive-list head-unlink fixture. No task was claimed and no implementation changed.
 Build products remain in the exact local/build/ directory. No removal boundary was created.
+
+## 2026-10-22 22:12 CDT — isolated save-temp verification
+
+No installs/downloads/dependency changes. Worker reused Apple clang 21.0.0 arm64, CMake 4.4.4
+and Ninja. Debug ASan/UBSan configure and focused test_save_stream_file build/run are recorded
+in docs/checkpoints/2026-10-22-codex-save-temp-worker.md; build products and red/mutation
+evidence remain in the managed worktree local/build/task1-save-temp-20261022 and
+local/validation/task1-save-temp-20261022. No global removal boundary. LeakSanitizer unsupported;
+ASan/UBSan pass with detect_leaks=0.
