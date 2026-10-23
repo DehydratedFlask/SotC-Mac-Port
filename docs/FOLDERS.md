@@ -1834,7 +1834,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `tools` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft/.cache` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
-| `tools/lift` | 458 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/lift` | 459 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/pkg-extractor` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
 
 Private recursive inventory: `local/indexes/folders.json` (excluded from publication).
