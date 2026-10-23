@@ -2,7 +2,7 @@
 
 Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + OpenCode orchestrator round 2.
 Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
-Round-2 through round-15 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
+Round-2 through round-16 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
 
 ## 2026-10-22 Repository history rewrite — Claude attribution + hostname identity
 
@@ -35,6 +35,23 @@ Round-2 through round-15 detail are the sections immediately below; the parallel
   pushing one would reintroduce old trailers. Gate: **G1 still PARTIAL**; nothing about boot/audio/save
   changes.
 - Next exact action: unchanged — next always-on after `0x532720`, or a bounded body lift.
+
+## 2026-10-23 Orchestrator round 16 — allocator wrappers + a correction (E553)
+
+- Agent: integrator.
+- Task: `CPU-01-ALLOC-WRAPPERS-NATIVE-01` (E553).
+- Observation: `0x17070` (20 B) = `mov esi,1; mov edx,8; mov ecx,1; jmp 0x12820`; `0x170b0` (10 B)
+  = `mov esi,1; jmp 0x12af0`; `0x170c0` (10 B) = `mov esi,2; jmp 0x12af0`. They are pure tail
+  wrappers, which is why so many modules list them as allocator hooks.
+- Correction: `0x12af0` is the allocator's **tagged deallocate dispatcher**, not a C++ destructor
+  (E552 said "destroy the object"). `0x170b0`/`0x170c0` are its tag-1/tag-2 wrappers and
+  `shared_release_f590` calls it with tag 0, so a last-reference release frees the pointee's
+  storage; destructor work, if any, is inside the dispatcher. The E552 checkpoint and the
+  `shared_release_f590` header were corrected.
+- Observation: **337/337** tests; checker sweep **417 passed / 20 skipped / 0 failed**.
+- Inference: G1 **PARTIAL**. Wrapper arguments are exact; both dispatch bodies remain contracts.
+- Next exact action: use these wrappers as the allocator seam for `insert_1beeb0`/`insert_21cd0`
+  so allocation/free go through the recovered tag protocol, then the owner installer `0x2569d0`.
 
 ## 2026-10-23 Orchestrator round 15 — `0xf590` is a shared-ownership release (E552)
 
