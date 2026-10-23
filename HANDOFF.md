@@ -2,7 +2,7 @@
 
 Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + OpenCode orchestrator round 2.
 Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
-Round-2 through round-10 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
+Round-2 through round-11 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
 
 ## 2026-10-22 Repository history rewrite — Claude attribution + hostname identity
 
@@ -35,6 +35,22 @@ Round-2 through round-10 detail are the sections immediately below; the parallel
   pushing one would reintroduce old trailers. Gate: **G1 still PARTIAL**; nothing about boot/audio/save
   changes.
 - Next exact action: unchanged — next always-on after `0x532720`, or a bounded body lift.
+
+## 2026-10-23 Orchestrator round 11 — Init byte coverage complete (E546)
+
+- Agent: integrator.
+- Task: `CPU-01-INIT-ENTRY-GAPS-01` (E546).
+- Observation: the last four unclaimed spans of Init `0x531d60..0x532b0c` are modelled —
+  entry frame 36 B, base-initialize call site 16 B, `call 0x56dca0` 5 B, merge `jmp` 5 B — each
+  with its own sha256 pinned by `tools/lift/check_finit_entry_gaps.py`.
+- Observation: `report_init_coverage.py` now reports **3500/3500 B = 100.0%**, 0 gaps, and the
+  suite is **332/332** with the checker sweep green.
+- Inference: **100% claimed bytes is not 100% semantics.** The 0xc40 frame and rsp alignment are
+  pins, span B is a call-site pin (base initialization still executes once, in the slice's base
+  phase), the four spans are not sequenced as a group, and every callee remains a hook.
+- Next exact action: grow semantics rather than coverage — unify the entry base-initialize call
+  with the slice's base phase, then `0xa56560` (the engine behind `0x54b250`) and the owner
+  singletons from `0x533100`/`0x2569d0`.
 
 ## 2026-10-23 Orchestrator round 10 — alternate path, native 0x1290 in the slice (E544–E545)
 
