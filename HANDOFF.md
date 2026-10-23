@@ -2,7 +2,7 @@
 
 Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + OpenCode orchestrator round 2.
 Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
-Round-2 through round-13 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
+Round-2 through round-14 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
 
 ## 2026-10-22 Repository history rewrite — Claude attribution + hostname identity
 
@@ -35,6 +35,21 @@ Round-2 through round-13 detail are the sections immediately below; the parallel
   pushing one would reintroduce old trailers. Gate: **G1 still PARTIAL**; nothing about boot/audio/save
   changes.
 - Next exact action: unchanged — next always-on after `0x532720`, or a bounded body lift.
+
+## 2026-10-23 Orchestrator round 14 — owner teardown lifted (E551)
+
+- Agent: integrator.
+- Task: `CPU-01-OWNER-DTOR-1BDAE0-NATIVE-01` (E551).
+- Observation: `0x1bdae0` (46 B) is the teardown half of the `0x1bdb10`/`0x1bdae0` owner family:
+  null slot returns; otherwise destroy `0x1bede0`, free `0x170b0`, clear the slot. It now runs
+  natively with destroy-before-free ordering and visible failures when a callee is missing —
+  including the case where destruction succeeded but the free did not, which leaves the slot set
+  and `ok == false`.
+- Observation: **335/335** tests; checker sweep **415 passed / 20 skipped / 0 failed**.
+- Inference: G1 **PARTIAL**. The holder semantics are exact; the object type and both callees are
+  contracts, and the `__cxa_atexit` registration still is not modelled.
+- Next exact action: the ring-clearing destructor `0x1bdeb0` (120 B), the owner installer
+  `0x2569d0`, or the `0xa54920` ConVar registrar.
 
 ## 2026-10-23 Orchestrator round 13 — insert chain complete (E548–E550)
 
