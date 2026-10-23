@@ -197,6 +197,10 @@ The rounds that follow the archive are in chronological order.
 - **E592** — `owner_bag_construct` models the observable derived-ctor sequence with pad/initial/
   gesture/login/publish hooks, the 1..4 selection, and `+0x10 = 1` last. The four input devices are
   opaque/null-safe and are not allocated by the native model.
+- **E593** — ResourcePool is characterized: the 0x100 B object is `ResourceWrapper` (no vtable),
+  `+0x30` external refs, `+0x40` deps; the pool map is a non-owning `std::map<ResourceId,
+  ResourceWrapper*, hash-then-strcmp>`; `GetResource` returns `owned=false`, and the nine attach
+  sites only use pointer identity and the two counters. The native model is in flight.
 - **E583** — the camera delegate has **no static writer**: `D` is the `_Root` node (vtable
   `0x15992b8`, ctor `0x1d6230`, 0x3c8 B), and the ctor zeroes `+0x2e8..+0x307`; an opcode-aware
   census found zero stores. The bound PMF target returns `const CameraTransform*`, but it is

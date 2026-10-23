@@ -278,3 +278,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Owner bag ctor (2026-10-23)](checkpoints/2026-10-23-owner-bag-ctor.md) | 1..4 per-user input devices, not language tables; E590 |
 | [Bag user selection (2026-10-23)](checkpoints/2026-10-23-owner-bag-users.md) | 1..4 input-device cap/dedupe; E591 |
 | [Bag construct (2026-10-23)](checkpoints/2026-10-23-owner-bag-construct.md) | Hooks, 1..4 selection, mode/publish; E592 |
+| [ResourcePool (2026-10-23)](checkpoints/2026-10-23-resource-pool.md) | ResourceWrapper refs/deps, non-owning map; E593 |
