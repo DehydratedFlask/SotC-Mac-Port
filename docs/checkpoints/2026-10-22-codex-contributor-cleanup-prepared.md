@@ -36,3 +36,10 @@ force-with-lease would protect the exact observed remote tips. No force push has
 Next action: continue the independent implementation tasks. After their ordinary publication,
 regenerate this verified cleanup from the final source tip. Apply only if the user explicitly
 approves the scoped exception; otherwise retain the review artifact and report the constraint.
+
+## User approval
+
+2026-10-22: user explicitly selected “Approve cleanup of main and Init with force-with-lease”.
+This overrides the no-force-push instruction only for this exact attribution cleanup of these
+two branches. Normal new source/docs publication continues on the Init branch. Regenerate
+the review from its final tip and verify remote leases immediately before applying.
