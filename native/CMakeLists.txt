@@ -65,6 +65,7 @@ add_library(sotc_core STATIC
   core/init_1290.cpp
   core/insert_1beeb0.cpp
   core/insert_21cd0.cpp
+  core/container_1bdb10.cpp
   core/appmain_init_remainder_slice.cpp
   core/xchg_store_u32_357f0.cpp
   core/base_initialize_255130.cpp
@@ -1694,6 +1695,10 @@ set_tests_properties(appmain_init_prologue_tail_slice PROPERTIES
 add_executable(test_init_1290 tests/test_init_1290.cpp)
 target_link_libraries(test_init_1290 sotc_core)
 add_test(NAME init_1290 COMMAND test_init_1290)
+
+add_executable(test_container_1bdb10 tests/test_container_1bdb10.cpp)
+target_link_libraries(test_container_1bdb10 sotc_core)
+add_test(NAME container_1bdb10 COMMAND test_container_1bdb10)
 
 add_executable(test_insert_1beeb0 tests/test_insert_1beeb0.cpp)
 target_link_libraries(test_insert_1beeb0 sotc_core)

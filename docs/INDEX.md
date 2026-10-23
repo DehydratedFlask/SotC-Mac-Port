@@ -224,3 +224,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Insert 0x1beeb0 native (2026-10-22)](checkpoints/2026-10-22-insert-1beeb0-native.md) | 0x20 B descriptor copy executed: new(0x60), self-link, list links, count; E531 |
 | [Insert 0x1beeb0 native (2026-10-22)](checkpoints/2026-10-22-insert-1beeb0-native.md) | 0x20 B descriptor copy executed: new(0x60), self-link, list links, count; E531/E532 |
 | [Insert 0x21cd0 native (2026-10-22)](checkpoints/2026-10-22-insert-21cd0-native.md) | Bump-allocator B insert: 0x20 B entry, begin/end + grow hooks; E533; G1 PARTIAL |
+| [Container 0x1bdb10 native (2026-10-22)](checkpoints/2026-10-22-container-1bdb10-native.md) | Three-list 0x60 B container ctor, self loops + counts; E534; G1 PARTIAL |
