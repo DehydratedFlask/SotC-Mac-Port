@@ -282,30 +282,32 @@ The rounds that follow the archive are in chronological order.
 
 ## Next exact work
 
-1. **Camera class identity.** E599 found no writer of `D+0x2e8` and showed the field behaves as an
-   intrusive-list node in `_Root`. The in-flight lane decodes `0xa68030`, finds the
-   `[element+0x18]` store and settles whether `D` is the 0x3c8 class. Do not model a native
-   `BoundMemberFn` before that verdict.
-2. **Save transaction `SAV-02-TRANSACTION-01`.** Implement the E598 contract: `ProgressV1`
-   (`0x3cd8` blob), `SaveStore`/`SaveIoOps`, `save_load`/`save_store`/backup/enumerate, header
-   `{1, FNV(body), size, 4}`, 1-based result ordinals, deterministic failure injection. No save/load
-   works claim; the real-game evidence is absent.
-3. **Next owner ctor.** `0xa5c850` is the recommended next bounded lift (~50 constant stores, two
-   mutex ctors). Rows 14/21 (`0xa597d0`, `0x4a690`) stay hooks for now.
-4. **ResourcePool production.** The nine attach sites use the real pool, but a production launcher
-   must supply the key allocator, the pool mutex model and the manager-delete delegation. The
-   screenshot seam needs a Metal capture provider before the report can carry real pixels.
-5. **Not started:** save/load execution, audio, Metal rendering, and a booting core. `0xa56560`
-   (stat engine) and `0xa54920` (ConVar registrar) remain contracts.
+1. **Startup continuation past slot 23 (`0xe71990`).** This is the outer critical path to a booting
+   native core. The recovered Init chain and owner rows are native through `0x2569d0`, but nothing
+   turns them into a running `SoCGameCore` process. The next slice must identify the first
+   unmodeled startup edge after the owner construction and implement it as ordinary native code
+   with a host service seam, not another isolated leaf.
+2. **SAV-04 real-save acceptance.** The transaction and metadata slices are synthetic. Accepting a
+   real user-owned PS4 `USR-DATA`/metadata pair (hashed privately, never committed) is the only way
+   to promote save/load beyond FIXTURE_VERIFIED. Do not claim G2/G5 before then.
+3. **Metal renderer + capture provider.** `attach_screenshot` is native but its `capture_frame`
+   hook has no provider. The renderer must produce the first real RGBA frame and the PNG encoder
+   path must consume it; this is also the first G3 evidence.
+4. **Launcher/core lifecycle.** The Swift shell honestly reports NOT BUILT. The next step is a
+   native `SoCGameCore` auxiliary executable that runs the recovered startup chain and reports
+   typed readiness; Play stays disabled until it can boot.
+5. **Optional owner rows.** Rows 14 (`0xa597d0`, 9 heap allocs + 7-arg call) and 21 (`0x4a690`,
+   global RB-tree walk) are the next bounded ctor lifts. The drain/element loops and refcount
+   bodies remain hooks.
 6. Round end: fresh build, full `ctest`, `SOTC_NATIVE_BUILD=local/build/orch-r22
    tools/lift/run_all_checkers.sh`, `python3 -I scripts/audit_publish_paths.py --all`,
    `python3 -I scripts/check_commit_attribution.py`.
 
 ## Parallel-agent state
 
-- Two read/code workers are live: the SaveData transaction implementation (`native/core/save_*` +
-  its CMake block) and the camera class-identity analysis (private evidence only). Workers do not
-  edit `HANDOFF.md` or commit.
+- No workers are running. The round-27 workers (ResourcePool wiring, owner slots/ctor/dtor,
+  SaveData transaction/metadata, camera census/registration) have all reported and their work is
+  committed. Workers do not edit `HANDOFF.md` or commit.
 - The preserved `origin/cursor/parallel-foundations-wip-20261023` content
   (shared_str_release_f590, save_stream exclusive temp, aud02 rackquery scripts, check_ff590) is now
   **integrated** (E566); `origin/cursor/parallel-foundations-86ac55b` was its base.
