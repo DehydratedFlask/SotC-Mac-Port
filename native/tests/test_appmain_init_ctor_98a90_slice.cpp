@@ -66,6 +66,7 @@
 #include "core/init_531d60_post_base_vcall18.hpp"
 #include "core/init_531d60_post_base_continue_a.hpp"
 #include "core/init_531d60_post_base_continue_b.hpp"
+#include "core/init_531d60_post_base_continue_c.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -282,6 +283,26 @@ std::uint8_t g_cont_b_4c4950_edi = 0;
 void* g_cont_b_rax = nullptr;
 void* g_cont_b_cell_32f84f8 = nullptr;
 alignas(8) std::uint8_t g_cont_b_rax_obj[8]{};
+// E511 grouped continue C 0x532904..0x53299d: per-call-site hooks + observed args.
+int g_cont_c_a52b70 = 0;
+int g_cont_c_a599e0 = 0;
+int g_cont_c_a431e0 = 0;
+int g_cont_c_vcall = 0;
+void* g_cont_c_a52b70_rdi = nullptr;
+std::uint8_t g_cont_c_a52b70_esi = 0;
+void* g_cont_c_a599e0_rdi = nullptr;
+std::uint8_t g_cont_c_a599e0_esi = 0;
+void* g_cont_c_a431e0_rdi = nullptr;
+std::uint8_t g_cont_c_a431e0_esi = 0;
+int g_cont_c_vcall_esi[3]{};
+void* g_cont_c_cell_32f8b80 = nullptr;
+void* g_cont_c_cell_32f6d18 = nullptr;
+void* g_cont_c_cell_2efe318 = nullptr;
+void* g_cont_c_cell_2efe340 = nullptr;
+std::uint8_t g_cont_c_flag1 = 0;
+std::uint8_t g_cont_c_flag2 = 0;
+alignas(8) std::uint8_t g_cont_c_obj_a[8]{};
+alignas(8) std::uint8_t g_cont_c_obj_b[8]{};
 int g_post_base_cell_2eff450_dtor = 0;
 int g_post_base_cell_2eff448_dtor = 0;
 void* g_cell_2eff450 = nullptr;
@@ -597,6 +618,25 @@ void hook_cont_b_4c4950(std::uint8_t edi) {
     ++g_cont_b_4c4950;
     g_cont_b_4c4950_edi = edi;
 }
+void hook_cont_c_a52b70(void* rdi, std::uint8_t esi) {
+    ++g_cont_c_a52b70;
+    g_cont_c_a52b70_rdi = rdi;
+    g_cont_c_a52b70_esi = esi;
+}
+void hook_cont_c_a599e0(void* rdi, std::uint8_t esi) {
+    ++g_cont_c_a599e0;
+    g_cont_c_a599e0_rdi = rdi;
+    g_cont_c_a599e0_esi = esi;
+}
+void hook_cont_c_a431e0(void* rdi, std::uint8_t esi) {
+    ++g_cont_c_a431e0;
+    g_cont_c_a431e0_rdi = rdi;
+    g_cont_c_a431e0_esi = esi;
+}
+void hook_cont_c_vcall(void* /*rdi*/, std::uint8_t esi) {
+    g_cont_c_vcall_esi[g_cont_c_vcall] = esi;
+    ++g_cont_c_vcall;
+}
 void hook_post_base_cell_2eff450_dtor(void* /*prev*/) { ++g_post_base_cell_2eff450_dtor; }
 void hook_post_base_cell_2eff448_dtor(void* /*prev*/) { ++g_post_base_cell_2eff448_dtor; }
 
@@ -822,6 +862,25 @@ int main() {
     g_cont_b_4c4950_edi = 0;
     g_cont_b_rax = nullptr;
     g_cont_b_cell_32f84f8 = nullptr;
+    g_cont_c_a52b70 = 0;
+    g_cont_c_a599e0 = 0;
+    g_cont_c_a431e0 = 0;
+    g_cont_c_vcall = 0;
+    g_cont_c_a52b70_rdi = nullptr;
+    g_cont_c_a52b70_esi = 0;
+    g_cont_c_a599e0_rdi = nullptr;
+    g_cont_c_a599e0_esi = 0;
+    g_cont_c_a431e0_rdi = nullptr;
+    g_cont_c_a431e0_esi = 0;
+    g_cont_c_vcall_esi[0] = 0;
+    g_cont_c_vcall_esi[1] = 0;
+    g_cont_c_vcall_esi[2] = 0;
+    g_cont_c_cell_32f8b80 = nullptr;
+    g_cont_c_cell_32f6d18 = nullptr;
+    g_cont_c_cell_2efe318 = nullptr;
+    g_cont_c_cell_2efe340 = nullptr;
+    g_cont_c_flag1 = 0;
+    g_cont_c_flag2 = 0;
     // E509 host stand-ins: *[0x32f79a8] -> 0x100 B object with u64 0x1234 @ +0xf8;
     // *[0x32f84f8] -> rdi marker; [r13] and 0x20(%rsp) -> distinct markers.
     std::memset(g_cont_a_obj, 0x5C, sizeof(g_cont_a_obj));
@@ -840,6 +899,16 @@ int main() {
     std::memset(g_cont_b_rax_obj, 0x6A, sizeof(g_cont_b_rax_obj));
     g_cont_b_rax = g_cont_b_rax_obj;
     g_cont_b_cell_32f84f8 = g_cont_a_rdi_marker;
+    // E511 host stand-ins: obj A / obj B objects, vtable + flag-source cells,
+    // and resolved flag bytes (flag1 -> 0 => sil 1; flag2 -> non-zero => sil 0).
+    std::memset(g_cont_c_obj_a, 0x2B, sizeof(g_cont_c_obj_a));
+    std::memset(g_cont_c_obj_b, 0x2C, sizeof(g_cont_c_obj_b));
+    g_cont_c_cell_32f8b80 = g_cont_c_obj_a;
+    g_cont_c_cell_32f6d18 = g_cont_c_obj_b;
+    g_cont_c_cell_2efe318 = g_cont_a_rdi_marker;   // vtable source stand-in
+    g_cont_c_cell_2efe340 = g_cont_a_rsp20_obj;    // flag source stand-in
+    g_cont_c_flag1 = 0;   // byte == 0 -> sete sil = 1
+    g_cont_c_flag2 = 0x5C;  // byte != 0 -> sete sil = 0
     g_post_base_cell_2eff450_dtor = 0;
     g_post_base_cell_2eff448_dtor = 0;
     g_cell_2eff450 = nullptr;
@@ -1151,6 +1220,19 @@ int main() {
     pbcb.cell_32f84f8 = &g_cont_b_cell_32f84f8;
     pbcb.call_1e4c0 = hook_cont_b_1e4c0;
     pbcb.call_4c4950 = hook_cont_b_4c4950;
+    Init531d60PostBaseContinueCHooks pbcc{};
+    pbcc.incoming_r14b = 0;  // fall-through path r14d = 0
+    pbcc.incoming_r15 = g_cont_a_rdi_marker;  // stable init pointer stand-in
+    pbcc.cell_32f8b80 = &g_cont_c_cell_32f8b80;
+    pbcc.cell_32f6d18 = &g_cont_c_cell_32f6d18;
+    pbcc.cell_2efe318 = &g_cont_c_cell_2efe318;
+    pbcc.cell_2efe340 = &g_cont_c_cell_2efe340;
+    pbcc.flag_byte_iter1 = &g_cont_c_flag1;
+    pbcc.flag_byte_iter2 = &g_cont_c_flag2;
+    pbcc.call_a52b70 = hook_cont_c_a52b70;
+    pbcc.call_a599e0 = hook_cont_c_a599e0;
+    pbcc.call_a431e0 = hook_cont_c_a431e0;
+    pbcc.vcall_slot0 = hook_cont_c_vcall;
 
     const std::uint64_t allocs_before = heap.alloc_count;
     const auto t0 = std::chrono::steady_clock::now();
@@ -1168,7 +1250,7 @@ int main() {
                                                      pba2edu3, pbf590u5, pbf590u6, pba2edu4,
                                                      pbf590u7, pbf590u8, pba2edu5, pbf590u9,
                                                      pbf590u10, pba2edu6, pbf590u11, pbf590u12,
-                                                     pba2edu7, pbf590u13, pbca, pbcb);
+                                                     pba2edu7, pbf590u13, pbca, pbcb, pbcc);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
@@ -1771,6 +1853,46 @@ int main() {
     CHECK(g_cont_b_1e4c0_eax == 0xA6);
     CHECK(g_cont_b_4c4950 == 1);
     CHECK(g_cont_b_4c4950_edi == 0xA7);  // bl(0xA6) xor 1
+    // E511: grouped Init continue C 0x532904..0x53299d — 38 units, 3 direct calls,
+    // 3 vtable slot-0 dispatches, 3 lea, 6 global loads; je8 target pinned but
+    // outcome NOT modelled.
+    CHECK(r.post_base_continue_c.ok);
+    CHECK(r.post_base_continue_c.unit_executed ==
+          kInit531d60PostBaseContinueCUnitCount);
+    CHECK(kInit531d60PostBaseContinueCUnitCount == 38);
+    for (int i = 0; i < kInit531d60PostBaseContinueCUnitCount; ++i) {
+        CHECK(r.post_base_continue_c.unit_counts[static_cast<std::size_t>(i)] == 1);
+    }
+    CHECK(kInit531d60PostBaseContinueCUnits[0].rva == 0x532904);
+    CHECK(kInit531d60PostBaseContinueCUnits[37].rva == 0x53299b);
+    CHECK(r.post_base_continue_c.call_count == 3);
+    CHECK(r.post_base_continue_c.vcall_count == 3);
+    CHECK(r.post_base_continue_c.lea_count == 3);
+    CHECK(r.post_base_continue_c.global_mov_count == 6);
+    CHECK(r.post_base_continue_c.xor_count == 5);
+    CHECK(r.post_base_continue_c.cmp_count == 3);
+    CHECK(r.post_base_continue_c.sete_count == 2);
+    CHECK(r.post_base_continue_c.branch_boundary_count == 1);
+    CHECK(!r.post_base_continue_c.branch_outcome_modelled);
+    CHECK(r.post_base_continue_c.end_rva == 0x53299d);
+    CHECK(r.post_base_continue_c.branch_target_rva == 0x5329ae);
+    CHECK(g_cont_c_a52b70 == 1);
+    CHECK(g_cont_c_a52b70_rdi == g_cont_a_rdi_marker);  // incoming r15 stand-in
+    CHECK(g_cont_c_a52b70_esi == 0);                    // incoming r14b = 0
+    CHECK(g_cont_c_a599e0 == 1);
+    CHECK(g_cont_c_a599e0_rdi == g_cont_c_obj_a);       // obj A
+    CHECK(g_cont_c_a599e0_esi == 1);                    // flag1 byte == 0 -> sil 1
+    CHECK(g_cont_c_a431e0 == 1);
+    CHECK(g_cont_c_a431e0_rdi == g_cont_c_obj_b);       // obj B
+    CHECK(g_cont_c_a431e0_esi == 0);                    // flag2 byte != 0 -> sil 0
+    CHECK(g_cont_c_vcall == 3);
+    CHECK(g_cont_c_vcall_esi[0] == 0);
+    CHECK(g_cont_c_vcall_esi[1] == 0);
+    CHECK(g_cont_c_vcall_esi[2] == 0);
+    CHECK(r.post_base_continue_c.flag1_known);
+    CHECK(r.post_base_continue_c.flag2_known);
+    CHECK(r.post_base_continue_c.sil_iter1 == 1);
+    CHECK(r.post_base_continue_c.sil_iter2 == 0);
     CHECK(r.remainder.trivial_ok);
     CHECK(r.remainder.registry.status == RegistryInit531d60Status::ok);
     CHECK(r.remainder.registry.entry_count == kInputTable551140Count);
@@ -1831,7 +1953,7 @@ int main() {
         "pba2edu2=%d pbf590u3=%d pbf590u4=%d pba2edu3=%d pbf590u5=%d pbf590u6=%d "
         "pba2edu4=%d pbf590u7=%d pbf590u8=%d pba2edu5=%d pbf590u9=%d "
         "pbf590u10=%d pba2edu6=%d pbf590u11=%d pbf590u12=%d "
-        "pba2edu7=%d pbf590u13=%d pbca_units=%d pbcb_units=%d "
+        "pba2edu7=%d pbf590u13=%d pbca_units=%d pbcb_units=%d pbcc_units=%d "
         "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
@@ -1937,6 +2059,7 @@ int main() {
         r.post_base_f590_a2ed00_u13.call_f590_count,
         r.post_base_continue_a.unit_executed,
         r.post_base_continue_b.unit_executed,
+        r.post_base_continue_c.unit_executed,
         static_cast<unsigned>(r.tail.gates.gate_byte), g_mid_reg,
         static_cast<unsigned long long>(r.ctor.tsc_value), r.remainder.registry.entry_count,
         static_cast<unsigned long long>(heap.alloc_count - allocs_before),

@@ -62,6 +62,7 @@ add_library(sotc_core STATIC
   core/registry_init_531d60.cpp
   core/appmain_init_registry_slice.cpp
   core/init_531d60_trivial_leaves.cpp
+  core/init_1290.cpp
   core/appmain_init_remainder_slice.cpp
   core/xchg_store_u32_357f0.cpp
   core/base_initialize_255130.cpp
@@ -167,6 +168,7 @@ add_library(sotc_core STATIC
   core/init_531d60_post_base_f590_a2ed00_u13.cpp
   core/init_531d60_post_base_continue_a.cpp
   core/init_531d60_post_base_continue_b.cpp
+  core/init_531d60_post_base_continue_c.cpp
   core/ctor_98a90_3be050.cpp
   core/appmain_init_prologue_slice.cpp
   core/appmain_init_prologue_tail_slice.cpp
@@ -1686,6 +1688,10 @@ target_link_libraries(test_appmain_init_prologue_tail_slice sotc_core)
 add_test(NAME appmain_init_prologue_tail_slice COMMAND test_appmain_init_prologue_tail_slice)
 set_tests_properties(appmain_init_prologue_tail_slice PROPERTIES
   ENVIRONMENT "SOTC_INPUTTABLE_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/inputtable_551140_names.bin")
+
+add_executable(test_init_1290 tests/test_init_1290.cpp)
+target_link_libraries(test_init_1290 sotc_core)
+add_test(NAME init_1290 COMMAND test_init_1290)
 
 add_executable(test_appmain_init_ctor_98a90_slice tests/test_appmain_init_ctor_98a90_slice.cpp)
 target_link_libraries(test_appmain_init_ctor_98a90_slice sotc_core)
