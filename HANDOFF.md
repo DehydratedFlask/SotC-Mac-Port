@@ -8,8 +8,8 @@ The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **359/359** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **456 passed / 0 skipped / 0 failed** with
+- Full native suite: **360/360** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **457 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -179,6 +179,9 @@ The rounds that follow the archive are in chronological order.
   shared control, capacity sufficient, capacity short); **only the capacity-short path returns
   true**, correcting the audit table. The fixture covers all paths, the shared-control refcount,
   the three size classes and failure preservation.
+- **E588** — the bug-report Frame root is native: `0xa70c30` lazily creates `"Frame"` with the
+  integer `frameNum`, and `0xa70d10` adopts the report root through `0xab0d40`. `ReportItem` now
+  carries integer properties. The live frame counter and the holder's `ctrl` remain contracts.
 - **E583** — the camera delegate has **no static writer**: `D` is the `_Root` node (vtable
   `0x15992b8`, ctor `0x1d6230`, 0x3c8 B), and the ctor zeroes `+0x2e8..+0x307`; an opcode-aware
   census found zero stores. The bound PMF target returns `const CameraTransform*`, but it is

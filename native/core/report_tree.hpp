@@ -55,6 +55,13 @@ public:
     [[nodiscard]] const std::string* property(std::string_view key) const;
     [[nodiscard]] std::size_t property_count() const noexcept { return properties_.size(); }
 
+    // Integer properties (`0xa70c30` stores "frameNum" this way, not as text).
+    void set_int_property(std::string key, std::int32_t value);
+    [[nodiscard]] const std::int32_t* int_property(std::string_view key) const;
+    [[nodiscard]] std::size_t int_property_count() const noexcept {
+        return int_properties_.size();
+    }
+
     // `0xab0d40`: O(1) tail append, ownership of `child` transfers to this item.
     [[nodiscard]] ReportItem* append(std::unique_ptr<ReportItem> child);
 
@@ -69,6 +76,7 @@ private:
     std::string text_;
     ReportKind kind_;
     std::map<std::string, std::string, std::less<>> properties_;
+    std::map<std::string, std::int32_t, std::less<>> int_properties_;
     ReportItem* parent_ = nullptr;
     ReportItem* first_child_ = nullptr;
     ReportItem* last_child_ = nullptr;

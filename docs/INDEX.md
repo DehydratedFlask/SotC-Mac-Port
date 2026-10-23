@@ -273,3 +273,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [SnapshotBugData gate (2026-10-23)](checkpoints/2026-10-23-snapshot-bug-data.md) | Gate clear, synthetic Command, Screenshot attachment, adoption; E585 |
 | [`0xf590` key wiring (2026-10-23)](checkpoints/2026-10-23-f590-key-wiring.md) | Nine real SharedStr keys/releases; E586 |
 | [SharedStr resize 0xf3c0 (2026-10-23)](checkpoints/2026-10-23-shared-str-resize.md) | Four COW paths, return-true only on reallocation; E587 |
+| [Frame root (2026-10-23)](checkpoints/2026-10-23-frame-root.md) | Lazy Frame/frameNum, adoption; E588 |

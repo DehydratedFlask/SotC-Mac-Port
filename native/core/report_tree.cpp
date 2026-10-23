@@ -19,6 +19,15 @@ const std::string* ReportItem::property(std::string_view key) const {
     return it == properties_.end() ? nullptr : &it->second;
 }
 
+void ReportItem::set_int_property(std::string key, std::int32_t value) {
+    int_properties_.insert_or_assign(std::move(key), value);
+}
+
+const std::int32_t* ReportItem::int_property(std::string_view key) const {
+    const auto it = int_properties_.find(key);
+    return it == int_properties_.end() ? nullptr : &it->second;
+}
+
 ReportItem* ReportItem::append(std::unique_ptr<ReportItem> child) {
     if (child == nullptr) {
         return nullptr;

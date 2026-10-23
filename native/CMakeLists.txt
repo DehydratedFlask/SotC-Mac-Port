@@ -90,6 +90,7 @@ add_library(sotc_core STATIC
   core/resource_id_14c2f0.cpp
   core/app_info_run.cpp
   core/snapshot_bug_data.cpp
+  core/frame_root.cpp
   core/camera_location_25a4d0.cpp
   core/list_dtor_1bdeb0.cpp
   core/insert_21cd0.cpp
@@ -1824,6 +1825,10 @@ add_test(NAME app_info_run COMMAND test_app_info_run)
 add_executable(test_snapshot_bug_data tests/test_snapshot_bug_data.cpp)
 target_link_libraries(test_snapshot_bug_data sotc_core)
 add_test(NAME snapshot_bug_data COMMAND test_snapshot_bug_data)
+
+add_executable(test_frame_root tests/test_frame_root.cpp)
+target_link_libraries(test_frame_root sotc_core)
+add_test(NAME frame_root COMMAND test_frame_root)
 
 add_executable(test_camera_location_25a4d0 tests/test_camera_location_25a4d0.cpp)
 target_link_libraries(test_camera_location_25a4d0 sotc_core)

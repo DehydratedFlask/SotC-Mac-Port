@@ -35,7 +35,7 @@
   The only normal gate is the `snapshotBugData` command at `0x25db56`, so dispatch is not per-frame
   and cannot duplicate entries. The old "LIFO" and "flag 0 producer unknown" claims are withdrawn.
 - **Native modules.** `app_info_registry`, `app_info_install`, `app_info_collect`,
-  `app_info_snapshot`, `appinfo_listb`, `report_tree`, `registry_owner`, `registry_slot`,
+  `app_info_snapshot`, `appinfo_listb`, `report_tree`, `frame_root`, `registry_owner`, `registry_slot`,
   `container_dtor_1bede0`, `insert_1bdc80`, `owner_properties_2569d0`, `owner_prop_bag`. Their
   headers state what is modelled and what is a hook.
 - **Native conventions.** App-info text is a **borrowed view** (`control == nullptr`) unless a module
