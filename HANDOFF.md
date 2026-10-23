@@ -187,6 +187,10 @@ The rounds that follow the archive are in chronological order.
   `"****"` wildcard is `_cmn`, and an unpopulated registry falls back to `_ps4`. The nine attach
   fragments default to the real table, and the integration fixture asserts the nine derived FNV
   key hashes.
+- **E590** — the bag derived ctor is characterized and **E576 is corrected**: the four 0xc88
+  objects are per-user input devices, not language tables, and they do not affect
+  `insert_a`/`insert_b`. The property-map path is complete; the input-device lifetime, mutex, IME
+  block and vectors remain contracts.
 - **E583** — the camera delegate has **no static writer**: `D` is the `_Root` node (vtable
   `0x15992b8`, ctor `0x1d6230`, 0x3c8 B), and the ctor zeroes `+0x2e8..+0x307`; an opcode-aware
   census found zero stores. The bound PMF target returns `const CameraTransform*`, but it is

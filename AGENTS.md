@@ -47,9 +47,10 @@
   `0xac5320` are `insert_equal` consumers, not tables; map A is `{i32,f32=1,u32}`, map B is
   `{f32 lo,f32 hi,f32 v,u32}`, and 8 keys are inserted twice (the sink must allow duplicates).
   `owner_prop_bag` models the 0x178 B bag with ordered multimaps (E577); the exact RB nodes/fixups
-  and trees 0/1 remain contracts. The 20 constructor rows (19 slot rows + 2 self-registered) remain
-  open as ctor hooks in `owner_members` (the 21-row driver, E579); the large bodies are blocked
-  subsystems.
+  and trees 0/1 remain contracts. The four 0xc88 objects in `0xa2afb0` are per-user **input
+  devices**, not language tables (E590), and do not affect the property path. The 20 constructor
+  rows (19 slot rows + 2 self-registered) remain open as ctor hooks in `owner_members` (the 21-row
+  driver, E579); the large bodies are blocked subsystems.
 - **`0xf590`** is a 73 B shared release. The 17 Init-slice modules and the four provably-zero
   `0x533100` sites (miss `0x5332f4`/`0x533300`, join `0x533399`, tail `0x53404d`; E574) are wired as
   exact inert zero-holder releases. The nine `0x533100` key-holder sites are real releases: the
