@@ -101,6 +101,15 @@ Fixture rules: three effects, that order, once each; `vcall` must receive `&A.se
 abort, so it is not observable behaviour of a correct lift, and must not become a fake success
 path).
 
+## Correction (E522)
+
+The later `0x1bde30`→`0x1beeb0` analysis settles blocker 2: the consumer copies exactly **0x20 B**
+into `node[0x10]` with `vmovups`, and `+0x40` is the third intrusive-list sentinel inside the
+0x60 B container, not part of the descriptor. The `HandlerEntryA` sketch below must therefore
+**not** be implemented as a 0x50 B descriptor: model the 0x20 B `{ctx, invoke, 0, fn}` copy and
+the separately-read registration context (`A+0x20` vcall argument, `A+0x40` table, `A+0x48`).
+See [2026-10-22-init-1bde30-insert-path.md](2026-10-22-init-1bde30-insert-path.md) (E522).
+
 ## Top 3 blockers to lifting `0x1290` natively
 
 1. **No native owner for the two singletons.** `*(0x2ee68c8)` and `*(0x2dfcbc8)` are BSS owning
