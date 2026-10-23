@@ -2,7 +2,7 @@
 
 Updated: 2026-10-22 23:59 CDT (America/Chicago). Integrator: /root (Codex) + OpenCode orchestrator round 2.
 Round-2 worker subagents ran on a non-Claude model and every claim was replayed by the integrator.
-Round-2 through round-11 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
+Round-2 through round-12 detail are the sections immediately below; the parallel-foundations state that follows stays authoritative.
 
 ## 2026-10-22 Repository history rewrite — Claude attribution + hostname identity
 
@@ -35,6 +35,24 @@ Round-2 through round-11 detail are the sections immediately below; the parallel
   pushing one would reintroduce old trailers. Gate: **G1 still PARTIAL**; nothing about boot/audio/save
   changes.
 - Next exact action: unchanged — next always-on after `0x532720`, or a bounded body lift.
+
+## 2026-10-23 Orchestrator round 12 — stat-query wrapper native (E547)
+
+- Agent: integrator.
+- Task: `CPU-01-STAT-QUERY-54B250-NATIVE-01` (E547).
+- Observation: `0x54b250` (119 B) now runs natively. It builds the 0x60 B descriptor
+  (`+0x40 = 0x15c9920`), calls the engine `0xa56560` with Init's exact shape
+  `(this, 0, 2, &descriptor, 0, 0)`, counts the provable no-op dispatch
+  (`traits slot 3 = 0x538200`, bare `ret`), and reports failure when the engine is missing or
+  returns false. The `void` return is modelled honestly: the query result stays in the discarded
+  frame descriptor.
+- Observation: batch E's `0x532b09` dispatch executes this wrapper when a `StatsEngine54b250`
+  contract is supplied; the raw hook remains the fallback. **333/333** tests, checker sweep
+  **413 passed / 20 skipped / 0 failed**.
+- Inference: G1 **PARTIAL**. The engine body is still a contract, so this is wrapper fidelity, not
+  stat semantics.
+- Next exact action: `0xa56560` (0xd8-byte frame, vtable dispatch) or the owner singletons from
+  `0x533100`/`0x2569d0`, which gate any real startup chain.
 
 ## 2026-10-23 Orchestrator round 11 — Init byte coverage complete (E546)
 
