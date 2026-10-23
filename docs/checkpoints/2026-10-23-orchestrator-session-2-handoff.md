@@ -20,10 +20,17 @@ recovered control flow, not as working game logic.
 | Platform contracts | `capture_a473b0` over `CaptureServices {ok, disabled, unsupported}`, all-unsupported default so a missing service is visible | E539 |
 | Analysis | `0x1290` body, `0x1bde30` insert width, `0x2efe318`/`0x2efe340` cells, `0x1e4c0` contract, Init tail blocks, `0x32f79a8`/`0x2eff450` provenance, `0x54b250`/`0xa54920` boundary | E516, E522, E530, E524, E537, E538, E540 |
 | Repo health | full suite was 324/326 at the inherited tip → **331/331**; publish-audit final-component gap fixed; clean-build reproducibility | E517, E518, E543 |
-| Coverage | `tools/lift/report_init_coverage.py`: Init `0x531d60..0x532b0c` = **3500/3500 B = 100.0%** claimed (semantics still partial), 0 byte gaps | E542, E544 |
+| Coverage | `tools/lift/report_init_coverage.py`: Init `0x531d60..0x532b0c` = **3500/3500 B = 100.0%** claimed (semantics still partial), 0 byte gaps | E542, E544, E546 |
 | Alternate path | `0x5327bd..0x532904` (327 B, 70 units) + `0x5327b6` failure exit | E544 |
 | Slice integration | the native `0x1290` (with both inserts) executes inside the modelled startup | E545 |
 | Attribution | `docs/ATTRIBUTION.md` + `scripts/check_commit_attribution.py` (13 fixtures) in the pre-push checklist; 0 assistant trailers in 1078 published commits | E523, E525 |
+
+## Tip state at end of session
+
+- Clean from-scratch build: **1118 targets**; full suite **337/337**; checker sweep **417 passed /
+  20 skipped / 0 failed**; publish-path audit exit 0; attribution gate clean (one historical
+  `orchestrator@local` commit recorded for an owner decision).
+- Evidence ledger reaches **E556**; every task claimed this session has a row and a checkpoint.
 
 ## Verification commands
 
