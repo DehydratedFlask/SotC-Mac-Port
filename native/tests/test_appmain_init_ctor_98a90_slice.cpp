@@ -67,6 +67,7 @@
 #include "core/init_531d60_post_base_continue_a.hpp"
 #include "core/init_531d60_post_base_continue_b.hpp"
 #include "core/init_531d60_post_base_continue_c.hpp"
+#include "core/capture_a473b0.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
 #include "core/registry_init_531d60.hpp"
@@ -617,6 +618,42 @@ void hook_cont_d_call(void* rdi) {
     ++g_cont_d_call;
     g_cont_d_rdi = rdi;
 }
+
+// Native 0xa473b0 contract mock for batch D: records the lift's service dispatches.
+struct CaptureRecorderA473b0 final : CaptureServices {
+    int live = 0;
+    int screen_enable = 0;
+    int screen_disable = 0;
+    int video_calls = 0;
+    std::uint32_t last_type = 0;
+    std::uint32_t last_value = 0;
+    std::size_t last_size = 0;
+    bool last_enable_arg = false;
+    CaptureServiceStatus game_live_streaming_enable(bool enable) override {
+        ++live;
+        last_enable_arg = enable;
+        return CaptureServiceStatus::ok;
+    }
+    CaptureServiceStatus screenshot_enable() override {
+        ++screen_enable;
+        return CaptureServiceStatus::ok;
+    }
+    CaptureServiceStatus screenshot_disable() override {
+        ++screen_disable;
+        return CaptureServiceStatus::ok;
+    }
+    CaptureServiceStatus video_recording_set_info(std::uint32_t type, const void* value,
+                                                  std::size_t size) override {
+        ++video_calls;
+        last_type = type;
+        last_size = size;
+        std::uint32_t v = 0;
+        std::memcpy(&v, value, size < sizeof(v) ? size : sizeof(v));
+        last_value = v;
+        return CaptureServiceStatus::ok;
+    }
+};
+CaptureRecorderA473b0 g_capture_a473b0;
 
 void hook_extra_slot0(void*, std::uint8_t) { ++g_extra_slot0; }
 
@@ -1250,7 +1287,8 @@ int main() {
     pbcc.vcall_slot0 = hook_cont_c_vcall;
     Init531d60PostBaseContinueDHooks pbcd{};
     pbcd.cell_32f79a8 = &g_cont_d_cell_value;
-    pbcd.call_a473b0 = hook_cont_d_call;
+    pbcd.call_a473b0 = hook_cont_d_call;         // fallback path (unused when services supplied)
+    pbcd.capture_services = &g_capture_a473b0;  // run the lifted 0xa473b0 body
 
     const std::uint64_t allocs_before = heap.alloc_count;
     const auto t0 = std::chrono::steady_clock::now();
@@ -1890,9 +1928,30 @@ int main() {
     CHECK(r.post_base_continue_d.unit_executed == 4);
     CHECK(r.post_base_continue_d.call_count == 1);
     CHECK(r.post_base_continue_d.load_count == 1);
-    CHECK(g_cont_d_call == 1);
-    CHECK(g_cont_d_rdi == const_cast<void*>(g_cont_d_cell_value));
+    CHECK(g_cont_d_call == 0);  // native body replaced the raw hook
+    CHECK(r.post_base_continue_d.capture_native);
+    CHECK(r.post_base_continue_d.capture.ok);
+    CHECK(r.post_base_continue_d.capture.enable == false);  // xor esi,esi -> enable=false
+    CHECK(g_capture_a473b0.live == 1);
+    CHECK(g_capture_a473b0.last_enable_arg == false);
+    CHECK(g_capture_a473b0.screen_enable == 0);
+    CHECK(g_capture_a473b0.screen_disable == 1);
+    CHECK(g_capture_a473b0.video_calls == 2);
     CHECK(r.post_base_continue_d.end_rva == 0x5329ae);
+
+    // Hook fallback: without a CaptureServices interface the raw call_a473b0 hook runs.
+    {
+        g_cont_d_call = 0;
+        Init531d60PostBaseContinueDHooks fallback{};
+        const void* fallback_cell = g_cont_d_cell_value;
+        fallback.cell_32f79a8 = &fallback_cell;
+        fallback.call_a473b0 = hook_cont_d_call;  // no capture_services
+        const auto fr = init_531d60_post_base_continue_d(fallback);
+        CHECK(fr.ok);
+        CHECK(!fr.capture_native);
+        CHECK(g_cont_d_call == 1);
+        CHECK(g_cont_d_rdi == const_cast<void*>(g_cont_d_cell_value));
+    }
     CHECK(r.post_base_continue_c.ok);
     CHECK(r.post_base_continue_c.unit_executed ==
           kInit531d60PostBaseContinueCUnitCount);

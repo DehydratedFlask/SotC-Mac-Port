@@ -9,14 +9,20 @@
 //
 // Claimed: the 17 B span, the RIP-relative lea target, the call rel32 target, and the
 // ordering (cell load before the call).
-// NOT modelled: the body of 0xa473b0; the value held by the 0x32f79a8 cell (host stand-in);
-// the `0x5329ae` successor block; the merge `je` outcome; r15/other incoming registers.
-// G1 PARTIAL — control-flow pin only.
+// The 0xa473b0 body is now executable native code: when a `CaptureServices` is supplied
+// (see capture_a473b0.hpp) the `call 0xa473b0` runs the lifted enable-state setter with
+// enable=false (the `xor esi,esi`), otherwise the raw `call_a473b0` hook stays the fallback.
+// NOT modelled: the value held by the 0x32f79a8 cell (host stand-in); the `0x5329ae`
+// successor block; the merge `je` outcome; r15/other incoming registers.
+// G1 PARTIAL — the 0xa473b0 body is native, but only as its service contracts; nothing ran
+// against the game.
 #pragma once
 
 #include <array>
 #include <cstddef>
 #include <cstdint>
+
+#include "capture_a473b0.hpp"
 
 namespace sotc {
 
@@ -55,6 +61,9 @@ struct Init531d60PostBaseContinueDHooks {
     const void* const* cell_32f79a8 = nullptr;
     // 0xa473b0(rdi, esi=0); null => no-op, call still counted.
     void (*call_a473b0)(void* rdi) = nullptr;
+    // When supplied, the `call 0xa473b0` runs the lifted capture_a473b0_set_enabled(false, …)
+    // body instead of the raw hook (hook stays the fallback otherwise).
+    CaptureServices* capture_services = nullptr;
 };
 
 struct Init531d60PostBaseContinueDResult {
@@ -64,6 +73,9 @@ struct Init531d60PostBaseContinueDResult {
     int call_count = 0;      // expect 1
     int load_count = 0;      // expect 1
     std::uint64_t end_rva = kInit531d60PostBaseContinueDEndRva;
+    // Populated when capture_services was supplied: the lifted 0xa473b0 body result.
+    bool capture_native = false;
+    CaptureA473b0Result capture{};
 };
 
 [[nodiscard]] Init531d60PostBaseContinueDResult init_531d60_post_base_continue_d(

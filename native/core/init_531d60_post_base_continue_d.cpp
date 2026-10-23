@@ -32,8 +32,11 @@ Init531d60PostBaseContinueDResult init_531d60_post_base_continue_d(
     }
     pin(out, ContinueDUnit::mov_rdi_cell_load);
 
-    // 0x5329a9 call 0xa473b0 (body NOT modelled).
-    if (hooks.call_a473b0 != nullptr) {
+    // 0x5329a9 call 0xa473b0 (body lifted when capture_services is supplied).
+    if (hooks.capture_services != nullptr) {
+        out.capture = capture_a473b0_set_enabled(false, *hooks.capture_services);
+        out.capture_native = true;
+    } else if (hooks.call_a473b0 != nullptr) {
         hooks.call_a473b0(rdi);
     }
     pin(out, ContinueDUnit::call_a473b0);

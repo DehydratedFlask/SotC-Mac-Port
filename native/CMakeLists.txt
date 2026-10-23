@@ -442,6 +442,7 @@ add_library(sotc_core STATIC
   core/vec_b47100.cpp
   core/vec_b44580.cpp
   core/vec_b33bd0.cpp
+  core/capture_a473b0.cpp
 )
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()
@@ -1708,6 +1709,10 @@ add_test(NAME insert_1beeb0 COMMAND test_insert_1beeb0)
 add_executable(test_insert_21cd0 tests/test_insert_21cd0.cpp)
 target_link_libraries(test_insert_21cd0 sotc_core)
 add_test(NAME insert_21cd0 COMMAND test_insert_21cd0)
+
+add_executable(test_capture_a473b0 tests/test_capture_a473b0.cpp)
+target_link_libraries(test_capture_a473b0 sotc_core)
+add_test(NAME capture_a473b0 COMMAND test_capture_a473b0)
 
 add_executable(test_appmain_init_ctor_98a90_slice tests/test_appmain_init_ctor_98a90_slice.cpp)
 target_link_libraries(test_appmain_init_ctor_98a90_slice sotc_core)
