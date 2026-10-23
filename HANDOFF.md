@@ -238,6 +238,11 @@ The rounds that follow the archive are in chronological order.
   `0xf180`, `0xb09650`, two event flags) and the 24 B global copy. `0x3b3d0` is
   `sceKernelCreateEventFlag`, not a mutex, and `0x32f8ff0` is the pointer slot. The dtor
   `0xa5cb30` remains a contract.
+- **E604** — the SaveData metadata/icon/delete contract is characterized: `0x530` block
+  (`memset` + three `strcpy` + `+0x500`), `SetParam` result discarded, only `+0x500` read back, the
+  icon is a shared resource copy, delete has three sites and no BUSY retry, and dialog status 2/3
+  is corrected. `save_store` does **not** call `save_check_backup`. Implementation is the next save
+  slice (`SAV-03-METADATA-01`).
 - **E594** — the native ResourceWrapper/ResourcePool/ResourceRef model is implemented: exact
   0x100 B wrapper, hash-then-strcmp comparator, non-owning map, hit/miss references, erase at zero,
   dependency recursion, the priority state table, and lock/unlock refs. Hooks cover allocation,

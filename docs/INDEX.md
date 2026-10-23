@@ -289,3 +289,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Save transaction (2026-10-23)](checkpoints/2026-10-23-save-transaction.md) | ProgressV1, atomic store/load, golden 20,013 B; E601 |
 | [Camera class identity (2026-10-23)](checkpoints/2026-10-23-camera-class-identity.md) | D is Camera, not `_Root`; debug-only pose sync; E602 |
 | [Owner ctor a5c850 (2026-10-23)](checkpoints/2026-10-23-owner-ctor-a5c850.md) | 721 B row-9 ctor, partial-init layout; E603 |
+| [Save metadata contract (2026-10-23)](checkpoints/2026-10-23-savedata-metadata-contract.md) | 0x530 block, shared icon, delete/dialog; E604 |
