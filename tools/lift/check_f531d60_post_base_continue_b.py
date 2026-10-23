@@ -132,7 +132,11 @@ def main() -> int:
     for mnemonic in ("xor esi,esi", "je 0x5328e0", "mov rdi,[r13+0]"):
         require(mnemonic in nh, f"unit listing {mnemonic}")
     cpp = NATIVE_CPP.read_text()
-    require("branch_outcome_modelled = false" in cpp, "branch outcome flag")
+    # E524/E528: the je outcome is modelled only when the 0x1e4c0 hook returns a proven
+    # boolean; the previous hard-coded `= false` is superseded.
+    require("branch_outcome_modelled = bl_is_boolean" in cpp, "branch outcome flag")
+    require("branch_taken = bl_is_boolean && (out.bl == 0)" in cpp, "branch taken rule")
+    require("bl == 0 => taken" in nh, "boolean contract documented")
     require("init_531d60_post_base_continue_b" in cpp, "cpp definition")
     st = SLICE.read_text()
     require("post_base_continue_b" in st or "PostBaseContinueB" in st, "slice wire")
