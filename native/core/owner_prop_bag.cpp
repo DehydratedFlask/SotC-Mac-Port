@@ -28,6 +28,26 @@ BagUserSelection select_bag_users(int initial_user, const int login_ids[4],
     return out;
 }
 
+OwnerBagConstructResult owner_bag_construct(OwnerPropBag& bag,
+                                            const OwnerBagConstructHooks& hooks) noexcept {
+    OwnerBagConstructResult out{};
+    out.pad_init_called = hooks.sce_pad_init != nullptr && hooks.sce_pad_init();
+    const int initial = hooks.initial_user != nullptr ? hooks.initial_user() : -1;
+    out.gesture_init_called = hooks.gesture_init != nullptr && hooks.gesture_init();
+    int login_ids[4] = {-1, -1, -1, -1};
+    const bool login_ok =
+        hooks.login_user_ids != nullptr && hooks.login_user_ids(login_ids);
+    out.users = select_bag_users(initial, login_ids, login_ok);
+    out.tables_created = out.users.count;
+    bag.set_mode_10(1);  // last on every original path
+    if (hooks.publish != nullptr) {
+        hooks.publish(bag);
+        out.published = true;
+    }
+    out.ok = out.pad_init_called && hooks.initial_user != nullptr && out.published;
+    return out;
+}
+
 void OwnerPropBag::insert_a(std::uint32_t key, const OwnerValueA& value) {
     tree_a_.emplace(key, value);  // multimap: equal keys are kept in insertion order
 }

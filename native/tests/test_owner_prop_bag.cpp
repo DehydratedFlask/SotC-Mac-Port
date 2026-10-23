@@ -9,6 +9,11 @@
 
 using namespace sotc;
 
+namespace {
+int g_publish_calls = 0;
+int g_published_mode = -1;
+}
+
 int main() {
     CHECK(kOwnerPropBagSize == 0x178);
     CHECK(kOwnerPropBagTreeAOffset == 0x48);
@@ -133,6 +138,48 @@ int main() {
         CHECK(s.count == 4);
         CHECK(s.user_ids[0] == 5 && s.user_ids[1] == 0 && s.user_ids[2] == 1 &&
               s.user_ids[3] == 2);
+    }
+
+    // ---- 6. 0xa2afb0 observable construction: hooks, cap, mode and publish. ----
+    {
+        g_publish_calls = 0;
+        g_published_mode = -1;
+        OwnerBagConstructHooks hooks{};
+        hooks.sce_pad_init = [] { return true; };
+        hooks.initial_user = [] { return 5; };
+        hooks.gesture_init = [] { return true; };
+        hooks.login_user_ids = [](int out[4]) {
+            out[0] = 0; out[1] = 1; out[2] = 2; out[3] = 3;
+            return true;
+        };
+        hooks.publish = [](OwnerPropBag& bag) {
+            ++g_publish_calls;
+            g_published_mode = bag.mode_10();
+        };
+
+        OwnerPropBag bag;
+        CHECK(bag.mode_10() == 0);
+        const auto result = owner_bag_construct(bag, hooks);
+        CHECK(result.ok);
+        CHECK(result.pad_init_called);
+        CHECK(result.gesture_init_called);
+        CHECK(result.published);
+        CHECK(result.tables_created == 4);
+        CHECK(result.users.user_ids[0] == 5 && result.users.user_ids[1] == 0 &&
+              result.users.user_ids[2] == 1 && result.users.user_ids[3] == 2);
+        CHECK(bag.mode_10() == 1);
+        CHECK(g_publish_calls == 1);
+        CHECK(g_published_mode == 1);
+
+        OwnerBagConstructHooks partial{};
+        partial.sce_pad_init = [] { return true; };
+        partial.publish = [](OwnerPropBag&) {};
+        OwnerPropBag second;
+        const auto partial_result = owner_bag_construct(second, partial);
+        CHECK(!partial_result.ok);  // missing initial_user
+        CHECK(partial_result.tables_created == 1);  // site A with -1
+        CHECK(partial_result.users.user_ids[0] == -1);
+        CHECK(second.mode_10() == 1);
     }
 
     return 0;

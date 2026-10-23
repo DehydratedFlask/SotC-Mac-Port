@@ -48,7 +48,8 @@
   `{f32 lo,f32 hi,f32 v,u32}`, and 8 keys are inserted twice (the sink must allow duplicates).
   `owner_prop_bag` models the 0x178 B bag with ordered multimaps (E577); the exact RB nodes/fixups
   and trees 0/1 remain contracts. The four 0xc88 objects in `0xa2afb0` are per-user **input
-  devices**, not language tables (E590), and do not affect the property path. The 20 constructor
+  devices**, not language tables (E590), and do not affect the property path; `owner_bag_construct`
+  models the observable sequence with hooks (E592). The 20 constructor
   rows (19 slot rows + 2 self-registered) remain open as ctor hooks in `owner_members` (the 21-row
   driver, E579); the large bodies are blocked subsystems.
 - **`0xf590`** is a 73 B shared release. The 17 Init-slice modules and the four provably-zero

@@ -57,10 +57,12 @@ def main() -> int:
     require(img.read(0xA2B032, 5) == bytes.fromhex("bf880c0000"), "0xc88 allocation")
 
     header = HEADER.read_text()
-    for token in ("BagUserSelection", "select_bag_users", "login_list_ok", "input"):
+    for token in ("BagUserSelection", "select_bag_users", "login_list_ok", "input",
+                  "OwnerBagConstructHooks", "owner_bag_construct", "mode_10"):
         require(token in header, f"header token {token!r}")
     source = SOURCE.read_text()
-    for token in ("initial_user", "i >= 2", "count >= 4", "user_ids"):
+    for token in ("initial_user", "i >= 2", "count >= 4", "user_ids", "set_mode_10",
+                  "hooks.publish"):
         require(token in source, f"source token {token!r}")
 
     print(

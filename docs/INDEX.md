@@ -277,3 +277,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Platform tag 0x147e20 (2026-10-23)](checkpoints/2026-10-23-platform-tag.md) | `_cmn`/`_ps4` table, nine real key hashes; E589 |
 | [Owner bag ctor (2026-10-23)](checkpoints/2026-10-23-owner-bag-ctor.md) | 1..4 per-user input devices, not language tables; E590 |
 | [Bag user selection (2026-10-23)](checkpoints/2026-10-23-owner-bag-users.md) | 1..4 input-device cap/dedupe; E591 |
+| [Bag construct (2026-10-23)](checkpoints/2026-10-23-owner-bag-construct.md) | Hooks, 1..4 selection, mode/publish; E592 |

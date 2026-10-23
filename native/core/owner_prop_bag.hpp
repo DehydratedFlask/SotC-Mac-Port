@@ -62,6 +62,30 @@ struct BagUserSelection {
 [[nodiscard]] BagUserSelection select_bag_users(int initial_user, const int login_ids[4],
                                                 bool login_list_ok) noexcept;
 
+class OwnerPropBag;
+
+struct OwnerBagConstructHooks {
+    // 0xf90d70 scePadInit(); the original calls it before the user queries.
+    bool (*sce_pad_init)() = nullptr;
+    // 0xf901e0 sceUserServiceGetInitialUser(&int); -1 when no user is logged in.
+    int (*initial_user)() = nullptr;
+    // 0xf91300 sceSystemGestureInitializePrimitiveTouchRecognizer(0).
+    bool (*gesture_init)() = nullptr;
+    // 0xf90df0 sceUserServiceGetLoginUserIdList(&int[4]); false on failure.
+    bool (*login_user_ids)(int out[4]) = nullptr;
+    // *(0x3305568) = bag (last construction wins).
+    void (*publish)(OwnerPropBag& bag) = nullptr;
+};
+
+struct OwnerBagConstructResult {
+    bool ok = false;
+    BagUserSelection users{};
+    int tables_created = 0;
+    bool pad_init_called = false;
+    bool gesture_init_called = false;
+    bool published = false;
+};
+
 class OwnerPropBag {
 public:
     using TreeA = std::multimap<std::uint32_t, OwnerValueA>;
@@ -73,6 +97,10 @@ public:
 
     [[nodiscard]] const TreeA& tree_a() const noexcept { return tree_a_; }
     [[nodiscard]] const TreeB& tree_b() const noexcept { return tree_b_; }
+    // `+0x10`: base ctor writes 0; the derived ctor writes 1 last on every path.
+    [[nodiscard]] int mode_10() const noexcept { return mode_10_; }
+    void set_mode_10(int mode) noexcept { mode_10_ = mode; }
+
     [[nodiscard]] std::size_t size_a() const noexcept { return tree_a_.size(); }
     [[nodiscard]] std::size_t size_b() const noexcept { return tree_b_.size(); }
     [[nodiscard]] std::size_t total() const noexcept { return tree_a_.size() + tree_b_.size(); }
@@ -80,7 +108,14 @@ public:
 private:
     TreeA tree_a_;
     TreeB tree_b_;
+    int mode_10_ = 0;
 };
+
+// `0xa2afb0` observable construction: pad/user/gesture hooks, the 1..4 user selection, the final
+// `+0x10 = 1`, and the global republish. The four 0xc88 input devices are opaque and null-safe for
+// every analyzed reader, so the native model records the selection but does not allocate them.
+[[nodiscard]] OwnerBagConstructResult owner_bag_construct(
+    OwnerPropBag& bag, const OwnerBagConstructHooks& hooks) noexcept;
 
 // Adapter that lets `apply_owner_properties` feed the bag directly.
 class OwnerPropBagSink final : public OwnerPropertySink {
