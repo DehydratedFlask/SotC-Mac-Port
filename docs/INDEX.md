@@ -211,3 +211,5 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Init 0x1290 body (2026-10-22)](checkpoints/2026-10-22-init-1290-body-analysis.md) | 195 B full body: guard read-only, `void`, one no-op vcall, two descriptor registrations; E516; G1 PARTIAL |
 | [Init continue batch A (2026-10-22)](checkpoints/2026-10-22-init-531d60-continue-batch-a.md) | 22 units / 95 B `0x532720..0x53277f`, 5 calls + 3 lea + `je` pinned; E519; G1 PARTIAL |
 | [Repo-health round (2026-10-22)](checkpoints/2026-10-22-repo-health-round.md) | Full suite green after stale ctor-test fix; publish-audit final-component gap fixed; E517/E518 |
+| [Init continue batch B (2026-10-22)](checkpoints/2026-10-22-init-531d60-continue-batch-b.md) | 14 units / 50 B `0x53277f..0x5327b1`, calls `0x1e4c0`/`0x4c4950`, `je->0x5328e0` pinned; E520; G1 PARTIAL |
+| [Fixture-suite replay (2026-10-22)](checkpoints/2026-10-22-int-validation-fixture-replay.md) | 326/326 with fixtures; "325/327 FAILED" does not reproduce; E521 |
