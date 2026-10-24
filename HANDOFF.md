@@ -1,11 +1,12 @@
 # SoC Mac Native — current handoff
 
-## 2026-10-24 15:53 CDT — GPU-03 direct-Metal synthetic-frame checkpoint
+## 2026-10-24 15:58 CDT — GPU-03 direct-Metal synthetic-frame checkpoint published
 
 - Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`. Previous published
-  checkpoint is `3f2f51b0b88186c4f0247f60b7f783fe24b5fee8` (typed RenderOp API); this checkpoint's
-  source/doc changes are being prepared for an owner-authored commit. The author identity is Johnny
-  Wang; no Claude/Anthropic co-author trailer will be added.
+  checkpoint is `3f2f51b0b88186c4f0247f60b7f783fe24b5fee8` (typed RenderOp API). The synthetic
+  Metal source/doc checkpoint is commit `c7adfdd68db845a590d963989ff35d2a627cac50`, pushed to
+  `origin/cursor/init-hash-551140-9dfc`. Johnny Wang is author and committer; the commit has no
+  Claude/Anthropic co-author trailer.
 - `GPU-03-METAL-SYNTHETIC-FRAME-01` is `FIXTURE_VERIFIED`. Parent
   `GPU-03-RENDEROPS-ASSET-FRAME-01` remains `ACTIVE`, 0 failed implementation hypotheses. E632
   records an Objective-C++ direct-Metal executor for the supported typed-op subset and a synthetic
@@ -40,15 +41,15 @@
   test nodes; `trail build` rebuilt the source wiring graph and the following `trail build --check`
   passed with 8,292 nodes. `trail grep 'MetalAssetFrameRenderer'` found the new API in the header and
   test. The deep meaning layer remains unbuilt.
-- Publication checks: staged path audit passed 14 paths; full path audit passed 2,746 paths;
-  `python3 -I scripts/check_commit_attribution.py` passed. Effective author is Johnny Wang
-  `<dehydratedflask@users.noreply.github.com>`. `git fetch origin cursor/init-hash-551140-9dfc`
-  found no divergence (0 ahead / 0 behind). Logs for the final pre-push replay are being saved under
+- Publication checks: staged path audit passed 14 paths before commit; full path audit passed 2,746
+  paths after commit; attribution passed both before and after the commit. The default staged audit
+  invoked after commit returned exit 2 because the index was empty; its required 14-path pre-commit
+  audit passed. Post-push `git ls-remote`, local HEAD and tracking ref all report `c7adfdd...`,
+  divergence is 0/0, and `git status` is clean. Logs are under
   `local/orchestrator/gpu03-r31/metal-frame/`.
-- Next exact action: repeat pre-push path/attribution checks after this handoff update, create the
-  owner-authored commit without a Claude/Anthropic trailer, and push `cursor/init-hash-551140-9dfc`.
-  Then apply the user's pending real-mesh, NRM0 and screenshot-seam choices before claiming L1
-  asset-derived geometry. Do not promote G3.
+- Next exact action: preserve the real-mesh/NRM0/screenshot choices as pending; a separate read-only
+  survey of startup slot 306 is in progress while those GPU-03 inputs remain unresolved. Do not claim
+  an L1 asset-derived frame or promote G3 until the real-asset and screenshot gates are met.
 - Status: synthetic direct-Metal subtask `FIXTURE_VERIFIED`; parent GPU-03 `ACTIVE`; overall game
   acceptance remains incomplete.
 

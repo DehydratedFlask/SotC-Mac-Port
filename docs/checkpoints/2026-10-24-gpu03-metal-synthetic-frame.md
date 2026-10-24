@@ -1,6 +1,6 @@
 # Checkpoint: GPU-03-METAL-SYNTHETIC-FRAME-01 — direct-Metal fixture verified
 
-- Time / timezone: 2026-10-24 15:53 CDT
+- Time / timezone: 2026-10-24 15:58 CDT (publication verification)
 - Agent and integrator: Codex `/root`; root owns the HANDOFF integration.
 - Task / gate / status: `GPU-03-METAL-SYNTHETIC-FRAME-01` — `FIXTURE_VERIFIED`. Parent
   `GPU-03-RENDEROPS-ASSET-FRAME-01` remains `ACTIVE`; G3 remains `NOT RUN`.
@@ -51,11 +51,16 @@
   normal, and whether screenshot proof should use `attach_screenshot` with a harness sequence label or
   direct PNG output. Real asset parse/draw, the screenshot seam, retail bindings, cold boot, game audio,
   real save/reload and all final product gates remain NOT RUN.
-- Publication preflight: staged path audit passed 14 paths and full path audit passed 2,746 paths;
-  pre-commit attribution passed; the active branch fetch showed 0 ahead / 0 behind. Repeat the audits
-  after this HANDOFF update, then commit and push the allowlisted files on the active branch.
-- Next exact action after publication: follow the user's pending asset/normal/screenshot choices before
-  attempting the L1 real-mesh frame.
+- Publication: owner-authored commit `c7adfdd68db845a590d963989ff35d2a627cac50` was pushed to
+  `origin/cursor/init-hash-551140-9dfc`. Author and committer are Johnny Wang
+  `<dehydratedflask@users.noreply.github.com>`; no co-author trailer is present. Staged path audit
+  passed 14 paths before commit, full path audit passed 2,746 paths after commit, and commit
+  attribution passed before and after. The default staged audit called after commit returned exit 2
+  because no paths remained staged; the 14-path staged audit had already passed. Post-push fetch,
+  `git ls-remote`, tracking ref and local HEAD agree; branch divergence is 0/0 and worktree is clean.
+  Verification logs are under `local/orchestrator/gpu03-r31/metal-frame/`.
+- Next exact action: follow the user's pending real-mesh, NRM0 and screenshot choices before attempting
+  the L1 real-mesh frame. A separate read-only survey of startup slot 306 is in progress meanwhile.
 - HANDOFF.md / TASKS / EVIDENCE / INSTALL_LOG / indexes updated: HANDOFF, TASKS, EVIDENCE, INSTALL_LOG,
   `docs/INDEX.md` and generated `docs/FOLDERS.md` updated. `python3 scripts/project_index.py` indexed
   9,038 folders. `trail build --check` reports 8,292 wiring nodes in sync; `trail grep
