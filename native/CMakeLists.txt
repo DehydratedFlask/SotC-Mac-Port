@@ -487,6 +487,7 @@ add_library(sotc_core STATIC
   core/vec_b44580.cpp
   core/vec_b33bd0.cpp
   core/capture_a473b0.cpp
+  core/owner_ctor_a597d0.cpp
 )
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()
@@ -1929,3 +1930,81 @@ target_link_libraries(test_allocator_front sotc_core)
 add_test(NAME allocator_front COMMAND test_allocator_front)
 
 add_subdirectory(api)
+
+# GPU-01-METAL-CAPTURE-PROVIDER-01: direct-Metal offscreen capture provider (Objective-C++).
+# Appended so existing target order is untouched; project-wide arm64 + sanitizer flags apply.
+enable_language(OBJCXX)
+set(CMAKE_OBJCXX_STANDARD 20)
+set(CMAKE_OBJCXX_STANDARD_REQUIRED ON)
+add_library(sotc_metal STATIC platform/metal_capture.mm)
+target_compile_options(sotc_metal PRIVATE -Wall -Wextra -Werror)
+target_link_libraries(sotc_metal PUBLIC sotc_core
+  "-framework Metal"
+  "-framework Foundation"
+  "-framework ImageIO"
+  "-framework CoreGraphics")
+add_executable(test_metal_capture tests/test_metal_capture.cpp)
+target_link_libraries(test_metal_capture sotc_metal sotc_core)
+add_test(NAME metal_capture COMMAND test_metal_capture)
+set_tests_properties(metal_capture PROPERTIES SKIP_RETURN_CODE 77)
+
+# --- APP-01-SOCGAMECORE-EXE-01: native SoCGameCore auxiliary executable (protocol v1) -----------
+# One JSON object per line on stdout; exit codes 0/2/3/4/5. Links the versioned ABI and the core.
+add_library(soc_core_status_json STATIC app/core_status_json.cpp)
+target_include_directories(soc_core_status_json PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/app)
+
+add_executable(soc_game_core app/soc_game_core_main.cpp)
+set_target_properties(soc_game_core PROPERTIES OUTPUT_NAME SoCGameCore)
+target_link_libraries(soc_game_core PRIVATE soc_core_status_json sotc_api sotc_core)
+
+add_executable(test_core_status_json tests/test_core_status_json.cpp)
+target_link_libraries(test_core_status_json PRIVATE soc_core_status_json)
+add_test(NAME core_status_json COMMAND test_core_status_json)
+
+# Spawn the real executable and pin protocol bytes, exit codes and serve framing.
+find_program(SOTC_PYTHON3 NAMES python3)
+if(SOTC_PYTHON3)
+  set(SOTC_FCORE_CHECK ${CMAKE_CURRENT_SOURCE_DIR}/../tools/lift/check_fcore_status.py)
+  foreach(sotc_case status coverage start serve validate)
+    add_test(NAME soc_game_core_${sotc_case}
+      COMMAND ${SOTC_PYTHON3} ${SOTC_FCORE_CHECK} --exe $<TARGET_FILE:soc_game_core> --only ${sotc_case})
+  endforeach()
+else()
+  message(STATUS "python3 not found: SoCGameCore protocol ctests fall back to --status only")
+  add_test(NAME soc_game_core_status COMMAND soc_game_core --status)
+  set_tests_properties(soc_game_core_status PROPERTIES
+    PASS_REGULAR_EXPRESSION "\"schema\":\"sotc.core.status.v1\"")
+endif()
+
+# CPU-01-CTOR-COVERAGE-BATCH-01: original-table coverage (573 rows), the last missing leaf_vec_copy
+# module (index 95), and the production registration coverage test. Appended without reordering any
+# existing target; the two new core sources are added with target_sources instead of editing the
+# existing source list.
+target_sources(sotc_core PRIVATE core/vec_d71f60.cpp core/ctor_original_table.cpp)
+
+add_executable(test_vec_d71f60 tests/test_vec_d71f60.cpp)
+target_link_libraries(test_vec_d71f60 sotc_core)
+add_test(NAME vec_d71f60 COMMAND test_vec_d71f60)
+
+add_executable(test_startup_ctor_coverage tests/test_startup_ctor_coverage.cpp)
+target_link_libraries(test_startup_ctor_coverage sotc_core)
+add_test(NAME startup_ctor_coverage COMMAND test_startup_ctor_coverage)
+set_tests_properties(startup_ctor_coverage PROPERTIES
+  ENVIRONMENT "SOTC_SLOT23_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/slot23_e71990_names.bin")
+
+# CPU-01-OWNER-ROW14-01: row-14 constructor `0xa597d0` + its context-free owner_members adapter.
+add_executable(test_owner_ctor_a597d0 tests/test_owner_ctor_a597d0.cpp)
+target_link_libraries(test_owner_ctor_a597d0 sotc_core)
+add_test(NAME owner_ctor_a597d0 COMMAND test_owner_ctor_a597d0)
+
+# CPU-01-OWNER-ROW21-01: row-21 owner constructor `0x4a690` (appended so existing targets keep
+# their order). Source list addition is deferred to target_sources for the same reason.
+target_sources(sotc_core PRIVATE core/owner_ctor_4a690.cpp)
+add_executable(test_owner_ctor_4a690 tests/test_owner_ctor_4a690.cpp)
+target_link_libraries(test_owner_ctor_4a690 sotc_core)
+add_test(NAME owner_ctor_4a690 COMMAND test_owner_ctor_4a690)
+
+# SAV-02-RELAUNCH-01: cross-process persistence proof for the native save transaction.
+add_executable(test_save_relaunch tests/test_save_relaunch.cpp)
+target_link_libraries(test_save_relaunch sotc_core)
+add_test(NAME save_relaunch COMMAND test_save_relaunch)
