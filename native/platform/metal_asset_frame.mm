@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <limits>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -25,6 +26,7 @@ constexpr RenderResourceHandle kDepthTargetHandle = 2;
 constexpr RenderResourceHandle kPipelineHandle = 3;
 constexpr RenderResourceHandle kVertexBufferHandle = 4;
 constexpr RenderResourceHandle kIndexBufferHandle = 5;
+constexpr RenderResourceHandle kFirstTextureHandle = 6;
 constexpr std::size_t kDepthCompareCount = 5;
 constexpr std::size_t kDepthStateCount = 2 * 2 * kDepthCompareCount;
 constexpr std::size_t kReadbackRowAlignment = 256;
@@ -33,7 +35,113 @@ struct DrawBinding {
     std::size_t vertex_offset = 0;
     std::size_t index_offset = 0;
     std::uint32_t index_count = 0;
+    RenderResourceHandle texture_handle = kInvalidRenderResource;
+    RenderResourceHandle sampler_handle = kInvalidRenderResource;
 };
+
+struct TextureInputBinding {
+    RenderResourceHandle texture_handle = kInvalidRenderResource;
+    RenderResourceHandle sampler_handle = kInvalidRenderResource;
+    AssetTexture2D texture;
+    AssetSamplerInput sampler;
+};
+
+struct TextureObjects {
+    std::unordered_map<RenderResourceHandle, id<MTLTexture>> textures;
+    std::unordered_map<RenderResourceHandle, id<MTLSamplerState>> samplers;
+
+    ~TextureObjects() {
+        for (const auto& [handle, texture] : textures) {
+            (void)handle;
+            [texture release];
+        }
+        for (const auto& [handle, sampler] : samplers) {
+            (void)handle;
+            [sampler release];
+        }
+    }
+};
+
+[[nodiscard]] bool valid_texture_filter(AssetTextureFilter filter) noexcept {
+    return filter == AssetTextureFilter::nearest || filter == AssetTextureFilter::linear;
+}
+
+[[nodiscard]] bool valid_texture_address_mode(AssetTextureAddressMode mode) noexcept {
+    return mode == AssetTextureAddressMode::clamp_to_edge ||
+           mode == AssetTextureAddressMode::repeat ||
+           mode == AssetTextureAddressMode::mirror_repeat;
+}
+
+[[nodiscard]] bool valid_texture_input(const AssetTexture2D& texture) noexcept {
+    constexpr std::uint32_t kMaxTextureDimension = 8192;
+    if (texture.width == 0 || texture.height == 0 ||
+        texture.width > kMaxTextureDimension || texture.height > kMaxTextureDimension) {
+        return false;
+    }
+    const std::size_t row_bytes = static_cast<std::size_t>(texture.width) * 4;
+    if (texture.height > std::numeric_limits<std::size_t>::max() / row_bytes) return false;
+    return texture.rgba8.data() != nullptr &&
+           texture.rgba8.size() == row_bytes * texture.height;
+}
+
+[[nodiscard]] MTLSamplerMinMagFilter metal_filter(AssetTextureFilter filter) noexcept {
+    return filter == AssetTextureFilter::linear ? MTLSamplerMinMagFilterLinear
+                                                : MTLSamplerMinMagFilterNearest;
+}
+
+[[nodiscard]] MTLSamplerAddressMode metal_address_mode(AssetTextureAddressMode mode) noexcept {
+    switch (mode) {
+        case AssetTextureAddressMode::clamp_to_edge: return MTLSamplerAddressModeClampToEdge;
+        case AssetTextureAddressMode::repeat: return MTLSamplerAddressModeRepeat;
+        case AssetTextureAddressMode::mirror_repeat: return MTLSamplerAddressModeMirrorRepeat;
+    }
+    return MTLSamplerAddressModeClampToEdge;
+}
+
+[[nodiscard]] bool make_texture_objects(id<MTLDevice> device,
+                                        const std::vector<TextureInputBinding>& inputs,
+                                        TextureObjects& objects, std::string& error) {
+    @autoreleasepool {
+        for (const TextureInputBinding& input : inputs) {
+            MTLTextureDescriptor* texture_descriptor = [MTLTextureDescriptor
+                texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA8Unorm
+                                             width:input.texture.width
+                                            height:input.texture.height
+                                         mipmapped:NO];
+            texture_descriptor.usage = MTLTextureUsageShaderRead;
+            texture_descriptor.storageMode = MTLStorageModeShared;
+            id<MTLTexture> texture = [device newTextureWithDescriptor:texture_descriptor];
+            if (texture == nil) {
+                error = "Metal fragment texture creation failed";
+                return false;
+            }
+            const std::size_t bytes_per_row = static_cast<std::size_t>(input.texture.width) * 4;
+            [texture replaceRegion:MTLRegionMake2D(0, 0, input.texture.width, input.texture.height)
+                       mipmapLevel:0
+                         withBytes:input.texture.rgba8.data()
+                       bytesPerRow:bytes_per_row];
+            objects.textures.emplace(input.texture_handle, texture);
+
+            MTLSamplerDescriptor* sampler_descriptor = [[MTLSamplerDescriptor alloc] init];
+            sampler_descriptor.minFilter = metal_filter(input.sampler.min_filter);
+            sampler_descriptor.magFilter = metal_filter(input.sampler.mag_filter);
+            sampler_descriptor.mipFilter = MTLSamplerMipFilterNotMipmapped;
+            sampler_descriptor.sAddressMode = metal_address_mode(input.sampler.address_u);
+            sampler_descriptor.tAddressMode = metal_address_mode(input.sampler.address_v);
+            sampler_descriptor.rAddressMode = MTLSamplerAddressModeClampToEdge;
+            sampler_descriptor.lodMinClamp = 0.0F;
+            sampler_descriptor.lodMaxClamp = 0.0F;
+            id<MTLSamplerState> sampler = [device newSamplerStateWithDescriptor:sampler_descriptor];
+            [sampler_descriptor release];
+            if (sampler == nil) {
+                error = "Metal fragment sampler creation failed";
+                return false;
+            }
+            objects.samplers.emplace(input.sampler_handle, sampler);
+        }
+    }
+    return true;
+}
 
 [[nodiscard]] std::string describe_ns_error(NSError* error) {
     if (error == nil) return "unknown error";
@@ -107,7 +215,9 @@ public:
         std::vector<DefaultShaderCase> vertex_cases;
         std::vector<std::uint16_t> index_data;
         std::vector<DrawBinding> bindings;
+        std::vector<TextureInputBinding> texture_inputs;
         bindings.reserve(draws.size());
+        texture_inputs.reserve(draws.size());
 
         for (std::size_t draw_index = 0; draw_index < draws.size(); ++draw_index) {
             const AssetMeshDraw& draw = draws[draw_index];
@@ -126,6 +236,25 @@ public:
                 return frame_error(config_.width, config_.height,
                                    "draw " + std::to_string(draw_index) +
                                        " shader case contains a non-finite value");
+            }
+            const bool has_texture = draw.fragment_texture0.has_value();
+            const bool has_sampler = draw.fragment_sampler0.has_value();
+            if (has_texture != has_sampler ||
+                has_texture != config_.fragment_texture_sampler_slot0) {
+                return frame_error(config_.width, config_.height,
+                                   "draw fragment texture/sampler inputs do not match the explicit slot-0 ABI");
+            }
+            if (has_texture && !valid_texture_input(*draw.fragment_texture0)) {
+                return frame_error(config_.width, config_.height,
+                                   "draw fragment texture must have exact nonempty RGBA8 2D bytes");
+            }
+            if (has_sampler &&
+                (!valid_texture_filter(draw.fragment_sampler0->min_filter) ||
+                 !valid_texture_filter(draw.fragment_sampler0->mag_filter) ||
+                 !valid_texture_address_mode(draw.fragment_sampler0->address_u) ||
+                 !valid_texture_address_mode(draw.fragment_sampler0->address_v))) {
+                return frame_error(config_.width, config_.height,
+                                   "draw fragment sampler contains an unsupported filter or address mode");
             }
             for (std::uint16_t index : draw.indices) {
                 if (static_cast<std::size_t>(index) >= draw.positions.size()) {
@@ -151,6 +280,18 @@ public:
             binding.vertex_offset = vertex_cases.size() * sizeof(DefaultShaderCase);
             binding.index_offset = index_data.size() * sizeof(std::uint16_t);
             binding.index_count = static_cast<std::uint32_t>(draw.indices.size());
+            if (has_texture) {
+                if (draw_index >
+                    (std::numeric_limits<RenderResourceHandle>::max() - kFirstTextureHandle) / 2) {
+                    return frame_error(config_.width, config_.height,
+                                       "fragment resource handle range overflow");
+                }
+                binding.texture_handle = kFirstTextureHandle +
+                    static_cast<RenderResourceHandle>(draw_index * 2);
+                binding.sampler_handle = binding.texture_handle + 1;
+                texture_inputs.push_back({binding.texture_handle, binding.sampler_handle,
+                                          *draw.fragment_texture0, *draw.fragment_sampler0});
+            }
             bindings.push_back(binding);
 
             for (const CmshPosition& position : draw.positions) {
@@ -191,6 +332,14 @@ public:
             return frame_error(config_.width, config_.height, "Metal vertex/index buffer creation failed");
         }
 
+        TextureObjects texture_objects;
+        std::string texture_error;
+        if (!make_texture_objects(device_, texture_inputs, texture_objects, texture_error)) {
+            [vertex_buffer release];
+            [index_buffer release];
+            return frame_error(config_.width, config_.height, std::move(texture_error));
+        }
+
         MTLTextureDescriptor* color_descriptor = [MTLTextureDescriptor
             texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
                                          width:config_.width
@@ -217,7 +366,8 @@ public:
         }
 
         std::vector<RenderOp> operations;
-        operations.reserve(5 + draws.size() * 4);
+        operations.reserve(5 + draws.size() *
+                               (config_.fragment_texture_sampler_slot0 ? 6 : 4));
         operations.emplace_back(BeginPass{kColorTargetHandle, kDepthTargetHandle,
                                           {0.0F, 0.0F, 0.0F, 1.0F}, 1.0F});
         operations.emplace_back(SetViewport{0.0F, 0.0F, static_cast<float>(config_.width),
@@ -229,6 +379,12 @@ public:
                                                      sizeof(DefaultShaderCase)});
             operations.emplace_back(BindConstants{RenderStage::fragment, kVertexBufferHandle, 0,
                                                   binding.vertex_offset, sizeof(DefaultShaderCase)});
+            if (binding.texture_handle != kInvalidRenderResource) {
+                operations.emplace_back(BindTexture{RenderStage::fragment,
+                                                    binding.texture_handle, 0});
+                operations.emplace_back(BindSampler{RenderStage::fragment,
+                                                    binding.sampler_handle, 0});
+            }
             operations.emplace_back(BindIndexStream{kIndexBufferHandle, binding.index_offset});
             operations.emplace_back(DrawIndexed{binding.index_count, 0});
         }
@@ -361,6 +517,22 @@ public:
                         [encoder setFragmentBuffer:vertex_buffer
                                             offset:constants->offset
                                            atIndex:constants->slot];
+                    } else if (const auto* texture = std::get_if<BindTexture>(&operation)) {
+                        const auto resource = texture_objects.textures.find(texture->texture);
+                        if (encoder == nil || texture->stage != RenderStage::fragment ||
+                            texture->slot != 0 || resource == texture_objects.textures.end()) {
+                            result.error = "BindTexture references an unsupported stage, slot, or host handle";
+                            break;
+                        }
+                        [encoder setFragmentTexture:resource->second atIndex:texture->slot];
+                    } else if (const auto* sampler = std::get_if<BindSampler>(&operation)) {
+                        const auto resource = texture_objects.samplers.find(sampler->sampler);
+                        if (encoder == nil || sampler->stage != RenderStage::fragment ||
+                            sampler->slot != 0 || resource == texture_objects.samplers.end()) {
+                            result.error = "BindSampler references an unsupported stage, slot, or host handle";
+                            break;
+                        }
+                        [encoder setFragmentSamplerState:resource->second atIndex:sampler->slot];
                     } else if (const auto* indices = std::get_if<BindIndexStream>(&operation)) {
                         if (encoder == nil || indices->buffer != kIndexBufferHandle ||
                             indices->offset > index_buffer.length) {

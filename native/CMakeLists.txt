@@ -1972,6 +1972,14 @@ set_tests_properties(metal_asset_frame PROPERTIES
   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/.."
   ENVIRONMENT "MTL_DEBUG_LAYER=1;MTL_SHADER_VALIDATION=1;MTL_SHADER_VALIDATION_DEFAULT_STATE=all;MTL_SHADER_VALIDATION_ENABLE_ERROR_REPORTING=1;MTL_SHADER_VALIDATION_REPORT_TO_STDERR=1;MTL_SHADER_VALIDATION_ABORT_ON_FAULT=1;SOTC_DEFAULT_PAIR_MSL=${CMAKE_SOURCE_DIR}/../local/validation/gcn-default-root-v1/default-pair.metal;SOTC_ASSET_FRAME_DUMP=${CMAKE_SOURCE_DIR}/../local/validation/gpu03-r31/synthetic-asset-frame.png")
 
+# GPU-03-RENDEROPS-TEXTURE-SAMPLER-01: synthetic fragment texture/sampler resource binding.
+add_executable(test_metal_texture_binding tests/test_metal_texture_binding.cpp)
+target_link_libraries(test_metal_texture_binding PRIVATE sotc_metal_asset_frame)
+add_test(NAME metal_texture_binding COMMAND test_metal_texture_binding)
+set_tests_properties(metal_texture_binding PROPERTIES
+  SKIP_RETURN_CODE 77
+  ENVIRONMENT "MTL_DEBUG_LAYER=1;MTL_SHADER_VALIDATION=1;MTL_SHADER_VALIDATION_DEFAULT_STATE=all;MTL_SHADER_VALIDATION_ENABLE_ERROR_REPORTING=1;MTL_SHADER_VALIDATION_REPORT_TO_STDERR=1;MTL_SHADER_VALIDATION_ABORT_ON_FAULT=1")
+
 # --- APP-01-SOCGAMECORE-EXE-01: native SoCGameCore auxiliary executable (protocol v1) -----------
 # One JSON object per line on stdout; exit codes 0/2/3/4/5. Links the versioned ABI and the core.
 add_library(soc_core_status_json STATIC app/core_status_json.cpp)

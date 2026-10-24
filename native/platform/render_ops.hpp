@@ -21,8 +21,6 @@ enum class UnsupportedRenderOpKind : std::uint8_t {
     set_blend_state,
     set_raster_state,
     set_stencil_state,
-    bind_texture,
-    bind_sampler,
     draw_index_auto,
     dispatch,
     present,
@@ -71,6 +69,18 @@ struct BindConstants {
     std::size_t size = 0;
 };
 
+struct BindTexture {
+    RenderStage stage = RenderStage::fragment;
+    RenderResourceHandle texture = kInvalidRenderResource;
+    std::uint32_t slot = 0;
+};
+
+struct BindSampler {
+    RenderStage stage = RenderStage::fragment;
+    RenderResourceHandle sampler = kInvalidRenderResource;
+    std::uint32_t slot = 0;
+};
+
 struct BindIndexStream {
     RenderResourceHandle buffer = kInvalidRenderResource;
     std::size_t offset = 0;
@@ -86,8 +96,8 @@ struct UnsupportedRenderOp {
 };
 
 using RenderOp = std::variant<BeginPass, EndPass, SetViewport, SetDepthState, SetPipeline,
-                              BindVertexStream, BindConstants, BindIndexStream, DrawIndexed,
-                              UnsupportedRenderOp>;
+                              BindVertexStream, BindConstants, BindTexture, BindSampler,
+                              BindIndexStream, DrawIndexed, UnsupportedRenderOp>;
 
 struct RenderOpValidation {
     bool ok = false;

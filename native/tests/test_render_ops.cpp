@@ -10,6 +10,8 @@ namespace {
 using sotc::BeginPass;
 using sotc::BindConstants;
 using sotc::BindIndexStream;
+using sotc::BindSampler;
+using sotc::BindTexture;
 using sotc::BindVertexStream;
 using sotc::DrawIndexed;
 using sotc::EndPass;
@@ -36,6 +38,8 @@ void check(std::string_view name, bool passed) {
             SetPipeline{3},
             BindVertexStream{4, 0, 0, 288},
             BindConstants{sotc::RenderStage::fragment, 4, 0, 0, 288},
+            BindTexture{sotc::RenderStage::fragment, 6, 0},
+            BindSampler{sotc::RenderStage::fragment, 7, 0},
             BindIndexStream{5, 0},
             DrawIndexed{6, 0},
             EndPass{}};
@@ -68,7 +72,7 @@ int main() {
     check_error("U16 index offset alignment enforced", bad_index_alignment, "U16-aligned");
 
     std::vector<RenderOp> bad_triangle_count = valid_ops();
-    bad_triangle_count[7] = DrawIndexed{4, 0};
+    bad_triangle_count[9] = DrawIndexed{4, 0};
     check_error("triangle count alignment enforced", bad_triangle_count, "DrawIndexed count");
 
     std::vector<RenderOp> nested_pass = valid_ops();
@@ -82,6 +86,20 @@ int main() {
                                          UnsupportedRenderOp{UnsupportedRenderOpKind::dispatch},
                                          EndPass{}};
     check_error("unsupported dispatch fails visibly", unsupported, "Dispatch is not implemented");
+
+    std::vector<RenderOp> invalid_texture = valid_ops();
+    invalid_texture[6] = BindTexture{sotc::RenderStage::fragment, 0, 0};
+    check_error("zero texture handle rejected", invalid_texture, "BindTexture requires");
+
+    std::vector<RenderOp> invalid_sampler_stage = valid_ops();
+    invalid_sampler_stage[7] = BindSampler{static_cast<sotc::RenderStage>(255), 7, 0};
+    check_error("invalid sampler stage rejected", invalid_sampler_stage, "BindSampler requires");
+
+    std::vector<RenderOp> texture_before_pipeline = valid_ops();
+    texture_before_pipeline.insert(texture_before_pipeline.begin() + 3,
+                                   BindTexture{sotc::RenderStage::fragment, 6, 0});
+    check_error("texture binding requires active pipeline", texture_before_pipeline,
+                "BindTexture requires");
 
     std::vector<RenderOp> unclosed = {BeginPass{1, 2}};
     check_error("unclosed pass rejected", unclosed, "unclosed pass");

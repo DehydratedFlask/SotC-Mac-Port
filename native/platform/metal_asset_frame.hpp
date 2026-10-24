@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -46,15 +47,39 @@ static_assert(offsetof(DefaultShaderCase, barycentric) == 272);
 
 [[nodiscard]] DefaultShaderCase make_default_shader_case() noexcept;
 
+enum class AssetTextureFilter : std::uint8_t { nearest, linear };
+enum class AssetTextureAddressMode : std::uint8_t { clamp_to_edge, repeat, mirror_repeat };
+
+// Explicit import-time harness texture input: one RGBA8Unorm 2D mip level. It does not describe a
+// retail texture format or recovered game binding.
+struct AssetTexture2D {
+    std::uint32_t width = 0;
+    std::uint32_t height = 0;
+    std::span<const std::uint8_t> rgba8;
+};
+
+// Explicit harness sampler settings. No mip filtering is used by this one-level texture slice.
+struct AssetSamplerInput {
+    AssetTextureFilter min_filter = AssetTextureFilter::nearest;
+    AssetTextureFilter mag_filter = AssetTextureFilter::nearest;
+    AssetTextureAddressMode address_u = AssetTextureAddressMode::clamp_to_edge;
+    AssetTextureAddressMode address_v = AssetTextureAddressMode::clamp_to_edge;
+};
+
 struct AssetMeshDraw {
     std::span<const CmshPosition> positions;
     std::span<const std::uint16_t> indices;
     DefaultShaderCase shader;
+    std::optional<AssetTexture2D> fragment_texture0 = std::nullopt;
+    std::optional<AssetSamplerInput> fragment_sampler0 = std::nullopt;
 };
 
 struct MetalAssetFrameConfig {
     std::uint32_t width = 256;
     std::uint32_t height = 256;
+    // Declares the caller-supplied MSL resource ABI. This fixture currently supports one paired
+    // fragment texture/sampler binding at slot 0 when enabled.
+    bool fragment_texture_sampler_slot0 = false;
 };
 
 struct MetalAssetFrameResult {

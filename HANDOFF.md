@@ -1,5 +1,55 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-24 16:37 CDT — GPU-03 texture/sampler fixture completed and rechecked
+
+- Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`. Task
+  `GPU-03-RENDEROPS-TEXTURE-SAMPLER-01` is `FIXTURE_VERIFIED`: one successful implementation, two
+  corrected compile-only harness checks, zero failed shader/resource semantic hypotheses. Parent
+  `GPU-03-RENDEROPS-ASSET-FRAME-01` remains ACTIVE; G3 remains PARTIAL.
+- The user-selected default material shader pair was already implemented and independently verified
+  in E627 before this task. E632/E633 cover its synthetic direct-Metal geometry paths. This task adds
+  typed `BindTexture`/`BindSampler` host-handle operations and a harness input for a single RGBA8Unorm
+  2D texture plus explicit min/mag filter and U/V address mode, bound to fragment slot 0. The renderer
+  rejects mismatched/missing resources, bad dimensions/byte counts, and unknown sampler modes.
+- Synthetic test MSL sampled a 2x1 RGBA8 texture with linear filtering and clamp-to-edge at the known
+  midpoint; the center readback was exactly `(50,70,90,255)`. Repeat RGBA/PNG output matched byte for
+  byte, changing one texture texel changed the sampled color and PNG, and missing/truncated/unknown
+  sampler inputs failed visibly. Metal API Validation and GPU Validation both logged enabled; no
+  validation diagnostic appeared. This is host binding evidence only: `gcn_to_msl.py` still rejects
+  WQM/MIMG, and no `image_sample` lowering or AMD/Metal derivative equivalence is claimed.
+- Independent review found texture descriptors could be autoreleased outside a pool in the CLI harness.
+  `make_texture_objects()` now creates them inside `@autoreleasepool`; focused build/CTest and the full
+  suite were rerun afterward. The reviewer found no further actionable issue.
+- Two early build checks failed at the harness boundary and were corrected: the first test revision
+  included an Objective-C Metal header from a C++ translation unit; the second exposed
+  `-Wmissing-field-initializers` for new optional draw inputs. The exact command and diagnoses are in
+  `local/orchestrator/gpu03-texture-sampler/first-build-failure.txt`. The corrected target build then
+  passed; there was no third failed attempt or shader/resource semantic hypothesis failure.
+- Post-review verification: configure exit 0; focused target build exit 0; `render_ops` +
+  `metal_texture_binding` CTest **2/2**; full build exit 0; full CTest **392/392**;
+  `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` **476 passed / 0 skipped /
+  0 failed**. Logs are under `local/orchestrator/gpu03-texture-sampler/post-review-*`.
+- Trail was rebuilt with the existing `scripts`, `tools`, and `reference` scopes plus `native`,
+  `launcher`, and `tests`. `trail build --check` passed with **8,306** wiring nodes, and its file API
+  returned the fixture's `main`. The deep meaning tier remains unbuilt. `python3 scripts/project_index.py`
+  indexed **9,043** folders. Staged publication path audit passed with **14 paths**; full path audit
+  passed with **2,751 paths**; commit-attribution audit passed for the current
+  `origin/cursor/init-hash-551140-9dfc..HEAD` range. These are the final pre-commit audit results.
+- Files changed: `native/CMakeLists.txt`, `native/platform/{render_ops.hpp,render_ops.cpp,
+  metal_asset_frame.hpp,metal_asset_frame.mm}`, `native/tests/test_render_ops.cpp`, new
+  `native/tests/test_metal_texture_binding.cpp`, `docs/TASKS.md`, `docs/EVIDENCE.md`,
+  `docs/METAL_FRAME_PATH.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, this HANDOFF, and
+  `docs/checkpoints/2026-10-24-gpu03-texture-sampler-complete.md`. No package/dependency was installed.
+- Remaining risks and boundaries: texture resource data is explicit one-mip RGBA8Unorm harness input;
+  retail texture format/tiling, logo material texture relationship, descriptor values, sampler state,
+  coordinates/attribute ABI, and AMD WQM to Metal derivative equivalence remain unknown. No original
+  asset bytes were read; real `.cmsh`, NRM0 and screenshot-seam choices remain open. No game frame,
+  boot, audio or saving claim is made.
+- Next exact action: inspect the final staged diff, commit as Johnny Wang without Claude or Anthropic
+  trailers, push `cursor/init-hash-551140-9dfc`, then verify remote SHA and clean worktree.
+- Status: texture/sampler binding child task complete as `FIXTURE_VERIFIED`; parent GPU-03 ACTIVE;
+  G3 PARTIAL.
+
 ## 2026-10-24 16:21 CDT — GPU-03 texture/sampler binding fixture claimed
 
 - Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`, clean at claim time at

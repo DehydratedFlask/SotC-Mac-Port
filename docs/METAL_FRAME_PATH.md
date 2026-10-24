@@ -2,7 +2,8 @@
 
 Status: E627 verifies the selected default shader pair against an independent oracle; E632 and E633
 verify direct Metal rendering of synthetic geometry, including a synthetic parser-to-renderer flow;
-E634 statically characterizes the selected logo pixel shader's WQM and texture-sample instruction path.
+E634 statically characterizes the selected logo pixel shader's WQM and texture-sample instruction path;
+E635 verifies synthetic fragment texture/sampler host binding through direct Metal.
 The L1 asset-derived harness is still in progress: real `.cmsh` bytes have not gone through the native
 parser or Metal renderer, retail bindings remain unknown, and no game frame is established. **G3 is
 PARTIAL, not PASSED**, under the synthetic-scene rule in `docs/VALIDATION.md`.
@@ -399,6 +400,19 @@ harness" and the VALIDATION G3 row stays PARTIAL at best.
 - The harness must not pretend to be the engine: no fake `frame_num`, no invented scene, no synthetic
   fallback when decoding fails (fail visibly; the existing provider's synthetic pattern must not be the
   fallback).
+
+### 6.5 Synthetic texture/sampler binding slice
+
+E635 implements the first fragment resource binding slice in the typed RenderOp executor. A caller
+declares the MSL ABI in `MetalAssetFrameConfig` and supplies one RGBA8Unorm 2D texture, one mip level,
+and an explicit sampler for each draw. This fixture binds fragment texture and sampler slot 0 with
+host-assigned handles; its sampler exposes nearest/linear minification and magnification plus clamp,
+repeat, and mirror-repeat U/V addressing. Invalid or missing descriptors fail before issuing the draw.
+
+The self-contained synthetic MSL fixture proves resource upload/binding, filtering, deterministic
+readback, and fail-visible input checks. It does not lower the game's MIMG `image_sample`, prove AMD
+WQM/Metal helper-lane or derivative equivalence, establish a retail texture/attribute ABI, or read a
+game texture. G3 remains PARTIAL.
 
 ## 7. Ranked task cards
 

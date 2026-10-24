@@ -26,8 +26,6 @@ const char* render_op_name(UnsupportedRenderOpKind kind) noexcept {
         case UnsupportedRenderOpKind::set_blend_state: return "SetBlendState";
         case UnsupportedRenderOpKind::set_raster_state: return "SetRasterState";
         case UnsupportedRenderOpKind::set_stencil_state: return "SetStencilState";
-        case UnsupportedRenderOpKind::bind_texture: return "BindTexture";
-        case UnsupportedRenderOpKind::bind_sampler: return "BindSampler";
         case UnsupportedRenderOpKind::draw_index_auto: return "DrawIndexAuto";
         case UnsupportedRenderOpKind::dispatch: return "Dispatch";
         case UnsupportedRenderOpKind::present: return "Present";
@@ -133,6 +131,24 @@ RenderOpValidation validate_render_ops(std::span<const RenderOp> operations) {
                 return failure(index, "BindConstants stage is invalid");
             }
             if (constants->stage == RenderStage::fragment) has_fragment_constants = true;
+            continue;
+        }
+
+        if (const auto* texture = std::get_if<BindTexture>(&operation)) {
+            if (!has_pipeline || texture->texture == kInvalidRenderResource ||
+                static_cast<std::uint8_t>(texture->stage) >
+                    static_cast<std::uint8_t>(RenderStage::fragment)) {
+                return failure(index, "BindTexture requires an active pipeline, stage, and host handle");
+            }
+            continue;
+        }
+
+        if (const auto* sampler = std::get_if<BindSampler>(&operation)) {
+            if (!has_pipeline || sampler->sampler == kInvalidRenderResource ||
+                static_cast<std::uint8_t>(sampler->stage) >
+                    static_cast<std::uint8_t>(RenderStage::fragment)) {
+                return failure(index, "BindSampler requires an active pipeline, stage, and host handle");
+            }
             continue;
         }
 
