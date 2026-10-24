@@ -1948,6 +1948,12 @@ target_link_libraries(test_metal_capture sotc_metal sotc_core)
 add_test(NAME metal_capture COMMAND test_metal_capture)
 set_tests_properties(metal_capture PROPERTIES SKIP_RETURN_CODE 77)
 
+# GPU-03-CMSH-RAW-POSIDX-01: raw POS0 float3 / U16 index subset for asset-derived frames.
+add_library(sotc_cmsh_mesh STATIC platform/cmsh_mesh.cpp)
+add_executable(test_cmsh_mesh tests/test_cmsh_mesh.cpp)
+target_link_libraries(test_cmsh_mesh PRIVATE sotc_cmsh_mesh)
+add_test(NAME cmsh_mesh COMMAND test_cmsh_mesh)
+
 # --- APP-01-SOCGAMECORE-EXE-01: native SoCGameCore auxiliary executable (protocol v1) -----------
 # One JSON object per line on stdout; exit codes 0/2/3/4/5. Links the versioned ABI and the core.
 add_library(soc_core_status_json STATIC app/core_status_json.cpp)

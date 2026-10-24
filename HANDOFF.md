@@ -1,5 +1,38 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-24 15:30 CDT — GPU-03 native mesh reader integration checkpoint
+
+- Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`. Parent task
+  `GPU-03-RENDEROPS-ASSET-FRAME-01` remains ACTIVE at attempt 0. The parser lane
+  `GPU-03-CMSH-RAW-POSIDX-01` is complete at `FIXTURE_VERIFIED`.
+- User direction: prioritize the asset-derived Metal slice and implement the default shader pair
+  first. Round-30 source `9565322` already contains the offline default pair. This checkpoint adds
+  only the raw POS0/index parser and its project CMake target; it does not implement Metal draws.
+- Files: `native/platform/cmsh_mesh.{hpp,cpp}`, `native/tests/test_cmsh_mesh.cpp`, and the
+  `sotc_cmsh_mesh` / `test_cmsh_mesh` entries in `native/CMakeLists.txt`. Evidence/checkpoint records
+  are E630 and `docs/checkpoints/2026-10-24-gpu03-cmsh-reader.md`.
+- Worker fixture compile and executable both exited 0. Root configure, target build, and focused
+  CTest exited 0. Full native configure/build/CTest also exited 0: 389/389 tests. Lift checkers:
+  476 passed, 0 skipped, 0 failed. Final staged path audit passed 10 paths; full path audit passed
+  2,738 paths; pre-commit attribution audit passed. `python3 scripts/project_index.py` indexed
+  9,020 folders; `trail build --check`
+  found all 8,231 wiring nodes in sync, and `git diff --check` passed. Logs are in
+  `local/orchestrator/gpu03-r31/verification/` and `cmsh-native/`.
+- Evidence boundary: E629's existing probe outputs remain the only real-member evidence. The C++
+  parser was exercised with synthetic bytes only; POS0 format code 2 is not confirmed on the actual
+  sample bytes. No NRM0 decode, Metal frame, mutation result, G3 pass, or game behavior is claimed.
+  A temporary private raw export was removed before parser use; the original archives were not
+  modified.
+- Remaining risks: native parser behavior on real members is intentionally NOT RUN; shader normals
+  and the screenshot seam's harness frame label are awaiting the user's choices. Metal draw/depth,
+  independent pixel checks and mutation sensitivity remain NOT RUN.
+- Next exact action: implement the typed RenderOp subset and direct-Metal indexed/depth backend,
+  using a per-vertex 288 B harness `ShaderCase` from the default MSL. Keep original member data and
+  generated MSL private under `local/`; keep the log/artifact label `asset-derived harness` and G3
+  at PARTIAL at best.
+- Status: parser subtask `FIXTURE_VERIFIED`; parent GPU-03 ACTIVE, 0 failed implementation
+  hypotheses. All game acceptance gates remain NOT RUN.
+
 ## 2026-10-24 15:17 CDT — GPU-03 raw-mesh and capture-seam checkpoint
 
 - Integrator: Codex `/root`. Active branch `cursor/init-hash-551140-9dfc` contains the published
