@@ -13,6 +13,37 @@
   pixel-shader WQM/MIMG, real texture bindings, and the unresolved `.cmsh`/NRM0/screenshot choices out
   of that task.
 
+## 2026-10-24 16:40 CDT — GPU-02 logo vertex fetch lowering claimed
+
+- Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`, starting revision
+  `73d485b8abd037a4bbde479c8ab73317c221d195`. Task
+  `GPU-02-GCN-LOGO-VS-FETCH-01` is ACTIVE, attempt 0, zero failed semantic hypotheses.
+- Scope: extend the offline MUBUF lowerer for explicit float2/float3/float4 formatted vertex streams;
+  add synthetic component-count/binding tests; lower and Metal-execute the pinned 140-byte logo vertex
+  program using a private, explicitly synthetic input ABI and compare vertex outputs to a separate
+  CPU oracle. Exact program digest `430f9adbb07d387c0b2b877b98300396f183faeab7f75cba0c9b0c67ada20c0c`.
+- The pinned logo VS has two `buffer_load_format_xy` and one `buffer_load_format_xyzw`; the current
+  lowerer accepts only `explicit_float3`. This is a one-vertex-per-case, straight-line offline lowering
+  task. The private fixture is `local/fixtures/gpu-r30/logo-vs.bin`; no game bytes, per-asset
+  instruction table, or generated MSL may enter the public tree.
+- Preflight replay: `python3 -I local/orchestrator/gpu02-logo-vs-fetch/claim_replay.py` now exits 0,
+  confirms the exact 140 B program hash/25 instructions/zero unknowns/exact end, and reports MUBUF
+  code offsets `0x34` XY, `0x3c` XY, `0x44` XYZW. Its log and payload-free report are under
+  `local/orchestrator/gpu02-logo-vs-fetch/`. The first replay printed all code offsets as `0x0` because
+  a report key named `offset` overwrote the instruction offset with the immediate value; exit was 0,
+  so the mismatch was caught by inspection, not an assertion. The private failure note records this;
+  the corrected report uses `instruction_offset` and asserts the expected offsets. No shader-semantic
+  hypothesis failed and task attempt count remains 0.
+- Claim-doc checks: `python3 scripts/project_index.py` indexed 9,043 folders; staged publish-path
+  audit passed 6 paths; full publish-path audit passed 2,752 paths; attribution audit passed.
+  Exact audit logs are in `local/orchestrator/gpu02-logo-vs-fetch/`.
+- Explicit boundary: the fixture ABI supplies float stream fields only; it does not recover retail
+  descriptors, semantic attribute names, or PS4 interpolation/SPI state. No logo pixel shader, WQM,
+  MIMG, texture, original mesh, `.cmsh`/NRM0, or screenshot seam is part of this task. G3 remains PARTIAL.
+- Next exact action: implement and test only the lowerer/test-file scope after this claim is published;
+  root independently prepares the private logo-VS manifest, CPU oracle, Metal replay, and review. Workers
+  do not commit or push.
+
 ## 2026-10-24 16:37 CDT — GPU-03 texture/sampler fixture completed and rechecked
 
 - Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`. Task

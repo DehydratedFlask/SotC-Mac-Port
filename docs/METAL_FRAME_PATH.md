@@ -414,6 +414,17 @@ readback, and fail-visible input checks. It does not lower the game's MIMG `imag
 WQM/Metal helper-lane or derivative equivalence, establish a retail texture/attribute ABI, or read a
 game texture. G3 remains PARTIAL.
 
+### 6.6 Logo vertex formatted-fetch lowering
+
+`GPU-02-GCN-LOGO-VS-FETCH-01` extends the offline per-lane lowerer to the pinned logo vertex
+program's `buffer_load_format_xy` and `buffer_load_format_xyzw` fetches. MUBUF descriptor identity,
+per-vertex indexing, fetch width, and destination-register writes must match an explicit harness ABI;
+format mismatches and unbound streams fail conversion. Tests exercise synthetic float2/float3/float4
+stream widths, then replay the pinned private logo-VS span with synthetic stream fields, an independent
+CPU oracle, and the Metal harness. The ABI is a test input and does not recover retail descriptor or
+attribute semantics. This stops before the logo pixel shader: WQM, MIMG sampling, texture binding,
+real mesh geometry, NRM0, and screenshot attachment remain outside scope. G3 remains PARTIAL.
+
 ## 7. Ranked task cards
 
 | # | ID | Scope | Exit check | Depends on |
