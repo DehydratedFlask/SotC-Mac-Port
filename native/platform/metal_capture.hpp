@@ -42,6 +42,12 @@ struct MetalCaptureResult {
     std::string error;
 };
 
+// Shared ImageIO encoder for tightly packed RGBA8 results produced by other direct-Metal passes.
+// This writes only the PNG byte vector; it does not fabricate an engine frame number or sink path.
+[[nodiscard]] bool metal_encode_rgba8_png(const std::vector<std::uint8_t>& rgba8,
+                                          std::uint32_t width, std::uint32_t height,
+                                          std::vector<std::uint8_t>& png, std::string& error);
+
 // Exact error text used when the host exposes no Metal device. The fixture treats only this case
 // as SKIP (return code 77); a shader/pipeline/render/readback/PNG failure must fail.
 inline constexpr char kMetalCaptureNoDeviceError[] = "no Metal device available in this environment";

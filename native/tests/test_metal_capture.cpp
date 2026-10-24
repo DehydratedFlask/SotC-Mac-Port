@@ -13,6 +13,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
@@ -216,6 +217,31 @@ void dump_png_if_requested(const std::vector<std::uint8_t>& png) {
 }  // namespace
 
 int main() {
+    // ImageIO must reject malformed public encoder inputs before multiplying dimensions or
+    // creating provider/image objects. The output buffer is cleared on every failure.
+    {
+        const std::vector<std::uint8_t> empty_rgba;
+        std::vector<std::uint8_t> png{0xAA};
+        std::string encode_error;
+        CHECK(!metal_encode_rgba8_png(empty_rgba, 0, 1, png, encode_error));
+        CHECK(encode_error == "invalid RGBA8 PNG dimensions");
+        CHECK(png.empty());
+
+        png = {0xAA};
+        encode_error.clear();
+        CHECK(!metal_encode_rgba8_png(empty_rgba, std::numeric_limits<std::uint32_t>::max(),
+                                      std::numeric_limits<std::uint32_t>::max(), png,
+                                      encode_error));
+        CHECK(encode_error == "RGBA8 PNG image size overflow");
+        CHECK(png.empty());
+
+        png = {0xAA};
+        encode_error.clear();
+        CHECK(!metal_encode_rgba8_png(empty_rgba, 1, 1, png, encode_error));
+        CHECK(encode_error == "rgba8 buffer size mismatch");
+        CHECK(png.empty());
+    }
+
     // 1. Invalid sizes are hard errors, never a skip.
     {
         std::string error;

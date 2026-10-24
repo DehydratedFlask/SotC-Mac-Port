@@ -11,6 +11,7 @@
 #include "platform/metal_capture.hpp"
 
 #include <cstddef>
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
@@ -75,8 +76,23 @@ std::string capture_size_text(std::uint32_t width, std::uint32_t height) {
 
 bool encode_png_rgba8(const std::vector<std::uint8_t>& rgba8, std::uint32_t width,
                       std::uint32_t height, std::vector<std::uint8_t>& png, std::string& error) {
+    png.clear();
+    error.clear();
+    if (width == 0 || height == 0) {
+        error = "invalid RGBA8 PNG dimensions";
+        return false;
+    }
+    if (static_cast<std::size_t>(width) > std::numeric_limits<std::size_t>::max() / 4) {
+        error = "RGBA8 PNG row size overflow";
+        return false;
+    }
     const std::size_t tight_row = static_cast<std::size_t>(width) * 4;
-    if (rgba8.size() != tight_row * height) {
+    if (static_cast<std::size_t>(height) > std::numeric_limits<std::size_t>::max() / tight_row) {
+        error = "RGBA8 PNG image size overflow";
+        return false;
+    }
+    const std::size_t expected_size = tight_row * static_cast<std::size_t>(height);
+    if (rgba8.size() != expected_size) {
         error = "rgba8 buffer size mismatch";
         return false;
     }
@@ -257,6 +273,12 @@ private:
 };
 
 }  // namespace
+
+bool metal_encode_rgba8_png(const std::vector<std::uint8_t>& rgba8, std::uint32_t width,
+                            std::uint32_t height, std::vector<std::uint8_t>& png,
+                            std::string& error) {
+    return encode_png_rgba8(rgba8, width, height, png, error);
+}
 
 std::unique_ptr<MetalCapture> MetalCapture::create(const MetalCaptureConfig& config,
                                                    std::string& error) {

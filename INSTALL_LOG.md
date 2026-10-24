@@ -455,3 +455,37 @@ exit0 in3.807s; full argv/provenance retained in local/validation/task2-release.
 330s import timeout and empty evidence export retained as limitations. Audio worker reused
 Python stdlib and Xcode llvm-objdump found by xcrun;20 synthetic tests and two deterministic
 private analyses pass. Exact commands/tool versions/evidence paths in worker reports/checkpoint.
+
+## 2026-10-24 15:53 CDT — GPU-03 direct-Metal synthetic-frame verification
+
+No install, download, or dependency change. Reused Apple clang 21.0.0 targeting arm64,
+CMake 4.4.4, Ninja 1.13.2, Xcode 27.1 (27A9275), macOS 27.0.1 (26A434), and the Apple M4 Pro.
+Purpose: build and verify the direct-Metal typed-op executor, its synthetic indexed/depth frame,
+and checked ImageIO PNG path. CMake registration enables Metal API and GPU validation for the
+fixture test. Exact commands from the workspace root:
+
+```sh
+cmake -S native -B local/build/orch-r22
+cmake --build local/build/orch-r22 -j 12
+ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure
+ctest --test-dir local/build/orch-r22 -V -R '^metal_asset_frame$'
+ctest --test-dir local/build/orch-r22 -R '^(metal_capture|metal_asset_frame)$' -j 2 --output-on-failure
+SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh
+python3 scripts/project_index.py
+trail build --check
+trail build
+trail build --check
+trail grep 'MetalAssetFrameRenderer'
+```
+
+All exited 0: CTest 391/391 and lift checkers 476 passed, 0 skipped, 0 failed. Complete logs are
+under `local/orchestrator/gpu03-r31/metal-frame/`; generated MSL, PNG and build products stay in
+`local/` (MSL SHA-256 `5524537e36b2481798abe5bf6c311e37082aed26b136c4590f7d685e671a455e`, PNG
+SHA-256 `35039e0fe8a9700ccfbe8bb66181426c16ea41849677633cea81ac99c0d21a94`). No installed tool or
+system configuration was changed; the removal boundary is limited to these task-local build and
+evidence artifacts. Preserve original game archives and extracted inputs.
+Trail 0.23.0 was reused with no upgrade. The first `trail build --check` reported `STALE` for
+the four edited test nodes and one new `fragment_classes_match` node; `trail build` regenerated
+8,292 wiring nodes and 11,219 edges, the next check passed, and `trail grep` found the new renderer
+API in its header and test. The graph cache is the existing git-ignored `graft/` directory; no
+downloaded tool or cache file is being published.

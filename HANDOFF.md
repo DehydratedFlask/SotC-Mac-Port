@@ -1,5 +1,57 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-24 15:53 CDT — GPU-03 direct-Metal synthetic-frame checkpoint
+
+- Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`. Previous published
+  checkpoint is `3f2f51b0b88186c4f0247f60b7f783fe24b5fee8` (typed RenderOp API); this checkpoint's
+  source/doc changes are being prepared for an owner-authored commit. The author identity is Johnny
+  Wang; no Claude/Anthropic co-author trailer will be added.
+- `GPU-03-METAL-SYNTHETIC-FRAME-01` is `FIXTURE_VERIFIED`. Parent
+  `GPU-03-RENDEROPS-ASSET-FRAME-01` remains `ACTIVE`, 0 failed implementation hypotheses. E632
+  records an Objective-C++ direct-Metal executor for the supported typed-op subset and a synthetic
+  quad/triangle fixture. The default-pair MSL input is pinned to SHA-256
+  `5524537e36b2481798abe5bf6c311e37082aed26b136c4590f7d685e671a455e` (E627).
+- Files changed: `native/CMakeLists.txt`, `native/platform/metal_capture.{hpp,mm}`,
+  `native/platform/metal_asset_frame.{hpp,mm}`, `native/tests/test_metal_capture.cpp`,
+  `native/tests/test_metal_asset_frame.cpp`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`,
+  `docs/FOLDERS.md`, `docs/checkpoints/2026-10-24-gpu03-metal-synthetic-frame.md`, `INSTALL_LOG.md`,
+  and this file.
+- Exact root commands: `cmake -S native -B local/build/orch-r22`; `cmake --build
+  local/build/orch-r22 -j 12`; `ctest --test-dir local/build/orch-r22 -j 12
+  --output-on-failure`; `ctest --test-dir local/build/orch-r22 -V -R '^metal_asset_frame$'`;
+  `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`. All exited 0. CTest
+  passed 391/391; lift checkers passed 476, 0 skipped and 0 failed. Private logs are under
+  `local/orchestrator/gpu03-r31/metal-frame/`.
+- Metal API and GPU validation both logged enabled. The private 256x256 PNG is 6,395 bytes with
+  SHA-256 `35039e0fe8a9700ccfbe8bb66181426c16ea41849677633cea81ac99c0d21a94`; CPU projection
+  reports 33,856 covered pixels, 0 y-down silhouette errors, 0 y-down per-pixel draw/depth-class
+  errors, and 3,424 y-up per-pixel errors. Repeat RGBA/PNG output matches; test-input vertex, index,
+  and shader-constant mutations each change the PNG hash. No Metal validation error/fault diagnostic
+  appears in the verbose test log.
+- Observation versus inference: the fixture uses hand-built geometry and an explicit encoded +Z
+  harness normal. It does not call `parse_cmsh_mesh`, read `cube_1m`/`cone` bytes, use `attach_screenshot`,
+  or represent a game frame. PNG output is a private direct test artifact. NRM0 semantics, real asset
+  reads, screenshot frame convention/seam, retail bindings, cold boot, game audio, real save/load and
+  G3 remain unresolved or `NOT RUN`. Existing real-mesh evidence stays limited to E629 hashes/counts.
+- Toolchain: Apple M4 Pro / arm64, macOS 27.0.1 (26A434), Xcode 27.1 (27A9275), Apple clang
+  21.0.0, CMake 4.4.4 and Ninja 1.13.2. No tool/dependency was installed or downloaded; generated
+  MSL, PNG, logs and build products remain under `local/`.
+- `python3 scripts/project_index.py` indexed 9,038 folders. Trail initially reported stale edited
+  test nodes; `trail build` rebuilt the source wiring graph and the following `trail build --check`
+  passed with 8,292 nodes. `trail grep 'MetalAssetFrameRenderer'` found the new API in the header and
+  test. The deep meaning layer remains unbuilt.
+- Publication checks: staged path audit passed 14 paths; full path audit passed 2,746 paths;
+  `python3 -I scripts/check_commit_attribution.py` passed. Effective author is Johnny Wang
+  `<dehydratedflask@users.noreply.github.com>`. `git fetch origin cursor/init-hash-551140-9dfc`
+  found no divergence (0 ahead / 0 behind). Logs for the final pre-push replay are being saved under
+  `local/orchestrator/gpu03-r31/metal-frame/`.
+- Next exact action: repeat pre-push path/attribution checks after this handoff update, create the
+  owner-authored commit without a Claude/Anthropic trailer, and push `cursor/init-hash-551140-9dfc`.
+  Then apply the user's pending real-mesh, NRM0 and screenshot-seam choices before claiming L1
+  asset-derived geometry. Do not promote G3.
+- Status: synthetic direct-Metal subtask `FIXTURE_VERIFIED`; parent GPU-03 `ACTIVE`; overall game
+  acceptance remains incomplete.
+
 ## 2026-10-24 15:37 CDT — GPU-03 typed RenderOp API checkpoint
 
 - Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`. The prior native mesh
