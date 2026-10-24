@@ -1,7 +1,8 @@
 # SoC Mac Native — current handoff
 
-Updated: 2026-10-23 (America/Chicago). Integrator: OpenCode orchestrator (goal resumed by explicit
-user command). Branch `cursor/init-hash-551140-9dfc`; round-26 tip is the commit carrying this file; round-25 tips `f394fc8`/`1eebca2`/`12f0ca2`/`c01f774`, round-24 `9a85650`.
+Updated: 2026-10-24 (America/Chicago). Integrator: OpenCode orchestrator (goal resumed by explicit
+user command). Branch `cursor/init-hash-551140-9dfc`; round-28 code tip `344efa8`, round-27 code/docs tips
+`991b7da`/`c61d2ca`, round-25 tips `f394fc8`/`1eebca2`/`12f0ca2`/`c01f774`, round-24 `9a85650`.
 Older rounds, the history-rewrite record and the full pre-tidy handoff are archived verbatim in
 [docs/checkpoints/HANDOFF-archive-2026-10-23.md](docs/checkpoints/HANDOFF-archive-2026-10-23.md).
 The rounds that follow the archive are in chronological order.
