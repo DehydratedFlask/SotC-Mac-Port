@@ -64,6 +64,10 @@
   `python3 -I scripts/audit_publish_paths.py` passed with 14 staged paths;
   `python3 -I scripts/audit_publish_paths.py --all` passed with 2,751 paths; commit-attribution audit
   passed for `origin/cursor/init-hash-551140-9dfc..HEAD`.
+- Published as `17844d8fad183554f75214dc18d391fdb95eacf3` on
+  `cursor/init-hash-551140-9dfc`; `git ls-remote` matched local HEAD and the worktree was clean.
+  Author/committer are Johnny Wang, and post-push attribution audit passed. Exact output:
+  `local/orchestrator/gpu03-texture-sampler/post-push-verify.log`.
 
 ## Evidence boundary and next action
 
@@ -73,5 +77,6 @@ Retail texture formats/tiling, the `logo.cmat` texture relationship, live descri
 state, texture coordinate/attribute mapping, and exact AMD-to-Metal derivative equivalence remain UNK.
 No real archive bytes or game screen were processed; no boot/audio/save or G3 PASS claim is made.
 
-Next exact action: inspect the final staged diff, commit as Johnny Wang without Claude/Anthropic
-coauthors, push the active branch, and verify remote head and clean worktree.
+Next exact action: read the current shader handoff/index/roadmap/task registry/lowerer specification,
+then claim a bounded offline logo vertex-shader fetch-format lowering task. Keep pixel-shader WQM/MIMG,
+real game bindings, `.cmsh`/NRM0 interpretation, and screenshot attachment outside that task.

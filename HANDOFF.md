@@ -1,5 +1,18 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-24 16:38 CDT — E635 publication verified
+
+- The synthetic texture/sampler fixture is published on `cursor/init-hash-551140-9dfc` as
+  `17844d8fad183554f75214dc18d391fdb95eacf3`. `git ls-remote` matches local HEAD; worktree is clean.
+- Commit author and committer are both Johnny Wang. The commit message contains no Claude, Anthropic,
+  or co-author trailer; post-push `check_commit_attribution.py` passed. Exact output is in
+  `local/orchestrator/gpu03-texture-sampler/post-push-verify.log`.
+- The task remains `FIXTURE_VERIFIED`, not asset-derived or G3-passed. G3 remains PARTIAL.
+- Next exact action: read the current GPU shader handoff, index, roadmap, task registry and lowerer
+  specification, then claim a bounded offline logo vertex-shader fetch-format lowering task. Keep
+  pixel-shader WQM/MIMG, real texture bindings, and the unresolved `.cmsh`/NRM0/screenshot choices out
+  of that task.
+
 ## 2026-10-24 16:37 CDT — GPU-03 texture/sampler fixture completed and rechecked
 
 - Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`. Task
@@ -45,8 +58,7 @@
   coordinates/attribute ABI, and AMD WQM to Metal derivative equivalence remain unknown. No original
   asset bytes were read; real `.cmsh`, NRM0 and screenshot-seam choices remain open. No game frame,
   boot, audio or saving claim is made.
-- Next exact action: inspect the final staged diff, commit as Johnny Wang without Claude or Anthropic
-  trailers, push `cursor/init-hash-551140-9dfc`, then verify remote SHA and clean worktree.
+- Publication verification is recorded in the 16:38 CDT checkpoint above.
 - Status: texture/sampler binding child task complete as `FIXTURE_VERIFIED`; parent GPU-03 ACTIVE;
   G3 PARTIAL.
 
