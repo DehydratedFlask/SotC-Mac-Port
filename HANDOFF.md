@@ -1,5 +1,33 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-24 15:37 CDT — GPU-03 typed RenderOp API checkpoint
+
+- Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`. The prior native mesh
+  parser checkpoint is published as `fa329cd3382b7aaf968ab86268366cc6033f8f4f`; local, tracking and
+  origin refs matched. That owner-authored commit has no Claude/Anthropic co-author trailer.
+- Task `GPU-03-RENDEROPS-TYPED-API-01` is `FIXTURE_VERIFIED`; parent
+  `GPU-03-RENDEROPS-ASSET-FRAME-01` remains ACTIVE at attempt 0. Typed operations now describe
+  pass, viewport, depth, pipeline, vertex/constants/index streams and indexed draws with host IDs;
+  unsupported operations and invalid state/order fail visibly.
+- Files: `native/platform/render_ops.{hpp,cpp}`, `native/tests/test_render_ops.cpp` and the CMake
+  target. E631 and `docs/checkpoints/2026-10-24-gpu03-renderops-api.md` hold the checkpoint.
+- Focused CTest passed 1/1. Full configure/build/CTest passed 390/390; lift checkers passed 476,
+  with 0 skipped and 0 failed. Logs: `local/orchestrator/gpu03-r31/render-ops/` and
+  `local/orchestrator/gpu03-r31/verification/`.
+- `python3 scripts/project_index.py` indexed 9,028 folders; `trail build --check` found all 8,258
+  wiring nodes in sync; `git diff --check` passed.
+- Final staged path audit passed 10 paths; the full path audit passed 2,742 paths; pre-commit
+  attribution passed. These checks are captured under `local/orchestrator/gpu03-r31/verification/`.
+- The typed contract is structural only: no Metal executor, asset draw, PNG hash, CPU silhouette or
+  depth comparison, mutation run, validation-layer result, or G3 claim exists. Real `.cmsh` bytes
+  remain limited to the E629 probe hashes/counts while a scope question is pending; NRM0 and the
+  screenshot frame label are unresolved. G3 remains PARTIAL at best.
+- Next exact action: implement a direct-Metal executor for the supported typed ops and a private
+  asset-derived harness test, respecting the user's evidence boundary and harness-input choices.
+  Continue to exclude original binaries and generated shader/mesh data from publication.
+- Status: typed API `FIXTURE_VERIFIED`; parent GPU-03 ACTIVE, 0 failed implementation hypotheses;
+  cold boot, game audio and real save/load remain NOT RUN.
+
 ## 2026-10-24 15:30 CDT — GPU-03 native mesh reader integration checkpoint
 
 - Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`. Parent task

@@ -1954,6 +1954,12 @@ add_executable(test_cmsh_mesh tests/test_cmsh_mesh.cpp)
 target_link_libraries(test_cmsh_mesh PRIVATE sotc_cmsh_mesh)
 add_test(NAME cmsh_mesh COMMAND test_cmsh_mesh)
 
+# GPU-03-RENDEROPS-ASSET-FRAME-01: host-handle typed render command list and fail-visible validation.
+add_library(sotc_render_ops STATIC platform/render_ops.cpp)
+add_executable(test_render_ops tests/test_render_ops.cpp)
+target_link_libraries(test_render_ops PRIVATE sotc_render_ops)
+add_test(NAME render_ops COMMAND test_render_ops)
+
 # --- APP-01-SOCGAMECORE-EXE-01: native SoCGameCore auxiliary executable (protocol v1) -----------
 # One JSON object per line on stdout; exit codes 0/2/3/4/5. Links the versioned ABI and the core.
 add_library(soc_core_status_json STATIC app/core_status_json.cpp)
