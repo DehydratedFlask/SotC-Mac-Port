@@ -293,3 +293,12 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Camera root registration (2026-10-23)](checkpoints/2026-10-23-camera-root-registration.md) | +0x10 is a pass-through, no camera attach; E605 |
 | [Owner dtor a5cb30 (2026-10-23)](checkpoints/2026-10-23-owner-dtor-a5cb30.md) | 594 B row-9 teardown; E607 |
 | [Save metadata (2026-10-23)](checkpoints/2026-10-23-save-metadata.md) | 0x530 block, USR-META, delete; E606 |
+| [Ctor coverage batch (2026-10-23)](checkpoints/2026-10-23-ctor-coverage-batch.md) | 308/573 registered, first gap 296; E608 |
+| [SoCGameCore executable (2026-10-23)](checkpoints/2026-10-23-soc-game-core-executable.md) | arm64 core, protocol v1, no engine; E609 |
+| [Metal capture provider (2026-10-23)](checkpoints/2026-10-23-metal-capture-provider.md) | offscreen RGBA/PNG, synthetic; E610 |
+| [Owner row 14 a597d0 (2026-10-23)](checkpoints/2026-10-23-owner-row14-a597d0.md) | 0x202 B row-14 ctor; E611 |
+| [Owner row 21 4a690 (2026-10-23)](checkpoints/2026-10-23-owner-row21-4a690.md) | queue drain into an ordered tree; E612 |
+| [Launcher process client (2026-10-23)](checkpoints/2026-10-23-launcher-process-client.md) | locator + v1 client + factory; E613 |
+| [Launcher bundle with core (2026-10-24)](checkpoints/2026-10-23-launcher-bundle-core.md) | signed app with SoCGameCore; E614 |
+| [Save relaunch (2026-10-23)](checkpoints/2026-10-23-save-relaunch.md) | cross-process write/load/enumerate; E615 |
+| [Save acceptance tool (2026-10-23)](SAVE_ACCEPTANCE.md) | read-only SAV-04 inspector; E616/NOT RUN |

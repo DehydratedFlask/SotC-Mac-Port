@@ -8,15 +8,19 @@ The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **369/369** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **466 passed / 0 skipped / 0 failed** with
+- Full native suite: **381/381** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **470 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
   bytes are not semantics** — most of it is call-site pinning with callee hooks.
 - Publish gate: `python3 -I scripts/audit_publish_paths.py` and
   `python3 -I scripts/check_commit_attribution.py` both exit 0 at this tip.
-- **G1 PARTIAL. G2–G6 NOT RUN.** No boot, no game audio, no save/load, no Metal frame.
+- A native `SoCGameCore` arm64 executable now exists and reports typed readiness over protocol v1
+  (308/573 constructors, first gap 296). It has **no engine** and never reports running.
+- **G1 PARTIAL. G2–G6 NOT RUN.** No boot, no game audio, no save/load of retail data, no Metal game
+  frame. The Metal capture provider renders only a synthetic pattern; the save persistence proof
+  uses synthetic `ProgressV1` data.
 
 ## Housekeeping 2026-10-23 (no code change)
 
@@ -264,6 +268,39 @@ The rounds that follow the archive are in chronological order.
   unbound in this build, so the live pose remains blocked. `bpe::Camera`/`DebugCamera` were also
   recovered, and the program-header map was corrected (phdr 1 carries `.data.rel.ro`).
 
+## 2026-10-24 Orchestrator round 28 — SoCGameCore, Metal capture, owner rows, ctor coverage (E608–E617)
+
+- Agent: integrator plus seven workers (ctor coverage, SoCGameCore executable, Metal capture,
+  owner rows 14/21, launcher process client, startup-cliff analysis).
+- **E608** — constructor coverage: `recovered_constructors()` now registers **308/573** entries.
+  152 already-lifted `vec_*`/`leaf_*` modules are on the production path and index 95 (`0xd71f60`,
+  a 17-byte `vmovups` leaf) is lifted. `ctor_original_table` carries the 573 rows (backwards table)
+  and reports the first unrecovered index **296 / `0xb2b6b0`**; 265 `other`-class slots remain.
+- **E609** — native `SoCGameCore` arm64 executable with protocol v1 (`status`, `coverage`,
+  `validate`, `start`, `serve`). Status reports 308/573 and `run_ok=true`; `--start` exits 3 with
+  `SOTC_ERR_ENGINE_NOT_IMPLEMENTED`; a missing fixture is fail-visible at `0xe71990`; the serve
+  state after a refused start is `failed`, never `running`. API coverage now says startup/save
+  PARTIAL, engine/Metal/audio NOT_IMPLEMENTED, and the save row is no longer falsely “no path”.
+- **E610** — direct-Metal offscreen capture provider (`native/platform/metal_capture.{hpp,mm}`):
+  640x360 BGRA8 render, tight RGBA8 readback, ImageIO PNG (5,258 B, sha256 `e6a64e93…`), wired into
+  `attach_screenshot`. Synthetic MSL pattern only; **G3 NOT RUN**.
+- **E611/E612** — owner rows 14 (`0xa597d0`, 0x202 B, deque + 64-trip clear loop + 7-arg thread
+  frame) and 21 (`0x4a690`, 0x194 B, drains an intrusive queue into an ordered tree via
+  `insert_unique`). Both correct E570's summaries and carry 8-section fixtures + checkers.
+- **E613/E614** — launcher child-process client (`CoreLocator`, `ProcessCoreClient`,
+  `CoreClientFactory`) with 147 Swift tests and an opt-in real-core test; `package_launcher.sh` now
+  bundles a thin-arm64 `SoCGameCore` into a signed `.app` (artifact verified, Finder launch NOT RUN).
+- **E615** — cross-process save persistence: a slot written in one process is loaded and enumerated
+  in two fresh processes (`ProgressV1` + `USR-META`). Synthetic only; G2/G5 NOT RUN.
+- **E616** — SAV-04 acceptance harness (`tools/dev/save_inspect.py`, `docs/SAVE_ACCEPTANCE.md`).
+  **NOT RUN**: no user-owned PS4 save exists in the workspace.
+- **E617** — startup cliff 296 is a 12-byte thunk into a 67 B TSC-timer constructor
+  (`sceKernelGetTscFrequency`), tooling/debug and inert in this image; 297 is a 400 x 0x118 record
+  initializer, 300 an inert `__cxa_atexit`, 301 the `rumbleEnabled` ConCmd. Proposed slice
+  296+297+300.
+- Verification at this tip: ctest **381/381**, checker sweep **470/0/0**, publish and attribution
+  audits exit 0; Swift **147** tests.
+
 ## Settled decisions (do not re-ask)
 
 - `StartupState` RAII ownership for the slot-10 mutex — implemented.
@@ -282,32 +319,35 @@ The rounds that follow the archive are in chronological order.
 
 ## Next exact work
 
-1. **Startup continuation past slot 23 (`0xe71990`).** This is the outer critical path to a booting
-   native core. The recovered Init chain and owner rows are native through `0x2569d0`, but nothing
-   turns them into a running `SoCGameCore` process. The next slice must identify the first
-   unmodeled startup edge after the owner construction and implement it as ordinary native code
-   with a host service seam, not another isolated leaf.
-2. **SAV-04 real-save acceptance.** The transaction and metadata slices are synthetic. Accepting a
-   real user-owned PS4 `USR-DATA`/metadata pair (hashed privately, never committed) is the only way
-   to promote save/load beyond FIXTURE_VERIFIED. Do not claim G2/G5 before then.
-3. **Metal renderer + capture provider.** `attach_screenshot` is native but its `capture_frame`
-   hook has no provider. The renderer must produce the first real RGBA frame and the PNG encoder
-   path must consume it; this is also the first G3 evidence.
-4. **Launcher/core lifecycle.** The Swift shell honestly reports NOT BUILT. The next step is a
-   native `SoCGameCore` auxiliary executable that runs the recovered startup chain and reports
-   typed readiness; Play stays disabled until it can boot.
-5. **Optional owner rows.** Rows 14 (`0xa597d0`, 9 heap allocs + 7-arg call) and 21 (`0x4a690`,
-   global RB-tree walk) are the next bounded ctor lifts. The drain/element loops and refcount
-   bodies remain hooks.
+1. **Startup continuation.** Finish the in-flight slots 296/297/300 slice, then continue at index
+   298 (`0xb0e250`, `shaderTypeToLoad` ConCmd), 299 (debug-text ConCommands) and 301
+   (`0xac9550`, `rumbleEnabled` ConCmd). 296 is a TSC-timer thunk that reuses the native
+   `store_tsc_323d0`; 297 is a 400 x 0x118 record initializer; 300 is inert. The 262 remaining
+   slots are still `other`-class bodies; do not claim startup completeness.
+2. **SAV-04 real-save acceptance.** The inspector is ready
+   (`python3 -I tools/dev/save_inspect.py <slot-dir>`), but no user-owned PS4 save exists in the
+   workspace. Run it privately on such a pair before promoting any save/load claim. G2/G5 remain
+   NOT RUN.
+3. **Launcher GUI integration.** The signed bundle now carries `SoCGameCore`; run a Finder launch
+   and inspect the readiness/diagnostics UI with the core present, then with it absent. This is
+   UI evidence only; Play must stay disabled while `engine_implemented=false`.
+4. **Metal next step.** The capture provider proves the offscreen Metal/readback/PNG path with a
+   synthetic pattern. The next slice is a real game frame source (renderer/scene), not another
+   synthetic pattern; G3 stays NOT RUN until then.
+5. **Owner rows.** Rows 14 and 21 are native. The remaining 18 ctor bodies stay hooks until lifted;
+   the drain/element loops and refcount bodies remain contracts.
 6. Round end: fresh build, full `ctest`, `SOTC_NATIVE_BUILD=local/build/orch-r22
    tools/lift/run_all_checkers.sh`, `python3 -I scripts/audit_publish_paths.py --all`,
-   `python3 -I scripts/check_commit_attribution.py`.
+   `python3 -I scripts/check_commit_attribution.py`, `python3 scripts/project_index.py`.
 
 ## Parallel-agent state
 
-- No workers are running. The round-27 workers (ResourcePool wiring, owner slots/ctor/dtor,
-  SaveData transaction/metadata, camera census/registration) have all reported and their work is
-  committed. Workers do not edit `HANDOFF.md` or commit.
+- One round-28 worker is still running: the startup slots 296/297/300 lift (`CPU-01-STARTUP-
+  SLOTS-296-297-300-01`). All other round-28 lanes (ctor coverage, SoCGameCore, Metal, owner rows
+  14/21, launcher client, startup-cliff analysis) have reported and are committed. Workers do not
+  edit `HANDOFF.md` or commit.
+- Builds are serialized with `tools/dev/with_build_lock.sh` because several workers share
+  `local/build/orch-r22` and `native/CMakeLists.txt`.
 - The preserved `origin/cursor/parallel-foundations-wip-20261023` content
   (shared_str_release_f590, save_stream exclusive temp, aud02 rackquery scripts, check_ff590) is now
   **integrated** (E566); `origin/cursor/parallel-foundations-86ac55b` was its base.
