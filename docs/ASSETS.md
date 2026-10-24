@@ -1,132 +1,126 @@
-# Asset archive findings (DATA-02, partial) — 2026-10-21
+# Asset archive findings (DATA-02, partial) — 2026-10-24
 
-Reader: [`scripts/psarc.py`](../scripts/psarc.py) (read-only, bounds-checked, tests in
-`scripts/test_psarc.py`). Private outputs: `local/manifests/assets/*.summary.json` and
-`*.members.jsonl` (path, size, offset, first block, TOC digest). No member was extracted to disk.
+The PSARC member mapping is corrected: member TOC keys are **MD5 of the exact UTF-8
+manifest path**, while TOC and manifest orders differ. The old positional pairing assigned
+valid decoded bytes to the wrong paths. Claims below use the corrected private manifests in
+`local/manifests/assets-md5pairing-r30/`; the historical `local/manifests/assets/` and hash-bound
+`local/validation/` artifacts are preserved, not silently replaced. Historical payload claims
+that used positional IDs are withdrawn as path-specific evidence.
 
-## Observed (all 7 archives parse; member count = header entries - 1)
+Reader: [`scripts/psarc.py`](../scripts/psarc.py), read-only and bounds-checked. Use
+`Psarc.members()` for `(exact_path, TOC_entry_id)` pairs or `Psarc.entry_index(path)` for lookup.
+`Psarc.paths()` returns manifest order only; never use its ordinal as an entry ID. The
+[reconciliation checkpoint](checkpoints/2026-10-24-psarc-md5-reconciliation.md) records the private
+replay, script tests, and corrections. No decoded member payloads were written by that replay.
 
-| Archive | Members | Notes |
-|---|---|---|
-| base cachedFiles | 40,213 | cmdl/cmat/fs/cmsh/cprt/anb |
-| patch cachedfiles (01.01) | 40,216 | same paths + 3 new `*.ar.ctxt`; 35,734 of 40,213 shared paths differ in TOC digest |
-| pak0 / pak1 / pak2 / pak3 | 6,918 / 5,630 / 1,313 / 12,053 | shaders, meshes, textures; pak2/pak3 hold `cp3shadow/` anim/model/sound-bank data |
-| pakN | 64,108 | 12.79 GB uncompressed; 3 paths also appear in the patch archive |
+## Archive inventory and path-key semantics
 
-Archive identity for the private 12,838,532,222-byte `pakN.psarc` was verified by a bounded
-1 MiB streaming SHA-256 pass: `559f7a3fa66bc652d36c5f1a885b351e4aeb17dadbba06a0006520bfd325be73`.
-The summary under `local/manifests/assets/` records the byte count and digest. The stream reader
-checks file identity/size/timestamps before and after hashing and rejects observed replacement,
-truncation, or growth; synthetic checks are in `scripts/test_psarc.py`.
+| Archive | Members | MD5(path) matches |
+|---|---:|---:|
+| base cachedFiles | 40,213 | 40,213 |
+| patch cachedfiles (01.01) | 40,216 | 40,216 |
+| pak0 | 6,918 | 6,918 |
+| pak1 | 5,630 | 5,630 |
+| pak2 | 1,313 | 1,313 |
+| pak3 | 12,053 | 12,053 |
+| pakN | 64,108 | 64,108 |
+| Total | 170,451 | 170,451 |
 
-- Format: v1.4, `zlib`, 30-byte entries, 64 KiB blocks, flags 0xc, manifest = NUL-separated paths
-  (entry 0). A block whose stored size equals its decoded size is raw (rule needed for pak0).
-- The TOC 16-byte value is neither MD5(path variants tried) nor MD5(content) on 39 sampled pak2
-  members; a separate full-payload sample of 17 pakN `sxd-high-entropy-8c0x` members also found
-  0/17 matches to MD5 of the complete decoded payload (E343). This is still sample-only; its
-  meaning is UNKNOWN. A full pakN metadata-only count finds 64,108 unique values for 64,108
-  manifest rows, with no repeated values (E122). Uniqueness does not identify the algorithm, input
-  bytes or integrity role. Do not use it as an integrity check.
+All seven observed archives have v1.4 headers, `zlib`, 30-byte TOC entries, 64 KiB blocks,
+flags `0xc`, MD5-sorted member TOCs, and alphabetically ordered, NUL-separated path manifests
+(entry 0). A stored block whose size equals its decoded size is raw. Pairing itself does not
+require sorted input and rejects missing TOC keys, duplicate TOC keys, and multiple paths
+claiming one entry. Manifest path counts must cover all member entries.
 
-## Overlay + case policy (DATA-02 slice, provisional)
+The MD5 input has no inserted leading slash or terminator, case folding, Unicode normalization,
+whitespace stripping, slash collapse, or dot-segment removal. Synthetic fixtures distinguish
+those spellings. This identifies the lookup key in this corpus; **it is not a content digest or
+integrity check**. The earlier negative MD5(path) samples used incorrect path/entry pairs and
+are withdrawn. Earlier payload-MD5 samples do not establish named-member identity.
 
-Implemented in [`scripts/psarc.py`](../scripts/psarc.py) (`build_overlay` / `resolve_path`);
-fixture: `python3 -I scripts/test_psarc.py`. Report:
-`local/manifests/assets/CUSA08809-cachedFiles-overlay.json`.
+The private `pakN.psarc` is 12,838,532,222 bytes, SHA-256
+`559f7a3fa66bc652d36c5f1a885b351e4aeb17dadbba06a0006520bfd325be73`.
+Archive hashes are checked with bounded 1 MiB reads and before/after file identity checks;
+that is archive identity evidence only. No executable or Sony module is run.
 
-| Rule | Value |
-|---|---|
-| Member path match | **exact** UTF-8 (case-sensitive) |
-| Collision detection | Unicode **casefold** only; never merge on fold |
-| Archive basename | **exact** — `cachedFiles.psarc` (base) ≠ `cachedfiles.psarc` (patch); keep separate extract dirs; never case-blind-copy |
-| Mount order (cachedFiles pair) | **base → patch** (patch wins on exact-path collision) |
+## Exact-path overlaps and overlay policy
 
-Observed on this title (from members.jsonl, no re-extract):
+Corrected metadata across seven manifests and all 21 unordered archive pairs gives:
 
-- base 40,213 / patch 40,216; shared 40,213; **only_base 0**; only_patch 3:
-  `text/common/_cmn/ui.ar.ctxt`, `text/shadow/_cmn/story.ar.ctxt`,
-  `text/shadow/_cmn/system.ar.ctxt`
-- TOC digest differs on 35,734 shared paths; casefold collisions within/across layers: **0**
-- The E75 audit of all seven member manifests found **0** exact duplicate path groups, **0** within-manifest `casefold()` collision groups and **0** differently spelled cross-archive pairs across all 21 archive pairs. This covers only these manifests; it does not prove filesystem/Fios case behavior or mount order.
-- The E77 exact-path overlap inventory covers the same seven manifests and all 21 unordered pairs: **40,216** shared-path pair occurrences, with **4,704** equal and **35,512** different TOC-declared-size comparisons. Equal declared sizes do not prove equal member bytes; this is path/size metadata only and says nothing about archive payloads, overlay priority, Fios, mount order, or game use.
-- The E123 TOC-field comparison covers those same 40,216 exact-path pair occurrences: **4,479** pairs have equal 16-byte values and **35,737** differ. This is an opaque metadata comparison; it does not prove content equality, digest semantics, overlay precedence, mount order, or game use.
-- The E239 cross-tab combines those same E77/E123 comparisons: **4,479** pairs have an equal TOC value and equal declared size, **0** have an equal value but different size, **225** have different values but equal size, and **35,512** differ in both. The four cells total **40,216** and reconcile to both prior margins. No member paths or raw TOC values were emitted. This remains metadata-only; it does not prove byte equality, digest meaning, overlay priority, mount order, or runtime use.
-- The E126 aggregate-only audit found **35,737** TOC values associated with multiple distinct exact paths (71,474 manifest rows). Separately, **4,479** exact-path/value associations repeat across archives (8,958 rows and 4,479 equal same-path pair occurrences, matching E123). No paths or TOC values were emitted; these opaque field relationships do not establish content identity or digest meaning.
-- Status: **PROVISIONAL_OBS**. Patch contains every base path, so a patch-wins overlay is
-  consistent with the TOC data; engine Fios/loader mount order is still **unproven** (RE/CPU).
+| Comparison | Count |
+|---|---:|
+| Shared exact-path pair occurrences | 40,216 |
+| Equal path key and equal declared size | 40,215 |
+| Equal path key and different declared size | 1 |
+| Different path key, either size relation | 0 |
+| Distinct exact paths / distinct TOC path keys | 130,235 / 130,235 |
+| TOC keys associated with multiple distinct exact paths | 0 |
+| Repeated exact-path/key associations / associated rows | 40,216 / 80,432 |
 
-## Audio-relevant members (AUD-01 input; codecs not identified)
+The E75 path-only result survives the pairing correction: zero exact duplicate paths within
+an archive, zero within-archive distinct-string `casefold()` collision groups, and zero
+cross-archive differently spelled casefold-equivalent pairs. E77's former size margins,
+E123's value-equality margins, E126's distinct-path value reuse, and E239's cross-tab were
+computed on mispaired metadata. They remain historical reproductions of those inputs and
+are superseded by the corrected counts above.
 
-`sound/shadow/{boss*,com_*,edp*}.sxd`, `music.sxd1/.sxd2`, `str_{amb,bgm,boss,event}.sxd1/.sxd2`
-(pakN, ~1 MB total), `cp3shadow/sound/se/*.hd|.bd` (25 pairs, ~2.7 MB), `cp3shadow/sound/test_adpcm/*.sts_cp3`
-(580 tiny files), `sound/shadow/_cmn/{shadow_sounds.cxml,shadowrandomevents.crmp,shadowstreams.crmp}`.
-No `.at9`, `.wav`, `.ogg` or similar member exists. Total identifiable sound-container bytes are far
-too small to be the whole soundtrack, so music/dialogue streams are NOT yet located.
+The base/patch cachedFiles pair shares 40,213 exact paths; every shared member has the same
+TOC path key, declared size, and decoded bytes in the live replay. There are zero base-only
+paths and three patch-only paths: `text/common/_cmn/ui.ar.ctxt`,
+`text/shadow/_cmn/story.ar.ctxt`, and `text/shadow/_cmn/system.ar.ctxt`.
+The former “35,734 differing TOC digests” claim was a pairing artifact.
 
-## AUD-01 header classification and member identity (codec UNKNOWN)
+The helper's provisional overlay policy remains exact UTF-8 path matching, Unicode casefold
+for collision detection only, and base then patch with patch winning exact collisions.
+This is a caller-selected policy; the engine's Fios/loader mount order remains **unproven**.
+Keep base `cachedFiles.psarc` and patch `cachedfiles.psarc` in separate extraction directories;
+archive basenames are exact and must not be collapsed by case-insensitive copying.
 
-Classifier: [`scripts/classify_audio_headers.py`](../scripts/classify_audio_headers.py)
-(tests: `scripts/test_audio_headers.py`). Output:
-`local/manifests/assets/audio-headers.json` (86 members across cachedFiles / patch
-cachedfiles / pak2 / pak3 / pakN). Each row includes the full decoded-member SHA-256 and PSARC
-entry ID, byte offset and first block, independently checked against `Psarc.read()`; the sample
-magic and entropy remain prefix observations. **Codec = UNKNOWN for every member. No NGS2
-inference.** Tests: `python3 -I scripts/test_audio_headers.py` (12 pass).
-**Publish boundary:** the JSON is game-derived and stays under gitignored `local/`; the
-classifier/test scripts under `scripts/` may be published (see `scripts/audit_publish_paths.py`).
+## Corrected audio-path inventory (codec UNKNOWN)
 
-| Family (OBS label) | Exts | Count | Magic (first bytes) | Entropy (bits/byte, 4 KiB sample) | Notes |
-|---|---|---|---|---|---|
-| `hd-bd-ascii-xff` | `.hd`/`.bd` | 44 | ASCII `xff\0` (`78666600…`) | 2.90–7.80 | Dominant SE bank pair form in pak2/pak3 |
-| `hd-bd-near-empty-3ebe7b` | `.hd`/`.bd` | 4 | `3ebe7b00…` then mostly zeros | 2.52–3.02 | pak2 stubs; trivial inflate is non-evidence |
-| `bd-ascii-qath` | `.bd` | 1 | ASCII `qath` | ~4.67 | `cp3shadow/sound/se/edp01.bd` only |
-| `other-e5000000` | `.hd` | 1 | `e5000000…` | ~5.62 | `boss22.hd` outlier |
-| `sxd-fbad9897` | `.sxd` | 2 | `fbad9897…` | ~5.76–5.82 | base + patch `sound/shadow/bridge.sxd` |
-| `sxd-high-entropy-8c0x` | `.sxd`/`.sxd1`/`.sxd2` | 17 | `8c0a…` or `8c06…` | 6.45–7.88 | **Subset** of pakN only — not all pakN sound members |
-| `sxd-le-small-ints` | `.sxd`/`.sxd1`/`.sxd2` | 12 | LE u32 ≤ 0x20 at +0/+4 | 4.24–6.20 | Structured / low-entropy pakN |
-| `sxd-ascii-80AE` | `.sxd` | 3 | ASCII `80AE` | 6.98–7.28 | e.g. `boss02.sxd`, `boss24.sxd`, `sotc_buss.sxd` |
-| other singletons | `.sxd`/`.sxd1` | 2 | `00020000…`, `00050000…` | 4.11 / 7.61 | `com_sys.sxd`; `str_boss.sxd1` embeds path-like ASCII |
+[`scripts/classify_audio_headers.py`](../scripts/classify_audio_headers.py) now uses MD5-paired
+TOC IDs. The corrected `audio-headers.json` has 86 members across base/patch cachedFiles,
+pak2, pak3, and pakN, with full decoded-member SHA-256, actual TOC entry ID, offset, and first
+block. The live replay reproduces this manifest. The total is **2,073,162,522 decoded bytes**;
+the old ~3.7 MB inventory and “too small for the soundtrack” inference are withdrawn.
 
-Private pair-structure cross-check (2026-10-19): all 25 `.hd`/`.bd` pair groups (50 members)
-matched manifest paths, PSARC locators and full hashes. The 22 `xff\0` pairs (44 members) all
-store their decoded member size as little-endian u32 at byte offset `0x14` (44/44, zero
-mismatches). The prefix has two observed variants; the byte at offset 12 varies, so bytes 4..19
-remain opaque. Reproduction:
-`PYTHONDONTWRITEBYTECODE=1 python3 -I local/validation/20261019-231219-audio-bank-header-crosscheck/pair_crosscheck.py`;
-log: `local/validation/20261019-231219-audio-bank-header-crosscheck/pair_crosscheck.log`.
-This establishes a repeated length relation only; codec, bank semantics, NGS2 behavior and game use
-remain UNKNOWN.
+| Extension | Count | Decoded bytes | Observed prefix |
+|---|---:|---:|---|
+| `.sxd` | 26 | 313,744,960 | `SXDF` |
+| `.sxd1` | 5 | 18,191,856 | `SXDF` |
+| `.sxd2` | 5 | 1,714,959,920 | `SXDS` |
+| `.hd` | 25 | 344,458 | varying little-endian-looking words |
+| `.bd` | 25 | 25,921,328 | first eight bytes zero |
 
-Bounded reader: [`scripts/audio_bank_header.py`](../scripts/audio_bank_header.py), with 21
-synthetic test methods in [`scripts/test_audio_bank_header.py`](../scripts/test_audio_bank_header.py).
-The reader verifies the archive summary, exact member paths, manifest locators and hashes before
-reporting the XFF magic, opaque bytes 4..19 and the u32le@0x14 decoded-length match. Root's
-acceptance logs are in `local/validation/20261019-2315-root-aud01-xff-verification/`. This is
-fixture and offline asset evidence only; it does not establish runtime decoding or playback.
+All 86 codec labels remain **UNKNOWN**. File names and magic observations do not establish
+framing, codec configuration, channels, sample rate, loop/seek semantics, audio-engine use,
+or playback. Paths named music and stream families are candidates; their actual content and
+gameplay routing need reader recovery. No game-audio gate is promoted.
 
-Private `.sts_cp3` identity comparison (2026-10-19):
-`local/validation/aud01-sts-identity-01.py` re-reads all 290 exact paths from each base/patch
-`cachedFiles` layer through `Psarc.read()`, checking archive summary identity and member ID/path/
-offset/first-block/decoded-size locators against the private manifests. The path sets match exactly;
-all 290 decoded SHA-256 hashes differ and 285 sizes change (5 sizes match). Base/patch decoded
-totals are 242,310 / 241,080 bytes; each layer ranges from 0–3,060 bytes. The full size-frequency
-tables and per-member identifiers/hashes are private in
-`local/validation/aud01-sts-identity-01.json` (SHA-256
-`566275c3c104dfc473f8cb3c227641a16b10e2b0da7ffb2811e22b00f877e654`). Root's repeat log matched
-the two worker logs. These are identity and byte observations only: the directory/extension names
-do not establish an ADPCM codec, schema, gameplay use, NGS2 behavior, or playback.
+The 290 `.sts_cp3` paths in each cachedFiles layer are all 120 bytes, and every base/patch
+pair is byte-identical. The selected `b_info_01.sts_cp3` is 120 bytes in each layer, at actual
+TOC IDs 13,300 (base) and 13,302 (patch). E55's 344/561-byte probe and the former all-290
+hash/size differences inspected other entries and are withdrawn as STS evidence. Likewise,
+`sound/shadow/bridge.sxd` is a byte-identical 144-byte member in both layers at TOC ID 2,581;
+E42's 619/638-byte comparison was misattributed. Historical reports remain preserved.
 
-One paired byte-layout probe (2026-10-20) examined only
-`cp3shadow/sound/test_adpcm/b_info_01.sts_cp3`, in memory through the live `Psarc.read()` API. The
-base member is 344 bytes; the patch member is 561 bytes. At equal absolute offsets, 39 positions
-match and 305 differ; the common prefix is 4 bytes and suffix is 2 bytes. An exhaustive maximal
-substring comparison found 101 exact spans of at least 4 bytes at shifted offsets; the longest is
-47 bytes at base `[228,275)` / patch `[382,429)`. The replayable report and root verification are
-private under `local/re/evidence/aud01-sts-byte-probe-01/`; see E55 and the
-[completion checkpoint](checkpoints/2026-10-20-root-aud01-sts-byte-probe-complete.md). These byte
-ranges do not establish record boundaries or a schema. Format and codec remain UNKNOWN; there is no
-NGS2, runtime-use, patch-precedence, or playback conclusion.
+## Generic XFF prefix reader; former audio attribution withdrawn
 
-Correction vs earlier note: pakN sound members do **not** all begin `8c0a`. zlib/xz probes on
-sampled heads do not yield meaningful payloads (trivial 1-byte inflate rejected). Next: recover
-the game's own reader (RE-02/Fios/ULT), not codec guessing.
+The former AUD-01 XFF “sound banks” were non-audio paths assigned the wrong TOC IDs. None of
+the 86 corrected audio-path members begins `xff\0`. **AUD-01-XFF-01's audio-bank premise is
+withdrawn**, including its path-specific live acceptance claims. Existing synthetic parser
+checks still verify their bounded byte relation.
+
+[`scripts/audio_bank_header.py`](../scripts/audio_bank_header.py) retains its legacy filename
+and error class, but is explicitly a **generic XFF prefix/length reader**. It requires an
+explicit member identity manifest, verifies the archive and MD5-paired member locators and
+SHA-256, and accepts only a complete `xff\0` member whose u32le at `0x14` equals the input
+length. Bytes `0x04..0x13` remain opaque. Reports identify `DATA-02-XFF-PREFIX-01` and
+`generic_xff_prefix`; they do not claim an audio format, decoder, or runtime use.
+
+The 44 historical XFF observations can still be reproduced at their original TOC IDs, with
+the same decoded hashes and length relation, but their corrected extensions are
+`.anb` (18), `.nmo` (15), `.clb` (5), `.nto` (4), and `.skb` (2). A generic structural
+observation does not restore the
+withdrawn audio attribution. Next: recover actual format readers and engine contracts;
+codec, audio output, selected-scene resolution, and game boot remain open.

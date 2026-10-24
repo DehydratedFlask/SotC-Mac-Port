@@ -9,6 +9,14 @@ Block table follows the entries: one big-endian value per block, width = bytes n
 (member paths, NUL-separated in this game's archives; newline accepted). Every length and offset is range-checked; path traversal and
 unknown compression are rejected. Nothing is extracted to disk by this module.
 
+Path <-> entry pairing (DATA-02-PSARC-PAIRING-FIX-01): the 16-byte TOC value of a member entry is
+MD5(path as UTF-8); the observed TOCs are sorted by that value while the manifest (entry 0) is alphabetical, so
+manifest line k is NOT entry k+1. Use `Psarc.members()` / `Psarc.entry_index(path)` (MD5 lookup,
+missing or duplicate TOC values rejected). `Psarc.paths()` still returns manifest order only.
+Hashing preserves the exact manifest spelling: no case folding, Unicode normalization, leading
+slash insertion, whitespace stripping, slash collapse, or dot-segment removal. Pairing does not
+require a particular TOC or manifest order. This MD5 is a path key, not a content-integrity hash.
+
 Overlay / case policy (DATA-02, provisional until Fios/loader recovery proves otherwise):
 - Member path identity is exact UTF-8 (case-sensitive). Resolve uses exact keys only.
 - Unicode casefold is used solely to detect ambiguous collisions (never to merge).
@@ -82,6 +90,13 @@ def be(data, pos, n):
     if pos < 0 or pos + n > len(data):
         raise PsarcError(f'out of bounds: {pos:#x}+{n}')
     return int.from_bytes(data[pos:pos + n], 'big')
+
+
+def path_md5(path):
+    """PSARC member path key: hex MD5 of exact UTF-8 spelling, without normalization."""
+    if not isinstance(path, str):
+        raise PsarcError('member path must be str')
+    return hashlib.md5(path.encode('utf-8')).hexdigest()
 
 
 def casefold_key(path):
@@ -293,15 +308,59 @@ class Psarc:
                 raise PsarcError(f'unsafe member path {n!r}')
         return names
 
+    def members(self):
+        """Return [(path, entry_id)] in manifest order, paired by MD5(path) (not by position).
+
+        Rejects duplicate TOC values among member entries, a manifest path with no TOC entry,
+        a TOC entry claimed by two manifest lines, and member entries no manifest path claims.
+        Cached after the first successful call.
+        """
+        cached = getattr(self, '_members', None)
+        if cached is not None:
+            return list(cached)
+        names = self.paths()
+        by_md5 = {}
+        for i in range(1, self.count):
+            key = self.entries[i]['md5']
+            if key in by_md5:
+                raise PsarcError(f'duplicate TOC value {key} (entries {by_md5[key]} and {i})')
+            by_md5[key] = i
+        out, claimed = [], {}
+        for name in names:
+            key = path_md5(name)
+            idx = by_md5.get(key)
+            if idx is None:
+                raise PsarcError(f'no TOC entry for MD5({name!r})')
+            if idx in claimed:
+                raise PsarcError(f'entry {idx} claimed by multiple manifest paths '
+                                 f'{claimed[idx]!r} and {name!r}')
+            claimed[idx] = name
+            out.append((name, idx))
+        if len(claimed) != self.count - 1:     # unreachable given counts, kept as a guard
+            raise PsarcError('manifest does not cover every member entry')
+        self._members = out
+        self._by_path = dict(out)
+        return list(out)
+
+    def entry_index(self, path):
+        """Entry id for an exact member path via MD5 lookup; PsarcError if absent."""
+        if not isinstance(path, str):
+            raise PsarcError('member path must be str')
+        self.members()
+        if path not in self._by_path:
+            raise PsarcError(f'no such member path {path!r}')
+        return self._by_path[path]
+
 
 def summarize(path, sample_per_ext=2):
     a = Psarc(path)
-    names = a.paths()
+    pairs = a.members()
+    names = [n for n, _ in pairs]
     ext = collections.Counter(posixpath.splitext(n)[1].lower() for n in names)
     dup = [n for n, c in collections.Counter(n.lower() for n in names).items() if c > 1]
     magics = collections.defaultdict(collections.Counter)
     seen = collections.Counter()
-    for i, n in enumerate(names, 1):
+    for n, i in pairs:
         x = posixpath.splitext(n)[1].lower()
         if seen[x] < sample_per_ext and a.entries[i]['size']:
             seen[x] += 1
@@ -354,14 +413,17 @@ def main():
     args.out.mkdir(parents=True, exist_ok=True)
     for path in args.archive:
         a, names, summary = summarize(path)
-        summary['sha256'] = _sha256_file(path)
-        stem = f"{path.parent.name}-{path.stem}"
-        (args.out / f'{stem}.summary.json').write_text(json.dumps(summary, indent=1) + '\n')
-        with (args.out / f'{stem}.members.jsonl').open('w') as f:
-            for i, n in enumerate(names, 1):
-                e = a.entries[i]
-                f.write(json.dumps(dict(id=i, path=n, size=e['size'], offset=e['offset'],
-                                        block=e['block'], md5=e['md5'])) + '\n')
+        try:
+            summary['sha256'] = _sha256_file(path)
+            stem = f"{path.parent.name}-{path.stem}"
+            (args.out / f'{stem}.summary.json').write_text(json.dumps(summary, indent=1) + '\n')
+            with (args.out / f'{stem}.members.jsonl').open('w') as f:
+                for n, i in a.members():     # MD5(path) pairing; `id` is the real TOC entry index
+                    e = a.entries[i]
+                    f.write(json.dumps(dict(id=i, path=n, size=e['size'], offset=e['offset'],
+                                            block=e['block'], md5=e['md5'])) + '\n')
+        finally:
+            a.close()
         print(f"{stem}: members={summary['members']} flags={summary['flags']:#x} "
               f"top_ext={list(summary['extensions'].items())[:6]}")
 

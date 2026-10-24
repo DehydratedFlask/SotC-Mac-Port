@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cerrno>
+#include <cstdlib>
 #include <fcntl.h>
 #include <limits>
 #include <utility>
@@ -207,9 +208,17 @@ SaveStreamReadResult read_save_stream_file(const std::string& path, DuplicatePol
 }
 
 SaveStreamIoResult write_file_atomic(const std::string& path, std::span<const std::byte> bytes) {
-    const std::string tmp = path + ".tmp";
-    int fd;
-    do { fd = ::open(tmp.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644); } while (fd < 0 && errno == EINTR);
+    std::string tmp;
+    int fd = -1;
+    // Exclusive creation never follows an existing alias or takes another invocation's temp.
+    // Pass the mode to open (rather than chmod after mkstemp) so the process umask still applies.
+    for (unsigned attempt = 0; attempt != 128; ++attempt) {
+        tmp = path + ".tmp." + std::to_string(::arc4random()) + "." +
+              std::to_string(::arc4random());
+        do { fd = ::open(tmp.c_str(), O_WRONLY | O_CREAT | O_EXCL, 0644); }
+        while (fd < 0 && errno == EINTR);
+        if (fd >= 0 || errno != EEXIST) break;
+    }
     if (fd < 0) return {SaveStreamError::io_open, errno};
 
     auto abort_with = [&](SaveStreamError error, int err) {

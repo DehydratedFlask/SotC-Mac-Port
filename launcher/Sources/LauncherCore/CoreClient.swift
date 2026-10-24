@@ -22,6 +22,9 @@ public protocol CoreClient: Sendable {
 
 /// Pure mapping from core facts to launcher vocabulary. No I/O.
 public enum CoreClientMapping {
+    /// Subsystem name the core uses for its recovered-constructor report.
+    public static let startupSubsystemName = "startup_constructors"
+
     /// The "Native game core" readiness row. `.ready` requires the core to say the engine is ready;
     /// asset readiness is a different row and never leaks into this one.
     public static func nativeCoreStatus(
@@ -31,8 +34,12 @@ public enum CoreClientMapping {
         if validation == nil, coverage == nil {
             return .notBuilt("NOT BUILT: native core has not been queried. Play disabled until a native SoCGameCore exists")
         }
+        // A core answered, so it exists: say the engine is missing, not the executable, and carry the
+        // core's own startup-recovery claim (verbatim, never recomputed here) so the row is typed.
         let abi = coverage.map { " (core ABI \($0.abiVersion))" } ?? ""
-        return .notBuilt("NOT BUILT: native game engine not implemented\(abi). Play disabled until a native SoCGameCore exists")
+        let startup = coverage?.subsystems.first { $0.name == startupSubsystemName && !$0.detail.isEmpty }
+            .map { "; startup constructors \(CoreDiagnostics.subsystemStatus($0.status)): \($0.detail)" } ?? ""
+        return .notBuilt("NOT BUILT: native game engine not implemented\(abi)\(startup). Play disabled until the engine is implemented")
     }
 
     /// Launcher state for a core status. An unrecognised or impossible combination is reported as

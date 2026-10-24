@@ -27,7 +27,7 @@ public enum SystemChecks {
     }
 
     /// Honest core presence probe. Never invents readiness: missing, non-executable, or non-Mach-O → NOT BUILT.
-    /// A real ARM64 Mach-O game core does not exist yet (G1 NOT PASSED); Play must stay disabled.
+    /// Presence does not imply an implemented engine; CoreClient supplies that separate readiness fact.
     public static func nativeCore(executable: URL?) -> ReadinessItem.Status {
         guard let executable else {
             return .notBuilt(notBuiltMessage("no \(expectedCoreExecutableName) path (auxiliary executable absent)"))
@@ -57,7 +57,7 @@ public enum SystemChecks {
     /// Lightweight header check only — does not execute the file or claim game readiness.
     /// Policy (user decision): require a thin 64-bit ARM64 Mach-O executable (MH_EXECUTE).
     /// Fat/universal files, other CPU types, and non-executable file types are rejected.
-    private static func isMachOExecutable(at url: URL) -> Bool {
+    static func isMachOExecutable(at url: URL) -> Bool {
         guard let handle = try? FileHandle(forReadingFrom: url) else { return false }
         defer { try? handle.close() }
         guard let header = try? handle.read(upToCount: 16), header.count >= 16 else { return false }

@@ -149,11 +149,12 @@ struct SaveStreamIoResult {
     int os_errno = 0;
 };
 
-// Atomic replace: write `<path>.tmp` in the same directory, fsync it, rename over `path`, then
-// best-effort fsync of the directory. On failure the temp file is removed and an existing `path`
-// is left untouched. This gives same-volume atomic replacement, NOT a power-loss durability
-// proof (see docs/VALIDATION.md G2 [B06]/[B07]); on macOS F_FULLFSYNC is attempted first.
-// Concurrent writers to the same path share the temp name and are not supported.
+// Atomic replace: exclusively create a unique `<path>.tmp.*` in the same directory with mode
+// 0644 subject to umask, write and fsync it, rename over `path`, then best-effort fsync of the
+// directory. On failure only this invocation's temp is removed and an existing `path` is left
+// untouched. Pre-existing temp files and aliases are preserved. This gives same-volume atomic
+// replacement, NOT a power-loss durability proof (see docs/VALIDATION.md G2 [B06]/[B07]); on
+// macOS F_FULLFSYNC is attempted first. Concurrent-writer ordering is not specified.
 [[nodiscard]] SaveStreamIoResult write_file_atomic(const std::string& path,
                                                    std::span<const std::byte> bytes);
 
