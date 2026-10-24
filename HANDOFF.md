@@ -1,5 +1,47 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-24 16:15 CDT — GPU-02 logo WQM analysis completed
+
+- Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`. Task
+  `GPU-02-GCN-LOGO-WQM-ANALYSIS-01` is `STATIC_ANALYSIS_VERIFIED`; one successful static replay,
+  0 failed semantic hypotheses. The user-selected default pair remains the implemented shader target;
+  this checkpoint statically characterizes the deferred logo PS only.
+- Exact inputs: private E625 `local/fixtures/gpu-r30/logo.csdr`, archive SHA-256
+  `21cde037542277bbac24fdb6d1e211f40dbb2187534ce9c31c7c59fad6b68d64`; PS code span offset
+  `0x4d8`, 152 B, SHA-256
+  `4309caada7f114ec822f61646be536f50a8261a8c6e54f2ce709db7c70b8b39a`. Existing inventory hash
+  `99bec189146f19d0248fb85759c252847411ea6adb06704b11aad4cfb194ab68`.
+- Exact command: `python3 -I local/orchestrator/gpu02-logo-wqm-analysis/replay.py` exited 0;
+  regenerated decoder inventory matches the recorded JSON; 34 instructions, 152 bytes consumed,
+  0 unknowns, 0 branches, exact final `s_endpgm`. Payload-free private report:
+  `local/orchestrator/gpu02-logo-wqm-analysis/report.json`, SHA-256
+  `91c52e19625afbe4bbf9b7918ca5a1c64ad72104671d3ae09d84000d70e1558a`.
+- A first replay attempt exited 1 at `assert fresh == stored` because Python tuples in decoder
+  output serialize as JSON arrays. The exact diagnosis/output is retained at
+  `local/orchestrator/gpu02-logo-wqm-analysis/replay-first-compare-failure.txt`; after normalizing
+  to JSON form, the input/inventory equality check and remaining assertions passed. This was a
+  serialization-shape correction, not a failed shader-semantic hypothesis.
+- Observations: offset `0x28` saves EXEC into VCC; `0x2c` applies `s_wqm_b64` to EXEC; interpolation,
+  MIMG sample, color multiply and packing follow without branches or another EXEC write; `0x88`
+  restores the saved mask before compressed MRT0 color export at `0x8c`. Resource descriptor loads
+  land in `s0:s7`, sampler loads in `s8:s11`; sample uses `dmask=0xf`, `vaddr=v2`, and those bases.
+  AMD Sea Islands ISA rev. 1.3 confirms the four-bit WQM expansion, architectural register aliases,
+  MIMG resource fields and final pixel export mask requirement.
+- Inference/unknowns: attr1's first two interpolated channels supply the sample's first two address
+  VGPRs, but resource dimension/coordinate role is not proven. Live descriptor contents, texture
+  dimension/format/tiling, filter/wrap/mip state, actual texture binding and Metal derivative
+  equivalence remain unknown. No MSL, asset import, Metal render, or game claim was made. G3 stays
+  `PARTIAL`, not PASSED.
+- Updated files: `docs/TASKS.md` (task status), `docs/EVIDENCE.md` (E634),
+  `docs/METAL_FRAME_PATH.md`, `docs/INDEX.md`, `docs/FOLDERS.md` (generated), this HANDOFF, and
+  `docs/checkpoints/2026-10-24-gpu02-logo-wqm-analysis.md`. Private verifier, report, and failure note
+  remain under `local/orchestrator/gpu02-logo-wqm-analysis/`. No tests/builds were run.
+- Next exact action: reconcile the logo material/PNG and descriptor/texture format inputs, then design
+  the native Metal fragment-stage sample using Metal's fragment derivative behavior with fail-visible
+  bindings. No code lowering until those data inputs are tied to evidence. Pending GPU-03 decisions
+  remain real `.cmsh` parser scope, NRM0 handling, and screenshot attachment seam.
+- Status: WQM analysis task complete; logo conversion and parent GPU-03 remain active; G3 is PARTIAL.
+
 ## 2026-10-24 16:09 CDT — GPU-03 synthetic parser-to-Metal flow verified
 
 - Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`. Task

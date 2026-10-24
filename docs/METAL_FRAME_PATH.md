@@ -1,7 +1,8 @@
 # Metal first-frame path: research, design, and bounded harness work
 
 Status: E627 verifies the selected default shader pair against an independent oracle; E632 and E633
-verify direct Metal rendering of synthetic geometry, including a synthetic parser-to-renderer flow.
+verify direct Metal rendering of synthetic geometry, including a synthetic parser-to-renderer flow;
+E634 statically characterizes the selected logo pixel shader's WQM and texture-sample instruction path.
 The L1 asset-derived harness is still in progress: real `.cmsh` bytes have not gone through the native
 parser or Metal renderer, retail bindings remain unknown, and no game frame is established. **G3 is
 PARTIAL, not PASSED**, under the synthetic-scene rule in `docs/VALIDATION.md`.
@@ -309,6 +310,10 @@ None of the four uses `DS`, LDS or `v_readlane`-class operations in this classif
 translation is plausible (a cross-lane use would have to be excluded instruction by instruction, card 3).
 
 ### 4.7 What is still not decoded (UNK)
+
+E634 now characterizes the logo PS's explicit EXEC save, whole-quad expansion, texture-sample interval,
+mask restore, and descriptor-register dataflow. The live image/sampler values and their mapping to
+Metal resources remain UNK; no logo MSL or textured render has been generated.
 
 - The `0x8C` block layer (section 4.2) and everything behind it: most meshes, all non-PNG textures,
   most shaders, `.ctxc` streaming chunks, `.cani`/`.cclm`/`.cgpr` bodies.

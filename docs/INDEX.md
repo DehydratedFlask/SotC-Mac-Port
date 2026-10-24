@@ -24,6 +24,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [GPU-03 typed RenderOp API](checkpoints/2026-10-24-gpu03-renderops-api.md) | E631 host handles and fail-visible typed indexed draw op validation; E632 separately records the synthetic direct-Metal fixture; real asset frame remains NOT RUN |
 | [GPU-03 synthetic direct-Metal frame](checkpoints/2026-10-24-gpu03-metal-synthetic-frame.md) | E632 pinned default-pair MSL, synthetic indexed/depth frame, CPU per-pixel validation and Metal API/GPU validation; no real mesh bytes or game-frame claim |
 | [GPU-03 synthetic parser-to-Metal flow](checkpoints/2026-10-24-gpu03-synthetic-parser-metal-flow.md) | E633 synthetic `.cmsh` bytes parsed and rendered through the default MSL path; output exactly matches a direct draw |
+| [GPU-02 logo WQM analysis](checkpoints/2026-10-24-gpu02-logo-wqm-analysis.md) | E634 byte-bound WQM/EXEC and texture-sample characterization; no logo MSL or G3 pass |
 | [CTOR_CLASSES](CTOR_CLASSES.md) | 573-entry constructor-table classification by reachable-body idiom plus the slot 10–19/24–47 family contract; CPU-01 |
 | [INPUTTABLE_551140](INPUTTABLE_551140.md) | Numeric-only deepen of Init-hash 275-entry table (`0x551140`); CPU-01 |
 | [INPUTTABLE_551140_NAMES_FIXTURE](INPUTTABLE_551140_NAMES_FIXTURE.md) | Private 275-name fixture recipe for registry fill `0x52a220`; CPU-01 |
