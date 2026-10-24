@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Read byte-supported structure from an XFF-prefixed audio-bank member.
+"""Read generic XFF prefix/length observations from an explicitly identified member.
 
-This is a structural observation only. It does not identify an audio codec, parse bank
-records, or infer NGS2 behavior. The private AUD-01 corpus shows the word at byte 0x14
-matching the decoded member length for all 44 XFF-prefixed .hd/.bd members.
+The historical audio-bank premise was withdrawn after correcting PSARC path/TOC pairing:
+the XFF-prefixed bytes belonged to non-audio members. This legacy-named module retains a
+bounded structural reader, not an audio-bank parser. It does not identify a codec, parse
+internal records, or infer runtime use. Inspection requires an explicit member manifest;
+the historical default audio manifest must not silently select mispaired evidence.
 """
 from __future__ import annotations
 
@@ -19,7 +21,6 @@ from psarc import Psarc, PsarcError, _sha256_file
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ASSET_MANIFEST_DIR = PROJECT_ROOT / 'local/manifests/assets'
-DEFAULT_AUDIO_MANIFEST = ASSET_MANIFEST_DIR / 'audio-headers.json'
 XFF_MAGIC = b'xff\0'
 XFF_SIZE_WORD_OFFSET = 0x14
 XFF_SIZE_WORD_WIDTH = 4
@@ -27,16 +28,15 @@ XFF_MIN_MEMBER_SIZE = XFF_SIZE_WORD_OFFSET + XFF_SIZE_WORD_WIDTH
 
 
 class AudioBankFormatError(ValueError):
-    """The member does not satisfy the observed XFF prefix/length structure."""
+    """Legacy error name for a member failing the generic XFF prefix/length checks."""
 
 
 def parse_xff_member(data: bytes | bytearray | memoryview) -> dict[str, Any]:
     """Return only byte-supported facts from one complete XFF-prefixed member.
 
-    The 4-byte ``xff\0`` prefix is observed in the selected pair and the wider
-    AUD-01 .hd/.bd corpus. Bytes 0x04..0x13 are retained as opaque evidence. At
-    0x14, a little-endian u32 equals the decoded member length in all 44 observed
-    XFF-prefixed .hd/.bd members. No internal data spans or codec are inferred.
+    Bytes 0x04..0x13 remain opaque. The u32le at 0x14 must equal the complete
+    input length for this bounded reader to accept it. This relation is an
+    admitted structure check, not evidence of an audio format or runtime use.
     """
     if not isinstance(data, (bytes, bytearray, memoryview)):
         raise TypeError('member data must be bytes-like')
@@ -83,7 +83,7 @@ def _matching_manifest_row(
     ]
     if len(matches) != 1:
         raise AudioBankFormatError(
-            f'expected one audio manifest row for {archive_path}:{member_path}, '
+            f'expected one member manifest row for {archive_path}:{member_path}, '
             f'found {len(matches)}')
     return matches[0]
 
@@ -101,7 +101,7 @@ def _load_archive_summary(archive_path: Path, summary_path: Path | None) -> tupl
 def inspect_members(
     archive_path: Path,
     member_paths: list[str],
-    manifest_path: Path = DEFAULT_AUDIO_MANIFEST,
+    manifest_path: Path,
     summary_path: Path | None = None,
 ) -> dict[str, Any]:
     """Verify live archive/member identities and report bounded XFF observations."""
@@ -111,7 +111,7 @@ def inspect_members(
         manifest = json.loads(manifest_path.read_text())
         rows = manifest['members']
     except (OSError, json.JSONDecodeError, KeyError, TypeError) as exc:
-        raise AudioBankFormatError(f'cannot read audio manifest {manifest_path}: {exc}') from exc
+        raise AudioBankFormatError(f'cannot read member manifest {manifest_path}: {exc}') from exc
 
     summary_file, summary = _load_archive_summary(archive_path, summary_path)
     try:
@@ -128,13 +128,15 @@ def inspect_members(
 
     archive = Psarc(archive_path)
     try:
-        names = archive.paths()
+        # Pair by MD5(path): TOC order is MD5 order, not manifest order.
+        try:
+            pairs = archive.members()
+        except PsarcError as exc:
+            raise AudioBankFormatError(
+                f'cannot pair PSARC manifest paths to TOC entries: {exc}') from exc
         reported: list[dict[str, Any]] = []
         for member_path in member_paths:
-            matches = [
-                entry_id for entry_id, path in enumerate(names, start=1)
-                if path == member_path
-            ]
+            matches = [entry_id for path, entry_id in pairs if path == member_path]
             if len(matches) != 1:
                 raise AudioBankFormatError(
                     f'expected one exact PSARC path for {member_path!r}, found {len(matches)}')
@@ -181,7 +183,8 @@ def inspect_members(
 
     return {
         'schema_version': 1,
-        'task': 'AUD-01-XFF-01',
+        'task': 'DATA-02-XFF-PREFIX-01',
+        'format_scope': 'generic_xff_prefix',
         'archive': {
             'path': str(archive_path),
             'bytes': archive_bytes,
@@ -190,6 +193,7 @@ def inspect_members(
             'summary_identity_match': True,
         },
         'limitations': [
+            'The historical AUD-01 audio-bank attribution was withdrawn after PSARC pairing correction.',
             'The XFF bytes after the 4-byte prefix and the word at 0x14 remain opaque.',
             'The word at 0x14 is reported only as a little-endian value matching decoded length.',
             'Codec, internal records, NGS2 contract, gameplay use, and playback are UNKNOWN.',
@@ -203,15 +207,15 @@ def main() -> None:
     parser.add_argument('--archive', type=Path, required=True, help='local PSARC path')
     parser.add_argument('--member', action='append', required=True,
                         help='exact PSARC member path; repeat for each member')
-    parser.add_argument('--manifest', type=Path, default=DEFAULT_AUDIO_MANIFEST,
-                        help='private AUD-01 member identity manifest')
+    parser.add_argument('--manifest', type=Path, required=True,
+                        help='explicit private member identity manifest with MD5-paired locators')
     parser.add_argument('--summary', type=Path,
                         help='private archive summary (defaults from archive parent/name)')
     args = parser.parse_args()
     try:
         report = inspect_members(args.archive, args.member, args.manifest, args.summary)
     except (AudioBankFormatError, PsarcError, OSError, ValueError) as exc:
-        raise SystemExit(f'audio bank inspection failed: {exc}') from exc
+        raise SystemExit(f'XFF member inspection failed: {exc}') from exc
     print(json.dumps(report, indent=2, sort_keys=True))
 
 

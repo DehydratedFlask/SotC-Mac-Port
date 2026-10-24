@@ -12,6 +12,13 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [POINTERS](POINTERS.md) | Address classes, tagged 31-bit fields, evidence labels (CPU-02 partial); integrator |
 | [ASSETS](ASSETS.md) | PSARC archive findings and audio-asset leads (DATA-02/AUD-01 partial); integrator |
 | [GPU01_PREP](GPU01_PREP.md) | Offline `.csdr`/`.cmat` member-name inventory from manifests (GPU-01 prep); GPU worker |
+| [METAL_FRAME_PATH](METAL_FRAME_PATH.md) | Renderer boundary research and bounded importer/Metal task cards; asset-derived harness only; G3 NOT RUN |
+| [PSARC MD5 reconciliation](checkpoints/2026-10-24-psarc-md5-reconciliation.md) | Correct path-key pairing and superseded audio/asset claims; E621 |
+| [Startup slots 302/303/305](checkpoints/2026-10-24-startup-slots-302-303-305.md) | 317/573 registered, first gap 306; E623; fixture/static verification only |
+| [Slot 303 checker publication repair](checkpoints/2026-10-24-slot303-publication-repair.md) | Complete function reconstruction removed from public checker; E624 |
+| [GFX7 default-pair inventory and Metal harness](checkpoints/2026-10-24-gcn-default-pair.md) | E625 inventory plus E627 bounded default VS/PS MSL and Metal harness; G3 NOT RUN |
+| [CSDR reader corpus and review](checkpoints/2026-10-24-csdr-reader.md) | E626 structural-first attempt3, arbitrary `cc xx`, full corpus v5 and independent review |
+| [Round 30 integration](checkpoints/2026-10-24-round30-integration.md) | Root replay: CTest 388/388, lift checkers 476/0/0, Python 228/228, shader harness and outstanding game gates; E628 |
 | [CTOR_CLASSES](CTOR_CLASSES.md) | 573-entry constructor-table classification by reachable-body idiom plus the slot 10–19/24–47 family contract; CPU-01 |
 | [INPUTTABLE_551140](INPUTTABLE_551140.md) | Numeric-only deepen of Init-hash 275-entry table (`0x551140`); CPU-01 |
 | [INPUTTABLE_551140_NAMES_FIXTURE](INPUTTABLE_551140_NAMES_FIXTURE.md) | Private 275-name fixture recipe for registry fill `0x52a220`; CPU-01 |
@@ -288,10 +295,10 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Screenshot contract (2026-10-23)](checkpoints/2026-10-23-screenshot-contract.md) | attach_screenshot decision table; E600 |
 | [Save transaction (2026-10-23)](checkpoints/2026-10-23-save-transaction.md) | ProgressV1, atomic store/load, golden 20,013 B; E601 |
 | [Camera class identity (2026-10-23)](checkpoints/2026-10-23-camera-class-identity.md) | D is Camera, not `_Root`; debug-only pose sync; E602 |
-| [Owner ctor a5c850 (2026-10-23)](checkpoints/2026-10-23-owner-ctor-a5c850.md) | 721 B row-9 ctor, partial-init layout; E603 |
+| [Owner ctor a5c850 (2026-10-23)](checkpoints/2026-10-23-owner-ctor-a5c850.md) | 721 B ctor, zero-based row 9 / one-based row 10, partial-init layout; E603 |
 | [Save metadata contract (2026-10-23)](checkpoints/2026-10-23-savedata-metadata-contract.md) | 0x530 block, shared icon, delete/dialog; E604 |
 | [Camera root registration (2026-10-23)](checkpoints/2026-10-23-camera-root-registration.md) | +0x10 is a pass-through, no camera attach; E605 |
-| [Owner dtor a5cb30 (2026-10-23)](checkpoints/2026-10-23-owner-dtor-a5cb30.md) | 594 B row-9 teardown; E607 |
+| [Owner dtor a5cb30 (2026-10-23)](checkpoints/2026-10-23-owner-dtor-a5cb30.md) | 594 B teardown, zero-based row 9 / one-based row 10; E607 |
 | [Save metadata (2026-10-23)](checkpoints/2026-10-23-save-metadata.md) | 0x530 block, USR-META, delete; E606 |
 | [Ctor coverage batch (2026-10-23)](checkpoints/2026-10-23-ctor-coverage-batch.md) | 308/573 registered, first gap 296; E608 |
 | [SoCGameCore executable (2026-10-23)](checkpoints/2026-10-23-soc-game-core-executable.md) | arm64 core, protocol v1, no engine; E609 |

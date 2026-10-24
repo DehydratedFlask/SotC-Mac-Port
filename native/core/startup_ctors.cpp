@@ -365,9 +365,35 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
              const Slot297Result r = init_slot297_b25470(s.slot297_table, default_slot297_hooks());
              if (!r.ok) s.init_failed = true;
          }},
+        // idx 298 / 0xb0e250: `shaderTypeToLoad` ranged/enum console variable. Queues into the
+        // pending ConCmd list (the manager is installed by the engine boot, after static init). The
+        // formerly unresolved indirect call is the bare-ret functor destroy slot 0xb0e240. Any
+        // failed stage is a visible failure.
+        {0xb0e250, 298, [](StartupState& s) noexcept {
+             if (!init_slot298_b0e250(s.slot298_shader_type, s.concmd).ok) s.init_failed = true;
+         }},
+        // idx 299 / 0xb0c7a0: debug-text scale settings (float var, bool var, two debug-menu items).
+        // The menu parent cell is null at startup; any assert branch or parent contract is a
+        // visible failure.
+        {0xb0c7a0, 299, [](StartupState& s) noexcept {
+             if (!init_slot299_b0c7a0(s.slot299, s.concmd, s.debug_menu).ok) s.init_failed = true;
+         }},
         // idx 300 / 0xacc880: __cxa_atexit of the bare-ret destructor 0xacc5b0, null argument.
         {0xacc880, 300, [](StartupState& s) noexcept { (void)init_slot300_acc880(s.slot300_cleanup); }},
+        // idx 301 / 0xac9550: `rumbleEnabled` bool console variable (shared bool-var shape).
+        {0xac9550, 301, [](StartupState& s) noexcept {
+             if (!init_slot301_ac9550(s.slot301_rumble, s.concmd).ok) s.init_failed = true;
+         }},
+        {0xaaeee0, 302, [](StartupState& s) noexcept {
+             if (!init_slot302_aaeee0(s.slot302, s.concmd.atexit_log)) s.init_failed = true;
+         }},
+        // idx 303 / 0xa82170: `ProfileCPU` bool console variable (value/default 0) plus its
+        // "Profile CPU" debug-menu toggle. Queues into the same pending list; the menu parent is null.
+        {0xa82170, 303, [](StartupState& s) noexcept {
+             if (!init_slot303_a82170(s.slot303, s.concmd, s.debug_menu).ok) s.init_failed = true;
+         }},
         {0xa816d0, 304, [](StartupState& s) noexcept { init_leaf_a816d0(s.leaf_a816d0); }},
+        {0xa77b60, 305, [](StartupState& s) noexcept { init_slot305_a77b60(s.slot305); }},
         {0x9b75a0, 319, [](StartupState& s) noexcept { init_leaf_9b75a0(s.leaf_9b75a0); }},
         {0x8f3d90, 320, [](StartupState& s) noexcept { init_leaf_8f3d90(s.leaf_8f3d90); }},
         {0x8a0440, 321, [](StartupState& s) noexcept { init_leaf_8a0440(s.leaf_8a0440); }},

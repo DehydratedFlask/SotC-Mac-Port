@@ -19,15 +19,29 @@ public enum CoreClientFactory {
         locator: CoreLocator = CoreLocator(),
         fallback: @Sendable () -> any CoreClient
     ) -> any CoreClient {
+        select(environment: environment, bundleURL: bundleURL, executableURL: executableURL, locator: locator, fallback: fallback).client
+    }
+
+    /// Same choice as `make`, but also reports which transport was used and why, so the UI can say
+    /// "SoCGameCore not found" instead of silently answering from the in-process fallback.
+    public static func select(
+        environment: [String: String] = ProcessInfo.processInfo.environment,
+        bundleURL: URL? = Bundle.main.bundleURL,
+        executableURL: URL? = Bundle.main.executableURL,
+        locator: CoreLocator = CoreLocator(),
+        fallback: @Sendable () -> any CoreClient
+    ) -> (client: any CoreClient, transport: CoreTransport) {
         switch locator.locate(environment: environment, bundleURL: bundleURL, executableURL: executableURL) {
         case .found(let coreURL):
             do {
-                return try ProcessCoreClient(coreURL: coreURL)
+                return (try ProcessCoreClient(coreURL: coreURL), .childProcess(coreURL))
             } catch {
-                return fallback()
+                let name = coreURL.lastPathComponent
+                let reason = (error as? CoreFailure)?.message ?? error.localizedDescription
+                return (fallback(), .inProcessFallback(CoreLocator.notBuilt("\(name) was found but could not be started (\(reason))")))
             }
-        case .notFound:
-            return fallback()
+        case .notFound(let status):
+            return (fallback(), .inProcessFallback(status))
         }
     }
 }

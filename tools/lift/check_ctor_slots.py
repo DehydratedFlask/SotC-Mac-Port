@@ -101,6 +101,20 @@ assert len(slot21_lines) == 1 and "init_const_table_ee1130(s.const_table_ee1130)
 slot23_lines = [l for l in source_lines if re.match(r"^\s*\{\s*0xe71990\s*,\s*23\s*,", l)]
 assert len(slot23_lines) == 1 and "init_slot23_leaf_e71990(s)" in slot23_lines[0], (
     "slot 23 must call init_slot23_leaf_e71990")
+# CPU-01-CONCMD-298-299-301-01: the three ConCmd slots, wired to the shared registry state.
+SLOT_298_299_301 = {
+    298: (0xb0e250, "init_slot298_b0e250(s.slot298_shader_type, s.concmd)"),
+    299: (0xb0c7a0, "init_slot299_b0c7a0(s.slot299, s.concmd, s.debug_menu)"),
+    301: (0xac9550, "init_slot301_ac9550(s.slot301_rumble, s.concmd)"),
+    # CPU-01-CONCMD-303-01: ProfileCPU bool variable + "Profile CPU" debug-menu toggle.
+    302: (0xaaeee0, "init_slot302_aaeee0(s.slot302, s.concmd.atexit_log)"),
+    305: (0xa77b60, "init_slot305_a77b60(s.slot305)"),
+    303: (0xa82170, "init_slot303_a82170(s.slot303, s.concmd, s.debug_menu)"),
+}
+for slot_index, (slot_rva, slot_api) in SLOT_298_299_301.items():
+    lines = [l for l in source_lines if re.match(rf"^\s*\{{\s*{slot_rva:#x}\s*,\s*{slot_index}\s*,", l)]
+    assert len(lines) == 1, f"slot {slot_index} ({slot_rva:#x}) must be registered exactly once"
+    assert slot_api in array_match.group(1), f"slot {slot_index} must call {slot_api}"
 # CPU-01-STARTUP-SLOTS-296-297-300-01: three slot-specific modules with real callbacks.
 SLOT_296_297_300 = {
     296: (0xb2b6b0, "init_slot296_b2b6b0(s.slot296_stamp)"),
@@ -165,23 +179,23 @@ for index in sorted(modules):
         f"pinned table says {original_rvas[index]:#x}, module says {modules[index]:#x}")
 
 # Registered set = recovered prefix 0-151 + every byte-verified module + the sparse late rows that
-# have no vec_/leaf_ module + the three slot-specific modules 296/297/300. Extra rows would be
+# have no vec_/leaf_ module + the slot-specific modules 296-301 and 302/303/305. Extra rows would be
 # unverified registrations; a missing module row means a recovered constructor is silently skipped.
-expected_registered = set(range(152)) | set(modules) | {282, 290, 520, 538, 296, 297, 300}
+expected_registered = set(range(152)) | set(modules) | {282, 290, 520, 538, 296, 297, 300, 298, 299, 301, 302, 303, 305}
 assert set(rows_by_index) == expected_registered, (
     "registered set differs from the computed expectation: "
     f"extra={sorted(set(rows_by_index) - expected_registered)} "
     f"missing={sorted(expected_registered - set(rows_by_index))}")
 registered_digest = hashlib.sha256(
     ",".join(str(index) for index in sorted(rows_by_index)).encode()).hexdigest()
-assert registered_digest == "54bb4ad1f65eedc4f0489cc6322a7a908c7215e2e79044ffdcbde8358c8c0b31", (
+assert registered_digest == "ee1bf21bc35e9baddf2d4a54f8296379786ab103b630c92779d2f2ae53d976e0", (
     f"registered index-set sha256 changed: {registered_digest}")
 
-# The remaining 262 original slots are all `other`-class bodies (census: local/re/work/
+# The remaining 256 original slots are all `other`-class bodies (census: local/re/work/
 # ctor-classes.json). The first one is the explicit startup cliff after this batch.
 unregistered = sorted(set(range(TABLE_COUNT)) - set(rows_by_index))
-assert len(unregistered) == 262, f"expected 262 unregistered slots, found {len(unregistered)}"
-assert unregistered[0] == 298 and original_rvas[298] == 0xb0e250, (
+assert len(unregistered) == 256, f"expected 256 unregistered slots, found {len(unregistered)}"
+assert unregistered[0] == 306 and original_rvas[306] == 0xa633b0, (
     f"first unregistered slot changed: {unregistered[0]}/{original_rvas[unregistered[0]]:#x}")
 
 # The 573-row data table must reproduce the ELF exactly, in index order.
@@ -291,6 +305,6 @@ print(
     f"OK: ELF sha256={elf_digest}; constructor table start={TABLE_START:#x} "
     f"count={TABLE_COUNT} sha256={table_digest}; verified {len(rows)} registered RVA/index pairs "
     f"({len(modules)} vec_*/leaf_* modules); registered index-set sha256={registered_digest}; "
-    f"slots 0-47 recovered; idx 95 registered; 262 unregistered `other` slots remain, first "
+    f"slots 0-47 recovered; idx 95 registered; 256 unregistered `other` slots remain, first "
     f"{unregistered[0]} / {original_rvas[unregistered[0]]:#x}"
 )

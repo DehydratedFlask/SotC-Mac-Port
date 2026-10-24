@@ -286,6 +286,12 @@
 #include "ctor_slot_296_b2b6b0.hpp"
 #include "ctor_slot_297_b25470.hpp"
 #include "ctor_slot_300_acc880.hpp"
+#include "ctor_slot_298_b0e250.hpp"
+#include "ctor_slot_299_b0c7a0.hpp"
+#include "ctor_slot_301_ac9550.hpp"
+#include "ctor_slot_302_aaeee0.hpp"
+#include "ctor_slot_303_a82170.hpp"
+#include "ctor_slot_305_a77b60.hpp"
 
 namespace sotc {
 
@@ -555,8 +561,17 @@ struct StartupState {
     VecB33BD0 vec_b33bd0{};  // idx 295 / 0xb33bd0
     Slot296Stamp slot296_stamp{};      // idx 296 / 0xb2b6b0 (8-byte TSC stamp at 0x334ac18)
     Slot297Table slot297_table{};      // idx 297 / 0xb25470 (400 x 0x118 records at 0x332f650)
-    // Indices 298 (0xb0e250) and 299 (0xb0c7a0) remain unrecovered; 300 clears the next gap.
+    // Shared console-command state: the manager cell [0x2dfcbc8] (null until the engine boot installer 0x242c0), the pending
+    // list 0x2dfce50 the ConCmd constructors queue into, and the atexit log (CPU-01-CONCMD-298-301).
+    ConCmdRegistry concmd{};
+    Slot298Object slot298_shader_type{};  // idx 298 / 0xb0e250 (shaderTypeToLoad, 0x3305d20)
+    DebugMenuRegistry debug_menu{};       // parent cell [0x2dfd4b8] (null) + root list 0x2dfd4c0
+    Slot299Objects slot299{};             // idx 299 / 0xb0c7a0 (0x3305a30..0x3305d1f)
     Slot300Cleanup slot300_cleanup{};  // idx 300 / 0xacc880 (one inert atexit entry)
+    Slot301Object slot301_rumble{};    // idx 301 / 0xac9550 (rumbleEnabled, 0x33054a0)
+    Slot302Objects slot302{};          // idx 302 / 0xaaeee0 (ten handles + identity vptr)
+    Slot305Pairs slot305{};            // idx 305 / 0xa77b60 (six guarded zero pairs)
+    Slot303Objects slot303{};          // idx 303 / 0xa82170 (ProfileCPU 0x32fd228 + debug toggle 0x32fd2f0)
     LeafA816d0 leaf_a816d0{};  // idx 304 / 0xa816d0
     Leaf9b75a0 leaf_9b75a0{};  // idx 319 / 0x9b75a0
     Leaf8f3d90 leaf_8f3d90{};  // idx 320 / 0x8f3d90

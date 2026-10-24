@@ -242,7 +242,7 @@ def main() -> int:
     block = array_match.group(1)
     rows = [(int(rva, 16), int(index)) for rva, index in re.findall(
         r"^\s*\{\s*(0x[0-9a-fA-F]+)\s*,\s*(\d+)\s*,\s*\[", block, re.MULTILINE)]
-    require(len(rows) == 311, f"expected 311 registered rows, found {len(rows)}")
+    require(len(rows) == 317, f"expected 317 registered rows (296-305 included), found {len(rows)}")
     indices = [index for _, index in rows]
     require(indices == sorted(indices) and len(indices) == len(set(indices)),
             "constructor rows must be in strictly increasing index order")
@@ -265,7 +265,7 @@ def main() -> int:
         f"({SLOT_296_CALLEE_SHA256[:12]}…); "
         f"297 body {SLOT_297_SHA256[:12]}… 400x0x118 @ {SLOT_297_TABLE:#x}, dtor "
         f"{SLOT_297_DTOR_SHA256[:12]}…; "
-        f"300 body {SLOT_300_SHA256[:12]}… + ret-dtor {SLOT_300_DTOR:#x}; 311 rows"
+        f"300 body {SLOT_300_SHA256[:12]}… + ret-dtor {SLOT_300_DTOR:#x}; 317 rows"
     )
     return 0
 

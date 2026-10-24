@@ -67,7 +67,8 @@ struct ContentView: View {
                         .font(.system(.footnote, design: .monospaced))
                         .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .accessibilityLabel(Text("Diagnostics report"))
+                        .accessibilityLabel(Text(DiagnosticsAccessibility.label))
+                        .accessibilityValue(Text(DiagnosticsAccessibility.value(for: model.diagnosticsText)))
                     Button("Copy Diagnostics", systemImage: "doc.on.doc") {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(model.diagnosticsText, forType: .string)

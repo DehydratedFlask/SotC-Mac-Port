@@ -2,7 +2,7 @@
 //
 // Proves that every lifted vec_*/leaf_* constructor module runs in recovered_constructors(), that
 // the registered rows pair with the pinned original table, and that the remaining startup cliff is
-// explicit (first unrecovered index 298 / RVA 0xb0e250 after slots 296, 297 and 300).
+// explicit (first unrecovered index 306 / RVA 0xa633b0 after slots 296-305).
 #include <cstdio>
 #include <cstdlib>
 
@@ -29,7 +29,7 @@ int main() {
     CHECK(result.blocked_on_rva == 0);
     CHECK(!st.init_failed);
     CHECK(result.completed == slots.size());
-    CHECK(slots.size() == 311);
+    CHECK(slots.size() == 317);
 
     // Every registered row is in original order and pairs with the pinned table.
     for (std::size_t i = 0; i < slots.size(); ++i) {
@@ -40,9 +40,9 @@ int main() {
     }
 
     // ---- explicit, machine-checked gap ---------------------------------------
-    CHECK(first_unrecovered_constructor_index() == 298);
-    CHECK(first_unrecovered_constructor_rva() == 0xb0e250);
-    CHECK(slots.size() + 262 == kOriginalCtorCount);
+    CHECK(first_unrecovered_constructor_index() == 306);
+    CHECK(first_unrecovered_constructor_rva() == 0xa633b0);
+    CHECK(slots.size() + 256 == kOriginalCtorCount);
 
     // ---- spot checks: destination cells hold their module constants ----------
     CHECK(st.vec_d71f60 == kVecD71f60Bits);     // idx 95, the batch's new lift
@@ -59,6 +59,31 @@ int main() {
     CHECK(st.slot297_table[399].node == &static_object_2ee3b10());
     CHECK(st.slot297_table[0].flag00 == 0 && st.slot297_table[0].flag110 == 0);
     CHECK(st.slot300_cleanup.registered == 1);   // idx 300: one inert cleanup
+    // ---- CPU-01-CONCMD-298-299-301-01 ----------------------------------------
+    CHECK(st.slot298_shader_type.base.registered == 1);          // idx 298: shaderTypeToLoad
+    CHECK(st.slot298_shader_type.fn_vptr == 0x15d5960);
+    CHECK(st.slot299.scale.value == 0x3f800000u);                // idx 299: globalDebugTextScale 1.0f
+    CHECK(st.slot299.adjust.value == 1);                         //          ...AdjustFor4K
+    CHECK(st.slot299.scale_item.target == &st.slot299.scale);
+    CHECK(st.slot301_rumble.value == 1 && st.slot301_rumble.base.registered == 1);   // idx 301
+    // 298, 299 (A, B) and 301 queue into the pending ConCmd list in index order; the manager is
+    // installed by the engine boot after static init, so nothing here ever sees one.
+    CHECK(st.concmd.manager.manager == nullptr);
+    CHECK(st.slot303.var.base.registered == 1 && st.slot303.var.value == 0);   // idx 303: ProfileCPU
+    CHECK(st.slot303.var.default_value == 0 && st.slot303.var.fn_vptr == 0x15d2478);
+    CHECK(st.slot303.item.target == &st.slot303.var && st.slot303.item.flags == 0x30);
+    CHECK(st.concmd.manager.manager == nullptr);
+    CHECK(st.concmd.pending.size() == 5);                        // 298, 299 A/B, 301, 303
+    CHECK(st.concmd.pending.first() == &st.slot298_shader_type.base.pending);
+    CHECK(st.debug_menu.root.count == 3);                        // idx 299 items C and D, idx 303 toggle
+    CHECK(st.concmd.atexit_log.size() == 19);                    // 7 (298-301) + 10 (302) + 2 (303)
+    for (std::size_t i = 0; i < kSlot302HandleCount; ++i) {
+        CHECK(st.slot302.handles[i] == nullptr);
+        CHECK(st.concmd.atexit_log.at(7 + i).dtor_rva == kSlot302DtorRva);
+        CHECK(st.concmd.atexit_log.at(7 + i).object == &st.slot302.handles[i]);
+    }
+    CHECK(st.slot302.identity_vptr == kSlot302IdentityVptr);
+    for (const Pair128& pair : st.slot305) CHECK(pair.lo == 0 && pair.hi == 0);
     CHECK(st.leaf_7ce8d0.word0 == 0x3f80000000000001ull);  // idx 346
     CHECK(st.leaf_7ce8d0.word1 == 0x3f80000000000001ull);
     CHECK(st.leaf_7ce8d0.flag0.load() == 0 && st.leaf_7ce8d0.flag1.load() == 0);

@@ -5,8 +5,11 @@ import Testing
 
 /// APP-01-LAUNCHER-PROCESS-CLIENT-01: locator precedence and honest rejections.
 struct CoreLocatorTests {
-    private static let thinARM64: [UInt8] = [0xFE, 0xED, 0xFA, 0xCF]
-    private static let fat: [UInt8] = [0xCA, 0xFE, 0xBA, 0xBE]
+    private static func header(cpu: UInt32 = 0x0100000C, fileType: UInt32 = 2) -> [UInt8] {
+        [UInt32(0xFEEDFACF), cpu, 0, fileType, 0, 0, 0, 0].flatMap { word in
+            withUnsafeBytes(of: word.littleEndian) { Array($0) }
+        }
+    }
 
     /// A temp tree with one candidate per search location.
     private final class Sandbox {
@@ -34,11 +37,11 @@ struct CoreLocatorTests {
 
         func cleanup() { try? FileManager.default.removeItem(at: root) }
 
-        func writeCore(_ url: URL, magic: [UInt8] = CoreLocatorTests.thinARM64, executable: Bool = true) throws {
+        func writeCore(_ url: URL, header: [UInt8] = CoreLocatorTests.header(), executable: Bool = true) throws {
             try FileManager.default.createDirectory(
                 at: url.deletingLastPathComponent(), withIntermediateDirectories: true
             )
-            try Data(magic + [UInt8](repeating: 0, count: 28)).write(to: url)
+            try Data(header).write(to: url)
             try FileManager.default.setAttributes(
                 [.posixPermissions: executable ? 0o755 : 0o644], ofItemAtPath: url.path(percentEncoded: false)
             )
@@ -70,30 +73,30 @@ struct CoreLocatorTests {
         )
     }
 
-    @Test func acceptsEveryMachOMagic() throws {
+    @Test func rejectsNonNativeOrNonExecutableMachOHeaders() throws {
         let sandbox = try Sandbox()
         defer { sandbox.cleanup() }
-        let magics: [[UInt8]] = [
-            [0xFE, 0xED, 0xFA, 0xCF],
-            [0xCF, 0xFA, 0xED, 0xFE],
-            [0xCA, 0xFE, 0xBA, 0xBE],
-            [0xBE, 0xBA, 0xFE, 0xCA],
-            [0xCA, 0xFE, 0xBA, 0xBF],
-            [0xBF, 0xBA, 0xFE, 0xCA],
+        let invalid: [[UInt8]] = [
+            Self.header(cpu: 0x01000007), // x86_64 MH_EXECUTE must never reach Process/Rosetta.
+            Self.header(fileType: 6), // ARM64 MH_DYLIB is not a child executable.
+            [0xCA, 0xFE, 0xBA, 0xBE] + [UInt8](repeating: 0, count: 28), // FAT_MAGIC
+            [0xBF, 0xBA, 0xFE, 0xCA] + [UInt8](repeating: 0, count: 28), // FAT_CIGAM_64
+            Array(Self.header().prefix(8)), // truncated thin ARM64
+            [0xFE, 0xED, 0xFA, 0xCF] + [UInt8](repeating: 0, count: 28), // wrong byte order / CPU
         ]
-        for magic in magics {
-            try sandbox.writeCore(sandbox.envCore, magic: magic)
-            #expect(locate(sandbox.envCore.path(percentEncoded: false), sandbox) == .found(sandbox.envCore))
+        for header in invalid {
+            try sandbox.writeCore(sandbox.envCore, header: header)
+            #expect(locate(sandbox.envCore.path(percentEncoded: false), sandbox).url == nil)
+            #expect(locate(sandbox.envCore.path(percentEncoded: false), sandbox).rejection
+                == SystemChecks.nativeCore(executable: sandbox.envCore))
         }
     }
 
-    @Test func acceptsAFatFileAndAThinARM64File() throws {
+    @Test func acceptsAThinARM64ExecutableHeader() throws {
         let sandbox = try Sandbox()
         defer { sandbox.cleanup() }
-        for magic in [Self.fat, Self.thinARM64] {
-            try sandbox.writeCore(sandbox.envCore, magic: magic)
-            #expect(locate(sandbox.envCore.path(percentEncoded: false), sandbox).url == sandbox.envCore)
-        }
+        try sandbox.writeCore(sandbox.envCore)
+        #expect(locate(sandbox.envCore.path(percentEncoded: false), sandbox).url == sandbox.envCore)
     }
 
     @Test func rejectsADirectoryWithTheSystemChecksWording() throws {
@@ -254,17 +257,12 @@ struct CoreLocatorTests {
     @Test func factoryPrefersTheProcessClientWhenTheLocatorFindsAValidCore() throws {
         let sandbox = try Sandbox()
         defer { sandbox.cleanup() }
-        // Any real Mach-O executable proves transport selection. It speaks no protocol, so this test
-        // never calls it; `/usr/bin/true` simply exits. The real core is built by the native worker.
-        let source = URL(filePath: "/usr/bin/true")
-        guard FileManager.default.isExecutableFile(atPath: source.path(percentEncoded: false)) else {
-            Issue.record("/usr/bin/true is not available on this host")
-            return
-        }
+        // A native slice of `true` proves transport selection without invoking Rosetta. It speaks no
+        // protocol; protocol agreement is covered by the opt-in real core test.
         try FileManager.default.createDirectory(
             at: sandbox.envCore.deletingLastPathComponent(), withIntermediateDirectories: true
         )
-        try FileManager.default.copyItem(at: source, to: sandbox.envCore)
+        try NativeExecutableFixture.write(to: sandbox.envCore)
 
         let client = CoreClientFactory.make(
             environment: [CoreLocator.environmentVariable: sandbox.envCore.path(percentEncoded: false)],

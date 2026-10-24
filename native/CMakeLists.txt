@@ -2019,3 +2019,57 @@ target_sources(sotc_core PRIVATE
 add_executable(test_ctor_slots_296_297_300 tests/test_ctor_slots_296_297_300.cpp)
 target_link_libraries(test_ctor_slots_296_297_300 sotc_core)
 add_test(NAME ctor_slots_296_297_300 COMMAND test_ctor_slots_296_297_300)
+
+# CPU-01-OWNER-ROWS-3-18-01: row-3 (ResourcePool, `0x14db00`) and row-18 (`0x3c5cb0`) owner
+# constructors + their context-free owner_members adapters. Appended; existing targets keep order.
+target_sources(sotc_core PRIVATE
+  core/owner_ctor_3c5cb0.cpp
+  core/owner_ctor_14db00.cpp)
+
+add_executable(test_owner_ctor_3c5cb0 tests/test_owner_ctor_3c5cb0.cpp)
+target_link_libraries(test_owner_ctor_3c5cb0 sotc_core)
+add_test(NAME owner_ctor_3c5cb0 COMMAND test_owner_ctor_3c5cb0)
+
+add_executable(test_owner_ctor_14db00 tests/test_owner_ctor_14db00.cpp)
+target_link_libraries(test_owner_ctor_14db00 sotc_core)
+add_test(NAME owner_ctor_14db00 COMMAND test_owner_ctor_14db00)
+
+# CPU-01-CONCMD-298-299-301-01: shared ConCmd base/registry, the bool and ranged console-variable
+# shapes, the debug-menu item, and the startup slots 298 (shaderTypeToLoad), 299 (debug text scale)
+# and 301 (rumbleEnabled). Appended; existing
+# target order is untouched.
+target_sources(sotc_core PRIVATE
+  core/concmd_base.cpp
+  core/concmd_vars.cpp
+  core/debug_menu_item.cpp
+  core/ctor_slot_298_b0e250.cpp
+  core/ctor_slot_299_b0c7a0.cpp
+  core/ctor_slot_301_ac9550.cpp)
+
+add_executable(test_concmd_slots_298_299_301 tests/test_concmd_slots_298_299_301.cpp)
+target_link_libraries(test_concmd_slots_298_299_301 sotc_core)
+add_test(NAME concmd_slots_298_299_301 COMMAND test_concmd_slots_298_299_301)
+
+# CPU-01-CONCMD-303-01: startup slot 303 (0xa82170), the `ProfileCPU` bool console variable and its
+# "Profile CPU" debug-menu toggle. Reuses the bool-var shape (now parameterised on value/default)
+# and the debug-menu toggle from the 298/299/301 batch. Appended; existing target order untouched.
+target_sources(sotc_core PRIVATE
+  core/ctor_slot_303_a82170.cpp)
+
+add_executable(test_ctor_slot_303 tests/test_ctor_slot_303.cpp)
+target_link_libraries(test_ctor_slot_303 sotc_core)
+add_test(NAME ctor_slot_303 COMMAND test_ctor_slot_303)
+
+# CPU-01-STARTUP-302-303-305-01: ten handles/cleanup records and six guarded pair copies.
+target_sources(sotc_core PRIVATE core/ctor_slot_302_aaeee0.cpp core/ctor_slot_305_a77b60.cpp)
+add_executable(test_ctor_slot_302_305 tests/test_ctor_slot_302_305.cpp)
+target_link_libraries(test_ctor_slot_302_305 sotc_core)
+add_test(NAME ctor_slot_302_305 COMMAND test_ctor_slot_302_305)
+
+# GPU-01-CSDR-READER-01: importer-only raw shader-container reader and metadata diagnostic.
+target_sources(sotc_core PRIVATE core/csdr_container.cpp)
+add_executable(test_csdr_container tests/test_csdr_container.cpp)
+target_link_libraries(test_csdr_container sotc_core)
+add_test(NAME csdr_container COMMAND test_csdr_container)
+add_executable(csdr_inspect ../tools/dev/csdr_inspect.cpp)
+target_link_libraries(csdr_inspect PRIVATE sotc_core)

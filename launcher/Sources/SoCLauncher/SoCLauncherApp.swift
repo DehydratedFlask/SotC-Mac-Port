@@ -4,7 +4,7 @@ import SwiftUI
 
 @main
 struct SoCLauncherApp: App {
-    @State private var model = LauncherModel(client: SoCLauncherApp.makeClient())
+    @State private var model = SoCLauncherApp.makeModel()
 
     var body: some Scene {
         Window("Shadow of the Colossus", id: "main") {
@@ -20,8 +20,9 @@ struct SoCLauncherApp: App {
     /// Prefer a real `SoCGameCore` child process when the locator finds one; otherwise talk to the
     /// in-process C ABI. If the handshake fails, every request reports that failure
     /// (`UnavailableCoreClient`); the launcher never substitutes a fake that could say "running".
-    private static func makeClient() -> any CoreClient {
-        CoreClientFactory.make(fallback: { makeInProcessClient() })
+    private static func makeModel() -> LauncherModel {
+        let selection = CoreClientFactory.select(fallback: { makeInProcessClient() })
+        return LauncherModel(client: selection.client, transport: selection.transport)
     }
 
     nonisolated private static func makeInProcessClient() -> any CoreClient {

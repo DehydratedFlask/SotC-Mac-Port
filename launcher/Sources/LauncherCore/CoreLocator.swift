@@ -8,26 +8,14 @@ import Foundation
 /// 3. `<app bundle>/Contents/Resources/SoCGameCore`,
 /// 4. `SoCGameCore` next to the running executable (covers `swift run` and an unbundled binary).
 ///
-/// A candidate is accepted only when it is an existing **regular executable file** whose first four
-/// bytes are a Mach-O magic. Directories, scripts and other files are rejected with the same wording
+/// A candidate is accepted only when it is an existing **regular executable file** with a thin
+/// 64-bit ARM64 MH_EXECUTE header. Directories, scripts and other files use the same rejection wording
 /// `SystemChecks.nativeCore(executable:)` uses, so the launcher's "NOT BUILT … Play disabled" copy
 /// stays identical. Finding a core proves only that a file exists — it never means the engine is
 /// implemented or that the game can start.
 public struct CoreLocator: Sendable {
     public static let environmentVariable = "SOTC_CORE_PATH"
     public static let executableName = SystemChecks.expectedCoreExecutableName
-
-    /// First four bytes as they appear on disk: thin 64-bit and universal (fat) files, both byte
-    /// orders. The locator accepts any of them; `SystemChecks` additionally requires a thin ARM64
-    /// `MH_EXECUTE` for its readiness probe.
-    static let machOMagics: Set<UInt32> = [
-        0xFEED_FACF,  // feedfacf
-        0xCFFA_EDFE,  // cffaedfe
-        0xCAFE_BABE,  // cafebabe
-        0xBEBA_FECA,  // bebafeca
-        0xCAFE_BABF,  // cafebabf
-        0xBFBA_FECA,  // bfbafeca
-    ]
 
     public enum Location: Equatable, Sendable {
         case found(URL)
@@ -127,18 +115,10 @@ public struct CoreLocator: Sendable {
         guard FileManager.default.isExecutableFile(atPath: path) else {
             return .failure(Rejection(detail: "\(name) is not executable", fileExists: true))
         }
-        guard hasMachOMagic(url) else {
+        guard SystemChecks.isMachOExecutable(at: url) else {
             return .failure(Rejection(detail: "\(name) is not a Mach-O executable (refusing scripts/stubs)", fileExists: true))
         }
         return .success(url)
     }
 
-    /// Header check only: reads four bytes, executes nothing, and makes no readiness claim.
-    private static func hasMachOMagic(_ url: URL) -> Bool {
-        guard let handle = try? FileHandle(forReadingFrom: url) else { return false }
-        defer { try? handle.close() }
-        guard let header = try? handle.read(upToCount: 4), header.count == 4 else { return false }
-        let magic = header.reduce(UInt32(0)) { ($0 << 8) | UInt32($1) }
-        return machOMagics.contains(magic)
-    }
 }
