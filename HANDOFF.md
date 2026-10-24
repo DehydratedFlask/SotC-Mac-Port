@@ -16,8 +16,9 @@
   `34fc0b4366dfe97c46a61ca659a6b19bd55c54992d56765227533f25094c72e2`; parsed output equals the
   direct draw byte-for-byte.
 - Full required gates all exited 0: configure; full build; CTest 391/391; lift checkers 476 passed,
-  0 skipped, 0 failed; full publish-path audit 2,746 paths; commit-attribution audit; project index
-  9,039 folders; `git diff --check`; and `trail build --check` with 8,295 wiring nodes. Full logs are
+  0 skipped, 0 failed; staged publish-path audit 9 paths; full publish-path audit 2,747 paths;
+  commit-attribution audit; project index 9,039 folders; `git diff --check`; and `trail build --check`
+  with 8,295 wiring nodes. Full logs are
   under `local/orchestrator/gpu03-r31/synthetic-parser-metal/`. A reviewer checked the source diff
   read-only and found no actionable issues.
 - One log-capture wrapper exited 1 because zsh's `status` variable is read-only; direct `trail build
@@ -34,10 +35,38 @@
   `docs/INDEX.md`, `docs/FOLDERS.md`, this HANDOFF, and new checkpoint
   `docs/checkpoints/2026-10-24-gpu03-synthetic-parser-metal-flow.md`. After adding the checkpoint,
   `python3 scripts/project_index.py` exited 0 and indexed 9,039 folders.
-- Next exact action: review/stage only the allowlisted source/docs, run the staged path audit and full
-  path audit, verify commit attribution, then commit and push this completed checkpoint as Johnny
-  Wang. No Claude/Anthropic contributor or co-author attribution.
+- Publication: implementation/evidence commit `400152ad6de95f4147ee5dbf1e6d6dbb3194fd30` was pushed
+  to `origin/cursor/init-hash-551140-9dfc`. `git ls-remote`, local HEAD and tracking ref all matched
+  that SHA; worktree is clean. Author and committer are Johnny Wang
+  `<dehydratedflask@users.noreply.github.com>`; attribution audit passed and the commit has no
+  Claude/Anthropic co-author trailer.
+- Next exact action: characterize the logo pixel shader's whole-quad lane behavior in the separately
+  claimed task below, using only E625's pinned private shader spans and authoritative ISA evidence.
+  Real raw `.cmsh` permission, NRM0 handling, and screenshot seam choices remain pending.
 - Status: child task `FIXTURE_VERIFIED`; parent GPU-03 `ACTIVE`; no game-frame claim.
+
+## 2026-10-24 16:10 CDT — GPU-02 logo WQM analysis task claimed
+
+- Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`, clean at claim time at
+  `400152ad6de95f4147ee5dbf1e6d6dbb3194fd30`. Task:
+  `GPU-02-GCN-LOGO-WQM-ANALYSIS-01`, attempt 0, 0 failed hypotheses.
+- User order: the default material pair was selected and is now fixture-verified (E627); the next
+  shader-only step characterizes the deferred logo pixel shader's whole-quad behavior before any
+  logo MSL lowering.
+- Bounded output: byte-bound analysis of the pinned E625 logo pixel program's execution-mask/WQM
+  controls and texture-sample dependencies. Record exact input identity and instruction boundaries,
+  map supported operations to authoritative AMD ISA semantics, and keep unresolved behavior named.
+  This is analysis only: no new MSL, renderer integration, asset re-extraction, or game-frame claim.
+- Files changed at claim: `docs/TASKS.md` (task row) and this HANDOFF checkpoint. No source or private
+  shader files were edited. No asset archive was opened.
+- Specification: `docs/METAL_FRAME_PATH.md` sections 4.6, 4.7 and task card 3; E625 inventories the
+  logo VS/PS spans and flags WQM as deferred. The next exact action is a Trail source query for the
+  decoder/emitter's current WQM and texture-sample support, then inspect only the existing E625
+  private span and cross-check official ISA wording.
+- Observation versus inference: default-pair completion permits advancing in the chosen shader order;
+  the logo shader's earlier inventory label alone is not proof of its wave/quad semantics.
+- Status: `ACTIVE`; attempt 0; no failed hypotheses. G3 remains PARTIAL at best; logo WQM/texture
+  lowering and the L1 real-asset frame are not verified.
 
 ## 2026-10-24 16:03 CDT — GPU-03 synthetic parser-to-Metal task claimed
 
