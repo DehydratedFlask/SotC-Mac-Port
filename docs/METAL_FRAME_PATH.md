@@ -1,8 +1,10 @@
-# Metal first-frame path: research and design
+# Metal first-frame path: research, design, and bounded harness work
 
-Status: RESEARCH AND DESIGN ONLY (round 29, lane D). Observations are STATIC_ANALYSIS_VERIFIED or
-ARTIFACT_VERIFIED as marked; nothing here renders a game frame, executes game code, or promotes a gate.
-**G3 stays NOT RUN.** The existing Metal capture provider (E610) still renders only a synthetic pattern.
+Status: E627 verifies the selected default shader pair against an independent oracle; E632 and E633
+verify direct Metal rendering of synthetic geometry, including a synthetic parser-to-renderer flow.
+The L1 asset-derived harness is still in progress: real `.cmsh` bytes have not gone through the native
+parser or Metal renderer, retail bindings remain unknown, and no game frame is established. **G3 is
+PARTIAL, not PASSED**, under the synthetic-scene rule in `docs/VALIDATION.md`.
 Read [AGENTS.md](../AGENTS.md), [ROADMAP.md](../ROADMAP.md), [HANDOFF.md](../HANDOFF.md),
 [PLATFORM.md](PLATFORM.md) and [VALIDATION.md](VALIDATION.md) (gate G3) first. This file adds no
 runtime behaviour; its only code is the read-only probe `tools/dev/gpu_asset_probe.py`.
@@ -477,4 +479,5 @@ the four programs is outside the simple per-lane subset, the card is re-scoped r
   `a47cba7da7bc`.
 - Pairing check, stdlib only: for each manifest path `p`, `hashlib.md5(p.encode()).hexdigest()` equals
   exactly one entry's TOC value; compare its index with `k + 1`.
-- Nothing here is a gate result: G3 NOT RUN, G1 PARTIAL as in HANDOFF.
+- The design and fixture evidence here do not establish a game frame. Current G3 is PARTIAL, not
+  PASSED; G1 remains PARTIAL as recorded in HANDOFF.

@@ -1,5 +1,44 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-24 16:09 CDT — GPU-03 synthetic parser-to-Metal flow verified
+
+- Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`. Task
+  `GPU-03-CMSH-SYNTHETIC-METAL-FLOW-01` is `FIXTURE_VERIFIED` at attempt 1, with 0 failed
+  implementation hypotheses. Parent `GPU-03-RENDEROPS-ASSET-FRAME-01` remains ACTIVE.
+- Source changed: `native/tests/test_metal_asset_frame.cpp`; added an in-memory 178-byte synthetic
+  POS0 float3/U16 triangle-list serializer, parser round-trip assertions, and an RGBA/PNG equality
+  check between the parser-owned mesh and the equivalent hand-built draw. No production API or
+  renderer behavior changed.
+- Exact focused commands and results: `cmake --build local/build/orch-r22 --target
+  test_metal_asset_frame -j 12` exit 0; `ctest --test-dir local/build/orch-r22 -V -R
+  '^metal_asset_frame$'` exit 0, 1/1. Metal API/GPU validation both logged enabled, with no
+  error/fault diagnostics. Parser-produced PNG is 5,999 B, SHA-256
+  `34fc0b4366dfe97c46a61ca659a6b19bd55c54992d56765227533f25094c72e2`; parsed output equals the
+  direct draw byte-for-byte.
+- Full required gates all exited 0: configure; full build; CTest 391/391; lift checkers 476 passed,
+  0 skipped, 0 failed; full publish-path audit 2,746 paths; commit-attribution audit; project index
+  9,039 folders; `git diff --check`; and `trail build --check` with 8,295 wiring nodes. Full logs are
+  under `local/orchestrator/gpu03-r31/synthetic-parser-metal/`. A reviewer checked the source diff
+  read-only and found no actionable issues.
+- One log-capture wrapper exited 1 because zsh's `status` variable is read-only; direct `trail build
+  --check` succeeded. This was a command-wrapper correction, not a product failure or failed
+  implementation hypothesis.
+- Observation versus inference: synthetic parser output feeds the current direct-Metal API and
+  matches a direct draw; retail POS0 format, NRM0, resource ABI, frame convention, game rendering,
+  and game acceptance remain unverified. Generated fixture bytes and its PNG hash stayed in memory;
+  logs and all build/PNG artifacts are private under `local/`.
+- G3 is now `PARTIAL`, following the explicit synthetic-scene rule in `docs/VALIDATION.md`; it is
+  not PASSED. E629 remains the only real-mesh evidence (probe hashes/counts). Real archive bytes,
+  NRM0 handling, and direct PNG versus `attach_screenshot` are awaiting the user's response.
+- Updated `docs/TASKS.md`, `docs/EVIDENCE.md` (E633), `docs/VALIDATION.md`, `docs/METAL_FRAME_PATH.md`,
+  `docs/INDEX.md`, `docs/FOLDERS.md`, this HANDOFF, and new checkpoint
+  `docs/checkpoints/2026-10-24-gpu03-synthetic-parser-metal-flow.md`. After adding the checkpoint,
+  `python3 scripts/project_index.py` exited 0 and indexed 9,039 folders.
+- Next exact action: review/stage only the allowlisted source/docs, run the staged path audit and full
+  path audit, verify commit attribution, then commit and push this completed checkpoint as Johnny
+  Wang. No Claude/Anthropic contributor or co-author attribution.
+- Status: child task `FIXTURE_VERIFIED`; parent GPU-03 `ACTIVE`; no game-frame claim.
+
 ## 2026-10-24 16:03 CDT — GPU-03 synthetic parser-to-Metal task claimed
 
 - Integrator: Codex `/root`; branch `cursor/init-hash-551140-9dfc`, clean at claim time, HEAD

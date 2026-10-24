@@ -131,7 +131,7 @@ Follow [AGENTS.md](../AGENTS.md), [PLATFORM.md](PLATFORM.md), [ROADMAP.md](../RO
 | G0 | Local inventory, provenance, toolchain, indexing | PARTIAL |
 | G1 | Pure native CPU/game-core feasibility | PARTIAL (startup harness + Init-hash + prologue early+tail+gates+lifted 0x3be050+0x1ab550→0xf08 singleton→base with lifted vslot 0x534130+mid 0x255340+0x533100 header+post/1fc80→registry; unresolved edges in E404–E422; not PASSED) |
 | G2 | Native services, audio fixtures, save fixtures | NOT RUN |
-| G3 | Direct Metal resources, shader semantics, rendering | NOT RUN |
+| G3 | Direct Metal resources, shader semantics, rendering | PARTIAL (E627 default-pair shader fixtures; E632/E633 synthetic Metal geometry/parser flow; real asset bindings and passes remain unverified) |
 | G4 | Native Swift/macOS launcher and lifecycle | NOT RUN |
 | G5 | Actual game boot, actual sound, real save/reload | NOT RUN |
 | G6 | Final packaging, native-only audit, stability/performance | NOT RUN |

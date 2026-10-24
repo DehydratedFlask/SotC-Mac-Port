@@ -12,17 +12,18 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [POINTERS](POINTERS.md) | Address classes, tagged 31-bit fields, evidence labels (CPU-02 partial); integrator |
 | [ASSETS](ASSETS.md) | PSARC archive findings and audio-asset leads (DATA-02/AUD-01 partial); integrator |
 | [GPU01_PREP](GPU01_PREP.md) | Offline `.csdr`/`.cmat` member-name inventory from manifests (GPU-01 prep); GPU worker |
-| [METAL_FRAME_PATH](METAL_FRAME_PATH.md) | Renderer boundary research and bounded importer/Metal task cards; asset-derived harness only; G3 NOT RUN |
+| [METAL_FRAME_PATH](METAL_FRAME_PATH.md) | Renderer boundary, bounded importer/Metal work, and synthetic harness evidence; G3 PARTIAL, no game frame |
 | [PSARC MD5 reconciliation](checkpoints/2026-10-24-psarc-md5-reconciliation.md) | Correct path-key pairing and superseded audio/asset claims; E621 |
 | [Startup slots 302/303/305](checkpoints/2026-10-24-startup-slots-302-303-305.md) | 317/573 registered, first gap 306; E623; fixture/static verification only |
 | [Slot 303 checker publication repair](checkpoints/2026-10-24-slot303-publication-repair.md) | Complete function reconstruction removed from public checker; E624 |
-| [GFX7 default-pair inventory and Metal harness](checkpoints/2026-10-24-gcn-default-pair.md) | E625 inventory plus E627 bounded default VS/PS MSL and Metal harness; G3 NOT RUN |
+| [GFX7 default-pair inventory and Metal harness](checkpoints/2026-10-24-gcn-default-pair.md) | E625 inventory plus E627 bounded default VS/PS MSL; overall G3 is PARTIAL from later synthetic Metal harness work |
 | [CSDR reader corpus and review](checkpoints/2026-10-24-csdr-reader.md) | E626 structural-first attempt3, arbitrary `cc xx`, full corpus v5 and independent review |
 | [Round 30 integration](checkpoints/2026-10-24-round30-integration.md) | Root replay: CTest 388/388, lift checkers 476/0/0, Python 228/228, shader harness and outstanding game gates; E628 |
 | [GPU-03 L1 asset-derived frame claim](checkpoints/2026-10-24-gpu03-claim.md) | E629 pins raw `cube_1m`/`cone` geometry; native reader and direct-Metal draw are active; no game-frame/G3 PASS claim |
 | [GPU-03 native raw mesh reader](checkpoints/2026-10-24-gpu03-cmsh-reader.md) | E630 bounded POS0/U16 parser, malformed synthetic fixtures, CMake integration and full native verification; real member bytes remain untested |
 | [GPU-03 typed RenderOp API](checkpoints/2026-10-24-gpu03-renderops-api.md) | E631 host handles and fail-visible typed indexed draw op validation; E632 separately records the synthetic direct-Metal fixture; real asset frame remains NOT RUN |
 | [GPU-03 synthetic direct-Metal frame](checkpoints/2026-10-24-gpu03-metal-synthetic-frame.md) | E632 pinned default-pair MSL, synthetic indexed/depth frame, CPU per-pixel validation and Metal API/GPU validation; no real mesh bytes or game-frame claim |
+| [GPU-03 synthetic parser-to-Metal flow](checkpoints/2026-10-24-gpu03-synthetic-parser-metal-flow.md) | E633 synthetic `.cmsh` bytes parsed and rendered through the default MSL path; output exactly matches a direct draw |
 | [CTOR_CLASSES](CTOR_CLASSES.md) | 573-entry constructor-table classification by reachable-body idiom plus the slot 10–19/24–47 family contract; CPU-01 |
 | [INPUTTABLE_551140](INPUTTABLE_551140.md) | Numeric-only deepen of Init-hash 275-entry table (`0x551140`); CPU-01 |
 | [INPUTTABLE_551140_NAMES_FIXTURE](INPUTTABLE_551140_NAMES_FIXTURE.md) | Private 275-name fixture recipe for registry fill `0x52a220`; CPU-01 |

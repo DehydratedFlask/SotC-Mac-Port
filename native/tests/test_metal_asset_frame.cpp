@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -249,6 +250,54 @@ void fragment_classes_match(std::span<const std::uint8_t> rgba, const CpuMask& c
     return {{-0.38F, -0.31F, -0.10F}, {0.39F, -0.29F, -0.10F}, {0.04F, 0.42F, -0.10F}};
 }
 
+void append_u16(std::vector<std::byte>& bytes, std::uint16_t value) {
+    bytes.push_back(static_cast<std::byte>(value & 0xff));
+    bytes.push_back(static_cast<std::byte>((value >> 8) & 0xff));
+}
+
+void append_u32(std::vector<std::byte>& bytes, std::uint32_t value) {
+    bytes.push_back(static_cast<std::byte>(value & 0xff));
+    bytes.push_back(static_cast<std::byte>((value >> 8) & 0xff));
+    bytes.push_back(static_cast<std::byte>((value >> 16) & 0xff));
+    bytes.push_back(static_cast<std::byte>((value >> 24) & 0xff));
+}
+
+[[nodiscard]] std::vector<std::byte> make_synthetic_raw_cmsh(
+    std::span<const sotc::CmshPosition> positions,
+    std::span<const std::uint16_t> indices) {
+    constexpr std::size_t kHeaderBytes = 0x4e;
+    constexpr std::size_t kDescriptorBytes = 24;
+    constexpr std::uint32_t kIndexMarker = 1;
+    if (positions.empty() || indices.empty() || indices.size() % 3 != 0 ||
+        positions.size() > std::numeric_limits<std::uint32_t>::max() / 12 ||
+        indices.size() > std::numeric_limits<std::uint32_t>::max()) {
+        return {};
+    }
+
+    std::vector<std::byte> bytes(kHeaderBytes, std::byte{0});
+    for (char tag_byte : std::array<char, 4>{'0', 'S', 'O', 'P'}) {
+        bytes.push_back(static_cast<std::byte>(tag_byte));
+    }
+    append_u16(bytes, 2);  // Synthetic POS0 float3 format used by the bounded parser fixture.
+    append_u16(bytes, 2);  // Opaque descriptor flags.
+    append_u32(bytes, 0);  // Stream offset relative to the computed data base.
+    append_u32(bytes, 0);  // Opaque descriptor field.
+    append_u32(bytes, static_cast<std::uint32_t>(positions.size() * 12));
+    append_u32(bytes, 0);  // Opaque descriptor field.
+    if (bytes.size() != kHeaderBytes + kDescriptorBytes) return {};
+    bytes.insert(bytes.end(), 8, std::byte{0xff});
+
+    for (const sotc::CmshPosition& position : positions) {
+        append_u32(bytes, std::bit_cast<std::uint32_t>(position.x));
+        append_u32(bytes, std::bit_cast<std::uint32_t>(position.y));
+        append_u32(bytes, std::bit_cast<std::uint32_t>(position.z));
+    }
+    append_u32(bytes, kIndexMarker);
+    append_u32(bytes, static_cast<std::uint32_t>(indices.size()));
+    for (std::uint16_t index : indices) append_u16(bytes, index);
+    return bytes;
+}
+
 [[nodiscard]] bool render_ok(sotc::MetalAssetFrameRenderer& renderer,
                              std::span<const sotc::AssetMeshDraw> draws,
                              sotc::MetalAssetFrameResult& result, std::string_view label) {
@@ -393,6 +442,46 @@ int main() {
 
     std::string baseline_hash = sha256_hex(baseline.png);
     check("baseline PNG SHA-256 computed", !baseline_hash.empty());
+
+    const std::vector<std::byte> synthetic_cmsh =
+        make_synthetic_raw_cmsh(back_positions, back_indices);
+    check("synthetic raw .cmsh bytes serialized", !synthetic_cmsh.empty());
+    const sotc::CmshParseResult parsed_result = sotc::parse_cmsh_mesh(synthetic_cmsh);
+    const auto* parsed_mesh = std::get_if<sotc::CmshMesh>(&parsed_result);
+    check("synthetic raw .cmsh parsed", parsed_mesh != nullptr);
+    if (parsed_mesh != nullptr) {
+        bool parsed_geometry_matches = parsed_mesh->positions.size() == back_positions.size() &&
+                                       parsed_mesh->indices == back_indices;
+        if (parsed_geometry_matches) {
+            for (std::size_t i = 0; i < back_positions.size(); ++i) {
+                const sotc::CmshPosition& parsed = parsed_mesh->positions[i];
+                const sotc::CmshPosition& expected = back_positions[i];
+                parsed_geometry_matches = parsed_geometry_matches && parsed.x == expected.x &&
+                                          parsed.y == expected.y && parsed.z == expected.z;
+            }
+        }
+        check("parser returns the serialized positions and U16 indices", parsed_geometry_matches);
+
+        const sotc::AssetMeshDraw hand_built_draw{back_positions, back_indices, back_shader};
+        const sotc::AssetMeshDraw parser_draw{parsed_mesh->positions, parsed_mesh->indices,
+                                              back_shader};
+        sotc::MetalAssetFrameResult hand_built_result;
+        sotc::MetalAssetFrameResult parser_result;
+        const bool hand_built_rendered = render_ok(*renderer, std::span(&hand_built_draw, 1),
+                                                   hand_built_result, "hand-built reference draw");
+        const bool parser_rendered = render_ok(*renderer, std::span(&parser_draw, 1),
+                                               parser_result, "synthetic parser-to-Metal draw");
+        check("hand-built and parser-produced draws render", hand_built_rendered && parser_rendered);
+        if (hand_built_rendered && parser_rendered) {
+            check("synthetic parser-to-Metal RGBA and PNG match the direct draw",
+                  parser_result.rgba8 == hand_built_result.rgba8 &&
+                      parser_result.png == hand_built_result.png);
+            std::printf("synthetic parser-to-Metal flow: bytes=%zu PNG bytes=%zu sha256=%s\n",
+                        synthetic_cmsh.size(), parser_result.png.size(),
+                        sha256_hex(parser_result.png).c_str());
+        }
+    }
+
     std::printf("metal_asset_frame: synthetic harness MSL sha256=%s; PNG bytes=%zu sha256=%s; "
                 "coverage=%zu; CPU mask errors yDown=%zu yUp=%zu; per-pixel draw errors="
                 "yDown:%zu yUp:%zu\n",
