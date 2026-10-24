@@ -1,5 +1,33 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-24 16:03 CDT — GPU-03 synthetic parser-to-Metal task claimed
+
+- Integrator: Codex `/root`; branch `cursor/init-hash-551140-9dfc`, clean at claim time, HEAD
+  `863f8a86ebe189731e9ad9230746edfe29552e3b`. Task:
+  `GPU-03-CMSH-SYNTHETIC-METAL-FLOW-01`, attempt 0, 0 failed implementation hypotheses.
+- Bounded output: extend only the private Metal fixture test to create well-formed synthetic raw
+  `.cmsh` bytes, parse them with `parse_cmsh_mesh`, pass the resulting live POS0/U16 vectors through
+  `AssetMeshDraw`, then compare direct-Metal output with an equivalent hand-built draw using the
+  hash-pinned default-pair MSL. No renderer API change is expected.
+- Files changed at claim: `docs/TASKS.md` (this HANDOFF checkpoint and the task row are the claim).
+  Source/tests have not been edited yet. Exact claim preflight: `git status --short --branch`,
+  `git log -3 --oneline --decorate`, and `trail grep 'parse_cmsh_mesh'`; all completed with exit 0.
+- Evidence prerequisites: E630 synthetic parser fixture; E632 synthetic direct-Metal frame; default
+  MSL SHA-256 `5524537e36b2481798abe5bf6c311e37082aed26b136c4590f7d685e671a455e`. Reviewers verified
+  that `CmshMesh` positions/indices match `AssetMeshDraw` spans, but the current Metal test does not
+  call the parser.
+- Ruling: keep this step synthetic while permission to parse real local asset bytes is pending. The
+  test will use the existing harness-supplied `DefaultShaderCase` and private PNG output, without
+  decoding NRM0 or attaching a screenshot. Cost if wrong: one extra synthetic-only checkpoint before
+  the desired real-asset harness.
+- Current claim check: `NOT RUN` for source implementation and tests. Next exact action: record this
+  docs-only claim checkpoint under the owner identity and push the active branch, then implement the
+  fixture and run its focused CTest plus publication gates. Real archive bytes, NRM0 semantics, and
+  `attach_screenshot` remain unresolved; no L1 asset-derived frame or G3 claim is made.
+- Observation versus inference: Trail reports 0.23.0 in use and 0.25.0 available; no upgrade or
+  install occurred. The task uses the existing direct Metal path and adds no dependency.
+- Task status: `ACTIVE`; one implementation hypothesis is pending, attempt count 0.
+
 ## 2026-10-24 15:58 CDT — GPU-03 direct-Metal synthetic-frame checkpoint published
 
 - Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`. Previous published
