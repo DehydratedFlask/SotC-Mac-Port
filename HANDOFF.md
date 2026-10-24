@@ -37,6 +37,11 @@
 - Claim-doc checks: `python3 scripts/project_index.py` indexed 9,043 folders; staged publish-path
   audit passed 6 paths; full publish-path audit passed 2,752 paths; attribution audit passed.
   Exact audit logs are in `local/orchestrator/gpu02-logo-vs-fetch/`.
+- Task claim is published as `6e60c96046fbe87db8ea24c070b75c02564bf826`; remote SHA matches local HEAD,
+  worktree is clean, author/committer are Johnny Wang, and post-push attribution audit passed. Log:
+  `local/orchestrator/gpu02-logo-vs-fetch/claim-push-verify.log`.
+- Publication-record refresh preflight: staged path audit passed 2 paths, full path audit passed
+  2,752 paths, attribution audit passed; logs use the `published-` prefix in the same private folder.
 - Explicit boundary: the fixture ABI supplies float stream fields only; it does not recover retail
   descriptors, semantic attribute names, or PS4 interpolation/SPI state. No logo pixel shader, WQM,
   MIMG, texture, original mesh, `.cmsh`/NRM0, or screenshot seam is part of this task. G3 remains PARTIAL.

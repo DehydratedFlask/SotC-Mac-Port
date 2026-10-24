@@ -17,6 +17,11 @@
   `python3 -I scripts/audit_publish_paths.py --all` — 2,752 paths passed;
   `python3 -I scripts/check_commit_attribution.py` — passed.
   Logs: `local/orchestrator/gpu02-logo-vs-fetch/claim-{staged-audit,all-audit,attribution}.log`.
+- Claim published as `6e60c96046fbe87db8ea24c070b75c02564bf826`; the remote branch ref matched local
+  HEAD, worktree was clean, and post-push attribution audit passed. Author/committer are Johnny Wang.
+  Exact output: `local/orchestrator/gpu02-logo-vs-fetch/claim-push-verify.log`.
+- Checkpoint-record refresh: staged path audit 2 paths, full path audit 2,752 paths, attribution audit
+  passed; logs `local/orchestrator/gpu02-logo-vs-fetch/published-{staged-audit,all-audit,attribution}.log`.
 
 ## Bounded implementation
 
