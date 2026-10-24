@@ -1,10 +1,34 @@
 # SoC Mac Native — current handoff
 
-## 2026-10-24 15:02 CDT — root integration checkpoint
+## 2026-10-24 15:10 CDT — GPU-03 asset-derived harness claim
 
-- Integrator: Codex `/root`. Active branch is `cursor/init-hash-551140-9dfc`, at baseline
-  `9f79b650844765378c54a696b1a4abc4315194e4`; no round-30 commit or push has happened yet.
-  Detailed commands, evidence paths, limits and the remaining publication actions are in
+- Integrator: Codex `/root`. Active branch `cursor/init-hash-551140-9dfc` contains the published
+  round-30 source checkpoint `95653223f279bbaee5fb68743d415039e1a46f61`.
+- **Task:** `GPU-03-RENDEROPS-ASSET-FRAME-01`, claimed by root at attempt 0. Its dependencies
+  `GPU-01-CSDR-READER-01` and the user-selected default-pair slice of
+  `GPU-02-GCN-SUBSET-DEFAULT-PAIR-01` are complete (E626/E627).
+- **Bounded output:** an L1 **asset-derived harness** drawing the raw `cube_1m` and `cone` meshes
+  with the default vertex/pixel pair through typed native render operations and the existing
+  direct-Metal offscreen capture/PNG seam. Acceptance is the deterministic image, independent CPU
+  projection/depth/outside-bounds assertions, Metal validation, and vertex/index/shader-constant
+  mutation sensitivity in `docs/METAL_FRAME_PATH.md` card 4. No game-driven frame or G3 PASS claim.
+- **Claim preflight:** `rg -n 'GPU-03-RENDEROPS-ASSET-FRAME-01|Asset-derived harness|### 6\.2 The seam|cube_1m|simple decoder|default pair draw' docs/TASKS.md docs/METAL_FRAME_PATH.md`
+  exited 0. Log: `local/orchestrator/gpu03-r31/active-claim-preflight.log`. At claim time only
+  docs were edited; the configured Projects wiki index has no SotC project entry.
+- **Remaining risks:** mesh vertex layout and shader bindings still require live-file verification;
+  the Metal asset-derived draw path has not been implemented. Logo WQM, compressed assets, the
+  retail renderer, boot, game audio and real save/load stay outside this slice or NOT RUN.
+- **Next exact action:** independently verify the two pinned raw mesh inputs/parser and inspect the
+  existing Metal capture implementation seam. Then implement the minimal L1 backend and pixel
+  checks against those verified inputs; stop at the card-4 acceptance boundary.
+- **Status:** ACTIVE / root, 0 failed implementation tries. Detailed claim is in
+  [GPU-03 checkpoint](docs/checkpoints/2026-10-24-gpu03-claim.md).
+
+## 2026-10-24 15:08 CDT — round 30 published checkpoint
+
+- Integrator: Codex `/root`. Round-30 source commit
+  `95653223f279bbaee5fb68743d415039e1a46f61` is pushed to active branch
+  `cursor/init-hash-551140-9dfc`. Detailed commands, evidence paths, limits and the next task queue are in
   [round-30 integration checkpoint](docs/checkpoints/2026-10-24-round30-integration.md).
 - `GPU-01-CSDR-READER-01` attempt 3 is complete. The final parser validates a complete raw
   structure before classifying any compressed prefix, including every `cc xx` second byte.
@@ -37,11 +61,15 @@
   `git diff --cached --check` both exited 0. Logs: `final-publish-audit-staged.log` and
   `final-staged-diff-check.log`. Remote fetch confirmed the active branch is **0 ahead / 0 behind**
   before this commit; effective git identity is Johnny Wang (`dehydratedflask@users.noreply.github.com`).
+- Commit attribution audit passed for commit `9565322`; author/committer are Johnny Wang and the
+  message has no co-author trailer. `git push origin cursor/init-hash-551140-9dfc` exited 0; fetch,
+  local HEAD, tracking ref, and `git ls-remote` all verify `95653223f279bbaee5fb68743d415039e1a46f61`.
+  Private confirmation: `local/orchestrator/r30/push-result.txt` and `postpush-*.log`.
 - These are bounded fixture/artifact and static-analysis results, not game behavior. Real cold
   boot, audible game content, retail save/load after relaunch, Metal frame validation, and all
-  required game acceptance gates remain NOT RUN. Root's next action: commit these audited paths as
-  the owner, rerun attribution checks against the new commit, and push only the active branch.
-  No Claude/Anthropic contributor trailer is permitted.
+  required game acceptance gates remain NOT RUN. Round-30 integration is published; the project
+  remains open. Next eligible queue item is `GPU-03-RENDEROPS-ASSET-FRAME-01`; claim and scope its
+  asset/binding work from `docs/METAL_FRAME_PATH.md` before editing.
 
 ## 2026-10-24 Codex round 30 — active orchestration claim
 

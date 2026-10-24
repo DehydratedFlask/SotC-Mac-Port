@@ -11,7 +11,7 @@ Gates and test evidence take precedence over a status label. Integrator owns thi
 | CPU-01-STARTUP-302-303-305-01 | Verify inherited slot 303 and recover the next bounded startup constructors, preserving fail-visible gaps | FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED (E623: 317/573, gap306; targeted5/5; E624 removes complete-body reconstruction from the public checker) / root | 0 failed semantic hypotheses; 1 REA tool startup timeout |
 | DATA-02-PSARC-MD5-RECONCILE-01 | Verify MD5(path) member pairing and repair evidence without replacing historical inputs | ARTIFACT_VERIFIED / FIXTURE_VERIFIED (E621: 7/7 archives, 170,451 rows; 228 tests) / root | 0 failed hypotheses |
 | APP-01-LAUNCHER-R29-VERIFY-01 | Review round-29 readiness/diagnostics and verify release core packaging and UI | FIXTURE_VERIFIED / ARTIFACT_VERIFIED (E622; no gameplay or G4 claim) / root | 0 new |
-| INT-R29-R30-VERIFY-01 | Integrate inherited work, independently review lanes, run full gates and publish allowlisted source | ACTIVE / root | 0 new |
+| INT-R29-R30-VERIFY-01 | Integrate inherited work, independently review lanes, run full gates and publish allowlisted source | FIXTURE_VERIFIED / ARTIFACT_VERIFIED (round-30 source commit `9565322` pushed; real game gates remain NOT RUN) / root | 0 new |
 
 ## Metal follow-up queue — design scope, no game-frame claim
 
@@ -24,7 +24,7 @@ new corrected manifests use a separate identity and are not silently substituted
 |---|---|---|---|
 | GPU-01-CSDR-READER-01 | Importer-side raw shader container reader; checked spans/counts and named unsupported cases | DATA-02-PSARC-MD5-RECONCILE-01 | ARTIFACT_VERIFIED / FIXTURE_VERIFIED (E626): structural-first attempt3; independent review passed all 256 short `ccXX` prefixes and valid raw count collisions. Root v5 corpus replay: 14,967 accepted raw members, 4 named structural exceptions, 19,320 compressed members rejected, 21,861 accepted program rows, 34,291 member rows. LeakSanitizer unavailable; supported ASan+UBSan had 0 diagnostics |
 | GPU-02-GCN-SUBSET-DEFAULT-PAIR-01 | Offline decoding and verified Metal conversion of the bounded default shader pair; logo inventory retained for later WQM work | GPU-01-CSDR-READER-01 | FIXTURE_VERIFIED / ARTIFACT_VERIFIED for the user-selected default pair (E627): 2,141 Metal cases and offscreen execution, separate oracle passed 34,256 components with max finite error 0. Harness-only ABI; mesh format, retail descriptors/SPI interpolation/FP mode UNVERIFIED. Logo WQM unresolved; G3 NOT RUN |
-| GPU-03-RENDEROPS-ASSET-FRAME-01 | Asset-derived geometry/shader harness through direct Metal, with independent pixel checks | GPU-01-CSDR-READER-01, GPU-02-GCN-SUBSET-DEFAULT-PAIR-01 | WAITING_FOR_DEPENDENCY |
+| GPU-03-RENDEROPS-ASSET-FRAME-01 | Asset-derived geometry/shader harness through direct Metal, with independent pixel checks | GPU-01-CSDR-READER-01, GPU-02-GCN-SUBSET-DEFAULT-PAIR-01 | ACTIVE / root (claim: L1 default-pair draws of `cube_1m` and `cone`; no game-frame/G3 PASS claim; attempt 0) |
 | ASSET-FMT-02-BLOCK-DECODER-DECISION-01 | Identify the 0x8C container/decoder and record provenance before choosing an importer implementation | DATA-02-PSARC-MD5-RECONCILE-01 | WAITING_FOR_DEPENDENCY; owner choice required before implementation |
 
 ## Register — baseline 2026-10-19

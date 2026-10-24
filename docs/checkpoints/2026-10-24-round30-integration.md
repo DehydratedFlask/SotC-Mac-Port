@@ -6,7 +6,8 @@
 
 **Task:** `INT-R29-R30-VERIFY-01`, integrating `GPU-01-CSDR-READER-01` and the user-selected
 default-pair slice of `GPU-02-GCN-SUBSET-DEFAULT-PAIR-01`.
-**Branch/base:** `cursor/init-hash-551140-9dfc` at `9f79b650844765378c54a696b1a4abc4315194e4`.
+**Branch/base:** `cursor/init-hash-551140-9dfc`, source commit
+`95653223f279bbaee5fb68743d415039e1a46f61` on top of `9f79b650844765378c54a696b1a4abc4315194e4`.
 
 ## Changes and evidence
 
@@ -81,9 +82,15 @@ lock. Exact output is retained under `local/orchestrator/r30/`.
   after relaunch, Metal validation on game frames, and G4 are **NOT RUN**.
 - **Status:** CSDR importer `ARTIFACT_VERIFIED / FIXTURE_VERIFIED`; selected default-pair harness
   `ARTIFACT_VERIFIED / FIXTURE_VERIFIED`; combined renderer/G3 work remains partial. Integration
-  task remains ACTIVE until index, path, and attribution audits pass and the allowlisted commit is
-  pushed.
-- **Next exact action:** commit the audited 90-path set with the owner identity and no
-  Claude/Anthropic/assistant co-author trailer, rerun attribution checks against the new commit,
-  and push only
-  `cursor/init-hash-551140-9dfc` without force.
+  task was completed and published in source commit `95653223f279bbaee5fb68743d415039e1a46f61`.
+- **Publication:** effective author and committer are Johnny Wang
+  (`dehydratedflask@users.noreply.github.com`). Commit message contains no co-author trailer;
+  `python3 -I scripts/check_commit_attribution.py` exited 0 after the commit. The command
+  `git push origin cursor/init-hash-551140-9dfc` exited 0 and advanced the branch from `9f79b65`
+  to `9565322`. A fresh fetch, local HEAD, tracking ref and `git ls-remote` agree on the full
+  revision. Private confirmation is in `local/orchestrator/r30/push-result.txt` and
+  `postpush-{status,revisions,remote-ref}.log`.
+- **Follow-on task:** `GPU-03-RENDEROPS-ASSET-FRAME-01` is now claimed by root at attempt 0 in
+  [the active GPU-03 checkpoint](2026-10-24-gpu03-claim.md). It targets the L1 asset-derived
+  `cube_1m`/`cone` draw only; the public round-30 source commit does not claim G3 or any real game
+  gate.
