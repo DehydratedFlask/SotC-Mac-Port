@@ -8,8 +8,8 @@ The rounds that follow the archive are in chronological order.
 
 ## Where things stand (measured at this tip)
 
-- Full native suite: **381/381** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
-- ELF checker sweep: **470 passed / 0 skipped / 0 failed** with
+- Full native suite: **382/382** (`ctest --test-dir local/build/orch-r22`), ASan+UBSan, Mach-O arm64.
+- ELF checker sweep: **471 passed / 0 skipped / 0 failed** with
   `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`.
 - Init prefix `0x531d60..0x532b0c` (the full body ends at `0x532c8b`): 100% of prefix bytes claimed by
   native modules (`tools/lift/report_init_coverage.py`), with the recorded gaps and limits. **Claimed
@@ -17,7 +17,7 @@ The rounds that follow the archive are in chronological order.
 - Publish gate: `python3 -I scripts/audit_publish_paths.py` and
   `python3 -I scripts/check_commit_attribution.py` both exit 0 at this tip.
 - A native `SoCGameCore` arm64 executable now exists and reports typed readiness over protocol v1
-  (308/573 constructors, first gap 296). It has **no engine** and never reports running.
+  (311/573 constructors, first gap 298). It has **no engine** and never reports running.
 - **G1 PARTIAL. G2–G6 NOT RUN.** No boot, no game audio, no save/load of retail data, no Metal game
   frame. The Metal capture provider renders only a synthetic pattern; the save persistence proof
   uses synthetic `ProgressV1` data.
@@ -270,14 +270,16 @@ The rounds that follow the archive are in chronological order.
 
 ## 2026-10-24 Orchestrator round 28 — SoCGameCore, Metal capture, owner rows, ctor coverage (E608–E617)
 
-- Agent: integrator plus seven workers (ctor coverage, SoCGameCore executable, Metal capture,
-  owner rows 14/21, launcher process client, startup-cliff analysis).
-- **E608** — constructor coverage: `recovered_constructors()` now registers **308/573** entries.
+- Agent: integrator plus eight workers (ctor coverage, SoCGameCore executable, Metal capture,
+  owner rows 14/21, launcher process client, startup-cliff analysis, startup slots 296/297/300).
+- **E608** — constructor coverage: `recovered_constructors()` now registers **308/573** entries
+  (311 after E618).
   152 already-lifted `vec_*`/`leaf_*` modules are on the production path and index 95 (`0xd71f60`,
   a 17-byte `vmovups` leaf) is lifted. `ctor_original_table` carries the 573 rows (backwards table)
   and reports the first unrecovered index **296 / `0xb2b6b0`**; 265 `other`-class slots remain.
 - **E609** — native `SoCGameCore` arm64 executable with protocol v1 (`status`, `coverage`,
-  `validate`, `start`, `serve`). Status reports 308/573 and `run_ok=true`; `--start` exits 3 with
+  `validate`, `start`, `serve`). Status reports 308/573 at this slice (311 after E618) and
+  `run_ok=true`; `--start` exits 3 with
   `SOTC_ERR_ENGINE_NOT_IMPLEMENTED`; a missing fixture is fail-visible at `0xe71990`; the serve
   state after a refused start is `failed`, never `running`. API coverage now says startup/save
   PARTIAL, engine/Metal/audio NOT_IMPLEMENTED, and the save row is no longer falsely “no path”.
@@ -298,7 +300,12 @@ The rounds that follow the archive are in chronological order.
   (`sceKernelGetTscFrequency`), tooling/debug and inert in this image; 297 is a 400 x 0x118 record
   initializer, 300 an inert `__cxa_atexit`, 301 the `rumbleEnabled` ConCmd. Proposed slice
   296+297+300.
-- Verification at this tip: ctest **381/381**, checker sweep **470/0/0**, publish and attribution
+- **E618** — startup slots 296/297/300 are native: 296 is a 12-byte thunk into the already-native
+  TSC store `0x323d0` (object `0x334ac18`, partial frequency reported honestly), 297 is the 400 x
+  0x118 record initializer (acquire/retain/clear order, exact prefixes, dtor pinned not executed),
+  and 300 is an inert `__cxa_atexit` thunk. The production table is **311/573**, first gap
+  **298 / `0xb0e250`**, 262 remain.
+- Verification at this tip: ctest **382/382**, checker sweep **471/0/0**, publish and attribution
   audits exit 0; Swift **147** tests.
 
 ## Settled decisions (do not re-ask)
@@ -319,10 +326,9 @@ The rounds that follow the archive are in chronological order.
 
 ## Next exact work
 
-1. **Startup continuation.** Finish the in-flight slots 296/297/300 slice, then continue at index
-   298 (`0xb0e250`, `shaderTypeToLoad` ConCmd), 299 (debug-text ConCommands) and 301
-   (`0xac9550`, `rumbleEnabled` ConCmd). 296 is a TSC-timer thunk that reuses the native
-   `store_tsc_323d0`; 297 is a 400 x 0x118 record initializer; 300 is inert. The 262 remaining
+1. **Startup continuation.** Slots 296/297/300 are native (E618). Continue at index 298
+   (`0xb0e250`, `shaderTypeToLoad` ConCmd; its `0x15d5960+0x18` indirect call is unresolved), then
+   299 (debug-text ConCommands) and 301 (`0xac9550`, `rumbleEnabled` ConCmd). The 262 remaining
    slots are still `other`-class bodies; do not claim startup completeness.
 2. **SAV-04 real-save acceptance.** The inspector is ready
    (`python3 -I tools/dev/save_inspect.py <slot-dir>`), but no user-owned PS4 save exists in the
@@ -342,10 +348,9 @@ The rounds that follow the archive are in chronological order.
 
 ## Parallel-agent state
 
-- One round-28 worker is still running: the startup slots 296/297/300 lift (`CPU-01-STARTUP-
-  SLOTS-296-297-300-01`). All other round-28 lanes (ctor coverage, SoCGameCore, Metal, owner rows
-  14/21, launcher client, startup-cliff analysis) have reported and are committed. Workers do not
-  edit `HANDOFF.md` or commit.
+- No round-28 workers are running. All lanes (ctor coverage, SoCGameCore, Metal, owner rows 14/21,
+  launcher client, startup-cliff analysis, startup slots 296/297/300) have reported; the code is
+  committed and the startup slice is being integrated. Workers do not edit `HANDOFF.md` or commit.
 - Builds are serialized with `tools/dev/with_build_lock.sh` because several workers share
   `local/build/orch-r22` and `native/CMakeLists.txt`.
 - The preserved `origin/cursor/parallel-foundations-wip-20261023` content

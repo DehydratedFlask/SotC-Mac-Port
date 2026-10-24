@@ -10,8 +10,8 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `.` | 7 | Project entry points and agent state |
 | `.graft` | 1 | Project folder; add a contract to docs/INDEX.md |
 | `Shadow of the Colossus` | 2 | Original user game inputs; read-only and private |
-| `docs` | 16 | Plans, task/evidence registries, checkpoint and escalation documentation |
-| `docs/checkpoints` | 696 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs` | 17 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs/checkpoints` | 705 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/escalations` | 5 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/schemas` | 1 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `graft` | 1 | Regenerable source graph; internal cache directories summarized |
@@ -58,7 +58,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/CSotcCore-t.build/Objects-normal/arm64` | 6 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/LauncherCore-t.build` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/LauncherCore-t.build/Objects-normal` | 0 | Native Swift macOS launcher |
-| `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/LauncherCore-t.build/Objects-normal/arm64` | 31 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/LauncherCore-t.build/Objects-normal/arm64` | 34 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/LauncherNativeCore-t.build` | 1 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/LauncherNativeCore-t.build/Objects-normal` | 0 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/SoCLauncher.build/Release/LauncherNativeCore-t.build/Objects-normal/arm64` | 16 | Native Swift macOS launcher |
@@ -71,10 +71,10 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/.build/out/Intermediates.noindex/XCBuildData/0db028a2dbecd90674bf8d3d15ef68fc.xcbuilddata/attachments` | 25 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/XCBuildData/72ac7ea23d6bf8071f74ebc8e17113f8.xcbuilddata` | 5 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/XCBuildData/72ac7ea23d6bf8071f74ebc8e17113f8.xcbuilddata/attachments` | 15 | Native Swift macOS launcher |
-| `launcher/.build/out/Intermediates.noindex/XCBuildData/80715af41836f10516ca5fa61d0adc57.xcbuilddata` | 5 | Native Swift macOS launcher |
-| `launcher/.build/out/Intermediates.noindex/XCBuildData/80715af41836f10516ca5fa61d0adc57.xcbuilddata/attachments` | 14 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/XCBuildData/b87f88059692f27ff44272c349ce1382.xcbuilddata` | 5 | Native Swift macOS launcher |
 | `launcher/.build/out/Intermediates.noindex/XCBuildData/b87f88059692f27ff44272c349ce1382.xcbuilddata/attachments` | 25 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/XCBuildData/ea93e73a97421ee3674e2040b0e8e626.xcbuilddata` | 5 | Native Swift macOS launcher |
+| `launcher/.build/out/Intermediates.noindex/XCBuildData/ea93e73a97421ee3674e2040b0e8e626.xcbuilddata/attachments` | 15 | Native Swift macOS launcher |
 | `launcher/.build/out/ModuleCache.noindex` | 2 | Native Swift macOS launcher |
 | `launcher/.build/out/ModuleCache.noindex/14YLEEWBHFFWX` | 39 | Native Swift macOS launcher |
 | `launcher/.build/out/ModuleCache.noindex/1KN50SL538VUW` | 38 | Native Swift macOS launcher |
@@ -1258,11 +1258,11 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/Sources` | 0 | Native Swift macOS launcher |
 | `launcher/Sources/CSotcCore` | 1 | Native Swift macOS launcher |
 | `launcher/Sources/CSotcCore/include` | 1 | Native Swift macOS launcher |
-| `launcher/Sources/LauncherCore` | 15 | Native Swift macOS launcher |
+| `launcher/Sources/LauncherCore` | 18 | Native Swift macOS launcher |
 | `launcher/Sources/LauncherNativeCore` | 1 | Native Swift macOS launcher |
 | `launcher/Sources/SoCLauncher` | 3 | Native Swift macOS launcher |
 | `launcher/Tests` | 0 | Native Swift macOS launcher |
-| `launcher/Tests/LauncherCoreTests` | 10 | Native Swift macOS launcher |
+| `launcher/Tests/LauncherCoreTests` | 13 | Native Swift macOS launcher |
 | `launcher/Tests/LauncherNativeCoreTests` | 1 | Native Swift macOS launcher |
 | `local` | 0 | Private extracted assets, binary analysis, manifests, builds and evidence |
 | `logs` | 100 | Private command/build/install/extraction logs |
@@ -1270,8 +1270,10 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `native/api` | 4 | Native game implementation; verify module README and task ownership |
 | `native/api/standalone` | 1 | Native game implementation; verify module README and task ownership |
 | `native/api/tests` | 2 | Native game implementation; verify module README and task ownership |
-| `native/core` | 961 | Native game implementation; verify module README and task ownership |
-| `native/tests` | 369 | Native game implementation; verify module README and task ownership |
+| `native/app` | 3 | Native game implementation; verify module README and task ownership |
+| `native/core` | 975 | Native game implementation; verify module README and task ownership |
+| `native/platform` | 2 | Native game implementation; verify module README and task ownership |
+| `native/tests` | 377 | Native game implementation; verify module README and task ownership |
 | `reference` | 0 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC` | 12 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC/docs` | 10 | Pinned upstream source; read-only; symbols indexed by Graft |
@@ -1832,9 +1834,10 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `reference/shadPS4Plus-pkg/src/video_core/texture_cache` | 18 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `scripts` | 28 | Small project and offline analysis helpers |
 | `tools` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/dev` | 2 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft/.cache` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
-| `tools/lift` | 496 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/lift` | 501 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/pkg-extractor` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
 
 Private recursive inventory: `local/indexes/folders.json` (excluded from publication).

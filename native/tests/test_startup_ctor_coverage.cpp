@@ -2,7 +2,7 @@
 //
 // Proves that every lifted vec_*/leaf_* constructor module runs in recovered_constructors(), that
 // the registered rows pair with the pinned original table, and that the remaining startup cliff is
-// explicit (first unrecovered index 296 / RVA 0xb2b6b0 after this batch).
+// explicit (first unrecovered index 298 / RVA 0xb0e250 after slots 296, 297 and 300).
 #include <cstdio>
 #include <cstdlib>
 
@@ -29,7 +29,7 @@ int main() {
     CHECK(result.blocked_on_rva == 0);
     CHECK(!st.init_failed);
     CHECK(result.completed == slots.size());
-    CHECK(slots.size() == 308);
+    CHECK(slots.size() == 311);
 
     // Every registered row is in original order and pairs with the pinned table.
     for (std::size_t i = 0; i < slots.size(); ++i) {
@@ -40,9 +40,9 @@ int main() {
     }
 
     // ---- explicit, machine-checked gap ---------------------------------------
-    CHECK(first_unrecovered_constructor_index() == 296);
-    CHECK(first_unrecovered_constructor_rva() == 0xb2b6b0);
-    CHECK(slots.size() + 265 == kOriginalCtorCount);
+    CHECK(first_unrecovered_constructor_index() == 298);
+    CHECK(first_unrecovered_constructor_rva() == 0xb0e250);
+    CHECK(slots.size() + 262 == kOriginalCtorCount);
 
     // ---- spot checks: destination cells hold their module constants ----------
     CHECK(st.vec_d71f60 == kVecD71f60Bits);     // idx 95, the batch's new lift
@@ -53,6 +53,12 @@ int main() {
     CHECK(st.vec_c09070 == kVecC09070Bits);     // idx 235
     CHECK(st.vec_b76950 == kVecB76950Bits);     // idx 280
     CHECK(st.vec_b33bd0 == kVecB33BD0Bits);     // idx 295
+    // ---- CPU-01-STARTUP-SLOTS-296-297-300-01 ---------------------------------
+    CHECK(st.slot296_stamp.tsc != 0);            // idx 296: the 8-byte TSC stamp
+    CHECK(st.slot297_table[0].node == &static_object_2ee3b10());    // idx 297
+    CHECK(st.slot297_table[399].node == &static_object_2ee3b10());
+    CHECK(st.slot297_table[0].flag00 == 0 && st.slot297_table[0].flag110 == 0);
+    CHECK(st.slot300_cleanup.registered == 1);   // idx 300: one inert cleanup
     CHECK(st.leaf_7ce8d0.word0 == 0x3f80000000000001ull);  // idx 346
     CHECK(st.leaf_7ce8d0.word1 == 0x3f80000000000001ull);
     CHECK(st.leaf_7ce8d0.flag0.load() == 0 && st.leaf_7ce8d0.flag1.load() == 0);

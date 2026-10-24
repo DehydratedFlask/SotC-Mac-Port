@@ -302,3 +302,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Launcher bundle with core (2026-10-24)](checkpoints/2026-10-23-launcher-bundle-core.md) | signed app with SoCGameCore; E614 |
 | [Save relaunch (2026-10-23)](checkpoints/2026-10-23-save-relaunch.md) | cross-process write/load/enumerate; E615 |
 | [Save acceptance tool (2026-10-23)](SAVE_ACCEPTANCE.md) | read-only SAV-04 inspector; E616/NOT RUN |
+| [Startup slots 296/297/300 (2026-10-24)](checkpoints/2026-10-24-startup-slots-296-297-300.md) | TSC thunk, 400-record table, inert atexit; E618 |

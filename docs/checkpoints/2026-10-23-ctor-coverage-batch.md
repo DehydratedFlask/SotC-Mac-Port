@@ -6,6 +6,9 @@
 - Gate: **FIXTURE_VERIFIED** for the registered table; **STATIC_ANALYSIS_VERIFIED** for the
   573-row original table
 
+Later slice: E618 adds indices 296/297/300, moving the registered count to 311/573 and the first
+gap to 298 (`0xb0e250`). The facts below describe this batch.
+
 ## What changed
 
 - `recovered_constructors()` registers **308 of the original 573** entries (was 155): 152

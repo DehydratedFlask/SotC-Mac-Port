@@ -355,6 +355,18 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xb47100, 293, [](StartupState& s) noexcept { init_vec_b47100(s.vec_b47100); }},
         {0xb44580, 294, [](StartupState& s) noexcept { init_vec_b44580(s.vec_b44580); }},
         {0xb33bd0, 295, [](StartupState& s) noexcept { init_vec_b33bd0(s.vec_b33bd0); }},
+        // idx 296 / 0xb2b6b0: 12-byte tail thunk `lea rdi,[0x334ac18]; jmp 0x323d0`. Reuses the
+        // lifted TSC store. A null/zero frequency hook leaves the documented sentinel 1 and reports
+        // the frequency half as partial; the stamp is still written, so this is not a hard failure.
+        {0xb2b6b0, 296, [](StartupState& s) noexcept { (void)init_slot296_b2b6b0(s.slot296_stamp); }},
+        // idx 297 / 0xb25470: 400 x 0x118 record initializer. Missing/failed native stages are a
+        // visible startup failure (the original's calls are unconditional).
+        {0xb25470, 297, [](StartupState& s) noexcept {
+             const Slot297Result r = init_slot297_b25470(s.slot297_table, default_slot297_hooks());
+             if (!r.ok) s.init_failed = true;
+         }},
+        // idx 300 / 0xacc880: __cxa_atexit of the bare-ret destructor 0xacc5b0, null argument.
+        {0xacc880, 300, [](StartupState& s) noexcept { (void)init_slot300_acc880(s.slot300_cleanup); }},
         {0xa816d0, 304, [](StartupState& s) noexcept { init_leaf_a816d0(s.leaf_a816d0); }},
         {0x9b75a0, 319, [](StartupState& s) noexcept { init_leaf_9b75a0(s.leaf_9b75a0); }},
         {0x8f3d90, 320, [](StartupState& s) noexcept { init_leaf_8f3d90(s.leaf_8f3d90); }},

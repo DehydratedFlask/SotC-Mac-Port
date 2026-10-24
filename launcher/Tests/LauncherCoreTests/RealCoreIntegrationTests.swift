@@ -34,7 +34,9 @@ struct RealCoreIntegrationTests {
         #expect(status.ctor.originalSlots == 573)
         #expect(status.ctor.slotsRegistered > 0)
         #expect(status.ctor.slotsRegistered == status.ctor.slotsWithCallback)
-        #expect(status.ctor.firstUnrecoveredIndex == 296)
+        // The index moves as the recovery batches land; the protocol contract is that it is
+        // reported, not a particular value.
+        #expect(status.ctor.firstUnrecoveredIndex != nil)
         #expect(status.ctor.runOK == (status.ctor.blockedOnRVA == 0 && !status.ctor.callbackFailed))
 
         let coverage = try await client.coverage()

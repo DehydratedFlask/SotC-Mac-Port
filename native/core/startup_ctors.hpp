@@ -283,6 +283,9 @@
 #include "leaf_3ca7c0.hpp"
 #include "leaf_163a40.hpp"
 #include "leaf_99350.hpp"
+#include "ctor_slot_296_b2b6b0.hpp"
+#include "ctor_slot_297_b25470.hpp"
+#include "ctor_slot_300_acc880.hpp"
 
 namespace sotc {
 
@@ -550,6 +553,10 @@ struct StartupState {
     VecB47100 vec_b47100{};  // idx 293 / 0xb47100
     VecB44580 vec_b44580{};  // idx 294 / 0xb44580
     VecB33BD0 vec_b33bd0{};  // idx 295 / 0xb33bd0
+    Slot296Stamp slot296_stamp{};      // idx 296 / 0xb2b6b0 (8-byte TSC stamp at 0x334ac18)
+    Slot297Table slot297_table{};      // idx 297 / 0xb25470 (400 x 0x118 records at 0x332f650)
+    // Indices 298 (0xb0e250) and 299 (0xb0c7a0) remain unrecovered; 300 clears the next gap.
+    Slot300Cleanup slot300_cleanup{};  // idx 300 / 0xacc880 (one inert atexit entry)
     LeafA816d0 leaf_a816d0{};  // idx 304 / 0xa816d0
     Leaf9b75a0 leaf_9b75a0{};  // idx 319 / 0x9b75a0
     Leaf8f3d90 leaf_8f3d90{};  // idx 320 / 0x8f3d90

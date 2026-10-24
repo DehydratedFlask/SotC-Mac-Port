@@ -2008,3 +2008,14 @@ add_test(NAME owner_ctor_4a690 COMMAND test_owner_ctor_4a690)
 add_executable(test_save_relaunch tests/test_save_relaunch.cpp)
 target_link_libraries(test_save_relaunch sotc_core)
 add_test(NAME save_relaunch COMMAND test_save_relaunch)
+
+# CPU-01-STARTUP-SLOTS-296-297-300-01: three recovered startup constructors (TSC stamp thunk,
+# 400-record table initializer, inert atexit thunk). Appended; existing target order is untouched.
+target_sources(sotc_core PRIVATE
+  core/ctor_slot_296_b2b6b0.cpp
+  core/ctor_slot_297_b25470.cpp
+  core/ctor_slot_300_acc880.cpp)
+
+add_executable(test_ctor_slots_296_297_300 tests/test_ctor_slots_296_297_300.cpp)
+target_link_libraries(test_ctor_slots_296_297_300 sotc_core)
+add_test(NAME ctor_slots_296_297_300 COMMAND test_ctor_slots_296_297_300)

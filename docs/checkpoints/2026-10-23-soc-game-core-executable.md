@@ -5,6 +5,9 @@
 - Task: `APP-01-SOCGAMECORE-EXE-01`
 - Gate: **FIXTURE_VERIFIED** for the protocol and exit codes; **NOT RUN** for an engine
 
+Later slice: E618 adds three constructors, so the live count is 311/573 and the first gap is 298
+(`0xb0e250`). The status JSON below is the measurement at this slice.
+
 ## What exists
 
 `native/app/soc_game_core_main.cpp` + `native/app/core_status_json.{hpp,cpp}` build a native
