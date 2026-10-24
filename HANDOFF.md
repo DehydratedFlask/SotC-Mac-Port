@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-## 2026-10-24 15:10 CDT — GPU-03 asset-derived harness claim
+## 2026-10-24 15:17 CDT — GPU-03 raw-mesh and capture-seam checkpoint
 
 - Integrator: Codex `/root`. Active branch `cursor/init-hash-551140-9dfc` contains the published
   round-30 source checkpoint `95653223f279bbaee5fb68743d415039e1a46f61`.
@@ -15,13 +15,26 @@
 - **Claim preflight:** `rg -n 'GPU-03-RENDEROPS-ASSET-FRAME-01|Asset-derived harness|### 6\.2 The seam|cube_1m|simple decoder|default pair draw' docs/TASKS.md docs/METAL_FRAME_PATH.md`
   exited 0. Log: `local/orchestrator/gpu03-r31/active-claim-preflight.log`. At claim time only
   docs were edited; the configured Projects wiki index has no SotC project entry.
-- **Remaining risks:** mesh vertex layout and shader bindings still require live-file verification;
-  the Metal asset-derived draw path has not been implemented. Logo WQM, compressed assets, the
-  retail renderer, boot, game audio and real save/load stay outside this slice or NOT RUN.
-- **Next exact action:** independently verify the two pinned raw mesh inputs/parser and inspect the
-  existing Metal capture implementation seam. Then implement the minimal L1 backend and pixel
-  checks against those verified inputs; stop at the card-4 acceptance boundary.
-- **Status:** ACTIVE / root, 0 failed implementation tries. Detailed claim is in
+- **Root input replay:** both exact `gpu_asset_probe.py cmsh` commands exited 0. `cube_1m.cmsh`:
+  850 B, SHA-256 `44738dbf663af252898bad5582f2b48f1aadf6fbaab403c20880410b79a380b7`, 24 vertices/36
+  indices. `cone.cmsh`: 1,462 B, SHA-256
+  `5456afadabe96b9f7f02c503dc0ed5410652ccd32601c19e8aeeaaf36c88600c`, 42 vertices/114 indices.
+  Exact commands and outputs: `local/orchestrator/gpu03-r31/root-mesh-replay/`.
+- **Read-only reviews:** `/root/gpu03_mesh_triage` confirmed raw POS0 float3 and U16 index streams
+  via `local/orchestrator/gpu03-r31/mesh-triage/mesh-triage-report.md`; NRM0 values are not decoded.
+  `/root/gpu03_metal_seam` found the current provider is an L0 fullscreen pattern with no indexed
+  draw/depth path, while `attach_screenshot` is a PNG callback/attachment seam. Details:
+  `local/orchestrator/gpu03-r31/metal-review/metal-review.md`. Both reviews were read-only; no
+  source or shared docs were edited.
+- **Remaining risks:** the `encoded_normal` input, retail vertex fetch and shader bindings remain
+  unverified; the Metal asset-derived draw path has not been implemented. Logo WQM, compressed
+  assets, the retail renderer, boot, game audio and real save/load stay outside this slice or NOT RUN.
+- **Next exact action:** implement a native reader for admitted raw POS0/index data under
+  `GPU-03-CMSH-RAW-POSIDX-01` (worker owns only its parser/test files; root owns CMake), then add the
+  typed-op Metal draw and independent projection/depth/mutation checks. The user is deciding
+  whether this L1 shader harness supplies explicit fixture normals or decodes the NRM0 stream.
+- **Status:** GPU-03 ACTIVE / root, 0 failed implementation tries. Raw mesh identity is
+  ARTIFACT_VERIFIED; native decode and rendering remain NOT RUN. Detailed claim is in
   [GPU-03 checkpoint](docs/checkpoints/2026-10-24-gpu03-claim.md).
 
 ## 2026-10-24 15:08 CDT — round 30 published checkpoint
@@ -68,8 +81,8 @@
 - These are bounded fixture/artifact and static-analysis results, not game behavior. Real cold
   boot, audible game content, retail save/load after relaunch, Metal frame validation, and all
   required game acceptance gates remain NOT RUN. Round-30 integration is published; the project
-  remains open. Next eligible queue item is `GPU-03-RENDEROPS-ASSET-FRAME-01`; claim and scope its
-  asset/binding work from `docs/METAL_FRAME_PATH.md` before editing.
+  remains open. `GPU-03-RENDEROPS-ASSET-FRAME-01` is now active at attempt 0 with its L1 scope and
+  native mesh-reader subtask recorded above.
 
 ## 2026-10-24 Codex round 30 — active orchestration claim
 
