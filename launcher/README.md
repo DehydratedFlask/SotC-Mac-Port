@@ -1,21 +1,44 @@
 # launcher/ — native SwiftUI Mac launcher shell (APP-01, shell only)
 
 Swift 6 / SwiftUI, macOS 15+, arm64. No Python, Electron, x86 helper or third-party package.
-Ownership decision: the game core will run as a native child process (`SoCGameCore` in the app's
-auxiliary executables), so the launcher stays responsive if the core fails. No such core exists yet.
+Ownership decision: the game core runs as a native child process (`SoCGameCore` in
+`Contents/MacOS`), so the launcher stays responsive if the core fails. The executable now exists
+(`native/app/`), but it has **no engine**: it reports `engine_implemented=false` and refuses start.
 
 | Target | Role |
 |---|---|
 | `LauncherCore` | Pure checks: `AssetValidator` (six archives, PSAR magic, ordered `AssetValidationReport`), `SystemChecks` (Metal Apple7 family, default audio output, native-core presence), `ReadinessReport` (runs off the main actor), `ReadinessAccessibility`, `DiagnosticsSummary`, `LauncherStatusCopy` |
 | `CoreClient` (in `LauncherCore`) | `CoreClient` protocol (`validate/start/stop/status/coverage`, async, throws `CoreFailure`), value models mirroring the native C ABI (`CoreModels.swift`) and `CoreClientMapping` (core facts -> `ReadinessItem.Status` / `LauncherState`). No native code. |
 | `CSotcCore` | C++ SwiftPM target whose `sotc_core.cpp` and `include/sotc_core.h` are **symlinks into `native/api/`** (single source), built with `SOTC_API_WITH_CORE_LIB=0` |
-| `LauncherNativeCore` | `NativeCoreClient`: `CoreClient` over the in-process C ABI. Wired into the app by `SoCLauncherApp` |
+| `LauncherNativeCore` | `NativeCoreClient`: `CoreClient` over the in-process C ABI (fallback when no child core is found) |
+| `LauncherCore` (process) | `CoreLocator` + `ProcessCoreClient` + `CoreClientFactory`: locate a Mach-O `SoCGameCore`, speak protocol v1 over `--serve`, map typed facts; never invents `.running` |
 | `SoCLauncher` | SwiftUI app: views + wiring only. `LauncherModel` (now in `LauncherCore`, `@MainActor @Observable`) routes validate/start/stop/status/coverage through an injected `CoreClient` |
 
 Honest states: "Native game core" reports **NOT BUILT** (and Play stays disabled) until a real
 Mach-O `SoCGameCore` auxiliary executable exists. Shell scripts/stubs are rejected. A readiness
 row and status line both carry the NOT BUILT / Play disabled wording — never fake success.
 This shell cannot pass G4 or boot the game.
+
+## Child-process core (APP-01-LAUNCHER-PROCESS-CLIENT-01)
+
+`CoreLocator` searches `SOTC_CORE_PATH`, `<bundle>/Contents/MacOS/SoCGameCore`,
+`<bundle>/Contents/Resources/SoCGameCore`, then the running executable's directory; only a regular
+executable Mach-O is accepted. `ProcessCoreClient` launches it with `--serve`, sends
+`<id> <command> [argument]` lines and reads one JSON response per request with a 5 s timeout;
+`CoreClientFactory` prefers it and falls back to `NativeCoreClient`.
+
+Build and bundle the core with:
+
+    cmake --build local/build/orch-r22 --target soc_game_core
+    scripts/package_launcher.sh local/build/launcher-app local/build/orch-r22/SoCGameCore
+
+The real-core integration test is opt-in:
+
+    SOTC_CORE_PATH="$PWD/local/build/orch-r22/SoCGameCore" \
+      swift test --package-path launcher --scratch-path local/build/launcher --filter RealCoreIntegrationTests
+
+The private slot-23 name fixture is not bundled; without `SOTC_SLOT23_FIXTURE` the core honestly
+reports `run_ok=false`. Protocol agreement is not game boot: Play stays disabled.
 
 ## Core ABI client (APP-01-CORE-ABI-01)
 
