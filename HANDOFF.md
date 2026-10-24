@@ -1,5 +1,42 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-24 16:21 CDT — GPU-03 texture/sampler binding fixture claimed
+
+- Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`, clean at claim time at
+  `e5981d81f7d9b6e14d93e2a31a25cdc420245c2d`. Task
+  `GPU-03-RENDEROPS-TEXTURE-SAMPLER-01` is ACTIVE, attempt 0, zero failed implementation hypotheses.
+- The user-selected default material pair is already `FIXTURE_VERIFIED / ARTIFACT_VERIFIED` in E627;
+  E632/E633 exercise it through synthetic direct-Metal geometry and parser flow. This bounded follow-up
+  adds the next missing renderer seam: typed fragment `BindTexture`/`BindSampler` operations and a
+  synthetic RGBA8 2D texture + explicit sampler binding at slot 0. It does not lower the logo's
+  `image_sample`, resolve AMD WQM/Metal derivative equivalence, read real texture/mesh bytes, or claim
+  an asset-derived/game frame.
+- Specification: `docs/METAL_FRAME_PATH.md` section 6.2 names `BindTexture/Sampler`; GPU-03 task card 4
+  lists the optional textured shader as a later follow-up. The renderer currently reports these ops as
+  unsupported and has no fragment texture binding path. The synthetic fixture will use known RGBA8
+  pixels and declared filtering/addressing values, with invalid or missing required bindings failing
+  visibly.
+- Files changed at claim: `docs/TASKS.md`, `docs/INDEX.md`, `docs/FOLDERS.md` (generated), this HANDOFF,
+  and `docs/checkpoints/2026-10-24-gpu03-texture-sampler-claim.md`. No production source or test file has
+  been edited yet. No dependency/tool was installed.
+- Preflight command `git status --short --branch && git rev-parse HEAD` exited 0; result was a clean
+  active branch at `e5981d81f7d9b6e14d93e2a31a25cdc420245c2d`. Trail lookup and caller/use scans identified
+  `native/platform/render_ops.{hpp,cpp}`, `native/platform/metal_asset_frame.{hpp,mm}` and their focused
+  tests. No tests/builds were run at claim time; no separate log artifact exists.
+- Observation versus inference: `UnsupportedRenderOpKind` includes `bind_texture` and `bind_sampler`,
+  but the validator/executor do not implement either. E634 identifies a single straight-line WQM-wrapped
+  logo sample; a synthetic Metal texture binding would test host plumbing only, not game texture ABI or
+  shader semantic equivalence.
+- Remaining risks: the logo material's actual texture relationship, texture encoding/format/tiling,
+  filter/address/mip state, vertex attribute contract, and native derivative equivalence remain unknown.
+  The outstanding real `.cmsh`, NRM0, and screenshot-seam choices still constrain the parent asset-frame
+  task; this fixture does not cross those boundaries. G3 remains PARTIAL.
+- Next exact action: add host-handle texture/sampler RenderOps, explicit RGBA8 texture and sampler input
+  descriptors for the bounded harness, and a focused synthetic offscreen sample fixture; then run the
+  focused CTests and required pre-publication gates, record an evidence row and completion checkpoint,
+  and commit/push allowlisted files under the owner identity with no Claude/Anthropic coauthor trailer.
+- Status: ACTIVE, attempt 0; no implementation hypothesis has yet been tried.
+
 ## 2026-10-24 16:15 CDT — GPU-02 logo WQM analysis completed
 
 - Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`. Task
