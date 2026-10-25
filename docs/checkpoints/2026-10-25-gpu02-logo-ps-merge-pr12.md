@@ -38,12 +38,13 @@ Commands and results:
   concept layer remains unbuilt and is not used as the source wiring gate.
 - Staged publish-path audit — PASSED, 6 paths; all-path audit — PASSED, 2,787 paths.
 - `git diff --cached --check` and `python3 -I scripts/check_commit_attribution.py --identity` — PASSED.
-- Owner-authored documentation closeout commit `docs: record PR 12 merge and main branch cleanup`
-  was created on `main`; the full `python3 -I scripts/check_commit_attribution.py` audit passed for
-  `origin/main..HEAD`, and the post-commit all-path audit passed for 2,787 paths. Author and
-  committer are Johnny Wang; there is no Claude/Anthropic trailer. The local branch is `main`, ahead
-  of `origin/main` by this docs-only commit. Next exact action: push it and verify the remote SHA and
-  clean checkout.
+- Owner-authored documentation closeout commit `9225de3e3ba719ba1e9c4135a369ee42adc9720c`
+  (`docs: record PR 12 merge and main branch cleanup`) was pushed to `origin/main`. Before the push,
+  the full `python3 -I scripts/check_commit_attribution.py` audit passed for `origin/main..HEAD`, and
+  the post-commit all-path audit passed for 2,787 paths. Author and committer are Johnny Wang; there
+  is no Claude/Anthropic trailer. After `git fetch origin main`, the local branch is clean `main` at
+  the same SHA as `origin/main`; both local and remote task-branch refs remain absent. This final
+  handoff note is the only additional documentation update; no source or validation input changed.
 
 No private game bytes, generated shader source, PNG, or test logs were staged. G3 remains PARTIAL;
 this merge does not establish retail descriptor/interpolation meaning, AMD WQM/helper-lane behavior,

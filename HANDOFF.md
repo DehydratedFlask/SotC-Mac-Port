@@ -1,5 +1,24 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 04:26 CDT — main publication and branch cleanup verified
+
+- Integrator: Codex `/root`; GPU-02 logo PS fixture is **FIXTURE_VERIFIED** under its exact private
+  shader digest and synthetic ABI. GPU-03 is still `NEEDS_PRINCIPAL`, G3 remains `PARTIAL`.
+- PR #12 is `MERGED` at `a07d45184c978bdd7a0a937be90c83f499fcca50`; its tested tree is exactly the
+  second-parent tree. The owner-authored documentation closeout commit
+  `9225de3e3ba719ba1e9c4135a369ee42adc9720c` was pushed to GitHub `main`.
+- Immediately before this final handoff-only update, `git fetch origin main` confirmed local `HEAD`
+  and `origin/main` both at `9225de3e3ba719ba1e9c4135a369ee42adc9720c`; `git status --short --branch`
+  was clean; the local and remote refs for `codex/gpu02-logo-ps-image-sample-20261025` were absent.
+  PR #12 remote branch removal is confirmed by GitHub.
+- Owner-only attribution audit passed for the unpublished commit before push; author and committer
+  are Johnny Wang. The all-path audit passed at 2,787 paths. No Claude or Anthropic contributor
+  trailer was added. The source tree was unchanged after the E646 full 397-test and 481-checker pass.
+- This final handoff/evidence update is documentation-only and will be published on `main`. After it
+  is pushed, leave the checkout clean on `main`; no additional work in this Metal slice is pending.
+  Select a different task from `docs/TASKS.md` only when directed. Do not resume GPU-03 without
+  principal reassessment.
+
 ## 2026-10-25 04:22 CDT — PR #12 merged; checkout restored to main
 
 - Integrator: Codex `/root`; `GPU-02-GCN-LOGO-PS-IMAGE-SAMPLE-01` remains
