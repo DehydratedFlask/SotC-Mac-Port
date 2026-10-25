@@ -7,8 +7,9 @@
 //                  front-end skips OOM reporting and returns NULL  (all decoded children use a
 //                  stub returning 0, so in practice reporting always runs)
 //   OBS  vt[+0xa8] deallocate(heap, ptr, &desc{kind})
-// The names, the C++ signature and the 64-bit size/align types are INF (native design). Real
-// bucket/heap/page layers will implement this later; they are not lifted here.
+// The names, the C++ signature and the 64-bit size/align types are INF (native design).
+// PageAllocator, CompositeAllocator, BucketAllocator, and HeapAllocator implement this;
+// HeapAllocator freelist/arena surgery is still INF (cap + page quantum are OBS).
 #pragma once
 
 #include <cstddef>
@@ -37,6 +38,11 @@ public:
 
     // ptr is non-null and was resolved to this heap by the owner map.
     virtual void deallocate(void* ptr, const AllocDesc& desc) = 0;
+
+    // The front-end routes frees straight to the owning child instead of back through a
+    // composite allocator. Wrapper allocators can use this notification to discard any
+    // per-pointer bookkeeping they added during allocate().
+    virtual void on_owner_map_deallocation(void*) noexcept {}
 
     // Called once after allocate() returned nullptr. Return true to say "handled": the front-end
     // then returns nullptr WITHOUT reporting out-of-memory. Default false (OBS: all children).

@@ -26,9 +26,17 @@
 //     return nullptr.
 //   * heap ids >= 256 are treated as a missing heap (original index range unknown).
 //   * the scope stack is one process-wide thread_local stack (original: per-thread block).
-//   * not modelled: lazy bootstrap (0x13380), TLS one-shot free-heap hint, realloc (0x12c50),
-//     get_heap (0x12a70), 5-arg 0x12950, profiling tracker.
-// Thread safety: front-end is lock-free on the alloc path (OBS) apart from the cold OOM path.
+//   * Lazy bootstrap gate (OBS 0x1284a..0x1286f / byte 0x2dfaaa0): if latch==0 and tbl[1]==null,
+//     invoke an injectable install hook (native stand-in for call 0x13380). On success the current
+//     alloc's heap id becomes the bootstrap object's id (OBS [obj+0x1c]; empty-table → slot 1).
+//     Latch itself is NOT set by 0x13380 (OBS); later allocs skip via tbl[1]!=null. Separate
+//     init 0x110d3 sets latch=1; shutdown 0x11f94 clears latch=0 — exposed as set_bootstrap_latch.
+//   * not modelled: TLS free-heap hint, realloc (0x12c50), get_heap (0x12a70), 5-arg 0x12950,
+//     profiling tracker, free-path latch copies, object[+0x1c] field layout.
+//   * Explicit bootstrap wiring helper: see allocator_bootstrap.hpp (OBS 0x13380).
+//   * composite / page layers: see composite_allocator.hpp + page_allocator.hpp (install as heap 1).
+// Thread safety: front-end is lock-free on the alloc path (OBS) apart from the cold OOM / lazy
+// bootstrap hook path (hook + latch load under the same mutex as OOM hooks).
 #pragma once
 
 #include <array>
@@ -41,6 +49,8 @@
 #include "page_owner_map.hpp"
 
 namespace sotc {
+
+class AllocatorFront;
 
 struct OomInfo {
     std::size_t size;        // after the 0 -> 1 adjustment
@@ -57,6 +67,17 @@ struct OomHooks {
     void* user = nullptr;
 };
 
+// OBS 0x12860 call target stand-in: install default heaps into `front`. Multiple alloc callers
+// may enter this hook concurrently while tbl[1] is null, so implementations must serialize their
+// installation and publish a complete hierarchy before returning true. False → alloc continues
+// and typically returns null.
+using LazyBootstrapFn = bool (*)(AllocatorFront& front, void* user);
+
+struct LazyBootstrapHooks {
+    LazyBootstrapFn install = nullptr;
+    void* user = nullptr;
+};
+
 class AllocatorFront {
 public:
     static constexpr std::uint32_t kHeapSlots = 256;       // OBS table of 256 u64
@@ -67,6 +88,10 @@ public:
     // Registers a heap in slot `id` (2..255 keeps the PageOwnerMap invariant; slot 1 is the
     // default composite heap; slot 0 is rejected). Returns false on a bad id / null heap.
     bool set_heap(std::uint32_t id, IAllocator* heap) noexcept;
+    // Transactional bootstrap helpers: do not replace an occupied slot, and only clear the
+    // exact pointer installed by the caller.
+    bool set_heap_if_empty(std::uint32_t id, IAllocator* heap) noexcept;
+    bool clear_heap_if(std::uint32_t id, IAllocator* expected) noexcept;
     void clear_heap(std::uint32_t id) noexcept;
     IAllocator* heap(std::uint32_t id) const noexcept;
 
@@ -75,6 +100,13 @@ public:
     void set_oom_hooks(const OomHooks& hooks);
     std::uint32_t oom_report_count() const noexcept { return oom_reports_.load(); }
     void set_tag(std::uint32_t tag) noexcept { tag_.store(tag); }
+
+    // OBS byte 0x2dfaaa0 (0 = allow lazy bootstrap check; 1 = skip). Default 0.
+    bool bootstrap_latch() const noexcept { return bootstrap_latch_.load(); }
+    void set_bootstrap_latch(bool set) noexcept { bootstrap_latch_.store(set); }
+
+    // Injectable 0x13380 stand-in for the alloc-path lazy gate. Null = no auto-install (legacy).
+    void set_lazy_bootstrap(const LazyBootstrapHooks& hooks);
 
     // 0x12820
     void* alloc(std::size_t size, std::uint32_t heap_id, std::size_t align, std::uint32_t flags);
@@ -91,14 +123,18 @@ public:
 
 private:
     void report_oom(const OomInfo& info);
+    // OBS 0x1284a..0x1286f. Returns true when bootstrap ran and heap_id should become slot 1.
+    bool maybe_lazy_bootstrap(std::uint32_t& heap_id);
 
     std::array<std::atomic<IAllocator*>, kHeapSlots> table_{};
     PageOwnerMap owners_;
     std::atomic<std::uint32_t> tag_{0};
     std::atomic<std::uint32_t> oom_reports_{0};
     std::atomic<bool> oom_latch_{false};
+    std::atomic<bool> bootstrap_latch_{false};  // OBS 0x2dfaaa0 (false == byte 0)
     std::mutex hooks_mu_;
     OomHooks hooks_{};
+    LazyBootstrapHooks lazy_bootstrap_{};
 };
 
 // Per-thread scoped default-heap override (OBS stack of <= 32 heap ids, honoured only for heap 1).
