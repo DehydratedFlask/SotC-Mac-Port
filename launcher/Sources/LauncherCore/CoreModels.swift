@@ -147,10 +147,17 @@ public struct CoreCtorPrefix: Equatable, Sendable {
     public let callbackFailed: Bool
     /// Original RVA of the first unrecovered constructor; 0 when the run reached the end of the table.
     public let blockedOnRVA: UInt32
+    /// Entries in the original constructor table (`ctor.original_slots`); 0 when the transport did
+    /// not report it (the C ABI has no such field, so `NativeCoreClient` always leaves 0 here).
+    public let originalSlots: Int
+    /// Index of the first constructor whose original body is not recovered
+    /// (`ctor.first_unrecovered_index`); nil when the transport did not report it.
+    public let firstUnrecoveredIndex: Int?
 
     public init(
         linked: Bool, slotsRegistered: Int, slotsWithCallback: Int, completed: Int,
-        runOK: Bool, callbackFailed: Bool, blockedOnRVA: UInt32
+        runOK: Bool, callbackFailed: Bool, blockedOnRVA: UInt32,
+        originalSlots: Int = 0, firstUnrecoveredIndex: Int? = nil
     ) {
         self.linked = linked
         self.slotsRegistered = slotsRegistered
@@ -159,6 +166,8 @@ public struct CoreCtorPrefix: Equatable, Sendable {
         self.runOK = runOK
         self.callbackFailed = callbackFailed
         self.blockedOnRVA = blockedOnRVA
+        self.originalSlots = originalSlots
+        self.firstUnrecoveredIndex = firstUnrecoveredIndex
     }
 
     public static let notLinked = CoreCtorPrefix(

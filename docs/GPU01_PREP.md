@@ -1,5 +1,10 @@
 # GPU-01 prep — offline shader/material member names
 
+Round-30 correction (E621): the path/extension counts below remain a names-only inventory.
+Per-path size, offset and TOC-value fields in the historical private JSONL were produced with
+incorrect positional PSARC pairing and are withdrawn. Use corrected MD5(path) manifests for
+any byte-level work; preserve the historical inputs for provenance.
+
 Date: 2026-10-19 (America/Chicago). Agent: `bc-3fe140af`.
 Scope: **names only** from `local/manifests/assets/*.members.jsonl`. No member
 extraction, no codec/GCN invent, no Metal, no edits to `native/core/` or

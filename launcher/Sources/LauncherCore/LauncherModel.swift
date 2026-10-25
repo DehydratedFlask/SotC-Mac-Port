@@ -35,14 +35,19 @@ public final class LauncherModel {
     public var assetsDirectory: URL?
 
     @ObservationIgnored private let client: any CoreClient
+    @ObservationIgnored private let transport: CoreTransport?
     @ObservationIgnored private let hostChecks: HostChecks
     @ObservationIgnored private let pollInterval: Duration
     @ObservationIgnored private var pollTask: Task<Void, Never>?
     private var lastFailure: CoreFailure?
     private var queryFailure: CoreFailure?
 
-    public init(client: any CoreClient, hostChecks: HostChecks = .live, pollInterval: Duration = .milliseconds(500)) {
+    public init(
+        client: any CoreClient, transport: CoreTransport? = nil,
+        hostChecks: HostChecks = .live, pollInterval: Duration = .milliseconds(500)
+    ) {
         self.client = client
+        self.transport = transport
         self.hostChecks = hostChecks
         self.pollInterval = pollInterval
     }
@@ -67,7 +72,8 @@ public final class LauncherModel {
     /// Copy-pasteable report: readiness lines, then the core's coverage report and last answers.
     public var diagnosticsText: String {
         CoreDiagnostics.text(
-            report: report, coverage: coverage, status: coreStatus, lastFailure: lastFailure, queryFailure: queryFailure
+            report: report, coverage: coverage, status: coreStatus, lastFailure: lastFailure, queryFailure: queryFailure,
+            transport: transport
         )
     }
 
@@ -115,7 +121,7 @@ public final class LauncherModel {
         queryFailure = snapshot.validationFailure ?? snapshot.coverageFailure ?? snapshot.statusFailure
         let result = CoreReadiness.report(
             assets: CoreReadiness.assetsStatus(directory: directory, validation: snapshot.validation, failure: snapshot.validationFailure),
-            nativeCore: CoreReadiness.nativeCoreStatus(
+            nativeCore: transport?.nativeCoreRowOverride ?? CoreReadiness.nativeCoreStatus(
                 validation: snapshot.validation, coverage: snapshot.coverage,
                 queryFailure: snapshot.validationFailure ?? snapshot.coverageFailure
             ),

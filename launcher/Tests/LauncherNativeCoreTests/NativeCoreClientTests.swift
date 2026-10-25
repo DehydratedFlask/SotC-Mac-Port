@@ -128,9 +128,12 @@ struct NativeCoreClientTests {
         #expect(coverage.subsystems.map(\.name).contains("engine_boot"))
         #expect(coverage.subsystems.allSatisfy { $0.status != .implemented })
         #expect(coverage.subsystems.first { $0.name == "engine_boot" }?.status == .notImplemented)
-        for name in ["metal_renderer", "audio", "save_load"] {
+        for name in ["metal_renderer", "audio"] {
             #expect(coverage.subsystems.first { $0.name == name }?.status == .notImplemented)
         }
+        // The fixture-verified save transaction/metadata is real code, so the row is PARTIAL; it is
+        // still not a platform save or a real PS4 acceptance.
+        #expect(coverage.subsystems.first { $0.name == "save_load" }?.status == .partial)
         // This package links the ABI facade only; the constructor runner is reported as not linked.
         #expect(coverage.ctor == .notLinked)
         #expect(coverage.subsystems.first { $0.name == "startup_constructors" }?.status == .notLinked)

@@ -197,13 +197,23 @@ int main() {
         CHECK(state.init_failed && !state.physmesh_registration.published());
     }
 
-    // Through the runner: slot 11 completes (slots 12-22 are registered too, 23 rows ran) and the runner
-    // stops at the explicit blocker slot 23 / 0xe71990.
+    // Through the runner: slot 11 runs (so its descriptor is published) and the runner reports the
+    // table's first null callback as the blocker, or success when the whole table is recovered.
+    // The expectation is derived from recovered_constructors() so a newly registered slot cannot
+    // silently invalidate this check.
     {
         StartupState state;
-        const CtorRunResult r = run_constructors(recovered_constructors(), state);
-        CHECK(!r.ok() && !r.callback_failed);
-        CHECK(r.completed == 23 && r.blocked_on_rva == 0xe71990);
+        const std::span<const CtorSlot> slots = recovered_constructors();
+        std::size_t first_unresolved = 0;
+        while (first_unresolved < slots.size() && slots[first_unresolved].run != nullptr) ++first_unresolved;
+        const CtorRunResult r = run_constructors(slots, state);
+        CHECK(!r.callback_failed);
+        CHECK(r.completed == first_unresolved);
+        if (first_unresolved == slots.size()) {
+            CHECK(r.ok() && r.blocked_on_rva == 0);
+        } else {
+            CHECK(!r.ok() && r.blocked_on_rva == slots[first_unresolved].original_rva);
+        }
         CHECK(state.physmesh_registration.descriptor() == &kClothingPhysicalMeshParametersDescriptor);
         CHECK(state.physmesh_tree.get().error == ParamTreeError::schema_not_available);
     }

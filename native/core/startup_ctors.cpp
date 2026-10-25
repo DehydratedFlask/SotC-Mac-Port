@@ -144,7 +144,10 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xd7be60, 92, [](StartupState& s) noexcept { init_vec_d7be60(s.vec_d7be60); }},
         {0xd7bc60, 93, [](StartupState& s) noexcept { init_vec_d7bc60(s.vec_d7bc60); }},
         {0xd7b930, 94, [](StartupState& s) noexcept { init_vec_d7b930(s.vec_d7b930); }},
-        // Gap idx 95 (0xd71f60) — NEEDS_PRINCIPAL.
+        // idx 95 / 0xd71f60: the last byte-verified leaf_vec_copy module. The original is the standard
+        // 17-byte form `vmovups xmm0,[0x1305650]; vmovups [0x33529c0],xmm0; ret`; the native module
+        // copies the same {~0,~0,~0,0} pattern into its own cell (CPU-01-CTOR-COVERAGE-BATCH-01).
+        {0xd71f60, 95, [](StartupState& s) noexcept { init_vec_d71f60(s.vec_d71f60); }},
         {0xd6e0f0, 96, [](StartupState& s) noexcept { init_vec_d6e0f0(s.vec_d6e0f0); }},
         {0xd6dbf0, 97, [](StartupState& s) noexcept { init_vec_d6dbf0(s.vec_d6dbf0); }},
         {0xd6d890, 98, [](StartupState& s) noexcept { init_vec_d6d890(s.vec_d6d890); }},
@@ -203,10 +206,205 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xce7300, 149, [](StartupState& s) noexcept { init_vec_ce7300(s.vec_ce7300); }},
         {0xce6fb0, 150, [](StartupState& s) noexcept { init_vec_ce6fb0(s.vec_ce6fb0); }},
         {0xce67b0, 151, [](StartupState& s) noexcept { init_vec_ce67b0(s.vec_ce67b0); }},
+        // ---- CPU-01-CTOR-COVERAGE-BATCH-01: every already-lifted vec_*/leaf_* constructor module is
+        // now registered at its pinned original index (rows are generated from the module headers and
+        // verified against the backward table by tools/lift/check_ctor_slots.py). Modules with runtime
+        // inputs (417, 548) take documented zero-initialised native stand-ins. The remaining 265
+        // `other`-class slots are unregistered; ctor_original_table.hpp reports the first one (296).
+        {0xce6130, 152, [](StartupState& s) noexcept { init_vec_ce6130(s.vec_ce6130); }},
+        {0xce57b0, 153, [](StartupState& s) noexcept { init_vec_ce57b0(s.vec_ce57b0); }},
+        {0xce38d0, 154, [](StartupState& s) noexcept { init_vec_ce38d0(s.vec_ce38d0); }},
+        {0xce0890, 155, [](StartupState& s) noexcept { init_vec_ce0890(s.vec_ce0890); }},
+        {0xcde740, 156, [](StartupState& s) noexcept { init_vec_cde740(s.vec_cde740); }},
+        {0xcdc760, 157, [](StartupState& s) noexcept { init_vec_cdc760(s.vec_cdc760); }},
+        {0xcd4d60, 158, [](StartupState& s) noexcept { init_vec_cd4d60(s.vec_cd4d60); }},
+        {0xcd0420, 159, [](StartupState& s) noexcept { init_vec_cd0420(s.vec_cd0420); }},
+        {0xcceaa0, 160, [](StartupState& s) noexcept { init_vec_cceaa0(s.vec_cceaa0); }},
+        {0xccd0f0, 161, [](StartupState& s) noexcept { init_vec_ccd0f0(s.vec_ccd0f0); }},
+        {0xcc8ac0, 162, [](StartupState& s) noexcept { init_vec_cc8ac0(s.vec_cc8ac0); }},
+        {0xcc8330, 163, [](StartupState& s) noexcept { init_vec_cc8330(s.vec_cc8330); }},
+        {0xcc5a10, 164, [](StartupState& s) noexcept { init_vec_cc5a10(s.vec_cc5a10); }},
+        {0xcc07d0, 165, [](StartupState& s) noexcept { init_vec_cc07d0(s.vec_cc07d0); }},
+        {0xcbb2c0, 166, [](StartupState& s) noexcept { init_vec_cbb2c0(s.vec_cbb2c0); }},
+        {0xcb5cb0, 167, [](StartupState& s) noexcept { init_vec_cb5cb0(s.vec_cb5cb0); }},
+        {0xcaeed0, 168, [](StartupState& s) noexcept { init_vec_caeed0(s.vec_caeed0); }},
+        {0xcae740, 169, [](StartupState& s) noexcept { init_vec_cae740(s.vec_cae740); }},
+        {0xcae240, 170, [](StartupState& s) noexcept { init_vec_cae240(s.vec_cae240); }},
+        {0xcad450, 171, [](StartupState& s) noexcept { init_vec_cad450(s.vec_cad450); }},
+        {0xcab080, 172, [](StartupState& s) noexcept { init_leaf_cab080(s.leaf_cab080); }},
+        {0xca4dc0, 173, [](StartupState& s) noexcept { init_vec_ca4dc0(s.vec_ca4dc0); }},
+        {0xca18d0, 174, [](StartupState& s) noexcept { init_leaf_ca18d0(s.leaf_ca18d0); }},
+        {0xc9e8e0, 175, [](StartupState& s) noexcept { init_vec_c9e8e0(s.vec_c9e8e0); }},
+        {0xc94ae0, 176, [](StartupState& s) noexcept { init_leaf_c94ae0(s.leaf_c94ae0); }},
+        {0xc91b10, 177, [](StartupState& s) noexcept { init_vec_c91b10(s.vec_c91b10); }},
+        {0xc891e0, 178, [](StartupState& s) noexcept { init_vec_c891e0(s.vec_c891e0); }},
+        {0xc811b0, 179, [](StartupState& s) noexcept { init_leaf_c811b0(s.leaf_c811b0); }},
+        {0xc7de60, 180, [](StartupState& s) noexcept { init_vec_c7de60(s.vec_c7de60); }},
+        {0xc7c310, 181, [](StartupState& s) noexcept { init_vec_c7c310(s.vec_c7c310); }},
+        {0xc786c0, 182, [](StartupState& s) noexcept { init_vec_c786c0(s.vec_c786c0); }},
+        {0xc77070, 183, [](StartupState& s) noexcept { init_vec_c77070(s.vec_c77070); }},
+        {0xc741c0, 184, [](StartupState& s) noexcept { init_vec_c741c0(s.vec_c741c0); }},
+        {0xc70e20, 185, [](StartupState& s) noexcept { init_vec_c70e20(s.vec_c70e20); }},
+        {0xc6fdf0, 186, [](StartupState& s) noexcept { init_vec_c6fdf0(s.vec_c6fdf0); }},
+        {0xc6f520, 187, [](StartupState& s) noexcept { init_leaf_c6f520(s.leaf_c6f520); }},
+        {0xc6e9d0, 188, [](StartupState& s) noexcept { init_leaf_c6e9d0(s.leaf_c6e9d0); }},
+        {0xc6d910, 189, [](StartupState& s) noexcept { init_vec_c6d910(s.vec_c6d910); }},
+        {0xc6bad0, 190, [](StartupState& s) noexcept { init_vec_c6bad0(s.vec_c6bad0); }},
+        {0xc69f70, 191, [](StartupState& s) noexcept { init_vec_c69f70(s.vec_c69f70); }},
+        {0xc686e0, 192, [](StartupState& s) noexcept { init_vec_c686e0(s.vec_c686e0); }},
+        {0xc675f0, 193, [](StartupState& s) noexcept { init_leaf_c675f0(s.leaf_c675f0); }},
+        {0xc66580, 194, [](StartupState& s) noexcept { init_vec_c66580(s.vec_c66580); }},
+        {0xc65f80, 195, [](StartupState& s) noexcept { init_vec_c65f80(s.vec_c65f80); }},
+        {0xc65da0, 196, [](StartupState& s) noexcept { init_vec_c65da0(s.vec_c65da0); }},
+        {0xc64060, 197, [](StartupState& s) noexcept { init_vec_c64060(s.vec_c64060); }},
+        {0xc61670, 198, [](StartupState& s) noexcept { init_vec_c61670(s.vec_c61670); }},
+        {0xc5f6f0, 199, [](StartupState& s) noexcept { init_vec_c5f6f0(s.vec_c5f6f0); }},
+        {0xc5c320, 200, [](StartupState& s) noexcept { init_vec_c5c320(s.vec_c5c320); }},
+        {0xc5c1a0, 201, [](StartupState& s) noexcept { init_vec_c5c1a0(s.vec_c5c1a0); }},
+        {0xc5c040, 202, [](StartupState& s) noexcept { init_vec_c5c040(s.vec_c5c040); }},
+        {0xc5a400, 203, [](StartupState& s) noexcept { init_vec_c5a400(s.vec_c5a400); }},
+        {0xc5a100, 204, [](StartupState& s) noexcept { init_vec_c5a100(s.vec_c5a100); }},
+        {0xc555c0, 205, [](StartupState& s) noexcept { init_vec_c555c0(s.vec_c555c0); }},
+        {0xc54d20, 206, [](StartupState& s) noexcept { init_vec_c54d20(s.vec_c54d20); }},
+        {0xc54830, 207, [](StartupState& s) noexcept { init_vec_c54830(s.vec_c54830); }},
+        {0xc53db0, 208, [](StartupState& s) noexcept { init_vec_c53db0(s.vec_c53db0); }},
+        {0xc4e5e0, 209, [](StartupState& s) noexcept { init_vec_c4e5e0(s.vec_c4e5e0); }},
+        {0xc4aa80, 210, [](StartupState& s) noexcept { init_vec_c4aa80(s.vec_c4aa80); }},
+        {0xc47e00, 211, [](StartupState& s) noexcept { init_vec_c47e00(s.vec_c47e00); }},
+        {0xc451d0, 212, [](StartupState& s) noexcept { init_vec_c451d0(s.vec_c451d0); }},
+        {0xc44830, 213, [](StartupState& s) noexcept { init_vec_c44830(s.vec_c44830); }},
+        {0xc42b00, 214, [](StartupState& s) noexcept { init_vec_c42b00(s.vec_c42b00); }},
+        {0xc3eaa0, 215, [](StartupState& s) noexcept { init_vec_c3eaa0(s.vec_c3eaa0); }},
+        {0xc3cf00, 216, [](StartupState& s) noexcept { init_vec_c3cf00(s.vec_c3cf00); }},
+        {0xc37020, 217, [](StartupState& s) noexcept { init_vec_c37020(s.vec_c37020); }},
+        {0xc36a80, 218, [](StartupState& s) noexcept { init_vec_c36a80(s.vec_c36a80); }},
+        {0xc23650, 219, [](StartupState& s) noexcept { init_vec_c23650(s.vec_c23650); }},
+        {0xc22300, 220, [](StartupState& s) noexcept { init_vec_c22300(s.vec_c22300); }},
+        {0xc20710, 221, [](StartupState& s) noexcept { init_vec_c20710(s.vec_c20710); }},
+        {0xc1a9a0, 222, [](StartupState& s) noexcept { init_vec_c1a9a0(s.vec_c1a9a0); }},
+        {0xc191a0, 223, [](StartupState& s) noexcept { init_vec_c191a0(s.vec_c191a0); }},
+        {0xc17a70, 224, [](StartupState& s) noexcept { init_vec_c17a70(s.vec_c17a70); }},
+        {0xc16b30, 225, [](StartupState& s) noexcept { init_leaf_c16b30(s.leaf_c16b30); }},
+        {0xc152c0, 226, [](StartupState& s) noexcept { init_vec_c152c0(s.vec_c152c0); }},
+        {0xc14f60, 227, [](StartupState& s) noexcept { init_vec_c14f60(s.vec_c14f60); }},
+        {0xc0d720, 228, [](StartupState& s) noexcept { init_vec_c0d720(s.vec_c0d720); }},
+        {0xc0d380, 229, [](StartupState& s) noexcept { init_leaf_c0d380(s.leaf_c0d380); }},
+        {0xc0bea0, 230, [](StartupState& s) noexcept { init_vec_c0bea0(s.vec_c0bea0); }},
+        {0xc0bbd0, 231, [](StartupState& s) noexcept { init_vec_c0bbd0(s.vec_c0bbd0); }},
+        {0xc0bb00, 232, [](StartupState& s) noexcept { init_vec_c0bb00(s.vec_c0bb00); }},
+        {0xc0baa0, 233, [](StartupState& s) noexcept { init_vec_c0baa0(s.vec_c0baa0); }},
+        {0xc0aae0, 234, [](StartupState& s) noexcept { init_vec_c0aae0(s.vec_c0aae0); }},
+        {0xc09070, 235, [](StartupState& s) noexcept { init_vec_c09070(s.vec_c09070); }},
+        {0xc060a0, 236, [](StartupState& s) noexcept { init_vec_c060a0(s.vec_c060a0); }},
+        {0xc05980, 237, [](StartupState& s) noexcept { init_leaf_c05980(s.leaf_c05980); }},
+        {0xbe5410, 238, [](StartupState& s) noexcept { init_vec_be5410(s.vec_be5410); }},
+        {0xbe5270, 239, [](StartupState& s) noexcept { init_vec_be5270(s.vec_be5270); }},
+        {0xbe50a0, 240, [](StartupState& s) noexcept { init_vec_be50a0(s.vec_be50a0); }},
+        {0xbe4ff0, 241, [](StartupState& s) noexcept { init_vec_be4ff0(s.vec_be4ff0); }},
+        {0xbd7a80, 242, [](StartupState& s) noexcept { init_vec_bd7a80(s.vec_bd7a80); }},
+        {0xbd7950, 243, [](StartupState& s) noexcept { init_vec_bd7950(s.vec_bd7950); }},
+        {0xbd60a0, 244, [](StartupState& s) noexcept { init_vec_bd60a0(s.vec_bd60a0); }},
+        {0xbd4dd0, 245, [](StartupState& s) noexcept { init_vec_bd4dd0(s.vec_bd4dd0); }},
+        {0xbd32f0, 246, [](StartupState& s) noexcept { init_vec_bd32f0(s.vec_bd32f0); }},
+        {0xbd3190, 247, [](StartupState& s) noexcept { init_vec_bd3190(s.vec_bd3190); }},
+        {0xbd06c0, 248, [](StartupState& s) noexcept { init_vec_bd06c0(s.vec_bd06c0); }},
+        {0xbceda0, 249, [](StartupState& s) noexcept { init_vec_bceda0(s.vec_bceda0); }},
+        {0xbccc00, 250, [](StartupState& s) noexcept { init_vec_bccc00(s.vec_bccc00); }},
+        {0xbcc960, 251, [](StartupState& s) noexcept { init_vec_bcc960(s.vec_bcc960); }},
+        {0xbcc4e0, 252, [](StartupState& s) noexcept { init_vec_bcc4e0(s.vec_bcc4e0); }},
+        {0xbcc3f0, 253, [](StartupState& s) noexcept { init_vec_bcc3f0(s.vec_bcc3f0); }},
+        {0xbc8210, 254, [](StartupState& s) noexcept { init_vec_bc8210(s.vec_bc8210); }},
+        {0xbc7280, 255, [](StartupState& s) noexcept { init_vec_bc7280(s.vec_bc7280); }},
+        {0xbc5b00, 256, [](StartupState& s) noexcept { init_vec_bc5b00(s.vec_bc5b00); }},
+        {0xbc2800, 257, [](StartupState& s) noexcept { init_vec_bc2800(s.vec_bc2800); }},
+        {0xbc07f0, 258, [](StartupState& s) noexcept { init_vec_bc07f0(s.vec_bc07f0); }},
+        {0xbc0670, 259, [](StartupState& s) noexcept { init_vec_bc0670(s.vec_bc0670); }},
+        {0xbbf580, 260, [](StartupState& s) noexcept { init_vec_bbf580(s.vec_bbf580); }},
+        {0xbbd5e0, 261, [](StartupState& s) noexcept { init_vec_bbd5e0(s.vec_bbd5e0); }},
+        {0xbbba10, 262, [](StartupState& s) noexcept { init_vec_bbba10(s.vec_bbba10); }},
+        {0xbb9740, 263, [](StartupState& s) noexcept { init_vec_bb9740(s.vec_bb9740); }},
+        {0xbb82d0, 264, [](StartupState& s) noexcept { init_vec_bb82d0(s.vec_bb82d0); }},
+        {0xbb7990, 265, [](StartupState& s) noexcept { init_vec_bb7990(s.vec_bb7990); }},
+        {0xbacfb0, 266, [](StartupState& s) noexcept { init_vec_bacfb0(s.vec_bacfb0); }},
+        {0xbace80, 267, [](StartupState& s) noexcept { init_vec_bace80(s.vec_bace80); }},
+        {0xbace50, 268, [](StartupState& s) noexcept { init_vec_bace50(s.vec_bace50); }},
+        {0xbacb30, 269, [](StartupState& s) noexcept { init_vec_bacb30(s.vec_bacb30); }},
+        {0xbab950, 270, [](StartupState& s) noexcept { init_vec_bab950(s.vec_bab950); }},
+        {0xba3ef0, 271, [](StartupState& s) noexcept { init_vec_ba3ef0(s.vec_ba3ef0); }},
+        {0xb950e0, 272, [](StartupState& s) noexcept { init_vec_b950e0(s.vec_b950e0); }},
+        {0xb8d170, 273, [](StartupState& s) noexcept { init_vec_b8d170(s.vec_b8d170); }},
+        {0xb89eb0, 274, [](StartupState& s) noexcept { init_vec_b89eb0(s.vec_b89eb0); }},
+        {0xb84580, 275, [](StartupState& s) noexcept { init_vec_b84580(s.vec_b84580); }},
+        {0xb7b270, 276, [](StartupState& s) noexcept { init_vec_b7b270(s.vec_b7b270); }},
+        {0xb77e90, 277, [](StartupState& s) noexcept { init_vec_b77e90(s.vec_b77e90); }},
+        {0xb77910, 278, [](StartupState& s) noexcept { init_vec_b77910(s.vec_b77910); }},
+        {0xb77740, 279, [](StartupState& s) noexcept { init_vec_b77740(s.vec_b77740); }},
+        {0xb76950, 280, [](StartupState& s) noexcept { init_vec_b76950(s.vec_b76950); }},
+        {0xb747f0, 281, [](StartupState& s) noexcept { init_vec_b747f0(s.vec_b747f0); }},
         {0xb743c0, 282, [](StartupState& s) noexcept { init_vec_b743c0(s.vec_b743c0); }},
+        {0xb71f80, 283, [](StartupState& s) noexcept { init_vec_b71f80(s.vec_b71f80); }},
+        {0xb6e6d0, 284, [](StartupState& s) noexcept { init_vec_b6e6d0(s.vec_b6e6d0); }},
+        {0xb692a0, 285, [](StartupState& s) noexcept { init_leaf_b692a0(s.leaf_b692a0); }},
+        {0xb67a70, 286, [](StartupState& s) noexcept { init_vec_b67a70(s.vec_b67a70); }},
+        {0xb5ecf0, 287, [](StartupState& s) noexcept { init_vec_b5ecf0(s.vec_b5ecf0); }},
+        {0xb58690, 288, [](StartupState& s) noexcept { init_vec_b58690(s.vec_b58690); }},
+        {0xb57360, 289, [](StartupState& s) noexcept { init_vec_b57360(s.vec_b57360); }},
         {0xb52110, 290, [](StartupState& s) noexcept { init_vec_b52110(s.vec_b52110); }},
+        {0xb4ef70, 291, [](StartupState& s) noexcept { init_vec_b4ef70(s.vec_b4ef70); }},
+        {0xb494d0, 292, [](StartupState& s) noexcept { init_vec_b494d0(s.vec_b494d0); }},
+        {0xb47100, 293, [](StartupState& s) noexcept { init_vec_b47100(s.vec_b47100); }},
+        {0xb44580, 294, [](StartupState& s) noexcept { init_vec_b44580(s.vec_b44580); }},
+        {0xb33bd0, 295, [](StartupState& s) noexcept { init_vec_b33bd0(s.vec_b33bd0); }},
+        // idx 296 / 0xb2b6b0: 12-byte tail thunk `lea rdi,[0x334ac18]; jmp 0x323d0`. Reuses the
+        // lifted TSC store. A null/zero frequency hook leaves the documented sentinel 1 and reports
+        // the frequency half as partial; the stamp is still written, so this is not a hard failure.
+        {0xb2b6b0, 296, [](StartupState& s) noexcept { (void)init_slot296_b2b6b0(s.slot296_stamp); }},
+        // idx 297 / 0xb25470: 400 x 0x118 record initializer. Missing/failed native stages are a
+        // visible startup failure (the original's calls are unconditional).
+        {0xb25470, 297, [](StartupState& s) noexcept {
+             const Slot297Result r = init_slot297_b25470(s.slot297_table, default_slot297_hooks());
+             if (!r.ok) s.init_failed = true;
+         }},
+        // idx 298 / 0xb0e250: `shaderTypeToLoad` ranged/enum console variable. Queues into the
+        // pending ConCmd list (the manager is installed by the engine boot, after static init). The
+        // formerly unresolved indirect call is the bare-ret functor destroy slot 0xb0e240. Any
+        // failed stage is a visible failure.
+        {0xb0e250, 298, [](StartupState& s) noexcept {
+             if (!init_slot298_b0e250(s.slot298_shader_type, s.concmd).ok) s.init_failed = true;
+         }},
+        // idx 299 / 0xb0c7a0: debug-text scale settings (float var, bool var, two debug-menu items).
+        // The menu parent cell is null at startup; any assert branch or parent contract is a
+        // visible failure.
+        {0xb0c7a0, 299, [](StartupState& s) noexcept {
+             if (!init_slot299_b0c7a0(s.slot299, s.concmd, s.debug_menu).ok) s.init_failed = true;
+         }},
+        // idx 300 / 0xacc880: __cxa_atexit of the bare-ret destructor 0xacc5b0, null argument.
+        {0xacc880, 300, [](StartupState& s) noexcept { (void)init_slot300_acc880(s.slot300_cleanup); }},
+        // idx 301 / 0xac9550: `rumbleEnabled` bool console variable (shared bool-var shape).
+        {0xac9550, 301, [](StartupState& s) noexcept {
+             if (!init_slot301_ac9550(s.slot301_rumble, s.concmd).ok) s.init_failed = true;
+         }},
+        {0xaaeee0, 302, [](StartupState& s) noexcept {
+             if (!init_slot302_aaeee0(s.slot302, s.concmd.atexit_log)) s.init_failed = true;
+         }},
+        // idx 303 / 0xa82170: `ProfileCPU` bool console variable (value/default 0) plus its
+        // "Profile CPU" debug-menu toggle. Queues into the same pending list; the menu parent is null.
+        {0xa82170, 303, [](StartupState& s) noexcept {
+             if (!init_slot303_a82170(s.slot303, s.concmd, s.debug_menu).ok) s.init_failed = true;
+         }},
+        {0xa816d0, 304, [](StartupState& s) noexcept { init_leaf_a816d0(s.leaf_a816d0); }},
+        {0xa77b60, 305, [](StartupState& s) noexcept { init_slot305_a77b60(s.slot305); }},
+        {0x9b75a0, 319, [](StartupState& s) noexcept { init_leaf_9b75a0(s.leaf_9b75a0); }},
+        {0x8f3d90, 320, [](StartupState& s) noexcept { init_leaf_8f3d90(s.leaf_8f3d90); }},
+        {0x8a0440, 321, [](StartupState& s) noexcept { init_leaf_8a0440(s.leaf_8a0440); }},
+        {0x83d800, 324, [](StartupState& s) noexcept { init_leaf_83d800(s.leaf_83d800); }},
+        {0x7ce8d0, 346, [](StartupState& s) noexcept { init_leaf_7ce8d0(s.leaf_7ce8d0); }},
+        {0x575d40, 417, [](StartupState& s) noexcept { init_leaf_575d40(s.leaf_575d40_source, s.leaf_575d40); }},
+        {0x3ca7c0, 466, [](StartupState& s) noexcept { init_leaf_3ca7c0(s.leaf_3ca7c0); }},
         {0x196c90, 520, [](StartupState& s) noexcept { clear_flag32(s.flag32); }},
+        {0x163a40, 526, [](StartupState& s) noexcept { init_leaf_163a40(s.leaf_163a40); }},
         {0x125990, 538, [](StartupState& s) noexcept { reset_scratch(s.scratch, s.scratch_slot); }},
+        {0x99350, 548, [](StartupState& s) noexcept { init_leaf_99350(s.leaf_99350, s.leaf_99350_inputs); }},
     };
     return kSlots;
 }
