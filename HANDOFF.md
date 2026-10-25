@@ -1,5 +1,23 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 09:58 CDT — focused checkpoint published on `main`
+
+- Integrator: Codex `/root`; commit `c03d6a51ae7df9a732180495f8e298613eef6b2e` publishes the
+  E667 focused test checkpoint to GitHub `main`. `git fetch origin main` confirms local `HEAD ==
+  origin/main`; current branch is `main`. The previous `cursor/init-hash-551140-9dfc` branch is
+  absent locally and remotely; GitHub reports no open PRs.
+- Before commit: staged path audit passed **6 paths**, all-path audit passed **2,795 paths**, cached
+  diff check and attribution audit passed. Commit author/committer are Johnny Wang
+  (`dehydratedflask@users.noreply.github.com`); no Claude/Anthropic/co-author trailer.
+- The worktree now contains only the three allowlisted source edits in
+  `native/tests/test_metal_texture_binding.cpp`, `tools/dev/gcn_to_msl.py`, and
+  `tools/dev/test_gcn_to_msl.py`; they are not yet committed. Focused test evidence is E667. Full
+  CMake/CTest and lift-checker gates remain **NOT RUN**.
+- Exact next action: run full configure/build/CTest with the opt-in logo-pair environment enabled,
+  run the lift checkers and final publish/attribution audits, update the result, then publish the
+  verified source changes to `main` as Johnny Wang.
+- Status: documentation checkpoint **PUBLISHED**; source task **ACTIVE**, attempt 2.
+
 ## 2026-10-25 09:56 CDT — logo-pair path guard and focused Metal checkpoint
 
 - Integrator: Codex `/root`; task `GPU-03-LOGO-VS-PS-METAL-PIPELINE-01` remains **ACTIVE**, attempt 2.

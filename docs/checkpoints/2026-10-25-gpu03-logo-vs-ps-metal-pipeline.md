@@ -41,6 +41,17 @@
   under the owner identity.
 - Focused gate status: **PASSED**. Full repository gates: **NOT RUN**. Task status: **ACTIVE**, attempt 2.
 
+## 2026-10-25 09:58 CDT — focused evidence checkpoint published
+
+- Documentation checkpoint commit `c03d6a51ae7df9a732180495f8e298613eef6b2e` was pushed to GitHub
+  `main`; fetch confirmed `HEAD == origin/main`. Commit author/committer are Johnny Wang; no
+  Claude/Anthropic/co-author trailer. Staged/all path audits passed 6/2,795; attribution passed.
+- `main` is checked out; the previous `cursor/init-hash-551140-9dfc` branch is absent locally and on
+  `origin`; no open PRs remain. The source changes are still local/uncommitted pending full gates.
+- Exact next action: run full repository CMake configure/build/CTest (with logo-pair opt-in paths),
+  lift checkers, and final path/attribution audits. This publication is documentation only; E667 is
+  the focused local implementation evidence, and G3 remains PARTIAL.
+
 ## 2026-10-25 09:40 CDT — claimed on `main`
 
 - Integrator: Codex `/root`; task `GPU-03-LOGO-VS-PS-METAL-PIPELINE-01` is **ACTIVE**, attempt 0.
