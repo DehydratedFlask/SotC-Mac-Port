@@ -1,5 +1,21 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 04:55 CDT — task claim published to GitHub main
+
+- Integrator: Codex `/root`; commit `bc12aed0dad90ef9e0034e70a9872fe545613128` published to
+  `main`. `git fetch origin main` and `git rev-parse HEAD origin/main` confirmed equal SHAs;
+  `git status --short --branch` is clean on `main`.
+- The commit records the active `GPU-03-LOGO-PNG-TEXTURE-SAMPLE-01` claim, verified PR #1–#12
+  merge state and safe PR #4 branch deletion, and the documentation-only gates. Attribution audit
+  passed for `origin/main..HEAD` before push; author and committer are Johnny Wang
+  (`dehydratedflask@users.noreply.github.com`), with no Claude/Anthropic coauthor trailer. All-path
+  audit passed at 2,788 paths. No source changes or private data were committed.
+- The removed branch `cursor/init-hash-551140-9dfc` is absent locally and from `git ls-remote`.
+  Checkout remains on `main`; no open PRs were observed at the claim checkpoint.
+- Task status remains ACTIVE, attempt 0. Exact next action: import the pinned PNG to ignored
+  `local/`, integrate the test-only ImageIO helper and pinned logo shader replay, then run the focused
+  Metal fixture with API/GPU validation before broad repository gates.
+
 ## 2026-10-25 04:53 CDT — task-claim publication gates pass
 
 - Integrator: Codex `/root`; `GPU-03-LOGO-PNG-TEXTURE-SAMPLE-01` remains **ACTIVE**, attempt 0,
