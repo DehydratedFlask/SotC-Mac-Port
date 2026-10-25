@@ -45,6 +45,7 @@ EXPECTED_CASES = {
     'unsigned_high_water': (1, 0, 0x7fffffffffffffff, 0x7ffffffffffffffe,
                             0x123456789abcdef0),
     'wrap_add_and_subtract': (8, 2, 0xfffffffffffffffc, 5, 4),
+    'zero_request_repairs_peak': (0, 0, 0x100, 0xff, 0x123),
 }
 
 

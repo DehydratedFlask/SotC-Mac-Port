@@ -28,6 +28,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [GPU-03 texture/sampler binding fixture](checkpoints/2026-10-24-gpu03-texture-sampler-complete.md) | E635 typed fragment resource binding and synthetic RGBA8 sample; no logo lowering, real asset binding, or WQM equivalence claim |
 | [GPU-02 logo vertex fetch lowering claim](checkpoints/2026-10-24-gpu02-logo-vs-fetch-claim.md) | Original bounded task claim and preflight; completion evidence is E636 below |
 | [GPU-02 logo vertex fetch lowering completion](checkpoints/2026-10-25-gpu02-logo-vs-fetch-complete.md) | E636 synthetic float2/float3/float4 MUBUF lowering and private Metal/CPU-oracle replay; no retail descriptor or G3 claim |
+| [E28 zero-request checker parity](checkpoints/2026-10-25-srv01-f19e00-checker-parity.md) | Existing fixture's zero-request case is now included in the instruction-derived checker; E368; no game execution |
 | [CTOR_CLASSES](CTOR_CLASSES.md) | 573-entry constructor-table classification by reachable-body idiom plus the slot 10–19/24–47 family contract; CPU-01 |
 | [INPUTTABLE_551140](INPUTTABLE_551140.md) | Numeric-only deepen of Init-hash 275-entry table (`0x551140`); CPU-01 |
 | [INPUTTABLE_551140_NAMES_FIXTURE](INPUTTABLE_551140_NAMES_FIXTURE.md) | Private 275-name fixture recipe for registry fill `0x52a220`; CPU-01 |

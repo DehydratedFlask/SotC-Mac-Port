@@ -115,10 +115,12 @@ public struct CoreLocator: Sendable {
         guard FileManager.default.isExecutableFile(atPath: path) else {
             return .failure(Rejection(detail: "\(name) is not executable", fileExists: true))
         }
-        guard SystemChecks.isMachOExecutable(at: url) else {
-            return .failure(Rejection(detail: "\(name) is not a Mach-O executable (refusing scripts/stubs)", fileExists: true))
+        switch SystemChecks.classifyCoreMachO(at: url) {
+        case .accepted:
+            return .success(url)
+        case .rejected(let detail):
+            return .failure(Rejection(detail: "\(name) \(detail)", fileExists: true))
         }
-        return .success(url)
     }
 
 }
