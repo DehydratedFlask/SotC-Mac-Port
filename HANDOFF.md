@@ -1,5 +1,22 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 06:27 CDT — TEX0 closeout published to main
+
+- Integrator: Codex `/root`; the read-only closeout for
+  `GPU-03-CMSH-TEX0-FORMAT-6-EVIDENCE-01` was published directly to GitHub `main` as
+  `2ddffa8d78b04ab5b2dfb6c59b4f71845ff11c74`.
+- `git fetch origin main` confirms local `HEAD == origin/main` at that commit. The worktree is clean
+  on `main`; `gh pr list --state open` returned `[]`.
+- Staged/all-path publish audits passed **6/2,793**; post-commit attribution passed. Commit author and
+  committer are Johnny Wang; no Claude/Anthropic/`Co-Authored-By` trailer is present.
+- Publication gates passed: CMake configure/build; CTest **397/397**; lift checkers **481/0/0**;
+  project index **19,591 folders**; Trail wiring graph synchronized at **8,546 nodes**. Build/test,
+  checker, index and Trail logs are under ignored
+  `local/validation/gpu03-cmsh-tex0-survey-20261025/`.
+- Outcome remains TEX0 semantics **UNKNOWN**. No parser, shader, or harness code changed; no runtime
+  claim. Exact next action: choose the next dependency-ready task from `docs/TASKS.md` after the
+  read-only Metal task scan completes.
+
 ## 2026-10-25 06:24 CDT — TEX0 format-code-6 evidence closed UNKNOWN
 
 - Integrator: Codex `/root`; bounded read-only task `GPU-03-CMSH-TEX0-FORMAT-6-EVIDENCE-01` is
