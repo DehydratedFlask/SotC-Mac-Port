@@ -1,5 +1,24 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 10:03 CDT — logo shader-pair source published to `main`
+
+- Integrator: Codex `/root`; source/evidence commit `a300db5d978b444bc6ca4a6b724a4f55122e5f88`
+  was pushed directly to GitHub `main`. Post-push fetch confirms `HEAD == origin/main`; worktree is
+  clean on `main`. The old topic branch is absent locally/remotely, and GitHub has no open PRs.
+- Staged/all-path audits passed **9/2,795** before commit; post-commit all-path audit and attribution
+  audit passed. Commit author/committer are Johnny Wang (`dehydratedflask@users.noreply.github.com`);
+  no Claude/Anthropic/co-author trailer is present. The source task is **FIXTURE_VERIFIED** in E669;
+  E670 records publication.
+- The pinned logo VS/PS composition passes focused Python 23/23, focused Metal 1/1 with API/GPU
+  validation, full CTest 397/397, lift checkers 481/0/0, project index 19,593 folders, and Trail
+  graph check at 8,560 nodes / 11,611 edges / 1,497 cards. Logs/artifacts are private under
+  `local/validation/gpu03-logo-vs-ps-pipeline-20261025/`.
+- Observation: only the closed synthetic indexed-quad fixture is verified. Retail binding, TEX0/NRM0,
+  AMD WQM/helper-lane equivalence, game-driven rendering, G3, boot/audio/save remain unverified.
+- Exact next action: continue on `main`; select the next dependency-ready bounded raw-asset task from
+  `docs/TASKS.md`, respecting the owner's decoder deferral. No task claims game execution.
+- Status: current shader-pair task **PUBLISHED / FIXTURE_VERIFIED**; project goal remains incomplete.
+
 ## 2026-10-25 10:02 CDT — logo shader-pair fixture verified
 
 - Integrator: Codex `/root`; `GPU-03-LOGO-VS-PS-METAL-PIPELINE-01` is now **FIXTURE_VERIFIED**,

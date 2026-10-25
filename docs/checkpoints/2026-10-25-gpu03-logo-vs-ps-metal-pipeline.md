@@ -23,6 +23,17 @@
   pending final staged audit and push to `main` under Johnny Wang.
 - Status: fixture acceptance **PASSED**; publication **PENDING**; task **FIXTURE_VERIFIED**, attempt 2.
 
+## 2026-10-25 10:03 CDT — source implementation published
+
+- Source/evidence commit `a300db5d978b444bc6ca4a6b724a4f55122e5f88` was pushed to GitHub `main`.
+  Post-push fetch confirmed local `HEAD == origin/main` and clean status on `main`.
+- Staged/all path audits passed 9/2,795; post-commit all-path and attribution audits passed. Author
+  and committer are Johnny Wang; there is no Claude/Anthropic/co-author trailer. The prior topic
+  branch is absent locally/remotely and `gh pr list --state open` returned `[]`.
+- E669 is the source fixture evidence; E670 records publication only. No runtime/game-frame claim is
+  added, and G3 remains PARTIAL. Next action: choose a dependency-ready raw-asset task from the task
+  register while continuing to defer the 0x8C decoder.
+
 ## 2026-10-25 09:56 CDT — focused implementation and path-safety checkpoint
 
 - Integrator: Codex `/root`; task remains **ACTIVE**, attempt 2. Independent source review found that
