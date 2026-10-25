@@ -4,9 +4,11 @@ Status: E627 verifies the selected default shader pair against an independent or
 synthetic direct-Metal geometry and parser flow; E649 verifies the pinned raw cube/cone POS0/U16
 members through the native parser and default-pair Metal harness; E634 characterizes the logo PS
 WQM/sample path; E635 verifies synthetic texture binding; E656 verifies the pinned logo PS/PNG on
-synthetic geometry. `GPU-03-LOGO-PNG-CMSH-ASSET-FRAME-01` is now combining the already verified raw
-mesh, image, and shader inputs under a synthetic UV adapter. Retail bindings remain unknown, and no
-game frame is established. **G3 is PARTIAL, not PASSED**, under the synthetic-scene rule in
+synthetic geometry. `GPU-03-LOGO-PNG-CMSH-ASSET-FRAME-01` combines the verified raw mesh, image, and
+shader inputs under a synthetic UV adapter. `GPU-03-LOGO-VS-PS-METAL-PIPELINE-01` is the next active
+slice: compose the separately pinned logo vertex and pixel shaders in one Metal pipeline. Retail
+bindings remain unknown, and no game frame is established. **G3 is PARTIAL, not PASSED**, under the
+synthetic-scene rule in
 `docs/VALIDATION.md`.
 Read [AGENTS.md](../AGENTS.md), [ROADMAP.md](../ROADMAP.md), [HANDOFF.md](../HANDOFF.md),
 [PLATFORM.md](PLATFORM.md) and [VALIDATION.md](VALIDATION.md) (gate G3) first. This file adds no
@@ -36,8 +38,8 @@ runtime behaviour; its only code is the read-only probe `tools/dev/gpu_asset_pro
 
 **Unfinished in this pass (marked UNK in the text):** Oodle identification is inference only; the
 `CompressionHeader` location, input-usage-slot decoding, `.cmat` constants, texture formats/tiling and the
-job-table edges were not resolved; the Gnm-band layer names are inferred from decompiler shape; the
-task cards are proposals not yet claimed in `docs/TASKS.md`.
+job-table edges were not resolved; the Gnm-band layer names are inferred from decompiler shape. The
+logo VS/PS Metal composition task is claimed in `docs/TASKS.md`; other future cards remain proposals.
 
 ## 1. Headline findings
 
@@ -61,7 +63,7 @@ task cards are proposals not yet claimed in `docs/TASKS.md`.
 6. Shader assets are decodable offline *without any decompressor* for about 44% of `.csdr` members: raw
    members carry `OrbShdr` GCN binaries that parse with a fully verified layout (14,967/14,971 raw
    members; section 4.3). The other ~56% (and ~95% of mesh/texture members) begin with a `0x8C`
-   block header consistent with Oodle LZ and need a decoder decision (section 4.2).
+   block header consistent with Oodle LZ and remain unsupported by the owner's defer decision (section 4.2).
 7. A **fully raw asset chain exists**: `default.cmat` -> `standard_4030788106.csdr` (VS 272 B + PS 240 B,
    no texture sample) with `cube_1m.cmsh` / `cone.cmsh` (section 4.6). A textured variant uses the
    `cp10shadowlogo` pair (VS 140 B, PS 152 B with one `image_sample`) and a PNG-wrapped boot texture.
@@ -217,6 +219,8 @@ The inline-index and predicated wrappers (`0x86a9d0`, `0x86aab0`, ...) have no c
   bytes (as an Oodle block's initial copy would be). INF: this is the Oodle LZ block header (magic nibble
   `0xC`; `0x0a`/`0x06` decoder-type codes; `0xCC` = block stored uncompressed). **UNK**: where the
   `CompressionHeader` lives for such a member, and which engine method value corresponds to which prefix.
+  Owner decision E665: defer implementing/importing a decoder; keep compressed members outside current
+  raw-asset tasks.
 - Census (OBS, correct pairing, first-bytes classification; "8C" = `8c 0a`/`8c 06`):
 
 | Archive/ext | Members | 8C | `cc` | PNG | Other (raw or tagged) |
@@ -502,6 +506,27 @@ No byte type, component order, normalization, orientation, or renderer binding i
 Keep TEX0 opaque and keep the E658 synthetic XY-to-UV mapping unchanged. Do not feed candidate
 decodings into the verified fixture based on the observed four-byte-per-position size ratio.
 
+### 6.10 Composed logo vertex/pixel Metal fixture
+
+`GPU-03-LOGO-VS-PS-METAL-PIPELINE-01` composes the pinned E636 logo VS (140 B,
+SHA-256 `430f9adbb07d387c0b2b877b98300396f183faeab7f75cba0c9b0c67ada20c0c`) with the pinned E646
+logo PS (152 B, SHA-256 `4309caada7f114ec822f61646be536f50a8261a8c6e54f2ce709db7c70b8b39a`) through a
+closed-world `logo-pair` profile. The generated MSL must use the E636 vertex stage and E646 fragment
+stage together; the E646 vertex adapter is not substituted for the pinned vertex shader.
+
+The fixture ABI is explicitly synthetic: `logo_clip` reads the per-vertex position, `logo_param0`
+reads a draw-level unit object row, and `logo_param1` aliases the per-vertex position so the PS gets
+varying UVs correlated with clip-space construction. A four-vertex indexed quad uses position corners
+in `[0,1]²`, camera XY `(1,1)`, and object row `(1,1,1,1)`. A 64x64 asymmetric RGBA8 texture and
+nearest/clamp slot-0 sampler feed a CPU-selected interior-pixel oracle. Repeat output must be
+deterministic; a position or texel mutation must change the selected readback; wrong shader hashes,
+unsupported ABI fields, and missing resource bindings must fail closed. Private MSL, logs, and PNGs
+stay under `local/`.
+
+This is a synthetic stage-composition check. It does not infer retail stream aliasing, TEX0/NRM0
+semantics, WQM/helper-lane equivalence, game-driven rendering, or G3 completion. E664 is the task
+claim; completion evidence will be appended after the focused and repository gates run.
+
 ## 7. Ranked task cards
 
 | # | ID | Scope | Exit check | Depends on |
@@ -510,7 +535,8 @@ decodings into the verified fixture based on the observed four-byte-per-position
 | 2 | `GPU-01-CSDR-READER-01` | Native importer-side C++ reader for the raw `.csdr` container (4.3): count, token, code span, `BinaryInfo`, type codes, hash/CRC, explicit GS count rule, fail-visible handling of 8C members; emit a private manifest row per shader. | 14,967/14,971 raw members parse; the 4 GS members take the documented path or fail with a named error; bit-flip/length/count/token mutations fail; ASan/UBSan clean; manifest digest recorded; ELF bytes never read at run time. | 1 |
 | 3 | `GPU-02-GCN-SUBSET-DEFAULT-PAIR-01` | Instruction-level decode of the four programs in 4.6 with an own table-driven GFX7 decoder (public ISA as basis), define the resource ABI (user-data SGPR table, `buffer_load_format` vertex fetch, `v_interp`, `exp` targets, `image_sample`), emit MSL at import time, unsupported opcodes fail conversion, add a separate offline oracle. | zero unknown opcodes and exact instruction boundaries in all four programs; generated MSL compiles; Metal output equals the oracle (exact for integer/move paths, documented tolerance for float) on at least 1,000 vectors including edge values; opcode coverage table recorded; assertion that no cross-lane instruction is present. | 2 |
 | 4 | `GPU-03-RENDEROPS-ASSET-FRAME-01` | Typed op list (6.2) and a Metal backend extending `metal_capture`; parse the identified local raw `cube_1m` and `cone` `.cmsh` bytes into vertex/index buffers; use per-vertex harness normal `[0.5, 0.5, 1.0]`; draw both meshes offscreen and write a private PNG directly (the owner selected this instead of `attach_screenshot`; do not invent an engine frame number); optional logo pair + PNG texture as the textured follow-up. | deterministic PNG hash recorded; independent assertions (covered-pixel count and silhouette from a CPU projection of the decoded positions, depth order of two meshes, no pixel outside the projected bounds); `MTL_DEBUG_LAYER=1` and Metal shader validation report zero faults; mutations of a vertex, an index or a shader constant change the hash; artifact and log carry the label "asset-derived harness". G3 stays PARTIAL at best. | 2, 3 |
-| 5 | `ASSET-FMT-02-BLOCK-DECODER-DECISION-01` | Owner decision on the provenance of the `0x8C` block decoder (lift the engine's statically linked routine behind `0x89d3b0` into ordinary native functions, adopt a third-party decoder per the AGENTS tool-acquisition record, or defer and restrict milestones to raw members); resolve where the `CompressionHeader` lives; implement import-time only. | owner decision recorded; known-answer tests: one `cc` stored block and at least one real block per prefix (`8c0a`, `8c06`) whose decoded size equals the engine's size field and whose output parses downstream (a `.csdr` yields `OrbShdr` blobs, a `.cmsh` yields descriptors); truncation/fuzz fail visibly. | 1 (blocks textures and most meshes/shaders; not 2-4) |
+| 4a | `GPU-03-LOGO-VS-PS-METAL-PIPELINE-01` | Hash-gated E636/E646 logo VS/PS pair and synthetic position-to-UV alias in a closed ABI; render an indexed quad with an asymmetric slot-0 RGBA8 texture through the existing direct-Metal frame API. | Generated MSL uses the pinned vertex and fragment stages together; Metal API/GPU validation passes; selected samples match an independent nearest/clamp and fp16-RTZ CPU oracle; repeat is deterministic; position and texel mutations are visible; unsupported hashes/ABI fail closed. No retail binding or game-frame claim. | E636, E646, E635 |
+| 5 | `ASSET-FMT-02-BLOCK-DECODER-DECISION-01` | Owner decision on the provenance of the `0x8C` block decoder before choosing implementation. | Decision recorded in E665: defer the decoder and restrict active milestones to already supported raw members; no decompressor implementation or import path is in scope. | 1 (compressed textures and most meshes/shaders remain unsupported; not raw tasks 2-4) |
 
 Not ranked (later, needs the engine): lift install rows 8/4/5/9 (`0x95a90`, `0x8f6f0`, `0x13a9a0`,
 `0x112db0`) with a Metal presenter and native backend hooks (CPU-04 territory), then port one real
@@ -518,35 +544,21 @@ Not ranked (later, needs the engine): lift install rows 8/4/5/9 (`0x95a90`, `0x8
 
 ## 8. Recommended next slice and exact first action
 
-**Slice: `GPU-02-GCN-SUBSET-DEFAULT-PAIR-01` (card 3), with card 1 landed first as a short precondition.**
-Why this one: it is the gating feasibility unknown for the whole path (can ordinary offline code turn real
-PS4 shader bytes into verified Metal?), it needs no decompressor and no engine, its inputs are already
-verified (4.3, 4.6), and a negative result is cheap and decisive before any renderer API is designed.
+The default pair, logo vertex fetch, and logo pixel sampling are already closed by E627, E636, and E646.
+The current next slice is `GPU-03-LOGO-VS-PS-METAL-PIPELINE-01`: compose the exact pinned stages through
+the closed synthetic ABI in section 6.10. Its claim is recorded in E664.
 
-Exact first action (read-only until the last step):
-
-1. Run `python3 -I tools/dev/gpu_asset_probe.py csdr local/extracted/CUSA08809/pak0.psarc --path
-   'materials/!cookedshaders/version57/simple/0f1c3bf0/_ps4/standard_4030788106.csdr'` and confirm the two
-   blobs: VS code @564 length 272, PS code @1368 length 240 (sha256 prefixes `5a4f11f29a8d46a3`,
-   `4af7cb6973d4743a`).
-2. Write the four code spans (default VS/PS, logo VS/PS) to private fixtures under `local/fixtures/gpu-r29/`
-   with their full sha256 recorded in a `SHA256SUMS` beside them (never into the repository).
-3. Create `tools/dev/gcn_inventory.py`: a table-driven GFX7 decoder for exactly the encodings these four
-   programs use, printing mnemonic-level lines and a unit-length check; success is zero unknown opcodes and
-   the last decoded instruction ending exactly at `length` with `s_endpgm`. Use the public GCN3/GCN ISA
-   manual and the OBS bytes; use `reference/.../frontend/decode.cpp` and `format.cpp` only to cross-check
-   opcode numbers, with no copied code.
-
-Stop and record the result (HANDOFF checkpoint) after step 3 before any MSL is generated: if any opcode in
-the four programs is outside the simple per-lane subset, the card is re-scoped rather than extended silently.
+Exact next action: extract the 140-byte and 152-byte program spans from their documented local `.csdr`
+inputs, verify the E636/E646 SHA-256 pins, then implement the bounded `logo-pair` profile without
+changing the existing `logo-ps` or default-pair outputs. If the exact pins or synthetic ABI anchors fail,
+stop and record the observed mismatch before adding a new lowering case.
 
 ## 9. Unresolved items and risks
 
 - **F0 (section 2) invalidates path-keyed asset facts** until card 1 lands. Highest-impact item.
 - **Oodle provenance (INF).** The block decoder is probably proprietary RAD code linked into the game.
-  Lifting it into a public repository, or shipping it in the importer, has licensing consequences the
-  owner must decide (card 5). If undecided, only the raw members (about 44% of `.csdr`, 13 PNG textures,
-  a minority of meshes) are usable.
+  The owner chose to defer it (E665); continue only with supported raw members (about 44% of `.csdr`,
+  13 PNG textures, and a minority of meshes). A future decoder/import decision needs a new task.
 - **No GFX7 disassembler on this machine** (LLVM 23.1.3 rejects the subtarget). The decoder must be written
   and validated against the ISA manual and the reference tables; there is no vendor oracle.
 - **GPL.** The reference recompiler is GPL-2.0-or-later. Adapting it needs the attribution and licensing

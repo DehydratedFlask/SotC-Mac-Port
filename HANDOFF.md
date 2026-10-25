@@ -1,5 +1,50 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 09:40 CDT — 0x8C decoder deferred by owner
+
+- Integrator: Codex `/root`; the user selected “defer 0x8C; continue with raw assets only.”
+  `ASSET-FMT-02-BLOCK-DECODER-DECISION-01` is **DONE_DOC**, attempt 0; no decoder was selected or
+  implemented, and no tool or dependency was installed.
+- Files changed: `HANDOFF.md`, `docs/TASKS.md`, `docs/METAL_FRAME_PATH.md`, `docs/EVIDENCE.md`,
+  `docs/INDEX.md`, `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-25-asset-block-decoder-deferral.md`.
+- Observation: raw shader/mesh/texture members remain in the documented task scope. Inference: 0x8C
+  members stay unsupported until a later explicit owner decision. This closes the decision task only;
+  it does not decode any bytes.
+- Exact next action: continue `GPU-03-LOGO-VS-PS-METAL-PIPELINE-01` on `main` with existing raw
+  shader spans; keep compressed members out of this work.
+- Status: decision **DONE_DOC**; no code or runtime evidence.
+
+## 2026-10-25 09:40 CDT — logo VS/PS Metal pipeline task claimed
+
+- Integrator: Codex `/root`; checkout was clean on `main` at
+  `d85e70018737a9351176ce21e437820c6b08cd35` before this claim. Task
+  `GPU-03-LOGO-VS-PS-METAL-PIPELINE-01` is **ACTIVE**, attempt 0, with no failed hypotheses.
+- Bounded output: a closed-world `logo-pair` MSL profile composes the E636 140-byte VS
+  (`430f9adbb07d387c0b2b877b98300396f183faeab7f75cba0c9b0c67ada20c0c`) and E646 152-byte PS
+  (`4309caada7f114ec822f61646be536f50a8261a8c6e54f2ce709db7c70b8b39a`), then renders a synthetic
+  indexed quad and asymmetric RGBA8 texture through direct Metal. The test-only ABI aliases UV to
+  position for this fixture; this is not a retail descriptor or TEX0 interpretation.
+- Live-source observations: `graft grep "AssetMeshDraw" --in native/` found the draw API and its
+  three-file use surface; `trail callers AssetMeshDraw --depth all` reported no indexed incoming
+  edges. Independent review confirmed the logo stage interfaces compose and the closed synthetic
+  alias can vary UV with vertex position without changing the renderer API.
+- Files changed for the claim: `HANDOFF.md`, `docs/TASKS.md`, `docs/METAL_FRAME_PATH.md`,
+  `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and
+  `docs/checkpoints/2026-10-25-gpu03-logo-vs-ps-metal-pipeline.md`. Source edits have not started.
+- Claim checks: `git diff --check` passed; CMake configure/build passed (build had no work); full
+  CTest passed **397/397**; lift checkers passed **481/0/0**; project index covered **19,592 folders**;
+  Trail graph check passed at **8,546 nodes**. Exact logs are under
+  `local/validation/gpu03-logo-vs-ps-pipeline-20261025/`. Staged/all publish-path audits passed
+  **8/2,795**; attribution audit passed for `origin/main..HEAD` and the configured owner identity.
+  These are repository gates, not game/runtime evidence.
+- Observation: prior E636/E646 artifacts pin both shader inputs and their interfaces; the current
+  renderer stores positions per vertex and draw-level shader constants. Inference: mapping the logo
+  PS UV input to the same synthetic position stream yields a useful interpolated-texture fixture.
+- Risks: this tests only a labeled closed ABI, not retail UV semantics, TEX0/NRM0, AMD WQM equivalence,
+  game-driven rendering, or G3. Exact next action: implement the hash-gated profile and its lowerer
+  rejects, then add the opt-in Metal quad/texture oracle test on separate source files.
+- Status: task **ACTIVE**, attempt 0; final acceptance and publication gates remain pending.
+
 ## 2026-10-25 06:27 CDT — TEX0 closeout published to main
 
 - Integrator: Codex `/root`; the read-only closeout for
@@ -13,9 +58,8 @@
   project index **19,591 folders**; Trail wiring graph synchronized at **8,546 nodes**. Build/test,
   checker, index and Trail logs are under ignored
   `local/validation/gpu03-cmsh-tex0-survey-20261025/`.
-- Outcome remains TEX0 semantics **UNKNOWN**. No parser, shader, or harness code changed; no runtime
-  claim. Exact next action: choose the next dependency-ready task from `docs/TASKS.md` after the
-  read-only Metal task scan completes.
+- Outcome remains TEX0 semantics **UNKNOWN**. No parser, shader, or harness code changed in that
+  task; no runtime claim. The next bounded shader task is recorded above.
 
 ## 2026-10-25 06:24 CDT — TEX0 format-code-6 evidence closed UNKNOWN
 
