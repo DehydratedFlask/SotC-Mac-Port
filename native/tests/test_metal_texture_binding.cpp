@@ -18,6 +18,7 @@
 #include <fstream>
 #include <initializer_list>
 #include <iterator>
+#include <limits>
 #include <memory>
 #include <span>
 #include <string>
@@ -30,6 +31,8 @@ namespace {
 
 constexpr std::uint32_t kWidth = 64;
 constexpr std::uint32_t kHeight = 64;
+constexpr float kLogoPairAssetCameraX = 0.8F;
+constexpr float kLogoPairAssetCameraY = 0.8F;
 constexpr std::string_view kPinnedLogoPsMslSha256 =
     "071a4ebe11177086c178119fafae04aae99a1a147ad8b8d1e92ee0f17abbfa71";
 constexpr std::string_view kPinnedLogoPngSha256 =
@@ -857,6 +860,486 @@ struct MeshLogoProbe {
     return passed;
 }
 
+[[nodiscard]] bool transform_cmsh_positions_to_logo_pair_region(
+    const sotc::CmshMesh& mesh, float region_center_x,
+    std::vector<sotc::CmshPosition>& positions) {
+    float min_x = 0.0F;
+    float max_x = 0.0F;
+    float min_y = 0.0F;
+    float max_y = 0.0F;
+    if (!cmsh_position_bounds(mesh, min_x, max_x, min_y, max_y)) return false;
+
+    constexpr float kMaximumRegionSpan = 0.40F;
+    const float source_span = std::max(max_x - min_x, max_y - min_y);
+    const float scale = kMaximumRegionSpan / source_span;
+    const float center_x = (min_x + max_x) * 0.5F;
+    const float center_y = (min_y + max_y) * 0.5F;
+    positions.clear();
+    positions.reserve(mesh.positions.size());
+    for (const sotc::CmshPosition& position : mesh.positions) {
+        positions.push_back({(position.x - center_x) * scale + region_center_x,
+                             (position.y - center_y) * scale + 0.5F, 0.25F});
+    }
+    return std::all_of(positions.begin(), positions.end(), [](const sotc::CmshPosition& position) {
+        return std::isfinite(position.x) && std::isfinite(position.y) &&
+               position.x > 0.0F && position.x < 1.0F &&
+               position.y > 0.0F && position.y < 1.0F;
+    });
+}
+
+struct LogoPairMutationPixel {
+    std::uint32_t x{};
+    std::uint32_t y{};
+    float original_coverage_margin{};
+    float mutated_coverage_margin{};
+    bool becomes_uncovered{};
+};
+
+struct LogoPairMutationSearchStats {
+    std::size_t newly_covered_geometry{};
+    std::size_t newly_covered_color{};
+    std::size_t newly_uncovered_geometry{};
+    std::size_t newly_uncovered_color{};
+};
+
+[[nodiscard]] bool triangle_barycentrics_at_pixel(
+    std::span<const sotc::CmshPosition> positions,
+    std::span<const std::uint16_t> indices, std::size_t triangle_index,
+    std::uint32_t output_x, std::uint32_t output_y,
+    float& w0, float& w1, float& w2) {
+    const std::size_t index_offset = triangle_index * 3U;
+    if (index_offset + 2U >= indices.size()) return false;
+    const std::uint16_t i0 = indices[index_offset];
+    const std::uint16_t i1 = indices[index_offset + 1U];
+    const std::uint16_t i2 = indices[index_offset + 2U];
+    if (i0 >= positions.size() || i1 >= positions.size() || i2 >= positions.size()) return false;
+
+    // E636 maps input (u,v) to clip (2*camera.x*u-1, 1-2*camera.y*v). The Metal target and
+    // readback are y-down, so this synthetic camera projects normalized position to
+    // (camera.x*u*width, camera.y*v*height) pixels.
+    const float x0 = positions[i0].x * kLogoPairAssetCameraX * static_cast<float>(kWidth);
+    const float y0 = positions[i0].y * kLogoPairAssetCameraY * static_cast<float>(kHeight);
+    const float x1 = positions[i1].x * kLogoPairAssetCameraX * static_cast<float>(kWidth);
+    const float y1 = positions[i1].y * kLogoPairAssetCameraY * static_cast<float>(kHeight);
+    const float x2 = positions[i2].x * kLogoPairAssetCameraX * static_cast<float>(kWidth);
+    const float y2 = positions[i2].y * kLogoPairAssetCameraY * static_cast<float>(kHeight);
+    const float px = static_cast<float>(output_x) + 0.5F;
+    const float py = static_cast<float>(output_y) + 0.5F;
+    const float denominator = (y1 - y2) * (x0 - x2) + (x2 - x1) * (y0 - y2);
+    if (std::abs(denominator) < 0.0001F) return false;
+
+    w0 = ((y1 - y2) * (px - x2) + (x2 - x1) * (py - y2)) / denominator;
+    w1 = ((y2 - y0) * (px - x2) + (x0 - x2) * (py - y2)) / denominator;
+    w2 = 1.0F - w0 - w1;
+    return true;
+}
+
+[[nodiscard]] float logo_pair_mesh_coverage_margin(
+    std::span<const sotc::CmshPosition> positions,
+    std::span<const std::uint16_t> indices, std::uint32_t output_x,
+    std::uint32_t output_y) {
+    if (indices.empty() || indices.size() % 3U != 0U) {
+        return -std::numeric_limits<float>::infinity();
+    }
+    float best_margin = -std::numeric_limits<float>::infinity();
+    for (std::size_t triangle_index = 0; triangle_index < indices.size() / 3U;
+         ++triangle_index) {
+        float w0 = 0.0F;
+        float w1 = 0.0F;
+        float w2 = 0.0F;
+        if (!triangle_barycentrics_at_pixel(positions, indices, triangle_index,
+                                            output_x, output_y, w0, w1, w2)) {
+            continue;
+        }
+        best_margin = std::max(best_margin, std::min({w0, w1, w2}));
+    }
+    return best_margin;
+}
+
+[[nodiscard]] LogoTextureUv logo_pair_asset_uv_for_pixel(std::uint32_t output_x,
+                                                         std::uint32_t output_y) {
+    return {1.0F, 1.0F,
+            (static_cast<float>(output_x) + 0.5F) /
+                (kLogoPairAssetCameraX * static_cast<float>(kWidth)),
+            (static_cast<float>(output_y) + 0.5F) /
+                (kLogoPairAssetCameraY * static_cast<float>(kHeight))};
+}
+
+[[nodiscard]] bool complete_logo_pair_frame(const sotc::MetalAssetFrameResult& frame) {
+    return frame.ok && frame.width == kWidth && frame.height == kHeight &&
+           frame.stride == kWidth * 4U &&
+           frame.rgba8.size() == static_cast<std::size_t>(frame.stride) * kHeight &&
+           !frame.png.empty();
+}
+
+[[nodiscard]] bool find_logo_pair_mesh_probe(
+    std::span<const sotc::CmshPosition> positions,
+    std::span<const std::uint16_t> indices,
+    std::span<const std::uint8_t> texture, std::uint32_t texture_width,
+    std::uint32_t texture_height, MeshLogoProbe& probe) {
+    if (indices.empty() || indices.size() % 3U != 0U || texture_width == 0U ||
+        texture_height == 0U ||
+        texture.size() != static_cast<std::size_t>(texture_width) * texture_height * 4U) {
+        return false;
+    }
+
+    bool found = false;
+    float best_score = -1.0F;
+    for (std::size_t triangle_index = 0; triangle_index < indices.size() / 3U;
+         ++triangle_index) {
+        const std::size_t index_offset = triangle_index * 3U;
+        const std::uint16_t i0 = indices[index_offset];
+        const std::uint16_t i1 = indices[index_offset + 1U];
+        const std::uint16_t i2 = indices[index_offset + 2U];
+        if (i0 >= positions.size() || i1 >= positions.size() || i2 >= positions.size()) {
+            return false;
+        }
+        for (std::uint32_t y = 0; y < kHeight; ++y) {
+            for (std::uint32_t x = 0; x < kWidth; ++x) {
+                float w0 = 0.0F;
+                float w1 = 0.0F;
+                float w2 = 0.0F;
+                if (!triangle_barycentrics_at_pixel(positions, indices, triangle_index,
+                                                    x, y, w0, w1, w2)) {
+                    continue;
+                }
+                const float minimum_barycentric = std::min({w0, w1, w2});
+                if (minimum_barycentric < 0.18F) continue;
+
+                const float u = w0 * positions[i0].x + w1 * positions[i1].x +
+                                w2 * positions[i2].x;
+                const float v = w0 * positions[i0].y + w1 * positions[i1].y +
+                                w2 * positions[i2].y;
+                if (u <= 0.0F || u >= 1.0F || v <= 0.0F || v >= 1.0F) continue;
+                const float texel_u = u * static_cast<float>(texture_width);
+                const float texel_v = v * static_cast<float>(texture_height);
+                const float fraction_u = texel_u - std::floor(texel_u);
+                const float fraction_v = texel_v - std::floor(texel_v);
+                const float texel_margin = std::min(
+                    {fraction_u, 1.0F - fraction_u, fraction_v, 1.0F - fraction_v});
+                if (texel_margin < 0.16F) continue;
+
+                const std::uint32_t texture_x = std::min(
+                    static_cast<std::uint32_t>(u * static_cast<float>(texture_width)),
+                    texture_width - 1U);
+                const std::uint32_t texture_y = std::min(
+                    static_cast<std::uint32_t>(v * static_cast<float>(texture_height)),
+                    texture_height - 1U);
+                const float score = minimum_barycentric + texel_margin * 0.25F;
+                if (!found || score > best_score) {
+                    found = true;
+                    best_score = score;
+                    probe = {x, y, texture_x, texture_y, u, v, minimum_barycentric};
+                }
+            }
+        }
+    }
+    return found;
+}
+
+[[nodiscard]] bool find_logo_pair_position_mutation_pixel(
+    std::span<const sotc::CmshPosition> original_positions,
+    std::span<const sotc::CmshPosition> mutated_positions,
+    std::span<const std::uint16_t> indices,
+    std::span<const sotc::CmshPosition> cone_positions,
+    std::span<const std::uint16_t> cone_indices,
+    std::span<const std::uint8_t> baseline_rgba8,
+    std::span<const std::uint8_t> texture, std::uint32_t texture_width,
+    std::uint32_t texture_height, LogoPairMutationPixel& probe,
+    LogoPairMutationSearchStats& stats) {
+    if (baseline_rgba8.size() != static_cast<std::size_t>(kWidth) * kHeight * 4U ||
+        original_positions.size() != mutated_positions.size() || indices.empty() ||
+        indices.size() % 3U != 0U || cone_indices.empty() || cone_indices.size() % 3U != 0U ||
+        texture_width == 0U || texture_height == 0U ||
+        texture.size() != static_cast<std::size_t>(texture_width) * texture_height * 4U) {
+        return false;
+    }
+
+    bool found_newly_uncovered = false;
+    LogoPairMutationPixel first_newly_uncovered{};
+    for (std::uint32_t y = 0; y < kHeight; ++y) {
+        for (std::uint32_t x = 0; x < kWidth; ++x) {
+            const float original_margin = logo_pair_mesh_coverage_margin(
+                original_positions, indices, x, y);
+            const float mutated_margin = logo_pair_mesh_coverage_margin(
+                mutated_positions, indices, x, y);
+            const float cone_margin = logo_pair_mesh_coverage_margin(
+                cone_positions, cone_indices, x, y);
+            if (cone_margin >= -0.08F) continue;
+
+            const bool newly_covered = original_margin < -0.08F && mutated_margin >= 0.18F;
+            const bool newly_uncovered = original_margin >= 0.18F && mutated_margin < -0.08F;
+            if (!newly_covered && !newly_uncovered) continue;
+            if (newly_covered) ++stats.newly_covered_geometry;
+            if (newly_uncovered) ++stats.newly_uncovered_geometry;
+
+            // E669 carries position through clip XY and interpolated UV. Invert its exact
+            // camera-scaled clip-to-viewport mapping before sampling the independent oracle.
+            const LogoTextureUv uv = logo_pair_asset_uv_for_pixel(x, y);
+            const auto expected = logo_png_pixel_oracle(
+                texture, texture_width, texture_height, uv);
+            const std::size_t offset = pixel_offset(x, y);
+            const std::array<std::uint8_t, 4> baseline_pixel = {
+                baseline_rgba8[offset], baseline_rgba8[offset + 1U],
+                baseline_rgba8[offset + 2U], baseline_rgba8[offset + 3U]};
+            constexpr std::array<std::uint8_t, 4> kClearColor = {0, 0, 0, 255};
+            if (newly_uncovered) {
+                if (baseline_pixel != expected || baseline_pixel == kClearColor) continue;
+                ++stats.newly_uncovered_color;
+                if (!found_newly_uncovered) {
+                    first_newly_uncovered = {x, y, original_margin, mutated_margin, true};
+                    found_newly_uncovered = true;
+                }
+            } else {
+                if (baseline_pixel != kClearColor || expected == kClearColor) continue;
+                ++stats.newly_covered_color;
+            }
+        }
+    }
+    if (found_newly_uncovered) probe = first_newly_uncovered;
+    return found_newly_uncovered;
+}
+
+[[nodiscard]] bool run_logo_pair_raw_cmsh_fixture(
+    sotc::MetalAssetFrameRenderer& renderer, const sotc::CmshMesh& cube,
+    const sotc::CmshMesh& cone, std::span<const std::uint8_t> logo_png_rgba8,
+    std::uint32_t texture_width, std::uint32_t texture_height,
+    const char* baseline_png_path, const char* texture_mutated_png_path,
+    const char* position_mutated_png_path) {
+    bool passed = true;
+    const auto record = [&passed](std::string_view name, bool result) {
+        check(name, result);
+        passed = passed && result;
+    };
+
+    std::vector<sotc::CmshPosition> cube_positions;
+    std::vector<sotc::CmshPosition> cone_positions;
+    const bool cube_transformed =
+        transform_cmsh_positions_to_logo_pair_region(cube, 0.23F, cube_positions);
+    const bool cone_transformed =
+        transform_cmsh_positions_to_logo_pair_region(cone, 0.77F, cone_positions);
+    record("cube mesh receives a test-only normalized clip/UV transform", cube_transformed);
+    record("cone mesh receives a test-only normalized clip/UV transform", cone_transformed);
+    if (!cube_transformed || !cone_transformed) return false;
+
+    float cube_min_x = 0.0F;
+    float cube_max_x = 0.0F;
+    float cube_min_y = 0.0F;
+    float cube_max_y = 0.0F;
+    float cone_min_x = 0.0F;
+    float cone_max_x = 0.0F;
+    float cone_min_y = 0.0F;
+    float cone_max_y = 0.0F;
+    const bool bounds_valid = cmsh_position_bounds(
+                                  sotc::CmshMesh{cube_positions, cube.indices}, cube_min_x,
+                                  cube_max_x, cube_min_y, cube_max_y) &&
+                              cmsh_position_bounds(
+                                  sotc::CmshMesh{cone_positions, cone.indices}, cone_min_x,
+                                  cone_max_x, cone_min_y, cone_max_y);
+    record("cube and cone occupy separate visible unit-position regions",
+           bounds_valid && cube_max_x < cone_min_x && cube_min_x > 0.0F &&
+               cone_max_x < 1.0F && cube_min_y > 0.0F && cube_max_y < 1.0F &&
+               cone_min_y > 0.0F && cone_max_y < 1.0F);
+    if (!bounds_valid || cube_max_x >= cone_min_x) return false;
+
+    sotc::DefaultShaderCase cube_shader = sotc::make_default_shader_case();
+    cube_shader.camera = {kLogoPairAssetCameraX, kLogoPairAssetCameraY, 0.0F, 0.0F};
+    cube_shader.object_row0 = {1.0F, 1.0F, 1.0F, 1.0F};
+    cube_shader.encoded_normal = {0.5F, 0.5F, 1.0F, 0.0F};
+    sotc::DefaultShaderCase cone_shader = cube_shader;
+    const sotc::AssetSamplerInput sampler{
+        sotc::AssetTextureFilter::nearest, sotc::AssetTextureFilter::nearest,
+        sotc::AssetTextureAddressMode::clamp_to_edge,
+        sotc::AssetTextureAddressMode::clamp_to_edge};
+    const sotc::AssetTexture2D texture{
+        texture_width, texture_height, logo_png_rgba8};
+
+    sotc::AssetMeshDraw cube_draw{cube_positions, cube.indices, cube_shader};
+    cube_draw.fragment_texture0 = texture;
+    cube_draw.fragment_sampler0 = sampler;
+    sotc::AssetMeshDraw cone_draw{cone_positions, cone.indices, cone_shader};
+    cone_draw.fragment_texture0 = texture;
+    cone_draw.fragment_sampler0 = sampler;
+    const std::array<sotc::AssetMeshDraw, 2> draws = {cube_draw, cone_draw};
+
+    MeshLogoProbe cube_probe;
+    MeshLogoProbe cone_probe;
+    const bool cube_probe_found = find_logo_pair_mesh_probe(
+        cube_positions, cube.indices, logo_png_rgba8, texture_width, texture_height,
+        cube_probe);
+    const bool cone_probe_found = find_logo_pair_mesh_probe(
+        cone_positions, cone.indices, logo_png_rgba8, texture_width, texture_height,
+        cone_probe);
+    record("cube CPU probe is a safe interior sample of an indexed triangle", cube_probe_found);
+    record("cone CPU probe is a safe interior sample of an indexed triangle", cone_probe_found);
+    if (!cube_probe_found || !cone_probe_found) return false;
+
+    const sotc::MetalAssetFrameResult baseline = renderer.render(draws);
+    record("composed logo pair renders both parsed raw meshes", baseline.ok);
+    if (!baseline.ok) {
+        std::fprintf(stderr, "FAIL raw CMSH logo-pair Metal render: %s\n",
+                     baseline.error.c_str());
+        return false;
+    }
+    const bool frame_shape_valid = complete_logo_pair_frame(baseline);
+    record("raw mesh pair readback is a complete 64x64 RGBA8 frame and PNG",
+           frame_shape_valid);
+    if (!frame_shape_valid) return false;
+
+    constexpr std::array<std::uint8_t, 4> kClearColor = {0, 0, 0, 255};
+    const float cube_clear_margin = logo_pair_mesh_coverage_margin(
+        cube_positions, cube.indices, 0U, 0U);
+    const float cone_clear_margin = logo_pair_mesh_coverage_margin(
+        cone_positions, cone.indices, 0U, 0U);
+    record("CPU coverage proves clear sample (0,0) is outside both meshes",
+           cube_clear_margin < -0.08F && cone_clear_margin < -0.08F);
+    record("Metal baseline clear sample (0,0) equals documented RGBA8 clear",
+           is_color(baseline.rgba8, 0U, 0U, kClearColor));
+
+    const auto verify_mesh_probe = [&](std::string_view label, const MeshLogoProbe& probe,
+                                       std::span<const std::uint8_t> source_texture,
+                                       const sotc::MetalAssetFrameResult& frame) {
+        const LogoTextureUv uv{1.0F, 1.0F, probe.u, probe.v};
+        const auto expected = logo_png_pixel_oracle(
+            source_texture, texture_width, texture_height, uv);
+        std::string check_name(label);
+        check_name += " interior pixel matches barycentric nearest/clamp fp16-RTZ oracle";
+        record(check_name, is_color(frame.rgba8, probe.output_x, probe.output_y, expected));
+    };
+    verify_mesh_probe("cube", cube_probe, logo_png_rgba8, baseline);
+    verify_mesh_probe("cone", cone_probe, logo_png_rgba8, baseline);
+    std::printf("logo-pair raw mesh probes: cube output=(%u,%u) UV=(%.6f,%.6f) "
+                "texel=(%u,%u) barycentric-min=%.3f; cone output=(%u,%u) "
+                "UV=(%.6f,%.6f) texel=(%u,%u) barycentric-min=%.3f\n",
+                cube_probe.output_x, cube_probe.output_y, static_cast<double>(cube_probe.u),
+                static_cast<double>(cube_probe.v), cube_probe.texture_x, cube_probe.texture_y,
+                static_cast<double>(cube_probe.minimum_barycentric), cone_probe.output_x,
+                cone_probe.output_y, static_cast<double>(cone_probe.u),
+                static_cast<double>(cone_probe.v), cone_probe.texture_x, cone_probe.texture_y,
+                static_cast<double>(cone_probe.minimum_barycentric));
+
+    const sotc::MetalAssetFrameResult repeated = renderer.render(draws);
+    record("raw mesh logo-pair repeat renders", repeated.ok);
+    if (repeated.ok) {
+        record("raw mesh logo-pair RGBA and PNG repeat byte-for-byte",
+               repeated.rgba8 == baseline.rgba8 && repeated.png == baseline.png);
+    }
+    record("raw mesh logo-pair baseline PNG writes under local evidence",
+           write_png_file(baseline_png_path, baseline.png));
+
+    std::vector<std::uint8_t> mutated_texture(logo_png_rgba8.begin(), logo_png_rgba8.end());
+    const std::size_t mutated_texel_offset =
+        (static_cast<std::size_t>(cube_probe.texture_y) * texture_width + cube_probe.texture_x) *
+        4U;
+    mutated_texture[mutated_texel_offset] =
+        mutated_texture[mutated_texel_offset] == 255U ? 0U : 255U;
+    const sotc::AssetTexture2D mutated_texture_input{
+        texture_width, texture_height, std::span<const std::uint8_t>(mutated_texture)};
+    std::array<sotc::AssetMeshDraw, 2> texture_mutated_draws = draws;
+    texture_mutated_draws[0].fragment_texture0 = mutated_texture_input;
+    texture_mutated_draws[1].fragment_texture0 = mutated_texture_input;
+    const sotc::MetalAssetFrameResult texture_mutated = renderer.render(texture_mutated_draws);
+    record("mutated source texel renders with the composed logo pair", texture_mutated.ok);
+    const bool texture_mutated_shape_valid = complete_logo_pair_frame(texture_mutated);
+    record("texture-mutated readback has complete dimensions, stride, RGBA and PNG",
+           texture_mutated_shape_valid);
+    if (texture_mutated_shape_valid) {
+        verify_mesh_probe("mutated cube", cube_probe, mutated_texture, texture_mutated);
+        verify_mesh_probe("mutated cone", cone_probe, mutated_texture, texture_mutated);
+        const std::size_t offset = pixel_offset(cube_probe.output_x, cube_probe.output_y);
+        const bool pixel_changed = !std::equal(
+            baseline.rgba8.begin() + static_cast<std::ptrdiff_t>(offset),
+            baseline.rgba8.begin() + static_cast<std::ptrdiff_t>(offset + 4U),
+            texture_mutated.rgba8.begin() + static_cast<std::ptrdiff_t>(offset));
+        record("source texel mutation changes the selected mesh readback and PNG",
+               pixel_changed && texture_mutated.png != baseline.png);
+        record("texture-mutated raw mesh PNG writes under local evidence",
+               write_png_file(texture_mutated_png_path, texture_mutated.png));
+    }
+
+    constexpr float kCubePositionMutation = 0.12F;
+    std::vector<sotc::CmshPosition> position_mutated_cube_positions = cube_positions;
+    for (sotc::CmshPosition& position : position_mutated_cube_positions) {
+        position.x += kCubePositionMutation;
+    }
+    const bool position_mutation_in_range = std::all_of(
+        position_mutated_cube_positions.begin(), position_mutated_cube_positions.end(),
+        [](const sotc::CmshPosition& position) {
+            return std::isfinite(position.x) && position.x > 0.0F && position.x < 1.0F;
+        });
+    record("cube mesh-position mutation remains in the unit clip/UV region",
+           position_mutation_in_range);
+    if (position_mutation_in_range) {
+        std::array<sotc::AssetMeshDraw, 2> position_mutated_draws = draws;
+        position_mutated_draws[0].positions = position_mutated_cube_positions;
+        LogoPairMutationPixel mutation_probe;
+        LogoPairMutationSearchStats mutation_search_stats;
+        const bool mutation_probe_found = find_logo_pair_position_mutation_pixel(
+            cube_positions, position_mutated_cube_positions, cube.indices, cone_positions,
+            cone.indices, baseline.rgba8, logo_png_rgba8, texture_width, texture_height,
+            mutation_probe, mutation_search_stats);
+        std::printf("logo-pair position mutation candidates: newly-covered geometric=%zu "
+                    "baseline-clear-filter=%zu; newly-uncovered geometric=%zu "
+                    "baseline-oracle-filter=%zu\n",
+                    mutation_search_stats.newly_covered_geometry,
+                    mutation_search_stats.newly_covered_color,
+                    mutation_search_stats.newly_uncovered_geometry,
+                    mutation_search_stats.newly_uncovered_color);
+        record("CPU mutation oracle finds a robust newly uncovered cube pixel",
+               mutation_probe_found && mutation_probe.becomes_uncovered);
+        if (mutation_probe_found) {
+            std::printf("logo-pair position mutation probe: output=(%u,%u) "
+                        "transition=covered-to-uncovered original-margin=%.3f "
+                        "mutated-margin=%.3f\n",
+                        mutation_probe.x, mutation_probe.y,
+                        static_cast<double>(mutation_probe.original_coverage_margin),
+                        static_cast<double>(mutation_probe.mutated_coverage_margin));
+            const LogoTextureUv mutation_uv = logo_pair_asset_uv_for_pixel(
+                mutation_probe.x, mutation_probe.y);
+            const auto expected_baseline_pixel = logo_png_pixel_oracle(
+                logo_png_rgba8, texture_width, texture_height, mutation_uv);
+            const std::size_t offset = pixel_offset(mutation_probe.x, mutation_probe.y);
+            const std::array<std::uint8_t, 4> baseline_pixel = {
+                baseline.rgba8[offset], baseline.rgba8[offset + 1U],
+                baseline.rgba8[offset + 2U], baseline.rgba8[offset + 3U]};
+            record("baseline covered mutation pixel matches camera-scaled texture oracle",
+                   is_color(baseline.rgba8, mutation_probe.x, mutation_probe.y,
+                            expected_baseline_pixel));
+            record("baseline covered mutation pixel differs from clear RGBA8",
+                   baseline_pixel != kClearColor);
+
+            const sotc::MetalAssetFrameResult position_mutated =
+                renderer.render(position_mutated_draws);
+            record("mesh-position mutation renders through the composed logo pair",
+                   position_mutated.ok);
+            const bool position_mutated_shape_valid = complete_logo_pair_frame(position_mutated);
+            record("position-mutated readback has complete dimensions, stride, RGBA and PNG",
+                   position_mutated_shape_valid);
+            if (position_mutated_shape_valid) {
+                const bool selected_pixel_is_clear = is_color(
+                    position_mutated.rgba8, mutation_probe.x, mutation_probe.y, kClearColor);
+                const bool pixel_changed = !std::equal(
+                    baseline.rgba8.begin() + static_cast<std::ptrdiff_t>(offset),
+                    baseline.rgba8.begin() + static_cast<std::ptrdiff_t>(offset + 4U),
+                    position_mutated.rgba8.begin() + static_cast<std::ptrdiff_t>(offset));
+                record("position mutation exposes the selected pixel as exact clear RGBA8",
+                       selected_pixel_is_clear);
+                record("position mutation changes selected readback pixel and PNG",
+                       pixel_changed && selected_pixel_is_clear &&
+                           baseline_pixel != kClearColor &&
+                           position_mutated.png != baseline.png);
+                record("position-mutated raw mesh PNG writes under local evidence",
+                       write_png_file(position_mutated_png_path, position_mutated.png));
+            }
+        }
+    }
+
+    std::puts("raw logo-pair asset scope: parsed cube/cone POS0/U16; synthetic XY normalization "
+              "drives E636 clip and correlated E646 UV; harness constants/normals only; "
+              "TEX0/NRM0 and retail bindings NOT VERIFIED; no game frame/G3 claim.");
+    return passed;
+}
+
 }  // namespace
 
 int main() {
@@ -1654,6 +2137,149 @@ int main() {
                     std::puts("logo VS/PS pair scope: E636 vertex + E646 fragment MSL, "
                               "synthetic position-correlated UV alias, unit harness object row; "
                               "retail TEX0/NRM0/stream bindings and game frame NOT VERIFIED.");
+                }
+            }
+        }
+    }
+
+    const char* logo_pair_cmsh_msl_path = std::getenv("SOTC_LOGO_PAIR_CMSH_MSL");
+    const char* logo_pair_cmsh_cube_path = std::getenv("SOTC_LOGO_PAIR_CMSH_CUBE");
+    const char* logo_pair_cmsh_cone_path = std::getenv("SOTC_LOGO_PAIR_CMSH_CONE");
+    const char* logo_pair_cmsh_png_path = std::getenv("SOTC_LOGO_PAIR_CMSH_PNG");
+    const char* logo_pair_cmsh_baseline_png_path =
+        std::getenv("SOTC_LOGO_PAIR_CMSH_BASELINE_PNG");
+    const char* logo_pair_cmsh_texture_mutated_png_path =
+        std::getenv("SOTC_LOGO_PAIR_CMSH_TEXTURE_MUTATED_PNG");
+    const char* logo_pair_cmsh_position_mutated_png_path =
+        std::getenv("SOTC_LOGO_PAIR_CMSH_POSITION_MUTATED_PNG");
+    const bool logo_pair_cmsh_requested =
+        logo_pair_cmsh_msl_path != nullptr || logo_pair_cmsh_cube_path != nullptr ||
+        logo_pair_cmsh_cone_path != nullptr || logo_pair_cmsh_png_path != nullptr ||
+        logo_pair_cmsh_baseline_png_path != nullptr ||
+        logo_pair_cmsh_texture_mutated_png_path != nullptr ||
+        logo_pair_cmsh_position_mutated_png_path != nullptr;
+    if (!logo_pair_cmsh_requested) {
+        std::puts("raw CMSH logo-pair fixture: NOT RUN (set all seven "
+                  "SOTC_LOGO_PAIR_CMSH_* paths)");
+    } else {
+        const bool logo_pair_cmsh_paths_complete =
+            path_is_set(logo_pair_cmsh_msl_path) && path_is_set(logo_pair_cmsh_cube_path) &&
+            path_is_set(logo_pair_cmsh_cone_path) && path_is_set(logo_pair_cmsh_png_path) &&
+            path_is_set(logo_pair_cmsh_baseline_png_path) &&
+            path_is_set(logo_pair_cmsh_texture_mutated_png_path) &&
+            path_is_set(logo_pair_cmsh_position_mutated_png_path);
+        const bool logo_pair_cmsh_paths_absolute =
+            logo_pair_cmsh_paths_complete &&
+            std::filesystem::path(logo_pair_cmsh_msl_path).is_absolute() &&
+            std::filesystem::path(logo_pair_cmsh_cube_path).is_absolute() &&
+            std::filesystem::path(logo_pair_cmsh_cone_path).is_absolute() &&
+            std::filesystem::path(logo_pair_cmsh_png_path).is_absolute() &&
+            std::filesystem::path(logo_pair_cmsh_baseline_png_path).is_absolute() &&
+            std::filesystem::path(logo_pair_cmsh_texture_mutated_png_path).is_absolute() &&
+            std::filesystem::path(logo_pair_cmsh_position_mutated_png_path).is_absolute();
+        const bool logo_pair_cmsh_paths_valid =
+            logo_pair_cmsh_paths_absolute &&
+            local_paths_are_distinct(
+                {logo_pair_cmsh_msl_path, logo_pair_cmsh_cube_path,
+                 logo_pair_cmsh_cone_path, logo_pair_cmsh_png_path,
+                 logo_pair_cmsh_baseline_png_path,
+                 logo_pair_cmsh_texture_mutated_png_path,
+                 logo_pair_cmsh_position_mutated_png_path});
+        check("raw CMSH logo-pair request has seven absolute distinct canonical local paths",
+              logo_pair_cmsh_paths_valid);
+        if (!logo_pair_cmsh_paths_valid) {
+            std::puts("raw CMSH logo-pair fixture: NOT RUN (partial/invalid path configuration; "
+                      "no MSL/asset read or PNG write)");
+        } else {
+            constexpr std::string_view kLogoPairMslSha256 =
+                "37e09aef0838dff77c8f151f288ed8cb2cdf7db26e202b40bb9f6f27a34dbd56";
+            std::vector<std::uint8_t> logo_pair_cmsh_msl_bytes;
+            const bool logo_pair_cmsh_msl_read =
+                read_binary_file(logo_pair_cmsh_msl_path, logo_pair_cmsh_msl_bytes);
+            check("composed raw-mesh logo-pair MSL reads under local/",
+                  logo_pair_cmsh_msl_read);
+            const bool logo_pair_cmsh_msl_size_ok =
+                logo_pair_cmsh_msl_read && logo_pair_cmsh_msl_bytes.size() == 4094U;
+            const bool logo_pair_cmsh_msl_hash_ok =
+                logo_pair_cmsh_msl_read &&
+                sha256_hex(logo_pair_cmsh_msl_bytes) == kLogoPairMslSha256;
+            check("composed raw-mesh logo-pair MSL has the pinned 4,094-byte size",
+                  logo_pair_cmsh_msl_size_ok);
+            check("composed raw-mesh logo-pair MSL matches the E669 SHA-256",
+                  logo_pair_cmsh_msl_hash_ok);
+
+            sotc::CmshMesh logo_pair_cmsh_cube;
+            sotc::CmshMesh logo_pair_cmsh_cone;
+            const bool logo_pair_cmsh_cube_ok = load_pinned_cmsh(
+                logo_pair_cmsh_cube_path, 850U,
+                "44738dbf663af252898bad5582f2b48f1aadf6fbaab403c20880410b79a380b7",
+                24U, 36U, "logo-pair cube_1m.cmsh", logo_pair_cmsh_cube);
+            const bool logo_pair_cmsh_cone_ok = load_pinned_cmsh(
+                logo_pair_cmsh_cone_path, 1462U,
+                "5456afadabe96b9f7f02c503dc0ed5410652ccd32601c19e8aeeaaf36c88600c",
+                42U, 114U, "logo-pair cone.cmsh", logo_pair_cmsh_cone);
+            check("raw logo-pair cube/cone hashes and parsed counts are pinned",
+                  logo_pair_cmsh_cube_ok && logo_pair_cmsh_cone_ok);
+
+            std::vector<std::uint8_t> logo_pair_cmsh_png_bytes;
+            const bool logo_pair_cmsh_png_read =
+                read_binary_file(logo_pair_cmsh_png_path, logo_pair_cmsh_png_bytes);
+            check("raw logo-pair source PNG reads under local/", logo_pair_cmsh_png_read);
+            const bool logo_pair_cmsh_png_size_ok =
+                logo_pair_cmsh_png_read && logo_pair_cmsh_png_bytes.size() == 24'636U;
+            const bool logo_pair_cmsh_png_hash_ok =
+                logo_pair_cmsh_png_read &&
+                sha256_hex(logo_pair_cmsh_png_bytes) == kPinnedLogoPngSha256;
+            check("raw logo-pair PNG has the pinned 24,636-byte size",
+                  logo_pair_cmsh_png_size_ok);
+            check("raw logo-pair PNG matches the E656 SHA-256",
+                  logo_pair_cmsh_png_hash_ok);
+
+            if (logo_pair_cmsh_msl_size_ok && logo_pair_cmsh_msl_hash_ok &&
+                logo_pair_cmsh_cube_ok && logo_pair_cmsh_cone_ok &&
+                logo_pair_cmsh_png_size_ok && logo_pair_cmsh_png_hash_ok) {
+                constexpr std::uint32_t kLogoPairAssetTextureWidth = 228;
+                constexpr std::uint32_t kLogoPairAssetTextureHeight = 128;
+                std::vector<std::uint8_t> logo_pair_cmsh_texture_rgba8;
+                std::string logo_pair_cmsh_png_error;
+                const bool logo_pair_cmsh_png_decoded =
+                    sotc::test::decode_asset_png_rgba8(
+                        logo_pair_cmsh_png_bytes, kLogoPairAssetTextureWidth,
+                        kLogoPairAssetTextureHeight, logo_pair_cmsh_texture_rgba8,
+                        logo_pair_cmsh_png_error);
+                check("pinned logo-pair PNG decodes to 228x128 RGBA8",
+                      logo_pair_cmsh_png_decoded &&
+                          logo_pair_cmsh_texture_rgba8.size() ==
+                              static_cast<std::size_t>(kLogoPairAssetTextureWidth) *
+                                  kLogoPairAssetTextureHeight * 4U);
+                if (!logo_pair_cmsh_png_decoded) {
+                    std::fprintf(stderr, "FAIL raw logo-pair PNG decode: %s\n",
+                                 logo_pair_cmsh_png_error.c_str());
+                } else {
+                    const std::string logo_pair_cmsh_msl_source(
+                        reinterpret_cast<const char*>(logo_pair_cmsh_msl_bytes.data()),
+                        logo_pair_cmsh_msl_bytes.size());
+                    sotc::MetalAssetFrameConfig logo_pair_cmsh_config{kWidth, kHeight, true};
+                    std::string logo_pair_cmsh_error;
+                    std::unique_ptr<sotc::MetalAssetFrameRenderer> logo_pair_cmsh_renderer =
+                        sotc::MetalAssetFrameRenderer::create(
+                            logo_pair_cmsh_config, logo_pair_cmsh_msl_source,
+                            logo_pair_cmsh_error);
+                    check("pinned E669 pair compiles for the raw mesh fixture",
+                          logo_pair_cmsh_renderer != nullptr);
+                    if (logo_pair_cmsh_renderer == nullptr) {
+                        std::fprintf(stderr, "FAIL raw CMSH logo-pair Metal pipeline: %s\n",
+                                     logo_pair_cmsh_error.c_str());
+                    } else {
+                        const bool raw_logo_pair_passed = run_logo_pair_raw_cmsh_fixture(
+                            *logo_pair_cmsh_renderer, logo_pair_cmsh_cube, logo_pair_cmsh_cone,
+                            logo_pair_cmsh_texture_rgba8, kLogoPairAssetTextureWidth,
+                            kLogoPairAssetTextureHeight, logo_pair_cmsh_baseline_png_path,
+                            logo_pair_cmsh_texture_mutated_png_path,
+                            logo_pair_cmsh_position_mutated_png_path);
+                        std::printf("raw CMSH logo-pair fixture: %s (asset-derived harness)\n",
+                                    raw_logo_pair_passed ? "PASSED" : "FAILED");
+                    }
                 }
             }
         }

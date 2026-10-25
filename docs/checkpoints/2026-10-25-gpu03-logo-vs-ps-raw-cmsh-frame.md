@@ -53,3 +53,63 @@
 - Before any fourth test, root recorded a principal reassessment authorizing exactly one try 4: record geometric/color-qualified entrant counts; search robust inside→outside coverage; correct UV to `(x+0.5)/(cameraX*width)` and `(y+0.5)/(cameraY*height)`; validate mutated RGBA shape; compare baseline-covered oracle color against a verified pixel uncovered by both meshes; require the mutated Metal pixel to equal clear and the PNG to differ. Preserve all existing checks. No fifth attempt is authorized.
 - Files changed for the checkpoint: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/METAL_FRAME_PATH.md`, this checkpoint, and the new escalation file. Task is ACTIVE after reassessment, 3 prior failed tries and 1 authorized attempt; G3 remains **PARTIAL**.
 - Exact next action: publish this recorded escalation/reassessment on `main`, then resume the owned test file for try 4; request scoped independent review before any completion claim.
+
+## 2026-10-25 10:37 CDT — principal-authorized attempt 4 passed; review pending
+
+- Implementation: `/root/review_logo_pair_metal`; source changed only `native/tests/test_metal_texture_binding.cpp`, 626 lines added relative to published base; SHA-256 `c048c6d3912da2cb80a731bc05635c18be641d9bdc535ef8e30729baa213fcaf`. `git diff --check` passed.
+- Build: `tools/dev/with_build_lock.sh cmake --build local/build/orch-r22 --target test_metal_texture_binding -j 12`; exit 0, log `local/validation/gpu03-logo-vs-ps-raw-cmsh-20261025/attempt4-build.log`.
+- Exactly one focused CTest ran, `metal_texture_binding`, with Metal API and GPU validation enabled. Result **PASSED 1/1**. Log `local/validation/gpu03-logo-vs-ps-raw-cmsh-20261025/attempt4.log`, SHA-256 `9f8585bfde6fa11b53708e2f3a20dda6123187d417d4d528e45f4c31712ab510`.
+- Probe counts were newly-covered geometry/color-qualified `0/0` and newly-uncovered geometry/oracle-qualified `13/2`. Selected pixel `(5,19)` changed CPU coverage margin from `+0.194` to `-0.106`; the corrected camera-scaled oracle passed; the position-mutated GPU pixel matched verified clear RGBA8 `{0,0,0,255}`. Baseline 938 B SHA-256 `ab7826d09a9ff8dfaa31fa2e338e73fb83a8c73d4cae7890a5cd5b6c6dc8a811`; texture mutation 947 B SHA-256 `e3f59b486ee631141074f9d73c843427ee4c9b9e8453c0a133d2d126b40da218`; position mutation 969 B SHA-256 `d683ea8d0aa9f54aedffb14175fa931d9340fb215e1a5106aee33aa06de45aad`.
+- Attempt 4 result: focused gate **PASSED**; task remains **ACTIVE** pending independent code/spec review and required full repo gates. No fifth attempt is authorized. G3 remains PARTIAL; retail bindings/WQM/game frame/boot/audio/save are not established.
+- Exact next action: complete the dispatched read-only review, then run the full verification set in `AGENTS.md`; publish only after review/gates and attribution/path audits.
+
+## 2026-10-25 10:39 CDT — independent review approved the bounded fixture
+
+- Reviewer `/root/review_gpu03_attempt4` inspected the implementation diff, accepted task scope,
+  escalation and attempt-4 log without editing or running tests. Verdict: supports
+  **FIXTURE_VERIFIED** for this synthetic asset-derived fixture; no Critical or Important findings.
+- Review confirmed the seven-input path/hash/count gates, both per-mesh oracle samples, deterministic
+  repeat, camera-scaled mutation UV, transition counts, clear-color check, mutated-frame shape
+  guards, position/texture mutations and no game-frame/retail ABI claim. Attempt-4 evidence and PNG
+  hashes are recorded in E677 and `docs/escalations/GPU-03-LOGO-VS-PS-RAW-CMSH-FRAME-01.md`.
+- Minor finding: ordinary CTest leaves the private raw-asset case `NOT RUN` when none of its seven
+  opt-in paths are supplied. Root ruling: defer as spec-compatible because game assets remain owner-
+  local and the accepted focused run supplies the complete paths. Cost if wrong: a default test run
+  could omit this fixture, so its status must be tied to the explicit opt-in invocation.
+- Task status: **FIXTURE_VERIFIED** for this bounded test only. Retail TEX0/NRM0, stream/resource
+  semantics, WQM equivalence, game frame and G3 remain unverified/PARTIAL. Full repository gates are
+  pending and required before publication.
+- Exact next action: run all `AGENTS.md` verification commands with the asset opt-in variables unset
+  for the full general suite, preserving the attempt-4 log as the only raw-pair gate run; then audit,
+  commit and push the allowlisted source/docs.
+
+## 2026-10-25 10:53 CDT — repository gates passed; publication pending
+
+- Integrator: Codex `/root`; branch `main`, pre-publication HEAD and `origin/main` both
+  `ea5b561b19c77001981a7c27e7bfdcd0720c8b03`. Open PR query returned `[]`; the previously active
+  `cursor/init-hash-551140-9dfc` ref is absent remotely. The owner explicitly requested resuming on
+  `main`; repo branch guidance is being synchronized to that instruction.
+- Current source remains `native/tests/test_metal_texture_binding.cpp`, SHA-256
+  `c048c6d3912da2cb80a731bc05635c18be641d9bdc535ef8e30729baa213fcaf`. No source change occurred
+  after the reviewed focused attempt. Exact output logs for configure, build, full CTest, lift
+  checkers, project index and Trail check are in
+  `local/validation/gpu03-raw-pair-final-20261025/`; hashes are enumerated in E679.
+- Exact repository commands and results: configure exit 0; build exit 0 (`ninja: no work to do`);
+  full CTest exit 0, **397/397**, 8.58 s; lift checkers exit 0, **481 passed / 0 skipped / 0
+  failed**; project index exit 0, **20,420** folders; Trail wiring check exit 0, **8,571** nodes
+  synchronized, deep concept layer not built. The full CTest run left the seven private asset paths
+  unset; the focused E677 run remains the only accepted attempt-4 asset-fixture gate.
+- The escalation recipe's MSL path was corrected to the extant E669 artifact. Its SHA-256 re-matches
+  the pin. The historical focused log does not record literal path environment values; this remains
+  an auditability limitation, not a reason to rerun the now-passing fourth attempt.
+- Files changed for this checkpoint: existing allowlisted source/docs plus
+  `docs/checkpoints/2026-10-25-f590-release-review-recovery.md`; no dependency or install changes.
+  Observation: the recorded commands and test counts passed. Inference boundary: no retail texture or
+  normal mapping, WQM equivalence, game-driven frame, G3, boot, audio or save/load proof follows.
+- Precommit publication checks passed: staged audit **12** paths; all-path audit **2,799** paths;
+  attribution audit reports an empty unpublished range `origin/main..HEAD`; staged whitespace and
+  project-index checks passed. The exact commands are recorded in the current `HANDOFF.md` entry.
+- Status: **FIXTURE_VERIFIED** bounded test; full repository gates and precommit audits passed;
+  direct-main publication remains pending. G3 **PARTIAL**. Exact next action: commit and push the
+  allowlisted source/docs to `origin main` under Johnny Wang, then fetch and verify local HEAD equals
+  `origin/main`.

@@ -133,11 +133,13 @@ not run `git commit`, `git tag`, or `git push`; the integrator commits under the
 ## Public GitHub remote (durable)
 
 - Remote: https://github.com/DehydratedFlask/SotC-Mac-Port.
-- Active work is published on the branch named in `HANDOFF.md` (currently
-  `cursor/init-hash-551140-9dfc`, draft PR #4). Push that branch; do **not** push directly to `main`
-  or merge/rebase the other draft PR branches without explicit owner approval. Never force-push.
+- The owner explicitly directed on 2026-10-25 that ongoing work return to `main`, after merging PR #4
+  and deleting `cursor/init-hash-551140-9dfc`. `main` is the active integration branch in
+  `HANDOFF.md`; commit and push allowlisted checkpoints there after the required audits. This
+  supersedes the earlier draft-branch default. Never force-push or merge other draft PR branches
+  without new explicit owner approval.
 - At every checkpoint / completed task claim: commit **allowlisted** changes only with a clear
-  message, then push the active branch. Pull/rebase if peers pushed the same branch.
+  message, then push `origin main`. Fetch and inspect remote changes before integrating peer work.
 - Allow: `native/`, `launcher/`, port docs (`README.md`, `ROADMAP.md`, `HANDOFF.md`, `AGENTS.md`,
   `docs/*` policy/spec), `scripts/` port tooling, `tools/` without game binaries, `.gitignore`.
 - Deny (also in `.gitignore`): `Shadow of the Colossus/`, PKG/PSARC/eboot/SELF/ELF/sprx dumps,

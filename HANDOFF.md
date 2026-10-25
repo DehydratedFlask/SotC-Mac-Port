@@ -1,5 +1,96 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 10:53 CDT — raw-mesh Metal fixture gates passed; work resumed on main
+
+- Integrator: Codex `/root`. The owner explicitly directed the repo to return to `main` after PR #4
+  was merged and `cursor/init-hash-551140-9dfc` was deleted. Current local/remote base before this
+  publication is `main` at `ea5b561b19c77001981a7c27e7bfdcd0720c8b03`; `gh pr list --state open` returned
+  `[]`; `git ls-remote --heads origin main cursor/init-hash-551140-9dfc` returned only `origin/main`.
+  Unrelated historical refs were not modified.
+- Task `GPU-03-LOGO-VS-PS-RAW-CMSH-FRAME-01` is **FIXTURE_VERIFIED** for the bounded synthetic,
+  asset-derived test only. The attempt-4 source is `native/tests/test_metal_texture_binding.cpp`,
+  SHA-256 `c048c6d3912da2cb80a731bc05635c18be641d9bdc535ef8e30729baa213fcaf`; E677 records the
+  explicit seven-path focused Metal validation run, E678 records the independent review (no
+  Critical/Important findings), and E679 records the general repository gates. The general full
+  CTest run leaves the seven private paths unset and does not replace the focused fixture run.
+- Exact gate results on this source tree: `cmake -S native -B local/build/orch-r22` exit 0;
+  `cmake --build local/build/orch-r22 -j 12` exit 0 (`ninja: no work to do`); `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure --output-log local/validation/gpu03-raw-pair-final-20261025/ctest-full.log` exit 0, **397/397**, 8.58 s;
+  `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` exit 0, **481 passed, 0
+  skipped, 0 failed**, log `local/validation/gpu03-raw-pair-final-20261025/lift-checkers.log`;
+  `python3 scripts/project_index.py` exit 0, **20,420** folders; `trail build --check` exit 0, **8,571**
+  wiring nodes in sync (deep concept layer not built).
+- Precommit publication checks all passed: `python3 -I scripts/audit_publish_paths.py` exit 0,
+  **12 staged paths**; `python3 -I scripts/audit_publish_paths.py --all` exit 0, **2,799 paths**;
+  `python3 -I scripts/check_commit_attribution.py` exit 0 with `origin/main..HEAD` empty; staged
+  whitespace check and `python3 scripts/project_index.py --check` also exit 0. The commit/push itself
+  is still pending.
+- The escalation's reproduction recipe now points to the actual E669 MSL at
+  `local/validation/gpu03-logo-vs-ps-pipeline-20261025/logo-pair.metal`. Its hash, plus raw cube,
+  cone and PNG hashes, re-match their pins. The accepted attempt-4 log does not include the literal
+  seven environment values; no additional Metal replay was made because the authorized fourth try
+  passed and no fifth attempt is authorized.
+- Concurrent review of `CPU-01-SHARED-STR-RELEASE-F590-01` found no code-level issue and freshly
+  passed its Debug ASan+UBSan 1/1 CTest plus pinned byte oracle; all 15 recovery artifact hashes
+  verify. Its prior five-mutant evidence files are absent and the mutations were not replayed, so
+  the full task remains **ACTIVE**. No runtime/G1 claim; allocator `0x12af0` remains external.
+- Files recorded in this checkpoint: `HANDOFF.md`, `AGENTS.md`, `ROADMAP.md`, `docs/EVIDENCE.md`,
+  `docs/INDEX.md`, `docs/METAL_FRAME_PATH.md`, `docs/TASKS.md`, the GPU-03 checkpoint/escalation, a
+  new F590 review checkpoint, and the reviewed Metal test source. `docs/FOLDERS.md` is regenerated
+  by `project_index.py`; `INSTALL_LOG.md` is unchanged because no dependency was installed.
+- Observation versus inference: configure/build/test/checker/index/trail results and hashes above
+  are observed; they do not prove retail bindings, TEX0/NRM0, WQM equivalence, game-driven render,
+  G3, boot, audio, or save/load. G3 remains **PARTIAL**.
+- Exact next action: commit the allowlisted source/docs as Johnny Wang, push `origin main`,
+  fetch and verify local HEAD equals `origin/main`, then claim the next Metal-ready task from the
+  task triage. Status: GPU fixture verified, publication pending; F590 review closed with the
+  five-mutation acceptance gap still open.
+
+## 2026-10-25 10:39 CDT — GPU-03 independent review approved bounded fixture
+
+- Reviewer `/root/review_gpu03_attempt4` independently reviewed the source, claim, escalation and
+  focused log; **no Critical or Important findings**. It confirmed all bounded acceptance checks:
+  pinned seven-path inputs, mesh/PNG/MSL hashes and counts, both mesh CPU oracle samples, repeat
+  determinism, corrected camera-scaled mutation oracle, candidate counts, verified clear-color
+  transition, mutated-frame shape guards, changed private PNG, and explicit synthetic-only scope.
+- One minor remains: with all seven opt-in paths absent, ordinary CTest prints `NOT RUN`; the focused
+  acceptance invocation supplies them and passed. Root ruling: keep the opt-in boundary because this
+  fixture reads owner-local game assets and the accepted gate was run explicitly; record this as a
+  deferred minor. Cost if wrong: a future default test run could pass without executing the
+  asset-derived fixture, so anyone claiming this fixture must use its explicit path-configured CTest.
+  The exact paths/hashes are in the escalation and checkpoint; generated PNG hashes are recorded in
+  E677.
+- Task `GPU-03-LOGO-VS-PS-RAW-CMSH-FRAME-01` may be recorded **FIXTURE_VERIFIED** for this bounded
+  synthetic asset-derived Metal fixture. It remains outside G3 completion: retail stream/resource
+  bindings, TEX0/NRM0, AMD WQM equivalence, game-driven frame, boot, audio, and save/load are not
+  verified. Full repository gates are the next exact action before source publication.
+
+## 2026-10-25 10:37 CDT — GPU-03 try 4 passed; independent review pending
+
+- Integrator: Codex `/root`; implementation `/root/review_logo_pair_metal`; reviewer
+  `/root/review_gpu03_attempt4`; branch `main` at `ea5b561b` before source publication.
+- Attempt 4 changed only `native/tests/test_metal_texture_binding.cpp` (626 lines added relative to
+  published base; SHA-256 `c048c6d3912da2cb80a731bc05635c18be641d9bdc535ef8e30729baa213fcaf`).
+  `git diff --check` passed. Build command
+  `tools/dev/with_build_lock.sh cmake --build local/build/orch-r22 --target test_metal_texture_binding -j 12`
+  passed (private log `local/validation/gpu03-logo-vs-ps-raw-cmsh-20261025/attempt4-build.log`).
+- Exactly one focused `metal_texture_binding` CTest ran with the seven pinned private paths and
+  Metal API/GPU validation; result **PASSED 1/1**. Log SHA-256
+  `9f8585bfde6fa11b53708e2f3a20dda6123187d417d4d528e45f4c31712ab510`. Position search counts:
+  newly-covered geometry/color-qualified `0/0`, newly-uncovered geometry/oracle-qualified `13/2`.
+  Selected pixel `(5,19)` transitions from margin `+0.194` to `-0.106`; the corrected camera-scale
+  CPU oracle passes, and mutated Metal readback equals verified clear `{0,0,0,255}`.
+- Private PNGs: baseline 938 B / SHA-256
+  `ab7826d09a9ff8dfaa31fa2e338e73fb83a8c73d4cae7890a5cd5b6c6dc8a811`; texture-mutated 947 B /
+  `e3f59b486ee631141074f9d73c843427ee4c9b9e8453c0a133d2d126b40da218`; position-mutated 969 B /
+  `d683ea8d0aa9f54aedffb14175fa931d9340fb215e1a5106aee33aa06de45aad`. All stay under ignored
+  `local/validation/gpu03-logo-vs-ps-raw-cmsh-20261025/`.
+- Status: attempt 4 passed the focused gate; independent code/spec review is running. Keep the task
+  ACTIVE and do not publish a `FIXTURE_VERIFIED` status until review and full repository gates finish.
+  This remains synthetic asset-derived fixture evidence, not retail bindings/WQM/game-frame/G3;
+  G3 remains PARTIAL. No fifth attempt is authorized.
+- Exact next action: finish independent review, then run all required repo verification gates; record
+  final status and publish only allowlisted source/docs with owner attribution.
+
 ## 2026-10-25 10:34 CDT — slot-306 survey closeout evidence reconciled
 
 - Task `CPU-01-STARTUP-SLOT-306-SURVEY-01` is **STATIC_ANALYSIS_VERIFIED** for table/body/call-footprint

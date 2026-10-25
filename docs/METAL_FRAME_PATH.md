@@ -5,14 +5,18 @@ synthetic direct-Metal geometry and parser flow; E649 verifies the pinned raw cu
 members through the native parser and default-pair Metal harness; E634 characterizes the logo PS
 WQM/sample path; E635 verifies synthetic texture binding; E656 verifies the pinned logo PS/PNG on
 synthetic geometry; E658 combines the raw mesh, image, and logo PS under a synthetic UV adapter; and
-E669 composes the separately pinned logo vertex and pixel shaders in one Metal pipeline. The active
+E669 composes the separately pinned logo vertex and pixel shaders in one Metal pipeline. The
 `GPU-03-LOGO-VS-PS-RAW-CMSH-FRAME-01` fixture exercises that composed pair on those same raw meshes
-and PNG with a synthetic position-to-clip/UV transform. Its first three focused attempts passed the
-baseline and texture checks but failed the one-sided position-probe search. A principal reassessment
-authorizes one symmetric coverage-loss probe, after an independent review found a camera-scaled UV
-oracle defect and missing mutated-frame shape validation (E675). The implementation is not yet
-fixture-verified. Retail bindings remain unknown, and no game frame is established. **G3 is PARTIAL,
-not PASSED**, under the synthetic-scene rule in
+and PNG with a synthetic position-to-clip/UV transform. The first attempt failed to find safe CPU
+interior probes before pipeline execution; attempts two and three passed baseline and texture checks
+but failed the one-sided position-probe search. A principal reassessment authorized one symmetric
+coverage-loss probe after an independent review found a camera-scaled UV oracle defect and missing
+mutated-frame shape validation (E675). The fourth focused CTest passed with Metal API/GPU validation
+and direct private PNGs (E677); independent review approved the bounded fixture (E678); repository
+configure/build, CTest 397/397, lift checkers 481/0/0, project index and Trail wiring checks passed
+(E679). Precommit staged/all-path and attribution audits passed; owner commit and direct-main push
+remain pending. Retail bindings remain
+unknown, and no game frame is established. **G3 is PARTIAL, not PASSED**, under the synthetic-scene rule in
 `docs/VALIDATION.md`.
 Read [AGENTS.md](../AGENTS.md), [ROADMAP.md](../ROADMAP.md), [HANDOFF.md](../HANDOFF.md),
 [PLATFORM.md](PLATFORM.md) and [VALIDATION.md](VALIDATION.md) (gate G3) first. This file adds no
@@ -43,8 +47,9 @@ runtime behaviour; its only code is the read-only probe `tools/dev/gpu_asset_pro
 **Unfinished in this pass (marked UNK in the text):** Oodle identification is inference only; the
 `CompressionHeader` location, input-usage-slot decoding, `.cmat` constants, texture formats/tiling and the
 job-table edges were not resolved; the Gnm-band layer names are inferred from decompiler shape. The
-logo VS/PS Metal composition is fixture-verified, while its raw-CMSH composed-frame follow-up is
-active after a recorded three-try escalation. Other future cards remain proposals.
+logo VS/PS Metal composition and raw-CMSH composed-frame fixture are fixture-verified within their
+synthetic ABI; the latter required a three-try escalation and a principal-authorized fourth attempt.
+Other future cards remain proposals.
 
 ## 1. Headline findings
 

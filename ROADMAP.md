@@ -99,9 +99,10 @@ or unwanted network subsystem into the native target.
 - Display name: SotC Mac Port. This remote holds the Mac native port + launcher + port docs/tooling only.
 - Users must supply their own legally obtained game files. No Sony assets ship in the repo.
 - At **every** HANDOFF checkpoint / completed task claim: commit allowlisted changes with a clear
-  message and push `origin cursor/init-hash-551140-9dfc` (the active draft-PR branch in
-  `HANDOFF.md`). Never push directly to `main`, force-push, or merge another draft branch without
-  explicit owner approval; inspect remote changes before integrating peer work.
+  message and push `origin main`. The owner explicitly returned ongoing work to `main` on 2026-10-25
+  after merging PR #4 and deleting `cursor/init-hash-551140-9dfc`; this supersedes the earlier
+  draft-branch default. Never force-push or merge another draft branch without new explicit owner
+  approval; inspect remote changes before integrating peer work.
 - Never stage forbidden paths (`Shadow of the Colossus/`, `local/`, `reference/`, `logs/`, game
   PKG/PSARC/eboot/SELF/ELF dumps, secrets). Before push: `git status`, then
   `python3 -I scripts/audit_publish_paths.py` on the staged set and `--all` on tracked files.
