@@ -1,5 +1,30 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 10:17 CDT — raw CMSH + logo VS/PS fixture claimed
+
+- Integrator: Codex `/root`; checkout is clean on `main` at `0e93d14b` before this claim. The
+  completed shader-pair and derivative fixtures satisfy the user's Metal priority; the next bounded
+  slice composes E669 with the already pinned E639/E656 raw inputs.
+- `GPU-03-LOGO-VS-PS-RAW-CMSH-FRAME-01` is **ACTIVE**, attempt 0. Scope: use the exact composed
+  E636/E646 MSL, parse the hash-pinned uncompressed cube/cone `.cmsh` files, decode the pinned logo
+  PNG through the existing test-only path, and render both meshes through direct Metal with a
+  documented synthetic position-to-clip/UV transform. Keep harness normals/constants synthetic and
+  emit private baseline/texture-mutated/position-mutated PNGs under `local/`.
+- Inputs: E669 MSL SHA-256
+  `37e09aef0838dff77c8f151f288ed8cb2cdf7db26e202b40bb9f6f27a34dbd56`; E639/E658 cube 850 B /
+  `44738dbf663af252898bad5582f2b48f1aadf6fbaab403c20880410b79a380b7`, cone 1,462 B /
+  `5456afadabe96b9f7f02c503dc0ed5410652ccd32601c19e8aeeaaf36c88600c`; E656 PNG 24,636 B /
+  `b4b135232304ab696785353b6ba96f874fc4bcfd8805e56b931119e415a300f5`. Inputs stay under ignored
+  `local/`; no compressed `0x8C` members, TEX0/NRM0 interpretation, or screenshot/frame-number seam.
+- Worker `/root/review_logo_pair_metal` owns only the implementation in
+  `native/tests/test_metal_texture_binding.cpp`; root retains docs, validation, and publication.
+  Exact first action: implement the test-only combined asset fixture, then run its opt-in focused
+  CTest with Metal API/GPU validation and the independent per-mesh pixel oracle.
+- Claim files: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`,
+  `docs/METAL_FRAME_PATH.md`, and `docs/checkpoints/2026-10-25-gpu03-logo-vs-ps-raw-cmsh-frame.md`.
+  This claim ran no test or renderer. G3 stays PARTIAL; AMD WQM equivalence, retail streams/material
+  bindings, actual game frame, boot/audio/save remain unverified. Status: **ACTIVE**, attempt 0.
+
 ## 2026-10-25 10:07 CDT — slot 306 survey claim published
 
 - Commit `c521168202de3e43fbe459af5ffb46cb73ddf214` published the new read-only slot-306 survey

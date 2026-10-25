@@ -4,11 +4,11 @@ Status: E627 verifies the selected default shader pair against an independent or
 synthetic direct-Metal geometry and parser flow; E649 verifies the pinned raw cube/cone POS0/U16
 members through the native parser and default-pair Metal harness; E634 characterizes the logo PS
 WQM/sample path; E635 verifies synthetic texture binding; E656 verifies the pinned logo PS/PNG on
-synthetic geometry. `GPU-03-LOGO-PNG-CMSH-ASSET-FRAME-01` combines the verified raw mesh, image, and
-shader inputs under a synthetic UV adapter. `GPU-03-LOGO-VS-PS-METAL-PIPELINE-01` is the next active
-slice: compose the separately pinned logo vertex and pixel shaders in one Metal pipeline. Retail
-bindings remain unknown, and no game frame is established. **G3 is PARTIAL, not PASSED**, under the
-synthetic-scene rule in
+synthetic geometry; E658 combines the raw mesh, image, and logo PS under a synthetic UV adapter; and
+E669 composes the separately pinned logo vertex and pixel shaders in one Metal pipeline. The active
+`GPU-03-LOGO-VS-PS-RAW-CMSH-FRAME-01` fixture will exercise that composed pair on those same raw
+meshes and PNG with a synthetic position-to-clip/UV transform. Retail bindings remain unknown, and
+no game frame is established. **G3 is PARTIAL, not PASSED**, under the synthetic-scene rule in
 `docs/VALIDATION.md`.
 Read [AGENTS.md](../AGENTS.md), [ROADMAP.md](../ROADMAP.md), [HANDOFF.md](../HANDOFF.md),
 [PLATFORM.md](PLATFORM.md) and [VALIDATION.md](VALIDATION.md) (gate G3) first. This file adds no
