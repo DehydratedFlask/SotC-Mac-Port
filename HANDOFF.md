@@ -1,5 +1,85 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 03:52 CDT — Metal derivative fixture publication gates pass
+
+- Integrator: Codex `/root`; `GPU-02-METAL-FRAGMENT-QUAD-DERIVATIVE-01` is
+  `FIXTURE_VERIFIED`, 0 failed hypotheses. The seven staged allowlisted files pass the staged path
+  audit; the all-path audit passes 2,782 paths; staged and committed diff checks pass.
+- Commit attribution audit `python3 -I scripts/check_commit_attribution.py --range origin/main..HEAD`
+  passes. The commit author and committer are Johnny Wang
+  (`dehydratedflask@users.noreply.github.com`); no Claude, Anthropic, or `Co-Authored-By` trailer
+  is present. Full logs remain under `local/validation/gpu02-fragment-derivative-20261025/`.
+- Next exact action: push `codex/gpu02-fragment-derivative-fixture-20261025`, open a PR against
+  `main`, merge only the exact verified head, fetch/switch to `main`, delete the local task branch,
+  and verify clean `main` equals `origin/main`. The one-mip derivative fixture remains limited as
+  described in E644; no G3 or gameplay claim.
+
+## 2026-10-25 03:51 CDT — Metal derivative fixture full verification complete
+
+- Integrator: Codex `/root`; `GPU-02-METAL-FRAGMENT-QUAD-DERIVATIVE-01` remains
+  `FIXTURE_VERIFIED`, 0 failed hypotheses. The source test and E644 docs are recorded in the section
+  below.
+- Full configure `cmake -S native -B local/build/orch-r22` passed. Full build
+  `cmake --build local/build/orch-r22 -j 12` exited 0 (`ninja: no work to do`); the changed target
+  had already compiled 2/2. Full CTest passed 397/397. Lift checkers passed 481/0/0.
+- The first `trail build --check` exited 1 because the graph was stale for the changed test file
+  (two changed spans, one added `gradient_oracle` symbol). `trail build` exited 0 after parsing that
+  one file and produced 8,491 nodes / 11,466 edges; the repeated `trail build --check` exited 0.
+  The graph is a git-ignored local cache and is not staged. `python3 scripts/project_index.py`
+  passed, indexing 19,588 folders. Logs are under
+  `local/validation/gpu02-fragment-derivative-20261025/`.
+- Staged publication audit passed 7 paths; all-path audit passed 2,783 paths; staged and committed
+  diff checks and commit attribution passed. The owner authored and committed the change; no Claude
+  attribution was introduced.
+- Next exact action: publish the branch through an exact-head PR, merge, and return to a clean
+  `main`. No dependency changes; no game claim.
+
+## 2026-10-25 03:48 CDT — Metal derivative fixture passes focused gate
+
+- Integrator: Codex `/root`; task `GPU-02-METAL-FRAGMENT-QUAD-DERIVATIVE-01` is
+  `FIXTURE_VERIFIED`, 0 failed hypotheses. Changed `native/tests/test_metal_texture_binding.cpp`,
+  `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/FOLDERS.md`, `docs/INDEX.md`, and added
+  `docs/checkpoints/2026-10-25-gpu02-metal-quad-derivative-fixture.md`; private logs are in
+  `local/validation/gpu02-fragment-derivative-20261025/`.
+- Baseline `python3 -I -W error tools/dev/test_gcn_to_msl.py` exited 0 (14/14). Focused build
+  `cmake --build local/build/orch-r22 --target test_metal_texture_binding -j 12` exited 0 (2/2);
+  `ctest -V --test-dir local/build/orch-r22 -R '^metal_texture_binding$'` exited 0 (1/1), with
+  Metal API and shader validation enabled and no validation fault. `git diff --check` passed.
+- Observation: the synthetic affine quad's CPU oracle matched Metal `dfdx`/`dfdy` values and the
+  implicit/explicit texture samples at an interior pixel and a primitive boundary. Changing the
+  input UV scale from 0.5 to 0.375 and changing the texel red value from 64 to 65 both changed the
+  output as expected. The exact test MSL and output are in the source and private logs above.
+- Limit: the fixture uses a one-mip constant synthetic texture; it cannot expose derivative-driven
+  LOD selection. It does not lower the pinned logo shader or establish AMD WQM equivalence, retail
+  binding semantics, an asset-derived frame, or G3 PASS. No game assets were read.
+- No game-frame claim; shader-semantic failed tries: 0; no dependency changes.
+
+## 2026-10-25 03:44 CDT — Metal fragment derivative fixture claimed
+
+- Integrator: Codex `/root`; bounded task `GPU-02-METAL-FRAGMENT-QUAD-DERIVATIVE-01` is ACTIVE,
+  attempt 0. This follows the user-selected default shader pair (E627) and the static logo WQM
+  characterization (E634); it does not reopen escalated GPU-03.
+- The clean starting point was `main` / `origin/main` at
+  `8229b5405b9441ff79c0d55cf3d178e4e84014bb`. The task branch
+  `codex/gpu02-fragment-derivative-fixture-20261025` was created with `git switch -c ...` (exit 0).
+- Bounded output: extend the existing direct-Metal texture-binding fixture with synthetic varying
+  fragment coordinates, explicit `dfdx`/`dfdy` sampling gradients, and a comparison between implicit
+  and explicit-gradient sampling against a separate CPU expectation at an interior pixel and a
+  primitive boundary. Keep the synthetic texture/sampler ABI explicit; this one-mip fixture proves
+  neither derivative-driven LOD selection, AMD WQM equivalence, nor game bindings.
+- Acceptance: Metal shader compilation and API/GPU validation succeed; derivative/sample pixels
+  match independent expected values, including a helper-lane edge case; mutations to the input
+  gradient or texel change the expected readback; focused CTest passes without a no-device skip.
+  No game-frame or G3 PASS claim.
+- Baseline command `python3 -I -W error tools/dev/test_gcn_to_msl.py` passed 14/14; output is in
+  `local/validation/gpu02-fragment-derivative-20261025/lowerer-baseline.log`. No source change or
+  failed hypothesis has occurred yet.
+- Next exact action: add the bounded Metal fixture and its focused assertions in
+  `native/tests/test_metal_texture_binding.cpp`, then run the focused target under Metal validation.
+  Record the exact outputs before deciding whether to attempt pinned logo `image_sample` lowering.
+- No dependency changes. Remaining risks: hardware helper-lane behavior and conversion from AMD's
+  whole-quad sequence to MSL derivatives remain unverified. Failed tries: 0.
+
 ## 2026-10-25 03:34 CDT — PR #9 closeout reconciled; final record on main
 
 - Integrator: Codex `/root`; task `INT-OPEN-PRS-1-2-3-5-01` is `FIXTURE_VERIFIED`. PR #8's
