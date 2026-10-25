@@ -1,4 +1,4 @@
-# NEEDS_PRINCIPAL: GPU-03-RENDEROPS-ASSET-FRAME-01 — raw mesh index mutation is not visible in the frame
+# GPU-03-RENDEROPS-ASSET-FRAME-01 — index-mutation gate passed after principal reassessment
 
 - Owner / principal / date: Codex integrator `/root`; principal reassessment required; 2026-10-25.
 - Requirement and failing gate: after importing and parsing the pinned `cube_1m.cmsh` and `cone.cmsh`,
@@ -63,8 +63,37 @@ env MTL_DEBUG_LAYER=1 MTL_SHADER_VALIDATION=1 MTL_SHADER_VALIDATION_DEFAULT_STAT
   parser and baseline frame may be used as evidence; the GPU-03 task itself must stop here.
 - Task register and HANDOFF checkpoint links: [TASKS.md](../TASKS.md), [HANDOFF.md](../../HANDOFF.md),
   and [raw member import checkpoint](../checkpoints/2026-10-25-gpu03-raw-cmsh-import.md).
-- Principal reassessment / authorized next approach: no fourth try is authorized. The principal must
-  record a new hypothesis, targeted observable, and recovery plan here before resuming this task.
+- Principal reassessment / authorized fourth approach — 2026-10-25 04:31 CDT, Codex `/root`:
+  the three recorded searches mutated one U16 index at a time but accepted candidates only when the
+  CPU coverage or front-draw mask changed. The pinned private default-pair MSL shows the vertex stage
+  exports transformed position in `param0`; the fragment stage uses perspective-correct interpolated
+  `param0` in its lighting calculation. Therefore a valid one-index substitution may alter fragment
+  inputs and the PNG while preserving both masks. Attempt 4 will extend the independent CPU projection
+  to retain the winning fragment's perspective-correct `param0`, select a candidate with unchanged
+  coverage/front-draw ownership but changed `param0` at one or more visible pixels, then render it and
+  require a changed PNG SHA-256. Existing baseline silhouette, depth, deterministic image, vertex and
+  shader-constant checks remain required. This is a bounded test hypothesis, not a claim about retail
+  interpolation or mesh semantics. If it fails, stop and reassess; no fifth try is authorized.
 
-Stop after try 3. Do not reset counts in another agent/session, retry by rewording, substitute
-emulation/silence or fabricate success. The principal must record a new assessment before try 4.
+  Recorded before implementation in `HANDOFF.md` and the current task row in `docs/TASKS.md`.
+
+- Attempt 4 result — 2026-10-25 04:33 CDT: **PASSED**. The final test source adds perspective-correct
+  `param0` values to the independent CPU projection and only renders candidates that preserve both
+  coverage and front-draw ownership while changing the winning interpolated input. Build
+  `cmake --build local/build/orch-r22 --target test_metal_asset_frame -j 12` passed. The exact private
+  asset replay used the pinned E627 MSL with `MTL_DEBUG_LAYER=1`,
+  `MTL_SHADER_VALIDATION=1`, `MTL_SHADER_VALIDATION_DEFAULT_STATE=all`,
+  `MTL_SHADER_VALIDATION_ENABLE_ERROR_REPORTING=1`,
+  `MTL_SHADER_VALIDATION_REPORT_TO_STDERR=1`, and `MTL_SHADER_VALIDATION_ABORT_ON_FAULT=1`; it exited
+  0 with no Metal fault. One cone index mutation, draw 1 / slot 33 / 14 → 23, preserved CPU coverage
+  and draw ownership while changing `param0` on 677 visible pixels. Baseline PNG SHA-256 is
+  `af42ca554f5d24a9f981fc92156dea50616c172af1faba12eef1ff0d4db0f645`; the index-mutated PNG SHA-256
+  is `e3384475049c0e174895c736edb7248c5925ea82ae3924db507efb302641432c`. The baseline also passed
+  deterministic repeat, covered-pixel/silhouette, depth, bounds, vertex mutation, and shader-constant
+  mutation checks. Full command, source, and private artifact hashes are recorded in
+  `docs/checkpoints/2026-10-25-gpu03-asset-frame-attempt4.md`; logs and PNG remain ignored under
+  `local/validation/gpu03-r31/`.
+
+  This completes the L1 harness's index sensitivity gate. It remains fixture evidence, not retail
+  mesh/interpolation semantics or a game-driven frame; G3 remains PARTIAL. No fifth attempt is
+  authorized or needed for this bounded task.

@@ -1,5 +1,68 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 04:33 CDT — GPU-03 L1 asset-derived frame fixture passes
+
+- Integrator: Codex `/root`; user-directed work remains on local `main`. Task
+  `GPU-03-RENDEROPS-ASSET-FRAME-01` is **FIXTURE_VERIFIED** after the recorded root principal
+  reassessment and fourth index-mutation hypothesis. The fourth attempt was one index change only;
+  the PNG-hash diagnostic was added and the same focused attempt replayed on the final source.
+- Exact commands/results: `cmake --build local/build/orch-r22 --target test_metal_asset_frame -j 12`
+  passed. The asset-derived executable ran with `MTL_DEBUG_LAYER=1`, full Metal shader validation,
+  and the pinned default-pair MSL; exact final output is captured in
+  `local/validation/gpu03-r31/attempt4-final-asset-derived.log`. The 256x256 baseline PNG is 3,147 B,
+  SHA-256 `af42ca554f5d24a9f981fc92156dea50616c172af1faba12eef1ff0d4db0f645`; covered=8,464,
+  overlap=6,584, silhouette errors=0, depth errors=0. Direct output is private at
+  `local/validation/gpu03-r31/asset-derived-final.png`.
+- Observed: one cone index mutation (draw 1, slot 33, value 14 → 23) preserves CPU coverage and
+  front-draw ownership while changing perspective-correct `param0` on 677 visible pixels. Metal
+  produced a different PNG SHA-256 `e3384475049c0e174895c736edb7248c5925ea82ae3924db507efb302641432c`.
+  Baseline determinism, CPU silhouette/depth/bounds checks, and vertex/index/constant mutation checks
+  all passed; Metal API/GPU validation reported enabled and no faults. Build logs are
+  `attempt4-build.log` and `attempt4-final-build.log` in that private validation folder.
+- Files changed: `native/tests/test_metal_asset_frame.cpp`, this handoff, `docs/TASKS.md`,
+  `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/escalations/GPU-03-RENDEROPS-ASSET-FRAME-01.md`, and
+  new checkpoint `docs/checkpoints/2026-10-25-gpu03-asset-frame-attempt4.md`. No private inputs,
+  MSL, PNG, or logs are included in the changes.
+- Limits: this verifies one L1 asset-derived harness fixture from local cube/cone mesh bytes and the
+  harness ABI. Retail mesh interpretation/attribute binding, WQM equivalence, a game-driven frame,
+  G3, boot, audio, and save/load remain unverified; G3 stays PARTIAL.
+- Full verification passed: configure and full native build; CTest 397/397 with private logo MSL;
+  lift checkers 481 passed / 0 skipped / 0 failed. `trail build` processed 2,001 source files into
+  8,522 nodes / 11,526 edges; `trail build --check` passed and `trail grep` found the new interpolant
+  helper. Project index: 19,589 folders. Staged-path audit passed 8/8 and all-path audit 2,788/2,788.
+  The first cached-diff check caught trailing Markdown hardbreak whitespace in the new checkpoint;
+  those spaces were removed and a final cached-diff check is pending. Attribution currently passes
+  `origin/main..HEAD` (empty unpublished range); rerun after commit. Full logs are under
+  `local/validation/gpu03-r31/`.
+- Next exact action: finish the cached-diff and staged audit recheck, record these full gates in
+  E650, then make an owner-authored commit and push to `main` under the user's explicit publication
+  instruction. Attempt count is 4; no further GPU-03 retry is planned.
+
+## 2026-10-25 04:31 CDT — GPU-03 principal reassessment; attempt 4 claimed
+
+- Integrator/principal: Codex `/root`; user-directed continuation on `main` after the GPU-02 Metal
+  shader slice. Starting point is clean `main` at `b2f6fefe29e11234c9c8c0c53bf60bf65bfc5637`, equal
+  to `origin/main`.
+- Bounded task: `GPU-03-RENDEROPS-ASSET-FRAME-01`, root reassessed the three-attempt escalation and
+  authorized exactly one focused fourth hypothesis. The baseline still parses the pinned local cube
+  and cone and passes asset-derived CPU silhouette/depth checks; only index-mutation sensitivity is
+  incomplete. G3 remains PARTIAL and no game-frame/boot/audio/save claim follows.
+- New hypothesis: an individual index substitution may preserve covered pixels and front-draw
+  ownership yet change the interpolated `param0` supplied to the default-pair fragment shader.
+  Live private MSL inspection shows the vertex stage exports transformed position in `param0`, and
+  the fragment stage consumes interpolated `param0` in its lighting calculation. The prior try-3
+  candidate filter compared only coverage and front-draw masks, so it could exclude this case.
+- Targeted observable: extend the independent CPU projection to retain the winning fragment's
+  perspective-correct `param0`; search the existing valid one-index substitutions for one that keeps
+  coverage/front-draw ownership unchanged while changing `param0` on at least one visible pixel.
+  Render only such candidates and require a changed PNG SHA-256, preserving all baseline checks.
+- Files claimed before editing: `native/tests/test_metal_asset_frame.cpp`,
+  `docs/escalations/GPU-03-RENDEROPS-ASSET-FRAME-01.md`, `docs/TASKS.md`, and `HANDOFF.md`.
+  No private raw member, MSL, PNG, or log will be staged.
+- Exact next action: implement the CPU interpolant observability and new candidate filter, build
+  `test_metal_asset_frame`, then run the recorded asset-derived command with Metal API/GPU
+  validation. Attempt count is 4 total; no fifth attempt will run without another reassessment.
+
 ## 2026-10-25 04:26 CDT — main publication and branch cleanup verified
 
 - Integrator: Codex `/root`; GPU-02 logo PS fixture is **FIXTURE_VERIFIED** under its exact private

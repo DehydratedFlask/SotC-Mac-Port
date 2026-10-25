@@ -53,6 +53,7 @@ struct CpuMask {
     std::vector<double> depth;
     std::vector<int> front_draw;
     std::vector<int> front_triangle;
+    std::vector<std::array<double, 4>> front_param0;
     std::size_t covered_count = 0;
 };
 
@@ -168,12 +169,60 @@ void check(std::string_view name, bool passed) {
     return wa * za + wb * zb + wc * zc;
 }
 
+[[nodiscard]] Point3 transform_object_position(const sotc::DefaultShaderCase& shader,
+                                               const sotc::CmshPosition& position) {
+    const double x = position.x;
+    const double y = position.y;
+    const double z = position.z;
+    return {
+        static_cast<double>(shader.object_row0[0]) * x +
+            static_cast<double>(shader.object_row0[1]) * y +
+            static_cast<double>(shader.object_row0[2]) * z + shader.object_row0[3],
+        static_cast<double>(shader.object_row1[0]) * x +
+            static_cast<double>(shader.object_row1[1]) * y +
+            static_cast<double>(shader.object_row1[2]) * z + shader.object_row1[3],
+        static_cast<double>(shader.object_row2[0]) * x +
+            static_cast<double>(shader.object_row2[1]) * y +
+            static_cast<double>(shader.object_row2[2]) * z + shader.object_row2[3],
+    };
+}
+
+[[nodiscard]] std::array<double, 4> vertex_param0(const sotc::DefaultShaderCase& shader,
+                                                 const sotc::CmshPosition& position) {
+    const Point3 world = transform_object_position(shader, position);
+    return {world.x, world.y, world.z,
+            static_cast<double>(shader.encoded_normal[0]) * 2.0 - 1.0};
+}
+
+[[nodiscard]] std::array<double, 4> perspective_interpolate_param0(
+    Point2 a, Point2 b, Point2 c, Point2 point,
+    const std::array<double, 4>& param0_a, const std::array<double, 4>& param0_b,
+    const std::array<double, 4>& param0_c, double clip_w_a, double clip_w_b,
+    double clip_w_c) {
+    const double area = edge(a, b, c);
+    if (std::abs(area) < 1.0e-12 || clip_w_a == 0.0 || clip_w_b == 0.0 || clip_w_c == 0.0) {
+        return {};
+    }
+    const double wa = edge(b, c, point) / area / clip_w_a;
+    const double wb = edge(c, a, point) / area / clip_w_b;
+    const double wc = edge(a, b, point) / area / clip_w_c;
+    const double sum = wa + wb + wc;
+    if (std::abs(sum) < 1.0e-12) return {};
+    std::array<double, 4> result{};
+    for (std::size_t component = 0; component < result.size(); ++component) {
+        result[component] = (wa * param0_a[component] + wb * param0_b[component] +
+                             wc * param0_c[component]) / sum;
+    }
+    return result;
+}
+
 [[nodiscard]] CpuMask cpu_project(std::span<const sotc::AssetMeshDraw> draws, bool y_down) {
     const std::size_t pixel_count = static_cast<std::size_t>(kWidth) * kHeight;
     CpuMask mask{std::vector<std::uint8_t>(pixel_count, 0),
                  std::vector<double>(pixel_count, 1.0),
                  std::vector<int>(pixel_count, -1),
-                 std::vector<int>(pixel_count, -1), 0};
+                 std::vector<int>(pixel_count, -1),
+                 std::vector<std::array<double, 4>>(pixel_count), 0};
 
     for (std::size_t draw_index = 0; draw_index < draws.size(); ++draw_index) {
         const auto& draw = draws[draw_index];
@@ -184,9 +233,27 @@ void check(std::string_view name, bool passed) {
             const Point3 a3 = transform_position(draw.shader, pa);
             const Point3 b3 = transform_position(draw.shader, pb);
             const Point3 c3 = transform_position(draw.shader, pc);
+            const Point3 world_a = transform_object_position(draw.shader, pa);
+            const Point3 world_b = transform_object_position(draw.shader, pb);
+            const Point3 world_c = transform_object_position(draw.shader, pc);
             const Point2 a{a3.x, a3.y};
             const Point2 b{b3.x, b3.y};
             const Point2 c{c3.x, c3.y};
+            const std::array<double, 4> param0_a = vertex_param0(draw.shader, pa);
+            const std::array<double, 4> param0_b = vertex_param0(draw.shader, pb);
+            const std::array<double, 4> param0_c = vertex_param0(draw.shader, pc);
+            const double clip_w_a = static_cast<double>(draw.shader.clip_row3[0]) * world_a.x +
+                                    static_cast<double>(draw.shader.clip_row3[1]) * world_a.y +
+                                    static_cast<double>(draw.shader.clip_row3[2]) * world_a.z +
+                                    draw.shader.clip_row3[3];
+            const double clip_w_b = static_cast<double>(draw.shader.clip_row3[0]) * world_b.x +
+                                    static_cast<double>(draw.shader.clip_row3[1]) * world_b.y +
+                                    static_cast<double>(draw.shader.clip_row3[2]) * world_b.z +
+                                    draw.shader.clip_row3[3];
+            const double clip_w_c = static_cast<double>(draw.shader.clip_row3[0]) * world_c.x +
+                                    static_cast<double>(draw.shader.clip_row3[1]) * world_c.y +
+                                    static_cast<double>(draw.shader.clip_row3[2]) * world_c.z +
+                                    draw.shader.clip_row3[3];
 
             const double min_x = std::min({a.x, b.x, c.x});
             const double max_x = std::max({a.x, b.x, c.x});
@@ -219,6 +286,9 @@ void check(std::string_view name, bool passed) {
                         mask.depth[pixel] = depth;
                         mask.front_draw[pixel] = static_cast<int>(draw_index);
                         mask.front_triangle[pixel] = static_cast<int>(first / 3);
+                        mask.front_param0[pixel] = perspective_interpolate_param0(
+                            a, b, c, point, param0_a, param0_b, param0_c,
+                            clip_w_a, clip_w_b, clip_w_c);
                     }
                 }
             }
@@ -558,8 +628,9 @@ struct MeshBounds {
     std::size_t changed_draw_index = 0;
     std::uint16_t changed_index_from = 0;
     std::uint16_t changed_index_to = 0;
-    std::size_t changed_cpu_pixels = 0;
-    std::size_t cpu_mutation_candidates = 0;
+    std::size_t changed_param0_pixels = 0;
+    std::size_t cpu_param0_candidates = 0;
+    std::string index_mutation_hash;
     for (std::size_t draw_index = 0; draw_index < draws.size() && !index_mutation_visible;
          ++draw_index) {
         const sotc::CmshMesh& mesh = draw_index == 0 ? cube : cone;
@@ -617,25 +688,46 @@ struct MeshBounds {
                     std::vector<sotc::AssetMeshDraw> index_mutation = draws;
                     index_mutation[draw_index].indices = changed_indices;
                     const CpuMask candidate_projection = cpu_project(index_mutation, true);
-                    std::size_t cpu_delta = 0;
+                    std::size_t ownership_delta = 0;
                     for (std::size_t pixel = 0; pixel < expected.covered.size(); ++pixel) {
                         if (expected.covered[pixel] != candidate_projection.covered[pixel] ||
                             expected.front_draw[pixel] != candidate_projection.front_draw[pixel]) {
-                            ++cpu_delta;
+                            ++ownership_delta;
                         }
                     }
-                    if (cpu_delta == 0) continue;
-                    ++cpu_mutation_candidates;
+                    if (ownership_delta != 0) continue;
+
+                    std::size_t param0_delta = 0;
+                    constexpr double kParam0MutationEpsilon = 1.0e-6;
+                    for (std::size_t pixel = 0; pixel < expected.covered.size(); ++pixel) {
+                        if (expected.covered[pixel] == 0 ||
+                            candidate_projection.covered[pixel] == 0 ||
+                            expected.front_draw[pixel] != static_cast<int>(draw_index) ||
+                            candidate_projection.front_draw[pixel] != static_cast<int>(draw_index)) {
+                            continue;
+                        }
+                        for (std::size_t component = 0; component < 4; ++component) {
+                            if (std::abs(expected.front_param0[pixel][component] -
+                                         candidate_projection.front_param0[pixel][component]) >
+                                kParam0MutationEpsilon) {
+                                ++param0_delta;
+                                break;
+                            }
+                        }
+                    }
+                    if (param0_delta == 0) continue;
+                    ++cpu_param0_candidates;
 
                     sotc::MetalAssetFrameResult changed;
                     if (render_ok(renderer, index_mutation, changed, "asset index mutation")) {
-                        index_mutation_visible = sha256_hex(changed.png) != baseline_hash;
+                        index_mutation_hash = sha256_hex(changed.png);
+                        index_mutation_visible = index_mutation_hash != baseline_hash;
                         if (index_mutation_visible) {
                             changed_draw_index = draw_index;
                             changed_index_slot = slot;
                             changed_index_from = original;
                             changed_index_to = replacement;
-                            changed_cpu_pixels = cpu_delta;
+                            changed_param0_pixels = param0_delta;
                         }
                     }
                 }
@@ -643,13 +735,15 @@ struct MeshBounds {
         }
     }
     if (index_mutation_visible) {
-        std::printf("asset index mutation: draw=%zu slot=%zu from=%u to=%u; CPU pixels changed=%zu\n",
+        std::printf("asset index mutation: draw=%zu slot=%zu from=%u to=%u; "
+                    "CPU param0 pixels changed=%zu with coverage/draw ownership preserved; "
+                    "PNG sha256=%s\n",
                     changed_draw_index, changed_index_slot,
                     static_cast<unsigned>(changed_index_from), static_cast<unsigned>(changed_index_to),
-                    changed_cpu_pixels);
+                    changed_param0_pixels, index_mutation_hash.c_str());
     } else {
-        std::printf("asset index mutation search: CPU-visible candidates=%zu\n",
-                    cpu_mutation_candidates);
+        std::printf("asset index mutation search: mask-preserving candidates with changed "
+                    "interpolated param0=%zu\n", cpu_param0_candidates);
     }
     check("asset index mutation changes PNG hash", index_mutation_visible);
 
