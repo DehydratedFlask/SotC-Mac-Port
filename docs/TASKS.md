@@ -8,7 +8,7 @@ Gates and test evidence take precedence over a status label. Integrator owns thi
 
 | ID | Bounded output | Status / owner | Failed tries |
 |---|---|---|---|
-| INT-OPEN-PRS-1-2-3-5-01 | Reconcile reviewed changes with current main, verify each change, remove assistant contributor trailers, publish integration branch through a PR, merge it and return workspace to main | FIXTURE_VERIFIED / root (PR #8 merged at `61c96f6`; main contains the root GPU-03 checkpoint, current E639/E640 evidence numbering, and E641 checker fix; CTest 397/397, lift checkers 481/0/0, path audits passed; `codex/merge-all-open-changes` deleted locally and remotely; GPU-03 remains NEEDS_PRINCIPAL and G3 PARTIAL) | 0 |
+| INT-OPEN-PRS-1-2-3-5-01 | Reconcile reviewed changes with current main, verify each change, remove assistant contributor trailers, publish integration branch through a PR, merge it and return workspace to main | FIXTURE_VERIFIED / root (PR #8 merged at `61c96f6`; PR #9 documentation closeout merged at `a8bd805`; workspace returned to clean `main`; CTest 397/397, lift checkers 481/0/0, path audits passed; GPU-03 remains NEEDS_PRINCIPAL and G3 PARTIAL) | 0 |
 | INT-PR3-PUBLISH-PATH-REGRESSION-01 | Correct only the post-merge PR3 positive fixtures whose exact `reference`/`logs` components violate main's path policy | INT-OPEN-PRS-1-2-3-5-01 | FIXTURE_VERIFIED / root (PR #6 commit `94ed6ed` merged at `8bd3d10`; publish-path 12/12, PSARC 53/53, full path audit 2,753 paths; one test-only fix) | 0 |
 
 ## Active orchestration — 2026-10-24 round 30
