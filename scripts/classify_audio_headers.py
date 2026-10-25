@@ -3,7 +3,7 @@
 
 Read-only. Uses scripts/psarc.py to decode each matching member in memory. SHA-256 covers
 the complete decoded member; the observed family and entropy use its first N bytes. PSARC
-entry IDs are table indices (entry 0 is the path manifest). Does NOT identify codecs, invent
+entry IDs are table indices (entry 0 is the path manifest) paired to paths by MD5(path). Does NOT identify codecs, invent
 NGS2 semantics, or extract members to disk.
 """
 from __future__ import annotations
@@ -132,8 +132,8 @@ def classify_archives(archives: list[Path], sample: int = SAMPLE) -> dict:
     for apath in archives:
         a = Psarc(apath)
         try:
-            names = a.paths()
-            for i, name in enumerate(names, 1):
+            # Pair by MD5(path), never by position: TOC order is MD5 order, manifest is alphabetical.
+            for name, i in a.members():
                 ext = posixpath.splitext(name)[1].lower()
                 if ext not in AUDIO_EXTS:
                     continue

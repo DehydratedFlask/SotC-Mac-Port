@@ -239,6 +239,9 @@ class ClassifyFixtureTests(unittest.TestCase):
             def paths(self):
                 return ['sound/fixture.sxd']
 
+            def members(self):
+                return [('sound/fixture.sxd', 1)]
+
             def read(self, index, limit=None):
                 self.read_calls.append((index, limit))
                 return member if limit is None else member[:limit]
@@ -268,6 +271,40 @@ class ClassifyFixtureTests(unittest.TestCase):
         self.assertEqual(instances[0].read_calls, [(1, None)])
         self.assertTrue(instances[0].closed)
         self.assertEqual(row['codec'], 'UNKNOWN')
+
+
+class ClassifyPairingTests(unittest.TestCase):
+    """DATA-02-PSARC-PAIRING-FIX-01: real synthetic PSARC, MD5-sorted TOC, alphabetical manifest."""
+
+    def test_entry_identity_follows_md5_not_manifest_position(self):
+        import tempfile
+        import test_psarc
+
+        files = sorted((f'sound/{n}.sxd', f'{n}-body-'.encode() * 4)
+                       for n in ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'))
+        files.append(('sound/not-audio.txt', b'skip me'))
+        files.sort()
+        with tempfile.TemporaryDirectory() as tmp:
+            arch = Path(tmp) / 'cachedFiles.psarc'
+            arch.write_bytes(test_psarc.build(files, sort_by_md5=True))
+            payload = cah.classify_archives([arch])
+            probe = cah.Psarc(arch)
+            try:
+                expected = dict(probe.members())
+                entries = probe.entries
+            finally:
+                probe.close()
+        self.assertEqual(payload['member_count'], 8)
+        wrong_positional = 0
+        for k, row in enumerate(payload['members']):
+            data = dict(files)[row['path']]
+            self.assertEqual(row['entry_id'], expected[row['path']])
+            self.assertEqual(row['member_sha256'], hashlib.sha256(data).hexdigest())
+            self.assertEqual(row['size'], len(data))
+            self.assertEqual(row['entry_offset'], entries[row['entry_id']]['offset'])
+            self.assertEqual(row['first_block'], entries[row['entry_id']]['block'])
+            wrong_positional += row['entry_id'] != k + 1
+        self.assertGreater(wrong_positional, 0)
 
 
 if __name__ == '__main__':

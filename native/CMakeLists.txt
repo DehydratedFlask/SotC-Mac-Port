@@ -46,6 +46,7 @@ add_library(sotc_core STATIC
   core/leaf_df94c0.cpp
   core/leaf_de0160.cpp
   core/fnv_cstr_161fb0.cpp
+  core/fnv_path_cstr_162020.cpp
   core/hashed_name_ctors.cpp
   core/guarded_static_helpers.cpp
   core/atomic_add_ref_14ccb0.cpp
@@ -53,15 +54,182 @@ add_library(sotc_core STATIC
   core/store_value_clear_flag_158340.cpp
   core/fnv_span_161f80.cpp
   core/hashed_string_14c3a0.cpp
+  core/shared_str_release_f590.cpp
   core/registry_object_14c9a0.cpp
+  core/registry_object_2efd160.cpp
+  core/registry_sorted_insert.cpp
+  core/inputtable_names_fixture.cpp
+  core/registry_fill_52a220.cpp
+  core/registry_init_531d60.cpp
+  core/appmain_init_registry_slice.cpp
+  core/init_531d60_trivial_leaves.cpp
+  core/init_1290.cpp
+  core/init_531d60_entry_gaps.cpp
+  core/stat_query_54b250.cpp
+  core/insert_1beeb0.cpp
+  core/insert_1bde30.cpp
+  core/shared_release_f590.cpp
+  core/alloc_wrappers_17070.cpp
+  core/insert_1bdb50.cpp
+  core/app_info_registry.cpp
+  core/app_info_install.cpp
+  core/registry_owner.cpp
+  core/container_dtor_1bede0.cpp
+  core/registry_slot.cpp
+  core/app_info_collect.cpp
+  core/appinfo_listb.cpp
+  core/app_info_snapshot.cpp
+  core/report_tree.cpp
+  core/insert_1bdc80.cpp
+  core/owner_properties_2569d0.cpp
+  core/owner_prop_bag.cpp
+  core/owner_members.cpp
+  core/owner_simple_ctors.cpp
+  core/owner_ctor_b111e0_slot48.cpp
+  core/owner_ctor_b11210_slot58.cpp
+  core/owner_ctor_a5c850.cpp
+  core/owner_dtor_a5cb30.cpp
+  core/shared_str_ctor_f1a0.cpp
+  core/shared_str_resize_f3c0.cpp
+  core/resource_id_14c2f0.cpp
+  core/resource_pool.cpp
+  core/app_info_run.cpp
+  core/snapshot_bug_data.cpp
+  core/screenshot_contract.cpp
+  core/frame_root.cpp
+  core/platform_tag_147e20.cpp
+  core/camera_location_25a4d0.cpp
+  core/list_dtor_1bdeb0.cpp
+  core/insert_21cd0.cpp
+  core/container_1bdb10.cpp
+  core/owner_dtor_1bdae0.cpp
+  core/appmain_init_remainder_slice.cpp
+  core/xchg_store_u32_357f0.cpp
+  core/base_initialize_255130.cpp
+  core/appmain_init_base_initialize_slice.cpp
+  core/init_flag_object_335a0.cpp
+  core/prologue_255180.cpp
+  core/store_tsc_323d0.cpp
+  core/ensure_capacity_3c2f70.cpp
+  core/init_sub_3be930.cpp
+  core/ctor_40_1ab550.cpp
+  core/prologue_gates_2552d4.cpp
+  core/vslot_30_534130.cpp
+  core/mid_255340.cpp
+  core/singleton_f08_531d84.cpp
+  core/vslot_40_533100_header.cpp
+  core/lookup_1fc80.cpp
+  core/vslot_40_533100_post.cpp
+  core/vslot_40_533100_miss.cpp
+  core/vslot_40_533100_join.cpp
+  core/vslot_40_533100_gfx_2ee2d00.cpp
+  core/vslot_40_533100_shadowmodels.cpp
+  core/vslot_40_533100_attach_common.cpp
+  core/vslot_40_533100_shadow_attach.cpp
+  core/vslot_40_533100_shadowskels.cpp
+  core/vslot_40_533100_skels_attach.cpp
+  core/vslot_40_533100_shadowanims.cpp
+  core/vslot_40_533100_anims_attach.cpp
+  core/vslot_40_533100_shadowbanks.cpp
+  core/vslot_40_533100_banks_attach.cpp
+  core/vslot_40_533100_shadowstreams.cpp
+  core/vslot_40_533100_streams_attach.cpp
+  core/vslot_40_533100_shadowrandomevents.cpp
+  core/vslot_40_533100_randomevents_attach.cpp
+  core/vslot_40_533100_shadowbossmusic.cpp
+  core/vslot_40_533100_bossmusic_attach.cpp
+  core/vslot_40_533100_cp3characters.cpp
+  core/vslot_40_533100_cp3characters_attach.cpp
+  core/vslot_40_533100_cp3shadowprecache.cpp
+  core/vslot_40_533100_cp3shadowprecache_attach.cpp
+  core/vslot_40_533100_tail_140d90.cpp
+  core/vslot_40_533100_stackchk.cpp
+  core/init_531d60_post_base_499f80.cpp
+  core/init_531d60_post_base_56dcb0.cpp
+  core/init_531d60_post_base_5c64c0.cpp
+  core/init_531d60_post_base_1290.cpp
+  core/init_531d60_post_base_56db70.cpp
+  core/init_531d60_post_base_5b3d00.cpp
+  core/init_531d60_post_base_5b3cf0.cpp
+  core/init_531d60_post_base_avx_bss.cpp
+  core/init_531d60_post_base_7f7220.cpp
+  core/init_531d60_post_base_56fad0.cpp
+  core/init_531d60_post_base_f90310.cpp
+  core/init_531d60_post_base_ymm_bss.cpp
+  core/init_531d60_post_base_ymm_intercell.cpp
+  core/init_531d60_post_base_xmm_seed.cpp
+  core/init_531d60_post_base_ymm_reload.cpp
+  core/init_531d60_post_base_26800_f590.cpp
+  core/init_531d60_post_base_sbj.cpp
+  core/init_531d60_post_base_sboj.cpp
+  core/init_531d60_post_base_52eb50.cpp
+  core/init_531d60_post_base_lea_vmovq.cpp
+  core/init_531d60_post_base_532ca0.cpp
+  core/init_531d60_post_base_vcall18.cpp
+  core/init_531d60_post_base_532ca0_u2.cpp
+  core/init_531d60_post_base_vcall18_u2.cpp
+  core/init_531d60_post_base_532ca0_u3.cpp
+  core/init_531d60_post_base_vcall18_u3.cpp
+  core/init_531d60_post_base_532ca0_u4.cpp
+  core/init_531d60_post_base_vcall18_u4.cpp
+  core/init_531d60_post_base_532ca0_u5.cpp
+  core/init_531d60_post_base_vcall18_u5.cpp
+  core/init_531d60_post_base_532ed0.cpp
+  core/init_531d60_post_base_vcall18_532ed0.cpp
+  core/init_531d60_post_base_532ed0_u2.cpp
+  core/init_531d60_post_base_vcall18_532ed0_u2.cpp
+  core/init_531d60_post_base_17070.cpp
+  core/init_531d60_post_base_544fe0.cpp
+  core/init_531d60_post_base_cell_2eff450.cpp
+  core/init_531d60_post_base_17070_u2.cpp
+  core/init_531d60_post_base_53fd10.cpp
+  core/init_531d60_post_base_cell_2eff448.cpp
+  core/init_531d60_post_base_vcall38.cpp
+  core/init_531d60_post_base_lea_32f4fe0.cpp
+  core/init_531d60_post_base_a2caf0.cpp
+  core/init_531d60_post_base_a2ed00.cpp
+  core/init_531d60_post_base_a2ed00_u2.cpp
+  core/init_531d60_post_base_a2ed00_u3.cpp
+  core/init_531d60_post_base_f590_a2ed00.cpp
+  core/init_531d60_post_base_f590_a2ed00_u2.cpp
+  core/init_531d60_post_base_f590_a2ed00_u3.cpp
+  core/init_531d60_post_base_f590_a2ed00_u4.cpp
+  core/init_531d60_post_base_f590_a2ed00_u5.cpp
+  core/init_531d60_post_base_f590_a2ed00_u6.cpp
+  core/init_531d60_post_base_a2ed00_u4.cpp
+  core/init_531d60_post_base_f590_a2ed00_u7.cpp
+  core/init_531d60_post_base_f590_a2ed00_u8.cpp
+  core/init_531d60_post_base_a2ed00_u5.cpp
+  core/init_531d60_post_base_f590_a2ed00_u9.cpp
+  core/init_531d60_post_base_f590_a2ed00_u10.cpp
+  core/init_531d60_post_base_a2ed00_u6.cpp
+  core/init_531d60_post_base_f590_a2ed00_u11.cpp
+  core/init_531d60_post_base_f590_a2ed00_u12.cpp
+  core/init_531d60_post_base_a2ed00_u7.cpp
+  core/init_531d60_post_base_f590_a2ed00_u13.cpp
+  core/init_531d60_post_base_continue_a.cpp
+  core/init_531d60_post_base_continue_b.cpp
+  core/init_531d60_post_base_continue_c.cpp
+  core/init_531d60_post_base_continue_d.cpp
+  core/init_531d60_post_base_continue_e.cpp
+  core/init_531d60_post_base_alt_5327bd.cpp
+  core/ctor_98a90_3be050.cpp
+  core/appmain_init_prologue_slice.cpp
+  core/appmain_init_prologue_tail_slice.cpp
+  core/appmain_init_ctor_98a90_slice.cpp
   core/scratch_reset.cpp
   core/save_checksum.cpp
   core/name_hash.cpp
   core/save_chunk_header.cpp
   core/save_stream.cpp
   core/save_chunk_codec.cpp
+  core/save_progress_object.cpp
+  core/save_slot_store.cpp
+  core/save_meta.cpp
+  core/save_transaction.cpp
   core/descriptor_registration.cpp
   core/const_table_ee1130.cpp
+  core/input_table_551140.cpp
   core/recursive_mutex.cpp
   core/startup_ctors.cpp
   core/clothing_preview_param.cpp
@@ -318,6 +486,8 @@ add_library(sotc_core STATIC
   core/vec_b47100.cpp
   core/vec_b44580.cpp
   core/vec_b33bd0.cpp
+  core/capture_a473b0.cpp
+  core/owner_ctor_a597d0.cpp
 )
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 enable_testing()
@@ -1442,6 +1612,10 @@ add_executable(test_fnv_cstr tests/test_fnv_cstr.cpp)
 target_link_libraries(test_fnv_cstr sotc_core)
 add_test(NAME fnv_cstr COMMAND test_fnv_cstr)
 
+add_executable(test_fnv_path_cstr_162020 tests/test_fnv_path_cstr_162020.cpp)
+target_link_libraries(test_fnv_path_cstr_162020 sotc_core)
+add_test(NAME fnv_path_cstr_162020 COMMAND test_fnv_path_cstr_162020)
+
 add_executable(test_hashed_name_ctors tests/test_hashed_name_ctors.cpp)
 target_link_libraries(test_hashed_name_ctors sotc_core)
 add_test(NAME hashed_name_ctors COMMAND test_hashed_name_ctors)
@@ -1452,6 +1626,10 @@ add_test(NAME guarded_static_helpers COMMAND test_guarded_static_helpers)
 add_executable(test_const_table_ee1130 tests/test_const_table_ee1130.cpp)
 target_link_libraries(test_const_table_ee1130 sotc_core)
 add_test(NAME const_table_ee1130 COMMAND test_const_table_ee1130)
+
+add_executable(test_input_table_551140 tests/test_input_table_551140.cpp)
+target_link_libraries(test_input_table_551140 sotc_core)
+add_test(NAME input_table_551140 COMMAND test_input_table_551140)
 
 add_executable(test_descriptor_registration tests/test_descriptor_registration.cpp)
 target_link_libraries(test_descriptor_registration sotc_core)
@@ -1481,6 +1659,14 @@ add_executable(test_save_chunk_codec tests/test_save_chunk_codec.cpp)
 target_link_libraries(test_save_chunk_codec sotc_core)
 add_test(NAME save_chunk_codec COMMAND test_save_chunk_codec)
 
+add_executable(test_save_transaction tests/test_save_transaction.cpp)
+target_link_libraries(test_save_transaction sotc_core)
+add_test(NAME save_transaction COMMAND test_save_transaction)
+
+add_executable(test_save_metadata tests/test_save_metadata.cpp)
+target_link_libraries(test_save_metadata sotc_core)
+add_test(NAME save_metadata COMMAND test_save_metadata)
+
 add_executable(test_atomic_add_ref_14ccb0 tests/test_atomic_add_ref_14ccb0.cpp)
 target_link_libraries(test_atomic_add_ref_14ccb0 sotc_core)
 add_test(NAME atomic_add_ref_14ccb0 COMMAND test_atomic_add_ref_14ccb0)
@@ -1501,9 +1687,235 @@ add_executable(test_hashed_string_14c3a0 tests/test_hashed_string_14c3a0.cpp)
 target_link_libraries(test_hashed_string_14c3a0 sotc_core)
 add_test(NAME hashed_string_14c3a0 COMMAND test_hashed_string_14c3a0)
 
+add_executable(test_shared_str_release_f590 tests/test_shared_str_release_f590.cpp)
+target_link_libraries(test_shared_str_release_f590 sotc_core)
+add_test(NAME shared_str_release_f590 COMMAND test_shared_str_release_f590)
+
 add_executable(test_registry_object_14c9a0 tests/test_registry_object_14c9a0.cpp)
 target_link_libraries(test_registry_object_14c9a0 sotc_core)
 add_test(NAME registry_object_14c9a0 COMMAND test_registry_object_14c9a0)
+
+add_executable(test_registry_object_2efd160 tests/test_registry_object_2efd160.cpp)
+target_link_libraries(test_registry_object_2efd160 sotc_core)
+add_test(NAME registry_object_2efd160 COMMAND test_registry_object_2efd160)
+
+add_executable(test_registry_sorted_insert tests/test_registry_sorted_insert.cpp)
+target_link_libraries(test_registry_sorted_insert sotc_core)
+add_test(NAME registry_sorted_insert COMMAND test_registry_sorted_insert)
+
+add_executable(test_inputtable_names_fixture tests/test_inputtable_names_fixture.cpp)
+target_link_libraries(test_inputtable_names_fixture sotc_core)
+add_test(NAME inputtable_names_fixture COMMAND test_inputtable_names_fixture)
+set_tests_properties(inputtable_names_fixture PROPERTIES
+  ENVIRONMENT "SOTC_INPUTTABLE_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/inputtable_551140_names.bin")
+
+add_executable(test_registry_fill_52a220 tests/test_registry_fill_52a220.cpp)
+target_link_libraries(test_registry_fill_52a220 sotc_core)
+add_test(NAME registry_fill_52a220 COMMAND test_registry_fill_52a220)
+set_tests_properties(registry_fill_52a220 PROPERTIES
+  ENVIRONMENT "SOTC_INPUTTABLE_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/inputtable_551140_names.bin")
+
+add_executable(test_registry_init_531d60 tests/test_registry_init_531d60.cpp)
+target_link_libraries(test_registry_init_531d60 sotc_core)
+add_test(NAME registry_init_531d60 COMMAND test_registry_init_531d60)
+set_tests_properties(registry_init_531d60 PROPERTIES
+  ENVIRONMENT "SOTC_INPUTTABLE_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/inputtable_551140_names.bin")
+
+add_executable(test_appmain_init_registry_slice tests/test_appmain_init_registry_slice.cpp)
+target_link_libraries(test_appmain_init_registry_slice sotc_core)
+add_test(NAME appmain_init_registry_slice COMMAND test_appmain_init_registry_slice)
+set_tests_properties(appmain_init_registry_slice PROPERTIES
+  ENVIRONMENT "SOTC_INPUTTABLE_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/inputtable_551140_names.bin")
+
+add_executable(test_appmain_init_remainder_slice tests/test_appmain_init_remainder_slice.cpp)
+target_link_libraries(test_appmain_init_remainder_slice sotc_core)
+add_test(NAME appmain_init_remainder_slice COMMAND test_appmain_init_remainder_slice)
+set_tests_properties(appmain_init_remainder_slice PROPERTIES
+  ENVIRONMENT "SOTC_INPUTTABLE_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/inputtable_551140_names.bin")
+
+add_executable(test_appmain_init_base_initialize_slice tests/test_appmain_init_base_initialize_slice.cpp)
+target_link_libraries(test_appmain_init_base_initialize_slice sotc_core)
+add_test(NAME appmain_init_base_initialize_slice COMMAND test_appmain_init_base_initialize_slice)
+set_tests_properties(appmain_init_base_initialize_slice PROPERTIES
+  ENVIRONMENT "SOTC_INPUTTABLE_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/inputtable_551140_names.bin")
+
+add_executable(test_appmain_init_prologue_slice tests/test_appmain_init_prologue_slice.cpp)
+target_link_libraries(test_appmain_init_prologue_slice sotc_core)
+add_test(NAME appmain_init_prologue_slice COMMAND test_appmain_init_prologue_slice)
+set_tests_properties(appmain_init_prologue_slice PROPERTIES
+  ENVIRONMENT "SOTC_INPUTTABLE_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/inputtable_551140_names.bin")
+
+add_executable(test_appmain_init_prologue_tail_slice tests/test_appmain_init_prologue_tail_slice.cpp)
+target_link_libraries(test_appmain_init_prologue_tail_slice sotc_core)
+add_test(NAME appmain_init_prologue_tail_slice COMMAND test_appmain_init_prologue_tail_slice)
+set_tests_properties(appmain_init_prologue_tail_slice PROPERTIES
+  ENVIRONMENT "SOTC_INPUTTABLE_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/inputtable_551140_names.bin")
+
+add_executable(test_stat_query_54b250 tests/test_stat_query_54b250.cpp)
+target_link_libraries(test_stat_query_54b250 sotc_core)
+add_test(NAME stat_query_54b250 COMMAND test_stat_query_54b250)
+
+add_executable(test_init_531d60_entry_gaps tests/test_init_531d60_entry_gaps.cpp)
+target_link_libraries(test_init_531d60_entry_gaps sotc_core)
+add_test(NAME init_531d60_entry_gaps COMMAND test_init_531d60_entry_gaps)
+
+add_executable(test_init_1290 tests/test_init_1290.cpp)
+target_link_libraries(test_init_1290 sotc_core)
+add_test(NAME init_1290 COMMAND test_init_1290)
+
+add_executable(test_owner_dtor_1bdae0 tests/test_owner_dtor_1bdae0.cpp)
+target_link_libraries(test_owner_dtor_1bdae0 sotc_core)
+add_test(NAME owner_dtor_1bdae0 COMMAND test_owner_dtor_1bdae0)
+
+add_executable(test_container_1bdb10 tests/test_container_1bdb10.cpp)
+target_link_libraries(test_container_1bdb10 sotc_core)
+add_test(NAME container_1bdb10 COMMAND test_container_1bdb10)
+
+add_executable(test_insert_1bdb50 tests/test_insert_1bdb50.cpp)
+target_link_libraries(test_insert_1bdb50 sotc_core)
+add_test(NAME insert_1bdb50 COMMAND test_insert_1bdb50)
+
+add_executable(test_app_info_registry tests/test_app_info_registry.cpp)
+target_link_libraries(test_app_info_registry sotc_core)
+add_test(NAME app_info_registry COMMAND test_app_info_registry)
+
+add_executable(test_app_info_install tests/test_app_info_install.cpp)
+target_link_libraries(test_app_info_install sotc_core)
+add_test(NAME app_info_install COMMAND test_app_info_install)
+
+add_executable(test_registry_owner tests/test_registry_owner.cpp)
+target_link_libraries(test_registry_owner sotc_core)
+add_test(NAME registry_owner COMMAND test_registry_owner)
+
+add_executable(test_container_dtor_1bede0 tests/test_container_dtor_1bede0.cpp)
+target_link_libraries(test_container_dtor_1bede0 sotc_core)
+add_test(NAME container_dtor_1bede0 COMMAND test_container_dtor_1bede0)
+
+add_executable(test_registry_slot tests/test_registry_slot.cpp)
+target_link_libraries(test_registry_slot sotc_core)
+add_test(NAME registry_slot COMMAND test_registry_slot)
+
+add_executable(test_app_info_collect tests/test_app_info_collect.cpp)
+target_link_libraries(test_app_info_collect sotc_core)
+add_test(NAME app_info_collect COMMAND test_app_info_collect)
+
+add_executable(test_appinfo_listb tests/test_appinfo_listb.cpp)
+target_link_libraries(test_appinfo_listb sotc_core)
+add_test(NAME appinfo_listb COMMAND test_appinfo_listb)
+
+add_executable(test_app_info_snapshot tests/test_app_info_snapshot.cpp)
+target_link_libraries(test_app_info_snapshot sotc_core)
+add_test(NAME app_info_snapshot COMMAND test_app_info_snapshot)
+
+add_executable(test_insert_1bdc80 tests/test_insert_1bdc80.cpp)
+target_link_libraries(test_insert_1bdc80 sotc_core)
+add_test(NAME insert_1bdc80 COMMAND test_insert_1bdc80)
+
+add_executable(test_owner_properties_2569d0 tests/test_owner_properties_2569d0.cpp)
+target_link_libraries(test_owner_properties_2569d0 sotc_core)
+add_test(NAME owner_properties_2569d0 COMMAND test_owner_properties_2569d0)
+
+add_executable(test_owner_prop_bag tests/test_owner_prop_bag.cpp)
+target_link_libraries(test_owner_prop_bag sotc_core)
+add_test(NAME owner_prop_bag COMMAND test_owner_prop_bag)
+
+add_executable(test_owner_members tests/test_owner_members.cpp)
+target_link_libraries(test_owner_members sotc_core)
+add_test(NAME owner_members COMMAND test_owner_members)
+
+add_executable(test_owner_simple_ctors tests/test_owner_simple_ctors.cpp)
+target_link_libraries(test_owner_simple_ctors sotc_core)
+add_test(NAME owner_simple_ctors COMMAND test_owner_simple_ctors)
+
+add_executable(test_owner_ctor_b111e0_slot48 tests/test_owner_ctor_b111e0_slot48.cpp)
+target_link_libraries(test_owner_ctor_b111e0_slot48 sotc_core)
+add_test(NAME owner_ctor_b111e0_slot48 COMMAND test_owner_ctor_b111e0_slot48)
+
+add_executable(test_owner_ctor_b11210_slot58 tests/test_owner_ctor_b11210_slot58.cpp)
+target_link_libraries(test_owner_ctor_b11210_slot58 sotc_core)
+add_test(NAME owner_ctor_b11210_slot58 COMMAND test_owner_ctor_b11210_slot58)
+
+add_executable(test_owner_ctor_a5c850 tests/test_owner_ctor_a5c850.cpp)
+target_link_libraries(test_owner_ctor_a5c850 sotc_core)
+add_test(NAME owner_ctor_a5c850 COMMAND test_owner_ctor_a5c850)
+
+add_executable(test_owner_dtor_a5cb30 tests/test_owner_dtor_a5cb30.cpp)
+target_link_libraries(test_owner_dtor_a5cb30 sotc_core)
+add_test(NAME owner_dtor_a5cb30 COMMAND test_owner_dtor_a5cb30)
+
+add_executable(test_shared_str_ctor_f1a0 tests/test_shared_str_ctor_f1a0.cpp)
+target_link_libraries(test_shared_str_ctor_f1a0 sotc_core)
+add_test(NAME shared_str_ctor_f1a0 COMMAND test_shared_str_ctor_f1a0)
+
+add_executable(test_shared_str_resize_f3c0 tests/test_shared_str_resize_f3c0.cpp)
+target_link_libraries(test_shared_str_resize_f3c0 sotc_core)
+add_test(NAME shared_str_resize_f3c0 COMMAND test_shared_str_resize_f3c0)
+
+add_executable(test_resource_id_14c2f0 tests/test_resource_id_14c2f0.cpp)
+target_link_libraries(test_resource_id_14c2f0 sotc_core)
+add_test(NAME resource_id_14c2f0 COMMAND test_resource_id_14c2f0)
+
+add_executable(test_resource_pool tests/test_resource_pool.cpp)
+target_link_libraries(test_resource_pool sotc_core)
+add_test(NAME resource_pool COMMAND test_resource_pool)
+
+add_executable(test_app_info_run tests/test_app_info_run.cpp)
+target_link_libraries(test_app_info_run sotc_core)
+add_test(NAME app_info_run COMMAND test_app_info_run)
+
+add_executable(test_snapshot_bug_data tests/test_snapshot_bug_data.cpp)
+target_link_libraries(test_snapshot_bug_data sotc_core)
+add_test(NAME snapshot_bug_data COMMAND test_snapshot_bug_data)
+
+add_executable(test_screenshot_contract tests/test_screenshot_contract.cpp)
+target_link_libraries(test_screenshot_contract sotc_core)
+add_test(NAME screenshot_contract COMMAND test_screenshot_contract)
+
+add_executable(test_frame_root tests/test_frame_root.cpp)
+target_link_libraries(test_frame_root sotc_core)
+add_test(NAME frame_root COMMAND test_frame_root)
+
+add_executable(test_platform_tag_147e20 tests/test_platform_tag_147e20.cpp)
+target_link_libraries(test_platform_tag_147e20 sotc_core)
+add_test(NAME platform_tag_147e20 COMMAND test_platform_tag_147e20)
+
+add_executable(test_camera_location_25a4d0 tests/test_camera_location_25a4d0.cpp)
+target_link_libraries(test_camera_location_25a4d0 sotc_core)
+add_test(NAME camera_location_25a4d0 COMMAND test_camera_location_25a4d0)
+
+add_executable(test_list_dtor_1bdeb0 tests/test_list_dtor_1bdeb0.cpp)
+target_link_libraries(test_list_dtor_1bdeb0 sotc_core)
+add_test(NAME list_dtor_1bdeb0 COMMAND test_list_dtor_1bdeb0)
+
+add_executable(test_alloc_wrappers_17070 tests/test_alloc_wrappers_17070.cpp)
+target_link_libraries(test_alloc_wrappers_17070 sotc_core)
+add_test(NAME alloc_wrappers_17070 COMMAND test_alloc_wrappers_17070)
+
+add_executable(test_shared_release_f590 tests/test_shared_release_f590.cpp)
+target_link_libraries(test_shared_release_f590 sotc_core)
+add_test(NAME shared_release_f590 COMMAND test_shared_release_f590)
+
+add_executable(test_insert_1bde30 tests/test_insert_1bde30.cpp)
+target_link_libraries(test_insert_1bde30 sotc_core)
+add_test(NAME insert_1bde30 COMMAND test_insert_1bde30)
+
+add_executable(test_insert_1beeb0 tests/test_insert_1beeb0.cpp)
+target_link_libraries(test_insert_1beeb0 sotc_core)
+add_test(NAME insert_1beeb0 COMMAND test_insert_1beeb0)
+
+add_executable(test_insert_21cd0 tests/test_insert_21cd0.cpp)
+target_link_libraries(test_insert_21cd0 sotc_core)
+add_test(NAME insert_21cd0 COMMAND test_insert_21cd0)
+
+add_executable(test_capture_a473b0 tests/test_capture_a473b0.cpp)
+target_link_libraries(test_capture_a473b0 sotc_core)
+add_test(NAME capture_a473b0 COMMAND test_capture_a473b0)
+
+add_executable(test_appmain_init_ctor_98a90_slice tests/test_appmain_init_ctor_98a90_slice.cpp)
+target_link_libraries(test_appmain_init_ctor_98a90_slice sotc_core)
+add_test(NAME appmain_init_ctor_98a90_slice COMMAND test_appmain_init_ctor_98a90_slice)
+set_tests_properties(appmain_init_ctor_98a90_slice PROPERTIES
+  ENVIRONMENT "SOTC_INPUTTABLE_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/inputtable_551140_names.bin")
 
 add_executable(test_page_owner_map tests/test_page_owner_map.cpp)
 target_link_libraries(test_page_owner_map sotc_core)
@@ -1518,3 +1930,178 @@ target_link_libraries(test_allocator_front sotc_core)
 add_test(NAME allocator_front COMMAND test_allocator_front)
 
 add_subdirectory(api)
+
+# GPU-01-METAL-CAPTURE-PROVIDER-01: direct-Metal offscreen capture provider (Objective-C++).
+# Appended so existing target order is untouched; project-wide arm64 + sanitizer flags apply.
+enable_language(OBJCXX)
+set(CMAKE_OBJCXX_STANDARD 20)
+set(CMAKE_OBJCXX_STANDARD_REQUIRED ON)
+add_library(sotc_metal STATIC platform/metal_capture.mm)
+target_compile_options(sotc_metal PRIVATE -Wall -Wextra -Werror)
+target_link_libraries(sotc_metal PUBLIC sotc_core
+  "-framework Metal"
+  "-framework Foundation"
+  "-framework ImageIO"
+  "-framework CoreGraphics")
+add_executable(test_metal_capture tests/test_metal_capture.cpp)
+target_link_libraries(test_metal_capture sotc_metal sotc_core)
+add_test(NAME metal_capture COMMAND test_metal_capture)
+set_tests_properties(metal_capture PROPERTIES SKIP_RETURN_CODE 77)
+
+# GPU-03-CMSH-RAW-POSIDX-01: raw POS0 float3 / U16 index subset for asset-derived frames.
+add_library(sotc_cmsh_mesh STATIC platform/cmsh_mesh.cpp)
+add_executable(test_cmsh_mesh tests/test_cmsh_mesh.cpp)
+target_link_libraries(test_cmsh_mesh PRIVATE sotc_cmsh_mesh)
+add_test(NAME cmsh_mesh COMMAND test_cmsh_mesh)
+
+# GPU-03-RENDEROPS-ASSET-FRAME-01: host-handle typed render command list and fail-visible validation.
+add_library(sotc_render_ops STATIC platform/render_ops.cpp)
+add_executable(test_render_ops tests/test_render_ops.cpp)
+target_link_libraries(test_render_ops PRIVATE sotc_render_ops)
+add_test(NAME render_ops COMMAND test_render_ops)
+
+# GPU-03-RENDEROPS-ASSET-FRAME-01: direct-Metal executor for typed indexed meshes and depth.
+add_library(sotc_metal_asset_frame STATIC platform/metal_asset_frame.mm)
+target_compile_options(sotc_metal_asset_frame PRIVATE -Wall -Wextra -Werror)
+target_link_libraries(sotc_metal_asset_frame PUBLIC sotc_metal sotc_cmsh_mesh sotc_render_ops)
+add_executable(test_metal_asset_frame tests/test_metal_asset_frame.cpp)
+target_link_libraries(test_metal_asset_frame PRIVATE sotc_metal_asset_frame)
+add_test(NAME metal_asset_frame COMMAND test_metal_asset_frame)
+set_tests_properties(metal_asset_frame PROPERTIES
+  SKIP_RETURN_CODE 77
+  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/.."
+  ENVIRONMENT "MTL_DEBUG_LAYER=1;MTL_SHADER_VALIDATION=1;MTL_SHADER_VALIDATION_DEFAULT_STATE=all;MTL_SHADER_VALIDATION_ENABLE_ERROR_REPORTING=1;MTL_SHADER_VALIDATION_REPORT_TO_STDERR=1;MTL_SHADER_VALIDATION_ABORT_ON_FAULT=1;SOTC_DEFAULT_PAIR_MSL=${CMAKE_SOURCE_DIR}/../local/validation/gcn-default-root-v1/default-pair.metal;SOTC_ASSET_FRAME_DUMP=${CMAKE_SOURCE_DIR}/../local/validation/gpu03-r31/synthetic-asset-frame.png")
+
+# GPU-03-RENDEROPS-TEXTURE-SAMPLER-01: synthetic fragment texture/sampler resource binding.
+add_executable(test_metal_texture_binding tests/test_metal_texture_binding.cpp)
+target_link_libraries(test_metal_texture_binding PRIVATE sotc_metal_asset_frame)
+add_test(NAME metal_texture_binding COMMAND test_metal_texture_binding)
+set_tests_properties(metal_texture_binding PROPERTIES
+  SKIP_RETURN_CODE 77
+  ENVIRONMENT "MTL_DEBUG_LAYER=1;MTL_SHADER_VALIDATION=1;MTL_SHADER_VALIDATION_DEFAULT_STATE=all;MTL_SHADER_VALIDATION_ENABLE_ERROR_REPORTING=1;MTL_SHADER_VALIDATION_REPORT_TO_STDERR=1;MTL_SHADER_VALIDATION_ABORT_ON_FAULT=1")
+
+# --- APP-01-SOCGAMECORE-EXE-01: native SoCGameCore auxiliary executable (protocol v1) -----------
+# One JSON object per line on stdout; exit codes 0/2/3/4/5. Links the versioned ABI and the core.
+add_library(soc_core_status_json STATIC app/core_status_json.cpp)
+target_include_directories(soc_core_status_json PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/app)
+
+add_executable(soc_game_core app/soc_game_core_main.cpp)
+set_target_properties(soc_game_core PROPERTIES OUTPUT_NAME SoCGameCore)
+target_link_libraries(soc_game_core PRIVATE soc_core_status_json sotc_api sotc_core)
+
+add_executable(test_core_status_json tests/test_core_status_json.cpp)
+target_link_libraries(test_core_status_json PRIVATE soc_core_status_json)
+add_test(NAME core_status_json COMMAND test_core_status_json)
+
+# Spawn the real executable and pin protocol bytes, exit codes and serve framing.
+find_program(SOTC_PYTHON3 NAMES python3)
+if(SOTC_PYTHON3)
+  set(SOTC_FCORE_CHECK ${CMAKE_CURRENT_SOURCE_DIR}/../tools/lift/check_fcore_status.py)
+  foreach(sotc_case status coverage start serve validate)
+    add_test(NAME soc_game_core_${sotc_case}
+      COMMAND ${SOTC_PYTHON3} ${SOTC_FCORE_CHECK} --exe $<TARGET_FILE:soc_game_core> --only ${sotc_case})
+  endforeach()
+else()
+  message(STATUS "python3 not found: SoCGameCore protocol ctests fall back to --status only")
+  add_test(NAME soc_game_core_status COMMAND soc_game_core --status)
+  set_tests_properties(soc_game_core_status PROPERTIES
+    PASS_REGULAR_EXPRESSION "\"schema\":\"sotc.core.status.v1\"")
+endif()
+
+# CPU-01-CTOR-COVERAGE-BATCH-01: original-table coverage (573 rows), the last missing leaf_vec_copy
+# module (index 95), and the production registration coverage test. Appended without reordering any
+# existing target; the two new core sources are added with target_sources instead of editing the
+# existing source list.
+target_sources(sotc_core PRIVATE core/vec_d71f60.cpp core/ctor_original_table.cpp)
+
+add_executable(test_vec_d71f60 tests/test_vec_d71f60.cpp)
+target_link_libraries(test_vec_d71f60 sotc_core)
+add_test(NAME vec_d71f60 COMMAND test_vec_d71f60)
+
+add_executable(test_startup_ctor_coverage tests/test_startup_ctor_coverage.cpp)
+target_link_libraries(test_startup_ctor_coverage sotc_core)
+add_test(NAME startup_ctor_coverage COMMAND test_startup_ctor_coverage)
+set_tests_properties(startup_ctor_coverage PROPERTIES
+  ENVIRONMENT "SOTC_SLOT23_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/slot23_e71990_names.bin")
+
+# CPU-01-OWNER-ROW14-01: row-14 constructor `0xa597d0` + its context-free owner_members adapter.
+add_executable(test_owner_ctor_a597d0 tests/test_owner_ctor_a597d0.cpp)
+target_link_libraries(test_owner_ctor_a597d0 sotc_core)
+add_test(NAME owner_ctor_a597d0 COMMAND test_owner_ctor_a597d0)
+
+# CPU-01-OWNER-ROW21-01: row-21 owner constructor `0x4a690` (appended so existing targets keep
+# their order). Source list addition is deferred to target_sources for the same reason.
+target_sources(sotc_core PRIVATE core/owner_ctor_4a690.cpp)
+add_executable(test_owner_ctor_4a690 tests/test_owner_ctor_4a690.cpp)
+target_link_libraries(test_owner_ctor_4a690 sotc_core)
+add_test(NAME owner_ctor_4a690 COMMAND test_owner_ctor_4a690)
+
+# SAV-02-RELAUNCH-01: cross-process persistence proof for the native save transaction.
+add_executable(test_save_relaunch tests/test_save_relaunch.cpp)
+target_link_libraries(test_save_relaunch sotc_core)
+add_test(NAME save_relaunch COMMAND test_save_relaunch)
+
+# CPU-01-STARTUP-SLOTS-296-297-300-01: three recovered startup constructors (TSC stamp thunk,
+# 400-record table initializer, inert atexit thunk). Appended; existing target order is untouched.
+target_sources(sotc_core PRIVATE
+  core/ctor_slot_296_b2b6b0.cpp
+  core/ctor_slot_297_b25470.cpp
+  core/ctor_slot_300_acc880.cpp)
+
+add_executable(test_ctor_slots_296_297_300 tests/test_ctor_slots_296_297_300.cpp)
+target_link_libraries(test_ctor_slots_296_297_300 sotc_core)
+add_test(NAME ctor_slots_296_297_300 COMMAND test_ctor_slots_296_297_300)
+
+# CPU-01-OWNER-ROWS-3-18-01: row-3 (ResourcePool, `0x14db00`) and row-18 (`0x3c5cb0`) owner
+# constructors + their context-free owner_members adapters. Appended; existing targets keep order.
+target_sources(sotc_core PRIVATE
+  core/owner_ctor_3c5cb0.cpp
+  core/owner_ctor_14db00.cpp)
+
+add_executable(test_owner_ctor_3c5cb0 tests/test_owner_ctor_3c5cb0.cpp)
+target_link_libraries(test_owner_ctor_3c5cb0 sotc_core)
+add_test(NAME owner_ctor_3c5cb0 COMMAND test_owner_ctor_3c5cb0)
+
+add_executable(test_owner_ctor_14db00 tests/test_owner_ctor_14db00.cpp)
+target_link_libraries(test_owner_ctor_14db00 sotc_core)
+add_test(NAME owner_ctor_14db00 COMMAND test_owner_ctor_14db00)
+
+# CPU-01-CONCMD-298-299-301-01: shared ConCmd base/registry, the bool and ranged console-variable
+# shapes, the debug-menu item, and the startup slots 298 (shaderTypeToLoad), 299 (debug text scale)
+# and 301 (rumbleEnabled). Appended; existing
+# target order is untouched.
+target_sources(sotc_core PRIVATE
+  core/concmd_base.cpp
+  core/concmd_vars.cpp
+  core/debug_menu_item.cpp
+  core/ctor_slot_298_b0e250.cpp
+  core/ctor_slot_299_b0c7a0.cpp
+  core/ctor_slot_301_ac9550.cpp)
+
+add_executable(test_concmd_slots_298_299_301 tests/test_concmd_slots_298_299_301.cpp)
+target_link_libraries(test_concmd_slots_298_299_301 sotc_core)
+add_test(NAME concmd_slots_298_299_301 COMMAND test_concmd_slots_298_299_301)
+
+# CPU-01-CONCMD-303-01: startup slot 303 (0xa82170), the `ProfileCPU` bool console variable and its
+# "Profile CPU" debug-menu toggle. Reuses the bool-var shape (now parameterised on value/default)
+# and the debug-menu toggle from the 298/299/301 batch. Appended; existing target order untouched.
+target_sources(sotc_core PRIVATE
+  core/ctor_slot_303_a82170.cpp)
+
+add_executable(test_ctor_slot_303 tests/test_ctor_slot_303.cpp)
+target_link_libraries(test_ctor_slot_303 sotc_core)
+add_test(NAME ctor_slot_303 COMMAND test_ctor_slot_303)
+
+# CPU-01-STARTUP-302-303-305-01: ten handles/cleanup records and six guarded pair copies.
+target_sources(sotc_core PRIVATE core/ctor_slot_302_aaeee0.cpp core/ctor_slot_305_a77b60.cpp)
+add_executable(test_ctor_slot_302_305 tests/test_ctor_slot_302_305.cpp)
+target_link_libraries(test_ctor_slot_302_305 sotc_core)
+add_test(NAME ctor_slot_302_305 COMMAND test_ctor_slot_302_305)
+
+# GPU-01-CSDR-READER-01: importer-only raw shader-container reader and metadata diagnostic.
+target_sources(sotc_core PRIVATE core/csdr_container.cpp)
+add_executable(test_csdr_container tests/test_csdr_container.cpp)
+target_link_libraries(test_csdr_container sotc_core)
+add_test(NAME csdr_container COMMAND test_csdr_container)
+add_executable(csdr_inspect ../tools/dev/csdr_inspect.cpp)
+target_link_libraries(csdr_inspect PRIVATE sotc_core)

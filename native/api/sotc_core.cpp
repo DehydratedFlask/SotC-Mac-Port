@@ -106,6 +106,51 @@ std::string ctor_note(const sotc_ctor_prefix& c) {
   return b;
 }
 
+// ---- coverage detail: the constructor table measured against the original 573-slot list ----
+
+std::string ctor_coverage_detail(const sotc_ctor_prefix& c) {
+  if (!c.linked) {
+    return "ABI library built without the native core library; not measured";
+  }
+#if SOTC_API_WITH_CORE_LIB
+  constexpr std::uint32_t kOriginalSlots = 573;
+  bool present[kOriginalSlots] = {};
+  std::uint32_t recovered = 0;
+  for (const sotc::CtorSlot& slot : sotc::recovered_constructors()) {
+    if (slot.original_index < kOriginalSlots && !present[slot.original_index]) {
+      present[slot.original_index] = true;
+      ++recovered;
+    }
+  }
+  bool has_first = false;
+  std::uint32_t first = 0;
+  for (std::uint32_t i = 0; i < kOriginalSlots; ++i) {
+    if (!present[i]) {
+      has_first = true;
+      first = i;
+      break;
+    }
+  }
+  const std::string first_text = has_first ? std::to_string(first) : std::string("none");
+  std::string detail = std::to_string(recovered) + " of " + std::to_string(kOriginalSlots) +
+                       " original constructor slots recovered; first unrecovered index " + first_text + "; ";
+  if (c.run_ok) {
+    detail += std::to_string(c.completed) + " registered slots ran OK";
+  } else if (c.callback_failed) {
+    char rva[16];
+    std::snprintf(rva, sizeof rva, "0x%x", c.blocked_on_rva);
+    detail += std::to_string(c.completed) + " registered slots ran, a callback failed at original RVA " + rva;
+  } else {
+    char rva[16];
+    std::snprintf(rva, sizeof rva, "0x%x", c.blocked_on_rva);
+    detail += std::to_string(c.completed) + " registered slots ran, blocked at original RVA " + rva;
+  }
+  return detail;
+#else
+  return "ABI library built without the native core library; not measured";
+#endif
+}
+
 // ---- asset validation (same checks and wording as the launcher's AssetValidator) ----
 
 void run_validation(const std::string& dir, sotc_validation_result& r) {
@@ -393,15 +438,17 @@ sotc_error sotc_core_coverage(sotc_coverage_report* out) {
 
   struct Row { const char* name; uint32_t status; std::string detail; };
   const Row rows[SOTC_SUBSYSTEM_COUNT] = {
-      {"startup_constructors",
-       out->ctor.linked ? SOTC_SUBSYSTEM_PARTIAL : SOTC_SUBSYSTEM_NOT_LINKED,
-       out->ctor.linked ? ctor_note(out->ctor) : "ABI library built without the native core library; not measured"},
+      {"startup_constructors", out->ctor.linked ? SOTC_SUBSYSTEM_PARTIAL : SOTC_SUBSYSTEM_NOT_LINKED,
+       ctor_coverage_detail(out->ctor)},
       {"engine_boot", SOTC_SUBSYSTEM_NOT_IMPLEMENTED,
        "no engine; sotc_core_start() always returns SOTC_ERR_ENGINE_NOT_IMPLEMENTED"},
-      {"metal_renderer", SOTC_SUBSYSTEM_NOT_IMPLEMENTED, "no Metal rendering code in native/"},
+      {"metal_renderer", SOTC_SUBSYSTEM_NOT_IMPLEMENTED,
+       "no Metal renderer: the offscreen capture provider exists but no game frame is rendered; "
+       "G3 NOT RUN"},
       {"audio", SOTC_SUBSYSTEM_NOT_IMPLEMENTED, "no audio output or mixing code in native/"},
-      {"save_load", SOTC_SUBSYSTEM_NOT_IMPLEMENTED,
-       "checksum and chunk-header helpers exist in native/core; no save or load path"},
+      {"save_load", SOTC_SUBSYSTEM_PARTIAL,
+       "fixture-verified USR-DATA transaction and metadata (E601/E604/E606); no platform save or real PS4 "
+       "acceptance"},
   };
   for (uint32_t i = 0; i < SOTC_SUBSYSTEM_COUNT; ++i) {
     copy_text(out->subsystems[i].name, rows[i].name);

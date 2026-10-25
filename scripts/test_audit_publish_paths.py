@@ -135,6 +135,41 @@ class PublishPathTests(unittest.TestCase):
             "native/local_tests/a.c",
             "tools/graft/README.md",
             "docs/Shadow of the Colossus notes.md",
+            # Exact `reference` and `logs` components stay forbidden at any depth;
+            # lookalike names under allowlisted roots remain allowed.
+            "docs/reference-notes/notes.md",
+            "tools/logs-build/build-notes.txt",
+            "scripts/references/helpers.py",
+        ]
+        self.assertEqual(audit.violations(cases), [])
+
+    def test_final_component_forbidden_dir_name_rejected(self):
+        # A gitlink/submodule or directory whose FINAL component is a forbidden
+        # dir name must fail: there is no trailing "/" in `git ls-files` output,
+        # so an "any component except the last" rule let `tools/local` through.
+        cases = [
+            "tools/local",
+            "native/x/local",
+            "tools/local/",
+            "docs/reference",
+            "tools/logs",
+            "launcher/vendor/AgentStores",
+            "native/x/Shadow of the Colossus",
+        ]
+        for path in cases:
+            with self.subTest(path=path):
+                self.assertTrue(audit.violations([path]), path)
+
+    def test_final_component_lookalikes_still_allowed(self):
+        # Rejecting a reserved dir name in the last position must not reject
+        # ordinary files that merely start with or extend that word.
+        cases = [
+            "tools/local.md",
+            "docs/local_notes.md",
+            "docs/reference-notes.md",
+            "tools/logs_parser.py",
+            "native/local_tests/a.c",
+            "docs/localization.md",
         ]
         self.assertEqual(audit.violations(cases), [])
 

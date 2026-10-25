@@ -30,7 +30,11 @@ enters `SOTC_STATE_RUNNING`; every "engine" field in a result is a measured fact
   `sotc_core_last_error_message`.
 - `sotc_core_coverage`: ctor-runner prefix plus five subsystem rows (`startup_constructors`,
   `engine_boot`, `metal_renderer`, `audio`, `save_load`) with `NOT_IMPLEMENTED` / `PARTIAL` /
-  `IMPLEMENTED` / `NOT_LINKED`. Nothing reports `IMPLEMENTED`.
+  `IMPLEMENTED` / `NOT_LINKED`. Nothing reports `IMPLEMENTED`. `startup_constructors` is `PARTIAL`
+  with a detail computed from `recovered_constructors()` (`N of 573 original constructor slots
+  recovered; first unrecovered index I; M registered slots ran OK/blocked at RVA ...`, never
+  hard-coded numbers). `save_load` is `PARTIAL` for the fixture-verified USR-DATA transaction and
+  metadata only (no platform save, no real PS4 acceptance).
 - Out-structs start with `uint32_t struct_size`; the library requires >= the v1 size, writes only the v1 prefix.
 
 ## Constructor-runner prefix
