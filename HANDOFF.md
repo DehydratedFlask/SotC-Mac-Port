@@ -1,5 +1,31 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 11:02 CDT — raw material selector task claimed
+
+- Integrator: Codex `/root`; task `GPU-02-RAW-MATERIAL-SELECTOR-01`, ACTIVE, attempt 0. Clean local
+  `main` and `origin/main` were both at `d6d2f0782c877737f1af41b944ed88b4f754767b` before this
+  claim. No source or private assets were changed; implementation tests are NOT RUN.
+- Claim checkpoint: [raw default-material selector](docs/checkpoints/2026-10-25-gpu02-raw-material-selector.md).
+  E682 pins `default.cmat` (171 B, SHA-256 `0c2233c1aab20cfc1da914de96fd1cbd0a20e37964024d54e10e36b260c6d29`)
+  and `standard_4030788106.csdr` (1,988 B, SHA-256
+  `c4214e4ee0852a962ce56e0cab0befbe3169698cb354bc62afa7eab4d1f3f356`).
+- Scope: exact PSARC MD5(path) lookups, raw-byte selector proof, CSDR structural parsing, E627 VS/PS
+  span match and existing MSL/oracle replay. Unknown or ambiguous bytes fail closed. Raw assets only;
+  `0x8C`, constants/layout interpretation, mesh/texture decoding and game-frame claims are excluded.
+- Exact commands/results: `git status --short --branch` clean on `main`; `git rev-parse HEAD origin/main`
+  returned the same `d6d2f07` commit; `trail ask` and `trail skeleton scripts/psarc.py` located
+  `parse_raw_csdr`, `Psarc.entry_index/read`, and existing E627 lowerer/oracle code. `trail build
+  --check` passed at 8,571 wiring nodes; `python3 scripts/project_index.py` wrote 20,421 folders
+  and `--check` passed. Logs are under `local/validation/gpu02-raw-material-selector-claim-20261025/`.
+  An initial project-index check ran before its output log existed and reported the resulting inventory
+  stale; regenerated with all log files present, then check passed. No implementation test/build run.
+- Remaining risks: asset selector use by the game is not established by the literal path alone; raw
+  member replay and acceptance checks remain NOT RUN. The `.cmat` constants remain UNKNOWN.
+- Next exact action: implement and test the isolated verifier in a new `tools/dev/` module, without
+  changing the shared Metal renderer test; keep all extracted bytes and generated evidence in
+  `local/`.
+- Status: claim only; verification and publication pending.
+
 ## 2026-10-25 10:58 CDT — GPU-03 fixture published on main
 
 - Integrator: Codex `/root`; task `GPU-03-LOGO-VS-PS-RAW-CMSH-FRAME-01`. The owner-directed main
