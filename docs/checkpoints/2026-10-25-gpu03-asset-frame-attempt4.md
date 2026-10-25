@@ -78,8 +78,16 @@ asset bytes, generated MSL, PNG, or logs are staged.
   helper. Deep/concept layer remains unbuilt and is not required for this wiring check.
 - Pre-publication path audit: staged **8/8** allowlisted paths; all-path audit **2,788/2,788**.
   The first `git diff --cached --check` found trailing Markdown hardbreak spaces in this checkpoint;
-  they were removed. The final cached-diff result will be recorded in the main publication
-  closeout.
+  they were removed and the final cached-diff check passed. The owner identity audit passed for
+  `origin/main..HEAD` before commit.
+
+## GitHub publication
+
+Owner commit `0f67022cea442727326af7b675942929add1f4c0` (`test(metal): validate asset index mutations
+through interpolants`) was pushed to GitHub `main` per the user's instruction. After a fresh fetch,
+local `main` and `origin/main` both resolve to this SHA and the worktree is clean. The commit author
+and committer are Johnny Wang (`dehydratedflask@users.noreply.github.com`); it contains no
+Claude/Anthropic coauthor trailer. [E651](../EVIDENCE.md) records publication.
 
 ## Limits and next state
 
