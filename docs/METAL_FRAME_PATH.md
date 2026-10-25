@@ -322,9 +322,9 @@ Program blobs (code offset in the `.csdr` file, length, `BinaryInfo` offset, sha
 selector literal occurrence and CSDR spans (E684), plus a fail-closed standalone verifier and tests
 (16/16), a fresh arm64 Metal replay, and the E627 MSL/oracle baseline replay (2,141 cases, 34,256
 components, max absolute error 0; E686/E687). The verifier and tests received an independent
-read-only review. The `.cmat` constants/layout and
-engine consumption remain UNKNOWN; this task does not decode `0x8C`, interpret mesh/texture streams,
-or claim a game-driven frame. Source publication to `main` is pending.
+read-only review. Source and checkpoint were published to `main` in E688. The `.cmat`
+constants/layout and engine consumption remain UNKNOWN; this task does not decode `0x8C`, interpret
+mesh/texture streams, or claim a game-driven frame.
 
 Encoding-class inventory (approximate; a classifier by encoding bits, with literal-dword handling, not a
 disassembler): default VS `SMRD 8, MUBUF 2, VOP2 17, VOP1 8, VOP3 7, EXP 3, SOPP 7, SOP1 2`; default PS

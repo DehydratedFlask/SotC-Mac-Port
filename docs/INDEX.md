@@ -24,7 +24,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Logo PS principal reassessment](escalations/GPU-02-GCN-LOGO-PS-IMAGE-SAMPLE-01.md) | Three unsuccessful test hypotheses, recorded root reassessment, and passed fourth focused replay |
 | [Logo PS PR #12 merge closeout](checkpoints/2026-10-25-gpu02-logo-ps-merge-pr12.md) | PR #12 merged as `a07d451`; local and remote task branches removed; clean local `main` verified |
 | [GFX7 default-pair inventory and Metal harness](checkpoints/2026-10-24-gcn-default-pair.md) | E625 inventory plus E627 bounded default VS/PS MSL; overall G3 is PARTIAL from later synthetic Metal harness work |
-| [Raw default-material selector](checkpoints/2026-10-25-gpu02-raw-material-selector.md) | E682/E683 claim; E684 exact raw pins/spans; E686 verifier, 16/16 tests, fresh Metal replay and 2,141-case oracle; E687 project gates; publication pending |
+| [Raw default-material selector](checkpoints/2026-10-25-gpu02-raw-material-selector.md) | E682/E683 claim; E684 raw pins/spans; E686 verifier/tests/Metal replay; E687 project gates; E688 publication; E689 read-only triage found no next READY Metal or startup task |
 | [CSDR reader corpus and review](checkpoints/2026-10-24-csdr-reader.md) | E626 structural-first attempt3, arbitrary `cc xx`, full corpus v5 and independent review |
 | [Round 30 integration](checkpoints/2026-10-24-round30-integration.md) | Root replay: CTest 388/388, lift checkers 476/0/0, Python 228/228, shader harness and outstanding game gates; E628 |
 | [GPU-03 L1 asset-derived frame claim](checkpoints/2026-10-24-gpu03-claim.md) | E629 pins raw `cube_1m`/`cone` geometry; native reader and direct-Metal draw are active; no game-frame/G3 PASS claim |

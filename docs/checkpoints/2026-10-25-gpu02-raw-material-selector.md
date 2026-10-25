@@ -1,5 +1,33 @@
 # GPU-02 raw default-material selector — claim
 
+## 2026-10-25 11:38 CDT — post-publication task triage
+
+- Read-only scouts found no existing READY/unblocked follow-up in the Metal/raw-asset queue or the
+  startup queue. The TEX0 format-6 task remains UNKNOWN from E662 pending new authoritative evidence;
+  the owner decision to defer `0x8C` remains in force (E665).
+- Startup's first gap remains slot 306 / RVA `0xa633b0`. E676 records an 8,461-byte body, 11
+  unresolved indirect calls, and no proven incoming direct code-call edge. Slot 307 is present at
+  `0xa5b090`, but surveying it now would skip the first unresolved gap. The scouts read project docs
+  only; they did not read executable bytes, edit source, or run tests.
+- Next task needs an owner choice: (a) a bounded analysis following one selected unresolved edge for
+  slot 306, or (b) a broader constructor-contract analysis. No new task was claimed. Ask before
+  creating the task card or starting source/reverse-engineering work.
+
+## 2026-10-25 11:34 CDT — source and evidence published to main (E688)
+
+- Commit `e6cc690419e0d7acd278041f562115277f9186b0` pushed to `origin main` (exit 0).
+  `git fetch origin main` confirms `HEAD == origin/main`; the worktree is clean on `main`; no open
+  PRs remain; remote query confirms the old `cursor/init-hash-551140-9dfc` branch is absent.
+- Author/committer: Johnny Wang (`dehydratedflask@users.noreply.github.com`). The commit message has
+  no Claude, Anthropic, or co-author trailer. Staged/all-path audits passed 9/2,802, whitespace and
+  attribution checks passed. The private publication log is
+  `local/validation/gpu02-raw-material-selector-20261025/publication.log`.
+- `GPU-02-RAW-MATERIAL-SELECTOR-01` is **PUBLISHED / FIXTURE_VERIFIED / ARTIFACT_VERIFIED** within
+  its exact raw-member and E627 replay scope. `.cmat` engine consumption/constants, retail bindings,
+  mesh/texture interpretation, `0x8C`, game-driven frame and G3 remain UNKNOWN/PARTIAL.
+- There is no next READY task in the existing Metal/raw-asset queue. Exact next action is to use the
+  read-only startup task triage, then claim only an unblocked bounded task from `docs/TASKS.md`.
+
 ## 2026-10-25 11:31 CDT — implementation, replay and review complete
 
 - Integrator: Codex `/root`; implementation worker `/root/gpu02_raw_selector` owned only the two

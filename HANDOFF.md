@@ -1,11 +1,16 @@
 # SoC Mac Native — current handoff
 
-## 2026-10-25 11:31 CDT — raw material selector replay passed; publication pending
+## 2026-10-25 11:38 CDT — selector published; no unblocked next task is registered
 
 - Integrator: Codex `/root`; task `GPU-02-RAW-MATERIAL-SELECTOR-01`, attempt 0 semantic
-  failures. Checkout is `main` at base `71c578a9b56d4e05bf09c0735ef3ba861c61ca14`, equal to
-  `origin/main` before this task's source publication. The implementation worker and independent
-  read-only reviewer have both finished; review found no remaining findings.
+  failures. Source commit `e6cc690419e0d7acd278041f562115277f9186b0` was pushed to `origin main`
+  (exit 0). Fetch confirmed `HEAD == origin/main == e6cc690419e0d7acd278041f562115277f9186b0`,
+  checkout is clean on `main`, `gh pr list --state open` returned `[]`, and `git ls-remote` shows
+  `main` but not the old `cursor/init-hash-551140-9dfc` branch. Publication log:
+  `local/validation/gpu02-raw-material-selector-20261025/publication.log`.
+- The implementation worker and independent read-only reviewer have finished; source review found
+  no remaining findings. Commit author and committer are Johnny Wang
+  (`dehydratedflask@users.noreply.github.com`); commit body has no Claude/Anthropic/co-author trailer.
 - Source files: `tools/dev/raw_material_selector.py` SHA-256
   `739338e40ece220924c4e79e5ce088727d167b0fb8828c388cb00d1bd6711930` and
   `tools/dev/test_raw_material_selector.py` SHA-256
@@ -44,10 +49,18 @@
   `docs/INDEX.md`, `docs/METAL_FRAME_PATH.md`, `docs/FOLDERS.md`, and the raw-selector checkpoint.
   No dependency/install changed. User data, binaries, generated MSL, logs and PNGs remain under
   ignored `local/`.
-- Next exact action: commit/push the allowlisted source/docs as Johnny Wang with no Claude/Anthropic
-  contributor trailer and push `origin main`. Fetch and verify `HEAD == origin/main`; add a
-  post-push checkpoint. Status: **FIXTURE_VERIFIED / ARTIFACT_VERIFIED**, publication pending;
-  F590 remains ACTIVE because its five original mutation cases are still unavailable.
+- Published source/docs are the two tools and seven root-owned documentation files listed above.
+  Status: **PUBLISHED / FIXTURE_VERIFIED / ARTIFACT_VERIFIED** for the bounded selector and E627
+  replay. Read-only triage found no next READY Metal/raw-asset or startup task. Startup still stops at
+  the first unresolved gap, slot 306 / RVA `0xa633b0`; E676 records an 8,461-byte body and 11
+  unresolved indirect calls, so moving to slot 307 would skip the gap. No source or executable bytes
+  were accessed in the triage. A new task needs an owner choice between one selected unresolved-edge
+  analysis for slot 306 and a broader constructor-contract analysis; no task was claimed. F590 remains
+  ACTIVE because its five original mutation cases are still unavailable. G3 remains PARTIAL.
+- Exact next action: get the owner's choice for the next bounded task, then update `docs/TASKS.md` and
+  claim it before any implementation or static-analysis work.
+
+## 2026-10-25 11:31 CDT — prior checkpoint: raw material selector replay passed; publication pending
 
 ## 2026-10-25 11:11 CDT — prior checkpoint: raw material bytes verified; source replay pending
 
