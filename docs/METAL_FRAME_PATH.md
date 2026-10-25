@@ -462,6 +462,16 @@ mapping. It binds one explicit RGBA8 texture/sampler at slot 0 and compares sele
 with the independent CPU sampler/fp16-RTZ oracle, including deterministic repeat and a visible
 texture mutation. Direct PNG evidence stays under `local/`.
 
+E658 passes this combined fixture with Metal API and GPU validation enabled. It parses the pinned
+850-byte cube (24 positions/36 indices) and 1,462-byte cone (42/114) raw members. The CPU coverage
+search selected interior readback pixels `(20,30)` and `(43,27)` from actual mesh indices; their
+synthetic UVs selected source texels `(93,65)` and `(134,68)`. Both matched the independent oracle,
+the repeat frame was byte-identical, and the source-texel mutation changed the readback and PNG.
+Private 64x64 PNG hashes are `5aa812cfd4db7056c7cb7c9193a7edc445e5e1ede23fa110b83580f667959154`
+and `a6e72b7044326b63619e7e64d4ef9ebc70e3421d61a14643e1d6c313bbb7c57c`. The focused CTest passed
+1/1, full CTest 397/397, and lift checks 481/0/0. An output-only partial texture configuration
+fails visibly before any optional asset read or PNG write.
+
 This is an asset-derived harness combination, not recovered material mapping: TEX0 and NRM0 remain
 opaque; normals and UV projection are harness inputs. It does not establish retail texture or vertex
 descriptors, orientation, WQM/helper-lane equivalence, a game-driven frame, or G3 completion.

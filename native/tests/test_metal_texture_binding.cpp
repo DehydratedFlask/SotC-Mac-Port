@@ -1,5 +1,6 @@
 #include "../platform/metal_asset_frame.hpp"
 #include "../platform/metal_capture.hpp"
+#include "../platform/cmsh_mesh.hpp"
 #include "asset_png_fixture.hpp"
 
 #include <CommonCrypto/CommonDigest.h>
@@ -22,6 +23,7 @@
 #include <string>
 #include <string_view>
 #include <system_error>
+#include <variant>
 #include <vector>
 
 namespace {
@@ -499,6 +501,350 @@ struct MipTextureStorage {
     return output.good();
 }
 
+[[nodiscard]] bool load_pinned_cmsh(const char* path, std::size_t expected_size,
+                                    std::string_view expected_sha256,
+                                    std::size_t expected_positions,
+                                    std::size_t expected_indices,
+                                    std::string_view label, sotc::CmshMesh& mesh) {
+    std::vector<std::uint8_t> raw;
+    const bool read = read_binary_file(path, raw);
+    check(std::string(label) + " raw .cmsh input is read under local/", read);
+    if (!read) return false;
+
+    const std::string digest = sha256_hex(raw);
+    const bool size_ok = raw.size() == expected_size;
+    const bool digest_ok = digest == expected_sha256;
+    check(std::string(label) + " exact raw byte count", size_ok);
+    check(std::string(label) + " exact raw SHA-256", digest_ok);
+    if (!size_ok || !digest_ok) return false;
+
+    const std::span<const std::byte> bytes(
+        reinterpret_cast<const std::byte*>(raw.data()), raw.size());
+    const sotc::CmshParseResult parsed_result = sotc::parse_cmsh_mesh(bytes);
+    const auto* parsed = std::get_if<sotc::CmshMesh>(&parsed_result);
+    check(std::string(label) + " parses as POS0/U16", parsed != nullptr);
+    if (parsed == nullptr) {
+        const auto* parse_error = std::get_if<sotc::CmshParseError>(&parsed_result);
+        std::fprintf(stderr, "FAIL %.*s parse: %s at byte %zu\n",
+                     static_cast<int>(label.size()), label.data(),
+                     parse_error == nullptr ? "unknown error"
+                                            : sotc::cmsh_error_name(parse_error->code),
+                     parse_error == nullptr ? 0 : parse_error->byte_offset);
+        return false;
+    }
+
+    mesh = *parsed;
+    const bool counts_ok = mesh.positions.size() == expected_positions &&
+                           mesh.indices.size() == expected_indices &&
+                           mesh.indices.size() % 3U == 0U;
+    check(std::string(label) + " parsed position/index counts match the pinned fixture",
+          counts_ok);
+    const bool indices_in_range = std::all_of(
+        mesh.indices.begin(), mesh.indices.end(), [&mesh](std::uint16_t index) {
+            return index < mesh.positions.size();
+        });
+    check(std::string(label) + " parsed indices address the pinned positions",
+          indices_in_range);
+    std::printf("logo mesh input %.*s: bytes=%zu sha256=%s positions=%zu indices=%zu\n",
+                static_cast<int>(label.size()), label.data(), raw.size(), digest.c_str(),
+                mesh.positions.size(), mesh.indices.size());
+    return counts_ok && indices_in_range;
+}
+
+[[nodiscard]] bool cmsh_position_bounds(const sotc::CmshMesh& mesh, float& min_x,
+                                        float& max_x, float& min_y, float& max_y) {
+    if (mesh.positions.empty()) return false;
+    min_x = max_x = mesh.positions.front().x;
+    min_y = max_y = mesh.positions.front().y;
+    for (const sotc::CmshPosition& position : mesh.positions) {
+        if (!std::isfinite(position.x) || !std::isfinite(position.y) ||
+            !std::isfinite(position.z)) {
+            return false;
+        }
+        min_x = std::min(min_x, position.x);
+        max_x = std::max(max_x, position.x);
+        min_y = std::min(min_y, position.y);
+        max_y = std::max(max_y, position.y);
+    }
+    return max_x > min_x && max_y > min_y;
+}
+
+[[nodiscard]] bool transform_cmsh_positions_to_clip(
+    const sotc::CmshMesh& mesh, float clip_center_x,
+    std::vector<sotc::CmshPosition>& clip_positions) {
+    float min_x = 0.0F;
+    float max_x = 0.0F;
+    float min_y = 0.0F;
+    float max_y = 0.0F;
+    if (!cmsh_position_bounds(mesh, min_x, max_x, min_y, max_y)) return false;
+
+    constexpr float kMaximumClipSpan = 0.58F;
+    const float source_span = std::max(max_x - min_x, max_y - min_y);
+    const float scale = kMaximumClipSpan / source_span;
+    const float center_x = (min_x + max_x) * 0.5F;
+    const float center_y = (min_y + max_y) * 0.5F;
+    clip_positions.clear();
+    clip_positions.reserve(mesh.positions.size());
+    for (const sotc::CmshPosition& position : mesh.positions) {
+        clip_positions.push_back({(position.x - center_x) * scale + clip_center_x,
+                                  (position.y - center_y) * scale, 0.25F});
+    }
+    return std::all_of(clip_positions.begin(), clip_positions.end(),
+                       [](const sotc::CmshPosition& position) {
+                           return std::isfinite(position.x) && std::isfinite(position.y) &&
+                                  position.x > -1.0F && position.x < 1.0F &&
+                                  position.y > -1.0F && position.y < 1.0F;
+                       });
+}
+
+struct MeshLogoProbe {
+    std::uint32_t output_x{};
+    std::uint32_t output_y{};
+    std::uint32_t texture_x{};
+    std::uint32_t texture_y{};
+    float u{};
+    float v{};
+    float minimum_barycentric{};
+};
+
+[[nodiscard]] bool find_mesh_logo_probe(
+    const std::vector<sotc::CmshPosition>& clip_positions,
+    std::span<const std::uint16_t> indices, float material_x, float material_y,
+    std::span<const std::uint8_t> texture, std::uint32_t texture_width,
+    std::uint32_t texture_height, MeshLogoProbe& probe) {
+    if (indices.empty() || indices.size() % 3U != 0U || texture_width == 0U ||
+        texture_height == 0U) {
+        return false;
+    }
+
+    bool found = false;
+    float best_score = -1.0F;
+    for (std::size_t index_offset = 0; index_offset < indices.size(); index_offset += 3U) {
+        const std::uint16_t i0 = indices[index_offset];
+        const std::uint16_t i1 = indices[index_offset + 1U];
+        const std::uint16_t i2 = indices[index_offset + 2U];
+        if (i0 >= clip_positions.size() || i1 >= clip_positions.size() ||
+            i2 >= clip_positions.size()) {
+            return false;
+        }
+        const sotc::CmshPosition& p0 = clip_positions[i0];
+        const sotc::CmshPosition& p1 = clip_positions[i1];
+        const sotc::CmshPosition& p2 = clip_positions[i2];
+        const float x0 = (p0.x * 0.5F + 0.5F) * static_cast<float>(kWidth);
+        const float y0 = (0.5F - p0.y * 0.5F) * static_cast<float>(kHeight);
+        const float x1 = (p1.x * 0.5F + 0.5F) * static_cast<float>(kWidth);
+        const float y1 = (0.5F - p1.y * 0.5F) * static_cast<float>(kHeight);
+        const float x2 = (p2.x * 0.5F + 0.5F) * static_cast<float>(kWidth);
+        const float y2 = (0.5F - p2.y * 0.5F) * static_cast<float>(kHeight);
+        const float denominator = (y1 - y2) * (x0 - x2) + (x2 - x1) * (y0 - y2);
+        if (std::abs(denominator) < 0.0001F) continue;
+
+        const float u0 = p0.x * material_x + 0.5F;
+        const float v0 = p0.y * material_y + 0.5F;
+        const float u1 = p1.x * material_x + 0.5F;
+        const float v1 = p1.y * material_y + 0.5F;
+        const float u2 = p2.x * material_x + 0.5F;
+        const float v2 = p2.y * material_y + 0.5F;
+
+        for (std::uint32_t y = 0; y < kHeight; ++y) {
+            for (std::uint32_t x = 0; x < kWidth; ++x) {
+                const float px = static_cast<float>(x) + 0.5F;
+                const float py = static_cast<float>(y) + 0.5F;
+                const float w0 = ((y1 - y2) * (px - x2) + (x2 - x1) * (py - y2)) /
+                                 denominator;
+                const float w1 = ((y2 - y0) * (px - x2) + (x0 - x2) * (py - y2)) /
+                                 denominator;
+                const float w2 = 1.0F - w0 - w1;
+                const float minimum_barycentric = std::min({w0, w1, w2});
+                // Stay well inside a real indexed triangle, away from edge-rule ambiguity.
+                if (minimum_barycentric < 0.16F) continue;
+
+                const float u = w0 * u0 + w1 * u1 + w2 * u2;
+                const float v = w0 * v0 + w1 * v1 + w2 * v2;
+                if (u <= 0.0F || u >= 1.0F || v <= 0.0F || v >= 1.0F) continue;
+                const float texel_u = u * static_cast<float>(texture_width);
+                const float texel_v = v * static_cast<float>(texture_height);
+                const float fraction_u = texel_u - std::floor(texel_u);
+                const float fraction_v = texel_v - std::floor(texel_v);
+                const float texel_margin = std::min(
+                    {fraction_u, 1.0F - fraction_u, fraction_v, 1.0F - fraction_v});
+                // Avoid nearest-sampler texel boundaries so interpolation roundoff cannot change
+                // which source texel the independent CPU oracle selects.
+                if (texel_margin < 0.16F) continue;
+
+                const LogoTextureUv uv{material_x, material_y, u, v};
+                std::uint32_t texture_x = 0;
+                std::uint32_t texture_y = 0;
+                const std::array<std::uint8_t, 4> expected = logo_png_pixel_oracle(
+                    texture, texture_width, texture_height, uv, &texture_x, &texture_y);
+                if (expected == std::array<std::uint8_t, 4>{0, 0, 0, 255}) continue;
+
+                const float score = minimum_barycentric + texel_margin * 0.25F;
+                if (!found || score > best_score) {
+                    found = true;
+                    best_score = score;
+                    probe = {x, y, texture_x, texture_y, u, v, minimum_barycentric};
+                }
+            }
+        }
+    }
+    return found;
+}
+
+[[nodiscard]] bool run_cmsh_logo_fixture(
+    sotc::MetalAssetFrameRenderer& renderer, const char* cube_path, const char* cone_path,
+    const char* output_png_path, const char* mutation_png_path,
+    std::span<const std::uint8_t> logo_png_rgba8, std::uint32_t texture_width,
+    std::uint32_t texture_height) {
+    constexpr std::string_view kCubeSha256 =
+        "44738dbf663af252898bad5582f2b48f1aadf6fbaab403c20880410b79a380b7";
+    constexpr std::string_view kConeSha256 =
+        "5456afadabe96b9f7f02c503dc0ed5410652ccd32601c19e8aeeaaf36c88600c";
+    bool passed = true;
+    const auto record = [&passed](std::string_view name, bool result) {
+        check(name, result);
+        passed = passed && result;
+    };
+
+    sotc::CmshMesh cube;
+    sotc::CmshMesh cone;
+    const bool cube_ok = load_pinned_cmsh(cube_path, 850U, kCubeSha256, 24U, 36U,
+                                          "cube_1m.cmsh", cube);
+    const bool cone_ok = load_pinned_cmsh(cone_path, 1462U, kConeSha256, 42U, 114U,
+                                          "cone.cmsh", cone);
+    record("both exact-hash raw mesh inputs parse with pinned counts", cube_ok && cone_ok);
+    if (!cube_ok || !cone_ok) return false;
+
+    std::vector<sotc::CmshPosition> cube_clip_positions;
+    std::vector<sotc::CmshPosition> cone_clip_positions;
+    record("cube positions receive a test-only clip-space transform",
+           transform_cmsh_positions_to_clip(cube, -0.47F, cube_clip_positions));
+    record("cone positions receive a test-only clip-space transform",
+           transform_cmsh_positions_to_clip(cone, 0.47F, cone_clip_positions));
+    if (cube_clip_positions.size() != cube.positions.size() ||
+        cone_clip_positions.size() != cone.positions.size()) {
+        return false;
+    }
+
+    constexpr float kHarnessUvScale = 0.25F;
+    constexpr float kHarnessDepth = 0.25F;
+    const sotc::AssetSamplerInput sampler{
+        sotc::AssetTextureFilter::nearest, sotc::AssetTextureFilter::nearest,
+        sotc::AssetTextureAddressMode::clamp_to_edge,
+        sotc::AssetTextureAddressMode::clamp_to_edge};
+    sotc::DefaultShaderCase cube_shader = sotc::make_default_shader_case();
+    cube_shader.material = {kHarnessUvScale, kHarnessUvScale, 0.0F, 1.0F};
+    cube_shader.encoded_normal = {0.5F, 0.5F, 1.0F, 0.0F};
+    cube_shader.param0_p0 = {1.0F, 1.0F, 1.0F, 1.0F};
+    sotc::DefaultShaderCase cone_shader = cube_shader;
+    cone_shader.clip_row2[3] = kHarnessDepth;
+    cube_shader.clip_row2[3] = kHarnessDepth;
+
+    sotc::AssetMeshDraw cube_draw{cube_clip_positions, cube.indices, cube_shader};
+    sotc::AssetMeshDraw cone_draw{cone_clip_positions, cone.indices, cone_shader};
+    cube_draw.fragment_texture0 =
+        sotc::AssetTexture2D{texture_width, texture_height, logo_png_rgba8};
+    cone_draw.fragment_texture0 =
+        sotc::AssetTexture2D{texture_width, texture_height, logo_png_rgba8};
+    cube_draw.fragment_sampler0 = sampler;
+    cone_draw.fragment_sampler0 = sampler;
+    std::vector<sotc::AssetMeshDraw> draws{cube_draw, cone_draw};
+
+    MeshLogoProbe cube_probe;
+    MeshLogoProbe cone_probe;
+    const bool cube_probe_found = find_mesh_logo_probe(
+        cube_clip_positions, cube.indices, kHarnessUvScale, kHarnessUvScale,
+        logo_png_rgba8, texture_width, texture_height, cube_probe);
+    const bool cone_probe_found = find_mesh_logo_probe(
+        cone_clip_positions, cone.indices, kHarnessUvScale, kHarnessUvScale,
+        logo_png_rgba8, texture_width, texture_height, cone_probe);
+    record("cube oracle probe is an interior pixel covered by an indexed mesh triangle",
+           cube_probe_found);
+    record("cone oracle probe is an interior pixel covered by an indexed mesh triangle",
+           cone_probe_found);
+    if (!cube_probe_found || !cone_probe_found) return false;
+
+    sotc::MetalAssetFrameResult baseline = renderer.render(draws);
+    record("combined cube/cone logo-PS Metal frame renders", baseline.ok);
+    if (!baseline.ok) {
+        std::fprintf(stderr, "FAIL combined logo mesh Metal render: %s\n",
+                     baseline.error.c_str());
+        return false;
+    }
+    const bool baseline_shape_ok =
+        baseline.width == kWidth && baseline.height == kHeight && baseline.stride == kWidth * 4U &&
+        baseline.rgba8.size() == static_cast<std::size_t>(baseline.stride) * kHeight &&
+        !baseline.png.empty();
+    record("combined logo mesh frame has a complete 64x64 RGBA8 readback and PNG",
+           baseline_shape_ok);
+    if (!baseline_shape_ok) return false;
+
+    const auto check_probe = [&](std::string_view label, const MeshLogoProbe& probe,
+                                 std::span<const std::uint8_t> texture,
+                                 const sotc::MetalAssetFrameResult& frame) {
+        const LogoTextureUv uv{kHarnessUvScale, kHarnessUvScale, probe.u, probe.v};
+        const auto expected = logo_png_pixel_oracle(texture, texture_width, texture_height, uv);
+        std::string check_name(label);
+        check_name += " covered texel matches independent nearest/fp16-RTZ CPU oracle";
+        record(check_name, is_color(frame.rgba8, probe.output_x, probe.output_y, expected));
+    };
+    check_probe("cube", cube_probe, logo_png_rgba8, baseline);
+    check_probe("cone", cone_probe, logo_png_rgba8, baseline);
+
+    std::printf("mesh-proven logo probes: cube output=(%u,%u) texel=(%u,%u) "
+                "barycentric-min=%.3f; cone output=(%u,%u) texel=(%u,%u) "
+                "barycentric-min=%.3f\n",
+                cube_probe.output_x, cube_probe.output_y, cube_probe.texture_x,
+                cube_probe.texture_y, static_cast<double>(cube_probe.minimum_barycentric),
+                cone_probe.output_x, cone_probe.output_y, cone_probe.texture_x,
+                cone_probe.texture_y, static_cast<double>(cone_probe.minimum_barycentric));
+
+    const sotc::MetalAssetFrameResult repeated = renderer.render(draws);
+    record("combined logo mesh frame repeats", repeated.ok);
+    if (repeated.ok) {
+        record("combined logo mesh RGBA8 and PNG are byte deterministic",
+               repeated.rgba8 == baseline.rgba8 && repeated.png == baseline.png);
+    }
+
+    std::vector<std::uint8_t> mutated_texture(logo_png_rgba8.begin(), logo_png_rgba8.end());
+    const std::size_t mutated_texel_offset =
+        (static_cast<std::size_t>(cube_probe.texture_y) * texture_width +
+         cube_probe.texture_x) *
+        4U;
+    mutated_texture[mutated_texel_offset] =
+        mutated_texture[mutated_texel_offset] == 255U ? 0U : 255U;
+    sotc::AssetTexture2D mutated_texture_view{
+        texture_width, texture_height, std::span<const std::uint8_t>(mutated_texture)};
+    std::vector<sotc::AssetMeshDraw> mutated_draws = draws;
+    mutated_draws[0].fragment_texture0 = mutated_texture_view;
+    mutated_draws[1].fragment_texture0 = mutated_texture_view;
+    const sotc::MetalAssetFrameResult mutated = renderer.render(mutated_draws);
+    record("mutated source logo texel renders through both parsed meshes", mutated.ok);
+    if (mutated.ok) {
+        check_probe("mutated cube", cube_probe, mutated_texture, mutated);
+        check_probe("mutated cone", cone_probe, mutated_texture, mutated);
+        const std::size_t output_offset = pixel_offset(cube_probe.output_x, cube_probe.output_y);
+        const bool selected_pixel_changed = !std::equal(
+            baseline.rgba8.begin() + static_cast<std::ptrdiff_t>(output_offset),
+            baseline.rgba8.begin() + static_cast<std::ptrdiff_t>(output_offset + 4U),
+            mutated.rgba8.begin() + static_cast<std::ptrdiff_t>(output_offset));
+        record("source texel mutation changes a CPU-proven mesh-covered readback pixel",
+               selected_pixel_changed);
+        record("source texel mutation changes the combined output PNG", mutated.png != baseline.png);
+
+        record("combined mesh baseline PNG writes under distinct local evidence",
+               write_png_file(output_png_path, baseline.png));
+        record("combined mesh mutation PNG writes under distinct local evidence",
+               write_png_file(mutation_png_path, mutated.png));
+    }
+
+    std::puts("logo PS composite scope: test-only clip-space transform and synthetic XY-to-UV "
+              "mapping; normals fixed to harness value; TEX0/NRM0 NOT decoded; retail UV, "
+              "bindings, and orientation NOT VERIFIED; AMD WQM/helper-lane equivalence NOT "
+              "VERIFIED; game-driven frame, G3, boot, game audio, and save/reload NOT VERIFIED.");
+    return passed;
+}
+
 }  // namespace
 
 int main() {
@@ -749,26 +1095,86 @@ int main() {
 
     const char* logo_msl_path = std::getenv("SOTC_LOGO_PS_MSL");
     const char* logo_texture_png_path = std::getenv("SOTC_LOGO_PS_TEXTURE_PNG");
-    const bool logo_texture_png_requested =
-        logo_texture_png_path != nullptr && logo_texture_png_path[0] != '\0';
     const char* logo_ps_synthetic_png_path = std::getenv("SOTC_LOGO_PS_PNG");
     const char* baseline_texture_png_path =
         std::getenv("SOTC_LOGO_PS_TEXTURE_OUTPUT_PNG");
     const char* mutation_texture_png_path =
         std::getenv("SOTC_LOGO_PS_TEXTURE_MUTATION_PNG");
+    const char* logo_cube_cmsh_path = std::getenv("SOTC_LOGO_PS_CUBE_CMSH");
+    const char* logo_cone_cmsh_path = std::getenv("SOTC_LOGO_PS_CONE_CMSH");
+    const char* logo_mesh_output_png_path = std::getenv("SOTC_LOGO_PS_MESH_OUTPUT_PNG");
+    const char* logo_mesh_mutation_png_path =
+        std::getenv("SOTC_LOGO_PS_MESH_MUTATION_PNG");
+    const auto path_is_set = [](const char* path) { return path != nullptr && path[0] != '\0'; };
+    const bool logo_texture_png_requested = path_is_set(logo_texture_png_path) ||
+                                            path_is_set(baseline_texture_png_path) ||
+                                            path_is_set(mutation_texture_png_path);
+    const bool logo_mesh_fixture_requested =
+        path_is_set(logo_cube_cmsh_path) || path_is_set(logo_cone_cmsh_path) ||
+        path_is_set(logo_mesh_output_png_path) || path_is_set(logo_mesh_mutation_png_path);
     bool logo_texture_output_paths_valid = true;
-    if (logo_texture_png_requested) {
-        if (logo_ps_synthetic_png_path != nullptr && logo_ps_synthetic_png_path[0] != '\0') {
-            logo_texture_output_paths_valid = local_paths_are_distinct(
-                {logo_msl_path, logo_texture_png_path, baseline_texture_png_path,
-                 mutation_texture_png_path, logo_ps_synthetic_png_path});
+    bool logo_texture_fixture_config_valid = false;
+    bool logo_mesh_fixture_config_valid = false;
+    if (logo_mesh_fixture_requested) {
+        const bool complete_path_set =
+            path_is_set(logo_msl_path) && path_is_set(logo_texture_png_path) &&
+            path_is_set(baseline_texture_png_path) && path_is_set(mutation_texture_png_path) &&
+            path_is_set(logo_cube_cmsh_path) && path_is_set(logo_cone_cmsh_path) &&
+            path_is_set(logo_mesh_output_png_path) &&
+            path_is_set(logo_mesh_mutation_png_path);
+        if (complete_path_set) {
+            if (path_is_set(logo_ps_synthetic_png_path)) {
+                logo_texture_output_paths_valid = local_paths_are_distinct(
+                    {logo_msl_path, logo_texture_png_path, baseline_texture_png_path,
+                     mutation_texture_png_path, logo_ps_synthetic_png_path,
+                     logo_cube_cmsh_path, logo_cone_cmsh_path, logo_mesh_output_png_path,
+                     logo_mesh_mutation_png_path});
+            } else {
+                logo_texture_output_paths_valid = local_paths_are_distinct(
+                    {logo_msl_path, logo_texture_png_path, baseline_texture_png_path,
+                     mutation_texture_png_path, logo_cube_cmsh_path, logo_cone_cmsh_path,
+                     logo_mesh_output_png_path, logo_mesh_mutation_png_path});
+            }
         } else {
-            logo_texture_output_paths_valid = local_paths_are_distinct(
-                {logo_msl_path, logo_texture_png_path, baseline_texture_png_path,
-                 mutation_texture_png_path});
+            logo_texture_output_paths_valid = false;
         }
-        check("logo MSL/source PNG and synthetic/baseline/mutation paths are distinct local files",
-              logo_texture_output_paths_valid);
+        logo_mesh_fixture_config_valid = complete_path_set && logo_texture_output_paths_valid;
+        logo_texture_fixture_config_valid = logo_mesh_fixture_config_valid;
+        check("composite mesh fixture has a complete canonical distinct local path set",
+              logo_mesh_fixture_config_valid);
+        if (!logo_mesh_fixture_config_valid) {
+            std::puts("logo PS composite fixture: NOT RUN (partial/invalid path configuration; "
+                      "no private asset reads or PNG writes)");
+        }
+        std::puts("logo PS composite limits: test-only clip-space transform and synthetic XY-to-UV "
+                  "mapping; normals fixed to harness value; TEX0/NRM0 NOT decoded; retail UV, "
+                  "bindings, and orientation NOT VERIFIED; AMD WQM/helper-lane equivalence NOT "
+                  "VERIFIED; game-driven frame, G3, boot, game audio, and save/reload NOT VERIFIED.");
+    } else if (logo_texture_png_requested) {
+        const bool complete_path_set = path_is_set(logo_msl_path) &&
+                                       path_is_set(logo_texture_png_path) &&
+                                       path_is_set(baseline_texture_png_path) &&
+                                       path_is_set(mutation_texture_png_path);
+        if (complete_path_set) {
+            if (path_is_set(logo_ps_synthetic_png_path)) {
+                logo_texture_output_paths_valid = local_paths_are_distinct(
+                    {logo_msl_path, logo_texture_png_path, baseline_texture_png_path,
+                     mutation_texture_png_path, logo_ps_synthetic_png_path});
+            } else {
+                logo_texture_output_paths_valid = local_paths_are_distinct(
+                    {logo_msl_path, logo_texture_png_path, baseline_texture_png_path,
+                     mutation_texture_png_path});
+            }
+        } else {
+            logo_texture_output_paths_valid = false;
+        }
+        logo_texture_fixture_config_valid = complete_path_set && logo_texture_output_paths_valid;
+        check("logo texture replay has a complete canonical distinct local path set",
+              logo_texture_fixture_config_valid);
+        if (!logo_texture_fixture_config_valid) {
+            std::puts("logo PS asset replay: NOT RUN (partial/invalid path configuration; "
+                      "no private asset reads or PNG writes)");
+        }
     } else if (logo_msl_path != nullptr && logo_msl_path[0] != '\0') {
         if (logo_ps_synthetic_png_path != nullptr && logo_ps_synthetic_png_path[0] != '\0') {
             logo_texture_output_paths_valid =
@@ -780,7 +1186,13 @@ int main() {
               logo_texture_output_paths_valid);
     }
     bool logo_texture_png_ran = false;
-    if (logo_msl_path == nullptr || logo_msl_path[0] == '\0') {
+    bool logo_mesh_fixture_passed = false;
+    if (logo_mesh_fixture_requested && !logo_mesh_fixture_config_valid) {
+        // Keep a partial composite configuration fail-visible while avoiding every optional
+        // private input read and output write in the logo fixture block below.
+    } else if (logo_texture_png_requested && !logo_texture_fixture_config_valid) {
+        // Any partial asset input/output request fails visibly without reading or writing files.
+    } else if (logo_msl_path == nullptr || logo_msl_path[0] == '\0') {
         if (logo_texture_png_requested) {
             check("logo PNG replay requires the private pinned logo PS MSL", false);
         } else {
@@ -1020,6 +1432,18 @@ int main() {
                                         }
                                     }
                                 }
+                            }
+                            if (logo_mesh_fixture_requested &&
+                                logo_mesh_fixture_config_valid &&
+                                logo_png_rgba8.size() ==
+                                    static_cast<std::size_t>(kLogoPngWidth) *
+                                        kLogoPngHeight * 4U) {
+                                logo_mesh_fixture_passed = run_cmsh_logo_fixture(
+                                    *logo_renderer, logo_cube_cmsh_path, logo_cone_cmsh_path,
+                                    logo_mesh_output_png_path, logo_mesh_mutation_png_path,
+                                    logo_png_rgba8, kLogoPngWidth, kLogoPngHeight);
+                                std::printf("logo PS composite fixture: %s (asset-derived harness)\n",
+                                            logo_mesh_fixture_passed ? "PASSED" : "FAILED");
                             }
                         }
                     }

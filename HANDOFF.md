@@ -1,5 +1,103 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 05:41 CDT — cached diff check caught checkpoint hardbreak spaces
+
+- Integrator: Codex `/root`; task `GPU-03-LOGO-PNG-CMSH-ASSET-FRAME-01` remains **FIXTURE_VERIFIED**.
+- Exact gate: `git diff --cached --check` exited 2 after staging. It reported trailing Markdown
+  hardbreak spaces on lines 3–5 of `docs/checkpoints/2026-10-25-gpu03-logo-png-cmsh-composite.md`.
+  The three trailing spaces have been removed; no source/test result changed.
+- Exact next action: restage the corrected checkpoint and updated `HANDOFF.md`, rerun cached diff,
+  staged/all path audits, and attribution checks before commit. The earlier staged audit was 8 paths
+  and all-path audit was 2,792 paths; repeat both after this edit.
+- Status: diff-check failure **CORRECTED / RECHECK PENDING**; fixture acceptance remains PASSED.
+
+## 2026-10-25 05:40 CDT — graph and project index are current
+
+- Integrator: Codex `/root`; the E658 fixture result remains **FIXTURE_VERIFIED**. `trail build`
+  completed for 2,002 files, yielding 8,546 wiring nodes / 11,572 edges / 1,497 cards. `graft grep
+  'find_mesh_logo_probe'` found the new helper and both call sites; `trail build --check` reports the
+  wiring graph in sync (the optional deep meaning layer remains unbuilt). `python3 scripts/project_index.py`
+  passed and indexed 19,590 folders, including the new checkpoint.
+- `python3 -I scripts/audit_publish_paths.py --all` passed over 2,791 currently tracked paths;
+  because the checkpoint file was not yet staged, the final staged/all audits must be repeated after
+  staging. `git diff --check` is clean; no private local asset, output, or log path appears in the
+  tracked change set.
+- Exact next action: stage only `native/tests/test_metal_texture_binding.cpp`, `HANDOFF.md`,
+  `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/METAL_FRAME_PATH.md`, `docs/INDEX.md`,
+  `docs/FOLDERS.md`, and the E658 checkpoint; run staged/all path audits and `git diff --cached
+  --check`, verify owner identity/attribution, then publish on `main`.
+- Status: code, fixture, full CTest, lift, Trail, and project-index gates **PASSED**; staged path and
+  commit attribution/push gates **PENDING**. G3 remains PARTIAL.
+
+## 2026-10-25 05:38 CDT — GPU-03 composite logo/mesh fixture verified
+
+- Integrator: Codex `/root`; `GPU-03-LOGO-PNG-CMSH-ASSET-FRAME-01` is **FIXTURE_VERIFIED** at attempt
+  0, with zero failed shader/fixture hypotheses. Independent review identified one partial standalone-texture
+  configuration fail-open; the fix now treats any input/output path as a replay request, requires
+  the complete canonical distinct path set, and rejects partial requests before optional file I/O.
+  A follow-up review found no remaining concerns.
+- Focused target build passed after one compile-only unused-variable correction. The output-only
+  negative test exited 8 as expected on its explicit config check, printed `NOT RUN` for private
+  file work, and created no output. Full configured `metal_texture_binding` CTest passed 1/1 with
+  Metal API/GPU validation; full CTest passed **397/397**; lift checkers passed **481/0/0**. Configure
+  and full build passed. Exact commands, logs, pinned input digests, selected pixels, and output PNG
+  hashes are in [the E658 checkpoint](docs/checkpoints/2026-10-25-gpu03-logo-png-cmsh-composite.md).
+- Observed: cube and cone decoded to 24/36 and 42/114 position/index counts. CPU triangle-interior
+  probes at output `(20,30)` and `(43,27)` matched the independent nearest/fp16-RTZ oracle at
+  synthetic source texels `(93,65)` and `(134,68)`. Repeat RGBA/PNG was deterministic; mutating the
+  selected source texel changed readback and PNG. Metal validation reported enabled and no faults.
+- Inference/limits: this is exact asset input through test-only clip transforms, synthetic XY-to-UV,
+  fixed harness normals, and slot-0 sampling. TEX0/NRM0 interpretation, retail bindings/orientation,
+  WQM/helper-lane equivalence, game-driven rendering, G3, boot, audio, and save/reload remain
+  unverified. E658 does not complete the port.
+- Files changed: `native/tests/test_metal_texture_binding.cpp`, `docs/TASKS.md`, `docs/EVIDENCE.md`,
+  `docs/METAL_FRAME_PATH.md`, `docs/INDEX.md`, and
+  `docs/checkpoints/2026-10-25-gpu03-logo-png-cmsh-composite.md`.
+- Exact next action: run `trail build` and `trail build --check`, query the new fixture helpers, run
+  `python3 scripts/project_index.py`, then staged/all path audits and attribution audit. Stage only
+  the allowlisted paths, verify no Claude/Anthropic commit trailer, commit/push `main` as Johnny
+  Wang, fetch, and confirm `HEAD == origin/main` with a clean worktree.
+- Status: fixture acceptance **PASSED**; publication/index/audit gates **IN PROGRESS**; G3 remains
+  PARTIAL.
+
+## 2026-10-25 05:34 CDT — review closed partial texture replay configuration
+
+- Integrator: Codex `/root`; task `GPU-03-LOGO-PNG-CMSH-ASSET-FRAME-01` remains **ACTIVE**,
+  attempt 0. The independent reviewer found a P2 fail-open in the existing standalone PNG replay:
+  setting only a PNG output variable did not request the replay, so it could be reported NOT RUN
+  without failing.
+- Change: any PNG input/baseline/mutation path now requests the replay. The standalone and composite
+  branches require complete canonical distinct paths (including pinned MSL and both output files);
+  invalid partial configuration is failure-visible and skips optional file reads/writes.
+- Files: `native/tests/test_metal_texture_binding.cpp`; `HANDOFF.md`; `docs/TASKS.md`. This change has
+  not yet been compiled or executed. Review result for all other requested composite checks was no
+  additional finding.
+- Exact next action: build the target and exercise an output-only configuration to confirm nonzero
+  exit without file creation; then rerun the fully configured composite CTest and required full gates.
+- Status: reviewer finding **FIX APPLIED / VERIFICATION NOT RUN**; fixture behavior hypotheses remain
+  untested, attempt 0.
+
+## 2026-10-25 05:33 CDT — composite logo/mesh fixture implementation compiled
+
+- Integrator: Codex `/root`; `GPU-03-LOGO-PNG-CMSH-ASSET-FRAME-01` remains **ACTIVE**, attempt 0.
+  The assigned worker edited only `native/tests/test_metal_texture_binding.cpp`; the composite
+  harness path is implemented and the focused target compiled on its second attempt.
+- Exact command: `cmake --build local/build/orch-r22 --target test_metal_texture_binding -j 12`.
+  Attempt 1 exited 1 because `-Werror` rejected an unused fixture bookkeeping flag. The worker
+  removed that flag; attempt 2 exited 0 and linked the target. Compiler output was not persisted to
+  a log file. `git diff --check` passed; current tracked change is the assigned test source only,
+  plus this checkpoint and its task-register note.
+- Observed in source, not yet executed: optional all-or-nothing path preflight; exact mesh size/hash
+  and POS0/U16 count checks; test-only clip transforms and synthetic XY-to-UV mapping; indexed
+  triangle interior probes; pinned PNG/Msl renderer reuse; repeat and selected-texel mutation checks;
+  private composite PNG outputs. None of these are fixture-verification claims until the test runs.
+- Limits: TEX0/NRM0 interpretation, retail UV/binding/orientation, WQM/helper-lane equivalence,
+  game-driven frames, G3, boot, game audio, and real save/reload remain unverified.
+- Exact next action at that checkpoint: finish an independent read-only code review, then verify
+  the composite fixture and run the required full gates before publishing as Johnny Wang.
+- Status: implementation compile **PASSED**; Metal fixture and full validation **NOT RUN**; task
+  remains ACTIVE at attempt 0 (no shader/fixture behavior hypothesis has been tested).
+
 ## 2026-10-25 05:23 CDT — composite logo-texture/raw-mesh fixture claimed
 
 - Integrator: Codex `/root`; task `GPU-03-LOGO-PNG-CMSH-ASSET-FRAME-01` is **ACTIVE**, attempt 0.
