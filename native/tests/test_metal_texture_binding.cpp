@@ -1,25 +1,37 @@
 #include "../platform/metal_asset_frame.hpp"
 #include "../platform/metal_capture.hpp"
+#include "asset_png_fixture.hpp"
+
+#include <CommonCrypto/CommonDigest.h>
 
 #include <array>
 #include <algorithm>
+#include <bit>
+#include <chrono>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <cstdio>
+#include <filesystem>
 #include <fstream>
+#include <initializer_list>
 #include <iterator>
 #include <memory>
 #include <span>
 #include <string>
 #include <string_view>
+#include <system_error>
 #include <vector>
 
 namespace {
 
 constexpr std::uint32_t kWidth = 64;
 constexpr std::uint32_t kHeight = 64;
+constexpr std::string_view kPinnedLogoPsMslSha256 =
+    "071a4ebe11177086c178119fafae04aae99a1a147ad8b8d1e92ee0f17abbfa71";
+constexpr std::string_view kPinnedLogoPngSha256 =
+    "b4b135232304ab696785353b6ba96f874fc4bcfd8805e56b931119e415a300f5";
 
 constexpr std::string_view kTextureSampleMsl = R"metal(
 #include <metal_stdlib>
@@ -216,6 +228,98 @@ constexpr std::array<std::array<std::uint8_t, 4>, 7> kMipColors = {{{0, 0, 0, 25
     return result;
 }
 
+struct LogoTextureProbe {
+    std::uint32_t output_x;
+    std::uint32_t output_y;
+    std::uint32_t texture_x;
+    std::uint32_t texture_y;
+};
+
+struct LogoTextureUv {
+    float scale_x;
+    float scale_y;
+    float u;
+    float v;
+};
+
+[[nodiscard]] LogoTextureUv logo_texture_uv_for_probe(const LogoTextureProbe& probe,
+                                                       std::uint32_t texture_width,
+                                                       std::uint32_t texture_height) {
+    const float clip_x =
+        2.0F * (static_cast<float>(probe.output_x) + 0.5F) / static_cast<float>(kWidth) - 1.0F;
+    const float clip_y =
+        1.0F - 2.0F * (static_cast<float>(probe.output_y) + 0.5F) / static_cast<float>(kHeight);
+    const float target_u = (static_cast<float>(probe.texture_x) + 0.5F) /
+                           static_cast<float>(texture_width);
+    const float target_v = (static_cast<float>(probe.texture_y) + 0.5F) /
+                           static_cast<float>(texture_height);
+    const float scale_x = (target_u - 0.5F) / clip_x;
+    const float scale_y = (target_v - 0.5F) / clip_y;
+    const float uv_x = clip_x * scale_x + 0.5F;
+    const float uv_y = clip_y * scale_y + 0.5F;
+    return {scale_x, scale_y, uv_x, uv_y};
+}
+
+[[nodiscard]] std::uint16_t float_to_half_rtz(float value) {
+    const std::uint32_t bits = std::bit_cast<std::uint32_t>(value);
+    const std::uint32_t sign = (bits >> 16U) & 0x8000U;
+    const std::uint32_t exponent = (bits >> 23U) & 0xffU;
+    const std::uint32_t mantissa = bits & 0x7fffffU;
+    if (exponent == 0xffU) {
+        return static_cast<std::uint16_t>(sign | (mantissa != 0 ? 0x7e00U : 0x7c00U));
+    }
+    const int unbiased_exponent = static_cast<int>(exponent) - 127;
+    if (unbiased_exponent > 15) return static_cast<std::uint16_t>(sign | 0x7bffU);
+    if (unbiased_exponent < -24) return static_cast<std::uint16_t>(sign);
+    if (unbiased_exponent >= -14) {
+        return static_cast<std::uint16_t>(sign |
+                                          (static_cast<std::uint32_t>(unbiased_exponent + 15)
+                                           << 10U) |
+                                          (mantissa >> 13U));
+    }
+    return static_cast<std::uint16_t>(sign |
+                                      ((mantissa | 0x800000U) >>
+                                       static_cast<unsigned>(-unbiased_exponent - 1)));
+}
+
+[[nodiscard]] float half_to_float(std::uint16_t half) {
+    const std::uint32_t sign = (static_cast<std::uint32_t>(half & 0x8000U)) << 16U;
+    const std::uint32_t exponent = (half >> 10U) & 0x1fU;
+    const std::uint32_t mantissa = half & 0x03ffU;
+    if (exponent == 0x1fU) {
+        return std::bit_cast<float>(sign | 0x7f800000U | (mantissa << 13U));
+    }
+    if (exponent == 0U) {
+        const float magnitude = static_cast<float>(mantissa) * 0x1p-24F;
+        return (sign == 0U) ? magnitude : -magnitude;
+    }
+    return std::bit_cast<float>(sign | ((exponent + 112U) << 23U) | (mantissa << 13U));
+}
+
+[[nodiscard]] std::array<std::uint8_t, 4> logo_png_pixel_oracle(
+    std::span<const std::uint8_t> rgba8, std::uint32_t texture_width,
+    std::uint32_t texture_height, const LogoTextureUv& uv, std::uint32_t* sampled_x = nullptr,
+    std::uint32_t* sampled_y = nullptr) {
+    const float bounded_u = std::clamp(uv.u, 0.0F, 1.0F);
+    const float bounded_v = std::clamp(uv.v, 0.0F, 1.0F);
+    const std::uint32_t x = std::min(static_cast<std::uint32_t>(bounded_u * texture_width),
+                                     texture_width - 1U);
+    const std::uint32_t y = std::min(static_cast<std::uint32_t>(bounded_v * texture_height),
+                                     texture_height - 1U);
+    if (sampled_x != nullptr) *sampled_x = x;
+    if (sampled_y != nullptr) *sampled_y = y;
+    std::array<std::uint8_t, 4> result{};
+    const std::size_t offset =
+        (static_cast<std::size_t>(y) * texture_width + x) * result.size();
+    for (std::size_t channel = 0; channel < result.size(); ++channel) {
+        const float sampled = static_cast<float>(rgba8[offset + channel]) / 255.0F;
+        const float fp16_rtz = half_to_float(float_to_half_rtz(sampled));
+        const float unorm = std::clamp(fp16_rtz, 0.0F, 1.0F) * 255.0F;
+        result[channel] = static_cast<std::uint8_t>(unorm + 0.5F);
+    }
+    return result;
+}
+
 [[nodiscard]] std::array<std::uint8_t, 4> mip_oracle(float uv_scale,
                                                      int mutated_level = -1) {
     const float gradient_channel = std::clamp((2.0F / 64.0F) * std::abs(uv_scale) * 16.0F,
@@ -266,8 +370,129 @@ struct MipTextureStorage {
     return input.good() || input.eof();
 }
 
+[[nodiscard]] bool is_strict_path_child(const std::filesystem::path& child,
+                                       const std::filesystem::path& parent) {
+    auto child_part = child.begin();
+    for (auto parent_part = parent.begin(); parent_part != parent.end();
+         ++parent_part, ++child_part) {
+        if (child_part == child.end() || *child_part != *parent_part) return false;
+    }
+    return child_part != child.end();
+}
+
+[[nodiscard]] bool canonical_local_path_under_repo(
+    const std::filesystem::path& repo_root_input,
+    const std::filesystem::path& candidate_input,
+    std::filesystem::path& canonical_candidate) {
+    std::error_code error;
+    const std::filesystem::path repo_root =
+        std::filesystem::weakly_canonical(repo_root_input, error);
+    if (error) return false;
+    const std::filesystem::path intended_local_root = repo_root / "local";
+    const std::filesystem::file_status local_status =
+        std::filesystem::symlink_status(intended_local_root, error);
+    if (error && error != std::errc::no_such_file_or_directory) return false;
+    if (!error && std::filesystem::is_symlink(local_status)) return false;
+    error.clear();
+    const std::filesystem::path local_root =
+        std::filesystem::weakly_canonical(intended_local_root, error);
+    if (error || local_root != intended_local_root) return false;
+    const std::filesystem::path candidate =
+        std::filesystem::weakly_canonical(candidate_input, error);
+    if (error || !is_strict_path_child(candidate, local_root)) return false;
+    canonical_candidate = candidate;
+    return true;
+}
+
+[[nodiscard]] bool canonical_local_path(const char* path,
+                                        std::filesystem::path& canonical_candidate) {
+    if (path == nullptr || path[0] == '\0') return false;
+    std::error_code error;
+    const std::filesystem::path repo_root = std::filesystem::weakly_canonical(".", error);
+    if (error) return false;
+    return canonical_local_path_under_repo(repo_root, path, canonical_candidate);
+}
+
+[[nodiscard]] bool is_local_path(const char* path) {
+    std::filesystem::path ignored;
+    return canonical_local_path(path, ignored);
+}
+
+[[nodiscard]] bool local_paths_are_distinct(std::initializer_list<const char*> paths) {
+    std::vector<std::filesystem::path> canonical_paths;
+    canonical_paths.reserve(paths.size());
+    for (const char* path : paths) {
+        std::filesystem::path canonical;
+        if (!canonical_local_path(path, canonical)) return false;
+        for (const std::filesystem::path& previous : canonical_paths) {
+            if (canonical == previous) return false;
+            std::error_code error;
+            const bool canonical_exists = std::filesystem::exists(canonical, error);
+            if (error) return false;
+            const bool previous_exists = std::filesystem::exists(previous, error);
+            if (error) return false;
+            if (canonical_exists && previous_exists &&
+                std::filesystem::equivalent(canonical, previous, error)) {
+                return false;
+            }
+            if (error) return false;
+        }
+        canonical_paths.push_back(std::move(canonical));
+    }
+    return !canonical_paths.empty();
+}
+
+[[nodiscard]] bool rejects_in_repo_local_root_symlink() {
+    std::error_code error;
+    const std::filesystem::path repo_root = std::filesystem::weakly_canonical(".", error);
+    if (error) return false;
+    const std::filesystem::path fixture_root =
+        repo_root / "local" /
+        (".gpu03-root-symlink-" + std::to_string(
+             std::chrono::steady_clock::now().time_since_epoch().count()));
+    if (std::filesystem::exists(fixture_root, error) || error ||
+        !is_local_path((fixture_root / "probe").c_str())) {
+        return false;
+    }
+    std::filesystem::create_directories(fixture_root / "native", error);
+    if (error) return false;
+    std::filesystem::create_directory_symlink("native", fixture_root / "local", error);
+    if (error) {
+        std::filesystem::remove_all(fixture_root, error);
+        return false;
+    }
+    std::filesystem::path ignored;
+    const bool rejected = !canonical_local_path_under_repo(
+        fixture_root, fixture_root / "local" / "probe.png", ignored);
+    std::filesystem::remove_all(fixture_root, error);
+    return rejected && !error;
+}
+
+[[nodiscard]] bool read_binary_file(const char* path, std::vector<std::uint8_t>& contents) {
+    if (!is_local_path(path)) return false;
+    std::ifstream input(path, std::ios::binary);
+    if (!input) return false;
+    contents.assign(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>());
+    return input.good() || input.eof();
+}
+
+[[nodiscard]] std::string sha256_hex(std::span<const std::uint8_t> bytes) {
+    std::array<unsigned char, CC_SHA256_DIGEST_LENGTH> digest{};
+    if (CC_SHA256(bytes.data(), static_cast<CC_LONG>(bytes.size()), digest.data()) == nullptr) {
+        return {};
+    }
+    constexpr char kHex[] = "0123456789abcdef";
+    std::string hex;
+    hex.reserve(digest.size() * 2U);
+    for (unsigned char byte : digest) {
+        hex.push_back(kHex[byte >> 4U]);
+        hex.push_back(kHex[byte & 0x0fU]);
+    }
+    return hex;
+}
+
 [[nodiscard]] bool write_png_file(const char* path, const std::vector<std::uint8_t>& png) {
-    if (path == nullptr || path[0] == '\0' || png.empty()) return false;
+    if (!is_local_path(path) || png.empty()) return false;
     std::ofstream output(path, std::ios::binary | std::ios::trunc);
     output.write(reinterpret_cast<const char*>(png.data()),
                  static_cast<std::streamsize>(png.size()));
@@ -279,6 +504,21 @@ struct MipTextureStorage {
 int main() {
     static_assert(sizeof(sotc::DefaultShaderCase) == 288);
     static_assert(offsetof(sotc::DefaultShaderCase, param1_p0) == 224);
+
+    std::error_code symlink_error;
+    const std::filesystem::path escape_link =
+        std::filesystem::path("local") /
+        (".gpu03-path-guard-" + std::to_string(
+             std::chrono::steady_clock::now().time_since_epoch().count()));
+    std::filesystem::create_directory_symlink("..", escape_link, symlink_error);
+    const bool symlink_created = !symlink_error;
+    const bool symlink_escape_rejected =
+        symlink_created && !is_local_path((escape_link / "guard-probe.png").c_str());
+    if (symlink_created) std::filesystem::remove(escape_link, symlink_error);
+    check("local output guard rejects symlinks escaping local", symlink_created &&
+              symlink_escape_rejected && !symlink_error);
+    check("local output guard rejects local-root symlinks into tracked paths",
+          rejects_in_repo_local_root_symlink());
 
     const std::array<sotc::CmshPosition, 4> positions = {{{-0.9F, -0.9F, 0.25F},
                                                            {0.9F, -0.9F, 0.25F},
@@ -508,13 +748,55 @@ int main() {
               invalid_lod_range.error.find("LOD clamp range") != std::string::npos);
 
     const char* logo_msl_path = std::getenv("SOTC_LOGO_PS_MSL");
+    const char* logo_texture_png_path = std::getenv("SOTC_LOGO_PS_TEXTURE_PNG");
+    const bool logo_texture_png_requested =
+        logo_texture_png_path != nullptr && logo_texture_png_path[0] != '\0';
+    const char* logo_ps_synthetic_png_path = std::getenv("SOTC_LOGO_PS_PNG");
+    const char* baseline_texture_png_path =
+        std::getenv("SOTC_LOGO_PS_TEXTURE_OUTPUT_PNG");
+    const char* mutation_texture_png_path =
+        std::getenv("SOTC_LOGO_PS_TEXTURE_MUTATION_PNG");
+    bool logo_texture_output_paths_valid = true;
+    if (logo_texture_png_requested) {
+        if (logo_ps_synthetic_png_path != nullptr && logo_ps_synthetic_png_path[0] != '\0') {
+            logo_texture_output_paths_valid = local_paths_are_distinct(
+                {logo_msl_path, logo_texture_png_path, baseline_texture_png_path,
+                 mutation_texture_png_path, logo_ps_synthetic_png_path});
+        } else {
+            logo_texture_output_paths_valid = local_paths_are_distinct(
+                {logo_msl_path, logo_texture_png_path, baseline_texture_png_path,
+                 mutation_texture_png_path});
+        }
+        check("logo MSL/source PNG and synthetic/baseline/mutation paths are distinct local files",
+              logo_texture_output_paths_valid);
+    } else if (logo_msl_path != nullptr && logo_msl_path[0] != '\0') {
+        if (logo_ps_synthetic_png_path != nullptr && logo_ps_synthetic_png_path[0] != '\0') {
+            logo_texture_output_paths_valid =
+                local_paths_are_distinct({logo_msl_path, logo_ps_synthetic_png_path});
+        } else {
+            logo_texture_output_paths_valid = is_local_path(logo_msl_path);
+        }
+        check("logo MSL and synthetic PNG paths are distinct local files",
+              logo_texture_output_paths_valid);
+    }
+    bool logo_texture_png_ran = false;
     if (logo_msl_path == nullptr || logo_msl_path[0] == '\0') {
-        std::puts("logo PS MSL replay: NOT RUN (set SOTC_LOGO_PS_MSL to the private generated source)");
+        if (logo_texture_png_requested) {
+            check("logo PNG replay requires the private pinned logo PS MSL", false);
+        } else {
+            std::puts("logo PS MSL replay: NOT RUN (set SOTC_LOGO_PS_MSL to the private generated source)");
+        }
     } else {
         std::string logo_msl_source;
-        check("private generated logo PS MSL can be read",
-              read_text_file(logo_msl_path, logo_msl_source));
-        if (!logo_msl_source.empty()) {
+        const bool logo_msl_read = logo_texture_output_paths_valid &&
+                                   read_text_file(logo_msl_path, logo_msl_source);
+        check("private generated logo PS MSL can be read", logo_msl_read);
+        const auto logo_msl_bytes = std::span(
+            reinterpret_cast<const std::uint8_t*>(logo_msl_source.data()), logo_msl_source.size());
+        const bool logo_msl_pinned =
+            logo_msl_read && sha256_hex(logo_msl_bytes) == kPinnedLogoPsMslSha256;
+        check("logo PS MSL matches the pinned generated shader digest", logo_msl_pinned);
+        if (logo_msl_pinned) {
             std::string logo_error;
             std::unique_ptr<sotc::MetalAssetFrameRenderer> logo_renderer =
                 sotc::MetalAssetFrameRenderer::create(config, logo_msl_source, logo_error);
@@ -540,10 +822,12 @@ int main() {
                     check("logo PS CPU oracle matches mip 1 at center and boundary",
                           is_color(logo_mip1.rgba8, 32, 32, mip_color_for_scale(1.0F)) &&
                               is_color(logo_mip1.rgba8, 3, 32, mip_color_for_scale(1.0F)));
-                    const char* png_path = std::getenv("SOTC_LOGO_PS_PNG");
+                    const char* png_path = logo_ps_synthetic_png_path;
                     if (png_path != nullptr && png_path[0] != '\0') {
-                        check("generated logo PS PNG is written directly under local evidence",
-                              write_png_file(png_path, logo_mip1.png));
+                        if (!logo_texture_png_requested || logo_texture_output_paths_valid) {
+                            check("generated logo PS PNG is written directly under local evidence",
+                                  write_png_file(png_path, logo_mip1.png));
+                        }
                     }
                 }
 
@@ -604,6 +888,142 @@ int main() {
                           is_color(logo_scaled_mutated.rgba8, 32, 32,
                                    logo_multiply_oracle(1.0F, color_scale, 1)));
                 }
+
+                if (!logo_texture_png_requested) {
+                    std::puts("logo PS asset PNG replay: NOT RUN (set SOTC_LOGO_PS_TEXTURE_PNG to the private imported PNG)");
+                } else {
+                    std::vector<std::uint8_t> png_bytes;
+                    const bool png_read = read_binary_file(logo_texture_png_path, png_bytes);
+                    check("logo PS PNG fixture is read from local evidence", png_read);
+                    check("logo PS PNG fixture has the pinned 24,636-byte size",
+                          png_read && png_bytes.size() == 24'636U);
+                    const bool logo_png_pinned =
+                        png_read && png_bytes.size() == 24'636U &&
+                        sha256_hex(png_bytes) == kPinnedLogoPngSha256;
+                    check("logo PS PNG fixture matches the pinned source SHA-256",
+                          logo_png_pinned);
+                    if (logo_png_pinned) {
+                        constexpr std::uint32_t kLogoPngWidth = 228;
+                        constexpr std::uint32_t kLogoPngHeight = 128;
+                        std::vector<std::uint8_t> logo_png_rgba8;
+                        std::string png_error;
+                        const bool decoded = sotc::test::decode_asset_png_rgba8(
+                            png_bytes, kLogoPngWidth, kLogoPngHeight, logo_png_rgba8, png_error);
+                        check("ImageIO decodes pinned logo PNG to 228x128 RGBA8", decoded);
+                        if (!decoded) {
+                            std::fprintf(stderr, "FAIL logo PNG decode: %s\n", png_error.c_str());
+                        } else {
+                            check("decoded logo PNG has tightly packed RGBA8 bytes",
+                                  logo_png_rgba8.size() ==
+                                      static_cast<std::size_t>(kLogoPngWidth) * kLogoPngHeight * 4U);
+                            const sotc::AssetSamplerInput asset_sampler{
+                                sotc::AssetTextureFilter::nearest,
+                                sotc::AssetTextureFilter::nearest,
+                                sotc::AssetTextureAddressMode::clamp_to_edge,
+                                sotc::AssetTextureAddressMode::clamp_to_edge};
+                            constexpr std::array<LogoTextureProbe, 3> kLogoPngProbes = {{
+                                {16, 20, 37, 29}, {46, 14, 171, 83}, {20, 46, 196, 101}}};
+                            if (baseline_texture_png_path == nullptr ||
+                                baseline_texture_png_path[0] == '\0' ||
+                                mutation_texture_png_path == nullptr ||
+                                mutation_texture_png_path[0] == '\0') {
+                                check("logo PNG replay supplies direct baseline and mutation PNG output paths",
+                                      false);
+                            }
+
+                            for (std::size_t probe_index = 0;
+                                 probe_index < kLogoPngProbes.size(); ++probe_index) {
+                                const LogoTextureProbe& probe = kLogoPngProbes[probe_index];
+                                const LogoTextureUv uv = logo_texture_uv_for_probe(
+                                    probe, kLogoPngWidth, kLogoPngHeight);
+                                std::uint32_t oracle_x = 0;
+                                std::uint32_t oracle_y = 0;
+                                const auto expected = logo_png_pixel_oracle(
+                                    logo_png_rgba8, kLogoPngWidth, kLogoPngHeight, uv,
+                                    &oracle_x, &oracle_y);
+                                check("synthetic UV lands on requested source texel center",
+                                      oracle_x == probe.texture_x && oracle_y == probe.texture_y);
+
+                                sotc::DefaultShaderCase asset_shader =
+                                    sotc::make_default_shader_case();
+                                asset_shader.material = {uv.scale_x, uv.scale_y, 0.0F, 1.0F};
+                                asset_shader.param0_p0 = {1.0F, 1.0F, 1.0F, 1.0F};
+                                sotc::AssetMeshDraw asset_draw{positions, indices, asset_shader};
+                                asset_draw.fragment_texture0 = sotc::AssetTexture2D{
+                                    kLogoPngWidth, kLogoPngHeight, logo_png_rgba8};
+                                asset_draw.fragment_sampler0 = asset_sampler;
+                                const sotc::MetalAssetFrameResult asset_frame =
+                                    logo_renderer->render(std::span(&asset_draw, 1));
+                                check("pinned logo PS samples the local PNG asset through slot 0",
+                                      asset_frame.ok);
+                                if (!asset_frame.ok) {
+                                    std::fprintf(stderr, "FAIL logo PNG Metal render: %s\n",
+                                                 asset_frame.error.c_str());
+                                    continue;
+                                }
+                                logo_texture_png_ran = true;
+                                check("logo PNG texel-center output matches fp16-RTZ CPU oracle",
+                                      is_color(asset_frame.rgba8, probe.output_x, probe.output_y,
+                                               expected));
+
+                                if (probe_index == 0) {
+                                    const sotc::MetalAssetFrameResult asset_repeat =
+                                        logo_renderer->render(std::span(&asset_draw, 1));
+                                    check("logo PNG fixture repeat renders", asset_repeat.ok);
+                                    if (asset_repeat.ok) {
+                                        check("logo PNG asset frame is byte deterministic",
+                                              asset_repeat.rgba8 == asset_frame.rgba8 &&
+                                                  asset_repeat.png == asset_frame.png);
+                                    }
+                                    if (logo_texture_output_paths_valid) {
+                                        check("logo PNG baseline is written directly under local evidence",
+                                              write_png_file(baseline_texture_png_path,
+                                                             asset_frame.png));
+                                    }
+
+                                    std::vector<std::uint8_t> mutated_texture = logo_png_rgba8;
+                                    const std::size_t texel_offset =
+                                        (static_cast<std::size_t>(probe.texture_y) *
+                                             kLogoPngWidth +
+                                         probe.texture_x) *
+                                        4U;
+                                    mutated_texture[texel_offset] =
+                                        mutated_texture[texel_offset] == 255U ? 0U : 255U;
+                                    sotc::AssetMeshDraw mutated_asset_draw = asset_draw;
+                                    mutated_asset_draw.fragment_texture0 = sotc::AssetTexture2D{
+                                        kLogoPngWidth, kLogoPngHeight, mutated_texture};
+                                    const sotc::MetalAssetFrameResult mutated_asset_frame =
+                                        logo_renderer->render(std::span(&mutated_asset_draw, 1));
+                                    check("logo PNG texel mutation renders", mutated_asset_frame.ok);
+                                    if (mutated_asset_frame.ok) {
+                                        const auto mutated_expected = logo_png_pixel_oracle(
+                                            mutated_texture, kLogoPngWidth, kLogoPngHeight, uv);
+                                        check("mutated logo PNG texel matches CPU oracle",
+                                              is_color(mutated_asset_frame.rgba8, probe.output_x,
+                                                       probe.output_y, mutated_expected));
+                                        const std::size_t output_offset =
+                                            pixel_offset(probe.output_x, probe.output_y);
+                                        check("logo PNG texel mutation changes selected readback",
+                                              !std::equal(
+                                                  asset_frame.rgba8.begin() +
+                                                      static_cast<std::ptrdiff_t>(output_offset),
+                                                  asset_frame.rgba8.begin() +
+                                                      static_cast<std::ptrdiff_t>(output_offset + 4U),
+                                                  mutated_asset_frame.rgba8.begin() +
+                                                      static_cast<std::ptrdiff_t>(output_offset)));
+                                        check("logo PNG texel mutation changes output PNG bytes",
+                                              mutated_asset_frame.png != asset_frame.png);
+                                        if (logo_texture_output_paths_valid) {
+                                            check("mutated logo PNG is written directly under local evidence",
+                                                  write_png_file(mutation_texture_png_path,
+                                                                 mutated_asset_frame.png));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             } else {
                 std::fprintf(stderr, "FAIL generated logo PS MSL pipeline: %s\n",
                              logo_error.c_str());
@@ -617,6 +1037,10 @@ int main() {
     }
     std::printf("metal_texture_binding: synthetic RGBA8 sample produced %zu PNG bytes\n",
                 baseline.png.size());
-    std::puts("metal_texture_binding checks: PASSED (synthetic texture; no game asset claim)");
+    if (logo_texture_png_ran) {
+        std::puts("metal_texture_binding checks: PASSED (local PNG fixture through synthetic ABI; no retail binding claim)");
+    } else {
+        std::puts("metal_texture_binding checks: PASSED (synthetic texture; no game asset claim)");
+    }
     return 0;
 }

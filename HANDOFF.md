@@ -1,5 +1,101 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 05:16 CDT — logo PNG texture fixture verified; ready to publish
+
+- Integrator: Codex `/root`; task `GPU-03-LOGO-PNG-TEXTURE-SAMPLE-01` is
+  **FIXTURE_VERIFIED**, one path-setup test failure recorded, zero shader-semantic hypotheses failed.
+  The first focused run used CTest's build-directory working directory and was rejected by the local
+  path guard; the CMake test working directory is now the repository root. Three independent
+  read-only reviews found path/hash/MSL identity gaps; all were fixed, and the last review found no
+  remaining actionable concerns.
+- Observed: exact PSARC entry 3738 for `misc/boot/_ps4/saveshadow_scee.ctxr` is 24,636 B with
+  SHA-256 `b4b135232304ab696785353b6ba96f874fc4bcfd8805e56b931119e415a300f5`; ImageIO decodes it
+  to 228x128 RGB / tightly packed top-row-first RGBA8 for the test harness. The private generated
+  logo PS MSL is pinned at SHA-256
+  `071a4ebe11177086c178119fafae04aae99a1a147ad8b8d1e92ee0f17abbfa71`. The renderer uses synthetic
+  slot-0 texture/sampler bindings and synthetic UV/geometry; three texel-center probes at source
+  `(37,29)`, `(171,83)`, `(196,101)` match the independent fp16-RTZ CPU oracle at output
+  `(16,20)`, `(46,14)`, `(20,46)`. Repeated RGBA/PNG output is byte deterministic; changing the first
+  source texel changes the selected readback and PNG.
+- Output PNGs are 64x64 RGBA. Baseline SHA-256:
+  `edd3672bca32b00f99d923cece72b885bf8b21f813eb591d3a432fde9d078ae0`; mutated SHA-256:
+  `171077945500013fcabe28906a9e5d63a851445d25785a6e2f68255aba96b524`. Input, pinned MSL, and all
+  configured PNG paths are canonicalized, required to remain under a real (non-symlink) `local/`
+  directory, and required to be distinct before any PNG write. Regressions cover nested symlink
+  escapes and a fake repo whose `local` symlink points at a tracked in-repo directory.
+- Verification: configure/build passed; full CTest passed **397/397** with Metal API/GPU validation
+  enabled and no reported faults; lift checker suite passed **481/0/0**; project index covered
+  **19,590** folders; Trail wiring graph is synchronized at **8,539 nodes / 11,548 edges** and the
+  new path helper is queryable. Publish-path audits passed for **10 staged paths / 2,791 total
+  paths**; pre-commit attribution audit passed for `origin/main..HEAD`. Logs are under
+  `local/validation/gpu03-logo-png-texture-20261025/` (`final4-*`, `review-fix3-*`). New durable
+  details are in E656 and [the GPU-03 PNG fixture checkpoint](docs/checkpoints/2026-10-25-gpu03-logo-png-texture-sample.md).
+- Inference/limits: this validates this exact pinned shader/PNG under the harness ABI only. Retail
+  descriptor, UV/orientation mapping, AMD WQM/helper-lane equivalence, game-driven frame, G3, boot,
+  game audio, and save/reload remain unverified. No game runtime or production binding is claimed.
+- Exact next action: commit the ten allowlisted staged paths as Johnny Wang with no Claude/Anthropic
+  trailer, push `main`, fetch, and verify local/remote SHA equality and clean status.
+
+## 2026-10-25 05:02 CDT — Metal fixture passes; Trail graph requires rebuild
+
+- Integrator: Codex `/root`; task `GPU-03-LOGO-PNG-TEXTURE-SAMPLE-01` is **ACTIVE**, attempt 1.
+  Focused target build and the full 397-test CTest suite pass; lift checkers pass 481/0/0; project
+  index covers 19,590 folders. Metal API and GPU validation were enabled in the asset replay.
+- The successful targeted CTest (`metal-asset-texture-ctest-attempt2.log`) exercised three
+  texel-center probes: source `(37,29)`, `(171,83)`, `(196,101)` read at output `(16,20)`, `(46,14)`,
+  `(20,46)`. The fp16-RTZ CPU byte oracle matched each readback; full repeat RGBA/PNG bytes were
+  deterministic. Changing the first probed source red channel changed its output pixel and PNG.
+  Private baseline/mutation PNGs are 64x64 RGBA at
+  `local/validation/gpu03-logo-png-texture-20261025/asset-derived.png` and
+  `asset-derived-mutated.png`; SHA-256 values are `edd3672bca32b00f99d923cece72b885bf8b21f813eb591d3a432fde9d078ae0` and
+  `171077945500013fcabe28906a9e5d63a851445d25785a6e2f68255aba96b524`. The imported PNG remains
+  24,636 B at the pinned SHA-256; its 228x128 RGB shape was confirmed by `file` and the test-only
+  ImageIO decoder.
+- Full build and CTest logs are `local/validation/gpu03-logo-png-texture-20261025/full-build.log`
+  and `full-ctest.log`; CTest is 397/397. Lift checkers: `lift-checkers.log` (481 passed, 0 skipped,
+  0 failed). Project index: `project-index.log` (19,590 folders).
+- `trail build --check` is **FAILED/STALE** after the new code. Exact output: changed 3 nodes and
+  added 12, including `native/tests/asset_png_fixture.hpp#decode_asset_png_rgba8` and the new CPU
+  oracle/test helpers; log: `local/validation/gpu03-logo-png-texture-20261025/trail-check.log`.
+  Live `.graft/config.json` contains only `{"followNestedRepos":true}`; graph fingerprints have no
+  `onlyDirs`, and the current 8,522-node/11,526-edge graph already contains native/launcher. Thus
+  the stale `onlyDirs` sentence in AGENTS.md does not match the live graph. **Ruling:** keep the
+  repository's broad default root scope and do not add a narrowing `onlyDirs` list; rebuild then
+  query the new helper declaration to verify native test coverage. Cost if wrong: an excluded scope
+  would remain unindexed; the post-build symbol query will expose that immediately.
+- Exact next action: run `trail build`, then `graft grep 'decode_asset_png_rgba8'` and
+  `trail build --check`. Do not stage `graft/` cache. After graph verification, finish diff review,
+  record E656, run staged/all path audits and attribution, then commit/push the allowlisted task files
+  to `main` as Johnny Wang without Claude/Anthropic coauthor trailers.
+
+## 2026-10-25 05:00 CDT — first logo PNG replay found CTest working-directory mismatch
+
+- Integrator: Codex `/root`; `GPU-03-LOGO-PNG-TEXTURE-SAMPLE-01` remains **ACTIVE**, attempt 1.
+  The helper build passed after the prior SDK enum-cast correction. The initial focused Metal replay
+  reached the test, with API and GPU validation enabled and no device skip.
+- Exact command: `SOTC_LOGO_PS_MSL='/Volumes/Extra/SoC Mac Native/local/validation/gpu02-logo-ps-image-sample-20261025/logo-ps.metal' SOTC_LOGO_PS_PNG='/Volumes/Extra/SoC Mac Native/local/validation/gpu03-logo-png-texture-20261025/logo-ps-synthetic.png' SOTC_LOGO_PS_TEXTURE_PNG='/Volumes/Extra/SoC Mac Native/local/validation/gpu03-logo-png-texture-20261025/saveshadow_scee.png' SOTC_LOGO_PS_TEXTURE_OUTPUT_PNG='/Volumes/Extra/SoC Mac Native/local/validation/gpu03-logo-png-texture-20261025/asset-derived.png' SOTC_LOGO_PS_TEXTURE_MUTATION_PNG='/Volumes/Extra/SoC Mac Native/local/validation/gpu03-logo-png-texture-20261025/asset-derived-mutated.png' ctest --test-dir local/build/orch-r22 -R '^metal_texture_binding$' --output-on-failure -V` exited 8. Log: `local/validation/gpu03-logo-png-texture-20261025/metal-asset-texture-ctest-attempt1.log`.
+- Observed: the private MSL replay itself compiled, but writing the existing synthetic PNG and reading the asset PNG failed the local-path guard. CTest reported its working directory as `local/build/orch-r22`; `is_local_path` had resolved `local/` relative to that directory. No shader output or CPU-oracle comparison ran. This is a test working-directory defect, not a shader-semantic result.
+- `docs/TASKS.md` records attempt 1. Exact next action: set this CTest's working directory to the repository root, as the asset-frame CTest already does, then rerun the same targeted command. No hypothesis about texture sampling has failed.
+
+## 2026-10-25 04:59 CDT — decoder helper build reports enum-conversion warning
+
+- Integrator: Codex `/root`; task `GPU-03-LOGO-PNG-TEXTURE-SAMPLE-01` is **ACTIVE**, attempt 0
+  semantic hypotheses. The private importer succeeded: exact PSARC entry 3738 yielded 24,636 B with
+  the pinned SHA-256 `b4b135232304ab696785353b6ba96f874fc4bcfd8805e56b931119e415a300f5` at
+  `local/validation/gpu03-logo-png-texture-20261025/saveshadow_scee.png`.
+- Source files currently modified: `native/CMakeLists.txt`,
+  `native/tests/test_metal_texture_binding.cpp`, `native/tests/asset_png_fixture.hpp`,
+  `native/tests/asset_png_fixture.mm`; the test-only helper is from `/root/png_decoder_helper` and
+  root now owns integration. No private asset or local log is staged.
+- Exact failed command: `cmake --build local/build/orch-r22 --target test_metal_texture_binding -j 12`
+  exited 1; log: `local/validation/gpu03-logo-png-texture-20261025/metal-test-build.log`. The Apple
+  SDK warns that OR-ing the anonymous bitmap byte-order enum with `CGImageAlphaInfo` is deprecated;
+  `-Werror` promotes it to an error. The C++ test integration compiled, the Objective-C++ decoder
+  did not. This is an SDK typing issue, not a PNG/shader behavior result.
+- Exact next action: cast both bitmap-info enum operands to `CGBitmapInfo`, rerun the focused target
+  build, then run the fixture with the hash-verified PNG, pinned MSL, local output paths, and Metal
+  API/GPU validation. Attempt count remains 0 for semantic hypotheses.
+
 ## 2026-10-25 04:55 CDT — task claim published to GitHub main
 
 - Integrator: Codex `/root`; commit `bc12aed0dad90ef9e0034e70a9872fe545613128` published to
