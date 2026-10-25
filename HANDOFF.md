@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 10:07 CDT — slot 306 survey claim published
+
+- Commit `c521168202de3e43fbe459af5ffb46cb73ddf214` published the new read-only slot-306 survey
+  claim to GitHub `main`. Fetch confirms local `HEAD == origin/main`; checkout is clean on `main`.
+- Staged/all-path audits passed **6/2,796**; attribution passed. Author/committer are Johnny Wang;
+  no Claude/Anthropic/co-author trailer. E672 records this documentation publication.
+- `CPU-01-STARTUP-SLOT-306-SURVEY-01` remains ACTIVE, attempt 0. Exact next action: assign the
+  private evidence work under `local/re/evidence/startup-slot-306-survey-20261025/`; root keeps
+  HANDOFF/TASKS/EVIDENCE ownership and integrates only a verified summary.
+
 ## 2026-10-25 10:06 CDT — startup slot 306 read-only survey claimed
 
 - Integrator: Codex `/root`; checkout remains clean on `main` at
