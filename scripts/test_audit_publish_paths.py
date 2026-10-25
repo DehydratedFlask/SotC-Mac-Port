@@ -135,11 +135,11 @@ class PublishPathTests(unittest.TestCase):
             "native/local_tests/a.c",
             "tools/graft/README.md",
             "docs/Shadow of the Colossus notes.md",
-            # Top-level reference/logs/graft are forbidden; nested names under allowlisted
-            # roots stay allowed (AUD-PUBLISH-NESTED-01 deliberate policy).
-            "docs/reference/notes.md",
-            "tools/logs/build-notes.txt",
-            "scripts/reference/helpers.py",
+            # Exact `reference` and `logs` components stay forbidden at any depth;
+            # lookalike names under allowlisted roots remain allowed.
+            "docs/reference-notes/notes.md",
+            "tools/logs-build/build-notes.txt",
+            "scripts/references/helpers.py",
         ]
         self.assertEqual(audit.violations(cases), [])
 
