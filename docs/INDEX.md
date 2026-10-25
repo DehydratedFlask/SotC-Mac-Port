@@ -21,6 +21,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Logo PS IMAGE_SAMPLE prerequisite](checkpoints/2026-10-25-gpu02-logo-ps-image-sample.md) | E645 synthetic multi-mip implicit/explicit Metal sampler prerequisite |
 | [Logo PS IMAGE_SAMPLE completion](checkpoints/2026-10-25-gpu02-logo-ps-image-sample-complete.md) | E646 pinned fixed-template MSL replay and synthetic Metal/CPU-oracle result; retail and G3 limits remain |
 | [Logo PS principal reassessment](escalations/GPU-02-GCN-LOGO-PS-IMAGE-SAMPLE-01.md) | Three unsuccessful test hypotheses, recorded root reassessment, and passed fourth focused replay |
+| [Logo PS PR #12 merge closeout](checkpoints/2026-10-25-gpu02-logo-ps-merge-pr12.md) | PR #12 merged as `a07d451`; local and remote task branches removed; clean local `main` verified |
 | [GFX7 default-pair inventory and Metal harness](checkpoints/2026-10-24-gcn-default-pair.md) | E625 inventory plus E627 bounded default VS/PS MSL; overall G3 is PARTIAL from later synthetic Metal harness work |
 | [CSDR reader corpus and review](checkpoints/2026-10-24-csdr-reader.md) | E626 structural-first attempt3, arbitrary `cc xx`, full corpus v5 and independent review |
 | [Round 30 integration](checkpoints/2026-10-24-round30-integration.md) | Root replay: CTest 388/388, lift checkers 476/0/0, Python 228/228, shader harness and outstanding game gates; E628 |

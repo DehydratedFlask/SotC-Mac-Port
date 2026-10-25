@@ -1,5 +1,29 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 04:22 CDT — PR #12 merged; checkout restored to main
+
+- Integrator: Codex `/root`; `GPU-02-GCN-LOGO-PS-IMAGE-SAMPLE-01` remains
+  **FIXTURE_VERIFIED** for its exact digest-pinned shader specialization and synthetic ABI. GPU-03
+  remains `NEEDS_PRINCIPAL`; G3 remains `PARTIAL`.
+- GitHub PR #12, `feat(metal): validate pinned logo image sampling`, merged into `main` from head
+  `ed08e2b83329738113d5611b34fca30d4177ab42` as merge commit
+  `a07d45184c978bdd7a0a937be90c83f499fcca50` at `2026-10-25T09:22:29Z`. GitHub removed the remote
+  task branch. PR: https://github.com/DehydratedFlask/SotC-Mac-Port/pull/12.
+- Local cleanup passed: `git switch main`, `git pull --ff-only origin main`,
+  `git branch -d codex/gpu02-logo-ps-image-sample-20261025`, and `git remote prune origin`. The local
+  task branch and `origin/codex/gpu02-logo-ps-image-sample-20261025` are absent; the source checkout
+  was clean `main` at the same SHA as `origin/main` before this documentation closeout.
+- The CTest/build/checker results in E646 were run on head `ed08e2b...`; the merge commit preserves
+  that exact source tree. No tests or code changes were made during branch cleanup.
+- This merge closeout is a documentation-only update on `main`; the implementation arrived through
+  PR #12. The owner's explicit instruction to merge all changes to GitHub `main` covers publishing
+  this factual closeout. Validation for the staged docs passed: project index 19,589 folders, Trail
+  8,519 nodes / 11,521 edges in sync, staged/all path audits 6/2,787, `git diff --cached --check`,
+  and owner identity audit. Owner-authored closeout commit is now on local `main`; the full
+  unpublished-range attribution audit passes, author/committer are Johnny Wang, no coauthor trailer
+  is present, and the all-path audit passes for 2,787 repository paths. Next exact action: push this
+  commit to `origin/main`, then verify clean `main` and exact remote SHA.
+
 ## 2026-10-25 04:16 CDT — E646 pinned logo PS Metal replay passes
 
 - Integrator: Codex `/root`; `GPU-02-GCN-LOGO-PS-IMAGE-SAMPLE-01` is **FIXTURE_VERIFIED** for the

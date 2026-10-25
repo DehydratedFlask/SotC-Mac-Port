@@ -65,7 +65,6 @@ Observed: exact private bytes pass the digest/structure gates, the fixed PS-only
 executes, tested synthetic image-sample/color-export outputs match the CPU oracle, and the full native
 fixture suite passes. Not established: AMD WQM/helper-lane derivative equivalence, retail descriptor
 or SPI interpretation, original texture data, an asset-derived or game-driven frame, or G3. Keep
-GPU-03 `NEEDS_PRINCIPAL`, G3 `PARTIAL`, and make no boot/audio/save completion claim. Next exact action:
-run staged/all publication-path and attribution audits, commit only allowlisted source/docs as Johnny
-Wang without Claude/Anthropic coauthor lines, publish a PR to main, merge the reviewed exact head,
-then return the local checkout to clean `main` and delete the task branch.
+GPU-03 `NEEDS_PRINCIPAL`, G3 `PARTIAL`, and make no boot/audio/save completion claim. PR #12 merged
+the tested tree into `main` as `a07d45184c978bdd7a0a937be90c83f499fcca50`; GitHub and the local checkout
+removed the task branch. See the [merge closeout](2026-10-25-gpu02-logo-ps-merge-pr12.md).
