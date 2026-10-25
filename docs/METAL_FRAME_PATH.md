@@ -525,7 +525,10 @@ stay under `local/`.
 
 This is a synthetic stage-composition check. It does not infer retail stream aliasing, TEX0/NRM0
 semantics, WQM/helper-lane equivalence, game-driven rendering, or G3 completion. E664 is the task
-claim; completion evidence will be appended after the focused and repository gates run.
+claim. E667 records the focused implementation result: 23/23 lowerer tests and the opt-in direct-Metal
+quad passed with Metal API/GPU validation enabled. The closed profile also canonicalizes and confines
+all five ABI/input/output paths to `local/` and rejects path collisions. Full repository gates remain
+pending; this is not task completion or game-frame evidence.
 
 ## 7. Ranked task cards
 

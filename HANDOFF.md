@@ -1,5 +1,42 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 09:56 CDT — logo-pair path guard and focused Metal checkpoint
+
+- Integrator: Codex `/root`; task `GPU-03-LOGO-VS-PS-METAL-PIPELINE-01` remains **ACTIVE**, attempt 2.
+  The lowerer now confines the ABI, both shader inputs, MSL output, and report to canonical workspace
+  `local/`; it also rejects any resolved path collision before reads or writes. An independent review
+  found the collision gap; a regression test covers output aliasing the VS input. Test fixture count
+  was corrected to the pinned report: VS 25 instructions, PS 34.
+- Failed-check record: first focused Python run had 23 tests with one assertion failure because the
+  collision diagnostic named the earlier VS input rather than the later MSL output. The preflight
+  had already rejected the alias before file I/O. The check order was corrected and the rerun passed
+  23/23. Preserved logs: `attempt2-python-lowering-tests-first-run.log` and
+  `python-lowering-tests.log` under `local/validation/gpu03-logo-vs-ps-pipeline-20261025/`.
+- Focused result: `python3 -I -W error tools/dev/test_gcn_to_msl.py` passed **23/23**; pinned pair
+  generation passed with exact E636/E646 input hashes, 25/34 instruction counts, and MSL SHA-256
+  `37e09aef0838dff77c8f151f288ed8cb2cdf7db26e202b40bb9f6f27a34dbd56`. Focused
+  `metal_texture_binding` CTest passed **1/1** with Metal API and GPU validation enabled. The CPU
+  oracle, repeat determinism, texel mutation, and position mutation checks passed; direct baseline and
+  mutated PNGs have hashes `db954a90001319db7954ac569c3ceffed9143de27ef3eda2fda37f4a24efac02` and
+  `74ee455f6c7bce82b70e2ff65e54dfe27a8c5de51ef392d4df469b43796be694`. Full logs and generated
+  artifacts remain under the ignored validation directory.
+- Earlier attempt 1 preserved the initial Metal oracle mismatch and its correction. It was a harness
+  Y/probe mapping error, not a shader lowering failure; the exact failed and corrected CTest records
+  remain in `attempt1-*` and `metal-logo-pair-ctest.log`.
+- Observation: the lowerer emits the pinned E636 vertex stage and E646 fragment stage in one MSL
+  source and the opt-in test executes both. Inference: the selected synthetic position-correlated UV
+  alias is useful for this fixture only. No retail stream/descriptor/TEX0/NRM0, WQM/helper-lane
+  equivalence, game-driven frame, or G3 claim follows.
+- The project index covers **19,593 folders**; Trail rebuilt and `trail build --check` passed with
+  **8,560 nodes / 11,611 edges / 1,497 cards** over 2,002 files (deep meaning layer not built).
+- Files changed: `tools/dev/gcn_to_msl.py`, `tools/dev/test_gcn_to_msl.py`, and
+  `native/tests/test_metal_texture_binding.cpp`; documentation now records E667. No install or
+  dependency change. Exact next action: run full CMake configure/build/CTest and lift checkers, then
+  staged/all-path and attribution audits; review and publish allowlisted files on `main` as Johnny
+  Wang. Project index and Trail wiring checks are refreshed and passed.
+- Status: focused lowering and Metal fixture checks **PASSED**; repository publication gates **NOT
+  RUN**; task remains **ACTIVE**, attempt 2.
+
 ## 2026-10-25 09:44 CDT — task claim and owner decision published
 
 - Integrator: Codex `/root`; commit `478163c32c2f7f4b099d46189f17fb468703d3c7` was pushed directly
