@@ -3,7 +3,7 @@
 Date: 2026-10-25 05:37 CDT
 Integrator: Codex `/root`
 Task: `GPU-03-LOGO-PNG-CMSH-ASSET-FRAME-01`
-Status: **FIXTURE_VERIFIED**; publication gates in progress
+Status: **FIXTURE_VERIFIED**; published to GitHub `main`
 
 ## Scope and implementation
 
@@ -101,7 +101,15 @@ interpretation, retail UV or vertex bindings, retail orientation, AMD WQM/helper
 game-driven rendering, and G3 remain unverified. The evidence does not establish boot, game audio,
 or save/reload.
 
-Next exact action: rebuild/check the Trail graph and query the new fixture helpers; run the project
-index, required publish-path and attribution audits, then stage only allowlisted source/docs and
-publish to `main` as Johnny Wang with no Claude/Anthropic contributor trailer. Capture final gate
-counts and commit/push SHAs in this checkpoint and `HANDOFF.md`.
+## Publication closeout
+
+Commit `87a285e7aac4832f77c4a465d1b872cf44794177` was pushed directly to GitHub `main` as requested.
+The commit author and committer are Johnny Wang; the message has no Claude/Anthropic/Co-Authored-By
+trailer. `git fetch origin main` confirmed local `HEAD == origin/main`; the worktree is clean on
+`main` and `gh pr list --state open` returned `[]`. Staged/all publication path audits passed 8/2,792
+paths; the unpublished-range attribution audit passed. Graph and project-index results are recorded
+above. E659 records publication, and this checkpoint records E658 fixture verification.
+
+Next exact action: perform a read-only, hash-bound survey of the two raw mesh TEX0 descriptor spans.
+Only claim supported format facts; keep synthetic UV mapping in the verified fixture until any retail
+UV interpretation has independent evidence and its own bounded task claim.

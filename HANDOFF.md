@@ -1,5 +1,24 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 05:42 CDT — E658 composite fixture published to main
+
+- Integrator: Codex `/root`; task `GPU-03-LOGO-PNG-CMSH-ASSET-FRAME-01` is **FIXTURE_VERIFIED**.
+  Source/evidence commit `87a285e7aac4832f77c4a465d1b872cf44794177` was pushed directly to
+  GitHub `main` as requested. Post-push `git fetch origin main` confirms local `HEAD` and
+  `origin/main` match; `git status --short --branch` is clean on `main`; `gh pr list --state open`
+  returned `[]`.
+- Staged and all-path publication audits passed 8 / 2,792 paths; `git diff --cached --check`
+  passed after removing three trailing Markdown hardbreak spaces. Attribution audit passed for
+  `origin/main..HEAD`. Commit author/committer are Johnny Wang
+  (`dehydratedflask@users.noreply.github.com`); the commit message contains no Claude, Anthropic,
+  or `Co-Authored-By` trailer. E659 records publication only; E658 remains the implementation test
+  evidence.
+- Exact next action: perform a read-only, hash-bound survey of the raw cube/cone TEX0 descriptor
+  bytes to determine whether independently supported UV-format evidence exists. Do not alter the
+  verified synthetic harness mapping or make a TEX0 decoder until the descriptor evidence and
+  bounded task scope are explicit.
+- Status: E658 source task published; overall game port remains incomplete, and G3 is PARTIAL.
+
 ## 2026-10-25 05:41 CDT — cached diff check caught checkpoint hardbreak spaces
 
 - Integrator: Codex `/root`; task `GPU-03-LOGO-PNG-CMSH-ASSET-FRAME-01` remains **FIXTURE_VERIFIED**.
