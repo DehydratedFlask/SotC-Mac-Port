@@ -1,5 +1,52 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 10:34 CDT — slot-306 survey closeout evidence reconciled
+
+- Task `CPU-01-STARTUP-SLOT-306-SURVEY-01` is **STATIC_ANALYSIS_VERIFIED** for table/body/call-footprint
+  characterization only. The pinned ELF is 65,214,308 B, SHA-256
+  `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`. Table slot index 306 at
+  file offset `0x2dda750` contains `b033a60000000000` → RVA `0xa633b0`. Reached body
+  `[0xa633b0,0xa654bd)` is 8,461 B, SHA-256
+  `f8f707c7f80129cb79d2d54a61b6fd53caa62bf920c36f18a5b93152ff9933c8`.
+- Independent read-only review caught and reconciled a typo in the private report: ELF has 11
+  program headers and **two** `PT_LOAD` segments, phdrs 0 and 2. No Ghidra/REA rerun or private
+  evidence rewrite was needed; the corrected count and report typo are disclosed in E676.
+- Risks/limits: 11 indirect calls unresolved; no direct incoming code-call edge proven, which does
+  not rule out indirect dispatch; 196/198 direct-call count disagreement; instruction counts 1,582
+  reachability, 1,571 LLVM (including three trailing NOPs), 1,568 Ghidra; direct-store footprint is
+  non-transitive. Analyzer touched 27 files in its fixed scratch directory without pre-run
+  inventory. Ghidra changed four index-cache mtimes; byte identity is unverified. Semantic contract
+  is UNKNOWN; no constructor implementation or startup/runtime claim; G1 remains PARTIAL.
+- Exact commands, logs, manifests and private byte evidence are under ignored
+  `local/re/evidence/startup-slot-306-survey-20261025/`. Commands and outcomes are summarized in the
+  survey checkpoint; project-side status is recorded as E676.
+- Exact next action: after the GPU-03 bounded attempt/review, select the next independent READY task
+  from `docs/TASKS.md`; do not revisit slot 306 through Ghidra without new evidence/authorization.
+
+## 2026-10-25 10:32 CDT — GPU-03 try-four scope corrected by independent review
+
+- Integrator/principal: Codex `/root`; branch `main`, base `2055cb20` before checkpoint. Review
+  agent `/root/review_gpu03_mutation` inspected the test diff and logs only; no code change or test.
+- Review confirmed the search is one-sided and found a definite CPU oracle bug: mutation UV in the
+  caller divides by frame width/height but must also divide by the fixture camera scale 0.8. It also
+  found mutated frame length is not checked before pixel-range indexing. The three logs do not show
+  whether the geometry candidate filters or clear-color filter exhausted attempt 2/3.
+- The recorded principal reassessment in
+  `docs/escalations/GPU-03-LOGO-VS-PS-RAW-CMSH-FRAME-01.md` now authorizes exactly one attempt 4 to
+  add counts for geometric entrants vs color-qualified entrants, search robust covered→uncovered
+  pixels, fix the camera-scaled UV oracle, validate mutated readback dimensions/stride before
+  indexing, and assert baseline texture-oracle color vs a verified pixel uncovered by both meshes,
+  then require the GPU-mutated pixel and PNG to change. Existing assertions remain. No fifth try is
+  authorized.
+- Exact next action: publish the updated three-try escalation/reassessment to `main`, then resume the
+  implementation lane for this bounded try 4; run a scoped independent review before acceptance.
+- Slot-306 independent review also completed: table/body/hash and caller checksums pass, but the
+  private report has a `PT_LOAD` count typo (two, not three). The two `PT_LOAD` fact and all unresolved
+  indirect/call-count/instruction-count and side-effect caveats are recorded for public closeout.
+- GPU-03 status remains ACTIVE after reassessment with 3 failed tries and one authorized try; G3 is
+  PARTIAL. CPU slot 306 is STATIC_ANALYSIS_VERIFIED only for characterization; semantics UNKNOWN,
+  G1 PARTIAL. Neither task claims runtime execution.
+
 ## 2026-10-25 10:19 CDT — raw CMSH + logo VS/PS task claim published
 
 - Commit `e2faefcd64de171d2890a1da2dd319afde9bd2c5` publishes E673 to GitHub `main`. Fetch confirms

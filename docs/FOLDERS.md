@@ -13,7 +13,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `docs` | 18 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/.cache` | 0 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/checkpoints` | 743 | Plans, task/evidence registries, checkpoint and escalation documentation |
-| `docs/escalations` | 7 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs/escalations` | 8 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/schemas` | 1 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `graft` | 1 | Regenerable source graph; internal cache directories summarized |
 | `launcher` | 2 | Native Swift macOS launcher |

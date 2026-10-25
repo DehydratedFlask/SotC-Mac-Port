@@ -34,6 +34,45 @@
   this checkpoint. No native/source implementation, installation, or binary execution.
 - Status: **ACTIVE**, attempt 0, no failed hypotheses. Next step is private read-only evidence review.
 
+## 2026-10-25 10:34 CDT — read-only characterization completed and independently audited
+
+- Integrator: Codex `/root`; reviewers `/root/next_task_triage`, `/root/slot306_callers`, and
+  independent read-only reviewer `/root/audit_slot306`. Branch is `main`; no source, constructor,
+  registration, or runtime behavior was changed.
+- Exact private verification command set is preserved in
+  `local/re/evidence/startup-slot-306-survey-20261025/body/commands.txt`. Core commands were:
+  `file`, `shasum -a 256`, and `stat` on `local/re/eboot.elf`; `xcrun llvm-objdump -p` for ELF headers;
+  `xcrun llvm-objdump -d --start-address=0xa633b0 --stop-address=0xa654c0` for linear disassembly;
+  `env PYTHONDONTWRITEBYTECODE=1 python3 -I tools/lift/analyze_slot_struct.py 0xa633b0`; then
+  `verify_slot306.py` and the read-only scratch inventory. The pinned ELF SHA-256 is
+  `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+- Result: index 306 maps from file offset `0x2dda750`, raw bytes `b033a60000000000`, to RVA
+  `0xa633b0`. Reachability body `[0xa633b0,0xa654bd)` is 8,461 B, hash
+  `f8f707c7f80129cb79d2d54a61b6fd53caa62bf920c36f18a5b93152ff9933c8`; the existing FDE/function
+  inventory row spans 8,462 B and includes a trailing NOP. Ghidra's body count is 1,568; LLVM's
+  requested range covers 1,571 instruction rows including three trailing NOPs; reachability reports
+  1,582. LLVM and the prior Ghidra edge export agree on 198 direct calls/15 targets; reachability
+  reports 196 and omits `0xa637ae -> 0xf8f390` and `0xa643ad -> 0xc300`. Eleven indirect calls remain
+  unresolved. The Ghidra reference query reports one DATA reference from the table word and no
+  incoming code/call reference; this is not proof against indirect dispatch.
+- Independent audit checked the table word, body span/hash, all 18 body-manifest entries and all
+  caller checksums. It found `body/REPORT.md` incorrectly says three `PT_LOAD` headers. The pinned
+  ELF has 11 program headers and **two** `PT_LOAD` headers (phdrs 0 and 2), as shown by the raw parse,
+  machine-readable verifier, and table-word record; public evidence uses the corrected value while
+  the original private report remains unchanged. All 61 direct RIP-relative store destinations are
+  in RW zero-fill, but the analyzer footprint omits pointer-derived/transitive callee effects and
+  does not establish ownership/semantics.
+- Side effects/risks remain explicit: the fixed-path analyzer wrote 27 scratch intermediates under
+  its pre-existing system temp directory without a before-inventory, so an older same-named file
+  replacement cannot be excluded. Ghidra -readOnly changed four index-cache mtimes; project/program
+  metadata mtimes stayed unchanged, but byte-for-byte database identity is unverified. No cleanup or
+  Ghidra/REA rerun occurred.
+- Files for public closeout: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, this
+  checkpoint. Status: **STATIC_ANALYSIS_VERIFIED** for address/table/body/call-footprint only;
+  constructor semantic contract stays UNKNOWN, no implementation/runtime claim; G1 remains PARTIAL.
+- Exact next action: publish the evidence closeout through the allowlisted main-branch process, then
+  pursue another independently READY task without reopening the persistent Ghidra project.
+
 ## 2026-10-25 10:07 CDT — claim published
 
 - Commit `c521168202de3e43fbe459af5ffb46cb73ddf214` was pushed to GitHub `main`; post-push fetch

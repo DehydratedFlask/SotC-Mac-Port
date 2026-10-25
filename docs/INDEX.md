@@ -15,7 +15,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [METAL_FRAME_PATH](METAL_FRAME_PATH.md) | Renderer boundary, bounded importer/Metal work, and synthetic harness evidence; G3 PARTIAL, no game frame |
 | [PSARC MD5 reconciliation](checkpoints/2026-10-24-psarc-md5-reconciliation.md) | Correct path-key pairing and superseded audio/asset claims; E621 |
 | [Startup slots 302/303/305](checkpoints/2026-10-24-startup-slots-302-303-305.md) | 317/573 registered, first gap 306; E623; fixture/static verification only |
-| [Startup slot 306 survey](checkpoints/2026-10-25-startup-slot-306-survey.md) | E671 read-only task claim for the next table gap; body and side-effect contract remain unverified |
+| [Startup slot 306 survey](checkpoints/2026-10-25-startup-slot-306-survey.md) | E676 hash-bound table/body/call-footprint characterization; semantics UNKNOWN, 11 indirect calls unresolved, G1 PARTIAL |
 | [Slot 303 checker publication repair](checkpoints/2026-10-24-slot303-publication-repair.md) | Complete function reconstruction removed from public checker; E624 |
 | [Integration PR #9 final closeout](checkpoints/2026-10-25-integration-pr9-final-closeout.md) | PR #9 merged at `a8bd805`; clean-main baseline and branch cleanup verified; E643 |
 | [Metal fragment derivative fixture](checkpoints/2026-10-25-gpu02-metal-quad-derivative-fixture.md) | Synthetic Metal helper-lane derivative and implicit/explicit sampling check; one mip only; E644 |
@@ -40,7 +40,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [GPU-03 raw CSMH member import](checkpoints/2026-10-25-gpu03-raw-cmsh-import.md) | E639 exact MD5(path)-mapped raw-member import and private size/hash verification; parser and Metal draw were verified separately in E640 |
 | [GPU-03 logo PNG texture sample](checkpoints/2026-10-25-gpu03-logo-png-texture-sample.md) | E656 exact PNG/MSL pins and synthetic slot-0 texel-center Metal replay; retail bindings and WQM equivalence remain unverified |
 | [GPU-03 logo VS/PS Metal pipeline](checkpoints/2026-10-25-gpu03-logo-vs-ps-metal-pipeline.md) | E669 fixture-verified composed E636/E646 Metal pipeline; E670 records publication on main; retail/game-frame limits remain |
-| [GPU-03 logo VS/PS on raw CMSH meshes](checkpoints/2026-10-25-gpu03-logo-vs-ps-raw-cmsh-frame.md) | Active E673 claim to execute the composed pair on exact-hash raw cube/cone meshes with the pinned PNG and a synthetic position-to-clip/UV transform |
+| [GPU-03 logo VS/PS on raw CMSH meshes](checkpoints/2026-10-25-gpu03-logo-vs-ps-raw-cmsh-frame.md) | E673 claim; E675 records three failed position-probe attempts and one principal-authorized reassessment; see [escalation](escalations/GPU-03-LOGO-VS-PS-RAW-CMSH-FRAME-01.md) |
 | [GPU-03 logo PNG and raw mesh composite](checkpoints/2026-10-25-gpu03-logo-png-cmsh-composite.md) | E658 exact-hash raw cube/cone POS0/U16 plus pinned logo PNG/MSL through the direct-Metal asset-derived harness; retail mapping and G3 remain unverified |
 | [GPU-03 CMSH TEX0 format code 6 evidence](checkpoints/2026-10-25-gpu03-cmsh-tex0-format-6.md) | E660 records the hash-pinned TEX0 spans; E662 records completed shipped-code tracing with no decoder found, so coordinate semantics remain UNKNOWN |
 | [GPU-03 logo VS/PS Metal pipeline](checkpoints/2026-10-25-gpu03-logo-vs-ps-metal-pipeline.md) | E664 claim and E666 publication of the closed synthetic composition of exact-hash E636/E646 stages; implementation is active |
