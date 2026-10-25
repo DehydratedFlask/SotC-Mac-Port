@@ -1,5 +1,48 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 02:03 CDT — GPU-02 logo vertex fetch lowering verified
+
+- Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`. Task
+  `GPU-02-GCN-LOGO-VS-FETCH-01` is `FIXTURE_VERIFIED`, attempt 1, with 0 failed shader-semantic
+  hypotheses. `/root/gpu_next_lane` implemented the lowerer/tests; root independently ran the private
+  ABI/oracle/Metal replay.
+- Source change: `tools/dev/gcn_to_msl.py` accepts explicit float2/float3/float4 formatted MUBUF
+  fetches, preserves descriptor/index/offset/flags checks, and writes exactly the fetched component
+  count. `tools/dev/test_gcn_to_msl.py` tests widths, retained trailing VGPRs, and fail-visible ABI
+  mismatches. No generated MSL or game bytes were added to the public tree.
+- Pinned input: `local/fixtures/gpu-r30/logo-vs.bin`, 140 B, SHA-256
+  `430f9adbb07d387c0b2b877b98300396f183faeab7f75cba0c9b0c67ada20c0c`; 25 instructions, no unknown
+  instructions, exact end. The two XY fetches and one XYZW fetch use only a private synthetic float
+  ABI. The default pixel shader is a synthetic execution sink, not the logo PS.
+- Exact commands/results: `python3 -I -W error tools/dev/test_gcn_to_msl.py` (14/14),
+  `python3 -I -W error tools/dev/test_gcn_inventory.py` (23/23),
+  `python3 -I local/orchestrator/gpu02-logo-vs-fetch/run_private_metal.py` (exit 0; Apple M4 Pro;
+  Metal API/GPU validation enabled; 1,024 cases; generated MSL compiled; compute and offscreen
+  execution complete; `fastMath=NO`; 12,288 components exact against the separate CPU oracle, 0
+  mismatches). Generated MSL SHA-256 `316b5505512c6f377415f486d7e5c4abd983a9aff56061efb107c14ab800226d`.
+  Full verification: CMake configure/build exit 0; CTest 392/392; lift checkers 476 passed / 0 skipped /
+  0 failed. Logs are under `local/orchestrator/gpu02-logo-vs-fetch/`.
+- A first synthetic width-1 fixture used an unsupported opcode and was rejected by decode before
+  reaching the lowerer; the test was corrected to use a valid width-2 opcode with an
+  `explicit_float1` ABI mismatch. This was fixture construction correction, not a shader-semantic
+  failure. No semantic hypothesis failed.
+- Observation versus inference: MSL for the pinned shader bytes matches the independent oracle under
+  this declared synthetic stream ABI; this does not establish retail descriptor values, semantic
+  attribute names, interpolation state, actual mesh bindings, logo pixel shader WQM/MIMG semantics,
+  game rendering, boot, audio, or saving. G3 remains PARTIAL.
+- Files changed: `tools/dev/gcn_to_msl.py`, `tools/dev/test_gcn_to_msl.py`, `docs/TASKS.md`,
+  `docs/EVIDENCE.md`, `docs/METAL_FRAME_PATH.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, this
+  HANDOFF, and `docs/checkpoints/2026-10-25-gpu02-logo-vs-fetch-complete.md`. No dependency change;
+  `INSTALL_LOG.md` unchanged.
+- User resolved the next GPU-03 L1 boundaries: raw identified local `.cmsh` bytes may be passed to the
+  parser/private Metal harness; use explicit harness normals `[0.5, 0.5, 1.0]`; write a direct private
+  PNG without `attach_screenshot` or an invented engine frame number. Those asset checks have not run.
+- Next exact action: finish the owner-requested GitHub PR audit/repairs, run publication audits, and
+  merge the reviewable PRs into `main`. PR #5 currently has a confirmed alignment-contract defect and
+  remains held for correction. After that publication step, start the authorized GPU-03 raw-mesh L1
+  frame task.
+- Publication of this checkpoint is pending pre-commit audits.
+
 ## 2026-10-24 16:38 CDT — E635 publication verified
 
 - The synthetic texture/sampler fixture is published on `cursor/init-hash-551140-9dfc` as

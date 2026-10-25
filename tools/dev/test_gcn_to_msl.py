@@ -30,6 +30,41 @@ def synthetic():
     return vs,ps,abi
 
 
+def synthetic_mubuf(components, stream_format=None, stream_field='position',
+                    descriptor_view='vertices', stream_view=None, vertex_index=True,
+                    mubuf_overrides=None):
+    mubuf_fields = dict(op=components - 1, data=10, addr=0, resource=0, offset=0,
+                        soffset=128, offen=0, idxen=1, glc=0, addr64=0, lds=0,
+                        slc=0, tfe=0)
+    mubuf_fields.update(mubuf_overrides or {})
+    code = e.mubuf(**mubuf_fields)
+    code += b''.join(e.exp(target=target, done=int(target == 12),
+                           src=(10, 11, 12, 13)) for target in (12, 32, 33)) + e.END
+
+    initial_vector = {'0': (dict(kind='vertex_index') if vertex_index
+                            else float_input('position', 'x'))}
+    for component in range(components, 4):
+        initial_vector[str(10 + component)] = float_input('material', 'xyzw'[component])
+    if stream_format is None:
+        stream_format = f'explicit_float{components}'
+    if stream_view is None:
+        stream_view = descriptor_view
+    abi = dict(
+        sha256=hashlib.sha256(code).hexdigest(),
+        initial_scalar={'0': dict(kind='descriptor', view=descriptor_view)},
+        initial_vector=initial_vector,
+        streams={stream_view: dict(format=stream_format, field=stream_field)},
+    )
+    return code, abi
+
+
+def lower_synthetic_mubuf(components, **kwargs):
+    code, abi = synthetic_mubuf(components, **kwargs)
+    lowerer = m.Lowerer(abi, 'vs')
+    lines, report = lowerer.run(code)
+    return lowerer, lines, report
+
+
 class LoweringTests(unittest.TestCase):
     def test_complete_synthetic_pair(self):
         vs,ps,abi=synthetic();source,report=m.generate(vs,ps,abi)
@@ -55,6 +90,55 @@ class LoweringTests(unittest.TestCase):
         p=e.sop1(op=10,dst=126,src=126)+e.END
         with self.assertRaisesRegex(m.LoweringError,'quad/wave'):
             m.Lowerer(dict(sha256=hashlib.sha256(p).hexdigest()),'ps').run(p)
+
+    def test_mubuf_float_widths_write_exact_destination_cells(self):
+        channels = 'xyzw'
+        for components in (2, 3, 4):
+            with self.subTest(components=components):
+                lowerer, lines, report = lower_synthetic_mubuf(components)
+                self.assertEqual(report['instructions'], 5)
+                self.assertEqual(report['stage'], 'vs')
+                for component in range(components):
+                    self.assertEqual(
+                        lowerer.v[10 + component],
+                        m.Cell('float', f'u.position.{channels[component]}'))
+                for component in range(components, 4):
+                    self.assertEqual(
+                        lowerer.v[10 + component],
+                        m.Cell('float', f'u.material.{channels[component]}'))
+                self.assertTrue(any(line.startswith('    out.clip = float4(') for line in lines))
+
+    def test_mubuf_component_width_format_mismatches_fail(self):
+        for components, stream_format in ((2, 'explicit_float3'),
+                                          (3, 'explicit_float4'),
+                                          (4, 'explicit_float2'),
+                                          (2, 'explicit_float1')):
+            with self.subTest(components=components, stream_format=stream_format):
+                code, abi = synthetic_mubuf(components, stream_format=stream_format)
+                with self.assertRaisesRegex(m.LoweringError,
+                                            'unsupported/unbound formatted stream ABI'):
+                    m.Lowerer(abi, 'vs').run(code)
+
+    def test_mubuf_binding_index_and_fetch_contract_mismatches_fail(self):
+        invalid_cases = (
+            {'stream_view': 'other'},
+            {'vertex_index': False},
+            {'mubuf_overrides': {'offset': 1}},
+            {'mubuf_overrides': {'offen': 1}},
+            {'mubuf_overrides': {'idxen': 0}},
+            {'mubuf_overrides': {'glc': 1}},
+            {'mubuf_overrides': {'addr64': 1}},
+            {'mubuf_overrides': {'lds': 1}},
+            {'mubuf_overrides': {'slc': 1}},
+            {'mubuf_overrides': {'tfe': 1}},
+            {'mubuf_overrides': {'addr': 1}},
+            {'mubuf_overrides': {'resource': 1}},
+        )
+        for kwargs in invalid_cases:
+            with self.subTest(kwargs=kwargs):
+                code, abi = synthetic_mubuf(3, **kwargs)
+                with self.assertRaises(m.LoweringError):
+                    m.Lowerer(abi, 'vs').run(code)
 
     def test_resource_pair_type_and_overlap(self):
         a=dict(initial_scalar={'0':dict(kind='pointer',view='uniforms')})

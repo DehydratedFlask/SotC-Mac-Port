@@ -214,14 +214,18 @@ class Lowerer:
                 elif i.encoding == 'MUBUF':
                     view = self.pair(f['resource_sgpr'], 'descriptor')
                     stream = self.abi.get('streams', {}).get(view)
-                    if (stream is None or stream.get('format') != 'explicit_float3'
-                        or f['components'] != 3 or any(f[k] for k in ('offset','offen','glc','addr64','lds','slc','tfe'))
+                    components = f['components']
+                    expected_format = (f'explicit_float{components}'
+                                       if components in (2, 3, 4) else None)
+                    if (stream is None or expected_format is None
+                        or stream.get('format') != expected_format
+                        or any(f[k] for k in ('offset','offen','glc','addr64','lds','slc','tfe'))
                         or f['idxen'] != 1 or f['soffset'] != 128
                         or self.v.get(f['vaddr']) != Cell('vertex_index', 'one_vertex_per_case')):
                         raise LoweringError('unsupported/unbound formatted stream ABI')
                     field = stream.get('field')
                     cells = self.bind(dict(kind='float4',field=field))
-                    for j in range(3):
+                    for j in range(components):
                         self.v[f['vdata']+j] = cells[j]
                 elif i.encoding == 'VINTRP':
                     if self.abi.get('interpolation') != 'supplied_float_coefficients':
