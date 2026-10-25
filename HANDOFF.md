@@ -1,10 +1,11 @@
 # SoC Mac Native — current handoff
 
-## 2026-10-25 11:02 CDT — raw material selector task claimed
+## 2026-10-25 11:11 CDT — raw material bytes verified; source replay pending
 
-- Integrator: Codex `/root`; task `GPU-02-RAW-MATERIAL-SELECTOR-01`, ACTIVE, attempt 0. Clean local
-  `main` and `origin/main` were both at `d6d2f0782c877737f1af41b944ed88b4f754767b` before this
-  claim. No source or private assets were changed; implementation tests are NOT RUN.
+- Integrator: Codex `/root`; GPU task `GPU-02-RAW-MATERIAL-SELECTOR-01`, ACTIVE, attempt 0
+  semantic failures; F590 remains ACTIVE pending its missing five-mutation evidence. Claim commit
+  `6c6bdfd5badae7cb2cd74b432bf2d9d42b38ddd4` is on `origin/main`; source implementation is not yet
+  committed. Root currently has only documentation edits after that clean published base.
 - Claim checkpoint: [raw default-material selector](docs/checkpoints/2026-10-25-gpu02-raw-material-selector.md).
   E682 pins `default.cmat` (171 B, SHA-256 `0c2233c1aab20cfc1da914de96fd1cbd0a20e37964024d54e10e36b260c6d29`)
   and `standard_4030788106.csdr` (1,988 B, SHA-256
@@ -12,19 +13,26 @@
 - Scope: exact PSARC MD5(path) lookups, raw-byte selector proof, CSDR structural parsing, E627 VS/PS
   span match and existing MSL/oracle replay. Unknown or ambiguous bytes fail closed. Raw assets only;
   `0x8C`, constants/layout interpretation, mesh/texture decoding and game-frame claims are excluded.
-- Exact commands/results: `git status --short --branch` clean on `main`; `git rev-parse HEAD origin/main`
-  returned the same `d6d2f07` commit; `trail ask` and `trail skeleton scripts/psarc.py` located
-  `parse_raw_csdr`, `Psarc.entry_index/read`, and existing E627 lowerer/oracle code. `trail build
-  --check` passed at 8,571 wiring nodes; `python3 scripts/project_index.py` wrote 20,421 folders
-  and `--check` passed. Logs are under `local/validation/gpu02-raw-material-selector-claim-20261025/`.
-  An initial project-index check ran before its output log existed and reported the resulting inventory
-  stale; regenerated with all log files present, then check passed. No implementation test/build run.
-- Remaining risks: asset selector use by the game is not established by the literal path alone; raw
-  member replay and acceptance checks remain NOT RUN. The `.cmat` constants remain UNKNOWN.
-- Next exact action: implement and test the isolated verifier in a new `tools/dev/` module, without
-  changing the shared Metal renderer test; keep all extracted bytes and generated evidence in
-  `local/`.
-- Status: claim only; verification and publication pending.
+- E684: exact MD5(path)-resolved `default.cmat` (cachedFiles entry 23809) and CSDR (pak0 entry 3300)
+  bytes/hash pins pass; the exact CSDR path occurs once at cmat offset 37. Root replay passed both
+  file pins/sizes, selector offset, and parser program-row equality with E627 VS/PS offsets/lengths.
+  Probe SHA-256 `ab6e7bc3630f5e6ca254bdfd20bc5ef88a699245a6420ea78142eed80b64803f`; output and raw
+  files stay under ignored `local/validation/gpu02-raw-material-selector-20261025/`. This does not
+  prove engine consumption. MSL/oracle replay and implementation tests are NOT RUN.
+- E685: read-only F590 search found both named mutation JSON files and the private report absent;
+  tracked F590 tests do not enumerate the five source mutants. No new mutants were created and no
+  tests ran; F590 remains ACTIVE. Details and corrected shell command are in
+  [the F590 recovery checkpoint](docs/checkpoints/2026-10-25-f590-release-review-recovery.md).
+- Project index currently records 20,423 folders (check passed); Trail wiring check passed at 8,571
+  nodes, deep layer not built. Logs: `local/validation/gpu02-raw-material-selector-claim-20261025/`.
+- Remaining risks: `.cmat` constants/layout and engine selector consumption remain UNKNOWN; E627
+  replay and fail-closed verifier tests remain NOT RUN. F590's five original mutations remain
+  unreproduced.
+- Next exact action: publish E684/E685 root-owned checkpoint updates on `main`, then authorize the
+  worker to add the isolated `tools/dev/` verifier/tests and replay the pinned E627 MSL/oracle
+  baseline. Keep raw assets and generated evidence under `local/`.
+- Status: GPU raw-input subtask ARTIFACT_VERIFIED; selector parent ACTIVE; F590 ACTIVE with its
+  acceptance gap open.
 
 ## 2026-10-25 10:58 CDT — GPU-03 fixture published on main
 

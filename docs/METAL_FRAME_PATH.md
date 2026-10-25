@@ -318,10 +318,11 @@ Program blobs (code offset in the `.csdr` file, length, `BinaryInfo` offset, sha
 | logo `standard_3728175326` | VS | 564 | 140 | 844 | `430f9adbb07d387c` |
 | logo | PS | 1240 | 152 | 1672 | `4309caada7f114ec` |
 
-The next bounded task, `GPU-02-RAW-MATERIAL-SELECTOR-01` (E682), will verify from the exact raw
-`default.cmat` bytes that this pinned CSDR is selected, then compare parsed default VS/PS code spans
-with E627 and replay the existing MSL/oracle baseline. The `.cmat` constants/layout remain UNKNOWN;
-this task does not decode `0x8C`, mesh/texture streams, or claim a game-driven frame.
+`GPU-02-RAW-MATERIAL-SELECTOR-01` (claim E682, publication E683) has ARTIFACT_VERIFIED exact raw
+member identity, selector literal occurrence and CSDR spans (E684). The standalone verifier/tests and
+task-specific replay of the existing MSL/oracle baseline remain NOT RUN. The `.cmat` constants/layout
+and engine consumption remain UNKNOWN; this task does not decode `0x8C`, mesh/texture streams, or
+claim a game-driven frame.
 
 Encoding-class inventory (approximate; a classifier by encoding bits, with literal-dword handling, not a
 disassembler): default VS `SMRD 8, MUBUF 2, VOP2 17, VOP1 8, VOP3 7, EXP 3, SOPP 7, SOP1 2`; default PS

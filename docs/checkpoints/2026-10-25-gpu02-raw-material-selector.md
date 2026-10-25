@@ -53,5 +53,49 @@
   entries, hash-gate both complete members, prove the target string occurs exactly once in the cmat,
   parse and match the CSDR spans, and compare generated MSL/oracle outputs against E627; stop as
   UNKNOWN on unsupported or ambiguous material bytes.
-- Status: ACTIVE / attempt 0. Implementation tests are NOT RUN. Documentation claim is ready for
-  allowlisted commit and push to `main`.
+- Publication: commit `6c6bdfd5badae7cb2cd74b432bf2d9d42b38ddd4` (`docs: claim raw default material
+  selector verification`) was pushed to `origin main`; `git fetch origin main` and
+  `git rev-parse HEAD origin/main` confirm both refs at that commit; checkout is clean. Precommit
+  audits passed 7 staged paths, 2,800 all paths, whitespace, and attribution. The postcommit staged
+  audit found no staged paths (exit 2); explicit audit of the 7 committed paths and the full tree
+  then passed. Attribution passed for `origin/main..HEAD` before push. Audit log:
+  `local/validation/gpu02-raw-material-selector-claim-20261025/publication.log`. Author and committer
+  are Johnny Wang; no Claude/Anthropic or assistant co-author trailer.
+- Status: ACTIVE / attempt 0. Implementation tests are NOT RUN. Claim publication is complete;
+  source implementation remains the next action.
+
+## 2026-10-25 11:11 CDT — raw material and shader bytes verified (E684)
+
+- Private import/probe by `/root/gpu02_raw_selector`; root independently replayed the local bytes
+  against the live §4.6 pins and `parse_raw_csdr`. No public source files were added yet.
+- Exact MD5(path) PSARC result for the material: `cachedFiles.psarc`, entry 23809,
+  `coredata/enginesupport/materials/_ps4/default.cmat`, entry/path MD5
+  `96452e65ef0730502ba802bdd1029f91`, 171 B, SHA-256
+  `0c2233c1aab20cfc1da914de96cfd1cbd0a20e37964024d54e10e36b260c6d29`.
+- Exact MD5(path) PSARC result for the shader: `pak0.psarc`, entry 3300,
+  `materials/!cookedshaders/version57/simple/0f1c3bf0/_ps4/standard_4030788106.csdr`, entry/path
+  MD5 `79f789146d1bf565cf8f3e289a66233f`, 1,988 B, SHA-256
+  `c4214e4ee0852a962ce56e0cab0befbe3169698cb354bc62afa7eab4d1f3f356`.
+- The exact ASCII selector `$/materials/!cookedshaders/version57/simple/0f1c3bf0/_ps4/standard_4030788106.csdr`
+  occurs once in the cmat at byte offset 37; a follow-up scan found one `.csdr` suffix. The existing
+  structural parser returns VS `(type 1, code 564, length 272, info 972)` and PS
+  `(type 0, code 1368, length 240, info 1744)`, matching E627. Probe JSON SHA-256
+  `ab6e7bc3630f5e6ca254bdfd20bc5ef88a699245a6420ea78142eed80b64803f` is at
+  `local/validation/gpu02-raw-material-selector-20261025/probe.json`; raw bytes and probe remain
+  ignored under `local/validation/gpu02-raw-material-selector-20261025/`.
+- Root replay exited 0 and confirmed both pins/sizes, unique selector offset and equality between the
+  probe program rows and `parse_raw_csdr`. The root's preliminary inline checker needed corrections
+  for a copied cmat digest, the nested probe JSON schema, and selecting the hash-bearing table row
+  instead of an earlier prose mention; after correction the replay passed. The worker also retained
+  two tooling corrections: an expected-digest typo stopped before writing bytes, then a report
+  formatter called `.hex()` on the string-valued PSARC MD5 after cmat extraction. None of these
+  failures tested selector semantics; failed semantic hypotheses remain 0.
+- Observation versus inference: member identity, hashes, path bytes, literal occurrence and container
+  spans are observed and root-replayed. The engine consuming the literal as a selector is NOT proven;
+  cmat constant/layout semantics remain UNKNOWN. E627 MSL/oracle replay and the new verifier/tests
+  are NOT RUN.
+- Next exact action: implement the isolated verifier/test pair under `tools/dev/`, including exact
+  path lookup, pin checks and fail-closed mutations, then reproduce the pinned E627 MSL SHA and
+  34,256-component oracle result. No shared Metal test or game-frame claim.
+- Status: raw-member/selector artifact subtask **ARTIFACT_VERIFIED**; parent task ACTIVE, attempt 0
+  semantic failures.

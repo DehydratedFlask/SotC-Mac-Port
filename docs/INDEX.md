@@ -24,7 +24,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Logo PS principal reassessment](escalations/GPU-02-GCN-LOGO-PS-IMAGE-SAMPLE-01.md) | Three unsuccessful test hypotheses, recorded root reassessment, and passed fourth focused replay |
 | [Logo PS PR #12 merge closeout](checkpoints/2026-10-25-gpu02-logo-ps-merge-pr12.md) | PR #12 merged as `a07d451`; local and remote task branches removed; clean local `main` verified |
 | [GFX7 default-pair inventory and Metal harness](checkpoints/2026-10-24-gcn-default-pair.md) | E625 inventory plus E627 bounded default VS/PS MSL; overall G3 is PARTIAL from later synthetic Metal harness work |
-| [Raw default-material selector claim](checkpoints/2026-10-25-gpu02-raw-material-selector.md) | E682 claim for exact raw `default.cmat` → CSDR selection and E627 span replay; implementation not started |
+| [Raw default-material selector claim](checkpoints/2026-10-25-gpu02-raw-material-selector.md) | E682/E683 claim publication; E684 exact raw selector bytes and E627 spans match; verifier and oracle replay pending |
 | [CSDR reader corpus and review](checkpoints/2026-10-24-csdr-reader.md) | E626 structural-first attempt3, arbitrary `cc xx`, full corpus v5 and independent review |
 | [Round 30 integration](checkpoints/2026-10-24-round30-integration.md) | Root replay: CTest 388/388, lift checkers 476/0/0, Python 228/228, shader harness and outstanding game gates; E628 |
 | [GPU-03 L1 asset-derived frame claim](checkpoints/2026-10-24-gpu03-claim.md) | E629 pins raw `cube_1m`/`cone` geometry; native reader and direct-Metal draw are active; no game-frame/G3 PASS claim |
@@ -42,7 +42,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [GPU-03 logo PNG texture sample](checkpoints/2026-10-25-gpu03-logo-png-texture-sample.md) | E656 exact PNG/MSL pins and synthetic slot-0 texel-center Metal replay; retail bindings and WQM equivalence remain unverified |
 | [GPU-03 logo VS/PS Metal pipeline](checkpoints/2026-10-25-gpu03-logo-vs-ps-metal-pipeline.md) | E669 fixture-verified composed E636/E646 Metal pipeline; E670 records publication on main; retail/game-frame limits remain |
 | [GPU-03 logo VS/PS on raw CMSH meshes](checkpoints/2026-10-25-gpu03-logo-vs-ps-raw-cmsh-frame.md) | E678 fixture review; E679 full gates and precommit audits passed; E681 published to main; G3 PARTIAL |
-| [F590 shared-string release review](checkpoints/2026-10-25-f590-release-review-recovery.md) | E680 independent source review and fresh ASan/UBSan + byte-oracle pass; five prior mutation cases not replayed because private inputs are absent |
+| [F590 shared-string release review](checkpoints/2026-10-25-f590-release-review-recovery.md) | E680 source/ASan/UBSan/byte-oracle review; E685 confirms the exact five-mutant inputs remain absent |
 | [GPU-03 logo PNG and raw mesh composite](checkpoints/2026-10-25-gpu03-logo-png-cmsh-composite.md) | E658 exact-hash raw cube/cone POS0/U16 plus pinned logo PNG/MSL through the direct-Metal asset-derived harness; retail mapping and G3 remain unverified |
 | [GPU-03 CMSH TEX0 format code 6 evidence](checkpoints/2026-10-25-gpu03-cmsh-tex0-format-6.md) | E660 records the hash-pinned TEX0 spans; E662 records completed shipped-code tracing with no decoder found, so coordinate semantics remain UNKNOWN |
 | [GPU-03 logo VS/PS Metal pipeline](checkpoints/2026-10-25-gpu03-logo-vs-ps-metal-pipeline.md) | E664 claim and E666 publication of the closed synthetic composition of exact-hash E636/E646 stages; implementation is active |
