@@ -1,5 +1,23 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 05:23 CDT — composite logo-texture/raw-mesh fixture claimed
+
+- Integrator: Codex `/root`; task `GPU-03-LOGO-PNG-CMSH-ASSET-FRAME-01` is **ACTIVE**, attempt 0.
+  E649 already verifies the two pinned raw meshes through `parse_cmsh_mesh` and direct Metal with the
+  default pair; E656 separately verifies the pinned logo PS MSL and PNG on synthetic geometry. This
+  bounded task combines those established inputs in one private Metal fixture.
+- Ruling: consume only the already hash-pinned local POS0/U16 `.cmsh` mesh data and use a test-side
+  transform plus the existing synthetic `position.xy * material.xy + 0.5` UV adapter. Keep the
+  harness normal `[0.5, 0.5, 1.0]`; do not decode TEX0/NRM0 or imply their layout/binding is known.
+  This reuses the owner's prior approval for raw local `.cmsh` imports and synthetic shader inputs.
+  Cost if wrong: a harness-only mapping could be mistaken for retail UV semantics; artifacts and
+  task labels will say synthetic/asset-derived harness and the handoff will preserve that limit.
+- Exact next action: add the optional composite path to the texture Metal fixture. Pin and parse both
+  mesh byte streams, bind the E656 PNG through the digest-pinned logo MSL at explicit slot 0, compare
+  selected covered texels to an independent CPU oracle, require repeat determinism and input
+  mutation, and write direct PNG evidence under `local/`. Then perform focused/full verification,
+  update E658/task status, audit paths/attribution, and publish to `main` as Johnny Wang.
+
 ## 2026-10-25 05:18 CDT — GPU-03 PNG fixture published on main
 
 - Integrator: Codex `/root`; commit `975f4437c784378b83f131e053065a208d84588b` is published to

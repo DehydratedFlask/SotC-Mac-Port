@@ -1,12 +1,13 @@
 # Metal first-frame path: research, design, and bounded harness work
 
-Status: E627 verifies the selected default shader pair against an independent oracle; E632 and E633
-verify direct Metal rendering of synthetic geometry, including a synthetic parser-to-renderer flow;
-E634 statically characterizes the selected logo pixel shader's WQM and texture-sample instruction path;
-E635 verifies synthetic fragment texture/sampler host binding through direct Metal.
-The L1 asset-derived harness is still in progress: real `.cmsh` bytes have not gone through the native
-parser or Metal renderer, retail bindings remain unknown, and no game frame is established. **G3 is
-PARTIAL, not PASSED**, under the synthetic-scene rule in `docs/VALIDATION.md`.
+Status: E627 verifies the selected default shader pair against an independent oracle; E632/E633 verify
+synthetic direct-Metal geometry and parser flow; E649 verifies the pinned raw cube/cone POS0/U16
+members through the native parser and default-pair Metal harness; E634 characterizes the logo PS
+WQM/sample path; E635 verifies synthetic texture binding; E656 verifies the pinned logo PS/PNG on
+synthetic geometry. `GPU-03-LOGO-PNG-CMSH-ASSET-FRAME-01` is now combining the already verified raw
+mesh, image, and shader inputs under a synthetic UV adapter. Retail bindings remain unknown, and no
+game frame is established. **G3 is PARTIAL, not PASSED**, under the synthetic-scene rule in
+`docs/VALIDATION.md`.
 Read [AGENTS.md](../AGENTS.md), [ROADMAP.md](../ROADMAP.md), [HANDOFF.md](../HANDOFF.md),
 [PLATFORM.md](PLATFORM.md) and [VALIDATION.md](VALIDATION.md) (gate G3) first. This file adds no
 runtime behaviour; its only code is the read-only probe `tools/dev/gpu_asset_probe.py`.
@@ -448,8 +449,22 @@ primitive-boundary samples, observes a selected-level mutation to blue, and chec
 multiplication plus the half-RTZ export using binary-fraction inputs. `SOTC_LOGO_PS_MSL` enables the
 private generated-MSL replay; `SOTC_LOGO_PS_PNG` writes the direct 64x64 harness image under `local/`.
 E646 passed the focused test and full CTest with Metal API/GPU validation enabled and no faults.
-This is synthetic fixture evidence only: WQM/helper-lane equivalence, game assets, retail bindings,
-game-driven rendering, and G3 remain unverified.
+This is fixture evidence for the exact shader and PNG under synthetic geometry and resource bindings.
+WQM/helper-lane equivalence, retail bindings, game-driven rendering, and G3 remain unverified.
+
+### 6.8 Raw mesh plus logo PNG composite fixture
+
+`GPU-03-LOGO-PNG-CMSH-ASSET-FRAME-01` combines the exact-hash local `cube_1m.cmsh` and `cone.cmsh`
+POS0/U16 subsets already parsed and drawn in E649 with the E656 digest-pinned logo PS MSL and
+`saveshadow_scee.ctxr` PNG. The test-side harness normalizes positions into clip space and derives
+synthetic UVs from transformed XY through the pinned adapter's `position.xy * material.xy + 0.5`
+mapping. It binds one explicit RGBA8 texture/sampler at slot 0 and compares selected covered texels
+with the independent CPU sampler/fp16-RTZ oracle, including deterministic repeat and a visible
+texture mutation. Direct PNG evidence stays under `local/`.
+
+This is an asset-derived harness combination, not recovered material mapping: TEX0 and NRM0 remain
+opaque; normals and UV projection are harness inputs. It does not establish retail texture or vertex
+descriptors, orientation, WQM/helper-lane equivalence, a game-driven frame, or G3 completion.
 
 ## 7. Ranked task cards
 
