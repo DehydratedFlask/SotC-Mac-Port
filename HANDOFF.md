@@ -1,5 +1,26 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 10:06 CDT — startup slot 306 read-only survey claimed
+
+- Integrator: Codex `/root`; checkout remains clean on `main` at
+  `2ac26e2076f5541bc918151c83235fb8ee74ee61`. New bounded task
+  `CPU-01-STARTUP-SLOT-306-SURVEY-01` is **ACTIVE**, attempt 0. The user’s earlier Metal priority is
+  complete as E669/E670; this claim follows the user’s broader instruction to complete more tasks.
+- Scope: read-only, hash-bound characterization of constructor table index 306 / RVA `0xa633b0`.
+  Confirm the table word and pinned ELF identity; independently establish the body extent/hash,
+  disassembly, direct callers/callees, global/side-effect footprint, and unresolved indirect edges.
+  This task does not implement or register the constructor. Keep the slot fail-visible and G1 PARTIAL.
+- Existing evidence is only incidental: R30 verifies 317/573 entries and first gap 306; the prior
+  302/303/305 Ghidra command did not analyze `0xa633b0`. `startup-cliff-296/out/facts.json` maps
+  index 306 to the table word, and separate disassembly/function/call-edge artifacts include the
+  address without a dedicated survey. Treat those as leads until rechecked against the pinned ELF.
+- Files changed for this claim: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`,
+  and `docs/checkpoints/2026-10-25-startup-slot-306-survey.md`. No native/tool implementation edits,
+  binary execution, or dependency changes. Exact next action: verify the incidental byte ranges and
+  call-edge data against `local/re/eboot.elf`, then use the existing read-only analysis path only if
+  unresolved facts require it; record private evidence under `local/re/evidence/`.
+- Status: task **ACTIVE**, attempt 0; no slot-306 behavior or runtime claim.
+
 ## 2026-10-25 10:03 CDT — logo shader-pair source published to `main`
 
 - Integrator: Codex `/root`; source/evidence commit `a300db5d978b444bc6ca4a6b724a4f55122e5f88`
