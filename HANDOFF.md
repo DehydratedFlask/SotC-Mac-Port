@@ -1,5 +1,34 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 03:34 CDT — PR #9 closeout reconciled; final record on main
+
+- Integrator: Codex `/root`; task `INT-OPEN-PRS-1-2-3-5-01` is `FIXTURE_VERIFIED`. PR #8's
+  integration merge is recorded at `61c96f6`; follow-up PR #9
+  (`docs: close out integration PR8 and branch cleanup`) merged at `2026-10-25T08:31:56Z` with
+  merge commit `a8bd805c48867b378a22efa6ed15e41c29583dbe`. PR #9's source branch was
+  `codex/integration-closeout-20261025` and GitHub removed it.
+- Immediately before this documentation closeout, `main` and `origin/main` both resolved to
+  `a8bd805c48867b378a22efa6ed15e41c29583dbe`; the checkout was clean on `main` and GitHub reported
+  no open PRs. The captured live queries and refs are in
+  `local/validation/root-pr9-final-closeout-20261025/`.
+- PR #9 changed documentation only and did not alter code or validation results. The exact PR #8
+  tree remains verified by CTest 397/397 and lift checkers 481/0/0, with publication audits and
+  attribution checks recorded in E642. GPU-03 remains `NEEDS_PRINCIPAL` after three failed
+  index-mutation hypotheses; G3 remains PARTIAL. No cold boot, real game audio, or save/reload is
+  claimed.
+- The PR #10 documentation-only candidate passes `cmake -S native -B local/build/orch-r22`, a full
+  build (700/700), CTest (397/397), and lift checkers (481/0/0). `trail build --check` passes at
+  8,490 nodes / 11,465 edges; `python3 scripts/project_index.py` indexes 19,587 folders; the
+  staged-path audit passes 6 paths and the all-path audit passes 2,782 paths. `git diff --cached
+  --check` and `python3 -I scripts/check_commit_attribution.py --range origin/main..HEAD` pass;
+  the commit author/committer is Johnny Wang and no Claude/Anthropic coauthor trailer is present.
+  Logs are under `local/validation/root-pr9-final-closeout-20261025/`.
+- This closeout checkpoint reconciles the PR #9 merge into the handoff/task/evidence indexes. The
+  publication branch is `codex/integration-final-closeout-20261025`; after its exact-head PR merges,
+  fetch `main`, switch/pull it, verify a clean checkout, and delete only that local branch. Then
+  continue the next unblocked task from `main`; do not retry GPU-03 without principal reassessment.
+- Failed tries: 0. No dependency changes. Checkpoint: [E643](docs/checkpoints/2026-10-25-integration-pr9-final-closeout.md).
+
 ## 2026-10-25 03:30 CDT — PR #8 merged; integration branch removed
 
 - Integrator: Codex `/root`; task `INT-OPEN-PRS-1-2-3-5-01` is `FIXTURE_VERIFIED`. PR #8
