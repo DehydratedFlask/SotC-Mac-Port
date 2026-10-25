@@ -30,6 +30,9 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [GPU-02 logo vertex fetch lowering completion](checkpoints/2026-10-25-gpu02-logo-vs-fetch-complete.md) | E636 synthetic float2/float3/float4 MUBUF lowering and private Metal/CPU-oracle replay; no retail descriptor or G3 claim |
 | [E28 zero-request checker parity](checkpoints/2026-10-25-srv01-f19e00-checker-parity.md) | Existing fixture's zero-request case is now included in the instruction-derived checker; E368; no game execution |
 | [PR #5 allocator bootstrap rollback and fixed quantum](checkpoints/2026-10-25-pr5-allocator-rollback-fixed-quantum.md) | E638 records rollback, publish-last concurrency safety, fixed 1 MiB request quantum and verification; allocator hierarchy remains fixture-only and not wired into startup |
+| [GPU-03 raw CSMH member import](checkpoints/2026-10-25-gpu03-raw-cmsh-import.md) | E639 exact MD5(path)-mapped raw-member import and private size/hash verification; parser and Metal draw were verified separately in E640 |
+| [GPU-03 asset-derived frame attempt](escalations/GPU-03-RENDEROPS-ASSET-FRAME-01.md) | E640 actual raw mesh parse and direct-Metal baseline verified; index-mutation test failed three approaches; task is NEEDS_PRINCIPAL, G3 remains PARTIAL |
+| [E28 checker build-directory selection fix](checkpoints/2026-10-25-srv01-f19e00-build-dir-env.md) | E641 `check_f19e00_accounting.py` now honors `SOTC_NATIVE_BUILD`; target and all 481 lift checkers pass |
 | [CTOR_CLASSES](CTOR_CLASSES.md) | 573-entry constructor-table classification by reachable-body idiom plus the slot 10–19/24–47 family contract; CPU-01 |
 | [INPUTTABLE_551140](INPUTTABLE_551140.md) | Numeric-only deepen of Init-hash 275-entry table (`0x551140`); CPU-01 |
 | [INPUTTABLE_551140_NAMES_FIXTURE](INPUTTABLE_551140_NAMES_FIXTURE.md) | Private 275-name fixture recipe for registry fill `0x52a220`; CPU-01 |
