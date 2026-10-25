@@ -1,5 +1,184 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 04:16 CDT — E646 pinned logo PS Metal replay passes
+
+- Integrator: Codex `/root`; `GPU-02-GCN-LOGO-PS-IMAGE-SAMPLE-01` is **FIXTURE_VERIFIED** for the
+  exact private shader digest and synthetic ABI. Three distinct test/oracle hypotheses failed during
+  this work. Root reassessment permitted one focused fourth check; it passed. The detailed try table
+  and reassessment are in `docs/escalations/GPU-02-GCN-LOGO-PS-IMAGE-SAMPLE-01.md`.
+- Exact private slice: 152 B at `.csdr` offset `0x4d8`, SHA-256
+  `4309caada7f114ec822f61646be536f50a8261a8c6e54f2ce709db7c70b8b39a`. The profile uses a fixed,
+  digest-gated PS-only MSL template for the closed synthetic slot-0 ABI; it is not a generic
+  row-by-row GCN translator. Retail descriptors/interpolation and AMD WQM/helper-lane equivalence
+  remain unverified.
+- Exact commands/results: `python3 -I -W error tools/dev/test_gcn_to_msl.py` passed 17/17;
+  `cmake -S native -B local/build/orch-r22` and `cmake --build local/build/orch-r22 -j 12` exited 0;
+  full CTest with absolute `SOTC_LOGO_PS_MSL`/`SOTC_LOGO_PS_PNG` paths passed 397/397;
+  `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` passed 481/0/0;
+  `trail build --check` passed at 8,519 nodes / 11,521 edges. Logs are in
+  `local/validation/gpu02-logo-ps-image-sample-20261025/`.
+- Observed: implicit sampling selects the expected red mip 1/green mip 2, center and primitive-edge
+  pixels match the CPU oracle, blue mip mutation is visible, and tested channel multipliers plus
+  fp16 RTZ outputs match. Metal API/GPU validation enabled with no fault. A direct private PNG is
+  64x64, 351 B, SHA-256
+  `267a344d7533777e675ba8360ca2e7cd2dcad5ff3b256d7c27f8867f4abc0fa8`.
+- Files changed in this task: `native/platform/metal_asset_frame.hpp`,
+  `native/platform/metal_asset_frame.mm`, `native/tests/test_metal_texture_binding.cpp`,
+  `tools/dev/gcn_to_msl.py`, `tools/dev/test_gcn_to_msl.py`, `HANDOFF.md`,
+  `docs/{TASKS,EVIDENCE,FOLDERS,INDEX,METAL_FRAME_PATH}.md`, this checkpoint, the E645 prerequisite
+  checkpoint, and the escalation record. Private data remains ignored under `local/`.
+- Principal reassessment followed the third oracle/harness failure; the fourth focused Metal replay
+  passed. This task has no remaining shader fixture gate. GPU-03 remains `NEEDS_PRINCIPAL`; G3 remains
+  `PARTIAL`; no game-frame, boot, audio or save claim follows.
+- Final publication preflight currently passes: staged-path audit 14/14, all-path audit 2,786/2,786,
+  and `git diff --cached --check`; project index is 19,589 folders and Trail wiring check is in sync.
+  The first attribution invocation had no upstream configured, so it audited all history and flagged
+  inherited base commit `f6604a86e60e` (`orchestrator@local`). After setting this task branch's
+  upstream to `origin/main`, `python3 -I scripts/check_commit_attribution.py` passed for
+  `origin/main..HEAD`; the only unpublished commit is by Johnny Wang as author and committer, with no
+  coauthor trailer. After push, rerun attribution with the explicit `origin/main..HEAD` range.
+  Next exact action: push/create a PR, merge the reviewed exact head to GitHub `main`, then checkout
+  clean `main` and delete this local task branch. No direct push to `main`.
+
+## 2026-10-25 04:07 CDT — mip input rejection cases pass
+
+- Integrator: Codex `/root`; task `GPU-02-GCN-LOGO-PS-IMAGE-SAMPLE-01` remains ACTIVE, attempt 1.
+  Added fail-visible C++ checks for noncanonical mip dimensions, truncated mip bytes, and unordered
+  LOD clamps. `python3 scripts/project_index.py` exited 0 and indexed 19,589 folders.
+- Exact commands/results: `cmake --build local/build/orch-r22 --target test_metal_texture_binding -j 12`
+  passed 2/2 (`local/validation/gpu02-logo-ps-image-sample-20261025/metal-test-build-rerun3.log`);
+  `ctest -V --test-dir local/build/orch-r22 -R '^metal_texture_binding$'` passed 1/1 without a
+  no-device skip (`local/validation/gpu02-logo-ps-image-sample-20261025/mip-fixture-ctest-rerun3.log`).
+  API/GPU validation was enabled with no Metal faults. The mip selection, center/edge oracle,
+  texture mutation, and malformed-input checks pass.
+- Observation: the texture path rejects bad mip dimensions/byte counts and invalid LOD ordering
+  before issuing Metal draws. The pinned generated logo MSL path is still NOT RUN because the
+  lowerer implementation is in progress.
+- Files changed since the previous checkpoint: `native/tests/test_metal_texture_binding.cpp`,
+  `HANDOFF.md`, `docs/EVIDENCE.md`, and this checkpoint. No private shader bytes were staged.
+- Next exact action: review the lowerer worker's code and tests, produce private MSL from the pinned
+  code, and run CTest with `SOTC_LOGO_PS_MSL` plus direct PNG output configured. No shader-semantic
+  hypothesis failed; one byte-rounding oracle attempt was corrected. G3 remains PARTIAL.
+
+## 2026-10-25 04:06 CDT — synthetic mip LOD fixture passes
+
+- Integrator: Codex `/root`; task `GPU-02-GCN-LOGO-PS-IMAGE-SAMPLE-01` is ACTIVE on
+  `codex/gpu02-logo-ps-image-sample-20261025`, attempt 1. The mip API worker's changes preserve
+  legacy aggregate initialization and compile; root's test-file changes add a seven-level synthetic
+  RGBA8 chain, implicit-vs-explicit fragment sample, and optional private generated-logo MSL replay.
+- Exact commands/results: focused target build
+  `cmake --build local/build/orch-r22 --target test_metal_texture_binding -j 12` passed 2/2 (log
+  `local/validation/gpu02-logo-ps-image-sample-20261025/metal-test-build-rerun2.log`); focused
+  `ctest -V --test-dir local/build/orch-r22 -R '^metal_texture_binding$'` passed 1/1, not skipped
+  (log `local/validation/gpu02-logo-ps-image-sample-20261025/mip-fixture-ctest-rerun2.log`). Metal
+  API and GPU validation were enabled, with no validation fault. `SOTC_LOGO_PS_MSL` was unset, so
+  generated pinned-logo MSL execution is explicitly NOT RUN in this pass.
+- Observation: the mip-distinct synthetic MSL returns the expected red mip at UV scale 1 and green
+  mip at scale 2, at both center and primitive boundary. Mutating the selected level to blue changes
+  readback as the CPU oracle predicts. The diagnostic half-gradient RGBA8 channel reads 127 at 0.5;
+  the CPU oracle now uses observed truncation and passes.
+- Correction/resolution: the 04:04/04:05 failure was byte quantization and stale error wording, not a
+  mip-selection mismatch. Failed shader-semantic hypotheses: 0. Total unsuccessful fixture/oracle
+  attempts: 1. E645 records this prerequisite fixture; no logo MSL conversion or retail ABI fact is
+  inferred. G3 remains PARTIAL.
+- Files changed so far: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/METAL_FRAME_PATH.md`,
+  `docs/INDEX.md`, this checkpoint, `native/platform/metal_asset_frame.hpp`,
+  `native/platform/metal_asset_frame.mm`, and `native/tests/test_metal_texture_binding.cpp`.
+- Next exact action: integrate the dedicated closed-world logo PS lowerer from `/root/logo_ps_lowerer`,
+  generate source from the private pinned code under `local/`, and run this same CTest with
+  `SOTC_LOGO_PS_MSL` set. Preserve direct PNG output under local evidence if configured. No game frame
+  or retail-sampling claim.
+
+## 2026-10-25 04:05 CDT — readback narrows the mip-oracle mismatch to byte quantization
+
+- Integrator: Codex `/root`; parent task `GPU-02-GCN-LOGO-PS-IMAGE-SAMPLE-01` remains ACTIVE on
+  `codex/gpu02-logo-ps-image-sample-20261025`, attempt 1. Root build
+  `cmake --build local/build/orch-r22 --target test_metal_texture_binding -j 12` passed; log:
+  `local/validation/gpu02-logo-ps-image-sample-20261025/metal-test-build-rerun1.log`.
+- Focused CTest was rerun as
+  `ctest -V --test-dir local/build/orch-r22 -R '^metal_texture_binding$'`; it exited 8 and is
+  captured at `local/validation/gpu02-logo-ps-image-sample-20261025/mip-fixture-ctest-rerun1.log`.
+  Metal API/GPU validation were enabled and reported no Metal faults. Pixel diagnostics show the
+  implicit and explicit samples matched expected mip colors at the interior and primitive boundary;
+  all three remaining failures are only blue diagnostic channel `127` versus oracle `128` at
+  gradient `0.5`. The old truncated-input error-string assertion now passes.
+- Observation: the tested input gradients selected the expected discrete mip level, including the
+  selected-level texture mutation. The current CPU oracle rounds `0.5*255` to 128; this Metal
+  RGBA8 render target produced 127. Inference: the test oracle should model the observed 8-bit
+  conversion as truncation for this output path; no AMD WQM equivalence is implied.
+- Correction to the 04:04 checkpoint: the initial log did not include channel values and tentatively
+  called the mismatch a shader-semantic hypothesis. The diagnostic rerun found no mip selection
+  disagreement; reclassify the one failed attempt as a byte-quantization oracle assumption. Failed
+  shader-semantic hypotheses remain 0; total unsuccessful fixture attempts: 1.
+- Files changed remain `HANDOFF.md`, `docs/TASKS.md`, the mip-aware platform API/Metal backend, and
+  `native/tests/test_metal_texture_binding.cpp`. No private shader bytes or generated MSL are in the
+  repository. No dependency changes.
+- Next exact action: update only the CPU diagnostic-byte conversion to match observed RGBA8
+  quantization, rerun the focused CTest, then add the private generated-logo MSL replay once the
+  lowerer worker returns. G3 remains PARTIAL.
+
+## 2026-10-25 04:04 CDT — mip-sensitive fixture first run needs oracle reconciliation
+
+- Integrator: Codex `/root`; worker subtask `/root/asset_texture_mips` changed only
+  `native/platform/metal_asset_frame.hpp` and `.mm`. It adds optional explicit RGBA8 mip levels and
+  mip sampler controls while preserving the old aggregate defaults. Worker command
+  `cmake --build local/build/orch-r22 --target test_metal_texture_binding -j 12` passed 4/4 compile/
+  link steps; its output was in the worker tool transcript. Root replay of the same build after
+  beginning the test-file edit failed because the new fixture symbols were not yet wired; the log is
+  `local/validation/gpu02-logo-ps-image-sample-20261025/api-build.log`. After wiring the fixture,
+  the target rebuilt successfully; exact log:
+  `local/validation/gpu02-logo-ps-image-sample-20261025/metal-test-build.log`.
+- Focused `ctest -V --test-dir local/build/orch-r22 -R '^metal_texture_binding$'` exited 8; log:
+  `local/validation/gpu02-logo-ps-image-sample-20261025/mip-fixture-ctest.log`. Metal API and GPU
+  validation were enabled with no reported Metal fault. Four assertions failed: an old truncated-
+  input error-string expectation and the new mip oracle at the center/boundary plus selected-mip
+  texture mutation. The underlying output pixel values were not yet printed, so the cause remains
+  unknown and is not being declared an implementation defect or a pass. The stale error expectation
+  has since been updated; `is_color` now prints actual/expected channels for the next run.
+- Initial accounting: 1 attempted fixture hypothesis, later reclassified by the 04:05 diagnostic
+  checkpoint as a byte-quantization oracle assumption. It is not a failed shader-semantic
+  hypothesis. The Metal mip API was compile-verified; the output-level result is summarized in the
+  newer checkpoint above.
+- Observation: the one-mip derivative checks ran, but the combined CTest still failed. Inference:
+  either the independent footprint oracle or the Metal mip setup/filter contract needs correction;
+  inspect logged channel values before choosing.
+- Files changed across this checkpoint: `HANDOFF.md`, `docs/TASKS.md`,
+  `native/platform/metal_asset_frame.hpp`, `native/platform/metal_asset_frame.mm`, and
+  `native/tests/test_metal_texture_binding.cpp`. No private shader bytes or generated MSL have been
+  added to the repository. No dependency changes.
+- Next exact action at the time: rebuild and rerun focused CTest with the improved pixel diagnostic.
+  The newer 04:05 checkpoint records that resolution. Parent task remains ACTIVE; G3 remains PARTIAL.
+
+## 2026-10-25 03:56 CDT — logo pixel IMAGE_SAMPLE lowering claimed
+
+- Integrator: Codex `/root`. Starting point was clean `main` and `origin/main` at
+  `376c080fa2664497f0626871cacb8536a154a6f7` (PR #11 merge). GitHub has no open PRs. The prior
+  derivative-fixture remote ref is already deleted; only a stale local tracking ref was present.
+- Bounded task: `GPU-02-GCN-LOGO-PS-IMAGE-SAMPLE-01`, ACTIVE, attempt 0. Work is on
+  `codex/gpu02-logo-ps-image-sample-20261025`, created from that `main` commit.
+- Scope: extend the offline lowerer for the E634-pinned 152-byte/34-instruction logo pixel shader's
+  WQM/save/restore and one base `IMAGE_SAMPLE`, emitting an ordinary PS-only MSL fragment against
+  an explicitly synthetic coordinate/texture/sampler ABI. Extend the existing test-only Metal
+  texture path to mip levels and verify implicit-sample LOD with a mip-distinct synthetic texture,
+  partial quad coverage, and an independent CPU oracle. Require exact input digest/instruction
+  pattern and fail visibly on unsupported changes. No retail binding or AMD/Metal equivalence claim.
+- Ruling: extend the existing test-only texture/sampler API instead of adding a parallel Metal test
+  target. This reuses the direct-Metal fixture and API/shader validation setup; the cost if wrong is
+  coupling two synthetic fixtures that may later need separate lifecycles.
+- User-selected constraints carried forward: default shader pair first, harness normals for fixture
+  geometry, and direct private PNG output where image evidence is needed. No engine frame number is
+  introduced. G3 remains PARTIAL; no gameplay, asset-binding, or game-frame claim.
+- Next exact action: inspect the live lowerer/test code spans, then implement the pinned PS-only
+  conversion and mip-sensitive fixture. Before stopping or changing task state, record exact test
+  commands/results, logs, limitations, and files in a checkpoint/EVIDENCE/TASKS update.
+- Initial claim changed `HANDOFF.md` only; the mip API subtask and Metal fixture changes are recorded
+  by the later checkpoint above. No dependency change.
+- Observation: `main` is clean at the recorded hash and PR #11 is merged. Inference: the existing
+  derivative fixture is a useful Metal validation host for this next isolated shader slice.
+- Risks: the private logo code binds an unverified synthetic ABI; Metal implicit LOD is not proof of
+  AMD WQM equivalence. Failed shader-semantic hypotheses: 0.
+- Status: ACTIVE; attempt 0. G3 remains PARTIAL.
+
 ## 2026-10-25 03:52 CDT — Metal derivative fixture publication gates pass
 
 - Integrator: Codex `/root`; `GPU-02-METAL-FRAGMENT-QUAD-DERIVATIVE-01` is

@@ -5,6 +5,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <span>
@@ -49,21 +50,36 @@ static_assert(offsetof(DefaultShaderCase, barycentric) == 272);
 
 enum class AssetTextureFilter : std::uint8_t { nearest, linear };
 enum class AssetTextureAddressMode : std::uint8_t { clamp_to_edge, repeat, mirror_repeat };
+enum class AssetTextureMipFilter : std::uint8_t { not_mipmapped, nearest, linear };
 
-// Explicit import-time harness texture input: one RGBA8Unorm 2D mip level. It does not describe a
-// retail texture format or recovered game binding.
-struct AssetTexture2D {
+// One explicitly supplied RGBA8Unorm 2D mip level after the base level. Dimensions must follow
+// the ordinary halving chain from AssetTexture2D's base level.
+struct AssetTextureMipLevel {
     std::uint32_t width = 0;
     std::uint32_t height = 0;
     std::span<const std::uint8_t> rgba8;
 };
 
-// Explicit harness sampler settings. No mip filtering is used by this one-level texture slice.
+// Explicit import-time harness texture input: one RGBA8Unorm 2D base level and optional supplied
+// mips. It does not describe a retail texture format or recovered game binding.
+struct AssetTexture2D {
+    std::uint32_t width = 0;
+    std::uint32_t height = 0;
+    std::span<const std::uint8_t> rgba8;
+    // Optional levels 1..N; empty preserves the existing one-level aggregate initializer behavior.
+    std::span<const AssetTextureMipLevel> mip_levels{};
+};
+
+// Explicit harness sampler settings. Defaults preserve one-level sampling; when mip filtering is
+// enabled, the broad default LOD range leaves implicit fragment LOD selection available.
 struct AssetSamplerInput {
     AssetTextureFilter min_filter = AssetTextureFilter::nearest;
     AssetTextureFilter mag_filter = AssetTextureFilter::nearest;
     AssetTextureAddressMode address_u = AssetTextureAddressMode::clamp_to_edge;
     AssetTextureAddressMode address_v = AssetTextureAddressMode::clamp_to_edge;
+    AssetTextureMipFilter mip_filter = AssetTextureMipFilter::not_mipmapped;
+    float lod_min_clamp = 0.0F;
+    float lod_max_clamp = std::numeric_limits<float>::max();
 };
 
 struct AssetMeshDraw {

@@ -2,9 +2,11 @@
 """Synthetic lowering/ABI failures; no game code or private ABI fixtures."""
 import hashlib
 import importlib.util
+import re
 from pathlib import Path
 import sys
 import unittest
+from dataclasses import replace
 
 
 def module(name,file):
@@ -28,6 +30,74 @@ def synthetic():
              vs=dict(sha256=hashlib.sha256(vs).hexdigest(),initial_vector={str(j):float_input('position',c) for j,c in enumerate('xyz')}),
              ps=dict(sha256=hashlib.sha256(ps).hexdigest(),initial_vector={str(j):float_input('material',c) for j,c in enumerate('xyzw')}))
     return vs,ps,abi
+
+
+def synthetic_logo_ps_rows():
+    """Build synthetic row objects for the profile guard without shader bytes."""
+    critical = {0x28, 0x2c, 0x44, 0x88, 0x8c, 0x94}
+    fillers = [offset for offset in range(0, 0x94, 4) if offset not in critical][:28]
+    offsets = sorted(fillers + list(critical))
+    rows = [m.gcn.Instruction(offset, 4, 'SOPP', 12, 's_waitcnt', {'simm16': 0}, ())
+            for offset in offsets]
+
+    def install(offset, encoding, opcode, mnemonic, fields, requirements=(), size=4):
+        index = next(i for i, row in enumerate(rows) if row.offset == offset)
+        rows[index] = m.gcn.Instruction(offset, size, encoding, opcode, mnemonic, fields,
+                                        tuple(requirements))
+
+    install(0x28, 'SOP1', 4, 's_mov_b64', {'src0': 126, 'sdst': 106},
+            ('reads_exec_mask',))
+    install(0x2c, 'SOP1', 10, 's_wqm_b64', {'src0': 126, 'sdst': 126},
+            ('reads_exec_mask', 'whole_quad_mode', 'writes_exec_mask'))
+    install(0x44, 'MIMG', 32, 'image_sample', {
+        'dmask': 15, 'unorm': 0, 'glc': 0, 'da': 0, 'r128': 0, 'tfe': 0, 'lwe': 0,
+        'slc': 0, 'vaddr': 2, 'vdata': 2, 'srsrc': 0, 'ssamp': 2,
+        'resource_sgpr': 0, 'sampler_sgpr': 8,
+    }, ('implicit_quad_derivatives', 'texture_sample'), size=8)
+    install(0x88, 'SOP1', 4, 's_mov_b64', {'src0': 106, 'sdst': 126},
+            ('reads_vcc_mask', 'writes_exec_mask'))
+    install(0x8c, 'EXP', 0, 'exp', {
+        'target': 0, 'en': 15, 'compr': 1, 'done': 1, 'vm': 1,
+        'vsrc0': 1, 'vsrc1': 0, 'vsrc2': 0, 'vsrc3': 0,
+    }, ('export',), size=8)
+    install(0x94, 'SOPP', 1, 's_endpgm', {'simm16': 0})
+    return rows
+
+
+def synthetic_logo_ps_manifest():
+    return {
+        'schema': m.LOGO_PS_SCHEMA,
+        'sha256': m.LOGO_PS_SHA256,
+        'initial_scalar': {'0': {'kind': 'pointer', 'view': 'binding_table'}},
+        'initial_vector': {
+            '0': {'kind': 'float', 'field': 'barycentric', 'component': 'x'},
+            '1': {'kind': 'float', 'field': 'barycentric', 'component': 'y'},
+        },
+        'views': {
+            'binding_table': {
+                '6': {'kind': 'pointer', 'view': 'image_descriptor_storage'},
+                '8': {'kind': 'pointer', 'view': 'sampler_descriptor_storage'},
+            },
+            'image_descriptor_storage': {
+                '0': {'kind': 'image_descriptor', 'identity': 'texture0', 'dwords': 8},
+            },
+            'sampler_descriptor_storage': {
+                '4': {'kind': 'descriptor', 'identity': 'sampler0', 'dwords': 4},
+            },
+        },
+        'image_sample': {
+            'resource_sgpr': 0,
+            'sampler_sgpr': 8,
+            'texture_identity': 'texture0',
+            'sampler_identity': 'sampler0',
+            'texture_slot': 0,
+            'sampler_slot': 0,
+            'format': 'rgba8unorm_2d',
+            'coordinate_components': 2,
+            'normalized_coordinates': True,
+            'lod': 'implicit',
+        },
+    }
 
 
 def synthetic_mubuf(components, stream_format=None, stream_field='position',
@@ -181,6 +251,116 @@ class LoweringTests(unittest.TestCase):
         for x,expected in ((0.0,0),(-0.0,0x8000),(1.0,0x3c00),(1.0005,0x3c00),
                            (65504.0,0x7bff),(65536.0,0x7bff),(2**-24,1),(2**-25,0)):
             self.assertEqual(o.half_rtz_bits(x),expected)
+
+    def test_pinned_logo_ps_sample_lowers_to_synthetic_ps_only_msl(self):
+        rows = synthetic_logo_ps_rows()
+        self.assertEqual(len(rows), m.LOGO_PS_ROWS)
+        source, report = m._lower_logo_ps_rows(rows, synthetic_logo_ps_manifest())
+
+        self.assertIn('struct ShaderCase {', source)
+        case_body = source.split('struct ShaderCase {', 1)[1].split('};', 1)[0]
+        self.assertEqual(re.findall(r'float4\s+(\w+);', case_body), list(m.CASE_FIELDS))
+        self.assertIn('vertex RasterValue asset_vertex', source)
+        self.assertIn('fragment float4 asset_fragment', source)
+        self.assertIn('texture2d<float> texture0 [[texture(0)]]', source)
+        self.assertIn('sampler sampler0 [[sampler(0)]]', source)
+        self.assertIn('out.position = float4(u.position.xyz, 1.0f);', source)
+        self.assertIn('out.param0 = u.param0_p0;', source)
+        self.assertIn('add32(mul32(u.position.x, u.material.x), 0.5f)', source)
+        self.assertIn('add32(mul32(u.position.y, u.material.y), 0.5f)', source)
+        self.assertIn('u.param0_p0 = in.param0;', source)
+        self.assertIn('u.param1_p0 = in.param1;', source)
+        self.assertIn('u.param0_p10 = float4(0.0f);', source)
+        self.assertIn('u.param0_p20 = float4(0.0f);', source)
+        self.assertIn('u.param1_p10 = float4(0.0f);', source)
+        self.assertIn('u.param1_p20 = float4(0.0f);', source)
+        self.assertIn('u.barycentric = float4(0.0f);', source)
+        self.assertIn('texture0.sample(sampler0, uv)', source)
+        self.assertNotIn('sample_compare', source)
+        self.assertNotIn('s_wqm_b64', source)
+        self.assertNotIn('kernel void verify_pair', source)
+        self.assertNotIn('recovered_vs', source)
+        self.assertEqual(report['code_sha256'], m.LOGO_PS_SHA256)
+        self.assertEqual(report['code_bytes'], 152)
+        self.assertEqual(report['stages'], [dict(stage='ps', sha256=m.LOGO_PS_SHA256,
+                                                  instructions=34)])
+        self.assertEqual(report['image_sample']['lod'], 'implicit')
+        self.assertIn('AMD WQM/Metal helper-lane and derivative equivalence NOT VERIFIED',
+                      report['limitations'])
+
+    def test_logo_ps_manifest_is_closed_world_and_strict(self):
+        rows = synthetic_logo_ps_rows()
+        base = synthetic_logo_ps_manifest()
+        invalid = []
+
+        wrong = dict(base); wrong['unexpected'] = True
+        invalid.append((wrong, 'unknown field'))
+        wrong = dict(base); wrong.pop('sha256')
+        invalid.append((wrong, 'missing field'))
+        wrong = {**base, 'schema': 'other'}
+        invalid.append((wrong, 'schema'))
+        wrong = {**base, 'sha256': '0' * 64}
+        invalid.append((wrong, 'sha256'))
+        wrong = {**base, 'image_sample': {**base['image_sample'], 'texture_slot': 1}}
+        invalid.append((wrong, 'texture_slot'))
+        wrong = {**base, 'image_sample': {**base['image_sample'], 'lod': 'explicit'}}
+        invalid.append((wrong, 'lod'))
+        wrong = {**base, 'views': {**base['views'],
+                                   'image_descriptor_storage': {'0': {'kind': 'descriptor',
+                                                                      'identity': 'texture0',
+                                                                      'dwords': 8}}}}
+        invalid.append((wrong, 'kind'))
+
+        for manifest, expected_path in invalid:
+            with self.subTest(expected_path=expected_path):
+                with self.assertRaisesRegex(m.LoweringError,
+                                            'unsupported logo PS synthetic ABI') as raised:
+                    m._lower_logo_ps_rows(rows, manifest)
+                self.assertIn(expected_path, str(raised.exception))
+
+    def test_logo_ps_profile_and_hash_mutations_fail_closed(self):
+        code = bytes(m.LOGO_PS_BYTES)
+        manifest = synthetic_logo_ps_manifest()
+        with self.assertRaisesRegex(m.LoweringError, 'SHA-256 mismatch') as raised:
+            m.generate_logo_ps(code, manifest)
+        self.assertIn(m.LOGO_PS_SHA256, str(raised.exception))
+
+        changed = bytearray(code)
+        changed[0] ^= 1
+        with self.assertRaisesRegex(m.LoweringError, 'SHA-256 mismatch'):
+            m.generate_logo_ps(bytes(changed), manifest)
+
+        rows = synthetic_logo_ps_rows()
+
+        def replace_fields(offset, **changes):
+            result = list(rows)
+            index = next(i for i, row in enumerate(result) if row.offset == offset)
+            fields = dict(result[index].fields)
+            fields.update(changes)
+            result[index] = replace(result[index], fields=fields)
+            return result
+
+        mutations = (
+            (replace_fields(0x28, sdst=108), '0x28'),
+            (replace_fields(0x2c, src0=124), '0x2c'),
+            (replace_fields(0x44, dmask=7), '0x44'),
+            (replace_fields(0x44, glc=1), '0x44'),
+            (replace_fields(0x44, vaddr=3), '0x44'),
+            (replace_fields(0x88, src0=108), '0x88'),
+            (replace_fields(0x8c, done=0), '0x8c'),
+            (replace_fields(0x94, simm16=1), '0x94'),
+            (list(reversed(rows)), 'boundary/order'),
+        )
+        for mutated_rows, expected in mutations:
+            with self.subTest(expected=expected):
+                with self.assertRaisesRegex(m.LoweringError, 'pinned logo PS'):
+                    m._validate_logo_ps_rows(mutated_rows)
+
+        exec_write = list(rows)
+        index = next(i for i, row in enumerate(exec_write) if row.offset == 0x40)
+        exec_write[index] = replace(exec_write[index], requirements=('writes_exec_mask',))
+        with self.assertRaisesRegex(m.LoweringError, 'intervening EXEC write'):
+            m._validate_logo_ps_rows(exec_write)
 
 
 if __name__=='__main__':unittest.main()
