@@ -3,6 +3,7 @@
 #pragma once
 #include <array>
 #include <atomic>
+#include <cstddef>
 #include <cstdint>
 #include <span>
 
@@ -35,8 +36,16 @@
 #include "vec_de6d20.hpp"
 #include "vec_dfd5f0.hpp"
 #include "leaf_df94c0.hpp"
+#include "leaf_de0160.hpp"
 #include "vec_ddab00.hpp"
 #include "vec_dda990.hpp"
+#include "guarded_dd91b0.hpp"
+#include "guarded_dd7e30.hpp"
+#include "guarded_dd4210.hpp"
+#include "guarded_d39b00.hpp"
+#include "guarded_d366d0.hpp"
+#include "guarded_d33b50.hpp"
+#include "avx_d5a280.hpp"
 #include "vec_dd41e0.hpp"
 #include "vec_b52110.hpp"
 #include "vec_b743c0.hpp"
@@ -115,10 +124,174 @@
 #include "vec_dac410.hpp"
 #include "vec_d853a0.hpp"
 #include "vec_d90310.hpp"
+#include "avx_d8fa40.hpp"
+#include "avx_d86ed0.hpp"
 #include "vec_d85490.hpp"
 #include "vec_d94cb0.hpp"
 #include "vec_dc4180.hpp"
 #include "vec_dddc90.hpp"
+#include "vec_d71f60.hpp"
+#include "vec_ce6130.hpp"
+#include "vec_ce57b0.hpp"
+#include "vec_ce38d0.hpp"
+#include "vec_ce0890.hpp"
+#include "vec_cde740.hpp"
+#include "vec_cdc760.hpp"
+#include "vec_cd4d60.hpp"
+#include "vec_cd0420.hpp"
+#include "vec_cceaa0.hpp"
+#include "vec_ccd0f0.hpp"
+#include "vec_cc8ac0.hpp"
+#include "vec_cc8330.hpp"
+#include "vec_cc5a10.hpp"
+#include "vec_cc07d0.hpp"
+#include "vec_cbb2c0.hpp"
+#include "vec_cb5cb0.hpp"
+#include "vec_caeed0.hpp"
+#include "vec_cae740.hpp"
+#include "vec_cae240.hpp"
+#include "vec_cad450.hpp"
+#include "leaf_cab080.hpp"
+#include "vec_ca4dc0.hpp"
+#include "leaf_ca18d0.hpp"
+#include "vec_c9e8e0.hpp"
+#include "leaf_c94ae0.hpp"
+#include "vec_c91b10.hpp"
+#include "vec_c891e0.hpp"
+#include "leaf_c811b0.hpp"
+#include "vec_c7de60.hpp"
+#include "vec_c7c310.hpp"
+#include "vec_c786c0.hpp"
+#include "vec_c77070.hpp"
+#include "vec_c741c0.hpp"
+#include "vec_c70e20.hpp"
+#include "vec_c6fdf0.hpp"
+#include "leaf_c6f520.hpp"
+#include "leaf_c6e9d0.hpp"
+#include "vec_c6d910.hpp"
+#include "vec_c6bad0.hpp"
+#include "vec_c69f70.hpp"
+#include "vec_c686e0.hpp"
+#include "leaf_c675f0.hpp"
+#include "vec_c66580.hpp"
+#include "vec_c65f80.hpp"
+#include "vec_c65da0.hpp"
+#include "vec_c64060.hpp"
+#include "vec_c61670.hpp"
+#include "vec_c5f6f0.hpp"
+#include "vec_c5c320.hpp"
+#include "vec_c5c1a0.hpp"
+#include "vec_c5c040.hpp"
+#include "vec_c5a400.hpp"
+#include "vec_c5a100.hpp"
+#include "vec_c555c0.hpp"
+#include "vec_c54d20.hpp"
+#include "vec_c54830.hpp"
+#include "vec_c53db0.hpp"
+#include "vec_c4e5e0.hpp"
+#include "vec_c4aa80.hpp"
+#include "vec_c47e00.hpp"
+#include "vec_c451d0.hpp"
+#include "vec_c44830.hpp"
+#include "vec_c42b00.hpp"
+#include "vec_c3eaa0.hpp"
+#include "vec_c3cf00.hpp"
+#include "vec_c37020.hpp"
+#include "vec_c36a80.hpp"
+#include "vec_c23650.hpp"
+#include "vec_c22300.hpp"
+#include "vec_c20710.hpp"
+#include "vec_c1a9a0.hpp"
+#include "vec_c191a0.hpp"
+#include "vec_c17a70.hpp"
+#include "leaf_c16b30.hpp"
+#include "vec_c152c0.hpp"
+#include "vec_c14f60.hpp"
+#include "vec_c0d720.hpp"
+#include "leaf_c0d380.hpp"
+#include "vec_c0bea0.hpp"
+#include "vec_c0bbd0.hpp"
+#include "vec_c0bb00.hpp"
+#include "vec_c0baa0.hpp"
+#include "vec_c0aae0.hpp"
+#include "vec_c09070.hpp"
+#include "vec_c060a0.hpp"
+#include "leaf_c05980.hpp"
+#include "vec_be5410.hpp"
+#include "vec_be5270.hpp"
+#include "vec_be50a0.hpp"
+#include "vec_be4ff0.hpp"
+#include "vec_bd7a80.hpp"
+#include "vec_bd7950.hpp"
+#include "vec_bd60a0.hpp"
+#include "vec_bd4dd0.hpp"
+#include "vec_bd32f0.hpp"
+#include "vec_bd3190.hpp"
+#include "vec_bd06c0.hpp"
+#include "vec_bceda0.hpp"
+#include "vec_bccc00.hpp"
+#include "vec_bcc960.hpp"
+#include "vec_bcc4e0.hpp"
+#include "vec_bcc3f0.hpp"
+#include "vec_bc8210.hpp"
+#include "vec_bc7280.hpp"
+#include "vec_bc5b00.hpp"
+#include "vec_bc2800.hpp"
+#include "vec_bc07f0.hpp"
+#include "vec_bc0670.hpp"
+#include "vec_bbf580.hpp"
+#include "vec_bbd5e0.hpp"
+#include "vec_bbba10.hpp"
+#include "vec_bb9740.hpp"
+#include "vec_bb82d0.hpp"
+#include "vec_bb7990.hpp"
+#include "vec_bacfb0.hpp"
+#include "vec_bace80.hpp"
+#include "vec_bace50.hpp"
+#include "vec_bacb30.hpp"
+#include "vec_bab950.hpp"
+#include "vec_ba3ef0.hpp"
+#include "vec_b950e0.hpp"
+#include "vec_b8d170.hpp"
+#include "vec_b89eb0.hpp"
+#include "vec_b84580.hpp"
+#include "vec_b7b270.hpp"
+#include "vec_b77e90.hpp"
+#include "vec_b77910.hpp"
+#include "vec_b77740.hpp"
+#include "vec_b76950.hpp"
+#include "vec_b747f0.hpp"
+#include "vec_b71f80.hpp"
+#include "vec_b6e6d0.hpp"
+#include "leaf_b692a0.hpp"
+#include "vec_b67a70.hpp"
+#include "vec_b5ecf0.hpp"
+#include "vec_b58690.hpp"
+#include "vec_b57360.hpp"
+#include "vec_b4ef70.hpp"
+#include "vec_b494d0.hpp"
+#include "vec_b47100.hpp"
+#include "vec_b44580.hpp"
+#include "vec_b33bd0.hpp"
+#include "leaf_a816d0.hpp"
+#include "leaf_9b75a0.hpp"
+#include "leaf_8f3d90.hpp"
+#include "leaf_8a0440.hpp"
+#include "leaf_83d800.hpp"
+#include "leaf_7ce8d0.hpp"
+#include "leaf_575d40.hpp"
+#include "leaf_3ca7c0.hpp"
+#include "leaf_163a40.hpp"
+#include "leaf_99350.hpp"
+#include "ctor_slot_296_b2b6b0.hpp"
+#include "ctor_slot_297_b25470.hpp"
+#include "ctor_slot_300_acc880.hpp"
+#include "ctor_slot_298_b0e250.hpp"
+#include "ctor_slot_299_b0c7a0.hpp"
+#include "ctor_slot_301_ac9550.hpp"
+#include "ctor_slot_302_aaeee0.hpp"
+#include "ctor_slot_303_a82170.hpp"
+#include "ctor_slot_305_a77b60.hpp"
 
 namespace sotc {
 
@@ -149,10 +322,14 @@ struct StartupState {
     VecDe7fb0 vec_de7fb0{};   // idx 56
     VecDe6d20 vec_de6d20{};   // idx 57
     VecDe1ad0 vec_de1ad0{};   // idx 58
+    LeafDe0160 leaf_de0160{}; // idx 59 / 0xde0160 (memset-1 + zero trailer; atexit omitted)
     VecDdef00 vec_ddef00{};   // idx 60
     VecDddc90 vec_dddc90{};   // idx 61
     VecDdab00 vec_ddab00{};   // idx 62
     VecDda990 vec_dda990{};   // idx 63
+    GuardedDd91b0 guarded_dd91b0{};  // idx 64 / 0xdd91b0
+    GuardedDd7e30 guarded_dd7e30{};  // idx 65 / 0xdd7e30
+    GuardedDd4210 guarded_dd4210{};  // idx 66 / 0xdd4210
     VecDd41e0 vec_dd41e0{};   // idx 67
     VecDc4180 vec_dc4180{};   // idx 68
     VecDc2d50 vec_dc2d50{};   // idx 69
@@ -166,6 +343,8 @@ struct StartupState {
     VecDac410 vec_dac410{};   // idx 77
     VecD94cb0 vec_d94cb0{};   // idx 78
     VecD90310 vec_d90310{};   // idx 79
+    AvxD8fa40 avx_d8fa40{};   // idx 80 / 0xd8fa40
+    AvxD86ed0 avx_d86ed0{};   // idx 81 / 0xd86ed0
     VecD85490 vec_d85490{};   // idx 82
     VecD853a0 vec_d853a0{};   // idx 83
     VecD84ee0 vec_d84ee0{};   // idx 84
@@ -188,6 +367,7 @@ struct StartupState {
     VecD62690 vec_d62690{};   // 0xd62690 idx 102
     VecD623c0 vec_d623c0{};   // 0xd623c0 idx 103
     VecD5fbe0 vec_d5fbe0{};   // 0xd5fbe0 idx 104
+    AvxD5a280 avx_d5a280{};   // idx 105 / 0xd5a280
     VecD47880 vec_d47880{};   // 0xd47880 idx 106
     VecD47420 vec_d47420{};   // 0xd47420 idx 107
     VecD47270 vec_d47270{};   // 0xd47270 idx 108
@@ -197,6 +377,9 @@ struct StartupState {
     VecD40010 vec_d40010{};   // 0xd40010 idx 112
     VecD3b790 vec_d3b790{};   // 0xd3b790 idx 113
     VecD3a6d0 vec_d3a6d0{};   // 0xd3a6d0 idx 114
+    GuardedD39b00 guarded_d39b00{};  // idx 115 / 0xd39b00
+    GuardedD366d0 guarded_d366d0{};  // idx 116 / 0xd366d0
+    GuardedD33b50 guarded_d33b50{};  // idx 117 / 0xd33b50
     VecD32720 vec_d32720{};   // 0xd32720 idx 119
     VecD2ffe0 vec_d2ffe0{};   // 0xd2ffe0 idx 120
     VecD32b70 vec_d32b70{};   // 0xd32b70 idx 118
@@ -233,6 +416,175 @@ struct StartupState {
     VecCe67b0 vec_ce67b0{};   // 0xce67b0 idx 151
     VecB743c0 vec_b743c0{};   // idx 282
     VecB52110 vec_b52110{};   // idx 290
+    VecD71f60 vec_d71f60{};  // idx 95 / 0xd71f60 (batch 01: last leaf_vec_copy module)
+    VecCe6130 vec_ce6130{};  // idx 152 / 0xce6130
+    VecCe57B0 vec_ce57b0{};  // idx 153 / 0xce57b0
+    VecCe38d0 vec_ce38d0{};  // idx 154 / 0xce38d0
+    VecCe0890 vec_ce0890{};  // idx 155 / 0xce0890
+    VecCde740 vec_cde740{};  // idx 156 / 0xcde740
+    VecCdc760 vec_cdc760{};  // idx 157 / 0xcdc760
+    VecCd4d60 vec_cd4d60{};  // idx 158 / 0xcd4d60
+    VecCd0420 vec_cd0420{};  // idx 159 / 0xcd0420
+    VecCceaa0 vec_cceaa0{};  // idx 160 / 0xcceaa0
+    VecCcd0f0 vec_ccd0f0{};  // idx 161 / 0xccd0f0
+    VecCc8ac0 vec_cc8ac0{};  // idx 162 / 0xcc8ac0
+    VecCc8330 vec_cc8330{};  // idx 163 / 0xcc8330
+    VecCc5a10 vec_cc5a10{};  // idx 164 / 0xcc5a10
+    VecCc07d0 vec_cc07d0{};  // idx 165 / 0xcc07d0
+    VecCbb2c0 vec_cbb2c0{};  // idx 166 / 0xcbb2c0
+    VecCb5cb0 vec_cb5cb0{};  // idx 167 / 0xcb5cb0
+    VecCaeed0 vec_caeed0{};  // idx 168 / 0xcaeed0
+    VecCae740 vec_cae740{};  // idx 169 / 0xcae740
+    VecCae240 vec_cae240{};  // idx 170 / 0xcae240
+    VecCad450 vec_cad450{};  // idx 171 / 0xcad450
+    LeafCab080 leaf_cab080{};  // idx 172 / 0xcab080
+    VecCa4dc0 vec_ca4dc0{};  // idx 173 / 0xca4dc0
+    LeafCa18d0 leaf_ca18d0{};  // idx 174 / 0xca18d0
+    VecC9e8e0 vec_c9e8e0{};  // idx 175 / 0xc9e8e0
+    LeafC94ae0 leaf_c94ae0{};  // idx 176 / 0xc94ae0
+    VecC91b10 vec_c91b10{};  // idx 177 / 0xc91b10
+    VecC891e0 vec_c891e0{};  // idx 178 / 0xc891e0
+    LeafC811b0 leaf_c811b0{};  // idx 179 / 0xc811b0
+    VecC7de60 vec_c7de60{};  // idx 180 / 0xc7de60
+    VecC7c310 vec_c7c310{};  // idx 181 / 0xc7c310
+    VecC786c0 vec_c786c0{};  // idx 182 / 0xc786c0
+    VecC77070 vec_c77070{};  // idx 183 / 0xc77070
+    VecC741c0 vec_c741c0{};  // idx 184 / 0xc741c0
+    VecC70e20 vec_c70e20{};  // idx 185 / 0xc70e20
+    VecC6fdf0 vec_c6fdf0{};  // idx 186 / 0xc6fdf0
+    LeafC6f520 leaf_c6f520{};  // idx 187 / 0xc6f520
+    LeafC6e9d0 leaf_c6e9d0{};  // idx 188 / 0xc6e9d0
+    VecC6d910 vec_c6d910{};  // idx 189 / 0xc6d910
+    VecC6bad0 vec_c6bad0{};  // idx 190 / 0xc6bad0
+    VecC69f70 vec_c69f70{};  // idx 191 / 0xc69f70
+    VecC686e0 vec_c686e0{};  // idx 192 / 0xc686e0
+    LeafC675f0 leaf_c675f0{};  // idx 193 / 0xc675f0
+    VecC66580 vec_c66580{};  // idx 194 / 0xc66580
+    VecC65f80 vec_c65f80{};  // idx 195 / 0xc65f80
+    VecC65da0 vec_c65da0{};  // idx 196 / 0xc65da0
+    VecC64060 vec_c64060{};  // idx 197 / 0xc64060
+    VecC61670 vec_c61670{};  // idx 198 / 0xc61670
+    VecC5f6f0 vec_c5f6f0{};  // idx 199 / 0xc5f6f0
+    VecC5c320 vec_c5c320{};  // idx 200 / 0xc5c320
+    VecC5c1a0 vec_c5c1a0{};  // idx 201 / 0xc5c1a0
+    VecC5C040 vec_c5c040{};  // idx 202 / 0xc5c040
+    VecC5A400 vec_c5a400{};  // idx 203 / 0xc5a400
+    VecC5A100 vec_c5a100{};  // idx 204 / 0xc5a100
+    VecC555C0 vec_c555c0{};  // idx 205 / 0xc555c0
+    VecC54D20 vec_c54d20{};  // idx 206 / 0xc54d20
+    VecC54830 vec_c54830{};  // idx 207 / 0xc54830
+    VecC53DB0 vec_c53db0{};  // idx 208 / 0xc53db0
+    VecC4E5E0 vec_c4e5e0{};  // idx 209 / 0xc4e5e0
+    VecC4AA80 vec_c4aa80{};  // idx 210 / 0xc4aa80
+    VecC47E00 vec_c47e00{};  // idx 211 / 0xc47e00
+    VecC451D0 vec_c451d0{};  // idx 212 / 0xc451d0
+    VecC44830 vec_c44830{};  // idx 213 / 0xc44830
+    VecC42B00 vec_c42b00{};  // idx 214 / 0xc42b00
+    VecC3EAA0 vec_c3eaa0{};  // idx 215 / 0xc3eaa0
+    VecC3CF00 vec_c3cf00{};  // idx 216 / 0xc3cf00
+    VecC37020 vec_c37020{};  // idx 217 / 0xc37020
+    VecC36A80 vec_c36a80{};  // idx 218 / 0xc36a80
+    VecC23650 vec_c23650{};  // idx 219 / 0xc23650
+    VecC22300 vec_c22300{};  // idx 220 / 0xc22300
+    VecC20710 vec_c20710{};  // idx 221 / 0xc20710
+    VecC1A9A0 vec_c1a9a0{};  // idx 222 / 0xc1a9a0
+    VecC191A0 vec_c191a0{};  // idx 223 / 0xc191a0
+    VecC17A70 vec_c17a70{};  // idx 224 / 0xc17a70
+    LeafC16b30 leaf_c16b30{};  // idx 225 / 0xc16b30
+    VecC152C0 vec_c152c0{};  // idx 226 / 0xc152c0
+    VecC14F60 vec_c14f60{};  // idx 227 / 0xc14f60
+    VecC0D720 vec_c0d720{};  // idx 228 / 0xc0d720
+    LeafC0d380 leaf_c0d380{};  // idx 229 / 0xc0d380
+    VecC0BEA0 vec_c0bea0{};  // idx 230 / 0xc0bea0
+    VecC0BBD0 vec_c0bbd0{};  // idx 231 / 0xc0bbd0
+    VecC0BB00 vec_c0bb00{};  // idx 232 / 0xc0bb00
+    VecC0BAA0 vec_c0baa0{};  // idx 233 / 0xc0baa0
+    VecC0AAE0 vec_c0aae0{};  // idx 234 / 0xc0aae0
+    VecC09070 vec_c09070{};  // idx 235 / 0xc09070
+    VecC060A0 vec_c060a0{};  // idx 236 / 0xc060a0
+    LeafC05980 leaf_c05980{};  // idx 237 / 0xc05980
+    VecBE5410 vec_be5410{};  // idx 238 / 0xbe5410
+    VecBE5270 vec_be5270{};  // idx 239 / 0xbe5270
+    VecBE50A0 vec_be50a0{};  // idx 240 / 0xbe50a0
+    VecBE4FF0 vec_be4ff0{};  // idx 241 / 0xbe4ff0
+    VecBD7A80 vec_bd7a80{};  // idx 242 / 0xbd7a80
+    VecBD7950 vec_bd7950{};  // idx 243 / 0xbd7950
+    VecBD60A0 vec_bd60a0{};  // idx 244 / 0xbd60a0
+    VecBD4DD0 vec_bd4dd0{};  // idx 245 / 0xbd4dd0
+    VecBD32F0 vec_bd32f0{};  // idx 246 / 0xbd32f0
+    VecBD3190 vec_bd3190{};  // idx 247 / 0xbd3190
+    VecBD06C0 vec_bd06c0{};  // idx 248 / 0xbd06c0
+    VecBCEDA0 vec_bceda0{};  // idx 249 / 0xbceda0
+    VecBCCC00 vec_bccc00{};  // idx 250 / 0xbccc00
+    VecBCC960 vec_bcc960{};  // idx 251 / 0xbcc960
+    VecBCC4E0 vec_bcc4e0{};  // idx 252 / 0xbcc4e0
+    VecBCC3F0 vec_bcc3f0{};  // idx 253 / 0xbcc3f0
+    VecBC8210 vec_bc8210{};  // idx 254 / 0xbc8210
+    VecBC7280 vec_bc7280{};  // idx 255 / 0xbc7280
+    VecBC5B00 vec_bc5b00{};  // idx 256 / 0xbc5b00
+    VecBC2800 vec_bc2800{};  // idx 257 / 0xbc2800
+    VecBC07F0 vec_bc07f0{};  // idx 258 / 0xbc07f0
+    VecBC0670 vec_bc0670{};  // idx 259 / 0xbc0670
+    VecBBF580 vec_bbf580{};  // idx 260 / 0xbbf580
+    VecBBD5E0 vec_bbd5e0{};  // idx 261 / 0xbbd5e0
+    VecBBBA10 vec_bbba10{};  // idx 262 / 0xbbba10
+    VecBB9740 vec_bb9740{};  // idx 263 / 0xbb9740
+    VecBB82D0 vec_bb82d0{};  // idx 264 / 0xbb82d0
+    VecBB7990 vec_bb7990{};  // idx 265 / 0xbb7990
+    VecBACFB0 vec_bacfb0{};  // idx 266 / 0xbacfb0
+    VecBACE80 vec_bace80{};  // idx 267 / 0xbace80
+    VecBACE50 vec_bace50{};  // idx 268 / 0xbace50
+    VecBACB30 vec_bacb30{};  // idx 269 / 0xbacb30
+    VecBAB950 vec_bab950{};  // idx 270 / 0xbab950
+    VecBA3EF0 vec_ba3ef0{};  // idx 271 / 0xba3ef0
+    VecB950E0 vec_b950e0{};  // idx 272 / 0xb950e0
+    VecB8D170 vec_b8d170{};  // idx 273 / 0xb8d170
+    VecB89EB0 vec_b89eb0{};  // idx 274 / 0xb89eb0
+    VecB84580 vec_b84580{};  // idx 275 / 0xb84580
+    VecB7B270 vec_b7b270{};  // idx 276 / 0xb7b270
+    VecB77E90 vec_b77e90{};  // idx 277 / 0xb77e90
+    VecB77910 vec_b77910{};  // idx 278 / 0xb77910
+    VecB77740 vec_b77740{};  // idx 279 / 0xb77740
+    VecB76950 vec_b76950{};  // idx 280 / 0xb76950
+    VecB747f0 vec_b747f0{};  // idx 281 / 0xb747f0
+    VecB71F80 vec_b71f80{};  // idx 283 / 0xb71f80
+    VecB6E6D0 vec_b6e6d0{};  // idx 284 / 0xb6e6d0
+    LeafB692a0 leaf_b692a0{};  // idx 285 / 0xb692a0
+    VecB67A70 vec_b67a70{};  // idx 286 / 0xb67a70
+    VecB5ECF0 vec_b5ecf0{};  // idx 287 / 0xb5ecf0
+    VecB58690 vec_b58690{};  // idx 288 / 0xb58690
+    VecB57360 vec_b57360{};  // idx 289 / 0xb57360
+    VecB4EF70 vec_b4ef70{};  // idx 291 / 0xb4ef70
+    VecB494D0 vec_b494d0{};  // idx 292 / 0xb494d0
+    VecB47100 vec_b47100{};  // idx 293 / 0xb47100
+    VecB44580 vec_b44580{};  // idx 294 / 0xb44580
+    VecB33BD0 vec_b33bd0{};  // idx 295 / 0xb33bd0
+    Slot296Stamp slot296_stamp{};      // idx 296 / 0xb2b6b0 (8-byte TSC stamp at 0x334ac18)
+    Slot297Table slot297_table{};      // idx 297 / 0xb25470 (400 x 0x118 records at 0x332f650)
+    // Shared console-command state: the manager cell [0x2dfcbc8] (null until the engine boot installer 0x242c0), the pending
+    // list 0x2dfce50 the ConCmd constructors queue into, and the atexit log (CPU-01-CONCMD-298-301).
+    ConCmdRegistry concmd{};
+    Slot298Object slot298_shader_type{};  // idx 298 / 0xb0e250 (shaderTypeToLoad, 0x3305d20)
+    DebugMenuRegistry debug_menu{};       // parent cell [0x2dfd4b8] (null) + root list 0x2dfd4c0
+    Slot299Objects slot299{};             // idx 299 / 0xb0c7a0 (0x3305a30..0x3305d1f)
+    Slot300Cleanup slot300_cleanup{};  // idx 300 / 0xacc880 (one inert atexit entry)
+    Slot301Object slot301_rumble{};    // idx 301 / 0xac9550 (rumbleEnabled, 0x33054a0)
+    Slot302Objects slot302{};          // idx 302 / 0xaaeee0 (ten handles + identity vptr)
+    Slot305Pairs slot305{};            // idx 305 / 0xa77b60 (six guarded zero pairs)
+    Slot303Objects slot303{};          // idx 303 / 0xa82170 (ProfileCPU 0x32fd228 + debug toggle 0x32fd2f0)
+    LeafA816d0 leaf_a816d0{};  // idx 304 / 0xa816d0
+    Leaf9b75a0 leaf_9b75a0{};  // idx 319 / 0x9b75a0
+    Leaf8f3d90 leaf_8f3d90{};  // idx 320 / 0x8f3d90
+    Leaf8a0440 leaf_8a0440{};  // idx 321 / 0x8a0440
+    Leaf83d800 leaf_83d800{};  // idx 324 / 0x83d800
+    Leaf7ce8d0 leaf_7ce8d0{};  // idx 346 / 0x7ce8d0
+    Leaf575d40Cell leaf_575d40_source{};  // idx 417 runtime source (original BSS 0x2eea480; producer not recovered)
+    Leaf575d40Cell leaf_575d40{};  // idx 417 / 0x575d40 (copies the source)
+    Leaf3ca7c0 leaf_3ca7c0{};  // idx 466 / 0x3ca7c0
+    Leaf163a40 leaf_163a40{};  // idx 526 / 0x163a40
+    Leaf99350 leaf_99350{};  // idx 548 / 0x99350
+    Leaf99350Inputs leaf_99350_inputs{};  // idx 548 runtime inputs (original cells 0x2dd9fa8 / 0x2dd9f84; producer not recovered)
+
     std::array<std::byte, kScratchBytes> scratch{};
     std::atomic<std::uint64_t> scratch_slot{0};
     std::atomic<std::uint32_t> flag32{0};
@@ -275,6 +627,11 @@ struct StartupState {
 // Returns false and sets state.init_failed on any failure.
 [[nodiscard]] bool init_slot23_leaf_e71990(StartupState& state) noexcept;
 
+// Original constructor-table length: 573 entries at 0x2dd70e0, indexed BACKWARDS
+// (index i is the qword at 0x2dd70e0 - 8*i). tools/lift/check_ctor_slots.py pins the table
+// sha256; ctor_original_table.hpp carries the full generated row table.
+inline constexpr std::size_t kOriginalCtorCount = 573;
+
 struct CtorSlot {
     std::uint32_t original_rva;               // identity only; never used as an address
     std::uint32_t original_index;             // position in the original 573-entry list (runs 0 -> 572)
@@ -290,7 +647,9 @@ struct CtorRunResult {
 
 CtorRunResult run_constructors(std::span<const CtorSlot> in_order, StartupState& state) noexcept;
 
-// Recovered subset in original index order. The first unresolved original slot is explicit with a null callback.
+// Recovered subset in original index order. There are no null callbacks: the first original index
+// missing from this span is reported by first_unrecovered_constructor_index() in
+// ctor_original_table.hpp, which is the explicit, machine-checked startup cliff.
 std::span<const CtorSlot> recovered_constructors() noexcept;
 
 // REGISTERED-AHEAD table: constructor-table indices 24..47 (the remaining 24 members of the 34-slot

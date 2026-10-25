@@ -101,6 +101,31 @@ assert len(slot21_lines) == 1 and "init_const_table_ee1130(s.const_table_ee1130)
 slot23_lines = [l for l in source_lines if re.match(r"^\s*\{\s*0xe71990\s*,\s*23\s*,", l)]
 assert len(slot23_lines) == 1 and "init_slot23_leaf_e71990(s)" in slot23_lines[0], (
     "slot 23 must call init_slot23_leaf_e71990")
+# CPU-01-CONCMD-298-299-301-01: the three ConCmd slots, wired to the shared registry state.
+SLOT_298_299_301 = {
+    298: (0xb0e250, "init_slot298_b0e250(s.slot298_shader_type, s.concmd)"),
+    299: (0xb0c7a0, "init_slot299_b0c7a0(s.slot299, s.concmd, s.debug_menu)"),
+    301: (0xac9550, "init_slot301_ac9550(s.slot301_rumble, s.concmd)"),
+    # CPU-01-CONCMD-303-01: ProfileCPU bool variable + "Profile CPU" debug-menu toggle.
+    302: (0xaaeee0, "init_slot302_aaeee0(s.slot302, s.concmd.atexit_log)"),
+    305: (0xa77b60, "init_slot305_a77b60(s.slot305)"),
+    303: (0xa82170, "init_slot303_a82170(s.slot303, s.concmd, s.debug_menu)"),
+}
+for slot_index, (slot_rva, slot_api) in SLOT_298_299_301.items():
+    lines = [l for l in source_lines if re.match(rf"^\s*\{{\s*{slot_rva:#x}\s*,\s*{slot_index}\s*,", l)]
+    assert len(lines) == 1, f"slot {slot_index} ({slot_rva:#x}) must be registered exactly once"
+    assert slot_api in array_match.group(1), f"slot {slot_index} must call {slot_api}"
+# CPU-01-STARTUP-SLOTS-296-297-300-01: three slot-specific modules with real callbacks.
+SLOT_296_297_300 = {
+    296: (0xb2b6b0, "init_slot296_b2b6b0(s.slot296_stamp)"),
+    297: (0xb25470, "init_slot297_b25470(s.slot297_table, default_slot297_hooks())"),
+    300: (0xacc880, "init_slot300_acc880(s.slot300_cleanup)"),
+}
+for slot_index, (slot_rva, slot_api) in SLOT_296_297_300.items():
+    lines = [l for l in source_lines if re.match(rf"^\s*\{{\s*{slot_rva:#x}\s*,\s*{slot_index}\s*,", l)]
+    assert len(lines) == 1, f"slot {slot_index} ({slot_rva:#x}) must be registered exactly once"
+    assert slot_api in array_match.group(1), (
+        f"slot {slot_index} must call {slot_api}")
 AHEAD = {24: 0xe56b70, 25: 0xe55f10, 26: 0xe55240, 27: 0xe54a30, 28: 0xe53a10, 29: 0xe52a20, 30: 0xe52150,
          31: 0xe518e0, 32: 0xe510e0, 33: 0xe50980, 34: 0xe500b0, 35: 0xe4f840, 36: 0xe4f040, 37: 0xe4e8e0,
          38: 0xe4e010, 39: 0xe4d7a0, 40: 0xe4cfa0, 41: 0xe4c840, 42: 0xe4bf10, 43: 0xe4b7b0, 44: 0xe4afb0,
@@ -114,12 +139,77 @@ assert [(rva, index) for rva, index, _, _ in rows if rva in (0xd32720, 0xd2ffe0)
     (0xd2ffe0, 120),
 ], "registered indices for 0xd32720 and 0xd2ffe0 must be 119 and 120"
 
-# Gaps that were previously documented as "lifted but not registered" must stay registered: the
-# native sources exist and are byte-verified by their own checkers, so a regression here means the
-# runner silently skipped a recovered constructor.
-for rva, index in ((0xe094e0, 50), (0xdbfa60, 70), (0xd85490, 82), (0xce8440, 147)):
-    assert (rva, index) in [(r[0], r[1]) for r in rows], (
-        f'lifted constructor {rva:#x} (index {index}) is no longer registered')
+# ---- computed rule: module coverage (replaces the hard-coded "lifted but not registered" list) ----
+# Every `vec_<rva>.hpp` / `leaf_<rva>.hpp` module is an already-lifted constructor: its file name
+# and its first comment line both name the original RVA. The pinned table is the identity authority;
+# a module RVA that is not a unique table row is a hard failure. Every module index must then be
+# registered with the pinned RVA, in original order, exactly once. (Prose index claims inside old
+# headers use a legacy survey numbering and are not used for identity.)
+core_dir = ROOT / "native/core"
+
+
+def module_index(path):
+    match = re.fullmatch(r"(?:vec|leaf)_([0-9a-f]+)\.hpp", path.name)
+    if not match:
+        return None
+    rva = int(match.group(1), 16)
+    matches = [index for index, value in enumerate(original_rvas) if value == rva]
+    assert len(matches) == 1, f"{path.name}: RVA {rva:#x} is not a unique constructor-table row"
+    first_line = path.read_text().splitlines()[0]
+    claimed = re.search(r"RVA\s*0x([0-9a-fA-F]+)", first_line)
+    assert claimed and int(claimed.group(1), 16) == rva, (
+        f"{path.name}: first-line RVA claim disagrees with the file name")
+    return matches[0]
+
+
+modules = {}
+for module_path in sorted(core_dir.glob("vec_*.hpp")) + sorted(core_dir.glob("leaf_*.hpp")):
+    index = module_index(module_path)
+    if index is None:
+        continue
+    assert index not in modules, f"two modules claim constructor index {index}"
+    modules[index] = int(module_path.stem.split("_", 1)[1], 16)
+
+rows_by_index = {index: rva for rva, index, _, _ in rows}
+for index in sorted(modules):
+    assert index in rows_by_index, (
+        f"constructor index {index} has module RVA {modules[index]:#x} but is not registered")
+    assert rows_by_index[index] == original_rvas[index] == modules[index], (
+        f"constructor index {index} registered at {rows_by_index[index]:#x}, "
+        f"pinned table says {original_rvas[index]:#x}, module says {modules[index]:#x}")
+
+# Registered set = recovered prefix 0-151 + every byte-verified module + the sparse late rows that
+# have no vec_/leaf_ module + the slot-specific modules 296-301 and 302/303/305. Extra rows would be
+# unverified registrations; a missing module row means a recovered constructor is silently skipped.
+expected_registered = set(range(152)) | set(modules) | {282, 290, 520, 538, 296, 297, 300, 298, 299, 301, 302, 303, 305}
+assert set(rows_by_index) == expected_registered, (
+    "registered set differs from the computed expectation: "
+    f"extra={sorted(set(rows_by_index) - expected_registered)} "
+    f"missing={sorted(expected_registered - set(rows_by_index))}")
+registered_digest = hashlib.sha256(
+    ",".join(str(index) for index in sorted(rows_by_index)).encode()).hexdigest()
+assert registered_digest == "ee1bf21bc35e9baddf2d4a54f8296379786ab103b630c92779d2f2ae53d976e0", (
+    f"registered index-set sha256 changed: {registered_digest}")
+
+# The remaining 256 original slots are all `other`-class bodies (census: local/re/work/
+# ctor-classes.json). The first one is the explicit startup cliff after this batch.
+unregistered = sorted(set(range(TABLE_COUNT)) - set(rows_by_index))
+assert len(unregistered) == 256, f"expected 256 unregistered slots, found {len(unregistered)}"
+assert unregistered[0] == 306 and original_rvas[306] == 0xa633b0, (
+    f"first unregistered slot changed: {unregistered[0]}/{original_rvas[unregistered[0]]:#x}")
+
+# The 573-row data table must reproduce the ELF exactly, in index order.
+startup_header = (core_dir / "startup_ctors.hpp").read_text()
+assert "inline constexpr std::size_t kOriginalCtorCount = 573;" in startup_header, (
+    "startup_ctors.hpp must pin kOriginalCtorCount = 573")
+table_source = (core_dir / "ctor_original_table.cpp").read_text()
+table_rows = [(int(index), int(rva, 16)) for index, rva in re.findall(
+    r"^\s*\{\s*(\d+)\s*,\s*(0x[0-9a-fA-F]+)\s*\},", table_source, re.MULTILINE)]
+assert len(table_rows) == TABLE_COUNT, (
+    f"ctor_original_table.cpp must carry {TABLE_COUNT} rows, found {len(table_rows)}")
+for index, rva in table_rows:
+    assert index < TABLE_COUNT and rva == original_rvas[index], (
+        f"ctor_original_table.cpp row {index}: {rva:#x} != ELF table {original_rvas[index]:#x}")
 
 
 # ---- byte anchors for slot 11 (ClothingPhysicalMeshParameters) against the pinned ELF ----
@@ -213,8 +303,8 @@ block_stores_ok(image.read(0xf08f00, 556), "reset 0xf08f00")
 
 print(
     f"OK: ELF sha256={elf_digest}; constructor table start={TABLE_START:#x} "
-    f"count={TABLE_COUNT} sha256={table_digest}; verified {len(rows)} registered RVA/index pairs; "
-    "slots 0-47 are recovered (slot 11 byte anchors + 12 array block offsets/strides; slots 12-19 body "
-    "digests + ELF-table RVAs; slot 23 private name fixture; slots 24-47 ahead-family on production); "
-    "contiguous prefix includes 0-47 plus later registered rows (see recovered_constructors for gaps)"
+    f"count={TABLE_COUNT} sha256={table_digest}; verified {len(rows)} registered RVA/index pairs "
+    f"({len(modules)} vec_*/leaf_* modules); registered index-set sha256={registered_digest}; "
+    f"slots 0-47 recovered; idx 95 registered; 256 unregistered `other` slots remain, first "
+    f"{unregistered[0]} / {original_rvas[unregistered[0]]:#x}"
 )
