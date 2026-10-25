@@ -10,12 +10,9 @@ constexpr std::size_t kHeader = 8;
 
 }  // namespace
 
-HeapAllocator::HeapAllocator(PageOwnerMap& owners, std::uint32_t owner_id, std::uint64_t cap_bytes,
-                             std::uint64_t page_bytes)
-    : owners_(owners),
-      owner_id_(owner_id),
-      cap_bytes_(cap_bytes),
-      page_bytes_(heap_round_page_quantum(page_bytes == 0 ? kHeapPageBytes : page_bytes)) {}
+HeapAllocator::HeapAllocator(PageOwnerMap& owners, std::uint32_t owner_id,
+                             std::uint64_t cap_bytes)
+    : owners_(owners), owner_id_(owner_id), cap_bytes_(cap_bytes) {}
 
 HeapAllocator::~HeapAllocator() {
     std::unordered_map<void*, Block> live;
@@ -34,10 +31,12 @@ void* HeapAllocator::allocate(std::size_t size, std::size_t align, const AllocDe
     if (!payload) return nullptr;
     if (align > std::numeric_limits<std::uint32_t>::max()) return nullptr;
 
-    // Map header + payload; host alignment at least 16 / request align (INF; original carves).
-    const std::uint64_t map_size = *payload + kHeader;
-    std::uint32_t map_align = 16;
-    if (align > map_align) map_align = static_cast<std::uint32_t>(align);
+    // Leave enough room to align the user pointer after its 8-byte size header.
+    const std::uint64_t alignment = align == 0 ? 1 : align;
+    const std::uint64_t padding = alignment - 1;
+    if (*payload > std::numeric_limits<std::uint64_t>::max() - kHeader - padding) return nullptr;
+    const std::uint64_t map_size = kHeader + padding + *payload;
+    const std::uint32_t map_align = 16;
 
     std::lock_guard<std::mutex> lock(mu_);
     if (stats_.bytes_in_use > cap_bytes_ || *payload > cap_bytes_ - stats_.bytes_in_use) {
@@ -49,9 +48,12 @@ void* HeapAllocator::allocate(std::size_t size, std::size_t align, const AllocDe
     if (!mapped) return nullptr;
 
     auto* raw = static_cast<unsigned char*>(mapped->ptr);
-    auto* hdr = reinterpret_cast<std::uint64_t*>(raw);
-    *hdr = *payload;  // OBS low 3 bits clear (flags unused here)
-    void* user = raw + kHeader;
+    const auto after_header = reinterpret_cast<std::uintptr_t>(raw + kHeader);
+    const auto remainder = after_header % alignment;
+    const auto user_padding = remainder == 0 ? 0 : alignment - remainder;
+    auto* user_bytes = raw + kHeader + user_padding;
+    std::memcpy(user_bytes - kHeader, &*payload, sizeof(*payload));  // OBS low 3 bits clear
+    void* user = user_bytes;
 
     if (owners_.add(reinterpret_cast<std::uintptr_t>(user), static_cast<std::size_t>(*payload),
                     owner_id_) != PageOwnerMap::Status::ok) {

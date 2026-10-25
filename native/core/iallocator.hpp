@@ -39,6 +39,11 @@ public:
     // ptr is non-null and was resolved to this heap by the owner map.
     virtual void deallocate(void* ptr, const AllocDesc& desc) = 0;
 
+    // The front-end routes frees straight to the owning child instead of back through a
+    // composite allocator. Wrapper allocators can use this notification to discard any
+    // per-pointer bookkeeping they added during allocate().
+    virtual void on_owner_map_deallocation(void*) noexcept {}
+
     // Called once after allocate() returned nullptr. Return true to say "handled": the front-end
     // then returns nullptr WITHOUT reporting out-of-memory. Default false (OBS: all children).
     virtual bool recover_from_failure() { return false; }

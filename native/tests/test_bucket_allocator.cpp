@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <limits>
 #include <vector>
 
 #include "core/allocator_front.hpp"
@@ -29,6 +30,7 @@ static void test_class_math() {
     CHECK(!bucket_class_bytes(0x401, 8));
     CHECK(bucket_class_bytes(0x10, 0x40) == 0x40u);  // align bumps class
     CHECK(!bucket_class_bytes(0x10, 0x800));           // align beyond band
+    CHECK(!bucket_class_bytes(std::numeric_limits<std::size_t>::max(), 8));  // size rounding overflow
     CHECK(bucket_class_index(0x10) == 0);
     CHECK(bucket_class_index(0x400) == 63);
     CHECK(kBucketClassCount == 64);
@@ -58,6 +60,24 @@ static void test_alloc_free_reuse() {
     CHECK(q == p);  // INF freelist LIFO reuse
     CHECK(static_cast<unsigned char*>(q)[0] == 0x5A);  // OBS: no zero-fill on reuse
     b.deallocate(q, d);
+}
+
+static void test_requested_alignments() {
+    PageOwnerMap owners;
+    BucketAllocator b(owners, 2);
+    AllocDesc d{};
+
+    for (const auto& request : {std::pair<std::size_t, std::size_t>{8, 16}, {0x21, 32}}) {
+        const auto [size, align] = request;
+        std::vector<void*> blocks;
+        for (int i = 0; i < 3; ++i) {
+            void* p = b.allocate(size, align, d);
+            CHECK(p != nullptr);
+            CHECK(reinterpret_cast<std::uintptr_t>(p) % align == 0);
+            blocks.push_back(p);
+        }
+        for (void* p : blocks) b.deallocate(p, d);
+    }
 }
 
 static void test_reject_oversize_and_foreign_free() {
@@ -117,6 +137,7 @@ static void test_many_classes_and_composite() {
 int main() {
     test_class_math();
     test_alloc_free_reuse();
+    test_requested_alignments();
     test_reject_oversize_and_foreign_free();
     test_many_classes_and_composite();
     std::puts("OK bucket_allocator");

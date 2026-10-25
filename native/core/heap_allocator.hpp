@@ -20,6 +20,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
+#include <limits>
 #include <mutex>
 #include <optional>
 #include <unordered_map>
@@ -32,11 +34,14 @@
 namespace sotc {
 
 // OBS 0x48c80: (size + 0xf) & ~0xf — and align bump. nullopt if above the heap page quantum.
-inline std::optional<std::uint64_t> heap_request_bytes(std::size_t size, std::size_t align) noexcept {
+inline std::optional<std::uint64_t> heap_request_bytes(std::size_t size,
+                                                       std::size_t align) noexcept {
     std::size_t need = size == 0 ? 1 : size;
     if (align > need) need = align;
+    const std::uint64_t unrounded = static_cast<std::uint64_t>(need);
+    if (unrounded > std::numeric_limits<std::uint64_t>::max() - 0xfu) return std::nullopt;
     const std::uint64_t rounded =
-        (static_cast<std::uint64_t>(need) + 0xfu) & ~std::uint64_t{0xfu};
+        (unrounded + 0xfu) & ~std::uint64_t{0xfu};
     if (rounded == 0 || rounded > kHeapPageBytes) return std::nullopt;
     return rounded;
 }
@@ -49,18 +54,17 @@ inline std::uint64_t heap_round_page_quantum(std::uint64_t page_bytes) noexcept 
 // OBS 0x48c70: usable payload size from header at user_ptr - 8.
 inline std::uint64_t heap_usable_size(const void* user_ptr) noexcept {
     if (!user_ptr) return 0;
-    const auto* hdr =
-        reinterpret_cast<const std::uint64_t*>(static_cast<const unsigned char*>(user_ptr) - 8);
-    return *hdr & ~std::uint64_t{7};
+    std::uint64_t header = 0;
+    std::memcpy(&header, static_cast<const unsigned char*>(user_ptr) - 8, sizeof(header));
+    return header & ~std::uint64_t{7};
 }
 
 class HeapAllocator final : public IAllocator {
 public:
     // `cap_bytes` mirrors the 0x48910 reservation argument (bootstrap 0x9600000).
-    // `page_bytes` mirrors the 0x488f0 argument (bootstrap 0x100000) after 64 KiB round-up.
+    // The native allocator fixes its page quantum to the observed bootstrap value, 1 MiB.
     HeapAllocator(PageOwnerMap& owners, std::uint32_t owner_id,
-                  std::uint64_t cap_bytes = kHeapAllocatorCapBytes,
-                  std::uint64_t page_bytes = kHeapPageBytes);
+                  std::uint64_t cap_bytes = kHeapAllocatorCapBytes);
     ~HeapAllocator() override;
     HeapAllocator(const HeapAllocator&) = delete;
     HeapAllocator& operator=(const HeapAllocator&) = delete;
@@ -70,7 +74,7 @@ public:
 
     bool owns_block(const void* p) const;
     std::uint64_t cap_bytes() const noexcept { return cap_bytes_; }
-    std::uint64_t page_bytes() const noexcept { return page_bytes_; }
+    std::uint64_t page_bytes() const noexcept { return kHeapPageBytes; }
 
     struct Stats {
         std::uint64_t live_blocks = 0;
@@ -90,7 +94,6 @@ private:
     PageOwnerMap& owners_;
     std::uint32_t owner_id_;
     std::uint64_t cap_bytes_;
-    std::uint64_t page_bytes_;
     mutable std::mutex mu_;
     std::unordered_map<void*, Block> live_;
     Stats stats_;

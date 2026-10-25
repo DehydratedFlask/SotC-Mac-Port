@@ -25,6 +25,17 @@ bool AllocatorFront::set_heap(std::uint32_t id, IAllocator* heap) noexcept {
     return true;
 }
 
+bool AllocatorFront::set_heap_if_empty(std::uint32_t id, IAllocator* heap) noexcept {
+    if (id == 0 || id >= kHeapSlots || heap == nullptr) return false;
+    IAllocator* empty = nullptr;
+    return table_[id].compare_exchange_strong(empty, heap);
+}
+
+bool AllocatorFront::clear_heap_if(std::uint32_t id, IAllocator* expected) noexcept {
+    if (id == 0 || id >= kHeapSlots || expected == nullptr) return false;
+    return table_[id].compare_exchange_strong(expected, nullptr);
+}
+
 void AllocatorFront::clear_heap(std::uint32_t id) noexcept {
     if (id < kHeapSlots) table_[id].store(nullptr);
 }
@@ -101,6 +112,9 @@ void AllocatorFront::free(void* ptr, std::uint32_t kind) {
     if (!owner) return;                            // OBS: foreign pointer ignored
     IAllocator* h = heap(*owner);
     if (h == nullptr) return;                      // INF: owner slot cleared -> ignore
+    IAllocator* default_heap = heap(kDefaultHeap);
+    if (default_heap != nullptr && default_heap != h)
+        default_heap->on_owner_map_deallocation(ptr);
     h->deallocate(ptr, AllocDesc{kind, tag_.load(std::memory_order_relaxed)});
 }
 

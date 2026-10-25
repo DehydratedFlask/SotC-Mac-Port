@@ -29,6 +29,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [GPU-02 logo vertex fetch lowering claim](checkpoints/2026-10-24-gpu02-logo-vs-fetch-claim.md) | Original bounded task claim and preflight; completion evidence is E636 below |
 | [GPU-02 logo vertex fetch lowering completion](checkpoints/2026-10-25-gpu02-logo-vs-fetch-complete.md) | E636 synthetic float2/float3/float4 MUBUF lowering and private Metal/CPU-oracle replay; no retail descriptor or G3 claim |
 | [E28 zero-request checker parity](checkpoints/2026-10-25-srv01-f19e00-checker-parity.md) | Existing fixture's zero-request case is now included in the instruction-derived checker; E368; no game execution |
+| [PR #5 allocator bootstrap rollback and fixed quantum](checkpoints/2026-10-25-pr5-allocator-rollback-fixed-quantum.md) | E638 records rollback, publish-last concurrency safety, fixed 1 MiB request quantum and verification; allocator hierarchy remains fixture-only and not wired into startup |
 | [CTOR_CLASSES](CTOR_CLASSES.md) | 573-entry constructor-table classification by reachable-body idiom plus the slot 10–19/24–47 family contract; CPU-01 |
 | [INPUTTABLE_551140](INPUTTABLE_551140.md) | Numeric-only deepen of Init-hash 275-entry table (`0x551140`); CPU-01 |
 | [INPUTTABLE_551140_NAMES_FIXTURE](INPUTTABLE_551140_NAMES_FIXTURE.md) | Private 275-name fixture recipe for registry fill `0x52a220`; CPU-01 |

@@ -67,8 +67,10 @@ struct OomHooks {
     void* user = nullptr;
 };
 
-// OBS 0x12860 call target stand-in: install default heaps into `front`. Return true on success
-// (tbl[1] must be non-null afterwards). False → alloc continues and typically returns null.
+// OBS 0x12860 call target stand-in: install default heaps into `front`. Multiple alloc callers
+// may enter this hook concurrently while tbl[1] is null, so implementations must serialize their
+// installation and publish a complete hierarchy before returning true. False → alloc continues
+// and typically returns null.
 using LazyBootstrapFn = bool (*)(AllocatorFront& front, void* user);
 
 struct LazyBootstrapHooks {
@@ -86,6 +88,10 @@ public:
     // Registers a heap in slot `id` (2..255 keeps the PageOwnerMap invariant; slot 1 is the
     // default composite heap; slot 0 is rejected). Returns false on a bad id / null heap.
     bool set_heap(std::uint32_t id, IAllocator* heap) noexcept;
+    // Transactional bootstrap helpers: do not replace an occupied slot, and only clear the
+    // exact pointer installed by the caller.
+    bool set_heap_if_empty(std::uint32_t id, IAllocator* heap) noexcept;
+    bool clear_heap_if(std::uint32_t id, IAllocator* expected) noexcept;
     void clear_heap(std::uint32_t id) noexcept;
     IAllocator* heap(std::uint32_t id) const noexcept;
 

@@ -42,7 +42,7 @@ static void test_math_and_usable_size() {
 
 static void test_cap_reject_and_no_zero() {
     PageOwnerMap owners;
-    HeapAllocator h(owners, 3, /*cap=*/0x1800, /*page=*/0x100000);
+    HeapAllocator h(owners, 3, /*cap=*/0x1800);
     AllocDesc d{};
     void* a = h.allocate(0x1000, 8, d);
     CHECK(a);
@@ -59,6 +59,28 @@ static void test_cap_reject_and_no_zero() {
     int stack = 0;
     h.deallocate(&stack, d);
     CHECK(h.stats().ignored_frees == 1);
+}
+
+static void test_requested_alignments() {
+    PageOwnerMap owners;
+    HeapAllocator h(owners, 3);
+    for (std::size_t align : {std::size_t{16}, std::size_t{32}}) {
+        void* p = h.allocate(1, align, AllocDesc{});
+        CHECK(p != nullptr);
+        CHECK(reinterpret_cast<std::uintptr_t>(p) % align == 0);
+        CHECK(heap_usable_size(p) >= 1);
+        h.deallocate(p, AllocDesc{});
+    }
+}
+
+static void test_fixed_page_quantum() {
+    PageOwnerMap owners;
+    HeapAllocator h(owners, 3, /*cap=*/0x200000);
+    CHECK(h.page_bytes() == kHeapPageBytes);
+    void* maximum = h.allocate(kHeapPageBytes, 8, AllocDesc{});
+    CHECK(maximum != nullptr);
+    h.deallocate(maximum, AllocDesc{});
+    CHECK(h.allocate(kHeapPageBytes + 1, 8, AllocDesc{}) == nullptr);
 }
 
 static void test_composite_mid_band() {
@@ -89,6 +111,8 @@ static void test_composite_mid_band() {
 int main() {
     test_math_and_usable_size();
     test_cap_reject_and_no_zero();
+    test_requested_alignments();
+    test_fixed_page_quantum();
     test_composite_mid_band();
     std::puts("OK heap_allocator");
     return 0;

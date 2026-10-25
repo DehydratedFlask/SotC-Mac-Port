@@ -54,6 +54,8 @@ public:
 
     // OBS 0x47dd0: append {threshold, heap}. Returns false when full or heap is null.
     bool add_child(std::uint64_t threshold, IAllocator* heap) noexcept;
+    // Bootstrap rollback for a hierarchy that has not been published to callers.
+    void clear_children() noexcept { children_.clear(); }
 
     std::size_t child_count() const noexcept { return children_.size(); }
     const CompositeChild* children() const noexcept {
@@ -62,9 +64,11 @@ public:
 
     void* allocate(std::size_t size, std::size_t align, const AllocDesc& desc) override;
     void deallocate(void* ptr, const AllocDesc& desc) override;
+    void on_owner_map_deallocation(void* ptr) noexcept override;
 
     // OBS [obj+0xd0] success counter (racy in original; atomic here).
     std::uint64_t bytes_dispatched() const noexcept { return bytes_dispatched_.load(); }
+    std::size_t tracked_allocation_count() const;
 
 private:
     std::vector<CompositeChild> children_;

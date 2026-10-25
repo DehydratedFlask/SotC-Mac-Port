@@ -134,14 +134,37 @@ static void test_no_zero_fill_and_front() {
     // Small alloc through front -> composite -> bucket; memory keeps fill tag (no zero).
     auto* p = static_cast<unsigned char*>(front.new_(0x20));
     CHECK(p && p[0] == 'B' && bucket.alloc_calls == 1);
+    CHECK(composite.tracked_allocation_count() == 1);
     front.delete_(p);
     CHECK(bucket.free_calls == 1);
+    CHECK(composite.tracked_allocation_count() == 0);
 
     // Large -> page allocator (registers owner 4); free via front owner map.
     void* big = front.alloc(0x200000, 1, 8, kAllocFlagNew);
     CHECK(big != nullptr && page.stats().live_blocks == 1);
+    CHECK(composite.tracked_allocation_count() == 1);
     front.free(big, kAllocFlagNew);
     CHECK(page.stats().live_blocks == 0);
+    CHECK(composite.tracked_allocation_count() == 0);
+}
+
+static void test_nested_composite_owner_map_notification() {
+    AllocatorFront front;
+    CountingHeap leaf('L', &front.owners(), 2);
+    CompositeAllocator inner;
+    CompositeAllocator outer;
+    CHECK(inner.add_child(kCompositePageThreshold, &leaf));
+    CHECK(outer.add_child(kCompositePageThreshold, &inner));
+    CHECK(front.set_heap(1, &outer));
+    CHECK(front.set_heap(2, &leaf));
+
+    void* p = front.new_(0x20);
+    CHECK(p != nullptr && outer.tracked_allocation_count() == 1);
+    CHECK(inner.tracked_allocation_count() == 1);
+    front.delete_(p);
+    CHECK(leaf.free_calls == 1);
+    CHECK(outer.tracked_allocation_count() == 0);
+    CHECK(inner.tracked_allocation_count() == 0);
 }
 
 static void test_add_child_guards() {
@@ -157,6 +180,7 @@ int main() {
     test_threshold_dispatch();
     test_fallback_next_child();
     test_no_zero_fill_and_front();
+    test_nested_composite_owner_map_notification();
     test_add_child_guards();
     std::puts("OK composite_allocator");
     return 0;

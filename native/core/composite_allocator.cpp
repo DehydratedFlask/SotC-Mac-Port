@@ -37,4 +37,23 @@ void CompositeAllocator::deallocate(void* ptr, const AllocDesc& desc) {
     child->deallocate(ptr, desc);
 }
 
+void CompositeAllocator::on_owner_map_deallocation(void* ptr) noexcept {
+    if (ptr == nullptr) return;
+    IAllocator* child = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(mu_);
+        auto it = live_.find(ptr);
+        if (it != live_.end()) {
+            child = it->second;
+            live_.erase(it);
+        }
+    }
+    if (child != nullptr) child->on_owner_map_deallocation(ptr);
+}
+
+std::size_t CompositeAllocator::tracked_allocation_count() const {
+    std::lock_guard<std::mutex> lock(mu_);
+    return live_.size();
+}
+
 }  // namespace sotc

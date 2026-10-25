@@ -19,15 +19,26 @@ BucketAllocator::~BucketAllocator() {
 }
 
 bool BucketAllocator::refill_class(std::size_t index, std::uint32_t class_bytes) {
-    const std::uint32_t slots = bucket_slots_per_page(class_bytes);
-    if (slots == 0) return false;
-
     auto mapped = map_anonymous_aligned(kBucketPageBytes, kBucketPageBytes);
     if (!mapped) return false;
 
     auto* base = static_cast<unsigned char*>(mapped->ptr);
-    // OBS 0x18750: first 0x38 bytes are page header; slots begin after.
-    unsigned char* cursor = base + kBucketPageHeader;
+    // Preserve the 0x38-byte page header, then align the first slot to its class stride.
+    // Every slot stays class-aligned because the class is a multiple of each request alignment.
+    auto* cursor = base + kBucketPageHeader;
+    const auto first_address = reinterpret_cast<std::uintptr_t>(cursor);
+    const std::uintptr_t remainder = first_address % class_bytes;
+    if (remainder != 0) cursor += class_bytes - remainder;
+    const auto used = static_cast<std::size_t>(cursor - base);
+    if (used >= kBucketPageBytes) {
+        unmap(*mapped);
+        return false;
+    }
+    const std::uint32_t slots = static_cast<std::uint32_t>((kBucketPageBytes - used) / class_bytes);
+    if (slots == 0) {
+        unmap(*mapped);
+        return false;
+    }
     for (std::uint32_t i = 0; i < slots; ++i) {
         free_[index].push_back(cursor);
         cursor += class_bytes;

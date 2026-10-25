@@ -3,10 +3,11 @@
 // OBS (private contract + tools/lift/check_f13380.py):
 //   * Early-out when the composite object pointer (originally [0x2dfb4d0]) is already set —
 //     native: front.heap(kCompositeHeapSlot) != nullptr.
-//   * Composite is forced into heap-table slot 1 (originally store to tbl[1] @ 0x2dfaab8).
-//   * Bucket / Heap / Page each scan for the first NULL slot starting at index 1
-//     (loop bound 0x100) and install there. On an empty table after composite@1 that
-//     yields slots 2 / 3 / 4.
+//   * Composite is published in heap-table slot 1 (originally store to tbl[1] @ 0x2dfaab8)
+//     after its children are ready, so concurrent default allocations cannot observe a partial
+//     hierarchy. Slot 1 is reserved while Bucket / Heap / Page scan for NULL slots from index 2;
+//     this is equivalent to scanning from 1 after the original composite@1 store and yields
+//     slots 2 / 3 / 4 on an empty table.
 //   * Children are registered on the composite via 0x47dd0 in order:
 //     Bucket thr 0x400, Heap thr 0x100000, Page thr ~0 (see install_default_hierarchy).
 //   * Bucket ctor args page 0x10000 / step 0x10 / max 0x400; Heap page-set 0x488f0 (1 MiB)

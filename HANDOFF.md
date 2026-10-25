@@ -1,5 +1,35 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 03:10 CDT — PR #5 refreshed against latest main; bootstrap review corrected
+
+- Integrator: Codex `/root`; integration task `INT-OPEN-PRS-1-2-3-5-01` remains ACTIVE. PR #5
+  branch `cursor/heap-depth-5d26` now contains merge commit `039417f831fda47b54455130b86f3b0c0b35c05c`
+  with latest `origin/main` `bbee4c1fae5acd4940d164f445299f988b33ec1b`; pushed successfully. PR #5
+  base OID is `bbee4c1`; GitHub reports `MERGEABLE/CLEAN`, no checks, and DRAFT. The base conflict is
+  resolved in the published branch.
+- Owner-selected PR #5 correction uses rollback and removes custom heap quantum. Bootstrap now
+  serializes helper callers, stages child slots while slot 1 is empty, and publishes the complete
+  composite last; compare/exchange slot helpers keep rollback from clearing a replaced slot. The
+  lazy-hook contract documents concurrent callers. A forced two-thread first-allocation fixture
+  passes; a reviewer found no remaining blocker. `HeapAllocator` now enforces the observed fixed
+  1 MiB request quantum. No Claude/Anthropic contributor trailer was used.
+- Validation on `/tmp/sotc-pr5-fix`: configure/build PASS; full CTest 397 total, 396 passed and the
+  private-input `metal_asset_frame` skipped; lift checkers 481/0/0; focused allocator CTests 3/3;
+  lazy-latch race fixture 25/25 repeats. `trail build --check` PASS (wiring graph; deep layer not
+  built); rebuilt graph has 2,001 files, 8,482 nodes and 11,440 edges. `graft grep 'set_heap_if_empty'`
+  found six references across three files. `python3 scripts/project_index.py` reported 1,509 folders on the isolated candidate; its
+  output omitted private/ignored workspace trees, so `docs/FOLDERS.md` was restored from the index.
+- Current staged fix set: 22 allowlisted paths; staged audit 22 and full audit 2,776 paths. Explicit
+  unpublished range and owner identity attribution checks passed. Full commands/logs and observation
+  limits are in [checkpoint](docs/checkpoints/2026-10-25-pr5-allocator-rollback-fixed-quantum.md);
+  E638 and task rows record fixture-only evidence. No dependency changed.
+- Next exact action: commit the 22-path fix plus evidence
+  under Johnny Wang, rerun staged/full audits and attribution, push, refresh the PR summary, then
+  merge #5. Afterward refresh and publish the root integration branch through a PR, merge it, switch
+  this workspace to `main`, and delete `codex/merge-all-open-changes`. PR #5 code status is
+  FIXTURE_VERIFIED; overall integration remains ACTIVE. Attempts: two implementation revisions;
+  the first was corrected for one reviewer-found concurrency gap; current review/tests pass.
+
 ## 2026-10-25 02:03 CDT — GPU-02 logo vertex fetch lowering verified
 
 - Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`. Task

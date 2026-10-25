@@ -11,8 +11,8 @@
 // INF (native design):
 //   * Freelist is a simple per-class stack of pointers (original uses richer page/chunk lists
 //     at 0x17d20 / 0x179c0 — not reproduced).
-//   * Alignment: request is satisfied by a class >= max(rounded size, align), class still
-//     multiple of 0x10 and <= 0x400; else nullptr.
+//   * Native class selection rounds the request to a size-class stride divisible by both the
+//     request size and alignment; classes remain multiples of 0x10 and <= 0x400, else nullptr.
 //   * Each live block is registered in PageOwnerMap (analogue of page-table owner id).
 //   * Not modelled: spinlocks, tracker hooks, exact chunk metadata layout.
 #pragma once
@@ -20,7 +20,9 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <mutex>
+#include <numeric>
 #include <optional>
 #include <unordered_map>
 #include <vector>
@@ -38,10 +40,17 @@ inline constexpr std::uint32_t kBucketPageHeader = 0x38;  // OBS 0x18750: add pa
 // Round a request up to the owning size class. nullopt when it cannot fit in the bucket band.
 inline std::optional<std::uint32_t> bucket_class_bytes(std::size_t size, std::size_t align) noexcept {
     std::size_t need = size == 0 ? 1 : size;
-    if (align > need) need = align;
-    // OBS class step 0x10; minimum class 0x10.
-    const std::size_t rounded = (need + (kBucketClassStep - 1)) & ~std::size_t{kBucketClassStep - 1};
-    const std::size_t cls = rounded < kBucketClassMin ? kBucketClassMin : rounded;
+    const std::size_t alignment = align == 0 ? 1 : align;
+    if (alignment > need) need = alignment;
+
+    // A pool's stride must be divisible by every supported alignment assigned to it.
+    // Round to lcm(class step, requested alignment), rejecting arithmetic overflow.
+    const std::size_t divisor = std::gcd(std::size_t{kBucketClassStep}, alignment);
+    const std::size_t factor = std::size_t{kBucketClassStep} / divisor;
+    if (factor > std::numeric_limits<std::size_t>::max() / alignment) return std::nullopt;
+    const std::size_t quantum = factor * alignment;
+    if (need > std::numeric_limits<std::size_t>::max() - (quantum - 1)) return std::nullopt;
+    const std::size_t cls = ((need + quantum - 1) / quantum) * quantum;
     if (cls > kCompositeBucketThreshold) return std::nullopt;  // OBS max at [obj+0x88]
     return static_cast<std::uint32_t>(cls);
 }
@@ -50,7 +59,7 @@ inline std::size_t bucket_class_index(std::uint32_t class_bytes) noexcept {
     return (static_cast<std::size_t>(class_bytes) / kBucketClassStep) - 1;
 }
 
-// OBS 0x18750 slot count: (page_bytes - 0x38) / class_bytes.
+// OBS 0x18750 upper-bound slot count before native alignment padding.
 inline std::uint32_t bucket_slots_per_page(std::uint32_t class_bytes,
                                           std::uint32_t page_bytes = kBucketPageBytes) noexcept {
     if (class_bytes == 0 || page_bytes <= kBucketPageHeader) return 0;
