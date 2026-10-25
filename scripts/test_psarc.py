@@ -544,8 +544,21 @@ class Tests(unittest.TestCase):
     def test_overlay_rejects_casefold_collision(self):
         base = {'Foo': dict(path='Foo', md5='1', size=1)}
         patch = {'foo': dict(path='foo', md5='2', size=1)}
-        with self.assertRaisesRegex(psarc.PsarcError, 'casefold collision'):
+        with self.assertRaisesRegex(psarc.PsarcError, r'casefold collision across layers'):
             psarc.build_overlay([('base', base), ('patch', patch)])
+
+    def test_overlay_rejects_casefold_collision_inside_layer(self):
+        # Distinct exact paths that share a casefold key must fail inside one layer too
+        # (ASSETS.md / build_overlay policy); the across-layers fixture does not cover this branch.
+        layer = {
+            'Dir/Item.bin': dict(path='Dir/Item.bin', md5='1', size=1),
+            'dir/item.bin': dict(path='dir/item.bin', md5='2', size=1),
+        }
+        with self.assertRaisesRegex(
+            psarc.PsarcError,
+            r"casefold collision inside layer 'base': 'Dir/Item\.bin' vs 'dir/item\.bin'",
+        ):
+            psarc.build_overlay([('base', layer)])
 
     def test_archive_basename_policy_is_exact(self):
         self.assertEqual(psarc.archive_basename_key('cachedFiles.psarc'), 'cachedFiles.psarc')
