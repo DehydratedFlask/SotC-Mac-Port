@@ -67,10 +67,13 @@ struct SystemChecksArchitectureTests {
         // FAT_MAGIC is big-endian 0xCAFEBABE on disk.
         let fat = Data([0xCA, 0xFE, 0xBA, 0xBE, 0, 0, 0, 1, 0x01, 0, 0, 0x0C, 0, 0, 0, 0])
         let status = try Self.probe(fat)
-        Self.expectNotBuilt(
-            status,
-            exact: "NOT BUILT: SoCGameCore is a fat/universal Mach-O, not a thin ARM64 executable. Play disabled until a native SoCGameCore exists"
-        )
+        let exact = "NOT BUILT: SoCGameCore is a fat/universal Mach-O, not a thin ARM64 executable. Play disabled until a native SoCGameCore exists"
+        Self.expectNotBuilt(status, exact: exact)
+
+        // Both byte orders of FAT_MAGIC_64/FAT_CIGAM_64 must use the same copy.
+        for magic: UInt32 in [0xCAFEBABF, 0xBFBAFECA] {
+            Self.expectNotBuilt(try Self.probe(Self.le([magic, 0, 0, 0])), exact: exact)
+        }
     }
 
     @Test func rejectsTruncatedHeaderWithExactCopy() throws {
