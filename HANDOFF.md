@@ -1,5 +1,36 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 02:05 CDT — PR #4 merged to main
+
+- Integrator: Codex `/root`; GitHub repository `DehydratedFlask/SotC-Mac-Port`. PR #4 was refreshed
+  with current E636 status, marked ready, and merged after the owner explicitly requested merging all
+  changes to `main`. Head `8a93c0319a6eeb59a06f691ded7e18f818e4960c` is now on `main` through merge commit
+  `29b1305b4fd0d8fd82fc54c1a5b3cf35e0cab745`; GitHub reports state `MERGED`, and `git ls-remote`
+  confirms the same SHA at `refs/heads/main`. PR #4 now covers 428 commits and 925 changed files.
+- The PR body/title were updated before merge to identify E636, the current local checks, and the
+  explicit G1/G3 `PARTIAL` boundary. No GitHub check runs were attached; local verification on the
+  exact head passed: CTest 392/392; lift checkers 476 passed / 0 skipped / 0 failed; shader lowerer
+  14/14 and inventory 23/23. PR #4 source/history attribution audit found no Claude/Anthropic
+  co-author trailers. The merge commit is authored by the repository owner and contains no such
+  trailer.
+- `python3 scripts/project_index.py` indexed 9,045 folders; `trail build --check` passed with 8,311
+  wiring nodes in sync (deep meaning tier remains unbuilt).
+- PR #4's body preserves the older E490 summary as historical context. No cold boot, real game audio,
+  save/reload, or complete asset-derived game frame was claimed; G1 and G3 remain PARTIAL.
+- Other open PR state at this checkpoint: #1 is conflicting in `docs/EVIDENCE.md`; #2 and #3 are
+  independent, reviewable changes with their focused tests recorded but no GitHub checks; #5 is held
+  because review found alignment-contract and CompositeAllocator bookkeeping defects. Separate remote
+  branches `cursor/parallel-foundations-86ac55b` and `cursor/parallel-foundations-wip-20261023` also
+  diverge from `main` and have no open PR; do not fold them in without reviewing their unique changes.
+- Files changed for this checkpoint: `HANDOFF.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and
+  `docs/checkpoints/2026-10-25-pr4-merged.md`. No source or dependency change.
+- Exact publication observations are logged under `local/orchestrator/github-merge-all/`. `main` was
+  fetched locally after the merge and matched GitHub's reported merge SHA.
+- Next exact action: finish the PR #5 alignment/bookkeeping fix in its isolated worktree; then update
+  and test PR heads against current `main`, merge #1–#3 and #5, and audit the unassociated foundation
+  branches before deciding whether they contain additional requested changes.
+- Status: overall merge-all request ACTIVE; PR #4 complete; remaining PR/branch audit incomplete.
+
 ## 2026-10-25 02:03 CDT — GPU-02 logo vertex fetch lowering verified
 
 - Integrator: Codex `/root`; active branch `cursor/init-hash-551140-9dfc`. Task
