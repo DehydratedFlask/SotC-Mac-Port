@@ -1,29 +1,50 @@
 # SoC Mac Native — current handoff
 
-## 2026-10-25 05:46 CDT — TEX0 format-6 evidence task claimed
+## 2026-10-25 06:24 CDT — TEX0 format-code-6 evidence closed UNKNOWN
 
-- Integrator: Codex `/root`; new bounded read-only task
-  `GPU-03-CMSH-TEX0-FORMAT-6-EVIDENCE-01` is **ACTIVE**, attempt 0. The E658 composite fixture stays
-  unchanged and verified.
-- Starting observation from the local hash-bound survey: the cube and cone each have four 24-byte
-  descriptors at file offsets `0x4e..0xae`; `TEX0` at `0x96` has format code `6`, flags `2`, and
-  computed spans `[0x296,0x2f6)` / `[0x416,0x4be)`. Their byte lengths are 96/168 for 24/42
-  positions (four bytes per vertex). Span hashes and raw prefixes/suffixes are in the private survey
-  log. **Observed layout only; texture-coordinate meaning is UNKNOWN.** Four bytes per vertex and
-  plausible-looking patterns do not prove half-float UVs, component order, normalization, or binding.
-- Scope: trace format code 6 to an independent shipped-code or authoritative format source using
-  the already owner-approved local `eboot.bin` offline analysis. Keep all analysis private under
-  `local/`; do not change the parser, harness, synthetic UV mapping, or make a runtime claim. Accept
-  a supported byte-to-coordinate mapping or an explicit `UNKNOWN` result.
-- Files to update after evidence: `docs/TASKS.md`, `docs/METAL_FRAME_PATH.md`, `docs/EVIDENCE.md`,
-  `docs/INDEX.md`, and a task checkpoint. The previous survey script/log are under
-  `local/validation/gpu03-cmsh-tex0-survey-20261025/`.
-- Exact next action: hash `local/extracted/CUSA08809/eboot.bin`, open that exact target with the
-  available REA Ghidra provider (ephemeral analysis; do not touch the persistent Ghidra project),
-  record binary digest, image base, provider version/profile, then search the descriptor-format
-  consumer path and preserve unresolved indirect calls/coverage.
-- Status: descriptor ranges **ARTIFACT_VERIFIED**; TEX0 semantics **UNKNOWN**; task ACTIVE at attempt
-  0; no source edits or tests.
+- Integrator: Codex `/root`; bounded read-only task `GPU-03-CMSH-TEX0-FORMAT-6-EVIDENCE-01` is
+  **CLOSED / UNKNOWN**, attempt 0, with no failed semantic hypotheses. The E658 composite fixture
+  and synthetic XY-to-UV mapping are unchanged.
+- The source SELF is 65,314,052 B, SHA-256
+  `21982727c6f97fd415b3af5e99c5e071619c4dcc2248787a701a31a45ab0a4e0`. REA rejected that container
+  before analysis. Existing plaintext-segment reconstruction `local/re/eboot.elf` is 65,214,308 B,
+  SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; its identity sidecar
+  binds it to that SELF, records entry `0xf120` and lowest PT_LOAD vaddr 0, and notes omitted SELF
+  segment 10. It is not a complete image or source recovery.
+- Ghidra 12.1.4 / REA 6.7.0, profile digest
+  `769518a8e9b57f953dd241adbb63672f0f486bb3d66359b9deef7c5e088ca7aa`, was used in an ephemeral,
+  source-immutable import. MCP `binary_overview` timed out at 330,000 ms with a 2 GiB heap; terminal REA
+  queries completed with the verified Ghidra install directory, 8 GiB heap and 1,200,000 ms limit.
+  Evidence IDs: entry function `ev_51f10a73…8a78b4`; `.cmsh` trace
+  `ev_636842f7…ef5551`; loader function `ev_0f5c74d9…ec82d8c`. Full Evidence JSON, snapshot,
+  diagnostics, and exact commands are private under
+  `local/validation/gpu03-cmsh-tex0-survey-20261025/rea-tex0-analysis-record.md`.
+- The `.cmsh` trace found six defined model-path strings; all six references enter
+  `FUN_00143f50` at `0x143f50` (832 B). Its body registers repeated resource paths through two
+  helpers and contains no TEX0 stream decode. Ghidra reports 170 outgoing reference records and 42
+  resolved direct calls for this function; its coverage notes that targetless computed flows may
+  be omitted. The raw ELF byte scan found no ASCII TEX0/POS0/NRM0/TAN0/CMSH tags. The pinned
+  reference-port checkout also has no `.cmsh`/TEX0 implementation at commit
+  `70bb43859cd7ff181a6d409540b757866184d60d`.
+- Observation: asset paths and helper calls are present. **No format-code-6 byte type, component
+  order, normalization, orientation, or renderer binding was established.** The four-byte-per-vertex
+  ratio remains a size relationship only; TEX0 remains opaque. Ghidra logged stripped-dynamic,
+  function-overlap, unresolved-constructor, and unreadable-address diagnostics; segment 10 is absent.
+- Files changed: `HANDOFF.md`, `docs/INDEX.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`,
+  `docs/METAL_FRAME_PATH.md`, and the existing linked TEX0 checkpoint. No parser/source edits. Task claim commit
+  `0c29f26ae36d5741ca693a45fc3d1ecab5adccbe` is on GitHub `main`, with staged/all-path audits
+  7/2,793 and Johnny-only attribution.
+- Verification: CMake configure passed; build passed (`ninja: no work to do`); CTest passed **397/397**;
+  lift checkers passed **481/0/0**. `python3 scripts/project_index.py` indexed **19,591** folders;
+  `trail build --check` confirmed the wiring graph synchronized at **8,546 nodes** (deep meaning layer
+  remains unbuilt); `git diff --check` passed. Full logs are under
+  `local/validation/gpu03-cmsh-tex0-survey-20261025/`. These are publication gates; no source code
+  changed in the read-only investigation.
+- Exact next action: keep TEX0 opaque and the fixture mapping synthetic. Reopen this task only if a
+  byte-bound authoritative format definition or a checked shipped-code consumer path becomes
+  available; otherwise select the next unblocked task from `docs/TASKS.md`.
+- Status: descriptor ranges **ARTIFACT_VERIFIED**; shipped asset-registration path
+  **STATIC_ANALYSIS_VERIFIED**; TEX0 semantics **UNKNOWN**; no source changes or runtime claim.
 
 ## 2026-10-25 05:42 CDT — E658 composite fixture published to main
 

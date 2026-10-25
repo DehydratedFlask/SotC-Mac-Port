@@ -489,11 +489,18 @@ establish the component type, order, normalization, coordinate orientation, or r
 The parser and private survey leave TEX0 payload bytes opaque; see E660 and the [format-6 evidence
 checkpoint](checkpoints/2026-10-25-gpu03-cmsh-tex0-format-6.md).
 
-`GPU-03-CMSH-TEX0-FORMAT-6-EVIDENCE-01` is a read-only source-tracing task. Its success result is an
-independently supported byte-to-coordinate mapping with source identity, address/coverage evidence,
-and byte-bound known answers; otherwise it records `UNKNOWN`. Do not feed candidate decodings into
-the verified asset-derived fixture or change its synthetic XY-to-UV mapping on pattern plausibility
-alone.
+`GPU-03-CMSH-TEX0-FORMAT-6-EVIDENCE-01` is closed **UNKNOWN**. Read-only Ghidra evidence on the
+hash-bound plaintext-segment ELF (`d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`,
+derived from SELF `21982727c6f97fd415b3af5e99c5e071619c4dcc2248787a701a31a45ab0a4e0`) traced six
+`.cmsh` asset-path references into `FUN_00143f50` (`0x143f50`, 832 B). That function registers paths
+through repeated helper calls; it does not decode the TEX0 stream. The pinned PC reference checkout
+contains no `.cmsh`/TEX0 implementation. The Ghidra profile, Evidence IDs, body/reference coverage,
+import warnings and missing-SELF-segment limitation are recorded in E662 and the [TEX0 evidence
+checkpoint](checkpoints/2026-10-25-gpu03-cmsh-tex0-format-6.md).
+
+No byte type, component order, normalization, orientation, or renderer binding is established.
+Keep TEX0 opaque and keep the E658 synthetic XY-to-UV mapping unchanged. Do not feed candidate
+decodings into the verified fixture based on the observed four-byte-per-position size ratio.
 
 ## 7. Ranked task cards
 
