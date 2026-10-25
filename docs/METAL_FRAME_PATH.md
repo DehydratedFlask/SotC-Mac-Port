@@ -14,8 +14,8 @@ coverage-loss probe after an independent review found a camera-scaled UV oracle 
 mutated-frame shape validation (E675). The fourth focused CTest passed with Metal API/GPU validation
 and direct private PNGs (E677); independent review approved the bounded fixture (E678); repository
 configure/build, CTest 397/397, lift checkers 481/0/0, project index and Trail wiring checks passed
-(E679). Precommit staged/all-path and attribution audits passed; owner commit and direct-main push
-remain pending. Retail bindings remain
+(E679). Precommit staged/all-path and attribution audits passed; E681 records publication to `main`.
+Retail bindings remain
 unknown, and no game frame is established. **G3 is PARTIAL, not PASSED**, under the synthetic-scene rule in
 `docs/VALIDATION.md`.
 Read [AGENTS.md](../AGENTS.md), [ROADMAP.md](../ROADMAP.md), [HANDOFF.md](../HANDOFF.md),

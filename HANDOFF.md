@@ -1,5 +1,37 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 10:58 CDT — GPU-03 fixture published on main
+
+- Integrator: Codex `/root`; task `GPU-03-LOGO-VS-PS-RAW-CMSH-FRAME-01`. The owner-directed main
+  workflow is current. Commit `ebae3a83e602385d2732a68e4d99d8064ec5f167` was pushed with
+  `git push origin main` (exit 0); `git fetch origin main` and `git rev-parse HEAD origin/main`
+  confirm both refs at that commit. `git status --short --branch` is clean on `main`;
+  `git ls-remote --heads origin main cursor/init-hash-551140-9dfc` lists only `main`; live
+  `gh pr list --state open --json number,title,headRefName,baseRefName --limit 50` returned `[]`.
+- Commit author and committer are Johnny Wang
+  (`dehydratedflask@users.noreply.github.com`). The commit message has no Claude/Anthropic or
+  assistant co-author trailer. Precommit checks passed: staged path audit 12, all-path audit 2,799,
+  commit-attribution audit, staged whitespace check, and project-index check.
+- Task `GPU-03-LOGO-VS-PS-RAW-CMSH-FRAME-01` is **PUBLISHED / FIXTURE_VERIFIED** for the bounded
+  synthetic asset-derived test only. E677/E678 cover the focused pass and independent review; E679
+  covers configure/build, 397/397 CTest, 481/0/0 lift checkers, 20,420 indexed folders and an
+  8,571-node synchronized Trail graph; E681 records publication. The full CTest intentionally left
+  private asset paths unset, so E677 remains the raw-pair execution record. G3 is still **PARTIAL**.
+- Concurrent F590 review has no code-level findings and fresh sanitizer/byte-oracle checks passed,
+  but the five previously reported mutation tests were not repeated because their private mutation
+  manifest/report are missing. `CPU-01-SHARED-STR-RELEASE-F590-01` stays **ACTIVE**; no runtime/G1
+  claim is made and allocator `0x12af0` remains external.
+- Files in this post-push checkpoint: `HANDOFF.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`,
+  `docs/TASKS.md`, `docs/METAL_FRAME_PATH.md`, the GPU-03 checkpoint, and the GPU-03 escalation.
+  These are documentation-only updates; no source or dependency changed after `ebae3a83`.
+- Observation versus inference: push/fetch/status/PR state and validation logs are observed; no
+  retail TEX0/NRM0, resource ABI, AMD WQM equivalence, game-driven frame, boot, audio or save/load
+  has been verified. The fixture remains synthetic and asset-derived.
+- Exact next action: commit/push this post-publication record to `main`, then add and publish a
+  bounded task claim for `GPU-02-RAW-MATERIAL-SELECTOR-01` before source edits. Use only the pinned
+  raw `default.cmat` and `standard_4030788106.csdr`; do not use the deferred `0x8C` decoder. Status:
+  GPU-03 complete at fixture scope and published; F590 mutation acceptance gap open.
+
 ## 2026-10-25 10:53 CDT — raw-mesh Metal fixture gates passed; work resumed on main
 
 - Integrator: Codex `/root`. The owner explicitly directed the repo to return to `main` after PR #4

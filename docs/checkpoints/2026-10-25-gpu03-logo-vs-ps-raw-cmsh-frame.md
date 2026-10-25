@@ -113,3 +113,16 @@
   direct-main publication remains pending. G3 **PARTIAL**. Exact next action: commit and push the
   allowlisted source/docs to `origin main` under Johnny Wang, then fetch and verify local HEAD equals
   `origin/main`.
+
+## 2026-10-25 10:58 CDT — source and evidence published to main
+
+- Commit `ebae3a83e602385d2732a68e4d99d8064ec5f167` published the reviewed source and checkpoint
+  updates. Exact push command `git push origin main` exited 0; after `git fetch origin main`, both
+  `HEAD` and `origin/main` are `ebae3a83e602385d2732a68e4d99d8064ec5f167`.
+- `git status --short --branch` reports a clean `main`; the old task branch is absent from
+  `git ls-remote`; the open-PR query returned `[]`. Commit author/committer are Johnny Wang and no
+  Claude/Anthropic/assistant co-author trailer appears.
+- Task status: **PUBLISHED / FIXTURE_VERIFIED** for the bounded synthetic asset-derived test only.
+  G3 stays **PARTIAL**; no retail binding, WQM/game-frame, boot, audio or save/load claim follows.
+- Exact next action: commit/push the post-publication handoff record, then claim the raw-material
+  selector task from the pinned default material/shader assets before editing source.

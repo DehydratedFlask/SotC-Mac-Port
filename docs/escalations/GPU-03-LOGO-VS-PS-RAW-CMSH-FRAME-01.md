@@ -85,6 +85,7 @@ was performed after the authorized fourth attempt.
   pinned 4,094-byte MSL. The attempt-4 output does not capture its seven literal path values; this
   limitation is recorded, and the test was not rerun after its authorized pass.
 - Precommit publication audits passed: staged path audit 12, all-path audit 2,799, and commit
-  attribution audit. The owner commit and direct-main push are still pending at this checkpoint. G3
-  remains **PARTIAL**; retail resource/stream/texture/normal bindings, AMD WQM equivalence,
-  game-driven rendering, boot, audio and save/reload remain unverified.
+  attribution audit. E681 records commit `ebae3a83` pushed to `main` under Johnny Wang and verified
+  by fetch; no Claude/Anthropic or assistant co-author trailer was added. G3 remains **PARTIAL**;
+  retail resource/stream/texture/normal bindings, AMD WQM equivalence, game-driven rendering, boot,
+  audio and save/reload remain unverified.
