@@ -1,5 +1,28 @@
 # GPU-03 logo VS/PS Metal pipeline — task claim
 
+## 2026-10-25 10:02 CDT — full fixture gates passed
+
+- Task `GPU-03-LOGO-VS-PS-METAL-PIPELINE-01` is **FIXTURE_VERIFIED**, attempt 2. The focused
+  implementation evidence is E667; E669 records the repository-wide gates. The lowerer emits the
+  exact E636 VS (25 instructions) and E646 PS (34 instructions) in one 4,094 B MSL source, digest
+  `37e09aef0838dff77c8f151f288ed8cb2cdf7db26e202b40bb9f6f27a34dbd56`. Python tests pass 23/23.
+- Commands and outcomes: `cmake -S native -B local/build/orch-r22` passed;
+  `cmake --build local/build/orch-r22 -j 12` passed (`ninja: no work to do`); full CTest with all three
+  logo-pair opt-in paths passed **397/397**, including `metal_texture_binding`; focused Metal CTest
+  passed **1/1** with Metal API/GPU validation enabled; lift checkers passed **481/0/0**. Project
+  index passed at **19,593 folders**; `trail build --check` passed at **8,560 nodes / 11,611 edges /
+  1,497 cards** across 2,002 files. Detailed command logs are in
+  `local/validation/gpu03-logo-vs-ps-pipeline-20261025/`.
+- Observation: selected pixel oracle, deterministic repeat, texture mutation, and position mutation
+  passed; direct private PNG hashes are baseline `db954a90001319db7954ac569c3ceffed9143de27ef3eda2fda37f4a24efac02`
+  and mutated `74ee455f6c7bce82b70e2ff65e54dfe27a8c5de51ef392d4df469b43796be694`. All five CLI
+  paths are canonicalized under `local/`; outside-local paths, symlink escape, wrong pins/ABI, and
+  input/output collisions reject. Inference: this is a valid synthetic stage-composition fixture.
+- Limits: no retail stream, UV, TEX0/NRM0, AMD WQM/Metal helper-lane equivalence, game-driven frame,
+  G3, boot/audio/save, or compatibility claim. No dependencies were added. Source publication is
+  pending final staged audit and push to `main` under Johnny Wang.
+- Status: fixture acceptance **PASSED**; publication **PENDING**; task **FIXTURE_VERIFIED**, attempt 2.
+
 ## 2026-10-25 09:56 CDT — focused implementation and path-safety checkpoint
 
 - Integrator: Codex `/root`; task remains **ACTIVE**, attempt 2. Independent source review found that

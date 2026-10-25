@@ -1,5 +1,26 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 10:02 CDT — logo shader-pair fixture verified
+
+- Integrator: Codex `/root`; `GPU-03-LOGO-VS-PS-METAL-PIPELINE-01` is now **FIXTURE_VERIFIED**,
+  attempt 2. The exact-hash E636 VS and E646 PS compose into one `logo-pair` MSL source under the
+  closed synthetic position-to-UV alias. The lowerer and Metal harness pass focused checks.
+- Full gates: `cmake -S native -B local/build/orch-r22` passed; build passed (`ninja: no work to do`);
+  full CTest passed **397/397** with all three `SOTC_LOGO_PAIR_*` paths set, including
+  `metal_texture_binding`; lift checkers passed **481/0/0**. `python3 -I -W error
+  tools/dev/test_gcn_to_msl.py` passed **23/23**. Project index passed at **19,593 folders**;
+  Trail graph is synchronized at **8,560 nodes / 11,611 edges / 1,497 cards** across 2,002 files.
+  Exact logs are under `local/validation/gpu03-logo-vs-ps-pipeline-20261025/`.
+- Focused Metal API/GPU validation is enabled; CPU nearest/clamp fp16-RTZ selected-pixel oracle,
+  deterministic repeat, texture mutation, and position mutation passed. Private direct PNG hashes are
+  recorded in E667. Observation remains a synthetic harness frame. Retail UV/TEX0/NRM0 bindings,
+  AMD WQM/helper-lane equivalence, game-driven rendering, G3, boot, audio, and saving remain
+  unverified.
+- Current remote base: `main` at `67eb9c71918b784d67fe3f8fc3f95044c2355e58`. Exact next action: stage
+  only the three implementation files and the task/evidence docs, pass staged/all-path and attribution
+  audits, then commit/push under Johnny Wang. No Claude or Anthropic contributor trailer.
+- Status: source fixture acceptance **PASSED**; final source publication **PENDING**.
+
 ## 2026-10-25 09:58 CDT — focused checkpoint published on `main`
 
 - Integrator: Codex `/root`; commit `c03d6a51ae7df9a732180495f8e298613eef6b2e` publishes the

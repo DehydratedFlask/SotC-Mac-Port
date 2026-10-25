@@ -322,6 +322,18 @@ struct LogoTextureUv {
     return result;
 }
 
+[[nodiscard]] std::array<std::uint8_t, 4> logo_pair_pixel_oracle(
+    std::span<const std::uint8_t> rgba8, std::uint32_t output_x, std::uint32_t output_y) {
+    const LogoTextureUv pixel_center_uv{
+        0.0F, 0.0F,
+        (static_cast<float>(output_x) + 0.5F) / static_cast<float>(kWidth),
+        (static_cast<float>(output_y) + 0.5F) / static_cast<float>(kHeight)};
+    // The quad maps per-vertex input position directly to UV. Its clip-space transform maps
+    // position Y=0 to the top and Y=1 to the bottom of the target. This independently applies
+    // nearest/clamp selection and the PS fp16-RTZ export modeled by the existing oracle.
+    return logo_png_pixel_oracle(rgba8, kWidth, kHeight, pixel_center_uv);
+}
+
 [[nodiscard]] std::array<std::uint8_t, 4> mip_oracle(float uv_scale,
                                                      int mutated_level = -1) {
     const float gradient_channel = std::clamp((2.0F / 64.0F) * std::abs(uv_scale) * 16.0F,
@@ -1451,6 +1463,198 @@ int main() {
             } else {
                 std::fprintf(stderr, "FAIL generated logo PS MSL pipeline: %s\n",
                              logo_error.c_str());
+            }
+        }
+    }
+
+    const char* logo_pair_msl_path = std::getenv("SOTC_LOGO_PAIR_MSL");
+    const char* logo_pair_png_path = std::getenv("SOTC_LOGO_PAIR_PNG");
+    const char* logo_pair_mutated_png_path = std::getenv("SOTC_LOGO_PAIR_MUTATED_PNG");
+    const bool logo_pair_requested = logo_pair_msl_path != nullptr ||
+                                     logo_pair_png_path != nullptr ||
+                                     logo_pair_mutated_png_path != nullptr;
+    if (!logo_pair_requested) {
+        std::puts("logo VS/PS Metal pair: NOT RUN (set SOTC_LOGO_PAIR_MSL, "
+                  "SOTC_LOGO_PAIR_PNG, and SOTC_LOGO_PAIR_MUTATED_PNG)");
+    } else {
+        const bool logo_pair_paths_complete = path_is_set(logo_pair_msl_path) &&
+                                              path_is_set(logo_pair_png_path) &&
+                                              path_is_set(logo_pair_mutated_png_path);
+        const bool logo_pair_paths_absolute =
+            logo_pair_paths_complete &&
+            std::filesystem::path(logo_pair_msl_path).is_absolute() &&
+            std::filesystem::path(logo_pair_png_path).is_absolute() &&
+            std::filesystem::path(logo_pair_mutated_png_path).is_absolute();
+        const bool logo_pair_output_paths_valid =
+            logo_pair_paths_absolute &&
+            local_paths_are_distinct(
+                {logo_pair_msl_path, logo_pair_png_path, logo_pair_mutated_png_path});
+        check("logo VS/PS pair has all absolute distinct paths under local",
+              logo_pair_output_paths_valid);
+        if (!logo_pair_output_paths_valid) {
+            std::puts("logo VS/PS Metal pair: NOT RUN (partial/invalid path configuration; "
+                      "no MSL read or PNG write)");
+        } else {
+            std::string logo_pair_msl_source;
+            const bool logo_pair_msl_read =
+                read_text_file(logo_pair_msl_path, logo_pair_msl_source) &&
+                !logo_pair_msl_source.empty();
+            check("private composed logo-pair MSL is readable and non-empty", logo_pair_msl_read);
+            if (!logo_pair_msl_read) {
+                std::puts("logo VS/PS Metal pair: FAILED (MSL is missing or empty)");
+            } else {
+                sotc::MetalAssetFrameConfig logo_pair_config{kWidth, kHeight, true};
+                std::string logo_pair_error;
+                std::unique_ptr<sotc::MetalAssetFrameRenderer> logo_pair_renderer =
+                    sotc::MetalAssetFrameRenderer::create(
+                        logo_pair_config, logo_pair_msl_source, logo_pair_error);
+                check("composed E636/E646 logo MSL compiles as one texture pipeline",
+                      logo_pair_renderer != nullptr);
+                if (logo_pair_renderer == nullptr) {
+                    std::fprintf(stderr, "FAIL composed logo-pair Metal pipeline: %s\n",
+                                 logo_pair_error.c_str());
+                } else {
+                    const std::array<sotc::CmshPosition, 4> logo_pair_positions = {{
+                        {0.0F, 0.0F, 0.25F}, {1.0F, 0.0F, 0.25F},
+                        {0.0F, 1.0F, 0.25F}, {1.0F, 1.0F, 0.25F}}};
+                    const std::array<std::uint16_t, 6> logo_pair_indices = {0, 1, 2, 2, 1, 3};
+                    std::vector<std::uint8_t> logo_pair_texture(
+                        static_cast<std::size_t>(kWidth) * kHeight * 4U);
+                    for (std::uint32_t y = 0; y < kHeight; ++y) {
+                        for (std::uint32_t x = 0; x < kWidth; ++x) {
+                            const std::size_t offset =
+                                (static_cast<std::size_t>(y) * kWidth + x) * 4U;
+                            logo_pair_texture[offset + 0] =
+                                static_cast<std::uint8_t>(x * 3U + y * 5U + 19U);
+                            logo_pair_texture[offset + 1] =
+                                static_cast<std::uint8_t>(x * 7U + y * 11U + 53U);
+                            logo_pair_texture[offset + 2] =
+                                static_cast<std::uint8_t>(x * 13U + y * 2U + 91U);
+                            logo_pair_texture[offset + 3] =
+                                static_cast<std::uint8_t>(x * 17U + y * 19U + 137U);
+                        }
+                    }
+
+                    sotc::DefaultShaderCase logo_pair_shader =
+                        sotc::make_default_shader_case();
+                    logo_pair_shader.camera = {1.0F, 1.0F, 0.0F, 0.0F};
+                    logo_pair_shader.object_row0 = {1.0F, 1.0F, 1.0F, 1.0F};
+                    sotc::AssetMeshDraw logo_pair_draw{
+                        logo_pair_positions, logo_pair_indices, logo_pair_shader};
+                    logo_pair_draw.fragment_texture0 = sotc::AssetTexture2D{
+                        kWidth, kHeight, std::span<const std::uint8_t>(logo_pair_texture)};
+                    logo_pair_draw.fragment_sampler0 = sotc::AssetSamplerInput{
+                        sotc::AssetTextureFilter::nearest,
+                        sotc::AssetTextureFilter::nearest,
+                        sotc::AssetTextureAddressMode::clamp_to_edge,
+                        sotc::AssetTextureAddressMode::clamp_to_edge};
+
+                    const sotc::MetalAssetFrameResult logo_pair_baseline =
+                        logo_pair_renderer->render(std::span(&logo_pair_draw, 1));
+                    check("composed logo VS/PS pair renders the synthetic indexed quad",
+                          logo_pair_baseline.ok);
+                    if (!logo_pair_baseline.ok) {
+                        std::fprintf(stderr, "FAIL composed logo-pair render: %s\n",
+                                     logo_pair_baseline.error.c_str());
+                    } else {
+                        constexpr std::array<std::array<std::uint32_t, 2>, 4> kLogoPairSamples = {{
+                            {13, 39}, {26, 9}, {42, 19}, {34, 52}}};
+                        for (const auto& sample : kLogoPairSamples) {
+                            const auto expected = logo_pair_pixel_oracle(
+                                logo_pair_texture, sample[0], sample[1]);
+                            check("logo-pair selected interior pixel matches nearest/clamp fp16-RTZ CPU oracle",
+                                  is_color(logo_pair_baseline.rgba8, sample[0], sample[1], expected));
+                        }
+
+                        const sotc::MetalAssetFrameResult logo_pair_repeat =
+                            logo_pair_renderer->render(std::span(&logo_pair_draw, 1));
+                        check("composed logo-pair repeat renders", logo_pair_repeat.ok);
+                        if (logo_pair_repeat.ok) {
+                            check("composed logo-pair RGBA and PNG are byte deterministic",
+                                  logo_pair_repeat.rgba8 == logo_pair_baseline.rgba8 &&
+                                      logo_pair_repeat.png == logo_pair_baseline.png);
+                        }
+                        check("logo-pair baseline PNG is written directly under local evidence",
+                              write_png_file(logo_pair_png_path, logo_pair_baseline.png));
+
+                        std::vector<std::uint8_t> logo_pair_mutated_texture = logo_pair_texture;
+                        constexpr std::uint32_t kMutationOutputX = 42;
+                        constexpr std::uint32_t kMutationOutputY = 19;
+                        constexpr std::uint32_t kMutationTextureX = kMutationOutputX;
+                        constexpr std::uint32_t kMutationTextureY = kMutationOutputY;
+                        const std::size_t mutated_texel_offset =
+                            (static_cast<std::size_t>(kMutationTextureY) * kWidth +
+                             kMutationTextureX) *
+                            4U;
+                        logo_pair_mutated_texture[mutated_texel_offset] =
+                            logo_pair_mutated_texture[mutated_texel_offset] == 255U ? 0U : 255U;
+                        sotc::AssetMeshDraw logo_pair_texture_mutation = logo_pair_draw;
+                        logo_pair_texture_mutation.fragment_texture0 = sotc::AssetTexture2D{
+                            kWidth, kHeight,
+                            std::span<const std::uint8_t>(logo_pair_mutated_texture)};
+                        const sotc::MetalAssetFrameResult logo_pair_texture_mutated_frame =
+                            logo_pair_renderer->render(std::span(&logo_pair_texture_mutation, 1));
+                        check("logo-pair texel mutation renders", logo_pair_texture_mutated_frame.ok);
+                        if (logo_pair_texture_mutated_frame.ok) {
+                            const auto mutated_expected = logo_pair_pixel_oracle(
+                                logo_pair_mutated_texture, kMutationOutputX, kMutationOutputY);
+                            check("logo-pair mutated texel matches nearest/clamp fp16-RTZ CPU oracle",
+                                  is_color(logo_pair_texture_mutated_frame.rgba8,
+                                           kMutationOutputX, kMutationOutputY, mutated_expected));
+                            const std::size_t mutation_pixel_offset =
+                                pixel_offset(kMutationOutputX, kMutationOutputY);
+                            const bool mutation_pixel_changed =
+                                logo_pair_texture_mutated_frame.rgba8.size() ==
+                                    logo_pair_baseline.rgba8.size() &&
+                                logo_pair_baseline.rgba8.size() == kWidth * kHeight * 4U &&
+                                !std::equal(
+                                    logo_pair_baseline.rgba8.begin() +
+                                        static_cast<std::ptrdiff_t>(mutation_pixel_offset),
+                                    logo_pair_baseline.rgba8.begin() +
+                                        static_cast<std::ptrdiff_t>(mutation_pixel_offset + 4U),
+                                    logo_pair_texture_mutated_frame.rgba8.begin() +
+                                        static_cast<std::ptrdiff_t>(mutation_pixel_offset));
+                            check("logo-pair texel mutation changes selected output and PNG",
+                                  mutation_pixel_changed &&
+                                      logo_pair_texture_mutated_frame.png !=
+                                          logo_pair_baseline.png);
+                            check("logo-pair mutated PNG is written directly under local evidence",
+                                  write_png_file(logo_pair_mutated_png_path,
+                                                 logo_pair_texture_mutated_frame.png));
+                        }
+
+                        auto position_mutation = logo_pair_positions;
+                        position_mutation[2].x = 0.125F;
+                        position_mutation[2].y = 0.875F;
+                        sotc::AssetMeshDraw logo_pair_position_mutation{
+                            position_mutation, logo_pair_indices, logo_pair_shader};
+                        logo_pair_position_mutation.fragment_texture0 =
+                            logo_pair_draw.fragment_texture0;
+                        logo_pair_position_mutation.fragment_sampler0 =
+                            logo_pair_draw.fragment_sampler0;
+                        const sotc::MetalAssetFrameResult logo_pair_position_mutated_frame =
+                            logo_pair_renderer->render(std::span(&logo_pair_position_mutation, 1));
+                        check("logo-pair per-vertex position mutation renders",
+                              logo_pair_position_mutated_frame.ok);
+                        if (logo_pair_position_mutated_frame.ok) {
+                            constexpr std::uint32_t kPositionProbeX = 2;
+                            constexpr std::uint32_t kPositionProbeY = kHeight - 3U;
+                            const std::size_t corner_offset =
+                                pixel_offset(kPositionProbeX, kPositionProbeY);
+                            check("logo-pair position mutation changes the corner readback",
+                                  !std::equal(
+                                      logo_pair_baseline.rgba8.begin() +
+                                          static_cast<std::ptrdiff_t>(corner_offset),
+                                      logo_pair_baseline.rgba8.begin() +
+                                          static_cast<std::ptrdiff_t>(corner_offset + 4U),
+                                      logo_pair_position_mutated_frame.rgba8.begin() +
+                                          static_cast<std::ptrdiff_t>(corner_offset)));
+                        }
+                    }
+                    std::puts("logo VS/PS pair scope: E636 vertex + E646 fragment MSL, "
+                              "synthetic position-correlated UV alias, unit harness object row; "
+                              "retail TEX0/NRM0/stream bindings and game frame NOT VERIFIED.");
+                }
             }
         }
     }

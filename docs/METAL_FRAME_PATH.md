@@ -527,8 +527,8 @@ This is a synthetic stage-composition check. It does not infer retail stream ali
 semantics, WQM/helper-lane equivalence, game-driven rendering, or G3 completion. E664 is the task
 claim. E667 records the focused implementation result: 23/23 lowerer tests and the opt-in direct-Metal
 quad passed with Metal API/GPU validation enabled. The closed profile also canonicalizes and confines
-all five ABI/input/output paths to `local/` and rejects path collisions. Full repository gates remain
-pending; this is not task completion or game-frame evidence.
+all five ABI/input/output paths to `local/` and rejects path collisions. E669 records the full
+repository gates and closes this bounded task as **FIXTURE_VERIFIED**; no game-frame or G3 claim.
 
 ## 7. Ranked task cards
 

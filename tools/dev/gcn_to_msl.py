@@ -32,6 +32,9 @@ LOGO_PS_SCHEMA = 'bounded-logo-ps-synthetic-v1'
 LOGO_PS_SHA256 = '4309caada7f114ec822f61646be536f50a8261a8c6e54f2ce709db7c70b8b39a'
 LOGO_PS_BYTES = 152
 LOGO_PS_ROWS = 34
+LOGO_PAIR_SCHEMA = 'bounded-logo-pair-synthetic-v1'
+LOGO_VS_SHA256 = '430f9adbb07d387c0b2b877b98300396f183faeab7f75cba0c9b0c67ada20c0c'
+LOGO_VS_BYTES = 140
 
 
 class LoweringError(ValueError):
@@ -354,6 +357,49 @@ def _expected_logo_ps_manifest() -> dict:
     }
 
 
+def _expected_logo_pair_abi() -> dict:
+    """Return the one synthetic VS/PS ABI admitted by the composed logo profile."""
+    return {
+        'schema': LOGO_PAIR_SCHEMA,
+        'vs': {
+            'sha256': LOGO_VS_SHA256,
+            'initial_scalar': {
+                '0': {'kind': 'pointer', 'view': 'root'},
+            },
+            'initial_vector': {
+                '0': {'kind': 'vertex_index'},
+            },
+            'views': {
+                'root': {
+                    '0': {'kind': 'pointer', 'view': 'streams'},
+                    '2': {'kind': 'pointer', 'view': 'view_constants'},
+                },
+                'streams': {
+                    '0': {'kind': 'descriptor', 'view': 'logo_clip'},
+                    '4': {'kind': 'descriptor', 'view': 'logo_param0'},
+                    '12': {'kind': 'descriptor', 'view': 'logo_param1'},
+                },
+                'view_constants': {
+                    '130': {'kind': 'float', 'field': 'camera', 'component': 'x'},
+                    '131': {'kind': 'float', 'field': 'camera', 'component': 'y'},
+                },
+            },
+            'streams': {
+                'logo_clip': {'format': 'explicit_float2', 'field': 'position'},
+                'logo_param0': {'format': 'explicit_float4', 'field': 'object_row0'},
+                'logo_param1': {'format': 'explicit_float2', 'field': 'position'},
+            },
+        },
+        'ps': _expected_logo_ps_manifest(),
+    }
+
+
+def _validate_logo_pair_abi(abi: dict) -> None:
+    mismatch = _manifest_difference(abi, _expected_logo_pair_abi())
+    if mismatch:
+        raise LoweringError(f'unsupported logo pair synthetic ABI: {mismatch}')
+
+
 def _manifest_difference(actual, expected, path='manifest') -> str | None:
     if type(actual) is not type(expected):
         return f'{path} has the wrong JSON type'
@@ -437,6 +483,56 @@ def _validate_pinned_logo_ps_code(code: bytes) -> list:
     return rows
 
 
+def _validate_pinned_logo_vs_code(code: bytes) -> None:
+    if len(code) != LOGO_VS_BYTES:
+        raise LoweringError(f'pinned logo VS must be {LOGO_VS_BYTES} bytes; got {len(code)}')
+    digest = hashlib.sha256(code).hexdigest()
+    if digest != LOGO_VS_SHA256:
+        raise LoweringError(
+            f'pinned logo VS SHA-256 mismatch: expected {LOGO_VS_SHA256}, got {digest}')
+
+
+def _compose_logo_pair_msl(vs_lines: list[str], ps_source: str) -> str:
+    """Keep the E636 vertex and E646 fragment wrappers around shared PS helpers."""
+    ps_header = '// Pinned logo PS; synthetic slot-0 resources only. Retail bindings and WQM equivalence NOT CLAIMED.\n'
+    if not ps_source.startswith(ps_header):
+        raise LoweringError('unexpected pinned logo PS MSL header')
+    shared = ps_source[len(ps_header):]
+    vertex_start = shared.find('\nvertex RasterValue asset_vertex(')
+    fragment_start = shared.find('\nfragment float4 asset_fragment(', vertex_start + 1)
+    if vertex_start < 0 or fragment_start < 0:
+        raise LoweringError('pinned logo PS MSL is missing its stage wrappers')
+    vertex_source = shared[vertex_start:fragment_start]
+    fragment_source = shared[fragment_start:]
+    if vertex_source.count('vertex RasterValue asset_vertex(') != 1:
+        raise LoweringError('pinned logo PS MSL has an unexpected vertex wrapper')
+    if fragment_source.count('fragment float4 asset_fragment(') != 1:
+        raise LoweringError('pinned logo PS MSL has an unexpected fragment wrapper')
+
+    source = ('// Pinned E636 logo VS + E646 logo PS; synthetic ABI only. '
+              'Retail bindings and WQM/Metal derivative equivalence NOT CLAIMED.\n')
+    source += shared[:vertex_start]
+    source += '\nstruct VertexValue { float4 clip; float4 param0; float4 param1; };\n'
+    source += '\ninline VertexValue recovered_logo_vs(thread const ShaderCase& u) {\n'
+    source += '    VertexValue out;\n' + '\n'.join(vs_lines) + '\n    return out;\n}\n'
+    source += r'''
+vertex RasterValue asset_vertex(device const ShaderCase* inputs [[buffer(0)]],
+                                uint vid [[vertex_id]]) {
+    ShaderCase u = inputs[vid];
+    VertexValue v = recovered_logo_vs(u);
+    RasterValue out;
+    out.position = v.clip;
+    out.param0 = v.param0;
+    out.param1 = v.param1;
+    return out;
+}
+'''
+    source += fragment_source
+    if 'kernel void verify_pair' in source:
+        raise LoweringError('logo pair MSL must not contain the compute/oracle sink')
+    return source
+
+
 def _logo_ps_source() -> str:
     source = '// Pinned logo PS; synthetic slot-0 resources only. Retail bindings and WQM equivalence NOT CLAIMED.\n'
     source += HELPERS
@@ -516,6 +612,35 @@ def generate_logo_ps(code: bytes, abi: dict) -> tuple[str, dict]:
     return _lower_logo_ps_rows(rows, abi)
 
 
+def generate_logo_pair(vs: bytes, ps: bytes, abi: dict) -> tuple[str, dict]:
+    """Lower the exact pinned logo shader pair under its one synthetic ABI."""
+    _validate_logo_pair_abi(abi)
+    _validate_pinned_logo_vs_code(vs)
+    vs_lines, vs_report = Lowerer(abi['vs'], 'vs').run(vs)
+    ps_rows = _validate_pinned_logo_ps_code(ps)
+    ps_source, ps_report = _lower_logo_ps_rows(ps_rows, abi['ps'])
+    source = _compose_logo_pair_msl(vs_lines, ps_source)
+    report = dict(
+        version=LOGO_PAIR_SCHEMA,
+        profile='pinned-logo-vs-ps-synthetic-pair',
+        code_sha256=dict(vs=LOGO_VS_SHA256, ps=LOGO_PS_SHA256),
+        code_bytes=dict(vs=LOGO_VS_BYTES, ps=LOGO_PS_BYTES),
+        stages=[vs_report, ps_report['stages'][0]],
+        image_sample=ps_report['image_sample'],
+        msl_sha256=hashlib.sha256(source.encode()).hexdigest(),
+        limitations=[
+            'synthetic vertex ABI: position supplies logo_clip and logo_param1; object_row0 supplies logo_param0',
+            'camera inputs remain explicit synthetic scaling inputs',
+            'synthetic slot-0 texture/sampler ABI',
+            'validated WQM/save/restore controls are not emitted as runtime operations',
+            'AMD WQM/Metal helper-lane and derivative equivalence NOT VERIFIED',
+            'retail resource bindings and SPI interpolation UNVERIFIED',
+            'G3 NOT RUN',
+        ],
+    )
+    return source, report
+
+
 def generate(vs: bytes, ps: bytes, abi: dict) -> tuple[str, dict]:
     if abi.get('schema') != VERSION or abi.get('floating_point') != 'nearest_even_ftz32_rtz16':
         raise LoweringError('explicit supported schema/floating-point harness profile required')
@@ -554,15 +679,47 @@ fragment float4 asset_fragment(RasterValue in [[stage_in]], constant ShaderCase&
                         limitations=['harness ABI only','retail descriptor/SPI mode unverified','G3 NOT RUN'])
 
 
+def _private_local_root(workspace: Path) -> Path:
+    workspace = workspace.resolve()
+    local_root = (workspace / 'local').resolve()
+    if not local_root.is_relative_to(workspace):
+        raise LoweringError('workspace local/ must resolve inside the workspace')
+    return local_root
+
+
+def _require_private_local_path(path: Path, local_root: Path, label: str) -> Path:
+    resolved = path.resolve()
+    if not resolved.is_relative_to(local_root):
+        raise LoweringError(f'logo-pair {label} must resolve under workspace local/')
+    return resolved
+
+
 def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--profile',choices=('pair','logo-ps'),default='pair')
+    p.add_argument('--profile',choices=('pair','logo-ps','logo-pair'),default='pair')
     p.add_argument('--vs',type=Path); p.add_argument('--ps',required=True,type=Path)
     p.add_argument('--abi',required=True,type=Path); p.add_argument('--output',required=True,type=Path)
     p.add_argument('--report',required=True,type=Path)
     a=p.parse_args(argv)
     try:
         workspace=Path(__file__).resolve().parents[2]
+        if a.profile == 'logo-pair':
+            local_root = _private_local_root(workspace)
+            for name, label in (('abi', 'ABI'), ('output', 'MSL output'),
+                                ('report', 'report'), ('vs', 'pinned logo VS'),
+                                ('ps', 'pinned logo PS')):
+                path = getattr(a, name)
+                if path is None:
+                    continue
+                setattr(a, name, _require_private_local_path(path, local_root, label))
+            seen_paths = {}
+            for label, path in (('ABI', a.abi), ('pinned logo VS', a.vs),
+                                ('pinned logo PS', a.ps), ('MSL output', a.output),
+                                ('report', a.report)):
+                if path in seen_paths:
+                    raise LoweringError(
+                        f'logo-pair {label} path collides with {seen_paths[path]} path')
+                seen_paths[path] = label
         for target in (a.output,a.report):
             resolved=target.resolve()
             if resolved.is_relative_to(workspace) and not resolved.is_relative_to(workspace/'local'):
@@ -574,6 +731,14 @@ def main(argv=None):
             if not a.ps.resolve().is_relative_to(workspace/'local'):
                 raise LoweringError('pinned logo PS input must be supplied from private local/')
             source,report=generate_logo_ps(a.ps.read_bytes(),abi)
+        elif a.profile == 'logo-pair':
+            if a.vs is None:
+                raise LoweringError('logo-pair profile requires --vs and --ps')
+            if not a.vs.resolve().is_relative_to(workspace/'local'):
+                raise LoweringError('pinned logo VS input must be supplied from private local/')
+            if not a.ps.resolve().is_relative_to(workspace/'local'):
+                raise LoweringError('pinned logo PS input must be supplied from private local/')
+            source,report=generate_logo_pair(a.vs.read_bytes(),a.ps.read_bytes(),abi)
         else:
             if a.vs is None:
                 raise LoweringError('pair profile requires --vs')

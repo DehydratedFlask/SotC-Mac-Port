@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 """Synthetic lowering/ABI failures; no game code or private ABI fixtures."""
 import hashlib
+import io
 import importlib.util
+import copy
 import re
 from pathlib import Path
 import sys
+import tempfile
 import unittest
+from contextlib import redirect_stderr
 from dataclasses import replace
+from unittest.mock import patch
 
 
 def module(name,file):
@@ -361,6 +366,133 @@ class LoweringTests(unittest.TestCase):
         exec_write[index] = replace(exec_write[index], requirements=('writes_exec_mask',))
         with self.assertRaisesRegex(m.LoweringError, 'intervening EXEC write'):
             m._validate_logo_ps_rows(exec_write)
+
+    def test_logo_pair_generator_composes_pinned_stage_wrappers(self):
+        abi = m._expected_logo_pair_abi()
+        vs_lines = [
+            '    out.clip = float4(u.position.x, u.position.y, 0.0f, 1.0f);',
+            '    out.param0 = float4(u.object_row0);',
+            '    out.param1 = float4(u.position.x, u.position.y, 0.0f, 0.0f);',
+        ]
+        vs_report = dict(stage='vs', sha256=m.LOGO_VS_SHA256, instructions=25,
+                         input_reads=['u.camera.x', 'u.camera.y', 'u.object_row0.x'])
+        ps_report = dict(stages=[dict(stage='ps', sha256=m.LOGO_PS_SHA256,
+                                      instructions=m.LOGO_PS_ROWS)],
+                         image_sample=dict(texture_slot=0, sampler_slot=0,
+                                            format='rgba8unorm_2d', lod='implicit'))
+        with (patch.object(m, '_validate_pinned_logo_vs_code'),
+              patch.object(m.Lowerer, 'run', return_value=(vs_lines, vs_report)),
+              patch.object(m, '_validate_pinned_logo_ps_code',
+                           return_value=synthetic_logo_ps_rows()),
+              patch.object(m, '_lower_logo_ps_rows',
+                           return_value=(m._logo_ps_source(), ps_report))):
+            source, report = m.generate_logo_pair(b'vs fixture', b'ps fixture', abi)
+
+        self.assertEqual(source.count('struct ShaderCase {'), 1)
+        self.assertEqual(source.count('vertex RasterValue asset_vertex('), 1)
+        self.assertEqual(source.count('fragment float4 asset_fragment('), 1)
+        self.assertIn('inline VertexValue recovered_logo_vs(', source)
+        self.assertIn('out.clip = float4(u.position.x, u.position.y, 0.0f, 1.0f);', source)
+        self.assertIn('out.param0 = float4(u.object_row0);', source)
+        self.assertIn('out.param1 = float4(u.position.x, u.position.y, 0.0f, 0.0f);', source)
+        self.assertIn('texture2d<float> texture0 [[texture(0)]]', source)
+        self.assertIn('sampler sampler0 [[sampler(0)]]', source)
+        self.assertIn('texture0.sample(sampler0, uv)', source)
+        self.assertNotIn('Synthetic harness mapping', source)
+        self.assertNotIn('kernel void verify_pair', source)
+        self.assertEqual(report['profile'], 'pinned-logo-vs-ps-synthetic-pair')
+        self.assertEqual(report['stages'], [vs_report, ps_report['stages'][0]])
+        self.assertEqual(report['image_sample']['texture_slot'], 0)
+        self.assertIn('AMD WQM/Metal helper-lane and derivative equivalence NOT VERIFIED',
+                      report['limitations'])
+
+    def test_logo_pair_manifest_rejects_wrong_hashes_and_unsupported_aliases(self):
+        abi = m._expected_logo_pair_abi()
+        m._validate_logo_pair_abi(abi)
+
+        wrong_alias = copy.deepcopy(abi)
+        wrong_alias['vs']['streams']['logo_param1']['field'] = 'material'
+        with self.assertRaisesRegex(m.LoweringError, 'unsupported logo pair synthetic ABI'):
+            m._validate_logo_pair_abi(wrong_alias)
+
+        wrong_format = copy.deepcopy(abi)
+        wrong_format['vs']['streams']['logo_clip']['format'] = 'explicit_float4'
+        with self.assertRaisesRegex(m.LoweringError, 'logo_clip.format'):
+            m._validate_logo_pair_abi(wrong_format)
+
+        wrong_texture = copy.deepcopy(abi)
+        wrong_texture['ps']['image_sample']['texture_slot'] = 1
+        with self.assertRaisesRegex(m.LoweringError, 'ps.image_sample.texture_slot'):
+            m._validate_logo_pair_abi(wrong_texture)
+
+    def test_logo_pair_generator_rejects_wrong_vs_and_ps_digests(self):
+        abi = m._expected_logo_pair_abi()
+        with self.assertRaisesRegex(m.LoweringError, 'pinned logo VS SHA-256 mismatch'):
+            m.generate_logo_pair(bytes(m.LOGO_VS_BYTES), bytes(m.LOGO_PS_BYTES), abi)
+
+        # Exercise the PS digest gate independently of the earlier VS digest gate.
+        with (patch.object(m, '_validate_pinned_logo_vs_code'),
+              patch.object(m.Lowerer, 'run', return_value=([], dict(stage='vs')))):
+            with self.assertRaisesRegex(m.LoweringError, 'pinned logo PS SHA-256 mismatch'):
+                m.generate_logo_pair(b'v' * m.LOGO_VS_BYTES,
+                                     bytes(m.LOGO_PS_BYTES), abi)
+
+    def test_logo_pair_cli_rejects_outside_local_abi_and_output(self):
+        workspace = Path(m.__file__).resolve().parents[2]
+        local = workspace / 'local'
+        cases = (
+            (Path(tempfile.gettempdir()) / 'gcn-to-msl-outside.abi.json',
+             local / 'unused.metal', local / 'unused-report.json', 'ABI'),
+            (local / 'unused-abi.json',
+             Path(tempfile.gettempdir()) / 'gcn-to-msl-outside.metal',
+             local / 'unused-report.json', 'MSL output'),
+        )
+        for abi, output, report, expected in cases:
+            with self.subTest(expected=expected):
+                stderr = io.StringIO()
+                args = [
+                    '--profile', 'logo-pair',
+                    '--vs', str(local / 'missing-vs.bin'),
+                    '--ps', str(local / 'missing-ps.bin'),
+                    '--abi', str(abi), '--output', str(output), '--report', str(report),
+                ]
+                with redirect_stderr(stderr):
+                    result = m.main(args)
+                self.assertEqual(result, 1)
+                self.assertIn(f'logo-pair {expected} must resolve under workspace local/',
+                              stderr.getvalue())
+
+    def test_logo_pair_cli_rejects_output_colliding_with_shader_input(self):
+        workspace = Path(m.__file__).resolve().parents[2]
+        local = workspace / 'local'
+        vs = local / 'missing-vs.bin'
+        report = local / 'unused-report.json'
+        stderr = io.StringIO()
+        args = [
+            '--profile', 'logo-pair',
+            '--vs', str(vs), '--ps', str(local / 'missing-ps.bin'),
+            '--abi', str(local / 'unused-abi.json'), '--output', str(vs),
+            '--report', str(report),
+        ]
+        with redirect_stderr(stderr):
+            result = m.main(args)
+        self.assertEqual(result, 1)
+        self.assertIn('logo-pair MSL output path collides with pinned logo VS path',
+                      stderr.getvalue())
+        self.assertFalse(vs.exists())
+        self.assertFalse(report.exists())
+
+    def test_private_local_path_rejects_symlink_escape(self):
+        workspace = Path(m.__file__).resolve().parents[2]
+        local_root = m._private_local_root(workspace)
+        with tempfile.TemporaryDirectory() as outside_dir, \
+                tempfile.TemporaryDirectory(dir=local_root) as private_dir:
+            escape = Path(private_dir) / 'escape'
+            escape.symlink_to(outside_dir, target_is_directory=True)
+            with self.assertRaisesRegex(m.LoweringError,
+                                        'logo-pair MSL output must resolve under workspace local/'):
+                m._require_private_local_path(escape / 'logo-pair.metal',
+                                              local_root, 'MSL output')
 
 
 if __name__=='__main__':unittest.main()
