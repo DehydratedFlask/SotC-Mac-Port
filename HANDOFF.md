@@ -1,6 +1,55 @@
 # SoC Mac Native — current handoff
 
-## 2026-10-25 11:11 CDT — raw material bytes verified; source replay pending
+## 2026-10-25 11:31 CDT — raw material selector replay passed; publication pending
+
+- Integrator: Codex `/root`; task `GPU-02-RAW-MATERIAL-SELECTOR-01`, attempt 0 semantic
+  failures. Checkout is `main` at base `71c578a9b56d4e05bf09c0735ef3ba861c61ca14`, equal to
+  `origin/main` before this task's source publication. The implementation worker and independent
+  read-only reviewer have both finished; review found no remaining findings.
+- Source files: `tools/dev/raw_material_selector.py` SHA-256
+  `739338e40ece220924c4e79e5ce088727d167b0fb8828c388cb00d1bd6711930` and
+  `tools/dev/test_raw_material_selector.py` SHA-256
+  `828552b074da842c4bb0e265fcfb064566f6e028ce3668c4b2f52b4852337bbe`.
+- Focused command `python3 -I tools/dev/test_raw_material_selector.py` passed **16/16**; log
+  `local/validation/gpu02-raw-material-selector-20261025/root-final-unit-tests.log` (SHA-256
+  `129723ba0f4d933bd2e4eba413631bb09bfaf3ac28a2f366a8d71bd0ddd5b975`).
+- Exact raw selector and replay command exited 0; log and summary are
+  `local/validation/gpu02-raw-material-selector-20261025/root-final-selector-run.log` and
+  `local/validation/gpu02-raw-material-selector-20261025/root-final-replay/summary.json` (SHA-256
+  `3111ff56fa74685b54590eaa9081e694af970a2e2f404eda209b841722203788`). Both exact PSARC member
+  pins passed; selector literal is unique at byte 37; CSDR VS `(564,272,972)` and PS
+  `(1368,240,1744)` match E627. Existing MSL SHA-256 is
+  `5524537e36b2481798abe5bf6c311e37082aed26b136c4590f7d685e671a455e`; oracle passed 2,141 cases
+  / 34,256 components with max absolute error 0.0; the verifier was freshly compiled arm64 from
+  tracked source and ran Metal API/shader validation. `default.cmat` engine consumption and constants
+  remain UNKNOWN; no `0x8C`, mesh/texture, game-frame, or G3 claim.
+- Repository gates: `cmake -S native -B local/build/orch-r22` and
+  `cmake --build local/build/orch-r22 -j 12` passed (logs under
+  `local/validation/gpu02-raw-material-selector-20261025/`); full CTest passed **397/397** in 8.59 s
+  (`local/validation/gpu02-raw-material-selector-20261025/ctest-full.log`, SHA-256
+  `dfbe82c900f47f9b9b415a2e37760e8d1acdd46e53d6ad63ac17ffefc6c5a1cd`); lift checkers passed
+  **481/0/0** (`local/validation/gpu02-raw-material-selector-20261025/lift-checkers.log`, SHA-256
+  `67953e13bc204b8fb0f4924e6a0c5f9b4cd6be3250dfc5de866a05accfeebaf2`). Final project index
+  generation/check both passed at **20,429** folders after all validation logs existed; the first
+  two checks were stale because two later log files changed a private folder's file count. Trail
+  wiring check passed at **8,623** nodes; deep layer not built.
+- Precommit gates on the allowlisted staged set passed: staged path audit **9 paths**, all-path audit
+  **2,802 paths**, staged whitespace check, commit-attribution audit (`origin/main..HEAD` empty), and
+  project-index check at **20,429** folders. Private audit logs are under the validation directory.
+- One initial root selector invocation exited 1 because the output directory had been pre-created;
+  the empty directory was removed and a fresh run passed. This was the intended no-overwrite guard,
+  not a shader or selector failure. A worker test-fixture path error was likewise corrected before
+  its final 16/16 pass. Failed semantic hypotheses remain 0.
+- Files changed: two `tools/dev/` source files; this handoff; `docs/TASKS.md`, `docs/EVIDENCE.md`,
+  `docs/INDEX.md`, `docs/METAL_FRAME_PATH.md`, `docs/FOLDERS.md`, and the raw-selector checkpoint.
+  No dependency/install changed. User data, binaries, generated MSL, logs and PNGs remain under
+  ignored `local/`.
+- Next exact action: commit/push the allowlisted source/docs as Johnny Wang with no Claude/Anthropic
+  contributor trailer and push `origin main`. Fetch and verify `HEAD == origin/main`; add a
+  post-push checkpoint. Status: **FIXTURE_VERIFIED / ARTIFACT_VERIFIED**, publication pending;
+  F590 remains ACTIVE because its five original mutation cases are still unavailable.
+
+## 2026-10-25 11:11 CDT — prior checkpoint: raw material bytes verified; source replay pending
 
 - Integrator: Codex `/root`; GPU task `GPU-02-RAW-MATERIAL-SELECTOR-01`, ACTIVE, attempt 0
   semantic failures; F590 remains ACTIVE pending its missing five-mutation evidence. Claim commit

@@ -1,5 +1,49 @@
 # GPU-02 raw default-material selector — claim
 
+## 2026-10-25 11:31 CDT — implementation, replay and review complete
+
+- Integrator: Codex `/root`; implementation worker `/root/gpu02_raw_selector` owned only the two
+  `tools/dev/` files; independent reviewer `/root/review_gpu02_selector` read the source/tests and
+  found no remaining findings. Current branch is `main` at `71c578a9b56d4e05bf09c0735ef3ba861c61ca14`
+  before publication.
+- Source hashes: verifier `739338e40ece220924c4e79e5ce088727d167b0fb8828c388cb00d1bd6711930`;
+  tests `828552b074da842c4bb0e265fcfb064566f6e028ce3668c4b2f52b4852337bbe`.
+- Exact root command `python3 -I tools/dev/test_raw_material_selector.py` passed **16/16**;
+  `local/validation/gpu02-raw-material-selector-20261025/root-final-unit-tests.log` SHA-256
+  `129723ba0f4d933bd2e4eba413631bb09bfaf3ac28a2f366a8d71bd0ddd5b975`.
+- Exact root replay command passed with
+  `--cachedfiles local/extracted/CUSA08809/cachedFiles.psarc --pak0
+  local/extracted/CUSA08809/pak0.psarc --output
+  local/validation/gpu02-raw-material-selector-20261025/root-final-replay`. It pins both exact
+  PSARC entries and full member hashes, proves the one selector literal at cmat byte 37, parses the
+  exact CSDR and matches E627 spans, regenerates the exact MSL, passes all 2,141 oracle cases / 34,256
+  components with max absolute error 0, compiles a fresh arm64 Metal verifier and executes it with
+  Metal API/shader validation. Summary/log SHA-256
+  `3111ff56fa74685b54590eaa9081e694af970a2e2f404eda209b841722203788`.
+- Repository gates: `cmake -S native -B local/build/orch-r22` and
+  `cmake --build local/build/orch-r22 -j 12` exited 0; CTest **397/397** (8.59 s); lift checkers
+  **481/0/0**; `trail build --check` passed at **8,623** nodes; `project_index.py` generation and
+  `--check` both passed at **20,429** folders. The first two index checks were stale because two
+  validation log files were created after generation; after logs stabilized, generation/check
+  passed. Logs are under `local/validation/gpu02-raw-material-selector-20261025/`.
+- One root invocation was rejected because the output directory had already been created; removed
+  that empty directory and reran successfully. This tests the verifier's no-overwrite guard and is
+  not a semantic failure. Earlier worker test-fixture setup corrections and their final pass are in
+  the prior E684 section. Total semantic failures for this task: **0**.
+- Observed: exact bytes, selector literal, hashes, parser spans, MSL/oracle output, Metal execution,
+  test counts, source review and repository gates. Inference not made: engine consumption of this
+  material. `.cmat` constants/layout, retail ABI/bindings, all `0x8C` members, mesh/texture semantics,
+  game frame and G3 remain UNKNOWN or PARTIAL.
+- Files for this checkpoint: two `tools/dev/` files, `HANDOFF.md`, `docs/TASKS.md`,
+  `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/METAL_FRAME_PATH.md`, `docs/FOLDERS.md` (generated),
+  and this file. No install/dependency change. Private inputs and every generated binary/report/log
+  remain under ignored `local/`.
+- Next exact action: stage only allowlisted files; run staged and full path audits plus
+  commit-attribution audit; commit/push to `origin main` under Johnny Wang
+  without Claude/Anthropic contributor trailers; fetch and verify `HEAD == origin/main`, then
+  record the publication hash in HANDOFF/EVIDENCE.
+- Status: **FIXTURE_VERIFIED / ARTIFACT_VERIFIED**, publication pending; attempt 0 semantic failures.
+
 ## 2026-10-25 11:02 CDT — bounded task claimed
 
 - Integrator: Codex `/root`; task `GPU-02-RAW-MATERIAL-SELECTOR-01`; local branch `main`, base
