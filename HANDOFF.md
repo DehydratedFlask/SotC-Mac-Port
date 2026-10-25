@@ -1,5 +1,19 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 05:18 CDT — GPU-03 PNG fixture published on main
+
+- Integrator: Codex `/root`; commit `975f4437c784378b83f131e053065a208d84588b` is published to
+  GitHub `main`. Post-push `git fetch origin main` reports local `main == origin/main` at this SHA,
+  clean worktree, current branch `main`, and no open pull requests. The requested old branch
+  `cursor/init-hash-551140-9dfc` is absent both locally and remotely.
+- Commit author and committer are Johnny Wang (`dehydratedflask@users.noreply.github.com`); the
+  commit message has no Claude/Anthropic/coauthor trailer. Post-commit attribution audit passed for
+  `origin/main..HEAD`; publish-path audit passed for 2,791 repository paths. Pre-commit staged-path
+  audit passed for 10 staged paths.
+- `GPU-03-LOGO-PNG-TEXTURE-SAMPLE-01` remains **FIXTURE_VERIFIED** with no game-runtime claim.
+  Exact next action: pick the next unblocked Metal/render task from `docs/TASKS.md` and continue on
+  `main`; retain the synthetic binding/WQM/G3 limits from E656.
+
 ## 2026-10-25 05:16 CDT — logo PNG texture fixture verified; ready to publish
 
 - Integrator: Codex `/root`; task `GPU-03-LOGO-PNG-TEXTURE-SAMPLE-01` is
