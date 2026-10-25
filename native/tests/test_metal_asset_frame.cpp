@@ -18,6 +18,8 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <system_error>
+#include <utility>
 #include <vector>
 
 namespace {
@@ -50,6 +52,7 @@ struct CpuMask {
     std::vector<std::uint8_t> covered;
     std::vector<double> depth;
     std::vector<int> front_draw;
+    std::vector<int> front_triangle;
     std::size_t covered_count = 0;
 };
 
@@ -82,6 +85,30 @@ void check(std::string_view name, bool passed) {
     if (!input) return false;
     contents.assign(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>());
     return !contents.empty();
+}
+
+[[nodiscard]] bool path_is_under_local(const char* path) {
+    if (path == nullptr || *path == '\0') return false;
+    std::error_code error;
+    const std::filesystem::path local_root = std::filesystem::weakly_canonical("local", error);
+    if (error) return false;
+    const std::filesystem::path candidate = std::filesystem::weakly_canonical(path, error);
+    if (error) return false;
+    const std::filesystem::path relative = candidate.lexically_relative(local_root);
+    if (relative.empty() || relative == ".") return false;
+    return *relative.begin() != "..";
+}
+
+[[nodiscard]] bool load_bytes(const char* path, std::vector<std::byte>& bytes) {
+    std::ifstream input(path, std::ios::binary);
+    if (!input) return false;
+    const std::vector<char> raw(std::istreambuf_iterator<char>(input), {});
+    if (input.bad()) return false;
+    bytes.resize(raw.size());
+    for (std::size_t i = 0; i < raw.size(); ++i) {
+        bytes[i] = static_cast<std::byte>(static_cast<unsigned char>(raw[i]));
+    }
+    return true;
 }
 
 [[nodiscard]] Point3 transform_position(const sotc::DefaultShaderCase& shader,
@@ -145,6 +172,7 @@ void check(std::string_view name, bool passed) {
     const std::size_t pixel_count = static_cast<std::size_t>(kWidth) * kHeight;
     CpuMask mask{std::vector<std::uint8_t>(pixel_count, 0),
                  std::vector<double>(pixel_count, 1.0),
+                 std::vector<int>(pixel_count, -1),
                  std::vector<int>(pixel_count, -1), 0};
 
     for (std::size_t draw_index = 0; draw_index < draws.size(); ++draw_index) {
@@ -190,6 +218,7 @@ void check(std::string_view name, bool passed) {
                     if (depth < mask.depth[pixel]) {
                         mask.depth[pixel] = depth;
                         mask.front_draw[pixel] = static_cast<int>(draw_index);
+                        mask.front_triangle[pixel] = static_cast<int>(first / 3);
                     }
                 }
             }
@@ -308,9 +337,341 @@ void append_u32(std::vector<std::byte>& bytes, std::uint32_t value) {
     return false;
 }
 
+struct MeshBounds {
+    float min_x = std::numeric_limits<float>::infinity();
+    float max_x = -std::numeric_limits<float>::infinity();
+    float min_y = std::numeric_limits<float>::infinity();
+    float max_y = -std::numeric_limits<float>::infinity();
+    float min_z = std::numeric_limits<float>::infinity();
+    float max_z = -std::numeric_limits<float>::infinity();
+};
+
+[[nodiscard]] bool mesh_bounds(const sotc::CmshMesh& mesh, MeshBounds& bounds) {
+    if (mesh.positions.empty()) return false;
+    for (const sotc::CmshPosition& position : mesh.positions) {
+        bounds.min_x = std::min(bounds.min_x, position.x);
+        bounds.max_x = std::max(bounds.max_x, position.x);
+        bounds.min_y = std::min(bounds.min_y, position.y);
+        bounds.max_y = std::max(bounds.max_y, position.y);
+        bounds.min_z = std::min(bounds.min_z, position.z);
+        bounds.max_z = std::max(bounds.max_z, position.z);
+    }
+    return std::isfinite(bounds.min_x) && std::isfinite(bounds.max_x) &&
+           std::isfinite(bounds.min_y) && std::isfinite(bounds.max_y) &&
+           std::isfinite(bounds.min_z) && std::isfinite(bounds.max_z) &&
+           bounds.max_x > bounds.min_x && bounds.max_y > bounds.min_y;
+}
+
+[[nodiscard]] sotc::DefaultShaderCase asset_shader(const MeshBounds& bounds, float depth,
+                                                   sotc::ShaderFloat4 material) {
+    constexpr float kTargetSpan = 0.72F;
+    const float x_span = bounds.max_x - bounds.min_x;
+    const float y_span = bounds.max_y - bounds.min_y;
+    const float xy_span = std::max(x_span, y_span);
+    const float xy_scale = kTargetSpan / xy_span;
+    const float z_span = bounds.max_z - bounds.min_z;
+    const float z_scale = z_span > 0.0F ? 0.12F / z_span : 0.0F;
+    const float center_x = (bounds.min_x + bounds.max_x) * 0.5F;
+    const float center_y = (bounds.min_y + bounds.max_y) * 0.5F;
+    const float center_z = (bounds.min_z + bounds.max_z) * 0.5F;
+
+    sotc::DefaultShaderCase shader = sotc::make_default_shader_case();
+    shader.encoded_normal = {0.5F, 0.5F, 1.0F, 0.0F};
+    shader.object_row0 = {xy_scale, 0.0F, 0.0F, -center_x * xy_scale};
+    shader.object_row1 = {0.0F, xy_scale, 0.0F, -center_y * xy_scale};
+    shader.object_row2 = {0.0F, 0.0F, z_scale, -center_z * z_scale};
+    shader.clip_row2[3] = depth;
+    shader.material = material;
+    return shader;
+}
+
+[[nodiscard]] bool parse_pinned_asset(const char* path, std::size_t expected_size,
+                                      std::string_view expected_sha256,
+                                      std::vector<std::byte>& raw, sotc::CmshMesh& mesh,
+                                      std::string_view label) {
+    check(std::string(label) + " input is inside local/", path_is_under_local(path));
+    if (!path_is_under_local(path)) return false;
+    check(std::string(label) + " bytes load", load_bytes(path, raw));
+    if (raw.empty()) return false;
+    const auto raw_u8 = std::span(reinterpret_cast<const std::uint8_t*>(raw.data()), raw.size());
+    const std::string digest = sha256_hex(raw_u8);
+    check(std::string(label) + " pinned byte count", raw.size() == expected_size);
+    check(std::string(label) + " pinned SHA-256", digest == expected_sha256);
+    if (raw.size() != expected_size || digest != expected_sha256) return false;
+
+    const sotc::CmshParseResult result = sotc::parse_cmsh_mesh(raw);
+    const auto* parsed = std::get_if<sotc::CmshMesh>(&result);
+    if (parsed == nullptr) {
+        const auto* parse_error = std::get_if<sotc::CmshParseError>(&result);
+        std::fprintf(stderr, "FAIL %.*s parser: %s at byte %zu\n",
+                     static_cast<int>(label.size()), label.data(),
+                     parse_error == nullptr ? "unknown error"
+                                            : sotc::cmsh_error_name(parse_error->code),
+                     parse_error == nullptr ? 0 : parse_error->byte_offset);
+        ++failures;
+        return false;
+    }
+    mesh = *parsed;
+    check(std::string(label) + " POS0/U16 mesh has triangles",
+          !mesh.positions.empty() && !mesh.indices.empty() && mesh.indices.size() % 3 == 0);
+    std::printf("asset-derived harness input %.*s: bytes=%zu sha256=%s positions=%zu indices=%zu\n",
+                static_cast<int>(label.size()), label.data(), raw.size(), digest.c_str(),
+                mesh.positions.size(), mesh.indices.size());
+    return !mesh.positions.empty() && !mesh.indices.empty();
+}
+
+[[nodiscard]] bool run_asset_derived_frame(sotc::MetalAssetFrameRenderer& renderer,
+                                           const char* cube_path, const char* cone_path,
+                                           const char* png_path) {
+    check("asset-derived inputs and PNG remain under local/",
+          path_is_under_local(cube_path) && path_is_under_local(cone_path) &&
+              path_is_under_local(png_path));
+    if (!path_is_under_local(cube_path) || !path_is_under_local(cone_path) ||
+        !path_is_under_local(png_path)) {
+        return false;
+    }
+
+    constexpr std::string_view kCubeSha256 =
+        "44738dbf663af252898bad5582f2b48f1aadf6fbaab403c20880410b79a380b7";
+    constexpr std::string_view kConeSha256 =
+        "5456afadabe96b9f7f02c503dc0ed5410652ccd32601c19e8aeeaaf36c88600c";
+    std::vector<std::byte> cube_bytes;
+    std::vector<std::byte> cone_bytes;
+    sotc::CmshMesh cube;
+    sotc::CmshMesh cone;
+    const bool cube_ok = parse_pinned_asset(cube_path, 850, kCubeSha256, cube_bytes, cube,
+                                            "cube_1m.cmsh");
+    const bool cone_ok = parse_pinned_asset(cone_path, 1462, kConeSha256, cone_bytes, cone,
+                                            "cone.cmsh");
+    if (!cube_ok || !cone_ok) return false;
+
+    MeshBounds cube_bounds;
+    MeshBounds cone_bounds;
+    check("cube bounds are finite and nondegenerate", mesh_bounds(cube, cube_bounds));
+    check("cone bounds are finite and nondegenerate", mesh_bounds(cone, cone_bounds));
+    if (!mesh_bounds(cube, cube_bounds) || !mesh_bounds(cone, cone_bounds)) return false;
+
+    const sotc::DefaultShaderCase cube_shader =
+        asset_shader(cube_bounds, 0.74F, {1.0F, 0.0F, 0.0F, 1.0F});
+    const sotc::DefaultShaderCase cone_shader =
+        asset_shader(cone_bounds, 0.26F, {0.0F, 1.0F, 0.0F, 1.0F});
+    std::vector<sotc::AssetMeshDraw> draws = {
+        {cube.positions, cube.indices, cube_shader},
+        {cone.positions, cone.indices, cone_shader},
+    };
+
+    sotc::MetalAssetFrameResult baseline;
+    check("asset-derived harness Metal frame renders",
+          render_ok(renderer, draws, baseline, "asset-derived harness"));
+    if (!baseline.ok) return false;
+    check("asset-derived frame has RGBA readback and PNG",
+          baseline.width == kWidth && baseline.height == kHeight &&
+              baseline.stride == kWidth * 4 &&
+              baseline.rgba8.size() == static_cast<std::size_t>(baseline.stride) * kHeight &&
+              !baseline.png.empty());
+    if (baseline.png.empty() || !write_png(png_path, baseline.png)) {
+        check("asset-derived PNG written under local/", false);
+        return false;
+    }
+
+    const CpuMask cube_only = cpu_project(std::span(&draws[0], 1), true);
+    const CpuMask cone_only = cpu_project(std::span(&draws[1], 1), true);
+    const CpuMask expected = cpu_project(draws, true);
+    std::size_t overlap_pixels = 0;
+    for (std::size_t pixel = 0; pixel < cube_only.covered.size(); ++pixel) {
+        if (cube_only.covered[pixel] != 0 && cone_only.covered[pixel] != 0) ++overlap_pixels;
+    }
+    check("asset silhouettes overlap enough to exercise depth order", overlap_pixels > 100);
+    check("both parsed meshes cover pixels", cube_only.covered_count > 100 &&
+                                                   cone_only.covered_count > 100);
+
+    std::size_t silhouette_errors = 0;
+    mask_matches(baseline.rgba8, expected, silhouette_errors);
+    const std::size_t edge_allowance = (static_cast<std::size_t>(kWidth) + kHeight) * 2;
+    check("asset frame covered-pixel count and CPU silhouette match",
+          expected.covered_count > 1000 && silhouette_errors <= edge_allowance);
+    std::size_t depth_errors = 0;
+    fragment_classes_match(baseline.rgba8, expected, depth_errors);
+    check("asset frame depth selects the nearer parsed cone in overlap",
+          overlap_pixels > 100 && depth_errors == 0);
+
+    int min_x = static_cast<int>(kWidth);
+    int min_y = static_cast<int>(kHeight);
+    int max_x = -1;
+    int max_y = -1;
+    int projected_min_x = static_cast<int>(kWidth);
+    int projected_min_y = static_cast<int>(kHeight);
+    int projected_max_x = -1;
+    int projected_max_y = -1;
+    for (std::size_t pixel = 0; pixel < expected.covered.size(); ++pixel) {
+        if (expected.covered[pixel] == 0) continue;
+        const int x = static_cast<int>(pixel % kWidth);
+        const int y = static_cast<int>(pixel / kWidth);
+        projected_min_x = std::min(projected_min_x, x);
+        projected_max_x = std::max(projected_max_x, x);
+        projected_min_y = std::min(projected_min_y, y);
+        projected_max_y = std::max(projected_max_y, y);
+    }
+    for (std::uint32_t y = 0; y < kHeight; ++y) {
+        for (std::uint32_t x = 0; x < kWidth; ++x) {
+            const std::size_t pixel = (static_cast<std::size_t>(y) * kWidth + x) * 4;
+            if (baseline.rgba8[pixel] == 0 && baseline.rgba8[pixel + 1] == 0 &&
+                baseline.rgba8[pixel + 2] == 0) continue;
+            min_x = std::min(min_x, static_cast<int>(x));
+            max_x = std::max(max_x, static_cast<int>(x));
+            min_y = std::min(min_y, static_cast<int>(y));
+            max_y = std::max(max_y, static_cast<int>(y));
+        }
+    }
+    check("asset-rendered pixels stay inside the CPU-projected bounds",
+          min_x == projected_min_x && max_x == projected_max_x &&
+              min_y == projected_min_y && max_y == projected_max_y);
+
+    sotc::MetalAssetFrameResult repeated;
+    const bool repeated_ok = render_ok(renderer, draws, repeated, "asset-derived repeat");
+    check("asset-derived frame renders twice", repeated_ok);
+    if (repeated_ok) {
+        check("asset-derived RGBA and PNG are deterministic",
+              repeated.rgba8 == baseline.rgba8 && repeated.png == baseline.png);
+    }
+
+    const std::string baseline_hash = sha256_hex(baseline.png);
+    check("asset-derived PNG SHA-256 computed", !baseline_hash.empty());
+    std::printf("asset-derived harness frame: PNG=%s bytes=%zu sha256=%s; covered=%zu; overlap=%zu; "
+                "silhouette-errors=%zu; depth-errors=%zu\n",
+                png_path, baseline.png.size(), baseline_hash.c_str(), expected.covered_count,
+                overlap_pixels, silhouette_errors, depth_errors);
+
+    std::vector<sotc::CmshPosition> moved_cone_positions = cone.positions;
+    const std::size_t moved_vertex = cone.indices.front();
+    moved_cone_positions[moved_vertex].x += (cone_bounds.max_x - cone_bounds.min_x) * 0.12F;
+    std::vector<sotc::AssetMeshDraw> vertex_mutation = draws;
+    vertex_mutation[1].positions = moved_cone_positions;
+    sotc::MetalAssetFrameResult moved;
+    check("asset vertex mutation renders",
+          render_ok(renderer, vertex_mutation, moved, "asset vertex mutation"));
+    if (moved.ok) check("asset vertex mutation changes PNG hash",
+                        sha256_hex(moved.png) != baseline_hash);
+
+    bool index_mutation_visible = false;
+    std::size_t changed_index_slot = 0;
+    std::size_t changed_draw_index = 0;
+    std::uint16_t changed_index_from = 0;
+    std::uint16_t changed_index_to = 0;
+    std::size_t changed_cpu_pixels = 0;
+    std::size_t cpu_mutation_candidates = 0;
+    for (std::size_t draw_index = 0; draw_index < draws.size() && !index_mutation_visible;
+         ++draw_index) {
+        const sotc::CmshMesh& mesh = draw_index == 0 ? cube : cone;
+        const sotc::DefaultShaderCase& shader = draws[draw_index].shader;
+        std::vector<std::pair<std::size_t, std::size_t>> visible_triangles;
+        visible_triangles.reserve(mesh.indices.size() / 3);
+        for (std::size_t triangle = 0; triangle < mesh.indices.size() / 3; ++triangle) {
+            std::size_t visible_pixels = 0;
+            for (std::size_t pixel = 0; pixel < expected.front_draw.size(); ++pixel) {
+                if (expected.front_draw[pixel] == static_cast<int>(draw_index) &&
+                    expected.front_triangle[pixel] == static_cast<int>(triangle)) {
+                    ++visible_pixels;
+                }
+            }
+            if (visible_pixels != 0) visible_triangles.emplace_back(visible_pixels, triangle);
+        }
+        std::sort(visible_triangles.begin(), visible_triangles.end(),
+                  [](const auto& left, const auto& right) { return left.first > right.first; });
+
+        const std::size_t triangle_probe_count =
+            std::min<std::size_t>(8, visible_triangles.size());
+        for (std::size_t probe = 0; probe < triangle_probe_count && !index_mutation_visible;
+             ++probe) {
+            const std::size_t triangle = visible_triangles[probe].second;
+            for (std::size_t corner = 0; corner < 3 && !index_mutation_visible; ++corner) {
+                const std::size_t slot = triangle * 3 + corner;
+                const std::uint16_t original = mesh.indices[slot];
+                const Point3 source = transform_position(shader, mesh.positions[original]);
+                std::vector<std::pair<double, std::uint16_t>> distant_vertices;
+                distant_vertices.reserve(mesh.positions.size());
+                for (std::size_t vertex = 0; vertex < mesh.positions.size() &&
+                                             vertex <= std::numeric_limits<std::uint16_t>::max();
+                     ++vertex) {
+                    const auto index = static_cast<std::uint16_t>(vertex);
+                    if (index == original || index == mesh.indices[triangle * 3 + (corner + 1) % 3] ||
+                        index == mesh.indices[triangle * 3 + (corner + 2) % 3]) {
+                        continue;
+                    }
+                    const Point3 projected = transform_position(shader, mesh.positions[vertex]);
+                    const double dx = projected.x - source.x;
+                    const double dy = projected.y - source.y;
+                    distant_vertices.emplace_back(dx * dx + dy * dy, index);
+                }
+                std::sort(distant_vertices.begin(), distant_vertices.end(),
+                          [](const auto& left, const auto& right) {
+                              return left.first > right.first;
+                          });
+                const std::size_t candidate_count =
+                    std::min<std::size_t>(4, distant_vertices.size());
+                for (std::size_t candidate = 0; candidate < candidate_count &&
+                                                !index_mutation_visible; ++candidate) {
+                    const std::uint16_t replacement = distant_vertices[candidate].second;
+                    std::vector<std::uint16_t> changed_indices = mesh.indices;
+                    changed_indices[slot] = replacement;
+                    std::vector<sotc::AssetMeshDraw> index_mutation = draws;
+                    index_mutation[draw_index].indices = changed_indices;
+                    const CpuMask candidate_projection = cpu_project(index_mutation, true);
+                    std::size_t cpu_delta = 0;
+                    for (std::size_t pixel = 0; pixel < expected.covered.size(); ++pixel) {
+                        if (expected.covered[pixel] != candidate_projection.covered[pixel] ||
+                            expected.front_draw[pixel] != candidate_projection.front_draw[pixel]) {
+                            ++cpu_delta;
+                        }
+                    }
+                    if (cpu_delta == 0) continue;
+                    ++cpu_mutation_candidates;
+
+                    sotc::MetalAssetFrameResult changed;
+                    if (render_ok(renderer, index_mutation, changed, "asset index mutation")) {
+                        index_mutation_visible = sha256_hex(changed.png) != baseline_hash;
+                        if (index_mutation_visible) {
+                            changed_draw_index = draw_index;
+                            changed_index_slot = slot;
+                            changed_index_from = original;
+                            changed_index_to = replacement;
+                            changed_cpu_pixels = cpu_delta;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (index_mutation_visible) {
+        std::printf("asset index mutation: draw=%zu slot=%zu from=%u to=%u; CPU pixels changed=%zu\n",
+                    changed_draw_index, changed_index_slot,
+                    static_cast<unsigned>(changed_index_from), static_cast<unsigned>(changed_index_to),
+                    changed_cpu_pixels);
+    } else {
+        std::printf("asset index mutation search: CPU-visible candidates=%zu\n",
+                    cpu_mutation_candidates);
+    }
+    check("asset index mutation changes PNG hash", index_mutation_visible);
+
+    std::vector<sotc::AssetMeshDraw> constant_mutation = draws;
+    constant_mutation[1].shader.material[1] = 0.35F;
+    sotc::MetalAssetFrameResult changed_constant;
+    check("asset shader-constant mutation renders",
+          render_ok(renderer, constant_mutation, changed_constant, "asset shader constant mutation"));
+    if (changed_constant.ok) check("asset shader-constant mutation changes PNG hash",
+                                   sha256_hex(changed_constant.png) != baseline_hash);
+
+    return failures == 0;
+}
+
 }  // namespace
 
-int main() {
+int main(int argc, char** argv) {
+    const bool asset_derived_mode = argc == 5 && std::string_view(argv[1]) == "--asset-derived";
+    if (argc != 1 && !asset_derived_mode) {
+        std::fprintf(stderr, "usage: %s [--asset-derived CUBE_CMSH CONE_CMSH OUTPUT_PNG]\n", argv[0]);
+        return 2;
+    }
     std::string msl_source;
     const char* msl_path = std::getenv("SOTC_DEFAULT_PAIR_MSL");
     if (!load_text(msl_path, msl_source)) {
@@ -339,6 +700,15 @@ int main() {
         }
         std::fprintf(stderr, "FAIL MetalAssetFrameRenderer::create: %s\n", error.c_str());
         return 1;
+    }
+
+    if (asset_derived_mode) {
+        if (!run_asset_derived_frame(*renderer, argv[2], argv[3], argv[4])) {
+            std::fprintf(stderr, "asset-derived harness checks: FAILED (%d)\n", failures);
+            return 1;
+        }
+        std::puts("asset-derived harness checks: PASSED (raw game meshes through native parser and direct Metal; no game frame)");
+        return 0;
     }
 
     std::vector<sotc::CmshPosition> back_positions = make_back_quad();

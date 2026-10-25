@@ -1,5 +1,362 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 03:15 CDT — PR #5 merged; root integration branch remains
+
+- Integrator: Codex `/root`; task `INT-OPEN-PRS-1-2-3-5-01` remains ACTIVE until the root integration
+  branch is published and merged. PR #5 merged normally at `2026-10-25T08:14:28Z` from exact head
+  `6b10496e4a0ff36f3b80b78e7c44cd43391d77c8`; merge commit is
+  `a1f21e62fe25294ac70d6753be7ab18322d7a169`. `git fetch origin main` and `git ls-remote` confirm
+  `origin/main` at that SHA. No pull requests are currently open.
+- Root branch `codex/merge-all-open-changes` is at `cbb7a54` plus pending local docs and one private
+  Metal harness test change. Its GPU-03 asset-frame attempt reached three failed index-mutation
+  hypotheses and is `NEEDS_PRINCIPAL`; preserve the failing acceptance check and private reproducer,
+  and do not resume that task. GPU evidence is renumbered E639 because merged PR #5 now owns E638.
+- Next exact action: commit the allowlisted root integration changes under Johnny Wang, merge the
+  latest main into this branch, rerun the publication gates, publish a PR, and merge it. Then switch
+  the workspace to `main` and delete local/remote `codex/merge-all-open-changes`. The code and game
+  gates remain fixture-only / PARTIAL; no boot, audio, or save claim.
+
+## 2026-10-25 02:56 CDT — PR #2 merged to current main
+
+- Integrator: Codex `/root`; task `INT-OPEN-PRS-1-2-3-5-01` remains ACTIVE. PR #2 was marked ready
+  and merged through GitHub with exact head `f19251df002a94195e23c2f1755441e6772d91cc` using
+  `gh pr merge 2 --match-head-commit f19251df002a94195e23c2f1755441e6772d91cc --merge`; exit 0.
+  GitHub reports MERGED at `2026-10-25T07:56:01Z`, merge commit
+  `92f2d5c7660daf8581997370a9290c5ec34acd0e`. `git fetch origin main` and `git ls-remote origin
+  refs/heads/main` both confirm current main at this SHA.
+- The PR branch was reconciled through merge commits `d560bd1` (main `8bd3d10`) and `f19251d`
+  (main `271e656`). Current diff was six intended paths (158 insertions / 25 deletions); tests on the
+  latest-main candidate: architecture 7/7, CoreLocator 14/14, AssetValidator 11/11, full launcher
+  153 tests / 20 suites with one opt-in protocol test skipped. Publish audits accepted 8 staged and
+  2,756 total paths. Attribution had no Claude/Anthropic trailer. No GitHub checks/review decision
+  were listed.
+- Main now advanced from `271e656` to `92f2d5c`. PR #5 head `25bfcfe` and the independent E28 checker
+  candidate based at `271e656` need refresh against `92f2d5c`. PR #5's two reviewed fixes are present
+  only in `/tmp/sotc-pr5-fix`; focused allocator tests pass 2/2, including exact two-free-slot and
+  preoccupied-table retry cases. A fresh full CTest/checker run is still required after those final
+  test additions. E28 checker parity is split into its own small PR candidate.
+- Files changed in this checkpoint: `HANDOFF.md`, `docs/TASKS.md` locally; main contains PR #2. No
+  dependency change. Next exact action: update the E28 checker branch and PR #5 branch with latest
+  main, run final gates, refresh PR descriptions, merge through PRs, then integrate the root branch.
+  PR #2 complete; overall integration remains ACTIVE, attempt count 0.
+
+## 2026-10-25 02:50 CDT — PR #1 merged to current main
+
+- Integrator: Codex `/root`; task `INT-OPEN-PRS-1-2-3-5-01` remains ACTIVE. PR #1 was refreshed on
+  latest main, marked ready, and merged with exact expected head
+  `815c6e3d9b08c0145ed64cc96e63fcf3df8527d8` using
+  `gh pr merge 1 --match-head-commit 815c6e3d9b08c0145ed64cc96e63fcf3df8527d8 --merge`; exit 0.
+  GitHub reports MERGED at `2026-10-25T07:50:51Z`, merge commit
+  `271e656474cf54a84d7d68d0474ba861d1706168`. `git fetch origin main` and `git ls-remote origin
+  refs/heads/main` both confirm that exact current main SHA.
+- PR #1 diff was four intended files (test, TASKS, EVIDENCE, checkpoint), 118 insertions. Focused
+  Swift tests 4/4; full launcher 152 tests / 20 suites with the opt-in core-protocol test skipped;
+  diff and path audits passed. `python3 -I scripts/check_commit_attribution.py --range
+  origin/main..HEAD` passed on the candidate; commits were authored under Johnny Wang without
+  Claude/Anthropic attribution. GitHub had no attached checks or review decision.
+- Current main advanced from `8bd3d10` to `271e656`; PR #2 head `d560bd1` and PR #5 head `25bfcfe`
+  now need another merge of latest main before either can be merged. The PR #5 P2 fixes are in its
+  isolated candidate only and pass focused tests; full CTest is 396 passed / 1 opt-in asset test
+  skipped, and lift checkers are 481/0/0 with the separately scoped E28 case temporarily present.
+- Files changed in this checkpoint: `HANDOFF.md`, `docs/TASKS.md` locally; GitHub main contains PR
+  #1. No dependency change. Next exact action: merge current main into PR #2 and PR #5 candidates,
+  preserve their branch ancestry, re-run focused gates and refresh PR summaries; decide the separate
+  E28 checker fixture before final PR #5 gates. PR #1 complete; overall integration task ACTIVE,
+  attempt count 0.
+
+## 2026-10-25 02:45 CDT — PR #2 conflict resolved against current main
+
+- Integrator: Codex `/root`; task `INT-OPEN-PRS-1-2-3-5-01` remains ACTIVE. `origin/main` is still
+  `8bd3d101a497db42f032829067b995657f046011`.
+- Isolated candidate `/tmp/sotc-pr2-integration` had PR branch
+  `a1791381bf20cc53af3bbf7dbaf6aea34599d642` merged with latest main, no unresolved paths. Created
+  merge-only commit `d560bd182efbc3b2de515cf721165de9661833fe` as Johnny Wang
+  (`dehydratedflask@users.noreply.github.com`) using
+  `git -c user.name='Johnny Wang' -c user.email='dehydratedflask@users.noreply.github.com' commit -m 'merge: reconcile launcher PR with current main'`; exit 0. Pushed with
+  `git push origin HEAD:refs/heads/cursor/app-honesty-next-5d26`; exit 0. No Claude/Anthropic
+  contributor trailer was added.
+- Live PR #2 is OPEN, base `8bd3d10`, head `d560bd1`, `MERGEABLE` / `CLEAN`, no review decision or
+  GitHub checks listed. The candidate retains exactly six intended paths (152 insertions, 25
+  deletions): evidence/task/checkpoint plus `CoreLocator.swift`, `SystemChecks.swift`, and the
+  architecture tests. Architecture tests 7/7, CoreLocator 14/14, AssetValidator 11/11, full launcher
+  suite 149 tests / 19 suites. Staged/full publish audits accepted 925/2,754 paths; attribution passed.
+  Logs: `/private/tmp/sotc-pr2-integration/local/orchestrator/pr2-main-integration/`.
+- `trail build --check` reports `NO GRAPH` in the isolated candidate; source graph availability is
+  the only recorded candidate limitation. No dependency changed. Because PR #1 also updates shared
+  docs, merge ordering is deferred until its refreshed candidate is ready, then recheck PR #2's
+  base/head and diff before merge.
+- Files changed in this checkpoint: `HANDOFF.md`, `docs/TASKS.md`; remote PR branch changed by the
+  merge-only commit. Next exact action: review refreshed PR #1 candidate, merge it if clean, then
+  merge PR #2 after a current-head check. PR #2 conflict gate is resolved; task remains ACTIVE,
+  attempt count 0.
+
+## 2026-10-25 02:41 CDT — PR #5 conflict resolved against current main
+
+- Integrator: Codex `/root`; task `INT-OPEN-PRS-1-2-3-5-01` remains ACTIVE. Latest verified
+  `origin/main` is `8bd3d101a497db42f032829067b995657f046011`.
+- In isolated candidate `/tmp/sotc-pr5-fix`, created merge-only commit
+  `25bfcfe68b091de9c6b83b4bf3e025fd56a00d4e` under Johnny Wang
+  (`dehydratedflask@users.noreply.github.com`) with exact command
+  `git -c user.name='Johnny Wang' -c user.email='dehydratedflask@users.noreply.github.com' commit -m 'merge: reconcile allocator PR with current main'`; exit 0.
+  Pushed with `git push origin HEAD:refs/heads/cursor/heap-depth-5d26`; exit 0. No Claude or
+  Anthropic trailer was added. The commit has parents PR tip `545003f8f7089bab478e8e6aa7064a86527e67cd`
+  and current `main` `8bd3d101a497db42f032829067b995657f046011`.
+- Live `gh pr view 5 --json state,headRefOid,baseRefOid,mergeable,mergeStateStatus,...` reports
+  OPEN, head `25bfcfe`, base `8bd3d10`, `MERGEABLE` / `CLEAN`, no review decision and no checks
+  listed. Remote refs confirmed by `git ls-remote origin`; conflict gate is resolved. PR body still
+  has stale base/tip text and needs refresh after the reviewed code fixes and final gate results.
+- Only the merge tree was committed; isolated candidate source followups remain unstaged. Review
+  found two P2 correctness issues in allocator bootstrap retry handling and configurable heap
+  quantum enforcement, plus a one-line E28 checker case outside PR #5 scope. No fix was applied yet;
+  a bundled approach question is pending with the owner. Earlier candidate verification remains
+  limited to its recorded results and is not a verification of this merge commit.
+- Files changed in this checkpoint: `HANDOFF.md`, `docs/TASKS.md`. No dependency change. Evidence:
+  live PR #5 URL `https://github.com/DehydratedFlask/SotC-Mac-Port/pull/5`; merge commit above.
+- Next exact action: apply the owner-selected fixes to the PR #5 candidate, separate the unrelated
+  E28 checker case if still out of scope, rerun the full publication gates, refresh the PR summary,
+  then merge only after reviewing the exact current head. Status: conflict resolved; PR #5 remains
+  open pending code fixes/review and final verification; attempt count for those fixes is 0.
+
+## 2026-10-25 02:34 CDT — GPU-03 index-mutation gate escalated after try 3
+
+- Integrator: Codex `/root`; task `GPU-03-RENDEROPS-ASSET-FRAME-01` is now `NEEDS_PRINCIPAL` after
+  three distinct failed index-mutation selection hypotheses. Per `AGENTS.md`, no fourth try is
+  authorized automatically; the full test gate remains failed and task work stops here.
+- Exact latest command: the `MTL_DEBUG_LAYER=1`, `MTL_SHADER_VALIDATION=1` reproducer in
+  `docs/escalations/GPU-03-RENDEROPS-ASSET-FRAME-01.md` — exit 1; the index check failed with
+  `asset index mutation search: CPU-visible candidates=0`. Log
+  `local/validation/gpu03-r31/asset-derived-frame.log` records try 3. Output PNG remains private at
+  `local/validation/gpu03-r31/asset-derived-cube-cone.png`.
+- Verified positive results: raw member sizes/hashes match E637; `parse_cmsh_mesh` returns cube 24/36
+  and cone 42/114 position/index counts; baseline Metal validation enabled with no fault reported;
+  PNG SHA-256 `af42ca554f5d24a9f981fc92156dea50616c172af1faba12eef1ff0d4db0f645`; CPU silhouette and
+  depth-class errors 0; 6,584 overlapping pixels; vertex and material-constant mutations change the
+  image. The required index mutation did not pass. These observations are recorded as E639 only for
+  parser/baseline-artifact facts, not full task completion.
+- Failed attempts and precise repro details are in
+  `docs/escalations/GPU-03-RENDEROPS-ASSET-FRAME-01.md`; `docs/TASKS.md` is marked `NEEDS_PRINCIPAL`.
+  Files changed: `native/tests/test_metal_asset_frame.cpp`, `HANDOFF.md`, `docs/TASKS.md`,
+  `docs/EVIDENCE.md`, `docs/INDEX.md`, and the escalation file. No dependency or public game asset
+  changed. Raw inputs, build, PNG and validation log remain under ignored `local/`.
+- Independent work that continues: resolve the current GitHub PR conflict and reconcile PRs #1, #2,
+  and #5 with the current main, then publish the integration ledger via PR. Do not resume GPU-03 without
+  a principal reassessment recorded in its escalation.
+- Status: GPU-03 L1 incomplete / `NEEDS_PRINCIPAL`; baseline frame partial evidence recorded; overall G3
+  remains PARTIAL, not PASSED.
+
+## 2026-10-25 02:33 CDT — second GPU-03 index-mutation hypothesis failed
+
+- Integrator: Codex `/root`; `GPU-03-RENDEROPS-ASSET-FRAME-01` remains ACTIVE at attempt 2. The
+  existing raw parse, Metal frame, silhouette, overlap and depth evidence still passes.
+- Exact command: the `MTL_DEBUG_LAYER=1` / `MTL_SHADER_VALIDATION=1` asset-derived invocation recorded
+  at 02:31, with the rebuilt test binary; exit 1, only `asset index mutation changes PNG hash` failed.
+  Current log: `local/validation/gpu03-r31/asset-derived-frame.log`.
+- Failed hypothesis: choosing one of the eight cone triangles with the most CPU-visible pixels and
+  replacing a corner with one of four farthest projected vertices would change the private PNG. The
+  baseline remains SHA-256 `af42ca554f5d24a9f981fc92156dea50616c172af1faba12eef1ff0d4db0f645`, with CPU
+  silhouette errors 0, depth errors 0, and 6,584 overlap pixels. No Metal validation fault was
+  reported. The cause of the unchanged image remains unknown.
+- Files changed since prior checkpoint: `native/tests/test_metal_asset_frame.cpp`, `HANDOFF.md`,
+  `docs/TASKS.md`; no dependency or public asset change.
+- Remaining risk: index-mutation hash sensitivity has failed two distinct selection hypotheses. One
+  further task-level try remains before the escalation rule.
+- Next exact action: search the CPU-visible triangles of the exposed red cube draw, choose a corner
+  whose replacement with a distant valid cone/cube vertex changes the predicted front-draw mask, then
+  run one corresponding Metal draw and require the PNG hash to change. If no supported index mutation
+  passes after that try, stop GPU-03 index-mutation work and escalate per `AGENTS.md`.
+- Status: parser and baseline asset-derived Metal frame verified; index-mutation sub-gate FAILED twice;
+  task ACTIVE, 2 failed hypotheses.
+
+## 2026-10-25 02:31 CDT — GPU-03 raw mesh Metal probe exposed a mutation-selection miss
+
+- Integrator: Codex `/root`; task `GPU-03-RENDEROPS-ASSET-FRAME-01` remains ACTIVE at attempt 1
+  (one failed test-selection hypothesis). The test target rebuilt successfully after adding a private
+  `--asset-derived` mode to `native/tests/test_metal_asset_frame.cpp`.
+- Exact targeted command: `env MTL_DEBUG_LAYER=1 MTL_SHADER_VALIDATION=1
+  MTL_SHADER_VALIDATION_DEFAULT_STATE=all MTL_SHADER_VALIDATION_ENABLE_ERROR_REPORTING=1
+  MTL_SHADER_VALIDATION_REPORT_TO_STDERR=1 MTL_SHADER_VALIDATION_ABORT_ON_FAULT=1
+  SOTC_DEFAULT_PAIR_MSL=local/validation/gcn-default-root-v1/default-pair.metal
+  local/build/orch-r22/test_metal_asset_frame --asset-derived
+  local/orchestrator/gpu03-r31/asset-derived/cube_1m.cmsh
+  local/orchestrator/gpu03-r31/asset-derived/cone.cmsh
+  local/validation/gpu03-r31/asset-derived-cube-cone.png` — exit 1 because the first index-mutation
+  search (slots 0–11, replacement deltas 1–4) did not change the PNG hash. Log:
+  `local/validation/gpu03-r31/asset-derived-frame.log`.
+- Observations: both raw inputs passed pinned size/SHA checks and `parse_cmsh_mesh` (cube 24 positions /
+  36 indices; cone 42 / 114). Metal API and GPU validation enabled; no validation fault reported.
+  Baseline PNG SHA-256 `af42ca554f5d24a9f981fc92156dea50616c172af1faba12eef1ff0d4db0f645`; CPU silhouette
+  errors 0, depth-class errors 0, and projected overlap 6,584 pixels. The test failed only the
+  index-mutation check.
+- Failed hypothesis: changing one of the first 12 cone index slots to one of the next four vertex
+  indices would affect a visible pixel. It did not. Do not count the parser, frame, or Metal path as
+  failed; those checks passed. No evidence yet identifies whether those slots were hidden, equivalent,
+  or otherwise raster-invariant.
+- Files changed: `native/tests/test_metal_asset_frame.cpp`, `HANDOFF.md`, `docs/TASKS.md`. No dependency
+  or tracked asset changed; raw meshes, PNG, and log remain under ignored `local/`.
+- Next exact action: choose an index from a triangle with large CPU-projected area and replace one corner
+  with a distant in-range vertex; rerun the same Metal validation command and require a changed PNG
+  hash. After the three mutations pass, record E639 and update the GPU-03 task status without claiming
+  a game-driven frame or G3 PASS.
+- Status: raw member parse and baseline L1 frame are partially verified; mutation acceptance FAILED on
+  the first selection hypothesis; 1 failed try, no NEEDS_PRINCIPAL threshold yet.
+
+## 2026-10-25 02:25 CDT — PR #3 post-merge fixture correction merged
+
+- Integrator: Codex `/root`; task `INT-PR3-PUBLISH-PATH-REGRESSION-01` is complete after the owner-
+  authored follow-up PR #6 merged. Main is now `8bd3d101a497db42f032829067b995657f046011` (GitHub
+  merge commit for `codex/pr3-postmerge-fix`, head `94ed6ed1cdfbc6e27f4cd2cd5400ccc00c904ab8`).
+- The fix changes only three positive test paths in `scripts/test_audit_publish_paths.py` from exact
+  forbidden `reference`/`logs` components to lookalike names. It preserves the path-policy
+  implementation and allows the intended nested lookalikes.
+- Exact checks on branch `codex/pr3-postmerge-fix` at base `aee9b0e`: `python3 -I
+  scripts/test_audit_publish_paths.py` 12/12; `python3 -I scripts/test_psarc.py` 53/53;
+  `python3 -I scripts/audit_publish_paths.py --all` 2,753 paths; staged publish-path audit 1 path;
+  `git diff --check` passed; commit-range attribution passed. PR #6 had no GitHub checks attached and
+  was merged normally. Commit `94ed6ed` is Johnny Wang, with no Claude/Anthropic trailer.
+- Observation versus inference: the old PR3 positive fixtures failed against the existing policy;
+  after renaming only fixture path components, both Python suites pass. No production code changed.
+- Files changed for the follow-up: `scripts/test_audit_publish_paths.py` on PR #6; this root docs
+  branch now records the merge in `HANDOFF.md`, `docs/TASKS.md`, and a checkpoint file. No dependency
+  or game asset change.
+- Next exact action: merge latest `origin/main` (`8bd3d10`) into private PR #1 candidate `28df7ed`,
+  rerun all launcher and Python suites, refresh the PR body, mark ready, then merge PR #1. PR #2 and #5
+  remain open; PR #5 has two checker blockers. Afterwards reconcile this docs branch and return the
+  checkout to `main`, deleting `codex/merge-all-open-changes` only after its changes are merged.
+- Status: PR #6 MERGED; PR #3 regression fixed; PR #1 current-main refresh pending; overall integration
+  ACTIVE.
+
+## 2026-10-25 02:23 CDT — PR #3 post-merge test regression found
+
+- Integrator: Codex `/root`; task `INT-PR3-PUBLISH-PATH-REGRESSION-01` is ACTIVE at attempt 0. This
+  is a current-main regression found while refreshing PR #1; do not merge #1 until the merged-main
+  Python suite is green.
+- Exact current-main command: `python3 -I scripts/test_audit_publish_paths.py` on
+  `origin/main` `aee9b0e1e92a477389555a560d256a0dc62afaee` exited 1 (11/12 passed). The sole failure is
+  `test_nested_lookalike_names_still_allowed`, whose fixtures use `docs/reference/notes.md`,
+  `tools/logs/build-notes.txt`, and `scripts/reference/helpers.py`. The existing policy rejects exact
+  `reference` and `logs` path components at any depth, so these positive fixtures contradict the
+  current audit rule. `python3 -I scripts/test_psarc.py` passed 53/53 on the same main tip.
+- The proposed correction is test-only: rename those fixture components to `reference-notes`,
+  `logs-build`, and `references`, preserving both the forbidden-component policy and the intent to
+  allow lookalike names under allowlisted roots. The separate PR3 candidate has a tested local diff;
+  `scripts/test_audit_publish_paths.py` passed 12/12 there, but that diff is not on main.
+- Observation versus inference: the main-tip test failure and error messages are observed; the fixture
+  names are the mismatch. No production audit code change is indicated by the current evidence.
+- Files changed for this claim: `HANDOFF.md`, `docs/TASKS.md`; the hotfix branch has not yet been
+  created. No dependency change or source asset access.
+- Risk: amending the already-merged PR3 through an unrelated PR #1 branch would mix review scopes and
+  mask this regression; keep the one-file correction isolated in its own follow-up PR.
+- Next exact action: branch from live `origin/main`, apply only the three fixture-name corrections,
+  run PSARC and publish-path tests plus path/attribution audits, then push/merge the fix as Johnny Wang.
+  After that, update and test PR #1 against the new main tip, merge it, and later return this checkout
+  to `main` and delete the merged `codex/merge-all-open-changes` branch.
+- Status: `FAILED` current-main merged test (1/12); fix not yet applied; 0 failed implementation
+  hypotheses.
+
+## 2026-10-25 02:20 CDT — live main refreshed; PR #1 conflict candidate update pending
+
+- Integrator: Codex `/root`; the user directed us to resolve the GitHub PR conflict first, preserve
+  current evidence, then return the checkout to `main` and delete the merged working branch. Task
+  `INT-OPEN-PRS-1-2-3-5-01` remains ACTIVE at attempt 0.
+- Live GitHub state changed during this work: `git fetch origin` advanced `origin/main` from
+  `29b1305b4fd0d8fd82fc54c1a5b3cf35e0cab745` to `aee9b0e1e92a477389555a560d256a0dc62afaee`, a
+  GitHub merge commit for PR #3. PR #3 is now MERGED; it was merged externally during this turn. PR #1
+  was updated by pushing `26f7f99b67722af0c79d6c7e1f2f4a682996958e`, but this candidate was based on
+  the old main `29b1305`; do not mark #1 ready until current `origin/main` is merged into it and tested.
+- PR #1 candidate evidence on the old base: E393 was inserted after E392 without dropping E394–E636;
+  current diff was four intended files / 106 insertions. Full launcher suite: 152 tests in 20 suites;
+  focused `PlayBlockedSummaryTests` 4/4; publish-path audits 932 staged / 2,755 full. Native
+  configure/build succeeded, CTest 392/392, lift checkers 476 passed / 0 skipped / 0 failed, shader
+  lowerer 14/14 and inventory 23/23. These native checks ran before PR #3 advanced main; its diff only
+  changed Python tests, which are being rerun against the live tip.
+- Attribution: the whole-history audit first flagged inherited commit `f6604a86e60e`
+  (`orchestrator <orchestrator@local>`). The unpublished `origin/main..HEAD` range passed after the
+  PR #1 merge commit: both commits are by Johnny Wang and contain no Claude/Anthropic trailer. Do not
+  rewrite inherited main history.
+- A candidate-local `python3 scripts/project_index.py` unexpectedly reported 3,629 folders and changed
+  the candidate's generated `docs/FOLDERS.md`; I restored that worktree copy, leaving its staged
+  merged-main file intact. Running the required command from this repository root reported 13,937
+  folders and made no tracked `docs/FOLDERS.md` change.
+- GPU-03 private asset import also completed: `python3 -I
+  local/orchestrator/gpu03-r31/asset-derived/import_raw_cmsh.py` used `Psarc.entry_index` and
+  `Psarc.read` for exact MD5(path)-mapped members. `cube_1m` entry 31789 is 850 B, SHA-256
+  `44738dbf663af252898bad5582f2b48f1aadf6fbaab403c20880410b79a380b7`; `cone` entry 5574 is 1,462 B,
+  SHA-256 `5456afadabe96b9f7f02c503dc0ed5410652ccd32601c19e8aeeaaf36c88600c`. Outputs remain under
+  `local/orchestrator/gpu03-r31/asset-derived/`; they have not yet been parsed or rendered.
+- Files changed on this docs branch: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`,
+  and `docs/checkpoints/2026-10-25-gpu03-raw-cmsh-import.md`; private importer and raw mesh files are
+  ignored under `local/`. No source asset was changed and no dependency was installed.
+- Remaining risks: PR #1 must be retested on current main; PR #2 still has CoreLocator rejection-copy
+  failures; PR #5 has unresolved checker failures; PR #3's merged tests must be run at current main.
+  Asset parsing and Metal rendering remain NOT RUN; L1 does not imply a game frame or G3 PASS.
+- Next exact action: merge new `origin/main` into the private PR #1 candidate, rerun focused/full
+  launcher and path checks, refresh the PR description, then merge #1 through GitHub. Reconcile the
+  remaining PRs and this docs branch. Switch the checkout to `main` and delete
+  `codex/merge-all-open-changes` only after its changes are merged.
+- Status: PR #3 MERGED; PR #1 update pushed but stale-base refresh pending; GPU-03 import
+  `ARTIFACT_VERIFIED`; integration ACTIVE.
+
+## 2026-10-25 02:20 CDT — GPU-03 raw asset inputs located
+
+- Integrator: Codex `/root`; task `GPU-03-RENDEROPS-ASSET-FRAME-01` remains ACTIVE at attempt 0.
+  Root continues its already-claimed L1 Metal work while isolated agents reconcile PRs #1, #3, and #5.
+- Exact commands: `rg --files --hidden --no-ignore local/extracted | rg 'pak0|cachedFiles|\\.psarc$|\\.cmsh$'`
+  (exit 0; private `pak0.psarc` and `cachedFiles.psarc` are present);
+  `graft ask "Metal asset frame test seam: construct AssetMeshDraw, invoke direct Metal, and persist PNG privately" --source --in native/`
+  (exit 0; found the existing `MetalAssetFrameRenderer`/PNG seam); `git status --short --branch`
+  (only the integration claim docs are modified).
+- Source evidence: `docs/METAL_FRAME_PATH.md` section 4.6 pins cachedFiles
+  `coredata/enginesupport/models/_cmn/cube_1m.cmsh` (850 B,
+  `44738dbf663af252898bad5582f2b48f1aadf6fbaab403c20880410b79a380b7`) and pak0
+  `coredata/enginesupport/models/_cmn/cone.cmsh` (1,462 B,
+  `5456afadabe96b9f7f02c503dc0ed5410652ccd32601c19e8aeeaaf36c88600c`). The documented `Psarc`
+  API exposes exact-path `entry_index`, which uses the corrected MD5(path) pairing; the native parser
+  and existing direct-Metal renderer seam are already in the active source tree.
+- Owner directions applied: the identified raw `.cmsh` members may be read into the private parser /
+  Metal harness; use the explicit harness normal `[0.5, 0.5, 1.0]`; write the resulting PNG directly
+  under `local/`; do not pass it through `attach_screenshot` or assign an engine frame number.
+- Observation versus inference: both archives are present under `local/extracted/CUSA08809/`; the
+  expected file sizes/digests/counts are documented probes, not yet rechecked against newly imported
+  bytes. No raw member has yet been written or parsed, and no asset-derived render has run.
+- Files changed at this checkpoint: `HANDOFF.md` only; no code, source assets, dependencies, or
+  generated outputs changed.
+- Remaining risks: the parser's real-member format/marker assumptions must match both raw members;
+  CPU pixel assertions and Metal validation may reveal render/coordinate issues. This work can only
+  establish L1 asset-derived harness evidence; G3 stays PARTIAL.
+- Next exact action: use `Psarc.entry_index` + `Psarc.read` to import the two named raw members into
+  `local/orchestrator/gpu03-r31/asset-derived/`, verify size and SHA-256, then feed those bytes to
+  `parse_cmsh_mesh` and the test renderer with visible failure on any import/parse mismatch.
+- Status: input discovery `ARTIFACT_VERIFIED`; GPU-03 L1 still ACTIVE; 0 failed hypotheses.
+
+## 2026-10-25 02:13 CDT — open PR integration claimed
+
+- Integrator: Codex `/root`; task `INT-OPEN-PRS-1-2-3-5-01` is ACTIVE at attempt 0. The owner
+  explicitly authorized merging all reviewable changes to GitHub `main`; publication will use PRs,
+  with no direct push to `main`.
+- Exact preflight commands: `git fetch origin` (exit 0); `gh pr list --state open --json
+  number,title,headRefName,headRefOid,baseRefName,isDraft,mergeStateStatus,url` (exit 0; open #1, #2,
+  #3, #5); `git status --short --branch && git log -1 --oneline && git remote -v` (clean on
+  `codex/merge-all-open-changes` at `cbb7a54`, origin points to the authorized GitHub repo).
+- Evidence/logs: PR #1 preflight Swift tests passed 4/4 at
+  `local/orchestrator/github-merge-all/pr1-current-branch.log`; full PR/worktree review is pending.
+  PR #4 is already merged at main `29b1305`. Orphan history audit found both parallel-foundations
+  refs patch-equivalent to PR4/main except for one WIP bookkeeping/comment-only commit; their raw
+  histories are not merge candidates.
+- Observation versus inference: the open PR list and fetched refs are live state. PR1's changed test
+  and evidence are the only candidate changes reported so far; PR2 has a compatibility/test issue on
+  merged main; PR3 has fixtures that conflict with current path policy; PR5 requires attempt-2
+  allocator fixes and full revalidation. No additional PR is ready to merge based on these interim
+  observations.
+- Files changed for this claim: `HANDOFF.md`, `docs/TASKS.md`; no source code or dependencies.
+- Risks: candidate tests may expose additional main-branch regressions; each PR must retain current
+  evidence numbering, pass applicable tests and publication/attribution audits, and contain no
+  Claude/Anthropic coauthor trailer. Asset/game data must remain private.
+- Next exact action: reconcile #1, #2, #3, and #5 in isolated worktrees against current `origin/main`,
+  run their covering and required full checks, then commit/push only allowlisted branch updates as
+  Johnny Wang and merge each reviewed PR. Publish this checkpoint branch through a PR after the
+  integration results are recorded.
+- Status: ACTIVE / root; 0 failed implementation hypotheses.
+
 ## 2026-10-25 02:05 CDT — PR #4 merged to main
 
 - Integrator: Codex `/root`; GitHub repository `DehydratedFlask/SotC-Mac-Port`. PR #4 was refreshed

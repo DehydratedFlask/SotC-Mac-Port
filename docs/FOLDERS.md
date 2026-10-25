@@ -12,8 +12,8 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `Shadow of the Colossus` | 2 | Original user game inputs; read-only and private |
 | `docs` | 18 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/.cache` | 0 | Plans, task/evidence registries, checkpoint and escalation documentation |
-| `docs/checkpoints` | 723 | Plans, task/evidence registries, checkpoint and escalation documentation |
-| `docs/escalations` | 5 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs/checkpoints` | 724 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs/escalations` | 6 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/schemas` | 1 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `graft` | 1 | Regenerable source graph; internal cache directories summarized |
 | `launcher` | 2 | Native Swift macOS launcher |
