@@ -1,5 +1,65 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 04:53 CDT — task-claim publication gates pass
+
+- Integrator: Codex `/root`; `GPU-03-LOGO-PNG-TEXTURE-SAMPLE-01` remains **ACTIVE**, attempt 0,
+  with documentation only changed. No new task implementation hypothesis has been tried.
+- Exact successful gates: `cmake -S native -B local/build/orch-r22` and
+  `cmake --build local/build/orch-r22 -j 12` exited 0; full CTest exited 0, 397/397 passed, with
+  the private logo MSL replay enabled using absolute `SOTC_LOGO_PS_MSL` and `SOTC_LOGO_PS_PNG`
+  paths; `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` passed 481, skipped
+  0, failed 0; `python3 scripts/project_index.py` indexed 19,590 folders; `trail build --check`
+  passed with the 8,522-node graph in sync; staged/all path audits passed 3/2,788 paths; and
+  `git diff --cached --check` passed. Private logs are under
+  `local/validation/gpu03-logo-png-texture-20261025/docs-{configure,build,full-ctest,lift-checkers,project-index,trail-check,path-audit-staged,path-audit-all}.log`.
+- One initial full CTest invocation exited 8 with 396/397 passing because the optional shader MSL
+  path was relative to the repo rather than the CTest working directory. This was recorded in the
+  preceding task-claim entry; rerunning with absolute local paths passed all 397 tests. No source
+  change was made to address it.
+- Next exact action: commit the three allowlisted docs files on `main`, run the unpublished-range
+  attribution audit, then push under Johnny Wang's identity and verify `main == origin/main`. Keep
+  the local asset importer, generated images, and logs ignored.
+
+## 2026-10-25 04:52 CDT — GPU-03 logo PNG texture fixture claimed on main
+
+- Integrator: Codex `/root`; checkout stays on `main`. Starting code head is
+  `565e57efba2602dc65279ac16d5f91839f175356`, equal to `origin/main` before these documentation
+  edits. PRs #1–#12 are merged and `gh pr list --state open` returned `[]`.
+- The user-requested PR #4 branch cleanup is complete: GitHub reports PR #4 `MERGED` into `main` at
+  `29b1305b4fd0d8fd82fc54c1a5b3cf35e0cab745`; `cursor/init-hash-551140-9dfc` is an ancestor of
+  `main` (`git rev-list --left-right --count` = `0 45`), and both local and remote branch refs have
+  been deleted. No worktree was attached to that branch.
+- Claimed bounded task `GPU-03-LOGO-PNG-TEXTURE-SAMPLE-01`, status **ACTIVE**, attempt 0. Input is
+  the already hash-pinned plain PNG member `pakN misc/boot/_ps4/saveshadow_scee.ctxr` (24,636 B,
+  228x128, RGB, SHA-256
+  `b4b135232304ab696785353b6ba96f874fc4bcfd8805e56b931119e415a300f5`). Import only by the
+  documented exact PSARC `MD5(path)` lookup into ignored `local/`; decode to test-only RGBA8 via
+  ImageIO, then sample it with the digest-gated logo PS MSL and the existing slot-0 Metal harness
+  using synthetic geometry, coordinates and sampler state. Compare selected texel-center readback
+  against an independent CPU oracle, require deterministic repeat and a visible copied-texel
+  mutation, enable Metal API/GPU validation, and write PNG/log evidence directly under `local/`.
+- Scope excludes retail texture/descriptor/UV/orientation semantics, AMD WQM/Metal helper-lane
+  equivalence, `attach_screenshot`/engine frame numbers, a game-driven frame, and G3/boot/audio/save
+  claims. The real asset bytes and all generated outputs stay private. The user selected direct PNG
+  output and previously approved use of documented local asset imports.
+- Documentation files changed for this claim: `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`;
+  no source files or private inputs have been changed or staged. Reconciliation updates E652 and adds
+  E653 for the verified merged-PR and branch-cleanup state.
+- Exact pre-edit checks: `git fetch origin` exited 0; `git status --short --branch` showed only the
+  three pending documentation edits; `gh pr list --state open --json number,state,headRefName
+  --limit 50` returned `[]`; `gh pr view 4 --json state,mergedAt,headRefName,baseRefName,mergeCommit`
+  returned `MERGED`, base `main`, merge time `2026-10-25T07:04:42Z`; the branch-ancestry check
+  returned `0 45`. `git push origin --delete cursor/init-hash-551140-9dfc` and
+  `git branch -d cursor/init-hash-551140-9dfc` both succeeded. Evidence is the live GitHub response
+  and git output in this session; validation results are recorded in the following checkpoint.
+- First publication-gate run: `SOTC_LOGO_PS_MSL=local/validation/gpu02-logo-ps-image-sample-20261025/logo-ps.metal SOTC_LOGO_PS_PNG=local/validation/gpu02-logo-ps-image-sample-20261025/logo-ps-final.png ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure` exited 8 (396/397 passed); `metal_texture_binding` could not read the MSL because CTest resolves this environment path from its build working directory. No source changed and no shader-semantic hypothesis failed. Rerun the same suite with absolute private-input paths.
+- Graft `ask` located the existing slot-0 texture renderer and private logo MSL replay; it reported
+  approximately 36,527 saved tokens. Exact next action: finish the documentation claim commit on
+  `main`, then implement the private PNG import/decode fixture and extend
+  `native/tests/test_metal_texture_binding.cpp`; run focused Metal validation followed by the
+  repository verification gates. Commit/push only allowlisted files as Johnny Wang, with no Claude
+  or Anthropic coauthor.
+
 ## 2026-10-25 04:39 CDT — GPU-03 L1 fixture published to GitHub main
 
 - Integrator: Codex `/root`; task `GPU-03-RENDEROPS-ASSET-FRAME-01` is **FIXTURE_VERIFIED** for
@@ -9,8 +69,9 @@
   `git diff --cached --check` passed, and `python3 -I scripts/check_commit_attribution.py` passed for
   `origin/main..HEAD` before push. The pushed commit's author and committer are Johnny Wang
   (`dehydratedflask@users.noreply.github.com`); no Claude/Anthropic coauthor trailer exists.
-- Post-push `git fetch origin main` confirmed `HEAD == origin/main ==
-  0f67022cea442727326af7b675942929add1f4c0`; `git status --short --branch` is clean on `main`.
+- Documentation closeout `565e57efba2602dc65279ac16d5f91839f175356` was then pushed to `main`;
+  the latest `git fetch origin main` confirmed `HEAD == origin/main ==
+  565e57efba2602dc65279ac16d5f91839f175356`, and `git status --short --branch` is clean on `main`.
 - Full validation remains as recorded below and in E649/E650: CTest 397/397, lift checkers 481/0/0,
   Trail 8,522 nodes / 11,526 edges and in sync, project index 19,589 folders. No private assets,
   generated MSL, PNG, or logs were committed. G3 remains PARTIAL; no game-driven frame, boot, audio,
