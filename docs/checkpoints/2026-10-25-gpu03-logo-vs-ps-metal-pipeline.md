@@ -31,3 +31,7 @@
 - Exact next action: implement the hash/ABI-gated `logo-pair` generator and add the opt-in Metal
   quad/texture oracle test. Then run focused checks followed by every publication gate in `AGENTS.md`.
 - Status: **ACTIVE**, attempt 0, zero failed hypotheses.
+- Publication: commit `478163c32c2f7f4b099d46189f17fb468703d3c7` is on GitHub `main`; post-push fetch
+  confirmed matching `origin/main`, clean `main`, and no open PRs. The staged/all path audits passed
+  8/2,795 and owner-only attribution passed. See E666 for full gates. This publication adds no
+  implementation or runtime evidence.

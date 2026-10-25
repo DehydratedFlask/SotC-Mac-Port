@@ -1,5 +1,19 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 09:44 CDT — task claim and owner decision published
+
+- Integrator: Codex `/root`; commit `478163c32c2f7f4b099d46189f17fb468703d3c7` was pushed directly
+  to GitHub `main`. Post-push fetch confirms `HEAD == origin/main`; worktree clean on `main`; no open
+  PRs. Author and committer are Johnny Wang; no assistant contributor trailer.
+- Publication checks passed: staged/all-path audits **8/2,795**, attribution audit, cached diff check,
+  CMake configure/build, CTest **397/397**, lift checkers **481/0/0**, project index **19,592
+  folders**, and Trail wiring graph check **8,546 nodes**. Logs are under
+  `local/validation/gpu03-logo-vs-ps-pipeline-20261025/`.
+- This publishes the active logo pipeline task claim and the owner's decision to defer the 0x8C
+  decoder. No shader implementation or runtime claim is included. Exact next action: start separate
+  generator and Metal-test implementation lanes on this `main` checkout; workers do not commit/push.
+- Status: publication **VERIFIED**; `GPU-03-LOGO-VS-PS-METAL-PIPELINE-01` remains ACTIVE, attempt 0.
+
 ## 2026-10-25 09:40 CDT — 0x8C decoder deferred by owner
 
 - Integrator: Codex `/root`; the user selected “defer 0x8C; continue with raw assets only.”
