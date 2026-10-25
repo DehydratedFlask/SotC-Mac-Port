@@ -35,3 +35,11 @@
 - Exact next action: implement the opt-in raw-mesh/pinned-PNG composed-pair case with canonical
   distinct path checks, run the focused `metal_texture_binding` CTest with its exact local inputs,
   and report outputs/hashes under `local/validation/gpu03-logo-vs-ps-raw-cmsh-20261025/`.
+
+## 2026-10-25 10:19 CDT — claim published
+
+- Commit `e2faefcd64de171d2890a1da2dd319afde9bd2c5` pushed directly to GitHub `main`; post-push
+  fetch verified `HEAD == origin/main`, clean `main`, and no open PRs.
+- Staged/all-path audits passed 7/2,797; attribution passed. Commit author and committer are Johnny
+  Wang, with no Claude/Anthropic/co-author trailer.
+- No implementation or test was run in this publication step. Task remains **ACTIVE**, attempt 0.

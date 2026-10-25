@@ -1,5 +1,18 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 10:19 CDT — raw CMSH + logo VS/PS task claim published
+
+- Commit `e2faefcd64de171d2890a1da2dd319afde9bd2c5` publishes E673 to GitHub `main`. Fetch confirms
+  `HEAD == origin/main`, checkout clean on `main`; GitHub has no open PRs. The staged path audit
+  passed 7 paths, all-path audit passed 2,797 paths, and attribution passed. Author and committer are
+  Johnny Wang; no Claude/Anthropic/co-author trailer.
+- `GPU-03-LOGO-VS-PS-RAW-CMSH-FRAME-01` remains **ACTIVE**, attempt 0. `/root/review_logo_pair_metal`
+  owns only the `native/tests/test_metal_texture_binding.cpp` implementation lane; root owns docs,
+  independent verification, and publication. Exact next action: run the focused opt-in Metal test,
+  inspect its diff/evidence, then record outcomes before any full repository gates.
+- Publication command: `git push origin main`; post-push command: `git fetch origin main` followed by
+  `git rev-parse HEAD origin/main`. The push contained the claim docs only; no tests or renderer ran.
+
 ## 2026-10-25 10:17 CDT — raw CMSH + logo VS/PS fixture claimed
 
 - Integrator: Codex `/root`; checkout is clean on `main` at `0e93d14b` before this claim. The
