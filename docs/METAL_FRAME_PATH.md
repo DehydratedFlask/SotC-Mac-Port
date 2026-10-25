@@ -476,6 +476,25 @@ This is an asset-derived harness combination, not recovered material mapping: TE
 opaque; normals and UV projection are harness inputs. It does not establish retail texture or vertex
 descriptors, orientation, WQM/helper-lane equivalence, a game-driven frame, or G3 completion.
 
+### 6.9 TEX0 descriptor format-6 evidence task
+
+The hash-bound local cube and cone members contain four 24-byte descriptors at file offsets
+`0x4e..0xae`. Their `TEX0` records begin at `0x96`, carry observed `format_u16 = 6` and
+`flags_u16 = 2`, and describe stream sizes 96 B and 168 B. Using the parser's observed base/offset
+arithmetic, their byte ranges are `[0x296,0x2f6)` (cube) and `[0x416,0x4be)` (cone), with SHA-256
+`c97732092653f3fd2e76d7bf72a99f3e00ce3fcef3afdb2d363e185ae2b91065` and
+`fd126498e069530ca39144521d4dbae76d85a1a0044aeafc15eb5ad8ca75b7b5`. These sizes happen to be
+four bytes per parsed POS0 vertex (24 and 42 vertices respectively), but that ratio does not
+establish the component type, order, normalization, coordinate orientation, or renderer binding.
+The parser and private survey leave TEX0 payload bytes opaque; see E660 and the [format-6 evidence
+checkpoint](checkpoints/2026-10-25-gpu03-cmsh-tex0-format-6.md).
+
+`GPU-03-CMSH-TEX0-FORMAT-6-EVIDENCE-01` is a read-only source-tracing task. Its success result is an
+independently supported byte-to-coordinate mapping with source identity, address/coverage evidence,
+and byte-bound known answers; otherwise it records `UNKNOWN`. Do not feed candidate decodings into
+the verified asset-derived fixture or change its synthetic XY-to-UV mapping on pattern plausibility
+alone.
+
 ## 7. Ranked task cards
 
 | # | ID | Scope | Exit check | Depends on |

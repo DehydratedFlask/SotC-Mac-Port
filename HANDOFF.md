@@ -1,5 +1,30 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 05:46 CDT — TEX0 format-6 evidence task claimed
+
+- Integrator: Codex `/root`; new bounded read-only task
+  `GPU-03-CMSH-TEX0-FORMAT-6-EVIDENCE-01` is **ACTIVE**, attempt 0. The E658 composite fixture stays
+  unchanged and verified.
+- Starting observation from the local hash-bound survey: the cube and cone each have four 24-byte
+  descriptors at file offsets `0x4e..0xae`; `TEX0` at `0x96` has format code `6`, flags `2`, and
+  computed spans `[0x296,0x2f6)` / `[0x416,0x4be)`. Their byte lengths are 96/168 for 24/42
+  positions (four bytes per vertex). Span hashes and raw prefixes/suffixes are in the private survey
+  log. **Observed layout only; texture-coordinate meaning is UNKNOWN.** Four bytes per vertex and
+  plausible-looking patterns do not prove half-float UVs, component order, normalization, or binding.
+- Scope: trace format code 6 to an independent shipped-code or authoritative format source using
+  the already owner-approved local `eboot.bin` offline analysis. Keep all analysis private under
+  `local/`; do not change the parser, harness, synthetic UV mapping, or make a runtime claim. Accept
+  a supported byte-to-coordinate mapping or an explicit `UNKNOWN` result.
+- Files to update after evidence: `docs/TASKS.md`, `docs/METAL_FRAME_PATH.md`, `docs/EVIDENCE.md`,
+  `docs/INDEX.md`, and a task checkpoint. The previous survey script/log are under
+  `local/validation/gpu03-cmsh-tex0-survey-20261025/`.
+- Exact next action: hash `local/extracted/CUSA08809/eboot.bin`, open that exact target with the
+  available REA Ghidra provider (ephemeral analysis; do not touch the persistent Ghidra project),
+  record binary digest, image base, provider version/profile, then search the descriptor-format
+  consumer path and preserve unresolved indirect calls/coverage.
+- Status: descriptor ranges **ARTIFACT_VERIFIED**; TEX0 semantics **UNKNOWN**; task ACTIVE at attempt
+  0; no source edits or tests.
+
 ## 2026-10-25 05:42 CDT — E658 composite fixture published to main
 
 - Integrator: Codex `/root`; task `GPU-03-LOGO-PNG-CMSH-ASSET-FRAME-01` is **FIXTURE_VERIFIED**.
