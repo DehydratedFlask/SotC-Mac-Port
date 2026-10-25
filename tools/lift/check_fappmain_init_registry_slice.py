@@ -71,18 +71,10 @@ def main() -> int:
     require(NATIVE_CPP.is_file(), "slice cpp")
     require("init_registry_fragment_531d60" in NATIVE_CPP.read_text(), "wires Init fragment")
 
-    # Tip must NOT contain PR #5 heap modules (merge gap observation).
-    for name in (
-        "heap_allocator.hpp",
-        "bucket_allocator.hpp",
-        "composite_allocator.hpp",
-        "allocator_bootstrap.hpp",
-    ):
-        require(not (ROOT / "native/core" / name).is_file(), f"unexpected PR5 module on tip: {name}")
-
+    # E405 is a historical snapshot of the measured tip; PR #5 modules may now be present.
     print(
         f"OK check_fappmain_init_registry_slice: vtable slot4→{INIT:#x}; "
-        f"callsite {CALLSITE:#x}; Init={digest[:12]}…; PR5 merge gap documented"
+        f"callsite {CALLSITE:#x}; Init={digest[:12]}…; E405 historical merge gap documented"
     )
     return 0
 

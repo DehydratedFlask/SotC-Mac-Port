@@ -242,6 +242,10 @@ add_library(sotc_core STATIC
   core/host_map.cpp
   core/page_owner_map.cpp
   core/page_allocator.cpp
+  core/composite_allocator.cpp
+  core/bucket_allocator.cpp
+  core/heap_allocator.cpp
+  core/allocator_bootstrap.cpp
   core/allocator_front.cpp
   core/free_list_carve.cpp
   core/region_split.cpp
@@ -1928,6 +1932,26 @@ add_test(NAME page_allocator COMMAND test_page_allocator)
 add_executable(test_allocator_front tests/test_allocator_front.cpp)
 target_link_libraries(test_allocator_front sotc_core)
 add_test(NAME allocator_front COMMAND test_allocator_front)
+
+add_executable(test_composite_allocator tests/test_composite_allocator.cpp)
+target_link_libraries(test_composite_allocator sotc_core)
+add_test(NAME composite_allocator COMMAND test_composite_allocator)
+
+add_executable(test_bucket_allocator tests/test_bucket_allocator.cpp)
+target_link_libraries(test_bucket_allocator sotc_core)
+add_test(NAME bucket_allocator COMMAND test_bucket_allocator)
+
+add_executable(test_heap_allocator tests/test_heap_allocator.cpp)
+target_link_libraries(test_heap_allocator sotc_core)
+add_test(NAME heap_allocator COMMAND test_heap_allocator)
+
+add_executable(test_allocator_bootstrap tests/test_allocator_bootstrap.cpp)
+target_link_libraries(test_allocator_bootstrap sotc_core)
+add_test(NAME allocator_bootstrap COMMAND test_allocator_bootstrap)
+
+add_executable(test_allocator_lazy_latch tests/test_allocator_lazy_latch.cpp)
+target_link_libraries(test_allocator_lazy_latch sotc_core)
+add_test(NAME allocator_lazy_latch COMMAND test_allocator_lazy_latch)
 
 add_subdirectory(api)
 

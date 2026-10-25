@@ -1,0 +1,26 @@
+# APP-01 arch NOT-BUILT copy fixture — completion checkpoint
+
+- Original implementation date/time: 2026-10-22 09:29 CDT (America/Chicago); latest-main integration replays: 2026-10-25 02:32 CDT at `8bd3d101a497db42f032829067b995657f046011`, and 02:53 CDT at `271e656474cf54a84d7d68d0474ba861d1706168`.
+- Agent: Codex `/root/audit_pr_1_2`, private candidate based on exact `origin/main` revision `8bd3d101a497db42f032829067b995657f046011`.
+- Task: `APP-01-SYSTEM-CHECKS-ARCH-NOT-BUILT-COPY-FIXTURE-01`, child of APP-01 / Phase D.
+- Status: `FIXTURE_VERIFIED`; one successful implementation; zero failed semantic hypotheses. An initial `git apply` from the old PR base failed because current `main` had changed the `SystemChecks` readiness comment and exposed `isMachOExecutable` for `CoreLocator`; this was a context mismatch, not an implementation failure. The source patch was reapplied from the exact candidate base. `CoreLocator` and `SystemChecks` now share the same classifier, and current-main `CoreClient` readiness wording is preserved.
+- Files changed in the candidate: `launcher/Sources/LauncherCore/SystemChecks.swift`, `launcher/Sources/LauncherCore/CoreLocator.swift`, `launcher/Tests/LauncherCoreTests/SystemChecksArchitectureTests.swift`, this checkpoint, and corresponding `docs/EVIDENCE.md` / `docs/TASKS.md` rows. `docs/FOLDERS.md` was restored after the isolated worktree's indexer produced an incomplete inventory that omitted main-checkout reference/Graft folders.
+- Observation: thin ARM64 `MH_EXECUTE` is accepted; fat/fat64, x86_64, 32-bit, non-`MH_EXECUTE`, byte-swapped, truncated, and non-Mach-O fixtures produce explicit NOT BUILT details. `CoreLocator` and `SystemChecks` use one classifier, so rejected-header wording is identical. The helper reads only a header and does not execute the candidate.
+- Focused commands and results:
+  - `swift test --package-path launcher --scratch-path local/build/pr2-rebase --filter SystemChecksArchitectureTests` — exit 0, 7/7; `local/validation/pr2-rebase/system-checks-architecture.log`.
+  - `swift test --package-path launcher --scratch-path local/build/pr2-rebase --filter CoreLocatorTests` — exit 0, 14/14; `local/validation/pr2-rebase/core-locator.log`.
+  - `swift test --package-path launcher --scratch-path local/build/pr2-rebase --filter AssetValidatorTests` — exit 0, 11/11; `local/validation/pr2-rebase/asset-validator.log`.
+  - `swift test --package-path launcher --scratch-path local/build/pr2-rebase` — exit 0, 149 tests in 19 suites passed; the opt-in real-core protocol test was skipped; `local/validation/pr2-rebase/full-swift.log`.
+  - `git diff --check` — exit 0.
+- Latest-main refresh (2026-10-25 02:53 CDT): PR branch `cursor/app-honesty-next-5d26` remains at `d560bd182efbc3b2de515cf721165de9661833fe`; latest main `271e656474cf54a84d7d68d0474ba861d1706168` is merged in the candidate worktree without a commit. No conflicts remain. Candidate delta is the six PR #2 paths only; `git diff origin/main --check` passes.
+  - `swift test --package-path launcher --scratch-path local/build/pr2-main-271e --filter SystemChecksArchitectureTests` — 7/7.
+  - `swift test --package-path launcher --scratch-path local/build/pr2-main-271e --filter CoreLocatorTests` — 14/14.
+  - `swift test --package-path launcher --scratch-path local/build/pr2-main-271e --filter AssetValidatorTests` — 11/11.
+  - `swift test --package-path launcher --scratch-path local/build/pr2-main-271e` — 153 tests / 20 suites passed; one opt-in real-core protocol test skipped.
+  - Logs: `local/orchestrator/pr2-main-271e-refresh/`; publish-path audits and attribution check rerun after merge. `trail build --check` reports `NO GRAPH`; no graph was generated.
+- Project index: `python3 scripts/project_index.py` exited 0 and reported 1,235 folders indexed. The candidate lacks main-checkout reference/Graft directories; its generated `docs/FOLDERS.md` omitted those existing entries and was restored, so no incomplete index is included.
+- Trail check: `trail build --check` exited 1, `graph check: STALE`; it listed 8 changed, 4 added, and 8 removed launcher nodes, including the new classifier and renamed architecture test symbols. Log: `local/validation/pr2-rebase/trail-check.log`. No shared Graft cache was rebuilt or committed.
+- Source hashes: `SystemChecks.swift` `3afbc3525d2878ab6106723a2cf304f67b554df64a83b8265aa69dd4ad8d7fbc`; `CoreLocator.swift` `52326ff191fc4822a71ec026441e98ffa14d04e337f69457634d8b3543165bfb`; `SystemChecksArchitectureTests.swift` `91b515ab289f8c1b01d57b20f0a2e8350089559f3745f1a486e53182b7094251`.
+- Inference / limits: all Mach-O cases are synthetic headers. This proves copy and header classification only; it does not establish a real core, G1, G4 Play launch, or game/runtime behavior. G4 remains NOT RUN.
+- Evidence identifier: E637 (E398 was already used by newer main history and is renumbered here).
+- Next exact action: integrator reviews this private candidate diff and decides the PR update/merge sequence. No commit or push was made in this candidate.

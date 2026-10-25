@@ -7,6 +7,7 @@ fixture executable is run to emit its before/after byte arrays.
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -45,6 +46,7 @@ EXPECTED_CASES = {
     'unsigned_high_water': (1, 0, 0x7fffffffffffffff, 0x7ffffffffffffffe,
                             0x123456789abcdef0),
     'wrap_add_and_subtract': (8, 2, 0xfffffffffffffffc, 5, 4),
+    'zero_request_repairs_peak': (0, 0, 0x100, 0xff, 0x123),
 }
 
 
@@ -126,8 +128,9 @@ def check_fixture(fixture_path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--elf', type=Path, default=ROOT / 'local/re/eboot.elf')
+    build_dir = Path(os.environ.get('SOTC_NATIVE_BUILD', 'local/build/native'))
     parser.add_argument('--fixture', type=Path,
-                        default=ROOT / 'local/build/native/test_arena_accounting')
+                        default=build_dir / 'test_arena_accounting')
     args = parser.parse_args()
     elf_path = args.elf if args.elf.is_absolute() else ROOT / args.elf
     fixture_path = args.fixture if args.fixture.is_absolute() else ROOT / args.fixture

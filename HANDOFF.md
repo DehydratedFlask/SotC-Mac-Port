@@ -1,20 +1,58 @@
 # SoC Mac Native — current handoff
 
-## 2026-10-25 03:15 CDT — PR #5 merged; root integration branch remains
+## 2026-10-25 03:25 CDT — main merge gates pass; checker build selection fixed
 
-- Integrator: Codex `/root`; task `INT-OPEN-PRS-1-2-3-5-01` remains ACTIVE until the root integration
-  branch is published and merged. PR #5 merged normally at `2026-10-25T08:14:28Z` from exact head
-  `6b10496e4a0ff36f3b80b78e7c44cd43391d77c8`; merge commit is
-  `a1f21e62fe25294ac70d6753be7ab18322d7a169`. `git fetch origin main` and `git ls-remote` confirm
-  `origin/main` at that SHA. No pull requests are currently open.
-- Root branch `codex/merge-all-open-changes` is at `cbb7a54` plus pending local docs and one private
-  Metal harness test change. Its GPU-03 asset-frame attempt reached three failed index-mutation
-  hypotheses and is `NEEDS_PRINCIPAL`; preserve the failing acceptance check and private reproducer,
-  and do not resume that task. GPU evidence is renumbered E639 because merged PR #5 now owns E638.
-- Next exact action: commit the allowlisted root integration changes under Johnny Wang, merge the
-  latest main into this branch, rerun the publication gates, publish a PR, and merge it. Then switch
-  the workspace to `main` and delete local/remote `codex/merge-all-open-changes`. The code and game
-  gates remain fixture-only / PARTIAL; no boot, audio, or save claim.
+- Integrator: Codex `/root`; `INT-OPEN-PRS-1-2-3-5-01` remains ACTIVE until the integration PR is
+  merged and the workspace returns to `main`. GitHub has PRs #1–#7 MERGED and no open PRs. Current
+  main is `a1f21e62fe25294ac70d6753be7ab18322d7a169`; the integration merge keeps its E637 App-01 and
+  E638 allocator evidence, with root asset import/frame records at E639/E640.
+- Native configure/build passed; CTest passed 397/397. The first full lift-checker run failed one
+  checker because it ignored `SOTC_NATIVE_BUILD` and read a stale five-case binary. After making the
+  default fixture path honor that variable, the targeted checker and full lift checkers passed
+  (481 passed / 0 skipped / 0 failed). The fix is recorded as E641 in
+  `tools/lift/check_f19e00_accounting.py` and
+  [its checkpoint](docs/checkpoints/2026-10-25-srv01-f19e00-build-dir-env.md). The old-binary failure is retained at
+  `local/validation/root-merge-integration-20261025/stale-fixture-path-repro.log`; passing logs are
+  in the same directory. No original ELF code was executed.
+- After the final checker-source edit, `trail build` indexed 2,001 files into 8,490 nodes / 11,465
+  edges and 1,496 cards; `trail build --check` passed. `trail grep 'bootstrap_allocator_hierarchy'`
+  found 14 hits in 10 symbols across 5 files. `python3 scripts/project_index.py` indexed 19,586
+  folders after the new checkpoint was added. Staged path audit passed 41 paths; full path audit
+  passed 2,780 paths. Both diff checks pass after removing trailing spaces caught in the first check.
+  The pre-merge `origin/main..HEAD` attribution audit passed; rerun it after creating the merge commit.
+- Root GPU-03 asset frame remains `NEEDS_PRINCIPAL`: parser and baseline frame observations are
+  recorded, but index-mutation sensitivity failed three hypotheses. G3 remains PARTIAL; no boot,
+  real game audio, save/reload, or game-driven frame claim.
+- Exact next action: commit this main merge under Johnny Wang, rerun attribution/path/diff audits on
+  the exact committed head, push `codex/merge-all-open-changes`, create and merge the integration PR,
+  then switch to `main` and delete the local and remote integration branch. Do not resume GPU-03
+  without principal reassessment. INT task remains ACTIVE, attempt count 0.
+
+## 2026-10-25 03:18 CDT — latest main reconciliation in progress
+
+- Integrator: Codex `/root`; task `INT-OPEN-PRS-1-2-3-5-01` remains ACTIVE until its changes are
+  published and merged. GitHub reports PRs #1–#7 MERGED and no open PRs. PR #5 merged normally at
+  `2026-10-25T08:14:28Z` from exact head `6b10496e4a0ff36f3b80b78e7c44cd43391d77c8`; merge commit
+  `a1f21e62fe25294ac70d6753be7ab18322d7a169`.
+- Root checkpoint commit `01e6019ed8fa24acb6c8fdebf0ffe30585eaec43` records the GPU-03 harness and
+  three failed index-mutation hypotheses. `git merge --no-edit origin/main` fetched latest main at
+  `a1f21e62fe25294ac70d6753be7ab18322d7a169` and stopped with conflicts in `HANDOFF.md`,
+  `docs/EVIDENCE.md`, and `docs/INDEX.md`. Resolution preserves main's E637 App-01 and E638 allocator
+  evidence, and assigns the root GPU records E639 (raw private member import) and E640 (asset-frame
+  attempt). The separate PR #5 implementation and validation details remain in
+  [its checkpoint](docs/checkpoints/2026-10-25-pr5-allocator-rollback-fixed-quantum.md).
+- `git status` shows this merge is still in progress. Files changed by the root checkpoint:
+  `HANDOFF.md`, `docs/EVIDENCE.md`, `docs/FOLDERS.md`, `docs/INDEX.md`, `docs/TASKS.md`, the GPU-03
+  import checkpoint and escalation, and `native/tests/test_metal_asset_frame.cpp`; current main also
+  brings its already-reviewed PR changes. No dependency changed.
+- Observation versus inference: GitHub PR state and the `origin/main` SHA are live checks. GPU-03's
+  parser/baseline Metal observations are recorded, but index-mutation acceptance failed on try 3;
+  task remains `NEEDS_PRINCIPAL`. No cold boot, real game audio, or save/reload claim follows.
+- Next exact action: finish the documentation resolution, run the full publication gates on the
+  merged tree, update the index/checkpoint with exact results, commit the merge under Johnny Wang,
+  push this integration branch, publish and merge its PR, then switch this workspace to `main` and
+  delete local/remote `codex/merge-all-open-changes`. GPU-03 itself must not resume without principal
+  reassessment. Attempt count for the integration task: 0.
 
 ## 2026-10-25 02:56 CDT — PR #2 merged to current main
 
@@ -127,11 +165,11 @@
   `asset index mutation search: CPU-visible candidates=0`. Log
   `local/validation/gpu03-r31/asset-derived-frame.log` records try 3. Output PNG remains private at
   `local/validation/gpu03-r31/asset-derived-cube-cone.png`.
-- Verified positive results: raw member sizes/hashes match E637; `parse_cmsh_mesh` returns cube 24/36
+- Verified positive results: raw member sizes/hashes match E639; `parse_cmsh_mesh` returns cube 24/36
   and cone 42/114 position/index counts; baseline Metal validation enabled with no fault reported;
   PNG SHA-256 `af42ca554f5d24a9f981fc92156dea50616c172af1faba12eef1ff0d4db0f645`; CPU silhouette and
   depth-class errors 0; 6,584 overlapping pixels; vertex and material-constant mutations change the
-  image. The required index mutation did not pass. These observations are recorded as E639 only for
+  image. The required index mutation did not pass. These observations are recorded as E640 only for
   parser/baseline-artifact facts, not full task completion.
 - Failed attempts and precise repro details are in
   `docs/escalations/GPU-03-RENDEROPS-ASSET-FRAME-01.md`; `docs/TASKS.md` is marked `NEEDS_PRINCIPAL`.
@@ -195,7 +233,7 @@
   or tracked asset changed; raw meshes, PNG, and log remain under ignored `local/`.
 - Next exact action: choose an index from a triangle with large CPU-projected area and replace one corner
   with a distant in-range vertex; rerun the same Metal validation command and require a changed PNG
-  hash. After the three mutations pass, record E639 and update the GPU-03 task status without claiming
+  hash. After the three mutations pass, record E640 and update the GPU-03 task status without claiming
   a game-driven frame or G3 PASS.
 - Status: raw member parse and baseline L1 frame are partially verified; mutation acceptance FAILED on
   the first selection hypothesis; 1 failed try, no NEEDS_PRINCIPAL threshold yet.

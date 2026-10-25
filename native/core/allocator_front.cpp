@@ -25,6 +25,17 @@ bool AllocatorFront::set_heap(std::uint32_t id, IAllocator* heap) noexcept {
     return true;
 }
 
+bool AllocatorFront::set_heap_if_empty(std::uint32_t id, IAllocator* heap) noexcept {
+    if (id == 0 || id >= kHeapSlots || heap == nullptr) return false;
+    IAllocator* empty = nullptr;
+    return table_[id].compare_exchange_strong(empty, heap);
+}
+
+bool AllocatorFront::clear_heap_if(std::uint32_t id, IAllocator* expected) noexcept {
+    if (id == 0 || id >= kHeapSlots || expected == nullptr) return false;
+    return table_[id].compare_exchange_strong(expected, nullptr);
+}
+
 void AllocatorFront::clear_heap(std::uint32_t id) noexcept {
     if (id < kHeapSlots) table_[id].store(nullptr);
 }
@@ -36,6 +47,28 @@ IAllocator* AllocatorFront::heap(std::uint32_t id) const noexcept {
 void AllocatorFront::set_oom_hooks(const OomHooks& hooks) {
     std::lock_guard<std::mutex> lock(hooks_mu_);
     hooks_ = hooks;
+}
+
+void AllocatorFront::set_lazy_bootstrap(const LazyBootstrapHooks& hooks) {
+    std::lock_guard<std::mutex> lock(hooks_mu_);
+    lazy_bootstrap_ = hooks;
+}
+
+bool AllocatorFront::maybe_lazy_bootstrap(std::uint32_t& heap_id) {
+    // OBS 0x1284a: if latch byte != 0 → skip. OBS 0x12854: if tbl[1] != 0 → skip.
+    if (bootstrap_latch_.load(std::memory_order_relaxed)) return false;
+    if (heap(kDefaultHeap) != nullptr) return false;
+
+    LazyBootstrapHooks lb;
+    {
+        std::lock_guard<std::mutex> lock(hooks_mu_);
+        lb = lazy_bootstrap_;
+    }
+    if (lb.install == nullptr) return false;
+    if (!lb.install(*this, lb.user)) return false;
+    // OBS 0x12865: heap id := returned[+0x1c]; empty-table composite lives in slot 1.
+    heap_id = kDefaultHeap;
+    return true;
 }
 
 void AllocatorFront::report_oom(const OomInfo& info) {
@@ -54,6 +87,9 @@ void AllocatorFront::report_oom(const OomInfo& info) {
 
 void* AllocatorFront::alloc(std::size_t size, std::uint32_t heap_id, std::size_t align,
                             std::uint32_t flags) {
+    // OBS 0x1284a..0x1286f before scoped-heap / table lookup.
+    (void)maybe_lazy_bootstrap(heap_id);
+
     // OBS: the scoped override applies only to heap 1 and only with a non-empty stack.
     if (heap_id == kDefaultHeap) {
         const std::uint32_t top = ScopedHeap::top();
@@ -76,6 +112,9 @@ void AllocatorFront::free(void* ptr, std::uint32_t kind) {
     if (!owner) return;                            // OBS: foreign pointer ignored
     IAllocator* h = heap(*owner);
     if (h == nullptr) return;                      // INF: owner slot cleared -> ignore
+    IAllocator* default_heap = heap(kDefaultHeap);
+    if (default_heap != nullptr && default_heap != h)
+        default_heap->on_owner_map_deallocation(ptr);
     h->deallocate(ptr, AllocDesc{kind, tag_.load(std::memory_order_relaxed)});
 }
 

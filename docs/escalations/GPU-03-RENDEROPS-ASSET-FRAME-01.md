@@ -9,7 +9,7 @@
   claimed.
 - Input SHA256, source pins, original RVA / file offset / image base: `cube_1m.cmsh` SHA-256
   `44738dbf663af252898bad5582f2b48f1aadf6fbaab403c20880410b79a380b7`, exact 850 B; `cone.cmsh` SHA-256
-  `5456afadabe96b9f7f02c503dc0ed5410652ccd32601c19e8aeeaaf36c88600c`, exact 1,462 B (E629/E637).
+  `5456afadabe96b9f7f02c503dc0ed5410652ccd32601c19e8aeeaaf36c88600c`, exact 1,462 B (E629/E639).
   Default-pair MSL SHA-256 `5524537e36b2481798abe5bf6c311e37082aed26b136c4590f7d685e671a455e`. The native
   parser/test harness is source code; this probe does not execute the original ELF or use an RVA.
 - Reproducer / expected result: build `test_metal_asset_frame`, then run the command below. Expected:
@@ -28,12 +28,13 @@ env MTL_DEBUG_LAYER=1 MTL_SHADER_VALIDATION=1 MTL_SHADER_VALIDATION_DEFAULT_STAT
   local/validation/gpu03-r31/asset-derived-cube-cone.png
 ```
 
-- Current tree changes and recovery location: root branch `codex/merge-all-open-changes`, HEAD
-  `cbb7a54ed22d8c284e61d5ffb490ab8334227dc1` (local branch still based on `29b1305`; live `origin/main`
-  is `8bd3d101a497db42f032829067b995657f046011`). Uncommitted code is in
-  `native/tests/test_metal_asset_frame.cpp`; task records are in `HANDOFF.md`, `docs/TASKS.md`,
-  `docs/EVIDENCE.md`, and this escalation. Raw inputs, executable, MSL, PNG and logs stay under ignored
-  `local/`. Modified test source SHA-256 is `c7d760ac64311d05f811f01b172a2126fb57a7b9d35fba3a7675ebc247ed3f36`.
+- Current tree changes and recovery location: root branch `codex/merge-all-open-changes`, root test
+  and escalation checkpoint commit `01e6019ed8fa24acb6c8fdebf0ffe30585eaec43`; latest `origin/main`
+  is `a1f21e62fe25294ac70d6753be7ab18322d7a169`, and its merge into the integration branch is in
+  progress. The test source is committed in `native/tests/test_metal_asset_frame.cpp`; task records
+  are in `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, and this escalation. Raw inputs,
+  executable, MSL, PNG and logs stay under ignored `local/`. Modified test source SHA-256 is
+  `c7d760ac64311d05f811f01b172a2126fb57a7b9d35fba3a7675ebc247ed3f36`.
 
 | Failed try | Distinct hypothesis/change | Exact command / environment | Actual result | Log/evidence |
 |---|---|---|---|---|
@@ -57,9 +58,9 @@ env MTL_DEBUG_LAYER=1 MTL_SHADER_VALIDATION=1 MTL_SHADER_VALIDATION_DEFAULT_STAT
   semantics. The current independent CPU projection agrees with the baseline frame but has not yet
   produced an index mutation candidate that changes its front-draw mask. Do not infer that all
   indices are semantically valid from baseline agreement alone.
-- Independent work that can continue: resolve/verify the open GitHub PRs, reconcile current `main`,
-  and update the repository handoff. The already verified private parser and baseline frame may be
-  used as evidence; the GPU-03 task itself must stop here.
+- Independent work that can continue: finish reconciling the integration branch, run its publication
+  gates, publish and merge its PR, then return the workspace to `main`. The already verified private
+  parser and baseline frame may be used as evidence; the GPU-03 task itself must stop here.
 - Task register and HANDOFF checkpoint links: [TASKS.md](../TASKS.md), [HANDOFF.md](../../HANDOFF.md),
   and [raw member import checkpoint](../checkpoints/2026-10-25-gpu03-raw-cmsh-import.md).
 - Principal reassessment / authorized next approach: no fourth try is authorized. The principal must
