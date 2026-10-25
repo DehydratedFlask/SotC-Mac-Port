@@ -33,6 +33,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [GPU-03 raw CSMH member import](checkpoints/2026-10-25-gpu03-raw-cmsh-import.md) | E639 exact MD5(path)-mapped raw-member import and private size/hash verification; parser and Metal draw were verified separately in E640 |
 | [GPU-03 asset-derived frame attempt](escalations/GPU-03-RENDEROPS-ASSET-FRAME-01.md) | E640 actual raw mesh parse and direct-Metal baseline verified; index-mutation test failed three approaches; task is NEEDS_PRINCIPAL, G3 remains PARTIAL |
 | [E28 checker build-directory selection fix](checkpoints/2026-10-25-srv01-f19e00-build-dir-env.md) | E641 `check_f19e00_accounting.py` now honors `SOTC_NATIVE_BUILD`; target and all 481 lift checkers pass |
+| [Integration PR #8 closeout](checkpoints/2026-10-25-integration-pr8-closeout.md) | PR #8 merged at `61c96f6`; integration branch deleted; workspace returned to clean `main`; no game boot/audio/save claim |
 | [CTOR_CLASSES](CTOR_CLASSES.md) | 573-entry constructor-table classification by reachable-body idiom plus the slot 10–19/24–47 family contract; CPU-01 |
 | [INPUTTABLE_551140](INPUTTABLE_551140.md) | Numeric-only deepen of Init-hash 275-entry table (`0x551140`); CPU-01 |
 | [INPUTTABLE_551140_NAMES_FIXTURE](INPUTTABLE_551140_NAMES_FIXTURE.md) | Private 275-name fixture recipe for registry fill `0x52a220`; CPU-01 |

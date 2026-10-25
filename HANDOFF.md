@@ -1,5 +1,28 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-25 03:30 CDT — PR #8 merged; integration branch removed
+
+- Integrator: Codex `/root`; task `INT-OPEN-PRS-1-2-3-5-01` is `FIXTURE_VERIFIED`. PR #8
+  (`integration: reconcile reviewed work and publish current checkpoints`) merged at
+  `2026-10-25T08:29:00Z`; reviewed head `8f57b64e58622ba181e797701ed407cd38e64cef`, merge commit
+  `61c96f6de128b53a5970a33ed504346e47ce42f2`. GitHub deleted remote branch
+  `codex/merge-all-open-changes` through `--delete-branch`.
+- `git fetch origin main`, `git switch main`, `git pull --ff-only origin main`, and
+  `git branch -d codex/merge-all-open-changes` all exited 0. `HEAD` and `origin/main` both resolve to
+  `61c96f6de128b53a5970a33ed504346e47ce42f2`; `git status --short --branch` is clean on `main`.
+  `git ls-remote` returned no `codex/merge-all-open-changes` ref.
+- On the merged PR head, CMake configure/build passed, CTest passed 397/397, and lift checkers passed
+  481/0/0. `trail build --check` passed at 8,490 nodes / 11,465 edges; project index: 19,586
+  folders. Staged audit passed 41 paths before merge, all-path audit 2,780 paths, PR-diff audit 11
+  paths, and attribution/diff checks passed. Logs are under
+  `local/validation/root-merge-integration-20261025/`.
+- PR #8 also includes the E641 checker build-directory fix. GPU-03 asset-frame remains
+  `NEEDS_PRINCIPAL` after three failed index-mutation hypotheses; G3 remains PARTIAL. No cold boot,
+  real game audio, or save/reload is claimed.
+- Exact next action: continue on `main` with the next unblocked task. Do not resume GPU-03 without a
+  principal reassessment recorded in its escalation. No dependency changed; integration task attempt
+  count: 0.
+
 ## 2026-10-25 03:27 CDT — main merge committed; publication audits pass
 
 - Integrator: Codex `/root`; `INT-OPEN-PRS-1-2-3-5-01` remains ACTIVE until the integration PR is
