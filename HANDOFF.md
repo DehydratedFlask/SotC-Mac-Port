@@ -1,6 +1,6 @@
 # SoC Mac Native — current handoff
 
-## 2026-10-25 03:25 CDT — main merge gates pass; checker build selection fixed
+## 2026-10-25 03:27 CDT — main merge committed; publication audits pass
 
 - Integrator: Codex `/root`; `INT-OPEN-PRS-1-2-3-5-01` remains ACTIVE until the integration PR is
   merged and the workspace returns to `main`. GitHub has PRs #1–#7 MERGED and no open PRs. Current
@@ -14,19 +14,26 @@
   [its checkpoint](docs/checkpoints/2026-10-25-srv01-f19e00-build-dir-env.md). The old-binary failure is retained at
   `local/validation/root-merge-integration-20261025/stale-fixture-path-repro.log`; passing logs are
   in the same directory. No original ELF code was executed.
+- Merge commit `1a8319a7667eff5a1e322f8232ce9f4e7e647af8` has parents root checkpoint
+  `01e6019ed8fa24acb6c8fdebf0ffe30585eaec43` and latest main
+  `a1f21e62fe25294ac70d6753be7ab18322d7a169`; it is authored and committed by Johnny Wang. The
+  integration branch is clean locally and 29 commits ahead of its previous remote tip.
 - After the final checker-source edit, `trail build` indexed 2,001 files into 8,490 nodes / 11,465
   edges and 1,496 cards; `trail build --check` passed. `trail grep 'bootstrap_allocator_hierarchy'`
   found 14 hits in 10 symbols across 5 files. `python3 scripts/project_index.py` indexed 19,586
   folders after the new checkpoint was added. Staged path audit passed 41 paths; full path audit
-  passed 2,780 paths. Both diff checks pass after removing trailing spaces caught in the first check.
-  The pre-merge `origin/main..HEAD` attribution audit passed; rerun it after creating the merge commit.
+  passed 2,780 paths; the committed PR diff path audit passed 11 paths. The post-commit staged-only
+  audit found nothing staged, so it returned its documented empty-index error; the earlier 41-path
+  staged audit and 11-path committed-diff audit passed. Both diff checks pass after removing trailing
+  spaces caught in the first check. `check_commit_attribution.py --range origin/main..HEAD` passes
+  for the merged head.
 - Root GPU-03 asset frame remains `NEEDS_PRINCIPAL`: parser and baseline frame observations are
   recorded, but index-mutation sensitivity failed three hypotheses. G3 remains PARTIAL; no boot,
   real game audio, save/reload, or game-driven frame claim.
-- Exact next action: commit this main merge under Johnny Wang, rerun attribution/path/diff audits on
-  the exact committed head, push `codex/merge-all-open-changes`, create and merge the integration PR,
-  then switch to `main` and delete the local and remote integration branch. Do not resume GPU-03
-  without principal reassessment. INT task remains ACTIVE, attempt count 0.
+- Exact next action: push `codex/merge-all-open-changes`, create and review its integration PR against
+  `main`, merge the exact verified head, then switch to `main` and delete the local and remote
+  integration branch. Do not resume GPU-03 without principal reassessment. INT task remains ACTIVE,
+  attempt count 0.
 
 ## 2026-10-25 03:18 CDT — latest main reconciliation in progress
 
