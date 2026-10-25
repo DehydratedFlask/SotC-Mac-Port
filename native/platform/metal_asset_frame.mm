@@ -72,16 +72,70 @@ struct TextureObjects {
            mode == AssetTextureAddressMode::mirror_repeat;
 }
 
-[[nodiscard]] bool valid_texture_input(const AssetTexture2D& texture) noexcept {
+[[nodiscard]] bool valid_texture_mip_filter(AssetTextureMipFilter filter) noexcept {
+    return filter == AssetTextureMipFilter::not_mipmapped ||
+           filter == AssetTextureMipFilter::nearest || filter == AssetTextureMipFilter::linear;
+}
+
+[[nodiscard]] bool valid_texture_level_bytes(std::uint32_t width, std::uint32_t height,
+                                             std::span<const std::uint8_t> rgba8,
+                                             std::size_t level_index,
+                                             std::string& error) {
+    const std::size_t row_bytes = static_cast<std::size_t>(width) * 4;
+    if (height > std::numeric_limits<std::size_t>::max() / row_bytes) {
+        error = "mip level " + std::to_string(level_index) + " byte count overflows";
+        return false;
+    }
+    const std::size_t expected_bytes = row_bytes * height;
+    if (rgba8.data() == nullptr || rgba8.size() != expected_bytes) {
+        error = "mip level " + std::to_string(level_index) + " must contain exactly " +
+                std::to_string(expected_bytes) + " RGBA8 bytes";
+        return false;
+    }
+    return true;
+}
+
+[[nodiscard]] bool valid_texture_input(const AssetTexture2D& texture, std::string& error) {
     constexpr std::uint32_t kMaxTextureDimension = 8192;
     if (texture.width == 0 || texture.height == 0 ||
         texture.width > kMaxTextureDimension || texture.height > kMaxTextureDimension) {
+        error = "base dimensions must be nonzero and no larger than 8192x8192";
         return false;
     }
-    const std::size_t row_bytes = static_cast<std::size_t>(texture.width) * 4;
-    if (texture.height > std::numeric_limits<std::size_t>::max() / row_bytes) return false;
-    return texture.rgba8.data() != nullptr &&
-           texture.rgba8.size() == row_bytes * texture.height;
+    if (!valid_texture_level_bytes(texture.width, texture.height, texture.rgba8, 0, error)) {
+        return false;
+    }
+
+    std::size_t maximum_level_count = 1;
+    for (std::uint32_t width = texture.width, height = texture.height;
+         width > 1 || height > 1;) {
+        width = std::max(1U, width / 2);
+        height = std::max(1U, height / 2);
+        ++maximum_level_count;
+    }
+    if (texture.mip_levels.size() > maximum_level_count - 1) {
+        error = "supplied mip level count exceeds the complete 2D chain";
+        return false;
+    }
+
+    std::uint32_t expected_width = texture.width;
+    std::uint32_t expected_height = texture.height;
+    for (std::size_t index = 0; index < texture.mip_levels.size(); ++index) {
+        expected_width = std::max(1U, expected_width / 2);
+        expected_height = std::max(1U, expected_height / 2);
+        const AssetTextureMipLevel& level = texture.mip_levels[index];
+        if (level.width != expected_width || level.height != expected_height) {
+            error = "mip level " + std::to_string(index + 1) + " dimensions must be " +
+                    std::to_string(expected_width) + "x" + std::to_string(expected_height) +
+                    ", got " + std::to_string(level.width) + "x" +
+                    std::to_string(level.height);
+            return false;
+        }
+        if (!valid_texture_level_bytes(level.width, level.height, level.rgba8, index + 1, error)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 [[nodiscard]] MTLSamplerMinMagFilter metal_filter(AssetTextureFilter filter) noexcept {
@@ -98,16 +152,28 @@ struct TextureObjects {
     return MTLSamplerAddressModeClampToEdge;
 }
 
+[[nodiscard]] MTLSamplerMipFilter metal_mip_filter(AssetTextureMipFilter filter) noexcept {
+    switch (filter) {
+        case AssetTextureMipFilter::not_mipmapped: return MTLSamplerMipFilterNotMipmapped;
+        case AssetTextureMipFilter::nearest: return MTLSamplerMipFilterNearest;
+        case AssetTextureMipFilter::linear: return MTLSamplerMipFilterLinear;
+    }
+    return MTLSamplerMipFilterNotMipmapped;
+}
+
 [[nodiscard]] bool make_texture_objects(id<MTLDevice> device,
                                         const std::vector<TextureInputBinding>& inputs,
                                         TextureObjects& objects, std::string& error) {
     @autoreleasepool {
         for (const TextureInputBinding& input : inputs) {
+            const NSUInteger mip_level_count = static_cast<NSUInteger>(
+                input.texture.mip_levels.size() + 1);
             MTLTextureDescriptor* texture_descriptor = [MTLTextureDescriptor
                 texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA8Unorm
                                              width:input.texture.width
                                             height:input.texture.height
-                                         mipmapped:NO];
+                                         mipmapped:(mip_level_count > 1)];
+            texture_descriptor.mipmapLevelCount = mip_level_count;
             texture_descriptor.usage = MTLTextureUsageShaderRead;
             texture_descriptor.storageMode = MTLStorageModeShared;
             id<MTLTexture> texture = [device newTextureWithDescriptor:texture_descriptor];
@@ -120,17 +186,27 @@ struct TextureObjects {
                        mipmapLevel:0
                          withBytes:input.texture.rgba8.data()
                        bytesPerRow:bytes_per_row];
+            for (std::size_t index = 0;
+                 index < input.texture.mip_levels.size(); ++index) {
+                const AssetTextureMipLevel& level = input.texture.mip_levels[index];
+                const std::size_t mip_bytes_per_row =
+                    static_cast<std::size_t>(level.width) * 4;
+                [texture replaceRegion:MTLRegionMake2D(0, 0, level.width, level.height)
+                           mipmapLevel:static_cast<NSUInteger>(index + 1)
+                             withBytes:level.rgba8.data()
+                           bytesPerRow:mip_bytes_per_row];
+            }
             objects.textures.emplace(input.texture_handle, texture);
 
             MTLSamplerDescriptor* sampler_descriptor = [[MTLSamplerDescriptor alloc] init];
             sampler_descriptor.minFilter = metal_filter(input.sampler.min_filter);
             sampler_descriptor.magFilter = metal_filter(input.sampler.mag_filter);
-            sampler_descriptor.mipFilter = MTLSamplerMipFilterNotMipmapped;
+            sampler_descriptor.mipFilter = metal_mip_filter(input.sampler.mip_filter);
             sampler_descriptor.sAddressMode = metal_address_mode(input.sampler.address_u);
             sampler_descriptor.tAddressMode = metal_address_mode(input.sampler.address_v);
             sampler_descriptor.rAddressMode = MTLSamplerAddressModeClampToEdge;
-            sampler_descriptor.lodMinClamp = 0.0F;
-            sampler_descriptor.lodMaxClamp = 0.0F;
+            sampler_descriptor.lodMinClamp = input.sampler.lod_min_clamp;
+            sampler_descriptor.lodMaxClamp = input.sampler.lod_max_clamp;
             id<MTLSamplerState> sampler = [device newSamplerStateWithDescriptor:sampler_descriptor];
             [sampler_descriptor release];
             if (sampler == nil) {
@@ -244,17 +320,29 @@ public:
                 return frame_error(config_.width, config_.height,
                                    "draw fragment texture/sampler inputs do not match the explicit slot-0 ABI");
             }
-            if (has_texture && !valid_texture_input(*draw.fragment_texture0)) {
-                return frame_error(config_.width, config_.height,
-                                   "draw fragment texture must have exact nonempty RGBA8 2D bytes");
+            if (has_texture) {
+                std::string texture_error;
+                if (!valid_texture_input(*draw.fragment_texture0, texture_error)) {
+                    return frame_error(config_.width, config_.height,
+                                       "draw fragment texture " + texture_error);
+                }
             }
-            if (has_sampler &&
-                (!valid_texture_filter(draw.fragment_sampler0->min_filter) ||
-                 !valid_texture_filter(draw.fragment_sampler0->mag_filter) ||
-                 !valid_texture_address_mode(draw.fragment_sampler0->address_u) ||
-                 !valid_texture_address_mode(draw.fragment_sampler0->address_v))) {
-                return frame_error(config_.width, config_.height,
-                                   "draw fragment sampler contains an unsupported filter or address mode");
+            if (has_sampler) {
+                const AssetSamplerInput& sampler = *draw.fragment_sampler0;
+                if (!valid_texture_filter(sampler.min_filter) ||
+                    !valid_texture_filter(sampler.mag_filter) ||
+                    !valid_texture_address_mode(sampler.address_u) ||
+                    !valid_texture_address_mode(sampler.address_v) ||
+                    !valid_texture_mip_filter(sampler.mip_filter)) {
+                    return frame_error(config_.width, config_.height,
+                                       "draw fragment sampler contains an unsupported filter or address mode");
+                }
+                if (!std::isfinite(sampler.lod_min_clamp) ||
+                    !std::isfinite(sampler.lod_max_clamp) || sampler.lod_min_clamp < 0.0F ||
+                    sampler.lod_max_clamp < sampler.lod_min_clamp) {
+                    return frame_error(config_.width, config_.height,
+                                       "draw fragment sampler LOD clamp range must be finite, nonnegative, and ordered");
+                }
             }
             for (std::uint16_t index : draw.indices) {
                 if (static_cast<std::size_t>(index) >= draw.positions.size()) {

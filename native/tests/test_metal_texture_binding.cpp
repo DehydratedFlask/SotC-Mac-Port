@@ -2,9 +2,14 @@
 #include "../platform/metal_capture.hpp"
 
 #include <array>
+#include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <cstdio>
+#include <fstream>
+#include <iterator>
 #include <memory>
 #include <span>
 #include <string>
@@ -91,6 +96,45 @@ fragment float4 asset_fragment(RasterValue in [[stage_in]],
 }
 )metal";
 
+constexpr std::string_view kMipGradientSampleMsl = R"metal(
+#include <metal_stdlib>
+using namespace metal;
+
+struct ShaderCase {
+    float4 position;
+    float4 padding0[9];
+    float4 material;
+    float4 padding1[3];
+    float4 param1_p0;
+    float4 padding2[3];
+};
+
+struct RasterValue {
+    float4 position [[position]];
+    float2 uv;
+};
+
+vertex RasterValue asset_vertex(device const ShaderCase* inputs [[buffer(0)]],
+                                uint vertex_id [[vertex_id]]) {
+    RasterValue out;
+    const ShaderCase value = inputs[vertex_id];
+    out.position = float4(value.position.xy, value.position.z, 1.0f);
+    out.uv = value.position.xy * value.material.xy + 0.5f;
+    return out;
+}
+
+fragment float4 asset_fragment(RasterValue in [[stage_in]],
+                               texture2d<float> source [[texture(0)]],
+                               sampler source_sampler [[sampler(0)]]) {
+    const float2 gradient_x = dfdx(in.uv);
+    const float2 gradient_y = dfdy(in.uv);
+    const float4 implicit_sample = source.sample(source_sampler, in.uv);
+    const float4 explicit_sample = source.sample(source_sampler, in.uv,
+                                                 gradient2d(gradient_x, gradient_y));
+    return float4(implicit_sample.r, explicit_sample.r, abs(gradient_x.x) * 16.0f, 1.0f);
+}
+)metal";
+
 int failures = 0;
 
 void check(std::string_view name, bool passed) {
@@ -109,7 +153,13 @@ void check(std::string_view name, bool passed) {
     if (x >= kWidth || y >= kHeight || rgba.size() != kWidth * kHeight * 4) return false;
     const std::size_t offset = pixel_offset(x, y);
     for (std::size_t channel = 0; channel < expected.size(); ++channel) {
-        if (rgba[offset + channel] != expected[channel]) return false;
+        if (rgba[offset + channel] != expected[channel]) {
+            std::fprintf(stderr,
+                         "PIXEL mismatch (%u,%u) channel %zu: got %u expected %u\n",
+                         x, y, channel, static_cast<unsigned>(rgba[offset + channel]),
+                         static_cast<unsigned>(expected[channel]));
+            return false;
+        }
     }
     return true;
 }
@@ -121,6 +171,107 @@ void check(std::string_view name, bool passed) {
     const float encoded_gradient = 2.0F * uv_scale;
     const auto gradient_byte = static_cast<std::uint8_t>(encoded_gradient * 255.0F + 0.5F);
     return {gradient_byte, gradient_byte, constant_texel_red, constant_texel_red};
+}
+
+constexpr std::array<std::array<std::uint8_t, 4>, 7> kMipColors = {{{0, 0, 0, 255},
+                                                                     {255, 0, 0, 255},
+                                                                     {0, 255, 0, 255},
+                                                                     {0, 0, 255, 255},
+                                                                     {255, 255, 0, 255},
+                                                                     {255, 0, 255, 255},
+                                                                     {0, 255, 255, 255}}};
+
+[[nodiscard]] std::size_t mip_level_for_scale(float uv_scale) {
+    // The affine harness UV is clip.xy * uv_scale + 0.5. For a 64x64
+    // target/texture, each pixel spans 2/64 clip units and therefore 2*scale
+    // texels. The nearest mip level is round(log2(rho)); test scales are exact
+    // powers of two to avoid a hardware tie-breaking boundary.
+    const float footprint = 2.0F * std::abs(uv_scale);
+    const float lod = std::log2(footprint);
+    return static_cast<std::size_t>(std::clamp(static_cast<int>(std::lround(lod)), 0,
+                                               static_cast<int>(kMipColors.size() - 1)));
+}
+
+[[nodiscard]] std::array<std::uint8_t, 4> mip_color_for_scale(float uv_scale,
+                                                              int mutated_level = -1) {
+    auto color = kMipColors[mip_level_for_scale(uv_scale)];
+    if (static_cast<int>(mip_level_for_scale(uv_scale)) == mutated_level) {
+        color = {0, 0, 255, 255};
+    }
+    return color;
+}
+
+[[nodiscard]] std::array<std::uint8_t, 4> logo_multiply_oracle(
+    float uv_scale, std::array<float, 4> color_scale, int mutated_level = -1) {
+    const std::array<std::uint8_t, 4> sample = mip_color_for_scale(uv_scale, mutated_level);
+    std::array<std::uint8_t, 4> result{};
+    for (std::size_t channel = 0; channel < result.size(); ++channel) {
+        // The synthetic inputs use binary fractions exactly representable by fp16, so RTZ leaves
+        // each shader product unchanged before the observed nearest-byte RGBA8 conversion.
+        const float product = (static_cast<float>(sample[channel]) / 255.0F) *
+                              color_scale[channel];
+        result[channel] = static_cast<std::uint8_t>(
+            std::clamp(product, 0.0F, 1.0F) * 255.0F + 0.5F);
+    }
+    return result;
+}
+
+[[nodiscard]] std::array<std::uint8_t, 4> mip_oracle(float uv_scale,
+                                                     int mutated_level = -1) {
+    const float gradient_channel = std::clamp((2.0F / 64.0F) * std::abs(uv_scale) * 16.0F,
+                                              0.0F, 1.0F);
+    // The observed Metal RGBA8 render-target conversion truncates this diagnostic value: 0.5
+    // reads back as 127. The shader-sampled mip colors are 0/1 and remain exact.
+    const auto gradient_byte = static_cast<std::uint8_t>(gradient_channel * 255.0F);
+    const auto color = mip_color_for_scale(uv_scale, mutated_level);
+    return {color[0], color[0], gradient_byte, 255};
+}
+
+struct MipTextureStorage {
+    std::array<std::vector<std::uint8_t>, 7> pixel_bytes;
+    std::array<sotc::AssetTextureMipLevel, 6> mip_levels;
+
+    [[nodiscard]] sotc::AssetTexture2D view() const noexcept {
+        return {64, 64, std::span<const std::uint8_t>(pixel_bytes[0]),
+                std::span<const sotc::AssetTextureMipLevel>(mip_levels)};
+    }
+};
+
+[[nodiscard]] MipTextureStorage make_mip_texture(int mutated_level = -1) {
+    constexpr std::array<std::uint32_t, 7> kDimensions = {64, 32, 16, 8, 4, 2, 1};
+    MipTextureStorage result;
+    for (std::size_t level = 0; level < kDimensions.size(); ++level) {
+        const std::uint32_t dimension = kDimensions[level];
+        auto color = kMipColors[level];
+        if (static_cast<int>(level) == mutated_level) color = {0, 0, 255, 255};
+        std::vector<std::uint8_t>& pixels = result.pixel_bytes[level];
+        pixels.resize(static_cast<std::size_t>(dimension) * dimension * 4);
+        for (std::size_t offset = 0; offset < pixels.size(); offset += 4) {
+            std::copy(color.begin(), color.end(), pixels.begin() +
+                      static_cast<std::ptrdiff_t>(offset));
+        }
+        if (level > 0) {
+            result.mip_levels[level - 1] = {
+                dimension, dimension, std::span<const std::uint8_t>(pixels)};
+        }
+    }
+    return result;
+}
+
+[[nodiscard]] bool read_text_file(const char* path, std::string& contents) {
+    if (path == nullptr || path[0] == '\0') return false;
+    std::ifstream input(path, std::ios::binary);
+    if (!input) return false;
+    contents.assign(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>());
+    return input.good() || input.eof();
+}
+
+[[nodiscard]] bool write_png_file(const char* path, const std::vector<std::uint8_t>& png) {
+    if (path == nullptr || path[0] == '\0' || png.empty()) return false;
+    std::ofstream output(path, std::ios::binary | std::ios::trunc);
+    output.write(reinterpret_cast<const char*>(png.data()),
+                 static_cast<std::streamsize>(png.size()));
+    return output.good();
 }
 
 }  // namespace
@@ -196,7 +347,8 @@ int main() {
     truncated_draw.fragment_texture0 = sotc::AssetTexture2D{2, 1, truncated_pixels};
     sotc::MetalAssetFrameResult truncated = renderer->render(std::span(&truncated_draw, 1));
     check("truncated RGBA8 input fails visibly",
-          !truncated.ok && truncated.error.find("exact nonempty RGBA8") != std::string::npos);
+          !truncated.ok && truncated.error.find("must contain exactly 8 RGBA8 bytes") !=
+                                std::string::npos);
 
     sotc::AssetMeshDraw invalid_sampler_draw = draw;
     invalid_sampler_draw.fragment_sampler0->min_filter =
@@ -261,6 +413,202 @@ int main() {
               is_color(changed_texel.rgba8, 32, 32,
                        gradient_oracle(0.5F, changed_constant_pixels[0])));
         check("texel mutation changes readback", changed_texel.rgba8 != gradient_frame.rgba8);
+    }
+
+    const MipTextureStorage mip_texture = make_mip_texture();
+    sotc::AssetMeshDraw mip_draw{positions, indices, gradient_shader};
+    mip_draw.shader.material = {1.0F, 1.0F, 0.0F, 1.0F};
+    mip_draw.fragment_texture0 = mip_texture.view();
+    sotc::AssetSamplerInput mip_sampler{
+        sotc::AssetTextureFilter::linear, sotc::AssetTextureFilter::linear,
+        sotc::AssetTextureAddressMode::clamp_to_edge,
+        sotc::AssetTextureAddressMode::clamp_to_edge};
+    mip_sampler.mip_filter = sotc::AssetTextureMipFilter::nearest;
+    mip_sampler.lod_min_clamp = 0.0F;
+    mip_sampler.lod_max_clamp = 6.0F;
+    mip_draw.fragment_sampler0 = mip_sampler;
+
+    std::string mip_error;
+    std::unique_ptr<sotc::MetalAssetFrameRenderer> mip_renderer =
+        sotc::MetalAssetFrameRenderer::create(config, kMipGradientSampleMsl, mip_error);
+    if (mip_renderer == nullptr) {
+        std::fprintf(stderr, "FAIL mip derivative MSL pipeline creation: %s\n", mip_error.c_str());
+        return 1;
+    }
+    sotc::MetalAssetFrameResult mip_frame = mip_renderer->render(std::span(&mip_draw, 1));
+    check("mip-sensitive implicit/explicit sample fixture renders", mip_frame.ok);
+    if (!mip_frame.ok) {
+        std::fprintf(stderr, "FAIL mip derivative render: %s\n", mip_frame.error.c_str());
+        return 1;
+    }
+    check("CPU oracle matches derivative-selected mip at interior pixel",
+          is_color(mip_frame.rgba8, 32, 32, mip_oracle(1.0F)));
+    check("CPU oracle matches derivative-selected mip at primitive boundary",
+          is_color(mip_frame.rgba8, 3, 32, mip_oracle(1.0F)));
+
+    sotc::AssetMeshDraw second_mip_draw = mip_draw;
+    second_mip_draw.shader.material[0] = 2.0F;
+    second_mip_draw.shader.material[1] = 2.0F;
+    sotc::MetalAssetFrameResult second_mip_frame =
+        mip_renderer->render(std::span(&second_mip_draw, 1));
+    check("larger affine UV gradient renders", second_mip_frame.ok);
+    if (second_mip_frame.ok) {
+        check("CPU oracle observes implicit LOD transition to mip 2",
+              is_color(second_mip_frame.rgba8, 32, 32, mip_oracle(2.0F)) &&
+                  is_color(second_mip_frame.rgba8, 3, 32, mip_oracle(2.0F)));
+        check("UV scale mutation changes mip-sensitive readback",
+              second_mip_frame.rgba8 != mip_frame.rgba8);
+    }
+
+    const MipTextureStorage mutated_mip_texture = make_mip_texture(1);
+    sotc::AssetMeshDraw mutated_mip_draw = mip_draw;
+    mutated_mip_draw.fragment_texture0 = mutated_mip_texture.view();
+    sotc::MetalAssetFrameResult mutated_mip_frame =
+        mip_renderer->render(std::span(&mutated_mip_draw, 1));
+    check("mutated mip level renders", mutated_mip_frame.ok);
+    if (mutated_mip_frame.ok) {
+        check("CPU oracle observes selected-mip texture mutation",
+              is_color(mutated_mip_frame.rgba8, 32, 32, mip_oracle(1.0F, 1)));
+        check("selected-mip texture mutation changes readback",
+              mutated_mip_frame.rgba8 != mip_frame.rgba8);
+    }
+
+    const std::array<sotc::AssetTextureMipLevel, 1> wrong_dimension_levels = {{
+        {31, 32, std::span<const std::uint8_t>(mip_texture.pixel_bytes[1])}}};
+    sotc::AssetMeshDraw wrong_mip_dimensions_draw = mip_draw;
+    wrong_mip_dimensions_draw.fragment_texture0 = sotc::AssetTexture2D{
+        64, 64, std::span<const std::uint8_t>(mip_texture.pixel_bytes[0]),
+        std::span<const sotc::AssetTextureMipLevel>(wrong_dimension_levels)};
+    const sotc::MetalAssetFrameResult wrong_mip_dimensions =
+        mip_renderer->render(std::span(&wrong_mip_dimensions_draw, 1));
+    check("noncanonical mip dimensions fail visibly",
+          !wrong_mip_dimensions.ok &&
+              wrong_mip_dimensions.error.find("dimensions must be 32x32") != std::string::npos);
+
+    std::array<std::uint8_t, 32 * 32 * 4 - 1> truncated_mip_bytes{};
+    const std::array<sotc::AssetTextureMipLevel, 1> truncated_mip_levels = {{
+        {32, 32, std::span<const std::uint8_t>(truncated_mip_bytes)}}};
+    sotc::AssetMeshDraw truncated_mip_draw = mip_draw;
+    truncated_mip_draw.fragment_texture0 = sotc::AssetTexture2D{
+        64, 64, std::span<const std::uint8_t>(mip_texture.pixel_bytes[0]),
+        std::span<const sotc::AssetTextureMipLevel>(truncated_mip_levels)};
+    const sotc::MetalAssetFrameResult truncated_mip =
+        mip_renderer->render(std::span(&truncated_mip_draw, 1));
+    check("truncated supplied mip bytes fail visibly",
+          !truncated_mip.ok && truncated_mip.error.find("mip level 1 must contain exactly") !=
+                                    std::string::npos);
+
+    sotc::AssetMeshDraw invalid_lod_range_draw = mip_draw;
+    invalid_lod_range_draw.fragment_sampler0->lod_min_clamp = 2.0F;
+    invalid_lod_range_draw.fragment_sampler0->lod_max_clamp = 1.0F;
+    const sotc::MetalAssetFrameResult invalid_lod_range =
+        mip_renderer->render(std::span(&invalid_lod_range_draw, 1));
+    check("unordered sampler LOD clamps fail visibly",
+          !invalid_lod_range.ok &&
+              invalid_lod_range.error.find("LOD clamp range") != std::string::npos);
+
+    const char* logo_msl_path = std::getenv("SOTC_LOGO_PS_MSL");
+    if (logo_msl_path == nullptr || logo_msl_path[0] == '\0') {
+        std::puts("logo PS MSL replay: NOT RUN (set SOTC_LOGO_PS_MSL to the private generated source)");
+    } else {
+        std::string logo_msl_source;
+        check("private generated logo PS MSL can be read",
+              read_text_file(logo_msl_path, logo_msl_source));
+        if (!logo_msl_source.empty()) {
+            std::string logo_error;
+            std::unique_ptr<sotc::MetalAssetFrameRenderer> logo_renderer =
+                sotc::MetalAssetFrameRenderer::create(config, logo_msl_source, logo_error);
+            check("generated pinned logo PS MSL compiles as a fragment pipeline",
+                  logo_renderer != nullptr);
+            if (logo_renderer != nullptr) {
+                auto make_logo_draw = [&](float uv_scale, const MipTextureStorage& texture,
+                                          std::array<float, 4> color_scale = {1.0F, 1.0F,
+                                                                              1.0F, 1.0F}) {
+                    sotc::DefaultShaderCase logo_shader = sotc::make_default_shader_case();
+                    logo_shader.material = {uv_scale, uv_scale, 0.0F, 1.0F};
+                    logo_shader.param0_p0 = color_scale;
+                    sotc::AssetMeshDraw logo_draw{positions, indices, logo_shader};
+                    logo_draw.fragment_texture0 = texture.view();
+                    logo_draw.fragment_sampler0 = mip_sampler;
+                    return logo_draw;
+                };
+                sotc::AssetMeshDraw logo_mip1_draw = make_logo_draw(1.0F, mip_texture);
+                sotc::MetalAssetFrameResult logo_mip1 =
+                    logo_renderer->render(std::span(&logo_mip1_draw, 1));
+                check("generated logo PS implicit sample renders mip 1", logo_mip1.ok);
+                if (logo_mip1.ok) {
+                    check("logo PS CPU oracle matches mip 1 at center and boundary",
+                          is_color(logo_mip1.rgba8, 32, 32, mip_color_for_scale(1.0F)) &&
+                              is_color(logo_mip1.rgba8, 3, 32, mip_color_for_scale(1.0F)));
+                    const char* png_path = std::getenv("SOTC_LOGO_PS_PNG");
+                    if (png_path != nullptr && png_path[0] != '\0') {
+                        check("generated logo PS PNG is written directly under local evidence",
+                              write_png_file(png_path, logo_mip1.png));
+                    }
+                }
+
+                const std::array<float, 4> color_scale = {0.5F, 0.75F, 0.25F, 0.875F};
+                sotc::AssetMeshDraw logo_scaled_mip1_draw =
+                    make_logo_draw(1.0F, mip_texture, color_scale);
+                sotc::MetalAssetFrameResult logo_scaled_mip1 =
+                    logo_renderer->render(std::span(&logo_scaled_mip1_draw, 1));
+                check("logo PS channel multiplies and fp16 RTZ export render", logo_scaled_mip1.ok);
+                if (logo_scaled_mip1.ok) {
+                    check("logo PS CPU oracle matches channel multiply and RTZ export",
+                          is_color(logo_scaled_mip1.rgba8, 32, 32,
+                                   logo_multiply_oracle(1.0F, color_scale)));
+                }
+
+                sotc::AssetMeshDraw logo_mip2_draw = make_logo_draw(2.0F, mip_texture);
+                sotc::MetalAssetFrameResult logo_mip2 =
+                    logo_renderer->render(std::span(&logo_mip2_draw, 1));
+                check("generated logo PS implicit sample renders mip 2", logo_mip2.ok);
+                if (logo_mip2.ok) {
+                    check("logo PS CPU oracle observes UV-gradient LOD transition",
+                          is_color(logo_mip2.rgba8, 32, 32, mip_color_for_scale(2.0F)) &&
+                              is_color(logo_mip2.rgba8, 3, 32, mip_color_for_scale(2.0F)));
+                    check("logo PS UV mutation changes mip-sensitive readback",
+                          logo_mip2.rgba8 != logo_mip1.rgba8);
+                }
+
+                sotc::AssetMeshDraw logo_scaled_mip2_draw =
+                    make_logo_draw(2.0F, mip_texture, color_scale);
+                sotc::MetalAssetFrameResult logo_scaled_mip2 =
+                    logo_renderer->render(std::span(&logo_scaled_mip2_draw, 1));
+                check("logo PS channel multiply renders for mip 2", logo_scaled_mip2.ok);
+                if (logo_scaled_mip2.ok) {
+                    check("logo PS CPU oracle matches green-channel multiply at mip 2",
+                          is_color(logo_scaled_mip2.rgba8, 32, 32,
+                                   logo_multiply_oracle(2.0F, color_scale)));
+                }
+
+                sotc::AssetMeshDraw logo_mutated_draw = make_logo_draw(1.0F, mutated_mip_texture);
+                sotc::MetalAssetFrameResult logo_mutated =
+                    logo_renderer->render(std::span(&logo_mutated_draw, 1));
+                check("generated logo PS reads a mutated selected mip", logo_mutated.ok);
+                if (logo_mutated.ok) {
+                    check("logo PS CPU oracle matches mutated mip at center",
+                          is_color(logo_mutated.rgba8, 32, 32, mip_color_for_scale(1.0F, 1)));
+                    check("mutating the selected mip changes generated shader readback",
+                          logo_mutated.rgba8 != logo_mip1.rgba8);
+                }
+
+                sotc::AssetMeshDraw logo_scaled_mutated_draw =
+                    make_logo_draw(1.0F, mutated_mip_texture, color_scale);
+                sotc::MetalAssetFrameResult logo_scaled_mutated =
+                    logo_renderer->render(std::span(&logo_scaled_mutated_draw, 1));
+                check("logo PS channel multiply renders for mutated blue mip",
+                      logo_scaled_mutated.ok);
+                if (logo_scaled_mutated.ok) {
+                    check("logo PS CPU oracle matches blue-channel multiply after RTZ export",
+                          is_color(logo_scaled_mutated.rgba8, 32, 32,
+                                   logo_multiply_oracle(1.0F, color_scale, 1)));
+                }
+            } else {
+                std::fprintf(stderr, "FAIL generated logo PS MSL pipeline: %s\n",
+                             logo_error.c_str());
+            }
+        }
     }
 
     if (failures != 0) {

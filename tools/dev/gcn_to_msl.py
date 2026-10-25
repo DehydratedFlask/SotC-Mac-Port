@@ -28,6 +28,10 @@ CASE_FIELDS = ('position', 'encoded_normal', 'object_row0', 'object_row1', 'obje
                'clip_row0', 'clip_row1', 'clip_row2', 'clip_row3', 'camera', 'material',
                'param0_p0', 'param0_p10', 'param0_p20', 'param1_p0', 'param1_p10', 'param1_p20',
                'barycentric')
+LOGO_PS_SCHEMA = 'bounded-logo-ps-synthetic-v1'
+LOGO_PS_SHA256 = '4309caada7f114ec822f61646be536f50a8261a8c6e54f2ce709db7c70b8b39a'
+LOGO_PS_BYTES = 152
+LOGO_PS_ROWS = 34
 
 
 class LoweringError(ValueError):
@@ -311,6 +315,207 @@ inline float half_float(uint h) {
 '''
 
 
+def _expected_logo_ps_manifest() -> dict:
+    """Return the one closed-world, synthetic ABI admitted by the logo PS profile."""
+    return {
+        'schema': LOGO_PS_SCHEMA,
+        'sha256': LOGO_PS_SHA256,
+        'initial_scalar': {
+            '0': {'kind': 'pointer', 'view': 'binding_table'},
+        },
+        'initial_vector': {
+            '0': {'kind': 'float', 'field': 'barycentric', 'component': 'x'},
+            '1': {'kind': 'float', 'field': 'barycentric', 'component': 'y'},
+        },
+        'views': {
+            'binding_table': {
+                '6': {'kind': 'pointer', 'view': 'image_descriptor_storage'},
+                '8': {'kind': 'pointer', 'view': 'sampler_descriptor_storage'},
+            },
+            'image_descriptor_storage': {
+                '0': {'kind': 'image_descriptor', 'identity': 'texture0', 'dwords': 8},
+            },
+            'sampler_descriptor_storage': {
+                '4': {'kind': 'descriptor', 'identity': 'sampler0', 'dwords': 4},
+            },
+        },
+        'image_sample': {
+            'resource_sgpr': 0,
+            'sampler_sgpr': 8,
+            'texture_identity': 'texture0',
+            'sampler_identity': 'sampler0',
+            'texture_slot': 0,
+            'sampler_slot': 0,
+            'format': 'rgba8unorm_2d',
+            'coordinate_components': 2,
+            'normalized_coordinates': True,
+            'lod': 'implicit',
+        },
+    }
+
+
+def _manifest_difference(actual, expected, path='manifest') -> str | None:
+    if type(actual) is not type(expected):
+        return f'{path} has the wrong JSON type'
+    if isinstance(expected, dict):
+        missing = sorted(expected.keys() - actual.keys(), key=str)
+        extra = sorted(actual.keys() - expected.keys(), key=str)
+        if missing:
+            return f'{path} is missing field(s): {", ".join(missing)}'
+        if extra:
+            return f'{path} has unknown field(s): {", ".join(extra)}'
+        for key in expected:
+            mismatch = _manifest_difference(actual[key], expected[key], f'{path}.{key}')
+            if mismatch:
+                return mismatch
+    elif actual != expected:
+        return f'{path} must be {expected!r}'
+    return None
+
+
+def _validate_logo_ps_manifest(abi: dict) -> None:
+    mismatch = _manifest_difference(abi, _expected_logo_ps_manifest())
+    if mismatch:
+        raise LoweringError(f'unsupported logo PS synthetic ABI: {mismatch}')
+
+
+def _validate_logo_ps_rows(rows: list) -> None:
+    if len(rows) != LOGO_PS_ROWS:
+        raise LoweringError(f'pinned logo PS instruction profile requires {LOGO_PS_ROWS} rows; got {len(rows)}')
+    offsets = tuple(row.offset for row in rows)
+    if offsets != tuple(sorted(offsets)) or len(set(offsets)) != len(offsets):
+        raise LoweringError('pinned logo PS instruction profile has an unexpected instruction boundary/order')
+
+    by_offset = {row.offset: row for row in rows}
+
+    def require_row(offset: int, encoding: str, mnemonic: str, size: int, **fields) -> None:
+        row = by_offset[offset]
+        if (row.encoding, row.mnemonic, row.size) != (encoding, mnemonic, size):
+            raise LoweringError(f'pinned logo PS profile mismatch at {offset:#x}: expected {mnemonic}')
+        for name, expected in fields.items():
+            if row.fields.get(name) != expected:
+                raise LoweringError(
+                    f'pinned logo PS profile mismatch at {offset:#x}: {name} must be {expected!r}')
+
+    require_row(0x28, 'SOP1', 's_mov_b64', 4, src0=126, sdst=106)
+    require_row(0x2c, 'SOP1', 's_wqm_b64', 4, src0=126, sdst=126)
+
+    samples = [row for row in rows if row.mnemonic == 'image_sample']
+    if len(samples) != 1 or samples[0].offset != 0x44:
+        raise LoweringError('pinned logo PS profile requires one base IMAGE_SAMPLE at 0x44')
+    require_row(0x44, 'MIMG', 'image_sample', 8, dmask=15,
+                unorm=0, glc=0, da=0, r128=0, tfe=0, lwe=0, slc=0,
+                vaddr=2, vdata=2, resource_sgpr=0, sampler_sgpr=8,
+                srsrc=0, ssamp=2)
+
+    require_row(0x88, 'SOP1', 's_mov_b64', 4, src0=106, sdst=126)
+    if any('writes_exec_mask' in row.requirements for row in rows
+           if 0x2c < row.offset < 0x88):
+        raise LoweringError('pinned logo PS profile has an intervening EXEC write')
+    if any(row.mnemonic.startswith(('s_branch', 's_cbranch')) for row in rows):
+        raise LoweringError('pinned logo PS profile does not admit branches')
+
+    require_row(0x8c, 'EXP', 'exp', 8, target=0, en=15, compr=1, done=1, vm=1,
+                vsrc0=1, vsrc1=0, vsrc2=0, vsrc3=0)
+    require_row(0x94, 'SOPP', 's_endpgm', 4, simm16=0)
+    if rows[-1] != by_offset[0x94]:
+        raise LoweringError('pinned logo PS profile requires an exact final s_endpgm')
+
+
+def _validate_pinned_logo_ps_code(code: bytes) -> list:
+    if len(code) != LOGO_PS_BYTES:
+        raise LoweringError(f'pinned logo PS must be {LOGO_PS_BYTES} bytes; got {len(code)}')
+    digest = hashlib.sha256(code).hexdigest()
+    if digest != LOGO_PS_SHA256:
+        raise LoweringError(
+            f'pinned logo PS SHA-256 mismatch: expected {LOGO_PS_SHA256}, got {digest}')
+    try:
+        rows = gcn.decode(code)
+    except gcn.DecodeError as exc:
+        raise LoweringError(f'pinned logo PS decode failed: {exc}') from None
+    _validate_logo_ps_rows(rows)
+    return rows
+
+
+def _logo_ps_source() -> str:
+    source = '// Pinned logo PS; synthetic slot-0 resources only. Retail bindings and WQM equivalence NOT CLAIMED.\n'
+    source += HELPERS
+    source += '\nstruct ShaderCase {\n' + ''.join(f'    float4 {field};\n' for field in CASE_FIELDS) + '};\n'
+    source += r'''
+struct RasterValue { float4 position [[position]]; float4 param0; float4 param1; };
+
+inline float4 recovered_logo_ps(thread const ShaderCase& u,
+                                texture2d<float> texture0, sampler sampler0) {
+    float2 uv = float2(u.param1_p0.x, u.param1_p0.y);
+    float4 sampled = texture0.sample(sampler0, uv);
+    float4 multiplied = float4(mul32(sampled.x, u.param0_p0.x),
+                               mul32(sampled.y, u.param0_p0.y),
+                               mul32(sampled.z, u.param0_p0.z),
+                               mul32(sampled.w, u.param0_p0.w));
+    return float4(half_float(half_rtz(multiplied.x)),
+                  half_float(half_rtz(multiplied.y)),
+                  half_float(half_rtz(multiplied.z)),
+                  half_float(half_rtz(multiplied.w)));
+}
+
+vertex RasterValue asset_vertex(device const ShaderCase* inputs [[buffer(0)]],
+                                uint vid [[vertex_id]]) {
+    ShaderCase u = inputs[vid];
+    RasterValue out;
+    // Synthetic harness mapping: preserve xyz and supply a valid clip-space w.
+    out.position = float4(u.position.xyz, 1.0f);
+    out.param0 = u.param0_p0;
+    out.param1 = float4(add32(mul32(u.position.x, u.material.x), 0.5f),
+                        add32(mul32(u.position.y, u.material.y), 0.5f),
+                        0.0f, 0.0f);
+    return out;
+}
+
+fragment float4 asset_fragment(RasterValue in [[stage_in]],
+                               constant ShaderCase& uniforms [[buffer(0)]],
+                               texture2d<float> texture0 [[texture(0)]],
+                               sampler sampler0 [[sampler(0)]]) {
+    ShaderCase u = uniforms;
+    u.param0_p0 = in.param0;
+    u.param1_p0 = in.param1;
+    u.param0_p10 = float4(0.0f);
+    u.param0_p20 = float4(0.0f);
+    u.param1_p10 = float4(0.0f);
+    u.param1_p20 = float4(0.0f);
+    u.barycentric = float4(0.0f);
+    return recovered_logo_ps(u, texture0, sampler0);
+}
+'''
+    return source
+
+
+def _lower_logo_ps_rows(rows: list, abi: dict) -> tuple[str, dict]:
+    _validate_logo_ps_rows(rows)
+    _validate_logo_ps_manifest(abi)
+    source = _logo_ps_source()
+    return source, dict(
+        version=LOGO_PS_SCHEMA,
+        profile='pinned-logo-ps-image-sample',
+        code_sha256=LOGO_PS_SHA256,
+        code_bytes=LOGO_PS_BYTES,
+        stages=[dict(stage='ps', sha256=LOGO_PS_SHA256, instructions=LOGO_PS_ROWS)],
+        image_sample=dict(texture_slot=0, sampler_slot=0, format='rgba8unorm_2d',
+                          coordinate_components=2, normalized_coordinates=True,
+                          lod='implicit', instruction_offset='0x44'),
+        msl_sha256=hashlib.sha256(source.encode()).hexdigest(),
+        limitations=['synthetic slot-0 texture/sampler ABI',
+                     'validated WQM/save/restore controls are not emitted as runtime operations',
+                     'AMD WQM/Metal helper-lane and derivative equivalence NOT VERIFIED',
+                     'retail resource bindings and SPI interpolation UNVERIFIED',
+                     'G3 NOT RUN'])
+
+
+def generate_logo_ps(code: bytes, abi: dict) -> tuple[str, dict]:
+    """Lower only the SHA-pinned logo PS through its explicit synthetic ABI."""
+    rows = _validate_pinned_logo_ps_code(code)
+    return _lower_logo_ps_rows(rows, abi)
+
+
 def generate(vs: bytes, ps: bytes, abi: dict) -> tuple[str, dict]:
     if abi.get('schema') != VERSION or abi.get('floating_point') != 'nearest_even_ftz32_rtz16':
         raise LoweringError('explicit supported schema/floating-point harness profile required')
@@ -351,7 +556,8 @@ fragment float4 asset_fragment(RasterValue in [[stage_in]], constant ShaderCase&
 
 def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--vs',required=True,type=Path); p.add_argument('--ps',required=True,type=Path)
+    p.add_argument('--profile',choices=('pair','logo-ps'),default='pair')
+    p.add_argument('--vs',type=Path); p.add_argument('--ps',required=True,type=Path)
     p.add_argument('--abi',required=True,type=Path); p.add_argument('--output',required=True,type=Path)
     p.add_argument('--report',required=True,type=Path)
     a=p.parse_args(argv)
@@ -361,7 +567,17 @@ def main(argv=None):
             resolved=target.resolve()
             if resolved.is_relative_to(workspace) and not resolved.is_relative_to(workspace/'local'):
                 raise LoweringError('asset-derived outputs inside this repo must stay under private local/')
-        source,report=generate(a.vs.read_bytes(),a.ps.read_bytes(),json.loads(a.abi.read_text()))
+        abi=json.loads(a.abi.read_text())
+        if a.profile == 'logo-ps':
+            if a.vs is not None:
+                raise LoweringError('logo-ps profile accepts only --ps; omit --vs')
+            if not a.ps.resolve().is_relative_to(workspace/'local'):
+                raise LoweringError('pinned logo PS input must be supplied from private local/')
+            source,report=generate_logo_ps(a.ps.read_bytes(),abi)
+        else:
+            if a.vs is None:
+                raise LoweringError('pair profile requires --vs')
+            source,report=generate(a.vs.read_bytes(),a.ps.read_bytes(),abi)
         a.output.parent.mkdir(parents=True,exist_ok=True)
         a.output.write_text(source); a.report.write_text(json.dumps(report,indent=2)+'\n')
     except (OSError,ValueError,KeyError,TypeError) as e:

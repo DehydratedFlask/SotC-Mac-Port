@@ -404,15 +404,21 @@ harness" and the VALIDATION G3 row stays PARTIAL at best.
 ### 6.5 Synthetic texture/sampler binding slice
 
 E635 implements the first fragment resource binding slice in the typed RenderOp executor. A caller
-declares the MSL ABI in `MetalAssetFrameConfig` and supplies one RGBA8Unorm 2D texture, one mip level,
-and an explicit sampler for each draw. This fixture binds fragment texture and sampler slot 0 with
-host-assigned handles; its sampler exposes nearest/linear minification and magnification plus clamp,
-repeat, and mirror-repeat U/V addressing. Invalid or missing descriptors fail before issuing the draw.
+declares the MSL ABI in `MetalAssetFrameConfig` and supplies an RGBA8Unorm 2D base level plus optional
+explicitly supplied mip levels and an explicit sampler for each draw. This fixture binds fragment
+texture and sampler slot 0 with host-assigned handles; its sampler exposes nearest/linear
+minification and magnification, optional nearest/linear mip filtering, and clamp, repeat, and
+mirror-repeat U/V addressing. Invalid or missing descriptors fail before issuing the draw. Defaults
+preserve E635's single-level path.
 
-The self-contained synthetic MSL fixture proves resource upload/binding, filtering, deterministic
-readback, and fail-visible input checks. It does not lower the game's MIMG `image_sample`, prove AMD
-WQM/Metal helper-lane or derivative equivalence, establish a retail texture/attribute ABI, or read a
-game texture. G3 remains PARTIAL.
+The E635 self-contained synthetic MSL fixture proves resource upload/binding, filtering, deterministic
+readback, and fail-visible input checks. E645 adds explicit mip upload and verifies a synthetic
+implicit/explicit gradient sample selects distinct levels against a CPU oracle. E646 specializes
+the exact digest-pinned logo PS for a synthetic slot-0 texture/sampler and coordinate ABI, then checks
+the generated fragment path against mip colors, per-channel multiplication, fp16 RTZ values, and a
+CPU readback oracle. The profile emits a fixed template for that one pinned shader; it is not a
+general per-instruction GCN translator. These fixtures do not prove AMD WQM/Metal helper-lane equivalence,
+establishes retail texture/attribute bindings, or reads a game texture. G3 remains PARTIAL.
 
 ### 6.6 Logo vertex formatted-fetch lowering
 
@@ -423,8 +429,27 @@ format mismatches and unbound streams fail conversion. Tests exercise synthetic 
 stream widths, then replay the pinned private logo-VS span with synthetic stream fields, an independent
 CPU oracle, and the Metal harness. The ABI is a test input and does not recover retail descriptor or
 attribute semantics. E636 verified 1,024 Metal cases and 12,288 exact output components against a
-separate CPU oracle. This stops before the logo pixel shader: WQM, MIMG sampling, logo texture binding,
-real mesh geometry and retail attribute semantics remain outside scope. G3 remains PARTIAL.
+separate CPU oracle. This vertex-fetch slice does not establish retail descriptors or attribute
+semantics, and it does not provide real mesh sampling. The bounded E646 pixel fixture is documented
+below. G3 remains PARTIAL.
+
+### 6.7 Pinned logo pixel image sample
+
+`GPU-02-GCN-LOGO-PS-IMAGE-SAMPLE-01` accepts only the private 152-byte E634 shader slice with its
+exact SHA-256 and a closed-world synthetic slot-0 ABI. The decoder checks the pinned instruction
+count, WQM save/enable/restore anchors, the single base `IMAGE_SAMPLE` fields and descriptor ranges,
+compressed target-0 export, end instruction, and absence of branches or intervening EXEC writes.
+The digest-gated profile emits a fixed PS-only MSL specialization; it validates and executes the
+actual private byte slice but does not claim a reusable instruction-to-MSL lowering for arbitrary
+programs or prove the retail descriptor/interpolation meaning.
+
+The Metal fixture selects red mip 1 or green mip 2 from implicit UV derivatives, verifies center and
+primitive-boundary samples, observes a selected-level mutation to blue, and checks channel
+multiplication plus the half-RTZ export using binary-fraction inputs. `SOTC_LOGO_PS_MSL` enables the
+private generated-MSL replay; `SOTC_LOGO_PS_PNG` writes the direct 64x64 harness image under `local/`.
+E646 passed the focused test and full CTest with Metal API/GPU validation enabled and no faults.
+This is synthetic fixture evidence only: WQM/helper-lane equivalence, game assets, retail bindings,
+game-driven rendering, and G3 remain unverified.
 
 ## 7. Ranked task cards
 

@@ -18,6 +18,9 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Slot 303 checker publication repair](checkpoints/2026-10-24-slot303-publication-repair.md) | Complete function reconstruction removed from public checker; E624 |
 | [Integration PR #9 final closeout](checkpoints/2026-10-25-integration-pr9-final-closeout.md) | PR #9 merged at `a8bd805`; clean-main baseline and branch cleanup verified; E643 |
 | [Metal fragment derivative fixture](checkpoints/2026-10-25-gpu02-metal-quad-derivative-fixture.md) | Synthetic Metal helper-lane derivative and implicit/explicit sampling check; one mip only; E644 |
+| [Logo PS IMAGE_SAMPLE prerequisite](checkpoints/2026-10-25-gpu02-logo-ps-image-sample.md) | E645 synthetic multi-mip implicit/explicit Metal sampler prerequisite |
+| [Logo PS IMAGE_SAMPLE completion](checkpoints/2026-10-25-gpu02-logo-ps-image-sample-complete.md) | E646 pinned fixed-template MSL replay and synthetic Metal/CPU-oracle result; retail and G3 limits remain |
+| [Logo PS principal reassessment](escalations/GPU-02-GCN-LOGO-PS-IMAGE-SAMPLE-01.md) | Three unsuccessful test hypotheses, recorded root reassessment, and passed fourth focused replay |
 | [GFX7 default-pair inventory and Metal harness](checkpoints/2026-10-24-gcn-default-pair.md) | E625 inventory plus E627 bounded default VS/PS MSL; overall G3 is PARTIAL from later synthetic Metal harness work |
 | [CSDR reader corpus and review](checkpoints/2026-10-24-csdr-reader.md) | E626 structural-first attempt3, arbitrary `cc xx`, full corpus v5 and independent review |
 | [Round 30 integration](checkpoints/2026-10-24-round30-integration.md) | Root replay: CTest 388/388, lift checkers 476/0/0, Python 228/228, shader harness and outstanding game gates; E628 |
