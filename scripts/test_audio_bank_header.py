@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Synthetic fixtures for the bounded XFF audio-bank header observations."""
+"""Synthetic fixtures for generic, bounded XFF prefix/length observations."""
 from __future__ import annotations
 
 import hashlib
@@ -196,6 +196,9 @@ class SyntheticPsarc:
     def paths(self) -> list[str]:
         return [self._member_path]
 
+    def members(self) -> list[tuple[str, int]]:
+        return [(self._member_path, 1)]
+
     def read(self, entry_id: int) -> bytes:
         self.read_calls.append(entry_id)
         if entry_id != 1:
@@ -265,7 +268,8 @@ class InspectMembersTests(unittest.TestCase):
         self.assertEqual(fixture['reader'].read_calls, [1])
         self.assertTrue(fixture['reader'].closed)
         self.assertEqual(report['schema_version'], 1)
-        self.assertEqual(report['task'], 'AUD-01-XFF-01')
+        self.assertEqual(report['task'], 'DATA-02-XFF-PREFIX-01')
+        self.assertEqual(report['format_scope'], 'generic_xff_prefix')
         self.assertEqual(report['archive'], {
             'path': str(fixture['archive_path'].resolve()),
             'bytes': len(fixture['archive_bytes']),
@@ -391,7 +395,7 @@ class InspectMembersTests(unittest.TestCase):
     def test_inspect_members_rejects_zero_exact_path_matches_and_closes_reader(self):
         fixture = self._fixture()
         reader = fixture['reader']
-        with patch.object(reader, 'paths', return_value=[]), \
+        with patch.object(reader, 'members', return_value=[]), \
                 patch.object(abh, 'Psarc', return_value=reader) as psarc:
             with self.assertRaises(abh.AudioBankFormatError) as ctx:
                 abh.inspect_members(
@@ -414,8 +418,8 @@ class InspectMembersTests(unittest.TestCase):
         reader = fixture['reader']
         with patch.object(
                 reader,
-                'paths',
-                return_value=[fixture['member_path'], fixture['member_path']]), \
+                'members',
+                return_value=[(fixture['member_path'], 1), (fixture['member_path'], 2)]), \
                 patch.object(abh, 'Psarc', return_value=reader) as psarc:
             with self.assertRaises(abh.AudioBankFormatError) as ctx:
                 abh.inspect_members(
@@ -432,6 +436,53 @@ class InspectMembersTests(unittest.TestCase):
         )
         self.assertEqual(reader.read_calls, [])
         self.assertTrue(reader.closed)
+
+    def test_inspect_members_wraps_pairing_error_and_closes_reader(self):
+        fixture = self._fixture()
+        reader = fixture['reader']
+        with patch.object(reader, 'members', side_effect=abh.PsarcError('synthetic pairing')), \
+                patch.object(abh, 'Psarc', return_value=reader):
+            with self.assertRaises(abh.AudioBankFormatError) as ctx:
+                abh.inspect_members(
+                    fixture['archive_path'], [fixture['member_path']],
+                    fixture['manifest_path'], fixture['summary_path'])
+        self.assertEqual(
+            str(ctx.exception),
+            'cannot pair PSARC manifest paths to TOC entries: synthetic pairing')
+        self.assertTrue(reader.closed)
+
+    def test_inspect_members_real_synthetic_psarc_md5_sorted_toc(self):
+        """Real PSARC bytes: MD5-sorted TOC + alphabetical manifest; entry id must be MD5's."""
+        import test_psarc
+        names = ['sound/' + n for n in ('a', 'b', 'c', 'd', 'e', 'f')]
+        members = [(n + '.hd', make_member(n.encode() * 8)) for n in names]
+        members.sort()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            archive_path = root / 'fixture.psarc'
+            archive_path.write_bytes(test_psarc.build(members, sort_by_md5=True))
+            probe = abh.Psarc(archive_path)
+            try:
+                # first member whose MD5 entry differs from the old positional k + 1
+                target, entry_id = next(
+                    (p[:-3], e) for k, (p, e) in enumerate(probe.members()) if e != k + 1)
+                entry = probe.entries[entry_id]
+            finally:
+                probe.close()
+            data = dict(members)[target + '.hd']
+            (root / 'fixture.summary.json').write_text(json.dumps({
+                'bytes': archive_path.stat().st_size,
+                'sha256': hashlib.sha256(archive_path.read_bytes()).hexdigest()}))
+            (root / 'audio.json').write_text(json.dumps({'members': [{
+                'archive': str(archive_path.resolve()), 'path': target + '.hd',
+                'entry_id': entry_id, 'entry_offset': entry['offset'],
+                'first_block': entry['block'], 'size': len(data),
+                'member_sha256': hashlib.sha256(data).hexdigest()}]}))
+            report = abh.inspect_members(
+                archive_path, [target + '.hd'], root / 'audio.json', root / 'fixture.summary.json')
+        self.assertEqual(report['members'][0]['psarc_entry_id'], entry_id)
+        self.assertEqual(report['members'][0]['decoded_member_sha256'],
+                         hashlib.sha256(data).hexdigest())
 
 
 if __name__ == '__main__':

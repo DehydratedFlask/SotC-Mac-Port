@@ -57,11 +57,22 @@ int main() {
         CHECK(st.thunk_registrations[slot].descriptor() == &kRegistrationThunkDescriptors[slot]);
     }
 
-    // The runner publishes all eight, in order, and nothing else of this family.
+    // The runner publishes all eight, in order, and nothing else of this family. The stop point is
+    // derived from the table itself: the runner must report the first row with a null callback, and
+    // succeed when every row is recovered (the production table has no explicit blocker today).
     {
         StartupState st;
-        auto r = run_constructors(recovered_constructors(), st);
-        CHECK(r.blocked_on_rva == 0xe71990 && !r.callback_failed);
+        const std::span<const CtorSlot> slots = recovered_constructors();
+        std::size_t first_unresolved = 0;
+        while (first_unresolved < slots.size() && slots[first_unresolved].run != nullptr) ++first_unresolved;
+        const auto r = run_constructors(slots, st);
+        CHECK(!r.callback_failed);
+        CHECK(r.completed == first_unresolved);
+        if (first_unresolved == slots.size()) {
+            CHECK(r.ok() && r.blocked_on_rva == 0);
+        } else {
+            CHECK(!r.ok() && r.blocked_on_rva == slots[first_unresolved].original_rva);
+        }
         CHECK(only_registered(st, 0, 7));
         for (std::size_t i = 0; i < kRegistrationThunkCount; ++i)
             CHECK(st.thunk_registrations[i].descriptor() == &kRegistrationThunkDescriptors[i]);

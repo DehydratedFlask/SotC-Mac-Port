@@ -427,3 +427,65 @@ All exited 0; baseline CTest passed 1/1. Logs are under
 local/validation/srv01-region-list-uncounted-head-20261022/. Purpose: evaluate a potential
 synthetic intrusive-list head-unlink fixture. No task was claimed and no implementation changed.
 Build products remain in the exact local/build/ directory. No removal boundary was created.
+
+## 2026-10-22 22:12 CDT — isolated save-temp verification
+
+No installs/downloads/dependency changes. Worker reused Apple clang 21.0.0 arm64, CMake 4.4.4
+and Ninja. Debug ASan/UBSan configure and focused test_save_stream_file build/run are recorded
+in docs/checkpoints/2026-10-22-codex-save-temp-worker.md; build products and red/mutation
+evidence remain in the managed worktree local/build/task1-save-temp-20261022 and
+local/validation/task1-save-temp-20261022. No global removal boundary. LeakSanitizer unsupported;
+ASan/UBSan pass with detect_leaks=0.
+
+## 2026-10-22 22:24 CDT — integrated build and verification recovery
+
+No new install/download. Root reused clang/CMake/Ninja for managed local/build/root-parallel-foundations-20261022
+Debug ASan/UBSan full build(1082 steps). Three suite approaches and exact fixture-copy identities
+are in docs/escalations/INT-VALIDATION-PARALLEL-FOUNDATIONS-01.md; logs remain managed local/validation/root-parallel-foundations-20261022.
+Private fixtures copied read-only from original inputs to managed local/fixtures after SHA checks;
+no originals changed. Release worker reused saved Ghidra12.1.4/OpenJDK25 project readOnly/noanalysis
+(success3.807s) after one REA default-import timeout. No configuration or saved database changed.
+
+## 2026-10-22 22:28 CDT — release/audio worker verification
+
+No installs/downloads/config changes. Release worker reused clang21/CMake/Ninja Debug ASan/UBSan
+in managed local/build/task2-release (428steps, final2step rebuild), focused1/1 and byte-oracle
+checks plus private mutants. Ghidra12.1.4/OpenJDK25 saved-project readOnly/noanalysis export
+exit0 in3.807s; full argv/provenance retained in local/validation/task2-release. REA default
+330s import timeout and empty evidence export retained as limitations. Audio worker reused
+Python stdlib and Xcode llvm-objdump found by xcrun;20 synthetic tests and two deterministic
+private analyses pass. Exact commands/tool versions/evidence paths in worker reports/checkpoint.
+
+## 2026-10-24 15:53 CDT — GPU-03 direct-Metal synthetic-frame verification
+
+No install, download, or dependency change. Reused Apple clang 21.0.0 targeting arm64,
+CMake 4.4.4, Ninja 1.13.2, Xcode 27.1 (27A9275), macOS 27.0.1 (26A434), and the Apple M4 Pro.
+Purpose: build and verify the direct-Metal typed-op executor, its synthetic indexed/depth frame,
+and checked ImageIO PNG path. CMake registration enables Metal API and GPU validation for the
+fixture test. Exact commands from the workspace root:
+
+```sh
+cmake -S native -B local/build/orch-r22
+cmake --build local/build/orch-r22 -j 12
+ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure
+ctest --test-dir local/build/orch-r22 -V -R '^metal_asset_frame$'
+ctest --test-dir local/build/orch-r22 -R '^(metal_capture|metal_asset_frame)$' -j 2 --output-on-failure
+SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh
+python3 scripts/project_index.py
+trail build --check
+trail build
+trail build --check
+trail grep 'MetalAssetFrameRenderer'
+```
+
+All exited 0: CTest 391/391 and lift checkers 476 passed, 0 skipped, 0 failed. Complete logs are
+under `local/orchestrator/gpu03-r31/metal-frame/`; generated MSL, PNG and build products stay in
+`local/` (MSL SHA-256 `5524537e36b2481798abe5bf6c311e37082aed26b136c4590f7d685e671a455e`, PNG
+SHA-256 `35039e0fe8a9700ccfbe8bb66181426c16ea41849677633cea81ac99c0d21a94`). No installed tool or
+system configuration was changed; the removal boundary is limited to these task-local build and
+evidence artifacts. Preserve original game archives and extracted inputs.
+Trail 0.23.0 was reused with no upgrade. The first `trail build --check` reported `STALE` for
+the four edited test nodes and one new `fragment_classes_match` node; `trail build` regenerated
+8,292 wiring nodes and 11,219 edges, the next check passed, and `trail grep` found the new renderer
+API in its header and test. The graph cache is the existing git-ignored `graft/` directory; no
+downloaded tool or cache file is being published.

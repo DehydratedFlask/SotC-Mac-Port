@@ -1,6 +1,116 @@
 # Validation gates and evidence protocol
 
-Current checkpoint: G0 PARTIAL; G1-G6 NOT RUN. This is a plan, not a game execution report.
+Current checkpoint: G0 PARTIAL; G1 PARTIAL (E404–E542). Measured native coverage of Init
+`0x531d60` over `0x531d60..0x532b0c` is **3500 / 3500 B = 100.0%** claimed (semantics still partial) (E542,
+`tools/lift/report_init_coverage.py`) — claimed bytes, not proven semantics; four gaps remain
+(all four former gaps are now pinned in `init_531d60_entry_gaps`; claimed bytes are not semantics).
+See E404–E508 —
+`docs/checkpoints/2026-10-22-g1-partial-evidence-pack.md`,
+`docs/checkpoints/2026-10-22-appmain-init-registry-slice.md`,
+`docs/checkpoints/2026-10-22-init-531d60-trivial-leaves.md`,
+`docs/checkpoints/2026-10-22-base-initialize-255130.md`,
+`docs/checkpoints/2026-10-22-prologue-255180-early.md`,
+`docs/checkpoints/2026-10-22-prologue-255180-tail.md`,
+`docs/checkpoints/2026-10-22-ctor-98a90-3be050.md`,
+`docs/checkpoints/2026-10-22-ctor-98a90-3be050-bufgrow.md`, and
+`docs/checkpoints/2026-10-22-ctor-98a90-3be050-listwalk.md`, and
+`docs/checkpoints/2026-10-22-store-tsc-323d0.md`, and
+`docs/checkpoints/2026-10-22-ensure-3c2f70.md`, and
+`docs/checkpoints/2026-10-22-init-sub-3be930.md`, and
+`docs/checkpoints/2026-10-22-ctor-40-1ab550.md`, and
+`docs/checkpoints/2026-10-22-prologue-gates-2552d4.md`, and
+`docs/checkpoints/2026-10-22-vslot-30-534130.md`, and
+`docs/checkpoints/2026-10-22-mid-255340.md`,
+`docs/checkpoints/2026-10-22-singleton-f08-531d84.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-header.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-post.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-miss.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-join.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-gfx.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-shadow.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-shadow-attach.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-shadowskels.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-skels-attach.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-shadowanims.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-anims-attach.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-shadowbanks.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-banks-attach.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-shadowstreams.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-streams-attach.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-shadowrandomevents.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-randomevents-attach.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-shadowbossmusic.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-bossmusic-attach.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-cp3characters.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-cp3characters-attach.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-cp3shadowprecache.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-cp3shadowprecache-attach.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-tail-140d90.md`,
+`docs/checkpoints/2026-10-22-vslot-40-533100-stackchk.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-499f80.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-56dcb0.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-5c64c0.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-1290.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-56db70.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-5b3d00.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-5b3cf0.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-avx-bss.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-7f7220.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-56fad0.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-f90310.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-ymm-bss.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-ymm-intercell.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-xmm-seed.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-ymm-reload.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-26800-f590.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-sbj.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-sboj.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-52eb50.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-lea-vmovq.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-532ca0.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-vcall18.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-532ca0-u2.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-vcall18-u2.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-532ca0-u3.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-vcall18-u3.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-532ca0-u4.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-vcall18-u4.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-532ca0-u5.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-vcall18-u5.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-532ed0.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-vcall18-532ed0.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-532ed0-u2.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-vcall18-532ed0-u2.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-17070.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-544fe0.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-cell-2eff450.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-17070-u2.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-53fd10.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-cell-2eff448.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-vcall38.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-lea-32f4fe0.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-a2caf0.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-a2ed00.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u2.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-a2ed00-u2.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u3.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u4.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-a2ed00-u3.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u5.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u6.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-a2ed00-u4.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u7.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u8.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-a2ed00-u5.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u9.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u10.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-a2ed00-u6.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u11.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u12.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-a2ed00-u7.md`,
+`docs/checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u13.md`);
+G2-G6 NOT RUN. This is a plan, not a game execution report. G1 is not PASSED.
 Artifact/tool/source evidence is recorded in EVIDENCE.md; full asset/linkage schemas remain open.
 Baseline supplied by the coordinating agent on 2026-10-19, America/Chicago: M4 Pro, 12 CPU cores,
 48 GB unified memory, macOS 27.0.1, Xcode 27.1. Read-only machine/toolchain capture on 2026-10-20
@@ -19,9 +129,9 @@ Follow [AGENTS.md](../AGENTS.md), [PLATFORM.md](PLATFORM.md), [ROADMAP.md](../RO
 | Gate | Deliverable | Current status |
 | --- | --- | --- |
 | G0 | Local inventory, provenance, toolchain, indexing | PARTIAL |
-| G1 | Pure native CPU/game-core feasibility | NOT RUN |
+| G1 | Pure native CPU/game-core feasibility | PARTIAL (startup harness + Init-hash + prologue early+tail+gates+lifted 0x3be050+0x1ab550→0xf08 singleton→base with lifted vslot 0x534130+mid 0x255340+0x533100 header+post/1fc80→registry; unresolved edges in E404–E422; not PASSED) |
 | G2 | Native services, audio fixtures, save fixtures | NOT RUN |
-| G3 | Direct Metal resources, shader semantics, rendering | NOT RUN |
+| G3 | Direct Metal resources, shader semantics, rendering | PARTIAL (E627 default-pair shader fixtures; E632/E633 synthetic Metal geometry/parser flow; real asset bindings and passes remain unverified) |
 | G4 | Native Swift/macOS launcher and lifecycle | NOT RUN |
 | G5 | Actual game boot, actual sound, real save/reload | NOT RUN |
 | G6 | Final packaging, native-only audit, stability/performance | NOT RUN |

@@ -42,12 +42,17 @@ FORBIDDEN_NAME_RE = re.compile(
 )
 
 # Directory names forbidden at ANY depth (case-insensitive component match).
+# "reference" and "logs" mirror the FORBIDDEN_PREFIXES roots: a nested dir with
+# one of those names is just as likely to hold unpublished upstream clones,
+# extracted game data, or regenerable private logs.
 FORBIDDEN_DIR_COMPONENTS = frozenset(
     {
         "shadow of the colossus",
         "local",
         "agentstores",
         ".graft",
+        "reference",
+        "logs",
     }
 )
 
@@ -89,21 +94,32 @@ def violations(paths: list[str]) -> list[str]:
         p = raw.replace("\\", "/")
         while p.startswith("./"):
             p = p[2:]
+        # Drop empty components so a trailing slash ("tools/local/") or a doubled
+        # separator ("tools//local") cannot hide the final component.
+        parts = [c for c in p.split("/") if c]
+        p = "/".join(parts)
         if not p:
             continue
-        if ".." in p.split("/"):
+        if ".." in parts:
             bad.append(f"path traversal: {p}")
             continue
-        top = p.split("/", 1)[0]
+        top = parts[0]
         if top not in ALLOWED_TOP and p not in ALLOWED_TOP:
             bad.append(f"outside allowlist: {p}")
             continue
+        # Every component is checked, including the last one: a gitlink/submodule
+        # or directory whose FINAL name is forbidden (e.g. "tools/local") must not
+        # slip through. Tradeoff: a plain *file* whose basename exactly equals one
+        # of these reserved dir names (e.g. "docs/local") is rejected too, because a
+        # path string alone cannot distinguish a file from a directory/gitlink
+        # without extra git/filesystem mode data. Names with extensions or extra
+        # words ("docs/local.md", "native/local_tests/a.c") still pass.
         nested = next(
-            (c for c in p.split("/")[:-1] if c.lower() in FORBIDDEN_DIR_COMPONENTS),
+            (c for c in parts if c.lower() in FORBIDDEN_DIR_COMPONENTS),
             None,
         )
         if nested is not None:
-            bad.append(f"forbidden nested directory {nested!r}: {p}")
+            bad.append(f"forbidden directory component {nested!r}: {p}")
             continue
         for pref in FORBIDDEN_PREFIXES:
             if p == pref.rstrip("/") or p.startswith(pref):

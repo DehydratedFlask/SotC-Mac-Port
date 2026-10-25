@@ -355,9 +355,10 @@ void test_coverage() {
       saw_engine = true;
       CHECK(s.status == SOTC_SUBSYSTEM_NOT_IMPLEMENTED);
     }
-    if (std::strcmp(s.name, "metal_renderer") == 0 || std::strcmp(s.name, "audio") == 0 ||
-        std::strcmp(s.name, "save_load") == 0)
+    if (std::strcmp(s.name, "metal_renderer") == 0 || std::strcmp(s.name, "audio") == 0)
       CHECK(s.status == SOTC_SUBSYSTEM_NOT_IMPLEMENTED);
+    if (std::strcmp(s.name, "save_load") == 0)
+      CHECK(s.status == SOTC_SUBSYSTEM_PARTIAL);  // fixture-verified transaction/metadata, no platform save
   }
   CHECK(saw_engine);
   CHECK(cov.ctor.run_ok == (cov.ctor.blocked_on_rva == 0 && !cov.ctor.callback_failed ? 1u : 0u) ||

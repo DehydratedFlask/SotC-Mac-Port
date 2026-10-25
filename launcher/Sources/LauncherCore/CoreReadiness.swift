@@ -57,25 +57,29 @@ public enum CoreDiagnostics {
     /// Full diagnostics: readiness lines, then the core section.
     public static func text(
         report: ReadinessReport?, coverage: CoreCoverageReport?, status: CoreStatus?,
-        lastFailure: CoreFailure?, queryFailure: CoreFailure?
+        lastFailure: CoreFailure?, queryFailure: CoreFailure?, transport: CoreTransport? = nil
     ) -> String {
         var parts: [String] = []
         parts.append(report.map(DiagnosticsSummary.text(for:)) ?? "No readiness check has run yet.")
-        parts.append(coreSection(coverage: coverage, status: status, lastFailure: lastFailure, queryFailure: queryFailure).joined(separator: "\n"))
+        parts.append(coreSection(coverage: coverage, status: status, lastFailure: lastFailure, queryFailure: queryFailure, transport: transport).joined(separator: "\n"))
         return parts.joined(separator: "\n\n")
     }
 
     public static func coreSection(
-        coverage: CoreCoverageReport?, status: CoreStatus?, lastFailure: CoreFailure?, queryFailure: CoreFailure?
+        coverage: CoreCoverageReport?, status: CoreStatus?, lastFailure: CoreFailure?, queryFailure: CoreFailure?,
+        transport: CoreTransport? = nil
     ) -> [String] {
         var lines = ["Core report:"]
+        if let transport { lines.append(transport.diagnosticsLine) }
         if let queryFailure {
             lines.append("  Core query failed: \(queryFailure.message) (\(code(queryFailure.code)))")
         }
         if let coverage {
             lines.append("  Core ABI: \(coverage.abiVersion)")
             lines.append("  Engine implemented: \(coverage.engineImplemented ? "YES" : "NO")")
-            lines.append("  Constructor prefix: \(ctor(coverage.ctor))")
+            // Protocol v1 coverage carries no ctor object; status does. Prefer whichever is linked.
+            let prefix = coverage.ctor.linked ? coverage.ctor : (status?.ctor.linked == true ? status!.ctor : coverage.ctor)
+            lines.append("  Constructor prefix: \(ctor(prefix))")
             if coverage.subsystems.isEmpty {
                 lines.append("  Subsystems: none reported")
             }
@@ -136,6 +140,11 @@ public enum CoreDiagnostics {
         guard prefix.linked else { return "NOT LINKED in this build" }
         let outcome = prefix.runOK ? "run OK" : "run did not complete"
         let blocked = prefix.blockedOnRVA == 0 ? "" : ", blocked on RVA 0x\(String(prefix.blockedOnRVA, radix: 16))"
-        return "\(prefix.completed) of \(prefix.slotsWithCallback) callbacks completed (\(prefix.slotsRegistered) slots registered), \(outcome)\(blocked)"
+        var recovery = ""
+        if prefix.originalSlots > 0 {
+            recovery = "; \(prefix.slotsRegistered) of \(prefix.originalSlots) original slots recovered"
+            if let first = prefix.firstUnrecoveredIndex { recovery += ", first unrecovered index \(first)" }
+        }
+        return "\(prefix.completed) of \(prefix.slotsWithCallback) callbacks completed (\(prefix.slotsRegistered) slots registered), \(outcome)\(blocked)\(recovery)"
     }
 }

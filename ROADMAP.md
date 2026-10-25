@@ -99,13 +99,40 @@ or unwanted network subsystem into the native target.
 - Display name: SotC Mac Port. This remote holds the Mac native port + launcher + port docs/tooling only.
 - Users must supply their own legally obtained game files. No Sony assets ship in the repo.
 - At **every** HANDOFF checkpoint / completed task claim: commit allowlisted changes with a clear
-  message and `git push origin main` (default branch). Never force-push; rebase/pull if peers pushed.
+  message and push `origin cursor/init-hash-551140-9dfc` (the active draft-PR branch in
+  `HANDOFF.md`). Never push directly to `main`, force-push, or merge another draft branch without
+  explicit owner approval; inspect remote changes before integrating peer work.
 - Never stage forbidden paths (`Shadow of the Colossus/`, `local/`, `reference/`, `logs/`, game
   PKG/PSARC/eboot/SELF/ELF dumps, secrets). Before push: `git status`, then
   `python3 -I scripts/audit_publish_paths.py` on the staged set and `--all` on tracked files.
-- See `.gitignore` and [AGENTS](AGENTS.md) for the full allow/deny lists.
+- See `.gitignore` and [AGENTS](AGENTS.md) for the full allow/deny lists, and
+  [ATTRIBUTION](docs/ATTRIBUTION.md) for the contributor-identity gate.
+
+### Commit attribution — Claude is never a contributor
+
+Repository contributors must be human. On every commit, before pushing:
+
+1. Author and committer must be the project owner identity (the configured local `user.name` /
+   `user.email`); never commit as Claude, Anthropic, "Claude Code", or any agent identity.
+2. Never add assistant attribution trailers: no `Co-Authored-By: Claude ...`, no
+   `Co-authored-by: <assistant>`, no `Generated with [Claude Code]`, no robot/agent sign-off.
+   If an assistant or subagent produced the change, its work is attributed to the owner only.
+3. Never write Claude/assistant names into `CONTRIBUTORS`, release notes, changelogs, PR bodies,
+   or issue text. Do not let a GitHub contributor graph entry be created for an assistant.
+4. Audit before every push: `python3 -I scripts/check_commit_attribution.py` must exit 0
+   (identity plus every unpublished commit), and
+   `git log -1 --format='%an <%ae> | %cn <%ce>'` must show the owner identity. The full policy
+   and audit state are in [ATTRIBUTION](docs/ATTRIBUTION.md).
+   Fix the message (or `git commit --amend` before pushing an unpushed commit) instead of pushing
+   an assistant-attributed commit. Already-pushed history is never rewritten, except an owner-approved attribution cleanup performed
+   with `--force-with-lease` on the agreed branch (see the PUB-01 cleanup task).
+5. Subagents that edit code are tooling, not authors: they must not run `git commit`, `git tag`,
+   or `git push`; the integrator commits under the owner identity.
 
 ## Agent execution contract
+
+Worker subagents are spawned on a non-Claude model; the orchestrator keeps the integrator role
+(docs, evidence numbers, index regeneration, commits, pushes) and replays every worker claim.
 
 Use one task card with a bounded output, prerequisites, owned files and acceptance check.
 Update [HANDOFF](HANDOFF.md) at every checkpoint, including failed experiments and exit.
