@@ -45,17 +45,18 @@ pre-push sequence.
   It is not an Anthropic/Claude attribution and is not linked to any GitHub account, so it does
   not add a Claude contributor. Rewriting it is a separate owner decision and is outside the
   requested Claude-trailer cleanup.
-- The 2026-10-23 audit covered the then-current main/Init refs and found zero Claude/Anthropic
-  credit trailers across 1,078 reachable commits. A fresh all-remote-ref audit found that
-  `origin/main` and seven other fetched branches are clean, while the stale
-  `cursor/parallel-foundations-86ac55b` branch and its one-commit WIP descendant still expose 70
-  of those trailers. No PR is open for either branch.
-- A disposable cleanup review now verifies the exact message-only rewrite: all 1,074 commits in
-  the WIP ancestry preserve their trees, author/committer headers, and mapped parents; 70 trailer
-  lines are removed, 708 commit IDs change, and there are no signed/mergetag commits. Candidate
-  tips are recorded in [EVIDENCE](EVIDENCE.md) and
-  [the checkpoint](checkpoints/2026-10-26-resume-integration-attribution-review.md). The original
-  remote refs remain unchanged pending the exact-lease push authorized by the owner.
+- A fresh audit found 9 GitHub branch heads and no remote tags. Two stale
+  `cursor/parallel-foundations-*` refs exposed 70 Claude/Anthropic trailers across their shared
+  history; no PR was open for either branch. Both were atomically updated with exact
+  `--force-with-lease` expectations after a disposable review verified the message-only rewrite.
+- The rewrite preserves trees, author/committer headers, and mapped parents for all 1,074 commits
+  in the WIP ancestry; it removes 70 trailer lines and changes 708 commit IDs. No signed or
+  mergetag commits were found. A post-push scan of 2,341 commits reachable from the remote heads
+  and tags found zero Claude/Anthropic credit trailers and zero Claude/Anthropic author/committer
+  identities. The exact tips and evidence are in [EVIDENCE](EVIDENCE.md) and
+  [the publication checkpoint](checkpoints/2026-10-26-attribution-cleanup-published.md).
+- The historical `f6604a86e60e` `orchestrator@local` author/committer remains the one separate
+  `--all` gate finding. It is not a Claude/Anthropic attribution and was not changed by this task.
 
 ## Why the host-derived identity matters
 
