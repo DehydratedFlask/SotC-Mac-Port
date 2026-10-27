@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 18:39 CDT (`/root`) — E853 close E852 publication and refresh attribution
+
+- **E852 publication:** `9d729dcd2f1f9f1f3ac9003ef2128f90ef3ddc47` (Johnny Wang) passed exact-range attribution, owner identity, six-path staged and 3,069-path committed-tree audits, diff checks, and the 31,984-folder project-index check; pushed and fetch-verified at `origin/main`.
+- **Fresh live attribution census:** 21 advertised refs (9 branches, 12 PR heads, 0 tags), 15 unique tips, 2,465 reachable commits, zero Claude/Anthropic identity or credit-line matches. Private stash unchanged by owner choice: 21 reflog tips, 826 commits, 70 credit-line matches, same stash hash. See [E853](docs/checkpoints/2026-10-27-publication-closeout-e852-e853.md).
+- **Bounded AUD-01 result:** exact local `music.sxd1` byte profile is `ARTIFACT_VERIFIED` with independent replay matching all 23 fields; no format, codec, NGS2, game-use, routing, or playback conclusion. Full game acceptance remains incomplete.
+- **E853 docs-only gates:** configure/build passed; CTest 431/431; lift checkers 516/0/0; Trail graph current at 9,877 nodes (deep layer unbuilt); project index current at 31,986 folders; staged/full path audits 6/6 and 3,070/3,070; identity, previous-commit attribution, and diff checks pass. E853 publication is pending.
+- **Files changed:** E853 updates the task/evidence/index and this handoff, adds the [E853 closeout](docs/checkpoints/2026-10-27-publication-closeout-e852-e853.md), and will regenerate `docs/FOLDERS.md`; private evidence remains under ignored `local/validation/`.
+- **Next exact action:** finish E853 checks, commit/push allowlisted docs as Johnny Wang, exact-range audit, fetch-verify; then continue with a next independent task only if it is unblocked.
+
 ## 2026-10-27 18:36 CDT (`/root`) — E852 close E851 publication and refresh public attribution
 
 - **E851 publication:** `05e1d7ebe71f91967c46866c88009ecb8d245c52` (Johnny Wang) passed exact-range attribution, identity, six-path staged audit, 3,068-path committed-tree audit, and diff checks; pushed and fetch-verified at `origin/main`.
