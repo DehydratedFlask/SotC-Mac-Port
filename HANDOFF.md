@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 13:56 CDT (`/root`) — E816 close out E814 and bound `0x240f0` ordering
+
+- **Tasks:** verify publication of E814; continue `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` with a bounded read-only caller-order pass.
+- **E814 publication:** owner commit `b0193c28f3d168b2008bf43a7056eed6b2da47a5`, parent `442e59186a42f70501b7ae534ab4ec8cfecb996d`; pushed and fetch-verified (`HEAD == origin/main == FETCH_HEAD`). Exact-range attribution and identity passed; committed-tree path audit passed **3,035/3,035**; commit diff check passed. Fresh remote census: 9 branch refs, 12 PR refs, 0 tags, 15 unique tips, **2,429 reachable commits**, zero Claude/Anthropic identities or contributor-credit lines. Stash refs were not touched.
+- **E816 documentation gates:** project-tools tests **13/13**; CMake configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail **9,877 nodes / 13,470 edges** in sync; project-index generation/check **31,924 folders**. Staged/full path audits **6/6** and **3,036/3,036**; precommit attribution, identity, diff and project-index checks passed. Logs: `local/validation/orch-20261027/e816-closeout/`.
+- **CPU-01 observation:** report `local/validation/orch-20261027/slot309/agent-240f0-order/REPORT.md`, SHA-256 `e94d5c47f8a4f3ad45cc85d0b79f06482bc2a262b629bc324cef50fda3e8042f`; reviewer approved and root verified the cited log hashes. Known direct chains installing tables `0x1594ec8`, `0x159c578`, and `0x15c8cd8` occur after the `0xf120 → 0x20` list dispatch. The `0x15d5b80/0x15d5b88 → 0xb11360/0xb11370 → 0x254bf0` route remains unordered. This establishes no supported pre-slot path among the examined direct chains, not global ordering or absence of indirect dispatch. Keep slot 309 unregistered; G1 PARTIAL.
+- **Limits:** read-only Ghidra/static evidence only; no game code ran, no native-lift boundary is established, and no game acceptance gate advances.
+- **Next exact action:** stage the six allowlisted documentation paths, run staged/full audits, commit under owner identity, push and fetch `main`; then seek an explicit producer or indirect callsite for the `0x15d5b80/0x15d5b88` wrapper table that could order cleanup against slot 309. If unsupported, preserve the hook boundary; separately resolve the general `+0x10` temporary ownership contract. Launcher VoiceOver readiness remains blocked until manual Mac unlock.
+- **Task status / attempts:** `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` ACTIVE, 0 failed semantic hypotheses; E816 documentation publication is next.
+
 ## 2026-10-27 13:47 CDT (`/root`) — E814 publish index fix and record slot-309 route follow-up
 
 - **Tasks:** publish E813 `DOC-INDEX-LAUNCHER-BUILD-CHURN-01`; record a bounded read-only subtask of `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`.
@@ -8,7 +18,8 @@
 - **CPU-01 observation:** independent subagent report `local/validation/orch-20261027/slot309/agent-slot309-dispatch/REPORT.md`, SHA-256 `4d0b7e5d23d5f211346ac563e2359a0b6f5b864ed358b926d3e93199cd4db941`, independently reviewed and accepted; root verified its cited logs. Ghidra has zero analyzed incoming refs to aligned cells in `0x15d5b60..0x15d5bc8`; this does not rule out indirect/data-driven/unmodeled/external dispatch. The selected direct path `0x531d60 → 0x255130 → 0x255180 → 0x264e50` constructs an object with vptr `0x159c958`, not the candidate `0x15d5b80` table. The producer/route to `0x15d5b80`, `0x240f0` cleanup order, and general temporary `+0x10` ownership remain unresolved. Slot 309 stays unregistered; G1 PARTIAL.
 - **Limits:** static analysis only; no game code was run, no native-lift boundary was established, and no actual game acceptance gate advanced.
 - **Next exact action:** commit the six explicitly staged docs paths under owner identity; verify the exact commit range/path/diff, push and fetch `main`, then continue by inspecting all `0x240f0` callers against constructor-list timing and searching for an explicit `0x15d5b80` producer/relocation/data-driven consumer. Retain the hook boundary if unsupported. Launcher VoiceOver readiness remains blocked until the Mac is unlocked.
-- **Task status / attempts:** project-index task PUBLISHED / FIXTURE_VERIFIED; slot-309 characterization ACTIVE, 0 failed semantic hypotheses, 2 new tooling-only errors corrected; E814 documentation publication is next.
+- **E814 publication:** commit `b0193c28f3d168b2008bf43a7056eed6b2da47a5` was fast-forward pushed and fetch-verified by E816; its public history remains free of Claude/Anthropic attribution.
+- **Task status / attempts:** project-index task PUBLISHED / FIXTURE_VERIFIED; slot-309 characterization ACTIVE, 0 failed semantic hypotheses, 2 new tooling-only errors corrected.
 
 ## 2026-10-27 13:37 CDT (`/root`) — E813 project-index build-churn fix
 
