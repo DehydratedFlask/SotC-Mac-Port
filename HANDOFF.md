@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 08:54 CDT (`/root`) — E785 post-push verification
+
+- **Task ID:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`.
+- **Files changed:** `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md`, `docs/FOLDERS.md`, `docs/INDEX.md`, `docs/TASKS.md`, and `docs/checkpoints/2026-10-27-post-6fcef564-attribution-scan.md`.
+- **Exact commands/results:** pushed checkpoint `6fcef564c8732c644ec2e4dac903596b8abfe38c`; `git fetch origin --prune` exited 0; `HEAD == origin/main`. The remote scanner exited 0 on 9 fetched GitHub branch heads, 0 tags, and 2,396 reachable commits, finding zero Claude/Anthropic matches. Post-commit attribution range and identity checks passed; explicit 7-path and full 3,015-path publication audits passed. `--all` remains **FAILED** only on unrelated historical `orchestrator@local` commit `f6604a86e60e`.
+- **Verification:** CMake configure/build passed, CTest **431/431**, lift checkers **516/0/0**, staged/full path audits **7/7** and **3,015/3,015**, attribution range and owner-identity checks passed, `git diff --cached --check` passed. `python3 scripts/project_index.py` exited 0 at 33,128 folders; generated `.build` churn was restored and durable `docs/checkpoints` count advanced 818→819. Logs and checksums are under `local/validation/orch-20261027/e785-publication/`; SHA256SUMS SHA-256 `d3a0948edead4b84a79295a9604884ba61ebff9810911f49ed33650bfdb6f755`.
+- **Observations vs inference:** the E785 fetched-ref scan includes pushed commit `6fcef564`; the closeout commit being prepared next will be individually checked after creation and is not included in the scan.
+- **Remaining risks:** 70 stash-only Claude-attributed commits remain unchanged by owner choice. CPU-01 slot 309 remains active at its ownership/invocation-order boundary; native-port acceptance gates remain incomplete.
+- **Next exact action:** stage only the seven allowlisted docs, verify the final staged path audit and diff, commit under the owner identity, push `origin main`, fetch, and audit the new commit range.
+- **Task status / attempts:** public fetched refs **ARTIFACT_VERIFIED** including `6fcef564`, 0 failed hypotheses; post-push closeout publication pending.
+
 ## 2026-10-27 08:40 CDT (`/root`) — E784 current public attribution scan
 
 - **Task ID:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`.
