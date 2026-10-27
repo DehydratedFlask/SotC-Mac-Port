@@ -1,5 +1,29 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 08:10 CDT (`/root`) — APP-01 TERM fixture verified; publication gates (E775)
+
+- `APP-01-PROCESS-CLIENT-SHUTDOWN-TERM-ESCALATION-01` is **FIXTURE_VERIFIED**. Final test-only source SHA-256 `6f3449c6b380aeff924b0e35b87e7f7538ef0918f49fdb7b67e809e4c0a6aaff`; focused `ProcessCoreClientTests` passed **24/24**, full launcher suite passed **157/157 across 20 suites**, and independent review approved the final readiness/TERM/cleanup logic. The failed first readiness-marker iteration remains recorded as E774; one failed follow-up iteration, zero failed semantic hypotheses. No production change, SIGKILL, game-core, or game-shutdown claim.
+- Native gates passed: configure/build exit 0, CTest **431/431**, lift checkers **516/0/0**. Trail rebuild indexed 9,876 nodes / 13,469 edges; check passed and the test method is queryable. Project index exited 0 with 33,115 folders; only the durable checkpoint count 816→817 is kept in `docs/FOLDERS.md`. Private logs/manifests are under `local/validation/orch-20261027/app01-term-checkpoint/` and `local/validation/orch-20261027/app01-shutdown-term-escalation/`.
+- E773 last scanned `origin/main == 30399e60770fa708c64f29e14d17e3b17669a04d`: 9 branch heads, 0 tags, 2,388 commits, zero Claude/Anthropic matches. `refs/stash` stays unchanged per owner direction.
+- E775 publication audits: staged **8/8** and full-tree **3,013/3,013** passed; owner identity passed. The pre-commit range was empty. `check_commit_attribution.py --all` continues to fail only on known non-Claude `f6604a86e60e` (`orchestrator@local`). Audit manifest SHA-256 `ab09332e92e5a671e011131e7f4db18c2ad03444932a7c6d8be7ec6f0273eef1`.
+- **Next exact action:** commit the staged eight allowlisted paths as owner, rerun the attribution-range check, push `origin main`, and verify the pushed commit is clean.
+
+
+## 2026-10-27 08:11 CDT (`/root`) — APP-01 readiness-marker iteration failed (E774)
+
+- The first reviewer-requested readiness-marker iteration failed the focused suite: `swift test --package-path launcher --scratch-path local/build/launcher --filter ProcessCoreClientTests` exited 1 with 24 tests, 1 suite, and 10 issues. Log SHA-256 `4a3f3699e550bfe3c1416d3e87774f4fdaa5ce8967a9fc18c5986cab22ce2f55` at `local/validation/orch-20261027/app01-shutdown-term-escalation/focused-ready.log`.
+- Observed failure: the test awaited `childReady` before calling `shutdown()`, while the fake emitted readiness only after receiving the `quit` that shutdown sends. This held the client open and caused related request timeout assertions. No production code changed.
+- The worker moved sleeper startup, TERM-trap installation, and readiness emission ahead of the stdin loop; current unverified test-file SHA-256 is `0f8a8aa691f80b0f6d2f10749a70c3bd7e8dfe92a19d528f7e3c080f76e63855`. This is 1 failed follow-up iteration after 1 successful initial fixture implementation; no failed semantic hypothesis. The three-try cap is not reached.
+- **Next exact action:** resume the worker for one focused test run against the corrected readiness ordering, then handle any result before another change.
+
+
+## 2026-10-27 07:57 CDT (`/root`) — post-30399 scan and APP-01 TERM escalation fixture claim (E773)
+
+- E773 after pushed owner commit `30399e60770fa708c64f29e14d17e3b17669a04d`: `git fetch origin --prune` and `python3 -I local/validation/orch-20261026/claude-credit-cleanup-review/scan_remote_refs_attribution.py` exited 0. It scanned 9 branch heads, 0 tags, 2,388 reachable commits, and found zero Claude/Anthropic identity or credit-line matches. Private report SHA-256 `24e1ff658d181362ed9bc02fe0137d784190d0fefbd5b82632c9d6e6e637fdc5`. Owner-directed private `refs/stash` remain unchanged; 70 stash-only matches remain out of this public scope.
+- APP-01 initial implementation is test-only: source SHA-256 `bc2ad14639957410ec9140506ea9226ee7ae48a61f77ef3533fd64533fb20e21`; focused suite **24/24** and full launcher suite **157 tests/20 suites** passed. Independent review approved the TERM behavior but requested a readiness marker so `shutdown()` cannot race trap installation. `/root/app01_shutdown_term` owns only the test-file follow-up; task remains ACTIVE with 1 successful implementation, 0 failed hypotheses.
+- CPU-01 slot 309 remains ACTIVE/G1 PARTIAL with both registration branches retained; the bounded E770 saved-project census did not establish payload ownership or invocation order.
+- **Next exact action:** receive the readiness-marker follow-up, review the final test diff, rerun focused and full launcher tests, then finish the publication gates and push the allowlisted checkpoint under the owner identity.
+
 ## 2026-10-27 07:41 CDT (`/root`) — saved-project Ghidra census and current attribution scan (E770/E771)
 
 - CPU-01 used the existing `local/ghidra/persistent-20261020/SotC` project through `-process eboot.elf -noanalysis -readOnly`; no new binary import or game execution. The loaded program path matches pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`. Ghidra 12.1.4, OpenJDK 25.0.4.1, ARM64. Private report `local/validation/orch-20261027/slot309/ghidra-readonly-xrefs/REPORT.md`, SHA-256 `f1f8eb90cd3961d071109d8b48e8c846e19c6f2769b4b71a0616e584dacbb0aa`.

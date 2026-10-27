@@ -278,3 +278,8 @@ Git writes `<login>@<hostname>` when `user.email` is unset. Those commits cannot
 with the owner's GitHub account and appear as a separate contributor in the repository graph.
 Setting the repository-local identity to the owner's GitHub noreply address, as this repository
 does, prevents that.
+- Refreshed after owner commit `30399e60770fa708c64f29e14d17e3b17669a04d`: all 9 fetched GitHub
+  branch heads, 0 remote tags, and **2,388 unique reachable commits** were parsed. The scan found
+  zero Claude/Anthropic identity or credit-line matches. Private report SHA-256
+  `24e1ff658d181362ed9bc02fe0137d784190d0fefbd5b82632c9d6e6e637fdc5`; see E773 and the [latest
+  checkpoint](checkpoints/2026-10-27-app01-shutdown-term-escalation.md).

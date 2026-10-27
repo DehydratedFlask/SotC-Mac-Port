@@ -361,6 +361,72 @@ struct ProcessCoreClientTests {
         #expect(logLines(fake).contains { $0.hasSuffix(" quit") })
     }
 
+    @Test func shutdownEscalatesToSIGTERMAndChildCleansItsSleeper() async throws {
+        let fake = try newFake()
+        defer { fake.remove() }
+        let log = fake.log.path(percentEncoded: false).replacingOccurrences(of: "'", with: "'\\''")
+        let termMarker = fake.directory.appending(path: "term.marker", directoryHint: .notDirectory)
+            .path(percentEncoded: false).replacingOccurrences(of: "'", with: "'\\''")
+        let readyMarker = fake.directory.appending(path: "ready.marker", directoryHint: .notDirectory)
+        let readyMarkerPath = readyMarker.path(percentEncoded: false)
+            .replacingOccurrences(of: "'", with: "'\\''")
+        try writeScript("""
+        #!/bin/sh
+        LOG='\(log)'
+        TERM_MARKER='\(termMarker)'
+        READY_MARKER='\(readyMarkerPath)'
+        sleeper_pid=
+        handle_term() {
+          printf 'TERM\\n' > "$TERM_MARKER"
+          if [ -n "$sleeper_pid" ]; then
+            kill "$sleeper_pid" 2>/dev/null || :
+            wait "$sleeper_pid" 2>/dev/null || :
+            if kill -0 "$sleeper_pid" 2>/dev/null; then
+              printf 'sleeper-not-cleaned\\n' >> "$TERM_MARKER"
+            else
+              printf 'sleeper-cleaned\\n' >> "$TERM_MARKER"
+            fi
+          fi
+          exit 0
+        }
+        trap handle_term TERM
+        /bin/sleep 30 &
+        sleeper_pid=$!
+        while ! kill -0 "$sleeper_pid" 2>/dev/null; do :; done
+        printf 'ready\\n' > "$READY_MARKER"
+        while IFS= read -r line; do
+          printf '%s\\n' "$line" >> "$LOG"
+          command=${line#* }
+          case "$command" in
+          quit)
+            wait "$sleeper_pid"
+            ;;
+          esac
+        done
+        exit 0
+        """, to: fake)
+        let client = try ProcessCoreClient(coreURL: fake.executable)
+        defer { client.shutdown() }
+
+        var childReady = false
+        for _ in 0..<200 {
+            if FileManager.default.fileExists(atPath: readyMarker.path(percentEncoded: false)) {
+                childReady = true
+                break
+            }
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        #expect(childReady)
+
+        client.shutdown()
+
+        let commands = logLines(fake)
+        #expect(commands == ["1 quit"])
+        let termRecords = (try? String(contentsOf: URL(filePath: termMarker), encoding: .utf8))?
+            .split(whereSeparator: \.isNewline).map(String.init) ?? []
+        #expect(termRecords == ["TERM", "sleeper-cleaned"])
+    }
+
     @Test func shutdownFailsPendingStatusBeforeSendingQuit() async throws {
         let fake = try newFake()
         defer { fake.remove() }
