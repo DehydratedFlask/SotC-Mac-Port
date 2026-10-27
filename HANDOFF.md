@@ -1,9 +1,20 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 07:23 CDT (`/root`) — public attribution scope closure and slot-309 boundary (E769)
+
+- Task `PUB-01-CLAUDE-CREDIT-CLEANUP-01`: the owner chose to leave private `refs/stash` unchanged. Mark **ARTIFACT_VERIFIED** for fetched GitHub refs under that agreed scope. After commit `7e67df61e58eb766d8bdf6e0b88f3029285b60ea`, fetch/scan exited 0: 9 branch heads, 0 tags, 2,386 reachable commits, and zero Claude/Anthropic identity or credit-line matches. Private report SHA-256 `b6a2da554a30cfe1125ea21eed10185b68e687b481d7ec752da98a5a577adaa8`.
+- The earlier private-ref audit found 70 matches only under `refs/stash`; these were not changed. Full-history `--all` still reports only unrelated `f6604a86e60e` `orchestrator@local`.
+- Slot 309 remains ACTIVE/G1 PARTIAL. Existing order report does not link `0x531d60` to startup slot 309. `mcp__rea__binary_session({})` returned `open=false`, `cleanup_pending=false`, no target. No fresh target import or branch choice was made; preserve both `*(0x2dfd4b8)` branches and leave slot 309 unregistered.
+- Attempt counts: PUB-01 has 0 failed hypotheses; CPU-01 has 0 failed semantic hypotheses in this checkpoint (prior provider timeout history is retained in `docs/TASKS.md`).
+- Configure/build exit 0; CTest **431/431**; lift sweep **516/0/0**; Trail graph consistent with 9,875 meaning nodes pending; project index exit 0 with 33,109 folders, retaining only durable `docs/checkpoints` 814→815. Logs and hashes are in `local/validation/orch-20261027/slot309-checkpoint/e769/`.
+- Staged/all path audits **7/3,011** passed; precommit and owner-identity attribution checks exit 0; all-history attribution still exits 1 only for non-Claude `f6604a86e60e` (`orchestrator@local`).
+- Changed files: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and this checkpoint.
+- **Next exact action:** keep this attribution scope closed and move to an independent active task; revisit slot 309 only if an already-open analysis session becomes available, preserving the current unresolved boundary otherwise.
+
 ## 2026-10-27 03:30 CDT (`/root`) — post-`9d87ef5b` public-ref attribution scan (E768)
 
 - After publishing `9d87ef5baf13fec06979693ff07316bfe034830d`, fetch and remote scan exited 0. It covered 9 branch heads, 0 tags, and 2,385 reachable public commits with zero Claude/Anthropic identity or credit-line matches. E768 and the private report hash are in `docs/EVIDENCE.md` and `docs/checkpoints/2026-10-27-post-9d87ef5b-attribution-scan.md`.
-- The table-consumer census remains inconclusive on startup order; slot 309 is ACTIVE/G1 PARTIAL and unregistered. E762 still finds 70 attribution matches only under `refs/stash`; those recovery refs remain unchanged pending the owner's scope answer.
+- The table-consumer census remains inconclusive on startup order; slot 309 is ACTIVE/G1 PARTIAL and unregistered. E762 found 70 attribution matches only under `refs/stash`; these recovery refs remain unchanged per the owner direction recorded in E769.
 - Verification: configure/build exit 0; CTest **431/431**; lift checkers **516/0/0**; Trail wiring graph consistent with 9,875 meaning nodes pending; project index exit 0 with 33,108 folders, retaining only durable `docs/checkpoints` 813→814 in `docs/FOLDERS.md`; staged/all publication audits **7/3,010** passed; precommit and owner-identity attribution checks exit 0. The all-history attribution audit exits 1 only for historical non-Claude `f6604a86e60e` (`orchestrator@local`). Logs and hashes are in `local/validation/orch-20261027/slot309-checkpoint/e768/`. The initial index-log wrapper hit zsh's read-only `status` variable after the index completed; the output and exit are recorded accurately. No source files changed.
 - Changed files: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and the E768 checkpoint.
 - **Next exact action:** commit only these seven allowlisted docs under owner identity, push `origin main`, and scan the new remote head. Then check the saved slot-309 map for the four exact identities in the E765 report.
