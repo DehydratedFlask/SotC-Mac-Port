@@ -1,5 +1,19 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 11:33 CDT (`/root`) — E803 all-advertised-ref attribution census closeout
+
+- **Task:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; E802 claim commit `29329cad4433cb8cf7fdc414b68e0adc14ded7e4`.
+- **Starting state:** E802 was pushed to `origin/main`; fetch confirmed `HEAD == origin/main` at `29329cad4433cb8cf7fdc414b68e0adc14ded7e4`, clean before this closeout.
+- **E803 precommit gates:** CMake configure/build exit 0 (build had no work); CTest **431/431**; lift checkers **516 passed / 0 skipped / 0 failed**; `trail build --check` exit 0 (9,876-node wiring graph in sync; deep layer unbuilt); project index generation/check exit 0 (**33,152 folders** at this machine snapshot). The generated folder table differed only by the durable `docs/checkpoints` increment 833→834 plus 64 transient `launcher/.build` rows; those rows were discarded, retaining the new durable checkpoint count. Staged/full publish-path audits passed **7/7** and **3,030/3,030**; default attribution, effective owner identity, and cached diff checks passed. Logs: `local/validation/orch-20261027/e803-closeout/`; precommit log manifest SHA-256 `2d6fc38d319254c9ff3041459e2c4563fbf823a52a2dce720e043537003b16f2`.
+- **Expanded GitHub scan:** `git ls-remote --refs origin` exposed **21 advertised refs** (9 branch heads, 12 `refs/pull/*/head`, 0 tags). Their ancestry has **2,414 unique commits**, all parsed, with zero Claude/Anthropic identity or credit-line matches. The branch-only scanner result also matched, but the expanded report explicitly covers the PR refs. Report SHA-256 `315e397624ed2585f923c9984290867422848924020260f96c961b36e8bc953e` at `local/validation/orch-20261027/e802-claim/all-advertised-ref-scan-after-29329cad.json`.
+- **Local scan:** 25 named non-stash refs / **2,414 commits**, zero matches (report SHA-256 `ba669248c243f7fe82676327fad3b531beec75d370f9cc89e41f38b8ad07435a`). The current `refs/stash` is 768 commits / 70 matches. Its 21 reflog tips jointly reach 826 commits / 70 matches, so the 58 extra reflog-only commits add no matches. No stash state was changed.
+- **Exact E802 commit checks:** range attribution, effective owner identity, explicit path audit 2/2, full tracked-path audit 3,029/3,029, and diff check passed; post-push fetch confirmed the published tip.
+- **Observations vs inference:** refs, heads, ancestor counts, parsed messages/identities, and report hashes are direct scanner outputs. Coverage is the set of currently advertised GitHub refs and named local refs/reflog tips; unreachable Git objects and GitHub contributor-graph rendering are not asserted. No code or game payload was changed or read.
+- **Current task status:** attribution is **ARTIFACT_VERIFIED** across all currently advertised GitHub refs and local non-stash refs through E802. No dependency-ready native implementation task surfaced; slot 309 ownership/call order, VoiceOver unlock, and authorized AUD-02 provider-query scope remain blockers. G0/G1 remain PARTIAL; G2/G4/G5/G6 remain NOT RUN; G3 remains PARTIAL. No actual game boot/audio/save/reload/gameplay frame is established.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, `docs/checkpoints/2026-10-27-e802-attribution-census-closeout.md`.
+- **Next exact action:** continue only from a concrete dependency-ready native task; keep slot 309 unregistered until payload ownership or invocation-order evidence exists. Preserve the explicit private-stash exclusion.
+- **Task status / attempts:** attribution refresh **ARTIFACT_VERIFIED**, 0 failed hypotheses; the overall native-port goal remains active and incomplete.
+
 ## 2026-10-27 11:26 CDT (`/root`) — E802 post-E801 attribution census claim
 
 - **Task:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`, bounded refresh through published E801.
@@ -9,9 +23,9 @@
 - **Precommit gates:** `cmake -S native -B local/build/orch-r22` (exit 0); `cmake --build local/build/orch-r22 -j 12` (exit 0, no work); `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure` (exit 0, 431/431); `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` (exit 0, 516 passed / 0 skipped / 0 failed); `trail build --check` (exit 0, wiring graph synchronized at 9,876 nodes; deep layer unbuilt); `python3 scripts/project_index.py` and `--check` (exit 0, 33,151 folders). The generated `docs/FOLDERS.md` showed only 64 transient `launcher/.build` row changes and was restored; the durable table remains unchanged. Staged/full publish-path audits passed 2/2 and 3,029/3,029; default attribution, effective owner identity, and cached diff checks passed. Logs: `local/validation/orch-20261027/e802-claim/` (`cmake-configure.log`, `cmake-build.log`, `ctest.log`, `lift-checkers.log`, `trail-check.log`, `project-index-generate.log`, `project-index-check.log`, `publish-staged.log`, `publish-all.log`, `attribution-default.log`, `attribution-identity.log`, `diff-check.log`).
 - **Observations vs inference:** the worktree is clean at E801 and fetched `origin/main` matches; that confirms the current integration base, not the new census result. No code or game payload was changed or read.
 - **Files changed:** `HANDOFF.md`, `docs/TASKS.md` (task claim only).
-- **Next exact action:** run the saved remote/local scanners to fresh report paths under `local/validation/orch-20261027/`, hash the reports, then record the fresh counts and run the required publication gates before the closeout commit.
+- **Next exact action (completed in E803):** expand the remote scan to every advertised ref including pull-request refs, verify stash reflog coverage read-only, then publish the fresh count and closeout.
 - **Risks/limits:** named refs and fetched heads only; this does not enumerate unreachable Git objects. Stash remains unmodified.
-- **Task status / attempts:** `ACTIVE`, attempt 0; no scan hypothesis attempted yet.
+- **Task status / attempts:** claim published; attribution census **ARTIFACT_VERIFIED** in E803, 0 failed hypotheses.
 
 ## 2026-10-27 11:22 CDT (`/root`) — E801 E800 publication verification and current-ref census
 

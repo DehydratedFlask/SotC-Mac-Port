@@ -407,3 +407,15 @@ does, prevents that.
   `4e23b5ea630bce6473e139e992110af4f021be6cc9820d3dda01eb59032629be`; see E801 and its
   [closeout checkpoint](checkpoints/2026-10-27-e800-publication-closeout.md). These scans cover
   fetched heads and named local refs, not unreachable Git objects.
+- Expanded after E802 `29329cad4433cb8cf7fdc414b68e0adc14ded7e4`: `git ls-remote --refs origin`
+  advertised 21 refs (9 branch heads, 12 pull-request heads, 0 tags). Their combined ancestry
+  comprised **2,414 unique commits** with zero Claude/Anthropic identities or credit lines. The
+  all-advertised-ref report SHA-256 is
+  `315e397624ed2585f923c9984290867422848924020260f96c961b36e8bc953e`. The named local scan
+  covered 25 non-stash refs / 2,414 commits, zero matches (SHA-256
+  `ba669248c243f7fe82676327fad3b531beec75d370f9cc89e41f38b8ad07435a`). Current stash ancestry
+  remains 768 commits / 70 matches; a read-only union of its 21 reflog tips reaches 826 commits
+  with the same 70 matches, leaving 58 additional reflog-only commits clear. The user directed that
+  all private stash state remain unchanged. See E803 and its
+  [closeout checkpoint](checkpoints/2026-10-27-e802-attribution-census-closeout.md). Unreachable
+  Git objects and GitHub contributor-graph rendering are not covered.
