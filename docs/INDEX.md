@@ -39,6 +39,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Attribution scan after 4682a337](checkpoints/2026-10-27-post-4682a337-attribution-scan.md) | All 9 remote heads and 2,356 reachable commits scan clean for Claude/Anthropic identities and credit lines |
 | [Attribution scan after c8f23500](checkpoints/2026-10-27-post-c8f23500-attribution-scan.md) | All 9 remote heads and 2,357 reachable commits scan clean for Claude/Anthropic identities and credit lines |
 | [Attribution scan after cf94e831](checkpoints/2026-10-27-post-cf94e831-attribution-scan.md) | All 9 remote heads and 2,358 reachable commits scan clean for Claude/Anthropic identities and credit lines |
+| [Attribution scan after 5315489c](checkpoints/2026-10-27-post-5315489c-attribution-scan.md) | All 9 remote heads and 2,359 reachable commits scan clean for Claude/Anthropic identities and credit lines |
 | [Startup slot 306 survey](checkpoints/2026-10-25-startup-slot-306-survey.md) | E676 hash-bound table/body/call-footprint characterization; semantics UNKNOWN, 11 indirect calls unresolved, G1 PARTIAL |
 | [Slot 303 checker publication repair](checkpoints/2026-10-24-slot303-publication-repair.md) | Complete function reconstruction removed from public checker; E624 |
 | [Integration PR #9 final closeout](checkpoints/2026-10-25-integration-pr9-final-closeout.md) | PR #9 merged at `a8bd805`; clean-main baseline and branch cleanup verified; E643 |

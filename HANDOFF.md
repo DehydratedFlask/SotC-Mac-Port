@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 00:31 CDT (`/root`) — post-5315489c history scan recorded
+
+- After `git fetch origin --prune` (exit 0), the scan command exited 0: 9 GitHub branch heads, 0 remote tags, and 2,359 unique reachable commits after `5315489cf9706b3713945c51fe0267a970614003`; zero Claude/Anthropic identity or credit-line matches (E734). Private JSON SHA-256 `b3f8c3ac4947a27e3ce10c728571ea6b52a1dc2073c474fbf3bebf119b9779db`; this scan predates its recording checkpoint.
+- The APP-01 concurrent `status()`/`coverage()` child-client correlation task is claimed and pushed in `5315489c`; no code edits yet. F590 remains **FIXTURE_VERIFIED** by root reassessment E731, with the original five mutants unrecovered and untested.
+- Files changed in this scan-record checkpoint: `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md` (E734), `docs/INDEX.md`, `docs/TASKS.md`, new `docs/checkpoints/2026-10-27-post-5315489c-attribution-scan.md`, and generated `docs/FOLDERS.md`. `python3 scripts/project_index.py` exited 0 and indexed 33,045 folders; `trail build --check` exited 0 with the wiring graph in sync (deep concept layer unbuilt, 9,872 meaning nodes pending). Pre-stage `--all` path audit passed 2,978 paths; staged path and cached-diff audits passed all 7 files. Identity-only and unpublished attribution checks passed; `--all` reports only the separate non-Claude `f6604a86e60e` `orchestrator@local` entry. The scan checkpoint commit was created under Johnny Wang's identity. Exact next action: run post-commit all-path/unpublished-attribution audits, push `origin main`, fetch/rescan, then edit only the claimed launcher test file.
+- Overall native game boot/audio/save/reload and Metal validation remain PARTIAL.
+
 ## 2026-10-27 00:29 CDT (`/root`) — APP-01 concurrent client request test claimed
 
 - `git fetch origin --prune` and the remote attribution scan exited 0. The scan after `cf94e831aea6b2ec60826334bb04206535e7d7d3` covers 9 GitHub branch heads, 0 tags, and 2,358 reachable commits with zero Claude/Anthropic author/committer or credit-line matches (E733). Private JSON SHA-256 `744bacee1982a169757bd0c8a1fda7982422d1e17d55f71a1de07a6864a37fb0`; this scan predates the new claim commit.
