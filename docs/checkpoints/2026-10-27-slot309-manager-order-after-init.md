@@ -1,0 +1,49 @@
+# Startup slot 309 manager creation order
+
+## 2026-10-27 13:09 CDT (`/root`)
+
+- **Task:** `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` — characterize the first remaining startup gap at constructor index 309 / RVA `0xa505e0`.
+- **Starting state:** clean `main`; `HEAD == origin/main == 1f5783687e3d07dacca9043f767816649b4b5427`.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and this checkpoint.
+- **Result:** static order evidence places the known normal-entry manager-creation path after the full constructor-list call. It does **not** exclude alternate vtable dispatch before slot 309. Preserve both registration branches, leave slot 309 unregistered, and keep G1 PARTIAL.
+
+## Observations
+
+- The pinned ELF is SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; its ELF64 little-endian header has `e_entry = 0xf120`. The constructor-list table has 573 entries at `0x2dd70e0`; the parser places slot 309 / `0xa505e0` at table address `0x2dd6738` and slot 567 / `0x235d0` at `0x2dd5f28`.
+- Ghidra decompilation of `FUN_00000020` shows the custom list is walked downward from `0x2dd70e0` until the `-1` sentinel. With entries stored at decreasing addresses, invocation proceeds in ascending constructor-index order.
+- The ELF entry function `FUN_0000f120` calls `FUN_00000020` at `0xf14d` and then `FUN_00536730` at `0xf15a`.
+- The saved-project reference census finds one code caller of `0x536730` (`0xf15a`) and one code caller of `0x536aa0` (`0x536775`). `0x536aa0` sets the constructed object's vptr to `0x15c8cd8`; `0x536730` dispatches through vptr `+0x10` and `+0x18` only after that setup.
+- Vtable cell `0x15c8ce8` (`0x15c8cd8 + 0x10`) contains `0xb11340`. That wrapper tail-jumps to `0x255110`; `0x255110` calls `0x242c0`; `0x242c0` writes the manager pointer to `0x2dfcbc8` at `0x243f5`.
+- Ghidra reports 64 references to `0x2dfcbc8`, with three `WRITE` references: reset at `0x23612`, cleanup at `0x241e1`, and manager store at `0x243f5`.
+- Other vtable data references point to `0x242c0` at `0x1594ed8`, `0x255110` at `0x159c588`, and `0xb11340` at `0x15d5b90`. Their indirect consumers and ordering remain unresolved.
+
+## Inference boundary
+
+The observed normal-entry path cannot set the manager cell before constructor index 309 because its sole direct setup caller runs after `FUN_00000020`. The alternate vtable/data-driven paths mean this does not prove that the manager cell is null when slot 309 reaches `0x20d60`. `[RBP-0x38]` ownership/lifetime is also still unknown, so no native-lift boundary is supported.
+
+This is **STATIC_ANALYSIS_VERIFIED** for the addresses, table order, references, and known normal-entry call sequence only. No game code was executed. No boot, game audio, save/reload, or gameplay Metal gate advances.
+
+## Repository checks for publication
+
+- `cmake -S native -B local/build/orch-r22`: exit 0.
+- `cmake --build local/build/orch-r22 -j 12`: exit 0, no work to do.
+- `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure`: exit 0, **431/431** passed.
+- `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`: exit 0, **516 passed / 0 skipped / 0 failed**.
+- `python3 -I scripts/audit_publish_paths.py --all`: exit 0, **3,033/3,033** paths passed. Staged `python3 -I scripts/audit_publish_paths.py`: exit 0, **6/6** paths passed.
+- `python3 -I scripts/check_commit_attribution.py`: exit 0 for the current empty `origin/main..HEAD` range; exact new-commit range check follows commit creation.
+- `trail build --check`: exit 0; the 9,876-node wiring graph is in sync. Trail reports its deep meaning layer is not built.
+- `python3 scripts/project_index.py`: exit 0, **33,162 folders** indexed. A strict `--check` reports `docs/FOLDERS.md` and private `local/indexes/folders.json` stale after generated/build inventory churn; only the durable `docs/checkpoints` count was retained in `docs/FOLDERS.md`.
+
+Gate logs are under `local/validation/orch-20261027/slot309-docs/`. These repository checks do not advance a game acceptance gate.
+
+## Private evidence and failed tooling attempts
+
+The private report is `local/validation/orch-20261027/slot309/manager-order/REPORT.md`, SHA-256 `b96e91f04ecf1e08e90237c41862691e379a8421fd70d7332de21e7b7ee50d77`. It records the pinned binary identity, Ghidra 12.1.4/OpenJDK 25 environment, exact commands, report hashes, observations, and limits. The constructor manifest is SHA-256 `2da1b0a88434574076443564dcd4cd2c1166a19dfeb0a94bd708eec3049dbdf0`; key Ghidra output hashes are in the private report.
+
+Two initial `ExportRefs.java` runs had Ghidra API type-signature errors (`getReferencesTo` returns an iterator; `getReferencesFrom` returns an array). The script was corrected and rerun with fresh logs; the successful saved-project query exited 0. These were tooling failures, not failed semantic hypotheses. No game execution or tracked binary modification occurred.
+
+## Remaining risks and next action
+
+- Keep `0x2dfd4b8` list/tree branches unresolved and slot 309 unregistered.
+- Continue a focused read-only census of the alternate vtable references at `0x1594ed8`, `0x159c588`, and `0x15d5b90`, and prove whether any can dispatch before index 309. In parallel, continue `[RBP-0x38]` payload ownership/lifetime analysis.
+- Task status remains **ACTIVE**, failed semantic hypotheses: **0**, G1: **PARTIAL**. Other acceptance gates remain unchanged.

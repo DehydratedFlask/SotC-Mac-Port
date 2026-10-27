@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 13:09 CDT (`/root`) — E809 slot-309 manager-order checkpoint
+
+- **Task:** `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`; extend the read-only startup-order analysis for the first remaining gap at index 309 / RVA `0xa505e0`.
+- **Starting state:** clean `main`; `HEAD == origin/main == 1f5783687e3d07dacca9043f767816649b4b5427`.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and [the E809 checkpoint](docs/checkpoints/2026-10-27-slot309-manager-order-after-init.md).
+- **Observed:** pinned ELF `e_entry=0xf120`; Ghidra shows the entry function calls the custom list dispatcher at `0x20` before `0x536730`. The sole analyzed code caller of `0x536730` constructs the `0x15c8cd8` vtable object, then reaches `0xb11340 → 0x255110 → 0x242c0`, whose manager-cell store is at `0x243f5`. The saved-project census found three `WRITE` references to `0x2dfcbc8` (reset, cleanup, manager store).
+- **Inference and limits:** the known normal-entry manager-store path follows the complete constructor-list call. Alternate vtable data references at `0x1594ed8`, `0x159c588`, and `0x15d5b90` leave indirect pre-slot dispatch unresolved. Keep both registration branches, leave slot 309 unregistered, and do not claim `[RBP-0x38]` ownership or a native-lift boundary. G1 remains PARTIAL; no actual game acceptance gate advances.
+- **Evidence:** private report `local/validation/orch-20261027/slot309/manager-order/REPORT.md`, SHA-256 `b96e91f04ecf1e08e90237c41862691e379a8421fd70d7332de21e7b7ee50d77`; pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; exact Ghidra commands, logs, and hashes are recorded in the private report. Two Ghidra API-signature corrections were tooling-only; final read-only queries exited 0.
+- **Verification:** `cmake -S native -B local/build/orch-r22` exited 0; `cmake --build local/build/orch-r22 -j 12` exited 0 (`ninja: no work to do`); CTest passed **431/431**; lift checkers passed **516/0/0** with an explicit rerun exit 0. Final staged/full `audit_publish_paths.py` checks passed **6/6** and **3,033/3,033**; `check_commit_attribution.py` passed for the current empty `origin/main..HEAD` range. `trail build --check` exited 0 with 9,876-node wiring graph in sync; deep layer remains unbuilt. `python3 scripts/project_index.py` exited 0 at **33,162 folders**; its strict check reports volatile `docs/FOLDERS.md` and `local/indexes/folders.json` as stale, so only the durable checkpoint count was recorded in `docs/FOLDERS.md`. Logs: `local/validation/orch-20261027/slot309-docs/`. These repository checks do not advance a game gate.
+- **Next exact action:** resolve consumers/order for the alternate vtable references and `[RBP-0x38]` payload lifetime using existing saved evidence; retain both branches and keep slot 309 unregistered until those contracts are proven.
+- **Task status / attempts:** ACTIVE; 0 failed semantic hypotheses; 2 corrected tooling-signature errors. Public Claude attribution history was previously scanned clear; the new commit will receive exact-range owner-attribution checks. The 70 stash-only Claude credit matches remain unchanged per user choice.
+
 ## 2026-10-27 12:35 CDT (`/root`) — Reconcile E621 task/evidence summaries
 
 - **Task:** `DOC-01-E621-SUPERSEDED-METADATA-CLAIMS-01`; claim checkpoint `97fca8449e1067d6136012656013a2c4cbedfb19` is pushed, fetched, and matches `origin/main`.
