@@ -361,6 +361,45 @@ struct ProcessCoreClientTests {
         #expect(logLines(fake).contains { $0.hasSuffix(" quit") })
     }
 
+    @Test func shutdownFailsPendingStatusBeforeSendingQuit() async throws {
+        let fake = try newFake()
+        defer { fake.remove() }
+        let log = fake.log.path(percentEncoded: false).replacingOccurrences(of: "'", with: "'\\''")
+        try writeScript("""
+        #!/bin/sh
+        LOG='\(log)'
+        while IFS= read -r line; do
+          printf '%s\\n' "$line" >> "$LOG"
+          command=${line#* }
+          case "$command" in
+          status) : ;; # Keep status pending until shutdown sends quit.
+          quit) exit 0 ;;
+          esac
+        done
+        exit 0
+        """, to: fake)
+        let client = try ProcessCoreClient(coreURL: fake.executable)
+        defer { client.shutdown() }
+
+        let statusTask = Task { try await client.status() }
+        var statusWasLogged = false
+        for _ in 0..<100 {
+            if logLines(fake).contains(where: { $0.hasSuffix(" status") }) {
+                statusWasLogged = true
+                break
+            }
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        #expect(statusWasLogged)
+
+        client.shutdown()
+
+        let failure = try #require(await expectFailure { _ = try await statusTask.value })
+        #expect(failure.code == .badState)
+        let commands = logLines(fake).compactMap { $0.split(separator: " ").last.map(String.init) }
+        #expect(commands == ["status", "quit"])
+    }
+
     @Test func requestsAfterShutdownFailWithBadState() async throws {
         let fake = try makeProtocolFake()
         defer { fake.remove() }
