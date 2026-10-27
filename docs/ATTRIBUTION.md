@@ -359,3 +359,11 @@ does, prevents that.
   `d32c88e68e0cc06dedcdf2f72f328f56f64160c752e1c929d70b04a35428674d`; local report SHA-256
   `599048a166fc879a59b81b2f137963ce1eb89991fda0dff246545befe5ccf158`; see E795 and its
   [closeout checkpoint](checkpoints/2026-10-27-e794-final-push-closeout.md).
+- After E795 `5325daaa1eb5c98f76c0180afe57158f3a1db4cf`, a fresh scan covered 9 fetched GitHub
+  heads, 0 tags, and **2,407 unique reachable commits**, with zero Claude/Anthropic identity or
+  credit-line matches. The local scan covered 25 named non-stash refs / 2,407 commits, also zero;
+  the 70 stash matches remain unchanged by user choice. Remote report SHA-256
+  `0aa7b27d0d85524ac30a69b60b0633ca034e7f9507aa285a8476b1f02925dc6a`; local report SHA-256
+  `0ccde4532f8ef1649c8f9e64bf58f1c38edca1dfddf8b09bf1a3a9e7a651e7da`; see E796 and its
+  [closeout checkpoint](checkpoints/2026-10-27-e795-final-publication-closeout.md). Scans cover
+  named refs and fetched heads, not unreachable Git objects.

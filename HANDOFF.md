@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 10:29 CDT (`/root`) — E796 post-E795 all-ref attribution closeout
+
+- **Tasks:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; `PUB-01-CLAUDE-CREDIT-CLEANUP-01`.
+- **Starting state:** clean `main` at E795 `5325daaa1eb5c98f76c0180afe57158f3a1db4cf`, matching `origin/main`.
+- **Fresh scans through E795:** GitHub fetch scan parsed 9 branch heads, 0 tags, and **2,407 unique reachable commits**, with 0 Claude/Anthropic author, committer, or credit-line matches (report SHA-256 `0aa7b27d0d85524ac30a69b60b0633ca034e7f9507aa285a8476b1f02925dc6a`). The local scan covered 25 named non-stash refs / **2,407 commits**, 0 matches; stash has 768 reachable commits / 70 matches, unchanged per the user's explicit choice (report SHA-256 `0ccde4532f8ef1649c8f9e64bf58f1c38edca1dfddf8b09bf1a3a9e7a651e7da`).
+- **E796 prepublication gates:** CMake configure/build passed; CTest **431/431**; lift checkers **516 passed / 0 skipped / 0 failed**; Trail wiring graph **9,876 nodes / 13,469 edges** (deep meaning layer not built); project index generation/check **33,144 folders**, then regenerated volatile `launcher/.build` rows were excluded and durable `docs/checkpoints` count advanced 827→828. Staged/full path audits passed **7/7** and **3,024/3,024**; default attribution, owner identity, and cached diff checks passed. Exact new-commit range and post-push fetch checks remain next. Gate log manifest SHA-256 `0782e453c6d0ed0329522f2adb5dba1a1a8556a6112cfd28b1100fe98cf9d017` under `local/validation/orch-20261027/e796-publication/`.
+- **Scope:** scans cover currently named Git refs and fetched GitHub heads through E795, not unreachable objects. The new documentation checkpoint is owner-authored and will be separately checked by the exact-range attribution and path audits. No history refs were rewritten in this census.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-e795-final-publication-closeout.md`.
+- **Remaining risks:** 70 stash-only matches remain by explicit direction. Native-game acceptance remains open (G0/G1 PARTIAL); no game boot, actual game audio, real save/reload, or real Metal scene is claimed. No task is currently READY: slot 309 lacks ownership/call-order evidence; VoiceOver awaits an unlocked Mac; the AUD-02 provider query is unreleased.
+- **Next exact action:** commit only these seven allowlisted documentation paths under the owner identity, push `origin main`, verify the exact commit range/identity/paths, then resume native-port work when an evidence-backed task or dependency becomes available.
+- **Task status:** Claude attribution is **ARTIFACT_VERIFIED** through E795 for fetched public refs and named local non-stash refs; 0 failed hypotheses. The broad native port remains active and incomplete.
+
 ## 2026-10-27 10:21 CDT (`/root`) — E795 E794 publication verification and final attribution scan
 
 - **Tasks:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; `PUB-01-CLAUDE-CREDIT-CLEANUP-01`.
