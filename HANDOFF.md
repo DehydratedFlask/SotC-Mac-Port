@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 03:07 CDT (`/root`) — post-`1a44ce55` public-ref attribution scan (E763)
+
+- Published checkpoint `1a44ce550f10045989de544142b80501dc929d2f` to `origin/main`; the remote scan then exited 0 and found zero Claude/Anthropic matches across 9 fetched heads, 0 tags, and 2,381 reachable commits. New docs checkpoint: `docs/checkpoints/2026-10-27-post-1a44ce55-attribution-scan.md`, with E763 in `docs/EVIDENCE.md` and updates to `docs/ATTRIBUTION.md`, `docs/INDEX.md`, and `docs/TASKS.md`. Configure/build exit 0; CTest **431/431**; lift sweep **516/0/0**; Trail wiring graph in sync with 9,875 deep nodes pending; project index exit 0 with 33,103 folders, retaining only durable `docs/checkpoints` 809→810 in FOLDERS. Exact logs are in `local/validation/orch-20261027/slot309-checkpoint/e763/`.
+- `refs/stash` still has 70 Claude-attributed commit objects, none branch/remote reachable; these local recovery refs remain unchanged pending the owner's answer. Main's all-history audit still flags only non-Claude `f6604a86e60e` `orchestrator@local`.
+- Documentation gates passed: staged/all path audits **7/3,006**, unpublished attribution and owner-identity audits exit 0; all-history attribution exit 1 only for `f6604a86e60e`. Exact logs and hashes are in `local/validation/orch-20261027/slot309-checkpoint/e763/`.
+- **Next exact action:** commit the seven allowlisted docs as owner and push `origin main`; then refresh the public-ref scan for the next checkpoint. Do not modify `refs/stash` until the scope question is answered.
+
 ## 2026-10-27 03:02 CDT (`/root`) — slot 309 boundary recheck and stash-only attribution audit (E761/E762)
 
 - Tasks: `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` and `PUB-01-CLAUDE-CREDIT-CLEANUP-01`. The saved Ghidra export is outgoing-only; no reusable saved project or `getReferencesTo(0x531d60)` result was found, and the current REA session has no open target. No new binary import was started. The existing hash-checked reports still leave writer invocation/order and `[RBP-0x38]` type/cleanup unresolved. Preserve both `0x2dfd4b8` branches; slot 309 remains unregistered, ACTIVE, G1 PARTIAL; failed semantic hypotheses 0.
