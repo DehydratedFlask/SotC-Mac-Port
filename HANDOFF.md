@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 14:30 CDT (`/root`) — E822 publish E821 and refresh GitHub attribution
+
+- **Task:** publish E821's bounded slot-309 payload ownership evidence and verify the remote attribution scope.
+- **E821 commit:** `0fe78843d5ce3f764e04d8b27cd1371c82e613d0` (parent `71b8d70a1040b11c74590647de200cea1df9de5e`), subject `docs: record slot-309 payload ownership boundary`; Johnny Wang author and committer.
+- **Exact command/results:** `git fetch origin main`; staged path audit **6/6** and full tracked-path audit **3,038/3,038** passed; `python3 -I scripts/check_commit_attribution.py` and `--identity` passed; `git diff-tree --check HEAD^ HEAD` passed; `git push origin main` and post-push fetch exited 0. `HEAD == origin/main == FETCH_HEAD == 0fe78843d5ce3f764e04d8b27cd1371c82e613d0`, worktree clean. Logs: `local/validation/orch-20261027/e821/`.
+- **Fresh live GitHub-ref attribution:** `python3 local/validation/orch-20261027/project-index-fix/live_remote_attribution_audit.py` exited 0: 9 branches, 12 PR refs, 0 tags, 15 tips, **2,434 reachable commits**, zero Claude/Anthropic identity hits, zero co-author/generated-by hits, remote main matches local. This includes E821. Private `refs/stash` remains at `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8` and unchanged per owner choice.
+- **Files changed by E821:** six allowlisted docs/index files; no source or game files. No runtime code executed.
+- **E822 documentation gates:** configure/build exit 0 (`ninja: no work to do`); CTest **431/431**; lift checkers **516/0/0**; Trail graph **9,877 nodes / 13,470 edges** (deep layer not built); project-index generation/check current at **31,929 folders**. E822 path, attribution, identity, diff, commit, push and fetch results are recorded in `local/validation/orch-20261027/e822/`.
+- **Status:** E821 is **ARTIFACT_VERIFIED** as published; its technical result remains **PARTIAL / STATIC_ANALYSIS_VERIFIED** for one copy/cleanup path. Slot 309 stays unregistered; G1 PARTIAL.
+- **Next exact action:** continue slot-309 characterization only if a concrete nonzero `+0x10` consumer/destruction path can be traced; otherwise retain the hook boundary and work the next dependency-ready independent task.
+
 ## 2026-10-27 14:26 CDT (`/root`) — E821 finish bounded slot-309 payload pass
 
 - **Task:** `CPU-01-STARTUP-SLOT-309-PAYLOAD-OWNERSHIP-01`; inspect the `+0x10` qword only through the observed slot-309 copy helper and cleanup path.
