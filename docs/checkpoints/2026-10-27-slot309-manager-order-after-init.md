@@ -47,3 +47,19 @@ Two initial `ExportRefs.java` runs had Ghidra API type-signature errors (`getRef
 - Keep `0x2dfd4b8` list/tree branches unresolved and slot 309 unregistered.
 - Continue a focused read-only census of the alternate vtable references at `0x1594ed8`, `0x159c588`, and `0x15d5b90`, and prove whether any can dispatch before index 309. In parallel, continue `[RBP-0x38]` payload ownership/lifetime analysis.
 - Task status remains **ACTIVE**, failed semantic hypotheses: **0**, G1: **PARTIAL**. Other acceptance gates remain unchanged.
+
+## Publication and post-push verification
+
+- E809 commit `47ea5711a50b4e68046c3ee642ebcda5db65a1cb` has parent `1f5783687e3d07dacca9043f767816649b4b5427`; author and committer are Johnny Wang `<dehydratedflask@users.noreply.github.com>`.
+- Exact-range attribution for `1f5783687e3d07dacca9043f767816649b4b5427..HEAD` and effective owner identity passed. The committed-tree path audit passed **3,033/3,033**, and `git diff-tree --check HEAD^ HEAD` passed.
+- The commit was pushed as a fast-forward to `origin main`. `git fetch origin main` confirmed `HEAD == origin/main == FETCH_HEAD == 47ea5711a50b4e68046c3ee642ebcda5db65a1cb`; the worktree was clean.
+- The earlier precommit staged audit passed **6/6**. A post-commit staged audit reported `nothing staged`, as expected after the commit.
+- This commit adds one owner-identified commit to the prior advertised-ref census of 2,423 commits with zero Claude/Anthropic matches. The new commit was checked separately by exact range; the 70 stash-only credit matches remain unchanged by owner choice.
+
+## E810 documentation-closeout checks
+
+- CMake configure exited 0; CMake build exited 0 with no work; CTest passed **431/431**; lift checkers passed **516/0/0**.
+- Final staged/full path audits passed **5/5** and **3,033/3,033**. The precommit attribution audit passed for the current empty `origin/main..HEAD` range.
+- `trail build --check` exited 0 with the 9,876-node wiring graph in sync; the deep layer remains unbuilt.
+- `python3 scripts/project_index.py` exited 0 at **33,162 folders**. Strict check reports generated `docs/FOLDERS.md` and private `local/indexes/folders.json` stale after launcher build/private evidence inventory churn; only the durable checkpoint count is retained in `docs/FOLDERS.md`.
+- Logs: `local/validation/orch-20261027/slot309-docs/e810-*`. These checks validate repository state only and do not advance a game gate.
