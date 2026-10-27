@@ -36,6 +36,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [RDX cached-CFG closeout](checkpoints/2026-10-27-aud02-rdx-cfg-closeout.md) | E728 closes bounded offline argument-origin analysis at static/fixture scope; parent AUD-02 remains partial |
 | [Attribution scan after 9e61358b](checkpoints/2026-10-27-post-9e61358b-attribution-scan.md) | All 9 remote heads and 2,354 reachable commits scan clean for Claude/Anthropic identities and credit lines |
 | [Attribution scan after 53634a15](checkpoints/2026-10-27-post-53634a15-attribution-scan.md) | All 9 remote heads and 2,355 reachable commits scan clean for Claude/Anthropic identities and credit lines |
+| [Attribution scan after 4682a337](checkpoints/2026-10-27-post-4682a337-attribution-scan.md) | All 9 remote heads and 2,356 reachable commits scan clean for Claude/Anthropic identities and credit lines |
 | [Startup slot 306 survey](checkpoints/2026-10-25-startup-slot-306-survey.md) | E676 hash-bound table/body/call-footprint characterization; semantics UNKNOWN, 11 indirect calls unresolved, G1 PARTIAL |
 | [Slot 303 checker publication repair](checkpoints/2026-10-24-slot303-publication-repair.md) | Complete function reconstruction removed from public checker; E624 |
 | [Integration PR #9 final closeout](checkpoints/2026-10-25-integration-pr9-final-closeout.md) | PR #9 merged at `a8bd805`; clean-main baseline and branch cleanup verified; E643 |
@@ -64,6 +65,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [GPU-03 logo VS/PS Metal pipeline](checkpoints/2026-10-25-gpu03-logo-vs-ps-metal-pipeline.md) | E669 fixture-verified composed E636/E646 Metal pipeline; E670 records publication on main; retail/game-frame limits remain |
 | [GPU-03 logo VS/PS on raw CMSH meshes](checkpoints/2026-10-25-gpu03-logo-vs-ps-raw-cmsh-frame.md) | E678 fixture review; E679 full gates and precommit audits passed; E681 published to main; G3 PARTIAL |
 | [F590 shared-string release review](checkpoints/2026-10-25-f590-release-review-recovery.md) | E680 source/ASan/UBSan/byte-oracle review; E685 confirms the exact five-mutant inputs remain absent |
+| [F590 replacement mutation acceptance](checkpoints/2026-10-27-f590-replacement-mutants-acceptance.md) | E731 root reassessment accepts the replacement set at fixture scope while preserving the missing-five and toolchain-specific limits |
 | [GPU-03 logo PNG and raw mesh composite](checkpoints/2026-10-25-gpu03-logo-png-cmsh-composite.md) | E658 exact-hash raw cube/cone POS0/U16 plus pinned logo PNG/MSL through the direct-Metal asset-derived harness; retail mapping and G3 remain unverified |
 | [GPU-03 CMSH TEX0 format code 6 evidence](checkpoints/2026-10-25-gpu03-cmsh-tex0-format-6.md) | E660 records the hash-pinned TEX0 spans; E662 records completed shipped-code tracing with no decoder found, so coordinate semantics remain UNKNOWN |
 | [GPU-03 logo VS/PS Metal pipeline](checkpoints/2026-10-25-gpu03-logo-vs-ps-metal-pipeline.md) | E664 claim and E666 publication of the closed synthetic composition of exact-hash E636/E646 stages; implementation is active |
