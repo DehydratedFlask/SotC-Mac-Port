@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 08:31 CDT (`/root`) — E781 slot-309 saved-report cross-check
+
+- **Task ID:** `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`.
+- **Files changed:** `HANDOFF.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/TASKS.md`, and `docs/checkpoints/2026-10-27-app01-shutdown-term-escalation.md`.
+- **Exact check:** opened the cited line ranges from the five existing private reports and hashed each report; no binary import, reanalysis, code execution, or tracked implementation change.
+- **Observations:** the reports show `[RBP-0x38]` is a copy source with no observed release, but its payload type/ownership remains unresolved. The `0x531d60` table slot has only a DATA reference in the saved Ghidra census; no caller or invocation-order edge to slot 309 is established. A conditional ordering of constructor-list rows does not put `0x531d60` on that list.
+- **Publication checks:** staged/full path audits passed 5/5 and 3,013/3,013; empty-range and owner-identity attribution audits passed. `--all` still fails only on the unrelated `orchestrator@local` alias. Exact logs are in the checkpoint.
+- **Remaining risks:** both `*(0x2dfd4b8)` branches must stay preserved; slot 309 stays unregistered and has no native-lift boundary. No direct evidence supports selecting the manager/list branch.
+- **Next exact action:** commit only the five staged allowlisted docs under the owner identity, run post-commit audits, and push `origin main`; then wait for an authoritative saved-project type/destructor link or concrete consumer/invocation-order edge. Do not import the binary again or lift on guessed ownership.
+- **Task status / attempts:** ACTIVE / G1 PARTIAL; 0 failed semantic hypotheses. This cross-check is a report review, not a new hypothesis attempt.
+
 ## 2026-10-27 08:28 CDT (`/root`) — E780 post-ba618452 public scan and push verification
 
 - **Task ID:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`; next independent work remains `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`.
