@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 13:27 CDT (`/root`) — E812 slot-309 direct-order and temporary follow-up
+
+- **Task:** `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`; bounded read-only follow-up on the alternate vtable installation path and `[RBP-0x38]` temporary lifetime.
+- **Starting state:** clean `main`; `HEAD == origin/main == 386c896b1d90fbd5d6523942ac0337c3c032077b`.
+- **Files:** durable changes are limited to `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, and the existing slot-309 checkpoint; private Ghidra outputs and report are under `local/validation/orch-20261027/slot309/`.
+- **Observed:** saved Ghidra references/decompilation establish the known direct path `0xf120 → 0x20 → 0x536730 → 0x536aa0 → 0x2534c0 → 0x23d60`; the last two functions install vtables `0x159c578` and `0x1594ec8` after the constructor dispatcher. Ghidra also confirms slot-309 `0xa505e0` calls `0xa50280`, which nests `0xa50440`; `0xa50220` copies only the qword at `+0x10` and writes the `0x15d1cc8` table pointer at `+0x20`. The observed call initializes/copies a zero payload, keeps the record local, and has no destructor call on that record before frame return.
+- **Inference and limits:** this narrows the known direct setup chain and this one slot-309 call only. `0x15d5b80`, indirect/data-driven dispatch, and ordering of destructor paths through `0x240f0` remain unresolved. The general temporary type/ownership contract is unknown. Keep slot 309 unregistered; no native-lift boundary or game gate advances.
+- **Evidence:** private follow-up `local/validation/orch-20261027/slot309/manager-order/FOLLOWUP-2026-10-27.md`, SHA-256 `4bc79b317819aaad4951530393c16463ae09e18323ca90e2a5c7c330f79bb361`; pinned ELF SHA-256 remains `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`. Independent read-only review agrees that direct evidence cannot exclude indirect pre-slot dispatch.
+- **Verification:** CMake configure/build exited 0 (`ninja: no work to do`); CTest passed **431/431**; lift checkers passed **516/0/0**; Trail wiring graph passed with 9,876 nodes in sync (deep layer unbuilt). `python3 scripts/project_index.py` exited 0 at **33,162 folders**; restored strict check exits 1 with volatile `docs/FOLDERS.md` and private `local/indexes/folders.json` stale after `.build` churn. Staged/full path audits passed **5/5** and **3,033/3,033**; staged diff check passed; precommit attribution passed for the current empty `origin/main..HEAD` range. Logs: `local/validation/orch-20261027/slot309-docs/e812-*`. No game code ran.
+- **Next exact action:** map any construction/dispatch route into `0x15d5b80` and the startup order of `0x240f0` cleanup; keep both manager-cell branches and slot 309 blocked until those paths and the general temporary contract are supported.
+- **Task status / attempts:** ACTIVE; 0 failed semantic hypotheses; 1 corrected Ghidra script-path tooling error. G1 remains PARTIAL.
+
 ## 2026-10-27 13:16 CDT (`/root`) — E811 verify E810 publication
 
 - **Task:** `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`; close out E810's publication before resuming the active static-analysis task.
