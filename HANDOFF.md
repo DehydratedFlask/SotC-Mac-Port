@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 15:46 CDT (`/root`) — E829 publish E828 and claim slot-309 consumer trace
+
+- **E828 publication:** owner commit `4f3d9af2d17a66a46afb1af636c6d59286235d87` (parent `763c9178c7b12123eb432ea48a9aa76b3a2b7d15`) is pushed and fetched; `HEAD == origin/main`. Eight allowlisted documentation paths; exact-range attribution, owner identity, committed diff and path checks passed.
+- **Claude attribution:** refreshed public refs include 9 branches, 12 PR heads, 0 tags, 15 unique tips and **2,441 reachable commits**. Claude-family author/committer identities and credit lines: **0**. The broader historical attribution gate also reports unrelated existing hostname-derived and other assistant-alias identity fields (1,070 affected commits); no unrelated identity cleanup was authorized. Private stash `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8` is unchanged per owner instruction.
+- **E828 result:** `AUD-01-PAKN-CRMP-CXML-STRUCTURE-PROBE-01` remains **PARTIAL**: all three sidecar identities and CRMP profiles agree, while CXML root/name counts remain UNKNOWN. No audio or game gate advances.
+- **Claimed continuation:** `CPU-01-STARTUP-SLOT-309-NONZERO-CONSUMER-01`, read-only examination of the existing hash-pinned saved Ghidra/export evidence for one concrete nonzero reader or destruction path of the qword copied at `+0x10` by `0xa50220`. No new binary import, game execution, registration, or ownership claim. If no path is supported within the scoped evidence, preserve the hook boundary and report the negative coverage precisely. Parent characterization remains ACTIVE; G1 PARTIAL.
+- **Files changed for E829 claim:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and this checkpoint.
+- **Next exact action:** after publishing E829, inspect only the pinned saved-project/export evidence and byte-verify any candidate nonzero `+0x10` consumer and cleanup path; request independent review before closing the bounded pass.
+
 ## 2026-10-27 15:41 CDT (`/root`) — E828 close pakN sidecar structure probe
 
 - **Task/status:** `AUD-01-PAKN-CRMP-CXML-STRUCTURE-PROBE-01` is **PARTIAL**, 0 failed analysis tries; one worker profile plus independent root replay and two reviewer approvals.
