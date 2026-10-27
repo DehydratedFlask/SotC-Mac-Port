@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 16:20 CDT (`/root`) — E833 stop unqualified slot-309 copy lead
+
+- **Starting state:** `main == origin/main == bbf731830fb4ca59b1fa905cd754b07e67d8ffb3` after E832; only documentation was modified locally. Private stashes were not touched.
+- **Candidate disposition:** independent review compared the proposed call at `0xa5054d` in `0xa50440` with E832's continuation gate. The existing profile identifies vtable slot 0 as copy-only helper `0xa50220`; the proposed source field `[rbx+0xb0]` is zeroed before the call. This is neither a concrete nonzero producer nor a semantic consumer.
+- **Task/status:** `CPU-01-STARTUP-SLOT-309-INDIRECT-VTABLE-COPY-01` is **NOT RUN / STOPPED** before byte or Ghidra analysis. No fresh verifier, query, or private report was created. Zero failed hypotheses; zero attempts. Parent slot-309 characterization remains ACTIVE but receives no new finding from this lead.
+- **Boundary:** keep slot 309 unregistered, `+0x10` ownership UNKNOWN, native-lift boundary UNKNOWN, and G1 PARTIAL. No game acceptance gate advances.
+- **Repository verification:** CMake configure/build exited 0; CTest **431/431**; lift checkers **516/0/0**; Trail wiring check passed at **9,877 nodes / 13,470 edges** (deep layer not built); project index regenerated and checked current at **31,948 folders**. The first index check returned 1 because the E833 private log directory was created after index generation; the second detected two newly created index-output logs. With all log paths precreated, generation exited 0 and the final check passed. Logs: `local/validation/orch-20261027/e833/`; stale outputs are `project-index-check.log` and `project-index-check-second-stale.log`, and the final outputs are `project-index-generate.log` and `project-index-check-final.log`.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-slot309-indirect-vtable-copy-stopped-e833.md`; no source, build, binary, or game-input changes.
+- **Exact commands:** `cmake -S native -B local/build/orch-r22`; `cmake --build local/build/orch-r22 -j 12`; `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure`; `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`; `trail build --check`; `python3 scripts/project_index.py`; `python3 scripts/project_index.py --check`.
+- **Next exact action:** leave this lead stopped. Reassess the active parent only when existing evidence supports a distinct concrete nonzero producer or semantic consumer; re-triage other task lanes after an external dependency/input changes.
+
 ## 2026-10-27 16:09 CDT (`/root`) — E832 close slot-309 helper caller census
 
 - **Task/status:** `CPU-01-STARTUP-SLOT-309-HELPER-CALLER-CENSUS-01` is **PARTIAL / STATIC_ANALYSIS_VERIFIED** for two saved-reference rows and one observed byte-level call chain. The only recorded callers are slot-309 `0xa505e0 → 0xa50280` at `0xa50c57` and `0xa50280 → 0xa50440` at `0xa503d7`. The source record's `+0x10` qword is zeroed before this call chain and copied to destination `+0x90`; no nonzero seed or semantic use is proven.
