@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 03:30 CDT (`/root`) — post-`9d87ef5b` public-ref attribution scan (E768)
+
+- After publishing `9d87ef5baf13fec06979693ff07316bfe034830d`, fetch and remote scan exited 0. It covered 9 branch heads, 0 tags, and 2,385 reachable public commits with zero Claude/Anthropic identity or credit-line matches. E768 and the private report hash are in `docs/EVIDENCE.md` and `docs/checkpoints/2026-10-27-post-9d87ef5b-attribution-scan.md`.
+- The table-consumer census remains inconclusive on startup order; slot 309 is ACTIVE/G1 PARTIAL and unregistered. E762 still finds 70 attribution matches only under `refs/stash`; those recovery refs remain unchanged pending the owner's scope answer.
+- Verification: configure/build exit 0; CTest **431/431**; lift checkers **516/0/0**; Trail wiring graph consistent with 9,875 meaning nodes pending; project index exit 0 with 33,108 folders, retaining only durable `docs/checkpoints` 813→814 in `docs/FOLDERS.md`; staged/all publication audits **7/3,010** passed; precommit and owner-identity attribution checks exit 0. The all-history attribution audit exits 1 only for historical non-Claude `f6604a86e60e` (`orchestrator@local`). Logs and hashes are in `local/validation/orch-20261027/slot309-checkpoint/e768/`. The initial index-log wrapper hit zsh's read-only `status` variable after the index completed; the output and exit are recorded accurately. No source files changed.
+- Changed files: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and the E768 checkpoint.
+- **Next exact action:** commit only these seven allowlisted docs under owner identity, push `origin main`, and scan the new remote head. Then check the saved slot-309 map for the four exact identities in the E765 report.
+
 ## 2026-10-27 03:22 CDT (`/root`) — post-`4b21a234` public-ref attribution scan (E767)
 
 - After publishing `4b21a234f127852910cf5252672ae6a5c6f8be09`, fetch and remote scan exited 0. The scan covers 9 branch heads, 0 tags, 2,384 reachable public commits, and finds zero Claude/Anthropic identities or credit lines. E767 and its private report hash are in `docs/EVIDENCE.md` and `docs/checkpoints/2026-10-27-post-4b21a234-attribution-scan.md`.
