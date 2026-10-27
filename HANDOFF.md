@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 15:59 CDT (`/root`) — E831 claim slot-309 helper caller census
+
+- **E830 publication:** owner commit `3a0d4e52588dc2ca59227fe83a554f381c0a0f8b` is pushed/fetched on `origin/main`; 6 allowlisted docs, exact-range attribution and path/diff checks passed. Post-E830 scan: 9 branches, 12 PR heads, 0 tags, 15 tips, **2,443 reachable commits**, zero Claude-family identity/credit hits; private stash unchanged.
+- **E830 disposition:** exact vtable/method bytes and saved-reference replay are **STATIC_ANALYSIS_VERIFIED**; no concrete nonzero payload producer, semantic reader, or release path. Slot 309 stays unregistered; `+0x10` ownership UNKNOWN; G1 PARTIAL.
+- **Claimed next bounded task:** `CPU-01-STARTUP-SLOT-309-HELPER-CALLER-CENSUS-01`. From the existing saved Ghidra project in `-noanalysis -readOnly` mode, enumerate the incoming-reference callsites for `0xa50280` and `0xa50440`, then byte-verify argument setup for the source object's `+0x10` value. This is distinct from E829's method-target query. No new import, project mutation, game execution, payload extraction, source changes, or slot registration. Dynamic/unresolved values stay UNKNOWN.
+- **Parent status:** `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` remains ACTIVE; keep the hook boundary and G1 PARTIAL.
+- **Files changed for E831 claim:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and this checkpoint.
+- **Next exact action:** after publishing E831, query only saved-project references to the two named helpers, verify each concrete caller's argument bytes from the pinned ELF, and independently replay/review the report before disposition.
+
 ## 2026-10-27 15:57 CDT (`/root`) — E830 close bounded slot-309 nonzero-consumer trace
 
 - **Task/status:** `CPU-01-STARTUP-SLOT-309-NONZERO-CONSUMER-01` is **PARTIAL / STATIC_ANALYSIS_VERIFIED** for exact method bytes and the saved ReferenceManager result only. No concrete nonzero producer, semantic reader, or release path was found. Parent slot-309 characterization remains ACTIVE; keep slot 309 unregistered, `+0x10` ownership UNKNOWN, and G1 PARTIAL.
