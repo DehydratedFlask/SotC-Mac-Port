@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-26 23:33 CDT (`/root`) — slot 309 read-only task claim published
+
+- Task: `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`, claim commit `df07effb7f39ad376cd2b30e9b55485fa37a1f35` pushed to `origin main`. The bounded read-only work packet is [here](docs/checkpoints/2026-10-26-slot309-characterization-claim.md); task is ACTIVE with 0 failed hypotheses.
+- After `git fetch origin --prune`, the 9 GitHub branch heads (no tags) scan covers **2,344** reachable commits with zero Claude/Anthropic credit trailers and zero Claude/Anthropic author/committer identities. Evidence: `local/validation/orch-20261026/claude-credit-cleanup-review/remote-refs-after-slot309-claim.txt` and `remote-scan-after-slot309-claim.log`. Main and origin/main both resolve to `df07effb7f39ad376cd2b30e9b55485fa37a1f35`.
+- `python3 scripts/project_index.py` passed (33,036 folders); staged/all-path, unpublished attribution, and cached diff audits passed before the claim commit. The completed leaf rows remain published at `cb6fe71d` (397/573, first gap 309); full CTest is 431/431 and lift checkers 516/0/0.
+- Next exact action: dispatch `/root/trail_scope_audit` for pinned-ELF characterization of slot 309 only. Require Graft/Trail navigation, recheck the 1,891-byte census estimate, map reachable branches/calls and unresolved indirect edges, retain private REA evidence if used, and return a native-lift feasibility recommendation. No source edit until the analysis is complete and reviewed.
+
 ## 2026-10-26 23:30 CDT (`/root`) — leaf rows published; slot 309 analysis claimed
 
 - Completed task: `CPU-01-STARTUP-LEAF-ROWS-315-560-01`, published as `cb6fe71d61a885e81f778b7a109af4a47b426834` on `origin/main`. Gates remain configure 0, build 433/433, CTest 431/431, lift checkers 516/0/0, Trail graph in sync. Coverage is **397/573**; 176 slots remain, first gap **309 / `0xa505e0`**. Details E713 and [leaf-row checkpoint](docs/checkpoints/2026-10-26-startup-leaf-rows-315-560.md).
