@@ -1,5 +1,19 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 11:42 CDT (`/root`) — E804 E803 publication verification and fresh all-ref census
+
+- **Task:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; verify E803 closeout commit and extend the census through it.
+- **Starting state:** clean `main` and `origin/main` both resolve to E803 `13ce186fd4762f66ec8f6715e38b67b86a673411` after fetch.
+- **E803 exact commit verification:** `python3 -I scripts/check_commit_attribution.py --range HEAD^..HEAD`, `--identity`, explicit seven-path audit, full tracked-path audit **3,030/3,030**, and committed diff check all passed. Author and committer are Johnny Wang `<dehydratedflask@users.noreply.github.com>`.
+- **Fresh scan after E803:** all 21 advertised GitHub refs (9 branch heads, 12 pull-request heads, 0 tags) reach **2,415 unique commits**, zero Claude/Anthropic matches (report SHA-256 `3ed3c86360093f97f82fc9d9f60d504326fa45c337603e159682e2c309486579`). Local scan covers 25 non-stash refs / **2,415 commits**, zero matches (SHA-256 `d62aaff0b55aecc32d4fa46dfdab7354d647f067eb83f59a91e2e8c5fe73968f`). Stash remains 768 commits / 70 matches; 21 reflog tips cover 826 commits / the same 70 matches, unchanged.
+- **Reports:** `local/validation/orch-20261027/e803-closeout/all-advertised-ref-scan-after-13ce186f.json` and `local/validation/orch-20261027/e803-closeout/local-scan-after-13ce186f.json`.
+- **Independent review:** `/root/metadata_followup_review` independently matched the live GitHub ref list, local ref list, public and stash counts, all match lists, and report hashes; review was read-only with no payload access.
+- **Observations vs inference:** current live GitHub refs, ancestry, identities/messages, local refs, and stash reflog tips were scanned; no unreachable Git object or contributor-graph rendering claim.
+- **E804 precommit gates:** CMake configure/build exited 0 (build had no work); CTest **431/431**; lift checkers **516/516** with no skips; `trail build --check` passed (9,876-node wiring graph in sync; deep layer unbuilt); project-index generation/check passed at **33,153 folders**. The generated public folder table differed only in 64 transient `launcher/.build` rows, which were discarded; durable checkpoint count remains 834. Staged/full publish-path audits passed **6/6** and **3,030/3,030**; default attribution, effective owner identity, and cached diff checks passed. Logs: `local/validation/orch-20261027/e804-closeout/`; precommit log manifest SHA-256 `ebad4249e7d696593405c222aeca2286b8e9c0f3abb8ae10d71622b46d07356d`.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, `docs/checkpoints/2026-10-27-e802-attribution-census-closeout.md`.
+- **Next exact action:** publish the six allowlisted documentation paths under the owner identity, then verify E804's exact range, identity, paths, and fetched tip.
+- **Task status / attempts:** attribution **ARTIFACT_VERIFIED** through E803; E804 publication is pending. Independent review passed; 0 failed hypotheses. The overall native-port goal remains active and incomplete.
+
 ## 2026-10-27 11:33 CDT (`/root`) — E803 all-advertised-ref attribution census closeout
 
 - **Task:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; E802 claim commit `29329cad4433cb8cf7fdc414b68e0adc14ded7e4`.
@@ -11,7 +25,7 @@
 - **Observations vs inference:** refs, heads, ancestor counts, parsed messages/identities, and report hashes are direct scanner outputs. Coverage is the set of currently advertised GitHub refs and named local refs/reflog tips; unreachable Git objects and GitHub contributor-graph rendering are not asserted. No code or game payload was changed or read.
 - **Current task status:** attribution is **ARTIFACT_VERIFIED** across all currently advertised GitHub refs and local non-stash refs through E802. No dependency-ready native implementation task surfaced; slot 309 ownership/call order, VoiceOver unlock, and authorized AUD-02 provider-query scope remain blockers. G0/G1 remain PARTIAL; G2/G4/G5/G6 remain NOT RUN; G3 remains PARTIAL. No actual game boot/audio/save/reload/gameplay frame is established.
 - **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, `docs/checkpoints/2026-10-27-e802-attribution-census-closeout.md`.
-- **Next exact action:** continue only from a concrete dependency-ready native task; keep slot 309 unregistered until payload ownership or invocation-order evidence exists. Preserve the explicit private-stash exclusion.
+- **Next exact action (superseded by E804):** verify the E803 closeout commit and refresh all advertised GitHub refs through that commit. Keep slot 309 unregistered until payload ownership or invocation-order evidence exists.
 - **Task status / attempts:** attribution refresh **ARTIFACT_VERIFIED**, 0 failed hypotheses; the overall native-port goal remains active and incomplete.
 
 ## 2026-10-27 11:26 CDT (`/root`) — E802 post-E801 attribution census claim

@@ -419,3 +419,13 @@ does, prevents that.
   all private stash state remain unchanged. See E803 and its
   [closeout checkpoint](checkpoints/2026-10-27-e802-attribution-census-closeout.md). Unreachable
   Git objects and GitHub contributor-graph rendering are not covered.
+- After E803 `13ce186fd4762f66ec8f6715e38b67b86a673411` was pushed, a new scan of all advertised
+  GitHub refs covered 9 branch heads, 12 pull-request heads, 0 tags, and **2,415 unique commits**,
+  with zero Claude/Anthropic matches (SHA-256
+  `3ed3c86360093f97f82fc9d9f60d504326fa45c337603e159682e2c309486579`). The local census covered
+  25 non-stash refs / 2,415 commits, also zero (SHA-256
+  `d62aaff0b55aecc32d4fa46dfdab7354d647f067eb83f59a91e2e8c5fe73968f`). The 21 current stash
+  reflog tips reach 826 commits / 70 message-credit matches, 0 identity hits; stash state remains
+  unchanged. Independent review reproduced both scans. See E804 and the
+  [closeout checkpoint](checkpoints/2026-10-27-e802-attribution-census-closeout.md). Unreachable
+  objects and contributor-graph rendering are outside this evidence.
