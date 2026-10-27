@@ -339,3 +339,9 @@ does, prevents that.
   [E791 publication closeout](checkpoints/2026-10-27-e791-publication-closeout.md). The 70
   stash-only matches remain untouched per the user's choice. E791 itself passed a separate exact
   range/identity/path audit after publication.
+- The E793 local-ref census extended the scan to every named ref except `refs/stash`, including
+  local/remote branches and Codex turn-diff refs: 25 refs and **2,404 unique commits**, with zero
+  Claude/Anthropic identities or assistant credit/signature matches. It separately found the
+  already-known 70 stash matches in 768 reachable stash commits and left the ref unchanged by user
+  direction. Private report SHA-256 `2d2c80f19d83e8bc4d5c1032fbfefed2501599396db1bb5d18480db20b56c5ef`;
+  see the [E793 local-ref census](checkpoints/2026-10-27-local-ref-attribution-census.md).
