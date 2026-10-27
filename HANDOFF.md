@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 18:42 CDT (`/root`) — E854 close E853 publication and leave current task handoff
+
+- **E853 publication:** `ad0f6d98be28d751a7bb95cfef1459906475f4b0` (Johnny Wang) passed exact-range attribution, owner identity, 6-path staged / 3,070-path full audit, and diff checks; push and fetch verification succeeded. Project index was current at 31,986 folders.
+- **E854 handoff publication:** the docs-only closeout is committed and pushed under Johnny Wang after its exact-range/identity and fetch checks; logs are under `local/validation/orch-20261027/e854/`.
+- **E854 gates:** configure/build passed; CTest 431/431; lift checkers 516/0/0; Trail graph current at 9,877 nodes (deep layer unbuilt); project index current at 31,987 folders; staged/full path audits 6/6 and 3,071/3,071; owner identity, previous-commit attribution, and diff checks pass.
+- **Attribution:** fresh E853 census immediately before that commit covered 21 advertised refs, 15 unique tips, 2,465 reachable commits, and zero Claude/Anthropic matches. E853 and E852 commits were separately exact-range checked, so their additions to `main` are also clean. Private stash remains untouched at 826 commits / 70 credit-line matches.
+- **Completed bounded task:** `AUD-01-PAKN-MUSIC-SXD1-BYTE-STRUCTURE-01` is `ARTIFACT_VERIFIED` for the private byte profile only; its independent replay matched all 23 fields. Actual format, codec, game audio integration, and game acceptance remain open.
+- **Current product blockers:** no other independent `READY` lane was found by the recent scouts; UI checks need an unlocked Mac, real save/load needs the user's save, AUD-02 needs a released query scope, GPU work is dependency-gated, and slot 309 needs producer/consumer evidence.
+- **Files changed:** this handoff, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and [E854](docs/checkpoints/2026-10-27-publication-closeout-e853-e854.md). Private evidence remains under ignored `local/validation/`.
+- **Next exact action:** re-scan `docs/TASKS.md` for a new independent task when new evidence or user-owned inputs open a blocked lane.
+
 ## 2026-10-27 18:39 CDT (`/root`) — E853 close E852 publication and refresh attribution
 
 - **E852 publication:** `9d729dcd2f1f9f1f3ac9003ef2128f90ef3ddc47` (Johnny Wang) passed exact-range attribution, owner identity, six-path staged and 3,069-path committed-tree audits, diff checks, and the 31,984-folder project-index check; pushed and fetch-verified at `origin/main`.
