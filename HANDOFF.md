@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 00:04 CDT (`/root`) — attribution refreshed after 209ff; slot 316 analyzer dispatched
+
+- `HEAD` and `origin/main` were both `209ff474d3d9d7727084076a6f27ec9c0eacdc39`; the slot 316 claim is published in that commit. `git fetch origin --prune` exited 0. The remote scan command in E722 exited 0 across 9 branch heads, 0 tags, and 2,351 reachable commits with zero Claude/Anthropic identities or credit lines. The private report is `local/validation/orch-20261026/claude-credit-cleanup-review/remote-scan-after-209ff474.json`.
+- Slot 316 `CPU-01-STARTUP-SLOT-316-CHARACTERIZATION-01` is dispatched to `/root/leaf_rows_review` for the existing table checker plus analyzer only. It may write private artifacts under `local/validation/orch-20261027/slot316/`; no shared source/docs edits or REA/Ghidra are in scope. Registration is still blocked behind 309/312/314. G1 remains PARTIAL.
+- Files changed for this checkpoint: `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md` (E722), `docs/FOLDERS.md`, `docs/INDEX.md`, `docs/TASKS.md`, and new `docs/checkpoints/2026-10-27-post-209ff474-attribution-scan.md`. `python3 scripts/project_index.py` exited 0 and indexed 33,040 folders; `docs/FOLDERS.md` lists 770 checkpoint files. Exact next action after publication: root-replay the slot 316 worker's table and analyzer results, then update its task/evidence/handoff and publish a separate checkpoint.
+- This is a docs-only attribution checkpoint. Run `python3 scripts/project_index.py`, stage only the seven allowlisted documentation paths, run staged/all-path and attribution audits plus `git diff --cached --check`, commit under the owner identity, and push `origin main`.
+
 ## 2026-10-27 00:02 CDT (`/root`) — slot 314 replayed; slot 316 claimed
 
 - The latest full GitHub history scan was run after `d0faf04e3758d1fa6c9843fb453eb16bfc4af837`: `git fetch origin --prune` and `python3 -I local/validation/orch-20261026/claude-credit-cleanup-review/scan_remote_refs_attribution.py > local/validation/orch-20261026/claude-credit-cleanup-review/remote-scan-after-d0faf04e.json` exited 0. It parsed 9 remote branch heads, 0 tag refs, 2,350 unique commits, and found 0 Claude/Anthropic identities or credit lines (E720).
