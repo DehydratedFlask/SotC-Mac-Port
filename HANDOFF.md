@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 16:45 CDT (`/root`) — E837 close E836 publication and attribution census
+
+- **Task ID/status:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01` closeout, `ARTIFACT_VERIFIED` for all currently advertised GitHub refs; E836 all-lane triage recorded. The larger native port goal remains active.
+- **E836 publication:** owner commit `c84312ddb635bfa05a9922349f6779117b5dbbf8` (parent `624bca59b53dc8d98933ca24f8f34c66d547e271`), subject `docs: record E836 all-lane readiness triage`, author/committer Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Push advanced `main`; fetch confirmed `HEAD == origin/main == c84312ddb635bfa05a9922349f6779117b5dbbf8`, clean. Exact-range attribution passed; full path audit passed **3,053/3,053**. Logs: `local/validation/orch-20261027/e836/post-commit-attribution.log`, `audit-all.log`, `push.log`, `git-fetch.log`.
+- **Fresh GitHub-ref census:** scanner parsed 21 advertised refs (9 branches, 12 PR heads, 0 tags), 15 unique tips, and **2,449 reachable commits**; zero Claude/Anthropic author/committer or matching credit-line hits. Report SHA-256 `9e6302a9890c8c41811338eb6ed5cf97cd30ed48b351e5f9796abef51d129a42`; scanner SHA-256 `aaf9a26d38df8332bb051a50f98a8be578ebcf64fefdc0c13e7054e8f8cbda31`; private artifacts and log are under `local/validation/orch-20261027/e836/`.
+- **Stash boundary:** scanner separately parsed 21 stash-reflog tips / 826 reachable commits and found 70 Claude/Anthropic matches. `refs/stash` remains `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`; no stash ref/reflog changed, per the user's explicit choice.
+- **E836 gates:** CMake configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail **9,877/13,470** in sync; project index **31,949** current; staged/full path audits **6/6** and **3,053/3,053**. The initial zsh audit wrapper and copied-scanner output path were corrected and rerun successfully; details in the E837 closeout.
+- **E837 closeout gates:** CMake configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail **9,877/13,470** in sync; project index **31,950** current; staged/full path audits **6/6** and **3,054/3,054**; precommit attribution command exited 0 for the empty `origin/main..HEAD` range. Logs are under `local/validation/orch-20261027/e837/`; exact E837 commit-range attribution is checked after commit.
+- **Task status:** parallel CPU, service/data/audio/save, app, GPU, and RE scouts found no new READY product task. Keep E832's slot-309 gate; other open tasks await external input, dependencies, or provider evidence. No game acceptance gate advanced.
+- **Files changed in E837:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-e836-publication-closeout-e837.md`. No product source changed.
+- **Next exact action:** continue from the current register when a required dependency, provider result, unlocked Mac, or user-owned save becomes available; otherwise retain the documented gates and do not claim the port complete.
+
 ## 2026-10-27 16:36 CDT (`/root`) — E836 all-lane readiness triage
 
 - **Task ID/status:** `GOAL-ORCHESTRATION-READY-LANE-TRIAGE-01`, DONE_DOC; no product task admitted and no task-register status changed. One completed read-only triage; 0 failed analysis attempts.
@@ -11,7 +23,7 @@
 - **Wiki context:** reviewed the supplied session digests as non-canonical metadata and navigated from `topics/projects/_index.md` to the current project portfolio; the live repository remains the implementation source of truth. The `@wiki` tool and `llm-wiki` CLI were unavailable, so no wiki content was changed.
 - **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-ready-lane-triage-e836.md`. No source, binaries, game inputs, or stashes changed; validation logs are private under `local/validation/orch-20261027/e836/`.
 - **Remaining risks / next exact action:** prerequisites can change. Re-triage when an external input/provider result arrives, the Mac is unlocked for VoiceOver, a user-owned save is available, or a registered dependency changes. Until then preserve E832's slot-309 gate and do not invent a weaker acceptance test.
-- **Attribution boundary:** the post-E835 fetched-GitHub-ref scan covers 9 branch refs, 12 PR heads, 0 tags, 15 unique tips, and 2,448 reachable commits with no Claude/Anthropic attribution; `refs/stash` remains unchanged per the user's explicit choice. E836 will refresh the public census after its commit is pushed.
+- **Attribution boundary:** E837 records the post-E836 fetched-GitHub-ref scan covering 21 advertised refs, 15 unique tips, and 2,449 reachable commits with no Claude/Anthropic attribution; `refs/stash` remains unchanged per the user's explicit choice.
 
 ## 2026-10-27 16:29 CDT (`/root`) — E835 close E834 publication and refresh public attribution
 
