@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-26 23:59 CDT (`/root`) — attribution rescanned at 97890a11
+
+- After publication, `git fetch origin --prune` exited 0; `HEAD` and `origin/main` both equal `97890a11b8bf53d1de98dcbaf742867024bea340`. The scan command `python3 -I local/validation/orch-20261026/claude-credit-cleanup-review/scan_remote_refs_attribution.py > local/validation/orch-20261026/claude-credit-cleanup-review/remote-scan-after-97890a11.json` exited 0: 9 remote branch heads, 0 tag refs, 2,349 unique reachable commits, zero Claude/Anthropic author/committer identities and zero credit-line matches (E719).
+- Checkpoint `97890a11` was pushed to `origin main` with owner author/committer. Before push: staged audit passed 9 paths, full audit passed 2,961 paths, unpublished attribution and diff checks passed; push exited 0. The remote scan now includes that checkpoint commit.
+- Slot 312 is **STATIC_ANALYSIS_VERIFIED** for its analyzer-only task (E718); two indirect calls remain unresolved and G1 is PARTIAL. Slot 314 claim is published in `97890a11` and its read-only preliminary analyzer pass is dispatched to `/root/trail_scope_audit`; no shared source edits.
+- Files changed in this checkpoint: `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md` (E719), `docs/FOLDERS.md`, `docs/INDEX.md`, `docs/TASKS.md`, and new `docs/checkpoints/2026-10-26-post-97890a11-attribution-scan.md`. `python3 scripts/project_index.py` exited 0 and indexed 33,040 folders; `docs/FOLDERS.md` lists 766 checkpoint files. Exact next action: stage only these seven allowlisted documentation paths, run staged/all-path, attribution and diff audits, commit and push the scan record, then continue reviewing slot 314. The older local `--all` audit finding is only `orchestrator@local`, not Claude/Anthropic.
+
 ## 2026-10-26 23:57 CDT (`/root`) — slot 312 replayed; slot 314 and attribution checkpoints prepared
 
 - Attribution: `git fetch origin --prune` exited 0; main and `origin/main` were `30121388e4bb903422dac1c68baed80a8cea6daa`. The full remote scan command in E717 exited 0 over 9 branch heads, 0 tags, and 2,348 unique commits with 0 Claude/Anthropic identity or credit-line matches. The historical local `--all` finding remains only `orchestrator@local`.
