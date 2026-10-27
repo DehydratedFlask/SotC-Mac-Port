@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 18:52 CDT (`/root`) — E856 close E855 publication and verify live attribution
+
+- **E855 publication:** `ff22975871588ef7012d5a59269df65c883c684f` (`docs: record E855 attribution census and publication checks`) is authored and committed by Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Exact-range attribution, owner identity, committed-tree audit (3,072 paths), and commit diff checks passed; push succeeded and fetch verified `HEAD == origin/main == FETCH_HEAD == ff22975871588ef7012d5a59269df65c883c684f`; the worktree was clean.
+- **Fresh post-E855 census:** 21 advertised refs (9 branches, 12 PR heads, 0 tags), 15 unique tips, 2,468 reachable commits; zero Claude/Anthropic identity and zero credit-line hits. Scanner SHA-256 `3456af0f8a3359dac4fb4af31c8b9c6a20f37f8a58cfefc3ed4ab9eaf98e6df3`, report SHA-256 `060e1a080aa718cb8a814bc1c50f82e17b5e4774ef37934ee39fe6b976322b60`, and log SHA-256 `7cfc59126e1a52f1013fd3a03f770bfdd13fc67af916cd582970760c2093449d`; all under `local/validation/orch-20261027/e855/attribution/`.
+- **Private stash boundary:** per the user's direction, the stash was left unchanged. Its 21 reflog tips / 826 commits still contain 70 Claude credit lines and zero Claude/Anthropic identity hits; `refs/stash` remains `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`.
+- **E856 gates:** configure passed; build passed with Ninja reporting no work; CTest passed 431/431; lift checkers passed 516/0 skipped/0 failed; `trail build --check` passed with the 9,877-node wiring graph current (deep layer unbuilt); project index regenerated and passed `--check` at 31,990 folders. Logs are under `local/validation/orch-20261027/e856/`.
+- **Files changed:** this handoff, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and [E856 checkpoint](docs/checkpoints/2026-10-27-publication-closeout-e855-e856.md). Staged/full path audits, attribution, diff, commit, push, and post-push fetch verification remain pending.
+- **Next exact action:** run staged/full path audits, identity/exact-range and diff checks; publish only the six allowlisted docs paths under Johnny Wang; exact-range check the new commit, push `origin main`, fetch-verify, and leave the worktree clean. Product acceptance remains incomplete.
+
+## 2026-10-27 18:48 CDT (`/root`) — E855 live advertised-ref attribution census
+
 ## 2026-10-27 18:48 CDT (`/root`) — E855 live advertised-ref attribution census
 
 - **Fresh census after E854:** scanner `local/validation/orch-20261027/e855/attribution/scan_advertised_refs_and_stash_e855.py` (SHA-256 `3456af0f8a3359dac4fb4af31c8b9c6a20f37f8a58cfefc3ed4ab9eaf98e6df3`) found 21 advertised refs (9 branches, 12 PR heads, 0 tags), 15 unique tips, and 2,467 reachable commit objects. No Claude/Anthropic identity or credit-line matches. Report SHA-256 `e90b39df57def6fecab3364aa53b96a14826fcdb6e198a49c4c41aef8c23eed2`; log SHA-256 `7cfc59126e1a52f1013fd3a03f770bfdd13fc67af916cd582970760c2093449d`.
