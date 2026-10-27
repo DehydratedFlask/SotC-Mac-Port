@@ -94,7 +94,8 @@ the old ~3.7 MB inventory and “too small for the soundtrack” inference are w
 
 All 86 codec labels remain **UNKNOWN**. File names and magic observations do not establish
 framing, codec configuration, channels, sample rate, loop/seek semantics, audio-engine use,
-or playback. A case-insensitive path-token census of this corrected manifest (E789) finds two
+or playback. E789's case-insensitive path-token census searched only this corrected 86-row
+audio-header manifest and found two
 `music` rows and two `bgm` rows; `dialog`, `voice`, and `stream` occur in zero paths. The four
 music/BGM path-name candidates are:
 
@@ -107,6 +108,44 @@ music/BGM path-name candidates are:
 
 These are path-name candidates only. They do not establish content format, codec, dialogue
 coverage, engine routing, or playback. No game-audio gate is promoted.
+
+### Seven-archive sound-path census (E798; metadata only)
+
+E798 extended the search to all seven corrected r30 `.members.jsonl` manifests: **170,451 rows**.
+Path-token matching is case-insensitive and bounded by non-alphanumeric characters. The search
+also includes the five known audio-family suffixes in the 86-row header manifest. It found
+**1,221 unique path/TOC candidates** after deduplicating rows that match multiple tokens; all 86
+audio-header records reconcile to the corrected manifest's exact path, TOC ID and declared size,
+and **1,135** candidates fall outside that header subset.
+
+| Path token | Rows |
+|---|---:|
+| `sound` | 679 |
+| `stream` | 536 |
+| `se` | 56 |
+| `music` | 2 |
+| `bgm` | 2 |
+| `dialog`, `dialogue`, `voice`, `voiceover`, `audio`, `sfx`, `speech`, `ambient`, `ambience` | 0 each |
+
+| Archive | Candidate rows |
+|---|---:|
+| Base `cachedFiles.psarc` | 301 |
+| Patch `cachedfiles.psarc` (01.01) | 301 |
+| `pak0.psarc` | 0 |
+| `pak1.psarc` | 0 |
+| `pak2.psarc` | 10 |
+| `pak3.psarc` | 47 |
+| `pakN.psarc` | 562 |
+| **Total** | **1,221** |
+
+The suffix hits are `.sxd` 26, `.sxd1` 5, `.sxd2` 5, `.hd` 25, and `.bd` 25; these 86 rows are
+the existing header subset. The full exact record set (archive, TOC ID, declared decoded size,
+path, matched tokens and suffixes) is retained in private report
+`local/validation/orch-20261027/aud01-seven-archive-sound-path-census/census-report.json`,
+SHA-256 `bdd36242d3ab49bd3b488254e29b7d723425afb1d9442c7441b9212fdf98d29e`. The E797 claim
+checkpoint pins the seven input manifest hashes. These names and suffixes identify candidates
+only; they do not establish audio content, codec, dialogue coverage, event meaning, engine
+routing, or playback.
 
 An E791 hash-bound review of existing saved Ghidra/REA text exports found `.sxd` only as a
 FourCC row in the platform-tag registry: `0xa60d60` registers it with `_cmn`, and the owner

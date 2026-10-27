@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 11:01 CDT (`/root`) — E798 sound-path census completion and all-ref refresh
+
+- **Tasks:** `AUD-01-SEVEN-ARCHIVE-SOUND-PATH-CENSUS-01`; `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`.
+- **Starting state:** E797 task claim `931e0394a47c03fdf4268727b30975f4431bf728` is on `origin/main`; after `git fetch origin --prune`, `HEAD == origin/main` at that commit.
+- **Census result:** scanned only seven corrected r30 member JSONL manifests (170,451 rows) and the existing 86-row header JSON. Found **1,221 union path/extension candidates**, with all 86 header records reconciled by archive/TOC ID/path/size and 1,135 matches outside that subset. Counts: `sound` 679, `stream` 536, `se` 56, `music` 2, `bgm` 2; other searched terms zero. Union by archive: base cachedFiles301, patch cachedfiles301, pak0 0, pak1 0, pak2 10, pak3 47, pakN 562. Exact list is in the private JSON report, SHA-256 `bdd36242d3ab49bd3b488254e29b7d723425afb1d9442c7441b9212fdf98d29e`; root rerun was byte-identical and independent review matched every candidate. No archive or payload read; no format/codec/dialogue/routing/playback claim.
+- **Fresh attribution scans after E797:** 9 GitHub heads / 0 tags / **2,409 commits**, zero Claude/Anthropic matches (SHA-256 `0bd1a8114a7f300a94c2989e5624edbbb18f493ab87ff1256c53151583cbb1b5`); 25 local non-stash refs / **2,409 commits**, zero matches (SHA-256 `316c5b290a5ce95d00331d6203e111373ea8b9f7fe5129e97154df41fe3f5902`). `refs/stash` remains 768 commits / 70 matches, unchanged per user choice.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/ASSETS.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-aud01-seven-archive-sound-path-complete.md`.
+- **Repository gates:** CMake configure/build exited 0; CTest **431/431**; lift checkers **516/0/0**; `trail build --check` reports the 9,876-node wiring graph in sync (deep layer not built); project-index generation/check **33,147/33,147**, with only durable checkpoint count 829→830 retained in `docs/FOLDERS.md`. Staged/full path audits passed **8/8** and **3,026/3,026**; default attribution (`origin/main..HEAD`), cached/worktree diff, and configured-owner identity checks passed. Gate-log manifest SHA-256 `fbe51af8d7733652fdb2b961ff09ba9c8bda14a9d8fe7bba606e50d3566aed4e`; logs are under `local/validation/orch-20261027/e798-publication/`.
+- **Limits:** all matched terms and suffixes remain path/extension candidates only. Native game acceptance remains incomplete; no game boot, authentic audio, real save/reload, or gameplay Metal frame is established. Slot 309 ownership/call order, VoiceOver manual unlock, and the AUD-02 provider-query boundary still block their lanes.
+- **Next exact action:** fetch and confirm no remote change since E797; commit only the eight allowlisted E798 docs under the owner identity, push `origin main`, fetch, and audit the exact commit range/identity/paths. Then triage for a new evidence-backed native-port task.
+- **Task status / attempts:** `AUD-01-SEVEN-ARCHIVE-SOUND-PATH-CENSUS-01` is **ARTIFACT_VERIFIED**, 0 failed hypotheses; attribution is **ARTIFACT_VERIFIED** through E797, with the latest 2,409-commit scans recorded here. The full native-port goal remains active.
+
 ## 2026-10-27 10:37 CDT (`/root`) — E797 E796 verification and all-archive audio metadata task claim
 
 - **Tasks:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; newly claimed `AUD-01-SEVEN-ARCHIVE-SOUND-PATH-CENSUS-01`.
