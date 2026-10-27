@@ -1,5 +1,19 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 00:56 CDT (`/root`) — APP-01 in-flight child-exit fixture claimed
+
+- Claimed `APP-01-PROCESS-CLIENT-INFLIGHT-EXIT-FAILURE-01` under the E613 process-client parent. Trail and live source show EOF aborts the pending request with `.io`; existing early-exit coverage does not prove the child received the request first. The test-only scope is `launcher/Tests/LauncherCoreTests/ProcessCoreClientTests.swift`; no production edit is authorized by this task.
+- Acceptance: a temporary shell fake logs the status request and exits nonzero without replying; assert `.io`, reject the response-timeout message, and assert the fake logged only status. Do not claim the second request was queued or test queue-draining; that state is not observable without a test hook. Focused ProcessCoreClient tests and full launcher suite required. Attempt count 0.
+- This claim is being recorded with the latest remote scan after `ff90a389`; that scan covered 9 refs / 2,365 commits with zero Claude/Anthropic matches (E742). Main is currently at `ff90a389`; neither the claim nor its code is yet pushed.
+- `python3 scripts/project_index.py` exited 0 and reported 33,054 folders. I discarded generated counts for ignored launcher build and private validation directories, retaining the checkpoint count change only (791 to 793) in `docs/FOLDERS.md`. `trail build --check` exited 0 with the wiring graph in sync; the deep concept layer remains unbuilt with 9,874 pending nodes.
+- Staged path audit passed all 8 docs paths; `git diff --cached --check` passed. All-path audit passed 2,989 paths (log `local/validation/orch-20261027/post-ff90a389-all-paths.log`, SHA-256 `7ff0902918341bb592e61670ca543af4568e7a1381185a6cf654c635103701ca`). Identity-only and unpublished-range attribution passed; `--all` reports only the historical `f6604a86e60e` `orchestrator@local` author/committer. Exact next action: commit/push these docs and claim paths, then rescan.
+
+## 2026-10-27 00:54 CDT (`/root`) — post-ff90a389 attribution scan
+
+- After `git fetch origin --prune` (exit 0), the scanner exited 0: 9 GitHub branch heads, 0 tags, and 2,365 unique reachable commits after `ff90a38919d6f199e560b9d74107f8c2d292e100`; zero Claude/Anthropic author/committer identities or credit-line matches (E742). Private report `local/validation/orch-20261026/claude-credit-cleanup-review/remote-scan-after-ff90a389.json`, SHA-256 `0ed77d2ed999928cb32c92e458ad56e30165e3b4cc688e82ef1a883156142156`. The scan predates this recording checkpoint.
+- `APP-01-PROCESS-CLIENT-SHUTDOWN-PENDING-REQUEST-01` was published in `447557f5` and is FIXTURE_VERIFIED (E740): focused 22/22 and full launcher 155/20, real-core integration skipped; no production source change. All-history attribution check still reports only the separate `f6604a86e60e` `orchestrator@local` identity.
+- This scan checkpoint adds `docs/checkpoints/2026-10-27-post-ff90a389-attribution-scan.md` and updates `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md` (E742), `docs/INDEX.md`, `docs/TASKS.md`, and `docs/FOLDERS.md`; regenerate folder counts, audit, commit/push as owner, then rescan. The native game gates remain PARTIAL/NOT RUN.
+
 ## 2026-10-27 00:52 CDT (`/root`) — post-447557f5 attribution scan
 
 - After `git fetch origin --prune` (exit 0), the scanner exited 0: 9 GitHub branch heads, 0 tags, and 2,364 unique reachable commits after `447557f5746d1550fbae6c0e655c80165aa2cd02`; zero Claude/Anthropic identity or credit-line matches (E741). Private JSON `local/validation/orch-20261026/claude-credit-cleanup-review/remote-scan-after-447557f5.json`, SHA-256 `8920b6237b04b9f179e3707ddeb7c395a77d921aa94bfefa6f6dd4cd33ec61db`. This scan predates its recording checkpoint.
