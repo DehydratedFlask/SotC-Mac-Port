@@ -441,6 +441,29 @@ struct ProcessCoreClientTests {
         #expect(failure.message.contains("native game core"))
     }
 
+    @Test func exitAfterReceivingRequestButBeforeReplyFailsWithIO() async throws {
+        let fake = try newFake()
+        defer { fake.remove() }
+        let log = fake.log.path(percentEncoded: false).replacingOccurrences(of: "'", with: "'\\''")
+        try writeScript("""
+        #!/bin/sh
+        LOG='\(log)'
+        IFS= read -r line || exit 3
+        printf '%s\\n' "$line" >> "$LOG"
+        exit 17
+        """, to: fake)
+        let client = try ProcessCoreClient(coreURL: fake.executable, responseTimeout: 2)
+        defer { client.shutdown() }
+
+        let failure = try #require(await self.expectFailure { _ = try await client.status() })
+
+        #expect(failure.code == .io)
+        #expect(!failure.message.contains("did not answer"))
+        let requests = logLines(fake)
+        #expect(requests.count == 1)
+        #expect(requests.first?.hasSuffix(" status") == true)
+    }
+
     @Test func exitAfterOneAnswerFailsTheNextRequest() async throws {
         let fake = try makeRawFake("""
         #!/bin/sh
