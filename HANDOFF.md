@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 15:57 CDT (`/root`) — E830 close bounded slot-309 nonzero-consumer trace
+
+- **Task/status:** `CPU-01-STARTUP-SLOT-309-NONZERO-CONSUMER-01` is **PARTIAL / STATIC_ANALYSIS_VERIFIED** for exact method bytes and the saved ReferenceManager result only. No concrete nonzero producer, semantic reader, or release path was found. Parent slot-309 characterization remains ACTIVE; keep slot 309 unregistered, `+0x10` ownership UNKNOWN, and G1 PARTIAL.
+- **Result:** pinned ELF `d0723afb…61d3`; vtable `0x15d1cc8` maps through PH1 to file offset `0x15d5cc8` and targets `0xa50220/40/60/70`. The first three bodies copy `+0x10`; `0xa50270` is `ret`. Existing saved-project queries and replay agree for five targets. Neither the wrapper cleanup nor the searched resolved references prove nonzero ownership or a semantic use.
+- **Review:** `/root/slot309_nonzero_consumer_review` approved. Reviewer verified report hash `8aedcb5e678e8bc46e760b81e3184edea986476fe977f89dd03aef8044021586`, all 12 listed artifact hashes, and an independent byte-profile replay. No fresh import, project mutation, game execution, source change, or game gate advance.
+- **Repository checks:** configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail check passed **9,877 nodes / 13,470 edges** (deep layer not built); project index current at **31,944 folders**. Logs are private under `local/validation/orch-20261027/e830/`.
+- **E829 publication:** claim commit `3f8cf1bc0f5e1340d53d51e1b544873268c720bc` is pushed/fetched on `origin/main`; post-E829 scan found 9 branches, 12 PR heads, 0 tags, 15 tips, **2,442 reachable commits**, zero Claude-family identity or credit hits; private stash unchanged.
+- **Files changed for E830:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and this checkpoint.
+- **Next exact action:** inspect the saved evidence only for a distinct concrete producer or semantic use that supplies a nonzero `+0x10` value; otherwise retain the slot-309 hook and do not claim ownership or a native-lift boundary.
+
 ## 2026-10-27 15:46 CDT (`/root`) — E829 publish E828 and claim slot-309 consumer trace
 
 - **E828 publication:** owner commit `4f3d9af2d17a66a46afb1af636c6d59286235d87` (parent `763c9178c7b12123eb432ea48a9aa76b3a2b7d15`) is pushed and fetched; `HEAD == origin/main`. Eight allowlisted documentation paths; exact-range attribution, owner identity, committed diff and path checks passed.
