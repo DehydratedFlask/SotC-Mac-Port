@@ -157,6 +157,33 @@ class ToolChecks(unittest.TestCase):
             generate(root, check=True)
             self.assertIn("new-module", (root / "docs/FOLDERS.md").read_text())
 
+    def test_index_ignores_only_launcher_build_output(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            generated = root / "launcher/.build/arm64/cache"
+            generated.mkdir(parents=True)
+            (generated / "build.db").write_text("transient")
+
+            generate(root)
+            generate(root, check=True)
+            paths = {
+                row["path"]
+                for row in json.loads((root / "local/indexes/folders.json").read_text())["folders"]
+            }
+            self.assertNotIn("launcher/.build", paths)
+            self.assertNotIn("launcher/.build/arm64", paths)
+            self.assertNotIn("launcher/.build/arm64/cache", paths)
+
+            other_build = root / "other/.build"
+            other_build.mkdir(parents=True)
+            with self.assertRaisesRegex(ValueError, "Stale indexes"):
+                generate(root, check=True)
+
+            generate(root)
+            (root / "new-module").mkdir()
+            with self.assertRaisesRegex(ValueError, "Stale indexes"):
+                generate(root, check=True)
+
     def test_index_check_does_not_create_missing_output_directories(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

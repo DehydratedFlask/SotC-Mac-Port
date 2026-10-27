@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 13:37 CDT (`/root`) — E813 project-index build-churn fix
+
+- **Task:** `DOC-INDEX-LAUNCHER-BUILD-CHURN-01`; make the required project-index check stable across Swift builds by excluding only ignored `launcher/.build` output and descendants, while retaining detection of ordinary new project folders.
+- **Starting state:** clean `main` at `d72870a319d58710152e93144f512a56cd0b20c7`, matching `origin/main`.
+- **Files:** `scripts/project_index.py`, `scripts/test_project_tools.py`, `docs/FOLDERS.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `HANDOFF.md`, and [the E813 checkpoint](docs/checkpoints/2026-10-27-project-index-build-churn.md). Private validation logs/report are under `local/validation/orch-20261027/project-index-fix/`.
+- **Change:** `inventory()` prunes exactly the `launcher/.build` subtree, not other `.build` directories. The new fixture proves cache files under that path leave both indexes current, while `other/.build` and a new ordinary module make them stale.
+- **Verification:** `scripts/test_project_tools.py` **13/13**; CMake configure/build exited 0 (`ninja: no work to do`); CTest **431/431**; lift sweep **516/0/0**. Trail was stale for the two changed scripts before rebuild; `trail build` exited 0 and `trail build --check` passed with **9,877 nodes / 13,470 edges** (deep layer not built). `python3 scripts/project_index.py` and `python3 -I scripts/project_index.py --check` both exited 0 at **31,921 folders**. Precommit staged/full path audits passed **8/8** and **3,034/3,034**; range attribution, owner identity, cached diff, and project-index check passed. Current live remote audit: 9 branch refs, 12 PR refs, 0 tags, 15 distinct tips, **2,427 reachable commits**, zero Claude/Anthropic identities or credit lines; `main` equals remote `main`. Stashes were not inspected or changed. Logs: `local/validation/orch-20261027/project-index-fix/`.
+- **Limits:** this only stabilizes generated folder indexes and synthetic fixtures. No game code ran and no game acceptance gate advances. The CPU-01 slot-309 task remains ACTIVE.
+- **Next exact action:** commit the eight explicit allowlisted paths under owner identity, fast-forward push to `origin main`, fetch and verify the tip; then record E814 for publication closeout and the new slot-309 route evidence.
+- **Task status / attempts:** `FIXTURE_VERIFIED`; staged/full path audits passed; commit/push is next; 0 failed implementation hypotheses.
+
 ## 2026-10-27 13:27 CDT (`/root`) — E812 slot-309 direct-order and temporary follow-up
 
 - **Task:** `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`; bounded read-only follow-up on the alternate vtable installation path and `[RBP-0x38]` temporary lifetime.

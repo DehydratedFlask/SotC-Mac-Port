@@ -7,6 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 GENERATED = {"docs/FOLDERS.md", "local/indexes/folders.json"}
+GENERATED_DIRS = {"launcher/.build"}
 ROLES = {
     ".": "Project entry points and agent state",
     "docs": "Plans, task/evidence registries, checkpoint and escalation documentation",
@@ -27,8 +28,12 @@ PRIVATE = {"local", "logs", "Shadow of the Colossus"}
 def inventory(root):
     records = []
     for current, directories, files in os.walk(root, followlinks=False):
-        directories[:] = sorted(d for d in directories if d not in {".git", "__pycache__"})
         relative = Path(current).relative_to(root).as_posix()
+        directories[:] = sorted(
+            d for d in directories
+            if d not in {".git", "__pycache__"}
+            and (Path(relative) / d).as_posix() not in GENERATED_DIRS
+        )
         top = relative.split("/")[0]
         if top == "graft":
             directories[:] = []  # The source graph has its own folder/symbol index.
