@@ -448,3 +448,13 @@ does, prevents that.
   its current 21-tip reflog union remains 826/70, unchanged. See E806 and the
   [closeout checkpoint](checkpoints/2026-10-27-e804-publication-closeout.md). Unreachable Git
   objects and contributor-graph rendering are not covered.
+- After E806 `70ba991e2093211d68ac4ca70134535dca8e75d4` was pushed, the all-advertised-ref scan
+  covered 21 GitHub refs (9 branches, 12 pull-request heads, 0 tags), **2,418 unique commits**,
+  and zero Claude/Anthropic matches (SHA-256
+  `14edf72ac7a2f83d5d683271ac1475b6a9d7bd8556831587464e351b6cdb9f83`). Local scan covered 25
+  non-stash refs / 2,418 commits, also zero (SHA-256
+  `021e1210ca0af54826dad23d0bf16a9b8c0d7a4a88c89aa72685bf073f5f8fba`). Stash remains 768/70;
+  its current 21-tip reflog union remains 826/70, unchanged per user choice. Independent review
+  reproduced both reports. See E807 and the
+  [closeout checkpoint](checkpoints/2026-10-27-e804-publication-closeout.md). Unreachable Git
+  objects and contributor-graph rendering are not covered.

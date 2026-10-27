@@ -40,3 +40,36 @@
 - **Remaining blockers:** slot 309 payload ownership/invocation order remains unresolved; APP-01 VoiceOver awaits an unlocked Mac; AUD-02 awaits an authorized provider-query scope. No actual game boot, game audio, real save/reload, or gameplay Metal frame is established.
 - **Next exact action:** publish this allowlisted closeout on `main`, verify exact commit metadata/path coverage and fetched HEAD, then continue with a dependency-ready native task.
 - **Task status / attempts:** attribution census **ARTIFACT_VERIFIED**, 0 failed hypotheses; overall native-port goal remains active and incomplete.
+
+## E807 — Verify E806 publication and refresh the attribution census
+
+- **Date/time:** 2026-10-27 12:00 CDT.
+- **Agent / integrator:** `/root`.
+- **Task:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`.
+- **Starting state:** E806 `70ba991e2093211d68ac4ca70134535dca8e75d4` was pushed to `origin/main`; post-push fetch confirmed matching HEAD and a clean worktree.
+
+### E806 exact commit verification
+
+- Exact-range attribution, owner identity, explicit six-path audit, full tracked-path audit **3,031/3,031**, and committed diff check passed. Author and committer are Johnny Wang `<dehydratedflask@users.noreply.github.com>`.
+- Fresh fetch resolved `HEAD` and `origin/main` to `70ba991e2093211d68ac4ca70134535dca8e75d4`.
+
+### Fresh scans after E806
+
+- All-advertised-ref scan covered **21 GitHub refs** (9 branch heads, 12 pull-request heads, 0 tags), **2,418 unique reachable commits**, and zero Claude/Anthropic identities or recognized credit lines. Report: `local/validation/orch-20261027/e806-closeout/all-advertised-ref-scan-after-70ba991e.json`, SHA-256 `14edf72ac7a2f83d5d683271ac1475b6a9d7bd8556831587464e351b6cdb9f83`.
+- Local scan covered **25 named non-stash refs / 2,418 commits**, zero matches. Report: `local/validation/orch-20261027/e806-closeout/local-scan-after-70ba991e.json`, SHA-256 `021e1210ca0af54826dad23d0bf16a9b8c0d7a4a88c89aa72685bf073f5f8fba`.
+- Current stash ancestry remains **768 commits / 70 message-credit matches**; the 21 current stash reflog tips reach **826 commits / the same 70 matches**. Independent review reproduced the refs, counts, match classes, and hashes. Stash remains unchanged per the user's explicit choice.
+- Coverage is limited to current advertised refs and current stash reflog tips, not unreachable Git objects or the rendered GitHub contributor graph.
+
+### E807 precommit gates
+
+- CMake configure/build exited 0 (build had no work); CTest passed **431/431**; lift checkers passed **516/516**, with no skips or failures; `trail build --check` passed with the **9,876-node wiring graph in sync** (deep layer unbuilt).
+- Project-index generation and check passed at **33,156 folders** on the generated snapshot. Generated `docs/FOLDERS.md` differed only by transient `launcher/.build` inventory rows; after discarding them, a fresh `--check` reports only `docs/FOLDERS.md` stale. The durable checkpoint count remains 835. Both check results are retained in the logs.
+- Staged/full publish-path audits passed **6/6** and **3,031/3,031**; default attribution (`origin/main..HEAD`), effective owner identity, and cached diff checks passed.
+- Gate-log manifest SHA-256 `d1975396c70774df9fcb7c95dd0c21d53a8d2cf1e56cdfcf2f6363bc9b0f96f4`. Logs: `local/validation/orch-20261027/e807-closeout/`.
+
+### Status and next action
+
+- **Observation vs inference:** named ref tips, reachable commit metadata/message records, report hashes, and command outputs are direct observations; this census does not enumerate unreachable objects or assert contributor-graph presentation.
+- **Remaining blockers:** slot 309 payload ownership/invocation order remains unresolved; APP-01 VoiceOver awaits an unlocked Mac; AUD-02 awaits an authorized provider-query scope. No actual game boot, game audio, real save/reload, or gameplay Metal frame is established.
+- **Next exact action:** publish these six allowlisted docs on `main`, then verify E807's exact range, identity, paths, fetched tip, and refreshed all-ref census.
+- **Task status / attempts:** attribution census **ARTIFACT_VERIFIED** through E806; E807 closeout active, 0 failed hypotheses. Overall native-port goal remains active and incomplete.
