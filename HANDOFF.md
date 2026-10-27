@@ -1,5 +1,166 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-26 23:09 CDT (`/root`) — resumed run: attribution audit and startup follow-up claimed
+
+- User instruction: complete as many registered tasks as practical, remove Claude as a contributor from all commits, and publish checkpoints to GitHub. The earlier no-push decision below is historical; the current request authorizes publication.
+- Attribution audit after `git fetch origin --prune` (exit 0): `origin/main` and six other remote refs have **0** Claude/Anthropic co-author trailers. Two stale refs retain **70** matching commits each, with identical 70-commit ancestry: `origin/cursor/parallel-foundations-86ac55b` at `86ac55b05fe6078db48ae7fc6e1197c790fec55f` and `origin/cursor/parallel-foundations-wip-20261023` at `a49fd2ae99d10749f2e345626cc9ce8ca2c9b6d6`. The WIP ref is one commit after the other; together they reach 1,071 branch-only commits past their merge base with `origin/main`. `gh pr list --state open` returned `[]`.
+- Gate results: `python3 -I scripts/check_commit_attribution.py --identity` PASSED; `--all` FAILED only on the documented historical `f6604a86e60e` author/committer `orchestrator <orchestrator@local>` (not Claude/Anthropic). Main has 1,268 reachable commits and 0 matching Claude trailers. Full per-ref command results: `local/validation/orch-20261026/resume/all-ref-attribution-audit.txt`.
+- **Tasks claimed before new source edits:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01` now covers every fetched remote ref; cleanup is limited to the two stale `parallel-foundations` refs and must preserve every tree, author, committer, and mapped parent before exact-lease publication. No history rewrite or push has occurred yet. `CPU-01-STARTUP-LEAF-ROWS-315-560-01` owns registering the 11 already-lifted leaves (315, 323, 341, 357, 378, 394, 412, 416, 496, 500, 560), updating state/coverage/order pins, and root replay.
+- Observations: Graft located `recovered_constructors()` and its production wiring in `native/core/startup_ctors.cpp`; the L1 checkpoint and independent read-only review supply exact RVAs, state shapes, and name arrays. Trail has no indexed nodes under `reference/ShadowOfTheColossus-PC/`; a separate scope audit found `native/`, `launcher/`, and `native/tests/` queryable, while the referenced upstream checkout is not. Do not infer missing bodies from these indexes.
+- Prior run's inherited gates (not yet rerun here): build exit 0, CTest **431/431**, lift checkers **516/0/0**, full publish-path audit OK. This resumed run has not yet staged, committed, or pushed source changes.
+- **Next exact actions:** run the repository publication gates on the accumulated tree; complete an isolated commit-metadata rewrite review for the two stale refs and compare all trees/authors/committers/parent maps; register the 11 leaf rows with their exact recovered order; record outcomes in `docs/EVIDENCE.md`; stage allowlisted files only, run staged/all-path and attribution gates, commit as the owner, push `origin main`, then publish the two reviewed stale-ref tips only with exact `--force-with-lease` expectations.
+- Status: both claimed tasks ACTIVE; attempt count 0; no failed semantic hypotheses. Remaining risks: the 11 rows do not advance the first gap at index 309; historical `orchestrator@local` remains a separate owner decision; no G1/G5 real-game gate is claimed.
+
+## 2026-10-26 (second orchestrated run, Claude Sonnet 5.5 orchestrator) — parallel slot-recovery lanes claimed
+
+- Pickup state verified: build clean, CTest **403/403** on the uncommitted tree atop `c5a667ca`; production rows **318/573**; 255 slots unregistered
+  (first gap now **307 / `0xa5b090`**). Survey of all 255 bodies via `tools/lift/analyze_slot_struct.py`: 42 are <=100 B, 78 <=300 B, 172 <=1000 B,
+  12 >3 KB (554 = 112 KB, 370 = 53 KB, 424 = 28 KB are the monsters). The constructor table is stored backwards: slot i at file offset `0x2dda750 + (306-i)*8`.
+- **Checkpoint (end of run, 2026-10-26):** all five lanes delivered, root-replayed and **wired**: `startup_ctors` 318 -> **386/573**, first gap
+  **309 / `0xa505e0`**. Gates: build exit 0; CTest **431/431**; lift checkers **516/0/0**; `audit_publish_paths.py --all` OK 2802; project index
+  32,762 folders. Evidence E705-E710; per-lane reports `docs/checkpoints/2026-10-26-L{1,2,3,4,5}-*.md` (each ends with its wiring snippets).
+  **Not run:** trail rebuild, commit-attribution, staged-path audit. **Nothing committed/pushed** (tree is large and uncommitted on `c5a667ca`).
+- **Remaining / next exact actions for the next agent:** (1) 4 L1 rows not wired because their callees are unlifted (409 414 494 535) plus 11 existing-leaf
+  rows (315 323 341 357 378 394 412 416 496 500 560: confirm each leaf's name array, then add rows, `StartupState` members and bump the 386 pin in
+  `check_fctor_slots_296_297_300.py`, `check_ctor_slots.py`, `test_startup_ctor_coverage.cpp`); (2) slots 309 (1891 B), 312 (1249 B), 314 (4328 B),
+  316 (2560 B) and everything >1000 B: 172 slots <=1000 B, large ones 349/375/370/424/554/571 (up to 112 KB); (3) merge duplicate 0x26db0 models
+  (`menu_item_26db0` L3 vs `ctor_shapes_343_356` L4); (4) run trail rebuild + `check_commit_attribution.py`, then ask the owner for the
+  commit/push approval (open question) and the F590 acceptance decision. Survey tooling: constructor table is stored backwards, slot i at ELF file
+  offset `0x2dda750 + (306-i)*8`; per-slot dossier `python3 -I tools/lift/analyze_slot_struct.py <rva>`.
+  Note: the AGENTS.md/ROADMAP rule bars assistant attribution trailers on commits; the harness reminder to add `Co-Authored-By: Claude` conflicts with it and must not be followed for this repo.
+- Lanes (workers do NOT edit shared docs / `startup_ctors.*`; root wires rows): **L1-TINY** (42 slots <=100 B, mostly `__cxa_atexit` thunks),
+  **L2-NEXT-SLOTS** (307,308,310,312,313,317,318), **L3** (322,325,327,328,330-334), **L4** (343-345,347,348,350,353,355,356),
+  **L5-RELEASE-FAMILY** (371,372,405,433,470,472,481,483-485,487,529 + 431,434,435,438,447). Each uses its own `local/build/L<n>` dir and appends one CMake block.
+  Reports: `docs/checkpoints/2026-10-26-L*-*.md`. No commits this run until the owner approves (open question carried).
+
+## 2026-10-26 (orchestrated run, GLM-5.3 as main orchestrator) — slot-306 assembly integration + handlers lane
+
+- Orchestrator: GLM-5.3 `/root` per owner /goal directive ("complete as many tasks as you can… spawn subagents… act as
+  the main orchestrator. Another agent has worked on this so pick up from where they left off."). Tree is uncommitted on
+  top of `c5a667ca`; the previous run's no-commit directive applied to that run only.
+- **Observed state on pickup (not in any earlier checkpoint):** beyond the three helper lanes (E698/E699/E700), an
+  untracked assembly module `native/core/ctor_slot_306_a633b0.{hpp,cpp}` + `native/tests/test_ctor_slot_306.cpp` (676
+  lines) already exists, is wired into `native/CMakeLists.txt` (test target `ctor_slot_306`) and registered as
+  production row `{0xa633b0, 306, …}` in `startup_ctors.cpp` with fail-visible `init_failed`. A further untracked
+  checkpoint `docs/checkpoints/2026-10-26-slot306-handlers.md` (static analysis of the three command handlers, the
+  atexit destructors, `0xba40`, `0x1e4c0`, `0xa5f380`, `0x21da0`, slider `+0x98/+0x9c`) also exists with private
+  evidence at `local/re/evidence/startup-slot-306-handlers-20261026/`. Neither has an EVIDENCE entry yet.
+- **Tasks claimed this run:**
+  - `CPU-01-STARTUP-SLOT-306-ASSEMBLE-01` (owner: root/integrator): verify the existing assembly against gates, fix the
+    stale row-count pin in `check_fctor_slots_296_297_300.py` (317→318, done, checker exit 0), add the missing
+    `tools/lift/check_ctor_slot_306.py` ELF-tie checker (worker lane), then document and record evidence.
+  - `CPU-01-SLOT306-HANDLERS-NATIVE-01` (owner: worker + root replay): native `sndx_command_handlers` module + unit
+    test + ELF hash-pin checker per the "Next native steps" of the 2026-10-26 handlers checkpoint, then wire the three
+    handler tags in `fconcmd_object_slot306`.
+  - `CPU-01-SLOT306-CATEGORY-VARS-01` (owner: worker + root replay): native `engine_category_vars` module for the
+    32 Mute + 32 Filter `sndxCategory_*` bool vars built by engine init `0xa5cd90` at engine `+0x8bd0` / `+0x72a8`,
+    stride `0xc8` (handlers checkpoint, next native step 2) + unit test + ELF-tie checker.
+- Root REA replay lane (this run, per owner direction to use the REA skill): open the pinned ELF with REA/Ghidra and
+  independently corroborate the handlers checkpoint contracts (`0xa5bf20/0xa5bf50/0xa5c020`, `0xba40`, `0x1e4c0`,
+  `0xa5f380`, `0x21da0`) with saved Evidence IDs before the native modules are accepted.
+- Gates on the pickup tree (before this run's edits): `cmake -S native -B local/build/orch-r22` exit 0; build exit 0;
+  CTest **401/401** (log `local/validation/orch-20261026/ctest-full.log`); lift checkers **484 passed, 1 failed**
+  (`check_fctor_slots_296_297_300.py` row-count 317 vs 318 — fixed above, re-run exit 0).
+- **Checkpoint 1 (assembly lane complete, 2026-10-26):** `CPU-01-STARTUP-SLOT-306-ASSEMBLE-01` is
+  **FIXTURE_VERIFIED + STATIC_ANALYSIS_VERIFIED**. New `tools/lift/check_ctor_slot_306.py` (all byte pins exit 0;
+  tampered-row mutation exits 1); row-count checker fixed 317→318 with order through 306 (exit 0). Combined gates:
+  build exit 0; CTest **401/401**; lift checkers **486/0/0** (log
+  `local/validation/orch-20261026/lift-checkers-after-fix.log`). Checkpoint
+  [2026-10-26-slot306-assemble.md](docs/checkpoints/2026-10-26-slot306-assemble.md); evidence E701 (assembly) and
+  E702 (inherited handlers static analysis). Files this lane: `tools/lift/check_fctor_slots_296_297_300.py`,
+  `tools/lift/check_ctor_slot_306.py` (new), `docs/checkpoints/2026-10-26-slot306-assemble.md` (new),
+  `docs/TASKS.md` (new 2026-10-26 section), `docs/EVIDENCE.md` (E701/E702), this handoff.
+- **Lanes in flight:** (a) worker `ses_e88e24c3effeunLu0WUneguo4a` owns
+  `sndx_command_handlers.{hpp,cpp}` + `test_sndx_command_handlers.cpp` + `check_fconcmd_handlers_slot306.py` +
+  the `fconcmd_object_slot306` handler-tag wiring + its CMake block; (b) root REA corroboration of the handlers
+  contract via the CLI (`rea function`, Ghidra 12.1.4, 8G heap, 20-min startup deadline — the MCP-side
+  `analyze_function` hits REA's 330 s default startup timeout on this 65 MB ELF; CLI env
+  `GHIDRA_INSTALL_DIR`/`GHIDRA_MAXMEM`/`REA_GHIDRA_STARTUP_TIMEOUT_MS` replicated from the opencode MCP config).
+  REA JSON evidence accumulates under `local/validation/orch-20261026/rea/`.
+- **Checkpoint 3 (category-vars lane complete, 2026-10-26):** `CPU-01-SLOT306-CATEGORY-VARS-01` is
+  **FIXTURE_VERIFIED + STATIC_ANALYSIS_VERIFIED**. Root implemented it directly (same subagent
+  transport failure): `native/core/engine_category_vars.{hpp,cpp}` (0xa5d990 loop model with the
+  0xf1a0/0xf590 owned-name lifecycle, 0xa62bc0 growth hook with a pending-list relocation fixup and
+  restore-on-failure, per-index menu-toggle hook), additive `init_bool_var_vector` sibling in
+  `concmd_vars` (no-atexit construction), 285-line test (ASan+UBSan; the ASan run caught a test-hook
+  stale-pointer bug and a real grow-failure link-restore gap — both fixed), and
+  `tools/lift/check_sndx_category_vars.py` (engine-init body hash + 20 instruction pins + 7
+  strings + constants; tamper kills). Gates: build exit 0; CTest **403/403**; lift checkers
+  **488/0/0** (logs `local/validation/orch-20261026/ctest-final.log`, `lift-checkers-final.log`).
+  Checkpoint [2026-10-26-slot306-category-vars.md](docs/checkpoints/2026-10-26-slot306-category-vars.md);
+  evidence E704. Files this lane: `native/core/engine_category_vars.{hpp,cpp}` (new),
+  `native/tests/test_sndx_category_vars.cpp` (new), `tools/lift/check_sndx_category_vars.py` (new),
+  `native/core/concmd_vars.{hpp,cpp}` (additive sibling), `native/core/sndx_command_handlers.hpp`
+  (additive `cap` on the shared span), `native/CMakeLists.txt` (one additive block), docs.
+- **Run totals so far (2026-10-26):** three lanes verified and documented (assembly E701, handlers
+  E703, category vars E704; inherited handlers static analysis E702) with two stale/missing
+  checkers fixed and three new checkers added; CTest 401→**403**, lift checkers 484/1→**488/0/0**.
+  REA corroboration recorded under `local/validation/orch-20261026/rea/` (CLI; the MCP-side
+  startup deadline is too short for this 65 MB ELF). Remaining this run: publish-path/attribution
+  audits + project index, then the owner questions below.
+- **Checkpoint 2 (handlers lane complete, 2026-10-26):** `CPU-01-SLOT306-HANDLERS-NATIVE-01` is
+  **FIXTURE_VERIFIED + STATIC_ANALYSIS_VERIFIED**. The background subagent died twice to transport errors
+  (ECONNRESET) with zero files written; root implemented the lane directly:
+  `native/core/sndx_command_handlers.{hpp,cpp}` (0/3 result codes, guards, 0xba40 clamp model, 0xa5f380
+  four-hook reload walk, tag bridge), 446-line test, `tools/lift/check_fconcmd_handlers_slot306.py`
+  (12 body hashes + 27 instruction-byte pins + token bytes + strcasecmp/_Stoul NID verification; tamper
+  kills), and the handler-tag wiring in `fconcmd_object_slot306.hpp` (static_asserts). REA corroboration
+  recorded (5 Ghidra dossiers + byte-pin for the 33-byte handler; both INF-open questions resolved:
+  case-insensitive strcasecmp compare, `_Stoul` numeric fallback). Gates: build exit 0; CTest **402/402**;
+  lift checkers **487/0/0** (logs `local/validation/orch-20261026/ctest-after-wiring.log`,
+  `lift-checkers-after-handlers.log`). Checkpoint
+  [2026-10-26-slot306-handlers-native.md](docs/checkpoints/2026-10-26-slot306-handlers-native.md); evidence
+  E703. Files this lane: `native/core/sndx_command_handlers.{hpp,cpp}` (new),
+  `native/tests/test_sndx_command_handlers.cpp` (new), `tools/lift/check_fconcmd_handlers_slot306.py` (new),
+  `native/core/fconcmd_object_slot306.hpp` (wiring + docs), `native/CMakeLists.txt` (one additive block),
+  docs/checkpoint/EVIDENCE updates.
+- Open owner questions carried from the previous run: (a) F590 acceptance (replacement 12/12 set vs. the lost original
+  five mutants); (b) owner-approved commit/push of the accumulated uncommitted allowlisted work to `origin main`.
+- Files this run so far: `tools/lift/check_fctor_slots_296_297_300.py` (row-count/order fix), this handoff, `docs/TASKS.md`.
+- Next exact actions: spawn the two worker lanes, integrate their outputs, run full gates, record EVIDENCE/checkpoints,
+  then ask the owner about commit/push and F590.
+
+## 2026-10-25 (orchestrated run, NO GitHub commits per owner) — five lanes complete, uncommitted
+
+- Orchestrator: Claude `/root`; workers did not edit shared docs. Owner directive: no GitHub commits/pushes this run
+  (tree is uncommitted on top of `c5a667ca`). Owner choice for the earlier open question: slot-306 indirect-edge analysis.
+- **Slot-306 native helpers (2026-10-26, no commits)**: three workers landed new modules, each with a native test and an ELF byte-oracle checker, root-replayed: menu ctors + `0x268b0` (E698), int-var ctors (E699), console-command object (E700). Gates on the combined tree: build exit 0; CTest 400/400; lift checkers 485/0/0; `audit_publish_paths.py --all` OK 2802; project index 27,516 folders. Trail rebuild, commit-attribution and staged-path audits NOT RUN. Each worker added one additive block to `native/CMakeLists.txt` after `concmd_slots_298_299_301`. **Not done**: the slot-306 row in `startup_ctors` is not assembled (G1 PARTIAL); command handlers `0xa5bf20/0xa5bf50/0xa5c020`, assert sites of `0x268b0`, and the 11 PARTIAL rows' remaining destructors stay hooks/unread. Next exact action: wire the 46 slot-306 objects into one native fragment using these modules, with a test that fails if any helper reports `ok == false`.
+
+- **Slot 306** (`CPU-01-STARTUP-SLOT-306-INDIRECT-EDGES-01`, E690, STATIC_ANALYSIS_VERIFIED): 11/11 indirect calls resolved
+  from pinned bytes (8× functor-destroy `call [rax+0x18]` to bare-`ret` targets `0xa62490/0xc4f0/0xa62850`; 3× `call r14`
+  = console-command register `0x20d60`). 196 vs 198 direct calls: walker `analyze_slot_struct.py` loses `0xa637ae→0xf8f390`
+  and `0xa643ad→0xc300` at 0x400-byte decode-window boundaries; 198 authoritative. Root replay: ELF/listing hashes, 198/11
+  counts and four slot words match. New checkpoint `docs/checkpoints/2026-10-25-slot306-indirect-edges.md`. Constructor
+  semantics and ConCmd names/defaults UNKNOWN; not implemented; G1 PARTIAL. Any future native checker must list the two
+  walker-omitted calls. Tool fix for the walker not done (out of scope).
+- **F590** (E691, FIXTURE_VERIFIED replacement): `tools/dev/f590_replacement_mutation_check.py` (new, tracked-untracked);
+  now 12/12 killed (M02 via a disassembly `ldaddal` vs `ldadd` check; SHA-256 `2869b988…`). Original five-mutant criterion still a principal decision; task stays ACTIVE.
+- **RDX-CFG** (E692): review ACCEPT WITH NOTES; M1/M2 fixed in `scripts/aud02_rackquery_cfg.py` + tests (30/30). New output
+  hashes recorded in E692; E514/E566 hashes no longer apply to current code.
+- **SAV-01** (E693): review found no code defect; 3 tests added to `native/tests/test_save_stream_file.cpp`.
+  Later closed by E694 (fsync/rename ordering) and E696 (exclusivity/EEXIST retry) via test-local link-time interposers.
+- **Follow-ups completed (same run):** E694 SAV-01 fsync/rename ordering tests (m8/m8b/m9 now killed; 5/5 stable);
+  E695 walker window-boundary fix in `tools/lift/analyze_slot_struct.py` + 6-test file (slot 306 now 198/11/1,568).
+  **Audit closed:** walker output for `0x2569d0` changed (old counts were a window-edge truncation at `0x256dcf`; new 2,142 instrs /
+  359 calls / 10 indirect, end `0x259b22`; the 5 B past AGENTS.md's 12,621 B is the stack-guard-fail tail `call 0xf8f3a0`).
+  No tracked doc cites the old numbers; 573-RVA diff: 76 instr counts and 7 spans changed (list in E695), ctor classes unchanged.
+  Walker test renamed to `tools/lift/check_analyze_slot_struct_windows.py`, runs in run-all (lift checkers 482/0/0 after
+  rename; 481/0/0 before). E567/owner-installer "36-rip" corrected to 35.
+- **Slot 306 semantics** (E697, STATIC_ANALYSIS_VERIFIED): the constructor is the `sndx_` sound-engine debug-variable block —
+  46 objects (3 int, 5 float, 11 bool vars, 3 console commands, 23 menu items); table/contract in
+  `docs/checkpoints/2026-10-25-slot306-semantics.md`. A native implementation first needs the missing helpers listed in E697
+  (int-var ctors `0xa624a0/0xa62860`, command-object shape, menu ctors `0x26c10/0x26b60/0x26f90`, `0x268b0` branches).
+- E696: SAV-01 exclusivity/EEXIST-retry tests (arc4random interposer) kill m1/m2b/m4/m5; all 18 review mutants now killed.
+- Gates (root, this tree): build exit 0; CTest **397/397**; lift checkers **482/0/0** (final); `audit_publish_paths.py --all`
+  OK **2802** paths; project index regenerated at **24,218** folders (private local/ growth) (includes private local/ growth).
+  Trail rebuild, commit-attribution and staged audits NOT RUN (no commit this run).
+- Files changed (uncommitted): `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`/folder index files,
+  `native/tests/test_save_stream_file.cpp`, `scripts/aud02_rackquery_cfg.py`, `scripts/test_aud02_rackquery_cfg.py`,
+  `tools/dev/f590_replacement_mutation_check.py`, `tools/lift/analyze_slot_struct.py`, `tools/lift/check_analyze_slot_struct_windows.py`, `docs/checkpoints/2026-10-25-slot306-indirect-edges.md`.
+- Failed hypotheses: 0 new. Exact next actions: (a) owner decision on F590 acceptance (accept replacement set vs. add a
+  litmus/disassembly check for M02); (b) optional follow-ups: fsync-counting wrapper test for SAV-01, fix the slot-306
+  walker window bug; (c) owner-approved commit of the above under owner identity with allowlist audits.
+
 ## 2026-10-25 11:38 CDT — selector published; no unblocked next task is registered
 
 - Integrator: Codex `/root`; task `GPU-02-RAW-MATERIAL-SELECTOR-01`, attempt 0 semantic
