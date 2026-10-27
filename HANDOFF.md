@@ -1,5 +1,18 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 11:15 CDT (`/root`) — E800 E799 publication verification and final attribution scan
+
+- **Tasks:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; final next-task triage.
+- **Starting state:** E799 `e86337375bbf5584bdc1bef05d655967089367d4` was pushed to `origin/main`; post-push fetch confirmed clean `main` at the same SHA.
+- **E799 exact commit verification:** exact-range attribution and identity checks passed; owner author/committer is Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Exact committed-path audit passed **7/7**, full tracked-path audit passed **3,027/3,027**, and committed diff check passed.
+- **Latest all-ref scans:** after E799, 9 fetched GitHub heads / 0 tags / **2,411 commits**, zero Claude/Anthropic matches (remote report SHA-256 `3a10d59ff78e9fdb3416a1b3035b193090d53bdfafd21d3455cde440e25c47fd`); 25 local non-stash refs / **2,411 commits**, zero matches (local report SHA-256 `074fd12d4732da3012bd54dcb7d7719108d1fb216203ba926b5ada645968976e`). Stash remains 768 commits / 70 matches, unchanged by user choice.
+- **Next-task triage:** no newly eligible native-port task. Slot 309 lacks payload ownership/call-order evidence; APP-01 VoiceOver awaits an unlocked Mac; AUD-02 awaits an authorized provider-query scope.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-e799-publication-closeout.md`.
+- **Repository gates:** CMake configure/build exited 0; CTest **431/431**; lift checkers **516/0/0**; `trail build --check` reports the 9,876-node wiring graph in sync (deep layer unbuilt); project-index generation/check **33,149/33,149**, retaining only the durable checkpoint count 831→832 in `docs/FOLDERS.md`. Staged/full path audits passed **7/7** and **3,028/3,028**; default attribution (`origin/main..HEAD`), configured-owner identity, and cached/worktree diff checks passed. Gate-log manifest SHA-256 `dfae6dfcb010197a4c310301e23042c69ba83f5bf2340b60a2ac51c58f1df6e9`; logs are under `local/validation/orch-20261027/e800-publication/`.
+- **Limits:** no actual game boot, authentic audio, save/reload, gameplay Metal frame, or contributor-graph UI update is established. Scans cover named refs and fetched heads, not unreachable Git objects.
+- **Next exact action:** commit only the seven allowlisted E800 docs under the owner identity, push `origin main`, and verify exact range, identity, paths, and fetched HEAD.
+- **Task status / attempts:** public refs and local non-stash refs **ARTIFACT_VERIFIED** through E799; 0 failed hypotheses. The whole native-port goal remains active and incomplete.
+
 ## 2026-10-27 11:09 CDT (`/root`) — E799 E798 publication verification and next-task triage
 
 - **Tasks:** `AUD-01-SEVEN-ARCHIVE-SOUND-PATH-CENSUS-01`; `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; next-task triage.
