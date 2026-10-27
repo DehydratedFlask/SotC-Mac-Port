@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 00:02 CDT (`/root`) — slot 314 replayed; slot 316 claimed
+
+- The latest full GitHub history scan was run after `d0faf04e3758d1fa6c9843fb453eb16bfc4af837`: `git fetch origin --prune` and `python3 -I local/validation/orch-20261026/claude-credit-cleanup-review/scan_remote_refs_attribution.py > local/validation/orch-20261026/claude-credit-cleanup-review/remote-scan-after-d0faf04e.json` exited 0. It parsed 9 remote branch heads, 0 tag refs, 2,350 unique commits, and found 0 Claude/Anthropic identities or credit lines (E720).
+- Slot 314 `CPU-01-STARTUP-SLOT-314-CHARACTERIZATION-01` is **STATIC_ANALYSIS_VERIFIED** for its analyzer-only scope. Root table check and analyzer replay match the worker's exact JSON; body span 4,328 B / 779 instructions, 84 direct calls, and 8 unresolved indirects (E721). No semantics, liftability, or runtime claim; G1 remains PARTIAL.
+- Slot 316 `CPU-01-STARTUP-SLOT-316-CHARACTERIZATION-01` is claimed at the live row `{316, 0xa33280}` in `native/core/ctor_original_table.cpp:330`. This is a read-only analyzer pass only; slot registration remains behind the earlier 309/312/314 gaps. The scout `/root/leaf_rows_review` found the row and checked the pinned ELF digest; dispatch for the analyzer pass follows publication.
+- Files changed in this checkpoint: `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md` (E720/E721), `docs/FOLDERS.md`, `docs/INDEX.md`, `docs/TASKS.md`, and new `docs/checkpoints/2026-10-27-post-d0faf04-attribution-scan.md`, `docs/checkpoints/2026-10-27-slot314-preliminary-dossier.md`, and `docs/checkpoints/2026-10-27-slot316-characterization-claim.md`. `python3 scripts/project_index.py` exited 0 and indexed 33,040 folders; `docs/FOLDERS.md` lists 769 checkpoint files. Exact next action: stage only these nine allowlisted documentation paths, run staged/all-path, attribution and diff audits, commit/push the checkpoint, then dispatch slot 316.
+
 ## 2026-10-26 23:59 CDT (`/root`) — attribution rescanned at 97890a11
 
 - After publication, `git fetch origin --prune` exited 0; `HEAD` and `origin/main` both equal `97890a11b8bf53d1de98dcbaf742867024bea340`. The scan command `python3 -I local/validation/orch-20261026/claude-credit-cleanup-review/scan_remote_refs_attribution.py > local/validation/orch-20261026/claude-credit-cleanup-review/remote-scan-after-97890a11.json` exited 0: 9 remote branch heads, 0 tag refs, 2,349 unique reachable commits, zero Claude/Anthropic author/committer identities and zero credit-line matches (E719).
