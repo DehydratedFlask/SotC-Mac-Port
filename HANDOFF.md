@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 14:26 CDT (`/root`) — E821 finish bounded slot-309 payload pass
+
+- **Task:** `CPU-01-STARTUP-SLOT-309-PAYLOAD-OWNERSHIP-01`; inspect the `+0x10` qword only through the observed slot-309 copy helper and cleanup path.
+- **Result:** helper `0xa50220` shallow-copies one qword from `+0x10`; the wrapper's indirect cleanup slot resolves through pinned ELF PH1 (`0x15d1ce0`, file offset `0x15d5ce0`) to `0xa50270`, whose PH0 bytes are `c3` (`ret`). The cleanup does not inspect/release that field on this path. This does not prove borrowed or owned semantics for a nonzero payload or other paths.
+- **Evidence/review:** private report `local/validation/orch-20261027/slot309/worker-payload-ownership-recheck/REPORT.md`, SHA-256 `a451c83d3cd0b84b6cc20817526a8072f151728e7d59a44c39faa71d46486a4e`; slot data log SHA-256 `e3f16fbe782233752c1a4891e63034368ac7d8378f802d2378ee154c69a7ee18`. Root verified all 9 report-cited evidence hashes; `/root/slot309_order_review` independently approved the report and PH1/PH0 mapping. No game code executed.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, `docs/checkpoints/2026-10-27-slot309-payload-ownership-e821.md` (documentation/index only).
+- **Verification:** CMake configure/build exit 0 (`ninja: no work to do`); CTest **431/431**; lift checkers **516 passed / 0 skipped / 0 failed**; `trail build --check` exit 0, graph **9,877 nodes / 13,470 edges**, deep layer not built; `python3 -I scripts/project_index.py --check` passed at **31,928 folders**. The first `git diff --check` found trailing spaces in the new Markdown checkpoint; removed. A later first index check was stale after the docs/log updates; regenerated and immediately rechecked current at 31,928. Fresh cached/worktree diff and index checks passed. Logs are in `local/validation/orch-20261027/e821/`; see E822 for commit/push closeout.
+- **Limits/status:** **PARTIAL / STATIC_ANALYSIS_VERIFIED** for this observed copy/cleanup path only. Semantic payload ownership and downstream uses remain unknown. Keep slot 309 unregistered and G1 PARTIAL. One bounded static pass; 0 failed semantic hypotheses.
+- **Next exact action:** after publishing E821, continue the parent slot-309 task only with a concrete nonzero `+0x10` consumer/destruction path; if none is established, retain the hook boundary and do not register slot 309.
+
 ## 2026-10-27 14:12 CDT (`/root`) — E820 claim bounded slot-309 payload-lifetime pass
 
 - **Task:** `CPU-01-STARTUP-SLOT-309-PAYLOAD-OWNERSHIP-01`, a read-only check of whether the `+0x10` payload is borrowed, copied, or owned on the observed slot-309 path at `0xa505e0`.
