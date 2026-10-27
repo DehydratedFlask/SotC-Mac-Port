@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 16:54 CDT (`/root`) — E839 close E838 publication and attribution census
+
+- **Task ID/status:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`, `ARTIFACT_VERIFIED` for the advertised GitHub refs through E838; the native-port goal remains active.
+- **E838 publication:** owner commit `42b81ce04eddf9b60adb3b3675351f6b2b036a1c` (parent `dce99981d73824d557d6c030179ab9f5ebc56876`), subject `docs: close out E837 publication and attribution audit`, author/committer Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Push advanced `main`; fetch confirmed `HEAD == origin/main == 42b81ce04eddf9b60adb3b3675351f6b2b036a1c`, clean. Exact-range attribution passed; full path audit passed **3,055/3,055**. Logs: `local/validation/orch-20261027/e838/post-commit-attribution.log`, `audit-all.log`, `push.log`, `fetch.log`.
+- **Fresh post-E838 census:** 21 advertised refs (9 branches, 12 PR heads, 0 tags), 15 unique tips, **2,451 reachable commits**, zero Claude/Anthropic author/committer identities and credit-line hits. Scanner SHA-256 `f44875788a271abe2c0fed5547d5569bb928004002ae4d8e8eedce957d34e8f9`; report SHA-256 `4332f78c3c20a2eb2d65b38d9651fb2beaa6a363e85c2be9bd77a409c7731251`; artifacts are under `local/validation/orch-20261027/e838/`.
+- **Stash boundary:** separate scan found 70 matches among 826 reachable commits across 21 stash-reflog tips. `refs/stash == 92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`; no stash refs/reflog changed, per the user's explicit choice.
+- **E838 gates:** configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail **9,877/13,470** in sync; project index **31,951** current; staged/full path audits **7/7** and **3,055/3,055**. Exact E838 attribution check passed after commit. Logs are under `local/validation/orch-20261027/e838/`.
+- **E839 closeout gates:** CMake configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail **9,877/13,470** in sync; project index expected **31,952** current; staged/full path audits expected **6/6** and **3,056/3,056**; precommit attribution check ran against an empty range. Exact E839 range will be checked after commit. Logs are under `local/validation/orch-20261027/e839/`.
+- **Task status:** no newly READY product task was identified by the E836 CPU, service/data/audio/save, app, GPU, and RE scouts. No game acceptance gate advanced. Keep the slot-309 evidence gate.
+- **Files changed in E839:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-e838-publication-closeout-e839.md`. No product source changed.
+- **Next exact action:** finish E839 documentation verification and publication; then continue only when a documented dependency/input changes.
+
 ## 2026-10-27 16:50 CDT (`/root`) — E838 close E837 publication and attribution census
 
 - **Task ID/status:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`, `ARTIFACT_VERIFIED` for the current advertised GitHub refs; the larger native-port goal remains active.
