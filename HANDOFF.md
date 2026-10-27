@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 18:32 CDT (`/root`) — E851 complete private SXD1 byte profile and refresh live attribution
+
+- **Completed bounded task:** `AUD-01-PAKN-MUSIC-SXD1-BYTE-STRUCTURE-01` is `ARTIFACT_VERIFIED` for its private in-memory byte profile only; 0 failed attempts. The pinned live archive and exact corrected-manifest/audio-header identity passed; the independent stdlib PSARC/zlib replay matched all 23 reported fields and both archive/member hashes. No payload file was written. The member’s format/codec, NGS2 semantics, game use, routing, playback, and all actual-game audio gates remain unknown/open. Detailed private artifact hashes are in [E851](docs/checkpoints/2026-10-27-aud01-music-sxd1-profile-e851.md).
+- **Fresh live attribution census:** 21 advertised refs (9 branches, 12 PR heads, 0 tags), 15 unique tips, 2,463 reachable commits, zero Claude/Anthropic identity or credit-line matches. The user directed that private stashes remain unchanged: 21 reflog tips, 826 commits, 70 matches, same `refs/stash` hash. E850 commit `58f93e7ab084d5bfcbad98a2a2921c9f800bbc19` is owner-authored, exact-range checked, pushed and fetch-verified.
+- **E851 gates:** configure/build passed; CTest 431/431; lift checkers 516/0/0; Trail graph check passed at 9,877 nodes (deep layer unbuilt). The first project-index check found a stale index after private E851 logs were added; regenerate after all docs/logs and run one final check without writing its output into indexed `local/`.
+- **Files changed:** six allowlisted docs paths: this handoff, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and the [E851 checkpoint](docs/checkpoints/2026-10-27-aud01-music-sxd1-profile-e851.md). Private probes/reports/logs are ignored under `local/validation/orch-20261027/`.
+- **Next exact action:** finish E851 project-index and publication audits, commit allowlisted docs under Johnny Wang, exact-range audit, push `origin main`, fetch-verify, and refresh the live attribution census. Product acceptance remains incomplete.
+
 ## 2026-10-27 18:17 CDT (`/root`) — E850 reconcile E849 and claim one AUD-01 asset probe
 
 - **E849 publication now verified:** `ce02512e76c3b6d80d3604d40b96ef63d6c7bfb5` is the owner-authored/committed `main` head; a fresh exact-range attribution check, identity check, fetch and `HEAD == origin/main == FETCH_HEAD` check all pass. The worktree was clean before this checkpoint.
