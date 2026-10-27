@@ -1,5 +1,11 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 02:41 CDT (`/root`) — post-329046c7 public-ref attribution scan (E758)
+
+- After pushing `329046c759199cb3e7a69919bcf76417de933b95`, `git fetch origin --prune` and `scan_remote_refs_attribution.py` exited 0. It covered 9 remote heads, 0 tags, and 2,378 unique reachable commits with zero Claude/Anthropic author/committer identities and credit lines. New main commit has the owner's author/committer. Private report SHA-256 `fb301aa7b7240072f3d3ff9fae21b977e3c7748a40c9b9bafea9840d40e4f933` (E758).
+- Checkpoint files: `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md` (E758), `docs/INDEX.md`, `docs/TASKS.md`, `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-post-329046c7-attribution-scan.md`. Configure/build exited 0, CTest **431/431**, lift checkers **516/0/0**, Trail graph in sync with 9,875 deep nodes pending, and project index exited 0 (33,100 folders; only checkpoint count 806→807 retained). Staged/all path audits **7/3,003** pass. The all-history attribution audit reports only historical non-Claude `f6604a86e60e` `orchestrator@local`; the unpublished check runs after commit. Slot-309 follow-up lanes are active for `0x531d60` invocation ordering and `[RBP-0x38]` lifetime; status remains ACTIVE/G1 PARTIAL, no native-lift claim.
+- **Next exact action:** finish staged/all path and unpublished/all-history attribution gates, then commit only the allowlisted docs as owner and push `origin main`.
+
 ## 2026-10-27 02:34 CDT (`/root`) — slot 309 lifecycle callbacks and post-f914 attribution scan (E756/E757)
 
 - Tasks: `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` and `PUB-01-CLAUDE-CREDIT-CLEANUP-01`. E757 integrates eight independently hash-checked private static reports: inspected manager keyed-map teardown is non-owning for mapped primary values; `0x32f7d30` is a global-storage object with a registered exit cleanup path; the third `0x20af0` path has zero source control qwords; `0xf180` is a 0x20-byte zero-initializer with unknown type; 12 root exit registrations are statically present; `0x27470` mutates manager records; and `0xa47d45` dispatches to `0xa4f4c0` for the constructed `0x32f79e8` object.
