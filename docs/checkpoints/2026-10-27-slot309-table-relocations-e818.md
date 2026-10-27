@@ -37,6 +37,12 @@ Primary private evidence paths:
 
 Gate logs: `local/validation/orch-20261027/e818/`.
 
+## E819 publication closeout
+
+E818 owner commit `e50179c13de2d2f165acb3ab267fd3fd42fa85b2` (parent `16df074d58c21d9f340f08054df486e2c8ea1284`) was pushed to `origin main`; fetch confirmed `HEAD == origin/main == FETCH_HEAD`, clean. Its exact-range attribution/identity and diff checks passed. The exact six committed paths passed the publication allowlist (**6/6**) and the full tracked tree passed (**3,037/3,037**). Owner author/committer is Johnny Wang `<dehydratedflask@users.noreply.github.com>`.
+
+Fresh live GitHub ref scan covers 9 branch refs, 12 pull-request refs, 0 tags, 15 unique tips, and **2,431 reachable commits**. It found zero Claude/Anthropic author/committer identity matches and zero co-author/generated-by credit lines; live remote `main` matches local `main`. The private stash refs were left untouched by the user's explicit choice. This scan is attribution evidence only; it does not change the native-port status.
+
 ## Next action and status
 
 Do not broaden the reference sweep or register slot 309 without a concrete producer/consumer candidate. If a separate `+0x10` ownership path is later selected, give it a bounded task with exact callsite evidence. Overall CPU-01 slot-309 characterization remains **ACTIVE**, G1 **PARTIAL**, with 0 failed semantic hypotheses. One root hash-check wrapper typo (wrong report filename) was corrected; the rerun verified every cited hash. No dependency or tool installation changed.

@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 14:11 CDT (`/root`) — E819 close out E818 publication
+
+- **Tasks:** verify E818 publication; close the bounded table-relocation follow-up for `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`; refresh live GitHub attribution coverage.
+- **E818 commit:** `e50179c13de2d2f165acb3ab267fd3fd42fa85b2`, parent `16df074d58c21d9f340f08054df486e2c8ea1284`; Johnny Wang is author and committer. The exact-range attribution/identity checks, committed six-path audit **6/6**, full tracked-path audit **3,037/3,037**, and committed diff check passed. Push and fetch exited 0; `HEAD == origin/main == FETCH_HEAD == e50179c13de2d2f165acb3ab267fd3fd42fa85b2`; worktree is clean.
+- **Fresh live-ref attribution:** scanner `local/validation/orch-20261027/project-index-fix/live_remote_attribution_audit.py` parsed 9 branch refs, 12 PR refs, 0 tags, 15 unique tips, and **2,431 reachable commits**; zero Claude/Anthropic author/committer identities and zero co-author/generated-by credit lines; local `main` matches live remote main. Private `refs/stash` remains unchanged by owner choice.
+- **E818 static result:** RELA rows 692840/692841 seed `0x15d5b80/88` with wrappers `0xb11360/70`; selected wrapper bytes reach cleanup `0x240f0`. No saved-reference destination appeared in the 112-byte candidate range, but the consumer and invocation order versus slot 309 remain unresolved. Preserve slot 309 unregistered, G1 PARTIAL, no native-lift boundary and no game acceptance claim. Reviewer approval and hashes are in [E818 checkpoint](docs/checkpoints/2026-10-27-slot309-table-relocations-e818.md).
+- **Repository verification:** E818 full gates passed (CMake configure/build, CTest **431/431**, lift **516/0/0**, Trail **9,877 nodes / 13,470 edges**, strict project index **31,925 folders**); pre/postcommit path and attribution details plus private logs remain under `local/validation/orch-20261027/e818/`.
+- **Next exact action:** keep the overall CPU-01 slot-309 characterization ACTIVE. Reopen the table-owner lane only if new evidence gives a concrete consumer candidate; otherwise preserve the current hook boundary. No tools or dependencies were installed, no game code ran, and no game acceptance gate advanced.
+- **Task status:** E818 table-owner subtask `STATIC_ANALYSIS_VERIFIED`; E818 publication and remote attribution scan `ARTIFACT_VERIFIED`; overall slot-309 characterization ACTIVE / G1 PARTIAL.
+
 ## 2026-10-27 14:09 CDT (`/root`) — E818 bound slot-309 wrapper-table evidence
 
 - **Task:** continue `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` with a read-only RELA producer / wrapper-reference pass; close only this bounded table-owner subtask.
