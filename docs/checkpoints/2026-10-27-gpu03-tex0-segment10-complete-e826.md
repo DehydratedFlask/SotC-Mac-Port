@@ -90,6 +90,21 @@ were preserved under the requested Claude-only cleanup scope. The concise Claude
 full broader output are `local/validation/orch-20261027/e825/remote-attribution-audit.log` and
 `remote-full-policy-audit.log` respectively.
 
+## E826 publication closeout
+
+Owner commit `569506365f035d7cd5c24489257ade35e5d83c66` (parent
+`f7ee08fdb48e64e41cb6c0dff9285767884f9307`) changed the six allowlisted files named above. The
+configured owner identity was Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Staged and
+committed-path audits passed 6/6; the full tracked-path audit passed **3,043/3,043**. Exact-range
+attribution and committed diff checks passed. `git push origin main` exited 0, and the subsequent
+fetch confirmed `HEAD == origin/main == 569506365f035d7cd5c24489257ade35e5d83c66` with a clean tree.
+
+The post-push scan fetched 9 branch refs and 12 PR-head refs (0 tags, 15 unique tips), then checked
+all **2,439 reachable commits**. It found zero Claude/Anthropic author or committer identities and
+zero assistant-credit lines. The user-selected stash remained
+`92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`. The scan output and publication logs are private under
+`local/validation/orch-20261027/e826/`.
+
 ## Repository verification
 
 Repository commands from the workspace root:
@@ -107,10 +122,9 @@ python3 scripts/project_index.py --check
 Configure/build exited 0 (`ninja: no work to do`); CTest passed **431/431**; lift checkers passed
 **516 / 0 skipped / 0 failed**; Trail is in sync at **9,877 nodes / 13,470 edges** (deep layer not
 built); project index generated and checked current at **31,937 folders**. Logs are under
-`local/validation/orch-20261027/e826/`. Publication path/identity checks and push/fetch remain
-pending. These repository checks do not advance boot, audio, save, Metal or other real-game
-acceptance.
+`local/validation/orch-20261027/e826/`. Publication gates passed as recorded above. These repository
+checks do not advance boot, audio, save, Metal or other real-game acceptance.
 
-**Next exact action:** assess the separate E824 sidecar structural-profile candidate against
-`docs/ASSETS.md` and the completed E798 census, then claim it only if it does not duplicate existing
-work. No source or dependency changes; no G0–G6 gate advances.
+**Next exact action:** publish E827's bounded claim for the three E824 sidecars, then run only the
+in-memory structure profile in its stated limits. No source or dependency changes; no G0–G6 gate
+advances.
