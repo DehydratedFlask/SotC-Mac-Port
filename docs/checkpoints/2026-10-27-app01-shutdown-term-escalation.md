@@ -1,4 +1,4 @@
-# Shutdown TERM fixture, public attribution, and slot-309 report checkpoint (E773-E782)
+# Shutdown TERM fixture, public attribution, and slot-309 report checkpoint (E773-E783)
 
 - Local date/time: 2026-10-27 07:57 CDT (America/Chicago).
 - Agent / integrator: `/root`.
@@ -252,3 +252,19 @@ no fresh binary import is authorized by this checkpoint.
 - Remaining risks: 70 stash-only Claude matches remain unchanged by owner direction; `--all` still reports only the unrelated `orchestrator@local` history; slot 309 stays unregistered with both `*(0x2dfd4b8)` branches preserved; boot, audible game content, real save/reload, Metal validation, and forbidden-runtime absence remain unverified.
 - Next exact action: commit these six staged allowlisted docs as owner, run post-commit attribution/path checks, and push `origin main`; then leave CPU-01 active pending authoritative type/destructor linkage or a concrete call-consumer/order edge. Use the saved project only; no fresh binary import.
 - Task status / attempts: PUB-01 **ARTIFACT_VERIFIED** for fetched public refs, 0 failed hypotheses; APP-01 TERM fixture **FIXTURE_VERIFIED**, one failed readiness iteration and 0 failed semantic hypotheses; CPU-01 slot 309 **ACTIVE / G1 PARTIAL**, 0 failed semantic hypotheses.
+
+
+## E783: final publish verification and stop point
+
+- Local date/time: 2026-10-27 08:35 CDT (America/Chicago).
+- Agent / integrator: `/root`.
+- Task IDs: `PUB-01-CLAUDE-CREDIT-CLEANUP-01`; `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`; `APP-01-PROCESS-CLIENT-SHUTDOWN-TERM-ESCALATION-01`.
+- Files changed: `HANDOFF.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/TASKS.md`, and this checkpoint.
+- Exact commands/results: `git push origin main` exited 0, advancing `98b3cc10..2ea6733d`. `git fetch origin --prune` exited 0; `git status --short --branch` showed a clean tree and both `git rev-parse HEAD` and `git rev-parse origin/main` returned `2ea6733dab72ab82d2bb4077d9572575d7767848`. `python3 -I scripts/check_commit_attribution.py` and `python3 -I scripts/check_commit_attribution.py --identity` passed after fetch.
+- Post-commit evidence: commit `2ea6733dab72ab82d2bb4077d9572575d7767848` was authored and committed as Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Its prior range audit passed; the explicit committed-path audit passed 6/6 and `python3 -I scripts/audit_publish_paths.py --all` passed 3,013/3,013. The all-history audit still fails only on unrelated `orchestrator@local` commit `f6604a86e60e`.
+- E783 closeout pre-commit commands/results: `python3 -I scripts/audit_publish_paths.py` passed 5 staged paths; `python3 -I scripts/audit_publish_paths.py --all` passed 3,013 paths; `python3 -I scripts/check_commit_attribution.py` passed the empty range; `python3 -I scripts/check_commit_attribution.py --identity` passed; `python3 -I scripts/check_commit_attribution.py --all` exited 1 only for `f6604a86e60e` (`orchestrator` / `orchestrator@local`).
+- E783 closeout audit log SHA-256: `local/validation/orch-20261027/e783-closeout/staged_path.log` — `639d78f9bedd1fd9881f910cceac47512334dbd0a41d972f1a251590225c6fa4`; `local/validation/orch-20261027/e783-closeout/all_path.log` — `2c2ed65cd259576fa6d92667e0b3ee100cd563754980efab77acf06c95b815b4`; `local/validation/orch-20261027/e783-closeout/attribution_range.log` — `72d954d7873849934ae10cdf5ad4049069928f3c6b433f3e7e44743823e63f33`; `local/validation/orch-20261027/e783-closeout/attribution_identity.log` — `888507b0410bfc1aa9548e21b4bd5bdaa271389b1515786e902bc91722c90559`; `local/validation/orch-20261027/e783-closeout/attribution_all.log` — `f67c8b2dabf442366fbc8922353feda1e6bbd31ffc26b3537d5161e8c1adad44`.
+- Observations vs inference: E782's full fetched-ref scan at `98b3cc10` directly covered 9 branch heads, 0 tags, and 2,393 unique commits with zero Claude/Anthropic matches. Final commit `2ea6733` postdated the scan but passed its own attribution range/identity checks, so it is separately covered.
+- Remaining risks: 70 private stash-only matches remain unchanged by owner direction; slot 309 payload ownership and invocation order remain unknown; overall native-port acceptance is incomplete.
+- Next exact action: wait for authoritative saved-project type/destructor evidence or a concrete `0x531d60` call-consumer/order edge; continue only from the existing saved Ghidra project, without a fresh binary import.
+- Task status / attempts: PUB-01 **ARTIFACT_VERIFIED** for fetched refs plus separately audited final owner commit, 0 failed hypotheses; APP-01 TERM fixture **FIXTURE_VERIFIED**, one failed readiness iteration and 0 failed semantic hypotheses; CPU-01 slot 309 **ACTIVE / G1 PARTIAL**, 0 failed semantic hypotheses.

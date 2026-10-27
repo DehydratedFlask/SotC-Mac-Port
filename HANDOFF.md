@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 08:35 CDT (`/root`) — E783 final publish verification and stop point
+
+- **Task IDs:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`; `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`; `APP-01-PROCESS-CLIENT-SHUTDOWN-TERM-ESCALATION-01`.
+- **Files changed:** `HANDOFF.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/TASKS.md`, and `docs/checkpoints/2026-10-27-app01-shutdown-term-escalation.md`.
+- **Exact result:** commit `2ea6733dab72ab82d2bb4077d9572575d7767848` was pushed to `origin/main`; subsequent `git fetch origin --prune` exited 0 and `HEAD == origin/main`, with a clean working tree. Post-commit attribution range and owner-identity checks passed; explicit committed-path audit passed 6/6 and full path audit passed 3,013/3,013. `--all` still reports only unrelated historical `orchestrator@local` commit `f6604a86e60e`.
+- **Closeout audit:** this five-file handoff update passes staged path audit 5/5 and full path audit 3,013/3,013; empty-range and owner identity checks pass. `--all` retains the same unrelated alias finding. See E783 for hashes.
+- **Observations vs inference:** the latest full remote scan at `98b3cc10` covered 2,393 reachable commits with zero Claude/Anthropic matches. The final docs commit `2ea6733` was published afterward and independently passed range/identity checks; the scan itself did not include that final commit.
+- **Remaining risks:** 70 stash-only matches remain unchanged per owner direction. Slot 309 remains ACTIVE/G1 PARTIAL with payload ownership and `0x531d60` invocation order unresolved; full native-port acceptance remains incomplete.
+- **Next exact action:** publish this closeout handoff, then wait for authoritative saved-project type/destructor linkage or a concrete `0x531d60` call-consumer/order edge. Resume CPU-01 from the existing saved Ghidra evidence only; no fresh binary import.
+- **Task status / attempts:** PUB-01 **ARTIFACT_VERIFIED** for fetched refs plus separately audited final owner commit, 0 failed hypotheses; APP-01 TERM fixture **FIXTURE_VERIFIED**, one failed readiness iteration and 0 failed semantic hypotheses; CPU-01 slot 309 **ACTIVE / G1 PARTIAL**, 0 failed semantic hypotheses.
+
 ## 2026-10-27 08:34 CDT (`/root`) — E782 final public scan and slot-309 stop point
 
 - **Task IDs:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`; `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`; `APP-01-PROCESS-CLIENT-SHUTDOWN-TERM-ESCALATION-01`.
