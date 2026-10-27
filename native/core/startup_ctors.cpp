@@ -405,12 +405,17 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0xa479d0, 310, [](StartupState& s) noexcept { if (!init_slot310_a479d0(s.slot310, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
         {0xa46b70, 311, [](StartupState& s) noexcept { if (!init_tiny_atexit_slot(311, s.tiny_atexit, &s.concmd.atexit_log).ok) s.init_failed = true; }},
         {0xa447a0, 313, [](StartupState& s) noexcept { if (!init_slot313_a447a0(s.slot313, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
+        {0xa3ade0, 315, [](StartupState& s) noexcept { store_zero32(s.slot315_cell); }},
         {0xa2c390, 317, [](StartupState& s) noexcept { if (!init_slot317_a2c390(s.slot317, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
         {0xa20e80, 318, [](StartupState& s) noexcept { if (!init_slot318_a20e80(s.slot318, s.concmd).ok) s.init_failed = true; }},
         {0x9b75a0, 319, [](StartupState& s) noexcept { init_leaf_9b75a0(s.leaf_9b75a0); }},
         {0x8f3d90, 320, [](StartupState& s) noexcept { init_leaf_8f3d90(s.leaf_8f3d90); }},
         {0x8a0440, 321, [](StartupState& s) noexcept { init_leaf_8a0440(s.leaf_8a0440); }},
         {0x849e30, 322, [](StartupState& s) noexcept { if (!init_slot322_849e30(s.slot322, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
+        {0x842450, 323, [](StartupState& s) noexcept {
+             constexpr std::array<const char*, 3> names{"BowShotsHit", "BowShotAccuracy", "FurthestArrowDistance"};
+             init_ctor_842450(s.slot323_cells, names);
+         }},
         {0x83d800, 324, [](StartupState& s) noexcept { init_leaf_83d800(s.leaf_83d800); }},
         {0x839f00, 325, [](StartupState& s) noexcept { if (!init_slot325_839f00(s.slot325, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
         {0x836330, 327, [](StartupState& s) noexcept { if (!init_slot327_836330(s.slot327, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
@@ -420,6 +425,10 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0x805440, 332, [](StartupState& s) noexcept { if (!init_slot332_805440(s.slot332, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
         {0x7fd6d0, 333, [](StartupState& s) noexcept { if (!init_slot333_7fd6d0(s.slot333, s.concmd).ok) s.init_failed = true; }},
         {0x7fc530, 334, [](StartupState& s) noexcept { if (!init_slot334_7fc530(s.slot334, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
+        {0x7dace0, 341, [](StartupState& s) noexcept {
+             constexpr std::array<const char*, 2> names{"InEndCutscene", "TimeResistingTheLight"};
+             init_ctor_7dace0(s.slot341_cells, names);
+         }},
         {0x7d7970, 343, [](StartupState& s) noexcept { s.slot343_result = init_slot343_7d7970(s.slot343, s.concmd); if (!s.slot343_result.ok) s.init_failed = true; }},
         {0x7d3810, 344, [](StartupState& s) noexcept { s.slot344_result = init_slot344_7d3810(s.slot344, s.concmd, s.debug_menu); if (!s.slot344_result.ok) s.init_failed = true; }},
         {0x7cec60, 345, [](StartupState& s) noexcept { s.slot345_result = init_slot345_7cec60(s.slot345, s.concmd, s.debug_menu); if (!s.slot345_result.ok) s.init_failed = true; }},
@@ -430,11 +439,22 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0x7a14d0, 353, [](StartupState& s) noexcept { s.slot353_result = init_slot353_7a14d0(s.slot353, s.concmd); if (!s.slot353_result.ok) s.init_failed = true; }},
         {0x7946d0, 355, [](StartupState& s) noexcept { s.slot355_result = init_slot355_7946d0(s.slot355, s.concmd, s.debug_menu); if (!s.slot355_result.ok) s.init_failed = true; }},
         {0x78e2f0, 356, [](StartupState& s) noexcept { s.slot356_result = init_slot356_78e2f0(s.slot356, s.concmd); if (!s.slot356_result.ok) s.init_failed = true; }},
+        {0x78c760, 357, [](StartupState& s) noexcept { init_ctor_78c760(s.slot357_cell); }},
         {0x70cdc0, 371, [](StartupState& s) noexcept { if (!init_release_family_slot(371, s.release_family, s.concmd.atexit_log, s.release_family_hooks).ok) s.init_failed = true; }},
         {0x70a040, 372, [](StartupState& s) noexcept { if (!init_release_family_slot(372, s.release_family, s.concmd.atexit_log, s.release_family_hooks).ok) s.init_failed = true; }},
+        {0x6dde20, 378, [](StartupState& s) noexcept {
+             constexpr std::array<const char*, 3> names{"InSaveVolume", "LastInSaveVolume", "FacingSaveVolume"};
+             init_ctor_6dde20(s.slot378_cells, names);
+         }},
+        {0x669450, 394, [](StartupState& s) noexcept {
+             constexpr std::array<const char*, 1> names{"IsCutsceneRunning"};
+             init_ctor_669450(s.slot394_cells, names);
+         }},
         {0x5e7c10, 404, [](StartupState& s) noexcept { init_slot404_5e7c10(s.slot404); }},
         {0x5e7790, 405, [](StartupState& s) noexcept { if (!init_release_family_slot(405, s.release_family, s.concmd.atexit_log, s.release_family_hooks).ok) s.init_failed = true; }},
         {0x5dbe10, 406, [](StartupState& s) noexcept { if (!init_slot406_5dbe10(s.slot406, s.concmd.atexit_log).ok) s.init_failed = true; }},
+        {0x58bd10, 412, [](StartupState& s) noexcept { zero_xmm_qword(s.slot412_xmm, s.slot412_q); }},
+        {0x5777a0, 416, [](StartupState& s) noexcept { zero_xmm16(s.slot416_xmm); }},
         {0x575d40, 417, [](StartupState& s) noexcept { init_leaf_575d40(s.leaf_575d40_source, s.leaf_575d40); }},
         {0x54b9c0, 425, [](StartupState& s) noexcept { if (!init_tiny_atexit_slot(425, s.tiny_atexit, &s.concmd.atexit_log).ok) s.init_failed = true; }},
         {0x523a00, 431, [](StartupState& s) noexcept { if (!init_release_family_slot(431, s.release_family, s.concmd.atexit_log, s.release_family_hooks).ok) s.init_failed = true; }},
@@ -453,6 +473,8 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0x2eee10, 484, [](StartupState& s) noexcept { if (!init_release_family_slot(484, s.release_family, s.concmd.atexit_log, s.release_family_hooks).ok) s.init_failed = true; }},
         {0x2ee5e0, 485, [](StartupState& s) noexcept { if (!init_release_family_slot(485, s.release_family, s.concmd.atexit_log, s.release_family_hooks).ok) s.init_failed = true; }},
         {0x2cd060, 487, [](StartupState& s) noexcept { if (!init_release_family_slot(487, s.release_family, s.concmd.atexit_log, s.release_family_hooks).ok) s.init_failed = true; }},
+        {0x268ce0, 496, [](StartupState& s) noexcept { init_ctor_268ce0(s.slot496_cell); }},
+        {0x24ebf0, 500, [](StartupState& s) noexcept { zero_struct12(s.slot500_cell); }},
         {0x1c00e0, 515, [](StartupState& s) noexcept { if (!init_tiny_atexit_slot(515, s.tiny_atexit, &s.concmd.atexit_log).ok) s.init_failed = true; }},
         {0x1aa510, 517, [](StartupState& s) noexcept { if (!init_slot517_1aa510(s.slot517, s.concmd.atexit_log).ok) s.init_failed = true; }},
         {0x19d2d0, 519, [](StartupState& s) noexcept { if (!init_slot519_19d2d0(s.slot519, s.concmd.atexit_log).ok) s.init_failed = true; }},
@@ -475,6 +497,7 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0x96650, 549, [](StartupState& s) noexcept { if (!init_tiny_atexit_slot(549, s.tiny_atexit, &s.concmd.atexit_log).ok) s.init_failed = true; }},
         {0x8d740, 551, [](StartupState& s) noexcept { if (!init_tiny_atexit_slot(551, s.tiny_atexit, &s.concmd.atexit_log).ok) s.init_failed = true; }},
         {0x8bd40, 553, [](StartupState& s) noexcept { if (!init_slot553_8bd40(s.slot553, s.concmd.atexit_log).ok) s.init_failed = true; }},
+        {0x3bd70, 560, [](StartupState& s) noexcept { clear_flag64(s.slot560_cell); }},
         {0x36100, 562, [](StartupState& s) noexcept { if (!init_slot562_36100(s.slot562, s.concmd.atexit_log).ok) s.init_failed = true; }},
         {0x32c70, 563, [](StartupState& s) noexcept { init_slot563_32c70(s.slot563); }},
         {0x31220, 564, [](StartupState& s) noexcept { if (!init_tiny_atexit_slot(564, s.tiny_atexit, &s.concmd.atexit_log).ok) s.init_failed = true; }},

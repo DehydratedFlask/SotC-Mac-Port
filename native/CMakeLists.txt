@@ -270,6 +270,7 @@ add_library(sotc_core STATIC
   core/store_zero32.cpp
   core/zero_xmm16.cpp
   core/zero_xmm_qword.cpp
+  core/zero_struct12.cpp
   core/init_f4fd40.cpp
   core/init_f4eba0.cpp
   core/init_f4b540.cpp

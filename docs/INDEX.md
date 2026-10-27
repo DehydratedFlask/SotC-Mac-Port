@@ -17,6 +17,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Startup slots 302/303/305](checkpoints/2026-10-24-startup-slots-302-303-305.md) | 317/573 registered, first gap 306; E623; fixture/static verification only |
 | [Resume integration and attribution review](checkpoints/2026-10-26-resume-integration-attribution-review.md) | Pre-publication 431/431 CTest, 516/0/0 lift sweep, and preserved-tree rewrite review; publication recorded below |
 | [Claude attribution cleanup published](checkpoints/2026-10-26-attribution-cleanup-published.md) | Both stale GitHub refs rewritten atomically with exact leases; 2,341 reachable remote commits scanned, zero Claude/Anthropic attribution |
+| [Startup leaf rows 315-560](checkpoints/2026-10-26-startup-leaf-rows-315-560.md) | 11 existing leaves wired; 397/573 constructors, first gap 309; full CTest and ELF checker sweep passed; G1 PARTIAL |
 | [Startup slot 306 survey](checkpoints/2026-10-25-startup-slot-306-survey.md) | E676 hash-bound table/body/call-footprint characterization; semantics UNKNOWN, 11 indirect calls unresolved, G1 PARTIAL |
 | [Slot 303 checker publication repair](checkpoints/2026-10-24-slot303-publication-repair.md) | Complete function reconstruction removed from public checker; E624 |
 | [Integration PR #9 final closeout](checkpoints/2026-10-25-integration-pr9-final-closeout.md) | PR #9 merged at `a8bd805`; clean-main baseline and branch cleanup verified; E643 |

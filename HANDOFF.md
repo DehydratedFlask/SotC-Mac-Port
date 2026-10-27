@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-26 23:26 CDT (`/root`) — 11 startup leaf rows root-replayed
+
+- Task: `CPU-01-STARTUP-LEAF-ROWS-315-560-01`; attribution cleanup `PUB-01-CLAUDE-CREDIT-CLEANUP-01` remains published/ARTIFACT_VERIFIED.
+- Files changed for this checkpoint: `native/CMakeLists.txt`, `native/core/startup_ctors.{hpp,cpp}`, `native/tests/test_startup_ctors.cpp`, `native/tests/test_startup_ctor_coverage.cpp`, `tools/lift/check_ctor_slots.py`, `tools/lift/check_fctor_slots_296_297_300.py`, `docs/TASKS.md`, `docs/EVIDENCE.md` (E713), `docs/INDEX.md`, `docs/FOLDERS.md`, `HANDOFF.md`, and `docs/checkpoints/2026-10-26-startup-leaf-rows-315-560.md`. Private full-gate logs: `local/validation/orch-20261026/leaf-rows-gates/`.
+- Root replay confirms the 11 exact leaf rows at indices 315/323/341/357/378/394/412/416/496/500/560, names/hashes and writes. Startup coverage is now **397/573**, with **176** unregistered and first gap **309 / `0xa505e0`**. Configure exit 0; build **433/433**; CTest **431/431**; lift checker sweep **516 passed / 0 skipped / 0 failed**; Trail graph check in sync; project index 33,036 folders. Pre-push staged path audit **13/13**, all-path audit **2,955**, unpublished attribution gate passed, and cached diff check passed. A focused link initially failed on missing `zero_struct12.cpp` membership in `sotc_core`; adding that existing source in CMake resolved it. No semantic hypothesis failed.
+- Status: task **FIXTURE_VERIFIED + STATIC_ANALYSIS_VERIFIED**, G1 PARTIAL. No game boot/audio/save claim. The leaf worker is done; edits are uncommitted and root-owned. The remote attribution scan remains clean across all GitHub heads/tags (9 heads, 2,341 commits); the private local stash still preserves the old ancestry and was not modified.
+- **Next exact action:** commit the 13 staged allowlisted files as the owner and push `origin main`; then verify the remote tip and rerun the published-ref attribution scan. Continue at the first remaining gap 309 or another bounded startup task.
+
 ## 2026-10-26 23:23 CDT (`/root`) — startup integration and attribution cleanup published
 
 - Tasks: `CPU-01-SLOT-LANES-L1-L5-2026-10-26`, `PUB-01-CLAUDE-CREDIT-CLEANUP-01`, and `CPU-01-STARTUP-LEAF-ROWS-315-560-01`.

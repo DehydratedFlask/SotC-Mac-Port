@@ -2,9 +2,10 @@
 //
 // Proves that every lifted vec_*/leaf_* constructor module runs in recovered_constructors(), that
 // the registered rows pair with the pinned original table, and that the remaining startup cliff is
-// explicit (first unrecovered index 307 / RVA 0xa5b090 after slots 296-306).
+// explicit (first unrecovered index 309 / RVA 0xa505e0).
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 
 #include "core/ctor_original_table.hpp"
 #include "core/startup_ctors.hpp"
@@ -22,6 +23,18 @@ int main() {
 
     // ---- production run -------------------------------------------------------
     StartupState st;
+    st.slot315_cell = 0xffffffffu;
+    for (auto& cell : st.slot323_cells) cell = {nullptr, 0xffffffffu, 0xa5a5a5a5u};
+    for (auto& cell : st.slot341_cells) cell = {nullptr, 0xffffffffu, 0xa5a5a5a5u};
+    st.slot357_cell = {0xffffffffffffffffull, 0xffffffffffffffffull};
+    for (auto& cell : st.slot378_cells) cell = {nullptr, 0xffffffffu, 0xa5a5a5a5u};
+    for (auto& cell : st.slot394_cells) cell = {nullptr, 0xffffffffu, 0xa5a5a5a5u};
+    st.slot412_xmm.fill(0xffffffffu);
+    st.slot412_q = 0xffffffffffffffffull;
+    st.slot416_xmm.fill(0xffffffffu);
+    st.slot496_cell = 0;
+    st.slot500_cell.fill(0xff);
+    st.slot560_cell.store(0xffffffffffffffffull, std::memory_order_relaxed);
     const auto slots = recovered_constructors();
     const CtorRunResult result = run_constructors(slots, st);
     CHECK(result.ok());
@@ -29,7 +42,7 @@ int main() {
     CHECK(result.blocked_on_rva == 0);
     CHECK(!st.init_failed);
     CHECK(result.completed == slots.size());
-    CHECK(slots.size() == 386);
+    CHECK(slots.size() == 397);
 
     // Every registered row is in original order and pairs with the pinned table.
     for (std::size_t i = 0; i < slots.size(); ++i) {
@@ -42,7 +55,37 @@ int main() {
     // ---- explicit, machine-checked gap ---------------------------------------
     CHECK(first_unrecovered_constructor_index() == 309);
     CHECK(first_unrecovered_constructor_rva() == 0xa505e0);
-    CHECK(slots.size() + 187 == kOriginalCtorCount);
+    CHECK(slots.size() + 176 == kOriginalCtorCount);
+
+    // ---- CPU-01-STARTUP-LEAF-ROWS-315-560-01 -------------------------------
+    CHECK(st.slot315_cell == 0);
+    const auto check_name_cells = [](const auto& cells, const char* const* names,
+                                     const std::uint32_t* hashes, std::size_t count) {
+        for (std::size_t i = 0; i < count; ++i) {
+            CHECK(cells[i].name != nullptr);
+            CHECK(std::strcmp(cells[i].name, names[i]) == 0);
+            CHECK(cells[i].hash == hashes[i]);
+            CHECK(cells[i].unwritten == 0xa5a5a5a5u);
+        }
+    };
+    const char* const names323[] = {"BowShotsHit", "BowShotAccuracy", "FurthestArrowDistance"};
+    const std::uint32_t hashes323[] = {0x9744358du, 0x019b017au, 0x49104024u};
+    check_name_cells(st.slot323_cells, names323, hashes323, 3);
+    const char* const names341[] = {"InEndCutscene", "TimeResistingTheLight"};
+    const std::uint32_t hashes341[] = {0xc30b4677u, 0x472539c3u};
+    check_name_cells(st.slot341_cells, names341, hashes341, 2);
+    CHECK(st.slot357_cell.lo == 0 && st.slot357_cell.hi == 0);
+    const char* const names378[] = {"InSaveVolume", "LastInSaveVolume", "FacingSaveVolume"};
+    const std::uint32_t hashes378[] = {0xbeb62505u, 0x559f2211u, 0xff2b538cu};
+    check_name_cells(st.slot378_cells, names378, hashes378, 3);
+    const char* const names394[] = {"IsCutsceneRunning"};
+    const std::uint32_t hashes394[] = {0xbedd0298u};
+    check_name_cells(st.slot394_cells, names394, hashes394, 1);
+    CHECK(st.slot412_xmm == Xmm16{} && st.slot412_q == 0);
+    CHECK(st.slot416_xmm == Xmm16{});
+    CHECK(st.slot496_cell == 0xff);
+    for (std::uint8_t byte : st.slot500_cell) CHECK(byte == 0);
+    CHECK(st.slot560_cell.load(std::memory_order_seq_cst) == 0);
 
     // ---- spot checks: destination cells hold their module constants ----------
     CHECK(st.vec_d71f60 == kVecD71f60Bits);     // idx 95, the batch's new lift

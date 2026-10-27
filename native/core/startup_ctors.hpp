@@ -13,6 +13,13 @@
 #include "vec_neg036.hpp"
 #include "xyz_mask_copy.hpp"
 #include "clear_flag32.hpp"
+#include "store_zero32.hpp"
+#include "hashed_name_ctors.hpp"
+#include "guarded_static_helpers.hpp"
+#include "zero_xmm_qword.hpp"
+#include "zero_xmm16.hpp"
+#include "zero_struct12.hpp"
+#include "clear_flag64.hpp"
 #include "init_f4fd40.hpp"
 #include "init_f4eba0.hpp"
 #include "init_f4b540.hpp"
@@ -609,6 +616,19 @@ struct StartupState {
     Slot553State slot553{};
     Slot562State slot562{};
     Slot563Stamp slot563{};
+    // Existing leaf helpers newly wired into the production table (L1 follow-up).
+    std::uint32_t slot315_cell = 0;
+    std::array<NameHashCell, 3> slot323_cells{};
+    std::array<NameHashCell, 2> slot341_cells{};
+    Pair128 slot357_cell{};
+    std::array<NameHashCell, 3> slot378_cells{};
+    std::array<NameHashCell, 1> slot394_cells{};
+    Xmm16 slot412_xmm{};
+    std::uint64_t slot412_q = 0;
+    Xmm16 slot416_xmm{};
+    std::uint8_t slot496_cell = 0;
+    Bytes12 slot500_cell{};
+    std::atomic<std::uint64_t> slot560_cell{0};
     ReleaseFamilyState release_family{};
     ReleaseFamilyHooks release_family_hooks{};  // null release_view -> lifted inert f590
     Slot307Objects slot307{};
