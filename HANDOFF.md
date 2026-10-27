@@ -1,5 +1,20 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 09:24 CDT (`/root`) — AUD-01 music/BGM path census claim
+
+- **Task IDs:** `AUD-01-MUSIC-BGM-PATH-CENSUS-01`; `PUB-01-CLAUDE-CREDIT-CLEANUP-01` closeout; `ORCH-NEXT-WORKPACKET-TRIAGE-2026-10-27`.
+- **Bounded output:** reproduce a metadata-only, case-insensitive census of music/BGM-named rows from the corrected r30 audio manifest; document the four path-name candidates and explicitly limit claims to names, locators, and sizes. No package/member payload reads, inventory rerun, codec/content/dialogue/routing/playback inference, or source implementation.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/ASSETS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-aud01-music-bgm-census.md`.
+- **Exact starting command/result:** `git status --short --branch && git rev-parse HEAD origin/main` — clean `main`; both revisions `e9be553af6f0136c69701501dc38d535fbe46bbe`.
+- **Exact query/evidence:** `python3 -I local/validation/orch-20261027/aud01-music-bgm-census/query_music_bgm_paths.py` exited 0; query script SHA-256 `041cb72d54810f2ca7b2231b3c747401510bef5ce780ed5690874949830cc240`, output log SHA-256 `753acd073a9f7a9b566107b2923f4a47e936839beed334602c5c8d0816775156`. It asserted 86/86 rows and found `music` 2, `bgm` 2, `dialog` 0, `voice` 0, `stream` 0. The four hits are `pakN.psarc` TOC entries 27715 / 37843 / 61642 / 17150, paths `sound/shadow/music.sxd1`, `music.sxd2`, `str_bgm.sxd1`, `str_bgm.sxd2`, sizes 9,872 / 172,367,136 / 2,461,232 / 514,125,344 B. The independent reviewer agrees.
+- **Historical corrections:** `docs/EVIDENCE.md` now marks E34's 3,726,760-byte replay and positional locators withdrawn for path-specific claims and removes the duplicate E787 row. The latest scan entry records the fetched-ref scan at `e9be553a`: 9 branch heads, 0 tags, 2,400 commits, zero Claude/Anthropic matches (report SHA-256 `2844551c2cd9b7f5061a20a66672b31810bcc6c116f0d5d7494297ac74fda48c`).
+- **Attribution scope:** 70 Claude-attributed commits only in private `refs/stash` remain unchanged per the user's explicit choice. The last fetched-ref scan covers 2,400 commits through `e9be553a`; the subsequent task checkpoint commit must be separately range/identity/path-audited and followed by a fresh fetched-ref scan.
+- **Observation vs inference:** path tokens can nominate candidate files only; no audio format, codec, dialogue coverage, engine route, or playback behavior is established.
+- **Remaining risks:** AUD-01 and the native game/audio gates remain open. `check_commit_attribution.py --all` still reports the unrelated non-Claude `orchestrator@local` commit `f6604a86e60e`.
+- **Verification:** CMake configure/build passed; CTest **431/431**; lift checkers **516 passed / 0 skipped / 0 failed**; `trail build --check` passed at 9,876 nodes / 13,469 edges (deep meaning layer not built); project index generation and `--check` passed at 33,133 folders. Transient `launcher/.build` index churn was excluded; `docs/FOLDERS.md` advances the durable `docs/checkpoints` count 820→821. Staged/full path audits passed **8/8** and **3,017/3,017**; cached diff check, owner identity, and default attribution range passed. `check_commit_attribution.py --all` remains **FAILED** only on non-Claude `orchestrator@local` `f6604a86e60e`. Private prepublication log-manifest SHA-256 `e6d806e6c43c90a44531ef07af275415dcd5186b4ee8bed9075f91664352f9a8` under `local/validation/orch-20261027/e789-publication/`.
+- **Next exact action:** commit the eight staged allowlisted docs as the owner, push `origin main`, fetch, audit the new commit's range/identity/path set, and scan fetched refs.
+- **Task status / attempts:** census **ARTIFACT_VERIFIED**, 0 failed hypotheses; publication pending. Public fetched-ref cleanup remains **ARTIFACT_VERIFIED** for the user-selected scope.
+
 ## 2026-10-27 09:14 CDT (`/root`) — E788 public scan and E787 push closeout
 
 - **Task IDs:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`; `ORCH-NEXT-WORKPACKET-TRIAGE-2026-10-27`.

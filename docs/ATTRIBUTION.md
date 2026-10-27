@@ -318,3 +318,10 @@ does, prevents that.
   Thus the E785 all-ref scan covers the public history through `6fcef564`; the new closeout commit
   is separately checked and contains no assistant attribution. The all-history audit still has
   only the unrelated historical `orchestrator@local` identity. See E786.
+- Refreshed after owner checkpoint `e9be553af6f0136c69701501dc38d535fbe46bbe`: all 9 fetched
+  GitHub branch heads, 0 remote tags, and **2,400 unique reachable commits** were parsed. The scan
+  found zero Claude/Anthropic identity or credit-line matches. Report SHA-256
+  `2844551c2cd9b7f5061a20a66672b31810bcc6c116f0d5d7494297ac74fda48c`; see E789 and the
+  [music/BGM path census checkpoint](checkpoints/2026-10-27-aud01-music-bgm-census.md). The 70
+  stash-only matches remain untouched by the user's explicit choice. The current checkpoint
+  commit is audited separately after publication.

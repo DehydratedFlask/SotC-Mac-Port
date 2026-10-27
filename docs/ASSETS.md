@@ -94,8 +94,19 @@ the old ~3.7 MB inventory and “too small for the soundtrack” inference are w
 
 All 86 codec labels remain **UNKNOWN**. File names and magic observations do not establish
 framing, codec configuration, channels, sample rate, loop/seek semantics, audio-engine use,
-or playback. Paths named music and stream families are candidates; their actual content and
-gameplay routing need reader recovery. No game-audio gate is promoted.
+or playback. A case-insensitive path-token census of this corrected manifest (E789) finds two
+`music` rows and two `bgm` rows; `dialog`, `voice`, and `stream` occur in zero paths. The four
+music/BGM path-name candidates are:
+
+| Archive | TOC entry | Decoded size | Manifest path |
+|---|---:|---:|---|
+| `pakN.psarc` | 27715 | 9,872 B | `sound/shadow/music.sxd1` |
+| `pakN.psarc` | 37843 | 172,367,136 B | `sound/shadow/music.sxd2` |
+| `pakN.psarc` | 61642 | 2,461,232 B | `sound/shadow/str_bgm.sxd1` |
+| `pakN.psarc` | 17150 | 514,125,344 B | `sound/shadow/str_bgm.sxd2` |
+
+These are path-name candidates only. They do not establish content format, codec, dialogue
+coverage, engine routing, or playback. No game-audio gate is promoted.
 
 The 290 `.sts_cp3` paths in each cachedFiles layer are all 120 bytes, and every base/patch
 pair is byte-identical. The selected `b_info_01.sts_cp3` is 120 bytes in each layer, at actual
