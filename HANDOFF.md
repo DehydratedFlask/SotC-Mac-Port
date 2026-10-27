@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 16:29 CDT (`/root`) — E835 close E834 publication and refresh public attribution
+
+- **E834 publication:** owner commit `5ca52a7f6389b9eae7d927afb0ba5aa064b79a42` (parent `9869c4c667e4c56975fa6bc2163c862ca475bb3e`), subject `docs: record E833 publication and attribution scan`, pushed to `origin main`. Its exact-range attribution and seven-path checks passed. Fetch confirms `HEAD == origin/main == FETCH_HEAD`, clean.
+- **Latest GitHub census:** after E834 was pushed, the live advertised-ref scan parsed 9 branches, 12 PR heads, 0 tags, 15 unique tips, and **2,447 reachable commits**. It found zero Claude/Anthropic author/committer identities and zero coauthor/generated-by credit lines; `main` matched the remote. The audit log is `local/validation/orch-20261027/e833/e834-remote-attribution.log` (SHA-256 `efbc7a4ad369203f55f30b38fea49d42a98d13fd83c16c978a647ab67f065ec8`). Stash `refs/stash` remains `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`, unchanged by owner choice.
+- **E834 repository gates:** configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail check **9,877 nodes / 13,470 edges**, in sync (deep layer not built); project index **31,948 folders**, current. Logs are under `local/validation/orch-20261027/e833/e834-*`.
+- **E835 closeout gates:** required CMake configure/build, CTest, lift, Trail, and project-index commands reran and passed: **431/431** CTest, **516/0/0** lift, **9,877/13,470** Trail graph, and **31,948** current folders. Logs are `local/validation/orch-20261027/e833/e835-*`.
+- **Technical state:** E833's proposed zero-copy call lead remains **NOT RUN / STOPPED** under E832's continuation gate. Slot 309 remains unregistered, ownership/lift boundary UNKNOWN, G1 PARTIAL. There is no separate READY task in the current register; the scout found open lanes gated by external input or owner choice.
+- **Files changed for E834:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-e833-publication-closeout-e834.md`. No source, binaries, game inputs, or stashes changed.
+- **Next exact action:** maintain the E832 continuation gate. Resume slot 309 only if a concrete nonzero producer or semantic consumer becomes supported; otherwise work another registered task only after its dependency/input becomes available.
+
 ## 2026-10-27 16:25 CDT (`/root`) — E834 publish E833 and refresh public attribution
 
 - **E833 publication:** owner commit `9869c4c667e4c56975fa6bc2163c862ca475bb3e` (parent `bbf731830fb4ca59b1fa905cd754b07e67d8ffb3`), subject `docs: stop slot-309 copy lead before analysis`, pushed to `origin main`. Author and committer are Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Fetch confirms `HEAD == origin/main == FETCH_HEAD`, clean.

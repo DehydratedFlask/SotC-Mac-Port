@@ -444,3 +444,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Slot-309 helper caller census](checkpoints/2026-10-27-slot309-helper-caller-census-complete-e832.md) | E832; one saved caller per helper; observed record's `+0x10` is zeroed and copied to `+0x90`; semantic ownership UNKNOWN |
 | [Slot-309 indirect-copy lead disposition](checkpoints/2026-10-27-slot309-indirect-vtable-copy-stopped-e833.md) | E833; proposed call fails the E832 continuation gate; analysis not run; ownership UNKNOWN |
 | [E833 publication and Claude-attribution closeout](checkpoints/2026-10-27-e833-publication-closeout-e834.md) | E834; E833 pushed and fetch-verified; all advertised GitHub refs remain Claude/Anthropic-clean |
+| [E834 publication and Claude-attribution closeout](checkpoints/2026-10-27-e834-publication-closeout-e835.md) | E835; E834 pushed and fetch-verified; 2,447 reachable GitHub commits scan clear |

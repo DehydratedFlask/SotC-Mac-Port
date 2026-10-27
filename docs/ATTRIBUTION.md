@@ -485,3 +485,10 @@ does, prevents that.
   owner-selected private stash boundary remains unchanged at `refs/stash` `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`.
   The captured audit log SHA-256 is `bd4a485f3f07564091c763f8d8aca293f62395eae005941f720aea96965f5959`.
   See E834 and the [publication closeout](checkpoints/2026-10-27-e833-publication-closeout-e834.md).
+- After E834 commit `5ca52a7f6389b9eae7d927afb0ba5aa064b79a42` was pushed, the live advertised-ref
+  scan covered 9 branch refs, 12 PR heads, 0 tags, 15 unique tips, and **2,447 reachable commits**.
+  It found zero Claude/Anthropic author or committer identities and zero coauthor/generated-by
+  credit lines; live remote `main` matched local. `refs/stash` remains at the owner-selected
+  unchanged tip. The scan log SHA-256 is
+  `efbc7a4ad369203f55f30b38fea49d42a98d13fd83c16c978a647ab67f065ec8`; see E835 and the
+  [publication closeout](checkpoints/2026-10-27-e834-publication-closeout-e835.md).
