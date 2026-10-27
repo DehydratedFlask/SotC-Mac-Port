@@ -63,3 +63,19 @@ Two initial `ExportRefs.java` runs had Ghidra API type-signature errors (`getRef
 - `trail build --check` exited 0 with the 9,876-node wiring graph in sync; the deep layer remains unbuilt.
 - `python3 scripts/project_index.py` exited 0 at **33,162 folders**. Strict check reports generated `docs/FOLDERS.md` and private `local/indexes/folders.json` stale after launcher build/private evidence inventory churn; only the durable checkpoint count is retained in `docs/FOLDERS.md`.
 - Logs: `local/validation/orch-20261027/slot309-docs/e810-*`. These checks validate repository state only and do not advance a game gate.
+
+## E811 publication closeout
+
+- E810 commit `3c6846bed53b67becd5031bbd560c418b078eae0` has parent `47ea5711a50b4e68046c3ee642ebcda5db65a1cb`; author and committer are Johnny Wang `<dehydratedflask@users.noreply.github.com>`.
+- `git push origin main` and `git fetch origin main` exited 0; fetch confirmed `HEAD == origin/main == FETCH_HEAD == 3c6846bed53b67becd5031bbd560c418b078eae0` and clean status.
+- E810 exact-range attribution, committed-tree audit (**3,033/3,033**), diff check, and precommit staged audit (**5/5**) passed. E811 closeout check outcomes are recorded in the current handoff section.
+- The stash-only Claude credit matches remain untouched per owner choice. E810 advances no native implementation or game acceptance gate.
+
+### E811 closeout gate results
+
+- CMake configure/build exited 0 (`ninja: no work to do`); CTest passed **431/431**; lift checkers passed **516/0/0**.
+- `trail build --check` exited 0 with the 9,876-node wiring graph in sync; deep layer remains unbuilt.
+- `python3 scripts/project_index.py` exited 0 at **33,162 folders**. Strict check exits 1 with transient `docs/FOLDERS.md` and private `local/indexes/folders.json` stale after `.build` churn; the generated `docs/FOLDERS.md` diff was restored.
+- Final staged/full publish path audits passed **5/5** and **3,033/3,033**; staged diff check passed; precommit attribution passed for the current empty `origin/main..HEAD` range.
+- The supplemental full-history `check_commit_attribution.py --all` audit reports legacy commit `f6604a86e60e` with author and committer `orchestrator <orchestrator@local>`. It is a generic assistant/agent identity, not Claude/Anthropic credit; current effective identity and the E811 exact commit range pass.
+- Exact logs: `local/validation/orch-20261027/slot309-docs/e811-*`. These repository checks do not advance G1 or another game acceptance gate.

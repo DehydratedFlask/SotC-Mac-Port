@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 13:16 CDT (`/root`) — E811 verify E810 publication
+
+- **Task:** `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`; close out E810's publication before resuming the active static-analysis task.
+- **Published checkpoint:** E810 commit `3c6846bed53b67becd5031bbd560c418b078eae0`, parent `47ea5711a50b4e68046c3ee642ebcda5db65a1cb`; author and committer are Johnny Wang `<dehydratedflask@users.noreply.github.com>`.
+- **Post-push observation:** `git push origin main` and `git fetch origin main` exited 0; `HEAD == origin/main == FETCH_HEAD == 3c6846bed53b67becd5031bbd560c418b078eae0`; worktree clean.
+- **E810 post-commit checks:** exact-range attribution (`47ea5711..HEAD`) passed, committed-tree path audit passed **3,033/3,033**, and `git diff-tree --check HEAD^ HEAD` passed. E810 precommit staged audit passed **5/5**. The 70 stash-only Claude credit matches remain untouched per owner choice.
+- **E811 repository checks:** CMake configure exited 0; build exited 0 (`ninja: no work to do`); CTest passed **431/431**; lift checkers passed **516/0/0**; `trail build --check` exited 0 with 9,876 wiring nodes in sync (deep layer unbuilt). `python3 scripts/project_index.py` exited 0 at **33,162 folders**; strict check exits 1 with `docs/FOLDERS.md` and private `local/indexes/folders.json` stale after restoring transient `.build` rows. Staged/full path audits passed **5/5** and **3,033/3,033**; staged diff check passed; precommit attribution passed for the current empty `origin/main..HEAD` range. Current effective identity and E811's exact commit range pass. Supplemental `check_commit_attribution.py --all` reports only legacy commit `f6604a86e60e` with `orchestrator <orchestrator@local>` author and committer; this is a generic assistant/agent identity, not Claude/Anthropic credit. Logs: `local/validation/orch-20261027/slot309-docs/e811-*`. These repository checks do not advance a game gate.
+- **Native task status:** unchanged; slot 309 remains unregistered, alternate-vtable dispatch and `[RBP-0x38]` ownership/lifetime remain unresolved, and G1 is PARTIAL.
+- **Next exact action:** resolve alternate vtable consumers/order and `[RBP-0x38]` payload lifetime from the saved read-only project; preserve the unresolved branches until their contracts are proven.
+
 ## 2026-10-27 13:09 CDT (`/root`) — E809 slot-309 manager-order checkpoint
 
 - **Task:** `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`; extend the read-only startup-order analysis for the first remaining gap at index 309 / RVA `0xa505e0`.

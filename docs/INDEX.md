@@ -425,4 +425,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Save acceptance tool (2026-10-23)](SAVE_ACCEPTANCE.md) | read-only SAV-04 inspector; E616/NOT RUN |
 | [Startup slots 296/297/300 (2026-10-24)](checkpoints/2026-10-24-startup-slots-296-297-300.md) | TSC thunk, 400-record table, inert atexit; E618 |
 | [E621 superseded metadata task/evidence reconciliation](checkpoints/2026-10-27-e621-task-evidence-reconciliation.md) | Reconciles stale DATA-02/AUD-01 task and evidence summaries with corrected E621 locators; no game gate |
-| [Slot 309 manager creation order after the constructor list](checkpoints/2026-10-27-slot309-manager-order-after-init.md) | E809/E810; static normal-entry path follows the constructor list and the checkpoint is published; alternate vtable dispatch remains unresolved |
+| [Slot 309 manager creation order after the constructor list](checkpoints/2026-10-27-slot309-manager-order-after-init.md) | E809-E811; static order evidence and E810 publication verified; alternate vtable dispatch remains unresolved |
