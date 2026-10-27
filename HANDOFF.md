@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 08:40 CDT (`/root`) — E784 current public attribution scan
+
+- **Task ID:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`.
+- **Files changed:** `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md`, `docs/FOLDERS.md`, `docs/INDEX.md`, `docs/TASKS.md`, and `docs/checkpoints/2026-10-27-post-109c9f9-attribution-scan.md`.
+- **Exact commands/results:** `git fetch origin --prune` exited 0. `git rev-parse HEAD origin/main` returned `109c9f9f56bdfcf986a9ebd36e1f0aa7066c2fd2` for both; `git status --short --branch` showed `main...origin/main` before the checkpoint edit. `python3 -I local/validation/orch-20261026/claude-credit-cleanup-review/scan_remote_refs_attribution.py > local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-109c9f9.json` exited 0. It parsed 9 fetched remote branch heads, 0 remote tags, and 2,395 unique reachable commits, with zero Claude/Anthropic identity or credit-line matches. Report SHA-256 `424eb281d5207c823f37b8191858424b1b96c466fad1a83121a5533372654e3d`.
+- **Observations vs inference:** the fetched-ref scan directly includes the current remote `main` at `109c9f9f`; `refs/stash` is outside the fetched public scope and stays unchanged per owner direction.
+- **Pre-publication checks:** CMake configure/build passed; CTest **431/431**; lift checkers **516/0/0**; staged/full path audits **7/7** and **3,014/3,014**; `git diff --cached --check`, attribution range, and owner identity passed. `check_commit_attribution.py --all` remains **FAILED** only on historical non-Claude alias `f6604a86e60e` (`orchestrator@local`). `python3 scripts/project_index.py` exited 0 at 33,127 indexed folders; transient `launcher/.build` output was restored and the durable checkpoint count alone advanced 817→818. Logs and checksum manifest are private under `local/validation/orch-20261027/e784-publication/` (manifest SHA-256 `783b53e3f960e695ee75474cfc53d54783b2a5d1532b1a723132306b3f69a367`).
+- **Remaining risks:** 70 stash-only Claude-attributed commits remain unchanged per owner choice; `--all` still reports only historical non-Claude `orchestrator@local` commit `f6604a86e60e`. CPU-01 slot 309 and the native-port acceptance gates remain incomplete.
+- **Next exact action:** finish the repository-required publication gates, commit these documentation paths under the owner identity, push `origin main`, fetch, and check the new commit independently. Then keep CPU-01 slot 309 at its evidence boundary and select another bounded active task only from concrete existing evidence.
+- **Task status / attempts:** public fetched refs **ARTIFACT_VERIFIED** at the scanned head, 0 failed hypotheses; this checkpoint's publication gates are pending.
+
 ## 2026-10-27 08:35 CDT (`/root`) — E783 final publish verification and stop point
 
 - **Task IDs:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`; `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`; `APP-01-PROCESS-CLIENT-SHUTDOWN-TERM-ESCALATION-01`.
