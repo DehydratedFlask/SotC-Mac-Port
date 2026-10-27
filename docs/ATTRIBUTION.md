@@ -429,3 +429,13 @@ does, prevents that.
   unchanged. Independent review reproduced both scans. See E804 and the
   [closeout checkpoint](checkpoints/2026-10-27-e802-attribution-census-closeout.md). Unreachable
   objects and contributor-graph rendering are outside this evidence.
+- After E804 `421a096803f78b8a2e4ba21eb72d85cadf578494` was pushed, the all-advertised-ref scan
+  covered 21 GitHub refs (9 branches, 12 pull-request heads, 0 tags), **2,416 unique commits**, and
+  zero Claude/Anthropic identities or credit lines (SHA-256
+  `6be3e8f00b577d7b0b5c6b79685ebe6dff5aafb790d4d829dbb16e61337ab73d`). The local scan covered 25
+  non-stash refs / 2,416 commits, also zero (SHA-256
+  `36c52992625baf4a0bede24fa1d252dcefeb89a2ef5df496c02976a82544698a`). Stash remained 768/70;
+  its 21-tip reflog union was 826/70, all message-credit matches with zero identity hits, and was
+  left unchanged. Independent review reproduced both reports. See E805 and the
+  [closeout checkpoint](checkpoints/2026-10-27-e804-publication-closeout.md). Unreachable objects
+  and contributor-graph rendering are outside this evidence.

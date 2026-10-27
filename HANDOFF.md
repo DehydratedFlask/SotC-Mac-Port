@@ -1,5 +1,19 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 11:47 CDT (`/root`) — E805 E804 publication closeout and all-ref refresh
+
+- **Task:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; verify E804 and refresh all advertised refs.
+- **Starting state:** E804 `421a096803f78b8a2e4ba21eb72d85cadf578494` is pushed; fetch confirmed clean `main` and `origin/main` match.
+- **E804 exact checks:** range attribution, effective owner identity, explicit six-path audit, full tracked-path audit **3,030/3,030**, and committed diff check passed. E804 author/committer are Johnny Wang `<dehydratedflask@users.noreply.github.com>`.
+- **Fresh scan after E804:** all 21 advertised GitHub refs (9 branch heads, 12 pull-request heads, 0 tags) reach **2,416 commits**, zero Claude/Anthropic matches (report SHA-256 `6be3e8f00b577d7b0b5c6b79685ebe6dff5aafb790d4d829dbb16e61337ab73d`). Local scan: 25 non-stash refs / **2,416 commits**, zero matches (SHA-256 `36c52992625baf4a0bede24fa1d252dcefeb89a2ef5df496c02976a82544698a`). Stash remains current ref 768/70 and 21-tip reflog union 826/70, unchanged.
+- **Reports:** `local/validation/orch-20261027/e804-closeout/all-advertised-ref-scan-after-421a0968.json` and `local/validation/orch-20261027/e804-closeout/local-scan-after-421a0968.json`.
+- **Independent review:** `/root/metadata_followup_review` reproduced the 21 live advertised refs, 2,416 public commits/zero matches, 25 local non-stash refs/2,416/zero, and 826 stash-reflog commits/70 matches; it confirmed both report hashes and made no changes.
+- **Observation vs inference:** named/live refs and reflog tips only; unreachable Git objects and contributor-graph rendering are not covered.
+- **E805 precommit gates:** CMake configure/build exited 0 (build had no work); CTest **431/431**; lift checkers **516 passed / 0 skipped / 0 failed**; Trail check passed (9,876-node wiring graph in sync; deep layer unbuilt); project index generation/check passed at **33,154 folders**. Generated `docs/FOLDERS.md` included only the durable checkpoint count increment 834→835 plus 64 transient `.build` rows; `.build` rows were discarded. Staged/full path audits passed **7/7** and **3,031/3,031**; default attribution, effective owner identity, and cached diff checks passed. Logs: `local/validation/orch-20261027/e805-closeout/`; manifest SHA-256 `536108a8413f5dcffdd9ec6eea4d473cb86464aa545aa910f0724bfbb75fd9bd`.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, `docs/checkpoints/2026-10-27-e804-publication-closeout.md`.
+- **Next exact action:** commit these seven allowlisted docs under the owner identity, push `origin main`, and verify E805's exact range, identity, paths, and fetched tip.
+- **Task status / attempts:** attribution **ARTIFACT_VERIFIED** through E804; E805 closeout is active pending publication, 0 failed hypotheses. Native-port goal remains active and incomplete.
+
 ## 2026-10-27 11:42 CDT (`/root`) — E804 E803 publication verification and fresh all-ref census
 
 - **Task:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; verify E803 closeout commit and extend the census through it.
@@ -12,7 +26,7 @@
 - **E804 precommit gates:** CMake configure/build exited 0 (build had no work); CTest **431/431**; lift checkers **516/516** with no skips; `trail build --check` passed (9,876-node wiring graph in sync; deep layer unbuilt); project-index generation/check passed at **33,153 folders**. The generated public folder table differed only in 64 transient `launcher/.build` rows, which were discarded; durable checkpoint count remains 834. Staged/full publish-path audits passed **6/6** and **3,030/3,030**; default attribution, effective owner identity, and cached diff checks passed. Logs: `local/validation/orch-20261027/e804-closeout/`; precommit log manifest SHA-256 `ebad4249e7d696593405c222aeca2286b8e9c0f3abb8ae10d71622b46d07356d`.
 - **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, `docs/checkpoints/2026-10-27-e802-attribution-census-closeout.md`.
 - **Next exact action:** publish the six allowlisted documentation paths under the owner identity, then verify E804's exact range, identity, paths, and fetched tip.
-- **Task status / attempts:** attribution **ARTIFACT_VERIFIED** through E803; E804 publication is pending. Independent review passed; 0 failed hypotheses. The overall native-port goal remains active and incomplete.
+- **Task status / attempts:** attribution **ARTIFACT_VERIFIED** through E803; E804 publication verified by E805, 0 failed hypotheses. The overall native-port goal remains active and incomplete.
 
 ## 2026-10-27 11:33 CDT (`/root`) — E803 all-advertised-ref attribution census closeout
 
