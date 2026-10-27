@@ -40,6 +40,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Attribution scan after c8f23500](checkpoints/2026-10-27-post-c8f23500-attribution-scan.md) | All 9 remote heads and 2,357 reachable commits scan clean for Claude/Anthropic identities and credit lines |
 | [Attribution scan after cf94e831](checkpoints/2026-10-27-post-cf94e831-attribution-scan.md) | All 9 remote heads and 2,358 reachable commits scan clean for Claude/Anthropic identities and credit lines |
 | [Attribution scan after 5315489c](checkpoints/2026-10-27-post-5315489c-attribution-scan.md) | All 9 remote heads and 2,359 reachable commits scan clean for Claude/Anthropic identities and credit lines |
+| [Attribution scan after 690eda93](checkpoints/2026-10-27-post-690eda93-attribution-scan.md) | All 9 remote heads and 2,360 reachable commits scan clean for Claude/Anthropic identities and credit lines |
 | [Startup slot 306 survey](checkpoints/2026-10-25-startup-slot-306-survey.md) | E676 hash-bound table/body/call-footprint characterization; semantics UNKNOWN, 11 indirect calls unresolved, G1 PARTIAL |
 | [Slot 303 checker publication repair](checkpoints/2026-10-24-slot303-publication-repair.md) | Complete function reconstruction removed from public checker; E624 |
 | [Integration PR #9 final closeout](checkpoints/2026-10-25-integration-pr9-final-closeout.md) | PR #9 merged at `a8bd805`; clean-main baseline and branch cleanup verified; E643 |
@@ -365,6 +366,7 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Owner row 21 4a690 (2026-10-23)](checkpoints/2026-10-23-owner-row21-4a690.md) | queue drain into an ordered tree; E612 |
 | [Launcher process client (2026-10-23)](checkpoints/2026-10-23-launcher-process-client.md) | locator + v1 client + factory; E613 |
 | [Concurrent process-client request claim](checkpoints/2026-10-27-app01-client-concurrent-requests-claim.md) | Test-only status/coverage concurrency and response-ID correlation through the child-process fake |
+| [Concurrent process-client request fixture](checkpoints/2026-10-27-app01-client-concurrent-requests-complete.md) | E736 test-only concurrency fixture; 21 focused and 154 launcher tests pass, real-core integration skipped |
 | [Launcher bundle with core (2026-10-24)](checkpoints/2026-10-23-launcher-bundle-core.md) | signed app with SoCGameCore; E614 |
 | [Save relaunch (2026-10-23)](checkpoints/2026-10-23-save-relaunch.md) | cross-process write/load/enumerate; E615 |
 | [Save acceptance tool (2026-10-23)](SAVE_ACCEPTANCE.md) | read-only SAV-04 inspector; E616/NOT RUN |

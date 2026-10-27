@@ -90,10 +90,12 @@ struct ProcessCoreClientTests {
         coverage: String = Fixtures.coverage,
         validate: String = Fixtures.validation,
         start: String = Fixtures.startRefused,
-        stop: String = Fixtures.stopOK
+        stop: String = Fixtures.stopOK,
+        slowResponses: Bool = false
     ) throws -> FakeCore {
         let fake = try newFake()
         let log = fake.log.path(percentEncoded: false).replacingOccurrences(of: "'", with: "'\\''")
+        let responseDelay = slowResponses ? "sleep 0.05" : ":"
         let script = """
         #!/bin/sh
         LOG='\(log)'
@@ -102,6 +104,7 @@ struct ProcessCoreClientTests {
           id=${line%% *}
           rest=${line#* }
           cmd=${rest%% *}
+          \(responseDelay)
           case "$cmd" in
           status) printf '\(printfLiteral(status))\\n' "$id" ;;
           coverage) printf '\(printfLiteral(coverage))\\n' "$id" ;;
@@ -201,6 +204,34 @@ struct ProcessCoreClientTests {
         #expect(coverage.subsystems[0].status == .partial)
         #expect(coverage.subsystems[0].detail == "308 of 573 slots")
         #expect(coverage.subsystems[1].status == .notImplemented)
+    }
+
+    @Test func concurrentStatusAndCoverageRequestsKeepResponsesPaired() async throws {
+        let fake = try makeProtocolFake(slowResponses: true)
+        defer { fake.remove() }
+        let client = try ProcessCoreClient(coreURL: fake.executable)
+        defer { client.shutdown() }
+
+        async let statusTask = client.status()
+        async let coverageTask = client.coverage()
+        let (status, coverage) = try await (statusTask, coverageTask)
+
+        #expect(status.state == .idle)
+        #expect(status.lastError == .ok)
+        #expect(!status.engineImplemented)
+        #expect(coverage.abiVersion == CoreABIVersion(major: 1, minor: 0))
+        #expect(coverage.subsystems.map(\.name) == ["startup_constructors", "audio"])
+        #expect(coverage.subsystems[0].status == .partial)
+        #expect(coverage.subsystems[1].status == .notImplemented)
+
+        let requests = logLines(fake).compactMap { line -> (id: String, command: String)? in
+            let fields = line.split(separator: " ")
+            guard fields.count == 2 else { return nil }
+            return (String(fields[0]), String(fields[1]))
+        }
+        #expect(requests.count == 2)
+        #expect(Set(requests.map { $0.command }) == Set(["status", "coverage"]))
+        #expect(Set(requests.map { $0.id }) == Set(["1", "2"]))
     }
 
     @Test func validateMapsArchivesAndEngineFacts() async throws {
