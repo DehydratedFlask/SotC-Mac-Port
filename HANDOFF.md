@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 08:23 CDT (`/root`) — E779 public-history scan after 91c23ecf
+
+- **Task ID:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`; APP-01 TERM fixture is complete at fixture scope; CPU-01 slot 309 remains open.
+- **Files changed:** `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/TASKS.md`, and `docs/checkpoints/2026-10-27-app01-shutdown-term-escalation.md`.
+- **Exact command/results:** `git fetch origin --prune` exited 0, then `python3 -I local/validation/orch-20261026/claude-credit-cleanup-review/scan_remote_refs_attribution.py > local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-91c23ecf.json` exited 0. The report is SHA-256 `bcaf081813afcf053c0789b8f7f151e14fc59e2fcebc8bdee0c5b93b85400fd2`. Pre-commit staged/full path audits passed 6/6 and 3,013/3,013; empty-range and owner-identity attribution checks passed. The all-history attribution audit still reports only the unrelated historical `orchestrator@local` alias. Detailed audit log hashes are in the checkpoint.
+- **Observation vs inference:** the fetched remote scanner directly observed 9 branch heads, 0 tag refs, 2,390 unique reachable commits, and 0 Claude/Anthropic attribution matches. `HEAD` and `origin/main` both equal `91c23ecf7dc252769fb51364741631b710204beb`; working tree was clean after fetch. This scan excludes private stash refs.
+- **Remaining risks:** 70 stash-only matches remain unchanged by owner choice; historical `--all` identity audit still flags the unrelated `orchestrator@local`; CPU-01 slot 309 and full native-port acceptance remain incomplete.
+- **Next exact action:** commit the six staged allowlisted documentation updates as owner, run post-commit path and attribution checks, and push `origin main`. The new commit must pass its post-commit range audit.
+- **Task status / attempts:** PUB-01 **ARTIFACT_VERIFIED** for the fetched GitHub refs, 0 failed hypotheses; APP-01 TERM fixture **FIXTURE_VERIFIED**, one failed readiness iteration and 0 failed semantic hypotheses; CPU-01 slot 309 **ACTIVE / G1 PARTIAL**, 0 failed hypotheses.
+
 ## 2026-10-27 08:22 CDT (`/root`) — E778 final docs audit and publication staging
 
 - **Task IDs:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01` (public-history scan and publication); `APP-01-PROCESS-CLIENT-SHUTDOWN-TERM-ESCALATION-01` (fixture checkpoint); `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` (open analysis boundary).

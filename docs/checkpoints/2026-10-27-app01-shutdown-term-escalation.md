@@ -1,4 +1,4 @@
-# APP-01 shutdown TERM escalation and post-46a759 attribution checkpoint (E773-E778)
+# APP-01 shutdown TERM escalation and public attribution checkpoint (E773-E779)
 
 - Local date/time: 2026-10-27 07:57 CDT (America/Chicago).
 - Agent / integrator: `/root`.
@@ -187,3 +187,18 @@ no fresh binary import is authorized by this checkpoint.
 - Remaining risks: 70 private stash-only Claude matches remain by owner choice; `--all` retains the unrelated `orchestrator@local` finding; CPU-01 slot 309 and overall native-port acceptance are incomplete.
 - Next exact action: commit these six allowlisted files as the owner, run post-commit checks, and push `origin main`.
 - Task status / attempts: PUB-01 **ARTIFACT_VERIFIED** for fetched public refs, 0 failed hypotheses; APP-01 TERM fixture **FIXTURE_VERIFIED**, one failed readiness iteration and 0 failed semantic hypotheses; CPU-01 slot 309 **ACTIVE / G1 PARTIAL**, 0 failed hypotheses.
+
+
+## E779: post-91c23ecf public attribution scan
+
+- Local date/time: 2026-10-27 08:24 CDT (America/Chicago).
+- Agent / integrator: `/root`.
+- Task ID: `PUB-01-CLAUDE-CREDIT-CLEANUP-01`; related statuses remain APP-01 TERM fixture verified and CPU-01 slot 309 active.
+- Files changed: `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/TASKS.md`, and this checkpoint.
+- Exact commands and results: `git fetch origin --prune` exited 0. Then `python3 -I local/validation/orch-20261026/claude-credit-cleanup-review/scan_remote_refs_attribution.py > local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-91c23ecf.json` exited 0. `HEAD` and `origin/main` both resolved to `91c23ecf7dc252769fb51364741631b710204beb`; `git status --short --branch` showed a clean `main...origin/main` tree. Pre-commit `python3 -I scripts/audit_publish_paths.py` passed 6 staged paths, and `python3 -I scripts/audit_publish_paths.py --all` passed 3,013 paths. `python3 -I scripts/check_commit_attribution.py` passed the empty range and `--identity` passed. `--all` exited 1 only for historical non-Claude `orchestrator` / `orchestrator@local` identity on `f6604a86e60e`.
+- Evidence path and SHA-256: `local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-91c23ecf.json`, `bcaf081813afcf053c0789b8f7f151e14fc59e2fcebc8bdee0c5b93b85400fd2`.
+- Pre-commit audit logs and SHA-256: staged paths `local/validation/orch-20261027/e779-final-docs-checkpoint/staged_path.log`, `6320dc13834a84b5ea100aeeb1f4e29e604fe41f2d405da103d16ca4b8e2d66c`; full tree `local/validation/orch-20261027/e779-final-docs-checkpoint/all_path.log`, `2c2ed65cd259576fa6d92667e0b3ee100cd563754980efab77acf06c95b815b4`; attribution range `local/validation/orch-20261027/e779-final-docs-checkpoint/attribution_range.log`, `72d954d7873849934ae10cdf5ad4049069928f3c6b433f3e7e44743823e63f33`; identity `local/validation/orch-20261027/e779-final-docs-checkpoint/attribution_identity.log`, `888507b0410bfc1aa9548e21b4bd5bdaa271389b1515786e902bc91722c90559`; all-history `local/validation/orch-20261027/e779-final-docs-checkpoint/attribution_all.log`, `f67c8b2dabf442366fbc8922353feda1e6bbd31ffc26b3537d5161e8c1adad44`.
+- Observations vs inference: the scanner parsed 9 fetched branch heads, 0 remote tag refs, and 2,390 unique reachable commit objects; it found zero Claude/Anthropic author, committer, or credit-line matches. This is direct evidence for fetched GitHub refs and does not include `refs/stash`.
+- Remaining risks: 70 private stash-only matches remain unchanged by owner choice; the unrelated historical `orchestrator@local` identity remains an `--all` audit finding; CPU-01 slot 309 and full native-port acceptance remain incomplete.
+- Next exact action: commit only the six staged allowlisted docs as owner, run post-commit path and attribution checks, then push `origin main`.
+- Task status / attempts: PUB-01 **ARTIFACT_VERIFIED** for fetched GitHub refs, 0 failed hypotheses; APP-01 TERM fixture **FIXTURE_VERIFIED**, one failed readiness iteration and 0 failed semantic hypotheses; CPU-01 slot 309 **ACTIVE / G1 PARTIAL**, 0 failed hypotheses.
