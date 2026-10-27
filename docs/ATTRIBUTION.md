@@ -241,6 +241,12 @@ pre-push sequence.
   matches. The private report is
   `local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-32f507e0.json`;
   see E766 and the [latest scan checkpoint](checkpoints/2026-10-27-slot309-table-consumer-post-32f-scan.md).
+- Refreshed after main commit `4b21a234f127852910cf5252672ae6a5c6f8be09`: all 9 fetched GitHub
+  branch heads, no remote tag refs, and **2,384 unique reachable commits** were parsed. The scan
+  found zero Claude/Anthropic author or committer identities and zero Claude/Anthropic credit-line
+  matches. The private report is
+  `local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-4b21a234.json`;
+  see E767 and the [latest scan checkpoint](checkpoints/2026-10-27-post-4b21a234-attribution-scan.md).
 - A separate read-only audit of all 26 local refs parsed **2,783 unique commits** and found 70
   Claude/Anthropic attribution matches, all reachable only from `refs/stash`; none are reachable
   from a local branch or remote ref. The private audit script and JSON are under

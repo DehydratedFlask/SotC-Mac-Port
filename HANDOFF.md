@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 03:22 CDT (`/root`) — post-`4b21a234` public-ref attribution scan (E767)
+
+- After publishing `4b21a234f127852910cf5252672ae6a5c6f8be09`, fetch and remote scan exited 0. The scan covers 9 branch heads, 0 tags, 2,384 reachable public commits, and finds zero Claude/Anthropic identities or credit lines. E767 and its private report hash are in `docs/EVIDENCE.md` and `docs/checkpoints/2026-10-27-post-4b21a234-attribution-scan.md`.
+- The E765 table-consumer census found two LEAs to `0x15c8cc8`; observed code dispatches vptr `+0x10/+0x18`, while the `0x531d60` entry at vptr `+0x20` is not used on that path. No slot-309 order was established; preserve both `0x2dfd4b8` branches and leave the constructor unregistered. Parent CPU task ACTIVE/G1 PARTIAL.
+- E762 all-local-ref scan still finds 70 Claude-attributed commits only under private `refs/stash`; these refs remain unchanged pending the owner's scope answer. Main's sole `--all` attribution finding remains historical, non-Claude `f6604a86e60e` `orchestrator@local`.
+- Configure/build exit 0; CTest **431/431**; lift sweep **516/0/0**; Trail graph in sync with 9,875 deep nodes pending; project index exit 0 with 33,107 folders, retaining only durable `docs/checkpoints` 812→813. Logs are under `local/validation/orch-20261027/slot309-checkpoint/e767/`.
+- **Next exact action:** finish staged/all path and attribution audits, commit the seven allowlisted documentation paths under the owner identity, push `origin main`, and scan the new remote head. Then check the saved slot-309 map for `0x536aa0`, `0x537f90`, `0x536730`, and `0xf120`; keep the branch unresolved unless ordering evidence appears.
+
 ## 2026-10-27 03:19 CDT (`/root`) — slot 309 table-consumer census and post-32f scan (E765/E766)
 
 - A bounded offline census found two RIP-relative LEAs to table base `0x15c8cc8`; the observed caller uses slots `+0x10/+0x18`, while `0x531d60` sits at vptr offset `+0x20` (table offset `+0x30`) and is not called on this path. The direct caller of `0x536730` is `0xf120`, followed by a trap; no link/order to startup slot 309 is established. Private report `local/validation/orch-20261027/slot309/table-consumer/REPORT.md`, SHA-256 `5dbe15d0c13cf6108259a55dc9ad1b2fb4beb21e322329024fbef6ca85bd9e11`. Preserve both `0x2dfd4b8` branches, keep slot 309 unregistered; CPU task ACTIVE/G1 PARTIAL, failed semantic hypotheses 0.
