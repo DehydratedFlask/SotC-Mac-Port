@@ -1,5 +1,19 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 14:42 CDT (`/root`) — E823 claim bounded pakN sidecar identity recheck
+
+- **Task:** `AUD-01-METADATA-SIDECAR-PAKN-REVALIDATE-01`, a private, read-only revalidation of three exact `pakN` sound-sidecar members at their corrected path/TOC locators.
+- **Starting state:** clean `main == origin/main == 6a7565e04ae08295ec60d283da2329f05b4560a8`. Fresh live-ref scan after E822 covers 9 branch refs, 12 PR refs, 0 tags, 15 tips, **2,435 reachable commits**, and zero Claude/Anthropic identity/credit hits. `refs/stash` remains unchanged by owner choice.
+- **Verified input identity:** local archive `local/extracted/CUSA08809/pakN.psarc`, **12,838,532,222 B**, SHA-256 `559f7a3fa66bc652d36c5f1a885b351e4aeb17dadbba06a0006520bfd325be73`; corrected manifest `local/manifests/assets-md5pairing-r30/CUSA08809-pakN.members.jsonl`, SHA-256 `4f7fba6bb85aa29712f502aa0c97ac0daa604dbe9766161d0f71f665b7c290ec`. Archive hash log: `local/validation/orch-20261027/e822/pakn-preclaim-hash.log`.
+- **Owner / worker:** root integrator; `/root/app_next_packet_scout` may start only after this claim is published. It owns a private report/log under `local/validation/orch-20261027/aud01-pakn-sidecar-revalidate/` and may not edit shared docs/source or commit.
+- **Exact member scope:** `sound/shadow/_cmn/shadow_sounds.cxml` (entry 59169, 355,718 B, offset 2,302,782,800, block 40,425); `sound/shadow/_cmn/shadowrandomevents.crmp` (entry 57178, 3,393 B, offset 38,205,543, block 558); `sound/shadow/_cmn/shadowstreams.crmp` (entry 38233, 3,295 B, offset 38,208,936, block 559). Verify exact path uniqueness/entry mapping, read each entry in memory, record decoded length and SHA-256 only. No payload extraction/output; no format, codec, semantic, routing, or playback inference.
+- **Spec:** `docs/ASSETS.md` and [PSARC reconciliation](docs/checkpoints/2026-10-24-psarc-md5-reconciliation.md) require exact path mapping with `Psarc.members()` / `entry_index(path)`; never use `Psarc.paths()` ordinals.
+- **Acceptance:** independently replay archive and manifest hashes, unique corrected rows and locator fields, exact `entry_index` results, three decoded lengths and hashes; reviewer checks the private report. Any identity mismatch stops the task.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and the task-claim checkpoint only.
+- **Repository gates:** configure/build exit 0 (`ninja: no work to do`); CTest **431/431**; lift **516 passed / 0 skipped / 0 failed**; Trail **9,877 nodes / 13,470 edges** (deep layer not built); project index current at **31,930 folders**. Exact logs are in `local/validation/orch-20261027/e823/`.
+- **Status / attempts:** CLAIMED; **0** failed hypotheses/attempts. Payload decoding is **NOT RUN**.
+- **Next exact action:** after the E823 claim is pushed, run the bounded three-member verifier; root replays the report before recording completion.
+
 ## 2026-10-27 14:30 CDT (`/root`) — E822 publish E821 and refresh GitHub attribution
 
 - **Task:** publish E821's bounded slot-309 payload ownership evidence and verify the remote attribution scope.
