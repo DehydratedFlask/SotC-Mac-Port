@@ -1,5 +1,11 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 00:58 CDT (`/root`) — post-ca87a357 attribution scan
+
+- After `git fetch origin --prune` (exit 0), the scanner exited 0: 9 GitHub branch heads, 0 tags, and 2,366 unique reachable commits after `ca87a357490b72877799b6ac589b837fac4b386c`; zero Claude/Anthropic identity or credit-line matches (E743). Private report `local/validation/orch-20261026/claude-credit-cleanup-review/remote-scan-after-ca87a357.json`, SHA-256 `8d564e5489e6f72917438822e013cda5c734d20fe3de34594f24638d6eecd6d5`. This scan predates its recording checkpoint.
+- The APP-01 in-flight child-exit task claim is published in `ca87a357`; worker `/root/app01_client_concurrency_test` is implementing the test-only fixture in `launcher/Tests/LauncherCoreTests/ProcessCoreClientTests.swift`. It must prove the fake received `status` before exiting without a response, then assert a non-timeout `.io`; no queue-drain claim.
+- This checkpoint adds `docs/checkpoints/2026-10-27-post-ca87a357-attribution-scan.md` and updates the attribution/evidence/index/task/handoff docs plus `docs/FOLDERS.md`. `python3 scripts/project_index.py` exited 0 (33,054 folders); generated counts for ignored launcher build and private validation directories were discarded, retaining only the checkpoint count increase from 793 to 794. `trail build --check` exited 0 with the graph in sync; the deep concept layer has 9,874 pending nodes. Staged path audit passed 7 docs paths; staged diff check passed; all-path audit passed 2,990 paths (log `local/validation/orch-20261027/post-ca87a357-all-paths.log`, SHA-256 `d5880e8f2182ea411bb4c85d0cf0d43e1d11714c8bfe02b2b9b063b1818cbcc6`). Identity-only and unpublished-range attribution passed; `--all` reports only `f6604a86e60e` `orchestrator@local`. Exact next action: commit/push as owner, then rescan. The full game gates remain PARTIAL/NOT RUN.
+
 ## 2026-10-27 00:56 CDT (`/root`) — APP-01 in-flight child-exit fixture claimed
 
 - Claimed `APP-01-PROCESS-CLIENT-INFLIGHT-EXIT-FAILURE-01` under the E613 process-client parent. Trail and live source show EOF aborts the pending request with `.io`; existing early-exit coverage does not prove the child received the request first. The test-only scope is `launcher/Tests/LauncherCoreTests/ProcessCoreClientTests.swift`; no production edit is authorized by this task.
