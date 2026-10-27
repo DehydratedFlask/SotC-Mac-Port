@@ -217,6 +217,17 @@ pre-push sequence.
   matches. The private report is
   `local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-d71c3ccf.json`;
   see E759 and the [latest scan checkpoint](checkpoints/2026-10-27-slot309-rbp38-writer-order-post-d71.md).
+- Refreshed after main commit `58e37ed335e2013fa450af8cfcb280a4818a93eb`: all 9 fetched GitHub
+  branch heads, no remote tag refs, and **2,380 unique reachable commits** were parsed. The scan
+  found zero Claude/Anthropic author or committer identities and zero Claude/Anthropic credit-line
+  matches. The private report is
+  `local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-58e37ed3-refresh.json`;
+  see E762 and the [latest scan checkpoint](checkpoints/2026-10-27-slot309-stash-attribution-audit.md).
+- A separate read-only audit of all 26 local refs parsed **2,783 unique commits** and found 70
+  Claude/Anthropic attribution matches, all reachable only from `refs/stash`; none are reachable
+  from a local branch or remote ref. The private audit script and JSON are under
+  `local/validation/orch-20261027/claude-credit-cleanup-review/` and are hash-recorded in the E762
+  checkpoint. Stash refs remain unchanged pending the owner's scope decision.
 - The historical `f6604a86e60e` `orchestrator@local` author/committer remains the one separate
   `--all` gate finding. It is not a Claude/Anthropic attribution and was not changed by this task.
 
