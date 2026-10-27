@@ -1,5 +1,18 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 09:34 CDT (`/root`) — E789 publication closeout and post-push attribution scan
+
+- **Task IDs:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`; `AUD-01-MUSIC-BGM-PATH-CENSUS-01`; newly claimed `AUD-01-SXDF-READER-CANDIDATE-01`.
+- **E789 commit:** `9ff7cf7b8d7a70569e27306f35b603ca064643bb` (`docs: record music BGM path census and attribution review`) was pushed to `origin/main`; fetch returned `HEAD == origin/main`, with a clean tree. Author and committer are both Johnny Wang `<dehydratedflask@users.noreply.github.com>`.
+- **Post-commit checks:** `python3 -I scripts/check_commit_attribution.py --range e9be553af6f0136c69701501dc38d535fbe46bbe..HEAD` passed; explicit committed-path audit passed **8/8**; full tracked-tree audit passed **3,017/3,017**; owner-identity check passed. The scan at E789's parent found 2,400 clean public commits; a fresh post-push scan now includes E789.
+- **Post-push public scan:** `python3 -I local/validation/orch-20261026/claude-credit-cleanup-review/scan_remote_refs_attribution.py > local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-9ff7cf7b.json` exited 0. It parsed 9 fetched GitHub branch heads, 0 tags, and **2,401 reachable commits**, with zero Claude/Anthropic identities or credit lines. Report SHA-256 `3de89259b7df6516eeb8ef66881df3a98024cccc3d5cf0eb9f7b21354e0b1c00`.
+- **Stash scope:** the 70 Claude-attributed commits reachable only from private `refs/stash` remain unchanged per the user's explicit choice. `check_commit_attribution.py --all` continues to flag only historical non-Claude `orchestrator@local` commit `f6604a86e60e`.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and this publication-closeout checkpoint.
+- **Observations vs inference:** the scan covers fetched GitHub branches/tags only. The private stash references remain outside the selected publication scope. The E789 path census remains metadata-only; it does not classify format, codec, dialogue coverage, engine routing, or playback.
+- **Next task claim:** `AUD-01-SXDF-READER-CANDIDATE-01`, ACTIVE / root, 0 failed tries. Bounded output: hash-bound, read-only census of existing saved Ghidra/REA reports for exact `.sxd`, `SXDF`, or `SXDS` reader/caller evidence; report a precise evidence-backed hit or no-hit. Spec: `docs/REVERSE_ENGINEERING.md` plus the UNKNOWN/metadata-only boundaries in `docs/ASSETS.md`. Do not reimport the ELF, read PSARC/member payloads, run original code, or infer a codec from the prefix alone.
+- **Next exact action:** finish this closeout, publish the allowlisted checkpoint and verify it; then execute the claimed saved-evidence census without importing binaries or reading member payloads.
+- **Task status / attempts:** public fetched-ref attribution **ARTIFACT_VERIFIED** through E789 under the user's stash exclusion; E789 audio path census **ARTIFACT_VERIFIED**; the new AUD-01 evidence census is **ACTIVE**, 0 failed tries.
+
 ## 2026-10-27 09:24 CDT (`/root`) — AUD-01 music/BGM path census claim
 
 - **Task IDs:** `AUD-01-MUSIC-BGM-PATH-CENSUS-01`; `PUB-01-CLAUDE-CREDIT-CLEANUP-01` closeout; `ORCH-NEXT-WORKPACKET-TRIAGE-2026-10-27`.

@@ -323,5 +323,12 @@ does, prevents that.
   found zero Claude/Anthropic identity or credit-line matches. Report SHA-256
   `2844551c2cd9b7f5061a20a66672b31810bcc6c116f0d5d7494297ac74fda48c`; see E789 and the
   [music/BGM path census checkpoint](checkpoints/2026-10-27-aud01-music-bgm-census.md). The 70
-  stash-only matches remain untouched by the user's explicit choice. The current checkpoint
-  commit is audited separately after publication.
+  stash-only matches remain untouched by the user's explicit choice. E789 was subsequently
+  range/identity/path-audited and included in the next fetched-ref scan below.
+- After publishing E789 `9ff7cf7b8d7a70569e27306f35b603ca064643bb`, the scanner parsed all 9 fetched
+  GitHub branch heads, 0 tags, and **2,401 unique reachable commits**. It found zero Claude/
+  Anthropic identity or credit-line matches. Report SHA-256
+  `3de89259b7df6516eeb8ef66881df3a98024cccc3d5cf0eb9f7b21354e0b1c00`; see E790 and the
+  [publication closeout checkpoint](checkpoints/2026-10-27-e789-publication-closeout.md). The 70
+  stash-only matches remain untouched per the user's choice. E789 itself passed a separate exact
+  range/identity/path audit after publication.
