@@ -37,16 +37,25 @@ python3 -I scripts/test_check_commit_attribution.py       # 13 fixtures
 Exit 0 means clean; exit 1 lists every violation. Add it next to the publish-path audit in the
 pre-push sequence.
 
-## Audit state (2026-10-23)
+## Audit state (2026-10-26)
 
 - Effective identity: owner, clean.
-- `--all` over the Init branch: **one** violation, the historical commit
+- `--all` over `main`: **one** violation, the historical commit
   `f6604a86e60e` authored and committed as `orchestrator <orchestrator@local>`.
   It is not an Anthropic/Claude attribution and is not linked to any GitHub account, so it does
-  not add a Claude contributor. Fixing it means rewriting 327 `main` descendants and 638 Init
-  descendants, so it is recorded as an owner decision rather than applied unilaterally.
-- Claude/Anthropic credit trailers in published history: **0** across 1078 reachable commits
-  (the owner-approved trailer cleanup is already reflected on both remote refs).
+  not add a Claude contributor. Rewriting it is a separate owner decision and is outside the
+  requested Claude-trailer cleanup.
+- The 2026-10-23 audit covered the then-current main/Init refs and found zero Claude/Anthropic
+  credit trailers across 1,078 reachable commits. A fresh all-remote-ref audit found that
+  `origin/main` and seven other fetched branches are clean, while the stale
+  `cursor/parallel-foundations-86ac55b` branch and its one-commit WIP descendant still expose 70
+  of those trailers. No PR is open for either branch.
+- A disposable cleanup review now verifies the exact message-only rewrite: all 1,074 commits in
+  the WIP ancestry preserve their trees, author/committer headers, and mapped parents; 70 trailer
+  lines are removed, 708 commit IDs change, and there are no signed/mergetag commits. Candidate
+  tips are recorded in [EVIDENCE](EVIDENCE.md) and
+  [the checkpoint](checkpoints/2026-10-26-resume-integration-attribution-review.md). The original
+  remote refs remain unchanged pending the exact-lease push authorized by the owner.
 
 ## Why the host-derived identity matters
 

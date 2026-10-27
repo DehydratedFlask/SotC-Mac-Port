@@ -2,7 +2,7 @@
 //
 // Proves that every lifted vec_*/leaf_* constructor module runs in recovered_constructors(), that
 // the registered rows pair with the pinned original table, and that the remaining startup cliff is
-// explicit (first unrecovered index 306 / RVA 0xa633b0 after slots 296-305).
+// explicit (first unrecovered index 307 / RVA 0xa5b090 after slots 296-306).
 #include <cstdio>
 #include <cstdlib>
 
@@ -29,7 +29,7 @@ int main() {
     CHECK(result.blocked_on_rva == 0);
     CHECK(!st.init_failed);
     CHECK(result.completed == slots.size());
-    CHECK(slots.size() == 317);
+    CHECK(slots.size() == 386);
 
     // Every registered row is in original order and pairs with the pinned table.
     for (std::size_t i = 0; i < slots.size(); ++i) {
@@ -40,9 +40,9 @@ int main() {
     }
 
     // ---- explicit, machine-checked gap ---------------------------------------
-    CHECK(first_unrecovered_constructor_index() == 306);
-    CHECK(first_unrecovered_constructor_rva() == 0xa633b0);
-    CHECK(slots.size() + 256 == kOriginalCtorCount);
+    CHECK(first_unrecovered_constructor_index() == 309);
+    CHECK(first_unrecovered_constructor_rva() == 0xa505e0);
+    CHECK(slots.size() + 187 == kOriginalCtorCount);
 
     // ---- spot checks: destination cells hold their module constants ----------
     CHECK(st.vec_d71f60 == kVecD71f60Bits);     // idx 95, the batch's new lift
@@ -73,10 +73,10 @@ int main() {
     CHECK(st.slot303.var.default_value == 0 && st.slot303.var.fn_vptr == 0x15d2478);
     CHECK(st.slot303.item.target == &st.slot303.var && st.slot303.item.flags == 0x30);
     CHECK(st.concmd.manager.manager == nullptr);
-    CHECK(st.concmd.pending.size() == 5);                        // 298, 299 A/B, 301, 303
+    CHECK(st.concmd.pending.size() == 62);                       // observed after the 2026-10-26 lanes: 27 through slot 306 + 35 from 307-356
     CHECK(st.concmd.pending.first() == &st.slot298_shader_type.base.pending);
-    CHECK(st.debug_menu.root.count == 3);                        // idx 299 items C and D, idx 303 toggle
-    CHECK(st.concmd.atexit_log.size() == 19);                    // 7 (298-301) + 10 (302) + 2 (303)
+    CHECK(st.debug_menu.root.count == 50);                       // observed: 26 through slot 306 + 24 from the later lanes
+    CHECK(st.concmd.atexit_log.size() == 188);                   // observed: 65 through slot 306 + 123 from the later lanes
     for (std::size_t i = 0; i < kSlot302HandleCount; ++i) {
         CHECK(st.slot302.handles[i] == nullptr);
         CHECK(st.concmd.atexit_log.at(7 + i).dtor_rva == kSlot302DtorRva);
@@ -84,6 +84,17 @@ int main() {
     }
     CHECK(st.slot302.identity_vptr == kSlot302IdentityVptr);
     for (const Pair128& pair : st.slot305) CHECK(pair.lo == 0 && pair.hi == 0);
+    // ---- CPU-01-STARTUP-SLOT-306-ASSEMBLE-01: the 46 `sndx_` objects ----------
+    CHECK(st.slot306_result.ok && st.slot306_result.built_count == 46 && st.slot306_result.gap_count == 0);
+    CHECK(kSlot306Gaps.size() == 0);
+    CHECK(st.slot306.int_vars[0].base.registered == 1 && st.slot306.int_vars[0].default_value == 0);
+    CHECK(st.slot306.floats[0].base.vptr == 0x15942b0);
+    CHECK(st.slot306.bools[0].base.vptr == kBoolVarFinalVptr && st.slot306.bools[0].value == 0);
+    CHECK(st.slot306.commands[0].base.vptr == 0x1594dd0 && st.slot306.commands[0].base.flags == 2);
+    CHECK(st.slot306.items[0].kind == 1 && st.slot306.items[0].flags == 0x30);
+    CHECK(st.slot306.items[45 - 23].target == &st.slot306.command_target_cell);
+    CHECK(st.concmd.atexit_log.at(19).object == slot306_object_address(st.slot306, 0));
+    CHECK(st.concmd.atexit_log.at(19 + 45).object == slot306_object_address(st.slot306, 45));
     CHECK(st.leaf_7ce8d0.word0 == 0x3f80000000000001ull);  // idx 346
     CHECK(st.leaf_7ce8d0.word1 == 0x3f80000000000001ull);
     CHECK(st.leaf_7ce8d0.flag0.load() == 0 && st.leaf_7ce8d0.flag1.load() == 0);

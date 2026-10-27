@@ -35,6 +35,7 @@
 #include <cstdint>
 
 #include "concmd_base.hpp"
+#include "shared_str_release_f590.hpp"  // SharedStrDeallocatorF590 for init_bool_var_vector
 
 namespace sotc {
 
@@ -80,6 +81,20 @@ struct BoolVarResult {
                                                  const SharedStr& description,
                                                  std::uint64_t fn_vptr_tag,
                                                  ConCmdRegistry& registry,
+                                                 std::uint8_t value = 1,
+                                                 std::uint8_t default_value = 1) noexcept;
+
+// CPU-01-SLOT306-CATEGORY-VARS-01: the same construction without the __cxa_atexit record — for
+// vector-owned bool vars (the engine-init 0xa5d990 category loop) whose teardown is the engine's,
+// not atexit's. An OWNED name (ctl != nullptr, e.g. a formatted `sndxCategory_*` name built with
+// the 0xf1a0 model) acquires a reference during construction and releases the caller's reference
+// through the real 0xf590 here, so it requires `name_deallocator`; a borrowed name is released as
+// an inert view and needs none.
+[[nodiscard]] BoolVarResult init_bool_var_vector(ConCmdBoolVar& var, const SharedStr& name,
+                                                 const SharedStr& description,
+                                                 std::uint64_t fn_vptr_tag,
+                                                 ConCmdRegistry& registry,
+                                                 SharedStrDeallocatorF590* name_deallocator,
                                                  std::uint8_t value = 1,
                                                  std::uint8_t default_value = 1) noexcept;
 
@@ -143,6 +158,9 @@ inline constexpr std::uint64_t kRangedFloatMidVptr = 0x1594128;    // 0x1594118 
 inline constexpr std::uint64_t kRangedFloatFinalVptr = 0x15942b0;  // 0x15942a0 + 0x10
 inline constexpr std::uint64_t kRangedFloatFnVtbl = 0x1594318;
 inline constexpr std::uint64_t kRangedFloatArgFnVtbl = 0x15d57e0;
+// Third caller functor vtable (startup slot 306, the five `sndx_` floats): its four slot bodies are the
+// same as 0x15d57e0 / 0x1594318 (byte-pinned by tools/lift/check_ctor_slot_306.py).
+inline constexpr std::uint64_t kRangedFloatArgFnVtblSndx = 0x15d2040;
 inline constexpr std::uint64_t kRangedFloatFnCopyRva = 0xc4a0;
 inline constexpr std::uint64_t kRangedFloatFnCloneRva = 0xc4c0;
 inline constexpr std::uint64_t kRangedFloatFnMoveRva = 0xc4e0;

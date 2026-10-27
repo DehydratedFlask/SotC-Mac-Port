@@ -46,6 +46,55 @@ BoolVarResult init_bool_var_static(ConCmdBoolVar& var, const SharedStr& name,
     return out;
 }
 
+BoolVarResult init_bool_var_vector(ConCmdBoolVar& var, const SharedStr& name,
+                                   const SharedStr& description, std::uint64_t fn_vptr_tag,
+                                   ConCmdRegistry& registry,
+                                   SharedStrDeallocatorF590* name_deallocator,
+                                   std::uint8_t value,
+                                   std::uint8_t default_value) noexcept {
+    // CPU-01-SLOT306-CATEGORY-VARS-01: identical construction to init_bool_var_static minus the
+    // __cxa_atexit record. The sound-engine category vars (engine-init 0xa5d990 loop: 32 Mute +
+    // 32 Filter `sndxCategory_*` bool vars at engine+0x8bd0/+0x72a8, stride 0xc8) live inside
+    // engine-owned vectors; the engine teardown (0xa5cb30 -> the vector destructors) destroys
+    // them, so the original never registers a per-object atexit dtor. Their formatted names are
+    // OWNED SharedStrs: the construction acquires the view and the loop releases its stack
+    // reference through the real 0xf590, so an owned name requires a deallocator here (a borrowed
+    // name is an inert release and needs none).
+    BoolVarResult out{};
+
+    var.base.vptr = kBoolVarFinalVptr;
+    init_concmd_base_20af0(var.base, name, description, 1);
+
+    var.base.vptr = kBoolVarMidVptr;
+    var.value_ref = &var.value;
+    std::memset(var.zero69, 0, sizeof var.zero69);
+    std::memset(var.zero70, 0, sizeof var.zero70);
+    var.fn_payload = 0;
+    var.fn_vptr = fn_vptr_tag;
+    var.fn_aux = 0;
+
+    const bool desc_inert = release_inert_view_f590(description);
+
+    var.base.vptr = kBoolVarFinalVptr;
+    var.value = value;
+    var.default_value = default_value;
+
+    out.registration = register_concmd_20d60(var.base, registry);
+
+    bool name_ok = false;
+    if (name.ctl == nullptr) {
+        name_ok = release_inert_view_f590(name);          // borrowed: inert no-op release
+    } else if (name_deallocator != nullptr) {              // owned: the observed real release
+        release_shared_str_f590(const_cast<SharedStr&>(name), *name_deallocator);
+        name_ok = true;
+    }
+    out.views_inert = desc_inert && name.ctl == nullptr && name_ok;
+
+    out.atexit_recorded = false;   // vector-owned: no __cxa_atexit(0x20b0) record
+    out.ok = out.registration.ok && desc_inert && name_ok;
+    return out;
+}
+
 namespace {
 
 // Shared by 0xb0e060 and 0xc300: the argument copy at +0x80 and the functor install through the
@@ -81,8 +130,11 @@ void copy_args_and_install_fn(ConCmdRangedVar& var, const RangedVarArgs& args,
 bool init_ranged_float_var_c300(ConCmdRangedVar& var, const SharedStr& name, void* value_ref,
                                 float min_value, float max_value, std::uint32_t flags,
                                 const RangedVarArgs& args, const SharedStr& description) noexcept {
-    // Clone/copy/move/destroy bodies are identical for 0x15d57e0 and 0x1594318 (checker-pinned).
-    if (args.fn_vptr != kRangedFloatArgFnVtbl && args.fn_vptr != kRangedFloatFnVtbl) return false;
+    // Clone/copy/move/destroy bodies are identical for 0x15d57e0, 0x15d2040 and 0x1594318 (checker-pinned).
+    if (args.fn_vptr != kRangedFloatArgFnVtbl && args.fn_vptr != kRangedFloatFnVtbl &&
+        args.fn_vptr != kRangedFloatArgFnVtblSndx) {
+        return false;
+    }
 
     // 0xc336: call 0x20af0(this, name, description, flags).
     init_concmd_base_20af0(var.base, name, description, flags);

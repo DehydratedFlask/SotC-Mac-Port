@@ -179,23 +179,26 @@ for index in sorted(modules):
         f"pinned table says {original_rvas[index]:#x}, module says {modules[index]:#x}")
 
 # Registered set = recovered prefix 0-151 + every byte-verified module + the sparse late rows that
-# have no vec_/leaf_ module + the slot-specific modules 296-301 and 302/303/305. Extra rows would be
+# have no vec_/leaf_ module + the slot-specific modules 296-301 and 302/303/305/306. Extra rows would be
 # unverified registrations; a missing module row means a recovered constructor is silently skipped.
-expected_registered = set(range(152)) | set(modules) | {282, 290, 520, 538, 296, 297, 300, 298, 299, 301, 302, 303, 305}
+# Slots recovered by the 2026-10-26 lanes (L1-L5), each with its own tools/lift/check_ctor_slot*/check_ctor_*_slots.py ELF checker.
+LANE_SLOTS_20261026 = {307, 308, 310, 311, 313, 317, 318, 322, 325, 327, 328, 330, 331, 332, 333, 334, 343, 344, 345, 347, 348, 350, 353, 355, 356, 371, 372, 404, 405, 406, 425, 431, 432, 433, 434, 435, 438, 447, 470, 471, 472, 481, 483, 484, 485, 487, 515, 517, 519, 522, 523, 525, 527, 528, 529, 531, 533, 541, 542, 546, 547, 549, 551, 553, 562, 563, 564, 565}
+expected_registered = (set(range(152)) | set(modules) | {282, 290, 520, 538, 296, 297, 300, 298, 299, 301, 302, 303, 305, 306}
+                       | LANE_SLOTS_20261026)
 assert set(rows_by_index) == expected_registered, (
     "registered set differs from the computed expectation: "
     f"extra={sorted(set(rows_by_index) - expected_registered)} "
     f"missing={sorted(expected_registered - set(rows_by_index))}")
 registered_digest = hashlib.sha256(
     ",".join(str(index) for index in sorted(rows_by_index)).encode()).hexdigest()
-assert registered_digest == "ee1bf21bc35e9baddf2d4a54f8296379786ab103b630c92779d2f2ae53d976e0", (
+assert registered_digest == "c0baa925e66e23397b68317119f8bd0ace7e9ec5d03eb476972c6b088e45d4b1", (
     f"registered index-set sha256 changed: {registered_digest}")
 
-# The remaining 256 original slots are all `other`-class bodies (census: local/re/work/
+# The remaining 255 original slots are all `other`-class bodies (census: local/re/work/
 # ctor-classes.json). The first one is the explicit startup cliff after this batch.
 unregistered = sorted(set(range(TABLE_COUNT)) - set(rows_by_index))
-assert len(unregistered) == 256, f"expected 256 unregistered slots, found {len(unregistered)}"
-assert unregistered[0] == 306 and original_rvas[306] == 0xa633b0, (
+assert len(unregistered) == 187, f"expected 187 unregistered slots, found {len(unregistered)}"
+assert unregistered[0] == 309 and original_rvas[309] == 0xa505e0, (
     f"first unregistered slot changed: {unregistered[0]}/{original_rvas[unregistered[0]]:#x}")
 
 # The 573-row data table must reproduce the ELF exactly, in index order.
@@ -305,6 +308,6 @@ print(
     f"OK: ELF sha256={elf_digest}; constructor table start={TABLE_START:#x} "
     f"count={TABLE_COUNT} sha256={table_digest}; verified {len(rows)} registered RVA/index pairs "
     f"({len(modules)} vec_*/leaf_* modules); registered index-set sha256={registered_digest}; "
-    f"slots 0-47 recovered; idx 95 registered; 256 unregistered `other` slots remain, first "
+    f"slots 0-47 recovered; idx 95 registered; {len(unregistered)} unregistered `other` slots remain, first "
     f"{unregistered[0]} / {original_rvas[unregistered[0]]:#x}"
 )

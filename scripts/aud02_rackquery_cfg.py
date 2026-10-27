@@ -5,6 +5,17 @@ The public tool contains no game instructions or per-site CFG data. Its JSON out
 is private evidence, never a codec, ABI, reachability, or runtime completion claim.
 Calls clobber every tracked register unless --preserve-register explicitly names it.
 LEA origins denote symbolic expressions at definition sites, not concrete addresses.
+
+Limitations that shape the pinned analysis (fail-closed by construction):
+* A block that ends in an indirect jump has an unverifiable successor set, so a cached
+  (possibly partial) list is never trusted: every block receives an
+  'indirect-successor-set-unverified' unknown contribution.
+* A block whose cached fall-through leaves the cached block set (e.g. a trailing call to
+  a no-return function) is a terminal gap; it poisons every block ('unbounded-or-terminal-
+  cfg-gap'). In the pinned data such a block exists, so the 11 unresolved arg3 origins are
+  unknown by construction of that poison and are NOT an analytic result about those sites.
+* A control transfer in the middle of a cached block makes the block model unsound; it is
+  rejected (exit 2), never silently merged.
 """
 from __future__ import annotations
 
@@ -38,6 +49,12 @@ MNEMONIC_ALIASES = {'jz': 'je', 'jnz': 'jne', 'jc': 'jb', 'jnc': 'jae', 'cmovc':
 SAFE_READ_ONLY = {'cmp', 'test', 'nop', 'ret', 'int3', 'ud2', 'endbr64'}
 VECTOR_ONLY = {'vmovups', 'vmovaps', 'movups', 'movaps', 'vxorps', 'xorps', 'vzeroupper'}
 STACK_OPS = {'push', 'pop'}
+TERMINATORS = {'ret', 'ud2', 'int3', 'hlt', 'retn', 'retf', 'iret', 'iretd', 'iretq', 'sysret', 'sysexit', 'loop', 'loope', 'loopne', 'loopz', 'loopnz'}
+
+
+def ends_block(ins: Instruction) -> bool:
+    """True for instructions that must be the last instruction of a cached block."""
+    return ins.mnemonic.startswith('j') or ins.mnemonic in TERMINATORS
 KNOWN_FIRST_WRITES = {'mov', 'lea', 'xor', 'add', 'sub', 'and', 'or', 'shl', 'shr', 'sar', 'imul', 'inc', 'dec', 'neg', 'not', 'sbb', 'adc', 'movzx', 'movsx', 'movsxd', 'bswap'}
 
 
@@ -280,8 +297,9 @@ def solve(blocks: list[Block], instructions: dict[int, Instruction], entry: int,
     """Least fixed point over observed edges; union keeps alternatives through loops.
 
     Missing decodable edges seed unknown input at the omitted destination. Dangling
-    and unbounded flows seed unknown inputs everywhere. Observed indirect successor
-    sets remain an explicit unverified graph assumption in the returned diagnostics.
+    and unbounded flows seed unknown inputs everywhere. Any indirect jump makes every
+    block's input unknown (its target set cannot be verified, even when partially cached).
+    A control transfer before the last instruction of a cached block raises ValueError.
     """
     preserved = frozenset(preserved)
     if not preserved <= set(REGISTERS):
@@ -295,6 +313,9 @@ def solve(blocks: list[Block], instructions: dict[int, Instruction], entry: int,
             raise ValueError('empty/inverted basic block')
         chunk = [ins for address, ins in sorted(instructions.items()) if block.start <= address < block.end]
         cursor = block.start
+        for ins in chunk[:-1]:
+            if ends_block(ins):
+                raise ValueError(f'control transfer {ins.mnemonic} at {ins.address:#x} inside cached block {block.start:#x}')
         for ins in chunk:
             if ins.address != cursor or ins.end > block.end or ins.address in owner:
                 raise ValueError('block instructions overlap or leave a gap')
@@ -309,6 +330,7 @@ def solve(blocks: list[Block], instructions: dict[int, Instruction], entry: int,
     diagnostics = []
     gaps = {start: set() for start in by_start}
     broad_gap = False
+    indirect_gap = False
     for block in blocks:
         for target in block.successors:
             if target not in by_start:
@@ -321,7 +343,9 @@ def solve(blocks: list[Block], instructions: dict[int, Instruction], entry: int,
         if last.mnemonic == 'jmp':
             target = number(last.operands[0]) if last.operands else None
             if target is None:
+                # A cached successor list is never evidence of a complete indirect target set.
                 diagnostics.append({'kind': 'indirect-successor-set-unverified', 'block': hex(block.start)})
+                indirect_gap = True
                 if not block.successors:
                     broad_gap = True
             else:
@@ -363,6 +387,8 @@ def solve(blocks: list[Block], instructions: dict[int, Instruction], entry: int,
             gaps[start].add('no-cached-predecessor')
         if broad_gap:
             gaps[start].add('unbounded-or-terminal-cfg-gap')
+        if indirect_gap:
+            gaps[start].add('indirect-successor-set-unverified')
     seeds = {}
     for start in by_start:
         seeds[start] = {reg: frozenset(Origin('unknown', reason, start) for reason in gaps[start]) for reg in REGISTERS}

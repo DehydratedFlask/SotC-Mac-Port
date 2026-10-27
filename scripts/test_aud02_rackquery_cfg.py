@@ -142,6 +142,125 @@ class FlowTests(unittest.TestCase):
         self.assertTrue(any(x['kind'] == 'indirect-successor-set-unverified' for x in summary['diagnostics']))
 
 
+class AdversarialCfgTests(unittest.TestCase):
+    """Regressions for the independent review (E: partial indirect set, F: mid-block jump)."""
+
+    # Entry je -> P(6) or fall into an indirect jmp whose cached set is only {X(4)}.
+    # X and P both define edx=7 and join at Y(8); the real indirect jump may also reach Y.
+    E_BLOCKS = [CFG.Block(0, 1, (1, 6)), CFG.Block(1, 3, (4,)), CFG.Block(4, 6, (8,)), CFG.Block(6, 8, (8,)), CFG.Block(8, 10, ())]
+    E_INSNS = [ins(0, 'je', '6'), ins(1, 'mov', 'rax', 'qword ptr [rsp+8]'), ins(2, 'jmp', 'rax'),
+               ins(4, 'mov', 'edx', '7'), ins(5, 'jmp', '8'), ins(6, 'mov', 'edx', '7'), ins(7, 'jmp', '8'),
+               ins(8, 'call', '99'), ins(9, 'ret')]
+    # One cached block whose first conditional jump is in the middle (taken path edx=7, fall-through edx=8).
+    F_BLOCKS = [CFG.Block(0, 5, (10,)), CFG.Block(10, 11, ())]
+    F_INSNS = [ins(0, 'mov', 'edx', '7'), ins(1, 'je', '10'), ins(2, 'mov', 'edx', '8'), ins(3, 'nop'),
+               ins(4, 'jmp', '10'), ins(10, 'ret')]
+
+    def test_e_partial_indirect_successor_set_degrades_every_origin(self):
+        before, info = CFG.solve(self.E_BLOCKS, {i.address: i for i in self.E_INSNS}, 0)
+        description = CFG.describe(before[8]['rdx'])
+        self.assertNotEqual(description['status'], 'conditional-unique-origin')
+        self.assertTrue(description['has_unknown'])
+        self.assertIn('7', values(before[8]['rdx']))
+        self.assertTrue(any(x.kind == 'unknown' and x.detail == 'indirect-successor-set-unverified' for x in before[8]['rdx']))
+        self.assertTrue(any(d['kind'] == 'indirect-successor-set-unverified' for d in info['diagnostics']))
+        self.assertEqual(info['graph_completeness'], 'NOT_ESTABLISHED')
+
+    def test_e_indirect_jump_with_empty_set_still_degrades(self):
+        blocks = [CFG.Block(0, 3, ()), CFG.Block(3, 4, ())]
+        before, _ = CFG.solve(blocks, {0: ins(0, 'mov', 'edx', '7'), 1: ins(1, 'nop'), 2: ins(2, 'jmp', 'rax'), 3: ins(3, 'ret')}, 0)
+        self.assertTrue(any(x.kind == 'unknown' for x in before[3]['rdx']))
+
+    def test_f_control_transfer_inside_block_is_rejected(self):
+        for operation in (ins(1, 'je', '10'), ins(1, 'jmp', '10'), ins(1, 'jmp', 'rax'), ins(1, 'ret'), ins(1, 'ud2'), ins(1, 'jrcxz', '10'), ins(1, 'loop', '0')):
+            with self.subTest(operation=operation.mnemonic):
+                instructions = {i.address: i for i in self.F_INSNS}
+                instructions[1] = operation
+                with self.assertRaisesRegex(ValueError, 'inside cached block'):
+                    CFG.solve(self.F_BLOCKS, instructions, 0)
+
+    def test_final_control_transfer_and_mid_block_call_remain_accepted(self):
+        blocks = [CFG.Block(0, 4, (4,)), CFG.Block(4, 5, ())]
+        instructions = [ins(0, 'mov', 'edx', '7'), ins(1, 'call', '99'), ins(2, 'nop'), ins(3, 'jmp', '4'), ins(4, 'ret')]
+        before, _ = CFG.solve(blocks, {i.address: i for i in instructions}, 0, frozenset({'rdx'}))
+        self.assertEqual(values(before[4]['rdx']), {'7'})
+
+
+def report_fixture(blocks, instructions, callsite, unresolved=True):
+    """Whole-report fixtures shaped like the pinned baseline/cache JSON, with synthetic data."""
+    value = {'basic_blocks': [{'start': hex(b.start), 'end': hex(b.end), 'successors': [hex(t) for t in b.successors]} for b in blocks],
+             'assembly': [f'{hex(i.address)}: {i.mnemonic}' for i in instructions],
+             'procedure': {'address': hex(blocks[0].start)}}
+    previous = {'callsites': [{'callsite': hex(callsite), 'function': 'fixture', 'arg3_slot': None if unresolved else 'slot'}]}
+    return previous, {'data': {'raw_result': {'value': value}}}, {i.address: i for i in instructions}
+
+
+class ReportTests(unittest.TestCase):
+    def report(self, blocks, instructions, callsite, preserve=frozenset()):
+        previous, capture, decoded = report_fixture(blocks, instructions, callsite)
+        return CFG.analyze(previous, capture, decoded, preserve)
+
+    def rdx(self, report):
+        return report['callsites'][0]['registers']['rdx']
+
+    def test_clean_report_has_unique_origin(self):
+        blocks = [CFG.Block(0, 4, ())]
+        report = self.report(blocks, [ins(0, 'mov', 'edx', '7'), ins(1, 'nop'), ins(2, 'call', '99'), ins(3, 'ret')], 2)
+        self.assertEqual(self.rdx(report)['status'], 'conditional-unique-origin')
+        self.assertEqual(report['aggregate']['previously_unresolved_arg3_status_counts'], {'conditional-unique-origin': 1})
+        self.assertEqual(report['aggregate']['cfg_site_count'], 1)
+        self.assertEqual(report['cfg']['diagnostics'], [])
+
+    def test_partial_indirect_set_degrades_whole_report(self):
+        report = self.report(AdversarialCfgTests.E_BLOCKS, AdversarialCfgTests.E_INSNS, 8)
+        self.assertEqual(self.rdx(report)['status'], 'conditional-origins-with-unknown')
+        self.assertEqual(report['aggregate']['previously_unresolved_arg3_status_counts'], {'conditional-origins-with-unknown': 1})
+        self.assertIn('indirect-successor-set-unverified', {o['detail'] for o in self.rdx(report)['origins'] if o['kind'] == 'unknown'})
+        self.assertEqual(report['cfg']['graph_completeness'], 'NOT_ESTABLISHED')
+
+    def test_unknown_conditional_target_degrades_whole_report(self):
+        blocks = [CFG.Block(0, 2, (2,)), CFG.Block(2, 4, ())]
+        report = self.report(blocks, [ins(0, 'mov', 'edx', '7'), ins(1, 'je', 'rax'), ins(2, 'call', '99'), ins(3, 'ret')], 2)
+        self.assertEqual(self.rdx(report)['status'], 'conditional-origins-with-unknown')
+        self.assertTrue(any(d['kind'] == 'unknown-conditional-target' for d in report['cfg']['diagnostics']))
+        self.assertIn('unbounded-or-terminal-cfg-gap', {o['detail'] for o in self.rdx(report)['origins']})
+
+    def test_mid_block_conditional_jump_rejects_whole_report(self):
+        with self.assertRaisesRegex(ValueError, 'inside cached block'):
+            self.report(AdversarialCfgTests.F_BLOCKS, AdversarialCfgTests.F_INSNS, 10)
+
+    def test_preserved_registers_cannot_launder_indirect_gap(self):
+        report = self.report(AdversarialCfgTests.E_BLOCKS, AdversarialCfgTests.E_INSNS, 8, frozenset({'rdx'}))
+        self.assertTrue(self.rdx(report)['has_unknown'])
+        self.assertEqual(report['cfg']['preserved_register_assumption'], ['rdx'])
+
+    def test_main_reports_and_fails_closed_on_whole_fixture(self):
+        def run(blocks, instructions, callsite):
+            previous, capture, decoded = report_fixture(blocks, instructions, callsite)
+            capture['data'].update({'evidence_id': 'fixture', 'provider': {'id': 'fixture'}})
+            capture['data']['raw_result']['value']['limitations'] = []
+            with tempfile.TemporaryDirectory() as temp:
+                out = Path(temp) / 'out.json'
+                with patch.object(CFG, 'private_output_path', return_value=out), \
+                        patch.object(CFG, 'load_pinned', return_value=(previous, capture, minimal_elf())), \
+                        patch.object(CFG, 'decode_and_reconcile', return_value=(decoded, [])), \
+                        patch.object(CFG.subprocess, 'check_output', return_value='fixture objdump 1\n'), \
+                        patch('sys.stdout') as stdout, patch('sys.stderr') as stderr:
+                    code = CFG.main(['--baseline', 'b', '--cache', 'c', '--elf', 'e', '--out', 'o', '--objdump', 'objdump'])
+                    written = json.loads(out.read_text()) if out.exists() else None
+                    printed = ''.join(call.args[0] for call in stdout.write.call_args_list)
+                    error = ''.join(call.args[0] for call in stderr.write.call_args_list)
+                return code, written, printed, error
+        code, written, printed, _ = run(AdversarialCfgTests.E_BLOCKS, AdversarialCfgTests.E_INSNS, 8)
+        self.assertEqual(code, 0)
+        self.assertEqual(written['strict']['callsites'][0]['registers']['rdx']['status'], 'conditional-origins-with-unknown')
+        self.assertIn('conditional-origins-with-unknown', printed)
+        code, written, _, error = run(AdversarialCfgTests.F_BLOCKS, AdversarialCfgTests.F_INSNS, 10)
+        self.assertEqual(code, 2)
+        self.assertIsNone(written)
+        self.assertIn('inside cached block', error)
+
+
 class InputTests(unittest.TestCase):
     def test_each_input_hash_is_pinned(self):
         with tempfile.TemporaryDirectory() as temp:

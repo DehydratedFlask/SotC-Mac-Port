@@ -2110,6 +2110,28 @@ add_executable(test_concmd_slots_298_299_301 tests/test_concmd_slots_298_299_301
 target_link_libraries(test_concmd_slots_298_299_301 sotc_core)
 add_test(NAME concmd_slots_298_299_301 COMMAND test_concmd_slots_298_299_301)
 
+# CPU-01-SLOT306-CONCMD-OBJECT-01: console-COMMAND object of startup slot 306 (vptr 0x1594dd0, flags 2,
+# destructor 0x4b0, thunk 0x1990), its destructor chain and a behavioural manager model. Additive.
+target_sources(sotc_core PRIVATE core/fconcmd_object_slot306.cpp)
+add_executable(test_fconcmd_object_slot306 tests/test_fconcmd_object_slot306.cpp)
+target_link_libraries(test_fconcmd_object_slot306 sotc_core)
+add_test(NAME fconcmd_object_slot306 COMMAND test_fconcmd_object_slot306)
+
+# CPU-01-SLOT306-INTVAR-CTORS-01: ranged int console-variable constructors 0xa624a0 / 0xa62860
+# (+ workers 0xa62660 / 0xa62a20) and the three startup slot-306 construction sites. Additive.
+target_sources(sotc_core PRIVATE core/intvar_a624a0.cpp)
+
+add_executable(test_intvar_a624a0 tests/test_intvar_a624a0.cpp)
+target_link_libraries(test_intvar_a624a0 sotc_core)
+add_test(NAME intvar_a624a0 COMMAND test_intvar_a624a0)
+
+# CPU-01-SLOT306-MENU-CTORS-01: debug-menu group/separator/command-item ctors and the complete
+# registration helper 0x268b0 (kind-1 branch) used by startup slot 306. Additive.
+target_sources(sotc_core PRIVATE core/fmenu_ctors_slot306.cpp)
+add_executable(test_fmenu_ctors_slot306 tests/test_fmenu_ctors_slot306.cpp)
+target_link_libraries(test_fmenu_ctors_slot306 sotc_core)
+add_test(NAME fmenu_ctors_slot306 COMMAND test_fmenu_ctors_slot306)
+
 # CPU-01-CONCMD-303-01: startup slot 303 (0xa82170), the `ProfileCPU` bool console variable and its
 # "Profile CPU" debug-menu toggle. Reuses the bool-var shape (now parameterised on value/default)
 # and the debug-menu toggle from the 298/299/301 batch. Appended; existing target order untouched.
@@ -2119,6 +2141,28 @@ target_sources(sotc_core PRIVATE
 add_executable(test_ctor_slot_303 tests/test_ctor_slot_303.cpp)
 target_link_libraries(test_ctor_slot_303 sotc_core)
 add_test(NAME ctor_slot_303 COMMAND test_ctor_slot_303)
+
+# CPU-01-STARTUP-SLOT-306-ASSEMBLE-01: startup slot 306 (0xa633b0), the 46 `sndx_` objects assembled from
+# the 306 int-var / command / menu modules, concmd_vars and debug_menu_item. Additive.
+target_sources(sotc_core PRIVATE core/ctor_slot_306_a633b0.cpp)
+add_executable(test_ctor_slot_306 tests/test_ctor_slot_306.cpp)
+target_link_libraries(test_ctor_slot_306 sotc_core)
+add_test(NAME ctor_slot_306 COMMAND test_ctor_slot_306)
+
+# CPU-01-SLOT306-HANDLERS-NATIVE-01: native sndx_ console-command handler model (0xa5bf20 /
+# 0xa5bf50 / 0xa5c020, the 0xba40 bool-var setter, the 0x1e4c0 lookup contract and the 0xa5f380
+# reload walk) with explicit hooks for every unlifted callee.
+target_sources(sotc_core PRIVATE core/sndx_command_handlers.cpp)
+add_executable(test_sndx_command_handlers tests/test_sndx_command_handlers.cpp)
+target_link_libraries(test_sndx_command_handlers sotc_core)
+add_test(NAME sndx_command_handlers COMMAND test_sndx_command_handlers)
+
+# CPU-01-SLOT306-CATEGORY-VARS-01: native model of the engine-init 0xa5d990 category loop —
+# 32 Mute + 32 Filter sndxCategory_* bool vars at engine+0x8bd0/+0x72a8, stride 0xc8.
+target_sources(sotc_core PRIVATE core/engine_category_vars.cpp)
+add_executable(test_sndx_category_vars tests/test_sndx_category_vars.cpp)
+target_link_libraries(test_sndx_category_vars sotc_core)
+add_test(NAME sndx_category_vars COMMAND test_sndx_category_vars)
 
 # CPU-01-STARTUP-302-303-305-01: ten handles/cleanup records and six guarded pair copies.
 target_sources(sotc_core PRIVATE core/ctor_slot_302_aaeee0.cpp core/ctor_slot_305_a77b60.cpp)
@@ -2133,3 +2177,138 @@ target_link_libraries(test_csdr_container sotc_core)
 add_test(NAME csdr_container COMMAND test_csdr_container)
 add_executable(csdr_inspect ../tools/dev/csdr_inspect.cpp)
 target_link_libraries(csdr_inspect PRIVATE sotc_core)
+
+# L5-RELEASE-FAMILY: 17 startup constructor slots (371 372 405 431 433 434 435 438 447 470 472 481 483 484
+# 485 487 529) sharing the 0xf590 shared-str release + __cxa_atexit shape; table-driven, ELF-pinned by
+# tools/lift/check_ctor_release_family_slots.py.
+target_sources(sotc_core PRIVATE core/ctor_release_family_slots.cpp)
+add_executable(test_ctor_release_family_slots tests/test_ctor_release_family_slots.cpp)
+target_link_libraries(test_ctor_release_family_slots sotc_core)
+add_test(NAME ctor_release_family_slots COMMAND test_ctor_release_family_slots)
+
+# CPU-01-TINY-ATEXIT-SLOTS-01 (lane L1-TINY): 19 "zero static object + __cxa_atexit" constructor slots
+# (311, 425, 432, 471, 515, 522..565 subset) as one table-driven module.
+target_sources(sotc_core PRIVATE core/ctor_tiny_atexit_slots.cpp)
+add_executable(test_ctor_tiny_atexit_slots tests/test_ctor_tiny_atexit_slots.cpp)
+target_link_libraries(test_ctor_tiny_atexit_slots sotc_core)
+add_test(NAME ctor_tiny_atexit_slots COMMAND test_ctor_tiny_atexit_slots)
+
+# CPU-01-STARTUP-SLOTS-343-356 (lane L4): shared shapes + nine startup constructor slots.
+target_sources(sotc_core PRIVATE
+  core/ctor_shapes_343_356.cpp
+  core/ctor_slot_343_7d7970.cpp
+  core/ctor_slot_344_7d3810.cpp
+  core/ctor_slot_345_7cec60.cpp
+  core/ctor_slot_347_7c93a0.cpp
+  core/ctor_slot_348_7c9150.cpp
+  core/ctor_slot_350_7af0b0.cpp
+  core/ctor_slot_353_7a14d0.cpp
+  core/ctor_slot_355_7946d0.cpp
+  core/ctor_slot_356_78e2f0.cpp)
+
+# CPU-01-STARTUP-SLOT-313-01 (lane L2): update_entitlement_status command + Platform Services menu items.
+target_sources(sotc_core PRIVATE core/ctor_slot_313_a447a0.cpp)
+add_executable(test_ctor_slot_313 tests/test_ctor_slot_313.cpp)
+target_link_libraries(test_ctor_slot_313 sotc_core)
+add_test(NAME ctor_slot_313 COMMAND test_ctor_slot_313)
+
+# CPU-01-TINY-MISC-SLOTS-01 (lane L1-TINY): 12 small constructor slots (404, 406, 409, 414, 494, 517, 519,
+# 535, 541, 553, 562, 563) with explicit hooks for unlifted callees.
+target_sources(sotc_core PRIVATE core/ctor_tiny_misc_slots.cpp)
+add_executable(test_ctor_tiny_misc_slots tests/test_ctor_tiny_misc_slots.cpp)
+target_link_libraries(test_ctor_tiny_misc_slots sotc_core)
+add_test(NAME ctor_tiny_misc_slots COMMAND test_ctor_tiny_misc_slots)
+
+# CPU-01-STARTUP-SLOTS-343-356 (lane L4): fixtures.
+add_executable(test_ctor_slot_343 tests/test_ctor_slot_343.cpp)
+target_link_libraries(test_ctor_slot_343 sotc_core)
+add_test(NAME ctor_slot_343 COMMAND test_ctor_slot_343)
+add_executable(test_ctor_slot_344 tests/test_ctor_slot_344.cpp)
+target_link_libraries(test_ctor_slot_344 sotc_core)
+add_test(NAME ctor_slot_344 COMMAND test_ctor_slot_344)
+add_executable(test_ctor_slot_345 tests/test_ctor_slot_345.cpp)
+target_link_libraries(test_ctor_slot_345 sotc_core)
+add_test(NAME ctor_slot_345 COMMAND test_ctor_slot_345)
+add_executable(test_ctor_slot_347 tests/test_ctor_slot_347.cpp)
+target_link_libraries(test_ctor_slot_347 sotc_core)
+add_test(NAME ctor_slot_347 COMMAND test_ctor_slot_347)
+add_executable(test_ctor_slot_348 tests/test_ctor_slot_348.cpp)
+target_link_libraries(test_ctor_slot_348 sotc_core)
+add_test(NAME ctor_slot_348 COMMAND test_ctor_slot_348)
+add_executable(test_ctor_slot_350 tests/test_ctor_slot_350.cpp)
+target_link_libraries(test_ctor_slot_350 sotc_core)
+add_test(NAME ctor_slot_350 COMMAND test_ctor_slot_350)
+add_executable(test_ctor_slot_353 tests/test_ctor_slot_353.cpp)
+target_link_libraries(test_ctor_slot_353 sotc_core)
+add_test(NAME ctor_slot_353 COMMAND test_ctor_slot_353)
+add_executable(test_ctor_slot_355 tests/test_ctor_slot_355.cpp)
+target_link_libraries(test_ctor_slot_355 sotc_core)
+add_test(NAME ctor_slot_355 COMMAND test_ctor_slot_355)
+add_executable(test_ctor_slot_356 tests/test_ctor_slot_356.cpp)
+target_link_libraries(test_ctor_slot_356 sotc_core)
+add_test(NAME ctor_slot_356 COMMAND test_ctor_slot_356)
+
+# CPU-01-STARTUP-SLOT-307-01 (lane L2): Trophy System block (bool var, two commands, group, two toggles).
+target_sources(sotc_core PRIVATE core/ctor_slot_307_a5b090.cpp)
+add_executable(test_ctor_slot_307 tests/test_ctor_slot_307.cpp)
+target_link_libraries(test_ctor_slot_307 sotc_core)
+add_test(NAME ctor_slot_307 COMMAND test_ctor_slot_307)
+add_executable(test_ctor_shapes_343_356 tests/test_ctor_shapes_343_356.cpp)
+target_link_libraries(test_ctor_shapes_343_356 sotc_core)
+add_test(NAME ctor_shapes_343_356 COMMAND test_ctor_shapes_343_356)
+
+# CPU-01-STARTUP-SLOTS-322-334 (lane L3): shared 0x26db0 named menu item + family helpers + nine startup
+# constructor slots (322 325 327 328 330 331 332 333 334) in one module, one fixture per slot.
+target_sources(sotc_core PRIVATE
+  core/menu_item_26db0.cpp
+  core/ctor_slot_family_items.cpp
+  core/ctor_slots_322_334.cpp)
+add_executable(test_ctor_slot_322 tests/test_ctor_slot_322.cpp)
+target_link_libraries(test_ctor_slot_322 sotc_core)
+add_test(NAME ctor_slot_322 COMMAND test_ctor_slot_322)
+add_executable(test_ctor_slot_325 tests/test_ctor_slot_325.cpp)
+target_link_libraries(test_ctor_slot_325 sotc_core)
+add_test(NAME ctor_slot_325 COMMAND test_ctor_slot_325)
+add_executable(test_ctor_slot_327 tests/test_ctor_slot_327.cpp)
+target_link_libraries(test_ctor_slot_327 sotc_core)
+add_test(NAME ctor_slot_327 COMMAND test_ctor_slot_327)
+add_executable(test_ctor_slot_328 tests/test_ctor_slot_328.cpp)
+target_link_libraries(test_ctor_slot_328 sotc_core)
+add_test(NAME ctor_slot_328 COMMAND test_ctor_slot_328)
+add_executable(test_ctor_slot_330 tests/test_ctor_slot_330.cpp)
+target_link_libraries(test_ctor_slot_330 sotc_core)
+add_test(NAME ctor_slot_330 COMMAND test_ctor_slot_330)
+add_executable(test_ctor_slot_331 tests/test_ctor_slot_331.cpp)
+target_link_libraries(test_ctor_slot_331 sotc_core)
+add_test(NAME ctor_slot_331 COMMAND test_ctor_slot_331)
+add_executable(test_ctor_slot_332 tests/test_ctor_slot_332.cpp)
+target_link_libraries(test_ctor_slot_332 sotc_core)
+add_test(NAME ctor_slot_332 COMMAND test_ctor_slot_332)
+add_executable(test_ctor_slot_333 tests/test_ctor_slot_333.cpp)
+target_link_libraries(test_ctor_slot_333 sotc_core)
+add_test(NAME ctor_slot_333 COMMAND test_ctor_slot_333)
+add_executable(test_ctor_slot_334 tests/test_ctor_slot_334.cpp)
+target_link_libraries(test_ctor_slot_334 sotc_core)
+add_test(NAME ctor_slot_334 COMMAND test_ctor_slot_334)
+
+# CPU-01-STARTUP-SLOT-308-01: constructor index 308 (0xa58f10) and the native 0xc580 ranged-int constructor.
+target_sources(sotc_core PRIVATE core/ranged_int_var_c580.cpp core/ctor_slot_308_a58f10.cpp)
+add_executable(test_ctor_slot_308 tests/test_ctor_slot_308.cpp)
+target_link_libraries(test_ctor_slot_308 sotc_core)
+add_test(NAME ctor_slot_308 COMMAND test_ctor_slot_308)
+
+# CPU-01-STARTUP-SLOT-317-01: constructor index 317 (0xa2c390).
+target_sources(sotc_core PRIVATE core/ctor_slot_317_a2c390.cpp)
+add_executable(test_ctor_slot_317 tests/test_ctor_slot_317.cpp)
+target_link_libraries(test_ctor_slot_317 sotc_core)
+add_test(NAME ctor_slot_317 COMMAND test_ctor_slot_317)
+# CPU-01-STARTUP-SLOT-318-01: constructor index 318 (0xa20e80).
+target_sources(sotc_core PRIVATE core/ctor_slot_318_a20e80.cpp)
+add_executable(test_ctor_slot_318 tests/test_ctor_slot_318.cpp)
+target_link_libraries(test_ctor_slot_318 sotc_core)
+add_test(NAME ctor_slot_318 COMMAND test_ctor_slot_318)
+# CPU-01-STARTUP-SLOT-310-01: constructor index 310 (0xa479d0) and the string-variable constructor 0x257a0.
+target_sources(sotc_core PRIVATE core/string_var_257a0.cpp core/ctor_slot_310_a479d0.cpp)
+add_executable(test_ctor_slot_310 tests/test_ctor_slot_310.cpp)
+target_link_libraries(test_ctor_slot_310 sotc_core)
+add_test(NAME ctor_slot_310 COMMAND test_ctor_slot_310)

@@ -59,7 +59,7 @@ byte-derived FIFO dispatch; `app_info_install` supplies the two native delegate 
 ## Verification
 
 - Private evidence: `local/re/evidence/owner-installer-2569d0/` (`report.md` 671 lines,
-  `summary.json`, 87-block/73-target/10-indirect/42-branch/36-rip-ref/19-store tables).
+  `summary.json`, 87-block/73-target/10-indirect/42-conditional-branch/35-rip-ref/19-store tables).
 - Full-suite and sweep counts are in the round verification checkpoint.
 
 ## Limits

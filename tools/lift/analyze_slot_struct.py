@@ -39,14 +39,33 @@ NORETURN = {
 }
 
 
+# Longest x86-64 instruction is 15 bytes. A window is decoded with this much extra tail so that an
+# instruction starting inside the window but ending past its edge is decoded whole.
+OVERLAP = 16
+
+
 def decode_from(image, addr, limit=0x400):
-    """Disassemble a window starting exactly at addr; return {addr: instruction}."""
+    """Disassemble a window starting exactly at addr; return {addr: instruction}.
+
+    The table holds only instructions whose *start* lies in [addr, addr + limit). The bytes are read
+    with OVERLAP extra tail bytes, so an instruction that straddles the window edge is decoded from
+    its real bytes (not as a truncated `<unknown>` row followed by misaligned instructions), and the
+    rows that start inside the overlap are discarded: the caller re-decodes from the first missing
+    address, which is a true instruction boundary because the table ends on one.
+    """
     if addr in _cache:
         return _cache[addr]
     WORK.mkdir(parents=True, exist_ok=True)
     blob = WORK / f'w{addr:x}.bin'
+    trim = True
     try:
-        blob.write_bytes(image.read(addr, limit))
+        try:
+            data = image.read(addr, limit + OVERLAP)
+        except ValueError:
+            # Window ends at the segment edge: no bytes exist past it, so nothing can straddle.
+            data = image.read(addr, limit)
+            trim = False
+        blob.write_bytes(data)
     except ValueError:
         _cache[addr] = {}
         return {}
@@ -57,8 +76,11 @@ def decode_from(image, addr, limit=0x400):
     for line in text.splitlines():
         m = INSN.match(line)
         if m:
-            table[int(m.group(1), 16)] = {
-                'addr': int(m.group(1), 16),
+            start = int(m.group(1), 16)
+            if trim and start >= addr + limit:
+                continue
+            table[start] = {
+                'addr': start,
                 'bytes': bytes.fromhex(m.group(2).replace(' ', '')),
                 'mnemonic': m.group(3),
                 'operands': (m.group(4) or '').strip(),

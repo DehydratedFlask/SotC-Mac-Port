@@ -292,6 +292,26 @@
 #include "ctor_slot_302_aaeee0.hpp"
 #include "ctor_slot_303_a82170.hpp"
 #include "ctor_slot_305_a77b60.hpp"
+#include "ctor_slot_306_a633b0.hpp"
+#include "ctor_slots_322_334.hpp"
+#include "ctor_tiny_atexit_slots.hpp"
+#include "ctor_tiny_misc_slots.hpp"
+#include "ctor_release_family_slots.hpp"
+#include "ctor_slot_307_a5b090.hpp"
+#include "ctor_slot_308_a58f10.hpp"
+#include "ctor_slot_310_a479d0.hpp"
+#include "ctor_slot_313_a447a0.hpp"
+#include "ctor_slot_317_a2c390.hpp"
+#include "ctor_slot_318_a20e80.hpp"
+#include "ctor_slot_343_7d7970.hpp"
+#include "ctor_slot_344_7d3810.hpp"
+#include "ctor_slot_345_7cec60.hpp"
+#include "ctor_slot_347_7c93a0.hpp"
+#include "ctor_slot_348_7c9150.hpp"
+#include "ctor_slot_350_7af0b0.hpp"
+#include "ctor_slot_353_7a14d0.hpp"
+#include "ctor_slot_355_7946d0.hpp"
+#include "ctor_slot_356_78e2f0.hpp"
 
 namespace sotc {
 
@@ -572,6 +592,49 @@ struct StartupState {
     Slot302Objects slot302{};          // idx 302 / 0xaaeee0 (ten handles + identity vptr)
     Slot305Pairs slot305{};            // idx 305 / 0xa77b60 (six guarded zero pairs)
     Slot303Objects slot303{};          // idx 303 / 0xa82170 (ProfileCPU 0x32fd228 + debug toggle 0x32fd2f0)
+    // idx 306 / 0xa633b0: the 46 `sndx_` objects. The hooks default to the malloc-backed stand-in for the
+    // allocator behind the four "MenuSeparator" strings; replace `slot306_hooks` to supply another, or
+    // clear `slot306_hooks.separator_alloc.alloc.allocate` to see the fragment fail closed (init_failed).
+    Slot306Objects slot306{};
+    Slot306Hooks slot306_hooks = default_slot306_hooks();
+    Slot306Result slot306_result{};
+
+    // Slot-recovery lanes L1/L2/L4/L5 (2026-10-26): see docs/checkpoints/2026-10-26-L*.md.
+    TinyAtexitState tiny_atexit{};  // L1 family A: 19 slots x 2 objects
+    Slot404Buffer slot404{};
+    Slot406State slot406{};
+    Slot517State slot517{};
+    Slot519State slot519{};
+    Slot541State slot541{};
+    Slot553State slot553{};
+    Slot562State slot562{};
+    Slot563Stamp slot563{};
+    ReleaseFamilyState release_family{};
+    ReleaseFamilyHooks release_family_hooks{};  // null release_view -> lifted inert f590
+    Slot307Objects slot307{};
+    Slot308Objects slot308{};
+    Slot310Objects slot310{};
+    Slot313Objects slot313{};
+    Slot317Objects slot317{};
+    Slot318Objects slot318{};
+    Slot343Objects slot343{}; Slot343Result slot343_result{};
+    Slot344Objects slot344{}; Slot344Result slot344_result{};
+    Slot345Objects slot345{}; Slot345Result slot345_result{};
+    Slot347Objects slot347{}; Slot347Result slot347_result{};
+    Slot348Objects slot348{}; Slot348Result slot348_result{};
+    Slot350Objects slot350{}; Slot350Result slot350_result{};
+    Slot353Objects slot353{}; Slot353Result slot353_result{};
+    Slot355Objects slot355{}; Slot355Result slot355_result{};
+    Slot356Objects slot356{}; Slot356Result slot356_result{};
+    Slot322Objects slot322{};
+    Slot325Objects slot325{};
+    Slot327Objects slot327{};
+    Slot328Objects slot328{};
+    Slot330Objects slot330{};
+    Slot331Objects slot331{};
+    Slot332Objects slot332{};
+    Slot333Objects slot333{};
+    Slot334Objects slot334{};
     LeafA816d0 leaf_a816d0{};  // idx 304 / 0xa816d0
     Leaf9b75a0 leaf_9b75a0{};  // idx 319 / 0x9b75a0
     Leaf8f3d90 leaf_8f3d90{};  // idx 320 / 0x8f3d90
