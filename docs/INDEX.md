@@ -454,3 +454,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Post-E841 live GitHub attribution census](checkpoints/2026-10-27-post-e841-github-attribution-census-e842.md) | E842; 2,454 advertised-ref reachable commits scan clear; 70 stash-only matches remain by owner choice |
 | [Claim: app-main Init callee `0xb11290` structure](checkpoints/2026-10-27-re02-b11290-claim-e843.md) | E843; bounded hash-pinned structural analysis claimed; no runtime or G1 claim |
 | [Partial app-main Init callee `0xb11290` structure](checkpoints/2026-10-27-re02-b11290-partial-e844.md) | E844; offline byte profile replay matches; REA function query timed out; no semantic or G1 claim |
+| [E844 publication closeout](checkpoints/2026-10-27-e844-publication-closeout-e845.md) | E845; E844 pushed and fetch-verified; fresh advertised-ref census covers 2,457 commits with zero Claude/Anthropic matches; stash left unchanged |

@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 17:34 CDT (`/root`) — E845 publish E844 and refresh Claude attribution census
+
+- **Task ID/status:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`, `ARTIFACT_VERIFIED` for all currently advertised GitHub refs through E844; private stash refs remain explicitly excluded by owner choice. `RE-02-APPMAIN-INIT-B11290-STRUCTURE-01` remains `PARTIAL / STATIC_ANALYSIS_VERIFIED` for offline bytes only; G1 and all game gates remain unchanged.
+- **E844 commit:** `ecb63ce92ee44c5987c7a955ac7916d079a971d8` (`docs: record partial RE-02 b11290 profile analysis (E844)`), parent `7a0fbef5423ac9e57693957cc20df146f3ebdd42`, author and committer Johnny Wang `<dehydratedflask@users.noreply.github.com>`. It was pushed to `origin main`; fetch confirmed `HEAD == origin/main == FETCH_HEAD`, clean. Exact-range attribution passed; committed-path audit passed 3,061/3,061.
+- **Fresh live census:** scanner `local/validation/orch-20261027/e845/scan_advertised_refs_e845.py` (SHA-256 `0d3f57a1609dfdff91083550557c5669fa601527c5651c691f3ae796f668ddd2`) queried 21 advertised refs (9 branches, 12 PR heads, 0 tags), 15 unique tips, and 2,457 reachable commits. Claude/Anthropic author/committer and credit-line matches: 0. Report `local/validation/orch-20261027/e845/remote-attribution-scan-e845.json`, SHA-256 `5c120b9bb950beadb8d9a0fe12544e8902b3e292d4ef3098b4ab7caa796c388d`.
+- **Stash boundary:** read-only scan remains 21 stash-reflog tips / 826 reachable commits / 70 Claude matches; `refs/stash == 92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`, unchanged. No private stash was rewritten.
+- **E845 verification:** configure/build passed; CTest 431/431; lift checkers 516/0/0; Trail 9,877-node graph in sync; project index 31,968 current; staged/full path audits 6/6 and 3,062/3,062. Owner identity and current `HEAD^..HEAD` precommit range checks passed; E845's exact new-commit check is run after commit. Logs are under `local/validation/orch-20261027/e845/`.
+- **No game gate advanced:** E844 changed documentation only; its profile is static structure and the REA function query timed out. No source, boot, game-audio, save/reload, or Metal acceptance claim is added.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-e844-publication-closeout-e845.md`; private scanner/report/logs are under `local/validation/orch-20261027/e845/`.
+- **Next exact action:** select another bounded product task only when a documented input, dependency, or provider result makes it READY; retain the slot-309 concrete-nonzero-producer/semantic-consumer gate and all game acceptance gates.
+
 ## 2026-10-27 17:30 CDT (`/root`) — E844 bounded RE-02 partial and publication closeout
 
 - **Task ID/status:** `RE-02-APPMAIN-INIT-B11290-STRUCTURE-01`, `PARTIAL / STATIC_ANALYSIS_VERIFIED` for the offline byte profile only; one REA provider timeout, zero failed semantic hypotheses, two independent profile replays. Parent `RE-02-APPMAIN-INIT-TRIAGE-01` remains `STATIC_PATH_BYTE_VERIFIED`; broader RE-02 remains `ACTIVE`.
