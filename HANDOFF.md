@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 00:15 CDT (`/root`) — cached-CFG task closed; attribution refreshed after 9e61358b
+
+- `AUD-02-NGS2-RACKQUERY-RDX-CFG-01` is **STATIC_ANALYSIS_VERIFIED + FIXTURE_VERIFIED** as a bounded offline task. Root verified current source/test and input hashes against E692/E514, confirmed three strict outputs and two reviewer outputs are byte-identical, and read the existing 30/30 test log. No tests were rerun. Eleven strict origins remain unknown by construction; parent AUD-02 and codec/playback work remain ACTIVE/partial.
+- After pushing `9e61358b9f6f81e6b17208911364a14ab0852609`, fetch and remote scan exited 0 across 9 branch heads, 0 tags, and 2,354 reachable commits with zero Claude/Anthropic matches (E727). Private report: `local/validation/orch-20261026/claude-credit-cleanup-review/remote-scan-after-9e61358b.json`.
+- Files changed for this checkpoint: `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md` (E727/E728), `docs/FOLDERS.md`, `docs/INDEX.md`, `docs/TASKS.md`, and new cached-CFG and post-9e61358b checkpoints. `python3 scripts/project_index.py` exited 0 and indexed 33,045 folders; `docs/FOLDERS.md` lists 776 checkpoint files. Exact next action after publication: choose an unblocked task from the live task register; F590 remains ACTIVE pending its recorded principal decision about the missing original five-mutant cases.
+- This is a docs-only task closeout. Run the project index, stage only these eight allowlisted documentation paths, run staged/all-path and attribution audits plus `git diff --cached --check`, commit as owner, and push `origin main`.
+
 ## 2026-10-27 00:12 CDT (`/root`) — atomic temp-isolation task closed at fixture scope
 
 - `SAV-01-ATOMIC-WRITER-TEMP-ISOLATION-01` is **FIXTURE_VERIFIED** as a bounded subtask. The current `save_stream.cpp`, `save_stream.hpp`, and `test_save_stream_file.cpp` hashes match the reviewed implementation and E696 test revision; root captured them in `local/validation/orch-20261027/sav01-atomic-closeout/live-source-hashes.txt`. E693-E696 record focused 5/5, full CTest 397/397, and 18/18 review mutants killed. Parent `SAV-01`, real game save/load, and power-loss durability remain open; no test was rerun for this documentation closeout.
