@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 17:02 CDT (`/root`) — E841 close E840 publication and attribution audit
+
+- **Task ID/status:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`, `ARTIFACT_VERIFIED` for the post-E838 advertised-ref census plus exact-range E839/E840 checks. The larger native-port goal remains active.
+- **E840 publication:** owner commit `3a06d31755c22dfa27d843b13921dc6670d2b7ba` (parent `427369ff305bca34b77476157cf7581336fc22d9`), subject `docs: close out E839 publication and attribution audit`, author/committer Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Push advanced `main`; fetch confirmed `HEAD == origin/main == 3a06d31755c22dfa27d843b13921dc6670d2b7ba`, clean. Exact-range attribution passed; full tracked-path audit passed **3,057/3,057**. Logs are under `local/validation/orch-20261027/e840/`.
+- **Attribution evidence and scope:** the latest full read-only scan after E838 covered 21 advertised refs (9 branches, 12 PR heads, 0 tags), 15 unique tips, and **2,451 reachable commits**, with zero Claude/Anthropic author/committer identities or credit-line hits. E839 and E840 each passed exact-range attribution after that census. This covers advertised GitHub commits through E840; unreachable objects outside advertised refs are excluded.
+- **Stash boundary:** 70 matches remain among 826 reachable commits over 21 stash-reflog tips. `refs/stash == 92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`; stashes remain untouched per the user's explicit choice.
+- **E840 repository gates:** CMake configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail **9,877 nodes / 13,470 edges** in sync; project index **31,953** current; staged/full path audits **7/7** and **3,057/3,057**; post-commit exact-range attribution passed. Logs are under `local/validation/orch-20261027/e840/`.
+- **Task state:** E836's CPU, service/data/audio/save, app, GPU, and RE scouts found no newly READY product task. No game acceptance gate advanced; preserve the slot-309 gate. No product source changed.
+- **E841 closeout:** documentation-only closeout; standard repository publication gates and post-commit attribution are recorded in `docs/checkpoints/2026-10-27-e840-publication-closeout-e841.md`. No full-port completion claim is implied.
+- **Next exact action:** wait for a documented external dependency/input, provider result, unlocked Mac, or user-owned save that makes a bounded product task READY; then re-triage without weakening its acceptance gate.
+
 ## 2026-10-27 16:58 CDT (`/root`) — E840 close E839 publication and attribution census
 
 - **Task ID/status:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`, `ARTIFACT_VERIFIED` for full advertised-ref scan through E838 plus exact-range E839 check; the native-port goal remains active.
@@ -7,10 +18,10 @@
 - **Latest full census:** the post-E838 scan covered 21 advertised refs (9 branches, 12 PR heads, 0 tags), 15 unique tips, and **2,451 reachable commits**, with zero Claude/Anthropic author/committer identities or credit-line hits. E839's additional commit passed its exact-range attribution audit. Thus current advertised commits through E839 are covered by the full scan plus the isolated new-commit check; unreachable objects outside advertised refs are excluded.
 - **Stash boundary:** 70 matches remain among 826 reachable commits over 21 stash-reflog tips. `refs/stash == 92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`; stashes remain untouched per user choice.
 - **E839 gates:** CMake configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail **9,877/13,470** in sync; project index **31,952** current; staged/full path audits **6/6** and **3,056/3,056**; exact E839 attribution passed. Logs are under `local/validation/orch-20261027/e839/`.
-- **E840 closeout gates:** CMake configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail **9,877/13,470** in sync; project index expected **31,953** current; staged/full path audits expected **7/7** and **3,057/3,057**; precommit attribution checked the empty range. Exact E840 range remains to be checked after commit. Logs are under `local/validation/orch-20261027/e840/`.
+- **E840 closeout gates:** CMake configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail **9,877 nodes / 13,470 edges** in sync; project index **31,953** current; staged/full path audits **7/7** and **3,057/3,057**; exact E840 range passed after commit. Logs are under `local/validation/orch-20261027/e840/`.
 - **Task status:** E836's CPU, service/data/audio/save, app, GPU, and RE scouts found no newly READY product task. No game acceptance gate advanced; preserve the slot-309 gate.
 - **Files changed in E840:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, `docs/checkpoints/2026-10-27-e838-publication-closeout-e839.md`, and `docs/checkpoints/2026-10-27-e839-publication-closeout-e840.md`. No product source changed.
-- **Next exact action:** finish E840 documentation gates and publish under owner identity; continue product work only when a documented dependency/input changes.
+- **Next exact action:** continue product work only when a documented dependency/input changes; preserve the established task acceptance gates.
 
 ## 2026-10-27 16:54 CDT (`/root`) — E839 close E838 publication and attribution census
 

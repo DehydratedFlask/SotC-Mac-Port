@@ -35,9 +35,9 @@ The standard documentation-publication gates passed:
 | `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure` | **431/431 passed** | `local/validation/orch-20261027/e840/ctest.log` |
 | `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` | **516 passed, 0 skipped, 0 failed** | `local/validation/orch-20261027/e840/lift.log` |
 | `trail build --check` | **9,877 nodes / 13,470 edges**, in sync; deep layer not built | `local/validation/orch-20261027/e840/trail.log` |
-| `python3 scripts/project_index.py` and `python3 scripts/project_index.py --check` | expected **31,953 folders**, final current result after final docs edit | `local/validation/orch-20261027/e840/project-index-{generate,check}.log` |
-| `python3 -I scripts/audit_publish_paths.py` and `--all` | expected **7/7 staged** and **3,057/3,057 tracked** paths | `local/validation/orch-20261027/e840/audit-{staged,all}.log` |
-| `python3 -I scripts/check_commit_attribution.py` | precommit empty range passed; repeat after E840 commit before push | `local/validation/orch-20261027/e840/post-commit-attribution.log` |
+| `python3 scripts/project_index.py` and `python3 scripts/project_index.py --check` | **31,953 folders**, final check current | `local/validation/orch-20261027/e840/project-index-{generate,check}.log` |
+| `python3 -I scripts/audit_publish_paths.py` and `--all` | **7/7 staged** and **3,057/3,057 tracked** paths passed | `local/validation/orch-20261027/e840/audit-{staged,all}.log` |
+| `python3 -I scripts/check_commit_attribution.py` | post-commit E840 range passed before push | `local/validation/orch-20261027/e840/post-commit-attribution.log` |
 
 These checks cover repository build and fixtures only. They do not establish full-port completion or real game boot/audio/save behavior.
 
