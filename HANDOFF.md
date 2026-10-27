@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 16:09 CDT (`/root`) — E832 close slot-309 helper caller census
+
+- **Task/status:** `CPU-01-STARTUP-SLOT-309-HELPER-CALLER-CENSUS-01` is **PARTIAL / STATIC_ANALYSIS_VERIFIED** for two saved-reference rows and one observed byte-level call chain. The only recorded callers are slot-309 `0xa505e0 → 0xa50280` at `0xa50c57` and `0xa50280 → 0xa50440` at `0xa503d7`. The source record's `+0x10` qword is zeroed before this call chain and copied to destination `+0x90`; no nonzero seed or semantic use is proven.
+- **Review:** `/root/slot309_helper_caller_review` approved. Reviewer independently checked the report and artifact hashes, ran the byte-profile and both saved-reference verifiers, and confirmed the limits. Slot 309 remains unregistered; general ownership, unresolved indirect flows, and runtime values remain UNKNOWN; G1 PARTIAL.
+- **Private evidence:** report `local/validation/orch-20261027/e831/slot309-helper-caller-census/REPORT.md`, SHA-256 `b3cdfc8acd527ad3c9717c944472e802349534b098faecb7328c6d0242350559`; replay instructions and exact commands in `REPRODUCE.md`. Root checksum verification passed **24/24** listed files. No source, project, binary, or game runtime change.
+- **Verification correction:** the first root checksum command ran from the evidence subdirectory, although manifest entries are workspace-root relative; it therefore could not open the paths. The corrected command from the workspace root passed all 24 entries. This was a working-directory error, not an analysis failure.
+- **Repository checks:** configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail check passed **9,877 nodes / 13,470 edges** (deep layer not built); project index regenerated and checked current at **31,947 folders**. Logs are under `local/validation/orch-20261027/e832/`.
+- **E831 publication:** claim commit `ca811c2373300b79100880fe801256b55d7f8097` is pushed/fetched; post-E831 remote scan covered 9 branches, 12 PR heads, 0 tags, 15 tips, **2,444 reachable commits**, zero Claude-family identity/credit hits; private stash unchanged.
+- **Files changed for E832:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and this checkpoint.
+- **Next exact action:** keep slot 309 unregistered. Continue only if a distinct, concrete nonzero producer or semantic consumer is supported by existing evidence; otherwise retain the hook boundary and leave ownership UNKNOWN.
+
 ## 2026-10-27 15:59 CDT (`/root`) — E831 claim slot-309 helper caller census
 
 - **E830 publication:** owner commit `3a0d4e52588dc2ca59227fe83a554f381c0a0f8b` is pushed/fetched on `origin/main`; 6 allowlisted docs, exact-range attribution and path/diff checks passed. Post-E830 scan: 9 branches, 12 PR heads, 0 tags, 15 tips, **2,443 reachable commits**, zero Claude-family identity/credit hits; private stash unchanged.
