@@ -1,4 +1,4 @@
-# Shutdown TERM fixture, public attribution, and slot-309 report checkpoint (E773-E781)
+# Shutdown TERM fixture, public attribution, and slot-309 report checkpoint (E773-E782)
 
 - Local date/time: 2026-10-27 07:57 CDT (America/Chicago).
 - Agent / integrator: `/root`.
@@ -236,3 +236,19 @@ no fresh binary import is authorized by this checkpoint.
 - Remaining risks: neither the payload's ownership contract nor an invocation-order edge is known. Do not lift/register slot 309 or select either `*(0x2dfd4b8)` branch on this evidence.
 - Next exact action: commit only the five staged allowlisted docs as owner, run post-commit audits, and push `origin main`; then wait for an authoritative saved-project type/destructor link or a concrete consumer/invocation-order edge. Use the existing saved Ghidra project only, with no fresh binary import.
 - Task status / attempts: **ACTIVE / G1 PARTIAL**, 0 failed semantic hypotheses. This was a read-only report cross-check, not a new semantic hypothesis attempt.
+
+
+## E782: final public scan and slot-309 stop point
+
+- Local date/time: 2026-10-27 08:34 CDT (America/Chicago).
+- Agent / integrator: `/root`.
+- Task IDs: `PUB-01-CLAUDE-CREDIT-CLEANUP-01`; `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`; `APP-01-PROCESS-CLIENT-SHUTDOWN-TERM-ESCALATION-01`.
+- Files changed: `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/TASKS.md`, and this checkpoint.
+- Exact commands/results: `git fetch origin --prune` exited 0; `git rev-parse HEAD` and `git rev-parse origin/main` both returned `98b3cc10d12d742d7456181ab97dfe3ea2696e79`. `python3 -I scripts/check_commit_attribution.py` passed for the synchronized tree. `python3 -I local/validation/orch-20261026/claude-credit-cleanup-review/scan_remote_refs_attribution.py > local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-98b3cc10.json` exited 0.
+- Public scan evidence: report `local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-98b3cc10.json`, SHA-256 `c780eebbf53e86c543d45a3b266fd3333ea22a6d088b5bd63ba876c1a54059d0`; 9 fetched branch heads, 0 remote tags, 2,393 unique reachable commits, and 0 Claude/Anthropic author, committer, or credit-line matches. The scan excludes private `refs/stash`.
+- Pre-commit commands/results: `python3 -I scripts/audit_publish_paths.py` passed 6 staged paths; `python3 -I scripts/audit_publish_paths.py --all` passed 3,013 paths; `python3 -I scripts/check_commit_attribution.py` passed the empty range; `python3 -I scripts/check_commit_attribution.py --identity` passed; `python3 -I scripts/check_commit_attribution.py --all` exited 1 only for `f6604a86e60e` (`orchestrator` / `orchestrator@local`).
+- Pre-commit audit logs and SHA-256: staged paths `local/validation/orch-20261027/e782-final-docs-checkpoint/staged_path.log` (`6320dc13834a84b5ea100aeeb1f4e29e604fe41f2d405da103d16ca4b8e2d66c`); full tree `local/validation/orch-20261027/e782-final-docs-checkpoint/all_path.log` (`2c2ed65cd259576fa6d92667e0b3ee100cd563754980efab77acf06c95b815b4`); attribution range `local/validation/orch-20261027/e782-final-docs-checkpoint/attribution_range.log` (`72d954d7873849934ae10cdf5ad4049069928f3c6b433f3e7e44743823e63f33`); identity `local/validation/orch-20261027/e782-final-docs-checkpoint/attribution_identity.log` (`888507b0410bfc1aa9548e21b4bd5bdaa271389b1515786e902bc91722c90559`); all-history `local/validation/orch-20261027/e782-final-docs-checkpoint/attribution_all.log` (`f67c8b2dabf442366fbc8922353feda1e6bbd31ffc26b3537d5161e8c1adad44`).
+- Observations vs inference: the fetched-ref scan directly verified the GitHub history at `98b3cc10`. The E781 report cross-check directly verified that current saved reports do not establish payload ownership or the invocation order for `0x531d60`; no native-lift boundary is supported.
+- Remaining risks: 70 stash-only Claude matches remain unchanged by owner direction; `--all` still reports only the unrelated `orchestrator@local` history; slot 309 stays unregistered with both `*(0x2dfd4b8)` branches preserved; boot, audible game content, real save/reload, Metal validation, and forbidden-runtime absence remain unverified.
+- Next exact action: commit these six staged allowlisted docs as owner, run post-commit attribution/path checks, and push `origin main`; then leave CPU-01 active pending authoritative type/destructor linkage or a concrete call-consumer/order edge. Use the saved project only; no fresh binary import.
+- Task status / attempts: PUB-01 **ARTIFACT_VERIFIED** for fetched public refs, 0 failed hypotheses; APP-01 TERM fixture **FIXTURE_VERIFIED**, one failed readiness iteration and 0 failed semantic hypotheses; CPU-01 slot 309 **ACTIVE / G1 PARTIAL**, 0 failed semantic hypotheses.

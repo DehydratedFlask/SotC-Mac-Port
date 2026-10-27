@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 08:34 CDT (`/root`) — E782 final public scan and slot-309 stop point
+
+- **Task IDs:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`; `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`; `APP-01-PROCESS-CLIENT-SHUTDOWN-TERM-ESCALATION-01`.
+- **Files changed:** `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/TASKS.md`, and `docs/checkpoints/2026-10-27-app01-shutdown-term-escalation.md`.
+- **Exact command/result:** after confirming `HEAD == origin/main == 98b3cc10d12d742d7456181ab97dfe3ea2696e79`, `python3 -I local/validation/orch-20261026/claude-credit-cleanup-review/scan_remote_refs_attribution.py > local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-98b3cc10.json` exited 0. It scanned 9 fetched heads, 0 remote tag refs, 2,393 unique reachable commits, and found zero Claude/Anthropic matches. Report SHA-256 `c780eebbf53e86c543d45a3b266fd3333ea22a6d088b5bd63ba876c1a54059d0`.
+- **Pre-commit audits:** staged/full path audits passed 6/6 and 3,013/3,013; empty-range and owner-identity attribution checks passed; `--all` still reports only the unrelated historical alias. Exact log hashes are listed in the checkpoint.
+- **Observation vs inference:** 98b3cc10 was pushed by owner identity and passed the post-commit attribution range/identity audits; the full fetched-ref scan at that remote head directly found no Claude/Anthropic matches. A final E782 docs commit will likewise be checked individually before push.
+- **Remaining risks:** 70 Claude-attributed commits remain only in private `refs/stash` per owner choice; all-history attribution audit still flags unrelated `orchestrator@local`; slot 309 payload ownership and `0x531d60` invocation order remain unresolved; native-port acceptance is incomplete.
+- **Next exact action:** commit these six staged allowlisted docs as owner, run post-commit attribution/path checks, and push `origin main`; then leave CPU-01 active pending authoritative type/destructor linkage or a concrete call-consumer/order edge. Reuse existing Ghidra data only; no fresh import.
+- **Task status / attempts:** PUB-01 **ARTIFACT_VERIFIED** for fetched GitHub refs, 0 failed hypotheses; APP-01 TERM fixture **FIXTURE_VERIFIED**, one failed readiness iteration and 0 failed semantic hypotheses; CPU-01 slot 309 **ACTIVE / G1 PARTIAL**, 0 failed semantic hypotheses.
+
 ## 2026-10-27 08:31 CDT (`/root`) — E781 slot-309 saved-report cross-check
 
 - **Task ID:** `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`.
