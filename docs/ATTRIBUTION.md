@@ -439,3 +439,12 @@ does, prevents that.
   left unchanged. Independent review reproduced both reports. See E805 and the
   [closeout checkpoint](checkpoints/2026-10-27-e804-publication-closeout.md). Unreachable objects
   and contributor-graph rendering are outside this evidence.
+- After E805 `e3821edda7685e24899020a28d225c398644e711` was pushed, the all-advertised-ref scan
+  covered 21 GitHub refs (9 branches, 12 pull-request heads, 0 tags), **2,417 unique commits**, with
+  zero Claude/Anthropic identity or credit-line matches (SHA-256
+  `cddda7c867b82e1530f498dc814eee50944f23c6ff85e6716215ee1edc30bf37`). Local scan covered 25
+  non-stash refs / 2,417 commits, also zero (SHA-256
+  `9b386897a1a65b0ec45e4a4c6974e59320d9880257e8018150ddf9a0b3121c86`). Stash remains 768/70;
+  its current 21-tip reflog union remains 826/70, unchanged. See E806 and the
+  [closeout checkpoint](checkpoints/2026-10-27-e804-publication-closeout.md). Unreachable Git
+  objects and contributor-graph rendering are not covered.
