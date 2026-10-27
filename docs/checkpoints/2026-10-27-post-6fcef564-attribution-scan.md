@@ -12,3 +12,16 @@
 - **Scope and limits:** this verifies the fetched GitHub refs. Private `refs/stash` remains excluded and unchanged per owner direction; 70 Claude-only matches remain there. It does not claim the native port or runtime gates are complete.
 - **Next exact action:** stage only the allowlisted docs, commit under the owner identity, push `origin main`, fetch, and audit the new commit range. Continue the project from an evidence-bounded task; slot 309 stays at its unresolved ownership/invocation-order boundary.
 - **Status/attempts:** fetched public refs **ARTIFACT_VERIFIED** at the scanned head; 0 failed hypotheses. Native-port gates remain incomplete.
+
+## E786 — owner closeout commit publication
+
+- **Date/time:** 2026-10-27, 09:00 CDT.
+- **Agent/task:** `/root`; `PUB-01-CLAUDE-CREDIT-CLEANUP-01`.
+- **Commit:** `8aa90e39d678a32cbaa49a880cfdf83d5bddeb39`, owner `Johnny Wang <dehydratedflask@users.noreply.github.com>`, message `docs: close out post-push attribution verification`.
+- **Commands/results:** `git push origin main` exited 0, updating `6fcef564..8aa90e39`. Subsequent `git fetch origin --prune` exited 0; `HEAD == origin/main == 8aa90e39d678a32cbaa49a880cfdf83d5bddeb39`; working tree clean. Post-commit `python3 -I scripts/check_commit_attribution.py --range 6fcef564..HEAD` and `--identity` passed. The explicit seven-path and full-tree publication audits passed (**7/7**, **3,015/3,015**).
+- **Attribution scope:** the E785 all-ref scan is at `6fcef564` and directly covers 9 fetched branch heads / 2,396 reachable commits with zero Claude/Anthropic matches. `8aa90e39` was added afterward and is separately range/identity checked; the scan itself does not include it. The only `--all` failure remains unrelated historical `orchestrator@local` `f6604a86e60e`.
+- **Repository verification:** CMake configure/build exited 0, CTest **431/431**, lift checkers **516 passed / 0 skipped / 0 failed**, staged/full path audits **6/6** and **3,015/3,015**, attribution range/identity checks passed, and staged diff check passed. `python3 scripts/project_index.py` exited 0 at 33,129 indexed folders; transient launcher `.build` churn was restored. `check_commit_attribution.py --all` exited 1 only on the already documented `orchestrator@local` historical identity.
+- **Private logs:** outputs are in `local/validation/orch-20261027/e786-publication/`; SHA256SUMS covers the logs and E785 private scan report. Manifest SHA-256: `b6c5e5fe3f7dca530edcf7e8487bbd27d063569dbdcb626abe383ecdaaa00650`.
+- **Stash boundary:** 70 Claude-only matches remain in private `refs/stash`; the owner explicitly chose to leave them unchanged. They are not branch or remote reachable.
+- **Next exact action:** keep slot 309 unregistered unless authoritative payload ownership/destructor evidence or a concrete `0x531d60` consumer/order edge appears. No existing bounded SAV-01 or SRV-01 child task was found ready by read-only scouts; continue from another specific task only when its evidence scope is concrete.
+- **Status/attempts:** published-history attribution cleanup **ARTIFACT_VERIFIED** for the E785 scanned refs plus separately audited E786 owner commit; 0 failed hypotheses. Native-port gates remain incomplete.

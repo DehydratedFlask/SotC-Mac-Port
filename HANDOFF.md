@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 09:00 CDT (`/root`) — E786 pushed-closeout verification
+
+- **Task ID:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`.
+- **Files changed:** `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/TASKS.md`, and the existing `docs/checkpoints/2026-10-27-post-6fcef564-attribution-scan.md`.
+- **Exact commands/results:** owner commit `8aa90e39d678a32cbaa49a880cfdf83d5bddeb39` was pushed; `git fetch origin --prune` exited 0 and `HEAD == origin/main`. Its post-commit range and owner-identity audits passed; the explicit 7-path and full-tree path audits passed (**7/7**, **3,015/3,015**). The E785 fetched-ref scan at `6fcef564` covered 9 remote heads / 2,396 commits and found zero Claude/Anthropic matches; `8aa90e39` is separately checked. `--all` remains **FAILED** only on historical non-Claude alias `orchestrator@local` (`f6604a86e60e`).
+- **Verification:** CMake configure/build passed, CTest **431/431**, lift checkers **516/0/0**, staged/full path audits **6/6** and **3,015/3,015**, attribution range and owner-identity checks passed, and `git diff --cached --check` passed. `python3 scripts/project_index.py` exited 0 at 33,129 folders; generated `.build` churn was restored and no new checkpoint directory entry was created. Logs and checksum manifest are under `local/validation/orch-20261027/e786-publication/`; manifest SHA-256 `b6c5e5fe3f7dca530edcf7e8487bbd27d063569dbdcb626abe383ecdaaa00650`.
+- **Observations vs inference:** no new public ref was introduced between the E785 scan and this fetch; the 8aa90 closeout commit itself passed the exact-range audit after creation.
+- **Remaining risks:** 70 stash-only Claude-attributed commits remain unchanged per owner choice. CPU-01 slot 309 remains at its unresolved ownership/invocation-order boundary; native-port acceptance is incomplete.
+- **Next exact action:** continue the active project only from a concrete evidence-bounded task; keep slot 309 unregistered until authoritative payload ownership/destructor evidence or a concrete `0x531d60` consumer/order edge appears. Read-only scouts found no ready SAV-01 or SRV-01 child packet.
+- **Task status / attempts:** published fetched-ref history **ARTIFACT_VERIFIED** through `6fcef564` plus separately audited owner commit `8aa90e39`; 0 failed hypotheses. Native-port gates remain incomplete.
+
 ## 2026-10-27 08:54 CDT (`/root`) — E785 post-push verification
 
 - **Task ID:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`.

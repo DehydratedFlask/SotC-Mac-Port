@@ -313,3 +313,8 @@ does, prevents that.
   found zero Claude/Anthropic identity or credit-line matches. Private report SHA-256
   `bb1a1a19850a051e71f0149801d03a810ba566c8eddd0ad38899a1887ba45f76`; see E785 and [the latest
   checkpoint](checkpoints/2026-10-27-post-6fcef564-attribution-scan.md).
+- The subsequent owner closeout commit `8aa90e39d678a32cbaa49a880cfdf83d5bddeb39` passed the
+  post-commit attribution audit for `6fcef564..HEAD`, and fetch verified `HEAD == origin/main`.
+  Thus the E785 all-ref scan covers the public history through `6fcef564`; the new closeout commit
+  is separately checked and contains no assistant attribution. The all-history audit still has
+  only the unrelated historical `orchestrator@local` identity. See E786.
