@@ -121,6 +121,12 @@ pre-push sequence.
   matches. The private report is
   `local/validation/orch-20261026/claude-credit-cleanup-review/remote-scan-after-690eda93.json`;
   see E735 and the [latest scan checkpoint](checkpoints/2026-10-27-post-690eda93-attribution-scan.md).
+- Refreshed after main commit `0fec9e9ede5db82b221034cfbbb2603d34b15a85`: all 9 fetched GitHub
+  branch heads, no remote tag refs, and **2,361 unique reachable commits** were parsed. The scan
+  found zero Claude/Anthropic author or committer identities and zero Claude/Anthropic credit-line
+  matches. The private report is
+  `local/validation/orch-20261026/claude-credit-cleanup-review/remote-scan-after-0fec9e9e.json`;
+  see E737 and the [latest scan checkpoint](checkpoints/2026-10-27-post-0fec9e9e-attribution-scan.md).
 - The historical `f6604a86e60e` `orchestrator@local` author/committer remains the one separate
   `--all` gate finding. It is not a Claude/Anthropic attribution and was not changed by this task.
 
