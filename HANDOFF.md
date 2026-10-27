@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 10:21 CDT (`/root`) — E795 E794 publication verification and final attribution scan
+
+- **Tasks:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; `PUB-01-CLAUDE-CREDIT-CLEANUP-01`.
+- **E794 commit:** `e4e4d20d4f5eb78bd589940a026f3997ea3934e5` (`docs: close out all-ref attribution publication`) was pushed to `origin/main`. Fetch verified clean `main`, `HEAD == origin/main`.
+- **Fresh post-E794 scans:** fetched GitHub scan covers 9 branch heads, 0 tags, **2,406 unique commits**, 0 Claude/Anthropic matches (report SHA-256 `d32c88e68e0cc06dedcdf2f72f328f56f64160c752e1c929d70b04a35428674d`). Local named-ref scan covers 25 refs other than stash, **2,406 commits**, 0 matches. `refs/stash` separately has 768 reachable commits / 70 Claude credit messages, unchanged by user choice (local report SHA-256 `599048a166fc879a59b81b2f137963ce1eb89991fda0dff246545befe5ccf158`).
+- **E795 prepublication gates:** CMake configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail graph **9,876 / 13,469** (deep meaning layer unbuilt); project index generation/check **33,142 folders**, then volatile `launcher/.build` rows were excluded and only the durable checkpoint count advanced 826→827. Staged/full path audits passed **7/7** and **3,023/3,023**; default attribution, owner identity, cached/worktree diff checks passed. Private gate manifest SHA-256 `efcea4b091a0fae9d47b629c9b9c0b79f69a1a4f80726255922815320b08d6f7`.
+- **Scope:** refs currently named by Git and fetched GitHub heads only; unreachable objects are not covered. E794's owner identity, exact range, committed paths, and diff were separately audited before push. No source or history refs were rewritten in this scan.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-e794-final-push-closeout.md`.
+- **Remaining risks:** 70 stash-only matches remain by explicit direction. Native game acceptance remains open (G0/G1 PARTIAL); no boot, actual audio, save/reload, or real Metal scene is claimed. No new dependency-ready game task was found; slot 309 evidence, manual Mac unlock, and an AUD-02 provider query remain blockers for those lanes.
+- **Next exact action:** commit only the seven allowlisted E795 docs as the owner, push `origin main`, and verify that commit's range, identity, and paths. Then resume a bounded native-port task when its evidence or dependency is available.
+- **Task status:** Claude cleanup is **ARTIFACT_VERIFIED** for fetched public refs and all named non-stash refs; 0 failed hypotheses.
+
 ## 2026-10-27 10:15 CDT (`/root`) — E794 E793 attribution checkpoint publication closeout
 
 - **Task IDs:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; `PUB-01-CLAUDE-CREDIT-CLEANUP-01`.

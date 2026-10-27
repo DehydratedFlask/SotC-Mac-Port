@@ -352,3 +352,10 @@ does, prevents that.
   `084a8baa01de2c454d00510c1a4613eef88e410ae5cc1c3c96c893fe55fa15df`; local report SHA-256
   `2d3d6b6f4f91da048efa66c9c545ce6950836786fc52e95304182359ca651449`; see E794 and its
   [publication closeout](checkpoints/2026-10-27-local-ref-attribution-push-closeout.md).
+- After E794 `e4e4d20d4f5eb78bd589940a026f3997ea3934e5` was pushed, a fresh scan covered 9 fetched
+  GitHub heads, 0 tags, and **2,406 unique commits**, with zero Claude/Anthropic identity or
+  credit-line matches. The local scan covered 25 named non-stash refs / 2,406 commits, also zero;
+  the 70 stash matches remain unchanged. Remote report SHA-256
+  `d32c88e68e0cc06dedcdf2f72f328f56f64160c752e1c929d70b04a35428674d`; local report SHA-256
+  `599048a166fc879a59b81b2f137963ce1eb89991fda0dff246545befe5ccf158`; see E795 and its
+  [closeout checkpoint](checkpoints/2026-10-27-e794-final-push-closeout.md).
