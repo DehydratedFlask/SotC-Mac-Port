@@ -1,5 +1,18 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 10:37 CDT (`/root`) — E797 E796 verification and all-archive audio metadata task claim
+
+- **Tasks:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; newly claimed `AUD-01-SEVEN-ARCHIVE-SOUND-PATH-CENSUS-01`.
+- **Starting state:** clean `main` at `896a920ebaeec86f11ecde984b3959dea8fcf64e`, matching `origin/main` after `git fetch origin --prune`.
+- **E796 publication verification:** commit `896a920e` was pushed to `origin/main`; its exact-range attribution check, owner identity, explicit committed-path audit **7/7**, full tracked-path audit **3,024/3,024**, and diff check passed. Fetch confirmed `HEAD == origin/main` and a clean tree.
+- **Fresh post-E796 scans:** fetched GitHub scan covered 9 heads, 0 tags, **2,408 commits**, 0 Claude/Anthropic matches (SHA-256 `23940c2ac2b55614f7de4f59f9b01c4d34490acef2f261a42130a33f7af4ed4d`). Local scan covered 25 non-stash named refs / **2,408 commits**, 0 matches; stash remains at 768 commits / 70 matches, unchanged by the user's explicit choice (SHA-256 `72965f534828888f396704a91df413cce2d1591c7616143713e070f60e936d84`).
+- **New bounded task claim:** census case-insensitive, token-bounded audio/dialogue-related path names across all seven corrected r30 `.members.jsonl` manifests (170,451 metadata rows), plus known audio extension suffixes `.sxd`, `.sxd1`, `.sxd2`, `.hd`, `.bd`; emit exact archive, TOC entry ID, declared decoded size, and path with per-token/archive counts; compare against the existing 86-row audio-header subset. Only JSONL metadata is in scope. Do not open PSARC files or member payloads, extract files, infer codec/dialogue coverage, or claim routing/playback.
+- **E797 claim publication gates:** CMake/build, CTest **431/431**, lift **516/0/0**, Trail **9,876/13,469**, project index generation/check **33,145 folders** (transient private and `.build` inventory excluded from durable `docs/FOLDERS.md`; checkpoint count 828→829) passed. Staged/full path audits passed **7/7** and **3,025/3,025**; attribution, owner identity, and cached diff checks passed. Exact new-commit range and post-push fetch remain next. Gate log manifest SHA-256 `8ddd322c71f213a6e4bd4536f8054237c61fda7ff36fb7766df48c0b25fa6abb` under `local/validation/orch-20261027/e797-publication/`.
+- **Files changed for E797 claim:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-aud01-seven-archive-sound-path-claim.md`.
+- **Remaining risks:** stash-only attribution matches remain by choice. Native-game acceptance is still open; no game boot, actual audio, real save/reload, or gameplay Metal frame is claimed. Slot 309 ownership/call order, APP-01 manual unlock, and the AUD-02 provider-query boundary remain blockers for those separate lanes.
+- **Next exact action:** publish this task claim, then run `python3 -I local/validation/orch-20261027/aud01-seven-archive-sound-path-census/census.py` against only the seven JSONL manifests and the already-corrected `audio-headers.json`; verify input hashes and row counts before and after, and publish only summarized path metadata.
+- **Task status / attempts:** attribution is **ARTIFACT_VERIFIED** through E796 across fetched GitHub refs and named non-stash local refs. The new metadata census is **ACTIVE**, 0 failed hypotheses.
+
 ## 2026-10-27 10:29 CDT (`/root`) — E796 post-E795 all-ref attribution closeout
 
 - **Tasks:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; `PUB-01-CLAUDE-CREDIT-CLEANUP-01`.

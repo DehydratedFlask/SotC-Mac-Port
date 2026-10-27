@@ -367,3 +367,11 @@ does, prevents that.
   `0ccde4532f8ef1649c8f9e64bf58f1c38edca1dfddf8b09bf1a3a9e7a651e7da`; see E796 and its
   [closeout checkpoint](checkpoints/2026-10-27-e795-final-publication-closeout.md). Scans cover
   named refs and fetched heads, not unreachable Git objects.
+- After E796 `896a920ebaeec86f11ecde984b3959dea8fcf64e` was pushed, the fetched-ref scan covered 9
+  GitHub heads, 0 tags, and **2,408 reachable commits**, with zero Claude/Anthropic identities or
+  credit lines. The local scan covered 25 named non-stash refs / 2,408 commits, also zero; the 70
+  stash matches remain unchanged by user choice. Remote report SHA-256
+  `23940c2ac2b55614f7de4f59f9b01c4d34490acef2f261a42130a33f7af4ed4d`; local report SHA-256
+  `72965f534828888f396704a91df413cce2d1591c7616143713e070f60e936d84`; see E797 and its
+  [closeout checkpoint](checkpoints/2026-10-27-aud01-seven-archive-sound-path-claim.md). The scan
+  covers fetched GitHub heads and named local refs, not unreachable Git objects.
