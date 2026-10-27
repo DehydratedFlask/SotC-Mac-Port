@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 03:12 CDT (`/root`) — post-`60b5947c` public-ref attribution scan (E764)
+
+- After pushing owner-authored checkpoint `60b5947ca80695424d7fb2ecfacc269958b301ce`, `git fetch origin --prune` and the remote scanner exited 0. It parsed 9 branch heads, 0 tags, and 2,382 reachable commits with zero Claude/Anthropic matches. E764 and the private report hash are recorded in `docs/EVIDENCE.md` and `docs/checkpoints/2026-10-27-post-60b5947c-attribution-scan.md`.
+- The E762 all-local-ref scan found 70 matching commit objects only under `refs/stash`; they remain unchanged pending the owner's scope answer. The active CPU-01 slot-309 boundary is still unresolved; there is no new evidence to close writer order or local-record lifetime.
+- Configure/build exit 0; CTest **431/431**; lift sweep **516/0/0**; Trail wiring graph in sync with 9,875 deep nodes pending; project index exit 0 with 33,104 folders, retaining only durable `docs/checkpoints` 810→811. Full logs are in `local/validation/orch-20261027/slot309-checkpoint/e764/`.
+- Staged/all path audits **7/3,007** pass; unpublished and identity attribution checks exit 0; `--all` exits 1 only for historical non-Claude `f6604a86e60e`.
+- **Next exact action:** commit only allowlisted documentation as owner, push `origin main`, and refresh the public-ref scan. Keep stash refs unchanged until the scope decision arrives.
+
 ## 2026-10-27 03:07 CDT (`/root`) — post-`1a44ce55` public-ref attribution scan (E763)
 
 - Published checkpoint `1a44ce550f10045989de544142b80501dc929d2f` to `origin/main`; the remote scan then exited 0 and found zero Claude/Anthropic matches across 9 fetched heads, 0 tags, and 2,381 reachable commits. New docs checkpoint: `docs/checkpoints/2026-10-27-post-1a44ce55-attribution-scan.md`, with E763 in `docs/EVIDENCE.md` and updates to `docs/ATTRIBUTION.md`, `docs/INDEX.md`, and `docs/TASKS.md`. Configure/build exit 0; CTest **431/431**; lift sweep **516/0/0**; Trail wiring graph in sync with 9,875 deep nodes pending; project index exit 0 with 33,103 folders, retaining only durable `docs/checkpoints` 809→810 in FOLDERS. Exact logs are in `local/validation/orch-20261027/slot309-checkpoint/e763/`.
