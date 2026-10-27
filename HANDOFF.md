@@ -1,5 +1,18 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 09:43 CDT (`/root`) — E791 SXDF/SXDS saved-evidence census; publication pending
+
+- **Task ID:** `AUD-01-SXDF-READER-CANDIDATE-01`.
+- **Starting state:** `git status --short --branch && git rev-parse HEAD && git rev-parse origin/main` exited 0; clean `main`, local and remote both `01f166fd784b1d1fea80ba541d4e865c86957b9e`.
+- **Exact query:** `python3 -I local/validation/orch-20261027/aud01-sxdf-reader-census/search_saved_evidence.py` exited 0. It scanned 3,453 hash-bound textual exports under `local/re`, skipped 0 at the 256 MiB cap, and wrote `local/validation/orch-20261027/aud01-sxdf-reader-census/search.json` (query SHA-256 `48b0f699775bc4fd4d047205374f772086e4ac9a51d23be728d18a9cbb0305da`; report SHA-256 `925d11c79d63a7e9f24d4fc720d37abda2537247904e8a30ed385fa839f8e712`).
+- **Findings:** 91 raw case-insensitive substring hits collapse to 89 repetitions of import NID `m0iS6jNsXds` plus two `.sxd` registry rows. The NID resolves in `local/re/imports.json` to `libScePosix/libkernel:sched_get_priority_min` at `0x1600c58`, not `SXDS`. The two `.sxd` hits are the FourCC row in saved `platform-tag-147e20` reports; it maps to `_cmn`, registered at `0xa60d60` and inserted at `0xa60db1`. `owner-installer-2569d0` records caller `0x2569d0` at `0x256b1e`. These are platform-tag registry setup, not an asset reader or decoder. Independent review scanned 4,135 saved text/report files and reached the same scoped conclusion (sorted path/hash manifest SHA-256 `218b8ae0951ec4eb0ee03acb96deca9a7104ad63e44ee6732c34a5b573cca050`).
+- **Observation vs inference:** no `SXDF`/`SXDS` framing reference or `.sxd` reader/decoder candidate appeared in the inspected saved text exports. This does not establish global absence from unexported analysis or other evidence types. Codec/framing/routing/playback remain UNKNOWN. No binary was reimported, original code executed, or PSARC/member payload opened.
+- **Pre-publication checks:** CMake configure and build exited 0 (`ninja: no work to do`); CTest **431/431**; lift checkers **516 passed / 0 skipped / 0 failed**; `trail build --check` passed at **9,876 nodes / 13,469 edges** (deep meaning layer not built); project index generation and `--check` passed at **33,134 folders**. Regenerable `launcher/.build` inventory churn was excluded; the durable `docs/checkpoints` count advanced 822→823. After staging, the full path audit passed **3,019/3,019** and staged audit **7/7**; default attribution audit passed (`origin/main..HEAD`); `git diff --check` and owner identity (`Johnny Wang <dehydratedflask@users.noreply.github.com>`) passed. Post-commit checks remain.
+- **Private gate-manifest SHA-256:** `604267d17c33ca46383b120b91e216c970cb2ff5f745cf30352fdf184d96cc29` (`local/validation/orch-20261027/aud01-sxdf-reader-census/prepublication-SHA256SUMS`).
+- **Files changed:** `HANDOFF.md`, `docs/ASSETS.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/FOLDERS.md`, `docs/INDEX.md`, and `docs/checkpoints/2026-10-27-aud01-sxdf-reader-census.md`.
+- **Next exact action:** stage only those seven allowlisted docs; run cached diff-check and staged-path audit; commit as the owner, push `origin main`, fetch and verify the new commit, then run the fetched-ref attribution scan.
+- **Task status / attempts:** census `STATIC_ANALYSIS_VERIFIED`, 0 failed tries; publication pending. No audio or native game gate advances.
+
 ## 2026-10-27 09:34 CDT (`/root`) — E789 publication closeout and post-push attribution scan
 
 - **Task IDs:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`; `AUD-01-MUSIC-BGM-PATH-CENSUS-01`; newly claimed `AUD-01-SXDF-READER-CANDIDATE-01`.

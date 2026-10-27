@@ -108,6 +108,14 @@ music/BGM path-name candidates are:
 These are path-name candidates only. They do not establish content format, codec, dialogue
 coverage, engine routing, or playback. No game-audio gate is promoted.
 
+An E791 hash-bound review of existing saved Ghidra/REA text exports found `.sxd` only as a
+FourCC row in the platform-tag registry: `0xa60d60` registers it with `_cmn`, and the owner
+installer `0x2569d0` calls that registration at `0x256b1e`. This is platform-tag setup, not an
+asset reader or decoder. The apparent `SXDS` substring in import NID `m0iS6jNsXds` resolves to
+`sched_get_priority_min`; no `SXDF`/`SXDS` reader evidence was found in the scanned exports.
+That scoped no-hit does not prove a reader is absent from unexported analysis or other evidence
+types. The audio codec and framing remain **UNKNOWN**; see the [E791 checkpoint](checkpoints/2026-10-27-aud01-sxdf-reader-census.md).
+
 The 290 `.sts_cp3` paths in each cachedFiles layer are all 120 bytes, and every base/patch
 pair is byte-identical. The selected `b_info_01.sts_cp3` is 120 bytes in each layer, at actual
 TOC IDs 13,300 (base) and 13,302 (patch). E55's 344/561-byte probe and the former all-290
