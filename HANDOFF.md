@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 18:17 CDT (`/root`) — E850 reconcile E849 and claim one AUD-01 asset probe
+
+- **E849 publication now verified:** `ce02512e76c3b6d80d3604d40b96ef63d6c7bfb5` is the owner-authored/committed `main` head; a fresh exact-range attribution check, identity check, fetch and `HEAD == origin/main == FETCH_HEAD` check all pass. The worktree was clean before this checkpoint.
+- **Fresh live attribution census:** the read-only scan after E849 covers 21 advertised refs (9 branches, 12 PR heads, 0 tags), 15 unique tips and 2,462 reachable commits with zero Claude/Anthropic identity or credit-line matches. Private stash history remains unchanged at 826 commits / 70 matches per owner choice.
+- **Claimed task:** `AUD-01-PAKN-MUSIC-SXD1-BYTE-STRUCTURE-01`, `/root`, 0 failed attempts. Read only `sound/shadow/music.sxd1` from local `pakN.psarc` in memory after matching the full archive pin and corrected manifest row (TOC 27715, 9,872 B). Produce a private hash-bound byte-structure profile; no member payload file, codec/NGS2 semantics, gameplay-use, routing, or playback claim. Product acceptance remains open.
+- **Owned paths:** this task's private evidence only under `local/validation/orch-20261027/e850/aud01-music-sxd1-structure/`; root owns the task docs and publication. Do not edit `reference/` or original game inputs.
+- **E850 repository gates:** configure/build passed; CTest passed 431/431; lift checkers passed 516/0/0; Trail is current at 9,877 nodes (deep layer unbuilt); project index is current at 31,979 folders. Staged/full publication audits passed 6/6 and 3,067/3,067; staged/worktree diff checks and owner identity passed. One initial staged diff check found two trailing spaces and one project-index check was stale after a private log was added; both were corrected and the final checks pass. Precommit fetch confirms `HEAD == origin/main == FETCH_HEAD == ce02512e76c3b6d80d3604d40b96ef63d6c7bfb5`. E850's exact-range check, commit, push and fetch verification are pending. Logs are under `local/validation/orch-20261027/e850/`.
+- **Next exact action:** commit only the six audited documentation paths under Johnny Wang, exact-range check the new commit, push `origin main`, and fetch-verify; then hash-check the current archive and manifest, profile TOC 27715 in memory, and obtain independent replay/review.
+
 ## 2026-10-27 18:10 CDT (`/root`) — E849 close E848 publication and verify current attribution
 
 - **Task status:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01` is `ARTIFACT_VERIFIED` for the live advertised refs through E848. The owner chose to leave private stashes unchanged. `RE-02-APPMAIN-INIT-B11290-STRUCTURE-01` remains `STATIC_ANALYSIS_VERIFIED` only for its bounded byte/profile dossier; broader RE-02, G1 and game acceptance remain incomplete.
