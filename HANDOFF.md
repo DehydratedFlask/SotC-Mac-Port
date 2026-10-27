@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-26 23:41 CDT (`/root`) — slot 309 Ghidra startup timed out once
+
+- Task: `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`, ACTIVE. The project analyzer result is recorded in E715: ELF SHA `d0723afb…61d3`, exact span 1,891 B, 353 instructions, 40 direct-call sites/10 targets, one branch edge, 73 RIP refs/18 stores, and three indirect sites.
+- Exact failed tool attempt: targeted REA/Ghidra function analysis returned `provider_timeout` at 330,000 ms, Ghidra 12.1.4, run ID `5d058cf8-d93f-4b82-b998-65a9342b551d`; headless import/analyze did not complete, no evidence ID or coverage. This is a tool/provider failure, not a semantic hypothesis. One `resolve_native_call_targets` request for `0xa5073c` remains pending; no retry of the same startup call is planned. No code or shared source changed.
+- Files changed in this checkpoint: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md` (E715), and `docs/checkpoints/2026-10-26-slot309-characterization-claim.md`. Private analyzer JSON: `local/validation/orch-20261026/slot309/slot_struct_analyzer.json`.
+- Status: **ARTIFACT_VERIFIED** for analyzer output only; CFG completeness, callee behavior, indirect targets, and native-lift feasibility remain UNKNOWN. Failed semantic hypotheses 0; provider timeouts 1. Next exact action: wait for the single pending targeted callee query, then have the worker return its final report for root replay or report the unresolved query as PARTIAL.
+
 ## 2026-10-26 23:40 CDT (`/root`) — slot 309 analyzer artifact captured
 
 - Task: `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`, ACTIVE with 0 failed hypotheses; the worker `/root/trail_scope_audit` has read the linked project docs and used Graft/Trail before source inspection. No shared source was edited.

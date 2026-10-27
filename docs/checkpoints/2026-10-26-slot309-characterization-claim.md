@@ -42,3 +42,13 @@ outside-image references. It identifies three indirect calls at `0xa5073c`, `0xa
 
 These measurements do not resolve the indirect calls or prove the analyzer's graph complete. REA
 overview/callee correlation is still running; root replay and a liftability decision remain pending.
+
+## REA startup attempt
+
+The worker's targeted REA/Ghidra function-analysis attempt timed out once at the configured
+330,000 ms startup deadline (Ghidra 12.1.4, run ID
+`5d058cf8-d93f-4b82-b998-65a9342b551d`). Headless import/analyze started but did not complete; no
+function Evidence ID or coverage result was returned. This is one provider/tool failure, not a
+failed semantic hypothesis. One focused `resolve_native_call_targets` query for indirect site
+`0xa5073c` is still pending; the worker will not repeat the same startup attempt. The body remains
+only **ARTIFACT_VERIFIED** by the project analyzer until a successful correlation and root replay.
