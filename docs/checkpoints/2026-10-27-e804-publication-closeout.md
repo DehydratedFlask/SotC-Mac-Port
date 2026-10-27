@@ -105,5 +105,39 @@
 
 - **Observation vs inference:** reachable refs, commit metadata/messages, scan counters, report hashes, and command outputs are observations. No claim is made about unreachable objects or GitHub contributor-graph rendering.
 - **Remaining native-port blockers:** slot 309 ownership/invocation order remains unresolved; APP-01 VoiceOver awaits an unlocked Mac; AUD-02 awaits an authorized provider-query scope. Read-only task triage found no READY native implementation task. No actual game boot, game audio, real save/reload, or gameplay Metal frame is established.
-- **Next exact action:** publish these six allowlisted docs, verify E808's commit and fetched tip, then resume only when a bounded native task is unblocked.
-- **Task status / attempts:** public attribution cleanup **ARTIFACT_VERIFIED** through E807; E808 closeout active, 0 failed hypotheses. Overall native-port goal remains active and incomplete.
+- **Next exact action (completed in E809):** publish these six allowlisted docs and verify E808's commit and fetched tip.
+- **Task status / attempts:** public attribution cleanup **ARTIFACT_VERIFIED** through E808; E808 closeout completed in E809, 0 failed hypotheses. Overall native-port goal remains active and incomplete.
+
+## E809 — Verify E808 and close the public attribution task
+
+- **Date/time:** 2026-10-27 12:12 CDT.
+- **Agent / integrator:** `/root`.
+- **Task:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`.
+- **Starting state:** E808 `968717d483bdb4b412b08751c7525d042f42c8ec` was pushed to `origin/main`; post-push fetch and independent review confirmed matching HEAD and a clean worktree.
+
+### E808 exact commit verification
+
+- Exact-range attribution and owner identity passed; author and committer are Johnny Wang `<dehydratedflask@users.noreply.github.com>`.
+- Explicit committed-path audit passed **6/6**; full tracked-path audit passed **3,031/3,031**; committed diff check passed. The six paths are `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, and this closeout checkpoint.
+- Local HEAD, `origin/main`, and live GitHub `main` all resolve to `968717d483bdb4b412b08751c7525d042f42c8ec`.
+
+### Fresh scans after E808
+
+- Live census: **21 GitHub refs** (9 branch heads, 12 pull-request heads, 0 tags), **2,420 reachable commits**, zero Claude/Anthropic matches. The scan log at `local/validation/orch-20261027/e808-closeout/all-advertised-ref-scan-after-968717d4.log` has SHA-256 `cb58878d86ea33afe421f8d4088e6a4023015344e2527151bb744312811c2ddf`.
+- Local census: **25 non-stash refs / 2,420 commits**, zero matches. Summary report at `local/validation/orch-20261027/e808-closeout/local-scan-after-968717d4.json` has SHA-256 `308d3b250e8ee402004d4ac67e9d51b003782c5a494e32b342eba6969d0091ea`.
+- Independent review reproduced the live refs, commit counts, classes, hashes, E808 identity, changed paths, and tip. Stash remains unchanged per the user's choice: **768 commits / 70 message-credit matches** in the current ref and **826 / 70** across 21 reflog tips, with no identity hits.
+- These scans cover current advertised and named refs, not unreachable objects or the rendered GitHub contributor graph.
+
+### E809 precommit gates
+
+- CMake configure/build exited 0 (build had no work); CTest passed **431/431**; lift checkers passed **516/516**, with no skips or failures; `trail build --check` passed with the **9,876-node wiring graph in sync** (deep layer unbuilt).
+- Project-index generation and check passed at **33,158 folders** on the generated snapshot. Generated `docs/FOLDERS.md` differed only by transient `launcher/.build` rows; after discarding them, a fresh `--check` reports only that file stale. The durable checkpoint count remains 835. Both check results are retained in the logs.
+- Staged/full publish-path audits passed **6/6** and **3,031/3,031**; default attribution (`origin/main..HEAD`), effective owner identity, and cached diff checks passed.
+- Gate-log manifest SHA-256 `ef76e3345943ddaa73b70b3a36ad3c99a8aaf27767cd4ab19d96812aed19a77d`. Logs: `local/validation/orch-20261027/e809-closeout/`.
+
+### Status and next action
+
+- **Observation vs inference:** ref names, reachable commit records, scan counters, report hashes, and command results are direct observations; no unreachable-object or contributor-graph claim is made.
+- **Remaining native-port blockers:** slot 309 ownership/invocation order remains unresolved; APP-01 VoiceOver awaits an unlocked Mac; AUD-02 awaits an authorized provider-query scope. Current task triage found no READY native implementation task. Native boot, game audio, real save/reload, and gameplay Metal remain unproven.
+- **Next exact action:** publish this allowlisted closeout, verify E809, and leave the repository ready for the next task whose prerequisites are available.
+- **Task status / attempts:** public attribution cleanup **ARTIFACT_VERIFIED** through E808; E809 closeout active, 0 failed hypotheses. Overall native-port goal remains active and incomplete.

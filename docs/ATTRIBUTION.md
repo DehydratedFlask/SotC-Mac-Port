@@ -468,3 +468,13 @@ does, prevents that.
   768/70 and its 21-tip reflog union 826/70, unchanged per user choice. See E808 and the
   [closeout checkpoint](checkpoints/2026-10-27-e804-publication-closeout.md). Unreachable Git
   objects and contributor-graph rendering are not covered.
+- After E808 `968717d483bdb4b412b08751c7525d042f42c8ec` was pushed, the live advertised-ref scan
+  covered 21 GitHub refs (9 branches, 12 pull-request heads, 0 tags), **2,420 unique commits**,
+  and zero Claude/Anthropic matches (scan log SHA-256
+  `cb58878d86ea33afe421f8d4088e6a4023015344e2527151bb744312811c2ddf`). Local scan covered 25
+  non-stash refs / 2,420 commits, also zero (summary report SHA-256
+  `308d3b250e8ee402004d4ac67e9d51b003782c5a494e32b342eba6969d0091ea`). Independent review
+  reproduced the counts and match classes. Stash remains 768/70; the 21-tip reflog union remains
+  826/70, unchanged by user choice. See E809 and the
+  [closeout checkpoint](checkpoints/2026-10-27-e804-publication-closeout.md). Unreachable Git
+  objects and contributor-graph rendering are not covered.

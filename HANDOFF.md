@@ -1,5 +1,19 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 12:12 CDT (`/root`) — E809 verify E808 and close public attribution work
+
+- **Task:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; record E808 post-push verification and final public-ref scan.
+- **Starting state:** E808 `968717d483bdb4b412b08751c7525d042f42c8ec` is pushed; fetch and independent review confirm clean `HEAD == origin/main`.
+- **Files changed:** pending.
+- **E808 exact checks:** post-push exact-range attribution and owner identity passed; explicit six-path audit **6/6**, full tracked-path audit **3,031/3,031**, and committed diff check passed. Author/committer are Johnny Wang `<dehydratedflask@users.noreply.github.com>`; fetch and independent review confirmed `HEAD == origin/main == 968717d483bdb4b412b08751c7525d042f42c8ec` and clean status.
+- **Fresh census after E808:** 21 live GitHub refs (9 branches, 12 pull-request heads, 0 tags) reach **2,420 commits**, zero Claude/Anthropic matches (scan log SHA-256 `cb58878d86ea33afe421f8d4088e6a4023015344e2527151bb744312811c2ddf`). Local census: 25 non-stash refs / **2,420 commits**, zero matches (report SHA-256 `308d3b250e8ee402004d4ac67e9d51b003782c5a494e32b342eba6969d0091ea`). Independent review reproduced all counts and match classes.
+- **Stash:** unchanged per user choice: 768 commits / 70 message-credit matches; 21 reflog tips reach 826 / the same 70 matches; no identity hits.
+- **Independent task triage:** no READY native implementation task. Slot 309 still lacks ownership/order evidence; APP-01 awaits an unlocked Mac; AUD-02 awaits authorized query scope.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, `docs/checkpoints/2026-10-27-e804-publication-closeout.md`.
+- **E809 precommit gates:** CMake configure/build exited 0 (no build work); CTest **431/431**; lift checkers **516 passed / 0 skipped / 0 failed**; Trail check passed (9,876-node wiring graph in sync; deep layer unbuilt). Project-index generation/check passed at **33,158 folders** on the generated snapshot. Generated `docs/FOLDERS.md` differed only by transient `.build` rows; after discarding them, a fresh `--check` reports only that file stale. Staged/full path audits passed **6/6** and **3,031/3,031**; default attribution, owner identity, and cached diff checks passed. Logs: `local/validation/orch-20261027/e809-closeout/`; gate-log manifest SHA-256 `ef76e3345943ddaa73b70b3a36ad3c99a8aaf27767cd4ab19d96812aed19a77d`.
+- **Next exact action:** publish the six allowlisted docs, verify E809's exact range, identity, paths, and fetched tip, then leave the repository ready for the next unblocked native task.
+- **Task status / attempts:** public attribution cleanup **ARTIFACT_VERIFIED** through E808; E809 closeout active, 0 failed hypotheses. No native game acceptance gate is newly passed.
+
 ## 2026-10-27 12:09 CDT (`/root`) — E808 E807 publication verification and attribution closeout
 
 - **Task:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; verify E807 and refresh the census through it.
@@ -10,8 +24,8 @@
 - **Independent task triage:** `/root/native_task_scout_live` found no READY native implementation task; slot 309 ownership/order, APP-01 unlocked-Mac access, and AUD-02 authorized scope remain unresolved.
 - **E808 precommit gates:** CMake configure/build exited 0 (no build work); CTest **431/431**; lift checkers **516 passed / 0 skipped / 0 failed**; Trail check passed (9,876-node wiring graph in sync; deep layer unbuilt). Project-index generation and check passed at **33,157 folders** on the generated snapshot. Generated `docs/FOLDERS.md` differed only by transient `.build` rows; after discarding them, a fresh `--check` reports only that file stale. Staged/full path audits passed **6/6** and **3,031/3,031**; default attribution, owner identity, and cached diff checks passed. Logs: `local/validation/orch-20261027/e808-closeout/`; gate-log manifest SHA-256 `f4a2c4cead24eae7a33809744056f95ddd429a955d1c0507f073e72ba90ce0c3`.
 - **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, `docs/checkpoints/2026-10-27-e804-publication-closeout.md`.
-- **Next exact action:** publish the six allowlisted docs, verify E808's exact range, identity, paths, and fetched tip, then resume when a bounded task is unblocked.
-- **Task status / attempts:** public attribution cleanup **ARTIFACT_VERIFIED** through E807; E808 closeout active, 0 failed hypotheses. Overall native-port goal remains active and incomplete.
+- **Next exact action (completed in E809):** publish the six allowlisted docs and verify E808's exact range, identity, paths, and fetched tip.
+- **Task status / attempts:** public attribution cleanup **ARTIFACT_VERIFIED** through E808; E808 closeout completed in E809, 0 failed hypotheses. Overall native-port goal remains active and incomplete.
 
 ## 2026-10-27 12:00 CDT (`/root`) — E807 E806 publication verification and attribution scan
 
