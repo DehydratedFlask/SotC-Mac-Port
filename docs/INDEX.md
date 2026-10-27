@@ -445,3 +445,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Slot-309 indirect-copy lead disposition](checkpoints/2026-10-27-slot309-indirect-vtable-copy-stopped-e833.md) | E833; proposed call fails the E832 continuation gate; analysis not run; ownership UNKNOWN |
 | [E833 publication and Claude-attribution closeout](checkpoints/2026-10-27-e833-publication-closeout-e834.md) | E834; E833 pushed and fetch-verified; all advertised GitHub refs remain Claude/Anthropic-clean |
 | [E834 publication and Claude-attribution closeout](checkpoints/2026-10-27-e834-publication-closeout-e835.md) | E835; E834 pushed and fetch-verified; 2,447 reachable GitHub commits scan clear |
+| [All-lane readiness triage](checkpoints/2026-10-27-ready-lane-triage-e836.md) | E836; CPU, service/data/audio/save, app, GPU, and RE scouts found no newly READY task |
