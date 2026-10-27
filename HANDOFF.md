@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 13:47 CDT (`/root`) — E814 publish index fix and record slot-309 route follow-up
+
+- **Tasks:** publish E813 `DOC-INDEX-LAUNCHER-BUILD-CHURN-01`; record a bounded read-only subtask of `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`.
+- **E813 publication:** commit `442e59186a42f70501b7ae534ab4ec8cfecb996d`, parent `d72870a319d58710152e93144f512a56cd0b20c7`; owner is author and committer. `git push origin main` and `git fetch origin main` exited 0; `HEAD == origin/main == FETCH_HEAD`. Postcommit exact-range attribution, owner identity, committed-tree audit **3,034/3,034**, and `git diff-tree --check` passed. Fresh remote census covers 9 branch refs and 12 PR refs (15 tips; 0 tags), **2,428 reachable commits**, and zero Claude/Anthropic identity or contributor-credit matches. The 70 private stash credit matches remain unchanged by owner choice.
+- **E814 document-closeout gates:** project-tools tests **13/13**; CMake configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail **9,877 nodes / 13,470 edges** in sync; strict project index **31,922 folders**; staged/full path audits **6/6** and **3,035/3,035**; attribution, identity, staged diff and project-index checks passed. Logs are in `local/validation/orch-20261027/e814-closeout/`.
+- **CPU-01 observation:** independent subagent report `local/validation/orch-20261027/slot309/agent-slot309-dispatch/REPORT.md`, SHA-256 `4d0b7e5d23d5f211346ac563e2359a0b6f5b864ed358b926d3e93199cd4db941`, independently reviewed and accepted; root verified its cited logs. Ghidra has zero analyzed incoming refs to aligned cells in `0x15d5b60..0x15d5bc8`; this does not rule out indirect/data-driven/unmodeled/external dispatch. The selected direct path `0x531d60 → 0x255130 → 0x255180 → 0x264e50` constructs an object with vptr `0x159c958`, not the candidate `0x15d5b80` table. The producer/route to `0x15d5b80`, `0x240f0` cleanup order, and general temporary `+0x10` ownership remain unresolved. Slot 309 stays unregistered; G1 PARTIAL.
+- **Limits:** static analysis only; no game code was run, no native-lift boundary was established, and no actual game acceptance gate advanced.
+- **Next exact action:** commit the six explicitly staged docs paths under owner identity; verify the exact commit range/path/diff, push and fetch `main`, then continue by inspecting all `0x240f0` callers against constructor-list timing and searching for an explicit `0x15d5b80` producer/relocation/data-driven consumer. Retain the hook boundary if unsupported. Launcher VoiceOver readiness remains blocked until the Mac is unlocked.
+- **Task status / attempts:** project-index task PUBLISHED / FIXTURE_VERIFIED; slot-309 characterization ACTIVE, 0 failed semantic hypotheses, 2 new tooling-only errors corrected; E814 documentation publication is next.
+
 ## 2026-10-27 13:37 CDT (`/root`) — E813 project-index build-churn fix
 
 - **Task:** `DOC-INDEX-LAUNCHER-BUILD-CHURN-01`; make the required project-index check stable across Swift builds by excluding only ignored `launcher/.build` output and descendants, while retaining detection of ordinary new project folders.
@@ -8,8 +18,9 @@
 - **Change:** `inventory()` prunes exactly the `launcher/.build` subtree, not other `.build` directories. The new fixture proves cache files under that path leave both indexes current, while `other/.build` and a new ordinary module make them stale.
 - **Verification:** `scripts/test_project_tools.py` **13/13**; CMake configure/build exited 0 (`ninja: no work to do`); CTest **431/431**; lift sweep **516/0/0**. Trail was stale for the two changed scripts before rebuild; `trail build` exited 0 and `trail build --check` passed with **9,877 nodes / 13,470 edges** (deep layer not built). `python3 scripts/project_index.py` and `python3 -I scripts/project_index.py --check` both exited 0 at **31,921 folders**. Precommit staged/full path audits passed **8/8** and **3,034/3,034**; range attribution, owner identity, cached diff, and project-index check passed. Current live remote audit: 9 branch refs, 12 PR refs, 0 tags, 15 distinct tips, **2,427 reachable commits**, zero Claude/Anthropic identities or credit lines; `main` equals remote `main`. Stashes were not inspected or changed. Logs: `local/validation/orch-20261027/project-index-fix/`.
 - **Limits:** this only stabilizes generated folder indexes and synthetic fixtures. No game code ran and no game acceptance gate advances. The CPU-01 slot-309 task remains ACTIVE.
-- **Next exact action:** commit the eight explicit allowlisted paths under owner identity, fast-forward push to `origin main`, fetch and verify the tip; then record E814 for publication closeout and the new slot-309 route evidence.
-- **Task status / attempts:** `FIXTURE_VERIFIED`; staged/full path audits passed; commit/push is next; 0 failed implementation hypotheses.
+- **Publication:** owner commit `442e59186a42f70501b7ae534ab4ec8cfecb996d` has been pushed and fetch-verified on `origin/main`; a post-push scan covers **2,428** remote-reachable commits with zero Claude/Anthropic identities or credit lines. The 70 private stash matches remain untouched by owner choice.
+- **Next exact action:** continue the active CPU-01 slot-309 order/lifetime work from E814; do not register slot 309 until the producer/order and general payload contract are supported.
+- **Task status / attempts:** `PUBLISHED / FIXTURE_VERIFIED`; 0 failed implementation hypotheses.
 
 ## 2026-10-27 13:27 CDT (`/root`) — E812 slot-309 direct-order and temporary follow-up
 
