@@ -345,3 +345,10 @@ does, prevents that.
   already-known 70 stash matches in 768 reachable stash commits and left the ref unchanged by user
   direction. Private report SHA-256 `2d2c80f19d83e8bc4d5c1032fbfefed2501599396db1bb5d18480db20b56c5ef`;
   see the [E793 local-ref census](checkpoints/2026-10-27-local-ref-attribution-census.md).
+- After E793 `3797ef7ea3e69439214c7c933ba3a63b55c3abef` was pushed, a fresh scan covered 9 fetched
+  GitHub heads, 0 tags, and **2,405 unique commits**, with zero Claude/Anthropic identity or
+  credit-line matches. The full local named-ref scan also covered 25 non-stash refs / 2,405
+  commits, with zero matches; the 70 stash matches remain unchanged. Remote report SHA-256
+  `084a8baa01de2c454d00510c1a4613eef88e410ae5cc1c3c96c893fe55fa15df`; local report SHA-256
+  `2d3d6b6f4f91da048efa66c9c545ce6950836786fc52e95304182359ca651449`; see E794 and its
+  [publication closeout](checkpoints/2026-10-27-local-ref-attribution-push-closeout.md).

@@ -1,5 +1,19 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 10:15 CDT (`/root`) — E794 E793 attribution checkpoint publication closeout
+
+- **Task IDs:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; `PUB-01-CLAUDE-CREDIT-CLEANUP-01`.
+- **E793 commit:** `3797ef7ea3e69439214c7c933ba3a63b55c3abef` (`docs: record full-ref attribution census and stash scope`) was pushed to `origin/main`. Author/committer are Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Fetch verified `HEAD == origin/main`, clean tree.
+- **Postcommit checks:** `f1ca39c12f41c7b411e997c421427000cc852951..HEAD` attribution and owner identity passed; explicit committed-path audit passed **7/7**; full tracked-path audit passed **3,021/3,021**; diff check passed.
+- **Fresh fetched-ref scan:** scanner parsed 9 GitHub branch heads, 0 tags, and **2,405 unique reachable commits** with zero Claude/Anthropic identities or credit-line matches. Report SHA-256 `084a8baa01de2c454d00510c1a4613eef88e410ae5cc1c3c96c893fe55fa15df`.
+- **Fresh all-local-ref scan:** after fetch, 25 named refs other than `refs/stash` reached **2,405 unique commits** with zero Claude/Anthropic identities or assistant credit/signature matches. `refs/stash` separately remains at 768 reachable commits / 70 Claude-attributed messages, unchanged by owner choice. Post-push report SHA-256 `2d3d6b6f4f91da048efa66c9c545ce6950836786fc52e95304182359ca651449`; pre-push report preserved as `claude-only-scan-prepush.json` with SHA-256 `2d2c80f19d83e8bc4d5c1032fbfefed2501599396db1bb5d18480db20b56c5ef`.
+- **E794 prepublication gates:** CMake configure/build exited 0; CTest **431/431**; lift **516/0/0**; Trail graph **9,876 / 13,469** (deep meaning layer unbuilt); project index generation/check passed at **33,139 folders**, then regenerated `launcher/.build` churn was excluded and only the durable checkpoint count advanced 825→826. Staged/full path audits passed **7/7** and **3,022/3,022**; attribution, owner identity, and diff checks passed. Private gate manifest SHA-256 `2cb8c3614aa1d7e08059957d853446f411eea3d2ec35693f76e5b89c80fa77dd`.
+- **Observation vs inference:** these scans cover refs currently named by Git and fetched GitHub refs, respectively; they do not cover unreachable Git objects. No stash or history refs were rewritten during this census or publication.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-local-ref-attribution-push-closeout.md`.
+- **Remaining risks:** 70 stash-only Claude credit trailers remain intentionally unchanged. The native port remains incomplete; G0/G1 are PARTIAL and no boot/audio/save/Metal acceptance is claimed.
+- **Next exact action:** commit only the seven allowlisted E794 documentation paths under the owner identity, push `origin main`, fetch, and verify the new tip and remote attribution scan; then continue the native-port goal from an evidence-backed task.
+- **Task status:** attribution cleanup **ARTIFACT_VERIFIED** across all non-stash named refs and fetched GitHub refs; no native game gate advanced.
+
 ## 2026-10-27 10:07 CDT (`/root`) — E793 all-ref Claude attribution census
 
 - **Task ID:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`, completing the local-ref boundary for `PUB-01-CLAUDE-CREDIT-CLEANUP-01`.
