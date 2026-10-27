@@ -458,3 +458,13 @@ does, prevents that.
   reproduced both reports. See E807 and the
   [closeout checkpoint](checkpoints/2026-10-27-e804-publication-closeout.md). Unreachable Git
   objects and contributor-graph rendering are not covered.
+- After E807 `c25e48abb06ce645ea04f193a1af2af1686fd79a` was pushed, the live advertised-ref census
+  covered 21 GitHub refs (9 branches, 12 pull-request heads, 0 tags), **2,419 unique commits**,
+  and zero Claude/Anthropic matches (summary report SHA-256
+  `7d3ba7e139b929316aa489002403561d14c799d9b167228077a61e7fe411af80`). Local scan covered 25
+  non-stash refs / 2,419 commits, also zero (summary report SHA-256
+  `402b13304691bf1fd952bd8cc214188be4d5e71752328bb285840c6c10cf3e7a`). The scan reports contain
+  summary counters; independent review separately verified the live ref listing. Stash remains
+  768/70 and its 21-tip reflog union 826/70, unchanged per user choice. See E808 and the
+  [closeout checkpoint](checkpoints/2026-10-27-e804-publication-closeout.md). Unreachable Git
+  objects and contributor-graph rendering are not covered.
