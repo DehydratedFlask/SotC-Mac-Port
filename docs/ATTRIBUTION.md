@@ -478,3 +478,10 @@ does, prevents that.
   826/70, unchanged by user choice. See E809 and the
   [closeout checkpoint](checkpoints/2026-10-27-e804-publication-closeout.md). Unreachable Git
   objects and contributor-graph rendering are not covered.
+- After E833 commit `9869c4c667e4c56975fa6bc2163c862ca475bb3e` was pushed, a live scan of all
+  advertised GitHub branch and PR refs covered 9 branches, 12 PR heads, 0 tags, 15 unique tips,
+  and **2,446 reachable commits**. It found zero Claude/Anthropic author or committer identities
+  and zero coauthor/generated-by credit lines; remote `main` matched the fetched local tip. The
+  owner-selected private stash boundary remains unchanged at `refs/stash` `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`.
+  The captured audit log SHA-256 is `bd4a485f3f07564091c763f8d8aca293f62395eae005941f720aea96965f5959`.
+  See E834 and the [publication closeout](checkpoints/2026-10-27-e833-publication-closeout-e834.md).

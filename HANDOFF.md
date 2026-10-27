@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 16:25 CDT (`/root`) — E834 publish E833 and refresh public attribution
+
+- **E833 publication:** owner commit `9869c4c667e4c56975fa6bc2163c862ca475bb3e` (parent `bbf731830fb4ca59b1fa905cd754b07e67d8ffb3`), subject `docs: stop slot-309 copy lead before analysis`, pushed to `origin main`. Author and committer are Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Fetch confirms `HEAD == origin/main == FETCH_HEAD`, clean.
+- **Attribution:** exact-range attribution passed for E833. After the push, the live advertised-ref audit parsed 9 branch refs, 12 PR heads, 0 tags, 15 unique tips, and **2,446 reachable commits**: zero Claude/Anthropic author/committer hits and zero Claude/Anthropic coauthor/generated-by hits; remote `main` matched. Stash `refs/stash` remains `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8` per owner choice.
+- **Publication audits:** staged path audit passed for the six allowlisted documentation paths; full tracked-path audit passed **3,050/3,050**. A post-commit staged audit found an empty index (expected after commit); exact committed-path audit also passed 6/6. Private logs: `local/validation/orch-20261027/e833/`.
+- **E833 disposition:** proposed `0xa5054d` copy lead is **NOT RUN / STOPPED** because it does not meet E832's nonzero-producer/semantic-consumer gate. No new byte or Ghidra analysis. Slot 309 remains unregistered, `+0x10` ownership and lift boundary UNKNOWN, G1 PARTIAL.
+- **Repository gates:** E833 and E834 CMake configure/build exited 0; CTest **431/431**; lift checkers **516/0/0**; Trail wiring graph **9,877 nodes / 13,470 edges**, in sync (deep layer not built); project index **31,948 folders**, current. E833's first two index checks caught newly created private logs, were recorded, and a regenerated check passed. E834 results are in `local/validation/orch-20261027/e833/e834-*`.
+- **Files changed in the E833/E834 publication sequence:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and the E833/E834 checkpoints. No source, binaries, game inputs, or stashes changed.
+- **Next exact action:** keep the E832 continuation gate. Wait for a concrete nonzero producer or semantic consumer, or a changed external dependency/input that makes another registered task READY. Do not resume the stopped copy-only lead.
+
 ## 2026-10-27 16:20 CDT (`/root`) — E833 stop unqualified slot-309 copy lead
 
 - **Starting state:** `main == origin/main == bbf731830fb4ca59b1fa905cd754b07e67d8ffb3` after E832; only documentation was modified locally. Private stashes were not touched.
