@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 18:36 CDT (`/root`) — E852 close E851 publication and refresh public attribution
+
+- **E851 publication:** `05e1d7ebe71f91967c46866c88009ecb8d245c52` (Johnny Wang) passed exact-range attribution, identity, six-path staged audit, 3,068-path committed-tree audit, and diff checks; pushed and fetch-verified at `origin/main`.
+- **Fresh live attribution census:** 21 advertised refs (9 branches, 12 PR heads, 0 tags), 15 unique tips, 2,464 reachable commits, zero Claude/Anthropic identity or credit-line matches. Private stash left unchanged by owner choice: 21 reflog tips, 826 commits, 70 matches, same `refs/stash` hash. See [E852](docs/checkpoints/2026-10-27-publication-closeout-e851-e852.md).
+- **Bounded asset task:** `AUD-01-PAKN-MUSIC-SXD1-BYTE-STRUCTURE-01` is `ARTIFACT_VERIFIED` for a private in-memory byte profile; independent parser replay matched all 23 fields. This does not establish codec/format, NGS2, game use, routing, or playback. Broader AUD-01 and game audio acceptance remain open; see [E851 profile](docs/checkpoints/2026-10-27-aud01-music-sxd1-profile-e851.md).
+- **E852 docs-only gates:** configure/build passed; CTest 431/431; lift checkers 516/0/0; Trail graph current at 9,877 nodes (deep layer unbuilt); project index regenerated and checked current at 31,984 folders; staged/full path audits 6/6 and 3,069/3,069; owner identity, prior-commit attribution, and diff checks pass. E852's own commit/push/fetch checks remain pending.
+- **Files changed:** E852 updates this handoff, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and the [E852 closeout](docs/checkpoints/2026-10-27-publication-closeout-e851-e852.md); scan and gate logs remain private.
+- **Next exact action:** finish E852 project index and publication audits, commit allowlisted docs under Johnny Wang, exact-range audit, push, fetch-verify, and refresh live attribution. Product acceptance remains incomplete.
+
 ## 2026-10-27 18:32 CDT (`/root`) — E851 complete private SXD1 byte profile and refresh live attribution
 
 - **Completed bounded task:** `AUD-01-PAKN-MUSIC-SXD1-BYTE-STRUCTURE-01` is `ARTIFACT_VERIFIED` for its private in-memory byte profile only; 0 failed attempts. The pinned live archive and exact corrected-manifest/audio-header identity passed; the independent stdlib PSARC/zlib replay matched all 23 reported fields and both archive/member hashes. No payload file was written. The member’s format/codec, NGS2 semantics, game use, routing, playback, and all actual-game audio gates remain unknown/open. Detailed private artifact hashes are in [E851](docs/checkpoints/2026-10-27-aud01-music-sxd1-profile-e851.md).
