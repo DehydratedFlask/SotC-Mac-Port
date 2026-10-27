@@ -35,6 +35,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Attribution scan after e6c8d33e](checkpoints/2026-10-27-post-e6c8d33e-attribution-scan.md) | All 9 remote heads and 2,353 reachable commits scan clean for Claude/Anthropic identities and credit lines |
 | [RDX cached-CFG closeout](checkpoints/2026-10-27-aud02-rdx-cfg-closeout.md) | E728 closes bounded offline argument-origin analysis at static/fixture scope; parent AUD-02 remains partial |
 | [Attribution scan after 9e61358b](checkpoints/2026-10-27-post-9e61358b-attribution-scan.md) | All 9 remote heads and 2,354 reachable commits scan clean for Claude/Anthropic identities and credit lines |
+| [Attribution scan after 53634a15](checkpoints/2026-10-27-post-53634a15-attribution-scan.md) | All 9 remote heads and 2,355 reachable commits scan clean for Claude/Anthropic identities and credit lines |
 | [Startup slot 306 survey](checkpoints/2026-10-25-startup-slot-306-survey.md) | E676 hash-bound table/body/call-footprint characterization; semantics UNKNOWN, 11 indirect calls unresolved, G1 PARTIAL |
 | [Slot 303 checker publication repair](checkpoints/2026-10-24-slot303-publication-repair.md) | Complete function reconstruction removed from public checker; E624 |
 | [Integration PR #9 final closeout](checkpoints/2026-10-25-integration-pr9-final-closeout.md) | PR #9 merged at `a8bd805`; clean-main baseline and branch cleanup verified; E643 |
