@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 00:25 CDT (`/root`) — post-c8f23500 history scan recorded
+
+- `git fetch origin --prune` and the attribution scan both exited 0. All 9 GitHub branch heads, 0 remote tags, and 2,357 unique reachable commits were scanned after `c8f23500f36d030729752ab9a1fbc1a754bd3a0d`; zero Claude/Anthropic identity or credit-line matches (E732). Private report SHA-256 `dd3a2070616c2576efa157a3c630f53608fca54ec2568eecdb21bfcb5e5b571a`; this scan predates the checkpoint now being prepared.
+- Files changed in this documentation checkpoint: `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md` (E732), `docs/INDEX.md`, `docs/TASKS.md`, new `docs/checkpoints/2026-10-27-post-c8f23500-attribution-scan.md`, and generated `docs/FOLDERS.md`. The last F590 leaf acceptance is committed at `c8f23500` as **FIXTURE_VERIFIED**; original five cases remain unrecovered and untested, with no equivalence claim. No test rerun was made for that closeout.
+- Independent read-only task triage found a possible APP-01 child-client concurrent-request fixture with no existing leaf task; it is not yet claimed and requires root verification of the live queue and fake-child harness. Slot 309 remains static-only after 3 REA timeouts. `python3 scripts/project_index.py` exited 0 (33,045 folders); `trail build --check` exited 0 with the wiring graph in sync (deep concept layer unbuilt, 9,872 meaning nodes pending). The staged path audit and `git diff --cached --check` passed all seven allowlisted paths; the pre-stage all-path audit passed 2,975 paths. Commit `b885e64c` was created with owner identity. Exact next action: rerun post-commit all-path/unpublished-attribution checks, push `origin main`, fetch/rescan, then verify whether the APP-01 fixture is safe to claim.
+- Overall native-game boot/audio/save/reload/Metal gates remain PARTIAL; the separate `orchestrator@local` history finding remains non-Claude.
+
 ## 2026-10-27 00:24 CDT (`/root`) — F590 replacement acceptance and post-4682a337 scan
 
 - After `git fetch origin --prune` (exit 0), the remote scanner command exited 0 and parsed 9 GitHub branch heads, 0 remote tags, and 2,356 unique commits after `4682a33743688d36ced7fec5e00401addceef11c`; it found zero Claude/Anthropic identity or credit-line matches (E730). The private JSON SHA-256 is `f943df93d0a6ffe729eaa59caf0a47741da5ce4f262234e20fcdb83ce42bfdf0`; the scan predates this checkpoint.
