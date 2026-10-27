@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 16:50 CDT (`/root`) — E838 close E837 publication and attribution census
+
+- **Task ID/status:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`, `ARTIFACT_VERIFIED` for the current advertised GitHub refs; the larger native-port goal remains active.
+- **E837 publication:** owner commit `dce99981d73824d557d6c030179ab9f5ebc56876` (parent `c84312ddb635bfa05a9922349f6779117b5dbbf8`), subject `docs: close out E836 publication and attribution audit`, author/committer Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Push advanced `main`; fetch confirmed `HEAD == origin/main == dce99981d73824d557d6c030179ab9f5ebc56876`, clean. Exact-range attribution passed; full path audit passed **3,054/3,054**. Logs: `local/validation/orch-20261027/e837/post-commit-attribution.log`, `audit-all.log`, `push.log`, `fetch.log`.
+- **Fresh post-E837 census:** 21 advertised refs (9 branches, 12 PR heads, 0 tags), 15 unique tips, **2,450 reachable commits**, zero Claude/Anthropic author/committer identities and credit-line hits. Scanner SHA-256 `e94109586bb10d72583b4df756124ba3fc7683b16898cbe2f345f8abef134135`; report SHA-256 `1856ace3ca33f94182b0b976c8acfc8fcd7043f34afb11c86f761e3dc74c2b39`; private logs/artifacts are under `local/validation/orch-20261027/e837/`.
+- **Stash boundary:** separate read-only scan found 70 matches among 826 reachable commits across 21 stash-reflog tips. `refs/stash == 92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`; no stash ref/reflog changed, per the user's explicit choice.
+- **E837 gates:** configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail **9,877/13,470** in sync; project index **31,950** current; staged/full path audits **6/6** and **3,054/3,054**. Exact E837 attribution check passed after commit. Logs are under `local/validation/orch-20261027/e837/`.
+- **Task status:** E836's all-lane scouts found no newly READY product task; no game gate advanced. The user-directed public attribution scope is clean through E837; private stashes remain excluded.
+- **Files changed in E838:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, `docs/checkpoints/2026-10-27-e836-publication-closeout-e837.md`, and `docs/checkpoints/2026-10-27-e837-publication-closeout-e838.md`. No product source changed.
+- **Next exact action:** preserve the task gates and re-triage only after a dependency/input changes. The E838 documentation closeout must pass the standard repo gates and exact-range attribution before push.
+
 ## 2026-10-27 16:45 CDT (`/root`) — E837 close E836 publication and attribution census
 
 - **Task ID/status:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01` closeout, `ARTIFACT_VERIFIED` for all currently advertised GitHub refs; E836 all-lane triage recorded. The larger native port goal remains active.
@@ -7,7 +18,7 @@
 - **Fresh GitHub-ref census:** scanner parsed 21 advertised refs (9 branches, 12 PR heads, 0 tags), 15 unique tips, and **2,449 reachable commits**; zero Claude/Anthropic author/committer or matching credit-line hits. Report SHA-256 `9e6302a9890c8c41811338eb6ed5cf97cd30ed48b351e5f9796abef51d129a42`; scanner SHA-256 `aaf9a26d38df8332bb051a50f98a8be578ebcf64fefdc0c13e7054e8f8cbda31`; private artifacts and log are under `local/validation/orch-20261027/e836/`.
 - **Stash boundary:** scanner separately parsed 21 stash-reflog tips / 826 reachable commits and found 70 Claude/Anthropic matches. `refs/stash` remains `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`; no stash ref/reflog changed, per the user's explicit choice.
 - **E836 gates:** CMake configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail **9,877/13,470** in sync; project index **31,949** current; staged/full path audits **6/6** and **3,053/3,053**. The initial zsh audit wrapper and copied-scanner output path were corrected and rerun successfully; details in the E837 closeout.
-- **E837 closeout gates:** CMake configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail **9,877/13,470** in sync; project index **31,950** current; staged/full path audits **6/6** and **3,054/3,054**; precommit attribution command exited 0 for the empty `origin/main..HEAD` range. Logs are under `local/validation/orch-20261027/e837/`; exact E837 commit-range attribution is checked after commit.
+- **E837 closeout gates:** CMake configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail **9,877/13,470** in sync; project index **31,950** current; staged/full path audits **6/6** and **3,054/3,054**; exact E837 commit-range attribution passed after commit. Logs are under `local/validation/orch-20261027/e837/`.
 - **Task status:** parallel CPU, service/data/audio/save, app, GPU, and RE scouts found no new READY product task. Keep E832's slot-309 gate; other open tasks await external input, dependencies, or provider evidence. No game acceptance gate advanced.
 - **Files changed in E837:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-e836-publication-closeout-e837.md`. No product source changed.
 - **Next exact action:** continue from the current register when a required dependency, provider result, unlocked Mac, or user-owned save becomes available; otherwise retain the documented gates and do not claim the port complete.
@@ -23,7 +34,7 @@
 - **Wiki context:** reviewed the supplied session digests as non-canonical metadata and navigated from `topics/projects/_index.md` to the current project portfolio; the live repository remains the implementation source of truth. The `@wiki` tool and `llm-wiki` CLI were unavailable, so no wiki content was changed.
 - **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-ready-lane-triage-e836.md`. No source, binaries, game inputs, or stashes changed; validation logs are private under `local/validation/orch-20261027/e836/`.
 - **Remaining risks / next exact action:** prerequisites can change. Re-triage when an external input/provider result arrives, the Mac is unlocked for VoiceOver, a user-owned save is available, or a registered dependency changes. Until then preserve E832's slot-309 gate and do not invent a weaker acceptance test.
-- **Attribution boundary:** E837 records the post-E836 fetched-GitHub-ref scan covering 21 advertised refs, 15 unique tips, and 2,449 reachable commits with no Claude/Anthropic attribution; `refs/stash` remains unchanged per the user's explicit choice.
+- **Attribution boundary:** E838 records the post-E837 fetched-GitHub-ref scan covering 21 advertised refs, 15 unique tips, and 2,450 reachable commits with no Claude/Anthropic attribution; `refs/stash` remains unchanged per the user's explicit choice.
 
 ## 2026-10-27 16:29 CDT (`/root`) — E835 close E834 publication and refresh public attribution
 

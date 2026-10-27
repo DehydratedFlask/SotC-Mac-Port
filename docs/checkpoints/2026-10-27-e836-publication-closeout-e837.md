@@ -46,9 +46,9 @@ The standard repository gates for this closeout passed:
 | `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure` | **431/431 passed** | `local/validation/orch-20261027/e837/ctest.log` |
 | `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` | **516 passed, 0 skipped, 0 failed** | `local/validation/orch-20261027/e837/lift.log` |
 | `trail build --check` | **9,877 nodes / 13,470 edges**, in sync; deep layer not built | `local/validation/orch-20261027/e837/trail.log` |
-| `python3 scripts/project_index.py` and `python3 scripts/project_index.py --check` | **31,950 folders**, final current check pending last doc regeneration | `local/validation/orch-20261027/e837/project-index-{generate,check}.log` |
+| `python3 scripts/project_index.py` and `python3 scripts/project_index.py --check` | **31,950 folders**, final check current | `local/validation/orch-20261027/e837/project-index-{generate,check}.log` |
 | `python3 -I scripts/audit_publish_paths.py` and `--all` | **6/6 staged** and **3,054/3,054 tracked** paths passed | `local/validation/orch-20261027/e837/audit-{staged,all}.log` |
-| `python3 -I scripts/check_commit_attribution.py` | precommit empty range passed; repeat after E837 commit and before push | `local/validation/orch-20261027/e837/post-commit-attribution.log` |
+| `python3 -I scripts/check_commit_attribution.py` | post-commit E837 range passed before push | `local/validation/orch-20261027/e837/post-commit-attribution.log` |
 
 These are fixture/build checks only. No completion claim for the full port or game boot/audio/save gates is implied.
 
