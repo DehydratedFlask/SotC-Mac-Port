@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 18:10 CDT (`/root`) — E849 close E848 publication and verify current attribution
+
+- **Task status:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01` is `ARTIFACT_VERIFIED` for the live advertised refs through E848. The owner chose to leave private stashes unchanged. `RE-02-APPMAIN-INIT-B11290-STRUCTURE-01` remains `STATIC_ANALYSIS_VERIFIED` only for its bounded byte/profile dossier; broader RE-02, G1 and game acceptance remain incomplete.
+- **E848 publication:** commit `d763a2eb71d24f2497a39a9918d9f147f9e14cb1` (Johnny Wang author/committer) passed exact-range attribution and committed-tree audits, was pushed, and fetched; `HEAD == origin/main == FETCH_HEAD`, clean.
+- **Fresh live census:** 21 advertised refs (9 branches, 12 PR heads, 0 tags), 15 unique tips, 2,461 reachable commits and zero Claude/Anthropic identity or credit-line matches. Stash remains 21 tips / 826 commits / 70 matches; stash ref unchanged. Full hashes are in [E849 closeout](docs/checkpoints/2026-10-27-e848-publication-closeout-e849.md).
+- **E849 repository gates:** configure passed (0.219 s); build passed (0.032 s; Ninja had no work); CTest passed 431/431 (8.570 s); lift checkers passed 516/0 skipped/0 failed (94.566 s); Trail is in sync at 9,877 nodes; project index generated and checked at 31,976 folders. Staged/full publication audits passed 6/6 and 3,066/3,066; staged/worktree diff checks and owner-identity check passed. Precommit fetch confirmed `HEAD == origin/main == FETCH_HEAD == d763a2eb71d24f2497a39a9918d9f147f9e14cb1`. Exact new-commit attribution, push and fetch verification remain pending. Logs are under `local/validation/orch-20261027/e849/`.
+- **Product triage:** no independent `READY` lane; current blockers remain an unlocked Mac, a user-owned save, a released AUD-02 query scope, GPU dependencies, and concrete semantic producer/consumer evidence for slot 309.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and E849 checkpoint; private logs/scans remain under ignored `local/validation/`.
+- **Next exact action:** commit only the six audited documentation paths under Johnny Wang, exact-range check the new commit, push `origin main`, and fetch-verify.
+
 ## 2026-10-27 18:04 CDT (`/root`) — E848 close E847 publication and refresh live attribution
 
 - **Task IDs/status:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01` is `ARTIFACT_VERIFIED` for currently advertised GitHub refs through E847; the user chose to leave private stashes unchanged. `RE-02-APPMAIN-INIT-B11290-STRUCTURE-01` is `STATIC_ANALYSIS_VERIFIED` for its bounded structural dossier only; broader RE-02, G1 and game acceptance remain incomplete.
