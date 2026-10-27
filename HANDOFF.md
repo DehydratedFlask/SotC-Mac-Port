@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 12:35 CDT (`/root`) — Reconcile E621 task/evidence summaries
+
+- **Task:** `DOC-01-E621-SUPERSEDED-METADATA-CLAIMS-01`; claim checkpoint `97fca8449e1067d6136012656013a2c4cbedfb19` is pushed, fetched, and matches `origin/main`.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and [the E621 reconciliation checkpoint](docs/checkpoints/2026-10-27-e621-task-evidence-reconciliation.md).
+- **Result:** seven task rows and two evidence rows now use corrected E621 path/TOC identities, the 40,215/1/0/0 key-size matrix, identical STS and bridge pairs, and generic non-audio XFF wording. Unknown schemas/codecs/runtime behavior remain explicit; no game gate advances.
+- **Verification:** CMake configure/build exit 0; CTest **431/431**; lift sweep **516/0/0**; pre-stage full path audit **3,031/3,031**; default attribution audit exit 0. Project index generated **33,160** folders. Strict `--check` reports `docs/FOLDERS.md` and `local/indexes/folders.json` stale after volatile launcher `.build` rows were restored; `docs/checkpoints` count is updated to 836. Exact logs: `local/validation/orch-20261027/doc-e621-final/`.
+- **Public history check:** the 21 advertised GitHub refs (9 branches, 12 PR heads) plus the local candidate cover **2,423 unique commits** with zero Claude/Anthropic identity or credit/signature matches; stashes were not scanned. A broader generic assistant-policy diagnostic flags 1,070 historical assistant/agent credits across the refs, so it is not a Claude-specific result. Logs are in the private folder above.
+- **Staged publication checks:** the explicit six-path audit passed **6/6** for the complete checkpoint; the final scan-note amendment passed **2/2**; full audit passed **3,032/3,032** and cached diff checks passed. Exact-range attribution on the final owner commit passed. No code changed; no game archive/member payload was inspected for this documentation correction.
+- **Next exact action:** push the verified documentation checkpoint to `origin main` as a fast-forward and fetch to confirm the tip; then resume from the native-port blockers.
+- **Task status / attempts:** content `ARTIFACT_VERIFIED`; commit/push verification is next; 0 failed hypotheses. Native boot/audio/save-load/Metal gates remain open.
+
 ## 2026-10-27 12:22 CDT (`/root`) — Claim E621 superseded-metadata reconciliation
 
 - **Task:** `DOC-01-E621-SUPERSEDED-METADATA-CLAIMS-01`; align stale DATA-02/AUD-01 summaries in `docs/TASKS.md` and `docs/EVIDENCE.md` with the corrected E621 evidence already recorded in `docs/ASSETS.md` and `docs/checkpoints/2026-10-24-psarc-md5-reconciliation.md`.
