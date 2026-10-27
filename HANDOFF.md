@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-26 23:40 CDT (`/root`) — slot 309 analyzer artifact captured
+
+- Task: `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`, ACTIVE with 0 failed hypotheses; the worker `/root/trail_scope_audit` has read the linked project docs and used Graft/Trail before source inspection. No shared source was edited.
+- Exact command: `python3 -I tools/lift/analyze_slot_struct.py 0xa505e0 --label slot309` exit 0. Pinned `local/re/eboot.elf` SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; span `[0xa505e0,0xa50d43)` = 1,891 B, body SHA prefix `b4a16d02`, 353 reachable instructions, 40 direct-call sites/10 targets, one conditional edge, 73 RIP-relative refs/18 stores, and 3 unresolved indirect calls. Private JSON: `local/validation/orch-20261026/slot309/slot_struct_analyzer.json`.
+- Status: **ARTIFACT_VERIFIED** for analyzer output only. REA/Ghidra overview has opened the ELF but is still pending; indirect call resolution, CFG completeness, callee semantics, and native-lift feasibility are **UNKNOWN**. No constructor implementation is approved by this preliminary snapshot.
+- Next exact action: let the worker correlate the body and call edges in Ghidra, retain the evidence ID/coverage, and return a final private report for root replay. G1 remains PARTIAL; no game boot/audio/save claim.
+
 ## 2026-10-26 23:33 CDT (`/root`) — slot 309 read-only task claim published
 
 - Task: `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`, claim commit `df07effb7f39ad376cd2b30e9b55485fa37a1f35` pushed to `origin main`. The bounded read-only work packet is [here](docs/checkpoints/2026-10-26-slot309-characterization-claim.md); task is ACTIVE with 0 failed hypotheses.

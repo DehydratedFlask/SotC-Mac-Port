@@ -29,3 +29,16 @@ No body semantics, callees, native implementation, or acceptance status are infe
 1,891-byte estimate. Status is **ACTIVE / read-only analysis**; failed hypotheses: **0**. Next exact
 action: `/root/trail_scope_audit` produces a private report and sends the exact commands, hashes,
 coverage, unresolved edges, and recommendation to the integrator.
+
+## Preliminary analyzer result (worker report; Ghidra/root replay pending)
+
+The worker ran `python3 -I tools/lift/analyze_slot_struct.py 0xa505e0 --label slot309` (exit 0).
+It reports the exact span `[0xa505e0,0xa50d43)` = **1,891 B** on ELF SHA-256
+`d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, body SHA prefix
+`b4a16d02`, 353 reachable instructions, one ret-terminated block, 40 direct-call sites / 10
+targets, branch `0xa50d2d -> 0xa50d3e`, 73 RIP-relative references (18 stores), and no
+outside-image references. It identifies three indirect calls at `0xa5073c`, `0xa50af4`, and
+`0xa50c73`. Private JSON: `local/validation/orch-20261026/slot309/slot_struct_analyzer.json`.
+
+These measurements do not resolve the indirect calls or prove the analyzer's graph complete. REA
+overview/callee correlation is still running; root replay and a liftability decision remain pending.
