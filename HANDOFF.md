@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 17:16 CDT (`/root`) — E843 claim app-main Init callee `0xb11290` structure
+
+- **Task ID/status:** `RE-02-APPMAIN-INIT-B11290-STRUCTURE-01`, `CLAIMED`, zero analysis attempts; parent `RE-02-APPMAIN-INIT-TRIAGE-01` remains `STATIC_PATH_BYTE_VERIFIED` and broader RE-02 remains `ACTIVE`.
+- **Bounded scope:** hash-bound structural profile of only the body reachable from RVA `0xb11290`: entry/body span and hash, reachable instructions, direct calls/branches, RIP-relative references, and unresolved indirect transfers. Do not assign behavior/class semantics, native liftability, startup registration, or G1 advancement.
+- **Inputs:** `local/re/eboot.elf` verified at SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; existing `local/re/rea-snapshot.json` targets the same ELF with Ghidra 12.1.4 and analysis profile digest `769518a8e9b57f953dd241adbb63672f0f486bb3d66359b9deef7c5e088ca7aa`. `mcp__rea__binary_session` reports Ghidra 12.1.4 available and no active target; no saved project or target is open.
+- **Attempt count:** 0. The exact next action after publishing the claim is to open the pinned ELF with its matching snapshot in the current REA session, query `0xb11290`, and independently replay `tools/lift/analyze_slot_struct.py` with its temporary work path redirected into `local/validation/orch-20261027/e843/re02-b11290/`.
+- **Limits:** no original-code execution, no PS4 emulation/runtime, no import or mutation of the persistent Ghidra project, and no slot registration. If REA evidence cannot be obtained from the matching snapshot, record the precise failure and stop at static-profile-only scope.
+
 ## 2026-10-27 17:08 CDT (`/root`) — E842 refresh live GitHub attribution census
 
 - **Task ID/status:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`, `ARTIFACT_VERIFIED` for all currently advertised GitHub refs through E841; the larger native-port goal remains active.
