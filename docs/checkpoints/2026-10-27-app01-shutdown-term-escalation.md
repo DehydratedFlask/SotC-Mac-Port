@@ -1,4 +1,4 @@
-# APP-01 shutdown TERM escalation task claim and post-30399 attribution scan (E773)
+# APP-01 shutdown TERM escalation and post-46a759 attribution checkpoint (E773-E778)
 
 - Local date/time: 2026-10-27 07:57 CDT (America/Chicago).
 - Agent / integrator: `/root`.
@@ -110,3 +110,80 @@ core shutdown, game shutdown, boot, audio, save/load, or runtime behavior claim 
 The private publication-audit manifest is `local/validation/orch-20261027/app01-term-checkpoint/publication/results.json`,
 SHA-256 `ab09332e92e5a671e011131e7f4db18c2ad03444932a7c6d8be7ec6f0273eef1`. The pre-commit
 range was empty; after commit, rerun that attribution check, then push `origin main`.
+
+
+## E776: post-push public attribution scan
+
+- Local date/time: 2026-10-27 08:13 CDT (America/Chicago).
+- Agent / integrator: `/root`.
+- Task ID: `PUB-01-CLAUDE-CREDIT-CLEANUP-01`; related statuses were `APP-01-PROCESS-CLIENT-SHUTDOWN-TERM-ESCALATION-01` and `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`.
+- Files changed: `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/TASKS.md`, and this checkpoint.
+- Exact command: `git fetch origin --prune && python3 -I local/validation/orch-20261026/claude-credit-cleanup-review/scan_remote_refs_attribution.py > local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-46a75900.json`.
+- Exit/result and evidence: exit 0; report SHA-256 `5c18b1e7c6a24c8d2e2adbf9a449414093a86ad7a44a1e84f0dddb4b4de2dff7`.
+- Observations vs inference: the scanner observed 9 fetched branch heads, 0 remote tag refs, 2,389 unique reachable commits, and zero Claude/Anthropic author, committer, or credit-line matches. This result covers fetched refs only; it does not include private stash refs.
+- Remaining risks: the owner directed that 70 stash-only matches remain unchanged; broader CPU/game acceptance remains open.
+- Next exact action: rerun repository gates after the final fixture cleanup, then stage only the allowlisted documentation and audit it before publication.
+- Task status / attempts: PUB-01 **ARTIFACT_VERIFIED** for fetched GitHub refs, 0 failed hypotheses; APP-01 TERM fixture **FIXTURE_VERIFIED**, one failed readiness iteration and 0 failed semantic hypotheses; CPU-01 slot 309 **ACTIVE / G1 PARTIAL**, 0 failed hypotheses.
+
+After owner commit `46a759003caba59b68a1fd421c07a401272c97fe` was pushed, the exact command
+`git fetch origin --prune && python3 -I local/validation/orch-20261026/claude-credit-cleanup-review/scan_remote_refs_attribution.py > local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-46a75900.json`
+exited 0. The report SHA-256 is
+`5c18b1e7c6a24c8d2e2adbf9a449414093a86ad7a44a1e84f0dddb4b4de2dff7`.
+
+Observed: 9 fetched branch heads, 0 remote tag refs, 2,389 unique reachable commit objects, and 0
+Claude/Anthropic author, committer, or credit-line matches. `origin/main` equals
+`46a759003caba59b68a1fd421c07a401272c97fe`. The 70 stash-only matches remain unchanged by owner
+direction and are outside this public scan scope.
+
+E776 `python3 scripts/project_index.py` exited 0 and reported 33,119 folders (log SHA-256
+`1d0912f208c0911f65f9548cd51d724e3a09c31efe807b5d9f9a32b9e736d346`); generated build-directory
+churn was excluded from the durable folder summary. The first `trail build --check` after the final
+test-only cleanup returned **STALE** because the graph predated that cleanup. Its private log is
+`local/validation/orch-20261027/post-46a759-checkpoint/trail-check.log`, SHA-256
+`d7b50d6583882d502891d759dee07701a8cb5056c46950e3405a159940bb262a`. This is a graph freshness
+failure, not a semantic hypothesis failure; the graph was rebuilt and the check passed in E777.
+
+## E777: repository verification
+
+- Local date/time: 2026-10-27 08:16 CDT (America/Chicago).
+- Agent / integrator: `/root`.
+- Task IDs: `APP-01-PROCESS-CLIENT-SHUTDOWN-TERM-ESCALATION-01` verification; `PUB-01-CLAUDE-CREDIT-CLEANUP-01` publication checkpoint; `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` stopping-point review.
+- Files changed: `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/TASKS.md`, and this checkpoint.
+- Exact commands, exits, and evidence: the command/result/log table follows. Trail ran as `trail build` (exit 0; `local/validation/orch-20261027/post-46a759-checkpoint/trail-build.log`, SHA-256 `d70cf6d1d88ccfe67c62cb06f0ac5b91cf35cf84b919e709b05ed9d05dff0dae`) and `trail build --check` (exit 0; `local/validation/orch-20261027/post-46a759-checkpoint/trail-check-after-build.log`, SHA-256 `eb64261b7e53ff1fb2a879c571528604a13c82c9e640c49bb3c0ba17e075d55c`). Project index ran as `python3 scripts/project_index.py` (exit 0; `local/validation/orch-20261027/post-46a759-checkpoint/project-index.log`, SHA-256 `1d0912f208c0911f65f9548cd51d724e3a09c31efe807b5d9f9a32b9e736d346`). Native logs are named in the private manifest below.
+- Observations vs inference: CMake, 431 CTests, and 516 lift checkers passed at repository fixture/static scope. These outcomes do not establish game boot, gameplay audio, real save/reload, retail rendering, or a native-lift boundary for slot 309.
+- Remaining risks: slot 309 payload ownership and `0x531d60` invocation order remain unknown; cold boot, audible game content, real save/reload, Metal validation, and forbidden-runtime absence remain unverified.
+- Next exact action: stage and audit the six allowlisted docs, then commit and push the checkpoint under the owner identity.
+- Task status / attempts: APP-01 TERM fixture **FIXTURE_VERIFIED**, one failed readiness iteration and 0 failed semantic hypotheses; PUB-01 **ARTIFACT_VERIFIED** for fetched refs, 0 failed hypotheses; CPU-01 slot 309 **ACTIVE / G1 PARTIAL**, 0 failed hypotheses.
+
+| Command | Result | Log SHA-256 |
+|---|---|---|
+| `cmake -S native -B local/build/orch-r22` | **PASSED**, exit 0 | `c9e06a32f55f3035929fbe7bc8358eaa65e4673d154f6e0d5b8ef8135dfee0e9` |
+| `cmake --build local/build/orch-r22 -j 12` | **PASSED**, no work to do | `8c35b1682f73592d30612d7b0fabdb384fcfff35cb5a076cb48b85b1368aa794` |
+| `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure` | **PASSED**, 431/431 | `2550b9f3a678bf7349e2b8a659017e65b8e0631928b5bb4ab72e155f6835b3a9` |
+| `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` | **PASSED**, 516/0/0 | `f6bd4048e58d79d1b452cdba2b9c54abb1ccac1b37de894eaae8ae7b626862db` |
+| `trail build` and `trail build --check` | **PASSED**, 9,876 nodes / 13,469 edges; deep semantic layer not built | logs under `local/validation/orch-20261027/post-46a759-checkpoint/`, hashes `d70cf6d1d88ccfe67c62cb06f0ac5b91cf35cf84b919e709b05ed9d05dff0dae`, `eb64261b7e53ff1fb2a879c571528604a13c82c9e640c49bb3c0ba17e075d55c` |
+| `python3 scripts/project_index.py` | **PASSED**, 33,119 folders indexed | `1d0912f208c0911f65f9548cd51d724e3a09c31efe807b5d9f9a32b9e736d346` |
+
+Private native-gate manifest: `local/validation/orch-20261027/post-46a759-checkpoint/native/results.json`,
+SHA-256 `fae178fa337e9065e58baf3c454a205a6f46428a73e96799a5309f62749e0fcd`.
+
+CPU-01 slot 309 remains ACTIVE/G1 PARTIAL: the new saved-project census did not establish payload
+ownership or invocation order. Preserve both `*(0x2dfd4b8)` branches, keep slot 309 unregistered,
+and do not claim a native-lift boundary. Next exact action is limited to reusing existing reports and
+the saved Ghidra database for a concrete `[RBP-0x38]` lifetime or `0x531d60` invocation-order clue;
+no fresh binary import is authorized by this checkpoint.
+
+
+## E778: final documentation publication audit
+
+- Local date/time: 2026-10-27 08:22 CDT (America/Chicago).
+- Agent / integrator: `/root`.
+- Task IDs: `PUB-01-CLAUDE-CREDIT-CLEANUP-01` publication; `APP-01-PROCESS-CLIENT-SHUTDOWN-TERM-ESCALATION-01` fixture status; `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` open analysis.
+- Files changed: `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/TASKS.md`, and this checkpoint. `docs/FOLDERS.md` was temporarily regenerated and restored to exclude ephemeral launcher build churn.
+- Exact command/results: `git fetch origin --prune` exit 0 with `HEAD == origin/main == 46a759003caba59b68a1fd421c07a401272c97fe`; `git diff --check` exit 0; `python3 -I scripts/audit_publish_paths.py` exit 0, 6 paths; `python3 -I scripts/audit_publish_paths.py --all` exit 0, 3,013 paths; `python3 -I scripts/check_commit_attribution.py` exit 0 for the empty pre-commit range; `python3 -I scripts/check_commit_attribution.py --identity` exit 0; `python3 -I scripts/check_commit_attribution.py --all` exit 1 only for the non-Claude `orchestrator` / `orchestrator@local` identity on `f6604a86e60e`.
+- Audit log paths and SHA-256 values: staged path `local/validation/orch-20261027/final-docs-checkpoint/staged_path.log` (`6320dc13834a84b5ea100aeeb1f4e29e604fe41f2d405da103d16ca4b8e2d66c`); full path `local/validation/orch-20261027/final-docs-checkpoint/all_path.log` (`2c2ed65cd259576fa6d92667e0b3ee100cd563754980efab77acf06c95b815b4`); attribution range `local/validation/orch-20261027/final-docs-checkpoint/attribution_range.log` (`72d954d7873849934ae10cdf5ad4049069928f3c6b433f3e7e44743823e63f33`); identity `local/validation/orch-20261027/final-docs-checkpoint/attribution_identity.log` (`888507b0410bfc1aa9548e21b4bd5bdaa271389b1515786e902bc91722c90559`); all-history `local/validation/orch-20261027/final-docs-checkpoint/attribution_all.log` (`f67c8b2dabf442366fbc8922353feda1e6bbd31ffc26b3537d5161e8c1adad44`).
+- Project index commands: `python3 scripts/project_index.py` exit 0, 33,121 folders; log `local/validation/orch-20261027/final-docs-checkpoint/project-index-refresh.log`, SHA-256 `c1c39e4b3f351efdbddad9207e5b678dae83a1eac234961cba752b6d13d943be`. `python3 scripts/project_index.py --check` returned exit 1; first log `local/validation/orch-20261027/final-docs-checkpoint/project-index-check.log`, SHA-256 `2e25949d3a1a9f6380cbbbb70072bb07dadea692c222766fd2268d7ce91e664b`, reported stale `docs/FOLDERS.md` and `local/indexes/folders.json`; second log `local/validation/orch-20261027/final-docs-checkpoint/project-index-check-after-refresh.log`, SHA-256 `31dad00ffd5208458ee89a329fea70b0fa13494e525ddd8a7e837c7614a2266b`, reported stale `local/indexes/folders.json`. The check log itself was written under recursively inventoried `local/` after refresh, and the generated docs index contained ephemeral launcher build churn; no `docs/FOLDERS.md` change is included.
+- Observations vs inference: only the staged six documentation paths passed the publication allowlist. The `--all` attribution failure is the pre-existing unrelated local alias, not Claude/Anthropic. E776 scanned 2,389 fetched GitHub-reachable commits; the new checkpoint commit will also be checked under the owner identity and by the post-commit range audit.
+- Remaining risks: 70 private stash-only Claude matches remain by owner choice; `--all` retains the unrelated `orchestrator@local` finding; CPU-01 slot 309 and overall native-port acceptance are incomplete.
+- Next exact action: commit these six allowlisted files as the owner, run post-commit checks, and push `origin main`.
+- Task status / attempts: PUB-01 **ARTIFACT_VERIFIED** for fetched public refs, 0 failed hypotheses; APP-01 TERM fixture **FIXTURE_VERIFIED**, one failed readiness iteration and 0 failed semantic hypotheses; CPU-01 slot 309 **ACTIVE / G1 PARTIAL**, 0 failed hypotheses.
