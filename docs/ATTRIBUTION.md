@@ -332,3 +332,10 @@ does, prevents that.
   [publication closeout checkpoint](checkpoints/2026-10-27-e789-publication-closeout.md). The 70
   stash-only matches remain untouched per the user's choice. E789 itself passed a separate exact
   range/identity/path audit after publication.
+- After publishing E791 `e7921208b541d03a517a8fbb7ade38c98ae77eda`, the scanner parsed all 9 fetched
+  GitHub branch heads, 0 tags, and **2,403 unique reachable commits**. It found zero Claude/
+  Anthropic identity or credit-line matches. Report SHA-256
+  `b87445237e6364b2a6baaab72483c1d6c5de94170a6641f50c95af02ed4173ae`; see E792 and the
+  [E791 publication closeout](checkpoints/2026-10-27-e791-publication-closeout.md). The 70
+  stash-only matches remain untouched per the user's choice. E791 itself passed a separate exact
+  range/identity/path audit after publication.

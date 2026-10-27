@@ -44,4 +44,10 @@ Gate logs are in `local/validation/orch-20261027/aud01-sxdf-reader-census/` (pri
 
 **Files changed for this task:** `HANDOFF.md`, `docs/ASSETS.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and this checkpoint. Private query and gate artifacts are under `local/validation/orch-20261027/aud01-sxdf-reader-census/` and excluded from publication.
 
-**Publication:** pending the staged-path audit, owner commit, push to `origin main`, fetch verification, and a fresh fetched-ref attribution scan.
+## Publication closeout — E792
+
+- **Commit:** `e7921208b541d03a517a8fbb7ade38c98ae77eda` (`docs: record SXDF saved-evidence census`), pushed to `origin/main`. Author and committer are Johnny Wang `<dehydratedflask@users.noreply.github.com>`; fetch verified `HEAD == origin/main`, clean tree.
+- **Commit checks:** `python3 -I scripts/check_commit_attribution.py --range 01f166fd784b1d1fea80ba541d4e865c86957b9e..HEAD` passed; the exact seven committed docs passed staged/full path audits **7/7** and **3,019/3,019**; postcommit full path audit passed **3,019/3,019**.
+- **Fetched-ref attribution scan:** `python3 -I local/validation/orch-20261026/claude-credit-cleanup-review/scan_remote_refs_attribution.py > local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-e7921208.json` exited 0. It parsed 9 fetched GitHub branch heads, 0 tags, and **2,403 unique reachable commits**, with zero Claude/Anthropic identities or credit lines. Report SHA-256 `b87445237e6364b2a6baaab72483c1d6c5de94170a6641f50c95af02ed4173ae`.
+- The 70 Claude-attributed commits reachable only from private `refs/stash` remain unchanged per the user's explicit choice. `check_commit_attribution.py --all` remains **FAILED** only on historical non-Claude `orchestrator@local` commit `f6604a86e60e`.
+- The scan covers fetched GitHub refs, not private stash refs. E791's scoped static-analysis no-candidate result does not prove global reader absence; audio format, codec, routing, and playback remain UNKNOWN.

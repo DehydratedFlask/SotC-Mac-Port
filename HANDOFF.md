@@ -1,5 +1,18 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 09:53 CDT (`/root`) — E792 E791 publication closeout and public attribution scan
+
+- **Task IDs:** `AUD-01-SXDF-READER-CANDIDATE-01`; `PUB-01-CLAUDE-CREDIT-CLEANUP-01`.
+- **E791 commit:** `e7921208b541d03a517a8fbb7ade38c98ae77eda` (`docs: record SXDF saved-evidence census`) was pushed to `origin/main`. Author and committer are Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Fetch verified `HEAD == origin/main`, clean tree.
+- **Commit checks:** `01f166fd784b1d1fea80ba541d4e865c86957b9e..HEAD` attribution audit passed; E791 touched exactly seven allowlisted docs, staged/full path audits passed **7/7** and **3,019/3,019**; postcommit full path audit passed **3,019/3,019**.
+- **Fresh public scan:** `python3 -I local/validation/orch-20261026/claude-credit-cleanup-review/scan_remote_refs_attribution.py > local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-e7921208.json` exited 0. It parsed 9 fetched GitHub branch heads, 0 tags, and **2,403 reachable commits**, with zero Claude/Anthropic identities or credit lines. Report SHA-256 `b87445237e6364b2a6baaab72483c1d6c5de94170a6641f50c95af02ed4173ae`.
+- **E792 closeout prepublication gates:** CMake configure/build exit 0; CTest **431/431**; lift **516/0/0**; Trail **9,876 nodes / 13,469 edges**; project index generation/check **33,135 folders** (first check stale because its output log was created after generation; precreated log paths and rerun passed; generated `launcher/.build` churn excluded; durable checkpoint count 823→824); closeout staged/full path audits **7/7** and **3,020/3,020**; cached diff, default attribution audit, and owner identity passed. Private log manifest SHA-256 `f94b31fcd43f5d73da16cf191038130209d724ca0d17cd5905fea6b55a8dd49d`.
+- **Attribution scope:** the 70 Claude-attributed commits reachable only from private `refs/stash` remain unchanged per the user's explicit choice. `check_commit_attribution.py --all` remains **FAILED** only on unrelated non-Claude `orchestrator@local` commit `f6604a86e60e`.
+- **Observation vs inference:** fetched GitHub branch/tag scan covers the public refs; it is not a scan of the user's private stash. E791 itself was separately range/identity/path-audited.
+- **Next task triage:** no additional task is marked READY. APP-01 VoiceOver still waits for an unlocked Mac; AUD-02 NGS2 has no released provider query. Do not start a new provider analysis without an authorized scope change.
+- **Next exact action:** keep the remaining port gates open; resume APP-01 VoiceOver after the Mac is unlocked, or AUD-02 if a provider query is released. Until then, claim no new task without a separately bounded evidence scope.
+- **Task status:** E791 census `STATIC_ANALYSIS_VERIFIED`; public fetched refs `ARTIFACT_VERIFIED` through 2,403 commits under the user's stash exclusion.
+
 ## 2026-10-27 09:43 CDT (`/root`) — E791 SXDF/SXDS saved-evidence census; publication pending
 
 - **Task ID:** `AUD-01-SXDF-READER-CANDIDATE-01`.
