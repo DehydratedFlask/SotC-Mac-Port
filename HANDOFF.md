@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 03:19 CDT (`/root`) — slot 309 table-consumer census and post-32f scan (E765/E766)
+
+- A bounded offline census found two RIP-relative LEAs to table base `0x15c8cc8`; the observed caller uses slots `+0x10/+0x18`, while `0x531d60` sits at vptr offset `+0x20` (table offset `+0x30`) and is not called on this path. The direct caller of `0x536730` is `0xf120`, followed by a trap; no link/order to startup slot 309 is established. Private report `local/validation/orch-20261027/slot309/table-consumer/REPORT.md`, SHA-256 `5dbe15d0c13cf6108259a55dc9ad1b2fb4beb21e322329024fbef6ca85bd9e11`. Preserve both `0x2dfd4b8` branches, keep slot 309 unregistered; CPU task ACTIVE/G1 PARTIAL, failed semantic hypotheses 0.
+- After pushing `32f507e033a6a374b03bf0109aefdfececfb4b42`, fetch/scan exited 0: 9 remote heads, 0 tags, 2,383 reachable commits, zero Claude/Anthropic matches. E766 report SHA-256 `5d8aabfd59f7cd1124b215903b219496bc6e7c3e5e52a3d660f7b556019eda93`.
+- E762 still finds 70 Claude-attributed commits only under private `refs/stash`; these refs are unchanged pending the owner's scope answer. Main's full-history attribution still has only the non-Claude `f6604a86e60e` `orchestrator@local` finding.
+- Configure/build exit 0; CTest **431/431**; lift sweep **516/0/0**; Trail wiring graph in sync with 9,875 deep nodes pending; project index exit 0 with 33,106 folders, retaining only durable `docs/checkpoints` 811→812. Full logs are in `local/validation/orch-20261027/slot309-checkpoint/e765-e766/`.
+- Staged/all path audits **7/3,008** pass; unpublished and identity attribution checks exit 0; `--all` exits 1 only for non-Claude `f6604a86e60e`.
+- **Next exact action:** finish staged/all path and attribution audits, commit the seven allowlisted docs under the owner identity, push `origin main`, and refresh the public-ref scan for the next checkpoint. For slot 309, check the saved order/map for `0x536aa0`, `0x537f90`, `0x536730`, or `0xf120`; if absent, retain the hook boundary and query incoming refs only from an already-open analysis session.
+
 ## 2026-10-27 03:12 CDT (`/root`) — post-`60b5947c` public-ref attribution scan (E764)
 
 - After pushing owner-authored checkpoint `60b5947ca80695424d7fb2ecfacc269958b301ce`, `git fetch origin --prune` and the remote scanner exited 0. It parsed 9 branch heads, 0 tags, and 2,382 reachable commits with zero Claude/Anthropic matches. E764 and the private report hash are recorded in `docs/EVIDENCE.md` and `docs/checkpoints/2026-10-27-post-60b5947c-attribution-scan.md`.
