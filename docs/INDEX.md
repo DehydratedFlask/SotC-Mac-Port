@@ -381,7 +381,9 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Post-4cb0afcd remote attribution scan](checkpoints/2026-10-27-post-4cb0afcd-attribution-scan.md) | E744; 9 branch heads and 2,367 commits scanned with zero Claude/Anthropic matches |
 | [Post-f033ed84 remote attribution scan](checkpoints/2026-10-27-post-f033ed84-attribution-scan.md) | E746; 9 branch heads and 2,368 commits scanned with zero Claude/Anthropic matches |
 | [Post-c4582888 remote attribution scan](checkpoints/2026-10-27-post-c4582888-attribution-scan.md) | E747; 9 branch heads and 2,369 commits scanned with zero Claude/Anthropic matches |
+| [Post-fc522ee7 remote attribution scan](checkpoints/2026-10-27-post-fc522ee7-attribution-scan.md) | E749; 9 branch heads and 2,371 commits scanned with zero Claude/Anthropic matches |
 | [Slot 309 saved-project Ghidra coverage](checkpoints/2026-10-27-slot309-ghidra-coverage.md) | E748; root static coverage verified, helper dispatch and lifetime boundary remain open |
+| [Post-fc522ee7 remote attribution scan](checkpoints/2026-10-27-post-fc522ee7-attribution-scan.md) | E749; 9 branch heads and 2,371 commits scanned with zero Claude/Anthropic matches |
 | [Launcher bundle with core (2026-10-24)](checkpoints/2026-10-23-launcher-bundle-core.md) | signed app with SoCGameCore; E614 |
 | [Save relaunch (2026-10-23)](checkpoints/2026-10-23-save-relaunch.md) | cross-process write/load/enumerate; E615 |
 | [Save acceptance tool (2026-10-23)](SAVE_ACCEPTANCE.md) | read-only SAV-04 inspector; E616/NOT RUN |

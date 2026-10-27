@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 01:19 CDT (`/root`) — post-fc522ee7 remote attribution scan (E749)
+
+- After publishing `fc522ee73c0f01e4c5e0a90abdb00ea1c696bf24`, `git fetch origin --prune` and the remote attribution scanner exited 0. All 9 fetched GitHub branch heads, 0 remote tags, and 2,371 unique reachable commits were scanned; zero Claude/Anthropic author/committer identities and zero credit-line matches. Private report `local/validation/orch-20261026/claude-credit-cleanup-review/remote-scan-after-fc522ee7.json`, SHA-256 `5860ef8adc7e15e6f36238713134a4cd5e8396455ead262f9a96715e90b1d53d`.
+- E748 commit `fc522ee7` passed the unpublished `python3 -I scripts/check_commit_attribution.py` audit and has Johnny Wang as author and committer. `--all` still reports only the historical, non-Claude `f6604a86e60e` `orchestrator@local` entry. `HEAD == origin/main`; checkout clean before this scan checkpoint.
+- This checkpoint adds `docs/checkpoints/2026-10-27-post-fc522ee7-attribution-scan.md` and updates `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md` (E749), `docs/INDEX.md`, `docs/TASKS.md`, and `docs/FOLDERS.md`. No source/test files changed. Native game boot/audio/save/load/Metal gates remain PARTIAL/NOT RUN.
+- `python3 scripts/project_index.py` exited 0 (33,066 folders); only `docs/checkpoints` was retained in `docs/FOLDERS.md` after discarding counts for ignored build/private validation churn (799 to 800). `trail build --check` exited 0; wiring graph in sync, 9,875 pending deep-layer nodes (log SHA-256 `00119eb6b8e66856a413c1ec07c3322f374159b225f828749d8d6f805ed4df5f`).
+- **Next exact action:** continue `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` by resolving the saved-project indirect call edges at `0x26f4a` and `0x26f58`; preserve unresolved edges and lifetime boundaries until evidence closes them.
+
+## 2026-10-27 01:15 CDT (`/root`) — slot 309 saved-project Ghidra coverage (E748)
+
 ## 2026-10-27 01:15 CDT (`/root`) — slot 309 saved-project Ghidra coverage (E748)
 
 - Completed read-only Ghidra coverage capture for `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` using the saved Ghidra 12.1.4 project with `-noanalysis -readOnly`; no original binary execution, source edit, install, or test run. The pinned ELF SHA-256 is `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
