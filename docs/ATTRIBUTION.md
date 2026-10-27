@@ -293,3 +293,8 @@ does, prevents that.
   zero Claude/Anthropic identity or credit-line matches. Private report SHA-256
   `bcaf081813afcf053c0789b8f7f151e14fc59e2fcebc8bdee0c5b93b85400fd2`; see E779 and [the latest
   checkpoint](checkpoints/2026-10-27-app01-shutdown-term-escalation.md).
+- Refreshed after owner commit `ba6184529e921dfb3aafb01bb4a9520d6ff0238d`: all 9 fetched GitHub
+  branch heads, 0 remote tags, and **2,391 unique reachable commits** were parsed. The scan found
+  zero Claude/Anthropic identity or credit-line matches. Private report SHA-256
+  `3e6e679f906c75c0fa30c00040e724807176e6999ce72684029870b3ddea0561`; see E780 and [the latest
+  checkpoint](checkpoints/2026-10-27-app01-shutdown-term-escalation.md).

@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 08:28 CDT (`/root`) — E780 post-ba618452 public scan and push verification
+
+- **Task ID:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`; next independent work remains `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`.
+- **Files changed:** `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/TASKS.md`, and `docs/checkpoints/2026-10-27-app01-shutdown-term-escalation.md`.
+- **Exact commands/results:** post-commit attribution range and owner-identity audits passed for `ba6184529e921dfb3aafb01bb4a9520d6ff0238d`; explicit committed-path audit passed 6/6 and full path audit passed 3,013/3,013. The all-history attribution scan remains failed only for historical non-Claude alias `f6604a86e60e` (`orchestrator@local`). `git push origin main` exited 0, updating remote main from `91c23ecf` to `ba618452`. After `git fetch origin --prune`, the remote scanner exited 0: 9 branch heads, 0 tag refs, 2,391 unique reachable commits, and 0 Claude/Anthropic matches. The private scan report SHA-256 is `3e6e679f906c75c0fa30c00040e724807176e6999ce72684029870b3ddea0561`.
+- **E780 pre-commit audit:** staged and full path audits passed 6/6 and 3,013/3,013; empty-range and owner-identity checks passed; `--all` retained only the known non-Claude alias. Exact logs and hashes are in the checkpoint.
+- **Observations vs inference:** GitHub fetched refs were directly scanned after `ba618452`; the local and fetched `main` heads matched and the working tree was clean. The scan excludes `refs/stash`; a final documentation commit will be checked by its post-commit attribution range/identity audits.
+- **Remaining risks:** 70 private stash-only matches remain unchanged by owner choice; the unrelated historical alias remains in `--all`; CPU-01 slot 309 is still ACTIVE/G1 PARTIAL and overall port acceptance is incomplete.
+- **Next exact action:** publish this E780 evidence checkpoint, then resume CPU-01 only from the existing private reports/saved Ghidra database for a concrete `[RBP-0x38]` ownership or `0x531d60` invocation-order clue. No fresh binary import.
+- **Task status / attempts:** PUB-01 **ARTIFACT_VERIFIED** for fetched refs, 0 failed hypotheses; APP-01 TERM fixture **FIXTURE_VERIFIED**, one failed readiness iteration and 0 failed semantic hypotheses; CPU-01 slot 309 **ACTIVE / G1 PARTIAL**, 0 failed hypotheses.
+
 ## 2026-10-27 08:23 CDT (`/root`) — E779 public-history scan after 91c23ecf
 
 - **Task ID:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`; APP-01 TERM fixture is complete at fixture scope; CPU-01 slot 309 remains open.

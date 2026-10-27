@@ -1,4 +1,4 @@
-# APP-01 shutdown TERM escalation and public attribution checkpoint (E773-E779)
+# APP-01 shutdown TERM escalation and public attribution checkpoint (E773-E780)
 
 - Local date/time: 2026-10-27 07:57 CDT (America/Chicago).
 - Agent / integrator: `/root`.
@@ -125,6 +125,7 @@ range was empty; after commit, rerun that attribution check, then push `origin m
 - Next exact action: rerun repository gates after the final fixture cleanup, then stage only the allowlisted documentation and audit it before publication.
 - Task status / attempts: PUB-01 **ARTIFACT_VERIFIED** for fetched GitHub refs, 0 failed hypotheses; APP-01 TERM fixture **FIXTURE_VERIFIED**, one failed readiness iteration and 0 failed semantic hypotheses; CPU-01 slot 309 **ACTIVE / G1 PARTIAL**, 0 failed hypotheses.
 
+
 After owner commit `46a759003caba59b68a1fd421c07a401272c97fe` was pushed, the exact command
 `git fetch origin --prune && python3 -I local/validation/orch-20261026/claude-credit-cleanup-review/scan_remote_refs_attribution.py > local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-46a75900.json`
 exited 0. The report SHA-256 is
@@ -202,3 +203,20 @@ no fresh binary import is authorized by this checkpoint.
 - Remaining risks: 70 private stash-only matches remain unchanged by owner choice; the unrelated historical `orchestrator@local` identity remains an `--all` audit finding; CPU-01 slot 309 and full native-port acceptance remain incomplete.
 - Next exact action: commit only the six staged allowlisted docs as owner, run post-commit path and attribution checks, then push `origin main`.
 - Task status / attempts: PUB-01 **ARTIFACT_VERIFIED** for fetched GitHub refs, 0 failed hypotheses; APP-01 TERM fixture **FIXTURE_VERIFIED**, one failed readiness iteration and 0 failed semantic hypotheses; CPU-01 slot 309 **ACTIVE / G1 PARTIAL**, 0 failed hypotheses.
+
+
+## E780: post-ba618452 publication and public scan
+
+- Local date/time: 2026-10-27 08:28 CDT (America/Chicago).
+- Agent / integrator: `/root`.
+- Task IDs: `PUB-01-CLAUDE-CREDIT-CLEANUP-01`; `APP-01-PROCESS-CLIENT-SHUTDOWN-TERM-ESCALATION-01` remains complete at fixture scope; `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` remains open.
+- Files changed: `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/TASKS.md`, and this checkpoint.
+- Exact commands and results: `python3 -I scripts/check_commit_attribution.py` and `python3 -I scripts/check_commit_attribution.py --identity` passed for owner commit `ba6184529e921dfb3aafb01bb4a9520d6ff0238d`; `python3 -I scripts/audit_publish_paths.py HANDOFF.md docs/ATTRIBUTION.md docs/EVIDENCE.md docs/INDEX.md docs/TASKS.md docs/checkpoints/2026-10-27-app01-shutdown-term-escalation.md` passed 6/6, and `python3 -I scripts/audit_publish_paths.py --all` passed 3,013/3,013. `python3 -I scripts/check_commit_attribution.py --all` exited 1 only for the unrelated historical `orchestrator` / `orchestrator@local` identity on `f6604a86e60e`. `git push origin main` exited 0 (`91c23ecf..ba618452`). Then `git fetch origin --prune` and `python3 -I local/validation/orch-20261026/claude-credit-cleanup-review/scan_remote_refs_attribution.py > local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-ba618452.json` both exited 0.
+- Post-commit audit logs and SHA-256: range `local/validation/orch-20261027/e779-final-docs-checkpoint/postcommit_range.log`, `72d954d7873849934ae10cdf5ad4049069928f3c6b433f3e7e44743823e63f33`; identity `local/validation/orch-20261027/e779-final-docs-checkpoint/postcommit_identity.log`, `888507b0410bfc1aa9548e21b4bd5bdaa271389b1515786e902bc91722c90559`; all-history `local/validation/orch-20261027/e779-final-docs-checkpoint/postcommit_all.log`, `f67c8b2dabf442366fbc8922353feda1e6bbd31ffc26b3537d5161e8c1adad44`; committed paths `local/validation/orch-20261027/e779-final-docs-checkpoint/postcommit_committed_paths.log`, `6320dc13834a84b5ea100aeeb1f4e29e604fe41f2d405da103d16ca4b8e2d66c`; all paths `local/validation/orch-20261027/e779-final-docs-checkpoint/postcommit_all_path.log`, `2c2ed65cd259576fa6d92667e0b3ee100cd563754980efab77acf06c95b815b4`.
+- Remote scan report: `local/validation/orch-20261027/claude-credit-cleanup-review/remote-scan-after-ba618452.json`, SHA-256 `3e6e679f906c75c0fa30c00040e724807176e6999ce72684029870b3ddea0561`. The scanner observed 9 fetched branch heads, 0 remote tag refs, 2,391 unique reachable commits, and 0 Claude/Anthropic author, committer, or credit-line matches. `HEAD == origin/main == ba6184529e921dfb3aafb01bb4a9520d6ff0238d`; working tree was clean.
+- E780 pre-commit audit commands: `python3 -I scripts/audit_publish_paths.py` passed 6 staged paths; `python3 -I scripts/audit_publish_paths.py --all` passed 3,013 paths; `python3 -I scripts/check_commit_attribution.py` passed the empty range; `python3 -I scripts/check_commit_attribution.py --identity` passed; `python3 -I scripts/check_commit_attribution.py --all` exited 1 only for historical non-Claude `orchestrator@local` commit `f6604a86e60e`.
+- E780 pre-commit audit log SHA-256: `local/validation/orch-20261027/e780-final-docs-checkpoint/precommit_path_staged.log` (`6320dc13834a84b5ea100aeeb1f4e29e604fe41f2d405da103d16ca4b8e2d66c`); `local/validation/orch-20261027/e780-final-docs-checkpoint/precommit_path_all.log` (`2c2ed65cd259576fa6d92667e0b3ee100cd563754980efab77acf06c95b815b4`); `local/validation/orch-20261027/e780-final-docs-checkpoint/precommit_attr_range.log` (`72d954d7873849934ae10cdf5ad4049069928f3c6b433f3e7e44743823e63f33`); `local/validation/orch-20261027/e780-final-docs-checkpoint/precommit_attr_identity.log` (`888507b0410bfc1aa9548e21b4bd5bdaa271389b1515786e902bc91722c90559`); `local/validation/orch-20261027/e780-final-docs-checkpoint/precommit_attr_all.log` (`f67c8b2dabf442366fbc8922353feda1e6bbd31ffc26b3537d5161e8c1adad44`).
+- Observations vs inference: the fetched-ref scanner directly verified all 2,391 reachable commits at `ba618452`. Any later checkpoint commit must be individually covered by its post-commit attribution range and owner identity checks.
+- Remaining risks: 70 private stash-only matches remain unchanged by owner choice; the unrelated `orchestrator@local` history remains flagged by `--all`; CPU-01 slot 309 and full native-port acceptance remain incomplete.
+- Next exact action: commit these six staged docs as owner, run post-commit attribution and path checks, push `origin main`, then resume CPU-01 from the existing private reports and saved Ghidra project only for a concrete payload-lifetime or invocation-order clue; do not perform a fresh import.
+- Task status / attempts: PUB-01 **ARTIFACT_VERIFIED** for fetched public refs, 0 failed hypotheses; APP-01 TERM fixture **FIXTURE_VERIFIED**, one failed readiness iteration and 0 failed semantic hypotheses; CPU-01 slot 309 **ACTIVE / G1 PARTIAL**, 0 failed hypotheses.
