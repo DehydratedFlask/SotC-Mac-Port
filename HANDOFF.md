@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 17:08 CDT (`/root`) — E842 refresh live GitHub attribution census
+
+- **Task ID/status:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`, `ARTIFACT_VERIFIED` for all currently advertised GitHub refs through E841; the larger native-port goal remains active.
+- **E841 publication:** owner commit `45772966200ea6aaa665b3baf36651942edd12f0` (parent `3a06d31755c22dfa27d843b13921dc6670d2b7ba`), subject `docs: close out E840 publication and attribution audit`, authored and committed by Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Exact-range attribution and full path audit **3,058/3,058** passed; push and fetch confirmed `HEAD == origin/main == FETCH_HEAD`, clean.
+- **Fresh live GitHub census:** read-only scan after E841 queried 21 advertised refs (9 branches, 12 PR heads, 0 tags), 15 unique tips, and **2,454 reachable commits**. Claude/Anthropic author/committer identities and credit-line matches: **0**. Scanner SHA-256 `ac01143c8392b760d8ca3ba46eac7fb5b17776abfe9d5e90b4baf3efbd6805ce`; report SHA-256 `74ba9b794cfe6e94144f15ae81ec18ca7c253c8d12a4bb1048fc3a5b1111595d`; private artifacts are under `local/validation/orch-20261027/e841/`.
+- **Stash boundary:** separate read-only scan found **70** Claude/Anthropic matches among **826** commits over 21 stash-reflog tips. `refs/stash == 92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`; no stash ref or reflog was modified, per the user's explicit choice. Unreachable objects outside the advertised refs and stash reflog are not covered.
+- **E842 closeout:** docs-only publication. Standard repository gates, exact-range attribution, path audits, and owner push/fetch verification are recorded in `docs/checkpoints/2026-10-27-post-e841-github-attribution-census-e842.md`. No game acceptance gate advanced; product source is unchanged.
+- **Next exact action:** resume a bounded product task only when a documented dependency/input, provider result, unlocked Mac, or user-owned save makes one READY. Preserve slot 309's concrete-producer/semantic-consumer threshold and all game acceptance gates.
+
 ## 2026-10-27 17:02 CDT (`/root`) — E841 close E840 publication and attribution audit
 
 - **Task ID/status:** `PUB-01-CLAUDE-CREDIT-CLEANUP-01`, `ARTIFACT_VERIFIED` for the post-E838 advertised-ref census plus exact-range E839/E840 checks. The larger native-port goal remains active.

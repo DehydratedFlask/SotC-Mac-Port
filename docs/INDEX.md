@@ -451,3 +451,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [E838 publication and attribution closeout](checkpoints/2026-10-27-e838-publication-closeout-e839.md) | E839; E838 pushed and fetch-verified; 2,451 advertised-ref reachable commits scan clear; stash left unchanged |
 | [E839 publication closeout](checkpoints/2026-10-27-e839-publication-closeout-e840.md) | E840; E839 pushed and fetch-verified; exact-range attribution passed; stash left unchanged |
 | [E840 publication closeout](checkpoints/2026-10-27-e840-publication-closeout-e841.md) | E841; E840 pushed and fetch-verified; exact-range attribution passed; stash left unchanged |
+| [Post-E841 live GitHub attribution census](checkpoints/2026-10-27-post-e841-github-attribution-census-e842.md) | E842; 2,454 advertised-ref reachable commits scan clear; 70 stash-only matches remain by owner choice |
