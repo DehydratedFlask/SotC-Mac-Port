@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 00:06 CDT (`/root`) — slot 316 replayed; attribution refreshed after d0b454b6
+
+- Slot 316 `CPU-01-STARTUP-SLOT-316-CHARACTERIZATION-01` is **STATIC_ANALYSIS_VERIFIED** for its analyzer-only scope. The live row is `{316, 0xa33280}`; worker and root checker logs match, and the root's full JSON replay is byte-identical to the worker output (E723). The 2,560 B span has 473 reachable instructions, 54 direct-call sites, and 5 unresolved indirect calls; no semantics, liftability, or runtime claim. Registration remains blocked behind 309/312/314; G1 remains PARTIAL.
+- The worker's analyzer command used its fixed generated decode cache at `/private/var/folders/vx/5z8skhb97w32g817rv7hbh940000gn/T/opencode/slot_struct`; root replay isolated its cache under `local/validation/orch-20261027/slot316/root-scratch/`. Private retained report/JSON/logs are under `local/validation/orch-20261027/slot316/`.
+- After pushing `d0b454b607c0799a6f5b03ffe51196e93d91279c`, `git fetch origin --prune` and the remote attribution scan exited 0: 9 branch heads, 0 tags, 2,352 reachable commits, and 0 Claude/Anthropic matches (E724). Report: `local/validation/orch-20261026/claude-credit-cleanup-review/remote-scan-after-d0b454b6.json`.
+- Files changed for this checkpoint: `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md` (E723/E724), `docs/FOLDERS.md`, `docs/INDEX.md`, `docs/TASKS.md`, and new slot 316 and post-d0b454b6 checkpoints. `python3 scripts/project_index.py` exited 0 and indexed 33,043 folders; `docs/FOLDERS.md` lists 772 checkpoint files. Exact next action after publication: select and claim the next bounded task from `docs/TASKS.md`; do not register a constructor beyond the first unrecovered index 309.
+- This is a docs-only checkpoint. Run the project index, stage only these eight allowlisted documentation paths, run staged/all-path and attribution audits plus `git diff --cached --check`, then commit as owner and push `origin main`.
+
 ## 2026-10-27 00:04 CDT (`/root`) — attribution refreshed after 209ff; slot 316 analyzer dispatched
 
 - `HEAD` and `origin/main` were both `209ff474d3d9d7727084076a6f27ec9c0eacdc39`; the slot 316 claim is published in that commit. `git fetch origin --prune` exited 0. The remote scan command in E722 exited 0 across 9 branch heads, 0 tags, and 2,351 reachable commits with zero Claude/Anthropic identities or credit lines. The private report is `local/validation/orch-20261026/claude-credit-cleanup-review/remote-scan-after-209ff474.json`.
