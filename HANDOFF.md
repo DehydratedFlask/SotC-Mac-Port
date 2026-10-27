@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-26 23:30 CDT (`/root`) — leaf rows published; slot 309 analysis claimed
+
+- Completed task: `CPU-01-STARTUP-LEAF-ROWS-315-560-01`, published as `cb6fe71d61a885e81f778b7a109af4a47b426834` on `origin/main`. Gates remain configure 0, build 433/433, CTest 431/431, lift checkers 516/0/0, Trail graph in sync. Coverage is **397/573**; 176 slots remain, first gap **309 / `0xa505e0`**. Details E713 and [leaf-row checkpoint](docs/checkpoints/2026-10-26-startup-leaf-rows-315-560.md).
+- Post-push attribution audit: `git fetch origin --prune` exit 0; all 9 GitHub branch heads (no tags), **2,343** reachable commits, 0 Claude/Anthropic credit trailers, 0 Claude/Anthropic author/committer identities. Log files: `local/validation/orch-20261026/claude-credit-cleanup-review/remote-refs-after-leaf-push.txt` and `remote-scan-after-leaf-push.log`. The two old local branch refs point at the cleaned tips; local stash snapshots still retain pre-cleanup ancestry and remain private/unmodified. The only `--all` attribution-gate finding is historical `f6604a86e60e` `orchestrator@local`.
+- Next bounded task `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` is claimed for read-only analysis and dispatched to `/root/trail_scope_audit`. The old 1,891-byte size is only a census estimate until rechecked against the pinned ELF. No source edits are authorized by this work packet; details in [the claim](docs/checkpoints/2026-10-26-slot309-characterization-claim.md). Status ACTIVE, 0 failed hypotheses.
+- Files changed in this checkpoint: `HANDOFF.md`, `docs/TASKS.md` (leaf published + slot 309 claim), `docs/EVIDENCE.md` (E714), `docs/INDEX.md`, `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-26-slot309-characterization-claim.md`. Project index must be rerun after this checkpoint file; stage only allowlisted paths, audit, commit as owner, and push `origin main` before analysis begins.
+- Limits: G1 remains PARTIAL. No native boot, audible game content, real save/reload, or game-driven Metal frame is claimed.
+
 ## 2026-10-26 23:26 CDT (`/root`) — 11 startup leaf rows root-replayed
 
 - Task: `CPU-01-STARTUP-LEAF-ROWS-315-560-01`; attribution cleanup `PUB-01-CLAUDE-CREDIT-CLEANUP-01` remains published/ARTIFACT_VERIFIED.
