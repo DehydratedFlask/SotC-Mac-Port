@@ -369,6 +369,7 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Concurrent process-client request fixture](checkpoints/2026-10-27-app01-client-concurrent-requests-complete.md) | E736 test-only concurrency fixture; 21 focused and 154 launcher tests pass, real-core integration skipped |
 | [Post-0fec9e9e remote attribution scan](checkpoints/2026-10-27-post-0fec9e9e-attribution-scan.md) | E737; 9 branch heads and 2,361 commits scanned with zero Claude/Anthropic matches |
 | [APP-01 pending-request shutdown fixture claim](checkpoints/2026-10-27-app01-shutdown-pending-request-claim.md) | Test-only task claim; controlled shell fake will verify `.badState` before `quit` |
+| [Post-07e2055f remote attribution scan](checkpoints/2026-10-27-post-07e2055f-attribution-scan.md) | E738; 9 branch heads and 2,362 commits scanned with zero Claude/Anthropic matches |
 | [Launcher bundle with core (2026-10-24)](checkpoints/2026-10-23-launcher-bundle-core.md) | signed app with SoCGameCore; E614 |
 | [Save relaunch (2026-10-23)](checkpoints/2026-10-23-save-relaunch.md) | cross-process write/load/enumerate; E615 |
 | [Save acceptance tool (2026-10-23)](SAVE_ACCEPTANCE.md) | read-only SAV-04 inspector; E616/NOT RUN |
