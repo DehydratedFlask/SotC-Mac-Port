@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 14:12 CDT (`/root`) — E820 claim bounded slot-309 payload-lifetime pass
+
+- **Task:** `CPU-01-STARTUP-SLOT-309-PAYLOAD-OWNERSHIP-01`, a read-only check of whether the `+0x10` payload is borrowed, copied, or owned on the observed slot-309 path at `0xa505e0`.
+- **Starting state:** clean `main == origin/main == c658b67a92e877fedf9a4e2fc4698aa907be22c7`; latest full live GitHub attribution census covers 2,432 reachable commits with zero Claude/Anthropic identities or credit lines.
+- **Owner / worker:** root integrator with `/root/slot309_payload_ownership`; worker is limited to a private report under `local/validation/orch-20261027/slot309/`, no shared source/docs edits and no commit. Pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; saved Ghidra queries must use `-noanalysis -readOnly`.
+- **Scope limits:** inspect only the existing slot-309 callsite, helper writes, observed return cleanup/destructor/free path, and hash-bound bytes. No broad consumer sweep, game-code execution, global ownership/liftability claim, or registration. Keep slot 309 unregistered and G1 PARTIAL.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md`.
+- **Next exact action:** complete the private bounded query, independently verify its hashes and conclusion, record the outcome in a checkpoint, then publish allowlisted docs under owner identity. If the observed path cannot prove payload ownership, retain the hook boundary.
+- **Task status / attempts:** CLAIMED / in progress; 0 failed semantic hypotheses.
+
 ## 2026-10-27 14:11 CDT (`/root`) — E819 close out E818 publication
 
 - **Tasks:** verify E818 publication; close the bounded table-relocation follow-up for `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`; refresh live GitHub attribution coverage.
