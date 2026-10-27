@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 12:22 CDT (`/root`) — Claim E621 superseded-metadata reconciliation
+
+- **Task:** `DOC-01-E621-SUPERSEDED-METADATA-CLAIMS-01`; align stale DATA-02/AUD-01 summaries in `docs/TASKS.md` and `docs/EVIDENCE.md` with the corrected E621 evidence already recorded in `docs/ASSETS.md` and `docs/checkpoints/2026-10-24-psarc-md5-reconciliation.md`.
+- **Starting state:** `HEAD == origin/main == df238ab20ee6e4fc90985c945084219114d48f01`; worktree clean. Exact check: `git status --short --branch; git rev-parse HEAD origin/main` — exit 0.
+- **Files changed:** `HANDOFF.md` only (claim checkpoint).
+- **Observed contradiction:** task rows DATA-02, metadata-sidecar, XFF, STS, and bridge retain superseded size/value matrices or misattributed named-member results; `docs/EVIDENCE.md` also preserves stale bridge/STS result text without marking it withdrawn. E621 corrects 40,215/1/0/0 path-key/size cells, 290 identical 120-byte STS pairs, and a byte-identical 144-byte bridge pair at TOC ID 2,581. Supporting live docs: `docs/EVIDENCE.md` E621; `docs/ASSETS.md` lines 48–71 and 158–183; `docs/checkpoints/2026-10-24-psarc-md5-reconciliation.md` lines 47–63 and 71–80.
+- **Scope and limits:** metadata/document correction only. No payload reads, code changes, format/schema/codec, mount-order, reader, runtime, or audio claims. E621 already supplies the artifact evidence; do not rewrite its immutable private reports.
+- **Claim precommit gates (2026-10-27 12:26 CDT):** CMake configure/build exit 0; CTest **431/431** (8.21 s); lift checkers **516 passed / 0 skipped / 0 failed**; `audit_publish_paths.py --all` **3,031/3,031**; attribution audit exit 0. `project_index.py` exit 0, **33,159 folders**; strict `--check` reports `docs/FOLDERS.md` and `local/indexes/folders.json` stale after generated `.build` churn. The only tracked project-index diff was transient `.build` rows; saved to the private log folder and `docs/FOLDERS.md` restored to HEAD. Logs: `local/validation/orch-20261027/doc-e621-claim/`.
+- **Staged publication checks:** only `HANDOFF.md` is staged; cached diff check exits 0; staged path audit **1/1** and final full path audit **3,031/3,031** pass. Logs: `path-audit-staged.log`, `path-audit-all-final.log` in the private folder above. Commit/push and post-push attribution/fetch checks remain next.
+- **Next exact action:** publish the claim checkpoint, then reconcile seven stale task-board rows and two evidence-ledger rows against E621 and append a completed checkpoint here.
+- **Task status / attempts:** `CLAIMED`; 0 failed hypotheses. No native game acceptance gate changes.
+
 ## 2026-10-27 12:12 CDT (`/root`) — E809 verify E808 and close public attribution work
 
 - **Task:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; record E808 post-push verification and final public-ref scan.
