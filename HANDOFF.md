@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 01:26 CDT (`/root`) — slot 309 `0x26ea0` virtual calls resolved (E750)
+
+- Resolved the two `0x26ea0` virtual-call sites for all four callsites in `0xa505e0`. The `+0x18` methods return 1; the `+0x30` methods return 1 except for the `0x32f7af0` object, whose method returns 0. Thus the helper's `second == 3` conditional is false on these four statically mapped paths. Ghidra DATA refs and instruction spans are recorded in E750; this is static inference, not executed behavior.
+- Call-time vptr correction: the `0x32f7af0` object uses `0x1594218` at the `0xa509f7` call. `0x15940b0` had been written earlier but was overwritten before this call. Ghidra decompilation of `0x20d80` shows writes begin at `param_1+8` or `param_1+0x20`, leaving `param_1+0` (the vptr) unchanged in this path.
+- One read-only vtable query stopped at a typo (`0x15d940b0`, unmapped) after reading the prior three entries; corrected reads completed. No source/project state changed. This was a query/address error, not a failed semantic hypothesis. Parent slot-309 characterization remains ACTIVE; G1 PARTIAL; three custom helper/nested-helper paths and lifetime effects remain unresolved; previous three provider timeouts remain counted.
+- E750 changes: `HANDOFF.md`, `docs/EVIDENCE.md`, `docs/TASKS.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and new `docs/checkpoints/2026-10-27-slot309-concmd-vcall-resolution.md`. No source, tests, tool installs, or dependency changes.
+- Exact saved-project Ghidra commands, outputs, and hashes are in the E750 checkpoint. Latest remote attribution scan after `9b0ed4d3` covered 9 heads, 0 tags, 2,372 commits with zero Claude/Anthropic matches (private report SHA-256 `db4db48c17c54db94704ac92e163c789336fe682782b293e1bec4f1de755cee2`).
+- `python3 scripts/project_index.py` exited 0 (33,068 folders); only `docs/checkpoints` was retained in `docs/FOLDERS.md` after discarding ignored build/private validation churn (800 to 801). `trail build --check` exited 0; wiring graph in sync, 9,875 pending deep-layer nodes (log SHA-256 `00119eb6b8e66856a413c1ec07c3322f374159b225f828749d8d6f805ed4df5f`).
+- **Next exact action:** resolve the three custom paths separately: `0xa4f4d0 -> 0xa4f690`, `0xa4fec0 -> 0xa50080`, and `0xa50280 -> 0xa50440`. Keep hook/lifetime boundaries explicit and do not implement the slot yet.
+
+## 2026-10-27 01:19 CDT (`/root`) — post-fc522ee7 remote attribution scan (E749)
+
 ## 2026-10-27 01:19 CDT (`/root`) — post-fc522ee7 remote attribution scan (E749)
 
 - After publishing `fc522ee73c0f01e4c5e0a90abdb00ea1c696bf24`, `git fetch origin --prune` and the remote attribution scanner exited 0. All 9 fetched GitHub branch heads, 0 remote tags, and 2,371 unique reachable commits were scanned; zero Claude/Anthropic author/committer identities and zero credit-line matches. Private report `local/validation/orch-20261026/claude-credit-cleanup-review/remote-scan-after-fc522ee7.json`, SHA-256 `5860ef8adc7e15e6f36238713134a4cd5e8396455ead262f9a96715e90b1d53d`.

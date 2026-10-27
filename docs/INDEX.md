@@ -21,6 +21,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Startup slot 309 characterization claim](checkpoints/2026-10-26-slot309-characterization-claim.md) | Read-only task for first gap `0xa505e0`; analyzer confirms the 1,891 B extent, while 3 indirect calls and REA correlation remain open |
 | [Startup slot 309 preliminary dossier](checkpoints/2026-10-26-slot309-preliminary-dossier.md) | Static analyzer and root RELA replay resolve the three root indirect slots; three Ghidra startup timeouts leave helper semantics and G1 partial |
 | [Startup slot 309 saved-project Ghidra coverage](checkpoints/2026-10-27-slot309-ghidra-coverage.md) | E748; saved-project coverage maps the 1,891 B root body and its three one-byte RET targets; custom helper dispatch remains unresolved |
+| [Startup slot 309 `0x26ea0` virtual calls](checkpoints/2026-10-27-slot309-concmd-vcall-resolution.md) | E750; both indirect slots resolve for all four slot-309 callers; custom helper edges remain open |
 | [Startup slot 312 characterization claim](checkpoints/2026-10-26-slot312-characterization-claim.md) | Parallel read-only analyzer task to identify the pinned RVA and map preliminary control flow; no native model claimed |
 | [Startup slot 312 preliminary dossier](checkpoints/2026-10-26-slot312-preliminary-dossier.md) | Root replay matches pinned table/analyzer output; two indirect calls remain unresolved, G1 partial |
 | [Startup slot 314 characterization claim](checkpoints/2026-10-26-slot314-characterization-claim.md) | Read-only analyzer task for pinned constructor row 314 / `0xa41810`; no semantics or liftability claim |
@@ -383,6 +384,7 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Post-c4582888 remote attribution scan](checkpoints/2026-10-27-post-c4582888-attribution-scan.md) | E747; 9 branch heads and 2,369 commits scanned with zero Claude/Anthropic matches |
 | [Post-fc522ee7 remote attribution scan](checkpoints/2026-10-27-post-fc522ee7-attribution-scan.md) | E749; 9 branch heads and 2,371 commits scanned with zero Claude/Anthropic matches |
 | [Slot 309 saved-project Ghidra coverage](checkpoints/2026-10-27-slot309-ghidra-coverage.md) | E748; root static coverage verified, helper dispatch and lifetime boundary remain open |
+| [Slot 309 `0x26ea0` virtual-call resolution](checkpoints/2026-10-27-slot309-concmd-vcall-resolution.md) | E750; four caller vptrs and constant-returning targets mapped, static only |
 | [Post-fc522ee7 remote attribution scan](checkpoints/2026-10-27-post-fc522ee7-attribution-scan.md) | E749; 9 branch heads and 2,371 commits scanned with zero Claude/Anthropic matches |
 | [Launcher bundle with core (2026-10-24)](checkpoints/2026-10-23-launcher-bundle-core.md) | signed app with SoCGameCore; E614 |
 | [Save relaunch (2026-10-23)](checkpoints/2026-10-23-save-relaunch.md) | cross-process write/load/enumerate; E615 |
