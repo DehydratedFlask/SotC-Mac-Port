@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 02:48 CDT (`/root`) — slot 309 lifetime and writer-order boundary; post-d71 scan (E759/E760)
+
+- Tasks: `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` and `PUB-01-CLAUDE-CREDIT-CLEANUP-01`. E760 integrates three hash-checked private lanes. The `[RBP-0x38]` helper records are initialized through `0xa50220` and used as copy sources, with no explicit helper-local release; source type/ownership and cleanup requirement remain unknown. Two independent pinned-byte/export audits find `0x531d60` address-taken but no direct caller or constructor entry and no identified indirect consumer. The extracted constructor walk does not order that address-taking call against slot 309. Preserve both `0x2dfd4b8` manager/list branches; parent ACTIVE/G1 PARTIAL; do not register slot 309.
+- After pushing owner commit `d71c3ccff1dd2eced3aac42aa61d1b949cbfd357`, fetch and remote attribution scan exited 0 (E759): 9 heads, 0 tags, 2,379 reachable commits, zero Claude/Anthropic identities or credit lines; scan SHA-256 `65975090a3d9b746cde68f61a5e08d45d3ef580dec23c298a051c8919006790b`.
+- New checkpoint files: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md` (E759/E760), `docs/ATTRIBUTION.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-slot309-rbp38-writer-order-post-d71.md`. Configure/build exited 0, CTest **431/431**, lift checkers **516/0/0**, Trail graph in sync with 9,875 deep nodes pending, project index exit 0 (33,101 folders; only checkpoint count 807→808 retained), and staged/all path audits **7/3,004** passed. All-history attribution reports only historical non-Claude `f6604a86e60e` `orchestrator@local`; unpublished attribution runs against the new commit before push. Logs/hashes are in the checkpoint.
+- **Next exact action:** commit the seven documentation paths as owner and push `origin main`. After publication, use an exclusive read-only saved-project query for incoming refs to `0x531d60` and continue seeking the local-record type/destructor contract.
+
 ## 2026-10-27 02:41 CDT (`/root`) — post-329046c7 public-ref attribution scan (E758)
 
 - After pushing `329046c759199cb3e7a69919bcf76417de933b95`, `git fetch origin --prune` and `scan_remote_refs_attribution.py` exited 0. It covered 9 remote heads, 0 tags, and 2,378 unique reachable commits with zero Claude/Anthropic author/committer identities and credit lines. New main commit has the owner's author/committer. Private report SHA-256 `fb301aa7b7240072f3d3ff9fae21b977e3c7748a40c9b9bafea9840d40e4f933` (E758).
