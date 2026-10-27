@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 01:45 CDT (`/root`) — post-cf1d019a remote attribution scan (E752)
+
+- After pushing owner-attributed commit `cf1d019a145492c3164f98ef9a9fdec54051e42b`, `git fetch origin --prune` and `scan_remote_refs_attribution.py` exited 0. The public scan parsed 9 remote branch heads, 0 tags, and 2,374 reachable commits; it found zero Claude/Anthropic author/committer identities and zero credit-line matches. Private report SHA-256 `50d90cdbfbb8ed35ce766b70fa08ee934f3e7d7ef1b5632e27921a201f3ee6c3`.
+- The new commit author and committer are both `Johnny Wang <dehydratedflask@users.noreply.github.com>`. The all-history local audit continues to flag only `f6604a86e60e` (`orchestrator@local`), which is unrelated to Claude and remains outside the approved cleanup. See [E752](docs/checkpoints/2026-10-27-post-cf1d019a-attribution-scan.md).
+- This documentation checkpoint reran configure/build (both exit 0), CTest **431/431**, lift checkers **516/0/0**, Trail freshness, and staged/all path audits (**7/2,999**); the unpublished attribution audit passes. No source or test files changed; no game acceptance claim.
+- **Next exact action:** resume the active slot-309 characterization on remaining indirect callees and temporary-object lifetime/service boundaries; keep G1 PARTIAL and do not register the slot until the boundary is supported.
+
 ## 2026-10-27 01:34 CDT (`/root`) — slot 309 helper dispatch partial (E751)
 
 - Completed read-only static call mapping for all three paths `0xa4f4d0 -> 0xa4f690`, `0xa4fec0 -> 0xa50080`, and `0xa50280 -> 0xa50440` using the saved Ghidra project and pinned ELF. Selected vtable calls resolve for the observed slot-309 stack objects; function-pointer edges and object lifetime/cleanup effects remain unresolved. No native-lift/runtime claim; parent task ACTIVE, G1 PARTIAL.
