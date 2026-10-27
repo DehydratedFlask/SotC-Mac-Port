@@ -378,6 +378,7 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Post-ca87a357 remote attribution scan](checkpoints/2026-10-27-post-ca87a357-attribution-scan.md) | E743; 9 branch heads and 2,366 commits scanned with zero Claude/Anthropic matches |
 | [APP-01 in-flight child-exit fixture](checkpoints/2026-10-27-app01-inflight-exit-failure-complete.md) | E745; 23 focused and 156 launcher tests pass; real-core integration skipped |
 | [Post-4cb0afcd remote attribution scan](checkpoints/2026-10-27-post-4cb0afcd-attribution-scan.md) | E744; 9 branch heads and 2,367 commits scanned with zero Claude/Anthropic matches |
+| [Post-f033ed84 remote attribution scan](checkpoints/2026-10-27-post-f033ed84-attribution-scan.md) | E746; 9 branch heads and 2,368 commits scanned with zero Claude/Anthropic matches |
 | [Launcher bundle with core (2026-10-24)](checkpoints/2026-10-23-launcher-bundle-core.md) | signed app with SoCGameCore; E614 |
 | [Save relaunch (2026-10-23)](checkpoints/2026-10-23-save-relaunch.md) | cross-process write/load/enumerate; E615 |
 | [Save acceptance tool (2026-10-23)](SAVE_ACCEPTANCE.md) | read-only SAV-04 inspector; E616/NOT RUN |
