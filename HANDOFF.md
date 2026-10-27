@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 00:12 CDT (`/root`) — atomic temp-isolation task closed at fixture scope
+
+- `SAV-01-ATOMIC-WRITER-TEMP-ISOLATION-01` is **FIXTURE_VERIFIED** as a bounded subtask. The current `save_stream.cpp`, `save_stream.hpp`, and `test_save_stream_file.cpp` hashes match the reviewed implementation and E696 test revision; root captured them in `local/validation/orch-20261027/sav01-atomic-closeout/live-source-hashes.txt`. E693-E696 record focused 5/5, full CTest 397/397, and 18/18 review mutants killed. Parent `SAV-01`, real game save/load, and power-loss durability remain open; no test was rerun for this documentation closeout.
+- After pushing `e6c8d33ed93867253f397600684dd1e8d59c2fa5`, fetch and remote scan exited 0 across 9 branch heads, 0 tags, and 2,353 reachable commits with zero Claude/Anthropic matches (E725). Private report: `local/validation/orch-20261026/claude-credit-cleanup-review/remote-scan-after-e6c8d33e.json`.
+- Files changed for this checkpoint: `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md` (E725/E726), `docs/FOLDERS.md`, `docs/INDEX.md`, `docs/TASKS.md`, and new atomic-task and post-e6c8d33e checkpoints. `python3 scripts/project_index.py` must run before staging. Exact next action after publication: continue with the next root-owned bounded task; F590 remains ACTIVE pending a recorded decision on its missing original five-mutant evidence.
+- This is a docs-only closeout. Run the project index, stage only these eight allowlisted documentation paths, run staged/all-path and attribution audits plus `git diff --cached --check`, commit as owner, and push `origin main`.
+
 ## 2026-10-27 00:06 CDT (`/root`) — slot 316 replayed; attribution refreshed after d0b454b6
 
 - Slot 316 `CPU-01-STARTUP-SLOT-316-CHARACTERIZATION-01` is **STATIC_ANALYSIS_VERIFIED** for its analyzer-only scope. The live row is `{316, 0xa33280}`; worker and root checker logs match, and the root's full JSON replay is byte-identical to the worker output (E723). The 2,560 B span has 473 reachable instructions, 54 direct-call sites, and 5 unresolved indirect calls; no semantics, liftability, or runtime claim. Registration remains blocked behind 309/312/314; G1 remains PARTIAL.
