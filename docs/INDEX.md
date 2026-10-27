@@ -433,3 +433,4 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [Slot-309 payload ownership boundary](checkpoints/2026-10-27-slot309-payload-ownership-e821.md) | E821; shallow `+0x10` copy and no-op cleanup confirmed on one path; ownership remains unresolved |
 | [E821 publication and attribution closeout](checkpoints/2026-10-27-e821-publication-closeout.md) | E822; E821 fetched on `main`; 2,434 remote commits scanned with zero Claude/Anthropic hits |
 | [Claim: revalidate three corrected pakN sidecar members](checkpoints/2026-10-27-aud01-pakn-sidecar-revalidate-claim-e823.md) | E823; pinned archive/manifest identities; selected decoded-member verification not yet run |
+| [Revalidated corrected pakN sidecar identities](checkpoints/2026-10-27-aud01-pakn-sidecar-revalidate-e824.md) | E824; three exact paths, TOC locators, decoded lengths and SHA-256 values verified; no format or runtime claim |

@@ -1,5 +1,18 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 14:54 CDT (`/root`) — E824 verify corrected pakN sidecar bytes
+
+- **Task:** `AUD-01-METADATA-SIDECAR-PAKN-REVALIDATE-01`, read-only identity revalidation of three corrected `pakN` entries.
+- **Result:** all three exact path rows were unique, each `Psarc.entry_index` resolved to the pinned entry, and `Psarc.read` returned the expected lengths. Worker and root-replay reports are byte-identical (report SHA-256 `94b6369353e1eaf27b4a29e81b4d66a482dc727906009c7ac90458ef658d921d`). `/root/slot309_order_review` approved after the decoder source hash was bound.
+- **Decoded-byte identities:** `shadow_sounds.cxml` (entry 59169, 355,718 B) SHA-256 `fc0b20fcd764f46b57142c9b30e51a524c31d936f476fc98cfb92492c0ee0c64`; `shadowrandomevents.crmp` (entry 57178, 3,393 B) SHA-256 `14977afe6ba82f641e5e50e9ac5212e39dd07f35d6bdebe47ded3b54049dacd7`; `shadowstreams.crmp` (entry 38233, 3,295 B) SHA-256 `d3f95c9e91071d234882116d23d91a3512c5149c9b1642fcccda0e7e02512fb9`.
+- **Inputs/decoder:** archive `local/extracted/CUSA08809/pakN.psarc` hash `559f7a3fa66bc652d36c5f1a885b351e4aeb17dadbba06a0006520bfd325be73`, 12,838,532,222 B; corrected manifest hash `4f7fba6bb85aa29712f502aa0c97ac0daa604dbe9766161d0f71f665b7c290ec`; decoder `scripts/psarc.py` SHA-256 `58997e3b81b32ced7a8f06f780f7593b8f3111da2a59fa4fa05af5a83f4feee7`, identical to the published E823 source blob at `8355662ef7d6d5090f541ea96f0914ab1d996f5b`.
+- **Private evidence:** worker report/verifier/log in `local/validation/orch-20261027/aud01-pakn-sidecar-revalidate/`; root fresh replay and report checker in `local/validation/orch-20261027/aud01-pakn-sidecar-root-replay/`; root replay log at `local/validation/orch-20261027/e823/root-replay.log`; decoder identity and review logs under `e824/`.
+- **Limits/status:** **ARTIFACT_VERIFIED** for three decoded byte identities only; one successful read-only pass, zero failed attempts. No payload bytes were written or extracted. No format/schema/codec/routing/playback/runtime claim. E824 does not advance a game gate.
+- **Repository gates:** configure/build exit 0 (`ninja: no work to do`); CTest **431/431**; lift **516 passed / 0 skipped / 0 failed**; Trail **9,877 nodes / 13,470 edges** (deep layer not built); project index current at **31,933 folders**. Logs are under `local/validation/orch-20261027/e824/`.
+- **Current publication/attribution:** fresh scan after E823 covers 9 branches, 12 PR refs, 0 tags, 15 tips, **2,436 commits**, zero Claude/Anthropic identities or credit lines; private stash remains unchanged by owner choice.
+- **Files changed:** docs/task/evidence/index checkpoint records only; worker made no shared source/docs edits.
+- **Next exact action:** review E662's coverage gap for SELF segment 10 and, if its offline recovery boundary remains bounded, claim a separate read-only recoverability task.
+
 ## 2026-10-27 14:42 CDT (`/root`) — E823 claim bounded pakN sidecar identity recheck
 
 - **Task:** `AUD-01-METADATA-SIDECAR-PAKN-REVALIDATE-01`, a private, read-only revalidation of three exact `pakN` sound-sidecar members at their corrected path/TOC locators.
