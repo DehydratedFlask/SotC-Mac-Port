@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-26 23:51 CDT (`/root`) — slot 309 static dossier reviewed; slot 312 claim ready for publication
+
+- Slot 309 task `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` remains ACTIVE / STATIC_ANALYSIS_VERIFIED. The private worker report and root RELA replay are recorded in E716: the three root computed calls map through type-8 RELA entries to 1-byte `ret` spans in the project analyzer. The overview, function, and focused resolver each hit the 330,000 ms Ghidra startup deadline; no Ghidra Evidence ID or coverage. Custom and nested helper edges and host lifetime effects remain open; no liftability or gameplay claim.
+- Slot 312 task `CPU-01-STARTUP-SLOT-312-CHARACTERIZATION-01` is claimed for a read-only preliminary analyzer pass and awaits dispatch after publication. Exact next action: recover index 312's RVA from the pinned constructor table, verify the ELF, run the existing analyzer, and report extent/hash/branches/calls/data references with limitations; no semantics/liftability conclusion or shared source edits.
+- Files changed in this checkpoint: `HANDOFF.md`, `docs/FOLDERS.md`, `docs/INDEX.md`, `docs/EVIDENCE.md`, `docs/TASKS.md`, `docs/checkpoints/2026-10-26-slot312-characterization-claim.md`, and new `docs/checkpoints/2026-10-26-slot309-preliminary-dossier.md`. `python3 -I local/validation/orch-20261026/slot309/verify_indirect_rela.py > local/validation/orch-20261026/slot309/indirect_rela_root_replay.json` exited 0; all three target analyzer commands exited 0. `python3 scripts/project_index.py` exited 0 and indexed 33,037 folders; `docs/FOLDERS.md` now records 762 checkpoint files.
+- `git fetch origin --prune` exited 0 with `HEAD` and `origin/main` both at `860be989b6d1e8cefa2a564eab716f9de39fb76a`. Next exact action: stage only these seven documentation paths, run staged/all-path, attribution and diff audits, commit/push the checkpoint, then dispatch the slot 312 read-only worker. Full G1 remains PARTIAL.
+
 ## 2026-10-26 23:41 CDT (`/root`) — slot 309 Ghidra startup timed out once
 
 - Task: `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`, ACTIVE. The project analyzer result is recorded in E715: ELF SHA `d0723afb…61d3`, exact span 1,891 B, 353 instructions, 40 direct-call sites/10 targets, one branch edge, 73 RIP refs/18 stores, and three indirect sites.
