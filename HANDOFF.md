@@ -1,5 +1,11 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 01:52 CDT (`/root`) — remote attribution scan after `5c5c2758` (E753)
+
+- `git fetch origin --prune` and the public-ref attribution scan exited 0. The scan parsed 9 fetched GitHub branch heads, 0 remote tag refs, and 2,375 unique reachable commits; it found zero Claude/Anthropic author/committer identities and zero co-author/generated-by credit-line matches. Main at scan time was `5c5c2758a4c6cd8c3891365f149c8f0d91baf5ab`, with owner author and committer. Private report SHA-256 `c9533b083f84b65bc42ee3f4945184c4514c7a052dcfb1a832dd927a47131784`; see [E753](docs/checkpoints/2026-10-27-post-5c5c2758-attribution-scan.md).
+- Repository validation for this recording checkpoint: configure/build exit 0; CTest **431/431**; lift checkers **516/0/0**; `trail build --check` exit 0 with the wiring graph in sync and 9,875 deep-layer nodes pending; project index exit 0 with only the docs/checkpoints count retained (803 to 804); staged/all path audits **7/3,000** pass; unpublished attribution passes. `check_commit_attribution.py --all` still exits 1 only for historical `f6604a86e60e` `orchestrator@local`, with no Claude/Anthropic matches. Logs are under `local/validation/orch-20261027/post-5c5c2758/`; exact hashes and limits are in E753.
+- **Next exact action:** commit the seven allowlisted docs under the owner identity, push `origin main`, then refresh the public-ref scan. In parallel, continue slot-309 static analysis; G1 stays PARTIAL, and the newly completed `0xa4fec0 -> 0xa50080` map does not establish native ownership/lifetime.
+
 ## 2026-10-27 01:45 CDT (`/root`) — post-cf1d019a remote attribution scan (E752)
 
 - After pushing owner-attributed commit `cf1d019a145492c3164f98ef9a9fdec54051e42b`, `git fetch origin --prune` and `scan_remote_refs_attribution.py` exited 0. The public scan parsed 9 remote branch heads, 0 tags, and 2,374 reachable commits; it found zero Claude/Anthropic author/committer identities and zero credit-line matches. Private report SHA-256 `50d90cdbfbb8ed35ce766b70fa08ee934f3e7d7ef1b5632e27921a201f3ee6c3`.
