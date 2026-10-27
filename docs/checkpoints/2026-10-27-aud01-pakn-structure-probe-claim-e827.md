@@ -94,3 +94,20 @@ lines. Private `refs/stash` remains unchanged at
 Root owns shared docs and publication. The worker may start only after this claim is committed and
 pushed. The only permitted worker output is private evidence under the path above. No source,
 reference, or dependency change is planned.
+
+## E827 claim publication closeout
+
+The claim was committed by the owner as `763c9178c7b12123eb432ea48a9aa76b3a2b7d15` (parent
+`569506365f035d7cd5c24489257ade35e5d83c66`). Seven staged/committed paths and the full
+**3,044-path** tracked tree passed publication-path audits; exact-range attribution, owner
+identity, and committed-diff checks passed. `git push origin main` exited 0; fetch confirmed
+`HEAD == origin/main == 763c9178c7b12123eb432ea48a9aa76b3a2b7d15`, clean.
+
+The post-E827 scan fetched 9 branch refs and 12 PR-head refs (0 tags, 15 unique tips), covering
+**2,440 reachable commits** with zero Claude/Anthropic author/committer identities and zero
+assistant-credit lines. The user-selected stash remained
+`92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`.
+
+The worker and root replay result is recorded in [E828](2026-10-27-aud01-pakn-structure-probe-complete-e828.md):
+all three E824 identities match; CRMP byte profiles agree; CXML structure remains UNKNOWN after
+the DTD-rejecting XML parser did not accept the member.

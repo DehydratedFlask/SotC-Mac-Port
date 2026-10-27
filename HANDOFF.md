@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 15:41 CDT (`/root`) — E828 close pakN sidecar structure probe
+
+- **Task/status:** `AUD-01-PAKN-CRMP-CXML-STRUCTURE-PROBE-01` is **PARTIAL**, 0 failed analysis tries; one worker profile plus independent root replay and two reviewer approvals.
+- **Result:** worker/root verified all three E824 path/ID/offset/block/size/SHA identities. The DTD-rejecting Expat parser did not accept `shadow_sounds.cxml`; root/tag/attribute-name counts remain UNKNOWN. CRMP profiles match exactly: random-events 3,393 B / 183 NUL / 1,670 printable bytes / 497 maximal runs; streams 3,295 B / 168 NUL / 1,526 printable bytes / 564 runs. Reports contain run offsets/lengths only, no payload text or values.
+- **Private evidence:** worker report/script/log and root replay/comparison hashes are in `docs/checkpoints/2026-10-27-aud01-pakn-structure-probe-complete-e828.md`; files remain under `local/validation/orch-20261027/aud01-pakn-structure-probe/`. Full archive SHA-256 was rechecked before claim at E827; worker/root also checked pinned size and stable file identity around selected reads, but did not rehash the full archive during replay.
+- **E827 publication/attribution:** claim commit `763c9178c7b12123eb432ea48a9aa76b3a2b7d15` is fetched on `origin/main`. Post-E827 remote scan: 9 branch refs, 12 PR heads, 0 tags, 15 unique tips, **2,440 reachable commits**, zero Claude/Anthropic author/committer identities or assistant-credit lines. Private stash `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8` remains unchanged.
+- **Repository checks:** configure/build passed (`ninja: no work to do`); CTest **431/431**; lift **516/0/0**; Trail **9,877 nodes / 13,470 edges**, deep layer not built; project index **31,941 folders**, current with 849 checkpoint files. Staged/full path, attribution, diff, and push checks for E828 docs remain pending. Logs are under `local/validation/orch-20261027/e828/`.
+- **Limits:** no game gate advances; schema, event meaning, codec, pairing, routing, playback and runtime remain UNKNOWN.
+- **Check correction:** the first saved report-comparator run rejected the worker schema because it expected a per-member false flag; the report has a global `string_values_recorded: false` field. The persisted comparator now checks that field and every expected locator, and passed. This was a comparator assertion correction, not a failed profile attempt.
+- **Files changed for E828:** `docs/ASSETS.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, the E827 claim closeout, and this checkpoint.
+- **Next exact action:** run E828 staged/full path and attribution checks, commit and push the allowlisted docs, fetch-verify `main`, then review `docs/TASKS.md` for the next independent bounded task.
+
 ## 2026-10-27 15:28 CDT (`/root`) — E827 claim bounded pakN sidecar structure probe
 
 - **Task:** `AUD-01-PAKN-CRMP-CXML-STRUCTURE-PROBE-01`; private, read-only in-memory structure profile for the three E824-verified sound sidecars. This is separate from E798 path-token census and E824 byte-identity work.
