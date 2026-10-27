@@ -1,5 +1,18 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 11:26 CDT (`/root`) — E802 post-E801 attribution census claim
+
+- **Task:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`, bounded refresh through published E801.
+- **Starting state:** `git fetch origin --prune` exited 0; clean `main` and `origin/main` both resolve to `be40ca0ea7a0faccd6da1cc1501ef5362d3663ef` (E801).
+- **Scope:** rescan every fetched GitHub branch head/tag and every named local non-stash ref for Claude/Anthropic identities and assistant credit lines; report `refs/stash` separately without modifying it. The 70 stash-only matches remain excluded by the user's explicit choice.
+- **Prior evidence:** E801's full scans cover 2,412 reachable commits through E800; E801 was separately checked for owner identity, attribution, paths, and diff. This refresh will count the one later checkpoint and any updated refs.
+- **Precommit gates:** `cmake -S native -B local/build/orch-r22` (exit 0); `cmake --build local/build/orch-r22 -j 12` (exit 0, no work); `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure` (exit 0, 431/431); `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` (exit 0, 516 passed / 0 skipped / 0 failed); `trail build --check` (exit 0, wiring graph synchronized at 9,876 nodes; deep layer unbuilt); `python3 scripts/project_index.py` and `--check` (exit 0, 33,151 folders). The generated `docs/FOLDERS.md` showed only 64 transient `launcher/.build` row changes and was restored; the durable table remains unchanged. Staged/full publish-path audits passed 2/2 and 3,029/3,029; default attribution, effective owner identity, and cached diff checks passed. Logs: `local/validation/orch-20261027/e802-claim/` (`cmake-configure.log`, `cmake-build.log`, `ctest.log`, `lift-checkers.log`, `trail-check.log`, `project-index-generate.log`, `project-index-check.log`, `publish-staged.log`, `publish-all.log`, `attribution-default.log`, `attribution-identity.log`, `diff-check.log`).
+- **Observations vs inference:** the worktree is clean at E801 and fetched `origin/main` matches; that confirms the current integration base, not the new census result. No code or game payload was changed or read.
+- **Files changed:** `HANDOFF.md`, `docs/TASKS.md` (task claim only).
+- **Next exact action:** run the saved remote/local scanners to fresh report paths under `local/validation/orch-20261027/`, hash the reports, then record the fresh counts and run the required publication gates before the closeout commit.
+- **Risks/limits:** named refs and fetched heads only; this does not enumerate unreachable Git objects. Stash remains unmodified.
+- **Task status / attempts:** `ACTIVE`, attempt 0; no scan hypothesis attempted yet.
+
 ## 2026-10-27 11:22 CDT (`/root`) — E801 E800 publication verification and current-ref census
 
 - **Tasks:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`; final next-task triage.
@@ -10,8 +23,8 @@
 - **Files changed:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-e800-publication-closeout.md`.
 - **Repository gates:** CMake configure/build exited 0; CTest **431/431**; lift checkers **516/0/0**; `trail build --check` reports the 9,876-node wiring graph in sync (deep layer unbuilt); project-index generation/check **33,150/33,150**, retaining only durable checkpoint count 832→833 in `docs/FOLDERS.md`. Staged/full path audits passed **7/7** and **3,029/3,029**; default attribution (`origin/main..HEAD`), configured-owner identity, and cached/worktree diff checks passed. Gate-log manifest SHA-256 `9cf87eac797559a65088121ef703574d205c304cbfbe733dc4b65a2b4f8747aa`; logs are under `local/validation/orch-20261027/e801-publication/`.
 - **Limits:** no actual game boot, authentic audio, save/reload, gameplay Metal frame, or contributor-graph UI update is established. Scans cover named refs and fetched heads, not unreachable Git objects.
-- **Next exact action:** commit only the seven allowlisted E801 docs under the owner identity, push `origin main`, and verify exact range, identity, paths, and fetched HEAD.
-- **Task status / attempts:** public refs and local non-stash refs **ARTIFACT_VERIFIED** through E800; 0 failed hypotheses. The whole native-port goal remains active and incomplete.
+- **Next exact action (superseded by E802):** refresh the all-ref attribution census through E801; E801 was already committed and pushed.
+- **Task status / attempts:** public refs and local non-stash refs **ARTIFACT_VERIFIED** through E800; E801 separately passed exact-range checks; 0 failed hypotheses. The whole native-port goal remains active and incomplete.
 
 ## 2026-10-27 11:15 CDT (`/root`) — E800 E799 publication verification and final attribution scan
 
