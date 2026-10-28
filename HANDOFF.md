@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 19:35 CDT (`/root`) — E862 close published E861 checkpoint
+
+- **Task:** `PUB-01-E861-PUBLISH-AND-POSTPUSH-CENSUS-02`. E861 commit `1904bf2f8e657540277ec2991e8f08dfd07c9c91` passed exact-range attribution, was pushed to `origin main`, then fetched and live-ref verified.
+- **Fresh census:** 37 named non-stash refs and all 21 currently advertised GitHub refs reach 2,474 commits; independent replay confirms zero Claude/Anthropic identities or credits and zero assistant credit lines. The only four assistant-alias identity headers are the author/committer fields on two historical `orchestrator@local` commits. User chose to leave stashes unchanged: 21 reflog tips / 826 commits / 70 Claude credit lines; `refs/stash` unchanged at `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`.
+- **Validation:** configure/build passed (Ninja no work); CTest 431/431; lift checkers 516/0/0; Trail wiring graph current and check OK at 9,877 nodes (deep layer unbuilt); project index current at 32,002 folders; staged/full path audits passed 6/6 and 3,079/3,079; final staged whitespace check passed. Logs and scan hashes are in [E862](docs/checkpoints/2026-10-27-e861-publish-closeout-e862.md) and ignored `local/validation/orch-20261027/e862/`.
+- **Files changed:** this handoff, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and the E862 checkpoint. No source code or local game inputs changed.
+- **Status / attempts:** live attribution census `ARTIFACT_VERIFIED`; E862 documentation closeout is in progress. 0 failed attribution hypotheses. **Next exact action:** regenerate/check folder indexes after adding all validation logs, stage only the six allowlisted docs paths, run staged/full path and whitespace audits, commit under Johnny Wang, exact-range check, push `origin main`, fetch-verify, and confirm a clean worktree. Native port goal remains active; current task triage found no product task `READY`.
+
 ## 2026-10-27 19:25 CDT (`/root`) — E861 live published-history census
 
 - **Task:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`, `ARTIFACT_VERIFIED`. The fresh read-only scan after E860 covers 37 named non-stash refs and all 21 currently advertised GitHub refs / 2,473 reachable commits; there are zero Claude/Anthropic identity or credit hits and zero assistant credit lines. Independent replay matches. Four assistant-alias identity headers are limited to two historical `orchestrator@local` commits; these are not Claude attributions.
