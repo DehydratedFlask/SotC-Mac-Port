@@ -1,6 +1,20 @@
 # SoC Mac Native — current handoff
 
-## 2026-10-27 23:30 CDT (`/root`) — E873 publication closeout and current task triage (E874 prepared)
+## 2026-10-27 23:31 CDT (`/root`) — E874 publication closeout and current task triage (E875 checkpoint)
+
+- **Completed task:** `PUB-01-E874-PUBLISH-CLOSEOUT-01`, `ARTIFACT_VERIFIED`; 0 failed hypotheses. E874 `017b6f318987ccca311abb9dbf5f345f174d6dbf` was authored by Johnny Wang, passed exact-range attribution, was pushed to `origin main`, and fetch-verified at local `HEAD`, `origin/main`, `FETCH_HEAD`, and live `refs/heads/main`.
+- **Current attribution and readiness:** 21 live advertised refs; GitHub contributors endpoint lists only `DehydratedFlask`; the private stash SHA remains `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`. The E873 census covers 2,485 commits at E872; E873/E874 were separately exact-range checked. No task row is `READY`; G4 remains `PARTIAL`.
+- **Validation:** CMake configure/build exit 0 (Ninja no work), CTest 431/431, lift checkers 516/0/0, Trail graph OK at 9,877 nodes (deep meaning layer not built), project index 32,019/current, staged audit 6/6, full audit 3,091/3,091, cached whitespace and precommit attribution checks exit 0. Logs are under `local/validation/orch-20261027/e875/`.
+- **Files in this checkpoint:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-e874-publish-closeout-e875.md`. No source, game input, dependency, or stash changed; `INSTALL_LOG.md` is unchanged.
+- **Observations and limits:** ref equality, exact commit identity, endpoint result, and stash SHA are verified observations. Unreachable objects outside census roots are not covered; VoiceOver spoken/caption output remains `NOT VERIFIED`. G4 is not promoted.
+- **Next exact action:** keep the port goal active and re-triage when new evidence or an external prerequisite creates a READY product task. Do not change private stashes.
+
+
+- **Completed task:** `PUB-01-E874-PUBLISH-CLOSEOUT-01`, `ARTIFACT_VERIFIED`; 0 failed hypotheses. E874 `017b6f318987ccca311abb9dbf5f345f174d6dbf` (`docs: verify E873 publication and task readiness`) was authored/committed by Johnny Wang, exact-range checked, pushed to `origin main`, and fetch/live-ref verified.
+- **Publication result:** local `HEAD`, `origin/main`, `FETCH_HEAD`, and live advertised `main` matched E874 `017b6f318987ccca311abb9dbf5f345f174d6dbf`; the contributors endpoint lists only `DehydratedFlask`, and the stash remains at its unchanged SHA.
+- **Next exact action:** keep the port goal active and re-triage when new evidence or an external prerequisite creates a READY product task. E874 is published; G4 remains PARTIAL.
+
+## 2026-10-27 23:30 CDT (`/root`) — E873 publication closeout and current task triage (published)
 
 - **Completed task:** `PUB-01-E873-PUBLISH-CLOSEOUT-01`, `ARTIFACT_VERIFIED`; 0 failed hypotheses. E873 `72eb3f529f08dc1f7af87d7aa99103b67987408f` (`docs: record E873 attribution census and APP-01 follow-up`) is on `main`; exact-range attribution passed. Fetch verification matched local `HEAD`, `origin/main`, `FETCH_HEAD`, and live advertised `main`. The contributor endpoint lists only `DehydratedFlask`; `refs/stash` remains `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`. The read-only census remains explicitly measured at E872 (2,485 commits); E873 is separately exact-range checked.
 - **Published commit:** E873 `72eb3f529f08dc1f7af87d7aa99103b67987408f` (`docs: record E873 attribution census and APP-01 follow-up`) is on `main`; exact-range attribution passed. Fetch verification matched local `HEAD`, `origin/main`, `FETCH_HEAD`, and live `refs/heads/main`. The contributor endpoint lists only `DehydratedFlask`; `refs/stash` remains `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`. The read-only census remains explicitly measured at E872 (2,485 commits); E873 is separately exact-range checked.
@@ -8,7 +22,7 @@
 - **Validation for E874:** CMake configure/build exit 0 (Ninja no work), CTest 431/431, lift checkers 516/0/0, Trail graph OK at 9,877 nodes (deep meaning layer not built), project index 32,018/current, staged audit 6/6, full audit 3,091/3,091, cached whitespace and precommit attribution checks exit 0. Logs: `local/validation/orch-20261027/e874/`. One initial READY scan self-matched the command text in a task row; the wording was corrected and the final scan found no rows.
 - **Files staged:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-e873-publish-closeout-e874.md`. No source, game input, dependency, or stash changed; `INSTALL_LOG.md` is unchanged.
 - **Observation vs inference / limits:** exact commit identity, ref equality, endpoint results, and stash SHA are observations. E873 census is still measured at E872 HEAD; E873 was separately checked. Unreachable objects outside scanned roots are not covered. VoiceOver spoken/caption output remains `NOT VERIFIED`.
-- **Next exact action:** commit the staged allowlisted E874 docs as Johnny Wang, check the exact commit range, push to `origin main`, fetch-verify the published head, and keep the port goal active. No product task is `READY`; G4 remains `PARTIAL`.
+- **Next exact action:** keep the port goal active and re-triage when a new prerequisite or evidence creates a READY product task. E874 is published; no product task is currently READY.
 
 ## 2026-10-27 23:24 CDT (`/root`) — E873 post-E872 attribution census and APP-01 accessibility follow-up (published)
 
