@@ -14,13 +14,17 @@ E886 commit bb015e26df50314221f0ada8765ffd0934374225 is authored and committed b
 
 The fresh census covers 36 named non-stash refs and all 21 live advertised GitHub refs (9 branches, 12 pull-request heads, 0 tags / 15 distinct tips), with 20 combined unique non-stash tips. It parsed 2,499 reachable commits and found zero Claude/Anthropic author or committer identities, zero Claude/Anthropic credit lines, and zero Claude-attributed commits. Four broader assistant-alias identity headers remain on two historical non-Claude orchestrator@local commits; assistant credit lines are zero.
 
-Current report: local/validation/orch-20261028/e885/attribution/report.json
-SHA-256: 8f71cd29a66d076477768361e5757a738dc2c05c6497d893905cd2225d75cefa
-Preserved report copy: local/validation/orch-20261028/e887/validation/post-e886-report.json
+E886 post-push report preserved at local/validation/orch-20261028/e887/validation/post-e886-report.json
 SHA-256: 8f71cd29a66d076477768361e5757a738dc2c05c6497d893905cd2225d75cefa
 Captured scanner output: local/validation/orch-20261028/e886/validation/postpush.log
 SHA-256: 47871aac3be803a329b7056d4bc7354cd6065fa34b185fda6ae2b26b41b09a5d
 The preceding E885 report measured 2,498 commits and is preserved at local/validation/orch-20261028/e886/validation/post-e885-report.json (SHA-256 78cef09562d018bec47e763123d461930a6fbbb020436e568d259bbfaac0a74a). A read-only independent reviewer confirmed the one-commit increase, stable ref counts, zero Claude/Anthropic matches, unchanged stash, and checker-pattern parity.
+
+## E887 publication closeout
+
+E887 commit 0c0b61306d6d166776ade3246c1c1cc6ecc95820 was authored and committed by Johnny Wang. Its exact-range attribution audit passed. It was pushed fast-forward to origin main; a post-push fetch shows local HEAD, origin/main, FETCH_HEAD, and live advertised refs/heads/main all equal E887. The contributors endpoint lists only DehydratedFlask.
+
+The fresh post-E887 scan covers 36 named non-stash refs and all 21 advertised refs (9 branches, 12 PR heads, 0 tags / 15 distinct tips), with 20 combined unique non-stash tips. It parsed 2,500 reachable commits and found zero Claude/Anthropic author or committer identities, zero Claude/Anthropic credit lines, and zero Claude-attributed commits. Four broader assistant-alias identity headers remain on two historical non-Claude orchestrator@local commits; assistant credit lines remain zero. Current report SHA-256 8abb00e72445044d377a0d53af881aaed05dabea045f9d723b739172d3227420 at local/validation/orch-20261028/e885/attribution/report.json. Preserved copy: local/validation/orch-20261028/e888/validation/post-e887-report.json. Scanner stdout: local/validation/orch-20261028/e887/validation/postpush.log (SHA-256 ab366949225191e2636703ff85b5751603c26a4c68738a9b27935f192c65be5d).
 
 ## Private stash boundary
 
