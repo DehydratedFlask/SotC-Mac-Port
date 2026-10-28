@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 22:43 CDT (`/root`) — APP-01 VoiceOver caption/focus follow-up (E869, publication pending)
+
+- **Task:** `APP-01-VOICEOVER-READINESS-02`, `PARTIAL`. User authorized temporarily enabling VoiceOver and restoring it off. Scope was the initial readiness screen; no folder was chosen and Play was not activated. Attempt count: 1 unsuccessful focus/caption observation, 0 code hypotheses.
+- **CUA result:** System Settings showed VoiceOver off, then on. VoiceOver Utility's “Show caption panel” was already enabled (Value 1) and was not changed. The workspace launcher AX tree again exposed Game assets (missing folder), Native game core (NOT BUILT), Metal Ready, Audio output Ready, overall status Not ready, and disabled Play help. The screenshot showed no caption text. Control+Option+Right and Tab left CUA focus at the main window; no speech audio was captured. Traversal and spoken phrasing remain NOT VERIFIED.
+- **Restoration:** VoiceOver is confirmed off and Full Keyboard Access remains off. The VoiceOver Utility process is no longer running. No game input, launcher preference, or caption preference changed. G4 remains PARTIAL.
+- **Private evidence:** `local/validation/orch-20261027/e869/voiceover-ax-state.txt`, SHA-256 `236bf81abe7b14c6fd0655bcc1a587d9006d71e3b4bd51b408c2b6c5f0012b5a`. Screenshots were visible in CUA but not persisted.
+- **Gates:** CMake configure/build passed (Ninja no work), CTest 431/431, lift checkers 516/0/0, Trail 9,877/current (deep layer unbuilt), project index 32,012/current, staged/full publication audit 6/6 and 3,086/3,086, staged whitespace and precommit attribution passed. A first project-index check was stale after new local log files were created; precreated remaining logs and regenerated/rechecked successfully. Detailed logs are in `local/validation/orch-20261027/e869/` and the gate table is in the [E869 checkpoint](docs/checkpoints/2026-10-27-app01-voiceover-readiness-e869.md).
+- **Files changed:** only allowlisted `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and the E869 checkpoint. No source or game input changed.
+- **Next exact action:** restage the final doc edits, repeat staged/full path and whitespace/attribution checks, commit under Johnny Wang, exact-range check the new commit, push `origin main`, fetch-verify, and record publication. Keep G4 PARTIAL.
+
 ## 2026-10-27 22:29 CDT (`/root`) — APP-01 initial readiness accessibility observation (partial)
 
 - **Task:** `APP-01-VOICEOVER-READINESS-01` — bounded to the initial readiness labels, focus, and announcements. User unlocked the Mac. Attempt count: 0 failed hypotheses; 1 partial UI observation. No folder selection or Play activation.
