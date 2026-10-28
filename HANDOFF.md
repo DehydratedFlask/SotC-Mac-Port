@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 19:47 CDT (`/root`) — E864 reconcile published E863 task status (completed)
+
+- **Task:** `PUB-01-E863-TASK-REGISTRY-CLOSEOUT-04` — correct the task register's stale “publication pending” text for E863 using the live owner-authored commit and fetch evidence.
+- **Scope / files:** allowlisted documentation only: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-27-e863-task-register-closeout-e864.md`. No source, game inputs, stash, or evidence payload changes; `INSTALL_LOG.md` unchanged because no dependency was acquired.
+- **Commands/results:** CMake configure/build exit 0 (Ninja no work); CTest 431/431 passed; lift checkers 516 passed / 0 skipped / 0 failed; `trail build --check` OK for the 9,877-node wiring graph (deep meaning layer not built); `python3 scripts/project_index.py` wrote 32,005 folders and `--check` found it current; `git diff --cached --check` passed; staged path audit passed 6 paths and full audit passed 3,081 paths.
+- **Evidence/logs:** `local/validation/orch-20261027/e864/{cmake-configure.log,cmake-build.log,ctest.log,lift-checkers.log,trail-check.log,project-index.log,path-audit-staged.log,path-audit-all.log}`. Observation: E863's publication is exact-range checked and fetch-verified; the stale row was inaccurate. Inference: correcting the task register does not change any product gate.
+- **Risks / next exact action:** no new product task is READY; native-port acceptance remains PARTIAL. Resume bounded product triage when new producer/consumer evidence, a released query scope, user-owned save evidence, or an unlocked Mac changes a prerequisite. **Status / attempts:** ARTIFACT_VERIFIED; 0 failed hypotheses.
+
 ## 2026-10-27 19:40 CDT (`/root`) — E863 final attribution state
 
 - **Task:** `PUB-01-E862-PUBLISHED-CLOSEOUT-03`. E861 `1904bf2f` and E862 `c01d1b9c` are owner-authored, exact-range checked, pushed, and fetch-verified. Fresh E863 scan and independent replay cover 37 named non-stash refs and all 21 live advertised refs / 2,475 commits, with zero Claude/Anthropic identity or credit hits and zero assistant credit lines. Four other assistant identity headers remain on two preserved non-Claude `orchestrator@local` commits.
