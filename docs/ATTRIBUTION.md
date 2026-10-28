@@ -350,8 +350,9 @@ pre-push sequence.
   only `DehydratedFlask`. The stash reflog remains 21 tips / 826 commits / 70 Claude credit lines,
   with `refs/stash` unchanged at `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8` by owner direction.
   Report SHA-256 `79f13836fb49a38cadb86c652d564268e165906b6db047b0a7f1a4a2c951c430` at
-  `local/validation/orch-20261028/e889/attribution/report.json`. This census is measured at E888;
-  E889 is checked separately after publication. See the [E889 closeout checkpoint](checkpoints/2026-10-28-e888-publish-closeout-e889.md).
+  `local/validation/orch-20261028/e889/attribution/report.json`. This census is measured at E888.
+  E889 `b512ca6997f20ca48bda97d17012364dabcec29c` was separately exact-range checked after
+  publication and matches live `main`. See the [E889 closeout checkpoint](checkpoints/2026-10-28-e888-publish-closeout-e889.md).
 
 ## Why the host-derived identity matters
 

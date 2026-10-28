@@ -3,7 +3,7 @@
 Date: 2026-10-28 01:28 CDT (claimed); verified through 01:36 CDT
 Agent: `/root`
 Task: `PUB-01-E888-PUBLISH-CLOSEOUT-01`
-Status: E888 closeout verified; E889 documentation checkpoint validated and staged; publication pending
+Status: E888 closeout verified; E889 documentation checkpoint published and post-push verified
 Attempt count: 0 failed hypotheses
 
 Files changed: `HANDOFF.md`, `docs/TASKS.md`, `docs/INDEX.md`, `docs/EVIDENCE.md`, `docs/ATTRIBUTION.md`, generated `docs/FOLDERS.md`, and this checkpoint.
@@ -50,6 +50,20 @@ Completed for the staged E889 documentation:
 - Required default `python3 -I scripts/check_commit_attribution.py`: exit 0 (`ATTRIBUTION AUDIT OK (origin/main..HEAD)`). Supplementary `python3 -I scripts/check_commit_attribution.py --all`: exit 1 only for known non-Claude author/committer alias `orchestrator@local` on historical commit `f6604a86e60e`; the separate all-ref census found zero Claude/Anthropic matches. E889's exact-range check remains to be run after the new commit is created.
 - Worktree whitespace check passed. The first cached check exited 2 on hard-break spaces at checkpoint line 27; after those were removed, a second check caught a hard-break space reintroduced at line 6 (captured at `local/validation/orch-20261028/e889/validation/diff-cached-failed-2.log`). All trailing spaces were stripped, the checkpoint was restaged, and final `git diff --cached --check` passed (empty output at `local/validation/orch-20261028/e889/validation/diff-cached-final.log`). These were documentation formatting corrections, not failed hypotheses.
 
+## E889 checkpoint publication
+
+E889 `b512ca6997f20ca48bda97d17012364dabcec29c` was authored and committed by Johnny Wang `<dehydratedflask@users.noreply.github.com>` with subject `docs: close E888 publication audit and refresh attribution census`. `python3 -I scripts/check_commit_attribution.py --range HEAD^..HEAD` returned `ATTRIBUTION AUDIT OK (HEAD^..HEAD)`; the default checker returned `ATTRIBUTION AUDIT OK (origin/main..HEAD)` after commit. The ordinary `git push origin main` completed as a fast-forward from E888. Post-push fetch and `git ls-remote` show local `HEAD`, `origin/main`, `FETCH_HEAD`, and live `refs/heads/main` at E889. The GitHub contributors endpoint lists only `DehydratedFlask`; `refs/stash` remains unchanged at `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`. Post-push terminal output was captured in the session; the exact-range checker output is saved at `local/validation/orch-20261028/e889/validation/attribution-e889-range.log`.
+
+### 2026-10-28 01:42 CDT (`/root`) — post-push documentation reconciliation
+
+Task: `PUB-01-E888-PUBLISH-CLOSEOUT-01`
+Files changed in this reconciliation: `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/EVIDENCE.md`, and this checkpoint.
+Status: reconciliation validation passed; 0 failed hypotheses.
+
+After confirming E889 was live, a doc-only update synchronized this handoff, `docs/ATTRIBUTION.md`, and `docs/EVIDENCE.md` with the published commit. The full validation pass was repeated: CMake configure/build 0, CTest 431/431, lift 516/0/0, staged publish-path audit 4/4, full audit 3,106/3,106, default attribution audit exit 0, Trail graph check exit 0 (9,877 nodes; deep layer not built), and worktree diff check exit 0.
+
+The first cached diff check for this update exited 2 on a trailing Markdown hard-break space at checkpoint line 6; it is preserved at `local/validation/orch-20261028/e889/validation/diff-cached-failed-e890.log`. Trailing spaces were stripped and the final cached diff check passed with empty output at `diff-cached-final.log`. The first project-index check exited 1 with `Stale indexes: local/indexes/folders.json` after the private validation logs were refreshed; the observation is saved at `project-index-failed-e890.log`. Running `python3 scripts/project_index.py` then `python3 scripts/project_index.py --check` passed at 32,054/current; output is saved at `project-index-check.log`. No product source or game input changed. These were documentation-check corrections, not failed implementation hypotheses.
+
 Logs: `local/validation/orch-20261028/e889/validation/`.
 
 ## Observation, inference, risks, and next action
@@ -69,4 +83,4 @@ No product source, game input, dependency, launcher preference, or VoiceOver set
 - `python3 scripts/project_index.py`; `python3 scripts/project_index.py --check`; `trail build --check`; `git diff --cached --check`; `git diff --check` — final checks passed; logs in the validation directory. The project-index check output is in `project-index-check.log`.
 - Independent reviewer ran `python3 -I scripts/check_commit_attribution.py --range d161ab422e236a10feeec57379d445ba851ec666^..d161ab422e236a10feeec57379d445ba851ec666` and confirmed `ATTRIBUTION AUDIT OK`; reviewer also confirmed E888 ancestry among all 21 live refs and the unchanged stash SHA. CUA command `await cua.getState();` returned `apps=[]` and “The Mac is locked and automatic unlock could not unlock it”; no setting changed. The captured preflight is `local/validation/orch-20261028/e889/app01/unlock-preflight.txt`.
 
-Exact next action: commit only the seven allowlisted documentation paths under Johnny Wang, push `origin main`, then verify E889's exact-range attribution and live refs.
+Exact next action: continue project work after manual Mac unlock; re-run the APP-01 prerequisite check only if a new observable speech/caption surface is available. No current product task is READY; G1/G4 remain PARTIAL.
