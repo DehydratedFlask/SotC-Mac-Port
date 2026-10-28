@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 19:54 CDT (`/root`) — E865 reconcile APP-01 status and refresh published attribution (completed)
+
+- **Task:** `DOC-APP01-PUB-RECONCILE-E865-01` — replace stale APP-01 registry statements with E613/E614/current-source evidence and record the current post-E864 GitHub attribution census.
+- **Files / scope:** six allowlisted documentation paths: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and [E865 checkpoint](docs/checkpoints/2026-10-27-app01-attribution-registry-closeout-e865.md). No source, game input, private evidence payload, or stash ref changed.
+- **Attribution observation:** at E864 `c68be85c17037f9e63033d58d743a806d7313d78`, 37 named non-stash refs and 21 live advertised GitHub refs / 2,477 commits have zero Claude/Anthropic identity/credit hits and zero assistant credit lines. The two documented non-Claude `orchestrator@local` commits remain. Stash was read-only and unchanged at `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`, 21 tips / 826 commits / 70 Claude/Anthropic credit lines, per user direction. E864 exact-range checker passed.
+- **APP-01 observation / inference:** current source routes `LauncherModel` through `CoreClient`; E613/E614/E775 verify client, bundle, and fixture results. `sotc_core_start()` still returns `SOTC_ERR_ENGINE_NOT_IMPLEMENTED`, so G4 remains PARTIAL. The locked Mac leaves VoiceOver/UI review waiting. This doc reconciliation does not change product behavior or gate status.
+- **Validation:** CMake configure/build exit 0 (Ninja no work); CTest 431/431; lift checkers 516/0/0; Trail graph check OK at 9,877 nodes (deep meaning layer unbuilt); project index 32,007/current; staged/full path audits 6/3,082 passed. Final staged whitespace and E865 exact-range checks passed. Logs: `local/validation/orch-20261027/e865/`.
+- **Attempts / remaining risks:** 0 failed product hypotheses; one scanner-copy path error was corrected without touching refs; a first staged diff check caught four trailing spaces, which were removed before the passing check. No product task is READY. **Next exact action after publication:** keep the port goal active and resume product triage when new source evidence or an external prerequisite changes; APP-01 VoiceOver readiness remains waiting on an unlocked Mac.
+
 ## 2026-10-27 19:47 CDT (`/root`) — E864 reconcile published E863 task status (completed)
 
 - **Task:** `PUB-01-E863-TASK-REGISTRY-CLOSEOUT-04` — correct the task register's stale “publication pending” text for E863 using the live owner-authored commit and fetch evidence.
