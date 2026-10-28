@@ -3,7 +3,7 @@
 - Local date/time: 2026-10-27 20:18 CDT
 - Agent: `/root`
 - Task: `PUB-01-E866-PUBLISH-AND-POSTPUSH-CENSUS-01`
-- Status: `ARTIFACT_VERIFIED`; all required prepublication gates passed; exact-range attribution check of the new commit, push, and fetch verification pending.
+- Status: `ARTIFACT_VERIFIED`; checkpoint published as `45af5f281fa5e93891795766fb0fb3646547df7f`, exact-range checked, pushed, and fetch-verified. E868 records the publication closeout.
 
 ## E866 publication
 
@@ -46,4 +46,4 @@ python3 scripts/project_index.py --check
 
 Configure and build each exited 0 (Ninja no work); CTest exited 0 with 431/431; lift checker exited 0 with 516 passed, 0 skipped, and 0 failed; Trail check exited 0 with 9,877 wiring nodes current (deep meaning layer unbuilt); project index reports 32,011 folders and `--check` is current. The staged path audit exited 0 for 7/7 paths, the full audit exited 0 for 3,084/3,084 paths, cached whitespace check exited 0, and the empty precommit attribution range passed. Exact logs: `cmake-configure.log`, `cmake-build.log`, `ctest.log`, `lift-checkers.log`, `trail-check.log`, `path-audit-all.log`, `path-audit-staged.log`, `path-audit-all-poststage.log`, `whitespace-staged.log`, `attribution-precommit.log`, `project-index.log`, and `project-index-check.log`, all under `local/validation/orch-20261027/e867/`. No dependencies were installed and `INSTALL_LOG.md` is unchanged.
 
-The final staged set passed `python3 -I scripts/audit_publish_paths.py` (7/7) and `python3 -I scripts/audit_publish_paths.py --all` (3,084/3,084); `git diff --cached --check` passed. `git fetch origin` verified `main` at `fc97d6fd55e5ff02a08ccc47ecb08f5592cf6db5`, and the configured author and committer identities are both Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Next exact actions: commit under the owner identity, run `python3 -I scripts/check_commit_attribution.py` on the new commit, push `origin main`, and fetch-verify. Overall game acceptance remains PARTIAL.
+The final staged set passed `python3 -I scripts/audit_publish_paths.py` (7/7) and `python3 -I scripts/audit_publish_paths.py --all` (3,084/3,084); `git diff --cached --check` passed. `git fetch origin` verified `main` at `fc97d6fd55e5ff02a08ccc47ecb08f5592cf6db5`, and the configured author and committer identities were both Johnny Wang `<dehydratedflask@users.noreply.github.com>`. E867 was committed as `45af5f281fa5e93891795766fb0fb3646547df7f`, exact-range checked, pushed to `origin main`, and fetch-verified at local/remote/live `main`. The post-push GitHub contributors endpoint lists only `DehydratedFlask`. Overall game acceptance remains PARTIAL.
