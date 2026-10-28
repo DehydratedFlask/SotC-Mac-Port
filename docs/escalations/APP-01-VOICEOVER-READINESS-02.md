@@ -18,3 +18,9 @@
 - Independent work that can continue: No `READY` product task was found in the E875 triage; keep the native-port objective active and re-triage when a prerequisite or new capture capability appears.
 - Task register and HANDOFF checkpoint links: [E877 checkpoint](../checkpoints/2026-10-27-app01-voiceover-escalation-e877.md), [task register](../TASKS.md), and [current handoff](../../HANDOFF.md).
 - Principal reassessment / authorized next approach: Before any fourth attempt, decide whether a genuine desktop-wide screenshot or permitted audio-capture method is available. If not, ask the owner to observe the spoken/caption output locally. Do not repeat the same CUA AX/chord/screenshot path or infer failure from its missing capture.
+
+## Principal reassessment E882 — 2026-10-28
+
+- The owner replied, “I’ll unlock the Mac,” and authorized temporarily enabling VoiceOver and restoring it off. `/root` records this as principal reassessment for one bounded fourth observation, contingent on a usable observation surface.
+- The fourth observation has **not started**. Three `await cua.getState();` preflights around 00:27, 00:28, and 00:37 CDT reported `apps: []` and “The Mac is locked and automatic unlock could not unlock it.” No app was inspected, no settings were changed, and VoiceOver was not toggled. The private record is `local/validation/orch-20261028/e882/voiceover-unlock-preflight.txt` (SHA-256 `f47a5a08fcf86afabd0ae54db17374a82680e56658c13411b6a7ada99d9f9e41`).
+- Attempt count remains three unsuccessful focus/caption observations. Wait for manual unlock. Then check for a genuine desktop-wide caption or supported speech-capture surface; perform one bounded observation only if new evidence is available and restore VoiceOver off. If no such surface is exposed, ask the owner to report local speech/caption output. Do not repeat the prior CUA-only AX/chord/app-window screenshot path as proof of speech or caption absence.

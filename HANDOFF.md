@@ -1,13 +1,24 @@
 # SoC Mac Native — current handoff
 
-## 2026-10-28 00:21 CDT (`/root`) — E881 E880 publication closeout and save-path feasibility (publication pending)
+## 2026-10-28 00:37 CDT (`/root`) — E882 E881 publication closeout and APP-01 principal reassessment (awaiting unlock)
+
+- **E881 publication:** commit `56a12677ebfab2fd280d71bd0526a8116497446f` was authored by Johnny Wang, exact-range checked, pushed, and fetch/`ls-remote` verified at `HEAD`, `origin/main`, `FETCH_HEAD`, and live `refs/heads/main`. The GitHub contributors endpoint lists only `DehydratedFlask`; `refs/stash` remains `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`.
+- **E881 verification:** configure/build exit 0, CTest 431/431, lift 516/0/0, full path audit 3,098/3,098, project index 32,027/current, Trail 9,877/current (deep layer not built), staged audit 6/6, and exact-range attribution passed. Logs are under `local/validation/orch-20261028/e881/`.
+- **APP-01 principal reassessment and claim:** the owner said “I’ll unlock the Mac” and authorized temporarily enabling VoiceOver and restoring it off. `APP-01-VOICEOVER-READINESS-02` is claimed by `/root`, but the fourth observation has not started: three CUA `getState()` preflights around 00:27, 00:28, and 00:37 CDT reported the Mac locked and exposed no native apps. No settings changed. Private record: `local/validation/orch-20261028/e882/voiceover-unlock-preflight.txt`.
+- **Task state:** `WAITING_FOR_DEPENDENCY` on manual unlock. The three previous focus/caption observations remain the only failed task-level tries; the fourth is principal-authorized but not started. G4 stays PARTIAL and no launcher gate is promoted.
+- **E882 documentation validation:** configure/build exit 0, CTest 431/431, lift checkers 516/0/0, full path audit 3,099/3,099, staged audit 7/7, final cached-diff check passed after removing four trailing spaces, precommit attribution passed, project index 32,028/current after regenerating one stale local index, and Trail graph 9,877/current (deep layer not built). Postcommit attribution/live-ref verification remains pending. Logs are under `local/validation/orch-20261028/e882/`.
+- **Next exact action:** after the owner unlocks the Mac, check whether a desktop-wide caption or permitted speech-capture surface is available. Perform at most one bounded observation if it provides new evidence; otherwise ask the owner to report local speech/caption output. Restore VoiceOver off after any toggle and do not repeat the prior CUA-only AX/chord/app-window screenshot path.
+
+## 2026-10-28 00:21 CDT (`/root`) — E881 E880 publication closeout and save-path feasibility (published)
 
 - **E880 publication:** commit `d4202016cf14aa8684b329aed0098561c65dad0f` was authored by Johnny Wang, exact-range checked, pushed, and fetch/`ls-remote` verified at `HEAD`, `origin/main`, `FETCH_HEAD`, and live `refs/heads/main`. GitHub's contributors endpoint lists only `DehydratedFlask`; the private stash SHA remains unchanged.
 - **Bounded save-path check:** a fresh REA/Ghidra open of the pinned ELF succeeded, but one typed query at `0x3260bb8` timed out after 330,889 ms at the 330,000 ms import/analyze deadline. No xrefs or count were returned. The scout closed the Ghidra session without a snapshot; no save-writer task was claimed or created. Private record: `local/validation/orch-20261028/e881/save-gamedata-xref-timeout.txt`.
 - **Task readiness:** no existing task is READY. CPU slot 23 remains PARTIAL and unregistered; the CXML probe remains stopped; APP-01 VoiceOver remains NEEDS_PRINCIPAL. G1/G4 remain PARTIAL; boot/audio/real-save acceptance remain unverified.
 - **E880 validation:** configure/build 0, CTest 431/431, lift 516/0/0, full path audit 3,096/3,096, project index 32,026/current, Trail 9,877/current (deep layer not built), staged audit 6/6, exact-range attribution and live-ref checks passed. Logs are under `local/validation/orch-20261028/e880/`.
 - **E881 validation:** configure/build 0 (`ninja: no work to do`), CTest 431/431, lift checkers 516/0/0, full path audit 3,098/3,098, project index 32,027/current, Trail 9,877/current (deep layer not built). Staged audit and postcommit exact-range check remain pending. Logs are under `local/validation/orch-20261028/e881/`.
-- **Next exact action:** run the full E881 verification, commit and push allowlisted files under Johnny Wang, then fetch/`ls-remote` verify `main`. Keep the broad port goal active.
+- **E881 publication:** commit `56a12677ebfab2fd280d71bd0526a8116497446f` was owner-authored, exact-range checked, pushed, and live-ref verified by E882. The contributor endpoint lists only `DehydratedFlask` and the private stash hash is unchanged.
+- **E881 validation:** configure/build 0 (`ninja: no work to do`), CTest 431/431, lift checkers 516/0/0, full path audit 3,098/3,098, project index 32,027/current, Trail 9,877/current (deep layer not built), staged audit 6/6, and exact-range attribution passed. Logs are under `local/validation/orch-20261028/e881/`.
+- **Next exact action:** E881 is closed by E882. The APP-01 fourth observation is authorized but waits for manual unlock; no product gate advanced.
 
 ## 2026-10-28 00:07 CDT (`/root`) — E880 E879 publication closeout (published)
 
