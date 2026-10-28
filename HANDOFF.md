@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 23:40 CDT (`/root`) — Claim bounded APP-01 VoiceOver validation attempt 3 (E876 claim checkpoint)
+
+- **Bounded task:** `APP-01-VOICEOVER-READINESS-02`; verify initial-screen VoiceOver focus/caption behavior while VoiceOver is explicitly enabled, then restore it off. Prior attempts E869 and E873 each left traversal/speech/caption output unverified; this is the third targeted observation.
+- **Observed result:** VoiceOver Utility reported “Show caption panel” Value 1. System Settings confirmed VoiceOver off, then on, and off again. On the launcher, the reported AX focus stayed at `Choose Folder…` after Control+Option+Right; the launcher-window screenshot showed no caption text. No speech was captured. Full Keyboard Access was not changed; no folder or Play action occurred. Private record: `local/validation/orch-20261027/e876/voiceover/observation.txt` (SHA-256 `f2edfd23bd1ca6a302e4bc4dd85d913d918f3a0fcb9dddcc630b49b517ad044c`).
+- **Files planned for closeout:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated folder index if needed, E876 checkpoint, and task escalation. No source or product code changes.
+- **Next exact action:** close E876 with the observed limits, apply the three-try rule to the still-unverified screen-reader output, and record `NEEDS_PRINCIPAL` with the smallest next step. G4 remains `PARTIAL`.
+
 ## 2026-10-27 23:31 CDT (`/root`) — E874 publication closeout and current task triage (E875 checkpoint)
 
 - **Completed task:** `PUB-01-E874-PUBLISH-CLOSEOUT-01`, `ARTIFACT_VERIFIED`; 0 failed hypotheses. E874 `017b6f318987ccca311abb9dbf5f345f174d6dbf` was authored by Johnny Wang, passed exact-range attribution, was pushed to `origin main`, and fetch-verified at local `HEAD`, `origin/main`, `FETCH_HEAD`, and live `refs/heads/main`.
