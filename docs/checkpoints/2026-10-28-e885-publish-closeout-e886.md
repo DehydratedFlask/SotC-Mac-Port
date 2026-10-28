@@ -14,11 +14,17 @@ E885 commit ef04a770e4b46be7104af98f4b3d1345a5477a43 is authored and committed b
 
 The fresh scan covers 36 named non-stash refs and all 21 live advertised GitHub refs (9 branches, 12 pull-request heads, 0 tags / 15 distinct tips), with 20 combined unique non-stash tips. It parsed 2,498 reachable commits and found zero Claude/Anthropic author or committer identities, zero Claude/Anthropic credit lines, and zero Claude-attributed commits. Four broader assistant-alias identity headers remain on two historical non-Claude orchestrator@local commits; assistant credit lines are zero.
 
-Current report: local/validation/orch-20261028/e885/attribution/report.json
+Post-E885 report preserved at local/validation/orch-20261028/e886/validation/post-e885-report.json
 SHA-256: 78cef09562d018bec47e763123d461930a6fbbb020436e568d259bbfaac0a74a
 Scanner output log: local/validation/orch-20261028/e885/validation/postpush-scan.log
 SHA-256: 8206c5b8012a7b798595ab16639976d63c8c89dce97a9f88744eb474b9523089
 The earlier pre-push report measured E884 at 2,497 commits and had SHA-256 939990b9be150221389593280e6ea92fc9b044b90cf7d423e1903373d4e7ad27. The scanner refreshed the same private report path after publication, so that prior report file is superseded.
+
+## E886 publication closeout
+
+E886 commit bb015e26df50314221f0ada8765ffd0934374225 was authored and committed by Johnny Wang. Its exact-range attribution audit passed. It was pushed fast-forward to origin main; a post-push fetch shows local HEAD, origin/main, FETCH_HEAD, and live advertised refs/heads/main all equal E886. The contributors endpoint lists only DehydratedFlask.
+
+The fresh post-E886 scan covers 36 named non-stash refs and all 21 live advertised refs (9 branches, 12 PR heads, 0 tags / 15 distinct tips), with 20 combined unique non-stash tips. It parsed 2,499 reachable commits and found zero Claude/Anthropic author or committer identities, zero Claude/Anthropic credit lines, and zero Claude-attributed commits. Four broader assistant-alias headers remain on two historical non-Claude orchestrator@local commits; assistant credit lines are zero. Current report at local/validation/orch-20261028/e885/attribution/report.json has SHA-256 8f71cd29a66d076477768361e5757a738dc2c05c6497d893905cd2225d75cefa. A preserved copy is local/validation/orch-20261028/e887/validation/post-e886-report.json with the same SHA-256. Captured scanner stdout is local/validation/orch-20261028/e886/validation/postpush.log, SHA-256 47871aac3be803a329b7056d4bc7354cd6065fa34b185fda6ae2b26b41b09a5d.
 
 ## Private stash boundary
 

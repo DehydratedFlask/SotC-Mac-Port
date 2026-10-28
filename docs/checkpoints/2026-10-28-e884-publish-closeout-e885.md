@@ -16,7 +16,7 @@ A fresh read-only census measured at E884 covers 36 named non-stash refs and all
 
 Private report: local/validation/orch-20261028/e885/attribution/report.json
 Pre-push E884 report SHA-256 at this path: 939990b9be150221389593280e6ea92fc9b044b90cf7d423e1903373d4e7ad27. It was superseded when the same scanner refreshed the report after E885 was pushed.
-Current post-push E885 report SHA-256: 78cef09562d018bec47e763123d461930a6fbbb020436e568d259bbfaac0a74a
+Post-push E885 report SHA-256: 78cef09562d018bec47e763123d461930a6fbbb020436e568d259bbfaac0a74a, preserved at local/validation/orch-20261028/e886/validation/post-e885-report.json after the shared report path was refreshed for E886.
 Scanner SHA-256: 3453d30b01de2ed72c1ededfe0198c1be1a5df40fd81859a515804e0e2772489
 Run log SHA-256: c7ec5f36865167651b389ab357c3ff9bf5bcb258a37aec00cc9cc144ae0f3bfd
 GitHub contributors endpoint: DehydratedFlask only.

@@ -315,8 +315,20 @@ pre-push sequence.
   orchestrator@local commits; assistant credit lines are zero. The contributors endpoint lists
   only DehydratedFlask. The stash reflog remains 21 tips / 826 commits / 70 Claude credit lines,
   with refs/stash unchanged at 92ceba574bd1e8445b9aa4f728f878fbfd4f57f8 by owner direction.
-  Current report SHA-256 78cef09562d018bec47e763123d461930a6fbbb020436e568d259bbfaac0a74a at
-  local/validation/orch-20261028/e885/attribution/report.json.
+  Post-E885 report SHA-256 78cef09562d018bec47e763123d461930a6fbbb020436e568d259bbfaac0a74a preserved at
+  local/validation/orch-20261028/e886/validation/post-e885-report.json.
+
+- After E886 bb015e26df50314221f0ada8765ffd0934374225 was pushed, a fresh scan of 36 named
+  non-stash refs and all 21 live advertised refs (9 branches, 12 PR heads, 0 tags / 15 tips;
+  20 combined non-stash tips) parsed 2,499 reachable commits. It found zero Claude/Anthropic
+  author or committer identities, zero Claude/Anthropic credit lines, and zero Claude-attributed
+  commits. Four broader assistant-alias headers remain on two historical non-Claude
+  orchestrator@local commits; assistant credit lines are zero. The contributors endpoint lists
+  only DehydratedFlask. The stash reflog remains 21 tips / 826 commits / 70 Claude credit lines,
+  with refs/stash unchanged at 92ceba574bd1e8445b9aa4f728f878fbfd4f57f8 by owner direction.
+  Current report SHA-256 8f71cd29a66d076477768361e5757a738dc2c05c6497d893905cd2225d75cefa at
+  local/validation/orch-20261028/e885/attribution/report.json; independent review reproduced the
+  ref-count progression and confirmed the scan patterns match the repository checker.
 
 ## Why the host-derived identity matters
 
