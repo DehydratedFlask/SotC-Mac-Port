@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 19:25 CDT (`/root`) — E861 live published-history census
+
+- **Task:** `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`, `ARTIFACT_VERIFIED`. The fresh read-only scan after E860 covers 37 named non-stash refs and all 21 currently advertised GitHub refs / 2,473 reachable commits; there are zero Claude/Anthropic identity or credit hits and zero assistant credit lines. Independent replay matches. Four assistant-alias identity headers are limited to two historical `orchestrator@local` commits; these are not Claude attributions.
+- **Stash boundary:** user selected leaving private stashes unchanged. The separate scan found 21 reflog tips / 826 commits / 70 Claude/Anthropic credit lines. `refs/stash` remained `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`.
+- **Validation:** configure/build passed (Ninja no work); CTest 431/431; lift checkers 516/0/0; Trail wiring graph current and check OK at 9,877 nodes (deep layer unbuilt); project index 32,000 folders and final `--check` current. Two redirected `--check` attempts reported the local index stale; after all validation artifacts were present, a final regeneration and direct check passed. Staged/full path audits passed 6/6 and 3,078/3,078. The first staged diff check found four trailing hard-break spaces in checkpoint metadata; those spaces were removed and the final staged check passed. Logs and scan hashes are in [E861](docs/checkpoints/2026-10-27-e860-publication-closeout-e861.md) and ignored `local/validation/orch-20261027/e861/`.
+- **Files changed:** this handoff, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and the E861 checkpoint. No source code or local game inputs changed.
+- **Status / attempts:** census `ARTIFACT_VERIFIED`; documentation publication pending. 0 failed attribution hypotheses; two transient project-index check failures were resolved by regenerating after the repo-local validation artifacts were complete. **Next exact action:** commit only these six audited documentation paths under Johnny Wang, exact-range check, push `origin main`, and fetch-verify. Actual game acceptance remains incomplete and no new product task was READY.
+
 ## 2026-10-27 19:15 CDT (`/root`) — E860 close E859 publication and refresh live attribution
 
 - **E859 publication:** `e2cb99243280bc8218d390290f6fd1dbe17972be` (`docs: close E858 attribution verification`) was committed and pushed on `main` as Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Its exact-range attribution, owner-identity, 3,076-path committed-tree, and diff checks passed; fetch verified `HEAD == origin/main == FETCH_HEAD`.
