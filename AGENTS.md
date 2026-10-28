@@ -70,9 +70,10 @@
 
 ## ELF facts (verified)
 
-- The reconstructed ELF has **three** program headers; the older two-header map dropped `phdr 1`
-  (`vaddr 0x1594000`, filesz `0x6d190`), which carries `.data.rel.ro` (the vtables). Do not assume
-  the RELRO window is absent because it is outside `phdr 0`.
+- The pinned ELF header has **11** program-header entries. Three image-mapping entries matter here:
+  `PT_LOAD phdr 0`, RELRO `phdr 1` (raw type `0x61000010`, `vaddr 0x1594000`, filesz `0x6d190`),
+  and `PT_LOAD phdr 2`. The older two-`PT_LOAD` map omitted `phdr 1`, which carries `.data.rel.ro`
+  (the vtables). Do not assume the RELRO window is absent because it is outside `phdr 0`.
 - The camera `D` is a Camera-typed registry object (`is_type<0x3cb0eb33>`, ctor `0x211c00`, 0xb0 B),
   **not** `_Root` (E602). The 24-byte block is at `[D+0x18]+0x2e8`, and the only path that touches it
   is the debug-only `bpe::ToolRemoteCommandMgr` `"SyncCameraAcrossTools"` command. `0xa68030` returns
