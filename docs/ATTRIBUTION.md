@@ -295,6 +295,18 @@ pre-push sequence.
   `local/validation/orch-20261028/e884/attribution/report.json`; E883 itself passed exact-range
   attribution and fetched/live `main` verification.
 
+- After E884 48f67020a3bba87bffdf46f749a57178b139658f was pushed, a fresh E885 scan of 36 named
+  non-stash refs and all 21 live advertised refs (9 branches, 12 PR heads, 0 tags / 15 tips)
+  parsed 2,497 reachable commits. It found zero Claude/Anthropic author or committer identities,
+  zero Claude/Anthropic credit lines, and zero Claude-attributed commits. Four broader assistant
+  alias headers remain on two historical non-Claude orchestrator@local commits; assistant credit
+  lines are zero. The contributors endpoint lists only DehydratedFlask. The stash reflog remains
+  21 tips / 826 commits / 70 Claude credit lines, with refs/stash unchanged at
+  92ceba574bd1e8445b9aa4f728f878fbfd4f57f8 by owner direction. The scan is measured at E884;
+  E885 is checked separately after publication. Private report SHA-256
+  939990b9be150221389593280e6ea92fc9b044b90cf7d423e1903373d4e7ad27 at
+  local/validation/orch-20261028/e885/attribution/report.json.
+
 ## Why the host-derived identity matters
 
 Git writes `<login>@<hostname>` when `user.email` is unset. Those commits cannot be associated
