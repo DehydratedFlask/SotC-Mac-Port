@@ -373,6 +373,17 @@ pre-push sequence.
   `d59b73a01e55291a9d8aa96952372f71b5ee22990e9578513aded952995b3cc6`. See E892 and the
   [E891 publication closeout](checkpoints/2026-10-28-e891-publish-closeout-e892.md).
 
+- Refreshed at E892 HEAD before the E893 documentation checkpoint: the live remote advertised 9
+  branch heads, 12 pull-request heads, no tags, and 15 unique tips. All 21 refs matched their
+  fetched tracking refs, and the union reached 2,506 commits. The full commit-object scan found
+  zero Claude/Anthropic author or committer identities and zero coauthor/generated-by/sign-off
+  credit trailers. GitHub's contributors endpoint listed only `DehydratedFlask`. The private report
+  is `local/validation/orch-20261028/e893/validation/remote-attribution.json`, SHA-256
+  `982101f9a720be056bc598a68404fd034bc0ecaba989f658fe79b59323b5bb3a`. `refs/stash` remained
+  at its owner-selected `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`; no stash ref was rewritten.
+  The supplementary `--all` check still reports the historical non-Claude
+  `orchestrator <orchestrator@local>` identity at `f6604a86e60e`. See E893.
+
 ## Why the host-derived identity matters
 
 Git writes `<login>@<hostname>` when `user.email` is unset. Those commits cannot be associated
