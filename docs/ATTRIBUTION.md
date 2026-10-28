@@ -37,7 +37,7 @@ python3 -I scripts/test_check_commit_attribution.py       # 13 fixtures
 Exit 0 means clean; exit 1 lists every violation. Add it next to the publish-path audit in the
 pre-push sequence.
 
-## Audit state (2026-10-26)
+## Audit state (refreshed 2026-10-28)
 
 - Effective identity: owner, clean.
 - `--all` over `main`: **one** violation, the historical commit
@@ -271,6 +271,18 @@ pre-push sequence.
   they are excluded from the published-history cleanup.
 - The historical `f6604a86e60e` `orchestrator@local` author/committer remains the one separate
   `--all` gate finding. It is not a Claude/Anthropic attribution and was not changed by this task.
+- Refreshed at E882 commit `6a5077002c971c818f06c0958258b6c44575a8be`: all 21 live advertised refs
+  (9 branches, 12 pull-request heads, 0 tags; 15 distinct tips) and 36 named local non-stash refs
+  resolve to 2,495 unique reachable commits. The Claude-specific scan found zero Claude/Anthropic
+  author or committer identity hits, zero Claude/Anthropic credit-line hits, and zero Claude/
+  Anthropic-attributed commits. The broader alias scan found four identity headers on two known
+  historical non-Claude `orchestrator@local` commits and zero assistant credit lines. The live
+  contributors endpoint lists only `DehydratedFlask`. Private stash reflogs still cover 21 tips /
+  826 commits with 70 Claude credit lines; `refs/stash` is unchanged at
+  `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8` by owner direction. Private report SHA-256 is
+  `b96ccc22f99b169bacd72036c7dbd5f69c8753c4aa0fc6a9dabb69e700dc1b5e` under
+  `local/validation/orch-20261028/e883b/attribution/report.json`; the census describes E882, and
+  later owner-authored checkpoint commits are checked separately.
 
 ## Why the host-derived identity matters
 
