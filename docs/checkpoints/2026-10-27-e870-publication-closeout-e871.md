@@ -31,7 +31,7 @@ The E870 full census count remains scoped to its measurement at E869 HEAD (`3ed9
 | `python3 -I scripts/audit_publish_paths.py` (staged) and `python3 -I scripts/audit_publish_paths.py --all` | PASSED, 7 staged paths / 3,088 full paths |
 | `git diff --cached --check` | PASSED, exit 0 |
 | `python3 -I scripts/check_commit_attribution.py` before commit | PASSED, empty `origin/main..HEAD` range |
-| E871 exact-range attribution, push, fetch/live-ref verification | Pending |
+| E871 exact-range attribution, push, fetch/live-ref verification | PASSED: E871 commit `5e5d6bbf9ceacd239ff938c7e80d13cf1f7ef175`, author/committer Johnny Wang; exact-range check passed on `origin/main..HEAD`; push advanced `main` from `c8d7fb5c` to `5e5d6bbf`; after fetch, `HEAD`, `origin/main`, `FETCH_HEAD`, and live `refs/heads/main` matched; contributors endpoint listed only `DehydratedFlask` |
 
 Gate logs are under `local/validation/orch-20261027/e870/attribution/`; these checks do not change G1–G4 product status.
 
@@ -39,4 +39,4 @@ Gate logs are under `local/validation/orch-20261027/e870/attribution/`; these ch
 
 Commands and outputs are under `local/validation/orch-20261027/e870/attribution/`: `attribution-exact.log`, `push.log`, `fetch-verify.log`, `final-contributors.log`, `final-status.log`, and `ref-counts.log`. No source, game input, or stash file was modified. E870's original 2,482-commit report and scanner hashes remain in `SHA256SUMS.txt`.
 
-This closeout updates only allowlisted docs plus generated `docs/FOLDERS.md`. No product task is READY. Keep the goal active and re-triage when new semantic evidence, an owner-released AUD-02 scope, a user-owned save, or another external prerequisite creates a bounded task.
+E871 commit `5e5d6bbf9ceacd239ff938c7e80d13cf1f7ef175` was exact-range checked, pushed to `origin main`, and fetch/live-ref verified. This closeout updates only allowlisted docs plus generated `docs/FOLDERS.md`. No product task is READY. Keep the goal active and re-triage when new semantic evidence, an owner-released AUD-02 scope, a user-owned save, or another external prerequisite creates a bounded task.
