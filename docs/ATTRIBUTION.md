@@ -283,6 +283,17 @@ pre-push sequence.
   `b96ccc22f99b169bacd72036c7dbd5f69c8753c4aa0fc6a9dabb69e700dc1b5e` under
   `local/validation/orch-20261028/e883b/attribution/report.json`; the census describes E882, and
   later owner-authored checkpoint commits are checked separately.
+- After E883 `ffb17c7c907af7b1fc445a2690f1eac431a62f50` was pushed, a fresh scan of 36 named
+  non-stash refs and all 21 live advertised refs (9 branches, 12 PR heads, 0 tags / 15 tips)
+  parsed **2,496 reachable commits**. It found zero Claude/Anthropic author or committer identities,
+  zero Claude/Anthropic credit lines, and zero Claude-attributed commits. The four assistant-alias
+  headers remain on the two historical non-Claude `orchestrator@local` commits; assistant credit
+  lines remain zero. The contributors endpoint lists only `DehydratedFlask`; the 21-tip stash
+  reflog still covers 826 commits / 70 Claude credit lines, and `refs/stash` remains unchanged at
+  `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`. Private report SHA-256:
+  `32baa46e1716f7d313d1c3b7af3169a5f63c35c4d202a27b57e07a4c1b8550c6` at
+  `local/validation/orch-20261028/e884/attribution/report.json`; E883 itself passed exact-range
+  attribution and fetched/live `main` verification.
 
 ## Why the host-derived identity matters
 
