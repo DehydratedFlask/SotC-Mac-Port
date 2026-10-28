@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 19:40 CDT (`/root`) — E863 final attribution state
+
+- **Task:** `PUB-01-E862-PUBLISHED-CLOSEOUT-03`. E861 `1904bf2f` and E862 `c01d1b9c` are owner-authored, exact-range checked, pushed, and fetch-verified. Fresh E863 scan and independent replay cover 37 named non-stash refs and all 21 live advertised refs / 2,475 commits, with zero Claude/Anthropic identity or credit hits and zero assistant credit lines. Four other assistant identity headers remain on two preserved non-Claude `orchestrator@local` commits.
+- **Stash boundary:** user directed to leave private stashes unchanged. The scan covered 21 reflog tips / 826 commits / 70 Claude/Anthropic credit lines; `refs/stash` stayed at `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`.
+- **Validation:** configure/build passed (Ninja no work); CTest 431/431; lift checkers 516/0/0; Trail wiring graph current and check OK at 9,877 nodes (deep layer unbuilt); project index current at 32,004 folders; staged/full path audits passed 6/6 and 3,080/3,080.
+- **Files changed:** this handoff, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and E863 checkpoint. No source code or original game input changed.
+- **Status / attempts:** attribution cleanup for current advertised GitHub refs is `ARTIFACT_VERIFIED`; 0 failed attribution hypotheses. **Next useful action:** keep the native-port goal active, but open the next product task only when new semantic evidence or a prerequisite becomes available. Current blockers: slot 309 producer/consumer evidence, released AUD-02 query scope, game serializer/deserializer and user-owned save, unlocked Mac for launcher UI validation, and GPU dependencies. Overall game acceptance remains PARTIAL.
+
 ## 2026-10-27 19:35 CDT (`/root`) — E862 close published E861 checkpoint
 
 - **Task:** `PUB-01-E861-PUBLISH-AND-POSTPUSH-CENSUS-02`. E861 commit `1904bf2f8e657540277ec2991e8f08dfd07c9c91` passed exact-range attribution, was pushed to `origin main`, then fetched and live-ref verified.
