@@ -1,6 +1,15 @@
 # SoC Mac Native — current handoff
 
-## 2026-10-27 22:43 CDT (`/root`) — APP-01 VoiceOver caption/focus follow-up (E869, publication pending)
+## 2026-10-27 22:57 CDT (`/root`) — post-E869 advertised-ref attribution census (active; publication gates pending)
+
+- **Task claim:** `PUB-01-POST-E869-ADVERTISED-REF-CENSUS-01` — refresh the read-only Claude/Anthropic attribution census for every currently advertised GitHub ref after E869, check the live contributors endpoint, and verify private stash state without modifying it. No branch rewriting, merging, or source edits. Attempt count: 0.
+- **Census result:** measured at E869 `3ed9e49e42e3c971151eb2f51d6a41a3c4f336bf`; 36 named non-stash refs, 21 live advertised refs / 15 advertised tips, 20 deduplicated local+advertised tips, and 2,482 reachable/parsed commits. Zero Claude/Anthropic identity hits, credit-line hits, matching commits, or assistant credit lines. Four assistant-alias identity headers remain on two historical non-Claude `orchestrator@local` commits (`f6604a86e60e7fd18cb15548362b8f134e433f5d`, `d614808bbdf732b5a3ebcf26b6d4c2a38f8d93b2`). The GitHub contributors endpoint lists only `DehydratedFlask`.
+- **Stash boundary:** read-only scan covered 21 reflog tips / 826 reachable commits / 70 Claude credit lines. `refs/stash` stayed at `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`; no stash ref or reflog changed, per user direction.
+- **Evidence and limits:** scanner/report/log hashes are in `local/validation/orch-20261027/e870/attribution/SHA256SUMS.txt`; independent auditors agreed. Results cover currently named refs, live advertised refs, and current stash reflog tips. Unreachable objects outside these roots are not covered. G1–G4/game acceptance claims did not change; G4 remains `PARTIAL` and VoiceOver focus traversal/spoken output remain `NOT VERIFIED`.
+- **Passed gates:** CMake configure/build (Ninja no work), CTest 431/431, lift checkers 516/0/0, Trail wiring graph 9,877/current (deep layer unbuilt), project index 32,014/current, staged/full audits 7/3,087 paths, cached whitespace, and empty-range precommit attribution. Logs are in `local/validation/orch-20261027/e870/attribution/` and listed in the E870 checkpoint.
+- **Next exact action:** commit the allowlisted docs as Johnny Wang, exact-range-check the new commit, push `origin main`, and fetch/compare live `main`. Preserve the private stash unchanged.
+
+## 2026-10-27 22:43 CDT (`/root`) — APP-01 VoiceOver caption/focus follow-up (E869, published)
 
 - **Task:** `APP-01-VOICEOVER-READINESS-02`, `PARTIAL`. User authorized temporarily enabling VoiceOver and restoring it off. Scope was the initial readiness screen; no folder was chosen and Play was not activated. Attempt count: 1 unsuccessful focus/caption observation, 0 code hypotheses.
 - **CUA result:** System Settings showed VoiceOver off, then on. VoiceOver Utility's “Show caption panel” was already enabled (Value 1) and was not changed. The workspace launcher AX tree again exposed Game assets (missing folder), Native game core (NOT BUILT), Metal Ready, Audio output Ready, overall status Not ready, and disabled Play help. The screenshot showed no caption text. Control+Option+Right and Tab left CUA focus at the main window; no speech audio was captured. Traversal and spoken phrasing remain NOT VERIFIED.
@@ -8,7 +17,8 @@
 - **Private evidence:** `local/validation/orch-20261027/e869/voiceover-ax-state.txt`, SHA-256 `236bf81abe7b14c6fd0655bcc1a587d9006d71e3b4bd51b408c2b6c5f0012b5a`. Screenshots were visible in CUA but not persisted.
 - **Gates:** CMake configure/build passed (Ninja no work), CTest 431/431, lift checkers 516/0/0, Trail 9,877/current (deep layer unbuilt), project index 32,012/current, staged/full publication audit 6/6 and 3,086/3,086, staged whitespace and precommit attribution passed. A first project-index check was stale after new local log files were created; precreated remaining logs and regenerated/rechecked successfully. Detailed logs are in `local/validation/orch-20261027/e869/` and the gate table is in the [E869 checkpoint](docs/checkpoints/2026-10-27-app01-voiceover-readiness-e869.md).
 - **Files changed:** only allowlisted `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and the E869 checkpoint. No source or game input changed.
-- **Next exact action:** restage the final doc edits, repeat staged/full path and whitespace/attribution checks, commit under Johnny Wang, exact-range check the new commit, push `origin main`, fetch-verify, and record publication. Keep G4 PARTIAL.
+- **Publication:** commit `3ed9e49e42e3c971151eb2f51d6a41a3c4f336bf` is by Johnny Wang, passed the exact-range attribution check, was pushed to `origin main`, and fetch/`ls-remote` verification matched `HEAD`, `origin/main`, `FETCH_HEAD`, and live `refs/heads/main`. The GitHub contributors endpoint reports only `DehydratedFlask`. Private stashes were left unchanged.
+- **Next exact action:** keep VoiceOver readiness PARTIAL; the post-E869 public attribution census is the current bounded task.
 
 ## 2026-10-27 22:29 CDT (`/root`) — APP-01 initial readiness accessibility observation (partial)
 

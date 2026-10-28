@@ -39,8 +39,8 @@ Results below are filled after the required workspace-root checks. The repositor
 | `python3 scripts/project_index.py` and `python3 scripts/project_index.py --check` | PASSED, 32,012/current. Two earlier checks found the private folder index stale because additional validation log files were created after generation; precreated the remaining log paths, regenerated, and rechecked successfully. |
 | `python3 -I scripts/audit_publish_paths.py` (staged) and `python3 -I scripts/audit_publish_paths.py --all` | PASSED, 6 staged paths / 3,086 full paths |
 | `git diff --cached --check` | PASSED, exit 0 |
-| `python3 -I scripts/check_commit_attribution.py` before commit | PASSED, empty `origin/main..HEAD` range; will repeat on the new commit before push |
-| Commit/push/fetch verification | Pending |
+| `python3 -I scripts/check_commit_attribution.py` before commit | PASSED on the empty precommit range; E869 commit exact-range result is recorded in the publication row below |
+| Commit/push/fetch verification | PASSED: E869 commit `3ed9e49e42e3c971151eb2f51d6a41a3c4f336bf`, author/committer Johnny Wang; exact-range attribution check passed; `git push origin main` passed; `git fetch origin` and `git ls-remote --refs origin` matched `HEAD`, `origin/main`, `FETCH_HEAD`, and live `refs/heads/main`; GitHub contributors endpoint listed only `DehydratedFlask`. See E870 for post-E869 attribution census. |
 
 Gate logs are under `local/validation/orch-20261027/e869/`. Full audit reported 3,085 paths before the new checkpoint was staged; the post-stage full audit is 3,086.
 
@@ -48,4 +48,4 @@ Gate logs are under `local/validation/orch-20261027/e869/`. Full audit reported 
 
 Allowlisted changes: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, this checkpoint, and a generated documentation index if required. Private evidence stays under ignored `local/`. No dependency or source changes.
 
-Next exact action: finish the listed gates, commit only allowlisted documentation paths as Johnny Wang, exact-range attribution-check, push `origin main`, fetch-verify, and record the final commit and post-push state. Keep G4 `PARTIAL`.
+E869 publication is complete: commit `3ed9e49e42e3c971151eb2f51d6a41a3c4f336bf` was exact-range checked as Johnny Wang, pushed to `origin main`, and fetch/live-ref verified. The post-E869 advertised-ref census and its documentation closeout are recorded in [E870](2026-10-27-post-e869-public-attribution-census-e870.md). Keep VoiceOver readiness and G4 `PARTIAL`.
