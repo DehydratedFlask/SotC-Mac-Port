@@ -1,13 +1,23 @@
 # SoC Mac Native — current handoff
 
-## 2026-10-28 00:07 CDT (`/root`) — E880 E879 publication closeout (publication pending)
+## 2026-10-28 00:21 CDT (`/root`) — E881 E880 publication closeout and save-path feasibility (publication pending)
+
+- **E880 publication:** commit `d4202016cf14aa8684b329aed0098561c65dad0f` was authored by Johnny Wang, exact-range checked, pushed, and fetch/`ls-remote` verified at `HEAD`, `origin/main`, `FETCH_HEAD`, and live `refs/heads/main`. GitHub's contributors endpoint lists only `DehydratedFlask`; the private stash SHA remains unchanged.
+- **Bounded save-path check:** a fresh REA/Ghidra open of the pinned ELF succeeded, but one typed query at `0x3260bb8` timed out after 330,889 ms at the 330,000 ms import/analyze deadline. No xrefs or count were returned. The scout closed the Ghidra session without a snapshot; no save-writer task was claimed or created. Private record: `local/validation/orch-20261028/e881/save-gamedata-xref-timeout.txt`.
+- **Task readiness:** no existing task is READY. CPU slot 23 remains PARTIAL and unregistered; the CXML probe remains stopped; APP-01 VoiceOver remains NEEDS_PRINCIPAL. G1/G4 remain PARTIAL; boot/audio/real-save acceptance remain unverified.
+- **E880 validation:** configure/build 0, CTest 431/431, lift 516/0/0, full path audit 3,096/3,096, project index 32,026/current, Trail 9,877/current (deep layer not built), staged audit 6/6, exact-range attribution and live-ref checks passed. Logs are under `local/validation/orch-20261028/e880/`.
+- **E881 validation:** configure/build 0 (`ninja: no work to do`), CTest 431/431, lift checkers 516/0/0, full path audit 3,098/3,098, project index 32,027/current, Trail 9,877/current (deep layer not built). Staged audit and postcommit exact-range check remain pending. Logs are under `local/validation/orch-20261028/e881/`.
+- **Next exact action:** run the full E881 verification, commit and push allowlisted files under Johnny Wang, then fetch/`ls-remote` verify `main`. Keep the broad port goal active.
+
+## 2026-10-28 00:07 CDT (`/root`) — E880 E879 publication closeout (published)
 
 - **Completed closeout:** `PUB-01-E879-PUBLISH-CLOSEOUT-01`, `ARTIFACT_VERIFIED`. E879 commit `20b6323f46a0f3add7a2fe32e64c4b964d47f752` was authored by Johnny Wang, passed the exact-range attribution audit, was pushed to `origin main`, and was fetch/`ls-remote` verified at `HEAD`, `origin/main`, `FETCH_HEAD`, and live `refs/heads/main`. The GitHub contributors endpoint lists only `DehydratedFlask`.
+- **E880 publication:** commit `d4202016cf14aa8684b329aed0098561c65dad0f` was also owner-authored, exact-range checked, pushed, and verified at all fetched/live `main` refs by E881.
 - **Attribution scope:** the latest full public-ref census remains the E872 measurement at 2,485 commits; all later commits through E879 were separately owner-authored and exact-range checked. `refs/stash` still equals the owner-selected unchanged SHA `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`.
 - **Product status:** E879's slot-23 result is instruction-level register dataflow only; caller reachability, vtable semantics, and string need remain UNKNOWN. The CXML scout invocation was out of scope and produced no counts. No product gate advanced; G1 and G4 remain PARTIAL; no task row is READY.
 - **E879 validation:** configure/build 0 (`ninja: no work to do`), CTest 431/431, lift checkers 516/0/0, full path audit 3,095/3,095, project index 32,025/current, Trail 9,877/current (deep layer not built), staged audit 6/6, and exact-range attribution passed. Logs: `local/validation/orch-20261028/e879/`.
 - **E880 validation:** configure exit 0; build exit 0 (`ninja: no work to do`); CTest 431/431; lift checkers 516/0/0; full path audit 3,096/3,096; project index 32,026/current; Trail check passed at 9,877 nodes (deep layer not built). Staged path and postcommit exact-range attribution checks are pending. Logs are under `local/validation/orch-20261028/e880/`.
-- **Next exact action:** run the required full verification for E880, commit and push the allowlisted closeout under Johnny Wang, then fetch/`ls-remote` verify `main`. Continue the broader project without promoting any gate.
+- **Next exact action:** E880 is closed by E881. Continue only from a newly available, bounded prerequisite; do not promote any product gate.
 
 ## 2026-10-28 00:04 CDT (`/root`) — E879 slot-23 structural replay, audio scope deviation, and current stopping point (published)
 
