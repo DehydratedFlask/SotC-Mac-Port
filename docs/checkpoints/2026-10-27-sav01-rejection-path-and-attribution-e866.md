@@ -3,7 +3,7 @@
 - Local date/time: 2026-10-27 20:07 CDT
 - Agent: `/root`
 - Tasks: `SAV-01-LOAD-PARTIAL-MUTATION-01`; `PUB-01-CLAUDE-CREDIT-CLEANUP-01`; `PUB-01-LOCAL-REF-ATTRIBUTION-CENSUS-01`
-- Status: static path claim verified; public attribution verified at the E865 published tip; all required documentation/publication gates passed; checkpoint publication pending.
+- Status: static path claim verified; E866 published in `fc97d6fd55e5ff02a08ccc47ecb08f5592cf6db5`; exact-range, push/fetch, and post-push attribution closeout are recorded in E867.
 
 ## Public commit attribution
 
@@ -60,4 +60,4 @@ Required prepublication gates completed:
 | `python3 -I scripts/audit_publish_paths.py --all` | exit 0; all 3,083 tracked paths allowed after staging |
 | `git diff --check` and `git diff --cached --check` | exit 0 |
 
-Logs are under `local/validation/orch-20261027/e866/`. The exact attribution checker passed only the empty precommit range; the new checkpoint commit still requires an exact-range check after creation. The six allowlisted documentation paths are staged and passed staged/full audits. Next exact action: commit under owner identity, exact-range-check the new commit, push `origin main`, fetch-verify, and recheck GitHub's live contributors endpoint. Overall game acceptance remains PARTIAL; no actual save/load or runtime behavior is claimed.
+Logs are under `local/validation/orch-20261027/e866/`. E866 commit `fc97d6fd55e5ff02a08ccc47ecb08f5592cf6db5` was authored and committed by Johnny Wang, passed the exact-range attribution checker, was pushed to `origin main`, and fetch verification matched local, remote-tracking, and live advertised `main`. The post-E866 census covers 2,479 current advertised commits with zero Claude/Anthropic identities or credits; GitHub lists only `DehydratedFlask`; the user-excluded stash ref remains unchanged. E867 records that publication closeout. Overall game acceptance remains PARTIAL; no actual save/load or runtime behavior is claimed.
