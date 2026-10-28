@@ -364,6 +364,15 @@ pre-push sequence.
   is `c26494de7a2b2ed933b58e8e5f3d580c5b2d8658b9f42eceeaae171b0004eeb9`. See E891 and the
   [E890 publication closeout](checkpoints/2026-10-28-e890-publish-closeout-e891.md).
 
+- After E891 `f8c22587bfca94615f8c72a1a5e68ab417fb4af5` was pushed, a fresh scan of 36 named
+  non-stash refs parsed 2,505 reachable commits. It found zero Claude/Anthropic author or
+  committer identities and zero Claude/Anthropic credit-signature matches. The exact-range checker
+  passed for E891, and GitHub's contributors endpoint lists only `DehydratedFlask`. The stash
+  reflog remains 21 tips / 826 commits / 70 Claude credit lines, with `refs/stash` unchanged at
+  `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8` by owner direction. The private scan SHA-256 is
+  `d59b73a01e55291a9d8aa96952372f71b5ee22990e9578513aded952995b3cc6`. See E892 and the
+  [E891 publication closeout](checkpoints/2026-10-28-e891-publish-closeout-e892.md).
+
 ## Why the host-derived identity matters
 
 Git writes `<login>@<hostname>` when `user.email` is unset. Those commits cannot be associated

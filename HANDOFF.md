@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-28 02:12 CDT (/root) — E892 E891 post-push closeout (validated; checkpoint publish pending)
+
+- Completed bounded task `PUB-01-E891-PUBLISH-CLOSEOUT-01`: E891 commit `f8c22587bfca94615f8c72a1a5e68ab417fb4af5` is by Johnny Wang, exact-range attribution passed, and the normal fast-forward push is verified at fetched/live `main`. The GitHub contributors endpoint lists only `DehydratedFlask`.
+- Fresh census at E891: 36 named non-stash refs / 2,505 reachable commits, zero Claude/Anthropic author or committer identity matches and zero credit-signature matches. The unchanged stash is `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`. Private logs: `local/validation/orch-20261028/e891/validation/`; census SHA-256 `d59b73a01e55291a9d8aa96952372f71b5ee22990e9578513aded952995b3cc6`.
+- Corrected the stale E891 “publication pending” handoff and the E890 task row that said the core was rebuilt; the configured target was up to date (`ninja: no work to do`). Native `SoCGameCore --coverage` remains 397/573 with first gap 309. This docs closeout does not rebuild the launcher bundle or promote G1/G4.
+- Fresh triage found no registered task `READY`. Slot 309 still lacks a native-lift boundary, while the APP-01 VoiceOver observation remains gated on unlock and an observable speech/caption surface. The current CUA preflight still reports locked; no settings changed. APP-01/G1/G4 remain PARTIAL.
+- E892 docs-only validation: configure/build exit 0, CTest **431/431**, lift **516 passed / 0 skipped / 0 failed**, project index **32,059/current**, Trail graph **9,877/current** (deep layer not built). Final staged/all-path audits and diff checks are next. Logs: `local/validation/orch-20261028/e892/validation/`.
+- Files changed: `HANDOFF.md`, `docs/ATTRIBUTION.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-28-e891-publish-closeout-e892.md`.
+- Task status: `ARTIFACT_VERIFIED`; 0 failed hypotheses. The E891 publication closeout is evidenced; E892's docs checkpoint is ready for final audits.
+- Next exact action: regenerate the folder index, stage only the seven allowlisted docs, pass staged/full publication and diff audits, commit under Johnny Wang, exact-range check, push fast-forward, and verify live refs plus the unchanged stash.
+
 ## 2026-10-28 02:01 CDT (/root) — E891 E890 publication closeout (validated; checkpoint publish pending)
 
 - Completed `PUB-01-E890-PUBLISH-CLOSEOUT-01`: E890 commit `e1a8c4c4effe5682a69757f06ad7824d427ca139` is by Johnny Wang, passed `python3 -I scripts/check_commit_attribution.py --range HEAD^..HEAD`, pushed fast-forward, and fetch/live-main verified. The GitHub contributors endpoint lists only `DehydratedFlask`.
