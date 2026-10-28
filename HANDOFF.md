@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 19:13 CDT (`/root`) — E859 close E858 and refresh published attribution census
+
+- **E858 publication:** `63fe6d24ca667518e71c1326932815e989bbfe50` (`docs: close E857 attribution verification`) was committed and pushed on `main` under Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Its exact-range attribution, identity, 3,075-path committed-tree audit, diff, push, and fetch checks passed.
+- **Fresh post-push census:** `local/validation/orch-20261027/e859/attribution/scan_all_attribution_roots_e859.py` SHA-256 `3453d30b01de2ed72c1ededfe0198c1be1a5df40fd81859a515804e0e2772489`, report SHA-256 `bb13c9e977ad74fd3016f2ee0d2464ec5f758770051a86ef4c311c8d7216d590`, log SHA-256 `89dfc05bfca4030c6753b7380e732d58040ebd876950fb79bb47e0ae953459ff`. Independent replay confirmed 37 named non-stash refs, all 21 live advertised refs, 21 unique tips and 2,471 commits; zero Claude/Anthropic identities or credits, zero assistant credits, and the two documented non-Claude `orchestrator@local` commits (four identity headers).
+- **Stash boundary:** 21 reflog roots / 826 commits / 70 Claude credit lines and one separate `orchestrator@local` identity; `refs/stash` remained `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8` per user direction.
+- **Task scan:** latest CPU, launcher, DATA/AUD/SAV/GPU scouts found no independent READY product lane. Product gate limitations remain: unlocked Mac for UI validation, a user-owned save and serializer for save/load, released scope for AUD-02, and unresolved GPU dependencies.
+- **E859 gates:** configure/build passed (Ninja had no work); CTest 431/431; lift checkers 516/0 skipped/0 failed; Trail current at 9,877 nodes (deep layer unbuilt); project index 31,996 folders. Logs are under `local/validation/orch-20261027/e859/`.
+- **Files changed for E859:** this handoff, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and [E859 checkpoint](docs/checkpoints/2026-10-27-e858-publication-closeout-e859.md). Private scan and gate artifacts are under ignored `local/validation/orch-20261027/e859/`.
+- **Next exact action:** commit these six allowlisted docs paths as Johnny Wang, exact-range check, push `origin main`, and fetch-verify. Native boot/audio/save/Metal acceptance remains incomplete.
+- **Task status / attempts:** public Claude/Anthropic attribution census `ARTIFACT_VERIFIED` over all current named and advertised refs; E859 documentation publication `ACTIVE / root`. Zero failed attribution hypotheses; one scanner-coverage correction, with the private E857 raw-report replacement documented in E858.
+
 ## 2026-10-27 19:08 CDT (`/root`) — E858 close E857 publication and refresh live attribution
 
 - **E857 publication:** `c8fd4cc49b69ea8dae26590e2b280ccb1e0bed01` (`docs: record E857 all-ref attribution census`) was committed and pushed on `main` as Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Exact-range attribution, effective identity, committed-tree audit (3,074 paths), commit diff, push, and fetch verification passed; `HEAD == origin/main == FETCH_HEAD`.
