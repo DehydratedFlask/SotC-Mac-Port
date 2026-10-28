@@ -46,7 +46,7 @@ This attribution closeout does not change product evidence. G1–G4/game accepta
 | `python3 -I scripts/audit_publish_paths.py` (staged) and `python3 -I scripts/audit_publish_paths.py --all` | PASSED, 7 staged paths / 3,087 full paths |
 | `git diff --cached --check` | PASSED, exit 0 |
 | `python3 -I scripts/check_commit_attribution.py` before commit | PASSED, empty `origin/main..HEAD` range |
-| Exact-range attribution, `git push origin main`, fetch/live-ref match, final contributor endpoint | PENDING |
+| Exact-range attribution, `git push origin main`, fetch/live-ref match, final contributor endpoint | PASSED: commit `c8d7fb5c1774451ca7847b7a5887d9e7e36cd714`, author/committer Johnny Wang; exact-range check passed on `origin/main..HEAD`; push to `origin main` passed; fetch matched `HEAD`, `origin/main`, `FETCH_HEAD`, and live `refs/heads/main`; contributors endpoint listed only `DehydratedFlask` |
 
 Exact outputs and hashes are in `local/validation/orch-20261027/e870/attribution/`; no private evidence is staged.
 
@@ -54,4 +54,4 @@ Exact outputs and hashes are in `local/validation/orch-20261027/e870/attribution
 
 Allowlisted documentation changes: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and the E869/E870 checkpoints. No source or original game input changed.
 
-Next exact action: complete the gate table, stage only the allowlisted paths, commit as Johnny Wang, exact-range-check and push `origin main`, then fetch and compare the live main ref. Preserve the private stash unchanged.
+E870 publication completed: commit `c8d7fb5c1774451ca7847b7a5887d9e7e36cd714` was exact-range checked, pushed to `origin main`, and fetch/live-ref verified. The separate publication closeout and no-READY triage are in [E871](2026-10-27-e870-publication-closeout-e871.md). The private stash remains unchanged.
