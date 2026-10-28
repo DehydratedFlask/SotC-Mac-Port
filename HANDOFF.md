@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 19:15 CDT (`/root`) — E860 close E859 publication and refresh live attribution
+
+- **E859 publication:** `e2cb99243280bc8218d390290f6fd1dbe17972be` (`docs: close E858 attribution verification`) was committed and pushed on `main` as Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Its exact-range attribution, owner-identity, 3,076-path committed-tree, and diff checks passed; fetch verified `HEAD == origin/main == FETCH_HEAD`.
+- **Fresh post-push census:** scanner `local/validation/orch-20261027/e860/attribution/scan_all_attribution_roots_e860.py` SHA-256 `3453d30b01de2ed72c1ededfe0198c1be1a5df40fd81859a515804e0e2772489`, report SHA-256 `94709e907cb63e8c68d73cb36a667ad8ffe2efebddcadb0103bc867a44dce961`, log SHA-256 `162f96ad2571cc7706957cf354a54486a49130b7bbfea2f346337cb3cfd464b2`. Independent replay confirmed 37 named non-stash refs and 21 live advertised refs (21 unique tips / 2,472 commits); zero Claude/Anthropic identity or credit hits and zero assistant credit lines; the two documented `orchestrator@local` commits are non-Claude.
+- **Stash boundary:** unchanged read-only scope of 21 reflog tips / 826 commits / 70 Claude credit lines; one separate `orchestrator@local` identity. `refs/stash` remains `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8` per user direction.
+- **Task scan:** no independent READY product lane in the latest CPU, launcher, DATA/AUD/SAV/GPU scans. Launcher UI validation requires an unlocked Mac; save/load needs the serializer and a user-owned save; AUD-02 needs a released query scope; GPU tasks remain dependency-gated.
+- **E860 gates:** configure/build passed (Ninja had no work); CTest 431/431; lift checkers 516/0 skipped/0 failed; Trail current at 9,877 nodes (deep layer unbuilt); project index 31,998 folders. Logs are under `local/validation/orch-20261027/e860/`.
+- **Files changed for E860:** this handoff, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and [E860 checkpoint](docs/checkpoints/2026-10-27-e859-publication-closeout-e860.md). Private scan and gate artifacts remain under ignored `local/validation/orch-20261027/e860/`.
+- **Next exact action:** commit six allowlisted docs paths under Johnny Wang, exact-range check, push `origin main`, and fetch-verify. Actual-game boot/audio/save/Metal gates remain incomplete.
+- **Task status / attempts:** E859 publication and 2,472-commit live census are verified; E860 documentation publication is in progress. Zero failed attribution hypotheses; one scanner coverage correction. The E857 raw-report replacement remains documented in E858.
+
 ## 2026-10-27 19:13 CDT (`/root`) — E859 close E858 and refresh published attribution census
 
 - **E858 publication:** `63fe6d24ca667518e71c1326932815e989bbfe50` (`docs: close E857 attribution verification`) was committed and pushed on `main` under Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Its exact-range attribution, identity, 3,075-path committed-tree audit, diff, push, and fetch checks passed.
