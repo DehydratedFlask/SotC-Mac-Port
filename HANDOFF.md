@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 19:08 CDT (`/root`) — E858 close E857 publication and refresh live attribution
+
+- **E857 publication:** `c8fd4cc49b69ea8dae26590e2b280ccb1e0bed01` (`docs: record E857 all-ref attribution census`) was committed and pushed on `main` as Johnny Wang `<dehydratedflask@users.noreply.github.com>`. Exact-range attribution, effective identity, committed-tree audit (3,074 paths), commit diff, push, and fetch verification passed; `HEAD == origin/main == FETCH_HEAD`.
+- **Post-push scan:** `local/validation/orch-20261027/e858/attribution/scan_all_attribution_roots_e858.py` SHA-256 `3453d30b01de2ed72c1ededfe0198c1be1a5df40fd81859a515804e0e2772489`, report SHA-256 `5e816922fbbc8d687a31bc37924a440a5fdc4e855bc5e840def33606d0419174`, log SHA-256 `db895c12e258f04a2fea5ef0d7713a18e75a167b8b39fc128d9c06e39b5d4a7d`. Independent replay confirms 37 named non-stash refs and 21 live advertised refs (21 unique tips / 2,470 commits); zero Claude/Anthropic identity or credit hits and zero assistant credit lines. The two historical `orchestrator@local` commits (four identity headers) remain preserved.
+- **Stash boundary:** fresh separate read-only scan is unchanged at 21 reflog tips / 826 commits / 70 Claude credit lines; one non-Claude `orchestrator@local` identity remains. `refs/stash` is still `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`.
+- **Evidence note:** an attempted scanner `--help` invocation ran the scanner because it has no argument parser and replaced the private E857 `report.json` with the post-push report. Its pre-push SHA-256 remains recorded in E857 docs and the independent reviewer confirmed the prior report; the refreshed report and log are now preserved in the separate E858 directory. No tracked file, Git ref, or stash changed in that invocation.
+- **Files changed for E858:** this handoff, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and [E858 checkpoint](docs/checkpoints/2026-10-27-e857-publication-closeout-e858.md). All fresh scan/gate artifacts remain private under ignored `local/validation/orch-20261027/e858/`.
+- **E858 gates:** configure/build passed (Ninja had no work); CTest 431/431; lift checkers 516/0 skipped/0 failed; Trail current at 9,877 nodes (deep layer unbuilt); project index 31,994 folders. Logs are under `local/validation/orch-20261027/e858/`.
+- **Next exact action:** commit the six allowlisted docs paths as Johnny Wang, exact-range check, push `origin main`, and fetch-verify. Native game acceptance remains incomplete; recent scouts found no independent READY product task.
+- **Task status / attempts:** E857 attribution census and E858 post-push census `ARTIFACT_VERIFIED`; E858 documentation publication `ACTIVE / root`. No attribution hypotheses failed; E857 scanner coverage was corrected once. One unsupported scanner-help invocation replaced the prior raw private report, now recorded as an evidence limitation.
+
 ## 2026-10-27 18:59 CDT (`/root`) — E857 verify E856 and census every named ref
 
 - **E856 starting publication:** `5504644addc7b6a0902c122d2aa3a2964ecc7436` is the fetched `main` tip; E856's exact-range attribution/identity and path audits passed before its push.
