@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-28 02:45 CDT (/root) — E895 E894 publication closeout (verified; no product gate advanced)
+
+- Completed `PUB-01-E894-PUBLISH-CLOSEOUT-01`: E894 commit `ce1ccda5a0b805043ce71a4aef1271a511ce2b39` was authored and committed by Johnny Wang `<dehydratedflask@users.noreply.github.com>`, passed `python3 -I scripts/check_commit_attribution.py --range HEAD^..HEAD`, and was pushed fast-forward to `origin main`.
+- Post-push `git fetch origin main` exited 0; `HEAD`, `origin/main`, `FETCH_HEAD`, and `refs/heads/main` all equal `ce1ccda5a0b805043ce71a4aef1271a511ce2b39`; worktree is clean. The private stash tip remains `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8`.
+- Fresh all-advertised-ref census: 9 branches, 12 PR heads, 0 tags / 15 unique tips; all 21 remote refs match local tracking refs; **2,508 reachable commits** parsed with zero Claude/Anthropic author/committer identity hits and zero Claude/Anthropic co-author/generated-by/sign-off hits. GitHub contributors endpoint lists only `DehydratedFlask`. Private report `local/validation/orch-20261028/e894/remote-attribution.json`, SHA-256 `583e082f28a0532992552f8cfc5fe889d7097e2e8353b3695603ff2c1745d0a0`.
+- The E894 raw census remains a negative consumer-search route: 12 u32 and 12 u64 matches were all consistent with relocation metadata, with no semantic consumer or native-lift boundary. Slot 309 remains unregistered; parent characterization ACTIVE; G1 PARTIAL. The task register still has no product task READY. No game/runtime gate advanced.
+- APP-01 VoiceOver attempt 4 remains waiting for an unlocked Mac and an observable speech/caption surface. Owner authorization to enable then restore VoiceOver OFF remains in force; no preference changed while the desktop stayed locked.
+- E894 validation passed: configure/build exit 0, CTest **431/431**, lift **516/0/0**, Trail **9,877/current** (deep layer not built), project index **32,062/current**, staged/full path audits **7/7** and **3,111/3,111**. The all-ref audit and contributors response are in the private E894 validation directory. E895 documentation-only closeout validation and publication are recorded in [E895 checkpoint](docs/checkpoints/2026-10-28-e894-publish-closeout-e895.md).
+- E895 documentation validation at 02:46 CDT (`/root`): Trail **9,877/current**, project index **32,063/current**, staged/full audits **6/6** and **3,112/3,112**, precommit attribution and diff checks passed. E894 source/build results remain applicable; no code changed.
+- Next exact action: wait for manual Mac unlock; then run CUA preflight and perform the authorized VoiceOver observation only if a suitable speech/caption surface is visible, restoring VoiceOver OFF immediately afterward. Do not repeat the negative slot-309 literal route; resume slot 309 only with a concrete producer/consumer edge or principal reassessment.
+- Task status: `ARTIFACT_VERIFIED`; E894 publication and current all-ref attribution are verified. No G1-G4 gate advanced.
+
 ## 2026-10-28 02:38 CDT (/root) — E894 slot-309 raw literal census (artifact verified; publication pending)
 
 - Completed bounded task `CPU-01-STARTUP-SLOT-309-RAW-LITERAL-CENSUS-01`, claimed at 02:31: scan the exact pinned ELF for unaligned 4-byte and 8-byte little-endian absolute literals into `[0x15d5b60,0x15d5bd0)`, then classify every hit against the complete ELF program-header table.
