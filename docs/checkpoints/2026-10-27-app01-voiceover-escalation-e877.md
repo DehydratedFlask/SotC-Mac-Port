@@ -27,4 +27,4 @@
 | `python3 -I scripts/audit_publish_paths.py` (staged) / `--all` | PASSED, 7/7 staged and 3,094/3,094 tracked paths |
 | `python3 -I scripts/check_commit_attribution.py` | PASSED before commit for the empty unpublished range; exact E877 commit range is recorded in the publication closeout |
 | `python3 scripts/project_index.py` and `--check` | PASSED, 32,022 indexed/current. One initial check found the private folder index stale because its redirected check log was created after generation; regeneration and direct check both passed. |
-| Commit / push / fetch verification | Pending |
+| Commit / push / fetch verification | PASSED for E877 `7a5ae224a45d597f8fa7b69f6a5a00cf38fe7b25`: author/committer Johnny Wang; exact-range attribution passed; pushed to `origin main`; `HEAD`, `origin/main`, `FETCH_HEAD`, and live `refs/heads/main` matched. Full closeout: [E878](2026-10-27-e877-publication-closeout-e878.md). |

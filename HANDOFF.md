@@ -1,14 +1,24 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-27 23:50 CDT (`/root`) — E878 E877 publication closeout and current stopping point (publication pending)
+
+- **Published checkpoint:** E877 `7a5ae224a45d597f8fa7b69f6a5a00cf38fe7b25` (`docs: escalate APP-01 VoiceOver verification limit`) was authored/committed by Johnny Wang, passed exact-range attribution, pushed to `origin main`, and fetch/`ls-remote` verified at local `HEAD`, `origin/main`, `FETCH_HEAD`, and live `refs/heads/main`. E876 claim commit `8a2170c11d4b8689a305c71e64e55535f74ec8e2` is also on `main`.
+- **Task status:** `APP-01-VOICEOVER-READINESS-02` is `NEEDS_PRINCIPAL` after three bounded observations (E869, E873, E876). VoiceOver is verified off; actual VoiceOver cursor traversal, speech, and caption output remain `NOT VERIFIED`. G4 remains `PARTIAL`; no product gate is promoted.
+- **Readiness:** fresh read-only triage found no `READY` product task and no newly satisfied prerequisite. The only active action is principal reassessment of a genuine desktop-wide caption or permitted audio-capture method; do not repeat the same UI evidence path.
+- **Validation for E877:** configure/build exit 0 (Ninja no work), CTest 431/431, lift checkers 516/0/0, Trail wiring graph 9,877/current (deep meaning layer unbuilt), project index 32,022/current, staged audit 7/7, full audit 3,094/3,094, and exact-range attribution passed. Logs are under `local/validation/orch-20261027/e877/`.
+- **Validation for E878:** configure/build exit 0 (Ninja no work), CTest 431/431, lift checkers 516/0/0, Trail graph 9,877/current (deep meaning layer unbuilt), project index 32,023/current, staged audit 6/6, full audit 3,095/3,095, and precommit attribution exit 0. Exact E878 attribution and publication are next.
+- **E878 files:** `HANDOFF.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, the E877 checkpoint, and this publication-closeout checkpoint. No source, game inputs, dependencies, or stashes changed. E878 publication is pending.
+- **Next exact action:** commit/push this allowlisted E878 closeout under the owner identity, check its exact attribution, then verify the live ref. Leave the broader port goal active; re-triage when the owner supplies a new capture method or another product prerequisite becomes available.
+
 ## 2026-10-27 23:44 CDT (`/root`) — E877 APP-01 VoiceOver attempt 3 and escalation (publication pending)
 
 - **Task outcome:** `APP-01-VOICEOVER-READINESS-02` reached its third bounded observation. VoiceOver Utility showed “Show caption panel” Value 1; System Settings verified VoiceOver off → on → off. On the launcher, CUA still reported `Choose Folder…` after Control+Option+Right, and its app-window capture showed no captions. No audio was captured, so actual VoiceOver cursor movement, spoken text, and caption output remain `NOT VERIFIED`. No folder or Play action occurred. VoiceOver is restored off; Full Keyboard Access was not changed. Private record: `local/validation/orch-20261027/e876/voiceover/observation.txt` (SHA-256 `f2edfd23bd1ca6a302e4bc4dd85d913d918f3a0fcb9dddcc630b49b517ad044c`).
 - **Status / attempts:** marked `NEEDS_PRINCIPAL` after the third unsuccessful focus/caption observation (E869, E873, E876); escalation is `docs/escalations/APP-01-VOICEOVER-READINESS-02.md`. G4 remains `PARTIAL`.
 - **Readiness:** a fresh read-only triage at E875 `85a2e941` found no `READY` product task and no newly satisfied prerequisite. The native product lanes remain gated as recorded in `docs/TASKS.md`.
 - **Published claim checkpoint:** E876 commit `8a2170c11d4b8689a305c71e64e55535f74ec8e2` (`docs: claim APP-01 VoiceOver validation attempt three`) is by Johnny Wang, exact-range attribution checked, pushed to `origin main`, and fetch/`ls-remote` verified at `HEAD`, `origin/main`, `FETCH_HEAD`, and live `refs/heads/main`.
-- **Files in E877:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, the E877 checkpoint, and the escalation. No source or product code changes. Publication of E877 is pending.
+- **Files in E877:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, the E877 checkpoint, and the escalation. No source or product code changes. E877 `7a5ae224a45d597f8fa7b69f6a5a00cf38fe7b25` was authored/committed by Johnny Wang, exact-range checked, pushed, and fetch/live-ref verified.
 - **Validation:** configure/build exit 0 (Ninja no work), CTest 431/431, lift checkers 516/0/0, Trail graph 9,877 nodes/current (deep meaning layer unbuilt), project index 32,022/current, staged audit 7/7, full audit 3,094/3,094, and precommit attribution exit 0. Logs: `local/validation/orch-20261027/e877/`.
-- **Next exact action:** commit/push E877 under the owner identity, check the exact commit attribution, verify the live ref, then record the publication closeout. No fourth UI attempt without a principal reassessment and a genuinely new capture method.
+- **Next exact action:** await principal reassessment before any fourth UI attempt; keep the broader port goal active and re-triage when a prerequisite changes.
 
 ## 2026-10-27 23:40 CDT (`/root`) — E876 claim checkpoint for APP-01 VoiceOver validation attempt 3 (published)
 

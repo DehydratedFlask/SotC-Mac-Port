@@ -487,4 +487,5 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [E875 E874 publication closeout and current task triage](checkpoints/2026-10-27-e874-publish-closeout-e875.md) | Verifies E874 commit `017b6f31` on live `main`; contributor endpoint remains owner-only; stash unchanged; no product task is READY |
 | [E876 APP-01 VoiceOver third-attempt claim](../HANDOFF.md) | Published the bounded third observation claim before shared task/evidence updates |
 | [E877 APP-01 VoiceOver third-attempt escalation](checkpoints/2026-10-27-app01-voiceover-escalation-e877.md) | CUA confirmed VoiceOver on/off and caption preference, but could not verify actual cursor movement, speech, or desktop-wide caption output; task stopped at `NEEDS_PRINCIPAL` |
+| [E878 E877 publication closeout](checkpoints/2026-10-27-e877-publication-closeout-e878.md) | Verifies E877 commit `7a5ae224` on live `main`; no product task is READY; G4 remains PARTIAL |
 | [APP-01 VoiceOver escalation](escalations/APP-01-VOICEOVER-READINESS-02.md) | Three bounded observations leave actual speech/caption output unverifiable with current CUA capture surfaces |
