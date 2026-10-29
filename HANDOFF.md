@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 04:25 CDT (/root) — E935 claim `SRV-01-ALLOCATOR-BUCKET-CALLEES-17E90-01` (ACTIVE)
+
+- Bounded output: characterize the three direct call sites in the already byte-matched Bucket deallocator `0x17e90` (`0x17f14` and `0x18012` to `0x3b570`; `0x1803f` to `0x476f0`), including argument dataflow, callee side effects, and unresolved edges. Byte-check the called bodies/call sites against the pinned ELF and compare only the observed free-list effects with the native `BucketAllocator::deallocate` contract.
+- Prerequisites/spec: `SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01` (E933/E934), `SRV-01-ALLOCATOR-FREE-BODY-12AF0-01` (E925), `SRV-01-ALLOCATOR-FRONTEND-CONTRACT-01` (E390), pinned ELF `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, and [`docs/REVERSE_ENGINEERING.md` Stage 2](docs/REVERSE_ENGINEERING.md#stage-2--per-function-recovery-protocol).
+- Scope boundary: saved-project Ghidra/static analysis and native-source comparison only. No code lift, startup wiring, edits to native implementation, original target execution, or runtime/game-gate claim. Stop at unresolved indirect/computed behavior.
+- Files changed for this claim: `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`; no product source changed.
+- Claim-publication checks: configure/build, full CTest, lift checkers, staged and all-path audits, attribution, project index, Trail graph check, and diff check are recorded in private `local/validation/orch-20261029/SRV-01-ALLOCATOR-BUCKET-CALLEES-17E90-01/claim-publication/`.
+- Observation: E933's instruction log identifies three direct-call sites in `0x17e90`; the exact callee contracts are not established by this claim. Trail returned no indexed content under the configured `reference/ShadowOfTheColossus-PC/` path, so the reference clone was not used for this source comparison.
+- Next exact action: create `local/validation/orch-20261029/SRV-01-ALLOCATOR-BUCKET-CALLEES-17E90-01/AllocatorBucketCallees.java`, then run `analyzeHeadless local/ghidra/persistent-20261020 SotC -process eboot.elf -noanalysis -readOnly -scriptPath local/validation/orch-20261029/SRV-01-ALLOCATOR-BUCKET-CALLEES-17E90-01 -postScript AllocatorBucketCallees.java`; independently byte-check each queried callee and call site against `local/re/eboot.elf`.
+- Status/attempt count: `ACTIVE`, zero analysis attempts, zero failed semantic hypotheses; no G1–G6 gate advanced.
+
 ## 2026-10-29 04:18 CDT (/root) — E934 allocator-dispatch publication closeout (ARTIFACT_VERIFIED)
 
 - E933 is owner-authored commit `8db3a57b5b18f76af7123faebfa299d44d1db14a` (`docs: verify allocator free dispatch targets`) on `main`; it changed only `HANDOFF.md`, `docs/EVIDENCE.md`, and `docs/TASKS.md`.
