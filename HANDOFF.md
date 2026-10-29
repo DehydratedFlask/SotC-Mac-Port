@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 03:56 CDT (/root) — E932 REA/Ghidra timeout (FAILED; task remains ACTIVE)
+
+- Task: `SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01`, failed tool/workflow attempt 1. Hypothesis: REA's default Ghidra import would analyze allocator bootstrap `0x13380` within the 330-second startup deadline.
+- Exact operations: `mcp__rea__open_binary({path: "/Volumes/Extra/SoC Mac Native/local/re/eboot.elf", provider_id: "ghidra"})` succeeded for pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; `mcp__rea__analyze_function({procedure: "0x13380"})` returned `provider_timeout` after 330,000 ms before producing a function dossier. Ghidra 12.1.4 / REA 6.7.0, profile `769518a8e9b57f953dd241adbb63672f0f486bb3d66359b9deef7c5e088ca7aa`, run ID `76e9aac7-2fab-44c1-8d8e-daf5fcf0263a`.
+- Observation: no function evidence ID or allocator-semantic result was returned. The temporary Ghidra runtime had been removed after timeout; a 105-byte exported REA bundle contains 0 evidence records and 0 unknowns. REA target was then closed. Private report: `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01/REA-ATTEMPT-01.md`; empty private bundle: `local/re/evidence/srv01-alloc-free-dispatch-a8-rea-attempt-01.json`.
+- Inference: the default full Ghidra import exceeds REA's current startup deadline on this host for this ELF. The existing saved project may support the same query without a full re-import.
+- Files changed: private failure report/bundle plus `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`; no product source changed.
+- Checkpoint verification from the workspace root: `cmake -S native -B local/build/orch-r22` exit 0; `cmake --build local/build/orch-r22 -j 12` exit 0; `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure` exit 0 (487/487); `env SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` exit 0 (572/0/0); `python3 -I scripts/audit_publish_paths.py --all` exit 0 (3,363); `python3 -I scripts/check_commit_attribution.py` exit 0; `python3 scripts/project_index.py` exit 0 (43,024 folders) and `--check` current; `trail build --check` exit 0 (wiring graph in sync; deep layer not built, 10,779 nodes pending); `git diff --check` exit 0. Logs: `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01/publication-closeout/attempt1-*.log`.
+- Remaining risks: vtable and allocator target mapping are still unknown; one of the three allowed failed tries is consumed. No G1–G6 runtime gate advanced.
+- Next exact action: query `local/ghidra/persistent-20261020/SotC` with Ghidra 12.1.4 `-process eboot.elf -noanalysis -readOnly`; bound only the heap-table construction and relevant vtable `+0xa8` slots, then byte-check against the pinned ELF.
+- Status/attempt count: task remains `ACTIVE`; 1 failed tool/workflow attempt, 0 semantic hypotheses tested.
+
 ## 2026-10-29 03:42 CDT (/root) — E931 claim-publication closeout (ARTIFACT_VERIFIED)
 
 - Owner-authored commit `e63339bf596896e2c841d577c606d466e586de38` (`docs: claim allocator free dispatch trace`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
@@ -7,8 +19,8 @@
 - Rechecked the final closeout docs at 03:47 CDT before publication: configure/build passed; CTest 487/487; lift checkers 572/0/0; all-path audit 3,363/3,363; attribution passed; project index 43,024 folders and `--check` current; `trail build --check` remains in sync with 10,779 deep-layer nodes pending. Logs: `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01/publication-closeout/`.
 - `git push origin main` and `git fetch origin main` exited 0; `HEAD == origin/main == FETCH_HEAD == e63339bf596896e2c841d577c606d466e586de38`; worktree clean. Logs are under `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01/`.
 - Observation: the bounded static-analysis task is now published and active. No concrete vtable target has been analyzed yet; G1–G6 runtime gates remain unchanged.
-- Next exact action: use the existing saved Ghidra project read-only to trace the heap object returned by the established owner lookup to its vtable `+0xa8` entry, then byte-check the entry and reachable target body against the pinned ELF.
-- Task status/attempt count: `SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01` is `ACTIVE`, zero analysis attempts, zero failed semantic hypotheses.
+- Next exact action: use the existing saved Ghidra project read-only to trace the heap object returned by the established owner lookup to its vtable `+0xa8` entry, then byte-check the entry and reachable target body against the pinned ELF. The first REA full-import attempt timed out and is recorded at E932.
+- Task status/attempt count: `SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01` is `ACTIVE`, one failed tool/workflow attempt, zero semantic hypotheses tested.
 
 ## 2026-10-29 03:39 CDT (/root) — claim `SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01` (ACTIVE)
 
