@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 05:28 CDT (/root) — E946 no-ready-task scan (ARTIFACT_VERIFIED)
+
+- After closing E945, reviewed `docs/TASKS.md` for a new bounded task. Exact command `rg -n '^\| [A-Z0-9-]+ \|.*\| READY([[:space:]/(]|$)' docs/TASKS.md` exited 1 with empty stdout: no task rows have status `READY`. Durable scan output: `local/validation/orch-20261029/SRV-01-ALLOCATOR-TRANSITIVE-CLEANUP-1B0E0-01/attempt-01/task-queue-check.txt`.
+- The task register still has `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` as `ACTIVE`; E911 says resume only with a concrete producer/consumer/order edge or principal reassessment. None was established by this read-only scan. No task was claimed and no analysis or code change was made.
+- Repository status before this scan: E945 is pushed/fetch-verified at `e314c52215bff8cea31b77afa6831e832450dd83`; task `SRV-01-ALLOCATOR-TRANSITIVE-CLEANUP-1B0E0-01` is complete within its static-analysis boundary. The overall native port remains incomplete and no G1–G6 runtime gate advanced.
+- Next exact action: wait for a newly READY bounded task, a concrete evidence change satisfying the slot-309 resume condition, or principal reassessment. Do not retry the unresolved task from the same evidence alone.
+
 ## 2026-10-29 05:25 CDT (/root) — E945 allocator cleanup-helper result publication closeout (ARTIFACT_VERIFIED)
 
 - Owner-authored result commit `19e0a03511fdc0f768142659d17ab3bb2d43326d` (`docs: characterize allocator cleanup helper`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`; task report and raw analysis artifacts remain private under `local/validation/orch-20261029/SRV-01-ALLOCATOR-TRANSITIVE-CLEANUP-1B0E0-01/`.
