@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 11:31 CDT (/root) — E989 RackQuery direct-call target first-block result (STATIC_PATH_BYTE_VERIFIED)
+
+- Completed attempt 1 of `AUD-02-NGS2-RACKQUERY-CALLEE-99D8E0-01`. On pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, Rizin and bounded Apple LLVM agree on exactly two instructions at E985's direct-call target: `mov eax, 0x8190` at `0x99d8e0` (`b8 90 81 00 00`, 5 bytes), then `ret` at `0x99d8e5` (`c3`, 1 byte). The raw ELF/PT_LOAD verifier maps these via phdr 0 to file offsets `0x9a18e0` and `0x9a18e5`.
+- The `ret` is the first control transfer and the stop boundary; its dynamic return destination was not resolved. No later bytes or target were inspected. E985's call is a static edge, not proof of runtime reachability. No function/API/NGS2/audio or game-behavior claim follows. Parent `AUD-02` remains active and no product gate advanced.
+- Private captures, tool versions, verifier output/script, and the verified SHA-256 manifest are under `local/validation/AUD-02-NGS2-RACKQUERY-CALLEE-99D8E0-01/analysis/attempt-01/`; claim logs are under `.../claim-publication/attempt-01/`. The saved Ghidra project was not used; no tools were installed and no source/binary/reference/game-input files changed.
+- Exact commands: `rizin -q -e scr.color=false -c 'aoj @ 0x99d8e0' local/re/eboot.elf`; `xcrun llvm-objdump -D --start-address=0x99d8e0 --stop-address=0x99d8e1 local/re/eboot.elf`; `rizin -q -e scr.color=false -c 'aoj @ 0x99d8e5' local/re/eboot.elf`; `xcrun llvm-objdump -D --start-address=0x99d8e5 --stop-address=0x99d8e6 local/re/eboot.elf`; `python3 -I local/validation/AUD-02-NGS2-RACKQUERY-CALLEE-99D8E0-01/analysis/attempt-01/verify_first_block.py`. All exited 0. One supported block; 0 failed semantic hypotheses.
+- Result docs: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-29-aud02-rackquery-callee-99d8e0-result-e989.md`.
+- Required gates passed: configure/build exit 0; CTest 487/487; lift checkers 572 passed / 0 skipped / 0 failed; Trail graph check in sync with 10,779 deep-layer nodes pending; project index 43,154/current. Logs are under `local/validation/AUD-02-NGS2-RACKQUERY-CALLEE-99D8E0-01/result-publication/attempt-01/`.
+- Next exact action: fetch and inspect `origin/main`, stage only the six allowlisted result docs, run staged/all-path audits and `git diff --cached --check`, then commit/push/fetch-verify and record closeout.
+- Status: analysis and required build/check gates passed; publication audits pending; 1 supported static byte-verified block; 0 failed semantic hypotheses.
+
 ## 2026-10-29 11:24 CDT (/root) — E988 publication closeout for E987 (ARTIFACT_VERIFIED)
 
 - E987 claim was published in owner-authored commit `d24ea5b7f77153d38134bf5803eaf64de5ebffd1` (`docs: claim RackQuery callee block check`), changing six allowlisted documentation paths. Author and committer are Johnny Wang.
