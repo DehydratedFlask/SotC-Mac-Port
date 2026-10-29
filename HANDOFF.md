@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 12:37 CDT (/root) — E1000: APP-01 importer cancellation-state fixture (FIXTURE_VERIFIED)
+
+- Starting tree: clean `main` at `3acdb53d3f743f607cc3a7abd33405f604773391`, matching `origin/main` before the five scoped launcher/test edits.
+- Implemented `FolderImportReducer` outcomes (`selected`, `cancelled`, `failed`), a synchronous `@MainActor LauncherModel.handleFolderImport`, and `ContentView` routing through the handler. Only selection updates `assetsDirectory`; the existing view still schedules `Task { await model.validate() }` on selection, ignores cancellation, and preserves localized failure alert copy.
+- Fixtures use synthetic URLs and `ScriptedCoreClient`; cancellation preserves the prior `assetsDirectory` and readiness report with no validation call. Reducer cases cover selection, both cancellation forms, and localized failure. No native picker, Finder, real game folder, or game core was exercised.
+- Verification: root focused run passed 5/5 across 2 suites; root full launcher run passed 160 tests / 21 suites. The worker's first full run had one unrelated `ProcessCoreClientTests.exitAfterOneAnswerFailsTheNextRequest()` timeout (2.480 s); it passed isolated, then the worker full rerun passed 160/21. Cause of the initial timeout is unknown. `git diff --check` passed. Commands/logs are in `local/validation/APP-01-IMPORTER-CANCEL-STATE-FIXTURE-01/implementation/attempt-01/`.
+- Files changed: `launcher/Sources/LauncherCore/LauncherLifecycle.swift`, `launcher/Sources/LauncherCore/LauncherModel.swift`, `launcher/Sources/SoCLauncher/ContentView.swift`, `launcher/Tests/LauncherCoreTests/LauncherLifecycleTests.swift`, `launcher/Tests/LauncherCoreTests/LauncherModelTests.swift`, and `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, plus this checkpoint.
+- Limits: this fixture verifies the model import-result path only. Native alert/picker interaction, Finder launch, repeated sessions, actual game readiness, and G4 remain unverified. No product gate advanced.
+- Next exact action: run required repository publication gates, then commit/push only the five source/test files and allowlisted documentation. Continue leaving G4 PARTIAL.
+- Task `APP-01-IMPORTER-CANCEL-STATE-FIXTURE-01`: 1 successful implementation; 0 failed semantic hypotheses; one transient unrelated ProcessCore test timeout recovered by isolated and full reruns.
+
 ## 2026-10-29 12:29 CDT (/root) — E999 claim: APP-01 importer cancellation state fixture (ACTIVE)
 
 - Starting tree: clean `main` at `60e3bc9b09f7fde49620dee136747ec7a4c5e680`, matching `origin/main`.

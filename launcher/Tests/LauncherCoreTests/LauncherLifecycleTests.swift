@@ -93,6 +93,21 @@ struct FolderImportErrorClassifierTests {
         #expect(FolderImportErrorClassifier.alertMessage(for: CancellationError()) == nil)
     }
 
+    @Test func reducerMapsSelectionCancellationAndLocalizedFailure() {
+        let directory = URL(filePath: "/tmp/selected-assets", directoryHint: .isDirectory)
+        let cocoaCancellation = NSError(domain: NSCocoaErrorDomain, code: NSUserCancelledError)
+        let ordinaryFailure = NSError(
+            domain: "FolderImporterTests",
+            code: 1,
+            userInfo: [NSLocalizedDescriptionKey: "The selected folder could not be read."]
+        )
+
+        #expect(FolderImportReducer.reduce(.success(directory)) == .selected(directory))
+        #expect(FolderImportReducer.reduce(.failure(cocoaCancellation)) == .cancelled)
+        #expect(FolderImportReducer.reduce(.failure(CancellationError())) == .cancelled)
+        #expect(FolderImportReducer.reduce(.failure(ordinaryFailure)) == .failed("The selected folder could not be read."))
+    }
+
     @Test func ordinaryFailureUsesLocalizedDescription() {
         let failure = NSError(
             domain: "FolderImporterTests",

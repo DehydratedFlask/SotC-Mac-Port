@@ -124,6 +124,43 @@ private func waitUntil(_ condition: @MainActor () -> Bool) async -> Bool {
 }
 
 @MainActor
+struct LauncherModelFolderImportTests {
+    @Test func cancellationPreservesSelectionAndReadinessWithoutValidation() async throws {
+        let client = ScriptedCoreClient()
+        let model = makeModel(client, directory: "prior-assets")
+        await model.validate()
+
+        let priorDirectory = try #require(model.assetsDirectory)
+        let priorReport = try #require(model.report)
+        let validateCalls = client.count("validate")
+        let cancellations: [any Error] = [
+            NSError(domain: NSCocoaErrorDomain, code: NSUserCancelledError),
+            CancellationError(),
+        ]
+
+        for error in cancellations {
+            let outcome = model.handleFolderImport(.failure(error))
+            #expect(outcome == .cancelled)
+            #expect(model.assetsDirectory == priorDirectory)
+            #expect(model.report == priorReport)
+            #expect(client.count("validate") == validateCalls)
+        }
+    }
+
+    @Test func successfulImportSelectsDirectoryAndLeavesValidationSchedulingToView() async {
+        let client = ScriptedCoreClient()
+        let model = makeModel(client, directory: "prior-assets")
+        let selectedDirectory = URL(filePath: "/tmp/next-assets", directoryHint: .isDirectory)
+
+        let outcome = model.handleFolderImport(.success(selectedDirectory))
+
+        #expect(outcome == .selected(selectedDirectory))
+        #expect(model.assetsDirectory == selectedDirectory)
+        #expect(client.count("validate") == 0)
+    }
+}
+
+@MainActor
 struct LauncherModelValidationTests {
     @Test func realisticCoreWithoutEngineIsIdleWithNativeCoreNotBuiltAndPlayDisabled() async throws {
         let client = ScriptedCoreClient()

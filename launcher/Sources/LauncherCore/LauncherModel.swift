@@ -52,6 +52,15 @@ public final class LauncherModel {
         self.pollInterval = pollInterval
     }
 
+    @discardableResult
+    public func handleFolderImport(_ result: Result<URL, any Error>) -> FolderImportOutcome {
+        let outcome = FolderImportReducer.reduce(result)
+        if case .selected(let directory) = outcome {
+            assetsDirectory = directory
+        }
+        return outcome
+    }
+
     // MARK: - Derived
 
     public var canStart: Bool {

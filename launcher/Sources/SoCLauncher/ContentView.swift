@@ -79,12 +79,13 @@ struct ContentView: View {
         }
         .formStyle(.grouped)
         .fileImporter(isPresented: $isChoosingFolder, allowedContentTypes: [.folder]) { result in
-            switch result {
-            case .success(let url):
-                model.assetsDirectory = url
+            switch model.handleFolderImport(result) {
+            case .selected:
                 Task { await model.validate() }
-            case .failure(let error):
-                folderImportError = FolderImportErrorClassifier.alertMessage(for: error)
+            case .cancelled:
+                break
+            case .failed(let message):
+                folderImportError = message
             }
         }
         .alert("Couldn’t Open Folder", isPresented: Binding(

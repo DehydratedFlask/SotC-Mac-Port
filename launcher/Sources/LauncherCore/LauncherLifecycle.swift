@@ -59,3 +59,23 @@ public enum FolderImportErrorClassifier {
         return cocoaError.domain == NSCocoaErrorDomain && cocoaError.code == NSUserCancelledError
     }
 }
+
+public enum FolderImportOutcome: Equatable {
+    case selected(URL)
+    case cancelled
+    case failed(String)
+}
+
+public enum FolderImportReducer {
+    public static func reduce(_ result: Result<URL, any Error>) -> FolderImportOutcome {
+        switch result {
+        case .success(let directory):
+            return .selected(directory)
+        case .failure(let error):
+            guard let message = FolderImportErrorClassifier.alertMessage(for: error) else {
+                return .cancelled
+            }
+            return .failed(message)
+        }
+    }
+}
