@@ -1,4 +1,4 @@
-# SAV-01 remaining payload-reader callers — E960 claim
+# SAV-01 remaining payload-reader callers — E960 claim and E961 result
 
 ## Claim
 
@@ -27,3 +27,15 @@ The original `0x8eba0` short-read path wraps without returning an error, and E95
 - `python3 scripts/project_index.py` wrote 43,079 folders. Its first `--check` failed with `Stale indexes: local/indexes/folders.json`; after validation logs existed, rerunning the generator and checker produced `43,079 folders indexed; current`. This was index synchronization only, not a semantic task failure.
 - Exact logs for these commands are under `local/validation/orch-20261029/SAV-01-PAYLOAD-READ-REMAINING-CALLERS-01/claim-publication/attempt-01/`.
 - Six allowlisted claim paths are changed; staged/all-path audits and owner attribution checks remain pending. Next exact action: run those audits, commit the claim under the owner identity, push/fetch-verify `main`, then begin the three bounded call-path queries.
+
+## E961 result — 2026-10-29 07:26 CDT (/root)
+
+- Result: `STATIC_ANALYSIS_VERIFIED` for the three scoped caller paths. Pinned ELF SHA-256: `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+- Ghidra 12.1.4 opened `local/ghidra/persistent-20261020/SotC` with `-noanalysis -readOnly`; query exit 0. The independent verifier exited 0 and checked full bodies for `0x543ba0` (355 bytes / 91 instructions) and `0x545d30` (11,797 bytes / 2,191 instructions), all direct edges in both bodies, the three call windows, and the tag-13 dispatch-table entry at `0x1016a00`.
+- `0x543697` uses reader `RDI=&[RSP+0x308]` and destination `RSI=&[RSP+0x2c0]`; tag `0xd` gates the read, and the qword compare is after the call. `0x5460ad` uses `RDI=&[RSP+0x648]`, `RSI=&[RSP+0x600]`, with the same guard ordering. `0x543ccd` uses `RDI=&[RBP-0x188]`, `RSI=&[RBP-0x190]`; tag 13 dispatches to the reader case. None of these paths proves eight remaining bytes before the call.
+- The REA provider timed out during fresh Ghidra startup at 330 seconds; run ID `2738ecb0-6ba0-4e8d-a56a-af7bb986e3f0`. No REA function evidence was emitted. Recovery used the persistent Ghidra project read-only. One completed Ghidra query, one provider timeout, two verifier setup corrections replayed, zero failed semantic hypotheses.
+- Report, query script/log, verifier, verification output, timeout log, and checksums: `local/validation/orch-20261029/SAV-01-PAYLOAD-READ-REMAINING-CALLERS-01/attempt-01/`.
+- Limits: static caller evidence only. No physical over-read, runtime binding or malformed-input behavior, native lift/wiring, real save/load, or G1–G6 gate is established. The dispatch's other cases and indirect call `0x547d46` remain unresolved.
+- Result publication gates: CMake configure/build exited 0; CTest exited 0 with 487/487 passed; lift checkers exited 0 with 572 passed / 0 skipped / 0 failed; `trail build --check` exited 0 with the wiring graph in sync and 10,779 deep-layer nodes pending; project-index generation and check exited 0 with 43,083 folders current. The initial index check was stale because the check's log file did not exist at generation time; after precreating it, regeneration and replay passed. Logs: `local/validation/orch-20261029/SAV-01-PAYLOAD-READ-REMAINING-CALLERS-01/result-publication/attempt-01/`.
+- Precommit audit: staged path audit passed 5/5; all-path audit passed 3,367/3,367; attribution and staged diff checks passed. Owner identity is Johnny Wang. Precommit fetch verified `HEAD == origin/main == FETCH_HEAD == 7af38324ebe3282d89a24f208ded827f86d834db`. Logs are in the same result-publication attempt directory.
+- Files changed for the result checkpoint: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, and this checkpoint; no source or binary files. Next exact action: commit this result, push/fetch-verify `main`, then record the publication closeout.
