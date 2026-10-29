@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 05:58 CDT (/root) — E950 save named-chunk reader analysis (STATIC_ANALYSIS_VERIFIED)
+
+- Completed `SAV-01-BOOL-CHUNK-READER-A81180-01` within its static-analysis boundary. REA verified the input artifact identity, but its fresh Ghidra import timed out at 330 seconds (E949). Recovery used the existing Ghidra 12.1.4 saved project read-only with `-noanalysis -readOnly`; target, direct-callee, and six-caller queries all exited 0.
+- Observation: `0xa81180` is a 238 B / 74-instruction name-hash chunk lookup, not a bool-only decoder. It requires marker `0xbeef`, walks 12 B records, returns the 16-bit chunk tag through the out pointer, and calls the result-object initializer with matched payload pointer/length (or zeroes on miss/marker failure). Representative callers confirm bool tag `0xd`, integer tag `8`, and string-like tag `0xc`. A direct-reference query found 49 callsites across six caller functions.
+- `python3 -I local/validation/orch-20261029/SAV-01-BOOL-CHUNK-READER-A81180-01/verify_bool_chunk.py` exited 0: all 238 target bytes, four direct-callee bodies, control-transfer encodings, 49 caller call instructions, and captured caller-context bytes match the pinned ELF; all rel32 targets agree. The first verifier invocation failed because it read caller records from the wrong log; the parser input was corrected, and the final verification passed. This was a verifier setup error, not a semantic hypothesis failure.
+- Report, query scripts/logs, REA empty evidence export and snapshot, verifier, and checksums are private under `local/validation/orch-20261029/SAV-01-BOOL-CHUNK-READER-A81180-01/`. `shasum -a 256 -c .../SHA256SUMS` passed all listed files. Remaining risks: exact payload-object ownership/consumption, deeper constructor behavior, length/bounds guarantees, computed callers, and full save schema. No native lift, real save/load, or G1–G6 gate advanced.
+- Task accounting: 1 completed static-analysis attempt, 1 provider startup timeout, 0 failed semantic hypotheses, 1 verifier parser error corrected. No source changes; only private analysis artifacts and this documentation closeout.
+- Next exact action after publication: inspect the current task register for the next bounded continuation, preserving the static-only boundary unless new evidence supports implementation work.
+
 ## 2026-10-29 05:47 CDT (/root) — E949 REA Ghidra startup timeout (ACTIVE)
 
 - First bounded-query command: `mcp__rea__analyze_function({procedure: "0xa81180"})` on the pinned ELF. REA/Ghidra 12.1.4 returned `provider_timeout` after its configured 330,000 ms startup deadline while importing/analyzing the large ELF; no function dossier or semantic result was returned. Target SHA-256 matched the pinned `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
