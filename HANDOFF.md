@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 13:34 CDT (/root) — E1006: claim SXDF/SXDS executable candidate scan (ACTIVE)
+
+- Starting tree is clean `main` at `eb30a143596680026898c29f41b487859e5d42eb`; `git fetch origin main` exited 0 and matched `origin/main` and `FETCH_HEAD`.
+- A bounded exploratory preflight verified `local/re/eboot.elf` SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3` and found eight raw `SXDF` byte occurrences; no raw `SXDS` occurrence. These are leads only. Rizin preview shows candidate code comparisons and one data occurrence; no reader, codec, audio route, or shipped-code claim is established.
+- Three read-only lane reviews found no safe save or game-driven Metal implementation with current prerequisites. The task board has no READY leaf task. Slot 309 remains stopped under E911 pending a concrete producer/consumer/order edge; do not retry its existing route.
+- Task `AUD-02-SXDF-RAW-ELF-CANDIDATE-SCAN-01` is claimed to verify the pinned ELF's `SXDF`/`SXDS` raw hits, map all hits through the ELF program headers, and independently decode only bounded executable-hit neighborhoods with Rizin and LLVM. This is candidate discovery only: no REA/Ghidra query, asset-payload read, runtime, decoder, or source implementation is authorized by this task.
+- Claim files: `HANDOFF.md`, `docs/TASKS.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-29-aud02-sxdf-raw-elf-candidate-scan-claim-e1006.md`. No product source or game input changed.
+- Claim verification: `cmake -S native -B local/build/orch-r22` and `cmake --build local/build/orch-r22 -j 12` exited 0; CTest passed **487/487**; lift checkers passed **572**, skipped **0**, failed **0**. `trail build --check` exited 0 with the wiring graph in sync (10,787 meaning-tier nodes pending). The full path audit exited 0 over **3,394** paths; the staged audit passed **5/5**; attribution audit exited 0; `git diff --cached --check` passed after one trailing-whitespace correction. The first project-index check found the newly created private log file stale; `python3 scripts/project_index.py` then exited 0 and the final check reported **44,201** folders indexed/current (final logs: `/tmp/sotc-e1006-project-index-final.log`, `/tmp/sotc-e1006-project-index-final-check.log`). All task logs are under `local/validation/AUD-02-SXDF-RAW-ELF-CANDIDATE-SCAN-01/claim-publication/attempt-01/`. These are existing-source checks; no game gate advances.
+- Next exact action: publish the claim, then run the formal hash-pinned full-file literal census and bounded dual-disassembler checks. Keep any code-reference interpretation preliminary until the required REA/Ghidra evidence path is available. Attempt count: 0 formal scans; 0 failed semantic hypotheses.
+
 ## 2026-10-29 13:19 CDT (/root) — E1005: current launcher bundle artifact verified (ARTIFACT_VERIFIED)
 
 - Completed `APP-01-CURRENT-BUNDLE-REBUILD-01` from claim commit `b2c8b0bef1912ced4a7453dfdb81ffe20ee3cbb1`. The fresh bundle is `local/build/e1004-launcher/SotC Launcher.app`; its standalone Release core is `local/build/e1004-native/SoCGameCore`.
