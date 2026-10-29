@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 06:43 CDT (/root) — E957 claim caller-side payload bound at `0x543462` (ACTIVE)
+
+- Current `docs/TASKS.md` scan found zero rows marked `READY`. Following E956's required principal reassessment, the read-only readiness scout found a narrow evidence-backed follow-up from E955: inspect whether caller `0x543462` in `0x542880` establishes enough bytes before calling `0x8eba0`.
+- Claimed `SAV-01-PAYLOAD-READ-CALLER-BOUND-543462-01`. Scope is limited to that callsite's argument provenance and predecessor path(s), the relevant length/guard checks, and byte verification against the pinned ELF. No whole-loader rewrite, lift/wiring, original-code execution, or runtime malformed-input claim.
+- Claim preflight: clean `main` at `a057a1a2ab228a38cff46ae341597d7513d0ede0`; fetched `origin/main` and `FETCH_HEAD` matched. The task ID was absent from `docs/TASKS.md` and `docs/EVIDENCE.md`. Pinned ELF SHA-256 rechecked as `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; saved Ghidra project exists at `local/ghidra/persistent-20261020/SotC.gpr`.
+- Prerequisites/spec: `SAV-01-PAYLOAD-READ-PRIMITIVE-8EBA0-01`, `SAV-01-LOADER-01`, and `docs/REVERSE_ENGINEERING.md` Stage 2. E955 verifies the primitive and callsite bytes but does not establish caller-side bounds.
+- Claim publication gates: CMake configure/build exited 0; CTest passed 487/487; lift checkers passed 572, skipped 0, failed 0; `trail build --check` reports the wiring graph in sync with 10,779 deep-layer nodes pending; project index wrote and checked 43,073 folders current. Path/attribution/identity/diff audits are next. Gate logs: `local/validation/orch-20261029/SAV-01-PAYLOAD-READ-CALLER-BOUND-543462-01/claim-publication/attempt-01/`.
+- Files changed for this claim: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and new `docs/checkpoints/2026-10-29-sav01-payload-read-caller-bound-543462.md`. Analysis attempts 0; failed semantic hypotheses 0. Next exact action after claim publication: query `0x543462` and the control-flow/argument setup leading to it in the saved Ghidra project using `-noanalysis -readOnly`, then independently byte-check the relevant blocks and callsite.
+
 ## 2026-10-29 06:37 CDT (/root) — E956 publication closeout for E955 (ARTIFACT_VERIFIED)
 
 - Published the E955 `SAV-01-PAYLOAD-READ-PRIMITIVE-8EBA0-01` result in owner-authored commit `0b0ec35cd3c7986e694a58bd22ca6c1189e589c3` (`docs: characterize save payload reader`), changing six allowlisted documentation paths: `HANDOFF.md`, `docs/EVIDENCE.md`, generated `docs/FOLDERS.md`, `docs/INDEX.md`, `docs/TASKS.md`, and `docs/checkpoints/2026-10-29-sav01-payload-read-primitive-8eba0.md`.
