@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 06:02 CDT (/root) — E951 claim nested save-result constructor (ACTIVE)
+
+- Principal reassessment continues the user-authorized task search after E950. Claimed `SAV-01-CHUNK-RESULT-CONSTRUCTOR-8DB10-01`, a bounded read-only follow-up to resolve direct nested helper `0x8db10` called by `0x4d470`.
+- Scope: characterize the nested helper's incoming register/stack dataflow and object writes; byte-check its body and callsite against the pinned ELF; reconcile whether the payload pointer/length supplied through `0xa81180 -> 0x4d470 -> 0x8db10` really create the bounded reader described by the older SAV-01 profile-chunks checkpoint. No lift, wiring, execution, or save/load claim.
+- Claim preflight: repository was clean on `main` at `e41e7e96728b1574b6eb04231b501e7bc61051fa`; task ID and `0x8db10` have no existing row in `docs/TASKS.md`/`docs/EVIDENCE.md`; pinned ELF SHA-256 is `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; saved Ghidra project file exists at `local/ghidra/persistent-20261020/SotC.gpr`.
+- Prerequisites/spec: `SAV-01-BOOL-CHUNK-READER-A81180-01` and `SAV-01-PROFILE-CHUNKS-01`; `docs/REVERSE_ENGINEERING.md` Stage 2.
+- Observation vs inference: observation—E950 found `0x4d470` calls `0x8db10` and sets a vtable while ignoring the other argument registers in its own body. Inference—the older profile-chunks checkpoint's claim that `0xa81180` creates a bounded payload sub-stream may depend on `0x8db10`, so that claim needs verification or explicit qualification.
+- Files changed: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`; no source files. Analysis attempts 0; failed semantic hypotheses 0. Next exact action: query `0x8db10` in the saved project with Ghidra `-noanalysis -readOnly`, inspect the nested call setup from `0x4d470`, then independently byte-check both bodies and the chain call instructions.
+
 ## 2026-10-29 05:58 CDT (/root) — E950 save named-chunk reader analysis (STATIC_ANALYSIS_VERIFIED)
 
 - Completed `SAV-01-BOOL-CHUNK-READER-A81180-01` within its static-analysis boundary. REA verified the input artifact identity, but its fresh Ghidra import timed out at 330 seconds (E949). Recovery used the existing Ghidra 12.1.4 saved project read-only with `-noanalysis -readOnly`; target, direct-callee, and six-caller queries all exited 0.
