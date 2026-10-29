@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 11:34 CDT (/root) — E990 publication closeout for E989 (ARTIFACT_VERIFIED)
+
+- E989 result was published in owner-authored commit `e01c3f668d897cb94f498317237b37dce50eedda` (`docs: verify RackQuery callee first block`), changing six allowlisted documentation paths. Author and committer are Johnny Wang.
+- Required checks passed: configure/build exit 0; CTest 487/487; lift checkers 572 passed / 0 skipped / 0 failed; Trail graph check in sync with 10,779 deep-layer nodes pending; project index 43,154/current; staged audit 6/6; all-path audit 3,379/3,379; final staged diff check passed.
+- Push/fetch verified `HEAD == origin/main == FETCH_HEAD == e01c3f668d897cb94f498317237b37dce50eedda`. Postpush all-path audit accepted 3,379/3,379; attribution passed on the empty unpublished range; `git show --format= --check HEAD` passed; project-index check reported 43,154/current; worktree is clean. Logs are under `local/validation/AUD-02-NGS2-RACKQUERY-CALLEE-99D8E0-01/result-publication/attempt-01/`.
+- The result establishes only `mov eax, 0x8190; ret` in the statically targeted block. Task `AUD-02-NGS2-RACKQUERY-CALLEE-99D8E0-01` is `STATIC_PATH_BYTE_VERIFIED`; parent `AUD-02` remains active; runtime reachability and all game acceptance gates remain unproven.
+- Next action: inspect the live task queue for another bounded independent evidence item; keep the slot-309 E911 stop unchanged.
+
 ## 2026-10-29 11:31 CDT (/root) — E989 RackQuery direct-call target first-block result (STATIC_PATH_BYTE_VERIFIED)
 
 - Completed attempt 1 of `AUD-02-NGS2-RACKQUERY-CALLEE-99D8E0-01`. On pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, Rizin and bounded Apple LLVM agree on exactly two instructions at E985's direct-call target: `mov eax, 0x8190` at `0x99d8e0` (`b8 90 81 00 00`, 5 bytes), then `ret` at `0x99d8e5` (`c3`, 1 byte). The raw ELF/PT_LOAD verifier maps these via phdr 0 to file offsets `0x9a18e0` and `0x9a18e5`.
