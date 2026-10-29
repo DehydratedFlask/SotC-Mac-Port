@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 14:42 CDT (/root) — E1012: SXDF REA instruction query timed out (BLOCKED)
+
+- The E1010 claim is on `main` at `e8cf85ba`; E1011 publication closeout is on `main` at `4ed3b269`. Both pushes were fetch-verified. The current task is `AUD-02-SXDF-DATA-REFERENCE-GHIDRA-01`.
+- The read-only `binary_session` preflight confirmed Ghidra 12.1.4, exact target `/Volumes/Extra/SoC Mac Native/local/re/eboot.elf`, pinned SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, and profile digest `769518a8e9b57f953dd241adbb63672f0f486bb3d66359b9deef7c5e088ca7aa`; it did not report image base. The task claim made image-base confirmation a pre-query gate. I nevertheless issued the single claimed instruction query before that gate was confirmed; record this procedure deviation.
+- `mcp__rea__inspect_native_instruction(address="0x9b5b10", document="/Volumes/Extra/SoC Mac Native/local/re/eboot.elf")` returned `provider_timeout` after 330,000 ms while Ghidra imported/analyzed the target (run `2738ecb0-6ba0-4e8d-a56a-af7bb986e3f0`). It returned no bytes, instruction/reference, image base, or Evidence ID. Raw response and summary: `local/validation/AUD-02-SXDF-DATA-REFERENCE-GHIDRA-01/analysis/attempt-01/instruction-query.json` and `REPORT.md`.
+- The second query at `0x12ba74a` was not issued. No retry, local fallback, asset access, source change, or game-gate advancement. Task status is `BLOCKED` after one provider query; failed semantic hypotheses: 0. This is below the three-try escalation threshold.
+- Failure-checkpoint verification: CMake configure/build exited 0; CTest passed 487/487; lift checkers passed 572/0/0; Trail wiring graph check is OK with 10,787 meaning-tier nodes pending; project index is 44,221/current. Final staged-path audit passed 6/6 and all-path audit passed 3,400; attribution and cached diff checks passed. Logs are under `local/validation/AUD-02-SXDF-DATA-REFERENCE-GHIDRA-01/result-publication/attempt-02/`.
+- Publication verification for this failure checkpoint is in `local/validation/AUD-02-SXDF-DATA-REFERENCE-GHIDRA-01/result-publication/attempt-02/`. Next exact action: do not retry until provider state changes and the principal reassesses how to establish image base before a new bounded claim.
+
 ## 2026-10-29 14:29 CDT (/root) — E1011: E1010 claim publication closeout (ARTIFACT_VERIFIED)
 
 - E1010 claim commit `e8cf85ba03b2562020842e2a45ef6c559553b711` was authored by Johnny Wang, pushed to `origin main`, and fetch-verified. `HEAD`, `origin/main`, `FETCH_HEAD`, and live `refs/heads/main` matched; the worktree was clean.
