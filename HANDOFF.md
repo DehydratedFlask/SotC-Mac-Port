@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 11:19 CDT (/root) — E987 claim: RackQuery direct-call target first block (ACTIVE)
+
+- Starting tree: clean `main` at `824f3f49749ad7ed469b62be99acb22f7fb242d6`, matching `origin/main` and `FETCH_HEAD`. Pinned ELF `local/re/eboot.elf` still hashes to `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0.
+- Claimed `AUD-02-NGS2-RACKQUERY-CALLEE-99D8E0-01`, a bounded follow-up from E985's static direct edge `0x94ecd6 -> 0x99d8e0`. The task board has no READY rows; the only active startup gap is slot 309, unchanged under E911. This exact task ID was absent before claim.
+- Scope: inspect the basic block starting at `0x99d8e0` through its first control-transfer instruction, with a hard limit of 32 instructions / 128 bytes; decode one instruction at a time and stop at the first transfer. Byte-map every selected instruction through the pinned ELF's file-backed PT_LOAD and recompute only direct targets. Stop with an unresolved result at any decode/mapping gap or at the hard limit.
+- Exclusions: do not inspect any transfer target's contents or later block; do not infer function identity, ABI/API, NGS2 semantics, runtime reachability, or actual audio. E985 supplies a static direct edge only. No code, executable, reference, or game-input file has changed; no tool installation is needed.
+- Claim docs: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-29-aud02-rackquery-callee-99d8e0-claim-e987.md`. Private claim-publication logs are under `local/validation/AUD-02-NGS2-RACKQUERY-CALLEE-99D8E0-01/claim-publication/attempt-01/`.
+- Claim verification passed: configure/build exit 0; CTest 487/487; lift checkers 572 passed / 0 skipped / 0 failed; Trail wiring check in sync with 10,779 deep-layer nodes pending; project index 43,154/current. Precommit fetch verified `HEAD == origin/main == FETCH_HEAD == 824f3f49749ad7ed469b62be99acb22f7fb242d6`. Full logs are under the claim-publication attempt directory.
+- Exact next commands: `rizin -q -e scr.color=false -c 'aoj @ 0x99d8e0' local/re/eboot.elf`; `xcrun llvm-objdump -D --start-address=0x99d8e0 --stop-address=0x99d8e1 local/re/eboot.elf`; after claim publication, save bounded output and verify the selected bytes/edges with a small raw ELF/PT_LOAD parser. If more instructions precede the first transfer, advance one instruction at a time and stop at the first transfer or 32-instruction / 128-byte cap.
+- Next exact action: stage the six allowlisted claim docs, rerun staged/all-path audits and `git diff --cached --check`, commit/push the claim, then fetch-verify before running the bounded analysis.
+- Status `ACTIVE`, claim verification passed, publication pending, analysis attempt 0; 0 failed semantic hypotheses. Parent `AUD-02` remains active; no product gate advanced.
+
 ## 2026-10-29 11:16 CDT (/root) — E986 publication closeout for E985 (ARTIFACT_VERIFIED)
 
 - E985 result was published in owner-authored commit `d85b4bdf996b6d7ecd0d658cedfe3317bcad1e2b` (`docs: record RackQuery first-transfer result`), changing six allowlisted documentation paths. Author and committer are Johnny Wang.
