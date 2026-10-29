@@ -1,5 +1,20 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 03:14 CDT (/root) — E922 publication closeout (ARTIFACT_VERIFIED)
+
+- Owner-authored commit `d8cee89fd291895a1e31b094c5e5519b3ea736eb` (`docs: classify allocator 0x110a0 as initializer`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
+- Pre-push checks: configure/build passed; CTest 487/487; lift checkers 572/0/0; staged audit 3/3; all-path audit 3,363/3,363; exact-range attribution passed for `HEAD^..HEAD`; `git diff --check` passed. Push/fetch succeeded; `HEAD == origin/main == FETCH_HEAD` at the commit and worktree is clean. Post-push all-path audit passed 3,363/3,363.
+- Logs are under `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-PATH-110A0-01/`. This verifies publication of the allocator-initializer correction only; no runtime gate advanced.
+
+## 2026-10-29 03:14 CDT (/root) — claim `SRV-01-ALLOCATOR-FREE-BODY-12AF0-01` (ACTIVE)
+
+- Bounded output: use the pinned ELF and the existing read-only Ghidra project to characterize RVA `0x12af0` and its stored direct callers, then compare observed free behavior with `AllocatorFront::free` / `delete_`. No code lift, source change, startup wiring, target execution, or runtime claim.
+- Prerequisites: `SRV-01-ALLOCATOR-FRONTEND-CONTRACT-01`; `SRV-01-ALLOCATOR-WRAPPER-ELF-TIE-01`; completed `SRV-01-ALLOCATOR-FREE-PATH-110A0-01`; Stage 2 protocol; pinned `local/re/eboot.elf` SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+- Claim-publication verification: configure/build passed; CTest 487/487; lift checkers 572 passed, 0 skipped, 0 failed; all-path audit passed 3,363; attribution passed; project index wrote 43,021 folders. Logs are under `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-BODY-12AF0-01/`.
+- Files changed: `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md` for the claim only. No analysis script or source has been changed yet.
+- Next exact action: run one bounded Ghidra 12.1.4 `-noanalysis -readOnly` function/reference query for `0x12af0`, save program/function metadata, instruction stream, decompilation, and stored incoming references under `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-BODY-12AF0-01/`, then verify the function bytes/targets against the pinned ELF and compare to live native source.
+- Status/attempt count: ACTIVE, 0 analysis attempts, 0 failed hypotheses; this claim advances no runtime/build/test gate.
+
 ## 2026-10-29 03:09 CDT (/root) — allocator `0x110a0` role correction (STATIC_ANALYSIS_VERIFIED)
 
 - Task: `SRV-01-ALLOCATOR-FREE-PATH-110A0-01`; characterize the pinned function and direct caller to verify the `0x110a0/free-path` lead and relation to `AllocatorFront::delete_`.
