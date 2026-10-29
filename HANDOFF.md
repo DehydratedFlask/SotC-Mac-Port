@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 06:50 CDT (/root) — E958 caller-side save payload bounds result (STATIC_ANALYSIS_VERIFIED; publication pending)
+
+- Completed `SAV-01-PAYLOAD-READ-CALLER-BOUND-543462-01` within the single caller path at `0x543462` in `FUN_00542880`. The caller checks the returned chunk tag against `0xd`, then calls `0x8eba0`; it compares the qword with RBX only after the read. No caller-side payload-length guard establishes eight bytes before the read.
+- Pinned ELF SHA-256: `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; saved Ghidra 12.1.4 project opened `-noanalysis -readOnly`. The function spans 4,886 bytes / 949 instructions.
+- Verification: `python3 -I local/validation/orch-20261029/SAV-01-PAYLOAD-READ-CALLER-BOUND-543462-01/attempt-01/verify_caller_bound.py` exited 0; all 949 instruction byte sequences and direct control-flow targets matched the pinned ELF. `shasum -a 256 -c .../attempt-01/SHA256SUMS` passed all six files. One verifier syntax correction; zero failed semantic hypotheses.
+- Prepublication gates: CMake configure/build exited 0; CTest passed 487/487; lift checkers passed 572, skipped 0, failed 0; `trail build --check` reports the wiring graph in sync with 10,779 deep-layer nodes pending; project index wrote and checked 43,075 folders current. Staged/all-path audits, attribution, identity, and diff checks are next. Gate logs: `local/validation/orch-20261029/SAV-01-PAYLOAD-READ-CALLER-BOUND-543462-01/result-publication/attempt-01/`.
+- No physical out-of-bounds access, runtime behavior, native lift, save/load, or G1–G6 gate is established. Private report/logs are under `local/validation/orch-20261029/SAV-01-PAYLOAD-READ-CALLER-BOUND-543462-01/attempt-01/`.
+- Files changed for the result: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, and the existing `docs/checkpoints/2026-10-29-sav01-payload-read-caller-bound-543462.md`. Current status: `STATIC_ANALYSIS_VERIFIED`, publication pending. Next exact action: run publication gates, audit/commit only allowlisted docs under owner identity, push/fetch-verify `main`, then re-evaluate bounded next work.
+
 ## 2026-10-29 06:43 CDT (/root) — E957 claim caller-side payload bound at `0x543462` (ACTIVE)
 
 - Current `docs/TASKS.md` scan found zero rows marked `READY`. Following E956's required principal reassessment, the read-only readiness scout found a narrow evidence-backed follow-up from E955: inspect whether caller `0x543462` in `0x542880` establishes enough bytes before calling `0x8eba0`.
