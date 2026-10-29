@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 11:48 CDT (/root) — E994 publication closeout for E993 (ARTIFACT_VERIFIED)
+
+- E993 result commit `e73605501a1dd41a06a95e73f0fca43252597afd` (`docs: verify RackQuery caller continuation`) is owner-authored and pushed to `origin/main`; its six changed paths were allowlisted documentation only. Author and committer are Johnny Wang.
+- Fetch verified `HEAD == origin/main == FETCH_HEAD == e73605501a1dd41a06a95e73f0fca43252597afd`. Post-push attribution, all-path audit (3,381 paths), commit whitespace check, and clean-worktree checks passed. Logs are under `local/validation/AUD-02-NGS2-RACKQUERY-CALLER-CONTINUATION-94ECDB-01/result-publication/attempt-01/`.
+- Closeout re-ran the required configure/build (exit 0), CTest (487/487), lift checkers (572 passed / 0 skipped / 0 failed), and `trail build --check` (wiring graph in sync; 10,779 deep-layer nodes remain pending). Logs are under `local/validation/AUD-02-NGS2-RACKQUERY-CALLER-CONTINUATION-94ECDB-01/closeout-publication/attempt-01/`.
+- The first project-index check after adding the per-attempt validation logs reported stale `local/indexes/folders.json`. Regenerated the folder indexes and reran the check successfully: 43,165 folders indexed; current. The first failure output remains in `result-publication/attempt-01/post-project-index-check.log`; the successful output is in `closeout-publication/attempt-01/project-index-check.log`. The duplicate stale `ACTIVE / 0 attempts` task row for the same child is removed, retaining the E993 result row.
+- The first staged diff check found trailing whitespace in the E994 checkpoint metadata; those spaces were removed and the staged diff check passed. Initial output is retained in `closeout-publication/attempt-01/diff-check-first.log`; the final empty check log is `closeout-publication/attempt-01/diff-check.log`. Staged/all-path audits pass for 6 / 3,382 paths.
+- Observation: E993 verifies one static caller slice ending at call `0x959620`; inference from E989 remains conditional on the prior call returning normally. No runtime route, API meaning, NGS2 behavior, actual audio, boot, or save/reload was demonstrated. Parent `AUD-02` remains active; no product gate advanced. The full native port is not done.
+- Files in this closeout checkpoint: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and the E994 checkpoint. Exact publication commands and results are recorded in that checkpoint and private logs.
+- Next exact action after this checkpoint is published: inspect `docs/TASKS.md` for the next bounded READY task while preserving the E911 slot-309 stop.
+- Task `AUD-02-NGS2-RACKQUERY-CALLER-CONTINUATION-94ECDB-01`: 1 supported static result; 0 failed semantic hypotheses. Parent `AUD-02`: ACTIVE.
+
 ## 2026-10-29 11:43 CDT (/root) — E993 RackQuery caller continuation result (STATIC_PATH_BYTE_VERIFIED)
 
 - Completed attempt 1 of `AUD-02-NGS2-RACKQUERY-CALLER-CONTINUATION-94ECDB-01`. On pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, Rizin and Apple LLVM agree on four instructions / 18 bytes from `0x94ecdb`: `mov rdi, qword [rsp+0x10]`; `movsxd rsi, eax`; `mov edx, 1`; direct `call 0x959620` at `0x94ece8`. The raw verifier maps them via PT_LOAD phdr 0 to file offsets `0x952cdb`, `0x952ce0`, `0x952ce3`, `0x952ce8`; the signed call displacement resolves to `0x959620`.
@@ -8,8 +20,7 @@
 - Exact commands and outputs are listed in the private `result.md`; the verifier is `verify_caller_continuation.py`, and all manifest entries passed `shasum -a 256 -c SHA256SUMS`.
 - Result docs: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-29-aud02-rackquery-caller-continuation-result-e993.md`.
 - Required gates passed: configure/build exit 0; CTest 487/487; lift checkers 572 passed / 0 skipped / 0 failed; Trail graph check in sync with 10,779 deep-layer nodes pending; project index 43,163/current. Logs are under `local/validation/AUD-02-NGS2-RACKQUERY-CALLER-CONTINUATION-94ECDB-01/result-publication/attempt-01/`.
-- Next exact action: fetch/inspect `origin/main`, stage only the six allowlisted result docs, run staged/all-path audits and `git diff --cached --check`, then commit/push and fetch-verify the result.
-- Status: analysis and required build/check gates passed; publication audits pending; 1 supported static caller-slice result; 0 failed semantic hypotheses.
+- Publication was completed and fetch-verified by E994; the E993 result itself remains `STATIC_PATH_BYTE_VERIFIED` for one static caller slice, with 1 supported static result and 0 failed semantic hypotheses.
 
 ## 2026-10-29 11:37 CDT (/root) — E992 publication closeout for E991 (ARTIFACT_VERIFIED)
 
