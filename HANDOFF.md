@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 13:11 CDT (/root) — E1004: claim current launcher bundle rebuild (ACTIVE)
+
+- Starting tree: clean `main` at `0f18c6f9f91486bc13a276575b53f996d435ee52`; `git fetch origin main` exited 0 and `HEAD == origin/main == FETCH_HEAD`. Owner identity is Johnny Wang / `dehydratedflask@users.noreply.github.com`.
+- Claimed `APP-01-CURRENT-BUNDLE-REBUILD-01`. The existing `local/build/launcher-app/SotC Launcher.app` and its launcher/core executables are dated 2026-10-24 00:44:09 CDT, predating the current source checkpoint. `scripts/package_launcher.sh` assembles and ad-hoc signs a thin-ARM64 `.app`; its requested output directory is deleted before recreation. The bounded command will use the fresh ignored path `local/build/e1004-launcher`, after confirming it does not exist, and a fresh release core build at `local/build/e1004-native`.
+- Scope is packaging/artifact verification only: build current source, package the current launcher and core, check Mach-O architecture, strict signatures, dynamic dependencies, and forbidden game/firmware files. No game input is accessed. No UI launch, engine readiness, boot, audio, save/load, or G4 completion claim is included. `sotc_core_start()` currently returns `SOTC_ERR_ENGINE_NOT_IMPLEMENTED`.
+- Claim publication changed `HANDOFF.md`, `docs/TASKS.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and this checkpoint. `python3 scripts/project_index.py --check` initially exited 1 because the private index lagged behind newly created task logs; after regenerating with `python3 scripts/project_index.py`, the check passed at 43,193/current. `trail build --check` passed the wiring graph with 10,787 meaning nodes pending; the full tracked-path audit passed 3,391/3,391. Claim logs are under `local/validation/APP-01-CURRENT-BUNDLE-REBUILD-01/claim-publication/attempt-01/`.
+- Next exact action: confirm the fresh output path is absent, configure/build `SoCGameCore` Release with sanitizers off, run `scripts/package_launcher.sh local/build/e1004-launcher local/build/e1004-native/SoCGameCore`, then inspect the resulting bundle without launching it. G4 remains PARTIAL / unpassed; no product gate advances from this claim.
+- Task status: ACTIVE; 0 build attempts; 0 failed hypotheses.
+
 ## 2026-10-29 13:03 CDT (/root) — E1003: RackQuery target byte-slice blocked (BLOCKED)
 
 - E1002 claim commit `08645d4dc9796f489996eab1e295091e374ddb7f` was pushed and fetch-verified before analysis. Pinned ELF identity remains SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0.
