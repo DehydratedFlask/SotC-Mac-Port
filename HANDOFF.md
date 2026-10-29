@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 10:00 CDT (/root) — E977 VoiceHandle static-path status reconciliation claim (ACTIVE)
+
+- Task ID `DOC-AUD02-VOICEHANDLE-STATIC-PATH-STATUS-01`, baseline 0 failed attempts. Scope: reconcile the existing `AUD-02-NGS2-RACK-VOICEHANDLE-01` task label against its one-callsite evidence. Recheck the private manifest and rerun its offline verifier; if they pass, record exactly one `STATIC_PATH_BYTE_VERIFIED` callsite while retaining the reachability, runtime binding, ABI, NGS2 semantics, and audio limits. No new provider query, binary edit, code lift, or runtime claim.
+- Prerequisites: existing callsite checkpoint `docs/checkpoints/2026-10-20-root-ngs2-voicehandle-and-rackquery-second-callsite-complete.md`; private report under `local/re/evidence/aud02-ngs2-rack-voicehandle-01/function-009496a8/`; pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+- Claim checkpoint files changed: `HANDOFF.md` only. Task/evidence/index files remain unchanged until the targeted replay is complete.
+- Exact next commands: from the evidence directory, `shasum -a 256 -c SHA256SUMS`, then `python3 -I verify_callsite_function.py`. Expected: all manifest entries pass and verifier exits 0 with `PASS_STATIC_CALLSITE_FUNCTION_ATTRIBUTION_PARTIAL_TASK`. Record observations separately from inference; the wider `AUD-02` and product gates remain partial/not run.
+- Status ACTIVE; 0 supported result replays on this reconciliation, 0 failed attempts. After replay, update the single task row and evidence/index/handoff only if the narrow path remains supported; then run required publication gates and push the allowlisted documentation.
+
 ## 2026-10-29 09:52 CDT (/root) — E976 task-register duplicate-row cleanup (DOCS_VERIFIED)
 
 - Removed only the earlier duplicate `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` row. The remaining row is byte-identical to the former later row and retains E894's raw-literal result and E911's stop condition; it remains ACTIVE and slot 309 stays unregistered. The task ID occurs exactly once.
