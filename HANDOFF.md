@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 15:05 CDT (/root) — E1014: E1013 publication closeout (ARTIFACT_VERIFIED)
+
+- E1013 commit `d0ed29efa7d6638cf7478ed07e4bb7f60dd350f8` was authored by Johnny Wang with message `docs: record SXDF provider status recheck` and pushed to `origin main`.
+- After `git fetch origin main`, local `HEAD`, `origin/main`, `FETCH_HEAD`, and live `refs/heads/main` all match `d0ed29efa7d6638cf7478ed07e4bb7f60dd350f8`; the worktree is clean.
+- Post-push all-path audit passed 3,401 paths, attribution and commit whitespace passed, and the project index is current at 44,224 folders. E1013's configure/build, CTest 487/487, lift checkers 572/0/0, Trail graph and staged-path audit results remain in `local/validation/AUD-02-SXDF-DATA-REFERENCE-GHIDRA-01/result-publication/attempt-03/`.
+- E1014 documentation closeout checks: configure/build 0, CTest 487/487, lift checkers 572/0/0, Trail graph OK with 10,787 meaning-tier nodes pending, project index 44,225/current, staged/all-path audits 6/6 and 3,402, attribution and staged diff checks passed. Logs are under `local/validation/AUD-02-SXDF-DATA-REFERENCE-GHIDRA-01/result-publication/attempt-04/`.
+- This verifies publication only. No source, game input, provider analysis, or G0–G6 gate changed; `AUD-02-SXDF-DATA-REFERENCE-GHIDRA-01` remains `BLOCKED` with its one query attempt. See [E1014](docs/checkpoints/2026-10-29-aud02-sxdf-provider-publication-e1014.md).
+- Next exact action: wait for a provider-state change or supported identity/image-base observation; do not repeat the timed-out instruction query.
+
 ## 2026-10-29 14:57 CDT (/root) — E1013: SXDF provider-status recheck (BLOCKED)
 
 - Task `AUD-02-SXDF-DATA-REFERENCE-GHIDRA-01` remains blocked after one provider query, one procedure-order deviation, and zero failed semantic hypotheses. This is a status recheck under the existing claim, not a new analysis attempt.
