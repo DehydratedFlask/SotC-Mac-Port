@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 01:15 CDT (/root) — claim M6 unverified slot checkers (ACTIVE)
+
+- Task ID: `CPU-01-STARTUP-SLOT-M6-UNVERIFIED-448-507-539-01`.
+- Bounded output: independently validate only the existing slot 448/507/539 models and tests against the pinned ELF; add one fail-closed byte-oracle checker per slot, then wire those exact models/tests/checkers into the M6 lane CMake only if their bytes and semantics pass. Do not change `startup_ctors`, register slots, or alter the excluded slots 379/518.
+- Exact preflight commands/results: `git status --short --branch` exited 0 at `e2b72b2f0dffdd42abbf2493008e01a8fe2a6b83 == origin/main`, with only the nine candidate M6 files untracked; `cat docs/checkpoints/2026-10-28-lane-m6-report.md` exited 0 and records 448/507/539 as not verified because they lack byte-oracle checkers and are absent from `native/lanes/m6.cmake`; `graft grep "init_slot448"` found the model/header/test entry points in those three files. The source ELF pin is SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+- Worker ownership: `/root/m6_448_audit`, `/root/m6_507_audit`, and `/root/m6_539_audit` each own one independent slot-specific audit/checker file; root owns task/docs, shared `native/lanes/m6.cmake`, verification, and publication. Workers do not edit the existing model/header/test files or commit/push.
+- Files changed at claim: `HANDOFF.md`, `docs/TASKS.md`; no native code, tests, original input, dependency, or game-runtime behavior changed.
+- Observations vs inference: the prior M6 report verifies five of ten candidates and explicitly excludes these three pending independent checker replay. The untracked drafts are leads only; their comments are not accepted evidence.
+- Remaining risks: the three candidate semantics and ABI effects are not yet verified. No constructor registration or G1 claim is authorized by this task alone; game boot/audio/save/Metal gates remain open.
+- Next exact action: collect the three read-only audits. If each confirms a bounded contract, authorize checker creation in disjoint paths; root will replay all checkers and targeted fixture tests before deciding whether to integrate the lane targets.
+- Status/attempt count: `ACTIVE`; 0 failed hypotheses. No acceptance gate advanced.
+
 ## 2026-10-29 01:12 CDT (/root) — publish slot 545 characterization checkpoint (ARTIFACT_VERIFIED)
 
 - Task ID: `CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01`.
