@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 00:15 CDT (/root) — E898 documentation checkpoint published (ARTIFACT_VERIFIED)
+
+- Task ID: `CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01` closeout for the E898 partial analysis checkpoint.
+- Files changed: `HANDOFF.md`, `docs/EVIDENCE.md`, and `docs/TASKS.md` only. Nine pre-existing untracked M6 files for slots 448/507/539 remain unmodified and excluded.
+- Commit: `4d71617c8169ba72c948f1758dc534d50b3fb061`, authored by Johnny Wang, exact-range attribution audit passed, pushed fast-forward to `origin/main`. After `git fetch origin main`, `HEAD`, `origin/main`, and `FETCH_HEAD` all equal that commit; ahead/behind 0/0.
+- Publication checks: staged path audit passed 3/3 paths; all-path audit passed 3,347/3,347; post-commit all-path audit passed 3,347/3,347. `python3 scripts/project_index.py` exited 0 (43,006 folders indexed); `trail build --check` reports 10,719-node wiring graph current, meaning layer not built. `git diff --cached --check` passed. No build, CTest, or checker suite was run for this docs-only checkpoint.
+- Result: E898’s static characterization and limitations are now published. Slot 545 remains unregistered; G1 and runtime acceptance gates remain PARTIAL.
+- Next exact action: resume the E898 next action by resolving the reported `0xb30a00`/`0xb30c20` body-repair overlaps in the pinned ELF, then characterize `0xab860` and thunk destinations before considering any lift.
+- Status: publication closeout complete; the slot 545 characterization task remains PARTIAL.
+
 ## 2026-10-29 00:11 CDT (/root) — slot 545 REA/Ghidra characterization (PARTIAL)
 
 - Task ID: `CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01`.
