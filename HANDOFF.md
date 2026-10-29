@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 01:12 CDT (/root) — publish slot 545 characterization checkpoint (ARTIFACT_VERIFIED)
+
+- Task ID: `CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01`.
+- Files changed for the published characterization: `HANDOFF.md`, `docs/EVIDENCE.md`, `docs/TASKS.md` only. The nine untracked M6 files for slots 448/507/539 remain untouched and unstaged.
+- Exact publication commands/results: `git commit -m 'docs: close slot 545 characterization'` exited 0 as `8d2541a10fb3a6ba062345015e042b07a2671174`; `python3 -I scripts/check_commit_attribution.py --range HEAD^..HEAD` exited 0 (`e906-attribution-commit.log`); `git push origin main` exited 0; `git fetch origin main` exited 0. Fetch verification found `HEAD == origin/main == FETCH_HEAD == 8d2541a10fb3a6ba062345015e042b07a2671174`, ahead/behind `0/0`. Post-commit all-path audit passed 3,347/3,347 (`e906-audit-all-postcommit.log`) and attribution passed (`e906-attribution-postcommit.log`); precommit staged audit passed 3/3.
+- Observation vs inference: the characterization output is published and fetch-verified; this is static analysis evidence and does not establish execution of the game or any runtime acceptance gate.
+- Remaining risks: slot 545 has no native implementation and remains unregistered. G1 remains PARTIAL; boot, audible game content, real save/reload after relaunch, and gameplay Metal validation remain outstanding.
+- Next exact action: claim a separate native-lift task before implementing or registering slot 545. No further work is required to complete `CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01`.
+- Status/attempt count: characterization `STATIC_ANALYSIS_VERIFIED`; its documentation artifact is `ARTIFACT_VERIFIED`. E900 remains the sole failed probe.
+
 ## 2026-10-29 01:10 CDT (/root) — close slot 545 characterization (STATIC_ANALYSIS_VERIFIED)
 
 - Task ID: `CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01`.
@@ -10,7 +20,7 @@
 - Files changed for this checkpoint: `HANDOFF.md`, `docs/EVIDENCE.md`, `docs/TASKS.md`; no source, original input, installation, or dependency changed. Slot 545 remains unregistered; G1 and all game-runtime acceptance gates remain PARTIAL/NOT RUN.
 - Status/attempt count: `STATIC_ANALYSIS_VERIFIED`; one failed probe remains (E900 timeout), with no additional failed hypothesis. The bounded characterization output is complete; native implementation is a separate task.
 - Next exact action: no further analysis is required for this characterization task. Claim a separate native-lift task before implementing or registering slot 545. Continue to report G1 as PARTIAL until boot, game audio, real save/reload, and gameplay Metal gates are demonstrated.
-- Validation/publication: `python3 scripts/project_index.py` exited 0 (43,006 folders; `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01/e906-project-index.log`); `trail build --check` exited 0 with the 10,719-node wiring graph in sync (`e906-trail-check.log`; deep meaning layer not built); staged path audit exited 0 (3/3; `e906-audit-staged.log`); all-path audit exited 0 (3,347/3,347; `e906-audit-all.log`); `python3 -I scripts/check_commit_attribution.py` exited 0 for `origin/main..HEAD` (`e906-attribution-precommit.log`); `git diff --cached --check` exited 0. `git fetch origin main` exited 0 and found `HEAD == origin/main == FETCH_HEAD == 8053d54932c09442985402ef59dacc0bbdcfcaeb`; the nine untracked M6 files remain untouched. No build, CTest, or checker suite ran for this docs-only change. Owner commit, push, and fetched-ref verification follow.
+- Validation/publication: `python3 scripts/project_index.py` exited 0 (43,006 folders; `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01/e906-project-index.log`); `trail build --check` exited 0 with the 10,719-node wiring graph in sync (`e906-trail-check.log`; deep meaning layer not built); staged path audit exited 0 (3/3; `e906-audit-staged.log`); all-path audit exited 0 (3,347/3,347; `e906-audit-all.log`); `python3 -I scripts/check_commit_attribution.py` exited 0 for `origin/main..HEAD` (`e906-attribution-precommit.log`); `git diff --cached --check` exited 0. No build, CTest, or checker suite ran for this docs-only change. Publication and fetched-ref verification are recorded in E907 above.
 
 ## 2026-10-29 01:00 CDT (/root) — characterize slot 545 cleanup callback (PARTIAL)
 
