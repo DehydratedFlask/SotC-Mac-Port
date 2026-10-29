@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 11:33 CDT (/root) — E991 claim: RackQuery caller continuation after `0x94ecd6` (ACTIVE)
+
+- Starting tree: clean `main` at `9445b7edb1759c252e5d8d0d7fff56aa0040db36`, matching `origin/main` and `FETCH_HEAD`. Pinned ELF `local/re/eboot.elf` SHA-256 is `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0.
+- Claimed `AUD-02-NGS2-RACKQUERY-CALLER-CONTINUATION-94ECDB-01`. E985 byte-verifies a 5-byte call at `0x94ecd6`, so the caller continuation begins at `0x94ecdb`; E989 byte-verifies only the direct target's `mov`/`ret` block. This child examines only caller bytes after the call.
+- Scope: decode one instruction at a time from `0x94ecdb` through its first control transfer, capped at 32 instructions / 128 bytes; map each selected instruction through file-backed `PT_LOAD`; recompute direct targets only. Stop on the first transfer, decode/mapping gap, or cap.
+- Exclusions: no transfer-target contents, alternate routes, caller/startup reachability, API/NGS2 semantics, or actual audio. E985/E989 static byte evidence does not establish runtime execution. No code, executable, reference, or game-input changes; no tool installation.
+- Claim docs: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-29-aud02-rackquery-caller-continuation-94ecdb-claim-e991.md`. Private publication logs are under `local/validation/AUD-02-NGS2-RACKQUERY-CALLER-CONTINUATION-94ECDB-01/claim-publication/attempt-01/`.
+- Claim verification passed: configure/build exit 0; CTest 487/487; lift checkers 572 passed / 0 skipped / 0 failed; Trail graph check in sync with 10,779 deep-layer nodes pending; project index 43,163/current. Logs are under the claim-publication attempt directory.
+- Exact next commands: `rizin -q -e scr.color=false -c 'aoj @ 0x94ecdb' local/re/eboot.elf`; `xcrun llvm-objdump -D --start-address=0x94ecdb --stop-address=0x94ecdc local/re/eboot.elf`; advance one instruction at a time only if needed, then verify all selected bytes/edges with a raw ELF/PT_LOAD parser.
+- Next exact action: fetch and inspect `origin/main`, stage the six allowlisted claim docs, run staged/all-path audits and `git diff --cached --check`, commit/push the claim, then fetch-verify before byte inspection.
+- Status `ACTIVE`, claim verification passed, publication pending, analysis attempt 0; 0 failed semantic hypotheses. Parent `AUD-02` remains active; no product gate advanced.
+
 ## 2026-10-29 11:34 CDT (/root) — E990 publication closeout for E989 (ARTIFACT_VERIFIED)
 
 - E989 result was published in owner-authored commit `e01c3f668d897cb94f498317237b37dce50eedda` (`docs: verify RackQuery callee first block`), changing six allowlisted documentation paths. Author and committer are Johnny Wang.
