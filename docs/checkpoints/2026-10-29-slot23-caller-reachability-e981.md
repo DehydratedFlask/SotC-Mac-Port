@@ -68,4 +68,10 @@ python3 -I scripts/audit_publish_paths.py --all        # 3,374 paths accepted
 
 Before commit, the staged path audit passed 6/6, the all-path audit passed 3,375/3,375, and `git diff --cached --check` passed. A precommit fetch verified `HEAD == origin/main == FETCH_HEAD == 0fed710f28aa763f325353922dd07c20186e4dff`; configured commit author is Johnny Wang. Attribution, commit, push, and post-push fetch verification are pending.
 
-Next exact action: create an owner-authored documentation commit, run attribution and postcommit path/diff checks, then push and fetch-verify `main`.
+## Publication closeout (E982)
+
+Published in owner-authored commit `2193f712ee31af3a02a8ab2c15b816892d32b64a` (`docs: verify slot-23 dispatch reachability`), changing six allowlisted documentation paths. Push and fetch verified `HEAD == origin/main == FETCH_HEAD`; author/committer are Johnny Wang. Precommit configure/build, CTest 487/487, lift checkers 572/0/0, Trail graph check, project index 43,136/current, staged audit 6/6, all-path audit 3,375/3,375, staged diff check, and attribution passed. Postpush all-path audit, attribution, `git show --format= --check HEAD`, project-index check, and clean-worktree verification passed. Logs are under `local/validation/CPU-01-SLOT23-CALLER-REACHABILITY-01/result-publication/attempt-01/`.
+
+The publication advances only the static path documentation. The parent slot-23 task remains PARTIAL; slot 23 is unregistered; G1 remains PARTIAL and G2–G6 NOT RUN. Full game boot/audio/save-load/Metal acceptance is incomplete.
+
+Next exact action: inspect the task register for another bounded evidence task and preserve E911's slot-309 stop.

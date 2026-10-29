@@ -1,15 +1,23 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 10:57 CDT (/root) — E982 publication closeout for E981 (ARTIFACT_VERIFIED)
+
+- E981 result was published in owner-authored commit `2193f712ee31af3a02a8ab2c15b816892d32b64a` (`docs: verify slot-23 dispatch reachability`), changing six allowlisted documentation files. Author and committer are Johnny Wang.
+- Precommit gates passed: configure/build exit 0; CTest 487/487; lift checkers 572 passed / 0 skipped / 0 failed; Trail wiring graph in sync with 10,779 deep-layer nodes pending; project index 43,136/current; staged audit 6/6; all-path audit 3,375/3,375; staged diff check passed; attribution audit passed on the new commit. Logs are under `local/validation/CPU-01-SLOT23-CALLER-REACHABILITY-01/result-publication/attempt-01/`.
+- Push and fetch succeeded; `HEAD == origin/main == FETCH_HEAD == 2193f712ee31af3a02a8ab2c15b816892d32b64a`; postpush all-path audit passed 3,375/3,375, attribution audit passed on the empty unpublished range, `git show --format= --check HEAD` passed, project index reports 43,136/current, and worktree is clean.
+- E981 verifies one conditional static path only. Slot 23 remains unregistered; the parent task is PARTIAL; G1 remains PARTIAL and G2–G6 NOT RUN. No code, binary, reference, or game-input files changed. Overall port acceptance is incomplete.
+- Next exact action: inspect the task register for a new bounded evidence task that can continue caller/target characterization; preserve the slot-309 stop under E911 and do not infer game behavior from E981.
+
 ## 2026-10-29 10:48 CDT (/root) — E981 slot-23 caller reachability result (STATIC_PATH_BYTE_VERIFIED)
 
 - Task `CPU-01-SLOT23-CALLER-REACHABILITY-01`, parent `CPU-01-SLOT23-CONSUMERS-01`. E980 claim is closed by this result. Starting tree was `0fed710f28aa763f325353922dd07c20186e4dff`, matching `origin/main` and `FETCH_HEAD`; pinned ELF SHA-256 remains `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
 - Static observation: `0xe5c0a5` computes table base `0x1319b08`; the nonzero edge at `0xe5c30b` reaches the first dispatch. The file-backed 13-entry signed-relative table at PT_LOAD phdr 0 / file offset `0x131db08` has entry 0 -> `0xe5c3a7`. With `R13d == 0x2b`, that case reaches `0xe5c3f0` and the call at `0xe5c3f5` (direct target `0xe70a60`). Primary byte parser and independent reviewer agree.
 - Status `STATIC_PATH_BYTE_VERIFIED` for this conditional static path only. R12 preservation depends on ordinary x86-64 ABI behavior and normal returns across intervening calls; the `R13d` runtime value, caller/startup reachability, receiver type, API/game semantics, and full Ghidra function Evidence remain unresolved. Parent stays `PARTIAL`; slot 23 is unregistered; G1 remains PARTIAL; G2–G6 remain NOT RUN.
-- Files to publish: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-29-slot23-caller-reachability-e981.md`. No source, binary, reference, or game-input files changed. Private report, verifier, disassemblies, and 35-entry hash manifest are under `local/validation/CPU-01-SLOT23-CALLER-REACHABILITY-01/attempt-01/`.
+- Published files: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-29-slot23-caller-reachability-e981.md` in commit `2193f712ee31af3a02a8ab2c15b816892d32b64a`. No source, binary, reference, or game-input files changed. Private report, verifier, disassemblies, and 35-entry hash manifest are under `local/validation/CPU-01-SLOT23-CALLER-REACHABILITY-01/attempt-01/`.
 - Analysis: one supported conditional path replay; zero failed semantic hypotheses. A wrapper command initially failed before disassembly because zsh reserves the variable `status`; rerunning with `rc` succeeded. This was not an analysis failure.
 - Required verification passed: `cmake -S native -B local/build/orch-r22` and `cmake --build local/build/orch-r22 -j 12` exited 0; CTest passed 487/487; lift checkers passed 572, skipped 0, failed 0; `trail build --check` reports the wiring graph in sync with 10,779 deep-layer nodes pending; `python3 scripts/project_index.py` wrote 43,136 folders and `--check` confirmed current. Logs are under `local/validation/CPU-01-SLOT23-CALLER-REACHABILITY-01/result-publication/attempt-01/`.
 - Precommit staged path audit passed 6/6; all-path audit passed 3,375/3,375; `git diff --cached --check` passed. Precommit fetch verified `HEAD == origin/main == FETCH_HEAD == 0fed710f28aa763f325353922dd07c20186e4dff`; configured commit author is Johnny Wang. Exact logs are under the result-publication attempt directory.
-- Next exact action: create an owner-authored documentation commit, run `python3 -I scripts/check_commit_attribution.py` and postcommit path/diff checks, then push and fetch-verify `main`.
+- E982 records push/fetch verification, postpush audits, and a clean worktree. Next exact action: inspect the task register for a new bounded evidence task; preserve E911's slot-309 stop.
 
 ## 2026-10-29 10:34 CDT (/root) — E980 claim: slot-23 caller reachability (closed by E981)
 
