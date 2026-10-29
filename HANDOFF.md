@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 05:02 CDT (/root) — E941 allocator import identity (STATIC_ANALYSIS_VERIFIED)
+
+- Task `SRV-01-ALLOCATOR-IMPORT-3B570-01` is complete within its bounded static scope. ELF SHA-256: `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+- Exact analysis commands and exits: `python3 -I scripts/ps4_dynlink.py local/re/eboot.elf --out local/validation/orch-20261029/SRV-01-ALLOCATOR-IMPORT-3B570-01/attempt-01/imports-with-thunk.json --thunk 0xf8fa20` (0); the same command with `--contracts reference/shadPS4/src/core/libraries` and output `imports-with-contracts.json` (0); `python3 -I local/validation/orch-20261029/SRV-01-ALLOCATOR-IMPORT-3B570-01/attempt-01/verify_import_slot.py local/re/eboot.elf local/validation/orch-20261029/SRV-01-ALLOCATOR-IMPORT-3B570-01/attempt-01/imports-with-contracts.json` (0); reference commit and contract-line checks (0); `shasum -a 256 -c local/validation/orch-20261029/SRV-01-ALLOCATOR-IMPORT-3B570-01/attempt-01/SHA256SUMS` (0, all 12 entries OK). Full logs and outputs are under `local/validation/orch-20261029/SRV-01-ALLOCATOR-IMPORT-3B570-01/attempt-01/`.
+- Raw-byte observations: `0x3b570` (`e9ab44f500`) jumps to `0xf8fa20`; `0xf8fa20` (`ff25da086700`) jumps through slot `0x1600300`. The slot is RELRO phdr 1, file offset `0x1604300`, with initial file qword `0xf8fa26`. The raw JMPREL row at table offset 2520 targets the slot and is type 7 / `R_X86_64_JUMP_SLOT`, symbol 551, addend 0. Symbol 551 is undefined `FUNC`, raw `1jfXLRVzisc#0#F`; raw dynamic metadata maps both library and module IDs to `libkernel`. The parser and independent raw decoder agree.
+- Reference-name evidence is scoped to pinned `reference/shadPS4` commit `0ebea15c24253b60f514fc37a348dabc8d0bcb90`: `kernel/time.cpp` registers NID `1jfXLRVzisc` as `sceKernelUsleep` for `libkernel` / `libkernel`. This is a contract name association, not proof of retail implementation semantics.
+- Files changed: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`; private analysis artifacts under the task directory. No product source or reference clone changed. Remaining risks: runtime loader binding/address, service semantics/equivalence, allocator runtime reachability, and all G1–G6 gates remain unproven.
+- Next exact action: run the required publication checks for this result, then commit and fetch-verify on `main`; afterwards re-evaluate the live dependency graph for another bounded, unblocked task.
+- Status/attempt count: `STATIC_ANALYSIS_VERIFIED`, one analysis attempt, zero failed semantic hypotheses.
+
 ## 2026-10-29 04:56 CDT (/root) — E940 allocator import claim publication closeout (ARTIFACT_VERIFIED)
 
 - Owner-authored claim commit `4e42f76b2687d016af26f8e8a9a1cb2481ba5a50` (`docs: claim allocator import thunk trace`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
