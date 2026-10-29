@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 11:57 CDT (/root) — E995 claim: Slot-23 direct-call target entry block (ACTIVE)
+
+- Starting tree: clean `main` at `d9aa2a6d2a53c2e670ef87196d9f4b753a57d1fb`, matching `origin/main`. Pinned ELF `local/re/eboot.elf` SHA-256 is `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0.
+- Claimed child `CPU-01-SLOT23-DIRECT-CALLEE-0E70A60-01` under parent `CPU-01-SLOT23-CONSUMERS-01`. E981 byte-verifies a conditional local path to call `0xe5c3f5` when `R13d == 0x2b`; that call's direct target `0xe70a60` was not inspected.
+- Scope: inspect only the entry basic block at `0xe70a60`, one instruction at a time, with a 32-instruction / 128-byte cap; map selected bytes through file-backed PT_LOAD and recompute direct edges. Stop at the first control transfer, decode gap, mapping gap, or cap. Do not inspect any transfer target.
+- Limits: this child does not establish that the enclosing code is reached from startup, that `R13d` can equal `0x2b`, method/API/receiver meaning, original-string necessity, runtime execution, or product behavior. Slot 23 stays unregistered; G1 remains PARTIAL. E911's slot-309 stop is unchanged.
+- Claim files: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-29-cpu01-slot23-direct-callee-e70a60-claim-e995.md`. Claim verification logs are under `local/validation/CPU-01-SLOT23-DIRECT-CALLEE-0E70A60-01/claim-publication/attempt-01/`.
+- Next exact action after claim publication: open the pinned ELF with REA's Ghidra provider, capture only the target entry block, compare the selected bytes with bounded LLVM output and a raw PT_LOAD verifier, then stop at the first control transfer.
+- Task status: ACTIVE; 0 analysis attempts; 0 failed semantic hypotheses. Parent slot-23 task remains PARTIAL; no product gate advanced.
+
 ## 2026-10-29 11:48 CDT (/root) — E994 publication closeout for E993 (ARTIFACT_VERIFIED)
 
 - E993 result commit `e73605501a1dd41a06a95e73f0fca43252597afd` (`docs: verify RackQuery caller continuation`) is owner-authored and pushed to `origin/main`; its six changed paths were allowlisted documentation only. Author and committer are Johnny Wang.
