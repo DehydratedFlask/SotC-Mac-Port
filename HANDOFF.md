@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 02:25 CDT (/root) — saved-reference triage publication closeout (ARTIFACT_VERIFIED)
+
+- Commit `ccf79caf240ef26945907a082e2c2e7ad87d2c5a` (`docs: close slot 309 saved-reference triage`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
+- Staged path audit passed 3/3; all-path audit passed 3,363/3,363 before and after publication; precommit attribution and cached diff checks passed; exact commit attribution for `HEAD^..HEAD` passed.
+- `git push origin main` and `git fetch origin main` exited 0. After fetch, `HEAD == origin/main == FETCH_HEAD == ccf79caf240ef26945907a082e2c2e7ad87d2c5a`; working tree clean on `main`.
+- Logs: `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-309-SAVED-REF-TRIAGE-01/` (`audit-staged.log`, `audit-all.log`, `audit-all-postpush.log`, `attribution-precommit.log`, `attribution-commit.log`, `diff-cached.log`, `push-main.log`, `fetch-main.log`, `status-postpush.log`, `commit.log`, `project-index.log`, `trail-build-check.log`).
+- Status: E917 saved-reference triage is `COMPLETE / STATIC_ANALYSIS_VERIFIED`; E918 `CPU-01-STARTUP-SLOT-309-CALLER-ORDER-01` is `ACTIVE`. Slot 309 stays unregistered and G1 remains `PARTIAL`; no runtime gate advanced.
+- Next exact action: inspect the current REA binary-session identity, then use the existing read-only Ghidra project to trace incoming references to `0x28af0` and `0x531d60`, their dispatcher consumers, and their possible order before constructor slot `0xa505e0`.
+
+## 2026-10-29 02:24 CDT (/root) — slot-309 saved-reference triage closed; caller/order trace claimed (E917–E918)
+
 ## 2026-10-29 02:24 CDT (/root) — slot-309 saved-reference triage closed; caller/order trace claimed (E917–E918)
 
 - Completed `CPU-01-STARTUP-SLOT-309-SAVED-REF-TRIAGE-01` against the existing 41-reference Ghidra census and saved bodies. The consolidated private report is `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-309-SAVED-REF-TRIAGE-01/REPORT.md`.
