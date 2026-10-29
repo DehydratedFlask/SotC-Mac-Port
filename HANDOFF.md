@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 09:44 CDT (/root) — E975 task-register duplicate-row cleanup claim (ACTIVE)
+
+- Current `main` is clean at `37c2ef293b5eb9bc40cea57b0510aa7feee6ddc1`, matching fetched `origin/main` and `FETCH_HEAD`. A live status-cell parse found zero READY rows, 11 ACTIVE rows, 15 WAITING_FOR_DEPENDENCY rows, and one ACTIVE/PARTIAL row. `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` appears twice at `docs/TASKS.md` rows 39 and 41; the later row includes E894's raw literal-census evidence while preserving the E911 stop condition.
+- Claimed `DOC-TASKS-SLOT309-DUPLICATE-ROW-01`: remove exactly the redundant earlier task-register row, retain the later E894-enriched row verbatim, preserve task status/attempts and the slot-309 stop, and make no shipped-code/evidence changes.
+- Claim-publication checkpoint: configure/build exited 0; CTest 487/487; checker sweep 572/0/0; Trail graph in sync with 10,779 deep-layer nodes pending; project index 43,124/current; staged audit 1/1; all-path audit 3,372/3,372; attribution and staged diff passed. Fetch verified `HEAD == origin/main == FETCH_HEAD == 37c2ef293b5eb9bc40cea57b0510aa7feee6ddc1`. Logs are in `local/validation/DOC-TASKS-SLOT309-DUPLICATE-ROW-01/claim-publication/attempt-01/`.
+- No slot-309 analysis will be performed under this documentation task. After publishing the claim, compare the rows, remove the duplicate, record the bounded docs result, run the required publication gates, then push and fetch-verify.
+
 ## 2026-10-29 09:41 CDT (/root) — E974 post-push whitespace repair (ARTIFACT_VERIFIED)
 
 - E973 result commit `46d765a13489dcdf2a07ef8aa3907dd39bc6f5f9` was pushed and fetch-verified. Its post-push `git show --format= --check HEAD` returned exit 2 and identified Markdown hard-break trailing spaces on the result checkpoint's Date, Agent, and Task lines. The static-analysis finding is unaffected; no code or binary evidence changed. Exact output is in `local/validation/AUD-02-NGS2-RACKQUERY-STACK-POSTCALL-94EBC2-01/result-publication/attempt-01/postcommit.log`.
