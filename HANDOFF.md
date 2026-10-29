@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 00:43 CDT (/root) — E902 correction publication verified (ARTIFACT_VERIFIED)
+
+- Task ID: `CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01`.
+- Files: E902 correction updates in `HANDOFF.md`, `docs/EVIDENCE.md`, and `docs/TASKS.md`; no source or private input changed. Nine pre-existing untracked M6 files for slots 448/507/539 remain unstaged.
+- Exact publication command: `git push origin main && git fetch origin main && git rev-parse HEAD origin/main FETCH_HEAD && git status -sb`.
+- Result: push exited 0, fast-forward `b22022e3..3de67d6b`; fetch exited 0; `HEAD`, `origin/main`, and `FETCH_HEAD` all equal `3de67d6b116184186cee6ae1a5cf438a97acd17a`, with zero ahead/behind.
+- Validation: precommit staged path audit 3/3, all-path audit 3,347/3,347, attribution passed, and `git diff --cached --check` passed. Postcommit all-path audit 3,347/3,347 and attribution passed. Postcommit staged audit returned exit 2 with `nothing staged`; its precommit counterpart passed 3/3. Project index passed at 43,006 folders; `trail build --check` passed at 10,719 nodes, meaning layer not built. No build, CTest, or lift checker suite ran for this documentation-only correction.
+- Logs: `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01/e902-audit-staged.log`, `e902-audit-all.log`, `e902-attribution.log`, `e902-audit-staged-postcommit.log`, `e902-audit-all-postcommit.log`, and `e902-attribution-postcommit.log`.
+- This closeout documentation changeset also passed its precommit staged path audit (3/3), all-path audit (3,347/3,347), attribution audit, and cached diff check. Its logs are `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01/e903-audit-staged.log`, `e903-audit-all.log`, and `e903-attribution.log`.
+- Observation/status: E902 corrects the false body-overlap interpretation; slot 545 remains PARTIAL and unregistered because the actual callees and exit behavior remain unresolved. No game acceptance gate advanced. One failed targeted probe remains (E900 timeout).
+- Next exact action: execute the process-local REA/Ghidra command for `0xab860` recorded in the preceding E902 checkpoint, inspect compact body/call evidence, then assess whether separate queries for `0xf8f396` and `0xf8f3a6` are needed.
+
 ## 2026-10-29 00:40 CDT (/root) — correct slot 545 address-range comparison (PARTIAL)
 
 - Task ID: `CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01`.
@@ -12,7 +24,7 @@
 - Remaining risk: do not lift/register slot 545 until the real callees and exit behavior are bounded. No boot, audio, saving, reload, or gameplay-Metal gate advanced.
 - Next exact action: run the documented process-local command `env GHIDRA_INSTALL_DIR=/Users/dehydratedflask/Applications/ghidra_12.1.4_PUBLIC JAVA_HOME=/opt/homebrew/Cellar/openjdk@25/25.0.4.1/libexec/openjdk.jdk/Contents/Home GHIDRA_HEADLESS_MAXMEM=8G REA_GHIDRA_STARTUP_TIMEOUT_MS=1200000 /Users/dehydratedflask/.npm/_npx/a1722018f28f9df2/node_modules/.bin/rea function /Volumes/Extra/SoC\ Mac\ Native/local/re/eboot.elf 0xab860 --provider ghidra --snapshot /Volumes/Extra/SoC\ Mac\ Native/local/re/evidence/slot545-helper-snapshot.json --format json > local/re/evidence/slot545-helper-analysis.json 2> local/validation/orch-20261029/CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01/ghidra-helper.stderr` and inspect compact call/body facts. Then assess whether `0xf8f396`/`0xf8f3a6` need separate queries. Keep the slot unregistered.
 - Attempt count: one failed probe remains (E900 timeout); E901/E902 CLI queries succeeded. Do not count the range correction as a new binary-analysis hypothesis.
-- Publication validation: `python3 scripts/project_index.py` passed (43,006 folders indexed); `trail build --check` passed with the 10,719-node wiring graph current (meaning layer not built); staged path audit passed 3/3; all-path audit passed 3,347/3,347; attribution audit passed for `origin/main..HEAD`; `git diff --cached --check` passed. Audit logs: `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01/e902-audit-staged.log`, `e902-audit-all.log`, and `e902-attribution.log`. Owner commit, push to `origin main`, and fetch verification follow in the publication closeout.
+- Publication validation: `python3 scripts/project_index.py` passed (43,006 folders indexed); `trail build --check` passed with the 10,719-node wiring graph current (meaning layer not built); precommit staged path audit passed 3/3; precommit all-path audit passed 3,347/3,347; precommit attribution audit passed for `origin/main..HEAD`; `git diff --cached --check` passed. E902 correction commit `3de67d6b116184186cee6ae1a5cf438a97acd17a` is owner-authored, pushed fast-forward to `origin main`, and fetch-verified with `HEAD`, `origin/main`, and `FETCH_HEAD` equal. Postcommit all-path and attribution audits passed. The postcommit staged audit returned exit 2 (`nothing staged`) because the index was empty; the precommit staged audit had passed 3/3. Logs are under `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01/`.
 
 ## 2026-10-29 00:30 CDT (/root) — slot 545 interior thunk observed (PARTIAL)
 
