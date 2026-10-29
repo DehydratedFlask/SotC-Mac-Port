@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 12:10 CDT (/root) — E997: E995 REA provider timeout (BLOCKED)
+
+- Starting tree: clean `main` at `829a193491ce3f4d1433f002092fef466ae67752`, matching `origin/main`. Pinned ELF `local/re/eboot.elf` SHA-256 is `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0.
+- Task `CPU-01-SLOT23-DIRECT-CALLEE-0E70A60-01`: after REA successfully opened the pinned ELF, the sole `mcp__rea__inspect_native_instruction({address:"0xe70a60"})` call returned `provider_timeout` at its exact 330,000 ms Ghidra startup deadline. Ghidra 12.1.4, REA 6.7.0, profile `769518a8e9b57f953dd241adbb63672f0f486bb3d66359b9deef7c5e088ca7aa`, run `5df90b86-e170-4434-981b-c6a571d2679c`; `output_incomplete=true`, no Evidence ID, instruction bytes, decoded instruction, or stop boundary. Coverage: 0 instructions.
+- The task packet requires stopping on provider setup failure. No LLVM/raw substitute or REA retry was run; no transfer target was inspected. This is one failed provider query, 0 failed semantic hypotheses. Private preflight, structured timeout metadata, result and SHA-256 values are under `local/validation/CPU-01-SLOT23-DIRECT-CALLEE-0E70A60-01/analysis/attempt-01/`.
+- Observation versus inference: the provider startup timeout and absence of an instruction result are observed; no target semantics or target-block bytes can be inferred. E981's conditional caller edge remains the only result; incoming startup reachability and `R13d` value provenance remain unknown.
+- Files changed for this checkpoint: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-29-cpu01-slot23-direct-callee-e70a60-provider-e997.md`.
+- Next exact action: do not retry E995 under the current task packet; keep slot 23 unregistered. Reassess only if REA/Ghidra readiness changes and the principal authorizes a fresh bounded attempt. Continue independent task `SAV-01-LOAD-DISPATCH-5435FC-01` under E996.
+- Task status: BLOCKED by provider setup; 1 attempted provider query, 0 failed semantic hypotheses. Parent `CPU-01-SLOT23-CONSUMERS-01` remains PARTIAL; G1 remains PARTIAL; no product gate advanced.
+
 ## 2026-10-29 12:03 CDT (/root) — E996 claim: SAV-01 load-dispatch target origin (ACTIVE)
 
 - Starting tree: clean `main` at `257601e257d595f4046e2727582dde4088725659`, matching `origin/main`. Pinned ELF `local/re/eboot.elf` SHA-256 is `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0.
