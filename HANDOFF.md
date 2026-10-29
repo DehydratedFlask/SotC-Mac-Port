@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 00:30 CDT (/root) — slot 545 interior thunk observed (PARTIAL)
+
+- Task ID: `CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01`.
+- Files changed: `docs/TASKS.md`, `docs/EVIDENCE.md`, and `HANDOFF.md`; private analysis outputs under `local/re/evidence/` and `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01/`. No source/game inputs or registry changed.
+- Exact command: `mkdir -p local/validation/orch-20261029/CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01 && test ! -e local/re/evidence/slot545-overlap-a-analysis.json && test ! -e local/re/evidence/slot545-overlap-a-snapshot.json && env GHIDRA_INSTALL_DIR=/Users/dehydratedflask/Applications/ghidra_12.1.4_PUBLIC JAVA_HOME=/opt/homebrew/Cellar/openjdk@25/25.0.4.1/libexec/openjdk.jdk/Contents/Home GHIDRA_HEADLESS_MAXMEM=8G REA_GHIDRA_STARTUP_TIMEOUT_MS=1200000 /Users/dehydratedflask/.npm/_npx/a1722018f28f9df2/node_modules/.bin/rea function /Volumes/Extra/SoC\ Mac\ Native/local/re/eboot.elf 0xb30a00 --provider ghidra --snapshot /Volumes/Extra/SoC\ Mac\ Native/local/re/evidence/slot545-overlap-a-snapshot.json --format json > local/re/evidence/slot545-overlap-a-analysis.json 2> local/validation/orch-20261029/CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01/ghidra-overlap-a.stderr`.
+- Result: exit 0; Ghidra 12.1.4, evidence ID `ev_9a68ac9c65dd0fcb29e43a2d204157642eca1a6d1ef909816bfba6e7ebc75234`. FunctionManager reports a 5-byte thunk at `0xb30a00`, with one instruction `JMP 0xf90c30`; that target is reported as a 6-byte thunk to `0xf90c36`. This entry is inside E898's parent range `0xb2ec0..0xb3154`. Caller coverage is PARTIAL (364 caller entries returned; 16 call-reference sources omitted). Evidence hashes are in E901; stderr is empty and Ghidra's ephemeral import log was removed on exit.
+- Observation vs inference: Ghidra reports an interior FunctionManager thunk overlapping the E898 parent body's address range, and its importer previously logged failed body repair at this address. This is evidence of conflicting function-boundary observations; it does not establish which body boundary is correct.
+- Gate/status: `PARTIAL`; one failed targeted probe remains (the E900 MCP timeout). The CLI query succeeded. Slot 545 remains unregistered; no game/runtime acceptance gate advanced.
+- Remaining risk: parent function body overlaps a shared thunk entry; caller coverage on the thunk is incomplete; the second reported overlap at `0xb30c20` and helper/thunk contracts remain open.
+- Next exact action: query `0xb30c20` with the same process-local REA/Ghidra CLI settings and determine whether its observed body also overlaps `0xb2ec0..0xb3154`; keep the slot unregistered if ownership remains ambiguous.
+- Publication validation: staged/all-path audits passed 3/3 and 3,347/3,347; precommit attribution audit passed for `origin/main..HEAD`; `git diff --cached --check` passed. No build, CTest, or checker suite was run because this checkpoint changes documentation only.
+
 ## 2026-10-29 00:21 CDT (/root) — slot 545 address-ownership query timed out (PARTIAL; failed try 1)
 
 - Task ID: `CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01`.
