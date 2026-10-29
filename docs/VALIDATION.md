@@ -1,6 +1,6 @@
 # Validation gates and evidence protocol
 
-Current checkpoint: G0 PARTIAL; G1 PARTIAL (E404–E542). Measured native coverage of Init
+Current checkpoint (E1005, 2026-10-29): G0 PARTIAL; G1 PARTIAL; G2 NOT RUN; G3 PARTIAL; G4 PARTIAL; G5–G6 NOT RUN. E1005 rebuilt and artifact-verified a current thin-ARM64 launcher/core bundle, but `sotc_core_start()` still returns `SOTC_ERR_ENGINE_NOT_IMPLEMENTED`; Finder launch and a meaningful native subsystem lifecycle remain unverified. Measured native coverage of Init
 `0x531d60` over `0x531d60..0x532b0c` is **3500 / 3500 B = 100.0%** claimed (semantics still partial) (E542,
 `tools/lift/report_init_coverage.py`) — claimed bytes, not proven semantics; four gaps remain
 (all four former gaps are now pinned in `init_531d60_entry_gaps`; claimed bytes are not semantics).
@@ -110,7 +110,7 @@ See E404–E508 —
 `docs/checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u12.md`,
 `docs/checkpoints/2026-10-22-init-531d60-post-base-a2ed00-u7.md`,
 `docs/checkpoints/2026-10-22-init-531d60-post-base-f590-a2ed00-u13.md`);
-G2-G6 NOT RUN. This is a plan, not a game execution report. G1 is not PASSED.
+G2 NOT RUN; G3 PARTIAL; G4 PARTIAL; G5-G6 NOT RUN. This is a plan, not a game execution report. G1 and G4 are not PASSED.
 Artifact/tool/source evidence is recorded in EVIDENCE.md; full asset/linkage schemas remain open.
 Baseline supplied by the coordinating agent on 2026-10-19, America/Chicago: M4 Pro, 12 CPU cores,
 48 GB unified memory, macOS 27.0.1, Xcode 27.1. Read-only machine/toolchain capture on 2026-10-20
@@ -132,7 +132,7 @@ Follow [AGENTS.md](../AGENTS.md), [PLATFORM.md](PLATFORM.md), [ROADMAP.md](../RO
 | G1 | Pure native CPU/game-core feasibility | PARTIAL (startup harness + Init-hash + prologue early+tail+gates+lifted 0x3be050+0x1ab550→0xf08 singleton→base with lifted vslot 0x534130+mid 0x255340+0x533100 header+post/1fc80→registry; unresolved edges in E404–E422; not PASSED) |
 | G2 | Native services, audio fixtures, save fixtures | NOT RUN |
 | G3 | Direct Metal resources, shader semantics, rendering | PARTIAL (E627 default-pair shader fixtures; E632/E633 synthetic Metal geometry/parser flow; real asset bindings and passes remain unverified) |
-| G4 | Native Swift/macOS launcher and lifecycle | NOT RUN |
+| G4 | Native Swift/macOS launcher and lifecycle | PARTIAL (E1005 verifies a current signed thin-ARM64 app/core bundle; the core still refuses start with `SOTC_ERR_ENGINE_NOT_IMPLEMENTED`, and Finder launch plus meaningful native subsystem start/stop remain unverified) |
 | G5 | Actual game boot, actual sound, real save/reload | NOT RUN |
 | G6 | Final packaging, native-only audit, stability/performance | NOT RUN |
 
