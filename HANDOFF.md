@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 12:44 CDT (/root) — E1001: E1000 publication closeout (ARTIFACT_VERIFIED)
+
+- Owner-authored implementation commit `c0891f04d9455e26c7a08446b6c3bc226d7719e7` (`feat(launcher): preserve folder state on import cancellation`) is on `main`; author/committer Johnny Wang. It changed 11 allowlisted paths: five launcher source/test files and six docs/checkpoint files.
+- At the E1000 publication point, fetch verification showed `HEAD == origin/main == FETCH_HEAD == c0891f04d9455e26c7a08446b6c3bc226d7719e7` and a clean worktree. Its staged/all-path audits passed 11/11 and 3,388/3,388; post-push audit, attribution, whitespace and project-index checks passed. The E1001 documentation closeout stages five allowlisted paths; its staged audit passed 5/5, all-path audit passed 3,389/3,389, `git diff --cached --check` passed, and `python3 scripts/project_index.py --check` reported 43,183/current. Closeout logs: `local/validation/APP-01-IMPORTER-CANCEL-STATE-FIXTURE-01/publication-closeout/attempt-01/`.
+- E1000 verification remains authoritative for the unchanged source: root focused Swift tests 5/5 and full launcher 160/21 passed; CMake configure/build exit 0, CTest 487/487, lift checker 572/0/0. First Trail check found the expected stale launcher nodes; `trail build` rebuilt the graph, then `trail build --check` passed with 10,787 wiring nodes and the new `handleFolderImport` symbol queryable (4 hits across 3 files). Deep-layer meaning summaries remain pending.
+- Publication logs: `local/validation/APP-01-IMPORTER-CANCEL-STATE-FIXTURE-01/result-publication/attempt-01/`; closeout logs: `local/validation/APP-01-IMPORTER-CANCEL-STATE-FIXTURE-01/publication-closeout/attempt-01/`. No code changed after c0891f04; this closeout reused the recorded E1000 build/test results.
+- G4 remains PARTIAL: the model import-result fixture does not prove native picker/alert interaction, Finder launch, repeated sessions, actual game readiness, or a working game core.
+- Next exact action: finish the active read-only task triage for another bounded, provider-independent task; claim it in HANDOFF before any implementation. Full port remains incomplete.
+
 ## 2026-10-29 12:37 CDT (/root) — E1000: APP-01 importer cancellation-state fixture (FIXTURE_VERIFIED)
 
 - Starting tree: clean `main` at `3acdb53d3f743f607cc3a7abd33405f604773391`, matching `origin/main` before the five scoped launcher/test edits.
