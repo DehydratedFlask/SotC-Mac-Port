@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 12:03 CDT (/root) — E996 claim: SAV-01 load-dispatch target origin (ACTIVE)
+
+- Starting tree: clean `main` at `257601e257d595f4046e2727582dde4088725659`, matching `origin/main`. Pinned ELF `local/re/eboot.elf` SHA-256 is `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0.
+- Claimed `SAV-01-LOAD-DISPATCH-5435FC-01` under active parent `SAV-01`. Existing E866 REA/Ghidra evidence identifies unresolved indirect calls at `0x5435fc` and `0x543611` in `FUN_00542880`; this child examines only `0x5435fc`.
+- Scope: trace the reaching definition of the call target through local registers, stack fields, and any uniquely referenced vtable/relocation entry; byte-check the callsite and target-producing instruction/slot. Stop at a single proven target entry, first unresolved provenance, decode/mapping gap, or 32-instruction / 128-byte cap. Do not inspect the callee body or adjacent call `0x543611`.
+- Limits: no caller/startup reachability, SaveData API meaning, runtime behavior, malformed-save outcome, real-save, or transaction-atomicity claim. No save file was read. The parent task-register summary was corrected: profile/progress chunk writers are partly byte-verified in the existing child dossier; the tag-4/tag-8 distinction and load-side deserializer remain unresolved.
+- Claim docs: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-29-sav01-load-dispatch-5435fc-claim-e996.md`. Logs are under `local/validation/SAV-01-LOAD-DISPATCH-5435FC-01/claim-publication/attempt-01/`.
+- Next exact action after claim publication: use REA/Ghidra on the pinned ELF to trace only the target origin for `0x5435fc`, compare the selected bytes/reference with bounded LLVM and raw ELF/PT_LOAD mapping, and stop at the target entry.
+- Task status: ACTIVE; 0 analysis attempts; 0 failed semantic hypotheses. SAV-04 real-save acceptance remains NOT RUN; no product gate advanced.
+
 ## 2026-10-29 11:57 CDT (/root) — E995 claim: Slot-23 direct-call target entry block (ACTIVE)
 
 - Starting tree: clean `main` at `d9aa2a6d2a53c2e670ef87196d9f4b753a57d1fb`, matching `origin/main`. Pinned ELF `local/re/eboot.elf` SHA-256 is `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0.
