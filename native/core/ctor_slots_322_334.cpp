@@ -111,7 +111,8 @@ Slot333Result init_slot333_7fd6d0(Slot333Objects& o, ConCmdRegistry& concmd) noe
 
 // ---- slot 334 (0x7fc530) ---------------------------------------------------------------------------
 bool unbounded_int_fn_table_lifted(std::uint64_t table) noexcept {
-    return table == kUnboundedIntSeedFnTable || table == kUnboundedIntFnTable || table == kUnboundedIntFnTableB;
+    return table == kUnboundedIntSeedFnTable || table == kUnboundedIntFnTable || table == kUnboundedIntFnTableB ||
+           table == kUnboundedIntFnTableSlot486 || table == kUnboundedIntFnTableSlot489;
 }
 
 bool init_unbounded_int_var_worker_3a980(ConCmdRangedVar& var, const SharedStr& name, std::uint32_t flags,

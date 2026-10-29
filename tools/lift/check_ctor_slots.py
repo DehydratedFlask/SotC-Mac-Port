@@ -189,21 +189,29 @@ LANE_SLOTS_20261026 = {
     496, 500, 515, 517, 519, 522, 523, 525, 527, 528, 529, 531, 533, 541, 542, 546, 547, 549,
     551, 553, 560, 562, 563, 564, 565,
 }
+LANE_SLOTS_20261028 = {
+    359, 364, 365, 376, 377, 383, 384, 385, 386, 387,
+    389, 393, 403, 407, 413, 415, 419, 421,
+    426, 436, 439, 440, 441, 456, 457, 458, 459, 461,
+    463, 465, 475, 476, 478, 479, 482, 486, 489, 490,
+    491, 492, 499, 502, 509, 516, 535, 540, 543,
+    544, 557, 558, 559, 569,
+}
 expected_registered = (set(range(152)) | set(modules) | {282, 290, 520, 538, 296, 297, 300, 298, 299, 301, 302, 303, 305, 306}
-                       | LANE_SLOTS_20261026)
+                       | LANE_SLOTS_20261026 | LANE_SLOTS_20261028)
 assert set(rows_by_index) == expected_registered, (
     "registered set differs from the computed expectation: "
     f"extra={sorted(set(rows_by_index) - expected_registered)} "
     f"missing={sorted(expected_registered - set(rows_by_index))}")
 registered_digest = hashlib.sha256(
     ",".join(str(index) for index in sorted(rows_by_index)).encode()).hexdigest()
-assert registered_digest == "77173e26669f9a37dc180287852d482cf4fe407ee92693c94b05e91674a0c4b4", (
+assert registered_digest == "383cae560dbbea3deab70292949dca6258fbb8b6284b9df8494b9604d908c3b4", (
     f"registered index-set sha256 changed: {registered_digest}")
 
-# The remaining 176 original slots have no registered native callback; the first is the explicit
+# The remaining 124 original slots have no registered native callback; the first is the explicit
 # startup cliff after this batch.
 unregistered = sorted(set(range(TABLE_COUNT)) - set(rows_by_index))
-assert len(unregistered) == 176, f"expected 176 unregistered slots, found {len(unregistered)}"
+assert len(unregistered) == 124, f"expected 124 unregistered slots, found {len(unregistered)}"
 assert unregistered[0] == 309 and original_rvas[309] == 0xa505e0, (
     f"first unregistered slot changed: {unregistered[0]}/{original_rvas[unregistered[0]]:#x}")
 

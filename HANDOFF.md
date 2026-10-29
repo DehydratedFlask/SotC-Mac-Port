@@ -1,5 +1,81 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-28 (root) — M1–M6 startup-lane integration (validation complete; publication pending)
+
+- Task ID: `CPU-01-STARTUP-SLOT-LANES-M1-M6-INTEGRATE-01`. Bounded output: independently validate the lane artifacts, wire only verified recovered slots into `StartupState` and the constructor registry, preserve fail-closed skips, and run the required full verification/publication sequence.
+- Initial inspection: `git fetch origin main` exited 0. M1–M4 reports contain 38 slot-level fixture/static-analysis results; M5 verifies 9/10 and excludes 494; M6 verifies 5/10 and excludes 379, 448, 507, 518, and 539. Independent M1/M4 review confirmed the whitelist expansions against pinned table bodies.
+- Current observation: 52 verified rows are wired in `StartupState` and `recovered_constructors`; the explicit exclusions remain absent. Coverage is 449/573 with slot 309 first missing and 124 unregistered. Configure/build exited 0, CTest passed 483/483, and the complete lift checker sweep passed 568/568 with 0 skipped. Final staged-path audit passed 252 paths and final all-path audit passed 3,347 paths; attribution audit passed for `origin/main..HEAD`; project index wrote 43,004 folder entries. Trail's wiring graph is current at 10,719 nodes; `native/core/ctor_slot_359_785f60.cpp` is queryable. Private logs are under `local/validation/orch-20261028/CPU-01-STARTUP-SLOT-LANES-M1-M6-INTEGRATE-01/`.
+- Observations vs inference: the M6 lane report excludes slots 448, 507, and 539 and their source/test files are omitted from `native/lanes/m6.cmake`; the five verified M6 slots are the only M6 registration rows. Build and fixture/checker success establish these bounded native models only, not game behavior.
+- Remaining risks: staged path audit, final fetch/commit/push, and live-ref verification remain. Slots 309, 409, 414, 494, 379, 448, 507, 518, and 539 remain excluded. G1 and the game's boot/audio/save/Metal acceptance gates remain unverified.
+- Next exact action: stage only allowlisted verified integration files, keep unverified M6 448/507/539 model/test files unstaged, pass the staged/full path audits, commit as the owner, push fast-forward to `origin main`, and verify the fetched live ref.
+- Status: `ACTIVE / validation complete; publication pending`; attempt 4 passed its bounded validation; no fifth attempt is authorized or needed.
+
+## 2026-10-28 23:53 CDT (/root) — M1–M6 authorized attempt 4 validation complete
+
+- Task ID: `CPU-01-STARTUP-SLOT-LANES-M1-M6-INTEGRATE-01`.
+- Files changed: lane M1–M6 native models/tests/checkers and reports; shared float/int whitelists; `startup_ctors.{hpp,cpp}` and coverage fixtures; global registration checkers; `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/FOLDERS.md`, and the escalation record. The unverified M6 448/507/539 model/source and test files remain excluded from the lane target and will stay unstaged.
+- Exact commands/results: `cmake -S native -B local/build/orch-r22` exit 0 (`configure-final.log`); `cmake --build local/build/orch-r22 -j 12` exit 0 (`build-final.log`); `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure` exit 0, **483/483** (`ctest-final.log`); `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` exit 0, **568 passed / 0 skipped / 0 failed** (`checkers-final2.log`); `python3 -I scripts/audit_publish_paths.py` exit 0, **252 staged paths** (`audit-publish-staged-final.log`); `python3 -I scripts/audit_publish_paths.py --all` exit 0, **3,347 paths** (`audit-publish-all-final2.log`); `python3 -I scripts/check_commit_attribution.py` exit 0 (`attribution.log`); `python3 scripts/project_index.py` exit 0, 43,004 folder entries (`project-index-final.log`); `trail build --only-dir scripts --only-dir tools --only-dir reference --only-dir native --only-dir launcher --only-dir tests` exit 0, 10,719 nodes (`trail-build.log`); `trail build --check` exit 0, graph in sync (`trail-check-final.log`); `trail grep --fixed "ctor_slot_359_785f60" --in native` exit 0, three hits in the source/header/test (`trail-query-slot359.log`). Logs are under `local/validation/orch-20261028/CPU-01-STARTUP-SLOT-LANES-M1-M6-INTEGRATE-01/`.
+- Observations vs inference: the explicit registry list and tests establish 449/573 registered indices, first gap 309, 124 unregistered, and aggregate side-effect counts of 107 pending, 60 debug-menu, and 268 atexit entries. The fixture/checker evidence establishes these bounded native models only; it does not establish game boot, game audio, save/reload, or gameplay Metal behavior.
+- Remaining risks: staged-path audit, owner commit, fast-forward push, and fetched live-ref verification remain. Exclusions are 309, 379, 409, 414, 448, 494, 507, 518, and 539. No installation or dependency change.
+- Next exact action: stage the allowlisted verified files only, run staged and all-path audits, exact-range attribution-check the owner commit, push `origin main`, then fetch and compare live refs.
+- Status: `ACTIVE / validation complete; publication pending`; three failed tries are documented and the principal-authorized fourth attempt passed. No fifth attempt is authorized or needed.
+
+## 2026-10-28 23:39 CDT (/root) — M1–M6 integration attempt 1 (FAILED; correction in progress)
+
+- Task ID: `CPU-01-STARTUP-SLOT-LANES-M1-M6-INTEGRATE-01`.
+- Files changed: `startup_ctors.hpp/.cpp`, coverage test, shared float/int whitelists and associated tests, lane M1/M4 checkers and reports. Private logs are under `local/validation/orch-20261028/CPU-01-STARTUP-SLOT-LANES-M1-M6-INTEGRATE-01/`.
+- Exact commands/results: `cmake -S native -B local/build/orch-r22` exited 0; `cmake --build local/build/orch-r22 -j 12` exited 1. Evidence: `configure.log` and `build.log` in the private directory above.
+- Observation: the compile reports conflicting `kSlot535Rva`, `kSlot535Size`, `kSlot535MutexDtorRva`, and `kSlot535ObjectSize` definitions from the new M5 slot header and existing `ctor_tiny_misc_slots.hpp`. Compile errors also show rows inserted inside existing multiline lambdas at slots 378 and 394.
+- Inference: the row-merge script treated a multiline CtorSlot body as a one-line row, and the M5 module reused public constant names from an earlier fixture-only model. The compiler errors are direct evidence; the fix is to preserve complete C++ initializer blocks and give the M5 constants distinct names.
+- Remaining risk: no successful compilation or test result yet; do not count the 449 coverage expectation as verified until the native coverage executable passes.
+- Next exact action: regenerate `startup_ctors.hpp/.cpp` from clean `HEAD` because both were unmodified at task start; use brace-balanced row blocks, rename new M5 constants, then rebuild.
+- Status: `ACTIVE`; attempt 1 failed; total failed attempts 1.
+
+## 2026-10-28 23:42 CDT (/root) — M1–M6 integration attempt 2 (PARTIAL; aggregate assertions stale)
+
+- Task ID: `CPU-01-STARTUP-SLOT-LANES-M1-M6-INTEGRATE-01`.
+- Files changed since attempt 1: `startup_ctors.hpp/.cpp` rebuilt from `HEAD` with 53 lane headers, 53 in-place state members, and 52 complete sorted registration rows; M5 slot-535 constants renamed within the lane-owned header/source/test/checker. Configure/build/CTest logs are in `local/validation/orch-20261028/CPU-01-STARTUP-SLOT-LANES-M1-M6-INTEGRATE-01/`.
+- Exact commands/results: `cmake --build local/build/orch-r22 -j 12` exited 0 (`build-confirm.log` reports no work after completing all targets in `build-attempt2.log`); `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure` exited 8 with **481/483 passed** (`ctest.log`). The M1–M6 individual tests all passed.
+- Observations: registry compiles with all 52 selected rows and excluded slots absent; CTest failures are `test_startup_ctors.cpp:253` (expected-index array still has 397 entries) and `test_startup_ctor_coverage.cpp:119` (pending ConCmd total still expected 62). No evidence yet for the new pending/menu/atexit totals.
+- Inference: these two failures are stale aggregate fixtures caused by the new registrations; no lane-specific test failed. This does not yet establish the expected aggregate values or the full verification gates.
+- Remaining risks: other aggregate counts in the coverage test (debug menu and atexit) may also be stale; checker sweep and path/attribution audits remain NOT RUN; no runtime game gate is met.
+- Next exact action: merge the 52 independently verified indices into the hard-coded expected sequence, capture exact production aggregate counts, then run the final full validation attempt.
+- Status: `ACTIVE`; attempt 2 failed its CTest gate; total failed attempts 2.
+
+## 2026-10-28 23:44 CDT (/root) — M1–M6 integration attempt 3 (NEEDS_PRINCIPAL; reassessed)
+
+- Task ID: `CPU-01-STARTUP-SLOT-LANES-M1-M6-INTEGRATE-01`.
+- Files changed: added `docs/escalations/CPU-01-STARTUP-SLOT-LANES-M1-M6-INTEGRATE-01.md`; temporarily added a diagnostic line in `native/tests/test_startup_ctor_coverage.cpp`. No production model or registration changed in this attempt.
+- Exact command/result: `cmake --build local/build/orch-r22 -j 12 --target test_startup_ctor_coverage` exited 1; log `coverage-diagnostic-build.log`.
+- Observation: `-Werror=format` rejected `%zu` for `st.debug_menu.root.count` (`std::uint32_t`).
+- Inference: this is a temporary diagnostic formatter typo, not evidence against any lane or the registry. The earlier full build and all lane-specific tests passed; the remaining acceptance failures are the old aggregate fixture expectations.
+- Remaining risks: the exact pending/menu/atexit totals and checker sweep are still unknown.
+- Next exact action: apply only the scope documented in the escalation’s principal reassessment; after the one authorized fourth attempt, do not retry without a new owner assessment.
+- Status: `NEEDS_PRINCIPAL` after three unsuccessful tries; principal reassessment explicitly authorizes one bounded fourth attempt.
+
+## 2026-10-28 23:48 CDT (/root) — principal-authorized attempt 4, initial gates
+
+- Task ID: `CPU-01-STARTUP-SLOT-LANES-M1-M6-INTEGRATE-01`.
+- Files changed: `native/tests/test_startup_ctors.cpp` now names all 449 expected indices; `native/tests/test_startup_ctor_coverage.cpp` records observed totals 107 pending, 60 debug-menu entries, and 268 atexit records. The temporary print was removed. The slot-364 checker now points to the shared float header and the retained M1 menu helper.
+- Exact commands/results: `cmake -S native -B local/build/orch-r22` exit 0 (`configure-final.log`); `cmake --build local/build/orch-r22 -j 12` exit 0 (`build-final.log`); `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure` exit 0, **483/483** (`ctest-final.log`); `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` exit 1, **566 passed / 0 skipped / 2 failed** (`checkers-final.log`).
+- Observation: both failed scripts reject the verified 52 rows only because they still expect 397 registrations. The live registered set has 449 rows, first gap 309, 124 unregistered slots, and digest `383cae560dbbea3deab70292949dca6258fbb8b6284b9df8494b9604d908c3b4`.
+- Inference: this is stale checker metadata, not a lane-body mismatch; all other checker scripts passed in the full sweep.
+- Remaining risks: update/replay those two global row-set scripts, then run publication-path, attribution, project-index, and Trail checks. No game runtime acceptance has been demonstrated.
+- Next exact action: make the checker metadata updates allowed by the principal reassessment and rerun the complete checker sweep.
+- Status: `ACTIVE / principal reassessed`; attempt 4 in progress; no fifth attempt authorized.
+
+## 2026-10-28 (orchestrator, Claude session) — parallel slot-lift lanes m1-m6 (IN PROGRESS; NOT wired, NOT committed)
+
+- Direction reset: E884-E895 were publication-closeout loops with no gate movement, and slot 309 is a negative route. 175 other startup slots are unregistered and independent (survey: 5 under 200 B, 50 at 200-500 B, 40 at 500-1000 B). Work now is parallel slot lifting; slot 309 stays unregistered.
+- Added a per-lane CMake hook at the tail of `native/CMakeLists.txt` (`SOTC_LANES` cache glob over `native/lanes/*.cmake`) plus `native/lanes/README.md`. Workers build with `-DSOTC_LANES=<lane>` into `local/build/lane-<lane>`; default `*` includes all lanes. Configure of `local/build/orch-r22` passed.
+- Lane reports (each has an "Integrator wiring" section: includes, StartupState members, CtorSlot rows): `docs/checkpoints/2026-10-28-lane-m{1..6}-report.md`.
+- Root replay (checker exit 0, `--tamper` exit 1, lane CTest): **m1** 359 364 365 376 377 383 384 385 386 387 = 10/10; **m2** 389 393 403 407 413 415 419 421 = 8/8 (409 and 414 skipped: need unlifted 0x12820 allocator dispatcher and libkernel mutex wrapper 0x3b310; existing hooks stay); **m3** 426 436 439 440 441 456 457 458 459 461 = 10/10; **m4** 463 465 475 476 478 479 482 486 489 490 = 10/10. Total 38 slots STATIC_ANALYSIS_VERIFIED + FIXTURE_VERIFIED at lane level.
+- **m5** (491 492 494 499 502 509 516 535 540 543) and **m6** (544 557 558 559 569 448 379 518 507 539) were still running at this checkpoint: their files may be partially present in the tree and are UNREPLAYED. Treat as unverified until their reports exist and root replays pass.
+- Whitelist substitutions to resolve at wiring: slot 364 functor 0x15cd240 (shim `lane_m1::init_float_var_static_equiv`); slots 486/489 int arg tags 0x15a2248 / 0x159fae0 (surrogate 0x15ce8c0, `arg_tag_surrogated`). Add them to the shared whitelists and drop the shims. m2's 413/415 use `lane_m2_shapes` wrappers.
+- NOT RUN: wiring into `native/core/startup_ctors.{hpp,cpp}`, full build, full CTest (last known 431/431), `tools/lift/run_all_checkers.sh` (last known 516/0/0), `project_index.py`, path/attribution audits, `docs/TASKS.md` and `docs/EVIDENCE.md` updates, commit/push. Coverage is still 397/573 (first gap 309) until wiring. G1 stays PARTIAL; no boot/audio/save claim.
+- Next exact action: (1) confirm m5/m6 finished (check their reports) and replay their checkers/tests; (2) wire all verified slots into startup_ctors per the lane reports, resolving the whitelist items above; (3) run the full verification block from AGENTS.md; (4) update TASKS/EVIDENCE/FOLDERS, then commit allowlisted paths as the owner with no assistant trailer (repo policy overrides the harness attribution reminder), path-audit, push. Next waves: the 500-2000 B slots (e.g. 448 379 518 361 374 467 430 504 536 545 411 366 464 363 550 ...), then the large slots.
+- Task status: `ACTIVE`; 0 failed hypotheses.
+
 ## 2026-10-28 02:45 CDT (/root) — E895 E894 publication closeout (verified; no product gate advanced)
 
 - Completed `PUB-01-E894-PUBLISH-CLOSEOUT-01`: E894 commit `ce1ccda5a0b805043ce71a4aef1271a511ce2b39` was authored and committed by Johnny Wang `<dehydratedflask@users.noreply.github.com>`, passed `python3 -I scripts/check_commit_attribution.py --range HEAD^..HEAD`, and was pushed fast-forward to `origin main`.

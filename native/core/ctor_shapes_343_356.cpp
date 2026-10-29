@@ -15,7 +15,8 @@ constexpr std::uint64_t kBareRetDestroyFunctors[] = {
     kFloatArgFnVtbl_347,          // 0x15ce318
     kFloatArgFnVtbl_350,          // 0x15ce260
     kFloatArgFnVtbl_353B,         // 0x15ce1c0
-    kUnboundedFloatInitialFnVtbl  // 0x1596878 (the functor class 0x6aa00 stores first)
+    kUnboundedFloatInitialFnVtbl, // 0x1596878 (the functor class 0x6aa00 stores first)
+    kFloatArgFnVtblSlot364        // 0x15cd240 (slot-364 caller; its destroy slot is byte-pinned bare-ret)
 };
 
 // 0xc300 / 0x6aa00 tail: the argument copy and the functor clone/copy/copy/copy/swap sequence. Every

@@ -66,7 +66,8 @@ void section_worker() {
     const SharedStr name = view("n", 1);
     const SharedStr desc = view("", 0);
     // every lifted table ends with the 0x15944a0 tag; payload/aux come from the block
-    for (std::uint64_t table : {0x15ce8c0ull, 0x1595660ull, 0x15944a0ull}) {
+    for (std::uint64_t table : {0x15ce8c0ull, 0x1595660ull, 0x15944a0ull, kUnboundedIntFnTableSlot486,
+                                kUnboundedIntFnTableSlot489}) {
         ConCmdRangedVar v;
         poison(v);
         RangedVarArgs args{};

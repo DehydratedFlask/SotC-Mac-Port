@@ -320,6 +320,60 @@
 #include "ctor_slot_355_7946d0.hpp"
 #include "ctor_slot_356_78e2f0.hpp"
 
+#include "ctor_slot_359_785f60.hpp"
+#include "ctor_slot_364_74a8e0.hpp"
+#include "ctor_slot_365_747870.hpp"
+#include "ctor_slot_376_6e4930.hpp"
+#include "ctor_slot_377_6de050.hpp"
+#include "ctor_slot_383_6c62b0.hpp"
+#include "ctor_slot_384_6b9260.hpp"
+#include "ctor_slot_385_6b4cf0.hpp"
+#include "ctor_slot_386_6b12f0.hpp"
+#include "ctor_slot_387_6acf00.hpp"
+#include "ctor_slot_389_695a50.hpp"
+#include "ctor_slot_393_66cc00.hpp"
+#include "ctor_slot_403_5f0160.hpp"
+#include "ctor_slot_407_5d41c0.hpp"
+#include "ctor_slot_413_57c810.hpp"
+#include "ctor_slot_415_578b60.hpp"
+#include "ctor_slot_419_56fae0.hpp"
+#include "ctor_slot_421_56da20.hpp"
+#include "ctor_slot_426_53fb50.hpp"
+#include "ctor_slot_436_50dbe0.hpp"
+#include "ctor_slot_439_4f7b70.hpp"
+#include "ctor_slot_440_4f0c60.hpp"
+#include "ctor_slot_441_4e68c0.hpp"
+#include "ctor_slot_456_471950.hpp"
+#include "ctor_slot_457_45c440.hpp"
+#include "ctor_slot_458_45ace0.hpp"
+#include "ctor_slot_459_43f460.hpp"
+#include "ctor_slot_461_419480.hpp"
+#include "ctor_slot_463_3e0040.hpp"
+#include "ctor_slot_465_3cc9e0.hpp"
+#include "ctor_slot_475_33cc60.hpp"
+#include "ctor_slot_476_329650.hpp"
+#include "ctor_slot_478_31eb00.hpp"
+#include "ctor_slot_479_31b660.hpp"
+#include "ctor_slot_482_2fb2a0.hpp"
+#include "ctor_slot_486_2d5e00.hpp"
+#include "ctor_slot_489_2acc10.hpp"
+#include "ctor_slot_490_296d90.hpp"
+#include "lane_m5_app_entry.hpp"
+#include "ctor_slot_491_295f90.hpp"
+#include "ctor_slot_492_278640.hpp"
+#include "ctor_slot_499_2500e0.hpp"
+#include "ctor_slot_502_249270.hpp"
+#include "ctor_slot_509_2196f0.hpp"
+#include "ctor_slot_516_1b97b0.hpp"
+#include "ctor_slot_535_138e20.hpp"
+#include "ctor_slot_540_10e390.hpp"
+#include "ctor_slot_543_fae50.hpp"
+#include "ctor_slot_544_d1b20.hpp"
+#include "ctor_slot_557_47490.hpp"
+#include "ctor_slot_558_428a0.hpp"
+#include "ctor_slot_559_3f2d0.hpp"
+#include "ctor_slot_569_1cc80.hpp"
+
 namespace sotc {
 
 // Native objects standing in for the original globals the recovered constructors write.
@@ -667,6 +721,60 @@ struct StartupState {
     Leaf163a40 leaf_163a40{};  // idx 526 / 0x163a40
     Leaf99350 leaf_99350{};  // idx 548 / 0x99350
     Leaf99350Inputs leaf_99350_inputs{};  // idx 548 runtime inputs (original cells 0x2dd9fa8 / 0x2dd9f84; producer not recovered)
+
+    Slot359Objects slot359{}; Slot359Result slot359_result{};
+    Slot364Objects slot364{}; Slot364Result slot364_result{};
+    Slot365Objects slot365{}; Slot365Result slot365_result{};
+    Slot376Objects slot376{}; Slot376Result slot376_result{};
+    Slot377Objects slot377{}; Slot377Result slot377_result{};
+    Slot383Objects slot383{}; Slot383Result slot383_result{};
+    Slot384Objects slot384{}; Slot384Result slot384_result{};
+    Slot385Objects slot385{}; Slot385Result slot385_result{};
+    Slot386Objects slot386{}; Slot386Result slot386_result{};
+    Slot387Objects slot387{}; Slot387Result slot387_result{};
+    Slot389Objects slot389{}; Slot389Result slot389_result{};
+    Slot393Objects slot393{}; Slot393Result slot393_result{};
+    Slot403Objects slot403{}; Slot403Result slot403_result{};
+    Slot407Objects slot407{}; Slot407Result slot407_result{};
+    Slot413Objects slot413{}; Slot413Result slot413_result{};
+    Slot415Objects slot415{}; Slot415Result slot415_result{};
+    Slot419Objects slot419{}; Slot419Result slot419_result{};
+    Slot421Objects slot421{}; Slot421Result slot421_result{};
+    Slot426Objects slot426{}; Slot426Result slot426_result{};
+    Slot436Objects slot436{}; Slot436Result slot436_result{};
+    Slot439Objects slot439{}; Slot439Result slot439_result{};
+    Slot440Objects slot440{}; Slot440Result slot440_result{};
+    Slot441Objects slot441{}; Slot441Result slot441_result{};
+    Slot456Objects slot456{}; Slot456Result slot456_result{};
+    Slot457Objects slot457{}; Slot457Result slot457_result{};
+    Slot458Objects slot458{}; Slot458Result slot458_result{};
+    Slot459Objects slot459{}; Slot459Result slot459_result{};
+    Slot461Objects slot461{}; Slot461Result slot461_result{};
+    Slot463Objects slot463{}; Slot463Result slot463_result{};
+    Slot465Objects slot465{}; Slot465Result slot465_result{};
+    Slot475Objects slot475{}; Slot475Result slot475_result{};
+    Slot476Objects slot476{}; Slot476Result slot476_result{};
+    Slot478Objects slot478{}; Slot478Result slot478_result{};
+    Slot479Objects slot479{}; Slot479Result slot479_result{};
+    Slot482Objects slot482{}; Slot482Result slot482_result{};
+    Slot486Objects slot486{}; Slot486Result slot486_result{};
+    Slot489Objects slot489{}; Slot489Result slot489_result{};
+    Slot490Objects slot490{}; Slot490Result slot490_result{};
+    lane_m5::AppInfoQueue app_info_queue{};
+    Slot491Objects slot491{}; bool slot491_ok{false};
+    Slot492Objects slot492{}; Slot492Result slot492_result{};
+    Slot499Objects slot499{}; Slot499Result slot499_result{};
+    Slot502Objects slot502{}; Slot502Result slot502_result{};
+    Slot509Objects slot509{}; Slot509Result slot509_result{};
+    Slot516Objects slot516{}; Slot516Result slot516_result{};
+    Slot535Objects slot535{}; Slot535Result slot535_result{};
+    Slot540Objects slot540{}; Slot540Result slot540_result{};
+    Slot543Objects slot543{}; Slot543Result slot543_result{};
+    Slot544Objects slot544{}; Slot544Result slot544_result{};
+    Slot557Objects slot557{}; Slot557Result slot557_result{};
+    Slot558Objects slot558{}; Slot558Result slot558_result{};
+    Slot559Objects slot559{}; Slot559Result slot559_result{};
+    Slot569Objects slot569{}; Slot569Result slot569_result{};
 
     std::array<std::byte, kScratchBytes> scratch{};
     std::atomic<std::uint64_t> scratch_slot{0};

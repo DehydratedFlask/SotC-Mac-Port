@@ -21,7 +21,7 @@ SharedStr borrowed(const char* t) {
 
 void section_functors() {
     for (std::uint64_t v : {0x15d57e0ull, 0x1594318ull, 0x15d2040ull, 0x15ce318ull, 0x15ce260ull, 0x15ce1c0ull,
-                            0x1596878ull}) {
+                            0x1596878ull, kFloatArgFnVtblSlot364}) {
         CHECK(is_known_float_arg_functor(v));
     }
     CHECK(!is_known_float_arg_functor(0) && !is_known_float_arg_functor(0x15ce1a0) /* a BOOL functor */ &&

@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+"""ELF byte-oracle for startup constructor slot 540 (RVA 0x10e390, 488 bytes), lane M5.
+
+Ten particle-group records (id 0x24) via 0xc1c70, rand() -> 0x158340 cell, showParticle_Errors name object (atexit 0x8ef00), list sentinel (atexit 0x101ea0).
+
+Offline only: reads the pinned private ELF (local/re/eboot.elf), never loads, relocates or executes an
+original RVA. Pins: constructor-table word, whole-body sha256 and extent, every rip-relative operand, call
+target, immediate store and indirect call of the body (generated once from the disassembly, re-verified here
+from bytes), the referenced strings and the hash of every shared callee. A mutation self-test flips the
+first/last byte of every pin and perturbs every native token; each mutant must be rejected.
+"""
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import lane_m5_check as lib  # noqa: E402
+
+SPEC = {
+    "slot": 540,
+    "base": 0x10e390,
+    "size": 488,
+    "body_sha256": "e575e67b399cc4fe043bcae039747addf3d038e4e0f402946fb6d56d1a2770ad",
+    "pad": "9090909090909090",
+    "callees": ['entry_writer_c1c70', 'store_value_clear_158340', 'name_object_dtor_8ef00', 'list_free_101ea0', 'release_f590'],
+    "bool_tags": [],
+    "float_tags": [],
+    "strings": [
+        (0xfa5328, b'ParticleGroup_Normal'),
+        (0xfa533d, b'ParticleGroup_UltraLowRes'),
+        (0xfa5357, b'ParticleGroup_BelowWater'),
+        (0xfa5370, b'ParticleGroup_Distortion'),
+        (0xfa5389, b'ParticleGroup_Fog'),
+        (0xfa539b, b'ParticleGroup_WaterDisplace'),
+        (0xfa53b7, b'ParticleGroup_WaterDisplace_Micro'),
+        (0xfa53d9, b'ParticleGroup_GroundDisplace'),
+        (0xfa53f6, b'ParticleGroup_RainDisplace'),
+        (0xfa5411, b'ParticleGroup_ScreenOverlay'),
+        (0xfa542d, b'showParticle_Errors'),
+    ],
+    "lengths": [
+        ('showParticle_Errors', 0x10e4d9, "48c745c813000000"),
+    ],
+    "pins": [
+        ("rip", 0x10e39d, 7, 3, 0x15fe518),
+        ("rip", 0x10e3a4, 7, 3, 0x2edef70),
+        ("rip", 0x10e3ab, 7, 3, 0xfa5328),
+        ("imm", 0x10e3b2, "be24000000"),
+        ("call", 0x10e3be, 0xc1c70),
+        ("rip", 0x10e3c3, 7, 3, 0x2edef80),
+        ("rip", 0x10e3ca, 7, 3, 0xfa533d),
+        ("imm", 0x10e3d1, "be24000000"),
+        ("call", 0x10e3d6, 0xc1c70),
+        ("rip", 0x10e3db, 7, 3, 0x2edef90),
+        ("rip", 0x10e3e2, 7, 3, 0xfa5357),
+        ("imm", 0x10e3e9, "be24000000"),
+        ("call", 0x10e3ee, 0xc1c70),
+        ("rip", 0x10e3f3, 7, 3, 0x2edefa0),
+        ("rip", 0x10e3fa, 7, 3, 0xfa5370),
+        ("imm", 0x10e401, "be24000000"),
+        ("call", 0x10e406, 0xc1c70),
+        ("rip", 0x10e40b, 7, 3, 0x2edefb0),
+        ("rip", 0x10e412, 7, 3, 0xfa5389),
+        ("imm", 0x10e419, "be24000000"),
+        ("call", 0x10e41e, 0xc1c70),
+        ("rip", 0x10e423, 7, 3, 0x2edefc0),
+        ("rip", 0x10e42a, 7, 3, 0xfa539b),
+        ("imm", 0x10e431, "be24000000"),
+        ("call", 0x10e436, 0xc1c70),
+        ("rip", 0x10e43b, 7, 3, 0x2edefd0),
+        ("rip", 0x10e442, 7, 3, 0xfa53b7),
+        ("imm", 0x10e449, "be24000000"),
+        ("call", 0x10e44e, 0xc1c70),
+        ("rip", 0x10e453, 7, 3, 0x2edefe0),
+        ("rip", 0x10e45a, 7, 3, 0xfa53d9),
+        ("imm", 0x10e461, "be24000000"),
+        ("call", 0x10e466, 0xc1c70),
+        ("rip", 0x10e46b, 7, 3, 0x2edeff0),
+        ("rip", 0x10e472, 7, 3, 0xfa53f6),
+        ("imm", 0x10e479, "be24000000"),
+        ("call", 0x10e47e, 0xc1c70),
+        ("rip", 0x10e483, 7, 3, 0x2edf000),
+        ("rip", 0x10e48a, 7, 3, 0xfa5411),
+        ("imm", 0x10e491, "be24000000"),
+        ("call", 0x10e496, 0xc1c70),
+        ("call", 0x10e49b, 0xf90130),
+        ("rip", 0x10e4a0, 7, 3, 0x2edf010),
+        ("call", 0x10e4a9, 0x158340),
+        ("rip", 0x10e4ae, 7, 3, 0x15976a0),
+        ("rip", 0x10e4b5, 7, 3, 0xfa542d),
+        ("rip", 0x10e4c4, 7, 3, 0x2edf018),
+        ("imm", 0x10e4d4, "b813000000"),
+        ("imm", 0x10e4d9, "48c745c813000000"),
+        ("rip", 0x10e4ef, 8, 4, 0x2edf020),
+        ("rip", 0x10e4f7, 8, 4, 0x2edf030),
+        ("rip", 0x10e4ff, 11, 3, 0x2edf040),
+        ("imm", 0x10e50a, "4883c110"),
+        ("rip", 0x10e50e, 7, 3, 0x2edf018),
+        ("call", 0x10e515, 0xf590),
+        ("rip", 0x10e51a, 7, 3, 0x1604218),
+        ("rip", 0x10e521, 7, 3, 0x8ef00),
+        ("call", 0x10e52e, 0xf8f390),
+        ("rip", 0x10e533, 7, 3, 0x2edf048),
+        ("rip", 0x10e53a, 7, 3, 0x101ea0),
+        ("imm", 0x10e549, "48c7461000000000"),
+        ("call", 0x10e55a, 0xf8f390),
+        ("imm", 0x10e568, "4883c428"),
+        ("call", 0x10e573, 0xf8f3a0),
+    ],
+    "elf_extra": [lib.name_object_extra],
+    "native": {'header': 'native/core/ctor_slot_540_10e390.hpp',
+     'source': 'native/core/ctor_slot_540_10e390.cpp',
+     'test': 'native/tests/test_ctor_slot_540.cpp',
+     'cmake': 'native/lanes/m5.cmake',
+     'consts': {'kSlot540Rva': 1106832,
+                'kSlot540Size': 488,
+                'kSlot540TableRva': 49147760,
+                'kSlot540EntryId': 36,
+                'kSlot540RandCellRva': 49147920,
+                'kSlot540NameObjectRva': 49147928,
+                'kSlot540SentinelRva': 49147976,
+                'kSlot540NameVptr': 22640304,
+                'kSlot540NameDtorRva': 585472,
+                'kSlot540SentinelDtorRva': 1056416},
+     'header_tokens': [],
+     'source_order': ['set_entry(objects.entries[k], kSlot540EntryId, names[k])',
+                      'store_value_clear_flag_158340(objects.rand_cell, out.rand_value)',
+                      'objects.name_object.vptr = kSlot540NameVptr',
+                      'release_inert_view_f590(view)',
+                      'log.record(kSlot540NameDtorRva, &objects.name_object)',
+                      'objects.sentinel.next = &objects.sentinel',
+                      'log.record(kSlot540SentinelDtorRva, &objects.sentinel)'],
+     'test_tokens': ['kSlot540Rva == 0x10e390', 'section_alone()', 'section_rand_sources()'],
+     'cmake_tokens': ['core/ctor_slot_540_10e390.cpp',
+                      'add_executable(test_ctor_slot_540 tests/test_ctor_slot_540.cpp)',
+                      'add_test(NAME ctor_slot_540 COMMAND test_ctor_slot_540)']},
+}
+
+
+if __name__ == "__main__":
+    raise SystemExit(lib.main(SPEC, 'Ten particle-group records (id 0x24) via 0xc1c70, rand() -> 0x158340 cell, showParticle_Errors name object (atexit 0x8ef00), list sentinel (atexit 0x101ea0).'))

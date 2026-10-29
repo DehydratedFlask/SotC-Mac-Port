@@ -1,0 +1,15 @@
+#include "ctor_slot_439_4f7b70.hpp"
+
+namespace sotc {
+
+Slot439Result init_slot439_4f7b70(Slot439Objects& objects, ConCmdRegistry& concmd,
+                         DebugMenuRegistry& menu) noexcept {
+    Slot439Result out{};
+    out.var = init_bool_var_site(objects.var, kSlot439VarName, kSlot439FnTag, concmd, 0, 0);
+    if (!out.var.ok) return out;
+    out.item = init_toggle_site_26db0(objects.item, objects.var, kSlot439Parent, concmd, menu);
+    out.ok = out.var.ok && out.item.ok;
+    return out;
+}
+
+}  // namespace sotc

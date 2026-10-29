@@ -18,9 +18,9 @@
 //        functor vtable it stores first is 0x1596878 (whose four slots are the float-functor bodies
 //        0xc4a0/0xc4c0/0xc4e0/0xc4f0), and the three functor calls leave [this+0xc0] = 0x1594318, exactly
 //        as at 0xc300. this=rdi, name=rsi, value_ref=rdx, flags=ecx, args=r8, description=r9.
-//   * the float functor vtables 0x15ce318 / 0x15ce260 / 0x15ce1c0 (the caller argument functors of
-//        slots 347 / 350 / 353) have the same four slot bodies as 0x15d57e0 / 0x15d2040 / 0x1594318,
-//        so the 0xc300 / 0x6aa00 functor sequence is reproduced exactly (checker-pinned).
+//   * the float functor vtables 0x15ce318 / 0x15ce260 / 0x15ce1c0 / 0x15cd240 (the caller argument
+//        functors of slots 347 / 350 / 353 / 364) have the same four slot bodies as the lifted float
+//        tables, so the 0xc300 / 0x6aa00 functor sequence is reproduced exactly (checker-pinned).
 //   * 0x26db0 (0xef B)  debug-menu toggle constructor that takes its CAPTION from the target variable:
 //        this=rdi, parent=rsi (a SharedStr view), target=rdx (a ConCmd variable), flags=ecx. View A
 //        (+0x28) = *parent (+ lock inc ctl), kind = 2, view B (+0x50) = target->name (+0x20, +lock inc
@@ -44,11 +44,12 @@
 namespace sotc {
 
 // ---- float functor identity ----------------------------------------------------------------------------
-// Caller argument functors of the L4 float sites. Their clone/copy/move/destroy slots are the float
+// Caller argument functors of the lifted float sites. Their clone/copy/move/destroy slots are the float
 // functor bodies, so the object's final functor vtable is 0x1594318 for every one of them.
 inline constexpr std::uint64_t kFloatArgFnVtbl_347 = 0x15ce318;
 inline constexpr std::uint64_t kFloatArgFnVtbl_350 = 0x15ce260;
 inline constexpr std::uint64_t kFloatArgFnVtbl_353B = 0x15ce1c0;
+inline constexpr std::uint64_t kFloatArgFnVtblSlot364 = 0x15cd240;  // slot-364 caller; byte-pinned to the same four bodies
 
 inline constexpr std::uint64_t kUnboundedFloatCtorRva = 0x6aa00;
 inline constexpr std::size_t kUnboundedFloatCtorSize = 0x142;

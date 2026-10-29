@@ -278,10 +278,12 @@ inline constexpr std::uint64_t kUnboundedIntFinalVptr = 0x1594c08;        // tab
 inline constexpr std::uint64_t kUnboundedIntSeedFnTable = 0x1595660;      // +0xc0 before the functor install
 inline constexpr std::uint64_t kUnboundedIntFnTable = 0x15944a0;          // +0xc0 after the install (copy/clone body)
 inline constexpr std::uint64_t kUnboundedIntFnTableB = 0x15ce8c0;         // second lifted table (slot 334's argument)
+inline constexpr std::uint64_t kUnboundedIntFnTableSlot486 = 0x15a2248;   // four slots byte-pinned in lane M4
+inline constexpr std::uint64_t kUnboundedIntFnTableSlot489 = 0x159fae0;   // four slots byte-pinned in lane M4
 inline constexpr std::uint32_t kUnboundedIntSlot3Result = 1;              // 0xbf70: mov eax,1; ret
 inline constexpr std::uint32_t kUnboundedIntSlot6Result = 2;              // 0xbfc0: mov eax,2; ret
 
-// The three tables whose four slot bodies (0xc720 / 0xc740 / 0xc760 / 0xc770) are lifted.
+// The five tables whose four slot bodies (0xc720 / 0xc740 / 0xc760 / 0xc770) are lifted.
 [[nodiscard]] bool unbounded_int_fn_table_lifted(std::uint64_t table) noexcept;
 
 // 0x3a980 (this=rdi, name=rsi, value cell=this+0xd0, flags=ecx, block=r8, description=r9). Leaves the

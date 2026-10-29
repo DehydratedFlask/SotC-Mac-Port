@@ -42,7 +42,7 @@ int main() {
     CHECK(result.blocked_on_rva == 0);
     CHECK(!st.init_failed);
     CHECK(result.completed == slots.size());
-    CHECK(slots.size() == 397);
+    CHECK(slots.size() == 449);
 
     // Every registered row is in original order and pairs with the pinned table.
     for (std::size_t i = 0; i < slots.size(); ++i) {
@@ -55,7 +55,7 @@ int main() {
     // ---- explicit, machine-checked gap ---------------------------------------
     CHECK(first_unrecovered_constructor_index() == 309);
     CHECK(first_unrecovered_constructor_rva() == 0xa505e0);
-    CHECK(slots.size() + 176 == kOriginalCtorCount);
+    CHECK(slots.size() + 124 == kOriginalCtorCount);
 
     // ---- CPU-01-STARTUP-LEAF-ROWS-315-560-01 -------------------------------
     CHECK(st.slot315_cell == 0);
@@ -116,10 +116,10 @@ int main() {
     CHECK(st.slot303.var.default_value == 0 && st.slot303.var.fn_vptr == 0x15d2478);
     CHECK(st.slot303.item.target == &st.slot303.var && st.slot303.item.flags == 0x30);
     CHECK(st.concmd.manager.manager == nullptr);
-    CHECK(st.concmd.pending.size() == 62);                       // observed after the 2026-10-26 lanes: 27 through slot 306 + 35 from 307-356
+    CHECK(st.concmd.pending.size() == 107);                      // observed: 27 through 306 + 35 from 307-356 + 45 from M1-M6
     CHECK(st.concmd.pending.first() == &st.slot298_shader_type.base.pending);
-    CHECK(st.debug_menu.root.count == 50);                       // observed: 26 through slot 306 + 24 from the later lanes
-    CHECK(st.concmd.atexit_log.size() == 188);                   // observed: 65 through slot 306 + 123 from the later lanes
+    CHECK(st.debug_menu.root.count == 60);                      // observed: 26 through 306 + 24 from 307-356 + 10 from M1-M6
+    CHECK(st.concmd.atexit_log.size() == 268);                  // observed: 65 through 306 + 123 from 307-356 + 80 from M1-M6
     for (std::size_t i = 0; i < kSlot302HandleCount; ++i) {
         CHECK(st.slot302.handles[i] == nullptr);
         CHECK(st.concmd.atexit_log.at(7 + i).dtor_rva == kSlot302DtorRva);

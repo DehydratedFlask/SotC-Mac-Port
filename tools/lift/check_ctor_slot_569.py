@@ -1,0 +1,162 @@
+#!/usr/bin/env python3
+"""ELF byte-oracle for startup constructor slot 569 (RVA 0x1cc80, 491 bytes), lane M6.
+
+An atomically zeroed qword cell (xchg), the ranged INT console variable `mem_platformMemVerify` (0xc580, min 0,
+max 2, flags 1, caller functor tag 0x1594c70, atexit 0x18a60) and the debug-menu toggle `Memory` / `PS4 Platform
+MemVerify (0=off)` targeting it (flags 0x30, atexit 0x272d0).
+
+Offline only: reads the pinned private ELF (local/re/eboot.elf), never loads, relocates or executes an
+original RVA. Pins: constructor-table word, whole-body sha256 and extent, every instruction operand of the
+body (rip-relative targets, call/jmp targets, immediates, indirect calls; generated once from the
+disassembly, re-verified here from bytes), the referenced strings, the functor vtables and the hash of
+every shared callee / destructor. A mutation self-test flips the first/last byte of every pin and
+perturbs every native token; each mutant must be rejected.
+"""
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import lane_m6_lib as lib  # noqa: E402
+
+SPEC = {
+    "slot": 569,
+    "base": 0x1cc80,
+    "size": 491,
+    "body_sha256": "5efb1e08c330f3c239300985152bfbd1e82d045e1d93cea59fda2519bdf1b973",
+    "pad": "9090909090",
+    "callees": ['concmd_register', 'release_f590', 'menu_toggle_ctor', 'menu_item_dtor'],
+    "bool_tags": [],
+    "float_tags": [],
+    "strings": [
+        (0xf94e90, b'mem_platformMemVerify'),
+        (0xf95291, b''),
+        (0xf94ea6, b'Memory'),
+        (0xf94ead, b'PS4 Platform MemVerify (0=off)'),
+    ],
+    "lengths": [
+    ],
+    "pins": [
+        ("imm", 0x1cc81, "4889e5"),
+        ("imm", 0x1cc8d, "4883e4e0"),
+        ("imm", 0x1cc91, "4881ece0000000"),
+        ("rip", 0x1cc98, 7, 3, 0x15fe518),
+        ("imm", 0x1cc9f, "4c8d642420"),
+        ("rip", 0x1cca4, 7, 3, 0xf94e90),
+        ("imm", 0x1ccab, "31f6"),
+        ("imm", 0x1ccad, "4c89e7"),
+        ("imm", 0x1ccb0, "488b00"),
+        ("imm", 0x1ccb3, "48898424c0000000"),
+        ("imm", 0x1ccbb, "31c0"),
+        ("rip", 0x1ccbd, 7, 3, 0x2dfc8a0),
+        ("call", 0x1ccc4, 0xf2f0),
+        ("rip", 0x1ccc9, 7, 3, 0x1594bf8),
+        ("imm", 0x1ccd0, "c5fc57c0"),
+        ("rip", 0x1ccd4, 7, 3, 0x1594c70),
+        ("rip", 0x1ccdb, 7, 3, 0x2dfc8b0),
+        ("imm", 0x1cce2, "48c784249000000000000000"),
+        ("imm", 0x1ccee, "c744241c00000000"),
+        ("imm", 0x1ccf6, "c744241802000000"),
+        ("imm", 0x1ccfe, "4c8dbc2480000000"),
+        ("imm", 0x1cd06, "4c8d6c2440"),
+        ("rip", 0x1cd0b, 7, 3, 0x2dfc980),
+        ("imm", 0x1cd12, "488d4c241c"),
+        ("imm", 0x1cd17, "4c8d442418"),
+        ("imm", 0x1cd1c, "41b901000000"),
+        ("imm", 0x1cd22, "4c89e6"),
+        ("imm", 0x1cd25, "c5fc11442460"),
+        ("imm", 0x1cd2b, "48898424a0000000"),
+        ("rip", 0x1cd33, 7, 3, 0xf95291),
+        ("imm", 0x1cd3a, "c5f857c0"),
+        ("imm", 0x1cd3e, "48c78424a800000000000000"),
+        ("imm", 0x1cd4a, "4c89f7"),
+        ("imm", 0x1cd4d, "4889442440"),
+        ("imm", 0x1cd52, "c5f811442448"),
+        ("imm", 0x1cd58, "48c744245800000000"),
+        ("imm", 0x1cd61, "488d442460"),
+        ("imm", 0x1cd66, "4883c310"),
+        ("rip", 0x1cd6a, 7, 3, 0x2dfc8b0),
+        ("call", 0x1cd74, 0xc580),
+        ("imm", 0x1cd79, "4883c410"),
+        ("imm", 0x1cd7d, "4c89ef"),
+        ("call", 0x1cd80, 0xf590),
+        ("imm", 0x1cd85, "488b8424a0000000"),
+        ("imm", 0x1cd8d, "4c89ff"),
+        ("imm", 0x1cd90, "ff5018"),
+        ("imm", 0x1cd93, "4c89f7"),
+        ("rip", 0x1cd96, 7, 3, 0x2dfc8b0),
+        ("rip", 0x1cd9d, 10, 2, 0x2dfc980),
+        ("imm", 0x1cda3, "00000000"),
+        ("rip", 0x1cda7, 10, 2, 0x2dfc918),
+        ("imm", 0x1cdad, "00000000"),
+        ("call", 0x1cdb1, 0x20d60),
+        ("imm", 0x1cdb6, "4c89e7"),
+        ("call", 0x1cdb9, 0xf590),
+        ("rip", 0x1cdbe, 7, 3, 0x1604218),
+        ("rip", 0x1cdc5, 7, 3, 0x18a60),
+        ("imm", 0x1cdcc, "4c89f6"),
+        ("imm", 0x1cdcf, "4c89fa"),
+        ("call", 0x1cdd2, 0xf8f390),
+        ("imm", 0x1cdd7, "4c8d642460"),
+        ("rip", 0x1cddc, 7, 3, 0xf94ea6),
+        ("imm", 0x1cde3, "31f6"),
+        ("imm", 0x1cde5, "4c89e7"),
+        ("call", 0x1cde8, 0xf2f0),
+        ("imm", 0x1cded, "488d5c2440"),
+        ("rip", 0x1cdf2, 7, 3, 0xf94ead),
+        ("imm", 0x1cdf9, "31f6"),
+        ("imm", 0x1cdfb, "4889df"),
+        ("call", 0x1cdfe, 0xf2f0),
+        ("rip", 0x1ce03, 7, 3, 0x2dfc988),
+        ("imm", 0x1ce0a, "41b830000000"),
+        ("imm", 0x1ce10, "4c89e6"),
+        ("imm", 0x1ce13, "4889da"),
+        ("imm", 0x1ce16, "4c89f1"),
+        ("imm", 0x1ce19, "4c89ef"),
+        ("call", 0x1ce1c, 0x26ea0),
+        ("imm", 0x1ce21, "4889df"),
+        ("call", 0x1ce24, 0xf590),
+        ("imm", 0x1ce29, "4c89e7"),
+        ("call", 0x1ce2c, 0xf590),
+        ("rip", 0x1ce31, 7, 3, 0x272d0),
+        ("imm", 0x1ce38, "4c89ee"),
+        ("imm", 0x1ce3b, "4c89fa"),
+        ("call", 0x1ce3e, 0xf8f390),
+        ("rip", 0x1ce43, 7, 3, 0x15fe518),
+        ("imm", 0x1ce4a, "488b00"),
+        ("imm", 0x1ce4d, "483b8424c0000000"),
+        ("imm", 0x1ce55, "750f"),
+        ("imm", 0x1ce57, "488d65d8"),
+        ("call", 0x1ce66, 0xf8f3a0),
+    ],
+    "m6_callees": {
+        "ranged_int_ctor_c580": (0xc580, 0x15f, "a93bc0f34cfd49fbbcbc7f2186b2668de6e49f5f54012caafca7f17dfb396bce"),
+        "int_fn_copy_c720": (0xc720, 0x14, "5b63116e7f29674de81acb2a9317619a1c1dcbdbc53f98785a3029c04aa7a914"),
+        "int_fn_clone_c740": (0xc740, 0x14, "3b5a8a9fd4b3e15b1f5f14f73127ac98c5becb3a88fd096f8ccfb2015e991593"),
+        "int_fn_move_c760": (0xc760, 0x9, "547772c99434936d33353159cfc12801b74a62a235674217d91aa61cc05467bd"),
+        "int_fn_destroy_c770": (0xc770, 0x1, "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e"),
+        "int_dtor_18a60": (0x18a60, 0x8244, "cf32afffc28d1672c3834b33197bdbea82df76e27cbadf447dd5d9fc78a60a4c"),
+        "int_slot3_bf70": (0xbf70, 0x6, "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67"),
+        "int_slot6_bfc0": (0xbfc0, 0x6, "7140f35dee6220b79b12aecc27acf5105bf3b77d1588e89fce345de7c16c72b7"),
+    },
+    "m6_extras": ['int_site', 'toggle_gate'],
+    "m6_int_tags": [0x1594c70],
+    "native": {
+        'header': 'native/core/ctor_slot_569_1cc80.hpp',
+        'source': 'native/core/ctor_slot_569_1cc80.cpp',
+        'test': 'native/tests/test_ctor_slot_569.cpp',
+        'cmake': 'native/lanes/m6.cmake',
+        'consts': {'kSlot569Rva': 117888, 'kSlot569Size': 491, 'kSlot569IntFnTag': 22629488, 'kSlot569VarNameLength': 21, 'kSlot569Min': 0, 'kSlot569Max': 2},
+        'header_tokens': ['kSlot569MenuLabel[] = "Memory"', 'kSlot569MenuText[] = "PS4 Platform MemVerify (0=off)"'],
+        'source_order': ['std::atomic_ref<std::uint64_t>(objects.cell).store(0, std::memory_order_seq_cst)', 'lane_m6::init_int_var_site(objects.var, spec, concmd)', 'lane_m6::init_toggle_site_target(objects.item, ranged_int_c580_menu_target(objects.var),'],
+        'test_tokens': ['kSlot569Rva == 0x1cc80', 'section_alone()', 'section_tag_refusal()', 'check_atexit(creg, 1, 0x27280, &menu.root)'],
+        'cmake_tokens': ['core/ctor_slot_569_1cc80.cpp', 'add_executable(test_ctor_slot_569 tests/test_ctor_slot_569.cpp)', 'add_test(NAME ctor_slot_569 COMMAND test_ctor_slot_569)'],
+        'shapes_h': 'native/core/lane_m6_shapes.hpp',
+        'shapes_c': 'native/core/lane_m6_shapes.cpp',
+        'shapes_tokens': ['args.fn_vptr = kRangedIntFnVtbl;', 'registry.atexit_log.record(kRangedIntDtorRva, &var)', 'registry.atexit_log.record(kDebugMenuItemDtorRva, &item)'],
+    },
+}
+
+
+if __name__ == "__main__":
+    raise SystemExit(lib.main(SPEC, 'atomic zero cell + ranged int var mem_platformMemVerify (0..2, tag 0x1594c70) + debug-menu toggle'))

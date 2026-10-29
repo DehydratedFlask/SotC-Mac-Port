@@ -2313,3 +2313,11 @@ target_sources(sotc_core PRIVATE core/string_var_257a0.cpp core/ctor_slot_310_a4
 add_executable(test_ctor_slot_310 tests/test_ctor_slot_310.cpp)
 target_link_libraries(test_ctor_slot_310 sotc_core)
 add_test(NAME ctor_slot_310 COMMAND test_ctor_slot_310)
+
+# Parallel-lane fragments: native/lanes/<lane>.cmake. Workers configure with -DSOTC_LANES=<lane>
+# to build only their own fragment; the integrator configures with the default "*" (all lanes).
+set(SOTC_LANES "*" CACHE STRING "Lane fragment glob under native/lanes (without .cmake)")
+file(GLOB SOTC_LANE_FRAGMENTS CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/lanes/${SOTC_LANES}.cmake")
+foreach(sotc_lane_fragment IN LISTS SOTC_LANE_FRAGMENTS)
+  include("${sotc_lane_fragment}")
+endforeach()
