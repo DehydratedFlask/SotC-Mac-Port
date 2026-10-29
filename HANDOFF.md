@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 04:52 CDT (/root) — E939 claim `SRV-01-ALLOCATOR-IMPORT-3B570-01` (ACTIVE)
+
+- Bounded output: resolve the import identity behind Bucket deallocator thunk `0x3b570` via RELRO slot `0x1600300`; tie thunk bytes, relocation target, import symbol/NID/library/module and the pinned ELF together. Static identity only; no runtime loader address, code lift, wiring or execution.
+- Prerequisites/spec: E937 (`SRV-01-ALLOCATOR-BUCKET-CALLEES-17E90-01`), RE-02, `RE-02-DYNLINK-01`, and [`docs/REVERSE_ENGINEERING.md` Stage 2](docs/REVERSE_ENGINEERING.md#stage-2--per-function-recovery-protocol). Pinned ELF SHA-256: `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+- Claim checkpoint commands: `git status --short --branch` (exit 0, `## main...origin/main`); `rg -n '0x1600300|0xf8fa20' docs/TASKS.md docs/EVIDENCE.md` (exit 0, E937 is the only matching recorded result); `python3 -I local/validation/orch-20261029/SRV-01-ALLOCATOR-IMPORT-3B570-01/claim/manifest_lead.py local/re/imports.json 0x1600300` (exit 0). Outputs and command list are in private `local/validation/orch-20261029/SRV-01-ALLOCATOR-IMPORT-3B570-01/claim/`.
+- Observation, not yet a verified conclusion: the existing manifest for the pinned ELF lists slot `0x1600300` as symbol index 551, NID `1jfXLRVzisc`, `libkernel` / `libkernel`, candidate `sceKernelUsleep`, status `contract-declared`. This is only a lead until the raw relocation and thunk are independently replayed.
+- Files changed: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`; private claim logs above. Remaining risks: manifest/parser provenance, relocation-to-slot mapping, and final runtime binding have not yet been independently checked. No G1–G6 gate advances.
+- Next exact action: rerun `scripts/ps4_dynlink.py` against the pinned ELF with `--thunk 0xf8fa20`, then independently verify the RIP-relative thunk-to-slot edge and relocation symbol record against raw ELF bytes; report imported symbol identity separately from runtime resolution.
+- Status/attempt count: `ACTIVE`, zero analysis attempts, zero failed semantic hypotheses.
+
 ## 2026-10-29 04:46 CDT (/root) — E938 E937 analysis publication closeout (ARTIFACT_VERIFIED)
 
 - Owner-authored analysis commit `95949d0891a0b0a1f410c2caca1b622318809d82` (`docs: verify allocator bucket helper trace`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
