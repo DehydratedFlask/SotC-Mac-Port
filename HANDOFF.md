@@ -1,5 +1,18 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 01:54 CDT (/root) — slot 309 route review; claim slot 545 native lift (ACTIVE)
+
+- Task IDs: `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` route review; new `CPU-01-STARTUP-SLOT-545-NATIVE-LIFT-01`.
+- Exact current-ref check: `git status --short --branch && git rev-parse HEAD origin/main` exited 0; clean `main...origin/main`, both refs `85ee383e72901642148b14fe50490d5ab753ebf1`.
+- Exact graph check: `mcp__trail__trail_check_freshness({})` reported the wiring graph in sync at 10,734 nodes; the meaning layer is not built (0%); no `graft/manifest.json` is present. Three targeted `trail_find_code` queries covered savedata and the slot-545 native hook/fixture layout; they did not run or alter game code.
+- Read-only slot-309 reviews: `/root/slot309_next_route_review` and `/root/slot309_saved_evidence_inventory` independently rechecked E748, E750, E818, E821, E829-E832, E883, and E894. No source, REA/Ghidra state, or private evidence changed. Existing E750 already resolves the `0x26ea0` caller paths; the remaining `0x2dfd4b8` branch and general `+0x10` ownership contract remain unresolved.
+- Observation vs inference: the reviewed saved artifacts expose no new concrete producer/consumer/order edge for slot 309. Conclusion that no distinct next query is supported by current evidence is an inference from those bounded reviews, not proof that no dynamic route exists. Keep slot 309 unregistered; resume that investigation only on a newly identified concrete edge or principal reassessment.
+- New task scope: lift verified constructor slot 545 (`0xb2ec0`) and helper `0xab860` as ordinary native code; model atexit identity with `StartupAtexitLog`; express destructor releases through `free_170c0` and `AllocDispatchContract`; add a fail-closed ELF byte checker and fixtures. Derive the matrix operation and exact float/aliasing behavior from the pinned instructions. Do not execute original RVAs, wire slot 545 into `startup_ctors`, or claim a game-runtime gate.
+- Files changed for this claim: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`; no source, binary, install, or dependency changed.
+- Remaining risks: slot 545's matrix convention/aliasing/FP edges must be verified against the pinned body before the lift can pass; `0x12af0` remains a host hook; the first startup gap is still 309; G1 remains PARTIAL.
+- Next exact action: implement and byte-pin the slot-545 module/test under `native/` and `tools/lift/`; keep it unregistered and fail visibly when required host hooks are missing.
+- Status/attempt count: slot-309 characterization remains ACTIVE with 0 failed semantic hypotheses; new slot-545 lift task ACTIVE with 0 attempts.
+
 ## 2026-10-29 01:46 CDT (/root) — E909 M6 slot checkpoint published and verified (ARTIFACT_VERIFIED)
 
 - Task ID: `CPU-01-STARTUP-SLOT-M6-UNVERIFIED-448-507-539-01`; E909's static-analysis and fixture results remain as recorded below.
