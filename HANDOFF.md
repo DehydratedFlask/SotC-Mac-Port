@@ -1,5 +1,20 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 03:27 CDT (/root) — E925 publication closeout (ARTIFACT_VERIFIED)
+
+- Owner-authored commit `3eb9c622da90b5178ca1467005f2ca633ab4e861` (`docs: record allocator free dispatch limits`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
+- Pre-push gates passed: configure/build; CTest 487/487; lift 572/0/0; staged audit 3/3; all-path audit 3,363/3,363; exact-range attribution `HEAD^..HEAD`; `git diff --check`. Push/fetch succeeded; `HEAD == origin/main == FETCH_HEAD`; post-push all-path audit 3,363/3,363 and exact-range attribution passed; worktree clean.
+- Logs are under `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-BODY-12AF0-01/`. This verifies publication of E925's partial static result only; no runtime gate advanced.
+
+## 2026-10-29 03:27 CDT (/root) — claim `SRV-01-ALLOCATOR-FREE-OWNER-11FB0-01` (ACTIVE)
+
+- Bounded output: characterize pinned helper `0x11fb0` and its stored direct callers, focusing on the `(owner_id, 0)` call from `0x19a50`; compare the observed owner-id-to-object resolution with native `PageOwnerMap` / heap-table lookup. No code lift, source change, startup wiring, or target execution.
+- Prerequisites: completed partial task `SRV-01-ALLOCATOR-FREE-BODY-12AF0-01`; `SRV-01-ALLOCATOR-FRONTEND-CONTRACT-01`; Stage 2 protocol; pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+- Claim-publication verification: configure/build passed; CTest 487/487; lift checkers 572 passed, 0 skipped, 0 failed; all-path audit 3,363; attribution passed; project index wrote 43,022 folders. `trail build --check` reports wiring graph in sync; deep concept layer remains unbuilt with 10,779 nodes pending. Logs are under `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-OWNER-11FB0-01/`.
+- Files changed: `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md` for the claim only. No analysis script or source has been changed yet.
+- Next exact action: run one Ghidra 12.1.4 `-noanalysis -readOnly` function/reference query for `0x11fb0`; save metadata, body instruction stream, decompilation and stored incoming refs under `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-OWNER-11FB0-01/`, then byte-check body and callsites against the pinned ELF.
+- Status/attempt count: ACTIVE, 0 analysis attempts, 0 failed hypotheses; no runtime gate.
+
 ## 2026-10-29 03:22 CDT (/root) — allocator free-body result E925 (PARTIAL / STATIC_ANALYSIS_VERIFIED)
 
 - Task: `SRV-01-ALLOCATOR-FREE-BODY-12AF0-01`; characterize original front-end free dispatch and stored callers, then compare with native `AllocatorFront::free` / `delete_`.
