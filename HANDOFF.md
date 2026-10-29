@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 02:18 CDT (/root) — claim exact saved-reference triage for slot 309 (ACTIVE)
+
+- Task ID: new `CPU-01-STARTUP-SLOT-309-SAVED-REF-TRIAGE-01`, dependent on `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`.
+- Evidence verified before claim: existing saved Ghidra script `local/validation/orch-20261027/slot309/ghidra-readonly-xrefs/Slot309IncomingRefs.java` SHA-256 `29041efd98b5fe81321dd38f6bd3cc166a213889a1c0e6ecaa64f6faad6d29de` includes exact global `0x2dfd4b8`; existing successful `headless-xrefs.log` SHA-256 `f0bb8d1294579a717b45405e09e304abec906f3d23467a14a30f96073cc7d879` reports `COUNT|0x2dfd4b8|41`. `REPORT.md` records Ghidra 12.1.4 and `-noanalysis -readOnly` use. This recovers a saved artifact omitted from E911's review scope; no new Ghidra/REA query was run.
+- Observation vs inference: the saved query contains 41 stored ReferenceManager references, including three observed writes (`0x2551d3`, `0x2558d1`, `0x2fd05`), known slot-path readers, and additional reader functions `0x7d8820`, `0xbcde0`, `0x2569d0`, `0x5d4440`, `0x28af0`, `0x261820`, `0x27050`, and `0x27120`. This is a finite saved-reference census, not proof of computed/runtime references, reachability, or execution order. The inference that a bounded reader triage might reveal a value-before-branch edge remains untested.
+- New task scope: triage only these existing 41 references and saved function evidence, concentrating on non-slot readers and the known writer/init chain. No generic xref scan, no REA/Ghidra run, no source changes, no startup registration, and no G1 claim. A bounded negative result is acceptable.
+- Files changed for this claim: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md` only. No game input, binary, local evidence, build output, or dependency changed.
+- Next exact action: independently review disjoint additional-reader subsets using saved reports/dossiers, then root-integrate only concrete value/order evidence and update the slot-309 task status accordingly.
+- Status/attempt count: saved-reference triage ACTIVE, 0 failed semantic tries; parent slot-309 characterization remains ACTIVE and the startup row remains unregistered.
+
 ## 2026-10-29 02:15 CDT (/root) — slot 545 closeout checkpoint published (ARTIFACT_VERIFIED)
 
 - Task ID: `CPU-01-STARTUP-SLOT-545-NATIVE-LIFT-01` publication closeout.
