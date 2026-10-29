@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 05:47 CDT (/root) — E949 REA Ghidra startup timeout (ACTIVE)
+
+- First bounded-query command: `mcp__rea__analyze_function({procedure: "0xa81180"})` on the pinned ELF. REA/Ghidra 12.1.4 returned `provider_timeout` after its configured 330,000 ms startup deadline while importing/analyzing the large ELF; no function dossier or semantic result was returned. Target SHA-256 matched the pinned `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+- The REA temporary runtime/log directory was removed on timeout; process 98188 was no longer present when checked. Durable failure summary: `local/validation/orch-20261029/SAV-01-BOOL-CHUNK-READER-A81180-01/attempt-01/rea-timeout.txt` (includes provider profile digest and run ID). This is a provider startup failure, not a failed semantic hypothesis and not a completed analysis attempt.
+- Task `SAV-01-BOOL-CHUNK-READER-A81180-01` remains ACTIVE; 1 provider timeout, 0 completed semantic analyses, 0 failed semantic hypotheses. No source changes or product/runtime gates. All G1–G6 remain unchanged.
+- Next exact action: run a bounded read-only script against the already initialized `local/ghidra/persistent-20261020/SotC.gpr` with Ghidra `-noanalysis -readOnly`, query `0xa81180` plus its direct caller/callees, and save the exact command/log under `local/validation/orch-20261029/SAV-01-BOOL-CHUNK-READER-A81180-01/attempt-01/`.
+
 ## 2026-10-29 05:39 CDT (/root) — E948 save-reader claim publication closeout (ARTIFACT_VERIFIED)
 
 - Published the `SAV-01-BOOL-CHUNK-READER-A81180-01` claim as owner-authored commit `2eaf63aeb9c7b5b3d5505b506f2e59d3904ade82` (`docs: claim save bool chunk reader analysis`), changing only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
