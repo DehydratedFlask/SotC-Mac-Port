@@ -74,6 +74,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [Atomic save temp isolation closeout](checkpoints/2026-10-27-sav01-atomic-temp-isolation-closeout.md) | E726 closes the fixture-only atomic temp ownership task; the parent real-save gate remains open |
 | [Attribution scan after e6c8d33e](checkpoints/2026-10-27-post-e6c8d33e-attribution-scan.md) | All 9 remote heads and 2,353 reachable commits scan clean for Claude/Anthropic identities and credit lines |
 | [RDX cached-CFG closeout](checkpoints/2026-10-27-aud02-rdx-cfg-closeout.md) | E728 closes bounded offline argument-origin analysis at static/fixture scope; parent AUD-02 remains partial |
+| [RackQuery poison-edge review](checkpoints/2026-10-29-aud02-ngs2-rackquery-poison-edge.md) | E964 verifies the stack-check failure edge; RDX at `0x94ebc2` remains unknown and parent AUD-02 remains partial |
 | [Attribution scan after 9e61358b](checkpoints/2026-10-27-post-9e61358b-attribution-scan.md) | All 9 remote heads and 2,354 reachable commits scan clean for Claude/Anthropic identities and credit lines |
 | [Attribution scan after 53634a15](checkpoints/2026-10-27-post-53634a15-attribution-scan.md) | All 9 remote heads and 2,355 reachable commits scan clean for Claude/Anthropic identities and credit lines |
 | [Attribution scan after 4682a337](checkpoints/2026-10-27-post-4682a337-attribution-scan.md) | All 9 remote heads and 2,356 reachable commits scan clean for Claude/Anthropic identities and credit lines |
