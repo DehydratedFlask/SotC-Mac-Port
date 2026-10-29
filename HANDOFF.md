@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 12:22 CDT (/root) — E998: E996 load-dispatch target-origin attempt (BLOCKED)
+
+- Starting tree: clean `main` at `f9df6e7bbd23501ec00282d2a05208e69248225e`, matching `origin/main`. Pinned ELF `local/re/eboot.elf` SHA-256 remains `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0.
+- Task `SAV-01-LOAD-DISPATCH-5435FC-01`: REA opened the pinned ELF, but the sole `inspect_native_instruction(0x5435fc)` query returned `provider_timeout` at 330,000 ms with no bytes, references, target origin, or Evidence ID. Ghidra 12.1.4, REA 6.7.0, profile `769518a8e9b57f953dd241adbb63672f0f486bb3d66359b9deef7c5e088ca7aa`, run `126e828e-7595-4795-aa99-8cd6eba74fb0`.
+- One follow-up `analyzeHeadless` invocation used the existing project with `-noanalysis -readOnly` and the bounded `QuerySAV01Dispatch5435FC.java` script. The tool response was truncated; no stdout/stderr capture, exit status, session ID, or target result is available. No second invocation or retry occurred.
+- During that fallback, `SotC.rep/versioned/~index.dat` and `SotC.rep/idata/~index.dat` acquired mtime `2026-10-29 12:19:02 -0500`; current SHA-256 values are `0a5034997e47499d758115fa580ad21d96557d2a32c89f2263bcfd3fa8a9a6e5` (59 B) and `81c5b7fd0df99dfd6b1f2b201122d64c83d83a4b9564fdf7040dfc3b2c5b7b29` (105 B). There are no before hashes/snapshots; no recovery was attempted. The `.gpr` remains empty with its 2026-10-20 timestamp. Do not claim the project contents are unchanged.
+- The ELF still matches the pinned SHA. No save or original asset was accessed. Observation versus inference: two project index mtimes changed during the invocation; the available evidence cannot establish which operation wrote them or whether any other project state changed. No code or game behavior was observed.
+- Private evidence and exact invocation summary are under `local/validation/SAV-01-LOAD-DISPATCH-5435FC-01/analysis/attempt-01/`; the incident report records the missing exit/capture and all current hashes. This result checkpoint is the only shared-file change apart from its registries and generated index.
+- Files changed: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-29-sav01-load-dispatch-5435fc-provider-e998.md`.
+- Next exact action: stop E996 with no further REA/headless attempts and no project recovery without a known before-state. Continue only with an independent task that does not need this Ghidra project. SAV-01 remains partial; SAV-04 real-save acceptance remains NOT RUN.
+- Task status: BLOCKED by provider timeout and incomplete fallback; 1 failed REA query, 1 incomplete headless invocation, 0 returned bytes, 0 failed semantic hypotheses. No product gate advanced.
+
 ## 2026-10-29 12:10 CDT (/root) — E997: E995 REA provider timeout (BLOCKED)
 
 - Starting tree: clean `main` at `829a193491ce3f4d1433f002092fef466ae67752`, matching `origin/main`. Pinned ELF `local/re/eboot.elf` SHA-256 is `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0.
