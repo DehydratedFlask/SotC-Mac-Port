@@ -1,12 +1,23 @@
 # SoC Mac Native — current handoff
 
-## 2026-10-29 10:34 CDT (/root) — E980 claim: slot-23 caller reachability (ACTIVE)
+## 2026-10-29 10:48 CDT (/root) — E981 slot-23 caller reachability result (STATIC_PATH_BYTE_VERIFIED)
+
+- Task `CPU-01-SLOT23-CALLER-REACHABILITY-01`, parent `CPU-01-SLOT23-CONSUMERS-01`. E980 claim is closed by this result. Starting tree was `0fed710f28aa763f325353922dd07c20186e4dff`, matching `origin/main` and `FETCH_HEAD`; pinned ELF SHA-256 remains `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+- Static observation: `0xe5c0a5` computes table base `0x1319b08`; the nonzero edge at `0xe5c30b` reaches the first dispatch. The file-backed 13-entry signed-relative table at PT_LOAD phdr 0 / file offset `0x131db08` has entry 0 -> `0xe5c3a7`. With `R13d == 0x2b`, that case reaches `0xe5c3f0` and the call at `0xe5c3f5` (direct target `0xe70a60`). Primary byte parser and independent reviewer agree.
+- Status `STATIC_PATH_BYTE_VERIFIED` for this conditional static path only. R12 preservation depends on ordinary x86-64 ABI behavior and normal returns across intervening calls; the `R13d` runtime value, caller/startup reachability, receiver type, API/game semantics, and full Ghidra function Evidence remain unresolved. Parent stays `PARTIAL`; slot 23 is unregistered; G1 remains PARTIAL; G2–G6 remain NOT RUN.
+- Files to publish: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-29-slot23-caller-reachability-e981.md`. No source, binary, reference, or game-input files changed. Private report, verifier, disassemblies, and 35-entry hash manifest are under `local/validation/CPU-01-SLOT23-CALLER-REACHABILITY-01/attempt-01/`.
+- Analysis: one supported conditional path replay; zero failed semantic hypotheses. A wrapper command initially failed before disassembly because zsh reserves the variable `status`; rerunning with `rc` succeeded. This was not an analysis failure.
+- Required verification passed: `cmake -S native -B local/build/orch-r22` and `cmake --build local/build/orch-r22 -j 12` exited 0; CTest passed 487/487; lift checkers passed 572, skipped 0, failed 0; `trail build --check` reports the wiring graph in sync with 10,779 deep-layer nodes pending; `python3 scripts/project_index.py` wrote 43,136 folders and `--check` confirmed current. Logs are under `local/validation/CPU-01-SLOT23-CALLER-REACHABILITY-01/result-publication/attempt-01/`.
+- Precommit staged path audit passed 6/6; all-path audit passed 3,375/3,375; `git diff --cached --check` passed. Precommit fetch verified `HEAD == origin/main == FETCH_HEAD == 0fed710f28aa763f325353922dd07c20186e4dff`; configured commit author is Johnny Wang. Exact logs are under the result-publication attempt directory.
+- Next exact action: create an owner-authored documentation commit, run `python3 -I scripts/check_commit_attribution.py` and postcommit path/diff checks, then push and fetch-verify `main`.
+
+## 2026-10-29 10:34 CDT (/root) — E980 claim: slot-23 caller reachability (closed by E981)
 
 - Starting tree: clean `main` at `d7371a66b776605aa6918ccf7f665f976fe40460`, matching fetched `origin/main` and `FETCH_HEAD`.
 - Task ID `CPU-01-SLOT23-CALLER-REACHABILITY-01`, parent `CPU-01-SLOT23-CONSUMERS-01`; baseline 0 failed hypotheses for this bounded child. Parent remains `PARTIAL`; its earlier Ghidra timeout and E879 zero-byte `.gpr` rejection remain recorded and are not reset.
 - Scope: inspect only the control/data flow at the indirect `jmp rax` at `0xe5c365` and whether it can establish a static path to candidate block `0xe5c3f5` from the existing `0xe5c330` traversal. Use the pinned ELF and existing private captures; stop at any target that depends on runtime state. Do not trace the later vtable targets, expose original names, register slot 23, change native code, or promote G1. Do not reopen the known zero-byte `.gpr` or repeat whole-program startup analysis.
 - Acceptance: hash-pin the input and bounded instruction capture, map the bytes to the pinned ELF, independently replay the selected bytes/edges, and preserve `UNKNOWN` if the indirect target or startup reachability stays dynamic. Without Ghidra function Evidence, this child cannot claim a complete per-function recovery.
-- Files changed for claim: `HANDOFF.md` only. No result has been produced yet. Parent failed-hypothesis count remains 0; prior tool/provider failures remain visible.
+- Files changed for claim: `HANDOFF.md` only. Result is recorded in E981 below. Parent failed-hypothesis count remains 0; prior tool/provider failures remain visible.
 - Exact next command: `xcrun llvm-objdump --disassemble --start-address=0xe5c330 --stop-address=0xe5c390 local/re/eboot.elf`; save stdout/stderr under `local/validation/CPU-01-SLOT23-CALLER-REACHABILITY-01/attempt-01/`, then compare with an independent bounded Rizin disassembly and the existing `root-slot23-e5c330.json` transfer record.
 - Status `ACTIVE`, attempt 1 of this bounded child. If the jump target remains dynamic, stop at the recorded boundary and leave the parent partial.
 
