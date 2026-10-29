@@ -1,14 +1,14 @@
 # SoC Mac Native — current handoff
 
-## 2026-10-28 (root) — M1–M6 startup-lane integration (validation complete; publication pending)
+## 2026-10-28 (root) — M1–M6 startup-lane integration (ARTIFACT_VERIFIED; published)
 
 - Task ID: `CPU-01-STARTUP-SLOT-LANES-M1-M6-INTEGRATE-01`. Bounded output: independently validate the lane artifacts, wire only verified recovered slots into `StartupState` and the constructor registry, preserve fail-closed skips, and run the required full verification/publication sequence.
 - Initial inspection: `git fetch origin main` exited 0. M1–M4 reports contain 38 slot-level fixture/static-analysis results; M5 verifies 9/10 and excludes 494; M6 verifies 5/10 and excludes 379, 448, 507, 518, and 539. Independent M1/M4 review confirmed the whitelist expansions against pinned table bodies.
-- Current observation: 52 verified rows are wired in `StartupState` and `recovered_constructors`; the explicit exclusions remain absent. Coverage is 449/573 with slot 309 first missing and 124 unregistered. Configure/build exited 0, CTest passed 483/483, and the complete lift checker sweep passed 568/568 with 0 skipped. Final staged-path audit passed 252 paths and final all-path audit passed 3,347 paths; attribution audit passed for `origin/main..HEAD`; project index wrote 43,004 folder entries. Trail's wiring graph is current at 10,719 nodes; `native/core/ctor_slot_359_785f60.cpp` is queryable. Private logs are under `local/validation/orch-20261028/CPU-01-STARTUP-SLOT-LANES-M1-M6-INTEGRATE-01/`.
+- Current observation: 52 verified rows are wired in `StartupState` and `recovered_constructors`; the explicit exclusions remain absent. Coverage is 449/573 with slot 309 first missing and 124 unregistered. Configure/build exited 0, CTest passed 483/483, and the complete lift checker sweep passed 568/568 with 0 skipped. Final staged-path audit passed 252 paths and final all-path audit passed 3,347 paths; exact-range attribution passed. Source commit `f78317ec40a4252056e63110e19627bd26f4988d` is pushed to `main`; fetched `HEAD`, `origin/main`, and `FETCH_HEAD` match with zero ahead/behind. The owner-selected stash is unchanged. Trail's wiring graph is current at 10,719 nodes; `native/core/ctor_slot_359_785f60.cpp` is queryable. Nine unverified M6 files for slots 448/507/539 remain untracked and were excluded from the commit. Private logs are under `local/validation/orch-20261028/CPU-01-STARTUP-SLOT-LANES-M1-M6-INTEGRATE-01/`.
 - Observations vs inference: the M6 lane report excludes slots 448, 507, and 539 and their source/test files are omitted from `native/lanes/m6.cmake`; the five verified M6 slots are the only M6 registration rows. Build and fixture/checker success establish these bounded native models only, not game behavior.
-- Remaining risks: staged path audit, final fetch/commit/push, and live-ref verification remain. Slots 309, 409, 414, 494, 379, 448, 507, 518, and 539 remain excluded. G1 and the game's boot/audio/save/Metal acceptance gates remain unverified.
-- Next exact action: stage only allowlisted verified integration files, keep unverified M6 448/507/539 model/test files unstaged, pass the staged/full path audits, commit as the owner, push fast-forward to `origin main`, and verify the fetched live ref.
-- Status: `ACTIVE / validation complete; publication pending`; attempt 4 passed its bounded validation; no fifth attempt is authorized or needed.
+- Remaining risks: slots 309, 409, 414, 494, 379, 448, 507, 518, and 539 remain excluded. G1 and the game's boot/audio/save/Metal acceptance gates remain unverified.
+- Next exact action: resume the broader CPU-01 recovery queue from the next unblocked bounded task in `docs/TASKS.md`; retain the live-game acceptance gates.
+- Status: `ARTIFACT_VERIFIED / source commit published and fetch-verified`; attempt 4 passed its bounded validation; no fifth attempt was needed or authorized.
 
 ## 2026-10-28 23:53 CDT (/root) — M1–M6 authorized attempt 4 validation complete
 
@@ -19,6 +19,16 @@
 - Remaining risks: staged-path audit, owner commit, fast-forward push, and fetched live-ref verification remain. Exclusions are 309, 379, 409, 414, 448, 494, 507, 518, and 539. No installation or dependency change.
 - Next exact action: stage the allowlisted verified files only, run staged and all-path audits, exact-range attribution-check the owner commit, push `origin main`, then fetch and compare live refs.
 - Status: `ACTIVE / validation complete; publication pending`; three failed tries are documented and the principal-authorized fourth attempt passed. No fifth attempt is authorized or needed.
+
+## 2026-10-28 23:56 CDT (/root) — M1–M6 integration publication verified
+
+- Task ID: `CPU-01-STARTUP-SLOT-LANES-M1-M6-INTEGRATE-01`.
+- Files changed for this closeout: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, and `docs/escalations/CPU-01-STARTUP-SLOT-LANES-M1-M6-INTEGRATE-01.md`.
+- Exact commands/results: owner commit `git commit -m 'feat(native): integrate verified startup constructor lanes'` exited 0 as `f78317ec40a4252056e63110e19627bd26f4988d`; `python3 -I scripts/check_commit_attribution.py --range HEAD^..HEAD` exited 0 (`attribution-commit.log`); `git push origin main` exited 0; `git fetch origin main` exited 0. Verification found `HEAD == origin/main == FETCH_HEAD == f78317ec40a4252056e63110e19627bd26f4988d`, ahead/behind `0/0`, and stash `92ceba574bd1e8445b9aa4f728f878fbfd4f57f8` unchanged. Pre-commit staged/all-path audits passed 252/252 and 3,347/3,347; logs are `audit-publish-staged-final.log` and `audit-publish-all-final2.log`.
+- Observations vs inference: this publishes the bounded 52-row constructor integration to live `main`. The nine unverified M6 model/header/test files for slots 448/507/539 remain untracked and were not included. Publication does not establish native game behavior.
+- Remaining risks: the broader target still lacks demonstrated game boot, audible game content, real save/reload after relaunch, and gameplay Metal validation. G1 remains PARTIAL.
+- Next exact action: resume the next unblocked bounded task in `docs/TASKS.md` for the broader CPU-01 recovery work.
+- Status: `ARTIFACT_VERIFIED`; three failed tries and the principal-authorized successful fourth attempt are recorded; source commit is pushed and live-ref verified.
 
 ## 2026-10-28 23:39 CDT (/root) — M1–M6 integration attempt 1 (FAILED; correction in progress)
 
