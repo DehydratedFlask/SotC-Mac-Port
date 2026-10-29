@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 11:16 CDT (/root) — E986 publication closeout for E985 (ARTIFACT_VERIFIED)
+
+- E985 result was published in owner-authored commit `d85b4bdf996b6d7ecd0d658cedfe3317bcad1e2b` (`docs: record RackQuery first-transfer result`), changing six allowlisted documentation paths. Author and committer are Johnny Wang.
+- Required checks passed: configure/build exit 0; CTest 487/487; lift checkers 572 passed / 0 skipped / 0 failed; Trail graph check in sync with 10,779 deep-layer nodes pending; project index 43,145/current; staged audit 6/6; all-path audit 3,377/3,377; final staged diff check passed. The first diff check caught trailing spaces in checkpoint metadata; those were removed and the initial failure remains in the log.
+- Push and fetch succeeded; `HEAD == origin/main == FETCH_HEAD == d85b4bdf996b6d7ecd0d658cedfe3317bcad1e2b`. Postpush all-path audit accepted 3,377/3,377; attribution audit passed on the empty unpublished range; `git show --format= --check HEAD` passed; project index remained 43,145/current; worktree is clean. Detailed logs are under `local/validation/AUD-02-NGS2-RACKQUERY-SUCCESSOR-94ECD6-01/result-publication/attempt-01/`.
+- E985 establishes one static direct-call edge only. Task `AUD-02-NGS2-RACKQUERY-SUCCESSOR-94ECD6-01` remains `STATIC_PATH_BYTE_VERIFIED`; parent `AUD-02` remains active; runtime reachability, API/audio/game semantics and all product gates are not established or advanced.
+- Next action: inspect the current task queue for a new bounded, independent evidence task; preserve the existing slot-309 stop and all product acceptance limits.
+
 ## 2026-10-29 11:15 CDT (/root) — E985 RackQuery successor first-transfer result (STATIC_PATH_BYTE_VERIFIED)
 
 - Completed attempt 1 of `AUD-02-NGS2-RACKQUERY-SUCCESSOR-94ECD6-01`. From pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, Rizin, bounded LLVM, and the raw PT_LOAD verifier agree that bytes `e8 05 ec 04 00` at `0x94ecd6` are a five-byte direct `CALL rel32` to `0x99d8e0`. PT_LOAD phdr 0 maps them to file offset `0x952cd6`; signed displacement is `+0x4ec05` from end address `0x94ecdb`.
