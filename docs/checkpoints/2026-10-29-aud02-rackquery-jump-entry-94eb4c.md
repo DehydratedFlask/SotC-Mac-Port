@@ -71,4 +71,10 @@ Do not enumerate sibling indirect destinations, trace the negative branch from `
 
 Precommit result gates: `cmake -S native -B local/build/orch-r22` and `cmake --build local/build/orch-r22 -j 12` exited 0; CTest exited 0 with 487/487 passed; checker sweep reported 572 passed, 0 skipped, 0 failed; `trail build --check` exited 0 with the wiring graph in sync and 10,779 deep-layer nodes pending; `python3 scripts/project_index.py` and `--check` exited 0 at 43,110 folders/current; staged path audit passed 5/5; all-path publish audit passed 3,370/3,370; attribution and staged diff checks passed. Precommit fetch verified `HEAD == origin/main == FETCH_HEAD == ef0f4137923ff0675ed77022b7d5f5d2c4018466`. Exact command logs are under `local/validation/AUD-02-NGS2-RACKQUERY-JUMP-ENTRY-94EB4C-01/result-publication/attempt-01/`.
 
-Commit, push and postcommit fetch verification are still pending at this result checkpoint. Overall `AUD-02` and G1-G6 remain open.
+## Publication closeout (E971)
+
+- E970 result commit `9a4997c5f074e04e471578118931b0a41160def2` (`docs: verify RackQuery dispatch entry`) changed five allowlisted documentation files. Push exited 0; fetch verified `HEAD == origin/main == FETCH_HEAD` at that SHA; worktree clean.
+- Precommit gates passed: configure/build, CTest 487/487, checker sweep 572/0/0, Trail wiring graph in sync with 10,779 deep-layer nodes pending, project index 43,110/current, staged path audit 5/5, all-path audit 3,370/3,370, attribution and staged diff.
+- Postcommit checks passed: all-path audit 3,370/3,370, attribution, `git show --format= --check HEAD`, and project-index check at 43,110/current. Exact logs are under `local/validation/AUD-02-NGS2-RACKQUERY-JUMP-ENTRY-94EB4C-01/result-publication/attempt-01/`.
+- Before publishing this closeout record, configure/build, CTest 487/487, checker sweep 572/0/0, Trail graph in sync with 10,779 deep-layer nodes pending, project index 43,111/current, staged audit 3/3, all-path audit 3,370/3,370, attribution and staged diff passed. Fetch verified `HEAD == origin/main == FETCH_HEAD == 9a4997c5f074e04e471578118931b0a41160def2`. Logs are under `local/validation/AUD-02-NGS2-RACKQUERY-JUMP-ENTRY-94EB4C-01/result-publication/attempt-02/`.
+- Overall `AUD-02` and G1-G6 remain open.

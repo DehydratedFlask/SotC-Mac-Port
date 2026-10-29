@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 09:11 CDT (/root) — E971 publication closeout for E970 (ARTIFACT_VERIFIED)
+
+- E970's static result is published in owner-authored commit `9a4997c5f074e04e471578118931b0a41160def2` (`docs: verify RackQuery dispatch entry`), changing five allowlisted documentation files. Push exited 0; post-push fetch verified `HEAD == origin/main == FETCH_HEAD == 9a4997c5f074e04e471578118931b0a41160def2`; worktree clean.
+- Before the result commit: configure/build exited 0; CTest passed 487/487; checker sweep reported 572 passed, 0 skipped, 0 failed; Trail wiring graph in sync with 10,779 deep-layer nodes pending; project index 43,110/current; staged path audit 5/5; all-path audit 3,370/3,370; attribution and staged diff passed. After commit: all-path audit 3,370/3,370, attribution, `git show --format= --check HEAD`, and project-index check 43,110/current passed.
+- Handoff-closeout verification also passed before this update: configure/build, CTest 487/487, checker sweep 572/0/0, Trail graph in sync with 10,779 deep-layer nodes pending, project index 43,111/current, staged audit 3/3, all-path audit 3,370/3,370, attribution and staged diff. `HEAD == origin/main == FETCH_HEAD == 9a4997c5f074e04e471578118931b0a41160def2` before the closeout record commit.
+- Exact logs are under `local/validation/AUD-02-NGS2-RACKQUERY-JUMP-ENTRY-94EB4C-01/result-publication/attempt-01/`; final handoff-closeout verification logs are under `.../result-publication/attempt-02/`. E970 closes the selected static route only; parent `AUD-02` remains ACTIVE and no runtime/audio/game acceptance gate advances. Next exact action: identify a separate ready, evidence-backed task from the live register.
+
 ## 2026-10-29 09:03 CDT (/root) — E970 RackQuery dispatch-entry result (STATIC_ANALYSIS_VERIFIED)
 
 - Completed `AUD-02-NGS2-RACKQUERY-JUMP-ENTRY-94EB4C-01` for the selected candidate route only. Root's read-only Ghidra query plus ELF/PT_LOAD verifier establish that table slot 11 at `0x12ac0f4` contains signed relative offset `-9,819,516`, which resolves from table base `0x12ac0c8` to entry `0x94eb4c`; the selected route reaches call `0x94ebc2`.
