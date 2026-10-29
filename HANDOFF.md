@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 04:32 CDT (/root) — E936 E935 claim-publication closeout (ARTIFACT_VERIFIED)
+
+- Owner-authored claim commit `22f828e623fe552e621e3b615bfb39e9e90422ea` (`docs: claim allocator bucket helper trace`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
+- Required checks passed: configure/build exit 0; CTest 487/487; lift checkers 572 passed, 0 skipped, 0 failed; Trail graph check in sync with 10,779 deep-layer nodes pending; project index 43,028 folders and `--check` current; staged/all-path audits 3/3 and 3,363/3,363; attribution and diff checks passed. The first project-index `--check` was stale because its own redirected log file was created after inventory generation; rerunning after precreating outputs passed. Logs are in `local/validation/orch-20261029/SRV-01-ALLOCATOR-BUCKET-CALLEES-17E90-01/claim-publication/`.
+- `git push origin main` and `git fetch origin main` exited 0; `HEAD == origin/main == FETCH_HEAD == 22f828e623fe552e621e3b615bfb39e9e90422ea`; worktree clean.
+- Task `SRV-01-ALLOCATOR-BUCKET-CALLEES-17E90-01` remains `ACTIVE`; zero analysis attempts and zero failed semantic hypotheses. No product source or G1–G6 runtime gate changed.
+- Next exact action: run the read-only saved-project Ghidra query for `0x3b570` and `0x476f0`, then independently byte-check each body and the three call sites against the pinned ELF.
+
 ## 2026-10-29 04:25 CDT (/root) — E935 claim `SRV-01-ALLOCATOR-BUCKET-CALLEES-17E90-01` (ACTIVE)
 
 - Bounded output: characterize the three direct call sites in the already byte-matched Bucket deallocator `0x17e90` (`0x17f14` and `0x18012` to `0x3b570`; `0x1803f` to `0x476f0`), including argument dataflow, callee side effects, and unresolved edges. Byte-check the called bodies/call sites against the pinned ELF and compare only the observed free-list effects with the native `BucketAllocator::deallocate` contract.
