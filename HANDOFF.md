@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 06:10 CDT (/root) — E952 nested save-result constructor (STATIC_ANALYSIS_VERIFIED)
+
+- Completed `SAV-01-CHUNK-RESULT-CONSTRUCTOR-8DB10-01` within the direct constructor/call-chain boundary. Ghidra 12.1.4 read-only analysis and independent byte verifier confirm the pointer/length flow from `0xa81180` through `0x4d470` into `0x8db10`.
+- Observation: match passes `record+12` and header payload length in `RDX`/`RCX`; miss passes null/zero. `0x8db10` stores `RDX` at raw `+0x120`, `RCX` at `+0x110` and `+0x118`, and zero at `+0x108`; it also initializes unrelated raw fields and a name subobject. This is consistent with a bounded payload view at position zero.
+- Qualification: constructor fields alone do not establish read-time bounds enforcement, field semantics, or ownership. The older profile-chunks “memory stream” statement should be read as inference until a consumer proves read behavior. No source implementation, save/reload, or G1–G6 gate advanced.
+- Pinned ELF SHA-256: `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; saved Ghidra 12.1.4 project reopened read-only with `-noanalysis`. Ghidra command exited 0; independent verifier exited 0 and matched complete instruction bodies of `0xa81180`, `0x4d470`, and `0x8db10`, plus all four chain edges.
+- One verifier setup correction (initial expected-call map omitted four unrelated direct calls in the full reader body); corrected replay passed. Zero failed semantic hypotheses. Files changed for this checkpoint: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, and new `docs/checkpoints/2026-10-29-sav01-result-constructor-8db10.md`; private query/report artifacts remain under `local/validation/orch-20261029/SAV-01-CHUNK-RESULT-CONSTRUCTOR-8DB10-01/`.
+- Exact next action after publication: claim the bounded `0x8eba0` payload-consumer analysis to establish whether the view-like fields are read as a cursor and whether bounds are enforced; see the checkpoint.
+
 ## 2026-10-29 06:02 CDT (/root) — E951 claim nested save-result constructor (ACTIVE)
 
 - Principal reassessment continues the user-authorized task search after E950. Claimed `SAV-01-CHUNK-RESULT-CONSTRUCTOR-8DB10-01`, a bounded read-only follow-up to resolve direct nested helper `0x8db10` called by `0x4d470`.
