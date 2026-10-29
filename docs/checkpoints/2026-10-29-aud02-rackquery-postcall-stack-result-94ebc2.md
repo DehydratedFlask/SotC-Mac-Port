@@ -1,8 +1,10 @@
 # AUD-02 RackQuery post-call caller slice — static result (E973)
 
-**Date:** 2026-10-29 09:35 CDT  
-**Agent:** `/root`  
-**Task:** `AUD-02-NGS2-RACKQUERY-STACK-POSTCALL-94EBC2-01`  
+**Date:** 2026-10-29 09:35 CDT
+
+**Agent:** `/root`
+
+**Task:** `AUD-02-NGS2-RACKQUERY-STACK-POSTCALL-94EBC2-01`
 **Status:** `STATIC_PATH_BYTE_VERIFIED` for this selected static caller slice; 1 supported static result, 0 failed hypotheses.
 
 ## Scope and evidence
@@ -35,3 +37,5 @@ The result proves only a static path and caller-side instruction bytes for one c
 - Exact command logs are under `local/validation/AUD-02-NGS2-RACKQUERY-STACK-POSTCALL-94EBC2-01/result-publication/attempt-01/`.
 
 **Precommit gate result:** all publication gates passed; the E973 result checkpoint is ready for owner-authored commit/push and fetch verification. Parent `AUD-02` and native-port acceptance remain open.
+
+The result was first published in commit `46d765a13489dcdf2a07ef8aa3907dd39bc6f5f9`, and fetch verified it. A subsequent `git show --format= --check HEAD` exited 2 because the three metadata lines above used trailing spaces for Markdown hard breaks. Those spaces were removed and the lines changed to blank-line-separated paragraphs; E974 records the correction checkpoint. The static byte result is unchanged.

@@ -1,5 +1,11 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 09:41 CDT (/root) — E974 post-push whitespace repair (ACTIVE)
+
+- E973 result commit `46d765a13489dcdf2a07ef8aa3907dd39bc6f5f9` was pushed and fetch-verified. Its post-push `git show --format= --check HEAD` returned exit 2 and identified Markdown hard-break trailing spaces on the result checkpoint's Date, Agent, and Task lines. The static-analysis finding is unaffected; no code or binary evidence changed. Exact output is in `local/validation/AUD-02-NGS2-RACKQUERY-STACK-POSTCALL-94EBC2-01/result-publication/attempt-01/postcommit.log`.
+- Removed the three trailing spaces and replaced hard breaks with blank lines. Files changed for this repair are `HANDOFF.md` and `docs/checkpoints/2026-10-29-aud02-rackquery-postcall-stack-result-94ebc2.md`.
+- Next exact action: verify the repair with staged/all-path audits, attribution, project-index and diff checks, commit/push, then fetch and run `git show --format= --check HEAD` again.
+
 ## 2026-10-29 09:35 CDT (/root) — E973 RackQuery post-call caller slice (STATIC_PATH_BYTE_VERIFIED)
 
 - Completed `AUD-02-NGS2-RACKQUERY-STACK-POSTCALL-94EBC2-01` for its one selected static slot-11 candidate slice. Ghidra 12.1.4 read-only capture and an independent ELF/PT_LOAD verifier match 10 contiguous instructions / 53 bytes in `FUN_0094ea10`, `[0x94ebc2, 0x94ebf7)`, against pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; all map to file-backed phdr 0. Edges: `0x94ebc2 -> 0xf91420` and fallthrough `0x94ebc7`; negative-result branch `0x94ebc9 -> 0x95077a`; helper call `0x94ebe1 -> 0x959620`; final branch `0x94ebf1 -> 0x94ecd6`, fallthrough `0x94ebf7`. The caller reads `[RSP+0xe28]` into RSI and later stores RAX at `[RSP+0xe20]`; the `+8` relation is offset arithmetic only.
