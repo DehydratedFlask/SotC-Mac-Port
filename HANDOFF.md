@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 10:34 CDT (/root) — E980 claim: slot-23 caller reachability (ACTIVE)
+
+- Starting tree: clean `main` at `d7371a66b776605aa6918ccf7f665f976fe40460`, matching fetched `origin/main` and `FETCH_HEAD`.
+- Task ID `CPU-01-SLOT23-CALLER-REACHABILITY-01`, parent `CPU-01-SLOT23-CONSUMERS-01`; baseline 0 failed hypotheses for this bounded child. Parent remains `PARTIAL`; its earlier Ghidra timeout and E879 zero-byte `.gpr` rejection remain recorded and are not reset.
+- Scope: inspect only the control/data flow at the indirect `jmp rax` at `0xe5c365` and whether it can establish a static path to candidate block `0xe5c3f5` from the existing `0xe5c330` traversal. Use the pinned ELF and existing private captures; stop at any target that depends on runtime state. Do not trace the later vtable targets, expose original names, register slot 23, change native code, or promote G1. Do not reopen the known zero-byte `.gpr` or repeat whole-program startup analysis.
+- Acceptance: hash-pin the input and bounded instruction capture, map the bytes to the pinned ELF, independently replay the selected bytes/edges, and preserve `UNKNOWN` if the indirect target or startup reachability stays dynamic. Without Ghidra function Evidence, this child cannot claim a complete per-function recovery.
+- Files changed for claim: `HANDOFF.md` only. No result has been produced yet. Parent failed-hypothesis count remains 0; prior tool/provider failures remain visible.
+- Exact next command: `xcrun llvm-objdump --disassemble --start-address=0xe5c330 --stop-address=0xe5c390 local/re/eboot.elf`; save stdout/stderr under `local/validation/CPU-01-SLOT23-CALLER-REACHABILITY-01/attempt-01/`, then compare with an independent bounded Rizin disassembly and the existing `root-slot23-e5c330.json` transfer record.
+- Status `ACTIVE`, attempt 1 of this bounded child. If the jump target remains dynamic, stop at the recorded boundary and leave the parent partial.
+
 ## 2026-10-29 10:21 CDT (/root) — E979 publication closeout for VoiceHandle status reconciliation (ARTIFACT_VERIFIED)
 
 - Task ID `DOC-AUD02-VOICEHANDLE-STATIC-PATH-STATUS-01` is complete as documentation. E978 result commit `16e3bc8f979c6d08ded1e095f7be0be77256eff8` (`docs: verify VoiceHandle callsite status`) was pushed to `origin main`; fetch verified `HEAD == origin/main == FETCH_HEAD == 16e3bc8f979c6d08ded1e095f7be0be77256eff8`. Worktree is clean.
