@@ -36,4 +36,8 @@ Attempt count: 2; one rejected whole-48-byte equality expectation and one passed
 - python3 -I scripts/audit_publish_paths.py --all: PASSED 3,397 paths; staged python3 -I scripts/audit_publish_paths.py: PASSED 7/7 paths.
 - python3 scripts/project_index.py and python3 scripts/project_index.py --check: 44,213 folders indexed and current.
 - Configure/build/test/checker/index/path-audit logs are under local/validation/AUD-01-SXDF-MUSIC-SAMPLE-HEADER-CORRELATION-01/result-publication/attempt-01/.
-- git diff --cached --check and precommit python3 -I scripts/check_commit_attribution.py passed; configured author and committer are Johnny Wang <dehydratedflask@users.noreply.github.com>. Postcommit attribution, commit whitespace, push, and fetched-ref verification remain.
+- git diff --cached --check and precommit python3 -I scripts/check_commit_attribution.py passed; configured author and committer are Johnny Wang <dehydratedflask@users.noreply.github.com>. Result commit 32a5a619da716938b694e069b9f8abda76d64111 was pushed and fetch-verified: HEAD, origin/main, FETCH_HEAD, and live refs/heads/main match; the worktree is clean. Post-push all-path audit passed 3,397 paths; attribution, commit whitespace, and project-index check passed. Exact refs: local/validation/AUD-01-SXDF-MUSIC-SAMPLE-HEADER-CORRELATION-01/result-publication/attempt-01/push-verify.log.
+
+## Follow-on REA preflight
+
+binary_session reported an open Ghidra 12.1.4 provider. One list_documents call returned no result after approximately 150 seconds and was cancelled. No target identity, Evidence ID, or code evidence was returned; no audio-reader task was claimed. The overall native-port work remains incomplete.
