@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 08:10 CDT (/root) — E965 publication closeout for E964 (ARTIFACT_VERIFIED)
+
+- E964's bounded static result is published on `main` as owner-authored commit `c380858023566a60dd07e663403a67b4f90c051e` (`docs: verify RackQuery poison edge`), changing six allowlisted documentation paths. The task `AUD-02-NGS2-RACKQUERY-POISON-EDGE-01` is complete at static-analysis scope; parent `AUD-02` remains ACTIVE and RDX at `0x94ebc2` remains UNKNOWN.
+- `git push origin main` exited 0. Fetch verified `HEAD == origin/main == FETCH_HEAD == c380858023566a60dd07e663403a67b4f90c051e`; worktree clean. Owner identity is Johnny Wang (`dehydratedflask@users.noreply.github.com`). Postcommit all-path audit passed 3,368/3,368; attribution and `git show --format= --check HEAD` passed. Logs: `local/validation/AUD-02-NGS2-RACKQUERY-POISON-EDGE-01/result-publication/attempt-01/post-commit-*.log`.
+- Result gates passed before commit: configure/build, CTest 487/487, lift checkers 572/0/0, Trail graph in sync with 10,779 deep-layer nodes pending, project index 43,089/current, staged audit 6/6, all-path audit 3,368/3,368, attribution and staged diff. Exact logs are in `local/validation/AUD-02-NGS2-RACKQUERY-POISON-EDGE-01/result-publication/attempt-01/`.
+- E965 handoff-update gates also passed: configure/build, CTest 487/487, checker sweep 572/0/0, Trail graph in sync with 10,779 deep-layer nodes pending, project index 43,090/current; staged audit 2/2, all-path audit 3,368/3,368, attribution and staged diff. Logs are in `local/validation/AUD-02-NGS2-RACKQUERY-POISON-EDGE-01/result-publication/attempt-02/`.
+- No engine, authentic audio playback, save/reload, or overall game-acceptance gate advanced. Next exact action: claim a separate bounded task to inspect the known call-clobber at `0x94f183` and determine whether its target semantics can narrow the RDX origin at `0x94ebc2`; do not re-run the all-sites census. Current task status: E964 complete and published; parent audio contract remains partial.
+
 ## 2026-10-29 08:03 CDT (/root) — E964 RackQuery poison-edge result (STATIC_ANALYSIS_VERIFIED)
 
 - Completed bounded task `AUD-02-NGS2-RACKQUERY-POISON-EDGE-01`, claimed and published in owner-authored commit `3faefa24052ec26ca92878774b8e19881df2c9e1`. New result file: `docs/checkpoints/2026-10-29-aud02-ngs2-rackquery-poison-edge.md`; updated `HANDOFF.md`, `docs/INDEX.md`, `docs/FOLDERS.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`. No implementation or reference files changed.
