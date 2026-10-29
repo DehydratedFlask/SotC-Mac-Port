@@ -1,5 +1,22 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 13:48 CDT (/root) — E1008: claim live SXDF sample-header correlation (ACTIVE)
+
+- Starting tree: `main` at `0925a54c96fbf20c2da76c168645b1c08b9a278d`, the E1006 claim commit; local `HEAD`, `origin/main`, `FETCH_HEAD`, and live GitHub `main` all matched after fetch. The claim was owner-authored and pushed.
+- E1007's corrected-manifest metadata identifies `sound/shadow/music.sxd1` in `local/extracted/CUSA08809/pakN.psarc`: TOC entry 27715, 9,872 decoded bytes, archive offset 569314592, first block 13967, member SHA-256 `b925ca03cb6dddf8e9d3448c24a2e2eeb0ac595067cd3bbf25087ec3e6692a94`. The matching archive summary records a 12,838,532,222-byte archive with SHA-256 `559f7a3fa66bc652d36c5f1a885b351e4aeb17dadbba06a0006520bfd325be73`.
+- Task `AUD-01-SXDF-MUSIC-SAMPLE-HEADER-CORRELATION-01` claims only to live-verify those archive/member identities, read the exact member into memory without extraction, and compare its first 48 bytes to E1007's candidate literal sequence. No parser, codec, audio-use, route, or playback claim is included.
+- Claim files: `HANDOFF.md`, `docs/TASKS.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-29-aud01-sxdf-music-sample-header-correlation-claim-e1008.md`; E1007 result also updates `docs/EVIDENCE.md` and adds its result checkpoint. No source or asset file is changed.
+- Next exact action: stream-hash the archive against its summary, resolve the exact path through `Psarc.members()`, verify TOC ID/offset/block/size/member SHA against the corrected manifest, and inspect only the first 48 bytes in memory. Attempt count: 0; 0 failed semantic hypotheses.
+
+## 2026-10-29 13:48 CDT (/root) — E1007: SXDF/SXDS raw ELF candidate scan (ARTIFACT_VERIFIED)
+
+- Completed `AUD-02-SXDF-RAW-ELF-CANDIDATE-SCAN-01` from published claim commit `0925a54c96fbf20c2da76c168645b1c08b9a278d`.
+- Pinned `local/re/eboot.elf` SHA-256 is `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; the ELF has 11 program headers and no section table. Full overlapping-byte scan: `SXDF` 8, reversed `FDXS` 0, `SXDS` 0, reversed `SDXS` 0. All eight `SXDF` hits map uniquely through PHDR 0's file-backed R-X PT_LOAD.
+- Root Rizin/LLVM and independent `/root/audio_lane_triage` Rizin/Xcode LLVM replay agree: six hits are confirmed instruction immediates (five CMP, one MOV), one raw hit overlaps displacement/branch bytes and remains unresolved, and one is in the string-like sequence `FORM\0VAGp\0SXDF\0fmt \0smpl...`. A bounded LEA at `0x9b5b10` computes the sequence base `0x12ba74a`, then sets length 4. This is only byte/address evidence; no parser, codec, audio role, event route, or runtime behavior is established.
+- An initial instruction decode started at the raw `0x9b5afb` hit and misclassified the byte sequence as an immediate. A 48-byte aligned Rizin/Xcode LLVM window corrected it to an unresolved overlap in `incl 0x44585338(%rcx)` and the following branch prefix. Record this as one corrected decode-boundary interpretation; there are 0 failed semantic hypotheses.
+- Private reproduction and independent review are under `local/validation/AUD-02-SXDF-RAW-ELF-CANDIDATE-SCAN-01/analysis/attempt-01/REPORT.md` and adjacent logs. No REA/Ghidra, PSARC payload, source, or runtime was used. No game gate advances.
+- Task status: `ARTIFACT_VERIFIED`; source build/checker counts reused from the immediately prior E1006 claim checkpoint because no source changed. Next exact action is the separate E1008 live member-header correlation claim.
+
 ## 2026-10-29 13:34 CDT (/root) — E1006: claim SXDF/SXDS executable candidate scan (ACTIVE)
 
 - Starting tree is clean `main` at `eb30a143596680026898c29f41b487859e5d42eb`; `git fetch origin main` exited 0 and matched `origin/main` and `FETCH_HEAD`.
