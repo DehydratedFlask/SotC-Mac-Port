@@ -1,5 +1,18 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 00:11 CDT (/root) — slot 545 REA/Ghidra characterization (PARTIAL)
+
+- Task ID: `CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01`.
+- Files changed: `docs/TASKS.md`, `docs/EVIDENCE.md`, `HANDOFF.md`. Private analysis artifacts only under `local/re/evidence/` and `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01/`; no source, game input, or registry changes.
+- Exact REA function invocation: `env GHIDRA_INSTALL_DIR=/Users/dehydratedflask/Applications/ghidra_12.1.4_PUBLIC JAVA_HOME=/opt/homebrew/Cellar/openjdk@25/25.0.4.1/libexec/openjdk.jdk/Contents/Home GHIDRA_HEADLESS_MAXMEM=8G REA_GHIDRA_STARTUP_TIMEOUT_MS=1200000 /Users/dehydratedflask/.npm/_npx/a1722018f28f9df2/node_modules/.bin/rea function /Volumes/Extra/SoC\ Mac\ Native/local/re/eboot.elf 0xb2ec0 --provider ghidra --snapshot /Volumes/Extra/SoC\ Mac\ Native/local/re/evidence/slot545-snapshot.json --format json > local/re/evidence/slot545-analysis.json 2> local/validation/orch-20261029/CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01/ghidra.stderr`.
+- Result: exit 0; provider Ghidra 12.1.4; evidence ID `ev_c7976814bc11cdb0dc8dd1aa4027476058163d88fac2dea5c0be3cd17ccf209f`. Dossier reports contiguous body `0xb2ec0..0xb3154` (661 B), 111 instructions, three blocks, five direct calls to three targets, and no reported indirect or unresolved calls. Full private evidence and hashes are recorded in E898. `ghidra.stderr` is empty; the ephemeral import log was removed when REA closed the temporary session.
+- Observations: REA reports `0xab860` as a 255-byte body and identifies 6-byte thunks at `0xf8f390` and `0xf8f3a0`. Its transient Ghidra log reported failed body repair due to overlaps at `0xb30a00` and `0xb30c20`, both inside the reported range. It marks the call at `0xb3150` no-return from FunctionManager metadata; this is not independently established. The overlap warnings are importer observations, not proof of valid function boundaries.
+- Gate: `PARTIAL`. The structural dossier is recorded, but the body overlap and uncharacterized helper/thunk semantics prevent a bounded native-lift claim. Slot 545 remains unregistered. No game-runtime or G1 acceptance gate advanced.
+- Remaining risks: resolve the overlap against exact pinned bytes and Ghidra body ownership; determine the semantic contract of `0xab860` and the `0xf8f396`/`0xf8f3a6` targets; keep all unresolved flow conservative.
+- Next exact action: characterize `0xb30a00` and `0xb30c20` in the same pinned ELF and determine whether their decoded bodies overlap `0xb2ec0`; then analyze `0xab860` and thunk destinations before opening any separate native-lift task.
+- Status/attempt count: `PARTIAL`; zero failed hypotheses. This characterization task made no native source changes.
+- Documentation validation: `python3 scripts/project_index.py` exited 0 (43,006 folders indexed); `trail build --check` passed with the 10,719-node wiring graph current and meaning layer not built; staged/all-path audits passed 3/3 and 3,347/3,347; attribution audit passed for `origin/main..HEAD`; `git diff --cached --check` passed. No build, CTest, or checker suite was run for this docs-only checkpoint.
+
 ## 2026-10-29 00:02 CDT (/root) — claim slot 545 REA/Ghidra characterization (ACTIVE)
 
 - Task ID: `CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01`.
