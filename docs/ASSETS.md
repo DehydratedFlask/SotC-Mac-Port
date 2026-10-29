@@ -180,6 +180,14 @@ hash/size differences inspected other entries and are withdrawn as STS evidence.
 `sound/shadow/bridge.sxd` is a byte-identical 144-byte member in both layers at TOC ID 2,581;
 E42's 619/638-byte comparison was misattributed. Historical reports remain preserved.
 
+An E1009 live check re-hashed the corrected 12,838,532,222-byte pakN.psarc and decoded
+sound/shadow/music.sxd1 in memory through the exact MD5-path mapping. The 9,872-byte member
+hash and TOC locator match the corrected manifest. Its first four bytes are SXDF, matching
+the four-byte token inside E1007's FORM / VAGp / SXDF static ELF context; the complete
+48-byte sequences differ. This confirms an artifact-level tag correlation only. It does not
+identify a reader, codec, parser behavior, audio role, runtime route, or playback. See the
+E1009 checkpoint (checkpoints/2026-10-29-aud01-sxdf-music-sample-header-correlation-result-e1009.md).
+
 ## Generic XFF prefix reader; former audio attribution withdrawn
 
 The former AUD-01 XFF “sound banks” were non-audio paths assigned the wrong TOC IDs. None of

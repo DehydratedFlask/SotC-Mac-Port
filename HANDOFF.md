@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 14:08 CDT (/root) — E1009: live SXDF member-header correlation (ARTIFACT_VERIFIED)
+
+- Completed AUD-01-SXDF-MUSIC-SAMPLE-HEADER-CORRELATION-01 from E1008 claim commit 87f39bcfbedb4b47fad6b2fe0e037145b5ede269; the E1008 commit had already been fetched and verified against live main.
+- Stream-hashed all 12,838,532,222 bytes of local/extracted/CUSA08809/pakN.psarc: SHA-256 559f7a3fa66bc652d36c5f1a885b351e4aeb17dadbba06a0006520bfd325be73, matching the corrected summary. Pinned E1007 ELF identity also matched (d0723afb…c25861d3).
+- Psarc.members() uniquely maps sound/shadow/music.sxd1 to entry 27715, offset 569314592, first block 13967, size 9872. The decoded member was read only in process memory and its full SHA-256 matched b925ca03cb6dddf8e9d3448c24a2e2eeb0ac595067cd3bbf25087ec3e6692a94.
+- The first 48 member bytes are 535844460400bb2d90260000201d460a711e4c81e3009f4893a0a0c501928b776d757369630000000000000000000000. They do not equal the 48-byte ELF literal context FORM / VAGp / SXDF / fmt / smpl / fact / data / cue / adtl / INF. The four-byte token SXDF at ELF-context offset 10 exactly matches the member's first four bytes. Attempt 1's whole-48 equality assertion exited 1; attempt 2 checked the four-byte tag and exited 0. This is a byte-level correlation only, with no reader/codec/audio-use/route/playback claim.
+- Private scripts, logs, and report: local/validation/AUD-01-SXDF-MUSIC-SAMPLE-HEADER-CORRELATION-01/analysis/attempt-01/ and .../attempt-02/REPORT.md. No extraction, asset write, tool install, source edit, or game execution occurred.
+- Task status: ARTIFACT_VERIFIED; 2 attempts, one rejected whole-48-byte equality expectation and one passed tag-prefix check; 0 failed semantic hypotheses. No product gate advances. Result docs: docs/ASSETS.md, docs/TASKS.md, docs/EVIDENCE.md, docs/INDEX.md, generated docs/FOLDERS.md, and docs/checkpoints/2026-10-29-aud01-sxdf-music-sample-header-correlation-result-e1009.md.
+- Repository verification: CMake configure/build exit 0; CTest 487/487; lift checkers 572 passed / 0 skipped / 0 failed; Trail graph check OK with 10,787 meaning-tier nodes pending; all-path audit 3,397 paths; staged-path audit 7/7; project index 44,213/current. Logs are under local/validation/AUD-01-SXDF-MUSIC-SAMPLE-HEADER-CORRELATION-01/result-publication/attempt-01/. git diff --cached --check and the precommit attribution audit passed; configured author and committer are Johnny Wang <dehydratedflask@users.noreply.github.com>. Postcommit attribution and fetched-ref checks remain before the push is considered verified.
+- Next exact action: stage only the seven allowlisted result-doc paths; run staged/all-path audits, diff check, final project-index check, and owner-attribution audit; commit and push origin main, then fetch-verify the published tip.
+
+
 ## 2026-10-29 13:48 CDT (/root) — E1008: claim live SXDF sample-header correlation (ACTIVE)
 
 - Starting tree: `main` at `0925a54c96fbf20c2da76c168645b1c08b9a278d`, the E1006 claim commit; local `HEAD`, `origin/main`, `FETCH_HEAD`, and live GitHub `main` all matched after fetch. The claim was owner-authored and pushed.
