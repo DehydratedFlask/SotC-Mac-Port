@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 08:32 CDT (/root) — E967 RackQuery callee result (STATIC_ANALYSIS_VERIFIED)
+
+- `AUD-02-NGS2-RACKQUERY-CALL-CLOBBER-954F183-01` is complete for the direct callee's returned RDX set. The pinned ELF and all 104 instructions / 430 bytes of `FUN_00954d70` match file-backed PT_LOAD bytes; 30 rel8/rel32 call and branch targets match Ghidra. The callee's sole RET is `0x954f1d`; every returning path sets zero-extended RDX to one value in `0..14`.
+- At caller `0x94f183`, the direct call targets `0x954d70`. Nonnegative EAX dispatch writes the jump-table base to RDX at `0x94f1a2`; the later query setup at `0x94eb78` copies RBX into RDX before the call at `0x94ebc2`. The negative branch to `0x94f370` and cached-CFG indirect-successor entries remain unverified; RDX at the RackQuery site remains UNKNOWN. No ABI, codec, playback, runtime, or product implementation claim.
+- Root verifier `verify_call_clobber.py` and JSON result hashes are in the checkpoint; independent reviewer verifier/output were root-replayed and byte-identical (`cmp` exit 0). Four verifier setup corrections were fixed before acceptance (three root parser/opcode corrections, one independent assertion-shape correction); no semantic hypothesis failed.
+- Result files updated: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, and `docs/checkpoints/2026-10-29-aud02-rackquery-call-clobber-954f183.md`. `python3 scripts/project_index.py --check` confirms `docs/FOLDERS.md` is current at 43,097 folders. Result publication gates passed: configure/build, CTest 487/487, lift checkers 572/0/0, Trail check (10,779 deep-layer nodes pending), project index 43,097/current, staged audit 5/5, all-path audit 3,369/3,369, attribution, and staged diff check. Owner-authored result commit and push remain; logs are under `local/validation/AUD-02-NGS2-RACKQUERY-RDX-CALL-CLOBBER-01/result-publication/attempt-01/`.
+- Next exact action after publishing: claim one separate bounded static check for computed-jump entry `0x94eb4c`, tracing only that path to `0x94ebc2` and RBX's reaching definition at `0x94eb78`. Parent `AUD-02` remains ACTIVE.
+
 ## 2026-10-29 08:18 CDT (/root) — E966 claim for RackQuery call-clobber review (ACTIVE)
 
 - Claimed `AUD-02-NGS2-RACKQUERY-CALL-CLOBBER-954F183-01`, the E965 next action. Scope is one direct call at `0x94f183` to `0x954d70`, its returned RDX facts, and whether that evidence changes the unknown at the single RackQuery callsite `0x94ebc2`. Do not repeat the all-sites census or infer NGS2 ABI/audio semantics.

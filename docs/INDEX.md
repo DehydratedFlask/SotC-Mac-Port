@@ -9,7 +9,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 |---|---|
 | [TASKS](TASKS.md) | Dependency-ordered task register and detailed work packets; integrator |
 | [EVIDENCE](EVIDENCE.md) | Verified artifact/source/tool facts and unresolved questions; integrator |
-| [AUD-02 RackQuery call-clobber claim (2026-10-29)](checkpoints/2026-10-29-aud02-rackquery-call-clobber-954f183.md) | E966; bounded read-only review of callee `0x954d70` at `0x94f183`; return-value conclusion pending |
+| [AUD-02 RackQuery call-clobber review (2026-10-29)](checkpoints/2026-10-29-aud02-rackquery-call-clobber-954f183.md) | E966/E967; callee returns RDX in `0..14`; RackQuery argument at `0x94ebc2` remains UNKNOWN |
 | [SAV-01 nested result constructor `0x8db10` (2026-10-29)](checkpoints/2026-10-29-sav01-result-constructor-8db10.md) | E952/E953; byte-verified payload pointer/length flow and published closeout; consumer semantics were characterized in follow-up E955 |
 | [SAV-01 payload reader `0x8eba0` (2026-10-29)](checkpoints/2026-10-29-sav01-payload-read-primitive-8eba0.md) | E955/E956; published static cursor and caller analysis; ordinary reads are length-gated, short reads wrap without reporting failure |
 | [SAV-01 payload reader caller `0x543462` (2026-10-29)](checkpoints/2026-10-29-sav01-payload-read-caller-bound-543462.md) | E958/E959; byte-verified caller checks tag `0xd` before the qword read and checks its value only afterward; no pre-read caller length guard |
