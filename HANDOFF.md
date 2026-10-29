@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 00:21 CDT (/root) — slot 545 address-ownership query timed out (PARTIAL; failed try 1)
+
+- Task ID: `CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01`.
+- Files changed: `HANDOFF.md`, `docs/EVIDENCE.md`, and `docs/TASKS.md`; private timeout metadata is `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01/mcp-overlap-timeout.json` (SHA-256 `280fae1f86c62f578afb72b57e8e956a886c598ac26efd12515923f31a641697`). No source/game inputs or registry changed.
+- Exact targeted query: REA MCP `resolve_containing_procedure` for `0xb30a00` in the pinned ELF `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+- Result: `provider_timeout` at 330,000 ms startup deadline; Ghidra 12.1.4, JVM heap 2G, analysis profile `769518a8e9b57f953dd241adbb63672f0f486bb3d66359b9deef7c5e088ca7aa`, provider run `c8fcfa31-ad77-4eda-ac46-ada5ad0a042f`. No procedure-ownership result. The diagnostic output repeated overlap-repair failures at `0xb30a00` and `0xb30c20`; these are importer observations, not proof of function boundaries. Temporary project/log were removed after timeout; the REA session was closed.
+- Status/attempt count: `PARTIAL`; one failed targeted probe. The prior E898 dossier remains valid for its reported body/call observations, with overlap limitations.
+- Next exact action: run one process-local `rea function` query for `0xb30a00` using the already verified Ghidra 12.1.4 CLI settings (`GHIDRA_HEADLESS_MAXMEM=8G`, `REA_GHIDRA_STARTUP_TIMEOUT_MS=1200000`); inspect the reported body against `0xb2ec0`, then decide whether to continue to `0xb30c20`.
+- Publication validation: staged/all-path audits passed 3/3 and 3,347/3,347; precommit attribution audit passed for `origin/main..HEAD`; `git diff --cached --check` passed. No build, CTest, or checker suite was run because this checkpoint changes documentation only.
+
 ## 2026-10-29 00:15 CDT (/root) — E898 documentation checkpoint published (ARTIFACT_VERIFIED)
 
 - Task ID: `CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01` closeout for the E898 partial analysis checkpoint.
