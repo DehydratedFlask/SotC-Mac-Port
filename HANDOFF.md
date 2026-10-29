@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 11:37 CDT (/root) — E992 publication closeout for E991 (ARTIFACT_VERIFIED)
+
+- E991 claim was published in owner-authored commit `08af7e785c88af2a227430d69ad98db72c3a140e` (`docs: claim RackQuery caller continuation check`), changing six allowlisted documentation paths. Author and committer are Johnny Wang.
+- Claim gates passed: configure/build exit 0; CTest 487/487; lift checkers 572 passed / 0 skipped / 0 failed; Trail graph check in sync with 10,779 deep-layer nodes pending; project index 43,163/current; staged audit 6/6; all-path audit 3,380/3,380; diff check and attribution passed.
+- Push/fetch verified `HEAD == origin/main == FETCH_HEAD == 08af7e785c88af2a227430d69ad98db72c3a140e`. Postpush all-path audit passed 3,380/3,380; attribution passed on the empty unpublished range; `git show --format= --check HEAD` passed; project index is 43,163/current; worktree is clean. Logs are under `local/validation/AUD-02-NGS2-RACKQUERY-CALLER-CONTINUATION-94ECDB-01/claim-publication/attempt-01/`.
+- Task `AUD-02-NGS2-RACKQUERY-CALLER-CONTINUATION-94ECDB-01` remains ACTIVE with 0 analysis attempts. Parent `AUD-02` remains active; no product gate advanced.
+- Next exact action: capture one instruction at `0x94ecdb` with Rizin and LLVM; advance only as needed, stop at the first control transfer, map selected bytes, and recompute only direct edges.
+
 ## 2026-10-29 11:33 CDT (/root) — E991 claim: RackQuery caller continuation after `0x94ecd6` (ACTIVE)
 
 - Starting tree: clean `main` at `9445b7edb1759c252e5d8d0d7fff56aa0040db36`, matching `origin/main` and `FETCH_HEAD`. Pinned ELF `local/re/eboot.elf` SHA-256 is `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0.
