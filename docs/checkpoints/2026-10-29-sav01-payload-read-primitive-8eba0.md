@@ -31,4 +31,9 @@ Computed callers, deeper import-slot relocation and runtime binding, payload own
 
 ## E956 publication closeout
 
-Publication gates, commit identity, remote verification, and exact counts will be recorded here after the checkpoint is committed and pushed.
+- Published in owner-authored commit `0b0ec35cd3c7986e694a58bd22ca6c1189e589c3`; pushed and fetch-verified on `main`, with a clean worktree.
+- Configure/build passed; CTest 487/487; lift checkers 572 passed, 0 skipped, 0 failed; Trail check passed with 10,779 deep-layer nodes pending; project index 43,068/current.
+- Staged and explicit-path audits passed 6/6; all-path audits passed 3,365/3,365; identity, attribution, and diff checks passed. Push/fetch verified `HEAD == origin/main == FETCH_HEAD == 0b0ec35cd3c7986e694a58bd22ca6c1189e589c3`.
+- Exact logs: `local/validation/orch-20261029/SAV-01-PAYLOAD-READ-PRIMITIVE-8EBA0-01/result-publication/attempt-01/`.
+- The full game remains incomplete. No native lift/wiring, original-code execution, authentic save/reload, or G1–G6 gate advanced.
+- Before publishing this closeout record, configure/build exited 0, CTest passed 487/487, lift checkers passed 572/0/0, Trail check reported the graph in sync with 10,779 deep-layer nodes pending, and project index wrote/checked 43,069 folders current. Exact repeat-run logs are under `local/validation/orch-20261029/SAV-01-PAYLOAD-READ-PRIMITIVE-8EBA0-01/result-publication/attempt-02/`.
