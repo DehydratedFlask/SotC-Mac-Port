@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 13:03 CDT (/root) — E1003: RackQuery target byte-slice blocked (BLOCKED)
+
+- E1002 claim commit `08645d4dc9796f489996eab1e295091e374ddb7f` was pushed and fetch-verified before analysis. Pinned ELF identity remains SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0.
+- Local Rizin 0.9.1, Apple LLVM 21.0.0 and raw PT_LOAD verifier agree on an unpromoted 11-instruction / 29-byte slice at `0x959620`, ending at conditional branch `0x959637`. Recomputed edge is `0x959637 -> 0x9596c7`; target and fallthrough were not inspected. The required REA `read_bytes(0x959620, 29)` query timed out after 330,000 ms during Ghidra 12.1.4 startup (run `2738ecb0-6ba0-4e8d-a56a-af7bb986e3f0`, profile `769518a8e9b57f953dd241adbb63672f0f486bb3d66359b9deef7c5e088ca7aa`); no bytes or Evidence ID returned. No retry, saved-project inspection, or recovery was attempted.
+- Task `AUD-02-NGS2-RACKQUERY-CALLEE-959620-01` is `BLOCKED`: one provider timeout, one verifier stderr-handling correction, 0 failed semantic hypotheses. The local slice is retained as preliminary evidence, not a shipped-code claim. Parent `AUD-02` remains active; no product gate advances.
+- Private analysis and failure metadata: `local/validation/AUD-02-NGS2-RACKQUERY-CALLEE-959620-01/analysis/attempt-01/`. No source, ELF, reference or game-input file changed. E1001's last source build/test results remain the current code verification; no source was modified here.
+- Documentation publication checks: project-index generation/check exited 0 (43,190/current); staged/all-path audits exited 0 (6/6 and 3,391/3,391); `git diff --cached --check` exited 0. No code build/test rerun because this checkpoint changes documentation only. Logs: `local/validation/AUD-02-NGS2-RACKQUERY-CALLEE-959620-01/result-publication/attempt-01/`.
+- Next exact action: do not retry this Ghidra request or inspect either branch successor without principal reassessment and a new bounded claim. Continue only with an independent, unblocked task; full port remains incomplete.
+
 ## 2026-10-29 12:50 CDT (/root) — E1002: claim RackQuery target byte slice (ACTIVE)
 
 - Starting tree: `main` at `5c50cfc28dfcf6bcbddcb293db0b6e1e7de84a31`, matching `origin/main` and `FETCH_HEAD`. Pinned `local/re/eboot.elf` SHA-256 is `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0. E993 verifies the direct edge `0x94ece8 -> 0x959620`; this task examines only the target entry block.
