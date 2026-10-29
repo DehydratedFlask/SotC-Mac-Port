@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 07:40 CDT (/root) — E962 publication closeout for E961 (ARTIFACT_VERIFIED)
+
+- E961's bounded analysis result is published on `main` as owner-authored commit `bf692def93260089a2ba9b323cea34116bd29b98` (`docs: verify remaining save reader caller bounds`), changing five allowlisted documentation files only.
+- Result gates passed for the E961 result commit and were replayed for this closeout: configure/build exit 0; CTest 487/487; lift checkers 572 passed / 0 skipped / 0 failed; Trail wiring graph in sync with 10,779 deep-layer nodes pending; project index 43,083/current. Exact commands and logs are in `local/validation/orch-20261029/SAV-01-PAYLOAD-READ-REMAINING-CALLERS-01/result-publication/attempt-01/` and `.../attempt-02/`.
+- Publication audits passed before commit: staged 5/5 paths, all-path 3,367/3,367, attribution and staged diff checks. After commit, explicit-path audit passed 5/5, all-path audit passed 3,367/3,367, attribution and `git show --format= --check HEAD` passed. The postcommit staged audit reported no staged paths (exit 2); the exact commit paths passed the staged audit before commit and explicit-path audit after commit.
+- Owner identity: Johnny Wang (`dehydratedflask@users.noreply.github.com`). `git push origin main` exited 0; fetch verified `HEAD == origin/main == FETCH_HEAD == bf692def93260089a2ba9b323cea34116bd29b98`; worktree clean. A first postcommit index check caught newly created log files; after regeneration it reported `43,083 folders indexed; current`.
+- This closes the three remaining known `0x8eba0` caller paths as `STATIC_ANALYSIS_VERIFIED` only. No native implementation or game acceptance gate advanced. G1/G2/G4/G5/G6 remain as previously recorded; boot, game audio, real save/reload, and runtime absence checks are not established.
+- Next exact action: select another bounded, evidence-backed open task from the live task board; keep the slot-309 E911 stop condition and do not infer port completion from this save-path result.
+
 ## 2026-10-29 07:26 CDT (/root) — E961 remaining save-reader caller bounds result (STATIC_ANALYSIS_VERIFIED)
 
 - Completed `SAV-01-PAYLOAD-READ-REMAINING-CALLERS-01` for the three named caller paths. Each invokes `0x8eba0` without a caller-side comparison proving eight remaining bytes. At `0x543697` and `0x5460ad`, tag `0xd` is checked first and the qword is compared only after the read. At `0x543ccd`, verified jump-table entry 11 (tag 13) selects the reader case; the nearby remaining-length check belongs to another path.
@@ -10,7 +19,7 @@
 - Result gates passed: `cmake -S native -B local/build/orch-r22` exit 0; `cmake --build local/build/orch-r22 -j 12` exit 0; `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure` exit 0, 487/487; `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` exit 0, 572 passed / 0 skipped / 0 failed; `trail build --check` exit 0, wiring graph in sync with 10,779 deep-layer nodes pending; `python3 scripts/project_index.py` and `--check` exit 0, 43,083 folders current. The initial index check was stale because its own new log file was created after generation; precreating the log, regenerating, and replaying passed. Logs: `local/validation/orch-20261029/SAV-01-PAYLOAD-READ-REMAINING-CALLERS-01/result-publication/attempt-01/`.
 - Precommit audit passed: staged path audit 5/5; all-path audit 3,367/3,367; attribution audit; `git diff --cached --check`; owner identity Johnny Wang; `git fetch origin main` confirmed `HEAD == origin/main == FETCH_HEAD == 7af38324ebe3282d89a24f208ded827f86d834db`. Logs: same `result-publication/attempt-01/` directory.
 - Report and private evidence are under `local/validation/orch-20261029/SAV-01-PAYLOAD-READ-REMAINING-CALLERS-01/attempt-01/`. This is static caller evidence only; runtime import binding, physical bounds behavior, real save/load, and G1–G6 remain unproven. The other dispatch cases and indirect call `0x547d46` remain unresolved.
-- Result changes: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, and `docs/checkpoints/2026-10-29-sav01-payload-read-remaining-callers.md`; no source changes. Next exact action: commit this result under the owner identity, push `origin main`, and fetch-verify. Then record publication closeout.
+- Result commit: `bf692def93260089a2ba9b323cea34116bd29b98`, pushed and fetch-verified; see E962 at the top of this handoff for publication gates. Next exact action: select another bounded task; full game acceptance remains open.
 
 ## 2026-10-29 07:09 CDT (/root) — E960 claim remaining save-reader caller bounds (ACTIVE)
 
