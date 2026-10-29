@@ -36,3 +36,9 @@ Do not enumerate sibling indirect destinations, trace the negative branch from `
 - `python3 -I scripts/audit_publish_paths.py`: passed 6/6 staged paths; `python3 -I scripts/audit_publish_paths.py --all`: passed 3,370/3,370 paths.
 - `python3 -I scripts/check_commit_attribution.py` passed (`origin/main..HEAD`); `git diff --cached --check` passed; `python3 scripts/project_index.py --check` confirmed 43,102 folders current.
 - Exact logs/status files are under `local/validation/AUD-02-NGS2-RACKQUERY-JUMP-ENTRY-94EB4C-01/claim-publication/attempt-01/`.
+
+## Claim publication closeout (E969)
+
+- Owner-authored commit `12ad9e2ad6fe6f969bdea753c5c5a1df4a659621` (`docs: claim RackQuery dispatch entry review`) changed six allowlisted docs paths and was pushed to `origin main`; fetch verified `HEAD == origin/main == FETCH_HEAD`, with a clean worktree.
+- Postcommit `python3 -I scripts/audit_publish_paths.py --all` passed 3,370/3,370; attribution, `git show --format= --check HEAD`, and `python3 scripts/project_index.py --check` (43,102 folders current) passed.
+- Logs are under `local/validation/AUD-02-NGS2-RACKQUERY-JUMP-ENTRY-94EB4C-01/claim-publication/attempt-02/`. This closes publication only; the static task remains ACTIVE with 0 completed and 0 failed semantic hypotheses.

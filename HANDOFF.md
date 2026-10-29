@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 08:44 CDT (/root) — E969 publication closeout for E968 (ARTIFACT_VERIFIED)
+
+- Claim `AUD-02-NGS2-RACKQUERY-JUMP-ENTRY-94EB4C-01` is published in owner-authored commit `12ad9e2ad6fe6f969bdea753c5c5a1df4a659621` (`docs: claim RackQuery dispatch entry review`), changing six allowlisted docs paths. Push exited 0; fetch verified `HEAD == origin/main == FETCH_HEAD` at that SHA; worktree clean.
+- Precommit claim gates passed: configure/build, CTest 487/487, checker sweep 572/0/0, Trail graph in sync with 10,779 deep-layer nodes pending, project index 43,102/current, staged audit 6/6, all-path audit 3,370/3,370, attribution and staged diff.
+- Postcommit checks passed: all-path audit 3,370/3,370, attribution, `git show --format= --check HEAD`, and project-index check 43,102/current. Logs are under `local/validation/AUD-02-NGS2-RACKQUERY-JUMP-ENTRY-94EB4C-01/claim-publication/attempt-01/` and `.../attempt-02/`.
+- Claim remains ACTIVE with no analysis run yet; E969 closes publication only. Next exact action: reuse the existing Ghidra 12.1.4 saved project read-only to capture only entry `0x94eb4c` through `0x94ebc2` and RBX's reaching definition at `0x94eb78`, then independently verify relevant bytes against the pinned ELF. Parent `AUD-02` remains ACTIVE.
+
 ## 2026-10-29 08:38 CDT (/root) — E968 E967 closeout and AUD-02 dispatch-entry claim (ACTIVE)
 
 - E967 is published in owner-authored commit `409ed112cf1d285dd4973756c7370a915d367dba` (`docs: verify RackQuery call-clobber result`). Push exited 0; fetch verified `HEAD == origin/main == FETCH_HEAD` at that SHA and the worktree was clean.
