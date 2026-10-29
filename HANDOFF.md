@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 02:47 CDT (/root) — caller/order trace publication closeout (ARTIFACT_VERIFIED)
+
+- Commit `3e27c0367dfb71e229262d2341054928321da458` (`docs: record slot 309 caller-order limits`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
+- Staged path audit passed 3/3; all-path audit passed 3,363/3,363 before and after publication; precommit attribution and cached diff checks passed; exact commit attribution for `HEAD^..HEAD` passed.
+- Push and fetch succeeded. After fetch, `HEAD == origin/main == FETCH_HEAD == 3e27c0367dfb71e229262d2341054928321da458`; worktree is clean on `main`.
+- Logs: `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-309-CALLER-ORDER-01/` (`audit-staged.log`, `audit-all.log`, `audit-all-postpush.log`, `attribution-precommit.log`, `attribution-commit.log`, `diff-cached.log`, `status-postpush.log`, `ghidra-incoming-refs.log`, `project-index.log`, `trail-build-check.log`).
+- Status: `CPU-01-STARTUP-SLOT-309-CALLER-ORDER-01` is bounded `PARTIAL / STATIC_ANALYSIS_VERIFIED`; parent slot-309 characterization stays `ACTIVE`, startup slot 309 remains unregistered, and G1 remains `PARTIAL`.
+- Next action: do not repeat the same incoming-reference census. Resume slot 309 only with a concrete dispatch/order edge or after principal reassessment.
+
+## 2026-10-29 02:46 CDT (/root) — slot-309 caller/order trace bounded result (E920)
+
 ## 2026-10-29 02:46 CDT (/root) — slot-309 caller/order trace bounded result (E920)
 
 - Task: `CPU-01-STARTUP-SLOT-309-CALLER-ORDER-01`; bounded saved-project Ghidra trace completed with `PARTIAL / STATIC_ANALYSIS_VERIFIED`. Private report: `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-309-CALLER-ORDER-01/REPORT.md`.
