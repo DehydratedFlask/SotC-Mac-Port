@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 04:46 CDT (/root) — E938 E937 analysis publication closeout (ARTIFACT_VERIFIED)
+
+- Owner-authored analysis commit `95949d0891a0b0a1f410c2caca1b622318809d82` (`docs: verify allocator bucket helper trace`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
+- Required checks passed: configure/build exit 0; CTest 487/487; lift checkers 572 passed, 0 skipped, 0 failed; Trail graph in sync with 10,779 deep-layer nodes pending; project index 43,032 folders and `--check` current; staged/all-path audits 3/3 and 3,363/3,363; attribution and diff checks passed. Exact logs are in `local/validation/orch-20261029/SRV-01-ALLOCATOR-BUCKET-CALLEES-17E90-01/result-publication/attempt-01/`.
+- `git push origin main` and `git fetch origin main` exited 0; `HEAD == origin/main == FETCH_HEAD == 95949d0891a0b0a1f410c2caca1b622318809d82`; worktree clean.
+- Task `SRV-01-ALLOCATOR-BUCKET-CALLEES-17E90-01` is `STATIC_ANALYSIS_VERIFIED` within its bounded scope. It records one failed checker assumption and zero failed semantic hypotheses. No product source or G1–G6 runtime gate changed.
+- Next exact action: re-evaluate task dependencies and choose another bounded, unblocked task; do not claim runtime acceptance from this static result.
+
 ## 2026-10-29 04:41 CDT (/root) — E937 Bucket deallocator direct-callee trace (STATIC_ANALYSIS_VERIFIED)
 
 - Task `SRV-01-ALLOCATOR-BUCKET-CALLEES-17E90-01`. Pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; Ghidra 12.1.4 saved project `local/ghidra/persistent-20261020/SotC`, `-noanalysis -readOnly`, image base 0.
