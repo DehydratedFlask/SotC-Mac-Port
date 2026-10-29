@@ -1,12 +1,25 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 11:00 CDT (/root) — E983 claim: RackQuery successor block at `0x94ecd6` (ACTIVE)
+
+- Starting tree: clean `main` at `ead03a8b5d8dceafe9699afb8c35f07eca421a99`, matching fetched `origin/main` and `FETCH_HEAD`. Pinned ELF `local/re/eboot.elf` SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0.
+- Claimed `AUD-02-NGS2-RACKQUERY-SUCCESSOR-94ECD6-01`. E973 explicitly left the direct successor at `0x94ecd6` unexamined. Scope: inspect only that basic block through its first control transfer, byte-map the selected bytes through file-backed `PT_LOAD`, and recompute the first target. Do not inspect the successor, other routes, callees, API/audio semantics, or runtime behavior.
+- The task board has no `READY` rows; the exact task ID was absent before this claim. Parent `AUD-02` remains active. E911's slot-309 stop is unchanged.
+- The Ghidra `.gpr` is 0 bytes; this child will not use or reopen it. Use bounded LLVM/Rizin captures and a raw ELF verifier instead. No tool install, source edit, or analysis attempt has occurred. Baseline: 0 attempts, 0 failed semantic hypotheses.
+- Claim files: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-29-aud02-rackquery-successor-94ecd6-claim.md`. Preflight records are under `local/validation/AUD-02-NGS2-RACKQUERY-SUCCESSOR-94ECD6-01/claim/attempt-01/`.
+- Claim verification and publication logs will be in `local/validation/AUD-02-NGS2-RACKQUERY-SUCCESSOR-94ECD6-01/claim-publication/attempt-01/`.
+- Claim verification passed: configure/build exit 0; CTest 487/487; lift checkers 572 passed / 0 skipped / 0 failed; `trail build --check` reports the wiring graph in sync with 10,779 deep-layer nodes pending; project index wrote 43,141 folders and `--check` confirmed current. Full logs are in the claim-publication attempt directory.
+- Precommit staged audit passed 6/6; all-path audit passed 3,376/3,376; `git diff --cached --check` passed. Precommit fetch verified `HEAD == origin/main == FETCH_HEAD == ead03a8b5d8dceafe9699afb8c35f07eca421a99`; configured author is Johnny Wang. An initial diff check found trailing Markdown whitespace on the new checkpoint metadata lines; it was removed and the final check passed. No analysis hypothesis failed.
+- Exact next commands: `xcrun llvm-objdump -D --start-address=0x94ecd6 --stop-address=0x94ed16 local/re/eboot.elf` and `rizin -q -e scr.color=false -c 'pD 64 @ 0x94ecd6' local/re/eboot.elf`; save stdout/stderr and stop analysis at the first control transfer.
+- Status `ACTIVE`, attempt 0. Attribution, commit, push, and postpush fetch verification are pending.
+
 ## 2026-10-29 10:57 CDT (/root) — E982 publication closeout for E981 (ARTIFACT_VERIFIED)
 
 - E981 result was published in owner-authored commit `2193f712ee31af3a02a8ab2c15b816892d32b64a` (`docs: verify slot-23 dispatch reachability`), changing six allowlisted documentation files. Author and committer are Johnny Wang.
 - Precommit gates passed: configure/build exit 0; CTest 487/487; lift checkers 572 passed / 0 skipped / 0 failed; Trail wiring graph in sync with 10,779 deep-layer nodes pending; project index 43,136/current; staged audit 6/6; all-path audit 3,375/3,375; staged diff check passed; attribution audit passed on the new commit. Logs are under `local/validation/CPU-01-SLOT23-CALLER-REACHABILITY-01/result-publication/attempt-01/`.
 - Push and fetch succeeded; `HEAD == origin/main == FETCH_HEAD == 2193f712ee31af3a02a8ab2c15b816892d32b64a`; postpush all-path audit passed 3,375/3,375, attribution audit passed on the empty unpublished range, `git show --format= --check HEAD` passed, project index reports 43,136/current, and worktree is clean.
 - E981 verifies one conditional static path only. Slot 23 remains unregistered; the parent task is PARTIAL; G1 remains PARTIAL and G2–G6 NOT RUN. No code, binary, reference, or game-input files changed. Overall port acceptance is incomplete.
-- Next exact action: inspect the task register for a new bounded evidence task that can continue caller/target characterization; preserve the slot-309 stop under E911 and do not infer game behavior from E981.
+- Next action recorded by E983: characterize only the unexamined `0x94ecd6` successor block; preserve the slot-309 stop under E911 and do not infer game behavior from E981.
 
 ## 2026-10-29 10:48 CDT (/root) — E981 slot-23 caller reachability result (STATIC_PATH_BYTE_VERIFIED)
 
