@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 07:58 CDT (/root) — E963 claim for AUD-02 NGS2 RackQuery poison-edge review
+
+- Claimed bounded task `AUD-02-NGS2-RACKQUERY-POISON-EDGE-01`: inspect the terminal edge at `0x9507a2` and re-evaluate only RDX at `0x94ebc2`. Base was clean `main` at `311c1a014e60c9242452fd5a8af4e94b51be92d6`, matching fetched `origin/main` and `FETCH_HEAD`; owner identity is Johnny Wang (`dehydratedflask@users.noreply.github.com`).
+- Files changed in this claim checkpoint: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`. No implementation, reference, game-input, or local binary files are changed.
+- Initial read-only Ghidra 12.1.4 saved-project query exited 0 with `-noanalysis -readOnly`; command used `/Users/dehydratedflask/Applications/ghidra_12.1.4_PUBLIC/support/analyzeHeadless local/ghidra/persistent-20261020 SotC -process eboot.elf -noanalysis -readOnly -scriptPath local/validation/AUD-02-NGS2-RACKQUERY-POISON-EDGE-01/attempt-01 -postScript QueryNgsPoisonEdge.java`. Output is under `local/validation/AUD-02-NGS2-RACKQUERY-POISON-EDGE-01/attempt-01/ghidra-final.*.log`; pinned ELF SHA-256 is `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+- Initial observation: Ghidra marks the call at `0x9507a2` as terminal through thunk `0xf8f3a0`; reused REA Evidence `ev_0fd925bf55ace3db6ec209c0b8b14dc5ed51ac17a80e18f6352aa8534aac4f3c` warns that this FunctionManager flag alone does not independently prove the callee cannot return. Hypothesis to verify: this is the stack-check failure edge; RDX at `0x94ebc2` may remain unknown for separate CFG gaps.
+- The REA MCP `list_documents({})` inventory request did not return; it was cancelled after about 75 seconds before a target was opened. This is a provider-operation failure, not a failed semantic hypothesis. Analysis continued in the existing Ghidra project read-only. Attempt accounting: 1 successful targeted query, 0 failed semantic hypotheses.
+- Next exact action: independently verify call/branch bytes and the imported target identity, replay only the stored RDX result for `0x94ebc2`, then record whether the origin remains unknown. Task status: ACTIVE; no ABI, codec, playback, or runtime claim.
+- Claim publication checks: configure and build exited 0; CTest passed 487/487; lift checkers passed 572/572 with 0 skipped and 0 failed; `trail build --check` passed with the wiring graph in sync and 10,779 deep-layer nodes pending; project index reported 43,087 folders indexed. Staged path audit passed 3/3; all-path audit passed 3,367/3,367; attribution and staged diff checks passed. Logs are under `local/validation/AUD-02-NGS2-RACKQUERY-POISON-EDGE-01/claim-publication/attempt-01/`.
+
 ## 2026-10-29 07:40 CDT (/root) — E962 publication closeout for E961 (ARTIFACT_VERIFIED)
 
 - E961's bounded analysis result is published on `main` as owner-authored commit `bf692def93260089a2ba9b323cea34116bd29b98` (`docs: verify remaining save reader caller bounds`), changing five allowlisted documentation files only.
