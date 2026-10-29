@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 11:24 CDT (/root) — E988 publication closeout for E987 (ARTIFACT_VERIFIED)
+
+- E987 claim was published in owner-authored commit `d24ea5b7f77153d38134bf5803eaf64de5ebffd1` (`docs: claim RackQuery callee block check`), changing six allowlisted documentation paths. Author and committer are Johnny Wang.
+- Claim gates passed: configure/build exit 0; CTest 487/487; lift checkers 572 passed / 0 skipped / 0 failed; Trail graph check in sync with 10,779 deep-layer nodes pending; project index 43,154/current; staged audit 6/6; all-path audit 3,378/3,378; diff check and attribution passed.
+- Push/fetch verified `HEAD == origin/main == FETCH_HEAD == d24ea5b7f77153d38134bf5803eaf64de5ebffd1`; postpush all-path audit passed 3,378/3,378, attribution passed on the empty unpublished range, `git show --format= --check HEAD` passed, project index is 43,154/current, and the worktree is clean. Exact logs are under `local/validation/AUD-02-NGS2-RACKQUERY-CALLEE-99D8E0-01/claim-publication/attempt-01/`.
+- Task `AUD-02-NGS2-RACKQUERY-CALLEE-99D8E0-01` remains ACTIVE with 0 analysis attempts. Parent `AUD-02` remains active; no product gate advanced. Slot 309 remains stopped under E911.
+- Next exact action: run only the bounded Rizin/LLVM captures at `0x99d8e0`, advancing one instruction at a time and stopping at the first transfer or the 32-instruction / 128-byte limit; map selected bytes and direct edges to the pinned ELF.
+
 ## 2026-10-29 11:19 CDT (/root) — E987 claim: RackQuery direct-call target first block (ACTIVE)
 
 - Starting tree: clean `main` at `824f3f49749ad7ed469b62be99acb22f7fb242d6`, matching `origin/main` and `FETCH_HEAD`. Pinned ELF `local/re/eboot.elf` still hashes to `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0.
