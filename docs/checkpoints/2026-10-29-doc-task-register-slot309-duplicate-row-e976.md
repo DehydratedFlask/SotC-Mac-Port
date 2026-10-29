@@ -32,4 +32,4 @@ The project status-cell parser after cleanup found 0 READY rows, 10 ACTIVE rows,
 - The status-cell scan and exact retained-row comparison are logged at `local/validation/DOC-TASKS-SLOT309-DUPLICATE-ROW-01/result-publication/attempt-01/postcommit.log`.
 - Exact command logs: `local/validation/DOC-TASKS-SLOT309-DUPLICATE-ROW-01/result-publication/attempt-01/`.
 
-**Precommit gate result:** all publication gates passed. The doc-only result is ready for owner-authored commit/push and fetch verification; parent startup task and overall port remain incomplete.
+**Publication result:** owner-authored commit `2ac556f01d61990974a3cba12e795f95ff0fcae9` (`docs: remove duplicate slot 309 task row`) changed six allowlisted documentation files. Push and fetch verified `HEAD == origin/main == FETCH_HEAD == 2ac556f01d61990974a3cba12e795f95ff0fcae9`; worktree clean; postcommit all-path audit and `git show --format= --check HEAD` passed. Parent startup task and overall port remain incomplete.
