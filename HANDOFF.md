@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 02:59 CDT (/root) — status-triage publication closeout (ARTIFACT_VERIFIED)
+
+- Owner-authored commit `73c76adda6ed1add0c3ae7251b42ef9d462411eb` (`docs: record current port gate and task readiness`) changed only `HANDOFF.md`.
+- Pre-publication verification: configure 0; build 0 (`ninja: no work to do`); CTest 487/487; lift checkers 572 passed, 0 skipped, 0 failed; project index 43,019 folders; staged path audit 1/1; all-path audit 3,363/3,363; attribution for the unpublished `origin/main..HEAD` range passed. Logs are under `local/validation/orch-20261029/PROJECT-PORT-STATUS-TRIAGE-01/`.
+- `git push origin main` and `git fetch origin main` succeeded; `HEAD == origin/main == FETCH_HEAD == 73c76adda6ed1add0c3ae7251b42ef9d462411eb`; post-push all-path audit passed 3,363/3,363 and attribution passed; working tree was clean on `main` at verification.
+- This closeout verifies publication of the project-status checkpoint only. It changes no game-runtime gate: the native-port goal remains incomplete, G1/G4 PARTIAL, and the next action is unchanged from the checkpoint below.
+
 ## 2026-10-29 02:58 CDT (/root) — broad port status and task-queue triage (PARTIAL)
 
 - Task: continue the user-requested broad native-port work and check whether the project is complete or has another independently ready product task. No new product task was claimed.
