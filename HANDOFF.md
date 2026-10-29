@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 03:42 CDT (/root) — E931 claim-publication closeout (ARTIFACT_VERIFIED)
+
+- Owner-authored commit `e63339bf596896e2c841d577c606d466e586de38` (`docs: claim allocator free dispatch trace`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
+- Pre-push verification: configure/build passed; CTest 487/487; lift checkers 572 passed, 0 skipped, 0 failed; staged path audit 3/3; all-path audit 3,363/3,363; attribution passed; project index 43,023 folders and `--check` current; `git diff --cached --check` passed. `trail build --check` reports the wiring graph in sync; the deep layer remains unbuilt with 10,779 nodes pending.
+- Rechecked the final closeout docs at 03:47 CDT before publication: configure/build passed; CTest 487/487; lift checkers 572/0/0; all-path audit 3,363/3,363; attribution passed; project index 43,024 folders and `--check` current; `trail build --check` remains in sync with 10,779 deep-layer nodes pending. Logs: `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01/publication-closeout/`.
+- `git push origin main` and `git fetch origin main` exited 0; `HEAD == origin/main == FETCH_HEAD == e63339bf596896e2c841d577c606d466e586de38`; worktree clean. Logs are under `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01/`.
+- Observation: the bounded static-analysis task is now published and active. No concrete vtable target has been analyzed yet; G1–G6 runtime gates remain unchanged.
+- Next exact action: use the existing saved Ghidra project read-only to trace the heap object returned by the established owner lookup to its vtable `+0xa8` entry, then byte-check the entry and reachable target body against the pinned ELF.
+- Task status/attempt count: `SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01` is `ACTIVE`, zero analysis attempts, zero failed semantic hypotheses.
+
 ## 2026-10-29 03:39 CDT (/root) — claim `SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01` (ACTIVE)
 
 - Bounded output: resolve the concrete virtual deallocator target(s) reached by the pinned `0x12af0` free fallback through owner IDs and allocator heap slots. Map the relevant vtable `+0xa8` entries and target bodies, byte-check each mapped span against the pinned ELF, and compare the observed dispatch with native `IAllocator` implementations. Stop with an explicit unresolved result if a computed target or heap-slot owner cannot be bounded.
@@ -9,7 +19,7 @@
 - Observation: E929 establishes that the free fallback resolves an owner ID to a heap-table object and the parent free body dispatches through vtable slot `+0xa8`; the concrete target implementations remain open. Inference: resolving only the allocator objects reachable through the established bootstrap/owner path can determine whether the native child deallocators represent that dispatch.
 - Claim-publication gates from the workspace root: `cmake -S native -B local/build/orch-r22` exit 0; `cmake --build local/build/orch-r22 -j 12` exit 0 (`ninja: no work to do`); `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure` exit 0 (487/487); `env SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` exit 0 (572 passed, 0 skipped, 0 failed); `python3 -I scripts/audit_publish_paths.py --all` exit 0 (3,363 paths); `python3 -I scripts/check_commit_attribution.py` exit 0; `python3 scripts/project_index.py` exit 0 (43,023 folders) and `python3 scripts/project_index.py --check` exit 0; `trail build --check` exit 0 (wiring graph in sync; deep layer not built, 10,779 nodes pending); `git diff --check` exit 0. Logs: `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01/`.
 - Remaining risks: indirect dispatch or allocator construction may not identify every reachable implementation; the result will remain static-only and cannot advance G1–G6 runtime gates.
-- Next exact action: run staged and all-path publish audits, commit and push the allowlisted claim docs to `origin main`, fetch-verify the remote, then query the saved Ghidra project read-only and verify vtable/target bytes against the pinned ELF.
+- Next exact action: query the saved Ghidra project read-only and verify the vtable entry and reachable target bodies against the pinned ELF.
 - Status/attempt count: `ACTIVE`, zero analysis attempts, zero failed semantic hypotheses; no runtime gate advanced.
 
 ## 2026-10-29 03:31 CDT (/root) — E927 publication closeout (ARTIFACT_VERIFIED)
