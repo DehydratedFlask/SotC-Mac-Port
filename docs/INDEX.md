@@ -9,7 +9,8 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 |---|---|
 | [TASKS](TASKS.md) | Dependency-ordered task register and detailed work packets; integrator |
 | [EVIDENCE](EVIDENCE.md) | Verified artifact/source/tool facts and unresolved questions; integrator |
-| [SAV-01 nested result constructor `0x8db10` (2026-10-29)](checkpoints/2026-10-29-sav01-result-constructor-8db10.md) | E952/E953; byte-verified payload pointer/length flow and published closeout; consumer reader semantics remain in follow-up E954 |
+| [SAV-01 nested result constructor `0x8db10` (2026-10-29)](checkpoints/2026-10-29-sav01-result-constructor-8db10.md) | E952/E953; byte-verified payload pointer/length flow and published closeout; consumer semantics were characterized in follow-up E955 |
+| [SAV-01 payload reader `0x8eba0` (2026-10-29)](checkpoints/2026-10-29-sav01-payload-read-primitive-8eba0.md) | E955; static cursor and caller analysis; ordinary reads are length-gated, short reads wrap without reporting failure; publication pending |
 | [POINTERS](POINTERS.md) | Address classes, tagged 31-bit fields, evidence labels (CPU-02 partial); integrator |
 | [ASSETS](ASSETS.md) | PSARC archive findings and audio-asset leads (DATA-02/AUD-01 partial); integrator |
 | [GPU01_PREP](GPU01_PREP.md) | Offline `.csdr`/`.cmat` member-name inventory from manifests (GPU-01 prep); GPU worker |
