@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 04:11 CDT (/root) — E933 allocator `+0xa8` targets (STATIC_ANALYSIS_VERIFIED)
+
+- Task `SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01` is complete as bounded static analysis. In the byte-matched `0x13380` bootstrap, root `CPUMemory` is assigned slot 1; child allocators first-free scan the zero-filled heap table and assign IDs 2/3/4 to Bucket/Heap/Page. The shared `0x13d20` setter stores the selected ID at `[this+0x1c]` (`89 77 1c c3`). The `0x12af0` virtual call at `0x12c25` therefore reaches bucket `0x17e90`, heap `0x493d0`, or page `0x18920` for allocator-produced owner IDs.
+- Observation: all three `+0xa8` pointer words match Ghidra and raw bytes in ELF RELRO phdr 1; all instructions in target bodies (523/515/203 B) and relevant bootstrap, constructor, setter, owner-lookup, and dispatch bodies byte-match pinned `local/re/eboot.elf` SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`. Repeatable private verifier: `python3 -I local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01/verify_allocator_dispatch.py` (exit 0); output `.../attempt-02/elf-verification.txt`. Ghidra 12.1.4 used saved project `local/ghidra/persistent-20261020/SotC` with `-noanalysis -readOnly`; exact invocations, logs and hashes are in private `.../ANALYSIS-REPORT.md` and `.../attempt-02/`.
+- Independent read-only reviewer `/root/allocator_dispatch_review` confirmed IDs, the `0x13d20` setter, all three RELRO words, target-body byte coverage, and native comparison. Native `AllocatorFront::free` resolves the owner ID then calls its selected allocator; bucket recycles to its size class, while heap/page remove ownership and unmap. This is a high-level comparison only.
+- Tooling failures recorded in the private report: REA full import timed out earlier (E932); this ELF has no section table and `readelf`/`llvm-readobj` are unavailable; the corrected stdlib verifier handles the special RELRO map and non-contiguous function bodies. No semantic hypothesis failed.
+- Limit: Ghidra returned empty C text for each target body, so exact internal helper semantics/equivalence remain open. This is offline static analysis only: no native lift/wiring and no G1–G6 runtime gate changes.
+- Files changed for the evidence checkpoint: `HANDOFF.md`, `docs/EVIDENCE.md`, `docs/TASKS.md`; private scripts/logs/reports remain under `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01/`.
+- Next exact action: re-evaluate task dependencies now that the free-dispatch parent gap is closed; select the next bounded unblocked task. Do not infer boot, audio, saving, or Metal readiness from this analysis.
+- Status/attempt count: this allocator dispatch task is `STATIC_ANALYSIS_VERIFIED`; one failed tool/workflow attempt (REA timeout), zero failed semantic hypotheses.
+
 ## 2026-10-29 03:56 CDT (/root) — E932 REA/Ghidra timeout (FAILED; task remains ACTIVE)
 
 - Task: `SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01`, failed tool/workflow attempt 1. Hypothesis: REA's default Ghidra import would analyze allocator bootstrap `0x13380` within the 330-second startup deadline.
