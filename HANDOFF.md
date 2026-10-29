@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 04:56 CDT (/root) — E940 allocator import claim publication closeout (ARTIFACT_VERIFIED)
+
+- Owner-authored claim commit `4e42f76b2687d016af26f8e8a9a1cb2481ba5a50` (`docs: claim allocator import thunk trace`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
+- Claim publication checks passed: configure/build exit 0; CTest 487/487; lift checkers 572 passed, 0 skipped, 0 failed; Trail wiring graph in sync with 10,779 deep-layer nodes pending; project index 43,036 folders and `--check` current; staged/all-path audits 3/3 and 3,363/3,363; attribution and diff checks passed. Exact outputs are in private `local/validation/orch-20261029/SRV-01-ALLOCATOR-IMPORT-3B570-01/claim-publication/attempt-01/`.
+- `git push origin main` and `git fetch origin main` exited 0; `HEAD == origin/main == FETCH_HEAD == 4e42f76b2687d016af26f8e8a9a1cb2481ba5a50`; worktree clean.
+- `SRV-01-ALLOCATOR-IMPORT-3B570-01` remains `ACTIVE`, zero analysis attempts and zero failed hypotheses. The existing import-manifest record is an unverified lead only; no product source or G1–G6 runtime gate changed.
+- Next exact action: query pinned ELF with `scripts/ps4_dynlink.py --thunk 0xf8fa20`; independently verify the thunk-to-slot and relocation-symbol mapping.
+
 ## 2026-10-29 04:52 CDT (/root) — E939 claim `SRV-01-ALLOCATOR-IMPORT-3B570-01` (ACTIVE)
 
 - Bounded output: resolve the import identity behind Bucket deallocator thunk `0x3b570` via RELRO slot `0x1600300`; tie thunk bytes, relocation target, import symbol/NID/library/module and the pinned ELF together. Static identity only; no runtime loader address, code lift, wiring or execution.
