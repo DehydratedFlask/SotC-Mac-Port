@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 14:57 CDT (/root) — E1013: SXDF provider-status recheck (BLOCKED)
+
+- Task `AUD-02-SXDF-DATA-REFERENCE-GHIDRA-01` remains blocked after one provider query, one procedure-order deviation, and zero failed semantic hypotheses. This is a status recheck under the existing claim, not a new analysis attempt.
+- After `git fetch origin main`, `HEAD`, `origin/main`, and `FETCH_HEAD` matched at `30d2eeff2a4ac902770a6b92705361dcc61e8baf`; the starting worktree was clean.
+- `mcp__rea__binary_session({})` was called as a read-only status operation. It reports `open=true`, `cleanup_pending=false`, selected Ghidra 12.1.4, the same profile digest `769518a8e9b57f953dd241adbb63672f0f486bb3d66359b9deef7c5e088ca7aa`, and REA 6.7.0 with server start time `2026-10-29T04:27:11.776Z`. It still exposes no image-base value; provider availability does not clear the E1012 pre-query gate. No code query or Evidence ID was made. Details: `docs/checkpoints/2026-10-29-aud02-sxdf-provider-status-recheck-e1013.md`; private summary: `local/validation/AUD-02-SXDF-DATA-REFERENCE-GHIDRA-01/provider-recheck/attempt-01/REPORT.md`.
+- Independent frontier checks found zero `READY` task rows. The CXML parser task remains stopped by its no-alternate-parser boundary; no service/save implementation leaf is eligible without new REA evidence. Current CUA preflight still reports the Mac locked; no UI changes.
+- No source or game input changed and no G0–G6 gate advanced. Configure/build exited 0, CTest passed 487/487, lift checkers passed 572/0/0, Trail wiring graph check was OK with 10,787 meaning-tier nodes pending, and project index passed current at 44,224 folders. Staged path audit passed 6/6, all-path audit passed 3,401, attribution passed, and final staged diff check passed after correcting one extra trailing blank line. Logs are under `local/validation/AUD-02-SXDF-DATA-REFERENCE-GHIDRA-01/result-publication/attempt-03/`.
+- Next exact action: wait for a provider-state change or a supported identity/image-base observation; do not repeat the timed-out instruction query under the current claim.
+
 ## 2026-10-29 14:42 CDT (/root) — E1012: SXDF REA instruction query timed out (BLOCKED)
 
 - The E1010 claim is on `main` at `e8cf85ba`; E1011 publication closeout is on `main` at `4ed3b269`. Both pushes were fetch-verified. The current task is `AUD-02-SXDF-DATA-REFERENCE-GHIDRA-01`.
