@@ -1,10 +1,11 @@
 # SoC Mac Native — current handoff
 
-## 2026-10-29 09:41 CDT (/root) — E974 post-push whitespace repair (ACTIVE)
+## 2026-10-29 09:41 CDT (/root) — E974 post-push whitespace repair (ARTIFACT_VERIFIED)
 
 - E973 result commit `46d765a13489dcdf2a07ef8aa3907dd39bc6f5f9` was pushed and fetch-verified. Its post-push `git show --format= --check HEAD` returned exit 2 and identified Markdown hard-break trailing spaces on the result checkpoint's Date, Agent, and Task lines. The static-analysis finding is unaffected; no code or binary evidence changed. Exact output is in `local/validation/AUD-02-NGS2-RACKQUERY-STACK-POSTCALL-94EBC2-01/result-publication/attempt-01/postcommit.log`.
-- Removed the three trailing spaces and replaced hard breaks with blank lines. Files changed for this repair are `HANDOFF.md` and `docs/checkpoints/2026-10-29-aud02-rackquery-postcall-stack-result-94ebc2.md`.
-- Next exact action: verify the repair with staged/all-path audits, attribution, project-index and diff checks, commit/push, then fetch and run `git show --format= --check HEAD` again.
+- Removed the three trailing spaces and replaced hard breaks with blank lines. Owner-authored repair commit `effbe5404b2bbb1b09320b106ba3fb349ef83bb6` was pushed; fetch verified `HEAD == origin/main == FETCH_HEAD`, worktree clean. Repeated `git show --format= --check HEAD` exited 0.
+- Repair-only publication gates passed: project index 43,119/current; staged audit 2/2; all-path audit 3,372/3,372; attribution and staged diff passed. The E973 configure/build, CTest 487/487, checker 572/0/0, and Trail gates were run before the original result commit; they were not repeated for this whitespace-only correction. Logs remain in `local/validation/AUD-02-NGS2-RACKQUERY-STACK-POSTCALL-94EBC2-01/result-publication/attempt-01/`.
+- The child static task is complete, but the port is not. The live board previously had zero READY rows; product startup remains stopped at slot 309 under E911. Next exact action: inspect the remaining open tasks for a distinct bounded task that can progress without bypassing that stop condition.
 
 ## 2026-10-29 09:35 CDT (/root) — E973 RackQuery post-call caller slice (STATIC_PATH_BYTE_VERIFIED)
 
