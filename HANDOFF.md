@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 03:39 CDT (/root) — claim `SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01` (ACTIVE)
+
+- Bounded output: resolve the concrete virtual deallocator target(s) reached by the pinned `0x12af0` free fallback through owner IDs and allocator heap slots. Map the relevant vtable `+0xa8` entries and target bodies, byte-check each mapped span against the pinned ELF, and compare the observed dispatch with native `IAllocator` implementations. Stop with an explicit unresolved result if a computed target or heap-slot owner cannot be bounded.
+- Prerequisites: `SRV-01-ALLOCATOR-FREE-BODY-12AF0-01` (E925), `SRV-01-ALLOCATOR-FREE-OWNER-11FB0-01` (E929), `SRV-01-ALLOCATOR-FRONTEND-CONTRACT-01`, and RE-02 Stage 2. Pinned ELF SHA-256: `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d`.
+- Scope boundary: offline Ghidra/static analysis and native source comparison only. No code lift, startup wiring, original target execution, or runtime claim.
+- Files changed for this claim: `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`; no product source or evidence artifact changed.
+- Observation: E929 establishes that the free fallback resolves an owner ID to a heap-table object and the parent free body dispatches through vtable slot `+0xa8`; the concrete target implementations remain open. Inference: resolving only the allocator objects reachable through the established bootstrap/owner path can determine whether the native child deallocators represent that dispatch.
+- Claim-publication gates from the workspace root: `cmake -S native -B local/build/orch-r22` exit 0; `cmake --build local/build/orch-r22 -j 12` exit 0 (`ninja: no work to do`); `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure` exit 0 (487/487); `env SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` exit 0 (572 passed, 0 skipped, 0 failed); `python3 -I scripts/audit_publish_paths.py --all` exit 0 (3,363 paths); `python3 -I scripts/check_commit_attribution.py` exit 0; `python3 scripts/project_index.py` exit 0 (43,023 folders) and `python3 scripts/project_index.py --check` exit 0; `trail build --check` exit 0 (wiring graph in sync; deep layer not built, 10,779 nodes pending); `git diff --check` exit 0. Logs: `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01/`.
+- Remaining risks: indirect dispatch or allocator construction may not identify every reachable implementation; the result will remain static-only and cannot advance G1–G6 runtime gates.
+- Next exact action: run staged and all-path publish audits, commit and push the allowlisted claim docs to `origin main`, fetch-verify the remote, then query the saved Ghidra project read-only and verify vtable/target bytes against the pinned ELF.
+- Status/attempt count: `ACTIVE`, zero analysis attempts, zero failed semantic hypotheses; no runtime gate advanced.
+
 ## 2026-10-29 03:31 CDT (/root) — E927 publication closeout (ARTIFACT_VERIFIED)
 
 - Owner-authored commit `ed7460f3aebca97facce8348072555914c0f454d` (`docs: claim allocator owner lookup trace`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
