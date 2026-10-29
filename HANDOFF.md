@@ -1,5 +1,26 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 03:09 CDT (/root) — allocator `0x110a0` role correction (STATIC_ANALYSIS_VERIFIED)
+
+- Task: `SRV-01-ALLOCATOR-FREE-PATH-110A0-01`; characterize the pinned function and direct caller to verify the `0x110a0/free-path` lead and relation to `AllocatorFront::delete_`.
+- Files changed: `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`; private report, Ghidra script, and output are under `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-PATH-110A0-01/`. No product source changed.
+- Exact command: Ghidra 12.1.4 `analyzeHeadless local/ghidra/persistent-20261020 SotC -process eboot.elf -noanalysis -readOnly -scriptPath local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-PATH-110A0-01 -postScript AllocatorFreePath110a0.java`; exit 0. `local/re/eboot.elf` SHA-256 is `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; output SHA-256 is `5e2471e1abc7ebe7e7a17b8c607471678c4f358202a8d537055747a23c52f374`.
+- Observation: Ghidra reports `FUN_000110a0`, body `0x110a0..0x11b52` (2,739 B), successful decompilation, 523 instruction records, 53 calls (36 direct, 17 indirect), and one stored incoming call at `0x23f6d` from `FUN_00023d60`. The body has a once guard and initializes allocator globals and objects, invokes `0x13380`, and constructs `GPUMemory`, `BucketAllocator`, `HeapAllocator`, `PageAllocator`, tagged arenas, and single/double frame allocators. It has no direct call to `0x12af0`, `0x170b0`, or `0x170c0`. Live `allocator_front.hpp` identifies `AllocatorFront::delete_` as `free(ptr, kAllocFlagNew)` and the original free body as `0x12af0`.
+- Inference: `0x110a0` is an allocator hierarchy initializer, not the free path; its observed effects do not map to `AllocatorFront::delete_`. The true free body `0x12af0` remains uncharacterized. All 17 indirect calls remain unresolved, and the reference census is limited to the saved Ghidra ReferenceManager.
+- Required repository verification: `cmake -S native -B local/build/orch-r22` exit 0; `cmake --build local/build/orch-r22 -j 12` exit 0 (`ninja: no work to do`); CTest 487/487; lift checkers 572 passed, 0 skipped, 0 failed; `python3 -I scripts/audit_publish_paths.py --all` passed 3,363 paths; `python3 -I scripts/check_commit_attribution.py` passed; `python3 scripts/project_index.py` indexed 43,020 folders. `trail build --check` exited 0 with wiring graph in sync; deep concept layer remains unbuilt (10,779 nodes pending). Logs are under the private task directory.
+- Remaining risks: allocator bootstrap is still not wired into startup; no actual game boot/audio/save/reload or gameplay Metal acceptance changed. The broad port remains incomplete, G1/G4 PARTIAL.
+- Next exact action: if continuing allocator-front analysis, claim a separate bounded task for `0x12af0` / `0x170b0` and characterize the free body and callers; otherwise resume only another task whose prerequisites are available. Do not label `0x110a0` as a free path.
+- Status/attempt count: bounded characterization `STATIC_ANALYSIS_VERIFIED`; one analysis attempt, zero implementation attempts, no runtime claim. Details and exact hashes are in the private `REPORT.md`.
+
+## 2026-10-29 03:04 CDT (/root) — claim `SRV-01-ALLOCATOR-FREE-PATH-110A0-01` (ACTIVE)
+
+- Bounded output: characterize the pinned function at RVA `0x110a0` and its direct callers to determine only the observed deallocation contract and whether it maps to the existing native `AllocatorFront::delete_` boundary. No source lift, allocator-bootstrap wiring, startup registration, or runtime claim in this task.
+- Prerequisites: completed `SRV-01-ALLOCATOR-LAZY-LATCH-01`; pinned ELF `local/re/eboot.elf` (SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`); Stage 2 protocol in `docs/REVERSE_ENGINEERING.md`.
+- Initial observation only: the task row says `0x110a0/free-path open`; a saved Ghidra caller dump at `local/validation/orch-20261027/slot309/agent-240f0-order/known-constructor-paths.stdout.log` records a direct call at `0x23f6d` from `FUN_00023d60`. This is a lead, not proof of `0x110a0` semantics or allocator role.
+- Files changed: `HANDOFF.md` (claim). No source files changed. No analysis call has yet been run for this task.
+- Next exact action: query the current REA binary session; if the pinned ELF/Ghidra profile is available without modifying a shared project, obtain one bounded function dossier for `0x110a0`, then verify the returned bytes and callers against the pinned ELF and saved caller log. Stop on unknown identity/body rather than broad xref scans.
+- Status/attempt count: ACTIVE, 0 analysis attempts, 0 failed hypotheses; no runtime/build/test claim.
+
 ## 2026-10-29 02:59 CDT (/root) — status-triage publication closeout (ARTIFACT_VERIFIED)
 
 - Owner-authored commit `73c76adda6ed1add0c3ae7251b42ef9d462411eb` (`docs: record current port gate and task readiness`) changed only `HANDOFF.md`.
