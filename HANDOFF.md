@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 00:02 CDT (/root) — claim slot 545 REA/Ghidra characterization (ACTIVE)
+
+- Task ID: `CPU-01-STARTUP-SLOT-545-CHARACTERIZATION-01`.
+- Bounded output: use the pinned ELF and REA/Ghidra to establish the exact reachable body for startup index 545 / RVA `0xb2ec0`, its calls, data references, and unresolved edges; decide whether a later native lift has a bounded contract. This task does not implement or register slot 545.
+- Starting state: `main` at `391e7a9037d8ac71d0da1ceaafc61e8789c5ff18`, fetched `origin/main` matches. The source is `local/re/eboot.elf`, expected SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`.
+- Candidate observation: the live table mapping at virtual address `0x2dd5fd8` (index 545 in table `0x2dd70e0`) yields RVA `0xb2ec0`; mapped file offset is `0x2dd9fd8`. The private classifier estimates a 661-byte span, 111 instructions, five direct calls, zero indirect calls, but this estimate is only a lead until REA/Ghidra confirms coverage and boundaries.
+- Limits and risks: slot 545 is unregistered in the verified 449-row startup list. Do not reuse the classifier extent as a recovered body; preserve unresolved calls and static-only limits. No boot/audio/save/Metal claim follows from this task.
+- Next exact action: perform one REA/Ghidra function analysis at `0xb2ec0`, export its Evidence and snapshot under `local/`, and compare the reported body/callees/references with the pinned table and existing native contracts. If the provider cannot establish adequate coverage, stop without a lift.
+- Status: `ACTIVE`; attempt count 0; no source or game-input files modified.
+
 ## 2026-10-28 (root) — M1–M6 startup-lane integration (ARTIFACT_VERIFIED; published)
 
 - Task ID: `CPU-01-STARTUP-SLOT-LANES-M1-M6-INTEGRATE-01`. Bounded output: independently validate the lane artifacts, wire only verified recovered slots into `StartupState` and the constructor registry, preserve fail-closed skips, and run the required full verification/publication sequence.
