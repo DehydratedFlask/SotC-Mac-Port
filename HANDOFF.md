@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 05:25 CDT (/root) — E945 allocator cleanup-helper result publication closeout (ARTIFACT_VERIFIED)
+
+- Owner-authored result commit `19e0a03511fdc0f768142659d17ab3bb2d43326d` (`docs: characterize allocator cleanup helper`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`; task report and raw analysis artifacts remain private under `local/validation/orch-20261029/SRV-01-ALLOCATOR-TRANSITIVE-CLEANUP-1B0E0-01/`.
+- Required checks passed for the unchanged source tree: `cmake -S native -B local/build/orch-r22` and `cmake --build local/build/orch-r22 -j 12` exited 0; `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure` passed 487/487; `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` passed 572, skipped 0, failed 0. `trail build --check` exited 0 with the wiring graph in sync (10,779 deep-layer nodes pending). `python3 scripts/project_index.py` generated 43,048 folders and `--check` passed. The first project-index check was stale because result-publication log folders had just been created; regeneration followed by a final check passed.
+- Before commit: `git diff --check` passed; staged path audit passed 3 paths; all-path audit passed 3,363 paths; `python3 -I scripts/check_commit_attribution.py` passed. After commit, `python3 -I scripts/audit_publish_paths.py` returned 2 because there were no staged paths; the explicit committed-path audit for the three changed docs and the all-path audit both passed. Attribution and diff checks passed.
+- `git push origin main` and `git fetch origin main` exited 0. Verified `HEAD == origin/main == FETCH_HEAD == 19e0a03511fdc0f768142659d17ab3bb2d43326d`; final `git status --short --branch` is clean (`## main...origin/main`). Exact logs are in `local/validation/orch-20261029/SRV-01-ALLOCATOR-TRANSITIVE-CLEANUP-1B0E0-01/result-publication/attempt-01/`.
+- Task `SRV-01-ALLOCATOR-TRANSITIVE-CLEANUP-1B0E0-01` is published `STATIC_ANALYSIS_VERIFIED` within its call/body scope: one analysis attempt and zero failed semantic hypotheses. The direct import's runtime binding and deeper imported cleanup/reporting effects remain unresolved. No source implementation, runtime, boot/audio/save, Metal, or G1–G6 gate advanced; the native Mac port remains incomplete.
+- Next exact action: review `docs/TASKS.md` for the next dependency-ready bounded task, claim it in `HANDOFF.md` before editing, then follow the repository Graft/Trail and checkpoint process.
+
 ## 2026-10-29 05:18 CDT (/root) — E944 allocator cleanup-helper result (STATIC_ANALYSIS_VERIFIED)
 
 - Completed `SRV-01-ALLOCATOR-TRANSITIVE-CLEANUP-1B0E0-01` within its static-analysis boundary. The saved E937 read-only Ghidra log supplied `0x1b0e0`; a new `-noanalysis -readOnly` query covered direct targets `0x323d0`, `0x1abf0`, `0x1af80`, `0x32560`, `0x19c90`, and `0xf8f3a0`.
