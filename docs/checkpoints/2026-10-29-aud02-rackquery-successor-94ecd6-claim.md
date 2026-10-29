@@ -31,7 +31,11 @@ Before publication, configure/build exited 0; CTest passed 487/487; lift checker
 
 Before commit, the staged audit passed 6/6; the all-path audit passed 3,376/3,376; and `git diff --cached --check` passed. A precommit fetch verified `HEAD == origin/main == FETCH_HEAD == ead03a8b5d8dceafe9699afb8c35f07eca421a99`; configured author is Johnny Wang. The first diff check found trailing Markdown whitespace in the metadata lines; it was corrected and the final check passed. No analysis hypothesis failed.
 
-Attribution, commit, push, and postpush fetch verification remain pending.
+## Publication closeout (E984)
+
+The claim was published in owner-authored commit `e9827d71a0258ce43be07517ab4309b391f875cd` (`docs: claim RackQuery successor block check`), changing six allowlisted documentation paths. Push/fetch verified `HEAD == origin/main == FETCH_HEAD`; author and committer are Johnny Wang. Claim gates: configure/build exit 0; CTest 487/487; lift checkers 572/0/0; Trail wiring graph in sync with 10,779 deep-layer nodes pending; project index 43,141/current; staged audit 6/6; all-path audit 3,376/3,376; staged diff and attribution passed. Postpush path audit, attribution, commit check, project-index check, and clean worktree passed. Logs are under `local/validation/AUD-02-NGS2-RACKQUERY-SUCCESSOR-94ECD6-01/claim-publication/attempt-01/`.
+
+The task remains ACTIVE at 0 analysis attempts. This claim does not establish behavior, route selection, audio, runtime reachability, or any product gate.
 
 Exact next commands:
 
