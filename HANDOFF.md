@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 05:39 CDT (/root) — E948 save-reader claim publication closeout (ARTIFACT_VERIFIED)
+
+- Published the `SAV-01-BOOL-CHUNK-READER-A81180-01` claim as owner-authored commit `2eaf63aeb9c7b5b3d5505b506f2e59d3904ade82` (`docs: claim save bool chunk reader analysis`), changing only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
+- Required gates: `cmake -S native -B local/build/orch-r22` and `cmake --build local/build/orch-r22 -j 12` exited 0; `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure` passed 487/487; `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` passed 572, skipped 0, failed 0. `trail build --check` exited 0 and reports the wiring graph in sync, with 10,779 deep-layer nodes pending. `python3 scripts/project_index.py` and `--check` both exited 0 at 43,051/current.
+- Before commit, staged path audit passed 3/3 paths and all-path audit passed 3,363/3,363; attribution, cached diff, and pre-push path audit passed. After commit, exact-range attribution (`python3 -I scripts/check_commit_attribution.py --range HEAD^..HEAD`), `git show --format= --check HEAD`, and all-path audit passed. Push/fetch succeeded; `HEAD == origin/main == FETCH_HEAD == 2eaf63aeb9c7b5b3d5505b506f2e59d3904ade82`; worktree clean. Exact logs: `local/validation/orch-20261029/SAV-01-BOOL-CHUNK-READER-A81180-01/claim-publication/attempt-01/`.
+- Observation: this verifies only the published task claim and repository checkpoint. No analysis has run; task remains ACTIVE with 0 attempts and 0 failed semantic hypotheses. No native save/load or G1–G6 gate advanced.
+- Next exact action: start the single bounded Ghidra 12.1.4 read-only analysis of `0xa81180` and its direct caller/callees, with independent pinned-ELF byte verification.
+
 ## 2026-10-29 05:34 CDT (/root) — E947 claim save bool-chunk reader (ACTIVE)
 
 - Principal reassessment: the user asked whether the project is done and reiterated the goal of completing as much work as possible. E946's exact task-board scan found no `READY` rows, so this checkpoint claims a new bounded continuation explicitly named by the completed blob-flush checkpoint: `SAV-01-BOOL-CHUNK-READER-A81180-01`.
