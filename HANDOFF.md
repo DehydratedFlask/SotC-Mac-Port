@@ -1,5 +1,23 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 03:31 CDT (/root) — E927 publication closeout (ARTIFACT_VERIFIED)
+
+- Owner-authored commit `ed7460f3aebca97facce8348072555914c0f454d` (`docs: claim allocator owner lookup trace`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
+- Claim pre-push gates passed: configure/build; CTest 487/487; lift 572/0/0; staged audit 3/3; all-path audit 3,363/3,363; attribution passed; project index 43,022 folders. Push/fetch succeeded, `HEAD == origin/main == FETCH_HEAD`; post-push exact-range attribution and all-path audit passed; worktree clean.
+- Logs are under `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-OWNER-11FB0-01/`. This verifies the task claim only.
+
+## 2026-10-29 03:31 CDT (/root) — allocator owner lookup result E929 (STATIC_ANALYSIS_VERIFIED)
+
+- Task: `SRV-01-ALLOCATOR-FREE-OWNER-11FB0-01`; characterize `0x11fb0` and its stored callers, focusing on the page-owner-to-heap lookup used from `0x19a50`.
+- Files changed: private query, verifier, logs, and report under `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-OWNER-11FB0-01/`; tracked `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md` were updated for the result. No product source changed.
+- Exact commands: Ghidra 12.1.4 `analyzeHeadless local/ghidra/persistent-20261020 SotC -process eboot.elf -noanalysis -readOnly -scriptPath local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-OWNER-11FB0-01 -postScript AllocatorOwnerLookup11fb0.java` exited 0; `python3 -I local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-OWNER-11FB0-01/verify_11fb0_bytes.py` exited 0. Pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; 40 instructions / 129 B in `0x11fb0..0x12030`, plus four stored call sites, all byte-matched and each target decodes to `0x11fb0`.
+- Observation: `0x11fb0(owner_id, 0)` returns the corresponding heap-table slot; it first lazily installs bootstrap if latch is clear and slot 1 empty. Only `owner_id == 1 && param_2 != 0` selects the last composite child. The free fallback calls with `param_2 == 0`; native `PageOwnerMap` reserves ids 0/1 and `AllocatorFront::free` maps the optional id to `heap(id)` then `deallocate`.
+- Inference: the owner-id → heap-table route in the `0x19a50` fallback is conceptually aligned with the native range-map / slot lookup. Original byte tables and lazy-bootstrap-on-free are not reproduced by the current model.
+- Remaining risks: other callers' argument values, vtable `+0xa8` target implementations, computed transfers, and runtime reachability remain open. No cold boot, actual game audio, real save/reload, or gameplay Metal gate advanced; G1/G4 remain PARTIAL.
+- Required repository verification: configure/build passed (`ninja: no work to do`); CTest 487/487; lift checkers 572 passed, 0 skipped, 0 failed; all-path audit 3,363; attribution passed; project index 43,022 folders. `trail build --check` reports wiring graph in sync; deep concept layer remains unbuilt with 10,779 nodes pending. Logs are under the private task directory.
+- Next exact action: if exact allocator equivalence is needed, characterize the three non-free callers' `param_2` values and concrete `+0xa8` implementations before modifying the native front-end.
+- Status/attempt count: `STATIC_ANALYSIS_VERIFIED`, one analysis attempt, zero failed semantic hypotheses; no runtime claim.
+
 ## 2026-10-29 03:27 CDT (/root) — E925 publication closeout (ARTIFACT_VERIFIED)
 
 - Owner-authored commit `3eb9c622da90b5178ca1467005f2ca633ab4e861` (`docs: record allocator free dispatch limits`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
