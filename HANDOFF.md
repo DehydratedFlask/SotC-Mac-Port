@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 04:18 CDT (/root) — E934 allocator-dispatch publication closeout (ARTIFACT_VERIFIED)
+
+- E933 is owner-authored commit `8db3a57b5b18f76af7123faebfa299d44d1db14a` (`docs: verify allocator free dispatch targets`) on `main`; it changed only `HANDOFF.md`, `docs/EVIDENCE.md`, and `docs/TASKS.md`.
+- Required verification passed: `cmake -S native -B local/build/orch-r22` exit 0; `cmake --build local/build/orch-r22 -j 12` exit 0; CTest 487/487; lift checkers 572 passed, 0 skipped, 0 failed; `trail build --check` says wiring graph in sync (deep layer remains unbuilt, 10,779 nodes pending); project index 43,026 folders and `--check` current; staged audit 3/3; all-path audit 3,363/3,363; attribution passed; staged diff check passed. Exact outputs are in `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01/publication-closeout/attempt2/`.
+- `git push origin main` and `git fetch origin main` exited 0; after publication `HEAD == origin/main == FETCH_HEAD == 8db3a57b5b18f76af7123faebfa299d44d1db14a`; worktree clean. The allocator task is `STATIC_ANALYSIS_VERIFIED` (E933); only its publication closeout is recorded here.
+- No product source changed and no G1–G6 gate advanced. The Ghidra target-body decompilation caveat and runtime limits remain as in E933.
+- Next exact action: re-evaluate the task dependency graph after closing the allocator free-dispatch parent gap and select the next bounded unblocked task.
+- Status: E933 publication `ARTIFACT_VERIFIED`; task analysis `STATIC_ANALYSIS_VERIFIED`; one failed REA tool/workflow attempt, zero failed semantic hypotheses.
+
 ## 2026-10-29 04:11 CDT (/root) — E933 allocator `+0xa8` targets (STATIC_ANALYSIS_VERIFIED)
 
 - Task `SRV-01-ALLOCATOR-FREE-DISPATCH-A8-01` is complete as bounded static analysis. In the byte-matched `0x13380` bootstrap, root `CPUMemory` is assigned slot 1; child allocators first-free scan the zero-filled heap table and assign IDs 2/3/4 to Bucket/Heap/Page. The shared `0x13d20` setter stores the selected ID at `[this+0x1c]` (`89 77 1c c3`). The `0x12af0` virtual call at `0x12c25` therefore reaches bucket `0x17e90`, heap `0x493d0`, or page `0x18920` for allocator-produced owner IDs.
