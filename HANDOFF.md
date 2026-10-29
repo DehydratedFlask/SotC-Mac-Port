@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 12:29 CDT (/root) — E999 claim: APP-01 importer cancellation state fixture (ACTIVE)
+
+- Starting tree: clean `main` at `60e3bc9b09f7fde49620dee136747ec7a4c5e680`, matching `origin/main`.
+- Claimed `APP-01-IMPORTER-CANCEL-STATE-FIXTURE-01` under `APP-01-IMPORTER-ERROR-01` / `APP-01`. Live `ContentView` sets `assetsDirectory` and schedules `validate()` only on picker success; picker failures use `FolderImportErrorClassifier`. Existing tests already cover silent Cocoa/Swift cancellation and localized ordinary-error copy, but they do not prove that cancellation preserves the model's selected directory/readiness through the handler used by the view.
+- Scope: add a small pure import-result reducer and a `@MainActor` LauncherModel state handler, wire the view through that handler, and add fixtures proving cancel preserves a prior synthetic directory and readiness report, emits no alert, and makes no validation call. Keep successful selection's existing validation scheduling and ordinary-error alert copy unchanged.
+- Limits: no native/macOS file-picker interaction, Finder launch, real game folder access, game-core readiness claim, or G4 pass. Only synthetic URLs and the existing scripted client may be used. Do not change core readiness or alter selection/validation behavior on success.
+- Claim files: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-29-app01-importer-cancel-state-claim-e999.md`. Claim logs: `local/validation/APP-01-IMPORTER-CANCEL-STATE-FIXTURE-01/claim-publication/attempt-01/`.
+- Next exact action after claim publication: implement the result reducer/state handler in LauncherCore, route `ContentView` through it, and add focused synthetic cancellation/success/error fixtures; preserve the current success validation schedule.
+- Task status: ACTIVE; 0 implementation attempts; 0 failed semantic hypotheses. G4 remains PARTIAL; no product gate advanced.
+
 ## 2026-10-29 12:22 CDT (/root) — E998: E996 load-dispatch target-origin attempt (BLOCKED)
 
 - Starting tree: clean `main` at `f9df6e7bbd23501ec00282d2a05208e69248225e`, matching `origin/main`. Pinned ELF `local/re/eboot.elf` SHA-256 remains `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0.
