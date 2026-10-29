@@ -1,5 +1,19 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 02:46 CDT (/root) — slot-309 caller/order trace bounded result (E920)
+
+- Task: `CPU-01-STARTUP-SLOT-309-CALLER-ORDER-01`; bounded saved-project Ghidra trace completed with `PARTIAL / STATIC_ANALYSIS_VERIFIED`. Private report: `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-309-CALLER-ORDER-01/REPORT.md`.
+- Pinned ELF: `local/re/eboot.elf`, SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; Ghidra 12.1.4, OpenJDK 25.0.4.1, ARM64 host, image base 0, language `x86:LE:64:default`.
+- Observed: saved-project xrefs give `0x531d60 -> 0x255130 -> 0x255180 -> 0x264e50 -> 0x27990`; `0x27990` reads function pointer `0x28af0` from `0x15fe540` and writes it into its object at `+0xd0`. `0x531d60` itself has one stored DATA reference from `0x15c8cf8`, with no code caller in this census. No incoming references were found to checked table cells `0x15c8ce8`, `0x15c8cf8`, `0x15c8d18`, metadata `0x2e716a0`, or the constructor slot address `0x2dd6738`; `0xa505e0` has the expected DATA ref from that slot.
+- Inference not made: the conditional writer/constructor chain and callback installation do not show that `0x531d60` runs before slot `0xa505e0`, nor that callback `0x28af0` is invoked during construction or before slot 309. Both `0x268b0` branches remain possible; no native-lift boundary is supported. Slot 309 remains unregistered and G1 `PARTIAL`.
+- REA note: opening the pinned ELF succeeded with the exact digest and Ghidra 12.1.4 (profile digest `769518a8e9b57f953dd241adbb63672f0f486bb3d66359b9deef7c5e088ca7aa`). Two xref calls were canceled after ~6m30 and a separate call after ~2m35; no REA Evidence IDs were returned. The target was closed cleanly. The successful result comes from the existing saved project with `-noanalysis -readOnly`.
+- Exact command: `/Users/dehydratedflask/Applications/ghidra_12.1.4_PUBLIC/support/analyzeHeadless local/ghidra/persistent-20261020 SotC -process eboot.elf -noanalysis -readOnly -scriptPath local/validation/orch-20261029/CPU-01-STARTUP-SLOT-309-CALLER-ORDER-01 -postScript Slot309CallerOrderRefs.java > local/validation/orch-20261029/CPU-01-STARTUP-SLOT-309-CALLER-ORDER-01/ghidra-incoming-refs.log 2>&1` exited 0. Script SHA-256 `467be926b9552fef096805f9c3ec571d4ec23b6a204053157a4da0e61f616bd8`; log SHA-256 `36c3aba7cbb6fb11c4352de7c9fd85248dc96b2a93ef7a50811bbba920a22858`.
+- A side probe of common cell `0x15fe518` returned 19,275 READ refs and was excluded as non-discriminating. No tests/build, target execution, or source change occurred. `python3 scripts/project_index.py` exited 0 at 43,018 folders; `trail build --check` exited 0 with 10,779 nodes in sync; deep meaning tier remains 0%.
+- Task status/attempts: caller/order trace bounded result recorded as `PARTIAL / STATIC_ANALYSIS_VERIFIED`; 0 failed semantic hypotheses. Parent `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` remains `ACTIVE`. Next action: keep slot 309 unregistered; resume only if a concrete dispatcher/order path is identified or after principal reassessment.
+- Prepublication checks: staged path audit passed 3/3; all-path audit passed 3,363/3,363; precommit attribution and cached diff checks passed. Logs are under `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-309-CALLER-ORDER-01/`. Commit/push closeout is pending.
+
+## 2026-10-29 02:25 CDT (/root) — saved-reference triage publication closeout (ARTIFACT_VERIFIED)
+
 ## 2026-10-29 02:25 CDT (/root) — saved-reference triage publication closeout (ARTIFACT_VERIFIED)
 
 - Commit `ccf79caf240ef26945907a082e2c2e7ad87d2c5a` (`docs: close slot 309 saved-reference triage`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
