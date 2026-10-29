@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 02:58 CDT (/root) — broad port status and task-queue triage (PARTIAL)
+
+- Task: continue the user-requested broad native-port work and check whether the project is complete or has another independently ready product task. No new product task was claimed.
+- Files changed: `HANDOFF.md` only; private verification logs are under `local/validation/orch-20261029/PROJECT-PORT-STATUS-TRIAGE-01/`.
+- Exact checks: `git fetch origin main` found no remote advance. `cmake -S native -B local/build/orch-r22` exited 0; `cmake --build local/build/orch-r22 -j 12` exited 0 (`ninja: no work to do`); `ctest --test-dir local/build/orch-r22 -j 12 --output-on-failure` passed 487/487; `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` reported 572 passed, 0 skipped, 0 failed; `python3 -I scripts/audit_publish_paths.py --all` passed 3,363/3,363; `python3 -I scripts/check_commit_attribution.py` passed; `python3 scripts/project_index.py` wrote 43,019 folder entries with no tracked index diff. Logs: `cmake-configure.log`, `build.log`, `ctest.log`, `lift-checkers.log`, `audit-all.log`, `attribution-precommit.log`, and `project-index.log` in the private directory above. A read-only Python filter over `docs/TASKS.md` found `READY: []`; `sed -n '3,6p' ROADMAP.md` says the game has not yet been booted; `sed -n '282,286p' docs/TASKS.md` confirms `sotc_core_start()` remains `SOTC_ERR_ENGINE_NOT_IMPLEMENTED` and the authorized VoiceOver follow-up waits for manual unlock.
+- Observed: latest slot-309 caller/order task remains `PARTIAL / STATIC_ANALYSIS_VERIFIED`; the startup slot is unregistered and G1 remains PARTIAL. Two read-only queue scouts suggested the unfinished CXML count, but `docs/ASSETS.md` and the E879 checkpoint explicitly require keeping it UNKNOWN and not repeating the parser probe, so it was not reopened. No game/runtime check was run.
+- Inference: the native-port goal is not complete, and this audit found no existing READY product task that can proceed under the current task boundaries. This does not prove no future task can be opened after a concrete new artifact or prerequisite appears.
+- Remaining risks: no cold game boot, authentic game audio, real save/reload, or gameplay Metal gate is verified. The Mac unlock prerequisite remains external; slot 309 requires a concrete dispatcher/order edge or principal reassessment.
+- Next exact action: resume the already-authorized APP-01 VoiceOver observation after manual unlock, or select a distinct bounded task when its required evidence/input is available. Do not repeat the slot-309 reference census or the stopped CXML parser probe.
+- Status/attempt count: broad goal remains ACTIVE and incomplete; queue triage is PARTIAL, 0 product-task attempts. Build/test/checker evidence verifies existing host fixtures only and advances no game-runtime gate.
+
 ## 2026-10-29 02:47 CDT (/root) — caller/order trace publication closeout (ARTIFACT_VERIFIED)
 
 - Commit `3e27c0367dfb71e229262d2341054928321da458` (`docs: record slot 309 caller-order limits`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
