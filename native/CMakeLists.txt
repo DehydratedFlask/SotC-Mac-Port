@@ -232,6 +232,7 @@ add_library(sotc_core STATIC
   core/input_table_551140.cpp
   core/recursive_mutex.cpp
   core/startup_ctors.cpp
+  core/ctor_slot_545_b2ec0.cpp
   core/clothing_preview_param.cpp
   core/lazy_param_def_tree.cpp
   core/clothing_physical_mesh_parameters.cpp
@@ -495,6 +496,8 @@ add_library(sotc_core STATIC
   core/owner_ctor_a597d0.cpp
 )
 target_include_directories(sotc_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+set_source_files_properties(core/ctor_slot_545_b2ec0.cpp PROPERTIES
+  COMPILE_OPTIONS "-ffp-contract=off")
 enable_testing()
 add_executable(test_math_constants tests/test_math_constants.cpp)
 target_link_libraries(test_math_constants sotc_core)
@@ -505,6 +508,9 @@ add_test(NAME scratch_reset COMMAND test_scratch_reset)
 add_executable(test_startup_ctors tests/test_startup_ctors.cpp)
 target_link_libraries(test_startup_ctors sotc_core)
 add_test(NAME startup_ctors COMMAND test_startup_ctors)
+add_executable(test_ctor_slot_545 tests/test_ctor_slot_545.cpp)
+target_link_libraries(test_ctor_slot_545 sotc_core)
+add_test(NAME ctor_slot_545 COMMAND test_ctor_slot_545)
 set_tests_properties(startup_ctors PROPERTIES
   ENVIRONMENT "SOTC_SLOT23_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/slot23_e71990_names.bin")
 add_executable(test_slot23_names_fixture tests/test_slot23_names_fixture.cpp)
