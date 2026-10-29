@@ -9,6 +9,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 |---|---|
 | [TASKS](TASKS.md) | Dependency-ordered task register and detailed work packets; integrator |
 | [EVIDENCE](EVIDENCE.md) | Verified artifact/source/tool facts and unresolved questions; integrator |
+| [AUD-02 RackQuery jump-entry review (2026-10-29)](checkpoints/2026-10-29-aud02-rackquery-jump-entry-94eb4c.md) | E968 claim; trace only dispatch entry `0x94eb4c` to `0x94ebc2` and determine RBX at `0x94eb78` |
 | [AUD-02 RackQuery call-clobber review (2026-10-29)](checkpoints/2026-10-29-aud02-rackquery-call-clobber-954f183.md) | E966/E967; callee returns RDX in `0..14`; RackQuery argument at `0x94ebc2` remains UNKNOWN |
 | [SAV-01 nested result constructor `0x8db10` (2026-10-29)](checkpoints/2026-10-29-sav01-result-constructor-8db10.md) | E952/E953; byte-verified payload pointer/length flow and published closeout; consumer semantics were characterized in follow-up E955 |
 | [SAV-01 payload reader `0x8eba0` (2026-10-29)](checkpoints/2026-10-29-sav01-payload-read-primitive-8eba0.md) | E955/E956; published static cursor and caller analysis; ordinary reads are length-gated, short reads wrap without reporting failure |
