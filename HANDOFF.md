@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 03:22 CDT (/root) — allocator free-body result E925 (PARTIAL / STATIC_ANALYSIS_VERIFIED)
+
+- Task: `SRV-01-ALLOCATOR-FREE-BODY-12AF0-01`; characterize original front-end free dispatch and stored callers, then compare with native `AllocatorFront::free` / `delete_`.
+- Files changed: private scripts/logs/report under `local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-BODY-12AF0-01/`; tracked `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md` were updated for this result. No product source changed.
+- Exact commands: Ghidra 12.1.4 `analyzeHeadless local/ghidra/persistent-20261020 SotC -process eboot.elf -noanalysis -readOnly -scriptPath local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-BODY-12AF0-01 -postScript AllocatorFreePath12af0.java` and the same with `AllocatorFallback19a50.java` both exited 0. `python3 -I local/validation/orch-20261029/SRV-01-ALLOCATOR-FREE-BODY-12AF0-01/verify_12af0_bytes.py` exited 0: `0x12af0` body 89 instructions/342 B and `0x19a50` body 37 instructions/131 B match pinned ELF bytes; all 86 saved `CALL`/`JMP` sites match bytes and decode to `0x12af0`.
+- Observations: pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; 11 program headers, 2 `PT_LOAD`. The free front-end accepts pointer + 32-bit kind, performs TLS heap selection, can enter lazy bootstrap `0x13380`, falls back through `0x19a50`, and calls virtual `+0xa8`. The fallback reads page/region metadata and calls `0x11fb0` for owner resolution. Saved refs: 86 sites (81 calls, 5 jumps), 70 caller labels. See private `REPORT.md` and `byte-verification.log`.
+- Inference: `0x170b0 -> 0x12af0` and kinds 1/2 align with native delete/delete[] wrappers. The native owner-map-to-allocator deallocation path is conceptually aligned with the original fallback, but the original TLS-selected and bootstrap paths are not represented in `AllocatorFront::free`.
+- Remaining risks: `0x11fb0`, the virtual `+0xa8` implementations, computed transfers, and callers' runtime reachability remain unresolved. No cold boot, actual game audio, real save/reload, or gameplay Metal gate advanced; G1/G4 remain PARTIAL.
+- Next exact action: if exact allocator equivalence is required, claim a separate bounded trace for `0x11fb0` and concrete allocator vtable `+0xa8` targets before changing native code. Do not wire allocator startup from this partial result.
+- Required repository verification for this result: configure/build passed (`ninja: no work to do`); CTest 487/487; lift checkers 572 passed, 0 skipped, 0 failed; `audit_publish_paths.py --all` passed 3,363 paths; precommit attribution passed; project index wrote 43,021 folders. `trail build --check` passed the wiring graph check; the deep concept layer remains unbuilt with 10,779 nodes pending. Logs are under the private task directory.
+- Status/attempt count: `PARTIAL / STATIC_ANALYSIS_VERIFIED`; one analysis attempt, zero failed semantic hypotheses. The initial byte-verifier parser failed on embedded pipe delimiters and was corrected; the corrected raw-byte/branch check passed.
+
 ## 2026-10-29 03:14 CDT (/root) — E922 publication closeout (ARTIFACT_VERIFIED)
 
 - Owner-authored commit `d8cee89fd291895a1e31b094c5e5519b3ea736eb` (`docs: classify allocator 0x110a0 as initializer`) changed only `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`.
