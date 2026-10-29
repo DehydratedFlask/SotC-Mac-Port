@@ -1,5 +1,19 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 02:24 CDT (/root) — slot-309 saved-reference triage closed; caller/order trace claimed (E917–E918)
+
+- Completed `CPU-01-STARTUP-SLOT-309-SAVED-REF-TRIAGE-01` against the existing 41-reference Ghidra census and saved bodies. The consolidated private report is `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-309-SAVED-REF-TRIAGE-01/REPORT.md`.
+- Observed: additional readers include `0x27050`/`0x27120`, which tail-jump to `0x268b0`; `0x261820` is a separate consumer; `0x2569d0` passes the global to other helpers; and the body containing `0x29a0d` loads `*(0x2dfd4b8)` and calls `0x268b0` at `0x29a21`, then `0x272d0`. The saved constructor list has no `0x28af0` entry, and the existing call-edge dump has no incoming caller row for `0x28af0`.
+- Inference not made: these stored references and local value/control-flow facts do not establish which reader executes before slot `0xa505e0`, or whether the known writer chain `0x531d60 -> 0x255130 -> 0x255180` runs before it. Both `0x268b0` registration branches stay open; slot 309 remains unregistered, with no native-lift boundary and G1 `PARTIAL`.
+- Exact root checks: `rg -n '268b0' local/re/evidence/appinfo-list-reader/dis/full.dis` exit 0; `sed -n '41470,41620p' local/re/evidence/appinfo-list-reader/dis/full.dis` exit 0; the focused Python query over all 573 `constructors.entries` for `28af0` exited 0 with no match; `shasum -a 256` verified `full.dis`, `ghidra-q1-call-edges.txt`, and `imports.json`. Independent reviewers read only saved bodies/evidence; no new REA/Ghidra query or target execution occurred. No tests/build ran and no source was changed.
+- Index checks: `python3 scripts/project_index.py` exited 0 with 43,017 folders indexed; `trail build --check` exited 0 with the 10,779-node wiring graph in sync. The deep meaning tier remains unbuilt at 0%.
+- Task status: bounded saved-reference triage `COMPLETE / STATIC_ANALYSIS_VERIFIED`, 0 failed semantic tries. Parent `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` remains `ACTIVE`.
+- New bounded task claim: `CPU-01-STARTUP-SLOT-309-CALLER-ORDER-01`, 0 failed tries. Use the existing read-only Ghidra project/REA session to query incoming references to `0x28af0` and `0x531d60`, identify any table/dispatcher consumer needed to explain those references, and determine whether either path can execute before constructor slot `0xa505e0`. Stop with an explicit unresolved result if computed dispatch/order remains unproven. No code change, startup registration, or runtime execution is in scope.
+- Files changed for this checkpoint: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, and the private report above. No game input or dependency changed.
+- Prepublication checks: staged path audit passed 3/3; all-path audit passed 3,363/3,363; precommit attribution and `git diff --cached --check` passed. Logs, project-index result, and Trail graph check are under `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-309-SAVED-REF-TRIAGE-01/`. The documentation checkpoint commit/push is next. Exact next action after publication: inspect the current REA binary-session identity, then perform the exact incoming-reference/order trace in the claimed task.
+
+## 2026-10-29 02:18 CDT (/root) — claim exact saved-reference triage for slot 309 (ACTIVE)
+
 ## 2026-10-29 02:18 CDT (/root) — claim exact saved-reference triage for slot 309 (ACTIVE)
 
 - Task ID: new `CPU-01-STARTUP-SLOT-309-SAVED-REF-TRIAGE-01`, dependent on `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01`.
