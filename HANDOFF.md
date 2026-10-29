@@ -1,5 +1,22 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 06:16 CDT (/root) — E954 claim save payload reader primitive (ACTIVE)
+
+- Principal continuation after E952/E953: claimed `SAV-01-PAYLOAD-READ-PRIMITIVE-8EBA0-01` to verify the documented use of reader primitive `0x8eba0` against the pointer/length fields initialized by `0x8db10`.
+- Scope: read-only characterize `0x8eba0` and its direct caller contexts; identify raw input fields, position/length advancement, return/error behavior, calls, and whether bounds are enforced; byte-check body and relevant callsites against the pinned ELF. No lift, wiring, original-code execution, or real save/load claim.
+- Claim preflight: clean `main` at `6abd3501ff0713fe66e430e43072def652e3b90f`; pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; no existing task/evidence row for this task ID. The prior profile-chunks checkpoint names `0x8eba0` among the reader primitives and says its caller reads the u64 prefix from the payload view; this is a lead, not proof.
+- Prerequisites/spec: `SAV-01-CHUNK-RESULT-CONSTRUCTOR-8DB10-01`, `SAV-01-BOOL-CHUNK-READER-A81180-01`, `SAV-01-PROFILE-CHUNKS-01`; `docs/REVERSE_ENGINEERING.md` Stage 2.
+- Observation vs inference: observation—E952 verified that constructor inputs place payload pointer and length into raw object offsets `+0x120`, `+0x110`, `+0x118`, with zero at `+0x108`. Inference—the primitive may consume these fields as a bounded stream; no method contract is established yet.
+- Files changed for this claim: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, and the existing SAV-01 checkpoint. Analysis attempts 0; failed semantic hypotheses 0. Next exact action after claim publication: query `0x8eba0` and its direct callers from the saved Ghidra project in `-noanalysis -readOnly` mode, then independently byte-check the method and argument setup.
+
+## 2026-10-29 06:15 CDT (/root) — E953 publication closeout for E952 (ARTIFACT_VERIFIED)
+
+- Owner-authored commit `6abd3501ff0713fe66e430e43072def652e3b90f` (`docs: characterize save result view constructor`) changed only six allowlisted documentation paths: `HANDOFF.md`, `docs/EVIDENCE.md`, generated `docs/FOLDERS.md`, `docs/INDEX.md`, `docs/TASKS.md`, and `docs/checkpoints/2026-10-29-sav01-result-constructor-8db10.md`.
+- Required gates: `cmake -S native -B local/build/orch-r22` exited 0; `cmake --build local/build/orch-r22 -j 12` exited 0; CTest passed 487/487; lift checkers passed 572, skipped 0, failed 0. `trail build --check` reported the wiring graph in sync with 10,779 deep-layer nodes pending. `python3 scripts/project_index.py` wrote 43,062 folders and `--check` passed current.
+- Pre-push staged path audit passed 6/6; all-path audit passed 3,364/3,364; attribution, identity, and staged diff checks passed. Post-commit explicit-path audit passed 6/6, all-path audit 3,364/3,364, exact-range attribution and `git show --format= --check HEAD` passed. The first project-index checks were stale because new local validation logs were added after generation; logs were precreated, the index regenerated after the build/checker run, and the final check passed.
+- `git push origin main` and `git fetch origin main` exited 0. Verified `HEAD == origin/main == FETCH_HEAD == 6abd3501ff0713fe66e430e43072def652e3b90f`; worktree clean. Exact logs: `local/validation/orch-20261029/SAV-01-CHUNK-RESULT-CONSTRUCTOR-8DB10-01/result-publication/attempt-01/`.
+- E952 remains `STATIC_ANALYSIS_VERIFIED` only for the direct constructor/call-chain boundary. No implementation or G1–G6 gate advanced. Next bounded task `SAV-01-PAYLOAD-READ-PRIMITIVE-8EBA0-01` is claimed below as E954.
+
 ## 2026-10-29 06:10 CDT (/root) — E952 nested save-result constructor (STATIC_ANALYSIS_VERIFIED)
 
 - Completed `SAV-01-CHUNK-RESULT-CONSTRUCTOR-8DB10-01` within the direct constructor/call-chain boundary. Ghidra 12.1.4 read-only analysis and independent byte verifier confirm the pointer/length flow from `0xa81180` through `0x4d470` into `0x8db10`.

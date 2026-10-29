@@ -26,3 +26,10 @@ These pointer/length/state writes support an empty-position bounded-view layout,
 
 - No native lift or wiring. The helper `0xf8f630`, object-field names/ownership, consumer bounds behavior, computed callers, full schema, and authentic save/reload remain unresolved.
 - Next bounded action: claim and characterize the direct payload-reading consumer identified in the older profile-chunks checkpoint (`0x8eba0`) against the same pinned ELF, then update the stream interpretation only if the consumer corroborates it.
+
+## E953 publication closeout
+
+- Published in owner-authored commit `6abd3501ff0713fe66e430e43072def652e3b90f`; pushed and fetch-verified on `main`, with a clean worktree.
+- CMake configure/build passed; CTest 487/487; lift checkers 572 passed, 0 skipped, 0 failed; Trail check passed with 10,779 deep-layer nodes pending; project index 43,062/current.
+- Staged and explicit committed-path audits passed 6/6; all-path audit passed 3,364/3,364; identity, attribution and diff checks passed. Exact logs are in `local/validation/orch-20261029/SAV-01-CHUNK-RESULT-CONSTRUCTOR-8DB10-01/result-publication/attempt-01/`.
+- Successor task `SAV-01-PAYLOAD-READ-PRIMITIVE-8EBA0-01` is claimed as E954 in `HANDOFF.md`, `docs/TASKS.md`, and `docs/EVIDENCE.md`; it remains ACTIVE with zero analysis attempts.
