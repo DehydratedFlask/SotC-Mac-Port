@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-30 00:00 CDT (/root) — E1031: `0x499f80` app-main Init body (PARTIAL)
+
+- User scope is the actual game startup path; VoiceOver/accessibility is out of scope. `RE-02-APPMAIN-499F80-BODY-LIFTABILITY-01` is now `PARTIAL / STATIC_ANALYSIS_VERIFIED` for body identity/control flow only. `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` remains ACTIVE.
+- Successful read-only REA/Ghidra 12.1.4 function dossier: Evidence `ev_23dcf45d3ce46417d94d92bbf0a8492625dd9a679c07185e6b3e14a0780ba23a`, pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`. Function body `0x499f80–0x49a040` inclusive, 193 bytes, 9 basic blocks; caller `0x531d60` at `0x531def`; eight direct calls to six callees and no unresolved calls. Independent pinned-byte disassembly and raw body SHA-256 `9ea23d248ce29318034c8f929f5cc435bbf7f92f57113ebf93b5b4c8e853f8ce` agree.
+- The body selects a pointer from its argument or global `0x15ff9a8`, writes it via `0x1604988`, allocates/initializes an object with two `0xa00` buffers, conditionally releases the old object at `0x2ef9fc8`, then stores the new pointer. These are static instruction/decompiler observations. The six callees' allocation, initialization, destructor, and ownership contracts are not established, so no native lift is proposed.
+- Private dossier/report: `local/validation/orch-20261029/RE-02-APPMAIN-499F80-BODY-LIFTABILITY-01/recovery-attempt-01/REPORT.md`; report SHA-256 `faf57e903f4755ca3efdce840f2a47a8019db4dcad59e8c5dc9b6cdf735eb628`. Full REA JSON and snapshot hashes, exact command, and byte recipe are recorded there. Earlier E1029/E1030 provider failures are resolved for this function query; 0 failed semantic hypotheses.
+- No source/runtime, launcher, reference clone, or game input changed. No engine startup, cold boot, game audio, real save/reload, or game-driven Metal frame is proved. `sotc_core_start()` remains `SOTC_ERR_ENGINE_NOT_IMPLEMENTED`; G1 PARTIAL, G5 NOT RUN. No product gate advances.
+- Next exact action: map callees `0x17070`, `0x17090`, `0x170b0`, `0x170c0`, `0x3b310`, and thunk target `0xf8f8c0` to pinned-ELF contracts and existing native allocator/lifecycle interfaces; stop at the first unestablished helper contract. Then return to the actual startup chain and identify the first engine/world-initialization boundary. Do not infer that this helper boots the game.
+- Validation: configure/build exit 0; CTest 487/487; lift checkers 572 passed, 0 skipped, 0 failed; `trail build --check` passed with 10,787 meaning nodes pending; project index 44,262/current. Staged path audit 6/6, all-path audit 3,416, attribution audit and `git diff --cached --check` passed. Logs: `local/validation/orch-20261029/STARTUP-APPMAIN-E1031-PUBLICATION/`.
+- Files changed: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and this E1031 checkpoint; private analysis/verification logs remain under `local/`. No source/runtime change.
+
 ## 2026-10-29 23:10 CDT (/root) — E1030: save-thread callback route (PARTIAL)
 
 - User scope is the actual game startup path; VoiceOver/accessibility is out of scope. `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` remains ACTIVE. `RE-02-APPMAIN-499F80-BODY-LIFTABILITY-01` remains BLOCKED.
