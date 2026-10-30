@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 20:38 CDT (/root) — E1016: E1015 publication closeout (ARTIFACT_VERIFIED)
+
+- E1015 result commit `e954fe24adaea7671c6086a4043c1a8b75db5d7a` (`docs: record slot 309 receiver route limits`) was authored by Johnny Wang, pushed to `origin main`, and fetch-verified. `HEAD`, `origin/main`, and `FETCH_HEAD` all matched; the post-push worktree was clean.
+- E1015 prepublication verification: CMake configure/build exited 0; CTest passed 487/487; lift checkers passed 572, skipped 0, failed 0 (corrected rerun exit 0); Trail wiring graph check passed with 10,787 meaning-tier nodes pending; project index passed at 44,230/current. Staged-path audit passed 6/6; all-path audit passed 3,403; attribution and staged diff checks passed. E1015 result logs are under `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-309-RECEIVER-PROVENANCE-01/result-publication/attempt-01/`.
+- Post-push checks passed: all-path audit 3,403; attribution; commit whitespace; project index 44,230/current. The staged-only audit after commit reported “nothing staged” (exit 2), expected because the staged-path audit had passed before commit; committed paths were checked by the all-path audit.
+- E1016 closeout verification repeated the repository gates with the same outcomes: configure/build 0; CTest 487/487; lift 572/0/0, exit 0; Trail wiring graph OK with 10,787 meaning-tier nodes pending; project index 44,231/current. Staged-path audit passed 5/5; all-path audit passed 3,404; attribution and cached diff checks passed. Logs are under `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-309-RECEIVER-PROVENANCE-01/result-publication/attempt-02/`.
+- E1016 verifies documentation publication only. The parent slot-309 task remains ACTIVE, the slot stays unregistered, G1 remains PARTIAL, no G0–G6 product gate advances, and the game is not running. Current board has 0 READY rows; no eligible independent service/save/Metal leaf advances real startup without crossing slot 309.
+- Next exact action: do not repeat the same receiver slice or generic xref/literal scans. Continue real boot work only with a distinct concrete producer/consumer/order edge or new evidence. Accessibility remains out of scope per the user's instruction.
+
 ## 2026-10-29 20:33 CDT (/root) — E1015: slot-309 app-main receiver route review (PARTIAL)
 
 - Parent task `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` was resumed after the user's explicit focus on getting the game running; accessibility work is out of scope. Existing saved exports were reviewed on pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`. No REA/Ghidra query, source change, target execution, or VoiceOver operation occurred.
