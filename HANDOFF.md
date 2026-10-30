@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-30 00:11 CDT (/root) — E1032: `0x499f80` callee-contract boundary (PARTIAL)
+
+- User explicitly requested a good stopping point and to stop the goal. Actual game startup remains the objective; VoiceOver/accessibility is out of scope. The goal will be paused after this docs-only checkpoint is pushed.
+- Live `main` and `origin/main` were clean at `190395545d4a08ebd6704d22939ed141f2746092` when this continuation began. No product source or game input changed.
+- E1031 body Evidence `ev_23dcf45d3ce46417d94d92bbf0a8492625dd9a679c07185e6b3e14a0780ba23a` remains the byte/control-flow anchor. Four callees already match `alloc_wrappers_17070`: `0x17070` uses tag 1/alignment 8/flags 1, `0x17090` tag 1/alignment 8/flags 2, `0x170c0` frees with tag 2, and `0x170b0` frees with tag 1.
+- Remaining boundary: `0x3b310` initializes a named mutex through imported pthread attribute/init calls and `0x3b380` reaches imported `scePthreadMutexDestroy`. The PS4 type-2 and 8-byte handle contract are not established. The immutable PC reference maps 2 to recursive, but that adapter is only a lead. Existing `RecursiveMutex` adds priority inheritance and stores a host `pthread_mutex_t` inline, so it is not a proven replacement.
+- A live source audit confirms `run_validation` reports `engine_ready=0`, coverage labels `engine_boot` not implemented, and `sotc_core_start()` always returns `SOTC_ERR_ENGINE_NOT_IMPLEMENTED`. No game boot, audio, save/reload, or game-driven Metal frame is proved; G1 remains PARTIAL, G5 NOT RUN.
+- Exact next action if resumed: establish the `0x3b310`/`0x3b380` host representation, type-2 mapping, and error/lifetime contract from primary evidence; then claim a bounded `0x499f80` native-lift task using the existing allocator wrappers. Keep the engine readiness gate closed until a real startup path exists.
+- Validation: configure/build exit 0; CTest 487/487; lift checkers 572/0/0; Trail wiring check passed with 10,787 meaning nodes pending; project index 44,264/current; staged audit 6/6; all-path audit 3,417; attribution and staged diff checks passed.
+- Private evidence report: `local/validation/orch-20261030/RE-02-499F80-CALLEE-CONTRACTS-E1032/REPORT.md`, SHA-256 `6b84bce0c404855007d893d1c0fbea96543d6103faeae8f151393568db6207b1`. Validation and publication logs: `local/validation/orch-20261030/STARTUP-STOP-E1032-PUBLICATION/`.
+
 ## 2026-10-30 00:00 CDT (/root) — E1031: `0x499f80` app-main Init body (PARTIAL)
 
 - User scope is the actual game startup path; VoiceOver/accessibility is out of scope. `RE-02-APPMAIN-499F80-BODY-LIFTABILITY-01` is now `PARTIAL / STATIC_ANALYSIS_VERIFIED` for body identity/control flow only. `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` remains ACTIVE.
