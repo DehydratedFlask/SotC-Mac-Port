@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 20:44 CDT (/root) — E1017: game-start status recheck (PARTIAL)
+
+- Scope is game startup only. Starting from clean `main` at `5d62a5978e34ac5b8bec86f1e8f8af56b2aae280`, `git fetch origin main` exited 0; `HEAD`, `origin/main`, and `FETCH_HEAD` still match. Files changed for this checkpoint: `HANDOFF.md` only.
+- Exact source check: `rg -n "CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01|CPU-01\| Native recovery feasibility slice|SOTC_ERR_ENGINE_NOT_IMPLEMENTED" docs/TASKS.md native/api/sotc_core.cpp`; `sed -n '355,395p' native/api/sotc_core.cpp`. The live `sotc_core_start()` transitions to STARTING, then FAILED, and returns `SOTC_ERR_ENGINE_NOT_IMPLEMENTED`; the slot-309 task remains ACTIVE with no native-lift boundary and G1 PARTIAL.
+- `trail ask "Which original startup path and constructor dependencies must be recovered after native initialization reaches constructor slot 309 (RVA 0xa505e0)?" --source --in reference/ShadowOfTheColossus-PC/` returned no indexed nodes under that prefix. Existing completed boot-path and service/save frontier reviews also found no implementation supported by current evidence. No new semantic hypothesis, source edit, game execution, or product gate advance. Required publication checks: configure/build exit 0; CTest 487/487; lift checkers 572 passed, 0 skipped, 0 failed; Trail wiring graph OK with 10,787 meaning-tier nodes pending; project index 44,234/current; staged audit 1/1; all-path audit 3,404; attribution and cached diff checks passed. Logs: `local/validation/orch-20261029/BOOT-FOCUS-RECHECK-E1017/result-publication/attempt-01/`.
+- Observed: current source refuses engine start and the task board still has the slot-309 gap. Inference: this build cannot start the game. Remaining risk is unresolved startup producer/consumer/order evidence for slot 309 and the absent engine chain after it. Overall boot, authentic game audio, real save/reload, gameplay Metal, and forbidden-runtime absence are not demonstrated.
+- Parent task `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` stays ACTIVE; no new analysis attempt and zero failed semantic hypotheses in this checkpoint. Next exact action: resume only when a distinct, verifiable producer/consumer/order edge or newly available pinned-binary evidence supports a bounded startup lift; do not repeat the reviewed receiver route.
+
 ## 2026-10-29 20:38 CDT (/root) — E1016: E1015 publication closeout (ARTIFACT_VERIFIED)
 
 - E1015 result commit `e954fe24adaea7671c6086a4043c1a8b75db5d7a` (`docs: record slot 309 receiver route limits`) was authored by Johnny Wang, pushed to `origin main`, and fetch-verified. `HEAD`, `origin/main`, and `FETCH_HEAD` all matched; the post-push worktree was clean.
