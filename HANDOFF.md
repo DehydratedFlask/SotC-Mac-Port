@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 20:33 CDT (/root) — E1015: slot-309 app-main receiver route review (PARTIAL)
+
+- Parent task `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` was resumed after the user's explicit focus on getting the game running; accessibility work is out of scope. Existing saved exports were reviewed on pinned ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`. No REA/Ghidra query, source change, target execution, or VoiceOver operation occurred.
+- The saved `0x25aa06` callsite shows `R15 = RDI` at `0x25a8f2`, first helper call `0x25a901 -> 0x33390`, then later a reload from `[R15]` at `0x25a9fd` and indirect dispatch at `0x25aa06`. The saved `0x33390` body visibly updates a TLS slot and a global counter, with no receiver access or nested call. A conditional branch bypasses or reaches additional calls before the reload; effects on a possible receiver alias on the latter edge are not closed. Three candidate pointer windows remain, with two distinct `+0x20` targets. No unique receiver vptr, target, or ordering edge relative to constructor slot `0xa505e0` was established.
+- Evidence/report: `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-309-RECEIVER-PROVENANCE-01/analysis/attempt-01/REPORT.md`; saved excerpts and input hashes are adjacent. Docs checkpoint: [E1015](docs/checkpoints/2026-10-29-slot309-receiver-provenance-e1015.md).
+- Files changed for this checkpoint: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and the E1015 checkpoint. No source, launcher, game input, or product gate changed. Attempt count: one bounded saved-export route review; zero failed semantic hypotheses.
+- Result: `PARTIAL / SAVED_EXPORT_REVIEWED`; slot 309 remains unregistered, G1 remains PARTIAL, and there is still no honest game-boot claim. Overall native-port acceptance remains incomplete.
+- Current task-board parse found 0 `READY` rows, 10 `ACTIVE`, 4 `BLOCKED`, and 15 `WAITING_FOR_DEPENDENCY`; the independent service/save/Metal review found no eligible implementation leaf that advances real boot without the slot-309 gate.
+- Remaining risks: receiver/vptr provenance, later-call alias effects, target identity, and pre-slot-309 producer/consumer/order remain unresolved. Cold game boot, actual game audio, real save/reload, and gameplay Metal are not demonstrated.
+- Next exact action: do not repeat this receiver slice or generic xref/literal scans. Resume boot implementation only from a distinct concrete producer/consumer/order edge or newly available evidence; first recheck the task board for any independent task that directly advances real startup without bypassing slot 309.
+- Repository verification and publication logs for this result are under `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-309-RECEIVER-PROVENANCE-01/result-publication/attempt-01/`; final counts and push/fetch details will be recorded in the publication closeout checkpoint.
+
 ## 2026-10-29 15:05 CDT (/root) — E1014: E1013 publication closeout (ARTIFACT_VERIFIED)
 
 - E1013 commit `d0ed29efa7d6638cf7478ed07e4bb7f60dd350f8` was authored by Johnny Wang with message `docs: record SXDF provider status recheck` and pushed to `origin main`.
