@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 22:38 CDT (/root) — E1029: `0x499f80` REA provider boundary (BLOCKED)
+
+- User scope remains getting the actual game startup path working; VoiceOver/accessibility is out of scope. E1029 follows the E1028 claim of a read-only function profile for `0x499f80`.
+- The active REA session reported Ghidra 12.1.4 open on pinned ELF `local/re/eboot.elf`, SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`. The worker's earlier `procedure_info` and `read_function_instructions` requests remained pending for about 121 seconds and 58 seconds and were stopped without Evidence IDs. Root made one direct `mcp__rea__read_bytes` call with `{"address":"0x499f80","length":192}`; it remained pending for two 31-second waits and execution cell `4697` was terminated. No bytes or Evidence ID returned.
+- This is a repeated provider-stall condition, not three distinct semantic hypotheses. Per `docs/TASKS.md`, keep failed semantic hypotheses at 0 and do not create a `NEEDS_PRINCIPAL` escalation. Task status is `BLOCKED` pending a reviewable function-evidence route. Private report plus follow-up SHA-256 `01a04bbbe68f19c8e0de111182a6bc1249d09db51519d03b375f56edb90a0294`.
+- Observed: no function-level Evidence ID, body range/hash, branches, writes, direct/indirect calls, or unresolved-transfer inventory. No game code ran, and no source, launcher, test, reference clone, or game input changed. Inference: current REA/Ghidra query path is unusable for this bounded body; its gameplay role remains unknown.
+- Product status: `sotc_core_start()` still returns `SOTC_ERR_ENGINE_NOT_IMPLEMENTED`; G1 remains PARTIAL. This provider checkpoint advances no gate and proves no boot, audio, save/reload, or game-driven Metal behavior.
+- Next exact action: keep this task blocked and do not repeat the same queries. Resume only with a function-evidence path that returns a reviewable Evidence ID, then compare the exact body against the pinned ELF. No lift or registration is authorized from the caller edge alone.
+- Files changed: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/FOLDERS.md` (generated), and this E1029 checkpoint; the private ignored report received an addendum. No source/runtime change.
+- Publication verification at the unchanged source baseline: CMake configure/build exit 0; CTest 487/487; lift checkers 572 passed, 0 skipped, 0 failed; `trail build --check` reports graph in sync with 10,787 meaning-tier nodes pending; project index 44,257/current; staged path audit 6/6; all-path audit 3,414; attribution and staged diff check passed. Logs: `local/validation/orch-20261029/RE-02-APPMAIN-499F80-BODY-LIFTABILITY-01/provider-checkpoint-publication/`.
+- Two documentation-only check corrections: the first project-index check ran before the private verification logs were all created and found `local/indexes/folders.json` stale; generation and check passed after the log paths existed. The first staged diff check found trailing spaces in the checkpoint metadata; they were removed and the rerun passed. Neither correction changed code or semantic attempt counts.
+
 ## 2026-10-29 22:23 CDT (/root) — E1028: claim `0x499f80` body liftability review (ACTIVE)
 
 - User scope remains getting the actual native game startup path working; VoiceOver/accessibility is out of scope. Claim `RE-02-APPMAIN-499F80-BODY-LIFTABILITY-01` under `RE-02-APPMAIN-INIT-TRIAGE-01`, following the newly verified next Init edge.
