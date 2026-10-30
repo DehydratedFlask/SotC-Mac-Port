@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 23:10 CDT (/root) — E1030: save-thread callback route (PARTIAL)
+
+- User scope is the actual game startup path; VoiceOver/accessibility is out of scope. `CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01` remains ACTIVE. `RE-02-APPMAIN-499F80-BODY-LIFTABILITY-01` remains BLOCKED.
+- Saved pinned-ELF disassembly and import parsing establish a static `scePthreadCreate` setup at `0xf8fab0`, with callback descriptor `0xa4d330` and name `Save Task Thread`. Existing REA/Ghidra dossier `ev_8bbfdf359b1c43a9e13d4b805c072bf339f1c1a209a4ea86c71c9adf29ebe63f` observes the queue-worker callback. Private evidence: `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-309-CALLBACK-ROUTE-01/CALLBACK-PTHREAD-ADDENDUM.md` (SHA-256 `f117605a2e0b2269cd0c6fdf9172e120d8824c47264ea87005e7c5533545f231`).
+- The worker setup runs through `0xa52530`, called by `0x2569d0`, which is reached from `0x533100`. Owner and order relative to slot 309 (`0xa505e0`) remain unknown. The REA caller query for `0x533100` timed out after 330,000 ms, returning no caller list or Evidence ID (run `2738ecb0-6ba0-4e8d-a56a-af7bb986e3f0`; private record `local/validation/orch-20261029/CPU-01-STARTUP-SLOT-309-CALLBACK-ROUTE-01/REA-CALLERS-533100-TIMEOUT.md`). A separate CLI attempt at `0x499f80` also timed out during startup import (run `a92119d9-664f-4710-b9dc-828f7d388408`; no body evidence).
+- Observations are static artifact facts only. No runtime invocation, constructor order, engine startup, cold boot, game audio, save/reload, or game-driven Metal behavior is proved. `sotc_core_start()` still returns `SOTC_ERR_ENGINE_NOT_IMPLEMENTED`; G1 PARTIAL, G2 NOT RUN, G3 PARTIAL, G4 PARTIAL, G5 NOT RUN.
+- Next exact action: one REA CLI function dossier for `0x533100` with `GHIDRA_HEADLESS_MAXMEM=8G` and `REA_GHIDRA_STARTUP_TIMEOUT_MS=1200000`, saving a unique snapshot and output under the private callback-route directory. Use returned callers to check startup owner/order; stop if no edge is established. No source/runtime change is claimed.
+- Pre-publication verification: configure/build exit 0; CTest 487/487; lift checkers 572/0/0; Trail graph check passed with 10,787 meaning nodes pending; all-path audit 3,414; attribution audit exit 0; project index 44,259/current. The first index check ran before the verification log set was complete and reported `local/indexes/folders.json` stale; generation and check passed after all logs were present. Logs: `local/validation/orch-20261029/STARTUP-SAVE-THREAD-E1030-PUBLICATION/`.
+- Files changed: `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, this E1030 checkpoint, and two private reports. No source/runtime change.
+
 ## 2026-10-29 22:38 CDT (/root) — E1029: `0x499f80` REA provider boundary (BLOCKED)
 
 - User scope remains getting the actual game startup path working; VoiceOver/accessibility is out of scope. E1029 follows the E1028 claim of a read-only function profile for `0x499f80`.
