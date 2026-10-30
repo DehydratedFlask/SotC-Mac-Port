@@ -469,6 +469,9 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [E839 publication closeout](checkpoints/2026-10-27-e839-publication-closeout-e840.md) | E840; E839 pushed and fetch-verified; exact-range attribution passed; stash left unchanged |
 | [E840 publication closeout](checkpoints/2026-10-27-e840-publication-closeout-e841.md) | E841; E840 pushed and fetch-verified; exact-range attribution passed; stash left unchanged |
 | [Post-E841 live GitHub attribution census](checkpoints/2026-10-27-post-e841-github-attribution-census-e842.md) | E842; 2,454 advertised-ref reachable commits scan clear; 70 stash-only matches remain by owner choice |
+| [Claim: app-main Init import map for 0xb11290 (2026-10-30)](checkpoints/2026-10-30-re02-b11290-import-map-claim-e1024.md) | E1024; bounded task claim, closed by E1025 |
+| [app-main Init import map result for 0xb11290](checkpoints/2026-10-29-re02-b11290-import-map-e1025.md) | E1025; three PLT stubs mapped to imports with pinned GOT/NID evidence; arguments and runtime effects remain unknown |
+| [Claim: `0xb11290` system-module loader arguments](checkpoints/2026-10-29-re02-b11290-sysmodule-args-claim-e1026.md) | E1026; recover 15 numeric IDs and cite only supported module names; no service-effect or boot inference |
 | [Claim: app-main Init callee `0xb11290` structure](checkpoints/2026-10-27-re02-b11290-claim-e843.md) | E843; bounded hash-pinned structural analysis claimed; no runtime or G1 claim |
 | [Partial app-main Init callee `0xb11290` structure](checkpoints/2026-10-27-re02-b11290-partial-e844.md) | E844; offline byte profile replay matches; REA function query timed out; no semantic or G1 claim |
 | [E844 publication closeout](checkpoints/2026-10-27-e844-publication-closeout-e845.md) | E845; E844 pushed and fetch-verified; fresh advertised-ref census covers 2,457 commits with zero Claude/Anthropic matches; stash left unchanged |
