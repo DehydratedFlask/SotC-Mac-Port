@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 22:23 CDT (/root) — E1028: claim `0x499f80` body liftability review (ACTIVE)
+
+- User scope remains getting the actual native game startup path working; VoiceOver/accessibility is out of scope. Claim `RE-02-APPMAIN-499F80-BODY-LIFTABILITY-01` under `RE-02-APPMAIN-INIT-TRIAGE-01`, following the newly verified next Init edge.
+- Existing private triage report `local/validation/orch-20261029/RE-02-APPMAIN-INIT-TRIAGE-01-NEXT/REPORT.md` (SHA-256 `7e0d4c9b3d3b245396978633c13d6a24a95fbf9a2c957fe793ec2635cf91cda1`) establishes callsite `0x531def → 0x499f80`, on the nonzero-return branch of `0x255130` and with argument `r12 + 0x3c70`. Existing task `CPU-01-INIT-531D60-POST-BASE-499F80-01` models this caller/callsite fixture but leaves `499f80_body` unmodelled (E446).
+- Scope is a read-only REA/Ghidra structural profile of function body `0x499f80`: record evidence ID, exact body range/hash, branches, writes, call targets and unresolved indirects; corroborate bytes against the pinned ELF; assess whether any small ordinary-native lift has a justified boundary. Stop at the first unresolved subsystem/indirect boundary. Do not infer engine/world role from the callsite name or order.
+- Task claim is active; no analysis attempts or failed hypotheses. No code, runtime, tests, or game input changed. Private output: `local/validation/orch-20261029/RE-02-APPMAIN-499F80-BODY-LIFTABILITY-01/REPORT.md`.
+- E1027 result commit `c323e583e2086a67f1b6982120c50a6767263750` was owner-authored and pushed. Post-push fetch verified `HEAD == origin/main == FETCH_HEAD`; all-path audit 3,412, attribution, commit check, project index 44,254/current, and clean-main passed. E1027 configure/build, CTest 487/487, lift 572/0/0, and Trail graph checks passed; logs remain under `local/validation/orch-20261029/RE-02-APPMAIN-B11290-SYSMODULE-ARGS-01/publication/`.
+- Claim-only check: no code changed after the E1027 code baseline, so its configure/build/test/lift results are reused. `python3 scripts/project_index.py` and `--check` passed at 44,256/current. Claim-publication logs: `local/validation/orch-20261029/RE-02-APPMAIN-499F80-BODY-LIFTABILITY-01/claim-publication/`.
+- Next exact action: open the pinned Ghidra project read-only for `0x499f80`, export a bounded function/body evidence record, then compare its decoded bytes and call edges against `local/re/eboot.elf`. Continue only to identify a defensible native-lift boundary; no product gate advances from this claim.
+
 ## 2026-10-29 22:16 CDT (/root) — E1027: app-main loader argument map (STATIC_PATH_BYTE_VERIFIED)
 
 - User scope is actual game startup; VoiceOver/accessibility is out of scope. E1026 completes the bounded call-site/argument map for Init callee `0xb11290`, following the E1025 import map.
