@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-29 21:54 CDT (/root) — E1023: startup-followup publication closeout (ARTIFACT_VERIFIED)
+
+- Result commit e116be1af71ee5fd685c69fb13ef335e46de3ff0 (docs: record startup path follow-up limits) was authored by Johnny Wang, changed six allowlisted documentation paths, and was pushed to origin main. git fetch origin main exited 0; HEAD == origin/main == FETCH_HEAD == e116be1af71ee5fd685c69fb13ef335e46de3ff0. Worktree is clean on main.
+- Verification before the result commit: configure/build exit 0; CTest 487/487; lift checkers 572 passed, 0 skipped, 0 failed; Trail wiring graph OK with 10,787 meaning-tier nodes pending; project index 44,249/current; staged audit 6/6; all-path audit 3,407; attribution and staged diff passed. The first project-index check found local/indexes/folders.json stale because validation logs were created after generation; regeneration against the stable log set and a second check passed.
+- Post-push verification passed: all-path audit 3,407; attribution; git show --format= --check HEAD; project-index check 44,249/current; clean status. Logs: local/validation/orch-20261029/STARTUP-FOCUS-E1020/. See [E1023](docs/checkpoints/2026-10-29-startup-followup-publication-e1023.md).
+- E1023 closeout documentation changes: HANDOFF.md, docs/TASKS.md, docs/EVIDENCE.md, docs/INDEX.md, generated docs/FOLDERS.md, and docs/checkpoints/2026-10-29-startup-followup-publication-e1023.md. Repeat configure/build exited 0; CTest 487/487; lift checkers 572/0/0; Trail graph check passed with 10,787 meaning-tier nodes pending; project index 44,249/current; staged audit 6/6; all-path audit 3,408; attribution and staged diff checks passed. Logs were reused under local/validation/orch-20261029/STARTUP-FOCUS-E1020/.
+- E1023 verifies documentation publication for static evidence only. Parent CPU-01-STARTUP-SLOT-309-CHARACTERIZATION-01 remains ACTIVE; slot 309 stays unregistered; G1 PARTIAL; G5 NOT RUN; no product gate advances.
+- Next exact action: continue game-start work only with new evidence establishing a concrete invocation/order edge or supporting a bounded ordinary-native lift; do not repeat the reviewed slot-309 consumer/alias scans. VoiceOver/accessibility is out of scope.
+
+
+
 ## 2026-10-29 21:47 CDT (/root) — E1020-E1022: startup caller, alias ownership, and slot-312 liftability follow-up (PARTIAL)
 
 - User scope is actual game startup; VoiceOver/accessibility is out of scope. Starting tree was clean main at d2d3456467b0cea557dfb5ec08012255e046e4a4. git fetch origin main exited 0; HEAD, origin/main, and FETCH_HEAD matched before edits.
