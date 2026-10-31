@@ -23,6 +23,7 @@
 #include "init_531d60_post_base_mov_rsi_rbx_532b29_u1.hpp"
 #include "init_531d60_post_base_call_52a220_532b2e_u1.hpp"
 #include "init_531d60_post_base_lea_rbx_2efd160_532b33_u1.hpp"
+#include "init_531d60_post_base_mov_r13_15fe518_532b3a_u1.hpp"
 #include "registry_fill_52a220.hpp"
 #include "registry_object_2efd160.hpp"
 
@@ -32,7 +33,7 @@
 namespace sotc {
 
 inline constexpr std::size_t kRegistryInitObjectBytes = 0x98;
-inline constexpr std::uint64_t kRegistryInit531d60FragmentPinnedRva = 0x532b3a;
+inline constexpr std::uint64_t kRegistryInit531d60FragmentPinnedRva = 0x532b41;
 
 struct RegistryInit531d60Hooks {
     bool merge_mov_edi_98_532b0c_u1_ran = false;
@@ -46,6 +47,7 @@ struct RegistryInit531d60Hooks {
     bool merge_mov_edx_eax_532b2c_u1_ran = false;
     bool merge_call_52a220_532b2e_u1_ran = false;
     bool merge_lea_rbx_2efd160_532b33_u1_ran = false;
+    bool merge_mov_r13_15fe518_532b3a_u1_ran = false;
 };
 
 enum class RegistryInit531d60Status : std::uint8_t {

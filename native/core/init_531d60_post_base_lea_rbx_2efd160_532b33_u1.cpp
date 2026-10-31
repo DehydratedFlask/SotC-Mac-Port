@@ -13,7 +13,7 @@ Init531d60PostBaseLeaRbx2efd160_532b33_U1Result init_531d60_post_base_lea_rbx_2e
     }
     ++out.lea_rip_count;
 
-    // Next: mov r13,[rip+disp] @ 0x532b3a — not modelled in this unit.
+    // Next: mov r13,[rip+disp] @ 0x532b3a — peeled as registry_body unit E559.
     out.ok = (out.lea_rip_count == 1);
     return out;
 }
