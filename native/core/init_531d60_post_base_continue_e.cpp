@@ -8,6 +8,7 @@
 #include "init_531d60_post_base_lea_rsp470_532a84_u1.hpp"
 #include "init_531d60_post_base_lea_rsi_15c8e18_532a8c_u1.hpp"
 #include "init_531d60_post_base_movq_rsp4a0_0_532a93_u1.hpp"
+#include "init_531d60_post_base_mov_rdi_r13_532a9f_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
 #include <cstring>
@@ -167,9 +168,22 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         desc3.field_30 = 0;
     }
 
-    // 0x532a9f mov rdi,[r13] — parent arg
-    void* parent3 = const_cast<void*>(hooks.incoming_r13);
-    pin(out, ContinueEUnit::mov_rdi_r13_3);
+    Init531d60PostBaseMovRdiR13_532a9f_U1Cells mov_rdi_cells =
+        hooks.mov_rdi_r13_532a9f_u1_cells;
+    if (mov_rdi_cells.incoming_r13 == nullptr) {
+        mov_rdi_cells.incoming_r13 = hooks.incoming_r13;
+    }
+    void* parent3 = nullptr;
+    if (!hooks.merge_mov_rdi_r13_532a9f_u1_ran) {
+        const Init531d60PostBaseMovRdiR13_532a9f_U1Result mrr =
+            init_531d60_post_base_mov_rdi_r13_532a9f_u1(mov_rdi_cells);
+        if (!mrr.ok) {
+            return out;
+        }
+        parent3 = mrr.parent;
+    } else {
+        parent3 = const_cast<void*>(hooks.incoming_r13);
+    }
 
     // 0x532aa3 lea rcx,[0x538870] — thunk 2 (ret no-op)
     pin(out, ContinueEUnit::lea_rcx_538870);

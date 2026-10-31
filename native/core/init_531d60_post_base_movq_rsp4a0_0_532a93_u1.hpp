@@ -2,7 +2,7 @@
 //   mov qword [rsp+0x4A0],0   ; save-data descriptor 3 field @ +0x30
 //
 // After E527 `lea_rsi_15c8e18_532a8c_u1` end @ `0x532a93`. NOT modelled: following
-// `mov rdi,[r13]` @ `0x532a9f`. G1 PARTIAL.
+// prep @ `0x532a9f` (E529 peel). G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
