@@ -2,7 +2,7 @@
 //   mov [rsp+0x488],rax   ; desc3[0x18] = 0x5388e0 (thunk 1 from lea @ 0x532a7d peel)
 //
 // After E533 `vmovdqa_rsp478_xmm0_532aba_u1` end @ `0x532ac3`. NOT modelled: following
-// `mov [rsp+0x4B0],rsi` @ `0x532acb` (E534+ continue_e). G1 PARTIAL.
+// `mov [rsp+0x4B0],rsi` @ `0x532acb` (E535 mov_rsp4b0 u1). G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

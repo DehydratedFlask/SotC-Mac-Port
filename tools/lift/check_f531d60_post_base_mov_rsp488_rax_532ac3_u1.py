@@ -49,7 +49,7 @@ def main() -> int:
     nh = NATIVE.read_text()
     require("init_531d60_post_base_mov_rsp488_rax_532ac3_u1" in nh, "API")
     ce = CONT_E.read_text()
-    require("kInit531d60PostBaseContinueERva = 0x532acb" in ce, "shrunk continue_e start")
+    require("kInit531d60PostBaseContinueERva = 0x532ad3" in ce, "shrunk continue_e start")
     require("merge_mov_rsp488_rax_532ac3_u1_ran" in ce, "mov488 merge hook")
     require("core/init_531d60_post_base_mov_rsp488_rax_532ac3_u1.cpp" in CMAKE.read_text(), "cmake")
 

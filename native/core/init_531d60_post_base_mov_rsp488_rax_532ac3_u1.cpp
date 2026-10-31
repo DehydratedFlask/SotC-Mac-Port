@@ -16,7 +16,7 @@ Init531d60PostBaseMovRsp488Rax_532ac3_U1Result init_531d60_post_base_mov_rsp488_
     }
     ++out.mov_rsp488_rax_count;
 
-    // Next: mov [rsp+0x4B0],rsi @ 0x532acb — see continue_e.
+    // Next: mov [rsp+0x4B0],rsi @ 0x532acb — see mov_rsp4b0_rsi_532acb_u1.
     out.ok = (out.mov_rsp488_rax_count == 1);
     return out;
 }

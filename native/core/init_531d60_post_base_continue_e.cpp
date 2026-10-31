@@ -13,6 +13,7 @@
 #include "init_531d60_post_base_lea_rbx_rsp490_532aaa_u1.hpp"
 #include "init_531d60_post_base_mov_rsp470_rdx_532ab2_u1.hpp"
 #include "init_531d60_post_base_mov_rsp488_rax_532ac3_u1.hpp"
+#include "init_531d60_post_base_mov_rsp4b0_rsi_532acb_u1.hpp"
 #include "init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
@@ -277,10 +278,28 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         std::memcpy(&desc3.zero[0x18], &rax_thunk1, sizeof(void*));
     }
 
-    // 0x532acb mov [rsp+0x4B0],rsi — desc3[0x40] = 0x15c8e18 (vtable 2)
-    desc3.vtable = reinterpret_cast<void*>(
-        static_cast<std::uintptr_t>(kInit531d60PostBaseContinueEVtable2Rva));
-    pin(out, ContinueEUnit::mov_rsp4b0_rsi);
+    Init531d60PostBaseMovRsp4b0_Rsi_532acb_U1Cells mov4b0_cells =
+        hooks.mov_rsp4b0_rsi_532acb_u1_cells;
+    if (mov4b0_cells.vtable_stack_out == nullptr) {
+        mov4b0_cells.vtable_stack_out = &desc3.vtable;
+    }
+    if (mov4b0_cells.rsi_in == nullptr) {
+        mov4b0_cells.rsi_in = lea_rsi_out;
+        if (mov4b0_cells.rsi_in == nullptr) {
+            mov4b0_cells.rsi_in = reinterpret_cast<void*>(static_cast<std::uintptr_t>(
+                kInit531d60PostBaseContinueEVtable2Rva));
+        }
+    }
+    if (!hooks.merge_mov_rsp4b0_rsi_532acb_u1_ran) {
+        const Init531d60PostBaseMovRsp4b0_Rsi_532acb_U1Result m4r =
+            init_531d60_post_base_mov_rsp4b0_rsi_532acb_u1(mov4b0_cells);
+        if (!m4r.ok) {
+            return out;
+        }
+    } else {
+        desc3.vtable = reinterpret_cast<void*>(
+            static_cast<std::uintptr_t>(kInit531d60PostBaseContinueEVtable2Rva));
+    }
 
     // 0x532ad3 lea rsi,[0x2efda50] — name struct 3 (RIP-rel pin)
     pin(out, ContinueEUnit::lea_rsi_2efda50);
