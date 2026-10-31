@@ -31,20 +31,6 @@ Init531d60PostBaseContinueAResult init_531d60_post_base_continue_a(
     const Init531d60PostBaseContinueAHooks& hooks) noexcept {
     Init531d60PostBaseContinueAResult out{};
 
-    // 0x532736 mov rdi,rbx — rbx stand-in optional (load @ 0x532728 demoted to E510 u1).
-    const void* rbx = hooks.incoming_rbx;
-    pin(out, ContinueAUnit::mov_rdi_rbx_2);
-
-    int eax = hooks.incoming_eax_from_a2ea00;
-    pin(out, ContinueAUnit::mov_esi_eax);
-
-    // 0x53273b call 0xa2e5d0 (body NOT modelled).
-    if (hooks.call_a2e5d0 != nullptr) {
-        hooks.call_a2e5d0(const_cast<void*>(rbx), eax);
-    }
-    pin(out, ContinueAUnit::call_a2e5d0);
-    ++out.call_count;
-
     // 0x532740 lea rax,[0x32f79a8] — cell-address pin (optional host stand-in).
     const void* const* cell_32f79a8 = hooks.cell_32f79a8;
     pin(out, ContinueAUnit::lea_rax_32f79a8);
@@ -153,7 +139,7 @@ Init531d60PostBaseContinueAResult init_531d60_post_base_continue_a(
     }
 
     out.ok = (out.unit_executed == kInit531d60PostBaseContinueAUnitCount) &&
-             (out.call_count == 3) && (out.lea_count == 4) && (out.alu_count == 2) &&
+             (out.call_count == 2) && (out.lea_count == 4) && (out.alu_count == 2) &&
              (out.branch_boundary_count == 1) && (out.unit_counts[0] == 1) &&
              (out.unit_counts[kInit531d60PostBaseContinueAUnitCount - 1] == 1);
     return out;

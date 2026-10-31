@@ -268,6 +268,7 @@ int g_post_base_a2ed00_u7 = 0;
 int g_post_base_f590_a2ed00_u13 = 0;
 int g_post_base_f590_a2ed00_u14 = 0;
 int g_post_base_a2ea00_u1 = 0;
+int g_post_base_a2e5d0_u1 = 0;
 // E519 grouped continue 0x532736..0x53277f: per-call-site hooks + observed args.
 int g_cont_a_a2e5d0 = 0;
 int g_cont_a_a543b0 = 0;
@@ -1219,6 +1220,7 @@ int main() {
     g_post_base_f590_a2ed00_u13 = 0;
     g_post_base_f590_a2ed00_u14 = 0;
     g_post_base_a2ea00_u1 = 0;
+    g_post_base_a2e5d0_u1 = 0;
     g_cont_a_a2e5d0 = 0;
     g_cont_a_a543b0 = 0;
     g_cont_a_1fc80 = 0;
@@ -1594,12 +1596,13 @@ int main() {
     Init531d60PostBaseA2ea00U1Hooks pba2eu1{};
     pba2eu1.incoming_rbx = g_cont_a_obj;
     pba2eu1.call_a2ea00 = hook_cont_a_a2ea00;
+    Init531d60PostBaseA2e5d0U1Hooks pba2e5{};
+    pba2e5.incoming_rbx = g_cont_a_obj;
+    pba2e5.call_a2e5d0 = hook_cont_a_a2e5d0;
     Init531d60PostBaseContinueAHooks pbca{};
-    pbca.incoming_rbx = g_cont_a_obj;
     pbca.cell_32f79a8 = &g_cont_a_cell_32f79a8;
     pbca.cell_32f84f8 = &g_cont_a_cell_32f84f8;
     pbca.rsp20_slot = &g_cont_a_rsp20;
-    pbca.call_a2e5d0 = hook_cont_a_a2e5d0;
     pbca.call_a543b0 = hook_cont_a_a543b0;
     pbca.call_1fc80 = hook_cont_a_1fc80;
     Init531d60PostBaseContinueBHooks pbcb{};
@@ -1660,7 +1663,8 @@ int main() {
                                                      pba2edu3, pbf590u5, pbf590u6, pba2edu4,
                                                      pbf590u7, pbf590u8, pba2edu5, pbf590u9,
                                                      pbf590u10, pba2edu6, pbf590u11, pbf590u12,
-                                                     pba2edu7, pbf590u13, pbf590u14, pba2eu1, pbca, pbcb, pbcc, pbcd, pbce, pbalt, ih);
+                                                     pba2edu7, pbf590u13, pbf590u14, pba2eu1, pba2e5,
+                                                     pbca, pbcb, pbcc, pbcd, pbce, pbalt, ih);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
@@ -2350,17 +2354,24 @@ int main() {
     CHECK(r.post_base_a2ea00_u1.call_a2ea00_count == 1);
     CHECK(r.post_base_a2ea00_u1.eax_return == 0x5A);
     CHECK(g_cont_a_a2ea00_rbx == g_cont_a_obj);
-    // E519: grouped Init continue 0x532736..0x53277f — 16 units, 3 call sites,
+    // E511: Init continue first 0xa2e5d0 call-site (5 B prep / body NOT modelled)
+    CHECK(r.post_base_a2e5d0_u1.ok);
+    CHECK(g_post_base_a2e5d0_u1 == 1);
+    CHECK(r.post_base_a2e5d0_u1.call_a2e5d0_count == 1);
+    CHECK(g_cont_a_a2e5d0 == 1);
+    CHECK(g_cont_a_a2e5d0_rbx == g_cont_a_obj);
+    CHECK(g_cont_a_a2e5d0_esi == 0x5A);  // mov esi,eax stand-in from E510 u1
+    // E519: grouped Init continue 0x532740..0x53277f — 13 units, 2 call sites,
     CHECK(r.post_base_continue_a.ok);
     CHECK(r.post_base_continue_a.unit_executed ==
           kInit531d60PostBaseContinueAUnitCount);
-    CHECK(kInit531d60PostBaseContinueAUnitCount == 16);
+    CHECK(kInit531d60PostBaseContinueAUnitCount == 13);
     for (int i = 0; i < kInit531d60PostBaseContinueAUnitCount; ++i) {
         CHECK(r.post_base_continue_a.unit_counts[static_cast<std::size_t>(i)] == 1);
     }
-    CHECK(kInit531d60PostBaseContinueAUnits[0].rva == 0x532736);
-    CHECK(kInit531d60PostBaseContinueAUnits[15].rva == 0x53277d);
-    CHECK(r.post_base_continue_a.call_count == 3);
+    CHECK(kInit531d60PostBaseContinueAUnits[0].rva == 0x532740);
+    CHECK(kInit531d60PostBaseContinueAUnits[12].rva == 0x53277d);
+    CHECK(r.post_base_continue_a.call_count == 2);
     CHECK(r.post_base_continue_a.lea_count == 4);
     CHECK(r.post_base_continue_a.load_count == 4);
     CHECK(r.post_base_continue_a.alu_count == 2);
@@ -2368,9 +2379,6 @@ int main() {
     CHECK(!r.post_base_continue_a.branch_outcome_modelled);
     CHECK(r.post_base_continue_a.end_rva == 0x53277f);
     CHECK(r.post_base_continue_a.branch_target_rva == 0x5327bd);
-    CHECK(g_cont_a_a2e5d0 == 1);
-    CHECK(g_cont_a_a2e5d0_rbx == g_cont_a_obj);
-    CHECK(g_cont_a_a2e5d0_esi == 0x5A);  // mov esi,eax stand-in
     CHECK(g_cont_a_a543b0 == 1);
     CHECK(g_cont_a_a543b0_rdi == g_cont_a_rdi_marker);  // [0x32f84f8]
     CHECK(r.post_base_continue_a.rsi_known);
@@ -2403,9 +2411,12 @@ int main() {
         const Init531d60PostBaseA2ea00U1Result a2eu1_default{init_531d60_post_base_a2ea00_u1()};
         CHECK(a2eu1_default.ok);
         CHECK(a2eu1_default.call_a2ea00_count == 1);
+        const Init531d60PostBaseA2e5d0U1Result a2e5_default{init_531d60_post_base_a2e5d0_u1()};
+        CHECK(a2e5_default.ok);
+        CHECK(a2e5_default.call_a2e5d0_count == 1);
         const Init531d60PostBaseContinueAResult cont_a_default{init_531d60_post_base_continue_a()};
         CHECK(cont_a_default.ok);
-        CHECK(cont_a_default.unit_counts[static_cast<std::size_t>(ContinueAUnit::mov_rdi_rbx_2)] == 1);
+        CHECK(cont_a_default.unit_counts[static_cast<std::size_t>(ContinueAUnit::lea_rax_32f79a8)] == 1);
     }
     // E510: grouped Init continue B 0x53277f..0x5327b1 — 14 units, 2 call sites,
     // 5 ALU ops, 1 load; je6 target pinned but outcome NOT modelled.
@@ -2739,6 +2750,7 @@ int main() {
         "post_base_f590_a2ed00_u13+"
         "post_base_f590_a2ed00_u14+"
         "post_base_a2ea00_u1+"
+        "post_base_a2e5d0_u1+"
         "post_base_continue_a+"
         "early+tail+base+trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
@@ -2755,7 +2767,7 @@ int main() {
         "pba2edu2=%d pbf590u3=%d pbf590u4=%d pba2edu3=%d pbf590u5=%d pbf590u6=%d "
         "pba2edu4=%d pbf590u7=%d pbf590u8=%d pba2edu5=%d pbf590u9=%d "
         "pbf590u10=%d pba2edu6=%d pbf590u11=%d pbf590u12=%d "
-        "pba2edu7=%d pbf590u13=%d pbf590u14=%d pba2eu1=%d pbca_units=%d pbcb_units=%d pbcc_units=%d "
+        "pba2edu7=%d pbf590u13=%d pbf590u14=%d pba2eu1=%d pba2e5=%d pbca_units=%d pbcb_units=%d pbcc_units=%d "
         "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
@@ -2861,6 +2873,7 @@ int main() {
         r.post_base_f590_a2ed00_u13.call_f590_count,
         r.post_base_f590_a2ed00_u14.call_f590_count,
         r.post_base_a2ea00_u1.call_a2ea00_count,
+        r.post_base_a2e5d0_u1.call_a2e5d0_count,
         r.post_base_continue_a.unit_executed,
         r.post_base_continue_b.unit_executed,
         r.post_base_continue_c.unit_executed,
