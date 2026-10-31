@@ -1,5 +1,7 @@
 #include "init_531d60_post_base_continue_e.hpp"
 
+#include "init_531d60_post_base_a54920_u1.hpp"
+
 #include <cstring>
 
 namespace sotc {
@@ -36,75 +38,24 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
     const Init531d60PostBaseContinueEHooks& hooks) noexcept {
     Init531d60PostBaseContinueEResult out{};
 
-    // ---- Block 1: save-data ctor 1 (name 0x2efd9a0, vtable 0x15c8d98) ----
-
-    // 0x5329ae lea rax,[0x2dcdf14] — boss-flag cell (RIP-rel pin only).
-    pin(out, ContinueEUnit::lea_rax_2dcdf14);
-    ++out.lea_rip_count;
-
-    // 0x5329b5 mov rdi,[r13] — parent arg (provenance NOT modelled).
-    void* parent1 = const_cast<void*>(hooks.incoming_r13);
-    pin(out, ContinueEUnit::mov_rdi_r13);
-
-    // 0x5329b9 lea rsi,[0x2efd9a0] — name struct 1 (RIP-rel pin).
-    pin(out, ContinueEUnit::lea_rsi_2efd9a0);
-    ++out.lea_rip_count;
-
-    // 0x5329c0 lea rdx,[rsp+0x520] — descriptor 1 on stack.
-    alignas(32) SaveDataDescriptor desc1{};
-    void* desc1_ptr = &desc1;
-    pin(out, ContinueEUnit::lea_rdx_rsp520);
-
-    // 0x5329c8 vxorps ymm0,ymm0,ymm0
-    pin(out, ContinueEUnit::vxorps_ymm0);
-
-    // 0x5329cc lea rbx,[0x15c8d98] — vtable 1 (slot-3 no-op source).
-    // rbx is reused for descriptor 2 as well.
-    pin(out, ContinueEUnit::lea_rbx_15c8d98);
-    ++out.lea_rip_count;
-
-    // 0x5329d3 mov qword [rsp+0x550],0 — desc1[0x30] = 0
-    desc1.field_30 = 0;
-    pin(out, ContinueEUnit::movq_rsp550_0);
-
-    // 0x5329df lea r14,[rsp+0x540] — self-ptr = &desc1[0x20]
-    desc1.self_ptr = reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(&desc1) + 0x20);
-    pin(out, ContinueEUnit::lea_r14_rsp540);
-
-    // 0x5329e7 vmovaps [rsp+0x520],ymm0 — zero desc1[0..0x1F]
-    std::memset(desc1.zero, 0, sizeof(desc1.zero));
-    pin(out, ContinueEUnit::vmovaps_rsp520_ymm0);
-
-    // 0x5329f0 mov [rsp+0x560],rbx — desc1[0x40] = vtable (0x15c8d98)
-    desc1.vtable = reinterpret_cast<void*>(
-        static_cast<std::uintptr_t>(kInit531d60PostBaseContinueEVtable1Rva));
-    pin(out, ContinueEUnit::mov_rsp560_rbx);
-
-    // 0x5329f8 mov qword [rsp+0x568],0 — desc1[0x48] = 0
-    desc1.field_48 = 0;
-    pin(out, ContinueEUnit::movq_rsp568_0);
-
-    // 0x532a04 mov [rax],r12b — stamp boss flag @0x2dcdf14
-    if (hooks.boss_flag_2dcdf14 != nullptr) {
-        out.boss_flag_before = *hooks.boss_flag_2dcdf14;
-        *hooks.boss_flag_2dcdf14 = hooks.incoming_r12b;
-        out.boss_flag_after = *hooks.boss_flag_2dcdf14;
+    if (!hooks.merge_a54920_u1_ran) {
+        Init531d60PostBaseA54920U1Hooks u1{};
+        u1.incoming_r13 = hooks.incoming_r13;
+        u1.incoming_r12b = hooks.incoming_r12b;
+        u1.boss_flag_2dcdf14 = hooks.boss_flag_2dcdf14;
+        u1.call_a54920 = hooks.call_a54920;
+        const Init531d60PostBaseA54920U1Result u1r = init_531d60_post_base_a54920_u1(u1);
+        if (!u1r.ok) {
+            return out;
+        }
+        out.call_a54920_count += u1r.call_a54920_count;
+        out.stamp_count += u1r.stamp_count;
+        out.lea_rip_count += u1r.lea_rip_count;
+        out.boss_flag_before = u1r.boss_flag_before;
+        out.boss_flag_after = u1r.boss_flag_after;
     }
-    pin(out, ContinueEUnit::mov_rax_r12b);
-    ++out.stamp_count;
 
-    // 0x532a07 call 0xa54920(parent, name=0x2efd9a0, descriptor=&desc1)
-    // Body NOT modelled; hook with visible status.
-    if (hooks.call_a54920 != nullptr) {
-        hooks.call_a54920(parent1,
-                          reinterpret_cast<void*>(
-                              static_cast<std::uintptr_t>(kInit531d60PostBaseContinueEName1Rva)),
-                          desc1_ptr);
-    }
-    pin(out, ContinueEUnit::call_a54920_1);
-    ++out.call_a54920_count;
-
-    // 0x532a0c mov rax,[rsp+0x560] — reload vtable
+    // 0x532a0c mov rax,[rsp+0x560] — reload vtable (stack from u1 prep NOT modelled)
     pin(out, ContinueEUnit::mov_rax_rsp560_1);
 
     // 0x532a14 mov rdi,r14 — this = &desc1[0x20]

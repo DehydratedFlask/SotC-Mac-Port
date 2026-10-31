@@ -2561,7 +2561,7 @@ int main() {
     // E1042 / CPU-01-INIT-DRIVER-JOIN-01: fall-through runs D then E (53 units) before remainder.
     CHECK(r.post_base_continue_e.ok);
     CHECK(r.post_base_continue_e.unit_executed == kInit531d60PostBaseContinueEUnitCount);
-    CHECK(kInit531d60PostBaseContinueEUnitCount == 53);
+    CHECK(kInit531d60PostBaseContinueEUnitCount == 40);
     CHECK(g_cont_e_a54920 == 3);  // pbce hooks: three save-data ctor calls on D→E path
     CHECK(r.init_r12b_known);
     CHECK(r.init_r12b_out == 0xA7);  // continue-B bl(0xA6) xor 1 feeds continue-E
@@ -2598,12 +2598,12 @@ int main() {
         const auto er = init_531d60_post_base_continue_e(eh);
         CHECK(er.ok);
         CHECK(er.unit_executed == kInit531d60PostBaseContinueEUnitCount);
-        CHECK(kInit531d60PostBaseContinueEUnitCount == 53);
+        CHECK(kInit531d60PostBaseContinueEUnitCount == 40);
         for (int i = 0; i < kInit531d60PostBaseContinueEUnitCount; ++i) {
             CHECK(er.unit_counts[static_cast<std::size_t>(i)] == 1);
         }
-        CHECK(kInit531d60PostBaseContinueEUnits[0].rva == 0x5329ae);
-        CHECK(kInit531d60PostBaseContinueEUnits[52].rva == 0x532b09);
+        CHECK(kInit531d60PostBaseContinueEUnits[0].rva == 0x532a0c);
+        CHECK(kInit531d60PostBaseContinueEUnits[39].rva == 0x532b09);
         CHECK(er.call_a54920_count == 3);
         CHECK(er.vcall_noop_count == 3);
         CHECK(er.vcall_54b250_count == 1);
@@ -2655,7 +2655,7 @@ int main() {
         Init531d60PostBaseContinueEHooks empty{};
         const auto er2 = init_531d60_post_base_continue_e(empty);
         CHECK(er2.ok);
-        CHECK(er2.unit_executed == 53);
+        CHECK(er2.unit_executed == 40);
         CHECK(er2.call_a54920_count == 3);
         CHECK(er2.vcall_noop_count == 3);
         CHECK(er2.vcall_54b250_count == 1);

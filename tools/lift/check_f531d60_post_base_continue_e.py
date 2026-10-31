@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ELF-tie Init 0x531d60 continue E branch-target block 0x5329ae..0x532b0c (350 B / 53 units).
+"""ELF-tie Init 0x531d60 continue E tail block 0x532a0c..0x532b0c (256 B / 40 units).
 
 Private: needs local/re/eboot.elf.  Pins every one of the 53 consecutive
 instructions, the three call 0xa54920 rel32 targets, the three vcall+0x18
@@ -23,10 +23,11 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import ps4_dynlink as d  # noqa: E402
 
 ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
-START = 0x5329AE
-SIZE = 350
+START = 0x532A0C
+SIZE = 256
 END = 0x532B0C
-REGION_SHA256 = "2aee42e047ad6c993898621aa65c65673befa328d58639140a6e3999e3c10d91"
+REGION_SHA256 = "f1e5b5d3bd29fd2944b5e8e84411d0f04d275464f4464ad27b2686d6cec6047a"
+U1_NATIVE = ROOT / "native/core/init_531d60_post_base_a54920_u1.hpp"
 
 CALL_A54920 = 0xA54920
 NOOP_VCALL1_RESOLVED = 0x538200   # ret
@@ -52,32 +53,6 @@ VMOVQ_15FF528 = 0x15FF528
 #         "vmovq"    -> vmovq xmm,[rip+disp32]; target must equal target
 #         "pin"       -> opcode/shape only
 UNITS = [
-    (0x5329AE, 7, "4a950a97bbf540d957e295b2ad3be6b28e449dd1e3716c202dd0dd18ee3c3f80",
-     "lea rax,[0x2dcdf14]", "lea_rip", LEA_2DCDF14),
-    (0x5329B5, 4, "5cbe8a11db9e94898aff3c8ff441d398f6eb9db110410761e1561b388d73a64b",
-     "mov rdi,[r13]", "pin", None),
-    (0x5329B9, 7, "bfe2ad08a5dac6ffd34fa121abbb812bf4c880802a855b6f6f0d70398b45af08",
-     "lea rsi,[0x2efd9a0]", "lea_rip", LEA_2EFD9A0),
-    (0x5329C0, 8, "418111e9b3f0f4402412014e6fea6e729dc28f4582f5715066a8d5e858096dc1",
-     "lea rdx,[rsp+0x520]", "pin", None),
-    (0x5329C8, 4, "8b214ae88f0f588c81fdf4ffe8a118e62d66db17278a67c43100ae6aa2c44103",
-     "vxorps ymm0,ymm0,ymm0", "pin", None),
-    (0x5329CC, 7, "fd5811b95c167b1e2b9c0a592201576fb17532f90dc1028d97a5755d057a9e2b",
-     "lea rbx,[0x15c8d98]", "lea_rip", LEA_15C8D98),
-    (0x5329D3, 12, "eeb60038b6b89f5cadfaba9cfcf32e876c76f2925673c60b116951828d1d7aa5",
-     "mov qword [rsp+0x550],0", "pin", None),
-    (0x5329DF, 8, "7f077670609e5b24883173d6fc31e7c5265de5cdf982deaf4747b16d918a67be",
-     "lea r14,[rsp+0x540]", "pin", None),
-    (0x5329E7, 9, "46449f1276335a2bbdfc30937e941eb95b7205ef294091b65aa2f3447c7cbb27",
-     "vmovaps [rsp+0x520],ymm0", "pin", None),
-    (0x5329F0, 8, "f840df49dfc75b6e1f347126a38a3af926539396fabd4fa4dfec87e9cc699efd",
-     "mov [rsp+0x560],rbx", "pin", None),
-    (0x5329F8, 12, "4457bf18c3929b1938e76a7b90f8715e5efca6b6a450c52ff99752ed90af1a4a",
-     "mov qword [rsp+0x568],0", "pin", None),
-    (0x532A04, 3, "b055a3bd27126d8cb6346fd10bbaa3f9984ac2cfba91e17ab1e8409fce9d31ed",
-     "mov [rax],r12b", "pin", None),
-    (0x532A07, 5, "df161f5138a59e161cdd7c34d3ab0d4dc4e32a45d84713a79da30caaa7792df1",
-     "call 0xa54920", "call", CALL_A54920),
     (0x532A0C, 8, "effa8e69926c8ef23f321ca74246f1225f29e9eab1de06d451e3a58bfccc56eb",
      "mov rax,[rsp+0x560]", "pin", None),
     (0x532A14, 3, "34eb50fdb7685f0af0775bc2ce9660fd5573393e1dac2a8c90d2ff1cb877d999",
@@ -180,7 +155,7 @@ def main() -> int:
     _, ph = d.program_headers(elf)
     img = d.Image(elf, ph)
 
-    require(len(UNITS) == 53, "unit count")
+    require(len(UNITS) == 40, "unit count")
     require(START + SIZE == END, "size arithmetic")
 
     # Verify contiguous unit coverage.
@@ -228,7 +203,9 @@ def main() -> int:
     nh = NATIVE_HPP.read_text()
     require("init_531d60_post_base_continue_e" in nh, "API")
     require("NOT modelled" in nh, "omission")
-    require("kInit531d60PostBaseContinueERva = 0x5329ae" in nh, "start rva")
+    require("kInit531d60PostBaseContinueERva = 0x532a0c" in nh, "start rva")
+    require("merge_a54920_u1_ran" in nh, "u1 merge hook")
+    require("init_531d60_post_base_a54920_u1" in U1_NATIVE.read_text(), "a54920 u1 API")
     require("kInit531d60PostBaseContinueEEndRva = 0x532b0c" in nh, "end rva")
     require("kInit531d60PostBaseContinueEUnitCount" in nh, "unit count")
     require("kInit531d60PostBaseContinueECtorRva = 0xa54920" in nh, "ctor rva pin")
@@ -254,11 +231,12 @@ def main() -> int:
     ncp = NATIVE_CPP.read_text()
     require("vcall_noop_count" in ncp, "noop vcall counted")
     require("20538200" not in ncp, "no bare no-op target hex in cpp")  # sanity
-    require("call_a54920_count == 3" in ncp, "3 a54920 calls")
+    require("merge_a54920_u1_ran" in ncp, "u1 merge in cpp")
+    require("call_a54920_count == 3" in ncp, "3 a54920 calls total")
     require("vcall_noop_count == 3" in ncp, "3 noop vcalls counted")
     require("vcall_54b250_count == 1" in ncp, "1 54b250 vcall")
     require("stamp_count == 1" in ncp, "1 boss-flag stamp")
-    require("lea_rip_count == 9" in ncp, "9 lea rip pins")
+    require("lea_rip_count == 9" in ncp, "9 lea rip pins total")
     require("vmovq_count == 1" in ncp, "1 vmovq pin")
 
     # Slice wiring.
@@ -281,8 +259,8 @@ def main() -> int:
             PREV_NATIVE.read_text(), "batch D end matches block entry")
 
     print(
-        f"OK check_f531d60_post_base_continue_e: span=0x{START:x}+{SIZE}B units=53; "
-        f"calls 0x{CALL_A54920:x}×3; vcall+0x18 no-ops×3→0x{NOOP_VCALL1_RESOLVED:x}/"
+        f"OK check_f531d60_post_base_continue_e: span=0x{START:x}+{SIZE}B units=40; "
+        f"calls 0x{CALL_A54920:x}×2 pinned (+1 u1); vcall+0x18 no-ops×3→0x{NOOP_VCALL1_RESOLVED:x}/"
         f"0x{NOOP_VCALL2_RESOLVED:x}(ret); vcall+0x8→0x{RESOLVED_VCALL_54B250:x}; "
         f"stamp 0x{LEA_2DCDF14:x}; end=0x{END:x}; "
         f"a54920_body/54b250_body/descriptor_semantics/r13_r12b_provenance NOT claimed"

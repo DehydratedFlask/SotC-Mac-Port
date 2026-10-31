@@ -1,6 +1,10 @@
-// Init `0x531d60` continue E — OBS `0x5329ae..0x532b0c` (350 B, 53 consecutive units).
+// Init `0x531d60` continue E — OBS `0x532a0c..0x532b0c` (256 B, 40 consecutive units).
 //
-// This is the BRANCH-TARGET block of batch C's `je 0x5329ae` (je TAKEN).
+// Branch-target block of batch C's `je 0x5329ae` (je TAKEN). Entry @ `0x5329ae` and
+// first `call 0xa54920` @ `0x532a07` run via `a54920_u1` (E520); this module pins
+// the post-call tail through `0x532b0c`.
+//
+// Full ELF block `0x5329ae..0x532b0c` (350 B) including demoted u1 prep.
 // Straight-line run: three save-data subsystem constructors (0xa54920), each
 // preceded by a vmovaps-zeroed 0x50 B stack descriptor with vtable pointer at
 // +0x40 and self-pointer at +0x20, followed by a vcall [rax+0x18] through the
@@ -23,7 +27,8 @@
 //   Block 4 (0x532af5..0x532b0c):  lea 0x2eff450, xor esi,esi, mov edx,2,
 //       call [rax+0x8] → 0x54b250(*(0x2eff450), 0, 2).
 //
-// Claimed: 53-unit span, three rel32 call 0xa54920 targets, three vcall+0x18
+// Claimed: 40-unit pinned span (plus u1 merge), three rel32 call 0xa54920 targets
+// (one via u1), three vcall+0x18
 // no-op sites with resolution pins, one vcall+0x8 site with resolved target
 // 0x54b250, nine RIP-relative lea targets, one vmovq target, the mov [rax],r12b
 // stamp site.
@@ -40,13 +45,18 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "init_531d60_post_base_a54920_u1.hpp"
 #include "stat_query_54b250.hpp"
 
 namespace sotc {
 
-inline constexpr std::uint64_t kInit531d60PostBaseContinueERva = 0x5329ae;
-inline constexpr std::size_t kInit531d60PostBaseContinueESize = 350;
+inline constexpr std::uint64_t kInit531d60PostBaseContinueERva = 0x532a0c;
+inline constexpr std::size_t kInit531d60PostBaseContinueESize = 256;
 inline constexpr std::uint64_t kInit531d60PostBaseContinueEEndRva = 0x532b0c;
+inline constexpr std::size_t kInit531d60PostBaseContinueEFullBlockSize = 350;
+
+static_assert(kInit531d60PostBaseA54920U1EndRva == kInit531d60PostBaseContinueERva,
+              "a54920 u1 end equals continue E pinned start");
 
 // Direct-call rel32 targets.
 inline constexpr std::uint64_t kInit531d60PostBaseContinueECtorRva = 0xa54920;
@@ -75,22 +85,9 @@ inline constexpr std::uint64_t kInit531d60PostBaseContinueEVmovqSrcRva = 0x15ff5
 // Vtable for the 0x2eff450 object (slot-1 = 0x54b250, resolved per E538).
 inline constexpr std::uint64_t kInit531d60PostBaseContinueEVtable2eff450Rva = 0x15c9830;
 
-// Unit identity for the 53 pinned instructions of the claimed run.
+// Unit identity for the 40 pinned instructions after E520 a54920_u1.
 enum class ContinueEUnit : int {
-    lea_rax_2dcdf14 = 0,       // 0x5329ae
-    mov_rdi_r13,               // 0x5329b5
-    lea_rsi_2efd9a0,           // 0x5329b9
-    lea_rdx_rsp520,            // 0x5329c0
-    vxorps_ymm0,               // 0x5329c8
-    lea_rbx_15c8d98,           // 0x5329cc
-    movq_rsp550_0,             // 0x5329d3
-    lea_r14_rsp540,            // 0x5329df
-    vmovaps_rsp520_ymm0,       // 0x5329e7
-    mov_rsp560_rbx,            // 0x5329f0
-    movq_rsp568_0,             // 0x5329f8
-    mov_rax_r12b,              // 0x532a04  (stamp boss flag)
-    call_a54920_1,             // 0x532a07
-    mov_rax_rsp560_1,          // 0x532a0c
+    mov_rax_rsp560_1 = 0,      // 0x532a0c
     mov_rdi_r14_1,             // 0x532a14
     vcall_noop_1,              // 0x532a17  (rax+0x18 → 0x538200 ret)
     mov_rdi_r13_2,             // 0x532a1a
@@ -135,8 +132,8 @@ enum class ContinueEUnit : int {
 
 inline constexpr int kInit531d60PostBaseContinueEUnitCount =
     static_cast<int>(ContinueEUnit::count);
-static_assert(kInit531d60PostBaseContinueEUnitCount == 53,
-              "53 units in 0x5329ae..0x532b0c");
+static_assert(kInit531d60PostBaseContinueEUnitCount == 40,
+              "40 units in 0x532a0c..0x532b0c");
 
 struct ContinueEUnitSpan {
     std::uint64_t rva = 0;
@@ -144,22 +141,9 @@ struct ContinueEUnitSpan {
     const char* mnemonic = "";
 };
 
-// OBS table derived from local/re/eboot.elf; sizes sum to kSize (350 B).
+// OBS table derived from local/re/eboot.elf; sizes sum to kSize (256 B).
 inline constexpr std::array<ContinueEUnitSpan, kInit531d60PostBaseContinueEUnitCount>
     kInit531d60PostBaseContinueEUnits{{
-        {0x5329AE, 7, "lea rax,[0x2dcdf14]"},
-        {0x5329B5, 4, "mov rdi,[r13]"},
-        {0x5329B9, 7, "lea rsi,[0x2efd9a0]"},
-        {0x5329C0, 8, "lea rdx,[rsp+0x520]"},
-        {0x5329C8, 4, "vxorps ymm0,ymm0,ymm0"},
-        {0x5329CC, 7, "lea rbx,[0x15c8d98]"},
-        {0x5329D3, 12, "mov qword [rsp+0x550],0"},
-        {0x5329DF, 8, "lea r14,[rsp+0x540]"},
-        {0x5329E7, 9, "vmovaps [rsp+0x520],ymm0"},
-        {0x5329F0, 8, "mov [rsp+0x560],rbx"},
-        {0x5329F8, 12, "mov qword [rsp+0x568],0"},
-        {0x532A04, 3, "mov [rax],r12b"},
-        {0x532A07, 5, "call 0xa54920"},
         {0x532A0C, 8, "mov rax,[rsp+0x560]"},
         {0x532A14, 3, "mov rdi,r14"},
         {0x532A17, 3, "call [rax+0x18]"},
@@ -219,6 +203,7 @@ struct Init531d60PostBaseContinueEHooks {
     // void* descriptor).  Called three times with distinct name structs and
     // stack descriptors.  null => no-op (call still counted as visible).
     void (*call_a54920)(void* parent, void* name_struct, void* descriptor) = nullptr;
+    bool merge_a54920_u1_ran = false;
 
     // Resolved vcall slot-1 through *(0x2eff450) — 0x54b250(this_obj, esi=0,
     // edx=2).  null => no-op (call still counted).
@@ -236,7 +221,7 @@ struct Init531d60PostBaseContinueEResult {
     bool ok = false;
     // Per-unit execution counters (all must be 1 on the modelled path).
     std::array<int, kInit531d60PostBaseContinueEUnitCount> unit_counts{};
-    int unit_executed = 0;          // expect 53
+    int unit_executed = 0;          // expect 40 (plus u1 prep/call when merged)
     int call_a54920_count = 0;      // expect 3 (contract/hook with visible status)
     int vcall_noop_count = 0;       // expect 3 (elided bare ret; counted, no dispatch)
     int vcall_54b250_count = 0;     // expect 1 (resolved slot-1)
@@ -261,8 +246,7 @@ struct Init531d60PostBaseContinueEResult {
     StatQuery54b250Result stat_query{};
 };
 
-// Runs the OBS `0x5329ae..0x532b0c` unit sequence: the branch-target block
-// entered when batch C's `je 0x5329ae` is taken.
+// Runs continue E after optional `a54920_u1` merge: pinned `0x532a0c..0x532b0c`.
 [[nodiscard]] Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
     const Init531d60PostBaseContinueEHooks& hooks = {}) noexcept;
 
