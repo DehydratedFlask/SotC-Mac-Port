@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-31 01:29 CDT (root) — E1049: `lookup_1fc80` default comparator correction claim (ACTIVE)
+
+- **Task:** `CPU-01-LOOKUP-1FC80-CASEFOLD-MODEL-01` — align the bounded host lookup model's default comparator and hook comments/name with the pinned `strcasecmp`-labeled import; add case-only lookup fixtures. Preserve the hash/NID-name inference and make no runtime/game claim.
+- **Claim:** root owns `native/core/lookup_1fc80.{cpp,hpp}`, the focused Init/lookup fixture, and task/evidence/checkpoint/index docs. Graft caller/lexical search was performed before any symbol edit; it found the Continue-A hook assignment and the lookup implementation/header uses.
+- **Basis:** the pinned ELF SHA is `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`; the raw five bytes at `0x1fcde` are `e8 1d f8 f6 00`, whose rel32 target is `0xf8f500`. The matching imports manifest SHA `78caaaae139b7c5d4d2618abab2e50e9f6918ea3cec73a90b81e0005c83b6744` labels NID `AV6ipCNa4Rw` at GOT `0x1600070` as `strcasecmp`, status `name-by-nid-hash-only`. Case-fold semantics remain an inference from that name.
+- **Target confirmed:** `ctest --test-dir local/build/orch-r22 -N -R 'init_continue_ab_native|vslot40_post'` lists `init_continue_ab_native` (CTest #237). No helper-only checker exists; use `python3 tools/lift/check_f533100_vslot40_post.py` for the byte-bound helper/parent contract.
+- `python3 scripts/project_index.py` — exit 0, 44,293 folders indexed after creating this task's private log directory.
+- Next exact action: update the null-hook default to the case-insensitive import model, rename the comparator override to `compare_f8f500`, add case-only lookup assertions, then run the focused target and existing byte checker.
+
 ## 2026-10-31 01:24 CDT (root) — E1048: ConCmd case-insensitive model correction (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-CONCMD-CASEFOLD-MODEL-01` COMPLETE. Slot-306 model now compares with `strcasecmp`; comments identify the NID-derived import label as an inference. Case-only duplicate insertion preserves the first entry, and destroying a case-only duplicate erases the key-only match.
