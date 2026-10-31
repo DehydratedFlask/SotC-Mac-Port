@@ -3,6 +3,7 @@
 #include "init_531d60_post_base_a54920_532a62_u1.hpp"
 #include "init_531d60_post_base_a54920_u1.hpp"
 #include "init_531d60_post_base_vcall18_532a17.hpp"
+#include "init_531d60_post_base_vcall18_532a72_u1.hpp"
 
 #include <cstring>
 
@@ -81,17 +82,16 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         out.lea_rip_count += u2r.lea_rip_count;
     }
 
-    // ---- Block 2 tail: post second ctor vcall through block 3 ----
-
-    // 0x532a67 mov rax,[rsp+0x500]
-    pin(out, ContinueEUnit::mov_rax_rsp500);
-
-    // 0x532a6f mov rdi,r14
-    pin(out, ContinueEUnit::mov_rdi_r14_2);
-
-    // 0x532a72 call [rax+0x18] — vcall slot-3 → 0x538200 (bare ret, elided).
-    pin(out, ContinueEUnit::vcall_noop_2);
-    ++out.vcall_noop_count;
+    if (!hooks.merge_vcall18_532a72_u1_ran) {
+        Init531d60PostBaseVcall18_532a72_U1Hooks vc2{};
+        vc2.call_vslot18 = hooks.call_vslot18_532a72;
+        const Init531d60PostBaseVcall18_532a72_U1Result vcr2 =
+            init_531d60_post_base_vcall18_532a72_u1(vc2);
+        if (!vcr2.ok) {
+            return out;
+        }
+        out.vcall_noop_count += vcr2.call_vslot18_count;
+    }
 
     // ---- Block 3: save-data ctor 3 (name 0x2efda50, vtable 0x15c8e18) ----
     // This descriptor setup is more elaborate: stores self-ptr at +0x00,
@@ -238,7 +238,8 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         1 + (hooks.merge_a54920_u1_ran ? 0 : 1) +
         (hooks.merge_a54920_532a62_u1_ran ? 0 : 1);
     const int expect_vcall_noop =
-        2 + (hooks.merge_vcall18_532a17_ran ? 0 : 1);
+        1 + (hooks.merge_vcall18_532a17_ran ? 0 : 1) +
+        (hooks.merge_vcall18_532a72_u1_ran ? 0 : 1);
     const int expect_stamp = hooks.merge_a54920_u1_ran ? 0 : 1;
     const int expect_lea_rip =
         5 + (hooks.merge_a54920_u1_ran ? 0 : 3) +

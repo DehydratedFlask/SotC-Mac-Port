@@ -2558,10 +2558,10 @@ int main() {
     CHECK(g_capture_a473b0.video_calls == 2);
     CHECK(r.post_base_continue_d.end_rva == 0x5329ae);
 
-    // E1042 / CPU-01-INIT-DRIVER-JOIN-01: fall-through runs D then E (53 units) before remainder.
+    // E1042 / CPU-01-INIT-DRIVER-JOIN-01: fall-through runs D then E (24 pinned units) before remainder.
     CHECK(r.post_base_continue_e.ok);
     CHECK(r.post_base_continue_e.unit_executed == kInit531d60PostBaseContinueEUnitCount);
-    CHECK(kInit531d60PostBaseContinueEUnitCount == 27);
+    CHECK(kInit531d60PostBaseContinueEUnitCount == 24);
     CHECK(g_cont_e_a54920 == 3);  // pbce hooks: three save-data ctor calls on D→E path
     CHECK(r.init_r12b_known);
     CHECK(r.init_r12b_out == 0xA7);  // continue-B bl(0xA6) xor 1 feeds continue-E
@@ -2581,8 +2581,8 @@ int main() {
         CHECK(g_cont_d_rdi == const_cast<void*>(g_cont_d_cell_value));
     }
 
-    // E522 shrunk continue_e direct: 0x532a67..0x532b0c (27 units); block-1/2 ctor/vcall
-    // live in a54920_u1 + vcall18_532a17 + a54920_532a62_u1 merges (skipped via flags).
+    // E523 shrunk continue_e direct: 0x532a75..0x532b0c (24 units); block-1/2 ctor/vcall
+    // live in a54920_u1 + vcall18_532a17 + a54920_532a62_u1 + vcall18_532a72_u1 merges.
     {
         g_cont_e_a54920 = 0;
         g_cont_e_54b250 = 0;
@@ -2591,20 +2591,21 @@ int main() {
         eh.merge_a54920_u1_ran = true;
         eh.merge_vcall18_532a17_ran = true;
         eh.merge_a54920_532a62_u1_ran = true;
+        eh.merge_vcall18_532a72_u1_ran = true;
         eh.call_a54920 = hook_cont_e_a54920;
         eh.call_54b250 = hook_cont_e_54b250;
         eh.cell_2eff450 = &g_cell_2eff450_value;
         const auto er = init_531d60_post_base_continue_e(eh);
         CHECK(er.ok);
         CHECK(er.unit_executed == kInit531d60PostBaseContinueEUnitCount);
-        CHECK(kInit531d60PostBaseContinueEUnitCount == 27);
+        CHECK(kInit531d60PostBaseContinueEUnitCount == 24);
         for (int i = 0; i < kInit531d60PostBaseContinueEUnitCount; ++i) {
             CHECK(er.unit_counts[static_cast<std::size_t>(i)] == 1);
         }
-        CHECK(kInit531d60PostBaseContinueEUnits[0].rva == 0x532a67);
-        CHECK(kInit531d60PostBaseContinueEUnits[26].rva == 0x532b09);
+        CHECK(kInit531d60PostBaseContinueEUnits[0].rva == 0x532a75);
+        CHECK(kInit531d60PostBaseContinueEUnits[23].rva == 0x532b09);
         CHECK(er.call_a54920_count == 1);
-        CHECK(er.vcall_noop_count == 2);
+        CHECK(er.vcall_noop_count == 1);
         CHECK(er.vcall_54b250_count == 1);
         CHECK(er.stamp_count == 0);
         CHECK(er.lea_rip_count == 5);
@@ -2635,11 +2636,12 @@ int main() {
         empty.merge_a54920_u1_ran = true;
         empty.merge_vcall18_532a17_ran = true;
         empty.merge_a54920_532a62_u1_ran = true;
+        empty.merge_vcall18_532a72_u1_ran = true;
         const auto er2 = init_531d60_post_base_continue_e(empty);
         CHECK(er2.ok);
-        CHECK(er2.unit_executed == 27);
+        CHECK(er2.unit_executed == 24);
         CHECK(er2.call_a54920_count == 1);
-        CHECK(er2.vcall_noop_count == 2);
+        CHECK(er2.vcall_noop_count == 1);
         CHECK(er2.vcall_54b250_count == 1);
         CHECK(er2.stamp_count == 0);
         CHECK(!er2.a54920_hook_supplied);

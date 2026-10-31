@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ELF-tie Init 0x531d60 continue E tail block 0x532a67..0x532b0c (165 B / 27 units).
+"""ELF-tie Init 0x531d60 continue E tail block 0x532a75..0x532b0c (151 B / 24 units).
 
 Private: needs local/re/eboot.elf.  Pins every one of the 53 consecutive
 instructions, the three call 0xa54920 rel32 targets, the three vcall+0x18
@@ -23,13 +23,14 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import ps4_dynlink as d  # noqa: E402
 
 ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
-START = 0x532A67
-SIZE = 165
+START = 0x532A75
+SIZE = 151
 END = 0x532B0C
-REGION_SHA256 = "9a6d871bf133ef327e6bf6d3bbcb1d50854be63e5fa937db6e6bbc32b5bdc9a0"
+REGION_SHA256 = "fada239a5a33edd9ca89c69723ed6413c843e53459a61f5cfcf63b9dc75a08af"
 U1_NATIVE = ROOT / "native/core/init_531d60_post_base_a54920_u1.hpp"
 U2_NATIVE = ROOT / "native/core/init_531d60_post_base_a54920_532a62_u1.hpp"
 VC18_NATIVE = ROOT / "native/core/init_531d60_post_base_vcall18_532a17.hpp"
+VC72_NATIVE = ROOT / "native/core/init_531d60_post_base_vcall18_532a72_u1.hpp"
 
 CALL_A54920 = 0xA54920
 NOOP_VCALL1_RESOLVED = 0x538200   # ret
@@ -55,12 +56,6 @@ VMOVQ_15FF528 = 0x15FF528
 #         "vmovq"    -> vmovq xmm,[rip+disp32]; target must equal target
 #         "pin"       -> opcode/shape only
 UNITS = [
-    (0x532A67, 8, "47e317e78bed8720e4a7954469d5a8bdba196684cdf37665661e1a1a431228a4",
-     "mov rax,[rsp+0x500]", "pin", None),
-    (0x532A6F, 3, "34eb50fdb7685f0af0775bc2ce9660fd5573393e1dac2a8c90d2ff1cb877d999",
-     "mov rdi,r14", "pin", None),
-    (0x532A72, 3, "22558207d1d705fcbda49d89be5b34ebe09d409878b0bf88e6819b7724e29e96",
-     "call [rax+0x18]", "vcall18", None),
     (0x532A75, 8, "f970e4d743bedbd28f18045f6cd2d6c61d1367f844519a5fe55646970144c670",
      "vmovq xmm0,[0x15ff528]", "vmovq", VMOVQ_15FF528),
     (0x532A7D, 7, "8ed7d0f04cc53d86379785218e047d03c6415d6038a62558fe1d66d3ef9cc12b",
@@ -131,7 +126,7 @@ def main() -> int:
     _, ph = d.program_headers(elf)
     img = d.Image(elf, ph)
 
-    require(len(UNITS) == 27, "unit count")
+    require(len(UNITS) == 24, "unit count")
     require(START + SIZE == END, "size arithmetic")
 
     # Verify contiguous unit coverage.
@@ -179,13 +174,15 @@ def main() -> int:
     nh = NATIVE_HPP.read_text()
     require("init_531d60_post_base_continue_e" in nh, "API")
     require("NOT modelled" in nh, "omission")
-    require("kInit531d60PostBaseContinueERva = 0x532a67" in nh, "start rva")
+    require("kInit531d60PostBaseContinueERva = 0x532a75" in nh, "start rva")
     require("merge_a54920_u1_ran" in nh, "u1 merge hook")
     require("merge_a54920_532a62_u1_ran" in nh, "a54920_532a62 merge hook")
     require("merge_vcall18_532a17_ran" in nh, "vcall18 merge hook")
+    require("merge_vcall18_532a72_u1_ran" in nh, "vcall72 merge hook")
     require("init_531d60_post_base_a54920_u1" in U1_NATIVE.read_text(), "a54920 u1 API")
     require("init_531d60_post_base_a54920_532a62_u1" in U2_NATIVE.read_text(), "a54920_532a62 u1 API")
     require("init_531d60_post_base_vcall18_532a17" in VC18_NATIVE.read_text(), "vcall18 API")
+    require("init_531d60_post_base_vcall18_532a72_u1" in VC72_NATIVE.read_text(), "vcall72 API")
     require("kInit531d60PostBaseContinueEEndRva = 0x532b0c" in nh, "end rva")
     require("kInit531d60PostBaseContinueEUnitCount" in nh, "unit count")
     require("kInit531d60PostBaseContinueECtorRva = 0xa54920" in nh, "ctor rva pin")
@@ -214,6 +211,7 @@ def main() -> int:
     require("merge_a54920_u1_ran" in ncp, "u1 merge in cpp")
     require("merge_a54920_532a62_u1_ran" in ncp, "a54920_532a62 merge in cpp")
     require("merge_vcall18_532a17_ran" in ncp, "vcall18 merge in cpp")
+    require("merge_vcall18_532a72_u1_ran" in ncp, "vcall72 merge in cpp")
     require("expect_a54920" in ncp, "conditional a54920 validation")
     require("expect_vcall_noop" in ncp, "conditional vcall noop validation")
     require("vcall_54b250_count == 1" in ncp, "1 54b250 vcall")
@@ -233,6 +231,7 @@ def main() -> int:
     require("init_531d60_post_base_continue_e.cpp" in cm, "continue_e in CMake")
     require("init_531d60_post_base_a54920_532a62_u1.cpp" in cm, "a54920_532a62 in CMake")
     require("init_531d60_post_base_vcall18_532a17.cpp" in cm, "vcall18_532a17 in CMake")
+    require("init_531d60_post_base_vcall18_532a72_u1.cpp" in cm, "vcall18_532a72 in CMake")
 
     # Test text.
     tt = TEST.read_text()
@@ -243,8 +242,8 @@ def main() -> int:
             PREV_NATIVE.read_text(), "batch D end matches block entry")
 
     print(
-        f"OK check_f531d60_post_base_continue_e: span=0x{START:x}+{SIZE}B units=27; "
-        f"calls 0x{CALL_A54920:x}×1 pinned (+2 u1); vcall+0x18 no-ops×2 pinned (+1 vcall18); "
+        f"OK check_f531d60_post_base_continue_e: span=0x{START:x}+{SIZE}B units=24; "
+        f"calls 0x{CALL_A54920:x}×1 pinned (+2 u1); vcall+0x18 no-ops×1 pinned (+2 vcall18); "
         f"no-ops→0x{NOOP_VCALL1_RESOLVED:x}/"
         f"0x{NOOP_VCALL2_RESOLVED:x}(ret); vcall+0x8→0x{RESOLVED_VCALL_54B250:x}; "
         f"stamp 0x{LEA_2DCDF14:x}; end=0x{END:x}; "

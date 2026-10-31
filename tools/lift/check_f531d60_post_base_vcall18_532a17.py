@@ -58,8 +58,11 @@ def main() -> int:
     require(f"0x{RESOLVED:x}" in nh.lower() or "538200" in nh, "resolved ret pin")
     ce = CONT_E.read_text()
     u2 = ROOT / "native/core/init_531d60_post_base_a54920_532a62_u1.hpp"
+    u72 = ROOT / "native/core/init_531d60_post_base_vcall18_532a72_u1.hpp"
     require("kInit531d60PostBaseA54920_532a62_U1PrepRva = 0x532a1a" in u2.read_text(),
             "a54920_532a62 prep after vcall18")
+    require("kInit531d60PostBaseVcall18_532a72_U1PrepRva = 0x532a67" in u72.read_text(),
+            "vcall72 prep after a54920_532a62")
     require("merge_a54920_532a62_u1_ran" in ce, "continue_e E522 merge hook")
     require("merge_vcall18_532a17_ran" in ce, "vcall merge hook")
     require("core/init_531d60_post_base_vcall18_532a17.cpp" in CMAKE.read_text(), "cmake")
