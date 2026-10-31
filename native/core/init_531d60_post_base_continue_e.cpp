@@ -23,6 +23,7 @@
 #include "init_531d60_post_base_lea_rax_2eff450_532af5_u1.hpp"
 #include "init_531d60_post_base_xor_esi_532afc_u1.hpp"
 #include "init_531d60_post_base_mov_edx_2_532afe_u1.hpp"
+#include "init_531d60_post_base_mov_rdi_rax_mem_532b03_u1.hpp"
 #include "init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
@@ -435,12 +436,22 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
     // is 0x15c9830.  Slot 1 (offset +0x8) = 0x54b250.  The call is:
     //   0x54b250(*(0x2eff450), esi=0, edx=2)
 
-    // 0x532b03 mov rdi,[rax] — rdi = *0x2eff450 (object pointer)
     void* obj_2eff450 = nullptr;
-    if (hooks.cell_2eff450 != nullptr) {
+    if (!hooks.merge_mov_rdi_rax_mem_532b03_u1_ran) {
+        Init531d60PostBaseMovRdiRaxMem_532b03_U1Cells rdi_cells =
+            hooks.mov_rdi_rax_mem_532b03_u1_cells;
+        if (rdi_cells.cell_ptr == nullptr && hooks.cell_2eff450 != nullptr) {
+            rdi_cells.cell_ptr = hooks.cell_2eff450;
+        }
+        const Init531d60PostBaseMovRdiRaxMem_532b03_U1Result mrdi =
+            init_531d60_post_base_mov_rdi_rax_mem_532b03_u1(rdi_cells);
+        if (!mrdi.ok) {
+            return out;
+        }
+        obj_2eff450 = mrdi.rdi;
+    } else if (hooks.cell_2eff450 != nullptr) {
         obj_2eff450 = *hooks.cell_2eff450;
     }
-    pin(out, ContinueEUnit::mov_rdi_rax);
 
     // 0x532b06 mov rax,[rdi] — rax = object->vtable (0x15c9830)
     // E538: the vtable pointer stored in the object = 0x15c9830, slot 1 = 0x54b250.
