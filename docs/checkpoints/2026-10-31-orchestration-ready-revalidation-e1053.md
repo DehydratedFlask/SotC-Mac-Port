@@ -1,6 +1,6 @@
 # E1053 — task availability revalidation after the E1052 stop
 
-**Date/agent:** 2026-10-31, root. **Task:** `DOC-ORCH-READY-REVALIDATION-01`. **Status:** DOCS_VERIFIED; publication pending. **Scope:** read-only reconciliation of the user-provided redacted session digests, live wiki navigation indexes, task board, gate state, and three parallel bounded scans. No source, test, game-input, private analysis, or Wiki topic files were changed.
+**Date/agent:** 2026-10-31, root. **Task:** `DOC-ORCH-READY-REVALIDATION-01`. **Status:** ARTIFACT_VERIFIED for the documentation checkpoint and publication only. **Scope:** read-only reconciliation of the user-provided redacted session digests, live wiki navigation indexes, task board, gate state, and three parallel bounded scans. No source, test, game-input, private analysis, or Wiki topic files were changed.
 
 ## Session and wiki context
 
@@ -38,8 +38,11 @@ The installed `llm-wiki` entry point does not expose a `session` subcommand: `ll
 - `python3 -I scripts/audit_publish_paths.py` — exit 0, 6 staged paths.
 - `python3 -I scripts/audit_publish_paths.py --all` — exit 0, 3,464 paths.
 - `python3 -I scripts/check_commit_attribution.py` — exit 0, attribution audit OK for the current empty `origin/main..HEAD` range; the new commit still needs an audit after creation.
-- Exact logs: `local/validation/orchestration-ready-e1053/` (`configure.log`, `build.log`, `ctest.log`, `lift-checkers.log`, `project-index-final.log`, `trail-check-final.log`, `audit-all.log`, `wiki-rehydrate.log`). Commit-specific attribution, push, and fetched-ref verification are pending.
+- `git commit -m "docs: record E1053 task availability revalidation"` — exit 0; owner commit `7b0c3c3cbca4340f387bc66ee5816e40c8e888db`.
+- Commit-specific `python3 -I scripts/check_commit_attribution.py` — exit 0.
+- `git push origin main` — exit 0; `git fetch origin` — exit 0; `git rev-parse HEAD`, `git rev-parse origin/main`, and `git rev-parse FETCH_HEAD` all returned `7b0c3c3cbca4340f387bc66ee5816e40c8e888db`; `git status --short --branch` reported clean `main...origin/main`.
+- Exact logs: `local/validation/orchestration-ready-e1053/` (`configure.log`, `build.log`, `ctest.log`, `lift-checkers.log`, `project-index-final.log`, `trail-check-final.log`, `audit-staged.log`, `audit-all-final.log`, `diff-check.log`, `attribution.log`, `wiki-rehydrate.log`).
 
 **Remaining risks:** no authentic game boot/start route, no game frame/audio/save-load, no gate advanced. UI observation needs manual unlock; selected code/analysis paths remain blocked at their written stop conditions.
 
-**Next exact action:** stage only the allowlisted documentation files, run staged/all-path audits, review, commit/push under the owner identity, then fetch-verify. For project work after this checkpoint, wait for a new concrete slot-309 edge or principal reassessment, unlock for the authorized VoiceOver observation, receive the owner host-policy choice for 499F80 rollback, or obtain new source evidence that satisfies the explicit TEX0/SAV-01 stop. Do not repeat blocked provider/UI probes or register slot 309.
+**Next exact action:** wait for a new concrete slot-309 edge or principal reassessment, unlock for the authorized VoiceOver observation, receive the owner host-policy choice for 499F80 rollback, or obtain new source evidence that satisfies the explicit TEX0/SAV-01 stop. Do not repeat blocked provider/UI probes or register slot 309.
