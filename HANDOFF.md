@@ -1,5 +1,20 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-31 12:45 CDT (bc-fae1f43e) — E515: Init continue `0x4c4950` call-site u1 (FIXTURE_VERIFIED)
+
+- **Edge:** `call 0x4c4950` @ `0x5327a0` (5 B); prep `0x532793..0x5327a0` (13 B) demoted; `continue_b` → `0x5327a5..0x5327b1` (3 units).
+- **Branch:** `cursor/init-hash-551140-6aa93e8` PR #13. G1 PARTIAL.
+- **Next:** grouped `je 0x5328e0` @ `0x5327ab` boundary.
+
+## 2026-10-31 12:35 CDT (bc-fae1f43e) — E514: Init continue `0x1e4c0` call-site u1 (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-INIT-531D60-POST-BASE-1E4C0-U1-01` on branch `cursor/init-hash-551140-6aa93e8` (draft PR #13).
+- **Edge:** first `call` after continue_a fall-through `0x53277f` → `call 0x1e4c0` @ `0x53278e` (5 B frag SHA `1e31031c…`); prep `0x53277f..0x53278e` (15 B) demoted. `continue_b` shrunk to `0x532793..0x5327b1` (8 units).
+- **Files:** `native/core/init_531d60_post_base_1e4c0_u1.{hpp,cpp}`, `continue_b` + slice/driver/tests, `tools/lift/check_f531d60_post_base_1e4c0_u1.py`, updated `check_f531d60_post_base_continue_b.py`, checkpoint [E514](docs/checkpoints/2026-10-31-init-531d60-post-base-1e4c0-u1-e514.md).
+- **Verification (`PASSED`):** CTest **495/495**; lift checkers **584/584**; ELF pin `d0723afb…`.
+- **Gate:** G1 PARTIAL (no boot/audio/save claim).
+- **Next:** next single call-site or `je 0x5328e0` @ `0x5327ab` per Init continue policy.
+
 ## 2026-10-31 02:50 CDT (root) — E1054 result: synchronize validation checkpoint pointers (ARTIFACT_VERIFIED)
 
 - **Task:** `DOC-VALIDATION-CHECKPOINT-SYNC-02` COMPLETE. Updated the validation summary to identify E1054 as current, retain E1050 as the latest host-source lifecycle audit, E1052 as the latest startup-binary route audit, E1053 as the task-availability checkpoint, and E1005 as the latest artifact-verified launcher bundle.
