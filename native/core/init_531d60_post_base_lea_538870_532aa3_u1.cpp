@@ -12,7 +12,7 @@ Init531d60PostBaseLea538870_532aa3_U1Result init_531d60_post_base_lea_538870_532
     }
     ++out.lea_rip_count;
 
-    // Next: lea rbx,[rsp+0x490] @ 0x532aaa — see continue_e.
+    // Next: lea rbx,[rsp+0x490] @ 0x532aaa — see lea_rbx_rsp490_532aaa_u1 (E531).
     out.ok = (out.lea_rip_count == 1);
     return out;
 }

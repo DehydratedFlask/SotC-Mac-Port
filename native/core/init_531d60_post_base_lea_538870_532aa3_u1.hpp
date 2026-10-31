@@ -2,7 +2,7 @@
 //   lea rcx,[0x538870]   ; thunk 2 address pin (ret no-op)
 //
 // After E529 `mov_rdi_r13_532a9f_u1` end @ `0x532aa3`. NOT modelled: following
-// `lea rbx,[rsp+0x490]` @ `0x532aaa` (E530+ continue_e). G1 PARTIAL.
+// `lea rbx,[rsp+0x490]` @ `0x532aaa` (E531 peel). G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

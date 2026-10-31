@@ -10,6 +10,7 @@
 #include "init_531d60_post_base_movq_rsp4a0_0_532a93_u1.hpp"
 #include "init_531d60_post_base_mov_rdi_r13_532a9f_u1.hpp"
 #include "init_531d60_post_base_lea_538870_532aa3_u1.hpp"
+#include "init_531d60_post_base_lea_rbx_rsp490_532aaa_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
 #include <cstring>
@@ -197,10 +198,26 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         out.lea_rip_count += lcr.lea_rip_count;
     }
 
-    // 0x532aaa lea rbx,[rsp+0x490] — &desc3[0x20] (self-ptr, stored as rbx for
-    // later vcall dispatch)
-    desc3.self_ptr = reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(&desc3) + 0x20);
-    pin(out, ContinueEUnit::lea_rbx_rsp490);
+    Init531d60PostBaseLeaRbxRsp490_532aaa_U1Cells lea_rbx_cells =
+        hooks.lea_rbx_rsp490_532aaa_u1_cells;
+    const void* synthetic_rsp =
+        reinterpret_cast<const std::uint8_t*>(desc3_ptr) -
+        static_cast<std::uintptr_t>(kInit531d60PostBaseLeaRsp470_532a84_U1Disp);
+    if (lea_rbx_cells.rbx_out == nullptr) {
+        lea_rbx_cells.rbx_out = &desc3.self_ptr;
+    }
+    if (lea_rbx_cells.stack_rsp == nullptr) {
+        lea_rbx_cells.stack_rsp = synthetic_rsp;
+    }
+    if (!hooks.merge_lea_rbx_rsp490_532aaa_u1_ran) {
+        const Init531d60PostBaseLeaRbxRsp490_532aaa_U1Result lbr =
+            init_531d60_post_base_lea_rbx_rsp490_532aaa_u1(lea_rbx_cells);
+        if (!lbr.ok) {
+            return out;
+        }
+    } else {
+        desc3.self_ptr = reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(&desc3) + 0x20);
+    }
 
     // 0x532ab2 mov [rsp+0x470],rdx — desc3[0x00] = &desc3 (self-pointer at head)
     // Original: stores rdx (the descriptor base address) into desc3[0x00].

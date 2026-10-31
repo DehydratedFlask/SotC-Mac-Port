@@ -2561,7 +2561,7 @@ int main() {
     // E1042 / CPU-01-INIT-DRIVER-JOIN-01: fall-through runs D then E (18 pinned units) before remainder.
     CHECK(r.post_base_continue_e.ok);
     CHECK(r.post_base_continue_e.unit_executed == kInit531d60PostBaseContinueEUnitCount);
-    CHECK(kInit531d60PostBaseContinueEUnitCount == 17);
+        CHECK(kInit531d60PostBaseContinueEUnitCount == 16);
     CHECK(g_cont_e_a54920 == 3);  // pbce hooks: three save-data ctor calls on D→E path
     CHECK(r.init_r12b_known);
     CHECK(r.init_r12b_out == 0xA7);  // continue-B bl(0xA6) xor 1 feeds continue-E
@@ -2581,10 +2581,11 @@ int main() {
         CHECK(g_cont_d_rdi == const_cast<void*>(g_cont_d_cell_value));
     }
 
-    // E530 shrunk continue_e direct: 0x532aaa..0x532b0c (17 units); block-1/2/3 peels
+    // E531 shrunk continue_e direct: 0x532ab2..0x532b0c (16 units); block-1/2/3 peels
     // live in a54920_u1 + vcall18_532a17 + a54920_532a62_u1 + vcall18_532a72_u1 +
     // vmovq_532a75_u1 + lea_5388e0_532a7d_u1 + lea_rsp470_532a84_u1 + lea_rsi_532a8c_u1 +
-    // movq_rsp4a0_532a93_u1 + mov_rdi_r13_532a9f_u1 + lea_538870_532aa3_u1 merges.
+    // movq_rsp4a0_532a93_u1 + mov_rdi_r13_532a9f_u1 + lea_538870_532aa3_u1 +
+    // lea_rbx_rsp490_532aaa_u1 merges.
     {
         g_cont_e_a54920 = 0;
         g_cont_e_54b250 = 0;
@@ -2602,6 +2603,7 @@ int main() {
         eh.merge_movq_rsp4a0_0_532a93_u1_ran = true;
         eh.merge_mov_rdi_r13_532a9f_u1_ran = true;
         eh.merge_lea_538870_532aa3_u1_ran = true;
+        eh.merge_lea_rbx_rsp490_532aaa_u1_ran = true;
         eh.call_a54920 = hook_cont_e_a54920;
         eh.call_54b250 = hook_cont_e_54b250;
         eh.cell_2eff450 = &g_cell_2eff450_value;
@@ -2639,15 +2641,24 @@ int main() {
         CHECK(lcr.ok);
         CHECK(lcr.lea_rip_count == 1);
         CHECK(lea_rcx_out == reinterpret_cast<void*>(static_cast<std::uintptr_t>(0x538870)));
+        void* lea_rbx_out = nullptr;
+        const void* cont_e_rsp =
+            reinterpret_cast<const std::uint8_t*>(g_cont_e_a54920_desc) -
+            static_cast<std::uintptr_t>(0x470);
+        const auto lbr = init_531d60_post_base_lea_rbx_rsp490_532aaa_u1(
+            Init531d60PostBaseLeaRbxRsp490_532aaa_U1Cells{
+                .stack_rsp = cont_e_rsp, .rbx_out = &lea_rbx_out});
+        CHECK(lbr.ok);
+        CHECK(lbr.lea_rsp_count == 1);
         const auto er = init_531d60_post_base_continue_e(eh);
         CHECK(er.ok);
         CHECK(er.unit_executed == kInit531d60PostBaseContinueEUnitCount);
-        CHECK(kInit531d60PostBaseContinueEUnitCount == 17);
+        CHECK(kInit531d60PostBaseContinueEUnitCount == 16);
         for (int i = 0; i < kInit531d60PostBaseContinueEUnitCount; ++i) {
             CHECK(er.unit_counts[static_cast<std::size_t>(i)] == 1);
         }
-        CHECK(kInit531d60PostBaseContinueEUnits[0].rva == 0x532aaa);
-        CHECK(kInit531d60PostBaseContinueEUnits[16].rva == 0x532b09);
+        CHECK(kInit531d60PostBaseContinueEUnits[0].rva == 0x532ab2);
+        CHECK(kInit531d60PostBaseContinueEUnits[15].rva == 0x532b09);
         CHECK(er.call_a54920_count == 1);
         CHECK(er.vcall_noop_count == 1);
         CHECK(er.vcall_54b250_count == 1);
@@ -2688,9 +2699,10 @@ int main() {
         empty.merge_movq_rsp4a0_0_532a93_u1_ran = true;
         empty.merge_mov_rdi_r13_532a9f_u1_ran = true;
         empty.merge_lea_538870_532aa3_u1_ran = true;
+        empty.merge_lea_rbx_rsp490_532aaa_u1_ran = true;
         const auto er2 = init_531d60_post_base_continue_e(empty);
         CHECK(er2.ok);
-        CHECK(er2.unit_executed == 17);
+        CHECK(er2.unit_executed == 16);
         CHECK(er2.call_a54920_count == 1);
         CHECK(er2.vcall_noop_count == 1);
         CHECK(er2.vcall_54b250_count == 1);
