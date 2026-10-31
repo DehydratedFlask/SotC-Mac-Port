@@ -78,11 +78,20 @@ RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, 
         }
         count_from_54dc20 = count_call.count;
     }
+    void* rbx_from_54dc10 = rax_from_54dc10;
     if (!hooks.merge_mov_r15_rax_532b26_u1_ran) {
         Init531d60PostBaseMovR15Rax_532b26_U1Cells cells{};
         cells.rax_in = count_from_54dc20;
         const auto mov_r15 = init_531d60_post_base_mov_r15_rax_532b26_u1(cells);
         if (!mov_r15.ok) {
+            return RegistryInit531d60Status::alloc_failed;
+        }
+    }
+    if (!hooks.merge_mov_rsi_rbx_532b29_u1_ran) {
+        Init531d60PostBaseMovRsiRbx_532b29_U1Cells cells{};
+        cells.rbx_in = rbx_from_54dc10;
+        const auto mov_rsi = init_531d60_post_base_mov_rsi_rbx_532b29_u1(cells);
+        if (!mov_rsi.ok) {
             return RegistryInit531d60Status::alloc_failed;
         }
     }

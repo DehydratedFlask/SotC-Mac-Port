@@ -12,7 +12,7 @@ Init531d60PostBaseMovR15Rax_532b26_U1Result init_531d60_post_base_mov_r15_rax_53
     }
     ++out.mov_r15_rax_count;
 
-    // Next: mov rsi,rbx / fill setup @ 0x532b29 — not modelled in this unit.
+    // Next: mov rsi,rbx @ 0x532b29 — peeled as registry_body unit E555.
     out.ok = (out.mov_r15_rax_count == 1);
     return out;
 }

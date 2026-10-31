@@ -237,6 +237,7 @@ add_library(sotc_core STATIC
   core/init_531d60_post_base_mov_rbx_rax_532b1e_u1.cpp
   core/init_531d60_post_base_call_54dc20_532b21_u1.cpp
   core/init_531d60_post_base_mov_r15_rax_532b26_u1.cpp
+  core/init_531d60_post_base_mov_rsi_rbx_532b29_u1.cpp
   core/init_531d60_post_base_registry_body.cpp
   core/init_531d60_post_base_registry_tail.cpp
   core/init_531d60_post_base_vmovq_532a75_u1.cpp
