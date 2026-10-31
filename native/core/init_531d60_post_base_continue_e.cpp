@@ -453,12 +453,20 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         obj_2eff450 = *hooks.cell_2eff450;
     }
 
-    // 0x532b06 mov rax,[rdi] — rax = object->vtable (0x15c9830)
-    // E538: the vtable pointer stored in the object = 0x15c9830, slot 1 = 0x54b250.
-    pin(out, ContinueEUnit::mov_rax_rdi);
+    if (!hooks.merge_mov_rax_rdi_mem_532b06_u1_ran) {
+        Init531d60PostBaseMovRaxRdiMem_532b06_U1Cells rax_cells =
+            hooks.mov_rax_rdi_mem_532b06_u1_cells;
+        if (rax_cells.cell_ptr == nullptr && obj_2eff450 != nullptr) {
+            rax_cells.cell_ptr = reinterpret_cast<void* const*>(obj_2eff450);
+        }
+        const Init531d60PostBaseMovRaxRdiMem_532b06_U1Result mrax =
+            init_531d60_post_base_mov_rax_rdi_mem_532b06_u1(rax_cells);
+        if (!mrax.ok) {
+            return out;
+        }
+    }
 
     // 0x532b09 call [rax+0x8] — vcall slot-1 → 0x54b250(this_obj, esi=0, edx=2).
-    // E547: prefer the lifted wrapper body when an engine contract is supplied.
     if (hooks.stat_engine != nullptr) {
         out.stat_query = stat_query_54b250(obj_2eff450, 0, 2, *hooks.stat_engine);
         out.stat_query_ran = true;
