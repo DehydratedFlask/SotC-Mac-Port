@@ -266,8 +266,8 @@ int g_post_base_f590_a2ed00_u11 = 0;
 int g_post_base_f590_a2ed00_u12 = 0;
 int g_post_base_a2ed00_u7 = 0;
 int g_post_base_f590_a2ed00_u13 = 0;
-// E509 grouped continue 0x532720..0x53277f: per-call-site hooks + observed args.
-int g_cont_a_f590 = 0;
+int g_post_base_f590_a2ed00_u14 = 0;
+// E519 grouped continue 0x532728..0x53277f: per-call-site hooks + observed args.
 int g_cont_a_a2ea00 = 0;
 int g_cont_a_a2e5d0 = 0;
 int g_cont_a_a543b0 = 0;
@@ -799,8 +799,8 @@ SharedReleaseF590Result hook_post_base_f590_a2ed00_u13(SharedHolderF590& holder)
     ++g_post_base_f590_a2ed00_u13;
     return f590_override(holder);
 }
-SharedReleaseF590Result hook_cont_a_f590(SharedHolderF590& holder) {
-    ++g_cont_a_f590;
+SharedReleaseF590Result hook_post_base_f590_a2ed00_u14(SharedHolderF590& holder) {
+    ++g_post_base_f590_a2ed00_u14;
     return f590_override(holder);
 }
 int hook_cont_a_a2ea00(void* rbx) {
@@ -1217,7 +1217,7 @@ int main() {
     g_post_base_f590_a2ed00_u12 = 0;
     g_post_base_a2ed00_u7 = 0;
     g_post_base_f590_a2ed00_u13 = 0;
-    g_cont_a_f590 = 0;
+    g_post_base_f590_a2ed00_u14 = 0;
     g_cont_a_a2ea00 = 0;
     g_cont_a_a2e5d0 = 0;
     g_cont_a_a543b0 = 0;
@@ -1589,12 +1589,13 @@ int main() {
     pba2edu7.call_a2ed00 = hook_post_base_a2ed00_u7;
     Init531d60PostBaseF590A2ed00U13Hooks pbf590u13{};
     pbf590u13.call_f590 = hook_post_base_f590_a2ed00_u13;
+    Init531d60PostBaseF590A2ed00U14Hooks pbf590u14{};
+    pbf590u14.call_f590 = hook_post_base_f590_a2ed00_u14;
     Init531d60PostBaseContinueAHooks pbca{};
     pbca.incoming_r13_slot = &g_cont_a_r13_obj;
     pbca.cell_32f79a8 = &g_cont_a_cell_32f79a8;
     pbca.cell_32f84f8 = &g_cont_a_cell_32f84f8;
     pbca.rsp20_slot = &g_cont_a_rsp20;
-    pbca.call_f590 = hook_cont_a_f590;
     pbca.call_a2ea00 = hook_cont_a_a2ea00;
     pbca.call_a2e5d0 = hook_cont_a_a2e5d0;
     pbca.call_a543b0 = hook_cont_a_a543b0;
@@ -1657,7 +1658,7 @@ int main() {
                                                      pba2edu3, pbf590u5, pbf590u6, pba2edu4,
                                                      pbf590u7, pbf590u8, pba2edu5, pbf590u9,
                                                      pbf590u10, pba2edu6, pbf590u11, pbf590u12,
-                                                     pba2edu7, pbf590u13, pbca, pbcb, pbcc, pbcd, pbce, pbalt, ih);
+                                                     pba2edu7, pbf590u13, pbf590u14, pbca, pbcb, pbcc, pbcd, pbce, pbalt, ih);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
         std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
@@ -2102,7 +2103,7 @@ int main() {
     CHECK(r.post_base_ymm_reload.ok);
     CHECK(r.post_base_ymm_reload.store_count == 1);
     CHECK(std::memcmp(g_ymm_reload_dst433c, g_ymm_reload_src430c, 0x30) == 0);
-    // E490..E508: the 17 Init 0xf590 sites now go through the shared release contract.
+    // E490..E509: the 18 Init 0xf590 sites now go through the shared release contract.
     // `f590_override` returns a result only a host override can produce, so `had_control`
     // proves the module called the override and stored its result.
     const auto check_f590_override = [](const SharedReleaseF590Result& rel) {
@@ -2336,18 +2337,23 @@ int main() {
     CHECK(g_post_base_f590_a2ed00_u13 == 1);
     CHECK(r.post_base_f590_a2ed00_u13.call_f590_count == 1);
     check_f590_override(r.post_base_f590_a2ed00_u13.release);
-    // E509: grouped Init continue 0x532720..0x53277f — 22 units, 5 call sites,
+    // E509: Init continue second post-a2ed00-u7 0xf590 call-site (mov-rdi prep / body NOT modelled)
+    CHECK(r.post_base_f590_a2ed00_u14.ok);
+    CHECK(g_post_base_f590_a2ed00_u14 == 1);
+    CHECK(r.post_base_f590_a2ed00_u14.call_f590_count == 1);
+    check_f590_override(r.post_base_f590_a2ed00_u14.release);
+    // E519: grouped Init continue 0x532728..0x53277f — 20 units, 4 call sites,
     // 4 lea pins, 5 host reads; je target pinned but outcome NOT modelled.
     CHECK(r.post_base_continue_a.ok);
     CHECK(r.post_base_continue_a.unit_executed ==
           kInit531d60PostBaseContinueAUnitCount);
-    CHECK(kInit531d60PostBaseContinueAUnitCount == 22);
+    CHECK(kInit531d60PostBaseContinueAUnitCount == 20);
     for (int i = 0; i < kInit531d60PostBaseContinueAUnitCount; ++i) {
         CHECK(r.post_base_continue_a.unit_counts[static_cast<std::size_t>(i)] == 1);
     }
-    CHECK(kInit531d60PostBaseContinueAUnits[0].rva == 0x532720);
-    CHECK(kInit531d60PostBaseContinueAUnits[21].rva == 0x53277d);
-    CHECK(r.post_base_continue_a.call_count == 5);
+    CHECK(kInit531d60PostBaseContinueAUnits[0].rva == 0x532728);
+    CHECK(kInit531d60PostBaseContinueAUnits[19].rva == 0x53277d);
+    CHECK(r.post_base_continue_a.call_count == 4);
     CHECK(r.post_base_continue_a.lea_count == 4);
     CHECK(r.post_base_continue_a.load_count == 5);
     CHECK(r.post_base_continue_a.alu_count == 2);
@@ -2355,8 +2361,6 @@ int main() {
     CHECK(!r.post_base_continue_a.branch_outcome_modelled);
     CHECK(r.post_base_continue_a.end_rva == 0x53277f);
     CHECK(r.post_base_continue_a.branch_target_rva == 0x5327bd);
-    CHECK(g_cont_a_f590 == 1);
-    check_f590_override(r.post_base_continue_a.release);
     CHECK(g_cont_a_a2ea00 == 1);
     CHECK(g_cont_a_a2ea00_rbx == g_cont_a_obj);  // [r13] pointer
     CHECK(g_cont_a_a2e5d0 == 1);
@@ -2390,10 +2394,10 @@ int main() {
         check_init_f590_defaults(init_531d60_post_base_f590_a2ed00_u11());
         check_init_f590_defaults(init_531d60_post_base_f590_a2ed00_u12());
         check_init_f590_defaults(init_531d60_post_base_f590_a2ed00_u13());
+        check_init_f590_defaults(init_531d60_post_base_f590_a2ed00_u14());
         const Init531d60PostBaseContinueAResult cont_a_default{init_531d60_post_base_continue_a()};
         CHECK(cont_a_default.ok);
-        CHECK(cont_a_default.unit_counts[static_cast<std::size_t>(ContinueAUnit::call_f590)] == 1);
-        check_f590_release_noop(cont_a_default.release);
+        CHECK(cont_a_default.unit_counts[static_cast<std::size_t>(ContinueAUnit::mov_rbx_load_r13)] == 1);
     }
     // E510: grouped Init continue B 0x53277f..0x5327b1 — 14 units, 2 call sites,
     // 5 ALU ops, 1 load; je6 target pinned but outcome NOT modelled.
@@ -2725,6 +2729,7 @@ int main() {
         "post_base_a2ed00_u6+post_base_f590_a2ed00_u11+"
         "post_base_f590_a2ed00_u12+post_base_a2ed00_u7+"
         "post_base_f590_a2ed00_u13+"
+        "post_base_f590_a2ed00_u14+"
         "post_base_continue_a+"
         "early+tail+base+trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
@@ -2741,7 +2746,7 @@ int main() {
         "pba2edu2=%d pbf590u3=%d pbf590u4=%d pba2edu3=%d pbf590u5=%d pbf590u6=%d "
         "pba2edu4=%d pbf590u7=%d pbf590u8=%d pba2edu5=%d pbf590u9=%d "
         "pbf590u10=%d pba2edu6=%d pbf590u11=%d pbf590u12=%d "
-        "pba2edu7=%d pbf590u13=%d pbca_units=%d pbcb_units=%d pbcc_units=%d "
+        "pba2edu7=%d pbf590u13=%d pbf590u14=%d pbca_units=%d pbcb_units=%d pbcc_units=%d "
         "gate_byte=%u mid_reg=%d tsc=0x%llx entries=%u "
         "alloc_ops=%llu duration_us=%lld "
         "allocator=tip_AllocatorFront+FakeHeap "
@@ -2845,6 +2850,7 @@ int main() {
         r.post_base_f590_a2ed00_u12.call_f590_count,
         r.post_base_a2ed00_u7.call_a2ed00_count,
         r.post_base_f590_a2ed00_u13.call_f590_count,
+        r.post_base_f590_a2ed00_u14.call_f590_count,
         r.post_base_continue_a.unit_executed,
         r.post_base_continue_b.unit_executed,
         r.post_base_continue_c.unit_executed,

@@ -18,7 +18,7 @@ Init531d60PostBaseF590A2ed00U13Result init_531d60_post_base_f590_a2ed00_u13(
     }
     ++out.call_f590_count;
 
-    // Next: mov rdi,r15 / call 0xf590 @ 0x532720 — NOT modelled here.
+    // Next: second post-a2ed00-u7 0xf590 @ 0x532723 — NOT modelled here.
     out.ok = (out.call_f590_count == 1);
     return out;
 }

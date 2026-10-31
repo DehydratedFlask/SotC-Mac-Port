@@ -1,6 +1,6 @@
 // Init `0x531d60` continue call-site OBS `0x53271b..0x532720` (5 B):
 //   call 0xf590   ; first unit after E507 seventh 0xa2ed00 call-site
-//   // stop before mov rdi,r15 / call 0xf590 @ 0x532720
+//   // stop before second post-a2ed00-u7 call 0xf590 @ 0x532723
 //
 // Always-on after E507 seventh 0xa2ed00. Intervening prep
 // `0x532718..0x53271b` (3 B: mov rdi,rbx) is NOT modelled — prefer this

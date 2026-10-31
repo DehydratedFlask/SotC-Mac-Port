@@ -31,20 +31,6 @@ Init531d60PostBaseContinueAResult init_531d60_post_base_continue_a(
     const Init531d60PostBaseContinueAHooks& hooks) noexcept {
     Init531d60PostBaseContinueAResult out{};
 
-    // 0x532720 mov rdi,r15 — r15 provenance NOT modelled (control-flow pin only).
-    pin(out, ContinueAUnit::mov_rdi_r15);
-
-    // 0x532723 call 0xf590 on the measured 32 B stack temp (rsp+0x58, `+0x10..0x1f` zeroed):
-    // no control block, so the lifted release is a no-op unless the host overrides it.
-    SharedHolderF590 holder{};
-    if (hooks.call_f590 != nullptr) {
-        out.release = hooks.call_f590(holder);
-    } else {
-        out.release = shared_release_f590(holder, hooks.release_hooks);
-    }
-    pin(out, ContinueAUnit::call_f590);
-    ++out.call_count;
-
     // 0x532728 mov rbx,[r13] — incoming r13 NOT modelled; slot supplies the load.
     const void* rbx = nullptr;
     if (hooks.incoming_r13_slot != nullptr) {
@@ -188,7 +174,7 @@ Init531d60PostBaseContinueAResult init_531d60_post_base_continue_a(
     }
 
     out.ok = (out.unit_executed == kInit531d60PostBaseContinueAUnitCount) &&
-             (out.call_count == 5) && (out.lea_count == 4) && (out.alu_count == 2) &&
+             (out.call_count == 4) && (out.lea_count == 4) && (out.alu_count == 2) &&
              (out.branch_boundary_count == 1) && (out.unit_counts[0] == 1) &&
              (out.unit_counts[kInit531d60PostBaseContinueAUnitCount - 1] == 1);
     return out;

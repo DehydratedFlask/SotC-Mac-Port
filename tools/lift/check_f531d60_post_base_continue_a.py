@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""ELF-tie Init 0x531d60 continue grouped run 0x532720..0x53277f (95 B / 22 units).
+"""ELF-tie Init 0x531d60 continue grouped run 0x532728..0x53277f (87 B / 20 units).
 
-Private: needs local/re/eboot.elf. Pins every one of the 22 consecutive units
-after E508 (first post-a2ed00-u7 0xf590 call-site), the five direct-call rel32
+Private: needs local/re/eboot.elf. Pins every one of the 20 consecutive units
+after E509 (second post-a2ed00-u7 0xf590 call-site), the four direct-call rel32
 targets, the four lea RIP-relative targets, the je rel8 target, and the byte
 span sha256 of each unit. Does NOT claim any callee body, the je outcome, the
 two successors, or the object/data layouts behind the lea targets.
@@ -20,15 +20,14 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import ps4_dynlink as d  # noqa: E402
 
 ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
-PREV_END = 0x532720
-START = 0x532720
-SIZE = 95
+PREV_END = 0x532728
+START = 0x532728
+SIZE = 87
 END = 0x53277F
-REGION_SHA256 = "9f4c676b6b368c43629b591db887ef2654bfade085b69fb91e493cb66ebcee40"
+REGION_SHA256 = "6612ab1e48504dc4e48ac7d750e4ee0f4369e71095c7a454ab06e0776235cc4b"
 BRANCH_RVA = 0x53277D
 BRANCH_TARGET = 0x5327BD
 
-CALL_F590 = 0xF590
 CALL_A2EA00 = 0xA2EA00
 CALL_A2E5D0 = 0xA2E5D0
 CALL_A543B0 = 0xA543B0
@@ -43,10 +42,6 @@ LEA_1014D69 = 0x1014D69
 #         "je"   -> rel8 branch target must equal target
 #         "pin"  -> opcode/shape only
 UNITS = [
-    (0x532720, 3, "4eef54c393ee98ea9816e4ce4154f9264971ddf328e3ce421b06e8841edef72f",
-     "mov rdi,r15", "pin", None),
-    (0x532723, 5, "99e1c7bf68018ac5cc75142af7d243c4dca81ce54eae209bd8d8cd573ac6e143",
-     "call 0xf590", "call", CALL_F590),
     (0x532728, 4, "657bd26319a05c1bdb127a1c2035563613bad51b5ac54606db6aa18c5cb1c98a",
      "mov rbx,[r13]", "pin", None),
     (0x53272C, 2, "2e2f89076640f42236c01bdc8663b50e0001b061170a88fd2ae0a99e0c7b1675",
@@ -93,7 +88,7 @@ NATIVE = ROOT / "native/core/init_531d60_post_base_continue_a.hpp"
 NATIVE_CPP = ROOT / "native/core/init_531d60_post_base_continue_a.cpp"
 SLICE = ROOT / "native/core/appmain_init_ctor_98a90_slice.hpp"
 SLICE_CPP = ROOT / "native/core/appmain_init_ctor_98a90_slice.cpp"
-PREV_NATIVE = ROOT / "native/core/init_531d60_post_base_f590_a2ed00_u13.hpp"
+PREV_NATIVE = ROOT / "native/core/init_531d60_post_base_f590_a2ed00_u14.hpp"
 TEST = ROOT / "native/tests/test_appmain_init_ctor_98a90_slice.cpp"
 CMAKE = ROOT / "native/CMakeLists.txt"
 
@@ -109,11 +104,11 @@ def main() -> int:
     _, ph = d.program_headers(elf)
     img = d.Image(elf, ph)
 
-    require(len(UNITS) == 22, "unit count")
+    require(len(UNITS) == 20, "unit count")
     require(PREV_END == START, "prev end == start")
     require(
-        "kInit531d60PostBaseF590A2ed00U13EndRva = 0x532720" in PREV_NATIVE.read_text(),
-        "u13 end",
+        "kInit531d60PostBaseF590A2ed00U14EndRva = 0x532728" in PREV_NATIVE.read_text(),
+        "u14 end",
     )
     require(START + SIZE == END, "size arithmetic")
 
@@ -149,14 +144,14 @@ def main() -> int:
     nh = NATIVE.read_text()
     require("init_531d60_post_base_continue_a" in nh, "API")
     require("NOT modelled" in nh, "omission")
-    require("kInit531d60PostBaseContinueARva = 0x532720" in nh, "start rva")
+    require("kInit531d60PostBaseContinueARva = 0x532728" in nh, "start rva")
     require("kInit531d60PostBaseContinueAEndRva = 0x53277f" in nh, "end rva")
     require("kInit531d60PostBaseContinueABranchTargetRva = 0x5327bd" in nh, "branch target")
     require("kInit531d60PostBaseContinueAUnitCount" in nh, "unit count")
     require("0x1014d69" in nh, "lea rva pin")
     require("0x32f84f8" in nh, "lea rva pin 2")
     require("0xa543b0" in nh, "call pin")
-    for mnemonic in ("mov rdi,r15", "je 0x5327bd", "mov rsi,[rax+0xf8]"):
+    for mnemonic in ("mov rbx,[r13]", "je 0x5327bd", "mov rsi,[rax+0xf8]"):
         require(mnemonic in nh, f"unit listing {mnemonic}")
     cpp = NATIVE_CPP.read_text()
     require("branch_outcome_modelled = false" in cpp, "branch outcome flag")
@@ -172,7 +167,7 @@ def main() -> int:
     print(
         f"OK check_f531d60_post_base_continue_a: span=0x{START:x}+{SIZE}B "
         f"units={len(UNITS)} region={REGION_SHA256[:12]}…; "
-        f"calls=0xf590/0xa2ea00/0xa2e5d0/0xa543b0/0x1fc80 pinned; "
+        f"calls=0xa2ea00/0xa2e5d0/0xa543b0/0x1fc80 pinned; "
         f"lea=0x32f79a8/0x32f84f8/0x1014d69 pinned; "
         f"je@{BRANCH_RVA:#x}->{BRANCH_TARGET:#x} target pinned "
         f"(default outcome unmodelled; known 0x1fc80 rax models taken iff null); "

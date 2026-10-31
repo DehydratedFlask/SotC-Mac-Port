@@ -1,6 +1,4 @@
-// Init `0x531d60` continue OBS `0x532720..0x53277f` (95 B, 22 consecutive units):
-//   0x532720  mov rdi,r15                  (3 B)
-//   0x532723  call 0xf590                  (5 B)
+// Init `0x531d60` continue OBS `0x532728..0x53277f` (87 B, 20 consecutive units):
 //   0x532728  mov rbx,[r13]                (4 B)
 //   0x53272c  xor esi,esi                  (2 B)
 //   0x53272e  mov rdi,rbx                  (3 B)
@@ -22,21 +20,21 @@
 //   0x53277a  test rax,rax                 (3 B)
 //   0x53277d  je 0x5327bd                  (2 B)  <- structural boundary
 //
-// Always-on after E508 first post-a2ed00-u7 `0xf590` call-site (0x53271b..0x532720).
+// Always-on after E509 second post-a2ed00-u7 `0xf590` call-site (0x532723..0x532728).
 // This is one contiguous branch-free run up to the FIRST conditional branch after
-// the tip, so it is modelled as ONE grouped module instead of 22 five-byte modules.
+// the tip, so it is modelled as ONE grouped module instead of 20 five-byte modules.
 //
 // Claimed (observations, each byte span pinned by
 // `tools/lift/check_f531d60_post_base_continue_a.py`):
-//   * exact 95 B span `0x532720..0x53277f` and its 22 instructions;
-//   * the five direct-call rel32 targets 0xf590 / 0xa2ea00 / 0xa2e5d0 / 0xa543b0 /
+//   * exact 87 B span `0x532728..0x53277f` and its 20 instructions;
+//   * the four direct-call rel32 targets 0xa2ea00 / 0xa2e5d0 / 0xa543b0 /
 //     0x1fc80; the four RIP-relative lea targets 0x32f79a8 / 0x32f84f8 / 0x1014d69
 //     and the rax+8 form; the `je` rel8 target 0x5327bd;
-//   * ordering: the five call sites are sequenced in this exact order, and the
+//   * ordering: the four call sites are sequenced in this exact order, and the
 //     last two calls consume rdi/rsi built by 0x532740..0x532771 (as observed).
 //
 // NOT modelled (do not read as semantics):
-//   * bodies of 0xf590, 0xa2ea00, 0xa2e5d0, 0xa543b0 — hooks are host stand-ins,
+//   * bodies of 0xa2ea00, 0xa2e5d0, 0xa543b0 — hooks are host stand-ins,
 //     null hook => no-op. 0x1fc80 stays a counting hook unless
 //     `use_native_lookup_1fc80` is set, in which case `lookup_1fc80` supplies rax;
 //   * BOTH successors (`0x53277f` fall-through block and `0x5327bd` branch target).
@@ -48,7 +46,7 @@
 //     real stack frame (only the `0x20(%rsp)` slot is exposed as a host cell);
 //   * any effect on Init's observable result, GL/audio state, or save data.
 //
-// Distinct from E489..E508 (single call-site chain) and from the earlier
+// Distinct from E489..E509 (single call-site chain) and from the earlier
 // `lea_vmovq` (E465) lea-cell module.
 // G1 remains PARTIAL. PR #5 cite-only.
 #pragma once
@@ -58,17 +56,15 @@
 #include <cstdint>
 
 #include "init_531d60_post_base_continue_b.hpp"
-#include "shared_release_f590.hpp"
 
 namespace sotc {
 
-inline constexpr std::uint64_t kInit531d60PostBaseContinueARva = 0x532720;
-inline constexpr std::size_t kInit531d60PostBaseContinueASize = 95;
+inline constexpr std::uint64_t kInit531d60PostBaseContinueARva = 0x532728;
+inline constexpr std::size_t kInit531d60PostBaseContinueASize = 87;
 inline constexpr std::uint64_t kInit531d60PostBaseContinueAEndRva = 0x53277f;
 // First conditional branch after the tip: pinned target, outcome NOT modelled.
 inline constexpr std::uint64_t kInit531d60PostBaseContinueABranchRva = 0x53277d;
 inline constexpr std::uint64_t kInit531d60PostBaseContinueABranchTargetRva = 0x5327bd;
-inline constexpr std::uint64_t kInit531d60PostBaseContinueACallF590Rva = 0xf590;
 inline constexpr std::uint64_t kInit531d60PostBaseContinueACallA2ea00Rva = 0xa2ea00;
 inline constexpr std::uint64_t kInit531d60PostBaseContinueACallA2e5d0Rva = 0xa2e5d0;
 inline constexpr std::uint64_t kInit531d60PostBaseContinueACallA543b0Rva = 0xa543b0;
@@ -81,10 +77,8 @@ inline constexpr std::size_t kInit531d60PostBaseContinueAObjOff = 0xf8;
 // `add rsi,0x40` at 0x53275c.
 inline constexpr std::size_t kInit531d60PostBaseContinueARsiAddend = 0x40;
 
-// Unit identity for the 22 pinned instructions of the claimed run.
+// Unit identity for the 20 pinned instructions of the claimed run.
 enum class ContinueAUnit : int {
-    mov_rdi_r15 = 0,    // 0x532720
-    call_f590,          // 0x532723
     mov_rbx_load_r13,   // 0x532728
     xor_esi_esi,        // 0x53272c
     mov_rdi_rbx_1,      // 0x53272e
@@ -117,11 +111,9 @@ struct ContinueAUnitSpan {
     const char* mnemonic = "";
 };
 
-// OBS table re-derived from local/re/eboot.elf; sizes sum to kSize (95 B).
+// OBS table re-derived from local/re/eboot.elf; sizes sum to kSize (87 B).
 inline constexpr std::array<ContinueAUnitSpan, kInit531d60PostBaseContinueAUnitCount>
     kInit531d60PostBaseContinueAUnits{{
-        {0x532720, 3, "mov rdi,r15"},
-        {0x532723, 5, "call 0xf590"},
         {0x532728, 4, "mov rbx,[r13]"},
         {0x53272c, 2, "xor esi,esi"},
         {0x53272e, 3, "mov rdi,rbx"},
@@ -160,14 +152,7 @@ struct Init531d60PostBaseContinueAHooks {
     // 0x20(%rsp) saved slot read at 0x532765.
     const void* const* rsp20_slot = nullptr;
 
-    // 0xf590(rdi = &holder) at 0x532723. Original: 32 B stack temp at rsp+0x58 with
-    // `+0x10..0x1f` zeroed, so the release finds no control block and does nothing.
-    // Null => run the lifted release; non-null => host override, whose result is reported instead.
-    SharedReleaseF590Result (*call_f590)(SharedHolderF590&) = nullptr;
-    // 0x12af0 destroy / 0x170b0 free-control contracts; only reached with a non-null `+0x18`.
-    SharedReleaseF590Hooks release_hooks{};
-
-    // Remaining callee bodies NOT lifted. Null => no-op, counter still advances.
+    // Callee bodies NOT lifted. Null => no-op, counter still advances.
     // 0x532731. Return value is a host stand-in for the observed eax only.
     int (*call_a2ea00)(void* rbx) = nullptr;
     // 0x53273b; esi carries the stand-in eax (0 when the a2ea00 hook is null).
@@ -190,14 +175,12 @@ struct Init531d60PostBaseContinueAResult {
     bool ok = false;
     // Per-unit execution counters (all must be 1 on the modelled path).
     std::array<int, kInit531d60PostBaseContinueAUnitCount> unit_counts{};
-    int unit_executed = 0;       // expect 22
-    int call_count = 0;          // expect 5 call sites sequenced
+    int unit_executed = 0;       // expect 20
+    int call_count = 0;          // expect 4 call sites sequenced
     int lea_count = 0;           // expect 4
     int load_count = 0;          // host-side reads performed (expect 5)
     int alu_count = 0;           // expect 2 (add rsi,0x40 / test rax,rax)
     int branch_boundary_count = 0;  // expect 1 (je pinned)
-    // Measured 0xf590 effect at 0x532723: holder `+0x18` is zero, so nothing is destroyed/freed.
-    SharedReleaseF590Result release{};
     // Observed plumbing at 0x53275c: ([*0x32f79a8 + 0xf8] + 0x40) when cells set.
     std::uintptr_t rsi_at_0x532760 = 0;
     bool rsi_known = false;
@@ -224,7 +207,7 @@ struct InitContinueAbNativeResult {
     Init531d60PostBaseContinueAHooks a_hooks,
     Init531d60PostBaseContinueBHooks b_hooks = {}) noexcept;
 
-// Runs the OBS `0x532720..0x53277f` unit sequence on the measured Init path.
+// Runs the OBS `0x532728..0x53277f` unit sequence on the measured Init path.
 [[nodiscard]] Init531d60PostBaseContinueAResult init_531d60_post_base_continue_a(
     const Init531d60PostBaseContinueAHooks& hooks = {}) noexcept;
 
