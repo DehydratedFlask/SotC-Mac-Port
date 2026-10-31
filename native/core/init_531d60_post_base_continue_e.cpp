@@ -4,6 +4,7 @@
 #include "init_531d60_post_base_a54920_u1.hpp"
 #include "init_531d60_post_base_vcall18_532a17.hpp"
 #include "init_531d60_post_base_vcall18_532a72_u1.hpp"
+#include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
 #include <cstring>
 
@@ -94,21 +95,19 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
     }
 
     // ---- Block 3: save-data ctor 3 (name 0x2efda50, vtable 0x15c8e18) ----
-    // This descriptor setup is more elaborate: stores self-ptr at +0x00,
-    // loads 8 B from 0x15ff528 into xmm0 and stores at +0x08, stores
-    // thunk 0x5388e0 at +0x18, vtable 0x15c8e18 at +0x40, thunk 0x538870
-    // at +0x48.
-
-    // 0x532a75 vmovq xmm0,[0x15ff528] — load 8 B from the ptr array
-    // (original semantics: load for descriptor3[0x08]; value NOT modelled).
     alignas(16) std::uint8_t xmm0_buf[16]{};
-    // The vmovq reads 8 bytes at the source RVA; in a native build we
-    // can't read the actual file, so we use a zero stand-in.
-    // The original is a link-time constant in rodata; the actual value
-    // is not needed for the modelled contract (the descriptor shape is
-    // pinned, not the data semantics).
-    pin(out, ContinueEUnit::vmovq_xmm0_15ff528);
-    ++out.vmovq_count;
+    Init531d60PostBaseVmovq532a75_U1Cells vq_cells = hooks.vmovq_532a75_cells;
+    if (!hooks.merge_vmovq_532a75_u1_ran) {
+        const Init531d60PostBaseVmovq532a75_U1Result vqr =
+            init_531d60_post_base_vmovq_532a75_u1(vq_cells);
+        if (!vqr.ok) {
+            return out;
+        }
+        out.vmovq_count += vqr.vmovq_count;
+    }
+    if (vq_cells.dst_xmm0 != nullptr) {
+        std::memcpy(xmm0_buf, vq_cells.dst_xmm0, kInit531d60PostBaseVmovq532a75_U1LaneBytes);
+    }
 
     // 0x532a7d lea rax,[0x5388e0] — thunk 1 (ret no-op)
     pin(out, ContinueEUnit::lea_rax_5388e0);
@@ -244,12 +243,13 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
     const int expect_lea_rip =
         5 + (hooks.merge_a54920_u1_ran ? 0 : 3) +
         (hooks.merge_a54920_532a62_u1_ran ? 0 : 1);
+    const int expect_vmovq = hooks.merge_vmovq_532a75_u1_ran ? 0 : 1;
     out.a54920_hook_supplied = (hooks.call_a54920 != nullptr);
     out.ok = (out.unit_executed == kInit531d60PostBaseContinueEUnitCount) &&
              (out.call_a54920_count == expect_a54920) &&
              (out.vcall_noop_count == expect_vcall_noop) &&
              (out.vcall_54b250_count == 1) && (out.stamp_count == expect_stamp) &&
-             (out.lea_rip_count == expect_lea_rip) && (out.vmovq_count == 1) &&
+             (out.lea_rip_count == expect_lea_rip) && (out.vmovq_count == expect_vmovq) &&
              (out.unit_counts[0] == 1) &&
              (out.unit_counts[kInit531d60PostBaseContinueEUnitCount - 1] == 1);
     return out;

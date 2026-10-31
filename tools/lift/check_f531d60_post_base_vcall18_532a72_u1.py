@@ -58,8 +58,8 @@ def main() -> int:
     require("init_531d60_post_base_vcall18_532a72_u1" in nh, "API")
     require("NOT modelled" in nh, "omission")
     require(f"0x{RESOLVED:x}" in nh.lower() or "538200" in nh, "resolved ret pin")
-    ce = CONT_E.read_text()
-    require("kInit531d60PostBaseContinueERva = 0x532a75" in ce, "shrunk continue_e start")
+    vmovq = (ROOT / "native/core/init_531d60_post_base_vmovq_532a75_u1.hpp").read_text()
+    require("kInit531d60PostBaseVmovq532a75_U1Rva = 0x532a75" in vmovq, "vmovq u1 follows vcall72")
     require("merge_vcall18_532a72_u1_ran" in ce, "vcall72 merge hook")
     require("core/init_531d60_post_base_vcall18_532a72_u1.cpp" in CMAKE.read_text(), "cmake")
 
