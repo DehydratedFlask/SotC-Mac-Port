@@ -1,6 +1,6 @@
 # E1054 — validation checkpoint pointer synchronization
 
-**Date/agent:** 2026-10-31, root. **Task:** `DOC-VALIDATION-CHECKPOINT-SYNC-02`. **Status:** DOCS_VERIFIED; publication pending. **Scope:** reconcile the current `docs/VALIDATION.md` paragraph to the live HANDOFF, task, evidence, and artifact records. No source, test, runtime, game-input, or product-gate changes.
+**Date/agent:** 2026-10-31, root. **Task:** `DOC-VALIDATION-CHECKPOINT-SYNC-02`. **Status:** ARTIFACT_VERIFIED for the documentation result and publication only. **Scope:** reconcile the current `docs/VALIDATION.md` paragraph to the live HANDOFF, task, evidence, and artifact records. No source, test, runtime, game-input, or product-gate changes.
 
 ## Reconciliation
 
@@ -27,5 +27,6 @@ Required verification:
 - `python3 -I scripts/audit_publish_paths.py --all` — exit 0, 3,465 paths.
 - `git diff --cached --check` — exit 0.
 - Precommit attribution check passed for the empty `origin/main..HEAD` range; commit-specific attribution is pending the task commit.
+- Owner-authored commit `f901ca0961894fc2ddb912d14d73f0c5bb1a1ebc` passed commit-specific attribution, was pushed to `origin main`, and was fetch-verified with `HEAD == origin/main == FETCH_HEAD`; the checkout is clean.
 
 Exact build/test/index/graph logs are under `local/validation/validation-sync-e1054/`.
