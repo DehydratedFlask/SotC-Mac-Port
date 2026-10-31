@@ -56,7 +56,7 @@ def main():
     require('init_531d60_post_base_mov_r14_rax_532b16_u1.cpp' in CMAKE.read_text(),'cmake mov r14')
     require('merge_call_17070_532b11_u1_ran' in TEST.read_text(),'test merge call')
     require('merge_mov_r14_rax_532b16_u1_ran' in TEST.read_text(),'test merge mov r14')
-    require('kRegistryInit531d60FragmentPinnedRva = 0x532b50' in REG.read_text(),'reg pin')
+    require('kRegistryInit531d60FragmentPinnedRva = 0x532b56' in REG.read_text(),'reg pin')
     print('OK check_f531d60_post_base_registry_tail post-peel=0x532b19+0B (body next)')
     return 0
 if __name__=='__main__': raise SystemExit(main())

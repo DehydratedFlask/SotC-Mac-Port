@@ -177,6 +177,8 @@ RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, 
         }
     }
 
+    bool r12_is_zero = false;
+    bool r12_is_zero_known = false;
     if (!hooks.merge_test_r12_r12_532b4d_u1_ran) {
         Init531d60PostBaseTestR12R12_532b4d_U1Cells test_cells{};
         test_cells.r12_in = r12_from_cell;
@@ -185,10 +187,23 @@ RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, 
             destroy_registry_object(obj, alloc);
             return RegistryInit531d60Status::alloc_failed;
         }
-        // NOT modelled: je @ 0x532b50 from test ZF — E564.
+        r12_is_zero = test.r12_is_zero;
+        r12_is_zero_known = true;
     }
 
-    // OBS 0x532b50..0x532bf8: destroy previous if different & non-null; then movq new, (0x2efd160).
+    if (!hooks.merge_je_532bf8_532b50_u1_ran) {
+        Init531d60PostBaseJe532bf8_532b50_U1Cells je_cells{};
+        je_cells.r12_is_zero = r12_is_zero;
+        je_cells.r12_is_zero_known = r12_is_zero_known;
+        const auto je = init_531d60_post_base_je_532bf8_532b50_u1(je_cells);
+        if (!je.ok) {
+            destroy_registry_object(obj, alloc);
+            return RegistryInit531d60Status::alloc_failed;
+        }
+        // NOT modelled: branch to 0x532bf8 vs destroy fall-through @ 0x532b56 (E562 merge rule).
+    }
+
+    // OBS 0x532b56..0x532bf8: destroy previous if different & non-null; then movq new, (0x2efd160).
     RegistryObject2efd160* prev = registry_cell_2efd160().load();
     if (prev == obj) {
         return RegistryInit531d60Status::ok;
