@@ -1,4 +1,4 @@
-// Init `0x531d60` registry fragment body — OBS @ `0x532b19..0x532b33` (7 units after E557 peel).
+// Init `0x531d60` registry fragment body — OBS @ `0x532b19..0x532b3a` (8 units after E558 peel).
 #pragma once
 
 #include <array>
@@ -7,6 +7,7 @@
 
 #include "allocator_front.hpp"
 #include "init_531d60_post_base_call_52a220_532b2e_u1.hpp"
+#include "init_531d60_post_base_lea_rbx_2efd160_532b33_u1.hpp"
 #include "init_531d60_post_base_call_54dc10_532b19_u1.hpp"
 #include "init_531d60_post_base_call_54dc20_532b21_u1.hpp"
 #include "init_531d60_post_base_mov_r14_rax_532b16_u1.hpp"
@@ -20,8 +21,8 @@
 namespace sotc {
 
 inline constexpr std::uint64_t kInit531d60PostBaseRegistryBodyRva = 0x532b19;
-inline constexpr std::size_t kInit531d60PostBaseRegistryBodySize = 26;
-inline constexpr std::uint64_t kInit531d60PostBaseRegistryBodyEndRva = 0x532b33;
+inline constexpr std::size_t kInit531d60PostBaseRegistryBodySize = 33;
+inline constexpr std::uint64_t kInit531d60PostBaseRegistryBodyEndRva = 0x532b3a;
 
 static_assert(kInit531d60PostBaseMovR14Rax_532b16_U1EndRva == kInit531d60PostBaseRegistryBodyRva);
 static_assert(kInit531d60PostBaseCall54dc10_532b19_U1Rva == kInit531d60PostBaseRegistryBodyRva);
@@ -38,6 +39,8 @@ static_assert(kInit531d60PostBaseMovRsiRbx_532b29_U1EndRva ==
 static_assert(kInit531d60PostBaseMovEdxEax_532b2c_U1EndRva ==
                   kInit531d60PostBaseCall52a220_532b2e_U1Rva);
 static_assert(kInit531d60PostBaseCall52a220_532b2e_U1EndRva ==
+                  kInit531d60PostBaseLeaRbx2efd160_532b33_U1Rva);
+static_assert(kInit531d60PostBaseLeaRbx2efd160_532b33_U1EndRva ==
                   kInit531d60PostBaseRegistryBodyEndRva);
 
 enum class RegistryBodyUnit : int {
@@ -48,6 +51,7 @@ enum class RegistryBodyUnit : int {
     mov_rsi_rbx_532b29_u1,
     mov_edx_eax_532b2c_u1,
     call_52a220_532b2e_u1,
+    lea_rbx_2efd160_532b33_u1,
     count
 };
 inline constexpr int kInit531d60PostBaseRegistryBodyUnitCount =
@@ -61,6 +65,7 @@ struct Init531d60PostBaseRegistryBodyHooks {
     bool merge_mov_rsi_rbx_532b29_u1_ran = false;
     bool merge_mov_edx_eax_532b2c_u1_ran = false;
     bool merge_call_52a220_532b2e_u1_ran = false;
+    bool merge_lea_rbx_2efd160_532b33_u1_ran = false;
     InputTable551140* table_in = nullptr;
     RegistryObject2efd160* obj_in = nullptr;
     AllocatorFront* alloc = nullptr;
@@ -71,11 +76,12 @@ struct Init531d60PostBaseRegistryBodyHooks {
     Init531d60PostBaseMovRsiRbx_532b29_U1Cells mov_rsi_rbx_cells{};
     Init531d60PostBaseMovEdxEax_532b2c_U1Cells mov_edx_eax_cells{};
     Init531d60PostBaseCall52a220_532b2e_U1Cells call_52a220_cells{};
+    Init531d60PostBaseLeaRbx2efd160_532b33_U1Cells lea_rbx_2efd160_cells{};
 };
 
 struct Init531d60PostBaseRegistryBodyResult {
     bool ok = false;
-    std::array<int, 7> unit_counts{};
+    std::array<int, 8> unit_counts{};
     int unit_executed = 0;
     int call_54dc10_count = 0;
     int mov_rbx_rax_count = 0;
@@ -84,9 +90,11 @@ struct Init531d60PostBaseRegistryBodyResult {
     int mov_rsi_rbx_count = 0;
     int mov_edx_eax_count = 0;
     int call_52a220_count = 0;
+    int lea_rbx_2efd160_count = 0;
     void* rax_from_54dc10 = nullptr;
     void* rbx_from_54dc10 = nullptr;
     void* rsi_from_rbx = nullptr;
+    void* rbx_global_cell_addr = nullptr;
     std::uint32_t edx_from_eax = 0;
     std::uint32_t count_from_54dc20 = 0;
     std::uint64_t r15_from_54dc20 = 0;

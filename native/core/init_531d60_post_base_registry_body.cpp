@@ -111,6 +111,18 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
         out.unit_counts[static_cast<std::size_t>(RegistryBodyUnit::call_52a220_532b2e_u1)] = 1;
         ++out.unit_executed;
     }
+    if (!hooks.merge_lea_rbx_2efd160_532b33_u1_ran) {
+        Init531d60PostBaseLeaRbx2efd160_532b33_U1Cells cells = hooks.lea_rbx_2efd160_cells;
+        const Init531d60PostBaseLeaRbx2efd160_532b33_U1Result lea_rbx =
+            init_531d60_post_base_lea_rbx_2efd160_532b33_u1(cells);
+        if (!lea_rbx.ok) {
+            return out;
+        }
+        out.lea_rbx_2efd160_count = lea_rbx.lea_rip_count;
+        out.rbx_global_cell_addr = lea_rbx.rbx;
+        out.unit_counts[static_cast<std::size_t>(RegistryBodyUnit::lea_rbx_2efd160_532b33_u1)] = 1;
+        ++out.unit_executed;
+    }
     out.end_rva = kInit531d60PostBaseRegistryBodyEndRva;
     const int expected_call = hooks.merge_call_54dc10_532b19_u1_ran ? 0 : 1;
     const int expected_mov_rbx = hooks.merge_mov_rbx_rax_532b1e_u1_ran ? 0 : 1;
@@ -119,15 +131,17 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
     const int expected_mov_rsi = hooks.merge_mov_rsi_rbx_532b29_u1_ran ? 0 : 1;
     const int expected_mov_edx = hooks.merge_mov_edx_eax_532b2c_u1_ran ? 0 : 1;
     const int expected_fill = hooks.merge_call_52a220_532b2e_u1_ran ? 0 : 1;
+    const int expected_lea_rbx = hooks.merge_lea_rbx_2efd160_532b33_u1_ran ? 0 : 1;
     const int expected_units = expected_call + expected_mov_rbx + expected_count + expected_mov_r15 +
-                               expected_mov_rsi + expected_mov_edx + expected_fill;
+                               expected_mov_rsi + expected_mov_edx + expected_fill + expected_lea_rbx;
     out.ok = (out.unit_executed == expected_units) && (out.call_54dc10_count == expected_call) &&
              (out.mov_rbx_rax_count == expected_mov_rbx) &&
              (out.call_54dc20_count == expected_count) &&
              (out.mov_r15_rax_count == expected_mov_r15) &&
              (out.mov_rsi_rbx_count == expected_mov_rsi) &&
              (out.mov_edx_eax_count == expected_mov_edx) &&
-             (out.call_52a220_count == expected_fill);
+             (out.call_52a220_count == expected_fill) &&
+             (out.lea_rbx_2efd160_count == expected_lea_rbx);
     return out;
 }
 

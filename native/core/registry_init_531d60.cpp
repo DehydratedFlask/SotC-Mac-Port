@@ -122,7 +122,15 @@ RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, 
         return RegistryInit531d60Status::fill_failed;
     }
 
-    // OBS 0x532b33..0x532bf8: compare with previous; destroy previous if different & non-null;
+    if (!hooks.merge_lea_rbx_2efd160_532b33_u1_ran) {
+        const auto lea_rbx = init_531d60_post_base_lea_rbx_2efd160_532b33_u1();
+        if (!lea_rbx.ok) {
+            destroy_registry_object(obj, alloc);
+            return RegistryInit531d60Status::alloc_failed;
+        }
+    }
+
+    // OBS 0x532b3a..0x532bf8: compare with previous; destroy previous if different & non-null;
     // then movq new, (0x2efd160). Same-pointer fast path skips destroy+store.
     RegistryObject2efd160* prev = registry_cell_2efd160().load();
     if (prev == obj) {

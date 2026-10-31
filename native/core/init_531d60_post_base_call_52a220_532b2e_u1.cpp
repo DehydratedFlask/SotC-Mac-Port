@@ -17,7 +17,7 @@ Init531d60PostBaseCall52a220_532b2e_U1Result init_531d60_post_base_call_52a220_5
         out.fill_invoked = true;
     }
 
-    // Next: lea rbx @ 0x532b33 — not modelled in this unit.
+    // Next: lea rbx @ 0x532b33 — peeled as registry_body unit E558.
     out.ok = (out.call_52a220_count == 1);
     return out;
 }

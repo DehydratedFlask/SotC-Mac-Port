@@ -28,7 +28,7 @@ def main():
     nh=NATIVE.read_text()
     require('init_531d60_post_base_mov_edi_98_532b0c_u1' in nh,'api')
     reg=REG.read_text()
-    require('kRegistryInit531d60FragmentPinnedRva = 0x532b33' in reg,'pin')
+    require('kRegistryInit531d60FragmentPinnedRva = 0x532b3a' in reg,'pin')
     require('merge_mov_edi_98_532b0c_u1_ran' in reg,'merge mov')
     require('merge_call_17070_532b11_u1_ran' in reg,'merge call')
     require('merge_mov_r14_rax_532b16_u1_ran' in reg,'merge mov r14')

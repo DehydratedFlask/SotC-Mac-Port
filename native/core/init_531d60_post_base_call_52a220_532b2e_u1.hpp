@@ -1,7 +1,7 @@
 // Init `0x531d60` registry call 0x52a220 OBS `0x532b2e..0x532b33` (5 B):
 //   call 0x52a220   ; fill ctor (rdi=obj/r14, rsi=table base, rdx=count in edx)
 //
-// After E556 mov edx,eax @ `0x532b2c`. NOT modelled: store/compare @ `0x532b33..`. G1 PARTIAL.
+// After E556 mov edx,eax @ `0x532b2c`. NOT modelled: mov r13 / compare-store @ `0x532b3a..`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
