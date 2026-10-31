@@ -18,8 +18,9 @@
 // [rsp+0x488],rax @ `0x532ac3` via `mov_rsp488_rax_532ac3_u1` (E534), mov
 // [rsp+0x4B0],rsi @ `0x532acb` via `mov_rsp4b0_rsi_532acb_u1` (E535), lea
 // rsi,[0x2efda50] @ `0x532ad3` via `lea_rsi_2efda50_532ad3_u1` (E536), mov
-// [rsp+0x4B8],rcx @ `0x532ada` via `mov_rsp4b8_rcx_532ada_u1` (E537); this module pins the
-// post-mov tail through `0x532b0c`.
+// [rsp+0x4B8],rcx @ `0x532ada` via `mov_rsp4b8_rcx_532ada_u1` (E537), mov
+// rax,[rsp+0x4B0] @ `0x532ae7` via `mov_rsp4b0_rax_532ae7_u1` (E539); this module pins the
+// post-load tail through `0x532b0c`.
 //
 // Full ELF block `0x5329ae..0x532b0c` (350 B) including demoted u1 prep.
 // Straight-line run: three save-data subsystem constructors (0xa54920), each
@@ -49,7 +50,7 @@
 // movq_rsp4a0_0_532a93_u1 + mov_rdi_r13_532a9f_u1 + lea_538870_532aa3_u1 +
 // lea_rbx_rsp490_532aaa_u1 + mov_rsp470_rdx_532ab2_u1 + vmovdqa_rsp478_xmm0_532aba_u1 +
 // mov_rsp488_rax_532ac3_u1 + mov_rsp4b0_rsi_532acb_u1 + lea_rsi_2efda50_532ad3_u1 +
-// mov_rsp4b8_rcx_532ada_u1 merges),
+// mov_rsp4b8_rcx_532ada_u1 + mov_rsp4b0_rax_532ae7_u1 merges),
 // three rel32 call
 // 0xa54920 targets (one via u1), three vcall+0x18
 // no-op sites with resolution pins, one vcall+0x8 site with resolved target
@@ -85,14 +86,15 @@
 #include "init_531d60_post_base_lea_rsi_2efda50_532ad3_u1.hpp"
 #include "init_531d60_post_base_mov_rsp4b8_rcx_532ada_u1.hpp"
 #include "init_531d60_post_base_a54920_532ae2_u1.hpp"
+#include "init_531d60_post_base_mov_rsp4b0_rax_532ae7_u1.hpp"
 #include "init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 #include "stat_query_54b250.hpp"
 
 namespace sotc {
 
-inline constexpr std::uint64_t kInit531d60PostBaseContinueERva = 0x532ae7;
-inline constexpr std::size_t kInit531d60PostBaseContinueESize = 37;
+inline constexpr std::uint64_t kInit531d60PostBaseContinueERva = 0x532aef;
+inline constexpr std::size_t kInit531d60PostBaseContinueESize = 29;
 inline constexpr std::uint64_t kInit531d60PostBaseContinueEEndRva = 0x532b0c;
 inline constexpr std::size_t kInit531d60PostBaseContinueEFullBlockSize = 350;
 
@@ -151,8 +153,11 @@ static_assert(kInit531d60PostBaseMovRsp4b8_Rcx_532ada_U1EndRva ==
                   kInit531d60PostBaseA54920_532ae2_U1Rva,
               "mov_rsp4b8 u1 end equals a54920_532ae2_u1 start");
 static_assert(kInit531d60PostBaseA54920_532ae2_U1EndRva ==
+                  kInit531d60PostBaseMovRsp4b0_Rax_532ae7_U1Rva,
+              "a54920_532ae2_u1 end equals mov_rsp4b0_rax u1 start");
+static_assert(kInit531d60PostBaseMovRsp4b0_Rax_532ae7_U1EndRva ==
                   kInit531d60PostBaseContinueERva,
-              "a54920_532ae2_u1 end equals continue E pinned start");
+              "mov_rsp4b0_rax u1 end equals continue E pinned start");
 
 // Direct-call rel32 targets.
 inline constexpr std::uint64_t kInit531d60PostBaseContinueECtorRva = 0xa54920;
@@ -181,9 +186,8 @@ inline constexpr std::uint64_t kInit531d60PostBaseContinueEVmovqSrcRva = 0x15ff5
 // Vtable for the 0x2eff450 object (slot-1 = 0x54b250, resolved per E538).
 inline constexpr std::uint64_t kInit531d60PostBaseContinueEVtable2eff450Rva = 0x15c9830;
 
-// Unit identity for the 9 pinned instructions after E538 a54920_532ae2_u1 peel.
+// Unit identity for the 8 pinned instructions after E539 mov_rsp4b0_rax u1 peel.
 enum class ContinueEUnit : int {
-    mov_rax_rsp4b0,            // 0x532ae7
     mov_rdi_rbx,               // 0x532aef
     vcall_noop_3,              // 0x532af2  (rax+0x18 → 0x5388c0 ret)
     lea_rax_2eff450,           // 0x532af5
@@ -197,8 +201,8 @@ enum class ContinueEUnit : int {
 
 inline constexpr int kInit531d60PostBaseContinueEUnitCount =
     static_cast<int>(ContinueEUnit::count);
-static_assert(kInit531d60PostBaseContinueEUnitCount == 9,
-              "9 units in 0x532ae7..0x532b0c");
+static_assert(kInit531d60PostBaseContinueEUnitCount == 8,
+              "8 units in 0x532aef..0x532b0c");
 
 struct ContinueEUnitSpan {
     std::uint64_t rva = 0;
@@ -206,10 +210,9 @@ struct ContinueEUnitSpan {
     const char* mnemonic = "";
 };
 
-// OBS table derived from local/re/eboot.elf; sizes sum to kSize (42 B).
+// OBS table derived from local/re/eboot.elf; sizes sum to kSize (29 B).
 inline constexpr std::array<ContinueEUnitSpan, kInit531d60PostBaseContinueEUnitCount>
     kInit531d60PostBaseContinueEUnits{{
-        {0x532AE7, 8, "mov rax,[rsp+0x4B0]"},
         {0x532AEF, 3, "mov rdi,rbx"},
         {0x532AF2, 3, "call [rax+0x18]"},
         {0x532AF5, 7, "lea rax,[0x2eff450]"},
@@ -307,6 +310,10 @@ struct Init531d60PostBaseContinueEHooks {
     // Third ctor call 0xa54920 @ 0x532ae2 (E538 peel). Null hook still counted.
     bool merge_a54920_532ae2_u1_ran = false;
 
+    // mov rax,[rsp+0x4B0] @ 0x532ae7 (E539 peel). Null cells => counted, default vtable pin.
+    Init531d60PostBaseMovRsp4b0_Rax_532ae7_U1Cells mov_rsp4b0_rax_532ae7_u1_cells{};
+    bool merge_mov_rsp4b0_rax_532ae7_u1_ran = false;
+
     // Resolved vcall slot-1 through *(0x2eff450) — 0x54b250(this_obj, esi=0,
     // edx=2).  null => no-op (call still counted).
     void (*call_54b250)(void* this_obj, std::uint32_t esi, std::uint32_t edx) = nullptr;
@@ -323,7 +330,7 @@ struct Init531d60PostBaseContinueEResult {
     bool ok = false;
     // Per-unit execution counters (all must be 1 on the modelled path).
     std::array<int, kInit531d60PostBaseContinueEUnitCount> unit_counts{};
-    int unit_executed = 0;          // expect 9 (plus peel merges when run)
+    int unit_executed = 0;          // expect 8 (plus peel merges when run)
     int call_a54920_count = 0;      // expect 3 (contract/hook with visible status)
     int vcall_noop_count = 0;       // expect 3 (elided bare ret; counted, no dispatch)
     int vcall_54b250_count = 0;     // expect 1 (resolved slot-1)
@@ -349,7 +356,7 @@ struct Init531d60PostBaseContinueEResult {
 };
 
 // Runs continue E after optional peel merges:
-// pinned `0x532ae7..0x532b0c`.
+// pinned `0x532aef..0x532b0c`.
 [[nodiscard]] Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
     const Init531d60PostBaseContinueEHooks& hooks = {}) noexcept;
 

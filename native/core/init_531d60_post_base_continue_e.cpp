@@ -17,6 +17,7 @@
 #include "init_531d60_post_base_lea_rsi_2efda50_532ad3_u1.hpp"
 #include "init_531d60_post_base_mov_rsp4b8_rcx_532ada_u1.hpp"
 #include "init_531d60_post_base_a54920_532ae2_u1.hpp"
+#include "init_531d60_post_base_mov_rsp4b0_rax_532ae7_u1.hpp"
 #include "init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
@@ -348,8 +349,30 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         out.call_a54920_count += u3r.call_a54920_count;
     }
 
-    // 0x532ae7 mov rax,[rsp+0x4B0] — reload vtable 2
-    pin(out, ContinueEUnit::mov_rax_rsp4b0);
+    void* rax_vtable2 = nullptr;
+    Init531d60PostBaseMovRsp4b0_Rax_532ae7_U1Cells mov4b0rax_cells =
+        hooks.mov_rsp4b0_rax_532ae7_u1_cells;
+    if (mov4b0rax_cells.vtable_stack_in == nullptr) {
+        mov4b0rax_cells.vtable_stack_in = const_cast<const void**>(
+            reinterpret_cast<void**>(&desc3.vtable));
+    }
+    if (mov4b0rax_cells.rax_out == nullptr) {
+        mov4b0rax_cells.rax_out = &rax_vtable2;
+    }
+    if (!hooks.merge_mov_rsp4b0_rax_532ae7_u1_ran) {
+        const Init531d60PostBaseMovRsp4b0_Rax_532ae7_U1Result m4b0raxr =
+            init_531d60_post_base_mov_rsp4b0_rax_532ae7_u1(mov4b0rax_cells);
+        if (!m4b0raxr.ok) {
+            return out;
+        }
+    } else {
+        const void* loaded = *mov4b0rax_cells.vtable_stack_in;
+        rax_vtable2 = const_cast<void*>(loaded);
+        if (rax_vtable2 == nullptr) {
+            rax_vtable2 = reinterpret_cast<void*>(static_cast<std::uintptr_t>(
+                kInit531d60PostBaseMovRsp4b0_Rax_532ae7_U1DefaultVtableRva));
+        }
+    }
 
     // 0x532aef mov rdi,rbx — this = &desc3[0x20]
     pin(out, ContinueEUnit::mov_rdi_rbx);
