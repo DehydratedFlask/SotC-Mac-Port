@@ -72,6 +72,7 @@
 #include "core/init_531d60_post_base_continue_a.hpp"
 #include "core/init_531d60_post_base_1e4c0_u1.hpp"
 #include "core/init_531d60_post_base_4c4950_u1.hpp"
+#include "core/init_531d60_post_base_a52b70_u1.hpp"
 #include "core/init_531d60_post_base_continue_b.hpp"
 #include "core/init_531d60_post_base_continue_c.hpp"
 #include "core/capture_a473b0.hpp"
@@ -1620,6 +1621,7 @@ int main() {
     pb1e4.call_1e4c0 = hook_cont_b_1e4c0;
     Init531d60PostBase4c4950U1Hooks pb4c{};
     pb4c.call_4c4950 = hook_cont_b_4c4950;
+    Init531d60PostBaseA52b70U1Hooks pba52u1{};
     Init531d60PostBaseContinueAHooks pbca{};
     Init531d60PostBaseContinueBHooks pbcb{};
     pbcb.cell_32f84f8 = &g_cont_b_cell_32f84f8;
@@ -1677,7 +1679,7 @@ int main() {
                                                      pbf590u7, pbf590u8, pba2edu5, pbf590u9,
                                                      pbf590u10, pba2edu6, pbf590u11, pbf590u12,
                                                      pba2edu7, pbf590u13, pbf590u14, pba2eu1, pba2e5,
-                                                     pba543, pb1fc, pb1e4, pb4c, pbca, pbcb, pbcc, pbcd, pbce, pbalt,
+                                                     pba543, pb1fc, pb1e4, pb4c, pba52u1, pbca, pbcb, pbcc, pbcd, pbce, pbalt,
                                                      ih);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
@@ -2497,13 +2499,39 @@ int main() {
     CHECK(!r.post_base_alt_5327bd.ok);
     CHECK(!r.post_base_alt_5327bd.reached_via_jmp);
     CHECK(!r.post_base_alt_5327bd.reached_via_preamble);
-    // E511: grouped Init continue C 0x532904..0x53299d — 38 units, 3 direct calls,
-    // 3 vtable slot-0 dispatches, 3 lea, 6 global loads; je8 target pinned but
-    // outcome NOT modelled.
-    // E536: with no merge flag byte the outcome is unknown; driver runs D then E then remainder.
+    // E516: merge first 0xa52b70 call-site (7 B prep NOT modelled)
+    CHECK(r.post_base_a52b70_u1.ok);
+    CHECK(r.post_base_a52b70_u1.call_a52b70_count == 1);
+    CHECK(g_cont_c_a52b70 == 1);
+    CHECK(g_cont_c_a52b70_rdi == g_cont_a_rdi_marker);
+    CHECK(g_cont_c_a52b70_esi == 0);
+    // E516: grouped Init continue C 0x532910..0x53299d — 35 units, 2 direct calls,
+    CHECK(r.post_base_continue_c.ok);
+    CHECK(r.post_base_continue_c.unit_executed ==
+          kInit531d60PostBaseContinueCUnitCount);
+    CHECK(kInit531d60PostBaseContinueCUnitCount == 35);
+    for (int i = 0; i < kInit531d60PostBaseContinueCUnitCount; ++i) {
+        CHECK(r.post_base_continue_c.unit_counts[static_cast<std::size_t>(i)] == 1);
+    }
+    CHECK(kInit531d60PostBaseContinueCUnits[0].rva == 0x532910);
+    CHECK(kInit531d60PostBaseContinueCUnits[34].rva == 0x53299b);
+    CHECK(r.post_base_continue_c.call_count == 2);
+    CHECK(r.post_base_continue_c.vcall_count == 3);
+    CHECK(r.post_base_continue_c.lea_count == 3);
+    CHECK(r.post_base_continue_c.global_mov_count == 6);
+    CHECK(r.post_base_continue_c.xor_count == 5);
+    CHECK(r.post_base_continue_c.cmp_count == 3);
+    CHECK(r.post_base_continue_c.sete_count == 2);
+    CHECK(r.post_base_continue_c.branch_boundary_count == 1);
     CHECK(!r.post_base_continue_c.merge_branch_outcome_modelled);
     CHECK(!r.init_branch_5329ae_taken);
     CHECK(!r.init_stopped_at_5329ae);
+    CHECK(!r.post_base_continue_c.branch_outcome_modelled);
+    CHECK(r.post_base_continue_c.end_rva == 0x53299d);
+    CHECK(r.post_base_continue_c.branch_target_rva == 0x5329ae);
+    CHECK(g_cont_c_a599e0 == 1);
+    CHECK(g_cont_c_a431e0 == 1);
+    CHECK(g_cont_c_vcall == 3);
 
     // Batch D: fall-through of C's je 0x5329ae — 17 B, 4 units, one call.
     CHECK(r.post_base_continue_d.ok);
@@ -2628,30 +2656,7 @@ int main() {
         CHECK(er2.boss_flag_before == 0);  // no cell supplied -> no write observed
     }
 
-    CHECK(r.post_base_continue_c.ok);
-    CHECK(r.post_base_continue_c.unit_executed ==
-          kInit531d60PostBaseContinueCUnitCount);
-    CHECK(kInit531d60PostBaseContinueCUnitCount == 38);
-    for (int i = 0; i < kInit531d60PostBaseContinueCUnitCount; ++i) {
-        CHECK(r.post_base_continue_c.unit_counts[static_cast<std::size_t>(i)] == 1);
-    }
-    CHECK(kInit531d60PostBaseContinueCUnits[0].rva == 0x532904);
-    CHECK(kInit531d60PostBaseContinueCUnits[37].rva == 0x53299b);
-    CHECK(r.post_base_continue_c.call_count == 3);
-    CHECK(r.post_base_continue_c.vcall_count == 3);
-    CHECK(r.post_base_continue_c.lea_count == 3);
-    CHECK(r.post_base_continue_c.global_mov_count == 6);
-    CHECK(r.post_base_continue_c.xor_count == 5);
-    CHECK(r.post_base_continue_c.cmp_count == 3);
-    CHECK(r.post_base_continue_c.sete_count == 2);
-    CHECK(r.post_base_continue_c.branch_boundary_count == 1);
-    CHECK(!r.post_base_continue_c.branch_outcome_modelled);
-    CHECK(r.post_base_continue_c.end_rva == 0x53299d);
-    CHECK(r.post_base_continue_c.branch_target_rva == 0x5329ae);
-    CHECK(g_cont_c_a52b70 == 1);
-    CHECK(g_cont_c_a52b70_rdi == g_cont_a_rdi_marker);  // incoming r15 stand-in
-    CHECK(g_cont_c_a52b70_esi == 0);                    // incoming r14b = 0
-    CHECK(g_cont_c_a599e0 == 1);
+    CHECK(r.post_base_continue_c.flag1_known);
     CHECK(g_cont_c_a599e0_rdi == g_cont_c_obj_a);       // obj A
     CHECK(g_cont_c_a599e0_esi == 1);                    // flag1 byte == 0 -> sil 1
     CHECK(g_cont_c_a431e0 == 1);
@@ -3202,7 +3207,7 @@ void run_alt_join_route_tests() {
         AppmainInitCtor98a90SliceResult out{};
         run_appmain_init_continue_driver_tail(
             out, route_table, route_front, route_setter.data(), 0, 0, 0, 0,
-            {}, {}, {}, {}, e, {}, {}, {}, {});
+            {}, {}, {}, {}, e, {}, {}, {}, {}, {});
         CHECK(out.post_base_continue_b.ok);
         CHECK(!out.post_base_continue_b.eax_known);
         CHECK(out.post_base_continue_c.ok);
@@ -3236,7 +3241,7 @@ void run_alt_join_route_tests() {
         AppmainInitCtor98a90SliceResult out{};
         run_appmain_init_continue_driver_tail(
             out, route_table, route_front, route_setter.data(), 0, 0, 0, 0,
-            {}, {}, {}, {}, e, alt, {}, {}, {});
+            {}, {}, {}, {}, e, alt, {}, {}, {}, {});
         CHECK(out.post_base_alt_5327bd.ok);
         CHECK(!out.post_base_alt_5327bd.reached_via_jmp);
         CHECK(!out.post_base_alt_5327bd.reached_via_preamble);
@@ -3308,7 +3313,7 @@ void run_alt_join_route_tests() {
         AppmainInitCtor98a90SliceResult out{};
         run_appmain_init_continue_driver_tail(
             out, route_table, route_front, route_setter.data(), 0, 0x11, 0x22, 0x33,
-            {}, {}, {}, {}, e, alt, {}, {}, {});
+            {}, {}, {}, {}, e, alt, {}, {}, {}, {});
         CHECK(out.post_base_alt_5327bd.ok);
         CHECK(out.post_base_alt_5327bd.reached_via_jmp);
         CHECK(out.post_base_alt_5327bd.r12b_known && out.post_base_alt_5327bd.r12b_out == 0);
@@ -3364,7 +3369,7 @@ void run_alt_join_route_tests() {
         AppmainInitCtor98a90SliceResult out{};
         run_appmain_init_continue_driver_tail(
             out, route_table, route_front, route_setter.data(), 0, 0x11, 0x22, 0x33,
-            {}, {}, c, {}, e, alt, {}, {}, {});
+            {}, {}, c, {}, e, alt, {}, {}, {}, {});
         CHECK(out.post_base_alt_5327bd.ok);
         CHECK(out.post_base_alt_5327bd.reached_via_preamble);
         CHECK(out.post_base_alt_5327bd.slot0_dispatch_count == 1);

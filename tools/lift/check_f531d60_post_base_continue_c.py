@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""ELF-tie Init 0x531d60 continue C merge run 0x532904..0x53299d (153 B / 38 units).
+"""ELF-tie Init 0x531d60 continue C merge run 0x532910..0x53299d (141 B / 35 units).
 
-Private: needs local/re/eboot.elf. Pins every one of the 38 consecutive units
-after E510 (continue_b je fall-through `jmp 0x532904` merge entry), the three
-direct-call rel32 targets, the three indirect `call [rax]` vtable-slot-0 sites,
+Private: needs local/re/eboot.elf. Pins every one of the 35 consecutive units
+after E516 first merge `0xa52b70` call-site (0x53290b..0x532910), the two
+remaining direct-call rel32 targets, the three indirect `call [rax]` vtable-slot-0 sites,
 the three RIP-relative lea targets, the six RIP-relative global loads, and the
 je rel8 target. Does NOT claim any callee body, the je outcome, the two
 successors, or the incoming r14b/r15 provenance.
@@ -21,10 +21,10 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import ps4_dynlink as d  # noqa: E402
 
 ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
-START = 0x532904
-SIZE = 153
+START = 0x532910
+SIZE = 141
 END = 0x53299D
-REGION_SHA256 = "2390d483b2e1bc47fd6657dae2bda4290b4f0d5f3bf986c7c27f795164560aa1"
+REGION_SHA256 = "9cbf00d1c725aa0ac0b3e4a86a5e73106c8ecbd5c4d7b9ba740e55bc4905402b"
 BRANCH_RVA = 0x53299B
 BRANCH_TARGET = 0x5329AE
 
@@ -45,12 +45,6 @@ GLOBAL_2EFE340 = 0x2EFE340
 #         "je8"      -> near je (74 <rel8>) target must equal target
 #         "pin"      -> opcode/shape only
 UNITS = [
-    (0x532904, 4, "8aa9c86504d89f38804640a4602461ce4f77bb337096a5b98b02f57a7255aee5",
-     "movzx esi,r14b", "pin", None),
-    (0x532908, 3, "4eef54c393ee98ea9816e4ce4154f9264971ddf328e3ce421b06e8841edef72f",
-     "mov rdi,r15", "pin", None),
-    (0x53290B, 5, "c6b65f41259ea6fa7075a4c35e88a4443b6ffbecfdc08a87eced18d5f70f936a",
-     "call 0xa52b70", "call", CALL_A52B70),
     (0x532910, 7, "5284fd9663f3d2c67d611f295637f9a500e501a6ac3814620dcd8ff0e9a53603",
      "lea rax,[0x32f8b80]", "lea", LEA_32F8B80),
     (0x532917, 7, "8a7024341a077f54572870d13e05bcd1149e0427f7f2ee8f657cdbe18884eb1f",
@@ -127,7 +121,7 @@ NATIVE = ROOT / "native/core/init_531d60_post_base_continue_c.hpp"
 NATIVE_CPP = ROOT / "native/core/init_531d60_post_base_continue_c.cpp"
 SLICE = ROOT / "native/core/appmain_init_ctor_98a90_slice.hpp"
 SLICE_CPP = ROOT / "native/core/appmain_init_ctor_98a90_slice.cpp"
-PREV_NATIVE = ROOT / "native/core/init_531d60_post_base_continue_b.hpp"
+PREV_NATIVE = ROOT / "native/core/init_531d60_post_base_a52b70_u1.hpp"
 TEST = ROOT / "native/tests/test_appmain_init_ctor_98a90_slice.cpp"
 CMAKE = ROOT / "native/CMakeLists.txt"
 
@@ -143,10 +137,10 @@ def main() -> int:
     _, ph = d.program_headers(elf)
     img = d.Image(elf, ph)
 
-    require(len(UNITS) == 38, "unit count")
+    require(len(UNITS) == 35, "unit count")
     require(
-        "kInit531d60PostBaseContinueBEndRva = 0x5327b1" in PREV_NATIVE.read_text(),
-        "continue_b end",
+        "kInit531d60PostBaseA52b70U1EndRva = 0x532910" in PREV_NATIVE.read_text(),
+        "a52b70_u1 end",
     )
     require(START + SIZE == END, "size arithmetic")
 
@@ -192,7 +186,7 @@ def main() -> int:
     nh = NATIVE.read_text()
     require("init_531d60_post_base_continue_c" in nh, "API")
     require("NOT modelled" in nh, "omission")
-    require("kInit531d60PostBaseContinueCRva = 0x532904" in nh, "start rva")
+    require("kInit531d60PostBaseContinueCRva = 0x532910" in nh, "start rva")
     require("kInit531d60PostBaseContinueCEndRva = 0x53299d" in nh, "end rva")
     require("kInit531d60PostBaseContinueCBranchTargetRva = 0x5329ae" in nh, "branch target")
     require("kInit531d60PostBaseContinueCUnitCount" in nh, "unit count")
@@ -209,6 +203,7 @@ def main() -> int:
     require("branch_outcome_modelled = false" in cpp, "branch outcome flag")
     require("init_531d60_post_base_continue_c" in cpp, "cpp definition")
     st = SLICE.read_text()
+    require("post_base_a52b70_u1" in st or "PostBaseA52b70U1" in st, "a52b70 u1 wire")
     require("post_base_continue_c" in st or "PostBaseContinueC" in st, "slice wire")
     require("post_base_continue_c" in SLICE_CPP.read_text(), "slice run")
     require("core/init_531d60_post_base_continue_c.cpp" in CMAKE.read_text(), "cmake")
@@ -219,7 +214,7 @@ def main() -> int:
     print(
         f"OK check_f531d60_post_base_continue_c: span=0x{START:x}+{SIZE}B "
         f"units={len(UNITS)} region={REGION_SHA256[:12]}…; "
-        f"calls=0xa52b70/0xa599e0/0xa431e0 pinned; "
+        f"calls=0xa599e0/0xa431e0 pinned (0xa52b70 in u1); "
         f"vcalls=3 (slot0 @[0x2efe318]); "
         f"lea=0x32f8b80/0x2efe318/0x32f6d18 pinned; "
         f"globals=0x2efe318x3/0x2efe340x3 pinned; "

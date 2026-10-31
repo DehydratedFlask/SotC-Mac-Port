@@ -1,5 +1,7 @@
 #include "init_531d60_post_base_continue_c.hpp"
 
+#include "init_531d60_post_base_a52b70_u1.hpp"
+
 #include <cstring>
 
 namespace sotc {
@@ -117,22 +119,18 @@ Init531d60PostBaseContinueCResult init_531d60_post_base_continue_c(
         r14b_in = out.preamble_r14b;
     }
 
-    // 0x532904 movzx esi,r14b — r14b is 0 on the fall-through path and the
-    // preamble's sete r14b on the 0x5328e0 taken path.
-    const std::uint8_t esi_1 = r14b_in;
-    out.first_esi = esi_1;
-    pin(out, ContinueCUnit::movzx_esi_r14b);
-
-    // 0x532908 mov rdi,r15 — r15 provenance upstream, NOT modelled.
-    void* rdi_1 = const_cast<void*>(hooks.incoming_r15);
-    pin(out, ContinueCUnit::mov_rdi_r15);
-
-    // 0x53290b call 0xa52b70 (body NOT modelled).
-    if (hooks.call_a52b70 != nullptr) {
-        hooks.call_a52b70(rdi_1, esi_1);
+    if (!hooks.merge_a52b70_u1_ran) {
+        Init531d60PostBaseA52b70U1Hooks u1{};
+        u1.incoming_r14b = r14b_in;
+        u1.incoming_r15 = hooks.incoming_r15;
+        u1.call_a52b70 = hooks.call_a52b70;
+        const Init531d60PostBaseA52b70U1Result u1r = init_531d60_post_base_a52b70_u1(u1);
+        if (!u1r.ok) {
+            return out;
+        }
     }
-    pin(out, ContinueCUnit::call_a52b70);
-    ++out.call_count;
+
+    out.first_esi = r14b_in;
 
     // 0x532910 lea rax,[0x32f8b80] — obj A cell; rbx = *cell.
     pin(out, ContinueCUnit::lea_rax_32f8b80);
@@ -268,7 +266,7 @@ Init531d60PostBaseContinueCResult init_531d60_post_base_continue_c(
     }
 
     out.ok = (out.unit_executed == kInit531d60PostBaseContinueCUnitCount) &&
-             (out.call_count == 3) && (out.vcall_count == 3) && (out.lea_count == 3) &&
+             (out.call_count == 2) && (out.vcall_count == 3) && (out.lea_count == 3) &&
              (out.global_mov_count == 6) && (out.xor_count == 5) && (out.cmp_count == 3) &&
              (out.sete_count == 2) && (out.branch_boundary_count == 1) &&
              (out.unit_counts[0] == 1) &&

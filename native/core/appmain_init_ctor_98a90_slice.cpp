@@ -82,6 +82,7 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBase1fc80U1Hooks& post_base_1fc80_u1_hooks,
     const Init531d60PostBase1e4c0U1Hooks& post_base_1e4c0_u1_hooks,
     const Init531d60PostBase4c4950U1Hooks& post_base_4c4950_u1_hooks,
+    const Init531d60PostBaseA52b70U1Hooks& post_base_a52b70_u1_hooks,
     const Init531d60PostBaseContinueAHooks& post_base_continue_a_hooks,
     const Init531d60PostBaseContinueBHooks& post_base_continue_b_hooks,
     const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks,
@@ -563,7 +564,8 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
         post_base_continue_a_hooks, post_base_continue_b_hooks,
         post_base_continue_c_hooks, post_base_continue_d_hooks,
         post_base_continue_e_hooks, post_base_alt_5327bd_hooks,
-        post_base_1fc80_u1_hooks, post_base_1e4c0_u1_hooks, post_base_4c4950_u1_hooks);
+        post_base_1fc80_u1_hooks, post_base_1e4c0_u1_hooks, post_base_4c4950_u1_hooks,
+        post_base_a52b70_u1_hooks);
     return out;
 }
 
@@ -579,7 +581,8 @@ void run_appmain_init_continue_driver_tail(
     const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks,
     const Init531d60PostBase1fc80U1Hooks& post_base_1fc80_u1_hooks,
     const Init531d60PostBase1e4c0U1Hooks& post_base_1e4c0_u1_hooks,
-    const Init531d60PostBase4c4950U1Hooks& post_base_4c4950_u1_hooks) {
+    const Init531d60PostBase4c4950U1Hooks& post_base_4c4950_u1_hooks,
+    const Init531d60PostBaseA52b70U1Hooks& post_base_a52b70_u1_hooks) {
     // E513: always-on Init continue — first 0x1fc80 call-site; 16 B prep NOT modelled.
     out.post_base_1fc80_u1 = init_531d60_post_base_1fc80_u1(post_base_1fc80_u1_hooks);
     if (!out.post_base_1fc80_u1.ok) {
@@ -676,7 +679,21 @@ void run_appmain_init_continue_driver_tail(
     }
     out.init_r12b_out = route_r12b;
 
-    // Continue C starts at 0x532904 on both routes. Only the B route may need
+    if (!c_hooks.enter_via_5328e0) {
+        Init531d60PostBaseA52b70U1Hooks a52_hooks = post_base_a52b70_u1_hooks;
+        a52_hooks.incoming_r14b = c_hooks.incoming_r14b;
+        a52_hooks.incoming_r15 = c_hooks.incoming_r15;
+        if (a52_hooks.call_a52b70 == nullptr) {
+            a52_hooks.call_a52b70 = c_hooks.call_a52b70;
+        }
+        out.post_base_a52b70_u1 = init_531d60_post_base_a52b70_u1(a52_hooks);
+        if (!out.post_base_a52b70_u1.ok) {
+            return;
+        }
+        c_hooks.merge_a52b70_u1_ran = true;
+    }
+
+    // Continue C merge body starts at 0x532910 after E516 first 0xa52b70 call-site.
     // its own 0x5328e0 preamble; the alternate route has already completed it.
     out.post_base_continue_c = init_531d60_post_base_continue_c(c_hooks);
     if (!out.post_base_continue_c.ok) {

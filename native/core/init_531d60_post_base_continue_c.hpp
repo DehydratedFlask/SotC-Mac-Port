@@ -1,4 +1,4 @@
-// Init `0x531d60` continue OBS `0x532904..0x53299d` (153 B, 38 consecutive units).
+// Init `0x531d60` continue OBS `0x532910..0x53299d` (141 B, 35 consecutive units).
 //
 // This is the MERGE block reached unconditionally by the continue_b fall-through
 // (`0x5327b1 e9 4e 01 00 00` = `jmp 0x532904`), and also by the continue_b je
@@ -90,8 +90,8 @@
 
 namespace sotc {
 
-inline constexpr std::uint64_t kInit531d60PostBaseContinueCRva = 0x532904;
-inline constexpr std::size_t kInit531d60PostBaseContinueCSize = 153;
+inline constexpr std::uint64_t kInit531d60PostBaseContinueCRva = 0x532910;
+inline constexpr std::size_t kInit531d60PostBaseContinueCSize = 141;
 inline constexpr std::uint64_t kInit531d60PostBaseContinueCEndRva = 0x53299d;
 // First conditional branch of the merge run: pinned target, outcome NOT modelled.
 inline constexpr std::uint64_t kInit531d60PostBaseContinueCBranchRva = 0x53299b;
@@ -108,12 +108,9 @@ inline constexpr std::uint64_t kInit531d60PostBaseContinueCLea32f6d18Rva = 0x32f
 inline constexpr std::uint64_t kInit531d60PostBaseContinueCGlobal2efe318Rva = 0x2efe318;
 inline constexpr std::uint64_t kInit531d60PostBaseContinueCGlobal2efe340Rva = 0x2efe340;
 
-// Unit identity for the 38 pinned instructions of the claimed run.
+// Unit identity for the 35 pinned instructions of the claimed run.
 enum class ContinueCUnit : int {
-    movzx_esi_r14b = 0,     // 0x532904
-    mov_rdi_r15,            // 0x532908
-    call_a52b70,            // 0x53290b
-    lea_rax_32f8b80,        // 0x532910
+    lea_rax_32f8b80 = 0,    // 0x532910
     lea_r15_2efe318,        // 0x532917
     xor_esi_esi_1,          // 0x53291e
     mov_rdi_r15_1,          // 0x532920
@@ -160,12 +157,9 @@ struct ContinueCUnitSpan {
     const char* mnemonic = "";
 };
 
-// OBS table re-derived from local/re/eboot.elf; sizes sum to kSize (153 B).
+// OBS table re-derived from local/re/eboot.elf; sizes sum to kSize (141 B).
 inline constexpr std::array<ContinueCUnitSpan, kInit531d60PostBaseContinueCUnitCount>
     kInit531d60PostBaseContinueCUnits{{
-        {0x532904, 4, "movzx esi,r14b"},
-        {0x532908, 3, "mov rdi,r15"},
-        {0x53290b, 5, "call 0xa52b70"},
         {0x532910, 7, "lea rax,[0x32f8b80]"},
         {0x532917, 7, "lea r15,[0x2efe318]"},
         {0x53291e, 2, "xor esi,esi"},
@@ -236,6 +230,8 @@ struct Init531d60PostBaseContinueCHooks {
 
     // Direct-call hooks (callee bodies NOT lifted; null => no-op):
     void (*call_a52b70)(void* rdi, std::uint8_t esi) = nullptr;
+    // When true, E516 merge call-site already ran (B-path driver); skip u1 inside body.
+    bool merge_a52b70_u1_ran = false;
     void (*call_a599e0)(void* rdi, std::uint8_t esi) = nullptr;
     void (*call_a431e0)(void* rdi, std::uint8_t esi) = nullptr;
     // Indirect vtable-slot-0 dispatch (call [rax], rax = [0x2efe318]); null => no-op.
