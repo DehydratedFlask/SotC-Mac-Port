@@ -14,6 +14,23 @@ void pin(Init531d60PostBaseAlt5327bdResult& out, Alt5327bdUnit u) noexcept {
     ++out.unit_executed;
 }
 
+void* load_ptr(const void* base, std::size_t offset) noexcept {
+    void* value = nullptr;
+    if (base != nullptr) {
+        std::memcpy(&value, static_cast<const std::uint8_t*>(base) + offset,
+                    sizeof(value));
+    }
+    return value;
+}
+
+const std::uint8_t* flag_byte_from_demo(const void* demo_object) noexcept {
+    const void* bound = load_ptr(demo_object, kLazyBind91210BoundOffset);
+    if (bound == nullptr) {
+        return nullptr;
+    }
+    return static_cast<const std::uint8_t*>(load_ptr(bound, 0x60));
+}
+
 }  // namespace
 
 Init531d60PostBaseAlt5327bdResult init_531d60_post_base_alt_5327bd(
@@ -28,9 +45,12 @@ Init531d60PostBaseAlt5327bdResult init_531d60_post_base_alt_5327bd(
     pin(out, Alt5327bdUnit::cmp_byte_rax_0);
 
     bool gate_open = true;
+    bool gate_known = false;
     if (hooks.gate_check_supplied) {
+        gate_known = true;
         gate_open = (hooks.gate_check_result == 0);
     } else if (hooks.gate_2dfce70 != nullptr) {
+        gate_known = true;
         gate_open = (static_cast<const std::uint8_t*>(
             hooks.gate_2dfce70)[kAlt5327bdGateOff] == 0);
     }
@@ -46,7 +66,7 @@ Init531d60PostBaseAlt5327bdResult init_531d60_post_base_alt_5327bd(
     pin(out, Alt5327bdUnit::mov_rdi_rbx_1);
 
     void* obj = const_cast<void*>(hooks.obj_3305568);
-    if (gate_open && hooks.call_ac5260 != nullptr)
+    if (gate_known && gate_open && hooks.call_ac5260 != nullptr)
         hooks.call_ac5260(obj, nullptr, 7);
     pin(out, Alt5327bdUnit::call_ac5260);            ++out.call_direct_count;
 
@@ -75,6 +95,14 @@ Init531d60PostBaseAlt5327bdResult init_531d60_post_base_alt_5327bd(
 
     bool float_ok = true;
     if (hooks.float_compare_supplied) float_ok = !hooks.float_below_equal;
+
+    // A known failed predicate is sufficient to prove the error route. Success
+    // requires both branches to be known and not taken; default stand-ins are
+    // not evidence of either route.
+    const bool error_path_known = (gate_known && !gate_open) ||
+                                  (hooks.float_compare_supplied && !float_ok);
+    const bool success_path_known = gate_known && gate_open &&
+                                    hooks.float_compare_supplied && float_ok;
 
     pin(out, Alt5327bdUnit::jbe_5328cf);             ++out.branch_count;
 
@@ -119,14 +147,14 @@ Init531d60PostBaseAlt5327bdResult init_531d60_post_base_alt_5327bd(
 
     bool do_log = (!list_empty && cflag_zero) || list_empty;
     if (hooks.skip_logging_supplied) do_log = !hooks.skip_logging;
-    if (do_log && hooks.call_3e7e0 != nullptr)
+    if (success_path_known && do_log && hooks.call_3e7e0 != nullptr)
         hooks.call_3e7e0(0, 1, 0, 1, nullptr, nullptr, nullptr);
     pin(out, Alt5327bdUnit::call_3e7e0);             ++out.call_direct_count;
 
     // === Success cleanup (units 55–59) ===
     pin(out, Alt5327bdUnit::xor_edi_edi);
     pin(out, Alt5327bdUnit::xor_r12d_r12d);
-    if (gate_open && float_ok && hooks.call_4c4950 != nullptr)
+    if (success_path_known && hooks.call_4c4950 != nullptr)
         hooks.call_4c4950(0);
     pin(out, Alt5327bdUnit::call_4c4950_1);          ++out.call_direct_count;
     pin(out, Alt5327bdUnit::mov_r15_r13);
@@ -135,7 +163,7 @@ Init531d60PostBaseAlt5327bdResult init_531d60_post_base_alt_5327bd(
 
     // === Error-catch path (units 60–63) ===
     pin(out, Alt5327bdUnit::mov_edi_1);
-    if ((!gate_open || !float_ok) && hooks.call_4c4950 != nullptr)
+    if (error_path_known && hooks.call_4c4950 != nullptr)
         hooks.call_4c4950(1);
     pin(out, Alt5327bdUnit::call_4c4950_2);          ++out.call_direct_count;
     pin(out, Alt5327bdUnit::mov_r15_r13_err);
@@ -150,25 +178,45 @@ Init531d60PostBaseAlt5327bdResult init_531d60_post_base_alt_5327bd(
     pin(out, Alt5327bdUnit::mov_rax_rax60_2);
     pin(out, Alt5327bdUnit::cmp_byte_rax_0_3);
 
-    bool flag340_zero = false;
-    if (hooks.cell_2efe340 != nullptr) {
-        flag340_zero = (static_cast<const std::uint8_t*>(
-            hooks.cell_2efe340)[0x60] == 0);
+    const bool error_path = error_path_known;
+    const std::uint8_t* flag_byte = nullptr;
+    if (error_path) {
+        if (hooks.use_native_lazy_bind_91210) {
+            ++out.slot0_dispatch_count;
+            const LazyBind91210Result bind =
+                run_lazy_bind_91210(hooks.demo_object, hooks.lazy_bind);
+            ++out.lazy_bind_calls;
+            out.lazy_bind_last_returned = bind.returned;
+            out.lazy_bind_ok = bind.ok;
+            if (!bind.ok) {
+                return out;
+            }
+            flag_byte = flag_byte_from_demo(hooks.demo_object);
+        } else {
+            if (hooks.vcall_slot0 != nullptr) {
+                ++out.slot0_dispatch_count;
+                hooks.vcall_slot0(const_cast<void*>(hooks.cell_2efe318), 0);
+            }
+            flag_byte = (hooks.cell_2efe340 != nullptr)
+                            ? static_cast<const std::uint8_t*>(hooks.cell_2efe340) + 0x60
+                            : nullptr;
+        }
     }
+    const bool flag340_zero = (flag_byte != nullptr) && (*flag_byte == 0);
     pin(out, Alt5327bdUnit::sete_r14b);              ++out.setcc_count;
 
     // === Join flags ===
-    if (gate_open && float_ok) {
+    if (success_path_known) {
         out.reached_via_jmp = true;
         out.r12b_out = 0;
         out.r14b_out = 0;
-    } else {
+    } else if (error_path_known) {
         out.reached_via_preamble = true;
         out.r12b_out = 1;
         out.r14b_out = flag340_zero ? 1 : 0;
     }
-    out.r12b_known = true;
-    out.r14b_known = true;
+    out.r12b_known = error_path_known || success_path_known;
+    out.r14b_known = success_path_known || (error_path_known && flag_byte != nullptr);
 
     out.ok = (out.unit_executed == kInit531d60PostBaseAlt5327bdUnitCount) &&
              (out.call_direct_count == 4) && (out.vcall_count == 5) &&

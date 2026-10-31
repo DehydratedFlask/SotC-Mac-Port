@@ -36,10 +36,12 @@
 //     last two calls consume rdi/rsi built by 0x532740..0x532771 (as observed).
 //
 // NOT modelled (do not read as semantics):
-//   * bodies of 0xf590, 0xa2ea00, 0xa2e5d0, 0xa543b0, 0x1fc80 — hooks are host
-//     stand-ins, null hook => no-op;
-//   * the `test rax,rax` flag value and the `je` outcome, plus BOTH successors
-//     (`0x53277f` fall-through block and `0x5327bd` branch target);
+//   * bodies of 0xf590, 0xa2ea00, 0xa2e5d0, 0xa543b0 — hooks are host stand-ins,
+//     null hook => no-op. 0x1fc80 stays a counting hook unless
+//     `use_native_lookup_1fc80` is set, in which case `lookup_1fc80` supplies rax;
+//   * BOTH successors (`0x53277f` fall-through block and `0x5327bd` branch target).
+//     The `je` outcome is modelled only when rax from 0x1fc80 is known
+//     (taken when that pointer is null);
 //   * provenance of the incoming r13 (set earlier in Init) and of r12/r14/r15;
 //   * object layouts at 0x32f79a8 / 0x32f84f8 beyond the observed `+0xf8` read,
 //     the contents of the data at 0x1014d69 (used only as an RVA pin), and the
@@ -55,6 +57,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "init_531d60_post_base_continue_b.hpp"
 #include "shared_release_f590.hpp"
 
 namespace sotc {
@@ -172,7 +175,15 @@ struct Init531d60PostBaseContinueAHooks {
     // 0x532760.
     void (*call_a543b0)(void* rdi, std::uintptr_t rsi) = nullptr;
     // 0x532775; rsi_rva is the pinned data RVA 0x1014d69 (not a host pointer).
+    // Counting hook: does not supply rax. Null => no-op.
     void (*call_1fc80)(void* rdi, std::uintptr_t rsi_rva) = nullptr;
+    // When non-null, its return is rax and the je outcome is modelled.
+    // Overrides use_native_lookup_1fc80.
+    void* (*call_1fc80_result)(void* rdi, std::uintptr_t rsi_rva) = nullptr;
+    // When true (and call_1fc80_result is null), run lookup_1fc80 on rdi with
+    // nointro_needle. The needle is the host C string for data RVA 0x1014d69.
+    bool use_native_lookup_1fc80 = false;
+    const char* nointro_needle = nullptr;
 };
 
 struct Init531d60PostBaseContinueAResult {
@@ -184,7 +195,7 @@ struct Init531d60PostBaseContinueAResult {
     int lea_count = 0;           // expect 4
     int load_count = 0;          // host-side reads performed (expect 5)
     int alu_count = 0;           // expect 2 (add rsi,0x40 / test rax,rax)
-    int branch_boundary_count = 0;  // expect 1 (je pinned, outcome NOT modelled)
+    int branch_boundary_count = 0;  // expect 1 (je pinned)
     // Measured 0xf590 effect at 0x532723: holder `+0x18` is zero, so nothing is destroyed/freed.
     SharedReleaseF590Result release{};
     // Observed plumbing at 0x53275c: ([*0x32f79a8 + 0xf8] + 0x40) when cells set.
@@ -194,7 +205,24 @@ struct Init531d60PostBaseContinueAResult {
     std::uint64_t end_rva = kInit531d60PostBaseContinueAEndRva;
     std::uint64_t branch_target_rva = kInit531d60PostBaseContinueABranchTargetRva;
     bool branch_outcome_modelled = false;
+    // Set only when call_1fc80_result or use_native_lookup_1fc80 produced rax.
+    void* rax_from_1fc80 = nullptr;
+    bool rax_from_1fc80_known = false;
+    // je 0x5327bd is taken when the known rax is null.
+    bool branch_taken = false;
 };
+
+struct InitContinueAbNativeResult {
+    Init531d60PostBaseContinueAResult cont_a{};
+    Init531d60PostBaseContinueBResult cont_b{};
+    bool ran_continue_b = false;
+};
+
+// continue_a with native 0x1fc80, then continue_b with config_bool_lookup_init_continue_b
+// when the lookup hit (rax non-null). Miss leaves continue_b unrun.
+[[nodiscard]] InitContinueAbNativeResult run_init_continue_ab_native_lookups(
+    Init531d60PostBaseContinueAHooks a_hooks,
+    Init531d60PostBaseContinueBHooks b_hooks = {}) noexcept;
 
 // Runs the OBS `0x532720..0x53277f` unit sequence on the measured Init path.
 [[nodiscard]] Init531d60PostBaseContinueAResult init_531d60_post_base_continue_a(

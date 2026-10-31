@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <new>
+#include <strings.h>
 
 namespace sotc {
 
@@ -231,8 +232,8 @@ FConCmdDtorResult destroy_fconcmd_4b0(ConCmdCommand& cmd, ConCmdRegistry& regist
 
 // ---- manager model ---------------------------------------------------------------------------------------
 
-bool FConCmdManagerModel::StrcmpLess::operator()(const char* a, const char* b) const noexcept {
-    return std::strcmp(a, b) < 0;
+bool FConCmdManagerModel::CaseInsensitiveLess::operator()(const char* a, const char* b) const noexcept {
+    return ::strcasecmp(a, b) < 0;
 }
 
 bool FConCmdManagerModel::insert_hook(void* manager, ConCmdBase& cmd) noexcept {

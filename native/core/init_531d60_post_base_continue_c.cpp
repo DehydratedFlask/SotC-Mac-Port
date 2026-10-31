@@ -1,5 +1,7 @@
 #include "init_531d60_post_base_continue_c.hpp"
 
+#include <cstring>
+
 namespace sotc {
 namespace {
 
@@ -22,6 +24,53 @@ std::uint8_t flag_from(const std::uint8_t* byte) noexcept {
     return (*byte == 0) ? 1 : 0;
 }
 
+void* load_ptr(const void* base, std::size_t offset) noexcept {
+    void* value = nullptr;
+    if (base == nullptr) {
+        return nullptr;
+    }
+    std::memcpy(&value, static_cast<const std::uint8_t*>(base) + offset, sizeof(value));
+    return value;
+}
+
+// rax = *(bound+0x60); the compared byte is *rax.
+const std::uint8_t* flag_byte_from_demo(const void* demo_object) noexcept {
+    const void* bound = load_ptr(demo_object, kLazyBind91210BoundOffset);
+    if (bound == nullptr) {
+        return nullptr;
+    }
+    return static_cast<const std::uint8_t*>(load_ptr(bound, 0x60));
+}
+
+bool dispatch_slot0(Init531d60PostBaseContinueCResult& out,
+                    const Init531d60PostBaseContinueCHooks& hooks) noexcept {
+    if (hooks.use_native_lazy_bind_91210) {
+        const LazyBind91210Result bound = run_lazy_bind_91210(hooks.demo_object, hooks.lazy_bind);
+        ++out.lazy_bind_calls;
+        out.lazy_bind_last_returned = bound.returned;
+        out.lazy_bind_ok = bound.ok;
+        return bound.ok;
+    }
+    if (hooks.vcall_slot0 != nullptr) {
+        hooks.vcall_slot0(const_cast<void*>(hooks.cell_2efe318 != nullptr
+                                                ? static_cast<const void*>(hooks.cell_2efe318)
+                                                : nullptr),
+                          0);
+    }
+    return true;
+}
+
+const std::uint8_t* resolve_flag(const Init531d60PostBaseContinueCHooks& hooks,
+                                 const std::uint8_t* supplied) noexcept {
+    if (supplied != nullptr) {
+        return supplied;
+    }
+    if (!hooks.use_native_lazy_bind_91210) {
+        return nullptr;
+    }
+    return flag_byte_from_demo(hooks.demo_object);
+}
+
 }  // namespace
 
 Init531d60PostBaseContinueCResult init_531d60_post_base_continue_c(
@@ -34,7 +83,8 @@ Init531d60PostBaseContinueCResult init_531d60_post_base_continue_c(
     // inventing a branch value.
     std::uint8_t r14b_in = hooks.incoming_r14b;
     if (hooks.enter_via_5328e0) {
-        if (hooks.vcall_slot0 == nullptr || hooks.preamble_flag_byte == nullptr) {
+        const bool native = hooks.use_native_lazy_bind_91210 && hooks.demo_object != nullptr;
+        if (!native && (hooks.vcall_slot0 == nullptr || hooks.preamble_flag_byte == nullptr)) {
             return out;  // ok == false, nothing pinned
         }
         // 0x5328e0 movq 0x2efe318(%rip),%rax / 0x5328e7 leaq 0x2efe318,%rdi
@@ -44,13 +94,15 @@ Init531d60PostBaseContinueCResult init_531d60_post_base_continue_c(
         ++out.preamble_unit_executed;
         // 0x5328f0 callq *(%rax) — slot 0 with rdi = vtable cell address, esi = 0
         out.preamble_call_count = 0;
-        hooks.vcall_slot0(
-            const_cast<void*>(hooks.cell_2efe318 != nullptr
-                                  ? static_cast<const void*>(hooks.cell_2efe318)
-                                  : nullptr),
-            0);
+        if (!dispatch_slot0(out, hooks)) {
+            return out;
+        }
         ++out.preamble_unit_executed;
         ++out.preamble_call_count;
+        const std::uint8_t* preamble_flag = resolve_flag(hooks, hooks.preamble_flag_byte);
+        if (preamble_flag == nullptr) {
+            return out;
+        }
         // 0x5328f2 movq 0x2efe340(%rip),%rax
         ++out.preamble_unit_executed;
         // 0x5328f9 movq 0x60(%rax),%rax
@@ -58,7 +110,7 @@ Init531d60PostBaseContinueCResult init_531d60_post_base_continue_c(
         // 0x5328fd cmpb $0,(%rax)
         ++out.preamble_unit_executed;
         // 0x532900 sete %r14b — r14b = (*flag_byte == 0)
-        out.preamble_r14b = (*hooks.preamble_flag_byte == 0) ? 1 : 0;
+        out.preamble_r14b = (*preamble_flag == 0) ? 1 : 0;
         out.preamble_flag_known = true;
         ++out.preamble_unit_executed;
         out.preamble_ran = true;
@@ -101,11 +153,8 @@ Init531d60PostBaseContinueCResult init_531d60_post_base_continue_c(
     // 0x532926 mov rax,[0x2efe318] / 0x53292d call [rax] (vtable slot 0).
     pin(out, ContinueCUnit::mov_rax_2efe318_1);
     ++out.global_mov_count;
-    if (hooks.vcall_slot0 != nullptr) {
-        hooks.vcall_slot0(const_cast<void*>(hooks.cell_2efe318 != nullptr
-                                                ? static_cast<const void*>(hooks.cell_2efe318)
-                                                : nullptr),
-                          0);
+    if (!dispatch_slot0(out, hooks)) {
+        return out;
     }
     pin(out, ContinueCUnit::vcall_slot0_1);
     ++out.vcall_count;
@@ -121,8 +170,9 @@ Init531d60PostBaseContinueCResult init_531d60_post_base_continue_c(
     pin(out, ContinueCUnit::mov_rax_rax60_1);
     pin(out, ContinueCUnit::cmp_byte_rax0_1);
     ++out.cmp_count;
-    const std::uint8_t sil_1 = flag_from(hooks.flag_byte_iter1);
-    out.flag1_known = (hooks.flag_byte_iter1 != nullptr);
+    const std::uint8_t* flag1 = resolve_flag(hooks, hooks.flag_byte_iter1);
+    const std::uint8_t sil_1 = flag_from(flag1);
+    out.flag1_known = (flag1 != nullptr);
     out.sil_iter1 = sil_1;
     pin(out, ContinueCUnit::sete_sil_1);
     ++out.sete_count;
@@ -149,11 +199,8 @@ Init531d60PostBaseContinueCResult init_531d60_post_base_continue_c(
     // 0x53295a mov rax,[0x2efe318] / 0x532961 call [rax] (vtable slot 0).
     pin(out, ContinueCUnit::mov_rax_2efe318_2);
     ++out.global_mov_count;
-    if (hooks.vcall_slot0 != nullptr) {
-        hooks.vcall_slot0(const_cast<void*>(hooks.cell_2efe318 != nullptr
-                                                ? static_cast<const void*>(hooks.cell_2efe318)
-                                                : nullptr),
-                          0);
+    if (!dispatch_slot0(out, hooks)) {
+        return out;
     }
     pin(out, ContinueCUnit::vcall_slot0_2);
     ++out.vcall_count;
@@ -169,8 +216,9 @@ Init531d60PostBaseContinueCResult init_531d60_post_base_continue_c(
     pin(out, ContinueCUnit::mov_rax_rax60_2);
     pin(out, ContinueCUnit::cmp_byte_rax0_2);
     ++out.cmp_count;
-    const std::uint8_t sil_2 = flag_from(hooks.flag_byte_iter2);
-    out.flag2_known = (hooks.flag_byte_iter2 != nullptr);
+    const std::uint8_t* flag2 = resolve_flag(hooks, hooks.flag_byte_iter2);
+    const std::uint8_t sil_2 = flag_from(flag2);
+    out.flag2_known = (flag2 != nullptr);
     out.sil_iter2 = sil_2;
     pin(out, ContinueCUnit::sete_sil_2);
     ++out.sete_count;
@@ -191,11 +239,8 @@ Init531d60PostBaseContinueCResult init_531d60_post_base_continue_c(
     pin(out, ContinueCUnit::mov_rdi_r15_3);
 
     // 0x53298b call [rax] (vtable slot 0).
-    if (hooks.vcall_slot0 != nullptr) {
-        hooks.vcall_slot0(const_cast<void*>(hooks.cell_2efe318 != nullptr
-                                                ? static_cast<const void*>(hooks.cell_2efe318)
-                                                : nullptr),
-                          0);
+    if (!dispatch_slot0(out, hooks)) {
+        return out;
     }
     pin(out, ContinueCUnit::vcall_slot0_3);
     ++out.vcall_count;
@@ -213,12 +258,13 @@ Init531d60PostBaseContinueCResult init_531d60_post_base_continue_c(
     // `lea rax,[0x32f79a8]`, and 0x5329ae branch target) NOT modelled.
     pin(out, ContinueCUnit::je_5329ae);
     ++out.branch_boundary_count;
-    out.branch_outcome_modelled = false;  // je outcome / both successors NOT modelled
+    out.branch_outcome_modelled = false;  // default; successors stay unmodelled
     // E530: the merge `je 0x5329ae` tests `*(*(0x2efe340) + 0x60)` against zero; when the
     // resolved byte is supplied the outcome is modelled (taken == byte is 0).
-    if (hooks.merge_flag_byte != nullptr) {
+    const std::uint8_t* merge_flag = resolve_flag(hooks, hooks.merge_flag_byte);
+    if (merge_flag != nullptr) {
         out.merge_branch_outcome_modelled = true;
-        out.merge_branch_taken = (*hooks.merge_flag_byte == 0);
+        out.merge_branch_taken = (*merge_flag == 0);
     }
 
     out.ok = (out.unit_executed == kInit531d60PostBaseContinueCUnitCount) &&

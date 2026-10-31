@@ -1,5 +1,143 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-31 01:24 CDT (root) — E1048: ConCmd case-insensitive model correction (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-CONCMD-CASEFOLD-MODEL-01` COMPLETE. Slot-306 model now compares with `strcasecmp`; comments identify the NID-derived import label as an inference. Case-only duplicate insertion preserves the first entry, and destroying a case-only duplicate erases the key-only match.
+- **Verification (PASSED):** focused build `cmake --build local/build/orch-r22 --target test_fconcmd_object_slot306 -j 12` (108 steps); focused CTest 1/1; `python3 tools/lift/check_fconcmd_object_slot306.py` OK. Graft/Trail rebuilt with `scripts/`, `tools/`, `reference/`, `native/`, `launcher/`, and `tests/`; `graft check` and `trail build --check` pass at 2,405 files, 10,951 nodes, 14,519 edges, 1,804 cards. Trail query resolves the comparator declaration and implementation. Logs: `local/validation/concmd-casefold-e1048/`.
+- `python3 scripts/project_index.py` — exit 0, 44,292 folders indexed; `git diff --check` passed.
+- **Combined full verification (PASSED before the next task):** required configure exit 0; build completed 596 steps; CTest 495/495; all lift checkers 578 passed, 0 skipped, 0 failed. Logs: `local/validation/e1048-publication/{configure.log,build.log,ctest.log,checkers.log}`. These cover the accumulated pending changes through E1048; no G0–G6 gate advances.
+- **Prepublication checks (PASSED):** final all-path audit accepted 3,454 paths; final staged-path audit accepted 67 paths; attribution audit reported `ATTRIBUTION AUDIT OK (origin/main..HEAD)`. The first staged diff check found trailing whitespace on two date lines in the E1035/E1037 checkpoint files; both whitespace marks were removed, and final staged/unstaged diff checks pass. Logs: `local/validation/e1048-publication/`.
+- **Files:** `native/core/fconcmd_object_slot306.{cpp,hpp}`, `native/core/concmd_base.{cpp,hpp}`, `native/tests/test_fconcmd_object_slot306.cpp`, plus task/evidence/checkpoint/index docs and ignored graph caches.
+- **Limits:** conventional `strcasecmp` case-folding is inferred from the hash-bound NID-derived import label; no runtime binding, real manager lifecycle, or game behavior is proved. Full CTest/checker sweep NOT RUN; Graft/Trail deep meaning tier NOT RUN. E1047 preserves the separate `lookup_1fc80` comparator follow-up.
+- Next exact action: select another independent bounded task; keep the `0x499f80` failure-policy implementation waiting for the user's preference.
+
+## 2026-10-31 01:18 CDT (root) — E1047: ConCmd comparator target audit (STATIC_ANALYSIS_VERIFIED)
+
+- **`CPU-01-CONCMD-COMPARATOR-20D80-213B0-AUDIT-01` COMPLETE:** all four pinned calls at `0x20e1a`, `0x20e4c`, `0x213eb`, and `0x2141e` resolve to `0xf8f500`; the thunk jumps through GOT `0x1600070`, whose same-ELF imports row labels libc NID `AV6ipCNa4Rw` as `strcasecmp` (status `name-by-nid-hash-only`).
+- **Evidence:** pinned ELF SHA `d0723afb…61d3`, saved `all.dis` SHA `9c196254…107e83`, imports manifest SHA `78caaaae…b6744`; report SHA `111df4857198e89d77a6009e294ff7fc25b447d1ec727e457a1e41e660badf1a`. Full hashes, exact offsets, and limits: [E1047](docs/checkpoints/2026-10-31-concmd-comparator-audit-e1047.md).
+- **Limits:** `0x20d80` behavior is corroborated by prior saved report; `0x213b0` is limited to call-target bytes. No REA call, runtime binding, manager lifecycle, or game behavior was established. The API name's case-folding semantics are an inference.
+- Next exact action: implement the separately claimed native model correction; leave `lookup_1fc80` fallback as an independent follow-up until its own callsite contract is audited.
+
+## 2026-10-31 01:10 CDT (root) — E1046: `0x499f80` failure-cleanup audit (STATIC_ANALYSIS_VERIFIED)
+
+- **`CPU-01-499F80-FAILURE-CLEANUP-AUDIT-01` COMPLETE:** rechecked pinned body and host model. The 193 B retail body has no error/status branches after allocation or CritSec calls; host model early returns can leave the newly allocated object, initialized handle, or first buffer live. The post-base wrapper propagates the failed result without cleanup. Existing fixtures cover success/replacement only.
+- **OBS:** body/callsite spans and fixture limits are recorded in [E1046](docs/checkpoints/2026-10-31-499f80-failure-cleanup-audit-e1046.md); no source/tests changed. `AllocDispatchContract` and CritSec hooks can attempt host rollback, but failed destroy/free ownership and the early `store_cell` write need a documented host policy.
+- **Decision pending:** host rollback changes behavior outside the observed retail CFG. I asked whether to add host-only rollback with cleanup-result reporting or return explicit partial ownership; dependent code edits are on hold while this preference is pending.
+- Next exact action: continue an independent eligible task; resume `CPU-01-499F80-HOST-FAILURE-ROLLBACK-01` only after the host error policy is settled.
+
+## 2026-10-31 01:09 CDT (root) — E1044: CritSec sidecar contention repair (FIXTURE_VERIFIED)
+
+- **`RE-02-CRITSEC-CONTENTION-01` COMPLETE:** `pthread_mutex_t` now lives in final heap storage owned by `unique_ptr`; no initialized mutex is copied. Lock/unlock calls acquire a per-operation lease under the registry mutex and call pthread outside it. Destroy retains the handle if the mutex is held or another lease is active, and clears the token only after successful destroy.
+- **Verification (PASSED):** worker target build, focused CTest 1/1, and CritSec checker passed. Integrator repeated the focused test 20 times; 20/20 passed. Worker logs: `local/validation/critsec-e1044/`; repeat log: `local/validation/critsec-e1044-integrator/repeat-ctest.log`.
+- **Review limits:** host fixture verifies a two-thread owner/waiter/unlock contention route; it does not establish retail PS4 contention behavior or scheduler equivalence. Type 2 → recursive remains an inference. Slot 414 still records the atexit identity without executing the destroy hook; teardown integration remains a separate limitation. Full CTest/checker sweeps were NOT RUN.
+- **Files:** `native/core/critsec_3b310.cpp`, `native/core/critsec_3b310.hpp`, `native/tests/test_critsec_3b310.cpp`, plus task/evidence/checkpoint/index docs. No CMake or INSTALL_LOG change.
+- Next exact action: keep the 499f80 host-failure policy explicit; E1046 has a separate implementation decision pending.
+
+## 2026-10-31 01:06 CDT (root) — E1045: Trail source-scope refresh (ARTIFACT_VERIFIED)
+
+- **`DOC-TRAIL-SCOPE-INDEX-01` COMPLETE:** persisted `scripts/`, `tools/`, `reference/`, `native/`, `launcher/`, and `tests/` scopes without dropping existing scopes. The initial `trail build --check` failed STALE with 509 launcher nodes added.
+- **Verification (PASSED):** after E1044 restored the CritSec source, a check exposed a stale graph with 509 launcher nodes. Rebuilt Graft and Trail using the same six scopes. Final wiring graph: 2,405 files, 10,951 nodes, 14,519 edges, and 1,804 cards. Both `graft check` and `trail build --check` pass. Trail queries resolve the C++ declaration and implementation for `critsec_lock_at` plus the C++ implementation/header for `run_init_continue_c_after_merge`. Logs: `local/validation/trail-scope-e1045/`. Optional Graft meaning tier remains 0% / 10,951 nodes pending. Project index ran after checkpoint creation and indexed 44,287 folders.
+- **Files:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, `docs/checkpoints/2026-10-31-trail-scope-index-e1045.md`; ignored local Trail graph/cache only. No source/runtime files changed.
+- **Remaining risk:** Trail/Graft graphs are ignored local caches; a fresh checkout must rebuild them. The deep meaning tier was not built. No product gate changes.
+- Next exact action: review the CritSec worker patch and its bounded fixture, then record an integrator checkpoint.
+
+## 2026-10-31 01:03 CDT (root) — E1043: Init driver join 1b/1c (FIXTURE_VERIFIED)
+
+- **`CPU-01-INIT-DRIVER-JOIN-01` COMPLETE:** both alt outcomes now rejoin at `0x532904`; the error preamble uses native `0x91210` when configured, and C starts without replaying that preamble. C→E and C→D→E share route `r12b`; B derives `bl ^ 1` only from known EAX, otherwise stops before E. Unknown alt gate/float joins stop at `0x532904`. `r13` is forwarded from alt to C/E.
+- **Verification (PASSED):** target build `cmake --build local/build/orch-r22 --target test_appmain_init_ctor_98a90_slice -j 12` (exit 0); focused CTest 1/1; alt, continue-C, and merge checkers all OK after the unknown-predicate callback guards. Logs: `local/validation/driver-join-e1043f/`. Earlier CTest log `driver-join-e1043c/` records one stale empty-alt-path expectation; corrected to treat absent branch operands as unknown, then passed. One failed check, no failed semantic hypothesis.
+- **Files:** `native/core/appmain_init_ctor_98a90_slice.{cpp,hpp}`, `native/core/init_531d60_post_base_alt_5327bd.{cpp,hpp}`, `native/tests/test_appmain_init_ctor_98a90_slice.cpp`, task/evidence/checkpoint/index docs. Full CTest and full lift checker sweep **NOT RUN** here. G0-G6 unchanged; no game behavior is inferred.
+- **Independent review finding / next claim `RE-02-CRITSEC-CONTENTION-01`:** E1034's CritSec sidecar copies an initialized `pthread_mutex_t`, and `critsec_lock_at` holds the registry mutex while blocking in `pthread_mutex_lock`, preventing the owner from reaching unlock. The original CritSec task is downgraded to PARTIAL. The `/root/prior_work_audit` worker is claimed on `native/core/critsec_3b310.{cpp,hpp}` and `native/tests/test_critsec_3b310.cpp`; the task board specifies stable storage, per-operation leases, destroy coordination, and a bounded owner/waiter fixture.
+- **Checkpoint artifacts:** [E1043 driver join](docs/checkpoints/2026-10-31-init-driver-join-e1043.md); E1033–E1042 evidence rows are reconciled in `docs/EVIDENCE.md`.
+- Next exact action: review the worker's CritSec patch; run its bounded focused fixture and checker, then record outcome before claiming another task.
+
+## 2026-10-30 08:45 CDT (composer-2.5) — E1042d: Sonnet rank + driver join 1a (FIXTURE_VERIFIED)
+
+- **Sonnet delegate COMPLETE:** [init-next-leverage-sonnet-e1042.md](/Volumes/Extra/SoC Mac Native/docs/checkpoints/2026-10-30-init-next-leverage-sonnet-e1042.md). Top task **`CPU-01-INIT-DRIVER-JOIN-01`** (successors already lifted; fix driver CFG). **1a done:** merge je not-taken / unknown path now runs **D → E → remainder** (OBS: E always entered at `0x5329ae`). Alt→merge (1b), r12b routing (1c), AB native wire (#3), remainder dedup (#4), `499f80` body (#5) still open.
+- **Corrections tracked:** `0xf8f500` = **strcasecmp** (verify slot-306 `StrcmpLess` before `0x21620`); Luna spec landed (21620 still BLOCKED); `53299D-PIN` redundant with batch D — kept as completed pin module.
+- **Verification (PASSED):** `appmain_init_ctor_98a90_slice` ctest. Full suite **NOT RUN**.
+- Next exact action: **1b** alt route continues into C (no double preamble); parallel **strcasecmp** audit on `lookup_1fc80` / fconcmd models.
+
+## 2026-10-30 08:40 CDT (composer-2.5) — E1042c: Luna `0x21620` spec ingested (BLOCKED lift)
+
+- **Luna delegate COMPLETE:** [2026-10-30-init-21620-luna-spec-e1042.md](/Volumes/Extra/SoC Mac Native/docs/checkpoints/2026-10-30-init-21620-luna-spec-e1042.md). **`0x21620` ≠ `lookup_1fc80`** (registry/map; key descriptor at `+0x00`/`+0x08`; node name `+0x20`, value `+0x40`; lock calls `0x3b390`/`0x3b3c0`). Full body **464 B** (`a7ba043b…`); hot **449 B** (`787bf4ad…`). **Do not implement** until stop rules cleared (descriptor at both callsites, tree/fallback, lock lifetime).
+- **Integrator ingest:** `native/core/lookup_21620.hpp` (pins only, explicit NOT IMPLEMENTED); `tools/lift/check_lookup_21620.py` (464 B + lock call sites; asserts no `lookup_21620.cpp`). **`CPU-01-INIT-21620-LOOKUP-01` → BLOCKED.**
+- **Verification (PASSED):** `python3 tools/lift/check_lookup_21620.py` OK.
+- **Still ACTIVE:** Sonnet leverage rank memo.
+- Next exact action: bounded contract pass on key descriptor at `0x91227` vs `0x53327d`; reuse `insert_21cd0` lock-hook pattern for `0x3b390`/`0x3b3c0` only after owner cell is pinned.
+
+## 2026-10-30 08:38 CDT (composer-2.5) — E1042b: merge fall-through pin (FIXTURE_VERIFIED)
+
+- **Composer 2.5 delegate `CPU-01-INIT-53299D-PIN-01` (FIXTURE_VERIFIED):** `run_init_continue_c_after_merge` chains continue-C → batch D on merge `je` not taken or outcome unmodelled (matches slice policy). Span **`0x53299d..0x5329ae`** (17 B, E535); static_assert ties `kInit531d60PostBaseContinueCEndRva`. Files: `init_531d60_post_base_continue_c_after_merge.{hpp,cpp}`, `test_init_continue_c_after_merge`, `check_f531d60_post_base_continue_c_after_merge.py`.
+- **Verification (PASSED):** `init_continue_c_after_merge` + `appmain_init_ctor_98a90_slice` ctest 2/2; checker OK (region `6f4e5fa8…`). Full suite **NOT RUN**.
+- **Still ACTIVE:** Luna `CPU-01-INIT-21620-SPEC-01`; Sonnet `CPU-01-INIT-NEXT-LEVERAGE-01`. **`engine_ready=0`.**
+- Next exact action: ingest Luna/Sonnet checkpoints → **`CPU-01-INIT-21620-LOOKUP-01`** per rank.
+
+## 2026-10-30 08:35 CDT (composer-2.5) — E1042: multi-model orchestration (ACTIVE)
+
+- Owner asked to use **Codex Luna**, **Claude Sonnet (CLI)**, and **Composer 2.5** sub-agents on the Mac port goal (`engine_ready=0`; finish line unchanged).
+- **Delegates launched (async, shared checkout):**
+  1. **Luna** `CPU-01-INIT-21620-SPEC-01` — **COMPLETE (E1042c):** [memo](docs/checkpoints/2026-10-30-init-21620-luna-spec-e1042.md); native lift **blocked**; checker + contract header added.
+  2. **Sonnet ultrathink** — **COMPLETE (E1042d):** [memo](docs/checkpoints/2026-10-30-init-next-leverage-sonnet-e1042.md); driver join **1a** implemented.
+  3. **Composer 2.5 worker** — **COMPLETE (E1042b):** `CPU-01-INIT-53299D-PIN-01` — `run_init_continue_c_after_merge` + checker.
+- **Integrator (this turn):** orchestration checkpoint only until delegate memos land; no false port-complete claims. Slot **309** still deferred.
+- Next exact action: ingest Luna + Sonnet checkpoints → claim **`CPU-01-INIT-21620-LOOKUP-01`** or successor pin per Sonnet rank; merge Composer worker diff if any.
+
+## 2026-10-30 08:30 CDT (grok-4.7) — E1041: continue-C calls `0x91210` (FIXTURE_VERIFIED)
+
+- **`CPU-01-INIT-91210-CONTINUE-C-01`:** `use_native_lazy_bind_91210` runs `run_lazy_bind_91210(demo_object)` at the preamble slot-0 site and the three merge-block slot-0 sites. After a bind, a null host flag slot reads `*(*(demo_object+0x28)+0x60)`. That byte sets `sete sil` and `merge_branch_taken` (taken when the byte is 0). Default slice hooks are unchanged (`branch_outcome_modelled` stays false; successors `0x53299d` / `0x5329ae` stay unmodelled). Missing bind hooks fail closed. **`engine_ready=0`.**
+- **Verification (PASSED):** `test_init_continue_c_lazy_bind`, `test_appmain_init_ctor_98a90_slice`, `check_f531d60_post_base_continue_c.py`. Full CTest **NOT RUN**.
+- Next exact action: lift `0x21620` (the name lookup `0x91210` still hooks), or one successor block at `0x53299d` / `0x5329ae`. Slot **309** still deferred.
+
+## 2026-10-30 08:20 CDT (grok-4.7) — E1040: `0x91210` lazy bind (FIXTURE_VERIFIED)
+
+- Goal recorded: finish the Mac native port (cold boot, game audio, save/reload, direct Metal, no guest runtime). **Not met.** `engine_ready=0`.
+- **`CPU-01-INIT-91210-LAZY-BIND-01`:** `run_lazy_bind_91210` models the 0x58 B accessor. Fast path returns 1 when `this+0x28` is already set. Slow path calls hooked `0x21620(this+8)`, requires vtable `+0x18` == 1, then stores the sub-object. **Byte correction vs E530:** `test eax,eax; je +8` means vtable `+0x30` **zero keeps** the bind and nonzero clears `+0x28`. Not wired into continue-C (that call site still passes a host cell, not this object). Checker `tools/lift/check_lazy_bind_91210.py`.
+- **Verification (PASSED):** `test_lazy_bind_91210`; `check_lazy_bind_91210.py`. Full CTest **NOT RUN**.
+- Next exact action: give continue-C a real `0x2efe318` object and call `run_lazy_bind_91210` from the three slot-0 sites, then model `je 0x5329ae` from the bound `+0x60` byte. `0x21620` body still a hook.
+
+## 2026-10-30 08:10 CDT (grok-4.7) — E1039: continue-A `0x1fc80` feeds continue-B (FIXTURE_VERIFIED)
+
+- **`CPU-01-INIT-1FC80-CONTINUE-AB-01` (FIXTURE_VERIFIED):** `0x1fc80` was already `lookup_1fc80` (0x98-stride name at `+0x28`). Continue-A now optionally runs that lookup (`use_native_lookup_1fc80` + host `"nointro"` needle, strcasecmp via the same PLT stand-in). Known null rax models `je 0x5327bd` as taken; a hit leaves rax as the config object. **`run_init_continue_ab_native_lookups`** then runs continue-B with `config_bool_lookup_init_continue_b`. Default slice hooks stay unmodelled (`branch_outcome_modelled` stays false). Successor blocks `0x53277f` / `0x5327bd` / `0x5328e0` stay unmodelled. **`engine_ready=0` unchanged.**
+- **Verification (PASSED):** `test_init_continue_ab_native`, `test_appmain_init_ctor_98a90_slice`, `check_f531d60_post_base_continue_a.py`, `check_config_bool_lookup_1e4c0.py`. Full CTest **NOT RUN** this checkpoint (new test registered).
+- Next exact action: model one successor after the proven boolean (`0x5328e0` or `0x532904`), or the next ranked Init hook (`0x91210`). Slot **309** still deferred.
+
+## 2026-10-30 01:12 CDT (composer-2.5) — E1038: shared `0x1e4c0` config lookup (FIXTURE_VERIFIED)
+
+- **`CPU-01-INIT-1E4C0-SHARED-LOOKUP-01` (FIXTURE_VERIFIED):** Added `native/core/config_bool_lookup_1e4c0.{hpp,cpp}` — E524 value parse (`true`/`yes`/`false`/`no` + decimal), config-object table at `+0x30/+0x38`, args-span 16 B `{name,value}` records; `config_bool_lookup_init_continue_b` for Init continue-B; `default_native_sndx_get_bool_arg_hooks()`. **`run_sndx_handler`** uses native span lookup when `get_bool_arg` hook absent (custom hook still wins). Tests: `test_config_bool_lookup_1e4c0`, updated `test_sndx_command_handlers`. Checker: `tools/lift/check_config_bool_lookup_1e4c0.py` pins **0x140 B** body `1188f851…` (E524; slot306 checker keeps separate **0x118** extent pin).
+- **Verification (PASSED):** `cmake --build local/build/orch-r22` exit 0; CTest **491/491**; `check_config_bool_lookup_1e4c0.py` OK; full lift suite **NOT RUN** this checkpoint. **`engine_ready=0` unchanged.**
+- Next exact action: **`CPU-01-INIT-1FC80-LOOKUP-01`** or Init slice wiring to call `config_bool_lookup_init_continue_b` without stub hook; **`0x56dcb0`** chain after post-base body; slot **309** still deferred per E1033 merge.
+
+## 2026-10-30 00:58 CDT (composer-2.5) — E1036: wire 0x499f80 body into post-base (FIXTURE_VERIFIED)
+
+- Owner asked to continue until the **full game is ported**. **Honest status:** that goal is **not achievable in a single agent session** (or current project phase). The product still has **no engine**, **no cold boot**, **no game audio**, **no save/reload**, and **no Metal gameplay frame** (`ROADMAP.md` / `VALIDATION.md` G5 NOT RUN). Coverage remains **449/573** ctor slots with gap **309**; **36+ Init hooks** unmodelled per E1035. Continuing means **incremental native lifts**, not claiming completion.
+- **E1036 wiring:** `Init531d60PostBase499f80Hooks` accepts optional `body_globals` + `body_hooks`; when set, `init_531d60_post_base_499f80` runs `run_init_499f80_body` after the E446 call-site pin. Default slice tests unchanged (hook-only). **`engine_ready=0` unchanged.**
+- **Parallel:** Luna delegate started for **0x1e4c0** config lookup — <t3-thread://v2/2ba8e621-35d3-4e6b-8af7-8383f3606600/thread:delegated-task:command%3Amcp%3Ab19eb2cb-a066-4439-bf05-5c8a69f31511%3Adelegate-task%3A67ca8f47-595e-424e-8b72-d1e1ebb3aefa> — **COMPLETE (E1037):** defer implementation; spec + test plan recorded. **Reconcile:** E524 already pins config-object 16 B `{name_ptr,value_ptr}` at `obj+0x30..+0x38`; sndx args vector is a **separate** entry shape — next task **`CPU-01-INIT-1E4C0-SHARED-LOOKUP-01`** ([checkpoint](docs/checkpoints/2026-10-30-init-1e4c0-luna-spec-e1037.md)).
+- **Verification:** build exit 0; `appmain_init_ctor_98a90_slice` + critsec + init_499f80_body tests **PASSED**. Full suite/checkers **NOT RUN** this micro-checkpoint.
+- Next exact action: **`CPU-01-INIT-1E4C0-SHARED-LOOKUP-01`** (value parser + dual entry paths) or add post-base **body_globals** fixture test; **no false port-complete claims**.
+
+## 2026-10-30 00:48 CDT (composer-2.5) — E1034: CritSec + 0x499f80 body native (FIXTURE_VERIFIED)
+
+- Continued after provider/delegate failures; multi-model direction from E1033 stands. **`engine_ready=0`**; `sotc_core_start()` still `SOTC_ERR_ENGINE_NOT_IMPLEMENTED`; G1 PARTIAL only.
+- **`RE-02-CRITSEC-3B310-3B380-NATIVE-01` (FIXTURE_VERIFIED):** Added `native/core/critsec_3b310.{hpp,cpp}` — 8 B opaque token + sidecar plain `PTHREAD_MUTEX_RECURSIVE` (**no** prio inherit); `Slot414Hooks` gains optional `mutex_destroy_3b380`; `default_critsec_slot414_hooks()`. Slot **535** lane uses `CritSecHandle` instead of `RecursiveMutex`. Tests: `test_critsec_3b310`, updated `test_ctor_slot_535`. Checker: `tools/lift/check_critsec_3b310_3b380.py`.
+- **`CPU-01-499F80-BODY-NATIVE-01` (FIXTURE_VERIFIED):** Added `native/core/init_499f80_body.{hpp,cpp}` + `test_init_499f80_body` + `tools/lift/check_init_499f80_body.py`. Models E1031 body (globals as host cells, `alloc_wrappers_17070`, CritSec, old-object release). Does **not** wire Init slice or chain `0x56dcb0`.
+- **Verification (PASSED):** `cmake --build local/build/orch-r22` exit 0; CTest **489/489**; lift checkers **574/574** (after checker header fix). Trail/project-index/audit **NOT RUN** this checkpoint.
+- **Haiku hook inventory (E1035, STATIC_ANALYSIS_VERIFIED):** 36 unmodelled Init hook callees + slot 309 row; top leverage after E1034: **(1) config lookup `0x1e4c0`/`0x1fc80`/`0x91210`**, **(2) CritSec/`0x499f80` done**, **(3) pthread create `0xa52530`**, save-data cluster, pool `0x21cd0`. Checkpoint [E1035](docs/checkpoints/2026-10-30-init-hook-inventory-e1035.md). **`0x499f80` body still hook-only in Init slice** until wired.
+- **Pending:** slot **309** lift still waits on principal; uncommitted E1033–E1035 docs + product sources.
+- Next exact action: wire `run_init_499f80_body` into Init slice / post-base hooks; or start **config lookup** native module (`0x1e4c0` family); run full AGENTS publication suite before push.
+
+## 2026-10-30 00:35 CDT (composer-2.5) — E1033: multi-model orchestration restart (ACTIVE)
+
+- Owner (Johnny) resumed work with Codex **GPT-6 Luna**, Claude **Haiku**, two **Sonnet ultrathink** direction runs, and **Composer 2.5** as integrator. VoiceOver out of scope; target native ARM64/Metal game startup without forbidden runtimes. Engine gate unchanged (`SOTC_ERR_ENGINE_NOT_IMPLEMENTED`); Haiku **487/487** CTest green.
+- **Two Sonnet memos (both COMPLETE) conflict on slot 309:** (A) register **309 first** for coverage 449→450; (B) **do not pivot to 309** without new order evidence — prioritize **shared contracts** then leverage-ranked lifts. **Integrator merge:** adopt (B) for **implementation order**; keep 309 as **coverage metric** and E1015–E1030 “unregistered until ranked” unless Johnny re-authorizes (A).
+- **Sonnet async memo (E1033-SONNET-B, bytes from saved `all.dis`):** `0x3b310` = attr init, settype **2**, mutex init `"CritSec"`, attr destroy; **both import results discarded** (no recoverable failure semantics; host fail-closed is stricter). `0x3b380` = jmp destroy; **`0x3b380` already atexit identity** in slots 414/535 (corrects E1032 “no paired destroy”). **`RecursiveMutex` wrong** (adds `PTHREAD_PRIO_INHERIT`). Blocker **smaller than E1032** — hook-bounded lift follows convention. **No further REA/Luna** for CritSec; REA stalls are not semantic failures. **`0x499f80`:** right as **next small step**, wrong as **boot critical path** (ctors → main → Init; E446 hooks ≠ behavior coverage).
+- **Adopted task sequence (merged):** (1) **`RE-02-CRITSEC-3B310-3B380-NATIVE-01`** — native CritSec + byte checkers + `Slot414Hooks` destroy pairing; stop if saved disasm shows inline handle dereference. (2) **`CPU-01-499F80-BODY-NATIVE-01`** — 193 B body + checker; offset-only globals; **do not** auto-chain `0x56dcb0`. (3) **`CPU-01-INIT-531D60-HOOK-INVENTORY-01`** — offline leverage table (Init + 309), no lifts. **`CPU-01-STARTUP-SLOT-309-NATIVE-LIFT-01`** waits on inventory/principal.
+- **Haiku (E1033-HAIKU):** gate at `sotc_core.cpp:380-385`; body in **separate module**, not `init_531d60_post_base_499f80.cpp`.
+- **Luna mutex research (E1033-LUNA, STATIC_ANALYSIS_VERIFIED, no edits):** Pinned ELF + `llvm-objdump` `0x3b310`–`0x3b3a0` agrees with E1032/Sonnet B (attr init, **type 2**, init `"CritSec"`, attr destroy; **no wrapper return checks**; `0x3b380` → destroy import). REA procedure queries **stalled** — no Evidence IDs; static disassembly only. Luna conclusion: **ABI/lifetime not proven enough to implement** without sidecar opaque `uint64_t` + registry design and consumer lock contract. **Integrator merge with Sonnet B:** implementation may proceed only as **hook-bounded native module with open inference** (same disclosure standard as `ctor_slot_535_138e20.hpp`: type-2 → recursive **inference**, host fail-closed stricter than original, destroy via atexit identity). Luna’s sidecar layout is the preferred shape if the 8 B field must stay opaque at game offsets. Stop implement if saved-disasm census finds **inline handle byte dereferences** (Sonnet B stop rule). Luna does **not** reopen REA for CritSec.
+- **Doc fixes this checkpoint:** `ROADMAP.md` operating plan (shared contracts + inventory; HANDOFF-only plan; slot-23 fixture caveat). **Still open:** stale slot-23 “unregistered” rows in deep `TASKS`/`HANDOFF` history (Sonnet B item 2); `TASKS` line 3 “no native game” vs lifted fixtures (labeling only).
+- **Commit policy:** owner user rule — **no commit/push unless requested** (overrides AGENTS default for this session). No assistant attribution trailers on owner commits.
+- Next exact action (Composer): claim **`RE-02-CRITSEC-3B310-3B380-NATIVE-01`** — implement `CritSec` module, checkers, wire hooks; full verification before publication. **`engine_ready=0`**. AGENTS gate suite **NOT RUN** until code lands.
+- Files changed (uncommitted): `HANDOFF.md`, `ROADMAP.md`, `docs/TASKS.md`.
+
 ## 2026-10-30 00:11 CDT (/root) — E1032: `0x499f80` callee-contract boundary (PARTIAL)
 
 - User explicitly requested a good stopping point and to stop the goal. Actual game startup remains the objective; VoiceOver/accessibility is out of scope. The goal will be paused after this docs-only checkpoint is pushed.

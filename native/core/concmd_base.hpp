@@ -11,7 +11,8 @@
 //        null     -> link `this+8` at the TAIL of the global pending list `0x2dfce50/58`
 //                    (lazily initialised under the Itanium guard byte `0x2dfce60`)  [NATIVE]
 //        non-null -> lock `manager+0x58` (0x3b390), `std::map<const char*, ConCmd*>` insert keyed by
-//                    the name pointer under strcmp (0x211d0 / 0xf8f500), unlock (0x3b3c0)
+//                    the name pointer under the `strcasecmp`-labeled import (NID-name inference),
+//                    unlock (0x3b3c0)
 //                    [CONTRACT: hook `ConCmdManagerContract::insert`]
 //
 // Why the null path is the honest startup path: the manager cell is zero-fill `.bss`. Its only
@@ -81,7 +82,7 @@ struct ConCmdBase {
     std::uint8_t registered;     // +0x18  register-once flag
     std::uint8_t gap19[3];       // +0x19  never touched
     std::uint32_t flags;         // +0x1c  ecx of the constructor (1 at the startup variables, 2 at resource_dump)
-    SharedStr name;              // +0x20  lookup key: the manager compares the first qword with strcmp
+    SharedStr name;              // +0x20  lookup key: manager comparator import is labeled strcasecmp (inference)
     SharedStr description;       // +0x40  second view (empty at every observed site; role inferred)
 };
 static_assert(sizeof(ConCmdBase) == 0x60);

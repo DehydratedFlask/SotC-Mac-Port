@@ -13,7 +13,13 @@ Init531d60PostBase499f80Result init_531d60_post_base_499f80(
     // OBS: test al,al already satisfied by caller (base_ok); jz fail not taken.
     // OBS: lea rdi, [r12+0x3c70]; call 0x499f80
     out.arg = static_cast<std::uint8_t*>(self) + kInit531d60PostBase499f80ArgOff;
-    if (hooks.call_499f80 != nullptr) {
+    if (hooks.body_globals != nullptr) {
+        out.body = run_init_499f80_body(out.arg, *hooks.body_globals, hooks.body_hooks);
+        out.body_native = out.body.ok;
+        if (!out.body.ok) {
+            return out;
+        }
+    } else if (hooks.call_499f80 != nullptr) {
         hooks.call_499f80(out.arg);
     }
     ++out.call_499f80_count;

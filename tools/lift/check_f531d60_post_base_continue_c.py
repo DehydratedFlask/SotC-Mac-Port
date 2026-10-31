@@ -223,9 +223,10 @@ def main() -> int:
         f"vcalls=3 (slot0 @[0x2efe318]); "
         f"lea=0x32f8b80/0x2efe318/0x32f6d18 pinned; "
         f"globals=0x2efe318x3/0x2efe340x3 pinned; "
-        f"je8@{BRANCH_RVA:#x}->{BRANCH_TARGET:#x} target pinned (outcome NOT modelled); "
+        f"je8@{BRANCH_RVA:#x}->{BRANCH_TARGET:#x} target pinned "
+        f"(default outcome unmodelled; known flag byte models taken iff zero); "
         f"end={END:#x}; "
-        f"callee_bodies/je_outcome/0x53299d_block/0x5329ae_block/"
+        f"a52b70_body/a599e0_body/a431e0_body/0x53299d_block/0x5329ae_block/"
         f"incoming_r14b/r15_provenance NOT claimed"
     )
     return 0

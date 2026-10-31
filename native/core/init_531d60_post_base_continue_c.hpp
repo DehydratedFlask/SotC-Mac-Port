@@ -63,11 +63,15 @@
 //     esi = (byte at [0x2efe340]->[+0x60]->byte == 0).
 //
 // NOT modelled (do not read as semantics):
-//   * bodies of 0xa52b70 / 0xa599e0 / 0xa431e0 and the vtable slot-0 callee —
-//     hooks are host stand-ins, null hook => no-op;
-//   * the `cmp byte [rax],0` flag value for the third iteration and the `je`
-//     outcome, plus BOTH successors (`0x53299d` fall-through block, whose head is
-//     `lea rax,[0x32f79a8]`, and `0x5329ae` branch target);
+//   * bodies of 0xa52b70 / 0xa599e0 / 0xa431e0. The vtable slot-0 callee stays a
+//     counting hook unless `use_native_lazy_bind_91210` is set, in which case
+//     `run_lazy_bind_91210` binds `demo_object+0x28` and the flag byte is
+//     `*(*(demo_object+0x28)+0x60)`;
+//   * BOTH successors (`0x53299d` fall-through block, whose head is
+//     `lea rax,[0x32f79a8]`, and `0x5329ae` branch target). The `je` outcome is
+//     modelled only when merge_flag_byte is supplied (taken when byte is 0).
+//     Execution of batch D/E is composed in `appmain_init_ctor_98a90_slice` (E535/E536),
+//     not inside this module's runner.
 //   * the incoming r15 and r14b provenance (r14b is 0 on the fall-through path
 //     and the `sete r14b` result on the `0x5328e0` taken path — both upstream);
 //   * the pointer values held in globals 0x32f8b80 / 0x32f6d18 / 0x2efe318 /
@@ -81,6 +85,8 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+
+#include "lazy_bind_91210.hpp"
 
 namespace sotc {
 
@@ -236,6 +242,13 @@ struct Init531d60PostBaseContinueCHooks {
     void (*vcall_slot0)(void* rdi, std::uint8_t esi) = nullptr;
     // Resolved [0x2efe340]+0x60 byte for the merge `je 0x5329ae` (0x532998).
     const std::uint8_t* merge_flag_byte = nullptr;
+
+    // When set, the slot-0 sites call run_lazy_bind_91210(demo_object).
+    // demo_object is the 0x2efe318 object (bound pointer at +0x28).
+    // A resolved `*(*(object+0x28)+0x60)` fills any null flag-byte slot.
+    bool use_native_lazy_bind_91210 = false;
+    void* demo_object = nullptr;
+    LazyBind91210Hooks lazy_bind{};
 };
 
 struct Init531d60PostBaseContinueCResult {
@@ -273,6 +286,10 @@ struct Init531d60PostBaseContinueCResult {
     // Effective value consumed by 0x532904 movzx esi,r14b (preamble result when
     // the taken path ran, else incoming_r14b).
     std::uint8_t first_esi = 0;
+    // Native 0x91210 invocations (preamble plus the three merge-block sites).
+    int lazy_bind_calls = 0;
+    int lazy_bind_last_returned = 0;
+    bool lazy_bind_ok = false;
 };
 
 // Runs the OBS `0x532904..0x53299d` unit sequence on the measured Init path.

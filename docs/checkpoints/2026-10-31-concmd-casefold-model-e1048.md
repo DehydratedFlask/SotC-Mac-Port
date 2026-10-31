@@ -1,0 +1,22 @@
+# ConCmd case-insensitive model correction — E1048
+
+- **Local time / agent:** 2026-10-31 01:24 CDT, `/root`
+- **Task:** `CPU-01-CONCMD-CASEFOLD-MODEL-01`
+- **Status:** COMPLETE / `FIXTURE_VERIFIED`; failed implementation hypotheses: 0.
+- **Scope:** update only the bounded slot-306 ConCmd manager model to use the comparator named by E1047's hash-bound import manifest; preserve that the NID-derived name is an inference. Add case-only duplicate insertion and erase fixture coverage. No real manager, runtime binding, or game claim.
+- **Files changed:** `native/core/fconcmd_object_slot306.cpp`, `native/core/fconcmd_object_slot306.hpp`, `native/core/concmd_base.cpp`, `native/core/concmd_base.hpp`, `native/tests/test_fconcmd_object_slot306.cpp`; `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, this checkpoint. Graft/Trail caches are ignored local artifacts.
+- **Exact implementation:** `FConCmdManagerModel::CaseInsensitiveLess::operator()` calls `::strcasecmp(a, b) < 0`. Case-only duplicate insertion keeps the first entry; key-only erase through destruction removes the comparator-equivalent key. Comments distinguish observed import label from inferred API behavior.
+- **Verification (PASSED):**
+  - `cmake --build local/build/orch-r22 --target test_fconcmd_object_slot306 -j 12` — exit 0, 108 build steps.
+  - `ctest --test-dir local/build/orch-r22 -R '^fconcmd_object_slot306$' --output-on-failure` — exit 0, 1/1.
+  - `python3 tools/lift/check_fconcmd_object_slot306.py` — exit 0, OK.
+  - `graft build --only-dir scripts --only-dir tools --only-dir reference --only-dir native --only-dir launcher --only-dir tests` and matching `trail build` — exit 0, 2,405 files, 10,951 nodes, 14,519 edges, 1,804 cards.
+  - `graft check` and `trail build --check` — exit 0, wiring graphs in sync. `trail grep 'CaseInsensitiveLess' --in native/core/` finds the implementation and declaration/map type.
+- `python3 scripts/project_index.py` — exit 0, 44,292 folders indexed; `git diff --check` passed.
+- **Combined full verification (PASSED before the next task):** `cmake -S native -B local/build/orch-r22` exit 0; full build 596 steps; CTest 495/495; `SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh` reports 578 passed, 0 skipped, 0 failed. Logs: `local/validation/e1048-publication/{configure.log,build.log,ctest.log,checkers.log}`. These results cover accumulated pending changes through E1048, not real game execution.
+- **Prepublication checks (PASSED):** final all-path publication audit accepted 3,454 paths, staged-path audit accepted 67 paths, and commit-attribution audit passed for `origin/main..HEAD`. The initial staged diff check found trailing whitespace on two date lines in the E1035/E1037 checkpoint files; only those trailing spaces were removed, then the final staged diff check passed. Logs: `local/validation/e1048-publication/`.
+- **Evidence and logs:** focused target logs `local/validation/concmd-casefold-e1048/{build.log,ctest.log,checker.log}`; graph check/query logs `graft-check.log`, `trail-check.log`, and `trail-grep.log` in the same directory. Trail query reports approximately 8,180 saved tokens.
+- **Observations:** the case-only fixture assertions pass for the host map model. E1047 provides static call-target and hash-bound NID-label evidence.
+- **Inference / limits:** case-fold semantics are inferred from the imported NID's conventional `strcasecmp` name. No runtime import binding, actual manager lifecycle, or game behavior was verified. Full CTest and lift-checker sweeps NOT RUN; Graft/Trail deep meaning tier NOT RUN. `lookup_1fc80` remains a separate comparator follow-up.
+- **Remaining risk:** host model behavior is bounded to fixture inputs; platform locale details and retail runtime behavior were not tested.
+- **Next exact action:** select another independent bounded task; do not change `0x499f80` failure ownership until the user's preference arrives.

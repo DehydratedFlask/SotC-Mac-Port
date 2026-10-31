@@ -174,10 +174,11 @@ def main() -> int:
         f"units={len(UNITS)} region={REGION_SHA256[:12]}…; "
         f"calls=0xf590/0xa2ea00/0xa2e5d0/0xa543b0/0x1fc80 pinned; "
         f"lea=0x32f79a8/0x32f84f8/0x1014d69 pinned; "
-        f"je@{BRANCH_RVA:#x}->{BRANCH_TARGET:#x} target pinned (outcome NOT modelled); "
+        f"je@{BRANCH_RVA:#x}->{BRANCH_TARGET:#x} target pinned "
+        f"(default outcome unmodelled; known 0x1fc80 rax models taken iff null); "
         f"end={END:#x}; "
-        f"f590_body/a2ea00_body/a2e5d0_body/a543b0_body/1fc80_body/"
-        f"je_outcome/0x53277f_block/0x5327bd_block/incoming_r13/r15/"
+        f"f590_body/a2ea00_body/a2e5d0_body/a543b0_body/"
+        f"0x53277f_block/0x5327bd_block/incoming_r13/r15/"
         f"32f79a8_layout/32f84f8_layout/1014d69_data/stack_frame NOT claimed"
     )
     return 0

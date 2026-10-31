@@ -295,10 +295,11 @@ struct FConCmdDtorResult {
 
 // ---- behavioural model of the non-null manager (0x20d80 manager path, 0x213b0) ------------------------
 // The original is a map from a SharedStr key to ConCmd* guarded by the mutex at manager+0x58:
-//   insert (0x20d80): lower-bound by strcmp(node.key.data, name.data); if the key is absent the key
+//   insert (0x20d80): lower-bound by the `strcasecmp`-labeled import (NID-name inference) on
+//     node.key.data and name.data; if the key is absent the key
 //     (a SharedStr copy, control counter acquired) and `cmd` are inserted; if present NOTHING is
 //     overwritten (first registration wins).
-//   erase  (0x213b0): lower-bound by strcmp; if found, size -= 1, unlink the node, release the key
+//   erase  (0x213b0): lower-bound by the same imported comparator; if found, size -= 1, unlink the node, release the key
 //     (0xf590), free the node, return 1; otherwise return 0. The lookup is by KEY ONLY, so destroying
 //     a command whose name was already taken erases the OTHER command's entry.
 // This class reproduces that behaviour only. The red-black node layout, 0x211d0 and 0x42f50 are not
@@ -317,7 +318,7 @@ public:
     [[nodiscard]] bool failed() const noexcept { return failed_; }   // sticky: an allocation/release failed
 
 private:
-    struct StrcmpLess {
+    struct CaseInsensitiveLess {
         bool operator()(const char* a, const char* b) const noexcept;
     };
     struct Entry {
@@ -326,7 +327,7 @@ private:
     };
     SharedReleaseF590Hooks key_release_hooks_;
     mutable std::mutex lock_;
-    std::map<const char*, Entry, StrcmpLess> map_;
+    std::map<const char*, Entry, CaseInsensitiveLess> map_;
     bool failed_ = false;
 };
 

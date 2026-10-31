@@ -10,18 +10,17 @@
 // bytes +0x00..+0x07 are NEVER written; +0x08..+0x17 get one 16 B zero store and +0x18..+0x1f one qword zero;
 // __cxa_atexit(0x138370, obj) -- 0x138370 (50 B) frees [obj+8] through 0x170b0 and re-zeroes 0x18 B (a tag here).
 //
-// NATIVE STAND-IN (INFERENCE, stated openly): the PS4 mutex handle is replaced by the host RecursiveMutex
-// (core/recursive_mutex): settype 2 is read as the FreeBSD/PS4 RECURSIVE constant (inference from the Sony ABI, not
-// observed in the image), the "CritSec" debug name has no host counterpart, and RecursiveMutex additionally sets
-// PTHREAD_PRIO_INHERIT. The consumers of the lock and of the object (a lazily filled buffer, by the destructor's
-// shape: inference) are NOT modelled.
+// NATIVE STAND-IN (INFERENCE, stated openly): the PS4 mutex handle is replaced by `CritSecHandle`
+// (core/critsec_3b310): 8-byte opaque token + sidecar plain recursive mutex (no priority inheritance).
+// Type 2 is read as PTHREAD_MUTEX_RECURSIVE (FreeBSD/PS4 inference, not observed in the image).
+// The "CritSec" debug name has no host counterpart. Consumers of the lock and of the object remain hooks.
 #pragma once
 
 #include <cstddef>
 #include <cstdint>
 
 #include "concmd_base.hpp"
-#include "recursive_mutex.hpp"
+#include "critsec_3b310.hpp"
 
 namespace sotc {
 
@@ -37,7 +36,7 @@ inline constexpr std::size_t kLaneM5Slot535ObjectSize = 0x20;
 enum class Slot535Stage : std::uint8_t { none, mutex_init, mutex_atexit, object_atexit };
 
 struct Slot535Objects {
-    RecursiveMutex mutex;                         // 0x2ee14f0 (host stand-in for the 8 B PS4 handle)
+    CritSecHandle mutex;                         // 0x2ee14f0 (8 B opaque handle)
     std::uint8_t object[kLaneM5Slot535ObjectSize];      // 0x2ee14f8 (+0x00 never written)
 };
 

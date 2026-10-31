@@ -114,10 +114,8 @@ struct SndxCategoryVectorSpan {
 
 // ---- hooks (fail closed; a missing hook is a named failure, never silent success) -----------------
 
-// 0x1e4c0 model. `lookup` implements the observed semantics: case-insensitive strcasecmp token
-// compare ("true"/"yes" -> 1, "false"/"no" -> 0, else _Stoul(text, 0, 10) != 0) against the
-// selected 16-byte argument record; absent/out-of-range returns default_value. The record layout
-// itself is not lifted, so the host supplies the parse.
+// 0x1e4c0 model. `lookup` may implement the observed semantics, or leave null and let
+// run_sndx_handler use config_bool_lookup_args_span (same token/decimal rules).
 struct SndxGetBoolArgHooks {
     bool (*lookup)(void* host, const SndxArgsSpan& args, std::size_t index, bool default_value) = nullptr;
     void* host = nullptr;

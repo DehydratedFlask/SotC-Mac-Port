@@ -51,7 +51,8 @@ ConCmdRegisterResult register_concmd_20d60(ConCmdBase& cmd, ConCmdRegistry& regi
 
     // 0x20d72: rsi = [0x2dfcbc8]; jmp 0x20d80
     if (registry.manager.manager != nullptr) {
-        // 0x20dae..0x20e76: lock manager+0x58, std::map insert keyed by name.data under strcmp, unlock.
+        // 0x20dae..0x20e76: lock manager+0x58, std::map insert keyed by name.data under the
+        // `strcasecmp`-labeled import (NID-name inference), unlock.
         out.path = ConCmdRegisterPath::manager;
         if (registry.manager.insert == nullptr) return out;   // contract missing: ok stays false
         out.ok = registry.manager.insert(registry.manager.manager, cmd);

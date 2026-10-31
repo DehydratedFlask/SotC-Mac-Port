@@ -89,6 +89,7 @@
     } while (0)
 
 void run_alt_5327bd_tests();
+void run_alt_join_route_tests();
 
 using namespace sotc;
 
@@ -834,6 +835,19 @@ void* g_cont_e_54b250_obj = nullptr;
 std::uint8_t g_boss_flag_cell = 0x01;   // match E418 file value
 void* g_cell_2eff450_value = nullptr;
 void* g_cont_e_r13 = nullptr;
+
+int g_alt_ac5260_calls = 0;
+int g_alt_3e7e0_calls = 0;
+int g_alt_4c4950_zero_calls = 0;
+int g_alt_4c4950_one_calls = 0;
+void hook_alt_ac5260(void*, void*, int) { ++g_alt_ac5260_calls; }
+void hook_alt_3e7e0(int, int, int, int, const void*, const void*, void*) {
+    ++g_alt_3e7e0_calls;
+}
+void hook_alt_4c4950(int edi) {
+    if (edi == 0) ++g_alt_4c4950_zero_calls;
+    if (edi == 1) ++g_alt_4c4950_one_calls;
+}
 
 void hook_cont_e_a54920(void* parent, void* name, void* descriptor) {
     int n = g_cont_e_a54920;
@@ -2421,8 +2435,7 @@ int main() {
     // E511: grouped Init continue C 0x532904..0x53299d — 38 units, 3 direct calls,
     // 3 vtable slot-0 dispatches, 3 lea, 6 global loads; je8 target pinned but
     // outcome NOT modelled.
-    // E536: with no merge flag byte the outcome is unknown, so the fall-through runs and
-    // no stop flag is set.
+    // E536: with no merge flag byte the outcome is unknown; driver runs D then E then remainder.
     CHECK(!r.post_base_continue_c.merge_branch_outcome_modelled);
     CHECK(!r.init_branch_5329ae_taken);
     CHECK(!r.init_stopped_at_5329ae);
@@ -2443,6 +2456,15 @@ int main() {
     CHECK(g_capture_a473b0.video_calls == 2);
     CHECK(r.post_base_continue_d.end_rva == 0x5329ae);
 
+    // E1042 / CPU-01-INIT-DRIVER-JOIN-01: fall-through runs D then E (53 units) before remainder.
+    CHECK(r.post_base_continue_e.ok);
+    CHECK(r.post_base_continue_e.unit_executed == kInit531d60PostBaseContinueEUnitCount);
+    CHECK(kInit531d60PostBaseContinueEUnitCount == 53);
+    CHECK(g_cont_e_a54920 == 3);  // pbce hooks: three save-data ctor calls on D→E path
+    CHECK(r.init_r12b_known);
+    CHECK(r.init_r12b_out == 0xA7);  // continue-B bl(0xA6) xor 1 feeds continue-E
+    CHECK(g_boss_flag_cell == 0xA7);
+
     // Hook fallback: without a CaptureServices interface the raw call_a473b0 hook runs.
     {
         g_cont_d_call = 0;
@@ -2461,6 +2483,9 @@ int main() {
     // (350 B, 53 units, three 0xa54920 save-data ctors, three elided no-op vcalls,
     // one resolved 0x54b250 call, and the boss-flag stamp).
     {
+        g_cont_e_a54920 = 0;
+        g_cont_e_54b250 = 0;
+        g_boss_flag_cell = 0x01;
         Init531d60PostBaseContinueEHooks eh{};
         eh.incoming_r13 = g_cont_e_r13;              // parent stand-in (NOT deref'd)
         eh.incoming_r12b = 0xAA;                     // stamp value
@@ -2934,12 +2959,15 @@ int main() {
         CHECK(r2.r14b_out == 1);
     }
 
-    // alt_5327bd empty hooks runs all 70 units
+    // alt_5327bd empty hooks pin all units but prove neither route.
     {
         auto r = init_531d60_post_base_alt_5327bd();
         CHECK(r.ok);
         CHECK(r.unit_executed == 70);
-        CHECK(r.reached_via_jmp);
+        CHECK(!r.reached_via_jmp);
+        CHECK(!r.reached_via_preamble);
+        CHECK(!r.r12b_known);
+        CHECK(!r.r14b_known);
         for (int i = 0; i < 70; ++i)
             CHECK(r.unit_counts[i] == 1);
     }
@@ -2952,6 +2980,7 @@ int main() {
     }
 
     run_alt_5327bd_tests();
+    run_alt_join_route_tests();
     std::puts("appmain_init_ctor_98a90_slice: all checks passed");
     return 0;
 }
@@ -3041,13 +3070,14 @@ void alt_case_3() {
 }
 
 void alt_case_4() {
-    // With no hooks supplied, all 70 units should still pin, gate_open=true
-    // (no gate check supplied), float_ok=true (no float compare supplied).
-    // The result reports success path.
+    // With no hooks, all static units pin but neither join route is known.
     auto r = init_531d60_post_base_alt_5327bd();
     CHECK(r.ok);
     CHECK(r.unit_executed == 70);
-    CHECK(r.reached_via_jmp);
+    CHECK(!r.reached_via_jmp);
+    CHECK(!r.reached_via_preamble);
+    CHECK(!r.r12b_known);
+    CHECK(!r.r14b_known);
     for (int i = 0; i < 70; ++i)
         CHECK(r.unit_counts[i] == 1);
 }
@@ -3064,4 +3094,205 @@ void run_alt_5327bd_tests() {
     alt_case_3();
     alt_case_4();
     alt_case_5();
+}
+
+void run_alt_join_route_tests() {
+    // Unknown continue-B eax must not be replaced by the E hook's default byte.
+    {
+        AllocatorFront route_front;
+        FakeHeap route_heap(route_front.owners(), 2);
+        CHECK(route_front.set_heap(1, &route_heap));
+        CHECK(route_front.set_heap(2, &route_heap));
+        InputTable551140 route_table{};
+        init_input_table_551140(route_table);
+        std::array<std::uint8_t, 0x60> route_setter{};
+        Init531d60PostBaseContinueEHooks e{};
+        e.incoming_r12b = 0xBB;
+        e.boss_flag_2dcdf14 = &g_boss_flag_cell;
+        g_boss_flag_cell = 0xCC;
+        AppmainInitCtor98a90SliceResult out{};
+        run_appmain_init_continue_driver_tail(
+            out, route_table, route_front, route_setter.data(), 0, 0, 0, 0,
+            {}, {}, {}, {}, e, {});
+        CHECK(out.post_base_continue_b.ok);
+        CHECK(!out.post_base_continue_b.eax_known);
+        CHECK(out.post_base_continue_c.ok);
+        CHECK(out.post_base_continue_d.ok);
+        CHECK(!out.init_r12b_known);
+        CHECK(out.init_stopped_at_5329ae);
+        CHECK(!out.post_base_continue_e.ok);
+        CHECK(!out.remainder.trivial_ok);
+        CHECK(g_boss_flag_cell == 0xCC);
+    }
+
+    // A known-open gate with no float-compare result proves neither join.
+    {
+        AllocatorFront route_front;
+        FakeHeap route_heap(route_front.owners(), 2);
+        CHECK(route_front.set_heap(1, &route_heap));
+        CHECK(route_front.set_heap(2, &route_heap));
+        InputTable551140 route_table{};
+        init_input_table_551140(route_table);
+        std::array<std::uint8_t, 0x60> route_setter{};
+        Init531d60PostBaseAlt5327bdHooks alt{};
+        alt.gate_check_supplied = true;
+        alt.gate_check_result = 0;
+        alt.call_ac5260 = hook_alt_ac5260;
+        alt.call_3e7e0 = hook_alt_3e7e0;
+        alt.call_4c4950 = hook_alt_4c4950;
+        Init531d60PostBaseContinueEHooks e{};
+        e.incoming_r12b = 0xBB;
+        e.boss_flag_2dcdf14 = &g_boss_flag_cell;
+        g_boss_flag_cell = 0xCC;
+        AppmainInitCtor98a90SliceResult out{};
+        run_appmain_init_continue_driver_tail(
+            out, route_table, route_front, route_setter.data(), 0, 0, 0, 0,
+            {}, {}, {}, {}, e, alt);
+        CHECK(out.post_base_alt_5327bd.ok);
+        CHECK(!out.post_base_alt_5327bd.reached_via_jmp);
+        CHECK(!out.post_base_alt_5327bd.reached_via_preamble);
+        CHECK(!out.post_base_alt_5327bd.r12b_known);
+        CHECK(!out.post_base_alt_5327bd.r14b_known);
+        CHECK(out.init_stopped_at_532904);
+        CHECK(!out.post_base_continue_c.ok);
+        CHECK(!out.post_base_continue_e.ok);
+        CHECK(!out.remainder.trivial_ok);
+        CHECK(g_boss_flag_cell == 0xCC);
+        CHECK(g_alt_ac5260_calls == 1); // gate-open work precedes the unknown float branch
+        CHECK(g_alt_3e7e0_calls == 0);
+        CHECK(g_alt_4c4950_zero_calls == 0);
+        CHECK(g_alt_4c4950_one_calls == 0);
+    }
+
+    // A failing float comparison proves the error route even when the earlier
+    // gate result is unknown; do not dispatch gate-conditional work speculatively.
+    {
+        Init531d60PostBaseAlt5327bdHooks alt{};
+        alt.float_compare_supplied = true;
+        alt.float_below_equal = true;
+        alt.call_ac5260 = hook_alt_ac5260;
+        alt.call_3e7e0 = hook_alt_3e7e0;
+        alt.call_4c4950 = hook_alt_4c4950;
+        g_alt_ac5260_calls = 0;
+        g_alt_3e7e0_calls = 0;
+        g_alt_4c4950_zero_calls = 0;
+        g_alt_4c4950_one_calls = 0;
+        const auto out = init_531d60_post_base_alt_5327bd(alt);
+        CHECK(out.ok);
+        CHECK(out.reached_via_preamble);
+        CHECK(out.r12b_known && out.r12b_out == 1);
+        CHECK(!out.r14b_known);
+        CHECK(g_alt_ac5260_calls == 0);
+        CHECK(g_alt_3e7e0_calls == 0);
+        CHECK(g_alt_4c4950_zero_calls == 0);
+        CHECK(g_alt_4c4950_one_calls == 1);
+    }
+
+    // Success alt route jumps directly to 0x532904 and then follows C→D→E.
+    {
+        AllocatorFront route_front;
+        FakeHeap route_heap(route_front.owners(), 2);
+        CHECK(route_front.set_heap(1, &route_heap));
+        CHECK(route_front.set_heap(2, &route_heap));
+        InputTable551140 route_table{};
+        init_input_table_551140(route_table);
+        std::array<std::uint8_t, 0x60> route_setter{};
+        std::array<std::uint8_t, 8> route_parent{};
+
+        Init531d60PostBaseAlt5327bdHooks alt{};
+        alt.gate_check_supplied = true;
+        alt.gate_check_result = 0;
+        alt.float_compare_supplied = true;
+        alt.float_below_equal = false;
+        alt.incoming_r13 = route_parent.data();
+        Init531d60PostBaseContinueEHooks e{};
+        e.incoming_r13 = nullptr;  // the alt route's r13 must reach E
+        e.incoming_r12b = 0xBB;    // route's r12b must replace this stand-in
+        e.boss_flag_2dcdf14 = &g_boss_flag_cell;
+        e.call_a54920 = hook_cont_e_a54920;
+        e.call_54b250 = hook_cont_e_54b250;
+        e.cell_2eff450 = &g_cell_2eff450_value;
+
+        g_cont_e_a54920 = 0;
+        g_cont_e_54b250 = 0;
+        g_boss_flag_cell = 0xAA;
+        AppmainInitCtor98a90SliceResult out{};
+        run_appmain_init_continue_driver_tail(
+            out, route_table, route_front, route_setter.data(), 0, 0x11, 0x22, 0x33,
+            {}, {}, {}, {}, e, alt);
+        CHECK(out.post_base_alt_5327bd.ok);
+        CHECK(out.post_base_alt_5327bd.reached_via_jmp);
+        CHECK(out.post_base_alt_5327bd.r12b_known && out.post_base_alt_5327bd.r12b_out == 0);
+        CHECK(out.post_base_continue_c.ok);
+        CHECK(!out.post_base_continue_c.preamble_ran);
+        CHECK(out.post_base_continue_d.ok);
+        CHECK(out.post_base_continue_e.ok);
+        CHECK(out.init_r12b_known && out.init_r12b_out == 0);
+        CHECK(g_boss_flag_cell == 0);
+        CHECK(g_cont_e_a54920 == 3);
+        CHECK(g_cont_e_a54920_parent[0] == route_parent.data());
+        CHECK(out.remainder.trivial_ok);
+    }
+
+    // Error alt route executes its preamble once, uses native 0x91210 binding,
+    // then enters C at 0x532904 with the resulting r14b/r12b values.
+    {
+        AllocatorFront route_front;
+        FakeHeap route_heap(route_front.owners(), 2);
+        CHECK(route_front.set_heap(1, &route_heap));
+        CHECK(route_front.set_heap(2, &route_heap));
+        InputTable551140 route_table{};
+        init_input_table_551140(route_table);
+        std::array<std::uint8_t, 0x60> route_setter{};
+        std::array<std::uint8_t, 8> route_parent{};
+        std::array<std::uint8_t, 0x30> demo_object{};
+        std::array<std::uint8_t, 0x68> bound_object{};
+        std::uint8_t native_flag = 0;
+        void* flag_cell = &native_flag;
+        std::memcpy(bound_object.data() + 0x60, &flag_cell, sizeof(flag_cell));
+        void* bound_ptr = bound_object.data();
+        std::memcpy(demo_object.data() + kLazyBind91210BoundOffset, &bound_ptr,
+                    sizeof(bound_ptr));
+
+        Init531d60PostBaseAlt5327bdHooks alt{};
+        alt.gate_check_supplied = true;
+        alt.gate_check_result = 1;  // error path, so the alt preamble is executed
+        alt.incoming_r13 = route_parent.data();
+        Init531d60PostBaseContinueCHooks c{};
+        c.use_native_lazy_bind_91210 = true;
+        c.demo_object = demo_object.data();
+        Init531d60PostBaseContinueEHooks e{};
+        e.incoming_r13 = route_parent.data();
+        e.incoming_r12b = 0xBB;
+        e.boss_flag_2dcdf14 = &g_boss_flag_cell;
+        e.call_a54920 = hook_cont_e_a54920;
+        e.call_54b250 = hook_cont_e_54b250;
+        e.cell_2eff450 = &g_cell_2eff450_value;
+
+        g_cont_e_a54920 = 0;
+        g_cont_e_54b250 = 0;
+        g_boss_flag_cell = 0xAA;
+        AppmainInitCtor98a90SliceResult out{};
+        run_appmain_init_continue_driver_tail(
+            out, route_table, route_front, route_setter.data(), 0, 0x11, 0x22, 0x33,
+            {}, {}, c, {}, e, alt);
+        CHECK(out.post_base_alt_5327bd.ok);
+        CHECK(out.post_base_alt_5327bd.reached_via_preamble);
+        CHECK(out.post_base_alt_5327bd.slot0_dispatch_count == 1);
+        CHECK(out.post_base_alt_5327bd.lazy_bind_calls == 1);
+        CHECK(out.post_base_alt_5327bd.lazy_bind_ok);
+        CHECK(out.post_base_alt_5327bd.r14b_known && out.post_base_alt_5327bd.r14b_out == 1);
+        CHECK(out.post_base_alt_5327bd.r12b_known && out.post_base_alt_5327bd.r12b_out == 1);
+        CHECK(out.post_base_continue_c.ok);
+        CHECK(!out.post_base_continue_c.preamble_ran);  // do not replay 0x5328e0
+        CHECK(out.post_base_continue_c.first_esi == 1); // alt r14b reaches C
+        CHECK(out.post_base_continue_c.lazy_bind_calls == 3); // C's own slot-0 sites
+        CHECK(out.init_branch_5329ae_taken);
+        CHECK(out.post_base_continue_e.ok);
+        CHECK(out.init_r12b_known && out.init_r12b_out == 1);
+        CHECK(g_boss_flag_cell == 1);
+        CHECK(g_cont_e_a54920 == 3);
+        CHECK(g_cont_e_a54920_parent[0] == route_parent.data());
+        CHECK(out.remainder.trivial_ok);
+    }
 }

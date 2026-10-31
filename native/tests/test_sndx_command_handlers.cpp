@@ -15,6 +15,7 @@
 #include <cstring>
 
 #include "core/concmd_vars.hpp"
+#include "core/config_bool_lookup_1e4c0.hpp"
 #include "core/sndx_command_handlers.hpp"
 
 #define CHECK(c) do { if (!(c)) { std::fprintf(stderr, "FAIL %s:%d %s\n", __FILE__, __LINE__, #c); std::exit(1); } } while (0)
@@ -419,13 +420,20 @@ void test_handlers() {
         for (std::size_t i = 0; i < kSndxCategoryVarCount; ++i) CHECK(filter.vars[i].value() == 0);
         CHECK(mute.vars[0].value() == 1);  // untouched
     }
-    // Missing get_bool_arg hook: fail closed -> 3.
+    // Missing get_bool_arg hook: native span lookup (E1037) still runs mute/filter.
     {
+        ConfigBoolEntry16 record{};
+        record.value = "false";
+        const std::uint8_t* base = reinterpret_cast<const std::uint8_t*>(&record);
+        SndxArgsSpan native_one{base, base + kConfigBoolEntrySize};
         SndxHandlerHooks partial = hooks;
         partial.get_bool_arg = SndxGetBoolArgHooks{};
-        SndxHandlerRun r = run_sndx_handler(SndxCommandId::category_mute_all, engine.base(), one,
-                                            mute_span, filter_span, partial);
-        CHECK(r.code == kSndxCmdResultRejected && r.stage == SndxHandlerStage::get_bool_arg_missing);
+        const std::size_t calls_before = arg_host.calls;
+        SndxHandlerRun r = run_sndx_handler(SndxCommandId::category_mute_all, engine.base(),
+                                            native_one, mute_span, filter_span, partial);
+        CHECK(r.code == kSndxCmdResultDone && r.stage == SndxHandlerStage::ok);
+        CHECK(arg_host.calls == calls_before);
+        for (std::size_t i = 0; i < kSndxCategoryVarCount; ++i) CHECK(mute.vars[i].value() == 0);
     }
     // Misaligned vector: defensive refusal.
     {

@@ -41,6 +41,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "lazy_bind_91210.hpp"
+
 namespace sotc {
 
 inline constexpr std::uint64_t kInit531d60PostBaseAlt5327bdRva = 0x5327BD;
@@ -276,6 +278,13 @@ struct Init531d60PostBaseAlt5327bdHooks {
     const void* cell_2efe318 = nullptr;
     const void* cell_2efe340 = nullptr;
 
+    // The error-path preamble's `call [rax]` at 0x5328f0 is slot 0 of
+    // 0x2efe318.  It may use the same native lazy-bind model as continue-C.
+    void (*vcall_slot0)(void* rdi, std::uint8_t esi) = nullptr;
+    bool use_native_lazy_bind_91210 = false;
+    void* demo_object = nullptr;
+    LazyBind91210Hooks lazy_bind{};
+
     // Incoming r13 (parent/init pointer, provenance NOT modelled).
     const void* incoming_r13 = nullptr;
 
@@ -322,6 +331,10 @@ struct Init531d60PostBaseAlt5327bdResult {
     int float_compare_count = 0; // expect 1 (vucomiss xmm0,[0x1014c40])
     int branch_count = 0;        // expect 5 (jne + jbe + je×2 + jmp)
     int setcc_count = 0;         // expect 1 (sete)
+    int slot0_dispatch_count = 0; // actual error-path dispatches at 0x5328f0
+    int lazy_bind_calls = 0;
+    int lazy_bind_last_returned = 0;
+    bool lazy_bind_ok = false;
 
     // Exit-stub state (modelled, not in byte span).
     bool exit_stub_active = false;  // true when the 0x5327b6 path was taken

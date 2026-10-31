@@ -122,6 +122,8 @@ struct Slot414State {
 struct Slot414Hooks {
     // Models 0x3b310(obj): initialises the 8-byte mutex handle at obj+0. Null or false fails closed.
     bool (*mutex_init_3b310)(void* obj) noexcept = nullptr;
+    // Models 0x3b380(obj): optional explicit destroy (atexit identity in the original). Null skips.
+    bool (*mutex_destroy_3b380)(void* obj) noexcept = nullptr;
 };
 [[nodiscard]] TinyMiscResult init_slot414_57b9b0(Slot414State& state, const Slot414Hooks& hooks,
                                                  StartupAtexitLog& log) noexcept;

@@ -1,3 +1,4 @@
+#include "config_bool_lookup_1e4c0.hpp"
 #include "sndx_command_handlers.hpp"
 
 #include <cstring>
@@ -237,11 +238,10 @@ SndxHandlerRun run_sndx_handler(SndxCommandId id, const void* engine, const Sndx
                 run.stage = SndxHandlerStage::args_count;
                 return run;
             }
-            if (!hooks.get_bool_arg.complete()) {
-                run.stage = SndxHandlerStage::get_bool_arg_missing;
-                return run;
-            }
-            const bool requested = hooks.get_bool_arg.lookup(hooks.get_bool_arg.host, args, 0, false);
+            const bool requested =
+                hooks.get_bool_arg.complete()
+                    ? hooks.get_bool_arg.lookup(hooks.get_bool_arg.host, args, 0, false)
+                    : config_bool_lookup_args_span(args, 0, false);
             const SndxCategoryVectorSpan& span =
                 id == SndxCommandId::category_mute_all ? mute : filter;
             if (!span.aligned()) {

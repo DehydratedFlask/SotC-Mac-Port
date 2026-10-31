@@ -340,9 +340,10 @@ void test_manager_path() {
     CHECK(model.find("sndx_missing") == nullptr);
 
     // Duplicate name: first registration wins, nothing is overwritten.
-    FConCmdCommandSpec dup{"sndx_reloadData", "other", 5, 0x77};
+    FConCmdCommandSpec dup{"SNDX_RELOADDATA", "other", 5, 0x77};
     CHECK(init_fconcmd_object(b, dup, registry2).ok);
     CHECK(model.size() == 3 && model.find("sndx_reloadData") == &c0.base);
+    CHECK(model.find("SNDX_RELOADDATA") == &c0.base);
     CHECK(!model.failed());
 }
 
@@ -509,12 +510,13 @@ void test_manager_erase_through_destructor() {
     // Duplicate-name command: erase is by KEY ONLY, so destroying the duplicate removes the entry that
     // belongs to the first command (0x213b0 never compares the stored ConCmd pointer).
     ConCmdCommand dup;
-    FConCmdCommandSpec spec{"sndx_categoryMuteAll", "dup", 3, 0x99};
+    FConCmdCommandSpec spec{"SNDX_CATEGORYMUTEALL", "dup", 3, 0x99};
     CHECK(init_fconcmd_object(dup, spec, registry).ok);
     CHECK(model.find("sndx_categoryMuteAll") == &cmds[1].base);
     d = destroy_fconcmd_4b0(dup, registry, hooks);
     CHECK(d.ok && d.base.manager_erased);
-    CHECK(model.find("sndx_categoryMuteAll") == nullptr && model.size() == 1);
+    CHECK(model.find("sndx_categoryMuteAll") == nullptr && model.find("SNDX_CATEGORYMUTEALL") == nullptr &&
+          model.size() == 1);
 
     // Erasing an absent key reports false from the hook but the destructor still completes.
     d = destroy_fconcmd_4b0(cmds[1], registry, hooks);

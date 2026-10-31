@@ -15,7 +15,7 @@
 // PR #5 cite-only.
 // NOT modelled: ensure migrate / heavy menu helpers / 0xf8f860 PLT / non-null list;
 // PLT bodies 0xf901a0/0xf901c0; ba40 listener invoke; 0x533100 hit /
-// success atexit; 0x499f80/0x56dcb0/0x5c64c0/0x1290 bodies; 0x7f7220 body;
+// success atexit; 0x499f80 body when body_globals omitted; 0x56dcb0/0x5c64c0/0x1290 bodies; 0x7f7220 body;
 // 0xf90310 PLT/Sony body; later ymm Init continue; 0x14c2f0/0x6a5370/0x6abcc0/
 // 0x21620/0x2779a0/0x42390 bodies; bodies of 0x523bd0 / 0x525b40 / 0x493230 /
 // 0x525080 / 0x2569d0.
@@ -235,8 +235,25 @@ struct AppmainInitCtor98a90SliceResult {
     // E536: merge `je 0x5329ae` outcome (modelled only when the flag byte is supplied).
     bool init_branch_5329ae_taken = false;
     bool init_stopped_at_5329ae = false;
+    bool init_stopped_at_532904 = false;
+    std::uint8_t init_r12b_out = 0;
+    bool init_r12b_known = false;
     AppmainInitRemainderSliceResult remainder{};
 };
+
+// Runs the post-A Init driver tail. Kept separately so each route through the
+// 0x5327bd and 0x532904 joins can be fixture-verified without replaying the
+// unrelated constructor prefix.
+void run_appmain_init_continue_driver_tail(
+    AppmainInitCtor98a90SliceResult& out, InputTable551140& table,
+    AllocatorFront& alloc, void* setter_obj, std::uint8_t flag_in,
+    std::uint8_t set_a, std::uint8_t set_b, std::uint8_t set_c,
+    const Init531d60PostBaseContinueAHooks& post_base_continue_a_hooks,
+    const Init531d60PostBaseContinueBHooks& post_base_continue_b_hooks,
+    const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks,
+    const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks,
+    const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks,
+    const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks);
 
 [[nodiscard]] AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     InputTable551140& table, AllocatorFront& alloc, void* self, void* arg,

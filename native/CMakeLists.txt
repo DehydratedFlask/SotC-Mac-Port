@@ -211,6 +211,7 @@ add_library(sotc_core STATIC
   core/init_531d60_post_base_continue_b.cpp
   core/init_531d60_post_base_continue_c.cpp
   core/init_531d60_post_base_continue_d.cpp
+  core/init_531d60_post_base_continue_c_after_merge.cpp
   core/init_531d60_post_base_continue_e.cpp
   core/init_531d60_post_base_alt_5327bd.cpp
   core/ctor_98a90_3be050.cpp
@@ -231,6 +232,10 @@ add_library(sotc_core STATIC
   core/const_table_ee1130.cpp
   core/input_table_551140.cpp
   core/recursive_mutex.cpp
+  core/critsec_3b310.cpp
+  core/init_499f80_body.cpp
+  core/config_bool_lookup_1e4c0.cpp
+  core/lazy_bind_91210.cpp
   core/startup_ctors.cpp
   core/ctor_slot_545_b2ec0.cpp
   core/clothing_preview_param.cpp
@@ -1378,6 +1383,38 @@ add_test(NAME save_checksum COMMAND test_save_checksum)
 add_executable(test_recursive_mutex tests/test_recursive_mutex.cpp)
 target_link_libraries(test_recursive_mutex sotc_core)
 add_test(NAME recursive_mutex COMMAND test_recursive_mutex)
+
+add_executable(test_critsec_3b310 tests/test_critsec_3b310.cpp)
+target_link_libraries(test_critsec_3b310 sotc_core)
+add_test(NAME critsec_3b310 COMMAND test_critsec_3b310)
+
+add_executable(test_init_499f80_body tests/test_init_499f80_body.cpp)
+target_link_libraries(test_init_499f80_body sotc_core)
+add_test(NAME init_499f80_body COMMAND test_init_499f80_body)
+
+add_executable(test_config_bool_lookup_1e4c0 tests/test_config_bool_lookup_1e4c0.cpp)
+target_link_libraries(test_config_bool_lookup_1e4c0 sotc_core)
+add_test(NAME config_bool_lookup_1e4c0 COMMAND test_config_bool_lookup_1e4c0)
+
+add_executable(test_init_continue_ab_native tests/test_init_continue_ab_native.cpp)
+target_link_libraries(test_init_continue_ab_native sotc_core)
+add_test(NAME init_continue_ab_native COMMAND test_init_continue_ab_native)
+
+add_executable(test_lazy_bind_91210 tests/test_lazy_bind_91210.cpp)
+target_link_libraries(test_lazy_bind_91210 sotc_core)
+add_test(NAME lazy_bind_91210 COMMAND test_lazy_bind_91210)
+
+add_executable(test_init_continue_c_lazy_bind tests/test_init_continue_c_lazy_bind.cpp)
+target_link_libraries(test_init_continue_c_lazy_bind sotc_core)
+add_test(NAME init_continue_c_lazy_bind COMMAND test_init_continue_c_lazy_bind)
+
+add_executable(test_init_continue_c_after_merge tests/test_init_continue_c_after_merge.cpp)
+target_link_libraries(test_init_continue_c_after_merge sotc_core)
+add_test(NAME init_continue_c_after_merge COMMAND test_init_continue_c_after_merge)
+
+add_executable(test_post_base_499f80_native_body tests/test_post_base_499f80_native_body.cpp)
+target_link_libraries(test_post_base_499f80_native_body sotc_core)
+add_test(NAME post_base_499f80_native_body COMMAND test_post_base_499f80_native_body)
 
 add_executable(test_vec_bb82d0 tests/test_vec_bb82d0.cpp)
 target_link_libraries(test_vec_bb82d0 sotc_core)

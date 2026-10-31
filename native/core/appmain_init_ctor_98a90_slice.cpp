@@ -525,83 +525,137 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     if (!out.post_base_f590_a2ed00_u13.ok) {
         return out;
     }
-    // E509: always-on Init continue — 22-unit branch-free run 0x532720..0x53277f;
-    // callee bodies / je outcome / both successors NOT modelled.
+    run_appmain_init_continue_driver_tail(
+        out, table, alloc, setter_obj, flag_in, set_a, set_b, set_c,
+        post_base_continue_a_hooks, post_base_continue_b_hooks,
+        post_base_continue_c_hooks, post_base_continue_d_hooks,
+        post_base_continue_e_hooks, post_base_alt_5327bd_hooks);
+    return out;
+}
+
+void run_appmain_init_continue_driver_tail(
+    AppmainInitCtor98a90SliceResult& out, InputTable551140& table,
+    AllocatorFront& alloc, void* setter_obj, std::uint8_t flag_in,
+    std::uint8_t set_a, std::uint8_t set_b, std::uint8_t set_c,
+    const Init531d60PostBaseContinueAHooks& post_base_continue_a_hooks,
+    const Init531d60PostBaseContinueBHooks& post_base_continue_b_hooks,
+    const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks,
+    const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks,
+    const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks,
+    const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks) {
+    // E509: always-on Init continue — 22-unit branch-free run 0x532720..0x53277f.
     out.post_base_continue_a = init_531d60_post_base_continue_a(post_base_continue_a_hooks);
     if (!out.post_base_continue_a.ok) {
-        return out;
+        return;
     }
 
-    // Batch A je 0x5327bd: when the `test rax,rax` result was zero (rax from
-    // 0x1fc80 was 0), the je is taken and the alternate path at 0x5327bd runs
-    // instead of batch B..E.  The caller supplies the branch outcome through the
-    // alt hooks' gate/compare overrides or simply by choosing to run this module.
-    // When taken, the alt module runs and stops at the documented join; we return
-    // immediately — do NOT fake continuity past the join into batch B/C/D/E.
+    // A supplied alt gate selects the 0x5327bd route (the AB-native selector is
+    // a separate task). Its error path already executes 0x5328e0..0x532904;
+    // its success path jumps directly to 0x532904.
+    Init531d60PostBaseContinueCHooks c_hooks = post_base_continue_c_hooks;
+    std::uint8_t route_r12b = 0;
+    bool alt_route = false;
+    const void* route_r13 = nullptr;
     if (post_base_alt_5327bd_hooks.gate_check_supplied ||
         post_base_alt_5327bd_hooks.gate_2dfce70 != nullptr) {
+        alt_route = true;
+        route_r13 = post_base_alt_5327bd_hooks.incoming_r13;
         out.init_branch_5327bd_taken = true;
-        out.post_base_alt_5327bd = init_531d60_post_base_alt_5327bd(
-            post_base_alt_5327bd_hooks);
-        if (!out.post_base_alt_5327bd.ok) {
-            return out;
+        Init531d60PostBaseAlt5327bdHooks alt_hooks = post_base_alt_5327bd_hooks;
+        if (alt_hooks.vcall_slot0 == nullptr) {
+            alt_hooks.vcall_slot0 = c_hooks.vcall_slot0;
         }
-        // Alt path completed — stop at the join.  The caller can read
-        // reached_via_jmp / reached_via_preamble and r14b_out / r12b_out
-        // to determine how to proceed (continue_c merge or exit).
-        return out;
+        if (alt_hooks.cell_2efe318 == nullptr && c_hooks.cell_2efe318 != nullptr) {
+            alt_hooks.cell_2efe318 = static_cast<const void*>(c_hooks.cell_2efe318);
+        }
+        if (!alt_hooks.use_native_lazy_bind_91210 && c_hooks.use_native_lazy_bind_91210) {
+            alt_hooks.use_native_lazy_bind_91210 = true;
+            alt_hooks.demo_object = c_hooks.demo_object;
+            alt_hooks.lazy_bind = c_hooks.lazy_bind;
+        }
+        out.post_base_alt_5327bd = init_531d60_post_base_alt_5327bd(alt_hooks);
+        if (!out.post_base_alt_5327bd.ok) {
+            return;
+        }
+        if (!out.post_base_alt_5327bd.r14b_known ||
+            !out.post_base_alt_5327bd.r12b_known) {
+            out.init_stopped_at_532904 = true;
+            return;
+        }
+        c_hooks.incoming_r14b = out.post_base_alt_5327bd.r14b_out;
+        c_hooks.enter_via_5328e0 = false;  // alt has already joined at 0x532904
+        c_hooks.incoming_r15 = const_cast<void*>(route_r13);
+        route_r12b = out.post_base_alt_5327bd.r12b_out;
+        out.init_r12b_known = true;
+    } else {
+        // E510: 14-unit fall-through 0x53277f..0x5327b1.
+        out.post_base_continue_b = init_531d60_post_base_continue_b(
+            post_base_continue_b_hooks);
+        if (!out.post_base_continue_b.ok) {
+            return;
+        }
+        out.init_branch_5328e0_taken = out.post_base_continue_b.branch_taken;
+        if (out.post_base_continue_b.eax_known) {
+            route_r12b = static_cast<std::uint8_t>(out.post_base_continue_b.bl ^ 1U);
+            out.init_r12b_known = true;
+        }
+        if (out.post_base_continue_b.branch_outcome_modelled &&
+            out.post_base_continue_b.branch_taken) {
+            c_hooks.enter_via_5328e0 = true;
+        }
     }
+    out.init_r12b_out = route_r12b;
 
-    // E510: always-on Init continue — 14-unit fall-through 0x53277f..0x5327b1;
-    // callee bodies / je outcome / both successors NOT modelled.
-    out.post_base_continue_b = init_531d60_post_base_continue_b(post_base_continue_b_hooks);
-    if (!out.post_base_continue_b.ok) {
-        return out;
-    }
-    // E524: je 0x5328e0 is taken when the proven-boolean bl is 0. The 36 B
-    // 0x5328e0 preamble is NOT modelled, so stop honestly instead of entering
-    // the merge block as if the taken path had been replayed.
-    out.init_branch_5328e0_taken = out.post_base_continue_b.branch_taken;
-    // E529: on a modelled taken branch, run the 36 B 0x5328e0 preamble first and
-    // feed its sete r14b into the merge entry, instead of skipping or faking it.
-    Init531d60PostBaseContinueCHooks c_hooks = post_base_continue_c_hooks;
-    if (out.post_base_continue_b.branch_outcome_modelled &&
-        out.post_base_continue_b.branch_taken) {
-        c_hooks.enter_via_5328e0 = true;
-    }
-    // Init continue merge — 38-unit run 0x532904..0x53299d (reached by the
-    // je-not-taken fall-through); callee bodies / vtable slot-0 target / the
-    // next je outcome and both of its successors NOT modelled.
+    // Continue C starts at 0x532904 on both routes. Only the B route may need
+    // its own 0x5328e0 preamble; the alternate route has already completed it.
     out.post_base_continue_c = init_531d60_post_base_continue_c(c_hooks);
     if (!out.post_base_continue_c.ok) {
-        return out;
+        return;
     }
-    // E536: the merge `je 0x5329ae` is taken when the resolved flag byte is 0.
-    // The branch-target block (0x5329ae..0x532b0c, 350 B, 53 units) is now lifted
-    // as continue_e.  When the branch is taken, run it; if it fails, stop honestly.
+
+    Init531d60PostBaseContinueEHooks e_hooks = post_base_continue_e_hooks;
+    e_hooks.incoming_r12b = route_r12b;
+    if (alt_route) {
+        e_hooks.incoming_r13 = route_r13;
+    }
     out.init_branch_5329ae_taken = out.post_base_continue_c.merge_branch_taken;
     if (out.post_base_continue_c.merge_branch_outcome_modelled &&
         out.post_base_continue_c.merge_branch_taken) {
-        out.post_base_continue_e = init_531d60_post_base_continue_e(
-            post_base_continue_e_hooks);
+        if (!out.init_r12b_known) {
+            out.init_stopped_at_5329ae = true;
+            return;
+        }
+        e_hooks.incoming_r12b = route_r12b;
+        out.post_base_continue_e = init_531d60_post_base_continue_e(e_hooks);
         if (!out.post_base_continue_e.ok) {
             out.init_stopped_at_5329ae = true;
-            return out;
+            return;
         }
-        // The block ends at 0x532b0c = `mov edi,0x98` (registry fragment entry).
-        // Continue to the remainder slice which models the registry.
         out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in,
                                                          set_a, set_b, set_c);
-        return out;
+        return;
     }
-    // Fall-through of the merge branch (je NOT taken): 17 B before 0x5329ae.
-    out.post_base_continue_d = init_531d60_post_base_continue_d(post_base_continue_d_hooks);
+
+    // 0x53299b not taken (or unmodelled): continue D, fall through to E, then
+    // reach the registry/remainder. Stop at 0x5329ae if B did not supply the
+    // r12b bit; the E hook's default byte is not register provenance.
+    out.post_base_continue_d = init_531d60_post_base_continue_d(
+        post_base_continue_d_hooks);
     if (!out.post_base_continue_d.ok) {
-        return out;
+        return;
     }
-    out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,
-                                                     set_b, set_c);
-    return out;
+    if (!out.init_r12b_known) {
+        out.init_stopped_at_5329ae = true;
+        return;
+    }
+    e_hooks.incoming_r12b = route_r12b;
+    out.post_base_continue_e = init_531d60_post_base_continue_e(e_hooks);
+    if (!out.post_base_continue_e.ok) {
+        out.init_stopped_at_5329ae = true;
+        return;
+    }
+    out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in,
+                                                     set_a, set_b, set_c);
 }
 
 }  // namespace sotc

@@ -12,7 +12,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `Shadow of the Colossus` | 2 | Original user game inputs; read-only and private |
 | `docs` | 18 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/.cache` | 0 | Plans, task/evidence registries, checkpoint and escalation documentation |
-| `docs/checkpoints` | 975 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs/checkpoints` | 987 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/escalations` | 10 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/schemas` | 1 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `graft` | 1 | Regenerable source graph; internal cache directories summarized |
@@ -34,10 +34,10 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `native/api/standalone` | 1 | Native game implementation; verify module README and task ownership |
 | `native/api/tests` | 2 | Native game implementation; verify module README and task ownership |
 | `native/app` | 3 | Native game implementation; verify module README and task ownership |
-| `native/core` | 1191 | Native game implementation; verify module README and task ownership |
+| `native/core` | 1202 | Native game implementation; verify module README and task ownership |
 | `native/lanes` | 7 | Native game implementation; verify module README and task ownership |
 | `native/platform` | 8 | Native game implementation; verify module README and task ownership |
-| `native/tests` | 486 | Native game implementation; verify module README and task ownership |
+| `native/tests` | 494 | Native game implementation; verify module README and task ownership |
 | `reference` | 0 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC` | 12 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC/docs` | 10 | Pinned upstream source; read-only; symbols indexed by Graft |
@@ -601,7 +601,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `tools/dev` | 14 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft/.cache` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
-| `tools/lift` | 612 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/lift` | 618 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/pkg-extractor` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
 
 Private recursive inventory: `local/indexes/folders.json` (excluded from publication).
