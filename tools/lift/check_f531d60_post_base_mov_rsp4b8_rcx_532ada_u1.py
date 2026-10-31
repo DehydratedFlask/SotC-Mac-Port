@@ -49,7 +49,9 @@ def main() -> int:
     nh = NATIVE.read_text()
     require("init_531d60_post_base_mov_rsp4b8_rcx_532ada_u1" in nh, "API")
     ce = CONT_E.read_text()
-    require("kInit531d60PostBaseContinueERva = 0x532ae2" in ce, "shrunk continue_e start")
+    u3 = ROOT / "native/core/init_531d60_post_base_a54920_532ae2_u1.hpp"
+    require("kInit531d60PostBaseA54920_532ae2_U1Rva = 0x532ae2" in u3.read_text(), "a54920_532ae2 u1 rva")
+    require("merge_a54920_532ae2_u1_ran" in ce, "a54920_532ae2 merge hook")
     require("merge_mov_rsp4b8_rcx_532ada_u1_ran" in ce, "mov4b8 merge hook")
     require(
         "core/init_531d60_post_base_mov_rsp4b8_rcx_532ada_u1.cpp" in CMAKE.read_text(),

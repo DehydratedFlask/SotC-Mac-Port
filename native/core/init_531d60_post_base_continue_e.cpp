@@ -16,6 +16,7 @@
 #include "init_531d60_post_base_mov_rsp4b0_rsi_532acb_u1.hpp"
 #include "init_531d60_post_base_lea_rsi_2efda50_532ad3_u1.hpp"
 #include "init_531d60_post_base_mov_rsp4b8_rcx_532ada_u1.hpp"
+#include "init_531d60_post_base_a54920_532ae2_u1.hpp"
 #include "init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
@@ -334,15 +335,18 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         std::memcpy(&desc3.field_48, &rcx_thunk2, sizeof(void*));
     }
 
-    // 0x532ae2 call 0xa54920(parent, name=0x2efda50, descriptor=&desc3)
-    if (hooks.call_a54920 != nullptr) {
-        hooks.call_a54920(parent3,
-                          reinterpret_cast<void*>(
-                              static_cast<std::uintptr_t>(kInit531d60PostBaseContinueEName3Rva)),
-                          desc3_ptr);
+    if (!hooks.merge_a54920_532ae2_u1_ran) {
+        Init531d60PostBaseA54920_532ae2_U1Hooks u3{};
+        u3.parent = parent3;
+        u3.descriptor = desc3_ptr;
+        u3.call_a54920 = hooks.call_a54920;
+        const Init531d60PostBaseA54920_532ae2_U1Result u3r =
+            init_531d60_post_base_a54920_532ae2_u1(u3);
+        if (!u3r.ok) {
+            return out;
+        }
+        out.call_a54920_count += u3r.call_a54920_count;
     }
-    pin(out, ContinueEUnit::call_a54920_3);
-    ++out.call_a54920_count;
 
     // 0x532ae7 mov rax,[rsp+0x4B0] — reload vtable 2
     pin(out, ContinueEUnit::mov_rax_rsp4b0);
@@ -394,8 +398,9 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
 
     // Final validation (u1 / vcall18 / a54920_532a62 merges add to ctor/vcall/stamp totals).
     const int expect_a54920 =
-        1 + (hooks.merge_a54920_u1_ran ? 0 : 1) +
-        (hooks.merge_a54920_532a62_u1_ran ? 0 : 1);
+        (hooks.merge_a54920_u1_ran ? 0 : 1) +
+        (hooks.merge_a54920_532a62_u1_ran ? 0 : 1) +
+        (hooks.merge_a54920_532ae2_u1_ran ? 0 : 1);
     const int expect_vcall_noop =
         1 + (hooks.merge_vcall18_532a17_ran ? 0 : 1) +
         (hooks.merge_vcall18_532a72_u1_ran ? 0 : 1);

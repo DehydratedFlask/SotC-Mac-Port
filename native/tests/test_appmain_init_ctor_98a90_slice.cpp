@@ -2561,7 +2561,7 @@ int main() {
     // E1042 / CPU-01-INIT-DRIVER-JOIN-01: fall-through runs D then E (14 pinned units) before remainder.
     CHECK(r.post_base_continue_e.ok);
     CHECK(r.post_base_continue_e.unit_executed == kInit531d60PostBaseContinueEUnitCount);
-    CHECK(kInit531d60PostBaseContinueEUnitCount == 10);
+    CHECK(kInit531d60PostBaseContinueEUnitCount == 9);
     CHECK(g_cont_e_a54920 == 3);  // pbce hooks: three save-data ctor calls on D→E path
     CHECK(r.init_r12b_known);
     CHECK(r.init_r12b_out == 0xA7);  // continue-B bl(0xA6) xor 1 feeds continue-E
@@ -2581,7 +2581,7 @@ int main() {
         CHECK(g_cont_d_rdi == const_cast<void*>(g_cont_d_cell_value));
     }
 
-    // E537 shrunk continue_e direct: 0x532ae2..0x532b0c (10 units); block-1/2/3 peels
+    // E538 shrunk continue_e direct: 0x532ae7..0x532b0c (9 units); block-1/2/3 peels
     // live in a54920_u1 + vcall18_532a17 + a54920_532a62_u1 + vcall18_532a72_u1 +
     // vmovq_532a75_u1 + lea_5388e0_532a7d_u1 + lea_rsp470_532a84_u1 + lea_rsi_532a8c_u1 +
     // movq_rsp4a0_532a93_u1 + mov_rdi_r13_532a9f_u1 + lea_538870_532aa3_u1 +
@@ -2698,12 +2698,12 @@ int main() {
         const auto er = init_531d60_post_base_continue_e(eh);
         CHECK(er.ok);
         CHECK(er.unit_executed == kInit531d60PostBaseContinueEUnitCount);
-        CHECK(kInit531d60PostBaseContinueEUnitCount == 10);
+        CHECK(kInit531d60PostBaseContinueEUnitCount == 9);
         for (int i = 0; i < kInit531d60PostBaseContinueEUnitCount; ++i) {
             CHECK(er.unit_counts[static_cast<std::size_t>(i)] == 1);
         }
-        CHECK(kInit531d60PostBaseContinueEUnits[0].rva == 0x532ae2);
-        CHECK(kInit531d60PostBaseContinueEUnits[9].rva == 0x532b09);
+        CHECK(kInit531d60PostBaseContinueEUnits[0].rva == 0x532ae7);
+        CHECK(kInit531d60PostBaseContinueEUnits[8].rva == 0x532b09);
         CHECK(er.call_a54920_count == 1);
         CHECK(er.vcall_noop_count == 1);
         CHECK(er.vcall_54b250_count == 1);
@@ -2751,10 +2751,11 @@ int main() {
         empty.merge_mov_rsp4b0_rsi_532acb_u1_ran = true;
         empty.merge_lea_rsi_2efda50_532ad3_u1_ran = true;
         empty.merge_mov_rsp4b8_rcx_532ada_u1_ran = true;
+        empty.merge_a54920_532ae2_u1_ran = true;
         const auto er2 = init_531d60_post_base_continue_e(empty);
         CHECK(er2.ok);
-        CHECK(er2.unit_executed == 10);
-        CHECK(er2.call_a54920_count == 1);
+        CHECK(er2.unit_executed == 9);
+        CHECK(er2.call_a54920_count == 0);
         CHECK(er2.vcall_noop_count == 1);
         CHECK(er2.vcall_54b250_count == 1);
         CHECK(er2.stamp_count == 0);
