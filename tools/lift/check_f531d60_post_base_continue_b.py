@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ELF-tie Init 0x531d60 continue B fall-through run 0x532793..0x5327b1 (30 B / 8 units)."""
+"""ELF-tie Init 0x531d60 continue B fall-through run 0x5327a5..0x5327b1 (12 B / 3 units)."""
 
 from __future__ import annotations
 
@@ -13,26 +13,15 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import ps4_dynlink as d  # noqa: E402
 
 ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
-PREV_END = 0x532793
-START = 0x532793
-SIZE = 30
+PREV_END = 0x5327A5
+START = 0x5327A5
+SIZE = 12
 END = 0x5327B1
-REGION_SHA256 = "8a78ddcb0daefe3de0e3089faa77f6fc74254f7e40dd83d24cd8e3224135ed16"
+REGION_SHA256 = "81bd97f0bf0e4c9a724f01955c79d4d1bdaba7a5bddb8aa572baebf5ab9c93a1"
 BRANCH_RVA = 0x5327AB
 BRANCH_TARGET = 0x5328E0
-CALL_4C4950 = 0x4C4950
 
 UNITS = [
-    (0x532793, 2, "59c3ff3b5508dff4125aa5d1f346b64fba779a271c5d8a02cd964dd9edb49f4b",
-     "mov ebx,eax", "pin", None),
-    (0x532795, 3, "f51ac5e8eea4a3ee42a5139cfd45d8bf9b207585d7e09f610e6fc500ba6c6474",
-     "mov r12b,bl", "pin", None),
-    (0x532798, 4, "a65f79ddce849d64d3df1cb19add7b3bfe108b7ecfd51d7bed24fb3f7205ddf5",
-     "xor r12b,1", "pin", None),
-    (0x53279C, 4, "fd874704edf4d841e2364cd339e3e8baeb9d1f364bcd3be1c29eb6ed23ffda57",
-     "movzx edi,r12b", "pin", None),
-    (0x5327A0, 5, "20455445a7b8a1a7ea1cc62eaef3025fcdccc415006e0bcd2c699cb69ce10ea3",
-     "call 0x4c4950", "call", CALL_4C4950),
     (0x5327A5, 4, "4c1648caac4a2a956dff05c0ed8149ebf8310fb0108beceee7f5b3e6d7f28aaf",
      "mov rdi,[r13+0]", "pin", None),
     (0x5327A9, 2, "7087cf5f9f4f30301fd1b1737cfc01976911f0b4063dca2561bf9152acbfbac4",
@@ -42,7 +31,7 @@ UNITS = [
 ]
 
 NATIVE = ROOT / "native/core/init_531d60_post_base_continue_b.hpp"
-PREV_NATIVE = ROOT / "native/core/init_531d60_post_base_1e4c0_u1.hpp"
+PREV_NATIVE = ROOT / "native/core/init_531d60_post_base_4c4950_u1.hpp"
 SLICE = ROOT / "native/core/appmain_init_ctor_98a90_slice.hpp"
 CMAKE = ROOT / "native/CMakeLists.txt"
 
@@ -59,8 +48,8 @@ def main() -> int:
     img = d.Image(elf, ph)
 
     require(
-        "kInit531d60PostBase1e4c0U1EndRva = 0x532793" in PREV_NATIVE.read_text(),
-        "1e4c0_u1 end",
+        "kInit531d60PostBase4c4950U1EndRva = 0x5327a5" in PREV_NATIVE.read_text(),
+        "4c4950_u1 end",
     )
     require(PREV_END == START, "prev end == start")
     require(START + SIZE == END, "size arithmetic")
@@ -70,10 +59,7 @@ def main() -> int:
         require(rva == cursor, f"contiguity at 0x{rva:x}")
         raw = img.read(rva, size)
         require(hashlib.sha256(raw).hexdigest() == sha, f"sha mismatch at 0x{rva:x}")
-        if kind == "call":
-            rel = struct.unpack("<i", raw[1:5])[0]
-            require(rva + 5 + rel == target, f"call target at 0x{rva:x}")
-        elif kind == "je6":
+        if kind == "je6":
             require(raw[0:2] == bytes.fromhex("0f84"), f"je6 opcode at 0x{rva:x}")
             rel = struct.unpack("<i", raw[2:6])[0]
             require(rva + 6 + rel == target, f"je6 target at 0x{rva:x}")
@@ -82,14 +68,14 @@ def main() -> int:
     require(hashlib.sha256(img.read(START, SIZE)).hexdigest() == REGION_SHA256, "region sha")
 
     nh = NATIVE.read_text()
-    require("kInit531d60PostBaseContinueBRva = 0x532793" in nh, "start rva")
-    require("post_base_1e4c0_u1" in SLICE.read_text(), "u1 wire")
-    require("core/init_531d60_post_base_1e4c0_u1.cpp" in CMAKE.read_text(), "cmake")
+    require("kInit531d60PostBaseContinueBRva = 0x5327a5" in nh, "start rva")
+    require("post_base_4c4950_u1" in SLICE.read_text(), "u1 wire")
+    require("core/init_531d60_post_base_4c4950_u1.cpp" in CMAKE.read_text(), "cmake")
 
     print(
         f"OK check_f531d60_post_base_continue_b: span=0x{START:x}+{SIZE}B "
         f"units={len(UNITS)} region={REGION_SHA256[:12]}…; "
-        f"call=0x4c4950; je@{BRANCH_RVA:#x}->{BRANCH_TARGET:#x}; end={END:#x}"
+        f"je@{BRANCH_RVA:#x}->{BRANCH_TARGET:#x}; end={END:#x}"
     )
     return 0
 

@@ -81,6 +81,7 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBaseA543b0U1Hooks& post_base_a543b0_u1_hooks,
     const Init531d60PostBase1fc80U1Hooks& post_base_1fc80_u1_hooks,
     const Init531d60PostBase1e4c0U1Hooks& post_base_1e4c0_u1_hooks,
+    const Init531d60PostBase4c4950U1Hooks& post_base_4c4950_u1_hooks,
     const Init531d60PostBaseContinueAHooks& post_base_continue_a_hooks,
     const Init531d60PostBaseContinueBHooks& post_base_continue_b_hooks,
     const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks,
@@ -562,7 +563,7 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
         post_base_continue_a_hooks, post_base_continue_b_hooks,
         post_base_continue_c_hooks, post_base_continue_d_hooks,
         post_base_continue_e_hooks, post_base_alt_5327bd_hooks,
-        post_base_1fc80_u1_hooks, post_base_1e4c0_u1_hooks);
+        post_base_1fc80_u1_hooks, post_base_1e4c0_u1_hooks, post_base_4c4950_u1_hooks);
     return out;
 }
 
@@ -577,7 +578,8 @@ void run_appmain_init_continue_driver_tail(
     const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks,
     const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks,
     const Init531d60PostBase1fc80U1Hooks& post_base_1fc80_u1_hooks,
-    const Init531d60PostBase1e4c0U1Hooks& post_base_1e4c0_u1_hooks) {
+    const Init531d60PostBase1e4c0U1Hooks& post_base_1e4c0_u1_hooks,
+    const Init531d60PostBase4c4950U1Hooks& post_base_4c4950_u1_hooks) {
     // E513: always-on Init continue — first 0x1fc80 call-site; 16 B prep NOT modelled.
     out.post_base_1fc80_u1 = init_531d60_post_base_1fc80_u1(post_base_1fc80_u1_hooks);
     if (!out.post_base_1fc80_u1.ok) {
@@ -643,6 +645,16 @@ void run_appmain_init_continue_driver_tail(
         }
         out.post_base_1e4c0_u1 = init_531d60_post_base_1e4c0_u1(e4_hooks);
         if (!out.post_base_1e4c0_u1.ok) {
+            return;
+        }
+        Init531d60PostBase4c4950U1Hooks c49_hooks = post_base_4c4950_u1_hooks;
+        c49_hooks.incoming_eax_from_1e4c0_u1 = out.post_base_1e4c0_u1.eax_return;
+        c49_hooks.incoming_eax_known = out.post_base_1e4c0_u1.eax_known;
+        if (c49_hooks.call_4c4950 == nullptr) {
+            c49_hooks.call_4c4950 = post_base_continue_b_hooks.call_4c4950;
+        }
+        out.post_base_4c4950_u1 = init_531d60_post_base_4c4950_u1(c49_hooks);
+        if (!out.post_base_4c4950_u1.ok) {
             return;
         }
         Init531d60PostBaseContinueBHooks b_hooks = post_base_continue_b_hooks;

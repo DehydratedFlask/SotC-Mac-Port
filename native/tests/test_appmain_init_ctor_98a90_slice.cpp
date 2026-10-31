@@ -71,6 +71,7 @@
 #include "core/init_531d60_post_base_vcall18.hpp"
 #include "core/init_531d60_post_base_continue_a.hpp"
 #include "core/init_531d60_post_base_1e4c0_u1.hpp"
+#include "core/init_531d60_post_base_4c4950_u1.hpp"
 #include "core/init_531d60_post_base_continue_b.hpp"
 #include "core/init_531d60_post_base_continue_c.hpp"
 #include "core/capture_a473b0.hpp"
@@ -1617,10 +1618,11 @@ int main() {
     Init531d60PostBase1e4c0U1Hooks pb1e4{};
     pb1e4.incoming_rax_standin = g_cont_b_rax;
     pb1e4.call_1e4c0 = hook_cont_b_1e4c0;
+    Init531d60PostBase4c4950U1Hooks pb4c{};
+    pb4c.call_4c4950 = hook_cont_b_4c4950;
     Init531d60PostBaseContinueAHooks pbca{};
     Init531d60PostBaseContinueBHooks pbcb{};
     pbcb.cell_32f84f8 = &g_cont_b_cell_32f84f8;
-    pbcb.call_4c4950 = hook_cont_b_4c4950;
     Init531d60PostBaseContinueCHooks pbcc{};
     pbcc.incoming_r14b = 0;  // fall-through path r14d = 0
     pbcc.incoming_r15 = g_cont_a_rdi_marker;  // stable init pointer stand-in
@@ -1675,7 +1677,7 @@ int main() {
                                                      pbf590u7, pbf590u8, pba2edu5, pbf590u9,
                                                      pbf590u10, pba2edu6, pbf590u11, pbf590u12,
                                                      pba2edu7, pbf590u13, pbf590u14, pba2eu1, pba2e5,
-                                                     pba543, pb1fc, pb1e4, pbca, pbcb, pbcc, pbcd, pbce, pbalt,
+                                                     pba543, pb1fc, pb1e4, pb4c, pbca, pbcb, pbcc, pbcd, pbce, pbalt,
                                                      ih);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
@@ -2443,6 +2445,9 @@ int main() {
         const Init531d60PostBase1e4c0U1Result e4_default{init_531d60_post_base_1e4c0_u1()};
         CHECK(e4_default.ok);
         CHECK(e4_default.call_1e4c0_count == 1);
+        const Init531d60PostBase4c4950U1Result c49_default{init_531d60_post_base_4c4950_u1()};
+        CHECK(c49_default.ok);
+        CHECK(c49_default.call_4c4950_count == 1);
         const Init531d60PostBaseContinueAResult cont_a_default{init_531d60_post_base_continue_a()};
         CHECK(cont_a_default.ok);
         CHECK(cont_a_default.unit_counts[static_cast<std::size_t>(ContinueAUnit::test_rax_rax)] == 1);
@@ -2453,19 +2458,26 @@ int main() {
     CHECK(g_cont_b_1e4c0 == 1);
     CHECK(g_cont_b_1e4c0_rdi == g_cont_b_rax_obj);
     CHECK(g_cont_b_1e4c0_eax == 0xA6);
-    // E514: grouped Init continue B 0x532793..0x5327b1 — 8 units, 1 call site,
-    // 2 ALU ops, 0..1 load; je6 target pinned but outcome NOT modelled when eax non-boolean.
+    // E515: Init continue first 0x4c4950 call-site (13 B prep NOT modelled)
+    CHECK(r.post_base_4c4950_u1.ok);
+    CHECK(r.post_base_4c4950_u1.call_4c4950_count == 1);
+    CHECK(r.post_base_4c4950_u1.edi_known);
+    CHECK(r.post_base_4c4950_u1.edi_arg == 0xA7);
+    CHECK(g_cont_b_4c4950 == 1);
+    CHECK(g_cont_b_4c4950_edi == 0xA7);
+    // E515: grouped Init continue B 0x5327a5..0x5327b1 — 3 units, 0 call sites,
+    // 1 ALU op, 0..1 load; je6 target pinned but outcome NOT modelled when eax non-boolean.
     CHECK(r.post_base_continue_b.ok);
     CHECK(r.post_base_continue_b.unit_executed ==
           kInit531d60PostBaseContinueBUnitCount);
-    CHECK(kInit531d60PostBaseContinueBUnitCount == 8);
+    CHECK(kInit531d60PostBaseContinueBUnitCount == 3);
     for (int i = 0; i < kInit531d60PostBaseContinueBUnitCount; ++i) {
         CHECK(r.post_base_continue_b.unit_counts[static_cast<std::size_t>(i)] == 1);
     }
-    CHECK(kInit531d60PostBaseContinueBUnits[0].rva == 0x532793);
-    CHECK(kInit531d60PostBaseContinueBUnits[7].rva == 0x5327ab);
-    CHECK(r.post_base_continue_b.call_count == 1);
-    CHECK(r.post_base_continue_b.alu_count == 2);
+    CHECK(kInit531d60PostBaseContinueBUnits[0].rva == 0x5327a5);
+    CHECK(kInit531d60PostBaseContinueBUnits[2].rva == 0x5327ab);
+    CHECK(r.post_base_continue_b.call_count == 0);
+    CHECK(r.post_base_continue_b.alu_count == 1);
     CHECK(r.post_base_continue_b.load_count == 1);
     CHECK(r.post_base_continue_b.branch_boundary_count == 1);
     CHECK(!r.post_base_continue_b.branch_outcome_modelled);
@@ -2478,8 +2490,6 @@ int main() {
     CHECK(r.post_base_continue_b.branch_target_rva == 0x5328e0);
     CHECK(r.post_base_continue_b.eax_known);
     CHECK(r.post_base_continue_b.eax_from_1e4c0 == 0xA6);
-    CHECK(g_cont_b_4c4950 == 1);
-    CHECK(g_cont_b_4c4950_edi == 0xA7);  // bl(0xA6) xor 1
 
     // Batch A alt: je 0x5327bd taken path — 70-unit alt module runs when
     // caller supplies hooks.  Not taken in the default full-slice run.
@@ -2678,6 +2688,10 @@ int main() {
         auto run_b = [&](int val) {
             g_cont_b_1e4c0_value = val;
             const Init531d60PostBase1e4c0U1Result e4 = init_531d60_post_base_1e4c0_u1(u1);
+            Init531d60PostBase4c4950U1Hooks u4{};
+            u4.incoming_eax_from_1e4c0_u1 = e4.eax_return;
+            u4.incoming_eax_known = e4.eax_known;
+            (void)init_531d60_post_base_4c4950_u1(u4);
             Init531d60PostBaseContinueBHooks h{};
             h.incoming_eax_from_1e4c0_u1 = e4.eax_return;
             h.incoming_eax_known = e4.eax_known;
@@ -2794,6 +2808,7 @@ int main() {
         "post_base_a543b0_u1+"
         "post_base_1fc80_u1+"
         "post_base_1e4c0_u1+"
+        "post_base_4c4950_u1+"
         "post_base_continue_a+"
         "early+tail+base+trivial+registry "
         "ok nested=%p ensure=%p obj40=%p f08=%p v40=%p pos=%p gfx=%p shadow=%p skels=%p "
@@ -3187,7 +3202,7 @@ void run_alt_join_route_tests() {
         AppmainInitCtor98a90SliceResult out{};
         run_appmain_init_continue_driver_tail(
             out, route_table, route_front, route_setter.data(), 0, 0, 0, 0,
-            {}, {}, {}, {}, e, {}, {}, {});
+            {}, {}, {}, {}, e, {}, {}, {}, {});
         CHECK(out.post_base_continue_b.ok);
         CHECK(!out.post_base_continue_b.eax_known);
         CHECK(out.post_base_continue_c.ok);
@@ -3221,7 +3236,7 @@ void run_alt_join_route_tests() {
         AppmainInitCtor98a90SliceResult out{};
         run_appmain_init_continue_driver_tail(
             out, route_table, route_front, route_setter.data(), 0, 0, 0, 0,
-            {}, {}, {}, {}, e, alt, {}, {});
+            {}, {}, {}, {}, e, alt, {}, {}, {});
         CHECK(out.post_base_alt_5327bd.ok);
         CHECK(!out.post_base_alt_5327bd.reached_via_jmp);
         CHECK(!out.post_base_alt_5327bd.reached_via_preamble);
@@ -3293,7 +3308,7 @@ void run_alt_join_route_tests() {
         AppmainInitCtor98a90SliceResult out{};
         run_appmain_init_continue_driver_tail(
             out, route_table, route_front, route_setter.data(), 0, 0x11, 0x22, 0x33,
-            {}, {}, {}, {}, e, alt, {}, {});
+            {}, {}, {}, {}, e, alt, {}, {}, {});
         CHECK(out.post_base_alt_5327bd.ok);
         CHECK(out.post_base_alt_5327bd.reached_via_jmp);
         CHECK(out.post_base_alt_5327bd.r12b_known && out.post_base_alt_5327bd.r12b_out == 0);
@@ -3349,7 +3364,7 @@ void run_alt_join_route_tests() {
         AppmainInitCtor98a90SliceResult out{};
         run_appmain_init_continue_driver_tail(
             out, route_table, route_front, route_setter.data(), 0, 0x11, 0x22, 0x33,
-            {}, {}, c, {}, e, alt, {}, {});
+            {}, {}, c, {}, e, alt, {}, {}, {});
         CHECK(out.post_base_alt_5327bd.ok);
         CHECK(out.post_base_alt_5327bd.reached_via_preamble);
         CHECK(out.post_base_alt_5327bd.slot0_dispatch_count == 1);

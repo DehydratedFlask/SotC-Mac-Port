@@ -3,6 +3,7 @@
 #include "config_bool_lookup_1e4c0.hpp"
 #include "init_531d60_post_base_1fc80_u1.hpp"
 #include "init_531d60_post_base_1e4c0_u1.hpp"
+#include "init_531d60_post_base_4c4950_u1.hpp"
 
 namespace sotc {
 namespace {
@@ -75,6 +76,14 @@ InitContinueAbNativeResult run_init_continue_ab_native_lookups(
     u1e4.call_1e4c0 = b_hooks.call_1e4c0;
     const Init531d60PostBase1e4c0U1Result e4 = init_531d60_post_base_1e4c0_u1(u1e4);
     if (!e4.ok) {
+        return out;
+    }
+    Init531d60PostBase4c4950U1Hooks u4{};
+    u4.incoming_eax_from_1e4c0_u1 = e4.eax_return;
+    u4.incoming_eax_known = e4.eax_known;
+    u4.call_4c4950 = b_hooks.call_4c4950;
+    const Init531d60PostBase4c4950U1Result c49 = init_531d60_post_base_4c4950_u1(u4);
+    if (!c49.ok) {
         return out;
     }
     Init531d60PostBaseContinueBHooks cb = b_hooks;
