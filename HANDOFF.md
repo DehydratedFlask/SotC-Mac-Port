@@ -1,5 +1,11 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-31 13:24 CDT (bc-0c031eff) — E518: Init continue `0xa431e0` call-site u1 (FIXTURE_VERIFIED)
+
+- **Edge:** `call 0xa431e0` @ `0x53297a` (5 B); prep `0x53294b..0x53297a` (47 B) demoted; `continue_c` → `0x53297f..0x53299d` (8 units / 30 B).
+- **Prior:** E517 tip `d5d1b1e403d60b7752721600738d64a36b4c33e5`.
+- **Next:** shrink merge tail / batch D entry as planned on PR #13.
+
 ## 2026-10-31 13:10 CDT (bc-37b8f36e) — E517: Init continue `0xa599e0` call-site u1 (FIXTURE_VERIFIED)
 
 - **Edge:** `call 0xa599e0` @ `0x532946` (5 B); prep `0x532910..0x532946` (54 B) demoted; `continue_c` → `0x53294b..0x53299d` (21 units / 82 B).

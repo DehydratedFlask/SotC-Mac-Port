@@ -84,6 +84,7 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBase4c4950U1Hooks& post_base_4c4950_u1_hooks,
     const Init531d60PostBaseA52b70U1Hooks& post_base_a52b70_u1_hooks,
     const Init531d60PostBaseA599e0U1Hooks& post_base_a599e0_u1_hooks,
+    const Init531d60PostBaseA431e0U1Hooks& post_base_a431e0_u1_hooks,
     const Init531d60PostBaseContinueAHooks& post_base_continue_a_hooks,
     const Init531d60PostBaseContinueBHooks& post_base_continue_b_hooks,
     const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks,
@@ -566,7 +567,7 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
         post_base_continue_c_hooks, post_base_continue_d_hooks,
         post_base_continue_e_hooks, post_base_alt_5327bd_hooks,
         post_base_1fc80_u1_hooks, post_base_1e4c0_u1_hooks, post_base_4c4950_u1_hooks,
-        post_base_a52b70_u1_hooks, post_base_a599e0_u1_hooks);
+        post_base_a52b70_u1_hooks, post_base_a599e0_u1_hooks, post_base_a431e0_u1_hooks);
     return out;
 }
 
@@ -584,7 +585,8 @@ void run_appmain_init_continue_driver_tail(
     const Init531d60PostBase1e4c0U1Hooks& post_base_1e4c0_u1_hooks,
     const Init531d60PostBase4c4950U1Hooks& post_base_4c4950_u1_hooks,
     const Init531d60PostBaseA52b70U1Hooks& post_base_a52b70_u1_hooks,
-    const Init531d60PostBaseA599e0U1Hooks& post_base_a599e0_u1_hooks) {
+    const Init531d60PostBaseA599e0U1Hooks& post_base_a599e0_u1_hooks,
+    const Init531d60PostBaseA431e0U1Hooks& post_base_a431e0_u1_hooks) {
     // E513: always-on Init continue — first 0x1fc80 call-site; 16 B prep NOT modelled.
     out.post_base_1fc80_u1 = init_531d60_post_base_1fc80_u1(post_base_1fc80_u1_hooks);
     if (!out.post_base_1fc80_u1.ok) {
@@ -712,9 +714,28 @@ void run_appmain_init_continue_driver_tail(
             return;
         }
         c_hooks.merge_a599e0_u1_ran = true;
+
+        Init531d60PostBaseA431e0U1Hooks a43_hooks = post_base_a431e0_u1_hooks;
+        a43_hooks.cell_32f6d18 = c_hooks.cell_32f6d18;
+        a43_hooks.cell_2efe318 = c_hooks.cell_2efe318;
+        a43_hooks.flag_byte_iter2 = c_hooks.flag_byte_iter2;
+        if (a43_hooks.vcall_slot0 == nullptr) {
+            a43_hooks.vcall_slot0 = c_hooks.vcall_slot0;
+        }
+        if (a43_hooks.call_a431e0 == nullptr) {
+            a43_hooks.call_a431e0 = c_hooks.call_a431e0;
+        }
+        a43_hooks.use_native_lazy_bind_91210 = c_hooks.use_native_lazy_bind_91210;
+        a43_hooks.demo_object = c_hooks.demo_object;
+        a43_hooks.lazy_bind = c_hooks.lazy_bind;
+        out.post_base_a431e0_u1 = init_531d60_post_base_a431e0_u1(a43_hooks);
+        if (!out.post_base_a431e0_u1.ok) {
+            return;
+        }
+        c_hooks.merge_a431e0_u1_ran = true;
     }
 
-    // Continue C merge body starts at 0x53294b after E517 first 0xa599e0 call-site.
+    // Continue C merge body starts at 0x53297f after E518 second direct call-site.
     out.post_base_continue_c = init_531d60_post_base_continue_c(c_hooks);
     if (!out.post_base_continue_c.ok) {
         return;
@@ -725,6 +746,14 @@ void run_appmain_init_continue_driver_tail(
         out.post_base_continue_c.lazy_bind_calls += out.post_base_a599e0_u1.lazy_bind_calls;
         if (out.post_base_a599e0_u1.lazy_bind_calls != 0) {
             out.post_base_continue_c.lazy_bind_ok = out.post_base_a599e0_u1.lazy_bind_ok;
+        }
+    }
+    if (out.post_base_a431e0_u1.ok) {
+        out.post_base_continue_c.flag2_known = out.post_base_a431e0_u1.flag2_known;
+        out.post_base_continue_c.sil_iter2 = out.post_base_a431e0_u1.sil_iter2;
+        out.post_base_continue_c.lazy_bind_calls += out.post_base_a431e0_u1.lazy_bind_calls;
+        if (out.post_base_a431e0_u1.lazy_bind_calls != 0 && !out.post_base_continue_c.lazy_bind_ok) {
+            out.post_base_continue_c.lazy_bind_ok = out.post_base_a431e0_u1.lazy_bind_ok;
         }
     }
 
