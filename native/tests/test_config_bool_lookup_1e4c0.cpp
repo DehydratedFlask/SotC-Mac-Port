@@ -4,6 +4,7 @@
 #include <cstring>
 
 #include "core/config_bool_lookup_1e4c0.hpp"
+#include "core/init_531d60_post_base_1e4c0_u1.hpp"
 #include "core/init_531d60_post_base_continue_b.hpp"
 #include "core/sndx_command_handlers.hpp"
 
@@ -84,11 +85,17 @@ void test_continue_b_native_branch() {
     obj.begin = rows;
     obj.end = rows + 1;
 
-    Init531d60PostBaseContinueBHooks hooks{};
-    hooks.incoming_rax_standin = &obj;
-    hooks.call_1e4c0 = [](void* rdi) -> int {
+    Init531d60PostBase1e4c0U1Hooks u1{};
+    u1.incoming_rax_standin = &obj;
+    u1.call_1e4c0 = [](void* rdi) -> int {
         return config_bool_lookup_init_continue_b(rdi);
     };
+
+    const Init531d60PostBase1e4c0U1Result e4_false =
+        init_531d60_post_base_1e4c0_u1(u1);
+    Init531d60PostBaseContinueBHooks hooks{};
+    hooks.incoming_eax_from_1e4c0_u1 = e4_false.eax_return;
+    hooks.incoming_eax_known = e4_false.eax_known;
 
     const auto taken = init_531d60_post_base_continue_b(hooks);
     CHECK(taken.ok);
@@ -98,6 +105,9 @@ void test_continue_b_native_branch() {
     CHECK(taken.branch_taken);
 
     rows[0].value = "true";
+    const Init531d60PostBase1e4c0U1Result e4_true = init_531d60_post_base_1e4c0_u1(u1);
+    hooks.incoming_eax_from_1e4c0_u1 = e4_true.eax_return;
+    hooks.incoming_eax_known = e4_true.eax_known;
     const auto fallthrough = init_531d60_post_base_continue_b(hooks);
     CHECK(fallthrough.eax_from_1e4c0 == 1);
     CHECK(fallthrough.branch_outcome_modelled);

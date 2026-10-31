@@ -80,6 +80,7 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBaseA2e5d0U1Hooks& post_base_a2e5d0_u1_hooks,
     const Init531d60PostBaseA543b0U1Hooks& post_base_a543b0_u1_hooks,
     const Init531d60PostBase1fc80U1Hooks& post_base_1fc80_u1_hooks,
+    const Init531d60PostBase1e4c0U1Hooks& post_base_1e4c0_u1_hooks,
     const Init531d60PostBaseContinueAHooks& post_base_continue_a_hooks,
     const Init531d60PostBaseContinueBHooks& post_base_continue_b_hooks,
     const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks,
@@ -561,7 +562,7 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
         post_base_continue_a_hooks, post_base_continue_b_hooks,
         post_base_continue_c_hooks, post_base_continue_d_hooks,
         post_base_continue_e_hooks, post_base_alt_5327bd_hooks,
-        post_base_1fc80_u1_hooks);
+        post_base_1fc80_u1_hooks, post_base_1e4c0_u1_hooks);
     return out;
 }
 
@@ -575,7 +576,8 @@ void run_appmain_init_continue_driver_tail(
     const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks,
     const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks,
     const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks,
-    const Init531d60PostBase1fc80U1Hooks& post_base_1fc80_u1_hooks) {
+    const Init531d60PostBase1fc80U1Hooks& post_base_1fc80_u1_hooks,
+    const Init531d60PostBase1e4c0U1Hooks& post_base_1e4c0_u1_hooks) {
     // E513: always-on Init continue — first 0x1fc80 call-site; 16 B prep NOT modelled.
     out.post_base_1fc80_u1 = init_531d60_post_base_1fc80_u1(post_base_1fc80_u1_hooks);
     if (!out.post_base_1fc80_u1.ok) {
@@ -630,9 +632,23 @@ void run_appmain_init_continue_driver_tail(
         route_r12b = out.post_base_alt_5327bd.r12b_out;
         out.init_r12b_known = true;
     } else {
-        // E510: 14-unit fall-through 0x53277f..0x5327b1.
-        out.post_base_continue_b = init_531d60_post_base_continue_b(
-            post_base_continue_b_hooks);
+        // E514: first B-path 0x1e4c0 call-site; 15 B prep NOT modelled.
+        Init531d60PostBase1e4c0U1Hooks e4_hooks = post_base_1e4c0_u1_hooks;
+        if (e4_hooks.incoming_rax_standin == nullptr &&
+            out.post_base_continue_a.rax_from_1fc80_known) {
+            e4_hooks.incoming_rax_standin = out.post_base_continue_a.rax_from_1fc80;
+        }
+        if (e4_hooks.call_1e4c0 == nullptr) {
+            e4_hooks.call_1e4c0 = post_base_continue_b_hooks.call_1e4c0;
+        }
+        out.post_base_1e4c0_u1 = init_531d60_post_base_1e4c0_u1(e4_hooks);
+        if (!out.post_base_1e4c0_u1.ok) {
+            return;
+        }
+        Init531d60PostBaseContinueBHooks b_hooks = post_base_continue_b_hooks;
+        b_hooks.incoming_eax_from_1e4c0_u1 = out.post_base_1e4c0_u1.eax_return;
+        b_hooks.incoming_eax_known = out.post_base_1e4c0_u1.eax_known;
+        out.post_base_continue_b = init_531d60_post_base_continue_b(b_hooks);
         if (!out.post_base_continue_b.ok) {
             return;
         }

@@ -2,6 +2,7 @@
 
 #include "config_bool_lookup_1e4c0.hpp"
 #include "init_531d60_post_base_1fc80_u1.hpp"
+#include "init_531d60_post_base_1e4c0_u1.hpp"
 
 namespace sotc {
 namespace {
@@ -66,11 +67,20 @@ InitContinueAbNativeResult run_init_continue_ab_native_lookups(
         out.cont_a.rax_from_1fc80 == nullptr) {
         return out;
     }
-    b_hooks.incoming_rax_standin = out.cont_a.rax_from_1fc80;
     if (b_hooks.call_1e4c0 == nullptr) {
         b_hooks.call_1e4c0 = &config_bool_lookup_init_continue_b;
     }
-    out.cont_b = init_531d60_post_base_continue_b(b_hooks);
+    Init531d60PostBase1e4c0U1Hooks u1e4{};
+    u1e4.incoming_rax_standin = out.cont_a.rax_from_1fc80;
+    u1e4.call_1e4c0 = b_hooks.call_1e4c0;
+    const Init531d60PostBase1e4c0U1Result e4 = init_531d60_post_base_1e4c0_u1(u1e4);
+    if (!e4.ok) {
+        return out;
+    }
+    Init531d60PostBaseContinueBHooks cb = b_hooks;
+    cb.incoming_eax_from_1e4c0_u1 = e4.eax_return;
+    cb.incoming_eax_known = e4.eax_known;
+    out.cont_b = init_531d60_post_base_continue_b(cb);
     out.ran_continue_b = true;
     return out;
 }
