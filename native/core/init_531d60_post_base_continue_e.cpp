@@ -5,6 +5,7 @@
 #include "init_531d60_post_base_vcall18_532a17.hpp"
 #include "init_531d60_post_base_vcall18_532a72_u1.hpp"
 #include "init_531d60_post_base_lea_5388e0_532a7d_u1.hpp"
+#include "init_531d60_post_base_lea_rsp470_532a84_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
 #include <cstring>
@@ -125,10 +126,18 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         out.lea_rip_count += lr.lea_rip_count;
     }
 
-    // 0x532a84 lea rdx,[rsp+0x470] — descriptor 3 on stack
+    Init531d60PostBaseLeaRsp470_532a84_U1Cells lea_rsp_cells = hooks.lea_rsp470_532a84_u1_cells;
+    if (!hooks.merge_lea_rsp470_532a84_u1_ran) {
+        const Init531d60PostBaseLeaRsp470_532a84_U1Result lrr =
+            init_531d60_post_base_lea_rsp470_532a84_u1(lea_rsp_cells);
+        if (!lrr.ok) {
+            return out;
+        }
+    }
+
+    // Descriptor 3 on stack (address pinned by lea rdx,[rsp+0x470] @ 0x532a84 peel).
     alignas(32) SaveDataDescriptor desc3{};
     void* desc3_ptr = &desc3;
-    pin(out, ContinueEUnit::lea_rdx_rsp470);
 
     // 0x532a8c lea rsi,[0x15c8e18] — vtable 2 (slot-3 no-op source)
     pin(out, ContinueEUnit::lea_rsi_15c8e18);

@@ -2,7 +2,7 @@
 //   lea rax,[0x5388e0]   ; thunk 1 address pin (ret no-op)
 //
 // After E524 `vmovq_532a75_u1` end @ `0x532a7d`. NOT modelled: following
-// stack descriptor prep @ `0x532a84`. G1 PARTIAL.
+// following lea rdx,[rsp+0x470] @ `0x532a84` (E526 peel). G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
