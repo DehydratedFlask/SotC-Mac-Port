@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-31 01:40 CDT (root) — E1050: CritSec slot-414 atexit teardown coverage audit claim (ACTIVE)
+
+- **Task:** `RE-02-CRITSEC-SLOT414-ATEXIT-LIFECYCLE-AUDIT-01` — read-only trace of whether the host lifecycle consumes `StartupAtexitLog` entries or invokes the slot-414 `0x3b380` destroy hook. Do not implement teardown or infer real runtime behavior.
+- **Claim:** root owns only the audit/result docs. The E1044 checkpoint says `init_slot414_57b9b0` records the destructor identity without executing it; the separate lifecycle question is whether any host shutdown path drains that log or invokes the hook.
+- **Graft-first triage:** `graft ask` surfaced `CritSecHandle`, `StartupAtexitLog`, `init_tiny_atexit_slot`, and `critsec_destroy_hook`; exhaustive `StartupAtexitLog` search found declarations and registration/test sites, but no lifecycle drain in the initial ranked results.
+- `python3 scripts/project_index.py` — exit 0, 44,293 folders indexed.
+- **Next exact action:** inspect live `StartupAtexitLog` methods, its owner/stop paths, slot-414 registration, and all destroy-hook references; independently verify the bounded conclusion. No source or test edits are in scope.
+
 ## 2026-10-31 01:38 CDT (root) — E1049: `lookup_1fc80` default comparator correction (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-LOOKUP-1FC80-CASEFOLD-MODEL-01` COMPLETE. The host lookup's null-hook default now calls `strcasecmp`; the override is named `compare_f8f500`. The fixture calls the helper directly with stored `nointro` and probe `NOINTRO`. Checker diagnostic now says `comparator PLT`.
