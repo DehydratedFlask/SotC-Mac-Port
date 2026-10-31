@@ -21,6 +21,7 @@
 #include "init_531d60_post_base_mov_rdi_rbx_532aef_u1.hpp"
 #include "init_531d60_post_base_vcall18_532af2_u1.hpp"
 #include "init_531d60_post_base_lea_rax_2eff450_532af5_u1.hpp"
+#include "init_531d60_post_base_xor_esi_532afc_u1.hpp"
 #include "init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
@@ -412,13 +413,18 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         out.lea_rip_count += lr4.lea_rip_count;
     }
 
+    if (!hooks.merge_xor_esi_532afc_u1_ran) {
+        const Init531d60PostBaseXorEsi_532afc_U1Result xr =
+            init_531d60_post_base_xor_esi_532afc_u1();
+        if (!xr.ok) {
+            return out;
+        }
+    }
+
     // ---- Block 4: resolved 0x54b250 call via 0x2eff450 ----
     // Resolution per E538: *(0x2eff450) is a 0x460-byte object whose vtable
     // is 0x15c9830.  Slot 1 (offset +0x8) = 0x54b250.  The call is:
     //   0x54b250(*(0x2eff450), esi=0, edx=2)
-
-    // 0x532afc xor esi,esi — arg1 = 0
-    pin(out, ContinueEUnit::xor_esi_esi);
 
     // 0x532afe mov edx,2 — arg2 = 2
     pin(out, ContinueEUnit::mov_edx_2);
