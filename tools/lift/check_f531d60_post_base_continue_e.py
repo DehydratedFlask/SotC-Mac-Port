@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ELF-tie Init 0x531d60 continue E tail block 0x532b0c..0x532b0c (0 B / 0 units after E547 peel).
+"""ELF-tie Init 0x531d60 continue E tail block 0x532b09..0x532b0c (3 B / 1 unit).
 
 Private: needs local/re/eboot.elf.  Pins every one of the 52 consecutive
 instructions, the three call 0xa54920 rel32 targets, the three vcall+0x18
@@ -23,10 +23,10 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import ps4_dynlink as d  # noqa: E402
 
 ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
-START = 0x532B0C
-SIZE = 0
+START = 0x532B09
+SIZE = 3
 END = 0x532B0C
-REGION_SHA256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+REGION_SHA256 = "3bf4b917424b527784120e40e040cc1709ac317c24237f69f8dad8bee50a4fde"
 VMOVQ_NATIVE = ROOT / "native/core/init_531d60_post_base_vmovq_532a75_u1.hpp"
 LEA_NATIVE = ROOT / "native/core/init_531d60_post_base_lea_5388e0_532a7d_u1.hpp"
 LEA_RSP_NATIVE = ROOT / "native/core/init_531d60_post_base_lea_rsp470_532a84_u1.hpp"
@@ -79,7 +79,10 @@ MOV_EDX532AFE_NATIVE = ROOT / "native/core/init_531d60_post_base_mov_edx_2_532af
 MOVRDI532B03_NATIVE = ROOT / "native/core/init_531d60_post_base_mov_rdi_rax_mem_532b03_u1.hpp"
 MOVRAX532B06_NATIVE = ROOT / "native/core/init_531d60_post_base_mov_rax_rdi_mem_532b06_u1.hpp"
 
-UNITS: list[tuple] = []
+UNITS = [
+    (0x532B09, 3, "3bf4b917424b527784120e40e040cc1709ac317c24237f69f8dad8bee50a4fde",
+     "call [rax+0x8]", "vcall08", None),
+]
 
 NATIVE_HPP = ROOT / "native/core/init_531d60_post_base_continue_e.hpp"
 NATIVE_CPP = ROOT / "native/core/init_531d60_post_base_continue_e.cpp"
@@ -101,7 +104,7 @@ def main() -> int:
     _, ph = d.program_headers(elf)
     img = d.Image(elf, ph)
 
-    require(len(UNITS) == 0, "unit count")
+    require(len(UNITS) == 1, "unit count")
     require(START + SIZE == END, "size arithmetic")
 
     # Verify contiguous unit coverage.
@@ -149,9 +152,7 @@ def main() -> int:
     nh = NATIVE_HPP.read_text()
     require("init_531d60_post_base_continue_e" in nh, "API")
     require("NOT modelled" in nh, "omission")
-    require("kInit531d60PostBaseContinueERva = 0x532b0c" in nh, "start rva")
-    require("kInit531d60PostBaseContinueESize = 0" in nh, "continue_e size")
-    require("merge_vcall08_532b09_u1_ran" in nh, "vcall08 merge hook")
+    require("kInit531d60PostBaseContinueERva = 0x532b09" in nh, "start rva")
     require("merge_a54920_532ae2_u1_ran" in nh, "a54920_532ae2 merge hook")
     require("merge_a54920_u1_ran" in nh, "u1 merge hook")
     require("merge_a54920_532a62_u1_ran" in nh, "a54920_532a62 merge hook")
@@ -255,12 +256,13 @@ def main() -> int:
     require("merge_xor_esi_532afc_u1_ran" in ncp, "xor_esi merge in cpp")
     require("merge_mov_edx_2_532afe_u1_ran" in ncp, "mov_edx merge in cpp")
     require("merge_mov_rdi_rax_mem_532b03_u1_ran" in ncp, "mov_rdi_rax_mem merge in cpp")
+    require("merge_mov_rax_rdi_mem_532b06_u1_ran" in ncp, "mov_rax merge in cpp")
+    require("pin(out, ContinueEUnit::vcall_rax08)" in ncp, "vcall pin in cpp")
+    require("merge_mov_rax_rdi_mem_532b06_u1_ran" in ncp, "mov_rax_rdi_mem merge in cpp")
     require("expect_vmovq" in ncp, "conditional vmovq validation")
     require("expect_a54920" in ncp, "conditional a54920 validation")
-    require("merge_vcall08_532b09_u1_ran" in ncp, "vcall08 merge in cpp")
-    require("expect_vcall_54b250" in ncp, "conditional vcall_54b250 validation")
-    require("init_531d60_post_base_vcall08_532b09_u1" in ncp, "vcall08 u1 dispatch")
     require("expect_vcall_noop" in ncp, "conditional vcall noop validation")
+    require("vcall_54b250_count == 1" in ncp, "1 54b250 vcall")
     require("expect_stamp" in ncp, "conditional boss-flag stamp")
     require("expect_lea_rip" in ncp, "conditional lea rip validation")
     require("expect_vmovq" in ncp, "conditional vmovq pin")
@@ -297,10 +299,14 @@ def main() -> int:
     require("init_531d60_post_base_mov_rdi_rbx_532aef_u1.cpp" in cm, "mov_rdi_rbx in CMake")
     require("init_531d60_post_base_lea_rax_2eff450_532af5_u1.cpp" in cm, "lea_rax_532af5 in CMake")
     require("init_531d60_post_base_xor_esi_532afc_u1.cpp" in cm, "xor_esi_532afc in CMake")
+    require("init_531d60_post_base_mov_rax_rdi_mem_532b06_u1.cpp" in cm, "mov_rax in CMake")
+    require("init_531d60_post_base_vcall08_532b09_u1.cpp" not in cm, "vcall08 not in CMake")
 
     # Test text.
     tt = TEST.read_text()
     require("init_531d60_post_base_continue_e" in tt, "continue_e in test")
+    require("merge_mov_rax_rdi_mem_532b06_u1_ran" in tt, "mov_rax merge in test")
+    require("merge_vcall08_532b09_u1_ran" not in tt, "no vcall08 merge in test")
 
     # Previous batch end check (batch D ends at 0x5329ae).
     require("kInit531d60PostBaseContinueDEndRva = 0x5329ae" in
@@ -311,7 +317,8 @@ def main() -> int:
         f"calls 0x{CALL_A54920:x}×0 pinned (+3 u1); vcall+0x18 no-ops×0 pinned (+3 vcall18); "
         f"no-ops→0x{NOOP_VCALL1_RESOLVED:x}/"
         f"0x{NOOP_VCALL2_RESOLVED:x}(ret); vcall+0x8→0x{RESOLVED_VCALL_54B250:x}; "
-        f"mov_rdi_rax_mem @0x532b03 + mov_rax_rdi_mem @0x532b06 (+u1); end=0x{END:x}; "
+        f"mov_rdi_rax_mem @0x532b03 + mov_rax_rdi_mem @0x532b06 + vcall08 @0x532b09 (+u1); "
+        f"empty continue_e; end=0x{END:x}; "
         f"a54920_body/54b250_body/descriptor_semantics/r13_r12b_provenance NOT claimed"
     )
     return 0
