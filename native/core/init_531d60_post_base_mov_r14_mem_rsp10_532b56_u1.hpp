@@ -1,7 +1,7 @@
 // Init `0x531d60` registry mov [rsp+0x10],r14 OBS `0x532b56..0x532b5b` (5 B):
 //   mov [rsp+0x10],r14   ; destroy-path prologue after je fall-through @ `0x532b50`
 //
-// After E564 je @ `0x532b50`. NOT modelled: reload/compare/destroy @ `0x532b5b..`. G1 PARTIAL.
+// After E564 je @ `0x532b50`. NOT modelled: test/compare/destroy @ `0x532b60..`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

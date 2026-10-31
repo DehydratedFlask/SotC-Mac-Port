@@ -213,7 +213,15 @@ RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, 
         }
     }
 
-    // OBS 0x532b5b..0x532bf8: destroy previous if different & non-null; then movq new, (0x2efd160).
+    if (!hooks.merge_mov_r13_mem_rsp40_532b5b_u1_ran) {
+        const auto mov_r13 = init_531d60_post_base_mov_r13_mem_rsp40_532b5b_u1({});
+        if (!mov_r13.ok) {
+            destroy_registry_object(obj, alloc);
+            return RegistryInit531d60Status::alloc_failed;
+        }
+    }
+
+    // OBS 0x532b60..0x532bf8: destroy previous if different & non-null; then movq new, (0x2efd160).
     RegistryObject2efd160* prev = registry_cell_2efd160().load();
     if (prev == obj) {
         return RegistryInit531d60Status::ok;
