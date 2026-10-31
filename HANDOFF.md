@@ -1,11 +1,13 @@
 # SoC Mac Native — current handoff
 
-## 2026-10-31 01:48 CDT (root) — E1051: validation checkpoint pointer sync claim (ACTIVE)
+## 2026-10-31 01:54 CDT (root) — E1051: validation checkpoint pointer sync (DOCS_VERIFIED)
 
-- **Task:** `DOC-VALIDATION-CHECKPOINT-SYNC-01` — reconcile the stale “Current checkpoint” pointer in `docs/VALIDATION.md` with E1050 while preserving the latest verified launcher bundle provenance and unchanged G0–G6 states.
-- **Claim:** root owns `HANDOFF.md`, `docs/VALIDATION.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-31-validation-checkpoint-sync-e1051.md` for this docs-only task. No code or gate changes are in scope.
-- **Evidence basis:** live `HANDOFF.md` is at E1050; live `docs/EVIDENCE.md` has E1050; `docs/VALIDATION.md` still labels E1005 as the current checkpoint. Gate status remains G0/G1/G3/G4 PARTIAL and G2/G5/G6 NOT RUN; E1005 remains the last verified launcher/core bundle checkpoint.
-- **Next exact action:** update the validation summary to identify E1050 as the latest project checkpoint and E1005 as the latest verified app bundle, then run publication checks and record exact results. Attempts: 0.
+- **Task:** `DOC-VALIDATION-CHECKPOINT-SYNC-01` COMPLETE. `docs/VALIDATION.md` now identifies E1051 as the current documentation checkpoint, E1050 as the latest substantive source audit, and E1005 as the latest artifact-verified thin-ARM64 launcher/core bundle; G0–G6 statuses remain unchanged.
+- **Files:** `HANDOFF.md`, `docs/EVIDENCE.md`, `docs/FOLDERS.md`, `docs/INDEX.md`, `docs/TASKS.md`, `docs/VALIDATION.md`, and `docs/checkpoints/2026-10-31-validation-checkpoint-sync-e1051.md`. `INSTALL_LOG.md` unchanged; no dependency acquired.
+- **Verification:** configure exit 0; Ninja build exit 0/no work; CTest 495/495; lift checkers 578 passed, 0 skipped, 0 failed; `python3 scripts/project_index.py` 44,295 folders. Staged audit 7 paths, all-path audit 3,459 paths, diff checks and attribution audit pass. Logs: `local/validation/doc-sync-e1051/`; exact command output and limits in [E1051](docs/checkpoints/2026-10-31-validation-checkpoint-sync-e1051.md).
+- **Publication (`ARTIFACT_VERIFIED`):** owner-authored commit `018922f71fca1259921f2fe4007cb38bf8411e86` pushed to `origin main`; post-push fetch confirmed `HEAD == origin/main == FETCH_HEAD`, and the worktree was clean.
+- **Evidence boundary / remaining risks:** documentation consistency only; no new launcher artifact, lifecycle, game boot, audio, save/reload, Metal gameplay, or G0–G6 pass. Task-board surveys found no `READY` task independent of existing policy/evidence dependencies.
+- **Next exact action:** wait for the pending `0x499f80` host-policy choice or a new concrete slot-309 producer/consumer/order edge; manual Mac unlock remains required for the VoiceOver readiness check. Attempts: 0.
 
 ## 2026-10-31 01:43 CDT (root) — E1050: CritSec slot-414 atexit teardown coverage audit (STATIC_ANALYSIS_VERIFIED)
 
