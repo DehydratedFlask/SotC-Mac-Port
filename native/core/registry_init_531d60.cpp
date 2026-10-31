@@ -70,9 +70,19 @@ RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, 
             return RegistryInit531d60Status::alloc_failed;
         }
     }
+    std::uint32_t count_from_54dc20 = 0;
     if (!hooks.merge_call_54dc20_532b21_u1_ran) {
         const auto count_call = init_531d60_post_base_call_54dc20_532b21_u1();
         if (!count_call.ok) {
+            return RegistryInit531d60Status::alloc_failed;
+        }
+        count_from_54dc20 = count_call.count;
+    }
+    if (!hooks.merge_mov_r15_rax_532b26_u1_ran) {
+        Init531d60PostBaseMovR15Rax_532b26_U1Cells cells{};
+        cells.rax_in = count_from_54dc20;
+        const auto mov_r15 = init_531d60_post_base_mov_r15_rax_532b26_u1(cells);
+        if (!mov_r15.ok) {
             return RegistryInit531d60Status::alloc_failed;
         }
     }

@@ -14,7 +14,7 @@ Init531d60PostBaseCall54dc20_532b21_U1Result init_531d60_post_base_call_54dc20_5
     }
     ++out.call_54dc20_count;
 
-    // Next: mov r15,rax / setup for fill @ 0x532b26 — not modelled in this unit.
+    // Next: mov r15,rax @ 0x532b26 — peeled as registry_body unit E554.
     out.ok = (out.call_54dc20_count == 1);
     return out;
 }
