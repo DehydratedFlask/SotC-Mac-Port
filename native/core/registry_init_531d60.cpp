@@ -138,16 +138,31 @@ RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, 
         }
     }
 
+    void* r12_from_cell = nullptr;
     if (!hooks.merge_mov_r12_rbx_532b41_u1_ran) {
         const auto mov_r12 = init_531d60_post_base_mov_r12_rbx_532b41_u1();
         if (!mov_r12.ok) {
             destroy_registry_object(obj, alloc);
             return RegistryInit531d60Status::alloc_failed;
         }
+        r12_from_cell = mov_r12.r12;
     }
 
-    // OBS 0x532b44..0x532bf8: compare with previous; destroy previous if different & non-null;
-    // then movq new, (0x2efd160). Same-pointer fast path skips destroy+store.
+    if (!hooks.merge_cmp_r12_r14_532b44_u1_ran) {
+        Init531d60PostBaseCmpR12R14_532b44_U1Cells cells{};
+        cells.r12_in = r12_from_cell;
+        cells.r14_in = obj;
+        const auto cmp = init_531d60_post_base_cmp_r12_r14_532b44_u1(cells);
+        if (!cmp.ok) {
+            destroy_registry_object(obj, alloc);
+            return RegistryInit531d60Status::alloc_failed;
+        }
+        if (cmp.pointers_equal) {
+            return RegistryInit531d60Status::ok;
+        }
+    }
+
+    // OBS 0x532b47..0x532bf8: destroy previous if different & non-null; then movq new, (0x2efd160).
     RegistryObject2efd160* prev = registry_cell_2efd160().load();
     if (prev == obj) {
         return RegistryInit531d60Status::ok;

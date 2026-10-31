@@ -15,7 +15,7 @@ Init531d60PostBaseMovR12Rbx_532b41_U1Result init_531d60_post_base_mov_r12_rbx_53
     }
     ++out.mov_r12_rbx_count;
 
-    // Next: cmp r12,r14 @ 0x532b44 — not modelled in this unit.
+    // Next: cmp r12,r14 @ 0x532b44 — peeled as registry_body unit E561.
     out.ok = (out.mov_r12_rbx_count == 1);
     return out;
 }

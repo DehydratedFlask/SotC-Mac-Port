@@ -1,7 +1,7 @@
 // Init `0x531d60` registry mov r12,[rbx] OBS `0x532b41..0x532b44` (3 B):
 //   mov r12,[rbx]   ; previous registry object pointer from global cell @ 0x2efd160
 //
-// After E559 mov r13 @ `0x532b3a`. NOT modelled: cmp r12,r14 / compare-store @ `0x532b44..`. G1 PARTIAL.
+// After E559 mov r13 @ `0x532b3a`. NOT modelled: cmp r12,r14 @ `0x532b44` (E561 peel) / destroy-store @ `0x532b47..`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
