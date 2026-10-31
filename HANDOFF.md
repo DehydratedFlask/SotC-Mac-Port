@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-31 01:43 CDT (root) — E1050: CritSec slot-414 atexit teardown coverage audit (STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `RE-02-CRITSEC-SLOT414-ATEXIT-LIFECYCLE-AUDIT-01` COMPLETE. No current host path drains `StartupAtexitLog` or invokes slot-414's `0x3b380` destroy hook. Log reads are test/testkit only; slot 414 is absent from `StartupState` and the recovered constructor table.
+- **C API boundary:** `measure_ctor_prefix` creates a temporary `StartupState` and caches counters; `sotc_core` owns no startup state. Start returns `SOTC_ERR_ENGINE_NOT_IMPLEMENTED`; stop only handles state callbacks; destroy calls stop then deletes the core.
+- **Independent review:** `/root/driver_gap_review` independently confirmed the same source boundary and found no production caller for `init_slot414_57b9b0` or direct destroy-hook invocation.
+- **Evidence:** private report `local/validation/critsec-slot414-teardown-e1050/REPORT.md`; live spans and Graft query inventory are in [E1050](docs/checkpoints/2026-10-31-critsec-slot414-teardown-audit-e1050.md). No source changes; tests NOT RUN. Project index: 44,294 folders.
+- **Prepublication (PASSED):** staged audit 6 paths; all-path audit 3,458 paths; attribution and staged/working diff checks pass. Logs: `local/validation/critsec-slot414-teardown-e1050/`.
+- **Limits:** no future engine-state owner, native destructor mapping, or teardown order is established. Broad CritSec task stays PARTIAL; no product gate advances.
+- Next exact action: hold teardown implementation until an engine lifecycle owner and native hook ordering contract exist; resume the independent `0x499f80` host-policy task only after the user's preference arrives.
+
 ## 2026-10-31 01:40 CDT (root) — E1050: CritSec slot-414 atexit teardown coverage audit claim (ACTIVE)
 
 - **Task:** `RE-02-CRITSEC-SLOT414-ATEXIT-LIFECYCLE-AUDIT-01` — read-only trace of whether the host lifecycle consumes `StartupAtexitLog` entries or invokes the slot-414 `0x3b380` destroy hook. Do not implement teardown or infer real runtime behavior.
