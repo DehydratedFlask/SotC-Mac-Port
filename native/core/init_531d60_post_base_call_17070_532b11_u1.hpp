@@ -2,7 +2,7 @@
 //   call 0x17070   ; size 0x98 in edi from prior mov edi peel (E548)
 //   // stop before mov r14,rax @ 0x532b16
 //
-// After E548 mov edi @ `0x532b0c`. NOT modelled: 0x17070 body; following mov r14,rax.
+// After E548 mov edi @ `0x532b0c`. NOT modelled: 0x17070 body (hook only).
 // G1 PARTIAL.
 #pragma once
 

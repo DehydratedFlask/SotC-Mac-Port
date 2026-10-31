@@ -28,9 +28,10 @@ def main():
     nh=NATIVE.read_text()
     require('init_531d60_post_base_mov_edi_98_532b0c_u1' in nh,'api')
     reg=REG.read_text()
-    require('kRegistryInit531d60FragmentPinnedRva = 0x532b16' in reg,'pin')
+    require('kRegistryInit531d60FragmentPinnedRva = 0x532b19' in reg,'pin')
     require('merge_mov_edi_98_532b0c_u1_ran' in reg,'merge mov')
     require('merge_call_17070_532b11_u1_ran' in reg,'merge call')
+    require('merge_mov_r14_rax_532b16_u1_ran' in reg,'merge mov r14')
     require('init_531d60_post_base_mov_edi_98_532b0c_u1.cpp' in CMAKE.read_text(),'cmake')
     print(f'OK check_f531d60_post_base_mov_edi_98_532b0c_u1 end={END:#x}')
     return 0

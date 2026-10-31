@@ -46,6 +46,12 @@ RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, 
             return RegistryInit531d60Status::alloc_failed;
         }
     }
+    if (!hooks.merge_mov_r14_rax_532b16_u1_ran) {
+        const auto mov_r14 = init_531d60_post_base_mov_r14_rax_532b16_u1();
+        if (!mov_r14.ok) {
+            return RegistryInit531d60Status::alloc_failed;
+        }
+    }
     void* raw = alloc.new_(kRegistryInitObjectBytes);
     if (raw == nullptr) {
         return RegistryInit531d60Status::alloc_failed;

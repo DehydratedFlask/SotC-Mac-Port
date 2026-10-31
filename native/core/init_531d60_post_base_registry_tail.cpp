@@ -25,13 +25,24 @@ Init531d60PostBaseRegistryTailResult init_531d60_post_base_registry_tail(
         out.unit_counts[static_cast<std::size_t>(RegistryTailUnit::call_17070_532b11_u1)] = 1;
         ++out.unit_executed;
     }
+    if (!hooks.merge_mov_r14_rax_532b16_u1_ran) {
+        const Init531d60PostBaseMovR14Rax_532b16_U1Result mov_r14 =
+            init_531d60_post_base_mov_r14_rax_532b16_u1(hooks.mov_r14_rax_cells);
+        if (!mov_r14.ok) {
+            return out;
+        }
+        out.mov_r14_rax_count = mov_r14.mov_r14_rax_count;
+        out.unit_counts[static_cast<std::size_t>(RegistryTailUnit::mov_r14_rax_532b16_u1)] = 1;
+        ++out.unit_executed;
+    }
     out.end_rva = kInit531d60PostBaseRegistryTailEndRva;
     const int expected_mov = hooks.merge_mov_edi_98_532b0c_u1_ran ? 0 : 1;
     const int expected_call = hooks.merge_call_17070_532b11_u1_ran ? 0 : 1;
-    const int expected_units =
-        hooks.merge_call_17070_532b11_u1_ran ? 0 : kInit531d60PostBaseRegistryTailUnitCount;
+    const int expected_mov_r14 = hooks.merge_mov_r14_rax_532b16_u1_ran ? 0 : 1;
+    const int expected_units = expected_call + expected_mov_r14;
     out.ok = (out.unit_executed == expected_units) && (out.mov_edi_count == expected_mov) &&
-             (out.call_17070_count == expected_call);
+             (out.call_17070_count == expected_call) &&
+             (out.mov_r14_rax_count == expected_mov_r14);
     return out;
 }
 
