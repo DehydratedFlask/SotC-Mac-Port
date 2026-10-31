@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-31 02:42 CDT (root) — E1053 result: task availability revalidation (DOCS_VERIFIED)
+
+- **Task:** `DOC-ORCH-READY-REVALIDATION-01` COMPLETE. Reviewed the requested redacted session digests and wiki indexes; revalidated the task board and gate state against current bounded CPU/GPU scans; recorded the external triggers without reopening stopped routes.
+- **Files:** `HANDOFF.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-31-orchestration-ready-revalidation-e1053.md`. Private logs: `local/validation/orchestration-ready-e1053/`. No source, test, original game input, or Wiki topic files changed.
+- **Verification (`PASSED`):** configure exit 0; build exit 0/no work; CTest 495/495; lift checkers 578 passed / 0 skipped / 0 failed; project index 44,297; Trail wiring check 10,951 nodes; staged audit 6 paths; all-path audit 3,464 paths; precommit attribution audit passed for the empty `origin/main..HEAD` range. Commit-specific attribution and publication are recorded in the closeout below.
+- **Result:** current task register has 0 READY rows; the CPU boot-path and G3/G5 scans found no safe bounded work without new evidence or external state. G0/G1/G3/G4 remain PARTIAL; G2/G5/G6 remain NOT RUN. E911 remains in force and slot 309 remains unregistered. No product gate advanced.
+- **Next exact action:** wait for a concrete slot-309 producer/consumer/order edge or principal reassessment, Mac unlock for the already-authorized VoiceOver observation, owner host-policy input for 499F80 rollback, or new byte-bound TEX0/save evidence satisfying written stop conditions. Do not repeat blocked provider/UI probes.
+
 ## 2026-10-31 02:28 CDT (root) — E1052 result: bounded save-dispatch route stopped (PARTIAL)
 
 - **Task:** `CPU-01-SLOT309-SAVE-DISPATCH-JUMPTABLES-01` is PARTIAL and stopped at its E911 boundary. Both tables' raw spans, hashes, signed-relative targets, and dispatch bounds are verified. Ghidra agrees with all 17 entries of table A; for table B it maps only the first 15 of 19 raw entries. Case 2 in `0xa48280` and case 3 in `0xa4ab90` reach direct calls to `0xa4a600`. Both functions have direct calls to `0xa4a940`, but table B's call has no verified case association. Nothing proves an edge/order to initializer `0xa505e0`.
