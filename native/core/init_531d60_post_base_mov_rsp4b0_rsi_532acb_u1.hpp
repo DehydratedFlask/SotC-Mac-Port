@@ -2,7 +2,7 @@
 //   mov [rsp+0x4B0],rsi   ; desc3 stack slot = vtable 2 (0x15c8e18 from lea @ 0x532a8c peel)
 //
 // After E534 `mov_rsp488_rax_532ac3_u1` end @ `0x532acb`. NOT modelled: following
-// `lea rsi,[0x2efda50]` @ `0x532ad3` (E535+ continue_e). G1 PARTIAL.
+// `lea rsi,[0x2efda50]` @ `0x532ad3` (E536 peel). G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

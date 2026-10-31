@@ -14,6 +14,7 @@
 #include "init_531d60_post_base_mov_rsp470_rdx_532ab2_u1.hpp"
 #include "init_531d60_post_base_mov_rsp488_rax_532ac3_u1.hpp"
 #include "init_531d60_post_base_mov_rsp4b0_rsi_532acb_u1.hpp"
+#include "init_531d60_post_base_lea_rsi_2efda50_532ad3_u1.hpp"
 #include "init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
@@ -298,9 +299,16 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
             static_cast<std::uintptr_t>(kInit531d60PostBaseContinueEVtable2Rva));
     }
 
-    // 0x532ad3 lea rsi,[0x2efda50] — name struct 3 (RIP-rel pin)
-    pin(out, ContinueEUnit::lea_rsi_2efda50);
-    ++out.lea_rip_count;
+    Init531d60PostBaseLeaRsi2efda50_532ad3_U1Cells lea_name3_cells =
+        hooks.lea_rsi_2efda50_532ad3_u1_cells;
+    if (!hooks.merge_lea_rsi_2efda50_532ad3_u1_ran) {
+        const Init531d60PostBaseLeaRsi2efda50_532ad3_U1Result lnr =
+            init_531d60_post_base_lea_rsi_2efda50_532ad3_u1(lea_name3_cells);
+        if (!lnr.ok) {
+            return out;
+        }
+        out.lea_rip_count += lnr.lea_rip_count;
+    }
 
     // 0x532ada mov [rsp+0x4B8],rcx — desc3[0x48] = 0x538870 (thunk 2)
     desc3.field_48 = kInit531d60PostBaseContinueEThunk2Rva;
@@ -373,11 +381,12 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         (hooks.merge_vcall18_532a72_u1_ran ? 0 : 1);
     const int expect_stamp = hooks.merge_a54920_u1_ran ? 0 : 1;
     const int expect_lea_rip =
-        2 + (hooks.merge_a54920_u1_ran ? 0 : 3) +
+        1 + (hooks.merge_a54920_u1_ran ? 0 : 3) +
         (hooks.merge_a54920_532a62_u1_ran ? 0 : 1) +
         (hooks.merge_lea_5388e0_532a7d_u1_ran ? 0 : 1) +
         (hooks.merge_lea_rsi_15c8e18_532a8c_u1_ran ? 0 : 1) +
-        (hooks.merge_lea_538870_532aa3_u1_ran ? 0 : 1);
+        (hooks.merge_lea_538870_532aa3_u1_ran ? 0 : 1) +
+        (hooks.merge_lea_rsi_2efda50_532ad3_u1_ran ? 0 : 1);
     const int expect_vmovq = hooks.merge_vmovq_532a75_u1_ran ? 0 : 1;
     out.a54920_hook_supplied = (hooks.call_a54920 != nullptr);
     out.ok = (out.unit_executed == kInit531d60PostBaseContinueEUnitCount) &&
