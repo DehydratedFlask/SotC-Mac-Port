@@ -1,7 +1,7 @@
 // Init `0x531d60` registry mov r14,rax OBS `0x532b16..0x532b19` (3 B):
 //   mov r14,rax   ; save alloc result from call 0x17070 @ 0x532b11
 //
-// After E549 call @ `0x532b11`. NOT modelled: call 0x54dc10 @ `0x532b19`. G1 PARTIAL.
+// After E549 call @ `0x532b11`. NOT modelled: registry-body units after `0x532b19`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

@@ -52,6 +52,14 @@ RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, 
             return RegistryInit531d60Status::alloc_failed;
         }
     }
+    if (!hooks.merge_call_54dc10_532b19_u1_ran) {
+        Init531d60PostBaseCall54dc10_532b19_U1Cells cells{};
+        cells.table_in = &table;
+        const auto table_base = init_531d60_post_base_call_54dc10_532b19_u1(cells);
+        if (!table_base.ok) {
+            return RegistryInit531d60Status::alloc_failed;
+        }
+    }
     void* raw = alloc.new_(kRegistryInitObjectBytes);
     if (raw == nullptr) {
         return RegistryInit531d60Status::alloc_failed;

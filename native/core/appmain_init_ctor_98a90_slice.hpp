@@ -105,6 +105,7 @@
 #include "init_531d60_post_base_continue_c.hpp"
 #include "init_531d60_post_base_continue_d.hpp"
 #include "init_531d60_post_base_continue_e.hpp"
+#include "init_531d60_post_base_registry_body.hpp"
 #include "init_531d60_post_base_registry_tail.hpp"
 #include "init_531d60_post_base_alt_5327bd.hpp"
 #include "input_table_551140.hpp"
@@ -246,6 +247,7 @@ struct AppmainInitCtor98a90SliceResult {
     Init531d60PostBaseContinueDResult post_base_continue_d{};
     Init531d60PostBaseContinueEResult post_base_continue_e{};
     Init531d60PostBaseRegistryTailResult post_base_registry_tail{};
+    Init531d60PostBaseRegistryBodyResult post_base_registry_body{};
     // Batch A je 0x5327bd alternate path: when taken at 0x53277d, runs the
     // 0x5327bd..0x532904 alt block instead of batch B..E.
     Init531d60PostBaseAlt5327bdResult post_base_alt_5327bd{};
@@ -276,6 +278,7 @@ void run_appmain_init_continue_driver_tail(
     const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks,
     const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks,
     const Init531d60PostBaseRegistryTailHooks& post_base_registry_tail_hooks,
+    const Init531d60PostBaseRegistryBodyHooks& post_base_registry_body_hooks,
     const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks,
     const Init531d60PostBase1fc80U1Hooks& post_base_1fc80_u1_hooks,
     const Init531d60PostBase1e4c0U1Hooks& post_base_1e4c0_u1_hooks,
@@ -371,6 +374,7 @@ void run_appmain_init_continue_driver_tail(
     const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks = {},
     const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks = {},
     const Init531d60PostBaseRegistryTailHooks& post_base_registry_tail_hooks = {},
+    const Init531d60PostBaseRegistryBodyHooks& post_base_registry_body_hooks = {},
     const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks = {},
     const Init1290Hooks& init_1290_hooks = {});
 

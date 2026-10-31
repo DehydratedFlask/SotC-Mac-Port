@@ -91,6 +91,7 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks,
     const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks,
     const Init531d60PostBaseRegistryTailHooks& post_base_registry_tail_hooks,
+    const Init531d60PostBaseRegistryBodyHooks& post_base_registry_body_hooks,
     const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks,
     const Init1290Hooks& init_1290_hooks) {
     AppmainInitCtor98a90SliceResult out{};
@@ -566,8 +567,9 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
         out, table, alloc, setter_obj, flag_in, set_a, set_b, set_c,
         post_base_continue_a_hooks, post_base_continue_b_hooks,
         post_base_continue_c_hooks, post_base_continue_d_hooks,
-        post_base_continue_e_hooks, post_base_registry_tail_hooks, post_base_alt_5327bd_hooks,
-        post_base_1fc80_u1_hooks, post_base_1e4c0_u1_hooks, post_base_4c4950_u1_hooks,
+        post_base_continue_e_hooks, post_base_registry_tail_hooks, post_base_registry_body_hooks,
+        post_base_alt_5327bd_hooks, post_base_1fc80_u1_hooks, post_base_1e4c0_u1_hooks,
+        post_base_4c4950_u1_hooks,
         post_base_a52b70_u1_hooks, post_base_a599e0_u1_hooks, post_base_a431e0_u1_hooks);
     return out;
 }
@@ -589,6 +591,9 @@ void run_remainder_after_registry_tail(
     if (out.post_base_registry_tail.mov_r14_rax_count == 1) {
         registry_hooks.merge_mov_r14_rax_532b16_u1_ran = true;
     }
+    if (out.post_base_registry_body.call_54dc10_count == 1) {
+        registry_hooks.merge_call_54dc10_532b19_u1_ran = true;
+    }
     out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,
                                                      set_b, set_c, registry_hooks);
 }
@@ -605,6 +610,7 @@ void run_appmain_init_continue_driver_tail(
     const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks,
     const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks,
     const Init531d60PostBaseRegistryTailHooks& post_base_registry_tail_hooks,
+    const Init531d60PostBaseRegistryBodyHooks& post_base_registry_body_hooks,
     const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks,
     const Init531d60PostBase1fc80U1Hooks& post_base_1fc80_u1_hooks,
     const Init531d60PostBase1e4c0U1Hooks& post_base_1e4c0_u1_hooks,
@@ -806,6 +812,15 @@ void run_appmain_init_continue_driver_tail(
             out.init_stopped_at_5329ae = true;
             return;
         }
+        {
+            Init531d60PostBaseRegistryBodyHooks body_hooks = post_base_registry_body_hooks;
+            body_hooks.table_in = &table;
+            out.post_base_registry_body = init_531d60_post_base_registry_body(body_hooks);
+            if (!out.post_base_registry_body.ok) {
+                out.init_stopped_at_5329ae = true;
+                return;
+            }
+        }
         run_remainder_after_registry_tail(out, table, alloc, setter_obj, flag_in, set_a, set_b,
                                         set_c);
         return;
@@ -834,6 +849,15 @@ void run_appmain_init_continue_driver_tail(
         if (!out.post_base_registry_tail.ok) {
             out.init_stopped_at_5329ae = true;
             return;
+        }
+        {
+            Init531d60PostBaseRegistryBodyHooks body_hooks = post_base_registry_body_hooks;
+            body_hooks.table_in = &table;
+            out.post_base_registry_body = init_531d60_post_base_registry_body(body_hooks);
+            if (!out.post_base_registry_body.ok) {
+                out.init_stopped_at_5329ae = true;
+                return;
+            }
         }
         run_remainder_after_registry_tail(out, table, alloc, setter_obj, flag_in, set_a, set_b,
                                         set_c);

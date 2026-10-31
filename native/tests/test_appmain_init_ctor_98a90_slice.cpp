@@ -77,6 +77,7 @@
 #include "core/init_531d60_post_base_continue_b.hpp"
 #include "core/init_531d60_post_base_continue_c.hpp"
 #include "core/init_531d60_post_base_mov_edi_98_532b0c_u1.hpp"
+#include "core/init_531d60_post_base_registry_body.hpp"
 #include "core/init_531d60_post_base_registry_tail.hpp"
 #include "core/capture_a473b0.hpp"
 #include "core/prologue_255180.hpp"
@@ -1652,6 +1653,8 @@ int main() {
     pbreg.merge_mov_edi_98_532b0c_u1_ran = false;
     pbreg.merge_call_17070_532b11_u1_ran = false;
     pbreg.merge_mov_r14_rax_532b16_u1_ran = false;
+    Init531d60PostBaseRegistryBodyHooks pbregbody{};
+    pbregbody.merge_call_54dc10_532b19_u1_ran = false;
     pbce.incoming_r13 = g_cont_e_r13;
     pbce.incoming_r12b = 0xBB;
     pbce.boss_flag_2dcdf14 = &g_boss_flag_cell;
@@ -1686,7 +1689,8 @@ int main() {
                                                      pbf590u7, pbf590u8, pba2edu5, pbf590u9,
                                                      pbf590u10, pba2edu6, pbf590u11, pbf590u12,
                                                      pba2edu7, pbf590u13, pbf590u14, pba2eu1, pba2e5,
-                                                     pba543, pb1fc, pb1e4, pb4c, pba52u1, {}, {}, pbca, pbcb, pbcc, pbcd, pbce, pbreg, pbalt,
+                                                     pba543, pb1fc, pb1e4, pb4c, pba52u1, {}, {}, pbca, pbcb, pbcc, pbcd, pbce, pbreg, pbregbody,
+                                                     pbalt,
                                                      ih);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
@@ -2575,6 +2579,12 @@ int main() {
     CHECK(r.post_base_registry_tail.call_17070_count == 1);
     CHECK(r.post_base_registry_tail.mov_r14_rax_count == 1);
     CHECK(r.post_base_registry_tail.end_rva == 0x532b19);
+    CHECK(r.post_base_registry_body.ok);
+    CHECK(r.post_base_registry_body.unit_executed == kInit531d60PostBaseRegistryBodyUnitCount);
+    CHECK(kInit531d60PostBaseRegistryBodyUnitCount == 1);
+    CHECK(r.post_base_registry_body.call_54dc10_count == 1);
+    CHECK(r.post_base_registry_body.end_rva == 0x532b1e);
+    CHECK(r.post_base_registry_body.rax_from_54dc10 == &table[0]);
     CHECK(g_cont_e_a54920 == 3);  // pbce hooks: three save-data ctor calls on D→E path
     CHECK(r.init_r12b_known);
     CHECK(r.init_r12b_out == 0xA7);  // continue-B bl(0xA6) xor 1 feeds continue-E
@@ -3334,7 +3344,7 @@ void run_alt_join_route_tests() {
         AppmainInitCtor98a90SliceResult out{};
         run_appmain_init_continue_driver_tail(
             out, route_table, route_front, route_setter.data(), 0, 0, 0, 0,
-            {}, {}, {}, {}, e, {}, {}, {}, {}, {}, {}, {}, {});
+            {}, {}, {}, {}, e, {}, {}, {}, {}, {}, {}, {}, {}, {});
         CHECK(out.post_base_continue_b.ok);
         CHECK(!out.post_base_continue_b.eax_known);
         CHECK(out.post_base_continue_c.ok);
@@ -3368,7 +3378,7 @@ void run_alt_join_route_tests() {
         AppmainInitCtor98a90SliceResult out{};
         run_appmain_init_continue_driver_tail(
             out, route_table, route_front, route_setter.data(), 0, 0, 0, 0,
-            {}, {}, {}, {}, e, {}, alt, {}, {}, {}, {}, {}, {});
+            {}, {}, {}, {}, e, {}, {}, alt, {}, {}, {}, {}, {}, {});
         CHECK(out.post_base_alt_5327bd.ok);
         CHECK(!out.post_base_alt_5327bd.reached_via_jmp);
         CHECK(!out.post_base_alt_5327bd.reached_via_preamble);
@@ -3440,7 +3450,7 @@ void run_alt_join_route_tests() {
         AppmainInitCtor98a90SliceResult out{};
         run_appmain_init_continue_driver_tail(
             out, route_table, route_front, route_setter.data(), 0, 0x11, 0x22, 0x33,
-            {}, {}, {}, {}, e, {}, alt, {}, {}, {}, {}, {}, {});
+            {}, {}, {}, {}, e, {}, {}, alt, {}, {}, {}, {}, {}, {});
         CHECK(out.post_base_alt_5327bd.ok);
         CHECK(out.post_base_alt_5327bd.reached_via_jmp);
         CHECK(out.post_base_alt_5327bd.r12b_known && out.post_base_alt_5327bd.r12b_out == 0);
@@ -3496,7 +3506,7 @@ void run_alt_join_route_tests() {
         AppmainInitCtor98a90SliceResult out{};
         run_appmain_init_continue_driver_tail(
             out, route_table, route_front, route_setter.data(), 0, 0x11, 0x22, 0x33,
-            {}, {}, c, {}, e, {}, alt, {}, {}, {}, {}, {}, {});
+            {}, {}, c, {}, e, {}, {}, alt, {}, {}, {}, {}, {}, {});
         CHECK(out.post_base_alt_5327bd.ok);
         CHECK(out.post_base_alt_5327bd.reached_via_preamble);
         CHECK(out.post_base_alt_5327bd.slot0_dispatch_count == 1);
