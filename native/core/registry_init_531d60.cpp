@@ -34,7 +34,18 @@ void destroy_registry_at_2efd160(AllocatorFront& alloc) noexcept {
 }
 
 RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, AllocatorFront& alloc, const RegistryInit531d60Hooks& hooks) {
-    if (!hooks.merge_mov_edi_98_532b0c_u1_ran) { const auto prep = init_531d60_post_base_mov_edi_98_532b0c_u1(); if (!prep.ok) return RegistryInit531d60Status::alloc_failed; }
+    if (!hooks.merge_mov_edi_98_532b0c_u1_ran) {
+        const auto prep = init_531d60_post_base_mov_edi_98_532b0c_u1();
+        if (!prep.ok) {
+            return RegistryInit531d60Status::alloc_failed;
+        }
+    }
+    if (!hooks.merge_call_17070_532b11_u1_ran) {
+        const auto call = init_531d60_post_base_call_17070_532b11_u1();
+        if (!call.ok) {
+            return RegistryInit531d60Status::alloc_failed;
+        }
+    }
     void* raw = alloc.new_(kRegistryInitObjectBytes);
     if (raw == nullptr) {
         return RegistryInit531d60Status::alloc_failed;

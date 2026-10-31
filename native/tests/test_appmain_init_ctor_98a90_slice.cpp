@@ -1650,6 +1650,7 @@ int main() {
     Init531d60PostBaseContinueEHooks pbce{};
     Init531d60PostBaseRegistryTailHooks pbreg{};
     pbreg.merge_mov_edi_98_532b0c_u1_ran = false;
+    pbreg.merge_call_17070_532b11_u1_ran = false;
     pbce.incoming_r13 = g_cont_e_r13;
     pbce.incoming_r12b = 0xBB;
     pbce.boss_flag_2dcdf14 = &g_boss_flag_cell;
@@ -2567,8 +2568,11 @@ int main() {
     CHECK(r.post_base_continue_e.unit_executed == kInit531d60PostBaseContinueEUnitCount);
     CHECK(kInit531d60PostBaseContinueEUnitCount == 0);
     CHECK(r.post_base_registry_tail.ok);
+    CHECK(r.post_base_registry_tail.unit_executed == kInit531d60PostBaseRegistryTailUnitCount);
+    CHECK(kInit531d60PostBaseRegistryTailUnitCount == 1);
     CHECK(r.post_base_registry_tail.mov_edi_count == 1);
-    CHECK(r.post_base_registry_tail.end_rva == 0x532b11);
+    CHECK(r.post_base_registry_tail.call_17070_count == 1);
+    CHECK(r.post_base_registry_tail.end_rva == 0x532b16);
     CHECK(g_cont_e_a54920 == 3);  // pbce hooks: three save-data ctor calls on D→E path
     CHECK(r.init_r12b_known);
     CHECK(r.init_r12b_out == 0xA7);  // continue-B bl(0xA6) xor 1 feeds continue-E
