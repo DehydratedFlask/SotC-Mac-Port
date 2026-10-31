@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-31 01:48 CDT (root) — E1051: validation checkpoint pointer sync claim (ACTIVE)
+
+- **Task:** `DOC-VALIDATION-CHECKPOINT-SYNC-01` — reconcile the stale “Current checkpoint” pointer in `docs/VALIDATION.md` with E1050 while preserving the latest verified launcher bundle provenance and unchanged G0–G6 states.
+- **Claim:** root owns `HANDOFF.md`, `docs/VALIDATION.md`, `docs/TASKS.md`, `docs/EVIDENCE.md`, `docs/INDEX.md`, generated `docs/FOLDERS.md`, and `docs/checkpoints/2026-10-31-validation-checkpoint-sync-e1051.md` for this docs-only task. No code or gate changes are in scope.
+- **Evidence basis:** live `HANDOFF.md` is at E1050; live `docs/EVIDENCE.md` has E1050; `docs/VALIDATION.md` still labels E1005 as the current checkpoint. Gate status remains G0/G1/G3/G4 PARTIAL and G2/G5/G6 NOT RUN; E1005 remains the last verified launcher/core bundle checkpoint.
+- **Next exact action:** update the validation summary to identify E1050 as the latest project checkpoint and E1005 as the latest verified app bundle, then run publication checks and record exact results. Attempts: 0.
+
 ## 2026-10-31 01:43 CDT (root) — E1050: CritSec slot-414 atexit teardown coverage audit (STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `RE-02-CRITSEC-SLOT414-ATEXIT-LIFECYCLE-AUDIT-01` COMPLETE. No current host path drains `StartupAtexitLog` or invokes slot-414's `0x3b380` destroy hook. Log reads are test/testkit only; slot 414 is absent from `StartupState` and the recovered constructor table.

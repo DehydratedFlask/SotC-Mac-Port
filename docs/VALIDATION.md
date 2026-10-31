@@ -1,6 +1,6 @@
 # Validation gates and evidence protocol
 
-Current checkpoint (E1005, 2026-10-29): G0 PARTIAL; G1 PARTIAL; G2 NOT RUN; G3 PARTIAL; G4 PARTIAL; G5–G6 NOT RUN. E1005 rebuilt and artifact-verified a current thin-ARM64 launcher/core bundle, but `sotc_core_start()` still returns `SOTC_ERR_ENGINE_NOT_IMPLEMENTED`; Finder launch and a meaningful native subsystem lifecycle remain unverified. Measured native coverage of Init
+Current checkpoint (E1050, 2026-10-31): G0 PARTIAL; G1 PARTIAL; G2 NOT RUN; G3 PARTIAL; G4 PARTIAL; G5–G6 NOT RUN. E1050's latest source audit found no host lifecycle owner for slot-414 teardown and did not advance a product gate; see [E1050](checkpoints/2026-10-31-critsec-slot414-teardown-audit-e1050.md). E1005 remains the latest artifact-verified thin-ARM64 launcher/core bundle: `sotc_core_start()` still returns `SOTC_ERR_ENGINE_NOT_IMPLEMENTED`, and Finder launch plus a meaningful native subsystem lifecycle remain unverified. Measured native coverage of Init
 `0x531d60` over `0x531d60..0x532b0c` is **3500 / 3500 B = 100.0%** claimed (semantics still partial) (E542,
 `tools/lift/report_init_coverage.py`) — claimed bytes, not proven semantics; four gaps remain
 (all four former gaps are now pinned in `init_531d60_entry_gaps`; claimed bytes are not semantics).
