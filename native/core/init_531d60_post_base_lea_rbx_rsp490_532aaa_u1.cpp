@@ -17,7 +17,7 @@ Init531d60PostBaseLeaRbxRsp490_532aaa_U1Result init_531d60_post_base_lea_rbx_rsp
     }
     ++out.lea_rsp_count;
 
-    // Next: mov [rsp+0x470],rdx @ 0x532ab2 — see continue_e.
+    // Next: mov [rsp+0x470],rdx @ 0x532ab2 — see mov_rsp470_rdx_532ab2_u1.
     out.ok = (out.lea_rsp_count == 1);
     return out;
 }

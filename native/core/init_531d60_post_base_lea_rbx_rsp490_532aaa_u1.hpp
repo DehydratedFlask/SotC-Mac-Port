@@ -2,7 +2,7 @@
 //   lea rbx,[rsp+0x490]   ; &desc3[0x20] (self-ptr for vcall dispatch)
 //
 // After E530 `lea_538870_532aa3_u1` end @ `0x532aaa`. NOT modelled: following
-// `mov [rsp+0x470],rdx` @ `0x532ab2` (E531+ continue_e). G1 PARTIAL.
+// `mov [rsp+0x470],rdx` @ `0x532ab2` (E532 mov_rsp470_rdx_532ab2_u1). G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

@@ -11,6 +11,7 @@
 #include "init_531d60_post_base_mov_rdi_r13_532a9f_u1.hpp"
 #include "init_531d60_post_base_lea_538870_532aa3_u1.hpp"
 #include "init_531d60_post_base_lea_rbx_rsp490_532aaa_u1.hpp"
+#include "init_531d60_post_base_mov_rsp470_rdx_532ab2_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
 #include <cstring>
@@ -219,14 +220,24 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         desc3.self_ptr = reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(&desc3) + 0x20);
     }
 
-    // 0x532ab2 mov [rsp+0x470],rdx — desc3[0x00] = &desc3 (self-pointer at head)
-    // Original: stores rdx (the descriptor base address) into desc3[0x00].
-    // We store the actual desc3_ptr.
-    {
+    Init531d60PostBaseMovRsp470Rdx_532ab2_U1Cells mov_head_cells =
+        hooks.mov_rsp470_rdx_532ab2_u1_cells;
+    if (mov_head_cells.head_out == nullptr) {
+        mov_head_cells.head_out = reinterpret_cast<void**>(&desc3.zero[0]);
+    }
+    if (mov_head_cells.rdx_in == nullptr) {
+        mov_head_cells.rdx_in = desc3_ptr;
+    }
+    if (!hooks.merge_mov_rsp470_rdx_532ab2_u1_ran) {
+        const Init531d60PostBaseMovRsp470Rdx_532ab2_U1Result mhr =
+            init_531d60_post_base_mov_rsp470_rdx_532ab2_u1(mov_head_cells);
+        if (!mhr.ok) {
+            return out;
+        }
+    } else {
         void* desc3_head = desc3_ptr;
         std::memcpy(&desc3.zero[0], &desc3_head, sizeof(void*));
     }
-    pin(out, ContinueEUnit::mov_rsp470_rdx);
 
     // 0x532aba vmovdqa [rsp+0x478],xmm0 — store xmm0 at desc3[0x08]
     // (value from vmovq; stand-in zero used here).
