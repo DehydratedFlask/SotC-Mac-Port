@@ -13,7 +13,7 @@ Init531d60PostBaseMovRbxRax_532b1e_U1Result init_531d60_post_base_mov_rbx_rax_53
     }
     ++out.mov_rbx_rax_count;
 
-    // Next: call 0x54dc20 @ 0x532b21 — not modelled in this unit.
+    // Next: call 0x54dc20 @ 0x532b21 — peeled as registry_body unit E553.
     out.ok = (out.mov_rbx_rax_count == 1);
     return out;
 }

@@ -1,7 +1,7 @@
 // Init `0x531d60` registry mov rbx,rax OBS `0x532b1e..0x532b21` (3 B):
 //   mov rbx,rax   ; save table base from call 0x54dc10 @ 0x532b19
 //
-// After E551 call @ `0x532b19`. NOT modelled: call 0x54dc20 @ `0x532b21`. G1 PARTIAL.
+// After E551 call @ `0x532b19`. NOT modelled: call 0x52a220 @ `0x532b2e`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
