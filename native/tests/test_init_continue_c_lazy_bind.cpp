@@ -69,7 +69,7 @@ int main() {
         CHECK(taken.lazy_bind_calls == 3);
         CHECK(taken.lazy_bind_ok);
         CHECK(taken.lazy_bind_last_returned == 1);
-        CHECK(taken.vcall_count == 3);
+        CHECK(taken.vcall_count == 2);
         CHECK(taken.flag1_known && taken.flag2_known);
         CHECK(taken.sil_iter1 == 1 && taken.sil_iter2 == 1);
         CHECK(taken.merge_branch_outcome_modelled);

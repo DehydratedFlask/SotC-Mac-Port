@@ -1,5 +1,11 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-31 13:10 CDT (bc-37b8f36e) — E517: Init continue `0xa599e0` call-site u1 (FIXTURE_VERIFIED)
+
+- **Edge:** `call 0xa599e0` @ `0x532946` (5 B); prep `0x532910..0x532946` (54 B) demoted; `continue_c` → `0x53294b..0x53299d` (21 units / 82 B).
+- **Branch:** `cursor/init-hash-551140-6aa93e8` PR #13. G1 PARTIAL.
+- **Next:** `call 0xa431e0` @ `0x53297a` (demote intervening obj-B prep from `0x53294b`).
+
 ## 2026-10-31 12:45 CDT (bc-fae1f43e) — E515: Init continue `0x4c4950` call-site u1 (FIXTURE_VERIFIED)
 
 - **Edge:** `call 0x4c4950` @ `0x5327a0` (5 B); prep `0x532793..0x5327a0` (13 B) demoted; `continue_b` → `0x5327a5..0x5327b1` (3 units).

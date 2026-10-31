@@ -1,4 +1,4 @@
-// Init `0x531d60` continue OBS `0x532910..0x53299d` (141 B, 35 consecutive units).
+// Init `0x531d60` continue OBS `0x53294b..0x53299d` (82 B, 21 consecutive units).
 //
 // This is the MERGE block reached unconditionally by the continue_b fall-through
 // (`0x5327b1 e9 4e 01 00 00` = `jmp 0x532904`), and also by the continue_b je
@@ -90,8 +90,8 @@
 
 namespace sotc {
 
-inline constexpr std::uint64_t kInit531d60PostBaseContinueCRva = 0x532910;
-inline constexpr std::size_t kInit531d60PostBaseContinueCSize = 141;
+inline constexpr std::uint64_t kInit531d60PostBaseContinueCRva = 0x53294b;
+inline constexpr std::size_t kInit531d60PostBaseContinueCSize = 82;
 inline constexpr std::uint64_t kInit531d60PostBaseContinueCEndRva = 0x53299d;
 // First conditional branch of the merge run: pinned target, outcome NOT modelled.
 inline constexpr std::uint64_t kInit531d60PostBaseContinueCBranchRva = 0x53299b;
@@ -108,42 +108,29 @@ inline constexpr std::uint64_t kInit531d60PostBaseContinueCLea32f6d18Rva = 0x32f
 inline constexpr std::uint64_t kInit531d60PostBaseContinueCGlobal2efe318Rva = 0x2efe318;
 inline constexpr std::uint64_t kInit531d60PostBaseContinueCGlobal2efe340Rva = 0x2efe340;
 
-// Unit identity for the 35 pinned instructions of the claimed run.
+// Unit identity for the 21 pinned instructions of the claimed run (after E517
+// `0xa599e0` call-site u1; prep `0x532910..0x532946` demoted).
 enum class ContinueCUnit : int {
-    lea_rax_32f8b80 = 0,    // 0x532910
-    lea_r15_2efe318,        // 0x532917
-    xor_esi_esi_1,          // 0x53291e
-    mov_rdi_r15_1,          // 0x532920
-    mov_rbx_rax_1,          // 0x532923
-    mov_rax_2efe318_1,      // 0x532926
-    vcall_slot0_1,          // 0x53292d
-    mov_rax_2efe340_1,      // 0x53292f
-    xor_esi_esi_2,          // 0x532936
-    mov_rdi_rbx_1,          // 0x532938
-    mov_rax_rax60_1,        // 0x53293b
-    cmp_byte_rax0_1,        // 0x53293f
-    sete_sil_1,             // 0x532942
-    call_a599e0,            // 0x532946
-    lea_rax_32f6d18,        // 0x53294b
-    xor_esi_esi_3,          // 0x532952
-    mov_rdi_r15_2,          // 0x532954
-    mov_rbx_rax_2,          // 0x532957
-    mov_rax_2efe318_2,      // 0x53295a
-    vcall_slot0_2,          // 0x532961
-    mov_rax_2efe340_2,      // 0x532963
-    xor_esi_esi_4,          // 0x53296a
-    mov_rdi_rbx_2,          // 0x53296c
-    mov_rax_rax60_2,        // 0x53296f
-    cmp_byte_rax0_2,        // 0x532973
-    sete_sil_2,             // 0x532976
+    lea_rax_32f6d18 = 0,    // 0x53294b
+    xor_esi_esi_1,          // 0x532952
+    mov_rdi_r15_1,          // 0x532954
+    mov_rbx_rax_1,          // 0x532957
+    mov_rax_2efe318_1,      // 0x53295a
+    vcall_slot0_1,          // 0x532961
+    mov_rax_2efe340_1,      // 0x532963
+    xor_esi_esi_2,          // 0x53296a
+    mov_rdi_rbx_1,          // 0x53296c
+    mov_rax_rax60_1,        // 0x53296f
+    cmp_byte_rax0_1,        // 0x532973
+    sete_sil_1,             // 0x532976
     call_a431e0,            // 0x53297a
-    mov_rax_2efe318_3,      // 0x53297f
-    xor_esi_esi_5,          // 0x532986
-    mov_rdi_r15_3,          // 0x532988
-    vcall_slot0_3,          // 0x53298b
-    mov_rax_2efe340_3,      // 0x53298d
-    mov_rax_rax60_3,        // 0x532994
-    cmp_byte_rax0_3,        // 0x532998
+    mov_rax_2efe318_2,      // 0x53297f
+    xor_esi_esi_3,          // 0x532986
+    mov_rdi_r15_2,          // 0x532988
+    vcall_slot0_2,          // 0x53298b
+    mov_rax_2efe340_2,      // 0x53298d
+    mov_rax_rax60_2,        // 0x532994
+    cmp_byte_rax0_2,        // 0x532998
     je_5329ae,              // 0x53299b (boundary; outcome NOT modelled)
     count
 };
@@ -157,23 +144,9 @@ struct ContinueCUnitSpan {
     const char* mnemonic = "";
 };
 
-// OBS table re-derived from local/re/eboot.elf; sizes sum to kSize (141 B).
+// OBS table re-derived from local/re/eboot.elf; sizes sum to kSize (82 B).
 inline constexpr std::array<ContinueCUnitSpan, kInit531d60PostBaseContinueCUnitCount>
     kInit531d60PostBaseContinueCUnits{{
-        {0x532910, 7, "lea rax,[0x32f8b80]"},
-        {0x532917, 7, "lea r15,[0x2efe318]"},
-        {0x53291e, 2, "xor esi,esi"},
-        {0x532920, 3, "mov rdi,r15"},
-        {0x532923, 3, "mov rbx,[rax]"},
-        {0x532926, 7, "mov rax,[0x2efe318]"},
-        {0x53292d, 2, "call [rax]"},
-        {0x53292f, 7, "mov rax,[0x2efe340]"},
-        {0x532936, 2, "xor esi,esi"},
-        {0x532938, 3, "mov rdi,rbx"},
-        {0x53293b, 4, "mov rax,[rax+0x60]"},
-        {0x53293f, 3, "cmp byte [rax],0"},
-        {0x532942, 4, "sete sil"},
-        {0x532946, 5, "call 0xa599e0"},
         {0x53294b, 7, "lea rax,[0x32f6d18]"},
         {0x532952, 2, "xor esi,esi"},
         {0x532954, 3, "mov rdi,r15"},
@@ -233,6 +206,7 @@ struct Init531d60PostBaseContinueCHooks {
     // When true, E516 merge call-site already ran (B-path driver); skip u1 inside body.
     bool merge_a52b70_u1_ran = false;
     void (*call_a599e0)(void* rdi, std::uint8_t esi) = nullptr;
+    bool merge_a599e0_u1_ran = false;
     void (*call_a431e0)(void* rdi, std::uint8_t esi) = nullptr;
     // Indirect vtable-slot-0 dispatch (call [rax], rax = [0x2efe318]); null => no-op.
     void (*vcall_slot0)(void* rdi, std::uint8_t esi) = nullptr;
@@ -251,14 +225,14 @@ struct Init531d60PostBaseContinueCResult {
     bool ok = false;
     // Per-unit execution counters (all must be 1 on the modelled path).
     std::array<int, kInit531d60PostBaseContinueCUnitCount> unit_counts{};
-    int unit_executed = 0;         // expect 38
-    int call_count = 0;            // expect 3 direct rel32 call sites
-    int vcall_count = 0;           // expect 3 indirect `call [rax]` slot-0 sites
-    int lea_count = 0;             // expect 3 RIP-relative lea
-    int global_mov_count = 0;      // expect 6 RIP-relative global loads
-    int xor_count = 0;             // expect 5 (xor esi,esi)
-    int cmp_count = 0;             // expect 3 (cmp byte [rax],0)
-    int sete_count = 0;            // expect 2 (sete sil)
+    int unit_executed = 0;         // expect 21
+    int call_count = 0;            // expect 1 direct rel32 call site (0xa431e0)
+    int vcall_count = 0;           // expect 2 indirect `call [rax]` slot-0 sites
+    int lea_count = 0;             // expect 1 RIP-relative lea
+    int global_mov_count = 0;      // expect 4 RIP-relative global loads
+    int xor_count = 0;             // expect 3 (xor esi,esi)
+    int cmp_count = 0;             // expect 2 (cmp byte [rax],0)
+    int sete_count = 0;            // expect 1 (sete sil)
     int branch_boundary_count = 0; // expect 1 (je pinned, outcome NOT modelled)
     // sete sil results (host stand-in; 0/unknown when the flag byte hook is null).
     bool flag1_known = false;
