@@ -284,11 +284,8 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         mov4b0_cells.vtable_stack_out = &desc3.vtable;
     }
     if (mov4b0_cells.rsi_in == nullptr) {
-        mov4b0_cells.rsi_in = lea_rsi_out;
-        if (mov4b0_cells.rsi_in == nullptr) {
-            mov4b0_cells.rsi_in = reinterpret_cast<void*>(static_cast<std::uintptr_t>(
-                kInit531d60PostBaseContinueEVtable2Rva));
-        }
+        mov4b0_cells.rsi_in = reinterpret_cast<void*>(static_cast<std::uintptr_t>(
+            kInit531d60PostBaseContinueEVtable2Rva));
     }
     if (!hooks.merge_mov_rsp4b0_rsi_532acb_u1_ran) {
         const Init531d60PostBaseMovRsp4b0_Rsi_532acb_U1Result m4r =
