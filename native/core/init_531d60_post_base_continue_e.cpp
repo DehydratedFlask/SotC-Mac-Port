@@ -19,6 +19,7 @@
 #include "init_531d60_post_base_a54920_532ae2_u1.hpp"
 #include "init_531d60_post_base_mov_rsp4b0_rax_532ae7_u1.hpp"
 #include "init_531d60_post_base_mov_rdi_rbx_532aef_u1.hpp"
+#include "init_531d60_post_base_vcall18_532af2_u1.hpp"
 #include "init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
@@ -389,10 +390,16 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         }
     }
 
-    // 0x532af2 call [rax+0x18] — vcall slot-3 → 0x5388c0 (bare ret, elided).
-    // Resolution: *(0x15c8e18 + 0x18) = 0x5388c0 = ret (E537).
-    pin(out, ContinueEUnit::vcall_noop_3);
-    ++out.vcall_noop_count;
+    if (!hooks.merge_vcall18_532af2_u1_ran) {
+        Init531d60PostBaseVcall18_532af2_U1Hooks vc3{};
+        vc3.call_vslot18 = hooks.call_vslot18_532af2;
+        const Init531d60PostBaseVcall18_532af2_U1Result vcr3 =
+            init_531d60_post_base_vcall18_532af2_u1(vc3);
+        if (!vcr3.ok) {
+            return out;
+        }
+        out.vcall_noop_count += vcr3.call_vslot18_count;
+    }
 
     // ---- Block 4: resolved 0x54b250 call via 0x2eff450 ----
     // Resolution per E538: *(0x2eff450) is a 0x460-byte object whose vtable
@@ -437,8 +444,9 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         (hooks.merge_a54920_532a62_u1_ran ? 0 : 1) +
         (hooks.merge_a54920_532ae2_u1_ran ? 0 : 1);
     const int expect_vcall_noop =
-        1 + (hooks.merge_vcall18_532a17_ran ? 0 : 1) +
-        (hooks.merge_vcall18_532a72_u1_ran ? 0 : 1);
+        (hooks.merge_vcall18_532a17_ran ? 0 : 1) +
+        (hooks.merge_vcall18_532a72_u1_ran ? 0 : 1) +
+        (hooks.merge_vcall18_532af2_u1_ran ? 0 : 1);
     const int expect_stamp = hooks.merge_a54920_u1_ran ? 0 : 1;
     const int expect_lea_rip =
         1 + (hooks.merge_a54920_u1_ran ? 0 : 3) +

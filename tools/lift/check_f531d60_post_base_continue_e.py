@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ELF-tie Init 0x531d60 continue E tail block 0x532af2..0x532b0c (26 B / 7 units).
+"""ELF-tie Init 0x531d60 continue E tail block 0x532af5..0x532b0c (23 B / 6 units).
 
 Private: needs local/re/eboot.elf.  Pins every one of the 52 consecutive
 instructions, the three call 0xa54920 rel32 targets, the three vcall+0x18
@@ -23,10 +23,10 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import ps4_dynlink as d  # noqa: E402
 
 ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
-START = 0x532AF2
-SIZE = 26
+START = 0x532AF5
+SIZE = 23
 END = 0x532B0C
-REGION_SHA256 = "58179d6451ddd87b96dfb7f97847ef294239692ad29ce8daba69532c9e82635f"
+REGION_SHA256 = "65d28f34e25dab4294a145e7ba6cf9a71478c7a0861285421c507c40da7cfefa"
 VMOVQ_NATIVE = ROOT / "native/core/init_531d60_post_base_vmovq_532a75_u1.hpp"
 LEA_NATIVE = ROOT / "native/core/init_531d60_post_base_lea_5388e0_532a7d_u1.hpp"
 LEA_RSP_NATIVE = ROOT / "native/core/init_531d60_post_base_lea_rsp470_532a84_u1.hpp"
@@ -48,6 +48,7 @@ U2_NATIVE = ROOT / "native/core/init_531d60_post_base_a54920_532a62_u1.hpp"
 U3_NATIVE = ROOT / "native/core/init_531d60_post_base_a54920_532ae2_u1.hpp"
 VC18_NATIVE = ROOT / "native/core/init_531d60_post_base_vcall18_532a17.hpp"
 VC72_NATIVE = ROOT / "native/core/init_531d60_post_base_vcall18_532a72_u1.hpp"
+VCaf2_NATIVE = ROOT / "native/core/init_531d60_post_base_vcall18_532af2_u1.hpp"
 
 CALL_A54920 = 0xA54920
 NOOP_VCALL1_RESOLVED = 0x538200   # ret
@@ -73,8 +74,6 @@ VMOVQ_15FF528 = 0x15FF528
 #         "vmovq"    -> vmovq xmm,[rip+disp32]; target must equal target
 #         "pin"       -> opcode/shape only
 UNITS = [
-    (0x532AF2, 3, "22558207d1d705fcbda49d89be5b34ebe09d409878b0bf88e6819b7724e29e96",
-     "call [rax+0x18]", "vcall18", None),
     (0x532AF5, 7, "4cee64d34e337abd4b52b8fb14bbe891d22e32a51ffcebc92595df69dab2c773",
      "lea rax,[0x2eff450]", "lea_rip", LEA_2EFF450),
     (0x532AFC, 2, "2e2f89076640f42236c01bdc8663b50e0001b061170a88fd2ae0a99e0c7b1675",
@@ -109,7 +108,7 @@ def main() -> int:
     _, ph = d.program_headers(elf)
     img = d.Image(elf, ph)
 
-    require(len(UNITS) == 7, "unit count")
+    require(len(UNITS) == 6, "unit count")
     require(START + SIZE == END, "size arithmetic")
 
     # Verify contiguous unit coverage.
@@ -157,12 +156,13 @@ def main() -> int:
     nh = NATIVE_HPP.read_text()
     require("init_531d60_post_base_continue_e" in nh, "API")
     require("NOT modelled" in nh, "omission")
-    require("kInit531d60PostBaseContinueERva = 0x532af2" in nh, "start rva")
+    require("kInit531d60PostBaseContinueERva = 0x532af5" in nh, "start rva")
     require("merge_a54920_532ae2_u1_ran" in nh, "a54920_532ae2 merge hook")
     require("merge_a54920_u1_ran" in nh, "u1 merge hook")
     require("merge_a54920_532a62_u1_ran" in nh, "a54920_532a62 merge hook")
     require("merge_vcall18_532a17_ran" in nh, "vcall18 merge hook")
     require("merge_vcall18_532a72_u1_ran" in nh, "vcall72 merge hook")
+    require("merge_vcall18_532af2_u1_ran" in nh, "vcall532af2 merge hook")
     require("merge_vmovq_532a75_u1_ran" in nh, "vmovq merge hook")
     require("merge_lea_5388e0_532a7d_u1_ran" in nh, "lea merge hook")
     require("merge_lea_rsp470_532a84_u1_ran" in nh, "lea_rsp merge hook")
@@ -294,7 +294,7 @@ def main() -> int:
             PREV_NATIVE.read_text(), "batch D end matches block entry")
 
     print(
-        f"OK check_f531d60_post_base_continue_e: span=0x{START:x}+{SIZE}B units=7; "
+        f"OK check_f531d60_post_base_continue_e: span=0x{START:x}+{SIZE}B units=6; "
         f"calls 0x{CALL_A54920:x}×0 pinned (+3 u1); vcall+0x18 no-ops×1 pinned (+2 vcall18); "
         f"no-ops→0x{NOOP_VCALL1_RESOLVED:x}/"
         f"0x{NOOP_VCALL2_RESOLVED:x}(ret); vcall+0x8→0x{RESOLVED_VCALL_54B250:x}; "
