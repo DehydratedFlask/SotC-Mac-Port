@@ -9,6 +9,7 @@
 #include "init_531d60_post_base_lea_rsi_15c8e18_532a8c_u1.hpp"
 #include "init_531d60_post_base_movq_rsp4a0_0_532a93_u1.hpp"
 #include "init_531d60_post_base_mov_rdi_r13_532a9f_u1.hpp"
+#include "init_531d60_post_base_lea_538870_532aa3_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
 #include <cstring>
@@ -185,9 +186,16 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         parent3 = const_cast<void*>(hooks.incoming_r13);
     }
 
-    // 0x532aa3 lea rcx,[0x538870] — thunk 2 (ret no-op)
-    pin(out, ContinueEUnit::lea_rcx_538870);
-    ++out.lea_rip_count;
+    Init531d60PostBaseLea538870_532aa3_U1Cells lea_rcx_cells =
+        hooks.lea_538870_532aa3_u1_cells;
+    if (!hooks.merge_lea_538870_532aa3_u1_ran) {
+        const Init531d60PostBaseLea538870_532aa3_U1Result lcr =
+            init_531d60_post_base_lea_538870_532aa3_u1(lea_rcx_cells);
+        if (!lcr.ok) {
+            return out;
+        }
+        out.lea_rip_count += lcr.lea_rip_count;
+    }
 
     // 0x532aaa lea rbx,[rsp+0x490] — &desc3[0x20] (self-ptr, stored as rbx for
     // later vcall dispatch)
@@ -292,10 +300,11 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         (hooks.merge_vcall18_532a72_u1_ran ? 0 : 1);
     const int expect_stamp = hooks.merge_a54920_u1_ran ? 0 : 1;
     const int expect_lea_rip =
-        3 + (hooks.merge_a54920_u1_ran ? 0 : 3) +
+        2 + (hooks.merge_a54920_u1_ran ? 0 : 3) +
         (hooks.merge_a54920_532a62_u1_ran ? 0 : 1) +
         (hooks.merge_lea_5388e0_532a7d_u1_ran ? 0 : 1) +
-        (hooks.merge_lea_rsi_15c8e18_532a8c_u1_ran ? 0 : 1);
+        (hooks.merge_lea_rsi_15c8e18_532a8c_u1_ran ? 0 : 1) +
+        (hooks.merge_lea_538870_532aa3_u1_ran ? 0 : 1);
     const int expect_vmovq = hooks.merge_vmovq_532a75_u1_ran ? 0 : 1;
     out.a54920_hook_supplied = (hooks.call_a54920 != nullptr);
     out.ok = (out.unit_executed == kInit531d60PostBaseContinueEUnitCount) &&

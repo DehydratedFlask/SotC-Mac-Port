@@ -2,7 +2,7 @@
 //   mov rdi,[r13]   ; save-data ctor 3 parent arg
 //
 // After E528 `movq_rsp4a0_0_532a93_u1` end @ `0x532a9f`. NOT modelled: following
-// `lea rcx,[0x538870]` @ `0x532aa3`. G1 PARTIAL.
+// `lea rcx,[0x538870]` @ `0x532aa3` (E530 peel). G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
