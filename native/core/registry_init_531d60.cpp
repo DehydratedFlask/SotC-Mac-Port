@@ -177,7 +177,18 @@ RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, 
         }
     }
 
-    // OBS 0x532b4d..0x532bf8: destroy previous if different & non-null; then movq new, (0x2efd160).
+    if (!hooks.merge_test_r12_r12_532b4d_u1_ran) {
+        Init531d60PostBaseTestR12R12_532b4d_U1Cells test_cells{};
+        test_cells.r12_in = r12_from_cell;
+        const auto test = init_531d60_post_base_test_r12_r12_532b4d_u1(test_cells);
+        if (!test.ok) {
+            destroy_registry_object(obj, alloc);
+            return RegistryInit531d60Status::alloc_failed;
+        }
+        // NOT modelled: je @ 0x532b50 from test ZF — E564.
+    }
+
+    // OBS 0x532b50..0x532bf8: destroy previous if different & non-null; then movq new, (0x2efd160).
     RegistryObject2efd160* prev = registry_cell_2efd160().load();
     if (prev == obj) {
         return RegistryInit531d60Status::ok;

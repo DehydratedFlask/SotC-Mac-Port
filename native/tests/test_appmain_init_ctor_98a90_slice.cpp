@@ -1666,6 +1666,7 @@ int main() {
     pbregbody.merge_mov_r12_rbx_532b41_u1_ran = false;
     pbregbody.merge_cmp_r12_r14_532b44_u1_ran = false;
     pbregbody.merge_je_532bfb_532b47_u1_ran = false;
+    pbregbody.merge_test_r12_r12_532b4d_u1_ran = false;
     pbce.incoming_r13 = g_cont_e_r13;
     pbce.incoming_r12b = 0xBB;
     pbce.boss_flag_2dcdf14 = &g_boss_flag_cell;
@@ -2592,7 +2593,7 @@ int main() {
     CHECK(r.post_base_registry_tail.end_rva == 0x532b19);
     CHECK(r.post_base_registry_body.ok);
     CHECK(r.post_base_registry_body.unit_executed == kInit531d60PostBaseRegistryBodyUnitCount);
-    CHECK(kInit531d60PostBaseRegistryBodyUnitCount == 12);
+    CHECK(kInit531d60PostBaseRegistryBodyUnitCount == 13);
     CHECK(r.post_base_registry_body.call_54dc10_count == 1);
     CHECK(r.post_base_registry_body.mov_rbx_rax_count == 1);
     CHECK(r.post_base_registry_body.call_54dc20_count == 1);
@@ -2605,10 +2606,12 @@ int main() {
     CHECK(r.post_base_registry_body.mov_r12_rbx_count == 1);
     CHECK(r.post_base_registry_body.cmp_r12_r14_count == 1);
     CHECK(r.post_base_registry_body.je_532bfb_count == 1);
+    CHECK(r.post_base_registry_body.test_r12_r12_count == 1);
     CHECK(r.post_base_registry_body.r12_r14_equal);
     CHECK(r.post_base_registry_body.je_branch_outcome_modelled);
     CHECK(r.post_base_registry_body.je_branch_taken);
-    CHECK(r.post_base_registry_body.end_rva == 0x532b4d);
+    CHECK(r.post_base_registry_body.r12_is_zero);
+    CHECK(r.post_base_registry_body.end_rva == 0x532b50);
     CHECK(r.post_base_registry_body.r12_from_cell == nullptr);
     CHECK(r.post_base_registry_body.r13_from_guard_cell ==
           reinterpret_cast<void*>(&stack_guard_value_cell()));
