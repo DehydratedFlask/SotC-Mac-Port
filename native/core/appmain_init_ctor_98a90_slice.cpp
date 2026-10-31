@@ -76,6 +76,7 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBaseA2ed00U7Hooks& post_base_a2ed00_u7_hooks,
     const Init531d60PostBaseF590A2ed00U13Hooks& post_base_f590_a2ed00_u13_hooks,
     const Init531d60PostBaseF590A2ed00U14Hooks& post_base_f590_a2ed00_u14_hooks,
+    const Init531d60PostBaseA2ea00U1Hooks& post_base_a2ea00_u1_hooks,
     const Init531d60PostBaseContinueAHooks& post_base_continue_a_hooks,
     const Init531d60PostBaseContinueBHooks& post_base_continue_b_hooks,
     const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks,
@@ -532,9 +533,19 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     if (!out.post_base_f590_a2ed00_u14.ok) {
         return out;
     }
+    // E510: always-on Init continue — first 0xa2ea00 call-site; 9 B prep NOT modelled.
+    out.post_base_a2ea00_u1 = init_531d60_post_base_a2ea00_u1(post_base_a2ea00_u1_hooks);
+    if (!out.post_base_a2ea00_u1.ok) {
+        return out;
+    }
+    Init531d60PostBaseContinueAHooks continue_a_hooks = post_base_continue_a_hooks;
+    continue_a_hooks.incoming_eax_from_a2ea00 = out.post_base_a2ea00_u1.eax_return;
+    if (continue_a_hooks.incoming_rbx == nullptr) {
+        continue_a_hooks.incoming_rbx = post_base_a2ea00_u1_hooks.incoming_rbx;
+    }
     run_appmain_init_continue_driver_tail(
         out, table, alloc, setter_obj, flag_in, set_a, set_b, set_c,
-        post_base_continue_a_hooks, post_base_continue_b_hooks,
+        continue_a_hooks, post_base_continue_b_hooks,
         post_base_continue_c_hooks, post_base_continue_d_hooks,
         post_base_continue_e_hooks, post_base_alt_5327bd_hooks);
     return out;
@@ -550,7 +561,7 @@ void run_appmain_init_continue_driver_tail(
     const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks,
     const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks,
     const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks) {
-    // E519: always-on Init continue — 20-unit branch-free run 0x532728..0x53277f.
+    // E519: always-on Init continue — 16-unit branch-free run 0x532736..0x53277f.
     out.post_base_continue_a = init_531d60_post_base_continue_a(post_base_continue_a_hooks);
     if (!out.post_base_continue_a.ok) {
         return;

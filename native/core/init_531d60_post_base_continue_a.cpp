@@ -31,32 +31,11 @@ Init531d60PostBaseContinueAResult init_531d60_post_base_continue_a(
     const Init531d60PostBaseContinueAHooks& hooks) noexcept {
     Init531d60PostBaseContinueAResult out{};
 
-    // 0x532728 mov rbx,[r13] — incoming r13 NOT modelled; slot supplies the load.
-    const void* rbx = nullptr;
-    if (hooks.incoming_r13_slot != nullptr) {
-        rbx = *hooks.incoming_r13_slot;
-        ++out.load_count;
-    }
-    pin(out, ContinueAUnit::mov_rbx_load_r13);
-
-    // 0x53272c xor esi,esi
-    pin(out, ContinueAUnit::xor_esi_esi);
-
-    // 0x53272e mov rdi,rbx
-    pin(out, ContinueAUnit::mov_rdi_rbx_1);
-
-    // 0x532731 call 0xa2ea00 (body NOT modelled; eax is a host stand-in).
-    int eax = 0;
-    if (hooks.call_a2ea00 != nullptr) {
-        eax = hooks.call_a2ea00(const_cast<void*>(rbx));
-    }
-    pin(out, ContinueAUnit::call_a2ea00);
-    ++out.call_count;
-
-    // 0x532736 mov rdi,rbx
+    // 0x532736 mov rdi,rbx — rbx stand-in optional (load @ 0x532728 demoted to E510 u1).
+    const void* rbx = hooks.incoming_rbx;
     pin(out, ContinueAUnit::mov_rdi_rbx_2);
 
-    // 0x532739 mov esi,eax — eax stand-in (0 when the a2ea00 hook is null).
+    int eax = hooks.incoming_eax_from_a2ea00;
     pin(out, ContinueAUnit::mov_esi_eax);
 
     // 0x53273b call 0xa2e5d0 (body NOT modelled).
@@ -174,7 +153,7 @@ Init531d60PostBaseContinueAResult init_531d60_post_base_continue_a(
     }
 
     out.ok = (out.unit_executed == kInit531d60PostBaseContinueAUnitCount) &&
-             (out.call_count == 4) && (out.lea_count == 4) && (out.alu_count == 2) &&
+             (out.call_count == 3) && (out.lea_count == 4) && (out.alu_count == 2) &&
              (out.branch_boundary_count == 1) && (out.unit_counts[0] == 1) &&
              (out.unit_counts[kInit531d60PostBaseContinueAUnitCount - 1] == 1);
     return out;
