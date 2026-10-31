@@ -6,6 +6,7 @@
 #include "init_531d60_post_base_vcall18_532a72_u1.hpp"
 #include "init_531d60_post_base_lea_5388e0_532a7d_u1.hpp"
 #include "init_531d60_post_base_lea_rsp470_532a84_u1.hpp"
+#include "init_531d60_post_base_lea_rsi_15c8e18_532a8c_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
 #include <cstring>
@@ -135,13 +136,20 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         }
     }
 
+    Init531d60PostBaseLeaRsi15c8e18_532a8c_U1Cells lea_rsi_cells =
+        hooks.lea_rsi_15c8e18_532a8c_u1_cells;
+    if (!hooks.merge_lea_rsi_15c8e18_532a8c_u1_ran) {
+        const Init531d60PostBaseLeaRsi15c8e18_532a8c_U1Result lsr =
+            init_531d60_post_base_lea_rsi_15c8e18_532a8c_u1(lea_rsi_cells);
+        if (!lsr.ok) {
+            return out;
+        }
+        out.lea_rip_count += lsr.lea_rip_count;
+    }
+
     // Descriptor 3 on stack (address pinned by lea rdx,[rsp+0x470] @ 0x532a84 peel).
     alignas(32) SaveDataDescriptor desc3{};
     void* desc3_ptr = &desc3;
-
-    // 0x532a8c lea rsi,[0x15c8e18] — vtable 2 (slot-3 no-op source)
-    pin(out, ContinueEUnit::lea_rsi_15c8e18);
-    ++out.lea_rip_count;
 
     // 0x532a93 mov qword [rsp+0x4A0],0 — desc3[0x30] = 0
     desc3.field_30 = 0;
@@ -258,9 +266,10 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         (hooks.merge_vcall18_532a72_u1_ran ? 0 : 1);
     const int expect_stamp = hooks.merge_a54920_u1_ran ? 0 : 1;
     const int expect_lea_rip =
-        4 + (hooks.merge_a54920_u1_ran ? 0 : 3) +
+        3 + (hooks.merge_a54920_u1_ran ? 0 : 3) +
         (hooks.merge_a54920_532a62_u1_ran ? 0 : 1) +
-        (hooks.merge_lea_5388e0_532a7d_u1_ran ? 0 : 1);
+        (hooks.merge_lea_5388e0_532a7d_u1_ran ? 0 : 1) +
+        (hooks.merge_lea_rsi_15c8e18_532a8c_u1_ran ? 0 : 1);
     const int expect_vmovq = hooks.merge_vmovq_532a75_u1_ran ? 0 : 1;
     out.a54920_hook_supplied = (hooks.call_a54920 != nullptr);
     out.ok = (out.unit_executed == kInit531d60PostBaseContinueEUnitCount) &&

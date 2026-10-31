@@ -17,7 +17,7 @@ Init531d60PostBaseLeaRsp470_532a84_U1Result init_531d60_post_base_lea_rsp470_532
     }
     ++out.lea_rsp_count;
 
-    // Next: lea rsi,[0x15c8e18] @ 0x532a8c — NOT modelled here.
+    // Next: lea rsi,[0x15c8e18] @ 0x532a8c — see lea_rsi_15c8e18_532a8c_u1 (E527).
     out.ok = (out.lea_rsp_count == 1);
     return out;
 }

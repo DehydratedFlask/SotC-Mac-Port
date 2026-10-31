@@ -225,6 +225,7 @@ add_library(sotc_core STATIC
   core/init_531d60_post_base_vmovq_532a75_u1.cpp
   core/init_531d60_post_base_lea_5388e0_532a7d_u1.cpp
   core/init_531d60_post_base_lea_rsp470_532a84_u1.cpp
+  core/init_531d60_post_base_lea_rsi_15c8e18_532a8c_u1.cpp
   core/init_531d60_post_base_continue_a.cpp
   core/init_531d60_post_base_continue_b.cpp
   core/init_531d60_post_base_continue_c.cpp
