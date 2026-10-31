@@ -7,6 +7,7 @@
 #include "init_531d60_post_base_lea_5388e0_532a7d_u1.hpp"
 #include "init_531d60_post_base_lea_rsp470_532a84_u1.hpp"
 #include "init_531d60_post_base_lea_rsi_15c8e18_532a8c_u1.hpp"
+#include "init_531d60_post_base_movq_rsp4a0_0_532a93_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
 #include <cstring>
@@ -151,9 +152,20 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
     alignas(32) SaveDataDescriptor desc3{};
     void* desc3_ptr = &desc3;
 
-    // 0x532a93 mov qword [rsp+0x4A0],0 — desc3[0x30] = 0
-    desc3.field_30 = 0;
-    pin(out, ContinueEUnit::movq_rsp4a0_0);
+    Init531d60PostBaseMovqRsp4a0_0_532a93_U1Cells movq_cells =
+        hooks.movq_rsp4a0_0_532a93_u1_cells;
+    if (movq_cells.field_30_out == nullptr) {
+        movq_cells.field_30_out = &desc3.field_30;
+    }
+    if (!hooks.merge_movq_rsp4a0_0_532a93_u1_ran) {
+        const Init531d60PostBaseMovqRsp4a0_0_532a93_U1Result mqr =
+            init_531d60_post_base_movq_rsp4a0_0_532a93_u1(movq_cells);
+        if (!mqr.ok) {
+            return out;
+        }
+    } else {
+        desc3.field_30 = 0;
+    }
 
     // 0x532a9f mov rdi,[r13] — parent arg
     void* parent3 = const_cast<void*>(hooks.incoming_r13);
