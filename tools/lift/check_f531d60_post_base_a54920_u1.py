@@ -56,7 +56,7 @@ def main() -> int:
     nh = NATIVE.read_text()
     require("init_531d60_post_base_a54920_u1" in nh, "API")
     ce = CONT_E.read_text()
-    require("kInit531d60PostBaseContinueERva = 0x532a0c" in ce, "shrunk continue_e start")
+    require("kInit531d60PostBaseContinueERva = 0x532a1a" in ce, "shrunk continue_e start")
     require("merge_a54920_u1_ran" in ce, "u1 merge hook")
     require("core/init_531d60_post_base_a54920_u1.cpp" in CMAKE.read_text(), "cmake")
 

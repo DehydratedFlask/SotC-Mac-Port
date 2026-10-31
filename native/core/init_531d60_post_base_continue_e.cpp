@@ -1,6 +1,7 @@
 #include "init_531d60_post_base_continue_e.hpp"
 
 #include "init_531d60_post_base_a54920_u1.hpp"
+#include "init_531d60_post_base_vcall18_532a17.hpp"
 
 #include <cstring>
 
@@ -55,16 +56,16 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         out.boss_flag_after = u1r.boss_flag_after;
     }
 
-    // 0x532a0c mov rax,[rsp+0x560] — reload vtable (stack from u1 prep NOT modelled)
-    pin(out, ContinueEUnit::mov_rax_rsp560_1);
-
-    // 0x532a14 mov rdi,r14 — this = &desc1[0x20]
-    pin(out, ContinueEUnit::mov_rdi_r14_1);
-
-    // 0x532a17 call [rax+0x18] — vcall slot-3 → 0x538200 (bare ret, elided).
-    // Resolution: *(0x15c8d98 + 0x18) = 0x538200 = ret (E537).
-    pin(out, ContinueEUnit::vcall_noop_1);
-    ++out.vcall_noop_count;
+    if (!hooks.merge_vcall18_532a17_ran) {
+        Init531d60PostBaseVcall18532a17Hooks vc{};
+        vc.call_vslot18 = hooks.call_vslot18_532a17;
+        const Init531d60PostBaseVcall18532a17Result vcr =
+            init_531d60_post_base_vcall18_532a17(vc);
+        if (!vcr.ok) {
+            return out;
+        }
+        out.vcall_noop_count += vcr.call_vslot18_count;
+    }
 
     // ---- Block 2: save-data ctor 2 (name 0x2efd9f8, vtable 0x15c8d98, rbx reused) ----
 
@@ -265,12 +266,19 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
     pin(out, ContinueEUnit::vcall_rax08);
     ++out.vcall_54b250_count;
 
-    // Final validation.
+    // Final validation (u1 / vcall18_532a17 merges add to ctor/vcall/stamp totals).
+    const int expect_a54920 =
+        2 + (hooks.merge_a54920_u1_ran ? 0 : 1);
+    const int expect_vcall_noop =
+        2 + (hooks.merge_vcall18_532a17_ran ? 0 : 1);
+    const int expect_stamp = hooks.merge_a54920_u1_ran ? 0 : 1;
+    const int expect_lea_rip = 6 + (hooks.merge_a54920_u1_ran ? 0 : 3);
     out.a54920_hook_supplied = (hooks.call_a54920 != nullptr);
     out.ok = (out.unit_executed == kInit531d60PostBaseContinueEUnitCount) &&
-             (out.call_a54920_count == 3) && (out.vcall_noop_count == 3) &&
-             (out.vcall_54b250_count == 1) && (out.stamp_count == 1) &&
-             (out.lea_rip_count == 9) && (out.vmovq_count == 1) &&
+             (out.call_a54920_count == expect_a54920) &&
+             (out.vcall_noop_count == expect_vcall_noop) &&
+             (out.vcall_54b250_count == 1) && (out.stamp_count == expect_stamp) &&
+             (out.lea_rip_count == expect_lea_rip) && (out.vmovq_count == 1) &&
              (out.unit_counts[0] == 1) &&
              (out.unit_counts[kInit531d60PostBaseContinueEUnitCount - 1] == 1);
     return out;
