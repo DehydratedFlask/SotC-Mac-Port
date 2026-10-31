@@ -11,7 +11,7 @@ Init531d60PostBaseMovRsp470Rdx_532ab2_U1Result init_531d60_post_base_mov_rsp470_
     }
     ++out.mov_rsp470_rdx_count;
 
-    // Next: vmovdqa [rsp+0x478],xmm0 @ 0x532aba — see continue_e.
+    // Next: vmovdqa [rsp+0x478],xmm0 @ 0x532aba — see vmovdqa_532aba_u1.
     out.ok = (out.mov_rsp470_rdx_count == 1);
     return out;
 }

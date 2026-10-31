@@ -2,7 +2,7 @@
 //   mov [rsp+0x470],rdx   ; desc3[0x00] = descriptor base (self-pointer at head)
 //
 // After E531 `lea_rbx_rsp490_532aaa_u1` end @ `0x532ab2`. NOT modelled: following
-// `vmovdqa [rsp+0x478],xmm0` @ `0x532aba` (E532+ continue_e). G1 PARTIAL.
+// `vmovdqa [rsp+0x478],xmm0` @ `0x532aba` (E533 vmovdqa u1). G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

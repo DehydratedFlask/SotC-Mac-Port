@@ -12,6 +12,7 @@
 #include "init_531d60_post_base_lea_538870_532aa3_u1.hpp"
 #include "init_531d60_post_base_lea_rbx_rsp490_532aaa_u1.hpp"
 #include "init_531d60_post_base_mov_rsp470_rdx_532ab2_u1.hpp"
+#include "init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
 #include <cstring>
@@ -239,10 +240,23 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         std::memcpy(&desc3.zero[0], &desc3_head, sizeof(void*));
     }
 
-    // 0x532aba vmovdqa [rsp+0x478],xmm0 — store xmm0 at desc3[0x08]
-    // (value from vmovq; stand-in zero used here).
-    std::memcpy(&desc3.zero[8], xmm0_buf, 16);
-    pin(out, ContinueEUnit::vmovdqa_rsp478_xmm0);
+    Init531d60PostBaseVmovdqaRsp478Xmm0_532aba_U1Cells vdqa_cells =
+        hooks.vmovdqa_rsp478_xmm0_532aba_u1_cells;
+    if (vdqa_cells.dest_out == nullptr) {
+        vdqa_cells.dest_out = &desc3.zero[8];
+    }
+    if (vdqa_cells.xmm0_in == nullptr) {
+        vdqa_cells.xmm0_in = xmm0_buf;
+    }
+    if (!hooks.merge_vmovdqa_rsp478_xmm0_532aba_u1_ran) {
+        const Init531d60PostBaseVmovdqaRsp478Xmm0_532aba_U1Result vdr =
+            init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1(vdqa_cells);
+        if (!vdr.ok) {
+            return out;
+        }
+    } else {
+        std::memcpy(&desc3.zero[8], xmm0_buf, 16);
+    }
 
     // 0x532ac3 mov [rsp+0x488],rax — desc3[0x18] = 0x5388e0 (thunk 1)
     std::memcpy(&desc3.zero[0x18], &rax_thunk1, sizeof(void*));
