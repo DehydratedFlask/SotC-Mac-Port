@@ -23,7 +23,7 @@ Init531d60PostBaseMovR13_15fe518_532b3a_U1Result init_531d60_post_base_mov_r13_1
     }
     ++out.mov_r13_rip_count;
 
-    // Next: mov r12,[rbx] @ 0x532b41 — not modelled in this unit.
+    // Next: mov r12,[rbx] @ 0x532b41 — peeled as registry_body unit E560.
     out.ok = (out.mov_r13_rip_count == 1);
     return out;
 }

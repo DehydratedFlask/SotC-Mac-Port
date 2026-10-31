@@ -1,7 +1,7 @@
 // Init `0x531d60` registry mov r13 OBS `0x532b3a..0x532b41` (7 B):
 //   mov r13,[0x15fe518]   ; __stack_chk_guard pointer cell
 //
-// After E558 lea rbx @ `0x532b33`. NOT modelled: mov r12,[rbx] / compare-store @ `0x532b41..`. G1 PARTIAL.
+// After E558 lea rbx @ `0x532b33`. NOT modelled: mov r12,[rbx] @ `0x532b41` (E560 peel) / compare-store @ `0x532b44..`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

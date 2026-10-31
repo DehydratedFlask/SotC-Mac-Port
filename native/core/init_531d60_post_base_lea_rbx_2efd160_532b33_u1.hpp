@@ -1,7 +1,7 @@
 // Init `0x531d60` registry lea rbx OBS `0x532b33..0x532b3a` (7 B):
 //   lea rbx,[0x2efd160]   ; address of global registry cell
 //
-// After E557 call 0x52a220 @ `0x532b2e`. NOT modelled: mov r13 @ `0x532b3a` (E559 peel) / compare-store @ `0x532b41..`. G1 PARTIAL.
+// After E557 call 0x52a220 @ `0x532b2e`. NOT modelled: mov r13 @ `0x532b3a` (E559) / mov r12 @ `0x532b41` (E560) / compare-store @ `0x532b44..`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

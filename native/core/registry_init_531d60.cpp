@@ -138,7 +138,15 @@ RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, 
         }
     }
 
-    // OBS 0x532b41..0x532bf8: compare with previous; destroy previous if different & non-null;
+    if (!hooks.merge_mov_r12_rbx_532b41_u1_ran) {
+        const auto mov_r12 = init_531d60_post_base_mov_r12_rbx_532b41_u1();
+        if (!mov_r12.ok) {
+            destroy_registry_object(obj, alloc);
+            return RegistryInit531d60Status::alloc_failed;
+        }
+    }
+
+    // OBS 0x532b44..0x532bf8: compare with previous; destroy previous if different & non-null;
     // then movq new, (0x2efd160). Same-pointer fast path skips destroy+store.
     RegistryObject2efd160* prev = registry_cell_2efd160().load();
     if (prev == obj) {
