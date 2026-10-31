@@ -55,7 +55,7 @@ def main() -> int:
     require("NOT modelled" in nh, "omission")
     require(f"0x{RESOLVED:x}" in nh.lower() or "5388c0" in nh, "resolved ret pin")
     ce = CONT_E.read_text()
-    require("kInit531d60PostBaseContinueERva = 0x532af5" in ce, "shrunk continue_e start")
+    require("kInit531d60PostBaseContinueERva = 0x532afc" in ce, "shrunk continue_e start")
     require("merge_vcall18_532af2_u1_ran" in ce, "vcall532af2 merge hook")
     require("core/init_531d60_post_base_vcall18_532af2_u1.cpp" in CMAKE.read_text(), "cmake")
 

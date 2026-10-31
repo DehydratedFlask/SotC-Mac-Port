@@ -20,6 +20,7 @@
 #include "init_531d60_post_base_mov_rsp4b0_rax_532ae7_u1.hpp"
 #include "init_531d60_post_base_mov_rdi_rbx_532aef_u1.hpp"
 #include "init_531d60_post_base_vcall18_532af2_u1.hpp"
+#include "init_531d60_post_base_lea_rax_2eff450_532af5_u1.hpp"
 #include "init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
@@ -401,14 +402,20 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         out.vcall_noop_count += vcr3.call_vslot18_count;
     }
 
+    if (!hooks.merge_lea_rax_2eff450_532af5_u1_ran) {
+        const Init531d60PostBaseLeaRax2eff450_532af5_U1Result lr4 =
+            init_531d60_post_base_lea_rax_2eff450_532af5_u1(
+                hooks.lea_rax_2eff450_532af5_u1_cells);
+        if (!lr4.ok) {
+            return out;
+        }
+        out.lea_rip_count += lr4.lea_rip_count;
+    }
+
     // ---- Block 4: resolved 0x54b250 call via 0x2eff450 ----
     // Resolution per E538: *(0x2eff450) is a 0x460-byte object whose vtable
     // is 0x15c9830.  Slot 1 (offset +0x8) = 0x54b250.  The call is:
     //   0x54b250(*(0x2eff450), esi=0, edx=2)
-
-    // 0x532af5 lea rax,[0x2eff450] — BSS vtable-object cell
-    pin(out, ContinueEUnit::lea_rax_2eff450);
-    ++out.lea_rip_count;
 
     // 0x532afc xor esi,esi — arg1 = 0
     pin(out, ContinueEUnit::xor_esi_esi);
@@ -449,7 +456,8 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         (hooks.merge_vcall18_532af2_u1_ran ? 0 : 1);
     const int expect_stamp = hooks.merge_a54920_u1_ran ? 0 : 1;
     const int expect_lea_rip =
-        1 + (hooks.merge_a54920_u1_ran ? 0 : 3) +
+        (hooks.merge_lea_rax_2eff450_532af5_u1_ran ? 0 : 1) +
+        (hooks.merge_a54920_u1_ran ? 0 : 3) +
         (hooks.merge_a54920_532a62_u1_ran ? 0 : 1) +
         (hooks.merge_lea_5388e0_532a7d_u1_ran ? 0 : 1) +
         (hooks.merge_lea_rsi_15c8e18_532a8c_u1_ran ? 0 : 1) +
