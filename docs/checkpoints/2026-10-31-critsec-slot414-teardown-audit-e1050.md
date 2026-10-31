@@ -26,4 +26,5 @@ Any future persistent engine state needs an explicit owner plus native teardown-
 
 - **Project index:** `python3 scripts/project_index.py` — exit 0, 44,294 folders indexed.
 - **Prepublication audits:** staged publication audit accepted 6 paths; all-path audit accepted 3,458 paths; attribution and staged/working diff checks passed. Logs: `local/validation/critsec-slot414-teardown-e1050/`.
+- **Publication:** owner-authored commit `3479d9ff93dde21e52a7844ab4b6001d33e5fdc1` was pushed to `origin main`; post-push fetch confirmed `HEAD == origin/main` and a clean checkout.
 - **Next exact action:** do not implement a destructor drain without an engine lifecycle owner and a native cleanup-order contract. Resume the independent `0x499f80` host-failure-policy task only after the user's preference arrives.

@@ -7,6 +7,7 @@
 - **Independent review:** `/root/driver_gap_review` independently confirmed the same source boundary and found no production caller for `init_slot414_57b9b0` or direct destroy-hook invocation.
 - **Evidence:** private report `local/validation/critsec-slot414-teardown-e1050/REPORT.md`; live spans and Graft query inventory are in [E1050](docs/checkpoints/2026-10-31-critsec-slot414-teardown-audit-e1050.md). No source changes; tests NOT RUN. Project index: 44,294 folders.
 - **Prepublication (PASSED):** staged audit 6 paths; all-path audit 3,458 paths; attribution and staged/working diff checks pass. Logs: `local/validation/critsec-slot414-teardown-e1050/`.
+- **Publication (ARTIFACT_VERIFIED):** owner-authored commit `3479d9ff93dde21e52a7844ab4b6001d33e5fdc1` pushed to `origin main`; post-push fetch confirmed `HEAD == origin/main` and a clean checkout.
 - **Limits:** no future engine-state owner, native destructor mapping, or teardown order is established. Broad CritSec task stays PARTIAL; no product gate advances.
 - Next exact action: hold teardown implementation until an engine lifecycle owner and native hook ordering contract exist; resume the independent `0x499f80` host-policy task only after the user's preference arrives.
 
