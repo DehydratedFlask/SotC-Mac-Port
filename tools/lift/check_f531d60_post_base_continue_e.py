@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ELF-tie Init 0x531d60 continue E tail block 0x532aef..0x532b0c (29 B / 8 units).
+"""ELF-tie Init 0x531d60 continue E tail block 0x532af2..0x532b0c (26 B / 7 units).
 
 Private: needs local/re/eboot.elf.  Pins every one of the 52 consecutive
 instructions, the three call 0xa54920 rel32 targets, the three vcall+0x18
@@ -23,10 +23,10 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import ps4_dynlink as d  # noqa: E402
 
 ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
-START = 0x532AEF
-SIZE = 29
+START = 0x532AF2
+SIZE = 26
 END = 0x532B0C
-REGION_SHA256 = "5d8a72d8d4bddd07641b3023ae15ca3fc117ed1386f473f0bb8beaf012b84898"
+REGION_SHA256 = "58179d6451ddd87b96dfb7f97847ef294239692ad29ce8daba69532c9e82635f"
 VMOVQ_NATIVE = ROOT / "native/core/init_531d60_post_base_vmovq_532a75_u1.hpp"
 LEA_NATIVE = ROOT / "native/core/init_531d60_post_base_lea_5388e0_532a7d_u1.hpp"
 LEA_RSP_NATIVE = ROOT / "native/core/init_531d60_post_base_lea_rsp470_532a84_u1.hpp"
@@ -40,6 +40,7 @@ VMOVDQA_NATIVE = ROOT / "native/core/init_531d60_post_base_vmovdqa_rsp478_xmm0_5
 MOV488_NATIVE = ROOT / "native/core/init_531d60_post_base_mov_rsp488_rax_532ac3_u1.hpp"
 MOV4B0_NATIVE = ROOT / "native/core/init_531d60_post_base_mov_rsp4b0_rsi_532acb_u1.hpp"
 MOV4B0RAX_NATIVE = ROOT / "native/core/init_531d60_post_base_mov_rsp4b0_rax_532ae7_u1.hpp"
+MOVRDIRBX_NATIVE = ROOT / "native/core/init_531d60_post_base_mov_rdi_rbx_532aef_u1.hpp"
 LEA2EFDA50_NATIVE = ROOT / "native/core/init_531d60_post_base_lea_rsi_2efda50_532ad3_u1.hpp"
 MOV4B8_NATIVE = ROOT / "native/core/init_531d60_post_base_mov_rsp4b8_rcx_532ada_u1.hpp"
 U1_NATIVE = ROOT / "native/core/init_531d60_post_base_a54920_u1.hpp"
@@ -72,8 +73,6 @@ VMOVQ_15FF528 = 0x15FF528
 #         "vmovq"    -> vmovq xmm,[rip+disp32]; target must equal target
 #         "pin"       -> opcode/shape only
 UNITS = [
-    (0x532AEF, 3, "0bc5a45e8b7b5bfc6d88912c19ddf334fbbdb17c2a1df7b79adf0dda065730ab",
-     "mov rdi,rbx", "pin", None),
     (0x532AF2, 3, "22558207d1d705fcbda49d89be5b34ebe09d409878b0bf88e6819b7724e29e96",
      "call [rax+0x18]", "vcall18", None),
     (0x532AF5, 7, "4cee64d34e337abd4b52b8fb14bbe891d22e32a51ffcebc92595df69dab2c773",
@@ -110,7 +109,7 @@ def main() -> int:
     _, ph = d.program_headers(elf)
     img = d.Image(elf, ph)
 
-    require(len(UNITS) == 8, "unit count")
+    require(len(UNITS) == 7, "unit count")
     require(START + SIZE == END, "size arithmetic")
 
     # Verify contiguous unit coverage.
@@ -158,7 +157,7 @@ def main() -> int:
     nh = NATIVE_HPP.read_text()
     require("init_531d60_post_base_continue_e" in nh, "API")
     require("NOT modelled" in nh, "omission")
-    require("kInit531d60PostBaseContinueERva = 0x532aef" in nh, "start rva")
+    require("kInit531d60PostBaseContinueERva = 0x532af2" in nh, "start rva")
     require("merge_a54920_532ae2_u1_ran" in nh, "a54920_532ae2 merge hook")
     require("merge_a54920_u1_ran" in nh, "u1 merge hook")
     require("merge_a54920_532a62_u1_ran" in nh, "a54920_532a62 merge hook")
@@ -179,6 +178,7 @@ def main() -> int:
     require("merge_lea_rsi_2efda50_532ad3_u1_ran" in nh, "lea_rsi_2efda50 merge hook")
     require("merge_mov_rsp4b8_rcx_532ada_u1_ran" in nh, "mov4b8 merge hook")
     require("merge_mov_rsp4b0_rax_532ae7_u1_ran" in nh, "mov4b0_rax merge hook")
+    require("merge_mov_rdi_rbx_532aef_u1_ran" in nh, "mov_rdi_rbx merge hook")
     require("init_531d60_post_base_mov_rsp470_rdx_532ab2_u1" in MOVRSP_NATIVE.read_text(), "mov_rsp470 u1 API")
     require("init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1" in VMOVDQA_NATIVE.read_text(), "vmovdqa u1 API")
     require("init_531d60_post_base_mov_rsp488_rax_532ac3_u1" in MOV488_NATIVE.read_text(), "mov488 u1 API")
@@ -186,6 +186,7 @@ def main() -> int:
     require("init_531d60_post_base_lea_rsi_2efda50_532ad3_u1" in LEA2EFDA50_NATIVE.read_text(), "lea_rsi_2efda50 u1 API")
     require("init_531d60_post_base_mov_rsp4b8_rcx_532ada_u1" in MOV4B8_NATIVE.read_text(), "mov4b8 u1 API")
     require("init_531d60_post_base_mov_rsp4b0_rax_532ae7_u1" in MOV4B0RAX_NATIVE.read_text(), "mov4b0_rax u1 API")
+    require("init_531d60_post_base_mov_rdi_rbx_532aef_u1" in MOVRDIRBX_NATIVE.read_text(), "mov_rdi_rbx u1 API")
     require("init_531d60_post_base_vmovq_532a75_u1" in VMOVQ_NATIVE.read_text(), "vmovq u1 API")
     require("init_531d60_post_base_lea_5388e0_532a7d_u1" in LEA_NATIVE.read_text(), "lea u1 API")
     require("init_531d60_post_base_lea_rsp470_532a84_u1" in LEA_RSP_NATIVE.read_text(), "lea_rsp u1 API")
@@ -244,6 +245,7 @@ def main() -> int:
     require("merge_lea_rsi_2efda50_532ad3_u1_ran" in ncp, "lea_rsi_2efda50 merge in cpp")
     require("merge_mov_rsp4b8_rcx_532ada_u1_ran" in ncp, "mov4b8 merge in cpp")
     require("merge_mov_rsp4b0_rax_532ae7_u1_ran" in ncp, "mov4b0_rax merge in cpp")
+    require("merge_mov_rdi_rbx_532aef_u1_ran" in ncp, "mov_rdi_rbx merge in cpp")
     require("expect_vmovq" in ncp, "conditional vmovq validation")
     require("expect_a54920" in ncp, "conditional a54920 validation")
     require("expect_vcall_noop" in ncp, "conditional vcall noop validation")
@@ -281,6 +283,7 @@ def main() -> int:
     require("init_531d60_post_base_lea_rsi_2efda50_532ad3_u1.cpp" in cm, "lea_rsi_2efda50 in CMake")
     require("init_531d60_post_base_mov_rsp4b8_rcx_532ada_u1.cpp" in cm, "mov4b8 in CMake")
     require("init_531d60_post_base_mov_rsp4b0_rax_532ae7_u1.cpp" in cm, "mov4b0_rax in CMake")
+    require("init_531d60_post_base_mov_rdi_rbx_532aef_u1.cpp" in cm, "mov_rdi_rbx in CMake")
 
     # Test text.
     tt = TEST.read_text()
@@ -291,7 +294,7 @@ def main() -> int:
             PREV_NATIVE.read_text(), "batch D end matches block entry")
 
     print(
-        f"OK check_f531d60_post_base_continue_e: span=0x{START:x}+{SIZE}B units=9; "
+        f"OK check_f531d60_post_base_continue_e: span=0x{START:x}+{SIZE}B units=7; "
         f"calls 0x{CALL_A54920:x}×0 pinned (+3 u1); vcall+0x18 no-ops×1 pinned (+2 vcall18); "
         f"no-ops→0x{NOOP_VCALL1_RESOLVED:x}/"
         f"0x{NOOP_VCALL2_RESOLVED:x}(ret); vcall+0x8→0x{RESOLVED_VCALL_54B250:x}; "

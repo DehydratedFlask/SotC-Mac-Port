@@ -2,7 +2,7 @@
 //   mov rax,[rsp+0x4B0]   ; reload vtable 2 (0x15c8e18 from E535 store peel)
 //
 // After E538 `a54920_532ae2_u1` end @ `0x532ae7`. NOT modelled: following
-// `mov rdi,rbx` @ `0x532aef` (continue_e). G1 PARTIAL.
+// `mov rdi,rbx` @ `0x532aef` via `mov_rdi_rbx_532aef_u1` (E540). G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

@@ -19,7 +19,7 @@ Init531d60PostBaseMovRsp4b0_Rax_532ae7_U1Result init_531d60_post_base_mov_rsp4b0
     }
     ++out.mov_rsp4b0_rax_count;
 
-    // Next: mov rdi,rbx @ 0x532aef — see continue_e.
+    // Next: mov rdi,rbx @ 0x532aef — see mov_rdi_rbx_532aef_u1.
     out.ok = (out.mov_rsp4b0_rax_count == 1);
     return out;
 }

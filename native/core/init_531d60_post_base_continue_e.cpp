@@ -18,6 +18,7 @@
 #include "init_531d60_post_base_mov_rsp4b8_rcx_532ada_u1.hpp"
 #include "init_531d60_post_base_a54920_532ae2_u1.hpp"
 #include "init_531d60_post_base_mov_rsp4b0_rax_532ae7_u1.hpp"
+#include "init_531d60_post_base_mov_rdi_rbx_532aef_u1.hpp"
 #include "init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
@@ -374,8 +375,19 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         }
     }
 
-    // 0x532aef mov rdi,rbx — this = &desc3[0x20]
-    pin(out, ContinueEUnit::mov_rdi_rbx);
+    void* rbx_this = desc3.self_ptr;
+    Init531d60PostBaseMovRdiRbx_532aef_U1Cells mov_rdi_rbx_cells =
+        hooks.mov_rdi_rbx_532aef_u1_cells;
+    if (mov_rdi_rbx_cells.rbx_in == nullptr) {
+        mov_rdi_rbx_cells.rbx_in = rbx_this;
+    }
+    if (!hooks.merge_mov_rdi_rbx_532aef_u1_ran) {
+        const Init531d60PostBaseMovRdiRbx_532aef_U1Result mdr =
+            init_531d60_post_base_mov_rdi_rbx_532aef_u1(mov_rdi_rbx_cells);
+        if (!mdr.ok) {
+            return out;
+        }
+    }
 
     // 0x532af2 call [rax+0x18] — vcall slot-3 → 0x5388c0 (bare ret, elided).
     // Resolution: *(0x15c8e18 + 0x18) = 0x5388c0 = ret (E537).
