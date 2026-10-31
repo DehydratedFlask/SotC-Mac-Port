@@ -1,7 +1,7 @@
 // Init `0x531d60` registry mov r15,rax OBS `0x532b26..0x532b29` (3 B):
 //   mov r15,rax   ; save count from call 0x54dc20 @ 0x532b21 (eax = 0x113)
 //
-// After E553 call @ `0x532b21`. NOT modelled: mov edx,eax @ `0x532b2c`. G1 PARTIAL.
+// After E553 call @ `0x532b21`. NOT modelled: call 0x52a220 @ `0x532b2e`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

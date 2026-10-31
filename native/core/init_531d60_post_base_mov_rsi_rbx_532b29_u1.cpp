@@ -13,7 +13,7 @@ Init531d60PostBaseMovRsiRbx_532b29_U1Result init_531d60_post_base_mov_rsi_rbx_53
     }
     ++out.mov_rsi_rbx_count;
 
-    // Next: mov edx,eax / call 0x52a220 @ 0x532b2c — not modelled in this unit.
+    // Next: mov edx,eax @ 0x532b2c — peeled as registry_body unit E556.
     out.ok = (out.mov_rsi_rbx_count == 1);
     return out;
 }
