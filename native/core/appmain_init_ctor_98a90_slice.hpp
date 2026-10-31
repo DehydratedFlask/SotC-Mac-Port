@@ -94,6 +94,7 @@
 #include "init_531d60_post_base_a2ea00_u1.hpp"
 #include "init_531d60_post_base_a2e5d0_u1.hpp"
 #include "init_531d60_post_base_a543b0_u1.hpp"
+#include "init_531d60_post_base_1fc80_u1.hpp"
 #include "init_531d60_post_base_continue_a.hpp"
 #include "init_531d60_post_base_continue_b.hpp"
 #include "init_531d60_post_base_continue_c.hpp"
@@ -227,6 +228,7 @@ struct AppmainInitCtor98a90SliceResult {
     Init531d60PostBaseA2ea00U1Result post_base_a2ea00_u1{};
     Init531d60PostBaseA2e5d0U1Result post_base_a2e5d0_u1{};
     Init531d60PostBaseA543b0U1Result post_base_a543b0_u1{};
+    Init531d60PostBase1fc80U1Result post_base_1fc80_u1{};
     Init531d60PostBaseContinueAResult post_base_continue_a{};
     Init531d60PostBaseContinueBResult post_base_continue_b{};
     Init531d60PostBaseContinueCResult post_base_continue_c{};
@@ -261,7 +263,8 @@ void run_appmain_init_continue_driver_tail(
     const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks,
     const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks,
     const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks,
-    const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks);
+    const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks,
+    const Init531d60PostBase1fc80U1Hooks& post_base_1fc80_u1_hooks);
 
 [[nodiscard]] AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     InputTable551140& table, AllocatorFront& alloc, void* self, void* arg,
@@ -338,6 +341,7 @@ void run_appmain_init_continue_driver_tail(
     const Init531d60PostBaseA2ea00U1Hooks& post_base_a2ea00_u1_hooks = {},
     const Init531d60PostBaseA2e5d0U1Hooks& post_base_a2e5d0_u1_hooks = {},
     const Init531d60PostBaseA543b0U1Hooks& post_base_a543b0_u1_hooks = {},
+    const Init531d60PostBase1fc80U1Hooks& post_base_1fc80_u1_hooks = {},
     const Init531d60PostBaseContinueAHooks& post_base_continue_a_hooks = {},
     const Init531d60PostBaseContinueBHooks& post_base_continue_b_hooks = {},
     const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks = {},
