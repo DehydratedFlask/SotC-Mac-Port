@@ -2542,9 +2542,9 @@ int main() {
     CHECK(g_cont_c_a431e0 == 1);
     CHECK(g_cont_c_vcall == 3);
 
-    // Batch D: fall-through of C's je 0x5329ae — 17 B, 4 units, one call.
+    // E519: batch D call-site in a473b0_u1; continue_d boundary @ 0x5329ae (0 units).
     CHECK(r.post_base_continue_d.ok);
-    CHECK(r.post_base_continue_d.unit_executed == 4);
+    CHECK(r.post_base_continue_d.unit_executed == 0);
     CHECK(r.post_base_continue_d.call_count == 1);
     CHECK(r.post_base_continue_d.load_count == 1);
     CHECK(g_cont_d_call == 0);  // native body replaced the raw hook

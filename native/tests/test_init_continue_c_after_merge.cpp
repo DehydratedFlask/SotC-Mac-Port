@@ -30,7 +30,7 @@ int main() {
         CHECK(plain.cont_c.ok);
         CHECK(plain.ran_fallthrough);
         CHECK(plain.fallthrough.ok);
-        CHECK(plain.fallthrough.unit_executed == 4);
+        CHECK(plain.fallthrough.unit_executed == 0);
         CHECK(plain.fallthrough.end_rva == 0x5329ae);
         CHECK(!plain.cont_c.merge_branch_outcome_modelled);
     }

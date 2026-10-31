@@ -2,7 +2,7 @@
 //
 // First instruction after continue C's pinned span (`kInit531d60PostBaseContinueCEndRva`):
 //   0x53299d  lea rax,[0x32f79a8]   (7 B)  — post-end lea head verified by continue-C checker
-//   … same four units as batch D (E535); execution uses `init_531d60_post_base_continue_d`.
+//   … 17 B ELF span `0x53299d..0x5329ae`; execution: `a473b0_u1` + batch D boundary @ `0x5329ae`.
 //
 // Claimed: entry/end RVAs, span size, and chaining from continue C's merge `je 0x5329ae` boundary
 // into the fall-through block when the branch is not taken (or outcome unmodelled, matching slice).
@@ -25,8 +25,8 @@ static_assert(kInit531d60PostBaseContinueCAfterMergeRva ==
                   kInit531d60PostBaseContinueCEndRva,
               "continue C end must equal merge fall-through entry");
 static_assert(kInit531d60PostBaseContinueCAfterMergeRva ==
-                  kInit531d60PostBaseContinueDRva,
-              "after-merge entry matches batch D");
+                  kInit531d60PostBaseContinueDFullSpanRva,
+              "after-merge entry matches batch D full span");
 static_assert(kInit531d60PostBaseContinueCAfterMergeEndRva ==
                   kInit531d60PostBaseContinueDEndRva,
               "after-merge end matches batch D");
