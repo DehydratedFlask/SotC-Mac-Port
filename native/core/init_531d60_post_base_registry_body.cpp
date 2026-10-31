@@ -89,6 +89,28 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
         out.unit_counts[static_cast<std::size_t>(RegistryBodyUnit::mov_edx_eax_532b2c_u1)] = 1;
         ++out.unit_executed;
     }
+    if (!hooks.merge_call_52a220_532b2e_u1_ran) {
+        Init531d60PostBaseCall52a220_532b2e_U1Cells cells = hooks.call_52a220_cells;
+        if (cells.table_in == nullptr) {
+            cells.table_in = hooks.table_in;
+        }
+        if (cells.obj_in == nullptr) {
+            cells.obj_in = hooks.obj_in;
+        }
+        if (cells.alloc == nullptr) {
+            cells.alloc = hooks.alloc;
+        }
+        cells.edx_in = out.edx_from_eax;
+        const Init531d60PostBaseCall52a220_532b2e_U1Result fill_call =
+            init_531d60_post_base_call_52a220_532b2e_u1(cells);
+        if (!fill_call.ok) {
+            return out;
+        }
+        out.call_52a220_count = fill_call.call_52a220_count;
+        out.fill_invoked = fill_call.fill_invoked;
+        out.unit_counts[static_cast<std::size_t>(RegistryBodyUnit::call_52a220_532b2e_u1)] = 1;
+        ++out.unit_executed;
+    }
     out.end_rva = kInit531d60PostBaseRegistryBodyEndRva;
     const int expected_call = hooks.merge_call_54dc10_532b19_u1_ran ? 0 : 1;
     const int expected_mov_rbx = hooks.merge_mov_rbx_rax_532b1e_u1_ran ? 0 : 1;
@@ -96,14 +118,16 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
     const int expected_mov_r15 = hooks.merge_mov_r15_rax_532b26_u1_ran ? 0 : 1;
     const int expected_mov_rsi = hooks.merge_mov_rsi_rbx_532b29_u1_ran ? 0 : 1;
     const int expected_mov_edx = hooks.merge_mov_edx_eax_532b2c_u1_ran ? 0 : 1;
+    const int expected_fill = hooks.merge_call_52a220_532b2e_u1_ran ? 0 : 1;
     const int expected_units = expected_call + expected_mov_rbx + expected_count + expected_mov_r15 +
-                               expected_mov_rsi + expected_mov_edx;
+                               expected_mov_rsi + expected_mov_edx + expected_fill;
     out.ok = (out.unit_executed == expected_units) && (out.call_54dc10_count == expected_call) &&
              (out.mov_rbx_rax_count == expected_mov_rbx) &&
              (out.call_54dc20_count == expected_count) &&
              (out.mov_r15_rax_count == expected_mov_r15) &&
              (out.mov_rsi_rbx_count == expected_mov_rsi) &&
-             (out.mov_edx_eax_count == expected_mov_edx);
+             (out.mov_edx_eax_count == expected_mov_edx) &&
+             (out.call_52a220_count == expected_fill);
     return out;
 }
 

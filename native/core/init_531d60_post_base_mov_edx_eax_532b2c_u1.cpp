@@ -12,7 +12,7 @@ Init531d60PostBaseMovEdxEax_532b2c_U1Result init_531d60_post_base_mov_edx_eax_53
     }
     ++out.mov_edx_eax_count;
 
-    // Next: call 0x52a220 @ 0x532b2e — not modelled in this unit.
+    // Next: call 0x52a220 @ 0x532b2e — peeled as registry_body unit E557.
     out.ok = (out.mov_edx_eax_count == 1);
     return out;
 }

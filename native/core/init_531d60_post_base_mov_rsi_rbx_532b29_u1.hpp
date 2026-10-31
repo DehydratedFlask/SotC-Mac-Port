@@ -1,7 +1,7 @@
 // Init `0x531d60` registry mov rsi,rbx OBS `0x532b29..0x532b2c` (3 B):
 //   mov rsi,rbx   ; table iterator base from mov rbx,rax @ 0x532b1e
 //
-// After E554 mov r15,rax @ `0x532b26`. NOT modelled: call 0x52a220 @ `0x532b2e`. G1 PARTIAL.
+// After E554 mov r15,rax @ `0x532b26`. NOT modelled: store/compare @ `0x532b33..`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
