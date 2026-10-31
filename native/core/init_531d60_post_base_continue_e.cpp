@@ -4,6 +4,7 @@
 #include "init_531d60_post_base_a54920_u1.hpp"
 #include "init_531d60_post_base_vcall18_532a17.hpp"
 #include "init_531d60_post_base_vcall18_532a72_u1.hpp"
+#include "init_531d60_post_base_lea_5388e0_532a7d_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
 #include <cstring>
@@ -109,9 +110,20 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         std::memcpy(xmm0_buf, vq_cells.dst_xmm0, kInit531d60PostBaseVmovq532a75_U1LaneBytes);
     }
 
-    // 0x532a7d lea rax,[0x5388e0] — thunk 1 (ret no-op)
-    pin(out, ContinueEUnit::lea_rax_5388e0);
-    ++out.lea_rip_count;
+    void* rax_thunk1 = reinterpret_cast<void*>(
+        static_cast<std::uintptr_t>(kInit531d60PostBaseContinueEThunk1Rva));
+    Init531d60PostBaseLea5388e0_532a7d_U1Cells lea_cells = hooks.lea_5388e0_532a7d_u1_cells;
+    if (lea_cells.rax_out == nullptr) {
+        lea_cells.rax_out = &rax_thunk1;
+    }
+    if (!hooks.merge_lea_5388e0_532a7d_u1_ran) {
+        const Init531d60PostBaseLea5388e0_532a7d_U1Result lr =
+            init_531d60_post_base_lea_5388e0_532a7d_u1(lea_cells);
+        if (!lr.ok) {
+            return out;
+        }
+        out.lea_rip_count += lr.lea_rip_count;
+    }
 
     // 0x532a84 lea rdx,[rsp+0x470] — descriptor 3 on stack
     alignas(32) SaveDataDescriptor desc3{};
@@ -154,11 +166,7 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
     pin(out, ContinueEUnit::vmovdqa_rsp478_xmm0);
 
     // 0x532ac3 mov [rsp+0x488],rax — desc3[0x18] = 0x5388e0 (thunk 1)
-    {
-        void* thunk1_val = reinterpret_cast<void*>(
-            static_cast<std::uintptr_t>(kInit531d60PostBaseContinueEThunk1Rva));
-        std::memcpy(&desc3.zero[0x18], &thunk1_val, sizeof(void*));
-    }
+    std::memcpy(&desc3.zero[0x18], &rax_thunk1, sizeof(void*));
     pin(out, ContinueEUnit::mov_rsp488_rax);
 
     // 0x532acb mov [rsp+0x4B0],rsi — desc3[0x40] = 0x15c8e18 (vtable 2)
@@ -241,8 +249,9 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         (hooks.merge_vcall18_532a72_u1_ran ? 0 : 1);
     const int expect_stamp = hooks.merge_a54920_u1_ran ? 0 : 1;
     const int expect_lea_rip =
-        5 + (hooks.merge_a54920_u1_ran ? 0 : 3) +
-        (hooks.merge_a54920_532a62_u1_ran ? 0 : 1);
+        4 + (hooks.merge_a54920_u1_ran ? 0 : 3) +
+        (hooks.merge_a54920_532a62_u1_ran ? 0 : 1) +
+        (hooks.merge_lea_5388e0_532a7d_u1_ran ? 0 : 1);
     const int expect_vmovq = hooks.merge_vmovq_532a75_u1_ran ? 0 : 1;
     out.a54920_hook_supplied = (hooks.call_a54920 != nullptr);
     out.ok = (out.unit_executed == kInit531d60PostBaseContinueEUnitCount) &&
