@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ELF-tie Init 0x531d60 continue E tail block 0x532ac3..0x532b0c (73 B / 14 units).
+"""ELF-tie Init 0x531d60 continue E tail block 0x532acb..0x532b0c (65 B / 13 units).
 
 Private: needs local/re/eboot.elf.  Pins every one of the 52 consecutive
 instructions, the three call 0xa54920 rel32 targets, the three vcall+0x18
@@ -23,10 +23,10 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import ps4_dynlink as d  # noqa: E402
 
 ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
-START = 0x532AC3
-SIZE = 73
+START = 0x532ACB
+SIZE = 65
 END = 0x532B0C
-REGION_SHA256 = "afdef1b04aba4b2875608736e18890265a10dcf141d08bb14fb5f0c2c9a549d2"
+REGION_SHA256 = "613784e1c8befe6e32d2b93c21620d83b7eaa08603989cd7dda2e35dbf6fd9a6"
 VMOVQ_NATIVE = ROOT / "native/core/init_531d60_post_base_vmovq_532a75_u1.hpp"
 LEA_NATIVE = ROOT / "native/core/init_531d60_post_base_lea_5388e0_532a7d_u1.hpp"
 LEA_RSP_NATIVE = ROOT / "native/core/init_531d60_post_base_lea_rsp470_532a84_u1.hpp"
@@ -37,6 +37,7 @@ LEA538870_NATIVE = ROOT / "native/core/init_531d60_post_base_lea_538870_532aa3_u
 LEARBX_NATIVE = ROOT / "native/core/init_531d60_post_base_lea_rbx_rsp490_532aaa_u1.hpp"
 MOVRSP_NATIVE = ROOT / "native/core/init_531d60_post_base_mov_rsp470_rdx_532ab2_u1.hpp"
 VMOVDQA_NATIVE = ROOT / "native/core/init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1.hpp"
+MOV488_NATIVE = ROOT / "native/core/init_531d60_post_base_mov_rsp488_rax_532ac3_u1.hpp"
 U1_NATIVE = ROOT / "native/core/init_531d60_post_base_a54920_u1.hpp"
 U2_NATIVE = ROOT / "native/core/init_531d60_post_base_a54920_532a62_u1.hpp"
 VC18_NATIVE = ROOT / "native/core/init_531d60_post_base_vcall18_532a17.hpp"
@@ -66,8 +67,6 @@ VMOVQ_15FF528 = 0x15FF528
 #         "vmovq"    -> vmovq xmm,[rip+disp32]; target must equal target
 #         "pin"       -> opcode/shape only
 UNITS = [
-    (0x532AC3, 8, "5d8fd0a894ccbe37fed4e3633ffaef6b99d2a25d3cedf931f9d74a9bffa5f188",
-     "mov [rsp+0x488],rax", "pin", None),
     (0x532ACB, 8, "d3742f2c57cd908ee5ecbda7fd0789a57c74c6a8de0db64521094caccd50b3a3",
      "mov [rsp+0x4B0],rsi", "pin", None),
     (0x532AD3, 7, "789228dafb710348d35a950b268d0872ae9833bc09f169b1f842bb4e8dfe352c",
@@ -116,7 +115,7 @@ def main() -> int:
     _, ph = d.program_headers(elf)
     img = d.Image(elf, ph)
 
-    require(len(UNITS) == 14, "unit count")
+    require(len(UNITS) == 13, "unit count")
     require(START + SIZE == END, "size arithmetic")
 
     # Verify contiguous unit coverage.
@@ -164,7 +163,7 @@ def main() -> int:
     nh = NATIVE_HPP.read_text()
     require("init_531d60_post_base_continue_e" in nh, "API")
     require("NOT modelled" in nh, "omission")
-    require("kInit531d60PostBaseContinueERva = 0x532ac3" in nh, "start rva")
+    require("kInit531d60PostBaseContinueERva = 0x532acb" in nh, "start rva")
     require("merge_a54920_u1_ran" in nh, "u1 merge hook")
     require("merge_a54920_532a62_u1_ran" in nh, "a54920_532a62 merge hook")
     require("merge_vcall18_532a17_ran" in nh, "vcall18 merge hook")
@@ -179,8 +178,10 @@ def main() -> int:
     require("merge_lea_rbx_rsp490_532aaa_u1_ran" in nh, "lea_rbx merge hook")
     require("merge_mov_rsp470_rdx_532ab2_u1_ran" in nh, "mov_rsp470 merge hook")
     require("merge_vmovdqa_rsp478_xmm0_532aba_u1_ran" in nh, "vmovdqa merge hook")
+    require("merge_mov_rsp488_rax_532ac3_u1_ran" in nh, "mov488 merge hook")
     require("init_531d60_post_base_mov_rsp470_rdx_532ab2_u1" in MOVRSP_NATIVE.read_text(), "mov_rsp470 u1 API")
     require("init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1" in VMOVDQA_NATIVE.read_text(), "vmovdqa u1 API")
+    require("init_531d60_post_base_mov_rsp488_rax_532ac3_u1" in MOV488_NATIVE.read_text(), "mov488 u1 API")
     require("init_531d60_post_base_vmovq_532a75_u1" in VMOVQ_NATIVE.read_text(), "vmovq u1 API")
     require("init_531d60_post_base_lea_5388e0_532a7d_u1" in LEA_NATIVE.read_text(), "lea u1 API")
     require("init_531d60_post_base_lea_rsp470_532a84_u1" in LEA_RSP_NATIVE.read_text(), "lea_rsp u1 API")
@@ -232,6 +233,7 @@ def main() -> int:
     require("merge_lea_rbx_rsp490_532aaa_u1_ran" in ncp, "lea_rbx merge in cpp")
     require("merge_mov_rsp470_rdx_532ab2_u1_ran" in ncp, "mov_rsp470 merge in cpp")
     require("merge_vmovdqa_rsp478_xmm0_532aba_u1_ran" in ncp, "vmovdqa merge in cpp")
+    require("merge_mov_rsp488_rax_532ac3_u1_ran" in ncp, "mov488 merge in cpp")
     require("expect_vmovq" in ncp, "conditional vmovq validation")
     require("expect_a54920" in ncp, "conditional a54920 validation")
     require("expect_vcall_noop" in ncp, "conditional vcall noop validation")
@@ -263,6 +265,7 @@ def main() -> int:
     require("init_531d60_post_base_lea_rbx_rsp490_532aaa_u1.cpp" in cm, "lea_rbx_532aaa in CMake")
     require("init_531d60_post_base_mov_rsp470_rdx_532ab2_u1.cpp" in cm, "mov_rsp470_532ab2 in CMake")
     require("init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1.cpp" in cm, "vmovdqa_532aba in CMake")
+    require("init_531d60_post_base_mov_rsp488_rax_532ac3_u1.cpp" in cm, "mov488_532ac3 in CMake")
 
     # Test text.
     tt = TEST.read_text()
@@ -273,7 +276,7 @@ def main() -> int:
             PREV_NATIVE.read_text(), "batch D end matches block entry")
 
     print(
-        f"OK check_f531d60_post_base_continue_e: span=0x{START:x}+{SIZE}B units=14; "
+        f"OK check_f531d60_post_base_continue_e: span=0x{START:x}+{SIZE}B units=13; "
         f"calls 0x{CALL_A54920:x}×1 pinned (+2 u1); vcall+0x18 no-ops×1 pinned (+2 vcall18); "
         f"no-ops→0x{NOOP_VCALL1_RESOLVED:x}/"
         f"0x{NOOP_VCALL2_RESOLVED:x}(ret); vcall+0x8→0x{RESOLVED_VCALL_54B250:x}; "

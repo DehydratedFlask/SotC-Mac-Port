@@ -2,7 +2,7 @@
 //   vmovdqa [rsp+0x478],xmm0   ; desc3[0x08] = xmm0 (from vmovq @ 0x532a75 peel)
 //
 // After E532 `mov_rsp470_rdx_532ab2_u1` end @ `0x532aba`. NOT modelled: following
-// `mov [rsp+0x488],rax` @ `0x532ac3` (E533+ continue_e). G1 PARTIAL.
+// `mov [rsp+0x488],rax` @ `0x532ac3` (E534 mov_rsp488 u1). G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

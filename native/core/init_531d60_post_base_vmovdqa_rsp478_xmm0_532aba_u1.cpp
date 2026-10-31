@@ -16,7 +16,7 @@ init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1(
     }
     ++out.vmovdqa_count;
 
-    // Next: mov [rsp+0x488],rax @ 0x532ac3 — see continue_e.
+    // Next: mov [rsp+0x488],rax @ 0x532ac3 — see mov_rsp488_rax_532ac3_u1.
     out.ok = (out.vmovdqa_count == 1);
     return out;
 }
