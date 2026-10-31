@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ELF-tie Init 0x531d60 continue E tail block 0x532afe..0x532b0c (14 B / 4 units).
+"""ELF-tie Init 0x531d60 continue E tail block 0x532b03..0x532b0c (9 B / 3 units).
 
 Private: needs local/re/eboot.elf.  Pins every one of the 52 consecutive
 instructions, the three call 0xa54920 rel32 targets, the three vcall+0x18
@@ -23,10 +23,10 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import ps4_dynlink as d  # noqa: E402
 
 ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
-START = 0x532AFE
-SIZE = 14
+START = 0x532B03
+SIZE = 9
 END = 0x532B0C
-REGION_SHA256 = "6e9bf4d2f2ae58c49d53750a9571ee55cf878cc1d64a1a340b5e1ad06098e397"
+REGION_SHA256 = "2215fd568b5c1abc91b9679fc8db300cc4dd910938de5a84d7cb3648baa8167e"
 VMOVQ_NATIVE = ROOT / "native/core/init_531d60_post_base_vmovq_532a75_u1.hpp"
 LEA_NATIVE = ROOT / "native/core/init_531d60_post_base_lea_5388e0_532a7d_u1.hpp"
 LEA_RSP_NATIVE = ROOT / "native/core/init_531d60_post_base_lea_rsp470_532a84_u1.hpp"
@@ -75,10 +75,9 @@ VMOVQ_15FF528 = 0x15FF528
 #         "pin"       -> opcode/shape only
 LEA_RAX532AF5_NATIVE = ROOT / "native/core/init_531d60_post_base_lea_rax_2eff450_532af5_u1.hpp"
 XOR_ESI532AFC_NATIVE = ROOT / "native/core/init_531d60_post_base_xor_esi_532afc_u1.hpp"
+MOV_EDX532AFE_NATIVE = ROOT / "native/core/init_531d60_post_base_mov_edx_2_532afe_u1.hpp"
 
 UNITS = [
-    (0x532AFE, 5, "252ddaa7ae0a8d071529fab21284ab34cb7bda4eb60c58c59dcfec5f79338f15",
-     "mov edx,2", "pin", None),
     (0x532B03, 3, "6355e6dc47fc8485f47f6455189f2dd9151220eae0f98847b8b09b55df9c3751",
      "mov rdi,[rax]", "pin", None),
     (0x532B06, 3, "81c7e25bd38dde9dde06d8a46d8bb57256fcbc780400d7e09baf1a8585b5b409",
@@ -107,7 +106,7 @@ def main() -> int:
     _, ph = d.program_headers(elf)
     img = d.Image(elf, ph)
 
-    require(len(UNITS) == 4, "unit count")
+    require(len(UNITS) == 3, "unit count")
     require(START + SIZE == END, "size arithmetic")
 
     # Verify contiguous unit coverage.
@@ -155,7 +154,7 @@ def main() -> int:
     nh = NATIVE_HPP.read_text()
     require("init_531d60_post_base_continue_e" in nh, "API")
     require("NOT modelled" in nh, "omission")
-    require("kInit531d60PostBaseContinueERva = 0x532afe" in nh, "start rva")
+    require("kInit531d60PostBaseContinueERva = 0x532b03" in nh, "start rva")
     require("merge_a54920_532ae2_u1_ran" in nh, "a54920_532ae2 merge hook")
     require("merge_a54920_u1_ran" in nh, "u1 merge hook")
     require("merge_a54920_532a62_u1_ran" in nh, "a54920_532a62 merge hook")
@@ -180,6 +179,7 @@ def main() -> int:
     require("merge_mov_rdi_rbx_532aef_u1_ran" in nh, "mov_rdi_rbx merge hook")
     require("merge_lea_rax_2eff450_532af5_u1_ran" in nh, "lea_rax_532af5 merge hook")
     require("merge_xor_esi_532afc_u1_ran" in nh, "xor_esi_532afc merge hook")
+    require("merge_mov_edx_2_532afe_u1_ran" in nh, "mov_edx_532afe merge hook")
     require("init_531d60_post_base_mov_rsp470_rdx_532ab2_u1" in MOVRSP_NATIVE.read_text(), "mov_rsp470 u1 API")
     require("init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1" in VMOVDQA_NATIVE.read_text(), "vmovdqa u1 API")
     require("init_531d60_post_base_mov_rsp488_rax_532ac3_u1" in MOV488_NATIVE.read_text(), "mov488 u1 API")
@@ -190,6 +190,7 @@ def main() -> int:
     require("init_531d60_post_base_mov_rdi_rbx_532aef_u1" in MOVRDIRBX_NATIVE.read_text(), "mov_rdi_rbx u1 API")
     require("init_531d60_post_base_lea_rax_2eff450_532af5_u1" in LEA_RAX532AF5_NATIVE.read_text(), "lea_rax_532af5 u1 API")
     require("init_531d60_post_base_xor_esi_532afc_u1" in XOR_ESI532AFC_NATIVE.read_text(), "xor_esi_532afc u1 API")
+    require("init_531d60_post_base_mov_edx_2_532afe_u1" in MOV_EDX532AFE_NATIVE.read_text(), "mov_edx_532afe u1 API")
     require("init_531d60_post_base_vmovq_532a75_u1" in VMOVQ_NATIVE.read_text(), "vmovq u1 API")
     require("init_531d60_post_base_lea_5388e0_532a7d_u1" in LEA_NATIVE.read_text(), "lea u1 API")
     require("init_531d60_post_base_lea_rsp470_532a84_u1" in LEA_RSP_NATIVE.read_text(), "lea_rsp u1 API")
