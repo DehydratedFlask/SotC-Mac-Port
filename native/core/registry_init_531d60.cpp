@@ -203,7 +203,17 @@ RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, 
         // NOT modelled: branch to 0x532bf8 vs destroy fall-through @ 0x532b56 (E562 merge rule).
     }
 
-    // OBS 0x532b56..0x532bf8: destroy previous if different & non-null; then movq new, (0x2efd160).
+    if (!hooks.merge_mov_r14_mem_rsp10_532b56_u1_ran) {
+        Init531d60PostBaseMovR14MemRsp10_532b56_U1Cells cells{};
+        cells.r14_in = obj;
+        const auto mov_rsp = init_531d60_post_base_mov_r14_mem_rsp10_532b56_u1(cells);
+        if (!mov_rsp.ok) {
+            destroy_registry_object(obj, alloc);
+            return RegistryInit531d60Status::alloc_failed;
+        }
+    }
+
+    // OBS 0x532b5b..0x532bf8: destroy previous if different & non-null; then movq new, (0x2efd160).
     RegistryObject2efd160* prev = registry_cell_2efd160().load();
     if (prev == obj) {
         return RegistryInit531d60Status::ok;
