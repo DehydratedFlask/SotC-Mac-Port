@@ -148,6 +148,8 @@ RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, 
         r12_from_cell = mov_r12.r12;
     }
 
+    bool pointers_equal = false;
+    bool pointers_equal_known = false;
     if (!hooks.merge_cmp_r12_r14_532b44_u1_ran) {
         Init531d60PostBaseCmpR12R14_532b44_U1Cells cells{};
         cells.r12_in = r12_from_cell;
@@ -157,12 +159,25 @@ RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, 
             destroy_registry_object(obj, alloc);
             return RegistryInit531d60Status::alloc_failed;
         }
-        if (cmp.pointers_equal) {
+        pointers_equal = cmp.pointers_equal;
+        pointers_equal_known = true;
+    }
+
+    if (!hooks.merge_je_532bfb_532b47_u1_ran) {
+        Init531d60PostBaseJe532bfb_532b47_U1Cells je_cells{};
+        je_cells.pointers_equal = pointers_equal;
+        je_cells.pointers_equal_known = pointers_equal_known;
+        const auto je = init_531d60_post_base_je_532bfb_532b47_u1(je_cells);
+        if (!je.ok) {
+            destroy_registry_object(obj, alloc);
+            return RegistryInit531d60Status::alloc_failed;
+        }
+        if (je.branch_taken) {
             return RegistryInit531d60Status::ok;
         }
     }
 
-    // OBS 0x532b47..0x532bf8: destroy previous if different & non-null; then movq new, (0x2efd160).
+    // OBS 0x532b4d..0x532bf8: destroy previous if different & non-null; then movq new, (0x2efd160).
     RegistryObject2efd160* prev = registry_cell_2efd160().load();
     if (prev == obj) {
         return RegistryInit531d60Status::ok;

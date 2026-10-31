@@ -9,7 +9,7 @@ Init531d60PostBaseCmpR12R14_532b44_U1Result init_531d60_post_base_cmp_r12_r14_53
     out.pointers_equal = (cells.r12_in == cells.r14_in);
     ++out.cmp_r12_r14_count;
 
-    // Next: je @ 0x532b47 — not modelled in this unit.
+    // Next: je @ 0x532b47 — peeled as E562 u1.
     out.ok = (out.cmp_r12_r14_count == 1);
     return out;
 }

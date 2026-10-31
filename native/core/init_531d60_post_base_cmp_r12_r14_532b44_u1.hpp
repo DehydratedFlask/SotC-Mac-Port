@@ -1,7 +1,7 @@
 // Init `0x531d60` registry cmp r12,r14 OBS `0x532b44..0x532b47` (3 B):
 //   cmp r12,r14   ; previous cell pointer vs alloc result saved in r14 @ 0x532b16
 //
-// After E560 mov r12,[rbx] @ `0x532b41`. NOT modelled: je fast path / destroy-store @ `0x532b47..`. G1 PARTIAL.
+// After E560 mov r12,[rbx] @ `0x532b41`. NOT modelled: destroy-store fall-through @ `0x532b4d..`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
