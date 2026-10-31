@@ -93,6 +93,7 @@
 #include "init_531d60_post_base_f590_a2ed00_u14.hpp"
 #include "init_531d60_post_base_a2ea00_u1.hpp"
 #include "init_531d60_post_base_a2e5d0_u1.hpp"
+#include "init_531d60_post_base_a543b0_u1.hpp"
 #include "init_531d60_post_base_continue_a.hpp"
 #include "init_531d60_post_base_continue_b.hpp"
 #include "init_531d60_post_base_continue_c.hpp"
@@ -225,6 +226,7 @@ struct AppmainInitCtor98a90SliceResult {
     Init531d60PostBaseF590A2ed00U14Result post_base_f590_a2ed00_u14{};
     Init531d60PostBaseA2ea00U1Result post_base_a2ea00_u1{};
     Init531d60PostBaseA2e5d0U1Result post_base_a2e5d0_u1{};
+    Init531d60PostBaseA543b0U1Result post_base_a543b0_u1{};
     Init531d60PostBaseContinueAResult post_base_continue_a{};
     Init531d60PostBaseContinueBResult post_base_continue_b{};
     Init531d60PostBaseContinueCResult post_base_continue_c{};
@@ -335,6 +337,7 @@ void run_appmain_init_continue_driver_tail(
     const Init531d60PostBaseF590A2ed00U14Hooks& post_base_f590_a2ed00_u14_hooks = {},
     const Init531d60PostBaseA2ea00U1Hooks& post_base_a2ea00_u1_hooks = {},
     const Init531d60PostBaseA2e5d0U1Hooks& post_base_a2e5d0_u1_hooks = {},
+    const Init531d60PostBaseA543b0U1Hooks& post_base_a543b0_u1_hooks = {},
     const Init531d60PostBaseContinueAHooks& post_base_continue_a_hooks = {},
     const Init531d60PostBaseContinueBHooks& post_base_continue_b_hooks = {},
     const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks = {},

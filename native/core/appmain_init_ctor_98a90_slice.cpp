@@ -78,6 +78,7 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBaseF590A2ed00U14Hooks& post_base_f590_a2ed00_u14_hooks,
     const Init531d60PostBaseA2ea00U1Hooks& post_base_a2ea00_u1_hooks,
     const Init531d60PostBaseA2e5d0U1Hooks& post_base_a2e5d0_u1_hooks,
+    const Init531d60PostBaseA543b0U1Hooks& post_base_a543b0_u1_hooks,
     const Init531d60PostBaseContinueAHooks& post_base_continue_a_hooks,
     const Init531d60PostBaseContinueBHooks& post_base_continue_b_hooks,
     const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks,
@@ -549,6 +550,11 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     if (!out.post_base_a2e5d0_u1.ok) {
         return out;
     }
+    // E512: always-on Init continue — first 0xa543b0 call-site; 32 B prep NOT modelled.
+    out.post_base_a543b0_u1 = init_531d60_post_base_a543b0_u1(post_base_a543b0_u1_hooks);
+    if (!out.post_base_a543b0_u1.ok) {
+        return out;
+    }
     run_appmain_init_continue_driver_tail(
         out, table, alloc, setter_obj, flag_in, set_a, set_b, set_c,
         post_base_continue_a_hooks, post_base_continue_b_hooks,
@@ -567,7 +573,7 @@ void run_appmain_init_continue_driver_tail(
     const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks,
     const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks,
     const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks) {
-    // E519: always-on Init continue — 13-unit branch-free run 0x532740..0x53277f.
+    // E519: always-on Init continue — 6-unit branch-free run 0x532765..0x53277f.
     out.post_base_continue_a = init_531d60_post_base_continue_a(post_base_continue_a_hooks);
     if (!out.post_base_continue_a.ok) {
         return;

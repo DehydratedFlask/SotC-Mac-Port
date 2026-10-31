@@ -3,7 +3,6 @@
 #include "config_bool_lookup_1e4c0.hpp"
 #include "lookup_1fc80.hpp"
 
-#include <cstring>
 #include <strings.h>
 
 namespace sotc {
@@ -31,58 +30,6 @@ Init531d60PostBaseContinueAResult init_531d60_post_base_continue_a(
     const Init531d60PostBaseContinueAHooks& hooks) noexcept {
     Init531d60PostBaseContinueAResult out{};
 
-    // 0x532740 lea rax,[0x32f79a8] — cell-address pin (optional host stand-in).
-    const void* const* cell_32f79a8 = hooks.cell_32f79a8;
-    pin(out, ContinueAUnit::lea_rax_32f79a8);
-    ++out.lea_count;
-
-    // 0x532747 lea r13,[0x32f84f8] — cell-address pin.
-    const void* const* cell_32f84f8 = hooks.cell_32f84f8;
-    pin(out, ContinueAUnit::lea_r13_32f84f8);
-    ++out.lea_count;
-
-    // 0x53274e mov rax,[rax]
-    const void* obj = nullptr;
-    if (cell_32f79a8 != nullptr) {
-        obj = *cell_32f79a8;
-        ++out.load_count;
-    }
-    pin(out, ContinueAUnit::load_rax_rax);
-    // 0x532751 mov rdi,[r13]
-    const void* rdi_532760 = nullptr;
-    if (cell_32f84f8 != nullptr) {
-        rdi_532760 = *cell_32f84f8;
-        ++out.load_count;
-    }
-    pin(out, ContinueAUnit::load_rdi_r13);
-
-    // 0x532755 mov rsi,[rax+0xf8] — 8 B read through the cell's object stand-in.
-    std::uintptr_t rsi = 0;
-    bool rsi_known = false;
-    if (obj != nullptr) {
-        const auto* bytes = static_cast<const std::uint8_t*>(obj);
-        std::memcpy(&rsi, bytes + kInit531d60PostBaseContinueAObjOff, sizeof(rsi));
-        rsi_known = true;
-        ++out.load_count;
-    }
-    pin(out, ContinueAUnit::load_rsi_rax_f8);
-
-    // 0x53275c add rsi,0x40
-    if (rsi_known) {
-        rsi += kInit531d60PostBaseContinueARsiAddend;
-    }
-    pin(out, ContinueAUnit::add_rsi_40);
-    ++out.alu_count;
-
-    // 0x532760 call 0xa543b0 (body NOT modelled).
-    if (hooks.call_a543b0 != nullptr) {
-        hooks.call_a543b0(const_cast<void*>(rdi_532760), rsi);
-    }
-    pin(out, ContinueAUnit::call_a543b0);
-    ++out.call_count;
-    out.rsi_at_0x532760 = rsi;
-    out.rsi_known = rsi_known;
-
     // 0x532765 mov rax,[rsp+0x20] — only this stack slot is exposed.
     const void* rax = nullptr;
     if (hooks.rsp20_slot != nullptr) {
@@ -103,8 +50,7 @@ Init531d60PostBaseContinueAResult init_531d60_post_base_continue_a(
     pin(out, ContinueAUnit::lea_rdi_rax8);
     ++out.lea_count;
 
-    // 0x532775 call 0x1fc80. Counting hook never supplies rax. A returning hook
-    // or use_native_lookup_1fc80 does; the body of 0x1fc80 is lookup_1fc80.
+    // 0x532775 call 0x1fc80.
     if (hooks.call_1fc80 != nullptr) {
         hooks.call_1fc80(rdi_532775, kInit531d60PostBaseContinueALea1014d69Rva);
     }
@@ -122,15 +68,12 @@ Init531d60PostBaseContinueAResult init_531d60_post_base_continue_a(
     pin(out, ContinueAUnit::call_1fc80);
     ++out.call_count;
 
-    // 0x53277a test rax,rax — flags are the known lookup result when lookup_known.
     pin(out, ContinueAUnit::test_rax_rax);
     ++out.alu_count;
 
-    // 0x53277d je 0x5327bd — target pinned. Outcome modelled only when rax is known.
-    // Both successor blocks stay unmodelled.
     pin(out, ContinueAUnit::je_5327bd);
     ++out.branch_boundary_count;
-    out.branch_outcome_modelled = false;  // default; set true only when rax is known
+    out.branch_outcome_modelled = false;
     if (lookup_known) {
         out.rax_from_1fc80 = lookup_rax;
         out.rax_from_1fc80_known = true;
@@ -139,7 +82,7 @@ Init531d60PostBaseContinueAResult init_531d60_post_base_continue_a(
     }
 
     out.ok = (out.unit_executed == kInit531d60PostBaseContinueAUnitCount) &&
-             (out.call_count == 2) && (out.lea_count == 4) && (out.alu_count == 2) &&
+             (out.call_count == 1) && (out.lea_count == 2) && (out.alu_count == 1) &&
              (out.branch_boundary_count == 1) && (out.unit_counts[0] == 1) &&
              (out.unit_counts[kInit531d60PostBaseContinueAUnitCount - 1] == 1);
     return out;

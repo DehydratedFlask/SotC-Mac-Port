@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""ELF-tie Init 0x531d60 continue grouped run 0x532740..0x53277f (63 B / 13 units).
+"""ELF-tie Init 0x531d60 continue grouped run 0x532765..0x53277f (26 B / 6 units).
 
-Private: needs local/re/eboot.elf. Pins every one of the 13 consecutive units
-after E511 (first 0xa2e5d0 call-site), the two direct-call rel32 targets, the
-four lea RIP-relative targets, the je rel8 target, and the byte span sha256 of
-each unit. Does NOT claim any callee body, the je outcome, the two successors,
-or the object/data layouts behind the lea targets.
+Private: needs local/re/eboot.elf. Pins every one of the 6 consecutive units
+after E512 (first 0xa543b0 call-site), the direct-call rel32 target 0x1fc80, the
+lea RIP-relative target, the je rel8 target, and the byte span sha256 of each unit.
+Does NOT claim any callee body, the je outcome, the two successors, or data layouts.
 """
 
 from __future__ import annotations
@@ -20,35 +19,18 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import ps4_dynlink as d  # noqa: E402
 
 ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
-PREV_END = 0x532740
-START = 0x532740
-SIZE = 63
+PREV_END = 0x532765
+START = 0x532765
+SIZE = 26
 END = 0x53277F
-REGION_SHA256 = "03b694236fa5d1351a587c0c473b8117557f3fbe396930fd0bb3edb6f696a395"
+REGION_SHA256 = "5c1c9d10c17102c25cd69ab0b42240aa8a04b1e6908ab04e44a41b5e0e1d9f46"
 BRANCH_RVA = 0x53277D
 BRANCH_TARGET = 0x5327BD
 
-CALL_A543B0 = 0xA543B0
 CALL_1FC80 = 0x1FC80
-LEA_32F79A8 = 0x32F79A8
-LEA_32F84F8 = 0x32F84F8
 LEA_1014D69 = 0x1014D69
 
 UNITS = [
-    (0x532740, 7, "174a36616c9054ebd8f6c7b29356a44f8611c24ad265f9797603d98a3e5d55b1",
-     "lea rax,[0x32f79a8]", "lea", LEA_32F79A8),
-    (0x532747, 7, "f3df838c0139885befe0b7b6e3092862097292f752821e76c455349cf708ad5c",
-     "lea r13,[0x32f84f8]", "lea", LEA_32F84F8),
-    (0x53274E, 3, "d2dd46ebb1555ee3ece77ec5799d371e6449a036344614c1e33c310697c2180c",
-     "mov rax,[rax]", "pin", None),
-    (0x532751, 4, "5cbe8a11db9e94898aff3c8ff441d398f6eb9db110410761e1561b388d73a64b",
-     "mov rdi,[r13]", "pin", None),
-    (0x532755, 7, "703bb189fb59e65a5e36d01df6bf9fe24c53fb3bbf4b2bc469992e20a33d52e4",
-     "mov rsi,[rax+0xf8]", "pin", None),
-    (0x53275C, 4, "0aaf7c8dae8cac3c5920008deba1aee859618144bbe0a4e4fa6639b73eaf50ab",
-     "add rsi,0x40", "pin", None),
-    (0x532760, 5, "c832b5949ba0d918a3c0b5bf633f4090be81bd841a11ca207574abf45e6b7b49",
-     "call 0xa543b0", "call", CALL_A543B0),
     (0x532765, 5, "b09f6d31bd33b5ef67f21764c53d5626a54d828ed322ebf9db54c570da85d692",
      "mov rax,[rsp+0x20]", "pin", None),
     (0x53276A, 7, "9b67b616fba345bf41279bd35aa958cdd48905797de7b509bcc4db32491f515d",
@@ -66,8 +48,7 @@ UNITS = [
 NATIVE = ROOT / "native/core/init_531d60_post_base_continue_a.hpp"
 NATIVE_CPP = ROOT / "native/core/init_531d60_post_base_continue_a.cpp"
 SLICE = ROOT / "native/core/appmain_init_ctor_98a90_slice.hpp"
-SLICE_CPP = ROOT / "native/core/appmain_init_ctor_98a90_slice.cpp"
-PREV_NATIVE = ROOT / "native/core/init_531d60_post_base_a2e5d0_u1.hpp"
+PREV_NATIVE = ROOT / "native/core/init_531d60_post_base_a543b0_u1.hpp"
 TEST = ROOT / "native/tests/test_appmain_init_ctor_98a90_slice.cpp"
 CMAKE = ROOT / "native/CMakeLists.txt"
 
@@ -83,11 +64,11 @@ def main() -> int:
     _, ph = d.program_headers(elf)
     img = d.Image(elf, ph)
 
-    require(len(UNITS) == 13, "unit count")
+    require(len(UNITS) == 6, "unit count")
     require(PREV_END == START, "prev end == start")
     require(
-        "kInit531d60PostBaseA2e5d0U1EndRva = 0x532740" in PREV_NATIVE.read_text(),
-        "a2e5d0_u1 end",
+        "kInit531d60PostBaseA543b0U1EndRva = 0x532765" in PREV_NATIVE.read_text(),
+        "a543b0_u1 end",
     )
     require(START + SIZE == END, "size arithmetic")
 
@@ -121,28 +102,22 @@ def main() -> int:
     nh = NATIVE.read_text()
     require("init_531d60_post_base_continue_a" in nh, "API")
     require("NOT modelled" in nh, "omission")
-    require("kInit531d60PostBaseContinueARva = 0x532740" in nh, "start rva")
+    require("kInit531d60PostBaseContinueARva = 0x532765" in nh, "start rva")
     require("kInit531d60PostBaseContinueAEndRva = 0x53277f" in nh, "end rva")
     require("kInit531d60PostBaseContinueABranchTargetRva = 0x5327bd" in nh, "branch target")
-    require("kInit531d60PostBaseContinueAUnitCount" in nh, "unit count")
-    for mnemonic in ("lea rax,[0x32f79a8]", "je 0x5327bd", "mov rsi,[rax+0xf8]"):
-        require(mnemonic in nh, f"unit listing {mnemonic}")
-    cpp = NATIVE_CPP.read_text()
-    require("branch_outcome_modelled = false" in cpp, "branch outcome flag")
     st = SLICE.read_text()
     require("post_base_continue_a" in st or "PostBaseContinueA" in st, "slice wire")
-    require("post_base_a2e5d0_u1" in st or "PostBaseA2e5d0U1" in st, "u1 wire")
+    require("post_base_a543b0_u1" in st or "PostBaseA543b0U1" in st, "u1 wire")
     require("core/init_531d60_post_base_continue_a.cpp" in CMAKE.read_text(), "cmake")
     tt = TEST.read_text()
-    for needle in ("pbca", "hook_cont_a_a543b0", "0x1274", "pbca_units"):
+    for needle in ("pbca", "hook_cont_a_1fc80", "pbca_units"):
         require(needle in tt, f"test wire {needle}")
 
     print(
         f"OK check_f531d60_post_base_continue_a: span=0x{START:x}+{SIZE}B "
         f"units={len(UNITS)} region={REGION_SHA256[:12]}…; "
-        f"calls=0xa543b0/0x1fc80 pinned; "
-        f"je@{BRANCH_RVA:#x}->{BRANCH_TARGET:#x} target pinned; end={END:#x}; "
-        f"a2e5d0_body/a543b0_body/0x53277f_block/0x5327bd_block NOT claimed"
+        f"call=0x1fc80 pinned; je@{BRANCH_RVA:#x}->{BRANCH_TARGET:#x}; end={END:#x}; "
+        f"a543b0_body/0x53277f_block/0x5327bd_block NOT claimed"
     )
     return 0
 
