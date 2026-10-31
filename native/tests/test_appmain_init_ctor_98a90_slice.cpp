@@ -1655,6 +1655,7 @@ int main() {
     pbreg.merge_mov_r14_rax_532b16_u1_ran = false;
     Init531d60PostBaseRegistryBodyHooks pbregbody{};
     pbregbody.merge_call_54dc10_532b19_u1_ran = false;
+    pbregbody.merge_mov_rbx_rax_532b1e_u1_ran = false;
     pbce.incoming_r13 = g_cont_e_r13;
     pbce.incoming_r12b = 0xBB;
     pbce.boss_flag_2dcdf14 = &g_boss_flag_cell;
@@ -2581,10 +2582,12 @@ int main() {
     CHECK(r.post_base_registry_tail.end_rva == 0x532b19);
     CHECK(r.post_base_registry_body.ok);
     CHECK(r.post_base_registry_body.unit_executed == kInit531d60PostBaseRegistryBodyUnitCount);
-    CHECK(kInit531d60PostBaseRegistryBodyUnitCount == 1);
+    CHECK(kInit531d60PostBaseRegistryBodyUnitCount == 2);
     CHECK(r.post_base_registry_body.call_54dc10_count == 1);
-    CHECK(r.post_base_registry_body.end_rva == 0x532b1e);
+    CHECK(r.post_base_registry_body.mov_rbx_rax_count == 1);
+    CHECK(r.post_base_registry_body.end_rva == 0x532b21);
     CHECK(r.post_base_registry_body.rax_from_54dc10 == &table[0]);
+    CHECK(r.post_base_registry_body.rbx_from_54dc10 == &table[0]);
     CHECK(g_cont_e_a54920 == 3);  // pbce hooks: three save-data ctor calls on D→E path
     CHECK(r.init_r12b_known);
     CHECK(r.init_r12b_out == 0xA7);  // continue-B bl(0xA6) xor 1 feeds continue-E

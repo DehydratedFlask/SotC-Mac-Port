@@ -17,7 +17,7 @@ Init531d60PostBaseCall54dc10_532b19_U1Result init_531d60_post_base_call_54dc10_5
     }
     ++out.call_54dc10_count;
 
-    // Next: mov rbx,rax @ 0x532b1e — not modelled in this unit.
+    // Next: registry body @ 0x532b1e — not modelled in this unit.
     out.ok = (out.call_54dc10_count == 1);
     return out;
 }

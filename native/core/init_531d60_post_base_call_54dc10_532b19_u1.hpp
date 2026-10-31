@@ -1,7 +1,7 @@
 // Init `0x531d60` registry call 0x54dc10 OBS `0x532b19..0x532b1e` (5 B):
 //   call 0x54dc10   ; input-table base accessor (returns rax)
 //
-// After E550 mov r14,rax @ `0x532b16`. NOT modelled: mov rbx,rax @ `0x532b1e`. G1 PARTIAL.
+// After E550 mov r14,rax @ `0x532b16`. NOT modelled: call 0x54dc20 @ `0x532b21`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
