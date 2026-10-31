@@ -6,7 +6,7 @@ Init531d60PostBaseMovEdx2_532afe_U1Result init_531d60_post_base_mov_edx_2_532afe
     Init531d60PostBaseMovEdx2_532afe_U1Result out{};
     out.edx = kInit531d60PostBaseMovEdx2_532afe_U1Immediate;
     ++out.mov_edx_count;
-    // Next: mov rdi,[rax] @ 0x532b03 — see continue_e.
+    // Next: mov rdi,[rax] @ 0x532b03 — see mov_rdi_rax_mem_532b03_u1.
     out.ok = (out.mov_edx_count == 1 && out.edx == 2);
     return out;
 }

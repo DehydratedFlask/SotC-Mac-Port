@@ -93,14 +93,15 @@
 #include "init_531d60_post_base_lea_rax_2eff450_532af5_u1.hpp"
 #include "init_531d60_post_base_xor_esi_532afc_u1.hpp"
 #include "init_531d60_post_base_mov_edx_2_532afe_u1.hpp"
+#include "init_531d60_post_base_mov_rdi_rax_mem_532b03_u1.hpp"
 #include "init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 #include "stat_query_54b250.hpp"
 
 namespace sotc {
 
-inline constexpr std::uint64_t kInit531d60PostBaseContinueERva = 0x532b03;
-inline constexpr std::size_t kInit531d60PostBaseContinueESize = 9;
+inline constexpr std::uint64_t kInit531d60PostBaseContinueERva = 0x532b06;
+inline constexpr std::size_t kInit531d60PostBaseContinueESize = 6;
 inline constexpr std::uint64_t kInit531d60PostBaseContinueEEndRva = 0x532b0c;
 inline constexpr std::size_t kInit531d60PostBaseContinueEFullBlockSize = 350;
 
@@ -177,8 +178,11 @@ static_assert(kInit531d60PostBaseXorEsi_532afc_U1EndRva ==
                   kInit531d60PostBaseMovEdx2_532afe_U1Rva,
               "xor_532afc u1 end equals mov_edx_532afe u1 start");
 static_assert(kInit531d60PostBaseMovEdx2_532afe_U1EndRva ==
+                  kInit531d60PostBaseMovRdiRaxMem_532b03_U1Rva,
+              "mov_edx_532afe u1 end equals mov_rdi_rax_mem u1 start");
+static_assert(kInit531d60PostBaseMovRdiRaxMem_532b03_U1EndRva ==
                   kInit531d60PostBaseContinueERva,
-              "mov_edx_532afe u1 end equals continue E pinned start");
+              "mov_rdi_rax_mem u1 end equals continue E pinned start");
 
 // Direct-call rel32 targets.
 inline constexpr std::uint64_t kInit531d60PostBaseContinueECtorRva = 0xa54920;
@@ -207,9 +211,8 @@ inline constexpr std::uint64_t kInit531d60PostBaseContinueEVmovqSrcRva = 0x15ff5
 // Vtable for the 0x2eff450 object (slot-1 = 0x54b250, resolved per E538).
 inline constexpr std::uint64_t kInit531d60PostBaseContinueEVtable2eff450Rva = 0x15c9830;
 
-// Unit identity for the 3 pinned instructions after E544 mov_edx_532afe u1 peel.
+// Unit identity for the 2 pinned instructions after E545 mov_rdi_rax_mem u1 peel.
 enum class ContinueEUnit : int {
-    mov_rdi_rax,               // 0x532b03
     mov_rax_rdi,               // 0x532b06
     vcall_rax08,               // 0x532b09  (rax+0x8 → 0x54b250)
     count
@@ -217,8 +220,8 @@ enum class ContinueEUnit : int {
 
 inline constexpr int kInit531d60PostBaseContinueEUnitCount =
     static_cast<int>(ContinueEUnit::count);
-static_assert(kInit531d60PostBaseContinueEUnitCount == 3,
-              "3 units in 0x532b03..0x532b0c");
+static_assert(kInit531d60PostBaseContinueEUnitCount == 2,
+              "2 units in 0x532b06..0x532b0c");
 
 struct ContinueEUnitSpan {
     std::uint64_t rva = 0;
@@ -226,10 +229,9 @@ struct ContinueEUnitSpan {
     const char* mnemonic = "";
 };
 
-// OBS table derived from local/re/eboot.elf; sizes sum to kSize (9 B).
+// OBS table derived from local/re/eboot.elf; sizes sum to kSize (6 B).
 inline constexpr std::array<ContinueEUnitSpan, kInit531d60PostBaseContinueEUnitCount>
     kInit531d60PostBaseContinueEUnits{{
-        {0x532B03, 3, "mov rdi,[rax]"},
         {0x532B06, 3, "mov rax,[rdi]"},
         {0x532B09, 3, "call [rax+0x8]"},
     }};
@@ -343,6 +345,10 @@ struct Init531d60PostBaseContinueEHooks {
     // mov edx,2 @ 0x532afe (E544 peel). Always counted; edx=2 stand-in.
     bool merge_mov_edx_2_532afe_u1_ran = false;
 
+    // mov rdi,[rax] @ 0x532b03 (E545 peel). Null cell_ptr => counted, rdi=null.
+    Init531d60PostBaseMovRdiRaxMem_532b03_U1Cells mov_rdi_rax_mem_532b03_u1_cells{};
+    bool merge_mov_rdi_rax_mem_532b03_u1_ran = false;
+
     // Resolved vcall slot-1 through *(0x2eff450) — 0x54b250(this_obj, esi=0,
     // edx=2).  null => no-op (call still counted).
     void (*call_54b250)(void* this_obj, std::uint32_t esi, std::uint32_t edx) = nullptr;
@@ -359,7 +365,7 @@ struct Init531d60PostBaseContinueEResult {
     bool ok = false;
     // Per-unit execution counters (all must be 1 on the modelled path).
     std::array<int, kInit531d60PostBaseContinueEUnitCount> unit_counts{};
-    int unit_executed = 0;          // expect 3 (plus peel merges when run)
+    int unit_executed = 0;          // expect 2 (plus peel merges when run)
     int call_a54920_count = 0;      // expect 3 (contract/hook with visible status)
     int vcall_noop_count = 0;       // expect 3 (elided bare ret; counted, no dispatch)
     int vcall_54b250_count = 0;     // expect 1 (resolved slot-1)
@@ -385,7 +391,7 @@ struct Init531d60PostBaseContinueEResult {
 };
 
 // Runs continue E after optional peel merges:
-// pinned `0x532b03..0x532b0c`.
+// pinned `0x532b06..0x532b0c` (mov rdi,[rax] @ 0x532b03 via mov_rdi_rax_mem u1).
 [[nodiscard]] Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
     const Init531d60PostBaseContinueEHooks& hooks = {}) noexcept;
 
