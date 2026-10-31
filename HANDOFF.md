@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-10-31 01:38 CDT (root) — E1049: `lookup_1fc80` default comparator correction (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-LOOKUP-1FC80-CASEFOLD-MODEL-01` COMPLETE. The host lookup's null-hook default now calls `strcasecmp`; the override is named `compare_f8f500`. The fixture calls the helper directly with stored `nointro` and probe `NOINTRO`. Checker diagnostic now says `comparator PLT`.
+- **Pinned evidence:** ELF SHA `d0723afb…61d3`; program-header 0 maps `0x1fcde` to file offset 146654, bytes `e8 1d f8 f6 00` target `0xf8f500`; matching imports SHA `78caaaae…b6744` names NID `AV6ipCNa4Rw` at GOT `0x1600070` `strcasecmp` (`name-by-nid-hash-only`).
+- **Verification (PASSED):** target build 13 steps; focused CTest 1/1; `check_f533100_vslot40_post.py` and `check_f531d60_post_base_continue_a.py` pass. Full configure exit 0, build 493 steps, CTest 495/495, all lift checkers 578 passed / 0 skipped / 0 failed. Graft/Trail checks pass at 2,405 files, 10,951 nodes, 14,519 edges, 1,804 cards; Trail resolves all three `compare_f8f500` references, and Graft finds no old `strcmp_f8f500` name. Project index: 44,293 folders. Logs: `local/validation/lookup-casefold-e1049/`.
+- **Limits:** case-fold behavior remains inferred from the NID-derived import name. The host fixture covers ASCII only; non-ASCII comparison may depend on locale. No runtime binding or game behavior is established. Graft/Trail deep meaning tier NOT RUN. Initial `llvm-objdump` invocation was unavailable; exact bytes and rel32 target were verified with a read-only ELF program-header parser instead.
+- **Prepublication (PASSED):** all-path audit accepted 3,456 paths; staged-path audit accepted 11 paths; attribution audit and staged/working diff checks pass. Logs: `local/validation/lookup-casefold-e1049/{audit-all-final.log,audit-staged-final.log,attribution-final.log,diff-cached-final.log,diff-final.log}`.
+- Next exact action: commit the allowlisted E1049 changes, push `origin main`, then fetch-verify the published commit.
+
 ## 2026-10-31 01:29 CDT (root) — E1049: `lookup_1fc80` default comparator correction claim (ACTIVE)
 
 - **Task:** `CPU-01-LOOKUP-1FC80-CASEFOLD-MODEL-01` — align the bounded host lookup model's default comparator and hook comments/name with the pinned `strcasecmp`-labeled import; add case-only lookup fixtures and make the parent checker diagnostic comparator-neutral. Preserve the hash/NID-name inference and make no runtime/game claim.

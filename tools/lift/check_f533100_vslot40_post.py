@@ -82,7 +82,7 @@ def main() -> int:
         "1fc80 sha",
     )
     require(img.read(LOOKUP + LOOKUP_SIZE - 1, 1) == b"\xc3", "1fc80 ret")
-    require(call_target(0x1FCDE, img) == 0xF8F500, "strcmp PLT")
+    require(call_target(0x1FCDE, img) == 0xF8F500, "comparator PLT")
     require(img.read(0xF8F500, 2) == bytes.fromhex("ff25"), "0xf8f500 is PLT")
     require(img.read(0x1FCEA, 7) == bytes.fromhex("4881c398000000"), "add rbx,0x98")
 

@@ -1,6 +1,7 @@
 #include "lookup_1fc80.hpp"
 
 #include <cstring>
+#include <strings.h>
 
 namespace sotc {
 namespace {
@@ -37,10 +38,10 @@ void* lookup_1fc80(void* table, const char* needle, const Lookup1fc80Hooks& hook
         elem_count(reinterpret_cast<std::uintptr_t>(begin), reinterpret_cast<std::uintptr_t>(end));
 
     auto cmp = [&](const char* a, const char* b) -> int {
-        if (hooks.strcmp_f8f500 != nullptr) {
-            return hooks.strcmp_f8f500(a, b);
+        if (hooks.compare_f8f500 != nullptr) {
+            return hooks.compare_f8f500(a, b);
         }
-        return std::strcmp(a, b);
+        return ::strcasecmp(a, b);
     };
 
     auto* cur = begin;

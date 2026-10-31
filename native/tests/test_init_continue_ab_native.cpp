@@ -51,6 +51,7 @@ int main() {
     NameTable table{};
     table.begin = elem.bytes;
     table.end = elem.bytes + kLookup1fc80Stride;
+    CHECK(lookup_1fc80(&table.begin, "NOINTRO") == elem.bytes);
     const void* table_ptr = &table;
 
     Init531d60PostBaseContinueAHooks hooks{};

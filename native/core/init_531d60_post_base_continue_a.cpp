@@ -164,7 +164,7 @@ Init531d60PostBaseContinueAResult init_531d60_post_base_continue_a(
         lookup_known = true;
     } else if (hooks.use_native_lookup_1fc80 && hooks.nointro_needle != nullptr) {
         Lookup1fc80Hooks lookup_hooks{};
-        lookup_hooks.strcmp_f8f500 = &strcasecmp_plt;
+        lookup_hooks.compare_f8f500 = &strcasecmp_plt;
         lookup_rax = lookup_1fc80(rdi_532775, hooks.nointro_needle, lookup_hooks);
         lookup_known = true;
     }
