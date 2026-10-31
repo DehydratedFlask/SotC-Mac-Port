@@ -2561,7 +2561,7 @@ int main() {
     // E1042 / CPU-01-INIT-DRIVER-JOIN-01: fall-through runs D then E (53 units) before remainder.
     CHECK(r.post_base_continue_e.ok);
     CHECK(r.post_base_continue_e.unit_executed == kInit531d60PostBaseContinueEUnitCount);
-    CHECK(kInit531d60PostBaseContinueEUnitCount == 37);
+    CHECK(kInit531d60PostBaseContinueEUnitCount == 27);
     CHECK(g_cont_e_a54920 == 3);  // pbce hooks: three save-data ctor calls on D→E path
     CHECK(r.init_r12b_known);
     CHECK(r.init_r12b_out == 0xA7);  // continue-B bl(0xA6) xor 1 feeds continue-E
@@ -2581,8 +2581,8 @@ int main() {
         CHECK(g_cont_d_rdi == const_cast<void*>(g_cont_d_cell_value));
     }
 
-    // E521 shrunk continue_e direct: 0x532a1a..0x532b0c (37 units); block-1 ctor/vcall
-    // live in a54920_u1 + vcall18_532a17 merges (skipped here via merge flags).
+    // E522 shrunk continue_e direct: 0x532a67..0x532b0c (27 units); block-1/2 ctor/vcall
+    // live in a54920_u1 + vcall18_532a17 + a54920_532a62_u1 merges (skipped via flags).
     {
         g_cont_e_a54920 = 0;
         g_cont_e_54b250 = 0;
@@ -2590,46 +2590,41 @@ int main() {
         eh.incoming_r13 = g_cont_e_r13;
         eh.merge_a54920_u1_ran = true;
         eh.merge_vcall18_532a17_ran = true;
+        eh.merge_a54920_532a62_u1_ran = true;
         eh.call_a54920 = hook_cont_e_a54920;
         eh.call_54b250 = hook_cont_e_54b250;
         eh.cell_2eff450 = &g_cell_2eff450_value;
         const auto er = init_531d60_post_base_continue_e(eh);
         CHECK(er.ok);
         CHECK(er.unit_executed == kInit531d60PostBaseContinueEUnitCount);
-        CHECK(kInit531d60PostBaseContinueEUnitCount == 37);
+        CHECK(kInit531d60PostBaseContinueEUnitCount == 27);
         for (int i = 0; i < kInit531d60PostBaseContinueEUnitCount; ++i) {
             CHECK(er.unit_counts[static_cast<std::size_t>(i)] == 1);
         }
-        CHECK(kInit531d60PostBaseContinueEUnits[0].rva == 0x532a1a);
-        CHECK(kInit531d60PostBaseContinueEUnits[36].rva == 0x532b09);
-        CHECK(er.call_a54920_count == 2);
+        CHECK(kInit531d60PostBaseContinueEUnits[0].rva == 0x532a67);
+        CHECK(kInit531d60PostBaseContinueEUnits[26].rva == 0x532b09);
+        CHECK(er.call_a54920_count == 1);
         CHECK(er.vcall_noop_count == 2);
         CHECK(er.vcall_54b250_count == 1);
         CHECK(er.stamp_count == 0);
-        CHECK(er.lea_rip_count == 6);
+        CHECK(er.lea_rip_count == 5);
         CHECK(er.vmovq_count == 1);
         CHECK(er.end_rva == 0x532b0c);
         CHECK(er.a54920_hook_supplied);
-        CHECK(g_cont_e_a54920 == 2);
+        CHECK(g_cont_e_a54920 == 1);
         CHECK(g_cont_e_a54920_name[0] ==
-              reinterpret_cast<void*>(static_cast<std::uintptr_t>(0x2efd9f8)));
-        CHECK(g_cont_e_a54920_name[1] ==
               reinterpret_cast<void*>(static_cast<std::uintptr_t>(0x2efda50)));
         CHECK(g_cont_e_a54920_parent[0] == g_cont_e_r13);
-        CHECK(g_cont_e_a54920_parent[1] == g_cont_e_r13);
         CHECK(g_cont_e_a54920_desc[0] != nullptr);
-        CHECK(g_cont_e_a54920_desc[1] != nullptr);
-        CHECK(g_cont_e_a54920_desc[0] != g_cont_e_a54920_desc[1]);
-        for (int i = 0; i < 2; ++i) {
-            const auto* dsc = static_cast<const std::uint8_t*>(g_cont_e_a54920_desc[i]);
+        {
+            const auto* dsc = static_cast<const std::uint8_t*>(g_cont_e_a54920_desc[0]);
             void* vt = nullptr;
             std::memcpy(&vt, dsc + 0x40, sizeof(void*));
-            CHECK(vt == reinterpret_cast<void*>(
-                             static_cast<std::uintptr_t>(i == 0 ? 0x15c8d98 : 0x15c8e18)));
+            CHECK(vt == reinterpret_cast<void*>(static_cast<std::uintptr_t>(0x15c8e18)));
             void* sp = nullptr;
             std::memcpy(&sp, dsc + 0x20, sizeof(void*));
             CHECK(reinterpret_cast<std::uintptr_t>(sp) ==
-                  reinterpret_cast<std::uintptr_t>(g_cont_e_a54920_desc[i]) + 0x20);
+                  reinterpret_cast<std::uintptr_t>(g_cont_e_a54920_desc[0]) + 0x20);
         }
         CHECK(g_cont_e_54b250 == 1);
         CHECK(g_cont_e_54b250_obj == g_cell_2eff450_value);
@@ -2639,10 +2634,11 @@ int main() {
         Init531d60PostBaseContinueEHooks empty{};
         empty.merge_a54920_u1_ran = true;
         empty.merge_vcall18_532a17_ran = true;
+        empty.merge_a54920_532a62_u1_ran = true;
         const auto er2 = init_531d60_post_base_continue_e(empty);
         CHECK(er2.ok);
-        CHECK(er2.unit_executed == 37);
-        CHECK(er2.call_a54920_count == 2);
+        CHECK(er2.unit_executed == 27);
+        CHECK(er2.call_a54920_count == 1);
         CHECK(er2.vcall_noop_count == 2);
         CHECK(er2.vcall_54b250_count == 1);
         CHECK(er2.stamp_count == 0);

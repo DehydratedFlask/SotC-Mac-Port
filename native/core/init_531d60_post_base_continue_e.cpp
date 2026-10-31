@@ -1,5 +1,6 @@
 #include "init_531d60_post_base_continue_e.hpp"
 
+#include "init_531d60_post_base_a54920_532a62_u1.hpp"
 #include "init_531d60_post_base_a54920_u1.hpp"
 #include "init_531d60_post_base_vcall18_532a17.hpp"
 
@@ -67,54 +68,20 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         out.vcall_noop_count += vcr.call_vslot18_count;
     }
 
-    // ---- Block 2: save-data ctor 2 (name 0x2efd9f8, vtable 0x15c8d98, rbx reused) ----
-
-    // 0x532a1a mov rdi,[r13] — parent arg
-    void* parent2 = const_cast<void*>(hooks.incoming_r13);
-    pin(out, ContinueEUnit::mov_rdi_r13_2);
-
-    // 0x532a1e lea rsi,[0x2efd9f8] — name struct 2 (RIP-rel pin)
-    pin(out, ContinueEUnit::lea_rsi_2efd9f8);
-    ++out.lea_rip_count;
-
-    // 0x532a25 lea rdx,[rsp+0x4C0] — descriptor 2 on stack
-    alignas(32) SaveDataDescriptor desc2{};
-    void* desc2_ptr = &desc2;
-    pin(out, ContinueEUnit::lea_rdx_rsp4c0);
-
-    // 0x532a2d vxorps ymm0,ymm0,ymm0
-    pin(out, ContinueEUnit::vxorps_ymm0_2);
-
-    // 0x532a31 mov qword [rsp+0x4F0],0 — desc2[0x30] = 0
-    desc2.field_30 = 0;
-    pin(out, ContinueEUnit::movq_rsp4f0_0);
-
-    // 0x532a3d lea r14,[rsp+0x4E0] — self-ptr = &desc2[0x20]
-    desc2.self_ptr = reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(&desc2) + 0x20);
-    pin(out, ContinueEUnit::lea_r14_rsp4e0);
-
-    // 0x532a45 vmovaps [rsp+0x4C0],ymm0 — zero desc2[0..0x1F]
-    std::memset(desc2.zero, 0, sizeof(desc2.zero));
-    pin(out, ContinueEUnit::vmovaps_rsp4c0_ymm0);
-
-    // 0x532a4e mov [rsp+0x500],rbx — desc2[0x40] = vtable (rbx still 0x15c8d98)
-    desc2.vtable = reinterpret_cast<void*>(
-        static_cast<std::uintptr_t>(kInit531d60PostBaseContinueEVtable1Rva));
-    pin(out, ContinueEUnit::mov_rsp500_rbx);
-
-    // 0x532a56 mov qword [rsp+0x508],0 — desc2[0x48] = 0
-    desc2.field_48 = 0;
-    pin(out, ContinueEUnit::movq_rsp508_0);
-
-    // 0x532a62 call 0xa54920(parent, name=0x2efd9f8, descriptor=&desc2)
-    if (hooks.call_a54920 != nullptr) {
-        hooks.call_a54920(parent2,
-                          reinterpret_cast<void*>(
-                              static_cast<std::uintptr_t>(kInit531d60PostBaseContinueEName2Rva)),
-                          desc2_ptr);
+    if (!hooks.merge_a54920_532a62_u1_ran) {
+        Init531d60PostBaseA54920_532a62_U1Hooks u2{};
+        u2.incoming_r13 = hooks.incoming_r13;
+        u2.call_a54920 = hooks.call_a54920;
+        const Init531d60PostBaseA54920_532a62_U1Result u2r =
+            init_531d60_post_base_a54920_532a62_u1(u2);
+        if (!u2r.ok) {
+            return out;
+        }
+        out.call_a54920_count += u2r.call_a54920_count;
+        out.lea_rip_count += u2r.lea_rip_count;
     }
-    pin(out, ContinueEUnit::call_a54920_2);
-    ++out.call_a54920_count;
+
+    // ---- Block 2 tail: post second ctor vcall through block 3 ----
 
     // 0x532a67 mov rax,[rsp+0x500]
     pin(out, ContinueEUnit::mov_rax_rsp500);
@@ -266,13 +233,16 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
     pin(out, ContinueEUnit::vcall_rax08);
     ++out.vcall_54b250_count;
 
-    // Final validation (u1 / vcall18_532a17 merges add to ctor/vcall/stamp totals).
+    // Final validation (u1 / vcall18 / a54920_532a62 merges add to ctor/vcall/stamp totals).
     const int expect_a54920 =
-        2 + (hooks.merge_a54920_u1_ran ? 0 : 1);
+        1 + (hooks.merge_a54920_u1_ran ? 0 : 1) +
+        (hooks.merge_a54920_532a62_u1_ran ? 0 : 1);
     const int expect_vcall_noop =
         2 + (hooks.merge_vcall18_532a17_ran ? 0 : 1);
     const int expect_stamp = hooks.merge_a54920_u1_ran ? 0 : 1;
-    const int expect_lea_rip = 6 + (hooks.merge_a54920_u1_ran ? 0 : 3);
+    const int expect_lea_rip =
+        5 + (hooks.merge_a54920_u1_ran ? 0 : 3) +
+        (hooks.merge_a54920_532a62_u1_ran ? 0 : 1);
     out.a54920_hook_supplied = (hooks.call_a54920 != nullptr);
     out.ok = (out.unit_executed == kInit531d60PostBaseContinueEUnitCount) &&
              (out.call_a54920_count == expect_a54920) &&
