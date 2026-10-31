@@ -2,7 +2,7 @@
 //   lea rsi,[0x2efda50]   ; name struct 3 ("save_%s_mem_used")
 //
 // After E535 `mov_rsp4b0_rsi_532acb_u1` end @ `0x532ad3`. NOT modelled: following
-// stack/descriptor prep @ `0x532ada`. G1 PARTIAL.
+// `mov [rsp+0x4B8],rcx` @ `0x532ada` (E537 mov_rsp4b8 u1). G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

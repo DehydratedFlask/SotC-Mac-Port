@@ -12,7 +12,7 @@ Init531d60PostBaseLeaRsi2efda50_532ad3_U1Result init_531d60_post_base_lea_rsi_2e
     }
     ++out.lea_rip_count;
 
-    // Next: mov [rsp+0x4B8],rcx @ 0x532ada — see continue_e.
+    // Next: mov [rsp+0x4B8],rcx @ 0x532ada — see mov_rsp4b8_rcx_532ada_u1.
     out.ok = (out.lea_rip_count == 1);
     return out;
 }

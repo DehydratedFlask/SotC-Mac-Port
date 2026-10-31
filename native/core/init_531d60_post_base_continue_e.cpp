@@ -15,6 +15,7 @@
 #include "init_531d60_post_base_mov_rsp488_rax_532ac3_u1.hpp"
 #include "init_531d60_post_base_mov_rsp4b0_rsi_532acb_u1.hpp"
 #include "init_531d60_post_base_lea_rsi_2efda50_532ad3_u1.hpp"
+#include "init_531d60_post_base_mov_rsp4b8_rcx_532ada_u1.hpp"
 #include "init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
@@ -192,8 +193,13 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         parent3 = const_cast<void*>(hooks.incoming_r13);
     }
 
+    void* rcx_thunk2 = reinterpret_cast<void*>(
+        static_cast<std::uintptr_t>(kInit531d60PostBaseContinueEThunk2Rva));
     Init531d60PostBaseLea538870_532aa3_U1Cells lea_rcx_cells =
         hooks.lea_538870_532aa3_u1_cells;
+    if (lea_rcx_cells.rcx_out == nullptr) {
+        lea_rcx_cells.rcx_out = &rcx_thunk2;
+    }
     if (!hooks.merge_lea_538870_532aa3_u1_ran) {
         const Init531d60PostBaseLea538870_532aa3_U1Result lcr =
             init_531d60_post_base_lea_538870_532aa3_u1(lea_rcx_cells);
@@ -310,9 +316,23 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         out.lea_rip_count += lnr.lea_rip_count;
     }
 
-    // 0x532ada mov [rsp+0x4B8],rcx — desc3[0x48] = 0x538870 (thunk 2)
-    desc3.field_48 = kInit531d60PostBaseContinueEThunk2Rva;
-    pin(out, ContinueEUnit::mov_rsp4b8_rcx);
+    Init531d60PostBaseMovRsp4b8_Rcx_532ada_U1Cells mov4b8_cells =
+        hooks.mov_rsp4b8_rcx_532ada_u1_cells;
+    if (mov4b8_cells.thunk_out == nullptr) {
+        mov4b8_cells.thunk_out = reinterpret_cast<void**>(&desc3.field_48);
+    }
+    if (mov4b8_cells.rcx_in == nullptr) {
+        mov4b8_cells.rcx_in = rcx_thunk2;
+    }
+    if (!hooks.merge_mov_rsp4b8_rcx_532ada_u1_ran) {
+        const Init531d60PostBaseMovRsp4b8_Rcx_532ada_U1Result m4b8r =
+            init_531d60_post_base_mov_rsp4b8_rcx_532ada_u1(mov4b8_cells);
+        if (!m4b8r.ok) {
+            return out;
+        }
+    } else {
+        std::memcpy(&desc3.field_48, &rcx_thunk2, sizeof(void*));
+    }
 
     // 0x532ae2 call 0xa54920(parent, name=0x2efda50, descriptor=&desc3)
     if (hooks.call_a54920 != nullptr) {
