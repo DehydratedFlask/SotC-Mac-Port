@@ -33,7 +33,7 @@ def main():
     require('NOT modelled' in nh,'omit')
     reg=REG.read_text()
     require('merge_cmp_r12_r14_532b44_u1_ran' in reg,'merge')
-    require('kRegistryInit531d60FragmentPinnedRva = 0x532b60' in reg,'pin')
+    require('kRegistryInit531d60FragmentPinnedRva = 0x532b65' in reg,'pin')
     require('init_531d60_post_base_cmp_r12_r14_532b44_u1.cpp' in CMAKE.read_text(),'cmake')
     print(f'OK check_f531d60_post_base_cmp_r12_r14_532b44_u1 end={END:#x}')
     return 0

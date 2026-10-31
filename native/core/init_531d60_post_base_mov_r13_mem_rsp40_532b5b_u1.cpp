@@ -16,7 +16,7 @@ Init531d60PostBaseMovR13MemRsp40_532b5b_U1Result init_531d60_post_base_mov_r13_m
     }
     ++out.mov_r13_mem_rsp40_count;
 
-    // Next: mov r14,[rsp+0x48] @ 0x532b60 — not modelled in this unit.
+    // Next: mov r14,[rsp+0x48] @ 0x532b60 — peeled in E567 sibling unit.
     out.ok = (out.mov_r13_mem_rsp40_count == 1);
     return out;
 }
