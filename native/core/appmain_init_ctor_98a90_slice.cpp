@@ -90,6 +90,7 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
     const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks,
     const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks,
     const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks,
+    const Init531d60PostBaseRegistryTailHooks& post_base_registry_tail_hooks,
     const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks,
     const Init1290Hooks& init_1290_hooks) {
     AppmainInitCtor98a90SliceResult out{};
@@ -565,11 +566,28 @@ AppmainInitCtor98a90SliceResult run_appmain_init_ctor_98a90_slice(
         out, table, alloc, setter_obj, flag_in, set_a, set_b, set_c,
         post_base_continue_a_hooks, post_base_continue_b_hooks,
         post_base_continue_c_hooks, post_base_continue_d_hooks,
-        post_base_continue_e_hooks, post_base_alt_5327bd_hooks,
+        post_base_continue_e_hooks, post_base_registry_tail_hooks, post_base_alt_5327bd_hooks,
         post_base_1fc80_u1_hooks, post_base_1e4c0_u1_hooks, post_base_4c4950_u1_hooks,
         post_base_a52b70_u1_hooks, post_base_a599e0_u1_hooks, post_base_a431e0_u1_hooks);
     return out;
 }
+
+
+namespace {
+
+void run_remainder_after_registry_tail(
+    AppmainInitCtor98a90SliceResult& out, InputTable551140& table, AllocatorFront& alloc,
+    void* setter_obj, std::uint8_t flag_in, std::uint8_t set_a, std::uint8_t set_b,
+    std::uint8_t set_c) {
+    RegistryInit531d60Hooks registry_hooks{};
+    if (out.post_base_registry_tail.mov_edi_count == 1) {
+        registry_hooks.merge_mov_edi_98_532b0c_u1_ran = true;
+    }
+    out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,
+                                                     set_b, set_c, registry_hooks);
+}
+
+}  // namespace
 
 void run_appmain_init_continue_driver_tail(
     AppmainInitCtor98a90SliceResult& out, InputTable551140& table,
@@ -580,6 +598,7 @@ void run_appmain_init_continue_driver_tail(
     const Init531d60PostBaseContinueCHooks& post_base_continue_c_hooks,
     const Init531d60PostBaseContinueDHooks& post_base_continue_d_hooks,
     const Init531d60PostBaseContinueEHooks& post_base_continue_e_hooks,
+    const Init531d60PostBaseRegistryTailHooks& post_base_registry_tail_hooks,
     const Init531d60PostBaseAlt5327bdHooks& post_base_alt_5327bd_hooks,
     const Init531d60PostBase1fc80U1Hooks& post_base_1fc80_u1_hooks,
     const Init531d60PostBase1e4c0U1Hooks& post_base_1e4c0_u1_hooks,
@@ -775,8 +794,14 @@ void run_appmain_init_continue_driver_tail(
             out.init_stopped_at_5329ae = true;
             return;
         }
-        out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in,
-                                                         set_a, set_b, set_c);
+        out.post_base_registry_tail =
+            init_531d60_post_base_registry_tail(post_base_registry_tail_hooks);
+        if (!out.post_base_registry_tail.ok) {
+            out.init_stopped_at_5329ae = true;
+            return;
+        }
+        run_remainder_after_registry_tail(out, table, alloc, setter_obj, flag_in, set_a, set_b,
+                                        set_c);
         return;
     }
 
@@ -798,8 +823,14 @@ void run_appmain_init_continue_driver_tail(
         out.init_stopped_at_5329ae = true;
         return;
     }
-    out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in,
-                                                     set_a, set_b, set_c);
+        out.post_base_registry_tail =
+            init_531d60_post_base_registry_tail(post_base_registry_tail_hooks);
+        if (!out.post_base_registry_tail.ok) {
+            out.init_stopped_at_5329ae = true;
+            return;
+        }
+        run_remainder_after_registry_tail(out, table, alloc, setter_obj, flag_in, set_a, set_b,
+                                        set_c);
 }
 
 }  // namespace sotc

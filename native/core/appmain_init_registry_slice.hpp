@@ -45,6 +45,6 @@ struct AppmainInitRegistrySliceResult {
 // Clean slate → init_registry_fragment_531d60(table, alloc) → measure installed cell.
 // Fail-visible without private I275 names (same contract as the Init fragment).
 [[nodiscard]] AppmainInitRegistrySliceResult run_appmain_init_registry_slice(
-    InputTable551140& table, AllocatorFront& alloc);
+    InputTable551140& table, AllocatorFront& alloc, const RegistryInit531d60Hooks& registry_hooks = {});
 
 }  // namespace sotc

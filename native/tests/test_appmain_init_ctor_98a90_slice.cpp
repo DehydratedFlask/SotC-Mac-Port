@@ -76,6 +76,8 @@
 #include "core/init_531d60_post_base_a599e0_u1.hpp"
 #include "core/init_531d60_post_base_continue_b.hpp"
 #include "core/init_531d60_post_base_continue_c.hpp"
+#include "core/init_531d60_post_base_mov_edi_98_532b0c_u1.hpp"
+#include "core/init_531d60_post_base_registry_tail.hpp"
 #include "core/capture_a473b0.hpp"
 #include "core/prologue_255180.hpp"
 #include "core/prologue_gates_2552d4.hpp"
@@ -1646,6 +1648,8 @@ int main() {
     // continue_e hooks (only used when the je is taken; supplied as stand-in values).
     g_cont_e_r13 = g_cont_a_rdi_marker;  // same parent stand-in as r15
     Init531d60PostBaseContinueEHooks pbce{};
+    Init531d60PostBaseRegistryTailHooks pbreg{};
+    pbreg.merge_mov_edi_98_532b0c_u1_ran = false;
     pbce.incoming_r13 = g_cont_e_r13;
     pbce.incoming_r12b = 0xBB;
     pbce.boss_flag_2dcdf14 = &g_boss_flag_cell;
@@ -1680,7 +1684,7 @@ int main() {
                                                      pbf590u7, pbf590u8, pba2edu5, pbf590u9,
                                                      pbf590u10, pba2edu6, pbf590u11, pbf590u12,
                                                      pba2edu7, pbf590u13, pbf590u14, pba2eu1, pba2e5,
-                                                     pba543, pb1fc, pb1e4, pb4c, pba52u1, {}, {}, pbca, pbcb, pbcc, pbcd, pbce, pbalt,
+                                                     pba543, pb1fc, pb1e4, pb4c, pba52u1, {}, {}, pbca, pbcb, pbcc, pbcd, pbce, pbreg, pbalt,
                                                      ih);
     const auto t1 = std::chrono::steady_clock::now();
     const auto us =
@@ -2561,7 +2565,10 @@ int main() {
     // E1042 / CPU-01-INIT-DRIVER-JOIN-01: fall-through runs D then E (12 pinned units) before remainder.
     CHECK(r.post_base_continue_e.ok);
     CHECK(r.post_base_continue_e.unit_executed == kInit531d60PostBaseContinueEUnitCount);
-    CHECK(kInit531d60PostBaseContinueEUnitCount == 1);
+    CHECK(kInit531d60PostBaseContinueEUnitCount == 0);
+    CHECK(r.post_base_registry_tail.ok);
+    CHECK(r.post_base_registry_tail.mov_edi_count == 1);
+    CHECK(r.post_base_registry_tail.end_rva == 0x532b11);
     CHECK(g_cont_e_a54920 == 3);  // pbce hooks: three save-data ctor calls on D→E path
     CHECK(r.init_r12b_known);
     CHECK(r.init_r12b_out == 0xA7);  // continue-B bl(0xA6) xor 1 feeds continue-E
@@ -2699,11 +2706,8 @@ int main() {
         const auto er = init_531d60_post_base_continue_e(eh);
         CHECK(er.ok);
         CHECK(er.unit_executed == kInit531d60PostBaseContinueEUnitCount);
-        CHECK(kInit531d60PostBaseContinueEUnitCount == 1);
-        for (int i = 0; i < kInit531d60PostBaseContinueEUnitCount; ++i) {
-            CHECK(er.unit_counts[static_cast<std::size_t>(i)] == 1);
-        }
-        CHECK(kInit531d60PostBaseContinueEUnits[0].rva == 0x532b09);
+        CHECK(kInit531d60PostBaseContinueEUnitCount == 0);
+        CHECK(kInit531d60PostBaseContinueEUnits.empty());
         CHECK(er.call_a54920_count == 1);
         CHECK(er.vcall_noop_count == 1);
         CHECK(er.vcall_54b250_count == 1);
@@ -2760,12 +2764,13 @@ int main() {
         empty.merge_mov_edx_2_532afe_u1_ran = true;
         empty.merge_mov_rdi_rax_mem_532b03_u1_ran = true;
         empty.merge_mov_rax_rdi_mem_532b06_u1_ran = true;
+        empty.merge_vcall08_532b09_u1_ran = true;
         const auto er2 = init_531d60_post_base_continue_e(empty);
         CHECK(er2.ok);
-        CHECK(er2.unit_executed == 1);
+        CHECK(er2.unit_executed == 0);
         CHECK(er2.call_a54920_count == 0);
         CHECK(er2.vcall_noop_count == 0);
-        CHECK(er2.vcall_54b250_count == 1);
+        CHECK(er2.vcall_54b250_count == 0);
         CHECK(er2.stamp_count == 0);
         CHECK(!er2.a54920_hook_supplied);
         CHECK(g_cont_e_a54920 == 0);
@@ -3323,7 +3328,7 @@ void run_alt_join_route_tests() {
         AppmainInitCtor98a90SliceResult out{};
         run_appmain_init_continue_driver_tail(
             out, route_table, route_front, route_setter.data(), 0, 0, 0, 0,
-            {}, {}, {}, {}, e, {}, {}, {}, {}, {}, {}, {});
+            {}, {}, {}, {}, e, {}, {}, {}, {}, {}, {}, {}, {});
         CHECK(out.post_base_continue_b.ok);
         CHECK(!out.post_base_continue_b.eax_known);
         CHECK(out.post_base_continue_c.ok);
@@ -3357,7 +3362,7 @@ void run_alt_join_route_tests() {
         AppmainInitCtor98a90SliceResult out{};
         run_appmain_init_continue_driver_tail(
             out, route_table, route_front, route_setter.data(), 0, 0, 0, 0,
-            {}, {}, {}, {}, e, alt, {}, {}, {}, {}, {}, {});
+            {}, {}, {}, {}, e, {}, alt, {}, {}, {}, {}, {}, {});
         CHECK(out.post_base_alt_5327bd.ok);
         CHECK(!out.post_base_alt_5327bd.reached_via_jmp);
         CHECK(!out.post_base_alt_5327bd.reached_via_preamble);
@@ -3429,7 +3434,7 @@ void run_alt_join_route_tests() {
         AppmainInitCtor98a90SliceResult out{};
         run_appmain_init_continue_driver_tail(
             out, route_table, route_front, route_setter.data(), 0, 0x11, 0x22, 0x33,
-            {}, {}, {}, {}, e, alt, {}, {}, {}, {}, {}, {});
+            {}, {}, {}, {}, e, {}, alt, {}, {}, {}, {}, {}, {});
         CHECK(out.post_base_alt_5327bd.ok);
         CHECK(out.post_base_alt_5327bd.reached_via_jmp);
         CHECK(out.post_base_alt_5327bd.r12b_known && out.post_base_alt_5327bd.r12b_out == 0);
@@ -3485,7 +3490,7 @@ void run_alt_join_route_tests() {
         AppmainInitCtor98a90SliceResult out{};
         run_appmain_init_continue_driver_tail(
             out, route_table, route_front, route_setter.data(), 0, 0x11, 0x22, 0x33,
-            {}, {}, c, {}, e, alt, {}, {}, {}, {}, {}, {});
+            {}, {}, c, {}, e, {}, alt, {}, {}, {}, {}, {}, {});
         CHECK(out.post_base_alt_5327bd.ok);
         CHECK(out.post_base_alt_5327bd.reached_via_preamble);
         CHECK(out.post_base_alt_5327bd.slot0_dispatch_count == 1);

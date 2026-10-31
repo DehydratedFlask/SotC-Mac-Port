@@ -33,9 +33,8 @@ void destroy_registry_at_2efd160(AllocatorFront& alloc) noexcept {
     destroy_registry_object(prev, alloc);
 }
 
-RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table,
-                                                       AllocatorFront& alloc) {
-    // OBS 0x532b0c: mov edi, 0x98; call 0x17070 (allocator does not zero-fill).
+RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, AllocatorFront& alloc, const RegistryInit531d60Hooks& hooks) {
+    if (!hooks.merge_mov_edi_98_532b0c_u1_ran) { const auto prep = init_531d60_post_base_mov_edi_98_532b0c_u1(); if (!prep.ok) return RegistryInit531d60Status::alloc_failed; }
     void* raw = alloc.new_(kRegistryInitObjectBytes);
     if (raw == nullptr) {
         return RegistryInit531d60Status::alloc_failed;

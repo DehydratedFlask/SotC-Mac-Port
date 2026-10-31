@@ -4,7 +4,7 @@ namespace sotc {
 
 AppmainInitRemainderSliceResult run_appmain_init_remainder_slice(
     InputTable551140& table, AllocatorFront& alloc, void* setter_obj, std::uint8_t flag_in,
-    std::uint8_t set_a, std::uint8_t set_b, std::uint8_t set_c) {
+    std::uint8_t set_a, std::uint8_t set_b, std::uint8_t set_c, const RegistryInit531d60Hooks& registry_hooks) {
     AppmainInitRemainderSliceResult out{};
 
     // Early Init leave contracts (after a successful base Initialize in the original).
@@ -31,7 +31,7 @@ AppmainInitRemainderSliceResult run_appmain_init_remainder_slice(
                      (out.setter_at_01 == set_a) && (out.setter_at_29 == set_b) &&
                      (out.setter_at_51 == set_c);
 
-    out.registry = run_appmain_init_registry_slice(table, alloc);
+    out.registry = run_appmain_init_registry_slice(table, alloc, registry_hooks);
     return out;
 }
 

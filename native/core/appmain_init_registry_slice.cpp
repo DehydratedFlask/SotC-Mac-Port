@@ -5,14 +5,14 @@
 namespace sotc {
 
 AppmainInitRegistrySliceResult run_appmain_init_registry_slice(InputTable551140& table,
-                                                               AllocatorFront& alloc) {
+                                                               AllocatorFront& alloc, const RegistryInit531d60Hooks& registry_hooks) {
     AppmainInitRegistrySliceResult out{};
 
     // Measured edge starts from a clean registry cell (app-main Init installs once per boot
     // in the original; re-run destroys previous via the fragment).
     destroy_registry_at_2efd160(alloc);
 
-    out.status = init_registry_fragment_531d60(table, alloc);
+    out.status = init_registry_fragment_531d60(table, alloc, registry_hooks);
     out.cell = registry_cell_2efd160().load();
     out.cell_installed = (out.cell != nullptr);
 

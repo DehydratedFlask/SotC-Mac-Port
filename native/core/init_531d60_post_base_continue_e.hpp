@@ -95,14 +95,15 @@
 #include "init_531d60_post_base_mov_edx_2_532afe_u1.hpp"
 #include "init_531d60_post_base_mov_rdi_rax_mem_532b03_u1.hpp"
 #include "init_531d60_post_base_mov_rax_rdi_mem_532b06_u1.hpp"
+#include "init_531d60_post_base_vcall08_532b09_u1.hpp"
 #include "init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 #include "stat_query_54b250.hpp"
 
 namespace sotc {
 
-inline constexpr std::uint64_t kInit531d60PostBaseContinueERva = 0x532b09;
-inline constexpr std::size_t kInit531d60PostBaseContinueESize = 3;
+inline constexpr std::uint64_t kInit531d60PostBaseContinueERva = 0x532b0c;
+inline constexpr std::size_t kInit531d60PostBaseContinueESize = 0;
 inline constexpr std::uint64_t kInit531d60PostBaseContinueEEndRva = 0x532b0c;
 inline constexpr std::size_t kInit531d60PostBaseContinueEFullBlockSize = 350;
 
@@ -185,8 +186,11 @@ static_assert(kInit531d60PostBaseMovRdiRaxMem_532b03_U1EndRva ==
                   kInit531d60PostBaseMovRaxRdiMem_532b06_U1Rva,
               "mov_rdi_rax_mem u1 end equals mov_rax_rdi_mem u1 start");
 static_assert(kInit531d60PostBaseMovRaxRdiMem_532b06_U1EndRva ==
+                  kInit531d60PostBaseVcall08_532b09_U1Rva,
+              "mov_rax_rdi_mem u1 end equals vcall08_532b09 u1 start");
+static_assert(kInit531d60PostBaseVcall08_532b09_U1EndRva ==
                   kInit531d60PostBaseContinueERva,
-              "mov_rax_rdi_mem u1 end equals continue E pinned start");
+              "vcall08_532b09 u1 end equals continue E pinned start");
 
 // Direct-call rel32 targets.
 inline constexpr std::uint64_t kInit531d60PostBaseContinueECtorRva = 0xa54920;
@@ -215,16 +219,13 @@ inline constexpr std::uint64_t kInit531d60PostBaseContinueEVmovqSrcRva = 0x15ff5
 // Vtable for the 0x2eff450 object (slot-1 = 0x54b250, resolved per E538).
 inline constexpr std::uint64_t kInit531d60PostBaseContinueEVtable2eff450Rva = 0x15c9830;
 
-// Unit identity for the pinned instruction after E546 mov_rax_rdi_mem u1 peel.
-enum class ContinueEUnit : int {
-    vcall_rax08,               // 0x532b09  (rax+0x8 → 0x54b250)
-    count
-};
+// E547: vcall +0x8 @ 0x532b09 peeled to vcall08_532b09_u1; continue_e span is empty.
+enum class ContinueEUnit : int { count };
 
 inline constexpr int kInit531d60PostBaseContinueEUnitCount =
     static_cast<int>(ContinueEUnit::count);
-static_assert(kInit531d60PostBaseContinueEUnitCount == 1,
-              "1 unit in 0x532b09..0x532b0c");
+static_assert(kInit531d60PostBaseContinueEUnitCount == 0,
+              "0 units in empty continue_e @ 0x532b0c");
 
 struct ContinueEUnitSpan {
     std::uint64_t rva = 0;
@@ -232,11 +233,8 @@ struct ContinueEUnitSpan {
     const char* mnemonic = "";
 };
 
-// OBS table derived from local/re/eboot.elf; sizes sum to kSize (3 B).
 inline constexpr std::array<ContinueEUnitSpan, kInit531d60PostBaseContinueEUnitCount>
-    kInit531d60PostBaseContinueEUnits{{
-        {0x532B09, 3, "call [rax+0x8]"},
-    }};
+    kInit531d60PostBaseContinueEUnits{};
 
 // Host stand-ins for the pinned operands. Every field optional: a null cell
 // or hook skips that host-side operation (the unit is still counted).
@@ -353,6 +351,7 @@ struct Init531d60PostBaseContinueEHooks {
 
     Init531d60PostBaseMovRaxRdiMem_532b06_U1Cells mov_rax_rdi_mem_532b06_u1_cells{};
     bool merge_mov_rax_rdi_mem_532b06_u1_ran = false;
+    bool merge_vcall08_532b09_u1_ran = false;
 
     // Resolved vcall slot-1 through *(0x2eff450) — 0x54b250(this_obj, esi=0,
     // edx=2).  null => no-op (call still counted).

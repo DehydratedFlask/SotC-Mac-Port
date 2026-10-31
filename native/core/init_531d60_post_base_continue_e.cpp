@@ -24,6 +24,8 @@
 #include "init_531d60_post_base_xor_esi_532afc_u1.hpp"
 #include "init_531d60_post_base_mov_edx_2_532afe_u1.hpp"
 #include "init_531d60_post_base_mov_rdi_rax_mem_532b03_u1.hpp"
+#include "init_531d60_post_base_mov_rax_rdi_mem_532b06_u1.hpp"
+#include "init_531d60_post_base_vcall08_532b09_u1.hpp"
 #include "init_531d60_post_base_vmovdqa_rsp478_xmm0_532aba_u1.hpp"
 #include "init_531d60_post_base_vmovq_532a75_u1.hpp"
 
@@ -31,15 +33,6 @@
 
 namespace sotc {
 namespace {
-
-int& slot(Init531d60PostBaseContinueEResult& out, ContinueEUnit u) noexcept {
-    return out.unit_counts[static_cast<int>(u)];
-}
-
-void pin(Init531d60PostBaseContinueEResult& out, ContinueEUnit u) noexcept {
-    ++slot(out, u);
-    ++out.unit_executed;
-}
 
 // 0x50-byte stack descriptor used by the three save-data ctor calls.
 // The original zeroes it with vmovaps and stores a vtable pointer at +0x40
@@ -466,15 +459,19 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         }
     }
 
-    // 0x532b09 call [rax+0x8] — vcall slot-1 → 0x54b250(this_obj, esi=0, edx=2).
-    if (hooks.stat_engine != nullptr) {
-        out.stat_query = stat_query_54b250(obj_2eff450, 0, 2, *hooks.stat_engine);
-        out.stat_query_ran = true;
-    } else if (hooks.call_54b250 != nullptr) {
-        hooks.call_54b250(obj_2eff450, 0, 2);
+    if (!hooks.merge_vcall08_532b09_u1_ran) {
+        Init531d60PostBaseVcall08_532b09_U1Hooks vh{};
+        vh.this_obj = obj_2eff450;
+        vh.call_54b250 = hooks.call_54b250;
+        vh.stat_engine = hooks.stat_engine;
+        const auto vr = init_531d60_post_base_vcall08_532b09_u1(vh);
+        if (!vr.ok) {
+            return out;
+        }
+        out.vcall_54b250_count += vr.vcall_54b250_count;
+        out.stat_query_ran = vr.stat_query_ran;
+        out.stat_query = vr.stat_query;
     }
-    pin(out, ContinueEUnit::vcall_rax08);
-    ++out.vcall_54b250_count;
 
     // Final validation (u1 / vcall18 / a54920_532a62 merges add to ctor/vcall/stamp totals).
     const int expect_a54920 =
@@ -495,14 +492,13 @@ Init531d60PostBaseContinueEResult init_531d60_post_base_continue_e(
         (hooks.merge_lea_538870_532aa3_u1_ran ? 0 : 1) +
         (hooks.merge_lea_rsi_2efda50_532ad3_u1_ran ? 0 : 1);
     const int expect_vmovq = hooks.merge_vmovq_532a75_u1_ran ? 0 : 1;
+    const int expect_vcall_54b250 = hooks.merge_vcall08_532b09_u1_ran ? 0 : 1;
     out.a54920_hook_supplied = (hooks.call_a54920 != nullptr);
     out.ok = (out.unit_executed == kInit531d60PostBaseContinueEUnitCount) &&
              (out.call_a54920_count == expect_a54920) &&
              (out.vcall_noop_count == expect_vcall_noop) &&
-             (out.vcall_54b250_count == 1) && (out.stamp_count == expect_stamp) &&
-             (out.lea_rip_count == expect_lea_rip) && (out.vmovq_count == expect_vmovq) &&
-             (out.unit_counts[0] == 1) &&
-             (out.unit_counts[kInit531d60PostBaseContinueEUnitCount - 1] == 1);
+             (out.vcall_54b250_count == expect_vcall_54b250) && (out.stamp_count == expect_stamp) &&
+             (out.lea_rip_count == expect_lea_rip) && (out.vmovq_count == expect_vmovq);
     return out;
 }
 

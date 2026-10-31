@@ -36,6 +36,6 @@ struct AppmainInitRemainderSliceResult {
 // `flag_in` models the dil argument to 0x4c4950 (Init passes 0 or 1 from pad outcome).
 [[nodiscard]] AppmainInitRemainderSliceResult run_appmain_init_remainder_slice(
     InputTable551140& table, AllocatorFront& alloc, void* setter_obj, std::uint8_t flag_in,
-    std::uint8_t set_a, std::uint8_t set_b, std::uint8_t set_c);
+    std::uint8_t set_a, std::uint8_t set_b, std::uint8_t set_c, const RegistryInit531d60Hooks& registry_hooks = {});
 
 }  // namespace sotc
