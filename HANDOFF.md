@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 16:05 CDT (root) — PM4 indirect traversal + typed draws (FIXTURE_VERIFIED)
+
+- **Task:** `GPU-01-PM4-TRANSLATOR-01` slice 3. `native/platform/pm4_indirect.{hpp,cpp}`: caller-supplied opcode policy (draw kind, count field, indirect address/size fields), nested-buffer traversal with **depth limit**, **path-based cycle detection**, unreadable and short-payload handling, buffer/draw caps, and a flat draw list carrying kind, count, depth and buffer address.
+- **No invented opcodes:** the policy table is supplied by the caller; the fixture uses a synthetic one because the game's PM4 opcodes are not yet byte-verified.
+- **Fixtures:** `native/tests/test_pm4_indirect.cpp` — 11 cases (flat, one level, nesting order, depth limit, cycle, self-cycle, unreadable, bad payload, missing reader, invalid policy/empty, draw cap) plus `--traverse` scenario mode. `tools/lift/check_pm4_indirect.py` independently traverses **19 scenarios** in Python and requires identical draw lists and statistics.
+- **Mutation probes:** disabling cycle detection → 3 failures; earlier size-field mistakes and a `clear_delta` defect were caught by the fixtures during development.
+- **Verification (PASSED):** configure/build exit 0; CTest **498/498**; lift checkers **688 passed / 0 failed**.
+- **Gates:** unchanged; G0/G1/G3/G4 PARTIAL, G2/G5/G6 NOT RUN.
+
 ## 2026-11-01 15:20 CDT (root) — PM4 register-file state slice (FIXTURE_VERIFIED)
 
 - **Task:** `GPU-01-PM4-TRANSLATOR-01` slice 2. `native/platform/pm4_state.{hpp,cpp}`: dense 16-bit register file with **all-or-nothing bounded writes**, overwrite tracking, delta list with clear, distinct-written count, **FNV-1a state digest** for shadow comparison, and `StateTrackingSink` applying type-1 packets during decode.

@@ -2485,3 +2485,10 @@ target_link_libraries(sotc_pm4_state PUBLIC sotc_pm4_decoder)
 add_executable(test_pm4_state tests/test_pm4_state.cpp)
 target_link_libraries(test_pm4_state PRIVATE sotc_pm4_state)
 add_test(NAME pm4_state COMMAND test_pm4_state)
+
+# GPU-01-PM4-TRANSLATOR-01 slice 3: policy-driven indirect traversal + typed draws.
+add_library(sotc_pm4_indirect STATIC platform/pm4_indirect.cpp)
+target_link_libraries(sotc_pm4_indirect PUBLIC sotc_pm4_decoder)
+add_executable(test_pm4_indirect tests/test_pm4_indirect.cpp)
+target_link_libraries(test_pm4_indirect PRIVATE sotc_pm4_indirect)
+add_test(NAME pm4_indirect COMMAND test_pm4_indirect)
