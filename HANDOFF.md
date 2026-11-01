@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 20:40 CDT (root) — .csdr loader search: negative in eboot (STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `GPU-01-CSDR-DECOMPRESSOR-RE-01` (attempt 1). Searched the pinned executable and its 6.6 M-line saved disassembly for the loader that would branch on the compressed prefix and decompress.
+- **Negative result:** no `cmpb/cmpq $0x8c`/`$0xcc` magic compare (the only three `cmpq $0x8c` sites are loop bounds around `addq $0x1c`), no `cmpl $0x8c0a/$0x8c06/$0xa8c/$0x68c`, **no `OrbShdr` magic constant at all** (`0x42524f`, `0x4f5242`, `0x5362724f` all absent), no `csdr`/`OrbShdr` strings, and **no decompression imports** (`inflate`/`deflate`/`uncompress`/`lz4`/`zstd`/`lzma`).
+- **Interpretation recorded as hypothesis, not fact:** the game hands opaque shader blobs to `libSceGnmDriver`, a PS4 system module this project may not ship; the compressed forms are consistent with a driver-side cache.
+- **Reachability data point:** the numeric suffix in member names is not a literal in `eboot` (neither LE32 nor ASCII for five sampled members), so shader selection is computed, not a static reference.
+- **Structural facts kept from the previous card:** byte1 ∈ {`0x0a`, `0x06`}, `u16be[2:4] == floor(size/256)` for 62/84, `u16be[6:8] == size-20` on single-blob members, payload entropy 3.28–7.97.
+- **Next exact action:** determine whether compressed members are live at all (engine may only load raw ones); if live, the codec must be recovered from data or published material, not from local code. Report: `docs/CSDR_LOADER_SEARCH.md`.
+
 ## 2026-11-01 20:05 CDT (root) — compressed .csdr container characterized, codec UNKNOWN (STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `GPU-01-MSL-OFFLINE-01` compressed-container card, continued as `GPU-01-CSDR-DECOMPRESSOR-RE-01`. `tools/dev/csdr_compressed_probe.py` samples 256 members deterministically; **84** are `0x8c`/`0xcc`-prefixed `.csdr` (33 %).
