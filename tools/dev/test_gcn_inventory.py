@@ -182,6 +182,60 @@ class EncodingOracleTests(unittest.TestCase):
             with self.assertRaises(gcn.DecodeError):
                 one(vopc(op=opcode))
 
+    def test_cndmask_conversions_and_integer_sub(self):
+        # VOP3 256 v_cndmask_b32: three sources, the third is a scalar/VCC/EXEC mask.
+        cnd = one(vop3(op=256, dst=5, src0=267, src1=268, src2=106, abs_=0, clamp=0, omod=0, neg=0))
+        self.assertEqual(cnd.mnemonic, 'v_cndmask_b32')
+        self.assertEqual(cnd.requirements, ('reads_vcc_mask',))
+        exec_mask = one(vop3(op=256, dst=5, src0=267, src1=268, src2=126, abs_=0, clamp=0, omod=0,
+                             neg=0))
+        self.assertEqual(exec_mask.requirements, ('reads_exec_mask',))
+        sgpr_mask = one(vop3(op=256, dst=5, src0=267, src1=268, src2=8, abs_=0, clamp=0, omod=0,
+                             neg=0))
+        self.assertEqual(sgpr_mask.requirements, ())
+        # A vector register as the mask, or a modifier on this integer row, is refused.
+        with self.assertRaises(gcn.DecodeError):
+            one(vop3(op=256, dst=5, src0=267, src1=268, src2=300, abs_=0, clamp=0, omod=0, neg=0))
+        with self.assertRaises(gcn.DecodeError):
+            one(vop3(op=256, dst=5, src0=267, src1=268, src2=8, abs_=1, clamp=0, omod=0, neg=0))
+
+        # Conversions and integer subtraction.
+        self.assertEqual(one(vop1(op=5)).mnemonic, 'v_cvt_f32_i32')
+        self.assertEqual(one(vop1(op=11)).mnemonic, 'v_cvt_f32_f16')
+        self.assertEqual(one(vop1(op=42)).mnemonic, 'v_rcp_f32')
+        sub = one(vop2(op=38))
+        self.assertEqual(sub.mnemonic, 'v_sub_i32')
+        self.assertEqual(sub.requirements, ('writes_vcc_mask',))
+        self.assertEqual(one(vopc(op=136)).mnemonic, 'v_cmp_class_f32')
+
+    def test_compare_rows_and_mask_destinations(self):
+        # VOPC 192-199 are the integer (non-cmpx) compares: they write VCC, never EXEC.
+        for op, name in ((192, 'v_cmp_f_u32'), (194, 'v_cmp_eq_u32'), (197, 'v_cmp_ne_u32'),
+                         (199, 'v_cmp_t_u32')):
+            insn = one(vopc(op=op))
+            self.assertEqual(insn.mnemonic, name)
+            self.assertEqual(insn.requirements, ('writes_vcc_mask',))
+        self.assertEqual(one(vopc(op=209)).requirements, ('writes_exec_mask',))
+
+        # VOP3-encoded compares: VDST is a mask destination, and modifier bits must be clear.
+        compare = one(vop3(op=194, dst=106, abs_=0, clamp=0, omod=0, neg=0))
+        self.assertEqual(compare.mnemonic, 'v_cmp_eq_u32')
+        self.assertEqual(compare.requirements, ('writes_vcc_mask',))
+        mask_pair = one(vop3(op=1, dst=8, abs_=0, clamp=0, omod=0, neg=0))
+        self.assertEqual(mask_pair.mnemonic, 'v_cmp_lt_f32')
+        self.assertEqual(mask_pair.requirements, ())
+
+        # Rejections: an unmodelled neighbour, a modifier on a compare, an odd mask pair.
+        for built in (vop3(op=2, dst=106, abs_=0, clamp=0, omod=0, neg=0),
+                      vop3(op=195, dst=106, abs_=0, clamp=0, omod=0, neg=0),
+                      vopc(op=200)):
+            with self.assertRaises(gcn.DecodeError):
+                one(built)
+        with self.assertRaises(gcn.DecodeError):
+            one(vop3(op=194, dst=106, abs_=1, clamp=0, omod=0, neg=0))
+        with self.assertRaises(gcn.DecodeError):
+            one(vop3(op=194, dst=9, abs_=0, clamp=0, omod=0, neg=0))
+
     def test_barrier_subrev_and_byte_pack(self):
         # SOPP 10 s_barrier decodes as a fixed one-dword instruction and is a wave-level blocker.
         # The pinned PS4 SOPP table puts S_BARRIER at 10; opcode 8 is S_CBRANCH_EXECZ, a branch.
@@ -407,7 +461,7 @@ class RejectionTests(unittest.TestCase):
     def test_unknown_opcode_each_family(self):
         for p in (sop1(255), sop2(12), sop2(43), sop2(45), sop2(127), sopc(16), sopc(127),
                   sopp(127), smrd(29), smrd(31), vop1(255), vopc(32), vopc(255),
-                  vop2(63), vop3(511), vintrp(3), mubuf(127), mimg(127)):
+                  vop2(41), vop3(511), vintrp(3), mubuf(127), mimg(127)):
             self.reject(p+END, 'unsupported')
 
     def test_unknown_encoding(self):
@@ -469,7 +523,7 @@ class RejectionTests(unittest.TestCase):
     def test_nearby_rows_stay_unsupported(self):
         # Neighbours that are NOT modelled keep rejecting: the integer VOP rows either side,
         # SOPP 5 `s_cbranch_scc1` (control transfer), the MUBUF/MIMG store rows.
-        for p in (vop2(op=38), vop2(op=40), vop1(op=37),
+        for p in (vop2(op=39), vop2(op=40), vop1(op=37),
                   vop3(op=323, abs_=0, clamp=0, omod=0, neg=0),
                   vop3(op=351, abs_=0, clamp=0, omod=0, neg=0),
                   sop1(op=35), sopp(op=2), sopp(op=5), sopp(op=9),

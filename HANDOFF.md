@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 00:40 CDT (root) — MSL decoder v6: compare family, cndmask, conversions (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01`, card 6. Added the compare family and the rows the block decoder exposed: VOPC 192–199 integer compares and VOPC 136 `v_cmp_class_f32`; VOP3-encoded compares 1/4/11/194/197 with an explicit **mask-destination rule** (`VDST` names VCC or an even SGPR pair, modifiers must be clear); VOP3 256 `v_cndmask_b32` with its third operand validated as a scalar/VCC/EXEC mask; VOP1 5/11/42; VOP2 38.
+- **Rule fixed, not patched:** `writes_vcc_mask` for VOPC is now decided by an explicit EXEC-writing set (`cmpx`) instead of `op < 16`, which would have mislabelled the integer compares at 192–199 as EXEC writers.
+- **Measured at sample 512** (`local/validation/msl-coverage/blocks-512d`): linear decoded **183 → 186 of 367**, instructions **6,574 → 6,786**, decode-error **184 → 181**, per-lane eligible **74 → 76** of 186. Block-decodable 186 (still equal to linear).
+- **Block-mode first blockers now:** `VINTRP 2` 48, `VOP1 6` 48, `VOP2 0` 26, `VOP1 32` 22, `SOP2 96` 22, `MIMG 39` 2, `VOP3 287` 2 — all ordinary table rows; none is control flow any more.
+- **Test honesty:** `vop2(op=63)` is not a valid negative probe — a VOP2 word with `op = 63` has VOP1's top bits by construction, so it was really testing a VOP1 opcode (and started decoding once VOP1 5 was modelled). Replaced with `vop2(39)`/`vop2(41)` rather than "fixed" by loosening the assertion. A tautological assertion I wrote in the same card was also removed.
+- **Tests:** `test_gcn_inventory` 39 (positives for every new row, negatives for modifiers on compares, a VGPR as a cndmask mask, VOP3 195, VOPC 200), `test_gcn_to_msl` 23, coverage self-test 23, blocks self-test 26.
+- **Still 0 lowered.**
+- **Verification (PASSED):** build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Next exact action:** `VINTRP 2` (`v_interp_mov_f32`) needs the matching lowering rule before it can be admitted (the lifter now refuses it explicitly); `VOP1 6` and `VOP2 0` are the next ordinary rows to verify against the pinned table.
+
 ## 2026-11-02 23:45 CDT (root) — basic-block decoder: the branch rows were masking table rows (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `GPU-01-MSL-OFFLINE-01`, block-decoding card. `tools/dev/gcn_blocks.py` decodes a span with `gcn_inventory.decode(..., allow_branches=True)`, splits the listing at every control-transfer row, and reports each branch's byte target (`offset + 4 + simm16*4`). It never follows an edge and never executes. 26 self-test checks on synthetic spans cover forward/backward/out-of-span targets, a literal-carrying instruction before a branch, an unsupported row, and the fact that strict `decode()` still refuses the same span.

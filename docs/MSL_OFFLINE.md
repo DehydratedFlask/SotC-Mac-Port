@@ -277,3 +277,29 @@ Two findings, both recorded as measurements rather than claims:
 because every branch-containing program still hits one of those later rows. The linear numbers are
 unchanged at 183/367 decoded, 184 decode-error. That is the honest reading: branch support alone does
 not move the census, it makes the next rows visible.
+
+## Decoder widening 5 (compare rows, cndmask, conversions)
+
+- **Added:** VOPC 192–199 integer compares (`v_cmp_{f,lt,eq,le,gt,ne,ge,t}_u32`, VCC destination) and
+  VOPC 136 `v_cmp_class_f32`; VOP3-encoded compares 1/4/11/194/197 with an explicit
+  **mask-destination rule** (`VDST` names VCC or an even SGPR pair, modifiers must be clear); VOP3 256
+  `v_cndmask_b32` with its third operand validated as a scalar/VCC/EXEC mask; VOP1 5/11/42 and VOP2 38.
+- **Fixed rule:** `writes_vcc_mask` for VOPC is now decided by an explicit EXEC-writing set
+  (`cmpx`) instead of `op < 16`, which would have mislabelled the integer compares at 192–199.
+- **Measured at sample 512** (`--out local/validation/msl-coverage/blocks-512d`):
+
+| Metric | v5 | v6 |
+|---|---:|---:|
+| Programs decoded / attempted (linear) | 183 / 367 | **186 / 367** |
+| Instructions in decoded programs | 6,574 | **6,786** |
+| Decode-error programs | 184 | **181** |
+| Per-lane eligible decoded programs | 74 / 183 | 76 / 186 |
+| Block-decodable programs | 183 | **186** |
+
+- **Block-mode first blockers after this card:** `VINTRP 2` 48, `VOP1 6` 48, `VOP2 0` 26,
+  `VOP1 32` 22, `SOP2 96` 22, `MIMG 39` 2, `VOP3 287` 2. Every one still needs its own row checked
+  against the pinned table; none is a control-flow problem any more.
+- One test case had to be replaced rather than "fixed": `vop2(op=63)` is not a valid negative probe,
+  because a VOP2 word with `op = 63` has the same top bits as a VOP1 instruction by construction, so
+  it was really testing a VOP1 opcode. The negatives now use `vop2(39)`/`vop2(41)`.
+- **Still zero lowered:** decoding is not Metal semantics, and no per-shader ABI manifest exists.
