@@ -20,6 +20,7 @@
 #include "vtable_15d1d80_slot08_c740.hpp"
 #include "vtable_15e0b48_slot28_ddf4b0.hpp"
 #include "vtable_15d1678_slot280_a460f0.hpp"
+#include "vtable_15e2d60_slot_d0_e24900.hpp"
 #include "vtable_15f2f08_slot38_e16a00.hpp"
 #include "vtable_159c908_slot58_2687b0.hpp"
 
@@ -129,5 +130,15 @@ struct MarshalA460f0 {
 };
 
 [[nodiscard]] MarshalA460f0 marshal_a460f0(GuestWindow& window, std::uint64_t self) noexcept;
+
+// 0xe24900: sub-dispatch; reads the sub pointer at `self+0x8` and stores through `out`.
+struct MarshalE24900 {
+    bool ok = false;
+    GuestStatus status = GuestStatus::no_window;
+    Vtable15e2d60SlotD0_e24900Cells cells{};
+};
+
+[[nodiscard]] MarshalE24900 marshal_e24900(GuestWindow& window, std::uint64_t self,
+                                           std::uint64_t out) noexcept;
 
 }  // namespace sotc

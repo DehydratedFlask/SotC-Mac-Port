@@ -271,6 +271,30 @@ RetailCallOutcome call_resolved(std::uint64_t rva, RetailFrame& frame, GuestWind
             out.ok = true;
             return out;
         }
+        case kVtable15e2d60SlotD0_e24900Rva: {
+            const auto marshalled = marshal_e24900(window, self, arg1);
+            if (!marshalled.ok) {
+                out.status = marshalled.status == GuestStatus::no_window
+                                 ? RetailCallStatus::no_window
+                                 : RetailCallStatus::out_of_range;
+                return out;
+            }
+            Vtable15e2d60SlotD0_e24900Hooks hooks{};
+            hooks.slot28 = context.slot28_e24900;
+            hooks.slot48 = context.slot48_e24900;
+            hooks.sub_slot40 = context.sub40_e24900;
+            hooks.result_slot_b8 = context.status_e24900;
+            hooks.result_slot10 = context.release_e24900;
+            const auto result = vtable_15e2d60_slot_d0_e24900(marshalled.cells, hooks);
+            if (!result.ok) {
+                out.status = RetailCallStatus::model_failed;
+                return out;
+            }
+            out.rax = static_cast<std::uint64_t>(static_cast<std::uint32_t>(result.status));
+            out.status = RetailCallStatus::ok;
+            out.ok = true;
+            return out;
+        }
         default:
             // The target has an ABI row but no cell adapter yet.
             out.status = RetailCallStatus::unknown_target;

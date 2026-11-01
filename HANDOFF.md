@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 16:55 CDT (root) — 0xe24900 sub-dispatch arm (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `marshal_e24900` (sub pointer read from `self+0x8`, out cell resolved from `rsi`) and a `call_resolved` arm wiring `slot28`, `slot48`, `sub40`, status and release hooks. `rax` now carries the model status for this arm.
+- **Dispatchable targets: 13 of 17.**
+- **Fixture:** zero-status path succeeds and the out cell is cleared; missing hooks fail as `model_failed`. The stale "abi row without adapter" assertion was retargeted from `0xe24900` to `0xe19980`, which is still unadapted — caught by the fixture before commit.
+- **Checkers:** 13 arms and 12 adapters over 12 model-declared offsets.
+- **Verification (PASSED):** build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Next exact action:** the last four are the largest — `0xe19980` (5 args, two paths), `0xe1a5c0` (scan over a container), `0xe21420` (decision contract), `0xe26f90` (status gate).
+
 ## 2026-11-02 16:10 CDT (root) — 0xa460f0 dispatch arm (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `marshal_a460f0` (vtable cell at `*self`, helper pointer at `self+0xc0`) and a `call_resolved` arm wiring `helper_a460f0`, `post_a460f0` and the shared alloc contract.

@@ -197,4 +197,31 @@ MarshalA460f0 marshal_a460f0(GuestWindow& window, std::uint64_t self) noexcept {
     return out;
 }
 
+MarshalE24900 marshal_e24900(GuestWindow& window, std::uint64_t self,
+                             std::uint64_t out) noexcept {
+    MarshalE24900 out_cells{};
+    if (!window.valid()) {
+        out_cells.status = GuestStatus::no_window;
+        return out_cells;
+    }
+    std::uint64_t sub = 0;
+    const GuestStatus sub_status =
+        window.read_u64(self + kVtable15e2d60SlotD0_e24900SubOffset, sub);
+    if (sub_status != GuestStatus::ok) {
+        out_cells.status = sub_status;
+        return out_cells;
+    }
+    std::uint8_t* out_pointer = window.host_pointer(out, sizeof(void*));
+    if (out_pointer == nullptr) {
+        out_cells.status = GuestStatus::out_of_range;
+        return out_cells;
+    }
+    out_cells.cells.self = reinterpret_cast<void*>(static_cast<std::uintptr_t>(self));
+    out_cells.cells.sub = reinterpret_cast<void*>(static_cast<std::uintptr_t>(sub));
+    out_cells.cells.out = reinterpret_cast<void**>(out_pointer);
+    out_cells.status = GuestStatus::ok;
+    out_cells.ok = true;
+    return out_cells;
+}
+
 }  // namespace sotc

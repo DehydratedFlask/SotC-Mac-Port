@@ -41,6 +41,13 @@ struct RetailCallContext {
     // 0xa460f0: teardown with one helper vcall, a post-pass, and the shared alloc contract.
     void (*helper_a460f0)(void* helper) = nullptr;
     void (*post_a460f0)(void* self) = nullptr;
+
+    // 0xe24900: sub-dispatch hooks.
+    void* (*slot28_e24900)(void* self) = nullptr;
+    std::uint32_t (*slot48_e24900)(void* self) = nullptr;
+    void* (*sub40_e24900)(void* sub, void* a, std::uint32_t index) = nullptr;
+    std::int32_t (*status_e24900)(void* result, void* self) = nullptr;
+    void (*release_e24900)(void* result) = nullptr;
 };
 
 enum class RetailCallStatus : std::uint8_t {

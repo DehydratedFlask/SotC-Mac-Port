@@ -248,6 +248,39 @@ void test_a460f0_teardown() {
     check("a460f0 range fails", !range.ok && range.status == RetailCallStatus::out_of_range);
 }
 
+void* slot28_e249(void*) { return reinterpret_cast<void*>(0x1234); }
+std::uint32_t slot48_e249(void*) { return 7; }
+void* sub40_e249(void*, void*, std::uint32_t) { return reinterpret_cast<void*>(0x5678); }
+std::int32_t status_e249(void*, void*) { return 0; }
+void release_e249(void*) {}
+
+void test_e24900_sub_dispatch() {
+    std::vector<std::uint8_t> storage(0x80, 0);
+    GuestWindow window(storage.data(), 0xC0000, storage.size());
+    std::uint64_t sub = 0xC0040;
+    std::memcpy(storage.data() + 0x08, &sub, sizeof(sub));
+
+    RetailFrame frame{};
+    frame.set(RetailArg::rdi, 0xC0000);
+    frame.set(RetailArg::rsi, 0xC0020);
+    RetailCallContext context{};
+    context.slot28_e24900 = slot28_e249;
+    context.slot48_e24900 = slot48_e249;
+    context.sub40_e24900 = sub40_e249;
+    context.status_e24900 = status_e249;
+    context.release_e24900 = release_e249;
+    const auto zero = call_resolved(sotc::kVtable15e2d60SlotD0_e24900Rva, frame, window, context);
+    check("e24900 ok", zero.ok);
+    check("e24900 rax", zero.rax == 0);
+    std::uint64_t stored = 0;
+    std::memcpy(&stored, storage.data() + 0x20, sizeof(stored));
+    check("e24900 cleared", stored == 0);
+
+    const auto range = call_resolved(sotc::kVtable15e2d60SlotD0_e24900Rva, frame, window);
+    check("e24900 missing hooks fail", !range.ok &&
+                                           range.status == RetailCallStatus::model_failed);
+}
+
 void test_failures() {
     std::vector<std::uint8_t> storage(0x40, 0);
     GuestWindow window(storage.data(), 0x50000, storage.size());
@@ -265,7 +298,7 @@ void test_failures() {
     check("no window fails", !nowhere.ok && nowhere.status == RetailCallStatus::no_window);
 
     frame.set(RetailArg::rdi, 0x50000);
-    const auto adapted_but_no_cells = call_resolved(0xe24900, frame, window);
+    const auto adapted_but_no_cells = call_resolved(0xe19980, frame, window);
     check("abi without adapter", !adapted_but_no_cells.ok &&
                                       adapted_but_no_cells.status ==
                                           RetailCallStatus::unknown_target);
@@ -282,6 +315,7 @@ int main() {
     test_copy_targets_and_noop();
     test_dual_vcall_and_manager();
     test_a460f0_teardown();
+    test_e24900_sub_dispatch();
     test_failures();
 
     if (failures == 0) {
