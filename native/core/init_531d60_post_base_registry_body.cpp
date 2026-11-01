@@ -773,7 +773,7 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
                 cells.r13_base = const_cast<void*>(static_cast<const void*>(
                     static_cast<const std::uint8_t*>(hooks.stack_rsp) + 0x40u));
             } else {
-                static alignas(16) std::uint8_t fallback_r13_node[0x20]{};
+                alignas(16) static std::uint8_t fallback_r13_node[0x20]{};
                 cells.r13_base = fallback_r13_node;
             }
         }
