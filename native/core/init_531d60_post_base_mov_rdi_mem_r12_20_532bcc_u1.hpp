@@ -1,7 +1,7 @@
 // Init `0x531d60` registry mov rdi,[r12+0x20] OBS `0x532bcc..0x532bd1` (5 B):
 //   mov rdi,[r12+0x20]   ; fall-through after call 0x170c0 @ `0x532bc7`
 //
-// After E596 call @ `0x532bc7`. NOT modelled: tail @ `0x532bd1..`. G1 PARTIAL.
+// After E596 call @ `0x532bc7`. NOT modelled: E598 test @ `0x532bd1` / tail @ `0x532bd4..`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
