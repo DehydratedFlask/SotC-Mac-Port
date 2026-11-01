@@ -1,7 +1,7 @@
 // Init `0x531d60` registry cmp r15,r11 OBS `0x532b78..0x532b7b` (3 B):
 //   cmp r15,r11   ; end iterator vs walk pointer after mov r15,[r13+0x18] @ `0x532b74`
 //
-// After E572 mov r15 @ `0x532b74`. NOT modelled: je @ `0x532b7b..`. G1 PARTIAL.
+// After E572 mov r15 @ `0x532b74`. NOT modelled: je @ `0x532b7b..` (E574 unit). G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
