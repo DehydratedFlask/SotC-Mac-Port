@@ -2620,3 +2620,18 @@ target_link_libraries(sotc_vtable_15ed2a0_slot_c0 PUBLIC sotc_core)
 add_executable(test_vtable_15ed2a0_slot_c0 tests/test_vtable_15ed2a0_slot_c0_e26f90.cpp)
 target_link_libraries(test_vtable_15ed2a0_slot_c0 PRIVATE sotc_vtable_15ed2a0_slot_c0)
 add_test(NAME vtable_15ed2a0_slot_c0 COMMAND test_vtable_15ed2a0_slot_c0)
+
+# CPU-01-AOT-CFG-SCALE-01: checked guest-memory window for retail frame marshalling.
+add_library(sotc_guest_memory STATIC core/guest_memory.cpp)
+target_link_libraries(sotc_guest_memory PUBLIC sotc_core)
+add_executable(test_guest_memory tests/test_guest_memory.cpp)
+target_link_libraries(test_guest_memory PRIVATE sotc_guest_memory)
+add_test(NAME guest_memory COMMAND test_guest_memory)
+
+# CPU-01-AOT-CFG-SCALE-01: guest-address -> host-cell marshalling for the retail thunk layer.
+add_library(sotc_retail_cells STATIC core/retail_cells.cpp)
+target_link_libraries(sotc_retail_cells PUBLIC sotc_guest_memory sotc_vtable_1594dc0_slot20
+  sotc_vtable_resolved_bodies_2 sotc_vtable_15949a0_slot88)
+add_executable(test_retail_cells tests/test_retail_cells.cpp)
+target_link_libraries(test_retail_cells PRIVATE sotc_retail_cells)
+add_test(NAME retail_cells COMMAND test_retail_cells)

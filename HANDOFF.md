@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 12:20 CDT (root) — guest-memory marshalling for the retail thunk layer (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`, marshalling card. Added `native/core/guest_memory.{hpp,cpp}`: a checked guest window (`base`, `guest_base`, `size`) with `read_u8/u32/u64`, `write_u8/u32/u64` and a bounded `read_cstr`, returning explicit `no_window` / `out_of_range` / `unterminated_string` statuses instead of touching memory.
+- **Adapters:** `native/core/retail_cells.{hpp,cpp}` turns guest addresses into the host cells the models need — `marshal_20d60` (once flag at `self+0x18`, global cell), `marshal_358c0` (table `self+0x20`, copy `self+0x10`, source `source+0x10`), `marshal_13d20` (`self+0x1c` dword) and `marshal_187c0` (self plus a range check).
+- **Fixture:** `test_guest_memory` (empty window, read/write round-trip, bounds incl. exact end, string limits, status names) and `test_retail_cells` (12 checks that drive the **real models** through marshalled cells: once-flag set, table/copy written, setter value stored, out-of-range and no-window rejects).
+- **Checker:** `tools/lift/check_retail_cells.py` requires every adapter offset to be the constant its model header declares, forbids bare `self + 0x…` numbers, and checks the CMake targets.
+- **Verification (PASSED):** build exit 0; CTest **517/517**; lift checkers **709 passed / 0 failed**.
+- **Limits:** the window is caller-provided host storage, not the PS4 address space; only four targets have adapters; a retail call still needs the frame marshaller to build `RetailFrame` arguments and the remaining 13 cells.
+- **Next exact action:** adapters for the remaining targets (start with the 1-arg `0x2687b0`/`0x1bf710` teardowns), or wire `retail_abi` + `retail_cells` into a single `call_resolved(RetailFrame&, GuestWindow&)` entry point.
+
 ## 2026-11-02 11:30 CDT (root) — 573-seed constructor sweep complete: 24 new sites, new target 0xe26f90 (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. The full constructor sweep finished: **573 seeds, 24 new resolved sites**, and an independent re-verification (`tools/lift/verify_frontier_sweep.py`) accepted **24/24** (slot qword + type-8 addend; no rejects).
