@@ -1,7 +1,7 @@
 // Init `0x531d60` registry mov r13,[r12+0x40] OBS `0x532bae..0x532bb3` (5 B):
 //   mov r13,[r12+0x40]   ; fall-through after jne @ `0x532bac`
 //
-// After E589 jne @ `0x532bac`. NOT modelled: lea @ `0x532bb3..`. G1 PARTIAL.
+// After E589 jne @ `0x532bac`. NOT modelled: E591 lea @ `0x532bb3` / tail @ `0x532bba..`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
