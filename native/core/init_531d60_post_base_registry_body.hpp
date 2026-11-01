@@ -17,7 +17,7 @@
 #include "init_531d60_post_base_mov_r14_mem_rsp48_532b60_u1.hpp"
 #include "init_531d60_post_base_cmp_r13_r14_532b65_u1.hpp"
 #include "init_531d60_post_base_je_532bba_532b68_u1.hpp"
-#include "init_531d60_post_base_lea_rsi_rsp10_532b6a_u1.hpp"
+#include "init_531d60_post_base_nopw_532b6a_u1.hpp"
 #include "init_531d60_post_base_mov_rbx_r13_10_532b70_u1.hpp"
 #include "init_531d60_post_base_mov_r15_r13_18_532b74_u1.hpp"
 #include "init_531d60_post_base_cmp_r15_r11_532b78_u1.hpp"
@@ -47,10 +47,9 @@
 #include "init_531d60_post_base_mov_rdi_mem_r12_20_532bcc_u1.hpp"
 #include "init_531d60_post_base_test_rdi_rdi_532bd1_u1.hpp"
 #include "init_531d60_post_base_je_532bdb_532bd4_u1.hpp"
-#include "init_531d60_post_base_mov_rax_rdi_mem_532bd6_u1.hpp"
-#include "init_531d60_post_base_mov_r13_8_rax_532bd9_u1.hpp"
-#include "init_531d60_post_base_mov_rax_rdi_mem_532bde_u1.hpp"
-#include "init_531d60_post_base_sub_eax_010cb932_532be1_u1.hpp"
+#include "init_531d60_post_base_call_170c0_532bd6_u1.hpp"
+#include "init_531d60_post_base_mov_rdi_mem_r12_532bdb_u1.hpp"
+#include "init_531d60_post_base_mov_r13_15fe518_532bdf_u1.hpp"
 #include "init_531d60_post_base_je_532bf0_532be6_u1.hpp"
 #include "init_531d60_post_base_call_170c0_532beb_u1.hpp"
 #include "init_531d60_post_base_mov_rdi_r12_532bf0_u1.hpp"
@@ -117,9 +116,9 @@ static_assert(kInit531d60PostBaseMovR14MemRsp48_532b60_U1EndRva ==
 static_assert(kInit531d60PostBaseCmpR13R14_532b65_U1EndRva ==
                   kInit531d60PostBaseJe532bba_532b68_U1Rva);
 static_assert(kInit531d60PostBaseJe532bba_532b68_U1EndRva ==
-                  kInit531d60PostBaseLeaRsiRsp10_532b6a_U1Rva);
-static_assert(kInit531d60PostBaseMovRbxR13_10_532b70_U1Rva ==
-                  kInit531d60PostBaseLeaRsiRsp10_532b6a_U1EndRva + 1);
+                  kInit531d60PostBaseNopw_532b6a_U1Rva);
+static_assert(kInit531d60PostBaseNopw_532b6a_U1EndRva ==
+                  kInit531d60PostBaseMovRbxR13_10_532b70_U1Rva);
 static_assert(kInit531d60PostBaseMovRbxR13_10_532b70_U1EndRva ==
                   kInit531d60PostBaseMovR15R13_18_532b74_U1Rva);
 static_assert(kInit531d60PostBaseMovR15R13_18_532b74_U1EndRva ==
@@ -177,14 +176,12 @@ static_assert(kInit531d60PostBaseMovRdiMemR12_20_532bcc_U1EndRva ==
 static_assert(kInit531d60PostBaseTestRdiRdi_532bd1_U1EndRva ==
                   kInit531d60PostBaseJe532bdb_532bd4_U1Rva);
 static_assert(kInit531d60PostBaseJe532bdb_532bd4_U1EndRva ==
-                  kInit531d60PostBaseMovRaxRdiMem_532bd6_U1Rva);
-static_assert(kInit531d60PostBaseMovRaxRdiMem_532bd6_U1EndRva ==
-                  kInit531d60PostBaseMovR13_8_Rax_532bd9_U1Rva);
-static_assert(kInit531d60PostBaseMovR13_8_Rax_532bd9_U1EndRva ==
-                  kInit531d60PostBaseMovRaxRdiMem_532bde_U1Rva);
-static_assert(kInit531d60PostBaseMovRaxRdiMem_532bde_U1EndRva ==
-                  kInit531d60PostBaseSubEax_010cb932_532be1_U1Rva);
-static_assert(kInit531d60PostBaseSubEax_010cb932_532be1_U1EndRva ==
+                  kInit531d60PostBaseCall170c0_532bd6_U1Rva);
+static_assert(kInit531d60PostBaseCall170c0_532bd6_U1EndRva ==
+                  kInit531d60PostBaseMovRdiMemR12_532bdb_U1Rva);
+static_assert(kInit531d60PostBaseMovRdiMemR12_532bdb_U1EndRva ==
+                  kInit531d60PostBaseMovR13_15fe518_532bdf_U1Rva);
+static_assert(kInit531d60PostBaseMovR13_15fe518_532bdf_U1EndRva ==
                   kInit531d60PostBaseJe532bf0_532be6_U1Rva);
 static_assert(kInit531d60PostBaseJe532bf0_532be6_U1EndRva ==
                   kInit531d60PostBaseCall170c0_532beb_U1Rva);
@@ -224,7 +221,7 @@ enum class RegistryBodyUnit : int {
     mov_r14_mem_rsp48_532b60_u1,
     cmp_r13_r14_532b65_u1,
     je_532bba_532b68_u1,
-    lea_rsi_rsp10_532b6a_u1,
+    nopw_532b6a_u1,
     mov_rbx_r13_10_532b70_u1,
     mov_r15_r13_18_532b74_u1,
     cmp_r15_r11_532b78_u1,
@@ -254,10 +251,9 @@ enum class RegistryBodyUnit : int {
     mov_rdi_mem_r12_20_532bcc_u1,
     test_rdi_rdi_532bd1_u1,
     je_532bdb_532bd4_u1,
-    mov_rax_rdi_mem_532bd6_u1,
-    mov_r13_8_rax_532bd9_u1,
-    mov_rax_rdi_mem_532bde_u1,
-    sub_eax_010cb932_532be1_u1,
+    call_170c0_532bd6_u1,
+    mov_rdi_mem_r12_532bdb_u1,
+    mov_r13_15fe518_532bdf_u1,
     je_532bf0_532be6_u1,
     call_170c0_532beb_u1,
     mov_rdi_r12_532bf0_u1,
@@ -292,7 +288,7 @@ struct Init531d60PostBaseRegistryBodyHooks {
     bool merge_mov_r14_mem_rsp48_532b60_u1_ran = false;
     bool merge_cmp_r13_r14_532b65_u1_ran = false;
     bool merge_je_532bba_532b68_u1_ran = false;
-    bool merge_lea_rsi_rsp10_532b6a_u1_ran = false;
+    bool merge_nopw_532b6a_u1_ran = false;
     bool merge_mov_rbx_r13_10_532b70_u1_ran = false;
     bool merge_mov_r15_r13_18_532b74_u1_ran = false;
     bool merge_cmp_r15_r11_532b78_u1_ran = false;
@@ -322,10 +318,9 @@ struct Init531d60PostBaseRegistryBodyHooks {
     bool merge_mov_rdi_mem_r12_20_532bcc_u1_ran = false;
     bool merge_test_rdi_rdi_532bd1_u1_ran = false;
     bool merge_je_532bdb_532bd4_u1_ran = false;
-    bool merge_mov_rax_rdi_mem_532bd6_u1_ran = false;
-    bool merge_mov_r13_8_rax_532bd9_u1_ran = false;
-    bool merge_mov_rax_rdi_mem_532bde_u1_ran = false;
-    bool merge_sub_eax_010cb932_532be1_u1_ran = false;
+    bool merge_call_170c0_532bd6_u1_ran = false;
+    bool merge_mov_rdi_mem_r12_532bdb_u1_ran = false;
+    bool merge_mov_r13_15fe518_532bdf_u1_ran = false;
     bool merge_je_532bf0_532be6_u1_ran = false;
     bool merge_call_170c0_532beb_u1_ran = false;
     bool merge_mov_rdi_r12_532bf0_u1_ran = false;
@@ -359,7 +354,6 @@ struct Init531d60PostBaseRegistryBodyHooks {
     Init531d60PostBaseMovR14MemRsp48_532b60_U1Cells mov_r14_mem_rsp48_cells{};
     Init531d60PostBaseCmpR13R14_532b65_U1Cells cmp_r13_r14_cells{};
     Init531d60PostBaseJe532bba_532b68_U1Cells je_532bba_cells{};
-    Init531d60PostBaseLeaRsiRsp10_532b6a_U1Cells lea_rsi_rsp10_cells{};
     Init531d60PostBaseMovRbxR13_10_532b70_U1Cells mov_rbx_r13_10_cells{};
     Init531d60PostBaseMovR15R13_18_532b74_U1Cells mov_r15_r13_18_cells{};
     Init531d60PostBaseCmpR15R11_532b78_U1Cells cmp_r15_r11_cells{};
@@ -389,10 +383,9 @@ struct Init531d60PostBaseRegistryBodyHooks {
     Init531d60PostBaseMovRdiMemR12_20_532bcc_U1Cells mov_rdi_mem_r12_20_532bcc_cells{};
     Init531d60PostBaseTestRdiRdi_532bd1_U1Cells test_rdi_rdi_532bd1_cells{};
     Init531d60PostBaseJe532bdb_532bd4_U1Cells je_532bdb_532bd4_cells{};
-    Init531d60PostBaseMovRaxRdiMem_532bd6_U1Cells mov_rax_rdi_mem_532bd6_cells{};
-    Init531d60PostBaseMovR13_8_Rax_532bd9_U1Cells mov_r13_8_rax_532bd9_cells{};
-    Init531d60PostBaseMovRaxRdiMem_532bde_U1Cells mov_rax_rdi_mem_532bde_cells{};
-    Init531d60PostBaseSubEax_010cb932_532be1_U1Cells sub_eax_010cb932_532be1_cells{};
+    Init531d60PostBaseCall170c0_532bd6_U1Cells call_170c0_532bd6_cells{};
+    Init531d60PostBaseMovRdiMemR12_532bdb_U1Cells mov_rdi_mem_r12_532bdb_cells{};
+    Init531d60PostBaseMovR13_15fe518_532bdf_U1Cells mov_r13_15fe518_532bdf_cells{};
     Init531d60PostBaseJe532bf0_532be6_U1Cells je_532bf0_532be6_cells{};
     Init531d60PostBaseCall170c0_532beb_U1Cells call_170c0_532beb_cells{};
     Init531d60PostBaseMovRdiR12_532bf0_U1Cells mov_rdi_r12_532bf0_cells{};
@@ -405,7 +398,7 @@ struct Init531d60PostBaseRegistryBodyHooks {
 
 struct Init531d60PostBaseRegistryBodyResult {
     bool ok = false;
-    std::array<int, 62> unit_counts{};
+    std::array<int, 61> unit_counts{};
     int unit_executed = 0;
     int call_54dc10_count = 0;
     int mov_rbx_rax_count = 0;
@@ -426,7 +419,7 @@ struct Init531d60PostBaseRegistryBodyResult {
     int mov_r14_mem_rsp48_count = 0;
     int cmp_r13_r14_count = 0;
     int je_532bba_count = 0;
-    int lea_rsi_rsp10_count = 0;
+    int nopw_532b6a_count = 0;
     int mov_rbx_r13_10_count = 0;
     int mov_r15_r13_18_count = 0;
     int cmp_r15_r11_count = 0;
@@ -465,14 +458,11 @@ struct Init531d60PostBaseRegistryBodyResult {
     void* rdi_from_r12_20 = nullptr;
     int test_rdi_rdi_count = 0;
     int je_532bdb_count = 0;
-    int mov_rax_rdi_mem_532bd6_count = 0;
-    void* rax_from_rdi_mem_532bd6 = nullptr;
-    int mov_r13_8_rax_532bd9_count = 0;
-    void* rax_stored_r13_8 = nullptr;
-    int mov_rax_rdi_mem_532bde_count = 0;
-    void* rax_from_rdi_mem_532bde = nullptr;
-    int sub_eax_010cb932_532be1_count = 0;
-    std::uint32_t eax_after_sub_532be1 = 0;
+    int call_170c0_532bd6_count = 0;
+    int mov_rdi_mem_r12_532bdb_count = 0;
+    void* rdi_from_r12_mem_532bdb = nullptr;
+    int mov_r13_rip_532bdf_count = 0;
+    void* r13_from_guard_532bdf = nullptr;
     int je_532bf0_532be6_count = 0;
     bool je_532bf0_branch_taken = false;
     bool je_532bf0_branch_outcome_modelled = false;
@@ -518,7 +508,6 @@ struct Init531d60PostBaseRegistryBodyResult {
     bool jne_532b80_branch_outcome_modelled = false;
     bool je_532ba5_branch_taken = false;
     bool je_532ba5_branch_outcome_modelled = false;
-    void* rsi_from_rsp10_lea = nullptr;
     void* rbx_from_r13_10 = nullptr;
     void* rbx_from_r13_10_post_jne = nullptr;
     void* r15_from_r13_18 = nullptr;

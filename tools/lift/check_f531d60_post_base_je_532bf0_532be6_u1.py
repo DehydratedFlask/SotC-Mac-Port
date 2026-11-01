@@ -19,7 +19,7 @@ FRAG_BYTES = bytes.fromhex("4885ff7405")
 FRAG_SHA256 = "201be5646f38f1b81ff370448d95d65ff330b608b531be7015cc5d3764f5e6b7"
 END = 0x532BEB
 NATIVE = ROOT / "native/core/init_531d60_post_base_je_532bf0_532be6_u1.hpp"
-PREV_NATIVE = ROOT / "native/core/init_531d60_post_base_sub_eax_010cb932_532be1_u1.hpp"
+PREV_NATIVE = ROOT / "native/core/init_531d60_post_base_mov_r13_15fe518_532bdf_u1.hpp"
 BODY = ROOT / "native/core/init_531d60_post_base_registry_body.hpp"
 REG = ROOT / "native/core/registry_init_531d60.hpp"
 CMAKE = ROOT / "native/CMakeLists.txt"
@@ -37,8 +37,8 @@ def main() -> int:
     img = d.Image(elf, ph)
 
     require(
-        "kInit531d60PostBaseSubEax_010cb932_532be1_U1EndRva = 0x532be6" in PREV_NATIVE.read_text(),
-        "sub eax end == test/je start",
+        "kInit531d60PostBaseMovR13_15fe518_532bdf_U1EndRva = 0x532be6" in PREV_NATIVE.read_text(),
+        "mov r13 end == test/je start",
     )
     require(PREV_END == FRAG, "contiguous")
     frag = img.read(FRAG, FRAG_SIZE)

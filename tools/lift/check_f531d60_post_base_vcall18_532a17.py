@@ -50,7 +50,7 @@ def main() -> int:
     require(frag[8:11] == bytes.fromhex("4c89f7"), "mov rdi,r14")
     require(frag[11:14] == bytes.fromhex("ff5018"), "call [rax+0x18]")
     require(VCALL == FRAG + 11, "vcall site")
-    require(img.read(END, 4)[0:3] == bytes.fromhex("488b7d"), "next mov rdi,[r13]")
+    require(img.read(END, 4) == bytes.fromhex("498b7d00"), "next mov rdi,[r13]")
 
     nh = NATIVE.read_text()
     require("init_531d60_post_base_vcall18_532a17" in nh, "API")

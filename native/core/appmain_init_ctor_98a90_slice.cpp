@@ -648,8 +648,8 @@ void run_remainder_after_registry_tail(
     if (out.post_base_registry_body.je_532bba_count == 1) {
         registry_hooks.merge_je_532bba_532b68_u1_ran = true;
     }
-    if (out.post_base_registry_body.lea_rsi_rsp10_count == 1) {
-        registry_hooks.merge_lea_rsi_rsp10_532b6a_u1_ran = true;
+    if (out.post_base_registry_body.nopw_532b6a_count == 1) {
+        registry_hooks.merge_nopw_532b6a_u1_ran = true;
     }
     if (out.post_base_registry_body.mov_rbx_r13_10_count == 1) {
         registry_hooks.merge_mov_rbx_r13_10_532b70_u1_ran = true;
@@ -733,17 +733,14 @@ void run_remainder_after_registry_tail(
     if (out.post_base_registry_body.je_532bdb_count == 1) {
         registry_hooks.merge_je_532bdb_532bd4_u1_ran = true;
     }
-    if (out.post_base_registry_body.mov_rax_rdi_mem_532bd6_count == 1) {
-        registry_hooks.merge_mov_rax_rdi_mem_532bd6_u1_ran = true;
+    if (out.post_base_registry_body.call_170c0_532bd6_count == 1) {
+        registry_hooks.merge_call_170c0_532bd6_u1_ran = true;
     }
-    if (out.post_base_registry_body.mov_r13_8_rax_532bd9_count == 1) {
-        registry_hooks.merge_mov_r13_8_rax_532bd9_u1_ran = true;
+    if (out.post_base_registry_body.mov_rdi_mem_r12_532bdb_count == 1) {
+        registry_hooks.merge_mov_rdi_mem_r12_532bdb_u1_ran = true;
     }
-    if (out.post_base_registry_body.mov_rax_rdi_mem_532bde_count == 1) {
-        registry_hooks.merge_mov_rax_rdi_mem_532bde_u1_ran = true;
-    }
-    if (out.post_base_registry_body.sub_eax_010cb932_532be1_count == 1) {
-        registry_hooks.merge_sub_eax_010cb932_532be1_u1_ran = true;
+    if (out.post_base_registry_body.mov_r13_rip_532bdf_count == 1) {
+        registry_hooks.merge_mov_r13_15fe518_532bdf_u1_ran = true;
     }
     if (out.post_base_registry_body.je_532bf0_532be6_count == 1) {
         registry_hooks.merge_je_532bf0_532be6_u1_ran = true;

@@ -83,7 +83,7 @@ struct RegistryInit531d60Hooks {
     bool merge_mov_r14_mem_rsp48_532b60_u1_ran = false;
     bool merge_cmp_r13_r14_532b65_u1_ran = false;
     bool merge_je_532bba_532b68_u1_ran = false;
-    bool merge_lea_rsi_rsp10_532b6a_u1_ran = false;
+    bool merge_nopw_532b6a_u1_ran = false;
     bool merge_mov_rbx_r13_10_532b70_u1_ran = false;
     bool merge_mov_r15_r13_18_532b74_u1_ran = false;
     bool merge_cmp_r15_r11_532b78_u1_ran = false;
@@ -113,10 +113,9 @@ struct RegistryInit531d60Hooks {
     bool merge_mov_rdi_mem_r12_20_532bcc_u1_ran = false;
     bool merge_test_rdi_rdi_532bd1_u1_ran = false;
     bool merge_je_532bdb_532bd4_u1_ran = false;
-    bool merge_mov_rax_rdi_mem_532bd6_u1_ran = false;
-    bool merge_mov_r13_8_rax_532bd9_u1_ran = false;
-    bool merge_mov_rax_rdi_mem_532bde_u1_ran = false;
-    bool merge_sub_eax_010cb932_532be1_u1_ran = false;
+    bool merge_call_170c0_532bd6_u1_ran = false;
+    bool merge_mov_rdi_mem_r12_532bdb_u1_ran = false;
+    bool merge_mov_r13_15fe518_532bdf_u1_ran = false;
     bool merge_je_532bf0_532be6_u1_ran = false;
     bool merge_call_170c0_532beb_u1_ran = false;
     bool merge_mov_rdi_r12_532bf0_u1_ran = false;
