@@ -2492,3 +2492,14 @@ target_link_libraries(sotc_pm4_indirect PUBLIC sotc_pm4_decoder)
 add_executable(test_pm4_indirect tests/test_pm4_indirect.cpp)
 target_link_libraries(test_pm4_indirect PRIVATE sotc_pm4_indirect)
 add_test(NAME pm4_indirect COMMAND test_pm4_indirect)
+
+# GPU-01-PM4-TRANSLATOR-01 slice 4: encode the typed draw list into one Metal render pass.
+add_library(sotc_metal_draw_encoder STATIC platform/metal_draw_encoder.mm)
+target_compile_options(sotc_metal_draw_encoder PRIVATE -Wall -Wextra -Werror)
+target_link_libraries(sotc_metal_draw_encoder PUBLIC sotc_pm4_indirect
+  "-framework Metal"
+  "-framework Foundation")
+add_executable(test_metal_draw_encoder tests/test_metal_draw_encoder.cpp)
+target_link_libraries(test_metal_draw_encoder PRIVATE sotc_metal_draw_encoder sotc_pm4_indirect)
+add_test(NAME metal_draw_encoder COMMAND test_metal_draw_encoder)
+set_tests_properties(metal_draw_encoder PROPERTIES SKIP_RETURN_CODE 77)

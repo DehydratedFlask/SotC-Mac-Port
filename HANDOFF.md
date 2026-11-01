@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 17:00 CDT (root) — Metal encoder for the typed draw list (FIXTURE_VERIFIED)
+
+- **Task:** `GPU-01-PM4-TRANSLATOR-01` slice 4. `native/platform/metal_draw_encoder.{hpp,mm}`: takes the `pm4::DrawCommand` list, starts **one** offscreen render pass (`BGRA8Unorm`, clear black), and issues one **indexed** `drawIndexedPrimitives` per typed draw through `MTLRenderCommandEncoder`; colour is derived from the draw kind and dimmed to 25% when the count is 0, so the readback proves which draws were issued. RGBA readback + FNV digest for cheap equality checks.
+- **No Vulkan/MoltenVK/OpenGL:** `MTLCreateSystemDefaultDevice`, `newLibraryWithSource`, one `MTLCommandQueue` and `getBytes` only.
+- **Fixture:** `native/tests/test_metal_draw_encoder.cpp` — 6 cases (typed list from a real `pm4::traverse` stream, band colours/alpha at four probes, clear-only black, `DrawKind::none` skip, null-list and zero-target rejection); exits 77 when the host has no device, like the other Metal fixtures. `tools/lift/check_metal_draw_encoder.py` re-derives the 4-band colour contract independently from the encoder's `--probe` output.
+- **Mutation probe:** swapping the `index_auto` colour fails "band red"/"band green".
+- **Verification (PASSED):** configure/build exit 0; CTest **499/499**; lift checkers **690 passed / 0 failed**.
+- **Limits:** synthetic geometry only — this proves the encoder seam, not a game frame. No game shaders, pipelines, resource bindings or GNM state. G3 remains NOT RUN; no boot/audio/save claim.
+
 ## 2026-11-01 16:30 CDT (root) — native service map (STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `PLAT-01-SERVICE-MAP-01` COMPLETE. `docs/SERVICE_MAP.md` + generated `docs/service_map.json` classify the pinned import manifest into **22 service areas** over **51 libraries / 588 imports**: libc 186, gnm 103, kernel 66, net 61, file_io 34, video_out 21, save 20, audio_out 18, input 18, dialog 16, ngs2 11, fiber 8, remainder small.
