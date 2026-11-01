@@ -183,3 +183,24 @@ tests **FIXTURE_VERIFIED**, census **STATIC_ANALYSIS_VERIFIED**, G3 NOT RUN.
   in private `local/`.
 - Metallib linking was byte-identical across runs on this machine/toolchain only; the tool records
   what the compiler produced, not MSL semantics.
+
+## Decoder widening 3 (MUBUF dword forms, VOPC integer cmpx)
+
+- **Added:** MUBUF 12/13/14 (`buffer_load_dword`, `dwordx2`, `dwordx4`) and 15/16/17
+  (`buffer_store_dword`, `x2`, `x4`) with explicit component counts (1/2/4 — GFX7 has no
+  `dwordx3`), plus VOPC 208–213 (`v_cmpx_{f,lt,eq,le,gt,ne}_u32`), values cross-checked against the
+  pinned shadPS4 frontend table (`209 = V_CMPX_LT_U32`, `212 = V_CMPX_GT_U32`).
+- **Test coverage:** `test_gcn_inventory.py` gained a positive case for each row and negatives for
+  MUBUF 11/18 and VOPC 207/214, which still reject.
+- **Measured at sample 512** (`--out local/validation/msl-coverage/after-opcodes-3`):
+
+| Metric | before (v3) | after (v4) |
+|---|---:|---:|
+| Programs decoded / attempted | 75 / 367 | **162 / 367** |
+| Instructions in decoded programs | 654 | **5,168** |
+| Decode-error programs | 292 | **205** |
+| Members with ≥1 decoded program | 71 | 71+ (see coverage.json) |
+
+- **New top blockers:** `SOPP 8` 117, `VINTRP 2` 48, `VOP3 350` 16, `SOPP 5` 5, `VOP2 5` 5.
+- **Limit:** decoding still says nothing about Metal semantics; 0 real shaders are lowered, because
+  no per-shader ABI manifest exists.

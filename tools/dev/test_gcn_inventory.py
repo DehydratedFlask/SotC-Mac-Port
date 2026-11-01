@@ -156,6 +156,32 @@ class EncodingOracleTests(unittest.TestCase):
         i = one(vopc(op=16, src0=255, literal=0x3f800000))
         self.assertEqual((i.size, i.fields['literal']), (8, 0x3f800000))
 
+    def test_integer_cmpx_and_dword_buffers(self):
+        # VOPC 208..213 are the integer `cmpx` compares; they overwrite EXEC like the f32 cmpx set.
+        i = one(vopc(op=209, src0=257, src1=2))
+        self.assertEqual((i.encoding, i.opcode, i.mnemonic, i.size),
+                         ('VOPC', 209, 'v_cmpx_lt_u32', 4))
+        self.assertEqual(i.requirements, ('writes_exec_mask',))
+        self.assertEqual(one(vopc(op=212)).mnemonic, 'v_cmpx_gt_u32')
+        self.assertEqual(one(vopc(op=208)).mnemonic, 'v_cmpx_f_u32')
+        self.assertEqual(one(vopc(op=213)).mnemonic, 'v_cmpx_ne_u32')
+
+        # MUBUF dword forms: 12/13/14 load 1/2/4 components; 15..17 store them.
+        load = one(mubuf(op=14, data=17, addr=59, resource=6))
+        self.assertEqual((load.mnemonic, load.fields['components']), ('buffer_load_dwordx4', 4))
+        self.assertEqual(one(mubuf(op=12)).fields['components'], 1)
+        self.assertEqual(one(mubuf(op=13)).fields['components'], 2)
+        self.assertEqual(one(mubuf(op=15)).mnemonic, 'buffer_store_dword')
+        self.assertEqual(one(mubuf(op=17)).fields['components'], 4)
+
+        # Neighbouring rows stay unsupported: no dwordx3, no store_format_xyzw in this table.
+        for opcode in (11, 18):
+            with self.assertRaises(gcn.DecodeError):
+                one(mubuf(op=opcode))
+        for opcode in (207, 214):
+            with self.assertRaises(gcn.DecodeError):
+                one(vopc(op=opcode))
+
     def test_scalar_memory_register_and_literal_offsets(self):
         # IMM=1 is the byte-immediate offset; IMM=0 makes OFFSET an SGPR selector and
         # selector 255 consumes the following dword (same width rule as SOP1 literals).

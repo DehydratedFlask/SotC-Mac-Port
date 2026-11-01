@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 21:40 CDT (root) — MSL decoder v4: MUBUF dword + integer cmpx (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01`, decoder widening card 4. Added MUBUF 12/13/14 (`buffer_load_dword`, `dwordx2`, `dwordx4`) and 15/16/17 (stores) with **explicit component counts** (1/2/4; GFX7 has no `dwordx3`), and VOPC 208-213 integer `cmpx` compares. The VOPC values are cross-checked against the pinned shadPS4 frontend table (`209 = V_CMPX_LT_U32`, `212 = V_CMPX_GT_U32`).
+- **Tests:** `test_gcn_inventory.py` is 36 tests, with positives for every new row and negatives proving MUBUF 11/18 and VOPC 207/214 still reject; `test_gcn_to_msl.py` 23 tests still pass.
+- **Coverage at sample 512** (`local/validation/msl-coverage/after-opcodes-3`): decoded programs **75 → 162 of 367**, instructions **654 → 5,168**, decode-error **292 → 205**. New top blockers: `SOPP 8` 117, `VINTRP 2` 48, `VOP3 350` 16, `SOPP 5` 5, `VOP2 5` 5.
+- **Still zero lowered:** decoding is not Metal semantics, and no per-shader ABI manifest exists.
+- **Verification (PASSED):** build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Next exact action:** `SOPP 8` (117 first-blockers) and `VINTRP 2` (48) are the next decoder rows; `VINTRP 2` needs a matching lowering change before it can be admitted.
+
 ## 2026-11-02 20:45 CDT (root) — guest stack arena replaces host scratch (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `RetailStack { top, size }` to `RetailCallContext` and `retail_stack_alloc` (down-growing, aligned, bounds-checked, `sp` untouched on failure) plus a `stack_unavailable` status.

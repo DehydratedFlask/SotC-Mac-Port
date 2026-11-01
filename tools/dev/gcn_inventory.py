@@ -25,7 +25,7 @@ import struct
 import sys
 
 ISA_URL = 'https://docs.amd.com/v/u/en-US/sea-islands-instruction-set-architecture_0'
-VERSION = 'gfx7-bounded-inventory-v3'
+VERSION = 'gfx7-bounded-inventory-v4'
 
 # These are encoding facts, not a translation/semantic implementation.
 # SOP2/SOPC/VOPC rows below are opcode-value facts from the GFX7 ISA tables,
@@ -77,14 +77,26 @@ OPCODES = {
              22: 'v_cmpx_ge_f32', 23: 'v_cmpx_o_f32', 24: 'v_cmpx_u_f32',
              25: 'v_cmpx_nge_f32', 26: 'v_cmpx_nlg_f32', 27: 'v_cmpx_ngt_f32',
              28: 'v_cmpx_nle_f32', 29: 'v_cmpx_neq_f32', 30: 'v_cmpx_nlt_f32',
-             31: 'v_cmpx_t_f32'},
+             31: 'v_cmpx_t_f32',
+             # Integer compares (the `cmpx` half). Values cross-checked against the pinned
+             # shadPS4 frontend table: 208 V_CMPX_F_U32 .. 213 V_CMPX_NE_U32.
+             208: 'v_cmpx_f_u32', 209: 'v_cmpx_lt_u32', 210: 'v_cmpx_eq_u32',
+             211: 'v_cmpx_le_u32', 212: 'v_cmpx_gt_u32', 213: 'v_cmpx_ne_u32'},
     'VINTRP': {0: 'v_interp_p1_f32', 1: 'v_interp_p2_f32'},
     'MUBUF': {0: 'buffer_load_format_x', 1: 'buffer_load_format_xy',
               2: 'buffer_load_format_xyz',
-              3: 'buffer_load_format_xyzw'},
+              3: 'buffer_load_format_xyzw',
+              12: 'buffer_load_dword', 13: 'buffer_load_dwordx2',
+              14: 'buffer_load_dwordx4',
+              15: 'buffer_store_dword', 16: 'buffer_store_dwordx2',
+              17: 'buffer_store_dwordx4'},
     'MIMG': {32: 'image_sample'},
     'EXP': {0: 'exp'},
 }
+
+# MUBUF component counts per modelled opcode (format loads/stores 1..4, dword forms 1/2/4).
+MUBUF_COMPONENTS = {0: 1, 1: 2, 2: 3, 3: 4, 4: 1, 5: 2, 6: 3, 7: 4,
+                    12: 1, 13: 2, 14: 4, 15: 1, 16: 2, 17: 4}
 
 # SOP2 operand widths: 64-bit destination, 64-bit first source, 64-bit second source.
 # The shift/bitfield forms take 64-bit values but a 32-bit shift/bitfield descriptor, so
@@ -322,10 +334,14 @@ def _validate(form: str, op: int, f: dict[str, int], at: int) -> tuple[str, ...]
     elif form == 'VINTRP':
         requirements.add('fixed_function_interpolation')
     elif form == 'MUBUF':
-        f.update(resource_sgpr=f['srsrc'] * 4, components=op + 1)
+        # Format loads/stores take 1..4 components from the opcode; the dword forms use the
+        # explicit sizes GFX7 defines (dword 1, x2 2, x4 4). There is no dwordx3 on this ISA.
+        components = MUBUF_COMPONENTS.get(op)
+        require(components is not None, 'unsupported MUBUF opcode width')
+        f.update(resource_sgpr=f['srsrc'] * 4, components=components)
         require(f['resource_sgpr'] + 4 <= 104, 'unsupported buffer descriptor range')
         require(_source(f['soffset'], literal=False), 'unsupported buffer scalar offset')
-        require(f['vdata'] + op + 1 <= 256, 'buffer destination range overflows VGPRs')
+        require(f['vdata'] + components <= 256, 'buffer destination range overflows VGPRs')
         require(not ((f['offen'] and f['idxen'] or f['addr64']) and f['vaddr'] == 255),
                 'buffer address pair overflows VGPRs')
         if f['lds']:
