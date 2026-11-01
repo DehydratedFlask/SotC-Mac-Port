@@ -1,7 +1,7 @@
 // Init `0x531d60` registry test rbx,rbx OBS `0x532b98..0x532b9b` (3 B):
 //   test rbx,rbx   ; ZF when mov @ `0x532b94` loaded null from [r13+0x10]
 //
-// After E582 mov @ `0x532b94`. NOT modelled: je tail @ `0x532b9b..`. G1 PARTIAL.
+// After E582 mov @ `0x532b94`. Je @ `0x532b9b` is E584 unit `je_532ba5_532b9b_u1`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
