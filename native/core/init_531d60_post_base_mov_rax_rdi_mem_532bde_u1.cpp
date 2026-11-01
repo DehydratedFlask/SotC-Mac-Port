@@ -9,7 +9,7 @@ Init531d60PostBaseMovRaxRdiMem_532bde_U1Result init_531d60_post_base_mov_rax_rdi
     if (cells.cell_ptr != nullptr) {
         out.rax = *cells.cell_ptr;
     }
-    // Next: tail @ 0x532be1 — not modelled here.
+    // Next: E603 sub eax,0x010cb932 @ 0x532be1 — not modelled here.
     out.ok = (out.mov_rax_rdi_mem_532bde_count == 1);
     return out;
 }

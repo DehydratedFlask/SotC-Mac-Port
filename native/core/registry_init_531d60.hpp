@@ -58,7 +58,7 @@
 namespace sotc {
 
 inline constexpr std::size_t kRegistryInitObjectBytes = 0x98;
-inline constexpr std::uint64_t kRegistryInit531d60FragmentPinnedRva = 0x532be1;
+inline constexpr std::uint64_t kRegistryInit531d60FragmentPinnedRva = 0x532be6;
 
 struct RegistryInit531d60Hooks {
     bool merge_mov_edi_98_532b0c_u1_ran = false;
@@ -116,6 +116,7 @@ struct RegistryInit531d60Hooks {
     bool merge_mov_rax_rdi_mem_532bd6_u1_ran = false;
     bool merge_mov_r13_8_rax_532bd9_u1_ran = false;
     bool merge_mov_rax_rdi_mem_532bde_u1_ran = false;
+    bool merge_sub_eax_010cb932_532be1_u1_ran = false;
 };
 
 

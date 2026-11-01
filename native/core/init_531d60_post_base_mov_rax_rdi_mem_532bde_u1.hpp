@@ -1,8 +1,8 @@
 // Init `0x531d60` registry mov rax,[rdi] OBS `0x532bde..0x532be1` (3 B):
 //   mov rax,[rdi]   ; rax = vtable pointer from object in rdi (post store path)
 //
-// After E601 `mov_r13_8_rax_532bd9_u1` end @ `0x532bde`. NOT modelled: tail @
-// `0x532be1`.. G1 PARTIAL.
+// After E601 `mov_r13_8_rax_532bd9_u1` end @ `0x532bde`. Fall-through sub is E603
+// `sub_eax_010cb932_532be1_u1` @ `0x532be1` / tail @ `0x532be6`.. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
