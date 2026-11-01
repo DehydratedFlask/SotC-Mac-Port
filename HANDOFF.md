@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 21:30 CDT (root) — indirect frontier enumerated (STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01` indirect-frontier card. `tools/lift/indirect_frontier.py` reuses the FDE loader/adjacency/closure from `cfg_census.py`, lists every indirect `call`/`jmp` in the `0x531d60` closure and classifies it from a 4-instruction window.
+- **Numbers (verified):** closure **608** functions, frontier **105** functions, **499** sites = 452 calls + 47 jumps. Classes: vtable-slot 283, first-slot 96, register-offset 45, indirect-jump 47, register 15, member-pointer 2.
+- **Resolution:** **1 of 499** resolves end to end — `0x28471` `call *0x20(%rax)` with `%rax` from `lea 0x1594dc0` (file-backed vtable) → slot `0x20` = **`0x20d60`**. Corroborated by the only dynamic relocation at that slot (`0x1594de0`, type 8, addend `0x20d60`) and `0x20d60` is an FDE start.
+- **Why the rest stay unknown:** of the 12 sites with a RIP-relative global base, 8 point at BSS globals (zero in the image) and 3 have vtable pointers whose slot addresses have no relocation row (runtime-filled). The remaining 487 sites take the object pointer from an argument/return/heap walk.
+- **Gate:** `tools/lift/check_indirect_frontier.py` regenerates `docs/indirect_frontier.json` and diffs it (skips cleanly without the private disassembly).
+- **Next exact action:** add `0x20d60` to the entry map and check its ABI before calling it; everything else needs runtime capture or per-site type proofs.
+
 ## 2026-11-01 20:40 CDT (root) — .csdr loader search: negative in eboot (STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `GPU-01-CSDR-DECOMPRESSOR-RE-01` (attempt 1). Searched the pinned executable and its 6.6 M-line saved disassembly for the loader that would branch on the compressed prefix and decompress.
