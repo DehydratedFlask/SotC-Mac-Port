@@ -2524,3 +2524,13 @@ target_link_libraries(sotc_vtable_15949a0_slot88 PUBLIC sotc_core)
 add_executable(test_vtable_15949a0_slot88 tests/test_vtable_15949a0_slot88_187c0.cpp)
 target_link_libraries(test_vtable_15949a0_slot88 PRIVATE sotc_vtable_15949a0_slot88)
 add_test(NAME vtable_15949a0_slot88 COMMAND test_vtable_15949a0_slot88)
+
+# CPU-01-AOT-CFG-SCALE-01: the remaining resolved vtable slots (0x13d20, 0x358c0, 0xc740).
+add_library(sotc_vtable_resolved_bodies_2 STATIC
+  core/vtable_1594ae8_slot28_13d20.cpp
+  core/vtable_15955c0_slot08_358c0.cpp
+  core/vtable_15d1d80_slot08_c740.cpp)
+target_link_libraries(sotc_vtable_resolved_bodies_2 PUBLIC sotc_core)
+add_executable(test_vtable_resolved_bodies_2 tests/test_vtable_resolved_bodies_2.cpp)
+target_link_libraries(test_vtable_resolved_bodies_2 PRIVATE sotc_vtable_resolved_bodies_2)
+add_test(NAME vtable_resolved_bodies_2 COMMAND test_vtable_resolved_bodies_2)

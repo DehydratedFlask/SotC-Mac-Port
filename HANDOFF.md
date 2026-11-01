@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 01:00 CDT (root) — remaining three resolved targets lifted (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. All five statically resolved vtable targets now have body models.
+- **`0x13d20`** (vtable `0x1594ae8` slot `0x28`, body 4 B `89 77 1c c3`): `void f(This*, uint32 esi)` storing `esi` at `this+0x1c`; model reports previous and written value, fails visibly without a field cell.
+- **`0x358c0`** and **`0xc740`** (20 B each, same shape): install their own table address at `this+0x20` (`0x15955c0` / `0x15944a0`) and copy `[rsi+0x10]` to `this+0x10`; both fail visibly unless all three host cells are supplied.
+- **Fixture:** `test_vtable_resolved_bodies_2` — 7 cases (constants, setter success/missing field, both ctor shapes, missing cells). Mutation probe: writing `0x15944a8` instead of the installed table fails 2 checks.
+- **Checker:** `tools/lift/check_vtable_resolved_bodies_2.py` pins each body bytes/hash, the 4-byte padding, the slot qword, the single RELA row per slot (`0x1594b10`, `0x15955c8`, `0x15d1d88`), the RIP-relative `lea` target the ctor bodies install, header constants, CMake and entry-map presence.
+- **Entry map:** regenerated to **1,399 constants / 956 RVAs / 370 headers** (the three addresses were already present from earlier modules).
+- **Verification (PASSED):** build exit 0; CTest **503/503**; lift checkers **696 passed / 0 failed**.
+- **Next exact action:** the frontier now has 5/562 union sites resolved; the next bounded step is retail calling-convention thunks for those five, or a fresh frontier seed (e.g. a startup slot entry) to find more static chains.
+
 ## 2026-11-02 00:10 CDT (root) — second resolved target lifted: 0x187c0 (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_15949a0_slot88_187c0.{hpp,cpp}` for the resolved slot `0x15949a0 + 0x88 -> 0x187c0`.
