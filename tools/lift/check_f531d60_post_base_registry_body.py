@@ -7,8 +7,9 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import ps4_dynlink as d
 ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
 START, SIZE, END = 0x532B19, 197, 0x532BDE
-REGION_SHA256 = "7ba806b5310316f61544890f08e0ef2913e5aac1b020f83e09a8dcf7356c0f9a"
+REGION_SHA256 = "7cb3e27b4399e2fbe21a992b8a842ec4ba76a7aab5ef0150f30fca37ec2862ba"
 PEEL_MOV_RAX_RDI = bytes.fromhex("488b07")
+PEEL_MOV_R13_8_RAX = bytes.fromhex("48894508")
 PEEL_LEA = bytes.fromhex("488d742410")
 PEEL_MOV = bytes.fromhex("498b5d10")
 PEEL_MOV15 = bytes.fromhex("4d8b7d18")
@@ -143,6 +144,7 @@ def patched_region(img):
     data[0x532B7B-START:0x532B7D-START]=PEEL_JE
     data[0x532B7D-START:0x532B80-START]=PEEL_NOP
     data[0x532BD6-START:0x532BD9-START]=PEEL_MOV_RAX_RDI
+    data[0x532BD9-START:0x532BDE-START]=PEEL_MOV_R13_8_RAX
     return bytes(data)
 
 def unit_bytes(img,rva,sz):
@@ -173,7 +175,7 @@ def main():
     rel=struct.unpack('<i',b[1:5])[0]; require(FILL_RVA+5+rel==FILL_TARGET,'fill 0x52a220')
     nh=NATIVE.read_text()
     require('kInit531d60PostBaseRegistryBodyEndRva = 0x532bde' in nh,'end')
-    require('call_54dc10_532b19_u1' in nh and 'mov_rbx_rax_532b1e_u1' in nh and 'call_54dc20_532b21_u1' in nh and 'mov_r15_rax_532b26_u1' in nh and 'mov_rsi_rbx_532b29_u1' in nh and 'mov_edx_eax_532b2c_u1' in nh and 'call_52a220_532b2e_u1' in nh and 'lea_rbx_2efd160_532b33_u1' in nh and 'mov_r13_15fe518_532b3a_u1' in nh and 'mov_r12_rbx_532b41_u1' in nh and 'cmp_r12_r14_532b44_u1' in nh and 'je_532bfb_532b47_u1' in nh and 'test_r12_r12_532b4d_u1' in nh and 'je_532bf8_532b50_u1' in nh and 'mov_r14_mem_rsp10_532b56_u1' in nh and 'mov_r13_mem_rsp40_532b5b_u1' in nh and 'mov_r14_mem_rsp48_532b60_u1' in nh and 'cmp_r13_r14_532b65_u1' in nh and 'je_532bba_532b68_u1' in nh and 'lea_rsi_rsp10_532b6a_u1' in nh and 'mov_rbx_r13_10_532b70_u1' in nh and 'mov_r15_r13_18_532b74_u1' in nh and 'cmp_r15_r11_532b78_u1' in nh and 'je_532b98_532b7b_u1' in nh and 'nop_532b7d_u1' in nh and 'mov_rax_rbx_48_532b80_u1' in nh and 'lea_rdi_rbx_28_532b84_u1' in nh and 'vcall18_532b88_u1' in nh and 'add_rbx_58_532b8b_u1' in nh and 'cmp_r15_rbx_532b8f_u1' in nh and 'jne_532b80_532b92_u1' in nh and 'mov_rbx_r13_10_532b94_u1' in nh and 'test_rbx_rbx_532b98_u1' in nh and 'je_532ba5_532b9b_u1' in nh and 'mov_rdi_rbx_532b9d_u1' in nh and 'cmp_r13_r14_532bbf_u1' in nh and 'je_532bcc_532bc2_u1' in nh and 'mov_r13_r15_532bc4_u1' in nh and 'call_170c0_532bc7_u1' in nh and 'mov_rdi_mem_r12_20_532bcc_u1' in nh and 'test_rdi_rdi_532bd1_u1' in nh and 'je_532bdb_532bd4_u1' in nh and 'mov_rax_rdi_mem_532bd6_u1' in nh and 'mov_r13_8_rax_532bd9_u1' in nh,'unit enum')
+    require('call_54dc10_532b19_u1' in nh and 'mov_rbx_rax_532b1e_u1' in nh and 'call_54dc20_532b21_u1' in nh and 'mov_r15_rax_532b26_u1' in nh and 'mov_rsi_rbx_532b29_u1' in nh and 'mov_edx_eax_532b2c_u1' in nh and 'call_52a220_532b2e_u1' in nh and 'lea_rbx_2efd160_532b33_u1' in nh and 'mov_r13_15fe518_532b3a_u1' in nh and 'mov_r12_rbx_532b41_u1' in nh and 'cmp_r12_r14_532b44_u1' in nh and 'je_532bfb_532b47_u1' in nh and 'test_r12_r12_532b4d_u1' in nh and 'je_532bf8_532b50_u1' in nh and 'mov_r14_mem_rsp10_532b56_u1' in nh and 'mov_r13_mem_rsp40_532b5b_u1' in nh and 'mov_r14_mem_rsp48_532b60_u1' in nh and 'cmp_r13_r14_532b65_u1' in nh and 'je_532bba_532b68_u1' in nh and 'lea_rsi_rsp10_532b6a_u1' in nh and 'mov_rbx_r13_10_532b70_u1' in nh and 'mov_r15_r13_18_532b74_u1' in nh and 'cmp_r15_r11_532b78_u1' in nh and 'je_532b98_532b7b_u1' in nh and 'nop_532b7d_u1' in nh and 'mov_rax_rbx_48_532b80_u1' in nh and 'lea_rdi_rbx_28_532b84_u1' in nh and 'vcall18_532b88_u1' in nh and 'add_rbx_58_532b8b_u1' in nh and 'cmp_r15_rbx_532b8f_u1' in nh and 'jne_532b80_532b92_u1' in nh and 'mov_rbx_r13_10_532b94_u1' in nh and 'test_rbx_rbx_532b98_u1' in nh and 'je_532ba5_532b9b_u1' in nh and 'mov_rdi_rbx_532b9d_u1' in nh and 'cmp_r13_r14_532bbf_u1' in nh and 'je_532bcc_532bc2_u1' in nh and 'mov_r13_r15_532bc4_u1' in nh and 'call_170c0_532bc7_u1' in nh and 'mov_rdi_mem_r12_20_532bcc_u1' in nh and 'test_rdi_rdi_532bd1_u1' in nh and 'je_532bdb_532bd4_u1' in nh and 'mov_rax_rdi_mem_532bd6_u1' in nh,'unit enum')
     require('kInit531d60PostBaseRegistryBodyUnitCount' in nh,'unit count')
     require('merge_call_54dc10_532b19_u1_ran' in nh,'merge call')
     require('merge_mov_rbx_rax_532b1e_u1_ran' in nh,'merge mov rbx')
@@ -220,8 +222,8 @@ def main():
     require('merge_je_532bdb_532bd4_u1_ran' in nh,'merge je 532bdb 532bd4')
     require('merge_mov_rax_rdi_mem_532bd6_u1_ran' in nh,'merge mov rax rdi mem 532bd6')
     require('merge_mov_r13_8_rax_532bd9_u1_ran' in nh,'merge mov r13 8 rax 532bd9')
-    require('merge_mov_rax_rdi_mem_532bd6_u1_ran' in nh,'merge mov rax rdi mem 532bd6')
     require('mov_rax_rdi_mem_532bd6_u1' in nh,'unit enum mov rax rdi mem 532bd6')
+    require('mov_r13_8_rax_532bd9_u1' in nh,'unit enum mov r13 8 rax 532bd9')
     require('init_531d60_post_base_call_54dc10_532b19_u1' in NCPP.read_text(),'cpp call')
     require('init_531d60_post_base_mov_rbx_rax_532b1e_u1' in NCPP.read_text(),'cpp mov rbx')
     require('init_531d60_post_base_call_54dc20_532b21_u1' in NCPP.read_text(),'cpp call count')

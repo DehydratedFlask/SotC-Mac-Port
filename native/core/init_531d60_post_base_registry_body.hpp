@@ -1,4 +1,4 @@
-// Init `0x531d60` registry fragment body — OBS @ `0x532b19..0x532bd6` (49 units after E599 peel).
+// Init `0x531d60` registry fragment body — OBS @ `0x532b19..0x532bde` (51 units).
 #pragma once
 
 #include <array>
@@ -47,6 +47,8 @@
 #include "init_531d60_post_base_mov_rdi_mem_r12_20_532bcc_u1.hpp"
 #include "init_531d60_post_base_test_rdi_rdi_532bd1_u1.hpp"
 #include "init_531d60_post_base_je_532bdb_532bd4_u1.hpp"
+#include "init_531d60_post_base_mov_rax_rdi_mem_532bd6_u1.hpp"
+#include "init_531d60_post_base_mov_r13_8_rax_532bd9_u1.hpp"
 #include "init_531d60_post_base_mov_r12_rbx_532b41_u1.hpp"
 #include "init_531d60_post_base_mov_r13_15fe518_532b3a_u1.hpp"
 #include "init_531d60_post_base_call_54dc10_532b19_u1.hpp"
@@ -62,8 +64,8 @@
 namespace sotc {
 
 inline constexpr std::uint64_t kInit531d60PostBaseRegistryBodyRva = 0x532b19;
-inline constexpr std::size_t kInit531d60PostBaseRegistryBodySize = 187;
-inline constexpr std::uint64_t kInit531d60PostBaseRegistryBodyEndRva = 0x532bd4;
+inline constexpr std::size_t kInit531d60PostBaseRegistryBodySize = 197;
+inline constexpr std::uint64_t kInit531d60PostBaseRegistryBodyEndRva = 0x532bde;
 
 static_assert(kInit531d60PostBaseMovR14Rax_532b16_U1EndRva == kInit531d60PostBaseRegistryBodyRva);
 static_assert(kInit531d60PostBaseCall54dc10_532b19_U1Rva == kInit531d60PostBaseRegistryBodyRva);
@@ -162,8 +164,13 @@ static_assert(kInit531d60PostBaseCall170c0_532bc7_U1EndRva ==
 static_assert(kInit531d60PostBaseMovRdiMemR12_20_532bcc_U1EndRva ==
                   kInit531d60PostBaseTestRdiRdi_532bd1_U1Rva);
 static_assert(kInit531d60PostBaseTestRdiRdi_532bd1_U1EndRva ==
+                  kInit531d60PostBaseJe532bdb_532bd4_U1Rva);
+static_assert(kInit531d60PostBaseJe532bdb_532bd4_U1EndRva ==
+                  kInit531d60PostBaseMovRaxRdiMem_532bd6_U1Rva);
+static_assert(kInit531d60PostBaseMovRaxRdiMem_532bd6_U1EndRva ==
+                  kInit531d60PostBaseMovR13_8_Rax_532bd9_U1Rva);
+static_assert(kInit531d60PostBaseMovR13_8_Rax_532bd9_U1EndRva ==
                   kInit531d60PostBaseRegistryBodyEndRva);
-
 enum class RegistryBodyUnit : int {
     call_54dc10_532b19_u1,
     mov_rbx_rax_532b1e_u1,
@@ -213,6 +220,9 @@ enum class RegistryBodyUnit : int {
     call_170c0_532bc7_u1,
     mov_rdi_mem_r12_20_532bcc_u1,
     test_rdi_rdi_532bd1_u1,
+    je_532bdb_532bd4_u1,
+    mov_rax_rdi_mem_532bd6_u1,
+    mov_r13_8_rax_532bd9_u1,
     count
 };
 inline constexpr int kInit531d60PostBaseRegistryBodyUnitCount =
@@ -267,6 +277,9 @@ struct Init531d60PostBaseRegistryBodyHooks {
     bool merge_call_170c0_532bc7_u1_ran = false;
     bool merge_mov_rdi_mem_r12_20_532bcc_u1_ran = false;
     bool merge_test_rdi_rdi_532bd1_u1_ran = false;
+    bool merge_je_532bdb_532bd4_u1_ran = false;
+    bool merge_mov_rax_rdi_mem_532bd6_u1_ran = false;
+    bool merge_mov_r13_8_rax_532bd9_u1_ran = false;
     const void* stack_rsp = nullptr;
     InputTable551140* table_in = nullptr;
     RegistryObject2efd160* obj_in = nullptr;
@@ -320,11 +333,14 @@ struct Init531d60PostBaseRegistryBodyHooks {
     Init531d60PostBaseCall170c0_532bc7_U1Cells call_170c0_532bc7_cells{};
     Init531d60PostBaseMovRdiMemR12_20_532bcc_U1Cells mov_rdi_mem_r12_20_532bcc_cells{};
     Init531d60PostBaseTestRdiRdi_532bd1_U1Cells test_rdi_rdi_532bd1_cells{};
+    Init531d60PostBaseJe532bdb_532bd4_U1Cells je_532bdb_532bd4_cells{};
+    Init531d60PostBaseMovRaxRdiMem_532bd6_U1Cells mov_rax_rdi_mem_532bd6_cells{};
+    Init531d60PostBaseMovR13_8_Rax_532bd9_U1Cells mov_r13_8_rax_532bd9_cells{};
 };
 
 struct Init531d60PostBaseRegistryBodyResult {
     bool ok = false;
-    std::array<int, 48> unit_counts{};
+    std::array<int, 51> unit_counts{};
     int unit_executed = 0;
     int call_54dc10_count = 0;
     int mov_rbx_rax_count = 0;
@@ -383,6 +399,13 @@ struct Init531d60PostBaseRegistryBodyResult {
     int mov_rdi_mem_r12_20_532bcc_count = 0;
     void* rdi_from_r12_20 = nullptr;
     int test_rdi_rdi_count = 0;
+    int je_532bdb_count = 0;
+    int mov_rax_rdi_mem_532bd6_count = 0;
+    void* rax_from_rdi_mem_532bd6 = nullptr;
+    int mov_r13_8_rax_532bd9_count = 0;
+    void* rax_stored_r13_8 = nullptr;
+    bool je_532bdb_branch_taken = false;
+    bool je_532bdb_branch_outcome_modelled = false;
     std::uint64_t r13_from_r15_532bc4 = 0;
     void* r13_after_add_30 = nullptr;
     void* rdi_from_rbx_mov = nullptr;
