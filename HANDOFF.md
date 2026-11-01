@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 13:10 CDT (root) — `call_resolved` entry point (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`, retail call entry. Added `native/core/retail_call.{hpp,cpp}`: `call_resolved(rva, RetailFrame&, GuestWindow&, RetailCallContext)` looks the target up in `retail_abi`, marshals its cells through `retail_cells`, invokes the model, and writes `rax`.
+- **Dispatchable today:** `0x20d60`, `0x358c0`, `0x13d20`, `0x187c0` — the four targets with both an ABI row and a cell adapter. A target with an ABI row but no adapter (for example `0xe24900`) returns `unknown_target` instead of guessing.
+- **Statuses:** `unknown_target`, `no_window`, `out_of_range`, `model_failed`; every failure leaves `rax` untouched.
+- **Fixture:** 6 cases — successful `0x20d60` (once-flag set, tail hook fired, `rax = 0`), `0x13d20` writing a guest dword, `0x358c0` copying the source qword and installing the table pointer, `0x187c0` failing without an allocation contract and succeeding with one (pre-call and free hooks fire), unknown target, out-of-range self, and no-window.
+- **Checker:** `tools/lift/check_retail_call.py` requires exactly four dispatch arms, each with an ABI row and an adapter, plus the unknown-target guard and the `rax` write.
+- **Verification (PASSED):** build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Limits:** the context supplies the `0x20d60` global address and the teardown hooks; there is still no guest thread or stack model, and 13 targets lack adapters.
+- **Next exact action:** adapters for the remaining targets (start with the 1-arg teardowns `0x2687b0`/`0x1bf710`, which need only self plus an alloc contract) and one dispatch arm each.
+
 ## 2026-11-02 12:20 CDT (root) — guest-memory marshalling for the retail thunk layer (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`, marshalling card. Added `native/core/guest_memory.{hpp,cpp}`: a checked guest window (`base`, `guest_base`, `size`) with `read_u8/u32/u64`, `write_u8/u32/u64` and a bounded `read_cstr`, returning explicit `no_window` / `out_of_range` / `unterminated_string` statuses instead of touching memory.

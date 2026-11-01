@@ -2635,3 +2635,10 @@ target_link_libraries(sotc_retail_cells PUBLIC sotc_guest_memory sotc_vtable_159
 add_executable(test_retail_cells tests/test_retail_cells.cpp)
 target_link_libraries(test_retail_cells PRIVATE sotc_retail_cells)
 add_test(NAME retail_cells COMMAND test_retail_cells)
+
+# CPU-01-AOT-CFG-SCALE-01: single retail call entry point (frame + window -> model -> rax).
+add_library(sotc_retail_call STATIC core/retail_call.cpp)
+target_link_libraries(sotc_retail_call PUBLIC sotc_retail_abi sotc_retail_cells sotc_guest_memory)
+add_executable(test_retail_call tests/test_retail_call.cpp)
+target_link_libraries(test_retail_call PRIVATE sotc_retail_call)
+add_test(NAME retail_call COMMAND test_retail_call)
