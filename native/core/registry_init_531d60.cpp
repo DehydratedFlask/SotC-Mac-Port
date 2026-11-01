@@ -233,6 +233,8 @@ RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, 
         r14_from_rsp48 = mov_r14.r14_loaded;
     }
 
+    bool r13_r14_equal = false;
+    bool r13_r14_equal_known = false;
     if (!hooks.merge_cmp_r13_r14_532b65_u1_ran) {
         Init531d60PostBaseCmpR13R14_532b65_U1Cells cells{};
         cells.r13_in = r13_from_rsp40;
@@ -242,9 +244,27 @@ RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, 
             destroy_registry_object(obj, alloc);
             return RegistryInit531d60Status::alloc_failed;
         }
+        r13_r14_equal = cmp.pointers_equal;
+        r13_r14_equal_known = true;
+    } else {
+        // cmp ran in registry_body merge; je still records the observational branch.
+        r13_r14_equal = (r13_from_rsp40 == r14_from_rsp48);
+        r13_r14_equal_known = true;
     }
 
-    // OBS 0x532b68..0x532bf8: destroy previous if different & non-null; then movq new, (0x2efd160).
+    if (!hooks.merge_je_532bba_532b68_u1_ran) {
+        Init531d60PostBaseJe532bba_532b68_U1Cells je_cells{};
+        je_cells.pointers_equal = r13_r14_equal;
+        je_cells.pointers_equal_known = r13_r14_equal_known;
+        const auto je = init_531d60_post_base_je_532bba_532b68_u1(je_cells);
+        if (!je.ok) {
+            destroy_registry_object(obj, alloc);
+            return RegistryInit531d60Status::alloc_failed;
+        }
+        // NOT modelled: branch to 0x532bba vs fall-through @ 0x532b6a (E569 merge rule).
+    }
+
+    // OBS 0x532b6a..0x532bf8: destroy previous if different & non-null; then movq new, (0x2efd160).
     RegistryObject2efd160* prev = registry_cell_2efd160().load();
     if (prev == obj) {
         return RegistryInit531d60Status::ok;
