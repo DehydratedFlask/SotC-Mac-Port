@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 03:00 CDT (root) — teardown target 0xa460f0 lifted (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_15d1678_slot280_a460f0.{hpp,cpp}` for the resolved slot `0x15d1678 + 0x280 -> 0xa460f0`.
+- **Body (62 B, pinned):** frame setup; `lea 0x15d1808` + `add 0x10` → install **`0x15d1818`** at `*this`; `mov 0xc0(%rbx),%rax; call *0x18(%rax)` (helper virtual); `call 0x20b50` (post-pass with `this`); tail `jmp 0x170b0` (tag-1 free of `this`). The `lea`+`add` pair means the installed table is **not** the lea target — the checker pins both.
+- **Model:** vtable store recorded; helper call and post-pass as hooks; free through the allocation contract. A null helper fails after the vtable store (the retail `call *0x18(%rax)` would fault), missing cells fail before any store, and a missing contract fails the free while still reporting the earlier steps.
+- **Fixture:** 5 cases (constants, full path with ordered trace, null-helper failure after the store, missing cells, no-contract free failure). Mutation probe: installing `0x15d1810` instead of `0x15d1818` fails 2 checks.
+- **Checker:** `tools/lift/check_vtable_15d1678_slot280_a460f0.py` verifies the body **structure** (prologue, `lea` target, vtable store, helper slot `0x18`, `e8` call to `0x20b50`, `e9` tail to `0x170b0`), the padding, the slot qword, the type-8 RELA at `0x15d18f8`, the header constants, CMake and entry-map presence.
+- **Entry map:** regenerated to **1,414 constants / 966 RVAs / 373 headers**.
+- **Verification (PASSED):** build exit 0; CTest **505/505**; lift checkers **698 passed / 0 failed**.
+- **Next exact action:** `0x2687b0` or `0x1bf710` (both FDE `0x1c`), then `0xddf4b0` (`0x34`), `0xe16a00` (`0x26`), `0xe1a5c0` (`0x97`), `0xe19980` (`0xa2`), `0xe21420` (`0x2a9`).
+
 ## 2026-11-02 02:05 CDT (root) — frontier widened to seven more seeds: 18 sites / 15 targets (STATIC_ANALYSIS_VERIFIED / FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Ran the frontier on seven further startup entries (`0x25a4d0`, `0x2569d0`, `0x25d8b0`, `0x255130`, `0x27990`, `0x47620`, `0xa505e0`); `0x1bdb10`, `0x3b310` and `0x532ca0` have no indirect sites.

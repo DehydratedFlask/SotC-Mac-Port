@@ -2543,3 +2543,10 @@ target_link_libraries(sotc_vtable_resolved_bodies_3 PUBLIC sotc_core)
 add_executable(test_vtable_resolved_bodies_3 tests/test_vtable_resolved_bodies_3.cpp)
 target_link_libraries(test_vtable_resolved_bodies_3 PRIVATE sotc_vtable_resolved_bodies_3)
 add_test(NAME vtable_resolved_bodies_3 COMMAND test_vtable_resolved_bodies_3)
+
+# CPU-01-AOT-CFG-SCALE-01: resolved teardown target 0xa460f0 (vtable 0x15d1678 slot 0x280).
+add_library(sotc_vtable_15d1678_slot280 STATIC core/vtable_15d1678_slot280_a460f0.cpp)
+target_link_libraries(sotc_vtable_15d1678_slot280 PUBLIC sotc_core)
+add_executable(test_vtable_15d1678_slot280 tests/test_vtable_15d1678_slot280_a460f0.cpp)
+target_link_libraries(test_vtable_15d1678_slot280 PRIVATE sotc_vtable_15d1678_slot280)
+add_test(NAME vtable_15d1678_slot280 COMMAND test_vtable_15d1678_slot280)
