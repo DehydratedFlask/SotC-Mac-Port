@@ -2613,3 +2613,10 @@ target_link_libraries(sotc_retail_abi PUBLIC sotc_core)
 add_executable(test_retail_abi tests/test_retail_abi.cpp)
 target_link_libraries(test_retail_abi PRIVATE sotc_retail_abi)
 add_test(NAME retail_abi COMMAND test_retail_abi)
+
+# CPU-01-AOT-CFG-SCALE-01: resolved status-gated helper target 0xe26f90 (vtable 0x15ed2a0 slot 0xc0).
+add_library(sotc_vtable_15ed2a0_slot_c0 STATIC core/vtable_15ed2a0_slot_c0_e26f90.cpp)
+target_link_libraries(sotc_vtable_15ed2a0_slot_c0 PUBLIC sotc_core)
+add_executable(test_vtable_15ed2a0_slot_c0 tests/test_vtable_15ed2a0_slot_c0_e26f90.cpp)
+target_link_libraries(test_vtable_15ed2a0_slot_c0 PRIVATE sotc_vtable_15ed2a0_slot_c0)
+add_test(NAME vtable_15ed2a0_slot_c0 COMMAND test_vtable_15ed2a0_slot_c0)

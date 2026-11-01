@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 11:30 CDT (root) — 573-seed constructor sweep complete: 24 new sites, new target 0xe26f90 (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. The full constructor sweep finished: **573 seeds, 24 new resolved sites**, and an independent re-verification (`tools/lift/verify_frontier_sweep.py`) accepted **24/24** (slot qword + type-8 addend; no rejects).
+- **Breakdown:** 19 additional sites for `0x20d60` (vtable `0x1594dc0` slot `0x20`), 2 for `0xe24900`, and **3 for a new target `0xe26f90`** (vtable `0x15ed2a0` slot `0xc0`, RELA `0x15ed360`, FDE `0xb7`).
+- **Table:** `vtable_resolved_entries` grew to **42 sites / 17 targets**. The fixture asserts 42/17; `check_vtable_resolved_entries.py` now **parses the header and re-verifies every row** (slot qword, RELA, FDE start, entry map) instead of checking a fixed list, so future rows are covered automatically.
+- **New body:** `native/core/vtable_15ed2a0_slot_c0_e26f90.{hpp,cpp}` — 183 B with stack canary: `slot78()` fetch, `slot90(name=0x131706d, &buffer)` status call, non-zero status returns 0 early, otherwise `helper(0xe255b0)(this, arg2, arg3, &buffer, &local)`; canary compare on exit.
+- **Fixture:** 5 cases (constants, early zero, helper path with argument marshalling, canary tamper, missing cells). Checker pins prologue/frame, canary load, both vcall slots, the status test, the early-zero bytes, the epilogue, resolves the name `lea` and helper call from the bytes, and ties slot/RELA/entry map.
+- **Entry map:** regenerated to **1,436 constants / 977 RVAs / 382 headers**.
+- **Verification (PASSED):** build exit 0; CTest **515/515**; lift checkers **708 passed / 0 failed**.
+- **Next exact action:** the frontier table is now sweep-complete for the 573 startup rows; the next bounded step is guest-memory marshalling for the retail thunks, or sweeping non-constructor roots (Init continue paths, `0x25d8b0` closure interior entries).
+
 ## 2026-11-02 10:20 CDT (root) — retail ABI contract table (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`, retail calling-convention card. Added `native/core/retail_abi.{hpp,cpp}`: a SysV integer frame (`rdi/rsi/rdx/rcx/r8/r9` + `rax`) and a sorted **16-row contract table** recording, per resolved target, how many argument registers the body reads, whether it returns a value, and a one-line derivation note (for example `0xe1a5c0`: `rdi=this, rsi=key, edx=value`, returns int; `0xa40e20`: no register is read).

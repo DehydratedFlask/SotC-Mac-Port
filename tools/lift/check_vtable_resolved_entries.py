@@ -13,6 +13,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import re
 import struct
 import sys
 from pathlib import Path
@@ -27,30 +28,15 @@ CMAKE = ROOT / "native/CMakeLists.txt"
 ENTRY_MAP = ROOT / "docs/entry_map.json"
 FDE_JSON = ROOT / "local/validation/registry-analysis-agent/fde_ranges.json"
 
-EXPECTED = [
-    (0x1254D, 0x15949A0, 0x88, 0x187C0),
-    (0x13620, 0x1594AE8, 0x28, 0x13D20),
-    (0x28471, 0x1594DC0, 0x20, 0x20D60),
-    (0x35165, 0x15955C0, 0x08, 0x358C0),
-    (0x14DC19, 0x1594DC0, 0x20, 0x20D60),
-    (0x257068, 0x159C908, 0x58, 0x2687B0),
-    (0xA3DF9C, 0x15D1678, 0xE8, 0xC2E0),
-    (0xA3DFDA, 0x15D1678, 0x68, 0xA40E20),
-    (0xA3DFF7, 0x15D1678, 0x280, 0xA460F0),
-    (0xA54B7B, 0x15D1D80, 0x08, 0xC740),
-    (0xA54C92, 0x15D1D80, 0x08, 0xC740),
-    (0xA70F4D, 0x1598E10, 0x18, 0x1BF710),
-    (0xDDF017, 0x15E0B48, 0x28, 0xDDF4B0),
-    (0xE119BE, 0x15E2028, 0x2A0, 0xE21420),
-    (0xE119D3, 0x15E2028, 0x70, 0xE1A5C0),
-    (0xE11C64, 0x15E1EE0, 0xB0, 0xE19980),
-    (0xED171C, 0x15F2F08, 0x38, 0xE16A00),
-    (0xED1733, 0x15F2F08, 0x38, 0xE16A00),
-    (0x47571, 0x1594DC0, 0x20, 0x20D60),
-    (0x4F0D41, 0x1594DC0, 0x20, 0x20D60),
-    (0xE1EE0D, 0x15E2D60, 0xD0, 0xE24900),
-    (0xE1EE31, 0x15E2D60, 0xD0, 0xE24900),
-]
+ROW_RE = re.compile(r"\{0x([0-9a-f]+), kResolvedVtable_([0-9a-f]+), (0x[0-9a-f]+), "
+                     r"kResolvedVtableTarget_([0-9a-f]+)Rva\}")
+
+
+def header_rows(text: str):
+    return [(int(site, 16), int(vtable, 16), int(slot, 16), int(target, 16))
+            for site, vtable, slot, target in ROW_RE.findall(text)]
+
+
 
 
 def require(cond: bool, msg: str) -> None:
@@ -67,6 +53,9 @@ def main() -> int:
     relocs = info["relocs"]
 
     header = HEADER.read_text()
+    EXPECTED = header_rows(header)
+    require(len(EXPECTED) == 42, f"expected 42 rows, found {len(EXPECTED)}")
+    require(len({row[3] for row in EXPECTED}) == 17, "expected 17 distinct targets")
     entry_map = json.loads(ENTRY_MAP.read_text())["entries"]
 
     fde_starts = None
