@@ -1,7 +1,7 @@
 // Init `0x531d60` registry mov edx,0x63647372 OBS `0x532c07..0x532c0c` (5 B):
 //   mov edx,0x63647372   ; tag immediate after E610 mov r14,[rsp+0x20] @ `0x532c02`
 //
-// After E610 mov @ `0x532c02`. NOT modelled: tail @ `0x532c0c`.. G1 PARTIAL.
+// After E610 mov @ `0x532c02`. NOT modelled: E612 mov rdi,[rax] @ `0x532c0c` / tail @ `0x532c0f`.. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
