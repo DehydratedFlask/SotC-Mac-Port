@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 20:05 CDT (root) — compressed .csdr container characterized, codec UNKNOWN (STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01` compressed-container card, continued as `GPU-01-CSDR-DECOMPRESSOR-RE-01`. `tools/dev/csdr_compressed_probe.py` samples 256 members deterministically; **84** are `0x8c`/`0xcc`-prefixed `.csdr` (33 %).
+- **Header:** byte0 `0x8c` (83/84) or `0xcc`; byte1 only `0x0a` (75) or `0x06` (9); `u16be[2:4] == floor(size/256)` for **62/84** (block-count hint); `[4:8]` and `[8:16]` uncorrelated so far.
+- **Codec trials:** zlib (15), raw deflate, gzip (31), bzip2 and lzma at offsets 0/2/4/8/12/16/20/24/32 — **3,780 attempts, 0 decodes**; no container magic. `lz4`/`zstd` block formats are **NOT TESTED** (libraries absent on this host), not ruled out.
+- **Ruled out:** embedded raw OrbShdr inside compressed members. Two `ORB` byte hits were investigated and are coincidental float data; `parse_raw_csdr` rejects every candidate span, including from offsets 0, 16 and `ORB-16`.
+- **Readable share unchanged:** re-ran `msl_corpus_coverage --sample 512` → unchanged `75/367` programs, `264` not-a-shader, `0` lowered. Expected: no decompressor was added.
+- **Conclusion:** the member is compressed/encrypted as a whole and the decoder lives in the executable. Next step is RE of the `.csdr` loader path (header branch + decompressor call), not more codec guessing.
+- **Report:** `docs/CSDR_COMPRESSED.md`; private metadata `local/validation/csdr-compressed/s256/`.
+
 ## 2026-11-01 19:20 CDT (root) — GFX7 decoder v3 + coverage ceiling re-measured (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `GPU-01-MSL-OFFLINE-01`, second decoder card (attempt 2). v3 adds VOP2 3/22/37, VOP1 36, VOP3 322/349 (three-source read-port rule), SOP1 36 (`s_and_saveexec_b64`, 64-bit SDST/SRC0 pairs) and MUBUF 0 (`buffer_load_format_x`, 1 component).
