@@ -37,6 +37,10 @@ struct RetailCallContext {
     void (*pre_ddf4b0)(void* self) = nullptr;
     void* (*fetch_manager_ddf4b0)() = nullptr;
     void (*tail_ddf4b0)(void* manager, void* self) = nullptr;
+
+    // 0xa460f0: teardown with one helper vcall, a post-pass, and the shared alloc contract.
+    void (*helper_a460f0)(void* helper) = nullptr;
+    void (*post_a460f0)(void* self) = nullptr;
 };
 
 enum class RetailCallStatus : std::uint8_t {

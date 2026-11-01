@@ -212,6 +212,42 @@ void test_dual_vcall_and_manager() {
     check("e16a00 range fails", !range.ok && range.status == RetailCallStatus::out_of_range);
 }
 
+void hook_helper_a46(void*) {}
+void hook_post_a46(void*) {}
+
+void test_a460f0_teardown() {
+    std::vector<std::uint8_t> storage(0x100, 0);
+    GuestWindow window(storage.data(), 0xA0000, storage.size());
+    const void* vtable = reinterpret_cast<const void*>(0x66000);
+    const void* helper = reinterpret_cast<const void*>(0x66010);
+    std::memcpy(storage.data(), &vtable, sizeof(vtable));
+    std::memcpy(storage.data() + 0xc0, &helper, sizeof(helper));
+
+    RetailFrame frame{};
+    frame.set(RetailArg::rdi, 0xA0000);
+    const auto without_alloc = call_resolved(sotc::kVtable15d1678Slot280_a460f0Rva, frame, window);
+    check("a460f0 no alloc fails", !without_alloc.ok &&
+                                       without_alloc.status == RetailCallStatus::model_failed);
+
+    AllocDispatchContract contract{};
+    contract.deallocate = deallocate;
+    RetailCallContext context{};
+    context.helper_a460f0 = hook_helper_a46;
+    context.post_a460f0 = hook_post_a46;
+    context.alloc = &contract;
+    g_trace = Trace{};
+    const auto ok = call_resolved(sotc::kVtable15d1678Slot280_a460f0Rva, frame, window, context);
+    check("a460f0 ok", ok.ok);
+    check("a460f0 free", g_trace.frees == 1);
+    std::uint64_t installed = 0;
+    std::memcpy(&installed, storage.data(), sizeof(installed));
+    check("a460f0 vtable installed", installed == sotc::kVtable15d1678Slot280_a460f0InstalledTable);
+
+    frame.set(RetailArg::rdi, 0xB0000);
+    const auto range = call_resolved(sotc::kVtable15d1678Slot280_a460f0Rva, frame, window, context);
+    check("a460f0 range fails", !range.ok && range.status == RetailCallStatus::out_of_range);
+}
+
 void test_failures() {
     std::vector<std::uint8_t> storage(0x40, 0);
     GuestWindow window(storage.data(), 0x50000, storage.size());
@@ -245,6 +281,7 @@ int main() {
     test_one_arg_teardowns();
     test_copy_targets_and_noop();
     test_dual_vcall_and_manager();
+    test_a460f0_teardown();
     test_failures();
 
     if (failures == 0) {

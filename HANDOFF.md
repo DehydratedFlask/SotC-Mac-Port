@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 16:10 CDT (root) — 0xa460f0 dispatch arm (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `marshal_a460f0` (vtable cell at `*self`, helper pointer at `self+0xc0`) and a `call_resolved` arm wiring `helper_a460f0`, `post_a460f0` and the shared alloc contract.
+- **Dispatchable targets: 12 of 17.**
+- **Fixture:** `model_failed` without an allocation contract; with one, the helper and post hooks fire, one tag-1 free runs, and the guest `*self` receives the installed table `0x15d1818`; an out-of-range `self` returns `out_of_range`.
+- **Checkers:** 12 arms (the no-op is the one adapter-less arm) and 11 adapters over 11 model-declared offsets.
+- **Verification (PASSED):** build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Next exact action:** the remaining five are the largest bodies — `0xe19980` (5 args, two paths), `0xe1a5c0` (scan), `0xe21420` (decision contract), `0xe26f90` (status gate), `0xe24900` (sub-dispatch).
+
 ## 2026-11-02 15:25 CDT (root) — dual-vcall and manager dispatch arms (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `marshal_e16a00` (resolves the vtable pointer at `*self` and forwards the argument) and `marshal_ddf4b0` (self-only), plus two `call_resolved` arms with the `slot18/slot20` and `pre/fetch_manager/tail` hook contexts.

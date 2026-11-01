@@ -19,6 +19,7 @@
 #include "vtable_15d1678_slot_e8_c2e0.hpp"
 #include "vtable_15d1d80_slot08_c740.hpp"
 #include "vtable_15e0b48_slot28_ddf4b0.hpp"
+#include "vtable_15d1678_slot280_a460f0.hpp"
 #include "vtable_15f2f08_slot38_e16a00.hpp"
 #include "vtable_159c908_slot58_2687b0.hpp"
 
@@ -119,5 +120,14 @@ struct MarshalDdf4b0 {
 };
 
 [[nodiscard]] MarshalDdf4b0 marshal_ddf4b0(GuestWindow& window, std::uint64_t self) noexcept;
+
+// 0xa460f0: teardown; needs the vtable cell at `*self` and the helper pointer at `self+0xc0`.
+struct MarshalA460f0 {
+    bool ok = false;
+    GuestStatus status = GuestStatus::no_window;
+    Vtable15d1678Slot280_a460f0Cells cells{};
+};
+
+[[nodiscard]] MarshalA460f0 marshal_a460f0(GuestWindow& window, std::uint64_t self) noexcept;
 
 }  // namespace sotc

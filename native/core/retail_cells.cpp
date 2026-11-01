@@ -180,4 +180,21 @@ MarshalDdf4b0 marshal_ddf4b0(GuestWindow& window, std::uint64_t self) noexcept {
     return out;
 }
 
+MarshalA460f0 marshal_a460f0(GuestWindow& window, std::uint64_t self) noexcept {
+    MarshalA460f0 out{};
+    std::uint8_t* vtable = window.host_pointer(self, sizeof(void*));
+    std::uint8_t* helper =
+        window.host_pointer(self + kVtable15d1678Slot280_a460f0HelperFieldOffset, sizeof(void*));
+    if (vtable == nullptr || helper == nullptr) {
+        out.status = window.valid() ? GuestStatus::out_of_range : GuestStatus::no_window;
+        return out;
+    }
+    out.cells.self = reinterpret_cast<void*>(static_cast<std::uintptr_t>(self));
+    out.cells.vtable_field = reinterpret_cast<void**>(vtable);
+    out.cells.helper_field = reinterpret_cast<const void* const*>(helper);
+    out.status = GuestStatus::ok;
+    out.ok = true;
+    return out;
+}
+
 }  // namespace sotc
