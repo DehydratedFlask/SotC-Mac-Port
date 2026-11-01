@@ -17,7 +17,7 @@ Init531d60PostBaseMovRbxR13_10_532b70_U1Result init_531d60_post_base_mov_rbx_r13
     }
     ++out.mov_rbx_r13_10_count;
 
-    // Next: mov r15,[r13+0x18] @ 0x532b74 — not modelled here.
+    // Next: mov r15,[r13+0x18] @ 0x532b74 — peeled in E572 sibling unit.
     out.ok = (out.mov_rbx_r13_10_count == 1);
     return out;
 }

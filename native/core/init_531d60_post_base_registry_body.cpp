@@ -317,6 +317,21 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
         out.unit_counts[static_cast<std::size_t>(RegistryBodyUnit::mov_rbx_r13_10_532b70_u1)] = 1;
         ++out.unit_executed;
     }
+    if (!hooks.merge_mov_r15_r13_18_532b74_u1_ran) {
+        Init531d60PostBaseMovR15R13_18_532b74_U1Cells cells = hooks.mov_r15_r13_18_cells;
+        if (cells.r13_base == nullptr) {
+            cells.r13_base = r13_from_rsp40;
+        }
+        const Init531d60PostBaseMovR15R13_18_532b74_U1Result mov_r15 =
+            init_531d60_post_base_mov_r15_r13_18_532b74_u1(cells);
+        if (!mov_r15.ok) {
+            return out;
+        }
+        out.mov_r15_r13_18_count = mov_r15.mov_r15_r13_18_count;
+        out.r15_from_r13_18 = mov_r15.r15;
+        out.unit_counts[static_cast<std::size_t>(RegistryBodyUnit::mov_r15_r13_18_532b74_u1)] = 1;
+        ++out.unit_executed;
+    }
     out.end_rva = kInit531d60PostBaseRegistryBodyEndRva;
     const int expected_call = hooks.merge_call_54dc10_532b19_u1_ran ? 0 : 1;
     const int expected_mov_rbx = hooks.merge_mov_rbx_rax_532b1e_u1_ran ? 0 : 1;
@@ -339,12 +354,13 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
     const int expected_je_532bba = hooks.merge_je_532bba_532b68_u1_ran ? 0 : 1;
     const int expected_lea_rsi = hooks.merge_lea_rsi_rsp10_532b6a_u1_ran ? 0 : 1;
     const int expected_mov_rbx_r13 = hooks.merge_mov_rbx_r13_10_532b70_u1_ran ? 0 : 1;
+    const int expected_mov_r15_r13 = hooks.merge_mov_r15_r13_18_532b74_u1_ran ? 0 : 1;
     const int expected_units = expected_call + expected_mov_rbx + expected_count + expected_mov_r15 +
                                expected_mov_rsi + expected_mov_edx + expected_fill + expected_lea_rbx +
                                expected_mov_r13 + expected_mov_r12 + expected_cmp + expected_je +
                                expected_test + expected_je_null + expected_mov_rsp10 + expected_mov_rsp40 +
                                expected_mov_rsp48 + expected_cmp_r13 + expected_je_532bba +
-                               expected_lea_rsi + expected_mov_rbx_r13;
+                               expected_lea_rsi + expected_mov_rbx_r13 + expected_mov_r15_r13;
     out.ok = (out.unit_executed == expected_units) && (out.call_54dc10_count == expected_call) &&
              (out.mov_rbx_rax_count == expected_mov_rbx) &&
              (out.call_54dc20_count == expected_count) &&
@@ -364,7 +380,8 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
              (out.cmp_r13_r14_count == expected_cmp_r13) &&
              (out.je_532bba_count == expected_je_532bba) &&
              (out.lea_rsi_rsp10_count == expected_lea_rsi) &&
-             (out.mov_rbx_r13_10_count == expected_mov_rbx_r13);
+             (out.mov_rbx_r13_10_count == expected_mov_rbx_r13) &&
+             (out.mov_r15_r13_18_count == expected_mov_r15_r13);
     return out;
 }
 
