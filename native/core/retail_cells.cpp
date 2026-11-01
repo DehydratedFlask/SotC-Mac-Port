@@ -225,8 +225,8 @@ MarshalE24900 marshal_e24900(GuestWindow& window, std::uint64_t self,
 }
 
 MarshalE26f90 marshal_e26f90(GuestWindow& window, std::uint64_t self, std::uint64_t arg2,
-                             std::int32_t arg3, std::uint64_t* host_canary, void* host_buffer,
-                             void* host_local) noexcept {
+                             std::int32_t arg3, std::uint64_t canary_guest,
+                             std::uint64_t buffer_guest, std::uint64_t local_guest) noexcept {
     MarshalE26f90 out{};
     if (!window.valid()) {
         out.status = GuestStatus::no_window;
@@ -236,16 +236,19 @@ MarshalE26f90 marshal_e26f90(GuestWindow& window, std::uint64_t self, std::uint6
         out.status = GuestStatus::out_of_range;
         return out;
     }
-    if (host_canary == nullptr || host_buffer == nullptr || host_local == nullptr) {
+    std::uint8_t* canary = window.host_pointer(canary_guest, sizeof(std::uint64_t));
+    std::uint8_t* buffer = window.host_pointer(buffer_guest, 0x10);
+    std::uint8_t* local = window.host_pointer(local_guest, sizeof(std::uint32_t));
+    if (canary == nullptr || buffer == nullptr || local == nullptr) {
         out.status = GuestStatus::out_of_range;
         return out;
     }
     out.cells.self = reinterpret_cast<void*>(static_cast<std::uintptr_t>(self));
     out.cells.arg2 = reinterpret_cast<void*>(static_cast<std::uintptr_t>(arg2));
     out.cells.arg3 = arg3;
-    out.cells.canary = host_canary;
-    out.cells.buffer = host_buffer;
-    out.cells.local = host_local;
+    out.cells.canary = reinterpret_cast<std::uint64_t*>(canary);
+    out.cells.buffer = buffer;
+    out.cells.local = local;
     out.status = GuestStatus::ok;
     out.ok = true;
     return out;
@@ -299,14 +302,15 @@ MarshalE1a5c0 marshal_e1a5c0(GuestWindow& window, std::uint64_t self, std::uint6
 }
 
 MarshalE19980 marshal_e19980(GuestWindow& window, std::uint64_t arg2, std::uint64_t arg3,
-                             std::uint64_t arg4, std::uint64_t arg5, std::uint64_t* host_canary,
+                             std::uint64_t arg4, std::uint64_t arg5, std::uint64_t canary_guest,
                              const void* const* value_cell) noexcept {
     MarshalE19980 out{};
     if (!window.valid()) {
         out.status = GuestStatus::no_window;
         return out;
     }
-    if (host_canary == nullptr || value_cell == nullptr) {
+    std::uint8_t* canary = window.host_pointer(canary_guest, sizeof(std::uint64_t));
+    if (canary == nullptr || value_cell == nullptr) {
         out.status = GuestStatus::out_of_range;
         return out;
     }
@@ -314,7 +318,7 @@ MarshalE19980 marshal_e19980(GuestWindow& window, std::uint64_t arg2, std::uint6
     out.args.arg3 = reinterpret_cast<void*>(static_cast<std::uintptr_t>(arg3));
     out.args.arg4 = reinterpret_cast<void*>(static_cast<std::uintptr_t>(arg4));
     out.args.arg5 = reinterpret_cast<void*>(static_cast<std::uintptr_t>(arg5));
-    out.cells.canary = host_canary;
+    out.cells.canary = reinterpret_cast<std::uint64_t*>(canary);
     out.cells.fast_store_value = value_cell;
     const bool aligned = (arg3 & kVtable15e1ee0SlotB0_e19980AlignmentMask) == 0;
     if (arg3 != 0 && aligned) {

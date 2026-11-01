@@ -18,6 +18,19 @@
 
 namespace sotc {
 
+// Guest stack arena for targets whose retail body uses its own frame. The stack grows down from
+// `top`; `size` is the number of bytes available below it. Addresses are guest addresses and are
+// resolved through the caller's `GuestWindow`.
+struct RetailStack {
+    std::uint64_t top = 0;
+    std::uint64_t size = 0;
+};
+
+// Allocates `bytes` (aligned) below `sp`. Returns false on overflow, leaving `sp` untouched.
+[[nodiscard]] bool retail_stack_alloc(const RetailStack& stack, std::uint64_t& sp,
+                                      std::uint64_t bytes, std::uint64_t alignment,
+                                      std::uint64_t& address) noexcept;
+
 struct RetailCallContext {
     // 0x20d60 hooks and inputs.
     void (*tail_20d60)(void* self, void* global) = nullptr;
@@ -54,9 +67,7 @@ struct RetailCallContext {
     std::int32_t (*slot90_e26f90)(void* self, const char* name, void* buffer) = nullptr;
     std::int32_t (*helper_e26f90)(void* self, void* arg2, std::int32_t arg3, void* buffer,
                                   void* local) = nullptr;
-    std::uint64_t* host_canary = nullptr;
-    void* host_buffer = nullptr;
-    void* host_local = nullptr;
+    RetailStack stack{};
 
     // 0xe1a5c0: container scan hooks.
     const char* (*element_key_e1a5c0)(void* element) = nullptr;
@@ -67,7 +78,6 @@ struct RetailCallContext {
     void (*slow_e19980)(void* element, void* buffer) = nullptr;
     void* slow_buffer_e19980 = nullptr;
     void (*fast_e19980)(void* arg3, void* arg2, void* arg4, void* arg5) = nullptr;
-    std::uint64_t* host_canary_e19980 = nullptr;
     const void* const* store_value_e19980 = nullptr;
 
     // 0xe21420: decision-contract hooks.
@@ -86,6 +96,7 @@ enum class RetailCallStatus : std::uint8_t {
     no_window,
     out_of_range,
     model_failed,
+    stack_unavailable,
 };
 
 const char* retail_call_status_name(RetailCallStatus status) noexcept;

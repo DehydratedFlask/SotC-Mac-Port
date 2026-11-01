@@ -4,6 +4,34 @@
 
 namespace sotc {
 
+bool retail_stack_alloc(const RetailStack& stack, std::uint64_t& sp, std::uint64_t bytes,
+                        std::uint64_t alignment, std::uint64_t& address) noexcept {
+    if (stack.size == 0 || stack.top == 0 || bytes == 0 || alignment == 0) {
+        return false;
+    }
+    if (sp == 0) {
+        sp = stack.top;
+    }
+    if (sp < stack.top - stack.size || sp > stack.top) {
+        return false;  // sp outside the arena
+    }
+    const std::uint64_t aligned_mask = alignment - 1;
+    if (sp < bytes || (sp - bytes) < (stack.top - stack.size)) {
+        // Reserve first, then align down; reject if alignment would leave the arena.
+        const std::uint64_t reserved = sp - bytes;
+        if (reserved < stack.top - stack.size) {
+            return false;
+        }
+    }
+    std::uint64_t candidate = (sp - bytes) & ~aligned_mask;
+    if (candidate < stack.top - stack.size) {
+        return false;
+    }
+    address = candidate;
+    sp = candidate;
+    return true;
+}
+
 const char* retail_call_status_name(RetailCallStatus status) noexcept {
     switch (status) {
         case RetailCallStatus::ok:
@@ -16,6 +44,8 @@ const char* retail_call_status_name(RetailCallStatus status) noexcept {
             return "out_of_range";
         case RetailCallStatus::model_failed:
             return "model_failed";
+        case RetailCallStatus::stack_unavailable:
+            return "stack_unavailable";
     }
     return "unknown";
 }
@@ -296,9 +326,21 @@ RetailCallOutcome call_resolved(std::uint64_t rva, RetailFrame& frame, GuestWind
             return out;
         }
         case kVtable15ed2a0SlotC0_e26f90Rva: {
+            std::uint64_t stack_pointer = 0;
+            std::uint64_t canary_guest = 0;
+            std::uint64_t buffer_guest = 0;
+            std::uint64_t local_guest = 0;
+            if (!retail_stack_alloc(context.stack, stack_pointer, sizeof(std::uint64_t), 8,
+                                    canary_guest) ||
+                !retail_stack_alloc(context.stack, stack_pointer, 0x10, 8, buffer_guest) ||
+                !retail_stack_alloc(context.stack, stack_pointer, sizeof(std::uint32_t), 4,
+                                    local_guest)) {
+                out.status = RetailCallStatus::stack_unavailable;
+                return out;
+            }
             const auto marshalled = marshal_e26f90(
                 window, self, arg1, static_cast<std::int32_t>(frame.get(RetailArg::rdx) & 0xFFFFFFFFu),
-                context.host_canary, context.host_buffer, context.host_local);
+                canary_guest, buffer_guest, local_guest);
             if (!marshalled.ok) {
                 out.status = marshalled.status == GuestStatus::no_window
                                  ? RetailCallStatus::no_window
@@ -344,10 +386,18 @@ RetailCallOutcome call_resolved(std::uint64_t rva, RetailFrame& frame, GuestWind
             return out;
         }
         case kVtable15e1ee0SlotB0_e19980Rva: {
+            std::uint64_t stack_pointer = 0;
+            std::uint64_t canary_guest = 0;
+            std::uint64_t buffer_guest = 0;
+            if (!retail_stack_alloc(context.stack, stack_pointer, sizeof(std::uint64_t), 8,
+                                    canary_guest) ||
+                !retail_stack_alloc(context.stack, stack_pointer, 0x100, 8, buffer_guest)) {
+                out.status = RetailCallStatus::stack_unavailable;
+                return out;
+            }
             const auto marshalled = marshal_e19980(
                 window, arg1, frame.get(RetailArg::rdx), frame.get(RetailArg::rcx),
-                frame.get(RetailArg::r8), context.host_canary_e19980,
-                context.store_value_e19980);
+                frame.get(RetailArg::r8), canary_guest, context.store_value_e19980);
             if (!marshalled.ok) {
                 out.status = marshalled.status == GuestStatus::no_window
                                  ? RetailCallStatus::no_window
@@ -356,7 +406,7 @@ RetailCallOutcome call_resolved(std::uint64_t rva, RetailFrame& frame, GuestWind
             }
             Vtable15e1ee0SlotB0_e19980Hooks hooks{};
             hooks.slow_vcall_d8 = context.slow_e19980;
-            hooks.slow_buffer = context.slow_buffer_e19980;
+            hooks.slow_buffer = window.host_pointer(buffer_guest, 0x100);
             hooks.fast_helper = context.fast_e19980;
             const auto result = vtable_15e1ee0_slot_b0_e19980(marshalled.args, marshalled.cells,
                                                              hooks);

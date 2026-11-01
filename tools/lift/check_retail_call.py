@@ -62,6 +62,10 @@ def main() -> int:
         require(adapter in cells, f"{adapter} missing from retail_cells.cpp")
 
     require("retail_arg_spec_for(rva) == nullptr" in cpp, "missing unknown-target guard")
+    require("retail_stack_alloc(" in cpp, "missing guest stack allocator")
+    require("RetailCallStatus::stack_unavailable" in cpp, "missing stack_unavailable status")
+    require("retail_stack_alloc(" in (ROOT / "native/core/retail_call.hpp").read_text(),
+            "stack allocator not declared")
     require("RetailCallStatus::unknown_target" in cpp, "missing unknown-target status")
     require("out.rax = 0" in cpp, "dispatch does not write rax")
     require("core/retail_call.cpp" in cmake, "cmake missing retail_call.cpp")

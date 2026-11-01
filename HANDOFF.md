@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 20:45 CDT (root) — guest stack arena replaces host scratch (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `RetailStack { top, size }` to `RetailCallContext` and `retail_stack_alloc` (down-growing, aligned, bounds-checked, `sp` untouched on failure) plus a `stack_unavailable` status.
+- **Switched:** `marshal_e19980` and `marshal_e26f90` now take **guest** addresses for canary/buffer/local and resolve them through the window; the `0xe19980` slow hook receives the stack buffer. Host supply is now limited to the hook contracts and configured values.
+- **Fixture:** in-bounds calls succeed through the guest stack (fast path store, slow paths, helper/early-zero paths, canary tamper); a too-small arena and a missing stack both return `stack_unavailable` for each target.
+- **Bug caught:** the tamper hook first pointed at `storage+0x3F0` while the allocator actually placed the canary at `0xF03F8`; the fixture failed until the address matched the allocator's result, which is exactly the behaviour this card was meant to prove.
+- **Checkers:** `check_retail_call.py` now also requires the stack allocator and status.
+- **Verification (PASSED):** build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Next exact action:** thread/TLS state, or return to MSL coverage (0 of 34,391 real `.csdr`).
+
 ## 2026-11-02 19:55 CDT (root) — final adapter: all 17 targets dispatchable (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `marshal_e21420` (provider pointer from `self+0x48`, name as a bounded nullable guest C string) and the last `call_resolved` arm with seven decision-contract hooks; `rax` carries the status.

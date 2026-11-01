@@ -156,8 +156,8 @@ struct MarshalE26f90 {
 
 [[nodiscard]] MarshalE26f90 marshal_e26f90(GuestWindow& window, std::uint64_t self,
                                            std::uint64_t arg2, std::int32_t arg3,
-                                           std::uint64_t* host_canary, void* host_buffer,
-                                           void* host_local) noexcept;
+                                           std::uint64_t canary_guest, std::uint64_t buffer_guest,
+                                           std::uint64_t local_guest) noexcept;
 
 // 0xe1a5c0: container scan. The array pointer lives at `self+0x8` and the count at `self+0x10`; the
 // key is a guest C string.
@@ -182,7 +182,7 @@ struct MarshalE19980 {
 
 [[nodiscard]] MarshalE19980 marshal_e19980(GuestWindow& window, std::uint64_t arg2,
                                            std::uint64_t arg3, std::uint64_t arg4,
-                                           std::uint64_t arg5, std::uint64_t* host_canary,
+                                           std::uint64_t arg5, std::uint64_t canary_guest,
                                            const void* const* value_cell) noexcept;
 
 // 0xe21420: decision contract. Provider pointer from `self+0x48`, name as a guest C string (may be

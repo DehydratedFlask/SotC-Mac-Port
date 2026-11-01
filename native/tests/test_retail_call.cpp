@@ -289,11 +289,10 @@ std::int32_t slot90_e26(void*, const char* name, void*) {
 std::int32_t helper_e26(void*, void*, std::int32_t, void*, void*) { return 21; }
 
 void test_e26f90_status_gate() {
-    std::vector<std::uint8_t> storage(0x60, 0);
+    std::vector<std::uint8_t> storage(0x200, 0);
     GuestWindow window(storage.data(), 0xD0000, storage.size());
     std::uint64_t canary = 7;
-    char buffer[16] = {};
-    int local = 0;
+    std::memcpy(storage.data() + 0x1F0, &canary, sizeof(canary));
 
     RetailFrame frame{};
     frame.set(RetailArg::rdi, 0xD0000);
@@ -303,9 +302,8 @@ void test_e26f90_status_gate() {
     context.slot78_e26f90 = slot78_e26;
     context.slot90_e26f90 = slot90_e26;
     context.helper_e26f90 = helper_e26;
-    context.host_canary = &canary;
-    context.host_buffer = buffer;
-    context.host_local = &local;
+    context.stack.top = 0xD0200;
+    context.stack.size = 0x100;
 
     g_e26_status = 0;
     const auto helper_path = call_resolved(sotc::kVtable15ed2a0SlotC0_e26f90Rva, frame, window,
@@ -316,13 +314,23 @@ void test_e26f90_status_gate() {
     const auto early = call_resolved(sotc::kVtable15ed2a0SlotC0_e26f90Rva, frame, window, context);
     check("e26f90 early zero", early.ok && early.rax == 0);
 
-    RetailCallContext no_scratch{};
-    no_scratch.slot78_e26f90 = slot78_e26;
-    no_scratch.slot90_e26f90 = slot90_e26;
+    RetailCallContext no_stack{};
+    no_stack.slot78_e26f90 = slot78_e26;
+    no_stack.slot90_e26f90 = slot90_e26;
     const auto missing = call_resolved(sotc::kVtable15ed2a0SlotC0_e26f90Rva, frame, window,
-                                       no_scratch);
-    check("e26f90 no scratch fails", !missing.ok &&
-                                         missing.status == RetailCallStatus::out_of_range);
+                                       no_stack);
+    check("e26f90 no stack fails", !missing.ok &&
+                                       missing.status == RetailCallStatus::stack_unavailable);
+
+    RetailCallContext tiny{};
+    tiny.slot78_e26f90 = slot78_e26;
+    tiny.slot90_e26f90 = slot90_e26;
+    tiny.helper_e26f90 = helper_e26;
+    tiny.stack.top = 0xD0200;
+    tiny.stack.size = 0x8;  // too small for canary + buffer + local
+    const auto overflow = call_resolved(sotc::kVtable15ed2a0SlotC0_e26f90Rva, frame, window, tiny);
+    check("e26f90 stack overflow", !overflow.ok &&
+                                       overflow.status == RetailCallStatus::stack_unavailable);
     g_e26_status = 0;
 }
 
@@ -388,11 +396,11 @@ void slow_e199(void*, void*) {
 void fast_e199(void*, void*, void*, void*) { ++g_fast_calls; }
 
 void test_e19980_paths() {
-    std::vector<std::uint8_t> storage(0x120, 0);
+    std::vector<std::uint8_t> storage(0x400, 0);
     GuestWindow window(storage.data(), 0xF0000, storage.size());
     std::uint64_t canary = 11;
+    std::memcpy(storage.data() + 0x3F8, &canary, sizeof(canary));
     const void* store_value = reinterpret_cast<const void*>(0x7777);
-    char buffer[16] = {};
 
     RetailFrame frame{};
     frame.set(RetailArg::rdi, 0xF0000);
@@ -403,8 +411,8 @@ void test_e19980_paths() {
     RetailCallContext context{};
     context.slow_e19980 = slow_e199;
     context.fast_e19980 = fast_e199;
-    context.slow_buffer_e19980 = buffer;
-    context.host_canary_e19980 = &canary;
+    context.stack.top = 0xF0400;
+    context.stack.size = 0x300;
     context.store_value_e19980 = &store_value;
 
     g_slow_calls = 0;
@@ -430,12 +438,19 @@ void test_e19980_paths() {
     check("e19980 slow arg4", slow4.ok && g_slow_calls == 1);
 
     frame.set(RetailArg::rcx, 0xF0064);  // slow path, and tamper with the canary inside the hook
-    g_tamper_canary = &canary;
+    g_tamper_canary = reinterpret_cast<std::uint64_t*>(storage.data() + 0x3F8);
     const auto tampered = call_resolved(sotc::kVtable15e1ee0SlotB0_e19980Rva, frame, window,
                                         context);
     g_tamper_canary = nullptr;
     check("e19980 canary tamper", !tampered.ok &&
                                       tampered.status == RetailCallStatus::model_failed);
+
+    RetailCallContext no_stack{};
+    no_stack.fast_e19980 = fast_e199;
+    const auto missing_stack = call_resolved(sotc::kVtable15e1ee0SlotB0_e19980Rva, frame, window,
+                                             no_stack);
+    check("e19980 no stack fails", !missing_stack.ok &&
+                                       missing_stack.status == RetailCallStatus::stack_unavailable);
 }
 
 struct Provider21420 {
