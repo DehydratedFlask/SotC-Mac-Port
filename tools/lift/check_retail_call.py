@@ -24,6 +24,9 @@ EXPECTED = {
     0x187C0: "marshal_187c0",
     0x2687B0: "marshal_2687b0",
     0x1BF710: "marshal_1bf710",
+    0xC2E0: "marshal_c2e0",
+    0xC740: "marshal_c740",
+    0xA40E20: None,  # pure no-op: no cells to marshal
 }
 
 
@@ -43,6 +46,10 @@ def main() -> int:
 
     for rva, adapter in EXPECTED.items():
         require(f"0x{rva:x}" in abi, f"0x{rva:x} missing from the retail ABI table")
+        if adapter is None:
+            require("vtable_15d1678_slot_68_a40e20()" in cpp,
+                    "no-op dispatch does not call the model directly")
+            continue
         require(adapter in cpp, f"dispatch for 0x{rva:x} does not call {adapter}")
         require(adapter in cells, f"{adapter} missing from retail_cells.cpp")
 

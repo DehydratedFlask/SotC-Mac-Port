@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 14:40 CDT (root) — copy targets and no-op dispatch (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added adapters `marshal_c2e0` and `marshal_c740` (self+source copies; offsets from each model header) and three dispatch arms: `0xc2e0`, `0xc740`, and the `0xa40e20` no-op which marshals no cells at all.
+- **Dispatchable targets: 9 of 17.**
+- **Fixture:** `0xc2e0` copies the guest qword at `source+0x10` into `self+0x10`; `0xc740` additionally installs `0x15944a0` at `self+0x20`; the no-op returns `ok` with `rax = 0`.
+- **Checkers:** `check_retail_call.py` now allows one adapter-less arm (the no-op) and requires 9 arms; `check_retail_cells.py` covers 8 adapters over 10 model-declared offsets.
+- **Verification (PASSED):** build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Next exact action:** the remaining 8 are the larger bodies (`0xe16a00` dual-vcall, `0xe19980`, `0xe1a5c0`, `0xe21420`, `0xe26f90`, `0xe24900`, `0xddf4b0`, `0xa460f0`); each needs offsets and hook wiring from its header.
+
 ## 2026-11-02 13:55 CDT (root) — teardown adapters and dispatch arms (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `marshal_2687b0` and `marshal_1bf710` (self-only teardowns: verify the guest address is inside the window, hand the pointer through) and two `call_resolved` arms using their models with `context.pre_2687b0` / `context.pre_1bf710` and the shared alloc contract.

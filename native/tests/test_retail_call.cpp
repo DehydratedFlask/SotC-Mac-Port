@@ -146,6 +146,31 @@ void test_one_arg_teardowns() {
                                   out_of_range.status == RetailCallStatus::out_of_range);
 }
 
+void test_copy_targets_and_noop() {
+    std::vector<std::uint8_t> storage(0x120, 0);
+    GuestWindow window(storage.data(), 0x70000, storage.size());
+    std::uint64_t source_value = 0xCAFEBABE12345678ULL;
+    std::memcpy(storage.data() + 0x110, &source_value, sizeof(source_value));
+    RetailFrame frame{};
+    frame.set(RetailArg::rdi, 0x70000);
+    frame.set(RetailArg::rsi, 0x70100);
+
+    const auto c2e0 = call_resolved(sotc::kVtable15d1678SlotE8_c2e0Rva, frame, window);
+    check("c2e0 ok", c2e0.ok);
+    std::uint64_t c2e0_copy = 0;
+    std::memcpy(&c2e0_copy, storage.data() + 0x10, sizeof(c2e0_copy));
+    check("c2e0 copied", c2e0_copy == source_value);
+
+    const auto c740 = call_resolved(sotc::kVtable15d1d80Slot08_c740Rva, frame, window);
+    check("c740 ok", c740.ok);
+    std::uint64_t c740_table = 0;
+    std::memcpy(&c740_table, storage.data() + 0x20, sizeof(c740_table));
+    check("c740 table", c740_table == sotc::kVtable15d1d80Slot08_c740InstalledTable);
+
+    const auto noop = call_resolved(sotc::kVtable15d1678Slot68_a40e20Rva, frame, window);
+    check("noop ok", noop.ok && noop.rax == 0);
+}
+
 void test_failures() {
     std::vector<std::uint8_t> storage(0x40, 0);
     GuestWindow window(storage.data(), 0x50000, storage.size());
@@ -177,6 +202,7 @@ int main() {
     test_358c0_copies_source();
     test_187c0_requires_alloc();
     test_one_arg_teardowns();
+    test_copy_targets_and_noop();
     test_failures();
 
     if (failures == 0) {

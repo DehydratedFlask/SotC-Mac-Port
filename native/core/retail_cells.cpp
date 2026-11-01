@@ -109,4 +109,43 @@ Marshal1bf710 marshal_1bf710(GuestWindow& window, std::uint64_t self) noexcept {
     return out;
 }
 
+Marshalc2e0 marshal_c2e0(GuestWindow& window, std::uint64_t self,
+                         std::uint64_t source) noexcept {
+    Marshalc2e0 out{};
+    std::uint8_t* copy =
+        window.host_pointer(self + kVtable15d1678SlotE8_c2e0CopyFieldOffset, sizeof(void*));
+    std::uint8_t* source_field =
+        window.host_pointer(source + kVtable15d1678SlotE8_c2e0SourceOffset, sizeof(void*));
+    if (copy == nullptr || source_field == nullptr) {
+        out.status = window.valid() ? GuestStatus::out_of_range : GuestStatus::no_window;
+        return out;
+    }
+    out.cells.copy_field = reinterpret_cast<void**>(copy);
+    out.cells.source_field = reinterpret_cast<const void* const*>(source_field);
+    out.status = GuestStatus::ok;
+    out.ok = true;
+    return out;
+}
+
+Marshalc740 marshal_c740(GuestWindow& window, std::uint64_t self,
+                         std::uint64_t source) noexcept {
+    Marshalc740 out{};
+    std::uint8_t* table =
+        window.host_pointer(self + kVtable15d1d80Slot08_c740TableFieldOffset, sizeof(void*));
+    std::uint8_t* copy =
+        window.host_pointer(self + kVtable15d1d80Slot08_c740CopyFieldOffset, sizeof(void*));
+    std::uint8_t* source_field =
+        window.host_pointer(source + kVtable15d1d80Slot08_c740SourceOffset, sizeof(void*));
+    if (table == nullptr || copy == nullptr || source_field == nullptr) {
+        out.status = window.valid() ? GuestStatus::out_of_range : GuestStatus::no_window;
+        return out;
+    }
+    out.cells.table_field = reinterpret_cast<void**>(table);
+    out.cells.copy_field = reinterpret_cast<void**>(copy);
+    out.cells.source_field = reinterpret_cast<const void* const*>(source_field);
+    out.status = GuestStatus::ok;
+    out.ok = true;
+    return out;
+}
+
 }  // namespace sotc

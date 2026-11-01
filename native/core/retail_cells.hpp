@@ -15,6 +15,9 @@
 #include "vtable_1594dc0_slot20_20d60.hpp"
 #include "vtable_15955c0_slot08_358c0.hpp"
 #include "vtable_1598e10_slot18_1bf710.hpp"
+#include "vtable_15d1678_slot_68_a40e20.hpp"
+#include "vtable_15d1678_slot_e8_c2e0.hpp"
+#include "vtable_15d1d80_slot08_c740.hpp"
 #include "vtable_159c908_slot58_2687b0.hpp"
 
 #include <cstdint>
@@ -76,5 +79,24 @@ struct Marshal1bf710 {
 };
 
 [[nodiscard]] Marshal1bf710 marshal_1bf710(GuestWindow& window, std::uint64_t self) noexcept;
+
+// 0xc2e0 and 0xc740: self + source copies. Offsets come from each model header.
+struct Marshalc2e0 {
+    bool ok = false;
+    GuestStatus status = GuestStatus::no_window;
+    Vtable15d1678SlotE8_c2e0Cells cells{};
+};
+
+[[nodiscard]] Marshalc2e0 marshal_c2e0(GuestWindow& window, std::uint64_t self,
+                                       std::uint64_t source) noexcept;
+
+struct Marshalc740 {
+    bool ok = false;
+    GuestStatus status = GuestStatus::no_window;
+    Vtable15d1d80Slot08_c740Cells cells{};
+};
+
+[[nodiscard]] Marshalc740 marshal_c740(GuestWindow& window, std::uint64_t self,
+                                       std::uint64_t source) noexcept;
 
 }  // namespace sotc

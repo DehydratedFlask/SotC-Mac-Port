@@ -158,6 +158,54 @@ RetailCallOutcome call_resolved(std::uint64_t rva, RetailFrame& frame, GuestWind
             out.ok = true;
             return out;
         }
+        case kVtable15d1678SlotE8_c2e0Rva: {
+            const auto marshalled = marshal_c2e0(window, self, arg1);
+            if (!marshalled.ok) {
+                out.status = marshalled.status == GuestStatus::no_window
+                                 ? RetailCallStatus::no_window
+                                 : RetailCallStatus::out_of_range;
+                return out;
+            }
+            const auto result = vtable_15d1678_slot_e8_c2e0(marshalled.cells);
+            if (!result.ok) {
+                out.status = RetailCallStatus::model_failed;
+                return out;
+            }
+            out.rax = 0;
+            out.status = RetailCallStatus::ok;
+            out.ok = true;
+            return out;
+        }
+        case kVtable15d1d80Slot08_c740Rva: {
+            const auto marshalled = marshal_c740(window, self, arg1);
+            if (!marshalled.ok) {
+                out.status = marshalled.status == GuestStatus::no_window
+                                 ? RetailCallStatus::no_window
+                                 : RetailCallStatus::out_of_range;
+                return out;
+            }
+            const auto result = vtable_15d1d80_slot08_c740(marshalled.cells);
+            if (!result.ok) {
+                out.status = RetailCallStatus::model_failed;
+                return out;
+            }
+            out.rax = 0;
+            out.status = RetailCallStatus::ok;
+            out.ok = true;
+            return out;
+        }
+        case kVtable15d1678Slot68_a40e20Rva: {
+            // Pure no-op: the model reads nothing, so no cells are marshalled.
+            const auto result = vtable_15d1678_slot_68_a40e20();
+            if (!result.ok) {
+                out.status = RetailCallStatus::model_failed;
+                return out;
+            }
+            out.rax = 0;
+            out.status = RetailCallStatus::ok;
+            out.ok = true;
+            return out;
+        }
         default:
             // The target has an ABI row but no cell adapter yet.
             out.status = RetailCallStatus::unknown_target;
