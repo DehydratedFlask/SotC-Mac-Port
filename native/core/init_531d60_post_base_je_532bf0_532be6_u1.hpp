@@ -2,8 +2,8 @@
 //   test rdi,rdi
 //   je 0x532bf0   ; skip call @ `0x532beb` when null
 //
-// After E603 `sub_eax_010cb932_532be1_u1` end @ `0x532be6`. NOT modelled: call @
-// `0x532beb`.. G1 PARTIAL.
+// After E603 `sub_eax_010cb932_532be1_u1` end @ `0x532be6`. Fall-through call is E605
+// `call_170c0_532beb_u1` @ `0x532beb`. NOT modelled: tail @ `0x532bf0`.. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

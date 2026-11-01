@@ -11,7 +11,7 @@ Init531d60PostBaseJe532bf0_532be6_U1Result init_531d60_post_base_je_532bf0_532be
     out.branch_taken = out.rdi_is_zero;
     ++out.je_532bf0_532be6_count;
 
-    // Next: call @ 0x532beb or fall-through target @ 0x532bf0 — not modelled here.
+    // Next: E605 call 0x170c0 @ 0x532beb — not modelled here.
     out.ok = (out.je_532bf0_532be6_count == 1);
     return out;
 }
