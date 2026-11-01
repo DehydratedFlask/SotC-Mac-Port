@@ -25,6 +25,7 @@
 #include "init_531d60_post_base_vcall18_532b88_u1.hpp"
 #include "init_531d60_post_base_add_rbx_58_532b8b_u1.hpp"
 #include "init_531d60_post_base_cmp_r15_rbx_532b8f_u1.hpp"
+#include "init_531d60_post_base_jne_532b80_532b92_u1.hpp"
 #include "init_531d60_post_base_lea_rbx_2efd160_532b33_u1.hpp"
 #include "init_531d60_post_base_cmp_r12_r14_532b44_u1.hpp"
 #include "init_531d60_post_base_je_532bfb_532b47_u1.hpp"
@@ -46,7 +47,7 @@
 namespace sotc {
 
 inline constexpr std::size_t kRegistryInitObjectBytes = 0x98;
-inline constexpr std::uint64_t kRegistryInit531d60FragmentPinnedRva = 0x532b92;
+inline constexpr std::uint64_t kRegistryInit531d60FragmentPinnedRva = 0x532b94;
 
 struct RegistryInit531d60Hooks {
     bool merge_mov_edi_98_532b0c_u1_ran = false;
@@ -82,6 +83,7 @@ struct RegistryInit531d60Hooks {
     bool merge_vcall18_532b88_u1_ran = false;
     bool merge_add_rbx_58_532b8b_u1_ran = false;
     bool merge_cmp_r15_rbx_532b8f_u1_ran = false;
+    bool merge_jne_532b80_532b92_u1_ran = false;
 };
 
 
