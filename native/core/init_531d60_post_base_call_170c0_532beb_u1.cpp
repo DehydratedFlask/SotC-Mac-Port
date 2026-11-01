@@ -21,7 +21,7 @@ Init531d60PostBaseCall170c0_532beb_U1Result init_531d60_post_base_call_170c0_532
     }
     ++out.call_170c0_532beb_count;
 
-    // Next: tail @ 0x532bf0 — not modelled here.
+    // Next: E606 mov rdi,r12 @ 0x532bf0 — not modelled here.
     out.ok = (out.call_170c0_532beb_count == 1);
     return out;
 }
