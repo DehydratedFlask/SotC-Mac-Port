@@ -2592,3 +2592,10 @@ target_link_libraries(sotc_vtable_15e1ee0_slot_b0 PUBLIC sotc_core)
 add_executable(test_vtable_15e1ee0_slot_b0 tests/test_vtable_15e1ee0_slot_b0_e19980.cpp)
 target_link_libraries(test_vtable_15e1ee0_slot_b0 PRIVATE sotc_vtable_15e1ee0_slot_b0)
 add_test(NAME vtable_15e1ee0_slot_b0 COMMAND test_vtable_15e1ee0_slot_b0)
+
+# CPU-01-AOT-CFG-SCALE-01: resolved status-code lookup 0xe21420 (vtable 0x15e2028 slot 0x2a0).
+add_library(sotc_vtable_15e2028_slot2a0 STATIC core/vtable_15e2028_slot2a0_e21420.cpp)
+target_link_libraries(sotc_vtable_15e2028_slot2a0 PUBLIC sotc_core)
+add_executable(test_vtable_15e2028_slot2a0 tests/test_vtable_15e2028_slot2a0_e21420.cpp)
+target_link_libraries(test_vtable_15e2028_slot2a0 PRIVATE sotc_vtable_15e2028_slot2a0)
+add_test(NAME vtable_15e2028_slot2a0 COMMAND test_vtable_15e2028_slot2a0)

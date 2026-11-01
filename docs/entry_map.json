@@ -3496,6 +3496,16 @@
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
+    "0xe21420": [
+      {
+        "constant": "kVtable15e2028Slot2A0_e21420",
+        "header": "native/core/vtable_15e2028_slot2a0_e21420.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_e21420",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0xf180": [
       {
         "constant": "kInitSlotF180",
@@ -3840,6 +3850,12 @@
       {
         "constant": "kSndxUnnamedGroup",
         "header": "native/core/engine_category_vars.hpp"
+      }
+    ],
+    "0x1317064": [
+      {
+        "constant": "kVtable15e2028Slot2A0_e21420Name",
+        "header": "native/core/vtable_15e2028_slot2a0_e21420.hpp"
       }
     ],
     "0x1353": [
@@ -11012,6 +11028,10 @@
     ],
     "0xe21420": [
       {
+        "constant": "kVtable15e2028Slot2A0_e21420",
+        "header": "native/core/vtable_15e2028_slot2a0_e21420.hpp"
+      },
+      {
         "constant": "kResolvedVtableTarget_e21420",
         "header": "native/core/vtable_resolved_entries.hpp"
       }
@@ -11319,9 +11339,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1428,
-    "distinct_rvas": 972,
-    "duplicate_rvas": 305,
-    "headers": 379
+    "constants": 1430,
+    "distinct_rvas": 973,
+    "duplicate_rvas": 306,
+    "headers": 380
   }
 }

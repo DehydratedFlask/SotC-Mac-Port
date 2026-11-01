@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 08:40 CDT (root) — last resolved target 0xe21420 lifted as a decision contract (FIXTURE_VERIFIED / PARTIAL body)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_15e2028_slot2a0_e21420.{hpp,cpp}` for slot `0x15e2028 + 0x2a0 -> 0xe21420`.
+- **Body:** 681 B with **19 indirect calls**. Modelled only its **decision contract**: provider load at `ctx+0x48`, `provider->slot28(name)` lookup, `slot18() == 0x0e` state gate, `slot20() == 1` kind gate, null-name + `slot78() > 1` early `0x14`, then a counted scan with `strcmp` (PLT `0xf8f490`) over `slot88(i)`. Statuses `0x13`, `0x14`, `0x1b` are modelled as observed.
+- **Explicit partiality:** the two terminal bodies (`0xe214f7` missing path, which allocates a `0x48` object; `0xe2167e` found path) are hooks, and the remaining ~400 bytes of the body are **NOT modelled**. All 15 resolved targets now have models, but this one is a **decision contract + entry record**, not a full body lift.
+- **Fixture:** 9 cases — constants, missing object, state mismatch, kind mismatch, null name with many entries, found with scan count and index, not found, missing hooks, path names. Mutation (routing the state mismatch to `0x14`) fails 2 checks.
+- **Checker:** pins prologue/frame, provider load, all five vcall anchors (`0x28`, `0x18`, `0x20`, `0x78`, `0x88`), the state/kind compares, the three status constants, the `r8` tail jump, and resolves the `strcmp` call at body offset `0xb5`; plus padding, slot qword, RELA `0x15e22c8`, header constants, CMake and entry map.
+- **Entry map:** regenerated to **1,430 constants / 973 RVAs / 380 headers**.
+- **Verification (PASSED):** build exit 0; CTest **512/512**; lift checkers **705 passed / 0 failed**.
+- **Next exact action:** the frontier is now fully modelled at the decision level; the next bounded step is retail calling-convention thunks for the modelled entries, or a fresh seed sweep (`0x25d8b0`/`0x255130` closures were only sampled).
+
 ## 2026-11-02 07:40 CDT (root) — target 0xe19980 lifted: alignment-dispatch wrapper (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_15e1ee0_slot_b0_e19980.{hpp,cpp}` for slot `0x15e1ee0 + 0xb0 -> 0xe19980`.
