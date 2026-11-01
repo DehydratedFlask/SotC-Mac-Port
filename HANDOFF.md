@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 07:40 CDT (root) — target 0xe19980 lifted: alignment-dispatch wrapper (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_15e1ee0_slot_b0_e19980.{hpp,cpp}` for slot `0x15e1ee0 + 0xb0 -> 0xe19980`.
+- **Body (162 B, pinned `ed801564…98fd`):** if `arg3 & 7` is set, or `arg4 & 7` is set, take the slow path — `snprintf`-like format at `0xb30570` into a `0x100` stack buffer, then `element->vtable[0xd8](element, buffer)`, return 0. Otherwise the fast path — helper `0xe1eda0(arg3, arg2, arg4, arg5)`, then `*arg3 = *(0x3353478)`. Both paths compare the stack canary and call `0xf8f3a0` on mismatch.
+- **Model:** alignment decision from the two masks, both paths as hooks, the fast-path global store, and the canary save/compare. Null canary fails visibly (the body always reads it). Fixture: 7 cases — fast path with store, both misalignment routes, canary tamper, missing canary, path names.
+- **Mutation probe:** first attempt (`misaligned3` only) failed to build under `-Werror` (unused variable), so it proved nothing; re-run as `misaligned3 || (misaligned4 && false)` → **`FAIL slow4 path`**.
+- **Checker:** pins the frame, canary load, argument saves, both `test $7` sites, the `0xd8` vcall, the fast-path `lea`/store, canary compare and epilogue, and verifies the body's three relative calls resolve exactly to `0xb30570`, `0xe1eda0`, `0xf8f3a0`; plus padding, slot qword, RELA `0x15e1f90`, header constants, CMake and entry map.
+- **Entry map:** regenerated to **1,428 constants / 972 RVAs / 379 headers**.
+- **Verification (PASSED):** build exit 0; CTest **511/511**; lift checkers **704 passed / 0 failed**.
+- **Next exact action:** `0xe21420` (`0x2a9`, the largest remaining), after which all 15 resolved targets have models.
+
 ## 2026-11-02 06:50 CDT (root) — target 0xe1a5c0 lifted: container lookup (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_15e2028_slot70_e1a5c0.{hpp,cpp}` for slot `0x15e2028 + 0x70 -> 0xe1a5c0`.

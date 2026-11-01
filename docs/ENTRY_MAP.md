@@ -13,10 +13,10 @@ call dispatcher needs before lifted code can call lifted code by guest address.
 
 | Metric | Value |
 |---|---|
-| Declared RVA constants | **1,425** |
-| Distinct guest RVAs | **970** |
-| Headers contributing | **378** |
-| RVAs claimed by more than one header | **304** |
+| Declared RVA constants | **1,428** |
+| Distinct guest RVAs | **972** |
+| Headers contributing | **379** |
+| RVAs claimed by more than one header | **305** |
 
 ## What the numbers mean
 

@@ -2585,3 +2585,10 @@ target_link_libraries(sotc_vtable_15e2028_slot70 PUBLIC sotc_core)
 add_executable(test_vtable_15e2028_slot70 tests/test_vtable_15e2028_slot70_e1a5c0.cpp)
 target_link_libraries(test_vtable_15e2028_slot70 PRIVATE sotc_vtable_15e2028_slot70)
 add_test(NAME vtable_15e2028_slot70 COMMAND test_vtable_15e2028_slot70)
+
+# CPU-01-AOT-CFG-SCALE-01: resolved alignment-dispatch target 0xe19980 (vtable 0x15e1ee0 slot 0xb0).
+add_library(sotc_vtable_15e1ee0_slot_b0 STATIC core/vtable_15e1ee0_slot_b0_e19980.cpp)
+target_link_libraries(sotc_vtable_15e1ee0_slot_b0 PUBLIC sotc_core)
+add_executable(test_vtable_15e1ee0_slot_b0 tests/test_vtable_15e1ee0_slot_b0_e19980.cpp)
+target_link_libraries(test_vtable_15e1ee0_slot_b0 PRIVATE sotc_vtable_15e1ee0_slot_b0)
+add_test(NAME vtable_15e1ee0_slot_b0 COMMAND test_vtable_15e1ee0_slot_b0)
