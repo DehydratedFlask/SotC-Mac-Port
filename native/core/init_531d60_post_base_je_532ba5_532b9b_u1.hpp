@@ -1,8 +1,8 @@
 // Init `0x531d60` registry je null-rbx skip OBS `0x532b9b..0x532b9d` (2 B rel8):
 //   je 0x532ba5   ; ZF from test rbx,rbx @ `0x532b98`
 //
-// After E583 test @ `0x532b98`. NOT modelled: `0x532ba5` epilogue or fall-through @
-// `0x532b9d..`. G1 PARTIAL.
+// After E583 test @ `0x532b98`. Fall-through `mov rdi,rbx` is E585 `mov_rdi_rbx_532b9d_u1`.
+// NOT modelled: `0x532ba5` epilogue. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

@@ -14,7 +14,7 @@ Init531d60PostBaseJe532ba5_532b9b_U1Result init_531d60_post_base_je_532ba5_532b9
     out.branch_taken = cells.rbx_is_zero;
     ++out.je_532ba5_count;
 
-    // Next: epilogue @ 0x532ba5 or fall-through @ 0x532b9d — not modelled here.
+    // Next: fall-through mov @ 0x532b9d (E585) or epilogue @ 0x532ba5 — not modelled here.
     out.ok = (out.je_532ba5_count == 1);
     return out;
 }
