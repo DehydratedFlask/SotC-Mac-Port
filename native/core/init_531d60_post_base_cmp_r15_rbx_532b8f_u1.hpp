@@ -1,7 +1,7 @@
 // Init `0x531d60` registry cmp r15,rbx OBS `0x532b8f..0x532b92` (3 B):
 //   cmp r15,rbx   ; end marker vs walk pointer after add rbx,+0x58 @ `0x532b8b`
 //
-// After E579 add rbx @ `0x532b8b`. NOT modelled: jne @ `0x532b92..` (E581 sibling). G1 PARTIAL.
+// After E579 add rbx @ `0x532b8b`. NOT modelled: jne @ `0x532b92..` (E581 peel). G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
