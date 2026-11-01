@@ -489,3 +489,25 @@ the four edited test nodes and one new `fragment_classes_match` node; `trail bui
 8,292 wiring nodes and 11,219 edges, the next check passed, and `trail grep` found the new renderer
 API in its header and test. The graph cache is the existing git-ignored `graft/` directory; no
 downloaded tool or cache file is being published.
+
+## 2026-11-01 17:20 CDT — Metal Toolchain component (GPU-01-MSL-OFFLINE-01)
+
+- **Purpose / task:** GPU-01-MSL-OFFLINE-01. `xcrun metal` was missing from this Xcode install, so
+  the offline GCN -> MSL archive step could not compile anything. Apple's own component installer
+  was used; no third-party download.
+- **Source:** Apple, via `xcodebuild -downloadComponent MetalToolchain` (Xcode 27.2, macOS 27.0.1).
+  Component **27B47**, asset `022-22476-056.dmg`, 838.9 MB, Apple-signed.
+- **Install command:** `xcodebuild -downloadComponent MetalToolchain`
+- **Install path (managed by Xcode):**
+  `/System/Library/AssetsV2/com_apple_MobileAsset_MetalToolchain/e5b5544bf11850c8bd817f7702339b202c00661b.asset`
+- **Verified:** `xcrun -sdk macosx metal --version` -> `Apple metal version 32023.922
+  (metalfe-32023.922.4)`, target `air64-apple-darwin27.0.0`.
+- **Smoke test:** `python3 -I tools/dev/test_msl_pipeline_archive.py` (9 tests, OK) and a real
+  two-shader compile through `tools/dev/msl_pipeline_archive.py` (`PASSED archive` /
+  `PASSED check`, metallib digests `ae0ac5e5…7451` and `398276e4…e4d3`). Private temp dir only.
+- **Removal boundary:** `xcodebuild -deleteComponent MetalToolchain`. Nothing else in this repo
+  depends on it yet; generated `.air`/`.metallib` files stay under private `local/` or temp paths.
+- **Notes:** `.air` embeds the resolved absolute source path, so identical sources compiled from a
+  different directory produce different AIR digests while the metallib digests stay identical.
+  `-fdebug-prefix-map` / `-ffile-prefix-map` do not change this; record the AIR digest as
+  path-sensitive evidence only.

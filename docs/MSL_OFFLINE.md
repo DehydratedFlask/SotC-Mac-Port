@@ -1,0 +1,90 @@
+# Offline MSL archive step (GPU-01 prep, offline only)
+
+Status: tool behaviour **FIXTURE_VERIFIED** on two synthetic MSL shaders on this machine; no
+real `.csdr` compiled, no pipeline state object, **G3 NOT RUN**.
+
+## Where this sits
+
+`tools/dev/gcn_to_msl.py` lowers a bounded, explicitly ABI-matched GCN program to ordinary
+MSL text plus a JSON report; it never compiles anything. `tools/dev/msl_pipeline_archive.py`
+is the next step, still offline: it freezes each generated MSL file into a content-addressed
+AIR object, links one `.metallib` per stage, and records digests, sizes, compiler version and
+exact command lines in a stable archive manifest. The archive is tooling output, not a
+runtime input: nothing is linked into the game, and no Vulkan, guest GPU, disassembler or
+Sony module is involved. The population it would eventually describe is the 34,392 unique
+`.csdr` / 10,365 `.cmat` inventory in `docs/GPU01_PREP.md`; none of it is consumed yet.
+
+## Input manifest
+
+```json
+{"schema": "msl-pipeline-input-v1",
+ "entries": [{"id": "logo_vs", "stage": "vertex",
+              "msl_source_path": "shaders/logo_vs.metal"}]}
+```
+
+Ids are unique `[A-Za-z0-9_.-]+`; `stage` is `vertex` or `fragment`; the source path must be
+relative and resolve inside the manifest directory; unknown fields are rejected (a bare list
+of entries is also accepted).
+
+## Archive manifest (`<out>/msl_archive.json`)
+
+Sorted keys, entries sorted by `id`, LF endings, no absolute paths (guarded at write time):
+
+| Field | Meaning |
+|---|---|
+| `schema` | `msl-pipeline-archive-v1` |
+| `toolchain` | first line of `xcrun -sdk macosx metal --version`; `sdk` is `macosx` |
+| `counts` | `{entries, unique_air, stages[]}` |
+| `entries[]` | `id`, `stage`, `msl_source` (declared relative path), `msl_sha256`, `msl_bytes`, `air{path,sha256,bytes}`, `command{argv[],line}` |
+| `stages{vertex,fragment}` | `path`, `sha256`, `bytes`, `air_sha256[]` (sorted), `command{argv[],line}` |
+
+Artifacts: `out/<msl_sha256>.air`, `out/<stage>.metallib`; commands run from the archive root,
+so tokens stay relative (`../shaders/logo_vs.metal`).
+
+## Commands
+
+```sh
+python3 -I tools/dev/msl_pipeline_archive.py --manifest in.json --out private/archive
+python3 -I tools/dev/msl_pipeline_archive.py --manifest in.json --out private/archive --check
+python3 -I tools/dev/test_msl_pipeline_archive.py -v
+```
+
+Exit codes: `0` ok, `1` failure (including a digest mismatch), `75` Metal toolchain
+unavailable with the reason on stderr. `--check` first re-verifies the archived artifacts,
+refuses a changed toolchain version, then recompiles into `out/.check/` and compares MSL,
+AIR and metallib digests and byte sizes; it never rewrites the archive.
+
+## What was actually run here
+
+2026-11-01, macOS 27.0.1 (build 26A434) on arm64, Xcode 27.2, Metal Toolchain component
+27B47. The component was absent at session start (`xcrun ... metal --version` reported
+"cannot execute tool 'metal' due to missing Metal Toolchain"); it was installed with
+`xcodebuild -downloadComponent MetalToolchain` (838.9 MB, asset `022-22476-056.dmg`).
+Toolchain string: `Apple metal version 32023.922 (metalfe-32023.922.4)`.
+
+Two synthetic hand-written shaders (336 B vertex, 276 B fragment) were compiled in a private
+temp directory; two AIR files and two stage metallibs were produced:
+
+```
+fragment	demo_fragment	msl=752a717a63b67dc960210845655a9ca471e9beb406e7e468242534bc9a8cb828 air=77707a627dbe574c7a54e67c956251f4dd1a2fa0c9a5648998854b9a5ea3b4bd air_bytes=3248
+vertex	demo_vertex	msl=939fd810ff78e92248d16b8d64b13da89c0c949c1242ef06381243ee4f4d256d air=145bfcbd26cca46fc5059fc7ec6a90739e238f9c94bbf4637bf834b5a7e0ed08 air_bytes=3296
+metallib	fragment	out/fragment.metallib	sha256=6ee668cc18d90e906eac9c6cf9038d1acdcf30ae55d4f2e3f6f60de946d36913 bytes=3852
+metallib	vertex	out/vertex.metallib	sha256=72a7cadc930c55f33974806cad4590cfe748ea7da553ffcf212683bc15386c04 bytes=3900
+```
+
+`--check` passed; a second archive of the same inputs was byte-identical; 9 unittest tests
+passed (one source char mutated fails `--check`; no `xcrun`, and a fake `xcrun` without the
+component, both exit 75).
+
+## Limits
+
+- Synthetic MSL only: two hand-written files, not produced by `gcn_to_msl.py`; 0 of the
+  34,392 unique `.csdr` were compiled and no `.cmat` was read.
+- No pipeline state objects, render pipeline descriptors, reflection or argument tables; the
+  two demo metallibs were archived but never loaded or executed, so there is no G3/Metal
+  frame claim and no runtime path. No `native/` change and no build target.
+- AIR embeds the resolved source path (`strings`): an identical build in another directory gave
+  different AIR digests (`b57a1931…`, `7865c861…`) with identical metallib digests, and
+  `-fdebug-prefix-map`/`-ffile-prefix-map` changed nothing. Keep archives in private `local/`.
+- Metallib linking was byte-identical across runs on this machine/toolchain only, not across OS
+  or toolchain versions; and the tool records what the compiler produced, not MSL semantics.

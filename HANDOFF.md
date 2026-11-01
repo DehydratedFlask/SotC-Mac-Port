@@ -1,5 +1,23 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 17:40 CDT (root) — whole-program CFG census (STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01` first increment. `tools/lift/cfg_census.py` (730 lines, stdlib only) builds the direct-call graph from the saved FDE ranges + one streaming pass over the pinned disassembly, then reports the transitive closure for `--seed` addresses and every unresolved indirect site inside it.
+- **Numbers (verified by rerun here):** FDE **55,790** ranges / **15,839,273 B** / **0 overlaps** / **0** duplicate keys, extent `0x80..0xf8f321`, **70.01%** of the executable range (`0x0..0x1593978`; the 30% is a 6.3 MB rodata tail plus padding). Calls: **227,401** sites = 179,920 direct + 47,481 indirect. Internal direct edges: 148,201 sites → 86,774 unique pairs → 19,322 callees, **0 mid-function targets**. The direct graph is **closed**: every direct call from FDE-covered code lands in another FDE range or the PLT (`0xf8f380..0xf91740`).
+- **Closure:** `0x531d60` → **608** functions / 1,496 edges / **105** indirect frontier; `0x1bdf30` → **416** / 1,175 / **59**; union **817** / 2,102 / **136**. Runtime ~1.05 s per pass over the 251.7 MB / 6,612,510-line disassembly.
+- **Robustness:** exit 2 on missing/malformed/duplicate inputs and out-of-range seeds, exit 4 on overlapping FDEs, byte-identical JSON across reruns.
+- **Limits:** indirect targets counted, never resolved; no LSDA/landing pads; objdump-derived rather than decoder-derived; default run does not follow intra-function branches or direct tail calls; needs the private ELF + `all.dis` + `fde_ranges.json`, so it cannot run from a clean checkout; nothing was executed.
+- **Report:** `docs/CFG_CENSUS.md`; run log `local/validation/aot-cfg/REPORT.md` (private).
+
+## 2026-11-01 17:25 CDT (root) — offline MSL pipeline archive (FIXTURE_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01` first increment. `tools/dev/msl_pipeline_archive.py` compiles MSL sources offline with `xcrun metal` into **content-addressed `.air`** plus one `.metallib` per stage, and writes a stable manifest (id, stage, msl/air/metallib digests, sizes, toolchain version, command line). `--check` recompiles and refuses digest/toolchain drift; exits 75 with a reason when the Metal toolchain is absent.
+- **Fixture:** `tools/dev/test_msl_pipeline_archive.py` — 9 stdlib unittest cases (happy path, digest stability, source mutation, missing toolchain, broken manifest not masked by the skip).
+- **Toolchain:** Apple Metal Toolchain component 27B47 (`Apple metal version 32023.922`), installed with `xcodebuild -downloadComponent MetalToolchain`; recorded in `INSTALL_LOG.md` with the removal boundary `xcodebuild -deleteComponent MetalToolchain`.
+- **Verified (PASSED):** unit tests 9/9; real two-shader compile -> `PASSED archive` / `PASSED check`, metallib digests `ae0ac5e5…7451` and `398276e4…e4d3`.
+- **Limits:** synthetic MSL only — **0 of 34,392 real `.csdr` compiled**; no pipeline state objects, no archive loaded at run time, no G3 claim. `.air` digests are path-sensitive (absolute source path is embedded) while `.metallib` digests are stable.
+- **Note:** the GCN→MSL lowering itself already existed in `tools/dev/gcn_to_msl.py`; this task added the archive/verification step, not a new lowering.
+
 ## 2026-11-01 17:00 CDT (root) — Metal encoder for the typed draw list (FIXTURE_VERIFIED)
 
 - **Task:** `GPU-01-PM4-TRANSLATOR-01` slice 4. `native/platform/metal_draw_encoder.{hpp,mm}`: takes the `pm4::DrawCommand` list, starts **one** offscreen render pass (`BGRA8Unorm`, clear black), and issues one **indexed** `drawIndexedPrimitives` per typed draw through `MTLRenderCommandEncoder`; colour is derived from the draw kind and dimmed to 25% when the count is 0, so the readback proves which draws were issued. RGBA readback + FNV digest for cheap equality checks.
