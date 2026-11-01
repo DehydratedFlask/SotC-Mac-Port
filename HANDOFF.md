@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 22:50 CDT (root) — MSL decoder v5 and the control-flow ceiling (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01`, decoder widening card 5. Added VOP2 5 `v_subrev_f32` and VOP3 350 `v_cvt_pk_u8_f32` (a three-source row, so it joins the scalar read-port rule with 321/322/349), both read from the pinned PS4 frontend table.
+- **Measured at sample 512** (`local/validation/msl-coverage/after-opcodes-5`): decoded programs **162 → 183 of 367** (75 at v3), instructions **5,168 → 6,574** (654 at v3), decode-error **205 → 184** (292 at v3), members with ≥1 decoded program **95 → 116**.
+- **A fabricated row was caught before commit.** The first attempt mapped `SOPP 8` to `s_barrier` from the Sea Islands ISA list. Two independent checks contradicted it: the pinned PS4 SOPP table puts `S_BARRIER` at **10**, and the 1,171 observed opcode-8 words carry small varied immediates (2, 9, 10, 13, 14, 16, 21, 27, 36, 112 …) — branch offsets, not a barrier's required zero. The row was reverted; `S_BARRIER` is now modelled at 10 with a `wave_barrier` per-lane blocker, and opcode 8 is documented as `s_cbranch_execz`.
+- **The ceiling is now control flow, not the opcode table.** `SOPP 8 s_cbranch_execz` (117) and `SOPP 5 s_cbranch_scc1` (5) are **122 of the 184 remaining decode errors**. A linear span decoder cannot represent a branch edge, and inventing fall-through would fabricate a program, so both stay rejected. The decoder now raises `unsupported control transfer SOPP opcode N (<name>)` so the census separates "needs a CFG" from "needs another row".
+- **Hardening:** `gcn_to_msl` now rejects any VINTRP opcode other than 0/1 explicitly, so `v_interp_mov_f32` (op 2) can never be mis-lowered as a P2 interpolation even if a future decoder admits it.
+- **Tests:** `test_gcn_inventory.py` 37 (positives for every new row; negatives for SOPP 2/8/9, a nonzero barrier immediate, VOP2 6, VOP3 351), `test_gcn_to_msl.py` 23, coverage self-test 23.
+- **Still zero lowered:** decoding is not Metal semantics and no per-shader ABI manifest exists.
+- **Verification (PASSED):** build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Next exact action:** a CFG-aware decoder (basic-block split at branch rows) is the only way past the 122 branch-blocked programs; the alternative is more per-lane lowering work on the 74 already-eligible programs.
+
 ## 2026-11-02 21:40 CDT (root) — MSL decoder v4: MUBUF dword + integer cmpx (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `GPU-01-MSL-OFFLINE-01`, decoder widening card 4. Added MUBUF 12/13/14 (`buffer_load_dword`, `dwordx2`, `dwordx4`) and 15/16/17 (stores) with **explicit component counts** (1/2/4; GFX7 has no `dwordx3`), and VOPC 208-213 integer `cmpx` compares. The VOPC values are cross-checked against the pinned shadPS4 frontend table (`209 = V_CMPX_LT_U32`, `212 = V_CMPX_GT_U32`).

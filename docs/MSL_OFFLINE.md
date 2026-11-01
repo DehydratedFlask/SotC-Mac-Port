@@ -199,8 +199,38 @@ tests **FIXTURE_VERIFIED**, census **STATIC_ANALYSIS_VERIFIED**, G3 NOT RUN.
 | Programs decoded / attempted | 75 / 367 | **162 / 367** |
 | Instructions in decoded programs | 654 | **5,168** |
 | Decode-error programs | 292 | **205** |
-| Members with ≥1 decoded program | 71 | 71+ (see coverage.json) |
+| Members with ≥1 decoded program | 71 | 95 |
 
 - **New top blockers:** `SOPP 8` 117, `VINTRP 2` 48, `VOP3 350` 16, `SOPP 5` 5, `VOP2 5` 5.
 - **Limit:** decoding still says nothing about Metal semantics; 0 real shaders are lowered, because
   no per-shader ABI manifest exists.
+
+## Decoder widening 4 (VOP2/VOP3 rows, and why the biggest blocker is not a table row)
+
+- **Added:** VOP2 5 `v_subrev_f32` and VOP3 350 `v_cvt_pk_u8_f32` (a three-source row, so it joins
+  the scalar read-port rule with 321/322/349). Both opcode values are read straight from the pinned
+  PS4 frontend table.
+- **Measured at sample 512** (`--out local/validation/msl-coverage/after-opcodes-5`):
+
+| Metric | v4 | v5 |
+|---|---:|---:|
+| Programs decoded / attempted | 162 / 367 | **183 / 367** |
+| Instructions in decoded programs | 5,168 | **6,574** |
+| Decode-error programs | 205 | **184** |
+| Members with ≥1 decoded program | 95 | **116** |
+| Per-lane eligible decoded programs | 74 / 162 | 74 / 183 |
+
+- **The remaining ceiling is control flow, not the opcode table.** The top two blockers are
+  `SOPP 8` (117) and `SOPP 5` (5) — together **122 of the 184 remaining decode errors**. The pinned
+  PS4 SOPP table names them `s_cbranch_execz` and `s_cbranch_scc1`: conditional branches whose target
+  is an immediate offset. A linear span decoder cannot represent that edge, and inventing fall-through
+  would fabricate a program, so both stay rejected. The decoder now reports them as
+  `unsupported control transfer SOPP opcode N (<name>)` so the census can separate "needs a CFG" from
+  "needs another table row".
+- **A wrong row was caught before commit.** The first attempt in this card mapped `SOPP 8` to
+  `s_barrier` from the Sea Islands ISA list. Two independent checks contradicted it: the pinned PS4
+  table puts `S_BARRIER` at **10**, and the 1,171 observed opcode-8 words carry small, varied
+  immediates (2, 9, 10, 13, 14, 16, 21, 27, 36, 112 …) — branch offsets, not a barrier's required
+  zero. The row was reverted; `S_BARRIER` is modelled at 10 with a `wave_barrier` per-lane blocker
+  and a test, and opcode 8 is documented as a branch.
+- **Still zero lowered:** decoding is not Metal semantics, and no per-shader ABI manifest exists.

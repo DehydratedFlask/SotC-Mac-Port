@@ -182,6 +182,36 @@ class EncodingOracleTests(unittest.TestCase):
             with self.assertRaises(gcn.DecodeError):
                 one(vopc(op=opcode))
 
+    def test_barrier_subrev_and_byte_pack(self):
+        # SOPP 10 s_barrier decodes as a fixed one-dword instruction and is a wave-level blocker.
+        # The pinned PS4 SOPP table puts S_BARRIER at 10; opcode 8 is S_CBRANCH_EXECZ, a branch.
+        barrier = one(sopp(op=10))
+        self.assertEqual((barrier.encoding, barrier.mnemonic, barrier.size),
+                         ('SOPP', 's_barrier', 4))
+        self.assertEqual(barrier.requirements, ('wave_barrier',))
+        self.assertFalse(gcn.inventory(sopp(op=10) + sopp(op=1))['per_lane_eligible'])
+
+        # VOP2 5 v_subrev_f32: src0 - src1 (reversed operands), still two sources.
+        self.assertEqual(one(vop2(op=5)).mnemonic, 'v_subrev_f32')
+        # VOP3 350 v_cvt_pk_u8_f32 is a three-source row.
+        packed = one(vop3(op=350, abs_=0, clamp=0, omod=0, neg=0))
+        self.assertEqual(packed.mnemonic, 'v_cvt_pk_u8_f32')
+        self.assertEqual(packed.fields['src2'], 269)
+
+        # Neighbouring rows still reject: branches, other SOPP rows, other VOP2/VOP3 slots.
+        # Branch rows are named as control transfers and never decoded; a barrier with a nonzero
+        # immediate is refused too.
+        for imm, opcode in ((0, 2), (0, 8), (0, 9), (1, 10)):
+            with self.assertRaises(gcn.DecodeError):
+                one(sopp(op=opcode, imm=imm))
+        with self.assertRaises(gcn.DecodeError) as caught:
+            one(sopp(op=8))
+        self.assertIn('control transfer', caught.exception.reason)
+        with self.assertRaises(gcn.DecodeError):
+            one(vop2(op=6))
+        with self.assertRaises(gcn.DecodeError):
+            one(vop3(op=351, abs_=0, clamp=0, omod=0, neg=0))
+
     def test_scalar_memory_register_and_literal_offsets(self):
         # IMM=1 is the byte-immediate offset; IMM=0 makes OFFSET an SGPR selector and
         # selector 255 consumes the following dword (same width rule as SOP1 literals).
@@ -439,8 +469,8 @@ class RejectionTests(unittest.TestCase):
         # SOPP 5 `s_cbranch_scc1` (control transfer), the MUBUF/MIMG store rows.
         for p in (vop2(op=38), vop2(op=40), vop1(op=37),
                   vop3(op=323, abs_=0, clamp=0, omod=0, neg=0),
-                  vop3(op=350, abs_=0, clamp=0, omod=0, neg=0),
-                  sop1(op=35), sopp(op=2), sopp(op=5), sopp(op=8),
+                  vop3(op=351, abs_=0, clamp=0, omod=0, neg=0),
+                  sop1(op=35), sopp(op=2), sopp(op=5), sopp(op=9),
                   mubuf(op=4), mubuf(op=28), mimg(op=8)):
             self.reject(p+END, 'unsupported')
 

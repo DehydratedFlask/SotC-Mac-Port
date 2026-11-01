@@ -235,6 +235,10 @@ class Lowerer:
                     for j in range(components):
                         self.v[f['vdata']+j] = cells[j]
                 elif i.encoding == 'VINTRP':
+                    if i.opcode not in (0, 1):
+                        # v_interp_mov_f32 (op 2) moves a parameter *or constant* without
+                        # interpolation; the P1/P2 pairing below cannot express it.
+                        raise LoweringError('unsupported interpolation opcode')
                     if self.abi.get('interpolation') != 'supplied_float_coefficients':
                         raise LoweringError('interpolation mode is not explicitly supplied')
                     if self.s.get(124) != Cell('interpolation_control','supplied_coefficients'):

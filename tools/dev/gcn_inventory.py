@@ -25,7 +25,7 @@ import struct
 import sys
 
 ISA_URL = 'https://docs.amd.com/v/u/en-US/sea-islands-instruction-set-architecture_0'
-VERSION = 'gfx7-bounded-inventory-v4'
+VERSION = 'gfx7-bounded-inventory-v5'
 
 # These are encoding facts, not a translation/semantic implementation.
 # SOP2/SOPC/VOPC rows below are opcode-value facts from the GFX7 ISA tables,
@@ -55,17 +55,18 @@ OPCODES = {
              9: 's_cmp_ge_u32', 10: 's_cmp_lt_u32', 11: 's_cmp_le_u32',
              12: 's_bitcmp0_b32', 13: 's_bitcmp1_b32', 14: 's_bitcmp0_b64',
              15: 's_bitcmp1_b64'},
-    'SOPP': {1: 's_endpgm', 12: 's_waitcnt', 22: 's_ttracedata'},
+    'SOPP': {1: 's_endpgm', 10: 's_barrier', 12: 's_waitcnt', 22: 's_ttracedata'},
     'SMRD': {0: 's_load_dword', 1: 's_load_dwordx2', 2: 's_load_dwordx4',
              3: 's_load_dwordx8', 4: 's_load_dwordx16',
              8: 's_buffer_load_dword', 9: 's_buffer_load_dwordx2',
              10: 's_buffer_load_dwordx4', 11: 's_buffer_load_dwordx8',
              12: 's_buffer_load_dwordx16'},
     'VOP1': {1: 'v_mov_b32', 36: 'v_floor_f32', 46: 'v_rsq_f32'},
-    'VOP2': {3: 'v_add_f32', 4: 'v_sub_f32', 8: 'v_mul_f32', 22: 'v_lshrrev_b32',
+    'VOP2': {3: 'v_add_f32', 4: 'v_sub_f32', 5: 'v_subrev_f32', 8: 'v_mul_f32',
+             22: 'v_lshrrev_b32',
              31: 'v_mac_f32', 37: 'v_add_i32', 47: 'v_cvt_pkrtz_f16_f32'},
     'VOP3': {264: 'v_mul_f32', 303: 'v_cvt_pkrtz_f16_f32', 321: 'v_mad_f32',
-             322: 'v_mad_i32_i24', 349: 'v_sad_u32'},
+             322: 'v_mad_i32_i24', 349: 'v_sad_u32', 350: 'v_cvt_pk_u8_f32'},
     'VOPC': {0: 'v_cmp_f_f32', 1: 'v_cmp_lt_f32', 2: 'v_cmp_eq_f32',
              3: 'v_cmp_le_f32', 4: 'v_cmp_gt_f32', 5: 'v_cmp_lg_f32',
              6: 'v_cmp_ge_f32', 7: 'v_cmp_o_f32', 8: 'v_cmp_u_f32',
@@ -98,6 +99,17 @@ OPCODES = {
 MUBUF_COMPONENTS = {0: 1, 1: 2, 2: 3, 3: 4, 4: 1, 5: 2, 6: 3, 7: 4,
                     12: 1, 13: 2, 14: 4, 15: 1, 16: 2, 17: 4}
 
+# Control-transfer rows that a linear span decoder must refuse: the target is an immediate offset,
+# and inventing fall-through would fabricate a program. Names come from the pinned PS4 table in
+# reference/shadPS4/src/shader_recompiler/frontend/format.cpp (SOPP block).
+CONTROL_TRANSFER_OPCODES = {
+    'SOPP': {2: 's_branch', 4: 's_cbranch_scc0', 5: 's_cbranch_scc1',
+             6: 's_cbranch_vccz', 7: 's_cbranch_vccnz',
+             8: 's_cbranch_execz', 9: 's_cbranch_execnz'},
+    'SOP2': {43: 's_cbranch_g_fork'},
+}
+
+
 # SOP2 operand widths: 64-bit destination, 64-bit first source, 64-bit second source.
 # The shift/bitfield forms take 64-bit values but a 32-bit shift/bitfield descriptor, so
 # only the boolean ops pair both sources; s_bfm_b64's two sources are both 32-bit.
@@ -110,7 +122,7 @@ SOPC_64BIT_SRC0 = frozenset((14, 15))
 # SDST and masks EXEC with SRC0, so both operands are wide).
 SOP1_64BIT = frozenset((4, 10, 36))
 # VOP3 rows that read all three source fields; every other modelled VOP3 row reads two.
-VOP3_THREE_SOURCE = frozenset((321, 322, 349))
+VOP3_THREE_SOURCE = frozenset((321, 322, 349, 350))
 # VOP3 ABS/CLAMP/OMOD/NEG modulate floating-point results only. On an integer row the ISA
 # defines none of them, so a nonzero value is a shape this decoder does not model rather
 # than a fold to guess.
@@ -267,6 +279,10 @@ def _validate(form: str, op: int, f: dict[str, int], at: int) -> tuple[str, ...]
     elif form == 'SOPP':
         if op == 1:
             require(f['simm16'] == 0, 'unsupported nonzero s_endpgm immediate')
+        elif op == 10:
+            require(f['simm16'] == 0, 'unsupported nonzero s_barrier immediate')
+            requirements.add('wave_barrier')
+
         elif op == 12:
             require(f['simm16'] & ~0x1f7f == 0, 'reserved s_waitcnt bits')
             f.update(vmcnt=f['simm16'] & 15, expcnt=(f['simm16'] >> 4) & 7,
@@ -380,6 +396,10 @@ def decode(code: bytes) -> list[Instruction]:
         op = (word >> shift) & opmask
         mnemonic = OPCODES[form].get(op)
         if mnemonic is None:
+            if form in CONTROL_TRANSFER_OPCODES and op in CONTROL_TRANSFER_OPCODES[form]:
+                raise DecodeError(offset,
+                                  f'unsupported control transfer {form} opcode {op} '
+                                  f'({CONTROL_TRANSFER_OPCODES[form][op]})')
             raise DecodeError(offset, f'unsupported {form} opcode {op}')
         literals = _literals(form, word)
         if len(literals) > 1:
@@ -409,7 +429,7 @@ def decode(code: bytes) -> list[Instruction]:
 
 
 PER_LANE_BLOCKERS = frozenset(('whole_quad_mode', 'writes_exec_mask', 'reads_exec_mask',
-                               'reads_vcc_mask', 'lds_direct',
+                               'reads_vcc_mask', 'lds_direct', 'wave_barrier',
                                'lds_memory', 'implicit_quad_derivatives'))
 
 
