@@ -16,7 +16,6 @@ Init531d60PostBaseAddRbx_58_532b8b_U1Result init_531d60_post_base_add_rbx_58_532
     }
     ++out.add_rbx_58_count;
 
-    // Next: cmp r15,rbx @ 0x532b8f — NOT modelled here.
     out.ok = (out.add_rbx_58_count == 1);
     return out;
 }
