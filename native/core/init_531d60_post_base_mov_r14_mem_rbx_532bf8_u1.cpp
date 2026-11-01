@@ -17,7 +17,7 @@ Init531d60PostBaseMovR14MemRbx_532bf8_U1Result init_531d60_post_base_mov_r14_mem
     out.stored = r14;
     ++out.mov_r14_mem_rbx_532bf8_count;
 
-    // Next: lea rax,[rip+disp] @ 0x532bfb — not modelled here.
+    // Next: E609 lea rax,[0x2ee2cf8] @ 0x532bfb — not modelled here.
     out.ok = (out.mov_r14_mem_rbx_532bf8_count == 1);
     return out;
 }
