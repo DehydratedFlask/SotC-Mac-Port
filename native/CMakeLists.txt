@@ -2478,3 +2478,10 @@ add_library(sotc_pm4_decoder STATIC platform/pm4_decoder.cpp)
 add_executable(test_pm4_decoder tests/test_pm4_decoder.cpp)
 target_link_libraries(test_pm4_decoder PRIVATE sotc_pm4_decoder)
 add_test(NAME pm4_decoder COMMAND test_pm4_decoder)
+
+# GPU-01-PM4-TRANSLATOR-01 slice 2: PM4 register-file state tracking with snapshot/digest.
+add_library(sotc_pm4_state STATIC platform/pm4_state.cpp)
+target_link_libraries(sotc_pm4_state PUBLIC sotc_pm4_decoder)
+add_executable(test_pm4_state tests/test_pm4_state.cpp)
+target_link_libraries(test_pm4_state PRIVATE sotc_pm4_state)
+add_test(NAME pm4_state COMMAND test_pm4_state)

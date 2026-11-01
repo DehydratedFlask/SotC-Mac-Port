@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 15:20 CDT (root) — PM4 register-file state slice (FIXTURE_VERIFIED)
+
+- **Task:** `GPU-01-PM4-TRANSLATOR-01` slice 2. `native/platform/pm4_state.{hpp,cpp}`: dense 16-bit register file with **all-or-nothing bounded writes**, overwrite tracking, delta list with clear, distinct-written count, **FNV-1a state digest** for shadow comparison, and `StateTrackingSink` applying type-1 packets during decode.
+- **Fixture:** `native/tests/test_pm4_state.cpp` — 10 cases (empty, single write/read, overwrite keeps one delta, multi-write, out-of-range rejection + boundary success, null/zero-count, digest sensitivity to value and index, sink apply, sink overflow stop, status names).
+- **Mutation probes:** `end > kRegisterIndexSpace` → `>=` fails "range boundary ok"; the fixture also caught a real bug during development (`clear_delta` left the in-delta flags set, so a rewrite after clearing was not recorded).
+- **Verification (PASSED):** configure/build exit 0; CTest **497/497**; lift checkers **687 passed / 0 failed**.
+- **Gates:** unchanged; G0/G1/G3/G4 PARTIAL, G2/G5/G6 NOT RUN.
+
 ## 2026-11-01 15:00 CDT (root) — independent checker byte audit: 0 mismatches (STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `AUD-01-CHECKER-BYTE-AUDIT-01`. Independent pass over all **687** `tools/lift/check_*.py` against the pinned ELF (`d0723afb…61d3`): **5,528** address-bound expectations (3,732 literal byte comparisons, 1,476 region SHA pins, 242 disp32-masked, 44 wildcard-template, 3 string SHA). **0 mismatches.**
