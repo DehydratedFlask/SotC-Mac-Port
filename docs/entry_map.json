@@ -3466,6 +3466,16 @@
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
+    "0xe16a00": [
+      {
+        "constant": "kVtable15f2f08Slot38_e16a00",
+        "header": "native/core/vtable_15f2f08_slot38_e16a00.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_e16a00",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0xf180": [
       {
         "constant": "kInitSlotF180",
@@ -10940,6 +10950,10 @@
     ],
     "0xe16a00": [
       {
+        "constant": "kVtable15f2f08Slot38_e16a00",
+        "header": "native/core/vtable_15f2f08_slot38_e16a00.hpp"
+      },
+      {
         "constant": "kResolvedVtableTarget_e16a00",
         "header": "native/core/vtable_resolved_entries.hpp"
       }
@@ -11265,9 +11279,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1423,
+    "constants": 1424,
     "distinct_rvas": 970,
-    "duplicate_rvas": 302,
-    "headers": 376
+    "duplicate_rvas": 303,
+    "headers": 377
   }
 }

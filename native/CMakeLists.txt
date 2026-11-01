@@ -2571,3 +2571,10 @@ target_link_libraries(sotc_vtable_15e0b48_slot28 PUBLIC sotc_core)
 add_executable(test_vtable_15e0b48_slot28 tests/test_vtable_15e0b48_slot28_ddf4b0.cpp)
 target_link_libraries(test_vtable_15e0b48_slot28 PRIVATE sotc_vtable_15e0b48_slot28)
 add_test(NAME vtable_15e0b48_slot28 COMMAND test_vtable_15e0b48_slot28)
+
+# CPU-01-AOT-CFG-SCALE-01: resolved dual-vcall target 0xe16a00 (vtable 0x15f2f08 slot 0x38).
+add_library(sotc_vtable_15f2f08_slot38 STATIC core/vtable_15f2f08_slot38_e16a00.cpp)
+target_link_libraries(sotc_vtable_15f2f08_slot38 PUBLIC sotc_core)
+add_executable(test_vtable_15f2f08_slot38 tests/test_vtable_15f2f08_slot38_e16a00.cpp)
+target_link_libraries(test_vtable_15f2f08_slot38 PRIVATE sotc_vtable_15f2f08_slot38)
+add_test(NAME vtable_15f2f08_slot38 COMMAND test_vtable_15f2f08_slot38)

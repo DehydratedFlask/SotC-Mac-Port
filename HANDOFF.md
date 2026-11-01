@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 06:00 CDT (root) — target 0xe16a00 lifted: dual-vcall forwarding (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_15f2f08_slot38_e16a00.{hpp,cpp}` for slot `0x15f2f08 + 0x38 -> 0xe16a00` (two call sites: `0xed171c`, `0xed1733`).
+- **Body (38 B, pinned `351ea6e0…43c11`):** save `this` and arg1; `mov (%rbx),%rax; call *0x18(%rax)`; **reload the vtable**; `mov %rbx,%rdi; mov %r14,%rsi; mov 0x20(%rax),%rax; jmp *%rax`. A forwarding wrapper that calls slot `0x18`, then tail-calls slot `0x20` with the same arguments.
+- **Correction:** the earlier frontier summary listed the RELA at `0x15f25f0`; the live row is **`0x15f2f40`** (type 8, addend `0xe16a00`). The header records the correction.
+- **Model:** vtable read twice (the retail body reloads it), both calls as ordered hooks, argument forwarded unchanged; null object or null vtable fails visibly because the retail body would fault on `mov (%rbx),%rax`. Fixture: 6 cases (constants, ordered full path with argument check, null self, null vtable, hooks absent but counted, missing cells). Mutation (dropping the tail hook) fails 2 checks.
+- **Checker:** verifies prologue, both saves, first vtable load + slot `0x18` call, vtable reload, argument reloads, slot `0x20` load, register restores, `ff e0`, padding, slot qword, RELA `0x15f2f40`, header constants, CMake and entry-map presence.
+- **Entry map:** regenerated to **1,424 constants / 970 RVAs / 377 headers**.
+- **Verification (PASSED):** build exit 0; CTest **509/509**; lift checkers **702 passed / 0 failed**.
+- **Next exact action:** `0xe1a5c0` (`0x97`), then `0xe19980` (`0xa2`), `0xe21420` (`0x2a9`).
+
 ## 2026-11-02 05:15 CDT (root) — target 0xddf4b0 lifted: first manager-dispatch body (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_15e0b48_slot28_ddf4b0.{hpp,cpp}` for slot `0x15e0b48 + 0x28 -> 0xddf4b0`.
