@@ -28,6 +28,15 @@ struct RetailCallContext {
     void (*pre_2687b0)(void* self) = nullptr;
     void (*pre_1bf710)(void* self) = nullptr;
     const AllocDispatchContract* alloc = nullptr;
+
+    // 0xe16a00: dual vcall, both receive (self, argument).
+    void (*slot18_e16a00)(void* self, void* argument) = nullptr;
+    void (*slot20_e16a00)(void* self, void* argument) = nullptr;
+
+    // 0xddf4b0: pre-pass, manager fetch, and the tail vcall through the manager.
+    void (*pre_ddf4b0)(void* self) = nullptr;
+    void* (*fetch_manager_ddf4b0)() = nullptr;
+    void (*tail_ddf4b0)(void* manager, void* self) = nullptr;
 };
 
 enum class RetailCallStatus : std::uint8_t {

@@ -171,6 +171,47 @@ void test_copy_targets_and_noop() {
     check("noop ok", noop.ok && noop.rax == 0);
 }
 
+void hook_slot18(void*, void*) {}
+void hook_slot20(void*, void*) {}
+void hook_pre_ddf(void* self) { (void)self; }
+void* g_manager = reinterpret_cast<void*>(0x1234);
+void* fetch_manager() { return g_manager; }
+void hook_tail_ddf(void*, void*) {}
+
+void test_dual_vcall_and_manager() {
+    std::vector<std::uint8_t> storage(0x100, 0);
+    GuestWindow window(storage.data(), 0x80000, storage.size());
+    const void* vtable = reinterpret_cast<const void*>(0x50000);
+    std::memcpy(storage.data(), &vtable, sizeof(vtable));
+    RetailFrame frame{};
+    frame.set(RetailArg::rdi, 0x80000);
+    frame.set(RetailArg::rsi, 0x80040);
+    RetailCallContext context{};
+    context.slot18_e16a00 = hook_slot18;
+    context.slot20_e16a00 = hook_slot20;
+    const auto dual = call_resolved(sotc::kVtable15f2f08Slot38_e16a00Rva, frame, window, context);
+    check("e16a00 ok", dual.ok);
+
+    RetailCallContext manager_context{};
+    manager_context.pre_ddf4b0 = hook_pre_ddf;
+    manager_context.fetch_manager_ddf4b0 = fetch_manager;
+    manager_context.tail_ddf4b0 = hook_tail_ddf;
+    const auto manager = call_resolved(sotc::kVtable15e0b48Slot28_ddf4b0Rva, frame, window,
+                                       manager_context);
+    check("ddf4b0 ok", manager.ok);
+
+    RetailCallContext missing_manager{};
+    missing_manager.pre_ddf4b0 = hook_pre_ddf;
+    const auto missing = call_resolved(sotc::kVtable15e0b48Slot28_ddf4b0Rva, frame, window,
+                                       missing_manager);
+    check("ddf4b0 no manager fails", !missing.ok &&
+                                         missing.status == RetailCallStatus::model_failed);
+
+    frame.set(RetailArg::rdi, 0x90000);
+    const auto range = call_resolved(sotc::kVtable15f2f08Slot38_e16a00Rva, frame, window, context);
+    check("e16a00 range fails", !range.ok && range.status == RetailCallStatus::out_of_range);
+}
+
 void test_failures() {
     std::vector<std::uint8_t> storage(0x40, 0);
     GuestWindow window(storage.data(), 0x50000, storage.size());
@@ -203,6 +244,7 @@ int main() {
     test_187c0_requires_alloc();
     test_one_arg_teardowns();
     test_copy_targets_and_noop();
+    test_dual_vcall_and_manager();
     test_failures();
 
     if (failures == 0) {

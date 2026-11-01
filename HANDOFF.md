@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 15:25 CDT (root) — dual-vcall and manager dispatch arms (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `marshal_e16a00` (resolves the vtable pointer at `*self` and forwards the argument) and `marshal_ddf4b0` (self-only), plus two `call_resolved` arms with the `slot18/slot20` and `pre/fetch_manager/tail` hook contexts.
+- **Dispatchable targets: 11 of 17.**
+- **Fixture:** dual-vcall path succeeds with a fake vtable cell; the manager path succeeds and reports `model_failed` when no manager fetch hook is supplied; an out-of-range `self` returns `out_of_range`.
+- **Checkers:** 11 arms (one adapter-less no-op allowed) and 10 adapters over 10 model-declared offsets.
+- **Verification (PASSED):** build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Next exact action:** the remaining six (`0xe19980` 5-arg, `0xe1a5c0` scan, `0xe21420` decision contract, `0xe26f90` status gate, `0xe24900` sub-dispatch, `0xa460f0` teardown) each need their offsets and hook wiring.
+
 ## 2026-11-02 14:40 CDT (root) — copy targets and no-op dispatch (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added adapters `marshal_c2e0` and `marshal_c740` (self+source copies; offsets from each model header) and three dispatch arms: `0xc2e0`, `0xc740`, and the `0xa40e20` no-op which marshals no cells at all.

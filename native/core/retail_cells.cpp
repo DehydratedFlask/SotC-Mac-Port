@@ -148,4 +148,36 @@ Marshalc740 marshal_c740(GuestWindow& window, std::uint64_t self,
     return out;
 }
 
+MarshalE16a00 marshal_e16a00(GuestWindow& window, std::uint64_t self,
+                             std::uint64_t argument) noexcept {
+    MarshalE16a00 out{};
+    std::uint8_t* vtable = window.host_pointer(self, sizeof(void*));
+    if (vtable == nullptr) {
+        out.status = window.valid() ? GuestStatus::out_of_range : GuestStatus::no_window;
+        return out;
+    }
+    out.cells.self = reinterpret_cast<void*>(static_cast<std::uintptr_t>(self));
+    out.cells.vtable_field = reinterpret_cast<const void* const*>(vtable);
+    out.cells.argument = reinterpret_cast<void*>(static_cast<std::uintptr_t>(argument));
+    out.status = GuestStatus::ok;
+    out.ok = true;
+    return out;
+}
+
+MarshalDdf4b0 marshal_ddf4b0(GuestWindow& window, std::uint64_t self) noexcept {
+    MarshalDdf4b0 out{};
+    if (!window.valid()) {
+        out.status = GuestStatus::no_window;
+        return out;
+    }
+    if (window.host_pointer(self, 1) == nullptr) {
+        out.status = GuestStatus::out_of_range;
+        return out;
+    }
+    out.cells.self = reinterpret_cast<void*>(static_cast<std::uintptr_t>(self));
+    out.status = GuestStatus::ok;
+    out.ok = true;
+    return out;
+}
+
 }  // namespace sotc

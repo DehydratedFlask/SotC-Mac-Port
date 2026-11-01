@@ -18,6 +18,8 @@
 #include "vtable_15d1678_slot_68_a40e20.hpp"
 #include "vtable_15d1678_slot_e8_c2e0.hpp"
 #include "vtable_15d1d80_slot08_c740.hpp"
+#include "vtable_15e0b48_slot28_ddf4b0.hpp"
+#include "vtable_15f2f08_slot38_e16a00.hpp"
 #include "vtable_159c908_slot58_2687b0.hpp"
 
 #include <cstdint>
@@ -98,5 +100,24 @@ struct Marshalc740 {
 
 [[nodiscard]] Marshalc740 marshal_c740(GuestWindow& window, std::uint64_t self,
                                        std::uint64_t source) noexcept;
+
+// 0xe16a00: the model reads the vtable pointer at `*this` and forwards one argument.
+struct MarshalE16a00 {
+    bool ok = false;
+    GuestStatus status = GuestStatus::no_window;
+    Vtable15f2f08Slot38_e16a00Cells cells{};
+};
+
+[[nodiscard]] MarshalE16a00 marshal_e16a00(GuestWindow& window, std::uint64_t self,
+                                           std::uint64_t argument) noexcept;
+
+// 0xddf4b0: manager dispatch; the model only needs `self`.
+struct MarshalDdf4b0 {
+    bool ok = false;
+    GuestStatus status = GuestStatus::no_window;
+    Vtable15e0b48Slot28_ddf4b0Cells cells{};
+};
+
+[[nodiscard]] MarshalDdf4b0 marshal_ddf4b0(GuestWindow& window, std::uint64_t self) noexcept;
 
 }  // namespace sotc
