@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 19:10 CDT (root) — 0xe19980 alignment-dispatch arm (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `marshal_e19980` — frame `rdi/rsi/rdx/rcx/r8`, host canary and slow-path buffer, and a fast-path store target resolved only when `rdx` is 8-aligned — plus a `call_resolved` arm with slow/fast hooks.
+- **Dispatchable targets: 16 of 17.**
+- **Fixture:** fast path stores the configured value and calls the helper; misaligned `rdx` and misaligned `rcx` each take the slow hook; a canary modified *inside* the hook fails as `model_failed`.
+- **Two fixture bugs caught before commit:** an earlier "tamper" that changed the canary before the call proved nothing (the model saves at entry), so the mutation moved into the slow hook; and the stale "abi row without adapter" probe had to move from `0xe19980` to `0xe21420`.
+- **Checkers:** 16 arms and 15 adapters.
+- **Verification (PASSED):** build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Next exact action:** `0xe21420` is the last target without an adapter; it is a decision contract with ~400 bytes unmodelled, so its adapter covers the guard ladder only.
+
 ## 2026-11-02 18:25 CDT (root) — 0xe1a5c0 container-scan arm (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `marshal_e1a5c0` — array pointer from `self+0x8`, count from `self+0x10`, key resolved as a bounded guest C string (unterminated strings fail) — and a `call_resolved` arm wiring the key/value/match hooks. `rax` carries the scan code.

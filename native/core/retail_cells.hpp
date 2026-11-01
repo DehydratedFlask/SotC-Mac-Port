@@ -21,6 +21,7 @@
 #include "vtable_15e0b48_slot28_ddf4b0.hpp"
 #include "vtable_15d1678_slot280_a460f0.hpp"
 #include "vtable_15e2d60_slot_d0_e24900.hpp"
+#include "vtable_15e1ee0_slot_b0_e19980.hpp"
 #include "vtable_15e2028_slot70_e1a5c0.hpp"
 #include "vtable_15ed2a0_slot_c0_e26f90.hpp"
 #include "vtable_15f2f08_slot38_e16a00.hpp"
@@ -167,5 +168,20 @@ struct MarshalE1a5c0 {
 
 [[nodiscard]] MarshalE1a5c0 marshal_e1a5c0(GuestWindow& window, std::uint64_t self,
                                            std::uint64_t key, std::int32_t value) noexcept;
+
+// 0xe19980: alignment-gated wrapper. Arguments come from the frame; the canary and the slow-path
+// buffer are host storage (no guest stack mapping yet), and the fast-path store target is the guest
+// address in `rdx` when it is 8-aligned.
+struct MarshalE19980 {
+    bool ok = false;
+    GuestStatus status = GuestStatus::no_window;
+    Vtable15e1ee0SlotB0_e19980Args args{};
+    Vtable15e1ee0SlotB0_e19980Cells cells{};
+};
+
+[[nodiscard]] MarshalE19980 marshal_e19980(GuestWindow& window, std::uint64_t arg2,
+                                           std::uint64_t arg3, std::uint64_t arg4,
+                                           std::uint64_t arg5, std::uint64_t* host_canary,
+                                           const void* const* value_cell) noexcept;
 
 }  // namespace sotc

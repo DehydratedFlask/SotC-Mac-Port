@@ -32,6 +32,7 @@ EXPECTED = {
     0xE24900: "marshal_e24900",
     0xE26F90: "marshal_e26f90",
     0xE1A5C0: "marshal_e1a5c0",
+    0xE19980: "marshal_e19980",
     0xA40E20: None,  # pure no-op: no cells to marshal
 }
 

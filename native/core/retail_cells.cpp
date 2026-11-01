@@ -298,4 +298,36 @@ MarshalE1a5c0 marshal_e1a5c0(GuestWindow& window, std::uint64_t self, std::uint6
     return out;
 }
 
+MarshalE19980 marshal_e19980(GuestWindow& window, std::uint64_t arg2, std::uint64_t arg3,
+                             std::uint64_t arg4, std::uint64_t arg5, std::uint64_t* host_canary,
+                             const void* const* value_cell) noexcept {
+    MarshalE19980 out{};
+    if (!window.valid()) {
+        out.status = GuestStatus::no_window;
+        return out;
+    }
+    if (host_canary == nullptr || value_cell == nullptr) {
+        out.status = GuestStatus::out_of_range;
+        return out;
+    }
+    out.args.arg2 = reinterpret_cast<void*>(static_cast<std::uintptr_t>(arg2));
+    out.args.arg3 = reinterpret_cast<void*>(static_cast<std::uintptr_t>(arg3));
+    out.args.arg4 = reinterpret_cast<void*>(static_cast<std::uintptr_t>(arg4));
+    out.args.arg5 = reinterpret_cast<void*>(static_cast<std::uintptr_t>(arg5));
+    out.cells.canary = host_canary;
+    out.cells.fast_store_value = value_cell;
+    const bool aligned = (arg3 & kVtable15e1ee0SlotB0_e19980AlignmentMask) == 0;
+    if (arg3 != 0 && aligned) {
+        std::uint8_t* target = window.host_pointer(arg3, sizeof(void*));
+        if (target == nullptr) {
+            out.status = GuestStatus::out_of_range;
+            return out;
+        }
+        out.cells.fast_store_target = reinterpret_cast<void**>(target);
+    }
+    out.status = GuestStatus::ok;
+    out.ok = true;
+    return out;
+}
+
 }  // namespace sotc

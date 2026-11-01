@@ -376,6 +376,68 @@ void test_e1a5c0_scan() {
     check("e1a5c0 null key", null_key.ok && null_key.rax == 1);
 }
 
+int g_slow_calls = 0;
+int g_fast_calls = 0;
+std::uint64_t* g_tamper_canary = nullptr;
+void slow_e199(void*, void*) {
+    ++g_slow_calls;
+    if (g_tamper_canary != nullptr) {
+        ++*g_tamper_canary;
+    }
+}
+void fast_e199(void*, void*, void*, void*) { ++g_fast_calls; }
+
+void test_e19980_paths() {
+    std::vector<std::uint8_t> storage(0x120, 0);
+    GuestWindow window(storage.data(), 0xF0000, storage.size());
+    std::uint64_t canary = 11;
+    const void* store_value = reinterpret_cast<const void*>(0x7777);
+    char buffer[16] = {};
+
+    RetailFrame frame{};
+    frame.set(RetailArg::rdi, 0xF0000);
+    frame.set(RetailArg::rsi, 0xF0020);
+    frame.set(RetailArg::rdx, 0xF0040);  // aligned store target
+    frame.set(RetailArg::rcx, 0xF0060);  // aligned
+    frame.set(RetailArg::r8, 0xF0080);
+    RetailCallContext context{};
+    context.slow_e19980 = slow_e199;
+    context.fast_e19980 = fast_e199;
+    context.slow_buffer_e19980 = buffer;
+    context.host_canary_e19980 = &canary;
+    context.store_value_e19980 = &store_value;
+
+    g_slow_calls = 0;
+    g_fast_calls = 0;
+    const auto fast = call_resolved(sotc::kVtable15e1ee0SlotB0_e19980Rva, frame, window, context);
+    check("e19980 fast ok", fast.ok && g_fast_calls == 1 && g_slow_calls == 0);
+    std::uint64_t stored = 0;
+    std::memcpy(&stored, storage.data() + 0x40, sizeof(stored));
+    check("e19980 fast store", stored == 0x7777);
+
+    frame.set(RetailArg::rdx, 0xF0044);  // misaligned arg3 -> slow path
+    g_slow_calls = 0;
+    g_fast_calls = 0;
+    const auto slow3 = call_resolved(sotc::kVtable15e1ee0SlotB0_e19980Rva, frame, window,
+                                     context);
+    check("e19980 slow arg3", slow3.ok && g_slow_calls == 1 && g_fast_calls == 0);
+
+    frame.set(RetailArg::rdx, 0xF0040);
+    frame.set(RetailArg::rcx, 0xF0064);  // misaligned arg4 -> slow path
+    g_slow_calls = 0;
+    const auto slow4 = call_resolved(sotc::kVtable15e1ee0SlotB0_e19980Rva, frame, window,
+                                     context);
+    check("e19980 slow arg4", slow4.ok && g_slow_calls == 1);
+
+    frame.set(RetailArg::rcx, 0xF0064);  // slow path, and tamper with the canary inside the hook
+    g_tamper_canary = &canary;
+    const auto tampered = call_resolved(sotc::kVtable15e1ee0SlotB0_e19980Rva, frame, window,
+                                        context);
+    g_tamper_canary = nullptr;
+    check("e19980 canary tamper", !tampered.ok &&
+                                      tampered.status == RetailCallStatus::model_failed);
+}
+
 void test_failures() {
     std::vector<std::uint8_t> storage(0x40, 0);
     GuestWindow window(storage.data(), 0x50000, storage.size());
@@ -393,7 +455,7 @@ void test_failures() {
     check("no window fails", !nowhere.ok && nowhere.status == RetailCallStatus::no_window);
 
     frame.set(RetailArg::rdi, 0x50000);
-    const auto adapted_but_no_cells = call_resolved(0xe19980, frame, window);
+    const auto adapted_but_no_cells = call_resolved(0xe21420, frame, window);
     check("abi without adapter", !adapted_but_no_cells.ok &&
                                       adapted_but_no_cells.status ==
                                           RetailCallStatus::unknown_target);
@@ -413,6 +475,7 @@ int main() {
     test_e24900_sub_dispatch();
     test_e26f90_status_gate();
     test_e1a5c0_scan();
+    test_e19980_paths();
     test_failures();
 
     if (failures == 0) {

@@ -62,6 +62,13 @@ struct RetailCallContext {
     const char* (*element_key_e1a5c0)(void* element) = nullptr;
     std::int32_t (*element_value_e1a5c0)(void* element) = nullptr;
     std::int32_t (*element_match_e1a5c0)(void* element) = nullptr;
+
+    // 0xe19980: alignment-gated paths plus host scratch storage.
+    void (*slow_e19980)(void* element, void* buffer) = nullptr;
+    void* slow_buffer_e19980 = nullptr;
+    void (*fast_e19980)(void* arg3, void* arg2, void* arg4, void* arg5) = nullptr;
+    std::uint64_t* host_canary_e19980 = nullptr;
+    const void* const* store_value_e19980 = nullptr;
 };
 
 enum class RetailCallStatus : std::uint8_t {
