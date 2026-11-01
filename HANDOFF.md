@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 01:40 CDT (root) — SOPK misattribution fixed; compare batch two (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01`, card 7. Added VOP2 0 `v_cndmask_b32` (the VOP2 form selects with **implicit VCC**, so the row tags `reads_vcc_mask` and is a per-lane blocker), VOP2 16 `v_max_f32`, VOP2 26 `v_lshlrev_b32`, VOP1 6/8/32/51, VOP3 3/6/136 compares, VOPC 214/215 `cmpx`.
+- **Bug fixed, not worked around:** `SOPK` shares bits 31-30 with `SOP2`, and the SOP2 entry (`mask 0xc0000000`) matched first, so **every SOPK instruction was reported as a bogus "SOP2 opcode 96..127"** — 35 block-mode first blockers. SOPK now has its own format entry matched before SOP2, its own fields, its own opcode table read from the pinned PS4 SOPK block, and `s_cbranch_i_fork` classified as a control transfer. Modelled only the straight-line rows: `s_movk_i32`, `s_cmovk_i32` (`reads_scc`), `s_cmpk_*` 3–14 and `s_addk_i32` (`writes_scc`), `s_mulk_i32`; the register-access rows stay refused.
+- **Measured at sample 512** (`blocks-512f`, `blocks-512g`): linear decode stays **186/367** — every row in this card sits behind a branch row, which is exactly what the block decoder exists to show. Block-mode first blockers move: `VOP1 6`/`VOP2 0`/`VOP1 32`/`VOP2 16`/`VOP3 6` all reach **0**, and the new top blockers are `VINTRP 2` 48, `MUBUF 29` 45, `SOP1 8` 41, `VOP3 287` 12.
+- **Tests:** `test_gcn_inventory` 42 (a SOPK test that first proves the SOP2/SOPK bit overlap exists, then that the row is named correctly; positives for every new row; negatives for reserved SOPK 1/18/19/20 and control-transfer SOPK 17), `test_gcn_to_msl` 23, coverage 23, blocks 26.
+- **Still 0 lowered.**
+- **Verification (PASSED):** build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Next exact action:** `MUBUF 29/31/50` (the next block-mode family, 45+9+6) and `SOP1 8` (41) — both need their pinned names and operand rules before being added.
+
 ## 2026-11-03 00:40 CDT (root) — MSL decoder v6: compare family, cndmask, conversions (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `GPU-01-MSL-OFFLINE-01`, card 6. Added the compare family and the rows the block decoder exposed: VOPC 192–199 integer compares and VOPC 136 `v_cmp_class_f32`; VOP3-encoded compares 1/4/11/194/197 with an explicit **mask-destination rule** (`VDST` names VCC or an even SGPR pair, modifiers must be clear); VOP3 256 `v_cndmask_b32` with its third operand validated as a scalar/VCC/EXEC mask; VOP1 5/11/42; VOP2 38.

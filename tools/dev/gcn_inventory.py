@@ -25,7 +25,7 @@ import struct
 import sys
 
 ISA_URL = 'https://docs.amd.com/v/u/en-US/sea-islands-instruction-set-architecture_0'
-VERSION = 'gfx7-bounded-inventory-v6'
+VERSION = 'gfx7-bounded-inventory-v9'
 
 # These are encoding facts, not a translation/semantic implementation.
 # SOP2/SOPC/VOPC rows below are opcode-value facts from the GFX7 ISA tables,
@@ -38,6 +38,14 @@ VERSION = 'gfx7-bounded-inventory-v6'
 OPCODES = {
     'SOP1': {3: 's_mov_b32', 4: 's_mov_b64', 10: 's_wqm_b64',
              36: 's_and_saveexec_b64'},
+    # SOPK: immediate scalar moves/compares. Exact opcode names from the pinned PS4 SOPK table
+    # (InstructionFormatSOPK in reference/shadPS4 .../format.cpp).
+    'SOPK': {0: 's_movk_i32', 2: 's_cmovk_i32',
+             3: 's_cmpk_eq_i32', 4: 's_cmpk_lg_i32', 5: 's_cmpk_gt_i32',
+             6: 's_cmpk_ge_i32', 7: 's_cmpk_lt_i32', 8: 's_cmpk_le_i32',
+             9: 's_cmpk_eq_u32', 10: 's_cmpk_lg_u32', 11: 's_cmpk_gt_u32',
+             12: 's_cmpk_ge_u32', 13: 's_cmpk_lt_u32', 14: 's_cmpk_le_u32',
+             15: 's_addk_i32', 16: 's_mulk_i32'},
     'SOP2': {0: 's_add_u32', 1: 's_sub_u32', 2: 's_add_i32', 3: 's_sub_i32',
              4: 's_addc_u32', 5: 's_subb_u32', 6: 's_min_i32', 7: 's_min_u32',
              8: 's_max_i32', 9: 's_max_u32', 10: 's_cselect_b32', 11: 's_cselect_b64',
@@ -61,12 +69,18 @@ OPCODES = {
              8: 's_buffer_load_dword', 9: 's_buffer_load_dwordx2',
              10: 's_buffer_load_dwordx4', 11: 's_buffer_load_dwordx8',
              12: 's_buffer_load_dwordx16'},
-    'VOP1': {1: 'v_mov_b32', 5: 'v_cvt_f32_i32', 11: 'v_cvt_f32_f16',
-             36: 'v_floor_f32', 42: 'v_rcp_f32', 46: 'v_rsq_f32'},
-    'VOP2': {3: 'v_add_f32', 4: 'v_sub_f32', 5: 'v_subrev_f32', 8: 'v_mul_f32',
-             15: 'v_min_f32', 22: 'v_lshrrev_b32', 27: 'v_and_b32', 38: 'v_sub_i32',
+    'VOP1': {1: 'v_mov_b32', 5: 'v_cvt_f32_i32', 6: 'v_cvt_f32_u32',
+             8: 'v_cvt_i32_f32', 11: 'v_cvt_f32_f16', 32: 'v_fract_f32',
+             36: 'v_floor_f32', 42: 'v_rcp_f32', 46: 'v_rsq_f32',
+             51: 'v_sqrt_f32'},
+    'VOP2': {0: 'v_cndmask_b32', 3: 'v_add_f32', 4: 'v_sub_f32',
+             5: 'v_subrev_f32', 8: 'v_mul_f32', 15: 'v_min_f32',
+             16: 'v_max_f32',
+             22: 'v_lshrrev_b32', 26: 'v_lshlrev_b32', 27: 'v_and_b32',
+             38: 'v_sub_i32',
              31: 'v_mac_f32', 37: 'v_add_i32', 47: 'v_cvt_pkrtz_f16_f32'},
-    'VOP3': {1: 'v_cmp_lt_f32', 4: 'v_cmp_gt_f32', 11: 'v_cmp_ngt_f32',
+    'VOP3': {1: 'v_cmp_lt_f32', 3: 'v_cmp_le_f32', 4: 'v_cmp_gt_f32',
+             6: 'v_cmp_ge_f32', 11: 'v_cmp_ngt_f32', 136: 'v_cmp_class_f32',
              194: 'v_cmp_eq_u32', 197: 'v_cmp_ne_u32',
              256: 'v_cndmask_b32',
              264: 'v_mul_f32', 303: 'v_cvt_pkrtz_f16_f32', 321: 'v_mad_f32',
@@ -90,7 +104,8 @@ OPCODES = {
              195: 'v_cmp_le_u32', 196: 'v_cmp_gt_u32', 197: 'v_cmp_ne_u32',
              198: 'v_cmp_ge_u32', 199: 'v_cmp_t_u32',
              208: 'v_cmpx_f_u32', 209: 'v_cmpx_lt_u32', 210: 'v_cmpx_eq_u32',
-             211: 'v_cmpx_le_u32', 212: 'v_cmpx_gt_u32', 213: 'v_cmpx_ne_u32'},
+             211: 'v_cmpx_le_u32', 212: 'v_cmpx_gt_u32', 213: 'v_cmpx_ne_u32',
+             214: 'v_cmpx_ge_u32', 215: 'v_cmpx_t_u32'},
     'VINTRP': {0: 'v_interp_p1_f32', 1: 'v_interp_p2_f32'},
     'MUBUF': {0: 'buffer_load_format_x', 1: 'buffer_load_format_xy',
               2: 'buffer_load_format_xyz',
@@ -115,6 +130,7 @@ CONTROL_TRANSFER_OPCODES = {
              6: 's_cbranch_vccz', 7: 's_cbranch_vccnz',
              8: 's_cbranch_execz', 9: 's_cbranch_execnz'},
     'SOP2': {43: 's_cbranch_g_fork'},
+    'SOPK': {17: 's_cbranch_i_fork'},
 }
 
 
@@ -132,10 +148,10 @@ SOP1_64BIT = frozenset((4, 10, 36))
 # VOP3-encoded VOPC-class compares: the VDST field names the mask destination (VCC or an SGPR
 # pair) instead of a vector register, and the modifier fields must be clear. Names and opcode
 # values come from the pinned PS4 frontend table.
-VOP3_COMPARE = frozenset((1, 4, 11, 194, 197))
+VOP3_COMPARE = frozenset((1, 3, 4, 6, 11, 136, 194, 197))
 # VOPC rows that overwrite EXEC instead of writing the VCC pair (`cmpx`). Everything else in the
 # modelled VOPC set writes VCC, including the integer compares at 192-199.
-VOPC_WRITES_EXEC = frozenset(range(16, 32)) | frozenset(range(208, 214))
+VOPC_WRITES_EXEC = frozenset(range(16, 32)) | frozenset(range(208, 216))
 
 # VOP3 rows that read all three source fields; every other modelled VOP3 row reads two.
 VOP3_THREE_SOURCE = frozenset((256, 321, 322, 349, 350))
@@ -145,6 +161,8 @@ VOP3_THREE_SOURCE = frozenset((256, 321, 322, 349, 350))
 VOP3_INTEGER = frozenset((256, 322, 349))
 # VOP2 integer add writes its carry out to VCC; the VOP2 form has no SDST field to name it.
 VOP2_WRITES_VCC = frozenset((37, 38))
+# VOP2 rows whose mask operand is implicit: only `v_cndmask_b32`, which selects with VCC.
+VOP2_READS_VCC = frozenset((0,))
 
 # mask, tag, opcode shift, opcode mask, fixed dword count. Specific
 # encodings precede VOP2 (which otherwise also matches VOP1/VOPC).
@@ -152,6 +170,7 @@ FORMATS = (
     ('SOP1', 0xff800000, 0xbe800000, 8, 255, 1),
     ('SOPC', 0xff800000, 0xbf000000, 16, 127, 1),
     ('SOPP', 0xff800000, 0xbf800000, 16, 127, 1),
+    ('SOPK', 0xf0000000, 0xb0000000, 23, 31, 1),
     ('SOP2', 0xc0000000, 0x80000000, 23, 127, 1),
     ('SMRD', 0xf8000000, 0xc0000000, 22, 31, 1),
     ('VINTRP', 0xfc000000, 0xc8000000, 16, 3, 1),
@@ -168,6 +187,7 @@ FORMATS = (
 FIELDS = {
     'SOP1': (('src0', 0, 8), ('sdst', 16, 7)),
     'SOP2': (('ssrc0', 0, 8), ('ssrc1', 8, 8), ('sdst', 16, 7)),
+    'SOPK': (('simm16', 0, 16), ('sdst', 16, 7)),
     'SOPC': (('ssrc0', 0, 8), ('ssrc1', 8, 8)),
     'SOPP': (('simm16', 0, 16),),
     'SMRD': (('offset', 0, 8), ('imm', 8, 1), ('sbase', 9, 6), ('sdst', 15, 7)),
@@ -292,6 +312,12 @@ def _validate(form: str, op: int, f: dict[str, int], at: int) -> tuple[str, ...]
             if f[name] in (106, 107, 251):
                 requirements.add('reads_vcc_mask')
         requirements.add('writes_scc')
+    elif form == 'SOPK':
+        require(_register(f['sdst']), 'unsupported scalar destination')
+        if 3 <= op <= 14 or op == 15:
+            requirements.add('writes_scc')
+        if op == 2:
+            requirements.add('reads_scc')
     elif form == 'SOPP':
         if op == 1:
             require(f['simm16'] == 0, 'unsupported nonzero s_endpgm immediate')
@@ -361,6 +387,8 @@ def _validate(form: str, op: int, f: dict[str, int], at: int) -> tuple[str, ...]
             require(len(sgprs) <= 1, 'multiple distinct scalar sources in VOP3')
             # Unused source/control bits are retained in the inventory; they are
             # not reinterpreted as an instruction or discarded as extra dwords.
+        if form == 'VOP2' and op in VOP2_READS_VCC:
+            requirements.add('reads_vcc_mask')
         if form == 'VOP2' and op in VOP2_WRITES_VCC:
             requirements.add('writes_vcc_mask')
         if (op == 47 and form == 'VOP2') or (op == 303 and form == 'VOP3'):

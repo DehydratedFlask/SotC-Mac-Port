@@ -303,3 +303,32 @@ not move the census, it makes the next rows visible.
   because a VOP2 word with `op = 63` has the same top bits as a VOP1 instruction by construction, so
   it was really testing a VOP1 opcode. The negatives now use `vop2(39)`/`vop2(41)`.
 - **Still zero lowered:** decoding is not Metal semantics, and no per-shader ABI manifest exists.
+
+## Decoder widening 6 (SOPK misattribution fixed, next compare batch)
+
+- **Bug fixed, not just a row added:** SOPK shares bits 31-30 with SOP2, and the decoder's SOP2 entry
+  (`mask 0xc0000000`) matched first, so **every SOPK instruction was reported as a bogus
+  "SOP2 opcode 96..127"** — 35 first blockers in block mode. `SOPK` now has its own entry matched
+  before SOP2 (mask `0xf0000000`), its own field set, its own opcode table from the pinned PS4 SOPK
+  block, and `s_cbranch_i_fork` is classified as a control transfer. Modelled: `s_movk_i32`,
+  `s_cmovk_i32` (`reads_scc`), `s_cmpk_*` 3–14 and `s_addk_i32` (`writes_scc`), `s_mulk_i32`.
+- **Rows added:** VOP2 0 `v_cndmask_b32` (VOP2 form selects with **implicit VCC**, so the row tags
+  `reads_vcc_mask` and is a per-lane blocker), VOP2 16 `v_max_f32`, VOP2 26 `v_lshlrev_b32`;
+  VOP1 6 `v_cvt_f32_u32`, 8 `v_cvt_i32_f32`, 32 `v_fract_f32`, 51 `v_sqrt_f32`;
+  VOP3 3/6/136 (compares, mask destination) and VOPC 214/215 (`cmpx`, EXEC destination).
+- **Measured at sample 512** (`local/validation/msl-coverage/blocks-512f`, `blocks-512g`): linear
+  decode stays **186/367** (all of these rows sit behind branch rows), but the block-mode first
+  blockers move twice:
+
+| Block-mode first blocker | after v6 | after SOPK fix | after this batch |
+|---|---:|---:|---:|
+| `VOP1 6` | 48 | 0 | 0 |
+| `VOP2 0` | 26 | 0 | 0 |
+| `VOP1 32` | 22 | 0 | 0 |
+| `SOP2 96` (really SOPK) | 0 | 35 → 0 | 0 |
+| `VOP2 16` | 0 | 48 | **0** |
+| `VOP3 6` | 0 | 42 | **0** |
+| `MUBUF 29` | 0 | 0 | **45** |
+| `SOP1 8` | 0 | 0 | **41** |
+
+- **Still zero lowered:** decoding is not Metal semantics, and no per-shader ABI manifest exists.

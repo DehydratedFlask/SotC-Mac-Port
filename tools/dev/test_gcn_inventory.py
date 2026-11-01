@@ -57,6 +57,10 @@ def vopc(op=4, src0=257, src1=2, literal=None):
     return encoded + (struct.pack('<I', literal) if literal is not None else b'')
 
 
+def sopk(op=0, dst=6, imm=1):
+    return word((4, 0b1011), (5, op), (7, dst), (16, imm))
+
+
 def smrd(op=2, dst=12, base=6, imm=1, offset=17, literal=None):
     encoded = word((5, 0b11000), (5, op), (7, dst), (6, base), (1, imm), (8, offset))
     return encoded + (struct.pack('<I', literal) if literal is not None else b'')
@@ -178,9 +182,74 @@ class EncodingOracleTests(unittest.TestCase):
         for opcode in (11, 18):
             with self.assertRaises(gcn.DecodeError):
                 one(mubuf(op=opcode))
-        for opcode in (207, 214):
+        for opcode in (207, 216):
             with self.assertRaises(gcn.DecodeError):
                 one(vopc(op=opcode))
+
+    def test_compare_batch_two_and_cmpx_u32(self):
+        # VOP3 3/6/136 are compares: mask destination, no modifiers.
+        for op, name in ((3, 'v_cmp_le_f32'), (6, 'v_cmp_ge_f32'), (136, 'v_cmp_class_f32')):
+            insn = one(vop3(op=op, dst=106, abs_=0, clamp=0, omod=0, neg=0))
+            self.assertEqual(insn.mnemonic, name)
+            self.assertEqual(insn.requirements, ('writes_vcc_mask',))
+        # VOPC 214/215 are `cmpx`: they overwrite EXEC.
+        for op, name in ((214, 'v_cmpx_ge_u32'), (215, 'v_cmpx_t_u32')):
+            insn = one(vopc(op=op))
+            self.assertEqual(insn.mnemonic, name)
+            self.assertEqual(insn.requirements, ('writes_exec_mask',))
+        # VOP2 16 max, VOP1 8/51 conversions.
+        self.assertEqual(one(vop2(op=16)).mnemonic, 'v_max_f32')
+        self.assertEqual(one(vop1(op=8)).mnemonic, 'v_cvt_i32_f32')
+        self.assertEqual(one(vop1(op=51)).mnemonic, 'v_sqrt_f32')
+
+    def test_sopk_is_not_sop2(self):
+        # A SOPK word shares bits 31-30 with SOP2; before this row existed every SOPK instruction
+        # was reported as a bogus "SOP2 opcode 96..127".
+        word_value = struct.unpack('<I', sopk(op=0, dst=6, imm=0x01f8))[0]
+        self.assertEqual(word_value & 0xf0000000, 0xb0000000)
+        misattributed = (word_value & 0xc0000000) == 0x80000000
+        self.assertTrue(misattributed)  # proves the two encodings really do overlap
+        movk = one(sopk(op=0, dst=6, imm=0x01f8))
+        self.assertEqual((movk.encoding, movk.mnemonic), ('SOPK', 's_movk_i32'))
+        self.assertEqual(movk.fields['simm16'], 0x01f8)
+        self.assertEqual(movk.requirements, ())
+
+        cmp_eq = one(sopk(op=3, dst=8, imm=7))
+        self.assertEqual(cmp_eq.mnemonic, 's_cmpk_eq_i32')
+        self.assertEqual(cmp_eq.requirements, ('writes_scc',))
+        self.assertEqual(one(sopk(op=15)).mnemonic, 's_addk_i32')
+        self.assertEqual(one(sopk(op=15)).requirements, ('writes_scc',))
+        self.assertEqual(one(sopk(op=2)).mnemonic, 's_cmovk_i32')
+        self.assertEqual(one(sopk(op=2)).requirements, ('reads_scc',))
+        self.assertEqual(one(sopk(op=16)).mnemonic, 's_mulk_i32')
+
+        # Reserved, unmodelled and control-transfer SOPK rows still reject, and the error names SOPK.
+        for opcode in (1, 18, 19, 20):
+            with self.assertRaises(gcn.DecodeError) as caught:
+                one(sopk(op=opcode))
+            self.assertIn('SOPK', caught.exception.reason)
+        with self.assertRaises(gcn.DecodeError) as caught:
+            one(sopk(op=17))
+        self.assertIn('control transfer', caught.exception.reason)
+
+    def test_vop2_cndmask_and_unary_conversions(self):
+        # VOP2 0 v_cndmask_b32 selects with the implicit VCC pair, so the row reads VCC.
+        cnd = one(vop2(op=0, dst=5, src1=6, src0=257))
+        self.assertEqual(cnd.mnemonic, 'v_cndmask_b32')
+        self.assertEqual(cnd.requirements, ('reads_vcc_mask',))
+        # That makes it a per-lane blocker rather than an eligible straight-line row.
+        self.assertFalse(gcn.inventory(vop2(op=0) + END)['per_lane_eligible'])
+
+        self.assertEqual(one(vop1(op=6)).mnemonic, 'v_cvt_f32_u32')
+        self.assertEqual(one(vop1(op=32)).mnemonic, 'v_fract_f32')
+        shift = one(vop2(op=26))
+        self.assertEqual(shift.mnemonic, 'v_lshlrev_b32')
+        self.assertEqual(shift.requirements, ())
+
+        # Unmodelled neighbours keep rejecting.
+        for built in (vop2(op=1), vop2(op=2), vop1(op=7), vop1(op=33)):
+            with self.assertRaises(gcn.DecodeError):
+                one(built)
 
     def test_cndmask_conversions_and_integer_sub(self):
         # VOP3 256 v_cndmask_b32: three sources, the third is a scalar/VCC/EXEC mask.
