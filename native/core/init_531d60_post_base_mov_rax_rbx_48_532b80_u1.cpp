@@ -17,7 +17,7 @@ Init531d60PostBaseMovRaxRbx_48_532b80_U1Result init_531d60_post_base_mov_rax_rbx
     }
     ++out.mov_rax_rbx_48_count;
 
-    // Next: lea rdi,[rbx+0x28] @ 0x532b84 — not modelled here.
+    // Next: lea rdi,[rbx+0x28] @ 0x532b84 — peeled in E577 sibling unit.
     out.ok = (out.mov_rax_rbx_48_count == 1);
     return out;
 }

@@ -669,6 +669,9 @@ void run_remainder_after_registry_tail(
     if (out.post_base_registry_body.mov_rax_rbx_48_count == 1) {
         registry_hooks.merge_mov_rax_rbx_48_532b80_u1_ran = true;
     }
+    if (out.post_base_registry_body.lea_rdi_rbx_28_count == 1) {
+        registry_hooks.merge_lea_rdi_rbx_28_532b84_u1_ran = true;
+    }
     out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,
                                                      set_b, set_c, registry_hooks);
 }

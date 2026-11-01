@@ -1,7 +1,7 @@
 // Init `0x531d60` registry mov rax,[rbx+0x48] OBS `0x532b80..0x532b84` (4 B):
 //   mov rax,[rbx+0x48]   ; fall-through after nop @ `0x532b7d`
 //
-// After E575 nop @ `0x532b7d`. NOT modelled: lea rdi/load tail @ `0x532b84..`. G1 PARTIAL.
+// After E575 nop @ `0x532b7d`. NOT modelled: lea rdi tail @ `0x532b84..` (E577 sibling). G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
