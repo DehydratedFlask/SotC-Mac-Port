@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 22:05 CDT (root) — resolved vtable slot lifted with an ABI stub (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01` follow-up. Added `native/core/vtable_1594dc0_slot20_20d60.{hpp,cpp}` for the one statically resolved indirect target (`0x1594dc0 + 0x20 -> 0x20d60`).
+- **Body (26 B, pinned):** `cmpb $0, 0x18(%rdi); je +1; retq; lea 0x2dfcbc8(%rip), %rax; movb $1, 0x18(%rdi); mov (%rax), %rsi; jmp 0x20d80`. Modelled: the once-flag gate, the flag write, and the tail call as a hook. Not modelled: the tail body `0x20d80`, the global's meaning, and any argument beyond `rdi` (the body overwrites `rsi` before the jump).
+- **ABI status:** `void f(This* rdi)` is inferred from this body only, not from a caller contract; recorded as such in the header.
+- **Fixture:** 6 cases — constants, first call sets flag + tail hook (self/global passed through), second call early-returns without touching the flag, two-call sequence, null-flag fail-visible, bare call without global/hook.
+- **Tie:** `tools/lift/check_vtable_1594dc0_slot20_20d60.py` pins the body bytes/hash, the file-backed vtable qword, the single RELA row at `0x1594de0` (addend `0x20d60`), the header constants, the CMake targets, and that `0x20d60` is present in the entry map.
+- **Entry map:** regenerated — 1,388 constants / 951 distinct RVAs / 365 headers; `0x20d60` was already named by the ConCmd modules (corroborating a "register once" entry) and `0x20d80` is now mapped too.
+- **Verification (PASSED):** build exit 0; CTest **500/500**; lift checkers **693 passed / 0 failed**.
+
 ## 2026-11-01 21:30 CDT (root) — indirect frontier enumerated (STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01` indirect-frontier card. `tools/lift/indirect_frontier.py` reuses the FDE loader/adjacency/closure from `cfg_census.py`, lists every indirect `call`/`jmp` in the `0x531d60` closure and classifies it from a 4-instruction window.

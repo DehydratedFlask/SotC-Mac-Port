@@ -512,6 +512,20 @@
       {
         "constant": "kOwnerRow3CommandRegister",
         "header": "native/core/owner_ctor_14db00.hpp"
+      },
+      {
+        "constant": "kVtable1594dc0Slot20_20d60",
+        "header": "native/core/vtable_1594dc0_slot20_20d60.hpp"
+      }
+    ],
+    "0x20d80": [
+      {
+        "constant": "kConCmdRegisterBody",
+        "header": "native/core/concmd_base.hpp"
+      },
+      {
+        "constant": "kVtable1594dc0Slot20_20d60TailTarget",
+        "header": "native/core/vtable_1594dc0_slot20_20d60.hpp"
       }
     ],
     "0x21620": [
@@ -4612,12 +4626,20 @@
       {
         "constant": "kOwnerRow3CommandRegister",
         "header": "native/core/owner_ctor_14db00.hpp"
+      },
+      {
+        "constant": "kVtable1594dc0Slot20_20d60",
+        "header": "native/core/vtable_1594dc0_slot20_20d60.hpp"
       }
     ],
     "0x20d80": [
       {
         "constant": "kConCmdRegisterBody",
         "header": "native/core/concmd_base.hpp"
+      },
+      {
+        "constant": "kVtable1594dc0Slot20_20d60TailTarget",
+        "header": "native/core/vtable_1594dc0_slot20_20d60.hpp"
       }
     ],
     "0x20f0": [
@@ -10935,9 +10957,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1386,
+    "constants": 1388,
     "distinct_rvas": 951,
-    "duplicate_rvas": 290,
-    "headers": 364
+    "duplicate_rvas": 291,
+    "headers": 365
   }
 }

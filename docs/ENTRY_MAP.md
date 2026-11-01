@@ -13,10 +13,10 @@ call dispatcher needs before lifted code can call lifted code by guest address.
 
 | Metric | Value |
 |---|---|
-| Declared RVA constants | **1,386** |
+| Declared RVA constants | **1,388** |
 | Distinct guest RVAs | **951** |
-| Headers contributing | **364** |
-| RVAs claimed by more than one header | **290** |
+| Headers contributing | **365** |
+| RVAs claimed by more than one header | **291** |
 
 ## What the numbers mean
 
@@ -26,7 +26,9 @@ call dispatcher needs before lifted code can call lifted code by guest address.
   lifting work done so far.
 - **Duplicates are expected and healthy.** Shared helpers are referenced by many modules: `0xf590`
   is named by 24 headers, `0x17070` (allocation wrapper) by 11, and the `0x2ee2cf8` global cell by
-  11 `vslot_40_533100_*` modules. A duplicate means "many units call this address", not "conflict".
+  11 `vslot_40_533100_*` modules. The one vtable slot resolved by the indirect-frontier card
+  (`0x20d60`) was already named by the ConCmd modules, which corroborates that it is a
+  "register once" entry. A duplicate means "many units call this address", not "conflict".
 - **The table mixes code and data targets.** It records the literal constant each header uses; a
   `…Target` constant is usually a call target, a `…Cell`/`…Slot` constant is usually a global
   address. Only 62 RVAs are named by a `Target`/`Rva`-style constant. Treating an entry as callable

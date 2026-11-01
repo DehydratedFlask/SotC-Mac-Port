@@ -2503,3 +2503,10 @@ add_executable(test_metal_draw_encoder tests/test_metal_draw_encoder.cpp)
 target_link_libraries(test_metal_draw_encoder PRIVATE sotc_metal_draw_encoder sotc_pm4_indirect)
 add_test(NAME metal_draw_encoder COMMAND test_metal_draw_encoder)
 set_tests_properties(metal_draw_encoder PROPERTIES SKIP_RETURN_CODE 77)
+
+# CPU-01-AOT-CFG-SCALE-01: the one statically resolved vtable slot (0x1594dc0 + 0x20 -> 0x20d60).
+add_library(sotc_vtable_1594dc0_slot20 STATIC core/vtable_1594dc0_slot20_20d60.cpp)
+target_link_libraries(sotc_vtable_1594dc0_slot20 PUBLIC sotc_core)
+add_executable(test_vtable_1594dc0_slot20 tests/test_vtable_1594dc0_slot20_20d60.cpp)
+target_link_libraries(test_vtable_1594dc0_slot20 PRIVATE sotc_vtable_1594dc0_slot20)
+add_test(NAME vtable_1594dc0_slot20 COMMAND test_vtable_1594dc0_slot20)
