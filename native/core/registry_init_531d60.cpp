@@ -213,23 +213,38 @@ RegistryInit531d60Status init_registry_fragment_531d60(InputTable551140& table, 
         }
     }
 
+    void* r13_from_rsp40 = nullptr;
     if (!hooks.merge_mov_r13_mem_rsp40_532b5b_u1_ran) {
         const auto mov_r13 = init_531d60_post_base_mov_r13_mem_rsp40_532b5b_u1({});
         if (!mov_r13.ok) {
             destroy_registry_object(obj, alloc);
             return RegistryInit531d60Status::alloc_failed;
         }
+        r13_from_rsp40 = mov_r13.r13_loaded;
     }
 
+    void* r14_from_rsp48 = nullptr;
     if (!hooks.merge_mov_r14_mem_rsp48_532b60_u1_ran) {
         const auto mov_r14 = init_531d60_post_base_mov_r14_mem_rsp48_532b60_u1({});
         if (!mov_r14.ok) {
             destroy_registry_object(obj, alloc);
             return RegistryInit531d60Status::alloc_failed;
         }
+        r14_from_rsp48 = mov_r14.r14_loaded;
     }
 
-    // OBS 0x532b65..0x532bf8: destroy previous if different & non-null; then movq new, (0x2efd160).
+    if (!hooks.merge_cmp_r13_r14_532b65_u1_ran) {
+        Init531d60PostBaseCmpR13R14_532b65_U1Cells cells{};
+        cells.r13_in = r13_from_rsp40;
+        cells.r14_in = r14_from_rsp48;
+        const auto cmp = init_531d60_post_base_cmp_r13_r14_532b65_u1(cells);
+        if (!cmp.ok) {
+            destroy_registry_object(obj, alloc);
+            return RegistryInit531d60Status::alloc_failed;
+        }
+    }
+
+    // OBS 0x532b68..0x532bf8: destroy previous if different & non-null; then movq new, (0x2efd160).
     RegistryObject2efd160* prev = registry_cell_2efd160().load();
     if (prev == obj) {
         return RegistryInit531d60Status::ok;

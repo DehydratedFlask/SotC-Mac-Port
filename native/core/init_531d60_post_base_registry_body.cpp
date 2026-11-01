@@ -228,6 +228,7 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
         out.unit_counts[static_cast<std::size_t>(RegistryBodyUnit::mov_r14_mem_rsp10_532b56_u1)] = 1;
         ++out.unit_executed;
     }
+    void* r13_from_rsp40 = nullptr;
     if (!hooks.merge_mov_r13_mem_rsp40_532b5b_u1_ran) {
         const Init531d60PostBaseMovR13MemRsp40_532b5b_U1Result mov_r13 =
             init_531d60_post_base_mov_r13_mem_rsp40_532b5b_u1(hooks.mov_r13_mem_rsp40_cells);
@@ -235,9 +236,11 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
             return out;
         }
         out.mov_r13_mem_rsp40_count = mov_r13.mov_r13_mem_rsp40_count;
+        r13_from_rsp40 = mov_r13.r13_loaded;
         out.unit_counts[static_cast<std::size_t>(RegistryBodyUnit::mov_r13_mem_rsp40_532b5b_u1)] = 1;
         ++out.unit_executed;
     }
+    void* r14_from_rsp48 = nullptr;
     if (!hooks.merge_mov_r14_mem_rsp48_532b60_u1_ran) {
         const Init531d60PostBaseMovR14MemRsp48_532b60_U1Result mov_r14 =
             init_531d60_post_base_mov_r14_mem_rsp48_532b60_u1(hooks.mov_r14_mem_rsp48_cells);
@@ -245,7 +248,26 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
             return out;
         }
         out.mov_r14_mem_rsp48_count = mov_r14.mov_r14_mem_rsp48_count;
+        r14_from_rsp48 = mov_r14.r14_loaded;
         out.unit_counts[static_cast<std::size_t>(RegistryBodyUnit::mov_r14_mem_rsp48_532b60_u1)] = 1;
+        ++out.unit_executed;
+    }
+    if (!hooks.merge_cmp_r13_r14_532b65_u1_ran) {
+        Init531d60PostBaseCmpR13R14_532b65_U1Cells cells = hooks.cmp_r13_r14_cells;
+        if (cells.r13_in == nullptr) {
+            cells.r13_in = r13_from_rsp40;
+        }
+        if (cells.r14_in == nullptr) {
+            cells.r14_in = r14_from_rsp48;
+        }
+        const Init531d60PostBaseCmpR13R14_532b65_U1Result cmp =
+            init_531d60_post_base_cmp_r13_r14_532b65_u1(cells);
+        if (!cmp.ok) {
+            return out;
+        }
+        out.cmp_r13_r14_count = cmp.cmp_r13_r14_count;
+        out.r13_r14_equal = cmp.pointers_equal;
+        out.unit_counts[static_cast<std::size_t>(RegistryBodyUnit::cmp_r13_r14_532b65_u1)] = 1;
         ++out.unit_executed;
     }
     out.end_rva = kInit531d60PostBaseRegistryBodyEndRva;
@@ -266,10 +288,12 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
     const int expected_mov_rsp10 = hooks.merge_mov_r14_mem_rsp10_532b56_u1_ran ? 0 : 1;
     const int expected_mov_rsp40 = hooks.merge_mov_r13_mem_rsp40_532b5b_u1_ran ? 0 : 1;
     const int expected_mov_rsp48 = hooks.merge_mov_r14_mem_rsp48_532b60_u1_ran ? 0 : 1;
+    const int expected_cmp_r13 = hooks.merge_cmp_r13_r14_532b65_u1_ran ? 0 : 1;
     const int expected_units = expected_call + expected_mov_rbx + expected_count + expected_mov_r15 +
                                expected_mov_rsi + expected_mov_edx + expected_fill + expected_lea_rbx +
                                expected_mov_r13 + expected_mov_r12 + expected_cmp + expected_je +
-                               expected_test + expected_je_null + expected_mov_rsp10 + expected_mov_rsp40 + expected_mov_rsp48;
+                               expected_test + expected_je_null + expected_mov_rsp10 + expected_mov_rsp40 +
+                               expected_mov_rsp48 + expected_cmp_r13;
     out.ok = (out.unit_executed == expected_units) && (out.call_54dc10_count == expected_call) &&
              (out.mov_rbx_rax_count == expected_mov_rbx) &&
              (out.call_54dc20_count == expected_count) &&
@@ -285,7 +309,8 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
              (out.je_532bf8_count == expected_je_null) &&
              (out.mov_r14_mem_rsp10_count == expected_mov_rsp10) &&
              (out.mov_r13_mem_rsp40_count == expected_mov_rsp40) &&
-             (out.mov_r14_mem_rsp48_count == expected_mov_rsp48);
+             (out.mov_r14_mem_rsp48_count == expected_mov_rsp48) &&
+             (out.cmp_r13_r14_count == expected_cmp_r13);
     return out;
 }
 
