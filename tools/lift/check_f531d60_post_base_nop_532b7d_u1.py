@@ -36,7 +36,7 @@ def main():
     require('init_531d60_post_base_nop_532b7d_u1' in nh,'api')
     require('NOT modelled' in nh,'omit')
     require('merge_nop_532b7d_u1_ran' in BODY.read_text(),'body merge')
-    require('kRegistryInit531d60FragmentPinnedRva = 0x532b80' in REG.read_text(),'pin')
+    require('kRegistryInit531d60FragmentPinnedRva = 0x532b84' in REG.read_text(),'pin')
     require('init_531d60_post_base_nop_532b7d_u1.cpp' in CMAKE.read_text(),'cmake')
     print(f'OK check_f531d60_post_base_nop_532b7d_u1 end={END:#x}')
     return 0
