@@ -35,6 +35,8 @@ Trace g_trace;
 
 void hook_tail(void*, void*) { ++g_trace.tails; }
 void hook_pre(void*) { ++g_trace.pre_calls; }
+void hook_pre_2687(void*) { ++g_trace.pre_calls; }
+void hook_pre_1bf7(void*) { ++g_trace.pre_calls; }
 bool deallocate(void*, std::uint32_t) {
     ++g_trace.frees;
     return true;
@@ -112,6 +114,38 @@ void test_187c0_requires_alloc() {
     check("187c0 hooks", g_trace.pre_calls == 1 && g_trace.frees == 1);
 }
 
+void test_one_arg_teardowns() {
+    g_trace = Trace{};
+    std::vector<std::uint8_t> storage(0x80, 0);
+    GuestWindow window(storage.data(), 0x60000, storage.size());
+    RetailFrame frame{};
+    frame.set(RetailArg::rdi, 0x60000);
+    AllocDispatchContract contract{};
+    contract.deallocate = deallocate;
+
+    const auto without_2687 = call_resolved(sotc::kVtable159c908Slot58_2687b0Rva, frame, window);
+    check("2687 no alloc fails", !without_2687.ok &&
+                                     without_2687.status == RetailCallStatus::model_failed);
+
+    RetailCallContext context{};
+    context.pre_2687b0 = hook_pre_2687;
+    context.pre_1bf710 = hook_pre_1bf7;
+    context.alloc = &contract;
+    const auto with_2687 = call_resolved(sotc::kVtable159c908Slot58_2687b0Rva, frame, window,
+                                         context);
+    check("2687 ok", with_2687.ok);
+    const auto with_1bf7 = call_resolved(sotc::kVtable1598e10Slot18_1bf710Rva, frame, window,
+                                         context);
+    check("1bf710 ok", with_1bf7.ok);
+    check("teardown hooks", g_trace.pre_calls == 2 && g_trace.frees == 2);
+
+    frame.set(RetailArg::rdi, 0x90000);
+    const auto out_of_range = call_resolved(sotc::kVtable159c908Slot58_2687b0Rva, frame, window,
+                                            context);
+    check("2687 range fails", !out_of_range.ok &&
+                                  out_of_range.status == RetailCallStatus::out_of_range);
+}
+
 void test_failures() {
     std::vector<std::uint8_t> storage(0x40, 0);
     GuestWindow window(storage.data(), 0x50000, storage.size());
@@ -142,6 +176,7 @@ int main() {
     test_13d20_writes_guest_dword();
     test_358c0_copies_source();
     test_187c0_requires_alloc();
+    test_one_arg_teardowns();
     test_failures();
 
     if (failures == 0) {

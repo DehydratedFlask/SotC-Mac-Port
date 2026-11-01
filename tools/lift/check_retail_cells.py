@@ -24,7 +24,8 @@ MODEL_HEADERS = {
     "kVtable1594ae8Slot28_13d20FieldOffset": "native/core/vtable_1594ae8_slot28_13d20.hpp",
 }
 
-EXPECTED_ADAPTERS = ("marshal_20d60", "marshal_358c0", "marshal_13d20", "marshal_187c0")
+EXPECTED_ADAPTERS = ("marshal_20d60", "marshal_358c0", "marshal_13d20", "marshal_187c0",
+                     "marshal_2687b0", "marshal_1bf710")
 
 
 def require(cond: bool, msg: str) -> None:

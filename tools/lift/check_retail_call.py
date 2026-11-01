@@ -22,6 +22,8 @@ EXPECTED = {
     0x358C0: "marshal_358c0",
     0x13D20: "marshal_13d20",
     0x187C0: "marshal_187c0",
+    0x2687B0: "marshal_2687b0",
+    0x1BF710: "marshal_1bf710",
 }
 
 

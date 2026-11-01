@@ -77,4 +77,36 @@ Marshal187c0 marshal_187c0(GuestWindow& window, std::uint64_t self) noexcept {
     return out;
 }
 
+Marshal2687b0 marshal_2687b0(GuestWindow& window, std::uint64_t self) noexcept {
+    Marshal2687b0 out{};
+    if (!window.valid()) {
+        out.status = GuestStatus::no_window;
+        return out;
+    }
+    if (window.host_pointer(self, 1) == nullptr) {
+        out.status = GuestStatus::out_of_range;
+        return out;
+    }
+    out.cells.self = reinterpret_cast<void*>(static_cast<std::uintptr_t>(self));
+    out.status = GuestStatus::ok;
+    out.ok = true;
+    return out;
+}
+
+Marshal1bf710 marshal_1bf710(GuestWindow& window, std::uint64_t self) noexcept {
+    Marshal1bf710 out{};
+    if (!window.valid()) {
+        out.status = GuestStatus::no_window;
+        return out;
+    }
+    if (window.host_pointer(self, 1) == nullptr) {
+        out.status = GuestStatus::out_of_range;
+        return out;
+    }
+    out.cells.self = reinterpret_cast<void*>(static_cast<std::uintptr_t>(self));
+    out.status = GuestStatus::ok;
+    out.ok = true;
+    return out;
+}
+
 }  // namespace sotc

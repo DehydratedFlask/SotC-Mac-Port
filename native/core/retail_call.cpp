@@ -116,6 +116,48 @@ RetailCallOutcome call_resolved(std::uint64_t rva, RetailFrame& frame, GuestWind
             out.ok = true;
             return out;
         }
+        case kVtable159c908Slot58_2687b0Rva: {
+            const auto marshalled = marshal_2687b0(window, self);
+            if (!marshalled.ok) {
+                out.status = marshalled.status == GuestStatus::no_window
+                                 ? RetailCallStatus::no_window
+                                 : RetailCallStatus::out_of_range;
+                return out;
+            }
+            Vtable159c908Slot58_2687b0Hooks hooks{};
+            hooks.pre_call_2687d0 = context.pre_2687b0;
+            hooks.alloc = context.alloc;
+            const auto result = vtable_159c908_slot58_2687b0(marshalled.cells, hooks);
+            if (!result.ok) {
+                out.status = RetailCallStatus::model_failed;
+                return out;
+            }
+            out.rax = 0;
+            out.status = RetailCallStatus::ok;
+            out.ok = true;
+            return out;
+        }
+        case kVtable1598e10Slot18_1bf710Rva: {
+            const auto marshalled = marshal_1bf710(window, self);
+            if (!marshalled.ok) {
+                out.status = marshalled.status == GuestStatus::no_window
+                                 ? RetailCallStatus::no_window
+                                 : RetailCallStatus::out_of_range;
+                return out;
+            }
+            Vtable1598e10Slot18_1bf710Hooks hooks{};
+            hooks.pre_call_1c0010 = context.pre_1bf710;
+            hooks.alloc = context.alloc;
+            const auto result = vtable_1598e10_slot18_1bf710(marshalled.cells, hooks);
+            if (!result.ok) {
+                out.status = RetailCallStatus::model_failed;
+                return out;
+            }
+            out.rax = 0;
+            out.status = RetailCallStatus::ok;
+            out.ok = true;
+            return out;
+        }
         default:
             // The target has an ABI row but no cell adapter yet.
             out.status = RetailCallStatus::unknown_target;

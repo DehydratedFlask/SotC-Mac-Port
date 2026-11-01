@@ -14,6 +14,8 @@
 #include "vtable_1594ae8_slot28_13d20.hpp"
 #include "vtable_1594dc0_slot20_20d60.hpp"
 #include "vtable_15955c0_slot08_358c0.hpp"
+#include "vtable_1598e10_slot18_1bf710.hpp"
+#include "vtable_159c908_slot58_2687b0.hpp"
 
 #include <cstdint>
 
@@ -56,5 +58,23 @@ struct Marshal187c0 {
 };
 
 [[nodiscard]] Marshal187c0 marshal_187c0(GuestWindow& window, std::uint64_t self) noexcept;
+
+// 0x2687b0 and 0x1bf710: the teardown models take only `self`; the adapter verifies the address is
+// inside the window and hands the guest pointer through.
+struct Marshal2687b0 {
+    bool ok = false;
+    GuestStatus status = GuestStatus::no_window;
+    Vtable159c908Slot58_2687b0Cells cells{};
+};
+
+[[nodiscard]] Marshal2687b0 marshal_2687b0(GuestWindow& window, std::uint64_t self) noexcept;
+
+struct Marshal1bf710 {
+    bool ok = false;
+    GuestStatus status = GuestStatus::no_window;
+    Vtable1598e10Slot18_1bf710Cells cells{};
+};
+
+[[nodiscard]] Marshal1bf710 marshal_1bf710(GuestWindow& window, std::uint64_t self) noexcept;
 
 }  // namespace sotc

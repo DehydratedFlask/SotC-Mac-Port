@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 13:55 CDT (root) — teardown adapters and dispatch arms (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `marshal_2687b0` and `marshal_1bf710` (self-only teardowns: verify the guest address is inside the window, hand the pointer through) and two `call_resolved` arms using their models with `context.pre_2687b0` / `context.pre_1bf710` and the shared alloc contract.
+- **Dispatchable targets: 6 of 17** (`0x20d60`, `0x358c0`, `0x13d20`, `0x187c0`, `0x2687b0`, `0x1bf710`).
+- **Fixture:** both teardowns fail as `model_failed` without an allocation contract; with one they succeed and fire pre-call + free once each (two teardown calls → `pre_calls == 2`, `frees == 2`); an out-of-range `self` returns `out_of_range`.
+- **Checkers:** `check_retail_call.py` now requires 6 dispatch arms and `check_retail_cells.py` 6 adapters, each with an ABI row and model-declared offsets.
+- **Verification (PASSED):** build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Next exact action:** the remaining 11 targets split into self+source copies (`0xc2e0`, `0xc740`), dual-vcall (`0xe16a00`), and the larger status/scan bodies (`0xe19980`, `0xe1a5c0`, `0xe21420`, `0xe26f90`, `0xe24900`, `0xddf4b0`, `0xa460f0`); each needs its own adapter with the offsets from its header.
+
 ## 2026-11-02 13:10 CDT (root) — `call_resolved` entry point (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`, retail call entry. Added `native/core/retail_call.{hpp,cpp}`: `call_resolved(rva, RetailFrame&, GuestWindow&, RetailCallContext)` looks the target up in `retail_abi`, marshals its cells through `retail_cells`, invokes the model, and writes `rax`.

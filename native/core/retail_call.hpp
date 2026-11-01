@@ -23,8 +23,10 @@ struct RetailCallContext {
     void (*tail_20d60)(void* self, void* global) = nullptr;
     std::uint64_t global_20d60 = 0;  // guest address of the 0x2dfcbc8 cell, 0 = none
 
-    // 0x187c0 hooks and allocation contract (the teardown frees `this`).
+    // 0x187c0 / 0x2687b0 / 0x1bf710 hooks and allocation contract (each teardown frees `this`).
     void (*pre_187c0)(void* self) = nullptr;
+    void (*pre_2687b0)(void* self) = nullptr;
+    void (*pre_1bf710)(void* self) = nullptr;
     const AllocDispatchContract* alloc = nullptr;
 };
 
