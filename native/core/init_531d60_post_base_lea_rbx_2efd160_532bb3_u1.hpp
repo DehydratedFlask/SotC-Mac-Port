@@ -1,7 +1,7 @@
 // Init `0x531d60` registry lea rbx OBS `0x532bb3..0x532bba` (7 B):
 //   lea rbx,[0x2efd160]   ; epilogue reload of global registry cell after mov r13 @ `0x532bae`
 //
-// After E590 mov @ `0x532bae`. NOT modelled: tail @ `0x532bba..`. G1 PARTIAL.
+// After E590 mov @ `0x532bae`. NOT modelled: E592 mov @ `0x532bba` / tail @ `0x532bbf..`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

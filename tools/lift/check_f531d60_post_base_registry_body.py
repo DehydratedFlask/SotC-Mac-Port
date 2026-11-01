@@ -6,8 +6,8 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 import ps4_dynlink as d
 ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
-START, SIZE, END = 0x532B19, 161, 0x532BBA
-REGION_SHA256 = "97fc043330c6b390b26c96d7603c2277a9df458ba2d4022174198f680f2ea021"
+START, SIZE, END = 0x532B19, 166, 0x532BBF
+REGION_SHA256 = "59cf9e802bd81de87f7ea984367d136cb1d9d0145956fb7ac1844288b4edc049"
 PEEL_LEA = bytes.fromhex("488d742410")
 PEEL_MOV = bytes.fromhex("498b5d10")
 PEEL_MOV15 = bytes.fromhex("4d8b7d18")
@@ -58,11 +58,13 @@ UNITS=[
     (0x532BAC,2,"4532ba8a8cb1ac213964c95496a5a8535246ca3b933cd8cf2b9c368d826e78e2"),
     (0x532BAE,5,"5161bd7ca4697196a7ed118df5923758c9c21e074bbe80a1e68063cc42b866e5"),
     (0x532BB3,7,"8163125859f1d4162340a7a7a06772541f61c5f19b6918952884eca7a28904b7"),
+    (0x532BBA,5,"0832b50b1127d182d74804dfe1d0e7c47ba24a7959ec75952e83dac10ea85388"),
 ]
 CMP532BA9=ROOT/"native/core/init_531d60_post_base_cmp_r13_r14_532ba9_u1.hpp"
 JNE532BAC=ROOT/"native/core/init_531d60_post_base_jne_532b70_532bac_u1.hpp"
 MOVR13M12=ROOT/"native/core/init_531d60_post_base_mov_r13_mem_r12_40_532bae_u1.hpp"
 LEARBX532BB3=ROOT/"native/core/init_531d60_post_base_lea_rbx_2efd160_532bb3_u1.hpp"
+MOVR14RSP532BBA=ROOT/"native/core/init_531d60_post_base_mov_r14_mem_rsp10_532bba_u1.hpp"
 ADDR1330=ROOT/"native/core/init_531d60_post_base_add_r13_30_532ba5_u1.hpp"
 CALL170C0=ROOT/"native/core/init_531d60_post_base_call_170c0_532ba0_u1.hpp"
 MOVRDIRBX532=ROOT/"native/core/init_531d60_post_base_mov_rdi_rbx_532b9d_u1.hpp"
@@ -139,7 +141,7 @@ def unit_bytes(img,rva,sz):
 def main():
     elf=(ROOT/"local/re/eboot.elf").read_bytes(); require(hashlib.sha256(elf).hexdigest()==ELF_SHA256,'elf')
     _,ph=d.program_headers(elf); img=d.Image(elf,ph)
-    require(len(UNITS)==41,'units')
+    require(len(UNITS)==42,'units')
     require(hashlib.sha256(patched_region(img)).hexdigest()==REGION_SHA256,'region')
     for rva,sz,sha in UNITS:
         require(hashlib.sha256(unit_bytes(img,rva,sz)).hexdigest()==sha,f'unit@{rva:#x}')
@@ -148,7 +150,7 @@ def main():
     b=img.read(FILL_RVA,5); require(b[0]==0xE8,'fill call')
     rel=struct.unpack('<i',b[1:5])[0]; require(FILL_RVA+5+rel==FILL_TARGET,'fill 0x52a220')
     nh=NATIVE.read_text()
-    require('kInit531d60PostBaseRegistryBodyEndRva = 0x532bba' in nh,'end')
+    require('kInit531d60PostBaseRegistryBodyEndRva = 0x532bbf' in nh,'end')
     require('call_54dc10_532b19_u1' in nh and 'mov_rbx_rax_532b1e_u1' in nh and 'call_54dc20_532b21_u1' in nh and 'mov_r15_rax_532b26_u1' in nh and 'mov_rsi_rbx_532b29_u1' in nh and 'mov_edx_eax_532b2c_u1' in nh and 'call_52a220_532b2e_u1' in nh and 'lea_rbx_2efd160_532b33_u1' in nh and 'mov_r13_15fe518_532b3a_u1' in nh and 'mov_r12_rbx_532b41_u1' in nh and 'cmp_r12_r14_532b44_u1' in nh and 'je_532bfb_532b47_u1' in nh and 'test_r12_r12_532b4d_u1' in nh and 'je_532bf8_532b50_u1' in nh and 'mov_r14_mem_rsp10_532b56_u1' in nh and 'mov_r13_mem_rsp40_532b5b_u1' in nh and 'mov_r14_mem_rsp48_532b60_u1' in nh and 'cmp_r13_r14_532b65_u1' in nh and 'je_532bba_532b68_u1' in nh and 'lea_rsi_rsp10_532b6a_u1' in nh and 'mov_rbx_r13_10_532b70_u1' in nh and 'mov_r15_r13_18_532b74_u1' in nh and 'cmp_r15_r11_532b78_u1' in nh and 'je_532b98_532b7b_u1' in nh and 'nop_532b7d_u1' in nh and 'mov_rax_rbx_48_532b80_u1' in nh and 'lea_rdi_rbx_28_532b84_u1' in nh and 'vcall18_532b88_u1' in nh and 'add_rbx_58_532b8b_u1' in nh and 'cmp_r15_rbx_532b8f_u1' in nh and 'jne_532b80_532b92_u1' in nh and 'mov_rbx_r13_10_532b94_u1' in nh and 'test_rbx_rbx_532b98_u1' in nh and 'je_532ba5_532b9b_u1' in nh and 'mov_rdi_rbx_532b9d_u1' in nh,'unit enum')
     require('kInit531d60PostBaseRegistryBodyUnitCount' in nh,'unit count')
     require('merge_call_54dc10_532b19_u1_ran' in nh,'merge call')
@@ -392,8 +394,8 @@ def main():
     require('test_rbx_rbx_count' in TEST.read_text(),'test test rbx rbx field')
     require('je_532ba5_count' in TEST.read_text(),'test je 532ba5 field')
     require('rsi_from_rsp10_lea' in TEST.read_text(),'test rsi from lea field')
-    require('kInit531d60PostBaseRegistryBodyUnitCount == 41' in TEST.read_text(),'test unit count 41')
-    require('kRegistryInit531d60FragmentPinnedRva = 0x532bba' in REG.read_text(),'reg pin')
+    require('kInit531d60PostBaseRegistryBodyUnitCount == 42' in TEST.read_text(),'test unit count 42')
+    require('kRegistryInit531d60FragmentPinnedRva = 0x532bbf' in REG.read_text(),'reg pin')
     require('merge_cmp_r15_r11_532b78_u1_ran' in REG.read_text(),'reg merge cmp r15 r11')
     require('merge_mov_rbx_r13_10_532b70_u1_ran' in REG.read_text(),'reg merge mov rbx r13')
     require('merge_mov_r14_mem_rsp10_532b56_u1_ran' in REG.read_text(),'reg merge mov rsp10')
@@ -440,6 +442,6 @@ def main():
     require('merge_call_170c0_532ba0_u1_ran' in SC.read_text(),'slice merge call 170c0 532ba0')
     require('merge_add_r13_30_532ba5_u1_ran' in SC.read_text(),'slice merge add r13 30 532ba5')
     require('merge_cmp_r13_r14_532ba9_u1_ran' in SC.read_text(),'slice merge cmp r13 r14 532ba9')
-    print('OK check_f531d60_post_base_registry_body end=0x532bba units=41')
+    print('OK check_f531d60_post_base_registry_body end=0x532bbf units=42')
     return 0
 if __name__=='__main__': raise SystemExit(main())
