@@ -1,8 +1,8 @@
 // Init `0x531d60` registry mov OBS `0x532b9d..0x532ba0` (3 B):
 //   mov rdi,rbx   ; fall-through from je @ `0x532b9b` when rbx non-null
 //
-// After E584 je @ `0x532b9b`. NOT modelled: `call 0x170c0` @ `0x532ba0` or epilogue @
-// `0x532ba5`. G1 PARTIAL.
+// After E584 je @ `0x532b9b`. Fall-through call is E586 `call_170c0_532ba0_u1`.
+// NOT modelled: epilogue @ `0x532ba5`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

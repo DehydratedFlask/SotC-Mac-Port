@@ -13,7 +13,7 @@ Init531d60PostBaseMovRdiRbx_532b9d_U1Result init_531d60_post_base_mov_rdi_rbx_53
     }
     ++out.mov_rdi_rbx_532b9d_count;
 
-    // Next: call 0x170c0 @ 0x532ba0 — not modelled here.
+    // Next: call 0x170c0 @ 0x532ba0 (E586) — not modelled here.
     out.ok = (out.mov_rdi_rbx_532b9d_count == 1);
     return out;
 }
