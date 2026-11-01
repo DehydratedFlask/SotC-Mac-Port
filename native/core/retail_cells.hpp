@@ -21,6 +21,7 @@
 #include "vtable_15e0b48_slot28_ddf4b0.hpp"
 #include "vtable_15d1678_slot280_a460f0.hpp"
 #include "vtable_15e2d60_slot_d0_e24900.hpp"
+#include "vtable_15ed2a0_slot_c0_e26f90.hpp"
 #include "vtable_15f2f08_slot38_e16a00.hpp"
 #include "vtable_159c908_slot58_2687b0.hpp"
 
@@ -140,5 +141,19 @@ struct MarshalE24900 {
 
 [[nodiscard]] MarshalE24900 marshal_e24900(GuestWindow& window, std::uint64_t self,
                                            std::uint64_t out) noexcept;
+
+// 0xe26f90: status gate. `self`/`arg2`/`arg3` come from the frame; the canary and the two scratch
+// regions are host storage because the retail body uses its own stack and this layer has no guest
+// stack mapping yet.
+struct MarshalE26f90 {
+    bool ok = false;
+    GuestStatus status = GuestStatus::no_window;
+    Vtable15ed2a0SlotC0_e26f90Cells cells{};
+};
+
+[[nodiscard]] MarshalE26f90 marshal_e26f90(GuestWindow& window, std::uint64_t self,
+                                           std::uint64_t arg2, std::int32_t arg3,
+                                           std::uint64_t* host_canary, void* host_buffer,
+                                           void* host_local) noexcept;
 
 }  // namespace sotc

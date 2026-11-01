@@ -35,7 +35,8 @@ MODEL_HEADERS = {
 EXPECTED_ADAPTERS = ("marshal_20d60", "marshal_358c0", "marshal_13d20", "marshal_187c0",
                      "marshal_2687b0", "marshal_1bf710", "marshal_c2e0", "marshal_c740",
                      "marshal_e16a00", "marshal_ddf4b0",
-                     "marshal_a460f0", "marshal_e24900")
+                     "marshal_a460f0", "marshal_e24900",
+                     "marshal_e26f90")
 
 
 def require(cond: bool, msg: str) -> None:

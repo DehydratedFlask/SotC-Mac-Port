@@ -224,4 +224,31 @@ MarshalE24900 marshal_e24900(GuestWindow& window, std::uint64_t self,
     return out_cells;
 }
 
+MarshalE26f90 marshal_e26f90(GuestWindow& window, std::uint64_t self, std::uint64_t arg2,
+                             std::int32_t arg3, std::uint64_t* host_canary, void* host_buffer,
+                             void* host_local) noexcept {
+    MarshalE26f90 out{};
+    if (!window.valid()) {
+        out.status = GuestStatus::no_window;
+        return out;
+    }
+    if (window.host_pointer(self, 1) == nullptr) {
+        out.status = GuestStatus::out_of_range;
+        return out;
+    }
+    if (host_canary == nullptr || host_buffer == nullptr || host_local == nullptr) {
+        out.status = GuestStatus::out_of_range;
+        return out;
+    }
+    out.cells.self = reinterpret_cast<void*>(static_cast<std::uintptr_t>(self));
+    out.cells.arg2 = reinterpret_cast<void*>(static_cast<std::uintptr_t>(arg2));
+    out.cells.arg3 = arg3;
+    out.cells.canary = host_canary;
+    out.cells.buffer = host_buffer;
+    out.cells.local = host_local;
+    out.status = GuestStatus::ok;
+    out.ok = true;
+    return out;
+}
+
 }  // namespace sotc

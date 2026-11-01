@@ -58,6 +58,7 @@ inline constexpr RetailArgSpec kRetailArgSpecs[] = {
     {0xe1a5c0, 4, true, "rdi=this, rsi=key, edx=value; returns int status"},
     {0xe21420, 3, true, "rdi=this, rsi=ctx, rdx=name; returns int status"},
     {0xe24900, 2, false, "rdi=this, rsi=out; stores through rsi; returns status in eax"},
+    {0xe26f90, 3, true, "rdi=this, rsi=arg2, edx=arg3; returns status in eax"},
 };
 
 inline constexpr std::size_t kRetailArgSpecCount =

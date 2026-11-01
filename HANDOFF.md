@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 17:40 CDT (root) — 0xe26f90 status-gate arm (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `marshal_e26f90` (frame `rdi/rsi/edx` plus **host** canary/buffer/local storage, because this layer still has no guest stack mapping) and a `call_resolved` arm with slot78/slot90/helper hooks; `rax` carries the model status.
+- **Dispatchable targets: 14 of 17.**
+- **Bug caught:** the ABI table had no `0xe26f90` row at all, so the new arm was unreachable and the fixture failed three checks. Added the row (17 targets); `check_retail_abi.py` and the ABI fixture now expect 17.
+- **Fixture:** helper path returns `rax = 21`; non-zero slot90 status takes the early-zero path (`rax = 0`); missing scratch storage fails as `out_of_range`.
+- **Checkers:** 14 arms and 13 adapters.
+- **Verification (PASSED):** build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Next exact action:** the last three are `0xe19980` (5 args, two paths), `0xe1a5c0` (container scan) and `0xe21420` (decision contract, ~400 bytes unmodelled).
+
 ## 2026-11-02 16:55 CDT (root) — 0xe24900 sub-dispatch arm (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `marshal_e24900` (sub pointer read from `self+0x8`, out cell resolved from `rsi`) and a `call_resolved` arm wiring `slot28`, `slot48`, `sub40`, status and release hooks. `rax` now carries the model status for this arm.

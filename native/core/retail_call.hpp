@@ -48,6 +48,15 @@ struct RetailCallContext {
     void* (*sub40_e24900)(void* sub, void* a, std::uint32_t index) = nullptr;
     std::int32_t (*status_e24900)(void* result, void* self) = nullptr;
     void (*release_e24900)(void* result) = nullptr;
+
+    // 0xe26f90: status gate with host scratch storage (no guest stack mapping yet).
+    std::uint64_t (*slot78_e26f90)(void* self) = nullptr;
+    std::int32_t (*slot90_e26f90)(void* self, const char* name, void* buffer) = nullptr;
+    std::int32_t (*helper_e26f90)(void* self, void* arg2, std::int32_t arg3, void* buffer,
+                                  void* local) = nullptr;
+    std::uint64_t* host_canary = nullptr;
+    void* host_buffer = nullptr;
+    void* host_local = nullptr;
 };
 
 enum class RetailCallStatus : std::uint8_t {

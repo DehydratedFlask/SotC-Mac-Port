@@ -22,7 +22,7 @@ void check(std::string_view name, bool passed) {
 }
 
 void test_table_shape() {
-    check("count", kRetailArgSpecCount == 16);
+    check("count", kRetailArgSpecCount == 17);
     bool sorted = true;
     for (std::size_t index = 1; index < kRetailArgSpecCount; ++index) {
         if (kRetailArgSpecs[index - 1].rva >= kRetailArgSpecs[index].rva) {

@@ -281,6 +281,51 @@ void test_e24900_sub_dispatch() {
                                            range.status == RetailCallStatus::model_failed);
 }
 
+std::uint64_t slot78_e26(void*) { return 0x99; }
+std::int32_t g_e26_status = 0;
+std::int32_t slot90_e26(void*, const char* name, void*) {
+    return name != nullptr ? g_e26_status : -1;
+}
+std::int32_t helper_e26(void*, void*, std::int32_t, void*, void*) { return 21; }
+
+void test_e26f90_status_gate() {
+    std::vector<std::uint8_t> storage(0x60, 0);
+    GuestWindow window(storage.data(), 0xD0000, storage.size());
+    std::uint64_t canary = 7;
+    char buffer[16] = {};
+    int local = 0;
+
+    RetailFrame frame{};
+    frame.set(RetailArg::rdi, 0xD0000);
+    frame.set(RetailArg::rsi, 0xD0020);
+    frame.set(RetailArg::rdx, 5);
+    RetailCallContext context{};
+    context.slot78_e26f90 = slot78_e26;
+    context.slot90_e26f90 = slot90_e26;
+    context.helper_e26f90 = helper_e26;
+    context.host_canary = &canary;
+    context.host_buffer = buffer;
+    context.host_local = &local;
+
+    g_e26_status = 0;
+    const auto helper_path = call_resolved(sotc::kVtable15ed2a0SlotC0_e26f90Rva, frame, window,
+                                           context);
+    check("e26f90 helper path", helper_path.ok && helper_path.rax == 21);
+
+    g_e26_status = 3;
+    const auto early = call_resolved(sotc::kVtable15ed2a0SlotC0_e26f90Rva, frame, window, context);
+    check("e26f90 early zero", early.ok && early.rax == 0);
+
+    RetailCallContext no_scratch{};
+    no_scratch.slot78_e26f90 = slot78_e26;
+    no_scratch.slot90_e26f90 = slot90_e26;
+    const auto missing = call_resolved(sotc::kVtable15ed2a0SlotC0_e26f90Rva, frame, window,
+                                       no_scratch);
+    check("e26f90 no scratch fails", !missing.ok &&
+                                         missing.status == RetailCallStatus::out_of_range);
+    g_e26_status = 0;
+}
+
 void test_failures() {
     std::vector<std::uint8_t> storage(0x40, 0);
     GuestWindow window(storage.data(), 0x50000, storage.size());
@@ -316,6 +361,7 @@ int main() {
     test_dual_vcall_and_manager();
     test_a460f0_teardown();
     test_e24900_sub_dispatch();
+    test_e26f90_status_gate();
     test_failures();
 
     if (failures == 0) {
