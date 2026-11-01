@@ -10,7 +10,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `.` | 9 | Project entry points and agent state |
 | `.graft` | 1 | Project folder; add a contract to docs/INDEX.md |
 | `Shadow of the Colossus` | 2 | Original user game inputs; read-only and private |
-| `docs` | 24 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs` | 26 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/checkpoints` | 1009 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/escalations` | 10 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/schemas` | 1 | Plans, task/evidence registries, checkpoint and escalation documentation |
@@ -600,7 +600,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `tools/dev` | 16 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft/.cache` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
-| `tools/lift` | 732 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/lift` | 734 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/pkg-extractor` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
 
 Private recursive inventory: `local/indexes/folders.json` (excluded from publication).

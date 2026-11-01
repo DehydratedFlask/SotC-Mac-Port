@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 18:05 CDT (root) — guest-address → native-entry map (STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01` continuation. `tools/lift/gen_entry_map.py` scans every `inline constexpr std::uint64_t k…Rva` in `native/core/` and `native/platform/` into `docs/entry_map.json`; `docs/ENTRY_MAP.md` explains what the numbers do and do not mean.
+- **Numbers:** **1,386** declared constants → **951 distinct guest RVAs** across **364** headers, **290** RVAs named by more than one header (`0xf590` by 24, `0x17070` by 11, the `0x2ee2cf8` cell by 11). **273** distinct entries fall inside the Init window `0x531d60..0x534100`.
+- **Honest scale:** 951 entries against the CFG census's **55,790** unwind ranges is roughly 1–2 % of the executable. The table mixes code and data targets; only 62 RVAs are named by a `Target`/`Rva`-style constant, and presence is not callability.
+- **Gate:** `tools/lift/check_entry_map.py` regenerates and diffs, so the map cannot drift from the headers.
+- **Still missing:** function-start classification against the FDE table, address → callable retail-ABI thunks, and the 105 unresolved indirect sites in the `0x531d60` closure.
+- **Verification:** `check_entry_map` OK; project index regenerated. Full CTest/checker sweep recorded at the next checkpoint.
+
 ## 2026-11-01 17:40 CDT (root) — whole-program CFG census (STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01` first increment. `tools/lift/cfg_census.py` (730 lines, stdlib only) builds the direct-call graph from the saved FDE ranges + one streaming pass over the pinned disassembly, then reports the transitive closure for `--seed` addresses and every unresolved indirect site inside it.
