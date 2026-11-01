@@ -38,7 +38,7 @@ def main():
     require('NOT modelled' in nh,'omit')
     require('merge_call_170c0_532bc7_u1_ran' in BODY.read_text(),'body merge')
     require('merge_call_170c0_532bc7_u1_ran' in REG.read_text(),'reg merge')
-    require('kRegistryInit531d60FragmentPinnedRva = 0x532bcc' in REG.read_text(),'pin')
+    require('kInit531d60PostBaseCall170c0_532bc7_U1EndRva = 0x532bcc' in NATIVE.read_text(),'end pin')
     require('init_531d60_post_base_call_170c0_532bc7_u1.cpp' in CMAKE.read_text(),'cmake')
     print(f'OK check_f531d60_post_base_call_170c0_532bc7_u1 end={END:#x}')
     return 0

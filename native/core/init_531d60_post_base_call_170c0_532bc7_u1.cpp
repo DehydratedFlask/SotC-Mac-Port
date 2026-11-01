@@ -21,7 +21,7 @@ Init531d60PostBaseCall170c0_532bc7_U1Result init_531d60_post_base_call_170c0_532
     }
     ++out.call_170c0_532bc7_count;
 
-    // Next: mov @ 0x532bcc — not modelled here.
+    // Next: mov rdi,[r12+0x20] @ 0x532bcc — see mov_rdi_mem_r12_20_532bcc_u1.
     out.ok = (out.call_170c0_532bc7_count == 1);
     return out;
 }
