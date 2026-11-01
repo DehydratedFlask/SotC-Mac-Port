@@ -2606,3 +2606,10 @@ target_link_libraries(sotc_vtable_15e2d60_slot_d0 PUBLIC sotc_core)
 add_executable(test_vtable_15e2d60_slot_d0 tests/test_vtable_15e2d60_slot_d0_e24900.cpp)
 target_link_libraries(test_vtable_15e2d60_slot_d0 PRIVATE sotc_vtable_15e2d60_slot_d0)
 add_test(NAME vtable_15e2d60_slot_d0 COMMAND test_vtable_15e2d60_slot_d0)
+
+# CPU-01-AOT-CFG-SCALE-01: retail SysV argument contract for the resolved targets.
+add_library(sotc_retail_abi STATIC core/retail_abi.cpp)
+target_link_libraries(sotc_retail_abi PUBLIC sotc_core)
+add_executable(test_retail_abi tests/test_retail_abi.cpp)
+target_link_libraries(test_retail_abi PRIVATE sotc_retail_abi)
+add_test(NAME retail_abi COMMAND test_retail_abi)

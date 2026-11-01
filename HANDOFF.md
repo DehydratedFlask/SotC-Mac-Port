@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 10:20 CDT (root) — retail ABI contract table (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`, retail calling-convention card. Added `native/core/retail_abi.{hpp,cpp}`: a SysV integer frame (`rdi/rsi/rdx/rcx/r8/r9` + `rax`) and a sorted **16-row contract table** recording, per resolved target, how many argument registers the body reads, whether it returns a value, and a one-line derivation note (for example `0xe1a5c0`: `rdi=this, rsi=key, edx=value`, returns int; `0xa40e20`: no register is read).
+- **Scope, stated plainly:** this is a **contract record**, not an implementation. A dispatcher can marshal arguments from a guest frame, but a target whose body needs guest memory still requires host cells/hooks; the table does not fabricate them.
+- **Fixture:** `tests/test_retail_abi.cpp` — table shape (16 rows, sorted, counts ≤ 6), lookup for setter/no-arg/scan rows, unknown RVAs, `retail_takes_at_least`, and frame get/set.
+- **Checker:** `tools/lift/check_retail_abi.py` requires every row to be an FDE function start **and** present in the entry map, plus the header rows, CMake targets and count constant.
+- **Verification (PASSED):** build exit 0; CTest **514/514**; lift checkers **707 passed / 0 failed**.
+- **Sweep status:** the full 573-seed constructor sweep is still running (child at `0xd04ce0`); `ctor-sweep.json` not yet written. Any further targets it finds will be added the same way.
+
 ## 2026-11-02 09:35 CDT (root) — constructor-seed sweep: 4 new sites, new target 0xe24900 lifted (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Swept the 573-row constructor table (40-seed sample synchronously; full sweep running in the background) and found four sites outside the previous 18.
