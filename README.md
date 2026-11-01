@@ -50,6 +50,17 @@ See [launcher/README.md](launcher/README.md).
 | [docs/PLATFORM.md](docs/PLATFORM.md) | ARM64 / Metal / audio / save design |
 | [docs/VALIDATION.md](docs/VALIDATION.md) | Pass/fail acceptance gates |
 
+## Licence
+
+This port is distributed under the **GNU General Public License, version 2 or later**
+([LICENSE](LICENSE)). The owner chose GPL-2.0-or-later on 2026-11-01 so that GPL-2.0-or-later
+prior-art code (the Metal command path and shader tooling from the public Bloodborne Mac ports,
+which build on shadPS4) can be ported or vendored here with attribution instead of being
+re-invented. Reused components keep their original authors and notices; see
+[docs/PRIOR_ART.md](docs/PRIOR_ART.md) and [docs/ATTRIBUTION.md](docs/ATTRIBUTION.md).
+
+No Sony game assets, packages or executables are included, and none may be committed.
+
 ## Public remote and agent checkpoints
 
 - **GitHub:** https://github.com/DehydratedFlask/SotC-Mac-Port

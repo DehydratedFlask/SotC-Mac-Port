@@ -61,8 +61,9 @@ Decisions taken from this:
    First slice landed: `native/platform/pm4_decoder.*`, `test_pm4_decoder`, and an independent
    Python oracle `tools/lift/check_pm4_decoder.py`.
 4. **Use the HLE map as a specification** for our native service layer.
-5. **Licence decision is a gate.** No GPL-2.0 code is vendored until the owner records a licence
-   choice; design-level re-implementation needs no such decision.
+5. **Licence decided (2026-11-01): GPL-2.0-or-later.** The owner chose GPL-2.0-or-later for this
+   repository ([LICENSE](LICENSE)) so GPL-2.0-or-later prior-art code may be ported or vendored with
+   attribution. `docs/ATTRIBUTION.md` records the rules; unlicensed code is still never copied.
 
 ## Read by role
 

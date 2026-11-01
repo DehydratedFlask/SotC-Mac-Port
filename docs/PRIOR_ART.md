@@ -162,5 +162,8 @@ public chain in the set, but must be re-implemented — no code may be copied.
    (`PLAT-01-SERVICE-MAP-01`), not as code.
 5. **Copy the packaging, not the runtime.** Signed/notarised DMG with an explicit asset-import flow
    (`APP-01-NOTARIZED-DMG-01`).
-6. **Licence decision first.** No GPL-2.0 code enters the tree until the owner records a licence
-   choice (see `docs/ATTRIBUTION.md`). Until then every prior-art item above is design-only.
+6. **Licence decided (2026-11-01):** the owner chose **GPL-2.0-or-later** for this repository
+   ([LICENSE](../LICENSE)), so GPL-2.0-or-later prior-art code may now be ported or vendored with
+   attribution. `docs/ATTRIBUTION.md` records the rules (original headers, `NOTICES.md` entry,
+   pinned upstream commit, no unlicensed code). Design-only re-implementation remains the default
+   for anything we can write cleanly ourselves.

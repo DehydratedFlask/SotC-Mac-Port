@@ -604,3 +604,23 @@ does, prevents that.
   unchanged tip. The scan log SHA-256 is
   `efbc7a4ad369203f55f30b38fea49d42a98d13fd83c16c978a647ab67f065ec8`; see E835 and the
   [publication closeout](checkpoints/2026-10-27-e834-publication-closeout-e835.md).
+
+## Repository licence and prior-art attribution
+
+The owner chose **GPL-2.0-or-later** for this repository on 2026-11-01 ([LICENSE](../LICENSE)).
+That decision exists so the direct-Metal command path and shader tooling from the public
+Bloodborne Mac ports — which are GPL-2.0-or-later and themselves build on shadPS4 — can be ported
+or vendored here lawfully. The assessment is in [PRIOR_ART](PRIOR_ART.md).
+
+Rules for reused code:
+
+1. Every ported or vendored file keeps its original copyright header and adds a line naming the
+   upstream project, the pinned commit, and the licence.
+2. A short notice goes in `NOTICES.md` (created on the first vendored file) listing: upstream
+   repository, commit, files, original authors, licence.
+3. Attribution is a human/upstream credit, never an agent identity; the commit rules above still
+   apply to every commit.
+4. Code with **no licence** (for example `truwa/nathan-drake-collection-macos`) is never copied —
+   only its published design may inform a re-implementation.
+5. Per-component provenance (which upstream file, which licence) is recorded in
+   `docs/PRIOR_ART.md` §3 before the code lands.
