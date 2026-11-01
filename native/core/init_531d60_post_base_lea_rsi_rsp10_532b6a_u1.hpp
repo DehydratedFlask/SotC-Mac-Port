@@ -1,7 +1,7 @@
 // Init `0x531d60` registry lea rsi OBS `0x532b6a..0x532b6f` (5 B):
 //   lea rsi,[rsp+0x10]   ; fall-through after je @ `0x532b68`
 //
-// After E569 je @ `0x532b68`. NOT modelled: destroy/load tail @ `0x532b6f..`. G1 PARTIAL.
+// After E569 je @ `0x532b68`. NOT modelled: destroy/load tail @ `0x532b70..`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

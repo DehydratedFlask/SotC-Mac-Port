@@ -16,7 +16,7 @@ Init531d60PostBaseLeaRsiRsp10_532b6a_U1Result init_531d60_post_base_lea_rsi_rsp1
     }
     ++out.lea_rsi_rsp10_count;
 
-    // Next: mov rbx,[r13+0x10] @ 0x532b6f — not modelled here.
+    // Next: mov rbx,[r13+0x10] @ 0x532b70 — peeled in E571 sibling unit.
     out.ok = (out.lea_rsi_rsp10_count == 1);
     return out;
 }

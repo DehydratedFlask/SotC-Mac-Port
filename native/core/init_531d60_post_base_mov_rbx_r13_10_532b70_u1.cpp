@@ -1,0 +1,25 @@
+#include "init_531d60_post_base_mov_rbx_r13_10_532b70_u1.hpp"
+
+namespace sotc {
+
+Init531d60PostBaseMovRbxR13_10_532b70_U1Result init_531d60_post_base_mov_rbx_r13_10_532b70_u1(
+    const Init531d60PostBaseMovRbxR13_10_532b70_U1Cells& cells) noexcept {
+    Init531d60PostBaseMovRbxR13_10_532b70_U1Result out{};
+
+    void* rbx = nullptr;
+    if (cells.r13_base != nullptr) {
+        const auto* base = static_cast<const std::uint8_t*>(cells.r13_base);
+        rbx = *reinterpret_cast<void* const*>(base + kInit531d60PostBaseMovRbxR13_10_532b70_U1Disp);
+    }
+    out.rbx = rbx;
+    if (cells.rbx_out != nullptr) {
+        *cells.rbx_out = rbx;
+    }
+    ++out.mov_rbx_r13_10_count;
+
+    // Next: mov r15,[r13+0x18] @ 0x532b74 — not modelled here.
+    out.ok = (out.mov_rbx_r13_10_count == 1);
+    return out;
+}
+
+}  // namespace sotc
