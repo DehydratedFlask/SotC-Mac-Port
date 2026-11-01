@@ -2534,3 +2534,12 @@ target_link_libraries(sotc_vtable_resolved_bodies_2 PUBLIC sotc_core)
 add_executable(test_vtable_resolved_bodies_2 tests/test_vtable_resolved_bodies_2.cpp)
 target_link_libraries(test_vtable_resolved_bodies_2 PRIVATE sotc_vtable_resolved_bodies_2)
 add_test(NAME vtable_resolved_bodies_2 COMMAND test_vtable_resolved_bodies_2)
+
+# CPU-01-AOT-CFG-SCALE-01: the two smallest newly resolved targets (0xc2e0, 0xa40e20).
+add_library(sotc_vtable_resolved_bodies_3 STATIC
+  core/vtable_15d1678_slot_e8_c2e0.cpp
+  core/vtable_15d1678_slot_68_a40e20.cpp)
+target_link_libraries(sotc_vtable_resolved_bodies_3 PUBLIC sotc_core)
+add_executable(test_vtable_resolved_bodies_3 tests/test_vtable_resolved_bodies_3.cpp)
+target_link_libraries(test_vtable_resolved_bodies_3 PRIVATE sotc_vtable_resolved_bodies_3)
+add_test(NAME vtable_resolved_bodies_3 COMMAND test_vtable_resolved_bodies_3)

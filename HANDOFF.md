@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 02:05 CDT (root) — frontier widened to seven more seeds: 18 sites / 15 targets (STATIC_ANALYSIS_VERIFIED / FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Ran the frontier on seven further startup entries (`0x25a4d0`, `0x2569d0`, `0x25d8b0`, `0x255130`, `0x27990`, `0x47620`, `0xa505e0`); `0x1bdb10`, `0x3b310` and `0x532ca0` have no indirect sites.
+- **Result:** **18 resolved call sites / 15 distinct targets**, every chain re-verified independently as slot qword `==` target **and** a type-8 relocation with the same addend, target an FDE start. New targets: `0x2687b0`, `0xc2e0`, `0xa40e20`, `0xa460f0`, `0x1bf710`, `0xddf4b0`, `0xe21420`, `0xe1a5c0`, `0xe19980`, `0xe16a00` (plus a second site `0x14dc19` for the known `0x20d60`).
+- **Table:** `vtable_resolved_entries` grew from 6 to 18 rows (sorted, lookup helper unchanged); fixture updated to 18/15 and passes; `check_vtable_resolved_entries.py` verifies all 18 chains against image, RELA and entry map.
+- **New body models:** `0xc2e0` (9 B: `mov 0x10(%rsi),%rax; mov %rax,0x10(%rdi); ret`) and `0xa40e20` (1 B `retq`, modelled as an explicit no-op). Fixture `test_vtable_resolved_bodies_3` (4 cases); checker `check_vtable_resolved_bodies_3.py` pins bodies, slots, RELA rows and entry map.
+- **Entry map:** regenerated to **1,411 constants / 966 RVAs / 372 headers**.
+- **Method note:** an independent re-verification first appeared to reject the new chains; the cause was the verifier ignoring the tool's `global_form`/`object_offset` chain, not the tool. Re-checked with the same chain: all 18 pass.
+- **Verification (PASSED):** build exit 0; CTest **504/504**; lift checkers **697 passed / 0 failed**.
+- **Next exact action:** body models for the remaining eight new targets, starting with the smallest FDE bodies (`0xa460f0` 0x3e, `0xed171c/0xed1733` share `0xe16a00` 0x26).
+
 ## 2026-11-02 01:00 CDT (root) — remaining three resolved targets lifted (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. All five statically resolved vtable targets now have body models.

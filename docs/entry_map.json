@@ -3228,6 +3228,16 @@
         "header": "native/core/init_531d60_post_base_a2ed00_u7.hpp"
       }
     ],
+    "0xa40e20": [
+      {
+        "constant": "kVtable15d1678Slot68_a40e20",
+        "header": "native/core/vtable_15d1678_slot_68_a40e20.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_a40e20",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0xa431e0": [
       {
         "constant": "kInit531d60PostBaseA431e0U1Target",
@@ -3372,6 +3382,16 @@
       {
         "constant": "kSlot544EntryWriter",
         "header": "native/core/ctor_slot_544_d1b20.hpp"
+      }
+    ],
+    "0xc2e0": [
+      {
+        "constant": "kVtable15d1678SlotE8_c2e0",
+        "header": "native/core/vtable_15d1678_slot_e8_c2e0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_c2e0",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0xc740": [
@@ -4626,6 +4646,12 @@
         "header": "native/core/insert_1beeb0.hpp"
       }
     ],
+    "0x1bf710": [
+      {
+        "constant": "kResolvedVtableTarget_1bf710",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0x1cc80": [
       {
         "constant": "kSlot569",
@@ -4972,6 +4998,12 @@
       {
         "constant": "kInit531d60PostBaseSbojTarget26800",
         "header": "native/core/init_531d60_post_base_sboj.hpp"
+      }
+    ],
+    "0x2687b0": [
+      {
+        "constant": "kResolvedVtableTarget_2687b0",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0x268b0": [
@@ -10036,6 +10068,16 @@
         "header": "native/core/init_531d60_post_base_a2ed00_u7.hpp"
       }
     ],
+    "0xa40e20": [
+      {
+        "constant": "kVtable15d1678Slot68_a40e20",
+        "header": "native/core/vtable_15d1678_slot_68_a40e20.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_a40e20",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0xa42900": [
       {
         "constant": "kSlot313CellDtor",
@@ -10068,6 +10110,12 @@
       {
         "constant": "kSlot313",
         "header": "native/core/ctor_slot_313_a447a0.hpp"
+      }
+    ],
+    "0xa460f0": [
+      {
+        "constant": "kResolvedVtableTarget_a460f0",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0xa46ba0": [
@@ -10704,6 +10752,16 @@
         "header": "native/core/ctor_slot_544_d1b20.hpp"
       }
     ],
+    "0xc2e0": [
+      {
+        "constant": "kVtable15d1678SlotE8_c2e0",
+        "header": "native/core/vtable_15d1678_slot_e8_c2e0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_c2e0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0xc300": [
       {
         "constant": "kRangedFloatCtor",
@@ -10754,6 +10812,36 @@
       {
         "constant": "kSlot544",
         "header": "native/core/ctor_slot_544_d1b20.hpp"
+      }
+    ],
+    "0xddf4b0": [
+      {
+        "constant": "kResolvedVtableTarget_ddf4b0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0xe16a00": [
+      {
+        "constant": "kResolvedVtableTarget_e16a00",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0xe19980": [
+      {
+        "constant": "kResolvedVtableTarget_e19980",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0xe1a5c0": [
+      {
+        "constant": "kResolvedVtableTarget_e1a5c0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0xe21420": [
+      {
+        "constant": "kResolvedVtableTarget_e21420",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0xf180": [
@@ -11059,9 +11147,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1399,
-    "distinct_rvas": 956,
-    "duplicate_rvas": 295,
-    "headers": 370
+    "constants": 1411,
+    "distinct_rvas": 966,
+    "duplicate_rvas": 297,
+    "headers": 372
   }
 }
