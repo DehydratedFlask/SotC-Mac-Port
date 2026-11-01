@@ -1,7 +1,7 @@
 // Init `0x531d60` registry cmp r13,r14 OBS `0x532ba9..0x532bac` (3 B):
 //   cmp r13,r14   ; epilogue loop bound after add r13,+0x30 @ `0x532ba5`
 //
-// After E587 add @ `0x532ba5`. NOT modelled: `jne 0x532b70` @ `0x532bac`. G1 PARTIAL.
+// After E587 add @ `0x532ba5`. NOT modelled: fall-through / loop re-entry after E589 jne @ `0x532bac`.
 #pragma once
 
 #include <cstddef>
