@@ -2517,3 +2517,10 @@ target_link_libraries(sotc_vtable_resolved_entries PUBLIC sotc_core)
 add_executable(test_vtable_resolved_entries tests/test_vtable_resolved_entries.cpp)
 target_link_libraries(test_vtable_resolved_entries PRIVATE sotc_vtable_resolved_entries)
 add_test(NAME vtable_resolved_entries COMMAND test_vtable_resolved_entries)
+
+# CPU-01-AOT-CFG-SCALE-01: second resolved vtable slot (0x15949a0 + 0x88 -> 0x187c0).
+add_library(sotc_vtable_15949a0_slot88 STATIC core/vtable_15949a0_slot88_187c0.cpp)
+target_link_libraries(sotc_vtable_15949a0_slot88 PUBLIC sotc_core)
+add_executable(test_vtable_15949a0_slot88 tests/test_vtable_15949a0_slot88_187c0.cpp)
+target_link_libraries(test_vtable_15949a0_slot88 PRIVATE sotc_vtable_15949a0_slot88)
+add_test(NAME vtable_15949a0_slot88 COMMAND test_vtable_15949a0_slot88)

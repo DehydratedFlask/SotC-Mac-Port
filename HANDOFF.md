@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 00:10 CDT (root) — second resolved target lifted: 0x187c0 (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_15949a0_slot88_187c0.{hpp,cpp}` for the resolved slot `0x15949a0 + 0x88 -> 0x187c0`.
+- **Body (28 B, pinned `e0daf471…8cde`):** `push rbp; mov rbp,rsp; push rbx; push rax; mov %rdi,%rbx; call 0x47620; mov %rbx,%rdi; add $0x8,%rsp; pop rbx; pop rbp; jmp 0x170b0`. So: save `this`, run an unconditional pre-pass, then tail-call the tag-1 free.
+- **Model:** pre-call as a hook (always counted, it is unconditional in the retail body), then `free_170b0(self, contract)`; a non-null object without an allocation contract fails visibly instead of pretending to free. `ok` reports only that the free succeeded; the function returns nothing.
+- **Fixture:** 6 cases — constants, null object without contract, non-null without contract (fail), non-null with contract (one tag-1 free of the right pointer), pre-before-free ordering, free failure propagation. Mutation probe (forcing `pre_call_modelled = false`) fails 3 checks.
+- **Checker:** `tools/lift/check_vtable_15949a0_slot88_187c0.py` pins body bytes/hash, the `e9` tail jump arithmetic to `0x170b0`, the vtable slot qword, the single RELA row at `0x1594a28`, the header constants, the CMake targets and entry-map presence.
+- **Entry map:** regenerated to **1,396 constants / 956 RVAs / 367 headers**; `0x47620` (pre-call) joined the map.
+- **Verification (PASSED):** build exit 0; CTest **502/502**; lift checkers **695 passed / 0 failed**.
+- **Next exact action:** lift `0x13d20` (vtable `0x1594ae8` slot `0x28`) the same way, then `0x358c0` and `0xc740`.
+
 ## 2026-11-01 23:05 CDT (root) — frontier widened to second seed; 5 targets resolved (STATIC_ANALYSIS_VERIFIED / FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01` second-seed card. `tools/lift/indirect_frontier.py` now covers `0x531d60`, `0x1bdf30` and their union, and resolves targets by **backward slicing to the nearest definition** of the call register (comment text stripped) instead of a fixed window; a candidate is published only when the slot value lands inside an FDE function.

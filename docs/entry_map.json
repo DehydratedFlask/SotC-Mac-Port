@@ -324,6 +324,10 @@
       {
         "constant": "kSharedReleaseF590Free",
         "header": "native/core/shared_release_f590.hpp"
+      },
+      {
+        "constant": "kVtable15949a0Slot88_187c0FreeTarget",
+        "header": "native/core/vtable_15949a0_slot88_187c0.hpp"
       }
     ],
     "0x170c0": [
@@ -366,6 +370,16 @@
       {
         "constant": "kListDtor1bdeb0Free",
         "header": "native/core/list_dtor_1bdeb0.hpp"
+      }
+    ],
+    "0x187c0": [
+      {
+        "constant": "kVtable15949a0Slot88_187c0",
+        "header": "native/core/vtable_15949a0_slot88_187c0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_187c0",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0x18a60": [
@@ -4232,6 +4246,10 @@
       {
         "constant": "kSharedReleaseF590Free",
         "header": "native/core/shared_release_f590.hpp"
+      },
+      {
+        "constant": "kVtable15949a0Slot88_187c0FreeTarget",
+        "header": "native/core/vtable_15949a0_slot88_187c0.hpp"
       }
     ],
     "0x170c0": [
@@ -4277,6 +4295,10 @@
       }
     ],
     "0x187c0": [
+      {
+        "constant": "kVtable15949a0Slot88_187c0",
+        "header": "native/core/vtable_15949a0_slot88_187c0.hpp"
+      },
       {
         "constant": "kResolvedVtableTarget_187c0",
         "header": "native/core/vtable_resolved_entries.hpp"
@@ -6680,6 +6702,12 @@
       {
         "constant": "kSlot557",
         "header": "native/core/ctor_slot_557_47490.hpp"
+      }
+    ],
+    "0x47620": [
+      {
+        "constant": "kVtable15949a0Slot88_187c0PreCall",
+        "header": "native/core/vtable_15949a0_slot88_187c0.hpp"
       }
     ],
     "0x493230": [
@@ -10989,9 +11017,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1393,
-    "distinct_rvas": 955,
-    "duplicate_rvas": 291,
-    "headers": 366
+    "constants": 1396,
+    "distinct_rvas": 956,
+    "duplicate_rvas": 292,
+    "headers": 367
   }
 }
