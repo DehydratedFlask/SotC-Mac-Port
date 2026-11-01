@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 13:19 CDT (root) — E613/E615 registry-body byte fidelity + prior-art roadmap (FIXTURE_VERIFIED / DOCS_VERIFIED)
+
+- **Branch:** `cursor/init-hash-551140-6aa93e8`, commits `21be37bf` → `a8199312` → `75d7a8da` (pushed; PR #18).
+- **E613 (correctness fix):** re-read of the pinned ELF (`d0723afb…61d3`) showed two wrong decodes carried since E570/E599–E602 — `0x532b6a` is a 6 B `nopw`, not `lea rsi,[rsp+0x10]`; `0x532bd6..0x532be6` is `call 0x170c0` + `mov rdi,[r12]` + `mov r13,[0x15fe518]`, not `mov rax,[rdi]`/`mov r13,[rax+8]`/`mov rax,[rdi]`/`sub eax,0x010cb932` (the old units started mid-instruction and skipped a real `free_170c0`). Replaced with four byte-faithful units; composite checker now hashes the **raw** region with no peel substitutions.
+- **Checker fleet repair:** 55 stale `kRegistryInit531d60FragmentPinnedRva` assertions and 4 neighbour byte/text assertions had never been re-run — the branch was **57 checkers red** before this checkpoint. Per-unit pin assertions are now prefix-based; the exact end is pinned once by the composite checker. One-shot apply scripts that would regenerate the withdrawn units were deleted.
+- **E615:** three more byte-exact units (`lea rsi,[r14+0x3ec0]` @ `0x532c0f`, `mov rax,[rdi]` @ `0x532c16`, `call [rax+0x70]` @ `0x532c19`); registry body is 64 units / 259 B, pin `0x532c1c`.
+- **Verification (PASSED):** cmake configure/build exit 0; CTest **495/495**; lift checkers **686 passed / 0 skipped / 0 failed**; path audit 3,808 paths (pre-commit staged audit clean on each commit).
+- **Prior art (DOCS):** assessed bmy/bbport-mac, Wooloomooloo2/bloodborne_mac_port and truwa/nathan-drake-collection-macos; new [PRIOR_ART](docs/PRIOR_ART.md) records execution models, the static-recompiler prototype and its verification numbers, the direct-Metal renderer design, the 327-entry HLE map, licences and per-component verdicts. `ROADMAP.md`, `docs/TASKS.md` and `docs/INDEX.md` updated; new task rows `DOC-PRIOR-ART-01`, `LIC-GPL-DECISION-01`, `CPU-01-AOT-CFG-SCALE-01`, `GPU-01-PM4-TRANSLATOR-01`, `GPU-01-MSL-OFFLINE-01`, `PLAT-01-SERVICE-MAP-01`, `APP-01-NOTARIZED-DMG-01`.
+- **Decision pending:** GPL-2.0. Both Bloodborne ports and shadPS4 are GPL-2.0; vendoring any of their renderer/shader code makes this repository GPL-2.0. No GPL code is in the tree; design-level re-implementation is unaffected.
+- **Gates:** G0/G1/G3/G4 PARTIAL; G2/G5/G6 NOT RUN. No boot/audio/save claim. Report generation of the independent audits: `local/validation/prior-art/`, `local/validation/e613-byte-audit/`, `local/validation/e613-review/`.
+
 ## 2026-10-31 13:24 CDT (bc-0c031eff) — E518: Init continue `0xa431e0` call-site u1 (FIXTURE_VERIFIED)
 
 - **Edge:** `call 0xa431e0` @ `0x53297a` (5 B); prep `0x53294b..0x53297a` (47 B) demoted; `continue_c` → `0x53297f..0x53299d` (8 units / 30 B).

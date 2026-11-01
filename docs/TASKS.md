@@ -4,6 +4,20 @@ Statuses: `READY`, `ACTIVE`, `BLOCKED`, `WAITING_FOR_DEPENDENCY`, `ARTIFACT_VERI
 `FIXTURE_VERIFIED`, `REAL_GAME_VERIFIED`, `DONE_DOC`, `UNKNOWN`, `NEEDS_PRINCIPAL`. No native game implementation exists.
 Gates and test evidence take precedence over a status label. Integrator owns this file.
 
+## Active orchestration — 2026-11-01 (prior-art follow-up)
+
+Assessment and evidence: [PRIOR_ART](PRIOR_ART.md). Reused code is gated on the licence decision row below.
+
+| ID | Bounded output | Depends on | Status / owner | Failed tries |
+|---|---|---|---|---|
+| DOC-PRIOR-ART-01 | Record what bmy/bbport-mac, Wooloomooloo2/bloodborne_mac_port and truwa/nathan-drake-collection-macos do, their tooling, licences and per-component reuse verdicts; update ROADMAP with the resulting plan | Published READMEs/design docs fetched 2026-11-01 | ACTIVE / root (docs/PRIOR_ART.md written; ROADMAP section added; independent deep-dive report in `local/validation/prior-art/`) | 0 |
+| LIC-GPL-DECISION-01 | Owner decides whether this repository adopts GPL-2.0 so GPL-2.0 prior-art code may be vendored, or stays design-only reuse | DOC-PRIOR-ART-01 | WAITING_FOR_DEPENDENCY / root | 0 |
+| CPU-01-AOT-CFG-SCALE-01 | Whole-program CFG closure from FDE/call graph plus a guest-address → native-entry map, so lifted units are callable as a program; static analysis first, no guest CPU at run time | DOC-PRIOR-ART-01; existing lift registry; pinned ELF | READY / — | 0 |
+| GPU-01-PM4-TRANSLATOR-01 | Our own PS4 command-stream decoder and Metal encoder path (render-pass coalescing, no Vulkan runtime), fixture-verified against pinned command captures | DOC-PRIOR-ART-01; existing GPU-01 Metal fixtures; licence decision only if code is vendored | WAITING_FOR_DEPENDENCY / — | 0 |
+| GPU-01-MSL-OFFLINE-01 | Offline GCN → IR → SPIR-V → MSL path with a persistent `MTLBinaryArchive`; evaluate prior-art tooling, implement or re-implement, record licence consequence | DOC-PRIOR-ART-01; GPU-01 shader manifests | WAITING_FOR_DEPENDENCY / — | 0 |
+| PLAT-01-SERVICE-MAP-01 | Native service map from the PS4 services a real game imports (kernel/memory/threads/audio/input/save/VideoOut/GnmDriver), as a specification for our own implementations; no guest execution | DOC-PRIOR-ART-01 | READY / — | 0 |
+| APP-01-NOTARIZED-DMG-01 | Signed, notarised DMG packaging with an explicit asset-import flow and a per-user state directory, modelled on the reviewed launcher packaging | DOC-PRIOR-ART-01; APP-01 bundle tasks | READY / — | 0 |
+
 ## Active orchestration — 2026-10-27 (integrator)
 
 | ID | Bounded output | Depends on | Status / owner | Failed tries |

@@ -162,6 +162,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [EXTRACTION](EXTRACTION.md) | Repeatable native extractor, inputs, SELF reconstruction; artifact worker |
 | [REVERSE_ENGINEERING](REVERSE_ENGINEERING.md) | Ghidra procedure, symbol manifests, boot/audio/save recovery; RE worker |
 | [REFERENCE_AUDIT](REFERENCE_AUDIT.md) | Pinned SoTC/Bloodborne/shadPS4 source anchors; source-audit worker |
+| [PRIOR_ART](PRIOR_ART.md) | Assessment of three public Apple-Silicon PS4 ports: execution models, lifting/GPU tooling, licences, reuse verdicts |
 | [PLATFORM](PLATFORM.md) | Native architecture and subsystem requirements; native-core owner |
 | [VALIDATION](VALIDATION.md) | Measurable gates, failures, real-game proof; validation owner |
 | [G1 PARTIAL pack (2026-10-22)](checkpoints/2026-10-22-g1-partial-evidence-pack.md) | Phase C evidence; G1 PARTIAL not PASSED; E404 |

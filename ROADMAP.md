@@ -29,6 +29,37 @@ boundary. There is no demonstrated automated full-game conversion pipeline here.
 recovery, used NGS2 behavior, and graphics wave semantics as feasibility gates, not chores
 with assumed solutions. Exact pinned-source evidence is in [REFERENCE_AUDIT](docs/REFERENCE_AUDIT.md).
 
+## Prior art on Apple Silicon (assessed 2026-11-01)
+
+Three public Mac ports were reviewed against this repository's constraints; the full assessment
+with paths, licences and per-component verdicts is in [PRIOR_ART](docs/PRIOR_ART.md).
+
+- **bmy/bbport-mac** (GPL-2.0) runs the game's x86-64 code under **Rosetta 2** and its renderer
+  natively on KosmicKrisp. Its CPU work is the relevant part: a **static recompiler prototype**
+  (plaintext SELF → ELF → FDE/CFG → LLVM IR → x86-64 **and AArch64** objects) validates
+  leaf functions against the original code (308,420 comparisons, 0 mismatches; 46,340 under QEMU
+  for arm64) and documents exactly what is still missing for a whole game.
+- **Wooloomooloo2/bloodborne_mac_port** (GPL-2.0) also uses Rosetta for the CPU, but ships a
+  **direct Metal renderer** (`renderer_metal/`) for PS4 command streams with no Vulkan at run time,
+  a pipeline archive with background shader compilation, and a classified map of the **327** HLE
+  functions it registers (only 77 imported by that game).
+- **truwa/nathan-drake-collection-macos** is a signed, notarised Swift launcher around a third-party
+  PC port; useful only as a packaging reference.
+
+Decisions taken from this:
+
+1. **Execution model unchanged.** Rosetta/guest-CPU execution remains forbidden, so our
+   byte-checked native lifting is the only compliant route; the Bloodborne ports show the GPU and
+   service boundary, not the CPU, is what dominates their engineering.
+2. **Adopt the lifting method, not the code.** Add whole-program CFG closure and a guest-address →
+   native-entry map to M1, following the published method and its stated gaps.
+3. **Port the direct-Metal design.** Our M3 renderer should be our own PS4 command decoder feeding
+   Metal encoders with render-pass coalescing and an `MTLBinaryArchive`, plus an offline GCN → MSL
+   step — never a Vulkan runtime.
+4. **Use the HLE map as a specification** for our native service layer.
+5. **Licence decision is a gate.** No GPL-2.0 code is vendored until the owner records a licence
+   choice; design-level re-implementation needs no such decision.
+
 ## Read by role
 
 | Need | Document |
@@ -54,14 +85,22 @@ progress. Slot **23** (`0xe71990`) is registered via a **private fixture**; cons
 remains unresolved (G1 caveat). Operating plan lives in [HANDOFF](HANDOFF.md) only. Prefer
 session-sized code + checker acceptance over characterization-only docs churn.
 
+Since the 2026-11-01 prior-art assessment ([PRIOR_ART](docs/PRIOR_ART.md)) the plan adds three
+leverage items on top of unit lifting: (a) **whole-program CFG closure + guest-address map** so
+lifted functions become a callable program rather than isolated units (`CPU-01-AOT-CFG-SCALE-01`);
+(b) a **PS4 command-stream → Metal** decoder/encoder of our own with an `MTLBinaryArchive`
+(`GPU-01-PM4-TRANSLATOR-01`, `GPU-01-MSL-OFFLINE-01`); (c) a **native service map** derived from the
+PS4 services a real game imports (`PLAT-01-SERVICE-MAP-01`). Vendoring GPL-2.0 prior-art code stays
+blocked on an explicit owner licence decision.
+
 ## Milestones in dependency order
 
 | Milestone | Required deliverable | Exit gate | Parallel work allowed |
 |---|---|---|---|
 | M0: reproducible inputs | Base/update/DLC inventory; plaintext ELF identity; repeatable extraction and REA evidence | G0 | Environment/tool docs |
-| M1: native-code feasibility | Recovered startup slice with native calls/data, relocations and required service contracts; no original CPU execution | G1 | Asset/audio format inventory, Swift shell, Metal fixtures |
-| M2: working native foundations | Job/TLS/fiber semantics, checked pointer schemas, assets, save transactions, decoded/mixed audio fixtures | G2 | Independent services, decoding, render fixtures |
-| M3: native graphics slice | Offline material/shader manifests; direct Metal frame from a real recovered scene path; validated resource ordering | G3 | Launcher, audio event integration |
+| M1: native-code feasibility | Recovered startup slice with native calls/data, relocations and required service contracts; no original CPU execution. Whole-program CFG closure and a guest-address → native-entry map make the lifted units callable as a program | G1 | Asset/audio format inventory, Swift shell, Metal fixtures |
+| M2: working native foundations | Job/TLS/fiber semantics, checked pointer schemas, assets, save transactions, decoded/mixed audio fixtures. Native service map derived from the PS4 services the game actually imports | G2 | Independent services, decoding, render fixtures |
+| M3: native graphics slice | Offline material/shader manifests; our own PS4 command-stream decoder feeding Metal encoders (render-pass coalescing, `MTLBinaryArchive`, background shader compile), plus an offline GCN → MSL step; direct Metal frame from a real recovered scene path; validated resource ordering | G3 | Launcher, audio event integration |
 | M4: native launcher | Finder-launchable Swift UI with actual core lifecycle and honest readiness/error states | G4 | Input and packaging checks |
 | M5: actual game vertical slice | Original title/menu to controllable world; authentic audio events; save, quit, reopen, load | G5 | Scene coverage after shared semantics stabilized |
 | M6: completion / performance | Gameplay coverage, all required effects/codecs/saves, robust restart; signed staging audit and measured optimization | G6 | Profile-driven optimizations |
