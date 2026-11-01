@@ -6,8 +6,8 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
 import ps4_dynlink as d
 ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
-START, SIZE, END = 0x532B19, 139, 0x532BA5
-REGION_SHA256 = "4ee77fa865b6b4f558d2975fc850c1c29005df03ada9facddbb648ae5ccc7f30"
+START, SIZE, END = 0x532B19, 143, 0x532BA9
+REGION_SHA256 = "34a828970c4262def1d2afba54547a1eeb2f3dab5b55ed1a1b534d545e6f3def"
 PEEL_LEA = bytes.fromhex("488d742410")
 PEEL_MOV = bytes.fromhex("498b5d10")
 PEEL_MOV15 = bytes.fromhex("4d8b7d18")
@@ -53,7 +53,9 @@ UNITS=[
     (0x532B9B,2,"ce7b207f44bdfcb4050755ac2969bf23f44a92ef9c1139df06caf97b9b3aedd1"),
     (0x532B9D,3,"0bc5a45e8b7b5bfc6d88912c19ddf334fbbdb17c2a1df7b79adf0dda065730ab"),
     (0x532BA0,5,"ba50bb61223083644ce96ef494e8c15caeb546653d72a138cf09727a8771622c"),
+    (0x532BA5,4,"87f6500906a263197172aa44232fecf534880a8a2de0ece2f7b80cd8759cb743"),
 ]
+ADDR1330=ROOT/"native/core/init_531d60_post_base_add_r13_30_532ba5_u1.hpp"
 CALL170C0=ROOT/"native/core/init_531d60_post_base_call_170c0_532ba0_u1.hpp"
 MOVRDIRBX532=ROOT/"native/core/init_531d60_post_base_mov_rdi_rbx_532b9d_u1.hpp"
 JE532BA5=ROOT/"native/core/init_531d60_post_base_je_532ba5_532b9b_u1.hpp"
@@ -129,7 +131,7 @@ def unit_bytes(img,rva,sz):
 def main():
     elf=(ROOT/"local/re/eboot.elf").read_bytes(); require(hashlib.sha256(elf).hexdigest()==ELF_SHA256,'elf')
     _,ph=d.program_headers(elf); img=d.Image(elf,ph)
-    require(len(UNITS)==36,'units')
+    require(len(UNITS)==37,'units')
     require(hashlib.sha256(patched_region(img)).hexdigest()==REGION_SHA256,'region')
     for rva,sz,sha in UNITS:
         require(hashlib.sha256(unit_bytes(img,rva,sz)).hexdigest()==sha,f'unit@{rva:#x}')
@@ -138,7 +140,7 @@ def main():
     b=img.read(FILL_RVA,5); require(b[0]==0xE8,'fill call')
     rel=struct.unpack('<i',b[1:5])[0]; require(FILL_RVA+5+rel==FILL_TARGET,'fill 0x52a220')
     nh=NATIVE.read_text()
-    require('kInit531d60PostBaseRegistryBodyEndRva = 0x532ba5' in nh,'end')
+    require('kInit531d60PostBaseRegistryBodyEndRva = 0x532ba9' in nh,'end')
     require('call_54dc10_532b19_u1' in nh and 'mov_rbx_rax_532b1e_u1' in nh and 'call_54dc20_532b21_u1' in nh and 'mov_r15_rax_532b26_u1' in nh and 'mov_rsi_rbx_532b29_u1' in nh and 'mov_edx_eax_532b2c_u1' in nh and 'call_52a220_532b2e_u1' in nh and 'lea_rbx_2efd160_532b33_u1' in nh and 'mov_r13_15fe518_532b3a_u1' in nh and 'mov_r12_rbx_532b41_u1' in nh and 'cmp_r12_r14_532b44_u1' in nh and 'je_532bfb_532b47_u1' in nh and 'test_r12_r12_532b4d_u1' in nh and 'je_532bf8_532b50_u1' in nh and 'mov_r14_mem_rsp10_532b56_u1' in nh and 'mov_r13_mem_rsp40_532b5b_u1' in nh and 'mov_r14_mem_rsp48_532b60_u1' in nh and 'cmp_r13_r14_532b65_u1' in nh and 'je_532bba_532b68_u1' in nh and 'lea_rsi_rsp10_532b6a_u1' in nh and 'mov_rbx_r13_10_532b70_u1' in nh and 'mov_r15_r13_18_532b74_u1' in nh and 'cmp_r15_r11_532b78_u1' in nh and 'je_532b98_532b7b_u1' in nh and 'nop_532b7d_u1' in nh and 'mov_rax_rbx_48_532b80_u1' in nh and 'lea_rdi_rbx_28_532b84_u1' in nh and 'vcall18_532b88_u1' in nh and 'add_rbx_58_532b8b_u1' in nh and 'cmp_r15_rbx_532b8f_u1' in nh and 'jne_532b80_532b92_u1' in nh and 'mov_rbx_r13_10_532b94_u1' in nh and 'test_rbx_rbx_532b98_u1' in nh and 'je_532ba5_532b9b_u1' in nh and 'mov_rdi_rbx_532b9d_u1' in nh,'unit enum')
     require('kInit531d60PostBaseRegistryBodyUnitCount' in nh,'unit count')
     require('merge_call_54dc10_532b19_u1_ran' in nh,'merge call')
@@ -382,8 +384,8 @@ def main():
     require('test_rbx_rbx_count' in TEST.read_text(),'test test rbx rbx field')
     require('je_532ba5_count' in TEST.read_text(),'test je 532ba5 field')
     require('rsi_from_rsp10_lea' in TEST.read_text(),'test rsi from lea field')
-    require('kInit531d60PostBaseRegistryBodyUnitCount == 36' in TEST.read_text(),'test unit count 36')
-    require('kRegistryInit531d60FragmentPinnedRva = 0x532ba5' in REG.read_text(),'reg pin')
+    require('kInit531d60PostBaseRegistryBodyUnitCount == 37' in TEST.read_text(),'test unit count 37')
+    require('kRegistryInit531d60FragmentPinnedRva = 0x532ba9' in REG.read_text(),'reg pin')
     require('merge_cmp_r15_r11_532b78_u1_ran' in REG.read_text(),'reg merge cmp r15 r11')
     require('merge_mov_rbx_r13_10_532b70_u1_ran' in REG.read_text(),'reg merge mov rbx r13')
     require('merge_mov_r14_mem_rsp10_532b56_u1_ran' in REG.read_text(),'reg merge mov rsp10')
@@ -404,16 +406,24 @@ def main():
     require('merge_je_532ba5_532b9b_u1_ran' in REG.read_text(),'reg merge je 532ba5 532b9b')
     require('merge_mov_rdi_rbx_532b9d_u1_ran' in REG.read_text(),'reg merge mov rdi rbx 532b9d')
     require('merge_call_170c0_532ba0_u1_ran' in REG.read_text(),'reg merge call 170c0 532ba0')
+    require('merge_add_r13_30_532ba5_u1_ran' in REG.read_text(),'reg merge add r13 30 532ba5')
     require('merge_mov_rdi_rbx_532b9d_u1_ran' in TEST.read_text(),'test merge mov rdi rbx 532b9d')
     require('merge_call_170c0_532ba0_u1_ran' in TEST.read_text(),'test merge call 170c0 532ba0')
+    require('merge_add_r13_30_532ba5_u1_ran' in TEST.read_text(),'test merge add r13 30 532ba5')
     require('mov_rdi_rbx_532b9d_count' in TEST.read_text(),'test mov rdi rbx 532b9d field')
     require('call_170c0_count' in TEST.read_text(),'test call 170c0 field')
+    require('add_r13_30_532ba5_count' in TEST.read_text(),'test add r13 30 532ba5 field')
     require('init_531d60_post_base_mov_rdi_rbx_532b9d_u1.cpp' in CMAKE.read_text(),'cmake mov rdi rbx 532b9d')
     require('init_531d60_post_base_call_170c0_532ba0_u1.cpp' in CMAKE.read_text(),'cmake call 170c0 532ba0')
+    require('init_531d60_post_base_add_r13_30_532ba5_u1.cpp' in CMAKE.read_text(),'cmake add r13 30 532ba5')
     require('init_531d60_post_base_call_170c0_532ba0_u1' in CALL170C0.read_text(),'call 170c0 hpp')
+    require('init_531d60_post_base_add_r13_30_532ba5_u1' in ADDR1330.read_text(),'add r13 30 532ba5 hpp')
     require('init_531d60_post_base_call_170c0_532ba0_u1' in NCPP.read_text(),'cpp call 170c0 532ba0')
+    require('init_531d60_post_base_add_r13_30_532ba5_u1' in NCPP.read_text(),'cpp add r13 30 532ba5')
     require('merge_call_170c0_532ba0_u1_ran' in nh,'merge call 170c0 532ba0')
+    require('merge_add_r13_30_532ba5_u1_ran' in nh,'merge add r13 30 532ba5')
     require('merge_call_170c0_532ba0_u1_ran' in SC.read_text(),'slice merge call 170c0 532ba0')
-    print('OK check_f531d60_post_base_registry_body end=0x532ba5 units=36')
+    require('merge_add_r13_30_532ba5_u1_ran' in SC.read_text(),'slice merge add r13 30 532ba5')
+    print('OK check_f531d60_post_base_registry_body end=0x532ba9 units=37')
     return 0
 if __name__=='__main__': raise SystemExit(main())
