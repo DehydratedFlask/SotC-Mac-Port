@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 15:00 CDT (root) — independent checker byte audit: 0 mismatches (STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `AUD-01-CHECKER-BYTE-AUDIT-01`. Independent pass over all **687** `tools/lift/check_*.py` against the pinned ELF (`d0723afb…61d3`): **5,528** address-bound expectations (3,732 literal byte comparisons, 1,476 region SHA pins, 242 disp32-masked, 44 wildcard-template, 3 string SHA). **0 mismatches.**
+- **Substitution suspects:** only the five E613 fallback checkers (`if sha != FRAG_SHA256: frag = FRAG_BYTES`), already fixed in `56566c38`. Current tree has none. Two E613 units (`0x532bd9`, `0x532be1`) were wrong only at an instruction boundary — a byte/SHA audit cannot see that class by construction; documented as an audit limitation.
+- **Cleanup:** removed `tools/lift/e606…e611_apply_once.py`, which still embedded the withdrawn peel bytes and would regenerate the fabricated units if run.
+- **Evidence:** `local/validation/e613-byte-audit/REPORT.md`; E613 code review `local/validation/e613-review/REPORT.md` (PASS on bytes, unit semantics, dependencies, checker purity and gates).
+- **Gates:** unchanged; G0/G1/G3/G4 PARTIAL, G2/G5/G6 NOT RUN.
+
 ## 2026-11-01 14:40 CDT (root) — GPU command surface census + GPL-2.0 adoption (STATIC_ANALYSIS_VERIFIED / DOCS_VERIFIED)
 
 - **Licence:** owner chose **GPL-2.0-or-later**; `LICENSE` added (sha256 `aaf13547…30df3`), README licence section, `docs/ATTRIBUTION.md` reuse rules, `docs/PRIOR_ART.md` §5.6 and ROADMAP updated. Commit `54913acb`.
