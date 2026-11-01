@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 05:15 CDT (root) — target 0xddf4b0 lifted: first manager-dispatch body (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_15e0b48_slot28_ddf4b0.{hpp,cpp}` for slot `0x15e0b48 + 0x28 -> 0xddf4b0`.
+- **Body (52 B, pinned `a634359f…be44e`):** pre-pass `0xddf310`; `test rbx,rbx; je` null early return; manager fetch `0xb2f940`; `mov (%rax),%rcx; mov %rax,%rdi; mov %rbx,%rsi; mov 0x18(%rcx),%rcx; jmp *%rcx`. This is the first resolved target that is not a plain teardown: it dispatches through a **manager object's vtable slot 0x18**.
+- **Model:** pre-pass counted; null object returns early without touching the manager path; the manager value is a real argument, so a missing fetch hook or a null manager fails visibly; the tail call is a hook and is counted even without one. Fixture: 6 cases (constants, full path, null early return, missing manager hook, null manager, tail without hook). Mutation (removing the tail hook call) fails 1 check.
+- **Checker:** verifies prologue, saved `this`, pre-call target `0xddf310`, `test`/`je 0x1a`, manager fetch target `0xb2f940`, the two argument moves, the `0x18` slot load, `ff e1`, the null-path `c3`, padding, slot qword, RELA `0x15e0b70`, header constants, CMake and entry-map presence.
+- **Entry map:** regenerated to **1,423 constants / 970 RVAs / 376 headers**.
+- **Verification (PASSED):** build exit 0; CTest **508/508**; lift checkers **701 passed / 0 failed**.
+- **Next exact action:** `0xe16a00` (`0x26`), then `0xe1a5c0` (`0x97`), `0xe19980` (`0xa2`), `0xe21420` (`0x2a9`).
+
 ## 2026-11-02 04:30 CDT (root) — target 0x1bf710 lifted (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_1598e10_slot18_1bf710.{hpp,cpp}` for slot `0x1598e10 + 0x18 -> 0x1bf710`.

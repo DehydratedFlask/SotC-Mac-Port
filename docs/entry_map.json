@@ -3456,6 +3456,16 @@
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
+    "0xddf4b0": [
+      {
+        "constant": "kVtable15e0b48Slot28_ddf4b0",
+        "header": "native/core/vtable_15e0b48_slot28_ddf4b0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_ddf4b0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0xf180": [
       {
         "constant": "kInitSlotF180",
@@ -10780,6 +10790,12 @@
         "header": "native/core/ctor_slot_545_b2ec0.hpp"
       }
     ],
+    "0xb2f940": [
+      {
+        "constant": "kVtable15e0b48Slot28_ddf4b0ManagerFetch",
+        "header": "native/core/vtable_15e0b48_slot28_ddf4b0.hpp"
+      }
+    ],
     "0xb890": [
       {
         "constant": "kBoolVarSlot3",
@@ -10906,7 +10922,17 @@
         "header": "native/core/ctor_slot_544_d1b20.hpp"
       }
     ],
+    "0xddf310": [
+      {
+        "constant": "kVtable15e0b48Slot28_ddf4b0PreCall",
+        "header": "native/core/vtable_15e0b48_slot28_ddf4b0.hpp"
+      }
+    ],
     "0xddf4b0": [
+      {
+        "constant": "kVtable15e0b48Slot28_ddf4b0",
+        "header": "native/core/vtable_15e0b48_slot28_ddf4b0.hpp"
+      },
       {
         "constant": "kResolvedVtableTarget_ddf4b0",
         "header": "native/core/vtable_resolved_entries.hpp"
@@ -11239,9 +11265,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1420,
-    "distinct_rvas": 968,
-    "duplicate_rvas": 301,
-    "headers": 375
+    "constants": 1423,
+    "distinct_rvas": 970,
+    "duplicate_rvas": 302,
+    "headers": 376
   }
 }

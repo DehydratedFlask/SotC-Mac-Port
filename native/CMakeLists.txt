@@ -2564,3 +2564,10 @@ target_link_libraries(sotc_vtable_1598e10_slot18 PUBLIC sotc_core)
 add_executable(test_vtable_1598e10_slot18 tests/test_vtable_1598e10_slot18_1bf710.cpp)
 target_link_libraries(test_vtable_1598e10_slot18 PRIVATE sotc_vtable_1598e10_slot18)
 add_test(NAME vtable_1598e10_slot18 COMMAND test_vtable_1598e10_slot18)
+
+# CPU-01-AOT-CFG-SCALE-01: resolved manager-dispatch target 0xddf4b0 (vtable 0x15e0b48 slot 0x28).
+add_library(sotc_vtable_15e0b48_slot28 STATIC core/vtable_15e0b48_slot28_ddf4b0.cpp)
+target_link_libraries(sotc_vtable_15e0b48_slot28 PUBLIC sotc_core)
+add_executable(test_vtable_15e0b48_slot28 tests/test_vtable_15e0b48_slot28_ddf4b0.cpp)
+target_link_libraries(test_vtable_15e0b48_slot28 PRIVATE sotc_vtable_15e0b48_slot28)
+add_test(NAME vtable_15e0b48_slot28 COMMAND test_vtable_15e0b48_slot28)
