@@ -48,13 +48,24 @@ From `docs/CSDR_COMPRESSED.md` (independent of this search):
 - payload entropy 7.5–8.0 in most members, 3.28 in one — so not every member is uniformly compressed;
 - no standard codec decodes any member; `lz4`/`zstd` block formats remain **NOT TESTED**.
 
-## Reachability data point
+## Reachability data points
 
-The numeric suffix in the member names (`…_2421303609.csdr`) is **not** a literal in the executable:
-five sampled compressed members' suffixes appear neither as little-endian 32-bit constants nor as
-ASCII digits anywhere in `eboot.elf`. Shader selection is therefore computed (a name/path hash or a
-table lookup), not a static reference, so a file's presence in the archive cannot be read as
-"this file is loaded". Proving reachability needs the loader, which is the next step below.
+1. **The numeric suffix is not a literal in the executable.** Five sampled compressed members'
+   suffixes (`…_2421303609.csdr`) appear neither as little-endian 32-bit constants nor as ASCII
+   digits anywhere in `eboot.elf`. Shader selection is computed (a name/path hash or a table
+   lookup), so a file's presence in the archive cannot be read as "this file is loaded".
+2. **Compressed members are not a dead duplicate class.** Over the 512-member coverage sample:
+   - 264 compressed, 248 readable;
+   - 77 of the 264 compressed members share a basename stem with a readable member
+     (`depthfadeout`, `shadow`, `depthfadeoutinvlodfade`, …), but 121 stems appear **only**
+     compressed;
+   - splitting by build variant, compressed vs readable is **135 / 118** among `_shipping` members
+     and **129 / 130** among non-shipping ones.
+
+   If the compressed set were a stale duplicate of the raw set, it would not split ~50/50 inside
+   both the shipping and non-shipping variants. Treat the compressed half as **live** until the
+   loader proves otherwise, which makes the missing decompressor a real coverage loss rather than
+   dead data.
 
 ## Next steps (bounded, in order)
 
