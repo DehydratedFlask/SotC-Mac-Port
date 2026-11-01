@@ -1,7 +1,7 @@
 // Init `0x531d60` registry lea rdi OBS `0x532b84..0x532b88` (4 B):
 //   lea rdi,[rbx+0x28]   ; fall-through after mov rax,[rbx+0x48] @ `0x532b80`
 //
-// After E576 mov rax @ `0x532b80`. NOT modelled: vcall/load tail @ `0x532b88..`. G1 PARTIAL.
+// After E576 mov rax @ `0x532b80`. NOT modelled: vcall tail @ `0x532b88..` (E578 sibling). G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

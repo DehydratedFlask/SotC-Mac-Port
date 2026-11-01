@@ -16,7 +16,7 @@ Init531d60PostBaseLeaRdiRbx_28_532b84_U1Result init_531d60_post_base_lea_rdi_rbx
     }
     ++out.lea_rdi_rbx_28_count;
 
-    // Next: call [rax+0x18] @ 0x532b88 — not modelled here.
+    // Next: call [rax+0x18] @ 0x532b88 — see vcall18_532b88_u1.
     out.ok = (out.lea_rdi_rbx_28_count == 1);
     return out;
 }
