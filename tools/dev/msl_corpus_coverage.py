@@ -49,7 +49,7 @@ for injected in (HERE, ROOT / "scripts"):
 from gpu_asset_probe import ContainerError, parse_raw_csdr  # noqa: E402
 from psarc import Psarc  # noqa: E402
 
-VERSION = "msl-corpus-coverage-v1"
+VERSION = "msl-corpus-coverage-v2"
 DEFAULT_ARCHIVES = ("local/extracted/CUSA08809/pak0.psarc",
                     "local/extracted/CUSA08809/pak1.psarc",
                     "local/extracted/CUSA08809/pakN.psarc")
@@ -73,6 +73,18 @@ def load_gcn():
 
 
 gcn = load_gcn()
+
+
+def load_blocks():
+    """Load the sibling block decoder by path (it re-uses this tool's gcn_inventory instance)."""
+    spec = importlib.util.spec_from_file_location("gcn_blocks_for_coverage", HERE / "gcn_blocks.py")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+blockdec = load_blocks()
 
 
 def digest_file(path: Path, chunk_size: int = 1 << 22) -> str:
@@ -117,6 +129,20 @@ def classify_program(code: bytes, ordinal: int, info: dict) -> dict:
         "per_lane_eligible": None,
         "per_lane_blocker_instructions": None,
         "lowering": "decode-error",
+        "block_decode": None,
+    }
+    block_program = blockdec.blocks(code)
+    row["block_decode"] = {
+        "ok": block_program.ok,
+        "blocks": len(block_program.blocks),
+        "instructions": block_program.instructions,
+        "branches": len(block_program.branches),
+        "branches_in_span": sum(1 for b in block_program.branches if b.target_in_span),
+        "branches_on_instruction": sum(1 for b in block_program.branches
+                                       if b.target_on_instruction),
+        "branch_mnemonics": sorted({b.mnemonic for b in block_program.branches}),
+        "error_offset": block_program.error_offset,
+        "error_reason": block_program.error_reason,
     }
     try:
         rows = gcn.decode(code)
@@ -205,6 +231,17 @@ def summarize(rows: list[dict], population: list[tuple], sample_info: dict,
         "programs_attempted": len(programs),
         "programs_decoded": len(decoded),
         "programs_decode_error": len(errors),
+        "programs_block_decodable": sum(1 for p in programs
+                                        if (p.get("block_decode") or {}).get("ok")),
+        "programs_linear_only": sum(1 for p in programs
+                                    if not p["decoded"]
+                                    and (p.get("block_decode") or {}).get("ok")),
+        "branch_rows_total": sum((p.get("block_decode") or {}).get("branches") or 0
+                                 for p in programs),
+        "branch_targets_in_span": sum((p.get("block_decode") or {}).get("branches_in_span") or 0
+                                      for p in programs),
+        "branch_targets_on_instruction": sum(
+            (p.get("block_decode") or {}).get("branches_on_instruction") or 0 for p in programs),
         "instructions_total": sum(p["instructions"] for p in decoded),
         "supported_opcode_share": distribution([p["supported_opcode_share"] for p in decoded]),
         "programs_with_unsupported_opcodes": sum(1 for p in decoded if p["unsupported_opcodes"]),

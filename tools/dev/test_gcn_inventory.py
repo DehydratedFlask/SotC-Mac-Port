@@ -193,6 +193,8 @@ class EncodingOracleTests(unittest.TestCase):
 
         # VOP2 5 v_subrev_f32: src0 - src1 (reversed operands), still two sources.
         self.assertEqual(one(vop2(op=5)).mnemonic, 'v_subrev_f32')
+        self.assertEqual(one(vop2(op=15)).mnemonic, 'v_min_f32')
+        self.assertEqual(one(vop2(op=27)).mnemonic, 'v_and_b32')
         # VOP3 350 v_cvt_pk_u8_f32 is a three-source row.
         packed = one(vop3(op=350, abs_=0, clamp=0, omod=0, neg=0))
         self.assertEqual(packed.mnemonic, 'v_cvt_pk_u8_f32')

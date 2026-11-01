@@ -63,7 +63,7 @@ OPCODES = {
              12: 's_buffer_load_dwordx16'},
     'VOP1': {1: 'v_mov_b32', 36: 'v_floor_f32', 46: 'v_rsq_f32'},
     'VOP2': {3: 'v_add_f32', 4: 'v_sub_f32', 5: 'v_subrev_f32', 8: 'v_mul_f32',
-             22: 'v_lshrrev_b32',
+             15: 'v_min_f32', 22: 'v_lshrrev_b32', 27: 'v_and_b32',
              31: 'v_mac_f32', 37: 'v_add_i32', 47: 'v_cvt_pkrtz_f16_f32'},
     'VOP3': {264: 'v_mul_f32', 303: 'v_cvt_pkrtz_f16_f32', 321: 'v_mad_f32',
              322: 'v_mad_i32_i24', 349: 'v_sad_u32', 350: 'v_cvt_pk_u8_f32'},
@@ -381,8 +381,14 @@ def _validate(form: str, op: int, f: dict[str, int], at: int) -> tuple[str, ...]
     return tuple(sorted(requirements))
 
 
-def decode(code: bytes) -> list[Instruction]:
-    """Decode the entire exact program or raise; s_endpgm must be last."""
+def decode(code: bytes, *, allow_branches: bool = False) -> list[Instruction]:
+    """Decode the entire exact program or raise; s_endpgm must be last.
+
+    `allow_branches=True` admits control-transfer rows as explicit one-dword `Instruction`s tagged
+    `requirements=('control_transfer',)`. It does **not** imply fall-through: the returned list is a
+    listing, and every consumer that walks it must treat a control-transfer row as a block
+    terminator (`gcn_blocks.blocks()` does exactly that). The default stays strict.
+    """
     if not code or len(code) % 4:
         raise DecodeError(0, 'program must be a nonempty multiple of four bytes')
     instructions: list[Instruction] = []
@@ -397,9 +403,17 @@ def decode(code: bytes) -> list[Instruction]:
         mnemonic = OPCODES[form].get(op)
         if mnemonic is None:
             if form in CONTROL_TRANSFER_OPCODES and op in CONTROL_TRANSFER_OPCODES[form]:
-                raise DecodeError(offset,
-                                  f'unsupported control transfer {form} opcode {op} '
-                                  f'({CONTROL_TRANSFER_OPCODES[form][op]})')
+                name = CONTROL_TRANSFER_OPCODES[form][op]
+                if not allow_branches:
+                    raise DecodeError(offset,
+                                      f'unsupported control transfer {form} opcode {op} ({name})')
+                if offset + 4 > len(code):
+                    raise DecodeError(offset, f'truncated {form} branch')
+                instructions.append(Instruction(
+                    offset=offset, size=4, encoding=form, opcode=op, mnemonic=name,
+                    fields={'simm16': word & 0xffff}, requirements=('control_transfer',)))
+                offset += 4
+                continue
             raise DecodeError(offset, f'unsupported {form} opcode {op}')
         literals = _literals(form, word)
         if len(literals) > 1:

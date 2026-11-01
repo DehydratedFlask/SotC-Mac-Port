@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 23:45 CDT (root) — basic-block decoder: the branch rows were masking table rows (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01`, block-decoding card. `tools/dev/gcn_blocks.py` decodes a span with `gcn_inventory.decode(..., allow_branches=True)`, splits the listing at every control-transfer row, and reports each branch's byte target (`offset + 4 + simm16*4`). It never follows an edge and never executes. 26 self-test checks on synthetic spans cover forward/backward/out-of-span targets, a literal-carrying instruction before a branch, an unsupported row, and the fact that strict `decode()` still refuses the same span.
+- **Census v2:** `msl_corpus_coverage.py` now records a per-program `block_decode` row (counters + the decoder's own error string) and totals `programs_block_decodable`, `programs_linear_only`, `branch_rows_total`, `branch_targets_in_span`, `branch_targets_on_instruction`.
+- **Finding 1 — the branch rows were masking ordinary table rows.** With branches admitted, 120 of the 122 branch-blocked programs moved their first blocker to `v_and_b32` (96) or `v_min_f32` (24), both plain two-source VOP2 rows read from the pinned PS4 table. Both are now modelled; block-mode blockers shift accordingly.
+- **Finding 2 — the next ceiling is the compare/convert family, not control flow.** After adding those rows the block-mode first blockers are `VINTRP 2` 48, `VOP3 4 v_cmp_gt_f32` 43, `VOPC 197 v_cmp_ne_u32` 33, `VOP3 194 v_cmp_eq_u32` 19, `VOP1 5 v_cvt_f32_i32` 13, `VOP3 1 v_cmp_lt_f32` 5, `VOP3 11 v_cmp_ngt_f32` 4. The `VOP3 1..197` rows are VOPC-class compares in the VOP3 encoding (mask destination in `VDST`), so they need a mask-destination rule rather than a bare table row.
+- **Honest limit:** **zero** additional programs are fully block-decodable (183 linear = 183 block-decodable), because every branch-containing program still hits a later unsupported row. Branch support alone does not move the census; it makes the next rows visible. Still 0 lowered.
+- **Verification (PASSED):** `test_gcn_inventory` 37, `test_gcn_to_msl` 23, coverage self-test 23, block self-test 26; build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Next exact action:** add the VOP3-encoded VOPC-class compare rows (`VOP3 1/4/11/194/197` plus the neighbouring block) with an explicit mask-destination rule, which is the largest remaining family in block mode (43+33+19+5+4 first blockers).
+
 ## 2026-11-02 22:50 CDT (root) — MSL decoder v5 and the control-flow ceiling (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `GPU-01-MSL-OFFLINE-01`, decoder widening card 5. Added VOP2 5 `v_subrev_f32` and VOP3 350 `v_cvt_pk_u8_f32` (a three-source row, so it joins the scalar read-port rule with 321/322/349), both read from the pinned PS4 frontend table.

@@ -234,3 +234,46 @@ tests **FIXTURE_VERIFIED**, census **STATIC_ANALYSIS_VERIFIED**, G3 NOT RUN.
   zero. The row was reverted; `S_BARRIER` is modelled at 10 with a `wave_barrier` per-lane blocker
   and a test, and opcode 8 is documented as a branch.
 - **Still zero lowered:** decoding is not Metal semantics, and no per-shader ABI manifest exists.
+
+## Basic-block decoding: what the branch rows were hiding
+
+`gcn_inventory.decode()` refuses `s_branch`/`s_cbranch_*` by design, so 122 of the 184 remaining
+decode errors were branch rows. `tools/dev/gcn_blocks.py` lifts that refusal *only* for structure: it
+decodes with `allow_branches=True` (branch rows become explicit one-dword instructions), splits the
+listing at every control-transfer row, and reports each branch's byte target
+(`offset + 4 + simm16*4`). It never follows an edge, never claims reachability, and never executes.
+
+```sh
+python3 -I tools/dev/gcn_blocks.py --self-test   # 26 checks, synthetic spans only
+```
+
+`msl_corpus_coverage.py` now records a `block_decode` row per program (counters plus the decoder's own
+error string), so the census can separate "needs a CFG" from "needs another table row".
+
+**Measured at sample 512** (`local/validation/msl-coverage/blocks-512`, `blocks-512b`):
+
+| Block-mode first blocker | before VOP2 15/27 | after |
+|---|---:|---:|
+| `VOP2 27` (`v_and_b32`) | 96 | 0 |
+| `VINTRP 2` | 48 | **48** |
+| `VOP2 15` (`v_min_f32`) | 24 | 0 |
+| `VOP3 4` (`v_cmp_gt_f32`) | 0 | **43** |
+| `VOPC 197` (`v_cmp_ne_u32`) | 0 | **33** |
+| `VOP3 194` (`v_cmp_eq_u32`) | 0 | **19** |
+| `VOP1 5` (`v_cvt_f32_i32`) | 0 | **13** |
+
+Two findings, both recorded as measurements rather than claims:
+
+1. **The branch rows were masking plain table rows.** Admitting branches moved the first blocker of
+   120 programs from a branch to `v_and_b32`/`v_min_f32`, which are ordinary two-source VOP2 rows.
+   Those two rows are now modelled (values from the pinned PS4 table), and the corpus confirms the
+   effect: block-mode first blockers shift from `VOP2 27`/`VOP2 15` to the comparison rows.
+2. **The next ceiling is the comparison/conversion family**, not control flow: `VINTRP 2` (48),
+   `VOP3 4` (43), `VOPC 197` (33), `VOP3 194` (19), `VOP1 5` (13). The `VOP3 1..197` rows are the
+   VOPC-class compares in the VOP3 encoding (mask destination in `VDST`), so admitting them needs a
+   mask-destination rule, and `v_cmpx_*` still has to tag `writes_exec_mask`.
+
+**No sampled program is fully block-decodable yet** (0 extra programs beyond the 183 linear decodes),
+because every branch-containing program still hits one of those later rows. The linear numbers are
+unchanged at 183/367 decoded, 184 decode-error. That is the honest reading: branch support alone does
+not move the census, it makes the next rows visible.
