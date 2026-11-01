@@ -340,6 +340,10 @@
         "header": "native/core/vtable_15949a0_slot88_187c0.hpp"
       },
       {
+        "constant": "kVtable159c908Slot58_2687b0FreeTarget",
+        "header": "native/core/vtable_159c908_slot58_2687b0.hpp"
+      },
+      {
         "constant": "kVtable15d1678Slot280_a460f0FreeTarget",
         "header": "native/core/vtable_15d1678_slot280_a460f0.hpp"
       }
@@ -632,6 +636,16 @@
       {
         "constant": "kInit531d60PostBaseSbojTarget26800",
         "header": "native/core/init_531d60_post_base_sboj.hpp"
+      }
+    ],
+    "0x2687b0": [
+      {
+        "constant": "kVtable159c908Slot58_2687b0",
+        "header": "native/core/vtable_159c908_slot58_2687b0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_2687b0",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0x26db0": [
@@ -4330,6 +4344,10 @@
         "header": "native/core/vtable_15949a0_slot88_187c0.hpp"
       },
       {
+        "constant": "kVtable159c908Slot58_2687b0FreeTarget",
+        "header": "native/core/vtable_159c908_slot58_2687b0.hpp"
+      },
+      {
         "constant": "kVtable15d1678Slot280_a460f0FreeTarget",
         "header": "native/core/vtable_15d1678_slot280_a460f0.hpp"
       }
@@ -5034,8 +5052,18 @@
     ],
     "0x2687b0": [
       {
+        "constant": "kVtable159c908Slot58_2687b0",
+        "header": "native/core/vtable_159c908_slot58_2687b0.hpp"
+      },
+      {
         "constant": "kResolvedVtableTarget_2687b0",
         "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0x2687d0": [
+      {
+        "constant": "kVtable159c908Slot58_2687b0PreCall",
+        "header": "native/core/vtable_159c908_slot58_2687b0.hpp"
       }
     ],
     "0x268b0": [
@@ -11183,9 +11211,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1414,
-    "distinct_rvas": 966,
-    "duplicate_rvas": 299,
-    "headers": 373
+    "constants": 1417,
+    "distinct_rvas": 967,
+    "duplicate_rvas": 300,
+    "headers": 374
   }
 }

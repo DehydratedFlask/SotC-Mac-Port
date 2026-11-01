@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 03:45 CDT (root) — target 0x2687b0 lifted (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_159c908_slot58_2687b0.{hpp,cpp}` for the resolved slot `0x159c908 + 0x58 -> 0x2687b0`.
+- **Body (28 B, pinned):** same teardown shape as `0x187c0` with a different pre-pass — save `this`, `call 0x2687d0`, reload, `jmp 0x170b0` (tag-1 free). Nothing else is read, so `void f(This* rdi)` is inferred from the body only.
+- **Model:** pre-call hook (always counted), free through `free_170b0`; a non-null object without a contract fails visibly, null object is a no-op free, free failure propagates.
+- **Fixture:** 5 cases (constants, full path with trace, null without contract, non-null without contract, free failure). Mutation probe (forcing `pre_call_modelled = false`) fails 3 checks.
+- **Checker:** `tools/lift/check_vtable_159c908_slot58_2687b0.py` verifies prologue, saved `this`, the relative pre-call to `0x2687d0`, the reload, the stack unwind, the `e9` tail to `0x170b0`, the padding, the slot qword, the type-8 RELA at `0x159c960`, header constants, CMake and entry-map presence.
+- **Entry map:** regenerated to **1,417 constants / 967 RVAs / 374 headers**.
+- **Verification (PASSED):** build exit 0; CTest **506/506**; lift checkers **699 passed / 0 failed**.
+- **Next exact action:** `0x1bf710` and `0xddf4b0` (`0x1c` / `0x34`), then `0xe16a00` (`0x26`), `0xe1a5c0` (`0x97`), `0xe19980` (`0xa2`), `0xe21420` (`0x2a9`).
+
 ## 2026-11-02 03:00 CDT (root) — teardown target 0xa460f0 lifted (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_15d1678_slot280_a460f0.{hpp,cpp}` for the resolved slot `0x15d1678 + 0x280 -> 0xa460f0`.

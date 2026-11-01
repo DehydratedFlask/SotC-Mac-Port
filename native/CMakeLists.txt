@@ -2550,3 +2550,10 @@ target_link_libraries(sotc_vtable_15d1678_slot280 PUBLIC sotc_core)
 add_executable(test_vtable_15d1678_slot280 tests/test_vtable_15d1678_slot280_a460f0.cpp)
 target_link_libraries(test_vtable_15d1678_slot280 PRIVATE sotc_vtable_15d1678_slot280)
 add_test(NAME vtable_15d1678_slot280 COMMAND test_vtable_15d1678_slot280)
+
+# CPU-01-AOT-CFG-SCALE-01: resolved teardown target 0x2687b0 (vtable 0x159c908 slot 0x58).
+add_library(sotc_vtable_159c908_slot58 STATIC core/vtable_159c908_slot58_2687b0.cpp)
+target_link_libraries(sotc_vtable_159c908_slot58 PUBLIC sotc_core)
+add_executable(test_vtable_159c908_slot58 tests/test_vtable_159c908_slot58_2687b0.cpp)
+target_link_libraries(test_vtable_159c908_slot58 PRIVATE sotc_vtable_159c908_slot58)
+add_test(NAME vtable_159c908_slot58 COMMAND test_vtable_159c908_slot58)
