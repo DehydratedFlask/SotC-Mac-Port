@@ -326,6 +326,56 @@ void test_e26f90_status_gate() {
     g_e26_status = 0;
 }
 
+struct Element {
+    const char* key;
+    std::int32_t value;
+};
+
+const char* element_key_e1a(void* element) { return static_cast<Element*>(element)->key; }
+std::int32_t element_value_e1a(void* element) { return static_cast<Element*>(element)->value; }
+std::int32_t match_e1a(void*) { return 9; }
+
+void test_e1a5c0_scan() {
+    std::vector<std::uint8_t> storage(0x200, 0);
+    GuestWindow window(storage.data(), 0xE0000, storage.size());
+    Element first{"alpha", 1};
+    Element second{"beta", 3};
+    std::uint64_t array = 0xE00A0;
+    std::uint64_t elements[2] = {reinterpret_cast<std::uint64_t>(&first),
+                                 reinterpret_cast<std::uint64_t>(&second)};
+    std::memcpy(storage.data() + 0x08, &array, sizeof(array));
+    std::memcpy(storage.data() + 0xA0, elements, sizeof(elements));
+    std::uint32_t count = 2;
+    std::memcpy(storage.data() + 0x10, &count, sizeof(count));
+    std::memcpy(storage.data() + 0x40, "beta", 5);
+
+    RetailFrame frame{};
+    frame.set(RetailArg::rdi, 0xE0000);
+    frame.set(RetailArg::rsi, 0xE0040);
+    frame.set(RetailArg::rdx, 3);
+    RetailCallContext context{};
+    context.element_key_e1a5c0 = element_key_e1a;
+    context.element_value_e1a5c0 = element_value_e1a;
+    context.element_match_e1a5c0 = match_e1a;
+    const auto found = call_resolved(sotc::kVtable15e2028Slot70_e1a5c0Rva, frame, window, context);
+    check("e1a5c0 found", found.ok && found.rax == 9);
+
+    frame.set(RetailArg::rdx, 4);  // right key, wrong value
+    const auto miss = call_resolved(sotc::kVtable15e2028Slot70_e1a5c0Rva, frame, window, context);
+    check("e1a5c0 value mismatch", miss.ok && miss.rax == 1);
+
+    std::memcpy(storage.data() + 0x40, "gamma", 6);
+    frame.set(RetailArg::rdx, 3);
+    const auto key_miss = call_resolved(sotc::kVtable15e2028Slot70_e1a5c0Rva, frame, window,
+                                        context);
+    check("e1a5c0 key mismatch", key_miss.ok && key_miss.rax == 1);
+
+    frame.set(RetailArg::rsi, 0);
+    const auto null_key = call_resolved(sotc::kVtable15e2028Slot70_e1a5c0Rva, frame, window,
+                                        context);
+    check("e1a5c0 null key", null_key.ok && null_key.rax == 1);
+}
+
 void test_failures() {
     std::vector<std::uint8_t> storage(0x40, 0);
     GuestWindow window(storage.data(), 0x50000, storage.size());
@@ -362,6 +412,7 @@ int main() {
     test_a460f0_teardown();
     test_e24900_sub_dispatch();
     test_e26f90_status_gate();
+    test_e1a5c0_scan();
     test_failures();
 
     if (failures == 0) {

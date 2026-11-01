@@ -2635,7 +2635,7 @@ target_link_libraries(sotc_retail_cells PUBLIC sotc_guest_memory sotc_vtable_159
   sotc_vtable_159c908_slot58 sotc_vtable_1598e10_slot18
   sotc_vtable_resolved_bodies_3
   sotc_vtable_15f2f08_slot38 sotc_vtable_15e0b48_slot28 sotc_vtable_15d1678_slot280
-  sotc_vtable_15e2d60_slot_d0 sotc_vtable_15ed2a0_slot_c0)
+  sotc_vtable_15e2d60_slot_d0 sotc_vtable_15ed2a0_slot_c0 sotc_vtable_15e2028_slot70)
 add_executable(test_retail_cells tests/test_retail_cells.cpp)
 target_link_libraries(test_retail_cells PRIVATE sotc_retail_cells)
 add_test(NAME retail_cells COMMAND test_retail_cells)

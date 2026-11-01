@@ -21,6 +21,7 @@
 #include "vtable_15e0b48_slot28_ddf4b0.hpp"
 #include "vtable_15d1678_slot280_a460f0.hpp"
 #include "vtable_15e2d60_slot_d0_e24900.hpp"
+#include "vtable_15e2028_slot70_e1a5c0.hpp"
 #include "vtable_15ed2a0_slot_c0_e26f90.hpp"
 #include "vtable_15f2f08_slot38_e16a00.hpp"
 #include "vtable_159c908_slot58_2687b0.hpp"
@@ -155,5 +156,16 @@ struct MarshalE26f90 {
                                            std::uint64_t arg2, std::int32_t arg3,
                                            std::uint64_t* host_canary, void* host_buffer,
                                            void* host_local) noexcept;
+
+// 0xe1a5c0: container scan. The array pointer lives at `self+0x8` and the count at `self+0x10`; the
+// key is a guest C string.
+struct MarshalE1a5c0 {
+    bool ok = false;
+    GuestStatus status = GuestStatus::no_window;
+    Vtable15e2028Slot70_e1a5c0Cells cells{};
+};
+
+[[nodiscard]] MarshalE1a5c0 marshal_e1a5c0(GuestWindow& window, std::uint64_t self,
+                                           std::uint64_t key, std::int32_t value) noexcept;
 
 }  // namespace sotc

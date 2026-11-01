@@ -251,4 +251,51 @@ MarshalE26f90 marshal_e26f90(GuestWindow& window, std::uint64_t self, std::uint6
     return out;
 }
 
+MarshalE1a5c0 marshal_e1a5c0(GuestWindow& window, std::uint64_t self, std::uint64_t key,
+                             std::int32_t value) noexcept {
+    MarshalE1a5c0 out{};
+    if (!window.valid()) {
+        out.status = GuestStatus::no_window;
+        return out;
+    }
+    std::uint64_t array = 0;
+    std::uint32_t count = 0;
+    if (window.read_u64(self + kVtable15e2028Slot70_e1a5c0ArrayOffset, array) != GuestStatus::ok ||
+        window.read_u32(self + kVtable15e2028Slot70_e1a5c0CountOffset, count) != GuestStatus::ok) {
+        out.status = GuestStatus::out_of_range;
+        return out;
+    }
+    std::uint8_t* count_pointer =
+        window.host_pointer(self + kVtable15e2028Slot70_e1a5c0CountOffset, sizeof(std::uint32_t));
+    if (count_pointer == nullptr) {
+        out.status = GuestStatus::out_of_range;
+        return out;
+    }
+    const char* key_pointer = nullptr;
+    if (key != 0) {
+        std::string_view text;
+        if (window.read_cstr(key, 4096, text) != GuestStatus::ok) {
+            out.status = GuestStatus::unterminated_string;
+            return out;
+        }
+        key_pointer = reinterpret_cast<const char*>(window.host_pointer(key, text.size() + 1));
+    }
+    std::uint8_t* array_pointer = nullptr;
+    if (count != 0) {
+        array_pointer = window.host_pointer(array, static_cast<std::size_t>(count) * sizeof(void*));
+        if (array_pointer == nullptr) {
+            out.status = GuestStatus::out_of_range;
+            return out;
+        }
+    }
+    out.cells.self = reinterpret_cast<void*>(static_cast<std::uintptr_t>(self));
+    out.cells.elements = reinterpret_cast<void* const*>(array_pointer);
+    out.cells.count = reinterpret_cast<const std::uint32_t*>(count_pointer);
+    out.cells.key = key_pointer;
+    out.cells.value = value;
+    out.status = GuestStatus::ok;
+    out.ok = true;
+    return out;
+}
+
 }  // namespace sotc

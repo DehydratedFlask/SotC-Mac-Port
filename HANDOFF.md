@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 18:25 CDT (root) — 0xe1a5c0 container-scan arm (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `marshal_e1a5c0` — array pointer from `self+0x8`, count from `self+0x10`, key resolved as a bounded guest C string (unterminated strings fail) — and a `call_resolved` arm wiring the key/value/match hooks. `rax` carries the scan code.
+- **Dispatchable targets: 15 of 17.**
+- **Fixture:** found element returns `rax = 9`; a value mismatch, a key mismatch and a null key each return `rax = 1`.
+- **Checkers:** 15 arms and 14 adapters over 14 model-declared offsets.
+- **Verification (PASSED):** build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Next exact action:** `0xe19980` (5 args, alignment-gated two-path body) and `0xe21420` (decision contract with ~400 bytes unmodelled) are the last two.
+
 ## 2026-11-02 17:40 CDT (root) — 0xe26f90 status-gate arm (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `marshal_e26f90` (frame `rdi/rsi/edx` plus **host** canary/buffer/local storage, because this layer still has no guest stack mapping) and a `call_resolved` arm with slot78/slot90/helper hooks; `rax` carries the model status.

@@ -57,6 +57,11 @@ struct RetailCallContext {
     std::uint64_t* host_canary = nullptr;
     void* host_buffer = nullptr;
     void* host_local = nullptr;
+
+    // 0xe1a5c0: container scan hooks.
+    const char* (*element_key_e1a5c0)(void* element) = nullptr;
+    std::int32_t (*element_value_e1a5c0)(void* element) = nullptr;
+    std::int32_t (*element_match_e1a5c0)(void* element) = nullptr;
 };
 
 enum class RetailCallStatus : std::uint8_t {
