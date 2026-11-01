@@ -2,7 +2,7 @@
 //   jne 0x532b70   ; ZF clear from cmp r13,r14 @ `0x532ba9`
 //
 // After E588 cmp @ `0x532ba9`. NOT modelled: re-entry @ `0x532b70..`. Fall-through @
-// `0x532bae..` peeled in a sibling unit. G1 PARTIAL.
+// `0x532bae..` peeled in E590 mov sibling. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

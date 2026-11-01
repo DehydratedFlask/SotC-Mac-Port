@@ -1,4 +1,4 @@
-// Init `0x531d60` registry fragment body — OBS @ `0x532b19..0x532bae` (39 units after E589 peel).
+// Init `0x531d60` registry fragment body — OBS @ `0x532b19..0x532bb3` (40 units after E590 peel).
 #pragma once
 
 #include <array>
@@ -37,6 +37,7 @@
 #include "init_531d60_post_base_add_r13_30_532ba5_u1.hpp"
 #include "init_531d60_post_base_cmp_r13_r14_532ba9_u1.hpp"
 #include "init_531d60_post_base_jne_532b70_532bac_u1.hpp"
+#include "init_531d60_post_base_mov_r13_mem_r12_40_532bae_u1.hpp"
 #include "init_531d60_post_base_mov_r12_rbx_532b41_u1.hpp"
 #include "init_531d60_post_base_mov_r13_15fe518_532b3a_u1.hpp"
 #include "init_531d60_post_base_call_54dc10_532b19_u1.hpp"
@@ -52,8 +53,8 @@
 namespace sotc {
 
 inline constexpr std::uint64_t kInit531d60PostBaseRegistryBodyRva = 0x532b19;
-inline constexpr std::size_t kInit531d60PostBaseRegistryBodySize = 148;
-inline constexpr std::uint64_t kInit531d60PostBaseRegistryBodyEndRva = 0x532bae;
+inline constexpr std::size_t kInit531d60PostBaseRegistryBodySize = 153;
+inline constexpr std::uint64_t kInit531d60PostBaseRegistryBodyEndRva = 0x532bb3;
 
 static_assert(kInit531d60PostBaseMovR14Rax_532b16_U1EndRva == kInit531d60PostBaseRegistryBodyRva);
 static_assert(kInit531d60PostBaseCall54dc10_532b19_U1Rva == kInit531d60PostBaseRegistryBodyRva);
@@ -134,6 +135,8 @@ static_assert(kInit531d60PostBaseAddR13_30_532ba5_U1EndRva ==
 static_assert(kInit531d60PostBaseCmpR13R14_532ba9_U1EndRva ==
                   kInit531d60PostBaseJne532b70_532bac_U1Rva);
 static_assert(kInit531d60PostBaseJne532b70_532bac_U1EndRva ==
+                  kInit531d60PostBaseMovR13MemR12_40_532bae_U1Rva);
+static_assert(kInit531d60PostBaseMovR13MemR12_40_532bae_U1EndRva ==
                   kInit531d60PostBaseRegistryBodyEndRva);
 
 enum class RegistryBodyUnit : int {
@@ -176,6 +179,7 @@ enum class RegistryBodyUnit : int {
     add_r13_30_532ba5_u1,
     cmp_r13_r14_532ba9_u1,
     jne_532b70_532bac_u1,
+    mov_r13_mem_r12_40_532bae_u1,
     count
 };
 inline constexpr int kInit531d60PostBaseRegistryBodyUnitCount =
@@ -221,6 +225,7 @@ struct Init531d60PostBaseRegistryBodyHooks {
     bool merge_add_r13_30_532ba5_u1_ran = false;
     bool merge_cmp_r13_r14_532ba9_u1_ran = false;
     bool merge_jne_532b70_532bac_u1_ran = false;
+    bool merge_mov_r13_mem_r12_40_532bae_u1_ran = false;
     const void* stack_rsp = nullptr;
     InputTable551140* table_in = nullptr;
     RegistryObject2efd160* obj_in = nullptr;
@@ -265,11 +270,12 @@ struct Init531d60PostBaseRegistryBodyHooks {
     Init531d60PostBaseAddR13_30_532ba5_U1Cells add_r13_30_532ba5_cells{};
     Init531d60PostBaseCmpR13R14_532ba9_U1Cells cmp_r13_r14_532ba9_cells{};
     Init531d60PostBaseJne532b70_532bac_U1Cells jne_532b70_532bac_cells{};
+    Init531d60PostBaseMovR13MemR12_40_532bae_U1Cells mov_r13_mem_r12_40_532bae_cells{};
 };
 
 struct Init531d60PostBaseRegistryBodyResult {
     bool ok = false;
-    std::array<int, 39> unit_counts{};
+    std::array<int, 40> unit_counts{};
     int unit_executed = 0;
     int call_54dc10_count = 0;
     int mov_rbx_rax_count = 0;
@@ -313,6 +319,8 @@ struct Init531d60PostBaseRegistryBodyResult {
     bool r13_r14_equal_532ba9 = false;
     bool jne_532b70_532bac_branch_taken = false;
     bool jne_532b70_532bac_branch_outcome_modelled = false;
+    int mov_r13_mem_r12_40_532bae_count = 0;
+    void* r13_from_r12_40 = nullptr;
     void* r13_after_add_30 = nullptr;
     void* rdi_from_rbx_mov = nullptr;
     void* rax_from_rbx_48 = nullptr;
