@@ -13,7 +13,7 @@ Init531d60PostBaseMovR13_8_Rax_532bd9_U1Result init_531d60_post_base_mov_r13_8_r
                                   kInit531d60PostBaseMovR13_8_Rax_532bd9_U1Disp) = cells.rax_in;
     }
     ++out.mov_r13_8_rax_532bd9_count;
-    // Next: tail @ 0x532bde — not modelled here.
+    // Next: E602 mov rax,[rdi] @ 0x532bde — not modelled here.
     out.ok = (out.mov_r13_8_rax_532bd9_count == 1);
     return out;
 }

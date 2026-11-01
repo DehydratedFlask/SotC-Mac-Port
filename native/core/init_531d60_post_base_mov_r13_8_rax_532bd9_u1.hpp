@@ -1,8 +1,8 @@
 // Init `0x531d60` registry mov [r13+0x8],rax OBS `0x532bd9..0x532bde` (5 B):
 //   mov [r13+0x8],rax   ; store vtable pointer into cursor node
 //
-// After E600 `mov_rax_rdi_mem_532bd6_u1` end @ `0x532bd9`. NOT modelled: tail @
-// `0x532bde`.. G1 PARTIAL.
+// After E600 `mov_rax_rdi_mem_532bd6_u1` end @ `0x532bd9`. NOT modelled: E602
+// `mov_rax_rdi_mem_532bde_u1` @ `0x532bde` / tail @ `0x532be1`.. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
