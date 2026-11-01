@@ -2,7 +2,7 @@
 //   sub eax,0x010cb932   ; 32-bit adjust after mov rax,[rdi] @ `0x532bde`
 //
 // After E602 `mov_rax_rdi_mem_532bde_u1` end @ `0x532be1`. NOT modelled: tail @
-// `0x532be6`.. G1 PARTIAL.
+// `je_532bf0_532be6_u1` @ `0x532be6` / tail @ `0x532beb`.. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

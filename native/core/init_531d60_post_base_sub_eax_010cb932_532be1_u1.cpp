@@ -12,7 +12,7 @@ Init531d60PostBaseSubEax_010cb932_532be1_U1Result init_531d60_post_base_sub_eax_
         *cells.eax_out = out.eax;
     }
 
-    // Next: tail @ 0x532be6 — not modelled here.
+    // Next: E604 test/je @ 0x532be6 — not modelled here.
     out.ok = (out.sub_eax_010cb932_532be1_count == 1);
     return out;
 }
