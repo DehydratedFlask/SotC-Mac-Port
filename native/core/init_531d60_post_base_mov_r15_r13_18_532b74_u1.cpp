@@ -17,7 +17,7 @@ Init531d60PostBaseMovR15R13_18_532b74_U1Result init_531d60_post_base_mov_r15_r13
     }
     ++out.mov_r15_r13_18_count;
 
-    // Next: cmp r15,r11 @ 0x532b78 — not modelled here.
+    // Next: cmp r15,r11 @ 0x532b78 — peeled as registry_body unit E573.
     out.ok = (out.mov_r15_r13_18_count == 1);
     return out;
 }

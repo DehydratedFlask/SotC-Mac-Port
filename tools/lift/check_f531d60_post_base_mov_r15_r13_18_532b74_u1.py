@@ -38,7 +38,7 @@ def main():
     require('init_531d60_post_base_mov_r15_r13_18_532b74_u1' in nh,'api')
     require('NOT modelled' in nh,'omit')
     require('merge_mov_r15_r13_18_532b74_u1_ran' in BODY.read_text(),'body merge')
-    require('kRegistryInit531d60FragmentPinnedRva = 0x532b78' in REG.read_text(),'pin')
+    require('kRegistryInit531d60FragmentPinnedRva = 0x532b7b' in REG.read_text(),'pin')
     require('init_531d60_post_base_mov_r15_r13_18_532b74_u1.cpp' in CMAKE.read_text(),'cmake')
     print(f'OK check_f531d60_post_base_mov_r15_r13_18_532b74_u1 end={END:#x}')
     return 0
