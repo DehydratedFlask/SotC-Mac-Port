@@ -1,0 +1,4689 @@
+{
+  "areas": {
+    "app_content": {
+      "imports": 2,
+      "libraries": [
+        "libSceAppContent",
+        "libScePlayGo"
+      ],
+      "native_hints": []
+    },
+    "audio_ajm": {
+      "imports": 0,
+      "libraries": [
+        "libSceAjm"
+      ],
+      "native_hints": []
+    },
+    "audio_ngs2": {
+      "imports": 11,
+      "libraries": [
+        "libSceNgs2"
+      ],
+      "native_hints": [
+        "native/core/audio_*"
+      ]
+    },
+    "audio_out": {
+      "imports": 18,
+      "libraries": [
+        "libSceAudio3d",
+        "libSceAudioIn",
+        "libSceAudioOut",
+        "libSceVoice"
+      ],
+      "native_hints": [
+        "native/core/audio_*"
+      ]
+    },
+    "dialog": {
+      "imports": 16,
+      "libraries": [
+        "libSceCommonDialog",
+        "libSceErrorDialog",
+        "libSceGameCustomDataDialog",
+        "libSceIme",
+        "libSceMsgDialog"
+      ],
+      "native_hints": []
+    },
+    "fiber": {
+      "imports": 8,
+      "libraries": [
+        "libSceFiber"
+      ],
+      "native_hints": [
+        "native/core/thread_*",
+        "native/core/tls_*"
+      ]
+    },
+    "file_io": {
+      "imports": 34,
+      "libraries": [
+        "libSceFios2"
+      ],
+      "native_hints": [
+        "scripts/psarc.py",
+        "native/core/save_*"
+      ]
+    },
+    "gnm": {
+      "imports": 103,
+      "libraries": [
+        "libSceGnmDriver"
+      ],
+      "native_hints": [
+        "native/platform/pm4_decoder.*",
+        "native/platform/pm4_state.*",
+        "native/platform/pm4_indirect.*"
+      ]
+    },
+    "image": {
+      "imports": 4,
+      "libraries": [
+        "libScePngEnc"
+      ],
+      "native_hints": [
+        "native/platform/metal_capture.*"
+      ]
+    },
+    "input": {
+      "imports": 18,
+      "libraries": [
+        "libScePad",
+        "libSceSystemGesture"
+      ],
+      "native_hints": [
+        "native/core/input_*",
+        "native/core/input_table_551140.*"
+      ]
+    },
+    "kernel": {
+      "imports": 66,
+      "libraries": [
+        "libkernel"
+      ],
+      "native_hints": [
+        "native/core/allocator_*",
+        "native/core/critsec_*",
+        "native/core/thread_*"
+      ]
+    },
+    "libc": {
+      "imports": 186,
+      "libraries": [
+        "libScePosix",
+        "libc"
+      ],
+      "native_hints": [
+        "native/core/lookup_1fc80.*"
+      ]
+    },
+    "net": {
+      "imports": 61,
+      "libraries": [
+        "libSceHttp",
+        "libSceNet",
+        "libSceNetCtl",
+        "libSceNpAuth",
+        "libSceNpCommon",
+        "libSceNpManager",
+        "libSceNpMatching2",
+        "libSceNpProfileDialog",
+        "libSceNpSignaling",
+        "libSceNpToolkit2",
+        "libSceNpTrophy",
+        "libSceNpTus",
+        "libSceNpUtility",
+        "libSceNpWebApi",
+        "libSceRemoteplay",
+        "libSceSsl"
+      ],
+      "native_hints": []
+    },
+    "rtc": {
+      "imports": 1,
+      "libraries": [
+        "libSceRtc"
+      ],
+      "native_hints": []
+    },
+    "save": {
+      "imports": 20,
+      "libraries": [
+        "libSceSaveData",
+        "libSceSaveDataDialog"
+      ],
+      "native_hints": [
+        "native/core/save_*"
+      ]
+    },
+    "screenshot": {
+      "imports": 2,
+      "libraries": [
+        "libSceScreenShot"
+      ],
+      "native_hints": [
+        "native/platform/metal_capture.*",
+        "native/core/screenshot_*"
+      ]
+    },
+    "share": {
+      "imports": 4,
+      "libraries": [
+        "libSceGameLiveStreaming",
+        "libSceShareUtility",
+        "libSceVideoRecording"
+      ],
+      "native_hints": []
+    },
+    "sysmodule": {
+      "imports": 2,
+      "libraries": [
+        "libSceSysmodule"
+      ],
+      "native_hints": []
+    },
+    "system": {
+      "imports": 6,
+      "libraries": [
+        "libSceCoredump",
+        "libSceSystemService"
+      ],
+      "native_hints": []
+    },
+    "tools": {
+      "imports": 0,
+      "libraries": [
+        "libSceRazorCpu"
+      ],
+      "native_hints": []
+    },
+    "user": {
+      "imports": 5,
+      "libraries": [
+        "libSceUserService"
+      ],
+      "native_hints": []
+    },
+    "video_out": {
+      "imports": 21,
+      "libraries": [
+        "libSceVideoOut"
+      ],
+      "native_hints": []
+    }
+  },
+  "libraries": {
+    "libSceAjm": {
+      "area": "audio_ajm",
+      "imports": 0,
+      "symbols": [],
+      "version": 1
+    },
+    "libSceAppContent": {
+      "area": "app_content",
+      "imports": 2,
+      "symbols": [
+        {
+          "module": "libSceAppContentUtil",
+          "name": "sceAppContentGetAddcontInfoList",
+          "nid": "xnd8BJzAxmk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceAppContentUtil",
+          "name": "sceAppContentInitialize",
+          "nid": "R9lA82OraNs",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceAudio3d": {
+      "area": "audio_out",
+      "imports": 11,
+      "symbols": [
+        {
+          "module": "libSceAudio3d",
+          "name": "sceAudio3dInitialize",
+          "nid": "UmCvjSmuZIw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceAudio3d",
+          "name": "sceAudio3dObjectReserve",
+          "nid": "jO2tec4dJ2M",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceAudio3d",
+          "name": "sceAudio3dObjectSetAttributes",
+          "nid": "4uyHN9q4ZeU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceAudio3d",
+          "name": "sceAudio3dObjectUnreserve",
+          "nid": "1HXxo-+1qCw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceAudio3d",
+          "name": "sceAudio3dPortAdvance",
+          "nid": "lw0qrdSjZt8",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceAudio3d",
+          "name": "sceAudio3dPortClose",
+          "nid": "OyVqOeVNtSk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceAudio3d",
+          "name": "sceAudio3dPortGetQueueLevel",
+          "nid": "YaaDbDwKpFM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceAudio3d",
+          "name": "sceAudio3dPortOpen",
+          "nid": "XeDDK0xJWQA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceAudio3d",
+          "name": "sceAudio3dPortPush",
+          "nid": "VEVhZ9qd4ZY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceAudio3d",
+          "name": "sceAudio3dPortSetAttribute",
+          "nid": "Yq9bfUQ0uJg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceAudio3d",
+          "name": "sceAudio3dTerminate",
+          "nid": "WW1TS2iz5yc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceAudioIn": {
+      "area": "audio_out",
+      "imports": 0,
+      "symbols": [],
+      "version": 1
+    },
+    "libSceAudioOut": {
+      "area": "audio_out",
+      "imports": 7,
+      "symbols": [
+        {
+          "module": "libSceAudioOut",
+          "name": "sceAudioOutClose",
+          "nid": "s1--uE9mBFw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceAudioOut",
+          "name": "sceAudioOutGetPortState",
+          "nid": "GrQ9s4IrNaQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceAudioOut",
+          "name": "sceAudioOutInit",
+          "nid": "JfEPXVxhFqA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceAudioOut",
+          "name": "sceAudioOutOpen",
+          "nid": "ekNvsT22rsY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceAudioOut",
+          "name": "sceAudioOutOutput",
+          "nid": "QOQtbeDqsT4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceAudioOut",
+          "name": "sceAudioOutOutputs",
+          "nid": "w3PdaSTSwGE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceAudioOut",
+          "name": "sceAudioOutSetMixLevelPadSpk",
+          "nid": "wVwPU50pS1c",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceCommonDialog": {
+      "area": "dialog",
+      "imports": 2,
+      "symbols": [
+        {
+          "module": "libSceCommonDialog",
+          "name": "sceCommonDialogInitialize",
+          "nid": "uoUpLGNkygk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceCommonDialog",
+          "name": "sceCommonDialogIsUsed",
+          "nid": "BQ3tey0JmQM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceCoredump": {
+      "area": "system",
+      "imports": 0,
+      "symbols": [],
+      "version": 1
+    },
+    "libSceErrorDialog": {
+      "area": "dialog",
+      "imports": 5,
+      "symbols": [
+        {
+          "module": "libSceErrorDialog",
+          "name": "sceErrorDialogClose",
+          "nid": "ekXHb1kDBl0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceErrorDialog",
+          "name": "sceErrorDialogInitialize",
+          "nid": "I88KChlynSs",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceErrorDialog",
+          "name": "sceErrorDialogOpen",
+          "nid": "M2ZF-ClLhgY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceErrorDialog",
+          "name": "sceErrorDialogTerminate",
+          "nid": "9XAxK2PMwk8",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceErrorDialog",
+          "name": "sceErrorDialogUpdateStatus",
+          "nid": "WWiGuh9XfgQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceFiber": {
+      "area": "fiber",
+      "imports": 8,
+      "symbols": [
+        {
+          "module": "libSceFiber",
+          "name": "_sceFiberInitializeImpl",
+          "nid": "hVYD7Ou2pCQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFiber",
+          "name": "sceFiberFinalize",
+          "nid": "JeNX5F-NzQU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFiber",
+          "name": "sceFiberGetInfo",
+          "nid": "uq2Y5BFz0PE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFiber",
+          "name": "sceFiberOptParamInitialize",
+          "nid": "asjUJJ+aa8s",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFiber",
+          "name": "sceFiberRename",
+          "nid": "JzyT91ucGDc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFiber",
+          "name": "sceFiberReturnToThread",
+          "nid": "B0ZX2hx9DMw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFiber",
+          "name": "sceFiberRun",
+          "nid": "a0LLrZWac0M",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFiber",
+          "name": "sceFiberSwitch",
+          "nid": "PFT2S-tJ7Uk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceFios2": {
+      "area": "file_io",
+      "imports": 34,
+      "symbols": [
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosArchiveGetMountBufferSizeSync",
+          "nid": "UUriaXy7G90",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosArchiveMountSync",
+          "nid": "xutLbQdqyb4",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosArchiveUnmountSync",
+          "nid": "yy6C7k7FPZY",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFHClose",
+          "nid": "5sYNBNK+W3g",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFHCloseSync",
+          "nid": "AOujSGqU+ms",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFHGetSize",
+          "nid": "FdjoqFQOlt0",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFHOpen",
+          "nid": "er6TkQFUvp0",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFHOpenSync",
+          "nid": "b44anV2D7K0",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFHPread",
+          "nid": "rR8wq7YFRZs",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFHPreadSync",
+          "nid": "2m9+Opco-hk",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFHPreadv",
+          "nid": "pl4pWsecyrY",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFHRead",
+          "nid": "cg-VoPqZYss",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFHReadSync",
+          "nid": "Bn2ZF4ZjeuQ",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFHReadv",
+          "nid": "Socc-lFocbc",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFHSeek",
+          "nid": "xReSebwKApA",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFHStatSync",
+          "nid": "xP45eIntEis",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFHSyncSync",
+          "nid": "EzzSJz6yuMc",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFHTell",
+          "nid": "MrRFrdgpsx8",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFHTruncateSync",
+          "nid": "tWS4uYFTU0M",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFHWriteSync",
+          "nid": "Kl-TbrDU9YM",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFileDeleteSync",
+          "nid": "bDupEgbQ6Fk",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFileExistsSync",
+          "nid": "NwOHMRM2Ppw",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosFileGetSizeSync",
+          "nid": "zF8-CRvRXnM",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosIOFilterAdd",
+          "nid": "lgITuBsRo2o",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosIOFilterCache",
+          "nid": "lAikj8EfcJg",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosIOFilterPsarcDearchiver",
+          "nid": "OIGbkgGOu6E",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosInitialize",
+          "nid": "wAKZ-det+yo",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosOpCancel",
+          "nid": "FA7dUleeGik",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosOpDelete",
+          "nid": "5cyEcilO-J0",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosOpGetActualCount",
+          "nid": "+FRvKknUj1I",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosOpGetError",
+          "nid": "X+7rIfY97Ps",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosOpIsDone",
+          "nid": "bfgo2Otmqz0",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosOpWait",
+          "nid": "SnoQQWnGK9I",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceFios2",
+          "name": "sceFiosStatSync",
+          "nid": "jayvY07C5dk",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceGameCustomDataDialog": {
+      "area": "dialog",
+      "imports": 0,
+      "symbols": [],
+      "version": 1
+    },
+    "libSceGameLiveStreaming": {
+      "area": "share",
+      "imports": 1,
+      "symbols": [
+        {
+          "module": "libSceGameLiveStreaming",
+          "name": "sceGameLiveStreamingEnableLiveStreaming",
+          "nid": "dWM80AX39o4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceGnmDriver": {
+      "area": "gnm",
+      "imports": 103,
+      "symbols": [
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmAddEqEvent",
+          "nid": "b0xyllnVY-I",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmAreSubmitsAllowed",
+          "nid": "b08AgtPlHPg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmBeginWorkload",
+          "nid": "ihxrbsoSKWc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmComputeWaitOnAddress",
+          "nid": "ffrNQOshows",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmComputeWaitSemaphore",
+          "nid": "EJapNl2+pgU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmCreateWorkloadStream",
+          "nid": "5udAm+6boVg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDebugHardwareStatus",
+          "nid": "qpGITzPE+Zc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDeleteEqEvent",
+          "nid": "PVT+fuoS9gU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDestroyWorkloadStream",
+          "nid": "UtObDRQiGbs",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDingDong",
+          "nid": "bX5IbRvECXk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDingDongForWorkload",
+          "nid": "byXlqupd8cE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDisableMipStatsReport",
+          "nid": "HHo1BAljZO8",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDispatchDirect",
+          "nid": "0BzLGljcwBo",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDispatchIndirect",
+          "nid": "Z43vKp5k7r0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDispatchIndirectOnMec",
+          "nid": "wED4ZXCFJT0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDispatchInitDefaultHardwareState",
+          "nid": "nF6bFRUBRAU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDrawIndex",
+          "nid": "HlTPoZ-oY7Y",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDrawIndexAuto",
+          "nid": "GGsn7jMTxw4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDrawIndexIndirect",
+          "nid": "ED9-Fjr8Ta4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDrawIndexIndirectCountMulti",
+          "nid": "thbPcG7E7qk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDrawIndexMultiInstanced",
+          "nid": "jHdPvIzlpKc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDrawIndexOffset",
+          "nid": "oYM+YzfCm2Y",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDrawIndirect",
+          "nid": "4v+otIIdjqg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDrawIndirectCountMulti",
+          "nid": "cUCo8OvArrw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDrawInitDefaultHardwareState350",
+          "nid": "yb2cRhagD1I",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDrawInitToDefaultContextState400",
+          "nid": "im2ZuItabu4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDrawOpaqueAuto",
+          "nid": "stDSYW2SBVM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDriverCaptureInProgress",
+          "nid": "TLV4mswiZ4A",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDriverTraceInProgress",
+          "nid": "R6z1xM3pW-w",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmDriverTriggerCapture",
+          "nid": "d88anrgNoKY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmEndWorkload",
+          "nid": "Fa3x75OOLRA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmFindResourcesPublic",
+          "nid": "4Mv9OXypBG8",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmFlushGarlic",
+          "nid": "iBt3Oe00Kvc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetEqEventType",
+          "nid": "UoYY0DWMC0U",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetEqTimeStamp",
+          "nid": "H7-fgvEutM0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetGpuBlockStatus",
+          "nid": "oL4hGI1PMpw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetGpuInfoStatus",
+          "nid": "tZCSL5ulnB4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetLastWaitedAddress",
+          "nid": "iFirFzgYsvw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetNumTcaUnits",
+          "nid": "KnldROUkWJY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetOffChipTessellationBufferSize",
+          "nid": "FFVZcCu3zWU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetOwnerName",
+          "nid": "QJjPjlmPAL0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetPhysicalCounterFromVirtualized",
+          "nid": "dewXw5roLs0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetProtectionFaultTimeStamp",
+          "nid": "fzJdEihTFV4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetResourceBaseAddressAndSizeInBytes",
+          "nid": "4PKnYXOhcx4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetResourceName",
+          "nid": "O0S96YnD04U",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetResourceShaderGuid",
+          "nid": "UBv7FkVfzcQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetResourceType",
+          "nid": "bdqdvIkLPIU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetResourceUserData",
+          "nid": "UoBuWAhKk7U",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetShaderProgramBaseAddress",
+          "nid": "nEyFbYUloIM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetShaderStatus",
+          "nid": "k7iGTvDQPLQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmGetTheTessellationFactorRingBufferBaseAddress",
+          "nid": "ln33zjBrfjk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmInsertDingDongMarker",
+          "nid": "NfvOrNzy6sk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmInsertPopMarker",
+          "nid": "7qZVNgEu+SY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmInsertPushColorMarker",
+          "nid": "aPIZJTXC+cU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmInsertPushMarker",
+          "nid": "W1Etj-jlW7Y",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmInsertSetColorMarker",
+          "nid": "aj3L-iaFmyk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmInsertSetMarker",
+          "nid": "jiItzS6+22g",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmInsertThreadTraceMarker",
+          "nid": "URDgJcXhQOs",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmInsertWaitFlipDone",
+          "nid": "1qXLHIpROPE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmIsUserPaEnabled",
+          "nid": "jg33rEKLfVs",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmLogicalCuIndexToPhysicalCuIndex",
+          "nid": "26PM5Mzl8zc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmLogicalCuMaskToPhysicalCuMask",
+          "nid": "RU74kek-N0c",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmLogicalTcaUnitToPhysical",
+          "nid": "Kl0Z3LH07QI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmMapComputeQueue",
+          "nid": "29oKvKXzEZo",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmMapComputeQueueWithPriority",
+          "nid": "A+uGq+3KFtQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmQueryResourceRegistrationUserMemoryRequirements",
+          "nid": "6IMbpR7nTzA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmRegisterGdsResource",
+          "nid": "9Mv61HaMhfA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmRegisterOwner",
+          "nid": "ZFqKFl23aMc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmRegisterResource",
+          "nid": "nvEwfYAImTs",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmRequestFlipAndSubmitDone",
+          "nid": "gObODli-OH8",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmRequestFlipAndSubmitDoneForWorkload",
+          "nid": "6YRHhh5mHCs",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmRequestMipStatsReportAndReset",
+          "nid": "f85orjx7qts",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmResetVgtControl",
+          "nid": "MYRtYhojKdA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSetCsShaderWithModifier",
+          "nid": "Kx-h-nWQJ8A",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSetEmbeddedPsShader",
+          "nid": "X9Omw9dwv5M",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSetEmbeddedVsShader",
+          "nid": "+AFvOEXrKJk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSetEsShader",
+          "nid": "FUHG8sQ3R58",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSetGsRingSizes",
+          "nid": "jtkqXpAOY6w",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSetGsShader",
+          "nid": "UJwNuMBcUAk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSetHsShader",
+          "nid": "VJNjFtqiF5w",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSetLsShader",
+          "nid": "vckdzbQ46SI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSetPsShader350",
+          "nid": "5uFKckiJYRM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSetResourceRegistrationUserMemory",
+          "nid": "q-qhDxP67Hg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSetResourceUserData",
+          "nid": "K3BKBBYKUSE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSetVgtControl",
+          "nid": "cFCp0NX8wf0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSetVsShader",
+          "nid": "gAhCn6UiU4Y",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSetWaveLimitMultipliers",
+          "nid": "XiyzNZ9J4nQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSetupMipStatsReport",
+          "nid": "+xuDhxlWRPg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSubmitAndFlipCommandBuffers",
+          "nid": "xbxNatawohc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSubmitAndFlipCommandBuffersForWorkload",
+          "nid": "Ga6r7H6Y0RI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSubmitCommandBuffers",
+          "nid": "zwY0YV91TTI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSubmitCommandBuffersForWorkload",
+          "nid": "jRcI8VcgTz4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmSubmitDone",
+          "nid": "yvZ73uQUqrk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmUnmapComputeQueue",
+          "nid": "ArSg-TGinhk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmUnregisterAllResourcesForOwner",
+          "nid": "yhFCnaz5daw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmUnregisterOwnerAndResources",
+          "nid": "fhKwCVVj9nk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmUnregisterResource",
+          "nid": "k8EXkhIP+lM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmUpdateGsShader",
+          "nid": "nLM2i2+65hA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmUpdateHsShader",
+          "nid": "GNlx+y7xPdE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmUpdatePsShader350",
+          "nid": "mLVL7N7BVBg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceGnmUpdateVsShader",
+          "nid": "V31V01UiScY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceRazorCaptureImmediate",
+          "nid": "u9YKpRRHe-M",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceGnmDriver",
+          "name": "sceRazorIsLoaded",
+          "nid": "f33OrruQYbM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceHttp": {
+      "area": "net",
+      "imports": 20,
+      "symbols": [
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpAddRequestHeader",
+          "nid": "EY28T2bkN7k",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpCreateConnectionWithURL",
+          "nid": "qgxDBjorUxs",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpCreateEpoll",
+          "nid": "6381dWF+xsQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpCreateRequestWithURL",
+          "nid": "Aeu5wVKkF9w",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpCreateTemplate",
+          "nid": "0gYjPTR-6cY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpDeleteConnection",
+          "nid": "P6A3ytpsiYc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpDeleteRequest",
+          "nid": "qe7oZ+v4PWA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpDeleteTemplate",
+          "nid": "4I8vEpuEhZ8",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpDestroyEpoll",
+          "nid": "wYhXVfS2Et4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpGetAllResponseHeaders",
+          "nid": "aCYPMSUIaP8",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpGetStatusCode",
+          "nid": "0a2TBNfE3BU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpInit",
+          "nid": "A9cVMUtEp4Y",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpReadData",
+          "nid": "P5pdoykPYTk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpSendRequest",
+          "nid": "1e2BNwI-XzE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpSetEpoll",
+          "nid": "-xm7kZQNpHI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpSetNonblock",
+          "nid": "s2-NPIvz+iA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpTerm",
+          "nid": "Ik-KpLTlf7Q",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpUnsetEpoll",
+          "nid": "59tL1AQBb8U",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpUriEscape",
+          "nid": "YuOW3dDAKYc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceHttp",
+          "name": "sceHttpWaitRequest",
+          "nid": "qISjDHrxONc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceIme": {
+      "area": "dialog",
+      "imports": 3,
+      "symbols": [
+        {
+          "module": "libSceIme",
+          "name": "sceImeKeyboardClose",
+          "nid": "PMVehSlfZ94",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceIme",
+          "name": "sceImeKeyboardOpen",
+          "nid": "eaFXjfJv3xs",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceIme",
+          "name": "sceImeUpdate",
+          "nid": "-4GCfYdNF1s",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceMsgDialog": {
+      "area": "dialog",
+      "imports": 6,
+      "symbols": [
+        {
+          "module": "libSceMsgDialog",
+          "name": "sceMsgDialogClose",
+          "nid": "HTrcDKlFKuM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceMsgDialog",
+          "name": "sceMsgDialogGetResult",
+          "nid": "Lr8ovHH9l6A",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceMsgDialog",
+          "name": "sceMsgDialogInitialize",
+          "nid": "lDqxaY1UbEo",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceMsgDialog",
+          "name": "sceMsgDialogOpen",
+          "nid": "b06Hh0DPEaE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceMsgDialog",
+          "name": "sceMsgDialogTerminate",
+          "nid": "ePw-kqZmelo",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceMsgDialog",
+          "name": "sceMsgDialogUpdateStatus",
+          "nid": "6fIC3XKt2k0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceNet": {
+      "area": "net",
+      "imports": 27,
+      "symbols": [
+        {
+          "module": "libSceNet",
+          "name": "sceNetAccept",
+          "nid": "PIWqhn9oSxc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetBind",
+          "nid": "bErx49PgxyY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetConnect",
+          "nid": "OXXX4mUk3uk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetGetSockInfo",
+          "nid": "hLuXdjHnhiI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetGetsockname",
+          "nid": "hoOAofhhRvE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetGetsockopt",
+          "nid": "xphrZusl78E",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetHtonl",
+          "nid": "9T2pDF2Ryqg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetHtons",
+          "nid": "iWQWrwiSt8A",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetInetNtop",
+          "nid": "9vA2aW+CHuA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetInetPton",
+          "nid": "8Kcp5d-q1Uo",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetInit",
+          "nid": "Nlev7Lg8k3A",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetListen",
+          "nid": "kOj1HiAGE54",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetNtohl",
+          "nid": "pQGpHYopAIY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetNtohs",
+          "nid": "Rbvt+5Y2iEw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetPoolCreate",
+          "nid": "dgJBaeJnGpo",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetPoolDestroy",
+          "nid": "K7RlrTkI-mw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetRecv",
+          "nid": "9wO9XrMsNhc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetRecvfrom",
+          "nid": "304ooNZxWDY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetResolverCreate",
+          "nid": "C4UgDHHPvdw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetResolverDestroy",
+          "nid": "kJlYH5uMAWI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetResolverStartAton",
+          "nid": "Apb4YDxKsRI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetResolverStartNtoa",
+          "nid": "Nd91WaWmG2w",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetSend",
+          "nid": "beRjXBn-z+o",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetSendto",
+          "nid": "gvD1greCu0A",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetSetsockopt",
+          "nid": "2mKX2Spso7I",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetSocket",
+          "nid": "Q4qBuN-c0ZM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNet",
+          "name": "sceNetSocketClose",
+          "nid": "45ggEzakPJQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceNetCtl": {
+      "area": "net",
+      "imports": 4,
+      "symbols": [
+        {
+          "module": "libSceNetCtl",
+          "name": "sceNetCtlGetInfo",
+          "nid": "obuxdTiwkF8",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNetCtl",
+          "name": "sceNetCtlGetState",
+          "nid": "uBPlr0lbuiI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNetCtl",
+          "name": "sceNetCtlInit",
+          "nid": "gky0+oaNM4k",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNetCtl",
+          "name": "sceNetCtlTerm",
+          "nid": "Z4wwCFiBELQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceNgs2": {
+      "area": "audio_ngs2",
+      "imports": 11,
+      "symbols": [
+        {
+          "module": "libSceNgs2",
+          "name": "sceNgs2RackCreate",
+          "nid": "cLV4aiT9JpA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNgs2",
+          "name": "sceNgs2RackCreateWithAllocator",
+          "nid": "U546k6orxQo",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNgs2",
+          "name": "sceNgs2RackDestroy",
+          "nid": "lCqD7oycmIM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNgs2",
+          "name": "sceNgs2RackGetVoiceHandle",
+          "nid": "MwmHz8pAdAo",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNgs2",
+          "name": "sceNgs2RackQueryBufferSize",
+          "nid": "0eFLVCfWVds",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNgs2",
+          "name": "sceNgs2SystemCreateWithAllocator",
+          "nid": "mPYgU4oYpuY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNgs2",
+          "name": "sceNgs2SystemDestroy",
+          "nid": "u-WrYDaJA3k",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNgs2",
+          "name": "sceNgs2SystemRender",
+          "nid": "i0VnXM-C9fc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNgs2",
+          "name": "sceNgs2VoiceControl",
+          "nid": "uu94irFOGpA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNgs2",
+          "name": "sceNgs2VoiceGetState",
+          "nid": "-TOuuAQ-buE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNgs2",
+          "name": "sceNgs2VoiceGetStateFlags",
+          "nid": "rEh728kXk3w",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceNpAuth": {
+      "area": "net",
+      "imports": 0,
+      "symbols": [],
+      "version": 1
+    },
+    "libSceNpCommon": {
+      "area": "net",
+      "imports": 0,
+      "symbols": [],
+      "version": 1
+    },
+    "libSceNpManager": {
+      "area": "net",
+      "imports": 2,
+      "symbols": [
+        {
+          "module": "libSceNpManager",
+          "name": "sceNpSetContentRestriction",
+          "nid": "A2CQ3kgSopQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNpManager",
+          "name": "sceNpSetNpTitleId",
+          "nid": "Ec63y59l9tw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceNpMatching2": {
+      "area": "net",
+      "imports": 0,
+      "symbols": [],
+      "version": 1
+    },
+    "libSceNpProfileDialog": {
+      "area": "net",
+      "imports": 0,
+      "symbols": [],
+      "version": 1
+    },
+    "libSceNpSignaling": {
+      "area": "net",
+      "imports": 0,
+      "symbols": [],
+      "version": 1
+    },
+    "libSceNpToolkit2": {
+      "area": "net",
+      "imports": 0,
+      "symbols": [],
+      "version": 1
+    },
+    "libSceNpTrophy": {
+      "area": "net",
+      "imports": 6,
+      "symbols": [
+        {
+          "module": "libSceNpTrophy",
+          "name": "sceNpTrophyCreateContext",
+          "nid": "XbkjbobZlCY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNpTrophy",
+          "name": "sceNpTrophyCreateHandle",
+          "nid": "q7U6tEAQf7c",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNpTrophy",
+          "name": "sceNpTrophyDestroyContext",
+          "nid": "E1Wrwd07Lr8",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNpTrophy",
+          "name": "sceNpTrophyDestroyHandle",
+          "nid": "GNcF4oidY0Y",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNpTrophy",
+          "name": "sceNpTrophyRegisterContext",
+          "nid": "TJCAxto9SEU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceNpTrophy",
+          "name": "sceNpTrophyUnlockTrophy",
+          "nid": "28xmRUFao68",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceNpTus": {
+      "area": "net",
+      "imports": 0,
+      "symbols": [],
+      "version": 1
+    },
+    "libSceNpUtility": {
+      "area": "net",
+      "imports": 0,
+      "symbols": [],
+      "version": 1
+    },
+    "libSceNpWebApi": {
+      "area": "net",
+      "imports": 0,
+      "symbols": [],
+      "version": 1
+    },
+    "libScePad": {
+      "area": "input",
+      "imports": 9,
+      "symbols": [
+        {
+          "module": "libScePad",
+          "name": "scePadClose",
+          "nid": "6ncge5+l5Qs",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libScePad",
+          "name": "scePadGetControllerInformation",
+          "nid": "gjP9-KQzoUk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libScePad",
+          "name": "scePadInit",
+          "nid": "hv1luiJrqQM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libScePad",
+          "name": "scePadOpen",
+          "nid": "xk0AcarP3V4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libScePad",
+          "name": "scePadRead",
+          "nid": "q1cHNfGycLI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libScePad",
+          "name": "scePadReadState",
+          "nid": "YndgXqQVV7c",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libScePad",
+          "name": "scePadSetLightBar",
+          "nid": "RR4novUEENY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libScePad",
+          "name": "scePadSetMotionSensorState",
+          "nid": "clVvL4ZDntw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libScePad",
+          "name": "scePadSetVibration",
+          "nid": "yFVnOdGxvZY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libScePlayGo": {
+      "area": "app_content",
+      "imports": 0,
+      "symbols": [],
+      "version": 1
+    },
+    "libScePngEnc": {
+      "area": "image",
+      "imports": 4,
+      "symbols": [
+        {
+          "module": "libScePngEnc",
+          "name": "scePngEncCreate",
+          "nid": "7aGTPfrqT9s",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libScePngEnc",
+          "name": "scePngEncDelete",
+          "nid": "RUrWdwTWZy8",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libScePngEnc",
+          "name": "scePngEncEncode",
+          "nid": "xgDjJKpcyHo",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libScePngEnc",
+          "name": "scePngEncQueryMemorySize",
+          "nid": "9030RnBDoh4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libScePosix": {
+      "area": "libc",
+      "imports": 45,
+      "symbols": [
+        {
+          "module": "libkernel",
+          "name": "accept",
+          "nid": "3e+4Iv7IJ8U",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "bind",
+          "nid": "KuOmgKoqCdY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "clock_gettime",
+          "nid": "lLMT9vJAck0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "close",
+          "nid": "bY-PO6JhzhQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "connect",
+          "nid": "XVL8So3QJUk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "gettimeofday",
+          "nid": "n88vx3C5nW8",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "listen",
+          "nid": "pxnCmagrtao",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "nanosleep",
+          "nid": "yS8U2TGCe1A",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_attr_destroy",
+          "nid": "zHchY8ft5pk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_attr_init",
+          "nid": "wtkt-teR1so",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_attr_setstacksize",
+          "nid": "2Q0z6rnBrTE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_cancel",
+          "nid": "0D4-FVvEikw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_cond_broadcast",
+          "nid": "mkx2fVhNMsg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_cond_destroy",
+          "nid": "RXXqi4CtF8w",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_cond_init",
+          "nid": "0TyVk4MSLt0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_cond_timedwait",
+          "nid": "27bAgiJmOh0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_cond_wait",
+          "nid": "Op8TBGY5KHg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_create",
+          "nid": "OxhIB8LB-PQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_exit",
+          "nid": "FJrT5LuUBAU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_getschedparam",
+          "nid": "FIs3-UQT9sg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_getspecific",
+          "nid": "0-KXaS70xy4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_join",
+          "nid": "h9CcP3J0oVM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_key_create",
+          "nid": "mqULNdimTn0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_key_delete",
+          "nid": "6BpEZuDT7YI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_mutex_destroy",
+          "nid": "ltCfaGr2JGE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_mutex_init",
+          "nid": "ttHNfU+qDBU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_mutex_lock",
+          "nid": "7H0iTOciTLo",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_mutex_trylock",
+          "nid": "K-jXhbt2gn4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_mutex_unlock",
+          "nid": "2Z+PpY6CaJg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_mutexattr_destroy",
+          "nid": "HF7lK46xzjY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_mutexattr_init",
+          "nid": "dQHWEsJtoE4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_mutexattr_setprotocol",
+          "nid": "5txKfcMUAok",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_mutexattr_settype",
+          "nid": "mDmgMOGVUqg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_self",
+          "nid": "EotR8a3ASf4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_setschedparam",
+          "nid": "Xs9hdiD7sAA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "pthread_setspecific",
+          "nid": "WrOLvHU0yQM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "recv",
+          "nid": "Ez8xjo9UF4E",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sched_get_priority_max",
+          "nid": "CBNtXOoef-E",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sched_get_priority_min",
+          "nid": "m0iS6jNsXds",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sched_yield",
+          "nid": "6XG4B33N09g",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "select",
+          "nid": "T8fER+tIGgk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "send",
+          "nid": "fZOeZIOEmLw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "setsockopt",
+          "nid": "fFxGkxF2bVo",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "shutdown",
+          "nid": "TUuiYS2kE8s",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "socket",
+          "nid": "TU-d9PfIHPM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceRazorCpu": {
+      "area": "tools",
+      "imports": 0,
+      "symbols": [],
+      "version": 1
+    },
+    "libSceRemoteplay": {
+      "area": "net",
+      "imports": 0,
+      "symbols": [],
+      "version": 1
+    },
+    "libSceRtc": {
+      "area": "rtc",
+      "imports": 1,
+      "symbols": [
+        {
+          "module": "libSceRtc",
+          "name": "sceRtcGetCurrentClock",
+          "nid": "8lfvnRMqwEM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceSaveData": {
+      "area": "save",
+      "imports": 11,
+      "symbols": [
+        {
+          "module": "libSceSaveData",
+          "name": "sceSaveDataCheckBackupData",
+          "nid": "RQOqDbk3bSU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveData",
+          "name": "sceSaveDataDelete",
+          "nid": "S1GkePI17zQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveData",
+          "name": "sceSaveDataDirNameSearch",
+          "nid": "dyIhnXq-0SM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveData",
+          "name": "sceSaveDataGetMountInfo",
+          "nid": "65VH0Qaaz6s",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveData",
+          "name": "sceSaveDataInitialize3",
+          "nid": "TywrFKCoLGY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveData",
+          "name": "sceSaveDataMount2",
+          "nid": "0z45PIH+SNI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveData",
+          "name": "sceSaveDataRestoreBackupData",
+          "nid": "lU9YRFsgwSU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveData",
+          "name": "sceSaveDataSaveIcon",
+          "nid": "c88Yy54Mx0w",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveData",
+          "name": "sceSaveDataSetParam",
+          "nid": "85zul--eGXs",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveData",
+          "name": "sceSaveDataTerminate",
+          "nid": "yKDy8S5yLA0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveData",
+          "name": "sceSaveDataUmountWithBackup",
+          "nid": "VwadwBBBJ80",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceSaveDataDialog": {
+      "area": "save",
+      "imports": 9,
+      "symbols": [
+        {
+          "module": "libSceSaveDataDialog",
+          "name": "sceSaveDataDialogClose",
+          "nid": "fH46Lag88XY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveDataDialog",
+          "name": "sceSaveDataDialogGetResult",
+          "nid": "yEiJ-qqr6Cg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveDataDialog",
+          "name": "sceSaveDataDialogGetStatus",
+          "nid": "ERKzksauAJA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveDataDialog",
+          "name": "sceSaveDataDialogInitialize",
+          "nid": "s9e3+YpRnzw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveDataDialog",
+          "name": "sceSaveDataDialogIsReadyToDisplay",
+          "nid": "en7gNVnh878",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveDataDialog",
+          "name": "sceSaveDataDialogOpen",
+          "nid": "4tPhsP6FpDI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveDataDialog",
+          "name": "sceSaveDataDialogProgressBarSetValue",
+          "nid": "hay1CfTmLyA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveDataDialog",
+          "name": "sceSaveDataDialogTerminate",
+          "nid": "YuH2FA7azqQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSaveDataDialog",
+          "name": "sceSaveDataDialogUpdateStatus",
+          "nid": "KK3Bdg1RWK0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceScreenShot": {
+      "area": "screenshot",
+      "imports": 2,
+      "symbols": [
+        {
+          "module": "libSceScreenShot",
+          "name": "sceScreenShotDisable",
+          "nid": "tIYf0W5VTi8",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceScreenShot",
+          "name": "sceScreenShotEnable",
+          "nid": "2xxUtuC-RzE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceShareUtility": {
+      "area": "share",
+      "imports": 2,
+      "symbols": [
+        {
+          "module": "libSceShareUtility",
+          "name": "sceShareUtilityInitializeEx2",
+          "nid": "j7DlalBzHh8",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceShareUtility",
+          "name": "sceShareUtilityOpenShareMenuDefault",
+          "nid": "8hZ2EEl2Tto",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceSsl": {
+      "area": "net",
+      "imports": 2,
+      "symbols": [
+        {
+          "module": "libSceSsl",
+          "name": "sceSslInit",
+          "nid": "hdpVEUDFW3s",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSsl",
+          "name": "sceSslTerm",
+          "nid": "0K1yQ6Lv-Yc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceSysmodule": {
+      "area": "sysmodule",
+      "imports": 2,
+      "symbols": [
+        {
+          "module": "libSceSysmodule",
+          "name": "sceSysmoduleLoadModule",
+          "nid": "g8cM39EUZ6o",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSysmodule",
+          "name": "sceSysmoduleUnloadModule",
+          "nid": "eR2bZFAAU0Q",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceSystemGesture": {
+      "area": "input",
+      "imports": 9,
+      "symbols": [
+        {
+          "module": "libSceSystemGesture",
+          "name": "sceSystemGestureClose",
+          "nid": "j4yXIA2jJ68",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSystemGesture",
+          "name": "sceSystemGestureCreateTouchRecognizer",
+          "nid": "FWF8zkhr854",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSystemGesture",
+          "name": "sceSystemGestureFinalizePrimitiveTouchRecognizer",
+          "nid": "3QYCmMlOlCY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSystemGesture",
+          "name": "sceSystemGestureGetTouchEventByIndex",
+          "nid": "TSKvgSz5ChU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSystemGesture",
+          "name": "sceSystemGestureGetTouchEventsCount",
+          "nid": "h8uongcBNVs",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSystemGesture",
+          "name": "sceSystemGestureInitializePrimitiveTouchRecognizer",
+          "nid": "3pcAvmwKCvM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSystemGesture",
+          "name": "sceSystemGestureOpen",
+          "nid": "qpo-mEOwje0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSystemGesture",
+          "name": "sceSystemGestureUpdatePrimitiveTouchRecognizer",
+          "nid": "GgFMb22sbbI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSystemGesture",
+          "name": "sceSystemGestureUpdateTouchRecognizer",
+          "nid": "j4h82CQWENo",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceSystemService": {
+      "area": "system",
+      "imports": 6,
+      "symbols": [
+        {
+          "module": "libSceSystemService",
+          "name": "sceSystemServiceGetDisplaySafeAreaInfo",
+          "nid": "1n37q1Bvc5Y",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSystemService",
+          "name": "sceSystemServiceGetStatus",
+          "nid": "rPo6tV8D9bM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSystemService",
+          "name": "sceSystemServiceHideSplashScreen",
+          "nid": "Vo5V8KAwCmk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSystemService",
+          "name": "sceSystemServiceLoadExec",
+          "nid": "JoBqSQt1yyA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSystemService",
+          "name": "sceSystemServiceParamGetInt",
+          "nid": "fZo48un7LK4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceSystemService",
+          "name": "sceSystemServiceReceiveEvent",
+          "nid": "656LMQSrg6U",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceUserService": {
+      "area": "user",
+      "imports": 5,
+      "symbols": [
+        {
+          "module": "libSceUserService",
+          "name": "sceUserServiceGetEvent",
+          "nid": "yH17Q6NWtVg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceUserService",
+          "name": "sceUserServiceGetInitialUser",
+          "nid": "CdWp0oHWGr0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceUserService",
+          "name": "sceUserServiceGetLoginUserIdList",
+          "nid": "fPhymKNvK-A",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceUserService",
+          "name": "sceUserServiceGetUserName",
+          "nid": "1xxcMiGu2fo",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceUserService",
+          "name": "sceUserServiceInitialize",
+          "nid": "j3YMu1MVNNo",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceVideoOut": {
+      "area": "video_out",
+      "imports": 21,
+      "symbols": [
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutAddFlipEvent",
+          "nid": "HXzjK9yI30k",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutAdjustColor_",
+          "nid": "pv9CI5VC+R0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutClose",
+          "nid": "uquVH4-Du78",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutColorSettingsSetGamma_",
+          "nid": "DYhhWbJSeRg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutConfigureOutputMode_",
+          "nid": "N1bEoJ4SRw4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutDeleteFlipEvent",
+          "nid": "-Ozn0F1AFRg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutGetDeviceCapabilityInfo_",
+          "nid": "kGVLc3htQE8",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutGetEventData",
+          "nid": "rWUTcKdkUzQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutGetEventId",
+          "nid": "U2JJtSqNKZI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutGetResolutionStatus",
+          "nid": "6kPnj51T62Y",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutIsFlipPending",
+          "nid": "zgXifHT9ErY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutModeSetAny_",
+          "nid": "pjkDsgxli6c",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutOpen",
+          "nid": "Up36PTk687E",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutRegisterBuffers",
+          "nid": "w3BY+tAEiQY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutSetBufferAttribute",
+          "nid": "i6-sR91Wt-4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutSetFlipRate",
+          "nid": "CBiu4mCE1DA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutSetWindowModeMargins",
+          "nid": "MTxxrOCeSig",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutSubmitChangeBufferAttribute",
+          "nid": "IOdgHlCGU-k",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutSubmitFlip",
+          "nid": "U46NwOiJpys",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutUnregisterBuffers",
+          "nid": "N5KDtkIjjJ4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libSceVideoOut",
+          "name": "sceVideoOutWaitVblank",
+          "nid": "j6RaAUlaLv0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceVideoRecording": {
+      "area": "share",
+      "imports": 1,
+      "symbols": [
+        {
+          "module": "libSceVideoRecording",
+          "name": "sceVideoRecordingSetInfo",
+          "nid": "Fc8qxlKINYQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libSceVoice": {
+      "area": "audio_out",
+      "imports": 0,
+      "symbols": [],
+      "version": 1
+    },
+    "libc": {
+      "area": "libc",
+      "imports": 141,
+      "symbols": [
+        {
+          "module": "libc",
+          "name": null,
+          "nid": "9LCjpWyQ5Zc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "Need_sceLibc",
+          "nid": "P330P3dFF68",
+          "status": "name-by-nid-hash-only",
+          "type": "OBJECT"
+        },
+        {
+          "module": "libc",
+          "name": "_Atomic_fetch_add_4",
+          "nid": "iPBqs+YUUFw",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_Atomic_fetch_sub_4",
+          "nid": "2HnmKiLmV6s",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_FLog",
+          "nid": "jjjRS7l1MPM",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_FSin",
+          "nid": "ZtjspkJQ+vw",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_Getpctype",
+          "nid": "sUP1hBaouOw",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_Getpmbstate",
+          "nid": "QxqK-IdpumU",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_Getptolower",
+          "nid": "1uJgoVq3bQU",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_Getptoupper",
+          "nid": "rcQCUr0EaRU",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_Getpwcstate",
+          "nid": "zS94yyJRSUs",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_Iswctype",
+          "nid": "CyXs2l-1kNA",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_Locksyslock",
+          "nid": "kALvdgEv5ME",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_Sin",
+          "nid": "cCXjU72Z0Ow",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_Stderr",
+          "nid": "H8AprKeZtNg",
+          "status": "name-by-nid-hash-only",
+          "type": "OBJECT"
+        },
+        {
+          "module": "libc",
+          "name": "_Stdout",
+          "nid": "2sWzhYqFH4E",
+          "status": "name-by-nid-hash-only",
+          "type": "OBJECT"
+        },
+        {
+          "module": "libc",
+          "name": "_Stoll",
+          "nid": "7pNKcscKrf8",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_Stoul",
+          "nid": "zlfEH8FmyUA",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_Stoull",
+          "nid": "q+9E0X3aWpU",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_Unlocksyslock",
+          "nid": "9nf8joUTSaQ",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_ZNKSt9exception6_RaiseEv",
+          "nid": "DuW5ZqZv-70",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_ZNSt11range_errorD1Ev",
+          "nid": "NnNaWa16OvE",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_ZNSt5ctypeIcE2idE",
+          "nid": "Cv+zC4EjGMA",
+          "status": "name-by-nid-hash-only",
+          "type": "OBJECT"
+        },
+        {
+          "module": "libc",
+          "name": "_ZNSt6locale16_GetgloballocaleEv",
+          "nid": "hEQ2Yi4PJXA",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_ZNSt6locale2id7_Id_cntE",
+          "nid": "H4fcpQOpc08",
+          "status": "name-by-nid-hash-only",
+          "type": "OBJECT"
+        },
+        {
+          "module": "libc",
+          "name": "_ZNSt6locale5_InitEv",
+          "nid": "9rMML086SEE",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_ZNSt6locale5facet9_RegisterEv",
+          "nid": "QW2jL1J5rwY",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_ZNSt6locale7_Locimp7_AddfacEPNS_5facetEm",
+          "nid": "uuga3RipCKQ",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_ZNSt6locale7_LocimpC1ERKS0_",
+          "nid": "WViwxtEKxHk",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_ZNSt7codecvtIwc9_MbstatetE2idE",
+          "nid": "FjZCPmK0SbA",
+          "status": "name-by-nid-hash-only",
+          "type": "OBJECT"
+        },
+        {
+          "module": "libc",
+          "name": "_ZNSt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEE2idE",
+          "nid": "E14mW8pVpoE",
+          "status": "name-by-nid-hash-only",
+          "type": "OBJECT"
+        },
+        {
+          "module": "libc",
+          "name": "_ZNSt8_LocinfoC1EPKc",
+          "nid": "hqi8yMOCmG0",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_ZNSt8_LocinfoD1Ev",
+          "nid": "p6LrHjIQMdk",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_ZNSt8ios_base7failureD1Ev",
+          "nid": "N2f485TmJms",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_ZNSt8ios_baseD2Ev",
+          "nid": "P8F2oavZXtY",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_ZSt11_Xbad_allocv",
+          "nid": "eT2UsmTewbU",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_ZSt14_Xlength_errorPKc",
+          "nid": "tQIo+GIPklo",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_ZSt14_Xout_of_rangePKc",
+          "nid": "ozMAr28BwSY",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_ZSt15set_new_handlerPFvvE",
+          "nid": "RqeErO3cFHU",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_ZSt17iostream_categoryv",
+          "nid": "V23qt24VPVs",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_ZSt21_sceLibcClassicLocale",
+          "nid": "Qoo175Ig+-k",
+          "status": "name-by-nid-hash-only",
+          "type": "OBJECT"
+        },
+        {
+          "module": "libc",
+          "name": "_ZSt4_Fpz",
+          "nid": "wiR+rIcbnlc",
+          "status": "name-by-nid-hash-only",
+          "type": "OBJECT"
+        },
+        {
+          "module": "libc",
+          "name": "_ZSt7_BADOFF",
+          "nid": "FQ9NFbBHb5Y",
+          "status": "name-by-nid-hash-only",
+          "type": "OBJECT"
+        },
+        {
+          "module": "libc",
+          "name": "_ZSt7nothrow",
+          "nid": "NLwJ3q+64bY",
+          "status": "name-by-nid-hash-only",
+          "type": "OBJECT"
+        },
+        {
+          "module": "libc",
+          "name": "_ZTVNSt8ios_base7failureE",
+          "nid": "yLE5H3058Ao",
+          "status": "name-by-nid-hash-only",
+          "type": "OBJECT"
+        },
+        {
+          "module": "libc",
+          "name": "_ZTVSt11range_error",
+          "nid": "RbzWN8X21hY",
+          "status": "name-by-nid-hash-only",
+          "type": "OBJECT"
+        },
+        {
+          "module": "libc",
+          "name": "_ZTVSt12system_error",
+          "nid": "Bq8m04PN1zw",
+          "status": "name-by-nid-hash-only",
+          "type": "OBJECT"
+        },
+        {
+          "module": "libc",
+          "name": "_ZTVSt13runtime_error",
+          "nid": "-L+-8F0+gBc",
+          "status": "name-by-nid-hash-only",
+          "type": "OBJECT"
+        },
+        {
+          "module": "libc",
+          "name": "_ZTVSt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEE",
+          "nid": "1kZFcktOm+s",
+          "status": "name-by-nid-hash-only",
+          "type": "OBJECT"
+        },
+        {
+          "module": "libc",
+          "name": "_ZnwmRKSt9nothrow_t",
+          "nid": "ryUxD-60bKM",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "__cxa_atexit",
+          "nid": "tsvEmnenz48",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "__cxa_guard_acquire",
+          "nid": "3GPpjQdAMTw",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "__cxa_guard_release",
+          "nid": "9rAeANT2tyE",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "__cxa_pure_virtual",
+          "nid": "zr094EQ39Ww",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "__isfinite",
+          "nid": "dhK16CKwhQg",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "__isfinitef",
+          "nid": "Q8pvJimUWis",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "_init_env",
+          "nid": "bzQExy189ZI",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "abort",
+          "nid": "L1SBTkC+Cvw",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "acosf",
+          "nid": "QI-x0SL8jhw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "asinf",
+          "nid": "GZWjF-YIFFk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "atan2",
+          "nid": "HUbZmOnT-Dg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "atan2f",
+          "nid": "EH-x713A99c",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "atanf",
+          "nid": "weDug8QD-lE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "atexit",
+          "nid": "8G2LB+A3rzg",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "atof",
+          "nid": "SRI6S9B+-a4",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "bsearch",
+          "nid": "NesIgTmfF0Q",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "catchReturnFromMain",
+          "nid": "XKRegsFpEpk",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "difftime",
+          "nid": "-VVn74ZyhEs",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "exit",
+          "nid": "uMei1W9uyNo",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "exp2f",
+          "nid": "wuAQt-j+p4o",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "expf",
+          "nid": "8zsu04XNsZ4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "fclose",
+          "nid": "uodLYyUip20",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "feof",
+          "nid": "LxcEU+ICu8U",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "fflush",
+          "nid": "MUjC4lbHrK4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "fgets",
+          "nid": "KdP-nULpuGw",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "fmod",
+          "nid": "pKwslsMUmSk",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "fmodf",
+          "nid": "88Vv-AzHVj8",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "fopen",
+          "nid": "xeYO4u7uyJ0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "fprintf",
+          "nid": "fffwELXNVFA",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "fputc",
+          "nid": "aZK8lNei-Qw",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "fputs",
+          "nid": "QrZZdJ8XsX0",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "fread",
+          "nid": "lbB+UlZqVG0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "free",
+          "nid": "tIhsqj0qsFE",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "frexpf",
+          "nid": "aaDMGGkXFxo",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "fscanf",
+          "nid": "npLpPTaSuHg",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "fseek",
+          "nid": "rQFVBXp-Cxg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "ftell",
+          "nid": "Qazy8LmXTvw",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "fwrite",
+          "nid": "MpxhMh8QFro",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "gmtime_s",
+          "nid": "5bBacGLyLOs",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "ldexp",
+          "nid": "JrwFIMzKNr0",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "localtime",
+          "nid": "efhK-YSUYYQ",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "localtime_s",
+          "nid": "fiiNDnNBKVY",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "malloc",
+          "nid": "gQX+4GDQjpM",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "memalign",
+          "nid": "Ujf3KzMvRmI",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "memchr",
+          "nid": "8u8lPzUEq+U",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "memcmp",
+          "nid": "DfivPArhucg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "memcpy",
+          "nid": "Q3VBxCXhUHs",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "memmove",
+          "nid": "+P6FRGH4LfA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "memset",
+          "nid": "8zTFvBIAIN8",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "mktime",
+          "nid": "n7AepwR0s34",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "modf",
+          "nid": "0WMHDb5Dt94",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "powf",
+          "nid": "1D0H2KNjshE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "printf",
+          "nid": "hcuQgD53UxM",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "putchar",
+          "nid": "m5wN+SwZOR4",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "puts",
+          "nid": "YQ0navp+YIc",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "qsort",
+          "nid": "AEJdIVZTEmo",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "quick_exit",
+          "nid": "qdGFBoLVNKI",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "rand",
+          "nid": "cpCOXWMgha0",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "realloc",
+          "nid": "Y7aJ1uydPMo",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "roundf",
+          "nid": "DDHG1a6+3q0",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "snprintf",
+          "nid": "eLdDw6l0-bU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "sprintf",
+          "nid": "tcVi5SivF7Q",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "srand",
+          "nid": "VPbJwTCgME0",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "sscanf",
+          "nid": "1Pk0qZQGeWo",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strcasecmp",
+          "nid": "AV6ipCNa4Rw",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strcat",
+          "nid": "Ls4tzzhimqQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strchr",
+          "nid": "ob5xAW4ln-0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strcmp",
+          "nid": "Ovb2dSJOAuE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strcpy",
+          "nid": "kiZSXIWd9vg",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strcspn",
+          "nid": "q0F6yS-rCms",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strftime",
+          "nid": "Av3zjWi64Kw",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strlen",
+          "nid": "j4ViWNHEgww",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strncasecmp",
+          "nid": "pXvbDfchu6k",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strncat",
+          "nid": "kHg45qPC6f0",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strncmp",
+          "nid": "aesyjrHVWy4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strncpy",
+          "nid": "6sJWiWSRuqk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strnlen",
+          "nid": "5jNubw4vlAA",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strrchr",
+          "nid": "9yDWMxEFdJU",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strspn",
+          "nid": "-kU6bB4M-+k",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strstr",
+          "nid": "viiwFMaNamA",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strtod",
+          "nid": "2vDqwBlpF-o",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "strtol",
+          "nid": "mXlxhmLNMPg",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "tanf",
+          "nid": "ZE6RNL+eLbk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "time",
+          "nid": "wLlFkwG9UcQ",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "vfprintf",
+          "nid": "pDBDcY6uLSA",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "vsnprintf",
+          "nid": "Q2V+iqvjgC0",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "vsprintf",
+          "nid": "jbz9I9vkqkk",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "vsprintf_s",
+          "nid": "+qitMEbkSWk",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "wmemcpy",
+          "nid": "fL3O02ypZFE",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "wmemmove",
+          "nid": "Noj9PsJrsa8",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        },
+        {
+          "module": "libc",
+          "name": "wmemset",
+          "nid": "Al8MZJh-4hM",
+          "status": "name-by-nid-hash-only",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    },
+    "libkernel": {
+      "area": "kernel",
+      "imports": 66,
+      "symbols": [
+        {
+          "module": "libkernel",
+          "name": "__error",
+          "nid": "9BcDykPmo1I",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "__stack_chk_fail",
+          "nid": "Ou3iL1abvng",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "__stack_chk_guard",
+          "nid": "f7uOxY9mM1U",
+          "status": "name-by-nid-hash-only",
+          "type": "OBJECT"
+        },
+        {
+          "module": "libkernel",
+          "name": "__tls_get_addr",
+          "nid": "vNe1w4diLCs",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelAddUserEventEdge",
+          "nid": "WDszmSbWuDk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelAllocateDirectMemory",
+          "nid": "rTXw65xmLIA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelAvailableDirectMemorySize",
+          "nid": "C0f7TJcbfac",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelAvailableFlexibleMemorySize",
+          "nid": "aNz11fnnzi4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelBatchMap",
+          "nid": "2SKEx6bSq-4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelClearEventFlag",
+          "nid": "7uhBFWRAS60",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelClose",
+          "nid": "UK2Tl2DWUns",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelCreateEqueue",
+          "nid": "D0OdFMjp46I",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelCreateEventFlag",
+          "nid": "BpFoboUJoZU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelDeleteEqueue",
+          "nid": "jpFjmgAC5AE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelDeleteEventFlag",
+          "nid": "8mql9OcQnd4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelDeleteUserEvent",
+          "nid": "LJDwdSNTnDg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelGetDirectMemorySize",
+          "nid": "pO96TwzOm5E",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelGetEventFilter",
+          "nid": "23CPPI1tyBY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelGetProcessTime",
+          "nid": "4J2sUJmuHZQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelGetTscFrequency",
+          "nid": "1j3S3n-tTW4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelIsNeoMode",
+          "nid": "WslcK1FQcGI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelLseek",
+          "nid": "oib76F-12fk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelMapDirectMemory",
+          "nid": "L-Q3LEjIbgA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelMapFlexibleMemory",
+          "nid": "IWIBBdTHit4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelOpen",
+          "nid": "1G3lF1Gg1k8",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelPollEventFlag",
+          "nid": "9lvj5DjHZiA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelRead",
+          "nid": "Cg4srZ6TKbU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelReadTsc",
+          "nid": "-2IRUCO--PM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelReserveVirtualRange",
+          "nid": "7oxv3PPCumo",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelSetEventFlag",
+          "nid": "IOnSvHzqu6A",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelSleep",
+          "nid": "-ZR+hG7aDHw",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelTriggerUserEvent",
+          "nid": "F6e0kwo4cnk",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelUsleep",
+          "nid": "1jfXLRVzisc",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelUuidCreate",
+          "nid": "Xjoosiw+XPI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelVirtualQuery",
+          "nid": "rVjRvHJ0X6c",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelWaitEqueue",
+          "nid": "fzyMKs9kim0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "sceKernelWaitEventFlag",
+          "nid": "JTvBflhYazQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadAttrDestroy",
+          "nid": "62KCwEMmzcM",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadAttrGet",
+          "nid": "x1X76arYMxU",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadAttrGetaffinity",
+          "nid": "8+s5BzZjxSg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadAttrGetstacksize",
+          "nid": "-fA+7ZlGDQs",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadAttrInit",
+          "nid": "nsYoNRywwNg",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadAttrSetaffinity",
+          "nid": "3qxgM4ezETA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadAttrSetdetachstate",
+          "nid": "-Wreprtu0Qs",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadAttrSetinheritsched",
+          "nid": "eXbUSpEaTsA",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadAttrSetschedparam",
+          "nid": "DzES9hQF4f4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadAttrSetschedpolicy",
+          "nid": "4+h9EzwKF4I",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadAttrSetstacksize",
+          "nid": "UTXzJbWhhTE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadCreate",
+          "nid": "6UgtwV+0zb4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadExit",
+          "nid": "3kg7rT0NQIs",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadGetaffinity",
+          "nid": "rcrVFJsQWRY",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadGetprio",
+          "nid": "1tKyG7RlMJo",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadGetthreadid",
+          "nid": "EI-5-jlq2dE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadJoin",
+          "nid": "onNY9Byn-W8",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadMutexDestroy",
+          "nid": "2Of0f+3mhhE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadMutexInit",
+          "nid": "cmo1RIYva9o",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadMutexLock",
+          "nid": "9UK1vLZQft4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadMutexTrylock",
+          "nid": "upoVrzMHFeE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadMutexUnlock",
+          "nid": "tn3VlD0hG60",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadMutexattrDestroy",
+          "nid": "smWEktiyyG0",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadMutexattrInit",
+          "nid": "F8bUHwAG284",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadMutexattrSettype",
+          "nid": "iMp8QpE+XO4",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadSelf",
+          "nid": "aI+OeCz8xrQ",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadSetaffinity",
+          "nid": "bt3CTBKmGyI",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadSetprio",
+          "nid": "W0Hpm2X0uPE",
+          "status": "contract-declared",
+          "type": "FUNC"
+        },
+        {
+          "module": "libkernel",
+          "name": "scePthreadYield",
+          "nid": "T72hz6ffq08",
+          "status": "contract-declared",
+          "type": "FUNC"
+        }
+      ],
+      "version": 1
+    }
+  },
+  "schema": "sotc-service-map/1",
+  "source": {
+    "elf_sha256": "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3",
+    "import_status_counts": {
+      "contract-declared": 436,
+      "name-by-nid-hash-only": 152
+    },
+    "symbol_count": 590
+  },
+  "totals": {
+    "areas": 22,
+    "imports": 588,
+    "libraries": 51
+  }
+}

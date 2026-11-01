@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 16:30 CDT (root) — native service map (STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `PLAT-01-SERVICE-MAP-01` COMPLETE. `docs/SERVICE_MAP.md` + generated `docs/service_map.json` classify the pinned import manifest into **22 service areas** over **51 libraries / 588 imports**: libc 186, gnm 103, kernel 66, net 61, file_io 34, video_out 21, save 20, audio_out 18, input 18, dialog 16, ngs2 11, fiber 8, remainder small.
+- **Facts recorded:** 17 libraries import nothing in this build (all `libSceNp*`, `libSceVoice`, `libSceAjm`, `libScePlayGo`, `libSceRemoteplay`, `libSceRazorCpu`, `libSceCoredump`, `libSceGameCustomDataDialog`, `libSceAudioIn`); 436 imports are `contract-declared`, 152 are `name-by-nid-hash-only`. Existing native modules are listed as hints, never as coverage.
+- **Regeneration gate:** `tools/lift/gen_service_map.py` writes the JSON deterministically; `tools/lift/check_service_map.py` (in the sweep) regenerates and diffs, so the doc cannot drift from the pinned manifest.
+- **Verification (PASSED):** CTest **498/498**; lift checkers **689 passed / 0 failed**.
+- **Gates:** unchanged; G0/G1/G3/G4 PARTIAL, G2/G5/G6 NOT RUN.
+
 ## 2026-11-01 16:05 CDT (root) — PM4 indirect traversal + typed draws (FIXTURE_VERIFIED)
 
 - **Task:** `GPU-01-PM4-TRANSLATOR-01` slice 3. `native/platform/pm4_indirect.{hpp,cpp}`: caller-supplied opcode policy (draw kind, count field, indirect address/size fields), nested-buffer traversal with **depth limit**, **path-based cycle detection**, unreadable and short-payload handling, buffer/draw caps, and a flat draw list carrying kind, count, depth and buffer address.

@@ -164,6 +164,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [REFERENCE_AUDIT](REFERENCE_AUDIT.md) | Pinned SoTC/Bloodborne/shadPS4 source anchors; source-audit worker |
 | [PRIOR_ART](PRIOR_ART.md) | Assessment of three public Apple-Silicon PS4 ports: execution models, lifting/GPU tooling, licences, reuse verdicts |
 | [GPU_COMMAND_SURFACE](GPU_COMMAND_SURFACE.md) | Static import census of the title's PS4 GPU surface (101 GnmDriver + 24 VideoOut) and the native boundary contract |
+| [SERVICE_MAP](SERVICE_MAP.md) | Native service map: 51 PS4 libraries / 588 imports grouped into 22 areas, with generated [service_map.json](service_map.json) |
 | [PLATFORM](PLATFORM.md) | Native architecture and subsystem requirements; native-core owner |
 | [VALIDATION](VALIDATION.md) | Measurable gates, failures, real-game proof; validation owner |
 | [G1 PARTIAL pack (2026-10-22)](checkpoints/2026-10-22-g1-partial-evidence-pack.md) | Phase C evidence; G1 PARTIAL not PASSED; E404 |
