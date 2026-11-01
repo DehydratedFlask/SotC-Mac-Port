@@ -1,7 +1,7 @@
 // Init `0x531d60` registry mov [rbx],r14 OBS `0x532bf8..0x532bfb` (3 B):
 //   mov [rbx],r14   ; store new object into global cell @ 0x2efd160 (null-r12 epilogue)
 //
-// After E607 call @ `0x532bf3`. NOT modelled: E609 lea rax @ `0x532bfb` / tail @ `0x532c02`.. G1 PARTIAL.
+// After E607 call @ `0x532bf3`. NOT modelled: E609 lea @ `0x532bfb` / E610 mov r14,[rsp+0x20] @ `0x532c02` / tail @ `0x532c07`.. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

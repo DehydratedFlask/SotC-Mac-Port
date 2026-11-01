@@ -13,7 +13,7 @@ Init531d60PostBaseLeaRax2ee2cf8_532bfb_U1Result init_531d60_post_base_lea_rax_2e
     }
     ++out.lea_rax_2ee2cf8_532bfb_count;
 
-    // Next: mov r14,[rsp+0x20] @ 0x532c02 — not modelled here.
+    // Next: E610 mov r14,[rsp+0x20] @ 0x532c02 — not modelled here.
     out.ok = (out.lea_rax_2ee2cf8_532bfb_count == 1);
     return out;
 }

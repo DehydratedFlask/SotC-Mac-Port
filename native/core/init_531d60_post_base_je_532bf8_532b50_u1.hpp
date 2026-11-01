@@ -1,7 +1,7 @@
 // Init `0x531d60` registry je null-r12 skip OBS `0x532b50..0x532b56` (6 B):
 //   je 0x532bf8   ; ZF from test r12,r12 @ `0x532b4d`
 //
-// After E563 test @ `0x532b4d`. NOT modelled: E608 mov @ `0x532bf8` / E609 lea @ `0x532bfb` or fall-through destroy @
+// After E563 test @ `0x532b4d`. NOT modelled: E608 mov @ `0x532bf8` / E609 lea @ `0x532bfb` / E610 mov @ `0x532c02` or fall-through destroy @
 // `0x532b56..`. G1 PARTIAL.
 #pragma once
 

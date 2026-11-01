@@ -1,7 +1,7 @@
 // Init `0x531d60` registry mov rdi,r12 OBS `0x532bf0..0x532bf3` (3 B):
 //   mov rdi,r12   ; je @ `0x532be6` merge / post-call restore of cell cursor
 //
-// After E605 call @ `0x532beb`. NOT modelled: E607 call @ `0x532bf3` / E608 mov @ `0x532bf8` / E609 lea @ `0x532bfb` / tail @ `0x532c02`.. G1 PARTIAL.
+// After E605 call @ `0x532beb`. NOT modelled: E607 call @ `0x532bf3` / E608 mov @ `0x532bf8` / E609 lea @ `0x532bfb` / E610 mov @ `0x532c02` / tail @ `0x532c07`.. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
