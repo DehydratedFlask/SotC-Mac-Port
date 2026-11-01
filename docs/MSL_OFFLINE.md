@@ -1,7 +1,8 @@
 # Offline MSL archive step (GPU-01 prep, offline only)
 
-Status: tool behaviour **FIXTURE_VERIFIED** on two synthetic MSL shaders on this machine; no
-real `.csdr` compiled, no pipeline state object, **G3 NOT RUN**.
+Status: tool behaviour **FIXTURE_VERIFIED** on two synthetic MSL shaders on this machine; the real
+corpus front end is measured below (**STATIC_ANALYSIS_VERIFIED**, zero shaders lowered); no real
+`.csdr` compiled, no pipeline state object, **G3 NOT RUN**.
 
 ## Where this sits
 
@@ -75,6 +76,54 @@ metallib	vertex	out/vertex.metallib	sha256=72a7cadc930c55f33974806cad4590cfe748e
 `--check` passed; a second archive of the same inputs was byte-identical; 9 unittest tests
 passed (one source char mutated fails `--check`; no `xcrun`, and a fake `xcrun` without the
 component, both exit 75).
+
+## Real corpus coverage
+
+`tools/dev/msl_corpus_coverage.py` measures how far the *front end* reaches: it samples `.csdr`
+members deterministically from the pinned private paks, reads each through the validated PSARC
+`MD5(path)` pairing, isolates every `OrbShdr` code span and asks `gcn_inventory.decode()`. It
+never lowers, never executes and never invents an ABI.
+
+```sh
+python3 -I tools/dev/msl_corpus_coverage.py --self-test   # FIXTURE_VERIFIED, synthetic spans only
+python3 -I tools/dev/msl_corpus_coverage.py               # default sample 64
+python3 -I tools/dev/msl_corpus_coverage.py --sample 512 --out local/validation/msl-coverage/sample-512
+```
+
+Population 34,291 `.csdr` (pak0 3,309 + pak1 2,512 + pakN 28,470; 34,291 unique paths). The
+default sample is **64**, chosen by deterministic even spacing `round(i*(N-1)/(k-1))` over the
+`(path, archive)`-sorted list (first and last included, implied stride 535.8); the 512 run uses
+the same rule.
+
+| Sample | compressed-prefix | raw, decode-error | raw, all programs decode | lowered |
+|---:|---:|---:|---:|---:|
+| 64 | 41 | 23 | 0 | **0** |
+| 512 | 264 | 244 | 4 | **0** |
+
+Programs (a member can hold a VS/PS pair): at 64, 31 attempted, 4 decoded, 27 decode-error; at
+512, 367 attempted, 74 decoded, 293 decode-error. The 4 programs decoded at n=64 are all 32-byte,
+5-instruction, type-0 (INF: PS) `depth`/`shadow` shaders (`EXP 1, SOP1 2, SOPP 2`), so no
+*member* is fully decodable there; at n=512, 70 raw members yield at least one decoded program
+and 4 decode completely (74 programs, 577 instructions, 73/74 per-lane eligible).
+
+Top decode-error reasons, n=512 / n=64: `unsupported encoding` 235 / 23, `unsupported SMRD
+register/literal offset` 39 / 4, `unsupported VINTRP opcode 2` 10 / 0, `unsupported VOP3 opcode
+349` 3 / 0. "Unsupported encoding" is the first word outside the bounded table (decode never
+resynchronizes): 289 of 293 failures stop between byte `0x14` and `0x2c`.
+
+Supported-opcode share (fraction of a decoded program's instructions whose encoding+opcode is in
+the imported `gcn_inventory.OPCODES`): **min 1.0, median 1.0, max 1.0** in both samples. That
+distribution is degenerate by construction - `decode()` rejects anything else - so the decode
+success rate, not this share, is the informative number.
+
+**Zero real shaders were lowered.** `gcn_to_msl.py` admits a program only through a per-shader
+ABI manifest (exact digest, named scalar views, stream bindings) and none exists for any retail
+member, so every decodable program is `blocked-no-abi-manifest`; inventing bindings is out of
+scope. Stage is the INF nibble label from filename co-occurrence, not verified semantics, and
+compressed members are classified, never decompressed. Evidence: the census is
+**STATIC_ANALYSIS_VERIFIED**, the tool self-test **FIXTURE_VERIFIED**; no Metal compile, no
+pipeline object, **G3 NOT RUN**. Private output `local/validation/msl-coverage/coverage.json`
+(+ `sample-512/`); full run log `local/validation/msl-coverage/REPORT.md`.
 
 ## Limits
 

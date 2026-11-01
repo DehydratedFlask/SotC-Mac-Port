@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 18:30 CDT (root) — real .csdr front-end coverage (STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01` coverage increment. `tools/dev/msl_corpus_coverage.py` samples the pinned private paks deterministically, reads each `.csdr` through the validated PSARC `MD5(path)` pairing, isolates every `OrbShdr` code span and asks the strict `gcn_inventory.decode()`. It never lowers, never executes and never invents an ABI.
+- **Population:** **34,291** unique `.csdr` (pak0 3,309 + pak1 2,512 + pakN 28,470).
+- **Sample 64** (verified by rerun to a fresh directory): 41 compressed-prefix (`8c06` 8, `8c0a` 33), 23 raw decode-error, **4 of 31 programs decoded**, **0 lowered**. **Sample 512:** 264 compressed-prefix, 244 raw decode-error, **74 of 367 programs decoded**, 4 members fully decodable, **0 lowered**.
+- **Top blockers (n=512):** `unsupported encoding` 235, `unsupported SMRD register/literal offset` 39, `unsupported VINTRP opcode 2` 10, `unsupported VOP3 opcode 349` 3.
+- **Zero real shaders lowered** — no per-shader ABI manifest exists, so every decodable program is `blocked-no-abi-manifest`. No bindings, names or semantics were guessed.
+- **Self-test:** 23 checks on synthetic spans (decodable span, trailing bytes after `s_endpgm`, compressed member, sampler determinism, missing-archive guard).
+- **Next exact action:** widen `gcn_inventory.OPCODES` (SOP2/SOPC/VOPC first, keep all-or-nothing decoding) and rerun `--sample 512 --overwrite`.
+- **Files:** `tools/dev/msl_corpus_coverage.py`, `docs/MSL_OFFLINE.md` (139 lines), private `local/validation/msl-coverage/`.
+
 ## 2026-11-01 18:05 CDT (root) — guest-address → native-entry map (STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01` continuation. `tools/lift/gen_entry_map.py` scans every `inline constexpr std::uint64_t k…Rva` in `native/core/` and `native/platform/` into `docs/entry_map.json`; `docs/ENTRY_MAP.md` explains what the numbers do and do not mean.
