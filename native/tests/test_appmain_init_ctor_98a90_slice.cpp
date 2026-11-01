@@ -2643,7 +2643,7 @@ int main() {
     CHECK(r.post_base_registry_tail.end_rva == 0x532b19);
     CHECK(r.post_base_registry_body.ok);
     CHECK(r.post_base_registry_body.unit_executed == kInit531d60PostBaseRegistryBodyUnitCount);
-    CHECK(kInit531d60PostBaseRegistryBodyUnitCount == 61);
+    CHECK(kInit531d60PostBaseRegistryBodyUnitCount == 64);
     CHECK(r.post_base_registry_body.call_54dc10_count == 1);
     CHECK(r.post_base_registry_body.mov_rbx_rax_count == 1);
     CHECK(r.post_base_registry_body.call_54dc20_count == 1);
@@ -2720,7 +2720,10 @@ int main() {
     CHECK(r.post_base_registry_body.mov_r14_mem_rsp20_532c02_count == 1);
     CHECK(r.post_base_registry_body.mov_edx_63647372_532c07_count == 1);
     CHECK(r.post_base_registry_body.mov_rdi_rax_mem_532c0c_count == 1);
-    CHECK(r.post_base_registry_body.end_rva == 0x532c0f);
+    CHECK(r.post_base_registry_body.lea_rsi_r14_3ec0_532c0f_count == 1);
+    CHECK(r.post_base_registry_body.mov_rax_rdi_mem_532c16_count == 1);
+    CHECK(r.post_base_registry_body.call_vslot70_532c19_count == 1);
+    CHECK(r.post_base_registry_body.end_rva == 0x532c1c);
     CHECK(r.post_base_registry_body.r13_from_r15_532bc4 == 0x113u);
     CHECK(r.post_base_registry_body.r12_from_cell == nullptr);
     CHECK(r.post_base_registry_body.r13_from_guard_cell ==

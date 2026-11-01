@@ -769,6 +769,15 @@ void run_remainder_after_registry_tail(
     if (out.post_base_registry_body.mov_rdi_rax_mem_532c0c_count == 1) {
         registry_hooks.merge_mov_rdi_rax_mem_532c0c_u1_ran = true;
     }
+    if (out.post_base_registry_body.lea_rsi_r14_3ec0_532c0f_count == 1) {
+        registry_hooks.merge_lea_rsi_r14_3ec0_532c0f_u1_ran = true;
+    }
+    if (out.post_base_registry_body.mov_rax_rdi_mem_532c16_count == 1) {
+        registry_hooks.merge_mov_rax_rdi_mem_532c16_u1_ran = true;
+    }
+    if (out.post_base_registry_body.call_vslot70_532c19_count == 1) {
+        registry_hooks.merge_vcall70_532c19_u1_ran = true;
+    }
     out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,
                                                      set_b, set_c, registry_hooks);
 }
