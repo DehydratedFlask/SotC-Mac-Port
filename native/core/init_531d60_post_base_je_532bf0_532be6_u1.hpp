@@ -3,7 +3,7 @@
 //   je 0x532bf0   ; skip call @ `0x532beb` when null
 //
 // After E603 `sub_eax_010cb932_532be1_u1` end @ `0x532be6`. Fall-through call is E605
-// `call_170c0_532beb_u1` @ `0x532beb` / E606 `mov_rdi_r12_532bf0_u1` @ `0x532bf0`. NOT modelled: tail @ `0x532bf3`.. G1 PARTIAL.
+// `call_170c0_532beb_u1` @ `0x532beb` / E606 `mov_rdi_r12_532bf0_u1` @ `0x532bf0` / E607 `call_170b0_532bf3_u1` @ `0x532bf3`. NOT modelled: tail @ `0x532bf8`.. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

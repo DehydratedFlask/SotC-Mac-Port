@@ -13,7 +13,7 @@ Init531d60PostBaseMovRdiR12_532bf0_U1Result init_531d60_post_base_mov_rdi_r12_53
     }
     ++out.mov_rdi_r12_532bf0_count;
 
-    // Next: call rel32 @ 0x532bf3 — not modelled here.
+    // Next: E607 call 0x170b0 @ 0x532bf3 — not modelled here.
     out.ok = (out.mov_rdi_r12_532bf0_count == 1);
     return out;
 }
