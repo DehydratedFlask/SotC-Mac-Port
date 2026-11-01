@@ -680,6 +680,7 @@ void run_remainder_after_registry_tail(
         registry_hooks.merge_add_rbx_58_532b8b_u1_ran = true;
         registry_hooks.merge_cmp_r15_rbx_532b8f_u1_ran = true;
         registry_hooks.merge_jne_532b80_532b92_u1_ran = true;
+        registry_hooks.merge_mov_rbx_r13_10_532b94_u1_ran = true;
     }
     out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,
                                                      set_b, set_c, registry_hooks);

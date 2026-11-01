@@ -1,8 +1,8 @@
 // Init `0x531d60` registry jne loop-back OBS `0x532b92..0x532b94` (2 B rel8):
 //   jne 0x532b80   ; ZF clear from cmp r15,rbx @ `0x532b8f`
 //
-// After E580 cmp @ `0x532b8f`. NOT modelled: fall-through @ `0x532b94..` or re-entry @
-// `0x532b80..`. G1 PARTIAL.
+// After E580 cmp @ `0x532b8f`. NOT modelled: re-entry @ `0x532b80..`. Fall-through mov @
+// `0x532b94..` peeled in E582 sibling. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
