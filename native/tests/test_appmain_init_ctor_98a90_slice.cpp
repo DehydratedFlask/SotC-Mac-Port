@@ -1697,6 +1697,7 @@ int main() {
     pbregbody.merge_lea_rbx_2efd160_532bb3_u1_ran = false;
     pbregbody.merge_mov_r14_mem_rsp10_532bba_u1_ran = false;
     pbregbody.merge_cmp_r13_r14_532bbf_u1_ran = false;
+    pbregbody.merge_je_532bcc_532bc2_u1_ran = false;
     alignas(16) static std::uint8_t registry_body_stack[0x200]{};
     pbregbody.stack_rsp = registry_body_stack;
     pbce.incoming_r13 = g_cont_e_r13;
@@ -2625,7 +2626,7 @@ int main() {
     CHECK(r.post_base_registry_tail.end_rva == 0x532b19);
     CHECK(r.post_base_registry_body.ok);
     CHECK(r.post_base_registry_body.unit_executed == kInit531d60PostBaseRegistryBodyUnitCount);
-    CHECK(kInit531d60PostBaseRegistryBodyUnitCount == 43);
+    CHECK(kInit531d60PostBaseRegistryBodyUnitCount == 44);
     CHECK(r.post_base_registry_body.call_54dc10_count == 1);
     CHECK(r.post_base_registry_body.mov_rbx_rax_count == 1);
     CHECK(r.post_base_registry_body.call_54dc20_count == 1);
@@ -2684,7 +2685,8 @@ int main() {
     CHECK(r.post_base_registry_body.lea_rbx_2efd160_532bb3_count == 1);
     CHECK(r.post_base_registry_body.mov_r14_mem_rsp10_532bba_count == 1);
     CHECK(r.post_base_registry_body.cmp_r13_r14_532bbf_count == 1);
-    CHECK(r.post_base_registry_body.end_rva == 0x532bc2);
+    CHECK(r.post_base_registry_body.je_532bcc_count == 1);
+    CHECK(r.post_base_registry_body.end_rva == 0x532bc4);
     CHECK(r.post_base_registry_body.r12_from_cell == nullptr);
     CHECK(r.post_base_registry_body.r13_from_guard_cell ==
           reinterpret_cast<void*>(&stack_guard_value_cell()));
