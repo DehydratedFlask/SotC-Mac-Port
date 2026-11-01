@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 06:50 CDT (root) — target 0xe1a5c0 lifted: container lookup (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_15e2028_slot70_e1a5c0.{hpp,cpp}` for slot `0x15e2028 + 0x70 -> 0xe1a5c0`.
+- **Body (151 B, pinned `b8b5e264…9fa6e`):** a lookup over `this` — null-key guard, `count == 0` guard (`this+0x10`), then for each element in the array at `this+0x8`: element key via slot `0x10`, exact **`strcmp`** (PLT `0xf8f490`, case-sensitive), element value via slot `0x18`, and on match a tail call through slot `0x20`; returns `1` when nothing matches.
+- **Model:** boundary guards, the scan, `strcmp` semantics, the value comparison and the match tail as a hook. Element slots are called once per scanned element, so a missing key/value hook fails visibly rather than skipping elements. Fixture: 7 cases (constants, null key, empty container, found-in-middle with scan count, key/value mismatch, case sensitivity, missing hooks). Mutation (bypassing the `strcmp` branch) fails the case-sensitivity check.
+- **Checker:** pins the scan anchors (guards, array/count loads, element loads, `ff 50 10`/`ff 50 18`/`ff 60 20`, loop back-edge, `mov $1` return, epilogue), verifies the body's **single** relative call resolves to `strcmp`, plus padding, slot qword, RELA `0x15e2098`, header constants, CMake and entry-map presence.
+- **Entry map:** regenerated to **1,425 constants / 970 RVAs / 378 headers**.
+- **Verification (PASSED):** build exit 0; CTest **510/510**; lift checkers **703 passed / 0 failed**.
+- **Next exact action:** `0xe19980` (`0xa2`), then `0xe21420` (`0x2a9`).
+
 ## 2026-11-02 06:00 CDT (root) — target 0xe16a00 lifted: dual-vcall forwarding (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_15f2f08_slot38_e16a00.{hpp,cpp}` for slot `0x15f2f08 + 0x38 -> 0xe16a00` (two call sites: `0xed171c`, `0xed1733`).

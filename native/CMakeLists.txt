@@ -2578,3 +2578,10 @@ target_link_libraries(sotc_vtable_15f2f08_slot38 PUBLIC sotc_core)
 add_executable(test_vtable_15f2f08_slot38 tests/test_vtable_15f2f08_slot38_e16a00.cpp)
 target_link_libraries(test_vtable_15f2f08_slot38 PRIVATE sotc_vtable_15f2f08_slot38)
 add_test(NAME vtable_15f2f08_slot38 COMMAND test_vtable_15f2f08_slot38)
+
+# CPU-01-AOT-CFG-SCALE-01: resolved lookup target 0xe1a5c0 (vtable 0x15e2028 slot 0x70).
+add_library(sotc_vtable_15e2028_slot70 STATIC core/vtable_15e2028_slot70_e1a5c0.cpp)
+target_link_libraries(sotc_vtable_15e2028_slot70 PUBLIC sotc_core)
+add_executable(test_vtable_15e2028_slot70 tests/test_vtable_15e2028_slot70_e1a5c0.cpp)
+target_link_libraries(test_vtable_15e2028_slot70 PRIVATE sotc_vtable_15e2028_slot70)
+add_test(NAME vtable_15e2028_slot70 COMMAND test_vtable_15e2028_slot70)
