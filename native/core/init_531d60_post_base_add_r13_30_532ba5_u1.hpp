@@ -1,7 +1,8 @@
 // Init `0x531d60` registry add r13 OBS `0x532ba5..0x532ba9` (4 B):
 //   add r13,0x30   ; epilogue / je @ `0x532ba5` merge target
 //
-// After E586 call @ `0x532ba0`. NOT modelled: `cmp r13,r14` @ `0x532ba9`. G1 PARTIAL.
+// After E586 call @ `0x532ba0`. Fall-through cmp is E588 `cmp_r13_r14_532ba9_u1`.
+// NOT modelled: `jne 0x532b70` @ `0x532bac`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

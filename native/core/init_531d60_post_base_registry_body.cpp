@@ -558,6 +558,24 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
         out.unit_counts[static_cast<std::size_t>(RegistryBodyUnit::add_r13_30_532ba5_u1)] = 1;
         ++out.unit_executed;
     }
+    if (!hooks.merge_cmp_r13_r14_532ba9_u1_ran) {
+        Init531d60PostBaseCmpR13R14_532ba9_U1Cells cells = hooks.cmp_r13_r14_532ba9_cells;
+        if (cells.r13_in == nullptr) {
+            cells.r13_in = out.r13_after_add_30;
+        }
+        if (cells.r14_in == nullptr) {
+            cells.r14_in = hooks.r14_in;
+        }
+        const Init531d60PostBaseCmpR13R14_532ba9_U1Result cmp =
+            init_531d60_post_base_cmp_r13_r14_532ba9_u1(cells);
+        if (!cmp.ok) {
+            return out;
+        }
+        out.cmp_r13_r14_532ba9_count = cmp.cmp_r13_r14_532ba9_count;
+        out.r13_r14_equal_532ba9 = cmp.pointers_equal;
+        out.unit_counts[static_cast<std::size_t>(RegistryBodyUnit::cmp_r13_r14_532ba9_u1)] = 1;
+        ++out.unit_executed;
+    }
     out.end_rva = kInit531d60PostBaseRegistryBodyEndRva;
     const int expected_call = hooks.merge_call_54dc10_532b19_u1_ran ? 0 : 1;
     const int expected_mov_rbx = hooks.merge_mov_rbx_rax_532b1e_u1_ran ? 0 : 1;
@@ -597,6 +615,7 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
     const int expected_mov_rdi_rbx_532b9d = hooks.merge_mov_rdi_rbx_532b9d_u1_ran ? 0 : 1;
     const int expected_call_170c0 = hooks.merge_call_170c0_532ba0_u1_ran ? 0 : 1;
     const int expected_add_r13_30_532ba5 = hooks.merge_add_r13_30_532ba5_u1_ran ? 0 : 1;
+    const int expected_cmp_r13_r14_532ba9 = hooks.merge_cmp_r13_r14_532ba9_u1_ran ? 0 : 1;
     const int expected_units = expected_call + expected_mov_rbx + expected_count + expected_mov_r15 +
                                expected_mov_rsi + expected_mov_edx + expected_fill + expected_lea_rbx +
                                expected_mov_r13 + expected_mov_r12 + expected_cmp + expected_je +
@@ -608,7 +627,8 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
                                expected_add_rbx_58 + expected_cmp_r15_rbx + expected_jne_532b80 +
                                expected_mov_rbx_r13_532b94 + expected_test_rbx_rbx +
                                expected_je_532ba5 + expected_mov_rdi_rbx_532b9d +
-                               expected_call_170c0 + expected_add_r13_30_532ba5;
+                               expected_call_170c0 + expected_add_r13_30_532ba5 +
+                               expected_cmp_r13_r14_532ba9;
     out.ok = (out.unit_executed == expected_units) && (out.call_54dc10_count == expected_call) &&
              (out.mov_rbx_rax_count == expected_mov_rbx) &&
              (out.call_54dc20_count == expected_count) &&
@@ -644,7 +664,8 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
              (out.je_532ba5_count == expected_je_532ba5) &&
              (out.mov_rdi_rbx_532b9d_count == expected_mov_rdi_rbx_532b9d) &&
              (out.call_170c0_count == expected_call_170c0) &&
-             (out.add_r13_30_532ba5_count == expected_add_r13_30_532ba5);
+             (out.add_r13_30_532ba5_count == expected_add_r13_30_532ba5) &&
+             (out.cmp_r13_r14_532ba9_count == expected_cmp_r13_r14_532ba9);
     return out;
 }
 

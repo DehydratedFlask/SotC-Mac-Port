@@ -697,6 +697,9 @@ void run_remainder_after_registry_tail(
     if (out.post_base_registry_body.add_r13_30_532ba5_count == 1) {
         registry_hooks.merge_add_r13_30_532ba5_u1_ran = true;
     }
+    if (out.post_base_registry_body.cmp_r13_r14_532ba9_count == 1) {
+        registry_hooks.merge_cmp_r13_r14_532ba9_u1_ran = true;
+    }
     out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,
                                                      set_b, set_c, registry_hooks);
 }
