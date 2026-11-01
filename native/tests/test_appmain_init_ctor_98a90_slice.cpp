@@ -1702,6 +1702,7 @@ int main() {
     pbregbody.merge_call_170c0_532bc7_u1_ran = false;
     pbregbody.merge_mov_rdi_mem_r12_20_532bcc_u1_ran = false;
     pbregbody.merge_test_rdi_rdi_532bd1_u1_ran = false;
+    pbregbody.merge_je_532bdb_532bd4_u1_ran = false;
     alignas(16) static std::uint8_t registry_body_stack[0x200]{};
     pbregbody.stack_rsp = registry_body_stack;
     pbce.incoming_r13 = g_cont_e_r13;
@@ -2630,7 +2631,7 @@ int main() {
     CHECK(r.post_base_registry_tail.end_rva == 0x532b19);
     CHECK(r.post_base_registry_body.ok);
     CHECK(r.post_base_registry_body.unit_executed == kInit531d60PostBaseRegistryBodyUnitCount);
-    CHECK(kInit531d60PostBaseRegistryBodyUnitCount == 48);
+    CHECK(kInit531d60PostBaseRegistryBodyUnitCount == 49);
     CHECK(r.post_base_registry_body.call_54dc10_count == 1);
     CHECK(r.post_base_registry_body.mov_rbx_rax_count == 1);
     CHECK(r.post_base_registry_body.call_54dc20_count == 1);

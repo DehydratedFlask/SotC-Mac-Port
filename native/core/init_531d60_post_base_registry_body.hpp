@@ -1,4 +1,4 @@
-// Init `0x531d60` registry fragment body — OBS @ `0x532b19..0x532bd4` (48 units after E598 peel).
+// Init `0x531d60` registry fragment body — OBS @ `0x532b19..0x532bd6` (49 units after E599 peel).
 #pragma once
 
 #include <array>
@@ -46,6 +46,7 @@
 #include "init_531d60_post_base_call_170c0_532bc7_u1.hpp"
 #include "init_531d60_post_base_mov_rdi_mem_r12_20_532bcc_u1.hpp"
 #include "init_531d60_post_base_test_rdi_rdi_532bd1_u1.hpp"
+#include "init_531d60_post_base_je_532bdb_532bd4_u1.hpp"
 #include "init_531d60_post_base_mov_r12_rbx_532b41_u1.hpp"
 #include "init_531d60_post_base_mov_r13_15fe518_532b3a_u1.hpp"
 #include "init_531d60_post_base_call_54dc10_532b19_u1.hpp"

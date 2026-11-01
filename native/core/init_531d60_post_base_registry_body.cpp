@@ -729,6 +729,23 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
         out.unit_counts[static_cast<std::size_t>(RegistryBodyUnit::test_rdi_rdi_532bd1_u1)] = 1;
         ++out.unit_executed;
     }
+    if (!hooks.merge_je_532bdb_532bd4_u1_ran) {
+        Init531d60PostBaseJe532bdb_532bd4_U1Cells cells = hooks.je_532bdb_532bd4_cells;
+        if (!cells.rdi_is_zero_known) {
+            cells.rdi_is_zero = out.rdi_is_zero;
+            cells.rdi_is_zero_known = (out.test_rdi_rdi_count == 1);
+        }
+        const Init531d60PostBaseJe532bdb_532bd4_U1Result je =
+            init_531d60_post_base_je_532bdb_532bd4_u1(cells);
+        if (!je.ok) {
+            return out;
+        }
+        out.je_532bdb_count = je.je_532bdb_count;
+        out.je_532bdb_branch_taken = je.branch_taken;
+        out.je_532bdb_branch_outcome_modelled = je.branch_outcome_modelled;
+        out.unit_counts[static_cast<std::size_t>(RegistryBodyUnit::je_532bdb_532bd4_u1)] = 1;
+        ++out.unit_executed;
+    }
     out.end_rva = kInit531d60PostBaseRegistryBodyEndRva;
     const int expected_call = hooks.merge_call_54dc10_532b19_u1_ran ? 0 : 1;
     const int expected_mov_rbx = hooks.merge_mov_rbx_rax_532b1e_u1_ran ? 0 : 1;
@@ -786,6 +803,8 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
         hooks.merge_mov_rdi_mem_r12_20_532bcc_u1_ran ? 0 : 1;
     const int expected_test_rdi_rdi =
         hooks.merge_test_rdi_rdi_532bd1_u1_ran ? 0 : 1;
+    const int expected_je_532bdb =
+        hooks.merge_je_532bdb_532bd4_u1_ran ? 0 : 1;
     const int expected_units = expected_call + expected_mov_rbx + expected_count + expected_mov_r15 +
                                expected_mov_rsi + expected_mov_edx + expected_fill + expected_lea_rbx +
                                expected_mov_r13 + expected_mov_r12 + expected_cmp + expected_je +
@@ -803,7 +822,8 @@ Init531d60PostBaseRegistryBodyResult init_531d60_post_base_registry_body(
                                expected_mov_r14_rsp10_532bba + expected_cmp_r13_r14_532bbf +
                                expected_je_532bcc + expected_mov_r13_r15 +
                                expected_call_170c0_532bc7 + expected_mov_rdi_mem_r12_20_532bcc +
-                               expected_test_rdi_rdi;
+                               expected_test_rdi_rdi + expected_je_532bdb +
+                               expected_mov_rax_rdi_mem_532bd6;
     out.ok = (out.unit_executed == expected_units) && (out.call_54dc10_count == expected_call) &&
              (out.mov_rbx_rax_count == expected_mov_rbx) &&
              (out.call_54dc20_count == expected_count) &&
