@@ -1,7 +1,7 @@
 // Init `0x531d60` registry mov r13,r15 OBS `0x532bc4..0x532bc7` (3 B):
 //   mov r13,r15   ; fall-through after je @ `0x532bc2` when r13 != r14 @ `0x532bbf`
 //
-// After E594 je @ `0x532bc2`. NOT modelled: call @ `0x532bc7..`. G1 PARTIAL.
+// After E594 je @ `0x532bc2`. NOT modelled: E596 call @ `0x532bc7` / tail @ `0x532bcc..`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

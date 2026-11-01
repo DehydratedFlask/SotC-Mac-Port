@@ -12,7 +12,7 @@ Init531d60PostBaseMovR13R15_532bc4_U1Result init_531d60_post_base_mov_r13_r15_53
     }
     ++out.mov_r13_r15_count;
 
-    // Next: call 0x170c0 @ 0x532bc7 — not modelled here.
+    // Next: E596 call 0x170c0 @ 0x532bc7 — not modelled here.
     out.ok = (out.mov_r13_r15_count == 1);
     return out;
 }
