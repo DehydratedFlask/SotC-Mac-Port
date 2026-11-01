@@ -25,16 +25,19 @@ import struct
 import sys
 
 ISA_URL = 'https://docs.amd.com/v/u/en-US/sea-islands-instruction-set-architecture_0'
-VERSION = 'gfx7-bounded-inventory-v2'
+VERSION = 'gfx7-bounded-inventory-v3'
 
 # These are encoding facts, not a translation/semantic implementation.
 # SOP2/SOPC/VOPC rows below are opcode-value facts from the GFX7 ISA tables,
 # cross-checked against the pinned `reference/` decoder. Values the ISA marks reserved
 # (SOP2 12/13) and control-transfer/VI-only rows are not listed, so they still reject:
 # s_cbranch_g_fork (SOP2 43), s_setvskip (SOPC 16), s_memtime / s_dcache_inv (SMRD 29..31)
-# carry no destination or rely on later ISAs.
+# carry no destination or rely on later ISAs. SOPP 5 `s_cbranch_scc1` is a branch for the
+# same reason: a linear span decoder cannot state where control resumes, so control transfer
+# stays out of the table (only s_endpgm/s_waitcnt/s_ttracedata are SOPP rows).
 OPCODES = {
-    'SOP1': {3: 's_mov_b32', 4: 's_mov_b64', 10: 's_wqm_b64'},
+    'SOP1': {3: 's_mov_b32', 4: 's_mov_b64', 10: 's_wqm_b64',
+             36: 's_and_saveexec_b64'},
     'SOP2': {0: 's_add_u32', 1: 's_sub_u32', 2: 's_add_i32', 3: 's_sub_i32',
              4: 's_addc_u32', 5: 's_subb_u32', 6: 's_min_i32', 7: 's_min_u32',
              8: 's_max_i32', 9: 's_max_u32', 10: 's_cselect_b32', 11: 's_cselect_b64',
@@ -58,10 +61,11 @@ OPCODES = {
              8: 's_buffer_load_dword', 9: 's_buffer_load_dwordx2',
              10: 's_buffer_load_dwordx4', 11: 's_buffer_load_dwordx8',
              12: 's_buffer_load_dwordx16'},
-    'VOP1': {1: 'v_mov_b32', 46: 'v_rsq_f32'},
-    'VOP2': {4: 'v_sub_f32', 8: 'v_mul_f32', 31: 'v_mac_f32',
-             47: 'v_cvt_pkrtz_f16_f32'},
-    'VOP3': {264: 'v_mul_f32', 303: 'v_cvt_pkrtz_f16_f32', 321: 'v_mad_f32'},
+    'VOP1': {1: 'v_mov_b32', 36: 'v_floor_f32', 46: 'v_rsq_f32'},
+    'VOP2': {3: 'v_add_f32', 4: 'v_sub_f32', 8: 'v_mul_f32', 22: 'v_lshrrev_b32',
+             31: 'v_mac_f32', 37: 'v_add_i32', 47: 'v_cvt_pkrtz_f16_f32'},
+    'VOP3': {264: 'v_mul_f32', 303: 'v_cvt_pkrtz_f16_f32', 321: 'v_mad_f32',
+             322: 'v_mad_i32_i24', 349: 'v_sad_u32'},
     'VOPC': {0: 'v_cmp_f_f32', 1: 'v_cmp_lt_f32', 2: 'v_cmp_eq_f32',
              3: 'v_cmp_le_f32', 4: 'v_cmp_gt_f32', 5: 'v_cmp_lg_f32',
              6: 'v_cmp_ge_f32', 7: 'v_cmp_o_f32', 8: 'v_cmp_u_f32',
@@ -75,7 +79,8 @@ OPCODES = {
              28: 'v_cmpx_nle_f32', 29: 'v_cmpx_neq_f32', 30: 'v_cmpx_nlt_f32',
              31: 'v_cmpx_t_f32'},
     'VINTRP': {0: 'v_interp_p1_f32', 1: 'v_interp_p2_f32'},
-    'MUBUF': {1: 'buffer_load_format_xy', 2: 'buffer_load_format_xyz',
+    'MUBUF': {0: 'buffer_load_format_x', 1: 'buffer_load_format_xy',
+              2: 'buffer_load_format_xyz',
               3: 'buffer_load_format_xyzw'},
     'MIMG': {32: 'image_sample'},
     'EXP': {0: 'exp'},
@@ -89,6 +94,17 @@ SOP2_SRC0_64 = frozenset((11, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 41, 42
 SOP2_SRC1_64 = frozenset((11, 15, 17, 19, 21, 23, 25, 27, 29))
 # SOPC opcodes whose first source is a 64-bit pair (the second is the bit index).
 SOPC_64BIT_SRC0 = frozenset((14, 15))
+# SOP1 rows whose destination and first source are 64-bit pairs (index 36 saves EXEC into
+# SDST and masks EXEC with SRC0, so both operands are wide).
+SOP1_64BIT = frozenset((4, 10, 36))
+# VOP3 rows that read all three source fields; every other modelled VOP3 row reads two.
+VOP3_THREE_SOURCE = frozenset((321, 322, 349))
+# VOP3 ABS/CLAMP/OMOD/NEG modulate floating-point results only. On an integer row the ISA
+# defines none of them, so a nonzero value is a shape this decoder does not model rather
+# than a fold to guess.
+VOP3_INTEGER = frozenset((322, 349))
+# VOP2 integer add writes its carry out to VCC; the VOP2 form has no SDST field to name it.
+VOP2_WRITES_VCC = frozenset((37,))
 
 # mask, tag, opcode shift, opcode mask, fixed dword count. Specific
 # encodings precede VOP2 (which otherwise also matches VOP1/VOPC).
@@ -195,12 +211,14 @@ def _validate(form: str, op: int, f: dict[str, int], at: int) -> tuple[str, ...]
     if form == 'SOP1':
         require(_register(f['sdst']), 'unsupported scalar destination')
         require(_source(f['src0']), 'reserved/unsupported scalar source')
-        if op in (4, 10):
+        if op in SOP1_64BIT:
             require(f['sdst'] % 2 == 0 and f['sdst'] != 124, 'invalid 64-bit destination pair')
             if f['src0'] < 128:
                 require(f['src0'] % 2 == 0 and f['src0'] != 124, 'invalid 64-bit source pair')
         if op == 10:
             requirements.add('whole_quad_mode')
+        if op == 36:
+            requirements.update(('reads_exec_mask', 'writes_exec_mask'))
         if f['sdst'] in (126, 127):
             requirements.add('writes_exec_mask')
         if f['src0'] in (126, 127, 252):
@@ -274,12 +292,17 @@ def _validate(form: str, op: int, f: dict[str, int], at: int) -> tuple[str, ...]
             if f[name] in (106, 107, 251):
                 requirements.add('reads_vcc_mask')
         if form == 'VOP3':
-            used = names if op == 321 else names[:2]
+            used = names if op in VOP3_THREE_SOURCE else names[:2]
+            if op in VOP3_INTEGER:
+                require(not (f['abs'] or f['clamp'] or f['omod'] or f['neg']),
+                        'floating-point modifier field set on an integer VOP3 instruction')
             # GFX7's scalar read-port restriction applies to the actual operands.
             sgprs = {f[n] for n in used if f[n] < 128}
             require(len(sgprs) <= 1, 'multiple distinct scalar sources in VOP3')
             # Unused source/control bits are retained in the inventory; they are
             # not reinterpreted as an instruction or discarded as extra dwords.
+        if form == 'VOP2' and op in VOP2_WRITES_VCC:
+            requirements.add('writes_vcc_mask')
         if (op == 47 and form == 'VOP2') or (op == 303 and form == 'VOP3'):
             requirements.add('fp16_round_toward_zero')
     elif form == 'VOPC':

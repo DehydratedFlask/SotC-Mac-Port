@@ -197,10 +197,54 @@ class EncodingOracleTests(unittest.TestCase):
         self.assertEqual(one(exp()).fields, dict(en=15, target=12, compr=0, done=1,
                          vm=0, vsrc0=3, vsrc1=5, vsrc2=7, vsrc3=9))
 
+    def test_integer_vector_rows(self):
+        # VOP2 37 writes its carry out to VCC (the VOP2 form has no SDST field to name);
+        # 22 is the reversed-shift row and 3 the f32 add. VOP1 36 is a one-source rounding row.
+        i = one(vop2(op=37, dst=9, src1=5, src0=257))
+        self.assertEqual((i.encoding, i.opcode, i.mnemonic, i.size),
+                         ('VOP2', 37, 'v_add_i32', 4))
+        self.assertEqual(i.fields, dict(src0=257, vsrc1=5, vdst=9))
+        self.assertEqual(i.requirements, ('writes_vcc_mask',))
+        i = one(vop2(op=22, dst=4, src1=6, src0=8))
+        self.assertEqual((i.mnemonic, i.requirements), ('v_lshrrev_b32', ()))
+        i = one(vop2(op=3, dst=4, src1=6, src0=8))
+        self.assertEqual((i.mnemonic, i.requirements), ('v_add_f32', ()))
+        i = one(vop1(op=36, dst=11, src=272))
+        self.assertEqual((i.encoding, i.mnemonic, i.fields),
+                         ('VOP1', 'v_floor_f32', dict(src0=272, vdst=11)))
+
+    def test_vop3_three_source_integer_rows(self):
+        i = one(vop3(op=349, dst=11, src0=267, src1=128, src2=269,
+                     abs_=0, clamp=0, omod=0, neg=0))
+        self.assertEqual((i.encoding, i.opcode, i.mnemonic, i.size),
+                         ('VOP3', 349, 'v_sad_u32', 8))
+        self.assertEqual(i.fields, dict(vdst=11, abs=0, clamp=0, src0=267, src1=128,
+                                        src2=269, omod=0, neg=0))
+        i = one(vop3(op=322, dst=12, src0=266, src1=267, src2=268,
+                     abs_=0, clamp=0, omod=0, neg=0))
+        self.assertEqual((i.mnemonic, i.fields['src2']), ('v_mad_i32_i24', 268))
+        # The third source really is read: a VGPR and an inline constant both decode.
+        self.assertEqual(one(vop3(op=349, src0=257, src1=258, src2=190,
+                                  abs_=0, clamp=0, omod=0, neg=0)).fields['src2'], 190)
+
+    def test_saveexec_and_single_format_fetch(self):
+        i = one(sop1(op=36, dst=8, src=10))
+        self.assertEqual((i.encoding, i.opcode, i.mnemonic),
+                         ('SOP1', 36, 's_and_saveexec_b64'))
+        self.assertEqual(i.fields, dict(src0=10, sdst=8))
+        self.assertEqual(i.requirements, ('reads_exec_mask', 'writes_exec_mask'))
+        # Saving and masking EXEC can never be a per-lane conversion.
+        self.assertFalse(gcn.inventory(sop1(op=36, dst=8, src=10) + END)['per_lane_eligible'])
+        i = one(mubuf(op=0))
+        self.assertEqual((i.mnemonic, i.fields['components']), ('buffer_load_format_x', 1))
+        # One component is the only row that may end on the last VGPR.
+        self.assertEqual(one(mubuf(op=0, data=255)).fields['vdata'], 255)
+
     def test_every_supported_opcode(self):
         # Deliberately does not enumerate the decoder's OPCODES table.
         families = [
-            (sop1, [(3, 's_mov_b32'), (4, 's_mov_b64'), (10, 's_wqm_b64')]),
+            (sop1, [(3, 's_mov_b32'), (4, 's_mov_b64'), (10, 's_wqm_b64'),
+                    (36, 's_and_saveexec_b64')]),
             (sop2, [(0, 's_add_u32'), (14, 's_and_b32'), (38, 's_mul_i32'),
                     (42, 's_bfe_i64'), (44, 's_absdiff_i32')]),
             (sopc, [(0, 's_cmp_eq_i32'), (9, 's_cmp_ge_u32'), (12, 's_bitcmp0_b32'),
@@ -211,14 +255,17 @@ class EncodingOracleTests(unittest.TestCase):
                     (8, 's_buffer_load_dword'), (9, 's_buffer_load_dwordx2'),
                     (10, 's_buffer_load_dwordx4'), (11, 's_buffer_load_dwordx8'),
                     (12, 's_buffer_load_dwordx16')]),
-            (vop1, [(1, 'v_mov_b32'), (46, 'v_rsq_f32')]),
-            (vop2, [(4, 'v_sub_f32'), (8, 'v_mul_f32'), (31, 'v_mac_f32'),
+            (vop1, [(1, 'v_mov_b32'), (36, 'v_floor_f32'), (46, 'v_rsq_f32')]),
+            (vop2, [(3, 'v_add_f32'), (4, 'v_sub_f32'), (8, 'v_mul_f32'),
+                    (22, 'v_lshrrev_b32'), (31, 'v_mac_f32'), (37, 'v_add_i32'),
                     (47, 'v_cvt_pkrtz_f16_f32')]),
-            (vop3, [(264, 'v_mul_f32'), (303, 'v_cvt_pkrtz_f16_f32'), (321, 'v_mad_f32')]),
+            (vop3, [(264, 'v_mul_f32'), (303, 'v_cvt_pkrtz_f16_f32'), (321, 'v_mad_f32'),
+                    (322, 'v_mad_i32_i24'), (349, 'v_sad_u32')]),
             (vopc, [(0, 'v_cmp_f_f32'), (15, 'v_cmp_t_f32'),
                     (16, 'v_cmpx_f_f32'), (31, 'v_cmpx_t_f32')]),
             (vintrp, [(0, 'v_interp_p1_f32'), (1, 'v_interp_p2_f32')]),
-            (mubuf, [(1, 'buffer_load_format_xy'), (2, 'buffer_load_format_xyz'),
+            (mubuf, [(0, 'buffer_load_format_x'), (1, 'buffer_load_format_xy'),
+                     (2, 'buffer_load_format_xyz'),
                      (3, 'buffer_load_format_xyzw')]),
             (mimg, [(32, 'image_sample')]),
         ]
@@ -228,6 +275,8 @@ class EncodingOracleTests(unittest.TestCase):
                     kw = dict(src=8) if make is sop1 else {}
                     if make is smrd:
                         kw = dict(dst=0, base=0)
+                    if make is vop3 and op in (322, 349):
+                        kw = dict(abs_=0, clamp=0, omod=0, neg=0)
                     self.assertEqual(one(make(op=op, **kw)).mnemonic, name)
         self.assertEqual(one(exp()).mnemonic, 'exp')
         self.assertEqual(gcn.decode(END)[0].mnemonic, 's_endpgm')
@@ -338,6 +387,36 @@ class RejectionTests(unittest.TestCase):
                   smrd(op=12, dst=96), smrd(op=8, base=1), smrd(op=2, dst=13),
                   smrd(imm=0, offset=104), smrd(imm=0, offset=254)):
             self.reject(p+END)
+
+    def test_integer_vop3_modifier_and_wide_operand_limits(self):
+        # The ISA defines no ABS/CLAMP/OMOD/NEG on integer VOP3 rows, so a nonzero field is
+        # rejected rather than folded away.
+        for kw in (dict(abs_=1), dict(abs_=4), dict(clamp=1), dict(omod=1), dict(neg=2)):
+            for op in (322, 349):
+                with self.subTest(op=op, kw=kw):
+                    self.reject(vop3(op=op, **kw)+END, 'modifier field')
+        # Three distinct scalar sources exceed the GFX7 read ports on the new rows too, and
+        # VOP3 still has no inline literal (selector 255 is not a source).
+        self.reject(vop3(op=349, src0=4, src1=6, src2=8, abs_=0, clamp=0, omod=0, neg=0)+END,
+                    'multiple distinct scalar sources')
+        self.reject(vop3(op=322, src0=255, abs_=0, clamp=0, omod=0, neg=0)+END)
+        self.reject(vop3(op=349, src1=254, abs_=0, clamp=0, omod=0, neg=0)+END)
+        # s_and_saveexec_b64 keeps the 64-bit pair rules, and the one-format fetch keeps
+        # the VGPR range rule.
+        for p in (sop1(op=36, dst=7, src=8), sop1(op=36, dst=124, src=8),
+                  sop1(op=36, dst=8, src=9)):
+            self.reject(p+END)
+        self.reject(mubuf(op=0, offen=1, idxen=1, addr=255)+END)
+
+    def test_nearby_rows_stay_unsupported(self):
+        # Neighbours that are NOT modelled keep rejecting: the integer VOP rows either side,
+        # SOPP 5 `s_cbranch_scc1` (control transfer), the MUBUF/MIMG store rows.
+        for p in (vop2(op=38), vop2(op=40), vop1(op=37),
+                  vop3(op=323, abs_=0, clamp=0, omod=0, neg=0),
+                  vop3(op=350, abs_=0, clamp=0, omod=0, neg=0),
+                  sop1(op=35), sopp(op=2), sopp(op=5), sopp(op=8),
+                  mubuf(op=4), mubuf(op=28), mimg(op=8)):
+            self.reject(p+END, 'unsupported')
 
     def test_one_inline_literal_per_instruction(self):
         # Two 255 selectors cannot both consume the single following dword.

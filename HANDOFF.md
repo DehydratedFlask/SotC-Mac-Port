@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 19:20 CDT (root) — GFX7 decoder v3 + coverage ceiling re-measured (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01`, second decoder card (attempt 2). v3 adds VOP2 3/22/37, VOP1 36, VOP3 322/349 (three-source read-port rule), SOP1 36 (`s_and_saveexec_b64`, 64-bit SDST/SRC0 pairs) and MUBUF 0 (`buffer_load_format_x`, 1 component).
+- **Verified by rerun at sample 512:** decoded programs **75/367** (+1, lost 0), instructions **654**, per-lane eligible 73/75, 4 members all-decodable, **0 lowered**.
+- **New blockers:** `MUBUF 14` 111, `VOPC 209` 65, `VOPC 212` 51, `VINTRP 2` 48, `SOPP 5` 5, then singles.
+- **Bigger finding:** **264 of the 512 sampled members (52%) are compressed-prefix `8c06`/`8c0a`** and cannot be read at all by the current container reader. That is a larger ceiling than any single opcode, so the next card should target the compressed `.csdr` container before more decoder rows.
+- **Skipped deliberately:** SOPP 5 `s_cbranch_scc1` (control transfer — a linear decoder would invent fall-through), VINTRP 2 (needs a matching lowering change), VOPC integer compares, MUBUF 12/14/15, MIMG 8.
+- **No mis-lowering admitted:** `gcn_to_msl.py` still rejects all eight new mnemonics by name.
+- **Tests (PASSED):** `test_gcn_inventory.py` 35, `test_gcn_to_msl.py` 23, coverage self-test 23.
+- **Security note:** the second-card worker reported that `reference/shadPS4/AGENTS.md` contains prompt-injection text (demands to run `gh`/`git` permission checks and create `i-didnt-check-my-work.md`). It was treated as untrusted reference content and ignored. Verified: no such file exists in the repo and `git status` shows only the three intended files.
+
 ## 2026-11-01 18:55 CDT (root) — GFX7 decoder widened to v2 (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `GPU-01-MSL-OFFLINE-01`, decoder widening (attempt 1). `tools/dev/gcn_inventory.py` v2 adds SOP2 (0-11, 14-42, 44 with correct 64-bit operand classes), SOPC (0-15, `writes_scc`), VOPC f32 (0-15 compare, 16-31 cmpx with EXEC tagging) and SMRD op 8/9/12 plus the `IMM=0`/`OFFSET=255` literal form. All-or-nothing decoding is unchanged.

@@ -139,13 +139,32 @@ python3 -I tools/dev/msl_corpus_coverage.py --sample 512 --overwrite --out local
 | first-failure `unsupported encoding` | 235 | **0** |
 | first-failure median byte offset | `0x20` | `0x28` |
 
-No additional program decodes yet: the newly accepted words sit in programs that hit an unmodelled
-opcode a few dwords later. New top blockers: `unsupported VOP3 opcode 349` 179, `VOP2 opcode 37`
-53, `VINTRP opcode 2` 48, `SOPP opcode 5` 5 (a branch). A private simulation adding those plus
-SOP1 36/MUBUF 0/VOP1 36 also decoded only 74: those programs next need MUBUF stores and VOPC
-integer compares, so the next step is a wider table, not one more opcode. Decode success is
-**STATIC_ANALYSIS_VERIFIED** and says nothing about Metal behaviour; the 30 decoder tests are
-**FIXTURE_VERIFIED**; nothing was lowered or executed.
+No additional program decoded: the newly accepted words sit in programs that hit an unmodelled
+opcode a few dwords later. New top blockers were VOP3 349 179, VOP2 37 53, VINTRP 2 48 and SOPP 5
+5 (a branch). **STATIC_ANALYSIS_VERIFIED**; decode says nothing about Metal behaviour; no lowering.
+
+## Decoder widening 2 (VOP2 / VOP1 / SOP1 / VOP3 integer rows)
+
+v3 adds VOP2 3/22/37 (`v_add_f32`, `v_lshrrev_b32`, `v_add_i32` + its VCC carry write), VOP1 36
+`v_floor_f32`, SOP1 36 `s_and_saveexec_b64` (64-bit pair, EXEC read+write), VOP3 322/349
+(`v_mad_i32_i24`, `v_sad_u32`: three real sources; ABS/CLAMP/OMOD/NEG are f32-only, and an integer
+row setting any of them is rejected) and MUBUF 0 `buffer_load_format_x`. Skipped: SOPP 5
+`s_cbranch_scc1` is control transfer (a linear decoder would invent fall-through) and VINTRP 2
+still, because `gcn_to_msl.py` models every VINTRP as P1/P2.
+
+```sh
+python3 -I tools/dev/msl_corpus_coverage.py --sample 512 --overwrite --out local/validation/msl-coverage/after-opcodes-2
+```
+
+| Sample 512 | v2 | v3 |
+|---|---:|---:|
+| programs decoded / attempted | 74 / 367 | **75 / 367** |
+| instructions / per-lane eligible | 577 / 73 of 74 | **654 / 73 of 75** |
+
+Only `standard_2874784413` (392 B, 77 instructions) is new. Next blockers, no targeted row left:
+MUBUF 14 `buffer_load_dwordx4` 111, VOPC 209 65, VOPC 212 51 (integer `v_cmpx_*`), VINTRP 2 48,
+SOPP 5 5. Nothing is lowered: `gcn_to_msl.py` rejects all eight new mnemonics by name. 35 decoder
+tests **FIXTURE_VERIFIED**, census **STATIC_ANALYSIS_VERIFIED**, G3 NOT RUN.
 
 ## Limits
 
