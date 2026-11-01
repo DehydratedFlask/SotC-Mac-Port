@@ -1,7 +1,7 @@
 // Init `0x531d60` registry test r13,r13 OBS `0x532bbf..0x532bc2` (3 B):
 //   test r13,r13  ; epilogue after mov r14,[rsp+0x10] @ `0x532bba` (`4d 85 ed`)
 //
-// After E592 mov @ `0x532bba`. NOT modelled: E594 je @ `0x532bc2` / tail @ `0x532bc4..`. G1 PARTIAL.
+// After E592 mov @ `0x532bba`. NOT modelled: E594 je @ `0x532bc2` / E595 mov @ `0x532bc4` / tail @ `0x532bc7..`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

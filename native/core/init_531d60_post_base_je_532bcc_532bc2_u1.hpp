@@ -1,7 +1,7 @@
 // Init `0x531d60` registry je r13-null skip OBS `0x532bc2..0x532bc4` (2 B rel8):
 //   je 0x532bcc   ; ZF from test r13,r13 @ `0x532bbf`
 //
-// After E593 test @ `0x532bbf`. NOT modelled: tail @ `0x532bc4..`. G1 PARTIAL.
+// After E593 cmp @ `0x532bbf`. NOT modelled: E595 mov @ `0x532bc4` / tail @ `0x532bc7..`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
