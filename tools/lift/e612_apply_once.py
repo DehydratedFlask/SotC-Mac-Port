@@ -26,7 +26,7 @@ def write(path: str, text: str) -> None:
 
 
 def region_sha() -> str:
-    START, SIZE = 0x532B19, 243
+    START, SIZE = 0x532B19, 246
     PEEL_MOV_RAX_RDI = bytes.fromhex("488b07")
     PEEL_MOV_R13_8_RAX = bytes.fromhex("48894508")
     PEEL_LEA = bytes.fromhex("488d742410")

@@ -7,7 +7,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import ps4_dynlink as d
 ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
 START, SIZE, END = 0x532B19, 246, 0x532C0F
-REGION_SHA256 = "bf9447bd8a7769b1d90f741b931ebf81dcfcfbef727fc85e2c7b7bc20baee95e"
+REGION_SHA256 = "e68472ebb732fbb6712db3e814a9293efb08e4d0f17ab472c24965ad6d882873"
 PEEL_MOV_RAX_RDI = bytes.fromhex("488b07")
 PEEL_MOV_R13_8_RAX = bytes.fromhex("48894508")
 PEEL_LEA = bytes.fromhex("488d742410")
