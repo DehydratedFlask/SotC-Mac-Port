@@ -93,6 +93,11 @@ Population 34,291 `.csdr` (pak0 3,309 + pak1 2,512 + pakN 28,470; all unique pat
 sample is **64**, deterministic even spacing `round(i*(N-1)/(k-1))` over the `(path, archive)`-
 sorted list (first and last included, implied stride 535.8); the 512 run uses the same rule.
 
+The compressed-prefix class is a known, older ceiling: E626 recorded **19,320** compressed-prefix
+members rejected by the raw container reader across the whole corpus (see `docs/EVIDENCE.md`), and
+no decompressor exists in this repository. It is therefore larger than any single decoder row, and
+widening the opcode table cannot reach those members at all.
+
 | Sample | compressed-prefix | raw, decode-error | raw, all programs decode | lowered |
 |---:|---:|---:|---:|---:|
 | 64 | 41 | 23 | 0 | **0** |
