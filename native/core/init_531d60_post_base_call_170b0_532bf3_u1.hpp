@@ -1,7 +1,7 @@
 // Init `0x531d60` registry call 0x170b0 OBS `0x532bf3..0x532bf8` (5 B rel32):
 //   call 0x170b0   ; tag-1 free(rdi) after mov rdi,r12 @ je merge `0x532be6`
 //
-// After E606 mov @ `0x532bf0`. NOT modelled: E608 mov @ `0x532bf8` / E609 lea @ `0x532bfb` / E610 mov @ `0x532c02` / tail @ `0x532c07`.. G1 PARTIAL.
+// After E606 mov @ `0x532bf0`. NOT modelled: E608 mov @ `0x532bf8` / E609 lea @ `0x532bfb` / E610 mov @ `0x532c02` / E611 mov edx @ `0x532c07` / tail @ `0x532c0c`.. G1 PARTIAL.
 #pragma once
 
 #include "alloc_wrappers_17070.hpp"

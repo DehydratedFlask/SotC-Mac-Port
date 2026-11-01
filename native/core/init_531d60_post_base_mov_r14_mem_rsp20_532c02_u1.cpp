@@ -16,7 +16,7 @@ Init531d60PostBaseMovR14MemRsp20_532c02_U1Result init_531d60_post_base_mov_r14_m
     }
     ++out.mov_r14_mem_rsp20_532c02_count;
 
-    // Next: mov edx, imm32 @ 0x532c07 — not modelled here.
+    // Next: E611 mov edx,0x63647372 @ 0x532c07 — not modelled here.
     out.ok = (out.mov_r14_mem_rsp20_532c02_count == 1);
     return out;
 }

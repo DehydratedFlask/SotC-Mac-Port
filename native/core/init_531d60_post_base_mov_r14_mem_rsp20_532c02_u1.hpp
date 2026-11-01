@@ -1,7 +1,7 @@
 // Init `0x531d60` registry mov r14,[rsp+0x20] OBS `0x532c02..0x532c07` (5 B):
 //   mov r14,[rsp+0x20]   ; reload saved r14 after lea rax @ `0x532bfb`
 //
-// After E609 lea @ `0x532bfb`. NOT modelled: tail @ `0x532c07`.. G1 PARTIAL.
+// After E609 lea @ `0x532bfb`. NOT modelled: E611 mov edx @ `0x532c07` / tail @ `0x532c0c`.. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

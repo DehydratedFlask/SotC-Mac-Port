@@ -1,7 +1,7 @@
 // Init `0x531d60` registry lea rax OBS `0x532bfb..0x532c02` (7 B):
 //   lea rax,[0x2ee2cf8]   ; ResourcePool loader cell after mov [rbx],r14 @ `0x532bf8`
 //
-// After E608 mov @ `0x532bf8`. NOT modelled: E610 mov r14,[rsp+0x20] @ `0x532c02` / tail @ `0x532c07`.. G1 PARTIAL.
+// After E608 mov @ `0x532bf8`. NOT modelled: E610 mov @ `0x532c02` / E611 mov edx @ `0x532c07` / tail @ `0x532c0c`.. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>
