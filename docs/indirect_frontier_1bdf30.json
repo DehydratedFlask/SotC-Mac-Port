@@ -1,0 +1,51 @@
+{
+  "closure_functions": 416,
+  "frontier_functions": 59,
+  "indirect_calls_in_closure": 102,
+  "indirect_sites_in_closure": 122,
+  "inputs": {
+    "dis_sha256": "9c1962541d929c167dec881a1f7093159bc5b156b71e873cd1bb3325dc107e83",
+    "elf_sha256": "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3",
+    "fde_sha256": "f507ab6cdc67e12c07a03be2c51cf02e8fd5fb7e27d00c45f1817c15bd226dd9"
+  },
+  "resolved_rows": [
+    {
+      "address": "0x1254d",
+      "class": "vtable-slot",
+      "global_address": 22628768,
+      "operands": "*0x88(%rax)",
+      "slot": 136,
+      "target": "0x187c0"
+    },
+    {
+      "address": "0x13620",
+      "class": "vtable-slot",
+      "global_address": 22629096,
+      "operands": "*0x28(%rax)",
+      "slot": 40,
+      "target": "0x13d20"
+    },
+    {
+      "address": "0x35165",
+      "class": "vtable-slot",
+      "global_address": 22631872,
+      "operands": "*0x8(%rax)",
+      "slot": 8,
+      "target": "0x358c0"
+    }
+  ],
+  "resolved_targets": 3,
+  "schema": "sotc-indirect-frontier-summary/1",
+  "seeds": [
+    "0x1bdf30"
+  ],
+  "sites_by_class": {
+    "first-slot": 26,
+    "indirect-jump": 20,
+    "member-pointer": 1,
+    "register": 6,
+    "register-offset": 26,
+    "vtable-slot": 43
+  },
+  "unknown_targets": 119
+}

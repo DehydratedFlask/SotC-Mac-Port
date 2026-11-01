@@ -2510,3 +2510,10 @@ target_link_libraries(sotc_vtable_1594dc0_slot20 PUBLIC sotc_core)
 add_executable(test_vtable_1594dc0_slot20 tests/test_vtable_1594dc0_slot20_20d60.cpp)
 target_link_libraries(test_vtable_1594dc0_slot20 PRIVATE sotc_vtable_1594dc0_slot20)
 add_test(NAME vtable_1594dc0_slot20 COMMAND test_vtable_1594dc0_slot20)
+
+# CPU-01-AOT-CFG-SCALE-01: statically resolved vtable call sites (image + RELA verified).
+add_library(sotc_vtable_resolved_entries STATIC core/vtable_resolved_entries.cpp)
+target_link_libraries(sotc_vtable_resolved_entries PUBLIC sotc_core)
+add_executable(test_vtable_resolved_entries tests/test_vtable_resolved_entries.cpp)
+target_link_libraries(test_vtable_resolved_entries PRIVATE sotc_vtable_resolved_entries)
+add_test(NAME vtable_resolved_entries COMMAND test_vtable_resolved_entries)

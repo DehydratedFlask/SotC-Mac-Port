@@ -32,19 +32,29 @@ def main() -> int:
         print("SKIP check_indirect_frontier: private disassembly not present")
         return 0
 
+    runs = [
+        (["0x531d60"], COMMITTED),
+        (["0x1bdf30"], ROOT / "docs/indirect_frontier_1bdf30.json"),
+        (["0x531d60", "0x1bdf30"], ROOT / "docs/indirect_frontier_union.json"),
+    ]
+
     with tempfile.TemporaryDirectory() as temp:
-        target = Path(temp) / "summary.json"
-        completed = subprocess.run(
-            [sys.executable, "-I", str(TOOL), "--seed", "0x531d60",
-             "--summary-json", str(target), "--json", str(Path(temp) / "full.json")],
-            capture_output=True, text=True, check=False, cwd=ROOT, env=os.environ.copy())
-        require(completed.returncode == 0,
-                (completed.stdout + completed.stderr).strip()[:400])
-        require(target.is_file(), "tool produced no summary")
-        if target.read_text() != COMMITTED.read_text():
-            print("FAIL summary drift: rerun tools/lift/indirect_frontier.py --summary-json "
-                  "docs/indirect_frontier.json")
-            return 1
+        for index, (seeds, committed) in enumerate(runs):
+            require(committed.is_file(), f"missing {committed.name}")
+            target = Path(temp) / f"summary-{index}.json"
+            argv = [sys.executable, "-I", str(TOOL), "--summary-json", str(target),
+                    "--json", str(Path(temp) / f"full-{index}.json")]
+            for seed in seeds:
+                argv += ["--seed", seed]
+            completed = subprocess.run(argv, capture_output=True, text=True, check=False,
+                                       cwd=ROOT, env=os.environ.copy())
+            require(completed.returncode == 0,
+                    (completed.stdout + completed.stderr).strip()[:400])
+            require(target.is_file(), "tool produced no summary")
+            if target.read_text() != committed.read_text():
+                print(f"FAIL summary drift for {committed.name}: rerun tools/lift/"
+                      f"indirect_frontier.py with seeds {seeds} --summary-json {committed}")
+                return 1
 
     import json
     document = json.loads(COMMITTED.read_text())

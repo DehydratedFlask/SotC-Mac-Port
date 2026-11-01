@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 23:05 CDT (root) — frontier widened to second seed; 5 targets resolved (STATIC_ANALYSIS_VERIFIED / FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01` second-seed card. `tools/lift/indirect_frontier.py` now covers `0x531d60`, `0x1bdf30` and their union, and resolves targets by **backward slicing to the nearest definition** of the call register (comment text stripped) instead of a fixed window; a candidate is published only when the slot value lands inside an FDE function.
+- **Per-seed numbers (verified by rerun):** `0x531d60` 608 functions / 105 frontier / 499 sites / **5 resolved**; `0x1bdf30` 416 / 59 / 122 / **3**; union 817 / 136 / 562 / **6**.
+- **Five distinct targets, six sites:** `0x1254d`→`0x187c0` (vtable `0x15949a0`, slot `0x88`), `0x13620`→`0x13d20` (`0x1594ae8`, `0x28`), `0x28471`→`0x20d60` (`0x1594dc0`, `0x20`), `0x35165`→`0x358c0` (`0x15955c0`, `0x08`), `0xa54b7b`/`0xa54c92`→`0xc740` (`0x15d1d80`, `0x08`). Each is corroborated by the slot qword **and** a type-8 dynamic relocation with the same addend, and each target is an FDE start.
+- **False positives rejected:** the earlier long-window runs "resolved" ASCII strings and padding; the new slicer plus the FDE check removed them (window 32/64/128 now all agree at the same counts).
+- **Artifacts:** `native/core/vtable_resolved_entries.{hpp,cpp}` (sorted table + `find_resolved_vtable_call_site`), fixture `test_vtable_resolved_entries` (3 cases), checker `check_vtable_resolved_entries.py`, published summaries `docs/indirect_frontier{,_1bdf30,_union}.json`; entry map regenerated to **1,393 constants / 955 RVAs / 366 headers**.
+- **Verification (PASSED):** build exit 0; CTest **501/501**; lift checkers **694 passed / 0 failed**.
+- **Next exact action:** lift the four remaining resolved targets (`0x187c0`, `0x13d20`, `0x358c0`, `0xc740`) with the same pinned-body fixture used for `0x20d60`.
+
 ## 2026-11-01 22:05 CDT (root) — resolved vtable slot lifted with an ABI stub (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01` follow-up. Added `native/core/vtable_1594dc0_slot20_20d60.{hpp,cpp}` for the one statically resolved indirect target (`0x1594dc0 + 0x20 -> 0x20d60`).

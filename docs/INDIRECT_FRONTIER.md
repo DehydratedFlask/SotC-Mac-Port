@@ -6,27 +6,26 @@ executed, and **no target is guessed**.
 
 - Tool: `tools/lift/indirect_frontier.py` (reuses the FDE loader, adjacency and closure from
   `cfg_census.py`).
-- Publishable summary: [`indirect_frontier.json`](indirect_frontier.json) (counts + resolved rows,
-  no instruction text). Full per-site rows stay private in `local/validation/indirect-frontier/`.
-- Checker: `tools/lift/check_indirect_frontier.py` regenerates the summary and diffs it; it skips
-  cleanly when the private disassembly is absent.
+- Publishable summaries: [`indirect_frontier.json`](indirect_frontier.json) (seed `0x531d60`),
+  [`indirect_frontier_1bdf30.json`](indirect_frontier_1bdf30.json) and
+  [`indirect_frontier_union.json`](indirect_frontier_union.json) (both seeds). Counts and resolved
+  rows only, no instruction text; full per-site rows stay private.
+- Checker: `tools/lift/check_indirect_frontier.py` regenerates all three summaries and diffs them;
+  it skips cleanly when the private disassembly is absent.
 
 Inputs (pinned): ELF `d0723afb…61d3`, disassembly `9c196254…107e83`, FDE ranges `f507ab6c…22e8`.
 
 ## Numbers
 
-| Metric | Value |
-|---|---:|
-| Closure functions from `0x531d60` | **608** |
-| Frontier functions (≥1 indirect site) | **105** |
-| Indirect sites in closure | **499** |
-| — indirect `call` sites | 452 |
-| — indirect `jmp` sites | 47 |
-| Sites whose target is resolved from the image | **1** |
-| Sites whose target stays unknown | 498 |
+| Seed | Closure functions | Frontier functions | Indirect sites | Resolved |
+|---|---:|---:|---:|---:|
+| `0x531d60` (appmain init) | 608 | 105 | 499 (452 calls + 47 jumps) | **5** |
+| `0x1bdf30` (app-info dispatch) | 416 | 59 | 122 (102 calls + 20 jumps) | **3** |
+| union | 817 | 136 | 562 (513 calls + 49 jumps) | **6** |
 
-The 608 / 105 pair matches `cfg_census.py --seed 0x531d60`; this card only adds the classification
-that the census deliberately refused to make.
+The per-seed closure sizes match `cfg_census.py` exactly (608 / 416 / 817); this card only adds the
+classification the census deliberately refused to make. The union resolves six sites because the
+two seeds overlap.
 
 ## Classification
 
@@ -41,24 +40,32 @@ that the census deliberately refused to make.
 
 ## What is resolvable
 
-Twelve sites carry a RIP-relative global base in the window; those are the only ones whose object
-identity is even statically named. Of them:
+Resolution is a backward slice, not a fixed window: the classifier walks back to the **nearest
+definition** of the call register (comment text stripped first) and then follows at most one
+RIP-relative base. A candidate is published only when the slot value points inside an FDE function,
+which rejects the string/padding false positives a naive window produces.
 
-- **1 resolves end to end.** `0x28471` (`call *0x20(%rax)` in a closure function) takes `%rax` from
-  `lea 0x1594dc0` (file-backed vtable), so slot `0x20` reads as **`0x20d60`**. Independent
-  corroboration: the dynamic relocations contain exactly one row at `0x1594de0` (the same slot),
-  type 8, symbol 0, addend `0x20d60`. `0x20d60` is also an FDE function start, so it is a concrete
-  native entry candidate once its ABI is checked.
-- **3 have a readable vtable pointer but an unreadable slot** (`0x2ee2d00`, `0x2ee3b10`,
-  `0x2eff450`): the pointer resolves into memory that is not file-backed, and none of the three slot
-  addresses (`0x2ee2d28`, `0x2ee3b78`, `0x2eff458`) has a dynamic relocation row. Those vtables are
-  filled at runtime, so their targets are unknowable from the image.
-- **8 point at BSS globals** (`0x2dfb500`, `0x2dfb600`, `0x2dfc700`, `0x2dfc800`, `0x2efe318`,
-  `0x2eff450`, …): the qword is zero in the image and only exists after construction at runtime.
+Five distinct targets resolve end to end, from six call sites. Every one is corroborated twice: the
+qword in the image and a type-8 dynamic relocation with the same addend.
+
+| Call site | Vtable | Slot | Target | RELA row |
+|---|---|---|---:|---|
+| `0x1254d` | `0x15949a0` | `0x88` | **`0x187c0`** | `0x1594a28` |
+| `0x13620` | `0x1594ae8` | `0x28` | **`0x13d20`** | `0x1594b10` |
+| `0x28471` | `0x1594dc0` | `0x20` | **`0x20d60`** | `0x1594de0` |
+| `0x35165` | `0x15955c0` | `0x08` | **`0x358c0`** | `0x15955c8` |
+| `0xa54b7b`, `0xa54c92` | `0x15d1d80` | `0x08` | **`0xc740`** | `0x15d1d88` |
+
+All five are FDE function starts. They are recorded in `native/core/vtable_resolved_entries.{hpp,cpp}`
+(sorted by call site, with `find_resolved_vtable_call_site`) and therefore appear in
+[`entry_map.json`](entry_map.json); `tools/lift/check_vtable_resolved_entries.py` re-verifies the
+slot qword, the RELA addend, the FDE start and the entry-map presence for each row. Only `0x20d60`
+has a body model so far (`vtable_1594dc0_slot20_20d60`); the other four are entry records awaiting
+their own lift.
 
 ## What stays unknown, and why
 
-- **487 sites have no static base at all.** The object pointer comes from a function argument, a
+- **The remaining sites have no static base.** The object pointer comes from a function argument, a
   returned value or a heap walk, so no file-backed chain exists to follow. They are genuinely
   dynamic; resolving them needs runtime construction or a type/ownership proof per call site, not a
   better window.
@@ -70,11 +77,12 @@ identity is even statically named. Of them:
 
 ## Next steps
 
-1. Add the single resolved target (`0x20d60`) to the entry map and check its ABI before calling it.
-2. The three "vtable readable, slot not" sites are already answered: no dynamic relocation targets
-   their slot addresses, so the tables are runtime-filled. Do not re-open them without new evidence.
-3. Everything else needs either runtime capture or per-site type proofs; record it as such rather
-   than widening the classifier.
+1. Lift the four resolved targets that still have no body model (`0x187c0`, `0x13d20`, `0x358c0`,
+   `0xc740`) one at a time, with the same pinned-body fixture used for `0x20d60`.
+2. The "vtable readable, slot not" sites are already answered: no dynamic relocation targets their
+   slot addresses, so the tables are runtime-filled. Do not re-open them without new evidence.
+3. Everything else needs runtime capture or per-site type proofs; do not widen the classifier to
+   manufacture resolutions.
 
 ## Limits
 

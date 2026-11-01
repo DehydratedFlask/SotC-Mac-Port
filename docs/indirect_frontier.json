@@ -10,15 +10,47 @@
   },
   "resolved_rows": [
     {
+      "address": "0x1254d",
+      "class": "vtable-slot",
+      "global_address": 22628768,
+      "operands": "*0x88(%rax)",
+      "slot": 136,
+      "target": "0x187c0"
+    },
+    {
+      "address": "0x13620",
+      "class": "vtable-slot",
+      "global_address": 22629096,
+      "operands": "*0x28(%rax)",
+      "slot": 40,
+      "target": "0x13d20"
+    },
+    {
       "address": "0x28471",
       "class": "vtable-slot",
       "global_address": 22629824,
       "operands": "*0x20(%rax)",
       "slot": 32,
       "target": "0x20d60"
+    },
+    {
+      "address": "0xa54b7b",
+      "class": "vtable-slot",
+      "global_address": 22879616,
+      "operands": "*0x8(%rax)",
+      "slot": 8,
+      "target": "0xc740"
+    },
+    {
+      "address": "0xa54c92",
+      "class": "vtable-slot",
+      "global_address": 22879616,
+      "operands": "*0x8(%rax)",
+      "slot": 8,
+      "target": "0xc740"
     }
   ],
-  "resolved_targets": 1,
+  "resolved_targets": 5,
   "schema": "sotc-indirect-frontier-summary/1",
   "seeds": [
     "0x531d60"
@@ -26,10 +58,10 @@
   "sites_by_class": {
     "first-slot": 96,
     "indirect-jump": 47,
-    "member-pointer": 2,
-    "register": 15,
-    "register-offset": 45,
-    "vtable-slot": 294
+    "member-pointer": 6,
+    "register": 11,
+    "register-offset": 20,
+    "vtable-slot": 319
   },
-  "unknown_targets": 498
+  "unknown_targets": 494
 }

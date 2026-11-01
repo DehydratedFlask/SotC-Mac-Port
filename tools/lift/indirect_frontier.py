@@ -79,6 +79,30 @@ def parse_line(line: str):
     return address, insn.group(1), insn.group(2).strip()
 
 
+
+_DEST_REGS = re.compile(r",\s*(%r[a-z0-9]+)$")
+
+
+def operands_only(text: str) -> str:
+    """Strip objdump's `# comment` tail before matching operands."""
+    return text.split("#", 1)[0].strip()
+
+
+def find_definition(register: str, window):
+    """Nearest preceding instruction that writes `register` (AT&T: destination is last).
+
+    Scanning stops at the first definition, so a longer window cannot pick up an older, unrelated
+    load. A `call` defines %rax through its return value.
+    """
+    for _addr, mnem, ops in reversed(window):
+        if mnem.startswith("call") and register in ("%rax", "%eax"):
+            return ("call", mnem, ops)
+        destination = _DEST_REGS.search(f"{mnem} {operands_only(ops)}")
+        if destination is not None and destination.group(1) == register:
+            return (mnem, mnem, ops)
+    return None
+
+
 def rip_global_for(register: str, window):
     """(address, form) for a RIP-relative global feeding `register`.
 
@@ -86,7 +110,7 @@ def rip_global_for(register: str, window):
     form == "value" when it is `mov`, so the register holds the qword stored at the global.
     """
     for _addr, mnem, ops in reversed(window):
-        match = _RIP_LOAD.match(f"{mnem} {ops}")
+        match = _RIP_LOAD.match(f"{mnem} {operands_only(ops)}")
         if match is None or match.group(3) != register:
             continue
         comment = _RIP_COMMENT.search(ops)
@@ -105,12 +129,10 @@ def classify(operands: str, window):
     if match:
         slot = int(match.group(1), 16)
         register = match.group(2)
+        definition = find_definition(register, window)
         load = None
-        for _addr, mnem, ops in reversed(window):
-            hit = _MOV_OFF.match(f"{mnem} {ops}")
-            if hit and hit.group(3) == register:
-                load = hit
-                break
+        if definition is not None and not definition[0].startswith("call"):
+            load = _MOV_OFF.match(f"{definition[0]} {operands_only(definition[2])}")
         if load is not None:
             object_off = int(load.group(1), 16)
             detail = {
@@ -134,9 +156,10 @@ def classify(operands: str, window):
     match = _CALL_IND_DEREF.match(operands)
     if match:
         register = match.group(1)
-        for _addr, mnem, ops in reversed(window):
-            hit = _MOV_OFF.match(f"{mnem} {ops}")
-            if hit and hit.group(3) == register:
+        definition = find_definition(register, window)
+        if definition is not None and not definition[0].startswith("call"):
+            hit = _MOV_OFF.match(f"{definition[0]} {operands_only(definition[2])}")
+            if hit is not None:
                 detail = {"vtable_register": register,
                           "object_offset": int(hit.group(1), 16),
                           "object_register": hit.group(2)}
@@ -144,22 +167,20 @@ def classify(operands: str, window):
                 if global_hit is not None:
                     detail["global_address"], detail["global_form"] = global_hit
                 return "first-slot", detail
-            hit = _MOV_LOAD.match(f"{mnem} {ops}")
-            if hit and hit.group(3) == register:
-                return "first-slot", {"vtable_register": register}
         return "first-slot", {"vtable_register": register}
 
     match = _CALL_IND_REG.match(operands)
     if match:
         register = match.group(1)
-        for _addr, mnem, ops in reversed(window):
-            hit = _MOV_OFF.match(f"{mnem} {ops}")
-            if hit and hit.group(3) == register:
+        definition = find_definition(register, window)
+        if definition is not None and not definition[0].startswith("call"):
+            hit = _MOV_OFF.match(f"{definition[0]} {operands_only(definition[2])}")
+            if hit is not None:
                 return "member-pointer", {"register": register,
                                           "object_offset": int(hit.group(1), 16),
                                           "object_register": hit.group(2)}
-            hit = _LEA.match(f"{mnem} {ops}")
-            if hit and hit.group(3) == register:
+            hit = _LEA.match(f"{definition[0]} {operands_only(definition[2])}")
+            if hit is not None:
                 return "member-pointer", {"register": register,
                                           "object_offset": int(hit.group(1) or "0", 16),
                                           "object_register": hit.group(2)}
@@ -224,7 +245,7 @@ def main(argv=None) -> int:
     parser.add_argument("--fde", type=Path, default=DEFAULT_FDE)
     parser.add_argument("--elf", type=Path, default=DEFAULT_ELF)
     parser.add_argument("--seed", action="append", default=None)
-    parser.add_argument("--window", type=int, default=4)
+    parser.add_argument("--window", type=int, default=32)
     parser.add_argument("--json", type=Path, default=None)
     parser.add_argument("--summary-json", type=Path, default=None,
                         help="publishable summary: counts and resolved targets, no instruction text")
@@ -300,6 +321,11 @@ def main(argv=None) -> int:
         target = read_u64(vtable + slot)
         if target is None or target == 0:
             row["resolution"] = "unknown (vtable slot unreadable)"
+            continue
+        if fdes.find(target) is None:
+            # A pointer into a string or padding is not a callee; treat the chain as a false
+            # positive instead of publishing it as a resolved target.
+            row["resolution"] = "unknown (slot value is not inside a function)"
             continue
         row["resolved_target"] = f"0x{target:x}"
         row["resolution"] = "resolved (global -> vtable -> slot)"

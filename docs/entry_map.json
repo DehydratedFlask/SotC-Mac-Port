@@ -516,6 +516,10 @@
       {
         "constant": "kVtable1594dc0Slot20_20d60",
         "header": "native/core/vtable_1594dc0_slot20_20d60.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_20d60",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0x20d80": [
@@ -3708,6 +3712,12 @@
         "header": "native/core/ctor_tiny_misc_slots.hpp"
       }
     ],
+    "0x13d20": [
+      {
+        "constant": "kResolvedVtableTarget_13d20",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0x147e10": [
       {
         "constant": "kPlatformDefaultKeySetter",
@@ -4266,6 +4276,12 @@
         "header": "native/core/list_dtor_1bdeb0.hpp"
       }
     ],
+    "0x187c0": [
+      {
+        "constant": "kResolvedVtableTarget_187c0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0x18a60": [
       {
         "constant": "kSlot334Dtor",
@@ -4630,6 +4646,10 @@
       {
         "constant": "kVtable1594dc0Slot20_20d60",
         "header": "native/core/vtable_1594dc0_slot20_20d60.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_20d60",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0x20d80": [
@@ -6454,6 +6474,12 @@
       {
         "constant": "kSlot475",
         "header": "native/core/ctor_slot_475_33cc60.hpp"
+      }
+    ],
+    "0x358c0": [
+      {
+        "constant": "kResolvedVtableTarget_358c0",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0x36100": [
@@ -10648,6 +10674,12 @@
         "header": "native/core/ranged_int_var_c580.hpp"
       }
     ],
+    "0xc740": [
+      {
+        "constant": "kResolvedVtableTarget_c740",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0xd1b20": [
       {
         "constant": "kSlot544",
@@ -10957,9 +10989,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1388,
-    "distinct_rvas": 951,
+    "constants": 1393,
+    "distinct_rvas": 955,
     "duplicate_rvas": 291,
-    "headers": 365
+    "headers": 366
   }
 }
