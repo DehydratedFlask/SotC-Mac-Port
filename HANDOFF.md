@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 19:55 CDT (root) — final adapter: all 17 targets dispatchable (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `marshal_e21420` (provider pointer from `self+0x48`, name as a bounded nullable guest C string) and the last `call_resolved` arm with seven decision-contract hooks; `rax` carries the status.
+- **Coverage:** **17 of 17** resolved targets now have an ABI row, a cell adapter (or documented host scratch) and a dispatch arm.
+- **Fixture:** found returns 0; state mismatch returns 0x13; kind mismatch returns 0x1b; not found and null name return 0x14. The stale "abi row without adapter" probe was removed because no unadapted row remains; an unknown address still fails as `unknown_target`.
+- **Checkers:** 17 arms and 16 adapters over 16 model-declared offsets.
+- **Verification (PASSED):** build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Remaining limits:** four targets still use host scratch for stack-like storage (`0xe19980`, `0xe26f90`) or configured hooks; there is no guest stack or thread model, and `0xe21420` remains a decision contract with ~400 bytes unmodelled.
+- **Next exact action:** the retail layer is complete for the current target set; the next bounded step is either a guest stack model or returning to MSL coverage (0 of 34,391 real `.csdr`).
+
 ## 2026-11-02 19:10 CDT (root) — 0xe19980 alignment-dispatch arm (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `marshal_e19980` — frame `rdi/rsi/rdx/rcx/r8`, host canary and slow-path buffer, and a fast-path store target resolved only when `rdx` is 8-aligned — plus a `call_resolved` arm with slow/fast hooks.

@@ -438,6 +438,73 @@ void test_e19980_paths() {
                                       tampered.status == RetailCallStatus::model_failed);
 }
 
+struct Provider21420 {
+    void* object = nullptr;
+    std::int32_t state = 0x0e;
+    std::uint64_t kind = 1;
+};
+
+void* lookup_e214(void* provider, const char*) {
+    return static_cast<Provider21420*>(provider)->object;
+}
+std::int32_t state_e214(void* object) { return static_cast<Provider21420*>(object)->state; }
+std::uint64_t kind_e214(void* object) { return static_cast<Provider21420*>(object)->kind; }
+const char* g_names[2] = {"alpha", "beta"};
+std::int32_t count_e214(void*) { return 2; }
+const char* name_e214(void*, std::int32_t index) {
+    return g_names[index >= 0 && index < 2 ? index : 0];
+}
+void missing_e214(void*) {}
+void found_e214(void*, std::int32_t) {}
+
+void test_e21420_decision() {
+    std::vector<std::uint8_t> storage(0x120, 0);
+    GuestWindow window(storage.data(), 0x100000, storage.size());
+    Provider21420 provider{};
+    provider.object = &provider;
+    std::uint64_t provider_guest = reinterpret_cast<std::uint64_t>(&provider);
+    std::memcpy(storage.data() + 0x48, &provider_guest, sizeof(provider_guest));
+    std::memcpy(storage.data() + 0x90, "beta", 5);
+
+    RetailFrame frame{};
+    frame.set(RetailArg::rdi, 0x100000);
+    frame.set(RetailArg::rsi, 0x100090);
+    RetailCallContext context{};
+    context.lookup_e21420 = lookup_e214;
+    context.state_e21420 = state_e214;
+    context.kind_e21420 = kind_e214;
+    context.count_e21420 = count_e214;
+    context.name_e21420 = name_e214;
+    context.missing_e21420 = missing_e214;
+    context.found_e21420 = found_e214;
+
+    const auto found = call_resolved(sotc::kVtable15e2028Slot2A0_e21420Rva, frame, window,
+                                     context);
+    check("e21420 found", found.ok && found.rax == 0);
+
+    provider.state = 0x0d;
+    const auto state_mismatch = call_resolved(sotc::kVtable15e2028Slot2A0_e21420Rva, frame, window,
+                                              context);
+    check("e21420 state mismatch", state_mismatch.ok && state_mismatch.rax == 0x13);
+
+    provider.state = 0x0e;
+    provider.kind = 2;
+    const auto kind_mismatch = call_resolved(sotc::kVtable15e2028Slot2A0_e21420Rva, frame, window,
+                                             context);
+    check("e21420 kind mismatch", kind_mismatch.ok && kind_mismatch.rax == 0x1b);
+
+    provider.kind = 1;
+    std::memcpy(storage.data() + 0x90, "gamma", 6);
+    const auto not_found = call_resolved(sotc::kVtable15e2028Slot2A0_e21420Rva, frame, window,
+                                         context);
+    check("e21420 not found", not_found.ok && not_found.rax == 0x14);
+
+    frame.set(RetailArg::rsi, 0);
+    const auto null_name = call_resolved(sotc::kVtable15e2028Slot2A0_e21420Rva, frame, window,
+                                         context);
+    check("e21420 null name", null_name.ok && null_name.rax == 0x14);
+}
+
 void test_failures() {
     std::vector<std::uint8_t> storage(0x40, 0);
     GuestWindow window(storage.data(), 0x50000, storage.size());
@@ -454,11 +521,11 @@ void test_failures() {
     const auto nowhere = call_resolved(sotc::kVtable1594dc0Slot20_20d60Rva, frame, empty);
     check("no window fails", !nowhere.ok && nowhere.status == RetailCallStatus::no_window);
 
+    // Every ABI row now has an adapter; a bare unknown address is the only remaining gap.
     frame.set(RetailArg::rdi, 0x50000);
-    const auto adapted_but_no_cells = call_resolved(0xe21420, frame, window);
-    check("abi without adapter", !adapted_but_no_cells.ok &&
-                                      adapted_but_no_cells.status ==
-                                          RetailCallStatus::unknown_target);
+    const auto not_in_table = call_resolved(0x12345678, frame, window);
+    check("rva without abi row", !not_in_table.ok &&
+                                     not_in_table.status == RetailCallStatus::unknown_target);
 }
 
 }  // namespace
@@ -476,6 +543,7 @@ int main() {
     test_e26f90_status_gate();
     test_e1a5c0_scan();
     test_e19980_paths();
+    test_e21420_decision();
     test_failures();
 
     if (failures == 0) {

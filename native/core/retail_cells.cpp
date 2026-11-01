@@ -330,4 +330,34 @@ MarshalE19980 marshal_e19980(GuestWindow& window, std::uint64_t arg2, std::uint6
     return out;
 }
 
+MarshalE21420 marshal_e21420(GuestWindow& window, std::uint64_t self,
+                             std::uint64_t name) noexcept {
+    MarshalE21420 out{};
+    if (!window.valid()) {
+        out.status = GuestStatus::no_window;
+        return out;
+    }
+    std::uint64_t provider = 0;
+    if (window.read_u64(self + kVtable15e2028Slot2A0_e21420ProviderOffset, provider) !=
+        GuestStatus::ok) {
+        out.status = GuestStatus::out_of_range;
+        return out;
+    }
+    const char* name_pointer = nullptr;
+    if (name != 0) {
+        std::string_view text;
+        if (window.read_cstr(name, 4096, text) != GuestStatus::ok) {
+            out.status = GuestStatus::unterminated_string;
+            return out;
+        }
+        name_pointer = reinterpret_cast<const char*>(window.host_pointer(name, text.size() + 1));
+    }
+    out.cells.self = reinterpret_cast<void*>(static_cast<std::uintptr_t>(self));
+    out.cells.provider = reinterpret_cast<void*>(static_cast<std::uintptr_t>(provider));
+    out.cells.name = name_pointer;
+    out.status = GuestStatus::ok;
+    out.ok = true;
+    return out;
+}
+
 }  // namespace sotc

@@ -22,6 +22,7 @@
 #include "vtable_15d1678_slot280_a460f0.hpp"
 #include "vtable_15e2d60_slot_d0_e24900.hpp"
 #include "vtable_15e1ee0_slot_b0_e19980.hpp"
+#include "vtable_15e2028_slot2a0_e21420.hpp"
 #include "vtable_15e2028_slot70_e1a5c0.hpp"
 #include "vtable_15ed2a0_slot_c0_e26f90.hpp"
 #include "vtable_15f2f08_slot38_e16a00.hpp"
@@ -183,5 +184,16 @@ struct MarshalE19980 {
                                            std::uint64_t arg3, std::uint64_t arg4,
                                            std::uint64_t arg5, std::uint64_t* host_canary,
                                            const void* const* value_cell) noexcept;
+
+// 0xe21420: decision contract. Provider pointer from `self+0x48`, name as a guest C string (may be
+// null). The model stops at the branch that selects the missing/found terminal paths.
+struct MarshalE21420 {
+    bool ok = false;
+    GuestStatus status = GuestStatus::no_window;
+    Vtable15e2028Slot2A0_e21420Cells cells{};
+};
+
+[[nodiscard]] MarshalE21420 marshal_e21420(GuestWindow& window, std::uint64_t self,
+                                           std::uint64_t name) noexcept;
 
 }  // namespace sotc

@@ -34,6 +34,8 @@ MODEL_HEADERS = {
     "kVtable15e2028Slot70_e1a5c0CountOffset": "native/core/vtable_15e2028_slot70_e1a5c0.hpp",
     "kVtable15e1ee0SlotB0_e19980AlignmentMask":
         "native/core/vtable_15e1ee0_slot_b0_e19980.hpp",
+    "kVtable15e2028Slot2A0_e21420ProviderOffset":
+        "native/core/vtable_15e2028_slot2a0_e21420.hpp",
 }
 
 EXPECTED_ADAPTERS = ("marshal_20d60", "marshal_358c0", "marshal_13d20", "marshal_187c0",
@@ -41,7 +43,7 @@ EXPECTED_ADAPTERS = ("marshal_20d60", "marshal_358c0", "marshal_13d20", "marshal
                      "marshal_e16a00", "marshal_ddf4b0",
                      "marshal_a460f0", "marshal_e24900",
                      "marshal_e26f90", "marshal_e1a5c0",
-                     "marshal_e19980")
+                     "marshal_e19980", "marshal_e21420")
 
 
 def require(cond: bool, msg: str) -> None:

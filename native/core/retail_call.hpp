@@ -69,6 +69,15 @@ struct RetailCallContext {
     void (*fast_e19980)(void* arg3, void* arg2, void* arg4, void* arg5) = nullptr;
     std::uint64_t* host_canary_e19980 = nullptr;
     const void* const* store_value_e19980 = nullptr;
+
+    // 0xe21420: decision-contract hooks.
+    void* (*lookup_e21420)(void* provider, const char* name) = nullptr;
+    std::int32_t (*state_e21420)(void* object) = nullptr;
+    std::uint64_t (*kind_e21420)(void* object) = nullptr;
+    std::int32_t (*count_e21420)(void* provider) = nullptr;
+    const char* (*name_e21420)(void* provider, std::int32_t index) = nullptr;
+    void (*missing_e21420)(void* provider) = nullptr;
+    void (*found_e21420)(void* provider, std::int32_t index) = nullptr;
 };
 
 enum class RetailCallStatus : std::uint8_t {
