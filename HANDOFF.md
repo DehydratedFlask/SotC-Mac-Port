@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 04:30 CDT (root) — target 0x1bf710 lifted (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_1598e10_slot18_1bf710.{hpp,cpp}` for slot `0x1598e10 + 0x18 -> 0x1bf710`.
+- **Body (28 B, pinned `90eee34c…10f4`):** the same teardown shape — save `this`, `call 0x1c0010`, reload, `jmp 0x170b0` (tag-1 free). Only `rdi` is read.
+- **Model:** pre-call hook (always counted), free through `free_170b0`, non-null without contract fails visibly, free failure propagates. Fixture: 5 cases; mutation (`pre_call_modelled = false`) fails 3 checks.
+- **Checker:** verifies prologue, saved `this`, relative pre-call to `0x1c0010`, reload, stack unwind, `e9` tail to `0x170b0`, padding, slot qword, type-8 RELA at `0x1598e28`, header constants, CMake and entry-map presence.
+- **Process note:** the module was cloned from the `0x2687b0` unit; the clone initially carried stale hook names, a stale CMAKE assertion and uppercase address constants, which the checker caught (body sha) before commit. Fixed and re-verified — the checker would have false-passed on the CMAKE assertion alone, so the body tie is what caught it.
+- **Entry map:** regenerated to **1,420 constants / 968 RVAs / 375 headers**.
+- **Verification (PASSED):** build exit 0; CTest **507/507**; lift checkers **700 passed / 0 failed**.
+- **Next exact action:** `0xddf4b0` (`0x34`), then `0xe16a00` (`0x26`), `0xe1a5c0` (`0x97`), `0xe19980` (`0xa2`), `0xe21420` (`0x2a9`).
+
 ## 2026-11-02 03:45 CDT (root) — target 0x2687b0 lifted (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_159c908_slot58_2687b0.{hpp,cpp}` for the resolved slot `0x159c908 + 0x58 -> 0x2687b0`.

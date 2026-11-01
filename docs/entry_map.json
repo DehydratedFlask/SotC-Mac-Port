@@ -340,6 +340,10 @@
         "header": "native/core/vtable_15949a0_slot88_187c0.hpp"
       },
       {
+        "constant": "kVtable1598e10Slot18_1bf710FreeTarget",
+        "header": "native/core/vtable_1598e10_slot18_1bf710.hpp"
+      },
+      {
         "constant": "kVtable159c908Slot58_2687b0FreeTarget",
         "header": "native/core/vtable_159c908_slot58_2687b0.hpp"
       },
@@ -500,6 +504,16 @@
       {
         "constant": "kInsert1beeb0",
         "header": "native/core/insert_1beeb0.hpp"
+      }
+    ],
+    "0x1bf710": [
+      {
+        "constant": "kVtable1598e10Slot18_1bf710",
+        "header": "native/core/vtable_1598e10_slot18_1bf710.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_1bf710",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0x1e4c0": [
@@ -4344,6 +4358,10 @@
         "header": "native/core/vtable_15949a0_slot88_187c0.hpp"
       },
       {
+        "constant": "kVtable1598e10Slot18_1bf710FreeTarget",
+        "header": "native/core/vtable_1598e10_slot18_1bf710.hpp"
+      },
+      {
         "constant": "kVtable159c908Slot58_2687b0FreeTarget",
         "header": "native/core/vtable_159c908_slot58_2687b0.hpp"
       },
@@ -4694,8 +4712,18 @@
     ],
     "0x1bf710": [
       {
+        "constant": "kVtable1598e10Slot18_1bf710",
+        "header": "native/core/vtable_1598e10_slot18_1bf710.hpp"
+      },
+      {
         "constant": "kResolvedVtableTarget_1bf710",
         "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0x1c0010": [
+      {
+        "constant": "kVtable1598e10Slot18_1bf710PreCall",
+        "header": "native/core/vtable_1598e10_slot18_1bf710.hpp"
       }
     ],
     "0x1cc80": [
@@ -11211,9 +11239,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1417,
-    "distinct_rvas": 967,
-    "duplicate_rvas": 300,
-    "headers": 374
+    "constants": 1420,
+    "distinct_rvas": 968,
+    "duplicate_rvas": 301,
+    "headers": 375
   }
 }
