@@ -86,14 +86,12 @@ never lowers, never executes and never invents an ABI.
 
 ```sh
 python3 -I tools/dev/msl_corpus_coverage.py --self-test   # FIXTURE_VERIFIED, synthetic spans only
-python3 -I tools/dev/msl_corpus_coverage.py               # default sample 64
-python3 -I tools/dev/msl_corpus_coverage.py --sample 512 --out local/validation/msl-coverage/sample-512
+python3 -I tools/dev/msl_corpus_coverage.py               # default sample 64; the 512 command is below
 ```
 
-Population 34,291 `.csdr` (pak0 3,309 + pak1 2,512 + pakN 28,470; 34,291 unique paths). The
-default sample is **64**, chosen by deterministic even spacing `round(i*(N-1)/(k-1))` over the
-`(path, archive)`-sorted list (first and last included, implied stride 535.8); the 512 run uses
-the same rule.
+Population 34,291 `.csdr` (pak0 3,309 + pak1 2,512 + pakN 28,470; all unique paths). The default
+sample is **64**, deterministic even spacing `round(i*(N-1)/(k-1))` over the `(path, archive)`-
+sorted list (first and last included, implied stride 535.8); the 512 run uses the same rule.
 
 | Sample | compressed-prefix | raw, decode-error | raw, all programs decode | lowered |
 |---:|---:|---:|---:|---:|
@@ -101,20 +99,15 @@ the same rule.
 | 512 | 264 | 244 | 4 | **0** |
 
 Programs (a member can hold a VS/PS pair): at 64, 31 attempted, 4 decoded, 27 decode-error; at
-512, 367 attempted, 74 decoded, 293 decode-error. The 4 programs decoded at n=64 are all 32-byte,
-5-instruction, type-0 (INF: PS) `depth`/`shadow` shaders (`EXP 1, SOP1 2, SOPP 2`), so no
-*member* is fully decodable there; at n=512, 70 raw members yield at least one decoded program
-and 4 decode completely (74 programs, 577 instructions, 73/74 per-lane eligible).
+512, 367 attempted, 74 decoded, 293 decode-error (74 programs, 577 instructions, 73/74
+per-lane eligible; 70 raw members yield at least one decoded program).
 
-Top decode-error reasons, n=512 / n=64: `unsupported encoding` 235 / 23, `unsupported SMRD
-register/literal offset` 39 / 4, `unsupported VINTRP opcode 2` 10 / 0, `unsupported VOP3 opcode
-349` 3 / 0. "Unsupported encoding" is the first word outside the bounded table (decode never
-resynchronizes): 289 of 293 failures stop between byte `0x14` and `0x2c`.
+Top decode-error reasons before widening, n=512 / n=64: `unsupported encoding` 235 / 23,
+`unsupported SMRD register/literal offset` 39 / 4, `unsupported VINTRP opcode 2` 10 / 0,
+`unsupported VOP3 opcode 349` 3 / 0 - the widening log below carries the post-change numbers.
 
-Supported-opcode share (fraction of a decoded program's instructions whose encoding+opcode is in
-the imported `gcn_inventory.OPCODES`): **min 1.0, median 1.0, max 1.0** in both samples. That
-distribution is degenerate by construction - `decode()` rejects anything else - so the decode
-success rate, not this share, is the informative number.
+Supported-opcode share is **1.0** in both samples by construction (`decode()` rejects anything
+else), so decode success - not this share - is the informative number.
 
 **Zero real shaders were lowered.** `gcn_to_msl.py` admits a program only through a per-shader
 ABI manifest (exact digest, named scalar views, stream bindings) and none exists for any retail
@@ -125,6 +118,35 @@ compressed members are classified, never decompressed. Evidence: the census is
 pipeline object, **G3 NOT RUN**. Private output `local/validation/msl-coverage/coverage.json`
 (+ `sample-512/`); full run log `local/validation/msl-coverage/REPORT.md`.
 
+## Decoder widening (SOP2 / SOPC / VOPC / SMRD offsets)
+
+`gcn_inventory.py` v2 adds the rows v1 rejected: SOP2 0-42 and 44 (12/13 reserved; 43
+`s_cbranch_g_fork` is control transfer, not modelled), SOPC 0-15 (16 `s_setvskip` is VI-only),
+VOPC 0-31 (f32 compare and `cmpx`), SMRD 8/9/12 `s_buffer_load_dword{,x2,x16}`, and the
+`IMM=0`/`OFFSET=255` register-literal offset (one literal dword; the 39 formerly rejected spans
+re-decode as 8-byte loads and fail later, at `0x44`/`0x40`/`0x3c`/`0x88`, not `0x24`-`0x2c`).
+Skipped: VINTRP op 2 `v_interp_mov_f32` (48 first-blockers) because `gcn_to_msl.py` models every
+VINTRP as P1/P2, so decoding it without a lowering change would admit the wrong shape; the
+remaining VOP3/VOP2/VOP1/SOP1/MUBUF/DS/MTBUF opcodes below are out of scope for this card.
+
+```sh
+python3 -I tools/dev/msl_corpus_coverage.py --sample 512 --overwrite --out local/validation/msl-coverage/after-opcodes
+```
+
+| Sample 512, same 512 members / 367 programs | before (v1) | after (v2) |
+|---|---:|---:|
+| programs decoded / attempted | 74 / 367 | **74 / 367** |
+| first-failure `unsupported encoding` | 235 | **0** |
+| first-failure median byte offset | `0x20` | `0x28` |
+
+No additional program decodes yet: the newly accepted words sit in programs that hit an unmodelled
+opcode a few dwords later. New top blockers: `unsupported VOP3 opcode 349` 179, `VOP2 opcode 37`
+53, `VINTRP opcode 2` 48, `SOPP opcode 5` 5 (a branch). A private simulation adding those plus
+SOP1 36/MUBUF 0/VOP1 36 also decoded only 74: those programs next need MUBUF stores and VOPC
+integer compares, so the next step is a wider table, not one more opcode. Decode success is
+**STATIC_ANALYSIS_VERIFIED** and says nothing about Metal behaviour; the 30 decoder tests are
+**FIXTURE_VERIFIED**; nothing was lowered or executed.
+
 ## Limits
 
 - Synthetic MSL only: two hand-written files, not produced by `gcn_to_msl.py`; 0 of the
@@ -133,7 +155,7 @@ pipeline object, **G3 NOT RUN**. Private output `local/validation/msl-coverage/c
   two demo metallibs were archived but never loaded or executed, so there is no G3/Metal
   frame claim and no runtime path. No `native/` change and no build target.
 - AIR embeds the resolved source path (`strings`): an identical build in another directory gave
-  different AIR digests (`b57a1931…`, `7865c861…`) with identical metallib digests, and
-  `-fdebug-prefix-map`/`-ffile-prefix-map` changed nothing. Keep archives in private `local/`.
-- Metallib linking was byte-identical across runs on this machine/toolchain only, not across OS
-  or toolchain versions; and the tool records what the compiler produced, not MSL semantics.
+  different AIR digests (`b57a1931…`, `7865c861…`) with identical metallib digests. Keep archives
+  in private `local/`.
+- Metallib linking was byte-identical across runs on this machine/toolchain only; the tool records
+  what the compiler produced, not MSL semantics.

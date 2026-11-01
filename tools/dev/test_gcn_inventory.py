@@ -42,8 +42,24 @@ def sopp(op=1, imm=0):
     return word((9, 0b101111111), (7, op), (16, imm))
 
 
-def smrd(op=2, dst=12, base=6, imm=1, offset=17):
-    return word((5, 0b11000), (5, op), (7, dst), (6, base), (1, imm), (8, offset))
+def sop2(op=0, dst=6, s0=8, s1=10, literal=None):
+    encoded = word((2, 0b10), (7, op), (7, dst), (8, s1), (8, s0))
+    return encoded + (struct.pack('<I', literal) if literal is not None else b'')
+
+
+def sopc(op=9, s0=8, s1=4, literal=None):
+    encoded = word((9, 0b101111110), (7, op), (8, s1), (8, s0))
+    return encoded + (struct.pack('<I', literal) if literal is not None else b'')
+
+
+def vopc(op=4, src0=257, src1=2, literal=None):
+    encoded = word((7, 0b0111110), (8, op), (8, src1), (9, src0))
+    return encoded + (struct.pack('<I', literal) if literal is not None else b'')
+
+
+def smrd(op=2, dst=12, base=6, imm=1, offset=17, literal=None):
+    encoded = word((5, 0b11000), (5, op), (7, dst), (6, base), (1, imm), (8, offset))
+    return encoded + (struct.pack('<I', literal) if literal is not None else b'')
 
 
 def vop1(op=1, dst=7, src=270):
@@ -109,6 +125,51 @@ class EncodingOracleTests(unittest.TestCase):
         i = one(smrd(1, dst=64))
         self.assertEqual((i.opcode, i.fields['sdst']), (1, 64))
 
+    def test_scalar_alu_fields_and_literal(self):
+        i = one(sop2(op=14, dst=106, s0=2, s1=255, literal=0x2a))
+        self.assertEqual((i.encoding, i.opcode, i.mnemonic, i.size),
+                         ('SOP2', 14, 's_and_b32', 8))
+        self.assertEqual(i.fields, dict(ssrc0=2, ssrc1=255, sdst=106, literal=0x2a))
+        i = one(sop2(op=38, dst=106, s0=2, s1=192))
+        self.assertEqual(i.fields, dict(ssrc0=2, ssrc1=192, sdst=106))
+        i = one(sop2(op=42, dst=8, s0=10, s1=12))
+        self.assertEqual((i.mnemonic, i.size), ('s_bfe_i64', 4))
+
+    def test_scalar_compare_fields(self):
+        i = one(sopc(op=9, s0=3, s1=4))
+        self.assertEqual((i.encoding, i.opcode, i.mnemonic, i.size),
+                         ('SOPC', 9, 's_cmp_ge_u32', 4))
+        self.assertEqual(i.fields, dict(ssrc0=3, ssrc1=4))
+        self.assertEqual(i.requirements, ('writes_scc',))
+        self.assertEqual(one(sopc(op=0, s0=8, s1=255, literal=7)).fields,
+                         dict(ssrc0=8, ssrc1=255, literal=7))
+
+    def test_compare_to_vcc_encoding(self):
+        # VOPC has no VDST: opcodes 0-15 write VCC, 16-31 (`cmpx`) overwrite EXEC.
+        i = one(vopc(op=4, src0=257, src1=2))
+        self.assertEqual((i.encoding, i.opcode, i.mnemonic, i.size),
+                         ('VOPC', 4, 'v_cmp_gt_f32', 4))
+        self.assertEqual(i.fields, dict(src0=257, vsrc1=2))
+        self.assertEqual(i.requirements, ('writes_vcc_mask',))
+        i = one(vopc(op=16))
+        self.assertEqual((i.mnemonic, i.requirements), ('v_cmpx_f_f32', ('writes_exec_mask',)))
+        i = one(vopc(op=16, src0=255, literal=0x3f800000))
+        self.assertEqual((i.size, i.fields['literal']), (8, 0x3f800000))
+
+    def test_scalar_memory_register_and_literal_offsets(self):
+        # IMM=1 is the byte-immediate offset; IMM=0 makes OFFSET an SGPR selector and
+        # selector 255 consumes the following dword (same width rule as SOP1 literals).
+        i = one(smrd(op=0, dst=6, base=10, imm=0, offset=7))
+        self.assertEqual((i.size, i.fields['offset'], i.fields['imm']), (4, 7, 0))
+        i = one(smrd(op=0, dst=28, base=10, imm=0, offset=255, literal=0x100))
+        self.assertEqual((i.size, i.fields['literal'], i.fields['base_sgpr']), (8, 0x100, 20))
+
+    def test_buffer_load_widths(self):
+        for op, dwords in ((8, 1), (9, 2), (10, 4), (11, 8), (12, 16)):
+            with self.subTest(op=op):
+                i = one(smrd(op=op, dst=0, base=0))
+                self.assertEqual((i.fields['dwords'], i.fields['base_sgpr']), (dwords, 0))
+
     def test_vector_fields_and_literal(self):
         i = one(vop1(src=255) + struct.pack('<I', 0x2468ace0))
         self.assertEqual(i.fields, dict(src0=255, vdst=7, literal=0x2468ace0))
@@ -140,14 +201,22 @@ class EncodingOracleTests(unittest.TestCase):
         # Deliberately does not enumerate the decoder's OPCODES table.
         families = [
             (sop1, [(3, 's_mov_b32'), (4, 's_mov_b64'), (10, 's_wqm_b64')]),
+            (sop2, [(0, 's_add_u32'), (14, 's_and_b32'), (38, 's_mul_i32'),
+                    (42, 's_bfe_i64'), (44, 's_absdiff_i32')]),
+            (sopc, [(0, 's_cmp_eq_i32'), (9, 's_cmp_ge_u32'), (12, 's_bitcmp0_b32'),
+                    (15, 's_bitcmp1_b64')]),
             (sopp, [(12, 's_waitcnt'), (22, 's_ttracedata')]),
             (smrd, [(0, 's_load_dword'), (1, 's_load_dwordx2'), (2, 's_load_dwordx4'),
                     (3, 's_load_dwordx8'), (4, 's_load_dwordx16'),
-                    (10, 's_buffer_load_dwordx4'), (11, 's_buffer_load_dwordx8')]),
+                    (8, 's_buffer_load_dword'), (9, 's_buffer_load_dwordx2'),
+                    (10, 's_buffer_load_dwordx4'), (11, 's_buffer_load_dwordx8'),
+                    (12, 's_buffer_load_dwordx16')]),
             (vop1, [(1, 'v_mov_b32'), (46, 'v_rsq_f32')]),
             (vop2, [(4, 'v_sub_f32'), (8, 'v_mul_f32'), (31, 'v_mac_f32'),
                     (47, 'v_cvt_pkrtz_f16_f32')]),
             (vop3, [(264, 'v_mul_f32'), (303, 'v_cvt_pkrtz_f16_f32'), (321, 'v_mad_f32')]),
+            (vopc, [(0, 'v_cmp_f_f32'), (15, 'v_cmp_t_f32'),
+                    (16, 'v_cmpx_f_f32'), (31, 'v_cmpx_t_f32')]),
             (vintrp, [(0, 'v_interp_p1_f32'), (1, 'v_interp_p2_f32')]),
             (mubuf, [(1, 'buffer_load_format_xy'), (2, 'buffer_load_format_xyz'),
                      (3, 'buffer_load_format_xyzw')]),
@@ -157,6 +226,8 @@ class EncodingOracleTests(unittest.TestCase):
             for op, name in cases:
                 with self.subTest(op=op, mnemonic=name):
                     kw = dict(src=8) if make is sop1 else {}
+                    if make is smrd:
+                        kw = dict(dst=0, base=0)
                     self.assertEqual(one(make(op=op, **kw)).mnemonic, name)
         self.assertEqual(one(exp()).mnemonic, 'exp')
         self.assertEqual(gcn.decode(END)[0].mnemonic, 's_endpgm')
@@ -185,6 +256,16 @@ class EncodingOracleTests(unittest.TestCase):
         self.assertFalse(gcn.inventory(sop1(op=10, dst=126, src=126) + END)['per_lane_eligible'])
         self.assertFalse(gcn.inventory(mimg() + END)['per_lane_eligible'])
         self.assertTrue(gcn.inventory(vop3() + vintrp() + exp() + END)['per_lane_eligible'])
+        # Scalar ALU/compare rows carry the same visibility rules as the other families.
+        i = one(sop2(op=14, dst=126, s0=252, s1=10))
+        self.assertEqual(i.requirements, ('reads_exec_mask', 'writes_exec_mask'))
+        i = one(sopc(op=9, s0=10, s1=251))
+        self.assertEqual(i.requirements, ('reads_vcc_mask', 'writes_scc'))
+        # A VOPC mask write to VCC alone is not a quad/wave/LDS blocker; `cmpx` is, because
+        # it overwrites EXEC (v_cmpx_* 16-31).
+        self.assertTrue(gcn.inventory(vopc() + END)['per_lane_eligible'])
+        self.assertFalse(gcn.inventory(vopc(op=16) + END)['per_lane_eligible'])
+        self.assertFalse(gcn.inventory(vopc(src0=254) + END)['per_lane_eligible'])
 
 
 class RejectionTests(unittest.TestCase):
@@ -199,7 +280,9 @@ class RejectionTests(unittest.TestCase):
             self.reject(p)
 
     def test_every_truncated_prefix_of_synthetic_program(self):
-        program = sop1(src=255)+struct.pack('<I', 0x13579bdf)+smrd()+vop3()+mubuf()+mimg()+exp()+END
+        program = (sop1(src=255)+struct.pack('<I', 0x13579bdf)+sop2(s1=255, literal=9)
+                   +sopc()+vopc()+smrd(imm=0, offset=255, literal=0x80)+smrd()
+                   +vop3()+mubuf()+mimg()+exp()+END)
         for n in range(len(program)):
             with self.subTest(prefix=n):
                 self.reject(program[:n])
@@ -209,18 +292,21 @@ class RejectionTests(unittest.TestCase):
             self.reject(p[:4], 'truncated')
 
     def test_literal_width(self):
-        for p in (sop1(src=255), vop1(src=255), vop2(src0=255)):
+        for p in (sop1(src=255), vop1(src=255), vop2(src0=255), vopc(src0=255),
+                  sop2(s0=255), sop2(s1=255), sopc(s0=255), sopc(s1=255),
+                  smrd(imm=0, offset=255)):
             self.reject(p, 'truncated')
-        self.reject(smrd(imm=0, offset=255)+END, 'unsupported SMRD')
 
     def test_unknown_opcode_each_family(self):
-        for p in (sop1(255), sopp(127), smrd(31), vop1(255), vop2(63),
-                  vop3(511), vintrp(3), mubuf(127), mimg(127)):
+        for p in (sop1(255), sop2(12), sop2(43), sop2(45), sop2(127), sopc(16), sopc(127),
+                  sopp(127), smrd(29), smrd(31), vop1(255), vopc(32), vopc(255),
+                  vop2(63), vop3(511), vintrp(3), mubuf(127), mimg(127)):
             self.reject(p+END, 'unsupported')
 
     def test_unknown_encoding(self):
-        # DS, VOPC, SOP2 and reserved high-prefix encodings are not guessed.
-        for p in (0xd8000000, 0x7c000000, 0x80000000, 0xfc000000):
+        # DS, MTBUF, VOP1-reserved and reserved high-prefix encodings are not guessed.
+        # SOP2/VOPC/SOPC are no longer here: those encodings are now explicitly modelled.
+        for p in (0xd8000000, 0xe8000000, 0x7a000000, 0xfc000000):
             self.reject(struct.pack('<I', p)+END, 'unsupported')
 
     def test_reserved_bits(self):
@@ -241,6 +327,22 @@ class RejectionTests(unittest.TestCase):
                   mimg(mask=0), mimg(resource=25), mimg(sampler=31), exp(target=10),
                   exp(compr=1, en=1), sopp(1, 1), sopp(12, 0x80), sopp(22, 1)):
             self.reject(p+END)
+
+    def test_new_encoding_operand_limits(self):
+        for p in (sop2(dst=125), sop2(s0=209), sop2(s1=254),
+                  sop2(op=42, dst=7, s0=8, s1=10),
+                  sop2(op=42, dst=8, s0=9, s1=10),
+                  sop2(op=15, dst=8, s0=8, s1=11),
+                  sopc(s0=254), sopc(s1=209), sopc(op=15, s0=9, s1=10),
+                  vopc(src0=209), vopc(src0=104), vopc(src0=125),
+                  smrd(op=12, dst=96), smrd(op=8, base=1), smrd(op=2, dst=13),
+                  smrd(imm=0, offset=104), smrd(imm=0, offset=254)):
+            self.reject(p+END)
+
+    def test_one_inline_literal_per_instruction(self):
+        # Two 255 selectors cannot both consume the single following dword.
+        self.reject(sop2(op=11, s0=255, s1=255, literal=0), 'multiple inline literals')
+        self.reject(sopc(s0=255, s1=255, literal=0), 'multiple inline literals')
 
     def test_end_is_exact_and_required(self):
         self.reject(vop3(), 'does not end')

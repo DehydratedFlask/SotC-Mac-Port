@@ -25,19 +25,55 @@ import struct
 import sys
 
 ISA_URL = 'https://docs.amd.com/v/u/en-US/sea-islands-instruction-set-architecture_0'
-VERSION = 'gfx7-bounded-inventory-v1'
+VERSION = 'gfx7-bounded-inventory-v2'
 
 # These are encoding facts, not a translation/semantic implementation.
+# SOP2/SOPC/VOPC rows below are opcode-value facts from the GFX7 ISA tables,
+# cross-checked against the pinned `reference/` decoder. Values the ISA marks reserved
+# (SOP2 12/13) and control-transfer/VI-only rows are not listed, so they still reject:
+# s_cbranch_g_fork (SOP2 43), s_setvskip (SOPC 16), s_memtime / s_dcache_inv (SMRD 29..31)
+# carry no destination or rely on later ISAs.
 OPCODES = {
     'SOP1': {3: 's_mov_b32', 4: 's_mov_b64', 10: 's_wqm_b64'},
+    'SOP2': {0: 's_add_u32', 1: 's_sub_u32', 2: 's_add_i32', 3: 's_sub_i32',
+             4: 's_addc_u32', 5: 's_subb_u32', 6: 's_min_i32', 7: 's_min_u32',
+             8: 's_max_i32', 9: 's_max_u32', 10: 's_cselect_b32', 11: 's_cselect_b64',
+             14: 's_and_b32', 15: 's_and_b64', 16: 's_or_b32', 17: 's_or_b64',
+             18: 's_xor_b32', 19: 's_xor_b64', 20: 's_andn2_b32', 21: 's_andn2_b64',
+             22: 's_orn2_b32', 23: 's_orn2_b64', 24: 's_nand_b32', 25: 's_nand_b64',
+             26: 's_nor_b32', 27: 's_nor_b64', 28: 's_xnor_b32', 29: 's_xnor_b64',
+             30: 's_lshl_b32', 31: 's_lshl_b64', 32: 's_lshr_b32', 33: 's_lshr_b64',
+             34: 's_ashr_i32', 35: 's_ashr_i64', 36: 's_bfm_b32', 37: 's_bfm_b64',
+             38: 's_mul_i32', 39: 's_bfe_u32', 40: 's_bfe_i32', 41: 's_bfe_u64',
+             42: 's_bfe_i64', 44: 's_absdiff_i32'},
+    'SOPC': {0: 's_cmp_eq_i32', 1: 's_cmp_lg_i32', 2: 's_cmp_gt_i32',
+             3: 's_cmp_ge_i32', 4: 's_cmp_lt_i32', 5: 's_cmp_le_i32',
+             6: 's_cmp_eq_u32', 7: 's_cmp_lg_u32', 8: 's_cmp_gt_u32',
+             9: 's_cmp_ge_u32', 10: 's_cmp_lt_u32', 11: 's_cmp_le_u32',
+             12: 's_bitcmp0_b32', 13: 's_bitcmp1_b32', 14: 's_bitcmp0_b64',
+             15: 's_bitcmp1_b64'},
     'SOPP': {1: 's_endpgm', 12: 's_waitcnt', 22: 's_ttracedata'},
     'SMRD': {0: 's_load_dword', 1: 's_load_dwordx2', 2: 's_load_dwordx4',
              3: 's_load_dwordx8', 4: 's_load_dwordx16',
-             10: 's_buffer_load_dwordx4', 11: 's_buffer_load_dwordx8'},
+             8: 's_buffer_load_dword', 9: 's_buffer_load_dwordx2',
+             10: 's_buffer_load_dwordx4', 11: 's_buffer_load_dwordx8',
+             12: 's_buffer_load_dwordx16'},
     'VOP1': {1: 'v_mov_b32', 46: 'v_rsq_f32'},
     'VOP2': {4: 'v_sub_f32', 8: 'v_mul_f32', 31: 'v_mac_f32',
              47: 'v_cvt_pkrtz_f16_f32'},
     'VOP3': {264: 'v_mul_f32', 303: 'v_cvt_pkrtz_f16_f32', 321: 'v_mad_f32'},
+    'VOPC': {0: 'v_cmp_f_f32', 1: 'v_cmp_lt_f32', 2: 'v_cmp_eq_f32',
+             3: 'v_cmp_le_f32', 4: 'v_cmp_gt_f32', 5: 'v_cmp_lg_f32',
+             6: 'v_cmp_ge_f32', 7: 'v_cmp_o_f32', 8: 'v_cmp_u_f32',
+             9: 'v_cmp_nge_f32', 10: 'v_cmp_nlg_f32', 11: 'v_cmp_ngt_f32',
+             12: 'v_cmp_nle_f32', 13: 'v_cmp_neq_f32', 14: 'v_cmp_nlt_f32',
+             15: 'v_cmp_t_f32',
+             16: 'v_cmpx_f_f32', 17: 'v_cmpx_lt_f32', 18: 'v_cmpx_eq_f32',
+             19: 'v_cmpx_le_f32', 20: 'v_cmpx_gt_f32', 21: 'v_cmpx_lg_f32',
+             22: 'v_cmpx_ge_f32', 23: 'v_cmpx_o_f32', 24: 'v_cmpx_u_f32',
+             25: 'v_cmpx_nge_f32', 26: 'v_cmpx_nlg_f32', 27: 'v_cmpx_ngt_f32',
+             28: 'v_cmpx_nle_f32', 29: 'v_cmpx_neq_f32', 30: 'v_cmpx_nlt_f32',
+             31: 'v_cmpx_t_f32'},
     'VINTRP': {0: 'v_interp_p1_f32', 1: 'v_interp_p2_f32'},
     'MUBUF': {1: 'buffer_load_format_xy', 2: 'buffer_load_format_xyz',
               3: 'buffer_load_format_xyzw'},
@@ -45,11 +81,22 @@ OPCODES = {
     'EXP': {0: 'exp'},
 }
 
+# SOP2 operand widths: 64-bit destination, 64-bit first source, 64-bit second source.
+# The shift/bitfield forms take 64-bit values but a 32-bit shift/bitfield descriptor, so
+# only the boolean ops pair both sources; s_bfm_b64's two sources are both 32-bit.
+SOP2_DST64 = frozenset((11, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 41, 42))
+SOP2_SRC0_64 = frozenset((11, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 41, 42))
+SOP2_SRC1_64 = frozenset((11, 15, 17, 19, 21, 23, 25, 27, 29))
+# SOPC opcodes whose first source is a 64-bit pair (the second is the bit index).
+SOPC_64BIT_SRC0 = frozenset((14, 15))
+
 # mask, tag, opcode shift, opcode mask, fixed dword count. Specific
 # encodings precede VOP2 (which otherwise also matches VOP1/VOPC).
 FORMATS = (
     ('SOP1', 0xff800000, 0xbe800000, 8, 255, 1),
+    ('SOPC', 0xff800000, 0xbf000000, 16, 127, 1),
     ('SOPP', 0xff800000, 0xbf800000, 16, 127, 1),
+    ('SOP2', 0xc0000000, 0x80000000, 23, 127, 1),
     ('SMRD', 0xf8000000, 0xc0000000, 22, 31, 1),
     ('VINTRP', 0xfc000000, 0xc8000000, 16, 3, 1),
     ('VOP3', 0xfc000000, 0xd0000000, 17, 511, 2),
@@ -57,16 +104,20 @@ FORMATS = (
     ('MIMG', 0xfc000000, 0xf0000000, 18, 127, 2),
     ('EXP', 0xfc000000, 0xf8000000, 0, 0, 2),
     ('VOP1', 0xfe000000, 0x7e000000, 9, 255, 1),
+    ('VOPC', 0xfe000000, 0x7c000000, 17, 255, 1),
     ('VOP2', 0x80000000, 0, 25, 63, 1),
 )
 
 # Fields are (name, lsb, width), across a little-endian 64-bit integer.
 FIELDS = {
     'SOP1': (('src0', 0, 8), ('sdst', 16, 7)),
+    'SOP2': (('ssrc0', 0, 8), ('ssrc1', 8, 8), ('sdst', 16, 7)),
+    'SOPC': (('ssrc0', 0, 8), ('ssrc1', 8, 8)),
     'SOPP': (('simm16', 0, 16),),
     'SMRD': (('offset', 0, 8), ('imm', 8, 1), ('sbase', 9, 6), ('sdst', 15, 7)),
     'VOP1': (('src0', 0, 9), ('vdst', 17, 8)),
     'VOP2': (('src0', 0, 9), ('vsrc1', 9, 8), ('vdst', 17, 8)),
+    'VOPC': (('src0', 0, 9), ('vsrc1', 9, 8)),
     'VOP3': (('vdst', 0, 8), ('abs', 8, 3), ('clamp', 11, 1),
              ('src0', 32, 9), ('src1', 41, 9), ('src2', 50, 9),
              ('omod', 59, 2), ('neg', 61, 3)),
@@ -115,6 +166,26 @@ def _source(value: int, *, vector: bool = False, literal: bool = True) -> bool:
             or (vector and (value == 254 or 256 <= value <= 511)))
 
 
+def _literals(form: str, word: int) -> tuple[str, ...]:
+    """Which operand fields select an inline literal; one extra dword follows per instruction.
+
+    The ISA source-operand table makes selector 255 read the literal in the next word.
+    SOP2/SOPC have two 8-bit sources, so only one of them may select it; SMRD uses the same
+    selector in its OFFSET field when IMM=0 (register/literal offset form), which the pinned
+    reference decoder also reads as an extra literal dword.
+    """
+    if form == 'SOP1':
+        return ('src0',) if word & 255 == 255 else ()
+    if form in ('VOP1', 'VOP2', 'VOPC'):
+        return ('src0',) if word & 511 == 255 else ()
+    if form in ('SOP2', 'SOPC'):
+        names = ('ssrc0',) if word & 255 == 255 else ()
+        return names + (('ssrc1',) if (word >> 8) & 255 == 255 else ())
+    if form == 'SMRD' and (word & 0x100) == 0:
+        return ('offset',) if word & 255 == 255 else ()
+    return ()
+
+
 def _validate(form: str, op: int, f: dict[str, int], at: int) -> tuple[str, ...]:
     def require(ok: bool, reason: str) -> None:
         if not ok:
@@ -136,6 +207,33 @@ def _validate(form: str, op: int, f: dict[str, int], at: int) -> tuple[str, ...]
             requirements.add('reads_exec_mask')
         if f['src0'] in (106, 107, 251):
             requirements.add('reads_vcc_mask')
+    elif form == 'SOP2':
+        require(_register(f['sdst']), 'unsupported scalar destination')
+        for name in ('ssrc0', 'ssrc1'):
+            require(_source(f[name]), 'reserved/unsupported scalar source')
+        if op in SOP2_DST64:
+            require(f['sdst'] % 2 == 0 and f['sdst'] != 124, 'invalid 64-bit destination pair')
+        for name, wide in (('ssrc0', op in SOP2_SRC0_64), ('ssrc1', op in SOP2_SRC1_64)):
+            if wide and f[name] < 128:
+                require(f[name] % 2 == 0 and f[name] != 124, 'invalid 64-bit source pair')
+        if f['sdst'] in (126, 127):
+            requirements.add('writes_exec_mask')
+        for name in ('ssrc0', 'ssrc1'):
+            if f[name] in (126, 127, 252):
+                requirements.add('reads_exec_mask')
+            if f[name] in (106, 107, 251):
+                requirements.add('reads_vcc_mask')
+    elif form == 'SOPC':
+        for name in ('ssrc0', 'ssrc1'):
+            require(_source(f[name]), 'reserved/unsupported scalar source')
+        if op in SOPC_64BIT_SRC0 and f['ssrc0'] < 128:
+            require(f['ssrc0'] % 2 == 0 and f['ssrc0'] != 124, 'invalid 64-bit source pair')
+        for name in ('ssrc0', 'ssrc1'):
+            if f[name] in (126, 127, 252):
+                requirements.add('reads_exec_mask')
+            if f[name] in (106, 107, 251):
+                requirements.add('reads_vcc_mask')
+        requirements.add('writes_scc')
     elif form == 'SOPP':
         if op == 1:
             require(f['simm16'] == 0, 'unsupported nonzero s_endpgm immediate')
@@ -157,9 +255,11 @@ def _validate(form: str, op: int, f: dict[str, int], at: int) -> tuple[str, ...]
         if op >= 8:
             require(f['base_sgpr'] % 4 == 0, 'misaligned buffer descriptor')
         if not f['imm']:
-            # Literal/register-offset SMRD is deliberately not part of this
-            # bounded reader; it must never silently acquire the wrong width.
-            require(0 <= f['offset'] <= 103, 'unsupported SMRD register/literal offset')
+            # IMM=0 makes OFFSET a 32-bit scalar operand: an SGPR index, or selector 255
+            # for the inline literal that immediately follows (size already accounts for
+            # it). Other selectors are not modelled and keep the old rejection text.
+            require(f['offset'] <= 103 or f['offset'] == 255,
+                    'unsupported SMRD register/literal offset')
         requirements.add('scalar_memory')
     elif form in ('VOP1', 'VOP2', 'VOP3'):
         names = ('src0', 'src1', 'src2') if form == 'VOP3' else ('src0',)
@@ -182,6 +282,20 @@ def _validate(form: str, op: int, f: dict[str, int], at: int) -> tuple[str, ...]
             # not reinterpreted as an instruction or discarded as extra dwords.
         if (op == 47 and form == 'VOP2') or (op == 303 and form == 'VOP3'):
             requirements.add('fp16_round_toward_zero')
+    elif form == 'VOPC':
+        # VSRC0 is the 9-bit vector source; VSRC1 is a plain 8-bit VGPR number and there is
+        # no VDST field. Opcodes 0-15 write the VCC pair, 16-31 (`cmpx`) overwrite EXEC.
+        require(_source(f['src0'], vector=True), 'reserved/unsupported vector source')
+        if f['src0'] == 254:
+            requirements.add('lds_direct')
+        if f['src0'] in (126, 127, 252):
+            requirements.add('reads_exec_mask')
+        if f['src0'] in (106, 107, 251):
+            requirements.add('reads_vcc_mask')
+        if op < 16:
+            requirements.add('writes_vcc_mask')
+        else:
+            requirements.add('writes_exec_mask')
     elif form == 'VINTRP':
         requirements.add('fixed_function_interpolation')
     elif form == 'MUBUF':
@@ -228,8 +342,11 @@ def decode(code: bytes) -> list[Instruction]:
         mnemonic = OPCODES[form].get(op)
         if mnemonic is None:
             raise DecodeError(offset, f'unsupported {form} opcode {op}')
-        has_literal = (form == 'SOP1' and word & 255 == 255
-                       or form in ('VOP1', 'VOP2') and word & 511 == 255)
+        literals = _literals(form, word)
+        if len(literals) > 1:
+            # One inline-literal dword per instruction, so two selectors are ambiguous.
+            raise DecodeError(offset, f'multiple inline literals in one {form} instruction')
+        has_literal = bool(literals)
         size = (count + int(has_literal)) * 4
         if offset + size > len(code):
             raise DecodeError(offset, f'truncated {form} instruction/literal ({size} bytes required)')

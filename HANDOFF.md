@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 18:55 CDT (root) — GFX7 decoder widened to v2 (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01`, decoder widening (attempt 1). `tools/dev/gcn_inventory.py` v2 adds SOP2 (0-11, 14-42, 44 with correct 64-bit operand classes), SOPC (0-15, `writes_scc`), VOPC f32 (0-15 compare, 16-31 cmpx with EXEC tagging) and SMRD op 8/9/12 plus the `IMM=0`/`OFFSET=255` literal form. All-or-nothing decoding is unchanged.
+- **Honest result at sample 512:** decode success stays **74/367** — the removed blockers each sat ~8 bytes before another unmodelled opcode. What changed is measurable: `unsupported encoding` **235 → 0**, SMRD literal-offset rejections **39 → 0** (now 8-byte loads failing later), median first-failure offset `0x20 → 0x28`.
+- **New top blockers:** `VOP3 349` 179, `VOP2 37` 53, `VINTRP 2` 48, `SOPP 5` 5, plus single MUBUF/VOP1/SOP1 sites.
+- **Deliberately skipped:** VINTRP op 2 (needs a matching `gcn_to_msl` change so P1/P2 shapes are not mis-lowered), VOPC 32-255 (GFX9 16-bit slots make SI membership unprovable from what was checked), SOP2 reserved/43, SOPC 16, SMRD 29-31, and the MUBUF/DS/MTBUF families.
+- **Tests (PASSED):** `test_gcn_inventory.py` 30 tests, `test_gcn_to_msl.py` 23 tests, coverage self-test 23 checks. Verified by rerun: `--sample 512` reproduces 74/367 with the blocker list above.
+- **Still zero real shaders lowered** (no ABI manifest) and **G3 NOT RUN**.
+- **Next exact action:** widen MUBUF (stores, `buffer_load_format_x`) + VOPC integer compares + VOP3 349/322 + VOP2 37 in a separate card; the private simulation showed those are needed together before decode success moves.
+
 ## 2026-11-01 18:30 CDT (root) — real .csdr front-end coverage (STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `GPU-01-MSL-OFFLINE-01` coverage increment. `tools/dev/msl_corpus_coverage.py` samples the pinned private paks deterministically, reads each `.csdr` through the validated PSARC `MD5(path)` pairing, isolates every `OrbShdr` code span and asks the strict `gcn_inventory.decode()`. It never lowers, never executes and never invents an ABI.
