@@ -645,6 +645,12 @@ void run_remainder_after_registry_tail(
     if (out.post_base_registry_body.cmp_r13_r14_count == 1) {
         registry_hooks.merge_cmp_r13_r14_532b65_u1_ran = true;
     }
+    if (out.post_base_registry_body.je_532bba_count == 1) {
+        registry_hooks.merge_je_532bba_532b68_u1_ran = true;
+    }
+    if (out.post_base_registry_body.lea_rsi_rsp10_count == 1) {
+        registry_hooks.merge_lea_rsi_rsp10_532b6a_u1_ran = true;
+    }
     out.remainder = run_appmain_init_remainder_slice(table, alloc, setter_obj, flag_in, set_a,
                                                      set_b, set_c, registry_hooks);
 }

@@ -1,4 +1,4 @@
-// Init `0x531d60` registry fragment body — OBS @ `0x532b19..0x532b68` (18 units after E568 peel).
+// Init `0x531d60` registry fragment body — OBS @ `0x532b19..0x532b6f` (20 units after E570 peel).
 #pragma once
 
 #include <array>
@@ -16,6 +16,8 @@
 #include "init_531d60_post_base_mov_r13_mem_rsp40_532b5b_u1.hpp"
 #include "init_531d60_post_base_mov_r14_mem_rsp48_532b60_u1.hpp"
 #include "init_531d60_post_base_cmp_r13_r14_532b65_u1.hpp"
+#include "init_531d60_post_base_je_532bba_532b68_u1.hpp"
+#include "init_531d60_post_base_lea_rsi_rsp10_532b6a_u1.hpp"
 #include "init_531d60_post_base_mov_r12_rbx_532b41_u1.hpp"
 #include "init_531d60_post_base_mov_r13_15fe518_532b3a_u1.hpp"
 #include "init_531d60_post_base_call_54dc10_532b19_u1.hpp"
@@ -31,8 +33,8 @@
 namespace sotc {
 
 inline constexpr std::uint64_t kInit531d60PostBaseRegistryBodyRva = 0x532b19;
-inline constexpr std::size_t kInit531d60PostBaseRegistryBodySize = 79;
-inline constexpr std::uint64_t kInit531d60PostBaseRegistryBodyEndRva = 0x532b68;
+inline constexpr std::size_t kInit531d60PostBaseRegistryBodySize = 86;
+inline constexpr std::uint64_t kInit531d60PostBaseRegistryBodyEndRva = 0x532b6f;
 
 static_assert(kInit531d60PostBaseMovR14Rax_532b16_U1EndRva == kInit531d60PostBaseRegistryBodyRva);
 static_assert(kInit531d60PostBaseCall54dc10_532b19_U1Rva == kInit531d60PostBaseRegistryBodyRva);
@@ -71,6 +73,10 @@ static_assert(kInit531d60PostBaseMovR13MemRsp40_532b5b_U1EndRva ==
 static_assert(kInit531d60PostBaseMovR14MemRsp48_532b60_U1EndRva ==
                   kInit531d60PostBaseCmpR13R14_532b65_U1Rva);
 static_assert(kInit531d60PostBaseCmpR13R14_532b65_U1EndRva ==
+                  kInit531d60PostBaseJe532bba_532b68_U1Rva);
+static_assert(kInit531d60PostBaseJe532bba_532b68_U1EndRva ==
+                  kInit531d60PostBaseLeaRsiRsp10_532b6a_U1Rva);
+static_assert(kInit531d60PostBaseLeaRsiRsp10_532b6a_U1EndRva ==
                   kInit531d60PostBaseRegistryBodyEndRva);
 
 enum class RegistryBodyUnit : int {
@@ -92,6 +98,8 @@ enum class RegistryBodyUnit : int {
     mov_r13_mem_rsp40_532b5b_u1,
     mov_r14_mem_rsp48_532b60_u1,
     cmp_r13_r14_532b65_u1,
+    je_532bba_532b68_u1,
+    lea_rsi_rsp10_532b6a_u1,
     count
 };
 inline constexpr int kInit531d60PostBaseRegistryBodyUnitCount =
@@ -116,6 +124,9 @@ struct Init531d60PostBaseRegistryBodyHooks {
     bool merge_mov_r13_mem_rsp40_532b5b_u1_ran = false;
     bool merge_mov_r14_mem_rsp48_532b60_u1_ran = false;
     bool merge_cmp_r13_r14_532b65_u1_ran = false;
+    bool merge_je_532bba_532b68_u1_ran = false;
+    bool merge_lea_rsi_rsp10_532b6a_u1_ran = false;
+    const void* stack_rsp = nullptr;
     InputTable551140* table_in = nullptr;
     RegistryObject2efd160* obj_in = nullptr;
     void* r14_in = nullptr;
@@ -138,11 +149,13 @@ struct Init531d60PostBaseRegistryBodyHooks {
     Init531d60PostBaseMovR13MemRsp40_532b5b_U1Cells mov_r13_mem_rsp40_cells{};
     Init531d60PostBaseMovR14MemRsp48_532b60_U1Cells mov_r14_mem_rsp48_cells{};
     Init531d60PostBaseCmpR13R14_532b65_U1Cells cmp_r13_r14_cells{};
+    Init531d60PostBaseJe532bba_532b68_U1Cells je_532bba_cells{};
+    Init531d60PostBaseLeaRsiRsp10_532b6a_U1Cells lea_rsi_rsp10_cells{};
 };
 
 struct Init531d60PostBaseRegistryBodyResult {
     bool ok = false;
-    std::array<int, 18> unit_counts{};
+    std::array<int, 20> unit_counts{};
     int unit_executed = 0;
     int call_54dc10_count = 0;
     int mov_rbx_rax_count = 0;
@@ -162,6 +175,8 @@ struct Init531d60PostBaseRegistryBodyResult {
     int mov_r13_mem_rsp40_count = 0;
     int mov_r14_mem_rsp48_count = 0;
     int cmp_r13_r14_count = 0;
+    int je_532bba_count = 0;
+    int lea_rsi_rsp10_count = 0;
     bool r12_r14_equal = false;
     bool r13_r14_equal = false;
     bool r12_is_zero = false;
@@ -169,6 +184,9 @@ struct Init531d60PostBaseRegistryBodyResult {
     bool je_branch_outcome_modelled = false;
     bool je_532bf8_branch_taken = false;
     bool je_532bf8_branch_outcome_modelled = false;
+    bool je_532bba_branch_taken = false;
+    bool je_532bba_branch_outcome_modelled = false;
+    void* rsi_from_rsp10_lea = nullptr;
     void* r13_from_guard_cell = nullptr;
     void* r12_from_cell = nullptr;
     void* rax_from_54dc10 = nullptr;
