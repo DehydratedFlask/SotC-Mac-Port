@@ -1,5 +1,13 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 14:40 CDT (root) — GPU command surface census + GPL-2.0 adoption (STATIC_ANALYSIS_VERIFIED / DOCS_VERIFIED)
+
+- **Licence:** owner chose **GPL-2.0-or-later**; `LICENSE` added (sha256 `aaf13547…30df3`), README licence section, `docs/ATTRIBUTION.md` reuse rules, `docs/PRIOR_ART.md` §5.6 and ROADMAP updated. Commit `54913acb`.
+- **New doc:** `docs/GPU_COMMAND_SURFACE.md` — static census from `local/re/imports.json`: **101 `sceGnm*` + 24 `sceVideoOut*`** imports, grouped into 11 families with the renderer consequence of each. Decidable consequences: the title uses geometry **and** hull shaders (Metal has neither), indirect draws and indirect dispatch, shader `Update*` patching, and workload streams.
+- **Boundary contract recorded** (submission, flip, shader registration/update, resource registration, workload streams, event queue, markers, queries) with the rule that none may reach a Vulkan/MoltenVK runtime.
+- **Limits:** import census only — no call-site counts, no frame-path proof, no PM4 opcode semantics, no runtime observation.
+- **Gates:** G0/G1/G3/G4 PARTIAL; G2/G5/G6 NOT RUN.
+
 ## 2026-11-01 14:05 CDT (root) — GPU-01 PM4 framing slice + prior-art integration (FIXTURE_VERIFIED / DOCS_VERIFIED)
 
 - **Task:** `GPU-01-PM4-TRANSLATOR-01` slice 1. Grounding: the pinned game imports 101 `sceGnm*` and 24 `sceVideoOut*` symbols (`local/re/imports.json`), so its path is a PM4 submission.
