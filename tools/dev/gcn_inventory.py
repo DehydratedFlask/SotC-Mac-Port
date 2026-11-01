@@ -25,7 +25,7 @@ import struct
 import sys
 
 ISA_URL = 'https://docs.amd.com/v/u/en-US/sea-islands-instruction-set-architecture_0'
-VERSION = 'gfx7-bounded-inventory-v9'
+VERSION = 'gfx7-bounded-inventory-v11'
 
 # These are encoding facts, not a translation/semantic implementation.
 # SOP2/SOPC/VOPC rows below are opcode-value facts from the GFX7 ISA tables,
@@ -36,7 +36,7 @@ VERSION = 'gfx7-bounded-inventory-v9'
 # same reason: a linear span decoder cannot state where control resumes, so control transfer
 # stays out of the table (only s_endpgm/s_waitcnt/s_ttracedata are SOPP rows).
 OPCODES = {
-    'SOP1': {3: 's_mov_b32', 4: 's_mov_b64', 10: 's_wqm_b64',
+    'SOP1': {3: 's_mov_b32', 4: 's_mov_b64', 8: 's_not_b64', 10: 's_wqm_b64',
              36: 's_and_saveexec_b64'},
     # SOPK: immediate scalar moves/compares. Exact opcode names from the pinned PS4 SOPK table
     # (InstructionFormatSOPK in reference/shadPS4 .../format.cpp).
@@ -82,7 +82,8 @@ OPCODES = {
     'VOP3': {1: 'v_cmp_lt_f32', 3: 'v_cmp_le_f32', 4: 'v_cmp_gt_f32',
              6: 'v_cmp_ge_f32', 11: 'v_cmp_ngt_f32', 136: 'v_cmp_class_f32',
              194: 'v_cmp_eq_u32', 197: 'v_cmp_ne_u32',
-             256: 'v_cndmask_b32',
+             256: 'v_cndmask_b32', 272: 'v_max_f32',
+             362: 'v_mul_hi_u32', 363: 'v_mul_lo_i32',
              264: 'v_mul_f32', 303: 'v_cvt_pkrtz_f16_f32', 321: 'v_mad_f32',
              322: 'v_mad_i32_i24', 349: 'v_sad_u32', 350: 'v_cvt_pk_u8_f32'},
     'VOPC': {0: 'v_cmp_f_f32', 1: 'v_cmp_lt_f32', 2: 'v_cmp_eq_f32',
@@ -107,20 +108,26 @@ OPCODES = {
              211: 'v_cmpx_le_u32', 212: 'v_cmpx_gt_u32', 213: 'v_cmpx_ne_u32',
              214: 'v_cmpx_ge_u32', 215: 'v_cmpx_t_u32'},
     'VINTRP': {0: 'v_interp_p1_f32', 1: 'v_interp_p2_f32'},
+    # Exact opcode values from the pinned PS4 MUBUF table: 15 is LOAD_DWORDX3, and the dword
+    # stores are 28-31. The earlier 15/16/17 "store" rows were Sea-Islands-list guesses and were
+    # wrong for this target.
     'MUBUF': {0: 'buffer_load_format_x', 1: 'buffer_load_format_xy',
               2: 'buffer_load_format_xyz',
               3: 'buffer_load_format_xyzw',
               12: 'buffer_load_dword', 13: 'buffer_load_dwordx2',
-              14: 'buffer_load_dwordx4',
-              15: 'buffer_store_dword', 16: 'buffer_store_dwordx2',
-              17: 'buffer_store_dwordx4'},
+              14: 'buffer_load_dwordx4', 15: 'buffer_load_dwordx3',
+              28: 'buffer_store_dword', 29: 'buffer_store_dwordx2',
+              30: 'buffer_store_dwordx4', 31: 'buffer_store_dwordx3',
+              50: 'buffer_atomic_add', 51: 'buffer_atomic_sub'},
     'MIMG': {32: 'image_sample'},
     'EXP': {0: 'exp'},
 }
 
 # MUBUF component counts per modelled opcode (format loads/stores 1..4, dword forms 1/2/4).
 MUBUF_COMPONENTS = {0: 1, 1: 2, 2: 3, 3: 4, 4: 1, 5: 2, 6: 3, 7: 4,
-                    12: 1, 13: 2, 14: 4, 15: 1, 16: 2, 17: 4}
+                    12: 1, 13: 2, 14: 4, 15: 3,
+                    28: 1, 29: 2, 30: 4, 31: 3,
+                    50: 1, 51: 1}  # atomics read/write one dword of vdata
 
 # Control-transfer rows that a linear span decoder must refuse: the target is an immediate offset,
 # and inventing fall-through would fabricate a program. Names come from the pinned PS4 table in
@@ -144,7 +151,7 @@ SOP2_SRC1_64 = frozenset((11, 15, 17, 19, 21, 23, 25, 27, 29))
 SOPC_64BIT_SRC0 = frozenset((14, 15))
 # SOP1 rows whose destination and first source are 64-bit pairs (index 36 saves EXEC into
 # SDST and masks EXEC with SRC0, so both operands are wide).
-SOP1_64BIT = frozenset((4, 10, 36))
+SOP1_64BIT = frozenset((4, 8, 10, 36))
 # VOP3-encoded VOPC-class compares: the VDST field names the mask destination (VCC or an SGPR
 # pair) instead of a vector register, and the modifier fields must be clear. Names and opcode
 # values come from the pinned PS4 frontend table.
@@ -410,6 +417,8 @@ def _validate(form: str, op: int, f: dict[str, int], at: int) -> tuple[str, ...]
     elif form == 'VINTRP':
         requirements.add('fixed_function_interpolation')
     elif form == 'MUBUF':
+        if op in (50, 51):
+            requirements.add('buffer_atomic')
         # Format loads/stores take 1..4 components from the opcode; the dword forms use the
         # explicit sizes GFX7 defines (dword 1, x2 2, x4 4). There is no dwordx3 on this ISA.
         components = MUBUF_COMPONENTS.get(op)
@@ -422,7 +431,12 @@ def _validate(form: str, op: int, f: dict[str, int], at: int) -> tuple[str, ...]
                 'buffer address pair overflows VGPRs')
         if f['lds']:
             requirements.add('lds_memory')
-        requirements.add('formatted_vertex_fetch')
+        # Every MUBUF row touches a buffer descriptor; only the format rows (0-7) pass through the
+        # vertex-format conversion, so the old unconditional `formatted_vertex_fetch` tag was wrong
+        # for plain dword loads, stores and atomics.
+        requirements.add('buffer_memory')
+        if 0 <= op <= 7:
+            requirements.add('formatted_vertex_fetch')
     elif form == 'MIMG':
         require(f['dmask'] != 0, 'image dmask must not be zero')
         f.update(resource_sgpr=f['srsrc'] * 4, sampler_sgpr=f['ssamp'] * 4)
@@ -503,7 +517,7 @@ def decode(code: bytes, *, allow_branches: bool = False) -> list[Instruction]:
 
 
 PER_LANE_BLOCKERS = frozenset(('whole_quad_mode', 'writes_exec_mask', 'reads_exec_mask',
-                               'reads_vcc_mask', 'lds_direct', 'wave_barrier',
+                               'reads_vcc_mask', 'lds_direct', 'wave_barrier', 'buffer_atomic',
                                'lds_memory', 'implicit_quad_derivatives'))
 
 

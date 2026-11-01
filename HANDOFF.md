@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 02:45 CDT (root) — MUBUF numbering was wrong; corrected (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01`, card 8. **MUBUF rows corrected.** The v4 card had labelled 15/16/17 as the dword stores from the Sea Islands list; the pinned PS4 MUBUF table puts **15 = `buffer_load_dwordx3`** and the dword stores at **28–31** (31 = `buffer_store_dwordx3`). Rows are now 12/13/14/15 (loads, 1/2/4/3 components) and 28/29/30/31 (stores, 1/2/4/3); 16/17 reject again. The earlier doc section is annotated, not rewritten, so the mistake stays visible.
+- **Second tag bug fixed:** every MUBUF row carried `formatted_vertex_fetch`, including plain dword loads, stores and atomics. All MUBUF rows now carry `buffer_memory`; only format rows 0–7 carry `formatted_vertex_fetch`.
+- **Rows added:** SOP1 8 `s_not_b64` (64-bit pair rules), VOP3 272 `v_max_f32`, 362 `v_mul_hi_u32`, 363 `v_mul_lo_i32`, MUBUF 50/51 `buffer_atomic_add`/`_sub`. Atomics decode but add a `buffer_atomic` per-lane blocker — memory ordering cannot be dropped in a per-lane straight-line conversion.
+- **Measured at sample 512** (`blocks-512h`, `blocks-512k`): linear decode stays **186/367** (everything in this card sits behind branch rows). Block-mode first blockers move from `MUBUF 29` (45), `SOP1 8` (41), `MUBUF 31` (9) to `VOP2 18` (54), `VINTRP 2` (48), `VOP3 287` (24), `VOP3 426` (14), `VOP2 32` (12).
+- **Tests:** `test_gcn_inventory` 44 — including a case that asserts 15 is `buffer_load_dwordx3`, that 16/17/18 reject, that 28/29/31 are the stores, that atomics are `('buffer_atomic', 'buffer_memory')` and not per-lane eligible, and the 64-bit pair rules for `s_not_b64`. `test_gcn_to_msl` 23, coverage 23, blocks 26.
+- **Still 0 lowered.**
+- **Verification (PASSED):** build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Next exact action:** `VOP2 18` and `VOP2 32` (the next block-mode rows) plus `VINTRP 2`, which still needs the matching lowering rule before it can be admitted.
+
 ## 2026-11-03 01:40 CDT (root) — SOPK misattribution fixed; compare batch two (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `GPU-01-MSL-OFFLINE-01`, card 7. Added VOP2 0 `v_cndmask_b32` (the VOP2 form selects with **implicit VCC**, so the row tags `reads_vcc_mask` and is a per-lane blocker), VOP2 16 `v_max_f32`, VOP2 26 `v_lshlrev_b32`, VOP1 6/8/32/51, VOP3 3/6/136 compares, VOPC 214/215 `cmpx`.

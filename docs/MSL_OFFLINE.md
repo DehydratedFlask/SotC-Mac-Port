@@ -186,10 +186,12 @@ tests **FIXTURE_VERIFIED**, census **STATIC_ANALYSIS_VERIFIED**, G3 NOT RUN.
 
 ## Decoder widening 3 (MUBUF dword forms, VOPC integer cmpx)
 
-- **Added:** MUBUF 12/13/14 (`buffer_load_dword`, `dwordx2`, `dwordx4`) and 15/16/17
-  (`buffer_store_dword`, `x2`, `x4`) with explicit component counts (1/2/4 — GFX7 has no
-  `dwordx3`), plus VOPC 208–213 (`v_cmpx_{f,lt,eq,le,gt,ne}_u32`), values cross-checked against the
+- **Added:** MUBUF 12/13/14 (`buffer_load_dword`, `dwordx2`, `dwordx4`) with explicit component
+  counts, plus VOPC 208–213 (`v_cmpx_{f,lt,eq,le,gt,ne}_u32`), values cross-checked against the
   pinned shadPS4 frontend table (`209 = V_CMPX_LT_U32`, `212 = V_CMPX_GT_U32`).
+- **Corrected later (see "Decoder widening 7"):** this section originally also claimed 15/16/17 were
+  the dword *stores*, taken from the Sea Islands list. The pinned PS4 table puts the dword stores at
+  28–31 and 15 at `buffer_load_dwordx3`, so those three rows were wrong and have been replaced.
 - **Test coverage:** `test_gcn_inventory.py` gained a positive case for each row and negatives for
   MUBUF 11/18 and VOPC 207/214, which still reject.
 - **Measured at sample 512** (`--out local/validation/msl-coverage/after-opcodes-3`):
@@ -331,4 +333,25 @@ not move the census, it makes the next rows visible.
 | `MUBUF 29` | 0 | 0 | **45** |
 | `SOP1 8` | 0 | 0 | **41** |
 
+- **Still zero lowered:** decoding is not Metal semantics, and no per-shader ABI manifest exists.
+
+## Decoder widening 7 (MUBUF numbering corrected, SOP1/void rows, buffer tags)
+
+- **Second wrong-row incident, caught the same way.** The v4 card had labelled MUBUF 15/16/17 as the
+  dword stores from the Sea Islands list. The pinned PS4 MUBUF table says otherwise: **15 is
+  `buffer_load_dwordx3`**, the dword stores are **28–31** (with 31 = `buffer_store_dwordx3`), and 16/17
+  are not dword stores at all. The rows are now 12/13/14/15 (loads, 1/2/4/3 components) and
+  28/29/30/31 (stores, 1/2/4/3). 16/17 reject again. The earlier section is annotated rather than
+  rewritten, so the mistake stays visible.
+- **MUBUF tags were wrong too:** every MUBUF row was tagged `formatted_vertex_fetch`, including plain
+  dword loads, stores and atomics. All MUBUF rows now carry `buffer_memory`, and only the format rows
+  0–7 carry `formatted_vertex_fetch`.
+- **Added:** SOP1 8 `s_not_b64` (64-bit pair rules), VOP3 272 `v_max_f32`, 362 `v_mul_hi_u32`,
+  363 `v_mul_lo_i32`, and MUBUF 50/51 `buffer_atomic_add`/`buffer_atomic_sub`. Atomics decode but are
+  **never per-lane eligible**: they add a `buffer_atomic` blocker, because memory ordering cannot be
+  dropped in a straight-line per-lane conversion.
+- **Measured at sample 512** (`blocks-512h`, `blocks-512k`): linear decode stays **186/367** (all of
+  this sits behind branch rows). Block-mode first blockers move from `MUBUF 29` (45), `SOP1 8` (41),
+  `VOP3 287` (12), `MUBUF 31` (9) to `VOP2 18` (54), `VINTRP 2` (48), `VOP3 287` (24), `VOP3 426` (14),
+  `VOP2 32` (12), `VOP1 53` (6).
 - **Still zero lowered:** decoding is not Metal semantics, and no per-shader ABI manifest exists.

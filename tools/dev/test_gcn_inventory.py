@@ -170,21 +170,45 @@ class EncodingOracleTests(unittest.TestCase):
         self.assertEqual(one(vopc(op=208)).mnemonic, 'v_cmpx_f_u32')
         self.assertEqual(one(vopc(op=213)).mnemonic, 'v_cmpx_ne_u32')
 
-        # MUBUF dword forms: 12/13/14 load 1/2/4 components; 15..17 store them.
+        # MUBUF dword forms (pinned PS4 numbering): 12/13/14 load 1/2/4, 15 loads 3; the dword
+        # stores are 28-31, and 29/31 carry 2/3 components.
         load = one(mubuf(op=14, data=17, addr=59, resource=6))
         self.assertEqual((load.mnemonic, load.fields['components']), ('buffer_load_dwordx4', 4))
         self.assertEqual(one(mubuf(op=12)).fields['components'], 1)
         self.assertEqual(one(mubuf(op=13)).fields['components'], 2)
-        self.assertEqual(one(mubuf(op=15)).mnemonic, 'buffer_store_dword')
-        self.assertEqual(one(mubuf(op=17)).fields['components'], 4)
+        self.assertEqual(one(mubuf(op=15)).mnemonic, 'buffer_load_dwordx3')
+        self.assertEqual(one(mubuf(op=15)).fields['components'], 3)
+        self.assertEqual(one(mubuf(op=28)).mnemonic, 'buffer_store_dword')
+        self.assertEqual(one(mubuf(op=29)).fields['components'], 2)
+        self.assertEqual(one(mubuf(op=31)).mnemonic, 'buffer_store_dwordx3')
 
-        # Neighbouring rows stay unsupported: no dwordx3, no store_format_xyzw in this table.
-        for opcode in (11, 18):
+        # Neighbouring rows stay unsupported: 16/17 are not dword stores on this ISA.
+        for opcode in (11, 16, 17, 18):
             with self.assertRaises(gcn.DecodeError):
                 one(mubuf(op=opcode))
         for opcode in (207, 216):
             with self.assertRaises(gcn.DecodeError):
                 one(vopc(op=opcode))
+
+    def test_vop3_multiply_rows_and_buffer_atomics(self):
+        for op, name in ((272, 'v_max_f32'), (362, 'v_mul_hi_u32'), (363, 'v_mul_lo_i32')):
+            insn = one(vop3(op=op, abs_=0, clamp=0, omod=0, neg=0))
+            self.assertEqual(insn.mnemonic, name)
+        # Atomics decode but are never per-lane eligible: memory ordering cannot be dropped.
+        atomic = one(mubuf(op=50, data=3, addr=8, resource=6))
+        self.assertEqual(atomic.mnemonic, 'buffer_atomic_add')
+        self.assertEqual(atomic.requirements, ('buffer_atomic', 'buffer_memory'))
+        self.assertFalse(gcn.inventory(mubuf(op=50) + END)['per_lane_eligible'])
+        self.assertEqual(one(mubuf(op=51)).mnemonic, 'buffer_atomic_sub')
+
+    def test_sop1_not_b64_is_a_64_bit_pair(self):
+        insn = one(sop1(op=8, dst=8, src=8))
+        self.assertEqual(insn.mnemonic, 's_not_b64')
+        # 64-bit pair rule: an odd destination is refused.
+        with self.assertRaises(gcn.DecodeError):
+            one(sop1(op=8, dst=9, src=8))
+        with self.assertRaises(gcn.DecodeError):
+            one(sop1(op=8, dst=8, src=9))
 
     def test_compare_batch_two_and_cmpx_u32(self):
         # VOP3 3/6/136 are compares: mask destination, no modifiers.
@@ -596,7 +620,7 @@ class RejectionTests(unittest.TestCase):
                   vop3(op=323, abs_=0, clamp=0, omod=0, neg=0),
                   vop3(op=351, abs_=0, clamp=0, omod=0, neg=0),
                   sop1(op=35), sopp(op=2), sopp(op=5), sopp(op=9),
-                  mubuf(op=4), mubuf(op=28), mimg(op=8)):
+                  mubuf(op=4), mubuf(op=32), mimg(op=8)):
             self.reject(p+END, 'unsupported')
 
     def test_one_inline_literal_per_instruction(self):
