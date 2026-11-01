@@ -46,6 +46,10 @@ EXPECTED = [
     (0xE11C64, 0x15E1EE0, 0xB0, 0xE19980),
     (0xED171C, 0x15F2F08, 0x38, 0xE16A00),
     (0xED1733, 0x15F2F08, 0x38, 0xE16A00),
+    (0x47571, 0x1594DC0, 0x20, 0x20D60),
+    (0x4F0D41, 0x1594DC0, 0x20, 0x20D60),
+    (0xE1EE0D, 0x15E2D60, 0xD0, 0xE24900),
+    (0xE1EE31, 0x15E2D60, 0xD0, 0xE24900),
 ]
 
 
@@ -105,6 +109,7 @@ def main() -> int:
         "kResolvedVtableTarget_e1a5c0Rva = 0xe1a5c0",
         "kResolvedVtableTarget_e19980Rva = 0xe19980",
         "kResolvedVtableTarget_e16a00Rva = 0xe16a00",
+        "kResolvedVtableTarget_e24900Rva = 0xe24900",
     ):
         require(needle in header, f"header constant missing: {needle}")
     require("kResolvedVtableCallSiteCount" in header, "count constant missing")

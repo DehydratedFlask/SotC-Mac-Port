@@ -17,6 +17,7 @@
 namespace sotc {
 
 inline constexpr std::uint64_t kResolvedVtableTarget_187c0Rva = 0x187c0;
+inline constexpr std::uint64_t kResolvedVtableTarget_e24900Rva = 0xe24900;
 inline constexpr std::uint64_t kResolvedVtableTarget_13d20Rva = 0x13d20;
 inline constexpr std::uint64_t kResolvedVtableTarget_20d60Rva = 0x20d60;
 inline constexpr std::uint64_t kResolvedVtableTarget_c740Rva = 0xc740;
@@ -38,6 +39,7 @@ inline constexpr std::uint64_t kResolvedVtable_1594ae8 = 0x1594ae8;
 inline constexpr std::uint64_t kResolvedVtable_1594dc0 = 0x1594dc0;
 inline constexpr std::uint64_t kResolvedVtable_15955c0 = 0x15955c0;
 inline constexpr std::uint64_t kResolvedVtable_15d1d80 = 0x15d1d80;
+inline constexpr std::uint64_t kResolvedVtable_15e2d60 = 0x15e2d60;
 inline constexpr std::uint64_t kResolvedVtable_159c908 = 0x159c908;
 inline constexpr std::uint64_t kResolvedVtable_15d1678 = 0x15d1678;
 inline constexpr std::uint64_t kResolvedVtable_1598e10 = 0x1598e10;
@@ -60,8 +62,10 @@ inline constexpr ResolvedVtableCallSite kResolvedVtableCallSites[] = {
     {0x13620, kResolvedVtable_1594ae8, 0x28, kResolvedVtableTarget_13d20Rva},
     {0x28471, kResolvedVtable_1594dc0, 0x20, kResolvedVtableTarget_20d60Rva},
     {0x35165, kResolvedVtable_15955c0, 0x08, kResolvedVtableTarget_358c0Rva},
+    {0x47571, kResolvedVtable_1594dc0, 0x20, kResolvedVtableTarget_20d60Rva},
     {0x14dc19, kResolvedVtable_1594dc0, 0x20, kResolvedVtableTarget_20d60Rva},
     {0x257068, kResolvedVtable_159c908, 0x58, kResolvedVtableTarget_2687b0Rva},
+    {0x4f0d41, kResolvedVtable_1594dc0, 0x20, kResolvedVtableTarget_20d60Rva},
     {0xa3df9c, kResolvedVtable_15d1678, 0xe8, kResolvedVtableTarget_c2e0Rva},
     {0xa3dfda, kResolvedVtable_15d1678, 0x68, kResolvedVtableTarget_a40e20Rva},
     {0xa3dff7, kResolvedVtable_15d1678, 0x280, kResolvedVtableTarget_a460f0Rva},
@@ -72,6 +76,8 @@ inline constexpr ResolvedVtableCallSite kResolvedVtableCallSites[] = {
     {0xe119be, kResolvedVtable_15e2028, 0x2a0, kResolvedVtableTarget_e21420Rva},
     {0xe119d3, kResolvedVtable_15e2028, 0x70, kResolvedVtableTarget_e1a5c0Rva},
     {0xe11c64, kResolvedVtable_15e1ee0, 0xb0, kResolvedVtableTarget_e19980Rva},
+    {0xe1ee0d, kResolvedVtable_15e2d60, 0xd0, kResolvedVtableTarget_e24900Rva},
+    {0xe1ee31, kResolvedVtable_15e2d60, 0xd0, kResolvedVtableTarget_e24900Rva},
     {0xed171c, kResolvedVtable_15f2f08, 0x38, kResolvedVtableTarget_e16a00Rva},
     {0xed1733, kResolvedVtable_15f2f08, 0x38, kResolvedVtableTarget_e16a00Rva},
 };

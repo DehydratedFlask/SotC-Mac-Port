@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 09:35 CDT (root) — constructor-seed sweep: 4 new sites, new target 0xe24900 lifted (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Swept the 573-row constructor table (40-seed sample synchronously; full sweep running in the background) and found four sites outside the previous 18.
+- **New rows:** `0x47571` and `0x4f0d41` resolve to the known `0x20d60` via vtable `0x1594dc0` slot `0x20`; `0xe1ee0d` and `0xe1ee31` resolve to a **new** target `0xe24900` via vtable `0x15e2d60` slot `0xd0` (RELA at `0x15e2e30`). Each chain re-verified: slot qword + type-8 addend + FDE start.
+- **Table:** `vtable_resolved_entries` is now **22 sites / 16 distinct targets**; the fixture and `check_vtable_resolved_entries.py` were extended and pass.
+- **New body:** `native/core/vtable_15e2d60_slot_d0_e24900.{hpp,cpp}` — 132 B: read `sub = *(this+0x8)`, load `sub->[0x40]`, fetch `this->[0x28]()` and `this->[0x48]()`, call `fn40(sub, a, index)`, store into `*arg1`; null result returns `0x1b`; otherwise status via `result->[0xb8]`, and a non-zero status triggers `result->[0x10]()` before clearing `*arg1`.
+- **Fixture:** 6 cases (constants, null result, zero status clearing, non-zero status releasing, missing cells, missing status hook). Checker pins every call site, the `0x1b`/store/clear anchors, the epilogue, slot qword, RELA and entry map.
+- **Entry map:** regenerated to **1,432 constants / 974 RVAs / 381 headers**.
+- **Verification (PASSED):** build exit 0; CTest **513/513**; lift checkers **706 passed / 0 failed**.
+- **Next exact action:** read `local/validation/indirect-frontier/ctor-sweep.json` when the full 573-seed sweep finishes and add any remaining new targets the same way.
+
 ## 2026-11-02 08:40 CDT (root) — last resolved target 0xe21420 lifted as a decision contract (FIXTURE_VERIFIED / PARTIAL body)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Added `native/core/vtable_15e2028_slot2a0_e21420.{hpp,cpp}` for slot `0x15e2028 + 0x2a0 -> 0xe21420`.

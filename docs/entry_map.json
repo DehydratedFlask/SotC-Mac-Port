@@ -3506,6 +3506,16 @@
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
+    "0xe24900": [
+      {
+        "constant": "kVtable15e2d60SlotD0_e24900",
+        "header": "native/core/vtable_15e2d60_slot_d0_e24900.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_e24900",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0xf180": [
       {
         "constant": "kInitSlotF180",
@@ -11036,6 +11046,16 @@
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
+    "0xe24900": [
+      {
+        "constant": "kVtable15e2d60SlotD0_e24900",
+        "header": "native/core/vtable_15e2d60_slot_d0_e24900.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_e24900",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0xf180": [
       {
         "constant": "kInitSlotF180",
@@ -11339,9 +11359,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1430,
-    "distinct_rvas": 973,
-    "duplicate_rvas": 306,
-    "headers": 380
+    "constants": 1432,
+    "distinct_rvas": 974,
+    "duplicate_rvas": 307,
+    "headers": 381
   }
 }

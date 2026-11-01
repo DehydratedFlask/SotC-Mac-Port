@@ -2599,3 +2599,10 @@ target_link_libraries(sotc_vtable_15e2028_slot2a0 PUBLIC sotc_core)
 add_executable(test_vtable_15e2028_slot2a0 tests/test_vtable_15e2028_slot2a0_e21420.cpp)
 target_link_libraries(test_vtable_15e2028_slot2a0 PRIVATE sotc_vtable_15e2028_slot2a0)
 add_test(NAME vtable_15e2028_slot2a0 COMMAND test_vtable_15e2028_slot2a0)
+
+# CPU-01-AOT-CFG-SCALE-01: resolved sub-dispatch target 0xe24900 (vtable 0x15e2d60 slot 0xd0).
+add_library(sotc_vtable_15e2d60_slot_d0 STATIC core/vtable_15e2d60_slot_d0_e24900.cpp)
+target_link_libraries(sotc_vtable_15e2d60_slot_d0 PUBLIC sotc_core)
+add_executable(test_vtable_15e2d60_slot_d0 tests/test_vtable_15e2d60_slot_d0_e24900.cpp)
+target_link_libraries(test_vtable_15e2d60_slot_d0 PRIVATE sotc_vtable_15e2d60_slot_d0)
+add_test(NAME vtable_15e2d60_slot_d0 COMMAND test_vtable_15e2d60_slot_d0)
