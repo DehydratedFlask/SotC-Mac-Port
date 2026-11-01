@@ -2,7 +2,7 @@
 //   test rdi,rdi
 //   je 0x532bf0   ; skip call @ `0x532beb` when null
 //
-// After E603 `sub_eax_010cb932_532be1_u1` end @ `0x532be6`. Fall-through call is E605
+// After the E613 `mov_r13_15fe518_532bdf_u1` end @ `0x532be6`. Fall-through call is E605
 // `call_170c0_532beb_u1` @ `0x532beb` / E606 `mov_rdi_r12_532bf0_u1` @ `0x532bf0` / E607 `call_170b0_532bf3_u1` @ `0x532bf3`. NOT modelled: E608 mov @ `0x532bf8` / E609 lea @ `0x532bfb` / E610 mov @ `0x532c02` / E611 mov edx @ `0x532c07` / tail @ `0x532c0c`.. G1 PARTIAL.
 #pragma once
 

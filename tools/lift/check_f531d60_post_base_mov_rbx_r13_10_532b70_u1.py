@@ -28,8 +28,6 @@ def main():
     require('kInit531d60PostBaseNopw_532b6a_U1EndRva = 0x532b70' in PREV.read_text(),'nopw end')
     require(PREV_END == FRAG,'contiguous after nopw padding')
     frag=img.read(FRAG,FRAG_SIZE)
-    if hashlib.sha256(frag).hexdigest() != FRAG_SHA256:
-        frag=FRAG_BYTES
     require(hashlib.sha256(frag).hexdigest()==FRAG_SHA256,'authoritative frag sha')
     require(frag[0:3]==bytes.fromhex('498b5d'),'mov rbx,[r13+disp8] opcode')
     require(frag[3]==DISP,'disp 0x10')

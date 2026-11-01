@@ -34,17 +34,19 @@ with assumed solutions. Exact pinned-source evidence is in [REFERENCE_AUDIT](doc
 Three public Mac ports were reviewed against this repository's constraints; the full assessment
 with paths, licences and per-component verdicts is in [PRIOR_ART](docs/PRIOR_ART.md).
 
-- **bmy/bbport-mac** (GPL-2.0) runs the game's x86-64 code under **Rosetta 2** and its renderer
-  natively on KosmicKrisp. Its CPU work is the relevant part: a **static recompiler prototype**
-  (plaintext SELF → ELF → FDE/CFG → LLVM IR → x86-64 **and AArch64** objects) validates
-  leaf functions against the original code (308,420 comparisons, 0 mismatches; 46,340 under QEMU
-  for arm64) and documents exactly what is still missing for a whole game.
-- **Wooloomooloo2/bloodborne_mac_port** (GPL-2.0) also uses Rosetta for the CPU, but ships a
-  **direct Metal renderer** (`renderer_metal/`) for PS4 command streams with no Vulkan at run time,
-  a pipeline archive with background shader compilation, and a classified map of the **327** HLE
-  functions it registers (only 77 imported by that game).
+- **bmy/bbport-mac** (GPL-2.0-or-later) runs the game's x86-64 code under **Rosetta 2** and still
+  bundles a Vulkan runtime. Its CPU work is the relevant part: a **static recompiler** pipeline
+  (plaintext SELF → ELF → FDE/CFG → LLVM IR → x86-64 **and AArch64** objects) is documented with
+  verification numbers (308,420 comparisons, 0 mismatches; 46,340 under QEMU for arm64), but the
+  `recompiler/` source is **not published** and covers only 140 memory-free integer leaves. Its
+  own `gpu/cp/` PM4 decoder and shadow self-test are the best module boundary in the set.
+- **Wooloomooloo2/bloodborne_mac_port** (GPL-2.0-or-later) also uses Rosetta for the CPU, but ships
+  a **direct Metal renderer** (`renderer_metal/`, 60 files) for PS4 command streams with **no
+  Vulkan** at run time (removed in 0.5.3), a pipeline archive with background shader compilation,
+  and a classified map of the **327** HLE functions it registers (only 77 imported by that game).
 - **truwa/nathan-drake-collection-macos** is a signed, notarised Swift launcher around a third-party
-  PC port; useful only as a packaging reference.
+  PC port. It has **no licence file**, so its code is unusable; only its packaging chain is a
+  reference.
 
 Decisions taken from this:
 
@@ -54,8 +56,10 @@ Decisions taken from this:
 2. **Adopt the lifting method, not the code.** Add whole-program CFG closure and a guest-address →
    native-entry map to M1, following the published method and its stated gaps.
 3. **Port the direct-Metal design.** Our M3 renderer should be our own PS4 command decoder feeding
-   Metal encoders with render-pass coalescing and an `MTLBinaryArchive`, plus an offline GCN → MSL
-   step — never a Vulkan runtime.
+   Metal encoders with render-pass coalescing and an `MTLBinaryArchive`, plus an offline
+   GCN → SPIR-V → MSL step (there is no single packaged GCN → MSL tool) — never a Vulkan runtime.
+   First slice landed: `native/platform/pm4_decoder.*`, `test_pm4_decoder`, and an independent
+   Python oracle `tools/lift/check_pm4_decoder.py`.
 4. **Use the HLE map as a specification** for our native service layer.
 5. **Licence decision is a gate.** No GPL-2.0 code is vendored until the owner records a licence
    choice; design-level re-implementation needs no such decision.

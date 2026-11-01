@@ -2472,3 +2472,9 @@ file(GLOB SOTC_LANE_FRAGMENTS CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/lanes
 foreach(sotc_lane_fragment IN LISTS SOTC_LANE_FRAGMENTS)
   include("${sotc_lane_fragment}")
 endforeach()
+
+# GPU-01-PM4-TRANSLATOR-01 slice 1: PS4 GNM/PM4 packet framing (bounds-checked, no opcode semantics).
+add_library(sotc_pm4_decoder STATIC platform/pm4_decoder.cpp)
+add_executable(test_pm4_decoder tests/test_pm4_decoder.cpp)
+target_link_libraries(test_pm4_decoder PRIVATE sotc_pm4_decoder)
+add_test(NAME pm4_decoder COMMAND test_pm4_decoder)

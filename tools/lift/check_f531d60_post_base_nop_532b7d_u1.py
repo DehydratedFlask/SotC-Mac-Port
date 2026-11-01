@@ -27,8 +27,6 @@ def main():
     require('kInit531d60PostBaseJe532b98_532b7b_U1EndRva = 0x532b7d' in PREV.read_text(),'je end')
     require(PREV_END == FRAG,'contiguous after je')
     frag=img.read(FRAG,FRAG_SIZE)
-    if hashlib.sha256(frag).hexdigest() != FRAG_SHA256:
-        frag=FRAG_BYTES
     require(hashlib.sha256(frag).hexdigest()==FRAG_SHA256,'authoritative frag sha')
     require(frag==FRAG_BYTES,'nop 0f1f00')
     require(img.read(END,3)==NEXT_HEAD,'mov rax,[rbx+0x48] head @ 0x532b80')

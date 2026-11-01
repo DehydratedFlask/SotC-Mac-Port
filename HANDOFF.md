@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 14:05 CDT (root) — GPU-01 PM4 framing slice + prior-art integration (FIXTURE_VERIFIED / DOCS_VERIFIED)
+
+- **Task:** `GPU-01-PM4-TRANSLATOR-01` slice 1. Grounding: the pinned game imports 101 `sceGnm*` and 24 `sceVideoOut*` symbols (`local/re/imports.json`), so its path is a PM4 submission.
+- **Code:** `native/platform/pm4_decoder.{hpp,cpp}` — bounds-checked framing of PM4 packet types 0–3 (nop/register/filler/command), 14-bit count field, explicit `Status` taxonomy, `Sink` callback, packet caps. Opcode/register *semantics* deliberately not encoded yet (no byte evidence).
+- **Tests:** `native/tests/test_pm4_decoder.cpp` (15 cases: empty, nop, register single/multi, command, filler, truncated header/payload, reserved bits, oversized, packet cap, sink reject, mixed census, helper, status names) plus `--census` mode; `tools/lift/check_pm4_decoder.py` re-frames 18 generated streams in Python and requires an identical census. Mutation probes: opcode-shift mutation → 1 failure; count-field mutation → 20 failures.
+- **Verification (PASSED):** configure exit 0; build exit 0; CTest **496/496**; lift checkers **687 passed / 0 failed** (includes the new `check_pm4_decoder`).
+- **Review fixes (E613 audit):** removed a tautological byte check (`if sha != FRAG_SHA256: frag = FRAG_BYTES`) from five checkers — all five still pass against the raw ELF, so no byte drift, but the pins are now meaningful; corrected two stale unit references in headers.
+- **Prior art (corrected):** `docs/PRIOR_ART.md` now records pinned commits, that bbport-mac's `recompiler/` source is **not published** (method only), that bloodborne_mac_port removed MoltenVK/Vulkan in 0.5.3 and ships a 60-file direct-Metal renderer, and that truwa's repo has **no licence**. Independent deep-dive: `local/validation/prior-art/REPORT.md`; E613 review: `local/validation/e613-review/REPORT.md`.
+- **Gates:** G0/G1/G3/G4 PARTIAL; G2/G5/G6 NOT RUN. No boot/audio/save claim.
+
 ## 2026-11-01 13:19 CDT (root) — E613/E615 registry-body byte fidelity + prior-art roadmap (FIXTURE_VERIFIED / DOCS_VERIFIED)
 
 - **Branch:** `cursor/init-hash-551140-6aa93e8`, commits `21be37bf` → `a8199312` → `75d7a8da` (pushed; PR #18).

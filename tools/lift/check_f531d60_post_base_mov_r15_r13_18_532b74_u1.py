@@ -28,8 +28,6 @@ def main():
     require('kInit531d60PostBaseMovRbxR13_10_532b70_U1EndRva = 0x532b74' in PREV.read_text(),'mov rbx end')
     require(PREV_END + 1 == FRAG,'contiguous after mov rbx')
     frag=img.read(FRAG,FRAG_SIZE)
-    if hashlib.sha256(frag).hexdigest() != FRAG_SHA256:
-        frag=FRAG_BYTES
     require(hashlib.sha256(frag).hexdigest()==FRAG_SHA256,'authoritative frag sha')
     require(frag[0:3]==bytes.fromhex('4d8b7d'),'mov r15,[r13+disp8] opcode')
     require(frag[3]==DISP,'disp 0x18')

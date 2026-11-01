@@ -35,8 +35,8 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `native/app` | 3 | Native game implementation; verify module README and task ownership |
 | `native/core` | 1418 | Native game implementation; verify module README and task ownership |
 | `native/lanes` | 7 | Native game implementation; verify module README and task ownership |
-| `native/platform` | 8 | Native game implementation; verify module README and task ownership |
-| `native/tests` | 494 | Native game implementation; verify module README and task ownership |
+| `native/platform` | 10 | Native game implementation; verify module README and task ownership |
+| `native/tests` | 495 | Native game implementation; verify module README and task ownership |
 | `reference` | 0 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC` | 12 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC/docs` | 10 | Pinned upstream source; read-only; symbols indexed by Graft |
@@ -600,7 +600,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `tools/dev` | 14 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft/.cache` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
-| `tools/lift` | 732 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/lift` | 733 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/pkg-extractor` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
 
 Private recursive inventory: `local/indexes/folders.json` (excluded from publication).

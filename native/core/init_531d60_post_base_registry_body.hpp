@@ -1,4 +1,4 @@
-// Init `0x531d60` registry fragment body — OBS @ `0x532b19..0x532c0f` (62 units).
+// Init `0x531d60` registry fragment body — OBS @ `0x532b19..0x532c1c` (64 units).
 #pragma once
 
 #include <array>
