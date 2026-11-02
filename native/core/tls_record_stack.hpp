@@ -52,6 +52,7 @@ enum class TlsRecordStatus : std::uint8_t {
     out_of_range,
     capacity,          // retail would overwrite the count at +0x400; the model refuses
     thread_pointer,    // the TLS model could not resolve `fs:0`
+    empty,             // the consumer path requires a non-zero count
 };
 
 const char* tls_record_status_name(TlsRecordStatus status) noexcept;
@@ -89,6 +90,13 @@ struct TlsRecordRead {
     std::uint8_t blob[16] = {};
     std::uint32_t field = 0;
 };
+
+// The consumers' idiom: `count = *(u32*)(tcb+0x400); if (!count) skip; record = tcb + (count-1)*0x20`.
+// Both allocator-front bodies (`0x11fb0` at 0x12007, `0x12820` at 0x12890) read the last pushed
+// record this way, so the records behave as a LIFO override stack for the current thread.
+[[nodiscard]] TlsRecordRead tls_record_peek_top(const GuestThreads& threads,
+                                               std::uint32_t thread_id) noexcept;
+
 
 [[nodiscard]] TlsRecordRead tls_record_read(const GuestThreads& threads, std::uint32_t thread_id,
                                             std::uint32_t index) noexcept;

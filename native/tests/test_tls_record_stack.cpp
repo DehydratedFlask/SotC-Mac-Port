@@ -11,6 +11,7 @@ using sotc::GuestThreads;
 using sotc::TlsRecordStatus;
 using sotc::tls_record_pop;
 using sotc::tls_record_push;
+using sotc::tls_record_peek_top;
 using sotc::tls_record_read;
 
 int failures = 0;
@@ -109,6 +110,33 @@ void test_unknown_thread_and_isolation() {
                                         sotc::TlsStatus::ok && count == 0);
 }
 
+void test_peek_top_matches_the_consumer_idiom() {
+    GuestThreads threads;
+    (void)threads.create(6);
+    check("empty stack", tls_record_peek_top(threads, 6).status == TlsRecordStatus::empty);
+
+    const std::uint8_t blob[16] = {};
+    (void)tls_record_push(threads, 6, 0x100, blob, 1);
+    const auto first_top = tls_record_peek_top(threads, 6);
+    check("first top", first_top.ok && first_top.arg0 == 0x100 && first_top.field == 1);
+
+    (void)tls_record_push(threads, 6, 0x200, blob, 2);
+    const auto second_top = tls_record_peek_top(threads, 6);
+    check("second top", second_top.ok && second_top.arg0 == 0x200 && second_top.field == 2);
+
+    // Peeking does not consume: the count is unchanged and pop returns the same record.
+    std::uint32_t count = 0;
+    (void)threads.read_u32(6, sotc::kTlsRecordCountOffset, count);
+    check("peek is non-destructive", count == 2);
+    (void)tls_record_pop(threads, 6);
+    const auto after_pop = tls_record_peek_top(threads, 6);
+    check("after pop", after_pop.ok && after_pop.arg0 == 0x100);
+    (void)tls_record_pop(threads, 6);
+    check("empty again", tls_record_peek_top(threads, 6).status == TlsRecordStatus::empty);
+    check("unknown thread peek",
+          tls_record_peek_top(threads, 99).status == TlsRecordStatus::no_thread);
+}
+
 void test_status_names() {
     check("name ok", std::string_view(sotc::tls_record_status_name(TlsRecordStatus::ok)) == "ok");
     check("name capacity",
@@ -123,6 +151,7 @@ int main() {
     test_pop();
     test_capacity_refused();
     test_unknown_thread_and_isolation();
+    test_peek_top_matches_the_consumer_idiom();
     test_status_names();
 
     if (failures == 0) {

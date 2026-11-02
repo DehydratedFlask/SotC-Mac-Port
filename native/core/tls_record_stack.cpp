@@ -16,6 +16,8 @@ const char* tls_record_status_name(TlsRecordStatus status) noexcept {
             return "capacity";
         case TlsRecordStatus::thread_pointer:
             return "thread_pointer";
+        case TlsRecordStatus::empty:
+            return "empty";
     }
     return "unknown";
 }
@@ -98,6 +100,24 @@ TlsRecordPopResult tls_record_pop(GuestThreads& threads, std::uint32_t thread_id
     out.ok = true;
     out.count_after = after;
     return out;
+}
+
+TlsRecordRead tls_record_peek_top(const GuestThreads& threads, std::uint32_t thread_id) noexcept {
+    TlsRecordRead out{};
+    if (!threads.alive(thread_id)) {
+        out.status = TlsRecordStatus::no_thread;
+        return out;
+    }
+    std::uint32_t count = 0;
+    if (threads.read_u32(thread_id, kTlsRecordCountOffset, count) != TlsStatus::ok) {
+        out.status = TlsRecordStatus::thread_pointer;
+        return out;
+    }
+    if (count == 0) {
+        out.status = TlsRecordStatus::empty;
+        return out;
+    }
+    return tls_record_read(threads, thread_id, count - 1);
 }
 
 TlsRecordRead tls_record_read(const GuestThreads& threads, std::uint32_t thread_id,

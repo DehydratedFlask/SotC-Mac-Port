@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 07:05 CDT (root) — the record-stack consumers are the allocator front (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`, consumer card. Found and pinned the code that reads the records: **`0x11fb0` at `0x12007`** and **`0x12820` at `0x12890`** — the two bodies `allocator_front.hpp` lists as the unmodelled "TLS free-heap hint". Both do `count = *(u32*)(tcb+0x400); if (!count) skip; record = tcb + (count-1)*0x20`, i.e. they take the **last** pushed record and only inspect it.
+- **Meaning of the records, established rather than guessed:** they are a **per-thread LIFO override stack** — `0x12300` pushes a 0x20-byte record, `0x12350` pops, and the allocator front peeks at `count-1`. A free-list reading is wrong: neither consumer removes the record it reads (the count is untouched), and pop is a separate call.
+- **Model:** `tls_record_peek_top(threads, thread_id)` reproduces that idiom exactly — non-destructive, `empty` when the count is zero, `no_thread` for an unknown thread — plus a fixture proving push/push → peek returns the second record, pop → peek returns the first, pop → `empty`, and peeking never changes the count.
+- **Checker:** `check_tls_record_stack.py` now pins both consumer windows by digest (`0x12007` `05b31f8c…`, `0x12890` `c7020037…`), requires them to still live inside `0x11fb0`/`0x12820`, and requires the header to declare both the accessor and the `empty` status. (A tautological assertion I first wrote in that spot was replaced with those two real digests.)
+- **Verification (PASSED):** build exit 0; CTest **520/520**; lift checkers **712 passed / 0 failed**.
+- **Next exact action:** the records' *contents* are pushed by 14 call sites of `0x12300` (e.g. `0x335d0`, `0x90470`, `0x917c0`, `0x1b2390`); picking one and reading what it pushes is the way to name the record fields (`arg0`, the 16-byte blob, the `+0x18` dword).
+
 ## 2026-11-03 06:05 CDT (root) — TLS record stack lifted from the two real bodies (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. `native/core/tls_record_stack.{hpp,cpp}` models the two TLS consumers the binary actually has: **`0x12300`** (77 B `push`: `tcb = *(fs:0 + *(0x15fff98))`, `count = *(u32*)(tcb+0x400)`, store `count+1`, then write a 0x20-byte record `{arg0, 16 bytes from rsi, *(u32*)(rsi+0x10)}` at `tcb + count*0x20`) and **`0x12350`** (31 B `pop`: `decl 0x400(%rax)`).

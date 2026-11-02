@@ -89,6 +89,23 @@ def main() -> int:
     require(push.find(bytes.fromhex("899000040000")) < push.find(bytes.fromhex("4c893408")),
             "push stores the count after the record, which contradicts the header comment")
 
+    # The consumer idiom: count at +0x400, bail when zero, take the LAST record (count-1)*0x20.
+    consumer_a = image.read(0x12007, 0x13)
+    consumer_b = image.read(0x12890, 0x10)
+    require(consumer_a.hex() == "8b880004000085c9740bffc948c1e1054801c8",
+            "0x12007 consumer idiom changed")
+    require(consumer_b.startswith(bytes.fromhex("8b880004000085c9740effc94489ea48")),
+            "0x12890 consumer idiom changed")
+    for site, body, sha in (
+            (0x12007, consumer_a, "05b31f8c35c9c69c5c89e481aba07e78be3b0b7f4dcb566b337264a1da1135d1"),
+            (0x12890, consumer_b, "c702003734723209abba7a550939e5858bd7037e0fe373377c76fe690429ff95")):
+        require(hashlib.sha256(body).hexdigest() == sha, f"0x{site:x} consumer bytes changed")
+        owner = fdes.find(site)
+        require(owner is not None and owner[0] in (0x11FB0, 0x12820),
+                f"0x{site:x} is no longer inside 0x11fb0/0x12820")
+    require("tls_record_peek_top" in header, "header lacks the consumer accessor")
+    require("empty," in header, "header lacks the empty status the consumer guard needs")
+
     # The link-time offset cell value is only meaningful at load time; record what is in the file.
     cell = struct.unpack("<q", image.read(0x15FFF98, 8))[0]
     print(f"0x15fff98 file value = {cell} (relocated at load time; not modelled)")
