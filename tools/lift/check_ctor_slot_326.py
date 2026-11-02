@@ -523,6 +523,30 @@ GATE_BYTES = {
     0xC4F0: "c3",
 }
 
+# The 0xc300 body's store script, so the module's reproduced net state is tied to the *bytes* and not to
+# another model: (site, bytes, what). 0xc300 FDE is 352 B, sha pinned below.
+C300_SHA = "b0fad1ce8145048f5faf081eb6e4a03f97f9b8eb1cdaa44a76ff41e94f5f442f"
+C300_BYTES = [
+    (0xC33B, "488d05d67d5801", "lea 0x1594118 (the mid vptr table base)"),
+    (0xC34D, "4883c010", "add rax,0x10 -> 0x1594128"),
+    (0xC351, "488903", "[this] = the mid vptr"),
+    (0xC354, "4c896360", "[this+0x60] = the caller's value cell"),
+    (0xC358, "c6436c00", "byte [this+0x6c] = 0 (then the dword)"),
+    (0xC35C, "c6437001", "byte [this+0x70] = 1 (min engaged)"),
+    (0xC360, "418b07", "eax = *min"),
+    (0xC363, "89436c", "[this+0x6c] = the min dword"),
+    (0xC366, "c6437400", "byte [this+0x74] = 0 (then the dword)"),
+    (0xC36A, "c6437801", "byte [this+0x78] = 1 (max engaged)"),
+    (0xC36E, "418b06", "eax = *max"),
+    (0xC371, "894374", "[this+0x74] = the max dword"),
+    (0xC374, "c5fc118380000000", "ymm [this+0x80] = 0 (the argument copy)"),
+    (0xC37C, "48898bc0000000", "[this+0xc0] = 0x1594318 (the seed functor tag)"),
+    (0xC383, "48c783b000000000000000", "[this+0xb0] = 0 (payload)"),
+    (0xC38E, "48c783c800000000000000", "[this+0xc8] = 0 (aux)"),
+    (0xC3C9, "488900", "[this+0x80] = this+0x80 (the q[3] self-pointer rule)"),
+    (0xC429, "48898bc8", "[this+0xc8] = the caller's aux (the aux swap)"),
+]
+
 # The 0x26800 body: its direct calls, its rip operand and its literal bytes.
 LABEL_CALLS = [(0x2685C, 0xF1A0), (0x26865, 0xF180), (0x268A8, 0x268B0)]
 LABEL_RIPS = [(0x2684E, 7, 3, 0xF96530), (0x2686A, 7, 3, 0x2DFD4B8)]
@@ -699,6 +723,13 @@ def check_elf(e: Elf) -> None:
             "the bool class gate bodies are pinned")
     require(GATE_BYTES[0xBBA0] == "b801000000c3" and GATE_BYTES[0xBBF0] == "b803000000c3",
             "the float class gate bodies are pinned")
+
+    # --- the 0xc300 body's store script (what the module reproduces) ----------------------------
+    require(fde_range(e, 0xC300) == 352, "the 0xc300 body is 352 B by its FDE")
+    require(digest(e.read(0xC300, 352)) == C300_SHA, "the 0xc300 body sha256")
+    require(e.rip(0xC33B, 7, 3) == 0x1594118, "0xc33b leads the mid vptr table 0x1594118")
+    for site, want, what in C300_BYTES:
+        e.bytes_at(site, want, what)
 
     # --- the two argument-functor tables -------------------------------------------------------
     for table, slots in ARG_TABLES:
