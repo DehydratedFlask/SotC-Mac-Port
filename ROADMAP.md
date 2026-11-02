@@ -84,8 +84,11 @@ Decisions taken from this:
 M0–M6 below remain the outer frame. Day-to-day work prioritizes **shared platform contracts**
 (`CritSec` `0x3b310`/`0x3b380`, allocator dispatch behind `alloc_wrappers_17070`) that unblock many
 lifts, then **leverage-ranked** native bodies (see `CPU-01-INIT-531D60-HOOK-INVENTORY-01` in
-[HANDOFF](HANDOFF.md) / [TASKS](docs/TASKS.md)). Constructor coverage remains **449/573** with first
-gap index **309** / `0xa505e0` — track it, but do not treat greedy per-callsite Init lifting as G1
+[HANDOFF](HANDOFF.md) / [TASKS](docs/TASKS.md)). Constructor coverage is **451/573** (measured by
+`tools/lift/g1_evidence_pack.py`, not remembered) with first gap index **314** / `0xa41810`. The
+recovered set is **not a prefix**: 137 rows above the first gap are registered, so 451/573 is
+registration coverage, not startup-order or semantic coverage — track it, but do not treat greedy
+per-callsite Init lifting as G1
 progress. Slot **23** (`0xe71990`) is registered via a **private fixture**; consumer/string necessity
 remains unresolved (G1 caveat). Operating plan lives in [HANDOFF](HANDOFF.md) only. Prefer
 session-sized code + checker acceptance over characterization-only docs churn.

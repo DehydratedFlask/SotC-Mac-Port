@@ -20,13 +20,16 @@
 // (0x17070), runs the manager constructor 0x210b0 on it and installs it. 0x242c0 is not a
 // constructor-table entry and has exactly one caller (0x255119, in the engine boot sequence that
 // follows static initialisation). The manager constructor 0x210b0 (0x111 B) then DRAINS the pending
-// list FIFO by calling 0x20d80(node-8, manager) for each queued command. The only other write is
+// list FIFO by calling 0x20d80(node-8, manager) for each queued command; it is native in
+// concmd_manager_210b0.{hpp,cpp}, and it re-empties the head in its tail block. The only other write
+// is
 // constructor-table index 567 (`0x235d0`), which stores 0 (`mov qword [r14],0`) before registering
 // the `executeCmd` command, and the teardown 0x240f0 stores 0 at 0x241e1. The census of the 28
 // image references to the cell (CPU-01-CONCMD-298-299-301-01) finds only `lea` forms, and the
 // stores through those registers are exactly these three (two zero, one install). Hence every ConCmd constructor at
 // indices 0..566 sees a null manager and queues itself. Nothing here creates, owns or drains a
-// manager.
+// manager: that is concmd_manager_210b0 (0x210b0), which builds the object and drains this list
+// through the register body 0x20d80.
 //
 // NOT modelled: the unregister/destructor chain (0x20b50 base, 0x20b0 / 0xb0cb40 / 0x20f0 /
 // 0x272d0 class destructors). They are registered with `__cxa_atexit` and are recorded in the
@@ -160,6 +163,15 @@ struct ConCmdRegisterResult {
 // 0x20d60 / 0x20d80.
 [[nodiscard]] ConCmdRegisterResult register_concmd_20d60(ConCmdBase& cmd,
                                                          ConCmdRegistry& registry) noexcept;
+
+// 0x20d80 alone, without 0x20d60's `cmp byte [rdi+0x18],0` once-flag guard. `manager` is the body's
+// second argument — 0x20d60 passes `[0x2dfcbc8]`, and the manager constructor 0x210b0 passes the
+// object it is still building (it installs the cell only after 0x210b0 returns, at 0x243f5). This is
+// the entry the drain uses (`callq 0x20d80` at 0x21166): a command queued by 0x20d60 already has
+// `registered == 1`, so calling the guarded entry from the drain would return immediately and insert
+// nothing. The body does not unlink the node it registers.
+[[nodiscard]] ConCmdRegisterResult register_concmd_body_20d80(ConCmdBase& cmd, void* manager,
+                                                             ConCmdRegistry& registry) noexcept;
 
 // `call 0xf590` on a stack view built by the constructors: the temporary never carries a control
 // counter, so the lifted release is an exact no-op. Returns false if a counter were present (the

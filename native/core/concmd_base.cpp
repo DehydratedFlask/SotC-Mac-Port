@@ -51,16 +51,8 @@ bool ensure_concmd_pending_list(ConCmdRegistry& registry) noexcept {
     return true;
 }
 
-ConCmdRegisterResult register_concmd_20d60(ConCmdBase& cmd, ConCmdRegistry& registry) noexcept {
+ConCmdRegisterResult register_concmd_body_20d80(ConCmdBase& cmd, ConCmdRegistry& registry) noexcept {
     ConCmdRegisterResult out{};
-
-    // 0x20d60: cmp byte [rdi+0x18],0; je continue; ret
-    if (cmd.registered != 0) {
-        out.ok = true;
-        out.path = ConCmdRegisterPath::already_registered;
-        return out;
-    }
-    cmd.registered = 1;   // mov byte [rdi+0x18],1
 
     // 0x20d72: rsi = [0x2dfcbc8]; jmp 0x20d80
     if (registry.manager.manager != nullptr) {
@@ -87,6 +79,19 @@ ConCmdRegisterResult register_concmd_20d60(ConCmdBase& cmd, ConCmdRegistry& regi
 
     out.ok = true;
     return out;
+}
+
+ConCmdRegisterResult register_concmd_20d60(ConCmdBase& cmd, ConCmdRegistry& registry) noexcept {
+    // 0x20d60: cmp byte [rdi+0x18],0; je continue; ret
+    if (cmd.registered != 0) {
+        ConCmdRegisterResult out{};
+        out.ok = true;
+        out.path = ConCmdRegisterPath::already_registered;
+        return out;
+    }
+    cmd.registered = 1;   // mov byte [rdi+0x18],1
+
+    return register_concmd_body_20d80(cmd, registry);   // 0x20d72: jmp 0x20d80
 }
 
 bool release_inert_view_f590(const SharedStr& view) noexcept {

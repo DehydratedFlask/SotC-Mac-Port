@@ -20,7 +20,8 @@ executed, and **no target is guessed**.
   exhaustive entry-map sweep, the vtable-closure sweep, and its provenance audit. Their artifacts
   live under `local/validation/indirect-frontier/` (`ctor-sweep.json`, `entry-map-sweep.json`,
   `entry-map-sweep2.json`, `entry-map-exhaustive-summary.json`, `vtable-closure-sweep-summary.json`,
-  `tied-sites-image-wide.json`, `tied-sites-image-wide-strict.json`).
+  `tied-sites-image-wide.json`, `tied-sites-image-wide-strict.json`,
+  `store-to-load-forwarding.json`).
 
 Inputs (pinned): ELF `d0723afb…61d3`, disassembly `9c196254…107e83`, FDE ranges `f507ab6c…22e8`.
 
@@ -279,7 +280,7 @@ Seed class: the 50 table-level rows themselves. This is the one route the previo
 "largest *provable* remainder" and left unmeasured: a locally constructed object whose vtable
 pointer is stored to a stack slot or member and reloaded before the indirect call.
 
-The pass (`tools/lift/store_to_load_forwarding.py`, self-tested on 15 synthetic cases) follows
+The pass (`tools/lift/store_to_load_forwarding.py`, self-tested on 16 synthetic cases) follows
 **exactly one hop**: call register ← one member load ← one earlier store to the same location in
 the same FDE. The store must be a single reaching definition inside one straight-line region — no
 call, no branch, no write to the location's base register, no possibly-aliasing store, and no

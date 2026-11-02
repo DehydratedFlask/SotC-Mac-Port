@@ -2,7 +2,7 @@
 //
 // Proves that every lifted vec_*/leaf_* constructor module runs in recovered_constructors(), that
 // the registered rows pair with the pinned original table, and that the remaining startup cliff is
-// explicit (first unrecovered index 314 / RVA 0xa41810).
+// explicit (first unrecovered index 316 / RVA 0xa33280).
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -42,7 +42,7 @@ int main() {
     CHECK(result.blocked_on_rva == 0);
     CHECK(!st.init_failed);
     CHECK(result.completed == slots.size());
-    CHECK(slots.size() == 451);
+    CHECK(slots.size() == 452);
 
     // Every registered row is in original order and pairs with the pinned table.
     for (std::size_t i = 0; i < slots.size(); ++i) {
@@ -53,9 +53,9 @@ int main() {
     }
 
     // ---- explicit, machine-checked gap ---------------------------------------
-    CHECK(first_unrecovered_constructor_index() == 314);
-    CHECK(first_unrecovered_constructor_rva() == 0xa41810);
-    CHECK(slots.size() + 122 == kOriginalCtorCount);
+    CHECK(first_unrecovered_constructor_index() == 316);
+    CHECK(first_unrecovered_constructor_rva() == 0xa33280);
+    CHECK(slots.size() + 121 == kOriginalCtorCount);
 
     // ---- CPU-01-STARTUP-LEAF-ROWS-315-560-01 -------------------------------
     CHECK(st.slot315_cell == 0);
@@ -116,10 +116,10 @@ int main() {
     CHECK(st.slot303.var.default_value == 0 && st.slot303.var.fn_vptr == 0x15d2478);
     CHECK(st.slot303.item.target == &st.slot303.var && st.slot303.item.flags == 0x30);
     CHECK(st.concmd.manager.manager == nullptr);
-    CHECK(st.concmd.pending.size() == 114);                      // observed: 111 through slot 310 + slot 312's 3 variables
+    CHECK(st.concmd.pending.size() == 124);                      // observed: 114 through slot 312 + slot 314's 10 variables
     CHECK(st.concmd.pending.first() == &st.slot298_shader_type.base.pending);
-    CHECK(st.debug_menu.root.count == 68);                      // observed: 64 through slot 310 + slot 312's 1 group + 3 toggles
-    CHECK(st.concmd.atexit_log.size() == 288);                  // observed: 280 through slot 310 + slot 312's 8 records
+    CHECK(st.debug_menu.root.count == 78);                      // observed: 68 through slot 312 + slot 314's 10 toggles
+    CHECK(st.concmd.atexit_log.size() == 310);                  // observed: 288 through slot 312 + slot 314's 22 records
                                                                 // (the menu root was already initialised, so
                                                                 //  0x268b0 records nothing new here)
     for (std::size_t i = 0; i < kSlot302HandleCount; ++i) {

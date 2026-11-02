@@ -180,6 +180,10 @@
         "header": "native/core/ctor_slot_312_a46130.hpp"
       },
       {
+        "constant": "kSlot314CanaryCell",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      },
+      {
         "constant": "kInitEntryGuardCell",
         "header": "native/core/init_531d60_entry_gaps.hpp"
       },
@@ -238,6 +242,10 @@
       {
         "constant": "kSlot312Dso",
         "header": "native/core/ctor_slot_312_a46130.hpp"
+      },
+      {
+        "constant": "kSlot314Dso",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       },
       {
         "constant": "kTinyAtexitDso",
@@ -602,12 +610,26 @@
         "header": "native/core/ctor_slot_309_a505e0.hpp"
       },
       {
+        "constant": "kSlot314ConCmdBaseCtor",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      },
+      {
         "constant": "kOwnerRow3CommandCtor",
         "header": "native/core/owner_ctor_14db00.hpp"
       },
       {
         "constant": "kRangedBoundBaseCtor",
         "header": "native/core/ranged_bound_var_a4f4d0.hpp"
+      }
+    ],
+    "0x20b0": [
+      {
+        "constant": "kBoolVarDtor",
+        "header": "native/core/concmd_vars.hpp"
+      },
+      {
+        "constant": "kSlot314BoolVarDtor",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       }
     ],
     "0x20b50": [
@@ -638,6 +660,10 @@
         "header": "native/core/ctor_slot_312_a46130.hpp"
       },
       {
+        "constant": "kSlot314ConCmdRegister",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      },
+      {
         "constant": "kOwnerRow3CommandRegister",
         "header": "native/core/owner_ctor_14db00.hpp"
       },
@@ -662,6 +688,16 @@
       {
         "constant": "kVtable1594dc0Slot20_20d60TailTarget",
         "header": "native/core/vtable_1594dc0_slot20_20d60.hpp"
+      }
+    ],
+    "0x20f0": [
+      {
+        "constant": "kRangedFloatDtor",
+        "header": "native/core/concmd_vars.hpp"
+      },
+      {
+        "constant": "kSlot314FloatVarDtor",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       }
     ],
     "0x21620": [
@@ -782,6 +818,10 @@
         "header": "native/core/ctor_slot_312_a46130.hpp"
       },
       {
+        "constant": "kSlot314MenuRegister",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      },
+      {
         "constant": "kDebugMenuRegister",
         "header": "native/core/debug_menu_item.hpp"
       }
@@ -814,6 +854,10 @@
       {
         "constant": "kSlot312MenuToggleCtor",
         "header": "native/core/ctor_slot_312_a46130.hpp"
+      },
+      {
+        "constant": "kSlot314MenuToggleCtor",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       },
       {
         "constant": "kDebugMenuItemToggleCtor",
@@ -866,6 +910,10 @@
       {
         "constant": "kSlot312TableTop",
         "header": "native/core/ctor_slot_312_a46130.hpp"
+      },
+      {
+        "constant": "kSlot314TableTop",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       }
     ],
     "0x2dfce50": [
@@ -1162,6 +1210,16 @@
       {
         "constant": "kStoreTsc323d0",
         "header": "native/core/store_tsc_323d0.hpp"
+      }
+    ],
+    "0x32f6d18": [
+      {
+        "constant": "kSlot313Cell",
+        "header": "native/core/ctor_slot_313_a447a0.hpp"
+      },
+      {
+        "constant": "kSlot314NextCtorFirstObject",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       }
     ],
     "0x32f79a8": [
@@ -3576,6 +3634,16 @@
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
+    "0xa41810": [
+      {
+        "constant": "kSlot312NextUnrecovered",
+        "header": "native/core/ctor_slot_312_a46130.hpp"
+      },
+      {
+        "constant": "kSlot314",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      }
+    ],
     "0xa431e0": [
       {
         "constant": "kInit531d60PostBaseA431e0U1Target",
@@ -3760,6 +3828,36 @@
       {
         "constant": "kResolvedVtableTarget_c2e0",
         "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0xc2f0": [
+      {
+        "constant": "kSlot309BoolVarFnSlot3",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
+        "constant": "kSlot314BoolArgDestroy",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      }
+    ],
+    "0xc300": [
+      {
+        "constant": "kRangedFloatCtor",
+        "header": "native/core/concmd_vars.hpp"
+      },
+      {
+        "constant": "kSlot314FloatVarCtor",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      }
+    ],
+    "0xc4f0": [
+      {
+        "constant": "kRangedFloatFnDestroy",
+        "header": "native/core/concmd_vars.hpp"
+      },
+      {
+        "constant": "kSlot314FloatArgDestroy",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       }
     ],
     "0xc740": [
@@ -3956,6 +4054,10 @@
         "header": "native/core/ctor_slot_312_a46130.hpp"
       },
       {
+        "constant": "kSlot314Release",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      },
+      {
         "constant": "kInit531d60PostBaseF590Target",
         "header": "native/core/init_531d60_post_base_26800_f590.hpp"
       },
@@ -4088,6 +4190,10 @@
         "header": "native/core/ctor_slot_312_a46130.hpp"
       },
       {
+        "constant": "kSlot314Atexit",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      },
+      {
         "constant": "kTinyAtexitPlt",
         "header": "native/core/ctor_tiny_atexit_slots.hpp"
       }
@@ -4100,6 +4206,10 @@
       {
         "constant": "kSlot312StackChkFail",
         "header": "native/core/ctor_slot_312_a46130.hpp"
+      },
+      {
+        "constant": "kSlot314StackChkFail",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       },
       {
         "constant": "kInsert1bdb50StackFail",
@@ -4272,6 +4382,24 @@
       {
         "constant": "kSharedReleaseF590Destroy",
         "header": "native/core/shared_release_f590.hpp"
+      }
+    ],
+    "0x12c2760": [
+      {
+        "constant": "kSlot314PageName",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      }
+    ],
+    "0x12c2789": [
+      {
+        "constant": "kSlot314MenuParent",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      }
+    ],
+    "0x12c2c83": [
+      {
+        "constant": "kSlot314EmptyText",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       }
     ],
     "0x12c2e60": [
@@ -4778,6 +4906,10 @@
         "header": "native/core/ctor_slot_312_a46130.hpp"
       },
       {
+        "constant": "kSlot314CanaryCell",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      },
+      {
         "constant": "kInitEntryGuardCell",
         "header": "native/core/init_531d60_entry_gaps.hpp"
       },
@@ -4884,6 +5016,10 @@
       {
         "constant": "kSlot312Dso",
         "header": "native/core/ctor_slot_312_a46130.hpp"
+      },
+      {
+        "constant": "kSlot314Dso",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       },
       {
         "constant": "kTinyAtexitDso",
@@ -5454,6 +5590,12 @@
         "header": "native/core/ctor_slot_569_1cc80.hpp"
       }
     ],
+    "0x1ce70": [
+      {
+        "constant": "kSlot314PageDtor",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      }
+    ],
     "0x1d9c0": [
       {
         "constant": "kInitBlock1d9c0",
@@ -5500,6 +5642,10 @@
         "header": "native/core/ctor_slot_309_a505e0.hpp"
       },
       {
+        "constant": "kSlot314ConCmdBaseCtor",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      },
+      {
         "constant": "kOwnerRow3CommandCtor",
         "header": "native/core/owner_ctor_14db00.hpp"
       },
@@ -5512,6 +5658,10 @@
       {
         "constant": "kBoolVarDtor",
         "header": "native/core/concmd_vars.hpp"
+      },
+      {
+        "constant": "kSlot314BoolVarDtor",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       }
     ],
     "0x20b50": [
@@ -5540,6 +5690,10 @@
       {
         "constant": "kSlot312ConCmdRegister",
         "header": "native/core/ctor_slot_312_a46130.hpp"
+      },
+      {
+        "constant": "kSlot314ConCmdRegister",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       },
       {
         "constant": "kOwnerRow3CommandRegister",
@@ -5572,6 +5726,10 @@
       {
         "constant": "kRangedFloatDtor",
         "header": "native/core/concmd_vars.hpp"
+      },
+      {
+        "constant": "kSlot314FloatVarDtor",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       }
     ],
     "0x210b0": [
@@ -5866,6 +6024,10 @@
         "header": "native/core/ctor_slot_312_a46130.hpp"
       },
       {
+        "constant": "kSlot314MenuRegister",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      },
+      {
         "constant": "kDebugMenuRegister",
         "header": "native/core/debug_menu_item.hpp"
       }
@@ -5940,6 +6102,10 @@
       {
         "constant": "kSlot312MenuToggleCtor",
         "header": "native/core/ctor_slot_312_a46130.hpp"
+      },
+      {
+        "constant": "kSlot314MenuToggleCtor",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       },
       {
         "constant": "kDebugMenuItemToggleCtor",
@@ -6050,6 +6216,12 @@
         "header": "native/core/vslot_30_534130.hpp"
       }
     ],
+    "0x2dd6710": [
+      {
+        "constant": "kSlot314TableWord",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      }
+    ],
     "0x2dd6720": [
       {
         "constant": "kSlot312TableWord",
@@ -6070,6 +6242,10 @@
       {
         "constant": "kSlot312TableTop",
         "header": "native/core/ctor_slot_312_a46130.hpp"
+      },
+      {
+        "constant": "kSlot314TableTop",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       }
     ],
     "0x2dd9578": [
@@ -7190,10 +7366,32 @@
         "header": "native/core/init_531d60_post_base_lea_32f4fe0.hpp"
       }
     ],
+    "0x32f5af0": [
+      {
+        "constant": "kSlot314Page",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      }
+    ],
+    "0x32f6538": [
+      {
+        "constant": "kSlot314Cell",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      }
+    ],
+    "0x32f6c70": [
+      {
+        "constant": "kSlot314LastObject",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      }
+    ],
     "0x32f6d18": [
       {
         "constant": "kSlot313Cell",
         "header": "native/core/ctor_slot_313_a447a0.hpp"
+      },
+      {
+        "constant": "kSlot314NextCtorFirstObject",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       }
     ],
     "0x32f6d28": [
@@ -7868,6 +8066,12 @@
       {
         "constant": "kSlot557",
         "header": "native/core/ctor_slot_557_47490.hpp"
+      }
+    ],
+    "0x475c0": [
+      {
+        "constant": "kSlot314PageCtor",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       }
     ],
     "0x47620": [
@@ -11224,6 +11428,18 @@
         "header": "native/core/init_531d60_post_base_a2ed00_u7.hpp"
       }
     ],
+    "0xa33280": [
+      {
+        "constant": "kSlot314NextUnrecovered",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      }
+    ],
+    "0xa3d9e0": [
+      {
+        "constant": "kSlot314CellDtor",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      }
+    ],
     "0xa40e20": [
       {
         "constant": "kVtable15d1678Slot68_a40e20",
@@ -11234,10 +11450,38 @@
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
+    "0xa41570": [
+      {
+        "constant": "kSlot314BoolCallbackCtor",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      }
+    ],
     "0xa41810": [
       {
         "constant": "kSlot312NextUnrecovered",
         "header": "native/core/ctor_slot_312_a46130.hpp"
+      },
+      {
+        "constant": "kSlot314",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      }
+    ],
+    "0xa428e2": [
+      {
+        "constant": "kSlot314Branch",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      }
+    ],
+    "0xa428f3": [
+      {
+        "constant": "kSlot314BranchTarget",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      }
+    ],
+    "0xa428f9": [
+      {
+        "constant": "kSlot314End",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       }
     ],
     "0xa42900": [
@@ -12096,12 +12340,20 @@
       {
         "constant": "kSlot309BoolVarFnSlot3",
         "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
+        "constant": "kSlot314BoolArgDestroy",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       }
     ],
     "0xc300": [
       {
         "constant": "kRangedFloatCtor",
         "header": "native/core/concmd_vars.hpp"
+      },
+      {
+        "constant": "kSlot314FloatVarCtor",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       }
     ],
     "0xc4a0": [
@@ -12126,6 +12378,10 @@
       {
         "constant": "kRangedFloatFnDestroy",
         "header": "native/core/concmd_vars.hpp"
+      },
+      {
+        "constant": "kSlot314FloatArgDestroy",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       }
     ],
     "0xc580": [
@@ -12424,6 +12680,10 @@
         "header": "native/core/ctor_slot_312_a46130.hpp"
       },
       {
+        "constant": "kSlot314Release",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      },
+      {
         "constant": "kInit531d60PostBaseF590Target",
         "header": "native/core/init_531d60_post_base_26800_f590.hpp"
       },
@@ -12574,6 +12834,10 @@
         "header": "native/core/ctor_slot_312_a46130.hpp"
       },
       {
+        "constant": "kSlot314Atexit",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
+      },
+      {
         "constant": "kTinyAtexitPlt",
         "header": "native/core/ctor_tiny_atexit_slots.hpp"
       }
@@ -12586,6 +12850,10 @@
       {
         "constant": "kSlot312StackChkFail",
         "header": "native/core/ctor_slot_312_a46130.hpp"
+      },
+      {
+        "constant": "kSlot314StackChkFail",
+        "header": "native/core/ctor_slot_314_a41810.hpp"
       },
       {
         "constant": "kInsert1bdb50StackFail",
@@ -12723,9 +12991,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1605,
-    "distinct_rvas": 1083,
-    "duplicate_rvas": 340,
-    "headers": 405
+    "constants": 1637,
+    "distinct_rvas": 1098,
+    "duplicate_rvas": 347,
+    "headers": 406
   }
 }

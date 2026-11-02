@@ -140,8 +140,8 @@ inline constexpr std::size_t kSlot312StoreSites = 8;
 inline constexpr std::uint64_t kSlot312TableTopRva = 0x2dd70e0;   // index i at TOP - 8*i
 inline constexpr std::uint64_t kSlot312TableWordRva = 0x2dd6720;  // 0x2dd70e0 - 312*8
 inline constexpr std::uint32_t kSlot312TableIndex = 312;
-inline constexpr std::uint32_t kSlot312NextUnrecoveredIndex = 314;      // 314 / 0xa41810
-inline constexpr std::uint64_t kSlot312NextUnrecoveredRva = 0xa41810;
+inline constexpr std::uint32_t kSlot312NextUnrecoveredIndex = 314;      // the gap this registration opened
+inline constexpr std::uint64_t kSlot312NextUnrecoveredRva = 0xa41810;   // (314 / 0xa41810 when 312 landed)
 
 // Frame / guard (same shape as slot 309, different frame size).
 inline constexpr std::uint64_t kSlot312CanaryCellRva = 0x15fe518;  // GOT cell of __stack_chk_guard

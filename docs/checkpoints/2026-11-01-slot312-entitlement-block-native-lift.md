@@ -98,10 +98,11 @@ not left dangling. The model reproduces the self-pointer and does not "fix" anyt
 |---|---|
 | `cmake -S native -B local/build/slot312` | exit 0 |
 | `cmake --build local/build/slot312 -j 6` | exit 0, no warnings |
-| `ctest --test-dir local/build/slot312 -j 6 --output-on-failure` | **532/532 PASSED** (533/533 on a re-run after a peer's `lookup_21620` test entered the tree) |
+| `ctest --test-dir local/build/slot312 -j 6 --output-on-failure` | **532/532 PASSED** at the commit that registered the slot; **534/534** on the later tree that also carries peers' `lookup_21620` test (`local/` fixtures are needed — a `git archive` export without them fails 8 startup tests, which is an export artifact, not a regression) |
 | `python3 -I tools/lift/check_ctor_slot_312.py` | OK, mutation self-test 394 + 145 |
 | 96 `check_ctor_* / check_fctor_* / check_startup_* / check_slot*` checkers | 91 OK / 0 FAIL (89 + 2 in two batches), re-run after the peer edits landed |
 | `python3 -I scripts/audit_publish_paths.py --all` | OK, 4,030 paths |
+| `python3 -I tools/lift/check_entry_map.py` | **FAIL (not slot 312)**: `docs/entry_map.json` is stale because an untracked `native/core/ctor_slot_314_a41810.hpp` is on disk (32 constants / 15 RVAs) and `native/core/lookup_21620.hpp` gained a constant after the last regeneration. With the 314 header excluded, the recomputed map's keys and totals match the committed one exactly, and every `kSlot312*` constant is already present. Regeneration is the entry-map owner's step (this task must not regenerate it). |
 | `tools/lift/run_all_checkers.sh` | **NOT RUN** (out of scope by task instruction) |
 | `python3 scripts/project_index.py` | **NOT RUN** (would regenerate `docs/INDEX.md` / `docs/FOLDERS.md`, out of scope) |
 

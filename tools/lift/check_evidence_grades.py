@@ -13,7 +13,9 @@ present, from the site itself:
     RIP-relative load of the row's own table - `lea TABLE(%rip)` or `mov G(%rip)` - or a member
     load whose base is one of those two. Then `register_value + slot` must be the row's slot
     address and its qword must be the row's target. A row the forwarding pass
-    (`tools/lift/store_to_load_forwarding.py`) proves also counts as site-provable.
+    (`tools/lift/store_to_load_forwarding.py`) proves also counts as site-provable. The backward
+    scan uses the audit's own window - at most 32 printed lines containing `mov`, `lea`, `call` or
+    `jmp` - so this re-derives the recorded artifact, quirks included.
 
 The derived split must equal the table in `docs/INDIRECT_FRONTIER.md` ("Evidence grades"):
 rows, distinct targets and distinct table bases for each grade. Counts drifting in either place
@@ -49,10 +51,12 @@ FORWARDING = ROOT / "tools/lift/store_to_load_forwarding.py"
 SITE_PROVABLE = "site-provable"
 TABLE_LEVEL = "table-level"
 
-# The audit that produced the grades ran `indirect_frontier.scan` with its 32-instruction window and
-# resolved the call register from that window alone. The strict predicate below uses the same bound
-# so this checker re-derives the documented artifact rather than a wider one.
+# The audit that produced the grades ran `indirect_frontier.scan` with a 32-instruction window, and
+# that scan only accumulates instructions whose printed line contains `call`, `jmp`, `mov` or `lea`.
+# `AUDIT_WINDOW` counts in those units, so the strict predicate below re-derives the documented
+# artifact rather than a wider one.
 AUDIT_WINDOW = 32
+AUDIT_WINDOW_MNEMONICS = ("call", "jmp", "mov", "lea")
 
 GRADE_TABLE_RE = re.compile(
     r"\|\s*site-provable\s*\|\s*\*\*(\d+)\*\*\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|")
@@ -181,9 +185,26 @@ def main() -> int:
             return None
         slot = int(match.group(1), 16)
 
+        def audit_definition(register, start):
+            """Nearest write to `register` inside the audit's 32-instruction window, else None."""
+            want = forwarding.family(register)
+            if want is None:
+                return None
+            seen = 0
+            for index in range(start - 1, -1, -1):
+                line = body[index].text
+                if not any(token in line for token in AUDIT_WINDOW_MNEMONICS):
+                    continue
+                seen += 1
+                if seen > AUDIT_WINDOW:
+                    return None
+                if want in forwarding.written_families(body[index]):
+                    return index
+            return None
+
         def static_value(register, start, allow_object):
             """(kind, value) for a register defined by a RIP table load, else None."""
-            definition = forwarding.nearest_definition(body, start, register, AUDIT_WINDOW)
+            definition = audit_definition(register, start)
             if definition is None:
                 return None
             insn = body[definition]

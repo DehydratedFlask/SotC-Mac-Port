@@ -423,6 +423,16 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
              if (!s.slot312_result.ok) s.init_failed = true;
          }},
         {0xa447a0, 313, [](StartupState& s) noexcept { if (!init_slot313_a447a0(s.slot313, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
+        // idx 314 / 0xa41810: the physics debug block -- one "PhysXToRenderThread" page, ten console
+        // variables (two inline bools, three `0xc300` floats, five `physX_*` callback bools) and ten
+        // "Physics" toggles, 22 __cxa_atexit records. The page ctor (0x475c0) and the callback bool ctor
+        // (0xa41570) run through the native models (default_slot314_hooks); any failed stage is a
+        // visible startup failure.
+        {0xa41810, 314, [](StartupState& s) noexcept {
+             const Slot314Hooks hooks = default_slot314_hooks();
+             s.slot314_result = init_slot314_a41810(s.slot314, s.concmd, s.debug_menu, hooks);
+             if (!s.slot314_result.ok) s.init_failed = true;
+         }},
         {0xa3ade0, 315, [](StartupState& s) noexcept { store_zero32(s.slot315_cell); }},
         {0xa2c390, 317, [](StartupState& s) noexcept { if (!init_slot317_a2c390(s.slot317, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
         {0xa20e80, 318, [](StartupState& s) noexcept { if (!init_slot318_a20e80(s.slot318, s.concmd).ok) s.init_failed = true; }},

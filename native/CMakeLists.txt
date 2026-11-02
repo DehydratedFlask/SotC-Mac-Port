@@ -2478,9 +2478,10 @@ target_link_libraries(test_ctor_slot_312 sotc_core)
 add_test(NAME ctor_slot_312 COMMAND test_ctor_slot_312)
 # CPU-01-STARTUP-SLOT-314-CHARACTERIZATION-01 / -NATIVE-LIFT-01: constructor index 314 (0xa41810),
 # the physics debug block (1 page, 10 variables, 10 toggles, 22 atexit records).
-# Slot 314's model is unfinished (the page layout fails its own static_assert and the fixture was
-# never written), so it is not in the build and slot 314 is not registered. The work in progress was
-# preserved under local/wip/slot314/; restore and finish it there before adding it back.
+target_sources(sotc_core PRIVATE core/ctor_slot_314_a41810.cpp)
+add_executable(test_ctor_slot_314 tests/test_ctor_slot_314.cpp)
+target_link_libraries(test_ctor_slot_314 sotc_core)
+add_test(NAME ctor_slot_314 COMMAND test_ctor_slot_314)
 
 # Parallel-lane fragments: native/lanes/<lane>.cmake. Workers configure with -DSOTC_LANES=<lane>
 # to build only their own fragment; the integrator configures with the default "*" (all lanes).

@@ -57,7 +57,6 @@ HEADER = ROOT / "native/core/vtable_resolved_entries.hpp"
 DEFAULT_DIS = ROOT / "local/validation/registry-analysis-agent/all.dis"
 DEFAULT_FDE = ROOT / "local/validation/registry-analysis-agent/fde_ranges.json"
 DEFAULT_ELF = ROOT / "local/re/eboot.elf"
-DEFAULT_JSON = ROOT / "local/validation/indirect-frontier/store-to-load-forwarding.json"
 
 MAX_STORE_SCAN = 512     # instructions scanned backwards for the reaching store
 MAX_VALUE_SCAN = 64      # instructions scanned backwards for one register link
@@ -135,7 +134,7 @@ _IMPLICIT_SINGLE = {"cdq": "rdx", "cqo": "rdx", "cwd": "rdx", "cdqe": "rax", "cl
 _STEMS = ("movabs", "movs", "movz", "mov", "lea", "add", "sub", "and", "or", "xor", "adc", "sbb",
           "sal", "shl", "sar", "shr", "rol", "ror", "imul", "mul", "div", "idiv", "neg", "not",
           "inc", "dec", "bswap", "pop", "push", "call", "test", "cmp", "ucomis", "comis", "bt",
-          "prefetch", "nop", "ret", "xadd", "cmpxchg", "xchg", "leave", "enter", "stos", "movs")
+          "prefetch", "nop", "ret", "xadd", "cmpxchg", "xchg", "leave", "enter", "stos")
 
 PREFIXES = ("lock", "rep", "repz", "repnz", "data16", "bnd", "notrack")
 
@@ -408,6 +407,9 @@ def stored_value(body: list[Insn], store_index: int, read_u64, chain: Chain):
             chain.block("stored-value-unclassified", insn.address)
             return None, None
         base = mnemonic_base(insn.mnemonic)
+        if parts[-1] != register:
+            chain.block("stored-value-width-mismatch", insn.address)
+            return None, None
         if rip_operand(parts[0]) and (base == "lea" or is_mov_form(insn.mnemonic)):
             address = comment_address(insn)
             if address is None:
@@ -499,6 +501,9 @@ def analyze_site(row: dict, body: list[Insn], associated: Associated, read_u64) 
     chain.load_address = insn.address
     parts = operands_of(insn)
     if len(parts) != 2:
+        return chain.block("call-register-definition-not-a-load")
+    if parts[1] != match.group(2):
+        # A sub-register write (`movl ...,%eax` for a `%rax` call) does not define the full value.
         return chain.block("call-register-definition-not-a-load")
     if (mnemonic_base(insn.mnemonic) == "lea" or is_mov_form(insn.mnemonic)) and \
             rip_operand(parts[0]):
@@ -796,6 +801,14 @@ def _self_test() -> int:
           row_for(0x1008, TABLE, SLOT, TARGET, SITE_PROVABLE), cells, "unproven",
           expect_blocker="already-site-provable")
 
+    narrow = [
+        (0x1000, "movl (%r12), %eax"),
+        (0x1010, "callq *0x18(%rax)"),
+    ]
+    check("negative: sub-register load does not define the call register", narrow,
+          row_for(0x1010, TABLE, SLOT, TARGET), cells, "unproven",
+          expect_blocker="call-register-definition-not-a-load")
+
     check("negative: forwarded slot holds no target", direct,
           row_for(0x1020, TABLE, SLOT, 0x777777), {}, "unproven",
           expect_blocker="forwarded-target-is-not-the-row-target")
@@ -812,7 +825,7 @@ def _self_test() -> int:
     if failures:
         print(f"SELF-TEST FAILED: {len(failures)} case(s): {', '.join(failures)}")
         return 1
-    print("SELF-TEST PASSED: 15/15 synthetic cases")
+    print("SELF-TEST PASSED: 16/16 synthetic cases")
     return 0
 
 

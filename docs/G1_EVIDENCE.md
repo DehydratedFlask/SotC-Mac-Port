@@ -284,9 +284,10 @@ mentions the address, nothing more. The totals move with every lane, so quote th
    (`tools/lift/store_to_load_forwarding.py`, one hop, same FDE, single reaching definition, static
    stored value) proves **0 of the 50**: 40 have no store to the load location anywhere in their own
    function, 8 have a call between the store and the load, 1 has control flow between them, 1 loads
-   through an indexed address. So this class is exhausted *for these rows*, not unmeasured: the
-   remaining 10 need a different argument, and the same pass over the 46,830 image-wide sites has not
-   been run.
+   through an indexed address. Worse for the table than "unproven": the nine rows that do have a
+   store all read `TABLE + 0x10 + slot`, so the recorded target sits at the *wrong slot* for the
+   site. This class is therefore exhausted *for these rows*, not unmeasured; the same pass over the
+   46,830 image-wide sites has not been run.
 7. **MSL: 0 real shaders lowered.** `lowered: 0` over a 34,291-member `.csdr` population (64-member
    deterministic sample; 4 decoded, 27 decode-error, 41 compressed-prefix). The blocker is a
    per-shader ABI manifest, not decoding. This is a **G1/G3 boundary fact, not a G1 pass** — the
@@ -355,7 +356,7 @@ library it links. Gitignored; the 2026-10-22 directory is retained as the histor
 | Frontier | 6 resolved rows, no grades | **91 rows / 37 targets**, split **41 site-provable / 50 table-level** |
 | Model headers | ungraded | 26 of 36 carry a grade; 10 still do not |
 | MSL | not mentioned | stated as a G1/G3 boundary: **0 lowered** |
-| Store-to-load forwarding | not mentioned | measured on all 91 rows: **0 promoted** (40 no store, 8 call, 1 control flow, 1 indexed) |
+| Store-to-load forwarding | not mentioned | measured on all 91 rows: **0 promoted** (40 no store, 8 call, 1 control flow, 1 indexed; the 9 with a store read `TABLE+0x10+slot`) |
 | Entry map | not mentioned | ~1,100 distinct RVAs (≈2 % of functions); a name map, not an ABI |
 | Claim | G1 PARTIAL | unchanged — **G1 PARTIAL, not PASSED** |
 
