@@ -75,6 +75,10 @@ BINDING_KINDS = tuple(BINDING_WIDTH)
 # `Lowerer.__init__` requires exactly one cell per `initial_vector` entry.
 SINGLE_CELL_KINDS = ('float', 'vertex_index', 'interpolation_control')
 VIEW_BINDING_KINDS = ('pointer', 'descriptor', 'float4', 'float')
+# Register/target namespaces: a scalar slot number and an export target number are not
+# comparable, so cross-section diagnostics stay inside one namespace.
+NAMESPACE = {'scalar_bases': 'sgpr', 'buffer_descriptors': 'sgpr',
+             'initial_scalars': 'sgpr', 'initial_vectors': 'vgpr', 'exports': 'target'}
 MANIFEST_KEYS = ('schema', 'shader', 'provenance', 'scalar_bases', 'buffer_descriptors',
                  'exports', 'initial_scalars', 'initial_vectors', 'views', 'policy')
 SHADER_KEYS = ('id', 'stage', 'sha256', 'bytes')
@@ -675,6 +679,16 @@ def _check_holes(manifest: dict, analysis: dict) -> list[dict]:
     }
     supplied = {name: {str(e[key]) for e in entries}
                 for name, (_, _, entries, key) in sections.items()}
+    # Where each slot is really used, so a binding in the wrong section gets a precise reason
+    # instead of "never uses it". SGPR slots, VGPR slots and export targets are separate
+    # namespaces: scalar s12 and export target 12 are not the same thing.
+    used_as: dict[tuple[str, str], set[str]] = {}
+    for name, (_, _, entries, key) in sections.items():
+        for entry in entries:
+            used_as.setdefault((NAMESPACE[name], str(entry[key])), set()).add(name)
+    for name, entries in derived_map.items():
+        for entry in entries:
+            used_as.setdefault((NAMESPACE[name], str(entry['slot'])), set()).add(name)
     for name, (label, prefix, entries, key) in sections.items():
         bound = manifest.get(name) or {}
         for entry in entries:
@@ -699,6 +713,12 @@ def _check_holes(manifest: dict, analysis: dict) -> list[dict]:
                     f'{label} {prefix}{extra} is used at {sites} but written by an earlier '
                     f'instruction; a direct binding cannot satisfy the lowering, so the '
                     f'program is shape-blocked rather than binding-blocked'))
+            elif used_as.get((NAMESPACE[name], extra), set()) - {name}:
+                other = sorted(used_as[(NAMESPACE[name], extra)] - {name})[0]
+                problems.append(_problem(
+                    'wrong-section', f'{prefix}{extra}',
+                    f'{label} {prefix}{extra} is used by this program as {other}, '
+                    f'not as {name}'))
             else:
                 problems.append(_problem(
                     f'unused-{label.replace("_", "-")}', f'{prefix}{extra}',
