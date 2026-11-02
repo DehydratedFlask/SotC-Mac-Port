@@ -85,9 +85,11 @@
 //
 // REGISTERED: `startup_ctors.cpp` row `{0xa505e0, 309, ...}` runs this module with
 // `default_slot309_hooks()`. The three console-variable constructors are no longer hooks without a
-// default, so the slot completes on the production startup path; the resulting startup cliff is
-// index 312 / 0xa46130 (the remaining 123 of kOriginalCtorCount). This module was previously a
-// verified-but-unregistered model for exactly that reason.
+// default, so the slot completes on the production startup path. When this module was registered the
+// startup cliff was index 312 / 0xa46130; slot 312 has since been registered too
+// (core/ctor_slot_312_a46130), and the current cliff is index 314 / 0xa41810 (the remaining 122 of
+// kOriginalCtorCount). This module was itself a verified-but-unregistered model for exactly that
+// reason until its three constructors were lifted.
 //
 // NOT modelled: every destructor body (they are identity tags) and every consumer of the 12 objects;
 // the runtime behaviour of the save manager; the `value_ref` cell's lifetime (see below).
