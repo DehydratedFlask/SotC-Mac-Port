@@ -74,7 +74,7 @@ void section_constants() {
     CHECK(kSlot326TableTopRva - 8 * kSlot326TableIndex == kSlot326TableWordRva);
     CHECK(kSlot326TableWordRva == 0x2dd66b0 && kSlot326TableIndex == 326);
     CHECK(kSlot326TableTopRva - 0x2dd65d0 == 354 * 8);
-    CHECK(kSlot326NextUnrecoveredIndex == 329 && kSlot326NextUnrecoveredRva == 0x829e90);
+    CHECK(kSlot326NextUnrecoveredIndex == 335 && kSlot326NextUnrecoveredRva == 0x7edf10);
     CHECK(kSlot326CanaryCellRva == 0x15fe518);
     CHECK(kSlot326StackChkFailRva == 0xf8f3a0 && kSlot326CanaryFrameOffset == 0xc0);
     CHECK(kSlot326BranchRva == 0x839aa8 && kSlot326BranchTargetRva == 0x839ab9);

@@ -183,10 +183,10 @@ inline constexpr std::size_t kSlot326BasicBlocks = 2;
 inline constexpr std::uint64_t kSlot326TableTopRva = 0x2dd70e0;   // index i at TOP - 8*i
 inline constexpr std::uint64_t kSlot326TableWordRva = 0x2dd66b0;  // 0x2dd70e0 - 326*8
 inline constexpr std::uint32_t kSlot326TableIndex = 326;
-// The next index that is still unrecovered once this one is registered: 327 and 328 are already
-// registered startup slots, so the cliff moves to index 329.
-inline constexpr std::uint32_t kSlot326NextUnrecoveredIndex = 329;
-inline constexpr std::uint64_t kSlot326NextUnrecoveredRva = 0x829e90;
+// The next index that is still unrecovered once this one is registered: 327 and 328 were already
+// registered startup slots and 329 has since been registered too, so the cliff is now index 335.
+inline constexpr std::uint32_t kSlot326NextUnrecoveredIndex = 335;
+inline constexpr std::uint64_t kSlot326NextUnrecoveredRva = 0x7edf10;
 
 // Frame / guard.
 inline constexpr std::uint64_t kSlot326CanaryCellRva = 0x15fe518;   // GOT cell holding &__stack_chk_guard

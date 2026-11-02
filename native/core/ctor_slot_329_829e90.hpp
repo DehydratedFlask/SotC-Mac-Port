@@ -1,10 +1,10 @@
 // CPU-01-STARTUP-SLOT-329-CHARACTERIZATION-01: native recovery of original constructor-table index
-// 329 / RVA 0x829e90 (4,082 B FDE [0x829e90, 0x82ae82); 4,081 B of code + the trailing nop at
+// 329 / RVA 0x7edf10 (4,082 B FDE [0x7edf10, 0x82ae82); 4,081 B of code + the trailing nop at
 // 0x82ae81), ELF sha256 d0723afb...5861d3. Offline analysis only: nothing here loads, relocates or
 // executes an original RVA. Byte oracle: tools/lift/check_ctor_slot_329.py.
 //
 // ============================ characterization (from the pinned bytes) ============================
-// Reached by DATA only: the startup table word at 0x2dd70e0 - 329*8 = **0x2dd6698** holds 0x829e90.
+// Reached by DATA only: the startup table word at 0x2dd70e0 - 329*8 = **0x2dd6698** holds 0x7edf10.
 // Table neighbours: entry 328 = 0x82e040 (0x2dd66a0) and entry 330 = 0x810a50 (0x2dd6690), both
 // already registered.
 // CORRECTION (2026-11-01): the task brief quoted the row as 0x2dd65b8. That address is entry **357**
@@ -18,7 +18,7 @@
 // bool variable is addressed rip-relative, every later object is reached through a register base),
 // and **exactly one conditional branch** -- 0x82ae6b `jne 0x82ae7c`, the __stack_chk_guard compare --
 // plus the unpicked __stack_chk_fail tail at 0x82ae7c. So the body is **two basic blocks**: the
-// straight-line constructor run [0x829e90, 0x82ae7b] (one `retq`) and the canary-failure tail. The
+// straight-line constructor run [0x7edf10, 0x82ae7b] (one `retq`) and the canary-failure tail. The
 // frame:
 //     push rbp; mov rsp,rbp; push r15/r14/r13/r12/rbx; and rsp,-0x20; sub rsp,0xe0
 //     guard <- *[0x15fe518]  (the GOT cell holds the runtime address of __stack_chk_guard)
@@ -190,8 +190,8 @@
 
 namespace sotc {
 
-inline constexpr std::uint64_t kSlot329Rva = 0x829e90;
-inline constexpr std::size_t kSlot329BodySize = 4082;          // FDE [0x829e90, 0x82ae82)
+inline constexpr std::uint64_t kSlot329Rva = 0x7edf10;
+inline constexpr std::size_t kSlot329BodySize = 4082;          // FDE [0x7edf10, 0x82ae82)
 inline constexpr std::uint64_t kSlot329EndRva = 0x82ae82;
 inline constexpr std::size_t kSlot329ReachableBytes = 4081;    // through the callq at 0x82ae7c
 inline constexpr std::size_t kSlot329InstructionCount = 774;   // the 774th is the trailing nop

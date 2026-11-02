@@ -2,7 +2,7 @@
 //
 // Proves that every lifted vec_*/leaf_* constructor module runs in recovered_constructors(), that
 // the registered rows pair with the pinned original table, and that the remaining startup cliff is
-// explicit (first unrecovered index 329 / RVA 0x829e90, after slot 326 landed).
+// explicit (first unrecovered index 335 / RVA 0x7edf10, after slot 329 landed).
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -42,7 +42,7 @@ int main() {
     CHECK(result.blocked_on_rva == 0);
     CHECK(!st.init_failed);
     CHECK(result.completed == slots.size());
-    CHECK(slots.size() == 454);
+    CHECK(slots.size() == 455);
 
     // Every registered row is in original order and pairs with the pinned table.
     for (std::size_t i = 0; i < slots.size(); ++i) {
@@ -53,9 +53,9 @@ int main() {
     }
 
     // ---- explicit, machine-checked gap ---------------------------------------
-    CHECK(first_unrecovered_constructor_index() == 329);
-    CHECK(first_unrecovered_constructor_rva() == 0x829e90);
-    CHECK(slots.size() + 119 == kOriginalCtorCount);
+    CHECK(first_unrecovered_constructor_index() == 335);
+    CHECK(first_unrecovered_constructor_rva() == 0x7edf10);
+    CHECK(slots.size() + 118 == kOriginalCtorCount);
 
     // ---- CPU-01-STARTUP-LEAF-ROWS-315-560-01 -------------------------------
     CHECK(st.slot315_cell == 0);
@@ -116,10 +116,10 @@ int main() {
     CHECK(st.slot303.var.default_value == 0 && st.slot303.var.fn_vptr == 0x15d2478);
     CHECK(st.slot303.item.target == &st.slot303.var && st.slot303.item.flags == 0x30);
     CHECK(st.concmd.manager.manager == nullptr);
-    CHECK(st.concmd.pending.size() == 145);                      // observed: 114 through 312 + 10 (314) + 6 (316) + 15 (326)
+    CHECK(st.concmd.pending.size() == 155);                      // observed: 114 through 312 + 10 (314) + 6 (316) + 15 (326) + 10 (329)
     CHECK(st.concmd.pending.first() == &st.slot298_shader_type.base.pending);
-    CHECK(st.debug_menu.root.count == 105);                     // observed: 68 through 312 + 10 (314) + 6 (316) + 21 (326)
-    CHECK(st.concmd.atexit_log.size() == 360);                  // observed: 288 through 312 + 22 (314) + 14 (316) + 36 (326)
+    CHECK(st.debug_menu.root.count == 117);                     // observed: 68 through 312 + 10 (314) + 6 (316) + 21 (326) + 12 (329)
+    CHECK(st.concmd.atexit_log.size() == 382);                  // measured: 360 through 326 + 22 (329)
                                                                 // (the menu root was already initialised, so
                                                                 //  0x268b0 records nothing new here)
     for (std::size_t i = 0; i < kSlot302HandleCount; ++i) {
@@ -221,6 +221,31 @@ int main() {
     CHECK(st.slot326.toggle_threshold.target == &st.slot326.threshold);
     CHECK(st.slot326.toggle_force_angry.target == &st.slot326.bool_force_angry);
     CHECK(st.slot326.slider_red[3].target == &st.slot326.eye[11]);
+
+    // ---- CPU-01-STARTUP-SLOT-329-CHARACTERIZATION-01: idx 329, the Shadow Path block ------------
+    CHECK(st.slot329_result.ok && st.slot329_result.atexit_records == 22);
+    CHECK(st.slot329_result.functors_destroyed == 3 && st.slot329_result.functor_dispatches == 24);
+    CHECK(st.slot329_result.vars_built == 10 && st.slot329_result.menu_items == 12);
+    CHECK(st.slot329_result.views_inert);
+    CHECK(st.slot329.bool_path_finding.base.vptr == 0x1594218 && st.slot329.bool_path_finding.value == 1);
+    CHECK(st.slot329.bool_path_finding.default_value == 1 && st.slot329.bool_draw_enable.value == 0);
+    CHECK(st.slot329.ranged_path_data.base.vptr == 0x15cea60);
+    CHECK(st.slot329.ranged_path_data.value == 2 && st.slot329.ranged_path_data.default_value == 2);
+    CHECK(st.slot329.ranged_path_data.fn_vptr == 0x15ceac8);
+    CHECK(st.slot329.ranged_chara_type.base.vptr == 0x15ceb18);
+    CHECK(st.slot329.ranged_chara_type.value == 1 && st.slot329.ranged_chara_type.fn_vptr == 0x15ceae8);
+    CHECK(st.slot329.ranged_chara_type.base.description.size == 0x46);
+    CHECK(st.slot329.float_translation.base.vptr == 0x15942b0);
+    CHECK(st.slot329.float_translation.value == 0x3f800000u &&
+          st.slot329.float_translation.fn_vptr == 0x1594318);
+    CHECK(st.slot329.bool_raycasts_enable.value == 1 && st.slot329.bool_raycasts_debug.value == 0);
+    CHECK(st.slot329.group.kind == 1 && st.slot329.group.flags == 0x30);
+    CHECK(st.slot329.items[5].kind == 3 && st.slot329.items[5].flags == 0x30);
+    CHECK(st.slot329.items[5].text.size == 13 &&
+          std::memcmp(st.slot329.items[5].text.data, "MenuSeparator", 13) == 0);
+    CHECK(st.slot329.items[0].target == &st.slot329.bool_draw_enable);
+    CHECK(st.slot329.items[4].target == &st.slot329.ranged_chara_type);
+    CHECK(st.slot329.items[7].target == &st.slot329.float_translation);
 
     std::puts("startup_ctor_coverage: all checks passed");
     return 0;

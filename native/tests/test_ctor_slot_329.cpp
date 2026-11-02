@@ -1,5 +1,5 @@
 // CPU-01-STARTUP-SLOT-329-CHARACTERIZATION-01: fixture for startup constructor index 329
-// (0x829e90, the Shadow Path / path-finding debug page: seven console bools, two integer range
+// (0x7edf10, the Shadow Path / path-finding debug page: seven console bools, two integer range
 // variables built by the block's own leaf/wrapper constructors, one float range variable, a
 // "Shadow"/"Shadow Path" group, ten toggles, one separator row and 22 __cxa_atexit records).
 //
@@ -62,7 +62,7 @@ std::size_t slot_records(const StartupAtexitLog& log, StartupAtexitEntry* out, s
 }
 
 void section_constants() {
-    CHECK(kSlot329Rva == 0x829e90 && kSlot329BodySize == 4082 && kSlot329EndRva == 0x82ae82);
+    CHECK(kSlot329Rva == 0x7edf10 && kSlot329BodySize == 4082 && kSlot329EndRva == 0x82ae82);
     CHECK(kSlot329ReachableBytes == 4081 && kSlot329InstructionCount == 774);
     CHECK(kSlot329DirectCallSites == 97 && kSlot329DirectCallees == 11);
     CHECK(kSlot329IndirectCallSites == 3);

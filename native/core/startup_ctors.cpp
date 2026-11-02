@@ -469,6 +469,17 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
          }},
         {0x836330, 327, [](StartupState& s) noexcept { if (!init_slot327_836330(s.slot327, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
         {0x82e040, 328, [](StartupState& s) noexcept { if (!init_slot328_82e040(s.slot328, s.concmd).ok) s.init_failed = true; }},
+        // idx 329 / 0x829e90: the Shadow Path / path-finding debug page -- seven console bools, two
+        // integer range variables (built by the block's OWN leaf 0x8298d0 and wrapper 0x829b30 +
+        // leaf 0x829cf0), one float range, a "Shadow"/"Shadow Path" group, ten toggles and one
+        // separator row, 22 __cxa_atexit records. Every callee runs through a native model; the only
+        // stand-in is the 0xf1a0 allocator of the separator row, and any failed stage is a visible
+        // startup failure.
+        {0x829e90, 329, [](StartupState& s) noexcept {
+             const Slot329Hooks hooks = default_slot329_hooks();
+             s.slot329_result = init_slot329_829e90(s.slot329, s.concmd, s.debug_menu, hooks);
+             if (!s.slot329_result.ok) s.init_failed = true;
+         }},
         {0x810a50, 330, [](StartupState& s) noexcept { if (!init_slot330_810a50(s.slot330, s.concmd).ok) s.init_failed = true; }},
         {0x809640, 331, [](StartupState& s) noexcept { if (!init_slot331_809640(s.slot331, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
         {0x805440, 332, [](StartupState& s) noexcept { if (!init_slot332_805440(s.slot332, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
