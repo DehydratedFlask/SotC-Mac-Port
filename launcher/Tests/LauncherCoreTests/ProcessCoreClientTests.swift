@@ -206,6 +206,41 @@ struct ProcessCoreClientTests {
         #expect(coverage.subsystems[1].status == .notImplemented)
     }
 
+    /// Parity with the in-process transport: a code the child does not know arrives as
+    /// `unknown:<code>` and must map to `.unknown(code)`, not be rejected as malformed. A bare
+    /// `unknown` is still rejected, so a malformed answer is never silently coerced.
+    @Test func unknownStatusCodesSurviveTheChildTransport() async throws {
+        let coverageWithUnknown = """
+        {"id":__ID__,"schema":"sotc.core.coverage.v1","abi":65536,"engine_implemented":false,"subsystems":[{"name":"startup_constructors","status":"partial","detail":""},{"name":"future","status":"unknown:7","detail":""}]}
+        """
+        let validationWithUnknown = """
+        {"id":__ID__,"schema":"sotc.core.validate.v1","ok":true,"error":0,"error_name":"SOTC_OK","assets_ready":false,"engine_ready":false,"start_would_succeed":false,"archives":[{"name":"cachedFiles.psarc","status":"unknown:9","size_bytes":0}],"detail":""}
+        """
+        let fake = try makeProtocolFake(coverage: coverageWithUnknown, validate: validationWithUnknown)
+        defer { fake.remove() }
+        let client = try ProcessCoreClient(coreURL: fake.executable)
+        defer { client.shutdown() }
+
+        let coverage = try await client.coverage()
+        #expect(coverage.subsystems[1].status == CoreSubsystem.Status.unknown(7))
+
+        let validation = try await client.validate(
+            assetsDirectory: URL(filePath: "/tmp/good-assets", directoryHint: .isDirectory)
+        )
+        #expect(validation.archives[0].status == CoreArchiveCheck.Status.unknown(9))
+
+        // A bare "unknown" carries no code and stays unrepresentable.
+        let bare = try makeProtocolFake(
+            coverage: """
+            {"id":__ID__,"schema":"sotc.core.coverage.v1","abi":65536,"engine_implemented":false,"subsystems":[{"name":"x","status":"unknown","detail":""}]}
+            """
+        )
+        defer { bare.remove() }
+        let bareClient = try ProcessCoreClient(coreURL: bare.executable)
+        defer { bareClient.shutdown() }
+        await #expect(throws: (any Error).self) { _ = try await bareClient.coverage() }
+    }
+
     @Test func concurrentStatusAndCoverageRequestsKeepResponsesPaired() async throws {
         let fake = try makeProtocolFake(slowResponses: true)
         defer { fake.remove() }

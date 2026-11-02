@@ -201,23 +201,26 @@ soc::status_json::CtorSnapshot make_ctor_snapshot(const sotc_ctor_prefix& prefix
     return ctor;
 }
 
-const char* subsystem_status_name(std::uint32_t status) {
+// An unrecognised code must stay representable. The in-process transport maps any code to
+// `CoreSubsystem.Status.unknown(N)`, so the child transport has to carry the number too; emitting a
+// bare "unknown" made ProcessCoreClient reject an answer the in-process client accepts.
+std::string subsystem_status_name(std::uint32_t status) {
     switch (status) {
         case SOTC_SUBSYSTEM_NOT_IMPLEMENTED: return "not_implemented";
         case SOTC_SUBSYSTEM_PARTIAL: return "partial";
         case SOTC_SUBSYSTEM_IMPLEMENTED: return "implemented";
         case SOTC_SUBSYSTEM_NOT_LINKED: return "not_linked";
-        default: return "unknown";
+        default: return "unknown:" + std::to_string(status);
     }
 }
 
-const char* archive_status_name(std::uint32_t status) {
+std::string archive_status_name(std::uint32_t status) {
     switch (status) {
         case SOTC_ARCHIVE_OK: return "ok";
         case SOTC_ARCHIVE_MISSING: return "missing";
         case SOTC_ARCHIVE_UNREADABLE: return "unreadable";
         case SOTC_ARCHIVE_BAD_MAGIC: return "bad_magic";
-        default: return "unknown";
+        default: return "unknown:" + std::to_string(status);
     }
 }
 

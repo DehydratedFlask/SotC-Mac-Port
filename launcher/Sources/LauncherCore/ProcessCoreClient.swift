@@ -524,13 +524,16 @@ public final class ProcessCoreClient: CoreClient, @unchecked Sendable {
         }
     }
 
+    /// Parses a subsystem status name. The child emits `unknown:<code>` for a code it does not know,
+    /// because the in-process transport maps any code to `.unknown(N)`; a bare unknown string here
+    /// would make the two transports disagree about what the core actually reported.
     private static func subsystemStatus(named name: String) -> CoreSubsystem.Status? {
         switch name {
         case "not_implemented": .notImplemented
         case "partial": .partial
         case "implemented": .implemented
         case "not_linked": .notLinked
-        default: nil
+        default: unknownCode(in: name).map(CoreSubsystem.Status.unknown)
         }
     }
 
@@ -540,8 +543,16 @@ public final class ProcessCoreClient: CoreClient, @unchecked Sendable {
         case "missing": .missing
         case "unreadable": .unreadable
         case "bad_magic": .badMagic
-        default: nil
+        default: unknownCode(in: name).map(CoreArchiveCheck.Status.unknown)
         }
+    }
+
+    /// `unknown:<code>` -> code. Anything else (including a bare "unknown") stays unrepresentable,
+    /// so a malformed answer is still rejected rather than being silently coerced.
+    private static func unknownCode(in name: String) -> UInt32? {
+        let prefix = "unknown:"
+        guard name.hasPrefix(prefix) else { return nil }
+        return UInt32(name.dropFirst(prefix.count))
     }
 
     private static func check(data: Data, id: UInt64, schema: String?) throws {
