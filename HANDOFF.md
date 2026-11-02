@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 09:00 CDT (root) — TLS allocation-site guard chain modelled in both allocator fronts (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. `native/core/alloc_site_context.{hpp,cpp}` encodes the guard chain common to `0x11fb0` (129 B) and `0x12820` (293 B): `cmpl $0x1, %ebx` (index), the `testb %r14b` flag in `0x11fb0`, `rax = fs:0 + *(0x15fff98)`, `rax = *(rax)`, `count = *(u32*)(rax+0x400)`, `count != 0`, `(count-1)*0x20`, then the fallback `0x2dfaab0 + index*8` and the final `movq (%rax),%rax|%rbx`.
+- **Semantics:** while a site frame is on the thread's stack, **the top record's owner field is the allocator to use**; otherwise the allocator comes from the per-index table. An empty stack is a **normal fallback** — the retail code branches to the table slot, it does not fail — and the model reports `tls_stack_empty` instead of pretending the guard failed.
+- **Fixture:** `test_alloc_site_context` — guard failures (index 2, flag clear) keep the table source; empty stack and unknown thread fall back with the right status; nested frames select the top record; popping restores the outer one; two threads do not share a choice.
+- **Checker:** `check_alloc_site_context.py` pins both body digests and FDE lengths, the two guard windows (`83fb01…8b8800040000…`), the scaling, the table-fallback windows, and the final pointer load (which differs: `movq (%rax),%rax` vs `movq (%rax),%rbx`).
+- **Runner bug found and fixed:** `tools/lift/run_all_checkers.sh` skipped any checker matching `*_all*`, and `check_alloc_site_context.py` contains `_alloc` → `_all`. The new checker was silently **not** running. The pattern is now `*/check_all_*.py|*util*`, and the sweep count moved 712 → **713**.
+- **Verification (PASSED):** build exit 0; CTest **521/521**; lift checkers **713 passed / 0 failed**.
+- **Next exact action:** wire `allocator_for_thread` into the allocator-front models, or widen the named push-site set (11 of 14 sites still undecoded).
+
 ## 2026-11-03 08:05 CDT (root) — the TLS records are allocation-site frames (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`, record semantics. The push sites build a 0x20-byte struct and push it **immediately before an allocation**, popping right after:

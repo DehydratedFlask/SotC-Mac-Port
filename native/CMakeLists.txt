@@ -2662,3 +2662,10 @@ target_link_libraries(sotc_tls_record_stack PUBLIC sotc_guest_tls)
 add_executable(test_tls_record_stack tests/test_tls_record_stack.cpp)
 target_link_libraries(test_tls_record_stack PRIVATE sotc_tls_record_stack)
 add_test(NAME tls_record_stack COMMAND test_tls_record_stack)
+
+# CPU-01-AOT-CFG-SCALE-01: the TLS allocation-site path inside 0x11fb0 / 0x12820.
+add_library(sotc_alloc_site_context STATIC core/alloc_site_context.cpp)
+target_link_libraries(sotc_alloc_site_context PUBLIC sotc_tls_record_stack)
+add_executable(test_alloc_site_context tests/test_alloc_site_context.cpp)
+target_link_libraries(test_alloc_site_context PRIVATE sotc_alloc_site_context)
+add_test(NAME alloc_site_context COMMAND test_alloc_site_context)

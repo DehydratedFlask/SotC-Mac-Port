@@ -21,8 +21,10 @@ fail=0
 ok=0
 skip=0
 for checker in tools/lift/check_*.py; do
+    # Skip helper modules, not every checker whose name merely contains "_all": the old
+    # `*_all*` pattern silently skipped check_alloc_site_context.py because "_alloc" contains it.
     case "$checker" in
-        *_all*|*util*) continue ;;
+        */check_all_*.py|*util*) continue ;;
     esac
     if python3 -I "$checker" >/tmp/checker.$$ 2>&1; then
         ok=$((ok + 1))
