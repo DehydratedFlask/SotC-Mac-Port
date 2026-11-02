@@ -616,7 +616,8 @@ own bookkeeping, not a measured duration.
 | Unknown | Next measurement |
 |---|---|
 | `SXDS` `+0x08` field (33/125/127/172/53) | Read the first access to payload offset 0 in the registrar `0x985900` after the chunk scan; test against all five files |
-| 960-byte block prefix fields (bytes 0–5) | The block is now known to be four ~240-byte sub-units whose byte phase drifts (E1074); next, disassemble `0x94b2c0` (the callee the stream path hands `base+0x5f8`/`0x600` to) and check whether it re-derives a bit-level frame boundary |
+| 960-byte block prefix fields (bytes 0–5) | The block is four 240-byte frames by the code's arithmetic, but entropy minima sit at 242/481/720 (E1076, unexplained); next, disassemble `0x94b2c0` (the callee the stream path hands `base+0x5f8`/`0x600` to) and check whether it re-derives a bit-level frame boundary |
+| Producers of setup-spec kinds 1 and 2 (`spec[+0x28]`, inline config at `spec+0x38/+0x3c/+0x40`) | Resolve the virtual call into `0x980620` (vtable `0x2dd0900`, slot `0x2dd09c8`); matters only for non-WAVE content |
 | Where the ATRAC9 transform executes | `0x94b2c0` is a local function with 13 callers; `maxAtrac9Decoders` (`0x12ac371`) and `VOICE_ALLOC_AT9 %d/%d` (`0x12ac61f`) exist but the first has no RIP-relative xref. Trace `0x94b2c0` and the NGS2 rack configuration; nothing here proves NGS2 is the decoder |
 | `SShd` sample directory (names/offsets/loops) | Complete the registrar at `0xb1f013`; the tables at `+0x10..0x24` are relative offsets and `+0x34`/`+0x38` become u16-array pointers |
 | `.sxd` `DATA` chunk codec (26 banks, 313 MB) | Same method as `SXD2`; `com_sys.sxd` DATA has 7.37 bits/byte and no 16-byte framing, so it is not the `.bd` format |
@@ -648,6 +649,14 @@ block-size/gcd identity for all six configuration groups):
 
 ```sh
 python3 -I local/validation/AUD-01-AUDIO-FORMAT-01/analysis/check_atrac9_config.py
+```
+
+Repo-tracked, fail-closed re-derivation (E1076; 65 checks, 40 mutation probes; covers the writer
+census, the kind-0/1/2 spec sources, the geometry table, and the asset-side gcd/census checks; prints
+SKIP and exits 0 when the private ELF is absent, exits 2 with `--require-private`):
+
+```sh
+python3 -I tools/lift/check_atrac9_config_provenance.py
 ```
 
 Helper used to walk the pinned disassembly while tracing (`fde` / `str` / `xref` subcommands):
