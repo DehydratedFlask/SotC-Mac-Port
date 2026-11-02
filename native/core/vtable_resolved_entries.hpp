@@ -22,6 +22,13 @@
 // table-level tie from `indirect_frontier.classify`, whose `rip_global_for` fallback scans *past*
 // the nearest definition and can attach a table load the call does not use;
 // `docs/INDIRECT_FRONTIER.md` ("Evidence grades") defines both grades and gives the counts.
+//
+// The bounded store-to-load forwarding pass (`tools/lift/store_to_load_forwarding.py`, 2026-11-01)
+// was then run over all 91 rows and promoted **none** of the 50: 40 have no store to the load
+// location anywhere in their own function, 9 reach a store that is not a single reaching definition
+// in a straight-line region, and 1 loads through an indexed address. No row's grade or value
+// changed as a result. `tools/lift/check_evidence_grades.py` re-derives the split from the pinned
+// ELF and this header, and fails when `docs/INDIRECT_FRONTIER.md` drifts.
 #pragma once
 
 #include <cstddef>

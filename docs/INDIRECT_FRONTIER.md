@@ -12,6 +12,10 @@ executed, and **no target is guessed**.
   rows only, no instruction text; full per-site rows stay private.
 - Checker: `tools/lift/check_indirect_frontier.py` regenerates all three summaries and diffs them;
   it skips cleanly when the private disassembly is absent.
+- Grades: `tools/lift/store_to_load_forwarding.py` is the bounded one-hop store-to-load pass for
+  the table-level rows (self-tested, `--self-test`); `tools/lift/check_evidence_grades.py`
+  re-derives the split from the pinned ELF and `vtable_resolved_entries.hpp` and fails if this card
+  drifts. Both skip cleanly without the private disassembly.
 - Later seed classes (below): the 573-row constructor table, a 40-seed entry-map sample, the
   exhaustive entry-map sweep, the vtable-closure sweep, and its provenance audit. Their artifacts
   live under `local/validation/indirect-frontier/` (`ctor-sweep.json`, `entry-map-sweep.json`,
@@ -123,6 +127,11 @@ What each grade is good for: a site-provable row can drive native dispatch for t
 table-level row must not. Both are sound as *target* records — the body model, the ABI row and the
 fixture describe the function, not the call site.
 
+The split did not move when the bounded store-to-load forwarding pass was run over all 91 rows:
+**0 of the 50** table-level rows become site-provable, for the reasons measured in
+[Store-to-load forwarding pass](#store-to-load-forwarding-pass). The table above is therefore both
+the pre-pass and the current measured split, and no row's value or grade was edited.
+
 ## Sweeps after the seed closure
 
 `vtable_resolved_entries` is the union of five sweeps, each with its own seed class:
@@ -215,8 +224,10 @@ The 2,249 / 795 figures reproduce exactly. The earlier card's **857** containers
 by this grouping; 892 is the count of FDE starts containing at least one tied site (891 for call
 sites alone), and 857 is not reproducible from the recorded predicate.
 
-The 2,208 unproven sites are not all wrong. `0x113c5` loads `(%r12)` after the same block stored
-`0x1595b60` into `(%r12)`, which is a store-to-load forward the audit does not model, and the plain
+The 2,208 unproven sites are not all wrong. `0x113c5` reloads `(%r12)` after the same block stored
+`0x1595b60 + 0x10` — not `0x1595b60` — into `(%r12)`, which is a store-to-load forward the strict
+predicate does not model; the pass below measures it and finds the call reads `0x1595b88`, not the
+row's `0x1595b78`. The plain
 teardown family (`0x1dd620`, `0x1de6c0`, ...) dispatches through a *member's* vtable, where the
 recorded table is the owner's. Both are `may`-ties, not `must`-ties. What the audit does establish is
 which rows are proven by the call site alone: **24 of the 74** rows that existed at that point (all
@@ -262,6 +273,57 @@ and then makes a qualified (non-virtual) call through the base table's slot `0x6
 qword, the type-8 RELA addend, the header constants, the 17 table rows and the entry-map record.
 `check_vtable_resolved_entries.py` re-verifies all 91 rows (37 targets).
 
+### Store-to-load forwarding pass
+
+Seed class: the 50 table-level rows themselves. This is the one route the previous card called the
+"largest *provable* remainder" and left unmeasured: a locally constructed object whose vtable
+pointer is stored to a stack slot or member and reloaded before the indirect call.
+
+The pass (`tools/lift/store_to_load_forwarding.py`, self-tested on 15 synthetic cases) follows
+**exactly one hop**: call register ← one member load ← one earlier store to the same location in
+the same FDE. The store must be a single reaching definition inside one straight-line region — no
+call, no branch, no write to the location's base register, no possibly-aliasing store, and no
+branch target entering the region from outside — and the stored value must be static within three
+register links (`lea TABLE(%rip)`, `mov G(%rip)`, `lea K(%reg)`/`add $K,%reg`/`mov %reg,%reg`).
+A store whose value itself came from memory is a second hop and is refused. A row is promoted only
+when the forwarded address is *the row's own slot* (`stored + slot == vtable + slot`) and the
+pinned image corroborates it (qword, one type-8 RELA with that addend, FDE start).
+
+**Result: 0 of the 50.** Measured blockers:
+
+| Blocker | Rows | Meaning |
+|---|---:|---|
+| `no-store-to-location-in-fde` | 40 | nothing in the containing function ever writes `(%base)`; the vptr comes from an argument or a runtime member |
+| `call-between-store-and-load` | 8 | a store exists, but a call while it is live can rewrite the slot |
+| `control-flow-between-store-and-load` | 1 | the store→load region is not straight-line |
+| `load-address-is-indexed` | 1 | `movq 0xd8(%rbx,%r15),%rax` is not a simple member load |
+
+The nine rows that do reach a store are exactly the constructor-tail shape, and they expose a
+second measured fact: the store materialises the vptr as `lea TABLE(%rip); add $0x10`, so the
+address the call reads is `TABLE + 0x10 + slot`, two slots **above** the row's `TABLE + slot`.
+For those nine the forwarded address is a real slot (one type-8 RELA, FDE start) holding a
+*different* function, so even a relaxed escape analysis would not promote the row as written:
+
+| Sites | Row slot → forwarded slot | Row target → forwarded target |
+|---|---|---|
+| `0x113c5` | `0x1595b78` → `0x1595b88` | `0x488d0` → `0x13d20` |
+| `0x113d6` | `0x1595bb0` → `0x1595bc0` | `0x13d60` → `0x47860` |
+| `0x11462` | `0x1594b38` → `0x1594b48` | `0x13d60` → `0x47860` |
+| `0x312ce`, `0x3133e` | `0x15954a0` → `0x15954b0` | `0x318b0` → `0x31900` |
+| `0x312de`, `0x3134e` | `0x1595498` → `0x15954a8` | `0x31870` → `0x318f0` |
+| `0x312f0`, `0x31360` | `0x1595410` → `0x1595420` | `0x31310` → `0x31520` |
+
+Those forwarded values are **diagnostics, not evidence**: the rows stay `table-level` and this card
+changes no row value. They say the site's read address is offset from the recorded one, which is
+inherent to a fallback tie: the recorded `(vtable, slot)` is the older `lea` plus the call
+displacement, and for a vptr-relative call that is not the address the call reads. Fixing that
+means rewriting row values, which needs its own audit and is not attempted here.
+
+Limits of the pass, stated so the zero is not read as "nothing is there": it matches a store only
+through the **same base register family**. Widening to any base is not a proof — offset `0` is the
+vptr of *every* object, so 46 of the 50 rows have some same-offset store through an unrelated
+register. Going further needs points-to/escape analysis, not a longer window.
+
 ### What stays unknown, and why
 
 - **Rows are not reachability.** A row says the slot holds that function in the pinned image, and —
@@ -279,10 +341,12 @@ qword, the type-8 RELA addend, the header constants, the 17 table rows and the e
 
 ## Next steps
 
-1. The next class is **store-to-load forwarding** for locally constructed objects: sites whose call
-   register is `movq (%obj),%rax` where the same block stored a static table into `(%obj)`. This is
-   the largest *provable* remainder (the constructor-tail pattern), but it needs a real local
-   memory-tracking pass; it is not measured yet.
+1. **Store-to-load forwarding is measured and closed for the current table.** The pass proves
+   **0 of the 50** rows ([Store-to-load forwarding pass](#store-to-load-forwarding-pass)): 40 have
+   no store to the load location in their own function, 9 reach a store that is not a unique
+   reaching definition in a straight-line region, and 1 is an indexed load. The nine rows with a
+   real store all read `TABLE + 0x10 + slot`, so the recorded target is at the wrong slot for the
+   site, not merely unproven. Do not re-run this class expecting rows.
 2. Do not re-sweep the constructor table or the entry-map keys; both are exhausted for new targets.
 3. Keep the "model, then row" order. A target without a fixture and checker stays out of the table.
 4. Do not add **new** rows from the window+fallback tie. Either prove the register, or record the

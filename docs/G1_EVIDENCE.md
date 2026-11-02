@@ -1,6 +1,6 @@
 # G1 PARTIAL evidence pack — what the ARM64 harness proves, and what it does not
 
-**Gate status: G1 PARTIAL — not PASSED.** Measured 2026-11-01 21:06 CDT (capture `c18b566d…`, see §7) on
+**Gate status: G1 PARTIAL — not PASSED.** Measured 2026-11-01 21:10 CDT (capture `12433a36…`, see §7) on
 `cursor/init-hash-551140-6aa93e8` + uncommitted work, Apple M4 Pro, macOS 27.0.1, Xcode 27.1.
 Every claim below is labelled `STATIC_ANALYSIS_VERIFIED`, `FIXTURE_VERIFIED`, `PARTIAL` or
 `NOT RUN`. Nothing in this pack was produced by executing the game, its `eboot.bin`, or any guest
@@ -199,11 +199,15 @@ inherited a tie that does not hold for the call.
 table-level row must not.** A table-level row remains a sound *target* record — the body model, the
 ABI row and the fixture describe the function, not the call.
 
-**This rule is not yet enforced by the code.** `ResolvedVtableCallSite` carries
+**The split is checked; its use is not.** `tools/lift/check_evidence_grades.py` re-derives
+41 / 50 / 91 from the pinned ELF and the header and fails when
+[INDIRECT_FRONTIER](INDIRECT_FRONTIER.md) drifts (`OK check_evidence_grades: 41 site-provable
+(6 targets, 6 table bases) / 50 table-level (31 targets, 17 of 21 table bases) / 91 rows`). What is
+**not** enforced is the consumer side: `ResolvedVtableCallSite` carries
 `{site, vtable, slot, target}` and no grade field, so `find_resolved_vtable_call_site()` cannot
-distinguish the 41 from the 50. The grade currently exists only as a trailing comment and as the
-prose in [INDIRECT_FRONTIER](INDIRECT_FRONTIER.md). Until the type carries the grade, "table-level
-rows must not drive native dispatch" is a documentation rule, not a machine-checked invariant.
+distinguish the 41 from the 50. Until the type carries the grade, "table-level rows must not drive
+native dispatch" is a documentation rule at the point of use, not an invariant a dispatcher can be
+made to respect.
 
 The 26 per-target model headers relabelled in E1066 now state their grade; **10 of the 36** vtable
 model headers still do not (`vtable_1594ae8_slot28_13d20.hpp`,
@@ -260,10 +264,10 @@ Measured against the whole image, the recovered surface is small:
 | Proven by the call register alone | **41** (0.14 % of slot calls) | idem |
 | Slot reads with an object base that has no static source | 27,408 | idem |
 
-`docs/entry_map.json` (1,638 RVA constants → 1,099 distinct RVAs, 406 headers at capture time)
-covers roughly **2 %** of those 55,790 functions, and it records *names*, not callable ABI: a presence
-in the map means a header mentions the address, nothing more. The map is regenerated often — quote
-`docs/entry_map.json`, not this paragraph, if the exact totals matter.
+`docs/entry_map.json` covers on the order of **1,100 distinct guest RVAs — roughly 2 %** of those
+55,790 functions — and it records *names*, not callable ABI: a presence in the map means a header
+mentions the address, nothing more. The totals move with every lane, so quote the generated
+`docs/entry_map.json` for them; this paragraph deliberately does not pin a number that changes hourly.
 
 ## 6. Unresolved edges (explicit)
 
@@ -275,20 +279,25 @@ in the map means a header mentions the address, nothing more. The map is regener
    in the C++ type today (§3).
 4. **10 of 36 vtable model headers** carry no grade (§3).
 5. **Image-wide dispatch**: 46,830 indirect calls, only 41 proven. 27,408 sites dispatch through an
-   object base with no static source; the store-to-load-forwarding class (constructor-tail
-   `movq (%obj),%rax` after a static table store) is the largest *provable* remainder and is **not
-   measured**.
-6. **MSL: 0 real shaders lowered.** `lowered: 0` over a 34,291-member `.csdr` population (64-member
+   object base with no static source.
+6. **Store-to-load forwarding was attempted on the 91 rows and promoted none.** The bounded pass
+   (`tools/lift/store_to_load_forwarding.py`, one hop, same FDE, single reaching definition, static
+   stored value) proves **0 of the 50**: 40 have no store to the load location anywhere in their own
+   function, 8 have a call between the store and the load, 1 has control flow between them, 1 loads
+   through an indexed address. So this class is exhausted *for these rows*, not unmeasured: the
+   remaining 10 need a different argument, and the same pass over the 46,830 image-wide sites has not
+   been run.
+7. **MSL: 0 real shaders lowered.** `lowered: 0` over a 34,291-member `.csdr` population (64-member
    deterministic sample; 4 decoded, 27 decode-error, 41 compressed-prefix). The blocker is a
    per-shader ABI manifest, not decoding. This is a **G1/G3 boundary fact, not a G1 pass** — the
    decoder never became a Metal pipeline (`docs/MSL_OFFLINE.md`).
-7. **Audio**: the `.sxd2` selector is resolved (ATRAC9, format byte `0x42`), but the ATRAC9
+8. **Audio**: the `.sxd2` selector is resolved (ATRAC9, format byte `0x42`), but the ATRAC9
    configuration word and frame geometry are unknown, so **no sample is decoded**. G2 `NOT RUN`.
-8. **Save/load**: no transaction, no relaunch proof. G2 `NOT RUN`.
-9. **No runtime**: `sotc_core_start()` cannot leave the failed state (§2).
-10. **The entry map is a name map, not an ABI.** `gen_entry_map.py --check` passes at capture time,
-    but `docs/ENTRY_MAP.md`'s prose totals (1,549 / 1,052 / 399) lag its own generated JSON
-    (1,638 / 1,099 / 406). Neither number is a claim that an address is callable.
+9. **Save/load**: no transaction, no relaunch proof. G2 `NOT RUN`.
+10. **No runtime**: `sotc_core_start()` cannot leave the failed state (§2).
+11. **The entry map is a name map, not an ABI.** `gen_entry_map.py --check` passes at capture time,
+    but `docs/ENTRY_MAP.md`'s prose totals lag its own generated JSON. Neither number is a claim that
+    an address is callable.
 
 ## 7. Reproduce
 
@@ -302,8 +311,10 @@ python3 -I tools/lift/check_ctor_slots.py            # 451 pairs, first gap 314 
 python3 -I tools/lift/check_startup_slot309_table.py # data-only row, no caller
 python3 -I tools/lift/check_ctor_slot_312.py         # body + class + atexit rows
 
-# the frontier's table-level facts (private ELF)
+# the frontier's table-level facts and the grade split (private ELF)
 python3 -I tools/lift/check_vtable_resolved_entries.py   # OK 91 sites / 37 targets
+python3 -I tools/lift/check_evidence_grades.py           # OK 41 / 50 / 91, doc matches
+python3 -I tools/lift/store_to_load_forwarding.py        # 0 of 50 promoted
 
 # closures and the indirect frontier (private disassembly)
 python3 -I tools/lift/cfg_census.py --seed 0x531d60
@@ -318,8 +329,10 @@ ctest --test-dir local/build/orch-r22 -R '^(startup_ctors|startup_ctor_coverage|
 ./local/build/orch-r22/test_startup_ctor_coverage           # asserts 451 / 314 / 0xa41810
 ```
 
-Private capture for this revision: `local/validation/g1-partial-20261101/` (`manifest.json`,
-`capture.py`; gitignored). The 2026-10-22 directory is retained as the historical artifact.
+Private capture for this revision: `local/validation/g1-partial-20261101/` — `manifest.json`
+sha256 `12433a36d0687a960bae22ea2ee0a72973542b7683a3607b4472c6d4ab55e2bc`, tip `b5798ead` (dirty
+tree), ctest 533/533, G1 subset 24/24, all five G1 checkers exit 0, every cited binary newer than the
+library it links. Gitignored; the 2026-10-22 directory is retained as the historical artifact.
 
 ## 8. Gate status
 
@@ -342,7 +355,8 @@ Private capture for this revision: `local/validation/g1-partial-20261101/` (`man
 | Frontier | 6 resolved rows, no grades | **91 rows / 37 targets**, split **41 site-provable / 50 table-level** |
 | Model headers | ungraded | 26 of 36 carry a grade; 10 still do not |
 | MSL | not mentioned | stated as a G1/G3 boundary: **0 lowered** |
-| Entry map | not mentioned | 1,638 constants → 1,099 RVAs / 406 headers; a name map, not an ABI |
+| Store-to-load forwarding | not mentioned | measured on all 91 rows: **0 promoted** (40 no store, 8 call, 1 control flow, 1 indexed) |
+| Entry map | not mentioned | ~1,100 distinct RVAs (≈2 % of functions); a name map, not an ABI |
 | Claim | G1 PARTIAL | unchanged — **G1 PARTIAL, not PASSED** |
 
 Corrections of prior text:
