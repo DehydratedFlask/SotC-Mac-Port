@@ -3,7 +3,7 @@
 - Task: `CPU-01-G1-PARTIAL-EVIDENCE-01` (rerun; the 2026-10-22 pack was stale).
 - Gate: **G1**; status **PARTIAL — not PASSED**. G0 PARTIAL, G2 NOT RUN, G3 PARTIAL, G4 PARTIAL,
   G5–G6 NOT RUN.
-- Tip at capture: `b5798ead` on `cursor/init-hash-551140-6aa93e8`, dirty tree.
+- Tip at capture: `d9ff4d2f` on `cursor/init-hash-551140-6aa93e8`, dirty tree.
 - Machine: Apple M4 Pro, macOS 27.0.1, Xcode 27.1, Python 3.15.
 - Failed tries: 0. One transient tree inconsistency was observed and is recorded below.
 
@@ -16,7 +16,7 @@
    ELF and the strict tie artifact. `--check` compares, `--write` regenerates, `--json` dumps.
 3. `tools/lift/check_g1_evidence_pack.py` — sweep wrapper; fails when the block drifts.
 4. `local/validation/g1-partial-20261101/{capture.py,manifest.json,SUMMARY.json}` — private capture,
-   `manifest.json` sha256 `12433a36d0687a960bae22ea2ee0a72973542b7683a3607b4472c6d4ab55e2bc`.
+   `manifest.json` sha256 `f3d4224017ac0717f436de57bfcda1807ac1ca6b5dedfb17a072b18d38cf5b2a`.
 5. `docs/INDIRECT_FRONTIER.md` — classification table corrected to the live tool's counts, with a note
    that the older row did not reproduce.
 6. `docs/TASKS.md` row and `docs/EVIDENCE.md` E1071.
@@ -36,7 +36,7 @@
 | `python3 -I tools/lift/store_to_load_forwarding.py` | 91 rows, 50 analysed, **0 promoted** |
 | `python3 -I tools/lift/indirect_frontier.py --seed 0x531d60` (and `0x1bdf30`, union) | 608/105/499/5, 416/59/122/3, 817/136/562/6 into a temp path |
 | `python3 -I tools/lift/cfg_census.py --seed …` | 55,790 FDE / 15,839,273 B; 227,401 call sites (47,481 indirect) |
-| `python3 -I local/validation/g1-partial-20261101/capture.py` | exit 0 — ctest 533/533, G1 subset 24/24, 5 checkers exit 0, 4 binaries arm64 and newer than `libsotc_core.a` |
+| `python3 -I local/validation/g1-partial-20261101/capture.py` | exit 0 — ctest 533/533, G1 subset 24/24, 6 checkers exit 0, 4 binaries arm64 and newer than `libsotc_core.a` |
 | `./local/build/orch-r22/test_startup_ctor_coverage` | exit 0 — asserts 451 / 314 / `0xa41810` |
 | `python3 -I tools/lift/gen_entry_map.py --check` | exit 0 after the integrator's 21:05 regeneration (1,638 constants → 1,099 RVAs / 406 headers) |
 | inline byte scan for `e8`/`e9` → `0xa505e0` / `0xa46130` | 0 sites each (superset scan over every executable segment) |

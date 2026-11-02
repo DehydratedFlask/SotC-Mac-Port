@@ -183,8 +183,7 @@ def main() -> int:
 
         def static_value(register, start, allow_object):
             """(kind, value) for a register defined by a RIP table load, else None."""
-            definition = forwarding.nearest_definition(body, start, register,
-                                                       forwarding.MAX_STORE_SCAN)
+            definition = forwarding.nearest_definition(body, start, register, AUDIT_WINDOW)
             if definition is None:
                 return None
             insn = body[definition]

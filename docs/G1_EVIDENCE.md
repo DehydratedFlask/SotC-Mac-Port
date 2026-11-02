@@ -1,6 +1,6 @@
 # G1 PARTIAL evidence pack — what the ARM64 harness proves, and what it does not
 
-**Gate status: G1 PARTIAL — not PASSED.** Measured 2026-11-01 21:10 CDT (capture `12433a36…`, see §7) on
+**Gate status: G1 PARTIAL — not PASSED.** Measured 2026-11-01 21:11 CDT (capture `f3d42240…`, see §7) on
 `cursor/init-hash-551140-6aa93e8` + uncommitted work, Apple M4 Pro, macOS 27.0.1, Xcode 27.1.
 Every claim below is labelled `STATIC_ANALYSIS_VERIFIED`, `FIXTURE_VERIFIED`, `PARTIAL` or
 `NOT RUN`. Nothing in this pack was produced by executing the game, its `eboot.bin`, or any guest
@@ -330,8 +330,8 @@ ctest --test-dir local/build/orch-r22 -R '^(startup_ctors|startup_ctor_coverage|
 ```
 
 Private capture for this revision: `local/validation/g1-partial-20261101/` — `manifest.json`
-sha256 `12433a36d0687a960bae22ea2ee0a72973542b7683a3607b4472c6d4ab55e2bc`, tip `b5798ead` (dirty
-tree), ctest 533/533, G1 subset 24/24, all five G1 checkers exit 0, every cited binary newer than the
+sha256 `f3d4224017ac0717f436de57bfcda1807ac1ca6b5dedfb17a072b18d38cf5b2a`, tip `d9ff4d2f` (dirty
+tree), ctest 533/533, G1 subset 24/24, all six G1 checkers exit 0, every cited binary newer than the
 library it links. Gitignored; the 2026-10-22 directory is retained as the historical artifact.
 
 ## 8. Gate status
