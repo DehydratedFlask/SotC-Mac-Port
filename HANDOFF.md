@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 08:05 CDT (root) — the TLS records are allocation-site frames (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`, record semantics. The push sites build a 0x20-byte struct and push it **immediately before an allocation**, popping right after:
+  - `0x904ee`: owner `lea 0x3c0(%rbx)`; blob = `"CRenderContext *CRenderBackend::PerFrameRenderContexts::RequestNewRenderContext(size_t, size_t, CRenderBackend *)"` + `"d:\\dev\\cp10\\Main\\Code\\BPE\\Source\\Renderer\\Backend\\PS4\\PS4CRenderBackend.cpp"`; line **0x25d (605)**; then `call 0x17070`.
+  - `0x16ea05`: blob = `"CComputeContext::CComputeContext(size_t, size_t, int, bpe::memory::IAllocator *, bpe::memory::IAllocator *)"` + `"…PS4ComputeContext.cpp"`; line **0x2e (46)**; then `call 0x12820`.
+  - `0x91926`: line 0xe9, sandwiched between `0x12820` and the pop.
+- **Result:** the records are **allocation-site frames** — owner object, function signature, source path, line — pushed around allocations, and the allocator front peeks the top at `count-1` to attribute the current allocation. That is what the `allocator_front.hpp` "TLS free-heap hint" note was standing in for.
+- **Model:** `TlsAllocSite {owner, function, file, line}` with `tls_alloc_site_push` / `tls_alloc_site_peek_top` (built on the existing record primitives, so capacity/empty/no_thread behaviour is unchanged). Fixture: empty stack, push outer/peek, push inner/peek returns the inner frame, pop restores the outer frame, unknown thread.
+- **Checker:** now also requires each push site to be followed by an allocation call (`0x17070`/`0x12820`) within 0x1c bytes, and resolves the two fully-decoded sites' signature and path strings — asserting non-empty signature and a `.cpp` path with a separator. (Fixed two of my own mistakes while doing it: a `\\s` regex typo and a window too small for the `0x16ea05` site.)
+- **Verification (PASSED):** build exit 0; CTest **520/520**; lift checkers **712 passed / 0 failed**.
+- **Next exact action:** the allocator front bodies (`0x11fb0`, `0x12820`) can now consult `tls_alloc_site_peek_top` in their not-yet-modelled paths, or the record stack's remaining 11 push sites can be decoded the same way to widen the named set.
+
 ## 2026-11-03 07:05 CDT (root) — the record-stack consumers are the allocator front (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`, consumer card. Found and pinned the code that reads the records: **`0x11fb0` at `0x12007`** and **`0x12820` at `0x12890`** — the two bodies `allocator_front.hpp` lists as the unmodelled "TLS free-heap hint". Both do `count = *(u32*)(tcb+0x400); if (!count) skip; record = tcb + (count-1)*0x20`, i.e. they take the **last** pushed record and only inspect it.

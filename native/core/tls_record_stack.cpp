@@ -120,6 +120,31 @@ TlsRecordRead tls_record_peek_top(const GuestThreads& threads, std::uint32_t thr
     return tls_record_read(threads, thread_id, count - 1);
 }
 
+TlsRecordPushResult tls_alloc_site_push(GuestThreads& threads, std::uint32_t thread_id,
+                                        const TlsAllocSite& site) noexcept {
+    std::uint8_t blob[kTlsRecordBlobBytes] = {};
+    std::memcpy(blob, &site.function, sizeof(site.function));
+    std::memcpy(blob + sizeof(site.function), &site.file, sizeof(site.file));
+    return tls_record_push(threads, thread_id, site.owner, blob, site.line);
+}
+
+TlsAllocSitePeek tls_alloc_site_peek_top(const GuestThreads& threads,
+                                         std::uint32_t thread_id) noexcept {
+    TlsAllocSitePeek out{};
+    const TlsRecordRead record = tls_record_peek_top(threads, thread_id);
+    if (!record.ok) {
+        out.status = record.status;
+        return out;
+    }
+    out.site.owner = record.arg0;
+    std::memcpy(&out.site.function, record.blob, sizeof(out.site.function));
+    std::memcpy(&out.site.file, record.blob + sizeof(out.site.function), sizeof(out.site.file));
+    out.site.line = record.field;
+    out.status = TlsRecordStatus::ok;
+    out.ok = true;
+    return out;
+}
+
 TlsRecordRead tls_record_read(const GuestThreads& threads, std::uint32_t thread_id,
                               std::uint32_t index) noexcept {
     TlsRecordRead out{};

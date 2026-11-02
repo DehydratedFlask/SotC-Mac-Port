@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import hashlib
 import importlib.util
+import re
 import struct
 import sys
 from pathlib import Path
@@ -23,6 +24,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import ps4_dynlink as d  # noqa: E402
 
 ELF = ROOT / "local/re/eboot.elf"
+DIS = ROOT / "local/validation/registry-analysis-agent/all.dis"
 FDE = ROOT / "local/validation/registry-analysis-agent/fde_ranges.json"
 HEADER = ROOT / "native/core/tls_record_stack.hpp"
 SOURCE = ROOT / "native/core/tls_record_stack.cpp"
@@ -36,6 +38,22 @@ FS0 = bytes.fromhex("64488b042500000000")
 def require(cond: bool, msg: str) -> None:
     if not cond:
         raise SystemExit(f"FAIL {msg}")
+
+
+INSTRUCTION = re.compile(r"^\s*([0-9a-f]+):\s+[a-z][a-z0-9.]*\s+.*$")
+
+
+def rows_by_address(start: int, size: int) -> list[str]:
+    """Raw disassembly text for instruction lines in [start, start+size)."""
+    texts = []
+    for line in DIS.open(encoding="utf-8", errors="replace"):
+        match = INSTRUCTION.match(line)
+        if match is None:
+            continue
+        address = int(match.group(1), 16)
+        if start <= address < start + size:
+            texts.append(line.rstrip())
+    return texts
 
 
 def main() -> int:
@@ -52,7 +70,7 @@ def main() -> int:
                    "test_tls_record_stack"):
         require(needle in cmake, f"cmake missing {needle}")
 
-    if not ELF.is_file() or not FDE.is_file():
+    if not ELF.is_file() or not FDE.is_file() or not DIS.is_file():
         print("SKIP check_tls_record_stack: private image not present (module wiring checked)")
         return 0
 
@@ -104,7 +122,46 @@ def main() -> int:
         require(owner is not None and owner[0] in (0x11FB0, 0x12820),
                 f"0x{site:x} is no longer inside 0x11fb0/0x12820")
     require("tls_record_peek_top" in header, "header lacks the consumer accessor")
+    require("tls_alloc_site_push" in header and "tls_alloc_site_peek_top" in header,
+            "header lacks the allocation-site helpers")
     require("empty," in header, "header lacks the empty status the consumer guard needs")
+
+    # The push sites build {function, file, line} and push immediately before an allocation.
+    def string_at(address: int, limit: int = 200) -> str:
+        out = bytearray()
+        for index in range(limit):
+            try:
+                byte = image.read(address + index, 1)[0]
+            except Exception:
+                break
+            if byte == 0:
+                break
+            out.append(byte)
+        return out.decode("utf-8", "replace")
+
+    SITES = (
+        # (push site, function-string address, file-string address, line immediate)
+        (0x904EE, 0xF9F05C, 0xF9EF3B, 0x25D),
+        (0x16EA05, 0xFABDDE, 0xFABD92, 0x2E),
+        (0x91926, None, None, 0xE9),
+    )
+    checked = 0
+    for site, function_address, file_address, line in SITES:
+        # The push must be followed by an allocation call within 0x1c bytes.
+        targets = {int(m.group(1), 16)
+                   for text in rows_by_address(site, 0x1c)
+                   for m in re.finditer(r"callq\s+0x([0-9a-f]+)", text)}
+        require(targets & {0x17070, 0x12820},
+                f"0x{site:x} is not followed by an allocation call (saw {sorted(hex(t) for t in targets)})")
+        if file_address is None:
+            continue
+        function_text = string_at(function_address)
+        file_text = string_at(file_address)
+        require(function_text.strip(), f"0x{site:x} function string is empty")
+        require(file_text.endswith(".cpp"), f"0x{site:x} file string is not a source path: {file_text!r}")
+        require("\\" in file_text or "/" in file_text, f"0x{site:x} file string has no path separator")
+        checked += 1
+    require(checked == 2, "expected two fully decoded push sites")
 
     # The link-time offset cell value is only meaningful at load time; record what is in the file.
     cell = struct.unpack("<q", image.read(0x15FFF98, 8))[0]

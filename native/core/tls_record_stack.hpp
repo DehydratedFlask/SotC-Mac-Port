@@ -82,6 +82,34 @@ struct TlsRecordPopResult {
 [[nodiscard]] TlsRecordPopResult tls_record_pop(GuestThreads& threads,
                                                 std::uint32_t thread_id) noexcept;
 
+// The record's fields, named from the push sites. Each of the three inspected call sites builds the
+// 0x20-byte source struct as {function-signature string, file-path string, line}:
+//   0x904ee: "CRenderContext *CRenderBackend::PerFrameRenderContexts::RequestNewRenderContext(...)"
+//            "d:\\dev\\cp10\\...\\PS4CRenderBackend.cpp",                     line 0x25d (605)
+//   0x16ea05: "CComputeContext::CComputeContext(...)"
+//            "d:\\dev\\cp10\\...\\PS4ComputeContext.cpp",                     line 0x2e  (46)
+// and pushes them immediately before an allocation call (`0x17070` / `0x12820`), popping right after.
+// So the stack records **where the current allocation came from**: owner object, function, file, line.
+struct TlsAllocSite {
+    std::uint64_t owner = 0;     // record +0x00 (rdi at the call)
+    std::uint64_t function = 0;  // record +0x08: guest address of the signature string
+    std::uint64_t file = 0;      // record +0x10: guest address of the source path
+    std::uint32_t line = 0;      // record +0x18
+};
+
+[[nodiscard]] TlsRecordPushResult tls_alloc_site_push(GuestThreads& threads,
+                                                      std::uint32_t thread_id,
+                                                      const TlsAllocSite& site) noexcept;
+
+struct TlsAllocSitePeek {
+    TlsRecordStatus status = TlsRecordStatus::no_thread;
+    bool ok = false;
+    TlsAllocSite site{};
+};
+
+[[nodiscard]] TlsAllocSitePeek tls_alloc_site_peek_top(const GuestThreads& threads,
+                                                       std::uint32_t thread_id) noexcept;
+
 // Reads the record `index` back (q0, the blob, the field), for fixtures and for a future consumer.
 struct TlsRecordRead {
     TlsRecordStatus status = TlsRecordStatus::no_thread;

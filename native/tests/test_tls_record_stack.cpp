@@ -11,7 +11,10 @@ using sotc::GuestThreads;
 using sotc::TlsRecordStatus;
 using sotc::tls_record_pop;
 using sotc::tls_record_push;
+using sotc::tls_alloc_site_peek_top;
+using sotc::tls_alloc_site_push;
 using sotc::tls_record_peek_top;
+using sotc::TlsAllocSite;
 using sotc::tls_record_read;
 
 int failures = 0;
@@ -137,6 +140,39 @@ void test_peek_top_matches_the_consumer_idiom() {
           tls_record_peek_top(threads, 99).status == TlsRecordStatus::no_thread);
 }
 
+void test_alloc_site_frames() {
+    GuestThreads threads;
+    (void)threads.create(7);
+    check("empty site stack", tls_alloc_site_peek_top(threads, 7).status == TlsRecordStatus::empty);
+
+    TlsAllocSite outer{};
+    outer.owner = 0x1000;
+    outer.function = 0x2000;
+    outer.file = 0x3000;
+    outer.line = 605;
+    check("push outer", tls_alloc_site_push(threads, 7, outer).ok);
+    const auto first = tls_alloc_site_peek_top(threads, 7);
+    check("peek outer", first.ok && first.site.owner == 0x1000 && first.site.function == 0x2000 &&
+                            first.site.file == 0x3000 && first.site.line == 605);
+
+    TlsAllocSite inner{};
+    inner.owner = 0x4000;
+    inner.function = 0x5000;
+    inner.file = 0x6000;
+    inner.line = 46;
+    check("push inner", tls_alloc_site_push(threads, 7, inner).ok);
+    const auto top = tls_alloc_site_peek_top(threads, 7);
+    check("peek inner", top.ok && top.site.owner == 0x4000 && top.site.file == 0x6000 &&
+                            top.site.line == 46);
+    // The peek is the "current allocation context": popping restores the outer frame.
+    (void)tls_record_pop(threads, 7);
+    const auto restored = tls_alloc_site_peek_top(threads, 7);
+    check("restored outer", restored.ok && restored.site.owner == 0x1000 &&
+                                restored.site.line == 605);
+    check("unknown thread site",
+          tls_alloc_site_peek_top(threads, 8).status == TlsRecordStatus::no_thread);
+}
+
 void test_status_names() {
     check("name ok", std::string_view(sotc::tls_record_status_name(TlsRecordStatus::ok)) == "ok");
     check("name capacity",
@@ -152,6 +188,7 @@ int main() {
     test_capacity_refused();
     test_unknown_thread_and_isolation();
     test_peek_top_matches_the_consumer_idiom();
+    test_alloc_site_frames();
     test_status_names();
 
     if (failures == 0) {
