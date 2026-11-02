@@ -1056,7 +1056,7 @@ def census(archives: list[Path], sample: int, top: int, out: Path,
         'top': [{'path': row['path'], 'archive': row['archive'],
                  'stage': row['stage'], 'code_bytes': row['bytes'],
                  'code_sha256': row['sha256'], 'instructions': row['instructions'],
-                 'counts': row['counts'], 'holes': row['holes'],
+                 'counts': row['counts'], 'holes': row['holes'], 'derived': row['derived'],
                  'manifest_only': row['manifest_only'], 'shape': row['shape']}
                 for row in named],
         'tool': {'path': str(Path(__file__).resolve().relative_to(ROOT)),
