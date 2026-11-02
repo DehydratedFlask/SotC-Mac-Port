@@ -214,7 +214,7 @@ assert registered_digest == "1f86fae471d562df33f6e16557407ed5fa50f295ee729488641
 # The remaining 119 original slots have no registered native callback; the first is the explicit
 # startup cliff after slot 326 was registered by CPU-01-STARTUP-SLOT-326-CHARACTERIZATION-01.
 unregistered = sorted(set(range(TABLE_COUNT)) - set(rows_by_index))
-assert len(unregistered) == 119, f"expected 120 unregistered slots, found {len(unregistered)}"
+assert len(unregistered) == 119, f"expected 119 unregistered slots, found {len(unregistered)}"
 assert unregistered[0] == 329 and original_rvas[329] == 0x829e90, (
     f"first unregistered slot changed: {unregistered[0]}/{original_rvas[unregistered[0]]:#x}")
 
