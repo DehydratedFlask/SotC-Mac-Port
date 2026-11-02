@@ -33,9 +33,13 @@ public final class NativeCoreClient: CoreClient, @unchecked Sendable {
     // The C handle takes an internal lock on every call, so sharing it across threads is safe.
     private let handle: OpaquePointer
 
-    public init() throws {
+    /// - Parameter expectedAbiVersion: the ABI the caller was compiled against. It defaults to
+    ///   `compiledAgainstABIVersion` and is injectable so the refusal path can be exercised: a
+    ///   client built against an incompatible library must fail at the handshake, not run and
+    ///   misread every struct it gets back.
+    public init(expectedAbiVersion: CoreABIVersion = NativeCoreClient.compiledAgainstABIVersion) throws {
         var created: OpaquePointer?
-        let code = sotc_core_create(Self.compiledAgainstABIVersion.packed, &created)
+        let code = sotc_core_create(expectedAbiVersion.packed, &created)
         guard code == SOTC_OK, let created else { throw Self.createFailure(code) }
         handle = created
     }

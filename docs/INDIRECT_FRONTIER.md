@@ -82,6 +82,42 @@ start and the entry-map presence for each row — table-level facts that hold fo
 not, and cannot, test dispatch. All 37 distinct targets now have a native body model; the table grew
 through the sweeps recorded below.
 
+## Evidence grades
+
+Two different claims live in `native/core/vtable_resolved_entries.hpp`, and since E1064 every row
+carries its grade as a trailing comment in the table. The grade is a property of the **row**, not of
+the target: one table base can produce both grades — on `0x1594dc0`, slot `0x20` is provable while
+slots `0x10` and `0x18` are table-level.
+
+| Grade | Rows | Targets | Table bases | What the row proves |
+|---|---:|---:|---:|---|
+| site-provable | **41** | 6 | 6 | the call site alone forces the target |
+| table-level only | **50** | 31 | 17 of 21 | the slot ties the target; the call is not proven |
+| **total** | **91** | **37** | **21** | |
+
+- **Site-provable.** The call is `call *slot(%reg)` and the register's *nearest* preceding definition
+  is the RIP-relative load of this table — the `lea` of the table base, or the `mov` of a
+  table-pointer global — with no intervening write the scanner cannot classify. The pinned image then
+  forces the target for that call. 41 sites in 41 containers; all 41 are rows.
+- **Table-level only.** The site side is not proven: the call register's nearest definition is a
+  member load (`movq OFF(%reg),%reg`) whose base has no static source, or a write the scanner cannot
+  classify. What remains proven is the table side: the qword at `vtable + slot` is the target, a
+  type-8 dynamic relocation at that address carries the same addend, and the target is an FDE start.
+  The site may dispatch elsewhere at run time, so the row is **not** evidence that this call reaches
+  this function — only that the slot does, and that some register value in the site's window was that
+  table.
+
+Measured, not estimated: parse the 91 rows of `native/core/vtable_resolved_entries.hpp` and intersect
+their sites with `local/validation/indirect-frontier/tied-sites-image-wide-strict.json` — 41 sites,
+6 targets, 41 containers under the nearest-definition predicate, with the sha-pinned inputs listed at
+the top of this card. That 41-site set is exactly the audit's 24 pre-existing rows plus its 17 new
+ones, so the two artifacts agree. 41 header rows intersect; 50 do not. By table, 15 of the 21 bases
+carry only table-level rows and 2 (`0x1594ae8`, `0x1594dc0`) carry both grades.
+
+What each grade is good for: a site-provable row can drive native dispatch for that call; a
+table-level row must not. Both are sound as *target* records — the body model, the ABI row and the
+fixture describe the function, not the call site.
+
 ## Sweeps after the seed closure
 
 `vtable_resolved_entries` is the union of five sweeps, each with its own seed class:
@@ -97,7 +133,9 @@ through the sweeps recorded below.
 The first three rows match the recorded checkpoints. The entry-map sample reached 47 rows / 22
 targets; the exhaustive entry-map sweep below added no new target on top of it, and the
 vtable-closure sweep is the class that did. The last row is the audit of that same class, recorded
-below; it keeps all 74 rows and adds 17.
+below; it keeps all 74 rows and adds 17. The rows are not graded uniformly — 41 of the 91 are
+site-provable and 50 are table-level only ([Evidence grades](#evidence-grades)) — and the audit added
+only rows that its strict predicate selected (17 of the 41).
 
 ### Exhaustive entry-map sweep (class exhausted)
 
@@ -114,11 +152,12 @@ discovery; more seeds from it only re-find the same tables.
 
 ### Vtable-closure sweep
 
-Seed class: the FDE-start **containers of every fully tied call site that goes through a vtable the
-table already trusts** and was not yet a row. This is a site-evidence class, not a name list: the
-sites were enumerated image-wide (slot qword + type-8 RELA addend + FDE start), then each containing
-function was used as a sweep seed so the site is provably inside the tool's closure. It is the only
-class that extends the table's own evidence base rather than sampling another entry-point list.
+Seed class: the FDE-start **containers of every tied call site that goes through a vtable the table
+already trusts** and was not yet a row. The tie is **table-level**, not site-level: the sites were
+enumerated image-wide by slot qword + type-8 RELA addend + FDE start, then each containing function
+was used as a sweep seed so the site is provably inside the tool's closure. It is the only class that
+extends the table's own evidence base rather than sampling another entry-point list; the audit below
+shows that most of that base is table-level only.
 
 - Artifact: `local/validation/indirect-frontier/vtable-closure-sweep-summary.json` (13 seeds,
   closure 847 functions, 347 sites, 30 resolved rows, no instruction text).
@@ -142,7 +181,8 @@ class that extends the table's own evidence base rather than sampling another en
 
 Every row was re-verified outside the sweep tool before it was written: the qword at
 `vtable + slot`, exactly one type-8 dynamic relocation at that address with the same addend, an FDE
-start at the target, and the body digest. `tools/lift/check_vtable_siblings_low.py`,
+start at the target, and the body digest. That re-verification is table-level by construction — it
+never tested whether the row's call site dispatches through the slot. `tools/lift/check_vtable_siblings_low.py`,
 `check_vtable_containers_e1.py` and `check_vtable_teardown_tail.py` pin the body bytes and sha256,
 the FDE length, the slot qword, the RELA addend and the entry-map record for all 11 new targets;
 `check_vtable_resolved_entries.py` re-verified those 74 rows (33 targets). The provenance-audited
@@ -150,7 +190,8 @@ slice below extends the same check to all 91 rows.
 
 ### Provenance audit of the site-evidence class
 
-The sweep's tie is **table-level**: the qword at `vtable + slot` equals one type-8 RELA addend, and
+The label is the sweep's own and it is misleading: the tie it selected is **table-level**. The qword
+at `vtable + slot` equals one type-8 RELA addend, and
 the call register has a RIP-relative table load somewhere in the 32-instruction window. But
 `indirect_frontier.classify` resolves the register with `rip_global_for(register, window)`, which
 scans *past* the register's nearest definition. When that definition is `movq (%rbx),%rax` — a load
@@ -173,16 +214,20 @@ The 2,208 unproven sites are not all wrong. `0x113c5` loads `(%r12)` after the s
 `0x1595b60` into `(%r12)`, which is a store-to-load forward the audit does not model, and the plain
 teardown family (`0x1dd620`, `0x1de6c0`, ...) dispatches through a *member's* vtable, where the
 recorded table is the owner's. Both are `may`-ties, not `must`-ties. What the audit does establish is
-which rows are proven by the call site alone: **24 of the existing 74** (all 22 rows of
-`0x1594dc0 + 0x20 -> 0x20d60`, plus `0x11452` and `0x13620`). The remaining 50 rows keep their
-table-level evidence and their models; their header comments are not site-level proofs.
+which rows are proven by the call site alone: **24 of the 74** rows that existed at that point (all
+22 rows of `0x1594dc0 + 0x20 -> 0x20d60`, plus `0x11452` and `0x13620`). The remaining 50 rows keep
+their table-level evidence and their models. In the current 91-row table the same predicate marks
+**41** rows site-provable (those 24 plus the 17 added below) and **50** table-level only; every row
+now states its grade in the header and this card's [Evidence grades](#evidence-grades).
 
 ### Provenance-audited slice
 
 Seed class: every image-wide `call *slot(%reg)` whose nearest register definition is the
 RIP-relative table load. That is 41 sites in 41 containers — a bounded, complete class rather than
 an RVA window, and the only class whose site provenance is proven end to end. 24 sites are already
-rows; the other **17** are new rows for **4** new targets and **4** new container bases.
+rows; the other **17** are new rows for **4** new targets and **4** new container bases. Every row
+in this slice is site-provable by construction, and none of the four targets below has a table-level
+row.
 
 Why not the RVA window: the "next 26 lowest-RVA containers without a seed history" slice was
 computed first (26 containers, 45 unrowed sites, 19 candidate targets) and then audited. **Zero of
@@ -214,8 +259,9 @@ qword, the type-8 RELA addend, the header constants, the 17 table rows and the e
 
 ### What stays unknown, and why
 
-- **Rows are not reachability.** A row says the slot holds that function in the pinned image. It does
-  not say the call executes, that the object is constructed, or that the path is gameplay-reachable.
+- **Rows are not reachability.** A row says the slot holds that function in the pinned image, and —
+  for a `site-provable` row only — that this call site reaches it. It does not say the call executes,
+  that the object is constructed, or that the path is gameplay-reachable.
 - **The static vtable graph is mostly dynamic dispatch.** Measured image-wide: 46,830 indirect
   `call *` sites, 28,925 of them `call *0xNN(%reg)`. Only **41** (0.14 %) are proven by the call
   register alone. Of the rest, 27,408 have an object base with no static source
@@ -234,8 +280,9 @@ qword, the type-8 RELA addend, the header constants, the 17 table rows and the e
    memory-tracking pass; it is not measured yet.
 2. Do not re-sweep the constructor table or the entry-map keys; both are exhausted for new targets.
 3. Keep the "model, then row" order. A target without a fixture and checker stays out of the table.
-4. Do not add rows from the window+fallback tie. Either prove the register, or record the site as
-   unresolved.
+4. Do not add **new** rows from the window+fallback tie. Either prove the register, or record the
+   site as unresolved. The 50 rows that already carry a table-level tie stay in the table as target
+   records and are labelled as such; they are not precedent for adding more.
 
 ## Limits
 

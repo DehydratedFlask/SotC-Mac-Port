@@ -195,31 +195,33 @@ def main() -> int:
     def reads(vaddr: int, size: int) -> bytes:
         return image.read(vaddr, size)
 
-    def near_refs(targets) -> dict[int, list[tuple[int, str]]]:
-        """Complete `e8`/`e9`+disp32 scan over every file-backed byte of every loadable segment.
+    # One complete `e8`/`e9`+disp32 scan over every file-backed byte of every loadable segment, for
+    # every target this checker asks about. It is decoder-independent: an encoding is found whether or
+    # not the byte sits on an instruction boundary. One pass, because a 65 MB byte loop is the whole
+    # cost of this checker.
+    wanted = {SLOT309, SLOT309 + 1, *VAR_CTORS, SHARED_BODY, WORKSPACE_CTOR, BOOTSTRAP, CALLBACK,
+              VIRTUAL, *TAG_BYTES}
+    near: dict[int, list[tuple[int, str]]] = {t: [] for t in wanted}
+    for seg in image.loads:
+        chunk = elf[seg["offset"]:seg["offset"] + seg["filesz"]]
+        base = seg["vaddr"]
+        for off in range(len(chunk) - 4):
+            opcode = chunk[off]
+            if opcode not in (0xE8, 0xE9):
+                continue
+            dest = base + off + 5 + struct.unpack_from("<i", chunk, off + 1)[0]
+            if dest in near:
+                near[dest].append((base + off, "call" if opcode == 0xE8 else "jmp"))
 
-        Decoder-independent: it finds every near call/jmp encoding that lands on a target whether or
-        not the byte sits on an instruction boundary."""
-        wanted = set(targets)
-        found: dict[int, list[tuple[int, str]]] = {t: [] for t in wanted}
-        for seg in image.loads:
-            chunk = elf[seg["offset"]:seg["offset"] + seg["filesz"]]
-            base = seg["vaddr"]
-            for off in range(len(chunk) - 4):
-                opcode = chunk[off]
-                if opcode not in (0xE8, 0xE9):
-                    continue
-                dest = base + off + 5 + struct.unpack_from("<i", chunk, off + 1)[0]
-                if dest in found:
-                    found[dest].append((base + off, "call" if opcode == 0xE8 else "jmp"))
-        return found
+    def callers(target: int) -> list[tuple[int, str]]:
+        return near.get(target, [])
 
     def check_call(site: int, target: int) -> bool:
         window = reads(site, 5)
         return window[0] == 0xE8 and site + 5 + struct.unpack_from("<i", window, 1)[0] == target
 
     # ---------------------------------------------------------------- A. slot 309 is a data-only edge
-    slot_hits = near_refs([SLOT309])[SLOT309]
+    slot_hits = callers(SLOT309)
     require(not slot_hits, f"a near call/jmp to 0x{SLOT309:x} appeared at {slot_hits}")
     require(len(addend_index.get(SLOT309, [])) == 1,
             f"slot 309 now has {len(addend_index.get(SLOT309, []))} relocations")
@@ -230,8 +232,7 @@ def main() -> int:
             "a second RELATIVE relocation references slot 309")
 
     # ---------------------------------------------- B. constructor callers of the three var ctors
-    census_targets = [*VAR_CTORS, SHARED_BODY]
-    calls = near_refs(census_targets)
+    calls = {t: callers(t) for t in (*VAR_CTORS, SHARED_BODY)}
     for ctor, site in VAR_CTOR_SLOT309_SITES.items():
         got = calls[ctor]
         require([s for s, _k in got] == [site],
@@ -258,7 +259,7 @@ def main() -> int:
             if fde:
                 require(fde.get(helper) == TAG_BYTES[helper][1],
                         f"0x{helper:x} FDE size changed")
-            require(not near_refs([helper])[helper],
+            require(not callers(helper),
                     f"0x{helper:x} is now directly called")
     for helper, (body, _extent) in TAG_BYTES.items():
         require(reads(helper, len(body) // 2).hex() == body, f"0x{helper:x} body bytes changed")
@@ -299,7 +300,7 @@ def main() -> int:
         require(addend_at.get(vpt + 0x10) == dtor, f"class vtable 0x{vpt:x}+0x10 moved")
 
     # ------------------------------------ G. the callback: one cell, one reader, one bound-member write
-    require(not near_refs([CALLBACK])[CALLBACK], "0x28af0 is now directly called")
+    require(not callers(CALLBACK), "0x28af0 is now directly called")
     require(addend_index.get(CALLBACK) == [CALLBACK_CELL],
             f"0x28af0 relocations changed: {[hex(t) for t in addend_index.get(CALLBACK, [])]}")
     require(struct.unpack_from("<Q", reads(CALLBACK_CELL, 8))[0] == CALLBACK,
@@ -318,7 +319,7 @@ def main() -> int:
     require(reads(CALLBACK_BIND_SELF, size).hex() == body, "the +0xc8 self pointer write changed")
 
     # ------------------------- H. the virtual: one vtable row, two installs, one dispatch, after main
-    require(not near_refs([VIRTUAL])[VIRTUAL], "0x531d60 is now directly called")
+    require(not callers(VIRTUAL), "0x531d60 is now directly called")
     require(addend_index.get(VIRTUAL) == [VTABLE_ROW],
             f"0x531d60 relocations changed: {[hex(t) for t in addend_index.get(VIRTUAL, [])]}")
     require(VTABLE_ROW - VTABLE_ADDR_POINT == 0x20, "the vtable row is no longer at +0x20")
@@ -346,9 +347,9 @@ def main() -> int:
         require(reads(store, 3).hex() == body, f"vptr store 0x{store:x} changed")
     require(addend_index.get(VTABLE_ADDR_POINT) is None,
             "the vptr is now also stored as a relocation (an install site went unnoticed)")
-    require([s for s, _k in near_refs([WORKSPACE_CTOR])[WORKSPACE_CTOR]] == [WORKSPACE_CTOR_SITE],
+    require([s for s, _k in callers(WORKSPACE_CTOR)] == [WORKSPACE_CTOR_SITE],
             "0x536aa0 callers changed")
-    require([s for s, _k in near_refs([BOOTSTRAP])[BOOTSTRAP]] == [BOOTSTRAP_SITE],
+    require([s for s, _k in callers(BOOTSTRAP)] == [BOOTSTRAP_SITE],
             "0x536730 no longer has `main` as its only caller")
     body, size = DISPATCH_BYTES
     require(reads(DISPATCH_WINDOW, size).hex() == body,
@@ -364,7 +365,7 @@ def main() -> int:
     require(ctor_index_of.get(SLOT309) == SLOT309_INDEX, "slot 309 lost its table index")
 
     # Self-test: the near-call scan is live (a wrong target must find nothing).
-    require(not near_refs([SLOT309 + 1])[SLOT309 + 1], "near-call scan is not discriminating")
+    require(not callers(SLOT309 + 1), "near-call scan is not discriminating")
 
     # ------------------------------------------------------------ I. the startup order, from code
     # `main` (the ELF entry point 0xf120) calls the constructor walker at 0x20 and then, straight-line,
