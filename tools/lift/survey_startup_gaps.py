@@ -456,7 +456,7 @@ def main() -> int:
     args = ap.parse_args()
 
     if not ELF_PATH.exists():
-        print(f"SKIP survey_startup_gaps: private image {ELF_PATH.relative_to(ROOT)} absent")
+        print(f"SKIP survey_startup_gaps: private image {ELF_PATH} absent")
         return 0
     objdump = find_objdump()
     e = Elf()                                     # verifies the pinned SHA-256 (fails closed)
@@ -711,6 +711,34 @@ def render_doc(result, gaps, ranked, batches, head_rows, wt_rows) -> str:
         bc = Counter(g["class"] for g in b)
         w("Mix: " + ", ".join(f"{v} {c}" for c, v in bc.items()) + ". Heaviest: " + ", ".join(
             f"{g['index']} ({g['effort_points']})" for g in sorted(b, key=lambda x: -x["effort_points"])[:5]) + ".\n")
+    uniq = [g for g in ranked if g["class"] != "debug-page template"]
+    w("## Non-template bodies (simple leaves and unique large bodies)\n")
+    w("Top callees of each (`callee x count`; names from the known-helper table). These are the slots that do not "
+      "reuse the 309/316/326/329 console-var/menu helper set and so need a fresh byte contract.\n")
+    w("| idx | RVA | class | insn | FDE B | guard | jcc | top callees | note |")
+    w("|--:|---|---|--:|--:|:-:|--:|---|---|")
+    for g in uniq:
+        top = ", ".join(f"`{k}`{('=' + HELPER_NAMES[int(k, 16)]) if int(k, 16) in HELPER_NAMES else ''} x{v}"
+                        for k, v in sorted(g["callees"].items(), key=lambda kv: -kv[1])[:3])
+        note = ""
+        if g["direct_calls"] and len(g["callees"]) == 1:
+            note = f"{g['direct_calls']} calls to one callee (table-registration run?)"
+        elif g["call_density"] < 0.02 and g["instructions"] > 500:
+            note = "mostly inline stores/arithmetic (constant-table style), few calls"
+        w(f"| {g['index']} | `{g['rva']}` | {g['class']} | {g['instructions']} | {g['fde_size']} | "
+          f"{'Y' if g['stack_guard'] else 'n'} | {g['cond_branches']} | {top or '-'} | {note} |")
+    poles = [g for g in ranked if g["effort_points"] >= 40.0]
+    w("\n## Long poles\n")
+    w("Slots at or above 40 points dominate their batch and should be scheduled first or split into a dedicated task "
+      "with its own decomposition (repeat-block recognition: these are runs of the same ConCmd-var construction "
+      "sequence, so a block-structure checker plus a table-driven model is the sensible shape): " + ", ".join(
+          f"{g['index']} (`{g['rva']}`, {g['fde_size']} B, {g['instructions']} insn, {g['atexit_calls']} atexit, "
+          f"{g['effort_points']} pts)" for g in poles) + ".\n")
+    w("Batch notes: each batch's first item should be its heaviest slot; the other workers are not blocked on it. "
+      "Shared lib/shape headers that workers may be tempted to extend (for example `lane_m6_shapes.hpp`, "
+      "`ctor_slot_family_test_util.hpp`, `tools/lift/l4_slot_lib.py`, `slot_pin_util.py`, `slotfam_specs.py`) are "
+      "integrator-owned: a worker that needs a new shape adds it to its own `ctor_slot_<N>_*` header and files a "
+      "promote-to-shared request in its bundle.\n")
     w("## Serialising the shared files\n")
     w("Every slot needs edits in four files no two workers may touch concurrently: `native/CMakeLists.txt` "
       "(`target_sources`, `add_executable`, `add_test`), `native/core/startup_ctors.hpp` (`#include` + `StartupState` "

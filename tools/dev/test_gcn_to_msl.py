@@ -300,6 +300,164 @@ class LoweringTests(unittest.TestCase):
         with self.assertRaisesRegex(m.LoweringError,'incomplete'):
             m.Lowerer(dict(sha256=hashlib.sha256(p).hexdigest()),'vs').run(p)
 
+    # -- export model -------------------------------------------------------------------
+    def array_abi(self, code, **extra):
+        abi = dict(sha256=hashlib.sha256(code).hexdigest(), export_sink='target-array')
+        abi.update(extra)
+        return abi
+
+    def test_target_array_sink_accepts_a_non_synthetic_export_set(self):
+        # A vertex stage that writes clip plus exactly one param, which the closed named harness
+        # cannot express: the target-array sink is indexed by target.
+        code = (e.vop1(dst=8, src=242) + e.exp(target=12, src=(8, 8, 8, 8))
+                + e.exp(target=32, src=(8, 8, 8, 8)) + e.END)
+        lines, report = m.Lowerer(self.array_abi(code), 'vs').run(code)
+        joined = '\n'.join(lines)
+        for component in 'xyzw':
+            self.assertIn(f'e.pos[0].{component} =', joined)
+            self.assertIn(f'e.param[0].{component} =', joined)
+        self.assertEqual(report['exports'], {'12': [0, 1, 2, 3], '32': [0, 1, 2, 3]})
+        self.assertEqual(report['export_sink'], 'target-array')
+        # The named harness keeps its own closed contract, unchanged.
+        with self.assertRaisesRegex(m.LoweringError, 'incomplete stage exports'):
+            m.Lowerer(dict(sha256=hashlib.sha256(code).hexdigest()), 'vs').run(code)
+
+    def test_partial_export_writes_only_the_enabled_components(self):
+        code = e.vop1(dst=4, src=242) + e.exp(target=0, en=3, src=(4, 4, 4, 4)) + e.END
+        lines, report = m.Lowerer(self.array_abi(code), 'ps').run(code)
+        joined = '\n'.join(lines)
+        self.assertIn('e.rt[0].x =', joined)
+        self.assertIn('e.rt[0].y =', joined)
+        self.assertNotIn('e.rt[0].z', joined)
+        self.assertNotIn('e.rt[0].w', joined)
+        self.assertEqual(report['exports'], {'0': [0, 1]})
+
+    def test_compressed_export_pair_mapping_and_refusals(self):
+        packed = e.vop2(op=47, dst=4, src0=256, src1=1)   # v4 = packed fp16 pair
+        # en bit 2 exports B,A from the SECOND payload register (vsrc1 = v4 here).
+        high = packed + e.exp(target=0, en=12, compr=1, done=1, vm=1, src=(0, 4, 0, 0)) + e.END
+        lines, report = m.Lowerer(self.array_abi(
+            high, initial_vector={'0': float_input('camera', 'x'),
+                                  '1': float_input('camera', 'y')}), 'ps').run(high)
+        joined = '\n'.join(lines)
+        self.assertIn('e.rt[0].z =', joined)
+        self.assertIn('e.rt[0].w =', joined)
+        self.assertNotIn('e.rt[0].x', joined)
+        self.assertNotIn('e.rt[0].y', joined)
+        self.assertEqual(report['valid_mask_exports'], [0])
+        # A compressed payload has no defined layout outside the render-target/depth targets.
+        bad = packed + e.exp(target=32, en=15, compr=1, done=1, vm=1, src=(4, 4, 0, 0)) + e.END
+        with self.assertRaisesRegex(m.LoweringError, 'compressed export outside'):
+            m.Lowerer(self.array_abi(bad, initial_vector={
+                '0': float_input('camera', 'x'), '1': float_input('camera', 'y')}),
+                'ps').run(bad)
+
+    def test_null_export_is_not_a_sink_write(self):
+        code = e.exp(target=9, en=0, compr=0, done=1, vm=1, src=(0, 0, 0, 0)) + e.END
+        lines, report = m.Lowerer(self.array_abi(code), 'ps').run(code)
+        self.assertEqual(lines, [])
+        self.assertEqual(report['exports'], {})
+        self.assertEqual(report['null_exports'], [9])
+        self.assertEqual(report['valid_mask_exports'], [9])
+
+    def test_valid_mask_export_is_refused_on_a_vertex_stage(self):
+        code = (e.vop1(dst=8, src=242) + e.exp(target=12, done=1, vm=1, src=(8, 8, 8, 8))
+                + e.exp(target=32, src=(8, 8, 8, 8)) + e.END)
+        with self.assertRaisesRegex(m.LoweringError, 'fragment stage'):
+            m.Lowerer(self.array_abi(code), 'vs').run(code)
+
+    # -- arithmetic rows ---------------------------------------------------------------
+    def test_integer_rows_and_the_reversed_shift_convention(self):
+        # v_lshrrev_b32 v6, v4, v5 shifts the VALUE of VSRC1 by the amount in SRC0.
+        code = (e.vop2(op=22, dst=6, src0=260, src1=5)
+                + e.vop2(op=27, dst=7, src0=261, src1=2)      # v_and_b32
+                + e.vop2(op=37, dst=8, src0=262, src1=3)      # v_add_i32
+                + e.vop2(op=38, dst=9, src0=263, src1=4)      # v_sub_i32
+                + e.vop2(op=26, dst=10, src0=264, src1=5)     # v_lshlrev_b32
+                + e.vop3(op=323, dst=11, src0=267, src1=268, src2=269,
+                         abs_=0, clamp=0, omod=0, neg=0)       # v_mad_u32_u24
+                + e.vop3(op=349, dst=12, src0=270, src1=271, src2=272,
+                         abs_=0, clamp=0, omod=0, neg=0)       # v_sad_u32
+                + e.exp(target=0, src=(6, 7, 8, 9)) + e.END)
+        vectors = {str(slot): float_input('camera', 'xyzw'[slot % 4])
+                   for slot in range(24)}
+        lines, _ = m.Lowerer(self.array_abi(code, initial_vector=vectors), 'ps').run(code)
+        joined = '\n'.join(lines)
+        # SRC0 is the shift amount in both REV forms, so the value side is VSRC1.
+        self.assertIn('>> (as_type<uint>(u.camera.x) & 31u)', joined)
+        self.assertIn(' << (', joined)
+        self.assertIn(' & ', joined)
+        self.assertIn('0xffffffu', joined)
+        self.assertIn('max(', joined)
+        self.assertIn(' + ', joined)
+        self.assertIn(' - ', joined)
+
+    def test_conversion_rows(self):
+        code = (e.vop1(op=5, dst=4, src=260)       # v_cvt_f32_i32 v4
+                + e.vop1(op=11, dst=5, src=261)    # v_cvt_f32_f16 v5
+                + e.exp(target=0, src=(4, 5, 5, 5)) + e.END)
+        abi = self.array_abi(code, initial_vector={'4': float_input('camera', 'x'),
+                                                   '5': float_input('camera', 'y')})
+        lines, _ = m.Lowerer(abi, 'ps').run(code)
+        joined = '\n'.join(lines)
+        self.assertIn('float(as_type<int>(as_type<uint>(u.camera.x)))', joined)
+        self.assertIn('half_float(as_type<uint>(u.camera.y) & 65535u)', joined)
+
+    def test_unlowered_rows_still_refuse(self):
+        for encoded in (e.vop1(op=53, dst=4, src=256),      # v_sin_f32
+                        e.vop1(op=32, dst=4, src=256),      # v_fract_f32
+                        e.vop3(op=426, dst=4, src0=256, src1=257,
+                               abs_=0, clamp=0, omod=0, neg=0)):   # v_rcp_f32
+            code = encoded + e.exp(target=0, src=(4, 4, 4, 4)) + e.END
+            abi = self.array_abi(code, initial_vector={
+                '0': float_input('camera', 'x'), '1': float_input('camera', 'y')})
+            with self.assertRaisesRegex(m.LoweringError, 'unsupported arithmetic'):
+                m.Lowerer(abi, 'ps').run(code)
+
+    # -- stage driver and two-level addressing ------------------------------------------
+    def test_generate_stage_emits_a_compilable_shaped_sink(self):
+        code = (e.vop1(dst=8, src=242) + e.exp(target=12, src=(8, 8, 8, 8))
+                + e.exp(target=32, src=(8, 8, 8, 8)) + e.END)
+        abi = self.array_abi(code)
+        source, report = m.generate_stage(code, abi, 'vs')
+        self.assertIn('struct StageExports {', source)
+        self.assertIn('float4 pos[4];', source)
+        self.assertIn('kernel void stage_exports', source)
+        self.assertIn('e.pos[0].w =', source)
+        self.assertEqual(report['sink_slots'], m.EXPORT_SINK_SLOTS)
+        self.assertIn('msl_sha256', report)
+        with self.assertRaisesRegex(m.LoweringError, 'target-array'):
+            m.generate_stage(code, dict(abi, export_sink='named'), 'vs')
+        # A vertex stage needs a full clip position to be a vertex stage.
+        partial = (e.vop1(dst=8, src=242) + e.exp(target=12, en=1, src=(8, 8, 8, 8))
+                   + e.exp(target=32, src=(8, 8, 8, 8)) + e.END)
+        with self.assertRaisesRegex(m.LoweringError, 'clip'):
+            m.generate_stage(partial, self.array_abi(partial), 'vs')
+
+    def test_memory_resident_descriptor_lowers(self):
+        # Two-level addressing: root dwords 0..1 are a pointer to view `a`, and dwords 4..7 of
+        # `a` are a buffer descriptor addressing the stream view `b`. The lowering accepts it
+        # because a view cell may itself be a pointer/descriptor.
+        code = (e.smrd(op=2, dst=16, base=0, offset=0)          # s[16:19] <- root[0..3]
+                + e.smrd(op=2, dst=20, base=8, offset=4)        # s[20:23] <- [s16 + 4]
+                + e.mubuf(op=3, data=4, addr=0, resource=5, offset=0, soffset=128,
+                          offen=0, idxen=1, glc=0, slc=0)
+                + e.exp(target=12, src=(4, 5, 6, 7))
+                + e.exp(target=32, src=(4, 5, 6, 7)) + e.END)
+        abi = self.array_abi(
+            code,
+            initial_scalar={'0': {'kind': 'pointer', 'view': 'root'}},
+            initial_vector={'0': {'kind': 'vertex_index'}},
+            views={'root': {'0': {'kind': 'pointer', 'view': 'a'},
+                            '2': {'kind': 'float', 'field': 'camera', 'component': 'x'},
+                            '3': {'kind': 'float', 'field': 'camera', 'component': 'y'}},
+                   'a': {'4': {'kind': 'descriptor', 'view': 'b'}}},
+            streams={'b': {'format': 'explicit_float4', 'field': 'position'}})
+        lines, report = m.Lowerer(abi, 'vs').run(code)
+        joined = '\n'.join(lines)
+        self.assertIn('u.position.x', joined)
+        self.assertEqual(report['exports'], {'12': [0, 1, 2, 3], '32': [0, 1, 2, 3]})
+
     def test_synthetic_oracle_known_equation(self):
         c=o.base_case();r=o.evaluate(c)
         self.assertEqual(r[:4],[0,0,.25,1])

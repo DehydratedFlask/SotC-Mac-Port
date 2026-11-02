@@ -3772,6 +3772,16 @@
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
+    "0x7ec4c0": [
+      {
+        "constant": "kSlot329NextUnrecovered",
+        "header": "native/core/ctor_slot_329_829e90.hpp"
+      },
+      {
+        "constant": "kSlot335NextUnrecovered",
+        "header": "native/core/ctor_slot_335_7edf10.hpp"
+      }
+    ],
     "0x7edf10": [
       {
         "constant": "kSlot314NextUnrecovered",
@@ -3780,10 +3790,6 @@
       {
         "constant": "kSlot326NextUnrecovered",
         "header": "native/core/ctor_slot_326_837f30.hpp"
-      },
-      {
-        "constant": "kSlot329NextUnrecovered",
-        "header": "native/core/ctor_slot_329_829e90.hpp"
       },
       {
         "constant": "kSlot335",
@@ -12048,6 +12054,10 @@
     ],
     "0x7ec4c0": [
       {
+        "constant": "kSlot329NextUnrecovered",
+        "header": "native/core/ctor_slot_329_829e90.hpp"
+      },
+      {
         "constant": "kSlot335NextUnrecovered",
         "header": "native/core/ctor_slot_335_7edf10.hpp"
       }
@@ -12084,10 +12094,6 @@
       {
         "constant": "kSlot326NextUnrecovered",
         "header": "native/core/ctor_slot_326_837f30.hpp"
-      },
-      {
-        "constant": "kSlot329NextUnrecovered",
-        "header": "native/core/ctor_slot_329_829e90.hpp"
       },
       {
         "constant": "kSlot335",
@@ -14419,7 +14425,7 @@
   "totals": {
     "constants": 1824,
     "distinct_rvas": 1184,
-    "duplicate_rvas": 364,
+    "duplicate_rvas": 365,
     "headers": 411
   }
 }

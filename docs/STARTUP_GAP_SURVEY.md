@@ -9,7 +9,7 @@ closed on any calibration, table or FDE inconsistency. Raw data: `local/validati
 Labels: every count below is `STATIC_ANALYSIS_VERIFIED`. The **effort score, template class and batch plan are
 ESTIMATES** (heuristics defined in the script header and below). Nothing here registers a slot or is a gate result.
 
-Coverage: HEAD 455/573, working tree 456/573. Gaps considered: 118 (113 open, in flight: 335; in-flight slots belong to the integrator and are not batched).
+Coverage: HEAD 456/573, working tree 456/573. Gaps considered: 117 (113 open, in flight: none; in-flight slots belong to the integrator and are not batched).
 
 ## Summary
 
@@ -144,9 +144,6 @@ Columns: idx, RVA, FDE bytes, insns, direct calls (callees), `__cxa_atexit`, ind
 | 111 | 424 | `0x551140` | 28370 | 3739 | 17 (5) | 4 | 0/3/0/0 | 4 | Y | 594 | unique large body | 316 | 0 | 80.17 | XL |
 | 112 | 370 | `0x720b50` | 52949 | 9189 | 1035 (16) | 222 | 138/3/0/0 | 4 | Y | 470 | debug-page template | 316 | 3 | 110.1 | XL |
 | 113 | 554 | `0x6efe0` | 112184 | 19550 | 2162 (32) | 436 | 267/0/1/0 | 2 | Y | 941 | debug-page template | 316 | 22 | 235.65 | XL |
-
-In flight (not ranked, owned by the integrator): 335 (`0x7edf10`, 2725 B, 485 insn).
-
 Modelled but not wired (tracked `ctor_slot_<N>_*` model + test + checker exist, no `recovered_constructors()` row; wiring/verification only, not ranked, assigned to the integrator or the first free worker): 448 (`0x4b8680`, 502 B, files core/ctor_slot_448_4b8680.hpp, tests/test_ctor_slot_448.cpp), 507 (`0x22f3c0`, 568 B, files core/ctor_slot_507_22f3c0.hpp, tests/test_ctor_slot_507.cpp), 539 (`0x121940`, 572 B, files core/ctor_slot_539_121940.hpp, tests/test_ctor_slot_539.cpp), 545 (`0xb2ec0`, 662 B, files core/ctor_slot_545_b2ec0.hpp).
 
 
@@ -327,7 +324,6 @@ Known names: `0x4b0`=cmd_dtor, `0x20b0`=bool_dtor, `0x20f0`=float_dtor, `0xc300`
 
 | idx | callee histogram | local helper bodies (FDE B) |
 |--:|---|---|
-| 335 | `0xf590`=release_f590 x22, `0xf8f390`=__cxa_atexit x11, `0x20d60`=concmd_register x7, `0x6aa00`=unbounded_float_ctor x4, `0x20af0`=concmd_base_ctor x3, `0xf2f0` x2, `0x27050` x2, `0x52a990` x2, `0x7dbca0` x2, `0x7edd80` x2, `0xf8f3a0`=__stack_chk_fail x1 | `0xf2f0` (40), `0x27050` (208), `0x52a990` (10), `0x7dbca0` (15), `0x7edd80` (386) |
 | 336 | `0xf590`=release_f590 x17, `0xf8f390`=__cxa_atexit x10, `0x20d60`=concmd_register x3, `0x26ea0`=menu_toggle_ctor x3, `0xc580` x1, `0x20af0`=concmd_base_ctor x1, `0x26c10`=menu_group_ctor x1, `0x6aa00`=unbounded_float_ctor x1, `0x14ccb0` x1, `0x14d880` x1, `0x158340` x1, `0x7ec160` x1, `0xf8f3a0`=__stack_chk_fail x1, `0xf90130` x1 | `0xc580` (352), `0x14ccb0` (5), `0x14d880` (121), `0x158340` (7), `0x7ec160`* (436) |
 | 337 | `0xf590`=release_f590 x15, `0xf8f390`=__cxa_atexit x8, `0x20d60`=concmd_register x7, `0x6aa00`=unbounded_float_ctor x5, `0x20af0`=concmd_base_ctor x2, `0xf8f3a0`=__stack_chk_fail x1 | - |
 | 338 | `0xf590`=release_f590 x18, `0x20af0`=concmd_base_ctor x9, `0x20d60`=concmd_register x9, `0xf8f390`=__cxa_atexit x9, `0xf8f3a0`=__stack_chk_fail x1 | - |
@@ -473,6 +469,32 @@ Mix: 33 debug-page template, 3 unique large body. Heaviest: 418 (25.34), 428 (24
 Slots: 340, 354, 358, 388, 398-399, 411, 420, 424, 437, 445, 450, 468-469, 474, 494, 504, 508, 510, 512, 514, 518, 524, 530, 532, 537, 552, 561, 567-568, 571
 
 Mix: 25 debug-page template, 5 unique large body, 1 simple leaf. Heaviest: 424 (80.17), 571 (24.41), 567 (21.66), 468 (20.68), 552 (15.55).
+
+## Non-template bodies (simple leaves and unique large bodies)
+
+Top callees of each (`callee x count`; names from the known-helper table). These are the slots that do not reuse the 309/316/326/329 console-var/menu helper set and so need a fresh byte contract.
+
+| idx | RVA | class | insn | FDE B | guard | jcc | top callees | note |
+|--:|---|---|--:|--:|:-:|--:|---|---|
+| 414 | `0x57b9b0` | simple leaf | 19 | 72 | n | 0 | `0x3b310` x1, `0xf8f390`=__cxa_atexit x1 |  |
+| 409 | `0x5b50f0` | simple leaf | 22 | 89 | n | 0 | `0x17070` x1 | 1 calls to one callee (table-registration run?) |
+| 494 | `0x26f7c0` | simple leaf | 22 | 84 | n | 0 | `0x26e340` x1, `0x26e770` x1, `0xf8f390`=__cxa_atexit x1 |  |
+| 453 | `0x48ac10` | unique large body | 168 | 856 | Y | 1 | `0xf590`=release_f590 x11, `0xa81700` x11, `0xf8f390`=__cxa_atexit x1 |  |
+| 537 | `0x1324c0` | unique large body | 129 | 795 | n | 0 | `0x157e90` x40, `0xf8f390`=__cxa_atexit x1 |  |
+| 363 | `0x751c70` | unique large body | 139 | 701 | Y | 1 | `0xf590`=release_f590 x3, `0xf730` x3, `0xf8f390`=__cxa_atexit x3 |  |
+| 532 | `0x143f50` | unique large body | 202 | 832 | n | 0 | `0xf2f0` x21, `0xf8f390`=__cxa_atexit x20 |  |
+| 505 | `0x236030` | unique large body | 199 | 1476 | n | 1 | `0x1621b0` x1, `0x162970` x1 |  |
+| 552 | `0x8c880` | unique large body | 561 | 3479 | n | 0 | `0x475c0` x8, `0xf8f390`=__cxa_atexit x7 |  |
+| 567 | `0x235d0` | unique large body | 347 | 1716 | Y | 17 | `0xf590`=release_f590 x8, `0xf8f390`=__cxa_atexit x5, `0xf2f0` x4 |  |
+| 428 | `0x52ec10` | unique large body | 1071 | 5375 | Y | 1 | `0xf590`=release_f590 x49, `0xf8f390`=__cxa_atexit x49, `0xa59620` x37 |  |
+| 418 | `0x572a10` | unique large body | 943 | 4726 | n | 0 | `0x52a990` x179 | 179 calls to one callee (table-registration run?) |
+| 424 | `0x551140` | unique large body | 3739 | 28370 | Y | 4 | `0xf590`=release_f590 x6, `0xf8f390`=__cxa_atexit x4, `0xf2f0` x3 | mostly inline stores/arithmetic (constant-table style), few calls |
+
+## Long poles
+
+Slots at or above 40 points dominate their batch and should be scheduled first or split into a dedicated task with its own decomposition (repeat-block recognition: these are runs of the same ConCmd-var construction sequence, so a block-structure checker plus a table-driven model is the sensible shape): 424 (`0x551140`, 28370 B, 3739 insn, 4 atexit, 80.17 pts), 370 (`0x720b50`, 52949 B, 9189 insn, 222 atexit, 110.1 pts), 554 (`0x6efe0`, 112184 B, 19550 insn, 436 atexit, 235.65 pts).
+
+Batch notes: each batch's first item should be its heaviest slot; the other workers are not blocked on it. Shared lib/shape headers that workers may be tempted to extend (for example `lane_m6_shapes.hpp`, `ctor_slot_family_test_util.hpp`, `tools/lift/l4_slot_lib.py`, `slot_pin_util.py`, `slotfam_specs.py`) are integrator-owned: a worker that needs a new shape adds it to its own `ctor_slot_<N>_*` header and files a promote-to-shared request in its bundle.
 
 ## Serialising the shared files
 

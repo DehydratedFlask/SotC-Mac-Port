@@ -213,7 +213,7 @@ class _Analysis:
         if name == 's_mov_b32':
             self.need_source(f['src0'], row)
             self.scalar_defined[f['sdst']] = 'derived'
-            self.writer[f['sdst']] = ('other', None, name)
+            self.writer[f['sdst']] = ('other', None, name, row.offset)
         elif name in ('s_waitcnt', 's_ttracedata', 's_endpgm'):
             pass
         elif enc == 'SMRD':
@@ -229,7 +229,7 @@ class _Analysis:
                                'slot': f['base_sgpr'], 'dst': f['sdst'], 'row': row})
             for j in range(f['dwords']):
                 self.scalar_defined[f['sdst'] + j] = 'loaded'
-                self.writer[f['sdst'] + j] = ('smrd', index, name)
+                self.writer[f['sdst'] + j] = ('smrd', index, name, row.offset)
         elif enc == 'MUBUF':
             self.need_descriptor(f['resource_sgpr'], row, f['components'])
             if f['soffset'] < 128:
@@ -350,26 +350,36 @@ class _Analysis:
             entry['sources'] = sources
             entry['components'] = sorted(set(entry['components']) | set(components))
 
-    def _producer(self, slot: int, width: int) -> tuple[str, dict | None]:
-        """Classify how a base/descriptor slot is produced.
+    def _producer(self, slot: int, width: int, sites: list[int]) -> tuple[str, dict | None]:
+        """Classify how a base/descriptor slot is produced, at the sites that read it.
 
-        `direct`: no cell of the range was written, so a manifest can bind it. `resident`: every
-        cell comes from ONE `SMRD` load, so the manifest can declare the *memory* that load reads
-        instead (a memory-resident pointer/descriptor). `opaque`: anything else (a move, several
-        loads, a partial overwrite) — no `SMRD` load of a single bound view can express it.
+        `direct`: the slot is bound by a manifest — nothing wrote it, or it is read only up to the
+        instruction that overwrites it (`s_load_dwordx2 s[0:1], [s0:1], 4` reads the root pointer
+        and stores the result into the same registers; every read of the root happens first).
+        `resident`: every cell comes from ONE `SMRD` load that is read after it, so the manifest can
+        declare the *memory* that load reads instead. `opaque`: anything else (a move, several
+        loads, a partial overwrite, or a read both before and after an in-place overwrite) — no
+        `SMRD` load of a single bound view can express it.
         """
         writers = [self.writer.get(slot + j) for j in range(width)]
         if all(w is None for w in writers):
             return 'direct', None
+        first_write = min(w[3] for w in writers if w is not None)
+        before = [site for site in sites if site <= first_write]
+        after = [site for site in sites if site > first_write]
+        if before and not after:
+            return 'direct', None
+        if before and after:
+            return 'reassigned', {'names': sorted({w[2] for w in writers if w is not None}),
+                                  'offset': first_write}
         first = writers[0]
         if first is not None and first[0] == 'smrd' and all(w == first for w in writers):
             load = self.loads[first[1]]
             return 'resident', {'load': first[1], 'via': load['slot'],
                                 'offset': load['offset'] + (slot - load['dst']),
                                 'row': load['row']}
-        names = sorted({self.writer[slot + j][2] for j in range(width)
-                        if self.writer.get(slot + j) is not None})
-        return 'opaque', {'names': names, 'site': slot}
+        names = sorted({w[2] for w in writers if w is not None})
+        return 'opaque', {'names': names, 'offset': first_write}
 
     @staticmethod
     def _runs(dwords) -> list[dict]:
@@ -394,7 +404,7 @@ class _Analysis:
             for slot in sorted(entries):
                 entry = entries[slot]
                 width = BINDING_WIDTH[entry['kind']]
-                producer, info = self._producer(slot, width)
+                producer, info = self._producer(slot, width, entry['sites'])
                 if producer == 'direct':
                     (direct if role == 'scalar_base' else descriptors).append(entry)
                 elif producer == 'resident':
@@ -405,6 +415,15 @@ class _Analysis:
                     if role == 'buffer_descriptor':
                         claim['formats'] = entry['formats']
                     resident.append(claim)
+                elif producer == 'reassigned':
+                    label = 'scalar base' if role == 'scalar_base' else 'buffer descriptor'
+                    self.shape.append({
+                        'offset': info['offset'],
+                        'mnemonic': 'SMRD',
+                        'kind': 'base-reassignment',
+                        'reason': f'{label} s{slot} is read before and after it is overwritten at '
+                                  f'{_hex(info["offset"])}, so its reads address two different '
+                                  f'views; one cell cannot be both'})
                 else:
                     label = ('scalar base' if role == 'scalar_base'
                              else 'buffer descriptor')
@@ -604,6 +623,63 @@ def skeleton(analysis: dict, identity: str | None = None,
             document['policy']['interpolation'] = entry['value']
         elif entry['name'] == 'vertex_select':
             document['policy']['vertex_select'] = None
+    return document
+
+
+def synthetic_fill(analysis: dict, identity: str = 'synthetic_fill') -> dict:
+    """Mechanically fill a skeleton from its own hole list.
+
+    This is *not* a binding: every value it supplies is a placeholder chosen to satisfy the form
+    (`view_<slot>` for a resource, `target_<n>` for an export, a named case field for a data dword).
+    Its purpose is to prove the form is closable and to let the lowering run offline; a program
+    with no holes produces a manifest with no bindings at all, which is the only case where such a
+    fill is not a placeholder.
+    """
+    holes = analysis['holes']
+    document = skeleton(analysis, identity, 'synthetic')
+    views: dict[str, dict] = {}
+
+    def view_dwords(view: str, requests: list[dict]) -> None:
+        entries = views.setdefault(view, {})
+        for request in requests:
+            for offset in range(request['offset'], request['offset'] + request['dwords']):
+                entries[str(offset)] = {'kind': 'float', 'field': 'camera', 'component': 'x'}
+
+    for entry in holes['scalar_bases']:
+        view = f'view_{entry["slot"]}'
+        document['scalar_bases'][str(entry['slot'])] = {'kind': entry['kind'], 'view': view}
+        view_dwords(view, entry['view_dwords'])
+    for entry in holes['buffer_descriptors']:
+        view = f'view_{entry["slot"]}'
+        document['buffer_descriptors'][str(entry['slot'])] = {
+            'kind': 'descriptor', 'view': view,
+            'format': entry['formats'][0], 'field': 'position'}
+        view_dwords(view, entry['view_dwords'])
+    for entry in holes.get('resident_slots') or []:
+        section = ('scalar_bases' if entry['role'] == 'scalar_base'
+                   else 'buffer_descriptors')
+        binding = document[section][str(entry['slot'])]
+        binding['view'] = f'view_{entry["slot"]}'
+        if section == 'buffer_descriptors':
+            binding['format'] = entry['formats'][0]
+            binding['field'] = 'position'
+        view_dwords(binding['view'], entry['view_dwords'])
+    for entry in holes['export_targets']:
+        document['exports'][str(entry['target'])] = {
+            'semantic': f'target_{entry["target"]}'}
+    for entry in holes['initial_vectors']:
+        document['initial_vectors'][str(entry['slot'])] = (
+            {'kind': 'vertex_index'} if entry['role'] == 'vertex_index'
+            else {'kind': 'float', 'field': 'camera', 'component': 'x'})
+    for entry in holes['initial_scalars']:
+        document['initial_scalars'][str(entry['slot'])] = {'kind': 'interpolation_control'}
+    for entry in holes['policy']:
+        if entry['name'] == 'interpolation':
+            document['policy']['interpolation'] = entry['value']
+        elif entry['name'] == 'vertex_select':
+            document['policy']['vertex_select'] = {str(selector): 'p10'
+                                                   for selector in entry['selectors']}
+    document['views'] = views
     return document
 
 
@@ -1622,54 +1698,8 @@ def _self_test() -> int:
     check('filled manifest validates', validate(filled, analysis) == [])
 
     def fill(analysed: dict) -> dict:
-        """Mechanically fill a skeleton from its own hole list: the form must always be closable."""
-        document = skeleton(analysed, 'synthetic_fill', 'synthetic')
-        views: dict[str, dict] = {}
-
-        def view_dwords(view: str, requests: list[dict]) -> None:
-            entries = views.setdefault(view, {})
-            for request in requests:
-                for offset in range(request['offset'], request['offset'] + request['dwords']):
-                    entries[str(offset)] = {'kind': 'float', 'field': 'camera',
-                                            'component': 'x'}
-
-        for entry in analysed['holes']['scalar_bases']:
-            view = f'view_{entry["slot"]}'
-            document['scalar_bases'][str(entry['slot'])] = {'kind': entry['kind'],
-                                                            'view': view}
-            view_dwords(view, entry['view_dwords'])
-        for entry in analysed['holes']['buffer_descriptors']:
-            view = f'view_{entry["slot"]}'
-            document['buffer_descriptors'][str(entry['slot'])] = {
-                'kind': 'descriptor', 'view': view,
-                'format': entry['formats'][0], 'field': 'position'}
-            view_dwords(view, entry['view_dwords'])
-        for entry in analysed['holes'].get('resident_slots') or []:
-            section = ('scalar_bases' if entry['role'] == 'scalar_base'
-                       else 'buffer_descriptors')
-            binding = document[section][str(entry['slot'])]
-            binding['view'] = f'view_{entry["slot"]}'
-            if section == 'buffer_descriptors':
-                binding['format'] = entry['formats'][0]
-                binding['field'] = 'position'
-            view_dwords(binding['view'], entry['view_dwords'])
-        for entry in analysed['holes']['export_targets']:
-            document['exports'][str(entry['target'])] = {
-                'semantic': f'target_{entry["target"]}'}
-        for entry in analysed['holes']['initial_vectors']:
-            document['initial_vectors'][str(entry['slot'])] = (
-                {'kind': 'vertex_index'} if entry['role'] == 'vertex_index'
-                else {'kind': 'float', 'field': 'camera', 'component': 'x'})
-        for entry in analysed['holes']['initial_scalars']:
-            document['initial_scalars'][str(entry['slot'])] = {'kind': 'interpolation_control'}
-        for entry in analysed['holes']['policy']:
-            if entry['name'] == 'interpolation':
-                document['policy']['interpolation'] = entry['value']
-            elif entry['name'] == 'vertex_select':
-                document['policy']['vertex_select'] = {str(s): 'p10'
-                                                       for s in entry['selectors']}
-        document['views'] = views
-        return document
+        """The module helper, so the closability claim is tested once and reused."""
+        return synthetic_fill(analysed)
 
     check('skeleton is closable', validate(fill(analysis), analysis) == [])
 
