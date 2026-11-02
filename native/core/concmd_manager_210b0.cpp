@@ -138,9 +138,13 @@ ConCmdManagerCtorResult construct_concmd_manager_210b0(void* manager, ConCmdRegi
         out.fail = ConCmdManagerCtorFail::null_tail_link;
         return out;
     }
-    head.next = &head;  // PROBE C: overfit to the emptying result
-    head.prev = &head;
-    (void)element_of(prev_link);
+    void* const tail = element_of(prev_link);
+    if (tail == sentinel) {
+        head.next = &head;  // 0x211a7 with the sentinel: the store lands on head.next
+    } else {
+        store_ptr(tail, kPendingNextOffset, &head);  // 0x211a7
+    }
+    head.prev = static_cast<ConCmdListNode*>(prev_link);  // 0x211ab / 0x211af
 
     out.list_emptied = head.next == &head && head.prev == &head;
     out.ok = out.fail == ConCmdManagerCtorFail::none;

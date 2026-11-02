@@ -2482,6 +2482,13 @@ target_sources(sotc_core PRIVATE core/ctor_slot_314_a41810.cpp)
 add_executable(test_ctor_slot_314 tests/test_ctor_slot_314.cpp)
 target_link_libraries(test_ctor_slot_314 sotc_core)
 add_test(NAME ctor_slot_314 COMMAND test_ctor_slot_314)
+# CPU-01-STARTUP-SLOT-316-CHARACTERIZATION-01 / -NATIVE-LIFT-01: constructor index 316 (0xa33280),
+# the Localization block (4 language variables, 1 bool, the `loc_reload` command, 6 toggles,
+# the "!!!Unlocalized!!!" string, 14 atexit records).
+target_sources(sotc_core PRIVATE core/ctor_slot_316_a33280.cpp)
+add_executable(test_ctor_slot_316 tests/test_ctor_slot_316.cpp)
+target_link_libraries(test_ctor_slot_316 sotc_core)
+add_test(NAME ctor_slot_316 COMMAND test_ctor_slot_316)
 
 # Parallel-lane fragments: native/lanes/<lane>.cmake. Workers configure with -DSOTC_LANES=<lane>
 # to build only their own fragment; the integrator configures with the default "*" (all lanes).

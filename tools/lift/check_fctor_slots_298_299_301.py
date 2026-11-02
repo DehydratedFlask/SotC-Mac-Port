@@ -539,8 +539,11 @@ def main() -> int:
     order = ["node->prev = tail;", "node->next = &list.head;", "list.head.prev = node;", "tail->next = node;"]
     pos = [base_c.index(token) for token in order]
     require(pos == sorted(pos), "native pending-list tail link order")
-    require("cmd.registered = 1" in base_c and "registry.manager.manager != nullptr" in base_c,
-            "native register sets the flag before choosing the path")
+    require("cmd.registered = 1" in base_c and
+            "return register_concmd_body_20d80(cmd, registry.manager.manager, registry);" in base_c and
+            "if (manager != nullptr)" in base_c,
+            "native register sets the flag before choosing the path, passes the cell (0x20d72) and "
+            "the body testq %r13,%r13-branches on that argument (0x20d9e)")
 
     require(const_value(vars_h, "kBoolVarMidVptr") == 0x15940B0 and const_value(vars_h, "kBoolVarFinalVptr") == 0x1594218,
             "native bool vptrs")

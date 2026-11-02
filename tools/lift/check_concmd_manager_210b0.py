@@ -134,9 +134,9 @@ FRAGMENTS = (
     (0x2119C, "488d48f8"),                  # lea rcx,[rax-8]
     (0x211A0, "4885c0"),                    # test rax,rax
     (0x211A3, "480f44c8"),                  # cmove rax,rcx
-    (0x211A7, "48895108"),                  # mov rdx,[rcx+8]
-    (0x211AB, "4883c108"),                  # add rcx,8
-    (0x211AF, "48890da2bcdd02"),            # mov rcx,[0x2dfce58]
+    (0x211A7, "48895108"),                  # mov %rdx,8(%rcx)   tail->next = &head (rdx = lea 0x2dfce50)
+    (0x211AB, "4883c108"),                  # add $8,%rcx        rcx = tail + 8 = the tail link
+    (0x211AF, "48890da2bcdd02"),            # mov %rcx,0x2dfce58(%rip)   head.prev = tail link
     (0x211B6, "4883c408"),                  # add rsp,8
     (0x211BA, "5b"),                        # pop rbx
     (0x211BB, "415e"),                      # pop r14
@@ -299,8 +299,9 @@ def elf_pins(e: Elf) -> None:
     require(e.lea(0x2118D) == PENDING_HEAD, "0x2118d loads &head")
     e.bytes_at(0x21198, "488b4110", "0x21198: read element+0x10 (the predecessor link)")
     e.bytes_at(0x2119C, "488d48f8", "0x2119c: predecessor element = link - 8")
-    e.bytes_at(0x211A7, "48895108", "0x211a7: predecessor->next = &head")
-    e.bytes_at(0x211AB, "4883c108", "0x211ab: rcx = the predecessor link")
+    e.bytes_at(0x211A7, "48895108", "0x211a7: mov %rdx,8(%rcx): predecessor->next = &head (rdx from 0x2118d)")
+    e.bytes_at(0x211AB, "4883c108", "0x211ab: add $8,%rcx: rcx = predecessor + 8 = the predecessor link")
+    e.bytes_at(0x211AF, "48890d", "0x211af: mov %rcx,disp(%rip): a STORE of rcx, not a load")
     require(e.rip(0x211AF, 7, 3) == PENDING_HEAD_PREV, "0x211af writes head.prev 0x2dfce58")
 
     # ---- prologue/epilogue completeness ---------------------------------------------------------
@@ -371,6 +372,12 @@ def native_pins() -> None:
     require("ensure_concmd_pending_list" in src, "the drain must share the guarded init")
     require("register_concmd_body_20d80" in src, "the drain must use the register body 0x20d80")
     require("critsec_init_at" in src, "the constructor must initialise the reviewed CritSec")
+    require("PROBE" not in src and "overfit" not in src,
+            "the constructor model must not carry a result-fitted probe")
+    require("store_ptr(tail, kPendingNextOffset, &head)" in src,
+            "0x211a7 must be modelled as the store [tail+8] = &head")
+    require("head.prev = static_cast<ConCmdListNode*>(prev_link)" in src,
+            "0x211ab/0x211af must be modelled as head.prev = the predecessor link")
     require("critsec_lock_at" not in src and "critsec_unlock_at" not in src,
             "the constructor must not lock: the body takes no lock")
     require("register_concmd_20d60" not in src,
@@ -396,6 +403,8 @@ def native_pins() -> None:
         require(needle in test, f"the fixture must cover {needle}")
     require("CHECK(!created.list_emptied)" in test,
             "the fixture must pin the general re-termination form (a list that is not emptied)")
+    require("6b. the two re-termination stores are observable" in test,
+            "the fixture must pin both re-termination stores with a stale head.prev and a poisoned tail")
     require("log.cell_seen_null" in test and "map.cell_seen_null" in test,
             "the fixture must prove the drain runs while the manager cell is still null")
     require("alpha.pending.next == &beta.pending" in test,
@@ -449,11 +458,12 @@ def main() -> int:
     elf_pins(e)
     mutants = mutation_self_test(e)
 
-    print("OK check_concmd_manager_210b0: 0x210b0 273 B body (FDE 273) as 63 contiguous instruction "
-          "fragments, 4 calls / 4 targets with no lock, the shared 63-byte guarded list construct, "
-          "the FIFO drain through 0x20d80 (not 0x20d60) with the manager argument, the re-termination "
-          f"block 0x2117f..0x211af, and the install order 0x243b1 < 0x243f5; {mutants} mutants "
-          "rejected. No construction result, engine bind or boot behaviour is proven.")
+    print(f"OK check_concmd_manager_210b0: 0x210b0 273 B body (FDE 273) as {len(FRAGMENTS)} contiguous "
+          "instruction fragments, 4 calls / 4 targets with no lock, the shared 63-byte guarded list "
+          "construct, the FIFO drain through 0x20d80 (not 0x20d60) with the manager argument, the "
+          "re-termination block 0x2117f..0x211af, and the install order 0x243b1 < 0x243f5; "
+          f"{mutants} mutants rejected. No construction result, engine bind or boot behaviour is "
+          "proven.")
     return 0
 
 

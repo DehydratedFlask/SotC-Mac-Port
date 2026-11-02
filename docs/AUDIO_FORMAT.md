@@ -1,13 +1,16 @@
 # Audio container and codec status (AUD-01-AUDIO-FORMAT-01)
 
 Status: **SXD/SShd containers now specified from bytes and code; the streamed music codec is
-identified as ATRAC9 by the title's own dispatch table, but no ATRAC9 payload has been decoded.**
+identified as ATRAC9 by the title's own dispatch table, its per-record configuration word is
+recovered, and its stream-block geometry is derived — but no ATRAC9 payload has been decoded.**
 This note proves the container grammar of the sound banks and stream descriptors, proves that the
-`.hd`/`.bd` sound-effect banks are PSX/PS2 SPU ADPCM, and (new, E1069) proves from pinned code which
+`.hd`/`.bd` sound-effect banks are PSX/PS2 SPU ADPCM, and (E1069) proves from pinned code which
 field of a `WAVE` record selects the streamed-audio codec and which codec each observed value names.
-It also records what the evidence still does **not** establish about `sound/shadow/*.sxd2` (the
-music/ambience/event stream payload): the ATRAC9 configuration block, the frame geometry and any
-decoded sample. No decoded game audio is claimed. No member bytes were extracted to disk.
+E1074 then recovers *where* the ATRAC9 configuration comes from and *what it says*: it is field
+`0x0A` of each `WAVE` record (`music.sxd1` is 33/33 at `0xFE761DF0`), and the derived values give
+960 bytes and 1024 samples per stream block for the 6-channel music. It also records what the
+evidence still does **not** establish about `sound/shadow/*.sxd2`: the codec's internal frame layout
+and any decoded sample. No decoded game audio is claimed. No member bytes were extracted to disk.
 
 Labels used: `ARTIFACT_VERIFIED` (pinned bytes measured here), `STATIC_ANALYSIS_VERIFIED` (pinned
 ELF code), `FIXTURE_VERIFIED` (synthetic), `PARTIAL`, `UNKNOWN`, `NOT RUN`.
@@ -211,12 +214,13 @@ codec, and no sampling of these files can produce PCM. `UNKNOWN`: units of `+0x1
 
 ## UNKNOWN — the `SXD2` stream codec
 
-**Partial resolution (E1069, 2026-11-01).** The *selector* is now known from pinned code and the
-codec it names is **ATRAC9**. The payload itself is still undecoded: the ATRAC9 configuration block,
-the frame geometry and one validated decode remain open. The 45 decompression probes and the MP3
-chain test recorded below were run **before** the selector was known and none of them should be read
-as a codec result; they are kept as the negative record. Jump to
-"RESOLVED — the wave-format dispatch" for the new evidence.
+**Partial resolution (E1069, extended by E1074).** The *selector* is now known from pinned code and
+the codec it names is **ATRAC9**; the per-record **configuration word** and the derived stream-block
+geometry are recovered in "RESOLVED — where the ATRAC9 configuration comes from" below. The payload
+itself is still undecoded: the codec's internal frame layout and one validated decode remain open.
+The 45 decompression probes and the MP3 chain test recorded below were run **before** the selector
+was known and none of them should be read as a codec result; they are kept as the negative record.
+Jump to "RESOLVED — the wave-format dispatch" for the new evidence.
 
 What was measured:
 
@@ -388,29 +392,182 @@ placement of the format byte in `WAVE_record[+0x04]` is proved twice — once fr
   block rather than a codec frame, which is exactly why a blind decode was refused.
 - **any decode.** ATRAC9 remains **NOT RUN** — see next measurement 1.
 
+### RESOLVED — where the ATRAC9 configuration comes from (E1074)
+
+`STATIC_ANALYSIS_VERIFIED` on the same pinned ELF, re-derived by
+`local/validation/AUD-01-AUDIO-FORMAT-01/analysis/check_atrac9_config.py` (**48 checks, all PASS,
+exit 0**), plus `ARTIFACT_VERIFIED` for the `.sxd1` field census. Every address is an RVA; the image
+base is 0. **The configuration is per-record data inside the `.sxd1` file, not an id into any table
+in the image.**
+
+**1. `0x987950` is not a lookup — it is a base-relative pointer fixup.**
+`0x987950`: `48 85 f6 / 74 07 / 48 03 77 20 / 48 89 f2 / 48 89 d0 / c3` =
+`return id ? [ctx+0x20] + id : inline`. Its inverse `0x987940`:
+`31 c0 / 48 85 f6 / 74 07 / 48 2b 77 20 / 48 89 f0 / c3` = `return ptr ? ptr - [ctx+0x20] : 0`.
+So the `[wave+0x5f8]` argument is an **offset** into the allocation whose base is `[ctx+0x20]`, and
+the `0x5e0` pair is only the fallback for `offset == 0`. Both helpers are called (never taken as a
+value — no raw qword anywhere in the file equals either address) from **52** sites in
+`0x940000..0x9a0000`; they are a general arena-pointer idiom, not codec code.
+
+`ctx` is `[wave+0xa0]`. That same object is the one the wave-record lookup uses: `0x98084e` loads
+`rdi = [obj+0xa0]` and calls `0x987990` (the self-relative `WAVE` table at `ctx+0x60`, count at
+`ctx+0x68`), and `0x980896` stores `record - [ctx+0x20]` at `[obj+0x580]`. The records and the
+configuration payload therefore live in the **same arena** as the `WAVE` table.
+
+**2. The writer: `WAVE`-record field `0x0A`.**
+The wave setup routine `0x980620` (the routine that also writes `0x579`, `0x580` and `0x5f8` for
+this object) parses a field list that starts at `record+0x28` and is entered only when
+`record[+0x00] & 1` (`0x9809aa`: `testb $0x1,(%r15)`; every one of the 830 records has bit 0 set).
+The loop (`0x980c30`) reads `{u8 id; u8 count; u16 size}` from `r14`, bounds `id` at `0x14`, and
+dispatches through a **21-entry self-relative table at `0x12b5274`** (`movslq (%r12,%rcx,4),%rcx /
+add %r12,%rcx / jmp *%rcx`); it advances `r14 += 2 + size`, so `size` counts the two size bytes.
+
+| Field id | Handler | Stores | Source |
+|---:|---|---|---|
+| `0x0A` | `0x980f29` | `[obj+0x5f8] = 0x987940(ctx, entry+4)`, `[obj+0x600] = min(count,16)` | **the ATRAC9 configuration word** |
+| `0x0C` | `0x980f78` | `[obj+0x5e8] = 0x987940(ctx, entry+4)`, `[obj+0x601] = min(count,16)` | second config block (per-channel descriptors) |
+| `0x0F` | `0x98106f` | `[obj+0x5f0] = 0x987940(ctx, entry+4)`, `[obj+0x602] = min(count,32)` | third config block |
+| all other ids in `0x00`–`0x14` | various | gain / filter / loop / per-channel fields; `0x08`, `0x09`, `0x10` are no-ops (`0x9811f0`) | not decoded here |
+
+The per-wave reset block (`0x980772`–`0x9807a5`) clears `0x5f8`, `0x600`, `0x5e0`..`0x5ef`,
+`0x5f0`, `0x601`, `0x602` before the dispatch, so a format-`0x42` wave with **no** field `0x0A`
+would read `0x5e0 = 0`, fail the `0xFE` test at `0x984246` and log the ATRAC9 error. No such record
+exists in the corpus (566/566 ATRAC9 records carry field `0x0A`).
+
+**3. The payload is one 32-bit word.** Field `0x0A` is `{id 0x0a; count 1; size 6; u32 word}` — six
+bytes from `+0x02`, i.e. the two size bytes plus exactly the word at `entry+4`; `count` is 1 in every
+record, so `0x600 = 1` and the arm consumes one word. In `music.sxd1` record 0 (file offset `0xCD4`)
+the entry is at `+0x3C` and the word is at `+0x40`.
+
+| `.sxd1` | `0xFE761DF0` | `0xFE761DE0` | `0xFE740FF0` | `0xFE740FE0` | `0xFE7A17F0` | `0xFE7007F0` | ATRAC9 records |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `music.sxd1` | **33** | – | – | – | – | – | 33 |
+| `str_amb.sxd1` | 87 | – | 47 | – | 1 | 17 | 152 |
+| `str_bgm.sxd1` | 82 | – | 50 | – | – | – | 132 |
+| `str_boss.sxd1` | 57 | 105 | 21 | 8 | 2 | – | 193 |
+| `str_event.sxd1` | 7 | 44 | 5 | – | – | – | 56 |
+| **total** | **266** | **149** | **123** | **8** | **3** | **17** | **566** |
+
+**`music.sxd1` is 33/33 at `0xFE761DF0`.** No other configuration word occurs; field `0x0C` (the
+second block, `0x5e8`/`0x601`) is **absent from all 830 records**, so the ATRAC9 arm always takes the
+inline-descriptor path at `0x9841e6` (`{count = channels, multiplier = 1}`).
+
+**4. The configuration word decodes to the geometry the arm then computes.**
+`bextr` control `0x414` = start 20, **len 4** → `bits[23:20]` indexes `0x12b5700`
+`[0,64,0,0,128,0,0,256]`; control `0x311` = start 17, **len 3** → `bits[19:17]` indexes `0x12b5720`
+`[1,2,2,6,8,4,0,0]`; control `0xb05` = start 5, **len 11** → `bits[15:5] + 1` is the byte count;
+`1 << ((cfg >> 3) & 3)` (`0x98416a`) is the block multiplier. (`bextr` encodes start in bits 7:0 and
+the bit count in bits 15:8. The widths above are the ones that make all six words self-consistent:
+read with a count of 4 at bit 17 the same word gives index 11 into an 8-entry table, and the 3-bit
+read gives 3 → 6 frames, which equals the channel count in all six groups — independently confirmed
+in §5. The 4- and 5-bit reads at bit 20 agree for every word here, because bit 24 is the low bit of
+the `0xFE` tag byte and is always 0.)
+
+| Config word | ch | `bits[23:20]` | samples | `bits[19:17]` | frames/superframe | `bits[15:5]+1` B | mult | `0x592` samples/block | `0x596` bytes/block |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `0xFE7007F0` | 1 | 7 | 256 | 0 | 1 | 64 | 4 | 1024 | **256** |
+| `0xFE740FE0` | 2 | 7 | 256 | 2 | 2 | 128 | 1 | 256 | **128** |
+| `0xFE740FF0` | 2 | 7 | 256 | 2 | 2 | 128 | 4 | 1024 | **512** |
+| `0xFE7A17F0` | 4 | 7 | 256 | 5 | 4 | 192 | 4 | 1024 | **768** |
+| `0xFE761DE0` | 6 | 7 | 256 | 3 | 6 | 240 | 1 | 256 | **240** |
+| `0xFE761DF0` | 6 | 7 | 256 | 3 | 6 | 240 | 4 | 1024 | **960** |
+
+`frames/superframe` equals the channel count in all six rows, and the inner loop at `0x984240`
+terminates when the accumulated frame count reaches the channel count — consistent with one
+configuration word covering one superframe of one frame per channel. The shared finaliser `0x9840f8`
+then writes `0x592 = mult × samples` and `0x596 = mult × bytes` (`0x984108`–`0x984119`), and the
+stream path divides a byte position by `0x596` to get a block index (`0x983977`).
+**Inference (labelled):** if one superframe does carry one frame per channel, a channel frame is
+`0x594 / channels` = 64/64/48/40 bytes for 256 samples (1/2/4/6 channels), i.e. 96/96/72/60 kbit/s
+at 48 kHz — values inside ATRAC9's published range, which is why the configuration is treated as a
+real ATRAC9 configuration and not as an arbitrary 0xFE word. That mapping is general knowledge; the
+bytes only prove the arithmetic.
+
+**5. Independent confirmation from the assets (no decode).** For every
+`(format, channels, configuration)` group in the five `.sxd1` files, the derived `0x596` value
+divides **every** segment length in that group and equals the group's gcd exactly:
+
+| group | records | gcd of segment lengths | derived `0x596` |
+|---|---:|---:|---:|
+| 1 ch / `0xFE7007F0` | 17 | 256 | 256 |
+| 2 ch / `0xFE740FE0` | 8 | 128 | 128 |
+| 2 ch / `0xFE740FF0` | 123 | 512 | 512 |
+| 4 ch / `0xFE7A17F0` | 3 | 768 | 768 |
+| 6 ch / `0xFE761DE0` | 149 | 240 | 240 |
+| 6 ch / `0xFE761DF0` | 266 | **960** | **960** |
+
+The whole `music.sxd2` payload is 172,367,040 B = **179,549 × 960** exactly, which is also the
+figure E1069 measured from entropy alone. The 960-byte "record" seen in the payload is therefore
+**one stream block of four ~240-byte ATRAC9 superframes**, not a frame. A byte-phase entropy census
+over 7,680,000 payload bytes (8,000 blocks) agrees: counting phases whose entropy is below 7 bits,
+periods 16/20/24/30/32/40/48/60/64/80/96/192/256 give **0**, period 240 gives **7** (phases 0–5 at
+4.40–6.98 bits and phase 154), and period 960 gives **46**, whose deep minima are at 0–5
+(0.94–5.61 bits), 242–245 (0.74), 481–484 (0.84), 720–723 (0.92) and 959 (5.98) with weaker bands at
+150–159, 392–397, 631–635 and 870–875. That is **four header-like regions per 960-byte block at a
+239–243-byte spacing**, i.e. the sub-block period is ~240 bytes but its byte phase drifts by up to
+three bytes across the block, so a naive byte-aligned header model is wrong. **No payload byte and
+no decoded sample is recorded here.**
+
+**6. Call-target enumeration of the ATRAC9 arm (`0x98413e`–`0x9842cf`).** Four `call`s and one
+`jmp`, no import and no decode:
+
+| Site | Target | Role |
+|---|---|---|
+| `0x984153` | `0x987950` | configuration lookup (`id = [obj+0x5f8]`, inline `&[obj+0x5e0]`) |
+| `0x9841bb` | `0x987950` | second block lookup (`id = [obj+0x5e8]`, `rdx = 0`); dead for this corpus |
+| `0x9842b1` | `0x983cf0` | message logger, failure arm only |
+| `0x9842ca` | `0xf8f3a0` | stack-canary failure handler |
+| `0x984299` | `0x9840f8` (jmp) | shared finaliser that folds the multiplier into `0x592`/`0x596` |
+
+So **the arm is geometry only**: it validates and measures the configuration and returns 0; it
+neither decodes nor calls out to a decoder. The descriptor it produces is handed on by the stream
+path (`0x983970`–`0x983b0f`), which passes `base+0x5f8`/`0x600`, `base+0x5e8`/`0x601` and
+`base+0x5f0`/`0x602` to `0x94b2c0` (call at `0x983b0f`); what that callee does with them is outside
+this task.
+
+**7. Nothing about this is in the image.** None of the six words occurs as raw bytes anywhere in the
+pinned ELF (0 hits each), and the R-only RELRO program header (`0x1594000`, filesz `0x6d190`)
+contains **no** `0xFE`-top dword. There is therefore no "default" ATRAC9 configuration to fall back
+on: the only source is the record.
+
+**8. What is still not settled.** No decode was attempted and none is claimed. The arm's arithmetic
+gives 256 samples and 240 bytes per column and 1024 samples / 960 bytes per stream block (four
+columns) **for the 6-channel music configuration**; whether a decoder's own frame size matches those
+numbers bit-for-bit is a property of the decoder, not of these bytes, and remains unverified. Whether
+`0x94b2c0` (or an NGS2 rack) ultimately performs the ATRAC9 transform is untouched: the literals
+`maxAtrac9Decoders` (RVA `0x12ac371`) and `VOICE_ALLOC_AT9 %d/%d` (RVA `0x12ac61f`) exist in the
+image, but `maxAtrac9Decoders` has **no** RIP-relative xref and nothing here proves NGS2 is the
+decoder. Duration is now derivable as `blocks × 0x592 / 48000` (for `music.sxd2`: 179,549 × 1024 /
+48,000 = 3,830.4 s of 6-channel material across the 33 waves), but that is arithmetic on the code's
+own bookkeeping, not a measured duration.
+
 ### Exact next measurements
 
-1. **Has ATRAC9 been ruled out as "reached only through a system library"?** No, the opposite: it is
-   named by locally linked sndx code, and the title imports no ATRAC library, so any ATRAC9 decoder
-   in this product is either the title's own or absent. Determine whether `0x983ea0`'s ATRAC9 branch
-   ends in a local decode loop or in a call to an import before any decode is attempted. The branch
-   spans `0x98413e`–`0x9842ca`; enumerate its call targets.
-2. **Recover the ATRAC9 configuration word.** Follow `0x987950` with `id = [wave+0x5f8]` and the
-   inline `0x5e0` pair; the word that must have top byte `0xFE` is the decoder's input, and it is the
-   only thing standing between the selector proof and a legitimate decode configuration.
-3. **Only then attempt a decode** of one payload unit, with that real configuration word and an
-   independent decoder (FFmpeg `atrac9`/`libatrac9`), reporting the attempt count. 960 bytes per
-   block is not yet established as one ATRAC9 frame; test whole blocks and whole 76-byte-record
-   segment slices.
-4. **Channel count / duration.** Channel count is now known per record (table above); duration still
-   needs the bytes-per-sample ratio that only the ATRAC9 config supplies.
+1. ~~**Has ATRAC9 been ruled out as "reached only through a system library"?**~~ **ANSWERED (E1074).**
+   `0x983ea0`'s ATRAC9 arm calls only `0x987950` (twice), `0x983cf0` (message logger) and `0xf8f3a0`
+   (stack canary), and tail-jumps to `0x9840f8`; it contains no decode and no import. The geometry is
+   consumed later by the stream path, which hands the configuration pointers to `0x94b2c0`. Where the
+   transform itself happens is still open.
+2. ~~**Recover the ATRAC9 configuration word.**~~ **ANSWERED (E1074).** `0x987950` is
+   `id ? [ctx+0x20] + id : inline`, and `[wave+0x5f8]` is written by the record field parser from
+   field `0x0A`. `music.sxd1` is 33/33 at `0xFE761DF0`; the corpus uses six words, listed above.
+3. **Attempt a decode** of one payload unit, with a real configuration word and an independent
+   decoder (FFmpeg `atrac9`/`libatrac9`), reporting the attempt count. Use `0xFE761DF0` for
+   `music.sxd2` and a **960-byte stream block** as the unit (it is exactly 179,549 blocks); a
+   single 240-byte superframe is the finer unit suggested by `bits[15:5]+1`, but the entropy census
+   shows the byte phase drifting inside a block, so start at 960 and 76-byte-record segment slices.
+4. ~~**Channel count / duration.**~~ **RESOLVED structurally (E1074).** Channel count is the format
+   dword's second byte; the configuration supplies `0x592` samples per stream block (1024 for
+   `music`), so duration is `blocks × 0x592 / 48000`. For `music.sxd2` that is 3,830.4 s of
+   6-channel material over the 33 waves — arithmetic on the code's own bookkeeping, not a decode.
 
 ### Other unknowns and their next measurement
 
 | Unknown | Next measurement |
 |---|---|
 | `SXDS` `+0x08` field (33/125/127/172/53) | Read the first access to payload offset 0 in the registrar `0x985900` after the chunk scan; test against all five files |
-| 960-byte record prefix fields (bytes 0–5) | Dump headers for one file and correlate with the `WAVE` format byte (now known: `0x42`); if it is a bit-packed stream, test bit offsets 0–7 for a constant sync |
+| 960-byte block prefix fields (bytes 0–5) | The block is now known to be four ~240-byte sub-units whose byte phase drifts (E1074); next, disassemble `0x94b2c0` (the callee the stream path hands `base+0x5f8`/`0x600` to) and check whether it re-derives a bit-level frame boundary |
+| Where the ATRAC9 transform executes | `0x94b2c0` is a local function with 13 callers; `maxAtrac9Decoders` (`0x12ac371`) and `VOICE_ALLOC_AT9 %d/%d` (`0x12ac61f`) exist but the first has no RIP-relative xref. Trace `0x94b2c0` and the NGS2 rack configuration; nothing here proves NGS2 is the decoder |
 | `SShd` sample directory (names/offsets/loops) | Complete the registrar at `0xb1f013`; the tables at `+0x10..0x24` are relative offsets and `+0x34`/`+0x38` become u16-array pointers |
 | `.sxd` `DATA` chunk codec (26 banks, 313 MB) | Same method as `SXD2`; `com_sys.sxd` DATA has 7.37 bits/byte and no 16-byte framing, so it is not the `.bd` format |
 | Whether the game reaches any of this at runtime | No runtime evidence exists; a decoded buffer alone would not prove playback |
@@ -432,6 +589,15 @@ pinned ELF, and re-runs the `.sxd1` format census when the private descriptors a
 
 ```sh
 python3 -I local/validation/AUD-01-AUDIO-FORMAT-01/analysis/check_sxd2_selector.py
+```
+
+ATRAC9 configuration provenance (E1074; re-derives the two pointer helpers, the 21-entry field table,
+the four writers, the arm's call targets, both geometry tables, the "no configuration in the image"
+result, and — when the private descriptors are present — the 566-record field census and the
+block-size/gcd identity for all six configuration groups):
+
+```sh
+python3 -I local/validation/AUD-01-AUDIO-FORMAT-01/analysis/check_atrac9_config.py
 ```
 
 Helper used to walk the pinned disassembly while tracing (`fde` / `str` / `xref` subcommands):
@@ -457,17 +623,23 @@ python3 -I tools/dev/se_bank_inspect.py --hd "…/cp3shadow/sound/se/bridge.hd" 
   demonstrated for `music.sxd1`.
 - The `.bd` PCM claim is `ARTIFACT_VERIFIED` for framing and `PARTIAL` for sample-exactness: the
   decode matches FFmpeg's independent `adpcm_psx` at correlation 0.99861, not bit-for-bit.
-- The stream **selector** is proved and names **ATRAC9** (`STATIC_ANALYSIS_VERIFIED`), but no
-  ATRAC9 payload has been decoded: the configuration word, the frame geometry and a validated
-  sample are all still missing, and ATRAC9 stays **NOT RUN**. The 45 decompression probes and one MP3
+- The stream **selector** is proved and names **ATRAC9** (`STATIC_ANALYSIS_VERIFIED`), and the
+  per-record **configuration word** plus the derived stream-block geometry are now recovered
+  (E1074), but no ATRAC9 payload has been decoded: the codec's internal frame layout and a validated
+  sample are still missing, and ATRAC9 stays **NOT RUN**. The 45 decompression probes and one MP3
   chain test predate the selector and are negative results only. A future decode must not be
   reported as "the title's audio" without a decoded, validated sample and a runtime path.
 - Channel count is claimed per record from the format dword's second byte (and the ATRAC9/SPU
-  dispatch reads that same byte); sample rate is 48,000 for every record. Loop semantics and
-  duration for `*.sxd2` are still not claimed.
+  dispatch reads that same byte); sample rate is 48,000 for every record. Duration is now
+  *derivable* (`blocks × 0x592 / 48000`) but is arithmetic on the code's bookkeeping, not a measured
+  value; loop semantics remain unclaimed.
+- The configuration word is located and its byte content is quoted, but its codec-internal field
+  meanings are only established through the arithmetic at `0x98413e`–`0x984119`; the labels "frame"
+  and "superframe" here are shorthand for what that arithmetic produces (a `bits[15:5]+1` byte count
+  and a `bits[19:17]` count that equals the channel count), not decoder-verified structures.
 - The `sceSndxInstanceWriteStreamData` route is **refuted**, not merely untested: that function is
   unreachable in this image. Do not re-open the "trace the stream-buffer producer" plan.
 - G2 (decoded/mixed audio fixtures) is **not** advanced to a pass by this note; it adds a proven
-  bank codec, a proven stream container, a proved codec selector, and a precise blocker for the
-  music codec's configuration.
+  bank codec, a proven stream container, a proved codec selector, a recovered per-record ATRAC9
+  configuration and a derived stream-block geometry. The decode itself is still absent.
 

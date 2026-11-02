@@ -11,10 +11,10 @@
 // records the class-name inference (`0xf95c3e` / `0xf95c8e`) and the installer.
 //
 // ============================== OBSERVED (pinned bytes; tools/lift/check_concmd_manager_210b0.py) ===
-// Body `0x210b0..0x211c1` = 273 B, FDE `(0x210b0, 273)`, sha256 619fba45…17ff40. 273 instructions in
-// one Ghidra block (the loop is a `do/while` with a short back edge), 4 branches, 4 relative calls to
-// 4 distinct targets, no `e9`, no indirect transfer. The body never locks or unlocks: `0x3b390` /
-// `0x3b3c0` do not appear in it. The calls are, in address order:
+// Body `0x210b0..0x211c1` = 273 B, FDE `(0x210b0, 273)`, sha256 619fba45…17ff40: 62 instructions
+// (the drain is a `do/while` with a short back edge), 4 branches, 4 relative
+// calls to 4 distinct targets, no `e9`, no indirect transfer. The body never locks or unlocks:
+// `0x3b390` / `0x3b3c0` do not appear in it. The calls are, in address order:
 //
 //   0x210f2  call 0x3b310   CritSec init on `manager+0x58` (retail discards the return code)
 //   0x21108  call 0xf8f3d0  __cxa_guard_acquire(&0x2dfce60)

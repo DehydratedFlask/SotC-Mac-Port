@@ -431,6 +431,40 @@ int main() {
         CHECK(critsec_destroy_at(storage.bytes + kConCmdManager210b0MutexOffset) == 0);
     }
 
+    // ---- 6b. the two re-termination stores are observable ------------------------------------
+    // The first element's prev names a node that is NOT in the drained chain. 0x21198 yields it,
+    // 0x211a7 must write `[tail + 8] = &head` and 0x211ab/0x211af must write `head.prev = tail link`.
+    // The tail starts with a poisoned next and the head with a stale prev, so omitting either store
+    // (or storing the head link instead of the tail link) is visible. This is the byte consequence of
+    // the pinned block, not a shape any 0x20d80-built list has.
+    {
+        ConCmdRegistry registry{};
+        ConCmdManagerStorage storage{};
+        ConCmdBase one{};
+        ConCmdBase outside{};
+        make_command(one, "alpha");
+        make_command(outside, "Gamma");
+        registry.pending.guard_done = true;
+        registry.pending.head.next = &one.pending;
+        registry.pending.head.prev = &one.pending;      // stale: the block must overwrite it
+        one.pending.next = &registry.pending.head;
+        one.pending.prev = &outside.pending;            // first->prev = a node outside the chain
+        outside.pending.next = &outside.pending;        // poison: must become &head
+        outside.pending.prev = &outside.pending;
+
+        DrainLog log{};
+        log.registry = &registry;
+        log.expected_manager = storage.address();
+        const auto created = construct_concmd_manager_210b0(storage.address(), registry, log.hooks());
+        CHECK(created.ok);
+        CHECK(created.drained == 1);
+        CHECK(!created.list_emptied);
+        CHECK(outside.pending.next == &registry.pending.head);   // 0x211a7: [tail+8] = &head
+        CHECK(registry.pending.head.prev == &outside.pending);   // 0x211ab/0x211af: head.prev = tail link
+        CHECK(registry.pending.head.next == &one.pending);       // head.next is not rewritten here
+        CHECK(critsec_destroy_at(storage.bytes + kConCmdManager210b0MutexOffset) == 0);
+    }
+
     // ---- 7. end to end: queue -> drain -> FindConCmd hit -------------------------------------
     {
         ConCmdRegistry registry{};
