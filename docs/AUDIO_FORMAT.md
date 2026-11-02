@@ -12,9 +12,10 @@ ELF code), `FIXTURE_VERIFIED` (synthetic), `PARTIAL`, `UNKNOWN`, `NOT RUN`.
 ## Scope and method
 
 - All members were resolved through the corrected MD5(path) PSARC mapping with
-  `scripts/psarc.py` and decoded **in memory only**; no member payload was written to disk or
-  into the repository. (The FFmpeg cross-check used a synthetic `VAGp` wrapper plus one 32 KiB
-  window in a private temp directory, deleted after the run.)
+  `scripts/psarc.py` and decoded **in memory only**; no member payload was written into the
+  repository. The FFmpeg cross-check used a synthetic `VAGp` wrapper plus one 32 KiB
+  window in a private, git-ignored directory; both files were deleted after the run, and no
+  decoded waveform was stored.
 - Container fields were checked against the pinned plaintext ELF, not guessed. The executable
   contains a real `SXDF`/`TONE`/`NAME` parser and an `SShd` bank registrar; both are cited by
   virtual address below (ELF SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`).
