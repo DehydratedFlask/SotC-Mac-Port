@@ -2676,3 +2676,13 @@ target_link_libraries(sotc_vtable_15e2028_slot2a0_tail PUBLIC sotc_core)
 add_executable(test_vtable_15e2028_slot2a0_tail tests/test_vtable_15e2028_slot2a0_e21420_tail.cpp)
 target_link_libraries(test_vtable_15e2028_slot2a0_tail PRIVATE sotc_vtable_15e2028_slot2a0_tail)
 add_test(NAME vtable_15e2028_slot2a0_tail COMMAND test_vtable_15e2028_slot2a0_tail)
+
+# CPU-01-AOT-CFG-SCALE-01: Fios read slots (0x31870/0x318b0) and the 0x4b0 array teardown.
+add_library(sotc_vtable_15953f8_fios STATIC core/vtable_15953f8_slot_a0_a8_fios_reads.cpp)
+target_link_libraries(sotc_vtable_15953f8_fios PUBLIC sotc_core)
+add_library(sotc_vtable_1594dc0_slot10 STATIC core/vtable_1594dc0_slot10_4b0.cpp)
+target_link_libraries(sotc_vtable_1594dc0_slot10 PUBLIC sotc_core)
+add_executable(test_vtable_15953f8_fios_and_4b0 tests/test_vtable_15953f8_fios_and_4b0.cpp)
+target_link_libraries(test_vtable_15953f8_fios_and_4b0 PRIVATE sotc_vtable_15953f8_fios
+  sotc_vtable_1594dc0_slot10)
+add_test(NAME vtable_15953f8_fios_and_4b0 COMMAND test_vtable_15953f8_fios_and_4b0)

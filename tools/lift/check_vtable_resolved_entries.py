@@ -54,8 +54,8 @@ def main() -> int:
 
     header = HEADER.read_text()
     EXPECTED = header_rows(header)
-    require(len(EXPECTED) == 42, f"expected 42 rows, found {len(EXPECTED)}")
-    require(len({row[3] for row in EXPECTED}) == 17, "expected 17 distinct targets")
+    require(len(EXPECTED) == 47, f"expected 47 rows, found {len(EXPECTED)}")
+    require(len({row[3] for row in EXPECTED}) == 22, "expected 22 distinct targets")
     entry_map = json.loads(ENTRY_MAP.read_text())["entries"]
 
     fde_starts = None

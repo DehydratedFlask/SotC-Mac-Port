@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 18:10 CDT (root) — entry-map seed sweep: 5 new sites, Fios read slots named (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. Ran `indirect_frontier.py` over **20 previously unswept FDE-start targets** taken from `docs/entry_map.json` (distinct from the 573-row constructor table already swept). Result: **5 new resolved sites / 5 targets**, every chain re-verified (slot qword, type-8 RELA addend, FDE start).
+- **New rows:** `0x312ce`→`0x318b0`, `0x312de`→`0x31870`, `0x312f0`→`0x31310` (all vtable `0x15953f8`, slots `0xa8/a0/0x18`) and `0x14def4`→`0x4b0`, `0x14df09`→`0x22a60` (vtable `0x1594dc0`, slots `0x10/0x18`). Table is now **47 sites / 22 distinct targets**; the fixture and checker assert those counts and the checker re-parses the whole table.
+- **Two targets are named by evidence, not by shape:** `0x31870` calls PLT `0xf8f6f0` = **`sceFiosFHReadv`** and `0x318b0` calls `0xf8f6c0` = **`sceFiosFHPreadv`** (both `libSceFios2`), so they are the file-handle read slots — an unpinned read and a positioned read with one extra argument.
+- **Body models added:** `vtable_15953f8_slot_a0_a8_fios_reads` (marker `0xFFFFFFFF00000004` at `+0x54`, status at `+0x50`, service as a hook) and `vtable_1594dc0_slot10_4b0` (vtable `0x1594dd0` installed, 0x50-byte element stride, two `0xf590` releases per element, tag-2 free of the array, post-pass at `0x20b50`). Fixture `test_vtable_15953f8_fios_and_4b0` covers both reads, a missing-fields failure, the 4-release/tag-2/post teardown, and a contract-less teardown failing visibly.
+- **Checker:** `check_fios_slots_and_4b0.py` pins the three bodies, their FDE lengths, the three slot qwords + relocations, the PLT names, the 0x50 stride and the tail jump. (`0x31310`, `0x22a60` remain entry records.)
+- **Verification (PASSED):** build exit 0; CTest **523/523**; lift checkers **716 passed / 0 failed**; entry map regenerated to 1,453 constants / 987 RVAs / 386 headers.
+- **Next exact action:** 291 FDE-start entry-map candidates remain unswept; the same loop over another sample is the cheapest way to add sites, and `0x31310`/`0x22a60` are the two small bodies still unmodelled.
+
 ## 2026-11-03 17:00 CDT (root) — all 14 TLS push sites resolved to full triples (STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. The 6 remaining partial sites are resolved: **14 of 14** now carry a full `(signature, source path, line)` triple (lines `0x2e`..`0x6d7`).

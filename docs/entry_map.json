@@ -556,6 +556,10 @@
         "header": "native/core/concmd_base.hpp"
       },
       {
+        "constant": "kVtable1594dc0Slot10PostCall",
+        "header": "native/core/vtable_1594dc0_slot10_4b0.hpp"
+      },
+      {
         "constant": "kVtable15d1678Slot280_a460f0PostCall",
         "header": "native/core/vtable_15d1678_slot280_a460f0.hpp"
       }
@@ -606,6 +610,16 @@
       {
         "constant": "kSndxCmdExecute",
         "header": "native/core/sndx_command_handlers.hpp"
+      }
+    ],
+    "0x22a60": [
+      {
+        "constant": "kFConCmdDeletingDtor",
+        "header": "native/core/fconcmd_object_slot306.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_22a60",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0x255130": [
@@ -912,6 +926,26 @@
         "header": "native/core/init_531d60_post_base_lea_rax_2eff450_532af5_u1.hpp"
       }
     ],
+    "0x31870": [
+      {
+        "constant": "kVtable15953f8SlotA0_31870",
+        "header": "native/core/vtable_15953f8_slot_a0_a8_fios_reads.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_31870",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0x318b0": [
+      {
+        "constant": "kVtable15953f8SlotA8_318b0",
+        "header": "native/core/vtable_15953f8_slot_a0_a8_fios_reads.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_318b0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0x323d0": [
       {
         "constant": "kSlot296Callee",
@@ -1064,6 +1098,20 @@
       {
         "constant": "kInit531d60PostBase499f80Target",
         "header": "native/core/init_531d60_post_base_499f80.hpp"
+      }
+    ],
+    "0x4b0": [
+      {
+        "constant": "kFConCmdDtor",
+        "header": "native/core/fconcmd_object_slot306.hpp"
+      },
+      {
+        "constant": "kVtable1594dc0Slot10_4b0",
+        "header": "native/core/vtable_1594dc0_slot10_4b0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_4b0",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0x4c4950": [
@@ -3636,6 +3684,10 @@
       {
         "constant": "kSharedReleaseF590",
         "header": "native/core/shared_release_f590.hpp"
+      },
+      {
+        "constant": "kSharedReleaseF590",
+        "header": "native/core/vtable_1594dc0_slot10_4b0.hpp"
       }
     ],
     "0xf7b0": [
@@ -4884,6 +4936,10 @@
         "header": "native/core/concmd_base.hpp"
       },
       {
+        "constant": "kVtable1594dc0Slot10PostCall",
+        "header": "native/core/vtable_1594dc0_slot10_4b0.hpp"
+      },
+      {
         "constant": "kVtable15d1678Slot280_a460f0PostCall",
         "header": "native/core/vtable_15d1678_slot280_a460f0.hpp"
       }
@@ -4982,6 +5038,10 @@
       {
         "constant": "kFConCmdDeletingDtor",
         "header": "native/core/fconcmd_object_slot306.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_22a60",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0x22ae0": [
@@ -6116,6 +6176,32 @@
         "header": "native/core/ctor_slot_386_6b12f0.hpp"
       }
     ],
+    "0x31310": [
+      {
+        "constant": "kResolvedVtableTarget_31310",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0x31870": [
+      {
+        "constant": "kVtable15953f8SlotA0_31870",
+        "header": "native/core/vtable_15953f8_slot_a0_a8_fios_reads.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_31870",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0x318b0": [
+      {
+        "constant": "kVtable15953f8SlotA8_318b0",
+        "header": "native/core/vtable_15953f8_slot_a0_a8_fios_reads.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_318b0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0x31b660": [
       {
         "constant": "kSlot479",
@@ -6988,6 +7074,14 @@
       {
         "constant": "kFConCmdDtor",
         "header": "native/core/fconcmd_object_slot306.hpp"
+      },
+      {
+        "constant": "kVtable1594dc0Slot10_4b0",
+        "header": "native/core/vtable_1594dc0_slot10_4b0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_4b0",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0x4b1d0": [
@@ -11270,6 +11364,10 @@
       {
         "constant": "kSharedReleaseF590",
         "header": "native/core/shared_release_f590.hpp"
+      },
+      {
+        "constant": "kSharedReleaseF590",
+        "header": "native/core/vtable_1594dc0_slot10_4b0.hpp"
       }
     ],
     "0xf5d9": [
@@ -11433,9 +11531,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1443,
-    "distinct_rvas": 984,
-    "duplicate_rvas": 308,
-    "headers": 384
+    "constants": 1453,
+    "distinct_rvas": 987,
+    "duplicate_rvas": 312,
+    "headers": 386
   }
 }
