@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 00:05 CDT (root) — two provider-blocked tasks closed from ELF bytes alone (STATIC_ANALYSIS_VERIFIED)
+
+- Both `AUD-02-NGS2-RACKQUERY-CALLEE-959620-01` and `CPU-01-SLOT23-DIRECT-CALLEE-0E70A60-01` had been `BLOCKED` on REA/Ghidra timeouts (E995/E1003). Both asked for **one entry basic block**, capped at 32 instructions / 128 bytes, stopping at the first control transfer. Both decode completely inside the cap, so both are *finished*, not truncated, and neither needed a provider query.
+- **`0x959620`** — 11 instructions / `0x1d` bytes (sha256 `7bfc3077…`): `push rbp; mov rsp,rbp; push r15/r14/r12/rbx`, `rsi→r14`, `rdi→r12`, `r15=0`, a null test of `r12`, ending at its single transfer `je 0x9596c7`. That `je` is the **6-byte** `0f 84 8a 00 00 00` form — a first draft of the checker assumed `0x19` bytes for the block and the checker caught it. (My own second draft then read the wrong next-instruction boundary; the two corrections are the reason the checker now pins the block length *and* the following instruction address.)
+- **`0xe70a60`** — 3 instructions / `0x07` bytes (sha256 `f647b937…`): `xor eax,eax; cmp esi,0xc`, ending at the 2-byte `77 12` `ja 0xe70a79`. So the function returns 0 for an index above 12.
+- `tools/lift/check_entry_blocks_959620_e70a60.py` re-derives both blocks, requires each to end at its single control transfer, and requires the next instruction to sit exactly at the pinned length. **No transfer target was inspected and no callee semantics are claimed** — the caps in the task specs were respected literally.
+- **Process note:** the first commit for this work went out carrying the checker but *not* the task-row edits its message described, because my edit script called a two-parameter function with three arguments. The rows were applied in a follow-up commit rather than rewriting the pushed commit.
+- Bookkeeping: `BLOCKED` is down from 4 to 2 (`CPU-01-INIT-21620-LOOKUP-01`, and `AUD-02-SXDF-DATA-REFERENCE-GHIDRA-01` which is in flight against the new Ghidra pipeline). Checker count is **725**.
+
 ## 2026-11-01 23:10 CDT (root) — audio: containers specified, SPU ADPCM banks proven, stream codec still UNKNOWN
 
 - **Task:** new `AUD-01-AUDIO-FORMAT-01`. This is the first audio work that produces a *codec* result rather than a byte profile.
