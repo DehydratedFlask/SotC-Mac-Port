@@ -11080,6 +11080,24 @@
         "header": "native/core/vtable_15e2028_slot2a0_e21420_tail.hpp"
       }
     ],
+    "0xe215ce": [
+      {
+        "constant": "kE21420NullName18000",
+        "header": "native/core/vtable_15e2028_slot2a0_e21420_tail.hpp"
+      }
+    ],
+    "0xe21634": [
+      {
+        "constant": "kE21420Match18000",
+        "header": "native/core/vtable_15e2028_slot2a0_e21420_tail.hpp"
+      }
+    ],
+    "0xe21654": [
+      {
+        "constant": "kE21420Exit18000",
+        "header": "native/core/vtable_15e2028_slot2a0_e21420_tail.hpp"
+      }
+    ],
     "0xe2167e": [
       {
         "constant": "kE21420Found18000",
@@ -11415,8 +11433,8 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1440,
-    "distinct_rvas": 981,
+    "constants": 1443,
+    "distinct_rvas": 984,
     "duplicate_rvas": 308,
     "headers": 384
   }

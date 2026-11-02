@@ -22,10 +22,23 @@
 //     if (arg3 == null) -> the 0xe215ce sub-tree (a different scan; not modelled here)
 //     else rescan provider->slot88(i) with strcmp, then provider->vtable[0xc0](r13) and r15 = 0x14
 //
-// What is modelled: the found path in full (lookup, null gate, tail call) and the missing path's
-// record construction plus its status and the two observable exits. What is NOT modelled: the
-// `arg3 == null` sub-tree at 0xe215ce..0xe2167e, the rescan's per-element bodies beyond the
-// strcmp calls, and any consumer of the constructed record.
+//   **null-name sub-tree (0xe215ce, 102 B)** — entered when `arg3` is null and the record exists:
+//     primary = provider->vtable[0x88](provider, 0)
+//     if (record->owner != null) {
+//       if (record->+0x38 != null && strcmp(record->+0x38, primary) == 0 && record->+0x42 != 0)
+//         record->owner->vtable[0xd0](owner, record->+0x38)
+//       primary = record->owner->vtable[0xc8](owner, primary)
+//     }
+//     record->+0x38 = primary; record->+0x42 = 1;  -> shared exit
+//
+//   **first-scan match (0xe21634, 32 B)**: `record->vtable[0x30](record, provider->slot88(index))`
+//   then the shared exit.
+//
+//   **shared exit (0xe21654, 42 B)**: `ctx->vtable[0x148](ctx, arg2, record, (uint8)arg4)`.
+//
+// What is modelled: all four continuations at the decision/call level. What is NOT modelled: the
+// callee bodies behind slots 0x30/0x88/0xc8/0xd0/0x148, the per-element bodies of the scans, and
+// any consumer of the constructed record.
 #pragma once
 
 #include <cstddef>
@@ -54,6 +67,18 @@ inline constexpr std::uint32_t kE21420RecordOwner = 0x08;
 inline constexpr std::uint32_t kE21420RecordZeroA = 0x10;
 inline constexpr std::uint32_t kE21420RecordZeroB = 0x30;
 inline constexpr std::uint32_t kE21420RecordFlags = 0x40;
+inline constexpr std::uint64_t kE21420NullName18000Rva = 0xe215ce;
+inline constexpr std::size_t kE21420NullName18000Size = 0x66;
+inline constexpr std::uint64_t kE21420Match18000Rva = 0xe21634;
+inline constexpr std::size_t kE21420Match18000Size = 0x20;
+inline constexpr std::uint64_t kE21420Exit18000Rva = 0xe21654;
+inline constexpr std::size_t kE21420Exit18000Size = 0x2a;
+inline constexpr std::uint32_t kE21420RecordPrimary = 0x38;
+inline constexpr std::uint32_t kE21420RecordReady = 0x42;
+inline constexpr std::uint32_t kE21420RecordHookSlot = 0x30;
+inline constexpr std::uint32_t kE21420PrimarySlot = 0x88;
+inline constexpr std::uint32_t kE21420CompareSlot = 0xc8;
+inline constexpr std::uint32_t kE21420NotifySlot = 0xd0;
 
 enum class E21420TailStatus : std::uint8_t {
     ok = 0,
@@ -115,6 +140,60 @@ struct E21420MissingResult {
     bool null_name_subtree = false;
     std::int32_t scanned = 0;
 };
+
+// The shared exit: `ctx->vtable[0x148](ctx, arg2, record, (uint8)arg4)`. Every modelled continuation
+// ends here, which is why the record pointer is the third argument in all of them.
+struct E21420ExitCells {
+    void* context = nullptr;
+    void* arg2 = nullptr;
+    void* record = nullptr;
+    std::uint8_t arg4_byte = 0;
+};
+
+struct E21420ExitHooks {
+    std::int32_t (*tail)(void* context, void* arg2, void* record, std::uint8_t arg4_byte) = nullptr;
+};
+
+struct E21420ExitResult {
+    bool ok = false;
+    bool tail_called = false;
+    std::int32_t code = 0;
+};
+
+[[nodiscard]] E21420ExitResult e21420_exit(const E21420ExitCells& cells,
+                                           const E21420ExitHooks& hooks) noexcept;
+
+// The `arg3 == null` sub-tree: primary lookup, the optional compare/notify pair, the record update.
+struct E21420NullNameCells {
+    void* provider = nullptr;
+    std::uint8_t* record = nullptr;   // the 0x48-byte record built by the missing path
+};
+
+struct E21420NullNameHooks {
+    const char* (*primary)(void* provider, std::int32_t index) = nullptr;   // slot 0x88
+    void (*notify)(void* owner, const char* value) = nullptr;               // slot 0xd0
+    const char* (*compare)(void* owner, const char* value) = nullptr;       // slot 0xc8
+};
+
+struct E21420NullNameResult {
+    bool ok = false;
+    bool owner_present = false;
+    bool notify_called = false;
+    bool compare_called = false;
+    bool ready_flag_written = false;
+};
+
+[[nodiscard]] E21420NullNameResult e21420_null_name(const E21420NullNameCells& cells,
+                                                    const E21420NullNameHooks& hooks) noexcept;
+
+// The first-scan match: `record->vtable[0x30](record, provider->slot88(index))`.
+struct E21420MatchResult {
+    bool ok = false;
+    bool hook_called = false;
+};
+
+[[nodiscard]] E21420MatchResult e21420_match(void* record, const char* value,
+                                             void (*record_hook)(void* record, const char* value)) noexcept;
 
 [[nodiscard]] E21420MissingResult e21420_missing(const E21420MissingCells& cells,
                                                  const E21420MissingHooks& hooks) noexcept;

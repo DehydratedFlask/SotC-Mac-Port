@@ -120,3 +120,73 @@ E21420MissingResult e21420_missing(const E21420MissingCells& cells,
 }
 
 }  // namespace sotc
+
+namespace sotc {
+
+E21420ExitResult e21420_exit(const E21420ExitCells& cells, const E21420ExitHooks& hooks) noexcept {
+    E21420ExitResult out{};
+    if (cells.context == nullptr || cells.record == nullptr || hooks.tail == nullptr) {
+        return out;
+    }
+    out.tail_called = true;
+    out.code = hooks.tail(cells.context, cells.arg2, cells.record, cells.arg4_byte);
+    out.ok = true;
+    return out;
+}
+
+E21420NullNameResult e21420_null_name(const E21420NullNameCells& cells,
+                                      const E21420NullNameHooks& hooks) noexcept {
+    E21420NullNameResult out{};
+    if (cells.provider == nullptr || cells.record == nullptr || hooks.primary == nullptr) {
+        return out;
+    }
+
+    const char* primary = hooks.primary(cells.provider, 0);
+
+    // `rbx = *(r13+0x8)` is the record's owner; a null owner jumps straight to the record update.
+    std::uint64_t owner_bits = 0;
+    std::memcpy(&owner_bits, cells.record + kE21420RecordOwner, sizeof(owner_bits));
+    void* owner = reinterpret_cast<void*>(static_cast<std::uintptr_t>(owner_bits));
+
+    if (owner != nullptr) {
+        out.owner_present = true;
+        // `r12 = *(r13+0x38)`, null -> skip the compare/notify pair.
+        std::uint64_t held_bits = 0;
+        std::memcpy(&held_bits, cells.record + kE21420RecordPrimary, sizeof(held_bits));
+        const char* held = reinterpret_cast<const char*>(
+            static_cast<std::uintptr_t>(held_bits));
+        if (held != nullptr && primary != nullptr && std::strcmp(held, primary) == 0 &&
+            cells.record[kE21420RecordReady] != 0) {
+            if (hooks.notify != nullptr) {
+                hooks.notify(owner, held);
+                out.notify_called = true;
+            }
+        }
+        if (hooks.compare != nullptr) {
+            primary = hooks.compare(owner, primary);
+            out.compare_called = true;
+        }
+    }
+
+    const std::uint64_t primary_bits =
+        static_cast<std::uint64_t>(reinterpret_cast<std::uintptr_t>(primary));
+    std::memcpy(cells.record + kE21420RecordPrimary, &primary_bits, sizeof(primary_bits));
+    cells.record[kE21420RecordReady] = 1;
+    out.ready_flag_written = true;
+    out.ok = primary != nullptr;
+    return out;
+}
+
+E21420MatchResult e21420_match(void* record, const char* value,
+                               void (*record_hook)(void* record, const char* value)) noexcept {
+    E21420MatchResult out{};
+    if (record == nullptr || record_hook == nullptr) {
+        return out;
+    }
+    record_hook(record, value);
+    out.hook_called = true;
+    out.ok = true;
+    return out;
+}
+
+}  // namespace sotc

@@ -16,7 +16,14 @@ using sotc::E21420MissingHooks;
 using sotc::E21420MissingResult;
 using sotc::E21420TailStatus;
 using sotc::e21420_found;
+using sotc::E21420ExitCells;
+using sotc::E21420ExitHooks;
+using sotc::E21420NullNameCells;
+using sotc::E21420NullNameHooks;
+using sotc::e21420_exit;
+using sotc::e21420_match;
 using sotc::e21420_missing;
+using sotc::e21420_null_name;
 
 int failures = 0;
 
@@ -168,6 +175,97 @@ void test_missing_null_name_subtree() {
     check("null name no rescan", result.scanned == 0);
 }
 
+const char* primary_value = "alpha";
+const char* primary_of(void*, std::int32_t) { return primary_value; }
+int g_notify = 0;
+int g_compare = 0;
+void notify(void*, const char*) { ++g_notify; }
+const char* compare_returns(void*, const char* value) { ++g_compare; return value; }
+int g_exit = 0;
+struct ExitTrace { void* record = nullptr; std::uint8_t byte = 0; std::int32_t code = 0; };
+ExitTrace g_exit_trace;
+std::int32_t exit_tail(void*, void*, void* record, std::uint8_t byte) {
+    ++g_exit;
+    g_exit_trace.record = record;
+    g_exit_trace.byte = byte;
+    g_exit_trace.code = 42;
+    return 42;
+}
+
+void test_null_name_subtree() {
+    // Owner null: no compare, no notify, but the primary is stored at +0x38 and +0x42 becomes 1.
+    {
+        std::vector<std::uint8_t> record(sotc::kE21420AllocationSize, 0);
+        E21420NullNameCells cells{};
+        cells.provider = reinterpret_cast<void*>(0x1);
+        cells.record = record.data();
+        E21420NullNameHooks hooks{};
+        hooks.primary = primary_of;
+        g_notify = g_compare = 0;
+        const auto result = e21420_null_name(cells, hooks);
+        check("owner null ok", result.ok && !result.owner_present);
+        check("owner null no notify/compare", g_notify == 0 && g_compare == 0);
+        std::uint64_t stored = 0;
+        std::memcpy(&stored, record.data() + sotc::kE21420RecordPrimary, 8);
+        check("primary stored", stored == reinterpret_cast<std::uint64_t>(primary_value));
+        check("ready flag", record[sotc::kE21420RecordReady] == 1);
+    }
+    // Owner present and the held value matches: notify then compare both run.
+    {
+        std::vector<std::uint8_t> record(sotc::kE21420AllocationSize, 0);
+        const std::uint64_t owner = 0x7777;
+        const std::uint64_t held = reinterpret_cast<std::uint64_t>(primary_value);
+        std::memcpy(record.data() + sotc::kE21420RecordOwner, &owner, 8);
+        std::memcpy(record.data() + sotc::kE21420RecordPrimary, &held, 8);
+        record[sotc::kE21420RecordReady] = 1;
+        E21420NullNameCells cells{};
+        cells.provider = reinterpret_cast<void*>(0x1);
+        cells.record = record.data();
+        E21420NullNameHooks hooks{};
+        hooks.primary = primary_of;
+        hooks.notify = notify;
+        hooks.compare = compare_returns;
+        g_notify = g_compare = 0;
+        const auto result = e21420_null_name(cells, hooks);
+        check("owner present ok", result.ok && result.owner_present);
+        check("notify ran", g_notify == 1 && result.notify_called);
+        check("compare ran", g_compare == 1 && result.compare_called);
+    }
+    // A record with no storage fails visibly.
+    {
+        E21420NullNameCells cells{};
+        cells.provider = reinterpret_cast<void*>(0x1);
+        E21420NullNameHooks hooks{};
+        hooks.primary = primary_of;
+        check("no record fails", !e21420_null_name(cells, hooks).ok);
+    }
+}
+
+void test_exit_and_match() {
+    int record_token = 0;
+    E21420ExitCells cells{};
+    cells.context = reinterpret_cast<void*>(0x1);
+    cells.record = &record_token;
+    cells.arg4_byte = 0x9;
+    E21420ExitHooks hooks{};
+    hooks.tail = exit_tail;
+    g_exit = 0;
+    const auto exit_result = e21420_exit(cells, hooks);
+    check("exit ok", exit_result.ok && exit_result.code == 42);
+    check("exit tail", g_exit == 1 && g_exit_trace.record == &record_token &&
+                           g_exit_trace.byte == 0x9);
+
+    int seen = 0;
+    const auto match = e21420_match(&record_token, primary_value,
+                                    [](void* record, const char*) {
+                                        ++*static_cast<int*>(record);
+                                    });
+    check("match hook", match.ok && match.hook_called);
+    check("match touched the record", record_token == 1);
+    (void)seen;
+    check("match without hook fails", !e21420_match(&record_token, primary_value, nullptr).ok);
+}
+
 void test_missing_requires_storage() {
     E21420MissingCells cells{};
     cells.provider = reinterpret_cast<void*>(0x1);
@@ -186,6 +284,8 @@ int main() {
     test_missing_record_layout();
     test_missing_without_match_releases();
     test_missing_null_name_subtree();
+    test_null_name_subtree();
+    test_exit_and_match();
     test_missing_requires_storage();
 
     if (failures == 0) {

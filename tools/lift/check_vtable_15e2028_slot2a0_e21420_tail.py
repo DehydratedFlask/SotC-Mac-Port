@@ -23,6 +23,9 @@ CMAKE = ROOT / "native/CMakeLists.txt"
 
 FOUND = (0xE2167E, 0x4B, "9e214c763f22348f3ee8ad05825172e9983b2385a6bff2c15613bf39866ea669")
 MISSING = (0xE214F7, 0xBF, "74f92e9e4f173752e0790372dc62b5e3cf4b0f349a27efa6e62761e2e30e800e")
+NULL_NAME = (0xE215CE, 0x66, "9c5d5cf69f890d817eb2fa0cf7882c1dcbcb4fea15f022279206fcb2de2bcead")
+MATCH = (0xE21634, 0x20, "f8459e0501df9773b62614895ba0b27f44a6d539a4d243e88f394cbc608ae1d1")
+EXIT = (0xE21654, 0x2A, "0554df070f09faffaf0645351e9f9b33e500210d9cf15be0d23e6199a9cb034e")
 
 
 def require(cond: bool, msg: str) -> None:
@@ -58,7 +61,7 @@ def main() -> int:
 
     owner = fdes.find(0xE21420)
     require(owner is not None and owner[0] == 0xE21420, "0xe21420 is not an FDE function start")
-    for rva, size, sha in (MISSING, FOUND):
+    for rva, size, sha in (MISSING, FOUND, NULL_NAME, MATCH, EXIT):
         body = image.read(rva, size)
         require(hashlib.sha256(body).hexdigest() == sha, f"0x{rva:x} window changed")
         require(owner[0] <= rva < owner[0] + owner[1],
@@ -84,7 +87,23 @@ def main() -> int:
     require(bytes.fromhex("4c8b8148010000") in found, "found path lost the 0x148 slot load")
     require(found.endswith(bytes.fromhex("41ffe0")), "found path no longer ends in the tail jmp")
 
-    print("OK check_vtable_15e2028_slot2a0_e21420_tail: both continuations pinned inside the "
+    null_name = image.read(*NULL_NAME[:2])
+    match = image.read(*MATCH[:2])
+    exit_window = image.read(*EXIT[:2])
+    # Null-name sub-tree: primary slot 0x88, the 0x38 held-value load, notify 0xd0, compare 0xc8.
+    require(bytes.fromhex("ff9088000000") in null_name, "null-name lost the 0x88 primary call")
+    require(bytes.fromhex("4d8b6538") in null_name, "null-name lost the +0x38 held-value load")
+    require(bytes.fromhex("ff90c8000000") in null_name, "null-name lost the 0xc8 compare call")
+    require(bytes.fromhex("ff90d0000000") in null_name, "null-name lost the 0xd0 notify call")
+    # Match path: the record's vtable slot 0x30 plus provider slot 0x88.
+    require(bytes.fromhex("ff9088000000") in match, "match lost the provider 0x88 call")
+    require(bytes.fromhex("ffd0") in match or bytes.fromhex("41ffd7") in match,
+            "match lost the indirect record call")
+    # Shared exit: slot 0x148 and the closing indirect jump.
+    require(bytes.fromhex("488b8048010000") in exit_window, "exit lost the 0x148 slot load")
+    require(exit_window.endswith(bytes.fromhex("ffe0")), "exit no longer ends in the tail jmp")
+
+    print("OK check_vtable_15e2028_slot2a0_e21420_tail: all four continuations pinned inside the "
           "0xe21420 range, with the 0xb0/0x38/0xc0/0x148 slots and the 0x48 allocation size")
     return 0
 

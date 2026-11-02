@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 15:10 CDT (root) — 0xe21420 fully modelled at the continuation level (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. The last unmodelled region of `0xe21420` is now covered: the **null-name sub-tree** (`0xe215ce`, 102 B), the **first-scan match** (`0xe21634`, 32 B) and the **shared exit** (`0xe21654`, 42 B) join the found (`0xe2167e`) and missing (`0xe214f7`) paths. Together the five windows cover every continuation of the 681-byte body; what remains unmodelled is only the *callee bodies* behind slots `0x30/0x88/0xc8/0xd0/0x148`, which are hooks.
+- **Null-name contract:** `primary = provider->slot88(0)`; if the record has an owner and its `+0x38` string equals the primary with `+0x42` set, call `owner->slot_d0`; then `primary = owner->slot_c8(owner, primary)`; store the result at record `+0x38` and set `+0x42 = 1`.
+- **Shared exit:** every path ends at `ctx->slot_148(ctx, arg2, record, (uint8)arg4)` — modelled once as `e21420_exit`, which is why the record is the third argument everywhere.
+- **Fixture:** owner-null vs owner-present sub-tree (notify/compare only in the second), stored primary and ready flag, exit tail with the arg4 byte, match hook, and the fail-visible cases (no record, no hook).
+- **Checker:** now pins **five** windows by digest (`0xe214f7`, `0xe2167e`, `0xe215ce`, `0xe21634`, `0xe21654`), all required to stay inside the `0xe21420` FDE range, plus the `0x88`/`0xc8`/`0xd0`/`0x148` slot calls and the closing `ff e0` jump.
+- **Verification (PASSED):** build exit 0; CTest **522/522**; lift checkers **714 passed / 0 failed**; entry map regenerated to **1,443 constants / 984 RVAs / 384 headers** (the doc line was corrected to the real totals after I wrote them from memory).
+- **Next exact action:** `0xe21420` is complete at this level — the next CPU-side step is a different target (indirect-frontier resolution or the remaining 11 of 14 TLS push sites).
+
 ## 2026-11-03 14:20 CDT (root) — 0xe21420 terminal paths lifted (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. `native/core/vtable_15e2028_slot2a0_e21420_tail.{hpp,cpp}` models the two continuations the guard ladder selects:
