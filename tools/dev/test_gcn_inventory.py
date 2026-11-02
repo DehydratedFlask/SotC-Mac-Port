@@ -359,8 +359,10 @@ class EncodingOracleTests(unittest.TestCase):
         self.assertEqual(shift.mnemonic, 'v_lshlrev_b32')
         self.assertEqual(shift.requirements, ())
 
-        # Unmodelled neighbours keep rejecting.
-        for built in (vop2(op=1), vop2(op=2), vop1(op=7), vop1(op=33)):
+        # Unmodelled neighbours keep rejecting. `vop1(op=7)` used to sit here; it is a modelled
+        # row now (v_cvt_u32_f32), so the probe moved to 9 (v_mov_fed_b32) rather than the
+        # assertion being loosened.
+        for built in (vop2(op=1), vop2(op=2), vop1(op=9), vop1(op=33)):
             with self.assertRaises(gcn.DecodeError):
                 one(built)
 
@@ -390,6 +392,72 @@ class EncodingOracleTests(unittest.TestCase):
         self.assertEqual(sub.requirements, ('writes_vcc_mask',))
         self.assertEqual(one(vopc(op=136)).mnemonic, 'v_cmp_class_f32')
 
+    def test_conversion_and_wide_integer_vop3_rows(self):
+        # VOP1 7 v_cvt_u32_f32: one float source, one uint destination, no blockers.
+        convert = one(vop1(op=7, dst=3, src=270))
+        self.assertEqual((convert.encoding, convert.opcode, convert.mnemonic),
+                         ('VOP1', 7, 'v_cvt_u32_f32'))
+        self.assertEqual(convert.requirements, ())
+        # VOP1 37 v_exp_f32 / 39 v_log_f32 are its transcription neighbours (one source each).
+        self.assertEqual(one(vop1(op=37)).mnemonic, 'v_exp_f32')
+        scalar_log = one(vop1(op=39))
+        self.assertEqual((scalar_log.mnemonic, scalar_log.requirements), ('v_log_f32', ()))
+
+        # VOP3 259/260/271 are two-source float rows: ABS/CLAMP/OMOD/NEG are legal on them, so a
+        # modifier must NOT reject here the way it does on an integer row.
+        add = one(vop3(op=259, dst=4, src0=267, src1=268, abs_=3, clamp=1, omod=2, neg=5))
+        self.assertEqual((add.mnemonic, add.requirements), ('v_add_f32', ()))
+        self.assertEqual(one(vop3(op=260, dst=4, src0=267, src1=268, abs_=0, clamp=0, omod=0,
+                                  neg=0)).mnemonic, 'v_sub_f32')
+        self.assertEqual(one(vop3(op=271, dst=4, src0=267, src1=268, abs_=0, clamp=0, omod=0,
+                                  neg=0)).mnemonic, 'v_min_f32')
+
+        # VOP3 423 v_log_f32 is a ONE-source row. Its SRC1/SRC2 fields are unused, so two
+        # distinct scalar selectors there must not trip the read-port rule - counting the row
+        # as two-source did exactly that before VOP3_UNARY existed.
+        log = one(vop3(op=423, dst=4, src0=8, src1=4, src2=0, abs_=0, clamp=0, omod=0, neg=0))
+        self.assertEqual((log.mnemonic, log.requirements), ('v_log_f32', ()))
+        self.assertEqual(one(vop3(op=426, dst=4, src0=8, src1=4, abs_=0, clamp=0, omod=0,
+                                  neg=0)).mnemonic, 'v_rcp_f32')
+        # The same selector pair on a genuine two-source row still exceeds the read ports.
+        with self.assertRaises(gcn.DecodeError) as caught:
+            one(vop3(op=259, dst=4, src0=8, src1=4, abs_=0, clamp=0, omod=0, neg=0))
+        self.assertIn('multiple distinct scalar sources', caught.exception.reason)
+
+        # VOP3 323/328/344 are three-source integer rows; 361 is the two-source integer mul.
+        for op, name in ((323, 'v_mad_u32_u24'), (328, 'v_bfe_u32'), (344, 'v_med3_i32')):
+            row = one(vop3(op=op, dst=5, src0=267, src1=268, src2=269, abs_=0, clamp=0, omod=0,
+                           neg=0))
+            self.assertEqual((row.opcode, row.mnemonic), (op, name))
+            self.assertEqual(row.requirements, ())
+        mul = one(vop3(op=361, dst=5, src0=267, src1=268, abs_=0, clamp=0, omod=0, neg=0))
+        self.assertEqual((mul.mnemonic, mul.requirements), ('v_mul_lo_u32', ()))
+        # Integer rows reject the floating-point modifier fields, like 322/349 already did.
+        for op in (323, 328, 344, 361):
+            with self.subTest(op=op):
+                with self.assertRaises(gcn.DecodeError) as caught:
+                    one(vop3(op=op, abs_=1, clamp=0, omod=0, neg=0))
+                self.assertIn('integer VOP3', caught.exception.reason)
+        # A three-source integer row with three distinct scalars still breaks the read ports.
+        with self.assertRaises(gcn.DecodeError):
+            one(vop3(op=328, src0=4, src1=6, src2=8, abs_=0, clamp=0, omod=0, neg=0))
+
+    def test_cmpx_vop3_rows_and_iflag_stay_refused(self):
+        # VOP3-encoded `cmpx` names in the pinned table (25 = v_cmpx_nge_f32, 28 =
+        # v_cmpx_nle_f32, 212 = v_cmpx_gt_u32) are NOT modelled: real programs put a non-EXEC
+        # value in VDST, and the destination contract is not established. They must keep
+        # failing rather than be silently invented.
+        for op in (25, 28, 212):
+            with self.subTest(op=op):
+                with self.assertRaises(gcn.DecodeError) as caught:
+                    one(vop3(op=op, dst=5, abs_=0, clamp=0, omod=0, neg=0))
+                self.assertIn(f'unsupported VOP3 opcode {op}', caught.exception.reason)
+        # VOP1 43 v_rcp_iflag_f32 exists for the integer-flag mode. Nothing pinned describes
+        # that state, so the row is refused instead of being folded to plain v_rcp_f32.
+        with self.assertRaises(gcn.DecodeError) as caught:
+            one(vop1(op=43))
+        self.assertIn('unsupported VOP1 opcode 43', caught.exception.reason)
+
     def test_compare_rows_and_mask_destinations(self):
         # VOPC 192-199 are the integer (non-cmpx) compares: they write VCC, never EXEC.
         for op, name in ((192, 'v_cmp_f_u32'), (194, 'v_cmp_eq_u32'), (197, 'v_cmp_ne_u32'),
@@ -403,6 +471,8 @@ class EncodingOracleTests(unittest.TestCase):
         compare = one(vop3(op=194, dst=106, abs_=0, clamp=0, omod=0, neg=0))
         self.assertEqual(compare.mnemonic, 'v_cmp_eq_u32')
         self.assertEqual(compare.requirements, ('writes_vcc_mask',))
+        greater = one(vop3(op=196, dst=8, abs_=0, clamp=0, omod=0, neg=0))
+        self.assertEqual((greater.mnemonic, greater.requirements), ('v_cmp_gt_u32', ()))
         mask_pair = one(vop3(op=1, dst=8, abs_=0, clamp=0, omod=0, neg=0))
         self.assertEqual(mask_pair.mnemonic, 'v_cmp_lt_f32')
         self.assertEqual(mask_pair.requirements, ())
@@ -704,9 +774,11 @@ class RejectionTests(unittest.TestCase):
 
     def test_nearby_rows_stay_unsupported(self):
         # Neighbours that are NOT modelled keep rejecting: the integer VOP rows either side,
-        # SOPP 5 `s_cbranch_scc1` (control transfer), the MUBUF/MIMG store rows.
-        for p in (vop2(op=39), vop2(op=40), vop1(op=37),
-                  vop3(op=323, abs_=0, clamp=0, omod=0, neg=0),
+        # SOPP 5 `s_cbranch_scc1` (control transfer), the MUBUF/MIMG store rows. Probes that
+        # this card modelled (VOP1 37, VOP3 323) moved to other unmodelled rows (VOP1 38
+        # `v_log_clamp_f32`, VOP3 324 `v_cubeid_f32`) instead of the assertion being loosened.
+        for p in (vop2(op=39), vop2(op=40), vop1(op=38),
+                  vop3(op=324, abs_=0, clamp=0, omod=0, neg=0),
                   vop3(op=351, abs_=0, clamp=0, omod=0, neg=0),
                   sop1(op=35), sopp(op=2), sopp(op=5), sopp(op=9),
                   mubuf(op=4), mubuf(op=32), mimg(op=8)):

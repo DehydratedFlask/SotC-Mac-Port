@@ -450,6 +450,9 @@ ambiguous addend), `VOP1 7` (28), `VOP2 32` (15, `v_madmk_f32` and its mandatory
 programs whose declared span carries bytes after `s_endpgm`**, `VOP3 28` (14, the `cmpx` row refused
 on evidence) and `VOP3 328` (6).
 
+*(Superseded by "Decoder widening 9" below: `VOP1 7`, `VOP1 37`, `VOP3 328` and nine other rows are
+modelled in `v17`, and the paired-blob split now covers 43 members instead of 14.)*
+
 - **Still zero lowered.** Block-decodability is structure, not semantics.
 
 ### The "bytes after s_endpgm" programs are paired shaders
@@ -509,3 +512,104 @@ not have without either a state trace from the running game or owner-supplied bi
 a plausible mapping would produce MSL that compiles and renders the wrong thing — the exact failure
 mode this pipeline was built to avoid. So the blocker is precise: **0 lowered because 0 manifests,
 and a manifest cannot be derived from shader bytes alone.**
+
+## Decoder widening 9 (VOP conversions, bitfield and float rows; 2026-11-01)
+
+Decoder `v16` → `v17`. Measured before (`local/validation/msl-coverage/r26-baseline`) and after
+(`local/validation/msl-coverage/r26-v17b`), both at deterministic sample 512, same archives, same
+machine, same command (`python3 tools/dev/msl_corpus_coverage.py --sample 512 --out <dir>`). Both
+`coverage.json` files record the decoder's SHA-256 and the sampled index list: the baseline's decoder
+hash is the committed `v16` file (`e3bd4608…`) and the after-run's is this `v17` file (`8a24cd2f…`),
+and the two index lists are identical — so the numbers below are one sample, not two samples.
+
+- **Rows added (12):** VOP1 7 `v_cvt_u32_f32`, VOP1 37 `v_exp_f32`, VOP1 39 `v_log_f32`;
+  VOP3 259 `v_add_f32`, 260 `v_sub_f32`, 271 `v_min_f32`, 423 `v_log_f32`,
+  323 `v_mad_u32_u24`, 328 `v_bfe_u32`, 344 `v_med3_i32`, 361 `v_mul_lo_u32`;
+  and VOP3 196 `v_cmp_gt_u32` (mask destination, so it joins the compare rule as well as the table).
+  Every name, opcode value and operand count was read from
+  `reference/shadPS4/src/shader_recompiler/frontend/format.cpp`, with each lookup bounded by the next
+  `InstructionFormat…` declaration and cross-checked a second time against the same clone's
+  `frontend/opcodes.h` enum values (VOP1 7/37/39, VOP3 259/260/271/323/328/344/361/423, VOPC 196).
+- **The operand counts are the pinned table's own `src_count`**, not an ISA recollection:
+  `InstFormat` is `{inst_class, inst_category, src_count, dst_count, src_type, dst_type}`, and the
+  declarations read 1 source for VOP1 7/37/39 and VOP3 423, 2 for VOP3 259/260/271/361/196, 3 for
+  VOP3 323/328/344.
+- **A real defect was found while reading those counts.** VOP3 423 `v_log_f32` is a **one-source**
+  row, but the decoder treated every non-three-source VOP3 row as two-source. Because selector 0 is
+  both `v0` and `s0`, that could count an unused SRC1 field as a second scalar source and reject a
+  valid program on the GFX7 read-port rule. `VOP3_UNARY` now exists and covers 423 **and 426**
+  (`v_rcp_f32`, already modelled, misclassified the same way). This is a **latent** correctness fix,
+  not a measured gain: re-running the same sample with `VOP3_UNARY` emptied leaves 410 / 230 / 329
+  unchanged, so no sampled unary row currently carries two distinct scalar selectors in SRC0/SRC1.
+  The shape is still tested both ways — two distinct scalars in SRC0/SRC1 of a unary row decode, and
+  the identical pair on the genuine two-source `v_add_f32` still fails with
+  `multiple distinct scalar sources`.
+- **Refused, not guessed (all still refused after this card):**
+  - VOP3 25/28/212 (`v_cmpx_nge_f32`, `v_cmpx_nle_f32`, `v_cmpx_gt_u32`): the VOP3-encoded `cmpx`
+    family. Real programs put a non-EXEC value in VDST, so the destination contract is not
+    established. Between them they are **23 of the 81** remaining block-mode first blockers.
+  - VOP3 287 `v_mac_f32` (31 blockers): the pinned table declares `src = 2`, but a MAC row reads
+    its destination, so whether the operand set is `{VDST, SRC0, SRC1}` or something else is not
+    settled by the table.
+  - VOP2 32 `v_madmk_f32` (15): mandatory inline literal that the 255-selector literal rule cannot
+    express.
+  - VOP1 43 `v_rcp_iflag_f32` (1): the row exists for the integer-flag mode. The only pinned
+    consumer folds it to plain `V_RCP_F32` (`frontend/translate/vector_alu.cpp`), which is that
+    translator's approximation, not evidence about the flag. Refused rather than folded.
+- **Deferred, not refused:** MIMG 39 `image_sample_lz` (5), MIMG 1 `image_load_mip` (3) and
+  MIMG 8 `image_store` (1). The pinned table gives all of them `src = 4`, `VectorMemory`, so their
+  *operand count* is not the open question — their **address shape** is (LZ takes no derivatives,
+  LOAD_MIP takes a mip coordinate, STORE writes memory). The decoder validates no coordinate count,
+  so naming them now would name rows whose operand shape it does not check. That is the next card.
+- **Also still a first blocker (2 programs):** the decoder's own rule
+  `modifier field set on a compare row`. That is not a missing row; it is a validation rule, and it
+  stays until the modifier semantics on compares are settled.
+
+| Metric (sample 512) | v16 | v17 |
+|---|---:|---:|
+| Sampled members | 512 | 512 |
+| Members: blocked-no-abi-manifest / decode-error / not-a-shader | 69 / 179 / 264 | **70 / 178 / 264** |
+| Program rows attempted | 381 | **410** |
+| Decoded (linear) | 200 | **230** |
+| Decode-error (linear) | 181 | **180** |
+| Block-decodable | 268 | **329** |
+| Block-decodable share | 70.3 % | **80.2 %** |
+| Instructions across decoded programs | 6,828 | **6,933** |
+| Per-lane-eligible decoded programs | 76 / 200 | **77 / 230** |
+| Members split into stages (stage rows) | 14 (28) | **43 (86)** |
+| Branch rows in block mode | 361 | **489** |
+| **Lowered** | **0** | **0** |
+
+- **Linear error composition is unchanged where it matters:** 170 of the 180 remaining linear errors
+  are control transfers (`SOPP 8` 117, `SOPP 4` 48, `SOPP 5` 5) and the other 10 are opcode rows
+  (`VOP3 287` 3, `MIMG 1` 2, `MIMG 39` 2, `MIMG 8` 1, `VOP2 32` 1, `VOP3 212` 1).
+  **Adding table rows can no longer move the linear number much** — 10 programs, all of them inside
+  the refusal list or the deferred image card.
+- **Block-mode first blockers:** `VOP3 287` 30 → **31**, `VOP1 7` 28 → **0**, `VOP2 32` 15 → 15,
+  `VOP3 28` 14 → **17**, `VOP3 328` 6 → **0**. The top five after the card are `VOP3 287` 31,
+  `VOP3 28` 17, `VOP2 32` 15, `VOP3 25` 5 and `MIMG 39` 5; the rest of the list is `MIMG 1` 3,
+  `modifier field set on a compare row` 2, `MIMG 8` 1, `VOP3 212` 1, `VOP1 43` 1. **70 of the 81
+  remaining block-mode blockers are deliberate refusals**, the other 11 are the deferred image card
+  or that validation rule.
+- **Where the measured gain actually came from** — attributed by re-keying every program row on
+  `(member path, code sha256)`, not assumed:
+  - 29 rows present before are **gone**: the whole spans of 29 paired blobs that used to be reported
+    as one undecodable program. The new rows let `split_stages` find a cut point where both halves
+    decode, so those members are now two programs each — **58 new stage rows, all block-decodable and
+    29 of them linear**. This is the container model becoming correct, unlocked by the rows. (Patch
+    harness over the same sample, `local/validation/msl-coverage/whatif_rows.py`: `VOP1 7` alone
+    unlocked 25 of the 29 splits and `VOP3 328` the other 4.)
+  - 352 rows exist both before and after; of those exactly **3 became block-decodable and 1 became
+    linearly decodable**. No shared row regressed.
+  - So of `decoded +30`, **29 are new stage rows and 1 is a row that stopped failing**; of
+    `block-decodable +61`, **58 are new stage rows and 3 stopped failing**. Stated the other way
+    round: the twelve rows themselves moved four program rows, and the rest of the number is the
+    container repair they made possible.
+- **Tests:** `test_gcn_inventory.py` 48 → **50** (positive cases for every added row, a positive and
+  a negative for the unary-source fix, rejections for VOP3 25/28/212 and VOP1 43). Two negative
+  probes had to **move rather than be loosened**, because the rows they probed are now modelled:
+  `vop1(op=7)` → `vop1(op=9)` (`v_mov_fed_b32`) and `vop1(op=37)`/`vop3(op=323)` →
+  `vop1(op=38)` (`v_log_clamp_f32`)/`vop3(op=324)` (`v_cubeid_f32`).
+- **Still zero lowered.** Not one real shader has an ABI manifest; decoding more rows does not
+  create one, and no lowering was attempted or claimed for any row in this card.
+

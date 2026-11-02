@@ -25,7 +25,7 @@ import struct
 import sys
 
 ISA_URL = 'https://docs.amd.com/v/u/en-US/sea-islands-instruction-set-architecture_0'
-VERSION = 'gfx7-bounded-inventory-v16'
+VERSION = 'gfx7-bounded-inventory-v17'
 
 # These are encoding facts, not a translation/semantic implementation.
 # SOP2/SOPC/VOPC rows below are opcode-value facts from the GFX7 ISA tables,
@@ -35,6 +35,10 @@ VERSION = 'gfx7-bounded-inventory-v16'
 # carry no destination or rely on later ISAs. SOPP 5 `s_cbranch_scc1` is a branch for the
 # same reason: a linear span decoder cannot state where control resumes, so control transfer
 # stays out of the table (only s_endpgm/s_waitcnt/s_ttracedata are SOPP rows).
+# Rows the pinned table names but this decoder still REFUSES on purpose (see docs/MSL_OFFLINE.md):
+# VOP3 25/28/212 (the VOP3-encoded `cmpx` forms; their VDST contract is not established),
+# VOP3 287 `v_mac_f32` (accumulator addend not decidable from the table), VOP2 32
+# `v_madmk_f32` (mandatory inline literal) and VOP1 43 `v_rcp_iflag_f32` (integer-flag state).
 OPCODES = {
     'SOP1': {3: 's_mov_b32', 4: 's_mov_b64', 8: 's_not_b64', 10: 's_wqm_b64',
              36: 's_and_saveexec_b64'},
@@ -70,7 +74,8 @@ OPCODES = {
              10: 's_buffer_load_dwordx4', 11: 's_buffer_load_dwordx8',
              12: 's_buffer_load_dwordx16'},
     'VOP1': {1: 'v_mov_b32', 5: 'v_cvt_f32_i32', 6: 'v_cvt_f32_u32',
-             8: 'v_cvt_i32_f32', 11: 'v_cvt_f32_f16', 32: 'v_fract_f32',
+             7: 'v_cvt_u32_f32', 8: 'v_cvt_i32_f32', 11: 'v_cvt_f32_f16',
+             32: 'v_fract_f32', 37: 'v_exp_f32', 39: 'v_log_f32',
              17: 'v_cvt_f32_ubyte0',
              36: 'v_floor_f32', 42: 'v_rcp_f32', 46: 'v_rsq_f32',
              51: 'v_sqrt_f32', 53: 'v_sin_f32', 54: 'v_cos_f32'},
@@ -85,10 +90,12 @@ OPCODES = {
              131: 'v_cmp_le_i32', 132: 'v_cmp_gt_i32', 133: 'v_cmp_ne_i32',
              134: 'v_cmp_ge_i32', 135: 'v_cmp_t_i32',
              6: 'v_cmp_ge_f32', 11: 'v_cmp_ngt_f32', 136: 'v_cmp_class_f32',
-             194: 'v_cmp_eq_u32', 197: 'v_cmp_ne_u32',
-             256: 'v_cndmask_b32', 272: 'v_max_f32', 426: 'v_rcp_f32',
+             194: 'v_cmp_eq_u32', 196: 'v_cmp_gt_u32', 197: 'v_cmp_ne_u32',
+             256: 'v_cndmask_b32', 259: 'v_add_f32', 260: 'v_sub_f32',
+             271: 'v_min_f32', 272: 'v_max_f32', 423: 'v_log_f32', 426: 'v_rcp_f32',
              282: 'v_lshlrev_b32',
-             362: 'v_mul_hi_u32', 363: 'v_mul_lo_i32',
+             323: 'v_mad_u32_u24', 328: 'v_bfe_u32', 344: 'v_med3_i32',
+             361: 'v_mul_lo_u32', 362: 'v_mul_hi_u32', 363: 'v_mul_lo_i32',
              264: 'v_mul_f32', 303: 'v_cvt_pkrtz_f16_f32', 321: 'v_mad_f32',
              322: 'v_mad_i32_i24', 349: 'v_sad_u32', 350: 'v_cvt_pk_u8_f32'},
     'VOPC': {0: 'v_cmp_f_f32', 1: 'v_cmp_lt_f32', 2: 'v_cmp_eq_f32',
@@ -171,21 +178,28 @@ SOP1_64BIT = frozenset((4, 8, 10, 36))
 # pair) instead of a vector register, and the modifier fields must be clear. Names and opcode
 # values come from the pinned PS4 frontend table.
 VOP3_COMPARE = frozenset((1, 3, 4, 6, 11, 128, 129, 130, 131, 132, 133, 134, 135,
-                          136, 194, 197))
+                          136, 194, 196, 197))
 # VOP3-encoded `cmpx` rows are deliberately NOT modelled: real shaders put a non-EXEC value in
-# VDST there, and the destination contract is not established (see docs/MSL_OFFLINE.md).
+# VDST there, and the destination contract is not established (see docs/MSL_OFFLINE.md). This is
+# why VOP3 28 `v_cmpx_nle_f32`, 25 `v_cmpx_nge_f32` and 212 `v_cmpx_gt_u32` stay refused even
+# though the pinned table names them.
 VOP3_EXEC_COMPARE = frozenset()
 # VOPC rows that overwrite EXEC instead of writing the VCC pair (`cmpx`). Everything else in the
 # modelled VOPC set writes VCC, including the integer compares at 192-199.
 VOPC_WRITES_EXEC = (frozenset(range(16, 32)) | frozenset(range(144, 152))
                     | frozenset(range(208, 216)))
 
-# VOP3 rows that read all three source fields; every other modelled VOP3 row reads two.
-VOP3_THREE_SOURCE = frozenset((256, 321, 322, 349, 350))
+# VOP3 source counts are the pinned PS4 table's own `src_count` field (InstFormat in
+# frontend/decode.h is {inst_class, inst_category, src_count, dst_count, src_type, dst_type}):
+# three sources for 256/321/322/323/328/344/349/350, one source for 423/426, two for the rest.
+# A one-source row counted as two would treat its unused SRC1 field as a real operand, and because
+# selector 0 is both v0 and s0 that can invent a second scalar source and reject a valid program.
+VOP3_THREE_SOURCE = frozenset((256, 321, 322, 323, 328, 344, 349, 350))
+VOP3_UNARY = frozenset((423, 426))
 # VOP3 ABS/CLAMP/OMOD/NEG modulate floating-point results only. On an integer row the ISA
 # defines none of them, so a nonzero value is a shape this decoder does not model rather
 # than a fold to guess.
-VOP3_INTEGER = frozenset((256, 322, 349))
+VOP3_INTEGER = frozenset((256, 322, 323, 328, 344, 349, 361))
 # VOP2 integer add writes its carry out to VCC; the VOP2 form has no SDST field to name it.
 VOP2_WRITES_VCC = frozenset((37, 38))
 # VOP2 rows whose mask operand is implicit: only `v_cndmask_b32`, which selects with VCC.
@@ -389,7 +403,12 @@ def _validate(form: str, op: int, f: dict[str, int], at: int) -> tuple[str, ...]
             if f[name] in (106, 107, 251):
                 requirements.add('reads_vcc_mask')
         if form == 'VOP3':
-            used = names if op in VOP3_THREE_SOURCE else names[:2]
+            if op in VOP3_UNARY:
+                used = names[:1]
+            elif op in VOP3_THREE_SOURCE:
+                used = names
+            else:
+                used = names[:2]
             if op == 256:
                 mask = f['src2']
                 require(mask < 104 or mask in (106, 107, 126, 127),

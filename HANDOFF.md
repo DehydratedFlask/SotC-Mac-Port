@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 21:20 CDT (gpu-msl worker, integrated by root) — MSL decoder v17: block-decodable 268 → 329 (STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01`. Twelve VOP rows added, each read from `reference/shadPS4/src/shader_recompiler/frontend/format.cpp` bounded by the next `InstructionFormat…` declaration and cross-checked against `opcodes.h`: VOP1 7 `v_cvt_u32_f32`, 37 `v_exp_f32`, 39 `v_log_f32`; VOP3 259 `v_add_f32`, 260 `v_sub_f32`, 271 `v_min_f32`, 423 `v_log_f32`, 323 `v_mad_u32_u24`, 328 `v_bfe_u32`, 344 `v_med3_i32`, 361 `v_mul_lo_u32`, 196 `v_cmp_gt_u32`.
+- **Measured at sample 512** (same index list, decoder hash recorded in both runs): programs 381 → **410**; linear decoded 200 → **230**; decode-error 181 → **180**; block-decodable 268 → **329** (70.3 % → 80.2 %); per-lane 76/200 → 77/230; instructions 6,828 → 6,933; members split into stages 14 → **43**.
+- **Honest attribution, not just a headline number:** of `decoded +30`, 29 are new stage rows unlocked by 29 newly-split paired blobs and 1 shared row stopped failing; of `block-decodable +59`, 58 are new stage rows and 3 shared rows. **The twelve rows themselves moved 4 program rows** — most of the gain is the paired-blob split they enabled (`VOP1 7` alone unlocked 25 splits, `VOP3 328` the other 4).
+- **A latent defect found while reading `src_count`:** VOP3 423 is one-source but the decoder treated every non-three-source VOP3 row as two-source, which could invent a second scalar source and hit the GFX7 read-port rule. New `VOP3_UNARY` covers 423 and 426. Measured honestly: removing it changes nothing on this sample, so it is a latent fix, not a gain.
+- **Block-mode top-5 after:** `VOP3 287` 31, `VOP3 28` 17, `VOP2 32` 15, `VOP3 25` 5, `MIMG 39` 5. **70 of the 81 remaining blockers are deliberate refusals** (compare-modifier VDST contract, `v_mac_f32` operand set, `v_madmk_f32` literal, `v_rcp_iflag_f32` flag state); the other 11 are MIMG 39/1/8, deferred pending an address-shape model.
+- **Verification (PASSED):** `test_gcn_inventory` 50/50, `test_gcn_to_msl` 24/24, `python3 -m unittest discover -s tools/dev` 99/99, coverage self-test 23, blocks self-test 26, `audit_publish_paths.py --all` OK. Full lift sweep **718 passed / 0 failed**.
+- **Still 0 lowered** — the per-shader ABI manifest blocker is unchanged. **Next exact action:** MIMG 39/1/8 need a coordinate-count model before they can be admitted.
+
 ## 2026-11-01 20:45 CDT (root) — slot 309 is a data-only edge; both save-data jump tables decode fully (STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `CPU-01-SLOT309-SAVE-DISPATCH-JUMPTABLES-01`, which had been `PARTIAL` under the E911 stop since E1052 because no call-graph order to the slot-309 initializer `0xa505e0` could be found. **E1056 answers why: there is no code edge, and there never was one to find.**
