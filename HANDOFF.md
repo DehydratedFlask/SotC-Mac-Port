@@ -1,5 +1,64 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 03:20 CDT (root) — SESSION HANDOFF for the next agent
+
+**State: green and pushed.** `main` at `44f2a310`. Configure 0, build 0, **CTest 532/532**, lift checkers **728 passed / 0 failed** (last full chunked sweep; count is now higher by the lanes added since — re-run for the current number), entry map **1,598 constants → 1,080 RVAs / 405 headers**, path audit OK.
+
+### What this session moved
+
+| Area | Before | After |
+|---|---|---|
+| Startup coverage | 449/573, cliff **309** | **451/573, cliff 314** |
+| Indirect frontier | 47 sites / 22 targets | **91 sites / 37 targets**, 41 site-provable / 50 table-level |
+| MSL decoder | 200/381 linear, 268 block | **230/410 linear, 329 block** |
+| Audio | byte profiles only | SXD/SShd containers **specified**, `.hd`/`.bd` proven **SPU ADPCM**; `SXD2` codec still UNKNOWN |
+| Ghidra | timed out, unusable | **working headless pipeline** + reproducible dossier |
+| Board | 16 PARTIAL / 4 BLOCKED | **5 PARTIAL / 1 BLOCKED** |
+
+### The five findings that matter most
+
+1. **Slot 309 and 312 have no callers — they are table rows.** `0xa505e0` and `0xa46130` each have zero direct near calls/jmps anywhere in the image and exactly one relocation pointing at them: a type-8 row in the 573-entry table at `0x2dd70e0` indexed **backwards** (`entry i = 0x2dd70e0 - 8*i`). Every earlier attempt to trace a "call order" to them was chasing something that does not exist. `tools/lift/check_startup_slot309_table.py` pins this.
+2. **Only 41 of the 91 frontier rows are provable from the call site.** The rest have table-level evidence only (slot qword + type-8 RELA addend + FDE start). The tool's register fallback scanned *past* the nearest definition, so a site could inherit an older RIP load. All 91 rows now say which grade they are. **Table-level rows must not drive native dispatch.**
+3. **E828's "malformed CXML" was a header-offset bug.** `shadow_sounds.cxml` is a 3-byte minimal base-128 varint length (`83 db 15` = 355,715 = 355,718 − 3) followed by valid UTF-8 XML. No DOCTYPE exists. The varint envelope is proven for that member only.
+4. **`0xa4bddb` was never a procedure** — it is a call inside `0xa4ab90` at `+0x124b`, which is why every provider said "no procedure exists". Ghidra had a coverage hole there, not a missing function.
+5. **The `.hd`/`.bd` sound banks are PSX/PS2 SPU ADPCM** (1,620,083 frames, 100 % framing acceptance, correlation 0.99861 vs FFmpeg `adpcm_psx` — recorded as PARTIAL sample-exactness, not bit-exact). The `SXD2` stream codec is **not** SPU ADPCM and is still unknown.
+
+### Verification commands (run these first)
+
+```sh
+cmake -S native -B local/build/orch-r22
+cmake --build local/build/orch-r22 -j 12
+ctest --test-dir local/build/orch-r22 -j 12          # expect 532/532
+SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh
+python3 -I scripts/audit_publish_paths.py --all
+python3 scripts/project_index.py
+```
+
+The single-sweep checker driver gets killed under concurrent load; run it in chunks (`check_[a-m]*` then `check_[n-z]*`) if it dies.
+
+### Open work, in priority order
+
+1. **Startup slot 314** (`0xa41810`, 4,328 B) is now the cliff. It is characterized (`STATIC_ANALYSIS_VERIFIED`, 779 instructions / 84 direct calls / 8 unresolved indirect) but not modelled. This is the single biggest boot-path gain available.
+2. **`0x2569d0`'s property records** — the Ghidra dossier has it (1,589 C lines). `AGENTS.md` notes the exact RB nodes/fixups and trees 0/1 remain contracts.
+3. **MSL is still 0 lowered.** The blocker is a per-shader ABI manifest (scalar bases s0/s2/s8/s9, descriptors s20/s24/s28, export targets 12/32). No mapping can be invented — it needs a state trace from a running game or owner-supplied bindings. This is the largest single blocker on the graphics path.
+4. **`SXD2` codec** — the next step is *not* another decode attempt; it is tracing the `$/sound/shadow/music.sxd1` consumer at `0x6b1d84` and the `Unknown wave type (%d)` branch to map the `WAVE` type field to a codec.
+5. **`CPU-01-INIT-21620-LOOKUP-01`** (last `BLOCKED`) — a worker is evaluating whether its five stop rules still hold now that `0x3b390` is pinned as `jmp scePthreadMutexLock`.
+6. **Honestly blocked, not actionable:** `APP-01-NOTARIZED-DMG-01` (needs a Developer ID Application identity + `notarytool` profile — only Apple Development/Distribution are installed).
+
+### Traps this session hit, so the next agent does not
+
+- **`starts[-1]` on a list of case blocks is not the highest address** — case blocks are not laid out in case order. Use `max(starts)`.
+- **A forward "base" for a backwards-indexed table can land on the right entry by coincidence.** `0x2dd5d90 = 0x2dd70e0 - 618*8` reaches entry 309 only because 618 = 2×309, and it mislabels every neighbour by six. Use the documented `0x2dd70e0 - 8*i` form.
+- **`cp` restore preserves mtime and can skip a rebuild** — `touch` and confirm the binary changed.
+- **A caller's short "reply with just…" question can make a worker abandon its deliverable.** Ask for a status *and* tell it to continue.
+- **Editing a two-parameter helper with three arguments fails silently in a heredoc** — one commit went out carrying its checker but not the task rows its message described; fixed forward, never rewritten.
+- **Workers mid-edit make the shared tree intermittently red.** If a build fails in a file a worker touched in the last few minutes, wait and retry before "fixing" it. Two real defects were found this way (`critsec_init_at` rejecting any non-zero cell; an orphaned `}  // namespace` after the `namespace {` opener was deleted).
+- **ASan caught two real bugs** that would otherwise have shipped (a 32-byte store past a 0x48 record; a destroy-after-free in the 499f80 fixture).
+
+### Working agreement still in force
+
+`AGENTS.md` is authoritative. No Rosetta/Wine/QEMU/guest-CPU/JIT/Vulkan. No commit of game files, `local/`, `reference/`, `logs/`. Every claim labelled. No boot/audio/save claim without real-game demonstration. Workers do not commit; the integrator does.
+
 ## 2026-11-02 01:15 CDT (root) — three more lanes closed; startup slot 309 registered (450/573)
 
 - **Startup slot 309 is now REGISTERED**, which is the first movement of the startup cliff this session: coverage **449 → 450 of 573**, first gap **309/`0xa505e0` → 312/`0xa46130`**, remaining **124 → 123**. The precondition recorded in my previous checkpoint was the three console-variable constructors; they are now covered.
