@@ -72,6 +72,8 @@ LOWERED_ARITHMETIC = frozenset(('v_mov_b32', 'v_sub_f32', 'v_mul_f32', 'v_mac_f3
 BINDING_WIDTH = {'pointer': 2, 'descriptor': 4, 'float4': 4, 'float': 1,
                  'vertex_index': 1, 'interpolation_control': 1}
 BINDING_KINDS = tuple(BINDING_WIDTH)
+# `Lowerer.__init__` requires exactly one cell per `initial_vector` entry.
+SINGLE_CELL_KINDS = ('float', 'vertex_index', 'interpolation_control')
 VIEW_BINDING_KINDS = ('pointer', 'descriptor', 'float4', 'float')
 MANIFEST_KEYS = ('schema', 'shader', 'provenance', 'scalar_bases', 'buffer_descriptors',
                  'exports', 'initial_scalars', 'initial_vectors', 'views', 'policy')
@@ -430,8 +432,8 @@ def skeleton(analysis: dict, identity: str | None = None,
         'views': {},
         'policy': {},
     }
-    if 'floating_point' in [p['name'] for p in holes['policy']] or True:
-        document['policy']['floating_point'] = FLOATING_POINT_PROFILES[0]
+    # `gcn_to_msl.generate()` admits exactly one floating-point profile, so it is a constant here.
+    document['policy']['floating_point'] = FLOATING_POINT_PROFILES[0]
     for entry in holes['policy']:
         if entry['name'] == 'interpolation':
             document['policy']['interpolation'] = entry['value']
@@ -495,7 +497,7 @@ def _check_document(manifest) -> list[dict]:
     for section, kinds in (('scalar_bases', ('pointer', 'descriptor')),
                            ('buffer_descriptors', ('descriptor',)),
                            ('initial_scalars', BINDING_KINDS),
-                           ('initial_vectors', BINDING_KINDS)):
+                           ('initial_vectors', SINGLE_CELL_KINDS)):
         value = manifest.get(section, {})
         if not require(isinstance(value, dict), section, None,
                        f'"{section}" must be an object'):
@@ -675,13 +677,18 @@ def _check_holes(manifest: dict, holes: dict) -> list[dict]:
                 continue
             if bound[slot] is None:
                 continue  # already reported by _check_document as unfilled-slot
-            problems.extend(_check_kind(name, label, prefix, entry, bound[slot], sites,
-                                        problems))
+            problems.extend(_check_kind(name, label, prefix, entry, bound[slot], sites))
         for extra in sorted(set(bound) - supplied[name], key=int):
             problems.append(_problem(
                 f'unused-{label.replace("_", "-")}', f'{prefix}{extra}',
                 f'{label} {prefix}{extra} is bound but this program never uses it'))
     policy = manifest.get('policy') or {}
+    needed = {entry['name'] for entry in holes['policy']}
+    for name in ('interpolation', 'vertex_select', 'vertex_mov_subtract_p10'):
+        if name in policy and name not in needed:
+            problems.append(_problem(
+                'unused-policy', f'policy.{name}',
+                f'policy.{name} is declared but this program needs no such knob'))
     for entry in holes['policy']:
         if entry['name'] == 'interpolation':
             if policy.get('interpolation') != entry['value']:
@@ -702,7 +709,7 @@ def _check_holes(manifest: dict, holes: dict) -> list[dict]:
 
 
 def _check_kind(section: str, label: str, prefix: str, entry: dict, binding: dict,
-                sites: str, _problems) -> list[dict]:
+                sites: str) -> list[dict]:
     """Per-section semantic checks on one filled binding."""
     problems: list[dict] = []
     where = f'{label} {prefix}{entry.get("slot", entry.get("target"))}'
@@ -965,16 +972,16 @@ def census(archives: list[Path], sample: int, top: int, out: Path,
                 label = cov.STAGE_BY_TYPE.get(blob['type'])
                 for span in spans:
                     rows += 1
-                    if label not in STAGES:
-                        counters['other-stage'] += 1
-                        continue
                     try:
-                        analysis = analyze(span, label)
+                        analysis = analyze(span, label if label in STAGES else None)
                     except AbiError:
                         counters['not-linear'] += 1
                         continue
                     if not analysis['per_lane_eligible']:
                         counters['per-lane-blocked'] += 1
+                        continue
+                    if label not in STAGES:
+                        counters['other-stage'] += 1
                         continue
                     counters['per-lane-eligible'] += 1
                     analysis.update({'archive': path.name, 'path': name,
@@ -1027,6 +1034,16 @@ def census(archives: list[Path], sample: int, top: int, out: Path,
     return document, path_out
 
 
+def _distribution(values: list[int]) -> dict:
+    if not values:
+        return {'count': 0, 'min': None, 'median': None, 'max': None}
+    ordered = sorted(values)
+    middle = len(ordered) // 2
+    median = (ordered[middle] if len(ordered) % 2
+              else (ordered[middle - 1] + ordered[middle]) / 2)
+    return {'count': len(ordered), 'min': ordered[0], 'median': median, 'max': ordered[-1]}
+
+
 def _aggregate(rows: list[dict], label: str) -> dict:
     bases = Counter()
     descriptors = Counter()
@@ -1063,6 +1080,8 @@ def _aggregate(rows: list[dict], label: str) -> dict:
         'shaders': len(rows),
         'manifest_only_shaders': manifest_only,
         'shape_blocked_shaders': len(rows) - manifest_only,
+        'code_bytes': _distribution([row['bytes'] for row in rows]),
+        'instructions': _distribution([row['instructions'] for row in rows]),
         'distinct_scalar_base_slots': len(bases),
         'distinct_buffer_descriptor_slots': len(descriptors),
         'distinct_export_targets': len(targets),
@@ -1238,6 +1257,8 @@ def _self_test() -> int:
     check('projection digest', abi['sha256'] == analysis['sha256'])
     check('projection keeps vector kind', abi['initial_vector']['0'] == {'kind': 'vertex_index'})
 
+    _DROP = object()
+
     def mutated(**changes) -> dict:
         document = json.loads(json.dumps(filled))
         for key, value in changes.items():
@@ -1246,8 +1267,6 @@ def _self_test() -> int:
             else:
                 document[key] = value
         return document
-
-    _DROP = object()
 
     # Missing scalar base: precise slot and site.
     missing_base = validate(mutated(scalar_bases={'0': {'kind': 'pointer', 'view': 'root'}}),
@@ -1336,6 +1355,10 @@ def _self_test() -> int:
                             '12': {'kind': 'float', 'field': 'camera', 'component': 'z'}}}),
               analysis)))
     check('missing view', 'missing-view' in codes(validate(mutated(views={}), analysis)))
+    check('unused policy knob',
+          'unused-policy' in codes(validate(mutated(
+              policy={'floating_point': FLOATING_POINT_PROFILES[0],
+                      'interpolation': 'supplied_vertex_values'}), analysis)))
 
     # Shape blockers: a manifest cannot fix an unsupported row, so validation fails closed.
     additive = program(vop1(1, src0=260, vdst=8),
@@ -1455,14 +1478,31 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.program is None:
             parser.error('pass --self-test, --census, or --program')
-        analysis = analyze(args.program.read_bytes(), args.stage)
+        manifest = None
+        stage = args.stage
         if args.manifest is not None:
             manifest = json.loads(args.manifest.read_text())
+            declared = (manifest.get('shader') or {}).get('stage') if isinstance(
+                manifest, dict) else None
+            if stage is None and declared in STAGES:
+                # A manifest names its own stage; --stage only has to agree when both are given.
+                stage = declared
+        analysis = analyze(args.program.read_bytes(), stage)
+        if manifest is not None:
             problems = validate(manifest, analysis)
-            for problem in problems:
+            shape = [p for p in problems if p['code'] == 'shape-blocker']
+            binding = [p for p in problems if p['code'] != 'shape-blocker']
+            for problem in binding:
                 print(f'FAILED: {problem["slot"]}: {problem["message"]}', file=sys.stderr)
-            if problems:
-                print(f'FAILED: {len(problems)} manifest problem(s); nothing was lowered',
+            for problem in shape:
+                print(f'BLOCKED: {problem["slot"]}: {problem["message"]}', file=sys.stderr)
+            if binding:
+                print(f'FAILED: {len(binding)} unfilled/incorrect binding(s); nothing was '
+                      f'lowered', file=sys.stderr)
+                return 1
+            if shape:
+                print(f'BLOCKED: manifest covers every hole of {analysis["sha256"][:16]}... but '
+                      f'{len(shape)} lowering-shape blocker(s) remain; nothing was lowered',
                       file=sys.stderr)
                 return 1
             print(f'PASSED manifest check: {args.manifest.name} covers '

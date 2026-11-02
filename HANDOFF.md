@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 22:10 CST (orchestrator c1982b) — wave 1 integrated; slot 329 claimed
+
+- **Workers returned (none committed):** ConCmd `0x210b0` model made faithful (no overfit; 225 mutants); ATRAC9 config word = WAVE-record field `0x0A` (E1076); `FUN_001aa2a0` single caller `0x147257`, 3-bit tag dispatch (E1075/E1078, `check_csdr_oodle_dispatch.py`); **`FUN_00b0cc50` is only the file-name callback, compressed `.csdr` member layout pinned on 19,320/19,320 (E1080, `check_csdr_b0cc50_container.py`)**; slots 316 and 326 registered (coverage 454/573, cliff **329 / `0x829e90`**, 119 remain).
+- **Decode is still NOT RUN** for both csdr (Oodle Mermaid/Kraken) and ATRAC9; E1077 shows the ATRAC9 transform is not in the image. Both need a native decoder: an owner decision on clean-room vs. vendoring (licensing) is pending.
+- **Stale docs fixed:** `docs/CSDR_COMPRESSED.md` carries a supersession banner. `local/re/csdr_trailer_probe.py` still has the old tag `0x0000000134534452` (private, unpublished).
+- **Claim:** `CPU-01-STARTUP-SLOT-329` (`0x829e90`, 4,082 B, helper pair `0x8298d0`/`0x829b30`) is claimed by the orchestrator's next worker. A peer integrator also commits to `main`; check `git log` before starting.
+
 ## 2026-11-02 — COMPLETE HANDOFF (orchestration session end)
 
 **State: `main` at `55ca6d17`, build exit 0, CTest 535/535, path audit OK.** One file is uncommitted and is a worker's in-flight edit (`native/core/concmd_manager_210b0.cpp`); its checker currently fails, so treat that lane as unfinished rather than done.
