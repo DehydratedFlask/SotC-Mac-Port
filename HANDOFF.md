@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 23:10 CDT (root) — audio: containers specified, SPU ADPCM banks proven, stream codec still UNKNOWN
+
+- **Task:** new `AUD-01-AUDIO-FORMAT-01`. This is the first audio work that produces a *codec* result rather than a byte profile.
+- **Container grammars are specified from bytes *and* from the pinned executable's own parser**, not guessed: `SXDF` (`*.sxd`, `*.sxd1`) and `SXDS` (`*.sxd2`), including the chunk grammar and the `WAVE` records that declare stream segments. Five files were censused; the `WAVE` tiling is exact only for `music.sxd1`.
+- **The `.hd`/`.bd` sound-effect banks are PSX/PS2 SPU ADPCM — proven, not assumed:** 1,620,083 frames; the 4-bit header nibbles follow the real ADPCM distribution (0: 49,910, 1: 162,339, 2: 911,961, 3: 164,493, 4: 331,380) which random or non-ADPCM bytes do not; the 16-byte SPU framing rule (`shift ≤ 12`, `filter ≤ 4`) is accepted by **100 %** of `.bd` frames; and an independent decode matches FFmpeg `adpcm_psx` at **correlation 0.99861**. That last number is why the claim is `PARTIAL` for sample-exactness rather than bit-exact — recorded that way on purpose.
+- **The streamed music codec stays UNKNOWN, and that is the honest result:** 45 decompression probes and one MP3 chain test failed, and the SPU/VAG framing test *rejects* `SXD2` — only **24.55 %** of aligned frames pass the rule while uniform random bytes give 25.39 % and real `.bd` gives 100 %. So `SXD2` is not SPU ADPCM, not byte-aligned PCM, and not an uncompressed container.
+- **ATRAC9 is a candidate but deliberately not attempted:** the executable is Sony `sndx` middleware, but the title imports **no** `libSceAudiocodec` / `libSceAjm` / ATRAC symbol, so claiming it would be a guess. The recorded next measurement is to find the *consumer* (which resource path is fed which codec selector), not to try another codec.
+- **New fail-closed reader** `tools/dev/se_bank_inspect.py` with 13 self-test checks; it rejects short headers, bad body sizes, bad frame filters and shifts, and ragged bodies.
+- **Verification:** self-test 13/13; path audit OK; committed as `1f89dea7` and `a1124de6`.
+- **Not claimed:** no decoded game audio, no playback, no G2 pass. `docs/AUDIO_FORMAT.md` says so in its own status line.
+
 ## 2026-11-01 22:30 CDT (root, integrating five workers) — frontier 74/33, slot 309 modelled unregistered, 27 grounded PM4 opcodes, Ghidra dossier, save load-dispatch resolved
 
 Five parallel workers landed in this window. Everything below is integrated in one commit because the shared `native/CMakeLists.txt` carries all three native slices and the generated `docs/entry_map.json` is consumed by the checkers; splitting them would leave intermediate commits red.
