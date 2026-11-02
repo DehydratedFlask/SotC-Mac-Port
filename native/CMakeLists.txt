@@ -2822,3 +2822,30 @@ target_sources(sotc_core PRIVATE core/concmd_manager_210b0.cpp)
 add_executable(test_concmd_manager_210b0 tests/test_concmd_manager_210b0.cpp)
 target_link_libraries(test_concmd_manager_210b0 sotc_core)
 add_test(NAME concmd_manager_210b0 COMMAND test_concmd_manager_210b0)
+
+# CPU-01-STARTUP-BATCH-DEBUG-PAGE-01: one parameterised model for the smallest uniform cluster of
+# debug-page startup constructors (slots 361 / 467 / 379 / 536). The four bodies are byte-for-byte the
+# same statement sequence (one or two bounded-float console variables through 0xc300, plus optionally one
+# 0x27050 slider or 0x26ea0 toggle item), so core/debug_page_var_item carries the sequence and each
+# ctor_slot_<N>_<rva>.hpp carries only the per-slot DATA. See core/debug_page_var_item.hpp.
+target_sources(sotc_core PRIVATE core/debug_page_var_item.cpp)
+
+target_sources(sotc_core PRIVATE core/ctor_slot_361_777390.cpp)
+add_executable(test_ctor_slot_361 tests/test_ctor_slot_361.cpp)
+target_link_libraries(test_ctor_slot_361 sotc_core)
+add_test(NAME ctor_slot_361 COMMAND test_ctor_slot_361)
+
+target_sources(sotc_core PRIVATE core/ctor_slot_467_3ca110.cpp)
+add_executable(test_ctor_slot_467 tests/test_ctor_slot_467.cpp)
+target_link_libraries(test_ctor_slot_467 sotc_core)
+add_test(NAME ctor_slot_467 COMMAND test_ctor_slot_467)
+
+target_sources(sotc_core PRIVATE core/ctor_slot_379_6d8d20.cpp)
+add_executable(test_ctor_slot_379 tests/test_ctor_slot_379.cpp)
+target_link_libraries(test_ctor_slot_379 sotc_core)
+add_test(NAME ctor_slot_379 COMMAND test_ctor_slot_379)
+
+target_sources(sotc_core PRIVATE core/ctor_slot_536_1342d0.cpp)
+add_executable(test_ctor_slot_536 tests/test_ctor_slot_536.cpp)
+target_link_libraries(test_ctor_slot_536 sotc_core)
+add_test(NAME ctor_slot_536 COMMAND test_ctor_slot_536)

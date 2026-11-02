@@ -1,8 +1,10 @@
 # Offline MSL archive step (GPU-01 prep, offline only)
 
 Status: tool behaviour **FIXTURE_VERIFIED** on two synthetic MSL shaders on this machine; the real
-corpus front end is measured below (**STATIC_ANALYSIS_VERIFIED**, zero shaders lowered); no real
-`.csdr` compiled, no pipeline state object, **G3 NOT RUN**.
+corpus front end is measured below (**STATIC_ANALYSIS_VERIFIED**). The last section measures the
+lowering: **71 of the 77** per-lane-eligible programs in the sample-512 population lower to MSL and
+all 71 compile offline, with placeholder or empty bindings — no pipeline state object, no render,
+no runtime path, **G3 NOT RUN**.
 
 ## Where this sits
 
@@ -808,3 +810,170 @@ the decoder's own strings only — no payload bytes, no listings). Two consecuti
 version produced byte-identical JSON, and the file records that tool version's own SHA-256, so the
 numbers above are reproducible from the same inputs. Census **STATIC_ANALYSIS_VERIFIED**, self-test
 **FIXTURE_VERIFIED**; **0 lowered**, nothing compiled, no pipeline state, **G3 NOT RUN**.
+
+## Lowering shape: the export model, the row set, and two-level addressing (2026-11-01)
+
+Task `GPU-01-MSL-OFFLINE-01`. The section above measured **0 of 77** per-lane-eligible programs
+manifest-only: the ABI holes were tiny, but every program was also blocked by the *lowering's* shape.
+This card built the three missing rules and re-measured on the same deterministic sample-512
+population. **71 of the 77 now lower to MSL, and all 71 of those compile** with
+`xcrun -sdk macosx metal` (`Apple metal version 32023.922`, `air64-apple-darwin27.0.0`).
+
+```sh
+python3 -I tools/dev/msl_abi_manifest.py --self-test     # 99 checks, synthetic spans only
+python3 -I tools/dev/msl_lower_ladder.py --self-test     # 6 checks, synthetic spans only
+python3 -I tools/dev/msl_lower_ladder.py --sample 512 \
+    --out local/validation/msl-shape-ladder/step3 --compile
+```
+
+### 1. The export model: a sink indexed by target (`export_sink: 'target-array'`)
+
+The old contract was `required = {12,32,33} if vs else {0}`, compared for equality: a closed
+synthetic harness profile, not a shader fact. What the encoding actually states, from the pinned
+translator (`frontend/translate/export.cpp`) and the pinned attribute table (`ir/attribute.h`):
+
+- `en` is a **component enable mask**; component `j` is fed by `vsrc<j>`, and a component whose bit
+  is clear is not written by that row.
+- The compressed form packs two fp16 components per payload dword: `en & 1` exports R,G from
+  `vsrc0`, `en >> 2 & 1` exports B,A from `vsrc1`, and the pinned translator asserts it for render
+  targets and depth only.
+- `en == 0` and the **Null** target (9) export nothing.
+- `vm` is the **valid mask** (it writes EXEC); `done` marks "last export" but retail vertices put
+  `done = 1` on the position export and then write `param0` with `done = 0`, so `done` is recorded
+  and never used as an ordering contract.
+- Targets: 0–7 MRT, 8 depth, 9 null, 12–15 clip positions, 32–63 params.
+
+Implemented in `gcn_to_msl.Lowerer`: a target-indexed sink `StageExports { rt[8]; depth[1];
+pos[4]; param[32]; }` (45 `float4` per lane) with **one write per enabled component**, and
+`generate_stage()` for a single real stage plus a compute kernel that copies the sink into a
+target-indexed output array. The `named` sink (the old `{12,32,33}`/`{0}` harness) is unchanged and
+still used by the pinned pair/logo profiles.
+
+- **Measured:** `export-contract` 77 → **0**; `export-shape` 69 → **0**. The 69 affected programs are
+  32-byte pixel shaders whose only `EXP` is `target 9, en = 0, compr = 0, done = 1, vm = 1` — a null
+  export with the valid mask, which after this model needs **no binding at all**.
+- **Refusals kept, and one that is modelled rather than refused:** a valid-mask export on a *vertex*
+  stage is refused (the pinned translator only discards for Fragment); a compressed export outside a
+  render-target/depth target is refused (the pinned `ASSERT_MSG`). `vm` **with** components is
+  modelled: it writes EXEC, a per-lane-eligible program cannot write EXEC (the decoder gates every
+  `writes_exec_mask` row out), so EXEC is exactly the covered-lane set the harness evaluates and the
+  write is the identity on every lane it visits. The wave-level effect on *uncovered* lanes is
+  stated as outside this bounded model and is recorded per program as `valid_mask_exports`.
+- **Not claimed:** that a target-array sink is what Metal should receive. It is the faithful
+  *export* model, not a raster pipeline; there is no render pipeline state object anywhere here.
+
+### 2. The row set (`unsupported-row` 37 → 0)
+
+Ten ordinary rows, each value read from `reference/shadPS4/src/shader_recompiler/frontend/format.cpp`
+bounded by the next `InstructionFormat…` declaration and each semantic read from the same clone's
+`frontend/translate/vector_alu.cpp`:
+
+| Row | Encoding / opcode | Definition used |
+|---|---|---|
+| `v_and_b32` | VOP2 27 | `a & b` |
+| `v_add_i32` / `v_sub_i32` | VOP2 37 / 38 | `a + b`, `a - b`; the VCC carry is not emitted because no lowerable program can read VCC |
+| `v_lshlrev_b32` / `v_lshrrev_b32` | VOP2 26 / 22 (VOP3 282 for shl) | `value << (amount & 31)`, `value >> (amount & 31)` with **`src0` the amount and `vsrc1` the value** — the REV convention, taken from the pinned translator, not from the mnemonic |
+| `v_mad_u32_u24` | VOP3 323 | `(a & 0xffffff) * (b & 0xffffff) + c` |
+| `v_sad_u32` | VOP3 349 | `max(a,b) - min(a,b) + c` (unsigned) |
+| `v_cvt_f32_i32` | VOP1 5 | `float(as_type<int>(x))` |
+| `v_cvt_f32_f16` | VOP1 11 | `half_float(x & 65535u)` |
+| `v_add_f32` | VOP2 3 / VOP3 259 | `add32(a, b)` (symmetry with `v_sub_f32`; no sampled program needs it) |
+
+Integer rows carry a `uint` cell holding the **bit pattern**, so a later float row reading one is an
+`as_type<float>` reinterpretation — which is also how the inline-constant file behaves. A structural
+tie now exists between the two tools: `gcn_to_msl.ARITHMETIC_ROWS` is the table
+`Lowerer.arithmetic()` enforces, and `msl_abi_manifest`'s `LOWERED_ARITHMETIC` is checked against it
+by the manifest self-test, so the two cannot drift apart silently.
+
+**Still refused** (decodable, named, and deliberately without a lowering row): `v_sin_f32`,
+`v_cos_f32`, `v_fract_f32`, `v_exp_f32`, `v_log_f32`, `v_floor_f32`, `v_sqrt_f32`, `v_rcp_f32`, and
+every VOP3-encoded `cmpx` (25/28/212), `v_mac_f32` (287), `v_madmk_f32` (VOP2 32) and
+`v_rcp_iflag_f32` (43) — unchanged from the previous card, with a test that they still raise.
+
+### 3. Two-level addressing: the *lowering* already accepted it, the *analysis* did not
+
+The previous section asked whether the lowering can take a memory-resident descriptor. It can, and
+it always could: `views[parent][dword] = {"kind": "descriptor", "view": W}` produces exactly the four
+cells that `s_load_dwordx4 s[20:23], [s16+4]` stores into `s20..23`, and the next `MUBUF` then
+resolves `pair(20, 'descriptor')` to `W`. `tools/dev/test_gcn_to_msl.py` now lowers such a program end
+to end. The gap was the **analysis**: `_Analysis` called any slot that a load had written a shape
+blocker (`derived-base`/`derived-descriptor`), and the validator refused a binding for it.
+
+Implemented:
+
+- A per-slot **producer classification** (`_producer`), because retail shaders re-use SGPR numbers:
+  - `direct` — every read happens at or before the slot's first write (the overwrite's result is
+    not read), so the manifest binds the slot;
+  - `resident` — every read happens after the **same single** `SMRD` load, so the manifest declares
+    the memory that load reads;
+  - `multiple-incarnations` / `opaque` — everything else (see the boundaries below).
+- A new hole section `resident_slots` carrying the measured `via` slot, parent dword offset and
+  width. The manifest expresses one as `{"kind": …, "via": "<slot>", "offset": N, "view": …}` in
+  `scalar_bases` or `buffer_descriptors`; `to_lowerer_stage_abi()` materialises the implied
+  `pointer`/`descriptor` cell in the parent view, and `_check_views` counts those implied cells as
+  dword coverage. New diagnostics: `wrong-producer` (the manifest names a different `via`/`offset`
+  than the encoding), `unresolved-resident-parent`, `resident-cell-conflict`.
+- **Measured:** `derived-base` 26 → 0 and `derived-descriptor` 14 → 0 as *blockers*; they are holes
+  now. Three programs additionally hit `resident-kind-conflict` (below), which is why the count of
+  newly lowerable programs is 1 rather than 4.
+
+### The ladder
+
+Same 512 members, same 410 program rows, same 77 per-lane-eligible programs as the v17 and E1081
+censuses (the ladder tool reproduces those counters exactly: 264 container-rejected members,
+410 = 180 not-linear + 153 per-lane-blocked + 77 analysed).
+
+| Step | Rule added | No longer shape-blocked | Actually lowered | Compiled |
+|---|---|---:|---:|---:|
+| 0 | E1081 baseline | 0 / 77 | 0 | — |
+| 1 | target-indexed export sink | **69 / 77** | 69 | — |
+| 2 | + the ten arithmetic rows | **70 / 77** | 70 | — |
+| 3 | + memory-resident cells | **71 / 77** | **71** | **71 / 71** |
+| — | blocked | 6 | 6 | — |
+
+Steps 1–2 are counted from the baseline's own per-program blocker list: a program becomes
+manifest-only when its remaining kinds are gone, and neither step can add a blocker. Step 3 is a
+*measured* run (`local/validation/msl-shape-ladder/step3/ladder.json`). A counterfactual "derived-*
+removed and nothing else changed" would be 74; the difference is exactly the two new boundaries
+below, which are more precise statements about programs the old taxonomy called `derived-*`.
+
+Of the 71 lowered, **69 fill zero bindings** — they are the 32-byte null-export pixel shaders, whose
+manifest is genuinely empty. The other two are `vs_main_5228ca40` (92 B, 18 instructions, 3
+placeholder bindings) and `standard_3883884949` (264 B, 55 instructions, 11 placeholder bindings).
+The placeholder bindings come from `msl_abi_manifest.synthetic_fill()`, which exists to prove the
+form closes; **a placeholder binding is not an ABI claim** and the generated MSL for those two
+shaders renders nothing meaningful.
+
+### What still blocks, and why
+
+| Kind | Programs | What it is |
+|---|---:|---|
+| `stream-shape` | 3 | Three sub-cases, all of them "the fetch address is draw state": a **nonzero `MUBUF` immediate offset**, a **raw `buffer_load_dword*`** rather than a formatted fetch (its address register is a byte offset the shader computed, i.e. the index stride), or a **1-component** fetch the stream contract has no format for. The three sampled programs carry the first two at once (`buffer_load_dword{,x3,x4}` at `+16`/`+32` through a computed address, alongside one `buffer_load_format_*` at `+0`). Fixing it needs a `(descriptor, offset)` stream key **and** a stated stride — state the manifest does not have. |
+| `resident-kind-conflict` | 3 | The same 16 bytes are read twice: as two 64-bit pointers (`s16:17`, `s18:19`) and as a `V#` (`s20:23`, which is also a `s_buffer_load` base). This is *not* a hardware conflict — one memory read two ways — but the cell model types a dword once, so one declaration cannot be both. |
+| `multiple-incarnations` | 4 | An SGPR number re-used across incarnations: `s0` is the bound root, then `s[0:1]` is loaded from it, then `s[0:15]` is overwritten by an `s_load_dwordx16`. Reads straddle the writes, so one slot would have to name more than one resource. The manifest is keyed by slot; this needs a key of `(slot, defining offset)`, i.e. schema v2. |
+
+Two more rules were added to the analysis so it cannot claim a program is manifest-only that the
+lowerer then refuses: a non-formatted `MUBUF` (above) and `stream-format-conflict` (one descriptor
+read with two component counts, which a single bound `format` cannot serve). The latter fires **0**
+times in this sample; it is a tightening of the analysis, not a measured gain.
+
+### Verification, and what is *not* established
+
+- `python3 -m unittest discover -s tools/dev -p 'test_*.py'` → **109 tests OK**
+  (`test_gcn_to_msl` 24 → **34**); `msl_abi_manifest --self-test` 76 → **99 checks**;
+  `msl_lower_ladder --self-test` 6 checks; `gcn_inventory`'s 50 tests unchanged.
+- **71 of 71** generated MSL files compile (`xcrun -sdk macosx metal -c`, exit 0, no diagnostics).
+  Two independent `--compile` runs produced identical MSL digests and identical compile results;
+  a run without `--compile` produced identical row identities and statuses, so the measurement is
+  deterministic on this machine and toolchain.
+- The bindings are placeholders except where a program has no holes; the stage is the INF filename
+  nibble, not verified semantics; **a compiled MSL file proves syntax and types, not that the
+  shader is correct**. There is no pipeline state object, no Metal pipeline, no render, no runtime
+  path, and **G3 NOT RUN**.
+- Counters: **STATIC_ANALYSIS_VERIFIED** for the census and the per-program attribution,
+  **ARTIFACT_VERIFIED** for the compiled AIR under `local/validation/msl-shape-ladder/step3/msl/`,
+  **FIXTURE_VERIFIED** for the three self-tests and the 34 unit tests.
+- Private outputs: `local/validation/msl-shape-ladder/{step0,step3,step3b,step3c}` plus
+  `step0/baseline_rows.json` (the committed-HEAD analyzer's per-program blocker list, used for the
+  step-1/step-2 arithmetic). No payload byte, listing or shader text was written outside `local/`.
+

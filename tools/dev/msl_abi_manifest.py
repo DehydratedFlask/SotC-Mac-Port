@@ -128,9 +128,11 @@ class _Analysis:
         self.stage = stage
         self.scalar_defined: dict[int, str] = {}
         self.vector_defined: dict[int, str] = {}
-        # Which instruction wrote each scalar cell, so a base/descriptor that is *loaded* from
-        # memory can be told apart from one that is computed (and therefore not bindable at all).
-        self.writer: dict[int, tuple] = {}
+        # Which instructions wrote each scalar cell and where, so a base/descriptor that is
+        # *loaded* from memory can be told apart from one that is computed (and therefore not
+        # bindable at all), and so an in-place register re-use can be detected instead of modelled
+        # as one resource.
+        self.writes: dict[int, list[tuple[int, tuple]]] = {}
         self.loads: list[dict] = []
         self.bases: dict[int, dict] = {}
         self.descriptors: dict[int, dict] = {}
@@ -213,7 +215,8 @@ class _Analysis:
         if name == 's_mov_b32':
             self.need_source(f['src0'], row)
             self.scalar_defined[f['sdst']] = 'derived'
-            self.writer[f['sdst']] = ('other', None, name, row.offset)
+            self.writes.setdefault(f['sdst'], []).append(
+                (row.offset, ('other', None, name)))
         elif name in ('s_waitcnt', 's_ttracedata', 's_endpgm'):
             pass
         elif enc == 'SMRD':
@@ -229,7 +232,8 @@ class _Analysis:
                                'slot': f['base_sgpr'], 'dst': f['sdst'], 'row': row})
             for j in range(f['dwords']):
                 self.scalar_defined[f['sdst'] + j] = 'loaded'
-                self.writer[f['sdst'] + j] = ('smrd', index, name, row.offset)
+                self.writes.setdefault(f['sdst'] + j, []).append(
+                    (row.offset, ('smrd', index, name)))
         elif enc == 'MUBUF':
             self.need_descriptor(f['resource_sgpr'], row, f['components'])
             if f['soffset'] < 128:
@@ -244,6 +248,18 @@ class _Analysis:
                              'formatted-stream shape outside the lowered contract '
                              f'(nonzero {", ".join(bad) or "none"}, idxen={f["idxen"]}, '
                              f'soffset={f["soffset"]})')
+            elif not 0 <= row.opcode <= 7:
+                # The lowered contract is the *formatted* fetch: its address register is the
+                # vertex index and the descriptor names the vertex format. A raw dword load's
+                # address is a byte offset the shader computed, i.e. draw state (the index
+                # stride), which no manifest field can supply.
+                self.blocker(row, 'stream-shape',
+                             f'{name} is not a formatted fetch; only buffer_load_format_* has the '
+                             f'vertex-index address contract the lowering models')
+            elif f['components'] not in (2, 3, 4):
+                self.blocker(row, 'stream-shape',
+                             f'{name} fetches {f["components"]} component(s); the stream contract '
+                             f'has formats for 2, 3 and 4')
         elif enc == 'VINTRP':
             if row.opcode == 2:
                 self.policies.setdefault('interpolation', {
@@ -353,33 +369,40 @@ class _Analysis:
     def _producer(self, slot: int, width: int, sites: list[int]) -> tuple[str, dict | None]:
         """Classify how a base/descriptor slot is produced, at the sites that read it.
 
-        `direct`: the slot is bound by a manifest — nothing wrote it, or it is read only up to the
-        instruction that overwrites it (`s_load_dwordx2 s[0:1], [s0:1], 4` reads the root pointer
-        and stores the result into the same registers; every read of the root happens first).
-        `resident`: every cell comes from ONE `SMRD` load that is read after it, so the manifest can
-        declare the *memory* that load reads instead. `opaque`: anything else (a move, several
-        loads, a partial overwrite, or a read both before and after an in-place overwrite) — no
-        `SMRD` load of a single bound view can express it.
+        A retail shader re-uses SGPR numbers: the same slot can hold a bound root, then a pointer
+        loaded from it, then something else. The manifest is keyed by *slot*, so only one of those
+        incarnations can be declared. Hence:
+
+        `direct`: every read of the slot happens at or before its first write, so the manifest
+        binds the slot and the overwrite's result is never read. `resident`: every read happens
+        after the same single `SMRD` load that wrote it, and no other load's result is read — the
+        manifest declares the *memory* that load reads. `multiple-incarnations`: reads straddle
+        more than one write, or read two different loads' results. `opaque`: one incarnation, but
+        produced by something other than a single `SMRD` load (a move, a partial overwrite).
         """
-        writers = [self.writer.get(slot + j) for j in range(width)]
-        if all(w is None for w in writers):
+        written = [self.writes.get(slot + j, []) for j in range(width)]
+        if not any(written):
             return 'direct', None
-        first_write = min(w[3] for w in writers if w is not None)
-        before = [site for site in sites if site <= first_write]
-        after = [site for site in sites if site > first_write]
-        if before and not after:
+        names = sorted({writer[2] for cells in written for _, writer in cells})
+        if any(cells != written[0] for cells in written):
+            return 'opaque', {'names': names, 'offset': min(
+                offset for cells in written for offset, _ in cells)}
+        sequence = written[0]
+        incarnations = {sum(1 for offset, _ in sequence if offset < site) for site in sites}
+        if len(incarnations) > 1:
+            return 'multiple-incarnations', {
+                'offset': sequence[0][0], 'sites': sorted(sites),
+                'writes': [offset for offset, _ in sequence]}
+        index = incarnations.pop() if incarnations else 0
+        if index == 0:
             return 'direct', None
-        if before and after:
-            return 'reassigned', {'names': sorted({w[2] for w in writers if w is not None}),
-                                  'offset': first_write}
-        first = writers[0]
-        if first is not None and first[0] == 'smrd' and all(w == first for w in writers):
-            load = self.loads[first[1]]
-            return 'resident', {'load': first[1], 'via': load['slot'],
-                                'offset': load['offset'] + (slot - load['dst']),
-                                'row': load['row']}
-        names = sorted({w[2] for w in writers if w is not None})
-        return 'opaque', {'names': names, 'offset': first_write}
+        offset, writer = sequence[index - 1]
+        if writer[0] != 'smrd':
+            return 'opaque', {'names': [writer[2]], 'offset': offset}
+        load = self.loads[writer[1]]
+        return 'resident', {'load': writer[1], 'via': load['slot'],
+                            'offset': load['offset'] + (slot - load['dst']),
+                            'row': load['row']}
 
     @staticmethod
     def _runs(dwords) -> list[dict]:
@@ -415,15 +438,17 @@ class _Analysis:
                     if role == 'buffer_descriptor':
                         claim['formats'] = entry['formats']
                     resident.append(claim)
-                elif producer == 'reassigned':
+                elif producer == 'multiple-incarnations':
                     label = 'scalar base' if role == 'scalar_base' else 'buffer descriptor'
                     self.shape.append({
                         'offset': info['offset'],
                         'mnemonic': 'SMRD',
-                        'kind': 'base-reassignment',
-                        'reason': f'{label} s{slot} is read before and after it is overwritten at '
-                                  f'{_hex(info["offset"])}, so its reads address two different '
-                                  f'views; one cell cannot be both'})
+                        'kind': 'multiple-incarnations',
+                        'reason': f'{label} s{slot} is read at '
+                                  f'{", ".join(_hex(site) for site in info["sites"])} across '
+                                  f'different writes ({", ".join(_hex(o) for o in info["writes"])}'
+                                  f'), so one slot would have to name more than one resource; the '
+                                  f'manifest is keyed by slot'})
                 else:
                     label = ('scalar base' if role == 'scalar_base'
                              else 'buffer descriptor')
@@ -474,6 +499,17 @@ class _Analysis:
                     data.setdefault(load['slot'], set()).add(dword)
         for entry in direct + descriptors + resident:
             entry['view_dwords'] = self._runs(data.get(entry['slot'], set()))
+        # A descriptor is bound once, so every load through it must ask for the same component
+        # count: the manifest's `format` cannot serve two widths at once.
+        for entry in descriptors:
+            if len(entry['formats']) > 1:
+                self.shape.append({
+                    'offset': entry['sites'][0], 'mnemonic': 'MUBUF',
+                    'kind': 'stream-format-conflict',
+                    'reason': f'buffer descriptor s{entry["slot"]} is read as '
+                              f'{"/".join(entry["formats"])} at '
+                              f'{", ".join(_hex(site) for site in entry["sites"])}; one bound '
+                              f'format cannot serve two widths'})
         modes = {entry['value'] for entry in self.policies.values()
                  if entry['name'] == 'interpolation'}
         if len(modes) > 1:
@@ -653,7 +689,7 @@ def synthetic_fill(analysis: dict, identity: str = 'synthetic_fill') -> dict:
         view = f'view_{entry["slot"]}'
         document['buffer_descriptors'][str(entry['slot'])] = {
             'kind': 'descriptor', 'view': view,
-            'format': entry['formats'][0], 'field': 'position'}
+            'format': (entry['formats'] or ['explicit_float4'])[0], 'field': 'position'}
         view_dwords(view, entry['view_dwords'])
     for entry in holes.get('resident_slots') or []:
         section = ('scalar_bases' if entry['role'] == 'scalar_base'
@@ -661,7 +697,7 @@ def synthetic_fill(analysis: dict, identity: str = 'synthetic_fill') -> dict:
         binding = document[section][str(entry['slot'])]
         binding['view'] = f'view_{entry["slot"]}'
         if section == 'buffer_descriptors':
-            binding['format'] = entry['formats'][0]
+            binding['format'] = (entry['formats'] or ['explicit_float4'])[0]
             binding['field'] = 'position'
         view_dwords(binding['view'], entry['view_dwords'])
     for entry in holes['export_targets']:
@@ -1928,7 +1964,30 @@ def _self_test() -> int:
     check('the conflicting program is not manifest-only', not conflicted_holes['manifest_only'])
 
 
-    # A synthetic PS that only exports MRT0: the pair projection needs both stages.
+    # A raw dword load is not a formatted fetch: its address is a byte offset the shader computed
+    # (index stride), which is draw state, so no manifest can satisfy it.
+    raw_fetch = program(
+        mubuf(12, srsrc=5, vaddr=0, vdata=6, idxen=1, soffset=128),
+        exp(12, vsrc0=6, vsrc1=6, vsrc2=6, vsrc3=6),
+        exp(32, vsrc0=6, vsrc1=6, vsrc2=6, vsrc3=6),
+        exp(33, vsrc0=6, vsrc1=6, vsrc2=6, vsrc3=6), end)
+    raw_holes = analyze(raw_fetch, 'vs')
+    check('a raw dword fetch is a stream-shape blocker',
+          [(b['kind'], 'not a formatted fetch' in b['reason']) for b in raw_holes['shape']]
+          == [('stream-shape', True)])
+    check('a raw dword fetch is not manifest-only', not raw_holes['manifest_only'])
+
+    # One descriptor, two component counts: one bound format cannot serve both.
+    two_widths = program(
+        mubuf(1, srsrc=5, vaddr=0, vdata=6, idxen=1, soffset=128),   # format_xy
+        mubuf(3, srsrc=5, vaddr=0, vdata=8, idxen=1, soffset=128),   # format_xyzw
+        exp(12, vsrc0=6, vsrc1=6, vsrc2=6, vsrc3=6),
+        exp(32, vsrc0=8, vsrc1=8, vsrc2=8, vsrc3=8),
+        exp(33, vsrc0=8, vsrc1=8, vsrc2=8, vsrc3=8), end)
+    width_holes = analyze(two_widths, 'vs')
+    check('two widths through one descriptor is a blocker',
+          any(b['kind'] == 'stream-format-conflict' for b in width_holes['shape']))
+
     ps_code = program(vop1(1, src0=256, vdst=4),
                       exp(0, vsrc0=4, vsrc1=4, vsrc2=4, vsrc3=4), end)
     ps_holes = analyze(ps_code, 'ps')

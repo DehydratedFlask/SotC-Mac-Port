@@ -54,9 +54,9 @@ class LadderError(ValueError):
     pass
 
 
-def lower_one(code: bytes, stage: str) -> dict:
+def lower_one(code: bytes, stage: str, analysis: dict | None = None) -> dict:
     """Analyse, fill, project and lower one program. Returns a row, never raises for a block."""
-    analysis = abi.analyze(code, stage)
+    analysis = analysis if analysis is not None else abi.analyze(code, stage)
     if not analysis['per_lane_eligible']:
         return {'status': None}
     row = {
@@ -157,17 +157,18 @@ def run(archives: list[Path], sample: int, out: Path, compile_msl_files: bool,
                 spans, _split = cov.split_stages(code)
                 label = cov.STAGE_BY_TYPE.get(blob['type'])
                 for span in spans:
-                    if label not in abi.STAGES:
-                        counters['other-stage'] += 1
-                        continue
                     try:
-                        row = lower_one(span, label)
+                        analysis = abi.analyze(span, label if label in abi.STAGES else None)
                     except abi.AbiError:
                         counters['not-linear'] += 1
                         continue
-                    if row.get('status') is None:
+                    if not analysis['per_lane_eligible']:
                         counters['per-lane-blocked'] += 1
                         continue
+                    if label not in abi.STAGES:
+                        counters['other-stage'] += 1
+                        continue
+                    row = lower_one(span, label, analysis)
                     row.update({'path': name, 'member_bytes': len(data)})
                     counters[row['status'].lower().replace('-', '_')] += 1
                     rows.append(row)
@@ -182,8 +183,10 @@ def run(archives: list[Path], sample: int, out: Path, compile_msl_files: bool,
         if shutil.which('xcrun') is None:
             raise LadderError('--compile requires xcrun; the Metal toolchain is not installed')
         workdir = target / 'msl'
-        if workdir.exists() and not overwrite:
-            raise LadderError(f'{workdir} already exists; pass --overwrite')
+        if workdir.exists():
+            if not overwrite:
+                raise LadderError(f'{workdir} already exists; pass --overwrite')
+            shutil.rmtree(workdir)
         workdir.mkdir(parents=True, exist_ok=True)
         for position, row in enumerate(rows):
             if row['status'] != 'LOWERED':

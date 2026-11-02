@@ -33,10 +33,10 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `native/api/standalone` | 1 | Native game implementation; verify module README and task ownership |
 | `native/api/tests` | 2 | Native game implementation; verify module README and task ownership |
 | `native/app` | 3 | Native game implementation; verify module README and task ownership |
-| `native/core` | 1525 | Native game implementation; verify module README and task ownership |
+| `native/core` | 1535 | Native game implementation; verify module README and task ownership |
 | `native/lanes` | 7 | Native game implementation; verify module README and task ownership |
 | `native/platform` | 18 | Native game implementation; verify module README and task ownership |
-| `native/tests` | 538 | Native game implementation; verify module README and task ownership |
+| `native/tests` | 542 | Native game implementation; verify module README and task ownership |
 | `reference` | 0 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC` | 12 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC/docs` | 10 | Pinned upstream source; read-only; symbols indexed by Graft |
@@ -600,7 +600,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `tools/dev` | 23 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft/.cache` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
-| `tools/lift` | 793 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/lift` | 795 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/pkg-extractor` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/re` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/re/ghidra` | 12 | Out-of-tree tool adapters and reproducible analysis recipes |

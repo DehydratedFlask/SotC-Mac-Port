@@ -20,8 +20,8 @@
 //     ... 480 instructions of constructor work ...
 //     cmp [rsp+0xe0],%rax ; jne 0x7ee9af ; lea -0x28(%rbp),%rsp; pops; retq
 // Every object of the block is loaded into a register first (`leaq <obj>,%rbx`), which is why this
-// body has **zero** rip-relative stores: all 128 register-based stores go through %rbx / %rsp, and
-// the object addresses are pinned as rip LEA operands instead.
+// body has **zero** rip-relative stores: every store goes through %rbx / %rsp, and the object
+// addresses are pinned as rip LEA operands instead.
 //
 // Callee histogram (every one of the 58 sites is pinned by the checker):
 //   0xf590    x22  shared release of a borrowed stack view (every site is an exact no-op)
