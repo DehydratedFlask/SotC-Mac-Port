@@ -49,6 +49,11 @@ FORWARDING = ROOT / "tools/lift/store_to_load_forwarding.py"
 SITE_PROVABLE = "site-provable"
 TABLE_LEVEL = "table-level"
 
+# The audit that produced the grades ran `indirect_frontier.scan` with its 32-instruction window and
+# resolved the call register from that window alone. The strict predicate below uses the same bound
+# so this checker re-derives the documented artifact rather than a wider one.
+AUDIT_WINDOW = 32
+
 GRADE_TABLE_RE = re.compile(
     r"\|\s*site-provable\s*\|\s*\*\*(\d+)\*\*\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|")
 TABLE_LEVEL_RE = re.compile(

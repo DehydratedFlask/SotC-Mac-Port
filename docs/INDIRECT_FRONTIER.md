@@ -320,9 +320,10 @@ displacement, and for a vptr-relative call that is not the address the call read
 means rewriting row values, which needs its own audit and is not attempted here.
 
 Limits of the pass, stated so the zero is not read as "nothing is there": it matches a store only
-through the **same base register family**. Widening to any base is not a proof — offset `0` is the
-vptr of *every* object, so 46 of the 50 rows have some same-offset store through an unrelated
-register. Going further needs points-to/escape analysis, not a longer window.
+through the **same base register family**. **38 of the 50** rows have a store to the same offset
+through a *different* base register and none through the load's own base. That is not evidence at
+this offset: `0` is the vptr of every object, so a same-offset store through another register says
+nothing about this object. Going further needs points-to/escape analysis, not a longer window.
 
 ### What stays unknown, and why
 
