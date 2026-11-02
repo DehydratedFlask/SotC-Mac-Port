@@ -15,8 +15,18 @@ three premises that this round falsified:
 What this round established instead: the image contains a **generic, type-tagged Oodle decompression
 dispatcher** — `FUN_001aa2a0`, six cases on the top three bits of its first argument, two of which
 call `OodleLZ_Decompress` with different `fuzzSafe` policy (§4.1) — plus the `.csdr` naming,
-variant-suffix table and registered loader callback (§3.2). What it did **not** establish is that the
-two are connected: `FUN_001aa2a0`'s callers and its tag semantics are open (§6).
+variant-suffix table and registered loader callback (§3.2). At the end of that round the two were not
+yet connected.
+
+**Round 3 — the edge is closed (§4.2).** `FUN_001aa2a0` is
+`bpe::Compression::Decompress(const CompressionHeader &, const void *, size_t, void *, size_t)` from
+`Core/Util/Compression.cpp`; its only caller is `ResourceFactory::CreateResource` (`0x147160`); and the
+`CompressionHeader` it is handed is the **last four bytes of the resource file**, checked against an
+8-byte tag that sits immediately before them. Every one of the 19,320 compressed-prefix `.csdr`
+members carries type **3** (`8c0a`) or **4** (`8c06`) in that trailer word, and both types dispatch to
+`OodleLZ_Decompress` at `0x1aa426`; the 15,072 raw members carry type **0** and take the `memcpy`
+case. **So yes: the one Oodle call site does expand `.csdr` members.** Nothing was decompressed —
+this is a call-graph and container-format result (§4.2(f) states what it does not cover).
 
 Details below are separated into what was **established** and what was **not**. Everything is
 `STATIC_ANALYSIS_VERIFIED` against `local/re/eboot.elf`
@@ -161,7 +171,7 @@ linked, which is exactly why the import table shows no decompression entry point
 | enum | `EShaderTypeToLoad` at `0x12cfcd2`; values `Debug`=0, `Shipping`=1, `PS4Neo_Debug`=2, `PS4Neo_Shipping`=3 (built by the string→int table in `FUN_00b0d580`, `0xb0d580`) |
 | resource type 4CC | `csdr` (`0x63736472`) registered at `FUN_00b0d3e0` call site `0xb0d464` |
 | sibling type | `cslt` (`0x63736c74`) at `FUN_00b0e3a0` call site `0xb0e403`; the same function registers the `ShaderList` string, so the two are associated (inference, not proven) |
-| `csdr` descriptor tag | 8-byte constant `0x0000000134534452` → byte image `52 44 53 43 01` (`RDSC` + version 1) |
+| `csdr` descriptor tag | 8-byte constant **`0x1343534452`** → byte image `52 44 53 43 13` (`RDSC` + `0x13`). *(Corrected in §4.2(e): this line previously read `0x0000000134534452` / `…43 01`; `movabsq $0x1343534452` at `0xb0d420`, and the corpus trailer agrees byte for byte.)* |
 | `csdr` descriptor suffix | `_ps4` (`0x12cfc29`) |
 | `csdr` loader callback | `FUN_00b0cc50` (624 B) stored into the descriptor at `0xb0d464`'s call |
 | path builder | `FUN_00b0cb80` (201 B): reads `table[shaderTypeToLoad]`, concatenates with the literal `.csdr` through `FUN_000102b0`, stores the result |
