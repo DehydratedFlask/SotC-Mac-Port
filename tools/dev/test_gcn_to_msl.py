@@ -241,6 +241,60 @@ class LoweringTests(unittest.TestCase):
                   dict(kind='pointer',view='bad();'),dict(kind='arbitrary_code')):
             with self.assertRaises(m.LoweringError):l.bind(b)
 
+    def test_v_interp_mov_f32_requires_an_explicit_vertex_map(self):
+        # A PS that moves one vertex's parameter and exports it.
+        # The interpolated value lands in v6, is packed into v5, and the export takes v5 twice.
+        code = (e.vintrp(op=2, dst=6, attr=0, chan=1, src=0)
+                + e.vop2(op=47, dst=5, src0=262, src1=3)
+                + e.exp(target=0, compr=1, done=1, vm=1, src=(5, 5, 0, 0)) + e.END)
+        base = dict(sha256=hashlib.sha256(code).hexdigest(),
+                    initial_vector={str(j): float_input('material', c)
+                                    for j, c in enumerate('xyzw')})
+
+        def lower(**extra):
+            abi = dict(base)
+            abi.update(extra)
+            return m.Lowerer(abi, 'ps').run(code)
+
+        # No mode at all: refused, and the message names the mode that would be needed.
+        with self.assertRaisesRegex(m.LoweringError, 'supplied_vertex_values'):
+            lower()
+        # The coefficient mode cannot express a vertex move either.
+        with self.assertRaisesRegex(m.LoweringError, 'supplied_vertex_values'):
+            lower(interpolation='supplied_float_coefficients')
+        # Mode present but no mapping: refused rather than guessing which vertex VSRC 0 means.
+        with self.assertRaisesRegex(m.LoweringError, 'vertex_select'):
+            lower(interpolation='supplied_vertex_values')
+
+        lines, report = lower(interpolation='supplied_vertex_values',
+                              vertex_select={'0': 'p20'})
+        joined = chr(10).join(lines)
+        self.assertIn('u.param0_p20.y', joined)
+        self.assertIn('u.param0_p20.y', report['input_reads'])
+
+        # An unmapped selector is refused.
+        with self.assertRaisesRegex(m.LoweringError, 'vertex selector ABI'):
+            lower(interpolation='supplied_vertex_values', vertex_select={'1': 'p20'})
+        # A mapping to something that is not a vertex name is refused.
+        with self.assertRaisesRegex(m.LoweringError, 'vertex selector ABI'):
+            lower(interpolation='supplied_vertex_values', vertex_select={'0': 'p30'})
+
+        # The subtraction is manifest-driven: absent -> plain move, listed -> sub32 against p10.
+        lines_plain, _ = lower(interpolation='supplied_vertex_values',
+                               vertex_select={'0': 'p20'})
+        self.assertNotIn('sub32', chr(10).join(lines_plain))
+        lines_sub, sub_report = lower(interpolation='supplied_vertex_values',
+                                      vertex_select={'0': 'p20'},
+                                      vertex_mov_subtract_p10=[0])
+        sub_joined = chr(10).join(lines_sub)
+        self.assertIn('sub32(u.param0_p20.y, u.param0_p10.y)', sub_joined)
+        self.assertIn('u.param0_p10.y', sub_report['input_reads'])
+        # A malformed subtraction list is refused.
+        for bad in ('0', [0.5], [True]):
+            with self.subTest(bad=bad), self.assertRaisesRegex(m.LoweringError, 'subtract_p10'):
+                lower(interpolation='supplied_vertex_values', vertex_select={'0': 'p20'},
+                      vertex_mov_subtract_p10=bad)
+
     def test_incomplete_exports_fail(self):
         p=e.vop1(dst=0,src=128)+e.END
         with self.assertRaisesRegex(m.LoweringError,'incomplete'):

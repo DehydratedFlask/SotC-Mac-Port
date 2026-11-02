@@ -155,6 +155,38 @@ class Lowerer:
         self.lines.append(f'    {"uint" if kind == "packed" else "float"} {name} = {expr};')
         self.v[register] = Cell(kind, name)
 
+    def interp_mov(self, i):
+        """`v_interp_mov_f32`: dst = one vertex's parameter value for `attrchan` of `attr`.
+
+        Which VSRC code means which vertex is taken from the manifest, not from the ISA: the pinned
+        PS4 translator asserts `src < 3` and maps the three selectors through its own table, while
+        the ISA summary describes them as P10/P20/P0. Supplying the map keeps the claim falsifiable
+        instead of baking in a mapping that has two sources disagreeing.
+        """
+        f = i.fields
+        if self.abi.get('interpolation') != 'supplied_vertex_values':
+            raise LoweringError('v_interp_mov_f32 requires the supplied_vertex_values mode')
+        if f['attr'] not in (0, 1):
+            raise LoweringError('unbound interpolation attribute')
+        select = self.abi.get('vertex_select')
+        if not isinstance(select, dict):
+            raise LoweringError('v_interp_mov_f32 requires an explicit vertex_select map')
+        vertex = select.get(str(f['vsrc']))
+        if vertex not in ('p10', 'p20', 'p0'):
+            raise LoweringError('unsupported v_interp_mov_f32 vertex selector ABI')
+        component = 'xyzw'[f['attrchan']]
+        subtract = self.abi.get('vertex_mov_subtract_p10', [])
+        if (not isinstance(subtract, list)
+                or any(not isinstance(x, int) or isinstance(x, bool) for x in subtract)):
+            raise LoweringError('invalid vertex_mov_subtract_p10 list')
+        expr = f'u.param{f["attr"]}_{vertex}.{component}'
+        self.input_reads.add(expr)
+        if f['vsrc'] in subtract:
+            p10 = f'u.param{f["attr"]}_p10.{component}'
+            self.input_reads.add(p10)
+            expr = f'sub32({expr}, {p10})'
+        self.assign(f['vdst'], expr)
+
     def arithmetic(self, i):
         f, name = i.fields, i.mnemonic
         a = self.float_cell(self.src(f['src0'], f.get('literal')))
@@ -235,9 +267,10 @@ class Lowerer:
                     for j in range(components):
                         self.v[f['vdata']+j] = cells[j]
                 elif i.encoding == 'VINTRP':
+                    if i.opcode == 2:
+                        self.interp_mov(i)
+                        continue
                     if i.opcode not in (0, 1):
-                        # v_interp_mov_f32 (op 2) moves a parameter *or constant* without
-                        # interpolation; the P1/P2 pairing below cannot express it.
                         raise LoweringError('unsupported interpolation opcode')
                     if self.abi.get('interpolation') != 'supplied_float_coefficients':
                         raise LoweringError('interpolation mode is not explicitly supplied')

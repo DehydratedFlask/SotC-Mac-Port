@@ -263,6 +263,23 @@ class EncodingOracleTests(unittest.TestCase):
         self.assertEqual(one(vop2(op=16)).mnemonic, 'v_max_f32')
         self.assertEqual(one(vop1(op=8)).mnemonic, 'v_cvt_i32_f32')
         self.assertEqual(one(vop1(op=51)).mnemonic, 'v_sqrt_f32')
+        self.assertEqual(one(vop1(op=17)).mnemonic, 'v_cvt_f32_ubyte0')
+        self.assertEqual(one(vop3(op=282, abs_=0, clamp=0, omod=0, neg=0)).mnemonic,
+                         'v_lshlrev_b32')
+
+    def test_interp_mov_selectors(self):
+        # v_interp_mov_f32 is admitted only with the three vertex selectors the pinned PS4
+        # translator accepts (P10 / P20 / P0).
+        for src in (0, 1, 2):
+            insn = one(vintrp(op=2, dst=4, attr=1, chan=1, src=src))
+            self.assertEqual((insn.mnemonic, insn.fields['vsrc']), ('v_interp_mov_f32', src))
+            self.assertEqual(insn.requirements,
+                             ('fixed_function_interpolation', 'per_vertex_parameter'))
+        with self.assertRaises(gcn.DecodeError) as caught:
+            one(vintrp(op=2, src=3))
+        self.assertIn('vertex selector', caught.exception.reason)
+        with self.assertRaises(gcn.DecodeError):
+            one(vintrp(op=3))
 
     def test_sopk_is_not_sop2(self):
         # A SOPK word shares bits 31-30 with SOP2; before this row existed every SOPK instruction

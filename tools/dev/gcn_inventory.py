@@ -25,7 +25,7 @@ import struct
 import sys
 
 ISA_URL = 'https://docs.amd.com/v/u/en-US/sea-islands-instruction-set-architecture_0'
-VERSION = 'gfx7-bounded-inventory-v13'
+VERSION = 'gfx7-bounded-inventory-v15'
 
 # These are encoding facts, not a translation/semantic implementation.
 # SOP2/SOPC/VOPC rows below are opcode-value facts from the GFX7 ISA tables,
@@ -71,6 +71,7 @@ OPCODES = {
              12: 's_buffer_load_dwordx16'},
     'VOP1': {1: 'v_mov_b32', 5: 'v_cvt_f32_i32', 6: 'v_cvt_f32_u32',
              8: 'v_cvt_i32_f32', 11: 'v_cvt_f32_f16', 32: 'v_fract_f32',
+             17: 'v_cvt_f32_ubyte0',
              36: 'v_floor_f32', 42: 'v_rcp_f32', 46: 'v_rsq_f32',
              51: 'v_sqrt_f32', 53: 'v_sin_f32', 54: 'v_cos_f32'},
     'VOP2': {0: 'v_cndmask_b32', 3: 'v_add_f32', 4: 'v_sub_f32',
@@ -86,6 +87,7 @@ OPCODES = {
              6: 'v_cmp_ge_f32', 11: 'v_cmp_ngt_f32', 136: 'v_cmp_class_f32',
              194: 'v_cmp_eq_u32', 197: 'v_cmp_ne_u32',
              256: 'v_cndmask_b32', 272: 'v_max_f32', 426: 'v_rcp_f32',
+             282: 'v_lshlrev_b32',
              362: 'v_mul_hi_u32', 363: 'v_mul_lo_i32',
              264: 'v_mul_f32', 303: 'v_cvt_pkrtz_f16_f32', 321: 'v_mad_f32',
              322: 'v_mad_i32_i24', 349: 'v_sad_u32', 350: 'v_cvt_pk_u8_f32'},
@@ -116,7 +118,7 @@ OPCODES = {
              208: 'v_cmpx_f_u32', 209: 'v_cmpx_lt_u32', 210: 'v_cmpx_eq_u32',
              211: 'v_cmpx_le_u32', 212: 'v_cmpx_gt_u32', 213: 'v_cmpx_ne_u32',
              214: 'v_cmpx_ge_u32', 215: 'v_cmpx_t_u32'},
-    'VINTRP': {0: 'v_interp_p1_f32', 1: 'v_interp_p2_f32'},
+    'VINTRP': {0: 'v_interp_p1_f32', 1: 'v_interp_p2_f32', 2: 'v_interp_mov_f32'},
     # Exact opcode values from the pinned PS4 MUBUF table: 15 is LOAD_DWORDX3, and the dword
     # stores are 28-31. The earlier 15/16/17 "store" rows were Sea-Islands-list guesses and were
     # wrong for this target.
@@ -433,6 +435,11 @@ def _validate(form: str, op: int, f: dict[str, int], at: int) -> tuple[str, ...]
         else:
             requirements.add('writes_vcc_mask')
     elif form == 'VINTRP':
+        if op == 2:
+            # `v_interp_mov_f32` selects one vertex's parameter; the pinned PS4 translator accepts
+            # selectors 0..2 only (P10 / P20 / P0), so anything else is an unmodelled shape.
+            require(f['vsrc'] < 3, 'unsupported v_interp_mov_f32 vertex selector')
+            requirements.add('per_vertex_parameter')
         requirements.add('fixed_function_interpolation')
     elif form == 'MUBUF':
         if op in (50, 51):

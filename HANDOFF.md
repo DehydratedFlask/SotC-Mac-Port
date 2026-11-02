@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 10:10 CDT (root) — VINTRP 2 admitted with a manifest-driven lowering (FIXTURE_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01`, interpolation card. `v_interp_mov_f32` is now decoded **and** lowerable:
+  - **Decoder:** VINTRP 2 admitted only for `vsrc ∈ {0,1,2}` (the selectors the pinned PS4 translator accepts), tagged `per_vertex_parameter`; other selectors reject the program.
+  - **Lifter:** new `interpolation: "supplied_vertex_values"` mode → `dst = u.param{attr}_{vertex}.{chan}`, with **`vertex_select` in the manifest** mapping the VSRC code to `p10`/`p20`/`p0`, and an optional `vertex_mov_subtract_p10` list reproducing the translator's "subtract P10" step. The mapping is manifest-supplied deliberately: the pinned translator maps the three selectors through its own table while the ISA summary describes them as P10/P20/P0, and those two descriptions do not line up one-for-one — baking either in would be a guess.
+  - **Also added:** VOP3 282 `v_lshlrev_b32`, VOP1 17 `v_cvt_f32_ubyte0` (what the admitted programs hit next).
+- **Measured at sample 512** (`blocks-512o` → `blocks-512p`): linear decode **186/367 unchanged** — every program past `VINTRP 2` then hit a branch (`SOPP 4 s_cbranch_scc0` grew 5 → 48). Error composition changed decisively: **170 of the 181 remaining linear errors are control transfers** (SOPP 8 117, SOPP 4 48, SOPP 5 5); only 11 are opcode rows. Adding rows can no longer move the linear number.
+- **Tests:** `gcn_inventory` 47 (VINTRP 2 positives for selectors 0-2 plus negatives for selector 3 and op 3; new VOP3 282 / VOP1 17 rows), `gcn_to_msl` 24 — including a full PS that moves a vertex parameter and exports it, with refusals for a missing mode, the coefficient mode, a missing map, an unmapped selector, a non-vertex name and malformed subtraction lists.
+- **Still 0 lowered.**
+- **Verification (PASSED):** build exit 0; CTest **521/521**; checkers **713 passed / 0 failed**.
+- **Next exact action:** the linear ceiling is control flow now — a CFG-aware decoder that represents branch edges (block splitting already exists in `gcn_blocks`) is the only route to more linear decodes; alternatively, per-lane lowering work on the 76 already-eligible programs.
+
 ## 2026-11-03 09:00 CDT (root) — TLS allocation-site guard chain modelled in both allocator fronts (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. `native/core/alloc_site_context.{hpp,cpp}` encodes the guard chain common to `0x11fb0` (129 B) and `0x12820` (293 B): `cmpl $0x1, %ebx` (index), the `testb %r14b` flag in `0x11fb0`, `rax = fs:0 + *(0x15fff98)`, `rax = *(rax)`, `count = *(u32*)(rax+0x400)`, `count != 0`, `(count-1)*0x20`, then the fallback `0x2dfaab0 + index*8` and the final `movq (%rax),%rax|%rbx`.

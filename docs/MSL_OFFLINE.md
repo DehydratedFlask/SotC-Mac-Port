@@ -377,3 +377,41 @@ not move the census, it makes the next rows visible.
   successive heads — `VOP2 18` (54) → `VOPC 148` (54) → `VOP3 129` (54) — and settle at
   `VINTRP 2` (48), `VOP3 287` (30), `VOP2 32` (15), `VOP3 28` (14), `MIMG 39` (5).
 - **Still zero lowered.**
+
+## VINTRP 2 admitted — and the linear ceiling becomes control flow
+
+`v_interp_mov_f32` was the last "needs a lowering rule" row. It is now decoded **and** lowerable, but
+only when the manifest says how:
+
+- **Decoder:** VINTRP 2 is admitted when `vsrc ∈ {0, 1, 2}` — the three selectors the pinned PS4
+  translator accepts — and carries the `per_vertex_parameter` requirement. Any other selector still
+  rejects the whole program.
+- **Lifter:** a new `interpolation: "supplied_vertex_values"` mode lowers it to
+  `dst = u.param{attr}_{vertex}.{chan}`, where **`vertex_select` in the manifest** maps the VSRC code
+  to `p10`/`p20`/`p0`. The mapping is manifest-supplied on purpose: the pinned translator asserts
+  `src < 3` and maps the three selectors through its own table, while the ISA summary describes them
+  as P10/P20/P0, and those two descriptions do not line up one-for-one. An optional
+  `vertex_mov_subtract_p10` list reproduces the translator's "subtract P10" step for the selectors it
+  names. Missing mode, missing map, unmapped selector, a non-vertex name, or a malformed list all
+  raise.
+- **Also added:** VOP3 282 `v_lshlrev_b32` and VOP1 17 `v_cvt_f32_ubyte0`, the two rows the newly
+  admitted programs hit next.
+
+**Measured at sample 512** (`blocks-512o` → `blocks-512p`): linear decode stays **186/367**, because
+every program that moved past `VINTRP 2` then hit a branch. What changed is the *composition* of the
+remaining errors:
+
+| Blocker | before | after |
+|---|---:|---:|
+| `VOP3 282` / `VOP1 17` / `VOP3 2xx` rows | — | 0 |
+| `VINTRP 2` | 48 | **0** |
+| `SOPP 8` (`s_cbranch_execz`) | 117 | 117 |
+| `SOPP 4` (`s_cbranch_scc0`) | 5 | **48** |
+| `SOPP 5` (`s_cbranch_scc1`) | 5 | 5 |
+
+So **170 of the 181 remaining linear decode errors are control transfers** (117 + 48 + 5); only 11
+are opcode rows. The linear number can no longer be moved by adding rows — it needs a CFG-aware
+decoder that represents branch edges.
+
+- **Still zero lowered:** the new mode is a rule the manifest must opt into, and no real shader has a
+  manifest.
