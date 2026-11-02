@@ -127,7 +127,22 @@ def classify_program(code: bytes, ordinal: int, info: dict) -> dict:
             "ok": False, "blocks": 0, "instructions": 0, "branches": 0,
             "branches_in_span": 0, "branches_on_instruction": 0, "branch_mnemonics": [],
             "error_offset": exc.offset, "error_reason": exc.reason,
+            "split_offset": None, "both_halves_decode": None,
         }
+        # "Bytes follow s_endpgm" is a container-shape signal, not a decoder gap: a blob can hold a
+        # VS/PS pair back to back. Look for the split point that makes both halves decodable.
+        if "bytes follow s_endpgm" in exc.reason and len(code) <= 4096:
+            for cut in range(4, len(code) - 3, 4):
+                try:
+                    gcn.decode(code[:cut], allow_branches=True)
+                    gcn.decode(code[cut:], allow_branches=True)
+                except gcn.DecodeError:
+                    continue
+                row["block_decode"]["split_offset"] = cut
+                row["block_decode"]["both_halves_decode"] = True
+                break
+            else:
+                row["block_decode"]["both_halves_decode"] = False
     else:
         row["block_decode"] = {
             "ok": True,
@@ -230,6 +245,12 @@ def summarize(rows: list[dict], population: list[tuple], sample_info: dict,
         "programs_decode_error": len(errors),
         "programs_block_decodable": sum(1 for p in programs
                                         if (p.get("block_decode") or {}).get("ok")),
+        "programs_paired_halves_decode": sum(
+            1 for p in programs
+            if (p.get("block_decode") or {}).get("both_halves_decode")),
+        "paired_split_offsets": sorted({(p.get("block_decode") or {}).get("split_offset")
+                                        for p in programs
+                                        if (p.get("block_decode") or {}).get("split_offset")}),
         "programs_linear_only": sum(1 for p in programs
                                     if not p["decoded"]
                                     and (p.get("block_decode") or {}).get("ok")),

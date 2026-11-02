@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 11:55 CDT (root) — the 14 "trailing bytes" programs are VS/PS pairs (STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01`. Investigated the 14 block-mode programs whose declared span carried bytes after `s_endpgm`. They are **not malformed**: every one carries a **second program** back to back — the two halves share an identical 16-byte tail pattern (`[s_mov_b64][exp][nop][s_endpgm]`) and decoding the span at the first `s_endpgm` yields a clean second program.
+- **Measured:** the census now searches for a split point where both halves decode and finds one in **14 of 14** (offsets 212/228/236/252/348/360/376/384 — the first stage's size). So the honest block-decodable count is **240 single programs + 14 pairs = 254 of 367**, and the container model "one `OrbShdr` blob = one program" is **wrong** for these members: it is a VS/PS pair in one blob.
+- **Recorded, not silently reclassified:** the census keeps the member in its current class and adds `programs_paired_halves_decode` and `paired_split_offsets` so the fact is visible and countable.
+- **Verification (PASSED):** `msl_corpus_coverage` self-test 23; sample 512 rerun records the two new totals; build exit 0; CTest **521/521**; checkers **713 passed / 0 failed**.
+- **Still 0 lowered.**
+- **Next exact action:** split paired blobs at the recorded offsets in the census so each stage is counted as its own program (a container-model change), or continue with `VOP1 7` / `VOP3 328` as ordinary rows.
+
 ## 2026-11-03 11:15 CDT (root) — CFG-aware decode promoted; 54 more programs decode (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `GPU-01-MSL-OFFLINE-01`. `gcn_inventory.decode_blocks()` is now the CFG-aware decode mode: a control-transfer row is an instruction that **ends its block**, with its byte target computed (`offset + size + simm16*4`); the listing still never assumes fall-through. New dataclasses `BranchTarget` (with `target_in_program` / `target_on_instruction`) and `BasicBlock` (start/end/instruction offsets/terminator/branch). `gcn_blocks.py` became the CLI adapter over it, and the coverage census now calls the inventory directly, so there is one implementation.

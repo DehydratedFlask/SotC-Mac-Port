@@ -451,3 +451,17 @@ programs whose declared span carries bytes after `s_endpgm`**, `VOP3 28` (14, th
 on evidence) and `VOP3 328` (6).
 
 - **Still zero lowered.** Block-decodability is structure, not semantics.
+
+### The "bytes after s_endpgm" programs are paired shaders
+
+The 14 programs whose declared span carried bytes past `s_endpgm` are not malformed: each blob holds
+**two programs back to back**. The census now searches for a split point where both halves decode,
+and finds one in **14 of 14** cases (split offsets 212/228/236/252/348/360/376/384 — the first
+stage's size, which varies).
+
+So the honest decodable count is **240 single programs + 14 pairs = 254 of 367**, and the container
+model "one `OrbShdr` blob = one program" is wrong for these members — it is a VS/PS pair in one blob.
+The census records this as `programs_paired_halves_decode` and `paired_split_offsets` rather than
+silently counting the members as undecodable.
+
+- **Still zero lowered:** a shader pair is twice the structure, not twice the semantics.
