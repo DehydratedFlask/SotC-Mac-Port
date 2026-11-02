@@ -138,6 +138,13 @@ DISPATCH_WINDOW = 0x25A9FD                                # the receiver reload 
 DISPATCH_BYTES = ("498b074c89ff4c89f6ff5020", 12)         # mov (%r15),%rax; mov %r15,%rdi; mov %r14,%rsi; call *0x20(%rax)
 DISPATCH_OWNER = 0x25A8D0                                 # slot 3 of the same table (0x15c8cf0)
 
+# --- the startup walker: `main` runs the whole constructor list before the workspace bootstrap -------
+WALKER = 0x20                                             # called from main, walks the table backwards
+CTOR_SENTINEL = CTOR_TABLE_TOP - 8 * CTOR_TABLE_COUNT      # 0x2dd5ef8 = 0xffffffffffffffff
+CTOR_LAST_ENTRY = CTOR_TABLE_TOP - 8 * (CTOR_TABLE_COUNT - 1)   # 0x2dd5f00 = 0x1a20
+MAIN_CALL_WALKER = 0xF14D                                 # call 0x20
+MAIN_CALL_BOOTSTRAP = 0xF15A                              # call 0x536730
+
 
 def require(cond: bool, msg: str) -> None:
     if not cond:
@@ -209,6 +216,10 @@ def main() -> int:
 
     def rip_target(addr: int, disp_at: int, end: int) -> int:
         return addr + struct.unpack_from("<i", reads(addr, end), disp_at)[0]
+
+    def check_call(site: int, target: int) -> bool:
+        window = reads(site, 5)
+        return window[0] == 0xE8 and site + 5 + struct.unpack_from("<i", window, 1)[0] == target
 
     # ---------------------------------------------------------------- A. slot 309 is a data-only edge
     slot_hits = near_refs([SLOT309])[SLOT309]
@@ -294,6 +305,8 @@ def main() -> int:
     require(not near_refs([CALLBACK])[CALLBACK], "0x28af0 is now directly called")
     require(addend_index.get(CALLBACK) == [CALLBACK_CELL],
             f"0x28af0 relocations changed: {[hex(t) for t in addend_index.get(CALLBACK, [])]}")
+    require(struct.unpack_from("<Q", reads(CALLBACK_CELL, 8))[0] == CALLBACK,
+            "the 0x15fe540 image word no longer holds 0x28af0")
     if fde:
         require(fde.get(CALLBACK) == CALLBACK_SIZE, "0x28af0 FDE size changed")
         require(fde.get(CALLBACK_INSTALLER) is not None, "0x27990 has no FDE")
@@ -356,6 +369,28 @@ def main() -> int:
     # Self-test: the near-call scan is live (a wrong target must find nothing).
     require(not near_refs([SLOT309 + 1])[SLOT309 + 1], "near-call scan is not discriminating")
 
+    # ------------------------------------------------------------ I. the startup order, from code
+    # `main` (the ELF entry point 0xf120) calls the constructor walker at 0x20 and then, straight-line,
+    # the workspace bootstrap 0x536730. The walker starts at the table TOP and steps DOWN by 8, so it
+    # runs index 0, 1, ... 572 and stops on the -1 sentinel one qword below entry 572.
+    require(reads(WALKER, 7).hex() == "554889e5415653", "the 0x20 constructor walker prologue changed")
+    require(reads(0x53, 7)[:3] == b"\x48\x8d\x1d", "the walker no longer `lea`s the table top")
+    require(0x53 + 7 + struct.unpack_from("<i", reads(0x53, 7), 3)[0] == CTOR_TABLE_TOP,
+            "the walker's table top is no longer 0x2dd70e0")
+    require(reads(0x60, 4).hex() == "4883c3f8", "the walker no longer steps -8 (backwards)")
+    require(reads(0x64, 3).hex() == "488b03", "the walker no longer loads the row")
+    require(reads(0x6C, 4).hex() == "4883f8ff", "the walker lost its -1 sentinel compare")
+    require(reads(0x72, 2).hex() == "ffd0", "the walker no longer `call *%rax`")
+    require(struct.unpack_from("<Q", reads(CTOR_SENTINEL, 8))[0] == 0xFFFFFFFFFFFFFFFF,
+            "the -1 sentinel below entry 572 moved: the table length is no longer proven")
+    require(struct.unpack_from("<Q", reads(CTOR_LAST_ENTRY, 8))[0] == 0x1A20,
+            "constructor entry 572 is no longer 0x1a20")
+    require(check_call(MAIN_CALL_WALKER, WALKER), "main no longer calls the walker at 0xf14d")
+    require(reads(MAIN_CALL_WALKER + 5, 8).hex() == "31d24489f74c89fe",
+            "the straight-line gap between the walker and the bootstrap call changed")
+    require(check_call(MAIN_CALL_BOOTSTRAP, BOOTSTRAP),
+            "main no longer calls 0x536730 at 0xf15a")
+
     result = {
         "task": ["CPU-01-STARTUP-SLOT-309-CALLER-ORDER-01",
                  "CPU-01-STARTUP-SLOT-309-HELPER-CALLER-CENSUS-01",
@@ -379,9 +414,13 @@ def main() -> int:
                              "address_point": f"0x{VTABLE_ADDR_POINT:x}",
                              "vptr_installs": {f"0x{s:x}": k for s, k in VTABLE_INSTALLS.items()},
                              "dispatch": f"0x{DISPATCH:x} call *0x20"},
-        "closure": {"main": f"0x{MAIN:x}", "bootstrap": f"0x{BOOTSTRAP:x}",
+        "closure": {"main": f"0x{MAIN:x}", "walker": f"0x{WALKER:x}",
+                    "walker_call": f"0x{MAIN_CALL_WALKER:x}",
+                    "bootstrap_call": f"0x{MAIN_CALL_BOOTSTRAP:x}",
+                    "bootstrap": f"0x{BOOTSTRAP:x}",
                     "workspace_ctor": f"0x{WORKSPACE_CTOR:x}",
-                    "table_entries_in_chain": 0},
+                    "table_entries_in_chain": 0,
+                    "sentinel": f"0x{CTOR_SENTINEL:x}", "last_entry": f"0x{CTOR_LAST_ENTRY:x}"},
         "fde_present": bool(fde),
     }
     if args.json is not None:
@@ -396,8 +435,10 @@ def main() -> int:
           f"0x28af0 has 1 cell (0x15fe540), 1 reader (0x27ab1) and 0 direct calls; "
           f"0x531d60 is row 0x{VTABLE_ROW:x} of the vtable at 0x{VTABLE_ADDR_POINT:x} installed only "
           f"by 0x536afa/0x537fa8, dispatched at 0x{DISPATCH:x}")
-    print("   order: both chains are downstream of main 0xf120 -> 0x536730; slot 309 runs in the "
-          "constructor walk before main, so neither can run before 0xa505e0")
+    print(f"   order: main 0x{MAIN:x} calls the walker 0x{WALKER:x} at 0x{MAIN_CALL_WALKER:x} and, "
+          f"straight-line, the bootstrap 0x{BOOTSTRAP:x} at 0x{MAIN_CALL_BOOTSTRAP:x}; the walker "
+          f"starts at the table top and steps -8 to the -1 sentinel at 0x{CTOR_SENTINEL:x}, so slot 309 "
+          f"runs before everything downstream of the bootstrap")
     print("STATIC_ANALYSIS_VERIFIED only: no runtime execution, no native code and no game claim")
     return 0
 

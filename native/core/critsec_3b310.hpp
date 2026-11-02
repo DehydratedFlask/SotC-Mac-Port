@@ -35,6 +35,10 @@
 //   slot 414 (0x57b9b0): after 0x3b310(0x2f35898), the constructor writes u32 0 at 0x2f358a0 (= base + 8)
 //       and 16 zero bytes at base + 0x10, so the handle window is [base, base + 8).
 //
+// The adjacent thunk 0x3b390 (its own 5-byte FDE) is a `jmp scePthreadMutexLock` on the same rdi, which
+// corroborates that this 8-byte field is the mutex handle itself and not a wrapper around one. It is not
+// modelled here.
+//
 // ============================== INFERENCE (not PS4-primary) ==========================================
 // Type 2 is read as PTHREAD_MUTEX_RECURSIVE. That is the FreeBSD-derived (PS4) numbering, not the glibc
 // one (Linux uses 1), so the mapping is an inference from the pinned constant 2 plus the platform ABI.

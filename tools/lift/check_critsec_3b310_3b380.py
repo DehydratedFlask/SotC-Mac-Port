@@ -96,6 +96,7 @@ def main() -> int:
     for site, target in CTOR_CALLS:
         require(e.call(site) == target, f"0x{site:x} call target")
     require(e.jmp(0x3B380) == 0xF8F8C0, "0x3b380 tail-jumps to scePthreadMutexDestroy")
+    require(e.jmp(0x3B390) == 0xF8F8E0, "0x3b390 tail-jumps to scePthreadMutexLock")
 
     # ---- no priority-inherit attribute can be requested --------------------------------------
     # The census above is complete: a raw scan finds exactly those five `e8` opcodes in the body, so a

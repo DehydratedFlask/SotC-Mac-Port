@@ -38,13 +38,12 @@ std::uint64_t load_u64(const std::uint8_t* p) {
 
 // Destroy hooks with observable results.
 int g_destroy_calls = 0;
-bool g_destroy_result = true;
 void* g_destroy_arg = nullptr;
 
 bool destroy_ok(void* obj) noexcept {
     ++g_destroy_calls;
     g_destroy_arg = obj;
-    return g_destroy_result;
+    return true;
 }
 
 bool destroy_fail(void* obj) noexcept {
@@ -148,14 +147,12 @@ int main() {
         CHECK(g_destroy_calls == 0);
 
         // Hook failure is visible and retryable: the token survives.
-        g_destroy_result = false;
         counted.mutex_destroy_3b380 = destroy_fail;
         CHECK(stage_is(teardown_slot414_57b9b0(*state, counted, log), "mutex_destroy"));
         CHECK(g_destroy_arg == state->obj.data());
         CHECK(load_u64(state->obj.data()) == token);
 
         // Retry with the real hook succeeds and clears the 8 bytes.
-        g_destroy_result = true;
         CHECK(teardown_slot414_57b9b0(*state, hooks, log).ok);
         CHECK(load_u64(state->obj.data()) == 0);
         CHECK(teardown_slot414_57b9b0(*state, hooks, log).ok == false);

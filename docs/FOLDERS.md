@@ -600,7 +600,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `tools/dev` | 21 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft/.cache` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
-| `tools/lift` | 773 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/lift` | 775 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/pkg-extractor` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/re` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/re/ghidra` | 4 | Out-of-tree tool adapters and reproducible analysis recipes |

@@ -45,6 +45,9 @@ RangedBoundVarResult init_ranged_bound_var_a4f4d0(ConCmdRangedVar& var,
     if (!is_pinned_class(cls)) return out;
     if (value_ref == nullptr) return out;
 
+    // The wrapper's own `[this] = final vptr` at 0xa4f535 is not reproduced: the leaf overwrites it
+    // with the mid vptr 30 instructions later and nothing in between reads it. The final store at
+    // 0xa4f63d below is the one that survives.
     // Leaf 0xa4f6c6: 0x20af0(this, name, description, flags).
     init_concmd_base_20af0(var.base, name, description, flags);
 
@@ -70,7 +73,9 @@ RangedBoundVarResult init_ranged_bound_var_a4f4d0(ConCmdRangedVar& var,
     // Wrapper 0xa4f63d..0xa4f657: final vptr, then value / default from the same cell.
     var.base.vptr = cls.final_vptr;            // [this] = final vptr (0xa4f63d)
     std::uint32_t cell = 0;
-    std::memcpy(&cell, value_ref, sizeof cell);   // movl (%rcx), %eax (0xa4f64a and again 0xa4f652)
+    // The original loads the cell twice (0xa4f64a and 0xa4f652); it is a stack temp that nothing else
+    // writes, so the model reads it once and stores the same value in both fields.
+    std::memcpy(&cell, value_ref, sizeof cell);
     var.value = cell;                          // dword [this+0xd0] (0xa4f64c)
     var.default_value = cell;                  // dword [this+0x68] (0xa4f654)
     out.value_from_cell = true;
