@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 03:50 CDT (root) — signed compare blocks added; one row refused on evidence (FIXTURE_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01`, card 9. Added VOPC 128–135 and 144–151 (signed compares and their `cmpx` forms), VOP3 128–135 (VCC destination), VOP2 17/18/19, VOP1 53/54 and VOP3 426. Every opcode value and name was read from the pinned PS4 tables with the scan bounded by the next `InstructionFormat…` declaration.
+- **A row was refused, not guessed.** VOP3 28 `v_cmpx_nle_f32`: the first rule required `VDST ∈ {EXEC, EXEC_HI}` and **14 sampled programs were rejected** for putting something else there. Compiler output does not follow the obvious contract, so the row is out of the table, the rejection is recorded in `docs/MSL_OFFLINE.md`, and the 14 programs stay blocked until evidence settles the destination.
+- **Also refused with tests:** VOP2 32 `v_madmk_f32` (mandatory inline literal the current 255-selector rule cannot express) and VOP3 287 `v_mac_f32` (ambiguous addend between the VOP2/VOP3 forms).
+- **Measured at sample 512** (`blocks-512l` → `blocks-512n`): linear **186/367** unchanged (all of it behind branch rows). Block-mode head moved through `VOP2 18` (54) → `VOPC 148` (54) → `VOP3 129` (54) and settled at `VINTRP 2` (48), `VOP3 287` (30), `VOP2 32` (15), `VOP3 28` (14), `MIMG 39` (5).
+- **Tests:** `test_gcn_inventory` 46 (positives for every new row; negatives for `VOP3 28`, `VOP2 32`, `VOP1 55`, `VOP3 425`, VOPC 137), `test_gcn_to_msl` 23, coverage 23, blocks 26.
+- **Still 0 lowered.**
+- **Verification (PASSED):** build exit 0; CTest **518/518**; lift checkers **710 passed / 0 failed**.
+- **Next exact action:** `VINTRP 2` is now the head and needs the matching lowering rule before admission; `MIMG 39`/`1` are the next image rows to verify.
+
 ## 2026-11-03 02:45 CDT (root) — MUBUF numbering was wrong; corrected (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `GPU-01-MSL-OFFLINE-01`, card 8. **MUBUF rows corrected.** The v4 card had labelled 15/16/17 as the dword stores from the Sea Islands list; the pinned PS4 MUBUF table puts **15 = `buffer_load_dwordx3`** and the dword stores at **28–31** (31 = `buffer_store_dwordx3`). Rows are now 12/13/14/15 (loads, 1/2/4/3 components) and 28/29/30/31 (stores, 1/2/4/3); 16/17 reject again. The earlier doc section is annotated, not rewritten, so the mistake stays visible.

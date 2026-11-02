@@ -355,3 +355,25 @@ not move the census, it makes the next rows visible.
   `VOP3 287` (12), `MUBUF 31` (9) to `VOP2 18` (54), `VINTRP 2` (48), `VOP3 287` (24), `VOP3 426` (14),
   `VOP2 32` (12), `VOP1 53` (6).
 - **Still zero lowered:** decoding is not Metal semantics, and no per-shader ABI manifest exists.
+
+## Decoder widening 8 (signed compare blocks, min/max, and one deliberate refusal)
+
+- **Added:** VOP2 17/18/19 (`v_min_i32`, `v_max_i32`, `v_min_u32` — no carry, unlike `v_add_i32`),
+  VOP1 53/54 (`v_sin_f32`, `v_cos_f32`), VOP3 426 `v_rcp_f32`, VOP3 128–135 (`v_cmp_*_i32`, VCC
+  destination), and VOPC 128–135 / 144–151 (the signed compares and their `cmpx` forms; the block
+  boundaries are taken from the pinned table, which puts the `i16` rows at 137–142 and
+  `V_CMPX_CLASS_F32` at 152, and those stay unmodelled).
+- **Deliberately refused — `VOP3 28` (`v_cmpx_nle_f32`).** The VOP3-encoded `cmpx` rows are not
+  modelled: when the first rule tried required `VDST ∈ {EXEC, EXEC_HI}`, **14 sampled programs were
+  rejected** for putting a different value there. Real compiler output therefore does not follow the
+  obvious contract, and guessing it would repeat the SOPP-8/MUBUF mistake. The row stays out of the
+  table, the rejection is recorded here, and the 14 programs remain blocked until the destination
+  contract is established from evidence.
+- **Also refused:** `VOP2 32` `v_madmk_f32` carries a **mandatory** inline literal that the current
+  literal rule (a 255 selector) cannot express, and `VOP3 287` `v_mac_f32` has an ambiguous addend
+  between the VOP2 and VOP3 forms. Both stay unmodelled with a test proving they reject.
+- **Measured at sample 512** (`blocks-512l` → `blocks-512n`): linear decode stays **186/367**, because
+  every row in this card still sits behind a branch row. Block-mode first blockers move through four
+  successive heads — `VOP2 18` (54) → `VOPC 148` (54) → `VOP3 129` (54) — and settle at
+  `VINTRP 2` (48), `VOP3 287` (30), `VOP2 32` (15), `VOP3 28` (14), `MIMG 39` (5).
+- **Still zero lowered.**

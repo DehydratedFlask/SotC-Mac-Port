@@ -190,6 +190,44 @@ class EncodingOracleTests(unittest.TestCase):
             with self.assertRaises(gcn.DecodeError):
                 one(vopc(op=opcode))
 
+    def test_signed_compare_blocks_and_vop3_cmpx(self):
+        # VOPC 128-135 are the signed compares (VCC); 144-151 are their cmpx forms (EXEC).
+        for op, name in ((129, 'v_cmp_lt_i32'), (133, 'v_cmp_ne_i32')):
+            insn = one(vopc(op=op))
+            self.assertEqual(insn.mnemonic, name)
+            self.assertEqual(insn.requirements, ('writes_vcc_mask',))
+        for op, name in ((145, 'v_cmpx_lt_i32'), (148, 'v_cmpx_gt_i32')):
+            insn = one(vopc(op=op))
+            self.assertEqual(insn.mnemonic, name)
+            self.assertEqual(insn.requirements, ('writes_exec_mask',))
+        # VOP3 128-135 are the signed compares with a VCC destination.
+        signed = one(vop3(op=129, dst=106, abs_=0, clamp=0, omod=0, neg=0))
+        self.assertEqual(signed.mnemonic, 'v_cmp_lt_i32')
+        self.assertEqual(signed.requirements, ('writes_vcc_mask',))
+        # VOP3 28 `v_cmpx_nle_f32` stays unmodelled on purpose: real shaders put a non-EXEC value
+        # in VDST, so the destination contract is not established.
+        with self.assertRaises(gcn.DecodeError):
+            one(vop3(op=28, dst=126, abs_=0, clamp=0, omod=0, neg=0))
+        self.assertEqual(one(vop1(op=54)).mnemonic, 'v_cos_f32')
+        # i16 compares and v_not_b32 stay unmodelled.
+        for built in (vopc(op=137), vop1(op=55)):
+            with self.assertRaises(gcn.DecodeError):
+                one(built)
+
+    def test_integer_minmax_rcp_and_sin(self):
+        for op, name in ((17, 'v_min_i32'), (18, 'v_max_i32'), (19, 'v_min_u32')):
+            insn = one(vop2(op=op))
+            self.assertEqual(insn.mnemonic, name)
+            # Integer min/max write no carry, unlike v_add_i32/v_sub_i32.
+            self.assertEqual(insn.requirements, ())
+        self.assertEqual(one(vop3(op=426, abs_=0, clamp=0, omod=0, neg=0)).mnemonic, 'v_rcp_f32')
+        self.assertEqual(one(vop1(op=53)).mnemonic, 'v_sin_f32')
+        # VOP2 32 `v_madmk_f32` carries a mandatory inline literal and stays unmodelled.
+        with self.assertRaises(gcn.DecodeError):
+            one(vop2(op=32))
+        with self.assertRaises(gcn.DecodeError):
+            one(vop3(op=425, abs_=0, clamp=0, omod=0, neg=0))
+
     def test_vop3_multiply_rows_and_buffer_atomics(self):
         for op, name in ((272, 'v_max_f32'), (362, 'v_mul_hi_u32'), (363, 'v_mul_lo_i32')):
             insn = one(vop3(op=op, abs_=0, clamp=0, omod=0, neg=0))

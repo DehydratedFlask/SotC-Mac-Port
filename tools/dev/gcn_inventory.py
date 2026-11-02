@@ -25,7 +25,7 @@ import struct
 import sys
 
 ISA_URL = 'https://docs.amd.com/v/u/en-US/sea-islands-instruction-set-architecture_0'
-VERSION = 'gfx7-bounded-inventory-v11'
+VERSION = 'gfx7-bounded-inventory-v13'
 
 # These are encoding facts, not a translation/semantic implementation.
 # SOP2/SOPC/VOPC rows below are opcode-value facts from the GFX7 ISA tables,
@@ -72,17 +72,20 @@ OPCODES = {
     'VOP1': {1: 'v_mov_b32', 5: 'v_cvt_f32_i32', 6: 'v_cvt_f32_u32',
              8: 'v_cvt_i32_f32', 11: 'v_cvt_f32_f16', 32: 'v_fract_f32',
              36: 'v_floor_f32', 42: 'v_rcp_f32', 46: 'v_rsq_f32',
-             51: 'v_sqrt_f32'},
+             51: 'v_sqrt_f32', 53: 'v_sin_f32', 54: 'v_cos_f32'},
     'VOP2': {0: 'v_cndmask_b32', 3: 'v_add_f32', 4: 'v_sub_f32',
              5: 'v_subrev_f32', 8: 'v_mul_f32', 15: 'v_min_f32',
-             16: 'v_max_f32',
+             16: 'v_max_f32', 17: 'v_min_i32', 18: 'v_max_i32', 19: 'v_min_u32',
              22: 'v_lshrrev_b32', 26: 'v_lshlrev_b32', 27: 'v_and_b32',
              38: 'v_sub_i32',
              31: 'v_mac_f32', 37: 'v_add_i32', 47: 'v_cvt_pkrtz_f16_f32'},
     'VOP3': {1: 'v_cmp_lt_f32', 3: 'v_cmp_le_f32', 4: 'v_cmp_gt_f32',
+             128: 'v_cmp_f_i32', 129: 'v_cmp_lt_i32', 130: 'v_cmp_eq_i32',
+             131: 'v_cmp_le_i32', 132: 'v_cmp_gt_i32', 133: 'v_cmp_ne_i32',
+             134: 'v_cmp_ge_i32', 135: 'v_cmp_t_i32',
              6: 'v_cmp_ge_f32', 11: 'v_cmp_ngt_f32', 136: 'v_cmp_class_f32',
              194: 'v_cmp_eq_u32', 197: 'v_cmp_ne_u32',
-             256: 'v_cndmask_b32', 272: 'v_max_f32',
+             256: 'v_cndmask_b32', 272: 'v_max_f32', 426: 'v_rcp_f32',
              362: 'v_mul_hi_u32', 363: 'v_mul_lo_i32',
              264: 'v_mul_f32', 303: 'v_cvt_pkrtz_f16_f32', 321: 'v_mad_f32',
              322: 'v_mad_i32_i24', 349: 'v_sad_u32', 350: 'v_cvt_pk_u8_f32'},
@@ -100,7 +103,13 @@ OPCODES = {
              31: 'v_cmpx_t_f32',
              # Integer compares (the `cmpx` half). Values cross-checked against the pinned
              # shadPS4 frontend table: 208 V_CMPX_F_U32 .. 213 V_CMPX_NE_U32.
+             128: 'v_cmp_f_i32', 129: 'v_cmp_lt_i32', 130: 'v_cmp_eq_i32',
+             131: 'v_cmp_le_i32', 132: 'v_cmp_gt_i32', 133: 'v_cmp_ne_i32',
+             134: 'v_cmp_ge_i32', 135: 'v_cmp_t_i32',
              136: 'v_cmp_class_f32',
+             144: 'v_cmpx_f_i32', 145: 'v_cmpx_lt_i32', 146: 'v_cmpx_eq_i32',
+             147: 'v_cmpx_le_i32', 148: 'v_cmpx_gt_i32', 149: 'v_cmpx_ne_i32',
+             150: 'v_cmpx_ge_i32', 151: 'v_cmpx_t_i32',
              192: 'v_cmp_f_u32', 193: 'v_cmp_lt_u32', 194: 'v_cmp_eq_u32',
              195: 'v_cmp_le_u32', 196: 'v_cmp_gt_u32', 197: 'v_cmp_ne_u32',
              198: 'v_cmp_ge_u32', 199: 'v_cmp_t_u32',
@@ -155,10 +164,15 @@ SOP1_64BIT = frozenset((4, 8, 10, 36))
 # VOP3-encoded VOPC-class compares: the VDST field names the mask destination (VCC or an SGPR
 # pair) instead of a vector register, and the modifier fields must be clear. Names and opcode
 # values come from the pinned PS4 frontend table.
-VOP3_COMPARE = frozenset((1, 3, 4, 6, 11, 136, 194, 197))
+VOP3_COMPARE = frozenset((1, 3, 4, 6, 11, 128, 129, 130, 131, 132, 133, 134, 135,
+                          136, 194, 197))
+# VOP3-encoded `cmpx` rows are deliberately NOT modelled: real shaders put a non-EXEC value in
+# VDST there, and the destination contract is not established (see docs/MSL_OFFLINE.md).
+VOP3_EXEC_COMPARE = frozenset()
 # VOPC rows that overwrite EXEC instead of writing the VCC pair (`cmpx`). Everything else in the
 # modelled VOPC set writes VCC, including the integer compares at 192-199.
-VOPC_WRITES_EXEC = frozenset(range(16, 32)) | frozenset(range(208, 216))
+VOPC_WRITES_EXEC = (frozenset(range(16, 32)) | frozenset(range(144, 152))
+                    | frozenset(range(208, 216)))
 
 # VOP3 rows that read all three source fields; every other modelled VOP3 row reads two.
 VOP3_THREE_SOURCE = frozenset((256, 321, 322, 349, 350))
@@ -381,7 +395,11 @@ def _validate(form: str, op: int, f: dict[str, int], at: int) -> tuple[str, ...]
             if op in VOP3_COMPARE:
                 require(not (f['abs'] or f['clamp'] or f['omod'] or f['neg']),
                         'modifier field set on a compare row')
-                if f['vdst'] in (106, 107):
+                if op in VOP3_EXEC_COMPARE:
+                    require(f['vdst'] in (126, 127),
+                            'cmpx mask destination must be EXEC')
+                    requirements.add('writes_exec_mask')
+                elif f['vdst'] in (106, 107):
                     requirements.add('writes_vcc_mask')
                 else:
                     require(f['vdst'] % 2 == 0 and f['vdst'] != 124,
