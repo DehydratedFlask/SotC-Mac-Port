@@ -300,22 +300,21 @@ class _Analysis:
     # -- result --------------------------------------------------------------------------
     def result(self, code: bytes, rows: list, inventory: dict) -> dict:
         bases = [entry for entry in self.bases.values() if not entry['derived']]
-        derived = [entry['slot'] for entry in self.bases.values() if entry['derived']]
+        derived = [entry for entry in self.bases.values() if entry['derived']]
         descriptors = [entry for entry in self.descriptors.values() if not entry['derived']]
-        derived_descriptors = [entry['slot'] for entry in self.descriptors.values()
-                               if entry['derived']]
-        for slot in derived:
-            self.shape.append({'offset': self.bases[slot]['sites'][0], 'mnemonic': 'SMRD',
+        derived_descriptors = [entry for entry in self.descriptors.values() if entry['derived']]
+        for entry in derived:
+            self.shape.append({'offset': entry['sites'][0], 'mnemonic': 'SMRD',
                                'kind': 'derived-base',
-                               'reason': f'scalar base s{slot} is written by an earlier '
-                                         f'instruction; the lowering requires a directly bound '
-                                         f'base'})
-        for slot in derived_descriptors:
-            self.shape.append({'offset': self.descriptors[slot]['sites'][0], 'mnemonic': 'MUBUF',
+                               'reason': f'scalar base s{entry["slot"]} is written by an '
+                                         f'earlier instruction; the lowering requires a '
+                                         f'directly bound base'})
+        for entry in derived_descriptors:
+            self.shape.append({'offset': entry['sites'][0], 'mnemonic': 'MUBUF',
                                'kind': 'derived-descriptor',
-                               'reason': f'buffer descriptor s{slot} is written by an earlier '
-                                         f'instruction; the lowering requires a directly bound '
-                                         f'descriptor'})
+                               'reason': f'buffer descriptor s{entry["slot"]} is written by an '
+                                         f'earlier instruction; the lowering requires a '
+                                         f'directly bound descriptor'})
         expected = EXPORT_CONTRACT.get(self.stage)
         observed = sorted(self.exports)
         if expected is not None:
@@ -361,6 +360,17 @@ class _Analysis:
         counts['binding_holes'] = sum(counts[k] for k in
                                       ('scalar_bases', 'buffer_descriptors', 'export_targets',
                                        'initial_vectors', 'initial_scalars', 'policy'))
+        # Slots the program touches but no manifest can bind: they are written by an earlier
+        # instruction, so `Lowerer.pair()` would reject a directly bound cell.
+        derived = {
+            'scalar_bases': sorted(({'slot': e['slot'], 'kind': e['kind'], 'sites': e['sites']}
+                                    for e in derived), key=lambda e: e['slot']),
+            'buffer_descriptors': sorted(
+                ({'slot': e['slot'], 'sites': e['sites']} for e in derived_descriptors),
+                key=lambda e: e['slot']),
+        }
+        counts['derived_slots'] = len(derived['scalar_bases']) + len(
+            derived['buffer_descriptors'])
         return {
             'schema': ANALYSIS_SCHEMA,
             'stage': self.stage,
@@ -370,6 +380,7 @@ class _Analysis:
             'per_lane_eligible': inventory['per_lane_eligible'],
             'per_lane_blockers': inventory['per_lane_blockers'],
             'holes': holes,
+            'derived': derived,
             'counts': counts,
             # A manifest is necessary but not sufficient: `shape` lists everything a manifest
             # cannot fix, so "waiting on bindings" is never claimed for a shape-blocked program.
@@ -644,8 +655,7 @@ def validate(manifest: dict, analysis: dict) -> list[dict]:
         problems.append(_problem('stage', None,
                                  f'shader.stage {shader["stage"]!r} does not match the analysed '
                                  f'stage {analysis["stage"]!r}'))
-    holes = analysis['holes']
-    problems.extend(_check_holes(manifest, holes))
+    problems.extend(_check_holes(manifest, analysis))
     for blocker in analysis['shape']:
         problems.append(_problem('shape-blocker', blocker['mnemonic'],
                                  f'{_hex(blocker["offset"])}: {blocker["reason"]}; no manifest '
@@ -653,7 +663,8 @@ def validate(manifest: dict, analysis: dict) -> list[dict]:
     return problems
 
 
-def _check_holes(manifest: dict, holes: dict) -> list[dict]:
+def _check_holes(manifest: dict, analysis: dict) -> list[dict]:
+    holes, derived_map = analysis['holes'], analysis.get('derived') or {}
     problems: list[dict] = []
     sections = {
         'scalar_bases': ('scalar_base', 's', holes['scalar_bases'], 'slot'),
@@ -679,9 +690,19 @@ def _check_holes(manifest: dict, holes: dict) -> list[dict]:
                 continue  # already reported by _check_document as unfilled-slot
             problems.extend(_check_kind(name, label, prefix, entry, bound[slot], sites))
         for extra in sorted(set(bound) - supplied[name], key=int):
-            problems.append(_problem(
-                f'unused-{label.replace("_", "-")}', f'{prefix}{extra}',
-                f'{label} {prefix}{extra} is bound but this program never uses it'))
+            derived = [entry for entry in derived_map.get(name, [])
+                       if str(entry['slot']) == extra]
+            if derived:
+                sites = ', '.join(_hex(site) for site in derived[0]['sites'])
+                problems.append(_problem(
+                    'derived-slot', f'{prefix}{extra}',
+                    f'{label} {prefix}{extra} is used at {sites} but written by an earlier '
+                    f'instruction; a direct binding cannot satisfy the lowering, so the '
+                    f'program is shape-blocked rather than binding-blocked'))
+            else:
+                problems.append(_problem(
+                    f'unused-{label.replace("_", "-")}', f'{prefix}{extra}',
+                    f'{label} {prefix}{extra} is bound but this program never uses it'))
     policy = manifest.get('policy') or {}
     needed = {entry['name'] for entry in holes['policy']}
     for name in ('interpolation', 'vertex_select', 'vertex_mov_subtract_p10'):
