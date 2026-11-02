@@ -58,24 +58,40 @@ FLOAT_FN_BODIES = [0xC4A0, 0xC4C0, 0xC4E0, 0xC4F0]   # copy / clone / move / bar
 MODEL_SOURCE = "native/core/debug_page_var_item.cpp"
 MODEL_HEADER = "native/core/debug_page_var_item.hpp"
 
-# The shared model's step order (each token must appear exactly once, in this order).
-MODEL_ORDER = [
-    "return Stage::var_ctor;",
-    "if (!init_bounded_float_var_c300(",
-    "const bool description_inert = release_inert_view_f590(description);",
-    "result.functor_destroy_ok = true;",
-    "var.value = row.value_bits;",
-    "result.registration = register_concmd_20d60(",
-    "const bool name_inert = release_inert_view_f590(name);",
-    "result.atexit_recorded = concmd.atexit_log.record(kFloatVarDtorRva",
-    "if (!init_debug_menu_item_27050(",
-    "if (!init_debug_menu_item_26ea0(",
-    "result.registration = register_debug_menu_item_268b0(",
-    "const bool text_inert = release_inert_view_f590(text);",
-    "const bool label_inert = release_inert_view_f590(label);",
-    "result.atexit_recorded = concmd.atexit_log.record(kMenuItemDtorRva",
-    "out.canary_checked = true;",
-]
+# The shared model's step order, per function of native/core/debug_page_var_item.cpp. The three slices are
+# checked separately because the helpers are defined before the driver.
+MODEL_ORDER = {
+    "build_var": [
+        "return Stage::var_ctor;",
+        "if (!init_bounded_float_var_c300(",
+        "const bool description_inert = release_inert_view_f590(description);",
+        "result.functor_destroy_ok = true;",
+        "var.value = row.value_bits;",
+        "result.registration = register_concmd_20d60(",
+        "const bool name_inert = release_inert_view_f590(name);",
+        "result.atexit_recorded = concmd.atexit_log.record(kFloatVarDtorRva",
+    ],
+    "build_item": [
+        "if (!init_debug_menu_item_27050(",
+        "if (!init_debug_menu_item_26ea0(",
+        "result.registration = register_debug_menu_item_268b0(",
+        "const bool text_inert = release_inert_view_f590(text);",
+        "const bool label_inert = release_inert_view_f590(label);",
+        "result.atexit_recorded = concmd.atexit_log.record(kMenuItemDtorRva",
+    ],
+    "driver": [
+        "const std::uint64_t guard_entry = hooks.stack_guard != nullptr ? *hooks.stack_guard : 0;",
+        "const Stage stage = build_var(",
+        "build_item(row, objects.items[index]",
+        "out.canary_checked = true;",
+        "out.ok = true;",
+    ],
+}
+MODEL_SLICES = {
+    "build_var": ("Stage build_var(", "// One item row"),
+    "build_item": ("Stage build_item(", "}  // namespace"),
+    "driver": ("Result init_debug_page(", "}  // namespace sotc::debug_page"),
+}
 
 MODEL_TOKENS = [
     "inline constexpr std::uint64_t kBoundedFloatCtorRva = 0xc300;",
@@ -97,7 +113,6 @@ MODEL_TOKENS = [
     "inline constexpr std::size_t kMaxScriptItems = 1;",
     # the only hook of the batch: the stack guard, and it is a host decision
     "const std::uint64_t* stack_guard = nullptr;",
-    "const std::uint64_t guard_entry = hooks.stack_guard != nullptr ? *hooks.stack_guard : 0;",
     "bool canary_checked = false;",
 ]
 
@@ -222,12 +237,18 @@ def check_native(texts: dict[str, str], spec: dict) -> None:
     # The shared model: constants, the hook wiring, and the step order this shape demands.
     for token in MODEL_TOKENS:
         require(token in texts["model_header"], f"model header token {token!r}")
-    positions = []
-    for token in MODEL_ORDER:
-        require(token in texts["model_source"], f"model source token {token!r}")
-        positions.append(texts["model_source"].index(token))
-    require(positions == sorted(positions) and len(set(positions)) == len(positions),
-            "the shared model's steps are in the original's order")
+    for name, tokens in MODEL_ORDER.items():
+        begin, end = MODEL_SLICES[name]
+        source = texts["model_source"]
+        slice_begin = source.index(begin)
+        slice_end = source.index(end, slice_begin)
+        body = source[slice_begin:slice_end]
+        positions = []
+        for token in tokens:
+            require(token in body, f"model {name} step {token!r}")
+            positions.append(body.index(token))
+        require(positions == sorted(positions) and len(set(positions)) == len(positions),
+                f"the shared model's {name} steps are in the original's order")
 
 
 def read_native(spec: dict) -> dict[str, str]:
@@ -271,7 +292,8 @@ def mutation_self_test(e: Elf, texts: dict[str, str], spec: dict) -> tuple[int, 
     native_ran = 0
     for key, tokens in (("header", list(spec["constants"]) + spec["header_tokens"]), ("source", spec["source_order"]),
                         ("test", spec["test_tokens"]), ("cmake", spec["cmake_tokens"]),
-                        ("model_header", MODEL_TOKENS), ("model_source", MODEL_ORDER)):
+                        ("model_header", MODEL_TOKENS),
+                        ("model_source", [t for tokens in MODEL_ORDER.values() for t in tokens])):
         for token in tokens:
             if token not in texts[key]:
                 continue

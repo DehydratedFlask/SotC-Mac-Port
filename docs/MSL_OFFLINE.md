@@ -960,7 +960,7 @@ times in this sample; it is a tightening of the analysis, not a measured gain.
 ### Verification, and what is *not* established
 
 - `python3 -m unittest discover -s tools/dev -p 'test_*.py'` → **109 tests OK**
-  (`test_gcn_to_msl` 24 → **34**); `msl_abi_manifest --self-test` 76 → **99 checks**;
+  (`test_gcn_to_msl` 24 → **34**); `msl_abi_manifest --self-test` 76 → **102 checks**;
   `msl_lower_ladder --self-test` 6 checks; `gcn_inventory`'s 50 tests unchanged.
 - **71 of 71** generated MSL files compile (`xcrun -sdk macosx metal -c`, exit 0, no diagnostics).
   Two independent `--compile` runs produced identical MSL digests and identical compile results;
