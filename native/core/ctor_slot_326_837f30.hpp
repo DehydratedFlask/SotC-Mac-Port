@@ -37,7 +37,8 @@
 //   0x20af0   x2   ConCmdBase ctor (the two bool variables)
 //   0x26800   x1   kind-0 "MenuSeparator" label item ctor (see below)
 //   0xf8f3a0  x1   __stack_chk_fail (the branch target only)
-// The five item ctors tail-call 0x268b0, so no direct 0x268b0 site appears in this body.
+// All four item ctors this body uses (0x26800 / 0x26c10 / 0x26ea0 / 0x27050) end in `jmp 0x268b0`, so
+// no direct 0x268b0 call site appears in this body.
 //
 // The 13 indirect sites (0x838240 / 0x838564 / 0x838674 / 0x838786 / 0x838890 / 0x83899d / 0x838ab2
 // / 0x838bc5 / 0x838cdc / 0x838df0 / 0x838efe / 0x839015 / 0x83912a) are `callq *0x18(%rax)` with
