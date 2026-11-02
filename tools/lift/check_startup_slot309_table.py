@@ -8,7 +8,7 @@ turns out not to be a call-graph question at all:
   * `0xa505e0` has **no direct near call or jump anywhere in the image** (checked by a complete raw
     byte scan for `e8`/`e9` + disp32, so it does not depend on instruction decoding);
   * exactly **one** RELA row references it: a type-8 row at `0x2dd6738`, which is
-    `0x2dd5d90 + 309 * 8` - row 309 of the startup constructor table.
+    `0x2dd70e0 - 309 * 8` - entry 309 of the backwards-indexed startup constructor table.
 
 So the only edge to slot 309 is data, which is why every call-graph trace (including the Ghidra one
 that timed out) failed to find an order.  The two jump tables are still pinned here because the
@@ -36,11 +36,19 @@ ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
 
 SLOT309_RVA = 0xA505E0
 SLOT309_TABLE_ROW = 0x2DD6738
-SLOT309_TABLE_BASE = 0x2DD5D90
+# The original constructor table is 573 qwords at 0x2dd70e0, indexed BACKWARDS: entry i is the qword
+# at `kCtorTableTop - 8*i` (see native/core/startup_ctors.hpp).  Entry 309 is therefore
+# 0x2dd70e0 - 309*8 = 0x2dd6738.  An earlier draft of this checker invented a forward "base"
+# 0x2dd5d90 = top - 618*8; that lands on entry 309 only because 618 == 2*309, and it mislabelled
+# every neighbouring entry by six positions.  The top/index form below is the real model.
+SLOT309_TABLE_TOP = 0x2DD70E0
+SLOT309_TABLE_COUNT = 573
 SLOT309_INDEX = 309
 
-# Neighbouring startup rows, so the table base is pinned by more than one arithmetic identity.
-NEIGHBOURS = {306: 0xA46130, 307: 0xA46B70, 308: 0xA479D0, 310: 0xA58F10, 311: 0xA5B090}
+# Neighbouring startup entries, so the table model is pinned by more than the slot-309 row alone.
+NEIGHBOURS = {306: 0xA633B0, 307: 0xA5B090, 308: 0xA58F10, 310: 0xA479D0, 311: 0xA46B70}
+# The two ends of the 573-entry span.
+TABLE_ENDS = {0: 0xF6CAD0, 572: 0x1A20}
 
 # The two computed jumps and their PIC-relative tables.
 JUMP_A = {"site": 0xA4869B, "load": 0xA4868D, "table": 0x12C3280, "count": 17, "bound": b"\x83\xf8\x10"}
@@ -85,15 +93,17 @@ def main() -> int:
                if as_int(r["addend"]) == SLOT309_RVA or as_int(r.get("symbol", 0)) == SLOT309_RVA]
     require(len(any_ref) == 1, f"a second relocation now references 0x{SLOT309_RVA:x}: {len(any_ref)}")
 
-    # The base is pinned by the row index and by four independent neighbours.
-    require(SLOT309_TABLE_BASE + SLOT309_INDEX * 8 == SLOT309_TABLE_ROW,
+    # The table model is pinned by the row index, by five neighbours and by both ends of the span.
+    require(SLOT309_TABLE_TOP - SLOT309_INDEX * 8 == SLOT309_TABLE_ROW,
             "slot 309 row/index arithmetic no longer holds")
     by_target = {}
     for row in type8:
         by_target[as_int(row["target"])] = as_int(row["addend"])
-    for index, expected in NEIGHBOURS.items():
-        got = by_target.get(SLOT309_TABLE_BASE + index * 8)
-        require(got == expected, f"startup row {index} is 0x{got:x}, expected 0x{expected:x}")
+    missing = [i for i in range(SLOT309_TABLE_COUNT) if SLOT309_TABLE_TOP - i * 8 not in by_target]
+    require(not missing, f"constructor table has {len(missing)} gaps, first {missing[:5]}")
+    for index, expected in {**NEIGHBOURS, **TABLE_ENDS}.items():
+        got = by_target.get(SLOT309_TABLE_TOP - index * 8)
+        require(got == expected, f"startup entry {index} is 0x{got:x}, expected 0x{expected:x}")
 
     # --- no code edge, checked without trusting a disassembler -------------------------------------------
     # A near call/jmp to `0xa505e0` must be `e8`/`e9` followed by a disp32 that lands on it.  Scanning
@@ -155,7 +165,8 @@ def main() -> int:
         require(owner == cases[case - 1], f"call 0x{call:x} is owned by case {cases.index(owner) + 1}, not {case}")
 
     print(f"OK check_startup_slot309_table: slot 309 is a data-only edge - 0x{SLOT309_RVA:x} is row "
-          f"{SLOT309_INDEX} of the table at 0x{SLOT309_TABLE_BASE:x} (single type-8 RELA row at "
+          f"{SLOT309_INDEX} of the backwards-indexed {SLOT309_TABLE_COUNT}-entry table at "
+          f"0x{SLOT309_TABLE_TOP:x} (single type-8 RELA row at "
           f"0x{SLOT309_TABLE_ROW:x}), with no near call/jmp to it anywhere in the image; "
           f"tables A/B decode {JUMP_A['count']}/{JUMP_B['count']} entries, all on instruction "
           f"boundaries, and cases A2/A14/B2/B19 own the four 0xa4a600/0xa4a940 calls")
