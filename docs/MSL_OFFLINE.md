@@ -613,3 +613,196 @@ and the two index lists are identical — so the numbers below are one sample, n
 - **Still zero lowered.** Not one real shader has an ABI manifest; decoding more rows does not
   create one, and no lowering was attempted or claimed for any row in this card.
 
+
+## ABI manifests: the schema, the holes, and why `lowered` is still 0 (2026-11-01)
+
+Task `GPU-01-MSL-OFFLINE-01`. The sections above measure the blocker precisely: `gcn_to_msl.py`
+refuses every program without a per-shader ABI manifest, and no retail member has one because the
+shader names register **slots** (`SMRD` `sbase`, `MUBUF` `srsrc`, `EXP` `target`) while the draw
+state owns what each slot addresses. This card builds the missing organ: a versioned schema, a
+generator that emits the exact unfilled form, a validator with per-slot diagnostics, and the
+measured hole list for a bounded sample.
+
+`tools/dev/msl_abi_manifest.py` decodes and counts. It never lowers, never compiles, never executes
+and never guesses a binding.
+
+```sh
+python3 -I tools/dev/msl_abi_manifest.py --self-test              # 69 checks, synthetic spans only
+python3 -I tools/dev/msl_abi_manifest.py --program span.bin --stage vs            # the hole list
+python3 -I tools/dev/msl_abi_manifest.py --program span.bin --stage vs --json     # same, as JSON
+python3 -I tools/dev/msl_abi_manifest.py --program span.bin --stage vs --skeleton form.json
+python3 -I tools/dev/msl_abi_manifest.py --program span.bin --manifest filled.json
+python3 -I tools/dev/msl_abi_manifest.py --census --sample 512 --top 20 \
+    --out local/validation/msl-abi-holes
+```
+
+Exit codes: `0` ok, `1` failure (a binding problem, or a shape blocker that no manifest can fix).
+The census output and any `--skeleton` path inside this repo must resolve under private `local/`.
+
+### Schema `msl-abi-manifest-v1`
+
+One JSON document per **shader stage**. Unknown fields are rejected and every leaf is type-checked.
+Sections default to empty, but a section the program needs and the manifest omits fails with one
+`missing-*` diagnostic per slot rather than one generic error.
+
+| Field | Shape | Meaning |
+|---|---|---|
+| `schema` | `"msl-abi-manifest-v1"` | version gate |
+| `shader` | `{id, stage, sha256, bytes}` | `id` a stable name, `stage` `vs`/`ps`, `sha256` the exact program digest, `bytes` its length; the digest is the only tie to a real program |
+| `provenance` | `{bindings, note?}` | `state-trace`, `owner-supplied` or `synthetic`; the note is free text |
+| `scalar_bases` | `{"N": {kind, view, note?}}` | an `SMRD` `sbase*2`: `kind` is `pointer` (2 scalar cells, `s_load_*`) or `descriptor` (4 cells, `s_buffer_load_*`), `view` names the memory it addresses |
+| `buffer_descriptors` | `{"N": {kind:"descriptor", view, format, field, note?}}` | a `MUBUF` `srsrc*4`: `format` is `explicit_float2/3/4`, `field` one of the lowering's named case fields |
+| `exports` | `{"T": {semantic, sources?, note?}}` | an `EXP` target: `semantic` names the MRT/param, `sources` optionally pins the four VGPRs the program must feed it from |
+| `initial_scalars` | `{"N": binding}` | a scalar read before being written (constant-buffer input, `s124` coefficient selector) |
+| `initial_vectors` | `{"N": binding}` | a vector read before being written; `vertex_index` for a formatted-fetch address, `float`+`field`+`component` for a supplied value |
+| `views` | `{name: {offset: binding}}` | the dword contents each `view` must expose, keyed by the dword offset the `SMRD` immediate names |
+| `policy` | `{floating_point, interpolation?, vertex_select?, vertex_mov_subtract_p10?}` | the knobs `gcn_to_msl.Lowerer` already exposes: the `supplied_float_coefficients`/`supplied_vertex_values` mode, the VSRC→`p10`/`p20`/`p0` map, and its optional subtract list |
+
+`binding` is one of `{kind:"pointer"|"descriptor", view}`, `{kind:"float4", field}`,
+`{kind:"float", field, component}`, `{kind:"vertex_index"}`, `{kind:"interpolation_control"}`.
+Those are exactly the five cell constructors `Lowerer.bind()` accepts, so a filled manifest is
+**projectable** onto the dict the lowerer consumes (`to_lowerer_stage_abi()`, and
+`to_lowerer_pair()` for a VS/PS pair). Nothing is lowered by that projection; it is a dict
+transformation, and it is the reason a validated manifest is the only missing input on the path.
+
+### Generator: the form, not the answer
+
+`--skeleton` emits the same document with every hole present and `null`. Worked example, measured
+on the largest per-lane-eligible program in the sample (`shadow_809795858_shipping.csdr`, 316 B,
+65 instructions, `sha256` `98163a1c…cd86`):
+
+```json
+{"schema": "msl-abi-manifest-v1",
+ "shader": {"id": "shadow_809795858_shipping", "stage": "vs", "sha256": "98163a1c…", "bytes": 316},
+ "scalar_bases": {"0": null},
+ "buffer_descriptors": {},
+ "exports": {"12": null, "32": null},
+ "initial_scalars": {"2": null},
+ "initial_vectors": {"0": {"kind": "vertex_index"}, "3": null},
+ "views": {},
+ "policy": {"floating_point": "nearest_even_ftz32_rtz16"}}
+```
+
+Six holes, and the shape of each is measured rather than assumed: `s0` is the `sbase*2` of both
+root `s_load` rows (`0x1c`, `0x20`), `12`/`32` are the two `EXP` targets (`0x120`, `0x130`), `s2`
+and `v3` are read at `0x14` before any write, and `v0` carries the formatted-fetch address at
+`0x44`/`0x64` — that one is pre-filled because `MUBUF idxen=1` on a format load *is* the vertex
+index, not because a resource was guessed. Only two *bindings* are pre-filled on that basis
+(`vertex_index`, and `interpolation_control` for `s124`); the third pre-filled value is
+`policy.floating_point`, which has exactly one accepted profile. `vertex_select` stays `null`
+because the pinned translator and the ISA summary disagree on the VSRC→vertex mapping.
+
+### Validator: fail-closed, per slot
+
+`--manifest` checks a filled document against the same decoded program. Every diagnostic names the
+slot, the requirement and the instruction offset that established it; there is no generic
+"invalid".
+
+| Code | Fires when |
+|---|---|
+| `missing-scalar-base` / `missing-buffer-descriptor` | the program reads that slot and the manifest does not bind it (message carries the sites) |
+| `missing-export-target` | the program writes that `EXP` target and the manifest does not declare it |
+| `missing-initial-vector` / `missing-initial-scalar` | a register is read before being written and no binding exists |
+| `missing-policy` | the encoding forces an interpolation mode or a `vertex_select` entry that the policy omits |
+| `missing-view` / `missing-view-dword` | a scalar load reads a dword the named view does not define |
+| `unused-scalar-base` / `unused-buffer-descriptor` / `unused-export-target` / `unused-initial-*` | a binding names a slot the program never touches |
+| `unused-view-entry` / `unused-policy` | a declared entry no load reads, or a knob the program has no row for |
+| `wrong-kind` | a base bound as `descriptor` that the program reads as a `pointer` (or the converse), or a `vertex_index`/`interpolation_control` cell bound as something else |
+| `wrong-format` | the descriptor's declared `format` is not the component count the `MUBUF` row asks for |
+| `wrong-section` | a binding sits in the wrong section for how the program uses the slot |
+| `derived-slot` | the slot is used, but an earlier instruction writes it, so no direct binding can satisfy `Lowerer.pair()` |
+| `export-source-mismatch` | `exports[T].sources` disagrees with the `vsrc0..3` the `EXP` row actually names |
+| `unfilled-slot` | the value is still `null` |
+| `digest` / `bytes` / `stage` / `schema` / `unknown-field` / `slot-key` / `view-name` / `invalid-binding` / `not-an-object` | structural |
+| `shape-blocker` | the program cannot be lowered by *any* manifest; reported as `BLOCKED`, never as a binding failure |
+
+Example on real data (a deliberately wrong manifest for the shader above):
+
+```
+FAILED: scalar_base s0: scalar_base s0 is read as a pointer at 0x1c, 0x20 but is bound as
+        'descriptor'; the lowering reads 2 consecutive scalar cells for a pointer
+FAILED: s20: scalar_base s20 is used by this program as buffer_descriptors, not as scalar_bases
+FAILED: s24: buffer_descriptor s24 is used at 0x44 but written by an earlier instruction; a direct
+        binding cannot satisfy the lowering, so the program is shape-blocked rather than
+        binding-blocked
+FAILED: 33: export_target 33 is bound but this program never uses it
+```
+
+### The measured hole list (sample 512, deterministic, private output)
+
+`--census` re-reads the same 512 members as the v17 coverage card, with the same
+`sample_indices` rule, so the two censuses describe one population. It reproduces the v17 numbers
+exactly — 410 program rows, **180 not linear**, **153 per-lane blocked**, **77 per-lane eligible**
+(153 + 77 = the 230 programs v17 decodes) — and then adds the hole list the coverage card could not
+express.
+
+| Aggregate | 77 eligible | 20 largest |
+|---|---:|---:|
+| Programs analysed | 77 | 20 |
+| **manifest-only** (a filled manifest would be the only missing input) | **0** | **0** |
+| shape-blocked (a manifest cannot help) | 77 | 20 |
+| distinct scalar-base slots | **1** (`s0`) | 1 (`s0`) |
+| distinct buffer-descriptor slots | **0** | 0 |
+| distinct export targets | **3** (`9`, `12`, `32`) | 3 |
+| distinct initial-vector slots | **2** (`v0`, `v3`) | 2 |
+| distinct initial-scalar slots | **1** (`s2`) | 1 |
+| distinct policy knobs | 0 | 0 |
+| scalar view dword requests | 5 | 5 |
+| code bytes min/median/max | 32 / 32 / 316 | 32 / 32 / 316 |
+| instructions min/median/max | 5 / 5 / 65 | 5 / 5 / 65 |
+
+The population is thin at the tail: the 20 largest are **8 substantial programs (92–316 B,
+18–65 instructions) plus 12 five-instruction 32-byte pixel shaders** whose only `EXP` row is
+target 9 with `en=0` (no components enabled). The eight substantial ones are all vertex shaders,
+and between them they are waiting on **exactly one root pointer, two export targets and three
+registers**:
+
+| Program | Bytes | Insns | Binding holes | of which | view dwords | derived slots | shape blockers |
+|---|---|---:|---:|---|---:|---:|---:|
+| `shadow_809795858_shipping` | 316 | 65 | 6 | `s0`; `EXP 12`,`32`; `v0`,`v3`; `s2` | 2 | 6 | 22 |
+| `depthfadeout_256418196_shipping` | 300 | 61 | 5 | `EXP 12`,`32`; `v0`,`v3`; `s2` | 0 | 5 | 21 |
+| `depthfadeout_3097466771_shipping` | 276 | 55 | 6 | `s0`; `EXP 12`,`32`; `v0`,`v3`; `s2` | 2 | 7 | 11 |
+| `standard_3883884949` | 264 | 55 | 4 | `s0`; `EXP 12`,`32`; `v0` | 1 | 7 | 8 |
+| `depth_102051268_shipping` | 252 | 50 | 3 | `EXP 12`,`32`; `v0` | 0 | 5 | 6 |
+| `depth_438780663_shipping` | 252 | 50 | 3 | `EXP 12`,`32`; `v0` | 0 | 5 | 6 |
+| `depth_673325337` | 252 | 50 | 3 | `EXP 12`,`32`; `v0` | 0 | 5 | 6 |
+| `vs_main_5228ca40` | 92 | 18 | 3 | `EXP 12`,`32`; `v0` | 0 | 0 | 11 |
+
+### What that measurement actually says
+
+**A filled manifest would unlock none of them, and the reason is in the lowering, not the ABI.**
+Every eligible program carries at least one shape blocker; the histogram over the 77 is
+`export-contract` 77, `export-shape` 69, `unsupported-row` 37, `derived-base` 26,
+`derived-descriptor` 14, `stream-shape` 6.
+
+1. **The export contract is synthetic.** `Lowerer.run` ends with
+   `required = {12,32,33} if stage=='vs' else {0}` and compares for equality, so a vertex shader
+   that writes clip plus one param — all eight substantial ones write exactly `12` and `32` — is
+   rejected before any binding is read. The tail programs export only target `9` with `en=0` — no
+   components enabled, the usual null-export idiom — which the `ps` branch (`required = {0}`) does
+   not accept either.
+2. **Retail shaders are two-level.** Every descriptor and every scalar base that is *not* the root
+   is written by a preceding `s_load_dwordx4 s[…], [s0+…]` before it is read, and `Lowerer.pair()`
+   requires the bound cells to be untouched. So the directly bindable ABI surface of a retail VS
+   collapses to its **root pointer**: across the whole 77-program sample that is 1 scalar base
+   (`s0`) and 0 buffer descriptors. Supporting the rest is a lowering rule (a memory-resident
+   descriptor), not a manifest field.
+3. **The row set is a 7-mnemonic subset.** `v_cvt_f32_f16`, `v_lshrrev_b32`, `v_sad_u32` and the
+   integer rows are outside `LOWERED_ARITHMETIC`, so a manifest cannot reach those programs.
+4. **`MUBUF` offsets are real.** Two rows in the largest program carry a nonzero `offset`, which the
+   current stream contract forbids.
+
+So the honest ordering of the remaining work is: **lowering shape first, ABI bindings second.**
+What this card removes is the excuse that the form was unknown: the holes are enumerated, typed and
+validated, and the day a state trace or an owner supplies the root pointer, the two export targets
+and the three registers above, the manifest is the only thing left to fill in.
+
+One recorded number needs a correction while it is being reused: the earlier card's
+"scalar memory bases `s0`, `s2`, `s8`, `s9`" are the 6-bit **`sbase` field**, not SGPR numbers —
+`gcn_inventory` decodes `base_sgpr = sbase*2`, so those four rows address `s0`, `s4`, `s16`, `s18`.
+The same program's `MUBUF` descriptor slots (`s20`, `s24`, `s28`) were recorded correctly, but all
+three are *loaded* rather than bindable, which is exactly the two-level finding above.
+
+Private output: `local/validation/msl-abi-holes/abi_holes.json` (slots, counts, digests, offsets and
+the decoder's own strings only — no payload bytes, no listings). Census **STATIC_ANALYSIS_VERIFIED**,
+self-test **FIXTURE_VERIFIED**; **0 lowered**, nothing compiled, no pipeline state, **G3 NOT RUN**.
