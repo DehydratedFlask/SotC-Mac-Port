@@ -511,3 +511,35 @@ downloaded tool or cache file is being published.
   different directory produce different AIR digests while the metallib digests stay identical.
   `-fdebug-prefix-map` / `-ffile-prefix-map` do not change this; record the AIR digest as
   path-sensitive evidence only.
+
+## 2026-11-01 20:15 CDT — PyGhidra python venv for the decompilation pipeline (RE-GHIDRA-PIPE-01)
+
+- **Purpose / task:** produce a reproducible Ghidra decompiler dossier for the five largest
+  unmodelled guest bodies. Ghidra 12 no longer ships Jython, so `.py` GhidraScripts need PyGhidra,
+  and `analyzeHeadless` cannot start it (measured: "Ghidra was not started with PyGhidra").
+- **Source:** the wheels bundled **inside the already-installed Ghidra 12.1.4**
+  (`Ghidra/Features/PyGhidra/pypkg/dist/`). No network access, no download, no third-party tool.
+  Ghidra 12.1.4 and OpenJDK 25.0.4.1 are the versions already logged on 2026-10-18 and reused here.
+- **Versions:** pyghidra 3.1.0, Jpype1 1.5.2, packaging 25.0 (interpreters: `/opt/homebrew/bin/python3.13`
+  — the system `python3` is 3.15 and has no matching JPype wheel).
+- **Install command:**
+  ```sh
+  /opt/homebrew/bin/python3.13 -m venv "local/venv-pyghidra"
+  ./local/venv-pyghidra/bin/pip install --no-index \
+      --find-links /Users/dehydratedflask/Applications/ghidra_12.1.4_PUBLIC/Ghidra/Features/PyGhidra/pypkg/dist \
+      pyghidra
+  ```
+- **Checksums of the wheels used** (SHA-256, from the Ghidra install):
+  `pyghidra-3.1.0-py3-none-any.whl` `f4c138098e63f7d6b3648ff8fba0619aabf088ce1d1e8692808fa1df9d8921a0`;
+  `jpype1-1.5.2-cp313-cp313-macosx_10_13_universal2.whl`
+  `4acb098cb1698b14b6e5c79e275f4c70dcc01b0fb93425f206d0a5e380e43c66`;
+  `packaging-25.0-py3-none-any.whl` `29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484`.
+- **Safety:** a task-local python venv under private `local/` (15 MB), built `--no-index` from files
+  already on disk, so nothing was fetched and no installer ran. It only starts Ghidra in-process;
+  it does not execute guest code, load `eboot.bin` at runtime, or reconstruct a PS4 environment.
+  Smoke test: `--check-project` listed `/eboot.elf` from the existing project and exited 0.
+- **Removal boundary:** `rm -rf local/venv-pyghidra`. Nothing else depends on it; the checkers keep
+  working without it (they SKIP when the private project is absent). Do not delete
+  `local/ghidra/persistent-20261020`, which predates this entry.
+- **Not installed:** no other package, no Homebrew formula, no Ghidra upgrade (0.28.x-style upgrade
+  banners for graft/trail were ignored on purpose).

@@ -12,6 +12,10 @@ executed, and **no target is guessed**.
   rows only, no instruction text; full per-site rows stay private.
 - Checker: `tools/lift/check_indirect_frontier.py` regenerates all three summaries and diffs them;
   it skips cleanly when the private disassembly is absent.
+- Later seed classes (below): the 573-row constructor table, a 40-seed entry-map sample, the
+  exhaustive entry-map sweep, and the vtable-closure sweep. Their artifacts live under
+  `local/validation/indirect-frontier/` (`ctor-sweep.json`, `entry-map-sweep.json`,
+  `entry-map-sweep2.json`, `entry-map-exhaustive-summary.json`, `vtable-closure-sweep-summary.json`).
 
 Inputs (pinned): ELF `d0723afb…61d3`, disassembly `9c196254…107e83`, FDE ranges `f507ab6c…22e8`.
 
@@ -59,30 +63,93 @@ qword in the image and a type-8 dynamic relocation with the same addend.
 All five are FDE function starts. They are recorded in `native/core/vtable_resolved_entries.{hpp,cpp}`
 (sorted by call site, with `find_resolved_vtable_call_site`) and therefore appear in
 [`entry_map.json`](entry_map.json); `tools/lift/check_vtable_resolved_entries.py` re-verifies the
-slot qword, the RELA addend, the FDE start and the entry-map presence for each row. Only `0x20d60`
-has a body model so far (`vtable_1594dc0_slot20_20d60`); the other four are entry records awaiting
-their own lift.
+slot qword, the RELA addend, the FDE start and the entry-map presence for each row. All 33
+distinct targets now have a native body model; the table grew through the sweeps recorded below.
 
-## What stays unknown, and why
+## Sweeps after the seed closure
 
-- **The remaining sites have no static base.** The object pointer comes from a function argument, a
-  returned value or a heap walk, so no file-backed chain exists to follow. They are genuinely
-  dynamic; resolving them needs runtime construction or a type/ownership proof per call site, not a
-  better window.
-- The one resolved site is 0.2 % of the frontier. That is the honest scale: the closure's indirect
-  calls are dominated by runtime-initialised objects, which matches the earlier findings for this
-  engine (`_Root`, the camera `D`, the app-info registry all register their vtables at runtime).
+`vtable_resolved_entries` is the union of four sweeps, each with its own seed class:
+
+| Sweep | Seeds | Resolved rows | Distinct targets |
+|---|---:|---:|---:|
+| `0x531d60` / `0x1bdf30` closures | 2 | 6 | 6 |
+| Constructor table (`0x2dd5f00..0x2dd70e0`, 573 entries) | 573 | 42 | 17 |
+| Entry-map sample, twice | 40 | 47 | 22 |
+| **Vtable-closure sweep** | **13 containers** | **74** | **33** |
+
+The first three rows match the recorded checkpoints. The entry-map sample reached 47 rows / 22
+targets; the exhaustive entry-map sweep below added no new target on top of it, and the
+vtable-closure sweep is the class that did.
+
+### Exhaustive entry-map sweep (class exhausted)
+
+Seed class: every key of `docs/entry_map.json` that is an FDE start and had never been used as a
+sweep seed — the 573 constructor rows, the 40 sampled seeds and the two base seeds removed. The live
+enumeration is **266** seeds (the checkpoint's `274` was an estimate from an earlier entry map), all
+run in one batch:
+`local/validation/indirect-frontier/entry-map-exhaustive-summary.json`.
+
+Result: closure **1,432** functions, **906** indirect sites, **15** resolved rows. Four of them were
+not yet in the header (`0x3133e`, `0x3134e`, `0x31360`, `0x1c00b8`), and every one reaches a target
+that was already recorded. **0 new targets.** The entry-map class is therefore exhausted for target
+discovery; more seeds from it only re-find the same tables.
+
+### Vtable-closure sweep
+
+Seed class: the FDE-start **containers of every fully tied call site that goes through a vtable the
+table already trusts** and was not yet a row. This is a site-evidence class, not a name list: the
+sites were enumerated image-wide (slot qword + type-8 RELA addend + FDE start), then each containing
+function was used as a sweep seed so the site is provably inside the tool's closure. It is the only
+class that extends the table's own evidence base rather than sampling another entry-point list.
+
+- Artifact: `local/validation/indirect-frontier/vtable-closure-sweep-summary.json` (13 seeds,
+  closure 847 functions, 347 sites, 30 resolved rows, no instruction text).
+- Rows added: **27**. Ten bases were already in the table (`0x15949a0`, `0x1594ae8`, `0x1594dc0`,
+  `0x15953f8`, `0x1598e10`, `0x15e1ee0`, `0x15e2028`, `0x15e2d60`, `0x15ed2a0`, `0x15f2f08`); two bases
+  are new because no header row used them before the sweep (`0x1595b60`, `0x1595320`).
+
+| Target | Slot(s) | Sites | Body | Model |
+|---|---|---:|---:|---|
+| **`0x13d50`** | `0x1594ae8 + 0x40` | 1 | 3 B: `xor eax,eax; ret` | `vtable_1594ae8_slot40_13d50` |
+| **`0x13d60`** | `0x1594ae8 + 0x50`, `0x1595b60 + 0x50` | 2 | 9 B: sets `this+0x70 = this+0x60` | `vtable_1594ae8_slot50_13d60` |
+| **`0x30e50`** | `0x1595320 + 0x10` | 1 | 5 B: `jmp 0x312a0` | `vtable_1595320_slot10_30e50` |
+| **`0x488d0`** | `0x1595b60 + 0x18` | 1 | 28 B: pre-pass `0x48790`, tag-1 free | `vtable_1595b60_slot18_488d0` |
+| **`0xc2c0`** | `0x15949a0 + 0x58` | 1 | 20 B: stamp `0x1594280`, copy `+0x10` | `vtable_15949a0_slot58_c2c0` |
+| **`0xe19cb0`** | `0x15e2028 + 0x18` | 1 | 28 B: pre-pass `0xe1b1b0`, tag-1 free | `vtable_15e2028_slot18_e19cb0` |
+| **`0xe19f70`** | `0x15e2028 + 0x38` | 1 | 197 B: name scan, max-id pick, returns found | `vtable_15e2028_slot38_e19f70` |
+| **`0xe1a040`** | `0x15e2028 + 0x40` | 1 | 129 B: name + id lookup, returns 0/1 | `vtable_15e2028_slot40_e1a040` |
+| **`0xe19440`** | `0x15e1ee0 + 0x10` | 1 | 143 B: three 8-byte nodes, slot-0x10 dispatch | `vtable_15e1ee0_slot10_e19440` |
+| **`0xe52cb0`** | `0x15ed2a0 + 0x10` | 1 | 254 B: three-owner teardown, base dtor | `vtable_15ed2a0_slot10_e52cb0` |
+| **`0xed4860`** | `0x15f2f08 + 0x88` | 1 | 5 B: `jmp 0x170b0` (tag-1 free) | `vtable_15f2f08_slot88_ed4860` |
+
+Every row was re-verified outside the sweep tool before it was written: the qword at
+`vtable + slot`, exactly one type-8 dynamic relocation at that address with the same addend, an FDE
+start at the target, and the body digest. `tools/lift/check_vtable_siblings_low.py`,
+`check_vtable_containers_e1.py` and `check_vtable_teardown_tail.py` pin the body bytes and sha256,
+the FDE length, the slot qword, the RELA addend and the entry-map record for all 11 new targets;
+`check_vtable_resolved_entries.py` re-verifies all 74 rows (33 targets).
+
+### What stays unknown, and why
+
+- **Rows are not reachability.** A row says the slot holds that function in the pinned image. It does
+  not say the call executes, that the object is constructed, or that the path is gameplay-reachable.
+- **The rest of the static vtable graph is huge.** An image-wide scan (same classifier) finds 2,249
+  fully tied `vtable-slot` sites over 795 distinct targets, i.e. 74 rows is 3.3 % of the tied sites.
+  The remaining targets are real, but each needs a body model before it may become a row, so they
+  are a queue, not a claim.
+- **Sites with no static base** come from arguments, returns or heap walks; no file-backed chain
+  exists to follow. They need runtime capture or a type/ownership proof per site.
 - A longer instruction window would reclassify some `register-offset`/`register` sites, but it would
   not create a file-backed object chain where none exists.
 
 ## Next steps
 
-1. Lift the four resolved targets that still have no body model (`0x187c0`, `0x13d20`, `0x358c0`,
-   `0xc740`) one at a time, with the same pinned-body fixture used for `0x20d60`.
-2. The "vtable readable, slot not" sites are already answered: no dynamic relocation targets their
-   slot addresses, so the tables are runtime-filled. Do not re-open them without new evidence.
-3. Everything else needs runtime capture or per-site type proofs; do not widen the classifier to
-   manufacture resolutions.
+1. The next bounded seed class is the remaining **containers of fully tied sites**: 27 rows came from
+   the 13 containers above; the image-wide scan lists 857 containers, so the next batch is a
+   deliberate slice (for example the next 26 lowest-RVA containers), each target still modelled
+   before its row is added.
+2. Do not re-sweep the constructor table or the entry-map keys; both are exhausted for new targets.
+3. Keep the "model, then row" order. A target without a fixture and checker stays out of the table.
 
 ## Limits
 

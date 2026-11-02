@@ -2493,6 +2493,14 @@ add_executable(test_pm4_indirect tests/test_pm4_indirect.cpp)
 target_link_libraries(test_pm4_indirect PRIVATE sotc_pm4_indirect)
 add_test(NAME pm4_indirect COMMAND test_pm4_indirect)
 
+# GPU-01-PM4-TRANSLATOR-01 slice 5: the opcode table this title's own writers emit, with a
+# validating sink on top of the framer.
+add_library(sotc_gnm_opcode_table STATIC platform/gnm_opcode_table.cpp)
+target_link_libraries(sotc_gnm_opcode_table PUBLIC sotc_pm4_decoder)
+add_executable(test_gnm_opcode_table tests/test_gnm_opcode_table.cpp)
+target_link_libraries(test_gnm_opcode_table PRIVATE sotc_gnm_opcode_table)
+add_test(NAME gnm_opcode_table COMMAND test_gnm_opcode_table)
+
 # GPU-01-PM4-TRANSLATOR-01 slice 4: encode the typed draw list into one Metal render pass.
 add_library(sotc_metal_draw_encoder STATIC platform/metal_draw_encoder.mm)
 target_compile_options(sotc_metal_draw_encoder PRIVATE -Wall -Wextra -Werror)
@@ -2607,6 +2615,38 @@ add_executable(test_vtable_15e2d60_slot_d0 tests/test_vtable_15e2d60_slot_d0_e24
 target_link_libraries(test_vtable_15e2d60_slot_d0 PRIVATE sotc_vtable_15e2d60_slot_d0)
 add_test(NAME vtable_15e2d60_slot_d0 COMMAND test_vtable_15e2d60_slot_d0)
 
+# CPU-01-AOT-CFG-SCALE-01: remaining slots of the already-resolved tables (vtable-closure sweep).
+add_library(sotc_vtable_siblings_low STATIC
+  core/vtable_1594ae8_slot40_13d50.cpp
+  core/vtable_1594ae8_slot50_13d60.cpp
+  core/vtable_15949a0_slot58_c2c0.cpp
+  core/vtable_1595320_slot10_30e50.cpp)
+target_link_libraries(sotc_vtable_siblings_low PUBLIC sotc_core)
+add_executable(test_vtable_siblings_low tests/test_vtable_siblings_low.cpp)
+target_link_libraries(test_vtable_siblings_low PRIVATE sotc_vtable_siblings_low)
+add_test(NAME vtable_siblings_low COMMAND test_vtable_siblings_low)
+
+# CPU-01-AOT-CFG-SCALE-01: container adapters reached through the 0x15e2028/0x15e1ee0 tables.
+add_library(sotc_vtable_containers_e1 STATIC
+  core/vtable_15e2028_slot40_e1a040.cpp
+  core/vtable_15e2028_slot38_e19f70.cpp
+  core/vtable_15e2028_slot18_e19cb0.cpp
+  core/vtable_15e1ee0_slot10_e19440.cpp)
+target_link_libraries(sotc_vtable_containers_e1 PUBLIC sotc_core)
+add_executable(test_vtable_containers_e1 tests/test_vtable_containers_e1.cpp)
+target_link_libraries(test_vtable_containers_e1 PRIVATE sotc_vtable_containers_e1)
+add_test(NAME vtable_containers_e1 COMMAND test_vtable_containers_e1)
+
+# CPU-01-AOT-CFG-SCALE-01: three-owner teardown 0xe52cb0 and the two plain tail frees.
+add_library(sotc_vtable_teardown_tail STATIC
+  core/vtable_15ed2a0_slot10_e52cb0.cpp
+  core/vtable_15f2f08_slot88_ed4860.cpp
+  core/vtable_1595b60_slot18_488d0.cpp)
+target_link_libraries(sotc_vtable_teardown_tail PUBLIC sotc_core)
+add_executable(test_vtable_teardown_tail tests/test_vtable_teardown_tail.cpp)
+target_link_libraries(test_vtable_teardown_tail PRIVATE sotc_vtable_teardown_tail)
+add_test(NAME vtable_teardown_tail COMMAND test_vtable_teardown_tail)
+
 # CPU-01-AOT-CFG-SCALE-01: retail SysV argument contract for the resolved targets.
 add_library(sotc_retail_abi STATIC core/retail_abi.cpp)
 target_link_libraries(sotc_retail_abi PUBLIC sotc_core)
@@ -2687,3 +2727,14 @@ add_executable(test_vtable_15953f8_fios_and_4b0 tests/test_vtable_15953f8_fios_a
 target_link_libraries(test_vtable_15953f8_fios_and_4b0 PRIVATE sotc_vtable_15953f8_fios
   sotc_vtable_1594dc0_slot10)
 add_test(NAME vtable_15953f8_fios_and_4b0 COMMAND test_vtable_15953f8_fios_and_4b0)
+
+# CPU-01-STARTUP-SLOT-309-NATIVE-LIFT-01: constructor index 309 (0xa505e0), the Save System variable
+# group (3 hook-gated console variables, 1 name object, 1 bool variable, 1 empty view, 4 toggles) and
+# its 12 __cxa_atexit registrations. Deliberately NOT registered in startup_ctors: the three variable
+# constructors 0xa4f4d0 / 0xa4fec0 / 0xa50280 are hooks with no default, so the slot cannot complete on
+# the production path. See core/ctor_slot_309_a505e0.hpp and tools/lift/check_ctor_slot_309.py.
+add_library(sotc_ctor_slot_309 STATIC core/ctor_slot_309_a505e0.cpp)
+target_link_libraries(sotc_ctor_slot_309 PUBLIC sotc_core)
+add_executable(test_ctor_slot_309 tests/test_ctor_slot_309.cpp)
+target_link_libraries(test_ctor_slot_309 PRIVATE sotc_ctor_slot_309)
+add_test(NAME ctor_slot_309 COMMAND test_ctor_slot_309)

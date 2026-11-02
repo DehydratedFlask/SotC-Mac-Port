@@ -7,8 +7,7 @@
 //  -> a target that is an FDE function start.
 //
 // These are entries, not implementations: the table records which guest function each call site
-// reaches. Body models exist for 20 of the 22 distinct targets; `0x31310` and `0x22a60` are entry
-// records awaiting their own lift.
+// reaches. Every one of the 33 distinct targets has a native body model.
 #pragma once
 
 #include <cstddef>
@@ -40,6 +39,19 @@ inline constexpr std::uint64_t kResolvedVtableTarget_e1a5c0Rva = 0xe1a5c0;
 inline constexpr std::uint64_t kResolvedVtableTarget_e19980Rva = 0xe19980;
 inline constexpr std::uint64_t kResolvedVtableTarget_e16a00Rva = 0xe16a00;
 
+// Vtable-closure sweep (2026-11-01): the remaining slots of the tables already recorded above.
+inline constexpr std::uint64_t kResolvedVtableTarget_13d50Rva = 0x13d50;
+inline constexpr std::uint64_t kResolvedVtableTarget_13d60Rva = 0x13d60;
+inline constexpr std::uint64_t kResolvedVtableTarget_30e50Rva = 0x30e50;
+inline constexpr std::uint64_t kResolvedVtableTarget_488d0Rva = 0x488d0;
+inline constexpr std::uint64_t kResolvedVtableTarget_c2c0Rva = 0xc2c0;
+inline constexpr std::uint64_t kResolvedVtableTarget_e19cb0Rva = 0xe19cb0;
+inline constexpr std::uint64_t kResolvedVtableTarget_e19f70Rva = 0xe19f70;
+inline constexpr std::uint64_t kResolvedVtableTarget_e1a040Rva = 0xe1a040;
+inline constexpr std::uint64_t kResolvedVtableTarget_e19440Rva = 0xe19440;
+inline constexpr std::uint64_t kResolvedVtableTarget_e52cb0Rva = 0xe52cb0;
+inline constexpr std::uint64_t kResolvedVtableTarget_ed4860Rva = 0xed4860;
+
 inline constexpr std::uint64_t kResolvedVtable_15949a0 = 0x15949a0;
 inline constexpr std::uint64_t kResolvedVtable_1594ae8 = 0x1594ae8;
 inline constexpr std::uint64_t kResolvedVtable_1594dc0 = 0x1594dc0;
@@ -55,6 +67,8 @@ inline constexpr std::uint64_t kResolvedVtable_15e0b48 = 0x15e0b48;
 inline constexpr std::uint64_t kResolvedVtable_15e2028 = 0x15e2028;
 inline constexpr std::uint64_t kResolvedVtable_15e1ee0 = 0x15e1ee0;
 inline constexpr std::uint64_t kResolvedVtable_15f2f08 = 0x15f2f08;
+inline constexpr std::uint64_t kResolvedVtable_1595b60 = 0x1595b60;
+inline constexpr std::uint64_t kResolvedVtable_1595320 = 0x1595320;
 
 
 struct ResolvedVtableCallSite {
@@ -66,13 +80,23 @@ struct ResolvedVtableCallSite {
 
 // Sorted by `site`.
 inline constexpr ResolvedVtableCallSite kResolvedVtableCallSites[] = {
+    {0x113c5, kResolvedVtable_1595b60, 0x18, kResolvedVtableTarget_488d0Rva},
+    {0x113d6, kResolvedVtable_1595b60, 0x50, kResolvedVtableTarget_13d60Rva},
+    {0x11452, kResolvedVtable_1594ae8, 0x28, kResolvedVtableTarget_13d20Rva},
+    {0x11462, kResolvedVtable_1594ae8, 0x50, kResolvedVtableTarget_13d60Rva},
+    {0x1149d, kResolvedVtable_1594ae8, 0x40, kResolvedVtableTarget_13d50Rva},
     {0x1254d, kResolvedVtable_15949a0, 0x88, kResolvedVtableTarget_187c0Rva},
     {0x13620, kResolvedVtable_1594ae8, 0x28, kResolvedVtableTarget_13d20Rva},
     {0x28471, kResolvedVtable_1594dc0, 0x20, kResolvedVtableTarget_20d60Rva},
+    {0x30f56, kResolvedVtable_1595320, 0x10, kResolvedVtableTarget_30e50Rva},
     {0x312ce, kResolvedVtable_15953f8, 0xa8, kResolvedVtableTarget_318b0Rva},
     {0x312de, kResolvedVtable_15953f8, 0xa0, kResolvedVtableTarget_31870Rva},
     {0x312f0, kResolvedVtable_15953f8, 0x18, kResolvedVtableTarget_31310Rva},
+    {0x3133e, kResolvedVtable_15953f8, 0xa8, kResolvedVtableTarget_318b0Rva},
+    {0x3134e, kResolvedVtable_15953f8, 0xa0, kResolvedVtableTarget_31870Rva},
+    {0x31360, kResolvedVtable_15953f8, 0x18, kResolvedVtableTarget_31310Rva},
     {0x35165, kResolvedVtable_15955c0, 0x8, kResolvedVtableTarget_358c0Rva},
+    {0x465eb, kResolvedVtable_15949a0, 0x58, kResolvedVtableTarget_c2c0Rva},
     {0x47571, kResolvedVtable_1594dc0, 0x20, kResolvedVtableTarget_20d60Rva},
     {0x4d179, kResolvedVtable_1594dc0, 0x20, kResolvedVtableTarget_20d60Rva},
     {0x8a5bf, kResolvedVtable_1594dc0, 0x20, kResolvedVtableTarget_20d60Rva},
@@ -80,6 +104,9 @@ inline constexpr ResolvedVtableCallSite kResolvedVtableCallSites[] = {
     {0x14dc19, kResolvedVtable_1594dc0, 0x20, kResolvedVtableTarget_20d60Rva},
     {0x14def4, kResolvedVtable_1594dc0, 0x10, kResolvedVtableTarget_4b0Rva},
     {0x14df09, kResolvedVtable_1594dc0, 0x18, kResolvedVtableTarget_22a60Rva},
+    {0x1be855, kResolvedVtable_1598e10, 0x18, kResolvedVtableTarget_1bf710Rva},
+    {0x1c00b8, kResolvedVtable_1598e10, 0x18, kResolvedVtableTarget_1bf710Rva},
+    {0x2537e1, kResolvedVtable_1594dc0, 0x20, kResolvedVtableTarget_20d60Rva},
     {0x257068, kResolvedVtable_159c908, 0x58, kResolvedVtableTarget_2687b0Rva},
     {0x357301, kResolvedVtable_1594dc0, 0x20, kResolvedVtableTarget_20d60Rva},
     {0x3e2d40, kResolvedVtable_1594dc0, 0x20, kResolvedVtableTarget_20d60Rva},
@@ -102,17 +129,31 @@ inline constexpr ResolvedVtableCallSite kResolvedVtableCallSites[] = {
     {0xa54b7b, kResolvedVtable_15d1d80, 0x8, kResolvedVtableTarget_c740Rva},
     {0xa54c92, kResolvedVtable_15d1d80, 0x8, kResolvedVtableTarget_c740Rva},
     {0xa70f4d, kResolvedVtable_1598e10, 0x18, kResolvedVtableTarget_1bf710Rva},
+    {0xab2f6a, kResolvedVtable_1598e10, 0x18, kResolvedVtableTarget_1bf710Rva},
+    {0xab620a, kResolvedVtable_1598e10, 0x18, kResolvedVtableTarget_1bf710Rva},
     {0xddf017, kResolvedVtable_15e0b48, 0x28, kResolvedVtableTarget_ddf4b0Rva},
     {0xe119be, kResolvedVtable_15e2028, 0x2a0, kResolvedVtableTarget_e21420Rva},
     {0xe119d3, kResolvedVtable_15e2028, 0x70, kResolvedVtableTarget_e1a5c0Rva},
     {0xe11c64, kResolvedVtable_15e1ee0, 0xb0, kResolvedVtableTarget_e19980Rva},
+    {0xe14c26, kResolvedVtable_15e1ee0, 0x10, kResolvedVtableTarget_e19440Rva},
+    {0xe1b1f1, kResolvedVtable_15e2028, 0x40, kResolvedVtableTarget_e1a040Rva},
+    {0xe1b204, kResolvedVtable_15e2028, 0x38, kResolvedVtableTarget_e19f70Rva},
+    {0xe1b245, kResolvedVtable_15e2028, 0x18, kResolvedVtableTarget_e19cb0Rva},
     {0xe1ee0d, kResolvedVtable_15e2d60, 0xd0, kResolvedVtableTarget_e24900Rva},
     {0xe1ee31, kResolvedVtable_15e2d60, 0xd0, kResolvedVtableTarget_e24900Rva},
+    {0xe1ee7d, kResolvedVtable_15e2d60, 0xd0, kResolvedVtableTarget_e24900Rva},
+    {0xe1eea1, kResolvedVtable_15e2d60, 0xd0, kResolvedVtableTarget_e24900Rva},
     {0xe52b97, kResolvedVtable_15ed2a0, 0xc0, kResolvedVtableTarget_e26f90Rva},
     {0xe52bb3, kResolvedVtable_15ed2a0, 0xc0, kResolvedVtableTarget_e26f90Rva},
     {0xe52bd2, kResolvedVtable_15ed2a0, 0xc0, kResolvedVtableTarget_e26f90Rva},
+    {0xe52cfb, kResolvedVtable_15ed2a0, 0xd0, kResolvedVtableTarget_e24900Rva},
+    {0xe52d30, kResolvedVtable_15ed2a0, 0x10, kResolvedVtableTarget_e52cb0Rva},
+    {0xe52d59, kResolvedVtable_15ed2a0, 0xc0, kResolvedVtableTarget_e26f90Rva},
+    {0xe52d76, kResolvedVtable_15ed2a0, 0xc0, kResolvedVtableTarget_e26f90Rva},
+    {0xe52d96, kResolvedVtable_15ed2a0, 0xc0, kResolvedVtableTarget_e26f90Rva},
     {0xed171c, kResolvedVtable_15f2f08, 0x38, kResolvedVtableTarget_e16a00Rva},
     {0xed1733, kResolvedVtable_15f2f08, 0x38, kResolvedVtableTarget_e16a00Rva},
+    {0xed2c55, kResolvedVtable_15f2f08, 0x88, kResolvedVtableTarget_ed4860Rva},
 };
 
 inline constexpr std::size_t kResolvedVtableCallSiteCount =

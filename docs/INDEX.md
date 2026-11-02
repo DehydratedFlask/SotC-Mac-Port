@@ -161,6 +161,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [INPUTTABLE_551140_NAMES_FIXTURE](INPUTTABLE_551140_NAMES_FIXTURE.md) | Private 275-name fixture recipe for registry fill `0x52a220`; CPU-01 |
 | [EXTRACTION](EXTRACTION.md) | Repeatable native extractor, inputs, SELF reconstruction; artifact worker |
 | [REVERSE_ENGINEERING](REVERSE_ENGINEERING.md) | Ghidra procedure, symbol manifests, boot/audio/save recovery; RE worker |
+| [GHIDRA_PIPELINE](GHIDRA_PIPELINE.md) | Reproducible Ghidra 12.1.4 decompiler dossier for the five largest unmodelled bodies; exact commands, pinned SHA, what ran and what did not |
 | [REFERENCE_AUDIT](REFERENCE_AUDIT.md) | Pinned SoTC/Bloodborne/shadPS4 source anchors; source-audit worker |
 | [PRIOR_ART](PRIOR_ART.md) | Assessment of three public Apple-Silicon PS4 ports: execution models, lifting/GPU tooling, licences, reuse verdicts |
 | [GPU_COMMAND_SURFACE](GPU_COMMAND_SURFACE.md) | Static import census of the title's PS4 GPU surface (101 GnmDriver + 24 VideoOut) and the native boundary contract |
@@ -556,6 +557,7 @@ Do not install a Sony SDK, an emulator or a second analysis engine just to avoid
 | [E996 SAV-01 load-dispatch target-origin claim](checkpoints/2026-10-29-sav01-load-dispatch-5435fc-claim-e996.md) | Claims only the target origin for indirect call `0x5435fc`; stop at target entry or unresolved provenance; no real-save claim |
 | [E997 Slot-23 direct-callee provider-timeout result](checkpoints/2026-10-29-cpu01-slot23-direct-callee-e70a60-provider-e997.md) | Records the E995 Ghidra startup timeout; no instruction bytes returned; task blocked, slot 23 unregistered |
 | [E998 SAV-01 load-dispatch provider-timeout result](checkpoints/2026-10-29-sav01-load-dispatch-5435fc-provider-e998.md) | Records the E996 REA timeout and incomplete headless fallback; no target bytes; Ghidra project index metadata changed during fallback |
+| [E1057 SAV-01 load-dispatch `0x5435fc` target resolved](checkpoints/2026-11-01-sav01-load-dispatch-5435fc.md) | E1057; pinned-ELF chain resolves `0x5435fc` to control-block slot `+0x10` = `0x517220` (`_M_dispose`) and `0x543611` to `0x517250`; new `check_sav_load_dispatch.py` checker re-derives it, no REA/Ghidra |
 | [E999 APP-01 importer cancellation-state fixture claim](checkpoints/2026-10-29-app01-importer-cancel-state-claim-e999.md) | Claims a testable LauncherCore result/state handler wired to ContentView; cancellation preserves prior directory/readiness; no native picker interaction |
 | [E1000 APP-01 importer cancellation-state fixture result](checkpoints/2026-10-29-app01-importer-cancel-state-result-e1000.md) | Reducer and model handler preserve prior directory/readiness on cancellation; root focused 5/5 and full launcher 160/21 pass; G4 remains partial |
 | [E1001 E1000 publication closeout](checkpoints/2026-10-29-app01-importer-cancel-state-publication-e1001.md) | Fetch-verifies c0891f04 on main, audits pass, project index current, Trail query proves the new handler is indexed; G4 remains partial |

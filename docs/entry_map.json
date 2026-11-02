@@ -60,6 +60,26 @@
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
+    "0x13d50": [
+      {
+        "constant": "kVtable1594ae8Slot40_13d50",
+        "header": "native/core/vtable_1594ae8_slot40_13d50.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_13d50",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0x13d60": [
+      {
+        "constant": "kVtable1594ae8Slot50_13d60",
+        "header": "native/core/vtable_1594ae8_slot50_13d60.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_13d60",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0x147e20": [
       {
         "constant": "kPlatformTagLookup147e20",
@@ -152,6 +172,10 @@
         "header": "native/core/capture_a473b0.hpp"
       },
       {
+        "constant": "kSlot309CanaryCell",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
         "constant": "kInitEntryGuardCell",
         "header": "native/core/init_531d60_entry_gaps.hpp"
       },
@@ -202,6 +226,10 @@
       {
         "constant": "kSlot300Dso",
         "header": "native/core/ctor_slot_300_acc880.hpp"
+      },
+      {
+        "constant": "kSlot309Dso",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
       },
       {
         "constant": "kTinyAtexitDso",
@@ -286,6 +314,10 @@
       {
         "constant": "kSharedStrControlAlloc",
         "header": "native/core/shared_str_ctor_f1a0.hpp"
+      },
+      {
+        "constant": "kVtable15e1ee0Slot10_e19440Alloc",
+        "header": "native/core/vtable_15e1ee0_slot10_e19440.hpp"
       }
     ],
     "0x17090": [
@@ -340,6 +372,10 @@
         "header": "native/core/vtable_15949a0_slot88_187c0.hpp"
       },
       {
+        "constant": "kVtable1595b60Slot18_488d0FreeTarget",
+        "header": "native/core/vtable_1595b60_slot18_488d0.hpp"
+      },
+      {
         "constant": "kVtable1598e10Slot18_1bf710FreeTarget",
         "header": "native/core/vtable_1598e10_slot18_1bf710.hpp"
       },
@@ -350,6 +386,14 @@
       {
         "constant": "kVtable15d1678Slot280_a460f0FreeTarget",
         "header": "native/core/vtable_15d1678_slot280_a460f0.hpp"
+      },
+      {
+        "constant": "kVtable15e2028Slot18_e19cb0FreeTarget",
+        "header": "native/core/vtable_15e2028_slot18_e19cb0.hpp"
+      },
+      {
+        "constant": "kVtable15f2f08Slot88_ed4860FreeTarget",
+        "header": "native/core/vtable_15f2f08_slot88_ed4860.hpp"
       }
     ],
     "0x170c0": [
@@ -546,6 +590,10 @@
         "header": "native/core/concmd_base.hpp"
       },
       {
+        "constant": "kSlot309ConCmdBaseCtor",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
         "constant": "kOwnerRow3CommandCtor",
         "header": "native/core/owner_ctor_14db00.hpp"
       }
@@ -568,6 +616,10 @@
       {
         "constant": "kConCmdRegister",
         "header": "native/core/concmd_base.hpp"
+      },
+      {
+        "constant": "kSlot309ConCmdRegister",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
       },
       {
         "constant": "kOwnerRow3CommandRegister",
@@ -680,6 +732,16 @@
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
+    "0x268b0": [
+      {
+        "constant": "kSlot309MenuRegister",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
+        "constant": "kDebugMenuRegister",
+        "header": "native/core/debug_menu_item.hpp"
+      }
+    ],
     "0x26db0": [
       {
         "constant": "kMenuToggleFromVarCtor",
@@ -688,6 +750,36 @@
       {
         "constant": "kMenuNamedItemCtor",
         "header": "native/core/menu_item_26db0.hpp"
+      }
+    ],
+    "0x26ea0": [
+      {
+        "constant": "kSlot309MenuToggleCtor",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
+        "constant": "kDebugMenuItemToggleCtor",
+        "header": "native/core/debug_menu_item.hpp"
+      }
+    ],
+    "0x27280": [
+      {
+        "constant": "kSlot309MenuRootDtor",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
+        "constant": "kDebugMenuRootDtor",
+        "header": "native/core/debug_menu_item.hpp"
+      }
+    ],
+    "0x272d0": [
+      {
+        "constant": "kSlot309MenuItemDtor",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
+        "constant": "kDebugMenuItemDtor",
+        "header": "native/core/debug_menu_item.hpp"
       }
     ],
     "0x2dcdf14": [
@@ -930,6 +1022,16 @@
         "header": "native/core/init_531d60_post_base_lea_rax_2eff450_532af5_u1.hpp"
       }
     ],
+    "0x30e50": [
+      {
+        "constant": "kVtable1595320Slot10_30e50",
+        "header": "native/core/vtable_1595320_slot10_30e50.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_30e50",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0x31310": [
       {
         "constant": "kVtable15953f8Slot18_31310",
@@ -1102,6 +1204,16 @@
       {
         "constant": "kSlot535MutexDtor",
         "header": "native/core/ctor_tiny_misc_slots.hpp"
+      }
+    ],
+    "0x488d0": [
+      {
+        "constant": "kVtable1595b60Slot18_488d0",
+        "header": "native/core/vtable_1595b60_slot18_488d0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_488d0",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0x499f80": [
@@ -3380,6 +3492,16 @@
         "header": "native/core/init_531d60_post_base_continue_d.hpp"
       }
     ],
+    "0xa50d3e": [
+      {
+        "constant": "kSlot309BranchTarget",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
+        "constant": "kSlot309StackChkFailCall",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
     "0xa54920": [
       {
         "constant": "kInit531d60PostBaseA54920_532a62_U1Target",
@@ -3498,6 +3620,16 @@
         "header": "native/core/ctor_slot_544_d1b20.hpp"
       }
     ],
+    "0xc2c0": [
+      {
+        "constant": "kVtable15949a0Slot58_c2c0",
+        "header": "native/core/vtable_15949a0_slot58_c2c0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_c2c0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0xc2e0": [
       {
         "constant": "kVtable15d1678SlotE8_c2e0",
@@ -3538,6 +3670,16 @@
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
+    "0xe19440": [
+      {
+        "constant": "kVtable15e1ee0Slot10_e19440",
+        "header": "native/core/vtable_15e1ee0_slot10_e19440.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_e19440",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0xe19980": [
       {
         "constant": "kVtable15e1ee0SlotB0_e19980",
@@ -3545,6 +3687,36 @@
       },
       {
         "constant": "kResolvedVtableTarget_e19980",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0xe19cb0": [
+      {
+        "constant": "kVtable15e2028Slot18_e19cb0",
+        "header": "native/core/vtable_15e2028_slot18_e19cb0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_e19cb0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0xe19f70": [
+      {
+        "constant": "kVtable15e2028Slot38_e19f70",
+        "header": "native/core/vtable_15e2028_slot38_e19f70.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_e19f70",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0xe1a040": [
+      {
+        "constant": "kVtable15e2028Slot40_e1a040",
+        "header": "native/core/vtable_15e2028_slot40_e1a040.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_e1a040",
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
@@ -3588,7 +3760,31 @@
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
+    "0xe52cb0": [
+      {
+        "constant": "kVtable15ed2a0Slot10_e52cb0",
+        "header": "native/core/vtable_15ed2a0_slot10_e52cb0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_e52cb0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0xed4860": [
+      {
+        "constant": "kVtable15f2f08Slot88_ed4860",
+        "header": "native/core/vtable_15f2f08_slot88_ed4860.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_ed4860",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0xf180": [
+      {
+        "constant": "kSlot309EmptyViewCtor",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
       {
         "constant": "kInitSlotF180",
         "header": "native/core/init_sub_3be930.hpp"
@@ -3614,6 +3810,10 @@
       {
         "constant": "kReleaseFamilyF590",
         "header": "native/core/ctor_release_family_slots.hpp"
+      },
+      {
+        "constant": "kSlot309Release",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
       },
       {
         "constant": "kInit531d60PostBaseF590Target",
@@ -3710,6 +3910,10 @@
         "header": "native/core/ctor_slot_307_a5b090.hpp"
       },
       {
+        "constant": "kSlot309EmptyViewDtor",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
         "constant": "kSlot313CaptionDtor",
         "header": "native/core/ctor_slot_313_a447a0.hpp"
       },
@@ -3736,11 +3940,19 @@
         "header": "native/core/ctor_slot_300_acc880.hpp"
       },
       {
+        "constant": "kSlot309Atexit",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
         "constant": "kTinyAtexitPlt",
         "header": "native/core/ctor_tiny_atexit_slots.hpp"
       }
     ],
     "0xf8f3a0": [
+      {
+        "constant": "kSlot309StackChkFail",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
       {
         "constant": "kInsert1bdb50StackFail",
         "header": "native/core/insert_1bdb50.hpp"
@@ -3896,6 +4108,90 @@
         "header": "native/core/shared_release_f590.hpp"
       }
     ],
+    "0x12c33a0": [
+      {
+        "constant": "kSlot309Var1Name",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x12c33bb": [
+      {
+        "constant": "kSlot309Var1Desc",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x12c33d5": [
+      {
+        "constant": "kSlot309NameObjectText",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x12c33ef": [
+      {
+        "constant": "kSlot309BoolVarName",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x12c33ff": [
+      {
+        "constant": "kSlot309ToggleLabel",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x12c340b": [
+      {
+        "constant": "kSlot309Toggle1Text",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x12c3426": [
+      {
+        "constant": "kSlot309Toggle2Text",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x12c34d1": [
+      {
+        "constant": "kSlot309Var2Name",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x12c34e4": [
+      {
+        "constant": "kSlot309Var2Desc",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x12c3519": [
+      {
+        "constant": "kSlot309Toggle3Text",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x12c3598": [
+      {
+        "constant": "kSlot309Var3Name",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x12c35ac": [
+      {
+        "constant": "kSlot309Var3Desc",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x12c35e2": [
+      {
+        "constant": "kSlot309Toggle4Text",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x12c3fc0": [
+      {
+        "constant": "kSlot309EmptyDesc",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
     "0x12c4892": [
       {
         "constant": "kOwnerA597D0ThreadName",
@@ -3995,6 +4291,26 @@
       },
       {
         "constant": "kResolvedVtableTarget_13d20",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0x13d50": [
+      {
+        "constant": "kVtable1594ae8Slot40_13d50",
+        "header": "native/core/vtable_1594ae8_slot40_13d50.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_13d50",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0x13d60": [
+      {
+        "constant": "kVtable1594ae8Slot50_13d60",
+        "header": "native/core/vtable_1594ae8_slot50_13d60.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_13d60",
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
@@ -4240,6 +4556,10 @@
         "header": "native/core/capture_a473b0.hpp"
       },
       {
+        "constant": "kSlot309CanaryCell",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
         "constant": "kInitEntryGuardCell",
         "header": "native/core/init_531d60_entry_gaps.hpp"
       },
@@ -4338,6 +4658,10 @@
       {
         "constant": "kSlot300Dso",
         "header": "native/core/ctor_slot_300_acc880.hpp"
+      },
+      {
+        "constant": "kSlot309Dso",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
       },
       {
         "constant": "kTinyAtexitDso",
@@ -4464,6 +4788,10 @@
       {
         "constant": "kSharedStrControlAlloc",
         "header": "native/core/shared_str_ctor_f1a0.hpp"
+      },
+      {
+        "constant": "kVtable15e1ee0Slot10_e19440Alloc",
+        "header": "native/core/vtable_15e1ee0_slot10_e19440.hpp"
       }
     ],
     "0x17090": [
@@ -4518,6 +4846,10 @@
         "header": "native/core/vtable_15949a0_slot88_187c0.hpp"
       },
       {
+        "constant": "kVtable1595b60Slot18_488d0FreeTarget",
+        "header": "native/core/vtable_1595b60_slot18_488d0.hpp"
+      },
+      {
         "constant": "kVtable1598e10Slot18_1bf710FreeTarget",
         "header": "native/core/vtable_1598e10_slot18_1bf710.hpp"
       },
@@ -4528,6 +4860,14 @@
       {
         "constant": "kVtable15d1678Slot280_a460f0FreeTarget",
         "header": "native/core/vtable_15d1678_slot280_a460f0.hpp"
+      },
+      {
+        "constant": "kVtable15e2028Slot18_e19cb0FreeTarget",
+        "header": "native/core/vtable_15e2028_slot18_e19cb0.hpp"
+      },
+      {
+        "constant": "kVtable15f2f08Slot88_ed4860FreeTarget",
+        "header": "native/core/vtable_15f2f08_slot88_ed4860.hpp"
       }
     ],
     "0x170c0": [
@@ -4934,6 +5274,10 @@
         "header": "native/core/concmd_base.hpp"
       },
       {
+        "constant": "kSlot309ConCmdBaseCtor",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
         "constant": "kOwnerRow3CommandCtor",
         "header": "native/core/owner_ctor_14db00.hpp"
       }
@@ -4962,6 +5306,10 @@
       {
         "constant": "kConCmdRegister",
         "header": "native/core/concmd_base.hpp"
+      },
+      {
+        "constant": "kSlot309ConCmdRegister",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
       },
       {
         "constant": "kOwnerRow3CommandRegister",
@@ -5268,6 +5616,10 @@
     ],
     "0x268b0": [
       {
+        "constant": "kSlot309MenuRegister",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
         "constant": "kDebugMenuRegister",
         "header": "native/core/debug_menu_item.hpp"
       }
@@ -5332,6 +5684,10 @@
     ],
     "0x26ea0": [
       {
+        "constant": "kSlot309MenuToggleCtor",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
         "constant": "kDebugMenuItemToggleCtor",
         "header": "native/core/debug_menu_item.hpp"
       }
@@ -5362,11 +5718,19 @@
     ],
     "0x27280": [
       {
+        "constant": "kSlot309MenuRootDtor",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
         "constant": "kDebugMenuRootDtor",
         "header": "native/core/debug_menu_item.hpp"
       }
     ],
     "0x272d0": [
+      {
+        "constant": "kSlot309MenuItemDtor",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
       {
         "constant": "kDebugMenuItemDtor",
         "header": "native/core/debug_menu_item.hpp"
@@ -5402,6 +5766,12 @@
         "header": "native/core/ctor_slot_489_2acc10.hpp"
       }
     ],
+    "0x2c84f0": [
+      {
+        "constant": "kSlot309NameObjectDtor",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
     "0x2d5e00": [
       {
         "constant": "kSlot486",
@@ -5420,6 +5790,18 @@
       {
         "constant": "kVslot30CellBossFlag",
         "header": "native/core/vslot_30_534130.hpp"
+      }
+    ],
+    "0x2dd6738": [
+      {
+        "constant": "kSlot309TableWord",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x2dd70e0": [
+      {
+        "constant": "kSlot309TableTop",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
       }
     ],
     "0x2dd9578": [
@@ -6194,6 +6576,22 @@
         "header": "native/core/ctor_slot_386_6b12f0.hpp"
       }
     ],
+    "0x30e50": [
+      {
+        "constant": "kVtable1595320Slot10_30e50",
+        "header": "native/core/vtable_1595320_slot10_30e50.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_30e50",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0x312a0": [
+      {
+        "constant": "kVtable1595320Slot10_30e50TailTarget",
+        "header": "native/core/vtable_1595320_slot10_30e50.hpp"
+      }
+    ],
     "0x31310": [
       {
         "constant": "kVtable15953f8Slot18_31310",
@@ -6594,6 +6992,78 @@
       {
         "constant": "kOwnerSingletonGlobal",
         "header": "native/core/owner_ctor_b111e0_slot48.hpp"
+      }
+    ],
+    "0x32f79b8": [
+      {
+        "constant": "kSlot309Cell",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x32f79c8": [
+      {
+        "constant": "kSlot309Cleared",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x32f79e8": [
+      {
+        "constant": "kSlot309Var1",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x32f7ac0": [
+      {
+        "constant": "kSlot309NameObject",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x32f7af0": [
+      {
+        "constant": "kSlot309BoolVar",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x32f7bc0": [
+      {
+        "constant": "kSlot309EmptyView",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x32f7be0": [
+      {
+        "constant": "kSlot309Toggle1",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x32f7c88": [
+      {
+        "constant": "kSlot309Toggle2",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x32f7d30": [
+      {
+        "constant": "kSlot309Var2",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x32f7e08": [
+      {
+        "constant": "kSlot309Toggle3",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x32f7eb0": [
+      {
+        "constant": "kSlot309Var3",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0x32f7f88": [
+      {
+        "constant": "kSlot309Toggle4",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
       }
     ],
     "0x32f84f8": [
@@ -7074,6 +7544,22 @@
       {
         "constant": "kVtable15949a0Slot88_187c0PreCall",
         "header": "native/core/vtable_15949a0_slot88_187c0.hpp"
+      }
+    ],
+    "0x48790": [
+      {
+        "constant": "kVtable1595b60Slot18_488d0PreCall",
+        "header": "native/core/vtable_1595b60_slot18_488d0.hpp"
+      }
+    ],
+    "0x488d0": [
+      {
+        "constant": "kVtable1595b60Slot18_488d0",
+        "header": "native/core/vtable_1595b60_slot18_488d0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_488d0",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0x493230": [
@@ -10432,6 +10918,12 @@
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
+    "0xa46620": [
+      {
+        "constant": "kSlot309CellDtor",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
     "0xa46ba0": [
       {
         "constant": "kSlot310TailDtor",
@@ -10472,6 +10964,112 @@
       {
         "constant": "kSlot310",
         "header": "native/core/ctor_slot_310_a479d0.hpp"
+      }
+    ],
+    "0xa47cb0": [
+      {
+        "constant": "kSlot309ClearedDtor",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0xa4d490": [
+      {
+        "constant": "kSlot309Var1Slot3",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0xa4d760": [
+      {
+        "constant": "kSlot309Var1Slot6",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0xa4e190": [
+      {
+        "constant": "kSlot309Var2Slot3",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0xa4e310": [
+      {
+        "constant": "kSlot309Var2Slot6",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0xa4e830": [
+      {
+        "constant": "kSlot309Var3Slot3",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0xa4e9b0": [
+      {
+        "constant": "kSlot309Var3Slot6",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0xa4f4c0": [
+      {
+        "constant": "kSlot309Var1FunctorSlot3",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0xa4f4d0": [
+      {
+        "constant": "kSlot309VarCtor1",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0xa4feb0": [
+      {
+        "constant": "kSlot309Var2FunctorSlot3",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0xa4fec0": [
+      {
+        "constant": "kSlot309VarCtor2",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0xa50270": [
+      {
+        "constant": "kSlot309Var3FunctorSlot3",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0xa50280": [
+      {
+        "constant": "kSlot309VarCtor3",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0xa505e0": [
+      {
+        "constant": "kSlot309",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0xa50d2d": [
+      {
+        "constant": "kSlot309Branch",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0xa50d3e": [
+      {
+        "constant": "kSlot309BranchTarget",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
+        "constant": "kSlot309StackChkFailCall",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      }
+    ],
+    "0xa50d44": [
+      {
+        "constant": "kSlot309End",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
       }
     ],
     "0xa50d50": [
@@ -11078,6 +11676,16 @@
         "header": "native/core/ctor_slot_544_d1b20.hpp"
       }
     ],
+    "0xc2c0": [
+      {
+        "constant": "kVtable15949a0Slot58_c2c0",
+        "header": "native/core/vtable_15949a0_slot58_c2c0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_c2c0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0xc2e0": [
       {
         "constant": "kVtable15d1678SlotE8_c2e0",
@@ -11086,6 +11694,12 @@
       {
         "constant": "kResolvedVtableTarget_c2e0",
         "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0xc2f0": [
+      {
+        "constant": "kSlot309BoolVarFnSlot3",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
       }
     ],
     "0xc300": [
@@ -11166,6 +11780,16 @@
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
+    "0xe19440": [
+      {
+        "constant": "kVtable15e1ee0Slot10_e19440",
+        "header": "native/core/vtable_15e1ee0_slot10_e19440.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_e19440",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0xe19980": [
       {
         "constant": "kVtable15e1ee0SlotB0_e19980",
@@ -11173,6 +11797,36 @@
       },
       {
         "constant": "kResolvedVtableTarget_e19980",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0xe19cb0": [
+      {
+        "constant": "kVtable15e2028Slot18_e19cb0",
+        "header": "native/core/vtable_15e2028_slot18_e19cb0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_e19cb0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0xe19f70": [
+      {
+        "constant": "kVtable15e2028Slot38_e19f70",
+        "header": "native/core/vtable_15e2028_slot38_e19f70.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_e19f70",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0xe1a040": [
+      {
+        "constant": "kVtable15e2028Slot40_e1a040",
+        "header": "native/core/vtable_15e2028_slot40_e1a040.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_e1a040",
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
@@ -11186,10 +11840,22 @@
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
+    "0xe1b1b0": [
+      {
+        "constant": "kVtable15e2028Slot18_e19cb0PreCall",
+        "header": "native/core/vtable_15e2028_slot18_e19cb0.hpp"
+      }
+    ],
     "0xe1eda0": [
       {
         "constant": "kVtable15e1ee0SlotB0_e19980FastHelper",
         "header": "native/core/vtable_15e1ee0_slot_b0_e19980.hpp"
+      }
+    ],
+    "0xe1ede0": [
+      {
+        "constant": "kVtable15ed2a0Slot10_e52cb0BaseDtor",
+        "header": "native/core/vtable_15ed2a0_slot10_e52cb0.hpp"
       }
     ],
     "0xe21420": [
@@ -11258,7 +11924,31 @@
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
+    "0xe52cb0": [
+      {
+        "constant": "kVtable15ed2a0Slot10_e52cb0",
+        "header": "native/core/vtable_15ed2a0_slot10_e52cb0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_e52cb0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0xed4860": [
+      {
+        "constant": "kVtable15f2f08Slot88_ed4860",
+        "header": "native/core/vtable_15f2f08_slot88_ed4860.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_ed4860",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0xf180": [
+      {
+        "constant": "kSlot309EmptyViewCtor",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
       {
         "constant": "kInitSlotF180",
         "header": "native/core/init_sub_3be930.hpp"
@@ -11314,6 +12004,10 @@
       {
         "constant": "kReleaseFamilyF590",
         "header": "native/core/ctor_release_family_slots.hpp"
+      },
+      {
+        "constant": "kSlot309Release",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
       },
       {
         "constant": "kInit531d60PostBaseF590Target",
@@ -11428,6 +12122,10 @@
         "header": "native/core/ctor_slot_307_a5b090.hpp"
       },
       {
+        "constant": "kSlot309EmptyViewDtor",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
         "constant": "kSlot313CaptionDtor",
         "header": "native/core/ctor_slot_313_a447a0.hpp"
       },
@@ -11454,11 +12152,19 @@
         "header": "native/core/ctor_slot_300_acc880.hpp"
       },
       {
+        "constant": "kSlot309Atexit",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
+      {
         "constant": "kTinyAtexitPlt",
         "header": "native/core/ctor_tiny_atexit_slots.hpp"
       }
     ],
     "0xf8f3a0": [
+      {
+        "constant": "kSlot309StackChkFail",
+        "header": "native/core/ctor_slot_309_a505e0.hpp"
+      },
       {
         "constant": "kInsert1bdb50StackFail",
         "header": "native/core/insert_1bdb50.hpp"
@@ -11565,9 +12271,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1457,
-    "distinct_rvas": 989,
-    "duplicate_rvas": 313,
-    "headers": 387
+    "constants": 1549,
+    "distinct_rvas": 1052,
+    "duplicate_rvas": 329,
+    "headers": 399
   }
 }

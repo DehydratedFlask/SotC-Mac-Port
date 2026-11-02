@@ -20,8 +20,8 @@ void check(std::string_view name, bool passed) {
 }
 
 void test_table_shape() {
-    check("count", kResolvedVtableCallSiteCount == 47);
-    check("distinct targets", resolved_vtable_target_count() == 22);
+    check("count", kResolvedVtableCallSiteCount == 74);
+    check("distinct targets", resolved_vtable_target_count() == 33);
     bool sorted = true;
     for (std::size_t index = 1; index < kResolvedVtableCallSiteCount; ++index) {
         if (kResolvedVtableCallSites[index - 1].site >= kResolvedVtableCallSites[index].site) {
@@ -55,7 +55,9 @@ void test_known_targets_present() {
     const std::uint64_t expected[] = {0x187c0, 0x13d20, 0x20d60, 0xc740, 0x358c0, 0x2687b0, 0xc2e0,
                                       0xa40e20, 0xa460f0, 0x1bf710, 0xddf4b0, 0xe21420, 0xe1a5c0,
                                       0xe19980, 0xe16a00, 0xe24900, 0xe26f90,
-                                      0x318b0, 0x31870, 0x31310, 0x4b0, 0x22a60};
+                                      0x318b0, 0x31870, 0x31310, 0x4b0, 0x22a60,
+                                      0x13d50, 0x13d60, 0x30e50, 0x488d0, 0xc2c0, 0xe19cb0,
+                                      0xe19f70, 0xe1a040, 0xe19440, 0xe52cb0, 0xed4860};
     for (const std::uint64_t target : expected) {
         bool found = false;
         for (std::size_t index = 0; index < kResolvedVtableCallSiteCount; ++index) {

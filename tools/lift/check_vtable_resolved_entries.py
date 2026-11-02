@@ -54,8 +54,8 @@ def main() -> int:
 
     header = HEADER.read_text()
     EXPECTED = header_rows(header)
-    require(len(EXPECTED) == 47, f"expected 47 rows, found {len(EXPECTED)}")
-    require(len({row[3] for row in EXPECTED}) == 22, "expected 22 distinct targets")
+    require(len(EXPECTED) == 74, f"expected 74 rows, found {len(EXPECTED)}")
+    require(len({row[3] for row in EXPECTED}) == 33, "expected 33 distinct targets")
     entry_map = json.loads(ENTRY_MAP.read_text())["entries"]
 
     fde_starts = None
@@ -99,6 +99,19 @@ def main() -> int:
         "kResolvedVtableTarget_e19980Rva = 0xe19980",
         "kResolvedVtableTarget_e16a00Rva = 0xe16a00",
         "kResolvedVtableTarget_e24900Rva = 0xe24900",
+        "kResolvedVtableTarget_13d50Rva = 0x13d50",
+        "kResolvedVtableTarget_13d60Rva = 0x13d60",
+        "kResolvedVtableTarget_30e50Rva = 0x30e50",
+        "kResolvedVtableTarget_488d0Rva = 0x488d0",
+        "kResolvedVtableTarget_c2c0Rva = 0xc2c0",
+        "kResolvedVtableTarget_e19cb0Rva = 0xe19cb0",
+        "kResolvedVtableTarget_e19f70Rva = 0xe19f70",
+        "kResolvedVtableTarget_e1a040Rva = 0xe1a040",
+        "kResolvedVtableTarget_e19440Rva = 0xe19440",
+        "kResolvedVtableTarget_e52cb0Rva = 0xe52cb0",
+        "kResolvedVtableTarget_ed4860Rva = 0xed4860",
+        "kResolvedVtable_1595b60 = 0x1595b60",
+        "kResolvedVtable_1595320 = 0x1595320",
     ):
         require(needle in header, f"header constant missing: {needle}")
     require("kResolvedVtableCallSiteCount" in header, "count constant missing")
