@@ -33,7 +33,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `native/api/standalone` | 1 | Native game implementation; verify module README and task ownership |
 | `native/api/tests` | 2 | Native game implementation; verify module README and task ownership |
 | `native/app` | 3 | Native game implementation; verify module README and task ownership |
-| `native/core` | 1523 | Native game implementation; verify module README and task ownership |
+| `native/core` | 1524 | Native game implementation; verify module README and task ownership |
 | `native/lanes` | 7 | Native game implementation; verify module README and task ownership |
 | `native/platform` | 18 | Native game implementation; verify module README and task ownership |
 | `native/tests` | 537 | Native game implementation; verify module README and task ownership |
