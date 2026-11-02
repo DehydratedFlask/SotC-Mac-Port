@@ -33,7 +33,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `native/api/standalone` | 1 | Native game implementation; verify module README and task ownership |
 | `native/api/tests` | 2 | Native game implementation; verify module README and task ownership |
 | `native/app` | 3 | Native game implementation; verify module README and task ownership |
-| `native/core` | 1474 | Native game implementation; verify module README and task ownership |
+| `native/core` | 1476 | Native game implementation; verify module README and task ownership |
 | `native/lanes` | 7 | Native game implementation; verify module README and task ownership |
 | `native/platform` | 16 | Native game implementation; verify module README and task ownership |
 | `native/tests` | 522 | Native game implementation; verify module README and task ownership |
@@ -600,8 +600,10 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `tools/dev` | 19 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft/.cache` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
-| `tools/lift` | 761 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/lift` | 762 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/pkg-extractor` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/re` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/re/ghidra` | 3 | Out-of-tree tool adapters and reproducible analysis recipes |
 
 Private recursive inventory: `local/indexes/folders.json` (excluded from publication).
 Canonical navigation and ownership: [INDEX](INDEX.md).

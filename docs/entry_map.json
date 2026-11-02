@@ -618,6 +618,10 @@
         "header": "native/core/fconcmd_object_slot306.hpp"
       },
       {
+        "constant": "kVtable1594dc0Slot18_22a60",
+        "header": "native/core/vtable_1594dc0_slot10_4b0.hpp"
+      },
+      {
         "constant": "kResolvedVtableTarget_22a60",
         "header": "native/core/vtable_resolved_entries.hpp"
       }
@@ -924,6 +928,16 @@
       {
         "constant": "kInit531d60PostBaseLeaRax2eff450_532af5_U1Target",
         "header": "native/core/init_531d60_post_base_lea_rax_2eff450_532af5_u1.hpp"
+      }
+    ],
+    "0x31310": [
+      {
+        "constant": "kVtable15953f8Slot18_31310",
+        "header": "native/core/vtable_15953f8_slot18_31310.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_31310",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0x31870": [
@@ -5040,6 +5054,10 @@
         "header": "native/core/fconcmd_object_slot306.hpp"
       },
       {
+        "constant": "kVtable1594dc0Slot18_22a60",
+        "header": "native/core/vtable_1594dc0_slot10_4b0.hpp"
+      },
+      {
         "constant": "kResolvedVtableTarget_22a60",
         "header": "native/core/vtable_resolved_entries.hpp"
       }
@@ -6178,6 +6196,10 @@
     ],
     "0x31310": [
       {
+        "constant": "kVtable15953f8Slot18_31310",
+        "header": "native/core/vtable_15953f8_slot18_31310.hpp"
+      },
+      {
         "constant": "kResolvedVtableTarget_31310",
         "header": "native/core/vtable_resolved_entries.hpp"
       }
@@ -6200,6 +6222,12 @@
       {
         "constant": "kResolvedVtableTarget_318b0",
         "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0x31900": [
+      {
+        "constant": "kVtable15953f8Slot18SubInit",
+        "header": "native/core/vtable_15953f8_slot18_31310.hpp"
       }
     ],
     "0x31b660": [
@@ -7062,6 +7090,12 @@
       {
         "constant": "kInit531d60PostBase499f80Target",
         "header": "native/core/init_531d60_post_base_499f80.hpp"
+      }
+    ],
+    "0x4a4a0": [
+      {
+        "constant": "kVtable15953f8Slot18Finish",
+        "header": "native/core/vtable_15953f8_slot18_31310.hpp"
       }
     ],
     "0x4a690": [
@@ -11531,9 +11565,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1453,
-    "distinct_rvas": 987,
-    "duplicate_rvas": 312,
-    "headers": 386
+    "constants": 1457,
+    "distinct_rvas": 989,
+    "duplicate_rvas": 313,
+    "headers": 387
   }
 }

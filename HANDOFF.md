@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 20:05 CDT (root) — 0x31310 wait-loop teardown and 0x22a60 lifted (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. The two small bodies left as entry records by the last sweep now have models: `0x31310` (105 B, `vtable 0x15953f8 + 0x18`) and `0x22a60` (121 B, `vtable 0x1594dc0 + 0x18`).
+- **`0x31310` is an async-completion teardown, and the wait target is named by evidence:** install `0x1595408` (`0x15953f8 + 0x10`) at `*this`, call `0x31900`; while its byte is zero call PLT `0xf8f7d0` = **`sceFiosOpWait`** on `*(u32*)(this+0x50)` and re-poll through vtable slot `0xa8` (**`0x318b0` = `sceFiosFHPreadv`**); then slot `0xa0` (`0x31870`), slot `0x18` when `*(u32*)(this+0x8) == 1`, `0x4a4a0`, and a tag-1 free of `this`.
+- **`0x4a4a0` is a 1-byte `retq`** — so the "finish helper" is a no-op call. Recorded as such rather than described from the shape of the call site.
+- **`0x22a60` is the 0x4b0 array teardown with a different ending:** it *calls* the `0x20b50` post-pass and then tail-calls `0x170b0` to free `this`, where `0x4b0` tail-calls the post-pass and frees nothing. Both share `walk_and_free` (installed table `0x1594dd0`, 0x50 stride, two `0xf590` releases per element, tag-2 free of the array).
+- **A defect in my own header, found while pinning:** `kVtable15953f8Slot18Reloc` said `0x1594dd8`, which is `0x1594dc0 + 0x18` — the *other* vtable's slot. The real slot is `0x1595410`. Fixed, and the checker now asserts the corrected value.
+- **Bounded wait:** the retail loop has no completion bound, so a wait that never finishes is a hang. The model stops at `kVtable15953f8Slot18MaxWaits` (1024) and reports `wait_overflow` instead of reproducing the hang.
+- **Checker:** `check_fios_slots_and_4b0.py` extended to five bodies (both reads, `0x4b0`, `0x31310`, `0x22a60`) with FDE lengths and digests, the `sceFiosOpWait` PLT name and library, the `0xa8`/`0xa0`/`+0x10`/`+0x8 == 1` anchors, the 1-byte `retq`, and five slot qwords + type-8 RELA addends.
+- **Verification (PASSED):** configure exit 0; build exit 0; CTest **523/523**; lift checkers **716 passed / 0 skipped / 0 failed**; entry map regenerated (1,457 constants → 989 RVAs / 387 headers).
+- **Next exact action:** 274 FDE-start entry-map candidates remain unswept (the second 20-seed sweep returned **0 new sites**, so new breadth now needs a different seed class, not more of the same).
+
 ## 2026-11-03 18:10 CDT (root) — entry-map seed sweep: 5 new sites, Fios read slots named (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. Ran `indirect_frontier.py` over **20 previously unswept FDE-start targets** taken from `docs/entry_map.json` (distinct from the 573-row constructor table already swept). Result: **5 new resolved sites / 5 targets**, every chain re-verified (slot qword, type-8 RELA addend, FDE start).

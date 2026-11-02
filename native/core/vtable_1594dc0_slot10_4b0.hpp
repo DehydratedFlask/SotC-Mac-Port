@@ -66,4 +66,28 @@ struct Vtable1594dc0Slot10_4b0Result {
     const Vtable1594dc0Slot10_4b0Cells& cells = {},
     const Vtable1594dc0Slot10_4b0Hooks& hooks = {}) noexcept;
 
+// `vtable 0x1594dc0 + 0x18 -> 0x22a60` (0x79 B): the same array teardown with a different ending.
+// The 0x4b0 variant *tail-calls* the post-pass at `0x20b50`; this one **calls** it and then tail-calls
+// the tag-1 free at `0x170b0`, so it also releases `this` itself.
+inline constexpr std::uint64_t kVtable1594dc0Slot18_22a60Rva = 0x22a60;
+inline constexpr std::size_t kVtable1594dc0Slot18_22a60Size = 0x79;
+inline constexpr std::uint32_t kVtable1594dc0Slot18 = 0x18;
+inline constexpr std::uint64_t kVtable1594dc0Slot18Reloc = 0x1594dd8;
+
+struct Vtable1594dc0Slot18_22a60Result {
+    bool ok = false;
+    void* vtable_written = nullptr;
+    std::uint32_t elements = 0;
+    std::uint32_t releases = 0;
+    bool array_freed = false;
+    std::uint32_t array_free_tag = 0;
+    bool post_called = false;
+    bool self_freed = false;
+    std::uint32_t self_free_tag = 0;
+};
+
+[[nodiscard]] Vtable1594dc0Slot18_22a60Result vtable_1594dc0_slot18_22a60(
+    const Vtable1594dc0Slot10_4b0Cells& cells = {},
+    const Vtable1594dc0Slot10_4b0Hooks& hooks = {}) noexcept;
+
 }  // namespace sotc

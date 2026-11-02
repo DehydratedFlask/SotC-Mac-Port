@@ -1,4 +1,5 @@
 #include "../core/vtable_1594dc0_slot10_4b0.hpp"
+#include "../core/vtable_15953f8_slot18_31310.hpp"
 #include "../core/vtable_15953f8_slot_a0_a8_fios_reads.hpp"
 
 #include <cstdint>
@@ -15,6 +16,9 @@ using sotc::FiosReadResult;
 using sotc::Vtable1594dc0Slot10_4b0Cells;
 using sotc::Vtable1594dc0Slot10_4b0Hooks;
 using sotc::vtable_1594dc0_slot10_4b0;
+using sotc::Vtable15953f8Slot18_31310Cells;
+using sotc::Vtable15953f8Slot18_31310Hooks;
+using sotc::vtable_15953f8_slot18_31310;
 using sotc::vtable_15953f8_slot_a0_31870;
 using sotc::vtable_15953f8_slot_a8_318b0;
 
@@ -102,6 +106,63 @@ bool deallocate(void*, std::uint32_t tag) {
     return true;
 }
 
+struct WaitTrace {
+    int waits = 0;
+    int reads = 0;
+    int plain = 0;
+    int mode_one = 0;
+    int finish = 0;
+    int pending_rounds = 0;
+};
+WaitTrace g_wait;
+
+bool sub_init_done(void*) { return false; }
+void wait_op(std::uint32_t) { ++g_wait.waits; }
+bool positioned_read(void*) {
+    ++g_wait.reads;
+    return g_wait.reads > g_wait.pending_rounds;   // completes after the configured rounds
+}
+void plain_read(void*) { ++g_wait.plain; }
+void mode_one(void*) { ++g_wait.mode_one; }
+void finish(void*) { ++g_wait.finish; }
+
+void test_fios_wait_loop_teardown() {
+    g_wait = WaitTrace{};
+    g_wait.pending_rounds = 2;
+    void* vtable = nullptr;
+    std::uint32_t op_handle = 0;
+    std::uint32_t mode = 1;
+    Vtable15953f8Slot18_31310Cells cells{};
+    cells.vtable_field = &vtable;
+    cells.op_handle = &op_handle;
+    cells.mode = &mode;
+    Vtable15953f8Slot18_31310Hooks hooks{};
+    hooks.sub_init = sub_init_done;
+    hooks.wait = wait_op;
+    hooks.positioned_read = positioned_read;
+    hooks.plain_read = plain_read;
+    hooks.mode_one = mode_one;
+    hooks.finish = finish;
+    const auto result = vtable_15953f8_slot18_31310(cells, hooks);
+    check("wait teardown ok", result.ok);
+    check("wait teardown vtable", vtable == reinterpret_cast<void*>(0x1595408));
+    check("wait teardown waits", result.waits == 3 && g_wait.waits == 3);
+    check("wait teardown reads", result.plain_read_called && g_wait.plain == 1);
+    check("wait teardown mode", result.mode_one_called && g_wait.mode_one == 1);
+    check("wait teardown finish", result.finish_called && g_wait.finish == 1);
+    check("wait teardown free", result.freed && result.free_tag == 1);
+
+    // A wait that never completes is refused instead of spinning.
+    g_wait = WaitTrace{};
+    g_wait.pending_rounds = 1 << 30;
+    const auto overflow = vtable_15953f8_slot18_31310(cells, hooks);
+    check("wait overflow refused", !overflow.ok && overflow.wait_overflow);
+    check("wait overflow bounded", overflow.waits == sotc::kVtable15953f8Slot18MaxWaits);
+
+    Vtable15953f8Slot18_31310Cells missing{};
+    check("wait missing fields fail", !vtable_15953f8_slot18_31310(missing, hooks).ok);
+}
+
 void test_array_teardown() {
     g_teardown = TeardownTrace{};
     // Two elements of 0x50 bytes; the record only needs the begin/end values to line up.
@@ -141,6 +202,7 @@ void test_array_teardown() {
 int main() {
     test_constants();
     test_read_and_pread();
+    test_fios_wait_loop_teardown();
     test_array_teardown();
 
     if (failures == 0) {
