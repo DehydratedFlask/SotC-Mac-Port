@@ -2669,3 +2669,10 @@ target_link_libraries(sotc_alloc_site_context PUBLIC sotc_tls_record_stack)
 add_executable(test_alloc_site_context tests/test_alloc_site_context.cpp)
 target_link_libraries(test_alloc_site_context PRIVATE sotc_alloc_site_context)
 add_test(NAME alloc_site_context COMMAND test_alloc_site_context)
+
+# CPU-01-AOT-CFG-SCALE-01: the two terminal paths of the 0xe21420 decision contract.
+add_library(sotc_vtable_15e2028_slot2a0_tail STATIC core/vtable_15e2028_slot2a0_e21420_tail.cpp)
+target_link_libraries(sotc_vtable_15e2028_slot2a0_tail PUBLIC sotc_core)
+add_executable(test_vtable_15e2028_slot2a0_tail tests/test_vtable_15e2028_slot2a0_e21420_tail.cpp)
+target_link_libraries(test_vtable_15e2028_slot2a0_tail PRIVATE sotc_vtable_15e2028_slot2a0_tail)
+add_test(NAME vtable_15e2028_slot2a0_tail COMMAND test_vtable_15e2028_slot2a0_tail)

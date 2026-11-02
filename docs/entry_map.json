@@ -11074,6 +11074,18 @@
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
+    "0xe214f7": [
+      {
+        "constant": "kE21420Missing18000",
+        "header": "native/core/vtable_15e2028_slot2a0_e21420_tail.hpp"
+      }
+    ],
+    "0xe2167e": [
+      {
+        "constant": "kE21420Found18000",
+        "header": "native/core/vtable_15e2028_slot2a0_e21420_tail.hpp"
+      }
+    ],
     "0xe24900": [
       {
         "constant": "kVtable15e2d60SlotD0_e24900",
@@ -11403,9 +11415,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1438,
-    "distinct_rvas": 979,
+    "constants": 1440,
+    "distinct_rvas": 981,
     "duplicate_rvas": 308,
-    "headers": 383
+    "headers": 384
   }
 }

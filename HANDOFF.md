@@ -1,5 +1,17 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 14:20 CDT (root) — 0xe21420 terminal paths lifted (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. `native/core/vtable_15e2028_slot2a0_e21420_tail.{hpp,cpp}` models the two continuations the guard ladder selects:
+  - **found** (`0xe2167e`, 75 B) in full: `object = provider->slot38(name)`; null → status `0x1b`; else tail call through the ctx vtable slot `0x148` with `(ctx, arg2, object, (uint8)arg4)`.
+  - **missing** (`0xe214f7`, 191 B): allocate `0x48` bytes via provider slot `0xb0`, construct the record (vtable `0x15e2d70`, owner = provider, 32-byte zero at `+0x10`, 16-byte zero at `+0x30`, flags `+0x40/+0x41/+0x42` = 1), then the second `strcmp` scan with status `0x1b` on a match or slot `0xc0` release + status `0x14` when exhausted. The `arg3 == null` sub-tree at `0xe215ce..0xe2167e` is **reported, not run**.
+- **A real bug caught by the sanitizer:** my first version zeroed `0x20` bytes at `+0x30`, which runs past the 0x48-byte record — ASan flagged a heap-buffer-overflow. The body uses `vmovups %ymm0` (32 B) at `+0x10` but `%xmm0` (16 B) at `+0x30`; the widths are now exact and the comment says why.
+- **A tautology caught in my own checker:** the flag-store assertion ended in `or True`; replaced with the three real `41 c6 45 40/42/41 01` sequences plus the record's vtable/owner stores.
+- **Fixture:** found (lookup ok → tail value; lookup null → `0x1b`; missing tail hook; no provider), missing (record layout byte-for-byte, rescan matched vs exhausted with release, null-name sub-tree reported, missing storage fails).
+- **Checker:** pins both windows by digest, requires them to stay inside the `0xe21420` FDE range, and verifies the `0x48` size, the `0xb0`/`0x38`/`0xc0`/`0x148` slots, the three flag stores and the `41 ff e0` tail jump.
+- **Verification (PASSED):** build exit 0; CTest **522/522**; lift checkers **714 passed / 0 failed**; entry map regenerated to 1,440 constants / 981 RVAs / 384 headers.
+- **Next exact action:** the `0xe215ce..0xe2167e` sub-tree (the `arg3 == null` branch) is the last unmodelled region of `0xe21420` — roughly 176 bytes.
+
 ## 2026-11-03 13:10 CDT (root) — the "0 lowered" blocker is now precise (STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `GPU-01-MSL-OFFLINE-01`. Measured what a real manifest would need, on the largest per-lane-eligible program in the sample (`shadow_809795858_shipping.csdr`, 316 B, 65 instructions): scalar memory bases **s0/s2/s8/s9**, buffer descriptors **s20/s24/s28**, export targets **12** (clip) and **32** (param0), plus initial vector bindings for the registers read before being written.

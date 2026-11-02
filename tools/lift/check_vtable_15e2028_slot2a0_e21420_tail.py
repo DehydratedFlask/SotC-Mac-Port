@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+"""Pin the two terminal continuations of the 0xe21420 decision contract.
+
+Window digests, the constants they imply (missing-path vtable 0x15e2d70, slot 0xb0/0xc0/0x148),
+and that both windows still live inside the 0xe21420 FDE range. Skips cleanly without the image.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import importlib.util
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "scripts"))
+import ps4_dynlink as d  # noqa: E402
+
+ELF = ROOT / "local/re/eboot.elf"
+FDE = ROOT / "local/validation/registry-analysis-agent/fde_ranges.json"
+HEADER = ROOT / "native/core/vtable_15e2028_slot2a0_e21420_tail.hpp"
+CMAKE = ROOT / "native/CMakeLists.txt"
+
+FOUND = (0xE2167E, 0x4B, "9e214c763f22348f3ee8ad05825172e9983b2385a6bff2c15613bf39866ea669")
+MISSING = (0xE214F7, 0xBF, "74f92e9e4f173752e0790372dc62b5e3cf4b0f349a27efa6e62761e2e30e800e")
+
+
+def require(cond: bool, msg: str) -> None:
+    if not cond:
+        raise SystemExit(f"FAIL {msg}")
+
+
+def main() -> int:
+    header = HEADER.read_text()
+    cmake = CMAKE.read_text()
+    for needle in ("kE21420Found18000Rva = 0xe2167e", "kE21420Missing18000Rva = 0xe214f7",
+                   "kE21420MissingVtable = 0x15e2d70", "kE21420TailSlot = 0x148",
+                   "kE21420AllocationSize = 0x48", "kE21420RecordFlags = 0x40"):
+        require(needle in header, f"header missing {needle}")
+    for needle in ("core/vtable_15e2028_slot2a0_e21420_tail.cpp",
+                   "tests/test_vtable_15e2028_slot2a0_e21420_tail.cpp",
+                   "test_vtable_15e2028_slot2a0_tail"):
+        require(needle in cmake, f"cmake missing {needle}")
+
+    if not ELF.is_file() or not FDE.is_file():
+        print("SKIP check_vtable_15e2028_slot2a0_e21420_tail: private image not present")
+        return 0
+
+    elf = ELF.read_bytes()
+    _, program_headers = d.program_headers(elf)
+    image = d.Image(elf, program_headers)
+
+    spec = importlib.util.spec_from_file_location("cfg_census", ROOT / "tools/lift/cfg_census.py")
+    census = importlib.util.module_from_spec(spec)
+    sys.modules["cfg_census"] = census
+    spec.loader.exec_module(census)
+    fdes, _duplicates = census.load_fde_ranges(FDE)
+
+    owner = fdes.find(0xE21420)
+    require(owner is not None and owner[0] == 0xE21420, "0xe21420 is not an FDE function start")
+    for rva, size, sha in (MISSING, FOUND):
+        body = image.read(rva, size)
+        require(hashlib.sha256(body).hexdigest() == sha, f"0x{rva:x} window changed")
+        require(owner[0] <= rva < owner[0] + owner[1],
+                f"0x{rva:x} is no longer inside the 0xe21420 range")
+
+    missing = image.read(*MISSING[:2])
+    found = image.read(*FOUND[:2])
+    # Missing path: allocate slot 0xb0, the vtable lea, the flag bytes and the release slot 0xc0.
+    require(bytes.fromhex("ff90b0000000") in missing, "missing path lost the 0xb0 allocation call")
+    require(bytes.fromhex("488d0d") in missing, "missing path lost the vtable lea")
+    # Three explicit `movb $0x1` stores at +0x40, +0x42 and +0x41 (that order in the body).
+    require(bytes.fromhex("41c6454001") in missing, "flag store at +0x40 missing")
+    require(bytes.fromhex("41c6454201") in missing, "flag store at +0x42 missing")
+    require(bytes.fromhex("41c6454101") in missing, "flag store at +0x41 missing")
+    # The record's vtable and owner stores.
+    require(bytes.fromhex("49894d00") in missing and bytes.fromhex("49894508") in missing,
+            "record vtable/owner stores missing")
+    require(bytes.fromhex("ff90c0000000") in missing, "missing path lost the 0xc0 release call")
+    require(bytes.fromhex("be48000000") in missing, "missing path lost the 0x48 size immediate")
+    # Found path: lookup slot 0x38, status 0x1b, tail slot 0x148 and the indirect tail jump.
+    require(bytes.fromhex("ff5038") in found, "found path lost the 0x38 lookup call")
+    require(bytes.fromhex("41bf1b000000") in found, "found path lost the 0x1b status")
+    require(bytes.fromhex("4c8b8148010000") in found, "found path lost the 0x148 slot load")
+    require(found.endswith(bytes.fromhex("41ffe0")), "found path no longer ends in the tail jmp")
+
+    print("OK check_vtable_15e2028_slot2a0_e21420_tail: both continuations pinned inside the "
+          "0xe21420 range, with the 0xb0/0x38/0xc0/0x148 slots and the 0x48 allocation size")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
