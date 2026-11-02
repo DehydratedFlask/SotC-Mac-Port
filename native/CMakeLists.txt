@@ -2768,3 +2768,12 @@ target_link_libraries(sotc_vtable_frontier2 PUBLIC sotc_core)
 add_executable(test_vtable_frontier2 tests/test_vtable_frontier2.cpp)
 target_link_libraries(test_vtable_frontier2 PRIVATE sotc_vtable_frontier2)
 add_test(NAME vtable_frontier2 COMMAND test_vtable_frontier2)
+
+# CPU-01-INIT-21620-LOOKUP-01: native `bpe::ConCmdManager::FindConCmd` (`0x21620`, 464 B pinned) —
+# the locked manager-map path, the guarded static pending-list path, and the adapters for the two
+# retail call sites (lazy_bind @ 0x91227, vslot-40 miss @ 0x53327d). Additive.
+# See core/lookup_21620.hpp and tools/lift/check_lookup_21620.py.
+target_sources(sotc_core PRIVATE core/lookup_21620.cpp)
+add_executable(test_lookup_21620 tests/test_lookup_21620.cpp)
+target_link_libraries(test_lookup_21620 sotc_core)
+add_test(NAME lookup_21620 COMMAND test_lookup_21620)

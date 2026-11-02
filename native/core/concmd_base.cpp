@@ -38,6 +38,19 @@ std::size_t ConCmdPendingList::size() const noexcept {
     return n;
 }
 
+bool ensure_concmd_pending_list(ConCmdRegistry& registry) noexcept {
+    // 0x20e87..0x20ebb (register) / 0x2171b..0x21755 (lookup): `__cxa_guard_acquire(0x2dfce60)`,
+    // then `head.next = head.prev = &head`, then `__cxa_guard_release`.
+    ConCmdPendingList& list = registry.pending;
+    if (list.guard_done) {
+        return false;
+    }
+    list.head.next = &list.head;
+    list.head.prev = &list.head;
+    list.guard_done = true;
+    return true;
+}
+
 ConCmdRegisterResult register_concmd_20d60(ConCmdBase& cmd, ConCmdRegistry& registry) noexcept {
     ConCmdRegisterResult out{};
 
@@ -62,13 +75,7 @@ ConCmdRegisterResult register_concmd_20d60(ConCmdBase& cmd, ConCmdRegistry& regi
     // 0x20e7f: null manager -> tail-link into the global pending list.
     out.path = ConCmdRegisterPath::pending_list;
     ConCmdPendingList& list = registry.pending;
-    if (!list.guard_done) {
-        // 0x20e87..0x20ebb: __cxa_guard_acquire(0x2dfce60) then head = {&head, &head}; release.
-        list.head.next = &list.head;
-        list.head.prev = &list.head;
-        list.guard_done = true;
-        out.list_initialised = true;
-    }
+    out.list_initialised = ensure_concmd_pending_list(registry);   // 0x20e87..0x20ebb
     // 0x20ebe..0x20edf: rcx = head.prev (tail); node = this+8;
     //   node.prev = tail; node.next = &head; head.prev = node; tail->next = node.
     ConCmdListNode* const tail = list.head.prev;

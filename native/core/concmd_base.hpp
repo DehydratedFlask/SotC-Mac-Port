@@ -138,6 +138,13 @@ struct ConCmdRegistry {
     StartupAtexitLog atexit_log{};
 };
 
+// The guarded `head = {&head, &head}` initialisation shared by BOTH readers of the pending list:
+// the register body 0x20d80 (guard at 0x20e87..0x20ebb) and the lookup body 0x21620 (guard at
+// 0x2171b..0x21755). Returns true only when this call performed the initialisation.
+// Empty-state comparison after this call: `head.next == &head` and `head.prev == &head`, which is
+// what the lookup path relies on to stop at the sentinel `(char*)&head - 8`.
+[[nodiscard]] bool ensure_concmd_pending_list(ConCmdRegistry& registry) noexcept;
+
 enum class ConCmdRegisterPath : std::uint8_t {
     already_registered,   // 0x20d60: `cmp byte [rdi+0x18],0; jne ret`
     pending_list,         // 0x20e7f..0x20edf: queued at the tail of the global pending list

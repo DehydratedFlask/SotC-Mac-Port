@@ -1,5 +1,6 @@
 #include "vslot_40_533100_miss.hpp"
 
+#include <cstdint>
 #include <cstring>
 
 namespace sotc {
@@ -38,9 +39,12 @@ Vslot40_533100MissResult vslot_40_533100_miss(const Vslot40_533100MissHooks& hoo
 
     // OBS: stack hashed-string for "r_fps" (name pin only; layout NOT fully modelled).
     std::memset(g_name_obj, 0, sizeof(g_name_obj));
-    // Store cstr pointer in a conventional slot so find hook can see the name if desired.
+    // 0x53323b/0x533257: the caller's `bpe::String` carries {data, size} — data at +0x00 and the
+    // pinned length 5 at +0x08. Only those two qwords are observable at the call site.
     const char* name = kVslot40MissNameRFps;
-    std::memcpy(g_name_obj, &name, sizeof(void*));
+    const std::uint64_t name_size = 5;
+    std::memcpy(g_name_obj, &name, sizeof(name));
+    std::memcpy(g_name_obj + 0x08, &name_size, sizeof(name_size));
 
     void* r12 = g_cell_2efe5c0;  // OBS: mov r12, [0x2efe5c0]
     void* held = nullptr;        // [rbp-0x108]
