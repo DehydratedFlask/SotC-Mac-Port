@@ -105,6 +105,10 @@ def exp(target=12, en=15, compr=0, done=1, vm=0, src=(3, 5, 7, 9)):
 END = sopp()
 
 
+def blocks_program(code):
+    return gcn.decode_blocks(code)
+
+
 def one(encoded):
     return gcn.decode(encoded + END)[0]
 
@@ -266,6 +270,36 @@ class EncodingOracleTests(unittest.TestCase):
         self.assertEqual(one(vop1(op=17)).mnemonic, 'v_cvt_f32_ubyte0')
         self.assertEqual(one(vop3(op=282, abs_=0, clamp=0, omod=0, neg=0)).mnemonic,
                          'v_lshlrev_b32')
+
+    def test_decode_blocks_terminators_and_targets(self):
+        # A forward branch: it ends its block, and its target is computed, not assumed.
+        forward = blocks_program(sopp(5, 2) + vop2() + vop2(4) + END)
+        self.assertEqual([(b.start, b.end, b.terminator) for b in forward.blocks],
+                         [(0, 4, 's_cbranch_scc1'), (4, 16, 's_endpgm')])
+        self.assertEqual(len(forward.branches), 1)
+        branch = forward.branches[0]
+        self.assertEqual((branch.offset, branch.immediate, branch.target), (0, 2, 0x0C))
+        self.assertTrue(branch.target_in_program and branch.target_on_instruction)
+        # The block that follows the terminator is just the next bytes: no fall-through claim.
+        self.assertIsNone(forward.blocks[1].branch)
+        self.assertEqual(forward.instructions[0].mnemonic, 's_cbranch_scc1')
+
+        # Backward branch to offset 0 lands on the first instruction.
+        backward = blocks_program(sopp(8, 0xFFFF) + vop2() + END)
+        self.assertEqual(backward.branches[0].target, 0)
+        self.assertTrue(backward.branches[0].target_on_instruction)
+
+        # A target past the end is reported, never repaired.
+        outside = blocks_program(sopp(5, 64) + END)
+        self.assertFalse(outside.branches[0].target_in_program)
+        self.assertFalse(outside.branches[0].target_on_instruction)
+
+        # All-or-nothing: an unmodelled row still fails the whole program.
+        with self.assertRaises(gcn.DecodeError):
+            blocks_program(sopp(5, 1) + mubuf(op=16) + END)
+        # And the strict linear decoder still refuses the same branch span.
+        with self.assertRaises(gcn.DecodeError):
+            gcn.decode(sopp(5, 2) + END)
 
     def test_interp_mov_selectors(self):
         # v_interp_mov_f32 is admitted only with the three vertex selectors the pinned PS4

@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 11:15 CDT (root) — CFG-aware decode promoted; 54 more programs decode (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01`. `gcn_inventory.decode_blocks()` is now the CFG-aware decode mode: a control-transfer row is an instruction that **ends its block**, with its byte target computed (`offset + size + simm16*4`); the listing still never assumes fall-through. New dataclasses `BranchTarget` (with `target_in_program` / `target_on_instruction`) and `BasicBlock` (start/end/instruction offsets/terminator/branch). `gcn_blocks.py` became the CLI adapter over it, and the coverage census now calls the inventory directly, so there is one implementation.
+- **Measured at sample 512** (`local/validation/msl-coverage/blocks-512q`): **block-decodable programs 186 → 240**, i.e. **54 of the 181 branch-blocked programs decode fully as blocks**; **333 branch rows, 333 targets inside the program, 333 on an instruction boundary** — the control-flow structure is well-formed, just not linear.
+- **Remaining block-mode first blockers:** `VOP3 287` (30, deliberately unmodelled), `VOP1 7` (28), `VOP2 32` (15, mandatory literal), **14 programs with bytes after `s_endpgm` inside their declared span**, `VOP3 28` (14, refused on evidence), `VOP3 328` (6).
+- **Tests:** `gcn_inventory` 48 — block/terminator layout, forward and backward targets, an out-of-span target, the "no fall-through claim" property (the post-terminator block has no branch), an unmodelled row failing the whole program, and the strict decoder still refusing the same span. `gcn_to_msl` 24, blocks self-test 26, coverage self-test 23.
+- **Still 0 lowered.**
+- **Verification (PASSED):** build exit 0; CTest **521/521**; checkers **713 passed / 0 failed**.
+- **Next exact action:** the 14 "bytes after s_endpgm" programs are a distinct class worth measuring (padding vs appended data); otherwise `VOP1 7` and `VOP3 328` are the next ordinary rows.
+
 ## 2026-11-03 10:10 CDT (root) — VINTRP 2 admitted with a manifest-driven lowering (FIXTURE_VERIFIED)
 
 - **Task:** `GPU-01-MSL-OFFLINE-01`, interpolation card. `v_interp_mov_f32` is now decoded **and** lowerable:

@@ -6,9 +6,9 @@ linear listing would have to invent fall-through past a taken branch. That refus
 the 184 remaining decode errors in the sampled corpus, and none of them can be unblocked by another
 opcode-table row.
 
-This module keeps the refusal's *reason* intact while extracting the structure that is really there:
-it decodes the span with `allow_branches=True` (branch rows become explicit instructions), then
-splits the listing at every control-transfer row. Each branch is reported with its byte target
+The splitting lives in `gcn_inventory.decode_blocks` (the CFG-aware decode mode); this module is the
+census-facing CLI and adapter around it. It decodes the span with `allow_branches=True` (branch rows
+become explicit instructions), then splits the listing at every control-transfer row. Each branch is reported with its byte target
 (`offset + 4 + simm16*4`, the GCN PC-relative rule). Nothing is followed: the tool never claims a
 block is reachable, never relocates code, and never executes anything.
 
@@ -35,7 +35,7 @@ gcn = importlib.util.module_from_spec(_SPEC)
 sys.modules['gcn_inventory'] = gcn
 _SPEC.loader.exec_module(gcn)
 
-VERSION = 'gfx7-blocks-v1'
+VERSION = 'gfx7-blocks-v2'
 CONTROL_TRANSFER = frozenset(('control_transfer',))
 
 
@@ -73,53 +73,31 @@ def _signed16(value: int) -> int:
 
 
 def blocks(code: bytes) -> BlockProgram:
-    """Decode `code` block-by-block. All-or-nothing: any undecodable row fails the whole span."""
+    """Decode `code` block-by-block.
+
+    The splitting and target arithmetic live in `gcn_inventory.decode_blocks`; this function only
+    adapts its result to the tool's own dataclasses and turns a `DecodeError` into a status record.
+    """
     try:
-        rows = gcn.decode(code, allow_branches=True)
+        program = gcn.decode_blocks(code)
     except gcn.DecodeError as exc:
         return BlockProgram(blocks=(), branches=(), ok=False,
                             error_offset=exc.offset, error_reason=exc.reason,
                             bytes=len(code), instructions=0)
-
-    starts = {row.offset for row in rows}
-    branches: list[Branch] = []
-    for row in rows:
-        if not CONTROL_TRANSFER.intersection(row.requirements):
-            continue
-        immediate = _signed16(row.fields['simm16'])
-        target = row.offset + row.size + immediate * 4
-        branches.append(Branch(offset=row.offset, mnemonic=row.mnemonic, immediate=immediate,
-                               target=target,
-                               target_in_span=0 <= target < len(code),
-                               target_on_instruction=target in starts))
-
-    out: list[Block] = []
-    current_start = rows[0].offset if rows else 0
-    count = 0
-    terminator: str | None = None
-    for row in rows:
-        count += 1
-        if CONTROL_TRANSFER.intersection(row.requirements):
-            terminator = row.mnemonic
-            out.append(Block(start=current_start, end=row.offset + row.size,
-                             instructions=count, terminator=terminator))
-            current_start = row.offset + row.size
-            count = 0
-            terminator = None
-        elif row.mnemonic == 's_endpgm':
-            out.append(Block(start=current_start, end=row.offset + row.size,
-                             instructions=count, terminator=row.mnemonic))
-            current_start = row.offset + row.size
-            count = 0
-    if count:
-        # Trailing rows after the final s_endpgm cannot happen: decode() already required the exact
-        # end, so this branch is unreachable for a well-formed program. Keep it explicit.
-        out.append(Block(start=current_start, end=rows[-1].offset + rows[-1].size,
-                         instructions=count, terminator=terminator))
-
-    return BlockProgram(blocks=tuple(out), branches=tuple(branches), ok=True,
+    blocks_out = tuple(
+        Block(start=block.start, end=block.end,
+              instructions=len(block.instruction_offsets), terminator=block.terminator)
+        for block in program.blocks
+    )
+    branches_out = tuple(
+        Branch(offset=branch.offset, mnemonic=branch.mnemonic, immediate=branch.immediate,
+               target=branch.target, target_in_span=branch.target_in_program,
+               target_on_instruction=branch.target_on_instruction)
+        for branch in program.branches
+    )
+    return BlockProgram(blocks=blocks_out, branches=branches_out, ok=True,
                         error_offset=None, error_reason=None,
-                        bytes=len(code), instructions=len(rows))
+                        bytes=len(code), instructions=len(program.instructions))
 
 
 def summary(program: BlockProgram) -> dict:

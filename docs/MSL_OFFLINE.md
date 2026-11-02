@@ -415,3 +415,39 @@ decoder that represents branch edges.
 
 - **Still zero lowered:** the new mode is a rule the manifest must opt into, and no real shader has a
   manifest.
+
+## CFG-aware decode promoted into the inventory
+
+`gcn_blocks` began as a census-only tool. The block splitting and branch-target arithmetic now live
+in `gcn_inventory.decode_blocks()` — the same all-or-nothing contract as `decode()`, with one change
+of representation: **a control-transfer row is an instruction that ends its block**, and its byte
+target is computed (`offset + size + simm16*4`, GCN's PC-relative rule). The listing still never
+assumes fall-through past a taken branch; the block after a terminator is simply the next run of
+bytes. `gcn_blocks.py` is now the CLI/adapter over that mode, and the coverage census calls the
+inventory directly.
+
+`BasicBlock` carries `start`, `end`, `instruction_offsets`, `terminator` and the matching
+`BranchTarget`; `BranchTarget` records `target_in_program` and `target_on_instruction`, so a branch
+into the middle of an instruction is *reported*, never repaired.
+
+**Measured at sample 512** (`blocks-512q`):
+
+| Metric | before | after |
+|---|---:|---:|
+| Linear decode | 186 / 367 | 186 / 367 |
+| **Block-decodable programs** | 186 | **240** |
+| Programs decodable as blocks but not linearly | 0 | **54** |
+| Branch rows in the sample | — | **333** |
+| Branch targets inside the program | — | **333 / 333** |
+| Branch targets on an instruction boundary | — | **333 / 333** |
+
+So **54 of the 181 branch-blocked programs are fully decodable once blocks are represented**, and
+every branch in the sample lands on a real instruction start — the control-flow structure is
+well-formed, it simply is not linear.
+
+Remaining block-mode first blockers: `VOP3 287` (30, `v_mac_f32`, deliberately unmodelled for its
+ambiguous addend), `VOP1 7` (28), `VOP2 32` (15, `v_madmk_f32` and its mandatory literal), **14
+programs whose declared span carries bytes after `s_endpgm`**, `VOP3 28` (14, the `cmpx` row refused
+on evidence) and `VOP3 328` (6).
+
+- **Still zero lowered.** Block-decodability is structure, not semantics.

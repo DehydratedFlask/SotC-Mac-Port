@@ -75,18 +75,6 @@ def load_gcn():
 gcn = load_gcn()
 
 
-def load_blocks():
-    """Load the sibling block decoder by path (it re-uses this tool's gcn_inventory instance)."""
-    spec = importlib.util.spec_from_file_location("gcn_blocks_for_coverage", HERE / "gcn_blocks.py")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
-    return module
-
-
-blockdec = load_blocks()
-
-
 def digest_file(path: Path, chunk_size: int = 1 << 22) -> str:
     h = hashlib.sha256()
     with path.open("rb") as stream:
@@ -131,19 +119,28 @@ def classify_program(code: bytes, ordinal: int, info: dict) -> dict:
         "lowering": "decode-error",
         "block_decode": None,
     }
-    block_program = blockdec.blocks(code)
-    row["block_decode"] = {
-        "ok": block_program.ok,
-        "blocks": len(block_program.blocks),
-        "instructions": block_program.instructions,
-        "branches": len(block_program.branches),
-        "branches_in_span": sum(1 for b in block_program.branches if b.target_in_span),
-        "branches_on_instruction": sum(1 for b in block_program.branches
-                                       if b.target_on_instruction),
-        "branch_mnemonics": sorted({b.mnemonic for b in block_program.branches}),
-        "error_offset": block_program.error_offset,
-        "error_reason": block_program.error_reason,
-    }
+    # The CFG-aware decode mode lives in gcn_inventory; this records its counters only.
+    try:
+        block_program = gcn.decode_blocks(code)
+    except gcn.DecodeError as exc:
+        row["block_decode"] = {
+            "ok": False, "blocks": 0, "instructions": 0, "branches": 0,
+            "branches_in_span": 0, "branches_on_instruction": 0, "branch_mnemonics": [],
+            "error_offset": exc.offset, "error_reason": exc.reason,
+        }
+    else:
+        row["block_decode"] = {
+            "ok": True,
+            "blocks": len(block_program.blocks),
+            "instructions": len(block_program.instructions),
+            "branches": len(block_program.branches),
+            "branches_in_span": sum(1 for b in block_program.branches if b.target_in_program),
+            "branches_on_instruction": sum(1 for b in block_program.branches
+                                           if b.target_on_instruction),
+            "branch_mnemonics": sorted({b.mnemonic for b in block_program.branches}),
+            "error_offset": None,
+            "error_reason": None,
+        }
     try:
         rows = gcn.decode(code)
     except gcn.DecodeError as exc:

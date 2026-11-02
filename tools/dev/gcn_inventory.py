@@ -25,7 +25,7 @@ import struct
 import sys
 
 ISA_URL = 'https://docs.amd.com/v/u/en-US/sea-islands-instruction-set-architecture_0'
-VERSION = 'gfx7-bounded-inventory-v15'
+VERSION = 'gfx7-bounded-inventory-v16'
 
 # These are encoding facts, not a translation/semantic implementation.
 # SOP2/SOPC/VOPC rows below are opcode-value facts from the GFX7 ISA tables,
@@ -143,6 +143,10 @@ MUBUF_COMPONENTS = {0: 1, 1: 2, 2: 3, 3: 4, 4: 1, 5: 2, 6: 3, 7: 4,
 # Control-transfer rows that a linear span decoder must refuse: the target is an immediate offset,
 # and inventing fall-through would fabricate a program. Names come from the pinned PS4 table in
 # reference/shadPS4/src/shader_recompiler/frontend/format.cpp (SOPP block).
+# Rows that end a block. `decode_blocks` keys off this requirement, not off the mnemonic, so any
+# future control-transfer row that is admitted automatically splits blocks.
+CONTROL_TRANSFER_TERMS = frozenset(('control_transfer',))
+
 CONTROL_TRANSFER_OPCODES = {
     'SOPP': {2: 's_branch', 4: 's_cbranch_scc0', 5: 's_cbranch_scc1',
              6: 's_cbranch_vccz', 7: 's_cbranch_vccnz',
@@ -544,6 +548,105 @@ def decode(code: bytes, *, allow_branches: bool = False) -> list[Instruction]:
 PER_LANE_BLOCKERS = frozenset(('whole_quad_mode', 'writes_exec_mask', 'reads_exec_mask',
                                'reads_vcc_mask', 'lds_direct', 'wave_barrier', 'buffer_atomic',
                                'lds_memory', 'implicit_quad_derivatives'))
+
+
+@dataclass(frozen=True)
+class BranchTarget:
+    """A control-transfer row and the byte target it names.
+
+    GCN branches are PC-relative in dwords from the *next* instruction, so
+    `target = offset + size + simm16 * 4`. `target_on_instruction` says the target lands on an
+    instruction boundary of this listing; a target inside the program but not on a boundary means
+    the branch enters the middle of a decoded instruction, which this decoder reports rather than
+    repairs.
+    """
+    offset: int
+    mnemonic: str
+    immediate: int
+    target: int
+    target_in_program: bool
+    target_on_instruction: bool
+
+
+@dataclass(frozen=True)
+class BasicBlock:
+    """A maximal straight-line run ending at a control-transfer row or `s_endpgm`.
+
+    The terminator is *included* in the block (`end` is exclusive, so it covers the branch), and the
+    block after it starts at the fall-through address. Nothing is followed: a block's existence does
+    not assert that the branch is taken, not taken, or reachable.
+    """
+    start: int
+    end: int
+    instruction_offsets: tuple[int, ...]
+    terminator: str | None
+    branch: BranchTarget | None
+
+
+@dataclass(frozen=True)
+class BlockProgram:
+    blocks: tuple[BasicBlock, ...]
+    branches: tuple[BranchTarget, ...]
+    instructions: tuple[Instruction, ...]
+    size: int
+
+
+def _signed16(value: int) -> int:
+    return value - 0x10000 if value & 0x8000 else value
+
+
+def decode_blocks(code: bytes) -> BlockProgram:
+    """CFG-aware decoding: control-transfer rows become explicit block terminators.
+
+    This is the same all-or-nothing contract as `decode()`, with one difference of *representation*:
+    a branch row is admitted as an instruction that **ends** its block, and its byte target is
+    computed. The listing still never assumes fall-through past a taken branch; the block that
+    follows a terminator is simply the next run of bytes. Raises `DecodeError` for anything the
+    linear decoder refuses.
+    """
+    rows = decode(code, allow_branches=True)
+    starts = {row.offset for row in rows}
+    branches: list[BranchTarget] = []
+    by_offset: dict[int, BranchTarget] = {}
+    for row in rows:
+        if not CONTROL_TRANSFER_TERMS.intersection(row.requirements):
+            continue
+        immediate = _signed16(row.fields['simm16'])
+        target = row.offset + row.size + immediate * 4
+        entry = BranchTarget(offset=row.offset, mnemonic=row.mnemonic, immediate=immediate,
+                             target=target, target_in_program=0 <= target < len(code),
+                             target_on_instruction=target in starts)
+        branches.append(entry)
+        by_offset[row.offset] = entry
+
+    blocks: list[BasicBlock] = []
+    current_start: int | None = None
+    offsets: list[int] = []
+    for row in rows:
+        if current_start is None:
+            current_start = row.offset
+        offsets.append(row.offset)
+        terminator: str | None = None
+        branch: BranchTarget | None = None
+        if row.offset in by_offset:
+            branch = by_offset[row.offset]
+            terminator = row.mnemonic
+        elif row.mnemonic == 's_endpgm':
+            terminator = row.mnemonic
+        if terminator is not None:
+            blocks.append(BasicBlock(start=current_start, end=row.offset + row.size,
+                                     instruction_offsets=tuple(offsets), terminator=terminator,
+                                     branch=branch))
+            current_start = None
+            offsets = []
+    if offsets and current_start is not None:
+        # `decode()` requires the exact end at s_endpgm, so this can only happen if that contract
+        # changes; keep the trailing run explicit rather than dropping it.
+        blocks.append(BasicBlock(start=current_start, end=rows[-1].offset + rows[-1].size,
+                                 instruction_offsets=tuple(offsets), terminator=None, branch=None))
+
+    return BlockProgram(blocks=tuple(blocks), branches=tuple(branches), instructions=tuple(rows),
+                        size=len(code))
 
 
 def inventory(code: bytes) -> dict:
