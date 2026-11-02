@@ -1,5 +1,16 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 20:45 CDT (root) — slot 309 is a data-only edge; both save-data jump tables decode fully (STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `CPU-01-SLOT309-SAVE-DISPATCH-JUMPTABLES-01`, which had been `PARTIAL` under the E911 stop since E1052 because no call-graph order to the slot-309 initializer `0xa505e0` could be found. **E1056 answers why: there is no code edge, and there never was one to find.**
+- **The measurement that settles it:** a complete `e8`/`e9` + disp32 scan over every file-backed byte of every loadable segment finds **zero** near calls or jumps to `0xa505e0`, so the result does not depend on any disassembler. The address appears **once** in the whole `9c196254…` disassembly — its own entry. And exactly **one** relocation references it: type-8 at `0x2dd6738` = `0x2dd5d90 + 309*8`, i.e. **row 309 of the startup constructor table**. Rows 306/307/308/310/311 (`0xa46130`, `0xa46b70`, `0xa479d0`, `0xa58f10`, `0xa5b090`) pin the base independently. Slot 309 is invoked by a table row, not a caller.
+- **Both PIC jump tables decode completely, closing the E1052 provider gap:** table A is 17 signed dwords at `0x12c3280` (bound `cmpl $0x10` after `lea -1(%r14)`), table B is 19 at `0x12c3324` (bound `cmpl $0x12` after `lea -1(%rdx)`), both loading with `movslq (%rcx,%rax,4),%rax; addq %rcx,%rax; jmpq *%rax`. **All 36 targets land on instruction boundaries**, so "Ghidra sees only 15 of 19 table-B entries" was a provider artifact, not missing data.
+- **Case ownership of the four dispatch calls:** A2 → `0xa4a600` (`0xa4890c`), A14 → `0xa4a940` (`0xa4947b`), B2 → `0xa4a600` (`0xa4b23a`), B19 → `0xa4a940` (`0xa4bf6d`).
+- **A bug in my own first draft:** the case-owner helper used `starts[-1]`, the last case in *case order* rather than the highest start address, so it mislabelled `0xa4947b` as case 17. The case blocks are not laid out in case order. Fixed to `max(starts)`; the checker caught it on the first run.
+- **Mutation-verified:** changing `kVtable15953f8Slot18InstalledTable` to `0x1595400` fails the fixture (`FAIL wait teardown vtable`); changing the checker's slot row to `0x2dd6740` fails (`FAIL slot 309 row moved`). Both restored and re-verified green.
+- **Verification:** `check_startup_slot309_table` OK; `check_fios_slots_and_4b0` OK; focused CTest green; full sweeps in flight (contended by parallel workers, see below).
+- **Slot 309 stays unregistered** — lifting it is `CPU-01-STARTUP-SLOT-309-NATIVE-LIFT-01`'s decision. Its body is a straight-line static initializer: 354 instructions, **one** branch (`0xa50d2d jne 0xa50d3e`), 40 direct calls over 10 callees (`0xf590` ×17, `__cxa_atexit` ×12, `0x26ea0` ×4, singles), 3 indirect `callq *0x18(%rax)`, and `__stack_chk_fail` — so it looks structurally liftable, and that work is delegated.
+
 ## 2026-11-01 20:05 CDT (root) — 0x31310 wait-loop teardown and 0x22a60 lifted (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. The two small bodies left as entry records by the last sweep now have models: `0x31310` (105 B, `vtable 0x15953f8 + 0x18`) and `0x22a60` (121 B, `vtable 0x1594dc0 + 0x18`).
