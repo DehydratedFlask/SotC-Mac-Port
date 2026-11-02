@@ -314,6 +314,7 @@
 #include "ctor_slot_316_a33280.hpp"
 #include "ctor_slot_326_837f30.hpp"
 #include "ctor_slot_329_829e90.hpp"
+#include "ctor_slot_335_7edf10.hpp"
 #include "ctor_slot_317_a2c390.hpp"
 #include "ctor_slot_318_a20e80.hpp"
 #include "ctor_slot_343_7d7970.hpp"
@@ -708,6 +709,9 @@ struct StartupState {
     Slot326Result slot326_result{};
     Slot329Objects slot329{};
     Slot329Result slot329_result{};
+    Slot335Objects slot335{};
+    Slot335ValueCells slot335_cells{};
+    Slot335Result slot335_result{};
     Slot317Objects slot317{};
     Slot318Objects slot318{};
     Slot343Objects slot343{}; Slot343Result slot343_result{};

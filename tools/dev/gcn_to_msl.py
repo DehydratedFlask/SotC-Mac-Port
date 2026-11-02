@@ -28,6 +28,32 @@ CASE_FIELDS = ('position', 'encoded_normal', 'object_row0', 'object_row1', 'obje
                'clip_row0', 'clip_row1', 'clip_row2', 'clip_row3', 'camera', 'material',
                'param0_p0', 'param0_p10', 'param0_p20', 'param1_p0', 'param1_p10', 'param1_p20',
                'barycentric')
+# Export sinks.
+#
+# `named` is the closed synthetic harness contract the pair profile has always used: it demands
+# exactly the target set `{12,32,33}` (vertex) or `{0}` (fragment) and writes four named members.
+# That contract is a harness convenience, not a shader fact: a retail vertex shader that writes
+# clip plus one param is refused by it before any binding is read.
+#
+# `target-array` is the faithful model. An `EXP` row enables a *set of components* (`en` bits) and
+# names one target; the sink is indexed by target with one component per enabled bit, so an
+# arbitrary target set and a partial `en` are both representable without inventing a value for a
+# component the program does not write. Nothing is emitted for an `en == 0` (null) export.
+EXPORT_SINKS = ('named', 'target-array')
+# The vector-ALU rows `Lowerer.arithmetic` computes. `v_add_i32`/`v_sub_i32` write VCC's carry,
+# but the decoder gates every program that *reads* VCC out as per-lane blocked, so the carry is
+# not observable in a program this loop sees. `msl_abi_manifest` mirrors this set and its
+# self-test fails if the two drift apart.
+ARITHMETIC_ROWS = frozenset((
+    'v_mov_b32', 'v_add_f32', 'v_sub_f32', 'v_mul_f32', 'v_mac_f32', 'v_mad_f32', 'v_rsq_f32',
+    'v_cvt_pkrtz_f16_f32', 'v_cvt_f32_f16', 'v_cvt_f32_i32', 'v_and_b32', 'v_add_i32',
+    'v_sub_i32', 'v_lshlrev_b32', 'v_lshrrev_b32', 'v_mad_u32_u24', 'v_sad_u32'))
+# Sink layout of the `target-array` model, in the pinned `IR::Attribute` numbering: 0..7 are the
+# render targets, 8 is depth (MRTZ), 9 is the null attribute, 12..15 are the four clip positions
+# and 32..63 are params 0..31.
+EXPORT_SPACES = (('rt', 0, 8), ('depth', 8, 9), ('pos', 12, 16), ('param', 32, 64))
+EXPORT_SINK_SLOTS = 8 + 1 + 4 + 32
+NULL_EXPORT_TARGET = 9
 LOGO_PS_SCHEMA = 'bounded-logo-ps-synthetic-v1'
 LOGO_PS_SHA256 = '4309caada7f114ec822f61646be536f50a8261a8c6e54f2ce709db7c70b8b39a'
 LOGO_PS_BYTES = 152
@@ -39,6 +65,19 @@ LOGO_VS_BYTES = 140
 
 class LoweringError(ValueError):
     pass
+
+
+def export_space(target: int) -> tuple[str, int]:
+    """Map an `EXP` target onto its sink space and index, or refuse it.
+
+    The four spaces and their bounds are the pinned attribute table
+    (`reference/shadPS4/src/shader_recompiler/ir/attribute.h`): RenderTarget0..7, Depth (8),
+    Position0..3 (12..15) and Param0..31 (32..63). The decoder already rejects any other target.
+    """
+    for space, low, high in EXPORT_SPACES:
+        if low <= target < high:
+            return space, target - low
+    raise LoweringError(f'export target {target} has no sink space')
 
 
 @dataclass(frozen=True)
@@ -55,10 +94,17 @@ class Lowerer:
         self.s: dict[int, Cell] = {}
         self.v: dict[int, Cell] = {}
         self.lines: list[str] = []
-        self.exports: dict[int, list[str]] = {}
+        # target -> {component index: MSL expression}; a second export to the same component of
+        # the same target replaces the expression, which is what the hardware does.
+        self.exports: dict[int, dict[int, str]] = {}
+        self.null_exports: list[int] = []
+        self.valid_mask_exports: list[int] = []
         self.serial = 0
         self.input_reads: set[str] = set()
         self.interp_pending: dict[int, tuple[int, int]] = {}
+        self.sink = abi.get('export_sink', 'named')
+        if self.sink not in EXPORT_SINKS:
+            raise LoweringError(f'unsupported export sink {self.sink!r}')
         for n, item in abi.get('initial_scalar', {}).items():
             for j, cell in enumerate(self.bind(item)):
                 slot=int(n)+j
@@ -126,8 +172,24 @@ class Lowerer:
                 self.input_reads.add(cell.value)
             return cell.value
         if cell.kind == 'uint':
+            # A `uint` cell is a bit pattern, so a float row reading it is a bit reinterpretation
+            # (that is also how the inline-constant file behaves).
             return f'as_type<float>({cell.value})'
         raise LoweringError(f'non-arithmetic resource {cell.kind} used as float')
+
+    def uint_cell(self, cell: Cell) -> str:
+        """A 32-bit pattern for an integer row: a float cell is reinterpreted, not converted."""
+        if cell.kind in ('uint', 'packed'):
+            return cell.value
+        if cell.kind == 'float':
+            if cell.value.startswith('u.'):
+                self.input_reads.add(cell.value)
+            return f'as_type<uint>({cell.value})'
+        raise LoweringError(f'non-arithmetic resource {cell.kind} used as an integer')
+
+    def int_cell(self, cell: Cell) -> str:
+        """A signed 32-bit value for `v_cvt_f32_i32`: the same bits, read as `int`."""
+        return f'as_type<int>({self.uint_cell(cell)})'
 
     def src(self, n: int, literal: int | None = None) -> Cell:
         if n >= 256:
@@ -152,7 +214,8 @@ class Lowerer:
     def assign(self, register: int, expr: str, kind: str = 'float') -> None:
         name = f't{self.serial}'
         self.serial += 1
-        self.lines.append(f'    {"uint" if kind == "packed" else "float"} {name} = {expr};')
+        wide = kind in ('packed', 'uint')
+        self.lines.append(f'    {"uint" if wide else "float"} {name} = {expr};')
         self.v[register] = Cell(kind, name)
 
     def interp_mov(self, i):
@@ -187,26 +250,84 @@ class Lowerer:
             expr = f'sub32({expr}, {p10})'
         self.assign(f['vdst'], expr)
 
+    def operands(self, i) -> list[Cell]:
+        """The source cells of one VOP row, in encoding order (modifiers not yet applied)."""
+        f = i.fields
+        if i.encoding == 'VOP3':
+            if i.opcode in gcn.VOP3_UNARY:
+                used = ('src0',)
+            elif i.opcode in gcn.VOP3_THREE_SOURCE:
+                used = ('src0', 'src1', 'src2')
+            else:
+                used = ('src0', 'src1')
+            return [self.src(f[name]) for name in used]
+        if i.encoding == 'VOP2':
+            return [self.src(f['src0'], f.get('literal')), self.src(f['vsrc1'] + 256)]
+        return [self.src(f['src0'], f.get('literal'))]
+
     def arithmetic(self, i):
+        """Lower one vector-ALU row.
+
+        Integer rows carry a `uint` cell, so a later float row reading one is a bit
+        reinterpretation and a later integer row sees the same bits. Every operation below is the
+        pinned PS4 translator's own definition (frontend/translate/vector_alu.cpp), including the
+        `REV` shift convention, the masked shift amount and the 24-bit fields of
+        `v_mad_u32_u24`. `v_add_i32`/`v_sub_i32` write the carry into VCC; the decoder gates every
+        program that *reads* VCC out as per-lane blocked, so the carry is not observable here and
+        no expression is emitted for it.
+        """
         f, name = i.fields, i.mnemonic
-        a = self.float_cell(self.src(f['src0'], f.get('literal')))
+        if name not in ARITHMETIC_ROWS:
+            raise LoweringError(f'unsupported arithmetic {name}')
+        cells = self.operands(i)
+        if name in ('v_and_b32', 'v_add_i32', 'v_sub_i32', 'v_lshlrev_b32', 'v_lshrrev_b32',
+                    'v_mad_u32_u24', 'v_sad_u32'):
+            a, b = self.uint_cell(cells[0]), self.uint_cell(cells[1])
+            if name == 'v_and_b32':
+                expr = f'({a} & {b})'
+            elif name == 'v_add_i32':
+                expr = f'({a} + {b})'
+            elif name == 'v_sub_i32':
+                expr = f'({a} - {b})'
+            elif name == 'v_lshlrev_b32':
+                # REV form: SRC0 is the shift amount, VSRC1 is the value, and the amount is
+                # masked to five bits (pinned translator: `src1 << (src0 & 0x1F)`).
+                expr = f'({b} << ({a} & 31u))'
+            elif name == 'v_lshrrev_b32':
+                expr = f'({b} >> ({a} & 31u))'
+            elif name == 'v_mad_u32_u24':
+                c = self.uint_cell(cells[2])
+                expr = f'(({a} & 0xffffffu) * ({b} & 0xffffffu) + {c})'
+            else:  # v_sad_u32: |S0 - S1| unsigned, plus S2
+                c = self.uint_cell(cells[2])
+                expr = f'(max({a}, {b}) - min({a}, {b}) + {c})'
+            self.assign(f['vdst'], expr, 'uint')
+            return
+        if name == 'v_cvt_f32_f16':
+            # Low half of the source, read as fp16 and widened (pinned translator unpacks 2x16).
+            self.assign(f['vdst'], f'half_float({self.uint_cell(cells[0])} & 65535u)')
+            return
+        if name == 'v_cvt_f32_i32':
+            self.assign(f['vdst'], f'float({self.int_cell(cells[0])})')
+            return
+        a = self.float_cell(cells[0])
         args = [a]
         if i.encoding == 'VOP3':
-            args += [self.float_cell(self.src(f['src1']))]
-            if name == 'v_mad_f32':
-                args += [self.float_cell(self.src(f['src2']))]
+            args += [self.float_cell(cell) for cell in cells[1:]]
             for j in range(len(args)):
                 if f['abs'] & 1 << j:
                     args[j] = f'fabs({args[j]})'
                 if f['neg'] & 1 << j:
                     args[j] = f'(-{args[j]})'
         elif i.encoding == 'VOP2':
-            args += [self.float_cell(self.src(f['vsrc1']+256))]
+            args += [self.float_cell(cells[1])]
         if name == 'v_mov_b32':
             # Bit-preserving moves are expressions, not float arithmetic.
             self.v[f['vdst']] = self.src(f['src0'], f.get('literal'))
             return
-        if name == 'v_sub_f32':
+        if name == 'v_add_f32':
+            expr = f'add32({args[0]}, {args[1]})'
+        elif name == 'v_sub_f32':
             expr = f'add32({args[0]}, -({args[1]}))'
         elif name == 'v_mul_f32':
             expr = f'mul32({args[0]}, {args[1]})'
@@ -228,6 +349,85 @@ class Lowerer:
             if f['clamp']:
                 expr = f'sat32({expr})'
         self.assign(f['vdst'], expr)
+
+    def export_row(self, i):
+        """Lower one `EXP` row into the sink, component by component.
+
+        What the encoding states, and nothing more: `en` selects which of the four components this
+        instruction writes, `vsrc<j>` supplies component `j` (pinned translator: for a
+        non-compressed export `components[i] = VGPR[inst.src[i]]` for every set bit `i`), and the
+        compressed form packs two fp16 components per payload dword with `en` bit 0 exporting R,G
+        from `vsrc0` and bit 2 exporting B,A from `vsrc1` (pinned: `if (exp.en & 1)` / `if
+        ((exp.en >> 2) & 1)`, asserted for render targets and depth only). A component the row
+        does not enable is not written, so no value is invented for it.
+        """
+        f = i.fields
+        target, enable, compr = f['target'], f['en'], f['compr']
+        if enable == 0 or target == NULL_EXPORT_TARGET:
+            # No component enabled, or the Null attribute: the row exports nothing.
+            if f['vm'] and self.stage != 'ps':
+                raise LoweringError('valid-mask export is only defined on a fragment stage')
+            if f['vm']:
+                self.valid_mask_exports.append(target)
+            self.null_exports.append(target)
+            return
+        if f['vm']:
+            # `vm` writes EXEC into the valid-mask slot. A per-lane-eligible program cannot write
+            # EXEC (the decoder gates that out), so EXEC is the covered-lane mask the harness
+            # evaluates and the write is the identity on every lane it visits. The wave-level
+            # effect on *uncovered* lanes is outside this bounded model and is not claimed.
+            if self.stage != 'ps':
+                raise LoweringError('valid-mask export is only defined on a fragment stage')
+            self.valid_mask_exports.append(target)
+        space, index = export_space(target)
+        sink = self.exports.setdefault(target, {})
+        if compr:
+            if space not in ('rt', 'depth'):
+                raise LoweringError('compressed export outside a render-target/depth target')
+            pairs = tuple((first, source) for bit, first, source in ((1, 0, 0), (4, 2, 1))
+                          if enable & bit)
+            if not pairs:
+                raise LoweringError('compressed export enables no component pair')
+            for first, source in pairs:
+                cell = self.src(f[f'vsrc{source}'] + 256)
+                if cell.kind not in ('packed', 'uint'):
+                    raise LoweringError('compressed export does not have a packed half input')
+                sink[first] = f'half_float({cell.value} & 65535u)'
+                sink[first + 1] = f'half_float({cell.value} >> 16)'
+            return
+        for component in range(4):
+            if enable & (1 << component):
+                sink[component] = self.float_cell(self.src(f[f'vsrc{component}'] + 256))
+
+    def finish_named(self) -> None:
+        """Materialise the closed synthetic harness contract (`named` sink)."""
+        required = {12, 32, 33} if self.stage == 'vs' else {0}
+        if set(self.exports) != required or self.interp_pending:
+            raise LoweringError('incomplete stage exports/interpolation')
+        for target in sorted(required):
+            components = self.exports[target]
+            if sorted(components) != [0, 1, 2, 3]:
+                raise LoweringError('incomplete stage exports')
+            values = ', '.join(components[j] for j in range(4))
+            if self.stage == 'vs':
+                member = {12: 'clip', 32: 'param0', 33: 'param1'}[target]
+                self.lines.append(f'    out.{member} = float4({values});')
+            else:
+                self.lines.append(f'    return float4({values});')
+
+    def finish_array(self) -> None:
+        """Materialise the target-indexed sink (`target-array`): one write per enabled component."""
+        if self.interp_pending:
+            raise LoweringError('incomplete stage exports/interpolation')
+        if self.stage == 'vs' and sorted(self.exports.get(12, {})) != [0, 1, 2, 3]:
+            # Not a shader fact but a stage contract: a vertex stage has to produce a full clip
+            # position, and the harness cannot rasterise a partial one.
+            raise LoweringError('a vertex stage must export all four clip components to target 12')
+        for target in sorted(self.exports):
+            space, index = export_space(target)
+            for component in sorted(self.exports[target]):
+                self.lines.append(f'    e.{space}[{index}].{"xyzw"[component]} = '
+                                  f'{self.exports[target][component]};')
 
     def run(self, code: bytes) -> tuple[list[str], dict]:
         if self.abi.get('sha256') != hashlib.sha256(code).hexdigest():
@@ -296,33 +496,21 @@ class Lowerer:
                 elif i.encoding.startswith('VOP'):
                     self.arithmetic(i)
                 elif i.encoding == 'EXP':
-                    if f['en'] != 15 or f['target'] in self.exports:
-                        raise LoweringError('unsupported partial/repeated export')
-                    if f['compr']:
-                        if self.stage != 'ps' or f['target'] != 0 or not f['done'] or not f['vm']:
-                            raise LoweringError('unsupported compressed export contract')
-                        parts=[self.src(f[f'vsrc{j}']+256) for j in range(2)]
-                        if any(c.kind!='packed' for c in parts):
-                            raise LoweringError('compressed export does not have packed half input')
-                        self.exports[0]=[f'half_float({c.value}{shift})' for c in parts for shift in (' & 65535u',' >> 16')]
-                    else:
-                        if self.stage != 'vs' or f['target'] not in (12,32,33) or f['vm']:
-                            raise LoweringError('unsupported vertex export ABI')
-                        self.exports[f['target']]=[self.float_cell(self.src(f[f'vsrc{j}']+256)) for j in range(4)]
+                    self.export_row(i)
                 else:
                     raise LoweringError(f'unsupported lowering {name}')
             except LoweringError as exc:
                 raise LoweringError(f'{self.stage}+{i.offset:#x}: {exc}') from None
-        required = {12,32,33} if self.stage=='vs' else {0}
-        if set(self.exports) != required or self.interp_pending:
-            raise LoweringError('incomplete stage exports/interpolation')
-        if self.stage=='vs':
-            for target, member in ((12,'clip'),(32,'param0'),(33,'param1')):
-                self.lines.append(f'    out.{member} = float4({", ".join(self.exports[target])});')
+        if self.sink == 'named':
+            self.finish_named()
         else:
-            self.lines.append(f'    return float4({", ".join(self.exports[0])});')
-        return self.lines, dict(stage=self.stage,sha256=self.abi['sha256'],
-                                instructions=len(rows),input_reads=sorted(self.input_reads))
+            self.finish_array()
+        report = dict(stage=self.stage, sha256=self.abi['sha256'], instructions=len(rows),
+                      input_reads=sorted(self.input_reads), export_sink=self.sink,
+                      exports={str(t): sorted(c) for t, c in sorted(self.exports.items())},
+                      null_exports=sorted(self.null_exports),
+                      valid_mask_exports=sorted(self.valid_mask_exports))
+        return self.lines, report
 
 
 HELPERS = r'''
@@ -681,6 +869,10 @@ def generate_logo_pair(vs: bytes, ps: bytes, abi: dict) -> tuple[str, dict]:
 def generate(vs: bytes, ps: bytes, abi: dict) -> tuple[str, dict]:
     if abi.get('schema') != VERSION or abi.get('floating_point') != 'nearest_even_ftz32_rtz16':
         raise LoweringError('explicit supported schema/floating-point harness profile required')
+    for name in ('vs', 'ps'):
+        if (abi.get(name) or {}).get('export_sink', 'named') != 'named':
+            raise LoweringError('the pair profile composes the named harness sink; use '
+                                'generate_stage() for a target-array stage')
     vl, vm = Lowerer(abi['vs'],'vs').run(vs)
     pl, pm = Lowerer(abi['ps'],'ps').run(ps)
     source = '// Private asset-derived harness; live binding and G3 NOT RUN.\n'+HELPERS
@@ -714,6 +906,60 @@ fragment float4 asset_fragment(RasterValue in [[stage_in]], constant ShaderCase&
     return source, dict(version=VERSION,profile=abi['floating_point'],stages=[vm,pm],
                         msl_sha256=hashlib.sha256(source.encode()).hexdigest(),
                         limitations=['harness ABI only','retail descriptor/SPI mode unverified','G3 NOT RUN'])
+
+
+def _stage_exports_struct() -> str:
+    return '''
+struct StageExports {
+    float4 rt[8];      // targets 0..7, render targets
+    float4 depth[1];   // target 8, MRTZ
+    float4 pos[4];     // targets 12..15, clip positions
+    float4 param[32];  // targets 32..63, params 0..31
+};
+'''
+
+
+def generate_stage(code: bytes, abi: dict, stage: str) -> tuple[str, dict]:
+    """Lower one real stage into the target-indexed export sink and a compute harness.
+
+    This is the faithful export model: the sink is indexed by export target and only the
+    components an `EXP` row enables are written. Nothing here invents a binding: `abi` must carry
+    an exact program digest and every register the program reads before writing, and any unbound
+    read still raises. The generated MSL is private derivative data; this tool never compiles it.
+    """
+    if stage not in ('vs', 'ps'):
+        raise LoweringError('generate_stage() takes a vertex or fragment stage')
+    if abi.get('export_sink') != 'target-array':
+        raise LoweringError("generate_stage() requires abi['export_sink'] == 'target-array'")
+    lines, report = Lowerer(abi, stage).run(code)
+    source = ('// Offline per-lane stage lowering; target-indexed export sink; synthetic harness '
+              'inputs only. Retail bindings and G3 NOT RUN.\n')
+    source += HELPERS
+    source += '\nstruct ShaderCase {\n' + ''.join(f'    float4 {field};\n'
+                                                  for field in CASE_FIELDS) + '};\n'
+    source += _stage_exports_struct()
+    source += '\ninline StageExports recovered_stage(thread const ShaderCase& u) {\n'
+    source += '    StageExports e;\n' + '\n'.join(lines) + '\n    return e;\n}\n'
+    source += '''
+kernel void stage_exports(device const ShaderCase* inputs [[buffer(0)]],
+                          device float4* outputs [[buffer(1)]],
+                          uint tid [[thread_position_in_grid]]) {
+    ShaderCase u = inputs[tid];
+    StageExports e = recovered_stage(u);
+    const uint base = tid * 45u;
+    for (uint i = 0; i < 8u; ++i) outputs[base + i] = e.rt[i];
+    outputs[base + 8u] = e.depth[0];
+    for (uint i = 0; i < 4u; ++i) outputs[base + 9u + i] = e.pos[i];
+    for (uint i = 0; i < 32u; ++i) outputs[base + 13u + i] = e.param[i];
+}
+'''
+    report['msl_sha256'] = hashlib.sha256(source.encode()).hexdigest()
+    report['sink_slots'] = EXPORT_SINK_SLOTS
+    report['limitations'] = ['synthetic ShaderCase harness inputs only',
+                             'components the program does not export are left unwritten',
+                             'no raster pipeline state, no Metal pipeline object',
+                             'G3 NOT RUN']
+    return source, report
 
 
 def _private_local_root(workspace: Path) -> Path:

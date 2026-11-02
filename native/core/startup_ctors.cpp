@@ -485,6 +485,17 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0x805440, 332, [](StartupState& s) noexcept { if (!init_slot332_805440(s.slot332, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
         {0x7fd6d0, 333, [](StartupState& s) noexcept { if (!init_slot333_7fd6d0(s.slot333, s.concmd).ok) s.init_failed = true; }},
         {0x7fc530, 334, [](StartupState& s) noexcept { if (!init_slot334_7fc530(s.slot334, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
+        // idx 335 / 0x7edf10: the "Shadow Cheat" assist page -- four unbounded Easy-Mode float
+        // multipliers, three cheat bools, two FNV-1a name records for the health/grip bars, and two
+        // bounded float sliders under the "Shadow Cheat" group, 11 __cxa_atexit records. Every callee
+        // runs through a native model (0x6aa00, 0x20af0, 0x20d60, 0x27050, 0x268b0 and this block's
+        // own 0x7edd80 / 0xf2f0 / 0x7dbca0 / 0x52a990); no allocator stand-in is needed and any failed
+        // stage is a visible startup failure.
+        {0x7edf10, 335, [](StartupState& s) noexcept {
+             s.slot335_result = init_slot335_7edf10(s.slot335, s.slot335_cells, s.concmd,
+                                                    s.debug_menu, default_slot335_hooks());
+             if (!s.slot335_result.ok) s.init_failed = true;
+         }},
         {0x7dace0, 341, [](StartupState& s) noexcept {
              constexpr std::array<const char*, 2> names{"InEndCutscene", "TimeResistingTheLight"};
              init_ctor_7dace0(s.slot341_cells, names);

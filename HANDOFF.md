@@ -6,6 +6,7 @@
 - **Decode is still NOT RUN** for both csdr (Oodle Mermaid/Kraken) and ATRAC9; E1077 shows the ATRAC9 transform is not in the image. Both need a native decoder: an owner decision on clean-room vs. vendoring (licensing) is pending.
 - **Stale docs fixed:** `docs/CSDR_COMPRESSED.md` carries a supersession banner. `local/re/csdr_trailer_probe.py` still has the old tag `0x0000000134534452` (private, unpublished).
 - **Claim:** `CPU-01-STARTUP-SLOT-329` (`0x829e90`, 4,082 B, helper pair `0x8298d0`/`0x829b30`) is claimed by the orchestrator's next worker. A peer integrator also commits to `main`; check `git log` before starting.
+- **Slot 329 DONE (E1083):** registered, coverage **455/573**, cliff **335 / `0x7edf10`** (118 remain; slot 335 files are in the tree from a peer, not mine). CTest 538/538; `gen_entry_map.py` must be rerun after any slot header change.
 
 ## 2026-11-02 — COMPLETE HANDOFF (orchestration session end)
 

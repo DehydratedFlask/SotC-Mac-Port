@@ -2504,6 +2504,14 @@ add_executable(test_ctor_slot_329 tests/test_ctor_slot_329.cpp)
 target_link_libraries(test_ctor_slot_329 sotc_core)
 add_test(NAME ctor_slot_329 COMMAND test_ctor_slot_329)
 
+# CPU-01-STARTUP-SLOT-335-CHARACTERIZATION-01: constructor index 335 (0x7edf10), the "Shadow Cheat"
+# assist page (4 unbounded floats, 3 bools, 2 FNV-1a name records, 2 bounded float sliders,
+# 2 sliders, 11 atexit records) and the 0x7edd80 / 0xf2f0 / 0x7dbca0 / 0x52a990 helpers it needs.
+target_sources(sotc_core PRIVATE core/ctor_slot_335_7edf10.cpp)
+add_executable(test_ctor_slot_335 tests/test_ctor_slot_335.cpp)
+target_link_libraries(test_ctor_slot_335 sotc_core)
+add_test(NAME ctor_slot_335 COMMAND test_ctor_slot_335)
+
 # Parallel-lane fragments: native/lanes/<lane>.cmake. Workers configure with -DSOTC_LANES=<lane>
 # to build only their own fragment; the integrator configures with the default "*" (all lanes).
 set(SOTC_LANES "*" CACHE STRING "Lane fragment glob under native/lanes (without .cmake)")

@@ -4870,30 +4870,6 @@
         "header": "native/core/shared_str_ctor_f1a0.hpp"
       }
     ],
-    "0x128adb4": [
-      {
-        "constant": "kSlot335HpMaxCell",
-        "header": "native/core/ctor_slot_335_7edf10.hpp"
-      }
-    ],
-    "0x128adb8": [
-      {
-        "constant": "kSlot335GripMinCell",
-        "header": "native/core/ctor_slot_335_7edf10.hpp"
-      }
-    ],
-    "0x128adbc": [
-      {
-        "constant": "kSlot335GripMaxCell",
-        "header": "native/core/ctor_slot_335_7edf10.hpp"
-      }
-    ],
-    "0x128adc0": [
-      {
-        "constant": "kSlot335HpMinCell",
-        "header": "native/core/ctor_slot_335_7edf10.hpp"
-      }
-    ],
     "0x128ade0": [
       {
         "constant": "kSlot335HpRangeMin",
@@ -14441,8 +14417,8 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1828,
-    "distinct_rvas": 1188,
+    "constants": 1824,
+    "distinct_rvas": 1184,
     "duplicate_rvas": 364,
     "headers": 411
   }

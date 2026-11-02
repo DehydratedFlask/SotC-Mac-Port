@@ -50,9 +50,16 @@ SCHEMA = 'msl-abi-manifest-v1'
 ANALYSIS_SCHEMA = 'msl-abi-holes-v1'
 CENSUS_SCHEMA = 'msl-abi-hole-census-v1'
 STAGES = ('vs', 'ps')
-# `Lowerer.run` ends with `required = {12,32,33} if stage=='vs' else {0}` and compares the set for
-# equality, so a program that exports a different set cannot be lowered by any manifest.
-EXPORT_CONTRACT = {'vs': (12, 32, 33), 'ps': (0,)}
+# The *named* sink in `gcn_to_msl.Lowerer` (the closed synthetic harness profile) demands exactly
+# this target set. It is a harness convenience, not a shader fact, so it is **not** the contract
+# this analyzer measures: the `target-array` sink accepts any set of modelled targets. What remains
+# a stage contract is that a vertex stage must define a full clip position.
+HARNESS_EXPORT_CONTRACT = {'vs': (12, 32, 33), 'ps': (0,)}
+# `EXP` target spaces, in the pinned `IR::Attribute` numbering (RenderTarget0..7, Depth 8,
+# Null 9, Position0..3 12..15, Param0..31 32..63). The decoder already rejects other targets.
+EXPORT_SPACES = (('rt', 0, 8), ('depth', 8, 9), ('pos', 12, 16), ('param', 32, 64))
+NULL_EXPORT_TARGET = 9
+CLIP_TARGET = 12
 IDENTIFIER = re.compile(r'[a-z][a-z0-9_]*')
 SHA256 = re.compile(r'[0-9a-f]{64}')
 # Mirrors `gcn_to_msl.CASE_FIELDS` (the only names `Lowerer.bind()` accepts for `float4`/`float`).
@@ -65,11 +72,14 @@ CASE_FIELDS = ('position', 'encoded_normal', 'object_row0', 'object_row1', 'obje
 # 125/126/127 EXEC-class. A program that *reads* one of those is a per-lane blocker anyway
 # (`reads_vcc_mask`/`reads_exec_mask`), so no hole is emitted for it.
 MASK_SELECTORS = frozenset((104, 105, 106, 107, 125, 126, 127))
-# `Lowerer.run` computes only these vector rows (plus the scalar passthrough `s_mov_b32`,
-# `s_waitcnt`, `s_ttracedata`, `s_endpgm`). A manifest cannot add a row here; a program containing
-# any other mnemonic is shape-blocked, not binding-blocked, and is reported as such.
-LOWERED_ARITHMETIC = frozenset(('v_mov_b32', 'v_sub_f32', 'v_mul_f32', 'v_mac_f32',
-                                'v_mad_f32', 'v_rsq_f32', 'v_cvt_pkrtz_f16_f32'))
+# `Lowerer.arithmetic` computes these rows. A manifest cannot add a row, so a program containing
+# any other arithmetic mnemonic is shape-blocked, not binding-blocked, and is reported as such.
+LOWERED_ARITHMETIC = frozenset(('v_mov_b32', 'v_add_f32', 'v_sub_f32', 'v_mul_f32',
+                                'v_mac_f32', 'v_mad_f32', 'v_rsq_f32',
+                                'v_cvt_pkrtz_f16_f32', 'v_cvt_f32_f16', 'v_cvt_f32_i32',
+                                'v_and_b32', 'v_add_i32', 'v_sub_i32',
+                                'v_lshlrev_b32', 'v_lshrrev_b32',
+                                'v_mad_u32_u24', 'v_sad_u32'))
 BINDING_WIDTH = {'pointer': 2, 'descriptor': 4, 'float4': 4, 'float': 1,
                  'vertex_index': 1, 'interpolation_control': 1}
 BINDING_KINDS = tuple(BINDING_WIDTH)
@@ -118,9 +128,15 @@ class _Analysis:
         self.stage = stage
         self.scalar_defined: dict[int, str] = {}
         self.vector_defined: dict[int, str] = {}
+        # Which instruction wrote each scalar cell, so a base/descriptor that is *loaded* from
+        # memory can be told apart from one that is computed (and therefore not bindable at all).
+        self.writer: dict[int, tuple] = {}
+        self.loads: list[dict] = []
         self.bases: dict[int, dict] = {}
         self.descriptors: dict[int, dict] = {}
         self.exports: dict[int, dict] = {}
+        self.null_exports: list[dict] = []
+        self.valid_mask_exports: list[int] = []
         self.initial_scalars: dict[int, dict] = {}
         self.initial_vectors: dict[int, dict] = {}
         self.policies: dict[str, dict] = {}
@@ -168,15 +184,13 @@ class _Analysis:
         entry = self.bases.get(slot)
         if entry is None:
             entry = self.bases[slot] = {'slot': slot, 'kind': kind, 'width': width,
-                                        'sites': [], 'view_dwords': [], 'derived': False}
+                                        'sites': [], 'view_dwords': []}
         elif entry['kind'] != kind:
             self.blocker(row, 'base-kind-conflict',
                          f'scalar base s{slot} is read as both {entry["kind"]} '
                          f'(earlier site {_hex(entry["sites"][0])}) and {kind}')
         if row.offset not in entry['sites']:
             entry['sites'].append(row.offset)
-        if any(s in self.scalar_defined for s in range(slot, slot + width)):
-            entry['derived'] = True
         request = {'offset': offset, 'dwords': dwords}
         if request not in entry['view_dwords']:
             entry['view_dwords'].append(request)
@@ -186,13 +200,12 @@ class _Analysis:
         format_name = f'explicit_float{components}'
         if entry is None:
             entry = self.descriptors[slot] = {
-                'slot': slot, 'formats': [], 'sites': [], 'derived': False}
+                'slot': slot, 'kind': 'descriptor', 'width': BINDING_WIDTH['descriptor'],
+                'formats': [], 'sites': []}
         if format_name not in entry['formats']:
             entry['formats'].append(format_name)
         if row.offset not in entry['sites']:
             entry['sites'].append(row.offset)
-        if any(s in self.scalar_defined for s in range(slot, slot + 4)):
-            entry['derived'] = True
 
     # -- per-row model -------------------------------------------------------------------
     def consume(self, row) -> None:
@@ -200,6 +213,7 @@ class _Analysis:
         if name == 's_mov_b32':
             self.need_source(f['src0'], row)
             self.scalar_defined[f['sdst']] = 'derived'
+            self.writer[f['sdst']] = ('other', None, name)
         elif name in ('s_waitcnt', 's_ttracedata', 's_endpgm'):
             pass
         elif enc == 'SMRD':
@@ -210,8 +224,12 @@ class _Analysis:
                 self.blocker(row, 'smrd-offset',
                              'SMRD register/literal offset (IMM=0) is not lowerable; '
                              'only the immediate form has a stated semantics here')
+            index = len(self.loads)
+            self.loads.append({'index': index, 'offset': f['offset'], 'dwords': f['dwords'],
+                               'slot': f['base_sgpr'], 'dst': f['sdst'], 'row': row})
             for j in range(f['dwords']):
                 self.scalar_defined[f['sdst'] + j] = 'loaded'
+                self.writer[f['sdst'] + j] = ('smrd', index, name)
         elif enc == 'MUBUF':
             self.need_descriptor(f['resource_sgpr'], row, f['components'])
             if f['soffset'] < 128:
@@ -271,28 +289,7 @@ class _Analysis:
                              f'{name} is not a lowering row (supported: '
                              f'{", ".join(sorted(LOWERED_ARITHMETIC))})')
         elif enc == 'EXP':
-            count = 4 if f['en'] == 15 else f['en'].bit_count()
-            sources = [f[f'vsrc{j}'] for j in range(count)]
-            for slot in sources:
-                self.need_vector(slot, row)
-            entry = self.exports.get(f['target'])
-            if entry is None:
-                entry = self.exports[f['target']] = {
-                    'target': f['target'], 'sources': sources,
-                    'sites': [row.offset], 'compressed': bool(f['compr'])}
-            else:
-                entry['sites'].append(row.offset)
-                if entry['sources'] != sources:
-                    self.blocker(row, 'export-repeat',
-                                 f'export target {f["target"]} is written twice with '
-                                 f'different sources')
-            if f['en'] != 15:
-                self.blocker(row, 'export-shape',
-                             'partial export (en != 15) has no lowered contract')
-            if f['compr'] and not (self.stage == 'ps' and f['target'] == 0
-                                   and f['done'] and f['vm']):
-                self.blocker(row, 'export-shape',
-                             'compressed export outside the ps/target 0 contract')
+            self.export_row(row)
         elif enc == 'MIMG':
             self.blocker(row, 'image-sample',
                          'image_sample is not a row of the per-lane lowerer')
@@ -303,36 +300,161 @@ class _Analysis:
         else:
             self.blocker(row, 'unsupported-row', f'{name} has no lowering row')
 
-    # -- result --------------------------------------------------------------------------
+    # -- exports ---------------------------------------------------------------------------
+    def export_row(self, row) -> None:
+        """Model one `EXP` row exactly as `gcn_to_msl.Lowerer.export_row` does.
+
+        `en` selects the components this row writes and `vsrc<j>` feeds component `j`; the
+        compressed form packs two fp16 components per dword with `en` bit 0 exporting R,G from
+        `vsrc0` and bit 2 exporting B,A from `vsrc1` (pinned PS4 translator, render target and
+        depth only); an `en == 0` row and the Null target export nothing; and `vm` is the wave
+        valid mask, modelled only on a row that carries no component (the null-export idiom).
+        """
+        f = row.fields
+        target, enable, compr = f['target'], f['en'], f['compr']
+        null = enable == 0 or target == NULL_EXPORT_TARGET
+        if f['vm'] and self.stage != 'ps':
+            self.blocker(row, 'export-shape',
+                         'valid-mask export is only defined on a fragment stage')
+            return
+        if not null and compr and not 0 <= target <= 8:
+            self.blocker(row, 'export-shape',
+                         'compressed export outside a render-target/depth target')
+            return
+        if not null and compr and not enable & 5:
+            self.blocker(row, 'export-shape', 'compressed export enables no component pair')
+            return
+        if null:
+            if f['vm']:
+                self.valid_mask_exports.append(target)
+            self.null_exports.append({'target': target, 'offset': row.offset,
+                                      'valid_mask': bool(f['vm'])})
+            return
+        if f['vm']:
+            self.valid_mask_exports.append(target)
+        if compr:
+            components = ([0, 1] if enable & 1 else []) + ([2, 3] if enable & 4 else [])
+        else:
+            components = [j for j in range(4) if enable & (1 << j)]
+        for component in components:
+            source = (0 if component < 2 else 1) if compr else component
+            self.need_vector(f[f'vsrc{source}'], row)
+        sources = [f[f'vsrc{j}'] for j in range(4)]
+        entry = self.exports.get(target)
+        if entry is None:
+            entry = self.exports[target] = {
+                'target': target, 'sources': sources, 'components': list(components),
+                'sites': [row.offset], 'compressed': bool(compr)}
+        else:
+            entry['sites'].append(row.offset)
+            entry['sources'] = sources
+            entry['components'] = sorted(set(entry['components']) | set(components))
+
+    def _producer(self, slot: int, width: int) -> tuple[str, dict | None]:
+        """Classify how a base/descriptor slot is produced.
+
+        `direct`: no cell of the range was written, so a manifest can bind it. `resident`: every
+        cell comes from ONE `SMRD` load, so the manifest can declare the *memory* that load reads
+        instead (a memory-resident pointer/descriptor). `opaque`: anything else (a move, several
+        loads, a partial overwrite) — no `SMRD` load of a single bound view can express it.
+        """
+        writers = [self.writer.get(slot + j) for j in range(width)]
+        if all(w is None for w in writers):
+            return 'direct', None
+        first = writers[0]
+        if first is not None and first[0] == 'smrd' and all(w == first for w in writers):
+            load = self.loads[first[1]]
+            return 'resident', {'load': first[1], 'via': load['slot'],
+                                'offset': load['offset'] + (slot - load['dst']),
+                                'row': load['row']}
+        names = sorted({self.writer[slot + j][2] for j in range(width)
+                        if self.writer.get(slot + j) is not None})
+        return 'opaque', {'names': names, 'site': slot}
+
+    @staticmethod
+    def _runs(dwords) -> list[dict]:
+        """Contiguous dword runs, in the `{'offset', 'dwords'}` shape the manifest already uses."""
+        runs, start, previous = [], None, None
+        for dword in sorted(dwords):
+            if start is None:
+                start = previous = dword
+            elif dword == previous + 1:
+                previous = dword
+            else:
+                runs.append({'offset': start, 'dwords': previous - start + 1})
+                start = previous = dword
+        if start is not None:
+            runs.append({'offset': start, 'dwords': previous - start + 1})
+        return runs
+
     def result(self, code: bytes, rows: list, inventory: dict) -> dict:
-        bases = [entry for entry in self.bases.values() if not entry['derived']]
-        derived = [entry for entry in self.bases.values() if entry['derived']]
-        descriptors = [entry for entry in self.descriptors.values() if not entry['derived']]
-        derived_descriptors = [entry for entry in self.descriptors.values() if entry['derived']]
-        for entry in derived:
-            self.shape.append({'offset': entry['sites'][0], 'mnemonic': 'SMRD',
-                               'kind': 'derived-base',
-                               'reason': f'scalar base s{entry["slot"]} is written by an '
-                                         f'earlier instruction; the lowering requires a '
-                                         f'directly bound base'})
-        for entry in derived_descriptors:
-            self.shape.append({'offset': entry['sites'][0], 'mnemonic': 'MUBUF',
-                               'kind': 'derived-descriptor',
-                               'reason': f'buffer descriptor s{entry["slot"]} is written by an '
-                                         f'earlier instruction; the lowering requires a '
-                                         f'directly bound descriptor'})
-        expected = EXPORT_CONTRACT.get(self.stage)
-        observed = sorted(self.exports)
-        if expected is not None:
-            missing = [t for t in expected if t not in self.exports]
-            extra = [t for t in observed if t not in expected]
-            if missing or extra:
-                self.shape.append({
-                    'offset': 0, 'mnemonic': 'EXP', 'kind': 'export-contract',
-                    'reason': f'stage export contract for {self.stage} is exactly '
-                              f'{list(expected)}; program writes {observed}'
-                              + (f' (missing {missing})' if missing else '')
-                              + (f' (undeclared by the contract {extra})' if extra else '')})
+        direct, descriptors, resident, opaque = [], [], [], []
+        for entries, role in ((self.bases, 'scalar_base'),
+                              (self.descriptors, 'buffer_descriptor')):
+            for slot in sorted(entries):
+                entry = entries[slot]
+                width = BINDING_WIDTH[entry['kind']]
+                producer, info = self._producer(slot, width)
+                if producer == 'direct':
+                    (direct if role == 'scalar_base' else descriptors).append(entry)
+                elif producer == 'resident':
+                    claim = {'slot': slot, 'role': role, 'kind': entry['kind'],
+                             'via': info['via'], 'offset': info['offset'], 'width': width,
+                             'sites': list(entry['sites']), 'load': info['load'],
+                             'view_dwords': []}
+                    if role == 'buffer_descriptor':
+                        claim['formats'] = entry['formats']
+                    resident.append(claim)
+                else:
+                    label = ('scalar base' if role == 'scalar_base'
+                             else 'buffer descriptor')
+                    opaque.append({'slot': slot, 'role': role, 'kind': entry['kind'],
+                                   'sites': list(entry['sites']),
+                                   'names': info['names']})
+                    self.shape.append({
+                        'offset': entry['sites'][0],
+                        'mnemonic': 'SMRD' if role == 'scalar_base' else 'MUBUF',
+                        'kind': 'derived-base' if role == 'scalar_base' else 'derived-descriptor',
+                        'reason': f'{label} s{slot} is written by '
+                                  f'{", ".join(info["names"])}, not by one SMRD load of a bound '
+                                  f'view, so neither a direct binding nor a memory-resident cell '
+                                  f'can express it'})
+        # One manifest cell per dword: two uses of the same dword with a different kind or span
+        # cannot both be declared, which is a property of the cell model rather than of the shader.
+        by_parent: dict[int, list[dict]] = {}
+        for claim in resident:
+            by_parent.setdefault(claim['via'], []).append(claim)
+        conflicts: list[dict] = []
+        for parent, claims in sorted(by_parent.items()):
+            for index, first in enumerate(claims):
+                for second in claims[index + 1:]:
+                    span = (first['offset'], first['width'], first['kind'])
+                    other = (second['offset'], second['width'], second['kind'])
+                    overlap = max(first['offset'], second['offset']) < min(
+                        first['offset'] + first['width'], second['offset'] + second['width'])
+                    if overlap and span != other:
+                        conflicts.append({
+                            'offset': second['sites'][0], 'mnemonic': 'SMRD',
+                            'kind': 'resident-kind-conflict',
+                            'reason': f's{first["slot"]} needs dword(s) '
+                                      f'[{first["offset"]}..{first["offset"] + first["width"] - 1}] '
+                                      f'as {first["kind"]} and s{second["slot"]} needs '
+                                      f'[{second["offset"]}..'
+                                      f'{second["offset"] + second["width"] - 1}] as '
+                                      f'{second["kind"]} in the same view (s{parent}); one dword '
+                                      f'cannot hold two cell types'})
+        self.shape.extend(conflicts)
+        # Every dword an SMRD load reads has to be defined by the view it reads, except the dwords
+        # that are exactly a resident cell of that same load.
+        data: dict[int, set[int]] = {}
+        for load in self.loads:
+            for dword in range(load['offset'], load['offset'] + load['dwords']):
+                covered = any(claim['offset'] <= dword < claim['offset'] + claim['width']
+                              for claim in by_parent.get(load['slot'], []))
+                if not covered:
+                    data.setdefault(load['slot'], set()).add(dword)
+        for entry in direct + descriptors + resident:
+            entry['view_dwords'] = self._runs(data.get(entry['slot'], set()))
         modes = {entry['value'] for entry in self.policies.values()
                  if entry['name'] == 'interpolation'}
         if len(modes) > 1:
@@ -345,10 +467,21 @@ class _Analysis:
                     'offset': entry['sites'][0], 'mnemonic': 'VOP', 'kind': 'view-role-conflict',
                     'reason': f'v{slot} is used both as a vertex index and as a plain '
                               f'addition input; the lowering requires the vertex-index cell'})
+        if self.stage == 'vs':
+            clip = self.exports.get(CLIP_TARGET)
+            if clip is None or clip['components'] != [0, 1, 2, 3]:
+                self.shape.append({
+                    'offset': 0, 'mnemonic': 'EXP', 'kind': 'export-contract',
+                    'reason': f'a vertex stage must export all four clip components to target '
+                              f'{CLIP_TARGET}; program exports '
+                              f'{ {t: e["components"] for t, e in sorted(self.exports.items())} }'})
         holes = {
-            'scalar_bases': sorted(bases, key=lambda e: e['slot']),
+            'scalar_bases': sorted(direct, key=lambda e: e['slot']),
             'buffer_descriptors': sorted(descriptors, key=lambda e: e['slot']),
+            'resident_slots': sorted(resident, key=lambda e: e['slot']),
             'export_targets': sorted(self.exports.values(), key=lambda e: e['target']),
+            'null_exports': sorted(self.null_exports, key=lambda e: (e['target'], e['offset'])),
+            'valid_mask_exports': sorted(set(self.valid_mask_exports)),
             'initial_vectors': sorted(self.initial_vectors.values(), key=lambda e: e['slot']),
             'initial_scalars': sorted(self.initial_scalars.values(), key=lambda e: e['slot']),
             'policy': sorted(self.policies.values(), key=lambda e: e['name']),
@@ -356,25 +489,30 @@ class _Analysis:
         counts = {
             'scalar_bases': len(holes['scalar_bases']),
             'buffer_descriptors': len(holes['buffer_descriptors']),
+            'resident_slots': len(holes['resident_slots']),
             'export_targets': len(holes['export_targets']),
+            'null_exports': len(holes['null_exports']),
             'initial_vectors': len(holes['initial_vectors']),
             'initial_scalars': len(holes['initial_scalars']),
             'policy': len(holes['policy']),
             'view_dword_requests': sum(len(e['view_dwords'])
-                                       for e in holes['scalar_bases']),
+                                       for e in holes['scalar_bases'] + holes['resident_slots']),
             'shape': len(self.shape),
         }
         counts['binding_holes'] = sum(counts[k] for k in
-                                      ('scalar_bases', 'buffer_descriptors', 'export_targets',
-                                       'initial_vectors', 'initial_scalars', 'policy'))
-        # Slots the program touches but no manifest can bind: they are written by an earlier
-        # instruction, so `Lowerer.pair()` would reject a directly bound cell.
+                                      ('scalar_bases', 'buffer_descriptors', 'resident_slots',
+                                       'export_targets', 'initial_vectors', 'initial_scalars',
+                                       'policy'))
+        # Slots the program touches but no manifest can bind, with the producing rows named.
         derived_map = {
-            'scalar_bases': sorted(({'slot': e['slot'], 'kind': e['kind'], 'sites': e['sites']}
-                                    for e in derived), key=lambda e: e['slot']),
-            'buffer_descriptors': sorted(
-                ({'slot': e['slot'], 'sites': e['sites']} for e in derived_descriptors),
-                key=lambda e: e['slot']),
+            'scalar_bases': sorted(({'slot': e['slot'], 'kind': e['kind'],
+                                     'sites': e['sites'], 'written_by': e['names']}
+                                    for e in opaque if e['role'] == 'scalar_base'),
+                                   key=lambda e: e['slot']),
+            'buffer_descriptors': sorted(({'slot': e['slot'], 'sites': e['sites'],
+                                           'written_by': e['names']}
+                                          for e in opaque if e['role'] == 'buffer_descriptor'),
+                                         key=lambda e: e['slot']),
         }
         counts['derived_slots'] = len(derived_map['scalar_bases']) + len(
             derived_map['buffer_descriptors'])
@@ -451,6 +589,14 @@ def skeleton(analysis: dict, identity: str | None = None,
         'views': {},
         'policy': {},
     }
+    for entry in holes.get('resident_slots') or []:
+        section = ('scalar_bases' if entry['role'] == 'scalar_base'
+                   else 'buffer_descriptors')
+        form = {'kind': entry['kind'], 'via': str(entry['via']),
+                'offset': entry['offset'], 'view': None}
+        if section == 'buffer_descriptors':
+            form.update({'format': None, 'field': None})
+        document[section][str(entry['slot'])] = form
     # `gcn_to_msl.generate()` admits exactly one floating-point profile, so it is a constant here.
     document['policy']['floating_point'] = FLOATING_POINT_PROFILES[0]
     for entry in holes['policy']:
@@ -527,6 +673,18 @@ def _check_document(manifest) -> list[dict]:
                 continue
             problems.extend(_check_binding(binding, f'{section}[{key}]', kinds,
                                            require_format=section == 'buffer_descriptors'))
+            if isinstance(binding, dict) and section in ('scalar_bases', 'buffer_descriptors'):
+                if 'via' in binding and not (isinstance(binding['via'], str)
+                                             and re.fullmatch(r'[0-9]+', binding['via'])):
+                    problems.append(_problem(
+                        'invalid-binding', f'{section}[{key}]',
+                        f'{section}[{key}].via must be the decimal slot the load reads'))
+                if 'offset' in binding and not (isinstance(binding['offset'], int)
+                                                and not isinstance(binding['offset'], bool)
+                                                and binding['offset'] >= 0):
+                    problems.append(_problem(
+                        'invalid-binding', f'{section}[{key}]',
+                        f'{section}[{key}].offset must be a non-negative dword offset'))
     exports = manifest.get('exports', {})
     if not require(isinstance(exports, dict), 'exports', None, '"exports" must be an object'):
         return problems
@@ -607,6 +765,11 @@ def _check_binding(binding, where: str, kinds, require_format: bool = False) -> 
                                                 f'filled in')]
     if not isinstance(binding, dict):
         return [_problem('invalid-binding', where, f'{where} must be an object or null')]
+    unfilled = sorted(key for key, value in binding.items() if value is None)
+    if unfilled:
+        return [_problem('unfilled-slot', where,
+                         f'{where} still has null field(s) {", ".join(unfilled)}: this hole was '
+                         f'not filled in')]
     kind = binding.get('kind')
     allowed = BINDING_KINDS if kinds is None else kinds
     if kind not in BINDING_KINDS:
@@ -671,12 +834,33 @@ def validate(manifest: dict, analysis: dict) -> list[dict]:
     return problems
 
 
+def _requirements(holes: dict) -> dict:
+    """Which manifest section each measured requirement belongs to, direct and resident alike."""
+    residents = holes.get('resident_slots') or []
+    return {
+        'scalar_bases': list(holes['scalar_bases']) + [
+            entry for entry in residents if entry['role'] == 'scalar_base'],
+        'buffer_descriptors': list(holes['buffer_descriptors']) + [
+            entry for entry in residents if entry['role'] == 'buffer_descriptor'],
+    }
+
+
+def _resolve_view(manifest: dict, slot: int) -> str | None:
+    """The view name a slot's binding addresses, whichever section holds that slot."""
+    for section in ('scalar_bases', 'buffer_descriptors'):
+        binding = (manifest.get(section) or {}).get(str(slot))
+        if isinstance(binding, dict) and isinstance(binding.get('view'), str):
+            return binding['view']
+    return None
+
+
 def _check_holes(manifest: dict, analysis: dict) -> list[dict]:
     holes, derived_map = analysis['holes'], analysis.get('derived') or {}
+    required = _requirements(holes)
     problems: list[dict] = []
     sections = {
-        'scalar_bases': ('scalar_base', 's', holes['scalar_bases'], 'slot'),
-        'buffer_descriptors': ('buffer_descriptor', 's', holes['buffer_descriptors'], 'slot'),
+        'scalar_bases': ('scalar_base', 's', required['scalar_bases'], 'slot'),
+        'buffer_descriptors': ('buffer_descriptor', 's', required['buffer_descriptors'], 'slot'),
         'exports': ('export_target', '', holes['export_targets'], 'target'),
         'initial_scalars': ('initial_scalar', 's', holes['initial_scalars'], 'slot'),
         'initial_vectors': ('initial_vector', 'v', holes['initial_vectors'], 'slot'),
@@ -698,6 +882,9 @@ def _check_holes(manifest: dict, analysis: dict) -> list[dict]:
         for entry in entries:
             slot = str(entry[key])
             sites = ', '.join(_hex(site) for site in entry['sites']) or 'no site'
+            if 'via' in entry:
+                sites += (f'; read from the view s{entry["via"]} addresses at dword(s) '
+                          f'[{entry["offset"]}..{entry["offset"] + entry["width"] - 1}]')
             if slot not in bound:
                 problems.append(_problem(
                     f'missing-{label.replace("_", "-")}', f'{prefix}{slot}',
@@ -706,6 +893,8 @@ def _check_holes(manifest: dict, analysis: dict) -> list[dict]:
                 continue
             if bound[slot] is None:
                 continue  # already reported by _check_document as unfilled-slot
+            if 'via' in entry:
+                problems.extend(_check_resident(label, prefix, entry, bound[slot], sites))
             problems.extend(_check_kind(name, label, prefix, entry, bound[slot], sites))
         for extra in sorted(set(bound) - supplied[name], key=int):
             derived = [entry for entry in derived_map.get(name, [])
@@ -714,9 +903,10 @@ def _check_holes(manifest: dict, analysis: dict) -> list[dict]:
                 sites = ', '.join(_hex(site) for site in derived[0]['sites'])
                 problems.append(_problem(
                     'derived-slot', f'{prefix}{extra}',
-                    f'{label} {prefix}{extra} is used at {sites} but written by an earlier '
-                    f'instruction; a direct binding cannot satisfy the lowering, so the '
-                    f'program is shape-blocked rather than binding-blocked'))
+                    f'{label} {prefix}{extra} is used at {sites} but written by '
+                    f'{", ".join(derived[0].get("written_by") or ["an earlier instruction"])}, '
+                    f'not by one SMRD load of a bound view; the program is shape-blocked rather '
+                    f'than binding-blocked'))
             elif used_as.get((NAMESPACE[name], extra), set()) - {name}:
                 other = sorted(used_as[(NAMESPACE[name], extra)] - {name})[0]
                 problems.append(_problem(
@@ -750,6 +940,29 @@ def _check_holes(manifest: dict, analysis: dict) -> list[dict]:
                         f'VSRC selector {selector} needs an explicit p10/p20/p0 mapping; '
                         f'{entry["reason"]}'))
     problems.extend(_check_views(manifest, holes))
+    return problems
+
+
+def _check_resident(label: str, prefix: str, entry: dict, binding: dict,
+                    sites: str) -> list[dict]:
+    """A memory-resident cell must declare the producer the encoding measured, not another one."""
+    problems: list[dict] = []
+    where = f'{label} {prefix}{entry["slot"]}'
+    via = binding.get('via')
+    if not (isinstance(via, str) and re.fullmatch(r'[0-9]+', via)):
+        problems.append(_problem('invalid-binding', where,
+                                 f'{where}.via must be the decimal slot the load reads'))
+        return problems
+    if int(via) != entry['via']:
+        problems.append(_problem(
+            'wrong-producer', where,
+            f'{where} is loaded through s{entry["via"]} at {sites}; the manifest declares via '
+            f's{via}'))
+    if binding.get('offset') != entry['offset']:
+        problems.append(_problem(
+            'wrong-producer', where,
+            f'{where} sits at dword {entry["offset"]} of that view at {sites}; the manifest '
+            f'declares offset {binding.get("offset")!r}'))
     return problems
 
 
@@ -799,26 +1012,97 @@ def _check_kind(section: str, label: str, prefix: str, entry: dict, binding: dic
     return problems
 
 
-def _check_views(manifest: dict, holes: dict) -> list[dict]:
-    """A view entry must exist for every dword a scalar load actually reads, and nothing more."""
+def _implied_cells(manifest: dict, holes: dict) -> tuple[dict[str, dict[str, dict]], list[dict]]:
+    """The view cells the resident declarations imply, keyed by the parent view they sit in.
+
+    A resident slot is not bound directly: the manifest declares that dword `offset` of the view
+    named by the slot's *producer* (`via`) holds a `pointer`/`descriptor` cell addressing the
+    slot's `view`. This is where those declarations become concrete view entries, and where an
+    unresolvable producer chain is reported.
+    """
+    implied: dict[str, dict[str, dict]] = {}
     problems: list[dict] = []
-    required: dict[str, set[int]] = {}
-    for entry in holes['scalar_bases']:
-        binding = (manifest.get('scalar_bases') or {}).get(str(entry['slot']))
+    for entry in holes.get('resident_slots') or []:
+        section = ('scalar_bases' if entry['role'] == 'scalar_base'
+                   else 'buffer_descriptors')
+        binding = (manifest.get(section) or {}).get(str(entry['slot']))
         if not isinstance(binding, dict) or not isinstance(binding.get('view'), str):
             continue  # unbound/malformed: already reported
-        dwords = required.setdefault(binding['view'], set())
-        for request in entry['view_dwords']:
-            dwords.update(range(request['offset'], request['offset'] + request['dwords']))
-    views = manifest.get('views') or {}
-    for name, offsets in sorted(required.items()):
-        entries = views.get(name)
-        if not isinstance(entries, dict) or not entries:
+        parent = _resolve_view(manifest, entry['via'])
+        if parent is None:
             problems.append(_problem(
-                'missing-view', f'view {name}',
-                f'scalar loads read dwords {sorted(offsets)} through view {name!r}, but the '
-                f'manifest declares no entries for it'))
+                'unresolved-resident-parent', f's{entry["via"]}',
+                f's{entry["slot"]} is read from the view that s{entry["via"]} addresses, but no '
+                f'binding names a view for s{entry["via"]}'))
             continue
+        cell = {'kind': entry['kind'], 'view': binding['view']}
+        table = implied.setdefault(parent, {})
+        previous = table.get(str(entry['offset']))
+        if previous is not None and previous != cell:
+            problems.append(_problem(
+                'resident-cell-conflict', f'view {parent}',
+                f'view {parent!r} dword {entry["offset"]} would have to be a '
+                f'{previous["kind"]} and a {cell["kind"]} at once'))
+            continue
+        table[str(entry['offset'])] = cell
+    return implied, problems
+
+
+def _check_views(manifest: dict, holes: dict) -> list[dict]:
+    """Every dword a scalar load reads must be defined exactly once, and nothing surplus."""
+    problems: list[dict] = []
+    implied, inferred = _implied_cells(manifest, holes)
+    problems.extend(inferred)
+    declared = manifest.get('views') or {}
+    effective: dict[str, dict[str, dict]] = {}
+    for name, entries in declared.items():
+        if isinstance(entries, dict):
+            effective[name] = {str(key): value for key, value in entries.items()}
+    for parent, cells in implied.items():
+        table = effective.setdefault(parent, {})
+        for offset, cell in cells.items():
+            previous = table.get(offset)
+            if previous is not None and previous != cell:
+                problems.append(_problem(
+                    'resident-cell-conflict', f'view {parent}',
+                    f'view {parent!r} declares dword {offset} as '
+                    f'{previous.get("kind") if isinstance(previous, dict) else previous!r} but the '
+                    f'resident declaration needs a {cell["kind"]} there'))
+                continue
+            table[offset] = cell
+    required: dict[str, set[int]] = {}
+    for name, entries in (('scalar_bases', holes['scalar_bases']),
+                          ('buffer_descriptors', holes['buffer_descriptors'])):
+        for entry in entries:
+            binding = (manifest.get(name) or {}).get(str(entry['slot']))
+            if not isinstance(binding, dict) or not isinstance(binding.get('view'), str):
+                continue  # unbound/malformed: already reported
+            for request in entry['view_dwords']:
+                required.setdefault(binding['view'], set()).update(
+                    range(request['offset'], request['offset'] + request['dwords']))
+    for entry in holes.get('resident_slots') or []:
+        binding = (manifest.get('scalar_bases' if entry['role'] == 'scalar_base'
+                                else 'buffer_descriptors') or {}).get(str(entry['slot']))
+        if not isinstance(binding, dict) or not isinstance(binding.get('view'), str):
+            continue
+        for request in entry['view_dwords']:
+            required.setdefault(binding['view'], set()).update(
+                range(request['offset'], request['offset'] + request['dwords']))
+        parent = _resolve_view(manifest, entry['via'])
+        if parent is not None:
+            required.setdefault(parent, set()).update(
+                range(entry['offset'], entry['offset'] + entry['width']))
+    for name, offsets in sorted(required.items()):
+        entries = declared.get(name)
+        if not isinstance(entries, dict) or not entries:
+            if implied.get(name):
+                entries = {}  # every cell here is resident; nothing to declare by hand
+            else:
+                problems.append(_problem(
+                    'missing-view', f'view {name}',
+                    f'scalar loads read dwords {sorted(offsets)} through view {name!r}, but the '
+                    f'manifest declares no entries for it'))
+                continue
         covered: set[int] = set()
         for key, binding in sorted(entries.items(), key=lambda kv: int(kv[0])):
             problems.extend(_check_binding(binding, f'views[{name}][{key}]',
@@ -835,6 +1119,11 @@ def _check_views(manifest: dict, holes: dict) -> list[dict]:
                     'unused-view-entry', f'view {name}',
                     f'view {name!r}[{key}] covers dword(s) {sorted(span)} but this program '
                     f'reads only {sorted(offsets)}'))
+        table = effective.get(name, {})
+        for key, binding in table.items():
+            if not isinstance(binding, dict) or binding.get('kind') not in BINDING_WIDTH:
+                continue
+            covered.update(range(int(key), int(key) + BINDING_WIDTH[binding['kind']]))
         missing = sorted(offsets - covered)
         if missing:
             problems.append(_problem(
@@ -847,25 +1136,59 @@ def to_lowerer_stage_abi(manifest: dict) -> dict:
     """Project a filled manifest onto the per-stage dict `gcn_to_msl.Lowerer` consumes.
 
     Pure dict transformation: nothing is decoded, lowered or compiled here. It exists so that a
-    validated manifest is the *only* missing input on the lowering path.
+    validated manifest is the *only* missing input on the lowering path. The projection selects
+    the faithful `target-array` export sink, and a resident (memory-loaded) base or descriptor
+    becomes a `pointer`/`descriptor` cell in the parent view, which is exactly the cell a
+    two-level `s_load_dwordx4 s[..], [s0+off]` of that view produces.
     """
     problems = _check_document(manifest)
     if problems:
         raise AbiError('manifest is not well formed: ' + problems[0]['message'])
     abi: dict = {'schema': 'bounded-ssa-msl-v1', 'sha256': manifest['shader']['sha256'],
-                 'initial_scalar': {}, 'initial_vector': {}, 'views': {}, 'streams': {}}
-    for slot, binding in sorted(manifest.get('scalar_bases', {}).items(), key=lambda kv: int(kv[0])):
-        abi['initial_scalar'][slot] = {'kind': binding['kind'], 'view': binding['view']}
+                 'initial_scalar': {}, 'initial_vector': {}, 'views': {}, 'streams': {},
+                 'export_sink': 'target-array'}
+
+    def project(section: str, binding: dict) -> None:
+        if 'via' not in binding:
+            return
+        parent = _resolve_view(manifest, int(binding['via']))
+        if parent is None:
+            raise AbiError(f'{section} slot {binding["view"]}: no binding names a view for '
+                           f's{binding["via"]}, so the resident cell has no parent view')
+        cell = {'kind': binding['kind'], 'view': binding['view']}
+        table = abi['views'].setdefault(parent, {})
+        previous = table.get(str(binding['offset']))
+        if previous is not None and previous != cell:
+            raise AbiError(f'view {parent!r} dword {binding["offset"]} would be both '
+                           f'{previous["kind"]} and {cell["kind"]}')
+        table[str(binding['offset'])] = cell
+
+    for slot, binding in sorted(manifest.get('scalar_bases', {}).items(),
+                                key=lambda kv: int(kv[0])):
+        if 'via' in binding:
+            project('scalar_bases', binding)
+        else:
+            abi['initial_scalar'][slot] = {'kind': binding['kind'], 'view': binding['view']}
     for slot, binding in sorted(manifest.get('buffer_descriptors', {}).items(),
                                 key=lambda kv: int(kv[0])):
-        abi['initial_scalar'][slot] = {'kind': 'descriptor', 'view': binding['view']}
+        if 'via' in binding:
+            project('buffer_descriptors', binding)
+        else:
+            abi['initial_scalar'][slot] = {'kind': 'descriptor', 'view': binding['view']}
         abi['streams'][binding['view']] = {'format': binding['format'],
                                            'field': binding['field']}
     abi['initial_scalar'].update(manifest.get('initial_scalars') or {})
     abi['initial_vector'].update(manifest.get('initial_vectors') or {})
     for name, entries in sorted((manifest.get('views') or {}).items()):
-        abi['views'][name] = {str(key): value for key, value in
-                              sorted(entries.items(), key=lambda kv: int(kv[0]))}
+        table = abi['views'].setdefault(name, {})
+        for key, value in sorted(entries.items(), key=lambda kv: int(kv[0])):
+            previous = table.get(str(key))
+            if previous is not None and previous != value:
+                raise AbiError(f'view {name!r} dword {key} is declared twice with different '
+                               f'cells')
+            table[str(key)] = value
+    for name, table in abi['views'].items():
+        abi['views'][name] = {key: table[key] for key in sorted(table, key=int)}
     policy = manifest.get('policy') or {}
     for key in ('interpolation', 'vertex_select', 'vertex_mov_subtract_p10'):
         if key in policy:
@@ -874,16 +1197,30 @@ def to_lowerer_stage_abi(manifest: dict) -> dict:
 
 
 def to_lowerer_pair(vs_manifest: dict, ps_manifest: dict) -> dict:
-    """Project two filled stage manifests onto the pair ABI `gcn_to_msl.generate()` accepts."""
+    """Project two filled manifests onto the pair ABI the closed pair harness accepts.
+
+    The pair profile (`gcn_to_msl.generate`) composes the *named* sink, which writes exactly
+    `{12,32,33}` for a vertex stage and `{0}` for a fragment stage. This projection therefore
+    refuses a stage that exports any other set: such a stage is lowered with
+    `gcn_to_msl.generate_stage()` and the `target-array` sink, one stage at a time.
+    """
     if vs_manifest['shader']['stage'] != 'vs' or ps_manifest['shader']['stage'] != 'ps':
         raise AbiError('to_lowerer_pair() takes one vs manifest and one ps manifest')
     profile = ((vs_manifest.get('policy') or {}).get('floating_point')
                or (ps_manifest.get('policy') or {}).get('floating_point'))
     if profile not in FLOATING_POINT_PROFILES:
         raise AbiError('both manifests must declare a supported policy.floating_point')
-    return {'schema': 'bounded-ssa-msl-v1', 'floating_point': profile,
-            'vs': to_lowerer_stage_abi(vs_manifest),
-            'ps': to_lowerer_stage_abi(ps_manifest)}
+    for name, manifest in (('vs', vs_manifest), ('ps', ps_manifest)):
+        expected = set(HARNESS_EXPORT_CONTRACT[name])
+        observed = {int(key) for key in (manifest.get('exports') or {})}
+        if observed != expected:
+            raise AbiError(f'the pair harness writes exactly {sorted(expected)} for a {name} '
+                           f'stage; this manifest exports {sorted(observed)} - lower it with '
+                           f'gcn_to_msl.generate_stage() instead')
+    vs, ps = to_lowerer_stage_abi(vs_manifest), to_lowerer_stage_abi(ps_manifest)
+    vs.pop('export_sink', None)
+    ps.pop('export_sink', None)
+    return {'schema': 'bounded-ssa-msl-v1', 'floating_point': profile, 'vs': vs, 'ps': ps}
 
 
 # --------------------------------------------------------------------------------------------
@@ -899,7 +1236,9 @@ def render_holes(analysis: dict, identity: str | None = None) -> list[str]:
         f'per-lane eligible={analysis["per_lane_eligible"]}',
         f'holes   : {counts["scalar_bases"]} scalar base(s), '
         f'{counts["buffer_descriptors"]} buffer descriptor(s), '
+        f'{counts.get("resident_slots", 0)} resident slot(s), '
         f'{counts["export_targets"]} export target(s), '
+        f'{counts.get("null_exports", 0)} null export(s), '
         f'{counts["initial_vectors"]} initial vector(s), '
         f'{counts["initial_scalars"]} initial scalar(s), '
         f'{counts["policy"]} policy knob(s), '
@@ -916,6 +1255,20 @@ def render_holes(analysis: dict, identity: str | None = None) -> list[str]:
         lines.append(f'  buffer_descriptor  s{entry["slot"]:<3} descriptor  needs format '
                      f'{"/".join(entry["formats"])} + a named field  sites '
                      f'{", ".join(_hex(s) for s in entry["sites"])}')
+    for entry in analysis['holes'].get('resident_slots') or []:
+        dwords = ', '.join(f'[{r["offset"]}..{r["offset"] + r["dwords"] - 1}]'
+                           for r in entry['view_dwords'])
+        extra = (f'  needs format {"/".join(entry["formats"])}'
+                 if entry.get('formats') else '')
+        lines.append(f'  resident_{entry["role"]:<9} s{entry["slot"]:<3} {entry["kind"]:<10} '
+                     f'{entry["width"]} cell(s) at dword {entry["offset"]} of the view '
+                     f's{entry["via"]} addresses  sites '
+                     f'{", ".join(_hex(s) for s in entry["sites"])}{extra}'
+                     + (f'  own view dwords {dwords}' if dwords else ''))
+    for entry in analysis['holes'].get('null_exports') or []:
+        lines.append(f'  null_export        target {entry["target"]:<3} writes no component'
+                     + ('  (valid mask)' if entry['valid_mask'] else '')
+                     + f'  site {_hex(entry["offset"])}')
     for entry in analysis['holes']['export_targets']:
         lines.append(f'  export_target      MRT {entry["target"]:<3} sources '
                      f'{entry["sources"]}  sites '
@@ -1093,7 +1446,9 @@ def _distribution(values: list[int]) -> dict:
 def _aggregate(rows: list[dict], label: str) -> dict:
     bases = Counter()
     descriptors = Counter()
+    residents = Counter()
     targets = Counter()
+    nulls = Counter()
     vectors = Counter()
     scalars = Counter()
     policies = Counter()
@@ -1112,6 +1467,13 @@ def _aggregate(rows: list[dict], label: str) -> dict:
             descriptors[entry['slot']] += 1
             for name in entry['formats']:
                 formats[name] += 1
+        for entry in holes.get('resident_slots') or []:
+            residents[entry['slot']] += 1
+            view_dwords += len(entry['view_dwords'])
+            for name in entry.get('formats') or ():
+                formats[name] += 1
+        for entry in holes.get('null_exports') or []:
+            nulls[entry['target']] += 1
         for entry in holes['export_targets']:
             targets[entry['target']] += 1
         for entry in holes['initial_vectors']:
@@ -1130,12 +1492,16 @@ def _aggregate(rows: list[dict], label: str) -> dict:
         'instructions': _distribution([row['instructions'] for row in rows]),
         'distinct_scalar_base_slots': len(bases),
         'distinct_buffer_descriptor_slots': len(descriptors),
+        'distinct_resident_slots': len(residents),
         'distinct_export_targets': len(targets),
+        'distinct_null_export_targets': len(nulls),
         'distinct_initial_vector_slots': len(vectors),
         'distinct_initial_scalar_slots': len(scalars),
         'scalar_base_slot_histogram': dict(sorted(bases.items())),
         'buffer_descriptor_slot_histogram': dict(sorted(descriptors.items())),
+        'resident_slot_histogram': dict(sorted(residents.items())),
         'export_target_histogram': dict(sorted(targets.items())),
+        'null_export_target_histogram': dict(sorted(nulls.items())),
         'initial_vector_slot_histogram': dict(sorted(vectors.items())),
         'initial_scalar_slot_histogram': dict(sorted(scalars.items())),
         'policy_histogram': dict(sorted(policies.items())),
@@ -1259,19 +1625,34 @@ def _self_test() -> int:
         """Mechanically fill a skeleton from its own hole list: the form must always be closable."""
         document = skeleton(analysed, 'synthetic_fill', 'synthetic')
         views: dict[str, dict] = {}
+
+        def view_dwords(view: str, requests: list[dict]) -> None:
+            entries = views.setdefault(view, {})
+            for request in requests:
+                for offset in range(request['offset'], request['offset'] + request['dwords']):
+                    entries[str(offset)] = {'kind': 'float', 'field': 'camera',
+                                            'component': 'x'}
+
         for entry in analysed['holes']['scalar_bases']:
             view = f'view_{entry["slot"]}'
             document['scalar_bases'][str(entry['slot'])] = {'kind': entry['kind'],
                                                             'view': view}
-            entries = views.setdefault(view, {})
-            for request in entry['view_dwords']:
-                for offset in range(request['offset'], request['offset'] + request['dwords']):
-                    entries[str(offset)] = {'kind': 'float', 'field': 'camera',
-                                            'component': 'x'}
+            view_dwords(view, entry['view_dwords'])
         for entry in analysed['holes']['buffer_descriptors']:
+            view = f'view_{entry["slot"]}'
             document['buffer_descriptors'][str(entry['slot'])] = {
-                'kind': 'descriptor', 'view': f'stream_{entry["slot"]}',
+                'kind': 'descriptor', 'view': view,
                 'format': entry['formats'][0], 'field': 'position'}
+            view_dwords(view, entry['view_dwords'])
+        for entry in analysed['holes'].get('resident_slots') or []:
+            section = ('scalar_bases' if entry['role'] == 'scalar_base'
+                       else 'buffer_descriptors')
+            binding = document[section][str(entry['slot'])]
+            binding['view'] = f'view_{entry["slot"]}'
+            if section == 'buffer_descriptors':
+                binding['format'] = entry['formats'][0]
+                binding['field'] = 'position'
+            view_dwords(binding['view'], entry['view_dwords'])
         for entry in analysed['holes']['export_targets']:
             document['exports'][str(entry['target'])] = {
                 'semantic': f'target_{entry["target"]}'}
@@ -1408,24 +1789,114 @@ def _self_test() -> int:
 
     # Shape blockers: a manifest cannot fix an unsupported row, so validation fails closed.
     additive = program(vop1(1, src0=260, vdst=8),
-                       vop2(3, src0=264, vsrc1=5, vdst=9),
+                       vop1(53, src0=256, vdst=9),   # v_sin_f32: decodable, not a lowering row
                        exp(12, vsrc0=9, vsrc1=9, vsrc2=9, vsrc3=9),
                        exp(32, vsrc0=9, vsrc1=9, vsrc2=9, vsrc3=9),
                        exp(33, vsrc0=9, vsrc1=9, vsrc2=9, vsrc3=9), end)
     additive_holes = analyze(additive, 'vs')
     check('additive is not manifest-only', not additive_holes['manifest_only'])
     check('additive blocker names the row',
-          any('v_add_f32' in b['reason'] for b in additive_holes['shape']))
+          any('v_sin_f32' in b['reason'] for b in additive_holes['shape']))
     check('shape blocker reaches the validator',
           'shape-blocker' in codes(validate(fill(additive_holes), additive_holes)))
 
-    # Stage export contract: a vs that writes only clip+param0 cannot be lowered.
+    # The synthetic harness export contract is gone: a vertex stage that writes clip plus one
+    # param is lowerable, because the target-array sink is indexed by target.
     partial = program(vop1(1, src0=260, vdst=8),
                       exp(12, vsrc0=8, vsrc1=8, vsrc2=8, vsrc3=8),
                       exp(32, vsrc0=8, vsrc1=8, vsrc2=8, vsrc3=8), end)
     partial_holes = analyze(partial, 'vs')
-    check('export contract is a blocker',
-          any('export contract' in b['reason'] for b in partial_holes['shape']))
+    check('clip plus one param is manifest-only', partial_holes['manifest_only'])
+    check('its export holes are the targets it writes',
+          [e['target'] for e in partial_holes['holes']['export_targets']] == [12, 32])
+    check('clip plus one param fill validates',
+          validate(fill(partial_holes), partial_holes) == [])
+
+    # What a vertex stage must still do is position itself: no full clip export is a blocker.
+    no_clip = program(vop1(1, src0=260, vdst=8),
+                      exp(32, vsrc0=8, vsrc1=8, vsrc2=8, vsrc3=8), end)
+    no_clip_holes = analyze(no_clip, 'vs')
+    check('a vertex stage without a full clip export is blocked',
+          any(blocker['kind'] == 'export-contract' for blocker in no_clip_holes['shape']))
+
+    # A partial `en` writes only the components it enables, so no component value is invented.
+    partial_en = program(vop1(1, src0=256, vdst=4),
+                         encode('EXP', 0, en=3, target=0, done=1, vsrc0=4, vsrc1=4), end)
+    partial_en_holes = analyze(partial_en, 'ps')
+    check('partial en records the enabled components',
+          [e['components'] for e in partial_en_holes['holes']['export_targets']] == [[0, 1]])
+    check('partial en is manifest-only', partial_en_holes['manifest_only'])
+
+    # A null export (en = 0) writes nothing, so it is neither an export hole nor a blocker.
+    null_export = program(encode('EXP', 0, en=0, target=9, done=1, vm=1), end)
+    null_holes = analyze(null_export, 'ps')
+    check('a null export is not an export hole', null_holes['holes']['export_targets'] == [])
+    check('a null export is recorded with its valid mask',
+          [(e['target'], e['valid_mask']) for e in null_holes['holes']['null_exports']]
+          == [(9, True)])
+    check('a null export with the valid mask is manifest-only', null_holes['manifest_only'])
+    check('a null export needs no binding at all', null_holes['counts']['binding_holes'] == 0)
+
+    # The valid mask is EXEC, i.e. the covered-lane mask a per-lane harness already evaluates, so
+    # on a fragment stage it is recorded rather than re-emitted; on a vertex stage the encoding
+    # gives it no meaning and it is refused.
+    vm_components = program(vop1(1, src0=256, vdst=4),
+                            encode('EXP', 0, en=15, target=0, done=1, vm=1,
+                                   vsrc0=4, vsrc1=4, vsrc2=4, vsrc3=4), end)
+    vm_holes = analyze(vm_components, 'ps')
+    check('a fragment valid-mask export is recorded',
+          vm_holes['holes']['valid_mask_exports'] == [0])
+    check('a fragment valid-mask export is manifest-only', vm_holes['manifest_only'])
+    vm_vertex = program(vop1(1, src0=260, vdst=8),
+                        encode('EXP', 0, en=15, target=12, done=1, vm=1,
+                               vsrc0=8, vsrc1=8, vsrc2=8, vsrc3=8),
+                        exp(32, vsrc0=8, vsrc1=8, vsrc2=8, vsrc3=8),
+                        exp(33, vsrc0=8, vsrc1=8, vsrc2=8, vsrc3=8), end)
+    vm_vertex_holes = analyze(vm_vertex, 'vs')
+    check('a vertex valid-mask export is blocked',
+          any(blocker['kind'] == 'export-shape' and 'fragment stage' in blocker['reason']
+              for blocker in vm_vertex_holes['shape']))
+
+    # Two-level addressing: a descriptor and a base that are *loaded* from a bound view. The
+    # lowering already accepts a memory-resident descriptor (the cell is a `descriptor` in the
+    # parent view), so this is a hole, not a shape blocker.
+    two_level = program(
+        smrd(2, offset=0, sbase=0, sdst=16),                       # s[16:19] <- root[0..3]
+        smrd(2, offset=4, sbase=8, sdst=20),                       # s[20:23] <- [s16 + 4]
+        mubuf(3, srsrc=5, vaddr=0, vdata=4, idxen=1, soffset=128),  # descriptor s20
+        exp(12, vsrc0=4, vsrc1=4, vsrc2=4, vsrc3=4),
+        exp(32, vsrc0=4, vsrc1=4, vsrc2=4, vsrc3=4),
+        exp(33, vsrc0=4, vsrc1=4, vsrc2=4, vsrc3=4), end)
+    two_level_holes = analyze(two_level, 'vs')
+    check('a memory-resident base and descriptor are holes',
+          [(e['slot'], e['kind'], e['via'], e['offset'])
+           for e in two_level_holes['holes']['resident_slots']]
+          == [(16, 'pointer', 0, 0), (20, 'descriptor', 16, 4)])
+    check('two-level program is manifest-only', two_level_holes['manifest_only'])
+    check('the root keeps only its unused dwords as data',
+          [(r['offset'], r['dwords'])
+           for r in two_level_holes['holes']['scalar_bases'][0]['view_dwords']]
+          == [(2, 2)])
+    check('two-level fill validates', validate(fill(two_level_holes), two_level_holes) == [])
+    check('a resident descriptor projects into the parent view',
+          to_lowerer_stage_abi(fill(two_level_holes))['views']['view_16']
+          == {'4': {'kind': 'descriptor', 'view': 'view_20'}})
+
+    # One dword cannot be two cell types: that is a shape blocker, not a binding failure.
+    conflicted = program(
+        smrd(2, offset=0, sbase=0, sdst=16),        # s[16:19] <- root[0..3], used as a pointer
+        smrd(2, offset=0, sbase=0, sdst=20),        # s[20:23] <- root[0..3], used as a descriptor
+        smrd(1, offset=4, sbase=8, sdst=24),        # a load through s16 makes it a base
+        mubuf(3, srsrc=5, vaddr=0, vdata=4, idxen=1, soffset=128),
+        exp(12, vsrc0=4, vsrc1=4, vsrc2=4, vsrc3=4),
+        exp(32, vsrc0=4, vsrc1=4, vsrc2=4, vsrc3=4),
+        exp(33, vsrc0=4, vsrc1=4, vsrc2=4, vsrc3=4), end)
+    conflicted_holes = analyze(conflicted, 'vs')
+    check('an overlapping pointer and descriptor are a shape blocker',
+          any(blocker['kind'] == 'resident-kind-conflict'
+              for blocker in conflicted_holes['shape']))
+    check('the conflicting program is not manifest-only', not conflicted_holes['manifest_only'])
+
 
     # A synthetic PS that only exports MRT0: the pair projection needs both stages.
     ps_code = program(vop1(1, src0=256, vdst=4),
@@ -1478,6 +1949,13 @@ def _self_test() -> int:
     lowering = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(lowering)
     check('case fields match gcn_to_msl', tuple(lowering.CASE_FIELDS) == CASE_FIELDS)
+    check('export spaces match gcn_to_msl', tuple(lowering.EXPORT_SPACES) == EXPORT_SPACES)
+    check('sink slots match the export spaces',
+          sum(high - low for _, low, high in EXPORT_SPACES) == lowering.EXPORT_SINK_SLOTS)
+    check('null export target matches gcn_to_msl',
+          lowering.NULL_EXPORT_TARGET == NULL_EXPORT_TARGET)
+    check('lowered arithmetic matches gcn_to_msl',
+          frozenset(LOWERED_ARITHMETIC) == frozenset(lowering.ARITHMETIC_ROWS))
     check('floating point profile matches', list(FLOATING_POINT_PROFILES) == ['nearest_even_ftz32_rtz16'])
 
     # Aggregation smoke test: counts are over distinct slots, not occurrences.
