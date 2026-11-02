@@ -214,9 +214,6 @@ def main() -> int:
                     found[dest].append((base + off, "call" if opcode == 0xE8 else "jmp"))
         return found
 
-    def rip_target(addr: int, disp_at: int, end: int) -> int:
-        return addr + struct.unpack_from("<i", reads(addr, end), disp_at)[0]
-
     def check_call(site: int, target: int) -> bool:
         window = reads(site, 5)
         return window[0] == 0xE8 and site + 5 + struct.unpack_from("<i", window, 1)[0] == target
