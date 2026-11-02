@@ -2,7 +2,7 @@
 //
 // Proves that every lifted vec_*/leaf_* constructor module runs in recovered_constructors(), that
 // the registered rows pair with the pinned original table, and that the remaining startup cliff is
-// explicit (first unrecovered index 326 / RVA 0x837f30, after slot 316 landed).
+// explicit (first unrecovered index 329 / RVA 0x829e90, after slot 326 landed).
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -42,7 +42,7 @@ int main() {
     CHECK(result.blocked_on_rva == 0);
     CHECK(!st.init_failed);
     CHECK(result.completed == slots.size());
-    CHECK(slots.size() == 453);
+    CHECK(slots.size() == 454);
 
     // Every registered row is in original order and pairs with the pinned table.
     for (std::size_t i = 0; i < slots.size(); ++i) {
@@ -53,9 +53,9 @@ int main() {
     }
 
     // ---- explicit, machine-checked gap ---------------------------------------
-    CHECK(first_unrecovered_constructor_index() == 326);
-    CHECK(first_unrecovered_constructor_rva() == 0x837f30);
-    CHECK(slots.size() + 120 == kOriginalCtorCount);
+    CHECK(first_unrecovered_constructor_index() == 329);
+    CHECK(first_unrecovered_constructor_rva() == 0x829e90);
+    CHECK(slots.size() + 119 == kOriginalCtorCount);
 
     // ---- CPU-01-STARTUP-LEAF-ROWS-315-560-01 -------------------------------
     CHECK(st.slot315_cell == 0);
@@ -116,10 +116,10 @@ int main() {
     CHECK(st.slot303.var.default_value == 0 && st.slot303.var.fn_vptr == 0x15d2478);
     CHECK(st.slot303.item.target == &st.slot303.var && st.slot303.item.flags == 0x30);
     CHECK(st.concmd.manager.manager == nullptr);
-    CHECK(st.concmd.pending.size() == 130);                      // observed: 114 through slot 312 + 10 (slot 314) + 6 (slot 316)
+    CHECK(st.concmd.pending.size() == 145);                      // observed: 114 through 312 + 10 (314) + 6 (316) + 15 (326)
     CHECK(st.concmd.pending.first() == &st.slot298_shader_type.base.pending);
-    CHECK(st.debug_menu.root.count == 84);                      // observed: 68 through slot 312 + 10 (slot 314) + 6 (slot 316)
-    CHECK(st.concmd.atexit_log.size() == 324);                  // observed: 288 through slot 312 + 22 (slot 314) + 14 (slot 316)
+    CHECK(st.debug_menu.root.count == 105);                     // observed: 68 through 312 + 10 (314) + 6 (316) + 21 (326)
+    CHECK(st.concmd.atexit_log.size() == 360);                  // observed: 288 through 312 + 22 (314) + 14 (316) + 36 (326)
                                                                 // (the menu root was already initialised, so
                                                                 //  0x268b0 records nothing new here)
     for (std::size_t i = 0; i < kSlot302HandleCount; ++i) {
@@ -200,6 +200,27 @@ int main() {
     CHECK(st.slot316.item_text.kind == 2 && st.slot316.item_text.flags == 0x30);
     CHECK(st.slot316.unlocalized.size == 17 &&
           std::memcmp(st.slot316.unlocalized.data, "!!!Unlocalized!!!", 17) == 0);
+
+    // ---- CPU-01-STARTUP-SLOT-326-CHARACTERIZATION-01: idx 326, the Colossus / Shadow eye block -----
+    CHECK(st.slot326_result.ok && st.slot326_result.atexit_records == 36);
+    CHECK(st.slot326_result.functors_destroyed == 13 && st.slot326_result.vars_built == 15 &&
+          st.slot326_result.menu_items == 21);
+    CHECK(st.slot326_result.eye_values_mirrored && st.slot326_result.views_inert);
+    CHECK(st.slot326.bool_eye_state.base.vptr == 0x1594218 && st.slot326.bool_eye_state.value == 0);
+    CHECK(st.slot326.bool_force_angry.base.registered == 1 && st.slot326.bool_force_angry.value == 0);
+    CHECK(st.slot326.threshold.base.vptr == 0x15942b0 && st.slot326.threshold.value == 0x40400000u);
+    CHECK(st.slot326.threshold.default_value == 0x40400000u && st.slot326.threshold.min_engaged == 1);
+    CHECK(st.slot326.eye[0].base.vptr == 0x15943c0 && st.slot326.eye[11].base.vptr == 0x15943c0);
+    CHECK(st.slot326.eye[0].default_value == 0x3f800000u && st.slot326.eye[3].default_value == 0);
+    CHECK(st.slot326.eye[4].default_value == 0x3e99999au && st.slot326.eye[9].default_value == 0x3f000000u);
+    CHECK(st.slot326_eye_values.inactive[0] == 0x3f800000u && st.slot326_eye_values.red[1] == 0x3f000000u);
+    CHECK(st.slot326.group_colossus.kind == 1 && st.slot326.group_colossus.flags == 0x30);
+    CHECK(st.slot326.item_label.kind == 0 && st.slot326.item_label.flags == 0);
+    CHECK(st.slot326.item_label.text.size == 13 &&
+          std::memcmp(st.slot326.item_label.text.data, "MenuSeparator", 13) == 0);
+    CHECK(st.slot326.toggle_threshold.target == &st.slot326.threshold);
+    CHECK(st.slot326.toggle_force_angry.target == &st.slot326.bool_force_angry);
+    CHECK(st.slot326.slider_red[3].target == &st.slot326.eye[11]);
 
     std::puts("startup_ctor_coverage: all checks passed");
     return 0;

@@ -98,7 +98,9 @@ void section_constants() {
     CHECK(kSlot316MenuToggleCtorRva == 0x26ea0 && kSlot316MenuRegisterRva == 0x268b0);
     CHECK(kSlot316NameViewRva == 0xf2f0 && kSlot316SharedStrCtorRva == 0xf1a0);
     CHECK(kSlot316LanguageVarWrapperRva == 0xa324c0 && kSlot316LanguageVarWrapperSize == 436);
+    CHECK(kSlot316LanguageVarWrapperInstructions == 98);
     CHECK(kSlot316LanguageVarLeafRva == 0xa32680 && kSlot316LanguageVarLeafSize == 352);
+    CHECK(kSlot316LanguageVarLeafInstructions == 89);
     CHECK(kSlot316FunctorDispatches == 48 && kSlot316LanguageDispatches == 11);
 
     // Identity tags.

@@ -105,7 +105,7 @@ void section_constants() {
     // 0x2dd70e0 - 314*8 == 0x2dd6710, the one word that references the body.
     CHECK(kSlot314TableTopRva - 8 * kSlot314TableIndex == kSlot314TableWordRva);
     CHECK(kSlot314TableWordRva == 0x2dd6710 && kSlot314TableIndex == 314);
-    CHECK(kSlot314NextUnrecoveredIndex == 316 && kSlot314NextUnrecoveredRva == 0xa33280);
+    CHECK(kSlot314NextUnrecoveredIndex == 329 && kSlot314NextUnrecoveredRva == 0x829e90);
     CHECK(kSlot314CanaryCellRva == 0x15fe518);
     CHECK(kSlot314StackChkFailRva == 0xf8f3a0 && kSlot314CanaryFrameOffset == 0xc0);
     CHECK(kSlot314BranchRva == 0xa428e2 && kSlot314BranchTargetRva == 0xa428f3);

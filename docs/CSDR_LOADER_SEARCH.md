@@ -28,6 +28,17 @@ members carries type **3** (`8c0a`) or **4** (`8c06`) in that trailer word, and 
 case. **So yes: the one Oodle call site does expand `.csdr` members.** Nothing was decompressed —
 this is a call-graph and container-format result (§4.2(f) states what it does not cover).
 
+**Round 4 — the header layout is recovered (§4.3).** `CompressionHeader` is a **single 4-byte
+little-endian bitfield** `{type:3 @ bits 31..29, size:29 @ bits 28..0}`; it is constructed with a
+4-byte store and only ever read at offset 0, and the `{8-byte tag}{4-byte header}` idiom is visible at
+all four constructor call sites. The `.csdr` prefix at offset 0 **is not a field of it** — read as a
+`CompressionHeader` it would always come out as type 0 with a ~285 MB size — and the leading bytes are
+instead a **generic BPE preheader shared by 18 resource extensions** (`.csdr` plus 17 others), whose
+first two bytes (`0x8c`, `0x0a`/`0x06`) are simultaneously a valid Oodle 2 stream header (compressor
+10 / 6). The decode
+contract is therefore `OodleLZ_Decompress(member[0 : len-12], …, rawLen = trailer & 0x1fffffff)` with
+nothing stripped and no length inferred (§4.3(g)).
+
 Details below are separated into what was **established** and what was **not**. Everything is
 `STATIC_ANALYSIS_VERIFIED` against `local/re/eboot.elf`
 (SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0) unless a
@@ -433,6 +444,202 @@ The §6.6 "sector-structured container" hypothesis is **withdrawn as an explanat
 members**: the trailing word names a codec and the dispatcher sends types 3/4 unconditionally to
 `OodleLZ_Decompress`.
 
+### 4.3 `bpe::Compression::CompressionHeader` — the layout (round 4)
+
+Round 3 knew *where* the header is (the last four bytes of the resource file) but not what is inside
+it. This section pins the struct from the code that reads and constructs it, then answers the question
+the task actually asked: **does the `.csdr` member header map onto it?** Answer: **no** — and §4.3(e)
+now says what the leading bytes are instead.
+
+Everything below is `STATIC_ANALYSIS_VERIFIED` against the pinned image (`d0723afb…61d3`, base 0,
+RVA == address) plus a whole-corpus word census. **No member was decompressed; no payload byte and no
+shader text is stored.** Instruction bytes were read straight from the ELF (PHDR 0, file = VA +
+`0x4000`) and cross-checked against the linear disassembly; no Ghidra query was made for this round.
+
+#### (a) The struct is one little-endian `u32` bitfield, four bytes, offset 0
+
+The compression bodies of `Core/Util/Compression.cpp` live in `0x1aa0b0..0x1aa46a`: nine tiny
+accessors plus the dispatcher, all of them reading or writing **offset 0 only**, and every one of them
+32-bit:
+
+| Role | RVA | Bytes | Semantics |
+|---|---|---|---|
+| `CompressionHeader::CompressionHeader()` | `0x1aa0b0` | `c7 07 00 00 00 00 c3` = `mov dword [rdi],0 ; ret` | zeroes **exactly 4 bytes** at `+0` |
+| `IsCompressed` | `0x1aa0c0` and `0x1aa210` | `81 3f ff ff ff 1f 0f 97 c0 c3` = `cmp dword [rdi],0x1fffffff ; seta al ; ret` | true ⇔ type ≠ 0 |
+| `GetType` / codec | `0x1aa0d0` and `0x1aa250` | `8b 07 c1 e8 1d c3` = `mov eax,[rdi] ; shr eax,0x1d ; ret` | bits **31..29** |
+| `GetSize` | `0x1aa0e0` and `0x1aa240` | `8b 07 25 ff ff ff 1f c3` = `mov eax,[rdi] ; and eax,0x1fffffff ; ret` | bits **28..0** |
+| `GetUncompressedData` | `0x1aa220`, `0x1aa230` | `48 89 f0 c3` = `mov rax,rsi ; ret` | returns the caller's data pointer unchanged; **identified by shape, not by its own metadata** — the two-instruction pass-through the `0xfade25` assert names (`Compression::GetUncompressedData()`) is this or an inlined copy of it |
+| `GetUncompressedSize` | `0x1aa260` | `8b 3f` / `c1 e9 1d` / switch / `25 ff ff ff 1f` | bits 28..0; `+0x10` for type 5 (see (g)) |
+| `Compress` | `0x1aa160` | `(buf, type)`; `type 2..5` ⇒ tail-jump `0x89ed10`, `type 1` ⇒ `0x1b4130`, `type 0` ⇒ `buf` | no header written |
+
+Bit assignment, in memory order on a little-endian target:
+
+| Bits | Width | Field | Read by | Meaning |
+|---|---|---|---|---|
+| `31..29` | 3 | codec/type | `0x1aa250`, `0x1aa2a0`@`0x1aa333` | 0 stored · 1 zlib · 2/3/4 Oodle `fuzzSafe=1` · 5 Oodle `fuzzSafe=0` |
+| `28..0` | 29 | size | `0x1aa240`, `0x1aa2a0`@`0x1aa31e` | uncompressed length (type 0: the stored length) |
+
+That is the entire struct. There is no second member: the constructor writes 4 bytes and nothing in
+the image ever loads `[h+4]`, `[h+8]`… — every accessor and the dispatcher read `(%rdi)`/`(%r14)`
+only, and `r14` is loaded at exactly two instructions in the 458-byte `Decompress` body.
+
+**Size pinned by construction, not by inference.** `0x1aa0b0` is a real function with four call
+sites, and each call site uses the same `{8-byte value}{4-byte header}` idiom:
+
+| Call site | Object | Neighbours |
+|---|---|---|
+| `0x1446cd` | descriptor `+0x30` | `mov qword [rbx+0x28],0` immediately before |
+| `0x1447e1` | descriptor `+0x30` | same idiom |
+| `0x149729` | loader `+0xf0` | `mov qword [rbx+0xe8],0` (the 8-byte tag) |
+| `0x14ae2c` | loader `+0xf0` (reset) | `vmovups [rbx+0xe0],xmm0` zeroes `+0xe0..+0xf0`, then the ctor covers `+0xf0..+0xf4` |
+
+and the 12-byte tail the resource reader copies is `memcpy(loader+0xe8, member[len-12], 12)`, i.e.
+`+0xe8` = the 8-byte type tag and `+0xf0` = the 4-byte header — 12 bytes, no slack
+(`0x14b9da` `lea rax,[r15+0xe8]`; `movq $0xc,0xe0(%r15)`).
+
+#### (b) `Decompress` reads two fields, and returns the header's size, not the codec's
+
+Inside `0x1aa2a0`:
+
+| Address | Bytes | Meaning |
+|---|---|---|
+| `0x1aa31e` | `41 8b 1e` | `mov ebx,[r14]` |
+| `0x1aa328` | `81 e3 ff ff ff 1f` | `and ebx,0x1fffffff` → `size` (used as `rawLen` and as every case's copy/count) |
+| `0x1aa333` | `41 8b 06` / `c1 e8 1d` | `mov eax,[r14] ; shr eax,0x1d` → `type`, the switch index |
+| `0x1aa442` | `48 01 9d …` | `[0x2ee6750] += size` — a process-wide "bytes decompressed" counter |
+| `0x1aa452` | `48 89 d8` | `mov rax,rbx` → **the return value is the header size in every case** |
+
+Two consequences worth carrying forward:
+
+1. **A codec failure is invisible.** The `OodleLZ_Decompress` return in `rax` is discarded at
+   `0x1aa42b`; `Decompress` returns `size` whatever the codec did. A port that wants fail-closed
+   behaviour must check the codec itself — the retail code does not.
+2. The switch runs inside a critical section on `0x2ee6728` (`call 0x326f0` at `0x1aa32e`,
+   `call 0x32710` at `0x1aa436`), because the shared Oodle decoder memory at `0x2ee6720` is used by every call.
+
+#### (c) The `.csdr` prefix is **not** a `CompressionHeader` — refuted on the bytes
+
+The candidate mapping was "the `0x8c` prefix at member offset 0 is a field of this header". It is
+refuted three ways:
+
+1. **Wrong end of the file.** The engine's header object is `loader+0xf0`, filled from
+   `member[len-4 : len)`; `CreateResource` calls `IsCompressed(loader+0xf0)` and
+   `Decompress(loader+0xf0, …)`. Nothing in the image ever passes a member-prefix pointer as a
+   `CompressionHeader`.
+2. **The type field would read 0.** A `CompressionHeader` at member offset 0 would be
+   `u32le(member[0:4])`, whose type field is the top three bits of `member[3]`. For all 19,320
+   compressed members `member[3] ∈ [5, 79]` (it is the body's 256-byte block count), so
+   `member[3] & 0xE0 == 0` ⇒ **type 0 = "not compressed"** — and the size field would be
+   `u32le(member[0:4]) & 0x1fffffff`, e.g. `0x11000a8c` = 285,215,372 for a 4,587-byte member.
+   A type-0 header sends `Decompress` down the `memcpy(dst, compBuf, size)` case at `0x1aa3cb`
+   (`mov rdx,rbx`): a 285 MB copy into a 6 KB allocation.
+3. **No aligned window works.** Scanning every 4-byte little-endian window at offsets 0..28 over
+   pak1's 1,442 compressed members, the number of windows at offset 0 that decode as type 3/4 with
+   `size > len-12` is **0**.
+
+So the prefix is neither a field of `CompressionHeader` nor (see (d)) a bare codec tag. The header
+itself is unambiguously the 4-byte trailer word, as round 3 established.
+
+#### (d) What the leading bytes are: a generic BPE preheader, measured corpus-wide
+
+A new census (`local/re/csdr_preheader_census.py`, first 32 bytes of every member, counts and
+distinct values only) gives, over **all 34,392 `.csdr` members** (34,291 in `pak0/pak1/pakN` plus the
+101 in `cachedFiles.psarc`):
+
+| Field | Rule | Holds |
+|---|---|---|
+| `[0]` | `0x8c` compressed · `0x01` · `0x02` raw | 19,320 · 8,178 · 6,894 |
+| `[1]` | `0x0a` 16,328 or `0x06` 2,992 — **1:1 with trailer type 3 / 4**, no exception | 19,320 / 19,320 |
+| `u24be[2:5]` | `== size - 18` | **19,320 / 19,320** |
+| `[5]` | `0x88` | 19,320 / 19,320 |
+| `u16be[6:8]` | `== size - 20` | **19,320 / 19,320** |
+| `u32le[8:12]` | 1 (4,238) or 2 (15,082) | 2 values |
+| `u32le[12:16]` | 0 (4,008) · 1 (226) · 2 (15,084) · 3 (2) | 4 values |
+| `u32le[16:20]` | 16-byte aligned | 19,320 / 19,320 |
+
+Two of these confirm §1.1 from the other end: `[8]` and `[12]` are exactly the two flag bytes §1.1
+saw as `0x01000000`/`0x02000000` and `0x00/0x01/0x02/0x03000000` when read big-endian — read
+little-endian they are the small integers 1–2 and 0–3.
+
+**The preheader is not `.csdr`-specific.** The same `[0] == 0x8c` + `u24be[2:5] == size-18` pair
+occurs in 17 other resource extensions in the same archives — `cmsh` 14,549 · `ctxr` 5,878 · `ctxc`
+3,592 · `cani` 968 · `cclm` 432 · `cgpr` 136 · `cprt` 104 · `csml` 84 · `cpid` 68 · `cskl` 63 ·
+`cptx` 34 · `cchr` 23 · `csli` 21 · `cfon` 26 · `crmp` 5 · `cslt` 2 · `cctx` 1. So it is a
+BPE-level compression wrapper, not a shader container header. `[2:5]` is a 24-bit length (it survives
+the 16-bit overflow that makes `[6:8]` fail on `cmsh`/`ctxr` members above 64 KB) and `[6:8]` is the
+same length truncated to 16 bits.
+
+#### (e) Why the retail caller can pass from byte 0: the prefix is also a valid Oodle 2 stream header
+
+`OodleLZ_Decompress` (`0x89d3b0`) does not touch the compressed bytes itself; it first calls the
+header reader at **`0x8ac710`** with `compBuf`, after rejecting `compBufLen < 2`:
+
+```
+0x89d3ee  mov rsi,r15                     ; rsi = compBuf (never rewritten before the call)
+0x89d424  cmp qword [rbp-0x78],0x2  ; jl  → fail
+0x89d433  lea rdi,[rbp-0xb0]              ; the parsed-header struct
+0x89d458  call 0x8ac710                   ; read_header(&hdr, compBuf)
+```
+
+and the reader's first test is exactly the `.csdr` prefix:
+
+| Address | Bytes | Meaning |
+|---|---|---|
+| `0x8ac719` | `0f b6 0b` | `movzx ecx, byte [rbx]` — `compBuf[0]` |
+| `0x8ac71c` | `89 c8 83 e0 0f` | `eax = byte0 & 0x0f` |
+| `0x8ac721` | `83 f8 0c` | `cmp eax,0x0c` ⇒ **`0x8c` takes this branch** |
+| `0x8ac740` | `b8 06 01 00 00` / `c4 e2 78 f7 …` | `bextr` mask `0x106`/`0x204`: bits 4..5 must be 0, bit 6 → `hdr+0x0c`, bit 7 → `hdr+0x10` |
+| `0x8ac753` | `0f b6 43 01` | `movzx eax, byte [rbx+1]` — `compBuf[1]` |
+| `0x8ac75b` | `89 c1 c1 e9 07` | `hdr+0x14 = byte1 >> 7` |
+| `0x8ac760` | `83 e0 7f` / `89 47 04` | `hdr+0x04 = byte1 & 0x7f` = **compressor id** |
+| `0x8ac789` | `83 f8 0c` + `cmovnbe rbx,rcx(0)` | compressor `> 0x0c` ⇒ "invalid header" |
+
+So `0x8c` is a stream-header byte, not a container magic, and `0x0a`/`0x06` are **compressor ids 10
+and 6**. The image's compressor→decode-type table at `0x1295090`
+(`[1,2,4,5,6,7,8,0,-1,-1,9,10,13]`) maps 10 → 9 and 6 → 8, and `0x89d55c` tests the decode type
+against the fuzz-safe mask `0x3f13` when `fuzzSafe == 1` — both 8 and 9 are in the mask, which is
+consistent with `bpe::Compression::Decompress` passing `R8D = 1` for **both** types 3 and 4
+(§4.2(c)). That also explains why BPE types 2, 3 and 4 share one case body: the codec is named by the
+*stream*, not by the BPE type, so type 3 and type 4 select nothing that type 2 does not.
+
+#### (f) The exact residual, stated so it can be tested
+
+The two length fields in the preheader count the **whole member, including the 12-byte trailer**
+(`size-18` = payload + 2, `size-20` = payload). No codec can know a file's final length, so those
+bytes were written by the cook tool, not by an encoder. The compression side of this translation
+unit cannot have written them either: **`bpe::Compression::Compress` (`0x1aa160`) has zero inbound
+`E8`/`E9` sites in the whole image** (only the decompress half is linked into the game's path;
+`GetUncompressedData`/`GetSize`/`GetType` at `0x1aa220/0x1aa230/0x1aa240/0x1aa250` and the
+`0x1aa0c0`–`0x1aa0e0` duplicates are likewise unreferenced out-of-line copies).
+
+What remains undecided is therefore *only* whether Oodle skips those preheader bytes or consumes them
+as its first quantum. That is not answerable without a working Oodle implementation, and **it does not
+change the port's contract**, because the retail call is the same either way — see (g). The test that
+settles it is a real decoder at candidate offsets 0/8/20 whose output must be exactly
+`trailer & 0x1fffffff` bytes *and* parse as a `.csdr` record table (0xe4-byte records, `0xb0ced0`).
+
+#### (g) The decode contract, as the retail code actually performs it
+
+| Item | Value | Evidence |
+|---|---|---|
+| compressed input | `member[**0** .. len-12)` — from byte **0**, ending before the 12-byte tail | `0x14c000` returns `*(void**)(loader+0x90)` (the read buffer); `0x14bcb7` stores `len-12` |
+| input length | `len - 12` | `0x14bcb7` (`r13 = [r15+0x78] - r12`, `r12` = 12) |
+| output buffer | fresh `FUN_00012820(rawLen, 1, 8, 0)`, exact size (call at `0x14723c`, `rdi = rawLen`) | `0x147239`–`0x147241` |
+| output length | `trailer & 0x1fffffff` | `0x1aa328` |
+| codec selector | `trailer >> 29` | `0x1aa336` |
+| type 0 | `memcpy(dst, member, size)` — **no codec** | `0x1aa3cb`–`0x1aa3d5` |
+| type 1 | zlib 1.2.3 `inflate` through `0x1b9130(dst, &size, src, (int)compLen)` | `0x1aa3dc`–`0x1aa3ee` |
+| types 2/3/4 | `OodleLZ_Decompress(compBuf, compLen, dst, size, fuzzSafe=1, checkCRC=0, verbosity=0, decBufBase=0, decBufSize=0, fpCallback=0, userData=0, decoderMemory, decoderMemorySize, threadPhase=3)` | `0x1aa351`, `0x1aa426` |
+| type 5 | same call with `fuzzSafe=0` | `0x1aa3f5` |
+| 8-byte tag | `member[len-12 .. len-4)` == `0x1343534452` (`52 44 53 43 13 00 00 00`) | `0x14bc63` vs `typeEntry+0x28` |
+| `.csdr` types in the corpus | 0 = 15,072 · 3 = 16,328 · 4 = 2,992; **no type 1, 2 or 5** | E1075 census; the `[1]` histogram of (d) is 1:1 with it |
+
+**Correction to E1075.** The type-5 arm of `GetUncompressedSize` (`0x1aa260`) does not "ask Oodle for
+the size". It masks, zeroes `esi` and tail-jumps to `0x89dad0`, whose whole body is
+`test esi,esi ; mov ecx,0x10 ; mov eax,0x100 ; cmovz rax,rcx ; add rax,rdi ; ret` — i.e.
+`return p + (flag ? 0x100 : 0x10)`. So `GetUncompressedSize(type 5) = (field & 0x1fffffff) + 0x10`;
+no Oodle entry point is involved, and type 5 does not occur in the corpus.
+
 ---
 
 ## 5. What the GNM command-buffer machinery does *not* do
@@ -499,15 +706,19 @@ The former steps 1–3 are done (§4.2): the caller is known, the descriptor's p
 a *path* producer rather than a decompressor, and the codec question is decided in Oodle's favour.
 What remains is deliberate and separate work:
 
-1. **A decoder is now a bounded task with a known interface.** Input: `member[0 : len-12]`; output:
-   exactly `trailer & 0x1fffffff` bytes; codec: `OodleLZ_Decompress` type 3/4 (`fuzzSafe = 1`),
-   `memcpy` for type 0. The unanswered codec-format question is §4.2(f): does the stream start at
-   byte 0 or after the 16-byte header. Deciding it needs a *working* Oodle implementation, which this
-   repository does not have; a from-scratch one is a separate, much larger task.
-2. **Do not re-derive the container.** `.csdr` = `[leading header][body][12-byte trailer]`, trailer =
-   `{u64 tag 0x1343534452; u32 {type:3,size:29}}`, `body length = u16be[6:8] + 20 = len`, is now
-   measured on 34,392 / 34,392 members. Further header archaeology (what `[8:12]`, `[12:16]`,
-   `[16:20]` mean) does **not** unblock decompression and should not be scheduled ahead of it.
+1. **A decoder is a bounded task with a fully known interface (§4.3(g)).** Input:
+   `member[0 : len-12]`; output: exactly `trailer & 0x1fffffff` bytes; codec: `OodleLZ_Decompress`
+   for trailer types 3/4 (`fuzzSafe = 1`), `memcpy` for type 0. There is **no header to strip and no
+   length to infer**: the 4-byte `CompressionHeader` is the trailer word (§4.3(a)) and the leading
+   bytes are stream bytes the retail code passes through unchanged (§4.3(e)). The one thing a decoder
+   must still be *tested* for is §4.3(f): confirm that a real Oodle run on `member[0 : len-12]`
+   produces `trailer & 0x1fffffff` bytes that parse as a `.csdr` record table, and only then treat the
+   preheader as transparent.
+2. **Do not re-derive the container.** `.csdr` = `[preheader][body][12-byte trailer]`, trailer =
+   `{u64 tag 0x1343534452; u32 {type:3,size:29}}`, and the preheader is now measured on the whole
+   corpus: `[0]=0x8c`, `[1]∈{0x0a,0x06}` 1:1 with trailer type 3/4, `u24be[2:5] = len-18`,
+   `[5]=0x88`, `u16be[6:8] = len-20`, `[8:12]∈{1,2}`, `[12:16]∈{0..3}`, `[16:20]` 16-aligned
+   (§4.3(d)). What `[8:20)` *mean* is still unknown and still does not block decompression.
 3. **Runtime liveness is a different task.** Nothing here shows that a compressed program is ever
    requested. That needs a dynamic observation (or the shipping/NEO variant selection traced through
    `shaderTypeToLoad`), and it is not answerable from the image alone.
@@ -568,6 +779,37 @@ python3 -I tools/lift/check_csdr_loader_search.py  # pins the claims above
 
 # 7. The trailing-word census of §4.2(e) — whole corpus, counts only.
 python3 -I local/re/csdr_tail_census.py 1 local/validation/csdr-decompressor-re/tail-census.json
+
+# 8. Round 4: the preheader census of §4.3(d) (all 34,392 members, first 32 bytes only).
+python3 -I local/re/csdr_preheader_census.py
+
+# 9. Round 4: struct layout and caller wiring, straight from the ELF (§4.3(a)-(c),(e)).
+python3 -I - <<'EOF'
+import struct
+d = open("local/re/eboot.elf", "rb").read()
+rd = lambda va, n: d[va + 0x4000:va + 0x4000 + n]        # PHDR 0
+for va, n, what in ((0x1aa0b0, 7,  "CompressionHeader ctor (4-byte store)"),
+                    (0x1aa210, 10, "IsCompressed  (> 0x1fffffff)"),
+                    (0x1aa240, 8,  "GetSize       (& 0x1fffffff)"),
+                    (0x1aa250, 6,  "GetType       (>> 29)"),
+                    (0x1aa31e, 12, "Decompress reads *h -> size"),
+                    (0x1aa333, 10, "Decompress reads *h -> type"),
+                    (0x8ac719, 12, "Oodle read_header: (compBuf[0] & 0x0f) == 0x0c"),
+                    (0x8ac753, 10, "Oodle read_header: compBuf[1] & 0x7f"),
+                    (0x149710, 26, "loader: ctor on +0xf0 after zeroing +0xe0..+0xf0"),
+                    (0x14c000, 14, "compBuf = loader+0x90"),
+                    (0x14bcb0, 12, "payloadSize = fileSize - 12")):
+    print(f"{what:52s} {va:#08x}  {rd(va, n).hex()}")
+# ctor call sites and accessor call sites: E8 rel32 census for the four RVAs
+want = {0x1aa0b0: "ctor", 0x1aa160: "Compress", 0x1aa2a0: "Decompress",
+        0x1aa210: "IsCompressed", 0x1aa260: "GetUncompressedSize"}
+for off in range(len(d) - 5):
+    if d[off] == 0xE8:
+        src = off - 0x4000
+        tgt = src + 5 + struct.unpack_from("<i", d, off + 1)[0]
+        if tgt in want:
+            print(f"  call {want[tgt]:20s} at {src:#08x}")
+EOF
 ```
 
 The FDE of §4.2(a) is read straight out of `.eh_frame` (no tool needed):
@@ -602,6 +844,11 @@ For §4.2: `local/re/csdr_tail_census.py` (and `csdr_trailer_probe.py`, its firs
 `dossier-1.txt … dossier-8.txt` in the same directory. No member byte and no decoded shader text is
 stored in any of them — the census writes header words and counts only.
 
+For §4.3: `local/re/csdr_preheader_census.py` (whole corpus, first 32 bytes, aggregate only) with
+`local/validation/csdr-header-layout/preheader-census.json`, and the sampling pass
+`local/re/csdr_member_header_probe.py` with `probe-pak1.json` in the same directory. Both store
+counts, distinct values and offsets — no member bytes.
+
 ## 9. Limits
 
 - Static analysis of one executable plus a corpus census. No guest code executed, no member
@@ -619,9 +866,21 @@ stored in any of them — the census writes header words and counts only.
   decodes".
 - §4.2(e)'s census reads member bytes but stores none: the JSON holds the tag match, the 3-bit type,
   the 29-bit size and per-archive counts.
-- §4.2(f) leaves the codec's *stream start offset* open on purpose. The compiled caller passes
-  `member[0 : len-12]`; whether those leading 16 bytes are codec input or a header the codec skips is
-  not decidable without an Oodle implementation.
+- §4.3(a)–(c) is read from instruction bytes only, and the struct size is pinned by the *constructor
+  call sites*, not by a type system: the four call sites all pass `&object+0x30` or `&loader+0xf0`,
+  each immediately after an 8-byte field at `-8`, and the 12-byte tail copy covers exactly
+  `{8-byte tag}{4-byte header}`. If a future build widened the header, that arithmetic would change.
+- §4.3(d) is a **word census**: it proves which byte patterns hold, not what the fields mean.
+  `[4:6]` and `[16:20]` remain unexplained, and the rule is not universal across types — in
+  `pak0`+`pak1`, 769 of 3,579 `cmsh` members and 17 of 1,884 `ctxr` members do **not** satisfy
+  `u24be[2:5] == size-18` (their `[2:5]` is some other value), so the preheader is only *proven*
+  identical for `.csdr`, where it holds 19,320 / 19,320.
+- §4.3(e) proves the first two stream bytes are *accepted* by the image's own Oodle header reader and
+  names the compressor; it does **not** prove the rest of the stream parses, and no Oodle code was
+  run. `0x8ac80c..0x8ac81c` is a decode hole in the linear disassembly, so the legacy branch of that
+  reader is only partly read.
+- §4.3(f) leaves the preheader/codec boundary open on purpose, and states why it cannot change the
+  port's call shape. Deciding it needs a working Oodle implementation.
 - §6.6 is **withdrawn**; the earlier text is kept above only so the correction is auditable.
 - The claim that compressed members are "live" is **not** re-established here; §1.2 only shows the
   previous argument for it was invalid.

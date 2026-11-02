@@ -50,9 +50,9 @@
 //   * one `callq *0x20(%rax)` (0xa338cb) with %rax = 0x1594dc0 (the command class table); slot
 //     [0x1594dc0 + 0x20] = 0x20d60, the register-once guard. This is the same dispatch shape as
 //     core/fconcmd_object_slot306, which already models it.
-// The 4 x 0xa324c0 calls add eleven more collapsed dispatches each (six in the wrapper, five in the
-// leaf, all through 0x15d1188 slots 0/1/3), so the whole slot performs 4*12 = 48 collapsed
-// dispatches (the eleventh being the row-local destroy above).
+// The 4 x 0xa324c0 calls add 11 collapsed dispatches each (six in the wrapper 0xa324c0, five in the
+// leaf 0xa32680, all through 0x15d1188 slots 0/1/3). With the row-local destroy above that is 12
+// dispatches per language variable, so the whole slot performs 4*12 = 48.
 //
 // The 14 __cxa_atexit records, in body order (site, dtor, object RVA; object offsets are + each
 // field's offset inside Slot316Objects), are kSlot316AtexitRows below: the 8 B pointer cell
@@ -175,10 +175,10 @@ inline constexpr std::uint64_t kSlot316UnlocalizedDtorRva = 0xf7b0;
 // The language-variable constructor pair.
 inline constexpr std::uint64_t kSlot316LanguageVarWrapperRva = 0xa324c0;
 inline constexpr std::size_t kSlot316LanguageVarWrapperSize = 436;   // FDE
-inline constexpr std::size_t kSlot316LanguageVarWrapperInstructions = 99;
+inline constexpr std::size_t kSlot316LanguageVarWrapperInstructions = 98;   // reachable (the FDE ends on a nop)
 inline constexpr std::uint64_t kSlot316LanguageVarLeafRva = 0xa32680;
 inline constexpr std::size_t kSlot316LanguageVarLeafSize = 352;      // FDE
-inline constexpr std::size_t kSlot316LanguageVarLeafInstructions = 90;
+inline constexpr std::size_t kSlot316LanguageVarLeafInstructions = 89;      // reachable (the FDE ends on a nop)
 inline constexpr std::uint64_t kSlot316SharedStrCtorRva = 0xf1a0;
 
 // Identity tags (original vtable address points; never dispatched through here).

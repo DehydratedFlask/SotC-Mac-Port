@@ -2489,6 +2489,13 @@ target_sources(sotc_core PRIVATE core/ctor_slot_316_a33280.cpp)
 add_executable(test_ctor_slot_316 tests/test_ctor_slot_316.cpp)
 target_link_libraries(test_ctor_slot_316 sotc_core)
 add_test(NAME ctor_slot_316 COMMAND test_ctor_slot_316)
+# CPU-01-STARTUP-SLOT-326-CHARACTERIZATION-01: constructor index 326 (0x837f30), the Colossus /
+# Shadow eye-colour debug page (2 bools, 13 float variables, 5 groups, 3 toggles, 12 sliders,
+# 1 kind-0 label row, 36 atexit records).
+target_sources(sotc_core PRIVATE core/ctor_slot_326_837f30.cpp)
+add_executable(test_ctor_slot_326 tests/test_ctor_slot_326.cpp)
+target_link_libraries(test_ctor_slot_326 sotc_core)
+add_test(NAME ctor_slot_326 COMMAND test_ctor_slot_326)
 
 # Parallel-lane fragments: native/lanes/<lane>.cmake. Workers configure with -DSOTC_LANES=<lane>
 # to build only their own fragment; the integrator configures with the default "*" (all lanes).

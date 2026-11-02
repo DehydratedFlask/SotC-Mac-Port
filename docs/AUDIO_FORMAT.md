@@ -214,13 +214,15 @@ codec, and no sampling of these files can produce PCM. `UNKNOWN`: units of `+0x1
 
 ## UNKNOWN — the `SXD2` stream codec
 
-**Partial resolution (E1069, extended by E1074).** The *selector* is now known from pinned code and
-the codec it names is **ATRAC9**; the per-record **configuration word** and the derived stream-block
-geometry are recovered in "RESOLVED — where the ATRAC9 configuration comes from" below. The payload
-itself is still undecoded: the codec's internal frame layout and one validated decode remain open.
-The 45 decompression probes and the MP3 chain test recorded below were run **before** the selector
-was known and none of them should be read as a codec result; they are kept as the negative record.
-Jump to "RESOLVED — the wave-format dispatch" for the new evidence.
+**Partial resolution (E1069, extended by E1074, E1076; codec location closed by E1077).** The
+*selector* is now known from pinned code and the codec it names is **ATRAC9**; the per-record
+**configuration word** and the derived stream-block geometry are recovered in "RESOLVED — where the
+ATRAC9 configuration comes from" below, and "RESOLVED — the ATRAC9 transform is not in this
+executable" proves there is **no decoder to lift in this image**: the transform is inside
+`libSceNgs2`. The payload itself is still undecoded: the codec's internal frame layout and one
+validated decode remain open. The 45 decompression probes and the MP3 chain test recorded below were
+run **before** the selector was known and none of them should be read as a codec result; they are
+kept as the negative record. Jump to "RESOLVED — the wave-format dispatch" for the new evidence.
 
 What was measured:
 
@@ -571,8 +573,8 @@ offsets. **No payload byte and no decoded sample is recorded here.**
 So **the arm is geometry only**: it validates and measures the configuration and returns 0; it
 neither decodes nor calls out to a decoder. The descriptor it produces is handed on by the stream
 path (`0x983970`–`0x983b0f`), which passes `base+0x5f8`/`0x600`, `base+0x5e8`/`0x601` and
-`base+0x5f0`/`0x602` to `0x94b2c0` (call at `0x983b0f`); what that callee does with them is outside
-this task.
+`base+0x5f0`/`0x602` to `0x94b2c0` (call at `0x983b0f`); **what that callee does with them is
+answered in E1077 below** — it is an `sceNgs2VoiceControl` marshaller and never reads the payload.
 
 **7. Nothing about this is in the image.** None of the six words occurs as raw bytes anywhere in the
 pinned ELF (0 hits each), and the R-only RELRO program header (`0x1594000`, filesz `0x6d190`)
@@ -583,20 +585,229 @@ on: the only source is the record.
 gives 256 samples and 240 bytes per column and 1024 samples / 960 bytes per stream block (four
 columns) **for the 6-channel music configuration**; whether a decoder's own frame size matches those
 numbers bit-for-bit is a property of the decoder, not of these bytes, and remains unverified. Whether
-`0x94b2c0` (or an NGS2 rack) ultimately performs the ATRAC9 transform is untouched: the literals
-`maxAtrac9Decoders` (RVA `0x12ac371`) and `VOICE_ALLOC_AT9 %d/%d` (RVA `0x12ac61f`) exist in the
-image, but `maxAtrac9Decoders` has **no** RIP-relative xref and nothing here proves NGS2 is the
-decoder. Duration is now derivable as `blocks × 0x592 / 48000` (for `music.sxd2`: 179,549 × 1024 /
-48,000 = 3,830.4 s of 6-channel material across the 33 waves), but that is arithmetic on the code's
-own bookkeeping, not a measured duration.
+`0x94b2c0` (or an NGS2 rack) ultimately performs the ATRAC9 transform was untouched by E1074: the
+literals `maxAtrac9Decoders` and `VOICE_ALLOC_AT9 %d/%d` (RVA `0x12ac61f`) exist in the image, and
+E1074 read `maxAtrac9Decoders` as having **no** RIP-relative xref. **That reading is withdrawn in
+E1077** — the key starts at `0x12ac36e` (not `0x12ac371`) and is referenced at `0x94876a`; NGS2 *is*
+the decoder host, and `0x94b2c0` is an `sceNgs2VoiceControl` marshaller, not a transform. See
+"RESOLVED — the ATRAC9 transform is not in this executable". Duration is now derivable as
+`blocks × 0x592 / 48000` (for `music.sxd2`: 179,549 × 1024 / 48,000 = 3,830.4 s of 6-channel material
+across the 33 waves), but that is arithmetic on the code's own bookkeeping, not a measured duration.
+
+### RESOLVED — the ATRAC9 transform is not in this executable (E1077)
+
+`STATIC_ANALYSIS_VERIFIED` on the same pinned ELF (`d0723afb…61d3`, image base 0, RVA == address).
+**`0x94b2c0` is not a decoder, not a codec-backend dispatcher and not a stub: it is
+`…\runtime\source\sndx\sndx_engine_ngs2_orbis.c`'s NGS2 voice-parameter marshaller, and it never
+touches one payload byte.** It is the sink the stream path calls at `0x983b0f` and `0x983bd0`.
+
+**1. Extent.** The `.eh_frame` FDE gives `[0x94b2c0, 0x94d8f2)` = **9,778 B** — not inferred from
+control flow: the next FDE starts at `0x94d900` (342 B), the byte at `0x94d8f1` is the trailing
+`nop` of the cold `call __stack_chk_fail` at `0x94d8ec`, and `0x94d8f2..0x94d8ff` is inter-function
+padding. Body: **1,841 instructions in 258 basic blocks**, prologue `push rbp / mov rsp,rbp /
+push r15,r14,r13,r12,rbx / and rsp,-0x20 / sub rsp,0x1e0`, one shared epilogue at `0x94b888`
+(canary test → `0x94d8ec`), one shared `ret` at `0x94b8b0`.
+
+**2. Signature and arguments.** `long f(void *ctx /*rdi*/, int cmd /*esi*/, const void *args /*rdx*/)`.
+`ctx` is `[wave+0x3f0]`. Per-channel state: `0x80(%rdi,i,8)` is the voice object for channel `i` (a
+NULL entry skips that channel), `0x114(%rdi,i)` is a channel→voice index map, and
+`movzbl 0x101(%rdi)` / `movzbl 0x124(%rdi)` are the two per-object counts that bound the per-channel
+loops in different arms (cmd 0 loops on `0x101`, the 7–14 and 17–24 arms loop on `0x124`); a zero
+`0x101` returns 0 immediately at `0x94b302`. `cmd` is bounds-checked `cmp $0x1a / ja` → **27 valid
+commands, 0..26**. `args` is a per-command descriptor whose offsets differ per arm; the stream arm's
+layout is below.
+
+**3. The dispatch table.** `0x12abe20`, 27 self-relative dword entries (`movslq (%r12,%rcx,4),%rcx /
+add %r12,%rcx / jmp *%rcx` at `0x94b326`–`0x94b32f`) landing on **11 distinct targets**, all inside
+the body. Per-arm size is the exclusive-reachable byte count from a control-flow walk from each
+target (`local/validation/AUD-01-AUDIO-FORMAT-01/analysis/reach.py`):
+
+| cmd | target | exclusive B | role (from the arm's own trace literal) |
+|---:|---|---:|---|
+| 0 | `0x94b8b1` | 2,374 | wave-format setup + segment submit; logs `Unsupported waveform type (%d)` and `VOICE_SEGMENT` |
+| 1 | `0x94bd6f` | 2,289 | `VOICE_VOLUME` (`0x94c0b9` → `0x12ac820`) |
+| 2 | `0x94c713` | 339 | `VOICE_PITCH` (`0x94c815` → `0x12ac845`) |
+| 3 | `0x94c866` | 923 | `VOICE_ADSR` (`0x94d350` → `0x12ac866`) |
+| 4, 15, 25, >26 | `0x94c9d1` | 32 | `Unknown parameter (%d)` (`0x12ac8ef`), line `0x109d`, **log code −7**; then `jmp 0x94b886` → `xorl %ecx,%ecx` → **returns 0**, i.e. an unknown command is silent success |
+| 5 | `0x94c9f1` | 258 | `VOICE_FILTER_IO` (`0x94ca0a` → `0x12ac896`) |
+| 6 | `0x94b888` | 0 | the shared epilogue — **no-op** |
+| 7–14 | `0x94b331` | 834 | `VOICE_FILTER` (`0x94b832` → `0x12ac8be`), two-level index through the 11-entry permutation `0x12ae7f0` and the 10-entry `0x12ae820` |
+| 16 | `0x94caf3` | 757 | per-voice state gate over `[ctx+0x80]` |
+| 17–24 | `0x94b357` | 513 | per-voice iteration over `[ctx+0x80 + i*8]` |
+| 26 | `0x94cde8` | 900 | sub-dispatch on `args[8]` ∈ {0,1}; `VOICE_SEGMENT` (`0x94d730` → `0x12ac7e4`); also reads `+0xe8`/`+0xf8`/`+0x108` to index a u16 table at `[args+0xf8]` and submit `0x10000005` as a `float` |
+
+Every arm returns through `0x94b888`, whose `movl %ecx,%eax` makes `eax < 0` the only failure signal
+(the stream path tests `testl %eax,%eax / js` at `0x983b14`); the `−7`/`−8` values at `0x94c9d8` and
+`0x94b994` are **log codes passed to `0x949b80` in `edi`**, not return values.
+
+**4. What cmd 0 does — the whole `.sxd2` path — and what it reads.** The stream caller builds this
+descriptor at `-0x140(%rbp)` and passes it as `args`:
+
+| off | field | set by the stream path |
+|---:|---|---|
+| `+0x00` | `u32` mode | `0` |
+| `+0x04` | `u32` **format byte** (not the format dword) | `[wave+0x579]` |
+| `+0x08` | `u32` bytes per stream block | `[wave+0x596]` |
+| `+0x10` | `u64` **payload pointer** | the reader's buffer |
+| `+0x18` | `u64` **payload length** | this read's byte count |
+| `+0x20` | `u8` end-of-stream | `setbe` |
+| `+0x24` | `u32` samples in this chunk | `mult × blocks` |
+| `+0xd8`/`+0xe0` | cfg1 ptr / count | `0x987950(ctx,[wave+0x5f8])`, `[wave+0x600]` |
+| `+0xe8`/`+0xf0` | cfg2 ptr / count | `0x987950(ctx,[wave+0x5e8])`, `[wave+0x601]` |
+| `+0xf8`/`+0x100` | cfg3 ptr / count | `0x987950(ctx,[wave+0x5f0])`, `[wave+0x602]` |
+| `+0x108` | per-channel table ptr | `[[wave]+0x4b8]` when bit 3 of `[[wave]+0xf2]` is set, else NULL (`0x983aab`–`0x983ac0`) |
+
+**Cmd 0 never reads `+0x10` or `+0x18`.** The only descriptor fields any cmd-0 instruction touches are
+`+0x00` (`0x94b8b1`), `+0x04` (`0x94b936`), `+0xd8` (`0x94ba89`), `+0xe8` (`0x94b916`), `+0xf8`
+(`0x94bc60`) and `+0x100` (`0x94bc3f`) — plus `+0x04` again on the reject path (`0x94b9b1`). So the
+960-byte stream block is **never dereferenced** by `0x94b2c0`; it stays inside the stream object
+`[wave+0x568]` and is consumed by `0x9910e0`. The configuration word supplies only a **number**
+(the waveform-type code below) and an offset.
+
+**5. A second 67-entry format table, and the format→waveform-type map.** Cmd 0 does its own
+`movl 0x4(%r12),%r8d / cmpq $0x42 / ja default / lea 0x12abeb0 / movslq / add / jmp *%rsi`
+(`0x94b936`–`0x94b978`). This table is **not** the geometry table `0x12b5410`: it has 22 distinct
+targets against that table's 10, it accepts format `0x28` and `0x30`–`0x35` and **rejects `0x22`**,
+which the geometry table accepts. It maps the format byte onto an internal waveform-type code:
+
+| format | code | format | code | format | code |
+|---:|---:|---:|---:|---:|---:|
+| `0x00` | `0x11` | `0x0C` | `0x16` | `0x20`,`0x21` | `0x1c` |
+| `0x01` | `0x10` | `0x0D` | `0x17` | `0x28` | `0x87` |
+| `0x04` | `0x12` | `0x10` | `0x18` | `0x30`–`0x35` | `0x81`–`0x86` |
+| `0x05` | `0x13` | `0x11` | `0x19` | **`0x42`** | **`0x40`** |
+| `0x08` | `0x14` | `0x14` | `0x1a` | everything else | `0x80` + `Unsupported waveform type (%d)` |
+| `0x09` | `0x15` | `0x15` | `0x1b` | | |
+
+The code is written as the **first payload dword of NGS2 parameter `0x10000000`**. The reject arm
+logs at line `0xcba` and *continues* with code `0x80`; it does not abort.
+
+**6. It is a parameter marshaller, and its import set proves it.** `0x94b2c0` makes **74 direct calls
+to 18 targets and 0 indirect calls** (no `call *`, no `jmp *` except the two dispatch tables). Exactly
+two of the targets are PLT stubs, resolved through the GOT:
+
+| stub | GOT slot | import |
+|---|---|---|
+| `0xf91410` | `0x1600ff8` | **`sceNgs2RackGetVoiceHandle`** (libSceNgs2, `MwmHz8pAdAo`) |
+| `0xf91460` | `0x1601020` | **`sceNgs2VoiceControl`** (libSceNgs2, `uu94irFOGpA`) |
+
+plus `0xf8f3a0` = `__stack_chk_fail`. The other 15 targets are local helpers, all ≤ 1,277 B
+(`0x9a9270` 1,277; `0x9a8390` 764; `0x9549e0` 631; `0x94dc50` 577; …). Each submission builds an NGS2
+parameter block `{u16 thisSize; u16 nextOffset; u32 paramId; payload…}` and calls
+`sceNgs2VoiceControl(handle, block)`. Observed `paramId`s: `0x10000000`, `0x10000001`, `0x10000003`,
+`0x10000005`, `0x10000006`, `0x10000007`, `0x10000008`, `0x1000000a`; sizes `0x10`/`0x18`/`0x20`/`0x28`/`0x30`.
+The voice handle always comes from `sceNgs2RackGetVoiceHandle(rack = [[0x32950b8]+0x78], id = [voice+8])`.
+**The 0x28-byte `0x10000000` block carries no pointer**: six dwords — code, an index, the block byte
+count, the bytes-per-superframe offset, a flag and `0`. No cmd-0 block carries a 64-bit payload
+address. (`0x10000001`, the `VOICE_SEGMENT` block, *does* carry two pointers — `[ctx+0x80+i*8]` and a
+stack structure at `-0x1a0` — but it belongs to cmd 26, which `0x9838b0` never calls.)
+
+**6b. Its callers — 13 sites, two functions.** Image-wide byte census (`e8`/`e9`/qword, over both
+file-backed `PT_LOAD`s): **13 `e8` calls, 0 `e9` jumps, 0 raw qwords**. Eleven are in `0x981aa0`
+(FDE 6,015 B) and two in `0x9838b0`:
+
+| site | `cmd` | caller | on the `.sxd2` path? |
+|---|---:|---|---|
+| `0x982243` | 0 | `0x981aa0` | no — in-memory/resident wave setup |
+| `0x9822a5` | 3 | `0x981aa0` | no |
+| `0x9822b6` | 6 | `0x981aa0` | no (cmd 6 is the no-op epilogue) |
+| `0x9822c5` | `0x10` | `0x981aa0` | no |
+| `0x9825f8` | 0 | `0x981aa0` | no |
+| `0x98298d` | 1 | `0x981aa0` | no |
+| `0x982a6e` | 2 | `0x981aa0` | no |
+| `0x982ac4` | 5 | `0x981aa0` | no |
+| `0x982b79` | `rbx-0x1c` (dynamic) | `0x981aa0` | no |
+| `0x982bfe` | `rbx-0x3a` (dynamic) | `0x981aa0` | no |
+| `0x982cca` | `0x1a` | `0x981aa0` | no |
+| **`0x983b0f`** | **0** | **`0x9838b0`** | **yes** — the per-block submit |
+| **`0x983bd0`** | **0** | **`0x9838b0`** | **yes** — the `0x588` "stopped" arm, with all six config pointers zeroed |
+
+So exactly **two of the thirteen** calls are on the streamed `.sxd2` path, both with `cmd 0`. `0x981aa0`
+also calls the stream worker `0x9838b0` once, so it is the shared sndx player entry, not a separate
+codec route. `cmd 0` is the **only arm that uses `+0x04` as a wave-format byte** (cmd 3 and the 7–14
+group read that offset as a plain integer). The only *other* arm that touches the configuration pairs
+is cmd 26 — it reads `+0xe8`/`+0xf8`/`+0x108` to look up a u16 at `[args+0xf8] + byte(args+0x108) +
+byte(args+0xe8, i, 8)` and submit it as the `float` payload of `0x10000005` (`0x94d0e9`–`0x94d192`) —
+and `0x9838b0` never calls cmd 26.
+
+**7. The one place ATRAC9 arithmetic appears a second time — still no transform.** `0x9a8390`
+(764 B) is private: its **4 call sites are all inside `0x94b2c0`** (`0x94b8f1` in cmd 0,
+`0x94d06c`, `0x94d5d2`, `0x94d850`). It re-applies the *same* config-word arithmetic as `0x98413e` —
+`bextr` controls `0x311` (start 17, len 3), `0xb05` (start 5, len 11) and `1 << ((cfg>>3)&3)` — and
+indexes a byte table at **`0x12b89b5` = `01 02 02 06 08 04 00 00`, byte-identical to `0x12b5720`**.
+It returns `{u32 frames_to_skip, u32 frame_index, u32 cfg_index, u32 byte_offset, u32 bytes_remaining,
+u32 config_word}`. It computes **where in the block a channel's frame sits**, not what it means. The
+`bextr` pair occurs at **exactly two functions image-wide** (`0x983ea0`, `0x9a8390`); there is no
+third site. Its `format == 0x42` branch needs `args+0xe8`/`+0xf0` (config2, field `0x0C`), which is
+absent from all 830 records, so for this corpus it returns **−1 with a zeroed out-struct**
+(`0x9a850c`) — the offset therefore starts at 0 and the arm continues.
+
+**8. Where the transform actually is: inside libSceNgs2.** The backend initialiser `0x9485a0`
+(FDE 5,586 B, same translation unit — `0x949b80` hardcodes `sndx_engine_ngs2_orbis.c` at `0x949c25`)
+does, in order:
+
+- `sceSysmoduleLoadModule(0xa7)` at `0x948670` → logs **` Loaded Audio3d module`** (`0x12ac2f5`);
+  `sceSysmoduleLoadModule(0xb)` at `0x9486b7` → logs **` Loaded NGS2 module`** (`0x12ac32e`). The
+  two "Failed to load …" siblings are `0x12ac2d1` and `0x12ac30d`, so the ids are named by the code's
+  own text: **`0xb` is NGS2**.
+- reads its options by string key through `0x959eb0`: `numGrains` (`0x12ac343`), `enableACP`
+  (`0x12ac34d`), `numDecoderMemoryBlocks` (`0x12ac357`, default 0, clamped ≤ 16), **`maxAtrac9Decoders`**
+  (`0x12ac36e`, default `0x100`, clamped ≤ `0x400`), `maxVoiceChannels` (`0x12ac380`),
+  `maxSubmixers` (`0x12ac391`).
+- builds `numGrains=%d numVoices=%d numDecoders=%d numVoiceEnvelopes=4 numDecoderMemoryBlocks=%d`
+  (`0x12ac4b9`) from exactly those four values — `numDecoders` is `maxAtrac9Decoders`.
+- `sceNgs2SystemCreateWithAllocator(&opt, [[0x2dce838]], &system)` at `0x94932e` with the system name
+  `"NGS2"` (`0x12ac56c`) and `numGrains`;
+  `sceNgs2RackCreateWithAllocator` at `0x9493f8` (rack `0x3000`, name `Master`), `0x9494a8`
+  (`0x2000`, `Pre Master`), `0x949581` (`0x1000`, `Sampler`), `0x94965f` (`0x2000`, `Dynam`), from
+  the rack-description blobs at `0x12ae088`…`0x12ae288` and those four literals at
+  `0x12ac571`/`0x12ac578`/`0x12ac583`/`0x12ac58b`. **The `maxAtrac9Decoders` value is written into
+  the `Sampler` (`0x1000`) rack option at `-0xcc`/`-0xb4` only when `enableACP != 0`**
+  (`0x9494d8 cmpl $0x0,-0x600(%rbp) / je`); on the `enableACP == 0` path those two fields keep the
+  constants from the description blob, and `-0xc8` is set to a literal `0x10`.
+- allocates the decoder/voice **slot pools** with `0x9a7220(alloc, index, stride, count, dtor)`:
+  `(…, 0, 0xc8, maxAtrac9Decoders, 0x949d50)` and `(…, 1, 0xc8, maxVoiceChannels, 0x949dc0)`. Each
+  slot is **200 B** and its only behaviour is the destructor's log — `0x949d50` does nothing but emit
+  `VOICE_FREE_DECODER %d` (`0x12ac98d`) and return. A 200-byte object cannot hold an ATRAC9 decoder.
+
+**Correction to E1074/E1076 (measured, not re-read).** `maxAtrac9Decoders` **does** have a
+RIP-relative xref: **`0x94876a`**. The earlier "no xref" was scanned at `0x12ac371`, which is the
+*second* character of the string — the key starts at `0x12ac36e`. Every neighbouring key resolves the
+same way (`0x9486e0`, `0x948701`, `0x948729`, `0x948797`, `0x9487c6`), so the negative was an
+addressing slip, not a missing reference.
+
+**9. Answer: a decode is NOT reachable from this executable.** The chain closes:
+
+1. The `.sxd2` stream path (`0x9838b0`) is the only place a 960-byte block and the ATRAC9
+   configuration word meet, and it hands both to `0x94b2c0` as `cmd 0`.
+2. `0x94b2c0` cmd 0 reads only `+0x00/+0x04/+0xd8/+0xe8/+0xf8/+0x100` of that descriptor — **never the
+   payload pointer, never the length** — maps the format byte to a small integer, and submits scalar
+   NGS2 parameters.
+3. `[wave+0x5f8]` (the arena offset that carries the configuration word) is read at exactly **five**
+   sites image-wide: `0x981d58`, `0x981edd`, `0x982552` (all in `0x981aa0`), `0x983a38` (the stream
+   path) and `0x984145` (the geometry arm). All five feed either a descriptor for `0x94b2c0` or the
+   geometry finaliser. None is a transform.
+4. No ATRAC9 code exists to call: the image's **34 imported libraries / 588 imports contain no
+   codec library at all** — `libSceAudiocodec`, `libSceAjm` and any AT9 entry point are absent, so
+   this is not the "system library reached by import" case either; the decode is behind
+   `sceNgs2VoiceControl` inside `libSceNgs2`, reached by loading sysmodule `0xb`.
+
+**Inference (labelled).** That `libSceNgs2` performs the ATRAC9 transform is the only reading
+consistent with 1–4, and the title's own code names the resource (`maxAtrac9Decoders`,
+`VOICE_ALLOC_AT9 %d/%d` at `0x12ac61f`, xref `0x94a7b5`) — but the codec itself is **outside the
+image** and cannot be verified from these bytes. **Consequence for the port (not a claim):** because
+`libSceNgs2` is a forbidden runtime dependency, an ATRAC9 decoder must be written natively; there is
+no decoder to lift. `0x94b2c0` is the exact contract such a native decoder has to sit behind, and
+`0x9a8390` is the exact per-channel block-offset function it must agree with.
 
 ### Exact next measurements
 
-1. ~~**Has ATRAC9 been ruled out as "reached only through a system library"?**~~ **ANSWERED (E1074).**
-   `0x983ea0`'s ATRAC9 arm calls only `0x987950` (twice), `0x983cf0` (message logger) and `0xf8f3a0`
-   (stack canary), and tail-jumps to `0x9840f8`; it contains no decode and no import. The geometry is
-   consumed later by the stream path, which hands the configuration pointers to `0x94b2c0`. Where the
-   transform itself happens is still open.
+1. ~~**Has ATRAC9 been ruled out as "reached only through a system library"?**~~ **ANSWERED
+   (E1074, closed by E1077).** `0x983ea0`'s ATRAC9 arm calls only `0x987950` (twice), `0x983cf0`
+   (message logger) and `0xf8f3a0` (stack canary), and tail-jumps to `0x9840f8`; it contains no decode
+   and no import. The geometry is consumed by the stream path, which hands the configuration pointers
+   to `0x94b2c0` — and `0x94b2c0` only marshals NGS2 parameters (see "RESOLVED — the ATRAC9 transform
+   is not in this executable"). The transform is inside `libSceNgs2`, loaded as sysmodule `0xb`.
 2. ~~**Recover the ATRAC9 configuration word.**~~ **ANSWERED (E1074).** `0x987950` is
    `id ? [ctx+0x20] + id : inline`, and `[wave+0x5f8]` is written by the record field parser from
    field `0x0A`. `music.sxd1` is 33/33 at `0xFE761DF0`; the corpus uses six words, listed above.
@@ -616,9 +827,9 @@ own bookkeeping, not a measured duration.
 | Unknown | Next measurement |
 |---|---|
 | `SXDS` `+0x08` field (33/125/127/172/53) | Read the first access to payload offset 0 in the registrar `0x985900` after the chunk scan; test against all five files |
-| 960-byte block prefix fields (bytes 0–5) | The block is four 240-byte frames by the code's arithmetic, but entropy minima sit at 242/481/720 (E1076, unexplained); next, disassemble `0x94b2c0` (the callee the stream path hands `base+0x5f8`/`0x600` to) and check whether it re-derives a bit-level frame boundary |
+| 960-byte block prefix fields (bytes 0–5) | The block is four 240-byte frames by the code's arithmetic, but entropy minima sit at 242/481/720 (E1076, unexplained); **`0x94b2c0` is now excluded as the boundary-finder** (E1077: it never dereferences the block), so the next step is the stream object's own reader (`0x990fe0`/`0x9910e0`, 254/259 B) and the NGS2 side |
 | Producers of setup-spec kinds 1 and 2 (`spec[+0x28]`, inline config at `spec+0x38/+0x3c/+0x40`) | Resolve the virtual call into `0x980620` (vtable `0x2dd0900`, slot `0x2dd09c8`); matters only for non-WAVE content |
-| Where the ATRAC9 transform executes | `0x94b2c0` is a local function with 13 callers; `maxAtrac9Decoders` (`0x12ac371`) and `VOICE_ALLOC_AT9 %d/%d` (`0x12ac61f`) exist but the first has no RIP-relative xref. Trace `0x94b2c0` and the NGS2 rack configuration; nothing here proves NGS2 is the decoder |
+| ~~Where the ATRAC9 transform executes~~ | **ANSWERED (E1077).** Not in the image. `0x94b2c0` is `sndx_engine_ngs2_orbis.c`'s `sceNgs2VoiceControl` marshaller (only 2 imports, 0 indirect calls, never reads the payload); the backend loads sysmodule `0xb` = NGS2 and configures `maxAtrac9Decoders` (xref `0x94876a`). The transform is behind `libSceNgs2`. A native decoder must be **written**, not lifted; `0x94b2c0` cmd 0 and `0x9a8390` are the contract to match |
 | `SShd` sample directory (names/offsets/loops) | Complete the registrar at `0xb1f013`; the tables at `+0x10..0x24` are relative offsets and `+0x34`/`+0x38` become u16-array pointers |
 | `.sxd` `DATA` chunk codec (26 banks, 313 MB) | Same method as `SXD2`; `com_sys.sxd` DATA has 7.37 bits/byte and no 16-byte framing, so it is not the `.bd` format |
 | Whether the game reaches any of this at runtime | No runtime evidence exists; a decoded buffer alone would not prove playback |
@@ -665,6 +876,19 @@ Helper used to walk the pinned disassembly while tracing (`fde` / `str` / `xref`
 python3 -I local/validation/AUD-01-AUDIO-FORMAT-01/analysis/trace_sxd2.py fde 0x983ea0
 ```
 
+Structural probes for `0x94b2c0` (E1077; all read-only, none writes a payload byte):
+
+```sh
+python3 -I local/validation/AUD-01-AUDIO-FORMAT-01/analysis/probe_94b2c0.py fde   0x94b2c0
+python3 -I local/validation/AUD-01-AUDIO-FORMAT-01/analysis/probe_94b2c0.py table 0x12abe20 27
+python3 -I local/validation/AUD-01-AUDIO-FORMAT-01/analysis/probe_94b2c0.py table 0x12abeb0 67
+python3 -I local/validation/AUD-01-AUDIO-FORMAT-01/analysis/census_calls.py  0x94b2c0    # 13 e8, 0 e9, 0 qwords
+python3 -I local/validation/AUD-01-AUDIO-FORMAT-01/analysis/dump_body.py     0x94b2c0 0x94d8f2
+python3 -I local/validation/AUD-01-AUDIO-FORMAT-01/analysis/blocks.py        0x94b2c0 0x94d8f2
+python3 -I local/validation/AUD-01-AUDIO-FORMAT-01/analysis/reach.py         0x94b2c0 0x94d8f2 \
+    0x94b8b1 0x94bd6f 0x94c713 0x94c866 0x94c9d1 0x94c9f1 0x94b331 0x94b357 0x94caf3 0x94cde8
+```
+
 Bank inspector (synthetic self-test, then a real pair):
 
 ```sh
@@ -698,7 +922,18 @@ python3 -I tools/dev/se_bank_inspect.py --hd "…/cp3shadow/sound/se/bridge.hd" 
   and a `bits[19:17]` count that equals the channel count), not decoder-verified structures.
 - The `sceSndxInstanceWriteStreamData` route is **refuted**, not merely untested: that function is
   unreachable in this image. Do not re-open the "trace the stream-buffer producer" plan.
+- The ATRAC9 **transform** is **not in this executable** (E1077, `STATIC_ANALYSIS_VERIFIED`): the
+  stream path's only sink, `0x94b2c0`, is an `sceNgs2VoiceControl` marshaller that never reads the
+  payload pointer or length, no codec library is imported at all, and the backend loads
+  `libSceNgs2` as sysmodule `0xb`. What `libSceNgs2` does with waveform-type code `0x40` is **outside
+  the image** and is not claimed: "ATRAC9 decode happens in NGS2" is a labelled inference from the
+  absence of any alternative plus the `maxAtrac9Decoders`/`VOICE_ALLOC_AT9` bookkeeping, not a
+  measured codec behaviour. The port therefore has **no decoder to lift**.
+- `0x9a8390`'s `format == 0x42` branch is only exercised with config2 (field `0x0C`) present, which
+  never happens in this corpus; for all 566 records it returns −1 and a zeroed out-struct. What the
+  arm does with a non-null config2 is **unread beyond the arithmetic** and is not claimed.
 - G2 (decoded/mixed audio fixtures) is **not** advanced to a pass by this note; it adds a proven
   bank codec, a proven stream container, a proved codec selector, a recovered per-record ATRAC9
-  configuration and a derived stream-block geometry. The decode itself is still absent.
+  configuration, a derived stream-block geometry and a proved **negative** on decoder reachability.
+  The decode itself is still absent.
 

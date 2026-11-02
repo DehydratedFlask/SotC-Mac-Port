@@ -133,8 +133,8 @@ inline constexpr std::size_t kSlot314StoreTargets = 56;
 inline constexpr std::uint64_t kSlot314TableTopRva = 0x2dd70e0;    // index i at TOP - 8*i
 inline constexpr std::uint64_t kSlot314TableWordRva = 0x2dd6710;   // 0x2dd70e0 - 314*8
 inline constexpr std::uint32_t kSlot314TableIndex = 314;
-inline constexpr std::uint32_t kSlot314NextUnrecoveredIndex = 316;     // 316 / 0xa33280
-inline constexpr std::uint64_t kSlot314NextUnrecoveredRva = 0xa33280;
+inline constexpr std::uint32_t kSlot314NextUnrecoveredIndex = 329;     // 329 / 0x829e90
+inline constexpr std::uint64_t kSlot314NextUnrecoveredRva = 0x829e90;
 
 // Frame / guard.
 inline constexpr std::uint64_t kSlot314CanaryCellRva = 0x15fe518;   // GOT cell holding &__stack_chk_guard

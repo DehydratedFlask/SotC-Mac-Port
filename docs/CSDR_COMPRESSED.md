@@ -1,6 +1,15 @@
 # Compressed `.csdr` container (8c06 / 8c0a / cc**): structure stats, codec unknown
 
-Status: **UNKNOWN codec**. This note records what a bounded probe measured and what it ruled out.
+> **SUPERSEDED 2026-11-01 (E1075, csdr checkpoints).** The codec is no longer unknown: the members are
+> **Oodle LZ** streams (Mermaid `8c0a`, Kraken `8c06`), expanded by the single `OodleLZ_Decompress`
+> call at `0x1aa426`. The `[2:4]` field is **not** a size/256 block count; it is the big-endian chunk
+> header and equals `compLen − 1`. No `0xcc`-prefixed `.csdr` exists in any scanned archive, so the
+> `cc0a` row below does not reproduce. Authoritative layout:
+> [csdr-b0cc50-expansion](checkpoints/2026-11-01-csdr-b0cc50-expansion.md) and
+> [csdr-1aa2a0-callers](checkpoints/2026-11-01-csdr-1aa2a0-callers.md). Everything below is kept as the
+> historical probe record. No member has been decoded (`NOT RUN`).
+
+Status (historical): **UNKNOWN codec**. This note records what a bounded probe measured and what it ruled out.
 It does not claim a format, a decoder or a readable member share.
 
 - Task: `GPU-01-MSL-OFFLINE-01` (compressed-container card).

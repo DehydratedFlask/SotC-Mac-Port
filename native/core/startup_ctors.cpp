@@ -456,6 +456,17 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
          }},
         {0x83d800, 324, [](StartupState& s) noexcept { init_leaf_83d800(s.leaf_83d800); }},
         {0x839f00, 325, [](StartupState& s) noexcept { if (!init_slot325_839f00(s.slot325, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
+        // idx 326 / 0x837f30: the Colossus / Shadow eye-colour debug page -- two console bools, one
+        // threshold float, twelve eye-colour floats ("Colossus" group with three toggles, "Shadow Eye
+        // Color" group with a kind-0 "MenuSeparator" row and three sub-groups of four sliders), 36
+        // __cxa_atexit records. Every callee runs through a native model; the only stand-in is the
+        // 0xf1a0 allocator of the label row, and any failed stage is a visible startup failure.
+        {0x837f30, 326, [](StartupState& s) noexcept {
+             const Slot326Hooks hooks = default_slot326_hooks();
+             s.slot326_result = init_slot326_837f30(s.slot326, s.slot326_eye_values, s.concmd,
+                                                    s.debug_menu, hooks);
+             if (!s.slot326_result.ok) s.init_failed = true;
+         }},
         {0x836330, 327, [](StartupState& s) noexcept { if (!init_slot327_836330(s.slot327, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
         {0x82e040, 328, [](StartupState& s) noexcept { if (!init_slot328_82e040(s.slot328, s.concmd).ok) s.init_failed = true; }},
         {0x810a50, 330, [](StartupState& s) noexcept { if (!init_slot330_810a50(s.slot330, s.concmd).ok) s.init_failed = true; }},
