@@ -2,7 +2,7 @@
 //
 // Proves that every lifted vec_*/leaf_* constructor module runs in recovered_constructors(), that
 // the registered rows pair with the pinned original table, and that the remaining startup cliff is
-// explicit (first unrecovered index 316 / RVA 0xa33280).
+// explicit (first unrecovered index 326 / RVA 0x837f30, after slot 316 landed).
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -42,7 +42,7 @@ int main() {
     CHECK(result.blocked_on_rva == 0);
     CHECK(!st.init_failed);
     CHECK(result.completed == slots.size());
-    CHECK(slots.size() == 452);
+    CHECK(slots.size() == 453);
 
     // Every registered row is in original order and pairs with the pinned table.
     for (std::size_t i = 0; i < slots.size(); ++i) {
@@ -53,9 +53,9 @@ int main() {
     }
 
     // ---- explicit, machine-checked gap ---------------------------------------
-    CHECK(first_unrecovered_constructor_index() == 316);
-    CHECK(first_unrecovered_constructor_rva() == 0xa33280);
-    CHECK(slots.size() + 121 == kOriginalCtorCount);
+    CHECK(first_unrecovered_constructor_index() == 326);
+    CHECK(first_unrecovered_constructor_rva() == 0x837f30);
+    CHECK(slots.size() + 120 == kOriginalCtorCount);
 
     // ---- CPU-01-STARTUP-LEAF-ROWS-315-560-01 -------------------------------
     CHECK(st.slot315_cell == 0);
@@ -116,10 +116,10 @@ int main() {
     CHECK(st.slot303.var.default_value == 0 && st.slot303.var.fn_vptr == 0x15d2478);
     CHECK(st.slot303.item.target == &st.slot303.var && st.slot303.item.flags == 0x30);
     CHECK(st.concmd.manager.manager == nullptr);
-    CHECK(st.concmd.pending.size() == 124);                      // observed: 114 through slot 312 + slot 314's 10 variables
+    CHECK(st.concmd.pending.size() == 130);                      // observed: 114 through slot 312 + 10 (slot 314) + 6 (slot 316)
     CHECK(st.concmd.pending.first() == &st.slot298_shader_type.base.pending);
-    CHECK(st.debug_menu.root.count == 78);                      // observed: 68 through slot 312 + slot 314's 10 toggles
-    CHECK(st.concmd.atexit_log.size() == 310);                  // observed: 288 through slot 312 + slot 314's 22 records
+    CHECK(st.debug_menu.root.count == 84);                      // observed: 68 through slot 312 + 10 (slot 314) + 6 (slot 316)
+    CHECK(st.concmd.atexit_log.size() == 324);                  // observed: 288 through slot 312 + 22 (slot 314) + 14 (slot 316)
                                                                 // (the menu root was already initialised, so
                                                                 //  0x268b0 records nothing new here)
     for (std::size_t i = 0; i < kSlot302HandleCount; ++i) {
@@ -183,6 +183,23 @@ int main() {
     CHECK(st.slot312.toggle_region.target == &st.slot312.region);
     CHECK(st.slot312.group.kind == 1 && st.slot312.toggle_sku.kind == 2);
     CHECK(st.slot312.record.word38 == 0xffffffffu && st.slot312.record.word3c == 0x72);
+
+    // ---- CPU-01-STARTUP-SLOT-316-CHARACTERIZATION-01: idx 316, the Localization block -------------
+    CHECK(st.slot316_result.ok && st.slot316_result.atexit_records == 14);
+    CHECK(st.slot316_result.functors_destroyed == 4 && st.slot316_result.functor_dispatches == 48);
+    CHECK(st.slot316_result.vars_built == 6 && st.slot316_result.menu_items == 6);
+    CHECK(st.slot316.var_text.base.vptr == 0x15d11b8 && st.slot316.var_text.base.registered == 1);
+    CHECK(st.slot316.var_text.value == 0xffffffffu && st.slot316.var_text.default_value == 0xffffffffu);
+    CHECK(st.slot316.var_text.fn_vptr == 0x15d1188 && st.slot316.var_text.args[1] == 0xa324a0);
+    CHECK(st.slot316.var_system.args[3] == 0xa2ca10);
+    CHECK(st.slot316.var_english.base.vptr == kBoolVarFinalVptr && st.slot316.var_english.value == 0);
+    CHECK(st.slot316.command.base.vptr == 0x1594dd0 && st.slot316.command.base.flags == 2);
+    CHECK(st.slot316.command.delegate.handler == 0xa2cad0);
+    CHECK(st.slot316.item_text.target == &st.slot316.var_text &&
+          st.slot316.item_reload.target == &st.slot316.command);
+    CHECK(st.slot316.item_text.kind == 2 && st.slot316.item_text.flags == 0x30);
+    CHECK(st.slot316.unlocalized.size == 17 &&
+          std::memcmp(st.slot316.unlocalized.data, "!!!Unlocalized!!!", 17) == 0);
 
     std::puts("startup_ctor_coverage: all checks passed");
     return 0;

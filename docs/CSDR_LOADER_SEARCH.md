@@ -268,10 +268,157 @@ this analysis**; what is proven is the 14-argument, 8-stack-slot call shape abov
 
 **What this does and does not prove.** It proves a *generic, tag-dispatched Oodle decompression entry
 point exists in game-reachable code* — not a library-internal one — and that Ghidra's "0 callers" was
-a coverage artefact hiding four of that function's six cases. It does **not** prove the entry point is
-reached from `.csdr`: `FUN_001aa2a0`'s own callers and the meaning of the three-bit tag are both
-still open. The tag space is small (6 cases), so one of them being "decompress a `csdr` member" is a
-plausible but unproven reading.
+a coverage artefact hiding four of that function's six cases. On its own this paragraph does **not**
+prove the entry point is reached from `.csdr`; §4.2 closes that edge with the caller, the trailer
+format and a whole-corpus census.
+
+### 4.2 The owner is `bpe::Compression::Decompress`, and it *is* the `.csdr` expander
+
+Everything below is `STATIC_ANALYSIS_VERIFIED` against the pinned image and the pinned corpus. **No
+member was decompressed, no guest instruction ran, and nothing here is a rendering claim.**
+
+#### (a) The function: extent from the bytes and from `.eh_frame`
+
+| Fact | Value |
+|---|---|
+| entry (`push rbp; mov rbp,rsp; push r15,r14,r13,r12,rbx; sub rsp,0x38`) | `0x1aa2a0` |
+| single epilogue `0x1aa42f..0x1aa463` (restores `RBX/R12/R13/R14/R15/RBP`, stack-cookie compare, `ret` at `0x1aa463`) | `0x1aa42f` |
+| cold tail `call __stack_chk_fail` (`0x1aa464`, 5 B) | ends `0x1aa469` |
+| **`.eh_frame` FDE** (file offset `0x135cccc`: `length 0x20`, `cie_ptr 0x178`, `pc_begin 0x1aa2a0`, `pc_range 0x1ca`) | **`[0x1aa2a0, 0x1aa46a)` = 458 B** |
+| hot body, prologue → `ret` | **452 B** |
+
+So the extent is **not** only inferred from control flow: an FDE really does claim the address — it
+starts at `0x1aa2a0` and spans 458 bytes, which *is* `0x1aa351..0x1aa42e` plus the prologue, the
+other four case bodies and the epilogue. What Ghidra lacked was not the boundary but the body:
+auto-analysis never followed the switch table at `0xfadd4c`, so `FUN_001aa2a0` was split into two
+discontiguous ranges totalling 235 B and the four case bodies (`0x1aa351`, `0x1aa35c`, `0x1aa3dc`,
+`0x1aa3f5`) were never decoded. The `0x1aa2a0..0x1aa468` / 456 B figure in §4.1 counts to two bytes
+inside the last instruction; the measured FDE range is 458 B and the last instruction ends at
+`0x1aa469`.
+
+#### (b) The identity: `bpe::Compression::Decompress`, `Core/Util/Compression.cpp`
+
+The body carries its own assert metadata, all three literals referenced from inside the function:
+
+| Address | String |
+|---|---|
+| `0xfadd6c` | `d:\dev\cp10\Main\Code\BPE\Source\Core\Util\Compression.cpp` |
+| `0xfadda7` | `static size_t bpe::Compression::Decompress(const bpe::Compression::CompressionHeader &, const void *, size_t, void *, size_t)` |
+| `0xfade25` | `Extracting a non-compressed buffer, use Compression::GetUncompressedData() instead!` |
+
+The same translation unit supplies `0x1aa0b0` (`CompressionHeader::CompressionHeader()`, `*h = 0`),
+`0x1aa210` (`0x1fffffff < *h`, the "is compressed" test), `0x1aa260` (uncompressed size), and
+`0x1aa040/0x1aa070/0x1aa0c0/0x1aa0e0/0x1aa160` (compressor-side helpers). So the one Oodle call site
+in the image lives in the engine's **generic compression wrapper**, not in Oodle's own code and not
+in a shader-specific reader.
+
+#### (c) The six cases, resolved to codecs
+
+| type = `*h >> 29` | case entry | what it does |
+|---:|---|---|
+| 0 | `0x1aa35c` | logs `0xfade25`, then `memcpy(dst, compBuf, *h & 0x1fffffff)` (`0xf8f470` is the `memcpy` thunk) — **stored, uncompressed** |
+| 1 | `0x1aa3dc` | `0x1b9130(dst, &len, compBuf, compLen)` → `inflateInit_(&strm, "1.2.3", 0x58)` + `inflate(&strm, 4)` — **zlib 1.2.3** |
+| 2, 3, 4 | `0x1aa351` | `MOV R8D,1` → `OodleLZ_Decompress(..., fuzzSafe = 1)` |
+| 5 | `0x1aa3f5` | `MOV R8D,0` → `OodleLZ_Decompress(..., fuzzSafe = 0)`; `0x1aa260` case 5 also asks Oodle (`0x89dad0`) for the size instead of masking it out of the header |
+
+The argument mapping is now **proven**, not inferred from the public signature: the case body loads
+`RDI = R15` (incoming `RSI`), `RSI = R12` (incoming `RDX`), `RDX = [RBP-0x60]` (incoming `RCX`),
+`RCX = RBX` (`*h & 0x1fffffff`), `R9D = 0`, and pushes eight slots whose last-pushed (first stack
+argument) is `0`; the two non-zero slots are `[0x2ee6720]` (`decoderMemory`, an allocation from
+`FUN_00017090`) and `[0x2ee6748]` (`decoderMemorySize`, `FUN_0089b980(-1,-1)`), and the top slot is
+`3` = Oodle's `ThreadPhase_Unthreaded`. `checkCRC` is 0.
+
+#### (d) The single caller is `ResourceFactory::CreateResource`
+
+`0x1aa2a0` has exactly **one** direct call in the image, at `0x147257`, inside `FUN_00147160` =
+**`ResourceFactory::CreateResource(uintptr)`** (own assert metadata: `0xfa97d1`
+`void ResourceFactory::CreateResource(uintptr)`, `0xfa944a`
+`…\Engine\Resource\ResourceFactory.cpp`). The decompiled body is unambiguous:
+
+```c
+lVar1 = *param_2;                              /* ResourceWrapper                       */
+lVar6 = FUN_0014c000(param_2);                 /* compBuf = loader+0x90  (whole file)    */
+lVar9 = param_2[0x10];                         /* compLen = loader+0x80  (= filelen-12)  */
+if ((*(byte *)(lVar2 + 0x70) & 8) != 0) {      /* wrapper flags                          */
+  if (FUN_001aa210(param_2 + 0x1e)) {          /* IsCompressed(loader+0xf0)              */
+    uVar7 = FUN_001aa260(param_2 + 0x1e);      /* rawLen = trailing word & 0x1fffffff    */
+    lVar8 = FUN_00012820(uVar7, 1, *(u32 *)(lVar2 + 0x54), 0);   /* 8-byte aligned alloc */
+    lVar9 = FUN_001aa2a0(param_2 + 0x1e, lVar6, lVar9, lVar8, uVar7);
+```
+
+The expanded buffer then goes through `FUN_0008dc30`/`FUN_00144880` into the resource object ctor,
+which for the `csdr` type is the descriptor's `+0x78` entry `FUN_00b0d4a0` → `FUN_00b0ced0`
+(allocates 0x88 B and parses a table of `0xe4`-byte shader records).
+
+#### (e) Where `loader+0xf0` comes from: a 12-byte trailer, proven on the whole corpus
+
+`ResourceFactory::PrepareNextResourceToLoad` (`0x146ea0`) reaches `FUN_0014aee0(loader, typeEntry)`,
+which opens the file named by the type's `+0x48` callback — for `csdr` that is `FUN_00b0cc50`, and the
+call is visible in raw bytes at `0x14ba2f` (`callq *0x48(%rcx)` with `rcx = *(r15+8)`, the type
+entry). `movq $0xc, 0xe0(%rbx)` at `0x14af2d` then sets a **12-byte** tail for any type whose
+descriptor flags carry bit 3; the `csdr` descriptor sets that bit (`orb $0x8` at `0xb0d447`).
+
+`FUN_0014b980` (read completion) executes, verbatim:
+
+```
+0x14b9da  leaq 0xe8(%r15),%rax      ; dst = &loader+0xe8
+0x14bc35  movq 0xe0(%r15),%r12      ; 12
+0x14bc50  subq %r12,%rsi
+0x14bc53  addq 0x90(%r15),%rsi      ; src = buffer + (bytesRead - 12)
+0x14bc5a  callq 0xf8f470            ; memcpy(dst, src, 12)
+0x14bc63  movq 0xe8(%r15),%rsi      ; file tail tag
+0x14bc6c  movq 0x28(%rax),%rdi      ; typeEntry->tag
+0x14bcb4  subq %r12,%r13
+0x14bcb7  movq %r13,0x80(%r15)      ; payloadSize = filelen - 12
+```
+
+So the last 12 bytes of every resource file are `{u64 tag; u32 CompressionHeader}`, and the 8-byte
+prefix of that tail is checked against the registered tag. An independent, whole-population census
+(`local/re/csdr_tail_census.py` over `scripts/psarc.py`; **34,392** members = the 34,291 of §1 plus
+the 101 `cachedFiles.psarc` members) gives:
+
+| Measurement | Result |
+|---|---|
+| members whose bytes `[len-12, len-4)` equal the tag `0x1343534452` | **34,392 / 34,392** |
+| trailing word type field | type **0** = 15,072 · type **3** = 16,328 · type **4** = 2,992 |
+| prefix ⇔ type | `0100` (8,178) and `0200` (6,894) → **0**; `8c0a` (16,328) → **3**; `8c06` (2,992) → **4** — 1:1, no exception |
+| type 0: `size == len-12` | **15,072 / 15,072** |
+| type 3/4: `size > len-12` | **19,320 / 19,320** (pak1 ratio: type 3 min 1.135 / median 1.343 / max 1.804; type 4 1.311 / 1.389 / 1.643) |
+
+**Correction to §3.2 and E1072:** the descriptor tag is **`0x1343534452`**, byte image
+`52 44 53 43 13` — `movabsq $0x1343534452` at `0xb0d420`. The earlier `0x0000000134534452` /
+`…43 01` dropped a `3`. The corpus trailer and the image constant now agree byte for byte.
+
+#### (f) The answer, and the argument characterisation the task asked for
+
+**Yes — the one `OodleLZ_Decompress` call site expands `.csdr` members**, on the following chain,
+every link direct and byte-verified:
+
+`.csdr` member → `ResourceFactoryResourceLoader` reads it → 12-byte tail copied to `loader+0xe8`
+(tag + `CompressionHeader`) → `payloadSize = filelen-12` → `CreateResource` (`0x147160`) sees
+`IsCompressed(loader+0xf0)` → `Compression::Decompress` (`0x1aa2a0`) → type 3/4 → case `0x1aa351`
+→ `CALL 0x89d3b0` at `0x1aa426`.
+
+| Question | Answer |
+|---|---|
+| which argument is the compressed buffer | `RDI` = the loader's read buffer `loader+0x90`, i.e. the member's bytes `[0, filelen-12)` — **from offset 0** |
+| which is the output | `RDX` = a fresh `FUN_00012820(size, 1, 8, 0)` allocation, exact size, no slack |
+| where the output length comes from | the **trailing** word: `rawLen = RCX = *h & 0x1fffffff` (bytes `[filelen-4, filelen)`) |
+| do the leading header fields feed it | **No.** `u16be[2:4]`, `u16be[6:8]`, `[8:16]` and `[16:20]` are never read by `Decompress`, by its caller, or by `IsCompressed`/`GetUncompressedSize`; they are ordinary bytes inside the `compBuf` range. The only field the path reads is the trailing word |
+
+**What is deliberately left open.** Bytes `[0:16)` of a compressed member are *structured*, not
+codec noise: over pak1's 1,442 compressed members `[8:12]` takes exactly two values and `[12:16]`
+two (co-varying), and `[6:8]` equals `len-20` for every member in the corpus (§1.1). Since the
+compiled caller passes the range from byte 0, whether the Oodle stream begins at byte 0 or after
+that header is a **codec-format** question: it cannot be settled without an Oodle implementation, and
+it is not needed to place the call on the path. A future decoder must reproduce whatever the retail
+caller does, and this document does not guess which.
+
+**Not claimed:** that any specific shader program is requested at run time (§1.2's "is the
+compressed set live" question is untouched); that any member decompresses; anything about rendering.
+The §6.6 "sector-structured container" hypothesis is **withdrawn as an explanation of the compressed
+members**: the trailing word names a codec and the dispatcher sends types 3/4 unconditionally to
+`OodleLZ_Decompress`.
 
 ---
 
@@ -299,48 +446,60 @@ the "no shader blob" statement is a structural reading of the same table, not a 
 
 ## 6. How a loader could still have been missed (the honest residual)
 
-The two sweeps above are strong but neither is a proof of absence. These are the concrete remaining
-holes, in the order they should be closed:
+The two sweeps above are strong but neither is a proof of absence. These were the concrete remaining
+holes, in the order they had to be closed. **Items 1, 3 and 6 are now closed by §4.2**; the rest
+stand, and the end-to-end path is `STATIC_ANALYSIS_VERIFIED` but never executed.
 
-1. **`FUN_001aa2a0`'s own callers and tag semantics.** The owner of the Oodle call *is* now
-   resolved (`FUN_001aa2a0`, §4.1), but who calls it and what the three-bit tag means is not. Six
-   cases is a small space; enumerate the callers of `0x1aa2a0` and the writers of the tagged words.
-   This is the only *positive* lead and must be closed first.
+1. ~~**`FUN_001aa2a0`'s own callers and tag semantics.**~~ **CLOSED (§4.2).** Exactly one caller,
+   `ResourceFactory::CreateResource` at `0x147257`; the tag is `bpe::Compression::CompressionHeader`
+   `{type:3, size:29}` and the six cases are None / zlib / Oodle fuzzSafe=1 (×3) / Oodle fuzzSafe=0.
 2. **102,894 instructions outside any function body** (§2) plus the undecoded ranges that
    `probe_disasm_range.py` exposes. Any loader that lives entirely in such a range is invisible to
    `getFunctionContaining`, to `getReferencesTo`, and to the decompiler. The rel32 census in §4 was
    immune to this for *call edges*, but a loader reached only through a `jmp` into a table, or
    reached by `call rax` after an indirect load, would still hide.
-3. **Indirect calls.** The image has 499 indirect call sites in one closure alone
-   (`docs/INDIRECT_FRONTIER.md`). A decompressor invoked through a per-resource-type function
-   pointer — which is exactly the shape §3.2 shows for `csdr` (`local_90 = FUN_00b0cc50` in the
-   descriptor) — would appear as a data reference to a descriptor, not as a call to `0x89d3b0`.
-   This is now the *most likely* hiding place, and it is why §3.2 matters more than §4.
+3. ~~**Indirect calls.**~~ **CLOSED for this path (§4.2).** The per-resource-type pointer is real —
+   the loader calls `typeEntry+0x48` (`0x14ba2f`) to get the file name — but it produces a *path*,
+   not a decompressor. The decompression is a direct `CALL 0x89d3b0` from a direct call of
+   `0x1aa2a0`, so no link on the `.csdr` → Oodle chain is indirect.
 4. **`.bss` globals.** The two stack arguments come from `0x02ee6720`/`0x02ee6748`, which have no
    file image. Their initialisers are known (`FUN_001aa2a0`), but any *other* writer would be
-   invisible to a byte scan of the image.
+   invisible to a byte scan of the image. §4.2 identifies them as `decoderMemory` and
+   `decoderMemorySize`; their *values* are still runtime state.
 5. **A second decompressor.** Oodle and zlib are both present; nothing rules out a third,
    title-specific block codec written in-house. No sweep in this round searched for one, because
-   there is no predicate for "a codec I have not seen".
-6. **The `[0]==0x8c` byte may not be a codec tag at all.** §1.1 shows the header carries no
-   compression ratio and that `[8:16]` look like flag words with `[16:20]` an offset. A
-   sector-structured container (e.g. per-256-byte-unit transform) would have exactly these fields
-   and would fit the 7.5–8.0 payload entropy better than a codec does. **This is a hypothesis, not a
-   finding**, and it changes what to look for: a sector loop, not a bitstream reader.
+   there is no predicate for "a codec I have not seen". §4.2 narrows this: the `.csdr` trailer names
+   only types 0/3/4, and those map to `memcpy` and Oodle, so a second codec would have to be inside
+   `OodleLZ_Decompress` itself.
+6. ~~**The `[0]==0x8c` byte may not be a codec tag at all.**~~ **WITHDRAWN (§4.2).** The hypothesis
+   was that `[8:16]`'s flag words and `[16:20]`'s offset-sized value would suit a sector-structured
+   container. The trailer settles it in the other direction: every `8c0a` member carries type **3**
+   and every `8c06` member type **4**, and the dispatcher sends those to `OodleLZ_Decompress`
+   unconditionally, so the compressed payload is a codec stream, not a per-256-byte-unit transform.
+   What remains unexplained is where inside the member the stream *starts* (see §4.2(f)).
 
 ---
 
 ## 7. Next steps (bounded, in order)
 
-1. **Enumerate callers of `FUN_001aa2a0`** and the writers of its tagged argument. One question
-   only: is `compBuf` (`R15`) an archive member buffer for a `.csdr` member. The switch table at
-   `0xfadd4c` is already decoded (§4.1), so the case bodies no longer need recovering.
-2. **Follow the `csdr` descriptor's function pointer.** `FUN_00b0d3e0` stores `FUN_00b0cc50` and
-   `&DAT_02ed1fb0` into the descriptor; find every consumer of that descriptor and read what it does
-   with the bytes it gets back. This is the path §6.3 predicts.
-3. Only then decide between "the member is Oodle-compressed" and "the member is a sector-structured
-   container". Do not write a decoder before that decision: `lz4`/`zstd` block formats are still
-   **NOT TESTED**, and a codec guess would repeat the 3,780-attempt dead end.
+The former steps 1–3 are done (§4.2): the caller is known, the descriptor's pointer turned out to be
+a *path* producer rather than a decompressor, and the codec question is decided in Oodle's favour.
+What remains is deliberate and separate work:
+
+1. **A decoder is now a bounded task with a known interface.** Input: `member[0 : len-12]`; output:
+   exactly `trailer & 0x1fffffff` bytes; codec: `OodleLZ_Decompress` type 3/4 (`fuzzSafe = 1`),
+   `memcpy` for type 0. The unanswered codec-format question is §4.2(f): does the stream start at
+   byte 0 or after the 16-byte header. Deciding it needs a *working* Oodle implementation, which this
+   repository does not have; a from-scratch one is a separate, much larger task.
+2. **Do not re-derive the container.** `.csdr` = `[leading header][body][12-byte trailer]`, trailer =
+   `{u64 tag 0x1343534452; u32 {type:3,size:29}}`, `body length = u16be[6:8] + 20 = len`, is now
+   measured on 34,392 / 34,392 members. Further header archaeology (what `[8:12]`, `[12:16]`,
+   `[16:20]` mean) does **not** unblock decompression and should not be scheduled ahead of it.
+3. **Runtime liveness is a different task.** Nothing here shows that a compressed program is ever
+   requested. That needs a dynamic observation (or the shipping/NEO variant selection traced through
+   `shaderTypeToLoad`), and it is not answerable from the image alone.
+4. `lz4`/`zstd` stay **NOT TESTED** and are now known to be irrelevant for this container: the
+   trailer names the codec.
 
 ---
 
@@ -386,6 +545,31 @@ python3 -I local/re/csdr_prefix_census.py           # 34,291 / 19,320, prefix hi
 python3 -I local/re/csdr_variant_crosstab.py       # 9,660 / 7,536 per name variant
 python3 -I local/re/csdr_header_fields.py          # field rules
 python3 -I tools/lift/check_csdr_loader_search.py  # pins the claims above
+
+# 6. The caller chain of §4.2 (read-only Ghidra decompilation of six bodies).
+./local/venv-pyghidra/bin/python tools/re/ghidra/run_dump.py \
+    --project-dir local/ghidra/persistent-20261020 --project-name SotC \
+    --script tools/re/ghidra/dump_functions.py \
+    --out local/validation/csdr-decompressor-re/dossier-1.txt \
+    0xb0d3e0 0xb0cc50 0xb0cb80 0x146ea0 0x147160 0x146b60
+
+# 7. The trailing-word census of §4.2(e) — whole corpus, counts only.
+python3 -I local/re/csdr_tail_census.py 1 local/validation/csdr-decompressor-re/tail-census.json
+```
+
+The FDE of §4.2(a) is read straight out of `.eh_frame` (no tool needed):
+
+```sh
+python3 -I - <<'EOF'
+import struct
+d = open("local/re/eboot.elf", "rb").read()
+o = 0x135cccc                                   # FDE, found through .eh_frame_hdr's search table
+ln = struct.unpack_from("<I", d, o)[0]
+pcrel = struct.unpack_from("<i", d, o + 8)[0]
+rng = struct.unpack_from("<I", d, o + 12)[0]
+pc = pcrel + (o + 8 - 0x4000)                   # .eh_frame is in PT_LOAD 0: file = VA + 0x4000
+print(hex(ln), hex(pc), hex(rng))               # 0x20 0x1aa2a0 0x1ca
+EOF
 ```
 
 Project hygiene: the persistent project was only ever **opened read-only** — no re-import, no
@@ -400,6 +584,11 @@ Private outputs (counts and addresses only, no member bytes):
 `local/re/csdr_variant_crosstab.json`, `local/re/csdr_header_fields.json`,
 `local/re/rel32_inbound.json`.
 
+For §4.2: `local/re/csdr_tail_census.py` (and `csdr_trailer_probe.py`, its first, sampling pass),
+`local/validation/csdr-decompressor-re/tail-census.json`, and the eight read-only Ghidra dossiers
+`dossier-1.txt … dossier-8.txt` in the same directory. No member byte and no decoded shader text is
+stored in any of them — the census writes header words and counts only.
+
 ## 9. Limits
 
 - Static analysis of one executable plus a corpus census. No guest code executed, no member
@@ -411,6 +600,15 @@ Private outputs (counts and addresses only, no member bytes):
   tables and function pointers are outside its reach.
 - The Oodle/zlib identification is by embedded strings and symbol labels. No Oodle API was called and
   no codec behaviour was reproduced.
-- §6.6 is a hypothesis about the container shape, explicitly not a finding.
+- §4.2 is a **call-graph and container-format** result. No member was decompressed: the Oodle call
+  site is placed on the path from bytes and from a corpus census, not by running it. "The `.csdr`
+  member expands" therefore means "the retail code feeds it to `OodleLZ_Decompress`", not "it
+  decodes".
+- §4.2(e)'s census reads member bytes but stores none: the JSON holds the tag match, the 3-bit type,
+  the 29-bit size and per-archive counts.
+- §4.2(f) leaves the codec's *stream start offset* open on purpose. The compiled caller passes
+  `member[0 : len-12]`; whether those leading 16 bytes are codec input or a header the codec skips is
+  not decidable without an Oodle implementation.
+- §6.6 is **withdrawn**; the earlier text is kept above only so the correction is auditable.
 - The claim that compressed members are "live" is **not** re-established here; §1.2 only shows the
   previous argument for it was invalid.

@@ -434,6 +434,16 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
              if (!s.slot314_result.ok) s.init_failed = true;
          }},
         {0xa3ade0, 315, [](StartupState& s) noexcept { store_zero32(s.slot315_cell); }},
+        // idx 316 / 0xa33280: the Localization block -- four language console variables (`loc_text` /
+        // `loc_subtitles` / `loc_speech` / `loc_system`) through the native wrapper+leaf model
+        // (default_slot316_hooks), the `sLanguageUnlocalizedAsEnglish` bool, the `loc_reload` command,
+        // six "Localization" toggles and the "!!!Unlocalized!!!" string, 14 __cxa_atexit records. The
+        // 0xf1a0 allocator is the documented host stand-in; any failed stage is a visible startup failure.
+        {0xa33280, 316, [](StartupState& s) noexcept {
+             const Slot316Hooks hooks = default_slot316_hooks();
+             s.slot316_result = init_slot316_a33280(s.slot316, s.concmd, s.debug_menu, hooks);
+             if (!s.slot316_result.ok) s.init_failed = true;
+         }},
         {0xa2c390, 317, [](StartupState& s) noexcept { if (!init_slot317_a2c390(s.slot317, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
         {0xa20e80, 318, [](StartupState& s) noexcept { if (!init_slot318_a20e80(s.slot318, s.concmd).ok) s.init_failed = true; }},
         {0x9b75a0, 319, [](StartupState& s) noexcept { init_leaf_9b75a0(s.leaf_9b75a0); }},
