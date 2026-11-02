@@ -81,7 +81,10 @@ struct PlayBlockedSummaryTests {
         #expect(presentation.status.contains("Play disabled"))
         #expect(presentation.accessibilityValue == "Not ready. \(Self.notBuilt)")
         #expect(presentation.tone == .neutral)
-        #expect(presentation.hint == nil)
+        // APP-01-VOICEOVER-READINESS-01: the idle status now also carries the guidance it shows. It
+        // must stay advice about the gate, never a readiness or running claim.
+        #expect(presentation.hint == LauncherPresentation.blockedActionHint)
+        #expect(presentation.accessibilityHint == LauncherPresentation.blockedActionHint)
         // Never softens into unavailable/running language while idle with NOT BUILT.
         #expect(!presentation.status.lowercased().contains("running"))
         #expect(presentation.tone != .success)

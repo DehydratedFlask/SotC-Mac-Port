@@ -511,8 +511,13 @@ struct LauncherPresentationTests {
         #expect(presentation.status == "NOT BUILT: x")
         #expect(presentation.accessibilityValue == "Not ready. NOT BUILT: x")
         #expect(presentation.tone == .neutral)
-        #expect(presentation.hint == nil)
-        #expect(LauncherPresentation.make(state: .idle, blockedReason: nil, failureCode: nil).status == "Not ready to play.")
+        #expect(presentation.hint == LauncherPresentation.blockedActionHint)
+        #expect(presentation.accessibilityHint == LauncherPresentation.blockedActionHint)
+        // Before any report exists there is nothing to act on, so no guidance is shown or spoken.
+        let beforeFirstCheck = LauncherPresentation.make(state: .idle, blockedReason: nil, failureCode: nil)
+        #expect(beforeFirstCheck.status == "Not ready to play.")
+        #expect(beforeFirstCheck.hint == nil)
+        #expect(beforeFirstCheck.accessibilityHint.isEmpty)
     }
 
     @Test func engineNotImplementedIsUnavailableOnlyWithThatCode() {

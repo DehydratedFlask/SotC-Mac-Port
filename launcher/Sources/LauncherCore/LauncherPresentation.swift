@@ -14,10 +14,20 @@ public struct LauncherPresentation: Equatable, Sendable {
     public let accessibilityLabel: String
     /// Spoken value: always names the state in words, so colour or icon is never the only cue.
     public let accessibilityValue: String
+    /// Spoken hint: exactly the recovery guidance the status area shows, or empty when there is none.
+    ///
+    /// The status area is one combined accessibility element with an explicit label and value, which
+    /// replaces the text of its children — a visible `hint` therefore never reaches assistive
+    /// technology unless it is spoken here. Empty means "no hint", never "no news".
+    public var accessibilityHint: String { hint ?? "" }
 
     public static let accessibilityStatusLabel = "Game core status"
     public static let engineUnavailableStatus =
         "Unavailable: the native game engine is not implemented yet, so the game cannot start."
+    /// Shown while Play is blocked but nothing has failed yet. Names the gate and where the core's
+    /// own evidence is; it never suggests the engine can be made to work.
+    public static let blockedActionHint =
+        "Play stays disabled until every readiness row says Ready. Open Diagnostics for the core’s own report."
 
     public init(status: String, hint: String?, tone: Tone, accessibilityValue: String) {
         self.status = status
@@ -34,7 +44,12 @@ public struct LauncherPresentation: Equatable, Sendable {
         switch state {
         case .idle:
             let text = blockedReason ?? LauncherStatusCopy.for(state).status
-            return LauncherPresentation(status: text, hint: nil, tone: .neutral, accessibilityValue: "Not ready. \(text)")
+            // Guidance only once a readiness report says what is blocking; before the first check
+            // there is nothing to act on, so the status stays silent about next steps.
+            return LauncherPresentation(
+                status: text, hint: blockedReason == nil ? nil : Self.blockedActionHint, tone: .neutral,
+                accessibilityValue: "Not ready. \(text)"
+            )
         case .validating:
             return plain(state, .progress, "Checking")
         case .ready:

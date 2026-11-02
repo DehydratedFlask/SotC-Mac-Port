@@ -10,8 +10,8 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `.` | 9 | Project entry points and agent state |
 | `.graft` | 1 | Project folder; add a contract to docs/INDEX.md |
 | `Shadow of the Colossus` | 2 | Original user game inputs; read-only and private |
-| `docs` | 33 | Plans, task/evidence registries, checkpoint and escalation documentation |
-| `docs/checkpoints` | 1010 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs` | 34 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs/checkpoints` | 1013 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/escalations` | 10 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/schemas` | 1 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `graft` | 1 | Regenerable source graph; internal cache directories summarized |
@@ -24,7 +24,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/Sources/LauncherNativeCore` | 1 | Native Swift macOS launcher |
 | `launcher/Sources/SoCLauncher` | 3 | Native Swift macOS launcher |
 | `launcher/Tests` | 0 | Native Swift macOS launcher |
-| `launcher/Tests/LauncherCoreTests` | 16 | Native Swift macOS launcher |
+| `launcher/Tests/LauncherCoreTests` | 17 | Native Swift macOS launcher |
 | `launcher/Tests/LauncherNativeCoreTests` | 1 | Native Swift macOS launcher |
 | `local` | 0 | Private extracted assets, binary analysis, manifests, builds and evidence |
 | `logs` | 100 | Private command/build/install/extraction logs |
@@ -33,10 +33,10 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `native/api/standalone` | 1 | Native game implementation; verify module README and task ownership |
 | `native/api/tests` | 2 | Native game implementation; verify module README and task ownership |
 | `native/app` | 3 | Native game implementation; verify module README and task ownership |
-| `native/core` | 1500 | Native game implementation; verify module README and task ownership |
+| `native/core` | 1510 | Native game implementation; verify module README and task ownership |
 | `native/lanes` | 7 | Native game implementation; verify module README and task ownership |
 | `native/platform` | 18 | Native game implementation; verify module README and task ownership |
-| `native/tests` | 527 | Native game implementation; verify module README and task ownership |
+| `native/tests` | 530 | Native game implementation; verify module README and task ownership |
 | `reference` | 0 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC` | 12 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `reference/ShadowOfTheColossus-PC/docs` | 10 | Pinned upstream source; read-only; symbols indexed by Graft |
@@ -597,13 +597,13 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `reference/shadPS4Plus-pkg/src/video_core/texture_cache` | 18 | Pinned upstream source; read-only; symbols indexed by Graft |
 | `scripts` | 28 | Small project and offline analysis helpers |
 | `tools` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
-| `tools/dev` | 19 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/dev` | 21 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/graft/.cache` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
-| `tools/lift` | 769 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/lift` | 773 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/pkg-extractor` | 1 | Out-of-tree tool adapters and reproducible analysis recipes |
 | `tools/re` | 0 | Out-of-tree tool adapters and reproducible analysis recipes |
-| `tools/re/ghidra` | 3 | Out-of-tree tool adapters and reproducible analysis recipes |
+| `tools/re/ghidra` | 4 | Out-of-tree tool adapters and reproducible analysis recipes |
 
 Private recursive inventory: `local/indexes/folders.json` (excluded from publication).
 Canonical navigation and ownership: [INDEX](INDEX.md).

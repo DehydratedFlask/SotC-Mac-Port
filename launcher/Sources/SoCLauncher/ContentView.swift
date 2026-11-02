@@ -26,6 +26,11 @@ struct ContentView: View {
                     ForEach(report.items) { item in
                         ReadinessRow(item: item)
                     }
+                } else if model.state == .validating {
+                    // The first check runs on appear without a folder, so the placeholder must not
+                    // ask for one while the rows are already being collected.
+                    Text("Checking readiness…")
+                        .foregroundStyle(.secondary)
                 } else {
                     Text("Choose your game folder to check readiness.")
                         .foregroundStyle(.secondary)
@@ -44,6 +49,9 @@ struct ContentView: View {
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel(Text(presentation.accessibilityLabel))
                 .accessibilityValue(Text(presentation.accessibilityValue))
+                // The combined element replaces its children, so the visible hint has to be spoken
+                // explicitly or a screen-reader user never hears the recovery guidance.
+                .accessibilityHint(Text(presentation.accessibilityHint))
 
                 HStack {
                     Spacer()
