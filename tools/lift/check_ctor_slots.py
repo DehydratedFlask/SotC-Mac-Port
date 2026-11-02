@@ -200,7 +200,7 @@ LANE_SLOTS_20261028 = {
 # Slot 309 (0xa505e0, the Save System debug block) was registered by CPU-01-RANGED-BOUND-VAR-A4F4D0-01
 # once its three console-variable constructors 0xa4f4d0 / 0xa4fec0 / 0xa50280 were lifted as the shared
 # model core/ranged_bound_var_a4f4d0 (pinned by tools/lift/check_console_var_ctors.py).
-expected_registered = (set(range(152)) | set(modules) | {282, 290, 520, 538, 296, 297, 300, 298, 299, 301, 302, 303, 305, 306, 309}
+expected_registered = (set(range(152)) | set(modules) | {282, 290, 520, 538, 296, 297, 300, 298, 299, 301, 302, 303, 305, 306, 309, 312}
                        | LANE_SLOTS_20261026 | LANE_SLOTS_20261028)
 assert set(rows_by_index) == expected_registered, (
     "registered set differs from the computed expectation: "
@@ -208,14 +208,14 @@ assert set(rows_by_index) == expected_registered, (
     f"missing={sorted(expected_registered - set(rows_by_index))}")
 registered_digest = hashlib.sha256(
     ",".join(str(index) for index in sorted(rows_by_index)).encode()).hexdigest()
-assert registered_digest == "4d7af7037f84854b9300a4c8f92cc0babc52a6d7f4a9f9dba04b1a732fd57571", (
+assert registered_digest == "a42cc27f42fe7967ae5adb506a5b7c4484f8c5db25a65f7e4e5b5793b1bdc052", (
     f"registered index-set sha256 changed: {registered_digest}")
 
-# The remaining 123 original slots have no registered native callback; the first is the explicit
-# startup cliff after slot 309 was registered by CPU-01-RANGED-BOUND-VAR-A4F4D0-01.
+# The remaining 122 original slots have no registered native callback; the first is the explicit
+# startup cliff after slot 312 was registered by CPU-01-STARTUP-SLOT-312-CHARACTERIZATION-01.
 unregistered = sorted(set(range(TABLE_COUNT)) - set(rows_by_index))
-assert len(unregistered) == 123, f"expected 123 unregistered slots, found {len(unregistered)}"
-assert unregistered[0] == 312 and original_rvas[312] == 0xa46130, (
+assert len(unregistered) == 122, f"expected 122 unregistered slots, found {len(unregistered)}"
+assert unregistered[0] == 314 and original_rvas[314] == 0xa41810, (
     f"first unregistered slot changed: {unregistered[0]}/{original_rvas[unregistered[0]]:#x}")
 
 # The 573-row data table must reproduce the ELF exactly, in index order.
