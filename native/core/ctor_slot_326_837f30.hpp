@@ -105,7 +105,14 @@
 //     site's final vptr 0x15942b0 and the two 3.0f stores (+0xd0 value, +0x68 default);
 //   * the twelve eye-colour floats through the same c300 net state on the 0xd0 shape, value_ref =
 //     a cell of the mirrored 0x2dce400 table, both bounds [0, 2.0] engaged, final vptr 0x15943c0,
-//     default = that cell;
+//     default = that cell.
+//     Why the net state is reproduced here instead of calling the shared `init_ranged_float_var_c300`:
+//     that model accepts exactly three argument tags (0x15d57e0 / 0x1594318 / 0x15d2040) and *refuses*
+//     0x15cec00, which is the only tag these thirteen sites pass. Widening a shared contract was out of
+//     scope for this task, so both object shapes go through `slot326_float_c300_state`, which refuses
+//     any tag but 0x15cec00; the checker pins every one of its stores against the 0xc300 body
+//     (+0x60, +0x6c, +0x70, +0x74, +0x78, +0x80, +0xb0, +0xc0, +0xc8 and the 0x1594128 mid vptr) rather
+//     than against the other model;
 //   * the five groups through `init_menu_group_26c10`, the three toggles through
 //     `init_debug_menu_item_26ea0` (with the {slot3, slot6} answers below), the twelve sliders through
 //     `init_debug_menu_item_27050` ({0.01, 0.1}), all registered through `register_menu_item_268b0`;
@@ -139,9 +146,10 @@
 //   * a `__stack_chk_guard` that changed across the body.
 //
 // NOT modelled: every destructor body (0x20b0 bool, 0x20f0 ranged float, 0xad30 eye colour,
-// 0x272d0 item, 0x27280 root) and the argument-functor slot bodies 0xc4a0/0xc4c0/0xc4e0 are pinned
-// identity recorders that are never executed. No eye colour, menu layout or gameplay behaviour is
-// claimed; nothing here reads the 0x2dce400 table back out of the image.
+// 0x272d0 item, 0x27280 root). The argument-functor slot bodies 0xc4a0 (copy) / 0xc4c0 (clone) /
+// 0xc4e0 (move) are byte-pinned and their net effect is reproduced by the collapsed install;
+// 0xc4f0 (destroy) is a bare `ret`. None of them is executed. No eye colour, menu layout or gameplay
+// behaviour is claimed; nothing here reads the 0x2dce400 table back out of the image.
 #pragma once
 
 #include <array>
