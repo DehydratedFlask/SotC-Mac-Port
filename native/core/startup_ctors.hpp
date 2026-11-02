@@ -315,6 +315,12 @@
 #include "ctor_slot_326_837f30.hpp"
 #include "ctor_slot_329_829e90.hpp"
 #include "ctor_slot_335_7edf10.hpp"
+// CPU-01-STARTUP-BATCH-DEBUG-PAGE-01: the first four data rows of the batch model
+// core/debug_page_var_item (one bounded float variable plus optionally one slider / toggle item).
+#include "ctor_slot_361_777390.hpp"
+#include "ctor_slot_379_6d8d20.hpp"
+#include "ctor_slot_467_3ca110.hpp"
+#include "ctor_slot_536_1342d0.hpp"
 #include "ctor_slot_317_a2c390.hpp"
 #include "ctor_slot_318_a20e80.hpp"
 #include "ctor_slot_343_7d7970.hpp"
@@ -712,6 +718,15 @@ struct StartupState {
     Slot335Objects slot335{};
     Slot335ValueCells slot335_cells{};
     Slot335Result slot335_result{};
+    // CPU-01-STARTUP-BATCH-DEBUG-PAGE-01: the batch's four stand-ins and results.
+    Slot361Objects slot361{};
+    debug_page::Result slot361_result{};
+    Slot379Objects slot379{};
+    debug_page::Result slot379_result{};
+    Slot467Objects slot467{};
+    debug_page::Result slot467_result{};
+    Slot536Objects slot536{};
+    debug_page::Result slot536_result{};
     Slot317Objects slot317{};
     Slot318Objects slot318{};
     Slot343Objects slot343{}; Slot343Result slot343_result{};

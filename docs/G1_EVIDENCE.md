@@ -48,9 +48,9 @@ regenerated — that is the point.
   "startup": {
     "first_unrecovered_index": 336,
     "first_unrecovered_rva": "0x7ec4c0",
-    "registered_rows": 456,
-    "remaining_rows": 117,
-    "rows_registered_above_first_gap": 120,
+    "registered_rows": 460,
+    "remaining_rows": 113,
+    "rows_registered_above_first_gap": 124,
     "table_base": "0x2dd70e0",
     "table_indexing": "backwards: entry i is the qword at 0x2dd70e0 - 8*i",
     "table_qwords": 573,

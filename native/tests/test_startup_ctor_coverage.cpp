@@ -42,7 +42,7 @@ int main() {
     CHECK(result.blocked_on_rva == 0);
     CHECK(!st.init_failed);
     CHECK(result.completed == slots.size());
-    CHECK(slots.size() == 456);
+    CHECK(slots.size() == 460);
 
     // Every registered row is in original order and pairs with the pinned table.
     for (std::size_t i = 0; i < slots.size(); ++i) {
@@ -55,7 +55,7 @@ int main() {
     // ---- explicit, machine-checked gap ---------------------------------------
     CHECK(first_unrecovered_constructor_index() == 336);
     CHECK(first_unrecovered_constructor_rva() == 0x7ec4c0);
-    CHECK(slots.size() + 117 == kOriginalCtorCount);
+    CHECK(slots.size() + 113 == kOriginalCtorCount);
 
     // ---- CPU-01-STARTUP-LEAF-ROWS-315-560-01 -------------------------------
     CHECK(st.slot315_cell == 0);
@@ -116,13 +116,15 @@ int main() {
     CHECK(st.slot303.var.default_value == 0 && st.slot303.var.fn_vptr == 0x15d2478);
     CHECK(st.slot303.item.target == &st.slot303.var && st.slot303.item.flags == 0x30);
     CHECK(st.concmd.manager.manager == nullptr);
-    CHECK(st.concmd.pending.size() == 164);                      // measured with a probe after slot 335; 155 through 329 + 9 (335)
+    CHECK(st.concmd.pending.size() == 169);                      // measured with a probe after the debug-page batch (361/379/467/536);
+                                                                // 164 through 335 + 5 (361 1, 379 1, 467 1, 536 2)
     CHECK(st.concmd.pending.first() == &st.slot298_shader_type.base.pending);
-    CHECK(st.debug_menu.root.count == 119);                     // measured with a probe after slot 335; 117 through 329 + 2 (335)
-    CHECK(st.concmd.atexit_log.size() == 393);                  // measured with a probe after slot 335;
-                                                                // 382 through 329 + 11 (335). The menu root was
-                                                                // already initialised, so 0x268b0 records
-                                                                // nothing new here.
+    CHECK(st.debug_menu.root.count == 122);                     // measured with a probe after the batch; 119 through 335
+                                                                // + 3 (361, 379, 467; 536 builds no item)
+    CHECK(st.concmd.atexit_log.size() == 401);                  // measured with a probe after the batch;
+                                                                // 393 through 335 + 8 (2 per batched slot).
+                                                                // The menu root was already initialised, so
+                                                                // 0x268b0 records nothing new here.
     for (std::size_t i = 0; i < kSlot302HandleCount; ++i) {
         CHECK(st.slot302.handles[i] == nullptr);
         CHECK(st.concmd.atexit_log.at(7 + i).dtor_rva == kSlot302DtorRva);

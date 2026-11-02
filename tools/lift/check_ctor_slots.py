@@ -197,24 +197,28 @@ LANE_SLOTS_20261028 = {
     491, 492, 499, 502, 509, 516, 535, 540, 543,
     544, 557, 558, 559, 569,
 }
+# CPU-01-STARTUP-BATCH-DEBUG-PAGE-01: the first four data rows of the debug-page cluster model
+# core/debug_page_var_item (361 / 379 / 467 / 536).
+DEBUG_PAGE_BATCH = {361, 379, 467, 536}
 # Slot 309 (0xa505e0, the Save System debug block) was registered by CPU-01-RANGED-BOUND-VAR-A4F4D0-01
 # once its three console-variable constructors 0xa4f4d0 / 0xa4fec0 / 0xa50280 were lifted as the shared
 # model core/ranged_bound_var_a4f4d0 (pinned by tools/lift/check_console_var_ctors.py).
 expected_registered = (set(range(152)) | set(modules) | {282, 290, 520, 538, 296, 297, 300, 298, 299, 301, 302, 303, 305, 306, 309, 312, 314, 316, 326, 329, 335}
-                       | LANE_SLOTS_20261026 | LANE_SLOTS_20261028)
+                       | LANE_SLOTS_20261026 | LANE_SLOTS_20261028 | DEBUG_PAGE_BATCH)
 assert set(rows_by_index) == expected_registered, (
     "registered set differs from the computed expectation: "
     f"extra={sorted(set(rows_by_index) - expected_registered)} "
     f"missing={sorted(expected_registered - set(rows_by_index))}")
 registered_digest = hashlib.sha256(
     ",".join(str(index) for index in sorted(rows_by_index)).encode()).hexdigest()
-assert registered_digest == "d08f4cc964ccd854174a1039f2aabef73dd298c0f0fbd44cdb31563eb847a04d", (
+assert registered_digest == "4257e41bdcc719d6eede2d532222b9fbe85cf79be543c722e748b5da635cf42e", (
     f"registered index-set sha256 changed: {registered_digest}")
 
-# The remaining 117 original slots have no registered native callback; the first is the explicit
-# startup cliff after slot 335 was registered by CPU-01-STARTUP-SLOT-335-CHARACTERIZATION-01.
+# The remaining 113 original slots have no registered native callback; the first is the explicit
+# startup cliff after slot 335 was registered by CPU-01-STARTUP-SLOT-335-CHARACTERIZATION-01
+# (index 336 / 0x7ec4c0 is still open, so the debug-page batch did not move the cliff).
 unregistered = sorted(set(range(TABLE_COUNT)) - set(rows_by_index))
-assert len(unregistered) == 117, f"expected 117 unregistered slots, found {len(unregistered)}"
+assert len(unregistered) == 113, f"expected 113 unregistered slots, found {len(unregistered)}"
 assert unregistered[0] == 336 and original_rvas[336] == 0x7ec4c0, (
     f"first unregistered slot changed: {unregistered[0]}/{original_rvas[unregistered[0]]:#x}")
 

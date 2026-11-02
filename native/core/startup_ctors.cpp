@@ -512,6 +512,14 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0x78e2f0, 356, [](StartupState& s) noexcept { s.slot356_result = init_slot356_78e2f0(s.slot356, s.concmd); if (!s.slot356_result.ok) s.init_failed = true; }},
         {0x78c760, 357, [](StartupState& s) noexcept { init_ctor_78c760(s.slot357_cell); }},
         {0x785f60, 359, [](StartupState& s) noexcept { s.slot359_result = init_slot359_785f60(s.slot359, s.concmd); if (!s.slot359_result.ok) s.init_failed = true; }},
+        // CPU-01-STARTUP-BATCH-DEBUG-PAGE-01: data rows of the cluster model core/debug_page_var_item
+        // (one or two bounded-float console variables through 0xc300, plus optionally one 0x27050
+        // slider / 0x26ea0 toggle item). Every callee is a native model, so no hook has to be
+        // supplied and no unimplemented native body is on the production path.
+        {0x777390, 361, [](StartupState& s) noexcept {
+             s.slot361_result = init_slot361_777390(s.slot361, s.concmd, s.debug_menu);
+             if (!s.slot361_result.ok) s.init_failed = true;
+         }},
         {0x74a8e0, 364, [](StartupState& s) noexcept { s.slot364_result = init_slot364_74a8e0(s.slot364, s.concmd, s.debug_menu); if (!s.slot364_result.ok) s.init_failed = true; }},
         {0x747870, 365, [](StartupState& s) noexcept { s.slot365_result = init_slot365_747870(s.slot365, s.concmd); if (!s.slot365_result.ok) s.init_failed = true; }},
         {0x70cdc0, 371, [](StartupState& s) noexcept { if (!init_release_family_slot(371, s.release_family, s.concmd.atexit_log, s.release_family_hooks).ok) s.init_failed = true; }},
@@ -521,6 +529,10 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0x6dde20, 378, [](StartupState& s) noexcept {
              constexpr std::array<const char*, 3> names{"InSaveVolume", "LastInSaveVolume", "FacingSaveVolume"};
              init_ctor_6dde20(s.slot378_cells, names);
+         }},
+        {0x6d8d20, 379, [](StartupState& s) noexcept {
+             s.slot379_result = init_slot379_6d8d20(s.slot379, s.concmd, s.debug_menu);
+             if (!s.slot379_result.ok) s.init_failed = true;
          }},
         {0x6c62b0, 383, [](StartupState& s) noexcept { s.slot383_result = init_slot383_6c62b0(s.slot383, s.concmd, s.debug_menu); if (!s.slot383_result.ok) s.init_failed = true; }},
         {0x6b9260, 384, [](StartupState& s) noexcept { s.slot384_result = init_slot384_6b9260(s.slot384, s.concmd); if (!s.slot384_result.ok) s.init_failed = true; }},
@@ -566,6 +578,10 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0x3e0040, 463, [](StartupState& s) noexcept { s.slot463_result = init_slot463_3e0040(s.slot463, s.concmd, s.debug_menu); if (!s.slot463_result.ok) s.init_failed = true; }},
         {0x3cc9e0, 465, [](StartupState& s) noexcept { s.slot465_result = init_slot465_3cc9e0(s.slot465, s.concmd); if (!s.slot465_result.ok) s.init_failed = true; }},
         {0x3ca7c0, 466, [](StartupState& s) noexcept { init_leaf_3ca7c0(s.leaf_3ca7c0); }},
+        {0x3ca110, 467, [](StartupState& s) noexcept {
+             s.slot467_result = init_slot467_3ca110(s.slot467, s.concmd, s.debug_menu);
+             if (!s.slot467_result.ok) s.init_failed = true;
+         }},
         {0x389a00, 470, [](StartupState& s) noexcept { if (!init_release_family_slot(470, s.release_family, s.concmd.atexit_log, s.release_family_hooks).ok) s.init_failed = true; }},
         {0x3600f0, 471, [](StartupState& s) noexcept { if (!init_tiny_atexit_slot(471, s.tiny_atexit, &s.concmd.atexit_log).ok) s.init_failed = true; }},
         {0x3583c0, 472, [](StartupState& s) noexcept { if (!init_release_family_slot(472, s.release_family, s.concmd.atexit_log, s.release_family_hooks).ok) s.init_failed = true; }},
@@ -604,6 +620,10 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
         {0x1442c0, 531, [](StartupState& s) noexcept { if (!init_tiny_atexit_slot(531, s.tiny_atexit, &s.concmd.atexit_log).ok) s.init_failed = true; }},
         {0x143300, 533, [](StartupState& s) noexcept { if (!init_tiny_atexit_slot(533, s.tiny_atexit, &s.concmd.atexit_log).ok) s.init_failed = true; }},
         {0x138e20, 535, [](StartupState& s) noexcept { s.slot535_result = init_slot535_138e20(s.slot535, s.concmd.atexit_log); if (!s.slot535_result.ok) s.init_failed = true; }},
+        {0x1342d0, 536, [](StartupState& s) noexcept {
+             s.slot536_result = init_slot536_1342d0(s.slot536, s.concmd, s.debug_menu);
+             if (!s.slot536_result.ok) s.init_failed = true;
+         }},
         {0x125990, 538, [](StartupState& s) noexcept { reset_scratch(s.scratch, s.scratch_slot); }},
         {0x10e390, 540, [](StartupState& s) noexcept { s.slot540_result = init_slot540_10e390(s.slot540, s.concmd.atexit_log); if (!s.slot540_result.ok) s.init_failed = true; }},
         {0xfd210, 541, [](StartupState& s) noexcept { init_slot541_fd210(s.slot541); }},

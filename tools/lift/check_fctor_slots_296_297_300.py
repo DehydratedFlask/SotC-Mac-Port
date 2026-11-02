@@ -243,7 +243,7 @@ def main() -> int:
     block = array_match.group(1)
     rows = [(int(rva, 16), int(index)) for rva, index in re.findall(
         r"^\s*\{\s*(0x[0-9a-fA-F]+)\s*,\s*(\d+)\s*,\s*\[", block, re.MULTILINE)]
-    require(len(rows) == 456, f"expected 456 registered rows (296-312 and verified lane rows included), found {len(rows)}")
+    require(len(rows) == 460, f"expected 460 registered rows (296-312 and verified lane rows included), found {len(rows)}")
     indices = [index for _, index in rows]
     require(indices == sorted(indices) and len(indices) == len(set(indices)),
             "constructor rows must be in strictly increasing index order")
