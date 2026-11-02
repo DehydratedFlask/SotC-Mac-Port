@@ -885,6 +885,11 @@ tie now exists between the two tools: `gcn_to_msl.ARITHMETIC_ROWS` is the table
 `Lowerer.arithmetic()` enforces, and `msl_abi_manifest`'s `LOWERED_ARITHMETIC` is checked against it
 by the manifest self-test, so the two cannot drift apart silently.
 
+The 37 affected programs carried nine distinct rows (rows / programs): `v_cvt_f32_f16` 16 / 2,
+`v_lshrrev_b32` 9 / 3, `v_cvt_f32_i32` 4 / 1, `v_sad_u32` 3 / 3, `v_sub_i32` 1 / 1,
+`v_lshlrev_b32` 1 / 1, `v_and_b32` 1 / 1, `v_add_i32` 1 / 1, `v_mad_u32_u24` 1 / 1 — the other 26
+of the 37 shared a program with one of these.
+
 **Still refused** (decodable, named, and deliberately without a lowering row): `v_sin_f32`,
 `v_cos_f32`, `v_fract_f32`, `v_exp_f32`, `v_log_f32`, `v_floor_f32`, `v_sqrt_f32`, `v_rcp_f32`, and
 every VOP3-encoded `cmpx` (25/28/212), `v_mac_f32` (287), `v_madmk_f32` (VOP2 32) and
@@ -938,11 +943,14 @@ removed and nothing else changed" would be 74; the difference is exactly the two
 below, which are more precise statements about programs the old taxonomy called `derived-*`.
 
 Of the 71 lowered, **69 fill zero bindings** — they are the 32-byte null-export pixel shaders, whose
-manifest is genuinely empty. The other two are `vs_main_5228ca40` (92 B, 18 instructions, 3
-placeholder bindings) and `standard_3883884949` (264 B, 55 instructions, 11 placeholder bindings).
-The placeholder bindings come from `msl_abi_manifest.synthetic_fill()`, which exists to prove the
-form closes; **a placeholder binding is not an ABI claim** and the generated MSL for those two
-shaders renders nothing meaningful.
+manifest is genuinely empty and whose lowered body is correspondingly **empty** (`StageExports e;
+return e;` with no write): the shader computes nothing and exports nothing, and the model claims no
+value for any component. Those 69 are a real count of real members, but they are evidence about the
+*model* and not about a substantive shader. The other two are `vs_main_5228ca40` (92 B, 18
+instructions, 3 placeholder bindings) and `standard_3883884949` (264 B, 55 instructions, 11
+placeholder bindings). The placeholder bindings come from `msl_abi_manifest.synthetic_fill()`, which
+exists to prove the form closes; **a placeholder binding is not an ABI claim** and the generated MSL
+for those two shaders renders nothing meaningful.
 
 ### What still blocks, and why
 
