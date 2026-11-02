@@ -1,7 +1,8 @@
 // CPU-01-STARTUP-SLOT-314-CHARACTERIZATION-01 / -NATIVE-LIFT-01: native recovery of original
 // constructor-table index 314 / RVA 0xa41810 (4,329 B FDE [0xa41810, 0xa428f9); 4,328 B reachable over
-// 779 instructions, the last byte 0xa428f8 being the trailing nop), ELF sha256 d0723afb...5861d3. Offline analysis only: nothing here loads, relocates or
-// executes an original RVA. Byte oracle: tools/lift/check_ctor_slot_314.py.
+// 779 instructions, the byte at 0xa428f8 being the trailing nop), ELF sha256 d0723afb...5861d3.
+// Offline analysis only: nothing here loads, relocates or executes an original RVA.
+// Byte oracle: tools/lift/check_ctor_slot_314.py.
 //
 // ============================ characterization (from the pinned bytes) ============================
 // Reached by DATA only: the startup table word at 0x2dd70e0 - 314*8 = 0x2dd6710 holds 0xa41810.
@@ -13,7 +14,8 @@
 //     guard <- *[0x15fe518]  (the GOT cell holds the runtime address of __stack_chk_guard)
 //     ...
 //     cmp [rsp+0xc0],%rax ; jne 0xa428f3 ; lea -0x28(%rbp),%rsp; pops; ret
-//   0xa428f3: callq 0xf8f3a0 (__stack_chk_fail); the FDE ends exactly at 0xa428f8.
+//   0xa428f3: callq 0xf8f3a0 (__stack_chk_fail); the FDE ends at 0xa428f9 (the byte at
+//   0xa428f8 is the trailing nop).
 //
 // This is the **physics debug block**: one thread-named menu page ("PhysXToRenderThread"), ten console
 // variables and ten debug-menu toggles, all under the menu caption "Physics". The strings are the
@@ -33,7 +35,8 @@
 //   0xa41570  x5  (bool variable WITH an on-change functor; calls 0x20d60 itself)
 //   0xc300    x3  (bounded float variable ctor; already native as core/concmd_vars)
 //   0x20af0   x2  (ConCmdBase ctor of the two inline bool variables)
-//   0x475c0   x1  (the 0x78 B page ctor: vptr 0x1594ca0, name, link head at +0x38, +0x70 = 0)
+//   0x475c0   x1  (the 87 B page BASE ctor: vptr 0x1595900, name, link head at +0x38, +0x70 = 0;
+//                    the body then stores the derived vptr 0x1594ca0)
 //   0xf8f3a0  x1  (__stack_chk_fail, the branch target only)
 //
 // The 8 indirect sites are `callq *0x18(%rax)` where %rax is the row's *argument-functor tag*: four

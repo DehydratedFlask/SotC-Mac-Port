@@ -12,7 +12,13 @@ three premises that this round falsified:
 | "the executable contains no `csdr`/`OrbShdr` string; raw members must be handed to something else as opaque blobs" | **FALSE** | `.csdr`, `_shipping.csdr`, `_neo.csdr`, `_neoshipping.csdr`, the `csdr` 4CC, a `shaderTypeToLoad` property and an `EShaderTypeToLoad` enum are all in the image, with a variant-suffix table and a registered loader callback. §3.2 |
 | "no `cmp $0x8c`/`$0x8c0a` exists, therefore nothing branches on the prefix" | **NOT DISCRIMINATING** | An exhaustive sweep of every scalar operand of all 3,661,345 instructions finds the prefix in **no** encoding at all. That is what a block header decoded as a bitfield looks like — so the predicate could never have found a loader, and its absence excludes nothing. §2 |
 
-What this round **did** establish, and what it did **not**, is separated below. Everything is
+What this round established instead: the image contains a **generic, type-tagged Oodle decompression
+dispatcher** — `FUN_001aa2a0`, six cases on the top three bits of its first argument, two of which
+call `OodleLZ_Decompress` with different `fuzzSafe` policy (§4.1) — plus the `.csdr` naming,
+variant-suffix table and registered loader callback (§3.2). What it did **not** establish is that the
+two are connected: `FUN_001aa2a0`'s callers and its tag semantics are open (§6).
+
+Details below are separated into what was **established** and what was **not**. Everything is
 `STATIC_ANALYSIS_VERIFIED` against `local/re/eboot.elf`
 (SHA-256 `d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3`, image base 0) unless a
 row says otherwise. **No guest instruction was executed, no member was decompressed, and nothing
@@ -31,7 +37,7 @@ and its TOC size. Counts only; no member bytes are stored.
 | compressed-prefix members | **19,320** = **56.34 %** |
 | raw (`0100`/`0200`) members | **14,971** = 43.66 % |
 | distinct 2-byte prefixes in the whole corpus | **exactly 4**: `8c0a` 16,328 · `0100` 8,077 · `0200` 6,894 · `8c06` 2,992 |
-| `cc*` prefixes | **0** in this corpus (the earlier report's single `cc0a` member is not in these archives) |
+| `cc*` prefixes | **0** in every archive scanned — the earlier report's single `cc0a` member is not in any of the six |
 | per archive (compressed / raw) | `pak0` 2,270 / 1,039 · `pak1` 1,442 / 1,070 · `pakN` 15,608 / 12,862 |
 | other archives | `pak2` and `pak3` hold **no** `.csdr`; `cachedFiles.psarc` holds **101**, all raw `0100` |
 
@@ -43,18 +49,19 @@ and its TOC size. Counts only; no member bytes are stored.
 | `[1]` | only `0x0a` (16,328) or `0x06` (2,992) | 19,320 / 19,320 |
 | `u16be[2:4]` | `== floor(size / 256)`, or exactly one less | 18,009 exact, 1,311 one less, **0 otherwise** |
 | `u16be[6:8]` | `== size - 20` | **19,320 / 19,320** |
-| `u32be[8:12]` | one constant bit pattern across the population (`0x02000000`, min `0x01000000`) | 1 distinct value in a 2,000-member sample |
-| `u32be[12:16]` | a second constant-ish flag word (`0x00000000`, `0x02000000`, `0x03000000` seen) | median `0x02000000` |
+| `u32be[8:12]` | **exactly 2 distinct values** over the whole population: `0x01000000` (4,238) and `0x02000000` (15,082) — a single bit in the top byte, i.e. a flag word | 19,320 / 19,320 |
+| `u32be[12:16]` | **exactly 4 distinct values**: `0x00000000` (4,008), `0x01000000` (226), `0x02000000` (15,084), `0x03000000` (2) — a two-bit flag word | 19,320 / 19,320 |
 | `u32be[16:20]` | an offset-shaped value, median `0x00107000`, sparse outliers up to `0x4057…` | — |
 | member size | min 1,412 · median 4,736 · max 20,397 B (`8c0a` median 5,278; `8c06` median 3,041) | — |
 
-Two consequences, both `STATIC_ANALYSIS_VERIFIED`:
+Two cross-checks, both `STATIC_ANALYSIS_VERIFIED`:
 
-- **The header carries no compression ratio.** `u16be[6:8]` is the *file* length minus 20, and
-  `u16be[2:4]` is a count of 256-byte units of the same file. A decompressor therefore has no
-  explicit output length in this header; it must infer one (e.g. `u16be[2:4] * 256`) or take it from
-  the caller. This contradicts the previous note's framing of `[2:4]` as a "block count hint" — it
-  is a *size* in 256-byte units, not a hint.
+- **The header carries no compression ratio, and its middle is flags, not sizes.** `u16be[6:8]` is the
+  *file* length minus 20, `u16be[2:4]` is a count of 256-byte units of the same file, and `[8:16]`
+  are two small flag words (§ table). A decompressor therefore has no explicit output length in this
+  header; it must infer one (e.g. `u16be[2:4] * 256`) or take it from the caller. This contradicts
+  the previous note's framing of `[2:4]` as a "block count hint" — on this corpus it is a *size* in
+  256-byte units with no ratio information attached.
 - **No `.csdr` member begins with `R`/`r`**, so the resource-descriptor tag in §3.2 is not a file
   magic for this corpus.
 
@@ -128,8 +135,8 @@ this question** in both directions.
 | …matching `OodleLZ` | **24** |
 | API labels present | `OodleLZ_Decompress`, `OodleLZ_Compress`, `OodleLZ_Compressor_to_DecodeType`, `OodleLZ_CompressContext_Alloc/_Free/_Reset`, `OodleLZ_CompressWithContext`, `OodleLZA/LZB/LZBLW/LZNA/LZNib_CompressFast_*`, `rrHuffman_PackCodeLensNew/_UnPackCodeLensNew`, `rrLZHLW_CompressFast/_CompressNormal_New/_CompressVeryFast`, `newLZ_decode_chunk_phase1/2`, `LZBLW_DecodeOneQuantum`, `LZNib_DecodeOneQuantum` |
 | codec family names | `LZHLW`, `LZNIB`, `LZB16`, `LZBLW`, `LZNA`, `Kraken`, `Mermaid`, `BitKnit`, `Selkie`, `Hydra`, `Leviathan` |
-| embedded source paths | `v:\devel\projects\oodle2\core\oodlelzcompressors.cpp`, `oodlelzpub.cpp`, `rrhuffmandecode.cpp`, `rrlzh.cpp`, `rrlzh_lzhlw_shared.cpp`, `templates\rrnew.h` |
-| `OODLE ERROR` / assertion strings | 105 |
+| embedded source paths | **25 distinct** `v:\devel\projects\oodle2\core\*.cpp` — the whole codec set, including `newlz.cpp`, `newlzf.cpp`, `newlzhc.cpp`, `lza.cpp`, `lzb.cpp`, `lzblw.cpp`, `lzna.cpp`, `lznib.cpp`, `oodlebitknit.cpp`, `rrrans64dual.cpp`, `rrhuffmandecode.cpp`, `rrhuffman.cpp`, `rrlzh.cpp`, `rrlzhlw.cpp`, `rrlzh_lzhlw_shared.cpp`, `oodlelzcompressors.cpp`, `oodlelzpub.cpp` |
+| `OODLE ERROR` / `bad parameter` assertion strings | **99** + **13** |
 | seekable/chunked API evidence | `OodleLZ_GetCompressedStepForRawStep`, `seekChunkLen`, `seekChunksIndependent`, `st: %d x %d seekchunks` |
 
 The decompressor entry this task was looking for **is in the image**: `OodleLZ_Decompress` at RVA
@@ -153,7 +160,7 @@ linked, which is exactly why the import table shows no decompression entry point
 | property name | `shaderTypeToLoad` at `0x12cfbe0` |
 | enum | `EShaderTypeToLoad` at `0x12cfcd2`; values `Debug`=0, `Shipping`=1, `PS4Neo_Debug`=2, `PS4Neo_Shipping`=3 (built by the string→int table in `FUN_00b0d580`, `0xb0d580`) |
 | resource type 4CC | `csdr` (`0x63736472`) registered at `FUN_00b0d3e0` call site `0xb0d464` |
-| sibling type | `cslt` (`0x63736c74`, "shader list") at `FUN_00b0e3a0` call site `0xb0e403` |
+| sibling type | `cslt` (`0x63736c74`) at `FUN_00b0e3a0` call site `0xb0e403`; the same function registers the `ShaderList` string, so the two are associated (inference, not proven) |
 | `csdr` descriptor tag | 8-byte constant `0x0000000134534452` → byte image `52 44 53 43 01` (`RDSC` + version 1) |
 | `csdr` descriptor suffix | `_ps4` (`0x12cfc29`) |
 | `csdr` loader callback | `FUN_00b0cc50` (624 B) stored into the descriptor at `0xb0d464`'s call |
@@ -189,6 +196,12 @@ region), then classify each source against Ghidra's coverage.
 | distinct in-window targets | 585 |
 | Ghidra-reported inbound call targets into the same window | 109 |
 | **sites Ghidra has no reference for** | **> 476** |
+
+Two independent implementations agree on the decisive case: `tools/re/ghidra/sweep_rel32_calls.py`
+does the same decode from Ghidra's own memory (77,245,752 initialised block bytes, 352,535 candidate
+sites, which is larger because Ghidra's blocks include zero-filled ranges that hold no code) and
+reports, for the window `0x89d3b0..0x89d3b1`, **1 in-window site, 1 distinct target,
+`0x1aa426`, class `OUTSIDE`**.
 
 Most of the extra sites are mid-instruction false positives (a `0xE8` byte inside another
 instruction's immediate), which is why the classification step matters: a site is only real when the
@@ -227,12 +240,38 @@ decBufBase, decBufSize, threadPhase, callback, userData…)` shape. The two non-
 else targets it, and the 8-byte little-endian value `0x000000000089d3b0` occurs **zero** times, so
 there is no function-pointer table entry for it either.
 
-**What this does and does not prove.** It proves the decompressor is *linked into reachable code* —
-one call site exists and Ghidra's "0 callers" was a coverage artefact. It does **not** prove that
-call site expands `.csdr` members: the enclosing function is not resolved (`0x1aa351..0x1aa42e` is
-still not claimed by any function entry, and the neighbouring `FUN_001aa2a0` is a tag-dispatch
-allocator whose low-29-bits-as-size accounting and `FUN_000326f0`/`FUN_00032710` lock pair do not
-look like an asset reader). **This is the one open edge, and it is the next task's first target.**
+#### The hole is the switch body of `FUN_001aa2a0`
+
+Ghidra's decompilation of `FUN_001aa2a0` ends at an unrecovered indirect jump
+(`WARNING: Could not recover jumptable at 0x001aa34f. Too many branches`). The table it failed to
+recover is a relative-offset switch table at **`0xfadd4c`** — the same address the decompiled C uses:
+
+| tag = `*param_1 >> 29` | case entry | lands at | what it does |
+|---:|---|---|---|
+| 0 | `0x1aa35c` | `0x1aa35c` | log/lookup path, then `CALL 0xf8f470` (thunk), then the epilogue |
+| 1 | `0x1aa3dc` | `0x1aa3dc` | `CALL 0x1b9130`, then the epilogue |
+| 2, 3, 4 | `0x1aa351` | `0x1aa351` | `MOV R8D,1` → falls into the Oodle call |
+| 5 | `0x1aa3f5` | `0x1aa3f5` | `MOV R8D,0` → falls into the Oodle call |
+
+(six real entries plus two trailing words holding `0x3f800000`, i.e. the next table's data, which is
+why the guard is `5 < tag`). So `0x1aa351..0x1aa42e` **is** part of
+`FUN_001aa2a0`: the function's true body is `0x1aa2a0..0x1aa468` (456 B), of which Ghidra claimed
+only 235 B in two ranges, and the epilogue at `0x1aa42f` restores `RBX/R12/R13/R14/R15/RBP` — the
+same registers the case bodies use, which is why the truncated decompilation showed them unset.
+
+`FUN_001aa2a0` therefore **is a type-tagged decompression dispatcher**: the tag is the top three bits
+of its first argument, and tags 2/3/4 and 5 both call `OodleLZ_Decompress`, differing only in `R8D`
+(`1` vs `0`). Reading the six register arguments against the public Oodle parameter order gives
+`compBuf = R15`, `compBufSize = R12`, `rawBuf = [RBP-0x60]`, `rawLen = RBX`, `R8D = fuzzSafe`,
+`R9D = checkCRC = 0` — **that mapping is an inference from the public signature order, not proven by
+this analysis**; what is proven is the 14-argument, 8-stack-slot call shape above.
+
+**What this does and does not prove.** It proves a *generic, tag-dispatched Oodle decompression entry
+point exists in game-reachable code* — not a library-internal one — and that Ghidra's "0 callers" was
+a coverage artefact hiding four of that function's six cases. It does **not** prove the entry point is
+reached from `.csdr`: `FUN_001aa2a0`'s own callers and the meaning of the three-bit tag are both
+still open. The tag space is small (6 cases), so one of them being "decompress a `csdr` member" is a
+plausible but unproven reading.
 
 ---
 
@@ -243,8 +282,10 @@ look like an asset reader). **This is the one open edge, and it is the next task
 `+0x18` grow callback, `+0x20` argument, `+0x28` flags). Checked this round:
 
 - The growable-buffer machinery **copies payload dwords** (`payload_dwords == count + 1`, `memcpy`
-  for `inline_data` families) and never resizes or reinterprets them. It has no shader-blob path:
-  the 711 grounded writer sites cover 27 opcodes, none of which carries a whole program image.
+  for `inline_data` families) and never resizes or reinterprets them. Nothing in the grounded table
+  carries a whole program image: the largest fixed payload is 6 dwords and the only unbounded family
+  (`0x10`) is used for 1..63-dword inline data, far below the 1.4–20 KB of a `.csdr` member. So the
+  command buffer is not the copy/expand path this task hypothesised it might be.
 - The shader bytes reach the driver through `libSceGnmDriver` imports (`sceGnmSetPsShader350`,
   `sceGnmSetVsShader`, `sceGnmUpdatePsShader350`, …), which are `jmp *GOT` thunks at
   `0xf903e0..0xf90a40`. Those thunks are external and are **not** part of this search's address
@@ -261,9 +302,10 @@ the "no shader blob" statement is a structural reading of the same table, not a 
 The two sweeps above are strong but neither is a proof of absence. These are the concrete remaining
 holes, in the order they should be closed:
 
-1. **The unresolved call site.** `0x1aa426 → 0x89d3b0` exists and is proven; the function that owns
-   it is not identified. Because the owner is unknown, "is this the asset path" is unanswered. This
-   is the only *positive* lead and must be closed first.
+1. **`FUN_001aa2a0`'s own callers and tag semantics.** The owner of the Oodle call *is* now
+   resolved (`FUN_001aa2a0`, §4.1), but who calls it and what the three-bit tag means is not. Six
+   cases is a small space; enumerate the callers of `0x1aa2a0` and the writers of the tagged words.
+   This is the only *positive* lead and must be closed first.
 2. **102,894 instructions outside any function body** (§2) plus the undecoded ranges that
    `probe_disasm_range.py` exposes. Any loader that lives entirely in such a range is invisible to
    `getFunctionContaining`, to `getReferencesTo`, and to the decompiler. The rel32 census in §4 was
@@ -290,9 +332,9 @@ holes, in the order they should be closed:
 
 ## 7. Next steps (bounded, in order)
 
-1. **Resolve `0x1aa351..0x1aa42e`.** Find the entry that reaches it (the jump table at `0xfadd4c`
-   indexed by `*param_1 >> 29` is the nearest candidate) and decompile the owner of the
-   `OodleLZ_Decompress` call. One question only: is `compBuf` an archive member buffer.
+1. **Enumerate callers of `FUN_001aa2a0`** and the writers of its tagged argument. One question
+   only: is `compBuf` (`R15`) an archive member buffer for a `.csdr` member. The switch table at
+   `0xfadd4c` is already decoded (§4.1), so the case bodies no longer need recovering.
 2. **Follow the `csdr` descriptor's function pointer.** `FUN_00b0d3e0` stores `FUN_00b0cc50` and
    `&DAT_02ed1fb0` into the descriptor; find every consumer of that descriptor and read what it does
    with the bytes it gets back. This is the path §6.3 predicts.
@@ -329,12 +371,28 @@ export GHIDRA_INSTALL_DIR=/Users/dehydratedflask/Applications/ghidra_12.1.4_PUBL
     --project-dir local/ghidra/persistent-20261020 --project-name SotC \
     --script tools/re/ghidra/probe_disasm_range.py --out /dev/null 0x1aa3fb 0x1aa442
 
-# 4. Corpus facts (§1).
+# 4. The switch table Ghidra could not recover, at 0xfadd4c (relative int32 offsets).
+python3 -I - <<'EOF'
+import struct
+d = open("local/re/eboot.elf", "rb").read()
+BASE, OFF = 0xfadd4c, 0xfadd4c + 0x4000     # PHDR 0: file offset = VA + 0x4000
+for i in range(6):
+    rel = struct.unpack_from("<i", d, OFF + 4 * i)[0]
+    print(i, hex((BASE + rel) & 0xffffffff))
+EOF
+
+# 5. Corpus facts (§1).
 python3 -I local/re/csdr_prefix_census.py           # 34,291 / 19,320, prefix histogram
 python3 -I local/re/csdr_variant_crosstab.py       # 9,660 / 7,536 per name variant
 python3 -I local/re/csdr_header_fields.py          # field rules
 python3 -I tools/lift/check_csdr_loader_search.py  # pins the claims above
 ```
+
+Project hygiene: the persistent project was only ever **opened read-only** — no re-import, no
+re-analysis, no save. Ghidra did rewrite its own bookkeeping (`SotC.rep/~index.*`,
+`SotC.rep/project.prp`) on open/close, which is normal; the program database
+(`SotC.rep/idata/00/`) still carries its 2026-10-20 timestamp, so the analysis is unchanged.
+`probe_disasm_range.py` and `probe_callgraph.py` alter the in-memory program only.
 
 Private outputs (counts and addresses only, no member bytes):
 `local/validation/csdr-loader/` (`sweep.txt`, `probe-strings.txt`, `rel32-oodle.txt`,

@@ -51,16 +51,17 @@ bool ensure_concmd_pending_list(ConCmdRegistry& registry) noexcept {
     return true;
 }
 
-ConCmdRegisterResult register_concmd_body_20d80(ConCmdBase& cmd, ConCmdRegistry& registry) noexcept {
+ConCmdRegisterResult register_concmd_body_20d80(ConCmdBase& cmd, void* manager,
+                                                ConCmdRegistry& registry) noexcept {
     ConCmdRegisterResult out{};
 
-    // 0x20d72: rsi = [0x2dfcbc8]; jmp 0x20d80
-    if (registry.manager.manager != nullptr) {
+    // 0x20d9e: `testq %r13,%r13` on the *argument*, not on the cell.
+    if (manager != nullptr) {
         // 0x20dae..0x20e76: lock manager+0x58, std::map insert keyed by name.data under the
         // `strcasecmp`-labeled import (NID-name inference), unlock.
         out.path = ConCmdRegisterPath::manager;
         if (registry.manager.insert == nullptr) return out;   // contract missing: ok stays false
-        out.ok = registry.manager.insert(registry.manager.manager, cmd);
+        out.ok = registry.manager.insert(manager, cmd);
         return out;
     }
 
@@ -91,7 +92,8 @@ ConCmdRegisterResult register_concmd_20d60(ConCmdBase& cmd, ConCmdRegistry& regi
     }
     cmd.registered = 1;   // mov byte [rdi+0x18],1
 
-    return register_concmd_body_20d80(cmd, registry);   // 0x20d72: jmp 0x20d80
+    // 0x20d72: rsi = [0x2dfcbc8]; jmp 0x20d80
+    return register_concmd_body_20d80(cmd, registry.manager.manager, registry);
 }
 
 bool release_inert_view_f590(const SharedStr& view) noexcept {

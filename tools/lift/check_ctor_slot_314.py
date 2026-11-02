@@ -471,6 +471,21 @@ RIPS = [
     (0xA428D0, 3, 0x15FE518, "488b0541bcbb00"),
 ]
 
+# The 63 rip-relative STORE sites of the body (a subset of RIPS; 56 distinct target addresses).
+STORE_SITES = [
+    0xA4187D, 0xA41884, 0xA4188F, 0xA41899, 0xA418B9, 0xA418CD,
+    0xA418DA, 0xA418EE, 0xA418FB, 0xA4190F, 0xA4191C, 0xA41930,
+    0xA4193D, 0xA4194A, 0xA4195E, 0xA4196B, 0xA41973, 0xA4197A,
+    0xA41988, 0xA41995, 0xA419A9, 0xA419B6, 0xA419CA, 0xA419D7,
+    0xA419EB, 0xA419F8, 0xA41A05, 0xA41A12, 0xA41A47, 0xA41A8D,
+    0xA41AB9, 0xA41AC0, 0xA41AC7, 0xA41AD1, 0xA41AD9, 0xA41AE4,
+    0xA41AEB, 0xA41AFE, 0xA41B05, 0xA41B0C, 0xA41BEA, 0xA41C3C,
+    0xA41C43, 0xA41C4A, 0xA41C54, 0xA41C5C, 0xA41C67, 0xA41C6E,
+    0xA41C81, 0xA41C88, 0xA41C8F, 0xA41DEF, 0xA41E21, 0xA41E28,
+    0xA41E32, 0xA41F2B, 0xA41FCA, 0xA41FD1, 0xA41FDB, 0xA420D1,
+    0xA4216D, 0xA42174, 0xA4217E,
+]
+
 # The 8 row-local `callq *0x18(%rax)` sites: (site, argument-functor tag, slot-3 body).
 INDIRECT = [
     (0xA41E1B, 0x15D1770, 0xC4F0),
@@ -723,6 +738,10 @@ def check_elf(e: Elf) -> None:
         require(e.call(site) == target, f"call at 0x{site:x} -> 0x{target:x}")
     require(len(RIPS) == 196 and len({row[0] for row in RIPS}) == 196, "196 distinct rip sites")
     require(len({row[2] for row in RIPS}) == 119, "119 distinct rip targets")
+    require(len(STORE_SITES) == 63 and len(set(STORE_SITES)) == 63, "63 distinct store sites")
+    rip_targets = {row[0]: row[2] for row in RIPS}
+    require(all(site in rip_targets for site in STORE_SITES), "every store site is a pinned rip operand")
+    require(len({rip_targets[site] for site in STORE_SITES}) == 56, "56 distinct store targets")
     for site, off, target, encoding in RIPS:
         raw = bytes.fromhex(encoding)
         require(e.read(site, len(raw)) == raw, f"rip operand encoding at 0x{site:x}")

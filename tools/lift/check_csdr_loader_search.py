@@ -40,6 +40,9 @@ PINNED_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d
 # Decompressor entry the doc pins, and the single inbound call site it records.
 OODLE_DECOMPRESS = 0x89D3B0
 OODLE_CALL_SITE = 0x1AA426
+# The relative switch table Ghidra could not recover, and the case entries it resolves to.
+SWITCH_TABLE_VA = 0xFADD4C
+SWITCH_TARGETS = [0x1AA35C, 0x1AA3DC, 0x1AA351, 0x1AA351, 0x1AA351, 0x1AA3F5]
 
 # Every string that has to survive in the image for the doc's identification to hold.
 OODLE_STRINGS = (
@@ -87,6 +90,9 @@ def check_doc() -> None:
         "0x1aa426",
         "0x1aa351..0x1aa42e",
         "0x15d5820",
+        "0xfadd4c",
+        "FUN_001aa2a0",
+        "0x1aa2a0..0x1aa468",
         "Oodle 2",
         "zlib 1.2.3",
         "E1065",
@@ -164,7 +170,19 @@ def check_elf() -> str:
     require(struct.pack("<Q", OODLE_DECOMPRESS) not in data,
             "OodleLZ_Decompress now has an absolute pointer table entry")
 
-    return "elf pinned; Oodle 2 + zlib 1.2.3 + .csdr naming present; 1 inbound call"
+    # The unrecovered switch table really does resolve into the hole.
+    mapping = [(v, o, f) for v, o, f in segs if v <= SWITCH_TABLE_VA < v + f]
+    require(mapping, f"switch table 0x{SWITCH_TABLE_VA:x} is not in any image segment")
+    vaddr, file_offset, _filesz = mapping[0]
+    table_offset = file_offset + (SWITCH_TABLE_VA - vaddr)
+    resolved = [SWITCH_TABLE_VA + struct.unpack_from("<i", data, table_offset + 4 * i)[0]
+                for i in range(len(SWITCH_TARGETS))]
+    require(resolved == SWITCH_TARGETS,
+            f"switch table resolves to {[hex(x) for x in resolved]}, "
+            f"pinned {[hex(x) for x in SWITCH_TARGETS]}")
+
+    return ("elf pinned; Oodle 2 + zlib 1.2.3 + .csdr naming present; 1 inbound call; "
+            "switch table resolves into the hole")
 
 
 def main() -> int:

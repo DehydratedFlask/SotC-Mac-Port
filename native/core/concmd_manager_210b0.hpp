@@ -85,6 +85,12 @@
 // no command. The manager object is a 0x60-byte block supplied by the caller (`new(0x60)` in retail,
 // `ConCmdManagerStorage` for a host).
 //
+// The drain's manager is the **argument**, not the cell: `0x20d80` branches on `testq %r13,%r13` of
+// its second argument, and the installer `0x242c0` stores `[0x2dfcbc8]` only *after* `0x210b0` has
+// returned (`0x243b1` call, `0x243f5` store). So during a real drain the cell is still null while
+// every queued command is inserted into the manager being built; a model that consulted the cell here
+// would re-queue everything and insert nothing.
+//
 // Because the drain must reach the register *body*, `concmd_base` now exposes
 // `register_concmd_body_20d80` and `register_concmd_20d60` is its guard plus that body. The observable
 // behaviour of `register_concmd_20d60` is unchanged (same paths, same results); the split only makes
@@ -105,8 +111,8 @@
 // NOT CLAIMED: what the container at `+0x08..+0x2f` is (a red-black map header is consistent with
 // every observable offset and with `0x211d0`/`0x22b20`, but the container type is not proved); what
 // `+0x30..+0x37` and `+0x50..+0x57` hold (this body does not write them, and whether the allocator at
-// `0x17070` zero-fills is not established); what `+0x38` points to; any run-time behaviour, engine
-// readiness, or whether the manager exists at any point during a real boot.
+// `0x17070` zero-fills is not established); what `+0x38` points to; any engine readiness, run-time
+// behaviour or engine role; and whether the manager exists at any point during a real boot.
 #pragma once
 
 #include <cstddef>
@@ -182,8 +188,8 @@ struct ConCmdManagerCtorHooks {
     void* host = nullptr;
     int (*critsec_init)(void* host, void* handle8) noexcept = nullptr;  // 0x3b310
     // 0x20d80. The default is `register_concmd_body_20d80`, i.e. the native body *without* the
-    // 0x20d60 once-flag guard.
-    ConCmdRegisterResult (*register_body)(void* host, ConCmdBase& cmd,
+    // 0x20d60 once-flag guard, called with the manager under construction as its second argument.
+    ConCmdRegisterResult (*register_body)(void* host, ConCmdBase& cmd, void* manager,
                                           ConCmdRegistry& registry) noexcept = nullptr;
 };
 

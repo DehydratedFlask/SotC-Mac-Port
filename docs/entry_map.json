@@ -700,6 +700,16 @@
         "header": "native/core/ctor_slot_314_a41810.hpp"
       }
     ],
+    "0x210b0": [
+      {
+        "constant": "kConCmdManagerCtor",
+        "header": "native/core/concmd_base.hpp"
+      },
+      {
+        "constant": "kConCmdManager210b0",
+        "header": "native/core/concmd_manager_210b0.hpp"
+      }
+    ],
     "0x21620": [
       {
         "constant": "kLookup21620",
@@ -5736,6 +5746,10 @@
       {
         "constant": "kConCmdManagerCtor",
         "header": "native/core/concmd_base.hpp"
+      },
+      {
+        "constant": "kConCmdManager210b0",
+        "header": "native/core/concmd_manager_210b0.hpp"
       }
     ],
     "0x213b0": [
@@ -12991,9 +13005,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1637,
+    "constants": 1638,
     "distinct_rvas": 1098,
-    "duplicate_rvas": 347,
-    "headers": 406
+    "duplicate_rvas": 348,
+    "headers": 407
   }
 }

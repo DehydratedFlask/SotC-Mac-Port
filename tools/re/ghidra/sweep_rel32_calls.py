@@ -47,14 +47,16 @@ def main():
     classes = {"CLEAN": 0, "NO_REF": 0, "BODY_HOLE": 0, "OUTSIDE": 0}
     per_target = {}
     rows = []
+    import jpype
     for block in memory.getBlocks():
         if not block.isInitialized():
             continue
         start = block.getStart().getOffset()
-        size = block.getSize()
+        size = int(block.getSize())
         total_bytes += size
-        buf = bytearray(size)
-        memory.getBytes(block.getStart(), buf)
+        raw = jpype.JArray(jpype.JByte)(size)
+        memory.getBytes(block.getStart(), raw)
+        buf = bytes(b & 0xFF for b in raw)
         for i in range(size - 5):
             if buf[i] not in (0xE8, 0xE9):
                 continue

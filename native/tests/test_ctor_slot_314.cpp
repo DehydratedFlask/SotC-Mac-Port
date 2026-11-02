@@ -259,7 +259,7 @@ void section_native_build() {
 
     CHECK(r.ok && r.blocked == Slot314Stage::none && r.blocked_index == 0);
     CHECK(r.atexit_records == 22 && r.functors_destroyed == 8);
-    CHECK(r.functor_dispatches == 5 * kSlot314BoolCallbackDispatches);
+    CHECK(r.functor_dispatches == kSlot314FunctorDispatches);   // 5 * 12 + 3 * 1
     CHECK(r.vars_built == 10 && r.menu_items == 10 && r.views_inert);
     CHECK(!r.canary_checked && !r.canary_matched);
     CHECK(r.page.ok);

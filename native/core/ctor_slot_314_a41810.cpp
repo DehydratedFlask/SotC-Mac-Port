@@ -307,6 +307,7 @@ Slot314Result init_slot314_a41810(Slot314Objects& o, ConCmdRegistry& concmd, Deb
                 return (void)fail.at(Slot314Stage::variable_build), out;
             }
             ++out.functors_destroyed;
+            ++out.functor_dispatches;
             // 0xa41e21: final vptr, then the value/default pair read from the caller's cell.
             var.base.vptr = kSlot314FloatFinalVptr;
             std::memcpy(&var.value, &spec.float_value_bits, 4);
@@ -340,6 +341,7 @@ Slot314Result init_slot314_a41810(Slot314Objects& o, ConCmdRegistry& concmd, Deb
             const Slot314FunctorSite& site = kSlot314FunctorSites[3 + (index - 5)];
             if (!slot314_inert_functor_destroy(site)) return (void)fail.at(Slot314Stage::variable_build), out;
             ++out.functors_destroyed;
+            ++out.functor_dispatches;
             // 0xa42333: 0xf590 on the stack name view.
             if (!release_inert_view_f590(l2::measured_view(spec.name, spec.name_len))) {
                 return (void)fail.at(Slot314Stage::variable_view_release), out;

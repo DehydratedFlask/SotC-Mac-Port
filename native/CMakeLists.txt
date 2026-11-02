@@ -2783,3 +2783,13 @@ target_sources(sotc_core PRIVATE core/lookup_21620.cpp)
 add_executable(test_lookup_21620 tests/test_lookup_21620.cpp)
 target_link_libraries(test_lookup_21620 sotc_core)
 add_test(NAME lookup_21620 COMMAND test_lookup_21620)
+
+# CPU-01-CONCMD-MANAGER-210B0-01: native manager constructor + pending drain (`0x210b0`, 273 B) —
+# the eight header stores, the guarded static list (shared with 0x20d80/0x21620), the FIFO drain
+# through the register BODY 0x20d80 with the manager as its argument, and the re-termination block
+# that re-empties the head. Additive. See core/concmd_manager_210b0.hpp and
+# tools/lift/check_concmd_manager_210b0.py.
+target_sources(sotc_core PRIVATE core/concmd_manager_210b0.cpp)
+add_executable(test_concmd_manager_210b0 tests/test_concmd_manager_210b0.cpp)
+target_link_libraries(test_concmd_manager_210b0 sotc_core)
+add_test(NAME concmd_manager_210b0 COMMAND test_concmd_manager_210b0)
