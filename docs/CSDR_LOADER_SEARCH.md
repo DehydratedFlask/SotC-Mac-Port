@@ -318,9 +318,10 @@ The body carries its own assert metadata, all three literals referenced from ins
 
 The same translation unit supplies `0x1aa0b0` (`CompressionHeader::CompressionHeader()`, `*h = 0`),
 `0x1aa210` (`0x1fffffff < *h`, the "is compressed" test), `0x1aa260` (uncompressed size), and
-`0x1aa040/0x1aa070/0x1aa0c0/0x1aa0e0/0x1aa160` (compressor-side helpers). So the one Oodle call site
-in the image lives in the engine's **generic compression wrapper**, not in Oodle's own code and not
-in a shader-specific reader.
+`0x1aa160`, which maps the *same* type field onto compressors (`0x1b4130` for type 1, `0x89ed10` for
+types 2–5) — the compression side of the same wrapper. So the one Oodle call site in the image lives
+in the engine's **generic compression wrapper**, not in Oodle's own code and not in a shader-specific
+reader.
 
 #### (c) The six cases, resolved to codecs
 
@@ -356,9 +357,11 @@ if ((*(byte *)(lVar2 + 0x70) & 8) != 0) {      /* wrapper flags                 
     lVar9 = FUN_001aa2a0(param_2 + 0x1e, lVar6, lVar9, lVar8, uVar7);
 ```
 
-The expanded buffer then goes through `FUN_0008dc30`/`FUN_00144880` into the resource object ctor,
-which for the `csdr` type is the descriptor's `+0x78` entry `FUN_00b0d4a0` → `FUN_00b0ced0`
-(allocates 0x88 B and parses a table of `0xe4`-byte shader records).
+The expanded buffer is then wrapped by `FUN_0004d470(&buf, owner, data, size, flag)` (which stores
+`&PTR_LAB_01595dc0` as the buffer object's vtable) and handed to `FUN_00144880`, which builds the
+resource through the type's object ctor — for `csdr` the descriptor's `+0x78` entry `FUN_00b0d4a0` →
+`FUN_00b0ced0` (allocates 0x88 B and parses a table of `0xe4`-byte shader records). `FUN_0008dc30` at
+`0x1473ac` is that buffer object's destructor, not part of the data path.
 
 #### (e) Where `loader+0xf0` comes from: a 12-byte trailer, proven on the whole corpus
 
