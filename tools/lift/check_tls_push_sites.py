@@ -31,35 +31,21 @@ HEADER = ROOT / "native/core/tls_record_stack.hpp"
 
 # site, line, sha256(file string), sha256(function signature), status
 SITES = (
-    # site, line, sha256(file), sha256(signature), status, allocation distance, allocation target
-    (0x33720, None, "8c0ea11ae25d62114c56b520aec0852351fcfeb4a434fce86493e8e647576e3d", None,
-     "partial", 0x4B, 0x17070),
-    (0x904EE, 605, "29f481463bf67f7e4435f9985d1e8b251ff4df446ad64adc7025bf9da4ca0edd",
-     "f5c9a29f84c30cc524fe8a684b65ed7ed7eaf9377f74125b3d4aaa4f2f6416b1", "resolved", 0xA, 0x17070),
-    (0x90732, 646, "29f481463bf67f7e4435f9985d1e8b251ff4df446ad64adc7025bf9da4ca0edd",
-     "e38ff048e8b91028a8a6f0f77b37c1266f31d9064eb838624573947d53051d4a", "resolved", 0xA, 0x17070),
-    (0x918C1, 227, "16d82085ed2deaf57078a3a0ca8aeeff8f6db420511037cbae51465885bd1d4e",
-     "0f8391632f709ce7537e00c364e78aeaa063c3e8a91db92713affcc0382b2f22", "resolved", 0x40, 0x12820),
-    (0x91926, 233, "16d82085ed2deaf57078a3a0ca8aeeff8f6db420511037cbae51465885bd1d4e",
-     "0f8391632f709ce7537e00c364e78aeaa063c3e8a91db92713affcc0382b2f22", "resolved", 0x14, 0x12820),
-    (0x16EA05, 46, "c45c6b1cef99baa0abe87a29eaaae8e8fdafdc0bb327b143ee707cfe9c5862fa",
-     "0b8bf9d3e797072d4251a9bdd50be012b0499886fb33b09b41d79112f95f20aa", "resolved", 0x14, 0x12820),
-    (0x16EA42, 50, "c45c6b1cef99baa0abe87a29eaaae8e8fdafdc0bb327b143ee707cfe9c5862fa",
-     "0b8bf9d3e797072d4251a9bdd50be012b0499886fb33b09b41d79112f95f20aa", "resolved", 0x18, 0x12820),
-    (0x19ACFA, 96, "ca1399c6fe4ecf89af9cae195dcd11f5b4633569e243f82410c764c51670a727",
-     "237a6419c8814f0201573601b0ad098d639b480132511288bc403fd2e75b1944", "resolved", 0xB3C, 0x12820),
-    (0x1B2E4A, 221, "1023a29c62ef868b7fc0377d905b25b18ca50206bdc45c87d5b5b3bcd07bd53c",
-     "7276030309a3137ecc6de6c1be7cc7574399dace94d881d2fbe01c4c0778cf8a", "resolved", 0x6C, 0x12820),
-    (0x1B37B7, None, "1023a29c62ef868b7fc0377d905b25b18ca50206bdc45c87d5b5b3bcd07bd53c",
-     "1265652f4927a582a7a8d169b93c02afc146c1f320156305d43e908ed4cdb844", "partial", 0x17E, 0x12820),
-    (0xA4676B, 0, "63956ae7159a9ed465c2d2cfd11fb4fa391d229c5bcece46d7a2cf1037e51936", None,
-     "partial", 0x1171, 0x17070),
-    (0xA47E67, None, "fc3f56f94a7d5617d2d481ca1f2da393623f1858d535956e0bb424ebc9d0f3db", None,
-     "partial", 0x285, 0x17070),
-    (0xA484C1, None, "fc3f56f94a7d5617d2d481ca1f2da393623f1858d535956e0bb424ebc9d0f3db", None,
-     "partial", 0xDBC, 0x17070),
-    (0xA4AC9C, None, "fc3f56f94a7d5617d2d481ca1f2da393623f1858d535956e0bb424ebc9d0f3db", None,
-     "partial", 0xDA, 0x17070),
+    # site, line, sha256(file), sha256(signature), status, allocation distance, target
+    (0x33720, 0x7a, "8c0ea11ae25d62114c56b520aec0852351fcfeb4a434fce86493e8e647576e3d", "b3da1be6be041094074ccce2c29301145fcba1d913a4ebbed93a5208cae33e0d", "resolved", 0x4b, 0x17070),
+    (0x904ee, 0x25d, "29f481463bf67f7e4435f9985d1e8b251ff4df446ad64adc7025bf9da4ca0edd", "f5c9a29f84c30cc524fe8a684b65ed7ed7eaf9377f74125b3d4aaa4f2f6416b1", "resolved", 0xa, 0x17070),
+    (0x90732, 0x286, "29f481463bf67f7e4435f9985d1e8b251ff4df446ad64adc7025bf9da4ca0edd", "e38ff048e8b91028a8a6f0f77b37c1266f31d9064eb838624573947d53051d4a", "resolved", 0xa, 0x17070),
+    (0x918c1, 0xe3, "16d82085ed2deaf57078a3a0ca8aeeff8f6db420511037cbae51465885bd1d4e", "0f8391632f709ce7537e00c364e78aeaa063c3e8a91db92713affcc0382b2f22", "resolved", 0x40, 0x12820),
+    (0x91926, 0xe9, "16d82085ed2deaf57078a3a0ca8aeeff8f6db420511037cbae51465885bd1d4e", "0f8391632f709ce7537e00c364e78aeaa063c3e8a91db92713affcc0382b2f22", "resolved", 0x14, 0x12820),
+    (0x16ea05, 0x2e, "c45c6b1cef99baa0abe87a29eaaae8e8fdafdc0bb327b143ee707cfe9c5862fa", "0b8bf9d3e797072d4251a9bdd50be012b0499886fb33b09b41d79112f95f20aa", "resolved", 0x14, 0x12820),
+    (0x16ea42, 0x32, "c45c6b1cef99baa0abe87a29eaaae8e8fdafdc0bb327b143ee707cfe9c5862fa", "0b8bf9d3e797072d4251a9bdd50be012b0499886fb33b09b41d79112f95f20aa", "resolved", 0x18, 0x12820),
+    (0x19acfa, 0x60, "ca1399c6fe4ecf89af9cae195dcd11f5b4633569e243f82410c764c51670a727", "237a6419c8814f0201573601b0ad098d639b480132511288bc403fd2e75b1944", "resolved", 0xb3c, 0x12820),
+    (0x1b2e4a, 0xdd, "1023a29c62ef868b7fc0377d905b25b18ca50206bdc45c87d5b5b3bcd07bd53c", "7276030309a3137ecc6de6c1be7cc7574399dace94d881d2fbe01c4c0778cf8a", "resolved", 0x6c, 0x12820),
+    (0x1b37b7, 0x180, "1023a29c62ef868b7fc0377d905b25b18ca50206bdc45c87d5b5b3bcd07bd53c", "1265652f4927a582a7a8d169b93c02afc146c1f320156305d43e908ed4cdb844", "resolved", 0x17e, 0x12820),
+    (0xa4676b, 0x36, "63956ae7159a9ed465c2d2cfd11fb4fa391d229c5bcece46d7a2cf1037e51936", "b3da1be6be041094074ccce2c29301145fcba1d913a4ebbed93a5208cae33e0d", "resolved", 0x1171, 0x17070),
+    (0xa47e67, 0x336, "fc3f56f94a7d5617d2d481ca1f2da393623f1858d535956e0bb424ebc9d0f3db", "b3da1be6be041094074ccce2c29301145fcba1d913a4ebbed93a5208cae33e0d", "resolved", 0x285, 0x17070),
+    (0xa484c1, 0x3be, "fc3f56f94a7d5617d2d481ca1f2da393623f1858d535956e0bb424ebc9d0f3db", "b3da1be6be041094074ccce2c29301145fcba1d913a4ebbed93a5208cae33e0d", "resolved", 0xdbc, 0x17070),
+    (0xa4ac9c, 0x6d7, "fc3f56f94a7d5617d2d481ca1f2da393623f1858d535956e0bb424ebc9d0f3db", "b3da1be6be041094074ccce2c29301145fcba1d913a4ebbed93a5208cae33e0d", "resolved", 0xda, 0x17070),
 )
 
 LINE = re.compile(r"^\s*([0-9a-f]+):\s+([a-z][a-z0-9.]*)\s+(.*)$")
@@ -125,42 +111,56 @@ def main() -> int:
                 f"0x{site:x} allocation target changed ({ops.split()[0]})")
 
         back = [(address, rows[address][0], rows[address][1]) for address in sorted(rows)
-                if site - 0x140 <= address < site]
+                if site - 0x300 <= address < site]
+
+        # The struct base is the frame slot handed to the call; the line lives at +0x10 of it.
+        frame = None
+        for _a, mnemonic, ops in reversed(back):
+            operands = f"{mnemonic} {ops.split('#', 1)[0].strip()}"
+            match = re.search(r"leaq\s+(-?0x[0-9a-f]+)\(%(rsp|rbp)\), %rsi$", operands)
+            if match is not None:
+                frame = (match.group(2), int(match.group(1), 16))
+                break
+
         leas = []
-        for _address, mnemonic, ops in reversed(back):
-            match = RIP_LEA.search(ops) if mnemonic == "leaq" else None
+        for _a, mnemonic, ops in reversed(back):
+            match = (re.search(r"leaq\s+0x[0-9a-f]+\(%rip\), %r[a-z0-9]+\s+#\s*(0x[0-9a-f]+)",
+                               f"{mnemonic} {ops}") if mnemonic == "leaq" else None)
             if match is not None:
                 leas.append(int(match.group(1), 16))
-                if len(leas) == 2:
-                    break
         require(leas, f"0x{site:x} has no rip-relative lea in its window")
-        strings = [string_at(address) for address in leas]
-        files = [text for text in strings if text.lower().endswith(".cpp")]
+        strings = [(address, string_at(address)) for address in leas]
+        files = [text for _address, text in strings if text.lower().endswith(".cpp")]
+        signatures = [text for _address, text in strings
+                      if text and not text.lower().endswith(".cpp")]
         require(files, f"0x{site:x} resolves no source path")
         require(hashlib.sha256(files[0].encode()).hexdigest() == file_sha,
                 f"0x{site:x} source path changed")
         require("\\" in files[0] or "/" in files[0], f"0x{site:x} path has no separator")
 
-        if status == "resolved":
-            resolved += 1
-            require(function_sha is not None, f"0x{site:x} resolved without a signature digest")
-            signatures = [text for text in strings if text and not text.lower().endswith(".cpp")]
-            require(signatures, f"0x{site:x} resolves no signature")
-            require(hashlib.sha256(signatures[0].encode()).hexdigest() == function_sha,
-                    f"0x{site:x} signature changed")
-            require(any(LINE_STORE.search(ops) and
-                        int(LINE_STORE.search(ops).group(1), 16) == line_value
-                        for _a, mnemonic, ops in back if mnemonic == "movl"),
-                    f"0x{site:x} line immediate {line_value} not found in the frame stores")
-        else:
-            require(line_value is None or line_value == 0,
-                    f"0x{site:x} is partial but records a nonzero line")
+        if status != "resolved":
+            require(line_value is None, f"0x{site:x} is partial but records a line")
+            continue
 
-    require(resolved == 8, f"expected 8 fully resolved sites, found {resolved}")
+        resolved += 1
+        require(frame is not None, f"0x{site:x} has no frame base for its struct")
+        require(signatures, f"0x{site:x} resolves no signature")
+        require(hashlib.sha256(signatures[0].encode()).hexdigest() == function_sha,
+                f"0x{site:x} signature changed")
+        register, displacement = frame
+        wanted = displacement + 0x10
+        stores = [int(match.group(1), 16) for _a, mnemonic, ops in back
+                  for match in [re.match(rf"movl\s+\$0x([0-9a-f]+), (-?0x[0-9a-f]+)\(%{register}\)$",
+                                         f"{mnemonic} {ops.split('#', 1)[0].strip()}")]
+                  if match is not None and int(match.group(2), 16) == wanted]
+        require(line_value in stores,
+                f"0x{site:x} line {line_value} not stored at {register}{wanted:+#x}")
+
+    require(resolved == len(SITES), f"expected {len(SITES)} resolved sites, found {resolved}")
     adjacent = sum(1 for site, _l, _f, _s, _st, distance, _t in SITES if distance <= 0x1C)
-    print(f"OK check_tls_push_sites: {len(SITES)} push sites, {resolved} full (function, file, line) "
-          f"triples and {len(SITES) - resolved} file-only; {adjacent} sit within 0x1c bytes of their "
-          f"allocation call, the rest push earlier in a longer block")
+    print(f"OK check_tls_push_sites: {len(SITES)} push sites, {resolved} full (signature, source path, "
+          f"line) triples; {adjacent} sit within 0x1c bytes of their allocation call, the rest push "
+          f"earlier in the same block")
     return 0
 
 

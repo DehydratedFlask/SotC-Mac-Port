@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 17:00 CDT (root) — all 14 TLS push sites resolved to full triples (STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. The 6 remaining partial sites are resolved: **14 of 14** now carry a full `(signature, source path, line)` triple (lines `0x2e`..`0x6d7`).
+- **The rule that works:** the record struct is the *frame slot handed to the call* (`leaq D(%rsp|%rbp), %rsi` immediately before `call 0x12300`), its line is stored at `D + 0x10`, and the two strings are the nearest `.cpp` path and the nearest non-path string among **all** rip-relative leas in the 0x300-byte window.
+- **Two of my own bugs caused the earlier "partial" verdicts:** a trailing `# imm = 0xNNN` comment broke the line-store match, and the extractor only looked at the last two `lea`s, missing the signature that sat third or fourth back. Both fixed; nothing about the sites changed.
+- **Checker:** `check_tls_push_sites.py` now asserts 14/14 resolved, recomputes the frame slot and the line store from the disassembly, re-hashes both strings, and still pins each site's allocation distance/target (5 within 0x1c bytes, the rest up to 0x1171).
+- **Verification (PASSED):** `check_tls_push_sites` OK (14 sites, 14 triples); build exit 0; CTest **522/522**; lift checkers **715 passed / 0 failed**.
+- **Next exact action:** the TLS side is complete at this level — remaining CPU work is indirect-frontier resolution (42/562) or new targets.
+
 ## 2026-11-03 16:05 CDT (root) — all 14 TLS push sites enumerated (STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. `tools/lift/check_tls_push_sites.py` enumerates **all 14** `call 0x12300` sites and pins, per site: the source-path digest, the signature digest (where resolved), the line immediate, and the following allocation call's distance **and** target.
