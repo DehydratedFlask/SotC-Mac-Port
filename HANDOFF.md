@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 06:05 CDT (root) — TLS record stack lifted from the two real bodies (FIXTURE_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. `native/core/tls_record_stack.{hpp,cpp}` models the two TLS consumers the binary actually has: **`0x12300`** (77 B `push`: `tcb = *(fs:0 + *(0x15fff98))`, `count = *(u32*)(tcb+0x400)`, store `count+1`, then write a 0x20-byte record `{arg0, 16 bytes from rsi, *(u32*)(rsi+0x10)}` at `tcb + count*0x20`) and **`0x12350`** (31 B `pop`: `decl 0x400(%rax)`).
+- **A real limit, refused rather than copied:** the retail push has **no bounds check**. At `count == 32` it increments the count and then writes the record at `+0x400` — over the count itself. The model reports `capacity` and leaves the count untouched instead of reproducing memory corruption. Pop-at-zero (which would wrap to `0xffffffff`) is likewise reported as `out_of_range`.
+- **Fixtures:** `test_tls_record_stack` — constants (count 0x400, stride 0x20, capacity 32), record layout at `+0x00/+0x08/+0x18`, count-then-record ordering visible through the public accessors, second record not disturbing the first, pop sequence plus zero refusal, 32-record fill then `capacity`, unknown thread → `no_thread`, and two threads not sharing a count.
+- **Checker:** `tools/lift/check_tls_record_stack.py` pins both body bytes/hashes and FDE lengths, the `fs:0` load shape, the `mov 0x400(%rax)`/`mov %edx,0x400(%rax)` pair, the `shl $0x5` stride, the `+0x18` field store, `decl 0x400(%rax)` in pop, **and that the count store precedes the record store** (the header's ordering claim). It also records the file value of `0x15fff98` = **-24**, i.e. the body reads the self-pointer slot one pointer below `fs:0`; that indirection is not modelled.
+- **Verification (PASSED):** build exit 0; CTest **520/520**; lift checkers **712 passed / 0 failed**; entry map regenerated to 1,438 constants / 979 RVAs / 383 headers.
+- **Next exact action:** find the record-stack consumer (who reads `tcb + count*0x20`) to give the records meaning, or wire `GuestThreads` into the allocator front's free-heap hint.
+
 ## 2026-11-03 05:10 CDT (root) — guest thread/TLS model (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`, thread/TLS card. `native/core/guest_tls.{hpp,cpp}`: a checked **0x800-byte block per guest thread id**, a thread pointer handed out from a caller-supplied base (`%fs:0x0`), `read/write_u8/u32/u64`, and statuses `ok / no_thread / out_of_range / already_exists / too_many_threads`. `retail_thread_pointer(context)` exposes it through the retail call layer (`RetailCallContext` gained an optional `GuestThreads*` + `thread_id`); without a model it reports `no_thread` rather than inventing an address.

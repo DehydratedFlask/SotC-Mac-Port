@@ -2655,3 +2655,10 @@ target_link_libraries(sotc_guest_tls PUBLIC sotc_core)
 add_executable(test_guest_tls tests/test_guest_tls.cpp)
 target_link_libraries(test_guest_tls PRIVATE sotc_guest_tls)
 add_test(NAME guest_tls COMMAND test_guest_tls)
+
+# CPU-01-AOT-CFG-SCALE-01: per-thread record stack (0x12300 push, 0x12350 pop) on the TLS model.
+add_library(sotc_tls_record_stack STATIC core/tls_record_stack.cpp)
+target_link_libraries(sotc_tls_record_stack PUBLIC sotc_guest_tls)
+add_executable(test_tls_record_stack tests/test_tls_record_stack.cpp)
+target_link_libraries(test_tls_record_stack PRIVATE sotc_tls_record_stack)
+add_test(NAME tls_record_stack COMMAND test_tls_record_stack)

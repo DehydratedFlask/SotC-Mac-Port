@@ -3788,6 +3788,18 @@
         "header": "native/core/ctor_slot_539_121940.hpp"
       }
     ],
+    "0x12300": [
+      {
+        "constant": "kTlsRecordPush18000",
+        "header": "native/core/tls_record_stack.hpp"
+      }
+    ],
+    "0x12350": [
+      {
+        "constant": "kTlsRecordPop18000",
+        "header": "native/core/tls_record_stack.hpp"
+      }
+    ],
     "0x12820": [
       {
         "constant": "kAllocDispatch",
@@ -11391,9 +11403,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1436,
-    "distinct_rvas": 977,
+    "constants": 1438,
+    "distinct_rvas": 979,
     "duplicate_rvas": 308,
-    "headers": 382
+    "headers": 383
   }
 }
