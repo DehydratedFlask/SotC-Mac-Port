@@ -1,5 +1,10 @@
 // Resolved vtable target `0xa460f0` (reached from vtable `0x15d1678` slot `0x280`).
 //
+// Evidence grade: **table-level only** (E1066). The qword at this slot, the type-8 RELA addend and the
+// FDE start tie the target to the table; they do NOT prove that the call site named here dispatches
+// there. That site's call register is not provably this table load, so it can dispatch through
+// another table at run time. `docs/INDIRECT_FRONTIER.md` "Evidence grades" defines both grades.
+//
 // Evidence: `0xa3dff7` is `call *0x280(%rax)` with `%rax` from the RIP-relative table `0x15d1678`;
 // the qword at slot `0x280` is `0xa460f0`, the dynamic relocation at `0x15d18f8` is type 8 with
 // addend `0xa460f0`, and `0xa460f0` is an FDE function start of length `0x3e`.

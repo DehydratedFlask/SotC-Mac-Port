@@ -133,6 +133,25 @@ Ghidra installation:
 base, executable path/MD5/SHA-256, function and symbol counts, and `present/kind/size/blocks` for
 each RVA.
 
+## `getFunctionAt` vs `getFunctionContaining`
+
+`probe_project.py` answers "is this a function **entry**", so an address in the middle of a
+function reports `present=no`, which reads like "not code". `probe_containing.py` separates the two
+questions and prints the body ranges:
+
+```sh
+./local/venv-pyghidra/bin/python tools/re/ghidra/run_dump.py \
+    --project-dir local/ghidra/persistent-20261020 --project-name SotC \
+    --script tools/re/ghidra/probe_containing.py --out /dev/null 0xa4bddb 0xa4ab90
+```
+
+It emits `CONTAIN <rva> is_entry= is_instruction= containing_entry= containing_size=
+containing_blocks= in_body= range_N=<min>..<max>`. That is how `0xa4bddb` (E1065) was resolved: no
+function entry, `containing_any=none`, and the address inside a hole that Ghidra never
+disassembled — while the containing function's own ranges bracket the hole on both sides. Note
+that `getFunctionContaining` also returns `none` for an address in a body hole, so a "no procedure
+exists" error has to be read together with `is_instruction=`.
+
 ## The five dossiers
 
 | RVA | Ghidra body | Decompiled C | Callees | What it is |

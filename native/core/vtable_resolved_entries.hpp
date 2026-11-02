@@ -1,6 +1,6 @@
 // Statically resolved vtable call slots (CPU-01-AOT-CFG-SCALE-01).
 //
-// Two evidence grades live in this table, and every row is labelled with its own (E1064):
+// Two evidence grades live in this table, and every row is labelled with its own (E1066):
 //
 //   site-provable - `call *slot(%reg)` where the register's NEAREST preceding write is the
 //     RIP-relative load of this table (`lea` of the table base, or `mov` of a table-pointer global),
@@ -18,7 +18,7 @@
 // it cannot and does not test dispatch.
 //
 // These are entries, not implementations: every one of the 37 distinct targets has a native body
-// model. Measured split (E1064): 41 site-provable rows, 50 table-level rows. The older rows inherited
+// model. Measured split (E1066): 41 site-provable rows, 50 table-level rows. The older rows inherited
 // a table-level tie from `indirect_frontier.classify`, whose `rip_global_for` fallback scans *past*
 // the nearest definition and can attach a table load the call does not use;
 // `docs/INDIRECT_FRONTIER.md` ("Evidence grades") defines both grades and gives the counts.

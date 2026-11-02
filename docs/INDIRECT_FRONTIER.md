@@ -84,7 +84,7 @@ through the sweeps recorded below.
 
 ## Evidence grades
 
-Two different claims live in `native/core/vtable_resolved_entries.hpp`, and since E1064 every row
+Two different claims live in `native/core/vtable_resolved_entries.hpp`, and since E1066 every row
 carries its grade as a trailing comment in the table. The grade is a property of the **row**, not of
 the target: one table base can produce both grades — on `0x1594dc0`, slot `0x20` is provable while
 slots `0x10` and `0x18` are table-level.

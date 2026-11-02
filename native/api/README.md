@@ -21,7 +21,9 @@ enters `SOTC_STATE_RUNNING`; every "engine" field in a result is a measured fact
 - `sotc_core_validate(core_or_NULL, assets_dir, &result)`: the six PSARC archives, same order, checks and
   wording as the launcher's `AssetValidator`. `result` separates `assets_ready` from `engine_ready`
   (always 0) and `start_would_succeed` (always 0). With a handle it drives IDLE/READY/FAILED ->
-  VALIDATING -> READY (all OK) or IDLE.
+  VALIDATING -> READY (all OK) or IDLE. A call that arrives while a check is already in flight (state
+  VALIDATING, including from a state callback) is refused with `SOTC_ERR_BAD_STATE` and writes
+  nothing, so re-entrant/burst checks never queue or interleave.
 - `sotc_core_start` (READY, or FAILED with ready assets): STARTING -> FAILED, returns
   `SOTC_ERR_ENGINE_NOT_IMPLEMENTED`. IDLE after failed validation: `SOTC_ERR_ASSETS_NOT_READY`; any
   other state: `SOTC_ERR_BAD_STATE`. Never `SOTC_OK`.
@@ -36,6 +38,26 @@ enters `SOTC_STATE_RUNNING`; every "engine" field in a result is a measured fact
   hard-coded numbers). `save_load` is `PARTIAL` for the fixture-verified USR-DATA transaction and
   metadata only (no platform save, no real PS4 acceptance).
 - Out-structs start with `uint32_t struct_size`; the library requires >= the v1 size, writes only the v1 prefix.
+
+## Versioning rules a client must follow
+
+`sotc_core_create` takes the `(major << 16) | minor` value the **caller** was compiled against and
+refuses a different MAJOR or a newer MINOR with `SOTC_ERR_ABI_MISMATCH`. Two rules keep that check
+meaningful:
+
+1. Pass the compile-time constant, never `sotc_core_abi_version()`. A client that reports the
+   library's own answer always agrees with whatever it found at run time, so an incompatible
+   library is accepted and every out-struct is then misread. Compare the two values only for
+   diagnostics.
+2. `SOTC_CORE_ABI_VERSION` is an expression macro. C and C++ can use it directly, but bindings whose
+   macro importer only handles literals cannot: the Swift Clang importer rejects it
+   (`macro 'SOTC_CORE_ABI_VERSION' unavailable: structure not supported`). Compose the same packed
+   value from `SOTC_CORE_ABI_MAJOR` and `SOTC_CORE_ABI_MINOR`, which are literal macros.
+
+`launcher/Tests/LauncherNativeCoreTests/AbiContractTests.swift` is the reference client-side check:
+it pins every error/state/archive/subsystem code against the header's own constants, asserts the
+handshake refuses a bumped major/minor, and asserts the fixed-size arrays are laid out the way the
+client decodes them.
 
 ## Constructor-runner prefix
 

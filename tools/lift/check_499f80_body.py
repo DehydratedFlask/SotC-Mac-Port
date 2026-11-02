@@ -16,6 +16,10 @@ Pinned here:
   object free (tag 1), then the replacement cell write.
 * **Offset-only globals**: the three global cells are loaded by rip-relative displacement and the native
   model addresses them only through caller-supplied cells (no RVA literal appears in the `.cpp`).
+* **Host rollback surface** (E1055, source structure only): the model exposes per-resource cleanup records,
+  a named `hooks_not_failure_atomic` rejection, a named `previous_cleanup_failed` stage and a rollback retry
+  entry point, and the fixture injects each allocation, each free and a CritSec `EBUSY` rejection. These are
+  host safety policy; the pinned body has no failure branch, so none of it is retail error semantics.
 
 The next call at `0x531df4` (`0x56dcb0`) is deliberately out of scope and is not pinned or continued.
 """
@@ -114,8 +118,19 @@ def main() -> int:
     require("free_170c0" in src and "free_170b0" in src, "replacement releases must use the pinned wrappers")
     for needle in ("tests/test_init_499f80_body.cpp", "test_init_499f80_body"):
         require(needle in cmake, f"cmake missing {needle}")
-    require("fail_at_call" in test, "fixture must inject allocation failures")
-    require("free_tags.empty()" in test, "fixture must assert that nothing is rolled back")
+    # Host-only rollback contract (E1055). These are source-structure pins only: the retail body has no
+    # failure branch, so nothing here may be read as recovered retail error semantics.
+    for needle in ("Init499f80Resource", "Init499f80Cleanup", "Init499f80CleanupRecord",
+                   "cleanup_complete", "store_cell_restored", "critsec_init_failure_atomic"):
+        require(needle in hdr, f"header missing host rollback surface {needle}")
+    for needle in ("hooks_not_failure_atomic", "previous_cleanup_failed",
+                   "rollback_init_499f80_candidate"):
+        require(needle in src, f"model missing host rollback contract {needle}")
+    require("fail_alloc_at_call" in test, "fixture must inject allocation failures")
+    require("fail_free_at_call" in test and "fail_free_at_call2" in test,
+            "fixture must inject each free failure")
+    require("EBUSY" in test, "fixture must inject a CritSec destroy rejection")
+    require("rollback_init_499f80_candidate" in test, "fixture must exercise the rollback retry")
 
     if not (ROOT / "local/re/eboot.elf").is_file() or not FDE.is_file():
         print("SKIP check_499f80_body: private image not present (module wiring checked)")

@@ -69,8 +69,15 @@ assets-ready GUI and actual game start remain unverified.
 ABI: [native/api/README.md](../native/api/README.md). `NativeCoreClient().start()` throws
 `CoreFailure(.engineNotImplemented)` and `status().state` becomes `.failed`, never `.running`;
 `CoreClientMapping.launcherState` additionally turns `running` without `engineImplemented` into `.failed`.
-Tests: `LauncherCoreTests/CoreClientTests` (scripted test double `FakeCoreClient`, deliberately test-only)
-and `LauncherNativeCoreTests` (real C ABI, including parity with `AssetValidator`).
+`NativeCoreClient` declares the ABI it was compiled against
+(`NativeCoreClient.compiledAgainstABIVersion`, from `SOTC_CORE_ABI_MAJOR`/`_MINOR`) and hands that to
+`sotc_core_create`, so an incompatible library is refused at the handshake instead of being queried
+with the wrong struct layout; `init(expectedAbiVersion:)` exists to exercise that refusal. A
+`CoreFailure` never carries `.ok`, and a failure message is only taken from the handle when the
+handle's most recent error is that same code.
+Tests: `LauncherCoreTests/CoreClientTests` (scripted test double `FakeCoreClient`, deliberately test-only),
+`LauncherNativeCoreTests` (real C ABI, including parity with `AssetValidator`) and
+`LauncherNativeCoreTests/AbiContractTests` (header constants vs. the Swift mirror).
 
 ## LauncherModel over CoreClient (APP-01-LAUNCHER-CORECLIENT-01)
 

@@ -1,5 +1,10 @@
 // Vtable slot resolved by the vtable-closure sweep: `0x1594ae8 + 0x50 -> 0x13d60`.
 //
+// Evidence grade: **table-level only** (E1066). The qword at this slot, the type-8 RELA addend and the
+// FDE start tie the target to the table; they do NOT prove that the call site named here dispatches
+// there. That site's call register is not provably this table load, so it can dispatch through
+// another table at run time. `docs/INDIRECT_FRONTIER.md` "Evidence grades" defines both grades.
+//
 // Evidence:
 //   * `0x11462` is `call *0x50(%rax)` with `%rax` loaded from the RIP-relative table `0x1594ae8`;
 //   * `0x113d6` reaches the same target through the table `0x1595b60` at slot `0x50`;

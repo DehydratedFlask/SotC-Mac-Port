@@ -1,5 +1,10 @@
 // Vtable slot resolved by the indirect-frontier card: `0x15949a0 + 0x88 -> 0x187c0`.
 //
+// Evidence grade: **table-level only** (E1066). The qword at this slot, the type-8 RELA addend and the
+// FDE start tie the target to the table; they do NOT prove that the call site named here dispatches
+// there. That site's call register is not provably this table load, so it can dispatch through
+// another table at run time. `docs/INDIRECT_FRONTIER.md` "Evidence grades" defines both grades.
+//
 // Evidence:
 //   * `0x1254d` is `call *0x88(%rax)` with `%rax` loaded from the RIP-relative table `0x15949a0`;
 //   * the qword at `0x15949a0 + 0x88` in the pinned image is `0x187c0`;
