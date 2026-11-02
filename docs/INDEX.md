@@ -169,7 +169,8 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [ENTRY_MAP](ENTRY_MAP.md) | Guest-address → native-entry table: 951 distinct RVAs declared by 1,386 constants across 364 headers, with generated [entry_map.json](entry_map.json) |
 | [INDIRECT_FRONTIER](INDIRECT_FRONTIER.md) | 499 indirect sites in the `0x531d60` closure classified by call shape; 1 target resolved from the image, with [indirect_frontier.json](indirect_frontier.json) |
 | [CSDR_COMPRESSED](CSDR_COMPRESSED.md) | Compressed `.csdr` container (8c06/8c0a/cc**) structure statistics and codec trials: UNKNOWN codec, what was ruled out |
-| [CSDR_LOADER_SEARCH](CSDR_LOADER_SEARCH.md) | Bounded search for the `.csdr` loader in the pinned executable: negative in `eboot`, evidence points to the system GPU driver |
+| [CSDR_LOADER_SEARCH](CSDR_LOADER_SEARCH.md) | `.csdr` loader found (E1075/E1078): `bpe::Compression::Decompress` dispatches on the trailer word to a statically linked Oodle 2 LZ SDK or zlib 1.2.3; member layout and the decode contract |
+| [CODEC_DECISIONS](CODEC_DECISIONS.md) | The two decoders the port must supply — Oodle (`.csdr`) and ATRAC9 (`.sxd2`): what is pinned, options with licences, acceptance tests; owner decision pending |
 | [PLATFORM](PLATFORM.md) | Native architecture and subsystem requirements; native-core owner |
 | [VALIDATION](VALIDATION.md) | Measurable gates, failures, real-game proof; validation owner |
 | [G1 PARTIAL pack (2026-10-22)](checkpoints/2026-10-22-g1-partial-evidence-pack.md) | Phase C evidence; G1 PARTIAL not PASSED; E404 |

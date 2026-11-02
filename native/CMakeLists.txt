@@ -2496,6 +2496,13 @@ target_sources(sotc_core PRIVATE core/ctor_slot_326_837f30.cpp)
 add_executable(test_ctor_slot_326 tests/test_ctor_slot_326.cpp)
 target_link_libraries(test_ctor_slot_326 sotc_core)
 add_test(NAME ctor_slot_326 COMMAND test_ctor_slot_326)
+# CPU-01-STARTUP-SLOT-329-CHARACTERIZATION-01: constructor index 329 (0x829e90), the Shadow Path /
+# path-finding debug page (7 bools, 2 integer ranges, 1 float range, 1 group, 10 toggles,
+# 1 separator row, 22 atexit records) plus its two local ranged-variable constructors.
+target_sources(sotc_core PRIVATE core/ctor_slot_329_829e90.cpp)
+add_executable(test_ctor_slot_329 tests/test_ctor_slot_329.cpp)
+target_link_libraries(test_ctor_slot_329 sotc_core)
+add_test(NAME ctor_slot_329 COMMAND test_ctor_slot_329)
 
 # Parallel-lane fragments: native/lanes/<lane>.cmake. Workers configure with -DSOTC_LANES=<lane>
 # to build only their own fragment; the integrator configures with the default "*" (all lanes).

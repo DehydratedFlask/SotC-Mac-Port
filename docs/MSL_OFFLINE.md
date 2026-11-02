@@ -627,7 +627,7 @@ measured hole list for a bounded sample.
 and never guesses a binding.
 
 ```sh
-python3 -I tools/dev/msl_abi_manifest.py --self-test              # 69 checks, synthetic spans only
+python3 -I tools/dev/msl_abi_manifest.py --self-test              # 76 checks, synthetic spans only
 python3 -I tools/dev/msl_abi_manifest.py --program span.bin --stage vs            # the hole list
 python3 -I tools/dev/msl_abi_manifest.py --program span.bin --stage vs --json     # same, as JSON
 python3 -I tools/dev/msl_abi_manifest.py --program span.bin --stage vs --skeleton form.json
@@ -804,5 +804,7 @@ The same program's `MUBUF` descriptor slots (`s20`, `s24`, `s28`) were recorded 
 three are *loaded* rather than bindable, which is exactly the two-level finding above.
 
 Private output: `local/validation/msl-abi-holes/abi_holes.json` (slots, counts, digests, offsets and
-the decoder's own strings only — no payload bytes, no listings). Census **STATIC_ANALYSIS_VERIFIED**,
-self-test **FIXTURE_VERIFIED**; **0 lowered**, nothing compiled, no pipeline state, **G3 NOT RUN**.
+the decoder's own strings only — no payload bytes, no listings). Two consecutive runs of one tool
+version produced byte-identical JSON, and the file records that tool version's own SHA-256, so the
+numbers above are reproducible from the same inputs. Census **STATIC_ANALYSIS_VERIFIED**, self-test
+**FIXTURE_VERIFIED**; **0 lowered**, nothing compiled, no pipeline state, **G3 NOT RUN**.

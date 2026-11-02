@@ -17,7 +17,8 @@ fill:
 It decodes and counts. It never lowers, never compiles, never executes and never guesses a
 binding, so nothing here moves `lowered` off zero by itself.
 
-Schema: `docs/MSL_OFFLINE.md` ("ABI manifest schema (msl-abi-manifest-v1)").
+Schema and measurement: `docs/MSL_OFFLINE.md`, section "ABI manifests: the schema, the
+holes, and why `lowered` is still 0".
 
   python3 -I tools/dev/msl_abi_manifest.py --self-test
   python3 -I tools/dev/msl_abi_manifest.py --program span.bin --stage vs --json
@@ -64,9 +65,9 @@ CASE_FIELDS = ('position', 'encoded_normal', 'object_row0', 'object_row1', 'obje
 # 125/126/127 EXEC-class. A program that *reads* one of those is a per-lane blocker anyway
 # (`reads_vcc_mask`/`reads_exec_mask`), so no hole is emitted for it.
 MASK_SELECTORS = frozenset((104, 105, 106, 107, 125, 126, 127))
-# `Lowerer.run` row support. A manifest cannot add a row here; a program containing any other
-# mnemonic is shape-blocked, not binding-blocked, and is reported as such rather than promised.
-LOWERED_PASSTHROUGH = frozenset(('s_mov_b32', 's_waitcnt', 's_ttracedata', 's_endpgm'))
+# `Lowerer.run` computes only these vector rows (plus the scalar passthrough `s_mov_b32`,
+# `s_waitcnt`, `s_ttracedata`, `s_endpgm`). A manifest cannot add a row here; a program containing
+# any other mnemonic is shape-blocked, not binding-blocked, and is reported as such.
 LOWERED_ARITHMETIC = frozenset(('v_mov_b32', 'v_sub_f32', 'v_mul_f32', 'v_mac_f32',
                                 'v_mad_f32', 'v_rsq_f32', 'v_cvt_pkrtz_f16_f32'))
 BINDING_WIDTH = {'pointer': 2, 'descriptor': 4, 'float4': 4, 'float': 1,
@@ -176,8 +177,9 @@ class _Analysis:
             entry['sites'].append(row.offset)
         if any(s in self.scalar_defined for s in range(slot, slot + width)):
             entry['derived'] = True
-        if kind == 'pointer' or row.encoding == 'SMRD':
-            entry['view_dwords'].append({'offset': offset, 'dwords': dwords})
+        request = {'offset': offset, 'dwords': dwords}
+        if request not in entry['view_dwords']:
+            entry['view_dwords'].append(request)
 
     def need_descriptor(self, slot: int, row, components: int) -> None:
         entry = self.descriptors.get(slot)
@@ -358,7 +360,8 @@ class _Analysis:
             'initial_vectors': len(holes['initial_vectors']),
             'initial_scalars': len(holes['initial_scalars']),
             'policy': len(holes['policy']),
-            'view_dwords': sum(len(e['view_dwords']) for e in holes['scalar_bases']),
+            'view_dword_requests': sum(len(e['view_dwords'])
+                                       for e in holes['scalar_bases']),
             'shape': len(self.shape),
         }
         counts['binding_holes'] = sum(counts[k] for k in
@@ -366,15 +369,15 @@ class _Analysis:
                                        'initial_vectors', 'initial_scalars', 'policy'))
         # Slots the program touches but no manifest can bind: they are written by an earlier
         # instruction, so `Lowerer.pair()` would reject a directly bound cell.
-        derived = {
+        derived_map = {
             'scalar_bases': sorted(({'slot': e['slot'], 'kind': e['kind'], 'sites': e['sites']}
                                     for e in derived), key=lambda e: e['slot']),
             'buffer_descriptors': sorted(
                 ({'slot': e['slot'], 'sites': e['sites']} for e in derived_descriptors),
                 key=lambda e: e['slot']),
         }
-        counts['derived_slots'] = len(derived['scalar_bases']) + len(
-            derived['buffer_descriptors'])
+        counts['derived_slots'] = len(derived_map['scalar_bases']) + len(
+            derived_map['buffer_descriptors'])
         return {
             'schema': ANALYSIS_SCHEMA,
             'stage': self.stage,
@@ -384,7 +387,7 @@ class _Analysis:
             'per_lane_eligible': inventory['per_lane_eligible'],
             'per_lane_blockers': inventory['per_lane_blockers'],
             'holes': holes,
-            'derived': derived,
+            'derived': derived_map,
             'counts': counts,
             # A manifest is necessary but not sufficient: `shape` lists everything a manifest
             # cannot fix, so "waiting on bindings" is never claimed for a shape-blocked program.
@@ -422,15 +425,16 @@ def skeleton(analysis: dict, identity: str | None = None,
              provenance: str = 'state-trace') -> dict:
     """Emit `msl-abi-manifest-v1` with exactly the holes present, each `null` until supplied.
 
-    Two values are pre-filled because the *encoding* forces them, not because a resource was
-    guessed: a `MUBUF` carry of a formatted vertex fetch reads the vertex index, and the
-    interpolation-control cell `s124` is the coefficient selector. `vertex_select` stays null: the
-    pinned translator and the ISA summary disagree on that mapping, so it is the owner's call.
+    Only what the *encoding* forces is pre-filled, never a resource: a `MUBUF` carry of a formatted
+    vertex fetch reads the vertex index, the interpolation-control cell `s124` is the coefficient
+    selector, the interpolation mode follows from the `VINTRP` row, and `floating_point` has one
+    accepted profile. `vertex_select` stays null: the pinned translator and the ISA summary disagree
+    on that mapping, so it is the owner's call.
     """
     holes = analysis['holes']
     document = {
         'schema': SCHEMA,
-        'shader': {'id': identity, 'stage': analysis['stage'],
+        'shader': {'id': identity or analysis['sha256'][:16], 'stage': analysis['stage'],
                    'sha256': analysis['sha256'], 'bytes': analysis['bytes']},
         'provenance': {'bindings': provenance,
                        'note': 'every null is an unfilled hole; slot numbers are measured, '
@@ -898,7 +902,8 @@ def render_holes(analysis: dict, identity: str | None = None) -> list[str]:
         f'{counts["export_targets"]} export target(s), '
         f'{counts["initial_vectors"]} initial vector(s), '
         f'{counts["initial_scalars"]} initial scalar(s), '
-        f'{counts["policy"]} policy knob(s), {counts["view_dwords"]} scalar view dword(s)',
+        f'{counts["policy"]} policy knob(s), '
+        f'{counts["view_dword_requests"]} scalar view dword request(s)',
     ]
     for entry in analysis['holes']['scalar_bases']:
         dwords = ', '.join(f'[{r["offset"]}..{r["offset"] + r["dwords"] - 1}]'
@@ -1421,6 +1426,25 @@ def _self_test() -> int:
     partial_holes = analyze(partial, 'vs')
     check('export contract is a blocker',
           any('export contract' in b['reason'] for b in partial_holes['shape']))
+
+    # A synthetic PS that only exports MRT0: the pair projection needs both stages.
+    ps_code = program(vop1(1, src0=256, vdst=4),
+                      exp(0, vsrc0=4, vsrc1=4, vsrc2=4, vsrc3=4), end)
+    ps_holes = analyze(ps_code, 'ps')
+    check('ps is manifest-only', ps_holes['manifest_only'])
+    check('ps exports mrt0', [e['target'] for e in ps_holes['holes']['export_targets']] == [0])
+    check('ps fill validates', validate(fill(ps_holes), ps_holes) == [])
+    pair = to_lowerer_pair(fill(analysis), fill(ps_holes))
+    check('pair schema', pair['schema'] == 'bounded-ssa-msl-v1')
+    check('pair profile', pair['floating_point'] == FLOATING_POINT_PROFILES[0])
+    check('pair stages', (pair['vs']['sha256'], pair['ps']['sha256'])
+          == (analysis['sha256'], ps_holes['sha256']))
+    try:
+        to_lowerer_pair(fill(ps_holes), fill(analysis))
+    except AbiError as exc:
+        check('pair refuses swapped stages', 'vs manifest' in str(exc))
+    else:
+        raise AssertionError('self-test failed: pair projection accepted a ps as vs')
 
     # VINTRP 2: the vertex-select map is a hole, the mode is forced by the encoding.
     interp = program(encode('VINTRP', 2, vsrc=1, attrchan=0, attr=0, vdst=2),
