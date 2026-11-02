@@ -39,7 +39,12 @@ extern "C" {
 
 #define SOTC_CORE_ABI_MAJOR 1u
 #define SOTC_CORE_ABI_MINOR 0u
-/* Packed as (major << 16) | minor. */
+/* Packed as (major << 16) | minor. This derived form is fine for C/C++, but some language bindings
+ * cannot import an expression macro (the Swift Clang importer rejects it: "structure not
+ * supported"). A binding that must state the version it was compiled against composes the same
+ * value from SOTC_CORE_ABI_MAJOR/SOTC_CORE_ABI_MINOR, which are plain literals and import
+ * normally, and compares it with sotc_core_abi_version() at run time. Do not pass the library's own
+ * answer to sotc_core_create(): that makes the check below vacuous. */
 #define SOTC_CORE_ABI_VERSION ((SOTC_CORE_ABI_MAJOR << 16) | SOTC_CORE_ABI_MINOR)
 
 /* Same six archives, same order, as launcher AssetValidator.requiredArchives. */
@@ -167,7 +172,10 @@ SOTC_API sotc_error sotc_core_set_state_callback(sotc_core* core, sotc_state_cal
 /* Check the six archives in assets_dir. With core == NULL this is a pure check. With a handle it
  * also moves it IDLE/READY/FAILED -> VALIDATING -> READY (all archives OK) or IDLE (problems)
  * and remembers the directory for start(). Returns SOTC_OK whenever the check itself ran, even if
- * the assets are not ready (read result->assets_ready); BAD_STATE while STARTING/RUNNING/STOPPING. */
+ * the assets are not ready (read result->assets_ready). BAD_STATE while VALIDATING/STARTING/
+ * RUNNING/STOPPING: a call that arrives while a check is already in flight is refused, not queued
+ * (this includes a call made from a state callback, which runs with the state already VALIDATING
+ * and the lock released). A refused call writes nothing to *out and sets no asset facts. */
 SOTC_API sotc_error sotc_core_validate(sotc_core* core, const char* assets_dir, sotc_validation_result* out);
 
 /* READY or FAILED (with assets still ready) -> STARTING -> FAILED, returning

@@ -12,15 +12,31 @@ import LauncherCore
 /// (`SoCGameCore`) will link the same facade plus `sotc_core`; a child-process `CoreClient` can then
 /// replace this one without touching `LauncherCore`.
 public final class NativeCoreClient: CoreClient, @unchecked Sendable {
+    /// The ABI version this client was compiled against.
+    ///
+    /// This is what `sotc_core_create` wants: it refuses a different MAJOR or a newer MINOR with
+    /// `SOTC_ERR_ABI_MISMATCH`. Passing `sotc_core_abi_version()` here instead would make the check
+    /// vacuous, because the caller would simply agree with whatever library it found at run time.
+    /// `SOTC_CORE_ABI_VERSION` is an expression macro the Clang importer cannot see, so the packed
+    /// value is composed from the two literal macros (the header documents this).
+    public static let compiledAgainstABIVersion = CoreABIVersion(
+        major: UInt16(truncatingIfNeeded: SOTC_CORE_ABI_MAJOR),
+        minor: UInt16(truncatingIfNeeded: SOTC_CORE_ABI_MINOR)
+    )
+
+    /// `sotc_core_create` returning `SOTC_OK` without a handle is an internal contradiction. It must
+    /// never surface as success, and a `CoreFailure` carrying `.ok` must never exist.
+    public static let missingHandleFailure = CoreFailure(
+        code: .internalError, message: "the core ABI reported success without a handle"
+    )
+
     // The C handle takes an internal lock on every call, so sharing it across threads is safe.
     private let handle: OpaquePointer
 
     public init() throws {
         var created: OpaquePointer?
-        let code = sotc_core_create(sotc_core_abi_version(), &created)
-        guard code == SOTC_OK, let created else {
-            throw CoreFailure(code: CoreErrorCode(code: code.rawValue), message: Self.message(for: code.rawValue))
-        }
+        let code = sotc_core_create(Self.compiledAgainstABIVersion.packed, &created)
+        guard code == SOTC_OK, let created else { throw Self.createFailure(code) }
         handle = created
     }
 
@@ -87,10 +103,36 @@ public final class NativeCoreClient: CoreClient, @unchecked Sendable {
 
     // MARK: - Conversions
 
+    /// A failure from a call on `handle`. The handle's detail text belongs to its *most recent*
+    /// failure, so it is used only when that failure is this same code; otherwise another call's
+    /// message would be attached to this one (an `INVALID_ARGUMENT` refused before the state
+    /// machine, for example, would carry the previous `ENGINE_NOT_IMPLEMENTED` text).
     private func failure(_ code: UInt32) -> CoreFailure {
-        var detail = Self.lastError(handle)
-        if detail.isEmpty { detail = Self.message(for: code) }
-        return CoreFailure(code: CoreErrorCode(code: code), message: detail)
+        var raw = sotc_status()
+        raw.struct_size = UInt32(MemoryLayout<sotc_status>.size)
+        let readStatus = sotc_core_status(handle, &raw) == SOTC_OK
+        return Self.failure(
+            code: code, handleLastError: readStatus ? raw.last_error : nil, handleMessage: Self.lastError(handle)
+        )
+    }
+
+    /// Pure form of the rule above, so the pairing is testable without a live handle.
+    /// `handleLastError` is nil when the handle could not be asked.
+    static func failure(code: UInt32, handleLastError: UInt32?, handleMessage: String) -> CoreFailure {
+        let message = (handleLastError == code && !handleMessage.isEmpty)
+            ? handleMessage
+            : Self.message(for: code)
+        return CoreFailure(code: CoreErrorCode(code: code), message: message)
+    }
+
+    /// The failure for a refused `sotc_core_create`. `SOTC_OK` is not a refusal, but it reaches here
+    /// exactly when the ABI did not hand back a handle, so it maps to `missingHandleFailure` and
+    /// never to a `CoreFailure` whose code is `.ok`.
+    static func createFailure(_ code: sotc_error) -> CoreFailure {
+        guard code != SOTC_OK else { return missingHandleFailure }
+        return CoreFailure(
+            code: CoreErrorCode(code: code.rawValue), message: Self.message(for: code.rawValue)
+        )
     }
 
     private static func message(for code: UInt32) -> String {

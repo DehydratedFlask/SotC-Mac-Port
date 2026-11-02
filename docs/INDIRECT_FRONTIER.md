@@ -30,7 +30,9 @@ Inputs (pinned): ELF `d0723afb…61d3`, disassembly `9c196254…107e83`, FDE ran
 
 The per-seed closure sizes match `cfg_census.py` exactly (608 / 416 / 817); this card only adds the
 classification the census deliberately refused to make. The union resolves six sites because the
-two seeds overlap.
+two seeds overlap. `Resolved` here is the tool's **window + register-fallback** resolution: of the
+union's six sites only `0x13620` and `0x28471` are site-provable, the other four are table-level ties
+(see [Evidence grades](#evidence-grades)).
 
 ## Classification
 
@@ -45,27 +47,40 @@ two seeds overlap.
 
 ## What is resolvable
 
-Resolution is a backward slice, not a fixed window: the classifier walks back to the **nearest
-definition** of the call register (comment text stripped first) and then follows at most one
-RIP-relative base. A candidate is published only when the slot value points inside an FDE function,
-which rejects the string/padding false positives a naive window produces.
+Resolution is a backward slice, not a fixed window, but until the audit below it was not a *strict*
+one: `classify` takes the **nearest** definition of the call register (comment text stripped first)
+and, when that definition is a memory load, follows at most one RIP-relative base. When the nearest
+definition is not a memory load it falls back to `rip_global_for`, which scans the whole
+32-instruction window for any RIP-relative load into the same register — **past** the nearest write.
+A candidate is published only when the slot value points inside an FDE function, which rejects the
+string/padding false positives a naive window produces.
 
-Five distinct targets resolve end to end, from six call sites. Every one is corroborated twice: the
-qword in the image and a type-8 dynamic relocation with the same addend.
+Six call sites are tied to five distinct targets. The table side is corroborated twice for every one:
+the qword in the image and a type-8 dynamic relocation with the same addend. The site side is not
+uniform — **two** of the six load the table as the nearest definition of the call register; the other
+four are fallback ties that do not prove dispatch.
 
-| Call site | Vtable | Slot | Target | RELA row |
-|---|---|---|---:|---|
-| `0x1254d` | `0x15949a0` | `0x88` | **`0x187c0`** | `0x1594a28` |
-| `0x13620` | `0x1594ae8` | `0x28` | **`0x13d20`** | `0x1594b10` |
-| `0x28471` | `0x1594dc0` | `0x20` | **`0x20d60`** | `0x1594de0` |
-| `0x35165` | `0x15955c0` | `0x08` | **`0x358c0`** | `0x15955c8` |
-| `0xa54b7b`, `0xa54c92` | `0x15d1d80` | `0x08` | **`0xc740`** | `0x15d1d88` |
+| Call site | Vtable | Slot | Target | RELA row | Grade |
+|---|---|---|---|---|---|
+| `0x1254d` | `0x15949a0` | `0x88` | **`0x187c0`** | `0x1594a28` | table-level |
+| `0x13620` | `0x1594ae8` | `0x28` | **`0x13d20`** | `0x1594b10` | site-provable |
+| `0x28471` | `0x1594dc0` | `0x20` | **`0x20d60`** | `0x1594de0` | site-provable |
+| `0x35165` | `0x15955c0` | `0x08` | **`0x358c0`** | `0x15955c8` | table-level |
+| `0xa54b7b`, `0xa54c92` | `0x15d1d80` | `0x08` | **`0xc740`** | `0x15d1d88` | table-level |
 
-All five are FDE function starts. They are recorded in `native/core/vtable_resolved_entries.{hpp,cpp}`
-(sorted by call site, with `find_resolved_vtable_call_site`) and therefore appear in
-[`entry_map.json`](entry_map.json); `tools/lift/check_vtable_resolved_entries.py` re-verifies the
-slot qword, the RELA addend, the FDE start and the entry-map presence for each row. All 37
-distinct targets now have a native body model; the table grew through the sweeps recorded below.
+The four table-level sites are not wrong about the table, only about the call: each one's nearest
+definition of the call register is a member load — `movq (%rbx),%rax`, `movq (%rdi),%rax`,
+`movq 0xd8(%rbx,%r15),%rax` — and an older `lea` of the table base inside the same 32-instruction
+window is what the fallback attached. Such a site can dispatch through whichever table the member
+holds at run time.
+
+All five targets are FDE function starts. They are recorded in
+`native/core/vtable_resolved_entries.{hpp,cpp}` (sorted by call site, with
+`find_resolved_vtable_call_site`) and therefore appear in [`entry_map.json`](entry_map.json);
+`tools/lift/check_vtable_resolved_entries.py` re-verifies the slot qword, the RELA addend, the FDE
+start and the entry-map presence for each row — table-level facts that hold for both grades. It does
+not, and cannot, test dispatch. All 37 distinct targets now have a native body model; the table grew
+through the sweeps recorded below.
 
 ## Sweeps after the seed closure
 

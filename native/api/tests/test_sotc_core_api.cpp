@@ -296,6 +296,48 @@ void test_validate_arguments_do_not_change_state() {
   sotc_core_destroy(c);
 }
 
+// The header allows a state callback to call back into the core. While a check is in flight the
+// state is VALIDATING and the lock is released, so the only legal answer to a second validate() is
+// BAD_STATE -- refused, not queued -- and it must neither write the caller's result nor leave its
+// error behind on the handle.
+struct ReentrantProbe {
+  sotc_core* core = nullptr;
+  sotc_error nested = SOTC_OK;
+  uint32_t nested_error_field = 0;
+  unsigned char nested_detail_first = 0;
+  int calls = 0;
+};
+void reenter_validate(void* user, sotc_state, sotc_state) {
+  auto* p = static_cast<ReentrantProbe*>(user);
+  if (p->calls++ != 0) return;  // only the first transition: IDLE -> VALIDATING
+  sotc_validation_result inner = blank_result();
+  p->nested = sotc_core_validate(p->core, "/tmp", &inner);
+  p->nested_error_field = inner.error;
+  p->nested_detail_first = static_cast<unsigned char>(inner.detail[0]);
+}
+
+void test_validate_during_validating_is_refused() {
+  const std::string dir = make_dir();
+  write_all_good(dir);
+  sotc_core* c = make_core();
+  ReentrantProbe probe;
+  probe.core = c;
+  CHECK(sotc_core_set_state_callback(c, reenter_validate, &probe) == SOTC_OK);
+
+  sotc_validation_result r = blank_result();
+  CHECK(sotc_core_validate(c, dir.c_str(), &r) == SOTC_OK);
+  CHECK(probe.calls == 2);  // IDLE -> VALIDATING and VALIDATING -> READY
+  CHECK(probe.nested == SOTC_ERR_BAD_STATE);
+  CHECK(probe.nested_error_field == 0xABABABABu);            // the refused call wrote nothing
+  CHECK(probe.nested_detail_first == 0xABu);
+  CHECK(r.assets_ready == 1 && r.error == SOTC_OK);          // the outer check still completed
+  const sotc_status s = get_status(c);
+  CHECK(s.state == SOTC_STATE_READY && s.assets_ready == 1);
+  CHECK(s.last_error == SOTC_OK);                            // the refusal was not left on the handle
+  sotc_core_destroy(c);
+  rm_rf(dir);
+}
+
 void test_concurrent_calls_never_report_running() {
   const std::string dir = make_dir();
   write_all_good(dir);
@@ -402,6 +444,7 @@ int main() {
   test_pure_validation();
   test_handle_lifecycle_never_runs();
   test_validate_arguments_do_not_change_state();
+  test_validate_during_validating_is_refused();
   test_concurrent_calls_never_report_running();
   test_coverage();
   std::puts("sotc_core_api: all checks passed");

@@ -21,7 +21,7 @@ let package = Package(
         .testTarget(name: "LauncherCoreTests", dependencies: ["LauncherCore"], path: "Tests/LauncherCoreTests"),
         .testTarget(
             name: "LauncherNativeCoreTests",
-            dependencies: ["LauncherNativeCore", "LauncherCore"],
+            dependencies: ["LauncherNativeCore", "LauncherCore", "CSotcCore"],
             path: "Tests/LauncherNativeCoreTests"
         ),
     ],
