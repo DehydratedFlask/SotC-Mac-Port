@@ -38,12 +38,17 @@ union's six sites only `0x13620` and `0x28471` are site-provable, the other four
 
 | Class | Sites | Meaning |
 |---|---:|---|
-| `vtable-slot` | 283 | `call *0xNN(%reg)` where the window loads `%reg` from `0xMM(object)` — slot `0xNN` of the object's vtable at `+0xMM` |
+| `vtable-slot` | 319 | `call *0xNN(%reg)` where the window loads `%reg` from `0xMM(object)` — slot `0xNN` of the object's vtable at `+0xMM` |
 | `first-slot` | 96 | `call *(%reg)` — slot 0 of the object's vtable |
-| `register-offset` | 45 | `call *0xNN(%reg)` with no vtable load in the 4-instruction window |
+| `register-offset` | 20 | `call *0xNN(%reg)` with no vtable load in the 4-instruction window |
 | `indirect-jump` | 47 | `jmp *…` inside the closure (dispatcher / tail-call shapes) |
-| `register` | 15 | `call *%reg`, emitters and callbacks |
-| `member-pointer` | 2 | `call *%reg` where the window loads a member pointer into `%reg` |
+| `register` | 11 | `call *%reg`, emitters and callbacks |
+| `member-pointer` | 6 | `call *%reg` where the window loads a member pointer into `%reg` |
+
+Counts are the `0x531d60` seed from a live `python3 -I tools/lift/indirect_frontier.py --seed
+0x531d60` run on 2026-11-01 and sum to the 499 sites in the table above. An earlier revision of this
+table listed 283/96/45/47/15/2, which the current classifier does not reproduce; the "Numbers" table
+above was and remains exact (608 / 105 / 499 / 5).
 
 ## What is resolvable
 

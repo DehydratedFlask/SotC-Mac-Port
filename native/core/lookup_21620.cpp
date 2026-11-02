@@ -131,7 +131,7 @@ FindConCmdResult find_concmd_21620(const SharedStr& name, ConCmdRegistry& regist
                     (void)unlock_with(hooks, handle);
                     return out;  // host guard: corrupt collection
                 }
-                if (compare_with(hooks, node_name, key_name) < 0) {  // 0x216bf `js` on the test of eax
+                if (compare_with(hooks, node_name, key_name) < 0) {  // 0x216bf testl+jns: eax < 0 -> left
                     void* const left = load_ptr(node, kLookup21620NodeLeftOffset);  // 0x216c3
                     if (left != nullptr) {
                         node = left;
@@ -179,7 +179,11 @@ FindConCmdResult find_concmd_21620(const SharedStr& name, ConCmdRegistry& regist
     ConCmdListNode& head = registry.pending.head;
     void* const end = byte_offset(&head, -8);  // 0x21761: the sentinel "element" is head - 8
     void* link = head.next;                    // 0x2175a: `movq [0x2dfce50],%rax`
-    void* element = link != nullptr ? byte_offset(link, -8) : nullptr;
+    if (link == nullptr) {
+        out.status = FindConCmdStatus::failed;  // host guard: the initialised list is never headless
+        return out;
+    }
+    void* element = byte_offset(link, -8);
     while (element != end) {
         const std::uint64_t entry_size = load_u64(element, kLookup21620PendingSizeOffset);  // 0x21790
         if (entry_size == static_cast<std::uint64_t>(name.size)) {

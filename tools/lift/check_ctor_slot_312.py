@@ -264,7 +264,7 @@ RIPS = [
 # Literal instruction bytes that no rip/call pin covers.
 BYTES_PINS = [
     (0xA46130, "554889e5", "push rbp; mov rsp,rbp"),
-    (0xA46134, "41574156415541 5453".replace(" ", ""), "push r15/r14/r13/r12/rbx"),
+    (0xA46134, "415741564155415453", "push r15/r14/r13/r12/rbx"),
     (0xA4613D, "4881ec88000000", "sub rsp,0x88"),
     (0xA46178, "488945d0", "canary -> -0x30(%rbp)"),
     (0xA461F5, "4c897580", "q[0] of the class-A block = &block"),
@@ -272,9 +272,9 @@ BYTES_PINS = [
     (0xA46249, "48c745b000000000", "class-A aux cell = 0"),
     (0xA46251, "48894dc0", "class-A functor tag -> block+0x40"),
     (0xA46258, "48c745c800000000", "class-A fn aux = 0"),
-    (0xA4626C, "ff5018", None),  # placeholder, replaced below
+    (0xA4626C, "ff5018", "callq *0x18(%rax) #1 (class A, slot 3 = bare ret)"),
     (0xA462BF, "c7855cffffff00000000", "class-B value cell = 0"),
-    (0xA46320, "ff5018", None),
+    (0xA46320, "ff5018", "callq *0x18(%rax) #2 (class B, slot 3 = bare ret)"),
     (0xA46361, "b930000000", "group flags ecx = 0x30"),
     (0xA463EC, "41b830000000", "toggle flags r8d = 0x30 (Sku Name)"),
     (0xA46470, "41b830000000", "toggle flags r8d = 0x30 (Age Restriction)"),
@@ -451,7 +451,7 @@ def check_elf(e: Elf) -> None:
     for site, length, disp_off, target in RIPS:
         require(e.rip(site, length, disp_off) == target, f"rip operand at 0x{site:x} -> 0x{target:x}")
     for site, want, what in BYTES_PINS:
-        e.bytes_at(site, want, what or f"bytes at 0x{site:x}")
+        e.bytes_at(site, want, what)
 
     # --- the single branch, decoded ------------------------------------------------------------
     branch = e.read(0xA465F8, 2)

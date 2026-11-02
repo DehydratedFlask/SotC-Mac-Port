@@ -100,7 +100,8 @@ def parse_header_rows(text: str):
 _LINE = re.compile(r"^\s*([0-9a-f]+):\s+(.*)$")
 _INSN = re.compile(r"^([0-9a-z.]+)\s*(.*)$")
 _COMMENT = re.compile(r"#\s*(0x[0-9a-f]+)")
-_MEM = re.compile(r"(-?0x[0-9a-f]+)?\((%r[a-z0-9]+)(?:,\s*(%r[a-z0-9]+)\s*,\s*([1248]))?\)")
+_MEM = re.compile(
+    r"(-?0x[0-9a-f]+)?\((%r[a-z0-9]+)(?:,\s*(%r[a-z0-9]+)(?:\s*,\s*([1248]))?)?\)")
 _RIP = re.compile(r"(-?0x[0-9a-f]+)?\(%rip\)")
 
 _FAMILY: dict[str, str] = {}
@@ -175,7 +176,23 @@ def strip_comment(text: str) -> str:
 
 
 def operands_of(insn: Insn) -> list[str]:
-    return [part.strip() for part in strip_comment(insn.operands).split(",") if part.strip()]
+    """Split operands on commas that are not inside a memory operand's parentheses."""
+    text = strip_comment(insn.operands)
+    parts: list[str] = []
+    depth = 0
+    current: list[str] = []
+    for character in text:
+        if character == "(":
+            depth += 1
+        elif character == ")":
+            depth = max(depth - 1, 0)
+        if character == "," and depth == 0:
+            parts.append("".join(current).strip())
+            current = []
+        else:
+            current.append(character)
+    parts.append("".join(current).strip())
+    return [part for part in parts if part]
 
 
 def comment_address(insn: Insn) -> int | None:
@@ -714,9 +731,9 @@ def _self_test() -> int:
         (0x1018, "movq (%r12), %rax"),
         (0x1020, "callq *0x18(%rax)"),
     ]
-    check("negative: base repointed before store", repointed,
+    check("negative: base repointed between store and load", repointed,
           row_for(0x1020, TABLE, SLOT, TARGET), cells, "unproven",
-          expect_blocker="base-repointed-before-store")
+          expect_blocker="no-store-to-location-in-fde")
 
     branched = [
         (0x1000, "leaq 0x1596000(%rip), %rax   # 0x1596000"),
@@ -872,7 +889,8 @@ def main(argv=None) -> int:
           f"{len(table_level)} table-level before the pass)")
     print(f"table-level rows analysed: {len(table_level)}")
     print(f"table-level rows proven by store-to-load forwarding: {len(proven_from_table_level)}")
-    print(f"proofs after the pass: {sum(1 for chain in chains if chain.proven)}")
+    print(f"rows site-provable after the pass: "
+          f"{len(rows) - len(table_level) + len(proven_from_table_level)} of {len(rows)}")
     print()
     blockers = Counter(chain.blocker for chain in table_level)
     print("table-level blocker histogram:")
@@ -904,7 +922,8 @@ def main(argv=None) -> int:
             "site_provable_before": len(rows) - len(table_level),
             "table_level_before": len(table_level),
             "table_level_proven": len(proven_from_table_level),
-            "site_provable_after": sum(1 for chain in chains if chain.proven),
+            "site_provable_after": len(rows) - len(table_level) + len(proven_from_table_level),
+            "table_level_after": len(table_level) - len(proven_from_table_level),
             "blockers": dict(sorted(blockers.items())),
             "chains": [chain.as_dict() for chain in chains],
         }

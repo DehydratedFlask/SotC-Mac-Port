@@ -1,6 +1,6 @@
 # G1 PARTIAL evidence pack — what the ARM64 harness proves, and what it does not
 
-**Gate status: G1 PARTIAL — not PASSED.** Measured 2026-11-01 21:05 CDT on
+**Gate status: G1 PARTIAL — not PASSED.** Measured 2026-11-01 21:06 CDT (capture `c18b566d…`, see §7) on
 `cursor/init-hash-551140-6aa93e8` + uncommitted work, Apple M4 Pro, macOS 27.0.1, Xcode 27.1.
 Every claim below is labelled `STATIC_ANALYSIS_VERIFIED`, `FIXTURE_VERIFIED`, `PARTIAL` or
 `NOT RUN`. Nothing in this pack was produced by executing the game, its `eboot.bin`, or any guest
@@ -105,9 +105,10 @@ verified 451 registered RVA/index pairs (250 vec_*/leaf_* modules);
 ```
 
 Slots 309 (`0xa505e0`) and 312 (`0xa46130`) were registered this cycle. Both are **data-only
-table rows**: neither has a near call or jump anywhere in the image, only the type-8 relocation at
-its table entry (`tools/lift/check_startup_slot309_table.py`). Registration therefore says the
-native row runs in the harness, not that a game path calls it.
+table rows**: a byte scan over every executable segment finds **0** `e8`/`e9` near call or jump sites
+targeting either address (a superset scan, so a zero is not a disassembly artifact), and each has
+exactly one relocation — the type-8 row at its table entry. Registration therefore says the native
+row runs in the harness, not that a game path calls it.
 
 ### 1.3 Every lifted unit is a *model* or a *hook*, and its header says which — `FIXTURE_VERIFIED`
 
@@ -126,7 +127,7 @@ Concrete boundaries measured this cycle:
 | Unit | Modelled | Hooked / not modelled |
 |---|---|---|
 | slot 312 `0xa46130` | 30 direct calls, 49 rip operands, both int-variable classes, 8 atexit rows | five destructors, four callback tags carried as data |
-| slot 309 `0xa505e0` | 12 objects, 8 atexit rows, net state of 11 functor calls | three console-variable constructor interiors |
+| slot 309 `0xa505e0` | 12 objects, 12 atexit records, net state of 11 functor calls | three console-variable constructor interiors |
 | `0x499f80` | all 8 calls, 9 stores, 1 read, 4 branch outcomes | the two CritSec callees stay hook-bounded host models |
 | `0x2569d0` | registry block, build classification, constant property table | the large bodies behind 87 blocks |
 
@@ -143,11 +144,11 @@ are mutation-tested:
 - `tools/lift/check_vtable_resolved_entries.py` — for every frontier row: slot qword, type-8 RELA
   addend, FDE start, entry-map record (`OK: 91 sites, 37 distinct targets`).
 
-The fixtures are host C++ that exercise the models (`ctest 532/532` on the snapshot build
-`local/build/orch-r22`, and **24/24** for the 24-test G1 harness subset — startup constructors,
-registry Init-hash chain, allocator front/page_*). A passing fixture proves the model is
-self-consistent and fails on the mutations it was written for. It does **not** prove the model
-equals the retail function.
+The fixtures are host C++ that exercise the models (`ctest` **533/533** on `local/build/orch-r22` at
+capture time — the total moves as lanes land — and **24/24** for the 24-test G1 harness subset:
+startup constructors, registry Init-hash chain, allocator front/page_*). A passing fixture proves
+the model is self-consistent and fails on the mutations it was written for. It does **not** prove
+the model equals the retail function.
 
 ## 2. What the harness does NOT prove
 
@@ -159,7 +160,8 @@ Stated plainly, because these are the claims most likely to be over-read:
 2. **No runtime.** `sotc_core_start()` always returns `SOTC_ERR_ENGINE_NOT_IMPLEMENTED`
    (`native/api/sotc_core.cpp:380`). There is no engine loop, no job/fibre scheduler, no live
    service layer.
-3. **No boot.** No cold boot of the game has occurred on this machine, at any point.
+3. **No boot.** No cold boot of the game has occurred in any recorded run of this project
+   ([ROADMAP](../ROADMAP.md): "The game has not yet been booted on this Mac").
 4. **No Metal frame.** The PM4 decoder and render-op fixtures are unit-level; no frame has been
    submitted to a device (`G3 PARTIAL`).
 5. **No audio.** Format work (SPU ADPCM banks, the `.sxd2` = ATRAC9 selector) establishes
@@ -221,7 +223,7 @@ header alone can understate them — never overstate, but still wrong.
 | Unregistered rows | **122** | idem |
 | First unrecovered index / RVA ("the cliff") | **314 / `0xa41810`** | idem + pinned table |
 | Rows registered *above* that first gap | **137** | idem |
-| Size of the cliff function | 4,328 B | `STATIC_ANALYSIS_VERIFIED` characterization, not modelled |
+| Size of the cliff function | 4,329 B FDE extent (4,328 B reachable) | `STATIC_ANALYSIS_VERIFIED` characterization, not modelled |
 | Next unrecovered indices | 316 (`0xa33280`), 326 (`0x837f30`), 329 (`0x829e90`) | idem |
 
 **The recovered set is not a prefix.** 137 rows above the first gap are registered, so 451/573 is
@@ -235,9 +237,12 @@ Several registered rows call hooks inside their bodies (see §1.3), and a regist
 original is never called by the game is still registered. Do not read 79% as "four fifths of startup
 is native".
 
-Slot 314 is the current cliff. It is characterized (779 instructions, 84 direct calls, 8 unresolved
-indirect) but has no model, so coverage cannot move without either modelling it or explicitly
-recording a hook contract that still returns a truthful result.
+Slot 314 is the current cliff: the physics debug block (1 page, 10 variables, 10 toggles, 22
+atexit records, per the build comment at `native/CMakeLists.txt:2479`). A WIP model exists but is
+deliberately **not in the build and not registered** — the same comment records that its page layout
+fails its own `static_assert` and its fixture was never written, and the fragment is parked under
+`local/wip/slot314/`. Coverage therefore cannot move until that model is finished or a hook contract
+that still reports truthfully is recorded.
 
 ## 5. Why PARTIAL is the honest label: the programme's scale
 
@@ -255,14 +260,17 @@ Measured against the whole image, the recovered surface is small:
 | Proven by the call register alone | **41** (0.14 % of slot calls) | idem |
 | Slot reads with an object base that has no static source | 27,408 | idem |
 
-`docs/entry_map.json` (committed 1,598 RVA constants → 1,080 distinct RVAs, 405 headers) covers
-roughly 1–2 % of those 55,790 functions, and it records *names*, not callable ABI: a presence in the
-map means a header mentions the address, nothing more.
+`docs/entry_map.json` (1,638 RVA constants → 1,099 distinct RVAs, 406 headers at capture time)
+covers roughly **2 %** of those 55,790 functions, and it records *names*, not callable ABI: a presence
+in the map means a header mentions the address, nothing more. The map is regenerated often — quote
+`docs/entry_map.json`, not this paragraph, if the exact totals matter.
 
 ## 6. Unresolved edges (explicit)
 
-1. **Slot 314 / `0xa41810`** — characterized, not modelled; the current startup cliff.
-2. **The remaining 122 unregistered rows** (314…572), including 316/`0xa33280` (2,561 B).
+1. **Slot 314 / `0xa41810`** — characterized, NOT modelled or registered; the WIP model is
+   parked in `local/wip/slot314/` because it fails its own `static_assert` (§4).
+2. **The remaining 122 unregistered rows**, spread over indices 314…572 (137 rows above 314
+   are registered), including 316/`0xa33280` (2,561 B) and 326/`0x837f30` (7,055 B).
 3. **The 50 table-level frontier rows** — target records, not dispatch proofs, and not representable
    in the C++ type today (§3).
 4. **10 of 36 vtable model headers** carry no grade (§3).
@@ -278,10 +286,9 @@ map means a header mentions the address, nothing more.
    configuration word and frame geometry are unknown, so **no sample is decoded**. G2 `NOT RUN`.
 8. **Save/load**: no transaction, no relaunch proof. G2 `NOT RUN`.
 9. **No runtime**: `sotc_core_start()` cannot leave the failed state (§2).
-10. **Stale entry map at this tree** (additive only): a fresh scan finds 1,605 constants / 1,083
-    RVAs, the committed map has 1,598 / 1,080; `tools/lift/gen_entry_map.py --check` currently fails
-    until the integrator regenerates it. `docs/ENTRY_MAP.md` prose (1,549 / 1,052 / 399) is older
-    still. Not regenerated by this pack, which only consumes the map.
+10. **The entry map is a name map, not an ABI.** `gen_entry_map.py --check` passes at capture time,
+    but `docs/ENTRY_MAP.md`'s prose totals (1,549 / 1,052 / 399) lag its own generated JSON
+    (1,638 / 1,099 / 406). Neither number is a claim that an address is callable.
 
 ## 7. Reproduce
 
@@ -306,7 +313,7 @@ python3 -I tools/lift/indirect_frontier.py --seed 0x531d60 --seed 0x1bdf30
 
 # the harness itself
 cmake -S native -B local/build/orch-r22 && cmake --build local/build/orch-r22 -j 12
-ctest --test-dir local/build/orch-r22 -j 12                 # 532/532 on the 2026-11-01 snapshot
+ctest --test-dir local/build/orch-r22 -j 12                 # 533/533 at capture time
 ctest --test-dir local/build/orch-r22 -R '^(startup_ctors|startup_ctor_coverage|…)$'  # 24/24
 ./local/build/orch-r22/test_startup_ctor_coverage           # asserts 451 / 314 / 0xa41810
 ```
@@ -331,11 +338,11 @@ Private capture for this revision: `local/validation/g1-partial-20261101/` (`man
 |---|---|---|
 | Startup coverage | 155 verified pairs, cliff 152+ / exec 424 | **451 / 573**, cliff **314 / `0xa41810`**, 122 remaining |
 | Dormant index 95 | listed as an unresolved `NEEDS_PRINCIPAL` gap | **registered** (slot 95 is covered) |
-| Tests | ctest 13/13 (a filtered subset) | **ctest 532/532** full suite, **24/24** G1 subset |
+| Tests | ctest 13/13 (a filtered subset) | **ctest 533/533** full suite, **24/24** G1 subset |
 | Frontier | 6 resolved rows, no grades | **91 rows / 37 targets**, split **41 site-provable / 50 table-level** |
 | Model headers | ungraded | 26 of 36 carry a grade; 10 still do not |
 | MSL | not mentioned | stated as a G1/G3 boundary: **0 lowered** |
-| Entry map | not mentioned | committed map is **stale at this tree** (additive), and is a name map |
+| Entry map | not mentioned | 1,638 constants → 1,099 RVAs / 406 headers; a name map, not an ABI |
 | Claim | G1 PARTIAL | unchanged — **G1 PARTIAL, not PASSED** |
 
 Corrections of prior text:

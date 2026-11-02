@@ -98,9 +98,9 @@ not left dangling. The model reproduces the self-pointer and does not "fix" anyt
 |---|---|
 | `cmake -S native -B local/build/slot312` | exit 0 |
 | `cmake --build local/build/slot312 -j 6` | exit 0, no warnings |
-| `ctest --test-dir local/build/slot312 -j 6 --output-on-failure` | **532/532 PASSED** |
+| `ctest --test-dir local/build/slot312 -j 6 --output-on-failure` | **532/532 PASSED** (533/533 on a re-run after a peer's `lookup_21620` test entered the tree) |
 | `python3 -I tools/lift/check_ctor_slot_312.py` | OK, mutation self-test 394 + 145 |
-| 96 `check_ctor_* / check_fctor_* / check_startup_* / check_slot*` checkers | 96 OK / 0 FAIL |
+| 96 `check_ctor_* / check_fctor_* / check_startup_* / check_slot*` checkers | 91 OK / 0 FAIL (89 + 2 in two batches), re-run after the peer edits landed |
 | `python3 -I scripts/audit_publish_paths.py --all` | OK, 4,030 paths |
 | `tools/lift/run_all_checkers.sh` | **NOT RUN** (out of scope by task instruction) |
 | `python3 scripts/project_index.py` | **NOT RUN** (would regenerate `docs/INDEX.md` / `docs/FOLDERS.md`, out of scope) |
