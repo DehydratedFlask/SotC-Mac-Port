@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 16:05 CDT (root) — all 14 TLS push sites enumerated (STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`. `tools/lift/check_tls_push_sites.py` enumerates **all 14** `call 0x12300` sites and pins, per site: the source-path digest, the signature digest (where resolved), the line immediate, and the following allocation call's distance **and** target.
+- **Result:** **8 of 14** sites resolve a full `(signature, source path, line)` triple — lines 46, 50, 96, 221, 227, 233, 605, 646 — and **6 are partial** (source path only: `0x33720`, `0x1b37b7`, `0xa4676b`, `0xa47e67`, `0xa484c1`, `0xa4ac9c`). The partial ones are recorded as partial; their lines are **not** guessed.
+- **A claim corrected by measurement:** the earlier note said every push sits "immediately before an allocation". Only **5 of 14** are within 0x1c bytes (distances 0xa/0xa/0x14/0x14/0x18); the rest range to **0x1171** — the record is pushed earlier in the same block. The header comment and the task row now say the measured thing.
+- **No game text copied:** the checker records sha256 digests of the resolved strings instead of the strings themselves, so it still pins the exact bytes without publishing debug paths into the repository.
+- **Verification (PASSED):** `check_tls_push_sites` OK (14 sites, 8 triples, 6 file-only, 5 adjacent); build exit 0; CTest **522/522**; lift checkers **715 passed / 0 failed**.
+- **Next exact action:** the 6 partial sites need a wider dataflow window (their line/function values are built further back); otherwise the remaining CPU-side work is indirect-frontier resolution.
+
 ## 2026-11-03 15:10 CDT (root) — 0xe21420 fully modelled at the continuation level (FIXTURE_VERIFIED)
 
 - **Task:** `CPU-01-AOT-CFG-SCALE-01`. The last unmodelled region of `0xe21420` is now covered: the **null-name sub-tree** (`0xe215ce`, 102 B), the **first-scan match** (`0xe21634`, 32 B) and the **shared exit** (`0xe21654`, 42 B) join the found (`0xe2167e`) and missing (`0xe214f7`) paths. Together the five windows cover every continuation of the 681-byte body; what remains unmodelled is only the *callee bodies* behind slots `0x30/0x88/0xc8/0xd0/0x148`, which are hooks.

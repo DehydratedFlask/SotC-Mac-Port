@@ -88,7 +88,11 @@ struct TlsRecordPopResult {
 //            "d:\\dev\\cp10\\...\\PS4CRenderBackend.cpp",                     line 0x25d (605)
 //   0x16ea05: "CComputeContext::CComputeContext(...)"
 //            "d:\\dev\\cp10\\...\\PS4ComputeContext.cpp",                     line 0x2e  (46)
-// and pushes them immediately before an allocation call (`0x17070` / `0x12820`), popping right after.
+// and pushes them around an allocation call (`0x17070` / `0x12820`) — 5 of the 14 sites sit within
+// 0x1c bytes of it, the rest push earlier in the same block — popping right after.
+// All 14 push sites are enumerated by `tools/lift/check_tls_push_sites.py`: 8 resolve a full
+// (signature, source path, line) triple and 6 resolve the source path only — recorded as partial, not
+// guessed.
 // So the stack records **where the current allocation came from**: owner object, function, file, line.
 struct TlsAllocSite {
     std::uint64_t owner = 0;     // record +0x00 (rdi at the call)
