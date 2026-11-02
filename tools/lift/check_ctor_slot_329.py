@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ELF tie for startup constructor index 329 (RVA 0x7edf10, 4082 B FDE): the Shadow Path /
+"""ELF tie for startup constructor index 329 (RVA 0x829e90, 4082 B FDE): the Shadow Path /
 path-finding debug page, and the block's own two ranged-variable constructors.
 
 Offline and read-only. Bytes of the pinned private ELF (`local/re/eboot.elf`, sha256 d0723afb...5861d3)
@@ -9,11 +9,11 @@ when the private inputs are absent.
 What is pinned here (everything is a byte read of the pinned image):
 
   * the constructor-table word: entry 329 of the backwards table is the u64 at
-    0x2dd70e0 - 329*8 = 0x2dd6698 and must hold 0x7edf10. The task brief quoted 0x2dd65b8, which is
+    0x2dd70e0 - 329*8 = 0x2dd6698 and must hold 0x829e90. The task brief quoted 0x2dd65b8, which is
     entry **357** (0x78c760); the checker pins the arithmetic, both registered neighbours (328 =
     0x82e040 at 0x2dd66a0, 330 = 0x810a50 at 0x2dd6690) and the fact that 0x2dd70e0 - 0x2dd65b8 =
     357*8, so that reading cannot come back;
-  * the body extent and digest: the FDE at .eh_frame_hdr declares 4082 B at [0x7edf10, 0x82ae82); the
+  * the body extent and digest: the FDE at .eh_frame_hdr declares 4082 B at [0x829e90, 0x82ae82); the
     4081 B *reachable* span ends on the `callq __stack_chk_fail`, the FDE's last byte 0x82ae81 being
     the trailing nop, and both digests are pinned;
   * all 97 direct `callq` sites and their targets (11 distinct callees), all 124 rip-relative operands
@@ -56,7 +56,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from slot_pin_util import Elf, ROOT, const_value, digest, require  # noqa: E402
 
 RVA = 0x829E90
-SIZE = 4082                                    # FDE address_range [0x7edf10, 0x82ae82)
+SIZE = 4082                                    # FDE address_range [0x829e90, 0x82ae82)
 REACHABLE = 4081                               # through the callq at 0x82ae7c
 SHA = "a35ded4ad1f7c74718b2a9e5d1367c49148663ec59b9a1cef5f65d3bc878b9ba"
 SHA_REACHABLE = "36e03879d3cc28c36cf3d7d585e564c3ebe61f0d34e28670fe6def73308892bf"
@@ -563,7 +563,7 @@ def fde_range(e: Elf, initial: int) -> int:
 def check_elf(e: Elf) -> None:
     # --- the startup-table row ---------------------------------------------------------------
     require(TABLE_TOP - 8 * TABLE_INDEX == TABLE_WORD == 0x2DD6698, "table row arithmetic")
-    require(e.u64(TABLE_WORD) == RVA, "constructor-table entry 329 -> 0x7edf10")
+    require(e.u64(TABLE_WORD) == RVA, "constructor-table entry 329 -> 0x829e90")
     # The table is indexed backwards, so entry 328 sits at a HIGHER address and entry 330 lower.
     require(TABLE_WORD + 8 == 0x2DD66A0 and e.u64(TABLE_WORD + 8) == 0x82E040,
             "entry 328 is the already-registered 0x82e040")
@@ -808,7 +808,7 @@ def main() -> int:
     if "--no-mutate" not in arguments and "--tamper" not in arguments:
         elf_runs, native_runs = mutation_self_test(e, texts)
         note = f"; mutation self-test {elf_runs} ELF + {native_runs} native mutants all rejected"
-    print(f"OK check_ctor_slot_329: slot 329 (0x7edf10, {SIZE} B FDE, {REACHABLE} B reachable, sha "
+    print(f"OK check_ctor_slot_329: slot 329 (0x829e90, {SIZE} B FDE, {REACHABLE} B reachable, sha "
           f"{SHA[:12]}...) is row 329 of the constructor table at 0x{TABLE_WORD:x}; 97 direct calls over "
           f"11 callees, 124 rip operands, 1 branch (0x82ae6b -> 0x82ae7c __stack_chk_fail), 3 "
           f"`callq *0x18(%rax)` inert functor destroys, 22 __cxa_atexit rows, the local ranged-variable "

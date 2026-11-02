@@ -244,7 +244,8 @@ int main() {
     CHECK(st.slot329.items[5].text.size == 13 &&
           std::memcmp(st.slot329.items[5].text.data, "MenuSeparator", 13) == 0);
     CHECK(st.slot329.items[0].target == &st.slot329.bool_draw_enable);
-    CHECK(st.slot329.items[4].target == &st.slot329.ranged_chara_type);
+    CHECK(st.slot329.items[3].target == &st.slot329.ranged_chara_type);
+    CHECK(st.slot329.items[4].target == &st.slot329.bool_path_finding);
     CHECK(st.slot329.items[7].target == &st.slot329.float_translation);
 
     std::puts("startup_ctor_coverage: all checks passed");
