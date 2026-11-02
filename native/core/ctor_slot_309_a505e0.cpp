@@ -11,15 +11,7 @@ namespace {
 
 constexpr std::size_t kFunctorCopyBytes = 0x20;   // rsp+0x80 in the original frame
 
-std::uint64_t load_tag(const Slot309VarObject& object) noexcept {
-    std::uint64_t tag = 0;
-    std::memcpy(&tag, object.bytes.data(), sizeof tag);
-    return tag;
-}
-
-void store_tag(Slot309VarObject& object, std::uint64_t tag) noexcept {
-    std::memcpy(object.bytes.data(), &tag, sizeof tag);
-}
+std::uint64_t load_tag(const Slot309VarObject& object) noexcept { return object.var.base.vptr; }
 
 // One of the three console-variable blocks: ctor hook, functor slot 3, the two view releases, atexit.
 // Returns Slot309Stage::none on success, otherwise the first step that could not be completed.
@@ -33,12 +25,12 @@ struct VarStages {
 Slot309Stage build_var(Slot309VarObject& object, const Slot309VarSpec& spec,
                        const Slot309FunctorSite& site, const Slot309Hooks& hooks,
                        ConCmdRegistry& concmd, const VarStages& stages, Slot309Result& out) noexcept {
-    // 0xa4f4d0 / 0xa4feb0 / 0xa502e5 store the class address point at object+0 inside the ctor. The
-    // hook owns the interior; the slot only needs the identity tag to stay correct, because the three
-    // toggles answer their 0x26ea0 gate from it. A missing hook writes nothing at all.
+    // 0xa4f4d0 / 0xa4fec0 / 0xa50280 install the class address point at object+0 inside the ctor. The
+    // hook owns the interior; the slot re-checks the tag afterwards, because the three toggles answer
+    // their 0x26ea0 gate from it. A missing hook writes nothing at all.
     if (hooks.var_ctor == nullptr) return stages.ctor;
-    store_tag(object, spec.vptr_tag);
-    if (!hooks.var_ctor(object, spec)) return stages.ctor;
+    object.var.base.vptr = spec.vptr_tag;
+    if (!hooks.var_ctor(object, spec, concmd)) return stages.ctor;
     if (load_tag(object) != spec.vptr_tag) return stages.ctor;
     ++out.vars_built;
 
@@ -149,6 +141,38 @@ DebugMenuTarget slot309_var_menu_target(const Slot309VarObject& var) noexcept {
         return DebugMenuTarget{object, kSlot309VarSlot3Value, kSlot309VarSlot6Value, true};
     }
     return DebugMenuTarget{object, 0, 0, false};
+}
+
+bool slot309_var_ctor_native(Slot309VarObject& object, const Slot309VarSpec& spec,
+                             ConCmdRegistry& concmd) noexcept {
+    const RangedBoundVarClass* const cls = ranged_bound_var_class_for(spec.ctor_rva);
+    if (cls == nullptr) return false;
+    if (cls->final_vptr != spec.vptr_tag || cls->mid_vptr != spec.mid_vptr_tag ||
+        cls->fn_vtbl != spec.functor_tag || cls->dtor_rva != spec.dtor_rva) {
+        return false;   // the spec and the pinned class row disagree: refuse, write nothing
+    }
+
+    // The call site's argument block (0xa5068b / 0xa506da / 0xa506e0 / 0xa506f7 and the var2/var3
+    // twins): q[0..3] zero, fn payload 0, fn vptr = the class tag, aux 0.
+    RangedVarArgs args{};
+    args.fn_vptr = spec.functor_tag;
+
+    // The call site's value cell is a stack temporary (`movl $0,0x3c(%rsp)`), not the object's own
+    // +0xd0; the wrapper reads it twice and the object keeps the address. Reproduced as-is.
+    std::int32_t cell = spec.initial_value;
+    const SharedStr name = l2::measured_view(spec.name, spec.name_len);
+    const SharedStr description = l2::measured_view(spec.description, spec.description_len);
+
+    const RangedBoundVarResult built = init_ranged_bound_var_a4f4d0(
+        object.var, *cls, name, &cell, static_cast<std::uint32_t>(spec.min_value),
+        static_cast<std::uint32_t>(spec.max_value), spec.flags, args, description, concmd);
+    return built.ok;
+}
+
+Slot309Hooks default_slot309_hooks() noexcept {
+    Slot309Hooks hooks{};
+    hooks.var_ctor = &slot309_var_ctor_native;
+    return hooks;
 }
 
 Slot309Result init_slot309_a505e0(Slot309Objects& o, ConCmdRegistry& concmd, DebugMenuRegistry& menu,

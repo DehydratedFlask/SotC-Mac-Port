@@ -173,6 +173,13 @@ inline constexpr std::size_t kRangedFloatDtorSize = 0x36;
                                               std::uint32_t flags, const RangedVarArgs& args,
                                               const SharedStr& description) noexcept;
 
+// The argument copy at +0x80 and the functor install shared by 0xb0e060 / 0xc300 / 0xc580 and the
+// 0xa4f690 family: clone -> copy -> copy(this.fn) -> copy(this.fn) -> aux swap -> bare-ret destroy,
+// collapsed to its net state (this.fn = {payload <- args.fn_payload, vptr = vtbl, aux <- args.fn_aux}
+// and args q[0..3] with the q[3] self-pointer rule). `vtbl` is the class tag the install stores.
+void install_ranged_fn_from_args(ConCmdRangedVar& var, const RangedVarArgs& args,
+                                 std::uint64_t vtbl) noexcept;
+
 // 0xb0e060 (this=rdi, name=rsi, value_ref=rdx, flags=ecx, args=r8, description=r9): the
 // "enum"-flavoured constructor (both optional bounds disengaged). Returns false only when the
 // caller supplied a functor vtable other than 0x15d5960, whose slot code is not lifted; in that

@@ -95,10 +95,9 @@ BoolVarResult init_bool_var_vector(ConCmdBoolVar& var, const SharedStr& name,
     return out;
 }
 
-namespace {
-
-// Shared by 0xb0e060 and 0xc300: the argument copy at +0x80 and the functor install through the
-// lifted slot bodies. `vtbl` is the constant the class slots store (0x15d5960 / 0x1594318).
+// The argument copy at +0x80 and the functor install through the lifted slot bodies. `vtbl` is the
+// constant the class slots store (0x15d5960 / 0x1594318 / 0x15944a0 / 0x15d1b78 / 0x15d1c30 /
+// 0x15d1cc8). The original sequence is
 //   saved_aux = args.fn_aux
 //   slot1 (clone)  tmp1 <- args.fn : tmp1.payload = args.fn_payload; tmp1.vptr = vtbl
 //   slot0 (copy)   tmp2 <- tmp1    : tmp2.payload = tmp1.payload;    tmp2.vptr = vtbl
@@ -106,8 +105,10 @@ namespace {
 //   slot0 (copy)   this.fn <- tmp2 : this.fn_payload = tmp2.payload; this.fn_vptr = vtbl
 //   swap(this.fn_aux, saved_aux)
 //   slot3 (bare ret) destroys tmp1: no effect.
-void copy_args_and_install_fn(ConCmdRangedVar& var, const RangedVarArgs& args,
-                              std::uint64_t vtbl) noexcept {
+// so this stores the net state only; the four dispatches are not reproduced (each of their bodies is
+// pinned, and their net effect is exactly the stores below).
+void install_ranged_fn_from_args(ConCmdRangedVar& var, const RangedVarArgs& args,
+                                 std::uint64_t vtbl) noexcept {
     var.args[1] = args.q[1];                // vmovups [this+0x88] <- [r8+8]
     var.args[2] = args.q[2];
     var.args[0] = args.q[0];                // [this+0x80] <- [r8]
@@ -125,7 +126,6 @@ void copy_args_and_install_fn(ConCmdRangedVar& var, const RangedVarArgs& args,
     var.fn_aux = saved_aux;
 }
 
-}  // namespace
 
 bool init_ranged_float_var_c300(ConCmdRangedVar& var, const SharedStr& name, void* value_ref,
                                 float min_value, float max_value, std::uint32_t flags,
@@ -153,7 +153,7 @@ bool init_ranged_float_var_c300(ConCmdRangedVar& var, const SharedStr& name, voi
     var.fn_payload = 0;                                // [this+0xb0] = 0
     var.fn_aux = 0;                                    // [this+0xc8] = 0
 
-    copy_args_and_install_fn(var, args, kRangedFloatFnVtbl);
+    install_ranged_fn_from_args(var, args, kRangedFloatFnVtbl);
     return true;
 }
 
@@ -178,7 +178,7 @@ bool init_ranged_var_b0e060(ConCmdRangedVar& var, const SharedStr& name, void* v
     var.fn_payload = 0;                     // [this+0xb0] = 0
     var.fn_aux = 0;                         // [this+0xc8] = 0
 
-    copy_args_and_install_fn(var, args, kRangedEnumFnVtbl);
+    install_ranged_fn_from_args(var, args, kRangedEnumFnVtbl);
     return true;
 }
 

@@ -20,8 +20,8 @@ void check(std::string_view name, bool passed) {
 }
 
 void test_table_shape() {
-    check("count", kResolvedVtableCallSiteCount == 74);
-    check("distinct targets", resolved_vtable_target_count() == 33);
+    check("count", kResolvedVtableCallSiteCount == 91);
+    check("distinct targets", resolved_vtable_target_count() == 37);
     bool sorted = true;
     for (std::size_t index = 1; index < kResolvedVtableCallSiteCount; ++index) {
         if (kResolvedVtableCallSites[index - 1].site >= kResolvedVtableCallSites[index].site) {
@@ -47,6 +47,22 @@ void test_lookup() {
     check("shared same vtable", shared != nullptr && shared_second != nullptr &&
                                     shared->vtable == shared_second->vtable);
 
+    const auto* getter = find_resolved_vtable_call_site(0x21a695);
+    check("getter found", getter != nullptr);
+    if (getter != nullptr) {
+        check("getter table", getter->vtable == 0x15cf248);
+        check("getter slot", getter->slot == 0x68);
+        check("getter target", getter->target == 0x9b7b80);
+    }
+
+    const auto* builder = find_resolved_vtable_call_site(0x96c533);
+    check("builder found", builder != nullptr);
+    if (builder != nullptr) {
+        check("builder table", builder->vtable == 0x2dd09b0);
+        check("builder slot", builder->slot == 0x08);
+        check("builder target", builder->target == 0x9804c0);
+    }
+
     check("unknown site", find_resolved_vtable_call_site(0xdeadbeef) == nullptr);
     check("zero site", find_resolved_vtable_call_site(0) == nullptr);
 }
@@ -57,7 +73,8 @@ void test_known_targets_present() {
                                       0xe19980, 0xe16a00, 0xe24900, 0xe26f90,
                                       0x318b0, 0x31870, 0x31310, 0x4b0, 0x22a60,
                                       0x13d50, 0x13d60, 0x30e50, 0x488d0, 0xc2c0, 0xe19cb0,
-                                      0xe19f70, 0xe1a040, 0xe19440, 0xe52cb0, 0xed4860};
+                                      0xe19f70, 0xe1a040, 0xe19440, 0xe52cb0, 0xed4860,
+                                      0x9b7b80, 0xd7c4b0, 0x6e92c0, 0x9804c0};
     for (const std::uint64_t target : expected) {
         bool found = false;
         for (std::size_t index = 0; index < kResolvedVtableCallSiteCount; ++index) {

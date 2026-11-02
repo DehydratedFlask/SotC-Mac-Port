@@ -58,21 +58,23 @@
 // (0xa4d490/0xa4d760, 0xa4e190/0xa4e310, 0xa4e830/0xa4e9b0 are all `b8 01 00 00 00 c3`) and the bool
 // class answers {1, 0} (0xb890/0xb930), so the default {1.0, 10.0} range is kept at all four toggles.
 //
-// ================================ modelled vs hook (G1 PARTIAL) =================================
+// ================================ modelled vs hook (G2) =================================
 // MODELLED (native, exact): the prologue/epilogue and canary guard; the two zeroed objects and their
 // atexit records; the name object's four stores, its 0xf590 release and its atexit record; the bool
 // variable through the shared native `init_bool_var_static` (0x20af0 + 0x20d60 + 0x20b0); the empty
 // SharedStr through the native 0xf180 model; the four toggles through the native 0x26ea0 model plus
-// the native 0x268b0 registration and 0x272d0 atexit record; all 12 atexit records in body order.
-// HOOKS (no default, fail visible): the three console-variable constructors 0xa4f4d0 / 0xa4fec0 /
-// 0xa50280. Their interiors are large (functor rebuild through `call *0x8(%rcx)` / `call *(%rax)`,
-// a `0xa4f690` sub-initialiser, an internal `0x20d60`, view copies with `lock inc`) and are NOT
-// modelled: the hook receives the pinned Slot309VarSpec (name/description/min/max/flags/vptr/functor
-// tag/dtor) and owns the object interior. A null hook stops the fragment at that step with ok == false
-// BEFORE that object's atexit record, so nothing downstream pretends to be built.
+// the native 0x268b0 registration and 0x272d0 atexit record; all 12 atexit records in body order;
+// and the three console-variable constructors 0xa4f4d0 / 0xa4fec0 / 0xa50280 through
+// `init_ranged_bound_var_a4f4d0` (core/ranged_bound_var_a4f4d0), the shared model of the three
+// instantiations of one template (see that header for the wrapper + leaf characterization).
+// HOOK (optional override, no default): `Slot309Hooks::var_ctor` still receives the pinned
+// Slot309VarSpec and owns the object interior. `default_slot309_hooks()` installs the native model;
+// a null hook stops the fragment at that step with ok == false BEFORE that object's atexit record, so
+// nothing downstream pretends to be built.
 //
 // Fail-visible contracts (all reported through `blocked` / `ok == false`, never a silent pass):
-//   * a null or failing `var_ctor`;
+//   * a null or failing `var_ctor` (the default hook fails when the shared model refuses):
+//     an unpinned class row, a functor tag that is not the instantiation's, or a null value cell;
 //   * a functor tag whose slot 3 is not the pinned bare `ret` (`slot309_inert_functor_destroy`);
 //   * a `0xf590` release that is not the exact inert no-op of a borrowed view;
 //   * a failed 0x20d60 / 0x268b0 registration;
@@ -81,15 +83,19 @@
 //     0xa50d3e). Without a host-supplied guard the comparison is not claimed: `canary_checked` stays
 //     false and the result never reports a silent pass.
 //
-// WHY UNREGISTERED: because of the three hooks, `init_slot309_a505e0` cannot complete on the production
-// startup path (StartupState supplies no var_ctor). Registering it would make run_constructors() stop
-// at index 309, so the slot stays out of recovered_constructors() and the coverage cliff stays at
-// 309 / 0xa505e0 (measured after this module landed: recovered_constructors().size() == 449 of
-// kOriginalCtorCount == 573, first_unrecovered_constructor_index() == 309). This module is a
-// verified model, not a registration.
+// REGISTERED: `startup_ctors.cpp` row `{0xa505e0, 309, ...}` runs this module with
+// `default_slot309_hooks()`. The three console-variable constructors are no longer hooks without a
+// default, so the slot completes on the production startup path; the resulting startup cliff is
+// index 312 / 0xa46130 (the remaining 123 of kOriginalCtorCount). This module was previously a
+// verified-but-unregistered model for exactly that reason.
 //
-// NOT modelled: the interiors of the three variable constructors, every destructor body (they are
-// identity tags), every consumer of the 12 objects, and the runtime behaviour of the save manager.
+// NOT modelled: every destructor body (they are identity tags) and every consumer of the 12 objects;
+// the runtime behaviour of the save manager; the `value_ref` cell's lifetime (see below).
+//
+// The object's +0x60 keeps the caller's value-cell pointer. Slot 309 passes the address of a stack
+// temporary (0x3c/0x38/0x34(%rsp)); the original therefore leaves +0x60 pointing into a dead frame
+// once the slot returns. The native model reproduces that shape and does not repair it; nothing in
+// the native path dereferences +0x60.
 #pragma once
 
 #include <array>
@@ -100,6 +106,7 @@
 #include "concmd_vars.hpp"
 #include "debug_menu_item.hpp"
 #include "fmenu_ctors_slot306.hpp"
+#include "ranged_bound_var_a4f4d0.hpp"
 
 namespace sotc {
 
@@ -257,25 +264,27 @@ inline constexpr std::array<Slot309AtexitRow, kSlot309AtexitRowCount> kSlot309At
 // What the hook of a console-variable constructor receives: the pinned argument identity only.
 struct Slot309VarSpec {
     std::uint64_t ctor_rva;        // 0xa4f4d0 / 0xa4fec0 / 0xa50280 (identity only)
-    std::uint64_t vptr_tag;        // the address point the ctor installs at object+0
+    std::uint64_t leaf_rva;        // 0xa4f690 / 0xa50080 / 0xa50440 (the wrapper's only callee)
+    std::uint64_t vptr_tag;        // the FINAL address point the wrapper installs at object+0
+    std::uint64_t mid_vptr_tag;    // the mid address point the leaf installs (transient)
     std::uint64_t functor_tag;     // the caller's argument-block functor vtable (identity)
     std::uint64_t dtor_rva;        // the __cxa_atexit destructor of this object (identity)
     const char* name;              // name view data
     std::uint32_t name_len;
     const char* description;       // second view data
     std::uint32_t description_len;
-    std::int32_t initial_value;    // *(rdx) of the original call
+    std::int32_t initial_value;    // the value cell the caller passes as rdx
     std::int32_t min_value;        // *(rcx)
     std::int32_t max_value;        // *(r8)
     std::uint32_t flags;           // r9d
 };
 
 inline constexpr std::array<Slot309VarSpec, 3> kSlot309Vars = {{
-    {kSlot309VarCtor1Rva, kSlot309Var1Vptr, kSlot309Var1FunctorTag, 0xa47d20,
+    {kSlot309VarCtor1Rva, 0xa4f690, kSlot309Var1Vptr, 0x15d1a20, kSlot309Var1FunctorTag, 0xa47d20,
      kSlot309Var1Name, 0x1a, kSlot309Var1Desc, 0x19, 0, 0, 5, kSlot309VarFlags},
-    {kSlot309VarCtor2Rva, kSlot309Var2Vptr, kSlot309Var2FunctorTag, 0xa48240,
+    {kSlot309VarCtor2Rva, 0xa50080, kSlot309Var2Vptr, 0x15d1a98, kSlot309Var2FunctorTag, 0xa48240,
      kSlot309Var2Name, 0x12, kSlot309Var2Desc, 0x34, 0, 0, 0x12, kSlot309VarFlags},
-    {kSlot309VarCtor3Rva, kSlot309Var3Vptr, kSlot309Var3FunctorTag, 0xa4ab50,
+    {kSlot309VarCtor3Rva, 0xa50440, kSlot309Var3Vptr, 0x15d1b10, kSlot309Var3FunctorTag, 0xa4ab50,
      kSlot309Var3Name, 0x13, kSlot309Var3Desc, 0x35, 0, 0, 0x14, kSlot309VarFlags},
 }};
 
@@ -304,9 +313,15 @@ struct Slot309Cleared {                    // 0x32f79c8, stride 0x20
     std::uint64_t gap18 = 0;               // +0x18 never written
 };
 
-struct Slot309VarObject {                  // 0xd8 stand-in for a console variable
-    alignas(8) std::array<std::uint8_t, kSlot309VarBytes> bytes{};
+// The console variable stand-in is the shared `ConCmdRangedVar` (0xd8 B: the last written byte is
+// value at +0xd0..+0xd3, +0xd4..+0xd7 is tail padding no body touches) so the shared constructor
+// model owns the interior. The stand-in is a real object here rather than a byte array: no aliasing
+// trick, and the field offsets are pinned below.
+struct Slot309VarObject {
+    ConCmdRangedVar var{};
 };
+static_assert(sizeof(ConCmdRangedVar) == 0xd8 && sizeof(Slot309VarObject) == 0xd8,
+              "the console-variable stand-in must keep the original 0xd8 stride");
 
 struct Slot309NameObject {                 // 0x30, the release-family name_object shape
     std::uint64_t vptr = 0;                // +0x00
@@ -405,15 +420,29 @@ enum class Slot309Stage : std::uint8_t {
 [[nodiscard]] const char* slot309_stage_name(Slot309Stage stage) noexcept;
 
 struct Slot309Hooks {
-    // 0xa4f4d0 / 0xa4fec0 / 0xa50280. NO default: a missing hook stops the fragment before that
-    // object's atexit record. The hook owns the object interior; the slot only re-checks the vptr tag.
-    bool (*var_ctor)(Slot309VarObject& object, const Slot309VarSpec& spec) noexcept = nullptr;
+    // 0xa4f4d0 / 0xa4fec0 / 0xa50280. NO default in this struct: a missing hook stops the fragment
+    // before that object's atexit record. The hook owns the object interior; the slot re-checks the
+    // final vptr tag afterwards. `default_slot309_hooks()` installs the native shared model
+    // (core/ranged_bound_var_a4f4d0) as this hook, which is what the production row uses.
+    bool (*var_ctor)(Slot309VarObject& object, const Slot309VarSpec& spec,
+                     ConCmdRegistry& concmd) noexcept = nullptr;
     // `callq *0x18(%rax)`. Null => slot309_inert_functor_destroy (exact no-op when slot 3 is a bare ret).
     bool (*destroy_functor)(void* functor, const Slot309FunctorSite& site) noexcept = nullptr;
     // __stack_chk_guard source (0x15fe518). Null => the comparison is not performed and
     // `canary_checked` stays false; a changed guard fails the fragment at stage `canary`.
     const std::uint64_t* stack_guard = nullptr;
 };
+
+// The native hook `default_slot309_hooks().var_ctor`: it builds the argument block the slot's call
+// site builds (q = 0, payload = 0, fn vptr = the spec's functor tag, aux = 0), derives the class row
+// from `spec.ctor_rva`, and runs `init_ranged_bound_var_a4f4d0`. A spec whose class row is not pinned,
+// or whose build fails, returns false (the slot then reports the stage and touches nothing else).
+[[nodiscard]] bool slot309_var_ctor_native(Slot309VarObject& object, const Slot309VarSpec& spec,
+                                           ConCmdRegistry& concmd) noexcept;
+
+// The production hooks: the native console-variable model, no functor override, no guard. The guard
+// is a host decision (the toolchain randomises it), so it stays null and `canary_checked` stays false.
+[[nodiscard]] Slot309Hooks default_slot309_hooks() noexcept;
 
 // The lifted `callq *0x18(%rax)` for the three pinned sites: a bare `ret` has no effect. Returns false
 // (visible) when the site's slot 3 is not the pinned bare ret.
@@ -427,7 +456,7 @@ struct Slot309Result {
     bool ok = false;
     Slot309Stage blocked = Slot309Stage::none;
     std::uint32_t atexit_records = 0;        // this body's 12 __cxa_atexit registrations
-    std::uint32_t functors_destroyed = 0;    // the three `callq *0x18(%rax)` sites
+    std::uint32_t functors_destroyed = 0;    // the three `callq *0x18(%rax)` sites of this body
     std::uint32_t vars_built = 0;            // var_ctor hooks that completed (0..3)
     std::uint32_t menu_items = 0;            // toggles registered through 0x268b0 (0..4)
     BoolVarResult bool_var{};                // the shared 0x20af0/0x20d60/0x20b0 shape

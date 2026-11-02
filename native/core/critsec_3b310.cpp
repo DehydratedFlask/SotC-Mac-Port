@@ -106,8 +106,12 @@ int critsec_init_at(void* handle_bytes) noexcept {
 
     try {
         std::lock_guard<std::mutex> lock(g_registry_mutex);
-        // Recheck while serialized in case another initializer received the same byte buffer.
-        if (read_token(handle_bytes) != 0) {
+        // Recheck while serialized in case another initializer received the same byte buffer. The retail
+        // shim never reads the field - it hands it to scePthreadMutexInit, which overwrites it - so only a
+        // token that is still live in this registry can mean "already initialised". Arbitrary contents
+        // (a fresh, unzeroed allocation) are overwritten, exactly like the imported call would.
+        const std::uint64_t existing = read_token(handle_bytes);
+        if (existing != 0 && g_sidecars.find(existing) != g_sidecars.end()) {
             (void)pthread_mutex_destroy(&sidecar->mutex);
             return EALREADY;
         }
@@ -201,6 +205,11 @@ int critsec_destroy_at(void* handle_bytes) noexcept {
         std::memcpy(handle_bytes, &empty, sizeof(empty));
     }
     return 0;
+}
+
+std::size_t critsec_live_sidecars() noexcept {
+    std::lock_guard<std::mutex> lock(g_registry_mutex);
+    return g_sidecars.size();
 }
 
 int critsec_lock_at(const void* handle_bytes) noexcept {

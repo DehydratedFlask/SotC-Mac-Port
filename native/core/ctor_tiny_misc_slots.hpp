@@ -36,6 +36,11 @@
 //
 // Shared cells (not aliased by this module): 0x2ea4700/0x2ea4708 are the process-wide TSC cells of
 // core/store_tsc_323d0 and ARE shared; the other objects are state-owned stand-ins.
+//
+// Slots 414 and 535 register the critical-section destroy `0x3b380` with `__cxa_atexit` and never call it.
+// `teardown_slot414_57b9b0` / `teardown_slot535_138e20` are host-only opt-ins that run that registered
+// identity (hook present, log entry still present, hook succeeds) and leave the handle intact on every
+// rejection. They are not wired into any production path; see core/critsec_3b310 for the 8-byte layout.
 #pragma once
 
 #include <array>
@@ -128,6 +133,17 @@ struct Slot414Hooks {
 [[nodiscard]] TinyMiscResult init_slot414_57b9b0(Slot414State& state, const Slot414Hooks& hooks,
                                                  StartupAtexitLog& log) noexcept;
 
+// Host-only teardown of the identity that 0x57b9b0 registered. OBSERVED: the constructor only records
+// `__cxa_atexit(0x3b380, obj)`; it never calls 0x3b380 itself, and nothing in this project's production
+// path drains StartupAtexitLog (E1050), so no caller is implied. These helpers are the explicit opt-in
+// that makes the registered identity executable by a host that owns the drain decision.
+//
+// Contract: the destroy hook must be present, the log must still hold that exact (identity, object) pair,
+// and the hook must succeed. Every rejection is visible and leaves the 8-byte handle untouched, so a
+// caller can retry. Retail contention/teardown ordering is not established and is not claimed here.
+[[nodiscard]] TinyMiscResult teardown_slot414_57b9b0(Slot414State& state, const Slot414Hooks& hooks,
+                                                     const StartupAtexitLog& log) noexcept;
+
 // ----------------------------------------------------------------------------------------------- 494
 inline constexpr std::uint64_t kSlot494Rva = 0x26f7c0;
 inline constexpr std::uint32_t kSlot494Size = 84;
@@ -200,6 +216,13 @@ struct Slot535State {
 };
 [[nodiscard]] TinyMiscResult init_slot535_138e20(Slot535State& state, const Slot414Hooks& hooks,
                                                  StartupAtexitLog& log) noexcept;
+
+// Host-only teardown of the mutex identity that 0x138e20 registered (`__cxa_atexit(0x3b380, mutex)`).
+// Same contract as teardown_slot414_57b9b0. OBSERVED ordering fact, deliberately NOT executed here: the
+// second record is `__cxa_atexit(0x138370, obj)`, so a real reverse-order drain would run the object
+// destructor 0x138370 before this mutex destroy. Whether to drain at all is still an open host decision.
+[[nodiscard]] TinyMiscResult teardown_slot535_138e20(Slot535State& state, const Slot414Hooks& hooks,
+                                                     const StartupAtexitLog& log) noexcept;
 
 // ----------------------------------------------------------------------------------------------- 541
 inline constexpr std::uint64_t kSlot541Rva = 0xfd210;

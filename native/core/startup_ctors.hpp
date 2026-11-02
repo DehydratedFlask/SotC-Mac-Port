@@ -306,6 +306,7 @@
 #include "ctor_release_family_slots.hpp"
 #include "ctor_slot_307_a5b090.hpp"
 #include "ctor_slot_308_a58f10.hpp"
+#include "ctor_slot_309_a505e0.hpp"
 #include "ctor_slot_310_a479d0.hpp"
 #include "ctor_slot_313_a447a0.hpp"
 #include "ctor_slot_317_a2c390.hpp"
@@ -687,6 +688,8 @@ struct StartupState {
     ReleaseFamilyHooks release_family_hooks{};  // null release_view -> lifted inert f590
     Slot307Objects slot307{};
     Slot308Objects slot308{};
+    Slot309Objects slot309{};
+    Slot309Result slot309_result{};
     Slot310Objects slot310{};
     Slot313Objects slot313{};
     Slot317Objects slot317{};

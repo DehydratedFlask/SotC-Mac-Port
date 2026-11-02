@@ -572,7 +572,7 @@ def main() -> int:
     enum_part = vars_c[vars_c.index("bool init_ranged_var_b0e060"):]
     order = ["init_concmd_base_20af0", "var.base.vptr = kRangedEnumMidVptr", "var.value_ref = value_ref",
              "var.min_engaged = 0", "var.max_engaged = 0", "std::memset(var.args", "var.fn_vptr = kRangedEnumFnVtbl",
-             "copy_args_and_install_fn"]
+             "install_ranged_fn_from_args"]
     pos = [enum_part.index(token) for token in order]
     require(pos == sorted(pos) and len(set(pos)) == len(pos), "native enum ctor store order")
 

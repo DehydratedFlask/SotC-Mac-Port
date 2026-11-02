@@ -54,8 +54,8 @@ def main() -> int:
 
     header = HEADER.read_text()
     EXPECTED = header_rows(header)
-    require(len(EXPECTED) == 74, f"expected 74 rows, found {len(EXPECTED)}")
-    require(len({row[3] for row in EXPECTED}) == 33, "expected 33 distinct targets")
+    require(len(EXPECTED) == 91, f"expected 91 rows, found {len(EXPECTED)}")
+    require(len({row[3] for row in EXPECTED}) == 37, "expected 37 distinct targets")
     entry_map = json.loads(ENTRY_MAP.read_text())["entries"]
 
     fde_starts = None
@@ -79,8 +79,11 @@ def main() -> int:
             found = fde_starts.find(target)
             require(found is not None and found[0] == target,
                     f"target {target:#x} is not an FDE function start")
-        require(f"0x{target:x}" in entry_map, f"entry map is missing 0x{target:x}")
-        require(f"0x{site:x}" not in entry_map or True, "site lookup placeholder")
+        key = f"0x{target:x}"
+        require(key in entry_map, f"entry map is missing {key}; run tools/lift/gen_entry_map.py")
+        owners = {row["header"] for row in entry_map[key]}
+        require("native/core/vtable_resolved_entries.hpp" in owners,
+                f"{key} entry map does not name the table header")
 
     for needle in (
         "kResolvedVtableTarget_187c0Rva = 0x187c0",
@@ -110,8 +113,16 @@ def main() -> int:
         "kResolvedVtableTarget_e19440Rva = 0xe19440",
         "kResolvedVtableTarget_e52cb0Rva = 0xe52cb0",
         "kResolvedVtableTarget_ed4860Rva = 0xed4860",
+        "kResolvedVtableTarget_9b7b80Rva = 0x9b7b80",
+        "kResolvedVtableTarget_d7c4b0Rva = 0xd7c4b0",
+        "kResolvedVtableTarget_6e92c0Rva = 0x6e92c0",
+        "kResolvedVtableTarget_9804c0Rva = 0x9804c0",
         "kResolvedVtable_1595b60 = 0x1595b60",
         "kResolvedVtable_1595320 = 0x1595320",
+        "kResolvedVtable_15cf248 = 0x15cf248",
+        "kResolvedVtable_15de228 = 0x15de228",
+        "kResolvedVtable_2dcb170 = 0x2dcb170",
+        "kResolvedVtable_2dd09b0 = 0x2dd09b0",
     ):
         require(needle in header, f"header constant missing: {needle}")
     require("kResolvedVtableCallSiteCount" in header, "count constant missing")
@@ -120,6 +131,7 @@ def main() -> int:
 
     print(f"OK check_vtable_resolved_entries: {len(EXPECTED)} sites, "
           f"{len({row[3] for row in EXPECTED})} distinct targets tied to image and entry map")
+
     return 0
 
 

@@ -402,6 +402,15 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
          }},
         {0xa5b090, 307, [](StartupState& s) noexcept { if (!init_slot307_a5b090(s.slot307, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
         {0xa58f10, 308, [](StartupState& s) noexcept { if (!init_slot308_a58f10(s.slot308, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
+        // idx 309 / 0xa505e0: the "Save System" debug block. The three console variables go through
+        // the shared 0xa4f4d0 family model (default_slot309_hooks), the bool variable through
+        // init_bool_var_static, and the four toggles through 0x26ea0 + 0x268b0. Any failed stage is a
+        // visible startup failure.
+        {0xa505e0, 309, [](StartupState& s) noexcept {
+             const Slot309Hooks hooks = default_slot309_hooks();
+             s.slot309_result = init_slot309_a505e0(s.slot309, s.concmd, s.debug_menu, hooks);
+             if (!s.slot309_result.ok) s.init_failed = true;
+         }},
         {0xa479d0, 310, [](StartupState& s) noexcept { if (!init_slot310_a479d0(s.slot310, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
         {0xa46b70, 311, [](StartupState& s) noexcept { if (!init_tiny_atexit_slot(311, s.tiny_atexit, &s.concmd.atexit_log).ok) s.init_failed = true; }},
         {0xa447a0, 313, [](StartupState& s) noexcept { if (!init_slot313_a447a0(s.slot313, s.concmd, s.debug_menu).ok) s.init_failed = true; }},

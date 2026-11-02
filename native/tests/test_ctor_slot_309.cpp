@@ -44,6 +44,13 @@ bool same_view(const SharedStr& v, const char* text, std::size_t len) {
            std::memcmp(v.data, text, len) == 0;
 }
 
+template <class T>
+bool region_poison(const T& obj, std::size_t off, std::size_t len) {
+    const auto* b = reinterpret_cast<const std::uint8_t*>(&obj);
+    for (std::size_t i = 0; i < len; ++i) if (b[off + i] != kPoison) return false;
+    return true;
+}
+
 // The three variable stand-ins are hook-owned; this hook only records what it was asked to build.
 struct HookLog {
     std::uint32_t calls = 0;
@@ -59,7 +66,9 @@ struct HookLog {
 };
 HookLog g_log{};
 
-bool recording_var_ctor(Slot309VarObject& object, const Slot309VarSpec& spec) noexcept {
+bool recording_var_ctor(Slot309VarObject& object, const Slot309VarSpec& spec,
+                        ConCmdRegistry& concmd) noexcept {
+    (void)concmd;
     const std::uint32_t i = g_log.calls++;
     if (i < 3) {
         g_log.ctors[i] = spec.ctor_rva;
@@ -69,10 +78,19 @@ bool recording_var_ctor(Slot309VarObject& object, const Slot309VarSpec& spec) no
         g_log.min[i] = spec.min_value;
         g_log.max[i] = spec.max_value;
         g_log.flags[i] = spec.flags;
-        if (!g_log.fail_on_call) object.bytes[8] = 0x5A;   // proof the hook owned the interior
+        // Proof the hook owned the interior: +0x79 is a byte no body of this family ever writes.
+        if (!g_log.fail_on_call) object.var.gap79[0] = 0x5A;
     }
     if (g_log.guard != nullptr) *g_log.guard ^= 1;
     return !g_log.fail_on_call;
+}
+
+// The native hook with a spec that does not match its pinned class row: it must refuse.
+bool refusing_native_var(Slot309VarObject& object, const Slot309VarSpec& spec,
+                         ConCmdRegistry& concmd) noexcept {
+    Slot309VarSpec broken = spec;
+    broken.functor_tag = 0x15d1d80;   // slot 308's argument tag, not this class's
+    return slot309_var_ctor_native(object, broken, concmd);
 }
 
 bool refusing_functor(void*, const Slot309FunctorSite&) noexcept { return false; }
@@ -116,11 +134,16 @@ void section_constants() {
         CHECK(kSlot309AtexitRows[i].dtor_rva == want_dtor[i]);
         CHECK(kSlot309AtexitRows[i].site_rva == want_site[i]);
     }
-    // Three variable classes: ctor, vptr, functor tag, dtor, and the two 0x26ea0 gate slots.
+    // Three variable classes: ctor, leaf, final + mid vptr, functor tag, dtor, and the two 0x26ea0
+    // gate slots. Every identity is the pinned row of the shared 0xa4f4d0 family.
     CHECK(kSlot309Vars[0].ctor_rva == 0xa4f4d0 && kSlot309Vars[1].ctor_rva == 0xa4fec0 &&
           kSlot309Vars[2].ctor_rva == 0xa50280);
+    CHECK(kSlot309Vars[0].leaf_rva == 0xa4f690 && kSlot309Vars[1].leaf_rva == 0xa50080 &&
+          kSlot309Vars[2].leaf_rva == 0xa50440);
     CHECK(kSlot309Vars[0].vptr_tag == 0x15d1ba8 && kSlot309Vars[1].vptr_tag == 0x15d1c60 &&
           kSlot309Vars[2].vptr_tag == 0x15d1cf8);
+    CHECK(kSlot309Vars[0].mid_vptr_tag == 0x15d1a20 && kSlot309Vars[1].mid_vptr_tag == 0x15d1a98 &&
+          kSlot309Vars[2].mid_vptr_tag == 0x15d1b10);
     CHECK(kSlot309Vars[0].functor_tag == 0x15d1b78 && kSlot309Vars[1].functor_tag == 0x15d1c30 &&
           kSlot309Vars[2].functor_tag == 0x15d1cc8);
     CHECK(kSlot309Vars[0].max_value == 5 && kSlot309Vars[1].max_value == 0x12 && kSlot309Vars[2].max_value == 0x14);
@@ -128,6 +151,16 @@ void section_constants() {
     CHECK(kSlot309Vars[0].initial_value == 0 && kSlot309Vars[1].initial_value == 0 &&
           kSlot309Vars[2].initial_value == 0);
     for (const auto& v : kSlot309Vars) CHECK(v.flags == 1);
+    // Each spec must be exactly the pinned row of the shared model, or the native hook refuses.
+    for (std::size_t i = 0; i < kSlot309Vars.size(); ++i) {
+        const RangedBoundVarClass* const row = ranged_bound_var_class_for(kSlot309Vars[i].ctor_rva);
+        CHECK(row == &kRangedBoundVarClasses[i]);
+        CHECK(row->leaf_rva == kSlot309Vars[i].leaf_rva);
+        CHECK(row->mid_vptr == kSlot309Vars[i].mid_vptr_tag);
+        CHECK(row->final_vptr == kSlot309Vars[i].vptr_tag);
+        CHECK(row->fn_vtbl == kSlot309Vars[i].functor_tag);
+        CHECK(row->dtor_rva == kSlot309Vars[i].dtor_rva);
+    }
     CHECK(kSlot309Vars[0].name_len == 0x1a && kSlot309Vars[0].description_len == 0x19);
     CHECK(kSlot309Vars[1].name_len == 0x12 && kSlot309Vars[1].description_len == 0x34);
     CHECK(kSlot309Vars[2].name_len == 0x13 && kSlot309Vars[2].description_len == 0x35);
@@ -158,12 +191,12 @@ void section_functor_and_target() {
     // The 0x26ea0 gate: {1, 1} for the three variable classes, unknown for anything else, {1, 0} bool.
     Slot309VarObject var;
     for (std::uint64_t tag : {kSlot309Var1Vptr, kSlot309Var2Vptr, kSlot309Var3Vptr}) {
-        std::memcpy(var.bytes.data(), &tag, sizeof tag);
+        var.var.base.vptr = tag;
         const DebugMenuTarget t = slot309_var_menu_target(var);
         CHECK(t.known && t.object == &var && t.slot3 == 1 && t.slot6 == 1);
     }
     const std::uint64_t foreign = 0x1594bf8;
-    std::memcpy(var.bytes.data(), &foreign, sizeof foreign);
+    var.var.base.vptr = foreign;
     CHECK(!slot309_var_menu_target(var).known);
 
     ConCmdBoolVar b{};
@@ -211,10 +244,11 @@ void section_build() {
     // 2. cleared: +0x00..+0x17 zero, +0x18 untouched.
     for (std::uint8_t byte : o.cleared.zero) CHECK(byte == 0);
     CHECK(o.cleared.gap18 == 0xa5a5a5a5a5a5a5a5ull);
-    // 3..5. the variable stand-ins keep the class tag and the hook's marker; the rest stays poison.
-    const std::uint8_t* v1 = o.var1.bytes.data();
-    CHECK(dword_at(o.var1, 0) == 0x15d1ba8u && v1[8] == 0x5A);
-    for (std::size_t i = 9; i < kSlot309VarBytes; ++i) CHECK(v1[i] == kPoison);
+    // 3..5. the variable stand-ins keep the class tag and the hook's marker; nothing else is written
+    // (the slot stores the final vptr at +0x00..+0x07, the hook only its +0x79 marker).
+    CHECK(o.var1.var.base.vptr == kSlot309Var1Vptr && o.var1.var.gap79[0] == 0x5A);
+    CHECK(region_poison(o.var1, 0x08, 0x71));   // +0x08..+0x78
+    CHECK(region_poison(o.var1, 0x7a, 0x5e));   // +0x7a..+0xd7
     // 4. name object: vptr, borrowed view, three zero words.
     CHECK(o.name_object.vptr == kSlot309NameObjectVptr);
     CHECK(same_view(o.name_object.name, "sSaveManagerShowInfoLevel", 0x19));
@@ -300,8 +334,8 @@ void section_var_hook_fails() {
     CHECK(r.atexit_records == 2 && r.vars_built == 0);
     // The class tag was stored before the hook (as the original ctor does); a failing hook that writes
     // nothing leaves the rest of the stand-in untouched.
-    CHECK(dword_at(o.var1, 0) == 0x15d1ba8u);
-    CHECK(o.var1.bytes[8] == kPoison);
+    CHECK(o.var1.var.base.vptr == kSlot309Var1Vptr);
+    CHECK(o.var1.var.gap79[0] == kPoison);
 }
 
 void section_functor_refused() {
@@ -370,6 +404,79 @@ void section_parent_contract() {
     }
 }
 
+void section_native_build() {
+    // The production path: `default_slot309_hooks()` installs the shared 0xa4f4d0 family model, so the
+    // whole body completes with no host-supplied variable hook at all.
+    ConCmdRegistry creg;
+    DebugMenuRegistry menu;
+    Slot309Objects o;
+    poison(o.var1);
+    poison(o.var2);
+    poison(o.var3);
+    const Slot309Hooks hooks = default_slot309_hooks();
+    CHECK(hooks.var_ctor == &slot309_var_ctor_native && hooks.destroy_functor == nullptr &&
+          hooks.stack_guard == nullptr);
+    const Slot309Result r = init_slot309_a505e0(o, creg, menu, hooks);
+    CHECK(r.ok && r.blocked == Slot309Stage::none);
+    CHECK(r.atexit_records == 12 && r.functors_destroyed == 3 && r.vars_built == 3 && r.menu_items == 4);
+    CHECK(!r.canary_checked && !r.canary_matched);
+
+    // Each variable is the full shared-model object, not a stand-in.
+    Slot309VarObject* const vars[3] = {&o.var1, &o.var2, &o.var3};
+    const std::int32_t max_cell[3] = {5, 0x12, 0x14};
+    for (int i = 0; i < 3; ++i) {
+        const ConCmdRangedVar& v = vars[i]->var;
+        const RangedBoundVarClass& row = kRangedBoundVarClasses[i];
+        CHECK(v.base.vptr == row.final_vptr && v.base.flags == 1 && v.base.registered == 1);
+        CHECK(v.base.name.size == static_cast<std::int64_t>(kSlot309Vars[i].name_len));
+        CHECK(std::memcmp(v.base.name.data, kSlot309Vars[i].name, kSlot309Vars[i].name_len) == 0);
+        CHECK(v.base.description.size == static_cast<std::int64_t>(kSlot309Vars[i].description_len));
+        CHECK(std::memcmp(v.base.description.data, kSlot309Vars[i].description,
+                          kSlot309Vars[i].description_len) == 0);
+        CHECK(dword_at(v, 0x68) == 0 && dword_at(v, 0xd0) == 0);   // value and default from the cell
+        CHECK(dword_at(v, 0x6c) == 0 && dword_at(v, 0x74) == static_cast<std::uint32_t>(max_cell[i]));
+        CHECK(v.min_engaged == 1 && v.max_engaged == 1);
+        CHECK(v.fn_vptr == row.fn_vtbl && v.fn_payload == 0 && v.fn_aux == 0);
+        for (std::uint64_t q : v.args) CHECK(q == 0);
+        // The caller's value cell is an external object (a dead stack temporary in the original), so
+        // +0x60 never aliases the object's own +0xd0.
+        CHECK(v.value_ref != nullptr);
+        CHECK(v.value_ref != static_cast<const void*>(&v.value));
+        // The six never-written regions of the shared shape.
+        CHECK(region_poison(v, 0x19, 3) && region_poison(v, 0x71, 3) && region_poison(v, 0x79, 7));
+        CHECK(region_poison(v, 0xa0, 0x10) && region_poison(v, 0xb8, 8) && region_poison(v, 0xd4, 4));
+    }
+
+    // Four registrations: the three variables (the wrapper's 0x20d60) and the bool variable.
+    CHECK(creg.pending.size() == 4);
+    CHECK(creg.atexit_log.size() == 13);
+    CHECK(menu.root.count == 4);
+    const void* const want_target[4] = {&o.var1, &o.bool_var.var, &o.var2, &o.var3};
+    const DebugMenuItem* const items[4] = {&o.toggle1, &o.toggle2, &o.toggle3, &o.toggle4};
+    for (int i = 0; i < 4; ++i) {
+        CHECK(items[i]->target == want_target[i]);
+        // The three variable classes answer {1, 1}, so 0x26ea0 keeps the default range.
+        CHECK(dword_at(*items[i], 0x98) == 0x3f800000u && dword_at(*items[i], 0x9c) == 0x41200000u);
+    }
+}
+
+void section_native_var_refused() {
+    // A spec that does not match its pinned class row must make the native hook refuse, and the slot
+    // must then stop at the ctor stage with nothing else built.
+    ConCmdRegistry creg;
+    DebugMenuRegistry menu;
+    Slot309Objects o;
+    poison(o.var1);
+    Slot309Hooks hooks = default_slot309_hooks();
+    hooks.var_ctor = &refusing_native_var;
+    const Slot309Result r = init_slot309_a505e0(o, creg, menu, hooks);
+    CHECK(!r.ok && r.blocked == Slot309Stage::var1_ctor);
+    CHECK(r.atexit_records == 2 && r.vars_built == 0 && creg.pending.size() == 0);
+    // The slot stores the final tag before the hook; the refusing hook wrote nothing after it.
+    CHECK(o.var1.var.base.vptr == kSlot309Var1Vptr);
+    CHECK(region_poison(o.var1, 0x08, 0xd0));
+}
+
 void section_canary() {
     // The body's only branch is the __stack_chk_guard compare. A guard that changed inside the body
     // takes the original's `jne 0xa50d3e` / __stack_chk_fail path, so the model fails at `canary`
@@ -401,6 +508,8 @@ int main() {
     section_functor_refused();
     section_concmd_registration_fails();
     section_parent_contract();
+    section_native_build();
+    section_native_var_refused();
     section_canary();
     std::puts("OK test_ctor_slot_309");
     return 0;

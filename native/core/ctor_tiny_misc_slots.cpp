@@ -28,6 +28,26 @@ TinyMiscResult done() noexcept {
 
 void store_u64(std::uint8_t* at, std::uint64_t v) noexcept { std::memcpy(at, &v, sizeof(v)); }
 
+// True when the log still holds exactly this (destructor identity, object) registration.
+bool log_holds(const StartupAtexitLog& log, std::uint64_t identity, const void* object) noexcept {
+    for (std::size_t i = 0; i < log.size(); ++i) {
+        const StartupAtexitEntry& entry = log.at(i);
+        if (entry.dtor_rva == identity && entry.object == object) return true;
+    }
+    return false;
+}
+
+// Runs the registered 0x3b380 identity for one 8-byte handle cell. Every rejection is visible and the
+// handle bytes are left exactly as they were, so the caller keeps the token and can retry.
+TinyMiscResult run_registered_mutex_destroy(void* handle, const Slot414Hooks& hooks,
+                                           const StartupAtexitLog& log,
+                                           std::uint64_t identity) noexcept {
+    if (hooks.mutex_destroy_3b380 == nullptr) return blocked("mutex_destroy_hook");
+    if (handle == nullptr || !log_holds(log, identity, handle)) return blocked("atexit_identity");
+    if (!hooks.mutex_destroy_3b380(handle)) return blocked("mutex_destroy");
+    return done();
+}
+
 // 0x8bd90(obj): mov qword [obj+0x10], 0; 16-byte constant -> [obj+0x18].
 void ctor_8bd90(std::uint8_t* obj) noexcept {
     store_u64(obj + 0x10, 0);
@@ -90,6 +110,11 @@ TinyMiscResult init_slot414_57b9b0(Slot414State& state, const Slot414Hooks& hook
     return done();
 }
 
+TinyMiscResult teardown_slot414_57b9b0(Slot414State& state, const Slot414Hooks& hooks,
+                                       const StartupAtexitLog& log) noexcept {
+    return run_registered_mutex_destroy(state.obj.data(), hooks, log, kSlot414DtorRva);
+}
+
 // ---------------------------------------------------------------------------------------------- 494
 TinyMiscResult init_slot494_26f7c0(Slot494State& state, const Slot494Hooks& hooks,
                                    StartupAtexitLog& log) noexcept {
@@ -132,6 +157,11 @@ TinyMiscResult init_slot535_138e20(Slot535State& state, const Slot414Hooks& hook
     std::memset(state.obj.data() + 8, 0, 0x18);                          // [+8,+0x18) vmovups, [+0x18,+0x20) qword
     if (!log.record(kSlot535ObjDtorRva, state.obj.data())) return blocked("atexit_record");
     return done();
+}
+
+TinyMiscResult teardown_slot535_138e20(Slot535State& state, const Slot414Hooks& hooks,
+                                       const StartupAtexitLog& log) noexcept {
+    return run_registered_mutex_destroy(state.mutex.data(), hooks, log, kSlot535MutexDtorRva);
 }
 
 // ---------------------------------------------------------------------------------------------- 541

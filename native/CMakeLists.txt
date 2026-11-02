@@ -1496,6 +1496,11 @@ add_executable(test_critsec_3b310 tests/test_critsec_3b310.cpp)
 target_link_libraries(test_critsec_3b310 sotc_core)
 add_test(NAME critsec_3b310 COMMAND test_critsec_3b310)
 
+# RE-02-CRITSEC-3B310-3B380-NATIVE-01: registered 0x3b380 identity teardown for slots 414 and 535.
+add_executable(test_critsec_slots_teardown tests/test_critsec_slots_teardown.cpp)
+target_link_libraries(test_critsec_slots_teardown sotc_core)
+add_test(NAME critsec_slots_teardown COMMAND test_critsec_slots_teardown)
+
 add_executable(test_init_499f80_body tests/test_init_499f80_body.cpp)
 target_link_libraries(test_init_499f80_body sotc_core)
 add_test(NAME init_499f80_body COMMAND test_init_499f80_body)
@@ -2445,6 +2450,7 @@ add_test(NAME ctor_slot_334 COMMAND test_ctor_slot_334)
 
 # CPU-01-STARTUP-SLOT-308-01: constructor index 308 (0xa58f10) and the native 0xc580 ranged-int constructor.
 target_sources(sotc_core PRIVATE core/ranged_int_var_c580.cpp core/ctor_slot_308_a58f10.cpp)
+target_sources(sotc_core PRIVATE core/ranged_bound_var_a4f4d0.cpp core/ctor_slot_309_a505e0.cpp)
 add_executable(test_ctor_slot_308 tests/test_ctor_slot_308.cpp)
 target_link_libraries(test_ctor_slot_308 sotc_core)
 add_test(NAME ctor_slot_308 COMMAND test_ctor_slot_308)
@@ -2728,13 +2734,31 @@ target_link_libraries(test_vtable_15953f8_fios_and_4b0 PRIVATE sotc_vtable_15953
   sotc_vtable_1594dc0_slot10)
 add_test(NAME vtable_15953f8_fios_and_4b0 COMMAND test_vtable_15953f8_fios_and_4b0)
 
-# CPU-01-STARTUP-SLOT-309-NATIVE-LIFT-01: constructor index 309 (0xa505e0), the Save System variable
-# group (3 hook-gated console variables, 1 name object, 1 bool variable, 1 empty view, 4 toggles) and
-# its 12 __cxa_atexit registrations. Deliberately NOT registered in startup_ctors: the three variable
-# constructors 0xa4f4d0 / 0xa4fec0 / 0xa50280 are hooks with no default, so the slot cannot complete on
-# the production path. See core/ctor_slot_309_a505e0.hpp and tools/lift/check_ctor_slot_309.py.
-add_library(sotc_ctor_slot_309 STATIC core/ctor_slot_309_a505e0.cpp)
-target_link_libraries(sotc_ctor_slot_309 PUBLIC sotc_core)
+# CPU-01-STARTUP-SLOT-309-NATIVE-LIFT-01 / -RANGED-BOUND-VAR-A4F4D0-01: constructor index 309
+# (0xa505e0), the Save System variable group (3 console variables through the shared 0xa4f4d0 family,
+# 1 name object, 1 bool variable, 1 empty view, 4 toggles) and its 12 __cxa_atexit registrations.
+# Registered in startup_ctors with default_slot309_hooks(). See core/ctor_slot_309_a505e0.hpp,
+# core/ranged_bound_var_a4f4d0.hpp and tools/lift/check_consvar_slots.py.
 add_executable(test_ctor_slot_309 tests/test_ctor_slot_309.cpp)
-target_link_libraries(test_ctor_slot_309 PRIVATE sotc_ctor_slot_309)
+target_link_libraries(test_ctor_slot_309 PRIVATE sotc_core)
 add_test(NAME ctor_slot_309 COMMAND test_ctor_slot_309)
+
+# The shared console-variable constructor family (0xa4f4d0 / 0xa4fec0 / 0xa50280 wrappers over the
+# 0xa4f690 / 0xa50080 / 0xa50440 leaves), used by startup slot 309.
+add_executable(test_ranged_bound_var_a4f4d0 tests/test_ranged_bound_var_a4f4d0.cpp)
+target_link_libraries(test_ranged_bound_var_a4f4d0 PRIVATE sotc_core)
+add_test(NAME ranged_bound_var_a4f4d0 COMMAND test_ranged_bound_var_a4f4d0)
+
+# CPU-01-AOT-CFG-SCALE-01: provenance-audited vtable-closure slice. Four targets whose call site
+# loads the container address with its nearest register definition: 0x9b7b80 (float getter through
+# 0x15cf248 + 0x68), 0xd7c4b0 (constant zero through 0x15de228 + 0x20), 0x6e92c0 (preset apply
+# through 0x2dcb170 + 0x08) and 0x9804c0 (record-array builder through 0x2dd09b0 + 0x08).
+add_library(sotc_vtable_frontier2 STATIC
+  core/vtable_15cf248_slot68_9b7b80.cpp
+  core/vtable_15de228_slot20_d7c4b0.cpp
+  core/vtable_2dcb170_slot08_6e92c0.cpp
+  core/vtable_2dd09b0_slot08_9804c0.cpp)
+target_link_libraries(sotc_vtable_frontier2 PUBLIC sotc_core)
+add_executable(test_vtable_frontier2 tests/test_vtable_frontier2.cpp)
+target_link_libraries(test_vtable_frontier2 PRIVATE sotc_vtable_frontier2)
+add_test(NAME vtable_frontier2 COMMAND test_vtable_frontier2)

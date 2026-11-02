@@ -596,6 +596,10 @@
       {
         "constant": "kOwnerRow3CommandCtor",
         "header": "native/core/owner_ctor_14db00.hpp"
+      },
+      {
+        "constant": "kRangedBoundBaseCtor",
+        "header": "native/core/ranged_bound_var_a4f4d0.hpp"
       }
     ],
     "0x20b50": [
@@ -624,6 +628,10 @@
       {
         "constant": "kOwnerRow3CommandRegister",
         "header": "native/core/owner_ctor_14db00.hpp"
+      },
+      {
+        "constant": "kRangedBoundRegister",
+        "header": "native/core/ranged_bound_var_a4f4d0.hpp"
       },
       {
         "constant": "kVtable1594dc0Slot20_20d60",
@@ -3394,6 +3402,16 @@
         "header": "native/core/stat_query_54b250.hpp"
       }
     ],
+    "0x6e92c0": [
+      {
+        "constant": "kVtable2dcb170Slot08_6e92c0",
+        "header": "native/core/vtable_2dcb170_slot08_6e92c0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_6e92c0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0x8ef00": [
       {
         "constant": "kSlot539HolderDtor",
@@ -3412,6 +3430,26 @@
       {
         "constant": "kScreenshotQuery",
         "header": "native/core/snapshot_bug_data.hpp"
+      }
+    ],
+    "0x9804c0": [
+      {
+        "constant": "kVtable2dd09b0Slot08_9804c0",
+        "header": "native/core/vtable_2dd09b0_slot08_9804c0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_9804c0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0x9b7b80": [
+      {
+        "constant": "kVtable15cf248Slot68_9b7b80",
+        "header": "native/core/vtable_15cf248_slot68_9b7b80.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_9b7b80",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0xa2ed00": [
@@ -3647,6 +3685,16 @@
       },
       {
         "constant": "kResolvedVtableTarget_c740",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
+    "0xd7c4b0": [
+      {
+        "constant": "kVtable15de228Slot20_d7c4b0",
+        "header": "native/core/vtable_15de228_slot20_d7c4b0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_d7c4b0",
         "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
@@ -3956,6 +4004,10 @@
       {
         "constant": "kInsert1bdb50StackFail",
         "header": "native/core/insert_1bdb50.hpp"
+      },
+      {
+        "constant": "kRangedBoundStackChkFail",
+        "header": "native/core/ranged_bound_var_a4f4d0.hpp"
       },
       {
         "constant": "kVslot40StackchkFail",
@@ -5280,6 +5332,10 @@
       {
         "constant": "kOwnerRow3CommandCtor",
         "header": "native/core/owner_ctor_14db00.hpp"
+      },
+      {
+        "constant": "kRangedBoundBaseCtor",
+        "header": "native/core/ranged_bound_var_a4f4d0.hpp"
       }
     ],
     "0x20b0": [
@@ -5314,6 +5370,10 @@
       {
         "constant": "kOwnerRow3CommandRegister",
         "header": "native/core/owner_ctor_14db00.hpp"
+      },
+      {
+        "constant": "kRangedBoundRegister",
+        "header": "native/core/ranged_bound_var_a4f4d0.hpp"
       },
       {
         "constant": "kVtable1594dc0Slot20_20d60",
@@ -10568,6 +10628,16 @@
         "header": "native/core/ctor_slot_376_6e4930.hpp"
       }
     ],
+    "0x6e92c0": [
+      {
+        "constant": "kVtable2dcb170Slot08_6e92c0",
+        "header": "native/core/vtable_2dcb170_slot08_6e92c0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_6e92c0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0x747870": [
       {
         "constant": "kSlot365",
@@ -10768,10 +10838,30 @@
         "header": "native/core/snapshot_bug_data.hpp"
       }
     ],
+    "0x9804c0": [
+      {
+        "constant": "kVtable2dd09b0Slot08_9804c0",
+        "header": "native/core/vtable_2dd09b0_slot08_9804c0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_9804c0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0x989450": [
       {
         "constant": "kSndxResourceUnregister",
         "header": "native/core/sndx_command_handlers.hpp"
+      }
+    ],
+    "0x9b7b80": [
+      {
+        "constant": "kVtable15cf248Slot68_9b7b80",
+        "header": "native/core/vtable_15cf248_slot68_9b7b80.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_9b7b80",
+        "header": "native/core/vtable_resolved_entries.hpp"
       }
     ],
     "0xa1cc0": [
@@ -11754,6 +11844,16 @@
         "header": "native/core/ctor_slot_544_d1b20.hpp"
       }
     ],
+    "0xd7c4b0": [
+      {
+        "constant": "kVtable15de228Slot20_d7c4b0",
+        "header": "native/core/vtable_15de228_slot20_d7c4b0.hpp"
+      },
+      {
+        "constant": "kResolvedVtableTarget_d7c4b0",
+        "header": "native/core/vtable_resolved_entries.hpp"
+      }
+    ],
     "0xddf310": [
       {
         "constant": "kVtable15e0b48Slot28_ddf4b0PreCall",
@@ -12170,6 +12270,10 @@
         "header": "native/core/insert_1bdb50.hpp"
       },
       {
+        "constant": "kRangedBoundStackChkFail",
+        "header": "native/core/ranged_bound_var_a4f4d0.hpp"
+      },
+      {
         "constant": "kVslot40StackchkFail",
         "header": "native/core/vslot_40_533100_stackchk.hpp"
       }
@@ -12196,6 +12300,12 @@
       {
         "constant": "kMenuSeparatorText",
         "header": "native/core/fmenu_ctors_slot306.hpp"
+      }
+    ],
+    "0xf97deb": [
+      {
+        "constant": "kCritSecName",
+        "header": "native/core/critsec_3b310.hpp"
       }
     ],
     "0xf9ebd0": [
@@ -12271,9 +12381,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 1549,
-    "distinct_rvas": 1052,
-    "duplicate_rvas": 329,
-    "headers": 399
+    "constants": 1561,
+    "distinct_rvas": 1057,
+    "duplicate_rvas": 333,
+    "headers": 404
   }
 }

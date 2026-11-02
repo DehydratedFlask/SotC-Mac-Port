@@ -154,16 +154,20 @@ E824 reverified exact decoded identities for `shadow_sounds.cxml` (355,718 B),
 manifest locators. E827 rechecked the archive's pinned size/SHA-256 before profiling. The worker
 and root replay read the selected decoded members in memory only; they wrote no payload bytes.
 
-The standard-library Expat parser, configured to reject DTDs, did not accept the CXML member as
-well-formed XML (`ExpatError`). Root, element-name, and attribute-name counts remain **UNKNOWN**;
-this does not establish whether the bytes are malformed or use another format. The two CRMP
-profiles matched exactly: random-events had 183 NUL bytes, 1,670 printable ASCII bytes, and 497
-maximal contiguous runs; streams had 168 NUL bytes, 1,526 printable ASCII bytes, and 564 runs.
-The private reports contain run offsets and lengths only, no printable contents. See the E828
-[checkpoint](checkpoints/2026-10-27-aud01-pakn-structure-probe-complete-e828.md); worker and root
-report SHA-256 values are recorded there. These observations do not establish schema, event
-meaning, codec, stream pairing, audio-engine use, routing, or playback. Audio and game gates remain
-open.
+The standard-library Expat parser, configured to reject DTDs, did not accept the CXML member when
+handed the whole member (`ExpatError`). Root, element-name, and attribute-name counts were left
+**UNKNOWN** at E828. **E1061 corrects this**: the member is a length-prefixed container —
+`<3-byte minimal base-128 varint payload length><UTF-8 XML 1.0 text>` — with header bytes `83db15`
+decoding to 355,715 = `355718 - 3`. The E828 rejection was `ExpatError` code 4 at line 1, column 0,
+i.e. the header byte; the document declares no DOCTYPE, and the payload alone parses to EOF. Structure:
+root `Sounds`, 8,002 elements (`Sound` 8,001, `Sounds` 1), max depth 2, 12,346 attribute occurrences
+over 7 names. The two CRMP profiles matched exactly: random-events had 183 NUL bytes, 1,670 printable
+ASCII bytes, and 497 maximal contiguous runs; streams had 168 NUL bytes, 1,526 printable ASCII bytes,
+and 564 runs. The private reports contain run offsets and lengths only, no printable contents. See the
+E828 [checkpoint](checkpoints/2026-10-27-aud01-pakn-structure-probe-complete-e828.md) and the E1061
+[checkpoint](checkpoints/2026-11-01-aud01-cxml-structure-probe-e1061.md); worker and root report
+SHA-256 values are recorded there. These observations do not establish schema, event meaning, codec,
+stream pairing, audio-engine use, routing, or playback. Audio and game gates remain open.
 
 An E791 hash-bound review of existing saved Ghidra/REA text exports found `.sxd` only as a
 FourCC row in the platform-tag registry: `0xa60d60` registers it with `_cmn`, and the owner

@@ -2,7 +2,7 @@
 //
 // Proves that every lifted vec_*/leaf_* constructor module runs in recovered_constructors(), that
 // the registered rows pair with the pinned original table, and that the remaining startup cliff is
-// explicit (first unrecovered index 309 / RVA 0xa505e0).
+// explicit (first unrecovered index 312 / RVA 0xa46130).
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -42,7 +42,7 @@ int main() {
     CHECK(result.blocked_on_rva == 0);
     CHECK(!st.init_failed);
     CHECK(result.completed == slots.size());
-    CHECK(slots.size() == 449);
+    CHECK(slots.size() == 450);
 
     // Every registered row is in original order and pairs with the pinned table.
     for (std::size_t i = 0; i < slots.size(); ++i) {
@@ -53,9 +53,9 @@ int main() {
     }
 
     // ---- explicit, machine-checked gap ---------------------------------------
-    CHECK(first_unrecovered_constructor_index() == 309);
-    CHECK(first_unrecovered_constructor_rva() == 0xa505e0);
-    CHECK(slots.size() + 124 == kOriginalCtorCount);
+    CHECK(first_unrecovered_constructor_index() == 312);
+    CHECK(first_unrecovered_constructor_rva() == 0xa46130);
+    CHECK(slots.size() + 123 == kOriginalCtorCount);
 
     // ---- CPU-01-STARTUP-LEAF-ROWS-315-560-01 -------------------------------
     CHECK(st.slot315_cell == 0);
@@ -116,10 +116,12 @@ int main() {
     CHECK(st.slot303.var.default_value == 0 && st.slot303.var.fn_vptr == 0x15d2478);
     CHECK(st.slot303.item.target == &st.slot303.var && st.slot303.item.flags == 0x30);
     CHECK(st.concmd.manager.manager == nullptr);
-    CHECK(st.concmd.pending.size() == 107);                      // observed: 27 through 306 + 35 from 307-356 + 45 from M1-M6
+    CHECK(st.concmd.pending.size() == 111);                      // observed: 107 before slot 309 + its 3 variables + 1 bool
     CHECK(st.concmd.pending.first() == &st.slot298_shader_type.base.pending);
-    CHECK(st.debug_menu.root.count == 60);                      // observed: 26 through 306 + 24 from 307-356 + 10 from M1-M6
-    CHECK(st.concmd.atexit_log.size() == 268);                  // observed: 65 through 306 + 123 from 307-356 + 80 from M1-M6
+    CHECK(st.debug_menu.root.count == 64);                      // observed: 60 before slot 309 + its 4 toggles
+    CHECK(st.concmd.atexit_log.size() == 280);                  // observed: 268 before slot 309 + its 12 records
+                                                                // (the menu root was already initialised, so
+                                                                //  0x268b0 records nothing new here)
     for (std::size_t i = 0; i < kSlot302HandleCount; ++i) {
         CHECK(st.slot302.handles[i] == nullptr);
         CHECK(st.concmd.atexit_log.at(7 + i).dtor_rva == kSlot302DtorRva);
@@ -141,6 +143,27 @@ int main() {
     CHECK(st.leaf_7ce8d0.word0 == 0x3f80000000000001ull);  // idx 346
     CHECK(st.leaf_7ce8d0.word1 == 0x3f80000000000001ull);
     CHECK(st.leaf_7ce8d0.flag0.load() == 0 && st.leaf_7ce8d0.flag1.load() == 0);
+    // ---- CPU-01-RANGED-BOUND-VAR-A4F4D0-01: idx 309, the "Save System" block -------------
+    CHECK(st.slot309_result.ok && st.slot309_result.vars_built == 3 &&
+          st.slot309_result.menu_items == 4);
+    CHECK(st.slot309_result.atexit_records == 12 && st.slot309_result.functors_destroyed == 3);
+    const struct { std::uint64_t final_vptr, fn_vtbl; std::uint32_t max; } want309[3] = {
+        {0x15d1ba8, 0x15d1b78, 5}, {0x15d1c60, 0x15d1c30, 0x12}, {0x15d1cf8, 0x15d1cc8, 0x14}};
+    const ConCmdRangedVar* const vars309[3] = {&st.slot309.var1.var, &st.slot309.var2.var,
+                                               &st.slot309.var3.var};
+    for (int i = 0; i < 3; ++i) {
+        CHECK(vars309[i]->base.vptr == want309[i].final_vptr);
+        CHECK(vars309[i]->fn_vptr == want309[i].fn_vtbl);
+        CHECK(vars309[i]->base.registered == 1 && vars309[i]->base.flags == 1);
+        CHECK(vars309[i]->min_engaged == 1 && vars309[i]->max_engaged == 1);
+        std::uint32_t max_cell = 0;
+        std::memcpy(&max_cell, vars309[i]->max_value, 4);
+        CHECK(max_cell == want309[i].max);
+        CHECK(vars309[i]->value == 0 && vars309[i]->default_value == 0);
+    }
+    CHECK(st.slot309.toggle1.target == &st.slot309.var1);
+    CHECK(st.slot309.toggle2.target == &st.slot309.bool_var.var);
+    CHECK(st.slot309.toggle1.kind == 2 && st.slot309.toggle1.flags == 0x30);
 
     std::puts("startup_ctor_coverage: all checks passed");
     return 0;
