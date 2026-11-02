@@ -2,7 +2,7 @@
 //
 // Proves that every lifted vec_*/leaf_* constructor module runs in recovered_constructors(), that
 // the registered rows pair with the pinned original table, and that the remaining startup cliff is
-// explicit (first unrecovered index 312 / RVA 0xa46130).
+// explicit (first unrecovered index 314 / RVA 0xa41810).
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -42,7 +42,7 @@ int main() {
     CHECK(result.blocked_on_rva == 0);
     CHECK(!st.init_failed);
     CHECK(result.completed == slots.size());
-    CHECK(slots.size() == 450);
+    CHECK(slots.size() == 451);
 
     // Every registered row is in original order and pairs with the pinned table.
     for (std::size_t i = 0; i < slots.size(); ++i) {
@@ -53,9 +53,9 @@ int main() {
     }
 
     // ---- explicit, machine-checked gap ---------------------------------------
-    CHECK(first_unrecovered_constructor_index() == 312);
-    CHECK(first_unrecovered_constructor_rva() == 0xa46130);
-    CHECK(slots.size() + 123 == kOriginalCtorCount);
+    CHECK(first_unrecovered_constructor_index() == 314);
+    CHECK(first_unrecovered_constructor_rva() == 0xa41810);
+    CHECK(slots.size() + 122 == kOriginalCtorCount);
 
     // ---- CPU-01-STARTUP-LEAF-ROWS-315-560-01 -------------------------------
     CHECK(st.slot315_cell == 0);
@@ -116,10 +116,10 @@ int main() {
     CHECK(st.slot303.var.default_value == 0 && st.slot303.var.fn_vptr == 0x15d2478);
     CHECK(st.slot303.item.target == &st.slot303.var && st.slot303.item.flags == 0x30);
     CHECK(st.concmd.manager.manager == nullptr);
-    CHECK(st.concmd.pending.size() == 111);                      // observed: 107 before slot 309 + its 3 variables + 1 bool
+    CHECK(st.concmd.pending.size() == 114);                      // observed: 111 through slot 310 + slot 312's 3 variables
     CHECK(st.concmd.pending.first() == &st.slot298_shader_type.base.pending);
-    CHECK(st.debug_menu.root.count == 64);                      // observed: 60 before slot 309 + its 4 toggles
-    CHECK(st.concmd.atexit_log.size() == 280);                  // observed: 268 before slot 309 + its 12 records
+    CHECK(st.debug_menu.root.count == 68);                      // observed: 64 through slot 310 + slot 312's 1 group + 3 toggles
+    CHECK(st.concmd.atexit_log.size() == 288);                  // observed: 280 through slot 310 + slot 312's 8 records
                                                                 // (the menu root was already initialised, so
                                                                 //  0x268b0 records nothing new here)
     for (std::size_t i = 0; i < kSlot302HandleCount; ++i) {
@@ -164,6 +164,25 @@ int main() {
     CHECK(st.slot309.toggle1.target == &st.slot309.var1);
     CHECK(st.slot309.toggle2.target == &st.slot309.bool_var.var);
     CHECK(st.slot309.toggle1.kind == 2 && st.slot309.toggle1.flags == 0x30);
+
+    // ---- CPU-01-STARTUP-SLOT-312-CHARACTERIZATION-01: idx 312, the entitlement/title block --------
+    CHECK(st.slot312_result.ok && st.slot312_result.atexit_records == 8 &&
+          st.slot312_result.functors_destroyed == 2 && st.slot312_result.var_functor_calls == 22);
+    CHECK(st.slot312_result.vars_built == 3 && st.slot312_result.menu_items == 4);
+    CHECK(st.slot312.title_sku.base.vptr == kStringVarFinalVptr &&
+          st.slot312.title_sku.base.registered == 1);
+    CHECK(st.slot312.title_sku.value.size == 7 &&
+          std::memcmp(st.slot312.title_sku.value.data, "DEFAULT", 7) == 0);
+    CHECK(st.slot312.age_restriction.base.vptr == 0x1594c08 && st.slot312.region.base.vptr == 0x15d18f0);
+    CHECK(st.slot312.age_restriction.value == 0xffffffffu && st.slot312.region.value == 0);
+    CHECK(st.slot312.age_restriction.fn_vptr == 0x15944a0 && st.slot312.region.fn_vptr == 0x15d18c0);
+    CHECK(st.slot312.age_restriction.value_ref == &st.slot312.age_restriction.value);
+    CHECK(st.slot312.age_restriction.args[3] == 0xa44a40 && st.slot312.region.args[3] == 0xa44a60);
+    CHECK(st.slot312.toggle_sku.target == &st.slot312.title_sku);
+    CHECK(st.slot312.toggle_age.target == &st.slot312.age_restriction);
+    CHECK(st.slot312.toggle_region.target == &st.slot312.region);
+    CHECK(st.slot312.group.kind == 1 && st.slot312.toggle_sku.kind == 2);
+    CHECK(st.slot312.record.word38 == 0xffffffffu && st.slot312.record.word3c == 0x72);
 
     std::puts("startup_ctor_coverage: all checks passed");
     return 0;

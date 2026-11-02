@@ -375,8 +375,8 @@ struct Slot312IntVarResult {
 struct Slot312Hooks {
     // 0xa45ba0 / 0xa45de0. NO default in this struct: a missing hook stops the fragment at that
     // variable's stage. `default_slot312_hooks()` installs the native net-state model.
-    bool (*var_ctor)(ConCmdRangedVar& var, const Slot312IntVarSpec& spec,
-                     ConCmdRegistry& registry) noexcept = nullptr;
+    Slot312IntVarResult (*var_ctor)(ConCmdRangedVar& var, const Slot312IntVarSpec& spec,
+                                    ConCmdRegistry& registry) noexcept = nullptr;
     // __stack_chk_guard source (0x15fe518). Null => the comparison is not performed and
     // `canary_checked` stays false; a changed guard fails the fragment at stage `canary`.
     const std::uint64_t* stack_guard = nullptr;

@@ -3,6 +3,8 @@
 
 #include <cstring>
 
+#include "init_sub_3be930.hpp"
+
 namespace sotc {
 
 namespace {
@@ -18,26 +20,23 @@ SharedStr var_description_view() noexcept {
 Slot312Stage build_int_var(ConCmdRangedVar& var, const Slot312IntVarSpec& spec,
                            const Slot312FunctorSite& site, const Slot312Hooks& hooks,
                            ConCmdRegistry& registry, Slot312Result& out,
-                           Slot312Stage ctor_stage, Slot312Stage release_stage,
-                           Slot312Stage functor_stage, Slot312Stage atexit_stage) noexcept {
-    // The wrapper installs the final vptr before the leaf; a missing hook writes nothing after that.
-    if (hooks.var_ctor == nullptr) return ctor_stage;
-    Slot312IntVarResult built{};
-    {
-        // The hook owns the interior; the slot re-checks the final tag afterwards.
-        const Slot312IntVarClass* const cls = slot312_int_var_class_for(spec.wrapper_rva);
-        if (cls == nullptr) return ctor_stage;
-        var.base.vptr = cls->final_vptr;
-        if (!hooks.var_ctor(var, spec, registry)) return ctor_stage;
-        if (var.base.vptr != cls->final_vptr) return ctor_stage;
-    }
-    built.functor_slot_calls = kSlot312VarFunctorDispatches;
-    out.int_vars[static_cast<std::size_t>(out.vars_built) - 1u] = built;
+                           Slot312Stage build_stage, Slot312Stage release_stage,
+                           Slot312Stage atexit_stage, std::size_t index) noexcept {
+    const Slot312IntVarClass* const cls = slot312_int_var_class_for(spec.wrapper_rva);
+    if (hooks.var_ctor == nullptr || cls == nullptr) return build_stage;
+
+    // The wrapper installs the final vptr before the leaf runs; the hook owns the interior.
+    var.base.vptr = cls->final_vptr;
+    const Slot312IntVarResult built = hooks.var_ctor(var, spec, registry);
+    if (!built.ok) return build_stage;
+    if (var.base.vptr != cls->final_vptr) return build_stage;
+    out.int_vars[index] = built;
     out.var_functor_calls += built.functor_slot_calls;
+    out.views_inert = out.views_inert && built.description_inert;
     ++out.vars_built;
 
     // `callq *0x18(%rax)` on the caller's 0x20 B functor copy, then 0xf590(name).
-    if (!slot312_inert_functor_destroy(site)) return functor_stage;
+    if (!slot312_inert_functor_destroy(site)) return build_stage;
     ++out.functors_destroyed;
 
     const SharedStr name = l2::measured_view(spec.name, spec.name_len);
@@ -122,10 +121,10 @@ Slot312IntVarResult init_slot312_int_var(ConCmdRangedVar& var, const Slot312IntV
     init_concmd_base_20af0(var.base, name, description, kSlot312CtorFlags);
     var.base.vptr = cls->mid_vptr;
     var.value_ref = &var.value;                       // `lea rsi,[rbx+0xd0]` in the wrapper
-    std::memset(var.min_value, 0, sizeof var.min_value);   // byte [obj+0x6c] = 0
-    var.min_engaged = 0;                                   // byte [obj+0x70] = 0
-    std::memset(var.max_value, 0, sizeof var.max_value);   // byte [obj+0x74] = 0
-    var.max_engaged = 0;                                   // byte [obj+0x78] = 0
+    var.min_value[0] = 0;                             // byte [obj+0x6c] = 0 (0x6d..0x6f never written)
+    var.min_engaged = 0;                              // byte [obj+0x70] = 0
+    var.max_value[0] = 0;                             // byte [obj+0x74] = 0
+    var.max_engaged = 0;                              // byte [obj+0x78] = 0
     std::memset(var.args, 0, sizeof var.args);             // ymm [obj+0x80] = 0
     var.fn_vptr = cls->seed_fn_tag;                        // qword [obj+0xc0] = 0x1595660 / 0x15d18c0
     var.fn_payload = 0;                                    // qword [obj+0xb0] = 0
@@ -200,7 +199,7 @@ Slot312Result init_slot312_a46130(Slot312Objects& o, ConCmdRegistry& concmd, Deb
         const Slot312Stage s = build_int_var(
             o.age_restriction, kSlot312IntVars[0], kSlot312FunctorSites[0], hooks, concmd, out,
             Slot312Stage::age_restriction_build, Slot312Stage::age_restriction_view_release,
-            Slot312Stage::age_restriction_build, Slot312Stage::age_restriction_atexit);
+            Slot312Stage::age_restriction_atexit, 0);
         if (s != Slot312Stage::none) return (void)fail.at(s), out;
     }
 
@@ -208,8 +207,7 @@ Slot312Result init_slot312_a46130(Slot312Objects& o, ConCmdRegistry& concmd, Deb
     {
         const Slot312Stage s = build_int_var(
             o.region, kSlot312IntVars[1], kSlot312FunctorSites[1], hooks, concmd, out,
-            Slot312Stage::region_build, Slot312Stage::region_view_release, Slot312Stage::region_build,
-            Slot312Stage::region_atexit);
+            Slot312Stage::region_build, Slot312Stage::region_view_release, Slot312Stage::region_atexit, 1);
         if (s != Slot312Stage::none) return (void)fail.at(s), out;
     }
 
@@ -295,7 +293,7 @@ Slot312Result init_slot312_a46130(Slot312Objects& o, ConCmdRegistry& concmd, Deb
 
     // 0xa4655c..0xa465e5: the 0x80 B record at 0x32f74f0, its two empty views and __cxa_atexit(0xa44ac0).
     {
-        o.record.name = l2::measured_view(kSlot312RecordNameRva, 7);
+        o.record.name = l2::measured_view(kSlot312SkuDefault, 7);   // the same rodata as 0x12c2e8b
         o.record.word20 = kSlot312RecordWord20;
         o.record.block24 = kSlot312RecordBlock24;
         o.record.word34 = kSlot312RecordWord34;

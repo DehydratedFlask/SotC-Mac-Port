@@ -2470,6 +2470,12 @@ target_sources(sotc_core PRIVATE core/string_var_257a0.cpp core/ctor_slot_310_a4
 add_executable(test_ctor_slot_310 tests/test_ctor_slot_310.cpp)
 target_link_libraries(test_ctor_slot_310 sotc_core)
 add_test(NAME ctor_slot_310 COMMAND test_ctor_slot_310)
+# CPU-01-STARTUP-SLOT-312-CHARACTERIZATION-01 / -NATIVE-LIFT-01: constructor index 312 (0xa46130),
+# the "Platform Services" / "TitleInfo" entitlement block (3 variables, 4 menu items, 1 record).
+target_sources(sotc_core PRIVATE core/ctor_slot_312_a46130.cpp)
+add_executable(test_ctor_slot_312 tests/test_ctor_slot_312.cpp)
+target_link_libraries(test_ctor_slot_312 sotc_core)
+add_test(NAME ctor_slot_312 COMMAND test_ctor_slot_312)
 
 # Parallel-lane fragments: native/lanes/<lane>.cmake. Workers configure with -DSOTC_LANES=<lane>
 # to build only their own fragment; the integrator configures with the default "*" (all lanes).

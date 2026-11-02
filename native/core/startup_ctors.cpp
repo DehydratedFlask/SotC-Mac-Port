@@ -413,6 +413,15 @@ std::span<const CtorSlot> recovered_constructors() noexcept {
          }},
         {0xa479d0, 310, [](StartupState& s) noexcept { if (!init_slot310_a479d0(s.slot310, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
         {0xa46b70, 311, [](StartupState& s) noexcept { if (!init_tiny_atexit_slot(311, s.tiny_atexit, &s.concmd.atexit_log).ok) s.init_failed = true; }},
+        // idx 312 / 0xa46130: the "Platform Services" / "TitleInfo" entitlement block -- the `titleskuid`
+        // string variable, `titleAgeRestriction` and `titleRegion` int variables, a menu group, three
+        // toggles and one 0x80 B record. The two int variables go through the native wrapper+leaf model
+        // (default_slot312_hooks); any failed stage is a visible startup failure.
+        {0xa46130, 312, [](StartupState& s) noexcept {
+             const Slot312Hooks hooks = default_slot312_hooks();
+             s.slot312_result = init_slot312_a46130(s.slot312, s.concmd, s.debug_menu, hooks);
+             if (!s.slot312_result.ok) s.init_failed = true;
+         }},
         {0xa447a0, 313, [](StartupState& s) noexcept { if (!init_slot313_a447a0(s.slot313, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
         {0xa3ade0, 315, [](StartupState& s) noexcept { store_zero32(s.slot315_cell); }},
         {0xa2c390, 317, [](StartupState& s) noexcept { if (!init_slot317_a2c390(s.slot317, s.concmd, s.debug_menu).ok) s.init_failed = true; }},
