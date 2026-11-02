@@ -508,6 +508,17 @@ def main() -> int:
                 die(f"calibration slot 329: {k} = {c[k]} (pinned {v})")
         if len(c["callees"]) != 11 or wanted[0x829E90] != 4082 or not c["stack_guard"]:
             die("calibration slot 329: callee/FDE/guard shape")
+        # (rva, FDE bytes, insns, direct calls, distinct callees, indirect call sites in total), all taken from
+        # the slot headers/checkers of the modelled templates.
+        for rva, fsz, ni, nc, nd, nind in ((0xA505E0, 1892, 354, 40, 10, 3), (0xA33280, 2561, 474, 54, 9, 5),
+                                           (0x837F30, 7055, 1306, 159, 10, 13)):
+            c = decoded.get(rva)
+            if c is None:
+                die(f"calibration: template body {rva:#x} was not decoded")
+            got = (wanted[rva], c["instructions"], c["direct_calls"], len(c["callees"]),
+                   c["indirect_calls_functor_slot3"] + c["indirect_calls_reg"] + c["indirect_calls_other"])
+            if got != (fsz, ni, nc, nd, nind):
+                die(f"calibration {rva:#x}: {got} != {(fsz, ni, nc, nd, nind)}")
 
     # Modelled knowledge.
     template_callees = {}
@@ -631,7 +642,7 @@ def render_doc(result, gaps, ranked, batches, head_rows, wt_rows) -> str:
     w(f"\nEffort tiers: " + ", ".join(f"{t}={tiers.get(t, 0)}" for t in ("S", "M", "L", "XL")) +
       " (S < 1.0 point, M < 4, L < 10, XL >= 10; one point is roughly one small checked slot).\n")
     w("Effort score = `insns/60 + rip_targets/40 + 0.6*unmodelled_local_helpers + 0.1*functor_slot3_sites "
-      "+ 3*other_indirect_calls + 4*indirect_jumps + 1*(cond_branches - canary) + 0.8*tail_jumps`, multiplied by "
+      "+ 0.5*register_indirect_calls + 3*other_indirect_calls + 4*indirect_jumps + 0.5*(cond_branches - canary) + 0.8*tail_jumps`, multiplied by "
       "0.6 for `debug-page template` and `simple leaf`, 1.0 for `unique large body`. A helper counts as unmodelled "
       "when no registered slot calls it and its RVA is not named anywhere under `native/`.\n")
     w("Template classes: **debug-page template** = stack-guarded body that calls one of the console-var/menu helpers "

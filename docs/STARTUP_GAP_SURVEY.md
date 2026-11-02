@@ -21,7 +21,7 @@ Coverage: HEAD 455/573, working tree 456/573. Gaps considered: 118 (113 open, in
 
 Effort tiers: S=3, M=46, L=40, XL=24 (S < 1.0 point, M < 4, L < 10, XL >= 10; one point is roughly one small checked slot).
 
-Effort score = `insns/60 + rip_targets/40 + 0.6*unmodelled_local_helpers + 0.1*functor_slot3_sites + 3*other_indirect_calls + 4*indirect_jumps + 1*(cond_branches - canary) + 0.8*tail_jumps`, multiplied by 0.6 for `debug-page template` and `simple leaf`, 1.0 for `unique large body`. A helper counts as unmodelled when no registered slot calls it and its RVA is not named anywhere under `native/`.
+Effort score = `insns/60 + rip_targets/40 + 0.6*unmodelled_local_helpers + 0.1*functor_slot3_sites + 0.5*register_indirect_calls + 3*other_indirect_calls + 4*indirect_jumps + 0.5*(cond_branches - canary) + 0.8*tail_jumps`, multiplied by 0.6 for `debug-page template` and `simple leaf`, 1.0 for `unique large body`. A helper counts as unmodelled when no registered slot calls it and its RVA is not named anywhere under `native/`.
 
 Template classes: **debug-page template** = stack-guarded body that calls one of the console-var/menu helpers (`0x20af0 0x20d60 0x26ea0 0x26db0 0x26c10 0x26b60 0xc300 0x6aa00`) like slots 309/316/326/329; **simple leaf** = short, guard-free, branch-free (or at most 2 branches, no indirect control flow) body; **unique large body** = everything else. `best template` is the modelled slot (309/316/326/329) sharing the most non-release local helpers.
 
