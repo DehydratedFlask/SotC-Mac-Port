@@ -1,4 +1,5 @@
 #include "../core/retail_call.hpp"
+#include "../core/guest_tls.hpp"
 
 #include <cstdint>
 #include <cstdio>
@@ -520,6 +521,25 @@ void test_e21420_decision() {
     check("e21420 null name", null_name.ok && null_name.rax == 0x14);
 }
 
+void test_thread_pointer_through_the_context() {
+    sotc::GuestThreads threads(0x2000'0000ULL);
+    check("tls create", threads.create(5) == sotc::TlsStatus::ok);
+    RetailCallContext with_tls{};
+    with_tls.threads = &threads;
+    with_tls.thread_id = 5;
+    std::uint64_t pointer = 0;
+    check("tls pointer ok", sotc::retail_thread_pointer(with_tls, pointer) == sotc::TlsStatus::ok);
+    check("tls pointer in window", pointer >= 0x2000'0000ULL &&
+                                      pointer < 0x2000'0000ULL + sotc::GuestThreads::kBlockSize);
+
+    RetailCallContext without_tls{};
+    std::uint64_t none = 0;
+    check("no model", sotc::retail_thread_pointer(without_tls, none) == sotc::TlsStatus::no_thread);
+
+    with_tls.thread_id = 6;  // never created
+    check("unknown thread", sotc::retail_thread_pointer(with_tls, none) == sotc::TlsStatus::no_thread);
+}
+
 void test_failures() {
     std::vector<std::uint8_t> storage(0x40, 0);
     GuestWindow window(storage.data(), 0x50000, storage.size());
@@ -559,6 +579,7 @@ int main() {
     test_e1a5c0_scan();
     test_e19980_paths();
     test_e21420_decision();
+    test_thread_pointer_through_the_context();
     test_failures();
 
     if (failures == 0) {

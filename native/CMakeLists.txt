@@ -2643,7 +2643,15 @@ add_test(NAME retail_cells COMMAND test_retail_cells)
 
 # CPU-01-AOT-CFG-SCALE-01: single retail call entry point (frame + window -> model -> rax).
 add_library(sotc_retail_call STATIC core/retail_call.cpp)
-target_link_libraries(sotc_retail_call PUBLIC sotc_retail_abi sotc_retail_cells sotc_guest_memory)
+target_link_libraries(sotc_retail_call PUBLIC sotc_retail_abi sotc_retail_cells sotc_guest_memory
+  sotc_guest_tls)
 add_executable(test_retail_call tests/test_retail_call.cpp)
 target_link_libraries(test_retail_call PRIVATE sotc_retail_call)
 add_test(NAME retail_call COMMAND test_retail_call)
+
+# CPU-01-AOT-CFG-SCALE-01: guest thread / TLS model (fs:0 thread pointer + checked per-thread block).
+add_library(sotc_guest_tls STATIC core/guest_tls.cpp)
+target_link_libraries(sotc_guest_tls PUBLIC sotc_core)
+add_executable(test_guest_tls tests/test_guest_tls.cpp)
+target_link_libraries(test_guest_tls PRIVATE sotc_guest_tls)
+add_test(NAME guest_tls COMMAND test_guest_tls)

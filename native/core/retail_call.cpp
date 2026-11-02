@@ -50,6 +50,13 @@ const char* retail_call_status_name(RetailCallStatus status) noexcept {
     return "unknown";
 }
 
+TlsStatus retail_thread_pointer(const RetailCallContext& context, std::uint64_t& out) noexcept {
+    if (context.threads == nullptr) {
+        return TlsStatus::no_thread;
+    }
+    return context.threads->thread_pointer(context.thread_id, out);
+}
+
 RetailCallOutcome call_resolved(std::uint64_t rva, RetailFrame& frame, GuestWindow& window,
                                 const RetailCallContext& context) noexcept {
     RetailCallOutcome out{};

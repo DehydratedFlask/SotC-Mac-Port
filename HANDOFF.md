@@ -1,5 +1,15 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 05:10 CDT (root) — guest thread/TLS model (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `CPU-01-AOT-CFG-SCALE-01`, thread/TLS card. `native/core/guest_tls.{hpp,cpp}`: a checked **0x800-byte block per guest thread id**, a thread pointer handed out from a caller-supplied base (`%fs:0x0`), `read/write_u8/u32/u64`, and statuses `ok / no_thread / out_of_range / already_exists / too_many_threads`. `retail_thread_pointer(context)` exposes it through the retail call layer (`RetailCallContext` gained an optional `GuestThreads*` + `thread_id`); without a model it reports `no_thread` rather than inventing an address.
+- **Grounded, not assumed.** Over FDE-covered code only: **38** FS-segment instructions, **every one** `movq %fs:0x0, %reg`, and the loaded thread pointer is dereferenced only at **0x8 / 0x10 / 0x400** (6 / 4 / 2 occurrences). A raw `%fs:` grep finds 10,096 hits with 171 distinct offsets — all outside every FDE range, and their "offsets" are ASCII codes ('o', 'g', '1', '_' …): data bytes disassembled by `-D`, not TLS accesses. The block size was chosen to cover the observed 0x400 and is labelled a policy choice, not a binary-proven bound.
+- **Fixture:** `test_guest_tls` — block/observed-offset constants, unique thread pointers, read/write at 0x8/0x10/0x400, two threads not aliasing (and a fresh thread seeing zeroes), last-qword boundary vs past-the-end, duplicate create, destroy-then-access, capacity fill plus slot reuse, status names. `test_retail_call` gained the context-level case (pointer ok, no model → `no_thread`, unknown thread → `no_thread`).
+- **Checker:** `tools/lift/check_guest_tls.py` re-derives the three documented facts (all-FS-accesses-are-fs:0, the offset set, no other FS offsets) from the pinned disassembly and requires them to fit the modelled block; it skips cleanly without the private inputs.
+- **Verification (PASSED):** build exit 0; CTest **519/519**; lift checkers **711 passed / 0 failed** (`OK check_guest_tls: 38 fs:0 loads, thread-pointer offsets ['0x10', '0x400', '0x8'] inside the 0x800 block, no other FS offsets`).
+- **Limits:** the PS4 kernel's real TLS layout, thread creation/exit, per-thread register state and the allocator's free-heap hint are **not** modelled; the block is host storage, not mapped guest memory.
+- **Next exact action:** wire `GuestThreads` into the allocator front's free-heap hint path, or return to `0xe21420`'s ~400 unmodelled bytes.
+
 ## 2026-11-03 03:50 CDT (root) — signed compare blocks added; one row refused on evidence (FIXTURE_VERIFIED)
 
 - **Task:** `GPU-01-MSL-OFFLINE-01`, card 9. Added VOPC 128–135 and 144–151 (signed compares and their `cmpx` forms), VOP3 128–135 (VCC destination), VOP2 17/18/19, VOP1 53/54 and VOP3 426. Every opcode value and name was read from the pinned PS4 tables with the scan bounded by the next `InstructionFormat…` declaration.

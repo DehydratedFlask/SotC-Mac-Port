@@ -11,6 +11,7 @@
 #pragma once
 
 #include "guest_memory.hpp"
+#include "guest_tls.hpp"
 #include "retail_abi.hpp"
 #include "retail_cells.hpp"
 
@@ -69,6 +70,11 @@ struct RetailCallContext {
                                   void* local) = nullptr;
     RetailStack stack{};
 
+    // Optional guest thread/TLS model. With it set, `retail_thread_pointer` answers `%fs:0x0` for
+    // `thread_id`; without it the lookup reports `no_thread` instead of inventing an address.
+    GuestThreads* threads = nullptr;
+    std::uint32_t thread_id = 0;
+
     // 0xe1a5c0: container scan hooks.
     const char* (*element_key_e1a5c0)(void* element) = nullptr;
     std::int32_t (*element_value_e1a5c0)(void* element) = nullptr;
@@ -106,6 +112,11 @@ struct RetailCallOutcome {
     RetailCallStatus status = RetailCallStatus::unknown_target;
     std::uint64_t rax = 0;  // only meaningful when ok
 };
+
+// Resolves `%fs:0x0` for the calling thread of this context. Every FS-segment access in the pinned
+// binary is `movq %fs:0x0, %reg` (38 sites), so this is the whole TLS entry surface the bodies use.
+[[nodiscard]] TlsStatus retail_thread_pointer(const RetailCallContext& context,
+                                             std::uint64_t& out) noexcept;
 
 // Dispatches `rva` with the arguments in `frame` (rdi/rsi/rdx/rcx/r8/r9) against `window`.
 [[nodiscard]] RetailCallOutcome call_resolved(std::uint64_t rva, RetailFrame& frame,
