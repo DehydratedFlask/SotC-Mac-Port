@@ -488,3 +488,24 @@ block-level view is now **268 of 381 rows (70 %)** against 240 of 367 before the
 What this changes and what it does not: the census now describes the container correctly (a blob can
 hold a VS/PS pair), and 14 more programs are decodable. It does not move `lowered` — still **0** —
 because lowering needs a per-shader ABI manifest that does not exist for any real shader.
+
+### Why `lowered` is still zero: what one real manifest would need
+
+The lowerer refuses any program without a per-shader ABI manifest, and the manifest has to name
+things the shader does not contain. Measured on the largest per-lane-eligible program in the sample
+(`shadow_809795858_shipping.csdr`, 316 B, 65 instructions, encodings EXP 2 / MUBUF 5 / SMRD 7 /
+SOP1 2 / SOPP 7 / VOP1 13 / VOP2 24 / VOP3 5):
+
+| Manifest slot | Observed registers |
+|---|---|
+| scalar memory bases (`SMRD` sbase) | **s0, s2, s8, s9** |
+| buffer descriptors (`MUBUF` srsrc) | **s20, s24, s28** |
+| export targets | **12** (clip) and **32** (param0) |
+| vector inputs | 13 `VOP1` + 24 `VOP2` + 5 `VOP3` results, several read from `v0..v3` before being written |
+
+The shader names the *register slots*; it does not say which buffer or memory each slot points at.
+That mapping lives in the draw state (the PM4/register writes and the resource tables), which we do
+not have without either a state trace from the running game or owner-supplied binding data. Inventing
+a plausible mapping would produce MSL that compiles and renders the wrong thing — the exact failure
+mode this pipeline was built to avoid. So the blocker is precise: **0 lowered because 0 manifests,
+and a manifest cannot be derived from shader bytes alone.**

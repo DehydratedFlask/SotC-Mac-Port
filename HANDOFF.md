@@ -1,5 +1,12 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 13:10 CDT (root) — the "0 lowered" blocker is now precise (STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01`. Measured what a real manifest would need, on the largest per-lane-eligible program in the sample (`shadow_809795858_shipping.csdr`, 316 B, 65 instructions): scalar memory bases **s0/s2/s8/s9**, buffer descriptors **s20/s24/s28**, export targets **12** (clip) and **32** (param0), plus initial vector bindings for the registers read before being written.
+- **Why it is a hard blocker, not a TODO:** the shader names register *slots*; which buffer or memory each slot points at lives in the draw state (PM4/register writes, resource tables). Without a state trace from the running game or owner-supplied bindings, any mapping would be invented — MSL that compiles and renders the wrong thing. Recorded in `docs/MSL_OFFLINE.md`.
+- **Verification:** docs-only change on top of the verified `f88c0439` state (build exit 0, CTest 521/521, checkers 713/0/0).
+- **Next exact action:** if the owner can supply one shader's binding table (or authorize a state-trace capture path), that single manifest converts the whole lowering path from "0 real shaders" to one end-to-end case. Otherwise the productive work is elsewhere: `0xe21420`'s remaining body, or the indirect frontier.
+
 ## 2026-11-03 12:40 CDT (root) — paired blobs split into stages (STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `GPU-01-MSL-OFFLINE-01`. The census now splits a paired blob at the cut point where **both** halves decode (`split_stages`), recording `split_offsets` per member and `span_index`/`span_count` per program row; a blob with no such cut stays whole so its failure stays visible.
