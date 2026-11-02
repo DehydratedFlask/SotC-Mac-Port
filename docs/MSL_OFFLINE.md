@@ -465,3 +465,26 @@ The census records this as `programs_paired_halves_decode` and `paired_split_off
 silently counting the members as undecodable.
 
 - **Still zero lowered:** a shader pair is twice the structure, not twice the semantics.
+
+### Paired blobs are now split into their stages
+
+The census splits a blob at the recorded cut point when **both** halves decode, so each stage is
+counted as its own program; a blob with no such cut stays whole and keeps its failure visible.
+
+**Measured at sample 512** (`blocks-512s` vs `blocks-512q`):
+
+| Metric | before | after |
+|---|---:|---:|
+| Program rows attempted | 367 | **381** |
+| Decoded (linear) | 186 | **200** |
+| Decode errors | 181 | 181 |
+| Block-decodable | 240 | **268** |
+| Members split into stages | — | **14** (→ 28 stage rows) |
+
+Only **14 of the 28** stage rows decode linearly: the large first stage is still branch-blocked,
+while the second stage is a tiny program that decodes. Every one of the 28 is block-decodable, so the
+block-level view is now **268 of 381 rows (70 %)** against 240 of 367 before the split.
+
+What this changes and what it does not: the census now describes the container correctly (a blob can
+hold a VS/PS pair), and 14 more programs are decodable. It does not move `lowered` — still **0** —
+because lowering needs a per-shader ABI manifest that does not exist for any real shader.

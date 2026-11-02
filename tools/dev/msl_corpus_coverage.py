@@ -127,22 +127,7 @@ def classify_program(code: bytes, ordinal: int, info: dict) -> dict:
             "ok": False, "blocks": 0, "instructions": 0, "branches": 0,
             "branches_in_span": 0, "branches_on_instruction": 0, "branch_mnemonics": [],
             "error_offset": exc.offset, "error_reason": exc.reason,
-            "split_offset": None, "both_halves_decode": None,
         }
-        # "Bytes follow s_endpgm" is a container-shape signal, not a decoder gap: a blob can hold a
-        # VS/PS pair back to back. Look for the split point that makes both halves decodable.
-        if "bytes follow s_endpgm" in exc.reason and len(code) <= 4096:
-            for cut in range(4, len(code) - 3, 4):
-                try:
-                    gcn.decode(code[:cut], allow_branches=True)
-                    gcn.decode(code[cut:], allow_branches=True)
-                except gcn.DecodeError:
-                    continue
-                row["block_decode"]["split_offset"] = cut
-                row["block_decode"]["both_halves_decode"] = True
-                break
-            else:
-                row["block_decode"]["both_halves_decode"] = False
     else:
         row["block_decode"] = {
             "ok": True,
@@ -178,6 +163,30 @@ def classify_program(code: bytes, ordinal: int, info: dict) -> dict:
     return row
 
 
+def split_stages(code: bytes) -> tuple[list[bytes], int | None]:
+    """Split a blob that holds more than one program back to back.
+
+    Some members carry a VS/PS pair: the declared span continues past the first `s_endpgm`, and
+    `decode_blocks` reports `bytes follow s_endpgm`. When a cut point exists where **both** halves
+    decode, the pair is returned as two spans; otherwise the span is returned whole so the failure
+    stays visible instead of being papered over.
+    """
+    try:
+        gcn.decode_blocks(code)
+    except gcn.DecodeError as exc:
+        if "bytes follow s_endpgm" not in exc.reason or len(code) > 4096:
+            return [code], None
+        for cut in range(4, len(code) - 3, 4):
+            try:
+                gcn.decode(code[:cut], allow_branches=True)
+                gcn.decode(code[cut:], allow_branches=True)
+            except gcn.DecodeError:
+                continue
+            return [code[:cut], code[cut:]], cut
+        return [code], None
+    return [code], None
+
+
 def classify_member(archive: str, path: str, entry_index: int, data: bytes) -> dict:
     """Classify one complete member: container readability first, then per-program decode."""
     row = {"archive": archive, "path": path, "entry_index": entry_index,
@@ -193,9 +202,19 @@ def classify_member(archive: str, path: str, entry_index: int, data: bytes) -> d
         else:
             row["reason"] = f"container: {exc}"
         return row
+    split_offsets = []
     for ordinal, blob in enumerate(blobs):
         code = data[blob["code_offset"]:blob["code_offset"] + blob["length"]]
-        row["programs"].append(classify_program(code, ordinal, blob))
+        spans, split = split_stages(code)
+        if split is not None:
+            split_offsets.append(split)
+        for span_index, span in enumerate(spans):
+            record = classify_program(span, ordinal, blob)
+            record["span_index"] = span_index
+            record["span_count"] = len(spans)
+            record["member_split"] = split
+            row["programs"].append(record)
+    row["split_offsets"] = split_offsets
     if not row["programs"]:
         row["reason"] = "container declared no programs"
         return row
@@ -245,12 +264,11 @@ def summarize(rows: list[dict], population: list[tuple], sample_info: dict,
         "programs_decode_error": len(errors),
         "programs_block_decodable": sum(1 for p in programs
                                         if (p.get("block_decode") or {}).get("ok")),
-        "programs_paired_halves_decode": sum(
-            1 for p in programs
-            if (p.get("block_decode") or {}).get("both_halves_decode")),
-        "paired_split_offsets": sorted({(p.get("block_decode") or {}).get("split_offset")
-                                        for p in programs
-                                        if (p.get("block_decode") or {}).get("split_offset")}),
+        "members_split_into_stages": sum(1 for r in rows if r.get("split_offsets")),
+        "programs_from_split_stages": sum(1 for p in programs
+                                          if (p.get("span_count") or 1) > 1),
+        "stage_split_offsets": sorted({offset for r in rows
+                                       for offset in (r.get("split_offsets") or [])}),
         "programs_linear_only": sum(1 for p in programs
                                     if not p["decoded"]
                                     and (p.get("block_decode") or {}).get("ok")),

@@ -1,5 +1,14 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-03 12:40 CDT (root) — paired blobs split into stages (STATIC_ANALYSIS_VERIFIED)
+
+- **Task:** `GPU-01-MSL-OFFLINE-01`. The census now splits a paired blob at the cut point where **both** halves decode (`split_stages`), recording `split_offsets` per member and `span_index`/`span_count` per program row; a blob with no such cut stays whole so its failure stays visible.
+- **Measured at sample 512** (`blocks-512s`): program rows **367 → 381**, decoded **186 → 200**, decode-error unchanged at **181**, block-decodable **240 → 268**; **14 members split into 28 stage rows**, with only the small second stage decoding linearly (the large first stage is still branch-blocked).
+- **What it fixes:** the container model. A blob can hold a VS/PS pair, and the census no longer reports such a member as one undecodable program.
+- **What it does not fix:** `lowered` is still **0** — no real shader has an ABI manifest.
+- **Verification (PASSED):** coverage self-test 23; sample-512 rerun records the new totals; build exit 0; CTest **521/521**; checkers **713 passed / 0 failed**.
+- **Next exact action:** the first stage of each pair is branch-blocked like the rest — the block view already covers it (268/381), so the next real lever is the 76 per-lane-eligible programs and their missing manifests, not more decoding.
+
 ## 2026-11-03 11:55 CDT (root) — the 14 "trailing bytes" programs are VS/PS pairs (STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `GPU-01-MSL-OFFLINE-01`. Investigated the 14 block-mode programs whose declared span carried bytes after `s_endpgm`. They are **not malformed**: every one carries a **second program** back to back — the two halves share an identical 16-byte tail pattern (`[s_mov_b64][exp][nop][s_endpgm]`) and decoding the span at the first `s_endpgm` yields a clean second program.
