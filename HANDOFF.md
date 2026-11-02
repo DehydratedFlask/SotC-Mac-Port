@@ -1,5 +1,57 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-01 22:30 CDT (root, integrating five workers) — frontier 74/33, slot 309 modelled unregistered, 27 grounded PM4 opcodes, Ghidra dossier, save load-dispatch resolved
+
+Five parallel workers landed in this window. Everything below is integrated in one commit because the shared `native/CMakeLists.txt` carries all three native slices and the generated `docs/entry_map.json` is consumed by the checkers; splitting them would leave intermediate commits red.
+
+### Indirect frontier: 74 sites / 33 targets, 11 new bodies (FIXTURE_VERIFIED)
+- **Seed class invented rather than repeated:** the two suggested classes are exhausted for *targets* — all 266 remaining FDE-start `entry_map.json` keys (closure 1,432 / 906 sites / 15 resolved) gave 4 new sites and **0 new targets**, and the 22 resolved-target FDE starts gave **0**. The productive class was **site-evidence**: the FDE-start containers of every fully tied call site (slot qword + exactly one type-8 RELA addend + FDE start) through a vtable the table already trusts. 13 seeds → closure 847 / 347 sites / 30 resolved → **27 new rows, 11 new targets**.
+- **New targets:** `0x13d50`, `0x13d60`, `0x30e50`, `0x488d0`, `0xc2c0`, `0xe19cb0`, `0xe19f70`, `0xe1a040`, `0xe19440`, `0xe52cb0`, `0xed4860`; two new vtable bases (`0x1595b60`, `0x1595320`). The other 16 rows reach existing targets. All 27 chains were re-verified *outside* the sweep tool from the ELF (`local/validation/indirect-frontier/vtable-closure-verify.log`, 27/27).
+- `vtable_resolved_entries` is now **74 sites / 33 distinct targets**, every target with a body model; three new fixtures and three new checkers.
+- **Live enumeration is 266, not the previously quoted 274** — the earlier figure predates entry-map regeneration.
+
+### Startup slot 309: modelled, deliberately NOT registered (FIXTURE_VERIFIED / STATIC_ANALYSIS_VERIFIED)
+- `0xa505e0` (1,892 B) is the **Save System debug block**: 12 objects, each followed by `__cxa_atexit(dtor, obj, 0x1604218)` — a cell, a zeroed 0x18 object, `force_save_debug_condition` (0..5), the `sSaveManagerShowInfoLevel` name object (vptr `0x159e1b8`), the `saveSmallMemory` bool, an empty `SharedStr`, toggles, `saveLoadStallState` (0..18), `saveStoreStallState` (0..20).
+- **The three `callq *0x18(%rax)` sites are inert:** all three functor tags (`0x15d1b78`/`0x15d1c30`/`0x15d1cc8`) have a **bare `ret`** at slot 3 (`0xa4f4c0`/`0xa4feb0`/`0xa50270`), so they are no-op destroys, not calls into live code.
+- **The canary is named:** `0x15fe518` = `__stack_chk_guard` (NID `f7uOxY9mM1U`), `0xf8f3a0` = `__stack_chk_fail` (NID `Ou3iL1abvng`). The single branch `0xa50d2d jne 0xa50d3e` *is* the canary check.
+- **Registration refused on purpose.** Three of the twelve objects are built by `0xa4f4d0` / `0xa4fec0` / `0xa50280`, each with **exactly one caller in the whole image — this body** — and each interior is large and unlifted (functor rebuild, `0xa4f690` sub-init, internal `0x20d60`). Registering would force the callback to return `ok`, claiming three console variables exist when only their vptr tag and argument list are pinned. Coverage therefore stays **449/573, first gap still 309**, and `test_startup_ctor_coverage.cpp` is untouched.
+- New: `native/core/ctor_slot_309_a505e0.{hpp,cpp}`, `native/tests/test_ctor_slot_309.cpp` (9 cases / 105 checks), `tools/lift/check_ctor_slot_309.py` (334 ELF + 167 native mutants rejected; `--tamper elf|native` exit 1; skips without the image).
+
+### GPU: the title's own PM4 writers, 27 grounded opcodes / 711 sites (STATIC_ANALYSIS_VERIFIED)
+- **A premise corrected:** `sceGnmSubmitCommandBuffers` has no direct `e8` caller because there is a second dispatch layer — 103 GNM imports each have a `jmp *GOT` thunk at `0xf903e0..0xf90a40`, 51 called directly, 52 through 16-byte stubs at `0x87f3b0..0x883070`. The submit is called **once**, from `0x8635fc` (function `0x863310`).
+- **293 functions in `0x865fa0..0x8852a0` write type-3 headers themselves** into a growable buffer (`[this+0x08]` end, `[this+0x10]` cursor, `[this+0x18]` grow callback, `[this+0x20]` argument, `[this+0x28]` flags). So the submitted stream is a **mix of game-written and driver-written packets** — the earlier census model was one-sided.
+- **Header rule grounded:** `0xC0000000 | opcode<<8 | (payload-1)<<16`, with `payload == count+1` confirmed wherever the same block advances the cursor. Bits `[7:1]` are always zero but **bit 0 is not reserved** — `0x86b7dd` ORs `this->flags & 1` in and still writes a complete 6-dword packet; a first draft that required `[7:0] == 0` would have rejected a real packet.
+- **27 opcodes**, each with payload bounds, closed/bounded/unbounded kind, stored-payload mask, structural family and writer sites. Semantics are **not** claimed.
+- **Enforced unknowns:** opcode `0x00` (`0xC0000000` is a 274+-site generic constant, never stored in the emitter region); **229 of 256 type-3 values have no writer site**; and only **8 of 711** writer sites sit in a function that calls an import at all, so draw packets are produced inside `libSceGnmDriver.sprx` and cannot be grounded without a capture.
+- New: `native/platform/gnm_opcode_table.{hpp,cpp}`, `native/tests/test_gnm_opcode_table.cpp` (12 cases / 64 assertions), `tools/lift/check_gnm_opcode_table.py` (27/711 re-derived; 3 mutation probes; drift probe fails as required), `docs/GPU_COMMAND_SURFACE.md` §6.
+
+### Ghidra: a reproducible decompiler dossier (ARTIFACT_VERIFIED pipeline / STATIC_ANALYSIS_VERIFIED readings)
+- **The 2026-10-20 project is valid:** program `/eboot.elf`, `x86:LE:64:default`, base `0x0`, 38,845 functions, source hashes to the pinned `d0723afb…61d3`. No re-analysis was needed, so the 45-minute rebuild was **not run**.
+- **A real blocker, worked around:** Ghidra 12.1.4 `analyzeHeadless` cannot run PyGhidra `.py` scripts ("Ghidra was not started with PyGhidra"), and this install has no Jython feature. `tools/re/ghidra/run_dump.py` starts PyGhidra and runs ordinary GhidraScripts — that is the working entry point.
+- **Dossier:** `0x2569d0` (12,626 B, 1,589 C lines), `0x1bdf30` (1,479 B, 181), `0x1bdb10` (56 B, 16), `0xa2afb0` (441 B, 64), `0x531d60` (3,889 B, 527); 2,372 lines, reproducible (rerun identical apart from timings; the persistent-project run left the project unmodified).
+- **Independent corroboration of the registry contract:** the decompiler shows the flag at `+0x50`, the drain on `flag == 1`, list C at `+0x40` walked first, and 259 `0xac5260`/`0xac5320` inserts with the `{i32,f32=1,u32}` and `{f32 lo,f32 hi,f32 v,u32}` records.
+- **Honest limits:** signatures are not recovered (everything is `undefined FUN_xxx()`); `0x2569d0`'s Ghidra body is 12,626 B vs the 12,621 B in `AGENTS.md` (unwind span ≠ owned instruction bytes, neither reconciled); `BLOCKS=1` is the address-range count, not a CFG measure.
+- New: `tools/re/ghidra/{run_dump,dump_functions,probe_project}.py`, `tools/lift/check_ghidra_pipeline.py`, `docs/GHIDRA_PIPELINE.md`; `INSTALL_LOG.md` records the PyGhidra venv and its removal boundary.
+
+### Save: `0x5435fc` resolved, task unblocked (STATIC_ANALYSIS_VERIFIED)
+- `SAV-01-LOAD-DISPATCH-5435FC-01` was `BLOCKED` on an REA timeout. Resolved from the ELF alone, **with no REA/Ghidra request**.
+- The call is a **`shared_ptr` control-block release**, not a game-object virtual call: the block is `sret[1]` of accessor `0x515770` called at `0x5430bf`; the accessor fetches it from the resource map via `0xa71c90` (tag `'CLCT'`), whose miss path invokes `0x2193d0` → `0x516230`, installing control-block vptr `0x15c6f68`; slot `+0x10` at `0x15c6f78` carries a type-8 addend **`0x517220`** (FDE start, 0x27 B). The companion `0x543611` → `0x517250`.
+- These are the only two indirect transfers in `FUN_00542880` (`0x542880`+`0x131c`), so E866's "two unresolved indirect calls" is superseded. Single-valued: `0xa721c0` has one call site; the `'CLCT'` immediate exists only at the insert and the read-only accessor.
+- **Naming is inferred from shape**, not from symbols: `_M_dispose`/`_M_destroy` are the standard `shared_ptr` protocol, and the resolved *addresses* do not depend on it.
+- New: `tools/lift/check_sav_load_dispatch.py`, `docs/checkpoints/2026-11-01-sav01-load-dispatch-5435fc.md`, E1057.
+
+### Verification
+- `cmake -S native -B local/build/orch-r22` exit 0; `cmake --build … -j 12` exit 0 with no warnings; CTest **528/528**.
+- **Lift checkers: 724 passed / 0 skipped / 0 failed.** Run in three visible chunks (`check_[a-c]` 92, `check_[d-m]` 602, `check_[n-z]` 30) because the single-sweep driver was being killed under concurrent worker load; the chunk counts cover every `check_*.py` the driver would have run.
+- `docs/entry_map.json` regenerated (**1,549 constants → 1,052 RVAs / 399 headers**) because the stale copy was failing `check_entry_map.py`; `project_index.py` regenerated `docs/FOLDERS.md` / `docs/INDEX.md`.
+- Committed as `5773c5ca` and pushed to `main`.
+
+### What is still open after this window
+- Startup coverage **449/573**, first gap **309** — deliberately unregistered; lifting `0xa4f4d0` / `0xa4fec0` / `0xa50280` (or a shared console-variable model) is the precondition. Next gaps behind it: 312 (`0xa46130`, 1,250 B), 314 (`0xa41810`, 4,329 B), 316 (`0xa33280`, 2,561 B).
+- Frontier has **795 tied targets** image-wide and 33 resolved; the next slice is the remaining tied-site containers.
+- MSL is still **0 lowered** (per-shader ABI manifest); the 11 remaining non-refusal blockers are MIMG 39/1/8 pending an address-shape model.
+- Real running captures, boot, audio and save/load remain **NOT RUN**.
+
 ## 2026-11-01 21:20 CDT (gpu-msl worker, integrated by root) — MSL decoder v17: block-decodable 268 → 329 (STATIC_ANALYSIS_VERIFIED)
 
 - **Task:** `GPU-01-MSL-OFFLINE-01`. Twelve VOP rows added, each read from `reference/shadPS4/src/shader_recompiler/frontend/format.cpp` bounded by the next `InstructionFormat…` declaration and cross-checked against `opcodes.h`: VOP1 7 `v_cvt_u32_f32`, 37 `v_exp_f32`, 39 `v_log_f32`; VOP3 259 `v_add_f32`, 260 `v_sub_f32`, 271 `v_min_f32`, 423 `v_log_f32`, 323 `v_mad_u32_u24`, 328 `v_bfe_u32`, 344 `v_med3_i32`, 361 `v_mul_lo_u32`, 196 `v_cmp_gt_u32`.
