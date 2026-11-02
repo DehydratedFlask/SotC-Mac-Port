@@ -18,8 +18,8 @@
 // it cannot and does not test dispatch.
 //
 // These are entries, not implementations: every one of the 37 distinct targets has a native body
-// model. Measured split (E1066): 41 site-provable rows, 50 table-level rows. The older rows inherited
-// a table-level tie from `indirect_frontier.classify`, whose `rip_global_for` fallback scans *past*
+// model. Measured split (E1066): 41 site-provable rows, 50 table-level rows. The 50 inherited a
+// table-level tie from `indirect_frontier.classify`, whose `rip_global_for` fallback scans *past*
 // the nearest definition and can attach a table load the call does not use;
 // `docs/INDIRECT_FRONTIER.md` ("Evidence grades") defines both grades and gives the counts.
 #pragma once

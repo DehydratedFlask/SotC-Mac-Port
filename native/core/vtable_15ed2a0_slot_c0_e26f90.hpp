@@ -1,9 +1,10 @@
 // Resolved vtable target `0xe26f90` (reached from vtable `0x15ed2a0` slot `0xc0`).
 //
 // Evidence grade: **table-level only** (E1066). The qword at this slot, the type-8 RELA addend and the
-// FDE start tie the target to the table; they do NOT prove that the call site named here dispatches
-// there. That site's call register is not provably this table load, so it can dispatch through
-// another table at run time. `docs/INDIRECT_FRONTIER.md` "Evidence grades" defines both grades.
+// FDE start tie the target to the table. The `call` in the evidence bullet is a window reading, not a
+// proof of dispatch: that site's call register is a member load, not provably this table, so it can
+// dispatch through another table at run time. `docs/INDIRECT_FRONTIER.md` "Evidence grades" has the
+// definitions and the counts.
 //
 // Evidence: sites `0xe52b97`, `0xe52bb3`, `0xe52bd2` are `call *0xc0(%rax)` with `%rax` from the
 // RIP-relative table `0x15ed2a0`; the qword at `0x15ed2a0 + 0xc0 = 0x15ed360` is `0xe26f90`; the
