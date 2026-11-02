@@ -1,5 +1,64 @@
 # SoC Mac Native — current handoff
 
+## 2026-11-02 — COMPLETE HANDOFF (orchestration session end)
+
+**State: `main` at `55ca6d17`, build exit 0, CTest 535/535, path audit OK.** One file is uncommitted and is a worker's in-flight edit (`native/core/concmd_manager_210b0.cpp`); its checker currently fails, so treat that lane as unfinished rather than done.
+
+### Verification commands
+
+```sh
+cmake -S native -B local/build/orch-r22
+cmake --build local/build/orch-r22 -j 12
+ctest --test-dir local/build/orch-r22 -j 12          # expect 535/535
+SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh
+python3 -I scripts/audit_publish_paths.py --all
+python3 scripts/project_index.py
+```
+
+The single-sweep checker driver is killed under concurrent load; run it in chunks (`check_[a-m]*`, then `check_[n-z]*`).
+
+### Where the port got to this session
+
+| Area | Before → After |
+|---|---|
+| Startup coverage | 449/573, cliff 309 → **452/573, cliff 316** |
+| Indirect frontier | 47 sites / 22 targets → **91 / 37**, graded **41 site-provable / 50 table-level** |
+| MSL decoder | 200/381 linear, 268 block → **230/410 linear, 329 block** |
+| Audio | byte profiles only → containers specified, banks proven SPU ADPCM, **`SXD2` = ATRAC9** |
+| Compressed shaders | "no loader, no decompressor" → **loader found; Oodle 2 SDK statically linked** |
+| Ghidra | timed out, unusable → **working headless pipeline + decompiler dossier** |
+| Task board | 16 PARTIAL / 4 BLOCKED → **~6 / 0** |
+
+### The findings that matter most
+
+1. **Startup slots 309/312/314 have no callers.** They are rows in the 573-entry table at `0x2dd70e0`, indexed **backwards** (`entry i = 0x2dd70e0 − 8·i`). Every earlier attempt to trace a "call order" was chasing something that does not exist. `tools/lift/check_startup_slot309_table.py` pins this.
+2. **Only 41 of 91 frontier rows are provable from the call site.** The rest have table-level evidence only (slot qword + type-8 RELA addend + FDE start). Store-to-load forwarding was measured and **closed at 0 of 50** — and it found something worse: the 9 rows that do reach a store forward to `TABLE+0x10+slot`, two slots *above* the row's slot, onto a different real function. A fallback tie's recorded `(vtable, slot)` is the older `lea` plus the call displacement, which for a vptr-relative call is **not** the address the call reads. **Do not re-run that class expecting rows;** fixing the rows means changing values and needs its own audited task.
+3. **The `.csdr` "no loader exists" conclusion is withdrawn.** The image statically links a complete **Oodle 2 LZ SDK** (178 oodle labels, 24 `OodleLZ*`, all 11 codec families, 25 `oodle2/core` source paths, 99 `OODLE ERROR` asserts) plus zlib 1.2.3 — static linkage is exactly why no import existed. A disassembler-independent rel32 census gives `OodleLZ_Decompress` (`0x89d3b0`) exactly **one** inbound call, at `0x1aa426`, inside `FUN_001aa2a0`'s missing switch body (relative switch table at `0xfadd4c`). It is a six-case type-tagged Oodle dispatcher in game-reachable code.
+4. **`0xa4bddb` was never a procedure** — a call inside `0xa4ab90` at `+0x124b`, inside a Ghidra coverage hole. That same hole-at-a-Ghidra-"no procedure" shape misled two separate tasks; always check `getFunctionContaining` and FDE extents.
+5. **The `.hd`/`.bd` banks are PSX/PS2 SPU ADPCM** (1,620,083 frames, 100 % framing, correlation 0.99861 vs FFmpeg `adpcm_psx` — PARTIAL sample-exactness, not bit-exact). `SXD2` is **ATRAC9** (566 of 830 `WAVE` records; `music.sxd2` is 6-channel), proven by the wave-format dispatch at `0x983ea0` through the 67-entry table at `0x12b5410`. The config word at `[wave+0x5f8]` is still unrecovered.
+
+### Open work, highest value first
+
+1. **`FUN_001aa2a0`'s callers and the 3-bit tag** — the single question "is `compBuf` an archive member buffer for a `.csdr` member" decides whether 19,320 compressed shaders become decodable. This is the biggest ceiling in the GPU path.
+2. **Startup slot 316** (`0xa33280`, 2,560 B) is the cliff. A worker was mid-characterization; re-check `docs/TASKS.md` before restarting it.
+3. **`FUN_00b0cc50`** (the `csdr` loader callback, 624 B) is characterized but its byte-level expansion is not.
+4. **MSL is still 0 lowered.** The blocker is a per-shader ABI manifest (scalar bases s0/s2/s8/s9, descriptors s20/s24/s28, export targets 12/32). It needs a state trace from a running game or owner-supplied bindings; inventing it would produce MSL that renders the wrong thing.
+5. **ATRAC9 config word** at `[wave+0x5f8]` — `0x987950` is the lookup, `[wave+0x5f8]` is zero-initialised at `0x980a34`, and nothing in a `WAVE` record carries a `0xFE` word.
+6. **Honestly blocked, not actionable:** `APP-01-NOTARIZED-DMG-01` needs a Developer ID Application identity + `notarytool` profile (only Apple Development/Distribution installed).
+
+### Traps this session hit
+
+- `starts[-1]` on case blocks is **not** the highest address — case blocks are not laid out in case order. Use `max(starts)`.
+- A forward "base" for a backwards-indexed table can land on the right entry **by coincidence**: `0x2dd5d90 = 0x2dd70e0 − 618·8` reaches entry 309 only because 618 = 2×309, and mislabels every neighbour by six.
+- `cp` restore preserves mtime and can skip a rebuild — `touch` and confirm the binary changed.
+- A worker told to "reply with just…" will abandon its deliverable. Ask for status **and** tell it to continue.
+- Count-pinning tests and checkers (`test_startup_ctor_coverage`, `test_startup_ctors`' `expect[]`, `check_console_var_ctors.py`'s `COVERAGE_TOKENS`, `check_ctor_slots.py`, `check_fctor_slots_296_297_300.py`) go stale the moment coverage moves. Update all of them in the same commit as a registration — this bit three times.
+- Several commits landed mid-flight worker state and had to be corrected forward (`d9ff4d2f` restored green after a slot-314 model that did not compile). Do not commit a worker's files until its own checker passes.
+
+### Working agreement
+
+`AGENTS.md` is authoritative. No Rosetta/Wine/QEMU/guest-CPU/JIT/Vulkan. No commit of game files, `local/`, `reference/`, `logs/`. Every claim labelled. No boot/audio/save claim without real-game demonstration. Workers do not commit; the integrator does.
+
 ## 2026-11-02 03:20 CDT (root) — SESSION HANDOFF for the next agent
 
 **State: green and pushed.** `main` at `44f2a310`. Configure 0, build 0, **CTest 532/532**, lift checkers **728 passed / 0 failed** (last full chunked sweep; count is now higher by the lanes added since — re-run for the current number), entry map **1,598 constants → 1,080 RVAs / 405 headers**, path audit OK.
