@@ -1,3 +1,53 @@
+## 2026-11-13 — `0x5b9f90` S4.1 + S5.1 executed: the "Particle" body and the "Stereo 3D" page run (23,232 B native)
+
+**State: green.** Continuation of commit `7619a143` on branch `cursor/init-hash-551140-6aa93e8`.
+Resumed at the recorded `0x5bc3d4` (S4) and decomposed it at callee boundaries instead of leaving it
+blocked: both halves of the 10 B S4 call pair were measured separately.
+
+- **S4.1 executed — `0x5dbf40..0x5ddcad`, the "Particle" page** (7,533 B, 1,243 instructions,
+  177 direct calls, no backward branch, single `ret` at `0x5ddcad`). 20 items in body order:
+  1 group ("Particle" under "Shadow Render"), 2 `0xc580` ranged ints (**Soft Particle Mode**
+  -1..2, **Debug Particle Index** -1..100; caller tag `0x15c8450`, helper `0x15c5800`),
+  5 `0xc300` bounded floats (Soft Particle Fixed Fade 0.05..5, Refract Min 0..50, Refract Max
+  0.01..50, Camera Min 0..50, Camera Max 0.01..50; functor `0x15cbda0`), and 12 `0x20af0` bool
+  variables (Draw Extend/Extend2/Blur0/Blur1/FakeVol/Anim/RandAxis/Refract, Trim Particles,
+  Optimize Identical, Optimize Null, Particle Offscreen Render; final vptr `0x1594348`, functor
+  `0x15cbdc0`, atexit `0xacf0`). The last bool has no guard cell in the body (checker skips 0).
+  The bool builder now takes the functor vptr per page (S3/S2 use `0x15cbd80`).
+- **S4.2 blocked (measured, 26 instructions):** `0x7f8930..0x7f898a` is a single-call guard
+  (`0x7f895b -> 0x7f8610`) that also touches `0x15fe570` and the host globals `0x3288478` /
+  `0x3288480`; `0x7f8610` is 688 instructions to its first `ret` at `0x7f87d9` and has no model
+  and no host table, so it cannot be claimed. Recorded with offset and reason; S4's call pair is
+  therefore `partial`.
+- **S5.1 executed — `0x5bc413..0x5bc78c`, the "Stereo 3D" page** (889 B, 149 instructions):
+  group "Stereo 3D" under "CP10" plus two bounded floats with `0x27120` sliders —
+  **Auto Focal Distance** (cell `0x2fedb58`, guard `0x2fedc28`, 0..500) and **Auto Distortion**
+  (cell `0x2fedc30`, guard `0x2fedd00`, 0..1), ranges 1.0/1.0, 4 releases, 2 destroys, 2 atexit.
+  S5.2 (`0x5bc78c..0x5c1196`, 18,954 B + the 53 B prologue at `0x5bc3de`) is "Dynamic 3D" and the
+  wormhole page, still needing item extraction; recorded blocked.
+- **Measured counters:** slices 10, groups 10, commands 38, toggles 8, floats 4, named_vars 19,
+  registered 104, releases 178, destroys 66, separators 6, sliders 17, int_sliders 2, contracts 2,
+  records 10, atexit 38, items 104, s4_items 20, s4_bytes 7,533, s5_items 3, s5_bytes 889.
+- **Coverage:** body extent **10,173 of 46,881 B (21.7 %)**; native total **23,232 B (49.6 %)**
+  = S0 177 + S2 call site 5 + S3 9,097 + S4 10 + S5.1 889 + executed callee bodies 5,526 + 7,533.
+  **Resume offset `0x5bc78c`** (S5.2). `post_calls_complete` stays false (S1, S4.2, S5.2, S6..S9).
+- **Observed run:** `ok=true`, exit 0, **`post_calls_executed=26`** (24 -> 26: one record per new
+  sub-slice), `post_calls_blocked=1`, `post_call_count=27`, boss `0xA7`.
+- **Byte-pinned:** `tools/lift/check_init_5b9f90_slices.py` pins S4.1's extent/1,243 instructions/
+  single ret/no backward branch/177 calls and all 20 tuples (additionally now searching real
+  little-endian float immediates instead of a bounded-literal stub); S5.1's 889 B/149 instructions/
+  3 tuples/cell+guard leas/float bounds; the 10,173/23,232 totals and resume constant.
+  `tools/lift/slice_5b9f90.py` emits the S5.1/S5.2 rows and `s5` block reproducibly.
+- **Verification:** build **0**; full CTest **704/704**; checker `check_init_5b9f90_slices.py` **OK**
+  (`executed=10173B items=53 s2=... executed_total=23232B`); sweep **914 passed / 0 skipped / 0 failed** (exit 0, after regenerating the entry map **3,040 constants → 1,949 RVAs / 584 headers (459 duplicates)**); init runtime
+  exit **0**, `ok=true`, stderr 0 B. Checkpoint `docs/checkpoints/2026-11-13-init-5dbf40-s4-1-executed.md`.
+- **Not claimed:** cold boot, audio, save/reload, Metal validation (NOT RUN); `0x2170` extent still
+  not closed, so S1 stays a contract. G1 **PARTIAL**.
+
+**Next exact action:** extract S5.2's "Dynamic 3D" page from `0x5bc78c` (bools, `c300`, `c580`,
+separators, the three `0x26f90` keyframe commands and the "Shadow Boss Worm Hole Effect" group),
+then S6's `0x5c94b0`/`0xb25840` page pair and S7.
+
 ## 2026-11-13 — `0x5b9f90` S2 executed: the `0x5cf140` "Shadow Credits" body runs (14,805 B native)
 
 **State: green.** Continuation of commit `44cef29a` on branch `cursor/init-hash-551140-6aa93e8`.

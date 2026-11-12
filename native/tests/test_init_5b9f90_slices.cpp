@@ -58,14 +58,15 @@ struct Fixture {
     DebugMenuRegistry menu{};
     ConCmdRegistry registry{};
     StartupAtexitLog atexit{};
-    std::array<DebugMenuItem, 96> items{};
+    std::array<DebugMenuItem, 128> items{};
     std::array<bool, 8> toggle_values{};
-    std::array<ConCmdBoolVar, 8> vars{};
-    std::array<bool, 8> var_values{};
-    std::array<bool, 8> var_guards{};
-    std::array<ConCmdRangedVar, 10> ranged{};
-    std::array<float, 10> ranged_values{};
-    std::array<bool, 10> ranged_guards{};
+    std::array<ConCmdBoolVar, 24> vars{};
+    std::array<bool, 24> var_values{};
+    std::array<bool, 24> var_guards{};
+    std::array<ConCmdRangedVar, 20> ranged{};
+    std::array<float, 20> ranged_values{};
+    std::array<std::int32_t, 20> ranged_int_values{};
+    std::array<bool, 20> ranged_guards{};
     std::uint64_t canary = 0;
     Init5b9f90Hooks hooks{};
 
@@ -86,6 +87,7 @@ struct Fixture {
         hooks.ranged_storage = ranged.data();
         hooks.ranged_capacity = ranged.size();
         hooks.ranged_value_storage = ranged_values.data();
+        hooks.ranged_int_value_storage = ranged_int_values.data();
         hooks.ranged_guard_storage = ranged_guards.data();
         hooks.separator_alloc.alloc.allocate = test_alloc;
         hooks.separator_alloc.alloc.deallocate = test_dealloc;
@@ -149,30 +151,38 @@ int main() {
         Fixture f;
         g_releases = 0;
         const Init5b9f90Result r = run_init_5b9f90_slices(f.hooks);
+
         CHECK(r.ok);
         CHECK(!r.complete);
         CHECK(r.blocked == nullptr);
         CHECK(r.resume_rva == kInit5b9f90ResumeRva);
-        CHECK(kInit5b9f90ResumeRva == 0x5BC3D4);
-        CHECK(r.groups == 8);
+        CHECK(kInit5b9f90ResumeRva == 0x5BC78C);
+        CHECK(r.groups == 10);
         CHECK(r.commands == 38);   // 37 S3 + the S2 credits-level command
         CHECK(r.toggles == 8);
         CHECK(r.float_items == 4);
-        CHECK(r.named_vars == 7);   // 4 S3.4 bool vars + 2 S2 bool vars + 1 external named var
+        CHECK(r.named_vars == 19);   // 7 (S3.4/S2) + 12 S4.1 bool variables
         CHECK(r.separators == 6);
-        CHECK(r.sliders == 10);
+        CHECK(r.sliders == 17);      // 10 S2 + 5 S4.1 + 2 S5.1
+        CHECK(r.int_sliders == 2);   // S4.1 0xc580
         CHECK(r.s2_executed);
         CHECK(r.s2_items == 21);
-        CHECK(r.registered == 81);   // 60 S3 + 21 S2 items
-        CHECK(r.contracts == 1);
-        CHECK(r.releases == 134);
-        CHECK(r.destroys == 44);
-        CHECK(r.executed_slices == 8);
+        CHECK(r.s4_executed);
+        CHECK(r.s4_items == 20);   // group + 7 sliders + 12 bool items
+        CHECK(r.s4_bytes == kInit5dbf40Size);
+        CHECK(r.registered == 104);   // 81 + 20 S4.1 + 3 S5.1 items
+        CHECK(r.contracts == 2);     // S1 0x2170 + S4.2 0x7f8930
+        CHECK(r.releases == 178);
+        CHECK(r.destroys == 66);
+        CHECK(r.executed_slices == 10);
+        CHECK(r.s5_executed);
+        CHECK(r.s5_items == 3);
+        CHECK(r.s5_bytes == kInit5b9f90S5_1Size);
         CHECK(r.canary_stored);
-        CHECK(r.items_used == 81);
+        CHECK(r.items_used == 104);
         CHECK(f.items[0].kind == 1);   // the storage the root list points into
         CHECK(f.canary == f.hooks.canary_token);
-        CHECK(r.record_count == 8);
+        CHECK(r.record_count == 10);
         CHECK(r.records[0].callee_rva == kInit5b9f90Rva);
         CHECK(r.records[1].callee_rva == kInit5cf140Rva);
         CHECK(r.records[2].callee_rva == 0x5BA04B);
@@ -181,15 +191,17 @@ int main() {
         CHECK(r.records[5].callee_rva == 0x5BBD2E);
         CHECK(r.records[6].callee_rva == 0x5BC377);
         CHECK(r.records[7].callee_rva == 0x5BC3C7);
+        CHECK(r.records[8].callee_rva == kInit5dbf40Rva);
+        CHECK(r.records[9].callee_rva == 0x5BC413);
         for (std::size_t i = 0; i < r.record_count; ++i) {
             CHECK(r.records[i].executed);
             CHECK(r.records[i].caller != nullptr && std::strcmp(r.records[i].caller, "0x5b9f90") == 0);
             CHECK(std::strstr(r.records[i].detail, "slice S") != nullptr);
         }
-        CHECK(root_size(f.menu) == 81);
-        CHECK(f.menu.root.count == 81);
-        // root destructor + 2 S2 bool vars + 10 S2 bounded floats + 4 S3.4 bool vars
-        CHECK(f.atexit.size() == 17);
+        CHECK(root_size(f.menu) == 104);
+        CHECK(f.menu.root.count == 104);
+        // root + 17 + S4.1 (19) + S5.1 (2)
+        CHECK(f.atexit.size() == 38);
 
         // 2. root-list shape: S0, S3.1, S3.2.
         check_item(*root_at(f.menu, 0), 1, "CP10", "Shadow", "Shadow", 0);
@@ -257,6 +269,33 @@ int main() {
         // S3.5 "Shadow Render" and S3.6 "MLAA" close the six pages (root 58, 59).
         check_item(*root_at(f.menu, 79), 1, "Shadow", "Shadow Render", "Shadow Render", 0);
         check_item(*root_at(f.menu, 80), 1, "Shadow Render", "MLAA", "MLAA", 0);
+
+        // S4.1 "Particle" (root 81..100): group, 7 variable sliders and 12 bool items.
+        check_item(*root_at(f.menu, 81), 1, "Shadow Render", "Particle", "Particle", 0);
+        CHECK(root_at(f.menu, 82)->range_min == 1.0f && root_at(f.menu, 82)->range_max == 1.0f);
+        CHECK(view_is(root_at(f.menu, 82)->text, "Soft Particle Mode"));
+        CHECK(root_at(f.menu, 82)->target == &f.ranged[10]);
+        CHECK(view_is(root_at(f.menu, 83)->text, "Soft Particle Fixed Fade"));
+        CHECK(root_at(f.menu, 83)->target == &f.ranged[11]);
+        CHECK(view_is(root_at(f.menu, 84)->text, "Refract Min Fade"));
+        CHECK(view_is(root_at(f.menu, 85)->text, "Refract Max Fade"));
+        CHECK(view_is(root_at(f.menu, 86)->text, "Camera Min Fade"));
+        CHECK(view_is(root_at(f.menu, 87)->text, "Camera Max Fade"));
+        CHECK(view_is(root_at(f.menu, 88)->text, "Draw Extend"));
+        CHECK(root_at(f.menu, 88)->target == &f.vars[7]);
+        CHECK(view_is(root_at(f.menu, 99)->text, "Optimize Null"));
+        CHECK(view_is(root_at(f.menu, 100)->text, "Particle Offscreen Render"));
+        CHECK(root_at(f.menu, 100)->target == &f.vars[18]);
+        CHECK(f.ranged_guards[10] && f.ranged_guards[16]);
+        CHECK(f.var_guards[7] && f.var_guards[18]);
+
+        // S5.1 "Stereo 3D" (root 101..103): group and two bounded sliders.
+        check_item(*root_at(f.menu, 101), 1, "CP10", "Stereo 3D", "Stereo 3D", 0);
+        CHECK(view_is(root_at(f.menu, 102)->text, "Auto Focal Distance"));
+        CHECK(root_at(f.menu, 102)->target == &f.ranged[17]);
+        CHECK(view_is(root_at(f.menu, 103)->text, "Auto Distortion"));
+        CHECK(root_at(f.menu, 103)->target == &f.ranged[18]);
+        CHECK(f.ranged_guards[17] && f.ranged_guards[18]);
     }
 
     // 3. fail-closed

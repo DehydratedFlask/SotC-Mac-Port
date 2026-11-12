@@ -173,14 +173,15 @@ struct HostPostBodies {
     DebugMenuRegistry menu_5b9f90{};
     ConCmdRegistry registry_5b9f90{};
     StartupAtexitLog atexit_5b9f90{};
-    std::array<DebugMenuItem, 96> items_5b9f90{};
-    std::array<ConCmdBoolVar, 8> vars_5b9f90{};
-    std::array<bool, 8> var_values_5b9f90{};
-    std::array<bool, 8> var_guards_5b9f90{};
+    std::array<DebugMenuItem, 128> items_5b9f90{};
+    std::array<ConCmdBoolVar, 24> vars_5b9f90{};
+    std::array<bool, 24> var_values_5b9f90{};
+    std::array<bool, 24> var_guards_5b9f90{};
     std::array<bool, 8> toggle_values_5b9f90{};
-    std::array<ConCmdRangedVar, 10> ranged_5b9f90{};
-    std::array<float, 10> ranged_values_5b9f90{};
-    std::array<bool, 10> ranged_guards_5b9f90{};
+    std::array<ConCmdRangedVar, 20> ranged_5b9f90{};
+    std::array<float, 20> ranged_values_5b9f90{};
+    std::array<std::int32_t, 20> ranged_int_values_5b9f90{};
+    std::array<bool, 20> ranged_guards_5b9f90{};
     std::uint64_t canary_5b9f90 = 0;
     Init5b9f90Hooks hooks_5b9f90{};
     Init5b9f90Result result_5b9f90{};
@@ -1120,13 +1121,13 @@ InitPostCallOutcome hook_5c_a() noexcept {
     const auto& r = p.result_5b9f90;
     char detail[kInitPostCallDetailBytes];
     std::snprintf(detail, sizeof detail,
-                  "native 0x5b9f90 slices S0/S3.1..S3.6 (%zu of 46881 B): groups=%d commands=%d "
-                  "toggles=%d floats=%d named_vars=%d registered=%d releases=%d destroys=%d "
-                  "contracts=%d s2=%d s2_bytes=%zu sliders=%d canary=%d resume=0x%llx remaining=%zu B",
+                  "0x5b9f90 S0/S2/S3.1-6/S4.1: %zu of 46881 B groups=%d cmd=%d tog=%d flt=%d nv=%d "
+                  "reg=%d rel=%d des=%d ct=%d s2=%d s2B=%zu sl=%d s4=%d s4B=%zu canary=%d "
+                  "resume=0x%llx rem=%zu",
                   static_cast<std::size_t>(kInit5b9f90ExecutedBytes), r.groups, r.commands,
                   r.toggles, r.float_items, r.named_vars, r.registered, r.releases, r.destroys,
                   r.contracts, r.s2_executed ? 1 : 0, static_cast<std::size_t>(kInit5cf140Size),
-                  r.sliders,
+                  r.sliders, r.s4_executed ? 1 : 0, static_cast<std::size_t>(kInit5dbf40Size),
                   r.canary_stored ? 1 : 0,                   static_cast<unsigned long long>(r.resume_rva),
                   static_cast<std::size_t>(kInit5b9f90Size - kInit5b9f90ExecutedBytes));
     InitPostCallOutcome o;  // the body's own record stays blocked: 37,607 B are unlifted
@@ -1664,6 +1665,7 @@ void configure_post(HostPostBodies& p) {
     p.hooks_5b9f90.ranged_storage = p.ranged_5b9f90.data();
     p.hooks_5b9f90.ranged_capacity = p.ranged_5b9f90.size();
     p.hooks_5b9f90.ranged_value_storage = p.ranged_values_5b9f90.data();
+    p.hooks_5b9f90.ranged_int_value_storage = p.ranged_int_values_5b9f90.data();
     p.hooks_5b9f90.ranged_guard_storage = p.ranged_guards_5b9f90.data();
     p.hooks_5b9f90.separator_alloc.alloc.allocate = key_alloc;
     p.hooks_5b9f90.separator_alloc.alloc.deallocate = key_dealloc;
@@ -2126,6 +2128,15 @@ InitWindowRuntimeResult run_init_window_runtime(const char* fixture_path) noexce
     out.post_5b9f90_registered = r5b.registered;
     out.post_5b9f90_releases = r5b.releases;
     out.post_5b9f90_destroys = r5b.destroys;
+    out.post_5b9f90_separators = r5b.separators;
+    out.post_5b9f90_sliders = r5b.sliders;
+    out.post_5b9f90_int_sliders = r5b.int_sliders;
+    out.post_5b9f90_s4_items = static_cast<int>(r5b.s4_items);
+    out.post_5b9f90_s4_bytes = static_cast<int>(r5b.s4_bytes);
+    out.post_5b9f90_s4 = r5b.s4_executed;
+    out.post_5b9f90_s5 = r5b.s5_executed;
+    out.post_5b9f90_s5_items = static_cast<int>(r5b.s5_items);
+    out.post_5b9f90_s5_bytes = static_cast<int>(r5b.s5_bytes);
     out.post_5b9f90_contracts = r5b.contracts;
     out.post_5b9f90_resume_rva = r5b.resume_rva;
     out.post_5b9f90_complete = r5b.complete;

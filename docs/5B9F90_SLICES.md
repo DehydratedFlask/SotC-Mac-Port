@@ -38,17 +38,20 @@ straight-line item clusters (view write, constructor at 0x26c10/0x26b60/0x26f90/
 | S3.4 | executed | "Shadow Trophy": 4 guarded bool variables + named items, 5 destroys |
 | S3.5 | executed | "Shadow Render": group header |
 | S3.6 | executed | "MLAA": group header |
-| S4 | blocked | 0x5dbf40 + 0x7f8930 callee bodies not lifted |
-| S5 | blocked | "Stereo 3D" / "Dynamic 3D" / wormhole pages: extraction pending |
+| S4.1 | executed | 0x5dbf40 "Particle" body (7,533 B, 1,243 insns, 177 calls): 1 group, 2 ranged ints, 5 bounded floats, 12 bool variables, 7 sliders, 20 destroys |
+| S4.2 | blocked | 0x7f8930 guard helper (26 insns, single call to 0x7f8610) needs 0x7f8610's 688-instruction body and the host globals 0x3288478/0x3288480 |
+| S5.1 | executed | 0x5bc413..0x5bc78c "Stereo 3D" page (889 B, 149 insns): 1 group, 2 bounded floats (0..500, 0..1), 2 sliders, 2 destroys |
+| S5.2 | blocked | 0x5bc78c..0x5c1196 "Dynamic 3D" + wormhole pages (18,954 B) still need item extraction |
+| S5 | partial | "Stereo 3D" page executed (S5.1); S5.2 extraction pending |
 | S6 | blocked | 0x5c94b0 + 0xb25840 callee bodies not lifted |
 | S7 | blocked | "Shadow Sound" / "Shadow Cursor" / "Layers": extraction pending |
 | S8 | blocked | the single loop nest (33 iterations over the 0x2dcaa90 table) |
 | S9 | blocked | "Performance" / "Transparency" / "Texture" / "Fullscreen Effects Tweaks" |
 
-Resume offset for the next agent: `0x5bc3d4` (S4, the 0x5dbf40 + 0x7f8930 pair).
-Executed extent: 9,279 of 46,881 B of the 0x5b9f90 body (19.8 %), plus the executed
-0x5cf140 callee body (5,526 B) for 14,805 B of native code (31.6 %);
-`post_calls_complete` stays false because S1 and S4..S9 are still contracts/blocked.
+Resume offset for the next agent: `0x5bc78c` (S5.2, the "Dynamic 3D" page).
+Executed extent: 10,173 of 46,881 B of the 0x5b9f90 body (21.7 %), plus the executed
+0x5cf140 body (5,526 B) and 0x5dbf40 body (7,533 B) for 23,232 B of native code (49.6 %);
+`post_calls_complete` stays false because S1, S4.2, S5.2 and S6..S9 are still contracts/blocked.
 
 ## Callees per slice
 
@@ -137,6 +140,31 @@ Executed extent: 9,279 of 46,881 B of the 0x5b9f90 body (19.8 %), plus the execu
 | `0x5bc377` | group | `0x1266e0b` "Shadow" (6) | `0x1267323` "Shadow Render" (13) | imm:0x30 | ? |
 | `0x5bc3c7` | group | `0x1267323` "Shadow Render" (13) | `0x1267331` "MLAA" (4) | imm:0x30 | ? |
 
+
+## S4.1 executed callee body `0x5dbf40..0x5ddcad` (7,533 B)
+
+| site | kind | parent | text | target / bounds |
+|---|---|---|---|---|
+| `0x5dbfaf` | group | Shadow Render | Particle | - |
+| `0x5dc0bb` | ranged_int | Particle | Soft Particle Mode | cell 0x3004980 guard 0x3004b28 -1..2 |
+| `0x5dc258` | ranged_float | Particle | Soft Particle Fixed Fade | cell 0x3004a58 guard 0x3004c00 0.05..5 |
+| `0x5dc3fe` | ranged_float | Particle | Refract Min Fade | cell 0x3004b30 guard 0x3004cd8 0..50 |
+| `0x5dc5a4` | ranged_float | Particle | Refract Max Fade | cell 0x3004c08 guard 0x3004db0 0.01..50 |
+| `0x5dc74a` | ranged_float | Particle | Camera Min Fade | cell 0x3004ce0 guard 0x3004e88 0..50 |
+| `0x5dc8f0` | ranged_float | Particle | Camera Max Fade | cell 0x3004db8 guard 0x3004f50 0.01..50 |
+| `0x5dca31` | bool_var | Particle | Draw Extend | cell 0x3004e90 guard 0x3005018 item 0x5dcb03 |
+| `0x5dcba3` | bool_var | Particle | Draw Extend2 | cell 0x3004f58 guard 0x30050e0 item 0x5dcc75 |
+| `0x5dcd15` | bool_var | Particle | Draw Blur0 | cell 0x3005020 guard 0x30051a8 item 0x5dcde7 |
+| `0x5dce87` | bool_var | Particle | Draw Blur1 | cell 0x30050e8 guard 0x3005270 item 0x5dcf59 |
+| `0x5dcff9` | bool_var | Particle | Draw FakeVol | cell 0x30051b0 guard 0x3005338 item 0x5dd0cb |
+| `0x5dd16b` | bool_var | Particle | Draw Anim | cell 0x3005278 guard 0x3005400 item 0x5dd23d |
+| `0x5dd2dd` | bool_var | Particle | Draw RandAxis | cell 0x3005340 guard 0x30054c8 item 0x5dd3af |
+| `0x5dd44f` | bool_var | Particle | Draw Refract | cell 0x3005408 guard 0x30055a0 item 0x5dd521 |
+| `0x5dd626` | ranged_int | Particle | Debug Particle Index | cell 0x30054d0 guard 0x3005668 -1..100 |
+| `0x5dd757` | bool_var | Particle | Trim Particles | cell 0x30055a8 guard 0x3005730 item 0x5dd829 |
+| `0x5dd8bd` | bool_var | Particle | Optimize Identical | cell 0x3005670 guard 0x30057f8 item 0x5dd98f |
+| `0x5dda23` | bool_var | Particle | Optimize Null | cell 0x3005738 guard 0x30058c0 item 0x5ddaf5 |
+| `0x5ddb87` | bool_var | Particle | Particle Offscreen Render | cell 0x3005800 no guard item 0x5ddc5c |
 
 ## S2 executed callee body `0x5cf140..0x5d06d6` (5,526 B)
 

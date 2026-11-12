@@ -72,13 +72,13 @@ inline constexpr std::uint64_t kInit5b9f90Rva = 0x5B9F90;
 inline constexpr std::uint64_t kInit5b9f90EndRva = 0x5C56B1;   // exclusive; the ret is at 0x5c56aa
 inline constexpr std::size_t kInit5b9f90Size = 0xB721;         // 46,881 B
 inline constexpr std::size_t kInit5b9f90Instructions = 7645;   // objdump-aligned, [0x5b9f90, 0x5c56b1)
-inline constexpr std::size_t kInit5b9f90ExecutedBytes = 9279;  // S0 177 + S2 site 5 + S3 9,097
-// Native code now executed by the same run, counting the 0x5cf140 callee body (S2) as well.
-inline constexpr std::size_t kInit5b9f90TotalExecutedBytes = 14805;   // 9,279 + 5,526
+inline constexpr std::size_t kInit5b9f90ExecutedBytes = 10173;  // 9,284 + S5.1 889
+// Native code now executed by the same run, counting the executed callee bodies (S2 + S4.1).
+inline constexpr std::size_t kInit5b9f90TotalExecutedBytes = 23232;   // 10,173 + 5,526 + 7,533
 inline constexpr std::uint64_t kInit5b9f90SingleRetRva = 0x5C56AA;
 inline constexpr std::uint64_t kInit5b9f90LoopHeadRva = 0x5C1D50;
 inline constexpr std::uint64_t kInit5b9f90LoopTailRva = 0x5C1E5B;   // jne 0x5c1d50, 33 iterations
-inline constexpr std::uint64_t kInit5b9f90ResumeRva = 0x5BC3D4;   // S4, not lifted
+inline constexpr std::uint64_t kInit5b9f90ResumeRva = 0x5BC78C;   // S5.2
 inline constexpr std::uint32_t kInit5b9f90ItemFlags = 0x30;       // every item in this body
 
 // The two page builders that sit between S0 and S3.
@@ -115,6 +115,34 @@ struct Init5b9f90Slice {
 // Coarse map (the ten slices in the header comment). Instruction and call counts are measured by
 // tools/lift/slice_5b9f90.py; tools/lift/check_init_5b9f90_slices.py re-derives the boundaries from
 // the bytes.
+// S4.1: the 0x5dbf40 "Particle" page body (7,533 B, 1,243 instructions, 177 direct calls, single
+// `ret` at 0x5ddcad, no backward branch). It is decomposed at its constructor clusters: one group,
+// seven bounded variables (two 0xc580 ranged ints, five 0xc300 floats) each with a 0x27120 slider,
+// and twelve 0x20af0 bool variables. The jne/je pairs in the body are the per-cluster `f8f3d0`
+// already-built guards; on the first run every guard is clear, so the observed path visits every
+// cluster once.
+inline constexpr std::uint64_t kInit5dbf40Rva = 0x5DBF40;
+inline constexpr std::uint64_t kInit5dbf40EndRva = 0x5DDCAD;   // the ret byte, exclusive
+inline constexpr std::size_t kInit5dbf40Size = 0x1D6D;         // 7,533 B
+inline constexpr std::uint64_t kInit5dbf40RetRva = 0x5DDCAD;
+inline constexpr std::size_t kInit5dbf40Insns = 1243;
+inline constexpr std::uint64_t kInit5dbf40BoolVarFnVptr = 0x15CBDC0;
+inline constexpr std::uint64_t kInit5dbf40RangedIntTag = 0x15C8450;   // int-family caller tag
+
+// S5.1: the first page of S5, `0x5bc413..0x5bc78c` (889 B, 149 instructions): group "Stereo 3D"
+// under "CP10" and the two bounded floats "Auto Focal Distance" (0..500) and "Auto Distortion"
+// (0..1) with their 0x27120 sliders. S5.2 (the rest of S5, 19,007 B) stays blocked.
+inline constexpr std::uint64_t kInit5b9f90S5Rva = 0x5BC3DE;
+inline constexpr std::uint64_t kInit5b9f90S5_1EndRva = 0x5BC78C;
+inline constexpr std::size_t kInit5b9f90S5_1Size = 0x379;   // 889 B
+
+// S4.2: the 0x7f8930 guard helper (26 instructions, one call at 0x7f895b to 0x7f8610, one `tls`
+// canary compare) needs 0x7f8610's 688-instruction body and the two host globals at 0x3288478 and
+// 0x3288480; it stays blocked with that measured reason.
+inline constexpr std::uint64_t kInit7f8930Rva = 0x7F8930;
+inline constexpr std::uint64_t kInit7f8930EndRva = 0x7F898A;
+inline constexpr std::uint64_t kInit7f8610Rva = 0x7F8610;
+
 inline constexpr Init5b9f90Slice kInit5b9f90Slices[] = {
     {"S0", 0x5B9F90, 0x5BA041, 33, 3, Init5b9f90SliceStatus::executed,
      "frame, canary, group \"Shadow\" under \"CP10\""},
@@ -124,10 +152,10 @@ inline constexpr Init5b9f90Slice kInit5b9f90Slices[] = {
      "0x5cf140 \"Shadow Credits\" body executed natively (5,526 B)"},
     {"S3", 0x5BA04B, 0x5BC3D4, 1460, 245, Init5b9f90SliceStatus::executed,
      "six pages, all executed; ends at 0x5bc3d4"},
-    {"S4", 0x5BC3D4, 0x5BC3DE, 2, 2, Init5b9f90SliceStatus::blocked,
-     "0x5dbf40 + 0x7f8930: callee bodies not lifted"},
-    {"S5", 0x5BC3DE, 0x5C1196, 3245, 452, Init5b9f90SliceStatus::blocked,
-     "\"Stereo 3D\" / \"Dynamic 3D\" / wormhole pages; extraction pending"},
+    {"S4", 0x5BC3D4, 0x5BC3DE, 2, 2, Init5b9f90SliceStatus::partial,
+     "S4.1 0x5dbf40 executed (7,533 B); S4.2 0x7f8930 blocked on 0x7f8610"},
+    {"S5", 0x5BC3DE, 0x5C1196, 3245, 452, Init5b9f90SliceStatus::partial,
+     "S5.1 \"Stereo 3D\" page executed (889 B); S5.2 19,007 B pending"},
     {"S6", 0x5C1196, 0x5C11A0, 2, 2, Init5b9f90SliceStatus::blocked,
      "0x5c94b0 + 0xb25840: callee bodies not lifted"},
     {"S7", 0x5C11A0, 0x5C1D50, 491, 75, Init5b9f90SliceStatus::blocked,
@@ -136,6 +164,29 @@ inline constexpr Init5b9f90Slice kInit5b9f90Slices[] = {
      "the only loop nest (33 iterations over the 0x2dcaa90 table); body pending"},
     {"S9", 0x5C1E61, 0x5C56B1, 2356, 347, Init5b9f90SliceStatus::blocked,
      "\"Performance\" / \"Transparency\" / \"Texture\" / \"Fullscreen Effects Tweaks\"; pending"},
+};
+
+// S4 is decomposed at its two call sites. S4.1 executes the full 0x5dbf40 "Particle" page body;
+// S4.2 is the 0x7f8930 guard helper, which needs 0x7f8610 (688 instructions in its measured window)
+// and the host globals 0x3288478/0x3288480, so it stays blocked with that reason.
+struct Init5b9f90SubSlice {
+    const char* id;
+    std::uint64_t call_site_rva;
+    std::uint64_t callee_rva;
+    std::uint64_t callee_end_rva;
+    Init5b9f90SliceStatus status;
+    const char* reason;
+};
+
+inline constexpr Init5b9f90SubSlice kInit5b9f90SubSlices[] = {
+    {"S4.1", 0x5BC3D4, kInit5dbf40Rva, kInit5dbf40EndRva, Init5b9f90SliceStatus::executed,
+     "0x5dbf40 \"Particle\" page body, 7,533 B, 1,243 insns, 177 calls, 20 items"},
+    {"S4.2", 0x5BC3D9, kInit7f8930Rva, kInit7f8930EndRva, Init5b9f90SliceStatus::blocked,
+     "0x7f8930 needs 0x7f8610 (688 insns) and globals 0x3288478/0x3288480"},
+    {"S5.1", 0x5BC413, kInit5b9f90S5Rva, kInit5b9f90S5_1EndRva, Init5b9f90SliceStatus::executed,
+     "\"Stereo 3D\" page: group + 2 bounded floats/sliders, 889 B, 149 insns"},
+    {"S5.2", 0x5BC78C, kInit5b9f90S5_1EndRva, 0x5C1196, Init5b9f90SliceStatus::blocked,
+     "\"Dynamic 3D\" + wormhole pages, 19,007 B; extraction pending"},
 };
 
 // One menu item exactly as the body builds it. `caption` is the item text (for a named variable it
@@ -291,6 +342,8 @@ inline constexpr std::size_t kInit5cf140Size = 0x1596;   // 5,526 B
 inline constexpr std::uint64_t kInit5cf140RetRva = 0x5D06D6;
 inline constexpr std::uint64_t kInit5cf140BoolVarDtorRva = 0xAD30;   // ranged-var atexit dtor
 
+
+
 enum class Init5cf140ItemKind : std::uint8_t {
     group,
     command,
@@ -298,6 +351,7 @@ enum class Init5cf140ItemKind : std::uint8_t {
     named_external,   // 0x26db0 over a variable constructed by unlifted code (name read from the ELF)
     bool_var,         // 0x20af0 + 0x20d60 + 0x26db0 (same class as S3.4)
     ranged_slider,    // 0xc300 bounded float variable + 0x27120 slider
+    ranged_int_slider,  // 0xc580 bounded int variable + 0x27120 slider (S4.1)
 };
 
 struct Init5cf140ItemSpec {
@@ -357,6 +411,66 @@ inline constexpr Init5cf140ItemSpec kInit5cf140Items[] = {
 inline constexpr std::size_t kInit5cf140ItemsCount =
     sizeof(kInit5cf140Items) / sizeof(kInit5cf140Items[0]);
 
+// S4.1 item table, in body order. `slider_site_rva` is the 0x27120 call for the bounded variables
+// and the 0x26db0 call for the bool variables. The group's page guard (0x3004a50) and the last bool
+// variable's guard are recorded in the map; the host owns all guard storage.
+inline constexpr Init5cf140ItemSpec kInit5dbf40Items[] = {
+    {Init5cf140ItemKind::group, 0x5DBFAF, "Shadow Render", 13, "Particle", 8, nullptr, 0, 0x3004A50, 0,
+     0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5DC0BB, "Particle", 8, "Soft Particle Mode", 18, nullptr, 0,
+     0x3004980, 0x3004B28, 1.0F, 1.0F, -1.0F, 2.0F, 0x5DC153},
+    {Init5cf140ItemKind::ranged_slider, 0x5DC258, "Particle", 8, "Soft Particle Fixed Fade", 24, nullptr,
+     0, 0x3004A58, 0x3004C00, 1.0F, 1.0F, 0.05F, 5.0F, 0x5DC2F9},
+    {Init5cf140ItemKind::ranged_slider, 0x5DC3FE, "Particle", 8, "Refract Min Fade", 16, nullptr, 0,
+     0x3004B30, 0x3004CD8, 1.0F, 1.0F, 0.0F, 50.0F, 0x5DC49F},
+    {Init5cf140ItemKind::ranged_slider, 0x5DC5A4, "Particle", 8, "Refract Max Fade", 16, nullptr, 0,
+     0x3004C08, 0x3004DB0, 1.0F, 1.0F, 0.01F, 50.0F, 0x5DC645},
+    {Init5cf140ItemKind::ranged_slider, 0x5DC74A, "Particle", 8, "Camera Min Fade", 15, nullptr, 0,
+     0x3004CE0, 0x3004E88, 1.0F, 1.0F, 0.0F, 50.0F, 0x5DC7EB},
+    {Init5cf140ItemKind::ranged_slider, 0x5DC8F0, "Particle", 8, "Camera Max Fade", 15, nullptr, 0,
+     0x3004DB8, 0x3004F50, 1.0F, 1.0F, 0.01F, 50.0F, 0x5DC991},
+    {Init5cf140ItemKind::bool_var, 0x5DCA31, "Particle", 8, "Draw Extend", 11, nullptr, 0, 0x3004E90,
+     0x3005018, 0, 0, 0, 0, 0x5DCB03},
+    {Init5cf140ItemKind::bool_var, 0x5DCBA3, "Particle", 8, "Draw Extend2", 12, nullptr, 0, 0x3004F58,
+     0x30050E0, 0, 0, 0, 0, 0x5DCC75},
+    {Init5cf140ItemKind::bool_var, 0x5DCD15, "Particle", 8, "Draw Blur0", 10, nullptr, 0, 0x3005020,
+     0x30051A8, 0, 0, 0, 0, 0x5DCDE7},
+    {Init5cf140ItemKind::bool_var, 0x5DCE87, "Particle", 8, "Draw Blur1", 10, nullptr, 0, 0x30050E8,
+     0x3005270, 0, 0, 0, 0, 0x5DCF59},
+    {Init5cf140ItemKind::bool_var, 0x5DCFF9, "Particle", 8, "Draw FakeVol", 12, nullptr, 0, 0x30051B0,
+     0x3005338, 0, 0, 0, 0, 0x5DD0CB},
+    {Init5cf140ItemKind::bool_var, 0x5DD16B, "Particle", 8, "Draw Anim", 9, nullptr, 0, 0x3005278,
+     0x3005400, 0, 0, 0, 0, 0x5DD23D},
+    {Init5cf140ItemKind::bool_var, 0x5DD2DD, "Particle", 8, "Draw RandAxis", 13, nullptr, 0, 0x3005340,
+     0x30054C8, 0, 0, 0, 0, 0x5DD3AF},
+    {Init5cf140ItemKind::bool_var, 0x5DD44F, "Particle", 8, "Draw Refract", 12, nullptr, 0, 0x3005408,
+     0x30055A0, 0, 0, 0, 0, 0x5DD521},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5DD626, "Particle", 8, "Debug Particle Index", 20, nullptr,
+     0, 0x30054D0, 0x3005668, 1.0F, 1.0F, -1.0F, 100.0F, 0x5DD6C3},
+    {Init5cf140ItemKind::bool_var, 0x5DD757, "Particle", 8, "Trim Particles", 14, nullptr, 0, 0x30055A8,
+     0x3005730, 0, 0, 0, 0, 0x5DD829},
+    {Init5cf140ItemKind::bool_var, 0x5DD8BD, "Particle", 8, "Optimize Identical", 18, nullptr, 0,
+     0x3005670, 0x30057F8, 0, 0, 0, 0, 0x5DD98F},
+    {Init5cf140ItemKind::bool_var, 0x5DDA23, "Particle", 8, "Optimize Null", 13, nullptr, 0, 0x3005738,
+     0x30058C0, 0, 0, 0, 0, 0x5DDAF5},
+    {Init5cf140ItemKind::bool_var, 0x5DDB87, "Particle", 8, "Particle Offscreen Render", 25, nullptr,
+     0, 0x3005800, 0, 0, 0, 0, 0, 0x5DDC5C},
+};
+
+inline constexpr std::size_t kInit5dbf40ItemsCount =
+    sizeof(kInit5dbf40Items) / sizeof(kInit5dbf40Items[0]);
+
+inline constexpr Init5cf140ItemSpec kInit5b9f90S5_1Items[] = {
+    {Init5cf140ItemKind::group, 0x5BC413, "CP10", 4, "Stereo 3D", 9, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_slider, 0x5BC51F, "Stereo 3D", 9, "Auto Focal Distance", 19, nullptr, 0,
+     0x2FEDB58, 0x2FEDC28, 1.0F, 1.0F, 0.0F, 500.0F, 0x5BC5B2},
+    {Init5cf140ItemKind::ranged_slider, 0x5BC6B7, "Stereo 3D", 9, "Auto Distortion", 15, nullptr, 0,
+     0x2FEDC30, 0x2FEDD00, 1.0F, 1.0F, 0.0F, 1.0F, 0x5BC753},
+};
+
+inline constexpr std::size_t kInit5b9f90S5_1ItemsCount =
+    sizeof(kInit5b9f90S5_1Items) / sizeof(kInit5b9f90S5_1Items[0]);
+
 struct Init5b9f90Hooks {
     void* host = nullptr;
     DebugMenuRegistry* menu = nullptr;
@@ -384,10 +498,11 @@ struct Init5b9f90Hooks {
     bool* var_value_storage = nullptr;
     bool* var_guard_storage = nullptr;
     std::size_t var_guard_capacity = 0;
-    // S2: ten bounded float variables and their atexit guards.
+    // S2/S4.1: bounded variables and their atexit guards.
     ConCmdRangedVar* ranged_storage = nullptr;
     std::size_t ranged_capacity = 0;
     float* ranged_value_storage = nullptr;
+    std::int32_t* ranged_int_value_storage = nullptr;
     bool* ranged_guard_storage = nullptr;
     // 0x26b60 builds its text through 0xf1a0; the host supplies the allocator.
     SharedStrCtorHooks separator_alloc{};
@@ -405,6 +520,13 @@ struct Init5b9f90Result {
     int named_vars = 0;
     int separators = 0;
     int sliders = 0;
+    int int_sliders = 0;
+    std::size_t s4_items = 0;
+    std::size_t s4_bytes = 0;
+    bool s4_executed = false;
+    std::size_t s5_items = 0;
+    std::size_t s5_bytes = 0;
+    bool s5_executed = false;
     int registered = 0;
     int releases = 0;
     int destroys = 0;
@@ -414,8 +536,8 @@ struct Init5b9f90Result {
     int executed_slices = 0;
     std::size_t items_used = 0;
     bool canary_stored = false;
-    // Executed sub-slice records handed to the runtime's post-call log (S0, S2 and the six S3 pages).
-    std::array<InitPostCallRecord, 9> records{};
+    // Executed sub-slice records handed to the runtime's post-call log (S0, S2, S3.1..S3.6, S4.1).
+    std::array<InitPostCallRecord, 10> records{};
     std::size_t record_count = 0;
 };
 

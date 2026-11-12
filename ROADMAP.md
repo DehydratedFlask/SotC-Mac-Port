@@ -200,9 +200,15 @@ liftable once the tracer learned stack-slot views, xmm arguments and `mem_f32` c
 tracer then executed **S2** (`0x5cf140..0x5d06d6`, 5,526 B): "Shadow Credits" with its command,
 six separators, the external `cp10_creditsUseNewList` variable, two guarded bool variables and ten
 bounded float sliders. The body extent is now **9,279 of 46,881 B (19.8 %)** and the native code
-executed by the same run is **14,805 B (31.6 %)**; 8 slice records, 1 contract (`0x2170`), resume
-still `0x5bc3d4` because S4's `0x5dbf40` (7,533 B) and `0x7f8930` (90 B) remain unlifted. Full CTest
-**704/704**, G1 **PARTIAL**.
+executed by the same run is **14,805 B (31.6 %)**; 8 slice records, 1 contract (`0x2170`).
+S4 was then decomposed at callee boundaries instead of being left whole: **S4.1** executes the
+`0x5dbf40..0x5ddcad` "Particle" page (7,533 B, 1,243 instructions, 177 calls, single `ret`) with
+its 20 byte-pinned items (2 `0xc580` ranged ints, 5 bounded floats, 12 bool variables), and **S5.1**
+executes the `0x5bc413..0x5bc78c` "Stereo 3D" page (889 B). S4.2 (`0x7f8930`) and S5.2
+(`0x5bc78c..0x5c1196`, 18,954 B) are blocked with recorded offsets and reasons. The body extent is
+now **10,173 of 46,881 B (21.7 %)** and the native code executed by the same run is **23,232 B
+(49.6 %)**; 10 slice records, resume **`0x5bc78c`**, `post_calls_executed` **26**, 1 blocked. Full
+CTest **704/704**, G1 **PARTIAL**.
 Slot **23** (`0xe71990`) is registered via a **private fixture**; consumer/string necessity
 remains unresolved (G1 caveat). Operating plan lives in [HANDOFF](HANDOFF.md) only. Prefer
 session-sized code + checker acceptance over characterization-only docs churn.

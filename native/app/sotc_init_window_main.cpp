@@ -42,12 +42,18 @@ void print_json_string(const char* text) {
 void print_post_calls(const sotc::InitWindowRuntimeResult& r) {
     std::printf("\"post_5b9f90\":{\"native\":%s,\"slices\":%d,\"groups\":%d,\"commands\":%d,"
                 "\"toggles\":%d,\"floats\":%d,\"named_vars\":%d,\"registered\":%d,"
-                "\"releases\":%d,\"destroys\":%d,\"contracts\":%d,\"resume\":\"0x%llx\","
-                "\"complete\":%s},",
+                "\"releases\":%d,\"destroys\":%d,\"separators\":%d,\"sliders\":%d,"
+                "\"int_sliders\":%d,\"s4\":%s,\"s4_items\":%d,\"s4_bytes\":%d,"
+                "\"s5\":%s,\"s5_items\":%d,\"s5_bytes\":%d,"
+                "\"contracts\":%d,\"resume\":\"0x%llx\",\"complete\":%s},",
                 r.post_5b9f90_ok ? "true" : "false", r.post_5b9f90_slices,
                 r.post_5b9f90_groups, r.post_5b9f90_commands, r.post_5b9f90_toggles,
                 r.post_5b9f90_floats, r.post_5b9f90_named_vars, r.post_5b9f90_registered,
-                r.post_5b9f90_releases, r.post_5b9f90_destroys, r.post_5b9f90_contracts,
+                r.post_5b9f90_releases, r.post_5b9f90_destroys, r.post_5b9f90_separators,
+                r.post_5b9f90_sliders, r.post_5b9f90_int_sliders,
+                r.post_5b9f90_s4 ? "true" : "false", r.post_5b9f90_s4_items,
+                r.post_5b9f90_s4_bytes, r.post_5b9f90_s5 ? "true" : "false",
+                r.post_5b9f90_s5_items, r.post_5b9f90_s5_bytes, r.post_5b9f90_contracts,
                 static_cast<unsigned long long>(r.post_5b9f90_resume_rva),
                 r.post_5b9f90_complete ? "true" : "false");
     std::printf("\"post_call_count\":%d,\"post_calls_executed\":%d,"

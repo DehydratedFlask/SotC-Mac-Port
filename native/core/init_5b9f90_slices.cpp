@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "ctor_shapes_343_356.hpp"
+#include "helper_c580_ranged_int.hpp"
 
 namespace sotc {
 namespace {
@@ -175,7 +176,7 @@ bool build_float_item(const BuildContext& ctx, const SharedStr& parent,
 // 0x26db0 named item. The original guards the whole construction with one Itanium guard byte per
 // variable; the host owns the guard bytes and the variable/value storage.
 bool build_bool_var_impl(const BuildContext& ctx, const SharedStr& parent, const char* name_text,
-                         std::uint8_t name_len, std::size_t index) noexcept {
+                         std::uint8_t name_len, std::size_t index, std::uint64_t fn_vptr) noexcept {
     Init5b9f90Result& out = *ctx.out;
     if (std::strlen(name_text) != name_len) return fail(out, "var_name_length_mismatch");
     if (ctx.hooks->registry == nullptr || ctx.hooks->var_storage == nullptr ||
@@ -197,7 +198,7 @@ bool build_bool_var_impl(const BuildContext& ctx, const SharedStr& parent, const
         var.base.vptr = kInit5b9f90BoolVarVptr;
         var.value_ref = reinterpret_cast<std::uint8_t*>(&value);
         var.default_value = value ? 1 : 0;
-        var.fn_vptr = kInit5b9f90BoolVarFnVptr;
+        var.fn_vptr = fn_vptr;
         if (!ctx.hooks->atexit->record(kInit5b9f90BoolVarDtorRva, &var)) {
             return fail(out, "var_atexit_failed");
         }
@@ -227,7 +228,8 @@ bool build_bool_var_impl(const BuildContext& ctx, const SharedStr& parent, const
 
 bool build_named_bool_var(const BuildContext& ctx, const SharedStr& parent,
                           const Init5b9f90ItemSpec& spec, std::size_t index) noexcept {
-    return build_bool_var_impl(ctx, parent, spec.caption, spec.caption_len, index);
+    return build_bool_var_impl(ctx, parent, spec.caption, spec.caption_len, index,
+                               kInit5b9f90BoolVarFnVptr);
 }
 
 // ---- S2, the 0x5cf140 "Shadow Credits" page builder ------------------------------------------
@@ -418,6 +420,188 @@ bool build_page(const BuildContext& ctx, const Init5b9f90PageSpec& page,
 
 }  // namespace
 
+// ---- S4.1, the 0x5dbf40 "Particle" page builder ---------------------------------------------
+
+bool build_s4_group(const BuildContext& ctx, const Init5cf140ItemSpec& spec,
+                    bool release_parent = true, bool destroy = true) noexcept {
+    Init5b9f90Result& out = *ctx.out;
+    if (std::strlen(spec.parent) != spec.parent_len || std::strlen(spec.text) != spec.text_len) {
+        return fail(out, "s4_group_view_length_mismatch");
+    }
+    const SharedStr parent = borrowed(spec.parent, spec.parent_len);
+    const SharedStr caption = borrowed(spec.text, spec.text_len);
+    DebugMenuItem* const item = next_item(ctx);
+    if (item == nullptr) return fail(out, "item_storage_exhausted");
+    if (!init_menu_group_26c10(*item, parent, caption, kInit5b9f90ItemFlags)) {
+        return fail(out, "s4_group_ctor_failed");
+    }
+    ++out.groups;
+    if (!register_menu_item_268b0(*item, *ctx.hooks->menu, *ctx.hooks->atexit).ok) {
+        return fail(out, "s4_group_register_failed");
+    }
+    ++out.registered;
+    if (destroy) ++out.destroys;   // the body's 0x272d0 destroy follows the group
+    // S5.1's group has no release in the body; S4.1's does.
+    if (release_parent && !release(ctx, parent)) return fail(out, "s4_group_release_failed");
+    return true;
+}
+
+bool build_s4_ranged_float(const BuildContext& ctx, const Init5cf140ItemSpec& spec,
+                           std::size_t index) noexcept {
+    Init5b9f90Result& out = *ctx.out;
+    if (ctx.hooks->registry == nullptr || ctx.hooks->ranged_storage == nullptr ||
+        ctx.hooks->ranged_value_storage == nullptr || ctx.hooks->ranged_guard_storage == nullptr ||
+        index >= ctx.hooks->ranged_capacity) {
+        return fail(out, "s4_ranged_state_missing");
+    }
+    const SharedStr parent = borrowed(spec.parent, spec.parent_len);
+    const SharedStr name = borrowed(spec.text, spec.text_len);
+    const SharedStr empty = borrowed("", 0);
+    ConCmdRangedVar& var = ctx.hooks->ranged_storage[index];
+    bool& guard = ctx.hooks->ranged_guard_storage[index];
+    float& value = ctx.hooks->ranged_value_storage[index];
+    if (!guard) {
+        var = ConCmdRangedVar{};
+        RangedVarArgs args{};
+        args.fn_vptr = 0x15CBDA0;   // the float-family caller tag at every 0xc300 site in this body
+        if (!init_bounded_float_var_c300(var, name, &value, spec.var_lo, spec.var_hi, 1, args, empty)) {
+            return fail(out, "s4_ranged_ctor_failed");
+        }
+        if (!ctx.hooks->atexit->record(kInit5cf140BoolVarDtorRva, &var)) {
+            return fail(out, "s4_ranged_atexit_failed");
+        }
+        if (!register_concmd_20d60(var.base, *ctx.hooks->registry).ok) {
+            return fail(out, "s4_ranged_register_failed");
+        }
+        guard = true;
+    }
+    DebugMenuItem* const item = next_item(ctx);
+    if (item == nullptr) return fail(out, "item_storage_exhausted");
+    if (!init_debug_menu_item_27120(*item, parent, var.base, kInit5b9f90ItemFlags, spec.lo, spec.hi)) {
+        return fail(out, "s4_slider_ctor_failed");
+    }
+    ++out.sliders;
+    if (!register_menu_item_268b0(*item, *ctx.hooks->menu, *ctx.hooks->atexit).ok) {
+        return fail(out, "s4_slider_register_failed");
+    }
+    ++out.registered;
+    ++out.destroys;
+    if (!release(ctx, name) || !release(ctx, empty)) return fail(out, "s4_ranged_release_failed");
+    return true;
+}
+
+bool build_s4_ranged_int(const BuildContext& ctx, const Init5cf140ItemSpec& spec,
+                         std::size_t index) noexcept {
+    Init5b9f90Result& out = *ctx.out;
+    if (ctx.hooks->registry == nullptr || ctx.hooks->ranged_storage == nullptr ||
+        ctx.hooks->ranged_int_value_storage == nullptr || ctx.hooks->ranged_guard_storage == nullptr ||
+        index >= ctx.hooks->ranged_capacity) {
+        return fail(out, "s4_ranged_int_state_missing");
+    }
+    const SharedStr parent = borrowed(spec.parent, spec.parent_len);
+    const SharedStr name = borrowed(spec.text, spec.text_len);
+    const SharedStr empty = borrowed("", 0);
+    ConCmdRangedVar& var = ctx.hooks->ranged_storage[index];
+    bool& guard = ctx.hooks->ranged_guard_storage[index];
+    std::int32_t& value = ctx.hooks->ranged_int_value_storage[index];
+    if (!guard) {
+        var = ConCmdRangedVar{};
+        RangedVarArgs args{};
+        args.fn_vptr = kInit5dbf40RangedIntTag;
+        const HelperCtorResult r = helper_c580_ranged_int(
+            var, name, &value, static_cast<std::int32_t>(spec.var_lo),
+            static_cast<std::int32_t>(spec.var_hi), 1, args, empty);
+        if (!r.ok) return fail(out, "s4_ranged_int_ctor_failed");
+        if (!ctx.hooks->atexit->record(kInit5cf140BoolVarDtorRva, &var)) {
+            return fail(out, "s4_ranged_int_atexit_failed");
+        }
+        if (!register_concmd_20d60(var.base, *ctx.hooks->registry).ok) {
+            return fail(out, "s4_ranged_int_register_failed");
+        }
+        guard = true;
+    }
+    DebugMenuItem* const item = next_item(ctx);
+    if (item == nullptr) return fail(out, "item_storage_exhausted");
+    if (!init_debug_menu_item_27120(*item, parent, var.base, kInit5b9f90ItemFlags, spec.lo, spec.hi)) {
+        return fail(out, "s4_int_slider_ctor_failed");
+    }
+    ++out.int_sliders;
+    if (!register_menu_item_268b0(*item, *ctx.hooks->menu, *ctx.hooks->atexit).ok) {
+        return fail(out, "s4_int_slider_register_failed");
+    }
+    ++out.registered;
+    ++out.destroys;
+    if (!release(ctx, name) || !release(ctx, empty)) return fail(out, "s4_ranged_int_release_failed");
+    return true;
+}
+
+bool build_s4_bool(const BuildContext& ctx, const Init5cf140ItemSpec& spec,
+                   std::size_t index) noexcept {
+    if (!build_bool_var_impl(ctx, borrowed(spec.parent, spec.parent_len), spec.text, spec.text_len,
+                             index, kInit5dbf40BoolVarFnVptr)) {
+        return false;
+    }
+    Init5b9f90Result& out = *ctx.out;
+    // The body's 0x272d0 destroy follows each bool item; the item site is byte-pinned in the table.
+    if (spec.slider_site_rva == 0) return fail(out, "s4_bool_item_site_missing");
+    ++out.destroys;
+    return true;
+}
+
+// S5.1: the 0x5bc413..0x5bc78c "Stereo 3D" page (group + two bounded floats and sliders).
+bool run_s5_1(const BuildContext& ctx) noexcept {
+    Init5b9f90Result& out = *ctx.out;
+    const int registered_before = out.registered;
+    std::size_t ranged_index = 17;   // S2 uses 0..9, S4 uses 10..16
+    for (std::size_t i = 0; i < kInit5b9f90S5_1ItemsCount; ++i) {
+        const Init5cf140ItemSpec& spec = kInit5b9f90S5_1Items[i];
+        const bool ok = spec.kind == Init5cf140ItemKind::group
+                            ? build_s4_group(ctx, spec, false, false)
+                            : build_s4_ranged_float(ctx, spec, ranged_index++);
+        if (!ok) return false;
+    }
+    out.s5_items = static_cast<std::size_t>(out.registered - registered_before);
+    out.s5_bytes = kInit5b9f90S5_1Size;
+    out.s5_executed = true;
+    add_record(out, "S5.1", kInit5b9f90S5_1EndRva - kInit5b9f90S5_1Size, kInit5b9f90S5_1EndRva,
+               "0x5bc413 \"Stereo 3D\": group + Auto Focal Distance 0..500 + Auto Distortion 0..1");
+    ++out.executed_slices;
+    return true;
+}
+
+bool run_s4(const BuildContext& ctx) noexcept {
+    Init5b9f90Result& out = *ctx.out;
+    const int registered_before = out.registered;
+    std::size_t bool_index = 7;      // S3 uses 0..3, S2 uses 4..6
+    std::size_t ranged_index = 10;   // S2 uses 0..9
+    for (std::size_t i = 0; i < kInit5dbf40ItemsCount; ++i) {
+        const Init5cf140ItemSpec& spec = kInit5dbf40Items[i];
+        bool ok = false;
+        switch (spec.kind) {
+            case Init5cf140ItemKind::group: ok = build_s4_group(ctx, spec); break;
+            case Init5cf140ItemKind::ranged_slider:
+                ok = build_s4_ranged_float(ctx, spec, ranged_index++);
+                break;
+            case Init5cf140ItemKind::ranged_int_slider:
+                ok = build_s4_ranged_int(ctx, spec, ranged_index++);
+                break;
+            case Init5cf140ItemKind::bool_var: ok = build_s4_bool(ctx, spec, bool_index++); break;
+            default: return fail(out, "s4_unknown_item_kind");
+        }
+        if (!ok) return false;
+    }
+    out.s4_items = static_cast<std::size_t>(out.registered - registered_before);
+    // The body releases its last stack view once after the final item.
+    if (!release(ctx, borrowed("", 0))) return false;
+    out.s4_executed = true;
+    out.s4_bytes = kInit5dbf40Size;
+    add_record(out, "S4.1", kInit5dbf40Rva, kInit5dbf40EndRva,
+               "0x5dbf40 \"Particle\": 1 group, 2 ranged ints, 5 bounded floats, 12 bool variables, "
+               "7 sliders, 20 destroys");
+    ++out.executed_slices;
+    return true;
+}
+
 Init5b9f90Result run_init_5b9f90_slices(const Init5b9f90Hooks& hooks) noexcept {
     Init5b9f90Result out{};
     if (hooks.host == nullptr || hooks.menu == nullptr || hooks.atexit == nullptr ||
@@ -468,11 +652,14 @@ Init5b9f90Result run_init_5b9f90_slices(const Init5b9f90Hooks& hooks) noexcept {
                 break;
             case Init5cf140ItemKind::bool_var:
                 ok = build_bool_var_impl(ctx, borrowed(spec.parent, spec.parent_len), spec.text,
-                                         spec.text_len, s2_var_index++);
+                                         spec.text_len, s2_var_index++, kInit5b9f90BoolVarFnVptr);
                 break;
             case Init5cf140ItemKind::ranged_slider:
                 ok = build_s2_ranged(ctx, spec, s2_ranged_index++);
                 break;
+            case Init5cf140ItemKind::ranged_int_slider:
+                fail(out, "s2_ranged_int_unsupported");
+                return out;
         }
         if (!ok) return out;
         ++out.s2_items;
@@ -486,7 +673,7 @@ Init5b9f90Result run_init_5b9f90_slices(const Init5b9f90Hooks& hooks) noexcept {
                "10 bounded floats + sliders, 21 destroys");
     ++out.executed_slices;
 
-    // S3.1..S3.6 in body order. Execution stops after S3.6 by construction (S4 is unlifted).
+    // S3.1..S3.6 in body order.
     std::size_t toggle_index = 0;
     std::size_t var_index = 0;
     for (const Init5b9f90PageSpec& page : kInit5b9f90Pages) {
@@ -495,7 +682,13 @@ Init5b9f90Result run_init_5b9f90_slices(const Init5b9f90Hooks& hooks) noexcept {
         ++out.executed_slices;
     }
 
-    // Everything from 0x5bc3d4 on (S4 ... S9) is unlifted.
+    // S4.1 executes; S4.2 (the 0x7f8930 guard helper) stays a named contract on its measured reason.
+    if (!run_s4(ctx)) return out;
+    ++out.contracts;
+    // S5.1 executes the "Stereo 3D" page; S5.2 and S6..S9 stay blocked.
+    if (!run_s5_1(ctx)) return out;
+
+    // Everything from 0x5bc78c on (S5.2 ... S9) is unlifted.
     out.resume_rva = kInit5b9f90ResumeRva;
     out.complete = false;
     out.ok = true;

@@ -5126,6 +5126,16 @@
         "header": "native/core/helper_5b5530_vector_dtors.hpp"
       }
     ],
+    "0x5bc78c": [
+      {
+        "constant": "kInit5b9f90Resume",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      },
+      {
+        "constant": "kInit5b9f90S5_1End",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
     "0x5c64c0": [
       {
         "constant": "kInit531d60PostBase5c64c0Target",
@@ -5153,6 +5163,16 @@
       },
       {
         "constant": "kInit5cf140Ret",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x5ddcad": [
+      {
+        "constant": "kInit5dbf40End",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      },
+      {
+        "constant": "kInit5dbf40Ret",
         "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
@@ -18328,9 +18348,19 @@
         "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
-    "0x5bc3d4": [
+    "0x5bc3de": [
+      {
+        "constant": "kInit5b9f90S5",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x5bc78c": [
       {
         "constant": "kInit5b9f90Resume",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      },
+      {
+        "constant": "kInit5b9f90S5_1End",
         "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
@@ -18434,6 +18464,22 @@
       {
         "constant": "kSlot406",
         "header": "native/core/ctor_tiny_misc_slots.hpp"
+      }
+    ],
+    "0x5dbf40": [
+      {
+        "constant": "kInit5dbf40",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x5ddcad": [
+      {
+        "constant": "kInit5dbf40End",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      },
+      {
+        "constant": "kInit5dbf40Ret",
+        "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
     "0x5e7c10": [
@@ -19400,6 +19446,24 @@
       {
         "constant": "kStaffroll7f7220End",
         "header": "native/core/init_post_bodies.hpp"
+      }
+    ],
+    "0x7f8610": [
+      {
+        "constant": "kInit7f8610",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x7f8930": [
+      {
+        "constant": "kInit7f8930",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x7f898a": [
+      {
+        "constant": "kInit7f8930End",
+        "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
     "0x7fc530": [
@@ -23121,9 +23185,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 3032,
-    "distinct_rvas": 1943,
-    "duplicate_rvas": 457,
+    "constants": 3040,
+    "distinct_rvas": 1949,
+    "duplicate_rvas": 459,
     "headers": 584
   }
 }

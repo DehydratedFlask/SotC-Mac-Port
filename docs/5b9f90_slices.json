@@ -1,12 +1,36 @@
 {
- "executed_bytes": 9274,
- "resume_rva": 6013908,
+ "executed_bytes": 10173,
+ "total_executed_bytes": 23232,
+ "resume_rva": 6014860,
  "body": {
   "rva": 6004624,
   "end_rva": 6051505,
   "size": 46881,
   "instructions": 7645,
   "direct_calls_to_modelled_targets": 491
+ },
+ "s4": {
+  "s4_1": {
+   "id": "S4.1",
+   "call_site": 6013908,
+   "rva": 6143808,
+   "end_rva": 6151341,
+   "size": 7533,
+   "insns": 1243,
+   "calls": 177,
+   "items": 20,
+   "status": "executed"
+  },
+  "s4_2": {
+   "id": "S4.2",
+   "call_site": 6013913,
+   "rva": 8358192,
+   "end_rva": 8358282,
+   "insns": 26,
+   "calls_to": 8357392,
+   "status": "blocked",
+   "reason": "needs 0x7f8610 (688 insns) and host globals 0x3288478/0x3288480"
+  }
  },
  "s2": {
   "id": "S2",
@@ -19,6 +43,25 @@
   "items": 21,
   "status": "executed",
   "executed_by": "native/core/init_5b9f90_slices.cpp (run_init_5b9f90_slices)"
+ },
+ "s5": {
+  "s5_1": {
+   "id": "S5.1",
+   "rva": 6013971,
+   "end_rva": 6014860,
+   "size": 889,
+   "insns": 149,
+   "items": 3,
+   "status": "executed"
+  },
+  "s5_2": {
+   "id": "S5.2",
+   "rva": 6014860,
+   "end_rva": 6033814,
+   "size": 18954,
+   "status": "blocked",
+   "reason": "\"Dynamic 3D\" and wormhole pages (19,007 B) still need item extraction"
+  }
  },
  "slices": [
   {

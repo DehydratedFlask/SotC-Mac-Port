@@ -33,13 +33,24 @@ ELF_SHA256 = 'd0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3'
 BODY = 0x5B9F90
 BODY_END = 0x5C56B1          # exclusive
 BODY_SIZE = 0xB721           # 46,881
-EXECUTED_SIZE = 9279         # S0 177 + S2 call site 5 + S3 9,097 (body extent)
+EXECUTED_SIZE = 10173        # 9,284 + S5.1 889 (body extent)
+S5_1_START = 0x5BC413
+S5_1_END = 0x5BC78C
+S5_1_SIZE = 0x379
+S4_START = 0x5DBF40
+S4_END = 0x5DDCAD            # the ret byte, exclusive
+S4_SIZE = 0x1D6D             # 7,533
+S4_INSNS = 1243
+S4_CALLS = 177
+S4_RET = 0x5DDCAD
+S7F8930_END = 0x7F898A
+S7F8930_CALLS = 0x7F8610
 S2_START = 0x5CF140
 S2_END = 0x5D06D6            # exclusive
 S2_SIZE = 0x1596             # 5,526
 S2_RET = 0x5D06D6
-TOTAL_EXECUTED = 14805       # 9,279 + 5,526
-RESUME_RVA = 0x5BC3D4
+TOTAL_EXECUTED = 23232       # 10,173 + 5,526 + 7,533
+RESUME_RVA = 0x5BC78C
 SEPARATOR_CTOR = 0x26B60
 RANGED_CTOR = 0xC300
 SLIDER_CTOR = 0x27120
@@ -72,6 +83,30 @@ PAGE_RE = re.compile(r'\{"(S3\.\d)", "([^"]*)", (\d+), "([^"]*)", (\d+), '
 ITEM_RE = re.compile(r'\{Init5b9f90ItemKind::(\w+), 0x([0-9A-F]+), "([^"]*)", (\d+), '
                      r'(nullptr|"([^"]*)"), (\d+),\s*0x([0-9A-F]+),\s*'
                      r'([0-9.]+)(?:F)?,\s*([0-9.]+)(?:F)?,\s*(0x[0-9A-F]+|0)\},')
+
+
+def split_args(block: str) -> list[str]:
+    out, cur, depth, quote = [], '', 0, False
+    for ch in block:
+        if ch == '"':
+            quote = not quote
+        if not quote:
+            if ch in '{([':
+                depth += 1
+            elif ch in '})]':
+                depth -= 1
+            elif ch == ',' and depth == 0:
+                out.append(cur.strip())
+                cur = ''
+                continue
+        cur += ch
+    if cur.strip():
+        out.append(cur.strip())
+    return out
+
+
+def f32(s: str) -> float:
+    return float(s.rstrip('Ff'))
 
 
 def require(cond, what):
@@ -182,16 +217,146 @@ def main() -> int:
                     sid + ' contract names a page builder')
     require([s[0] for s in slice_table if s[5] == 'executed'] == ['S0', 'S2', 'S3'],
             'executed coarse slices are S0, S2 and S3')
-    require(not [s for s in slice_table if s[5] == 'partial'], 'no partial coarse slice')
+    require([s[0] for s in slice_table if s[5] == 'partial'] == ['S4', 'S5'],
+            'partial coarse slices are S4 and S5')
+
     require([s[0] for s in slice_table if s[5] == 'contract'] == ['S1'],
             'the 0x2170 page builder stays the only contract')
-    executed = sum(s[2] - s[1] for s in slice_table if s[0] in ('S0', 'S2', 'S3'))
-    require(executed == EXECUTED_SIZE, 'executed extent ' + str(executed) + ' != 9279')
+    # S4 contributes only its executed S4.1 call site (5 B), not the 5 B blocked S4.2 site.
+    executed = sum(s[2] - s[1] for s in slice_table if s[0] in ('S0', 'S2', 'S3')) + 5 + 889
+    require(executed == EXECUTED_SIZE, 'executed extent ' + str(executed) + ' != 10173')
     header_text = HEADER.read_text()
-    require('kInit5b9f90ExecutedBytes = 9279' in header_text, 'executed-bytes constant')
-    require('kInit5b9f90TotalExecutedBytes = 14805' in header_text, 'total executed-bytes constant')
+    require('kInit5b9f90ExecutedBytes = 10173' in header_text, 'executed-bytes constant')
+    require('kInit5b9f90TotalExecutedBytes = 23232' in header_text, 'total executed-bytes constant')
     require(S2_END - S2_START == S2_SIZE == 5526, 'S2 size constant')
-    require('kInit5b9f90ResumeRva = 0x5BC3D4' in header_text, 'resume constant')
+    require('kInit5b9f90ResumeRva = 0x5BC78C' in header_text, 'resume constant')
+
+    # ---- S5.1: the 0x5bc413..0x5bc78c "Stereo 3D" page ---------------------------------------
+    s51 = smap.disassemble_range(S5_1_START, S5_1_END)
+    require(len(s51) == 149, 'S5.1 instruction count ' + str(len(s51)))
+    require(S5_1_END - S5_1_START == S5_1_SIZE == 889, 'S5.1 size')
+    s51_by_addr = {a: (m, o) for a, m, o, _ in s51}
+    require(s51_by_addr.get(0x5BC413, ('',))[0] == 'callq' and
+            call_target_ok(img, 0x5BC413, GROUP_CTOR), 'S5.1 group ctor')
+    s51_rows = []
+    s51_offset = header_text.index('kInit5b9f90S5_1Items')
+    for m in re.finditer(r'\{Init5cf140ItemKind::(\w+),(.*?)\},\n', header_text, re.S):
+        if m.start() < s51_offset:
+            continue
+        args = split_args(m.group(2))
+        require(len(args) == 14, 'S5.1 row arity')
+        s51_rows.append((m.group(1), [a.strip('"') for a in args]))
+    require(len(s51_rows) == 3, 'S5.1 rows ' + str(len(s51_rows)))
+    for kind, a in s51_rows:
+        site = int(a[0], 16)
+        if kind == 'group':
+            require(0x5BC413 <= site < S5_1_END, 'S5.1 group site')
+            require(len(a[1]) == int(a[2]) and len(a[3]) == int(a[4]), 'S5.1 group views')
+            continue
+        require(call_target_ok(img, site, RANGED_CTOR), 'S5.1 ranged ctor at ' + hex(site))
+        target = int(a[7], 16)
+        guard = int(a[8], 16)
+        item_site = int(a[13], 16)
+        require(call_target_ok(img, item_site, SLIDER_CTOR), 'S5.1 slider at ' + hex(item_site))
+        leas = set()
+        for x, _m, o, _r in s51:
+            if site - 0x140 <= x < item_site + 0x60:
+                leas.update(lee_targets(o))
+        require(target in leas and guard in leas, 'S5.1 cell/guard at ' + hex(site))
+        require(any(read_cstr(img, va) == a[3] for va in leas), 'S5.1 name at ' + hex(site))
+        for val in (f32(a[11]), f32(a[12])):
+            raw = b''.join(bytes.fromhex(r) for x, _m, _o, r in s51 if site - 0x120 <= x < site)
+            require(pack('<f', val) in raw, 'S5.1 bound %r' % val)
+
+    # ---- S4.1: the 0x5dbf40 "Particle" body executed by the same run ---------------------------
+    require(img.read(S4_START, 1) == b'\x55', 'S4.1 starts with pushq %rbp')
+    s4 = smap.disassemble_range(S4_START, S4_END + 1)
+    s4_body = [x for x in s4 if x[0] < S4_END]
+    s4_by_addr = {a: (m, o) for a, m, o, _ in s4_body}
+    require(len(s4_body) == S4_INSNS, 'S4.1 instruction count ' + str(len(s4_body)))
+    require([a for a, m, _, _ in s4 if m.startswith('ret')] == [S4_RET], 'S4.1 single ret')
+    s4_calls = [(a, int(o.split()[0], 16)) for a, m, o, _ in s4_body
+                if m == 'callq' and o.startswith('0x')]
+    require(len(s4_calls) == S4_CALLS, 'S4.1 direct call count ' + str(len(s4_calls)))
+    require(not [a for a, m, o, _ in s4_body if m.startswith('j') and
+                 (re.search(r'^0x([0-9a-f]+)', o) and int(re.search(r'^0x([0-9a-f]+)', o).group(1), 16) < a)],
+            'S4.1 has no backward branch')
+    require(S4_END - S4_START == S4_SIZE == 7533, 'S4.1 size constant')
+
+    s4_rows = []
+    s4_offset = header_text.index('kInit5dbf40Items')
+    s5_offset = header_text.index('kInit5b9f90S5_1Items')
+    for m in re.finditer(r'\{Init5cf140ItemKind::(\w+),(.*?)\},\n', header_text, re.S):
+        if m.start() < s4_offset or m.start() >= s5_offset:
+            continue
+        args = split_args(m.group(2))
+        require(len(args) == 14, 'S4 row arity ' + m.group(1))
+        s4_rows.append((m.group(1), [a.strip('"') for a in args]))
+    s4_table = s4_rows
+    require(len(s4_table) == 20, 'S4.1 item rows ' + str(len(s4_table)))
+    s4_counts = {}
+    for kind, a in s4_table:
+        s4_counts[kind] = s4_counts.get(kind, 0) + 1
+        site = int(a[0], 16)
+        parent, plen = a[1], int(a[2])
+        text, tlen = a[3], int(a[4])
+        require(len(parent) == plen and len(text) == tlen, 'S4 view lengths at ' + hex(site))
+        guard = int(a[8], 16) if a[8] != '0' else 0
+        target = int(a[7], 16) if a[7] != '0' else 0
+        item_site = int(a[13], 16) if a[13] != '0' else 0
+        leas = set()
+        limit = item_site + 0x60 if item_site else site + 0x60
+        for x, _m, o, _r in s4_body:
+            if site - 0x140 <= x < limit:
+                leas.update(lee_targets(o))
+        if kind == 'group':
+            require(s4_by_addr.get(site, ('',))[0] == 'callq' and call_target_ok(img, site, GROUP_CTOR),
+                    'S4 group ctor')
+            require(any(read_cstr(img, va) == text for va in leas), 'S4 group caption')
+            continue
+        if kind in ('ranged_slider', 'ranged_int_slider'):
+            ctor = RANGED_CTOR if kind == 'ranged_slider' else 0xC580
+            require(call_target_ok(img, site, ctor), 'S4 ' + kind + ' ctor at ' + hex(site))
+            require(target in leas, 'S4 variable cell 0x%x' % target)
+            require(guard in leas, 'S4 variable guard 0x%x' % guard)
+            require(any(read_cstr(img, va) == text for va in leas), 'S4 variable name at ' + hex(site))
+            require(item_site and call_target_ok(img, item_site, SLIDER_CTOR),
+                    'S4 slider ctor at ' + hex(item_site))
+            raw_window = b''.join(bytes.fromhex(r) for x, _m, _o, r in s4_body
+                                  if site - 0x120 <= x < site)
+            for val in (f32(a[11]), f32(a[12])):
+                if kind == 'ranged_int_slider':
+                    require(pack('<I', int(val) & 0xFFFFFFFF) in raw_window,
+                            'S4 int bound %d' % int(val))
+                else:
+                    require(pack('<f', val) in raw_window, 'S4 float bound %r' % val)
+            continue
+        if kind == 'bool_var':
+            require(call_target_ok(img, site, BASE_CTOR), 'S4 bool ctor at ' + hex(site))
+            window = set()
+            for x, _m, o, _r in s4_body:
+                if site <= x < site + 0x140:
+                    window.update(lee_targets(o))
+            require(target in window, 'S4 bool cell at ' + hex(site))
+            if guard:
+                require(guard in window, 'S4 bool guard at ' + hex(site))   # the last item has none
+            require(BOOL_VAR_DTOR in window, 'S4 bool dtor 0xacf0')
+            require(item_site and call_target_ok(img, item_site, NAMED_CTOR),
+                    'S4 bool item at ' + hex(item_site))
+            continue
+        raise SystemExit('FAIL unknown S4 kind ' + kind)
+    require(s4_counts.get('group') == 1, 'S4 one group')
+    require(s4_counts.get('ranged_slider') == 5, 'S4 five bounded floats')
+    require(s4_counts.get('ranged_int_slider') == 2, 'S4 two ranged ints')
+    require(s4_counts.get('bool_var') == 12, 'S4 twelve bool variables')
+
+    # S4.2: the 0x7f8930 guard helper, pinned as blocked on its measured shape.
+    require(img.read(0x7F8930, 1) == b'\x55', 'S4.2 starts with pushq %rbp')
+    s42 = smap.disassemble_range(0x7F8930, S7F8930_END + 1)
+    require(len(s42) == 26, 'S4.2 instruction count')
+    require([a for a, m, _, _ in s42 if m.startswith('ret')] == [0x7F898A], 'S4.2 single ret')
+    require(call_target_ok(img, 0x7F895B, S7F8930_CALLS), 'S4.2 calls 0x7f8610')
+    require('S4.2' in header_text and '0x7f8610' in header_text, 'S4.2 blocked reason recorded')
 
     # ---- S2: the 0x5cf140 "Shadow Credits" body executed by the same run ----------------------
     require(img.read(S2_START, 1) == b'\x55', 'S2 starts with pushq %rbp')
@@ -207,27 +372,10 @@ def main() -> int:
     require(len(s2_calls) == 132, 'S2 direct call count ' + str(len(s2_calls)))
 
     # Parse the 21-item table with a tolerant top-level comma split.
-    def split_args(block: str) -> list[str]:
-        out, cur, depth, quote = [], '', 0, False
-        for ch in block:
-            if ch == '"':
-                quote = not quote
-            if not quote:
-                if ch in '{([':
-                    depth += 1
-                elif ch in '})]':
-                    depth -= 1
-                elif ch == ',' and depth == 0:
-                    out.append(cur.strip())
-                    cur = ''
-                    continue
-            cur += ch
-        if cur.strip():
-            out.append(cur.strip())
-        return out
-
     s2_rows = []
     for m in re.finditer(r'\{Init5cf140ItemKind::(\w+),(.*?)\},\n', header_text, re.S):
+        if m.start() >= s4_offset:
+            continue
         args = split_args(m.group(2))
         require(len(args) == 14, 'S2 row arity ' + m.group(1) + ': ' + str(len(args)))
         s2_rows.append((m.group(1), [a.strip('"') for a in args]))
@@ -273,9 +421,6 @@ def main() -> int:
                     'S2 0x26db0 after bool var at ' + hex(site))
         elif kind == 'ranged_slider':
             require(call_target_ok(img, site, RANGED_CTOR), 'S2 0xc300 at ' + hex(site))
-            def f32(s: str) -> float:
-                return float(s.rstrip('Ff'))
-
             lo, hi = f32(a[9]), f32(a[10])
             vlo, vhi = f32(a[11]), f32(a[12])
             slider_site = int(a[13], 16)

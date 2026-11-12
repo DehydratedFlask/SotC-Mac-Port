@@ -171,6 +171,15 @@ struct InitWindowRuntimeResult {
     int post_5b9f90_registered = 0;
     int post_5b9f90_releases = 0;
     int post_5b9f90_destroys = 0;
+    int post_5b9f90_separators = 0;
+    int post_5b9f90_sliders = 0;
+    int post_5b9f90_int_sliders = 0;
+    int post_5b9f90_s4_items = 0;
+    int post_5b9f90_s4_bytes = 0;
+    bool post_5b9f90_s4 = false;
+    bool post_5b9f90_s5 = false;
+    int post_5b9f90_s5_items = 0;
+    int post_5b9f90_s5_bytes = 0;
     int post_5b9f90_contracts = 0;
     std::uint64_t post_5b9f90_resume_rva = 0;
     bool post_5b9f90_complete = false;
