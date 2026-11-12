@@ -4,6 +4,8 @@
 #include <cstdio>
 #include <cstring>
 
+#include "ctor_shapes_343_356.hpp"
+
 namespace sotc {
 namespace {
 
@@ -172,10 +174,10 @@ bool build_float_item(const BuildContext& ctx, const SharedStr& parent,
 // 0x20af0 base ctor, the bool-class stores, __cxa_atexit(0xacf0), 0x20d60 registration and the
 // 0x26db0 named item. The original guards the whole construction with one Itanium guard byte per
 // variable; the host owns the guard bytes and the variable/value storage.
-bool build_named_bool_var(const BuildContext& ctx, const SharedStr& parent,
-                          const Init5b9f90ItemSpec& spec, std::size_t index) noexcept {
+bool build_bool_var_impl(const BuildContext& ctx, const SharedStr& parent, const char* name_text,
+                         std::uint8_t name_len, std::size_t index) noexcept {
     Init5b9f90Result& out = *ctx.out;
-    if (std::strlen(spec.caption) != spec.caption_len) return fail(out, "var_name_length_mismatch");
+    if (std::strlen(name_text) != name_len) return fail(out, "var_name_length_mismatch");
     if (ctx.hooks->registry == nullptr || ctx.hooks->var_storage == nullptr ||
         ctx.hooks->var_value_storage == nullptr || ctx.hooks->var_guard_storage == nullptr ||
         ctx.hooks->atexit == nullptr) {
@@ -184,7 +186,7 @@ bool build_named_bool_var(const BuildContext& ctx, const SharedStr& parent,
     if (index >= ctx.hooks->var_capacity || index >= ctx.hooks->var_guard_capacity) {
         return fail(out, "var_storage_exhausted");
     }
-    const SharedStr name = borrowed(spec.caption, spec.caption_len);
+    const SharedStr name = borrowed(name_text, name_len);
     const SharedStr empty = borrowed("", 0);
     ConCmdBoolVar& var = ctx.hooks->var_storage[index];
     bool& value = ctx.hooks->var_value_storage[index];
@@ -220,6 +222,156 @@ bool build_named_bool_var(const BuildContext& ctx, const SharedStr& parent,
     ++out.registered;
     // The body releases both stack views after the variable definition.
     if (!release(ctx, name) || !release(ctx, empty)) return fail(out, "var_release_failed");
+    return true;
+}
+
+bool build_named_bool_var(const BuildContext& ctx, const SharedStr& parent,
+                          const Init5b9f90ItemSpec& spec, std::size_t index) noexcept {
+    return build_bool_var_impl(ctx, parent, spec.caption, spec.caption_len, index);
+}
+
+// ---- S2, the 0x5cf140 "Shadow Credits" page builder ------------------------------------------
+
+bool build_s2_group(const BuildContext& ctx, const Init5cf140ItemSpec& spec) noexcept {
+    Init5b9f90Result& out = *ctx.out;
+    if (std::strlen(spec.parent) != spec.parent_len || std::strlen(spec.text) != spec.text_len) {
+        return fail(out, "s2_group_view_length_mismatch");
+    }
+    const SharedStr parent = borrowed(spec.parent, spec.parent_len);
+    const SharedStr caption = borrowed(spec.text, spec.text_len);
+    DebugMenuItem* const item = next_item(ctx);
+    if (item == nullptr) return fail(out, "item_storage_exhausted");
+    if (!init_menu_group_26c10(*item, parent, caption, kInit5b9f90ItemFlags)) {
+        return fail(out, "s2_group_ctor_failed");
+    }
+    ++out.groups;
+    if (!register_menu_item_268b0(*item, *ctx.hooks->menu, *ctx.hooks->atexit).ok) {
+        return fail(out, "s2_group_register_failed");
+    }
+    ++out.registered;
+    if (!release(ctx, parent)) return fail(out, "s2_group_release_failed");
+    return true;
+}
+
+bool build_s2_command(const BuildContext& ctx, const Init5cf140ItemSpec& spec) noexcept {
+    Init5b9f90Result& out = *ctx.out;
+    if (std::strlen(spec.parent) != spec.parent_len || std::strlen(spec.text) != spec.text_len ||
+        spec.command == nullptr || std::strlen(spec.command) != spec.command_len) {
+        return fail(out, "s2_command_view_length_mismatch");
+    }
+    const SharedStr parent = borrowed(spec.parent, spec.parent_len);
+    const SharedStr caption = borrowed(spec.text, spec.text_len);
+    const SharedStr command = borrowed(spec.command, spec.command_len);
+    DebugMenuItem* const item = next_item(ctx);
+    if (item == nullptr) return fail(out, "item_storage_exhausted");
+    if (!init_menu_command_26f90(*item, parent, caption,
+                                 reinterpret_cast<const void*>(static_cast<std::uintptr_t>(
+                                     spec.target_rva)),
+                                 command, kInit5b9f90ItemFlags)) {
+        return fail(out, "s2_command_ctor_failed");
+    }
+    ++out.commands;
+    if (!register_menu_item_268b0(*item, *ctx.hooks->menu, *ctx.hooks->atexit).ok) {
+        return fail(out, "s2_command_register_failed");
+    }
+    ++out.registered;
+    if (!release(ctx, caption) || !release(ctx, command)) {
+        return fail(out, "s2_command_release_failed");
+    }
+    return true;
+}
+
+bool build_s2_separator(const BuildContext& ctx, const Init5cf140ItemSpec& spec) noexcept {
+    Init5b9f90Result& out = *ctx.out;
+    if (std::strlen(spec.parent) != spec.parent_len) return fail(out, "s2_separator_length_mismatch");
+    const SharedStr parent = borrowed(spec.parent, spec.parent_len);
+    DebugMenuItem* const item = next_item(ctx);
+    if (item == nullptr) return fail(out, "item_storage_exhausted");
+    if (!init_menu_separator_26b60(*item, parent, kInit5b9f90ItemFlags,
+                                   ctx.hooks->separator_alloc)) {
+        return fail(out, "s2_separator_ctor_failed");
+    }
+    ++out.separators;
+    if (!register_menu_item_268b0(*item, *ctx.hooks->menu, *ctx.hooks->atexit).ok) {
+        return fail(out, "s2_separator_register_failed");
+    }
+    ++out.registered;
+    return true;
+}
+
+// 0x26db0 over a variable built by unlifted code: the host stand-in carries the name read from
+// the ELF and the measured bool-class identity; no constructor is claimed for the variable itself.
+bool build_s2_named_external(const BuildContext& ctx, const Init5cf140ItemSpec& spec,
+                             std::size_t index) noexcept {
+    Init5b9f90Result& out = *ctx.out;
+    if (ctx.hooks->var_storage == nullptr || index >= ctx.hooks->var_capacity) {
+        return fail(out, "s2_var_storage_missing");
+    }
+    const SharedStr parent = borrowed(spec.parent, spec.parent_len);
+    const SharedStr name = borrowed(spec.text, spec.text_len);
+    ConCmdBoolVar& var = ctx.hooks->var_storage[index];
+    var = ConCmdBoolVar{};
+    var.base.name = name;
+    var.base.vptr = kInit5b9f90BoolVarVptr;
+    DebugMenuTarget target{};
+    target.object = &var;
+    target.slot3 = 1;
+    target.slot6 = 0;
+    target.known = true;
+    DebugMenuItem* const item = next_item(ctx);
+    if (item == nullptr) return fail(out, "item_storage_exhausted");
+    if (!init_debug_menu_item_26db0(*item, parent, var.base, target, kInit5b9f90ItemFlags)) {
+        return fail(out, "s2_named_ctor_failed");
+    }
+    ++out.named_vars;
+    if (!register_menu_item_268b0(*item, *ctx.hooks->menu, *ctx.hooks->atexit).ok) {
+        return fail(out, "s2_named_register_failed");
+    }
+    ++out.registered;
+    return true;
+}
+
+// 0xc300 bounded float variable + 0x20d60 + __cxa_atexit(0xad30) + the 0x27120 slider.
+bool build_s2_ranged(const BuildContext& ctx, const Init5cf140ItemSpec& spec,
+                     std::size_t index) noexcept {
+    Init5b9f90Result& out = *ctx.out;
+    if (ctx.hooks->registry == nullptr || ctx.hooks->ranged_storage == nullptr ||
+        ctx.hooks->ranged_value_storage == nullptr || ctx.hooks->ranged_guard_storage == nullptr ||
+        index >= ctx.hooks->ranged_capacity) {
+        return fail(out, "s2_ranged_state_missing");
+    }
+    const SharedStr parent = borrowed(spec.parent, spec.parent_len);
+    const SharedStr name = borrowed(spec.text, spec.text_len);
+    const SharedStr empty = borrowed("", 0);
+    ConCmdRangedVar& var = ctx.hooks->ranged_storage[index];
+    bool& guard = ctx.hooks->ranged_guard_storage[index];
+    float& value = ctx.hooks->ranged_value_storage[index];
+    if (!guard) {
+        var = ConCmdRangedVar{};
+        RangedVarArgs args{};
+        args.fn_vptr = 0x15CB238;   // the caller functor tag at all ten sites
+        if (!init_bounded_float_var_c300(var, name, &value, spec.var_lo, spec.var_hi, 1, args, empty)) {
+            return fail(out, "s2_ranged_ctor_failed");
+        }
+        if (!ctx.hooks->atexit->record(kInit5cf140BoolVarDtorRva, &var)) {
+            return fail(out, "s2_ranged_atexit_failed");
+        }
+        if (!register_concmd_20d60(var.base, *ctx.hooks->registry).ok) {
+            return fail(out, "s2_ranged_register_failed");
+        }
+        guard = true;
+    }
+    DebugMenuItem* const item = next_item(ctx);
+    if (item == nullptr) return fail(out, "item_storage_exhausted");
+    if (!init_debug_menu_item_27120(*item, parent, var.base, kInit5b9f90ItemFlags, spec.lo, spec.hi)) {
+        return fail(out, "s2_slider_ctor_failed");
+    }
+    ++out.sliders;
+    if (!register_menu_item_268b0(*item, *ctx.hooks->menu, *ctx.hooks->atexit).ok) {
+        return fail(out, "s2_slider_register_failed");
+    }
+    ++out.registered;
+    if (!release(ctx, name) || !release(ctx, empty)) return fail(out, "s2_ranged_release_failed");
     return true;
 }
 
@@ -287,8 +439,8 @@ Init5b9f90Result run_init_5b9f90_slices(const Init5b9f90Hooks& hooks) noexcept {
                "canary store, group \"Shadow\" under \"CP10\", 2 releases");
     ++out.executed_slices;
 
-    // S1/S2: the two page builders. Their bodies are not lifted; the host observes the call and
-    // the slices stay `contract` in the map.
+    // S1: the 0x2170 page builder. Its body is not lifted; the host observes the call and the
+    // slice stays `contract` in the map.
     {
         const InitPostCallOutcome o = hooks.page_builder(
             hooks.host, kInit5b9f90PageBuilderShadowMiscRva, "Shadow Misc");
@@ -298,15 +450,41 @@ Init5b9f90Result run_init_5b9f90_slices(const Init5b9f90Hooks& hooks) noexcept {
         }
         ++out.contracts;
     }
-    {
-        const InitPostCallOutcome o = hooks.page_builder(
-            hooks.host, kInit5b9f90PageBuilderSecondRva, "unnamed page builder");
-        if (!o.executed) {
-            out.blocked = o.blocker != nullptr ? o.blocker : "page_builder_5cf140_refused";
-            return out;
+
+    // S2: the 0x5cf140 "Shadow Credits" page builder, executed natively in body order (after the
+    // 0x2170 call, before the S3 pages).
+    // The two S2 bool variables use slots 4..6 (S3 uses 0..3).
+    std::size_t s2_var_index = 4;
+    std::size_t s2_ranged_index = 0;
+    for (std::size_t i = 0; i < kInit5cf140ItemsCount; ++i) {
+        const Init5cf140ItemSpec& spec = kInit5cf140Items[i];
+        bool ok = false;
+        switch (spec.kind) {
+            case Init5cf140ItemKind::group: ok = build_s2_group(ctx, spec); break;
+            case Init5cf140ItemKind::command: ok = build_s2_command(ctx, spec); break;
+            case Init5cf140ItemKind::separator: ok = build_s2_separator(ctx, spec); break;
+            case Init5cf140ItemKind::named_external:
+                ok = build_s2_named_external(ctx, spec, s2_var_index++);
+                break;
+            case Init5cf140ItemKind::bool_var:
+                ok = build_bool_var_impl(ctx, borrowed(spec.parent, spec.parent_len), spec.text,
+                                         spec.text_len, s2_var_index++);
+                break;
+            case Init5cf140ItemKind::ranged_slider:
+                ok = build_s2_ranged(ctx, spec, s2_ranged_index++);
+                break;
         }
-        ++out.contracts;
+        if (!ok) return out;
+        ++out.s2_items;
     }
+    // The body ends with one release and its 0x272d0 destroy block over the 21 items.
+    if (!release(ctx, borrowed("", 0))) return out;
+    for (std::size_t i = 0; i < out.s2_items; ++i) ++out.destroys;
+    out.s2_executed = true;
+    add_record(out, "S2", kInit5cf140Rva, kInit5cf140EndRva,
+               "0x5cf140 \"Shadow Credits\": 1 group, 1 command, 6 separators, 3 named variables, "
+               "10 bounded floats + sliders, 21 destroys");
+    ++out.executed_slices;
 
     // S3.1..S3.6 in body order. Execution stops after S3.6 by construction (S4 is unlifted).
     std::size_t toggle_index = 0;

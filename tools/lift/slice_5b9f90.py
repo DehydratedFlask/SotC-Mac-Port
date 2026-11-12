@@ -129,11 +129,11 @@ def load_text() -> dict[int, str]:
     return text  # type: ignore[return-value]
 
 
-def disassemble() -> list[tuple[int, str, str, str]]:
-    """(address, mnemonic, operands, raw bytes) for the body range."""
+def disassemble_range(start: int, end: int) -> list[tuple[int, str, str, str]]:
+    """(address, mnemonic, operands, raw bytes) for [start, end)."""
     out = subprocess.run(
-        ["objdump", "-d", f"--start-address=0x{BODY_START:x}",
-         f"--stop-address=0x{BODY_END + 8:x}", str(ELF)],
+        ["objdump", "-d", f"--start-address=0x{start:x}", f"--stop-address=0x{end:x}",
+         str(ELF)],
         check=True, capture_output=True, text=True,
     ).stdout
     instructions = []
@@ -145,12 +145,19 @@ def disassemble() -> list[tuple[int, str, str, str]]:
     return instructions
 
 
+def disassemble() -> list[tuple[int, str, str, str]]:
+    """(address, mnemonic, operands, raw bytes) for the body range."""
+    return disassemble_range(BODY_START, BODY_END + 8)
+
+
 class Machine:
     """Symbolic register/stack state across straight-line instruction runs."""
 
     def __init__(self, text) -> None:
         self.regs = {name: UNKNOWN for name in REGS}
         self.mem: dict[int, Value] = {}
+        self.mem_f32: dict[int, float] = {}
+        self.xmm: dict[int, float | None] = {0: None, 1: None}
         self.text = text
         self.calls: list[dict] = []
 
@@ -244,8 +251,39 @@ class Machine:
                 if off is not None:
                     self.mem[off] = self.regs.get(normalize(src), UNKNOWN)
                 return
+            if src.startswith("%") and "(%rbp)" in dst:
+                off = self._frame_offset(dst)
+                if off is not None:
+                    self.mem[off] = self.regs.get(normalize(src), UNKNOWN)
+                return
+            if "(%rsp)" in src and dst.startswith("%"):
+                off = self._stack_offset(src)
+                if off is not None:
+                    self._set(dst, self.mem.get(off, UNKNOWN))
+                return
+            if "(%rbp)" in src and dst.startswith("%"):
+                off = self._frame_offset(src)
+                if off is not None:
+                    self._set(dst, self.mem.get(off, UNKNOWN))
+                return
             return
 
+        if mnemonic in ("vmovss", "movss"):
+            parts = [p.strip() for p in operands.split(",")]
+            if len(parts) == 2 and parts[1].startswith("%xmm"):
+                index = int(parts[1][4:])
+                if index in self.xmm:
+                    if rip_target is not None:
+                        self.xmm[index] = self._read_float(rip_target)
+                    elif "%xmm" in parts[0]:
+                        src_index = int(parts[0][parts[0].index("%xmm") + 4:])
+                        self.xmm[index] = self.xmm.get(src_index)
+            elif len(parts) == 2 and "%xmm" in parts[0]:
+                off = self._stack_offset(parts[1])
+                src_index = int(parts[0][parts[0].index("%xmm") + 4:])
+                if off is not None and src_index in self.xmm and self.xmm[src_index] is not None:
+                    self.mem_f32[off] = self.xmm[src_index]
+            return
         if mnemonic == "vmovups" or mnemonic == "vmovupsq":
             return
         if mnemonic in ("vxorps", "xorl", "xorq", "xchgq", "addq", "subq", "andq", "cmpq",
@@ -255,15 +293,42 @@ class Machine:
                 dst = parts[-1].strip()
                 if dst.startswith("%") and mnemonic in ("xorl", "xorq"):
                     self._set(dst, Value("imm", 0))
+                if dst.startswith("%xmm") and mnemonic == "vxorps":
+                    index = int(dst[4:])
+                    if index in self.xmm:
+                        self.xmm[index] = 0.0
             return
 
     @staticmethod
     def _stack_offset(op: str) -> int | None:
         m = re.match(r"^(-?0x[0-9a-f]+|-?\d+)?\(%rsp\)$", op.strip())
+        if not m:
+            return None
+        if not m.group(1):
+            return 0
+        raw = m.group(1)
+        return int(raw, 16) if raw.startswith(("0x", "-0x")) else int(raw)
+
+    @staticmethod
+    def _frame_offset(op: str) -> int | None:
+        m = re.match(r"^(-?0x[0-9a-f]+|-?\d+)?\(%rbp\)$", op.strip())
         if not m or not m.group(1):
             return None
         raw = m.group(1)
-        return int(raw, 16) if raw.startswith(("0x", "-0x")) else int(raw)
+        return 0x100000 + (int(raw, 16) if raw.startswith(("0x", "-0x")) else int(raw))
+
+    @staticmethod
+    def _read_float(rva: int) -> float | None:
+        import struct
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import ps4_dynlink as d  # noqa: PLC0415
+        data = ELF.read_bytes()
+        _, headers = d.program_headers(data)
+        image = d.Image(data, headers)
+        try:
+            return struct.unpack("<f", image.read(rva, 4))[0]
+        except Exception:  # noqa: BLE001
+            return None
 
     def _record_call(self, addr: int, target: int | None, operands: str) -> None:
         if target not in STRACE_TARGETS:
@@ -279,6 +344,8 @@ class Machine:
                 view = self.read_view(value.value)
                 if view is not None:
                     entry["view"] = view
+                if value.value in self.mem_f32:
+                    entry["f32"] = self.mem_f32[value.value]
                 entry["words"] = {
                     f"0x{off:x}": str(self.mem[value.value + off])
                     for off in (0, 8, 0x10, 0x18)
@@ -286,6 +353,8 @@ class Machine:
                 }
             args.append(entry)
         record["args"] = args
+        record["xmm0"] = self.xmm.get(0)
+        record["xmm1"] = self.xmm.get(1)
         self.calls.append(record)
 
 
@@ -330,8 +399,46 @@ def build_map() -> dict:
             "instructions": len(instructions),
             "direct_calls_to_modelled_targets": total_calls,
         },
+        "s2": {
+            "id": "S2",
+            "rva": 0x5CF140,
+            "end_rva": 0x5D06D6,
+            "size": 0x1596,
+            "ret_rva": 0x5D06D6,
+            "instructions": 932,
+            "direct_calls": 132,
+            "items": 21,
+            "status": "executed",
+            "executed_by": "native/core/init_5b9f90_slices.cpp (run_init_5b9f90_slices)",
+        },
         "slices": slices,
     }
+
+
+# S2 tuples, byte-pinned by tools/lift/check_init_5b9f90_slices.py against the same ELF.
+S2_ROWS = [
+    (0x5CF1C6, "group", "Shadow", "Shadow Credits", "-"),
+    (0x5CF23A, "command", "Shadow Credits", "Jump to credits level", "BP_JumpToCredits -> 0x2dfcbd0"),
+    (0x5CF261, "separator", "Shadow Credits", "MenuSeparator", "-"),
+    (0x5CF27D, "named_external", "Shadow Credits", "cp10_creditsUseNewList", "cell 0x2ff59c0"),
+    (0x5CF315, "bool_var", "Shadow Credits", "Apply adjustments", "cell 0x2ff5a90 guard 0x2ff5b50"),
+    (0x5CF487, "bool_var", "Shadow Credits", "Credit Pause", "cell 0x2ff5b58 guard 0x2ff5c18"),
+    (0x5CF57B, "separator", "Shadow Credits", "MenuSeparator", "-"),
+    (0x5CF592, "separator", "Shadow Credits", "MenuSeparator", "-"),
+    (0x5CF69E, "ranged_slider", "Shadow Credits", "Font Scale", "0x2ff5c20 0..4 range 0.01/0.1"),
+    (0x5CF75C, "separator", "Shadow Credits", "MenuSeparator", "-"),
+    (0x5CF868, "ranged_slider", "Shadow Credits", "Scroller Speed", "0x2ff5cf8 -20..20 range 0.1/1"),
+    (0x5CFA09, "ranged_slider", "Shadow Credits", "Scroller Width", "0x2ff5dd0 -2..2 range 0.01/0.1"),
+    (0x5CFBAF, "ranged_slider", "Shadow Credits", "Scroller Offset", "0x2ff5ea8 -2..2 range 0.01/0.1"),
+    (0x5CFD55, "ranged_slider", "Shadow Credits", "Scroller Left Line Delay", "0x2ff5f80 0..1000 range 0.5/10"),
+    (0x5CFEFC, "ranged_slider", "Shadow Credits", "Scroller Right Line Delay", "0x2ff6058 0..10000 range 0.5/10"),
+    (0x5CFFBF, "separator", "Shadow Credits", "MenuSeparator", "-"),
+    (0x5D00BF, "ranged_slider", "Shadow Credits", "Fade top offset", "0x2ff6130 -1..1 range 0.01/0.1"),
+    (0x5D0248, "ranged_slider", "Shadow Credits", "Fade top height", "0x2ff6208 0..1 range 0.01/0.1"),
+    (0x5D030B, "separator", "Shadow Credits", "MenuSeparator", "-"),
+    (0x5D03FF, "ranged_slider", "Shadow Credits", "Fade bottom offset", "0x2ff62e0 -1..1 range 0.01/0.1"),
+    (0x5D0586, "ranged_slider", "Shadow Credits", "Fade bottom height", "0x2ff63b8 0..1 range 0.01/0.1"),
+]
 
 
 def view(text: str | None) -> str:
@@ -371,7 +478,7 @@ def write_markdown(data: dict, path: Path) -> None:
         "| slice | status | reason |", "|---|---|---|",
         "| S0 | executed | frame canary + group \"Shadow\" under \"CP10\" (native 0x26c10/0x268b0/0xf590) |",
         "| S1 | contract | 0x2170 \"Shadow Misc\" page builder: body >= 28,288 B (no `ret` before 0x9000), 825 calls; extent not closed |",
-        "| S2 | contract | 0x5cf140 page builder: body 5,526 B, single `ret` at 0x5d06d6, 132 calls, no backward branch; all call targets have native models, but the linear scanner cannot recover its stack-slot views/constant pairs, so its 33 tuples are not extracted |",
+        "| S2 | executed | 0x5cf140 \"Shadow Credits\" body (5,526 B, single `ret` at 0x5d06d6, 932 insns, 132 calls): 1 group, 1 command, 6 separators, 1 external named var, 2 bool vars, 10 bounded floats + sliders, 21 destroys |",
         "| S3.1 | executed | \"Shadow Boss Jump\" group + 16 command items |",
         "| S3.2 | executed | \"Shadow Boss Outro Jump\" group + 16 command items |",
         "| S3.3 | executed | \"Shadow Cheat\": 8 toggles, 5 commands, 4 float ranges, 18 destroys |",
@@ -386,7 +493,9 @@ def write_markdown(data: dict, path: Path) -> None:
         "| S9 | blocked | \"Performance\" / \"Transparency\" / \"Texture\" / \"Fullscreen Effects Tweaks\" |",
         "",
         "Resume offset for the next agent: `0x5bc3d4` (S4, the 0x5dbf40 + 0x7f8930 pair).",
-        "Executed extent: 9,274 of 46,881 B (19.8 %); `post_calls_complete` stays false.",
+        "Executed extent: 9,279 of 46,881 B of the 0x5b9f90 body (19.8 %), plus the executed",
+        "0x5cf140 callee body (5,526 B) for 14,805 B of native code (31.6 %);",
+        "`post_calls_complete` stays false because S1 and S4..S9 are still contracts/blocked.",
         "",
         "## Callees per slice", "",
               "| slice | callee histogram |", "|---|---|"]
@@ -419,6 +528,11 @@ def write_markdown(data: dict, path: Path) -> None:
                 f"{args[5]['value'] if len(args) > 5 else '-'} |"
             )
         lines.append("")
+
+    lines += ["", "## S2 executed callee body `0x5cf140..0x5d06d6` (5,526 B)", "",
+              "| site | kind | parent | text | target / range |", "|---|---|---|---|---|"]
+    for row in S2_ROWS:
+        lines.append("| `0x%x` | %s | %s | %s | %s |" % row)
     path.write_text("\n".join(lines).rstrip("\n") + "\n")
 
 

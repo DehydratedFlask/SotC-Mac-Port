@@ -1,3 +1,60 @@
+## 2026-11-13 — `0x5b9f90` S2 executed: the `0x5cf140` "Shadow Credits" body runs (14,805 B native)
+
+**State: green.** Continuation of commit `44cef29a` on branch `cursor/init-hash-551140-6aa93e8`.
+Resumed at the recorded `0x5bc3d4` (S4) and left it blocked on its two unlifted callees, then took
+the tracer-enabled win: S2's body.
+
+- **Newly executed:** **S2, the `0x5cf140..0x5d06d6` "Shadow Credits" page builder** (5,526 B, 932
+  instructions, 132 direct calls, single `ret` at `0x5d06d6`, no backward branch). The model
+  executes its 21 items in body order with the proven ctors: **1 group** (`0x26c10`), **1 command**
+  (`0x26f90`, `BP_JumpToCredits` -> `0x2dfcbd0`), **6 separators** (`0x26b60`, text built through
+  `0xf1a0` by the host allocator), **1 external named variable** (`cp10_creditsUseNewList` at
+  `0x2ff59c0`, built by unlifted `0x5d41c0`; name read from the ELF literal `0x1268590`), **2
+  guarded bool variables** (`Apply adjustments` cell `0x2ff5a90` guard `0x2ff5b50`, `Credit Pause`
+  cell `0x2ff5b58` guard `0x2ff5c18`, `0x20af0` + `0x20d60` + atexit `0xacf0`), and **10 bounded
+  float variables + `0x27120` sliders** (`0xc300`, functor `0x15cb238`, atexit `0xad30`; ranges
+  0.01/0.1, 0.1/1, 0.5/10; bounded domains 0..4, -20..20, -2..2, -2..2, 0..1000, 0..10000,
+  -1..1, 0..1, -1..1, 0..1). **21 destroys**, **28 releases**, **21 menu registrations + 12 ConCmd
+  registrations**.
+- **Measured coverage:** body extent **9,279 of 46,881 B (19.8 %)** = S0 177 + the S2 call site 5 +
+  S3 9,097; plus the executed `0x5cf140` callee body **5,526 B** = **14,805 B of native code
+  (31.6 %)**. Eight executed slice records; **1 contract left** (S1 `0x2170`).
+- **Tracer work that enabled it:** `tools/lift/slice_5b9f90.py` now tracks stack/`%rbp` loads,
+  `vmovss`/`vxorps` xmm values, `mem_f32` stores and `xmm0`/`xmm1` call arguments; it recovers the
+  page's stack-slot views, float pairs and the ten `0xc300` bounded ranges (min/max dwords decoded
+  from the frame stores), which is what the previous pass recorded as missing. `disassemble_range`
+  was added for the callee body.
+- **Byte-pinned:** `tools/lift/check_init_5b9f90_slices.py` now re-derives the S2 extent, the 932
+  instructions, the single `ret`/no-backward-branch, the 132 calls, and all **21 tuples** (ctor
+  targets, caption/command literals, variable cells, guard bytes, atexit RVAs, bounded float
+  immediates, slider ctor and ranges). The map generator emits the S2 table and marks S2
+  `executed`.
+- **Observed run:** `ok=true`, `post_chain_complete=true`, `post_call_count=25`,
+  **`post_calls_executed=24`** (23 → 24), `post_calls_blocked=1`, **`post_calls_complete=false`**,
+  `post_5b9f90={slices:8,groups:8,commands:38,toggles:8,floats:4,named_vars:7,registered:81,
+  releases:134,destroys:44,contracts:1,resume:"0x5bc3d4",complete:false}`, exit 0, boss `0xA7`.
+- **S4 stays blocked (measured):** `0x5dbf40` (7,533 B, first `ret` `0x5ddcad`) and `0x7f8930`
+  (90 B, calls `0x7f8610`, touches `0x15fe570`) have no native models; the pair is 10 B of call
+  sites but cannot be claimed without both bodies. **Resume offset unchanged: `0x5bc3d4`.**
+- **Next slices, in order:** S4 (the above pair), S5 (`0x5bc3de..0x5c1196`, 19,896 B: 3 groups,
+  3 commands, 7 separators, 9 bool vars, 30 `c300`, 37 `27120` sliders, 7 `c580`), S6 (0x5c94b0 +
+  0xb25840), S7, S8 (the 33-iteration loop), S9. S5 is the largest contiguous win for the models
+  already proven here and needs `c580` page-cell support plus the S2 item kinds extended to its
+  89-item table.
+- **Verification:** build **0**; full CTest **704/704**; checker
+  `check_init_5b9f90_slices.py` **OK** (`executed=9279B items=53 s2=... executed_total=14805B`);
+  sweep **914 passed / 0 skipped / 0 failed**, exit 0; init runtime exit **0**, `ok=true`. Entry
+  map **3,032 constants → 1,943 RVAs / 584 headers (457 duplicates)**, project index
+  **114,663**, publish audit and attribution re-run with the commit. Checkpoint
+  `docs/checkpoints/2026-11-13-init-5cf140-s2-executed.md`.
+- **Not claimed:** cold boot, audio, save/reload, Metal validation (NOT RUN);
+  `post_calls_complete=false`; `0x2170` extent still not closed, so S1 stays a contract. G1
+  **PARTIAL**.
+
+**Next exact action:** lift S4's `0x5dbf40` + `0x7f8930` pair, or extend the proven item kinds with
+`c580` page-cell variables and execute S5's 89-item page; do not claim either body before every
+callee has a model.
+
 ## 2026-11-13 — `0x5b9f90` S3 complete: six pages execute (9,274 of 46,881 B)
 
 **State: green.** Continuation of commit `d39985c2` on branch `cursor/init-hash-551140-6aa93e8`.

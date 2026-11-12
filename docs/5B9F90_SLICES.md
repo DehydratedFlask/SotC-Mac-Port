@@ -31,7 +31,7 @@ straight-line item clusters (view write, constructor at 0x26c10/0x26b60/0x26f90/
 |---|---|---|
 | S0 | executed | frame canary + group "Shadow" under "CP10" (native 0x26c10/0x268b0/0xf590) |
 | S1 | contract | 0x2170 "Shadow Misc" page builder: body >= 28,288 B (no `ret` before 0x9000), 825 calls; extent not closed |
-| S2 | contract | 0x5cf140 page builder: body 5,526 B, single `ret` at 0x5d06d6, 132 calls, no backward branch; all call targets have native models, but the linear scanner cannot recover its stack-slot views/constant pairs, so its 33 tuples are not extracted |
+| S2 | executed | 0x5cf140 "Shadow Credits" body (5,526 B, single `ret` at 0x5d06d6, 932 insns, 132 calls): 1 group, 1 command, 6 separators, 1 external named var, 2 bool vars, 10 bounded floats + sliders, 21 destroys |
 | S3.1 | executed | "Shadow Boss Jump" group + 16 command items |
 | S3.2 | executed | "Shadow Boss Outro Jump" group + 16 command items |
 | S3.3 | executed | "Shadow Cheat": 8 toggles, 5 commands, 4 float ranges, 18 destroys |
@@ -46,7 +46,9 @@ straight-line item clusters (view write, constructor at 0x26c10/0x26b60/0x26f90/
 | S9 | blocked | "Performance" / "Transparency" / "Texture" / "Fullscreen Effects Tweaks" |
 
 Resume offset for the next agent: `0x5bc3d4` (S4, the 0x5dbf40 + 0x7f8930 pair).
-Executed extent: 9,274 of 46,881 B (19.8 %); `post_calls_complete` stays false.
+Executed extent: 9,279 of 46,881 B of the 0x5b9f90 body (19.8 %), plus the executed
+0x5cf140 callee body (5,526 B) for 14,805 B of native code (31.6 %);
+`post_calls_complete` stays false because S1 and S4..S9 are still contracts/blocked.
 
 ## Callees per slice
 
@@ -134,3 +136,30 @@ Executed extent: 9,274 of 46,881 B (19.8 %); `post_calls_complete` stays false.
 | `0x5bc2f9` | named | `0x12672bc` "Shadow Trophy" (13) | rva:0x2feda90 | imm:0x30 | ? |
 | `0x5bc377` | group | `0x1266e0b` "Shadow" (6) | `0x1267323` "Shadow Render" (13) | imm:0x30 | ? |
 | `0x5bc3c7` | group | `0x1267323` "Shadow Render" (13) | `0x1267331` "MLAA" (4) | imm:0x30 | ? |
+
+
+## S2 executed callee body `0x5cf140..0x5d06d6` (5,526 B)
+
+| site | kind | parent | text | target / range |
+|---|---|---|---|---|
+| `0x5cf1c6` | group | Shadow | Shadow Credits | - |
+| `0x5cf23a` | command | Shadow Credits | Jump to credits level | BP_JumpToCredits -> 0x2dfcbd0 |
+| `0x5cf261` | separator | Shadow Credits | MenuSeparator | - |
+| `0x5cf27d` | named_external | Shadow Credits | cp10_creditsUseNewList | cell 0x2ff59c0 |
+| `0x5cf315` | bool_var | Shadow Credits | Apply adjustments | cell 0x2ff5a90 guard 0x2ff5b50 |
+| `0x5cf487` | bool_var | Shadow Credits | Credit Pause | cell 0x2ff5b58 guard 0x2ff5c18 |
+| `0x5cf57b` | separator | Shadow Credits | MenuSeparator | - |
+| `0x5cf592` | separator | Shadow Credits | MenuSeparator | - |
+| `0x5cf69e` | ranged_slider | Shadow Credits | Font Scale | 0x2ff5c20 0..4 range 0.01/0.1 |
+| `0x5cf75c` | separator | Shadow Credits | MenuSeparator | - |
+| `0x5cf868` | ranged_slider | Shadow Credits | Scroller Speed | 0x2ff5cf8 -20..20 range 0.1/1 |
+| `0x5cfa09` | ranged_slider | Shadow Credits | Scroller Width | 0x2ff5dd0 -2..2 range 0.01/0.1 |
+| `0x5cfbaf` | ranged_slider | Shadow Credits | Scroller Offset | 0x2ff5ea8 -2..2 range 0.01/0.1 |
+| `0x5cfd55` | ranged_slider | Shadow Credits | Scroller Left Line Delay | 0x2ff5f80 0..1000 range 0.5/10 |
+| `0x5cfefc` | ranged_slider | Shadow Credits | Scroller Right Line Delay | 0x2ff6058 0..10000 range 0.5/10 |
+| `0x5cffbf` | separator | Shadow Credits | MenuSeparator | - |
+| `0x5d00bf` | ranged_slider | Shadow Credits | Fade top offset | 0x2ff6130 -1..1 range 0.01/0.1 |
+| `0x5d0248` | ranged_slider | Shadow Credits | Fade top height | 0x2ff6208 0..1 range 0.01/0.1 |
+| `0x5d030b` | separator | Shadow Credits | MenuSeparator | - |
+| `0x5d03ff` | ranged_slider | Shadow Credits | Fade bottom offset | 0x2ff62e0 -1..1 range 0.01/0.1 |
+| `0x5d0586` | ranged_slider | Shadow Credits | Fade bottom height | 0x2ff63b8 0..1 range 0.01/0.1 |

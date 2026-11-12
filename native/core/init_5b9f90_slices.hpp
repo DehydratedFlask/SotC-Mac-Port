@@ -72,7 +72,9 @@ inline constexpr std::uint64_t kInit5b9f90Rva = 0x5B9F90;
 inline constexpr std::uint64_t kInit5b9f90EndRva = 0x5C56B1;   // exclusive; the ret is at 0x5c56aa
 inline constexpr std::size_t kInit5b9f90Size = 0xB721;         // 46,881 B
 inline constexpr std::size_t kInit5b9f90Instructions = 7645;   // objdump-aligned, [0x5b9f90, 0x5c56b1)
-inline constexpr std::size_t kInit5b9f90ExecutedBytes = 9274;  // S0 177 + S3 9,097
+inline constexpr std::size_t kInit5b9f90ExecutedBytes = 9279;  // S0 177 + S2 site 5 + S3 9,097
+// Native code now executed by the same run, counting the 0x5cf140 callee body (S2) as well.
+inline constexpr std::size_t kInit5b9f90TotalExecutedBytes = 14805;   // 9,279 + 5,526
 inline constexpr std::uint64_t kInit5b9f90SingleRetRva = 0x5C56AA;
 inline constexpr std::uint64_t kInit5b9f90LoopHeadRva = 0x5C1D50;
 inline constexpr std::uint64_t kInit5b9f90LoopTailRva = 0x5C1E5B;   // jne 0x5c1d50, 33 iterations
@@ -118,8 +120,8 @@ inline constexpr Init5b9f90Slice kInit5b9f90Slices[] = {
      "frame, canary, group \"Shadow\" under \"CP10\""},
     {"S1", 0x5BA041, 0x5BA046, 1, 1, Init5b9f90SliceStatus::contract,
      "0x2170 page builder (\"Shadow Misc\"): body not lifted, named host contract"},
-    {"S2", 0x5BA046, 0x5BA04B, 1, 1, Init5b9f90SliceStatus::contract,
-     "0x5cf140 page builder: body not lifted, named host contract"},
+    {"S2", 0x5BA046, 0x5BA04B, 1, 1, Init5b9f90SliceStatus::executed,
+     "0x5cf140 \"Shadow Credits\" body executed natively (5,526 B)"},
     {"S3", 0x5BA04B, 0x5BC3D4, 1460, 245, Init5b9f90SliceStatus::executed,
      "six pages, all executed; ends at 0x5bc3d4"},
     {"S4", 0x5BC3D4, 0x5BC3DE, 2, 2, Init5b9f90SliceStatus::blocked,
@@ -278,6 +280,83 @@ inline constexpr Init5b9f90PageSpec kInit5b9f90Pages[] = {
      Init5b9f90SliceStatus::executed},
 };
 
+// S2: the 0x5cf140 "Shadow Credits" page builder, executed natively as part of the same run.
+// Body 0x5cf140..0x5d06d6 (end-exclusive 0x5d06d6, 5,526 B), single `ret` at 0x5d06d6, 932
+// instructions, 132 direct calls, no backward branch. Its six separators, three named variables
+// (one bool var built by 0x5d41c0 named `cp10_creditsUseNewList`), ten bounded float variables
+// built by 0xc300 and ten 0x27120 sliders are modelled with the same ctors as S3.
+inline constexpr std::uint64_t kInit5cf140Rva = 0x5CF140;
+inline constexpr std::uint64_t kInit5cf140EndRva = 0x5D06D6;
+inline constexpr std::size_t kInit5cf140Size = 0x1596;   // 5,526 B
+inline constexpr std::uint64_t kInit5cf140RetRva = 0x5D06D6;
+inline constexpr std::uint64_t kInit5cf140BoolVarDtorRva = 0xAD30;   // ranged-var atexit dtor
+
+enum class Init5cf140ItemKind : std::uint8_t {
+    group,
+    command,
+    separator,
+    named_external,   // 0x26db0 over a variable constructed by unlifted code (name read from the ELF)
+    bool_var,         // 0x20af0 + 0x20d60 + 0x26db0 (same class as S3.4)
+    ranged_slider,    // 0xc300 bounded float variable + 0x27120 slider
+};
+
+struct Init5cf140ItemSpec {
+    Init5cf140ItemKind kind;
+    std::uint64_t site_rva;      // the constructor call (0x20af0 / 0xc300 for the variable kinds)
+    const char* parent;
+    std::uint8_t parent_len;
+    const char* text;            // caption, or the variable name for the variable kinds
+    std::uint8_t text_len;
+    const char* command;         // command items only
+    std::uint8_t command_len;
+    std::uint64_t target_rva;    // command target / variable cell
+    std::uint64_t guard_rva;     // bool_var / ranged_slider guard byte
+    float lo, hi;                // 0x27120 slider range
+    float var_lo, var_hi;        // 0xc300 bounded range
+    std::uint64_t slider_site_rva;
+};
+
+inline constexpr Init5cf140ItemSpec kInit5cf140Items[] = {
+    {Init5cf140ItemKind::group, 0x5CF1C6, "Shadow", 6, "Shadow Credits", 14, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::command, 0x5CF23A, "Shadow Credits", 14, "Jump to credits level", 21,
+     "BP_JumpToCredits", 16, 0x2DFCBD0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::separator, 0x5CF261, "Shadow Credits", 14, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::named_external, 0x5CF27D, "Shadow Credits", 14, "cp10_creditsUseNewList",
+     22, nullptr, 0, 0x2FF59C0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5CF315, "Shadow Credits", 14, "Apply adjustments", 17, nullptr, 0,
+     0x2FF5A90, 0x2FF5B50, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5CF487, "Shadow Credits", 14, "Credit Pause", 12, nullptr, 0,
+     0x2FF5B58, 0x2FF5C18, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::separator, 0x5CF57B, "Shadow Credits", 14, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::separator, 0x5CF592, "Shadow Credits", 14, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_slider, 0x5CF69E, "Shadow Credits", 14, "Font Scale", 10, nullptr, 0,
+     0x2FF5C20, 0x2FF5CF0, 0.01F, 0.1F, 0.0F, 4.0F, 0x5CF73D},
+    {Init5cf140ItemKind::separator, 0x5CF75C, "Shadow Credits", 14, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_slider, 0x5CF868, "Shadow Credits", 14, "Scroller Speed", 14, nullptr, 0,
+     0x2FF5CF8, 0x2FF5DC8, 0.1F, 1.0F, -20.0F, 20.0F, 0x5CF904},
+    {Init5cf140ItemKind::ranged_slider, 0x5CFA09, "Shadow Credits", 14, "Scroller Width", 14, nullptr, 0,
+     0x2FF5DD0, 0x2FF5EA0, 0.01F, 0.1F, -2.0F, 2.0F, 0x5CFAAA},
+    {Init5cf140ItemKind::ranged_slider, 0x5CFBAF, "Shadow Credits", 14, "Scroller Offset", 15, nullptr, 0,
+     0x2FF5EA8, 0x2FF5F78, 0.01F, 0.1F, -2.0F, 2.0F, 0x5CFC50},
+    {Init5cf140ItemKind::ranged_slider, 0x5CFD55, "Shadow Credits", 14, "Scroller Left Line Delay", 24,
+     nullptr, 0, 0x2FF5F80, 0x2FF6050, 0.5F, 10.0F, 0.0F, 1000.0F, 0x5CFDF6},
+    {Init5cf140ItemKind::ranged_slider, 0x5CFEFC, "Shadow Credits", 14, "Scroller Right Line Delay", 25,
+     nullptr, 0, 0x2FF6058, 0x2FF6128, 0.5F, 10.0F, 0.0F, 10000.0F, 0x5CFFA0},
+    {Init5cf140ItemKind::separator, 0x5CFFBF, "Shadow Credits", 14, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_slider, 0x5D00BF, "Shadow Credits", 14, "Fade top offset", 15, nullptr, 0,
+     0x2FF6130, 0x2FF6200, 0.01F, 0.1F, -1.0F, 1.0F, 0x5D015B},
+    {Init5cf140ItemKind::ranged_slider, 0x5D0248, "Shadow Credits", 14, "Fade top height", 15, nullptr, 0,
+     0x2FF6208, 0x2FF62D8, 0.01F, 0.1F, 0.0F, 1.0F, 0x5D02EC},
+    {Init5cf140ItemKind::separator, 0x5D030B, "Shadow Credits", 14, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_slider, 0x5D03FF, "Shadow Credits", 14, "Fade bottom offset", 18,
+     nullptr, 0, 0x2FF62E0, 0x2FF63B0, 0.01F, 0.1F, -1.0F, 1.0F, 0x5D049B},
+    {Init5cf140ItemKind::ranged_slider, 0x5D0586, "Shadow Credits", 14, "Fade bottom height", 18,
+     nullptr, 0, 0x2FF63B8, 0x2FF6488, 0.01F, 0.1F, 0.0F, 1.0F, 0x5D062A},
+};
+
+inline constexpr std::size_t kInit5cf140ItemsCount =
+    sizeof(kInit5cf140Items) / sizeof(kInit5cf140Items[0]);
+
 struct Init5b9f90Hooks {
     void* host = nullptr;
     DebugMenuRegistry* menu = nullptr;
@@ -305,6 +384,13 @@ struct Init5b9f90Hooks {
     bool* var_value_storage = nullptr;
     bool* var_guard_storage = nullptr;
     std::size_t var_guard_capacity = 0;
+    // S2: ten bounded float variables and their atexit guards.
+    ConCmdRangedVar* ranged_storage = nullptr;
+    std::size_t ranged_capacity = 0;
+    float* ranged_value_storage = nullptr;
+    bool* ranged_guard_storage = nullptr;
+    // 0x26b60 builds its text through 0xf1a0; the host supplies the allocator.
+    SharedStrCtorHooks separator_alloc{};
 };
 
 struct Init5b9f90Result {
@@ -317,15 +403,19 @@ struct Init5b9f90Result {
     int toggles = 0;
     int float_items = 0;
     int named_vars = 0;
+    int separators = 0;
+    int sliders = 0;
     int registered = 0;
     int releases = 0;
     int destroys = 0;
     int contracts = 0;
+    std::size_t s2_items = 0;
+    bool s2_executed = false;
     int executed_slices = 0;
     std::size_t items_used = 0;
     bool canary_stored = false;
-    // Executed sub-slice records handed to the runtime's post-call log (S0 and the six S3 pages).
-    std::array<InitPostCallRecord, 8> records{};
+    // Executed sub-slice records handed to the runtime's post-call log (S0, S2 and the six S3 pages).
+    std::array<InitPostCallRecord, 9> records{};
     std::size_t record_count = 0;
 };
 

@@ -5136,6 +5136,26 @@
         "header": "native/core/init_post_bodies.hpp"
       }
     ],
+    "0x5cf140": [
+      {
+        "constant": "kInit5b9f90PageBuilderSecond",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      },
+      {
+        "constant": "kInit5cf140",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x5d06d6": [
+      {
+        "constant": "kInit5cf140End",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      },
+      {
+        "constant": "kInit5cf140Ret",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
     "0x6aa00": [
       {
         "constant": "kUnboundedFloatCtor",
@@ -5764,6 +5784,10 @@
       {
         "constant": "kSlot554B9FloatDtor",
         "header": "native/core/ctor_slot_554_batch9_7f098.hpp"
+      },
+      {
+        "constant": "kInit5cf140BoolVarDtor",
+        "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
     "0xad70": [
@@ -18372,6 +18396,20 @@
       {
         "constant": "kInit5b9f90PageBuilderSecond",
         "header": "native/core/init_5b9f90_slices.hpp"
+      },
+      {
+        "constant": "kInit5cf140",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x5d06d6": [
+      {
+        "constant": "kInit5cf140End",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      },
+      {
+        "constant": "kInit5cf140Ret",
+        "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
     "0x5d41c0": [
@@ -21096,6 +21134,10 @@
       {
         "constant": "kSlot554B9FloatDtor",
         "header": "native/core/ctor_slot_554_batch9_7f098.hpp"
+      },
+      {
+        "constant": "kInit5cf140BoolVarDtor",
+        "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
     "0xad70": [
@@ -23079,9 +23121,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 3028,
-    "distinct_rvas": 1942,
-    "duplicate_rvas": 455,
+    "constants": 3032,
+    "distinct_rvas": 1943,
+    "duplicate_rvas": 457,
     "headers": 584
   }
 }

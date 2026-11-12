@@ -195,9 +195,14 @@ stores, `__cxa_atexit(0xacf0)` and `0x26db0`) and the "Shadow Render"/"MLAA" gro
 23 `0x272d0` destroys. All six S3 pages execute, so the measured extent is **9,274 of 46,881 B
 (19.8 %)**, 60 menu items and 106 releases; the run reports **23 executed / 1 blocked** post-calls
 with `post_calls_complete=false` and resume `0x5bc3d4` (S4). The two page builders stay contracts:
-`0x2170` is ≥ 28,288 B with no `ret` before `0x9000`, and `0x5cf140` (5,526 B, single `ret`) is
-liftable but needs a pre-call view/constant tracer before its 33 tuples can be byte-pinned. Full
-CTest **704/704**, G1 **PARTIAL**.
+`0x2170` is ≥ 28,288 B with no `ret` before `0x9000`, and `0x5cf140` (5,526 B, single `ret`) was
+liftable once the tracer learned stack-slot views, xmm arguments and `mem_f32` constants. That
+tracer then executed **S2** (`0x5cf140..0x5d06d6`, 5,526 B): "Shadow Credits" with its command,
+six separators, the external `cp10_creditsUseNewList` variable, two guarded bool variables and ten
+bounded float sliders. The body extent is now **9,279 of 46,881 B (19.8 %)** and the native code
+executed by the same run is **14,805 B (31.6 %)**; 8 slice records, 1 contract (`0x2170`), resume
+still `0x5bc3d4` because S4's `0x5dbf40` (7,533 B) and `0x7f8930` (90 B) remain unlifted. Full CTest
+**704/704**, G1 **PARTIAL**.
 Slot **23** (`0xe71990`) is registered via a **private fixture**; consumer/string necessity
 remains unresolved (G1 caveat). Operating plan lives in [HANDOFF](HANDOFF.md) only. Prefer
 session-sized code + checker acceptance over characterization-only docs churn.

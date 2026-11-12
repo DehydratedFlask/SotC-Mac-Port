@@ -173,11 +173,14 @@ struct HostPostBodies {
     DebugMenuRegistry menu_5b9f90{};
     ConCmdRegistry registry_5b9f90{};
     StartupAtexitLog atexit_5b9f90{};
-    std::array<DebugMenuItem, 64> items_5b9f90{};
+    std::array<DebugMenuItem, 96> items_5b9f90{};
     std::array<ConCmdBoolVar, 8> vars_5b9f90{};
     std::array<bool, 8> var_values_5b9f90{};
     std::array<bool, 8> var_guards_5b9f90{};
     std::array<bool, 8> toggle_values_5b9f90{};
+    std::array<ConCmdRangedVar, 10> ranged_5b9f90{};
+    std::array<float, 10> ranged_values_5b9f90{};
+    std::array<bool, 10> ranged_guards_5b9f90{};
     std::uint64_t canary_5b9f90 = 0;
     Init5b9f90Hooks hooks_5b9f90{};
     Init5b9f90Result result_5b9f90{};
@@ -1119,10 +1122,11 @@ InitPostCallOutcome hook_5c_a() noexcept {
     std::snprintf(detail, sizeof detail,
                   "native 0x5b9f90 slices S0/S3.1..S3.6 (%zu of 46881 B): groups=%d commands=%d "
                   "toggles=%d floats=%d named_vars=%d registered=%d releases=%d destroys=%d "
-                  "contracts=%d canary=%d resume=0x%llx remaining=%zu B",
+                  "contracts=%d s2=%d s2_bytes=%zu sliders=%d canary=%d resume=0x%llx remaining=%zu B",
                   static_cast<std::size_t>(kInit5b9f90ExecutedBytes), r.groups, r.commands,
                   r.toggles, r.float_items, r.named_vars, r.registered, r.releases, r.destroys,
-                  r.contracts,
+                  r.contracts, r.s2_executed ? 1 : 0, static_cast<std::size_t>(kInit5cf140Size),
+                  r.sliders,
                   r.canary_stored ? 1 : 0,                   static_cast<unsigned long long>(r.resume_rva),
                   static_cast<std::size_t>(kInit5b9f90Size - kInit5b9f90ExecutedBytes));
     InitPostCallOutcome o;  // the body's own record stays blocked: 37,607 B are unlifted
@@ -1657,6 +1661,12 @@ void configure_post(HostPostBodies& p) {
     p.hooks_5b9f90.var_value_storage = p.var_values_5b9f90.data();
     p.hooks_5b9f90.var_guard_storage = p.var_guards_5b9f90.data();
     p.hooks_5b9f90.var_guard_capacity = p.var_guards_5b9f90.size();
+    p.hooks_5b9f90.ranged_storage = p.ranged_5b9f90.data();
+    p.hooks_5b9f90.ranged_capacity = p.ranged_5b9f90.size();
+    p.hooks_5b9f90.ranged_value_storage = p.ranged_values_5b9f90.data();
+    p.hooks_5b9f90.ranged_guard_storage = p.ranged_guards_5b9f90.data();
+    p.hooks_5b9f90.separator_alloc.alloc.allocate = key_alloc;
+    p.hooks_5b9f90.separator_alloc.alloc.deallocate = key_dealloc;
     p.hooks_5b9f90.canary_cell = &p.canary_5b9f90;
     p.hooks_5b9f90.canary_token = 0x5B9F90CA11ULL;
     p.hooks_5b9f90.item_storage = p.items_5b9f90.data();
