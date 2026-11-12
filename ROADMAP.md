@@ -214,8 +214,12 @@ S6's two page bodies (`0x5c94b0` 23,673 B / 76 items; `0xb25840` 24,169 B / 60 i
 S1 call site at `0x5ba041` remains because `0x2170` stays a contract — and the native code executed
 by the same run is **108,325 B**; 18 slice records, resume **`0x5ba041`**, `post_calls_executed`
 **34**, 1 blocked. S4.2's geometry block is gated on the live debug-tool singletons
-`0x3288478`/`0x3288480` and stays a contract with that offset. Full CTest **704/704**, G1
-**PARTIAL**.
+`0x3288478`/`0x3288480` and stays a contract with that offset. Then the entry map itself was typed
+against the ELF (`CPU-01-ENTRY-MAP-CLOSURE-01`): of its 1,957 RVAs, **830 are function starts**, 381
+are interior labels, 12 are PLT stubs, 203 are data in the R+X segment and 531 are image data; **141
+of the 608 functions in the `0x531d60` closure (23.2 %) have a native entry**, which measures the
+remaining callee-closure gap. The native runtime answers `guest_entry_find(rva)` from a generated
+table. Full CTest **705/705**, G1 **PARTIAL**.
 Slot **23** (`0xe71990`) is registered via a **private fixture**; consumer/string necessity
 remains unresolved (G1 caveat). Operating plan lives in [HANDOFF](HANDOFF.md) only. Prefer
 session-sized code + checker acceptance over characterization-only docs churn.

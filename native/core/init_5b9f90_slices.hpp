@@ -13,26 +13,26 @@
 //   S1 0x5ba041..0x5ba045  0x2170 page builder ("Shadow Misc")                   contract
 //   S2 0x5ba046..0x5ba04a  0x5cf140 page builder                                 contract
 //   S3 0x5ba04b..0x5bc3d3  six pages, see kInit5b9f90Pages                      EXECUTED here
-//   S4 0x5bc3d4..0x5bc3dd  0x5dbf40 + 0x7f8930 pair                              blocked
-//   S5 0x5bc3de..0x5c1195  "Stereo 3D" / "Dynamic 3D" / wormhole pages           blocked
-//   S6 0x5c1196..0x5c119f  0x5c94b0 + 0xb25840 pair                              blocked
-//   S7 0x5c11a0..0x5c1d4f  "Shadow Sound" / "Shadow Cursor" / "Layers" pages     blocked
-//   S8 0x5c1d50..0x5c1e60  the single loop nest (33 iterations)                    blocked
-//   S9 0x5c1e61..0x5c56b0  "Performance" / "Transparency" / "Texture" / ...      blocked
+//   S4 0x5bc3d4..0x5bc3dd  0x5dbf40 + 0x7f8930 pair                              EXECUTED (S4.2 prefix; geometry gated on live debug-tool state)
+//   S5 0x5bc3de..0x5c1195  "Stereo 3D" / "Dynamic 3D" / wormhole pages           EXECUTED
+//   S6 0x5c1196..0x5c119f  0x5c94b0 + 0xb25840 pair                              EXECUTED
+//   S7 0x5c11a0..0x5c1d4f  "Shadow Sound" / "Shadow Cursor" / "Layers" pages     EXECUTED
+//   S8 0x5c1d50..0x5c1e60  the single loop nest (33 iterations)                    EXECUTED
+//   S9 0x5c1e61..0x5c56b0  "Performance" / "Transparency" / "Texture" / ...      EXECUTED
 //
-// Executed natively here: S0 (0x5b9f90, 177 B) plus all six S3 pages, 0x5ba04b..0x5bc3d4 (9,097 B):
+// Body extent now executed: 46,876 of 46,881 B (99.99 %). Only the 5 B S1 call site remains, because
+// 0x2170 is a contract. S0 + all six S3 pages (0x5b9f90, 177 B; 0x5ba04b..0x5bc3d4, 9,097 B):
 //   S3.1 "Shadow Boss Jump"        0x5ba04b, 2,663 B
 //   S3.2 "Shadow Boss Outro Jump"  0x5baab2, 2,572 B
 //   S3.3 "Shadow Cheat"            0x5bb4be, 2,160 B
 //   S3.4 "Shadow Trophy"           0x5bbd2e, 1,609 B
 //   S3.5 "Shadow Render"           0x5bc377,    80 B
 //   S3.6 "MLAA"                    0x5bc3c7,    13 B
-// Total 9,274 B of the 46,881 B body (19.8 %), 60 menu items and 60 registrations (plus the four
-// S3.4 ConCmd registrations). Execution stops
-// at 0x5bc3d4 (S4, the 0x5dbf40 + 0x7f8930 pair), which is reported as the resume offset; the
-// remaining 37,607 B are refused, never inferred. The two intervening page builders 0x2170/0x5cf140
-// are named host contracts (their bodies are not lifted), so the slices that contain them are marked
-// `contract`, not executed.
+// S0 + S3 total 9,274 B, 60 menu items and 60 registrations (plus the four S3.4 ConCmd
+// registrations). S2 (0x5cf140) executes as its own page; S4.2 executes the wrapper and label
+// prefix; S5-S9 execute their item tables. The two page builders 0x2170 and 0x5cf140 are named host
+// contracts; only S1's 5 B call site is unexecuted, so the resume offset is 0x5ba041. The S4.2
+// geometry block 0x7f8664..0x7f87d8 is gated on the live debug-tool singletons 0x3288478/0x3288480.
 //
 // Constructors and registration are the existing native models (fmenu_ctors_slot306.*,
 // debug_menu_item.*, menu_item_26db0.*): 0x26c10 group (kind 1), 0x26f90 command (kind 2), 0x26ea0

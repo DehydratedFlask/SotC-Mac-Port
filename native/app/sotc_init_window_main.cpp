@@ -6,6 +6,7 @@
 #include <cstring>
 #include <string>
 
+#include "core/guest_entry_table.hpp"
 #include "core/init_window_runtime.hpp"
 
 namespace {
@@ -37,6 +38,25 @@ void print_json_string(const char* text) {
         }
     }
     std::putchar('"');
+}
+
+void print_entry_map() {
+    const sotc::GuestEntryCounts& c = sotc::guest_entry_counts();
+    std::printf("\"entry_map\":{\"entries\":%u,\"function_start\":%u,"
+                "\"function_interior\":%u,\"plt\":%u,\"executable_data\":%u,"
+                "\"image_data\":%u,\"outside_image\":%u,\"dispatchable\":%u,"
+                "\"lookups\":{",
+                c.entries, c.function_start, c.function_interior, c.plt, c.executable_data,
+                c.image_data, c.outside_image, c.function_start);
+    const std::uint64_t samples[] = {0x531d60, 0x5b9f90, 0x1353, 0xf8f390, 0x1014a80, 0x1594d90,
+                                     0x12345678};
+    for (std::size_t i = 0; i < sizeof(samples) / sizeof(samples[0]); ++i) {
+        const sotc::GuestEntry* entry = sotc::guest_entry_find(samples[i]);
+        std::printf("%s\"0x%llx\":\"%s\"", i == 0 ? "" : ",",
+                    static_cast<unsigned long long>(samples[i]),
+                    entry ? sotc::guest_entry_kind_name(entry->kind) : "unknown");
+    }
+    std::fputs("}},", stdout);
 }
 
 void print_post_calls(const sotc::InitWindowRuntimeResult& r) {
@@ -242,6 +262,7 @@ int main(int argc, char** argv) {
         r.savedata_refusal, r.savedata_counters, r.savedata_items,
         r.stat_engine_calls, r.stat_engine_arg2,
         r.ok ? "" : (r.first_failed_stage[0] ? r.first_failed_stage : "unknown"));
+    print_entry_map();
     print_post_calls(r);
     std::fputs("}\n", stdout);
     return r.ok ? 0 : 3;

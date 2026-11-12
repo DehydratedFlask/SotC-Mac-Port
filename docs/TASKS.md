@@ -5,6 +5,12 @@ Statuses: `READY`, `ACTIVE`, `BLOCKED`, `WAITING_FOR_DEPENDENCY`, `WAITING_FOR_O
 `UNKNOWN`, `NEEDS_PRINCIPAL`. No native game implementation exists.
 Gates and test evidence take precedence over a status label. Integrator owns this file.
 
+## Active orchestration — 2026-11-13 (guest entry map closure)
+
+| ID | Bounded output | Depends on | Status / owner | Failed tries |
+|---|---|---|---|---|
+| CPU-01-ENTRY-MAP-CLOSURE-01 | Type every mapped guest RVA against the pinned ELF's FDE/PT_LOAD map, intersect the `0x531d60` closure, expose the result through the native runtime by binary search, and pin it with an ELF checker and a fixture; continuation of `CPU-01-AOT-CFG-SCALE-01` (M1 guest-address → native-entry map) | E1439; `local/re/eboot.elf`; `docs/entry_map.json`; `local/validation/aot-cfg/closure_531d60.json`; `entry_closure.py` | PASSED / STATIC_ANALYSIS_VERIFIED / FIXTURE_VERIFIED / ARTIFACT_VERIFIED / Buffy (**830 starts / 381 interior / 12 PLT / 203 exec-data / 531 image-data / 0 outside** of 1,957; 115 target-named → 75/31/1/8; closure **141/608 = 23.2 %**; runtime `entry_map` block, `test_guest_entry_table`, `check_entry_closure.py`; ctest **705/705**, sweep **915/0/0**; E1440; [checkpoint](checkpoints/2026-11-13-entry-map-closure.md)) | 0 |
+
 ## Active orchestration — 2026-11-13 (Init `0x5b9f90` slice map + first executed slices)
 
 | ID | Bounded output | Depends on | Status / owner | Failed tries |

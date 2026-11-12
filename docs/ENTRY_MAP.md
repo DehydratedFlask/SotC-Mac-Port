@@ -13,34 +13,36 @@ call dispatcher needs before lifted code can call lifted code by guest address.
 
 | Metric | Value |
 |---|---|
-| Declared RVA constants | **3,017** |
-| Distinct guest RVAs | **1,932** |
-| Headers contributing | **583** |
-| RVAs claimed by more than one header | **455** |
+| Declared RVA constants | **3,052** |
+| Distinct guest RVAs | **1,957** |
+| Headers contributing | **584** |
+| RVAs claimed by more than one header | **462** |
 
 ## What the numbers mean
 
-- **1,910 distinct addresses is small against the program.** The CFG census
+- **1,957 distinct addresses is small against the program.** The CFG census
   ([CFG_CENSUS](CFG_CENSUS.md)) finds **55,790** unwind ranges in the same binary, so the current
-  native entry map covers about 3 % of the executable. That is the honest scale of the
+  native entry map covers about 3.5 % of the executable. That is the honest scale of the
   lifting work done so far.
 - **Duplicates are expected and healthy.** Shared helpers are referenced by many modules: `0xf590`
   is named by 54 headers, `0x17070` (allocation wrapper) by 13, and the `0x2ee2cf8` global cell by
   11 `vslot_40_533100_*` modules. The one vtable slot resolved by the indirect-frontier card
   (`0x20d60`) was already named by the ConCmd modules, which corroborates that it is a
   "register once" entry. A duplicate means "many units call this address", not "conflict".
-- **The table mixes code and data targets.** It records the literal constant each header uses; a
-  `…Target` constant is usually a call target, a `…Cell`/`…Slot` constant is usually a global
-  address. Only 160 RVAs are named by a `Target`/`Rva`-style constant. Treating an entry as callable
-  requires the owning module's checker, not this table.
+- **Every address is now typed against the ELF** ([ENTRY_CLOSURE](ENTRY_CLOSURE.md)): **830** are
+  exact FDE starts, **381** are branch labels inside a function, **12** are PLT stubs, **203** are
+  data in the R+X segment, **531** are non-executable image data and **0** are outside the image.
+  Only a `function_start` is a dispatchable call entry; the name convention alone is not the
+  contract (of 115 `Target`/`Rva`-named addresses, 31 are interior labels and 8 are data).
 - **Concentration:** the Init body window `0x531d60..0x534100` alone contributes **273** distinct
   entries, so the per-instruction Init lifting dominates the map.
 
 ## What is still missing
 
-1. **Entry point type.** Nothing here says whether an address starts a function, is called
-   mid-function, or is data. The CFG census gives function starts for 55,790 ranges; intersecting
-   the two tables is the next step (`CPU-01-AOT-CFG-SCALE-01` continuation).
+1. ~~**Entry point type.**~~ Done 2026-11-13 (`CPU-01-ENTRY-MAP-CLOSURE-01`): every mapped RVA is
+   typed against the 55,790 FDE ranges and the PT_LOAD map, and the native runtime answers it by
+   binary search (`guest_entry_find`). See [ENTRY_CLOSURE](ENTRY_CLOSURE.md); 141 of the 608
+   functions in the `0x531d60` closure have an exact native entry (23.2 %).
 2. **ABI.** A native entry today is `bool f(const Cells&) noexcept`-style with explicit hooks, not a
    retail ABI call. Calling one from lifted code needs an address → callable-thunk map.
 3. **Indirect targets.** 105 indirect call sites are in the `0x531d60` closure and remain

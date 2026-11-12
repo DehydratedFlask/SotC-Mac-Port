@@ -1,3 +1,50 @@
+## 2026-11-13 — Guest entry map typed against the ELF (CPU-01-ENTRY-MAP-CLOSURE-01)
+
+**State: green.** Continuation of `4312f738` on branch `cursor/init-hash-551140-6aa93e8`. Init-lift is
+untouched and unchanged: body extent **46,876 / 46,881 B**, native total **108,325 B**, only the
+`0x2170` contract (`0x5ba041`) and the S4.2 geometry block (`0x7f8664..0x7f87d8`, gated on
+`0x3288478`/`0x3288480`) stay open.
+
+This pass takes the next roadmap item the docs already named: `ENTRY_MAP.md`'s open item 1,
+"entry point type", i.e. the `CPU-01-AOT-CFG-SCALE-01` continuation and M1's guest-address →
+native-entry map. Until now the map said *which* RVAs our headers name; it did not say whether an
+address is a function entry, a mid-function label, an import stub or data.
+
+- **`tools/lift/entry_closure.py`** parses `.eh_frame_hdr` at `0x150c08c` (encodings checked;
+  **55,790** FDE ranges, `0x80..0xf8f321`, 15,839,273 B), parses the PT_LOAD map, and types every
+  distinct RVA in `docs/entry_map.json`. It also intersects the `0x531d60` closure.
+- **Measured classification (1,957 RVAs):** **830 function starts (42.4 %)**, **381 function
+  interiors (19.5 %)**, **12 PLT stubs**, **203 executable-data** bytes in R+X, **531 image data**
+  (including the vtables in the OS-specific `0x1594000` read-only segment), **0 outside image**.
+- **Audit finding:** of the **115** distinct addresses whose constants say `Target`/`Rva`, only
+  **75** are function starts; **31 are interior labels** and **8 are data**. The naming convention
+  is not a dispatch contract — the type is.
+- **Callee-closure gap measured:** the `0x531d60` closure reaches **608 functions**; **141 (23.2 %)**
+  have an exact native entry, **467** do not. The missing list is in the closure/JSON artifacts.
+- **Native runtime:** `native/core/guest_entry_table.{hpp,cpp}` expose
+  `guest_entry_find(rva)`/`guest_entry_counts()`/`guest_entry_kind_name()` over the generated
+  `guest_entry_table.inc` (1,957 strictly sorted rows, `static_assert`ed). The `sotc_init_window`
+  JSON now carries an `entry_map` block; the observed lookups are `0x531d60`/`0x5b9f90`
+  `function_start`, `0x1353` `function_interior`, `0xf8f390` `plt`, `0x1014a80` `executable_data`,
+  `0x1594d90` `image_data`, `0x12345678` `unknown`.
+- **Docs/fixture:** `docs/ENTRY_CLOSURE.md` + `docs/entry_closure.json` are generated;
+  `test_guest_entry_table` pins one RVA per kind and all counts; `check_entry_closure.py` re-derives
+  the JSON and the `.inc` from the pinned ELF byte-for-byte. `docs/ENTRY_MAP.md` totals now match the
+  regenerated map (**3,052 constants → 1,957 RVAs / 584 headers / 462 duplicates**).
+- **Bug fixed:** the top-of-file slice map in `init_5b9f90_slices.hpp` still labelled S4–S9
+  `blocked` and S1/S2 `contract` after the E1439 execution; it now matches the statuses the runtime
+  reports (S1 contract only, S2/S4.2-prefix/S5–S9 executed, `0x7f8664` geometry gated).
+- **Verification:** build **0**; full CTest **705/705** (704 + `guest_entry_table`); entry checker
+  **OK**; sweep **915/0/0**; `sotc_init_window` exit **0**, **stderr 0 B**, `ok=true`; entry map
+  **3,052 → 1,957 / 584 headers (462 duplicates)**; project index **114,665**; checkpoint
+  `docs/checkpoints/2026-11-13-entry-map-closure.md`.
+- **Not claimed:** cold boot, audio, save/reload, Metal validation (NOT RUN). G1 **PARTIAL** — no ABI
+  thunk map and no indirect-target resolution yet (105 indirect sites in the closure).
+
+**Next exact action:** `ENTRY_MAP.md`'s remaining open item 2 — give the 830 typed function entries an
+address → callable-thunk map (retail ABI) — or resolve part of the 105-site indirect frontier. Do not
+re-open `0x2170` or the `0x7f8664` geometry block.
+
 ## 2026-11-13 — `0x5b9f90` S4.2/S5-prologue/S6/S7/S8/S9 executed: 46,876 of 46,881 B (99.99 %), 108,325 B native
 
 **State: green.** Continuation of `5211f01d` on branch `cursor/init-hash-551140-6aa93e8`.
