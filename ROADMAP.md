@@ -204,11 +204,13 @@ executed by the same run is **14,805 B (31.6 %)**; 8 slice records, 1 contract (
 S4 was then decomposed at callee boundaries instead of being left whole: **S4.1** executes the
 `0x5dbf40..0x5ddcad` "Particle" page (7,533 B, 1,243 instructions, 177 calls, single `ret`) with
 its 20 byte-pinned items (2 `0xc580` ranged ints, 5 bounded floats, 12 bool variables), and **S5.1**
-executes the `0x5bc413..0x5bc78c` "Stereo 3D" page (889 B). S4.2 (`0x7f8930`) and S5.2
-(`0x5bc78c..0x5c1196`, 18,954 B) are blocked with recorded offsets and reasons. The body extent is
-now **10,173 of 46,881 B (21.7 %)** and the native code executed by the same run is **23,232 B
-(49.6 %)**; 10 slice records, resume **`0x5bc78c`**, `post_calls_executed` **26**, 1 blocked. Full
-CTest **704/704**, G1 **PARTIAL**.
+executes the `0x5bc413..0x5bc78c` "Stereo 3D" page (889 B). S4.2 (`0x7f8930`) stays blocked
+on its measured reason. S5.2 then turned out to be liftable with the same page machinery and now
+executes `0x5bc78c..0x5c1196` ("Dynamic 3D" + "Shadow Boss Worm Hole Effect", 18,954 B, 3,085
+instructions) as 56 byte-pinned items: 2 groups, 9 bool variables, 28 bounded floats, 7 ranged ints,
+7 separators and 3 keyframe commands. The body extent is now **29,127 of 46,881 B (62.1 %)** and the
+native code executed by the same run is **42,186 B (90.0 %)**; 11 slice records, resume
+**`0x5c1196`**, `post_calls_executed` **27**, 1 blocked. Full CTest **704/704**, G1 **PARTIAL**.
 Slot **23** (`0xe71990`) is registered via a **private fixture**; consumer/string necessity
 remains unresolved (G1 caveat). Operating plan lives in [HANDOFF](HANDOFF.md) only. Prefer
 session-sized code + checker acceptance over characterization-only docs churn.

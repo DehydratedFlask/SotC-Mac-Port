@@ -508,9 +508,13 @@ bool build_s4_ranged_int(const BuildContext& ctx, const Init5cf140ItemSpec& spec
         var = ConCmdRangedVar{};
         RangedVarArgs args{};
         args.fn_vptr = kInit5dbf40RangedIntTag;
+        const auto to_int = [](float v) {
+            if (v >= 2147483647.0F) return std::int32_t{2147483647};
+            if (v <= -2147483648.0F) return std::int32_t{-2147483647 - 1};
+            return static_cast<std::int32_t>(v);
+        };
         const HelperCtorResult r = helper_c580_ranged_int(
-            var, name, &value, static_cast<std::int32_t>(spec.var_lo),
-            static_cast<std::int32_t>(spec.var_hi), 1, args, empty);
+            var, name, &value, to_int(spec.var_lo), to_int(spec.var_hi), 1, args, empty);
         if (!r.ok) return fail(out, "s4_ranged_int_ctor_failed");
         if (!ctx.hooks->atexit->record(kInit5cf140BoolVarDtorRva, &var)) {
             return fail(out, "s4_ranged_int_atexit_failed");
@@ -565,6 +569,78 @@ bool run_s5_1(const BuildContext& ctx) noexcept {
     out.s5_executed = true;
     add_record(out, "S5.1", kInit5b9f90S5_1EndRva - kInit5b9f90S5_1Size, kInit5b9f90S5_1EndRva,
                "0x5bc413 \"Stereo 3D\": group + Auto Focal Distance 0..500 + Auto Distortion 0..1");
+    ++out.executed_slices;
+    return true;
+}
+
+// S5.2: the 0x5bc78c..0x5c1196 "Dynamic 3D" and wormhole pages.
+bool run_s5_2(const BuildContext& ctx) noexcept {
+    Init5b9f90Result& out = *ctx.out;
+    const int registered_before = out.registered;
+    std::size_t ranged_index = 19;   // S2 0..9, S4 10..16, S5.1 17..18
+    std::size_t bool_index = 19;     // S3 0..3, S2 4..6, S4 7..18
+    for (std::size_t i = 0; i < kInit5b9f90S5_2ItemsCount; ++i) {
+        const Init5cf140ItemSpec& spec = kInit5b9f90S5_2Items[i];
+        bool ok = false;
+        switch (spec.kind) {
+            case Init5cf140ItemKind::group: ok = build_s4_group(ctx, spec, false, false); break;
+            case Init5cf140ItemKind::separator: {
+                const SharedStr parent = borrowed(spec.parent, spec.parent_len);
+                DebugMenuItem* const item = next_item(ctx);
+                if (item == nullptr) return fail(out, "item_storage_exhausted");
+                if (!init_menu_separator_26b60(*item, parent, kInit5b9f90ItemFlags,
+                                               ctx.hooks->separator_alloc)) {
+                    return fail(out, "s5_2_separator_ctor_failed");
+                }
+                if (!register_menu_item_268b0(*item, *ctx.hooks->menu, *ctx.hooks->atexit).ok) {
+                    return fail(out, "s5_2_separator_register_failed");
+                }
+                ++out.separators;
+                ++out.registered;
+                ++out.destroys;
+                if (!release(ctx, parent)) return fail(out, "s5_2_separator_release_failed");
+                ok = true;
+                break;
+            }
+            case Init5cf140ItemKind::command: {
+                const SharedStr parent = borrowed(spec.parent, spec.parent_len);
+                const SharedStr caption = borrowed(spec.text, spec.text_len);
+                const SharedStr name = borrowed(spec.command, spec.command_len);
+                DebugMenuItem* const item = next_item(ctx);
+                if (item == nullptr) return fail(out, "item_storage_exhausted");
+                if (!init_menu_command_26f90(*item, parent, caption,
+                                            reinterpret_cast<const void*>(static_cast<std::uintptr_t>(0x2DFCBD0)),
+                                            name, kInit5b9f90ItemFlags)) {
+                    return fail(out, "s5_2_command_ctor_failed");
+                }
+                if (!register_menu_item_268b0(*item, *ctx.hooks->menu, *ctx.hooks->atexit).ok) {
+                    return fail(out, "s5_2_command_register_failed");
+                }
+                ++out.commands;
+                ++out.registered;
+                ++out.destroys;
+                if (!release(ctx, caption) || !release(ctx, name)) {
+                    return fail(out, "s5_2_command_release_failed");
+                }
+                ok = true;
+                break;
+            }
+            case Init5cf140ItemKind::bool_var: ok = build_s4_bool(ctx, spec, bool_index++); break;
+            case Init5cf140ItemKind::ranged_slider:
+                ok = build_s4_ranged_float(ctx, spec, ranged_index++);
+                break;
+            case Init5cf140ItemKind::ranged_int_slider:
+                ok = build_s4_ranged_int(ctx, spec, ranged_index++);
+                break;
+            default: return fail(out, "s5_2_unknown_item_kind");
+        }
+        if (!ok) return false;
+    }
+    out.s5_items += static_cast<std::size_t>(out.registered - registered_before);
+    out.s5_bytes += kInit5b9f90S5_2Size;
+    add_record(out, "S5.2", kInit5b9f90S5_2Rva, kInit5b9f90S5_2EndRva,
+               "0x5bc78c \"Dynamic 3D\" + \"Shadow Boss Worm Hole Effect\": 2 groups, 9 bools, "
+               "35 bounded vars, 7 separators, 3 commands");
     ++out.executed_slices;
     return true;
 }
@@ -687,8 +763,9 @@ Init5b9f90Result run_init_5b9f90_slices(const Init5b9f90Hooks& hooks) noexcept {
     ++out.contracts;
     // S5.1 executes the "Stereo 3D" page; S5.2 and S6..S9 stay blocked.
     if (!run_s5_1(ctx)) return out;
+    if (!run_s5_2(ctx)) return out;
 
-    // Everything from 0x5bc78c on (S5.2 ... S9) is unlifted.
+    // Everything from 0x5c1196 on (S6 ... S9) is unlifted.
     out.resume_rva = kInit5b9f90ResumeRva;
     out.complete = false;
     out.ok = true;

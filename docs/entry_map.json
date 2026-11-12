@@ -5128,11 +5128,21 @@
     ],
     "0x5bc78c": [
       {
+        "constant": "kInit5b9f90S5_1End",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      },
+      {
+        "constant": "kInit5b9f90S5_2",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x5c1196": [
+      {
         "constant": "kInit5b9f90Resume",
         "header": "native/core/init_5b9f90_slices.hpp"
       },
       {
-        "constant": "kInit5b9f90S5_1End",
+        "constant": "kInit5b9f90S5_2End",
         "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
@@ -18356,11 +18366,21 @@
     ],
     "0x5bc78c": [
       {
+        "constant": "kInit5b9f90S5_1End",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      },
+      {
+        "constant": "kInit5b9f90S5_2",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x5c1196": [
+      {
         "constant": "kInit5b9f90Resume",
         "header": "native/core/init_5b9f90_slices.hpp"
       },
       {
-        "constant": "kInit5b9f90S5_1End",
+        "constant": "kInit5b9f90S5_2End",
         "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
@@ -23185,9 +23205,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 3040,
-    "distinct_rvas": 1949,
-    "duplicate_rvas": 459,
+    "constants": 3042,
+    "distinct_rvas": 1950,
+    "duplicate_rvas": 460,
     "headers": 584
   }
 }

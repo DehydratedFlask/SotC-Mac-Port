@@ -35,7 +35,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/Tests/LauncherCoreTests` | 18 | Native Swift macOS launcher |
 | `launcher/Tests/LauncherNativeCoreTests` | 2 | Native Swift macOS launcher |
 | `local` | 14 | Private extracted assets, binary analysis, manifests, builds and evidence |
-| `logs` | 153 | Private command/build/install/extraction logs |
+| `logs` | 155 | Private command/build/install/extraction logs |
 | `native` | 2 | Native game implementation; verify module README and task ownership |
 | `native/api` | 4 | Native game implementation; verify module README and task ownership |
 | `native/api/standalone` | 1 | Native game implementation; verify module README and task ownership |

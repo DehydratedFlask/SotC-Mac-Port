@@ -33,10 +33,13 @@ ELF_SHA256 = 'd0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3'
 BODY = 0x5B9F90
 BODY_END = 0x5C56B1          # exclusive
 BODY_SIZE = 0xB721           # 46,881
-EXECUTED_SIZE = 10173        # 9,284 + S5.1 889 (body extent)
+EXECUTED_SIZE = 29127        # 10,173 + S5.2 18,954 (body extent)
 S5_1_START = 0x5BC413
 S5_1_END = 0x5BC78C
 S5_1_SIZE = 0x379
+S5_2_START = 0x5BC78C
+S5_2_END = 0x5C1196
+S5_2_SIZE = 0x4A0A
 S4_START = 0x5DBF40
 S4_END = 0x5DDCAD            # the ret byte, exclusive
 S4_SIZE = 0x1D6D             # 7,533
@@ -49,8 +52,8 @@ S2_START = 0x5CF140
 S2_END = 0x5D06D6            # exclusive
 S2_SIZE = 0x1596             # 5,526
 S2_RET = 0x5D06D6
-TOTAL_EXECUTED = 23232       # 10,173 + 5,526 + 7,533
-RESUME_RVA = 0x5BC78C
+TOTAL_EXECUTED = 42186       # 29,127 + 5,526 + 7,533
+RESUME_RVA = 0x5C1196
 SEPARATOR_CTOR = 0x26B60
 RANGED_CTOR = 0xC300
 SLIDER_CTOR = 0x27120
@@ -223,13 +226,60 @@ def main() -> int:
     require([s[0] for s in slice_table if s[5] == 'contract'] == ['S1'],
             'the 0x2170 page builder stays the only contract')
     # S4 contributes only its executed S4.1 call site (5 B), not the 5 B blocked S4.2 site.
-    executed = sum(s[2] - s[1] for s in slice_table if s[0] in ('S0', 'S2', 'S3')) + 5 + 889
-    require(executed == EXECUTED_SIZE, 'executed extent ' + str(executed) + ' != 10173')
+    executed = sum(s[2] - s[1] for s in slice_table if s[0] in ('S0', 'S2', 'S3')) + 5 + 889 + 18954
+    require(executed == EXECUTED_SIZE, 'executed extent ' + str(executed) + ' != 29127')
     header_text = HEADER.read_text()
-    require('kInit5b9f90ExecutedBytes = 10173' in header_text, 'executed-bytes constant')
-    require('kInit5b9f90TotalExecutedBytes = 23232' in header_text, 'total executed-bytes constant')
+    require('kInit5b9f90ExecutedBytes = 29127' in header_text, 'executed-bytes constant')
+    require('kInit5b9f90TotalExecutedBytes = 42186' in header_text, 'total executed-bytes constant')
     require(S2_END - S2_START == S2_SIZE == 5526, 'S2 size constant')
-    require('kInit5b9f90ResumeRva = 0x5BC78C' in header_text, 'resume constant')
+    require('kInit5b9f90ResumeRva = 0x5C1196' in header_text, 'resume constant')
+
+
+    # ---- S5.2: 0x5bc78c..0x5c1196 "Dynamic 3D" + wormhole pages -------------------------------
+    s52_offset = header_text.index('kInit5b9f90S5_2Items')
+    s52 = smap.disassemble_range(S5_2_START, S5_2_END)
+    require(len(s52) == 3085, 'S5.2 instruction count ' + str(len(s52)))
+    require(S5_2_END - S5_2_START == S5_2_SIZE == 18954, 'S5.2 size')
+    s52_rows = []
+    for m in re.finditer(r'\{Init5cf140ItemKind::(\w+),(.*?)\},\n', header_text, re.S):
+        if m.start() < s52_offset:
+            continue
+        args = split_args(m.group(2))
+        require(len(args) == 14, 'S5.2 row arity')
+        s52_rows.append((m.group(1), [a.strip('"') for a in args]))
+    require(len(s52_rows) == 56, 'S5.2 rows ' + str(len(s52_rows)))
+    kinds = [k for k, _ in s52_rows]
+    require(kinds.count('group') == 2 and kinds.count('bool_var') == 9 and
+            kinds.count('ranged_slider') == 28 and kinds.count('ranged_int_slider') == 7 and
+            kinds.count('separator') == 7 and kinds.count('command') == 3, 'S5.2 kind counts')
+    for kind, a in s52_rows:
+        site = int(a[0], 16)
+        require(S5_2_START <= site < S5_2_END, 'S5.2 site range ' + hex(site))
+        if kind == 'group':
+            require(call_target_ok(img, site, GROUP_CTOR), 'S5.2 group ctor ' + hex(site))
+        elif kind == 'separator':
+            require(call_target_ok(img, site, 0x26B60), 'S5.2 separator ctor ' + hex(site))
+        elif kind == 'command':
+            require(call_target_ok(img, site, 0x26F90), 'S5.2 command ctor ' + hex(site))
+            require(int(a[7], 16) == 0x2DFCBD0, 'S5.2 command target ' + hex(site))
+        elif kind == 'bool_var':
+            require(call_target_ok(img, site, 0x20AF0), 'S5.2 bool ctor ' + hex(site))
+            item_site = int(a[13], 16)
+            if item_site:
+                require(call_target_ok(img, item_site, 0x26DB0), 'S5.2 bool item ' + hex(site))
+        else:
+            target_ctor = RANGED_CTOR if kind == 'ranged_slider' else 0xC580
+            require(call_target_ok(img, site, target_ctor), 'S5.2 var ctor ' + hex(site))
+            item_site = int(a[13], 16)
+            require(call_target_ok(img, item_site, SLIDER_CTOR), 'S5.2 slider ' + hex(item_site))
+            leas = set()
+            for x, _m, o, _r in s52:
+                if site - 0x180 <= x < site + 0x220:
+                    leas.update(lee_targets(o))
+            require(int(a[7], 16) in leas, 'S5.2 cell ' + hex(site))
+            if int(a[8], 16):
+                require(int(a[8], 16) in leas, 'S5.2 guard ' + hex(site))
+            require(any(read_cstr(img, va) == a[3] for va in leas), 'S5.2 name ' + hex(site))
 
     # ---- S5.1: the 0x5bc413..0x5bc78c "Stereo 3D" page ---------------------------------------
     s51 = smap.disassemble_range(S5_1_START, S5_1_END)
@@ -240,8 +290,9 @@ def main() -> int:
             call_target_ok(img, 0x5BC413, GROUP_CTOR), 'S5.1 group ctor')
     s51_rows = []
     s51_offset = header_text.index('kInit5b9f90S5_1Items')
+    s52_offset = header_text.index('kInit5b9f90S5_2Items')
     for m in re.finditer(r'\{Init5cf140ItemKind::(\w+),(.*?)\},\n', header_text, re.S):
-        if m.start() < s51_offset:
+        if m.start() < s51_offset or m.start() >= s52_offset:
             continue
         args = split_args(m.group(2))
         require(len(args) == 14, 'S5.1 row arity')

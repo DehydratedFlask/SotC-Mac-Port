@@ -72,13 +72,13 @@ inline constexpr std::uint64_t kInit5b9f90Rva = 0x5B9F90;
 inline constexpr std::uint64_t kInit5b9f90EndRva = 0x5C56B1;   // exclusive; the ret is at 0x5c56aa
 inline constexpr std::size_t kInit5b9f90Size = 0xB721;         // 46,881 B
 inline constexpr std::size_t kInit5b9f90Instructions = 7645;   // objdump-aligned, [0x5b9f90, 0x5c56b1)
-inline constexpr std::size_t kInit5b9f90ExecutedBytes = 10173;  // 9,284 + S5.1 889
+inline constexpr std::size_t kInit5b9f90ExecutedBytes = 29127;  // 10,173 + S5.2 18,954
 // Native code now executed by the same run, counting the executed callee bodies (S2 + S4.1).
-inline constexpr std::size_t kInit5b9f90TotalExecutedBytes = 23232;   // 10,173 + 5,526 + 7,533
+inline constexpr std::size_t kInit5b9f90TotalExecutedBytes = 42186;   // 29,127 + 5,526 + 7,533
 inline constexpr std::uint64_t kInit5b9f90SingleRetRva = 0x5C56AA;
 inline constexpr std::uint64_t kInit5b9f90LoopHeadRva = 0x5C1D50;
 inline constexpr std::uint64_t kInit5b9f90LoopTailRva = 0x5C1E5B;   // jne 0x5c1d50, 33 iterations
-inline constexpr std::uint64_t kInit5b9f90ResumeRva = 0x5BC78C;   // S5.2
+inline constexpr std::uint64_t kInit5b9f90ResumeRva = 0x5C1196;   // S6
 inline constexpr std::uint32_t kInit5b9f90ItemFlags = 0x30;       // every item in this body
 
 // The two page builders that sit between S0 and S3.
@@ -131,10 +131,13 @@ inline constexpr std::uint64_t kInit5dbf40RangedIntTag = 0x15C8450;   // int-fam
 
 // S5.1: the first page of S5, `0x5bc413..0x5bc78c` (889 B, 149 instructions): group "Stereo 3D"
 // under "CP10" and the two bounded floats "Auto Focal Distance" (0..500) and "Auto Distortion"
-// (0..1) with their 0x27120 sliders. S5.2 (the rest of S5, 19,007 B) stays blocked.
+// (0..1) with their 0x27120 sliders. S5.2 executes the rest of S5.
 inline constexpr std::uint64_t kInit5b9f90S5Rva = 0x5BC3DE;
 inline constexpr std::uint64_t kInit5b9f90S5_1EndRva = 0x5BC78C;
 inline constexpr std::size_t kInit5b9f90S5_1Size = 0x379;   // 889 B
+inline constexpr std::uint64_t kInit5b9f90S5_2Rva = 0x5BC78C;
+inline constexpr std::uint64_t kInit5b9f90S5_2EndRva = 0x5C1196;
+inline constexpr std::size_t kInit5b9f90S5_2Size = 0x4A0A;   // 18,954 B
 
 // S4.2: the 0x7f8930 guard helper (26 instructions, one call at 0x7f895b to 0x7f8610, one `tls`
 // canary compare) needs 0x7f8610's 688-instruction body and the two host globals at 0x3288478 and
@@ -155,7 +158,7 @@ inline constexpr Init5b9f90Slice kInit5b9f90Slices[] = {
     {"S4", 0x5BC3D4, 0x5BC3DE, 2, 2, Init5b9f90SliceStatus::partial,
      "S4.1 0x5dbf40 executed (7,533 B); S4.2 0x7f8930 blocked on 0x7f8610"},
     {"S5", 0x5BC3DE, 0x5C1196, 3245, 452, Init5b9f90SliceStatus::partial,
-     "S5.1 \"Stereo 3D\" page executed (889 B); S5.2 19,007 B pending"},
+     "S5.1 + S5.2 execute (19,843 B); the 53 B prologue 0x5bc3de..0x5bc413 is not separately modelled"},
     {"S6", 0x5C1196, 0x5C11A0, 2, 2, Init5b9f90SliceStatus::blocked,
      "0x5c94b0 + 0xb25840: callee bodies not lifted"},
     {"S7", 0x5C11A0, 0x5C1D50, 491, 75, Init5b9f90SliceStatus::blocked,
@@ -185,8 +188,8 @@ inline constexpr Init5b9f90SubSlice kInit5b9f90SubSlices[] = {
      "0x7f8930 needs 0x7f8610 (688 insns) and globals 0x3288478/0x3288480"},
     {"S5.1", 0x5BC413, kInit5b9f90S5Rva, kInit5b9f90S5_1EndRva, Init5b9f90SliceStatus::executed,
      "\"Stereo 3D\" page: group + 2 bounded floats/sliders, 889 B, 149 insns"},
-    {"S5.2", 0x5BC78C, kInit5b9f90S5_1EndRva, 0x5C1196, Init5b9f90SliceStatus::blocked,
-     "\"Dynamic 3D\" + wormhole pages, 19,007 B; extraction pending"},
+    {"S5.2", 0x5BC78C, kInit5b9f90S5_2Rva, kInit5b9f90S5_2EndRva, Init5b9f90SliceStatus::executed,
+     "\"Dynamic 3D\" + \"Shadow Boss Worm Hole Effect\": 2 groups, 9 bools, 35 bounded vars, 7 separators, 3 commands"},
 };
 
 // One menu item exactly as the body builds it. `caption` is the item text (for a named variable it
@@ -471,6 +474,73 @@ inline constexpr Init5cf140ItemSpec kInit5b9f90S5_1Items[] = {
 inline constexpr std::size_t kInit5b9f90S5_1ItemsCount =
     sizeof(kInit5b9f90S5_1Items) / sizeof(kInit5b9f90S5_1Items[0]);
 
+// S5.2: the 0x5bc78c..0x5c1196 "Dynamic 3D" and "Shadow Boss Worm Hole Effect" pages
+// (18,954 B, 3,085 instructions): 2 groups, 9 bool variables, 35 bounded variables + sliders
+// (28 0xc300 floats, 7 0xc580 ints), 7 separators and 3 0x26f90 keyframe commands.
+
+inline constexpr Init5cf140ItemSpec kInit5b9f90S5_2Items[] = {
+    {Init5cf140ItemKind::group, 0x5BC78C, "Stereo 3D", 9, "Dynamic 3D", 10, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5BC824, "Stereo 3D", 9, "Focus On Objects", 16, nullptr, 0, 0x2fedd08, 0x2fede90, 0, 0, 0, 0, 0x5BC8F6},
+    {Init5cf140ItemKind::bool_var, 0x5BC996, "Stereo 3D", 9, "Show Crosshair in 3D", 20, nullptr, 0, 0x2feddd0, 0x2fedf58, 0, 0, 0, 0, 0x5BCA68},
+    {Init5cf140ItemKind::bool_var, 0x5BCB08, "Stereo 3D", 9, "Dynamic S3D", 11, nullptr, 0, 0x2fede98, 0x2fee020, 0, 0, 0, 0, 0x5BCBDA},
+    {Init5cf140ItemKind::bool_var, 0x5BCC7A, "Stereo 3D", 9, "Clamp Max Separation", 20, nullptr, 0, 0x2fedf60, 0x2fee0e8, 0, 0, 0, 0, 0x5BCD4C},
+    {Init5cf140ItemKind::bool_var, 0x5BCDEC, "Stereo 3D", 9, "Debug Clamp Max Separation", 26, nullptr, 0, 0x2fee028, 0x2fee1c0, 0, 0, 0, 0, 0x5BCEBE},
+    {Init5cf140ItemKind::ranged_slider, 0x5BCFC3, "Stereo 3D", 9, "Underwater Distortion Scale", 27, nullptr, 0, 0x2fee0f0, 0x2fee298, 1.0F, 1.0F, 0.0F, 1.0F, 0x5BD067},
+    {Init5cf140ItemKind::separator, 0x5BD086, "Stereo 3D", 9, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5BD192, "Stereo 3D", 9, "Extraction border size", 22, nullptr, 0, 0x2fee1c8, 0x2fee370, 1.0F, 1.0F, 16, 256, 0x5BD229},
+    {Init5cf140ItemKind::ranged_slider, 0x5BD32E, "Stereo 3D", 9, "Extraction border weight", 24, nullptr, 0, 0x2fee2a0, 0x2fee448, 1.0F, 1.0F, 0.0F, 10.0F, 0x5BD3CF},
+    {Init5cf140ItemKind::ranged_slider, 0x5BD4D4, "Stereo 3D", 9, "Auto Distance Step%", 19, nullptr, 0, 0x2fee378, 0x2fee520, 1.0F, 1.0F, 0.0F, 1.0F, 0x5BD575},
+    {Init5cf140ItemKind::ranged_slider, 0x5BD67A, "Stereo 3D", 9, "Auto Distortion Step%", 21, nullptr, 0, 0x2fee450, 0x2fee5f8, 1.0F, 1.0F, 0.0F, 1.0F, 0x5BD71E},
+    {Init5cf140ItemKind::separator, 0x5BD73D, "Stereo 3D", 9, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_slider, 0x5BD849, "Stereo 3D", 9, "Near Focal Distance", 19, nullptr, 0, 0x2fee528, 0x2fee6d0, 1.0F, 1.0F, 0.0F, 100.0F, 0x5BD8E4},
+    {Init5cf140ItemKind::ranged_slider, 0x5BD9E9, "Stereo 3D", 9, "Near Weight 1", 13, nullptr, 0, 0x2fee600, 0x2fee7a8, 1.0F, 1.0F, 0.0F, 20.0F, 0x5BDA8A},
+    {Init5cf140ItemKind::ranged_slider, 0x5BDB90, "Stereo 3D", 9, "Near Weight 2", 13, nullptr, 0, 0x2fee6d8, 0x2fee880, 1.0F, 1.0F, 0.0F, 20.0F, 0x5BDC31},
+    {Init5cf140ItemKind::ranged_slider, 0x5BDD37, "Stereo 3D", 9, "Near Weight 3", 13, nullptr, 0, 0x2fee7b0, 0x2fee958, 1.0F, 1.0F, 0.0F, 20.0F, 0x5BDDD8},
+    {Init5cf140ItemKind::ranged_slider, 0x5BDEDD, "Stereo 3D", 9, "Near Distortion Near", 20, nullptr, 0, 0x2fee888, 0x2feea30, 1.0F, 1.0F, 0.0F, 1.0F, 0x5BDF7E},
+    {Init5cf140ItemKind::ranged_slider, 0x5BE084, "Stereo 3D", 9, "Near Distortion Mid", 19, nullptr, 0, 0x2fee960, 0x2feeb08, 1.0F, 1.0F, 0.0F, 1.0F, 0x5BE125},
+    {Init5cf140ItemKind::ranged_slider, 0x5BE22B, "Stereo 3D", 9, "Near Distortion Far", 19, nullptr, 0, 0x2feea38, 0x2feebe0, 1.0F, 1.0F, 0.0F, 1.0F, 0x5BE2CF},
+    {Init5cf140ItemKind::separator, 0x5BE2EE, "Stereo 3D", 9, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_slider, 0x5BE3FC, "Stereo 3D", 9, "Far Focal Distance", 18, nullptr, 0, 0x2feeb10, 0x2feecb8, 1.0F, 1.0F, 0.0F, 100.0F, 0x5BE499},
+    {Init5cf140ItemKind::ranged_slider, 0x5BE59F, "Stereo 3D", 9, "Far Weight 1", 12, nullptr, 0, 0x2feebe8, 0x2feed90, 1.0F, 1.0F, 0.0F, 20.0F, 0x5BE640},
+    {Init5cf140ItemKind::ranged_slider, 0x5BE746, "Stereo 3D", 9, "Far Weight 2", 12, nullptr, 0, 0x2feecc0, 0x2feee68, 1.0F, 1.0F, 0.0F, 20.0F, 0x5BE7E7},
+    {Init5cf140ItemKind::ranged_slider, 0x5BE8ED, "Stereo 3D", 9, "Far Weight 3", 12, nullptr, 0, 0x2feed98, 0x2feef40, 1.0F, 1.0F, 0.0F, 20.0F, 0x5BE98E},
+    {Init5cf140ItemKind::ranged_slider, 0x5BEA94, "Stereo 3D", 9, "Far Distortion Near", 19, nullptr, 0, 0x2feee70, 0x2fef018, 1.0F, 1.0F, 0.0F, 1.0F, 0x5BEB35},
+    {Init5cf140ItemKind::ranged_slider, 0x5BEC3B, "Stereo 3D", 9, "Far Distortion Mid", 18, nullptr, 0, 0x2feef48, 0x2fef0f0, 1.0F, 1.0F, 0.0F, 1.0F, 0x5BECDC},
+    {Init5cf140ItemKind::ranged_slider, 0x5BEDE2, "Stereo 3D", 9, "Far Distortion Far", 18, nullptr, 0, 0x2fef020, 0x2fef1c8, 1.0F, 1.0F, 0.0F, 1.0F, 0x5BEE86},
+    {Init5cf140ItemKind::separator, 0x5BEEE9, "Stereo 3D", 9, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5BEFE6, "Stereo 3D", 9, "Cinematic Control", 17, nullptr, 0, 0x2fef0f8, 0x2fef2a0, 1.0F, 1.0F, 0, 1, 0x5BF07E},
+    {Init5cf140ItemKind::ranged_slider, 0x5BF183, "Stereo 3D", 9, "Cinematic Focal Distance", 24, nullptr, 0, 0x2fef1d0, 0x2fef378, 1.0F, 1.0F, 0.0F, 500.0F, 0x5BF21B},
+    {Init5cf140ItemKind::ranged_slider, 0x5BF320, "Stereo 3D", 9, "Cinematic Distortion", 20, nullptr, 0, 0x2fef2a8, 0x2fef450, 1.0F, 1.0F, 0.0F, 1.0F, 0x5BF3B8},
+    {Init5cf140ItemKind::ranged_slider, 0x5BF4BD, "Stereo 3D", 9, "Cinematic FOV Adjustment", 24, nullptr, 0, 0x2fef380, 0x2fef528, 1.0F, 1.0F, -3.0F, 3.0F, 0x5BF555},
+    {Init5cf140ItemKind::ranged_slider, 0x5BF65A, "Stereo 3D", 9, "Cinematic Near Plane Adj", 24, nullptr, 0, 0x2fef458, 0x2fef600, 1.0F, 1.0F, 0.05000000074505806F, 10.0F, 0x5BF6F2},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5BF7F7, "Stereo 3D", 9, "Cinematic Character Motion Blur", 31, nullptr, 0, 0x2fef530, 0x2fef6c8, 1.0F, 1.0F, 0, 2, 0x5BF896},
+    {Init5cf140ItemKind::separator, 0x5BF8B5, "Stereo 3D", 9, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5BF94D, "Stereo 3D", 9, "Manual Control", 14, nullptr, 0, 0x2fef608, 0x2fef7a0, 0, 0, 0, 0, 0x5BFA1F},
+    {Init5cf140ItemKind::ranged_slider, 0x5BFB24, "Stereo 3D", 9, "Manual Focal Distance", 21, nullptr, 0, 0x2fef6d0, 0x2fef878, 1.0F, 1.0F, 0.0F, 500.0F, 0x5BFBC5},
+    {Init5cf140ItemKind::ranged_slider, 0x5BFCCA, "Stereo 3D", 9, "Manual Distortion", 17, nullptr, 0, 0x2fef7a8, 0x2fef950, 1.0F, 1.0F, 0.0F, 1.0F, 0x5BFD6B},
+    {Init5cf140ItemKind::ranged_slider, 0x5BFE70, "Stereo 3D", 9, "Manual FOV Adjustment", 21, nullptr, 0, 0x2fef880, 0x2fefa28, 1.0F, 1.0F, -3.0F, 3.0F, 0x5BFF11},
+    {Init5cf140ItemKind::ranged_slider, 0x5C0016, "Stereo 3D", 9, "Manual Near Plane Adj", 21, nullptr, 0, 0x2fef958, 0x2fefb00, 1.0F, 1.0F, 0.05000000074505806F, 10.0F, 0x5C00B7},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C01BC, "Stereo 3D", 9, "Manual Character Motion Blur", 28, nullptr, 0, 0x2fefa30, 0x0, 1.0F, 1.0F, 0, 2, 0x5C025C},
+    {Init5cf140ItemKind::separator, 0x5C027B, "Stereo 3D", 9, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::command, 0x5C02FD, "Stereo 3D", 9, "Create Keyframe", 15, "BP_CreateCinematicKeyframe", 26, 0x2DFCBD0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::command, 0x5C0388, "Stereo 3D", 9, "Save Keyframe File", 18, "BP_SaveCinematicKeyframes", 25, 0x2DFCBD0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5C0430, "Stereo 3D", 9, "Pause on First Frame", 20, nullptr, 0, 0x2fefb08, 0x2fefc90, 0, 0, 0, 0, 0x5C0502},
+    {Init5cf140ItemKind::bool_var, 0x5C05A2, "Stereo 3D", 9, "Pause on Last Frame", 19, nullptr, 0, 0x2fefbd0, 0x2fefd58, 0, 0, 0, 0, 0x5C0674},
+    {Init5cf140ItemKind::bool_var, 0x5C0714, "Stereo 3D", 9, "Pause on EVERY Frame", 20, nullptr, 0, 0x2fefc98, 0x0, 0, 0, 0, 0, 0x5C07E9},
+    {Init5cf140ItemKind::command, 0x5C0870, "Stereo 3D", 9, "Reset All Keyframes", 19, "BP_DeleteCinematicKeyframes", 27, 0x2DFCBD0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::separator, 0x5C0897, "Stereo 3D", 9, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C09A3, "Stereo 3D", 9, "Cinematic Camera Stage", 22, nullptr, 0, 0x2fefd60, 0x2feff08, 1.0F, 1.0F, -1.0F, 2147483647.0F, 0x5C0A37},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C0B3C, "Stereo 3D", 9, "Cinematic Camera Frame", 22, nullptr, 0, 0x2fefe38, 0x2feffe0, 1.0F, 1.0F, 0.0F, 2147483647.0F, 0x5C0BD5},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C0CDA, "Stereo 3D", 9, "Cinematic Camera Frame Max", 26, nullptr, 0, 0x2feff10, 0x2ff00b8, 1.0F, 1.0F, 0.0F, 2147483647.0F, 0x5C0D76},
+    {Init5cf140ItemKind::group, 0x5C0DAF, "Stereo 3D", 9, "Shadow Boss Worm Hole Effect", 28, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_slider, 0x5C0EBB, "Stereo 3D", 9, "Focal Distance", 14, nullptr, 0, 0x2feffe8, 0x2ff0190, 1.0F, 1.0F, -500.0F, 500.0F, 0x5C0F56},
+    {Init5cf140ItemKind::ranged_slider, 0x5C105B, "Stereo 3D", 9, "Distortion", 10, nullptr, 0, 0x2ff00c0, 0x0, 1.0F, 1.0F, 0.0F, 1.0F, 0x5C10FF},
+};
+
+inline constexpr std::size_t kInit5b9f90S5_2ItemsCount =
+    sizeof(kInit5b9f90S5_2Items) / sizeof(kInit5b9f90S5_2Items[0]);
+
+
 struct Init5b9f90Hooks {
     void* host = nullptr;
     DebugMenuRegistry* menu = nullptr;
@@ -537,7 +607,7 @@ struct Init5b9f90Result {
     std::size_t items_used = 0;
     bool canary_stored = false;
     // Executed sub-slice records handed to the runtime's post-call log (S0, S2, S3.1..S3.6, S4.1).
-    std::array<InitPostCallRecord, 10> records{};
+    std::array<InitPostCallRecord, 16> records{};
     std::size_t record_count = 0;
 };
 

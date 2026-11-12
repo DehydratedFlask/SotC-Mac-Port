@@ -41,17 +41,17 @@ straight-line item clusters (view write, constructor at 0x26c10/0x26b60/0x26f90/
 | S4.1 | executed | 0x5dbf40 "Particle" body (7,533 B, 1,243 insns, 177 calls): 1 group, 2 ranged ints, 5 bounded floats, 12 bool variables, 7 sliders, 20 destroys |
 | S4.2 | blocked | 0x7f8930 guard helper (26 insns, single call to 0x7f8610) needs 0x7f8610's 688-instruction body and the host globals 0x3288478/0x3288480 |
 | S5.1 | executed | 0x5bc413..0x5bc78c "Stereo 3D" page (889 B, 149 insns): 1 group, 2 bounded floats (0..500, 0..1), 2 sliders, 2 destroys |
-| S5.2 | blocked | 0x5bc78c..0x5c1196 "Dynamic 3D" + wormhole pages (18,954 B) still need item extraction |
-| S5 | partial | "Stereo 3D" page executed (S5.1); S5.2 extraction pending |
+| S5.2 | executed | 0x5bc78c..0x5c1196 "Dynamic 3D" + "Shadow Boss Worm Hole Effect" (18,954 B, 3,085 insns): 2 groups, 9 bools, 35 bounded vars + sliders, 7 separators, 3 keyframe commands |
+| S5 | partial | S5.1 + S5.2 execute (19,843 B); the 53 B prologue 0x5bc3de..0x5bc413 is not separately modelled |
 | S6 | blocked | 0x5c94b0 + 0xb25840 callee bodies not lifted |
 | S7 | blocked | "Shadow Sound" / "Shadow Cursor" / "Layers": extraction pending |
 | S8 | blocked | the single loop nest (33 iterations over the 0x2dcaa90 table) |
 | S9 | blocked | "Performance" / "Transparency" / "Texture" / "Fullscreen Effects Tweaks" |
 
-Resume offset for the next agent: `0x5bc78c` (S5.2, the "Dynamic 3D" page).
-Executed extent: 10,173 of 46,881 B of the 0x5b9f90 body (21.7 %), plus the executed
-0x5cf140 body (5,526 B) and 0x5dbf40 body (7,533 B) for 23,232 B of native code (49.6 %);
-`post_calls_complete` stays false because S1, S4.2, S5.2 and S6..S9 are still contracts/blocked.
+Resume offset for the next agent: `0x5c1196` (S6, the 0x5c94b0/0xb25840 page pair).
+Executed extent: 29,127 of 46,881 B of the 0x5b9f90 body (62.1 %), plus the executed
+0x5cf140 body (5,526 B) and 0x5dbf40 body (7,533 B) for 42,186 B of native code (90.0 %);
+`post_calls_complete` stays false because S1, S4.2 and S6..S9 are still contracts/blocked.
 
 ## Callees per slice
 

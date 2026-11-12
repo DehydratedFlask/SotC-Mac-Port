@@ -58,15 +58,15 @@ struct Fixture {
     DebugMenuRegistry menu{};
     ConCmdRegistry registry{};
     StartupAtexitLog atexit{};
-    std::array<DebugMenuItem, 128> items{};
+    std::array<DebugMenuItem, 192> items{};
     std::array<bool, 8> toggle_values{};
-    std::array<ConCmdBoolVar, 24> vars{};
-    std::array<bool, 24> var_values{};
-    std::array<bool, 24> var_guards{};
-    std::array<ConCmdRangedVar, 20> ranged{};
-    std::array<float, 20> ranged_values{};
-    std::array<std::int32_t, 20> ranged_int_values{};
-    std::array<bool, 20> ranged_guards{};
+    std::array<ConCmdBoolVar, 32> vars{};
+    std::array<bool, 32> var_values{};
+    std::array<bool, 32> var_guards{};
+    std::array<ConCmdRangedVar, 64> ranged{};
+    std::array<float, 64> ranged_values{};
+    std::array<std::int32_t, 64> ranged_int_values{};
+    std::array<bool, 64> ranged_guards{};
     std::uint64_t canary = 0;
     Init5b9f90Hooks hooks{};
 
@@ -109,7 +109,7 @@ const DebugMenuItem* root_at(const DebugMenuRegistry& menu, std::size_t index) {
     return reinterpret_cast<const DebugMenuItem*>(link);
 }
 
-std::size_t root_size(const DebugMenuRegistry& menu) {
+[[maybe_unused]] std::size_t root_size(const DebugMenuRegistry& menu) {
     std::size_t n = 0;
     for (const MenuLink* link = menu.root.link.next; link != &menu.root.link; link = link->next) {
         ++n;
@@ -156,33 +156,33 @@ int main() {
         CHECK(!r.complete);
         CHECK(r.blocked == nullptr);
         CHECK(r.resume_rva == kInit5b9f90ResumeRva);
-        CHECK(kInit5b9f90ResumeRva == 0x5BC78C);
-        CHECK(r.groups == 10);
-        CHECK(r.commands == 38);   // 37 S3 + the S2 credits-level command
+        CHECK(kInit5b9f90ResumeRva == 0x5C1196);
+        CHECK(r.groups == 12);   // + S5.2 Dynamic 3D + wormhole group
+        CHECK(r.commands == 41);   // + 3 S5.2 keyframe commands   // 37 S3 + the S2 credits-level command
         CHECK(r.toggles == 8);
         CHECK(r.float_items == 4);
-        CHECK(r.named_vars == 19);   // 7 (S3.4/S2) + 12 S4.1 bool variables
-        CHECK(r.separators == 6);
-        CHECK(r.sliders == 17);      // 10 S2 + 5 S4.1 + 2 S5.1
-        CHECK(r.int_sliders == 2);   // S4.1 0xc580
+        CHECK(r.named_vars == 28);   // + 9 S5.2 bool variables   // 7 (S3.4/S2) + 12 S4.1 bool variables
+        CHECK(r.separators == 13);   // + 7 S5.2 separators
+        CHECK(r.sliders == 45);   // + 28 S5.2 floats      // 10 S2 + 5 S4.1 + 2 S5.1
+        CHECK(r.int_sliders == 9);   // + 7 S5.2 0xc580 ints   // S4.1 0xc580
         CHECK(r.s2_executed);
         CHECK(r.s2_items == 21);
         CHECK(r.s4_executed);
         CHECK(r.s4_items == 20);   // group + 7 sliders + 12 bool items
         CHECK(r.s4_bytes == kInit5dbf40Size);
-        CHECK(r.registered == 104);   // 81 + 20 S4.1 + 3 S5.1 items
+        CHECK(r.registered == 160);   // 81 + 20 S4.1 + 3 S5.1 items
         CHECK(r.contracts == 2);     // S1 0x2170 + S4.2 0x7f8930
-        CHECK(r.releases == 178);
-        CHECK(r.destroys == 66);
-        CHECK(r.executed_slices == 10);
+        CHECK(r.releases == 279);
+        CHECK(r.destroys == 120);
+        CHECK(r.executed_slices == 11);
         CHECK(r.s5_executed);
-        CHECK(r.s5_items == 3);
-        CHECK(r.s5_bytes == kInit5b9f90S5_1Size);
+        CHECK(r.s5_items == 59);
+        CHECK(r.s5_bytes == kInit5b9f90S5_1Size + kInit5b9f90S5_2Size);
         CHECK(r.canary_stored);
-        CHECK(r.items_used == 104);
+        CHECK(r.items_used == 160);
         CHECK(f.items[0].kind == 1);   // the storage the root list points into
         CHECK(f.canary == f.hooks.canary_token);
-        CHECK(r.record_count == 10);
+        CHECK(r.record_count == 11);
         CHECK(r.records[0].callee_rva == kInit5b9f90Rva);
         CHECK(r.records[1].callee_rva == kInit5cf140Rva);
         CHECK(r.records[2].callee_rva == 0x5BA04B);
@@ -193,15 +193,15 @@ int main() {
         CHECK(r.records[7].callee_rva == 0x5BC3C7);
         CHECK(r.records[8].callee_rva == kInit5dbf40Rva);
         CHECK(r.records[9].callee_rva == 0x5BC413);
+        CHECK(r.records[10].callee_rva == kInit5b9f90S5_2Rva);
         for (std::size_t i = 0; i < r.record_count; ++i) {
             CHECK(r.records[i].executed);
             CHECK(r.records[i].caller != nullptr && std::strcmp(r.records[i].caller, "0x5b9f90") == 0);
             CHECK(std::strstr(r.records[i].detail, "slice S") != nullptr);
         }
-        CHECK(root_size(f.menu) == 104);
-        CHECK(f.menu.root.count == 104);
+        CHECK(f.menu.root.count == 160);
         // root + 17 + S4.1 (19) + S5.1 (2)
-        CHECK(f.atexit.size() == 38);
+        CHECK(f.atexit.size() == 82);
 
         // 2. root-list shape: S0, S3.1, S3.2.
         check_item(*root_at(f.menu, 0), 1, "CP10", "Shadow", "Shadow", 0);

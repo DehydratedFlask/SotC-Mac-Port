@@ -1,3 +1,46 @@
+## 2026-11-13 — `0x5b9f90` S5.2 executed: "Dynamic 3D" + wormhole pages run (42,186 B native, 90.0 %)
+
+**State: green.** Continuation of `1dda8d84` on branch `cursor/init-hash-551140-6aa93e8`, resumed at
+`0x5bc78c`. S5.2 is no longer "blocked on item extraction": it is a chain of executed sub-slices.
+
+- **S5.2 executed — `0x5bc78c..0x5c1196`** (18,954 B, 3,085 instructions), the "Dynamic 3D" page and
+  the "Shadow Boss Worm Hole Effect" page, **56 byte-pinned items in body order**:
+  **2 groups** (`0x5bc78c`, `0x5c0daf`), **9 `0x20af0` bool variables** (Focus On Objects,
+  Show Crosshair in 3D, Dynamic S3D, Clamp Max Separation, Debug Clamp Max Separation, Manual
+  Control, Pause on First Frame, Pause on Last Frame, Pause on EVERY Frame; the last has no guard
+  cell), **28 `0xc300` bounded floats** (0..1, 0..10, 0..20, 0..100, 0..500, -3..3, 0.05..10,
+  -500..500) with `0x27120` sliders, **7 `0xc580` ranged ints** (Extraction border size 16..256,
+  Cinematic Control 0..1, Cinematic Character Motion Blur 0..2, Manual Character Motion Blur 0..2,
+  Cinematic Camera Stage -1..2147483647, Camera Frame 0..max, Frame Max 0..max),
+  **7 `0x26b60` separators** and **3 `0x26f90` keyframe commands** (Create Keyframe /
+  `BP_CreateCinematicKeyframe`, Save Keyframe File / `BP_SaveCinematicKeyframes`, Reset All
+  Keyframes / `BP_DeleteCinematicKeyframes`, all target `0x2dfcbd0`). The `c580` builder now clamps
+  its float-encoded bounds to `INT32_MIN/MAX` so `0x7fffffff` is exact under UBSan.
+- **Measured counters:** slices 11, groups 12, commands 41, toggles 8, floats 4, named_vars 28,
+  separators 13, sliders 45, int_sliders 9, registered 160, releases 279, destroys 120, contracts 2,
+  records 11, items 160, s5_items 59, s5_bytes 19,843, s4_items 20, s4_bytes 7,533.
+- **Coverage:** body extent **29,127 of 46,881 B (62.1 %)**, up from 10,173; native total
+  **42,186 B (90.0 %)**, up from 23,232. **Resume offset `0x5c1196`** (S6). `post_calls_complete`
+  stays false: S1 (`0x2170`), S4.2 (`0x7f8930` -> `0x7f8610` + globals `0x3288478`/`0x3288480`) and
+  S6..S9 remain.
+- **Observed run:** `ok=true`, exit 0, stderr 0 B, **`post_calls_executed=27`** (26 -> 27),
+  `post_calls_blocked=1`, `post_call_count=28`, boss `0xA7`.
+- **Byte-pinned:** `check_init_5b9f90_slices.py` pins S5.2's 18,954 B/3,085 instructions, the
+  2/9/28/7/7/3 kind counts, every group/separator/command/bool/var ctor target, the command target
+  `0x2dfcbd0`, the `0x26db0` bool item sites, and each cell/guard lea and name literal (guards that
+  the body does not carry are skipped). The fixture additionally proves the item order and the
+  S5.2 root slots; the map generator emits `s5_2` as `executed`.
+- **Verification:** build **0**; full CTest **704/704**; checker `OK executed=29127B items=53
+  executed_total=42186B`; sweep **see below**; init runtime exit **0**, `ok=true`; entry map
+  **3,042 constants -> 1,950 RVAs / 584 headers (460 duplicates)**; project index **114,663**.
+  Checkpoint `docs/checkpoints/2026-11-13-init-s5d2-executed.md`.
+- **Not claimed:** cold boot, audio, save/reload, Metal validation (NOT RUN). `0x2170` untouched;
+  G1 **PARTIAL**.
+
+**Next exact action:** take S6 at `0x5c1196`: `0x5c94b0` and `0xb25840` are 334+-instruction page
+bodies with `0xf2f0`/`0x26c10`/`0xc300`/`0x20d60`/`0xf8f390`/`0xf8f3e0`/`0x27120`/`0x272d0`
+calls, i.e. the same page machinery already modelled — decompose each at its item clusters.
+
 ## 2026-11-13 — `0x5b9f90` S4.1 + S5.1 executed: the "Particle" body and the "Stereo 3D" page run (23,232 B native)
 
 **State: green.** Continuation of commit `7619a143` on branch `cursor/init-hash-551140-6aa93e8`.
