@@ -44,10 +44,20 @@ const GuestEntryCounts& guest_entry_counts() noexcept {
                 case GuestEntryKind::ImageData: ++c.image_data; break;
                 case GuestEntryKind::OutsideImage: ++c.outside_image; break;
             }
+            switch (entry.callable) {
+                case GuestEntryCallable::RetailEntry: ++c.retail_entry; break;
+                case GuestEntryCallable::JmpThunk: ++c.jmp_thunk; break;
+                case GuestEntryCallable::RetStub: ++c.ret_stub; break;
+                case GuestEntryCallable::NotCallable: ++c.not_callable; break;
+            }
         }
         return c;
     }();
     return counts;
+}
+
+const GuestIndirectSummary& guest_entry_indirect() noexcept {
+    return kGuestIndirectSummary;
 }
 
 const char* guest_entry_kind_name(GuestEntryKind kind) noexcept {
@@ -58,6 +68,16 @@ const char* guest_entry_kind_name(GuestEntryKind kind) noexcept {
         case GuestEntryKind::ExecutableData: return "executable_data";
         case GuestEntryKind::ImageData: return "image_data";
         case GuestEntryKind::OutsideImage: return "outside_image";
+    }
+    return "unknown";
+}
+
+const char* guest_entry_callable_name(GuestEntryCallable callable) noexcept {
+    switch (callable) {
+        case GuestEntryCallable::RetailEntry: return "retail_entry";
+        case GuestEntryCallable::JmpThunk: return "jmp_thunk";
+        case GuestEntryCallable::RetStub: return "ret_stub";
+        case GuestEntryCallable::NotCallable: return "not_callable";
     }
     return "unknown";
 }

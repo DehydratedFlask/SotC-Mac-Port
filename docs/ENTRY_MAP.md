@@ -43,11 +43,15 @@ call dispatcher needs before lifted code can call lifted code by guest address.
    typed against the 55,790 FDE ranges and the PT_LOAD map, and the native runtime answers it by
    binary search (`guest_entry_find`). See [ENTRY_CLOSURE](ENTRY_CLOSURE.md); 141 of the 608
    functions in the `0x531d60` closure have an exact native entry (23.2 %).
-2. **ABI.** A native entry today is `bool f(const Cells&) noexcept`-style with explicit hooks, not a
-   retail ABI call. Calling one from lifted code needs an address → callable-thunk map.
-3. **Indirect targets.** 105 indirect call sites are in the `0x531d60` closure and remain
-   unresolved (see CFG_CENSUS). Those are exactly the sites this map cannot help until their target
-   set is known.
+2. ~~**ABI shape.**~~ Done 2026-11-13 (`CPU-01-AOT-CFG-CALLABLE-01`): every function start is
+   classified from its decoded entry as `retail_entry` (786), `jmp_thunk` (10) or `ret_stub` (34),
+   with prologue frame and call-alignment evidence. This proves the ELF entry shape, not a native
+   thunk signature; a real address → native-callable map still has to be written module by module.
+3. ~~**Indirect targets.**~~ Measured and partially resolved 2026-11-13: the `0x531d60` closure has
+   **105 frontier functions containing 499 indirect sites** (not 105 sites). **180 are resolved** to
+   exact FDE starts through same-block vtable bases and **319 are blocked** with a verbatim reason
+   (top: 109 stack-block boundary, 45 block boundary, 44 indexed-register arithmetic). All 499
+   sites are listed with offsets in [ENTRY_CLOSURE](ENTRY_CLOSURE.md) / `entry_closure.json`.
 
 ## Limits
 

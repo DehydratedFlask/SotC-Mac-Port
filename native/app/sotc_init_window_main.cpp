@@ -42,12 +42,17 @@ void print_json_string(const char* text) {
 
 void print_entry_map() {
     const sotc::GuestEntryCounts& c = sotc::guest_entry_counts();
+    const sotc::GuestIndirectSummary& indirect = sotc::guest_entry_indirect();
     std::printf("\"entry_map\":{\"entries\":%u,\"function_start\":%u,"
                 "\"function_interior\":%u,\"plt\":%u,\"executable_data\":%u,"
                 "\"image_data\":%u,\"outside_image\":%u,\"dispatchable\":%u,"
-                "\"lookups\":{",
+                "\"retail_entry\":%u,\"jmp_thunk\":%u,\"ret_stub\":%u,"
+                "\"not_callable\":%u,\"indirect\":{\"functions\":%u,\"sites\":%u,"
+                "\"resolved\":%u,\"blocked\":%u},\"lookups\":{",
                 c.entries, c.function_start, c.function_interior, c.plt, c.executable_data,
-                c.image_data, c.outside_image, c.function_start);
+                c.image_data, c.outside_image, c.function_start, c.retail_entry, c.jmp_thunk,
+                c.ret_stub, c.not_callable, indirect.functions, indirect.sites, indirect.resolved,
+                indirect.blocked);
     const std::uint64_t samples[] = {0x531d60, 0x5b9f90, 0x1353, 0xf8f390, 0x1014a80, 0x1594d90,
                                      0x12345678};
     for (std::size_t i = 0; i < sizeof(samples) / sizeof(samples[0]); ++i) {

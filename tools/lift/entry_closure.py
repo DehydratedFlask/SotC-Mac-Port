@@ -1,38 +1,44 @@
 #!/usr/bin/env python3
-"""Type every guest address in the native-entry map against the pinned ELF (CPU-01-ENTRY-MAP-CLOSURE-01).
+"""Type every guest address and resolve the Init closure's indirect sites (CPU-01-AOT-CFG-CALLABLE-01).
 
 Offline, read-only and stdlib-only. The private ELF (`local/re/eboot.elf`, sha256 d0723afb...
-5861d3) is read through `slot_pin_util.Elf`, which verifies the digest; nothing is loaded,
-relocated, executed or written into the pinned image.
+5861d3) is read through `slot_pin_util.Elf`, which verifies the digest; instructions come from the
+Xcode `llvm-objdump` (`/usr/bin/objdump`) over the pinned bytes. Nothing is loaded, relocated,
+executed or written into the pinned image.
 
-`docs/ENTRY_MAP.md` records which guest RVAs our native modules name, but not *what* each address
-is. This tool closes that gap with the ELF's own unwind data:
+Three questions are answered per address and per indirect site:
 
-  * parses `.eh_frame_hdr` (fixed VA 0x150c08c, encodings checked) into the 55,790 FDE ranges
-    that define the function universe;
-  * classifies every distinct mapped RVA as `function_start` (exact FDE start), `function_interior`
-    (inside an FDE range: a branch/jump label or embedded constant), `plt` (the 0xf8f380..0xf91740
-    import stubs), `executable_data` (R+X bytes with no FDE: literal pools and the read-only tail),
-    `image_data` (another mapped PT_LOAD, including the OS-specific 0x1594000 read-only segment
-    that hosts the vtables) or `outside_image`;
-  * intersects the map with the 0x531d60 Init closure so the callee-closure gap is measured, not
-    remembered;
-  * writes `native/core/guest_entry_table.inc` so the native runtime can answer "is this RVA a
-    function start?" by binary search, and `docs/ENTRY_CLOSURE.md` + `docs/entry_closure.json`.
+1. Entry kind (from the previous pass): exact FDE start, interior label, PLT stub, data in R+X,
+   image data, outside image.
+2. Callable shape for every FDE start: a normal SysV entry with a measured prologue
+   (`frame_pointer` / `frame_less` / `leaf`), a direct or GOT `jmp` thunk, or a one-byte `ret` stub.
+   The prologue's static stack delta is measured (`8*pushes + sub rsp`) so alignment before calls is
+   `aligned`, `misaligned`, `dynamic` (`and rsp,-16`) or `n/a` for leaves.
+3. Indirect sites in the `0x531d60` closure: the operand form and, where a same-block definition
+   proves an absolute base, the pinned target (vtable/const slot, global pointer or register). Every
+   other site is recorded with its exact offset and a verbatim blocking reason.
 
-Honesty labels: every number is STATIC_ANALYSIS_VERIFIED. An `function_interior` entry is not an
-error: 381 mapped constants are branch targets or embedded literals inside a function (for example
-`kSlot536BranchTarget` at 0x13455d). Only `function_start` entries are dispatchable call entries.
-Nothing here proves a calling convention, resolves an indirect call, or executes the ELF.
+The generated `native/core/guest_entry_table.inc` carries (rva, kind, callable) rows plus the
+indirect summary; `docs/entry_closure.json` carries every site and every resolution/block reason;
+`docs/ENTRY_CLOSURE.md` is the human report. `check_entry_closure.py` re-derives all of it.
 
-Usage: entry_closure.py [--check]   (--check is what check_entry_closure.py runs)
+Honesty: an interior address is a label/literal, not an error; a `retail_entry` means the ELF shows a
+normal function entry, not that a native thunk with a matching signature has been written. No
+indirect target is guessed: a site is resolved only when a same-basic-block definition yields an
+absolute address and the slot contents land exactly on an FDE start.
+
+Usage: entry_closure.py [--check]
 """
 
 from __future__ import annotations
 
+import bisect
 import json
+import re
 import struct
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -47,10 +53,14 @@ OUT_JSON = ROOT / "docs/entry_closure.json"
 OUT_DOC = ROOT / "docs/ENTRY_CLOSURE.md"
 OUT_INC = ROOT / "native/core/guest_entry_table.inc"
 CLOSURE_JSON = ROOT / "local/validation/aot-cfg/closure_531d60.json"
+ELF_PATH = ROOT / "local/re/eboot.elf"
+OBJDUMP = "/usr/bin/objdump"
 EH_FRAME_HDR = 0x150C08C
 PLT_START = 0xF8F380
 PLT_END = 0xF91740
 CLOSURE_SEED = "0x531d60"
+MAX_PROLOGUE = 18
+SCAN_WINDOW = 128
 
 KIND_ORDER = ("function_start", "function_interior", "plt", "executable_data", "image_data",
               "outside_image")
@@ -63,13 +73,27 @@ KIND_ENUM = {
     "outside_image": "OutsideImage",
 }
 KIND_HELP = {
-    "function_start": "exact FDE start: a real function entry, dispatchable",
+    "function_start": "exact FDE start: a real function entry",
     "function_interior": "inside an FDE range but not its start: branch/jump label or embedded literal",
     "plt": "import stub in 0xf8f380..0xf91740: callable only through the resolved import",
     "executable_data": "R+X bytes with no FDE: literal pool or the read-only text tail",
     "image_data": "mapped by a non-executable PT_LOAD (globals, vtables, BSS)",
     "outside_image": "not mapped by any PT_LOAD",
 }
+CALLABLE_ORDER = ("retail_entry", "jmp_thunk", "ret_stub", "not_callable")
+CALLABLE_ENUM = {
+    "retail_entry": "RetailEntry",
+    "jmp_thunk": "JmpThunk",
+    "ret_stub": "RetStub",
+    "not_callable": "NotCallable",
+}
+FRAME_ORDER = ("frame_pointer", "frame_less", "leaf")
+ALIGN_ORDER = ("aligned", "misaligned", "dynamic", "n/a")
+ALIAS = {"eax": "rax", "ebx": "rbx", "ecx": "rcx", "edx": "rdx", "esi": "rsi", "edi": "rdi",
+         "ebp": "rbp", "esp": "rsp"}
+BRANCHES = {"jmp", "jmpq", "je", "jne", "jz", "jnz", "jb", "jbe", "ja", "jae", "jl", "jle", "jg",
+            "jge", "js", "jns", "jp", "jnp", "jo", "jno", "jrcxz", "loop", "loope", "loopne", "ret",
+            "retq"}
 
 
 def die(message: str, code: int = 1) -> None:
@@ -77,8 +101,12 @@ def die(message: str, code: int = 1) -> None:
     raise SystemExit(code)
 
 
+def reg(name: str) -> str:
+    value = name.strip().lstrip("%")
+    return ALIAS.get(value, value)
+
+
 def parse_fdes(e: Elf) -> list[tuple[int, int]]:
-    """(start, size) for every FDE in .eh_frame_hdr's binary-search table, sorted."""
     hdr = e.raw(EH_FRAME_HDR, 12)
     ver, fenc, cenc, tenc = hdr[0], hdr[1], hdr[2], hdr[3]
     if (ver, fenc, cenc, tenc) != (1, 0x1B, 0x03, 0x3B):
@@ -91,15 +119,13 @@ def parse_fdes(e: Elf) -> list[tuple[int, int]]:
         fa = EH_FRAME_HDR + fde
         rec = e.raw(fa, 16)
         start = struct.unpack_from("<i", rec, 8)[0] + fa + 8
-        size = struct.unpack_from("<I", rec, 12)[0]
-        out.append((start, size))
+        out.append((start, struct.unpack_from("<I", rec, 12)[0]))
     out.sort()
     return out
 
 
 def parse_segments() -> list[tuple[int, int, int, int]]:
-    """(type, flags, vaddr, memsz) for every program header with a non-zero memory size."""
-    elf = (ROOT / "local/re/eboot.elf").read_bytes()
+    elf = ELF_PATH.read_bytes()
     phoff = struct.unpack_from("<Q", elf, 0x20)[0]
     entsize = struct.unpack_from("<H", elf, 0x36)[0]
     count = struct.unpack_from("<H", elf, 0x38)[0]
@@ -113,17 +139,8 @@ def parse_segments() -> list[tuple[int, int, int, int]]:
     return segments
 
 
-def mapped(rva: int, segments: list[tuple[int, int, int, int]]) -> tuple[int, int, int, int] | None:
-    for seg in segments:
-        if seg[2] <= rva < seg[2] + seg[3]:
-            return seg
-    return None
-
-
 def classify(rva: int, fdes: list[tuple[int, int]], starts: list[int],
              segments: list[tuple[int, int, int, int]]):
-    """(kind, function_start, function_size) for one RVA."""
-    import bisect
     k = bisect.bisect_right(starts, rva) - 1
     if k >= 0 and fdes[k][0] <= rva < fdes[k][0] + fdes[k][1]:
         if fdes[k][0] == rva:
@@ -131,10 +148,9 @@ def classify(rva: int, fdes: list[tuple[int, int]], starts: list[int],
         return "function_interior", fdes[k][0], fdes[k][1]
     if PLT_START <= rva < PLT_END:
         return "plt", None, None
-    seg = mapped(rva, segments)
-    if seg is not None:
-        executable = seg[1] & 1
-        return ("executable_data" if executable else "image_data"), None, None
+    for p_type, p_flags, vaddr, memsz in segments:
+        if vaddr <= rva < vaddr + memsz:
+            return ("executable_data" if p_flags & 1 else "image_data"), None, None
     return "outside_image", None, None
 
 
@@ -142,6 +158,365 @@ def owner(rows: list[dict]) -> tuple[str, str]:
     row = sorted(rows, key=lambda r: (r["header"], r["constant"]))[0]
     return row["constant"], row["header"]
 
+
+# ---------------------------------------------------------------- disassembly
+
+def merge_intervals(intervals: list[tuple[int, int]]) -> list[tuple[int, int]]:
+    merged: list[tuple[int, int]] = []
+    for start, end in sorted(intervals):
+        if merged and start <= merged[-1][1]:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], end))
+        else:
+            merged.append((start, end))
+    return merged
+
+
+def disassemble(intervals: list[tuple[int, int]]) -> dict[int, tuple[str, str]]:
+    """{addr: (mnemonic, operands)} for every instruction inside the merged intervals."""
+    if not Path(OBJDUMP).exists():
+        die("llvm-objdump is required for the callable/indirect analysis", 2)
+    merged = merge_intervals(intervals)
+    starts = [s for s, _ in merged]
+    max_end = merged[-1][1]
+
+    def inside(addr: int) -> bool:
+        if addr < merged[0][0] or addr >= max_end:
+            return False
+        k = bisect.bisect_right(starts, addr) - 1
+        return k >= 0 and addr < merged[k][1]
+
+    fd, path = tempfile.mkstemp(prefix="eboot-", suffix=".dis")
+    try:
+        with open(fd, "w") as out:
+            subprocess.run([OBJDUMP, "-d", str(ELF_PATH)], stdout=out, check=True)
+        table: dict[int, tuple[str, str]] = {}
+        with open(path, "r", errors="ignore") as text:
+            for line in text:
+                parts = line.split("\t")
+                if len(parts) < 2:
+                    continue
+                try:
+                    addr = int(parts[0].split(":")[0], 16)
+                except ValueError:
+                    continue
+                if not inside(addr):
+                    continue
+                mnemonic = parts[1].strip()
+                operands = parts[2].strip() if len(parts) > 2 else ""
+                table[addr] = (mnemonic, operands)
+        return table
+    finally:
+        try:
+            Path(path).unlink()
+        except OSError:
+            pass
+
+
+def split_ops(operands: str) -> tuple[str, str]:
+    code = operands.split("#")[0].strip()
+    if "," in code:
+        src, dst = code.rsplit(",", 1)
+        return src.strip(), dst.strip()
+    return code, ""
+
+
+def absolute_operand(ins: dict[int, tuple[str, str]], addrs: list[int], index: int) -> int | None:
+    """Effective address for a RIP-relative operand, using the next instruction address."""
+    operands = split_ops(ins[addrs[index]][1])[0]
+    match = re.match(r"^(-?0x[0-9a-f]+)?\(%rip\)$", operands)
+    if match is None:
+        return None
+    disp = int(match.group(1), 16) if match.group(1) else 0
+    nxt = addrs[index + 1] if index + 1 < len(addrs) else addrs[index]
+    return nxt + disp
+
+
+# ---------------------------------------------------------------- callable shape
+
+def callable_shape(ins: dict[int, tuple[str, str]], addrs: list[int], start: int,
+                   size: int) -> dict:
+    window = [a for a in addrs if start <= a < start + min(SCAN_WINDOW, max(size, 1))]
+    if not window or window[0] != start:
+        return {"callable": "retail_entry", "form": "unknown", "target": None,
+                "frame": "leaf", "align": "n/a", "pushes": 0, "sub_rsp": 0, "canary": False,
+                "endbr64": False}
+    i = 0
+    endbr64 = False
+    if ins[window[0]][0] == "endbr64":
+        endbr64 = True
+        i = 1
+    if i >= len(window):
+        return {"callable": "retail_entry", "form": "unknown", "target": None, "frame": "leaf",
+                "align": "n/a", "pushes": 0, "sub_rsp": 0, "canary": False, "endbr64": endbr64}
+    mnemonic, operands = ins[window[i]]
+    if mnemonic in ("jmp", "jmpq") and not operands.startswith("*"):
+        match = re.match(r"^(0x[0-9a-f]+)", operands)
+        target = int(match.group(1), 16) if match else None
+        return {"callable": "jmp_thunk", "form": "direct", "target": target, "frame": "thunk",
+                "align": "n/a", "pushes": 0, "sub_rsp": 0, "canary": False, "endbr64": endbr64}
+    if mnemonic in ("jmp", "jmpq") and "(%rip)" in operands:
+        ea = absolute_operand(ins, window, i)
+        return {"callable": "jmp_thunk", "form": "got", "target": ea, "frame": "thunk",
+                "align": "n/a", "pushes": 0, "sub_rsp": 0, "canary": False, "endbr64": endbr64}
+    if mnemonic in ("ret", "retq"):
+        return {"callable": "ret_stub", "form": "ret", "target": None, "frame": "ret",
+                "align": "n/a", "pushes": 0, "sub_rsp": 0, "canary": False, "endbr64": endbr64}
+
+    pushes = 0
+    sub_rsp = 0
+    frame_pointer = False
+    dynamic = False
+    canary = False
+    j = i
+    steps = 0
+    while j < len(window) and steps < MAX_PROLOGUE:
+        mnemonic, operands = ins[window[j]]
+        src, dst = split_ops(operands)
+        if mnemonic == "pushq" and dst == "" and src.startswith("%"):
+            pushes += 1
+        elif mnemonic == "subq" and dst == "%rsp" and src.startswith("$0x"):
+            sub_rsp += int(src[1:], 16)
+        elif mnemonic == "movq" and dst == "%rbp" and src == "%rsp":
+            frame_pointer = True
+        elif mnemonic == "andq" and dst == "%rsp":
+            dynamic = True
+        elif mnemonic == "movq" and src == "%fs:0x28":
+            canary = True
+        elif mnemonic in ("movq", "movl", "leaq") and ("(%rsp)" in dst or dst == "%rsp"):
+            pass  # prologue spill/save
+        else:
+            break
+        j += 1
+        steps += 1
+
+    delta = 8 * pushes + sub_rsp
+    frame = "frame_pointer" if frame_pointer else ("frame_less" if (pushes or sub_rsp) else "leaf")
+    if frame == "leaf":
+        align = "n/a"
+    elif dynamic:
+        align = "dynamic"
+    else:
+        align = "aligned" if (8 + delta) % 16 == 0 else "misaligned"
+    return {"callable": "retail_entry", "form": frame, "target": None, "frame": frame,
+            "align": align, "pushes": pushes, "sub_rsp": sub_rsp, "canary": canary,
+            "endbr64": endbr64, "stack_delta": delta}
+
+
+# ---------------------------------------------------------------- indirect sites
+
+def op_form(operands: str) -> tuple[str, str | None, int, str]:
+    """(form, base register, displacement, detail) for an indirect operand."""
+    code = operands.split("#")[0].strip()
+    indexed = re.match(r"^\*(-?(?:0x[0-9a-f]+)?)\(,%([a-z0-9]+),8\)$", code)
+    if indexed:
+        return "indexed_table", None, 0, code
+    if "(%" in code and "," in code.split("(", 1)[1]:
+        return "indexed_table", None, 0, code
+    mem = re.match(r"^\*(-?(?:0x[0-9a-f]+)?)\(%([a-z0-9]+)\)$", code)
+    if mem:
+        disp = int(mem.group(1), 16) if mem.group(1) else 0
+        return "slot", reg(mem.group(2)), disp, code
+    direct = re.match(r"^\*%([a-z0-9]+)$", code)
+    if direct:
+        return "register", reg(direct.group(1)), 0, code
+    if code.startswith("*") and "(%rip)" in code:
+        return "rip", None, 0, code
+    return "other", None, 0, code
+
+
+def analyze_indirect(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int],
+                     functions: list[tuple[int, int, int]], starts: list[int]) -> dict:
+    """Resolve every indirect site in the closure frontier, or record why it cannot be resolved."""
+    site_records = []
+    reason_counts: dict[str, int] = {}
+    resolved_counts: dict[str, int] = {}
+
+    def read_qword(addr: int) -> tuple[int | None, str | None]:
+        if addr is None:
+            return None, "no_absolute_address"
+        try:
+            return e.u64(addr), None
+        except Exception:
+            return None, "not_file_backed"
+
+    for fn, start, size in functions:
+        window = [a for a in addrs if start <= a < start + size]
+        if not window or window[0] != start:
+            continue
+        position = {a: i for i, a in enumerate(window)}
+        leaders = {start}
+        for k, a in enumerate(window):
+            mnemonic, operands = ins[a]
+            if mnemonic in BRANCHES:
+                match = re.match(r"^(0x[0-9a-f]+)", operands)
+                if match is not None and int(match.group(1), 16) in position:
+                    leaders.add(int(match.group(1), 16))
+                if k + 1 < len(window):
+                    leaders.add(window[k + 1])
+
+        def boundary(idx: int) -> bool:
+            return window[idx] in leaders and window[idx] != start
+
+        def value_of(regname: str, idx: int, depth: int = 0) -> tuple[int | None, str | None]:
+            if depth > 3:
+                return None, "register_copy_chain"
+            cur = reg(regname)
+            k = idx - 1
+            while k >= 0:
+                if boundary(k):
+                    return None, "block_boundary"
+                mnemonic, operands = ins[window[k]]
+                if mnemonic in ("call", "callq"):
+                    return None, "call_clobbers"
+                if mnemonic in BRANCHES:
+                    return None, "branch_clobbers"
+                src, dst = split_ops(operands)
+                if dst.startswith("%") and reg(dst) == cur:
+                    if mnemonic in ("testq", "cmpq", "testl", "cmpl", "pushq", "push"):
+                        k -= 1
+                        continue
+                    if mnemonic in ("movq", "movl", "movabsq", "leaq", "mov"):
+                        if src.startswith("$0x"):
+                            return int(src[1:], 16), None
+                        if "(%rip)" in src:
+                            ea = absolute_operand(ins, window, k)
+                            if ea is None:
+                                return None, "rip_operand_unresolved"
+                            if mnemonic == "leaq":
+                                return ea, None
+                            value, why = read_qword(ea)
+                            return (value, None) if why is None else (None, why)
+                        stack = re.match(r"^(-?0x[0-9a-f]+)\(%(rsp|rbp)\)$", src)
+                        if stack:
+                            return stack_value(int(stack.group(1), 16), stack.group(2), k, depth + 1)
+                        if src.startswith("%"):
+                            cur = reg(src)
+                            k -= 1
+                            continue
+                        return None, "object_load:" + src
+                    if mnemonic in ("addq", "subq") and src.startswith("$0x"):
+                        value, why = value_of(cur, k, depth + 1)
+                        if value is None:
+                            return None, why
+                        delta = int(src[1:], 16)
+                        return (value + delta if mnemonic == "addq" else value - delta), None
+                    if mnemonic in ("xorq", "xorl", "popq", "andq", "orq", "shlq", "shrq"):
+                        return None, mnemonic + "_clobbers"
+                    return None, mnemonic + "_writes_" + cur
+                k -= 1
+            return None, "no_reaching_definition"
+
+        def stack_value(disp: int, base: str, idx: int, depth: int) -> tuple[int | None, str | None]:
+            k = idx - 1
+            while k >= 0:
+                if boundary(k):
+                    return None, "stack_block_boundary"
+                mnemonic, operands = ins[window[k]]
+                if mnemonic in BRANCHES:
+                    return None, "stack_no_definition"
+                src, dst = split_ops(operands)
+                match = re.match(r"^(-?0x[0-9a-f]+)\(%(rsp|rbp)\)$", dst)
+                if match and int(match.group(1), 16) == disp and match.group(2) == base:
+                    if mnemonic not in ("movq", "movl"):
+                        return None, "stack_store_form:" + mnemonic
+                    if src.startswith("$0x"):
+                        return int(src[1:], 16), None
+                    if src.startswith("%"):
+                        value, why = value_of(src, k, depth + 1)
+                        return (value, None) if value is not None else (None, "stack_" + (why or "unknown"))
+                    if "(%rip)" in src:
+                        ea = absolute_operand(ins, window, k)
+                        if ea is None:
+                            return None, "stack_rip_unresolved"
+                        if mnemonic == "movl":
+                            return ea, None
+                        value, why = read_qword(ea)
+                        return (value, None) if why is None else (None, "stack_" + why)
+                    return None, "stack_store_form:" + src
+                k -= 1
+            return None, "stack_no_definition"
+
+        for idx, a in enumerate(window):
+            mnemonic, operands = ins[a]
+            if mnemonic not in ("call", "callq", "jmp", "jmpq"):
+                continue
+            if not operands.strip().startswith("*"):
+                continue
+            form, base, disp, detail = op_form(operands)
+            record = {"function": f"0x{fn:x}", "site": f"0x{a:x}", "mnemonic": mnemonic,
+                      "operand": detail, "form": form, "status": "blocked", "target": None,
+                      "reason": None, "evidence": None}
+            target = None
+            kind = None
+            if form == "other":
+                record["reason"] = "unsupported_operand_form"
+            elif form == "indexed_table":
+                record["reason"] = "indexed_jump_table_index_not_bounded"
+            elif form == "rip":
+                match = re.search(r"#\s*(0x[0-9a-f]+)", operands)
+                if match is None:
+                    record["reason"] = "rip_operand_without_address"
+                else:
+                    ea = int(match.group(1), 16)
+                    value, why = read_qword(ea)
+                    if value is None:
+                        record["reason"] = "global_" + why
+                        record["evidence"] = f"global 0x{ea:x}"
+                    elif value == 0:
+                        record["reason"] = "zero_initialized_global"
+                        record["evidence"] = f"global 0x{ea:x}"
+                    elif value in starts:
+                        target, kind = value, "global_pointer"
+                        record["evidence"] = f"global 0x{ea:x} -> 0x{value:x}"
+                    else:
+                        record["reason"] = "global_holds_non_entry"
+                        record["evidence"] = f"global 0x{ea:x} -> 0x{value:x}"
+            else:
+                value, why = value_of(base, idx)
+                if value is None:
+                    record["reason"] = why or "unresolved_base"
+                elif form == "register":
+                    if value in starts:
+                        target, kind = value, "register"
+                        record["evidence"] = f"{base} = 0x{value:x}"
+                    else:
+                        record["reason"] = "register_value_not_entry"
+                        record["evidence"] = f"{base} = 0x{value:x}"
+                else:
+                    addr = value + disp
+                    value2, why2 = read_qword(addr)
+                    if value2 is None:
+                        record["reason"] = "slot_" + why2
+                        record["evidence"] = f"slot 0x{addr:x}"
+                    elif value2 in starts:
+                        target, kind = value2, "vtable_slot"
+                        record["evidence"] = f"base 0x{value:x} slot 0x{disp:x} -> 0x{value2:x}"
+                    elif value2 == 0:
+                        record["reason"] = "slot_holds_zero"
+                        record["evidence"] = f"slot 0x{addr:x}"
+                    else:
+                        record["reason"] = "slot_holds_non_entry"
+                        record["evidence"] = f"slot 0x{addr:x} -> 0x{value2:x}"
+            if target is not None:
+                record.update(status="resolved", target=f"0x{target:x}", kind=kind)
+                resolved_counts[kind] = resolved_counts.get(kind, 0) + 1
+            else:
+                reason_counts[record["reason"]] = reason_counts.get(record["reason"], 0) + 1
+            site_records.append(record)
+
+    site_records.sort(key=lambda r: int(r["site"], 16))
+    return {
+        "functions": len(functions),
+        "sites": len(site_records),
+        "resolved": sum(resolved_counts.values()),
+        "blocked": len(site_records) - sum(resolved_counts.values()),
+        "resolved_kinds": dict(sorted(resolved_counts.items())),
+        "blocked_reasons": dict(sorted(reason_counts.items(), key=lambda kv: (-kv[1], kv[0]))),
+        "sites_detail": site_records,
+    }
+
+
+# ---------------------------------------------------------------- build
 
 def build() -> tuple[dict, str]:
     e = Elf()
@@ -164,6 +539,51 @@ def build() -> tuple[dict, str]:
         kinds[rva] = classify(rva, fdes, starts, segments)
     if len(kinds) != entry_map["totals"]["distinct_rvas"]:
         die("entry count disagrees with entry_map totals")
+    start_set = {rva for rva in kinds if kinds[rva][0] == "function_start"}
+
+    closure = None
+    closure_missing: list[str] = []
+    frontier: list[tuple[int, int, int]] = []
+    if CLOSURE_JSON.exists():
+        reached = json.loads(CLOSURE_JSON.read_text())["closure"]["reached_list"]
+        closure_rvas = sorted(int(x, 16) for x in reached)
+        with_entry = [rva for rva in closure_rvas if rva in start_set]
+        closure_missing = [f"0x{rva:x}" for rva in closure_rvas if rva not in start_set]
+        closure = {"seed": CLOSURE_SEED, "functions": len(closure_rvas),
+                   "with_native_entry": len(with_entry),
+                   "without_native_entry": len(closure_rvas) - len(with_entry),
+                   "percent": round(100.0 * len(with_entry) / len(closure_rvas), 1),
+                   "missing_sample": closure_missing[:16]}
+        frontier_json = json.loads(CLOSURE_JSON.read_text())["closure"]["indirect_frontier"]
+        for item in frontier_json:
+            fn = int(item["fn"], 16)
+            k = bisect.bisect_right(starts, fn) - 1
+            if k < 0 or fdes[k][0] != fn:
+                die(f"frontier function {fn:#x} is not an FDE start")
+            frontier.append((fn, fdes[k][0], fdes[k][1]))
+
+    intervals = [(rva, rva + min(SCAN_WINDOW, size)) for rva, size in
+                 ((rva, kinds[rva][2]) for rva in start_set)]
+    intervals += [(start, start + size) for _fn, start, size in frontier]
+    ins = disassemble(intervals)
+    addrs = sorted(ins)
+
+    callable_counts = {name: 0 for name in CALLABLE_ORDER}
+    frame_counts = {name: 0 for name in FRAME_ORDER}
+    align_counts = {name: 0 for name in ALIGN_ORDER}
+    shapes: dict[int, dict] = {}
+    for rva in sorted(start_set):
+        shape = callable_shape(ins, addrs, rva, int(kinds[rva][2] or 1))
+        shapes[rva] = shape
+        callable_counts[shape["callable"]] += 1
+        if shape["callable"] == "retail_entry":
+            frame_counts[shape["frame"]] += 1
+            align_counts[shape["align"]] += 1
+    for rva in kinds:
+        if rva not in start_set:
+            callable_counts["not_callable"] += 1
+
+    indirect = analyze_indirect(e, ins, addrs, frontier, starts) if frontier else None
 
     counts = {kind: 0 for kind in KIND_ORDER}
     samples: dict[str, list[dict]] = {kind: [] for kind in KIND_ORDER}
@@ -175,61 +595,48 @@ def build() -> tuple[dict, str]:
         if len(samples[kind]) < 8:
             samples[kind].append({"rva": f"0x{rva:x}", "constant": constant, "header": header})
         if kind == "function_interior":
-            interior.append({
-                "rva": f"0x{rva:x}",
-                "function": f"0x{fn_start:x}",
-                "size": fn_size,
-                "offset": rva - fn_start,
-                "constant": constant,
-                "header": header,
-            })
+            interior.append({"rva": f"0x{rva:x}", "function": f"0x{fn_start:x}", "size": fn_size,
+                             "offset": rva - fn_start, "constant": constant, "header": header})
 
     target_named = {kind: 0 for kind in KIND_ORDER}
     target_entries = 0
     for rva in sorted(kinds):
-        constant, _header = owner(rows[f"0x{rva:x}"])
         names = [r["constant"] for r in rows[f"0x{rva:x}"]]
         if not any("Target" in n or n.endswith("Rva") or n.endswith("RVA") for n in names):
             continue
         target_entries += 1
         target_named[kinds[rva][0]] += 1
 
-    closure = None
-    closure_missing: list[str] = []
-    if CLOSURE_JSON.exists():
-        reached = json.loads(CLOSURE_JSON.read_text())["closure"]["reached_list"]
-        closure_rvas = sorted(int(x, 16) for x in reached)
-        with_entry = [rva for rva in closure_rvas if rva in kinds and kinds[rva][0] == "function_start"]
-        closure_missing = [f"0x{rva:x}" for rva in closure_rvas if rva not in kinds]
-        closure = {
-            "seed": CLOSURE_SEED,
-            "functions": len(closure_rvas),
-            "with_native_entry": len(with_entry),
-            "without_native_entry": len(closure_rvas) - len(with_entry),
-            "percent": round(100.0 * len(with_entry) / len(closure_rvas), 1),
-            "missing_sample": closure_missing[:16],
-        }
-        if any(rva in kinds and kinds[rva][0] == "function_interior" for rva in closure_rvas):
-            die("a closure function is mapped only as an interior address")
+    thunk_targets = []
+    for rva in sorted(start_set):
+        shape = shapes[rva]
+        if shape["callable"] == "jmp_thunk":
+            thunk_targets.append({"rva": f"0x{rva:x}", "form": shape["form"],
+                                  "slot": f"0x{shape['target']:x}" if shape["target"] else None})
+    stub_rows = [f"0x{rva:x}" for rva in sorted(start_set)
+                 if shapes[rva]["callable"] == "ret_stub"]
 
     data = {
-        "schema": "sotc-entry-closure/1",
+        "schema": "sotc-entry-closure/2",
         "inputs": {
             "elf_sha256": "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3",
             "entry_map": "docs/entry_map.json",
             "closure": "local/validation/aot-cfg/closure_531d60.json" if closure else None,
             "eh_frame_hdr": f"0x{EH_FRAME_HDR:x}",
             "plt": f"0x{PLT_START:x}..0x{PLT_END:x}",
+            "disassembler": "Apple LLVM objdump 21.0.0 (/usr/bin/objdump)",
         },
-        "fde": {
-            "count": len(fdes),
-            "min_start": f"0x{fdes[0][0]:x}",
-            "max_end": f"0x{fdes[-1][0] + fdes[-1][1]:x}",
-            "total_bytes": total,
-        },
+        "fde": {"count": len(fdes), "min_start": f"0x{fdes[0][0]:x}",
+                "max_end": f"0x{fdes[-1][0] + fdes[-1][1]:x}", "total_bytes": total},
         "totals": dict({"entries": len(kinds)}, **counts),
+        "callable": {"counts": callable_counts, "frame": frame_counts, "align": align_counts,
+                     "thunks": thunk_targets, "ret_stubs": stub_rows,
+                     "samples": {name: [f"0x{rva:x}" for rva in sorted(start_set)
+                                        if shapes[rva]["callable"] == name][:8]
+                                 for name in ("retail_entry", "jmp_thunk", "ret_stub")}},
         "target_named": dict({"entries": target_entries}, **target_named),
         "closure": closure,
+        "indirect": indirect,
         "samples": samples,
         "interior": interior,
     }
@@ -239,39 +646,51 @@ def build() -> tuple[dict, str]:
         "// Pinned ELF sha256 d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3,",
         "// .eh_frame_hdr @ 0x150c08c (55,790 FDE ranges) and docs/entry_map.json (1,957 RVAs).",
         "// kind: 1 function start, 2 interior label, 3 PLT stub, 4 data in R+X, 5 image data.",
+        "// callable: 1 retail entry, 2 jmp thunk, 3 ret stub, 4 not callable.",
         "static constexpr GuestEntry kGuestEntryTable[] = {",
     ]
     for rva in sorted(kinds):
-        lines.append(f"    {{0x{rva:012x}ULL, GuestEntryKind::{KIND_ENUM[kinds[rva][0]]}}},")
+        shape = shapes.get(rva)
+        callable_name = shape["callable"] if shape else "not_callable"
+        lines.append(f"    {{0x{rva:012x}ULL, GuestEntryKind::{KIND_ENUM[kinds[rva][0]]}, "
+                     f"GuestEntryCallable::{CALLABLE_ENUM[callable_name]}}},")
     lines.append("};")
+    if indirect:
+        lines.append("static constexpr GuestIndirectSummary kGuestIndirectSummary = "
+                     f"{{{indirect['functions']}u, {indirect['sites']}u, "
+                     f"{indirect['resolved']}u, {indirect['blocked']}u}};")
     return data, "\n".join(lines) + "\n"
 
+
+# ---------------------------------------------------------------- doc
 
 def render_doc(data: dict) -> str:
     totals = data["totals"]
     fde = data["fde"]
     closure = data["closure"]
+    callable_data = data["callable"]
+    indirect = data["indirect"]
     total = totals["entries"]
+    cc = callable_data["counts"]
     lines = [
-        "# Entry-point typing for the guest-address map (CPU-01-ENTRY-MAP-CLOSURE-01)",
+        "# Entry typing, callable shapes and the indirect frontier (CPU-01-AOT-CFG-CALLABLE-01)",
         "",
-        "**Evidence label: STATIC_ANALYSIS_VERIFIED.** Generated by `tools/lift/entry_closure.py`; the",
-        "checker `tools/lift/check_entry_closure.py` re-derives every number from the pinned ELF",
+        "**Evidence label: STATIC_ANALYSIS_VERIFIED.** Generated by `tools/lift/entry_closure.py`;",
+        "`tools/lift/check_entry_closure.py` re-derives every number from the pinned ELF",
         "(`sha256 d0723afb...5861d3`) and `docs/entry_map.json`. Nothing here was executed.",
         "",
-        "`ENTRY_MAP.md` answers *which* guest RVAs our native modules name. This document answers the",
-        "next question the roadmap asks: **what is at that address** - a function entry, a branch label",
-        "inside a function, an import stub, or data - and how much of the executed Init closure has a",
-        "native entry at all.",
+        "This is the successor to the 2026-11-13 entry-map typing pass: it answers what each mapped",
+        "address is, what shape its entry has, and which of the Init closure's indirect calls can be",
+        "resolved from the pinned binary.",
         "",
         "## Inputs",
         "",
         f"- FDE universe: `.eh_frame_hdr` at `{data['inputs']['eh_frame_hdr']}` -> **{fde['count']:,}** ranges, "
         f"`{fde['min_start']}..{fde['max_end']}`, {fde['total_bytes']:,} B.",
         f"- Mapped RVAs: **{total:,}** distinct addresses from `docs/entry_map.json`.",
-        "- Import stubs: `" + data["inputs"]["plt"] + "` (the PLT range the CFG census established).",
+        f"- Disassembly: `{data['inputs']['disassembler']}` over the pinned image.",
         "",
-        "## Classification",
+        "## Address kinds",
         "",
         "| Kind | Entries | Share | Meaning |",
         "| --- | ---: | ---: | --- |",
@@ -280,65 +699,97 @@ def render_doc(data: dict) -> str:
         lines.append(f"| `{kind}` | **{totals[kind]:,}** | {100.0 * totals[kind] / total:.1f} % | {KIND_HELP[kind]} |")
     lines += [
         "",
-        "## Findings",
+        "## Callable shape of every function start",
         "",
-        f"- **{totals['function_start']:,} of {total:,} mapped addresses ({100.0 * totals['function_start'] / total:.1f} %) are real function entries.** "
-        "Those are the only entries a native dispatcher may call without further evidence.",
-        f"- **{totals['function_interior']:,} are inside a function but not at its start.** They are not map errors:",
-        "  they are the branch/jump labels and embedded literals the models name (`kSlot536Branch`,",
-        "  `kSlot536BranchTarget`, `kFn1290End`, `kAppInfoRunDispatchNext`, ...). A dispatcher must",
-        "  reject them; the full list is in `entry_closure.json` under `interior`.",
-        f"- **{totals['plt']:,} are PLT stubs**, including `__cxa_atexit` (`0xf8f390`), `strlen`, `memcpy`,",
-        "  `memmove`, `strncpy`, the guard acquire/release pair and `__stack_chk_fail`.",
-        f"- **{totals['executable_data']:,} are R+X bytes with no unwind range**: literal pools and the",
-        "  read-only tail after the last `ret` (0xf8f321). Reading them as code would be wrong.",
-        f"- **{totals['image_data']:,} are mapped by a non-executable PT_LOAD**, including the vtables in",
-        "  the OS-specific `0x1594000` read-only segment (`0x1594d90`, `0x1594dc0`, ...).",
-        f"- **{totals['outside_image']} addresses fall outside every PT_LOAD.**",
+        f"All **{totals['function_start']:,}** exact FDE starts were decoded at their entry:",
         "",
-        "### Named call targets",
+        "| Callable | Count | Evidence |",
+        "| --- | ---: | --- |",
+        f"| `retail_entry` | **{cc['retail_entry']:,}** | normal SysV entry with a measured prologue |",
+        f"| `jmp_thunk` | **{cc['jmp_thunk']:,}** | first instruction is a direct `jmp rel32` or `jmp *GOT(%rip)` |",
+        f"| `ret_stub` | **{cc['ret_stub']:,}** | first instruction is `ret` (1-byte function) |",
+        f"| `not_callable` | **{cc['not_callable']:,}** | interior label, PLT stub or data row |",
         "",
-        f"Of the **{data['target_named']['entries']}** distinct addresses whose constants say `Target`/`Rva`,",
+        "Prologue shapes of the retail entries:",
+        "",
+        "| Frame | Count | Alignment before calls | Count |",
+        "| --- | ---: | --- | ---: |",
     ]
-    tn = data["target_named"]
+    for frame in FRAME_ORDER:
+        align = callable_data["align"]
+        if frame == "leaf":
+            lines.append(f"| `leaf` | **{callable_data['frame'][frame]:,}** | `n/a` | {align['n/a']:,} |")
+        elif frame == "frame_pointer":
+            lines.append(f"| `frame_pointer` | **{callable_data['frame'][frame]:,}** | "
+                         f"`aligned` {align['aligned']:,}, `misaligned` {align['misaligned']:,}, "
+                         f"`dynamic` {align['dynamic']:,} |")
+        else:
+            lines.append(f"| `frame_less` | **{callable_data['frame'][frame]:,}** | (combined above) |")
     lines += [
-        f"**{tn['function_start']} are function starts**, **{tn['function_interior']} are interior labels**, "
-        f"**{tn['plt']} is a PLT stub** and **{tn['image_data']} are data** (vtables/globals). The",
-        "name convention alone therefore overstates callability for the interior and data rows; the",
-        "type, not the constant name, is the dispatch contract.",
         "",
-        "### Init closure coverage",
+        "Alignment is `(8 + 8*pushes + sub rsp) % 16 == 0`, i.e. the ABI's 16-byte call alignment",
+        "after the return address; `dynamic` means `and rsp,-16` realignment. A leaf has no",
+        "prologue, so alignment is not applicable (it makes no calls of its own).",
+        "",
+        f"The **{cc['jmp_thunk']}** thunks are real aliases, not bodies:",
         "",
     ]
-    if closure:
+    for thunk in callable_data["thunks"]:
+        lines.append(f"- `{thunk['rva']}` -> {thunk['form']} `{thunk['slot']}`")
+    lines += [
+        "",
+        "The `ret_stub` rows are the one-byte `ret` functions already executed on the Init path",
+        "(`0x56dca0`, `0x56db70`, `0x5b3d00`, `0x5b3cf0`, `0x56fad0` are among them).",
+        "",
+        "## Indirect frontier of the Init closure",
+        "",
+    ]
+    if indirect:
         lines += [
-            f"The shared CFG census (`closure_531d60.json`) reaches **{closure['functions']:,} functions** from the",
-            f"Init entry `0x531d60`. **{closure['with_native_entry']:,} of them ({closure['percent']} %) have an exact",
-            f"native entry** in this map; **{closure['without_native_entry']:,} do not yet**. That is the measured",
-            "callee-closure gap G1 refers to, and it is a list, not an estimate: the unmapped functions are",
-            "recorded in `closure.missing_sample`/the closure JSON.",
+            f"The `{closure['seed']}` closure contains **{indirect['functions']}** functions with at least one",
+            f"indirect call/jump: **{indirect['sites']} sites**. **{indirect['resolved']} are resolved** to an exact",
+            f"pinned target and **{indirect['blocked']} are blocked** with a recorded reason.",
+            "",
+            "| Resolution | Count | Meaning |",
+            "| --- | ---: | --- |",
+        ]
+        for kind, count in indirect["resolved_kinds"].items():
+            lines.append(f"| `{kind}` | **{count}** | same-block absolute base, slot contents land on an FDE start |")
+        lines += [
+            "",
+            "| Blocking reason | Sites | Verbatim meaning |",
+            "| --- | ---: | --- |",
+        ]
+        for reason, count in indirect["blocked_reasons"].items():
+            lines.append(f"| `{reason}` | **{count}** | {reason.replace('_', ' ')} |")
+        lines += [
+            "",
+            "Every site (function, site RVA, operand, status, target or reason) is listed in",
+            "`entry_closure.json` under `indirect.sites_detail`; nothing is guessed. A resolution",
+            "requires a same-basic-block definition of the base register, an absolute address, and",
+            "slot contents that are an exact FDE start.",
         ]
     else:
-        lines.append("The private closure census was not present, so closure coverage was not measured in this run.")
+        lines.append("The private closure census was not present, so the indirect frontier was not measured.")
     lines += [
         "",
         "## What this changes",
         "",
-        "- `ENTRY_MAP.md`'s open item 1 (\"entry point type\") is now answered for every mapped RVA.",
-        "- The native runtime can answer `guest_entry_find(rva)` and `guest_entry_kind_name()`; the",
-        "  generated table is `native/core/guest_entry_table.inc` and the test is",
-        "  `test_guest_entry_table`.",
-        "- The map is still not an ABI: a `function_start` says an FDE begins there, not that a thunk",
-        "  with the retail calling convention exists. Indirect targets remain unresolved.",
+        "- `ENTRY_MAP.md`'s open item 2 (address → callable retail-ABI entry) is answered at the shape",
+        "  level: every start is a retail entry, a jmp thunk or a ret stub, with prologue and alignment",
+        "  evidence. It is still not a native ABI thunk: a caller needs a matching native signature.",
+        "- Open item 3 (indirect targets) is measured and partially resolved; every remaining site is",
+        "  enumerated with its blocking reason instead of being left as a count.",
+        "- The native runtime exposes `guest_entry_callable(rva)` and the indirect summary from the",
+        "  generated table; `test_guest_entry_table` pins the counts.",
         "",
         "## Limits",
         "",
-        "- FDE-derived: a function with no unwind record is invisible, and an FDE range may cover",
-        "  alignment or literal bytes (which is exactly why interior addresses are typed, not rejected).",
-        "- `.eh_frame_hdr` is read at its fixed VA `0x150c08c`; the encodings are checked, so a different",
-        "  image fails closed instead of misparsing.",
-        "- No semantic or behavioural claim: presence in the table means the address has that ELF type,",
-        "  nothing more. Every address claim still needs the owning module's checker.",
+        "- FDE-derived function universe; a function without unwind data is invisible.",
+        "- Provenance is a linear same-block backward scan (max 70 instructions, max 3 register hops).",
+        "  A definition behind a branch, call or block boundary is deliberately treated as unknown.",
+        "- `retail_entry` proves the ELF shape, not a native callable signature; no thunk bodies are",
+        "  generated and no target is inferred from a vtable's name or from a runtime object type.",
         "",
     ]
     return "\n".join(lines)
@@ -353,9 +804,13 @@ def main(argv: list[str]) -> int:
         OUT_INC.write_text(inc)
     totals = data["totals"]
     closure = data["closure"]
+    indirect = data["indirect"]
     print(f"{'checked' if check_only else 'wrote'} entry closure: entries={totals['entries']} "
           f"start={totals['function_start']} interior={totals['function_interior']} plt={totals['plt']} "
           f"xdata={totals['executable_data']} data={totals['image_data']} outside={totals['outside_image']} "
+          f"retail={data['callable']['counts']['retail_entry']} thunks={data['callable']['counts']['jmp_thunk']} "
+          f"stubs={data['callable']['counts']['ret_stub']} "
+          f"indirect={indirect['resolved'] if indirect else '?'}/{indirect['sites'] if indirect else '?'} "
           f"closure={closure['with_native_entry'] if closure else '?'}/"
           f"{closure['functions'] if closure else '?'}")
     return 0

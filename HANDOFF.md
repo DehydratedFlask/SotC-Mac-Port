@@ -1,3 +1,53 @@
+## 2026-11-13 — Callable entry shapes and the indirect frontier (CPU-01-AOT-CFG-CALLABLE-01)
+
+**State: green.** Continuation of `62f10629` on branch `cursor/init-hash-551140-6aa93e8`. Init-lift is
+untouched and unchanged: **46,876 / 46,881 B**, **108,325 B** native, only the `0x2170` contract
+(`0x5ba041`) and the S4.2 geometry block (`0x7f8664..0x7f87d8`, gated on `0x3288478`/`0x3288480`).
+
+This is the successor to `CPU-01-ENTRY-MAP-CLOSURE-01`: the map knew what each address *is*, not
+whether it has a retail-ABI entry, nor which of the Init closure's indirect calls resolve.
+
+- **Callable shape of all 830 function starts** (decoded at the entry from the pinned ELF):
+  **786 `retail_entry`**, **10 `jmp_thunk`**, **34 `ret_stub`**; the remaining 1,127 rows are
+  `not_callable` (interior labels, PLT stubs, data). Retail prologues: **626 `frame_pointer`**,
+  **160 `leaf`**, **0 `frame_less`**. Static call alignment: **494 aligned**, **1 misaligned**
+  (`(8 + 8*pushes + sub rsp) % 16`), **131 `dynamic`** (`and rsp,-16`), 160 `n/a` leaves.
+- **The 10 thunks** are real aliases: `0x27280->0x272b3`, `0x30e50->0x312a0`,
+  `0x3b380/0x3b390/0x3b3c0/0x3b570 -> 0xf8f8c0/0xf8f8e0/0xf8f900/0xf8fa20`,
+  `0x499e50->0x49c9e0`, `0x87f3e0->0xf906d0`, `0x8c360->0x47620`, `0xed4860->0x170b0`.
+- **Indirect frontier:** the closure has **105 functions with 499 indirect sites** (ENTRY_MAP's
+  earlier "105 sites" was the function count — corrected). **180 sites are resolved** to an exact
+  FDE start (all through a same-block absolute vtable base: 15 distinct targets, e.g. `0x1290`'s
+  `call *0x18(%rax)` at `0x1301` -> `0x19f0` via base `0x1594060`), and **319 are blocked** with a
+  verbatim reason: 109 `stack_block_boundary`, 45 `block_boundary`, 44 indexed-register arithmetic,
+  95 `object_load` from object fields, 10 `not_file_backed` BSS globals, 9 `stack_call_clobbers`,
+  and the long tail (60 distinct reasons). Every one of the 499 sites is recorded with function,
+  site RVA, operand text, status, target/evidence or reason.
+- **Native surface:** `GuestEntry` now carries `GuestEntryCallable`; the generated
+  `guest_entry_table.inc` has (rva, kind, callable) plus `kGuestIndirectSummary`
+  (105/499/180/319). The runtime JSON reports `retail_entry`/`jmp_thunk`/`ret_stub`/`not_callable`
+  and the indirect summary. `test_guest_entry_table` pins all of them.
+- **Checker:** `check_entry_closure.py` re-derives every row and every site from the pinned ELF
+  (objdump over the pinned image) and compares JSON and `.inc` exactly. `--mutate` runs an in-memory
+  probe: a tampered table row and a tampered total are both detected. An external tamper of
+  `docs/entry_closure.json` and of the `.inc` was also run (checker exited 1) and reverted.
+- **Real bugs found and fixed in the resolver:** (1) `absolute_operand` matched the whole
+  two-operand string instead of the source operand, so every RIP-relative load failed and the first
+  run resolved **0/499**; (2) a stack spill was invalidated by an intervening `call`, although a
+  callee cannot modify the caller's frame — allowing spills to survive calls raised the resolved
+  sites from 0 to 180. Registers still stop at calls.
+- **Verification:** build **0**; full CTest **705/705**; checker `OK ... indirect=180/499` plus the
+  mutation probe; sweep **915/0/0**; `sotc_init_window` exit **0**, **stderr 0 B**, `ok=true`,
+  `entry_map.indirect = {105,499,180,319}`; entry map 3,052 → 1,957 / 584 headers (462 duplicates);
+  project index **114,665**; checkpoint `docs/checkpoints/2026-11-13-callable-map-indirect-frontier.md`.
+- **Not claimed:** no native ABI thunk bodies were generated; 319 indirect sites remain blocked with
+  exact reasons; cold boot, audio, save/reload and Metal validation stay NOT RUN. G1 **PARTIAL**.
+
+**Next exact action:** write the first **native ABI thunk bodies** for a high-value resolved target
+(the 15 resolved targets are the natural set) or attack the top blocker class
+(`stack_block_boundary`, 109 sites) by following stack definitions across branch joins with a real
+CFG. Do not re-open `0x2170` or the `0x7f8664` geometry block.
+
 ## 2026-11-13 — Guest entry map typed against the ELF (CPU-01-ENTRY-MAP-CLOSURE-01)
 
 **State: green.** Continuation of `4312f738` on branch `cursor/init-hash-551140-6aa93e8`. Init-lift is
