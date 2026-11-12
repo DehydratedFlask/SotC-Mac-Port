@@ -200,27 +200,116 @@ LANE_SLOTS_20261028 = {
 # CPU-01-STARTUP-BATCH-DEBUG-PAGE-01: the first four data rows of the debug-page cluster model
 # core/debug_page_var_item (361 / 379 / 467 / 536).
 DEBUG_PAGE_BATCH = {361, 379, 467, 536}
+# Batch 2: 374 (one-variable + toggle with the leading {name, hash} record) and the four tracked models
+# that had no table row until now: 448 / 507 / 539 (lane M6 bool-variable shapes) and 545 (matrix statics).
+DEBUG_PAGE_BATCH_2 = {374, 448, 507, 539, 545}
+# Batch 3: slot 518 (one float variable + the static-float tail) and the bool debug-page rows.
+DEBUG_PAGE_BATCH_3 = {362, 410, 423, 449, 477, 518}
+# CPU-01-STARTUP-BATCH-DEBUG-PAGE-01 batch 4: bool/toggle/group/holder debug pages.
+DEBUG_PAGE_BATCH_4 = {338, 368, 443, 512, 550}
+# CPU-01-STARTUP-BATCH-DEBUG-PAGE-01 batch 5: slot 437 (three bool variables + sixteen borrowed views).
+DEBUG_PAGE_BATCH_5 = {437}
+# Batch 6 (CPU-01-STARTUP-BATCH-6): helper-callee-backed slots - 366/411 (bool vars + 0x26db0 toggles),
+# 430 (0xc580 ranged int), 504 (0x6aa00 float + bool), 555 (0x257a0 strings + 0x3a980 int), and the float/bool
+# rows 397 / 442 / 450 / 460 built through helper_init_unbounded_float_var_site, and 514 / 455 / 488 / 369 / 420
+# (menu toggles, group, sliders, ranged/unbounded int rows, the 420 separator with its allocator stand-in).
+DEBUG_PAGE_BATCH_6 = {366, 411, 430, 504, 555, 397, 442, 450, 460, 514, 455, 488, 369, 420}
+# Batch 7 (CPU-01-STARTUP-BATCH-7): 336 (the attract-mode page: the local enum variable constructor 0x7ec160 / 0x7ec320,
+# a bool, a ranged int, the rand() cell, a group with three toggles, a name holder, an unbounded float and a retained cell).
+DEBUG_PAGE_BATCH_7 = {336, 506, 392, 396, 409, 414}
+DEBUG_PAGE_BATCH_8 = {337, 351, 400, 444, 474, 521}
+# Batch 9 (CPU-01-STARTUP-BATCH-9): 339 (the old cliff: its indirect call was a NAME resolution miss, not a missing target) and the
+# bool / bounded-float / unbounded-float debug pages 395, 380, 375, 382, 360, 373, 354.
+DEBUG_PAGE_BATCH_9 = {339, 395, 380, 375, 382, 360, 373, 354}
+# Batch 10 (CPU-01-STARTUP-BATCH-10): 340 (the batch-9 cliff; its six indirect calls are the console-command register-once slot
+# [0x1594dc0 + 0x20] = 0x20d60, resolved statically by tools/lift/check_ctor_slot_340.py) and 342 (the same slot plus the 0x23fd00 name cell,
+# tools/lift/check_ctor_slot_342.py).
+DEBUG_PAGE_BATCH_10 = {340, 342, 349, 388, 480}
+# Batch 11 (CPU-01-STARTUP-BATCH-11): repo-resident generator tools/lift/startup_gen (static register tracker over the pinned ELF);
+DEBUG_PAGE_BATCH_11 = {352, 363, 367, 398, 401}
+# Batch 12 (CPU-01-STARTUP-BATCH-12): same generator (tools/lift/startup_gen); adds the cmd / unbounded-uint / 0x27050 row kinds and cells-only pages.
+DEBUG_PAGE_BATCH_12 = {358, 381, 391, 399, 418, 561}
+# Batch 13 (CPU-01-STARTUP-BATCH-13): same generator; adds the sentinel-container, named-record (0xa81700), zero-container, external-slider-target and described-lint row kinds.
+DEBUG_PAGE_BATCH_13 = {370, 469, 508, 513}
+# Batch 14 (CPU-01-STARTUP-BATCH-14): same generator (tools/lift/startup_gen), plus the tree / node-reference row kinds
+DEBUG_PAGE_BATCH_14 = {390, 402, 408, 424, 427, 428, 429, 445, 446, 451, 453, 464, 473, 494, 498, 501, 534, 566, 571, 572}
+# Batch 15 (CPU-01-STARTUP-BATCH-15): same generator, plus twin-uint (0x140b00/0x25ab0), multi-tree and strncpy-cell rows
+DEBUG_PAGE_BATCH_15 = {422, 493, 503, 511}
+# Batch 21 (CPU-01-STARTUP-BATCH-21): slot 570 (0x16d80), the three bespoke preamble tables plus the
+# `mem_Verify` bool and the `Memory` / `Verify Memory Integrity` toggle.
+DEBUG_PAGE_BATCH_16 = {570}
+# Batch 22 (CPU-01-STARTUP-BATCH-22): slot 532 (0x143f50), 21 borrowed string views registered at
+# 0xf7b0, pinned by tools/lift/check_ctor_slot_532.py.
+DEBUG_PAGE_BATCH_17 = {532}
+# Batch 23 (CPU-01-STARTUP-BATCH-23): slot 537 (0x1324c0), 40 binary32 -> binary16 conversions
+# through the 0x157e90 helper, pinned by tools/lift/check_ctor_slot_537.py.
+DEBUG_PAGE_BATCH_18 = {537}
+# Batch 24 (CPU-01-STARTUP-BATCH-24): slot 452 (0x498640), four console commands and one
+# toggle, pinned by tools/lift/check_ctor_slot_452.py.
+DEBUG_PAGE_BATCH_19 = {452}
+# Batch 25 (CPU-01-STARTUP-BATCH-25): slot 495 (0x268ee0), the blob-parser debug page,
+# pinned by tools/lift/check_ctor_slot_495.py and check_blob_parser_a38960.py.
+DEBUG_PAGE_BATCH_25 = {495}
+DEBUG_PAGE_BATCH_26 = {454}
+# Batch 27 (CPU-01-STARTUP-BATCH-27): slot 462 (0x3e2730), the presentation / point-of-interest
+# page and the functor command 0x6af60 built by 0x6b0f0, pinned by check_ctor_slot_462.py and
+# check_concmd_functor_6af60.py.
+DEBUG_PAGE_BATCH_27 = {462}
+# Startup slot 468 (0x3c3a90): automation command page, pinned by check_ctor_slot_468.py and
+# check_scripted_entry_3c2a00.py.
+DEBUG_PAGE_BATCH_28 = {468}
+# Batch 29 (CPU-01-STARTUP-BATCH-29): slot 568 (0x207e0), the LoadCmdsFromFile command with a
+# two-token inline vector, pinned by tools/lift/check_ctor_slot_568.py.
+DEBUG_PAGE_BATCH_29 = {568}
+# Batch 30 (CPU-01-STARTUP-BATCH-30): slot 556 (0x4ccb0), four lane-M5 app-info entries plus the
+# sendEmail command, pinned by tools/lift/check_ctor_slot_556.py.
+DEBUG_PAGE_BATCH_30 = {556}
+# Batch 31 (CPU-01-STARTUP-BATCH-31): slot 530 (0x149f00), the Resources page, pinned by
+# tools/lift/check_ctor_slot_530.py.
+DEBUG_PAGE_BATCH_31 = {530}
+# Batch 32 (CPU-01-STARTUP-BATCH-32): slot 524 (0x16a810), the screenshot command, planned together
+# with its 544 B token-appender helper 0x16a380; pinned by tools/lift/check_ctor_slot_524.py.
+DEBUG_PAGE_BATCH_32 = {524}
+# Batch 33 (CPU-01-STARTUP-BATCH-33): slot 505 (0x236030), the table copy + 226-step bounds
+# min/max constructor and its 0x1621b0/0x162970 helpers, pinned by check_ctor_slot_505.py.
+DEBUG_PAGE_BATCH_33 = {505}
+# Batch 34 (CPU-01-STARTUP-BATCH-34): slot 552 (0x8c880), eight page objects (six class-A pages,
+# one class-B, one class-C) with eight __cxa_atexit records, pinned by check_ctor_slot_552.py.
+DEBUG_PAGE_BATCH_34 = {552}
+# Batch 35 (CPU-01-STARTUP-BATCH-35): slot 567 (0x235d0), the ConCmdManager cell plus four console
+# commands (executeCmd/getValue/help/core_unittests) and five __cxa_atexit records, pinned by
+# check_ctor_slot_567.py.
+DEBUG_PAGE_BATCH_35 = {567}
+# Batch 36 (CPU-01-STARTUP-SLOT-510): slot 510 (0x211340), property cell + FollowGameCamera bool var
+# + Debug Game toggle + pose constants + SyncCameraAcrossTools with seven tokens; oracle
+# check_ctor_slot_510.py.
+DEBUG_PAGE_BATCH_36 = {510}
+# Batch 37 (CPU-01-STARTUP-SLOT-497): slot 497 (0x262a80), 24 console variables, 19 debug-menu
+# items, 7 named records and 3 registration entries; oracle check_ctor_slot_497.py.
+DEBUG_PAGE_BATCH_37 = {497}
+# Batch 38 (CPU-01-STARTUP-SLOT-554-BATCH-01): page header + first eight variables of slot 554.
+DEBUG_PAGE_BATCH_38 = {554}
 # Slot 309 (0xa505e0, the Save System debug block) was registered by CPU-01-RANGED-BOUND-VAR-A4F4D0-01
 # once its three console-variable constructors 0xa4f4d0 / 0xa4fec0 / 0xa50280 were lifted as the shared
 # model core/ranged_bound_var_a4f4d0 (pinned by tools/lift/check_console_var_ctors.py).
 expected_registered = (set(range(152)) | set(modules) | {282, 290, 520, 538, 296, 297, 300, 298, 299, 301, 302, 303, 305, 306, 309, 312, 314, 316, 326, 329, 335}
-                       | LANE_SLOTS_20261026 | LANE_SLOTS_20261028 | DEBUG_PAGE_BATCH)
+                       | LANE_SLOTS_20261026 | LANE_SLOTS_20261028 | DEBUG_PAGE_BATCH
+                       | DEBUG_PAGE_BATCH_2 | DEBUG_PAGE_BATCH_3 | DEBUG_PAGE_BATCH_4
+                       | DEBUG_PAGE_BATCH_5 | DEBUG_PAGE_BATCH_6 | DEBUG_PAGE_BATCH_7 | DEBUG_PAGE_BATCH_8
+                       | DEBUG_PAGE_BATCH_9 | DEBUG_PAGE_BATCH_10 | DEBUG_PAGE_BATCH_11 | DEBUG_PAGE_BATCH_12 | DEBUG_PAGE_BATCH_13 | DEBUG_PAGE_BATCH_14 | DEBUG_PAGE_BATCH_15
+                       | DEBUG_PAGE_BATCH_16 | DEBUG_PAGE_BATCH_17 | DEBUG_PAGE_BATCH_18 | DEBUG_PAGE_BATCH_19 | DEBUG_PAGE_BATCH_25 | DEBUG_PAGE_BATCH_26 | DEBUG_PAGE_BATCH_27 | DEBUG_PAGE_BATCH_28 | DEBUG_PAGE_BATCH_29 | DEBUG_PAGE_BATCH_30 | DEBUG_PAGE_BATCH_31 | DEBUG_PAGE_BATCH_32 | DEBUG_PAGE_BATCH_33 | DEBUG_PAGE_BATCH_34 | DEBUG_PAGE_BATCH_35 | DEBUG_PAGE_BATCH_36 | DEBUG_PAGE_BATCH_37 | DEBUG_PAGE_BATCH_38)
 assert set(rows_by_index) == expected_registered, (
     "registered set differs from the computed expectation: "
     f"extra={sorted(set(rows_by_index) - expected_registered)} "
     f"missing={sorted(expected_registered - set(rows_by_index))}")
 registered_digest = hashlib.sha256(
     ",".join(str(index) for index in sorted(rows_by_index)).encode()).hexdigest()
-assert registered_digest == "4257e41bdcc719d6eede2d532222b9fbe85cf79be543c722e748b5da635cf42e", (
+assert registered_digest == "174295fe200e020010d156ee3b7544c9ed2a13326f7ab076233c165ba1a84881", (
     f"registered index-set sha256 changed: {registered_digest}")
 
-# The remaining 113 original slots have no registered native callback; the first is the explicit
-# startup cliff after slot 335 was registered by CPU-01-STARTUP-SLOT-335-CHARACTERIZATION-01
-# (index 336 / 0x7ec4c0 is still open, so the debug-page batch did not move the cliff).
+# Batch 38 registered the last row (554); batch 13 closed its body on 2026-11-08 (E1417).
 unregistered = sorted(set(range(TABLE_COUNT)) - set(rows_by_index))
-assert len(unregistered) == 113, f"expected 113 unregistered slots, found {len(unregistered)}"
-assert unregistered[0] == 336 and original_rvas[336] == 0x7ec4c0, (
-    f"first unregistered slot changed: {unregistered[0]}/{original_rvas[unregistered[0]]:#x}")
+assert not unregistered, f"expected every row registered, found {unregistered}"
 
 # The 573-row data table must reproduce the ELF exactly, in index order.
 startup_header = (core_dir / "startup_ctors.hpp").read_text()
@@ -329,6 +418,5 @@ print(
     f"OK: ELF sha256={elf_digest}; constructor table start={TABLE_START:#x} "
     f"count={TABLE_COUNT} sha256={table_digest}; verified {len(rows)} registered RVA/index pairs "
     f"({len(modules)} vec_*/leaf_* modules); registered index-set sha256={registered_digest}; "
-    f"slots 0-47 recovered; idx 95 registered; {len(unregistered)} unregistered `other` slots remain, first "
-    f"{unregistered[0]} / {original_rvas[unregistered[0]]:#x}"
+    f"slots 0-47 recovered; idx 95 registered; all {TABLE_COUNT} rows registered and fully lifted"
 )

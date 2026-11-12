@@ -8,8 +8,8 @@
 // over deepen 0x1290 / 0x5c64c0 / 0x56dcb0 / 0x499f80 / 0x140d90 / 0x14c2f0 /
 // 0x6a5370. Prefer over empty-path migrate/non-null.
 //
-// Claimed: call-site control flow pin only.
-// NOT modelled: PLT/Sony body / later ymm Init continues. PR #5 cite-only.
+// Claimed: call-site wrapper. The Sony PLT body is not lifted; the runtime calls a named
+// splash-hide host service and observes the call (E1426). Later ymm Init continues are separate.
 #pragma once
 
 #include <cstddef>

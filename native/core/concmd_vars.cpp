@@ -7,7 +7,7 @@ namespace sotc {
 BoolVarResult init_bool_var_static(ConCmdBoolVar& var, const SharedStr& name,
                                    const SharedStr& description, std::uint64_t fn_vptr_tag,
                                    ConCmdRegistry& registry, std::uint8_t value,
-                                   std::uint8_t default_value) noexcept {
+                                   std::uint8_t default_value, bool early_description_release) noexcept {
     BoolVarResult out{};
 
     // 0xac9595..0xac95d3: [obj] = 0x1594218 (overwritten by the base constructor), then
@@ -25,7 +25,8 @@ BoolVarResult init_bool_var_static(ConCmdBoolVar& var, const SharedStr& name,
     var.fn_aux = 0;                                       // qword [obj+0xb8] = 0
 
     // 0xac9635: call 0xf590 on the stack description view (no control counter).
-    const bool desc_inert = release_inert_view_f590(description);
+    bool desc_inert = true;
+    if (early_description_release) desc_inert = release_inert_view_f590(description);
 
     // 0xac963d..0xac964b.
     var.base.vptr = kBoolVarFinalVptr;                    // [obj] = 0x1594218
@@ -34,6 +35,8 @@ BoolVarResult init_bool_var_static(ConCmdBoolVar& var, const SharedStr& name,
 
     // 0xac9652: call 0x20d60.
     out.registration = register_concmd_20d60(var.base, registry);
+
+    if (!early_description_release) desc_inert = release_inert_view_f590(description);   // late order: after 0x20d60
 
     // 0xac965a: call 0xf590 on the stack name view.
     const bool name_inert = release_inert_view_f590(name);
@@ -130,9 +133,11 @@ void install_ranged_fn_from_args(ConCmdRangedVar& var, const RangedVarArgs& args
 bool init_ranged_float_var_c300(ConCmdRangedVar& var, const SharedStr& name, void* value_ref,
                                 float min_value, float max_value, std::uint32_t flags,
                                 const RangedVarArgs& args, const SharedStr& description) noexcept {
-    // Clone/copy/move/destroy bodies are identical for 0x15d57e0, 0x15d2040 and 0x1594318 (checker-pinned).
+    // Clone/copy/move/destroy bodies are identical for 0x15d57e0, 0x15d2040, 0x1594318 and
+    // 0x1596878 (checker-pinned relocation addends).
     if (args.fn_vptr != kRangedFloatArgFnVtbl && args.fn_vptr != kRangedFloatFnVtbl &&
-        args.fn_vptr != kRangedFloatArgFnVtblSndx) {
+        args.fn_vptr != kRangedFloatArgFnVtblSndx &&
+        args.fn_vptr != kRangedFloatArgFnVtblMiscDebug) {
         return false;
     }
 

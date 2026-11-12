@@ -11,10 +11,10 @@ bool is_lane_m6_int_site_tag(std::uint64_t tag) noexcept { return tag == kIntSit
 BoolVarResult init_bool_var_literal(ConCmdBoolVar& var, const char* name, std::size_t name_length,
                                     const char* description, std::size_t description_length, std::uint64_t fn_tag,
                                     ConCmdRegistry& registry, std::uint8_t value,
-                                    std::uint8_t default_value) noexcept {
+                                    std::uint8_t default_value, bool early_description_release) noexcept {
     const SharedStr n = l2::measured_view(name, name_length);
     const SharedStr d = l2::measured_view(description, description_length);
-    return init_bool_var_static(var, n, d, fn_tag, registry, value, default_value);
+    return init_bool_var_static(var, n, d, fn_tag, registry, value, default_value, early_description_release);
 }
 
 FloatVarResult init_float_var_site(ConCmdRangedVar& var, const FloatVarSpec& spec,

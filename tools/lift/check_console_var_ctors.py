@@ -258,10 +258,12 @@ TEST_TOKENS = ["section_constants", "section_build_three", "section_value_cell",
                "r.functor_slot_calls == kRangedBoundFunctorSlotCalls"]
 SLOT_TEST_TOKENS = ["section_native_build", "section_native_var_refused",
                     "default_slot309_hooks()", "slot309_var_ctor_native"]
-COVERAGE_TOKENS = ["slots.size() == 460", "first_unrecovered_constructor_index() == 336",
-                   "first_unrecovered_constructor_rva() == 0x7ec4c0",
-                   "slots.size() + 113 == kOriginalCtorCount",
-                   "st.slot309_result.ok"]
+COVERAGE_TOKENS = ["slots.size() == 573", "first_unrecovered_constructor_index() == -1",
+                   "first_unrecovered_constructor_rva() == 0",
+                   "slots.size() == kOriginalCtorCount",
+                   "st.slot309_result.ok", "st.slot556_result.ok", "st.slot568_result.ok",
+                   "st.slot530_result.ok", "st.slot524_result.ok", "st.slot505_result.ok",
+                   "st.slot567_result.ok", "st.slot510_result.ok", "st.slot497_result.ok"]
 CMAKE_TOKENS = ["core/ranged_bound_var_a4f4d0.cpp", "core/ctor_slot_309_a505e0.cpp",
                 "add_test(NAME ranged_bound_var_a4f4d0 COMMAND test_ranged_bound_var_a4f4d0)",
                 "add_test(NAME ctor_slot_309 COMMAND test_ctor_slot_309)"]

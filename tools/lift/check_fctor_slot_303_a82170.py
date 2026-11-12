@@ -84,7 +84,8 @@ SOURCE_ORDER = [   # store / call order of 0xa82188..0xa8230e
 ]
 VARS_TOKENS = [
     "ConCmdRegistry& registry,\n                                                 std::uint8_t value = 1,\n"
-    "                                                 std::uint8_t default_value = 1) noexcept;",
+    "                                                 std::uint8_t default_value = 1,\n"
+    "                                                 bool early_description_release = true) noexcept;",
     "std::uint8_t value,\n                                   std::uint8_t default_value) noexcept {",
     "var.value = value;", "var.default_value = default_value;",
 ]

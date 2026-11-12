@@ -5,7 +5,9 @@
 // module pins only the post-call boundary (batch E entry @ `0x5329ae`).
 //
 // Claimed: boundary RVA, chaining after u1, and u1 merge counters on the D result.
-// NOT modelled: `0x5329ae` successor block, merge `je` outcome, incoming registers.
+// The runtime supplies `capture_services`, so the native `0xa473b0` body executes
+// instead of a counting hook. NOT modelled here: `0x5329ae` successor block, merge
+// `je` outcome, incoming registers.
 #pragma once
 
 #include <array>

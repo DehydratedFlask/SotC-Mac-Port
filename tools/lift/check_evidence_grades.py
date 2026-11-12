@@ -100,7 +100,7 @@ def main() -> int:
 
     forwarding = load_module("store_to_load_forwarding", FORWARDING)
     rows = forwarding.parse_header_rows(HEADER.read_text())
-    require(len(rows) == 91, f"expected 91 rows in the header, found {len(rows)}")
+    require(len(rows) == 83, f"expected 83 rows in the header, found {len(rows)}")
     require(len({row["site"] for row in rows}) == len(rows), "duplicate call site in the header")
     require(all(row["grade"] in forwarding.GRADES for row in rows),
             "every row must carry a `// site-provable` or `// table-level` comment")

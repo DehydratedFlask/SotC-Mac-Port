@@ -89,8 +89,9 @@ All five targets are FDE function starts. They are recorded in
 `find_resolved_vtable_call_site`) and therefore appear in [`entry_map.json`](entry_map.json);
 `tools/lift/check_vtable_resolved_entries.py` re-verifies the slot qword, the RELA addend, the FDE
 start and the entry-map presence for each row — table-level facts that hold for both grades. It does
-not, and cannot, test dispatch. All 37 distinct targets now have a native body model; the table grew
-through the sweeps recorded below.
+not, and cannot, test dispatch. All 32 distinct targets now in the table have a native body model; the table grew
+through the sweeps recorded below and then shrank by 8 rows in the E1095 correction
+([Vptr-skew correction](#vptr-skew-correction-e1095)).
 
 ## Evidence grades
 
@@ -102,8 +103,8 @@ slots `0x10` and `0x18` are table-level.
 | Grade | Rows | Targets | Table bases | What the row proves |
 |---|---:|---:|---:|---|
 | site-provable | **41** | 6 | 6 | the call site alone forces the target |
-| table-level only | **50** | 31 | 17 of 21 | the slot ties the target; the call is not proven |
-| **total** | **91** | **37** | **21** | |
+| table-level only | **42** | 27 | 16 of 20 | the slot ties the target; the call is not proven |
+| **total** | **83** | **32** | **20** | |
 
 - **Site-provable.** The call is `call *slot(%reg)` and the register's *nearest* preceding definition
   is the RIP-relative load of this table — the `lea` of the table base, or the `mov` of a
@@ -117,21 +118,23 @@ slots `0x10` and `0x18` are table-level.
   this function — only that the slot does, and that some register value in the site's window was that
   table.
 
-Measured, not estimated: parse the 91 rows of `native/core/vtable_resolved_entries.hpp` and intersect
+Measured, not estimated: parse the 83 rows of `native/core/vtable_resolved_entries.hpp` and intersect
 their sites with `local/validation/indirect-frontier/tied-sites-image-wide-strict.json` — 41 sites,
 6 targets, 41 containers under the nearest-definition predicate, with the sha-pinned inputs listed at
 the top of this card. That 41-site set is exactly the audit's 24 pre-existing rows plus its 17 new
-ones, so the two artifacts agree. 41 header rows intersect; 50 do not. By table, 15 of the 21 bases
+ones, so the two artifacts agree. 41 header rows intersect; 42 do not. By table, 14 of the 20 bases
 carry only table-level rows and 2 (`0x1594ae8`, `0x1594dc0`) carry both grades.
 
 What each grade is good for: a site-provable row can drive native dispatch for that call; a
 table-level row must not. Both are sound as *target* records — the body model, the ABI row and the
 fixture describe the function, not the call site.
 
-The split did not move when the bounded store-to-load forwarding pass was run over all 91 rows:
-**0 of the 50** table-level rows become site-provable, for the reasons measured in
-[Store-to-load forwarding pass](#store-to-load-forwarding-pass). The table above is therefore both
-the pre-pass and the current measured split, and no row's value or grade was edited.
+The split did not move when the bounded store-to-load forwarding pass was run over the 91 rows that
+existed then: **0 of the 50** table-level rows became site-provable, for the reasons measured in
+[Store-to-load forwarding pass](#store-to-load-forwarding-pass). That pass also showed nine rows
+carried the wrong slot; E1095 corrected one and withdrew eight ([Vptr-skew
+correction](#vptr-skew-correction-e1095)), which removed 8 table-level rows and left the 41
+site-provable rows untouched. The table above is the current measured split.
 
 ## Sweeps after the seed closure
 
@@ -143,13 +146,15 @@ the pre-pass and the current measured split, and no row's value or grade was edi
 | Constructor table (`0x2dd5f00..0x2dd70e0`, 573 entries) | 573 | 42 | 17 |
 | Entry-map sample, twice | 40 | 47 | 22 |
 | Vtable-closure sweep | 13 containers | 74 | 33 |
-| **Provenance-audited slice** | **41 containers** | **91** | **37** |
+| Provenance-audited slice | 41 containers | 91 | 37 |
+| **E1095 vptr-skew correction** | audit of 9 rows | **83** | **32** |
 
 The first three rows match the recorded checkpoints. The entry-map sample reached 47 rows / 22
 targets; the exhaustive entry-map sweep below added no new target on top of it, and the
 vtable-closure sweep is the class that did. The last row is the audit of that same class, recorded
-below; it keeps all 74 rows and adds 17. The rows are not graded uniformly — 41 of the 91 are
-site-provable and 50 are table-level only ([Evidence grades](#evidence-grades)) — and the audit added
+below; it keeps all 74 rows and adds 17 (91). E1095 then withdrew 8 of them, so the table holds 83.
+The rows are not graded uniformly — 41 of the 83 are
+site-provable and 42 are table-level only ([Evidence grades](#evidence-grades)) — and the audit added
 only rows that its strict predicate selected (17 of the 41).
 
 ### Exhaustive entry-map sweep (class exhausted)
@@ -183,9 +188,9 @@ shows that most of that base is table-level only.
 | Target | Slot(s) | Sites | Body | Model |
 |---|---|---:|---:|---|
 | **`0x13d50`** | `0x1594ae8 + 0x40` | 1 | 3 B: `xor eax,eax; ret` | `vtable_1594ae8_slot40_13d50` |
-| **`0x13d60`** | `0x1594ae8 + 0x50`, `0x1595b60 + 0x50` | 2 | 9 B: sets `this+0x70 = this+0x60` | `vtable_1594ae8_slot50_13d60` |
+| ~~`0x13d60`~~ | ~~`0x1594ae8 + 0x50`, `0x1595b60 + 0x50`~~ (E1095: withdrawn, no call reads these slots) | 0 | 9 B: sets `this+0x70 = this+0x60` | `vtable_1594ae8_slot50_13d60` (model kept) |
 | **`0x30e50`** | `0x1595320 + 0x10` | 1 | 5 B: `jmp 0x312a0` | `vtable_1595320_slot10_30e50` |
-| **`0x488d0`** | `0x1595b60 + 0x18` | 1 | 28 B: pre-pass `0x48790`, tag-1 free | `vtable_1595b60_slot18_488d0` |
+| ~~`0x488d0`~~ | ~~`0x1595b60 + 0x18`~~ (E1095: withdrawn; `0x113c5` reads `0x1595b88` -> `0x13d20`) | 0 | 28 B: pre-pass `0x48790`, tag-1 free | `vtable_1595b60_slot18_488d0` (model kept) |
 | **`0xc2c0`** | `0x15949a0 + 0x58` | 1 | 20 B: stamp `0x1594280`, copy `+0x10` | `vtable_15949a0_slot58_c2c0` |
 | **`0xe19cb0`** | `0x15e2028 + 0x18` | 1 | 28 B: pre-pass `0xe1b1b0`, tag-1 free | `vtable_15e2028_slot18_e19cb0` |
 | **`0xe19f70`** | `0x15e2028 + 0x38` | 1 | 197 B: name scan, max-id pick, returns found | `vtable_15e2028_slot38_e19f70` |
@@ -201,7 +206,7 @@ never tested whether the row's call site dispatches through the slot. `tools/lif
 `check_vtable_containers_e1.py` and `check_vtable_teardown_tail.py` pin the body bytes and sha256,
 the FDE length, the slot qword, the RELA addend and the entry-map record for all 11 new targets;
 `check_vtable_resolved_entries.py` re-verified those 74 rows (33 targets). The provenance-audited
-slice below extends the same check to all 91 rows.
+slice below extends the same check to all 91 rows (83 after E1095).
 
 ### Provenance audit of the site-evidence class
 
@@ -233,8 +238,9 @@ teardown family (`0x1dd620`, `0x1de6c0`, ...) dispatches through a *member's* vt
 recorded table is the owner's. Both are `may`-ties, not `must`-ties. What the audit does establish is
 which rows are proven by the call site alone: **24 of the 74** rows that existed at that point (all
 22 rows of `0x1594dc0 + 0x20 -> 0x20d60`, plus `0x11452` and `0x13620`). The remaining 50 rows keep
-their table-level evidence and their models. In the current 91-row table the same predicate marks
-**41** rows site-provable (those 24 plus the 17 added below) and **50** table-level only; every row
+their table-level evidence and their models. In the current 83-row table the same predicate marks
+**41** rows site-provable (those 24 plus the 17 added below) and **42** table-level only (50 before
+E1095 withdrew eight); every row
 now states its grade in the header and this card's [Evidence grades](#evidence-grades).
 
 ### Provenance-audited slice
@@ -272,11 +278,11 @@ and then makes a qualified (non-virtual) call through the base table's slot `0x6
 
 `tools/lift/check_vtable_frontier2.py` pins the body bytes and sha256, the FDE length, the slot
 qword, the type-8 RELA addend, the header constants, the 17 table rows and the entry-map record.
-`check_vtable_resolved_entries.py` re-verifies all 91 rows (37 targets).
+`check_vtable_resolved_entries.py` re-verifies all 83 rows (32 targets).
 
 ### Store-to-load forwarding pass
 
-Seed class: the 50 table-level rows themselves. This is the one route the previous card called the
+Seed class: the 50 table-level rows themselves (measured on the 91-row table, before E1095). This is the one route the previous card called the
 "largest *provable* remainder" and left unmeasured: a locally constructed object whose vtable
 pointer is stored to a stack slot or member and reloaded before the indirect call.
 
@@ -314,17 +320,48 @@ For those nine the forwarded address is a real slot (one type-8 RELA, FDE start)
 | `0x312de`, `0x3134e` | `0x1595498` → `0x15954a8` | `0x31870` → `0x318f0` |
 | `0x312f0`, `0x31360` | `0x1595410` → `0x1595420` | `0x31310` → `0x31520` |
 
-Those forwarded values are **diagnostics, not evidence**: the rows stay `table-level` and this card
-changes no row value. They say the site's read address is offset from the recorded one, which is
-inherent to a fallback tie: the recorded `(vtable, slot)` is the older `lea` plus the call
-displacement, and for a vptr-relative call that is not the address the call reads. Fixing that
-means rewriting row values, which needs its own audit and is not attempted here.
+Those forwarded values were first recorded as diagnostics. They are now acted on: see
+[Vptr-skew correction](#vptr-skew-correction-e1095) below. The cause is inherent to a fallback tie:
+the recorded `(vtable, slot)` is the older `lea` plus the call displacement, and for a vptr-relative
+call that is not the address the call reads.
 
 Limits of the pass, stated so the zero is not read as "nothing is there": it matches a store only
 through the **same base register family**. **38 of the 50** rows have a store to the same offset
 through a *different* base register and none through the load's own base. That is not evidence at
 this offset: `0` is the vptr of every object, so a same-offset store through another register says
 nothing about this object. Going further needs points-to/escape analysis, not a longer window.
+
+### Vptr-skew correction (E1095)
+
+The nine sites above were audited from ELF bytes. Each is `movq (%base),%rax; call *disp(%rax)`
+whose single reaching store of `(%base)` is `lea TABLE(%rip); add $0x10`. The Itanium ABI address
+point is `TABLE + 0x10`, so the call reads `TABLE + 0x10 + disp`, not `TABLE + disp`. For every site
+the read address holds one type-8 RELA and an FDE start. Corroboration independent of the pass: the
+devirtualized direct call at `0x312b7` goes to `0x31900`, which is the corrected slot-`0xa8` target
+of `0x312ce`/`0x3133e`; and the site-provable `0x11452` (`0x1594ae8 + 0x28 -> 0x13d20`) is the same
+shape as the corrected `0x113c5` in the neighbouring table.
+
+| Site | Recorded (table + slot -> target) | Real read address -> target | Action |
+|---|---|---|---|
+| `0x113c5` | `0x1595b60 + 0x18 -> 0x488d0` | `0x1595b88` (`+0x28`) -> `0x13d20` | row corrected (target already modelled) |
+| `0x113d6` | `0x1595b60 + 0x50 -> 0x13d60` | `0x1595bc0` -> `0x47860` | row withdrawn |
+| `0x11462` | `0x1594ae8 + 0x50 -> 0x13d60` | `0x1594b48` -> `0x47860` | row withdrawn |
+| `0x312ce`, `0x3133e` | `0x15953f8 + 0xa8 -> 0x318b0` | `0x15954b0` -> `0x31900` | rows withdrawn |
+| `0x312de`, `0x3134e` | `0x15953f8 + 0xa0 -> 0x31870` | `0x15954a8` -> `0x318f0` | rows withdrawn |
+| `0x312f0`, `0x31360` | `0x15953f8 + 0x18 -> 0x31310` | `0x1595420` -> `0x31520` | rows withdrawn |
+
+Only `0x113c5` keeps a row, because its real target `0x13d20` already has a model, fixture and
+checker. The other real targets (`0x47860`, `0x31900`, `0x318f0`, `0x31520`) have none, and "model,
+then row" keeps a target without a model out of the table. Withdrawal removes five targets from
+the table (`0x13d60`, `0x488d0`, `0x318b0`, `0x31870`, `0x31310`) and the whole `0x15953f8` base;
+their body models stay, as function records untied from any call site. The corrected row stays
+**table-level**: the call register's nearest definition is a member load, so the strict
+nearest-definition predicate does not hold, and a hand argument over callee write-sets is not a
+site-provable tie. The correction promotes no row. The audit facts live in `kCorrectedVptrReads` in the table header and are
+pinned, with one mutation probe per row, by `tools/lift/check_frontier_vptr_correction.py`.
+
+The other 42 table-level rows were surveyed for the same skew: they are fallback ties through
+member-object vptrs (a different, already documented limitation), not this error.
 
 ### What stays unknown, and why
 
@@ -347,12 +384,13 @@ nothing about this object. Going further needs points-to/escape analysis, not a 
    **0 of the 50** rows ([Store-to-load forwarding pass](#store-to-load-forwarding-pass)): 40 have
    no store to the load location in their own function, 9 reach a store that is not a unique
    reaching definition in a straight-line region, and 1 is an indexed load. The nine rows with a
-   real store all read `TABLE + 0x10 + slot`, so the recorded target is at the wrong slot for the
-   site, not merely unproven. Do not re-run this class expecting rows.
+   real store all read `TABLE + 0x10 + slot`, so the recorded target was at the wrong slot for the
+   site, not merely unproven; E1095 corrected one row and withdrew eight. Do not re-run this class
+   expecting rows.
 2. Do not re-sweep the constructor table or the entry-map keys; both are exhausted for new targets.
 3. Keep the "model, then row" order. A target without a fixture and checker stays out of the table.
 4. Do not add **new** rows from the window+fallback tie. Either prove the register, or record the
-   site as unresolved. The 50 rows that already carry a table-level tie stay in the table as target
+   site as unresolved. The 42 rows that already carry a table-level tie stay in the table as target
    records and are labelled as such; they are not precedent for adding more.
 
 ## Limits

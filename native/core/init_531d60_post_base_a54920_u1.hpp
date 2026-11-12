@@ -4,7 +4,8 @@
 // Branch-target entry @ `0x5329ae` (batch C merge je taken). Prep
 // `0x5329ae..0x532a07` (89 B: boss-flag lea, descriptor setup, r12b stamp) NOT
 // modelled as pinned units in `continue_e`; this u1 runs the prep semantics and
-// the first ctor call. NOT modelled: 0xa54920 body beyond hook; vcall after call.
+// the first ctor call. The runtime supplies a native `0xa54920` model through the
+// hook; this fragment does not inline the body. NOT modelled here: vcall after call.
 // G1 PARTIAL.
 #pragma once
 

@@ -47,7 +47,8 @@ inline constexpr std::uint64_t kIntSiteTag_569 = 0x1594c70;
 [[nodiscard]] BoolVarResult init_bool_var_literal(ConCmdBoolVar& var, const char* name, std::size_t name_length,
                                                   const char* description, std::size_t description_length,
                                                   std::uint64_t fn_tag, ConCmdRegistry& registry,
-                                                  std::uint8_t value, std::uint8_t default_value) noexcept;
+                                                  std::uint8_t value, std::uint8_t default_value,
+                                                  bool early_description_release = true) noexcept;
 
 // ---- bounded float variable whose caller functor tag is a lane-m6 tag -----------------------------------------
 // `spec.arg_fn_vtbl` must be one of kFloatSiteTag_379 / kFloatSiteTag_518; otherwise nothing is written and

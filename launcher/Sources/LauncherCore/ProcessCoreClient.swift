@@ -524,35 +524,12 @@ public final class ProcessCoreClient: CoreClient, @unchecked Sendable {
         }
     }
 
-    /// Parses a subsystem status name. The child emits `unknown:<code>` for a code it does not know,
-    /// because the in-process transport maps any code to `.unknown(N)`; a bare unknown string here
-    /// would make the two transports disagree about what the core actually reported.
     private static func subsystemStatus(named name: String) -> CoreSubsystem.Status? {
-        switch name {
-        case "not_implemented": .notImplemented
-        case "partial": .partial
-        case "implemented": .implemented
-        case "not_linked": .notLinked
-        default: unknownCode(in: name).map(CoreSubsystem.Status.unknown)
-        }
+        CoreSubsystem.Status(wireName: name)
     }
 
     private static func archiveStatus(named name: String) -> CoreArchiveCheck.Status? {
-        switch name {
-        case "ok": .ok
-        case "missing": .missing
-        case "unreadable": .unreadable
-        case "bad_magic": .badMagic
-        default: unknownCode(in: name).map(CoreArchiveCheck.Status.unknown)
-        }
-    }
-
-    /// `unknown:<code>` -> code. Anything else (including a bare "unknown") stays unrepresentable,
-    /// so a malformed answer is still rejected rather than being silently coerced.
-    private static func unknownCode(in name: String) -> UInt32? {
-        let prefix = "unknown:"
-        guard name.hasPrefix(prefix) else { return nil }
-        return UInt32(name.dropFirst(prefix.count))
+        CoreArchiveCheck.Status(wireName: name)
     }
 
     private static func check(data: Data, id: UInt64, schema: String?) throws {
@@ -705,4 +682,88 @@ private struct JSONResponse {
 private struct ResponseDecodingError: Error, CustomStringConvertible {
     let description: String
     init(_ description: String) { self.description = description }
+}
+
+// MARK: - Wire names for numeric statuses
+
+/// The child transport's lossless text form of the ABI's numeric subsystem / archive statuses.
+///
+/// Grammar (mirrors `soc::status_json::{subsystem,archive}_status_name` in
+/// `native/app/core_status_json.cpp`): the four known names, or `unknown:<N>` where `<N>` is the
+/// code in canonical plain decimal. The in-process transport maps *any* code through
+/// `Status(code:)`, so the child transport has to carry codes it does not know; a bare `unknown`
+/// would drop the number and is rejected.
+///
+/// Parsing is deliberately strict so that decoding is the exact inverse of encoding and the two
+/// transports can never disagree about a code: only ASCII digits, no sign / space / leading zeros /
+/// radix prefix, must fit `UInt32`, and the code must not be one that `Status(code:)` already names
+/// (`unknown:1` is a malformed way to say `partial`, not `.unknown(1)`).
+enum CoreWireStatus {
+    static let unknownPrefix = "unknown:"
+
+    /// Canonical wire text for a code outside the known set; `nil` for anything the grammar rejects.
+    static func unknownCode(in name: String) -> UInt32? {
+        guard name.hasPrefix(unknownPrefix) else { return nil }
+        let digits = name.utf8.dropFirst(unknownPrefix.utf8.count)
+        guard !digits.isEmpty, digits.allSatisfy({ $0 >= 0x30 && $0 <= 0x39 }) else { return nil }
+        guard digits.count == 1 || digits.first != 0x30 else { return nil }  // no leading zeros
+        return UInt32(String(decoding: digits, as: UTF8.self))  // nil on overflow
+    }
+
+    static func unknownName(for code: UInt32) -> String { unknownPrefix + String(code) }
+}
+
+extension CoreSubsystem.Status {
+    /// Encodes as the child process would. `.unknown(N)` for a code that has a known name encodes to
+    /// text the parser rejects; build values with `init(code:)` to stay canonical.
+    var wireName: String {
+        switch self {
+        case .notImplemented: "not_implemented"
+        case .partial: "partial"
+        case .implemented: "implemented"
+        case .notLinked: "not_linked"
+        case .unknown(let code): CoreWireStatus.unknownName(for: code)
+        }
+    }
+
+    /// Strict inverse of `wireName`; `nil` for any text the child protocol does not define.
+    init?(wireName: String) {
+        switch wireName {
+        case "not_implemented": self = .notImplemented
+        case "partial": self = .partial
+        case "implemented": self = .implemented
+        case "not_linked": self = .notLinked
+        default:
+            guard let code = CoreWireStatus.unknownCode(in: wireName),
+                  case .unknown = Self(code: code)
+            else { return nil }
+            self = .unknown(code)
+        }
+    }
+}
+
+extension CoreArchiveCheck.Status {
+    var wireName: String {
+        switch self {
+        case .ok: "ok"
+        case .missing: "missing"
+        case .unreadable: "unreadable"
+        case .badMagic: "bad_magic"
+        case .unknown(let code): CoreWireStatus.unknownName(for: code)
+        }
+    }
+
+    init?(wireName: String) {
+        switch wireName {
+        case "ok": self = .ok
+        case "missing": self = .missing
+        case "unreadable": self = .unreadable
+        case "bad_magic": self = .badMagic
+        default:
+            guard let code = CoreWireStatus.unknownCode(in: wireName),
+                  case .unknown = Self(code: code)
+            else { return nil }
+            self = .unknown(code)
+        }
+    }
 }

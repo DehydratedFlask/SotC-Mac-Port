@@ -66,4 +66,32 @@ struct FamilyItemResult {
                                                       std::size_t caption_len, std::uint32_t flags,
                                                       ConCmdRegistry& registry, DebugMenuRegistry& menu) noexcept;
 
+// 0x26b60(item, parent, 0, flags); 0xf590(parent); atexit(0x272d0, item). The separator builds its "MenuSeparator" text through the native
+// 0xf1a0, which allocates: `alloc` is the HOST allocator contract (0x12820 / 0x12af0 are not lifted); a missing contract refuses before the first store.
+[[nodiscard]] FamilyItemResult family_separator_item_26b60(DebugMenuItem& item, const char* parent,
+                                                          std::size_t parent_len, std::uint32_t flags,
+                                                          const SharedStrCtorHooks& alloc,
+                                                          ConCmdRegistry& registry, DebugMenuRegistry& menu) noexcept;
+
+// 0x26800(item, label, 0, flags); 0xf590(label); atexit(0x272d0, item) (batch 20, slots 501 / 497). The kind-0 label item reuses the native model
+// init_slot326_label_item_26800 (173 B body: the separator shape with the caller's flags; kind 3 is stored and then overwritten with 0). Like the separator it
+// builds "MenuSeparator" through the native 0xf1a0, which allocates: `alloc` is the HOST allocator contract; a missing contract refuses before the first store.
+[[nodiscard]] FamilyItemResult family_label_item_26800(DebugMenuItem& item, const char* parent,
+                                                      std::size_t parent_len, std::uint32_t flags,
+                                                      const SharedStrCtorHooks& alloc,
+                                                      ConCmdRegistry& registry, DebugMenuRegistry& menu) noexcept;
+
+// malloc / free stand-in for the separator's text (NOT the engine allocator; a host replaces it).
+[[nodiscard]] SharedStrCtorHooks default_family_separator_alloc() noexcept;
+
+// 0x26f90(item, parent, caption, target, command, flags); 0xf590(command); 0xf590(caption); 0xf590(parent);
+// atexit(0x272d0, item). `target` is the opaque pointer the original passes (a global at an ELF address that
+// another slot owns); the model stores it verbatim and never dereferences it, so a null target is refused.
+[[nodiscard]] FamilyItemResult family_command_item_26f90(DebugMenuItem& item, const char* parent,
+                                                        std::size_t parent_len, const char* caption,
+                                                        std::size_t caption_len, const char* command,
+                                                        std::size_t command_len, const void* target,
+                                                        std::uint32_t flags, ConCmdRegistry& registry,
+                                                        DebugMenuRegistry& menu) noexcept;
+
 }  // namespace sotc

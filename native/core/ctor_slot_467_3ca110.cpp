@@ -8,7 +8,8 @@ namespace sotc {
 debug_page::Result init_slot467_3ca110(Slot467Objects& objects, ConCmdRegistry& concmd,
                                        DebugMenuRegistry& menu, const debug_page::Hooks& hooks) noexcept {
     const debug_page::Objects view{std::span<ConCmdRangedVar>(&objects.var, 1),
-                                   std::span<DebugMenuItem>(&objects.item, 1)};
+                                   std::span<DebugMenuItem>(&objects.item, 1),
+                                   std::span<NameHashCell>()};
     return debug_page::init_debug_page(kSlot467Script, view, concmd, menu, hooks);
 }
 

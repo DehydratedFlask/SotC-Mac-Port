@@ -84,12 +84,99 @@ Decisions taken from this:
 M0–M6 below remain the outer frame. Day-to-day work prioritizes **shared platform contracts**
 (`CritSec` `0x3b310`/`0x3b380`, allocator dispatch behind `alloc_wrappers_17070`) that unblock many
 lifts, then **leverage-ranked** native bodies (see `CPU-01-INIT-531D60-HOOK-INVENTORY-01` in
-[HANDOFF](HANDOFF.md) / [TASKS](docs/TASKS.md)). Constructor coverage is **451/573** (measured by
-`tools/lift/g1_evidence_pack.py`, not remembered) with first gap index **314** / `0xa41810`. The
-recovered set is **not a prefix**: 137 rows above the first gap are registered, so 451/573 is
-registration coverage, not startup-order or semantic coverage — track it, but do not treat greedy
-per-callsite Init lifting as G1
-progress. Slot **23** (`0xe71990`) is registered via a **private fixture**; consumer/string necessity
+[HANDOFF](HANDOFF.md) / [TASKS](docs/TASKS.md)). Constructor coverage is **573/573 registered rows and
+573/573 fully lifted** (measured by `tools/lift/g1_evidence_pack.py`, not remembered); slot 554
+(`0x6efe0`), the last open row, closed with batch 13 on 2026-11-08 (E1417,
+`docs/STARTUP_SLOT_554_PLAN.md`). The recovered set was **not a prefix** (18 rows above the former first
+gap were registered early), so registration was never startup-order or semantic coverage — track it, but
+do not treat greedy per-callsite Init lifting as G1 progress. With no constructor row left, the next work
+is the Init chain (`0x531d60` closure / post-body slices) and the runtime gates, not another slot batch.
+First post-constructor slice landed 2026-11-09: `0xa54920` (1,840 B, the largest unmodelled body on
+the Init path) is now a native model composed from the `0x3a980` worker, `0x26ea0` item ctor and
+deferred `0x272d0` records, with `0xa55050` as an explicit contract (E1419). It adds no constructor
+row; 573/573 remains and G1 stays PARTIAL.
+The follow-up savedata-family pass (E1420) replaced that contract with a full 347 B `0xa55050`
+slot allocator, lifted the reachable 303 B `0xa57c10` sentinel cleanup (documenting its dead
+`a57c45..a57cea` traversal), and converted the 367 B `0xa586a0` grow placeholder into a precise
+fail-closed contract. It also adds no constructor row. The tree-helper follow-up (E1421) closed that boundary: `0xa57d40` (1,201 B) is a full lift by
+delegation to the byte-identical admitted `0x482a90` erase, and `0xa58490` (76 B) is a real
+recursive release, so `0xa57c10` no longer releases through a host seam. Its `a57c45..a57cea`
+traversal stays dead (no entry from any body), not an unlifted hook. The savedata-grow follow-up
+(E1422) then replaced the 367 B `0xa586a0` fail-closed contract with a full block-map model:
+0x50 B object, 0x100 B blocks, front/back in-place shifts and the allocate/copy/free path, with
+`0x17090`/`0x170c0` reused and the `0xf8f470`/`0xf8f480` imports proven as `memcpy`/`memmove`.
+No constructor row changed. The runtime-entry follow-up (E1423) then executed the lifted Init
+control-flow window from `init_531d60_entry_gaps` through the `0x532c1c` registry checkpoint:
+entry units 17, registry body 64 units, 275 entries, status 0, with the full suite 701/701.
+The seam-replacement follow-up (E1424) then executed all three bodies natively: `0xa473b0`
+(capture, 1 call), `0xa54920` (save-data/statistics, 3 calls, 9 counters + 9 menu items) and
+`0x54b250` (stat-query wrapper, 1 call), leaving `0xa56560` and the platform capture services as
+explicit host contracts. The first post-base callee closure (E1425) then executed the already-lifted
+193 B `0x499f80` body in that runtime: it receives `self+0x3c70`, commits one 0x50 B object with two
+0xa00 B buffers and a live CritSec (1 call, cleanup failures 0), with the allocator dispatch and
+CritSec supply still explicit host contracts. The post-base closure (E1426) then executed `0x56dcb0`, `0x5c64c0`, `0x1290` and `0x7f7220`
+natively, plus the five one-byte-ret sites (`0x56dca0`/`0x56db70`/`0x5b3d00`/`0x5b3cf0`/`0x56fad0`), and
+observed `0xf90310` as a named splash-hide host service. The runtime JSON reports all ten
+sites, `post_chain_complete=true`, 275 registry entries and status 0; full CTest **702/702**.
+The per-call follow-up (E1427) then made the post-base call surface explicit: the three bodies
+emit **17** records (7 native leaves executed, 10 named blockers with observed arguments and
+runtime diagnostics), while the anchored run still reaches the 275-entry checkpoint with
+`post_chain_complete=true` and `post_calls_complete=false`. Executed are five one-byte `ret`
+targets, the 174 B `0x5c91e0` copy and the 14 B `0x5d06f0` query; `0xa5cd90`, `0x946880`,
+`0xa5d990`, `0x560b60`, `0x5b9f90`, `0x96f20`/`0x97a50`, `0x5d5410` and `0x7f6f90` remain
+unlifted. The post-call checker gate was repaired separately (the first sweep exposed ten stale
+`NOT modelled` assertions and a stale entry map); the full **908/0/0** checker sweep and
+**2,929 → 1,861 RVA / 576 header** entry map now agree with the executed bodies. This is a
+startup-runtime proof, not a game boot and not callee closure; G1 stays
+**PARTIAL**. Next leverage is the next runtime gate or a named seam, not another constructor
+batch.
+The `0x946880` follow-up (E1428) then lifted the smallest blocked chain: `0x946880` (353 B)
+and `0x9469f0` (360 B) are native, with explicit hooks for `0x98a450`, `0x986f30`,
+`0x987720`, `0x9882e0`, `0x988400`, `0x9556a0`, `0x9878d0`, `0x987260` and `0x984700`.
+Both observed values use the invalid-handle `0x9469f0` branch and return 0; the runtime now
+reports **9 executed / 8 blocked** post-calls, still with 275 registry entries and status 0.
+The valid-handle `0x944de0` (399 B) branch and the remaining eight invocations stay named
+blocks; `post_calls_complete=false`. The focused fixture, extended 56dcb0 checker and entry
+map agree with the bodies. G1 stays **PARTIAL**.
+The `0x5d5410` follow-up (E1429) then executed that group natively: `0x5d5410` (420 B),
+`0x8be60` (547 B), `0x8f520` (269 B) and `0x8f1d0` (171 B) configure both 0x30 B objects and
+write the nine-qword state block. The real run now reports **10 executed / 7 blocked**
+post-calls with 275 registry entries/status 0; the measured path reaches neither the bounded
+host allocator (`0x12820`) nor the refusing platform tail (`0x87f3e0 -> 0xf906d0`). Seven
+invocations remain named blockers, led by `0x96f20`/`0x97a50` (2,835 B, 10 args, 607
+instructions, 55 direct calls). `post_calls_complete=false`; this is not callee closure or a
+game boot, and G1 stays **PARTIAL**.
+The `0x7f6f90` follow-up (E1430) then lifted the staffroll loader: 656 B, 19 direct call
+sites, a 37-token table, stdio plus the four-call fallback host contract, and retained
+text buffers so the absolute rest pointers stay valid. Both real `0x7f7220` invocations
+execute; mode 0 stores `CENTER_FULL_SCREEN` at index 19 (19 B) and mode 1 stores `TARGET`
+at index 36 (7 B), both through the fallback (`fopen=false`). The real run now reports
+**12 executed / 5 blocked** post-calls with 275 registry entries/status 0; `post_7f7220`
+reports two sets and zero blocked. The remaining five invocations are `0xa5cd90`,
+`0xa5d990`, `0x560b60`, `0x5b9f90` and `0x96f20`/`0x97a50`. `post_calls_complete=false`;
+this is not callee closure or a game boot, and G1 stays **PARTIAL**.
+The `0x560b60`/`0x96f20` follow-up (E1431) then moved two more post-call entries: the
+803 B `0x560b60` body executes its object/buffer/global stores and the 41 B `0x96f20`
+wrapper returns the host's observed 448-byte `0x97a50` object. The real run now reports
+**14 executed / 3 blocked** post-calls with 275 registry entries/status 0; `0x5c64c0.cell`
+is non-null. The three remaining blocked records are `0xa5cd90`, `0xa5d990` and
+`0x5b9f90`; `0x97a50` and the thirteen `0x560b60` helpers remain explicit host seams, so
+`post_calls_complete=false` and this is not callee closure or a game boot. G1 stays
+**PARTIAL**.
+The 2026-11-12 pass (E1432) first repaired a red handover tree: the native `0xa5cd90` body
+passed the selected config-string **original-image RVA** to its `0x994e70` hook as a
+`const char*`, so the host's `%s` read address `0x12c4f51` and the Init runtime aborted under
+ASan (CTest **701/702**). The hook now takes the RVA as an identity tag. The same pass then
+executed the 2,709 B `0xa5d990` body natively: region 1 reuses the existing
+`build_sndx_category_vars` loop (32 Mute + 32 Filter vars with the engine-span write-back),
+region 2 is the "Unnamed Categories" block proven dead behind a gate byte that is only written
+from a zero register, and region 3 builds the two separators and four `Mute All`/`Unmute All`/
+`Filter All`/`Unfilter All` command items through the existing `fmenu_ctors_slot306` models,
+registers them and destroys them through a caller-owned `0x272d0` hook. The run now reports
+**16 executed / 1 blocked** post-calls with 275 registry entries and status 0; only
+`0x5b9f90` (46,881 B) remains, so `post_calls_complete=false` still holds and G1 stays
+**PARTIAL**. Full CTest **703/703**; two new ELF checkers pin both bodies.
+Slot **23** (`0xe71990`) is registered via a **private fixture**; consumer/string necessity
 remains unresolved (G1 caveat). Operating plan lives in [HANDOFF](HANDOFF.md) only. Prefer
 session-sized code + checker acceptance over characterization-only docs churn.
 

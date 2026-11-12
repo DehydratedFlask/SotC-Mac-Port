@@ -320,7 +320,135 @@
 #include "ctor_slot_361_777390.hpp"
 #include "ctor_slot_379_6d8d20.hpp"
 #include "ctor_slot_467_3ca110.hpp"
+#include "ctor_slot_468_3c3a90.hpp"
+#include "ctor_slot_568_207e0.hpp"
+#include "ctor_slot_556_4ccb0.hpp"
+#include "ctor_slot_524_16a810.hpp"
+// CPU-01-STARTUP-SLOT-505: table copy + 226-step min/max bounds construction.
+#include "ctor_slot_505_236030.hpp"
+#include "ctor_slot_552_8c880.hpp"
+#include "ctor_slot_554_6efe0.hpp"
+#include "ctor_slot_554_2a_6f793.hpp"
+#include "ctor_slot_554_2b_6fc29.hpp"
+#include "ctor_slot_554_2b_cont_7036d.hpp"
+#include "ctor_slot_554_batch3_718bb.hpp"
+#include "ctor_slot_554_batch4_739e8.hpp"
+#include "ctor_slot_554_batch5_75d22.hpp"
+#include "ctor_slot_554_batch6_781c5.hpp"
+#include "ctor_slot_554_batch7_7a68c.hpp"
+#include "ctor_slot_554_batch8_7cb5b.hpp"
+#include "ctor_slot_554_batch9_7f098.hpp"
+#include "ctor_slot_554_batch10_8160c.hpp"
+#include "ctor_slot_554_batch11_83ad1.hpp"
+#include "ctor_slot_554_batch12_86052.hpp"
+#include "ctor_slot_554_batch13_8849d.hpp"
+#include "ctor_slot_567_235d0.hpp"
+#include "ctor_slot_530_149f00.hpp"
 #include "ctor_slot_536_1342d0.hpp"
+// CPU-01-STARTUP-BATCH-DEBUG-PAGE-01 (batch 2): slot 374 (data row with the leading {name, hash} record)
+// and the four tracked-but-unwired models 448 / 507 / 539 (lane M6 bool-variable shapes) and 545.
+#include "ctor_slot_374_701230.hpp"
+#include "ctor_slot_448_4b8680.hpp"
+#include "ctor_slot_507_22f3c0.hpp"
+#include "ctor_slot_539_121940.hpp"
+#include "ctor_slot_545_b2ec0.hpp"
+// CPU-01-STARTUP-BATCH-DEBUG-PAGE-01 (batch 3): slot 518 (one float variable + the static-float tail).
+#include "ctor_slot_518_1a57d0.hpp"
+// Batch 3, bool debug pages: 362 / 410 / 423 / 449 / 477.
+#include "ctor_slot_362_76b8d0.hpp"
+#include "ctor_slot_410_5ac580.hpp"
+#include "ctor_slot_423_55f080.hpp"
+#include "ctor_slot_449_4b0200.hpp"
+#include "ctor_slot_477_3270d0.hpp"
+// Batch 4, debug pages: 338 / 368 / 443 / 512 / 550.
+#include "ctor_slot_336_7ec4c0.hpp"
+#include "ctor_slot_506_2340b0.hpp"
+#include "ctor_slot_392_681690.hpp"
+#include "ctor_slot_396_650f20.hpp"
+#include "ctor_slot_337_7e81d0.hpp"
+#include "ctor_slot_446_4c92a0.hpp"
+#include "ctor_slot_444_4d3f10.hpp"
+#include "ctor_slot_445_4cfe80.hpp"
+#include "ctor_slot_521_17bf50.hpp"
+#include "ctor_slot_400_62b100.hpp"
+#include "ctor_slot_474_344850.hpp"
+#include "ctor_slot_351_7ae220.hpp"
+#include "ctor_slot_339_7e2fc0.hpp"
+#include "ctor_slot_395_65af60.hpp"
+#include "ctor_slot_380_6d71f0.hpp"
+#include "ctor_slot_375_6f1c20.hpp"
+#include "ctor_slot_360_7806f0.hpp"
+#include "ctor_slot_373_7081e0.hpp"
+#include "ctor_slot_354_79e180.hpp"
+#include "ctor_slot_382_6c8600.hpp"
+#include "ctor_slot_340_7de7e0.hpp"
+#include "ctor_slot_342_7d8e10.hpp"
+#include "ctor_slot_349_7bde50.hpp"
+#include "ctor_slot_352_7a2390.hpp"
+#include "ctor_slot_401_621530.hpp"
+#include "ctor_slot_398_63cf60.hpp"
+#include "ctor_slot_363_751c70.hpp"
+#include "ctor_slot_367_740980.hpp"
+#include "ctor_slot_358_786f50.hpp"
+#include "ctor_slot_391_68ebc0.hpp"
+#include "ctor_slot_381_6cd5b0.hpp"
+#include "ctor_slot_561_3ac00.hpp"
+#include "ctor_slot_566_25de0.hpp"
+#include "ctor_slot_424_551140.hpp"
+#include "ctor_slot_399_632ca0.hpp"
+#include "ctor_slot_418_572a10.hpp"
+#include "ctor_slot_370_720b50.hpp"
+#include "ctor_slot_469_394a20.hpp"
+#include "ctor_slot_473_355a00.hpp"
+#include "ctor_slot_513_1d0770.hpp"
+#include "ctor_slot_508_2241e0.hpp"
+#include "ctor_slot_390_691c50.hpp"
+#include "ctor_slot_402_610430.hpp"
+#include "ctor_slot_572_1a20.hpp"
+#include "ctor_slot_493_277560.hpp"
+#include "ctor_slot_498_252ae0.hpp"
+#include "ctor_slot_451_49d230.hpp"
+#include "ctor_slot_427_5388f0.hpp"
+#include "ctor_slot_532_143f50.hpp"
+#include "ctor_slot_537_1324c0.hpp"
+#include "ctor_slot_452_498640.hpp"
+#include "ctor_slot_454_483e40.hpp"
+#include "ctor_slot_495_268ee0.hpp"
+#include "ctor_slot_534_1418d0.hpp"
+#include "ctor_slot_422_56b980.hpp"
+#include "ctor_slot_511_1d90c0.hpp"
+#include "ctor_slot_503_247f00.hpp"
+#include "ctor_slot_571_c780.hpp"
+#include "ctor_slot_388_6a8c60.hpp"
+#include "ctor_slot_480_30daf0.hpp"
+#include "ctor_slot_338_7e6c90.hpp"
+#include "ctor_slot_368_73df50.hpp"
+#include "ctor_slot_443_4de370.hpp"
+#include "ctor_slot_512_1d5e80.hpp"
+#include "ctor_slot_550_91290.hpp"
+// Batch 5, debug page: 437 (three bool variables + 16 borrowed bone-point name views).
+#include "ctor_slot_437_5070c0.hpp"
+// Batch 6, debug page: 366 / 411 (two bool variables + two 0x26db0 named toggles each).
+#include "ctor_slot_366_744ac0.hpp"
+#include "ctor_slot_411_591710.hpp"
+// Batch 6, helper-callee slots: 430 (0xc580 family), 504 (0x6aa00 family + bool), 555 (0x3a980 family + two string vars).
+#include "ctor_slot_430_529df0.hpp"
+#include "ctor_slot_504_23f4d0.hpp"
+#include "ctor_slot_555_527f0.hpp"
+// Batch 6b: float chains and mixed bool/float rows through helper_init_unbounded_float_var_site.
+#include "ctor_slot_397_64d760.hpp"
+#include "ctor_slot_442_4e3760.hpp"
+#include "ctor_slot_450_4af4b0.hpp"
+#include "ctor_slot_453_48ac10.hpp"
+#include "ctor_slot_460_41c340.hpp"
+#include "ctor_slot_464_3db070.hpp"
+#include "ctor_slot_455_47bfa0.hpp"
+#include "ctor_slot_369_734190.hpp"
+#include "ctor_slot_420_56f6e0.hpp"
+#include "ctor_slot_428_52ec10.hpp"
+#include "ctor_slot_429_52e2b0.hpp"
+#include "ctor_slot_488_2ba5d0.hpp"
+#include "ctor_slot_514_1c4c50.hpp"
 #include "ctor_slot_317_a2c390.hpp"
 #include "ctor_slot_318_a20e80.hpp"
 #include "ctor_slot_343_7d7970.hpp"
@@ -347,6 +475,7 @@
 #include "ctor_slot_393_66cc00.hpp"
 #include "ctor_slot_403_5f0160.hpp"
 #include "ctor_slot_407_5d41c0.hpp"
+#include "ctor_slot_408_5c7f50.hpp"
 #include "ctor_slot_413_57c810.hpp"
 #include "ctor_slot_415_578b60.hpp"
 #include "ctor_slot_419_56fae0.hpp"
@@ -361,6 +490,7 @@
 #include "ctor_slot_458_45ace0.hpp"
 #include "ctor_slot_459_43f460.hpp"
 #include "ctor_slot_461_419480.hpp"
+#include "ctor_slot_462_3e2730.hpp"
 #include "ctor_slot_463_3e0040.hpp"
 #include "ctor_slot_465_3cc9e0.hpp"
 #include "ctor_slot_475_33cc60.hpp"
@@ -374,9 +504,13 @@
 #include "lane_m5_app_entry.hpp"
 #include "ctor_slot_491_295f90.hpp"
 #include "ctor_slot_492_278640.hpp"
+#include "ctor_slot_497_262a80.hpp"
 #include "ctor_slot_499_2500e0.hpp"
+#include "ctor_slot_501_24db80.hpp"
+#include "ctor_slot_494_26f7c0.hpp"
 #include "ctor_slot_502_249270.hpp"
 #include "ctor_slot_509_2196f0.hpp"
+#include "ctor_slot_510_211340.hpp"
 #include "ctor_slot_516_1b97b0.hpp"
 #include "ctor_slot_535_138e20.hpp"
 #include "ctor_slot_540_10e390.hpp"
@@ -386,6 +520,7 @@
 #include "ctor_slot_558_428a0.hpp"
 #include "ctor_slot_559_3f2d0.hpp"
 #include "ctor_slot_569_1cc80.hpp"
+#include "ctor_slot_570_16d80.hpp"
 
 namespace sotc {
 
@@ -677,6 +812,8 @@ struct StartupState {
     TinyAtexitState tiny_atexit{};  // L1 family A: 19 slots x 2 objects
     Slot404Buffer slot404{};
     Slot406State slot406{};
+    Slot409State slot409{};   // idx 409: sentinel node from the host malloc stand-in (default_slot409_hooks), never freed here
+    Slot414State slot414{};   // idx 414: native CritSec handle (core/critsec_3b310); the 0x3b380 destroy is recorded, never run
     Slot517State slot517{};
     Slot519State slot519{};
     Slot541State slot541{};
@@ -725,8 +862,74 @@ struct StartupState {
     debug_page::Result slot379_result{};
     Slot467Objects slot467{};
     debug_page::Result slot467_result{};
+    Slot468Objects slot468{};
+    Slot468Result slot468_result{};
+    // CPU-01-AOT-CFG-SCALE-01-BATCH29: LoadCmdsFromFile command page.
+    Slot568Objects slot568{};
+    Slot568Result slot568_result{};
+    // CPU-01-STARTUP-SLOT-524: the `screenshot` command plus its 0x16a380 token-appender helper.
+    Slot524Objects slot524{};
+    Slot524Result slot524_result{};
+    // CPU-01-STARTUP-SLOT-505: host source stand-in for the 0xfc0580 table. Production fills this
+    // from the documented asset-only import; the native startup sweep uses zeroes.
+    std::array<std::uint8_t, kSlot505SourceCopySize> slot505_source{};
+    Slot505Objects slot505{};
+    Slot505Result slot505_result{};
+    // CPU-01-STARTUP-SLOT-552: seven flag dwords, seventeen zeroed records and eight page objects
+    // (six class-A pages, one class-B, one class-C), each registered with __cxa_atexit.
+    Slot552Objects slot552{};
+    Slot552Result slot552_result{};
+    // CPU-01-STARTUP-SLOT-567: the ConCmdManager cell and four console commands (executeCmd,
+    // getValue, help, core_unittests) with five __cxa_atexit records.
+    Slot567Objects slot567{};
+    Slot567Result slot567_result{};
+    // CPU-01-STARTUP-SLOT-510: property cell, FollowGameCamera bool var, Debug Game toggle, pose
+    // constants and the SyncCameraAcrossTools command with its seven-token vector.
+    Slot510Objects slot510{};
+    Slot510TokenStore slot510_tokens{};
+    Slot510Result slot510_result{};
     Slot536Objects slot536{};
     debug_page::Result slot536_result{};
+    // CPU-01-STARTUP-BATCH-DEBUG-PAGE-01 (batch 2).
+    Slot374Objects slot374{};
+    debug_page::Result slot374_result{};
+    // CPU-01-STARTUP-BATCH-DEBUG-PAGE-01 (batch 3).
+    Slot518Objects slot518{};
+    Slot518Result slot518_result{};
+    Slot362Objects slot362{};
+    Slot362Result slot362_result{};
+    Slot410Objects slot410{};
+    Slot410Result slot410_result{};
+    Slot423Objects slot423{};
+    Slot423Result slot423_result{};
+    Slot449Objects slot449{};
+    Slot449Result slot449_result{};
+    Slot477Objects slot477{};
+    Slot477Result slot477_result{};
+    Slot448Objects slot448{};
+    Slot448Result slot448_result{};
+    Slot507Objects slot507{};
+    Slot507Result slot507_result{};
+    Slot539Objects slot539{};
+    Slot539Result slot539_result{};
+    Slot545State slot545{};          // host image of the sparse statics at 0x2ed37f8 (self-linked: StartupState is never copied)
+    Slot545Result slot545_result{};
+    // CPU-01-STARTUP-BATCH-DEBUG-PAGE-01 (batch 4).
+    Slot336Objects slot336{};
+    Slot336Result slot336_result{};
+    Slot338Objects slot338{};
+    Slot338Result slot338_result{};
+    Slot368Objects slot368{};
+    Slot368Result slot368_result{};
+    Slot443Objects slot443{};
+    Slot443Result slot443_result{};
+    Slot512Objects slot512{};
+    Slot512Result slot512_result{};
+    Slot550Objects slot550{};
+    Slot550Result slot550_result{};
+    // CPU-01-STARTUP-BATCH-DEBUG-PAGE-01 (batch 5).
+    Slot437Objects slot437{};
+    Slot437Result slot437_result{};
     Slot317Objects slot317{};
     Slot318Objects slot318{};
     Slot343Objects slot343{}; Slot343Result slot343_result{};
@@ -774,6 +977,7 @@ struct StartupState {
     Slot393Objects slot393{}; Slot393Result slot393_result{};
     Slot403Objects slot403{}; Slot403Result slot403_result{};
     Slot407Objects slot407{}; Slot407Result slot407_result{};
+    Slot408Objects slot408{}; Slot408Result slot408_result{};
     Slot413Objects slot413{}; Slot413Result slot413_result{};
     Slot415Objects slot415{}; Slot415Result slot415_result{};
     Slot419Objects slot419{}; Slot419Result slot419_result{};
@@ -788,6 +992,7 @@ struct StartupState {
     Slot458Objects slot458{}; Slot458Result slot458_result{};
     Slot459Objects slot459{}; Slot459Result slot459_result{};
     Slot461Objects slot461{}; Slot461Result slot461_result{};
+    Slot462Objects slot462{}; Slot462Result slot462_result{};
     Slot463Objects slot463{}; Slot463Result slot463_result{};
     Slot465Objects slot465{}; Slot465Result slot465_result{};
     Slot475Objects slot475{}; Slot475Result slot475_result{};
@@ -802,6 +1007,8 @@ struct StartupState {
     Slot491Objects slot491{}; bool slot491_ok{false};
     Slot492Objects slot492{}; Slot492Result slot492_result{};
     Slot499Objects slot499{}; Slot499Result slot499_result{};
+    Slot501Objects slot501{}; Slot501Result slot501_result{};
+    Slot494Objects slot494{}; Slot494Result slot494_result{};
     Slot502Objects slot502{}; Slot502Result slot502_result{};
     Slot509Objects slot509{}; Slot509Result slot509_result{};
     Slot516Objects slot516{}; Slot516Result slot516_result{};
@@ -813,6 +1020,107 @@ struct StartupState {
     Slot558Objects slot558{}; Slot558Result slot558_result{};
     Slot559Objects slot559{}; Slot559Result slot559_result{};
     Slot569Objects slot569{}; Slot569Result slot569_result{};
+    Slot570Objects slot570{}; Slot570Result slot570_result{};
+    // CPU-01-STARTUP-BATCH-DEBUG-PAGE-01 (batch 6).
+    Slot366Objects slot366{}; Slot366Result slot366_result{};
+    Slot411Objects slot411{}; Slot411Result slot411_result{};
+    Slot430Objects slot430{}; Slot430Result slot430_result{};
+    Slot504Objects slot504{}; Slot504Result slot504_result{};
+    Slot506Objects slot506{}; Slot506Result slot506_result{};
+    Slot392Objects slot392{}; Slot392Result slot392_result{};
+    Slot396Objects slot396{}; Slot396Result slot396_result{};
+    Slot337Objects slot337{}; Slot337Result slot337_result{};
+    Slot446Objects slot446{}; Slot446Result slot446_result{};
+    Slot444Objects slot444{}; Slot444Result slot444_result{};
+    Slot445Objects slot445{}; Slot445Result slot445_result{};
+    Slot521Objects slot521{}; Slot521Result slot521_result{};
+    Slot400Objects slot400{}; Slot400Result slot400_result{};
+    Slot474Objects slot474{}; Slot474Result slot474_result{};
+    Slot351Objects slot351{}; Slot351Result slot351_result{};
+    Slot339Objects slot339{}; Slot339Result slot339_result{};
+    Slot395Objects slot395{}; Slot395Result slot395_result{};
+    Slot380Objects slot380{}; Slot380Result slot380_result{};
+    Slot375Objects slot375{}; Slot375Result slot375_result{};
+    Slot360Objects slot360{}; Slot360Result slot360_result{};
+    Slot373Objects slot373{}; Slot373Result slot373_result{};
+    Slot354Objects slot354{}; Slot354Result slot354_result{};
+    Slot382Objects slot382{}; Slot382Result slot382_result{};
+    Slot340Objects slot340{}; Slot340Result slot340_result{};
+    Slot342Objects slot342{}; Slot342Result slot342_result{};
+    Slot349Objects slot349{}; Slot349Result slot349_result{};
+    Slot352Objects slot352{}; Slot352Result slot352_result{};
+    Slot401Objects slot401{}; Slot401Result slot401_result{};
+    Slot398Objects slot398{}; Slot398Result slot398_result{};
+    Slot363Objects slot363{}; Slot363Result slot363_result{};
+    Slot367Objects slot367{}; Slot367Result slot367_result{};
+    Slot358Objects slot358{}; Slot358Result slot358_result{};
+    Slot391Objects slot391{}; Slot391Result slot391_result{};
+    Slot381Objects slot381{}; Slot381Result slot381_result{};
+    Slot561Objects slot561{}; Slot561Result slot561_result{};
+    Slot566Objects slot566{}; Slot566Result slot566_result{};
+    Slot424Objects slot424{}; Slot424Result slot424_result{};
+    Slot399Objects slot399{}; Slot399Result slot399_result{};
+    Slot418Objects slot418{}; Slot418Result slot418_result{};
+    Slot370Objects slot370{}; Slot370Result slot370_result{};
+    Slot469Objects slot469{}; Slot469Result slot469_result{};
+    Slot473Objects slot473{}; Slot473Result slot473_result{};
+    Slot513Objects slot513{}; Slot513Result slot513_result{};
+    Slot508Objects slot508{}; Slot508Result slot508_result{};
+    std::uint64_t global_2dfcbd0_standin = 0;   // identity stand-in for the opaque global at 0x2dfcbd0 (the target of every 0x26f90 command item); stored by pointer only, never read
+    Slot390Objects slot390{}; Slot390Result slot390_result{};
+    Slot402Objects slot402{}; Slot402Result slot402_result{};
+    Slot572Objects slot572{}; Slot572Result slot572_result{};
+    Slot493Objects slot493{}; Slot493Result slot493_result{};
+    Slot497Objects slot497{}; Slot497Result slot497_result{};
+    Slot554Objects slot554{}; Slot554Result slot554_result{};
+    Slot554Batch2AObjects slot554_batch2a{}; Slot554Batch2AResult slot554_batch2a_result{};
+    Slot554Batch2BObjects slot554_batch2b{}; Slot554Batch2BResult slot554_batch2b_result{};
+    Slot554B2BContObjects slot554_batch2b_cont{}; Slot554B2BContResult slot554_batch2b_cont_result{};
+    Slot554Batch3Objects slot554_batch3{}; Slot554Batch3Result slot554_batch3_result{};
+    Slot554Batch4Objects slot554_batch4{}; Slot554Batch4Result slot554_batch4_result{};
+    Slot554Batch5Objects slot554_batch5{}; Slot554Batch5Result slot554_batch5_result{};
+    Slot554Batch6Objects slot554_batch6{}; Slot554Batch6Result slot554_batch6_result{};
+    Slot554Batch7Objects slot554_batch7{}; Slot554Batch7Result slot554_batch7_result{};
+    Slot554Batch8Objects slot554_batch8{}; Slot554Batch8Result slot554_batch8_result{};
+    Slot554Batch9Objects slot554_batch9{}; Slot554Batch9Result slot554_batch9_result{};
+    Slot554Batch10Objects slot554_batch10{}; Slot554Batch10Result slot554_batch10_result{};
+    Slot554Batch11Objects slot554_batch11{}; Slot554Batch11Result slot554_batch11_result{};
+    Slot554Batch12Objects slot554_batch12{}; Slot554Batch12Result slot554_batch12_result{};
+    Slot554Batch13Objects slot554_batch13{}; Slot554Batch13Result slot554_batch13_result{};
+    Slot498Objects slot498{}; Slot498Result slot498_result{};
+    Slot451Objects slot451{}; Slot451Result slot451_result{};
+    Slot427Objects slot427{}; Slot427Result slot427_result{};
+    Slot532Objects slot532{}; Slot532Result slot532_result{};
+    Slot537Objects slot537{}; Slot537Result slot537_result{};
+    Slot452Objects slot452{}; Slot452Result slot452_result{};
+    Slot454Objects slot454{}; Slot454Result slot454_result{};
+    Slot495Objects slot495{}; Slot495Result slot495_result{};
+    Slot534Objects slot534{}; Slot534Result slot534_result{};
+    Slot422Objects slot422{}; Slot422Result slot422_result{};
+    Slot511Objects slot511{}; Slot511Result slot511_result{};
+    Slot503Objects slot503{}; Slot503Result slot503_result{};
+    Slot571Objects slot571{}; Slot571Result slot571_result{};
+    // The process named-record registry (the original: the function-local static at 0x32fd398 + guard 0x33053f0, shared by every 0xa81700 caller). The vectors come from the host malloc stand-in
+    // (default_slot513_record_alloc, NOT the engine allocator) and, like the original's static, are never freed here.
+    RecordRegistryCell record_registry{};
+    Slot388Objects slot388{}; Slot388Result slot388_result{};
+    Slot480Objects slot480{}; Slot480Result slot480_result{};
+    Slot555Objects slot555{}; Slot555Result slot555_result{};
+    Slot556Objects slot556{}; Slot556Result slot556_result{};
+    Slot530Objects slot530{}; Slot530Result slot530_result{};
+    Slot397Objects slot397{}; Slot397Result slot397_result{};
+    Slot442Objects slot442{}; Slot442Result slot442_result{};
+    Slot450Objects slot450{}; Slot450Result slot450_result{};
+    Slot453Objects slot453{}; Slot453Result slot453_result{};
+    Slot460Objects slot460{}; Slot460Result slot460_result{};
+    Slot464Objects slot464{}; Slot464Result slot464_result{};
+    Slot514Objects slot514{}; Slot514Result slot514_result{};
+    Slot455Objects slot455{}; Slot455Result slot455_result{};
+    Slot488Objects slot488{}; Slot488Result slot488_result{};
+    Slot369Objects slot369{}; Slot369Result slot369_result{};
+    Slot420Objects slot420{}; Slot420Result slot420_result{};
+    Slot428Objects slot428{}; Slot428Result slot428_result{};
+    Slot429Objects slot429{}; Slot429Result slot429_result{};
 
     std::array<std::byte, kScratchBytes> scratch{};
     std::atomic<std::uint64_t> scratch_slot{0};

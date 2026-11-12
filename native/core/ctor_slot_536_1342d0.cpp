@@ -7,7 +7,7 @@ namespace sotc {
 
 debug_page::Result init_slot536_1342d0(Slot536Objects& objects, ConCmdRegistry& concmd,
                                        DebugMenuRegistry& menu, const debug_page::Hooks& hooks) noexcept {
-    const debug_page::Objects view{std::span<ConCmdRangedVar>(&objects.var1, 2), std::span<DebugMenuItem>()};
+    const debug_page::Objects view{std::span<ConCmdRangedVar>(&objects.var1, 2), std::span<DebugMenuItem>(), std::span<NameHashCell>()};
     return debug_page::init_debug_page(kSlot536Script, view, concmd, menu, hooks);
 }
 

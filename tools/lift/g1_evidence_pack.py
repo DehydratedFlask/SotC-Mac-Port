@@ -8,7 +8,7 @@ a new frontier row makes the block stale instead of silently wrong.
 Sources (all read-only):
   native/core/startup_ctors.cpp          registered constructor rows (RVA, original index)
   native/core/ctor_original_table.cpp    the 573-row original table, index order
-  native/core/vtable_resolved_entries.hpp  91 frontier rows with their evidence grade comment
+  native/core/vtable_resolved_entries.hpp  83 frontier rows with their evidence grade comment
   native/core/vtable_*.hpp               per-target body models (graded headers)
   local/re/eboot.elf                     PRIVATE: the pinned 573-qword table at 0x2dd70e0
   local/validation/indirect-frontier/tied-sites-image-wide-strict.json
@@ -50,9 +50,12 @@ ELF_SHA256 = "d0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3"
 CTOR_TABLE_BASE = 0x2DD70E0
 CTOR_TABLE_COUNT = 573
 CTOR_TABLE_SHA256 = "5917cb85db190e9ef93ce5e06d5b6596d40b6c3623166e37ed7c6c3c3cd3ab28"
+PARTIAL_SLOTS: set[int] = set()  # registered rows whose bodies are not fully lifted (none remain)
 
 BEGIN = "<!-- g1-evidence-pack:begin -->"
 END = "<!-- g1-evidence-pack:end -->"
+PROSE_BEGIN = "<!-- g1-evidence-pack:startup-prose:begin -->"
+PROSE_END = "<!-- g1-evidence-pack:startup-prose:end -->"
 
 SLOT_ROW_RE = re.compile(r"^\s*\{\s*(0x[0-9a-fA-F]+)\s*,\s*(\d+)\s*,\s*(nullptr|\[\])", re.M)
 ORIGINAL_ROW_RE = re.compile(r"\{\s*(\d+)\s*,\s*(0x[0-9a-fA-F]+)\s*\}")
@@ -62,8 +65,8 @@ FRONTIER_ROW_RE = re.compile(
 )
 TEST_ASSERT_RE = {
     "rows": re.compile(r"CHECK\(slots\.size\(\) == (\d+)\);"),
-    "index": re.compile(r"CHECK\(first_unrecovered_constructor_index\(\) == (\d+)\);"),
-    "rva": re.compile(r"CHECK\(first_unrecovered_constructor_rva\(\) == (0x[0-9a-fA-F]+)\);"),
+    "index": re.compile(r"CHECK\(first_unrecovered_constructor_index\(\) == (-?\d+)\);"),
+    "rva": re.compile(r"CHECK\(first_unrecovered_constructor_rva\(\) == (0x[0-9a-fA-F]+|0)\);"),
     "remaining": re.compile(r"CHECK\(slots\.size\(\) \+ (\d+) == kOriginalCtorCount\);"),
 }
 
@@ -102,29 +105,42 @@ def measure_startup() -> dict:
     # at the time of writing). "Coverage" therefore means "registered rows", and the cliff index is
     # the FIRST unrecovered index, not the end of a contiguous run.
     missing = [index for index in range(CTOR_TABLE_COUNT) if index not in set(indices)]
-    first = missing[0]
-    above = [index for index in indices if index > first]
+    partial = sorted(index for index in PARTIAL_SLOTS if index in set(indices))
+    first = missing[0] if missing else -1
+    above = [index for index in indices if index > first] if first >= 0 else []
     require(len(rows) + len(missing) == CTOR_TABLE_COUNT, "coverage and gaps do not sum to 573")
 
     # The C++ test already asserts these; a disagreement means one of the two is wrong.
     test = read(ROOT / "native/tests/test_startup_ctor_coverage.cpp")
     asserts = {name: regex.search(test) for name, regex in TEST_ASSERT_RE.items()}
-    for name, match in asserts.items():
+    for name in ("rows", "index", "rva"):
+        match = asserts[name]
         require(match is not None, f"test_startup_ctor_coverage.cpp lost its {name} assertion")
     require(int(asserts["rows"].group(1)) == len(rows), "test row count disagrees with kSlots[]")
     require(int(asserts["index"].group(1)) == first, "test cliff index disagrees with the source")
-    require(int(asserts["rva"].group(1), 16) == original[first], "test cliff RVA disagrees with the table")
-    require(int(asserts["remaining"].group(1)) == len(missing), "test remaining count disagrees")
+    if first >= 0:
+        require(int(asserts["rva"].group(1), 16) == original[first], "test cliff RVA disagrees with the table")
+        require(asserts["remaining"] is not None, "test lost its remaining-count assertion")
+        require(int(asserts["remaining"].group(1)) == len(missing), "test remaining count disagrees")
+    else:
+        require(int(asserts["rva"].group(1), 16) == 0, "test cliff RVA is not 0")
+        require(re.search(r"CHECK\(slots\.size\(\) == kOriginalCtorCount\);\s*// all", test) is not None,
+                "test does not assert complete registration")
 
     return {
         "table_base": f"0x{CTOR_TABLE_BASE:x}",
         "table_indexing": "backwards: entry i is the qword at 0x2dd70e0 - 8*i",
         "table_qwords": CTOR_TABLE_COUNT,
         "registered_rows": len(rows),
+        "partial_rows": partial,
+        "fully_lifted_rows": len(rows) - len(partial),
         "remaining_rows": len(missing),
         "first_unrecovered_index": first,
-        "first_unrecovered_rva": f"0x{original[first]:x}",
+        "first_unrecovered_rva": f"0x{original[first]:x}" if first >= 0 else "0x0",
         "rows_registered_above_first_gap": len(above),
+        "next_unrecovered": [[index, f"0x{original[index]:x}"] for index in missing[1:4]],
+        "vec_leaf_modules": len([p for p in list(CORE_DIR.glob("vec_*.hpp")) + list(CORE_DIR.glob("leaf_*.hpp"))
+                                 if re.fullmatch(r"[0-9a-f]+", p.stem.split("_", 1)[1])]),
         "test_agrees": True,
     }
 
@@ -240,6 +256,93 @@ def render(payload: dict) -> str:
     return "```json\n" + json.dumps(body, indent=2, sort_keys=True) + "\n```"
 
 
+def render_prose(payload: dict) -> str:
+    """The section 1.2 bullets that quote the registered / unrecovered counts, derived from the same measurement as the JSON block (batch 18: so the prose cannot go stale)."""
+    st = payload["startup"]
+    reg, total, rem = st["registered_rows"], st["table_qwords"], st["remaining_rows"]
+    idx, rva = st["first_unrecovered_index"], st["first_unrecovered_rva"]
+    if rem:
+        return (f"- **{reg} of {total} rows are registered**, every `(RVA, index)` pair matches the pinned table, and\n"
+                f"  **{rem} rows remain unrecovered**, the **first at index {idx} / `{rva}`**.\n"
+                f"- The C++ test `native/tests/test_startup_ctor_coverage.cpp` asserts those exact numbers\n"
+                f"  (`slots.size() == {reg}`, `first_unrecovered_constructor_index() == {idx}`,\n"
+                f"  `first_unrecovered_constructor_rva() == {rva}`, `slots.size() + {rem} == {total}`), so the source\n"
+                f"  cannot drift from the pack silently in one direction.\n"
+                f"  (These bullets are generated by `tools/lift/g1_evidence_pack.py --write` between the `startup-prose` markers; do not edit them by hand.)")
+    return (f"- **{reg} of {total} rows are registered**, every `(RVA, index)` pair matches the pinned table;\n"
+            f"  **no row remains unregistered and no row is PARTIAL** — all **{st['fully_lifted_rows']} rows are fully lifted**\n"
+            f"  (the last open row, slot **554**, closed with batch 13; see `docs/STARTUP_SLOT_554_PLAN.md`).\n"
+            f"- The C++ test `native/tests/test_startup_ctor_coverage.cpp` asserts those exact numbers\n"
+            f"  (`slots.size() == {reg}`, `first_unrecovered_constructor_index() == -1`), so the source\n"
+            f"  cannot drift from the pack silently in one direction.\n"
+            f"  (These bullets are generated by `tools/lift/g1_evidence_pack.py --write` between the `startup-prose` markers; do not edit them by hand.)")
+
+
+SNIP_BEGIN = "<!-- g1-evidence-pack:ctor-check:begin -->"
+SNIP_END = "<!-- g1-evidence-pack:ctor-check:end -->"
+SEC4_BEGIN = "<!-- g1-evidence-pack:startup-coverage:begin -->"
+SEC4_END = "<!-- g1-evidence-pack:startup-coverage:end -->"
+
+
+def render_ctor_check(payload: dict) -> str:
+    st = payload["startup"]
+    tail = (f"… {st['remaining_rows']} unregistered `other` slots remain, first {st['first_unrecovered_index']} / {st['first_unrecovered_rva']}"
+            if st["remaining_rows"] else f"all {st['registered_rows']} rows registered and fully lifted")
+    return ("```\n$ python3 -I tools/lift/check_ctor_slots.py\n"
+            "OK: … constructor table start=0x2dd70e0 count=573 sha256=5917cb85…ab28;\n"
+            f"verified {st['registered_rows']} registered RVA/index pairs ({st['vec_leaf_modules']} vec_*/leaf_* modules);\n"
+            f"{tail}\n```")
+
+
+def render_coverage(payload: dict) -> str:
+    st = payload["startup"]
+    reg, total, rem, above = st["registered_rows"], st["table_qwords"], st["remaining_rows"], st["rows_registered_above_first_gap"]
+    idx, rva = st["first_unrecovered_index"], st["first_unrecovered_rva"]
+    nxt = ", ".join(f"{i} (`{r}`)" for i, r in st["next_unrecovered"]) or "none"
+    pct = round(100 * reg / total)
+    if rem:
+        cliff = f"**{idx} / `{rva}`**"
+        above_row = f"| Rows registered *above* that first gap | **{above}** | idem |\n"
+        note = (f"**The recovered set is not a prefix.** {above} rows above the first gap are registered, so {reg}/{total} is\n"
+                f"not \"everything up to {idx} plus a missing tail\", and the cliff is the *first* missing index rather\n"
+                f"than the end of the recovered run. Reading the number as a startup-order percentage would be wrong\n"
+                f"in both directions.\n\n")
+    else:
+        cliff = "none (all rows registered)"
+        above_row = ""
+        note = (f"All {total} registered rows pair with the pinned table and every registered body is lifted\n"
+                f"({st['fully_lifted_rows']}/{total}), the last open row (**554**) having closed with batch 13 (E1417).\n"
+                f"Registration is still not semantic coverage of the whole startup chain.\n\n")
+    return (f"| Metric | Value | Source |\n|---|---:|---|\n"
+            f"| Rows in the original table | {total} | `native/core/ctor_original_table.cpp` |\n"
+            f"| Registered rows in `recovered_constructors()` | **{reg}** | `native/core/startup_ctors.cpp` |\n"
+            f"| Unregistered rows | **{rem}** | idem |\n"
+            f"| First unrecovered index / RVA (\"the cliff\") | {cliff} | idem + pinned table |\n"
+            f"{above_row}"
+            f"| Next unrecovered indices | {nxt} | idem |\n\n"
+            f"{note}"
+            f"**{reg}/{total} is *registration* coverage, not semantic coverage.** A registered row means the native row\n"
+            f"executes in `run_constructors()` and its `(RVA, index)` pair is byte-paired with the original table.\n"
+            f"Several registered rows call hooks inside their bodies (see §1.3), and a registered row whose\n"
+            f"original is never called by the game is still registered. Do not read {pct}% as \"{pct} percent of startup\n"
+            f"is native\".")
+
+
+GENERATED_REGIONS = (
+    (PROSE_BEGIN, PROSE_END, render_prose),
+    (SNIP_BEGIN, SNIP_END, render_ctor_check),
+    (SEC4_BEGIN, SEC4_END, render_coverage),
+)
+
+
+def prose_from_doc(text: str) -> str | None:
+    start = text.find(PROSE_BEGIN)
+    end = text.find(PROSE_END)
+    if start < 0 or end < 0 or end < start:
+        return None
+    return text[start + len(PROSE_BEGIN):end].strip()
+
+
 def block_from_doc(text: str) -> str | None:
     start = text.find(BEGIN)
     end = text.find(END)
@@ -267,7 +370,13 @@ def main(argv=None) -> int:
         require(BEGIN in text and END in text, f"{DOC.name} lost its pack markers")
         head, rest = text.split(BEGIN, 1)
         _old, tail = rest.split(END, 1)
-        DOC.write_text(f"{head}{BEGIN}\n\n{render(payload)}\n\n{END}{tail}")
+        text = f"{head}{BEGIN}\n\n{render(payload)}\n\n{END}{tail}"
+        for rbegin, rend, renderer in GENERATED_REGIONS:
+            require(rbegin in text and rend in text, f"{DOC.name} lost its {rbegin} markers")
+            ph, prest = text.split(rbegin, 1)
+            _po, ptail = prest.split(rend, 1)
+            text = f"{ph}{rbegin}\n{renderer(payload)}\n{rend}{ptail}"
+        DOC.write_text(text)
         print(f"wrote {DOC.relative_to(ROOT)}")
 
     if args.check:
@@ -295,6 +404,13 @@ def main(argv=None) -> int:
         else:
             print("note: private inputs absent; the block's private section was not re-verified")
 
+        for rbegin, rend, renderer in GENERATED_REGIONS:
+            if rbegin not in text or rend not in text or text.find(rend) < text.find(rbegin):
+                raise SystemExit(f"FAIL {DOC.name} has no {rbegin} ... {rend} block")
+            region = text[text.find(rbegin) + len(rbegin):text.find(rend)].strip()
+            if region != renderer(payload).strip():
+                stale.append((rbegin, region, renderer(payload).strip()))
+
         if stale:
             for key, doc_value, tree_value in stale:
                 print(f"stale: {key}\n  doc:    {json.dumps(doc_value, sort_keys=True)}\n"
@@ -302,7 +418,9 @@ def main(argv=None) -> int:
             raise SystemExit("FAIL docs/G1_EVIDENCE.md is stale; run "
                              "python3 tools/lift/g1_evidence_pack.py --write, then update the prose")
         print(f"OK tools/lift/g1_evidence_pack.py: docs/G1_EVIDENCE.md matches the tree "
-              f"(451/573 startup, 91 frontier rows, 41 site-provable)")
+              f"({payload['startup']['registered_rows']}/{payload['startup']['table_qwords']} startup, "
+              f"{payload['frontier']['rows']} frontier rows, "
+              f"{payload['frontier']['site_provable_rows']} site-provable)")
 
     startup = payload["startup"]
     frontier = payload["frontier"]

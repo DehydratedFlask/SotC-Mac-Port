@@ -11,7 +11,9 @@ What it does
      pairs it with the native registration (`native/core/startup_ctors.cpp`, the
      `recovered_constructors()` rows). The gap set is the union of the rows missing in `git HEAD`
      and in the working tree; a gap that the working tree already registers (or that has an
-     untracked `ctor_slot_<N>_*.hpp`) is flagged `IN_FLIGHT` and is excluded from the batches.
+     untracked `ctor_slot_<N>_*.hpp`) is excluded from the batches. A gap the working tree registers is
+     `WIRED_UNCOMMITTED` (done, only the commit is pending); a gap with only an untracked model file and
+     no registered row is `IN_FLIGHT` (a worker is still on it).
   2. Parses `.eh_frame_hdr` and gives every gap its FDE size (and flags a ctor whose RVA is not an
      FDE start).
   3. Decodes each gap (and every registered slot, to learn which callees are already modelled) and
@@ -477,9 +479,10 @@ def main() -> int:
     gap_idx = sorted((set(range(TABLE_COUNT)) - set(head_rows)) | (set(range(TABLE_COUNT)) - set(wt_rows)))
     tracked = git_tracked_slot_files()
     # IN_FLIGHT: registered by the working tree but not by HEAD, or its ctor_slot_<N>_* header is untracked.
-    in_flight = {i for i in gap_idx if i in wt_rows or any(n not in tracked for n in slot_files.get(i, []))}
+    wired_uncommitted = {i for i in gap_idx if i in wt_rows}
+    in_flight = {i for i in gap_idx if i not in wired_uncommitted and any(n not in tracked for n in slot_files.get(i, []))}
     # MODELLED_UNWIRED: a tracked native model exists but no recovered_constructors() row (needs wiring only).
-    unwired = {i for i in gap_idx if i not in in_flight and any(n in tracked for n in slot_files.get(i, []))}
+    unwired = {i for i in gap_idx if i not in in_flight and i not in wired_uncommitted and any(n in tracked for n in slot_files.get(i, []))}
 
     # Decode: every registered slot (callee knowledge), every gap, plus calibration.
     wanted: dict[int, int] = {}                    # rva -> fde size
@@ -544,7 +547,7 @@ def main() -> int:
         cls = classify(rec, template_callees, find_fde, unmodelled)
         pts = effort(rec, cls, unmodelled)
         g = {
-            "index": i, "rva": f"{rva:#x}", "fde_size": wanted[rva], "status": "IN_FLIGHT" if i in in_flight else "MODELLED_UNWIRED" if i in unwired else "OPEN",
+            "index": i, "rva": f"{rva:#x}", "fde_size": wanted[rva], "status": "WIRED_UNCOMMITTED" if i in wired_uncommitted else "IN_FLIGHT" if i in in_flight else "MODELLED_UNWIRED" if i in unwired else "OPEN",
             "native_files": sorted(f for f in native_tokens.get(rva, set()) if not f.startswith(
                 ("core/startup_ctors", "core/ctor_original_table"))),
             **rec, **cls,
@@ -576,6 +579,7 @@ def main() -> int:
         "coverage_working_tree": f"{len(wt_rows)}/{TABLE_COUNT}",
         "gap_count": len(gaps), "open_count": len(open_gaps),
         "in_flight": sorted(in_flight),
+        "wired_uncommitted": sorted(wired_uncommitted),
         "modelled_unwired": sorted(unwired),
         "gaps": gaps,
         "unmodelled_helpers": helpers,
@@ -596,7 +600,7 @@ def main() -> int:
         DOC_PATH.write_text(render_doc(result, gaps, ranked, batches, head_rows, wt_rows))
 
     print(f"OK survey_startup_gaps: HEAD {len(head_rows)}/{TABLE_COUNT}, working tree {len(wt_rows)}/{TABLE_COUNT}, "
-          f"{len(gaps)} gaps ({len(open_gaps)} open, in-flight {sorted(in_flight)}, modelled-unwired {sorted(unwired)}); "
+          f"{len(gaps)} gaps ({len(open_gaps)} open, in-flight {sorted(in_flight)}, wired-uncommitted {len(wired_uncommitted)}, modelled-unwired {sorted(unwired)}); "
           f"classes {dict(Counter(g['class'] for g in open_gaps))}; batch points {result['batch_points']}")
     print(f"  wrote {args.json.relative_to(ROOT)}" + (f" and {DOC_PATH.relative_to(ROOT)}" if args.write_doc else ""))
     return 0
@@ -631,7 +635,12 @@ def render_doc(result, gaps, ranked, batches, head_rows, wt_rows) -> str:
     w("ESTIMATES** (heuristics defined in the script header and below). Nothing here registers a slot or is a gate result.\n")
     w(f"Coverage: HEAD {result['coverage_head']}, working tree {result['coverage_working_tree']}. "
       f"Gaps considered: {result['gap_count']} ({result['open_count']} open, in flight: "
-      f"{', '.join(map(str, result['in_flight'])) or 'none'}; in-flight slots belong to the integrator and are not batched).\n")
+      f"{', '.join(map(str, result['in_flight'])) or 'none'}; in-flight slots belong to the integrator and are not batched; "
+      f"wired in the working tree but not yet committed: {', '.join(map(str, result['wired_uncommitted'])) or 'none'}).\n")
+    if result["open_count"] == 0:
+        w("**No open constructor gap remains**: the working tree registers every row of the pinned table, so the\n"
+          "ranked table and batch plan below are empty. Re-run `tools/lift/g1_evidence_pack.py --write` for the\n"
+          "registration/lifting counts; this survey only ranks *unregistered* rows.\n")
     cls = Counter(g["class"] for g in gaps if g["status"] == "OPEN")
     tiers = Counter(g["effort_tier"] for g in gaps if g["status"] == "OPEN")
     w("## Summary\n")
@@ -674,8 +683,8 @@ def render_doc(result, gaps, ranked, batches, head_rows, wt_rows) -> str:
     w("\n## Template shape of the debug-page gaps\n")
     w("`pure` = same shape as 309/326/329 (straight line, only the canary branch, only `callq *0x18(%rax)` functor sites, "
       "all local helpers already modelled). Others carry extras that need a new contract:\n")
-    w(f"- pure: {sum(1 for g in ranked if g['template_shape'] == 'pure')} slots: " + ranges(
-        [g["index"] for g in ranked if g["template_shape"] == "pure"]))
+    w((f"- pure: {sum(1 for g in ranked if g['template_shape'] == 'pure')} slots: " + ranges(
+        [g["index"] for g in ranked if g["template_shape"] == "pure"])).rstrip())
     for g in shapes:
         w(f"- {g['index']} (`{g['rva']}`, {g['instructions']} insn): {g['template_shape'][2:]}")
     w("")

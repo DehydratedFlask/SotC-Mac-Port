@@ -97,6 +97,24 @@
   reconstructs/executes the original executable. Existing installs are not permission to use them.
 - Do not commit downloaded tool binaries. `tools/` holds recipes/adapters and attribution only.
 
+## TokenEconomizer (Freebuff host adapter)
+
+Upstream `microsoft/TokenEconomizer` has no Freebuff plugin/hook API, so it is installed here as
+`tools/tokeneconomizer/` (adapter, launcher, installer) over a pinned checkout in the private,
+gitignored `local/tools/TokenEconomizer`. Use it in a session where command cost matters:
+
+```sh
+tools/tokeneconomizer/te-freebuff start                       # prints this repository's learned facts
+tools/tokeneconomizer/te-freebuff run -- <build or check>     # records the call, passes the result through
+tools/tokeneconomizer/te-freebuff end                         # folds the session; the next start learns
+```
+
+`start` prints the model-free `envfacts` micro-skills block: read it and follow it. Anything else
+(`status`, `microskills`, `config`, ...) passes through to the plugin's own CLI with
+`--host freebuff`. Tool pruning does not apply (Freebuff's tool set is not configurable from a
+repository) and the loop guard is off (its judge is a model call); leave both as `install.sh`
+sets them. Learned state stays in `~/.tokeneconomizer`, never in this repository.
+
 ## Checkpoints are mandatory
 
 Update `HANDOFF.md` at EVERY checkpoint: completed task or subtask, passed/failed gate,

@@ -67,7 +67,7 @@ SPEC = {
         "std::span<const debug_page::MenuRow>()",
     ],
     "source_order": [
-        "debug_page::Objects view{std::span<ConCmdRangedVar>(&objects.var1, 2), std::span<DebugMenuItem>()};",
+        "debug_page::Objects view{std::span<ConCmdRangedVar>(&objects.var1, 2), std::span<DebugMenuItem>(), std::span<NameHashCell>()};",
         "return debug_page::init_debug_page(kSlot536Script, view, concmd, menu, hooks);",
     ],
     "test_tokens": [

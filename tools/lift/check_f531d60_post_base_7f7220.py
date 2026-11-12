@@ -2,7 +2,7 @@
 """ELF-tie Init 0x531d60 continue call-site for 0x7f7220.
 
 Private: needs local/re/eboot.elf. Pins 5 B fragment after AVX BSS copy.
-Does NOT claim staffroll helper body 0x7f7220 (~108 B) or later Init continues.
+E1426 executes the native 54 B body in init_post_bodies.cpp; query/set hooks stay named.
 """
 
 from __future__ import annotations
@@ -61,16 +61,16 @@ def main() -> int:
 
     nh = NATIVE.read_text()
     require("init_531d60_post_base_7f7220" in nh, "API")
-    require("NOT modelled" in nh, "omission")
+    require("54 B body is native" in nh and "E1426" in nh, "E1426 native body claim")
     require("staffroll" in nh.lower() or "0x7f7220 body" in nh or "body NOT" in nh, "body omit")
     st = SLICE.read_text()
     require("post_base_7f7220" in st or "PostBase7f7220" in st, "wire")
 
     print(
         f"OK check_f531d60_post_base_7f7220: frag={FRAG_SHA256[:12]}…; "
-        f"call {TARGET:#x} (staffroll helper body NOT claimed, {first_ret + 1} B); "
+        f"call {TARGET:#x} (native staffroll body E1426, {first_ret + 1} B); "
         f"end={END:#x}; "
-        f"7f7220_body/56fad0/1290_body/5c64c0_body/56dcb0_body/499f80_body/140d90_body/"
+        f"56fad0/1290_body/5c64c0_body/56dcb0_body/499f80_body/140d90_body/"
         f"14c2f0/6a5370 NOT claimed"
     )
     return 0

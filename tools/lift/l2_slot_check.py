@@ -47,6 +47,7 @@ class Spec:
     elf_extra: Callable[[Elf], None] | None = None
     pad_byte: int | None = 0x90   # first byte after the body (nop padding)
     summary: str = ""
+    table_word: int | None = None  # slot-table value when the body is a sub-batch (default: base)
 
 
 def run_pins(e: Elf, pins: list) -> None:
@@ -65,7 +66,8 @@ def run_pins(e: Elf, pins: list) -> None:
 
 
 def run_elf_checks(spec: Spec, e: Elf) -> None:
-    require(e.u64(TABLE_START - 8 * spec.index) == spec.base, f"table word {spec.index}")
+    expected = spec.base if spec.table_word is None else spec.table_word
+    require(e.u64(TABLE_START - 8 * spec.index) == expected, f"table word {spec.index}")
     recording, e.recording = e.recording, False   # the whole-body hash read is not an operand pin
     e.body_hash(spec.name, spec.base, spec.size, spec.sha)
     e.recording = recording
@@ -82,11 +84,17 @@ def read_native(spec: Spec) -> dict[str, str]:
     return {key: (ROOT / path).read_text() for key, path in spec.native_files.items()}
 
 
+def header_text(t: dict[str, str]) -> str:
+    """The slot header, plus an optional companion header (e.g. a helper modelled in the same batch)."""
+    return "\n".join(t[key] for key in ("header", "helper_header") if key in t)
+
+
 def check_native(spec: Spec, t: dict[str, str]) -> None:
+    headers = header_text(t)
     for name, value in spec.header_constants.items():
-        require(const_value(t["header"], name) == value, f"native {name}")
+        require(const_value(headers, name) == value, f"native {name}")
     for token in spec.header_tokens:
-        require(token in t["header"], f"header token {token!r}")
+        require(token in headers, f"header token {token!r}")
     pos = [t["source"].index(token) if token in t["source"] else -1 for token in spec.source_order]
     require(-1 not in pos and pos == sorted(pos) and len(set(pos)) == len(pos),
             f"native slot {spec.index} call order")
@@ -142,9 +150,12 @@ def mutation_self_test(spec: Spec, e: Elf, texts: dict[str, str]) -> tuple[int, 
     e.overlay = {}
 
     native_ran = 0
-    token_groups = (("header", spec.header_tokens), ("source", spec.source_order),
-                    ("test", spec.test_tokens), ("cmake", spec.cmake_tokens))
+    token_groups = (("header", spec.header_tokens), ("helper_header", spec.header_tokens),
+                    ("source", spec.source_order), ("test", spec.test_tokens),
+                    ("cmake", spec.cmake_tokens))
     for key, tokens in token_groups:
+        if key not in texts:
+            continue
         for token in tokens:
             if token not in texts[key]:
                 continue
@@ -154,9 +165,15 @@ def mutation_self_test(spec: Spec, e: Elf, texts: dict[str, str]) -> tuple[int, 
             native_ran += 1
     for name, value in spec.header_constants.items():
         pattern = re.compile(rf"({name} = )(0x[0-9A-Fa-f]+|\d+)(u?;)")
-        mutated = dict(texts)
-        mutated["header"] = pattern.sub(lambda m: f"{m.group(1)}{value ^ 0x4:#x}{m.group(3)}", texts["header"], count=1)
-        require(mutated["header"] != texts["header"], f"constant {name} pattern did not match")
+        mutated = None
+        for key in ("header", "helper_header"):
+            if key not in texts or not pattern.search(texts[key]):
+                continue
+            mutated = dict(texts)
+            mutated[key] = pattern.sub(
+                lambda m: f"{m.group(1)}{value ^ 0x4:#x}{m.group(3)}", texts[key], count=1)
+            break
+        require(mutated is not None, f"constant {name} pattern did not match")
         expect_failure(f"constant {name}", lambda m=mutated: check_native(spec, m))
         native_ran += 1
     return ran, native_ran

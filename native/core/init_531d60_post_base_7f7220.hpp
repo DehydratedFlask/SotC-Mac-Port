@@ -7,8 +7,8 @@
 // not the body. Prefer over deepen 0x1290 / 0x5c64c0 / 0x56dcb0 / 0x499f80 /
 // 0x140d90 / 0x14c2f0 / 0x6a5370. Prefer over empty-path migrate/non-null.
 //
-// Claimed: call-site control flow pin only.
-// NOT modelled: 0x7f7220 body / later Init continues (0x56fad0…). PR #5 cite-only.
+// Claimed: call-site wrapper. The 54 B body is native in init_post_bodies.cpp; the runtime
+// supplies the query/set hooks and executes both observed branches' selection here (E1426).
 #pragma once
 
 #include <cstddef>

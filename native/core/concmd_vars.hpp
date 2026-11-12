@@ -77,12 +77,15 @@ struct BoolVarResult {
 // block both store value 1 / default 1 (the parameter defaults), while slot 303 (`ProfileCPU`,
 // functor tag 0x15d2478) stores value 0 / default 0. `value` is the byte at +0xc0 (stored first),
 // `default_value` the byte at +0x68 (stored second), exactly as the three bodies order them.
+// `early_description_release = false` is the late order seen at slots 446 / 451: f590(description) is
+// issued after 0x20d60 (registration), directly before f590(name); the stores are unchanged.
 [[nodiscard]] BoolVarResult init_bool_var_static(ConCmdBoolVar& var, const SharedStr& name,
                                                  const SharedStr& description,
                                                  std::uint64_t fn_vptr_tag,
                                                  ConCmdRegistry& registry,
                                                  std::uint8_t value = 1,
-                                                 std::uint8_t default_value = 1) noexcept;
+                                                 std::uint8_t default_value = 1,
+                                                 bool early_description_release = true) noexcept;
 
 // CPU-01-SLOT306-CATEGORY-VARS-01: the same construction without the __cxa_atexit record — for
 // vector-owned bool vars (the engine-init 0xa5d990 category loop) whose teardown is the engine's,
@@ -161,6 +164,10 @@ inline constexpr std::uint64_t kRangedFloatArgFnVtbl = 0x15d57e0;
 // Third caller functor vtable (startup slot 306, the five `sndx_` floats): its four slot bodies are the
 // same as 0x15d57e0 / 0x1594318 (byte-pinned by tools/lift/check_ctor_slot_306.py).
 inline constexpr std::uint64_t kRangedFloatArgFnVtblSndx = 0x15d2040;
+// Fourth caller functor vtable (startup slot 554 batch 2b object `miscDebugShaderFloat0`): its four
+// slot bodies are byte-pinned equal to 0x15d57e0 / 0x1594318 by their relocation addends
+// (0xc4a0 / 0xc4c0 / 0xc4e0 / 0xc4f0).
+inline constexpr std::uint64_t kRangedFloatArgFnVtblMiscDebug = 0x1596878;
 inline constexpr std::uint64_t kRangedFloatFnCopyRva = 0xc4a0;
 inline constexpr std::uint64_t kRangedFloatFnCloneRva = 0xc4c0;
 inline constexpr std::uint64_t kRangedFloatFnMoveRva = 0xc4e0;

@@ -9,6 +9,9 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 |---|---|
 | [TASKS](TASKS.md) | Dependency-ordered task register and detailed work packets; integrator |
 | [EVIDENCE](EVIDENCE.md) | Verified artifact/source/tool facts and unresolved questions; integrator |
+| [Init crash repair + `0xa5d990` body (2026-11-12)](checkpoints/2026-11-12-init-a5cd90-crash-a5d990-body.md) | E1432; fixes the `0xa5cd90` config-RVA dereference that made the handover tree segfault (701/702) and executes the 2,709 B `0xa5d990` body (**16 executed / 1 blocked**); `0x5b9f90` remains |
+| [Init blockers: `0x96f20` + `0x560b60` bodies (2026-11-10)](checkpoints/2026-11-10-init-blockers-96f20-560b60.md) | E1431; executes both post-call bodies natively (**14 executed / 3 blocked**, from 12/5), pinned hashes/ranges and a checker per body; `0x97a50` remains a host allocation contract |
+| [Init `0x7f6f90` staffroll body (2026-11-10)](checkpoints/2026-11-10-init-7f6f90.md) | E1430; native `0x7f6f90` fallback body with pinned range/hash, call sites and checker; G1 stays PARTIAL |
 | [AUD-02 RackQuery jump-entry review (2026-10-29)](checkpoints/2026-10-29-aud02-rackquery-jump-entry-94eb4c.md) | E968/E970; slot 11 resolves to `0x94eb4c`; selected path passes a caller-stack pointer through RBX to `0x94ebc2` (static only) |
 | [AUD-02 RackQuery post-call stack-cell claim (2026-10-29)](checkpoints/2026-10-29-aud02-rackquery-postcall-stack-94ebc2.md) | E972 claim; byte-check caller-side post-call references to the stack region passed at `0x94ebc2` on slot-11 route only |
 | [AUD-02 RackQuery post-call caller-slice result (2026-10-29)](checkpoints/2026-10-29-aud02-rackquery-postcall-stack-result-94ebc2.md) | E973; 10 caller instructions / 53 bytes and direct edges verified for the selected static slot-11 candidate; no runtime/API/audio claim |
@@ -166,7 +169,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 | [PRIOR_ART](PRIOR_ART.md) | Assessment of three public Apple-Silicon PS4 ports: execution models, lifting/GPU tooling, licences, reuse verdicts |
 | [GPU_COMMAND_SURFACE](GPU_COMMAND_SURFACE.md) | Static import census of the title's PS4 GPU surface (101 GnmDriver + 24 VideoOut) and the native boundary contract |
 | [SERVICE_MAP](SERVICE_MAP.md) | Native service map: 51 PS4 libraries / 588 imports grouped into 22 areas, with generated [service_map.json](service_map.json) |
-| [ENTRY_MAP](ENTRY_MAP.md) | Guest-address → native-entry table: 951 distinct RVAs declared by 1,386 constants across 364 headers, with generated [entry_map.json](entry_map.json) |
+| [ENTRY_MAP](ENTRY_MAP.md) | Guest-address → native-entry table: 1,910 distinct RVAs declared by 2,983 constants across 581 headers, with generated [entry_map.json](entry_map.json) |
 | [INDIRECT_FRONTIER](INDIRECT_FRONTIER.md) | 499 indirect sites in the `0x531d60` closure classified by call shape; 1 target resolved from the image, with [indirect_frontier.json](indirect_frontier.json) |
 | [CSDR_COMPRESSED](CSDR_COMPRESSED.md) | Compressed `.csdr` container (8c06/8c0a/cc**) structure statistics and codec trials: UNKNOWN codec, what was ruled out |
 | [CSDR_LOADER_SEARCH](CSDR_LOADER_SEARCH.md) | `.csdr` loader found (E1075/E1078): `bpe::Compression::Decompress` dispatches on the trailer word to a statically linked Oodle 2 LZ SDK or zlib 1.2.3; member layout and the decode contract |

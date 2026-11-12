@@ -543,3 +543,35 @@ downloaded tool or cache file is being published.
   `local/ghidra/persistent-20261020`, which predates this entry.
 - **Not installed:** no other package, no Homebrew formula, no Ghidra upgrade (0.28.x-style upgrade
   banners for graft/trail were ignored on purpose).
+
+## 2026-11-08 — TokenEconomizer, driven from Freebuff sessions (TOOL-TE-FREEBUFF-01)
+
+- **Source:** https://github.com/microsoft/TokenEconomizer (Microsoft, Apache-2.0). Pin
+  `264e7a7f32f0112a06aa83a97b9c2c4681563968` (`main`, 2026-11-08), clone at
+  `local/tools/TokenEconomizer` (241 tracked files, `git rev-parse HEAD` verified).
+- **Install path:** private, gitignored clone under `local/tools/`; the adapter that Freebuff
+  needs is `tools/tokeneconomizer/` (publishable: `te-freebuff`, `te_freebuff.py`,
+  `freebuff_host.py`, `sitecustomize.py`, `install.sh`). Installer:
+  `tools/tokeneconomizer/install.sh` (idempotent; `--check` reports state).
+- **Why an adapter:** upstream ships hosts for Claude Code, Codex, Copilot CLI, Pi, and
+  experimental Cursor/Grok/opencode/Hermes/Antigravity. Freebuff has no plugin or hook protocol,
+  so `freebuff_host.py` registers a `freebuff` host in `hosts.HOSTS` and `te_freebuff.py` speaks
+  the plugin's Claude-shaped hook contract for it, writing each session's calls into a
+  Claude-shaped transcript in `~/.tokeneconomizer/freebuff-sessions/`.
+- **Interpreter:** `/opt/homebrew/bin/python3.14` (3.14.8), auto-selected by `te-freebuff`;
+  the package needs 3.10+ and the system `python3` is 3.9.6. `TE_PYTHON` overrides.
+- **Repository settings** (`te-freebuff config`): `microskills=envfacts` (model-free facts),
+  `toolprune=off` (not applicable on this host), `loopguard=off` (its judge is a model call),
+  `repomap=off`. State in `~/.tokeneconomizer/repos/sotc-mac-port-cc037f7797/freebuff`.
+- **Safety:** standard-library Python, no network at use time, no model call, no install script
+  from upstream run, and no Sony/game artifact touched. It reads only its own transcripts and
+  this repository's git identity. `spctl`/`codesign` do not apply (pure Python source).
+- **Verification (FIXTURE_VERIFIED):** in a throwaway git repo (`local/te-smoke/repo`, since
+  removed), four sessions each ran `te-freebuff start/prompt/run -- nosetests -q/end`; the fact
+  `absent_tool:nosetests` promoted to `ACTIVE` (`fire=4/4`) and the fifth `start` printed
+  "`nosetests …` fails here with command not found…". `run -- false` → exit 1, `run -- true` →
+  exit 0 (status passthrough). `te-freebuff status` reports 4 sessions folded. Not run: micro-skills'
+  paid proposer and the loop guard (both need a host model CLI, deliberately off).
+- **Removal boundary:** `rm -rf local/tools/TokenEconomizer ~/.tokeneconomizer` and delete
+  `tools/tokeneconomizer/`; no other tool depends on it, and the port builds and tests without
+  it. Do not delete `~/.tokeneconomizer/repos/` for other repositories you may also use it in.

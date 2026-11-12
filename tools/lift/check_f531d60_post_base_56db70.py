@@ -2,8 +2,8 @@
 """ELF-tie Init 0x531d60 continue call-site for 0x56db70.
 
 Private: needs local/re/eboot.elf. Pins 5 B fragment after 0x1290.
-Target 0x56db70 is a one-byte ret (like E406 0x56dca0). Does NOT claim
-later Init continues.
+Target 0x56db70 is a one-byte ret (like E406 0x56dca0); E1426 executes the
+native empty body. Later Init continues stay separate.
 """
 
 from __future__ import annotations
@@ -53,13 +53,13 @@ def main() -> int:
 
     nh = NATIVE.read_text()
     require("init_531d60_post_base_56db70" in nh, "API")
-    require("NOT modelled" in nh, "omission")
+    require("native empty" in nh and "E1426" in nh, "E1426 native ret claim")
     require("post_base_56db70" in SLICE.read_text() or "PostBase56db70" in SLICE.read_text(), "wire")
 
     print(
         f"OK check_f531d60_post_base_56db70: frag={FRAG_SHA256[:12]}…; "
         f"call {TARGET:#x} (ret-nop); end={END:#x}; "
-        f"5b3d00/1290_body/5c64c0_body/56dcb0_body/499f80_body/140d90_body/14c2f0/6a5370 NOT claimed"
+        f"56db70 ret native (E1426); 5b3d00/1290_body/5c64c0_body/56dcb0_body/499f80_body/140d90_body/14c2f0/6a5370 NOT claimed"
     )
     return 0
 

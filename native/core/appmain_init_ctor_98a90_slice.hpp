@@ -5,18 +5,19 @@
 // skels-attach+shadowanims+anims-attach+shadowbanks+banks-attach+shadowstreams+
 // streams-attach+shadowrandomevents+randomevents-attach+shadowbossmusic+
 // bossmusic-attach+cp3characters+cp3characters-attach+cp3shadowprecache+
-// cp3shadowprecache-attach+tail-140d90+stackchk) → post-base 0x499f80 call-site
-// → post-base 0x56dcb0 call-site → post-base 0x5c64c0 call-site →
-// post-base 0x1290 call-site → post-base 0x56db70 / 0x5b3d00 / 0x5b3cf0
-// call-sites (ret-nops) → post-base AVX BSS copy (0x1b1dd40→0x1b1dd00/0x1b1dd20)
-// → post-base 0x7f7220 call-site → post-base 0x56fad0 call-site (ret-nop)
-// → post-base 0xf90310 call-site (splash-hide PLT) → registry.
+// cp3shadowprecache-attach+tail-140d90+stackchk) → post-base 0x499f80 native body
+// → post-base 0x56dcb0 native body → post-base 0x5c64c0 native body →
+// post-base 0x1290 native call → post-base 0x56db70 / 0x5b3d00 / 0x5b3cf0
+// native one-byte-ret call sites → post-base AVX BSS copy
+// (0x1b1dd40→0x1b1dd00/0x1b1dd20) → post-base 0x7f7220 native call →
+// post-base 0x56fad0 native ret → post-base 0xf90310 splash-hide host service → registry.
 // Tip AllocatorFront+FakeHeap.
 // PR #5 cite-only.
 // NOT modelled: ensure migrate / heavy menu helpers / 0xf8f860 PLT / non-null list;
 // PLT bodies 0xf901a0/0xf901c0; ba40 listener invoke; 0x533100 hit /
-// success atexit; 0x499f80 body when body_globals omitted; 0x56dcb0/0x5c64c0/0x1290 bodies; 0x7f7220 body;
-// 0xf90310 PLT/Sony body; later ymm Init continue; 0x14c2f0/0x6a5370/0x6abcc0/
+// success atexit; 0x499f80 body when body_globals omitted (the runtime now supplies them);
+// 0xf90310 Sony PLT body (runtime uses a named splash-hide host service); later ymm Init
+// continue; 0x14c2f0/0x6a5370/0x6abcc0/
 // 0x21620/0x2779a0/0x42390 bodies; bodies of 0x523bd0 / 0x525b40 / 0x493230 /
 // 0x525080 / 0x2569d0.
 #pragma once

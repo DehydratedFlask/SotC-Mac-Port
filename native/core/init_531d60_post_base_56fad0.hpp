@@ -8,8 +8,8 @@
 // 0x56dcb0 / 0x499f80 / 0x140d90 / 0x14c2f0 / 0x6a5370.
 // Prefer over empty-path migrate/non-null.
 //
-// Claimed: call-site control flow pin only (+ target is-ret identity).
-// NOT modelled: later Init continues (0xf90310…). PR #5 cite-only.
+// Claimed: call-site wrapper for a one-byte `ret` target. The runtime supplies a native empty
+// body, so the site executes and is counted (E1426); later Init continues are separate.
 #pragma once
 
 #include <cstddef>

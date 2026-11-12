@@ -1,4 +1,6 @@
+#include <cstdlib>
 #include "ctor_slot_family_items.hpp"
+#include "ctor_slot_326_837f30.hpp"
 
 namespace sotc {
 
@@ -56,6 +58,64 @@ FamilyItemResult family_group_item_26c10(DebugMenuItem& item, const char* parent
     if (!out.ctor_ok) return out;
     out.registration = register_menu_item_268b0(item, menu, registry.atexit_log);
     out.views_inert = release_inert_view_f590(c) && release_inert_view_f590(p);
+    out.atexit_recorded = registry.atexit_log.record(kDebugMenuItemDtorRva, &item);
+    return out;
+}
+
+FamilyItemResult family_separator_item_26b60(DebugMenuItem& item, const char* parent, std::size_t parent_len,
+                                            std::uint32_t flags, const SharedStrCtorHooks& alloc,
+                                            ConCmdRegistry& registry, DebugMenuRegistry& menu) noexcept {
+    FamilyItemResult out{};
+    const SharedStr p = family_view(parent, parent_len);
+    out.ctor_ok = init_menu_separator_26b60(item, p, flags, alloc);
+    if (!out.ctor_ok) return out;
+    out.registration = register_menu_item_268b0(item, menu, registry.atexit_log);
+    out.views_inert = release_inert_view_f590(p);
+    out.atexit_recorded = registry.atexit_log.record(kDebugMenuItemDtorRva, &item);
+    return out;
+}
+
+FamilyItemResult family_label_item_26800(DebugMenuItem& item, const char* parent, std::size_t parent_len,
+                                        std::uint32_t flags, const SharedStrCtorHooks& alloc,
+                                        ConCmdRegistry& registry, DebugMenuRegistry& menu) noexcept {
+    FamilyItemResult out{};
+    const SharedStr p = family_view(parent, parent_len);
+    out.ctor_ok = init_slot326_label_item_26800(item, p, flags, alloc);
+    if (!out.ctor_ok) return out;
+    out.registration = register_menu_item_268b0(item, menu, registry.atexit_log);
+    out.views_inert = release_inert_view_f590(p);
+    out.atexit_recorded = registry.atexit_log.record(kDebugMenuItemDtorRva, &item);
+    return out;
+}
+
+namespace {
+void* separator_host_allocate(std::size_t size, std::uint32_t, std::uint32_t, std::uint32_t) noexcept { return std::malloc(size); }
+bool separator_host_deallocate(void* ptr, std::uint32_t) noexcept {
+    std::free(ptr);
+    return true;
+}
+}  // namespace
+
+SharedStrCtorHooks default_family_separator_alloc() noexcept {
+    SharedStrCtorHooks hooks{};
+    hooks.alloc.allocate = &separator_host_allocate;
+    hooks.alloc.deallocate = &separator_host_deallocate;
+    return hooks;
+}
+
+FamilyItemResult family_command_item_26f90(DebugMenuItem& item, const char* parent, std::size_t parent_len,
+                                          const char* caption, std::size_t caption_len, const char* command,
+                                          std::size_t command_len, const void* target, std::uint32_t flags,
+                                          ConCmdRegistry& registry, DebugMenuRegistry& menu) noexcept {
+    FamilyItemResult out{};
+    if (target == nullptr) return out;   // fail closed: the original passes a real global's address
+    const SharedStr p = family_view(parent, parent_len);
+    const SharedStr c = family_view(caption, caption_len);
+    const SharedStr m = family_view(command, command_len);
+    out.ctor_ok = init_menu_command_26f90(item, p, c, target, m, flags);
+    if (!out.ctor_ok) return out;
+    out.registration = register_menu_item_268b0(item, menu, registry.atexit_log);
+    out.views_inert = release_inert_view_f590(m) && release_inert_view_f590(c) && release_inert_view_f590(p);
     out.atexit_recorded = registry.atexit_log.record(kDebugMenuItemDtorRva, &item);
     return out;
 }

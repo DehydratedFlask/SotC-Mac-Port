@@ -1,0 +1,180 @@
+#!/usr/bin/env python3
+"""ELF byte-oracle for startup constructor slot 410 (batch 3 bool debug page).
+
+The pinned body is the inclusive range 0x5ac580..0x5ac85e (735 bytes; FDE range = 735). Offline only: reads the
+pinned private ELF and relocation metadata; it never loads, relocates or executes original code. Pins the table
+word, body hash, every direct call / rip-relative operand, strings, string-length immediates, the bool functor
+tag relocations, the shared callees and the atexit / stack-check import NIDs, plus the native model/test
+contract. The inherited M6 driver runs a fail-closed byte/relocation/native-token mutation suite and supports an
+explicit --tamper rejection probe. Generated from the disassembly by the batch-3 generator and then reviewed.
+"""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bool_page_lib as bp  # noqa: E402
+
+SPEC = {
+    "slot": 410,
+    "base": 0x5AC580,
+    "size": 735,
+    "body_sha256": "9c43be4198aaa05c4c673e1d040e138269d61fe7fe1a17068b46b6455bd3117f",
+    "pad": "90",
+    "callees": [
+        'concmd_base_ctor',
+        'concmd_register',
+        'bool_dtor',
+        'release_f590',
+        'bool_fn_copy',
+        'bool_fn_clone',
+        'bool_fn_move',
+        'bool_fn_destroy',
+        'bool_slot3',
+        'bool_slot6',
+    ],
+    "bool_tags": [0x15CB188],
+    "float_tags": [],
+    "strings": [
+        (0x1264680, b'collision_useBIH'),
+        (0x1264691, b'collision_showPlayer'),
+        (0x12646A6, b'collision_drawEnableZ'),
+        (0x1265FFF, b''),
+    ],
+    "lengths": [
+        ('collision_useBIH', 0x5AC5E1, "48c7459810000000"),
+        ('collision_showPlayer', 0x5AC6BC, "48c7459814000000"),
+        ('collision_drawEnableZ', 0x5AC793, "48c7459815000000"),
+    ],
+    "pins": [
+        ("imm", 0x5AC580, "55"),
+        ("imm", 0x5AC581, "4889e5"),
+        ("imm", 0x5AC584, "4157"),
+        ("imm", 0x5AC586, "4156"),
+        ("imm", 0x5AC588, "4155"),
+        ("imm", 0x5AC58A, "4154"),
+        ("imm", 0x5AC58C, "53"),
+        ("imm", 0x5AC58D, "4883ec48"),
+        ("rip", 0x5AC591, 7, 3, 0x15FE518),
+        ("rip", 0x5AC598, 7, 3, 0x1594208),
+        ("rip", 0x5AC59F, 7, 3, 0x2FD9FA0),
+        ("rip", 0x5AC5A6, 7, 3, 0x1264680),
+        ("rip", 0x5AC5AD, 7, 3, 0x1265FFF),
+        ("imm", 0x5AC5C0, "b901000000"),
+        ("imm", 0x5AC5C8, "4983c610"),
+        ("imm", 0x5AC5E1, "48c7459810000000"),
+        ("imm", 0x5AC5F6, "48c745c800000000"),
+        ("call", 0x5AC5FE, 0x20AF0),
+        ("rip", 0x5AC603, 7, 3, 0x15940A0),
+        ("rip", 0x5AC618, 7, 3, 0x15CB188),
+        ("imm", 0x5AC61F, "4983c410"),
+        ("imm", 0x5AC62A, "c7436900000000"),
+        ("imm", 0x5AC636, "48c783a000000000000000"),
+        ("imm", 0x5AC648, "48c783b800000000000000"),
+        ("call", 0x5AC653, 0xF590),
+        ("imm", 0x5AC65E, "c683c000000001"),
+        ("imm", 0x5AC665, "c6436801"),
+        ("call", 0x5AC669, 0x20D60),
+        ("call", 0x5AC671, 0xF590),
+        ("rip", 0x5AC676, 7, 3, 0x20B0),
+        ("rip", 0x5AC67D, 7, 3, 0x1604218),
+        ("call", 0x5AC687, 0xF8F390),
+        ("rip", 0x5AC68C, 7, 3, 0x2FDA068),
+        ("rip", 0x5AC693, 7, 3, 0x1264691),
+        ("imm", 0x5AC6A6, "b901000000"),
+        ("rip", 0x5AC6AF, 7, 3, 0x1265FFF),
+        ("imm", 0x5AC6BC, "48c7459814000000"),
+        ("imm", 0x5AC6D2, "48c745c800000000"),
+        ("call", 0x5AC6E0, 0x20AF0),
+        ("rip", 0x5AC6F3, 7, 3, 0x15CB188),
+        ("imm", 0x5AC701, "c7436900000000"),
+        ("imm", 0x5AC70D, "48c783a000000000000000"),
+        ("imm", 0x5AC71F, "48c783b800000000000000"),
+        ("call", 0x5AC72A, 0xF590),
+        ("imm", 0x5AC735, "c683c000000000"),
+        ("imm", 0x5AC73C, "c6436800"),
+        ("call", 0x5AC740, 0x20D60),
+        ("call", 0x5AC748, 0xF590),
+        ("rip", 0x5AC74D, 7, 3, 0x20B0),
+        ("rip", 0x5AC754, 7, 3, 0x1604218),
+        ("call", 0x5AC75E, 0xF8F390),
+        ("rip", 0x5AC763, 7, 3, 0x2FDA130),
+        ("rip", 0x5AC76A, 7, 3, 0x12646A6),
+        ("imm", 0x5AC77D, "b901000000"),
+        ("rip", 0x5AC786, 7, 3, 0x1265FFF),
+        ("imm", 0x5AC793, "48c7459815000000"),
+        ("imm", 0x5AC7A9, "48c745c800000000"),
+        ("call", 0x5AC7B7, 0x20AF0),
+        ("rip", 0x5AC7CA, 7, 3, 0x15CB188),
+        ("imm", 0x5AC7D8, "c7436900000000"),
+        ("imm", 0x5AC7E4, "48c783a000000000000000"),
+        ("imm", 0x5AC7F6, "48c783b800000000000000"),
+        ("call", 0x5AC801, 0xF590),
+        ("imm", 0x5AC80C, "c683c000000000"),
+        ("imm", 0x5AC813, "c6436800"),
+        ("call", 0x5AC817, 0x20D60),
+        ("call", 0x5AC81F, 0xF590),
+        ("rip", 0x5AC824, 7, 3, 0x20B0),
+        ("rip", 0x5AC82B, 7, 3, 0x1604218),
+        ("call", 0x5AC835, 0xF8F390),
+        ("rip", 0x5AC83A, 7, 3, 0x15FE518),
+        ("imm", 0x5AC848, "750f"),
+        ("imm", 0x5AC84A, "4883c448"),
+        ("imm", 0x5AC84E, "5b"),
+        ("imm", 0x5AC84F, "415c"),
+        ("imm", 0x5AC851, "415d"),
+        ("imm", 0x5AC853, "415e"),
+        ("imm", 0x5AC855, "415f"),
+        ("imm", 0x5AC857, "5d"),
+        ("imm", 0x5AC858, "c3"),
+        ("call", 0x5AC859, 0xF8F3A0),
+        ("imm", 0x5AC85E, "90"),
+    ],
+    "m6_bytes": [
+        (0xF8F390, "ff25220c6700", "__cxa_atexit PLT thunk"),
+        (0xF8F3A0, "ff251a0c6700", "__stack_chk_fail PLT thunk"),
+    ],
+    "m6_extras": ['bp_atexit_imports', 'bp_object_vtables'],
+    "native": {
+        "header": "native/core/ctor_slot_410_5ac580.hpp",
+        "source": "native/core/ctor_slot_410_5ac580.cpp",
+        "test": "native/tests/test_ctor_slot_410.cpp",
+        "consts": {
+            "kSlot410Rva": 0x5AC580,
+            "kSlot410Size": 0x2DF,
+            "kSlot410BoolFnTag": 0x15CB188,
+            "kSlot410Var0NameLength": 0x10,
+            "kSlot410Var1NameLength": 0x14,
+            "kSlot410Var2NameLength": 0x15,
+        },
+        "header_tokens": [
+            "IDENTITY TAGS, recorded and never run.",
+        ],
+        "source_order": [
+            'out.var0 = lane_m6::init_bool_var_literal(objects.var0, kSlot410Var0Name,',
+            'out.var1 = lane_m6::init_bool_var_literal(objects.var1, kSlot410Var1Name,',
+            'out.var2 = lane_m6::init_bool_var_literal(objects.var2, kSlot410Var2Name,',
+            'out.ok = out.var0.ok && out.var1.ok && out.var2.ok;',
+        ],
+        "test_tokens": [
+            'CHECK(kSlot410Rva == 0x5ac580 && kSlot410Size == 735 && kSlot410BoolFnTag == 0x15cb188);',
+            'CHECK(r.ok && r.var0.ok && r.var0.views_inert && r.var1.ok && r.var1.views_inert && r.var2.ok && r.var2.views_inert);',
+            'CHECK(r.var0.registration.ok && r.var0.registration.path == ConCmdRegisterPath::pending_list);',
+            'check_bool_with_description(o.var0, 0x15cb188, 1, "", 0);',
+            'CHECK(same_view(o.var0.base.name, kSlot410Var0Name, 0x10));',
+            'check_bool_with_description(o.var1, 0x15cb188, 0, "", 0);',
+            'CHECK(same_view(o.var1.base.name, kSlot410Var1Name, 0x14));',
+            'check_bool_with_description(o.var2, 0x15cb188, 0, "", 0);',
+            'CHECK(same_view(o.var2.base.name, kSlot410Var2Name, 0x15));',
+            'CHECK(creg.pending.size() == 3);',
+            'CHECK(creg.atexit_log.size() == 3);',
+            'CHECK(!r.ok',
+        ],
+    },
+}
+
+
+if __name__ == "__main__":
+    raise SystemExit(bp.main(SPEC, '3 bool variable(s)'))

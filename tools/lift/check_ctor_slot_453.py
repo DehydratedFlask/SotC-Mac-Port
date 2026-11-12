@@ -1,0 +1,142 @@
+#!/usr/bin/env python3
+"""ELF byte-oracle for startup constructor slot 453 (RVA 0x48ac10, 856 bytes), batch 14, a records-only page.
+
+Generated from the ELF by tools/lift/startup_gen (a static register tracker over the pinned ELF; it reads bytes and never executes them). Every constructor row is pinned operand by operand: object addresses, name string
+addresses and length immediates, flags, init / range immediates, the caller functor tags and the __cxa_atexit records. The 11 named records go through the registrar 0xa81700 (byte-pinned in check_helper_a81700.py; whole-body hashes here). The group destructor 0x48a250 unregisters the block's records last first (shape checked, hashed, never run). Vtables, functor tags and destructors are IDENTITY TAGS (recorded, never run). What reads the variables at run time is NOT established (readings are inference from the strings).
+
+Offline only: reads the pinned private ELF (local/re/eboot.elf), never loads, relocates or executes an original RVA. The inherited M6 driver runs a fail-closed mutation self-test; --tamper [elf|native] are explicit rejection probes.
+"""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bool_page_lib as bp  # noqa: E402
+
+SPEC = {
+    "slot": 453,
+    "base": 0x48ac10,
+    "size": 856,
+    "body_sha256": "77f475eda8726db640c537cfa0688a18223d8431e91e4dc65398b66fbabbc7a6",
+    "pad": "9090909090909090",
+    "callees": ['concmd_base_ctor', 'concmd_register', 'release_f590'],
+    "bool_tags": [],
+    "float_tags": [],
+    "strings": [
+        (0xffb78b, b'Net connection: connection count'),
+        (0xffb7ac, b'Net connection: connections pending'),
+        (0xffb7d0, b'Net connection: tx bytes (compressed)'),
+        (0xffb7f6, b'Net connection: rx bytes (compressed)'),
+        (0xffb81c, b'Net connection: tx bytes (decompressed)'),
+        (0xffb844, b'Net connection: rx bytes (decompressed)'),
+        (0xffb86c, b'Net connection: updates skipped'),
+        (0xffb88c, b'Net connection: serialize time'),
+        (0xffb8ab, b'Net connection: deserialize time'),
+        (0xffb8cc, b'Net connection: compression time'),
+        (0xffb8ed, b'Net connection: decompression time'),
+    ],
+    "lengths": [
+        ('Net connection: connection count', 0x48ac52, "48c745c820000000"),
+        ('Net connection: connections pending', 0x48ac8d, "48c745a823000000"),
+        ('Net connection: tx bytes (compressed)', 0x48accb, "48c7458825000000"),
+        ('Net connection: rx bytes (compressed)', 0x48ad0f, "48c78568ffffff25000000"),
+        ('Net connection: tx bytes (decompressed)', 0x48ad59, "48c78548ffffff27000000"),
+        ('Net connection: rx bytes (decompressed)', 0x48ada3, "48c78528ffffff27000000"),
+        ('Net connection: updates skipped', 0x48aded, "48c78508ffffff1f000000"),
+        ('Net connection: serialize time', 0x48ae37, "48c785e8feffff1e000000"),
+        ('Net connection: deserialize time', 0x48ae81, "48c785c8feffff20000000"),
+        ('Net connection: compression time', 0x48aecb, "48c785a8feffff20000000"),
+        ('Net connection: decompression time', 0x48af15, "48c78588feffff22000000"),
+    ],
+    "pins": [
+        ("imm", 0x48ac19, "4881ec68010000"),
+        ("rip", 0x48ac20, 7, 3, 0x15fe518),
+        ("rip", 0x48ac27, 7, 3, 0x2ef8988),
+        ("rip", 0x48ac2e, 7, 3, 0xffb78b),
+        ("imm", 0x48ac52, "48c745c820000000"),
+        ("call", 0x48ac5f, 0xa81700),
+        ("call", 0x48ac67, 0xf590),
+        ("rip", 0x48ac70, 7, 3, 0xffb7ac),
+        ("rip", 0x48ac7b, 7, 3, 0x2ef89c0),
+        ("imm", 0x48ac8d, "48c745a823000000"),
+        ("call", 0x48ac9a, 0xa81700),
+        ("call", 0x48aca2, 0xf590),
+        ("rip", 0x48acab, 7, 3, 0xffb7d0),
+        ("rip", 0x48acb6, 7, 3, 0x2ef89f8),
+        ("imm", 0x48acbd, "ba01000000"),
+        ("imm", 0x48accb, "48c7458825000000"),
+        ("call", 0x48acd8, 0xa81700),
+        ("call", 0x48ace0, 0xf590),
+        ("rip", 0x48acec, 7, 3, 0xffb7f6),
+        ("rip", 0x48acf7, 7, 3, 0x2ef8a30),
+        ("imm", 0x48acfe, "ba01000000"),
+        ("imm", 0x48ad0f, "48c78568ffffff25000000"),
+        ("call", 0x48ad22, 0xa81700),
+        ("call", 0x48ad2a, 0xf590),
+        ("rip", 0x48ad36, 7, 3, 0xffb81c),
+        ("rip", 0x48ad41, 7, 3, 0x2ef8a68),
+        ("imm", 0x48ad48, "ba01000000"),
+        ("imm", 0x48ad59, "48c78548ffffff27000000"),
+        ("call", 0x48ad6c, 0xa81700),
+        ("call", 0x48ad74, 0xf590),
+        ("rip", 0x48ad80, 7, 3, 0xffb844),
+        ("rip", 0x48ad8b, 7, 3, 0x2ef8aa0),
+        ("imm", 0x48ad92, "ba01000000"),
+        ("imm", 0x48ada3, "48c78528ffffff27000000"),
+        ("call", 0x48adb6, 0xa81700),
+        ("call", 0x48adbe, 0xf590),
+        ("rip", 0x48adca, 7, 3, 0xffb86c),
+        ("rip", 0x48add5, 7, 3, 0x2ef8ad8),
+        ("imm", 0x48addc, "ba01000000"),
+        ("imm", 0x48aded, "48c78508ffffff1f000000"),
+        ("call", 0x48ae00, 0xa81700),
+        ("call", 0x48ae08, 0xf590),
+        ("rip", 0x48ae14, 7, 3, 0xffb88c),
+        ("rip", 0x48ae1f, 7, 3, 0x2ef8b10),
+        ("imm", 0x48ae26, "ba01000000"),
+        ("imm", 0x48ae37, "48c785e8feffff1e000000"),
+        ("call", 0x48ae4a, 0xa81700),
+        ("call", 0x48ae52, 0xf590),
+        ("rip", 0x48ae5e, 7, 3, 0xffb8ab),
+        ("rip", 0x48ae69, 7, 3, 0x2ef8b48),
+        ("imm", 0x48ae70, "ba01000000"),
+        ("imm", 0x48ae81, "48c785c8feffff20000000"),
+        ("call", 0x48ae94, 0xa81700),
+        ("call", 0x48ae9c, 0xf590),
+        ("rip", 0x48aea8, 7, 3, 0xffb8cc),
+        ("rip", 0x48aeb3, 7, 3, 0x2ef8b80),
+        ("imm", 0x48aeba, "ba01000000"),
+        ("imm", 0x48aecb, "48c785a8feffff20000000"),
+        ("call", 0x48aede, 0xa81700),
+        ("call", 0x48aee6, 0xf590),
+        ("rip", 0x48aef2, 7, 3, 0xffb8ed),
+        ("rip", 0x48aefd, 7, 3, 0x2ef8bb8),
+        ("imm", 0x48af04, "ba01000000"),
+        ("imm", 0x48af15, "48c78588feffff22000000"),
+        ("call", 0x48af28, 0xa81700),
+        ("call", 0x48af30, 0xf590),
+        ("rip", 0x48af35, 7, 3, 0x1604218),
+        ("rip", 0x48af3c, 7, 3, 0x48a250),
+        ("call", 0x48af46, 0xf8f390),
+        ("imm", 0x48af54, "4881c468010000"),
+        ("call", 0x48af62, 0xf8f3a0),
+    ],
+    "m6_callees": {
+        'named_record_ctor_a81700': (0xa81700, 190, "d1cd3b80f06fb1259fd898a474ba53bccf44eca8b9bc0c508b8df3b2e9c39411"),
+        'record_registry_push_a81840': (0xa81840, 265, "5b5f3c60b45197d5521030ce80c1de96ed4dc5540a6d1863798c4a2a6d7d5283"),
+        'vec_reserve_a82050': (0xa82050, 245, "def6d82b0c831bb693039b2cf3b92f338ee2c41b185148965f3d9ac201cd9831"),
+        'record_registry_ctor_a81b50': (0xa81b50, 34, "99b8398a9607e7e3870e3157958ca1ac8a5903b1dfad1cd959d2f70f43bd808f"),
+        'records_dtor_48a250': (0x48a250, 137, "d7e7cfa0478766a3114c3d090de8a35e770fcddfb6563de043d1b2e4a3341e94"),
+        'record_unregister_a81950': (0xa81950, 147, "db1c5f59ff06d01e4ac087fcd21bf8ae1c489fe0d985730f9d360fbbbe8d0845"),
+        'record_registry_dtor_a81b80': (0xa81b80, 138, "0bb33a6d2795d0a61b221e9012b6ee75e956c26545803d0c63399508b843d64f"),
+    },
+    "m6_extras": ['bp_atexit_imports'],
+    "native": {'header': 'native/core/ctor_slot_453_48ac10.hpp', 'source': 'native/core/ctor_slot_453_48ac10.cpp', 'test': 'native/tests/test_ctor_slot_453.cpp', 'consts': {'kSlot453Rva': 4762640, 'kSlot453Size': 856, 'kSlot453BoolFnTag': 0, 'kSlot453FloatFnTag': 0, 'kSlot453ItemFlags': 48, 'kSlot453VarFlags': 1, 'kSlot453BoolCount': 0, 'kSlot453FloatCount': 0, 'kSlot453UFloatFnTag': 0, 'kSlot453UFloatCount': 0, 'kSlot453IntFnTag': 0, 'kSlot453IntCount': 0, 'kSlot453LocalIntCount': 0, 'kSlot453UIntFnTag': 0, 'kSlot453UIntCount': 0, 'kSlot453CmdCount': 0, 'kSlot453StrVarCount': 0, 'kSlot453RowCount': 1, 'kSlot453StringCount': 0, 'kSlot453SliderCount': 0, 'kSlot453Object0Rva': 49252744, 'kSlot453CellCount': 0, 'kSlot453HolderCount': 0, 'kSlot453SentinelCount': 0, 'kSlot453RecsCount': 1, 'kSlot453RecordCount': 11, 'kSlot453RecsDtorRva': 4760144},
+        'header_tokens': ['std::size_t kSlot453RecNameLength[kSlot453RecordCount] = {0x20, 0x23, 0x25, 0x25, 0x27, 0x27, 0x1f, 0x1e, 0x20, 0x20, 0x22}', 'std::uint32_t kSlot453RecKind[kSlot453RecordCount] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1}', 'std::uint8_t kSlot453RecFlag[kSlot453RecordCount] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}', 'IDENTITY TAGS'], 'source_order': ['register_named_record_a81700(*cell, recs.rec[n], view, kSlot453RecKind[n], kSlot453RecFlag[n], alloc)', 'concmd.atexit_log.record(kRecordRegistryDtorRva, &cell->registry)', 'concmd.atexit_log.record(kSlot453RecsDtorRva, &recs)', 'objects.r00'], 'test_tokens': ['kSlot453Rva == 0x48ac10 && kSlot453Size == 856', 'section_constants()', 'section_alone()', 'section_failures()', 'CHECK(items == 0);', 'creg.atexit_log.size() == kSlot453RowCount - cells + kSlot453RecsCount);', 'CHECK(r.ok && creg.pending.size() == 0);']},
+}
+
+
+if __name__ == "__main__":
+    raise SystemExit(bp.main(SPEC, 'eleven named records and a group destructor'))

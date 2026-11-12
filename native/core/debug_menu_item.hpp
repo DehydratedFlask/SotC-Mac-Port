@@ -47,6 +47,8 @@ namespace sotc {
 
 inline constexpr std::uint64_t kDebugMenuItemFloatCtorRva = 0x27050;
 inline constexpr std::size_t kDebugMenuItemFloatCtorSize = 0xd0;
+inline constexpr std::uint64_t kDebugMenuItemFloatFromVarCtorRva = 0x27120;   // text = the target variable's own name view
+inline constexpr std::size_t kDebugMenuItemFloatFromVarCtorSize = 0xd2;
 inline constexpr std::uint64_t kDebugMenuItemToggleCtorRva = 0x26ea0;
 inline constexpr std::size_t kDebugMenuItemToggleCtorSize = 0xed;
 inline constexpr std::uint64_t kDebugMenuRegisterRva = 0x268b0;
@@ -140,6 +142,13 @@ struct DebugMenuTarget {
 // 0x272d0. `label` and `text` are copied with `lock inc` when they carry a control counter.
 [[nodiscard]] bool init_debug_menu_item_27050(DebugMenuItem& item, const SharedStr& label,
                                               const SharedStr& text, const void* target,
+                                              std::uint32_t flags, float range_min, float range_max) noexcept;
+
+// 0x27120 (0xd2 B): the 0x27050 stores with the text view copied from the TARGET VARIABLE's name view
+// (`vmovups 0x20(%rdx)`; `lock inc` of its control counter when non-null) instead of an explicit argument.
+// this=rdi, label=rsi, target=rdx, flags=ecx, min=xmm0, max=xmm1; tail-calls 0x268b0(this, [0x2dfd4b8]).
+// The target is any console variable object (name view at +0x20); it is only stored, never called.
+[[nodiscard]] bool init_debug_menu_item_27120(DebugMenuItem& item, const SharedStr& label, const ConCmdBase& target,
                                               std::uint32_t flags, float range_min, float range_max) noexcept;
 
 // 0x26ea0. `target` supplies the two virtual-slot results (see header).

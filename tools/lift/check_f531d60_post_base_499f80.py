@@ -2,7 +2,7 @@
 """ELF-tie Init 0x531d60 post-base continue call-site for 0x499f80.
 
 Private: needs local/re/eboot.elf. Pins 21 B fragment after Base Initialize
-return. Does NOT claim body of 0x499f80 (192 B) or subsequent Init leaves.
+return. E1034/E1426 execute the body in run_init_499f80_body; later leaves stay separate.
 """
 
 from __future__ import annotations
@@ -62,13 +62,13 @@ def main() -> int:
     nh = NATIVE.read_text()
     require("init_531d60_post_base_499f80" in nh, "API")
     require("kInit531d60PostBase499f80ArgOff" in nh, "arg off")
-    require("NOT modelled" in nh, "omission")
+    require("run_init_499f80_body" in nh and "E1034" in nh, "E1034 native body claim")
     require("post_base_499f80" in SLICE.read_text() or "PostBase499f80" in SLICE.read_text(), "wire")
 
     print(
         f"OK check_f531d60_post_base_499f80: frag={FRAG_SHA256[:12]}…; "
         f"arg=self+0x3c70; call {TARGET:#x}; end={END:#x}; "
-        f"499f80_body/56dcb0/140d90_body/14c2f0/6a5370 NOT claimed"
+        f"499f80 body native (E1034); 56dcb0/140d90_body/14c2f0/6a5370 NOT claimed"
     )
     return 0
 

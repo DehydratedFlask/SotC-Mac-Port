@@ -1,0 +1,28 @@
+#!/bin/sh
+# `te-freebuff`: TokenEconomizer inside a Freebuff session (see te_freebuff.py).
+#
+# TokenEconomizer needs Python 3.10+; this machine's /usr/bin/python3 is older, so the
+# interpreter is chosen explicitly. `TE_PYTHON` overrides the search.
+set -f
+self=$0
+dir=$(CDPATH= cd -- "${self%/*}" && pwd)
+export PYTHONUTF8=1
+
+pick() {
+  for py in "${TE_PYTHON:-}" python3.15 python3.14 python3.13 python3.12 python3.11 python3; do
+    [ -n "$py" ] || continue
+    command -v "$py" >/dev/null 2>&1 || continue
+    if "$py" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)' \
+        </dev/null >/dev/null 2>&1; then
+      printf '%s\n' "$py"
+      return 0
+    fi
+  done
+  return 1
+}
+
+py=$(pick) || {
+  echo "te-freebuff: Python 3.10+ is required; set TE_PYTHON to an interpreter" >&2
+  exit 1
+}
+exec "$py" "$dir/te_freebuff.py" "$@"

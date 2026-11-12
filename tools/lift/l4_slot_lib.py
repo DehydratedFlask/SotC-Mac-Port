@@ -169,6 +169,7 @@ def mutation_self_test(e: Elf, spec: dict, texts: dict[str, str]) -> tuple[int, 
         if (addr, size) == (spec["base"], spec["size"]):
             continue   # whole-body extent: covered by the body-hash mutation below
         for byte_addr in sorted({addr, addr + size - 1}):
+            e.overlay = {}   # read the pristine byte: a stale overlay from the previous mutant made xor-1 restore it
             pristine = e.raw(byte_addr, 1)[0]
             e.overlay = {byte_addr: pristine ^ 0x01}
             ran += 1

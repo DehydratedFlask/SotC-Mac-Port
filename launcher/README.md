@@ -28,6 +28,26 @@ executable with a thin ARM64 `MH_EXECUTE` header is accepted (the same check as 
 `<id> <command> [argument]` lines and reads one JSON response per request with a 5 s timeout;
 `CoreClientFactory` prefers it and falls back to `NativeCoreClient`.
 
+### Wire names for numeric statuses
+
+The C ABI reports subsystem and archive statuses as numbers; the in-process `NativeCoreClient` maps
+any number through `Status(code:)`, so an unrecognised code becomes `.unknown(N)`. The child transport
+carries the same information as text (`status` members of `sotc.core.coverage.v1` rows and
+`sotc.core.validate.v1` archives):
+
+| code | subsystem name | archive name |
+|---|---|---|
+| 0 / 1 / 2 / 3 | `not_implemented` / `partial` / `implemented` / `not_linked` | `ok` / `missing` / `unreadable` / `bad_magic` |
+| any other `uint32` N | `unknown:N` | `unknown:N` |
+
+`N` is canonical decimal: ASCII digits only, no sign, no leading zeros, within `0...4294967295`, and
+never a code that has a name (`unknown:1` is malformed, not `.unknown(1)`). A bare `unknown`, a
+different case, padding, or an out-of-range number is rejected by `ProcessCoreClient` as a malformed
+answer (`.internalError`), never coerced to a status. Encoder: `soc::status_json::{subsystem,archive}_status_name`
+(`native/app/core_status_json.cpp`, pinned in `native/tests/test_core_status_json.cpp`); decoder:
+`Status(wireName:)` in `ProcessCoreClient.swift` (pinned in `CoreWireStatusTests.swift` and
+`ProcessCoreClientTests.swift`). The golden table is duplicated in the two test files.
+
 Build and bundle the core with:
 
     cmake -S native -B local/build/launcher-release -DSOTC_SANITIZE=OFF -DCMAKE_BUILD_TYPE=Release

@@ -8,7 +8,8 @@
 // Prefer over empty-path migrate/non-null.
 //
 // Claimed: call-site control flow pin only.
-// NOT modelled: body of 0x1290. PR #5 cite-only.
+// The runtime uses the real init_1290 body with both containers and supplies this wrapper
+// only for call-site-only fixtures (E1426).
 #pragma once
 
 #include <cstddef>

@@ -13,25 +13,25 @@ call dispatcher needs before lifted code can call lifted code by guest address.
 
 | Metric | Value |
 |---|---|
-| Declared RVA constants | **1,549** |
-| Distinct guest RVAs | **1,052** |
-| Headers contributing | **399** |
-| RVAs claimed by more than one header | **329** |
+| Declared RVA constants | **3,017** |
+| Distinct guest RVAs | **1,932** |
+| Headers contributing | **583** |
+| RVAs claimed by more than one header | **455** |
 
 ## What the numbers mean
 
-- **951 distinct addresses is small against the program.** The CFG census
+- **1,910 distinct addresses is small against the program.** The CFG census
   ([CFG_CENSUS](CFG_CENSUS.md)) finds **55,790** unwind ranges in the same binary, so the current
-  native entry map covers on the order of 1–2 % of the executable. That is the honest scale of the
+  native entry map covers about 3 % of the executable. That is the honest scale of the
   lifting work done so far.
 - **Duplicates are expected and healthy.** Shared helpers are referenced by many modules: `0xf590`
-  is named by 24 headers, `0x17070` (allocation wrapper) by 11, and the `0x2ee2cf8` global cell by
+  is named by 54 headers, `0x17070` (allocation wrapper) by 13, and the `0x2ee2cf8` global cell by
   11 `vslot_40_533100_*` modules. The one vtable slot resolved by the indirect-frontier card
   (`0x20d60`) was already named by the ConCmd modules, which corroborates that it is a
   "register once" entry. A duplicate means "many units call this address", not "conflict".
 - **The table mixes code and data targets.** It records the literal constant each header uses; a
   `…Target` constant is usually a call target, a `…Cell`/`…Slot` constant is usually a global
-  address. Only 62 RVAs are named by a `Target`/`Rva`-style constant. Treating an entry as callable
+  address. Only 160 RVAs are named by a `Target`/`Rva`-style constant. Treating an entry as callable
   requires the owning module's checker, not this table.
 - **Concentration:** the Init body window `0x531d60..0x534100` alone contributes **273** distinct
   entries, so the per-instruction Init lifting dominates the map.

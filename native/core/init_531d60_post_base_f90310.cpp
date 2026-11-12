@@ -6,7 +6,7 @@ Init531d60PostBaseF90310Result init_531d60_post_base_f90310(
     const Init531d60PostBaseF90310Hooks& hooks) noexcept {
     Init531d60PostBaseF90310Result out{};
 
-    // OBS: call 0xf90310 (splash-hide PLT; body NOT modelled)
+    // OBS: call 0xf90310 (splash-hide PLT; runtime supplies a named host service, E1426)
     if (hooks.call_f90310 != nullptr) {
         hooks.call_f90310();
     }

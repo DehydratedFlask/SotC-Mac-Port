@@ -1,4 +1,1588 @@
+## 2026-11-12 — Init crash fixed; `0xa5d990` body executed natively (uncommitted)
+
+**State: green, uncommitted.** The 2026-11-10 tree was **red**: `sotc_init_window` aborted with
+ASan `SEGV on unknown address 0x0000012c4f51` and CTest was **701/702**. The native `0xa5cd90`
+body passed a config-string **original-image RVA** to its `0x994e70` hook as `const char*`, and
+the host hook called `snprintf("%s", ...)`. The RVA is an identity tag; the hook now takes
+`std::uintptr_t` and never dereferences it. The 2,709 B `0xa5d990` body then executes natively as
+a composition of the existing `engine_category_vars` loop and the `fmenu_ctors_slot306` menu
+ctors; the dead "Unnamed Categories" gate is recorded, not run.
+
+- **Observed run:** `sotc.init_window.v5`, `ok=true`, `post_chain_complete=true`,
+  `post_calls_complete=false`, `post_call_count=17`, **`post_calls_executed=16`**,
+  **`post_calls_blocked=1`**, 275 registry entries, status 0, boss flag `0xA7`,
+  `first_failed_stage=""`, stderr **0 B**.
+- **Native movement:** `0xa5d990` (`0xa5d990..0xa5e425`, sha `2e6a87f4…`, 500 instructions,
+  **64 direct calls, no indirect**) reports `mute=32 filter=32 toggles=0 stage=0 separators=2
+  commands=4 registered=6 destroys=6 dead_unnamed=1`. The span write-back matches the body's own
+  `addq $0xc8,0x8bd8(%rbx)`. `0xa5cd90` already ran natively; the crash had hidden it, so the
+  count moves **14 → 16** rather than 15 → 16.
+- **Explicit contracts:** the 32-entry category-name table is runtime data at `0x1604bf0` the host
+  does not have, so the real run passes null (`toggles=0`, fixture-covered); `0x272d0` is a
+  caller-owned hook; the `0x5b9f90` body remains absent.
+- **New checker catch:** `tools/lift/check_a5d990_body.py` rejected the first
+  "Unfilter All" command length (`0x10`); the body's own `movq $0x1c,-0x728(%rbp)` says `0x1c`.
+- **Verification:** full build **0**; runtime **0**, stderr **0 B**; full CTest **703/703**
+  (`init_a5d990_body` added); checker sweep **913 passed / 0 skipped / 0 failed**, exit **0**;
+  `check_a5cd90_body` OK (44 calls / 2 indirect / 6 strings / 2 table words);
+  `check_a5d990_body` OK (64 calls / dead gate / 15 strings); entry map
+  **3,017 constants → 1,932 RVAs / 583 headers (455 duplicates)**; project index **114,660
+  folders**; publish audit **OK** (staged and `--all`); attribution **OK**; **947 paths staged**.
+  Evidence `docs/checkpoints/2026-11-12-init-a5cd90-crash-a5d990-body.md`.
+- **Not claimed:** `post_calls_complete=false` (`0x5b9f90`, 46,881 B/7,685 insns, unlifted); no
+  callee closure, cold boot, audio, save/reload, Metal validation or forbidden-runtime absence.
+  G0/G1/G3/G4 **PARTIAL**; G2/G5/G6 **NOT RUN**.
+
+**Next exact action:** either bound `0x5b9f90` into executable sub-slices (the 46 KB menu/UI
+builder is not a single-session body) or take the next runtime gate after `0x532c1c`. Do not
+relabel the null name table or the caller-owned `0x272d0` as closure.
+
+## 2026-11-10 — Init `0x560b60` and `0x96f20` entries executed (uncommitted)
+
+**State: green, uncommitted.** The 803 B `0x560b60` collision/descriptor initializer and
+the 41 B `0x96f20` wrapper now execute in the real `0x531d60` run. `post_calls_executed`
+rises **12 → 14** and `post_calls_blocked` falls **5 → 3**; `post_5c64c0.cell` is no longer
+zero because the wrapper returns the host's observed 448-byte `0x97a50` object.
+
+- **Observed run:** `sotc.init_window.v5`, `ok=true`, `post_chain_complete=true`,
+  `post_calls_complete=false`, `post_call_count=17`, **`post_calls_executed=14`**,
+  **`post_calls_blocked=3`**, 275 registry entries, status 0, boss flag `0xA7`,
+  `first_failed_stage=""`.
+- **Native movement:** `0x560b60` (803 B, sha `9f67f04f…`) writes the 0x136f0 object
+  headers/ranges, allocates `0x2000`/`0x400`/`0x200` buffers, publishes the descriptor
+  globals, releases a previous object, stores the three callbacks, builds the three stack
+  descriptors, stores the `0x14c0f0` int/32-byte output, and implements the conditional
+  `0x95580` and final `0x56efb0` calls. The measured first run reports `calls=13`,
+  `allocs=4`, `prev_cleanup=false`, `global28=0`, non-null object and buffers. All 20
+  direct call sites are pinned; the cleanup and `0x95580` branches are fixture-covered.
+- **`0x96f20`:** the 41 B wrapper (sha `384d9d1f…`) forwards
+  `(a0,a1,1,1,a2,a3,0,0,0,0)` to `0x97a50` and returns its value. `0x97a50` (2,835 B,
+  sha `3e202117…`) is **not** lifted; the host contract allocates the observed 0x1c0-byte
+  object at `0x97af7` (448 B) and reports it. This is an explicit host seam, not a callee
+  body claim.
+- **Explicit contracts:** `0x560b60`'s descriptor, allocator/free, `0x3ca330`,
+  `0x273890`, `0x14c0f0`, `0xf590`, `0x56b540`, `0x95580` and `0x56efb0` are named host
+  seams; the body's stores and branches are native. `0x97a50`'s fields are not modelled.
+- **Residual blocked records (3):** `0xa5cd90`, `0xa5d990` and `0x5b9f90`; each has
+  observed args and a verbatim runtime diagnostic. `post_5c64c0.blocked=1` (only
+  `0x5b9f90`), `post_56dcb0.blocked=2` (`0xa5cd90`, `0xa5d990`); BSS hashes remain
+  `0x19edac14`/`0x75a104c5`/`0x8428e931`. Callee closure is still false because `0x97a50`
+  and the thirteen `0x560b60` helpers remain host seams.
+- **Verification:** full build **0**; focused test **0**; runtime **0**, stderr **0 B**;
+  full CTest **702/702**; checker sweep **911 passed / 0 skipped / 0 failed**, exit **0**;
+  entry map **2,983 constants → 1,910 RVAs / 581 headers (445 duplicates)**; project index
+  **114,652 folders**; publish audit **OK (4,110 paths)**; attribution **OK**;
+  `git diff --check` clean; **0 staged**. Evidence
+  `docs/evidence/2026-11-10-init-blockers-96f20-560b60.md`, checkpoint
+  `docs/checkpoints/2026-11-10-init-blockers-96f20-560b60.md`.
+- **Not claimed:** no callee closure (`post_calls_complete=false`), no cold boot, audio,
+  save/reload, Metal validation or forbidden-runtime/module absence. G0/G1/G3/G4
+  **PARTIAL**; G2/G5/G6 **NOT RUN**. No commit/tag/push.
+
+**Next exact action:** lift `0xa5cd90` or `0x5b9f90` with the same body/hook/checker
+standard; `0x97a50` needs a direct-call survey (55 calls) before its body can be claimed.
+Do not relabel the host seams or the 275-entry checkpoint as closure.
+
+## 2026-11-10 — Init `0x7f6f90` staffroll loader executed natively (uncommitted)
+
+**State: green, uncommitted.** The 656 B `0x7f6f90` staffroll text loader is native. In
+the real `0x531d60` run, both posted calls execute, `post_calls_executed` rises
+**10 → 12** and `post_calls_blocked` falls **7 → 5**. The body loads the remaster and
+original records through the explicit fallback contract because the absolute
+`/app0/CP3Shadow/...` files are absent.
+
+- **Observed run:** `sotc.init_window.v5`, `ok=true`, `post_chain_complete=true`,
+  `post_calls_complete=false`, `post_call_count=17`, **`post_calls_executed=12`**,
+  **`post_calls_blocked=5`**, 275 registry entries, status 0, boss flag `0xA7`,
+  `first_failed_stage=""`.
+- **Native movement:** `0x7f6f90` (656 B, sha `6b68dce8…`) formats
+  `/app0/CP3Shadow/%s`, uses `rb`, and implements the observed stdio fallback and
+  parser. The 37-token table at `0x15ce750` maps `CENTER_FULL_SCREEN` to index 19 and
+  `TARGET` to index 36; counts are at `0x326806c`, 16 B records at `0x3268080`,
+  `0x10000` mode stride, 4096 capacity. Both real calls report one record:
+  mode 0 `entries=1 index0=19 rest0=19 bytes=19`, mode 1
+  `entries=1 index0=36 rest0=7 bytes=7`; `fopen=false` for both.
+- **Explicit contracts:** `0x57cb70` is the original formatting wrapper, represented
+  by libc `snprintf`; stdio is libc. The four fallback calls
+  `0x56cdb0`/`0x56ceb0`/`0x56cec0`/`0x56ce60` are explicit host contracts. The
+  `0x7f721a -> 0xf8f3a0` stack-check site is pinned and never called. The original's
+  `strlen(remainder)+1` advance means one record per buffer; the retained text
+  allocation keeps each absolute `rest` pointer valid.
+- **Residual blockers (5):** `0xa5cd90`, `0xa5d990`, `0x560b60`, `0x5b9f90`, and
+  `0x96f20`/`0x97a50`; each has observed args and a verbatim runtime diagnostic.
+  `post_5c64c0.cell` remains `0x0` because `0x96f20` refused; BSS hashes remain
+  `0x19edac14`/`0x75a104c5`/`0x8428e931`.
+- **Verification:** focused build **0**; runtime **0**, stderr **0 B**; full CTest
+  **702/702**; checker sweep **909 passed / 0 skipped / 0 failed**, exit **0**; entry map
+  **2,967 constants → 1,894 RVAs / 579 headers (445 duplicates)**; project index
+  **114,651 folders**; publish audit **OK (4,110 paths)**; attribution **OK**;
+  `git diff --check` clean; **0 staged**. Evidence
+  `docs/evidence/2026-11-10-init-7f6f90.md`, checkpoint
+  `docs/checkpoints/2026-11-10-init-7f6f90.md`.
+- **Not claimed:** no callee closure (`post_calls_complete=false`), no cold boot, audio,
+  save/reload, Metal validation or forbidden-runtime/module absence. G0/G1/G3/G4
+  **PARTIAL**; G2/G5/G6 **NOT RUN**. No commit/tag/push.
+
+**Next exact action:** lift `0x96f20` + `0x97a50` (2,835 B, 10 args, 607 instructions,
+55 direct calls) with a full direct-call survey, or take the independent `0x944de0` /
+`0xa5cd90` branch; do not relabel the host contracts or the 275-entry checkpoint as
+closure.
+
+## 2026-11-09 — Init `0x5d5410` chain executed natively (uncommitted)
+
+**State: green, uncommitted.** The `0x5d5410` post-base group now runs native code. In the real
+`0x531d60` run, `post_calls_executed` rises **9 → 10** and `post_calls_blocked` falls
+**8 → 7**; `0x5d5410`, `0x8be60`, `0x8f520` and `0x8f1d0` all execute, and the measured path
+reaches none of the explicit host contracts.
+
+- **Observed run:** `sotc.init_window.v5`, `ok=true`, `post_chain_complete=true`,
+  `post_calls_complete=false`, `post_call_count=17`, **`post_calls_executed=10`**,
+  **`post_calls_blocked=7`**, 275 registry entries, status 0, boss flag `0xA7`,
+  `first_failed_stage=""`.
+- **Native movement:** `0x5d5410` (420 B, sha `f23ba618…`) loads owner `[0x2ed33f0]`,
+  configures two 0x30 B objects at `0x30015c8`/`0x30015f0` through `0x8be60` (547 B, sha
+  `95be6ad8…`), then writes three 16 B and three 8 B records through `0x8f520` (269 B, sha
+  `a3514fb4…`) and `0x8f1d0` (171 B, sha `59cb70a1…`). The observed state is nine qwords
+  `0x700793, 0xffffff00ffffffff, 0x820010001, 0x7007f7, 0xffffff00ffffffff, 0x20010001,
+  0x7007c3, 0xffffff00ffffffff, 0xffffffff61060106`; both objects report
+  `+0x04=0x100000` / `+0x0c=0x20077fac`.
+- **Explicit contracts:** `0x12820` is a bounded host arena (`host_5d_alloc`); `0x87f3e0 ->
+  0xf906d0` is a refusing platform-tail record (`host_5d_tail`). The measured path sets `a4`
+  bit 1, so it reaches neither. The compiler stack-check sites `0x8f628`/`0x8f276 ->
+  0xf8f3a0` are pinned and never called. The real `0x8be9e -> 0x8bf5e` `r15`-uninitialized
+  jump is refused by name.
+- **Residual blockers (7):** `0xa5cd90`, `0xa5d990`, `0x560b60`, `0x5b9f90`,
+  `0x96f20`/`0x97a50`, and `0x7f6f90`×2; each has observed args and a verbatim runtime
+  diagnostic. `post_5c64c0.cell` remains `0x0` because `0x96f20` refused; BSS hashes remain
+  `0x19edac14`/`0x75a104c5`/`0x8428e931`.
+- **Verification:** focused build **0**; runtime **0**, stderr **0 B**; full CTest
+  **702/702**; checker sweep **908 passed / 0 skipped / 0 failed**, exit **0**; entry map
+  **2,956 constants → 1,884 RVAs / 578 headers (445 duplicates)**; project index
+  **114,651 folders**; publish audit **OK (4,110 paths)**; attribution **OK**;
+  `git diff --check` clean; **0 staged**. Evidence
+  `docs/evidence/2026-11-09-init-5d5410.md`, checkpoint
+  `docs/checkpoints/2026-11-09-init-5d5410.md`.
+- **Not claimed:** no callee closure (`post_calls_complete=false`), no cold boot, audio,
+  save/reload, Metal validation or forbidden-runtime/module absence. G0/G1/G3/G4
+  **PARTIAL**; G2/G5/G6 **NOT RUN**. No commit/tag/push.
+
+**Next exact action:** lift `0x96f20` + `0x97a50` (2,835 B, 10 args, 607 instructions, 55 direct
+calls) with a full direct-call survey, or take the independent `0x944de0` / `0xa5cd90` branch;
+do not relabel the host contracts or the 275-entry checkpoint as closure.
+
+## 2026-11-09 — Init `0x946880` / `0x9469f0` lifted and measured (uncommitted)
+
+**State: green, uncommitted.** The smallest post-base blocker chain now executes native code. `0x946880` (353 B) and its invalid-handle callee `0x9469f0` (360 B) are native bodies with explicit call contracts; both observed values (`1`, `0`) reach the `0x9469f0` branch and return status 0.
+
+- **Observed run:** `sotc.init_window.v5`, `ok=true`, `post_chain_complete=true`, `post_calls_complete=false`, `post_call_count=17`, **`post_calls_executed=9`**, **`post_calls_blocked=8`**, 275 registry entries, status 0, boss flag `0xA7`, `first_failed_stage=""`.
+- **Native movement:** each `0x946880` invocation reports `status=0`, `took_9469f0=true`, `inner_ok=true`, `inner_calls=8`, `lock=0`. The inner body calls `0x986f30`, `0x987720`, `0x988400`×2, `0x9556a0`×2, `0x9878d0` and `0x987260`; the release block runs on every post-lock path. The query reports `field50=-1`, so the valid-handle `0x944de0` path stays a named 399 B contract. Service-id `-1` selects the `0x944de0(first=1)` branch, also a contract.
+- **Residual blockers (8):** `0xa5cd90`, `0xa5d990`, `0x560b60`, `0x5b9f90`, `0x96f20`/`0x97a50`, `0x5d5410`/`0x8be60`/`0x8f520`/`0x8f1d0`, and `0x7f6f90`×2; each has observed args and a verbatim runtime diagnostic. `post_5c64c0.cell` remains `0x0` because `0x96f20` refused; BSS hashes remain `0x19edac14`/`0x75a104c5`/`0x8428e931`.
+- **Verification:** focused build **0**; runtime **0**, stderr 0 B; full CTest **702/702**; checker sweep **908/0/0**; entry map **2,938 constants → 1,870 RVAs / 577 headers (443 duplicates)**; project index **114,651 folders**; publish audit **OK (4,110 paths)**; attribution **OK**; `git diff --check` clean; **0 staged**. Evidence `docs/evidence/2026-11-09-init-946880.md`, checkpoint `docs/checkpoints/2026-11-09-init-946880.md`.
+- **Not claimed:** no callee closure (`post_calls_complete=false`), no cold boot, audio, save/reload, Metal validation or forbidden-runtime/module absence. G0/G1/G3/G4 **PARTIAL**; G2/G5/G6 **NOT RUN**. No commit/tag/push.
+
+**Next exact action:** lift `0x944de0` (399 B) or one independent blocker chain (`0x96f20` + `0x97a50`, or `0x5d5410` + `0x8be60`/`0x8f520`/`0x8f1d0`); do not relabel the host service record or the 275-entry checkpoint as closure.
+
+## 2026-11-09 — Init post-base calls measured per invocation (uncommitted)
+
+**State: green, uncommitted.** The three lifted post-base bodies now emit a per-call trace. Each of their 17 invocations has a callee RVA, observed arguments and either a native execution result or a named refusal with its runtime diagnostic.
+
+- **Observed run:** `sotc.init_window.v5`, `ok=true`, `post_chain_complete=true`, `post_calls_complete=false`, `post_call_count=17`, `post_calls_executed=7`, `post_calls_blocked=10`, 275 registry entries, status 0, boss flag `0xA7`, `first_failed_stage=""`.
+- **Executed:** five one-byte `ret` bodies (`0x5ddcc0`/`0x5d57f0`/`0x5d5760`/`0x5d5700`/tail `0x5cf130`), the 174 B `0x5c91e0` data copy (`dst[0]=0x3f900000`, `dst[0x20]=0x3f800000`, `dst[0x24]=0x3f800000`) and the 14 B `0x5d06f0` query (host parent `[0x2ff59c0]+0x60` byte 0 -> return `0x0`).
+- **Blocked, with observed args and verbatim diagnostics:** `0xa5cd90` (1143 B/260 insns/46 calls; descriptor `0x101e7ac`/`0x30a`), `0x946880`×2 (353 B; values 1/0), `0xa5d990` (2709 B/500 insns; category loop only in `engine_category_vars`), `0x560b60` (803 B), `0x5b9f90` (46881 B/7685 insns), `0x96f20` (41 B wrapper around unmodelled `0x97a50`, 2835 B), `0x5d5410` (420 B; first nested `0x8be60`), `0x7f6f90`×2 (656 B; modes `(0,0x128b8ac)`/`(1,0x128b892)`).
+- **State:** `0x5c64c0` BSS hashes unchanged `0x19edac14`/`0x75a104c5`/`0x8428e931`; its cell is `0x0` because `0x96f20` refused. `0x7f7220` still selected the remaster/original path. `0x1290` remains 1/1 with one vcall; the five other one-byte sites and `0xf90310` remain as E1426.
+- **Verification:** build exit **0**; runtime exit **0**, stderr 0 B; full CTest **702/702**; checker sweep **908/0/0**, exit 0; entry map **2,929 constants → 1,861 RVAs / 576 headers**; project index **114,651 folders**, publish audit **OK (4,110 paths)**, attribution audit **OK**, diff clean. Evidence `docs/evidence/2026-11-09-init-post-calls.md`, checkpoints `docs/checkpoints/2026-11-09-init-post-calls.md` and `...-checker-repair.md`, E1427. **0 staged; no commit/tag/push.**
+- **Gate repair:** the first post-E1427 sweep failed **11/908** (ten stale `NOT modelled` checker assertions + stale entry map). The checkers now assert the E1426/E1034 native-body claims; the full sweep is green. This is a documentation/checker repair, not new runtime coverage.
+- **Not claimed:** no callee closure (`post_calls_complete=false`), no cold boot, audio, save/reload, Metal validation or forbidden-runtime/module absence. G0/G1/G3/G4 **PARTIAL**; G2/G5/G6 **NOT RUN**.
+
+**Next exact action:** lift the smallest complete blocker chain, `0x96f20` + `0x97a50` or `0x5d5410` + `0x8be60`/`0x8f520`/`0x8f1d0`; do not relabel the 275-entry checkpoint as callee closure.
+
+## 2026-11-09 — Init post-base chain executed natively (uncommitted)
+
+**State: green, uncommitted.** Every post-base Init call site now has an explicit executed native body or a named host seam; no `0x531d60` post-base site remains an unlabelled pin.
+
+- **Observed run:** `post_chain_complete=true`, `post_chain_blocked=""`, 275 registry entries, status 0, boss flag `0xA7`, `first_failed_stage=""`; `0x1290` A/B inserts 1/1 with one vcall; `0x56dcb0` 5 calls and descriptor `0x101e7ac`/`0x030a`; `0x5c64c0` 9 calls/tail with BSS hashes `0x19edac14`/`0x75a104c5`/`0x8428e931`; `0x7f7220` selected `(0,0x128b8ac)` and `(1,0x128b892)`; five one-byte-ret bodies (`0x56dca0` plus four) called once each; `0xf90310` splash-hide host call once.
+- **Explicit boundaries:** `0x56dcb0`'s four helpers, `0x5c64c0`'s eight helpers, `0x7f7220`'s query/set pair, the host source/BSS cells, `0x1290`'s singleton owners and the Sony `0xf90310` body remain host seams. No original RVA is executed. `0x499f80` remains as in E1425; `0xa56560`, capture services and the `0xa54920` descriptor vcalls remain as in E1424.
+- **Verification:** build exit **0**; runtime exit **0**, stderr 0 B; full CTest **702/702** (701 baseline + `init_post_bodies`); logs `local/validation/2026-11-09-init-post-chain-build3.log`, `...-runtime.json`, `...-ctest-final.log`; `git diff --check` clean; project index **114,651 folders** and publish audit **OK (4,110 paths)**; 0 staged. Evidence `docs/evidence/2026-11-09-init-post-chain.md`, checkpoint `docs/checkpoints/2026-11-09-init-post-chain.md`, E1426.
+- **Not claimed:** no cold boot, audio, save/reload, Metal validation or forbidden-runtime/module absence. G0/G1/G3/G4 **PARTIAL**; G2/G5/G6 **NOT RUN**. 0 staged; no commit/tag/push.
+
+**Next exact action:** take the next runtime gate (cold boot path) or lift one of the named host seams with real RE; do not start another constructor batch and do not relabel a host seam as a native body.
+
+## 2026-11-09 — Init `0x499f80` body executed natively (uncommitted)
+
+**State: green, uncommitted.** The first post-base Init callee is no longer a host no-op. The runtime supplies the lifted 193 B `0x499f80` body with `self+0x3c70`, host global cells, and explicit allocator/CritSec contracts; the body commits a real object and two buffers on the measured path.
+
+- **Observed run:** `ok=true`, 17 entry units, 275 registry entries, status 0, boss flag `0xA7`, `first_failed_stage=""`; `executed_body_calls["0x499f80"]=1`, `executed_body_ok["0x499f80"]=true`, `body_499f80_committed/object_live/buffer_a/buffer_b=true`, `cleanup_failures=0`, `stage=""`.
+- **Explicit boundaries:** `0x12820`/`0x12af0` allocator dispatch and `0x3b310`/`0x3b380` CritSec are host contracts/shims; the host global cells are stand-ins; the committed object is released in host teardown after observation. Only the first-commit branch ran; replacement remains fixture-covered. `0x56dcb0`/`0x5c64c0`/`0x1290`/`0x7f7220` stay call-site-only; `0xa56560`, capture services and the `0xa54920` descriptor vcalls remain as in E1424.
+- **Verification:** build exit **0**; runtime exit **0**; full CTest **701/701**; logs `local/validation/2026-11-09-init-499f80-build.log`, `...-runtime.log`, `...-full-ctest.log`. Evidence `docs/evidence/2026-11-09-init-499f80-body.md`, checkpoint `docs/checkpoints/2026-11-09-init-499f80-body.md`, E1425.
+- **Not claimed:** no cold boot, audio, save/reload, Metal validation or forbidden-runtime absence. G0/G1/G3/G4 **PARTIAL**; G2/G5/G6 **NOT RUN**. 0 staged; no commit/tag/push.
+
+**Next exact action:** execute the next post-base body (`0x56dcb0` 126 B, the already-lifted `0x1290` 195 B, or `0x7f7220`), not another constructor batch.
+
+## 2026-11-09 — Init window seams executed natively (uncommitted)
+
+**State: green, uncommitted.** The three bodies the E1423 runtime counted as host seams now execute. `sotc_init_window` runs `0xa473b0` (native capture body), `0xa54920` three times (native save-data/statistics model) and `0x54b250` (native stat-query wrapper); JSON reports per-body call counts/statuses and `stub_hooks` is empty.
+
+- **Observed run:** `ok=true`, entry `0x531d60`, checkpoint `0x532c1c`, 17 entry units, 275 registry entries, status 0, boss flag `0xA7`; `executed_body_calls` = `0xa473b0` 1, `0xa54920` 3, `0x54b250` 1; all three `executed_body_ok` true; capture step 5, video values 1/0; `savedata_refusal=0`, 9 counters and 9 menu items registered; stat engine called once with `arg2=2`.
+- **Inputs:** the three `0xa54920` calls use the real slot-428 save-name records (`CollectionProfile`, `ShadowProfile`, `ShadowProgress`) from `kSlot428SaveSpecs`; parent slots and the deque map are supplied natively. No invented prefixes.
+- **Explicit boundaries:** `0x54b250`'s un-lifted engine `0xa56560` is a host contract (1 call, `arg2=2`); capture platform services are host no-ops returning ok; the `0xa54920` model's five descriptor vcalls per call are caller-owned and counted, not dispatched. Remaining post-base callee bodies stay in the slice's `NOT modelled` list.
+- **Verification:** build exit **0**; runtime exit **0**; full CTest **701/701** passed; log `local/validation/2026-11-09-init-seams-full-ctest.log`. Evidence `docs/evidence/2026-11-09-init-window-seams-wired.md`, checkpoint `docs/checkpoints/2026-11-09-init-window-seams-wired.md`, E1424.
+- **Not claimed:** no cold boot, audio, save/reload, Metal validation or forbidden-runtime absence. G0/G1/G3/G4 **PARTIAL**; G2/G5/G6 **NOT RUN**. 0 staged; no commit/tag/push.
+
+**Next exact action:** take the next runtime gate (cold boot path) or lift `0xa56560`; no new constructor batch.
+
+## 2026-11-09 — Init window executed from native entry (uncommitted)
+
+**State: green, uncommitted.** The lifted startup Init window now has a real native entry. `sotc_init_window` calls `init_531d60_entry_gaps` first; its base callback runs the measured `run_appmain_init_ctor_98a90_slice`, and the driver requires the native registry body/remainder to reach `0x532c1c`.
+
+- **Observed run:** `ok=true`, entry RVA `0x531d60`, checkpoint `0x532c1c`, entry units **17**, entry base calls **1**, early/tail/ctor/base/post-base/continue_e/registry_tail/registry_body/remainder all true, registry body **64** units, registry entries **275**, registry status **0**, boss flag **0xA7**, `first_failed_stage=""`.
+- **Entry:** `native/core/init_window_runtime.{hpp,cpp}` + `native/app/sotc_init_window_main.cpp`; CMake target `sotc_init_window`, CTest `init_window_runtime`.
+- **Explicit boundaries:** the run invokes caller-owned `0xa473b0` (1), `0xa54920` (3) and `0x54b250` (1) hooks and names them in JSON. The post-base call-site callees remain in the slice header's `NOT modelled` list; control flow/state executes, their bodies do not. No hidden stub is claimed as a body.
+- **Verification:** build exit **0**; full CTest **701/701** passed, including `init_window_runtime`; logs `local/validation/2026-11-09-init-window-runtime.log`, `...-full-build.log`, `...-full-ctest.log`. Evidence: `docs/evidence/2026-11-09-init-window-runtime.md`, checkpoint `docs/checkpoints/2026-11-09-init-window-runtime.md`, E1423.
+- **Not claimed:** no cold game boot, audible game audio, save/reload, Metal validation or forbidden-runtime/module absence. G0/G1/G3/G4 stay **PARTIAL**; G2/G5/G6 **NOT RUN**. 0 staged, no commit/tag/push.
+
+**Next exact action:** replace the three explicit seams with real bodies (or the next runtime gate), not another constructor batch.
+
+## 2026-11-09 — Savedata grow `0xa586a0` lifted (uncommitted)
+
+**State: green, uncommitted.** The last savedata-family seam is now real code. `0xa586a0` no
+longer takes a host grow callback and no header still calls it fail-closed.
+
+- **`0xa586a0..0xa5880f` (367 B, sha256 `723d9b30…5b791f`)** is a **full 108-instruction lift**:
+  4 direct calls, 7 branches, 14 stores. The admitted map is 0x50 B (`+0x00` base, `+0x08`
+  capacity, `+0x28` current slot, `+0x48` last slot; cached `+0x18/+0x20/+0x38/+0x40`), blocks are
+  0x100 B. Mode 1 shifts used slots left by `max(requested, front/2)`; mode 0 shifts right by
+  `max(requested, free/2)`; otherwise it allocates `(capacity + max(capacity, requested) + 2) * 8`,
+  places the current slot after the mode-0 front gap, copies, frees the old base, and commits
+  base/capacity. Invalid maps are refused before a read; allocation/free failure leaves the map
+  unchanged and is reported.
+- **Callees are reused/proven, not duplicated.** `0x17090` (20 B, 4 insn, `jmp 0x12820`) and
+  `0x170c0` (10 B, 2 insn, `jmp 0x12af0`) are the existing `alloc_17090`/`free_170c0` models.
+  `0xf8f470` (6 B, 1 insn, bytes `ff25b20b6700`, GOT `0x1600028`) is `memcpy` (NID
+  `Q3VBxCXhUHs`); `0xf8f480` (6 B, 1 insn, bytes `ff25aa0b6700`, GOT `0x1600030`) is `memmove`
+  (NID `+P6FRGH4LfA`). The oracle checks both thunk bytes and NIDs, and the models call the ISO C
+  `std::memcpy`/`std::memmove`.
+- **Fixture:** front shift, back shift (two used slots), mode-1 allocation, mode-0 front gap,
+  allocation failure, failed old-base free with new-base cleanup, missing contract, null map and
+  invalid layout. **Oracle:** 9 windows (5 bodies + 4 callees), 340/340 normalized `0xa57d40 ==
+  0x482a90`, and **9 body + 9 header** tamper mutations rejected.
+- **Verification:** build exit **0**; focused CTest **7/7** (`savedata_family`,
+  `savedata_stats_a54920`, `alloc_wrappers_17070`, `rb_tree_482a90`, `ctor_slot_454`,
+  `registry_init_531d60`, `init_531d60_entry_gaps`); allocator oracle **0**; oracle **0**; tamper
+  self-test **0** (first run exposed only a harness
+  bug: the header tamper hit a comment before the constant; fixed by targeting `= 0x…;`). Coverage
+  `0xa586a0` **367/367 B (100.0%) before → 367/367 B (100.0%) after** — the old range was already
+  pinned, so this is a semantic replacement, not a byte-count gain; the two wrapper windows remain
+  **20/10 B**, the two import pins are new **0 → 6 B each**, prior windows **347/303/1,201/76 B**
+  and Init **3,500/3,500 B** are unchanged. Entry map **2,913 constants → 1,852 RVAs / 574 headers
+  (440 duplicates)**; publish-path audit OK (4,110 paths); project index **114,634 folders**;
+  `git diff --check` clean; **0 staged**. G1 stays **PARTIAL**; no guest byte was executed. No
+  subagent was used; the streams ran directly.
+
+**Next exact action:** wire the now-real `savedata_slot_alloc_a55050`,
+`savedata_tree_clear_a57c10` and `savedata_grow_a586a0` models into the `0xa54920` caller instead of
+its remaining `sibling_ctor`/`list_node_dtor`/`vector_grow` integration seams, then take the next
+ROADMAP runtime gate. Nothing is staged, committed, tagged or pushed.
+
+## 2026-11-09 — Savedata tree helpers: 0xa57d40 + 0xa58490 lifted (uncommitted)
+
+**State: green, uncommitted.** This pass completed the list lifecycle the previous checkpoint named
+as next: the two helpers `0xa57c10` calls are now real native models, and the cleanup no longer
+routes release through a host seam.
+
+- **`0xa57d40..0xa581f1` (1,201 B, sha256 `4f54c1a6…b3f2e`)** is a **full lift by delegation**: 340
+  instructions, 2 direct calls (`0x170b0`, `0xf8fc20`), 77 branches, 86 stores, one RIP operand
+  (`0x12c4741`). It is the admitted `0x482a90` erase: 340/340 normalized instructions match, both
+  call targets match, and the assert text is byte-identical (`invalid map/set<T> iterator`); only
+  relative encodings differ. `savedata_tree_erase_a57d40` therefore calls `rb_erase_482a90` rather
+  than duplicating a second rebalance.
+- **`0xa58490..0xa584dc` (76 B, sha256 `7003816a…43c24b`)** is a **full recursive lift**: 26
+  instructions, 2 direct calls (itself and `0x170b0`), 2 branches, 0 stores. It rejects the sentinel
+  (`+0x19`), recurses `+0x10`, frees through the tag-1 wrapper, then iterates `+0x00`. The fixture
+  reproduces the resulting release order 3,2,1 on a three-node tree and checks partial-release
+  failure reporting.
+- **`0xa57c10..0xa57d3f` (303 B, sha256 `6c03fcb0…fd029c`)** now calls the real `0xa58490` model.
+  Its first compare remains self-equal and the cleanup at `a57ceb..a57d11` remains the only
+  reachable path; a full disassembly scan found no branch or call into `a57c45..a57cff`, so the
+  traversal is dead code, not an unlifted hook. This is unchanged from E1420 except that its
+  release is now backed by real code.
+
+The reused RB model had a mirrored field layout; it is corrected in place to `+0x00 left / +0x08
+parent / +0x10 right / +0x18 colour / +0x19 nil` (header root at `header+0x08`) with the root
+rotations fixed. `rb_tree_482a90` and `ctor_slot_454` pass. Verification: focused CTest **4/4**;
+`check_savedata_family.py` exit **0** and self-test exit **0** with all five body-byte and all five
+header-RVA mutations rejected; coverage new windows **0 → 1,201 B** and **0 → 76 B (100.0%)**, prior
+savedata windows 347/303/367 B and Init 3,500/3,500 B unchanged; entry map **2,907 constants →
+1,848 RVAs / 574 headers (440 duplicates)**; `check_entry_map`, `check_g1_evidence_pack` and the
+publish-path audit (4,110 paths) pass; `git diff --check` clean; 0 staged. G1 stays **PARTIAL**; no
+guest byte was executed. No subagent was used this pass; the streams ran directly.
+
+**Next exact action:** recover the `0xa586a0` container layout and its four helpers
+(`0x17090`/`0x170c0`/`0xf8f470`/`0xf8f480`) to replace the grow contract, or take the next
+ROADMAP runtime slice. Nothing is staged, committed, tagged or pushed.
+
+## 2026-11-09 — Savedata family neighbours: two lifts + one fail-closed contract (uncommitted)
+
+**State: green, uncommitted.** The `0xa54920` unit left three default hooks at its boundary. This
+pass bounded and handled all three:
+
+- **`0xa55050..0xa551ab` (347 B, sha256 `062b16fd…a7456e`)** is now a **full native lift**: 98
+  instructions, no calls, eight `je`, one store. It reads cursor `0x32f88a0`, scans eight `0xb8`
+  slots at `parent+0x28` for a zero dword at `+0x14`, writes `idx+1` on a hit, and returns
+  `parent+0x28` without changing the cursor when full.
+- **`0xa57c10..0xa57d3f` (303 B, sha256 `6c03fcb0…fd029c`)** now has a **native reachable path**: 81
+  instructions, 3 direct calls, 12 branches, 9 stores. `a57c37..a57c3f` compares `rbx=[r13]` with
+  `[r13]`, so the first `je` always reaches the cleanup at `a57ceb..a57d11`; the second compare and
+  traversal `a57c45..a57cea` are dead from this entry and are documented rather than faked.
+- **`0xa586a0..0xa5880f` (367 B, sha256 `723d9b30…5b791f`)** is now a **precise fail-closed
+  contract**, not a placeholder: 108 instructions, 4 direct calls (`0x17090`/`0x170c0`/
+  `0xf8f470`/`0xf8f480`), 7 branches, 14 stores. Its container layout and helpers are unlifted, so
+  the model refuses unless the host supplies the grow hook; exact fields/calls are in the header.
+
+New files are `native/core/savedata_family.{hpp,cpp}`, `native/tests/test_savedata_family.cpp`,
+`tools/lift/trace_savedata_family.py` and `tools/lift/check_savedata_family.py`; `native/CMakeLists.txt`
+adds the source/test. `savedata_stats_a54920.hpp` no longer claims `0xa55050` is unlifted; its
+`sibling_ctor`/`vector_grow` remain caller integration seams. The fixture covers cursor 5→6, wrap
+7→1, full fallback, sentinel reset, null/refusal and grow success/refusal; the oracle pins all three
+bodies and rejects all three body-byte and header-RVA tamper modes. Build exit 0; focused CTest
+**2/2**; coverage per body **0 → 347/303/367 B (100.0%)**, Init unchanged **3,500/3,500 B**; entry
+map **2,902 constants → 1,844 RVAs / 574 headers (439 duplicates)**; `check_entry_map`,
+`check_g1_evidence_pack`, publish-path audit (4,110) and project index (114,634 folders) pass. G1
+stays **PARTIAL**; no guest byte was executed. Nothing staged, committed, tagged or pushed.
+
+**Next exact action:** lift `0xa57d40` then `0xa58490` so the `0xa57c10` traversal can be modelled
+honestly; that completes the list lifecycle. Otherwise recover the `0xa586a0` container layout and
+its four helpers before replacing the grow contract.
+
+## 2026-11-09 — Init body `0xa54920` modelled (1,840 B) (uncommitted)
+
+**State: green, uncommitted.** With no constructor row left, this pass took the largest unmodelled
+body on the Init path, `0xa54920` (`0xa54920..0xa55050`, 1,840 B, sha256
+`27c76ceb08e4aac8d9e67b1dfcdeb87c8833fa8e73ae4f56de2481c475167810`; called at `0x532a07`,
+`0x532a62`, `0x532ae2`). It is not the save-data hook: it builds three `0xd8` save-statistics
+counters, three `0x26ea0` "Save System" toggles, three deferred `0x272d0` atexit records, and the
+`0xa55050` sibling/list contract. It adds **no constructor row**; the registered/lifted counts stay
+573/573 and G1 stays **PARTIAL**.
+
+The model is `native/core/savedata_stats_a54920.{hpp,cpp}`. The counters reuse the existing
+`0x3a980` worker with ctor flags 1 and the newly admitted argument-functor table `0x15d1d80`
+(slots verified as `0xc720/0xc740/0xc760/0xc770`, added to `ctor_slots_322_334`). Each counter takes
+vptr `0x1594c08`, `+0x68 = +0xd0 = max_count` (first) or 0, a `0x20d60` registration, and replaces
+the caller's `+0x40/+0x48/+0x50` slot. The toggles use `%s Max Count`, `%s Saves Used`,
+`%s Save Mem Used (MB)` with the observed `snprintf` sizes `0xc/0xd/0x15`, range 1.0–10.0 and flags
+`0x30`; names use `save_%s_max_count` / `_saves_used` / `_mem_used` with sizes `0x11/0x12/0x10`,
+which truncate a `"save"` prefix exactly as the original. The `0xa55050` sibling is an explicit
+contract (default 0x100 B descriptor: sentinel `0x100000001`, type 2, head at `+0x38`, 5 vcalls),
+not a claim that its body is lifted; `0xa57c10` and the `0xa586a0` grow path are hooks.
+
+Evidence: `native/tests/test_savedata_stats_a54920.cpp` (counters, old-slot destruction, self-link,
+grow/refusals, previous head), `tools/lift/trace_a54920.py`, and
+`tools/lift/check_fsavedata_stats_a54920.py`. The listing pins 363 instructions, 42 direct + 11
+indirect calls, 13 branches, 73 stores, 7 literals and 10 RIP targets; the checker and its body/
+header tamper self-test exit 0. Build exit 0; focused CTest **4/4** (savedata + ctor_slot_334/486/
+489). Coverage measured through the project tool: callee window **0 B / 0.0% before → 1,840 B /
+100.0% after** (delta **+1,840 B / +100.0 pp**) (before obtained by temporarily renaming the header), Init window
+`0x531d60..0x532b0c` unchanged **3,500/3,500 B (100.0%)**. Entry map regenerated to **2,895
+constants → 1,840 distinct RVAs / 573 headers (437 duplicates)** and `check_entry_map`/`check_g1_
+evidence_pack` pass. Nothing staged, committed, tagged or pushed.
+
+**Next exact action:** measure and lift the `0xa55050` sibling body next (the one remaining contract
+this unit hooks), or take the next measured Init-path body; do not reread batch 13 or reopen slot 554.
+
+## 2026-11-08 — G1/startup-gap record sync after batch 13 (no code change)
+**State: records match the verified 573/573 tree; no commit, stage or push.**
+After BATCH49 closed slot 554, three records still described 554 as PARTIAL:
+`tools/lift/g1_evidence_pack.py` (`PARTIAL_SLOTS = {554}` plus three hardcoded prose branches), the
+generated `docs/G1_EVIDENCE.md` §4/changelog and its stale slot-445 "current cliff" paragraph, and
+`docs/STARTUP_GAP_SURVEY.md` (pre-batch-1 table). The generator now uses an empty partial set and
+`render_prose`/`render_ctor_check`/`render_coverage` state that every registered row is fully lifted;
+`survey_startup_gaps.py --write-doc` prints an explicit "no open constructor gap remains" line.
+Commands/results: `python3 tools/lift/g1_evidence_pack.py --write` → **573/573 rows, first gap
+-1/`0x0`, 0 remaining, 83 frontier rows / 32 targets (41 site-provable)**;
+`python3 tools/lift/survey_startup_gaps.py --write-doc` → **HEAD 460/573, working tree 573/573,
+113 gaps (0 open, 113 wired-uncommitted)**, exit 0 (`logs/survey_regen.log`);
+`python3 -I tools/lift/check_g1_evidence_pack.py` → OK (573/573). G1 stays **PARTIAL**: registration/
+lifting coverage is complete, but boot/audio/save/Metal gates remain open.
+Files changed: `tools/lift/g1_evidence_pack.py`, `tools/lift/survey_startup_gaps.py`,
+`docs/G1_EVIDENCE.md`, `docs/STARTUP_GAP_SURVEY.md`, `ROADMAP.md`, `HANDOFF.md`, `docs/TASKS.md`,
+`docs/EVIDENCE.md`, `docs/checkpoints/2026-11-08-g1-startup-record-sync.md`.
+**Next exact action:** with no constructor row left, inventory the Init `0x531d60` closure remainder
+(`0x499f80` and the `appmain_init_ctor_98a90` slice are already modelled) and register one bounded slice,
+or take `APP-01-NOTARIZED-DMG-01`, which needs signing/packaging.
+
+## 2026-11-08 — slot 554 batch 13 verified; slot 554 model complete (uncommitted)
+**State: batch 13 is implemented, integrated and fully verified in the working tree.** The model is
+`native/core/ctor_slot_554_batch13_8849d.{hpp,cpp}`: 31 block variables `0x2ebd7f8..0x2ebf0d0`
+(`0x18d8` B: 7 bool, 14 c300 float, 3 page-cell c580, 3 owned `0xd8` c580, 4 wrappers) plus the
+separate `0xd0` `option_unavailable` command at `0x2ebf0d0` (32 starts, `0x19a8` total).
+`native/tests/test_ctor_slot_554_batch13.cpp` passes, including direct assertions for the dummy
+149/59 and owned 175/41 masks. The oracle `tools/lift/check_ctor_slot_554_batch13.py` passes with
+body SHA-256 `16e9439f28767c3d1a49073201b02005113ec2638bdda8f32bf7124b6b5a910f`, 358 operand pins
+(all 161 direct calls + 197 RIP operands), and 720 ELF + 25 native mutants rejected.
+The mask evidence is a pinned-ELF store trace, not a shape guess: dummy writes from `0x20af0`
+(`+0x00`, `+0x18`, `+0x1c`, `+0x20..0x5f`), `0x20d80` (`+0x08..0x17`) and the site
+`0x8a584/0x8a587/0x8a5ac/0x8a5b4`; owned rows use `0xc580`'s stores plus the caller's
+`+0x68..0x6b` and `+0xd0..0xd3`. See `docs/checkpoints/2026-11-08-startup-slot-554-batch13-mask-trace.md`.
+Full native build PASSED; CTest **698/698 PASSED** after the mask assertion was added; coverage is
+`pending 1402 → 1434` and `atexit 2162 → 2194`. Entry map regenerated to **2,882 constants →
+1,829 distinct RVAs / 572 headers (436 duplicates)**. The first unbounded sweep completed
+**905 passed / 0 skipped / 1 failed** (stale `entry_map.json`); after regeneration the full rerun
+completed **906 passed / 0 skipped / 0 failed**, exit 0 (`logs/b13_sweep_green.log`). The six
+`0xc580` calls reconcile to six c580 starts; the 32 `0xf8f390` calls reconcile to 32 starts.
+No commit, stage or push. Tree is not clean: pre-existing modified/untracked work remains.
+
+## 2026-11-08 — TokenEconomizer installed for Freebuff sessions (TOOL-TE-FREEBUFF-01)
+
+**State: green, uncommitted; tooling only — no native/launcher change.** Task: install
+`microsoft/TokenEconomizer` and use it inside Freebuff, which has no plugin or hook protocol.
+Installed a pinned private checkout `local/tools/TokenEconomizer`@`264e7a7` plus a Freebuff host
+adapter in `tools/tokeneconomizer/` (`te-freebuff`, `te_freebuff.py`, `freebuff_host.py`,
+`sitecustomize.py`, `install.sh`); repo settings `microskills=envfacts toolprune=off
+loopguard=off repomap=off`. Usage is recorded in `AGENTS.md` ("TokenEconomizer (Freebuff host
+adapter)") and the install in `INSTALL_LOG.md`.
+
+Files changed: `tools/tokeneconomizer/*` (new), `AGENTS.md`, `INSTALL_LOG.md`, `HANDOFF.md`.
+Commands: `tools/tokeneconomizer/install.sh` (exit 0); `tools/tokeneconomizer/te-freebuff status`
+reports the `freebuff` host and its state dir; four fixture sessions in a throwaway repo promoted
+`absent_tool:nosetests` to ACTIVE (`fire=4/4`) and the fifth `start` printed it; `run -- false` →
+1, `run -- true` → 0. Evidence: `~/.tokeneconomizer/repos/repo-f6c4c4e224` (fixture state, since
+deleted with the fixture repo).
+
+Observation vs inference: **observed** — learn → promote → inject works through the adapter, and
+`te-freebuff` never calls a model. **Inferred/untested** — real Freebuff sessions will accumulate
+facts only where the agent runs commands through `te-freebuff run`; tool pruning cannot apply on
+this host. Remaining risk: upstream `main` moves (re-pin before trusting the adapter), and
+`sitecustomize.py` on the checkout root is how the plugin's detached fold sees the host. Next
+action: use `start`/`run`/`end` in the next working session and read `te-freebuff status` for the
+cost report. Attempt 1, PASSED (fixture). Native build/CTest untouched by this change.
+
+## 2026-11-08 — slot 554 (`0x6efe0`) batch 12 landed (36 objects)
+
+**State: green, uncommitted.** Build 0; CTest **697/697**; coverage **573/573 registered, 572 fully
+lifted + slot 554 PARTIAL (batches 1, 2a, 2b, the 2b continuation, and 3–12)**; no first gap.
+This unit is the 36 objects `0x2ebbbc8..0x2ebd7f8` (`0x1c30` B): seventeen `0xc0` bools, seventeen
+`0xd0` bounded floats on `0xc300` (page cells `+0x434..+0x470`; bounds `0..1`, `0..10`, `0..100`,
+`0..200`, `0..1000`, `-100000..100000`), and two `0xd0` unbounded wrappers `r_furStats` (`0x6e800`
+outer 0x190 sha `be9df394…` / `0x6ebe0` inner 0x160 sha `745ea214…`, getter/setter
+`0x6e990`/`0x6e9b0`, inner vptr `0x1597478`, final `0x15972d0`, tag `0x1597348`, dtor `0x54fe0`,
+page+`0x45c`) and `r_furDebugMode` (`0x6e9f0` outer 0x190 sha `f5ac8603…` / `0x6ede0` inner 0x160
+sha `dcc1b033…`, getter/setter `0x6eb80`/`0x6eba0`, inner vptr `0x1597510`, final `0x1597368`, tag
+`0x15973e0`, dtor `0x55020`, page+`0x464`). Body `[0x86052,0x8849d)` = `0x244b` B, sha256
+`634603b5c627d875d067453f32a541cd83a789b32a310c3eae071d8e210ec9ba`; 1,613 instructions, **180
+direct + 19 indirect** calls (72 `0xf590`, 36 `0xf8f390`, 36 `0x20d60`, 17 `0x20af0`, 17 `0xc300`
+and one each `0x6e800`/`0x6e9f0`; the 19 indirect are 17 float functor destroys + 2 wrapper view
+destroys), **518 stores (191 object + 327 stack)**, no branch. Byte maps: bool **162/30**, float
+**171/37**, wrapper **195/13**; batch **6,051 written / 1,165 holes** of `0x1c30`. All 36 name strings
+from the `0xf9c749` table match their blocks, from `r_pixelSizeOverrideEnable` through
+`r_furAirResist`; the next name `r_furWaterResist` starts at `0xf9ca33`. ELF corrections: the
+inherited body end `0x8849d` is correct (it holds batch 13's `leaq` of `0x2ebd7f8`); the inherited
+last object start `0x2ebd728` is correct but the block ends at `0x2ebd7f8`; the inherited 199 calls
+and 148 stores are wrong — measured 180 direct + 19 indirect calls and 518 strict stores (191 object
++ 327 stack). Fixture `test_ctor_slot_554_batch12` covers every field, 36 registrations/atexit rows,
+72 inert views, two wrapper calls carrying their RVAs, two view destroys, the 1,165-hole sentinel
+sweep, fail-closed stages (wrapper-call refusal stops at `built == 30`; view-destroy refusal fires
+after the first call) and byte-identical replay; `check_ctor_slot_554_batch12.py` OK (459 operand
+pins, body/callee hashes including both wrappers and getters/setters, 1,027 ELF + 99 native mutants;
+both tamper modes exit 1). Batches 1 + 2a + 2b + 2b-cont + 3–12: `0x18ec0` body bytes / `0x14910`
+object bytes, **70,186 written / 14,054 holes**, 404 registrations/atexit rows. Coverage **573/573
+registered, 572 fully lifted + 554 PARTIAL**; CTest **697/697**; pending **1402**, atexit **2162**,
+menu **440**; entry map **2,861 -> 1,824 RVAs / 571 headers (432 duplicates)**; G1 **OK 573/573**; project index **113,055**; path
+audit **OK**; attribution **OK**; full sweep **905 passed / 0 skipped / 0 failed**. Guest bytes NOT
+executed. Next open unit: batch 13, body starts at `0x8849d`; first object `0x2ebd7f8`, second
+`0x2ebd8c8` at `0x885ab`; name table continues at `r_furWaterResist` (`0xf9ca33`); its 32-object
+count and body end `0x8a618` were subsequently measured: 31 block variables plus the separate
+`0xd0` dummy, `0x19a8` total stride (see the batch-13 measurement section above).
+
+## 2026-11-08 — slot 554 (`0x6efe0`) batch 11 landed (36 objects)
+
+**State: green, uncommitted.** Build 0; CTest **696/696**; coverage **573/573 registered, 572 fully
+lifted + slot 554 PARTIAL (batches 1, 2a, 2b, the 2b continuation, and 3–11)**; no first gap.
+This unit is the 36 objects `0x2eb9ee8..0x2ebbbc8` (`0x1ce0` B): six `0xc0` bools, twenty-six
+`0xd0` bounded floats on `0xc300` (page cells `+0x394..+0x40c`; bounds `0..0.05`, `0..0.1`, `0..1`,
+`0..2`, `0..10`, `0..100`), three `0xd0` bounded dwords on `0xc580` with page-cell value refs
+(`r_aaForceJitterIndex` page+`0x3b4`, `-1..100`; `r_forceViewportHeightForPixelSizeCalc`
+page+`0x42c`, `-1..2160`; `r_forceLod` page+`0x430`, `-1..10`) and one `0xd0` wrapper `r_aaMethod`
+(`0x6e4d0` outer 0x190 sha `332bde1c…` / `0x6e660` inner 0x160 sha `09f5a105…`, inner vptr
+`0x1596600`, final `0x1597258`, tag `0x1597238`, dtor `0x54fa0`, page+`0x3a8`, bounds `0..1`).
+Body `[0x83ad1,0x86052)` = `0x2581` B, sha256
+`0f7577aea5c97031cbb980639f39465d633ed3ddba4e3667a043da524873e848`; 1,670 instructions, **179
+direct + 30 indirect** calls (26 float + 3 dword functor destroys + 1 wrapper view destroy), **508
+stores (112 object + 396 stack)**, no branch. Call histogram: `0xf590` 72, `0xf8f390` 36, `0x20d60`
+35, `0xc300` 26, `0x20af0` 6, `0xc580` 3, `0x6e4d0` 1. All 36 name strings from the `0xf9c396` table
+match their blocks, from `r_ui_HdrConsistentUIWhitePoint` through `r_forceLod`. Byte maps: bool
+**162/30**, float **171/37**, dword **171/37**, wrapper **195/13**; batch **6,126 written / 1,266
+holes** of `0x1ce0`. ELF corrections: the inherited object row ended at `0x2ebbaf8` (the last
+object's start); the measured block ends at `0x2ebbbc8`, which `0x86052`'s batch-12 `leaq` names.
+The inherited 209 calls are 179 direct + 30 indirect; the inherited 64 "direct stores" is not a
+store count (112 object stores, 508 including stack). The strict store rule (mov-family memory
+writes + all `vmovups`) recounts batch 10 at 497/119/378; batch 10's fixture, oracle, plan and
+evidence are corrected from the landed 481/119/362 (16 stack writes short). Fixture
+`test_ctor_slot_554_batch11` covers every field, 36 registrations/atexit rows, 72 inert views, one
+wrapper call carrying its RVA, one view destroy, the 1,266-hole sentinel sweep, fail-closed stages
+(wrapper-call refusal stops at `built == 7`; view-destroy refusal fires after the call) and
+byte-identical replay; `check_ctor_slot_554_batch11.py` OK (484 operand pins, body/callee hashes
+including wrapper/inner/c580, 1,067 ELF + 84 native mutants; both tamper modes exit 1). Batches 1 +
+2a + 2b + 2b-cont + 3–11: `0x16a75` body bytes / `0x12ce0` object bytes, **64,135 written / 12,889
+holes**, 368 registrations/atexit rows. Coverage **573/573 registered, 572 fully lifted + 554
+PARTIAL**; CTest **696/696**; pending **1366**, atexit **2126**, menu **440**; entry map **2,835 ->
+1,812 RVAs / 570 headers** (431 duplicates); G1 **OK 573/573**; project index **111,567**; path
+audit **OK**; attribution **OK**; full sweep **904 passed / 0 skipped / 0 failed** (exit 0). Guest bytes NOT executed. Next open
+Batch 12 is closed (above): measured body `[0x86052,0x8849d)`, objects
+`0x2ebbbc8..0x2ebd7f8`, 180 direct + 19 indirect calls and 518 strict stores.
+
+## 2026-11-08 — slot 554 (`0x6efe0`) batch 10 landed (36 objects)
+
+**State: green, uncommitted.** Build 0; CTest **695/695**; coverage **573/573 registered, 572 fully
+lifted + slot 554 PARTIAL (batches 1, 2a, 2b, the 2b continuation, and 3–10)**; no first gap.
+This unit is the 36 objects `0x2eb8218..0x2eb9ee8` (`0x1cd0` B): seven `0xc0` bools, twenty-two
+`0xd0` bounded floats on `0xc300`, four `0xd0` unbounded floats on `0x6aa00`, two `0xd0`
+unbounded ints on `0x3a980` and one `0xd0` wrapper `r_fullscreenBlurEnabled` (`0x6e140` outer
+0x190 sha `6e4377a8…` / `0x6e2d0` inner 0x160 sha `f9b81604…`, inner vptr `0x1596598`, final
+`0x15971d0`, tag `0x15971a0`, dtor `0x54f60`, page+`0x4d0`, bounds `0..2`). Body
+`[0x8160c,0x83ad1)` = `0x24c5` B, sha256
+`94191f4eb264bb0c1b9230a3ed65b266b3e45b8d8eb8a97ca2c5cb49059dd27b`; 1,641 instructions, **179
+direct + 29 indirect** calls (22 bounded + 4 unbounded float + 2 int functor destroys + 1 wrapper
+view destroy), **497 stores (119 object + 378 stack; strict recount, correcting the landed 481/119/362)**, no branch. Call histogram: `0xf590` 72,
+`0xf8f390` 36, `0x20d60` 35, `0xc300` 22, `0x20af0` 7, `0x6aa00` 4, `0x3a980` 2, `0x6e140` 1.
+Byte maps: bool **162/30**, bounded float **171/37**, unbounded float **165/43**, int **165/43**,
+wrapper **195/13**; batch **6,081 written / 1,295 holes**. ELF corrections: the inherited object-row
+end `0x2eb9e18` is the last object's start; the block ends at `0x2eb9ee8` (= body end). The
+inherited 208 calls are 179 direct + 29 indirect; the inherited 84 "direct stores" is not a store
+store count (119 object; 497 including stack under the strict recount). Fixture `test_ctor_slot_554_batch10` covers every field,
+36 registrations/atexit rows, 72 inert views, one wrapper call carrying its RVA, one view destroy,
+the 1,295-hole sentinel sweep, fail-closed stages (wrapper-call refusal stops at `built == 24`;
+view-destroy refusal fires after the call) and byte-identical replay;
+`check_ctor_slot_554_batch10.py` OK (475 operand pins, body/callee hashes, 1,051 ELF + 87 native
+mutants; both tamper modes exit 1). Batches 1 + 2a + 2b + 2b-cont + 3–10: `0x144f4` body bytes /
+`0x11000` object bytes, **58,009 written / 11,623 holes**, 332 registrations/atexit rows. Coverage
+**573/573 registered, 572 fully lifted + 554 PARTIAL**; CTest **695/695**; pending **1330**, atexit
+**2090**, menu **440**; entry map **2,816 -> 1,807 RVAs / 569 headers** (430 duplicates); G1 **OK
+573/573**; project index **110,081**; path audit **OK**; attribution **OK**; full sweep **903
+passed / 0 skipped / 0 failed**. Guest bytes NOT executed. Next open unit: batch 11, body
+`0x83ad1..` (start measured; `0x83ad1` holds the `leaq` of `0x2eb9ee8`), objects from `0x2eb9ee8`;
+its last object start is inherited `0x2ebbaf8`, so the block end must be measured, not inherited.
+
+## 2026-11-08 — slot 554 (`0x6efe0`) batch 9 landed (36 objects)
+
+**State: green, uncommitted.** Build 0; CTest **694/694**; coverage **573/573 registered, 572 fully
+lifted + slot 554 PARTIAL (batches 1, 2a, 2b, the 2b continuation, and batches 3–9)**; no first gap.
+This unit is the 36 objects `0x2eb6538..0x2eb8218` (`0x1ce0` B): six `0xc0` bools, twenty-eight
+`0xd0` bounded floats on `0xc300` (final vptr `0x15943c0`, arg-fn `0x1596878`, class vtable
+`0x1594318`, atexit `0xad30`), and two `0xd0` wrappers: `r_showRenderSettings` (`0x6da20` outer
+0x190 sha `b79c31c0…` / `0x6dbb0` inner 0x160 sha `68e035…`, inner vptr `0x15964a8`, final
+`0x15970a0`, tag `0x1597070`, dtor `0x54ee0`, page+`0x2ec`, bounds `0..2`) and
+`r_showRenderSettingsValues` (`0x6ddb0` outer 0x190 sha `22b2d5d2…` / `0x6df40` inner 0x160 sha
+`0c5e56…`, inner vptr `0x1596520`, final `0x1597138`, tag `0x1597108`, dtor `0x54f20`,
+page+`0x2f0`, bounds `0..1`). Body `[0x7f098,0x8160c)` = `0x2574` B, sha256
+`d3b8db529400729e574b4dc3d1e000b515123b58439efdaa5c41b5160fcbc6f6`; 1,660 instructions, **178
+direct + 30 indirect** calls (28 float functor destroys + 2 wrapper view destroys), **506 stores
+(110 object + 396 stack)**, no branch of any kind. Call histogram: `0xf590` 72, `0xf8f390` 36,
+`0x20d60` 34, `0xc300` 28, `0x20af0` 6, `0x6da20` 1, `0x6ddb0` 1. Byte maps: bool **162/30**,
+float **171/37**, wrapper **195/13**; batch **6,150 written / 1,242 holes**. ELF corrections: the
+inherited object-row end `0x2eb8158` is the last object's start; the real block ends at
+`0x2eb8218` (batch 10's first `leaq`). The body end `0x8160c` is confirmed by that same `leaq`. The
+inherited 208 calls are 178 direct + 30 indirect; the inherited 58 "direct stores" is not a store
+count (110 object stores, 506 including stack). Fixture `test_ctor_slot_554_batch9` covers every
+field, 36 registrations/atexit rows, 72 inert views, two wrapper calls carrying their own RVAs, two
+view destroys, the 1,242-hole sentinel sweep, fail-closed stages (wrapper-call refusal stops before
+the call; view-destroy refusal fires after it) and byte-identical replay;
+`check_ctor_slot_554_batch9.py` OK (428 operand pins, body/callee hashes, 949 ELF + 78 native
+mutants; both tamper modes exit 1). Batches 1 + 2a + 2b + 2b-cont + 3 + 4 + 5 + 6 + 7 + 8 + 9:
+`0x1202f` body bytes / `0xf330` object bytes, **51,928 written / 10,328 holes**, 296
+registrations/atexit rows. Coverage **573/573 registered, 572 fully lifted + 554 PARTIAL**; CTest
+**694/694**; pending **1294**, atexit **2054**, menu **440**; entry map **2,796 -> 1,802 RVAs / 568
+headers** (429 duplicates); G1 **OK 573/573**; project index **108,597**; path audit **OK 4,110
+paths**; attribution **OK**; full sweep **902 passed / 0 skipped / 0 failed**. Guest bytes NOT
+executed. Next open unit: batch 10, body `0x8160c..` (start measured), objects from `0x2eb8218`;
+its object-row end must be measured, not inherited.
+
+## 2026-11-08 — slot 554 (`0x6efe0`) batch 8 landed (36 objects)
+
+**State: green, uncommitted.** Build 0; CTest **693/693**; coverage **573/573 registered, 572 fully
+lifted + slot 554 PARTIAL (batches 1, 2a, 2b, the 2b continuation, and batches 3–8)**; no first gap.
+This unit is the 36 objects `0x2eb4868..0x2eb6538` (`0x1cd0` B): seven `0xc0` bools, twenty-six
+`0xd0` bounded floats on `0xc300` (final vptr `0x15943c0`, arg-fn `0x1596878`, class vtable
+`0x1594318`, atexit `0xad30`), and three `0xd0` wrappers: `r_waterDebugDraw` (`0x6c850` outer 0x190
+sha `e5e882ab…` / `0x6c9e0` inner 0x160 sha `182cec86…`, inner vptr `0x1596250`, final `0x1596da8`,
+tag `0x1596d78`, dtor `0x54da0`, page+`0x270`, bounds `0..5`) and `r_tonemapMethodSDR`/`HDR`
+(`0x6d690` outer 0x190 sha `6108d972…` / `0x6d820` inner 0x160 sha `1fc5b407…`, inner vptr
+`0x1596430`, final `0x1597008`, tag `0x1596fd8`, dtor `0x54ea0`, page+`0x290`/`0x294`, bounds `0..5`).
+Body `[0x7cb5b,0x7f098)` = `0x253d` B, sha256
+`ff7cbbd941da544771e5212252595b1a0be8477d85ac8d3914b11455ea79d9bb`; 1,659 instructions, **177
+direct + 29 indirect** calls (26 float functor destroys + 3 wrapper view destroys), **505 stores
+(115 object + 390 stack)**, no branch of any kind. Call histogram: `0xc300` x26, `0x20af0` x7,
+`0x20d60` x33, `0x6c850` x1, `0x6d690` x2, `0xf590` x72, `0xf8f390` x36. Byte maps: bool **162/30**,
+float **171/37**, wrapper **195/13**; batch **6,165 written / 1,211 holes**. ELF corrections: the
+inherited object-row end `0x2eb6468` is the last object's start; the real block ends at `0x2eb6538`
+(batch 9's `leaq`). The inherited 206 calls are 177 direct + 29 indirect; the inherited 62 "direct
+stores" is not a store count (115 object stores, 505 including stack); the inherited body size
+`0x1cd0` is the object byte count, the measured body is `0x253d`. Fixture
+`test_ctor_slot_554_batch8` covers every field, 36 registrations/atexit rows, 72 inert views, three
+wrapper calls carrying their own RVAs, three view destroys, the 1,211-hole sentinel sweep,
+fail-closed stages (wrapper-call refusal stops at `built == 2`; view-destroy refusal fires after the
+wrapper call) and byte-identical replay; `check_ctor_slot_554_batch8.py` OK (423 operand pins,
+body/callee hashes, 939 ELF + 78 native mutants; both tamper modes exit 1). Batches 1 + 2a + 2b +
+2b-cont + 3 + 4 + 5 + 6 + 7 + 8: `0xfabb` body bytes / `0xd650` object bytes, **45,778 written /
+9,086 holes**, 260 registrations/atexit rows. Coverage **573/573 registered, 572 fully lifted + 554
+PARTIAL**; CTest **693/693**; pending **1258**, atexit **2018**, menu **440**; entry map **2,776 ->
+1,794 RVAs / 567 headers** (428 duplicates); G1 **OK 573/573**; project index **107,115**; path audit
+**OK 4,110 paths**; attribution **OK**; full sweep **901 passed / 0 skipped / 0 failed**. Guest bytes
+NOT executed. Next open unit: batch 9, body `0x7f098..` (start measured), objects from `0x2eb6538`;
+its inherited object-row end is the last object's start.
+
+## 2026-11-08 — slot 554 (`0x6efe0`) batch 7 landed (36 objects)
+
+**State: green, uncommitted.** Build 0; CTest **692/692**; coverage **573/573 registered, 572 fully
+lifted + slot 554 PARTIAL (batches 1, 2a, 2b, the 2b continuation, and batches 3, 4, 5, 6 and 7)**;
+no first gap. This unit is the 36 objects `0x2eb2ba0..0x2eb4868` (`0x1cc8` B): nine `0xc0` bools
+(base `0x20af0`, mid `0x15940b0`, final `0x1594348`, tag `0x1596898`, atexit `0xacf0`), nineteen
+`0xd0` bounded floats on `0xc300` (final vptr **`0x15943c0`**, arg-fn `0x1596878`, class vtable
+`0x1594318`, atexit `0xad30`), four `0xd0` unbounded ints on `0x3a980` (final `0x1594438`, arg-fn
+`0x1596858`, atexit `0xad70`), three `0xd8` **object-hosted** bounded dwords on `0xc580` (no page
+cell: the ctor is handed `object+0xd0`; final `0x1594c08` = table `0x1594bf8` + `0x10`, atexit
+`0x18a60`, bounds `0..0x10`) and one `0xd0` wrapper `fog_superSampleMode` (`0x6d300` outer 0x190
+sha `da3a787b…` / `0x6d490` inner 0x160 sha `1a761e29…`, inner vptr `0x15963a8`, final `0x1596f70`,
+tag `0x1596f40`, dtor `0x54e60`, page+`0x1f8`, bounds `0..2`). Body `[0x7a68c,0x7cb5b)` = `0x24cf` B
+sha `33c4a4266ddd…`; 1,631 instructions, **179 direct + 27 indirect** (19 float functor destroys,
+four int destroys, three dword destroys, one wrapper view destroy), **508 stores (137 object, 371
+stack)**, no branch of any kind; call histogram `0xc300` x19, `0xc580` x3, `0x3a980` x4, `0x20af0`
+x9, `0x20d60` x35, `0x6d300` x1, `0xf590` x72, `0xf8f390` x36. Byte maps: bool **162/30**, float
+**171/37**, int **165/43**, dword **175/41**, wrapper **195/13**; batch **6,087 written / 1,281
+holes**. Four ELF corrections to the inherited table: the object block ends at `0x2eb4868`
+(`0x2eb47a8` is the last object's start and `0x2eb4868` holds batch 8's `leaq`, so there is no pad
+byte); the column's 206 calls are 179 direct + 27 indirect (206 is the total); its 88 "direct
+stores" is not a store count — the real object stores are 137 (508 including stack); and the three
+`_Cinematic`/`_BasePS4`/`_Perf` dwords have no page cell because `0xc580` receives the
+object-hosted `+0xd0` cell. New module `ctor_slot_554_batch7_7a68c.{hpp,cpp}`; fixture
+`test_ctor_slot_554_batch7`; oracle `check_ctor_slot_554_batch7.py` (**425 operand pins**,
+body/callee hashes, **943 ELF + 89 native mutants rejected**; both tamper modes exit 1). Batches 1 +
+2a + 2b + 2b-cont + 3 + 4 + 5 + 6 + 7 cover `0xd57e` body bytes and `0xb980` object bytes, **39,613
+written / 7,875 holes**, 224 registrations and 224 atexit rows. Coverage counters pending 1186 ->
+**1222**, atexit 1946 -> **1982**, menu **440**; entry map **2,756 constants -> 1,789 RVAs / 566
+headers** (424 duplicates); G1 **OK 573/573**; path audit **OK**; attribution **OK**; project index
+**107,113**; full sweep **pending at write time** (started against `local/build/b38`). Guest bytes
+NOT executed. No boot/audio/Metal/save claim. **Next open unit:** batch 8, 36 objects starting
+`0x2eb4868` (**measured**: it is batch 7's block end and batch 8's first `leaq` target), body
+`[0x7cb5b, …)` whose **start `0x7cb5b` is measured** (batch 7 ends on `callq 0xf8f390` at `0x7cb56`)
+and whose inherited end `0x7f098`, inherited size `0x1cd0` and inherited block end `0x2eb6538` are
+**not measured**.
+
+## 2026-11-08 — slot 554 (`0x6efe0`) batch 6 landed (36 objects)
+
+**State: green, uncommitted.** Build 0; CTest **691/691**; coverage **573/573 registered, 572 fully
+lifted + slot 554 PARTIAL (batches 1, 2a, 2b, the 2b continuation, and batches 3, 4, 5 and 6)**; no
+first gap. This unit is the 36 objects `0x2eb0f10..0x2eb2ba0` (`0x1c90` B): eleven `0xc0` bools,
+twenty-two `0xd0` bounded floats on `0xc300` (final vptr `0x15943c0`, arg-fn `0x1596878`, class
+vtable `0x1594318`, atexit `0xad30`) and three `0xd0` wrappers — `r_rainDebugDraw` (`0x6c850` outer
+0x190 / `0x6c9e0` inner 0x160, inner vptr `0x1596250`, final `0x1596da8`, tag `0x1596d78`, dtor
+`0x54da0`, page+`0x194`, bounds `0..5`), `AO_Mode` (`0x6cbe0`/`0x6cd70`, inner `0x15962b8`, final
+`0x1596e30`, tag `0x1596e10`, dtor `0x54de0`, page+`0x19c`, bounds `0..3`) and `BakedAOMode`
+(`0x6cf70`/`0x6d100`, inner `0x1596330`, final `0x1596ec8`, tag `0x1596ea8`, dtor `0x54e20`,
+page+`0x1a0`, bounds `0..1`). Body `[0x781c5,0x7a68c)` = `0x24c7` B sha `6885fb038c46…`; 1,636
+instructions, **177 direct + 25 indirect** (22 functor destroys, three wrapper view destroys), **509
+stores (143 object, 366 stack)**, no branch of any kind; call histogram `0xc300` x22, `0x20af0` x11,
+`0x20d60` x33, `0x6c850`/`0x6cbe0`/`0x6cf70` x1 each, `0xf590` x72, `0xf8f390` x36. Byte maps: bool
+**162/30**, float **171/37**, wrapper **195/13**; batch **6,129 written / 1,183 holes**. Three ELF
+corrections to the inherited table: the object block ends at `0x2eb2ba0` (`0x2eb2ad0` is the last
+object's start, `BakedAO_FadeRange`); the column's 202 calls are 177 direct + 25 indirect (202 is
+the total call count); and its 103 "direct stores" is not a store count — the real object stores
+are 143 (509 including stack). New module `ctor_slot_554_batch6_781c5.{hpp,cpp}`; fixture
+`test_ctor_slot_554_batch6`; oracle `check_ctor_slot_554_batch6.py` (**430 operand pins**,
+body/callee hashes, **957 ELF + 83 native mutants rejected**; both tamper modes exit 1). Batches 1 +
+2a + 2b + 2b-cont + 3 + 4 + 5 + 6 cover `0xb0af` body bytes and `0x9cb8` object bytes, **33,526
+written / 6,594 holes**, 188 registrations and 188 atexit rows. Coverage counters pending 1150 ->
+**1186**, atexit 1910 -> **1946**, menu **440**; entry map **2,735 constants -> 1,784 RVAs / 565
+headers** (423 duplicates); G1 **OK 573/573**, first gap `-1/0x0`; path audit **OK**; attribution
+**OK**; project index **107,110**; full sweep **899 passed / 0 skipped / 0 failed** (exit 0,
+`local/build/b38/sweep_b6_final.log`). Guest bytes NOT executed. No boot/audio/Metal/save claim.
+**Next open unit:** batch 7, 36 objects starting `0x2eb2ba0`, body `[0x7a68c,0x7cb5b)`; its inherited
+span end `0x2eb47a8` is the last object's start, so the block should end at `0x2eb4868` (arithmetic
+from the inherited size column; batch 7's body is not measured yet).
+
+## 2026-11-08 — slot 554 (`0x6efe0`) batch 5 landed (36 objects)
+
+**State: green, uncommitted.** Build 0; CTest **690/690**; coverage **573/573 registered, 572 fully
+lifted + slot 554 PARTIAL (batches 1, 2a, 2b, the 2b continuation, batches 3, 4 and 5)**; no first
+gap. This unit is the 36 objects `0x2eaf2a0..0x2eb0f10` (`0x1c70` B): thirteen `0xc0` bools,
+twenty-two `0xd0` bounded floats on `0xc300` (final vptr `0x15943c0`, arg-fn `0x1596878`, class
+vtable `0x1594318`, atexit `0xad30`) and one `0xd0` wrapper `showBakedLightingType` (`0x6c4c0` outer
+0x190 / `0x6c650` inner 0x160, inner vptr `0x15961d8`, final vptr `0x1596d10`, tag `0x1596ce0`,
+dtor `0x54d60`, page+`0x178`, bounds `0..4`). Body `[0x75d22,0x781c5)` = `0x24a3` B sha
+`475a12b6035f…`; 1,628 instructions, **179 direct + 23 indirect** (22 functor destroys, one wrapper
+view destroy), **516 stores (161 object, 355 stack)**, no conditional branch; the final `callq
+0xf8f390` ends exactly at `0x781c5`, which is batch 6's first instruction, so there is no pad byte.
+Byte maps: bool **162/30**, float **171/37**, wrapper **195/13**; batch **6,063 written / 1,217
+holes**. Three ELF corrections to the inherited table: the object block ends at `0x2eb0f10`
+(`0x2eb0e50` is the last object's start); the column's 202 calls are 179 direct + 23 indirect; and
+its 117 "direct stores" is not a store count — the real object stores are 161 (516 including
+stack). One inherited constant was wrong and is corrected in batches 2b-cont, 3, 4 and 5: the
+`0xc300` float final vptr is **`0x15943c0`**, not `0x15942b0` (`0x6f2ba leaq 0x15943b0`, `+0x10`;
+`%rax` -> `%r15` at `0x6f2cf`; stored at `0x10(%rsp)` by `0x6f4a4`; the batch-4/5 float blocks
+reload that slot; E1409). New module `ctor_slot_554_batch5_75d22.{hpp,cpp}`; fixture
+`test_ctor_slot_554_batch5`; oracle `check_ctor_slot_554_batch5.py` (**420 operand pins**,
+body/callee hashes, **929 ELF + 70 native mutants rejected**; both tamper modes exit 1). Batches 1 +
+2a + 2b + 2b-cont + 3 + 4 + 5 cover `0x8be8` body bytes and `0x8028` object bytes, **27,397 written /
+5,411 holes**, 152 registrations and 152 atexit rows. Coverage counters pending 1114 -> **1150**,
+atexit 1874 -> **1910**, menu **440**; entry map **2,712 constants -> 1,773 RVAs / 564 headers**
+(422 duplicates); G1 **OK 573/573**, first gap `-1/0x0`; path audit **OK**; attribution **OK**;
+project index **107,107**; full sweep **898 passed / 0 skipped / 0 failed** (exit 0,
+`local/build/b38/sweep_b5_final.log`). Guest bytes NOT executed. No boot/audio/Metal/save claim. **Next
+open unit:** batch 6, 36 objects starting `0x2eb0f10`, body `[0x781c5,0x7a68c)`.
+
+## 2026-11-08 — slot 554 (`0x6efe0`) batch 4 landed (36 objects)
+
+**State: green, uncommitted.** Build 0; CTest **689/689**; coverage **573/573 registered, 572 fully
+lifted + slot 554 PARTIAL (batches 1, 2a, 2b, the 2b continuation, batch 3 and batch 4)**; no first
+gap. This unit is the 36 objects `0x2ead6b0..0x2eaf2a0` (`0x1bf0` B): twenty-one `0xc0` bools,
+twelve `0xd0` bounded floats on `0xc300`, one `0xd0` bounded dword `particleNumShadowCascades` on
+`0xc580` (page+`0x80`, bounds `0..4`) and two `0xd0` wrappers (`particleResolution` on `0x6bda0`
+outer / `0x6bf30` inner, inner vptr `0x15960e8`, final vptr `0x1596be0`, tag `0x1596bb0`, dtor
+`0x54ce0`, page+`0x84`, bounds `0..2`; `r_showLightProbes` on `0x6c130` / `0x6c2c0`, inner vptr
+`0x1596160`, final vptr `0x1596c78`, tag `0x1596c48`, dtor `0x54d20`, page+`0x174`, bounds `0..4`).
+Body `[0x739e8,0x75d22)` = `0x233a` B sha `7efb56aa8a91…`; 1,568 instructions, **178 direct calls
++ 15 indirect** (13 functor destroys, two wrapper view destroys), **522 stores (215 object, 307
+stack)**, no conditional branch; call histogram `0xc300` x12, `0xc580` x1, `0x20af0` x21, `0x20d60`
+x34, `0x6bda0` x1, `0x6c130` x1, `0xf590` x72, `0xf8f390` x36. Byte maps: bool **162/30**, float
+**171/37**, dword **171/37**, wrapper **195/13**; batch **6,015 written / 1,137 holes**. Four ELF
+corrections to the inherited table: the object span ends at `0x2eaf2a0` (`0x2eaf1e0` is the last
+object's start); the plan's 193 calls are 178 direct + 15 indirect; the column's 178 "direct
+stores" is the direct-call count — the real object stores are 215 (522 including stack); and there
+is **no pad byte**, `0x75d22` holds `48 8d 1d …` (batch 5 code), the batches abut. New module
+`ctor_slot_554_batch4_739e8.{hpp,cpp}`; fixture `test_ctor_slot_554_batch4`; oracle
+`check_ctor_slot_554_batch4.py` (**408 operand pins**, body/callee hashes, **911 ELF + 87 native
+mutants rejected**; both tamper modes exit 1). Batches 1 + 2a + 2b + 2b-cont + 3 + 4 cover `0x6745`
+body bytes and `0x63b8` object bytes, **21,334 written / 4,194 holes**, 116 registrations and 116
+atexit rows. Coverage counters pending 1078 -> **1114**, atexit 1838 -> **1874**, menu **440**;
+entry map **2,695 constants -> 1,768 RVAs / 563 headers** (421 duplicates); G1 **OK 573/573**;
+path audit **OK**; attribution **OK**; full sweep **897 passed / 0 skipped / 0 failed** (exit 0,
+`local/build/b38/sweep_b4.log`); project index **107,104**. Guest bytes NOT executed. No
+boot/audio/Metal/save claim. **Next open unit:** batch 5, 36 objects starting `0x2eaf2a0`, body
+`[0x75d22,0x781c5)`.
+
+## 2026-11-08 — slot 554 (`0x6efe0`) batch 3 landed (36 objects)
+
+**State: green, uncommitted.** Build 0; CTest **688/688**; coverage **573/573 registered, 572 fully
+lifted + slot 554 PARTIAL (batches 1, 2a, 2b, the 2b continuation and batch 3)**; no first gap. This
+unit is the 36 objects `0x2eabb80..0x2ead6b0` (`0x1b30` B): thirty-three `0xc0` bools, two `0xd0`
+bounded floats (`particleTimeScale` page+`0x74` bounds `0..2.0f`, `particleWaterFogScale`
+page+`0x78` bounds `0..10.0f`, both on `0xc300`) and one `0xd0` wrapper (`showParticle_Stats` on
+`0x6ba10` outer / `0x6bba0` inner, final vptr `0x1596b48`, tag `0x1596b18`, dtor `0x54ca0`,
+page+`0x8c`, bounds `0..3`). Body `[0x718bb,0x739e8)` = `0x1b30` B sha `1f981b72ce2b…`; 1,494
+instructions, 179 direct calls, three indirect `call [reg+0x18]` destroys, 472 stores (303 object,
+169 stack), no conditional branch. Byte maps: bool **162/30**, float **171/37**, wrapper
+**195/13**; batch **5,883 written / 1,077 holes**. The ELF corrected the inherited span: the 36
+constructions end at `0x2ead6b0`, not `0x2ead5f0`; batch 4 begins at `0x2ead6b0`. New module
+`ctor_slot_554_batch3_718bb.{hpp,cpp}`; fixture `test_ctor_slot_554_batch3`; oracle
+`check_ctor_slot_554_batch3.py` (**366 operand pins**, body/callee hashes, **821 ELF + 56 native
+mutants rejected**; both tamper modes exit 1). Batches 1 + 2a + 2b + 2b-cont + 3 cover `0x440b`
+body bytes and `0x47c8` object bytes, **15,319 written / 3,057 holes**, 80 registrations and 80
+atexit rows. Coverage counters pending 1042 -> **1078**, atexit 1802 -> **1838**, menu **440**;
+entry map **2,673 constants -> 1,760 RVAs / 562 headers** (420 duplicates); G1 **OK 573/573**;
+path audit **OK**; attribution **OK**; full sweep **896 passed / 0 skipped / 0 failed** (exit 0, `local/build/b38/sweep_b3.log`). Guest bytes NOT executed. No boot/audio/Metal/save claim.
+**Next open unit:** batch 4, 36 objects starting `0x2ead6b0`, body `[0x739e8,0x75d22)`.
+
+## 2026-11-08 — slot 554 (`0x6efe0`) batch 2b continuation landed (23 objects)
+
+**State: green, uncommitted.** Build 0; CTest **687/687**; coverage **573/573 registered, 572 fully
+lifted + slot 554 PARTIAL (batches 1, 2a, the 2b eight-object prefix and the 2b continuation of
+23)**; no first gap. This unit is the remaining 23 objects `0x2eaa9e0..0x2eabb80` (`0x11a0` B):
+four `0xd0` wrapper-family objects (`ShowRenderTarget` / `Show Ambient RenderTarget` on
+`0x6af60`/`0x6b0f0`, `ShaderDebugCollisionMode` on `0x6b2f0`/`0x6b480`, `ShaderDebugMode` on
+`0x6b680`/`0x6b810`), one unbounded int (`RenderTargetDisplayMip`, `0x3a980`), one bounded float
+(`miscDebugShaderFloat0`, `0xc300`, arg-fn alias `0x1596878`) and seventeen `0xc0` bools. Body
+`[0x7036d,0x718bb)` = `0x154e` B sha `5d14edc8d2d0…`; 955 instructions, 111 direct calls, six
+indirect `call [reg+0x18]` functor destroys, 332 stores (157 object, 175 stack), no conditional
+branch. Byte maps: wrapper **195 written / 13 holes**, int **165 / 43**, float **171 / 37**, bool
+**162 / 30**; batch **3870 written / 642 holes**. Three ELF checks corrected the draft: the second
+wrapper's low bound is `0xf`; `0x6b2f0`/`0x6b680` publish `0x1596a18`/`0x1596ab0` (table + `0x10`)
+like `0x6af60`; and the float path accepts `0x1596878` only because its four relocations resolve to
+the same `0x15d57e0`/`0x1594318` helpers. New module `ctor_slot_554_2b_cont_7036d.{hpp,cpp}`;
+fixture `test_ctor_slot_554_batch2b_cont`; oracle `check_ctor_slot_554_batch2b_cont.py` (**274
+operand pins**, body/callee hashes, **621 ELF + 48 native mutants rejected**; both tamper modes exit
+1). The spec-table rows for `0x6b2f0`/`0x6b680` now also carry `0x1596a18`/`0x1596ab0`; the fixture
+and oracle pin those final vptrs and all four wrapper bounds. Batches 1 + 2a + 2b cover `0x28db` body bytes and `0x2c98` object bytes, **9436 written / 1980
+holes**, 44 registrations and 44 atexit rows. Coverage counters pending 1019 -> **1042**, atexit
+1779 -> **1802**, menu **440**; entry map **2,656 constants -> 1,754 RVAs / 561 headers** (420
+duplicates); G1 **OK 573/573**; project index **107,100**; path audit **OK**; attribution **OK**;
+full sweep **895 passed / 0 skipped / 0 failed** (exit 0). Final combined-tree re-verification:
+CTest **692/692**, checker sweep **900 passed / 0 skipped / 0 failed**. Guest bytes NOT executed.
+No boot/audio/Metal/save claim. **Next open unit:** batch 3, 36 objects `0x2eabb80..0x2ead6b0`, body
+`[0x718bb,0x739e8)` = `0x1b30` B, 182 calls.
+
+## 2026-11-08 — slot 554 (`0x6efe0`) batch 2b prefix landed (occluder object + seven bools)
+
+**State: green, uncommitted.** Build 0; CTest **686/686**; all **573/573** constructor rows are
+registered, with **572 fully lifted + slot 554 PARTIAL (batches 1, 2a and the 2b eight-object
+prefix of 13)**; no first gap. The landed 2b prefix is object 0 at `0x2eaa3d0`
+(`XPR Occluder Debug Mode`, `0xd0`, built by the `0x6abb0` wrapper / `0x6ad40` inner) plus seven
+`0xc0` bools at `0x2eaa4a0..0x2eaa9e0`, body `[0x6fc29,0x7036d)` sha `9244a7d9ba3a…`; 328
+instructions, 39 direct calls (`0x6abb0` x1, `0x20af0` x7, `0xf590` x16, `0x20d60` x7, `0xf8f390`
+x8), one indirect `call [rax+0x18]`, 63 stores into the seven bools and 54 stack stores; no
+conditional branch or canary in this prefix. Object 0 is **195 written / 13 holes**; each bool is
+**162 / 30**; prefix **1329 written / 223 holes** of `0x610`. Wrapper pins: outer `0x6abb0`
+sha `242aa9fe5b26…` (0x18d), inner `0x6ad40` sha `e4e6ec135d1f…` (0x160), caller/tag `0x15968b9`,
+inner mid table `0x1595e80` / address point `0x1595e90`, final table `0x15968d8` / point `0x15968e8`,
+register `0x20d60`, atexit `0x54b60`. New module `ctor_slot_554_2b_6fc29.{hpp,cpp}`; fixture
+`test_ctor_slot_554_batch2b`; oracle `check_ctor_slot_554_batch2b.py` (**81 operand pins**, body and
+wrapper/inner/callee hashes, **193 ELF + 49 native mutants rejected**; both tamper modes exit 1).
+Batches 1 + 2a + 2b cover `0x138d` body bytes and `0x1af8` object bytes, **5566 written / 1338
+holes**, 21 registrations and 21 atexit rows. Entry map **2,636 -> 1,748 RVAs / 560 headers** (417
+duplicates); G1 **573/573 registered, 572 fully lifted + 554 PARTIAL**; project index **107,098**;
+path audit **OK 4,110 paths**; attribution **OK**; full sweep **894 passed / 0 skipped / 0 failed**
+(exit 0, `local/build/b38/sweep_b2b_final.log`). Guest bytes NOT executed. No boot/audio/Metal/save
+claim. **Next open unit:** the remaining 23 objects `0x2eaa9e0..0x2eabb80`, body
+`[0x7036d,0x718bb)` = `0x154e` B, still PARTIAL.
+
+## 2026-11-08 — slot 554 (`0x6efe0`) batch 2a landed (five bools)
+
+**State: green, uncommitted.** Build 0; CTest **685/685**; all **573/573** constructor rows are
+registered, with **572 fully lifted + slot 554 PARTIAL (batches 1 and 2a of 13)**; no first gap.
+Batch 2a is the five `0xc0` bools at `0x2eaa010..0x2eaa3d0`
+(`threadedCulling`, `threadedRendering`, `threadedSumbit`, `enableAsyncCompute`,
+`enableGPUCounters`), body `[0x6f793,0x6fc29)` sha `adfcc16736d8…`; 209 instructions, 25 direct
+calls (`0x20af0` x5, `0xf590` x10, `0x20d60` x5, `0xf8f390` x5), 40 direct stores, no indirect
+call and no canary. Per object **162 written / 30 holes**; batch **810 written / 150 holes**.
+Batch 1 + 2a is `0x14e8` B, **4237 written / 1115 holes**, 13 registrations and 13 atexit rows.
+New module `ctor_slot_554_2a_6f793.{hpp,cpp}`; fixture `test_ctor_slot_554_batch2a`; oracle
+`check_ctor_slot_554_batch2a.py` (**30 operand pins**, body/extent/callee hashes, **81 ELF + 29
+native mutants rejected**; both tamper modes exit 1). Batch 2 was split because object 5
+(`0x2eaa3d0`, `XPR Occluder Debug Mode`) switches to a `0xd0` `0x6abb0` wrapper; batch 2b then
+remained 31 objects `0x2eaa3d0..0x2eabb80`, body `0x6fc29..0x718bb`. Entry map **2,624 -> 1,743 RVAs / 559
+headers** (417 duplicates); G1 **573/573 registered, 572 fully lifted + 554 PARTIAL**; project index
+**107,095**; path audit **OK 4,110 paths**; attribution **OK**; full sweep **893 passed / 0 skipped / 0 failed** (exit 0, `local/build/b38/sweep_b2a_final.log`). Guest bytes
+NOT executed. No boot/audio/Metal/save claim.
+
+## 2026-11-08 — slot 554 (`0x6efe0`) batch 1 landed; decomposition recorded
+
+**State: green, uncommitted.** Build 0; CTest **684/684**; all **573/573** constructor rows are
+registered, with **572 fully lifted + slot 554 PARTIAL (1/13 batches)**; no first gap remains.
+Slot 554 body is 112,184 B / 19,550 instructions / 2,162 calls / 436 atexit / 415 registrations /
+436 objects. Batch 1 is the page `0x2ea8ee8..0x2ea99b0` (0xac8, 187 stores, **2113 written / 647
+holes**) plus eight variables `0x2ea99b0..0x2eaa010` (0x660, **1314 written / 318 holes**):
+`backgroundColor`, `gpuMarkerLevel`, `globalRenderVarX/Y/Z/W`, `profileEnableGpu`, `groupCulling`.
+Batch body `[0x6efe0,0x6f793)` sha `483de6397f25…`; total block **3427 written / 965 holes**; 8
+registrations, 8 atexit rows, 16 inert releases, 6 functor destroys. New module
+`ctor_slot_554_6efe0.{hpp,cpp}` + `ctor_slot_554_page_init.inc`; fixture `test_ctor_slot_554`;
+oracle `check_ctor_slot_554.py` (**50 operand pins**, page/callee hashes; **129 ELF + 32 native
+mutants rejected**; both tamper modes exit 1). Remaining 428 objects are cut into twelve batches in
+[`docs/STARTUP_SLOT_554_PLAN.md`](docs/STARTUP_SLOT_554_PLAN.md); hole accounting stays a lift-time
+gate for each. **CTest 684/684**; full sweep **892 passed / 0 skipped / 0 failed** (`local/build/b38/sweep554c.log`);
+G1 checker **573/573 registered, 572 fully lifted + 554 PARTIAL**; entry map **2,615 -> 1,742
+RVAs / 558 headers**; project index **107,093 folders**; path audit **OK 4,110 paths**; attribution
+**OK**. Guest bytes NOT executed. No boot/audio/Metal/save claim. The g1 pack was repaired to model
+complete registration with a PARTIAL row instead of assuming `missing[0]` exists.
+
 # SoC Mac Native — current handoff
+
+## 2026-11-07 — slot 497 (`0x262a80`, `Bluepoint Engine` debug page) landed as batch 37
+
+**State: green, uncommitted.** Build 0, **CTest 683/683**, coverage **572/573** with **1 open**,
+first gap **554 / `0x6efe0`**, entry map 2,599 constants -> 1,735 RVAs / 557 headers, G1 OK
+(572/573), gap survey 572/573 / 113 gaps / 1 open, project index **107,092 folders**, full sweep
+**891 passed / 0 skipped / 0 failed** (exit 0, `local/build/b38/sweep2.log`), path audit **OK 4,110
+paths**, attribution **OK**.
+
+- **Selection:** after 510, 497 was the only bounded open row. 554 is 112,184 B / 19,550
+  instructions / 2,162 calls / 436 atexit / 415 registrations and remains its own XL batch.
+- **Body:** `[0x262a80,0x264e50)` (0x23d0), sha `e14572358aea…`; 1,742 real instructions plus five
+  `0x90` alignment bytes; 225 direct calls, 7 indirect `call *0x18(%rax)` functor destroys, 10
+  branches, canary `0x15fe518`, `call __stack_chk_fail` at `0x264e46`; table word
+  `0x2dd70e0-8*497 = 0x2dd6158` holds `0x262a80`; the pad byte at `0x264e50` is `0x55`.
+- **Calls:** 87 `0xf590`, 54 `__cxa_atexit`, 20 `0x20d60`, 15 `0x20af0`, 10 `0x26ea0`,
+  7 `0xa81700`, 4 `0xf2f0`, 4 `0xf730`, 3 `0x26800`, 3 `0x26c10`, 3 `0x4b560`, 2 `0x6aa00`,
+  2 `0x257a0`, 2 `0x26b60`, and one each of `0x8d650`, `0xc580`, `0xc300`, `0x3a980`,
+  `0x261b50`, `0x261f10`, `0x27050`, `0x323d0`, `0xf8f3a0`.
+- **Block:** `0x2eec4d8..0x2eee8a8` = 0x23d0 B: cell `0x2eec4d8` (four bytes written, `+4..+8`
+  holes); page header `0x2eec4e0` (`0x780`, `0x438`, zero, hole, qword 0, -1.0f, hole); view
+  `0x2eec500` `Bluepoint Engine` (view length 0); 24 variables from `+0x48` (15 bool 0xc8, four
+  ranged/bounded 0xd8, three unbounded, two string 0x148); 19 menu items from `+0x1478` (0xa8
+  stride); zero container `+0x20f0`; TSC `+0x2140`; seven 0x38 records from `+0x2148`; tail qword
+  `+0x22d0` (`+0x22d8..+0x22e0` hole); three 0x50 entries from `+0x22e0`. **0x1c9a written / 0x736
+  holes.** Earlier draft totals 0x1dff/0x5d1 are withdrawn: they counted functor inline buffers,
+  string `+0x110` padding and the cell tail, none of which has a store in the body or a called
+  ctor. Per-item written maps: bool 0x93, ranged/bounded 0x9f, unbounded 0x96 (default is the full
+  dword at `+0x68..+0x6b`), string 0xd1, menu 0x99, record 0x2e, entry 0x49.
+- **Families:** 15 bools (`r_fps`, `show_memory`, `show_globalTime`, `show_timeManager`,
+  `show_buildversion`, `exitGame`, `restartGame`, `singleStep`, and the seven
+  `snapshotGameInfo`/`logGameInfo`/`snapshotAssets`/`logGameMessages`/
+  `logGameMessagesEventLog`/`snapshotBugData`/`disableRumble`); ranged `show_profileInfo` (0..2),
+  bounded `gameDeltaTimeCorrectionTolorance` (0..1, 0.5), local ranged
+  `TargetFramesPerSeconds` (0..3) / `VSyncWindow` (0..5); unbounded `gameSpeed` 1.0,
+  `gameMaxDeltaTime` 0.1, `randomSeed` -1; strings `loadScripting` /
+  `StartupScriptFromEditor`. Menu: labels `Debug`/`Messages`/`Profile`/`Systems`, `Game Speed`
+  slider 0.01..0.5, toggles Restart/Exit/Display Frame Rate/Memory/Global Time/Build Version/
+  Target FPS/VSync Window/Profile Info/Time Manager, two separators and two groups. Seven `Main
+  loop:` timing records (Wall time kind 0 flag 1, six kind 1 flag 1); entries
+  `CookedAssetStatusInternal`, `SendLivePropertyUpdate`, `SendMessageToComponent` (`0x4b560`).
+- **Fixture:** `test_ctor_slot_497.cpp` covers layout and field values, all four registration
+  families, every missing-hook and refused-registration path, the 0x736-hole sentinel sweep with
+  an 8 KiB arena, the default native pending/menu/atexit state (24/19/54), and a byte-identical
+  re-run.
+- **Oracle:** `check_ctor_slot_497.py` pins body/extent, 494 operands (252 RIP, 225 direct calls,
+  17 byte/branch/indirect), callee hashes, literals and vtables; **991 ELF + 84 native mutants
+  rejected**; clean exit 0, `--tamper elf` and `--tamper native` exit 1.
+- **Counts:** coverage 571 -> **572/573**, open 2 -> **1**, atexit 1,704 -> **1,758** (+54),
+  pending 974 -> **998** (+24), menu 421 -> **440** (+19); index-set digest
+  `52c3479f16c892cfedc2b535a5ab866552fa08a2bece95862f23ab2cbdbb4733`; CTest 682 -> **683/683**;
+  entry map 2,558 -> **2,599 constants -> 1,735 RVAs / 557 headers** (413 duplicates).
+- **Next action (batch 38):** only 554 (`0x6efe0`) remains; it is the 112,184 B debug-page clone
+  with 19,550 instructions, 2,162 calls, 267 functor slot-3 destroys, 436 atexit rows and 21
+  unmodelled helpers, so it needs its own decomposition and several sub-batches. Checkpoint:
+  `docs/checkpoints/2026-11-07-startup-slot-497.md`. E1402.
+
+## 2026-11-07 — slot 510 (`0x211340`, debug-tool page) landed as batch 36
+
+**State: green, uncommitted.** Build 0, **CTest 682/682**, coverage **571/573** with **2 open**,
+first gap **497 / `0x262a80`**, entry map 2,558 constants -> 1,725 RVAs / 556 headers, G1 OK
+(571/573), gap survey 571/573 / 113 gaps / 2 open, project index **105,631 folders**, full sweep
+**890 passed / 0 skipped / 0 failed** (exit 0, `local/build/b36/sweep.log`), path audit **OK 4,110
+paths**, attribution audit **OK**.
+
+- **Selection:** 510 was the bounded remaining debug-tool body — 2,226 B, 377 instructions, 38 direct
+  calls, 2 indirect calls, 14 branches, one canary. 497 (225 calls / 54 atexit / 87 releases) and 554
+  (872 releases / 436 atexit / 415 registrations) still require decomposition first.
+- **Body:** `0x211340..0x211bf2` (0x8b2), sha
+  `dd271da84089e6a2a0dde8dd321642085b7ecbb9c5f1ace47e3708fc79bd729a`, table word `0x2dd60f0`,
+  trailing 0x90 pad before 0x211c00. Direct calls: 14 `0xf590`, 6 `0xf180`, 6 `0x20640`,
+  4 `__cxa_atexit`, 2 `0x20af0`, 1 each `0x20d60`, `0x26ea0`, `0xf2f0`, `0x20540`, `0x210e00`,
+  `0xf8f3a0`. Indirect: command vtable `+0x10` = `0x20d60`; scratch `0x159abc0+0x18` = `0x2111d0`
+  (bare `ret`).
+- **Block:** four contiguous globals `0x2ee8438..0x2ee86b0` = 0x278 B: string property cell
+  `inputRequiresAppFocus` (0x30, vptr `0x15976b0`, atexit `0x8ef00`); bool variable
+  `FollowGameCamera` in the `ConCmdBoolVar` shape (0xc8, vptr sequence `0x1594218` -> `0x15940b0` ->
+  `0x1594218`, functor tag `0x159aba0`, value/default 0, atexit `0x20b0`); toggle `Debug Game` /
+  `Follow Game Camera` (0xa4, flags `0x21`, target gate slot3 1 / slot6 0 so range 1.0–10.0, atexit
+  `0x272d0`); 4-byte pad; sync payload defaults (0x30: two float4 `{1,0,0,0}` then ids
+  `0xff1b6468/0x1b6416/0x1b640c/0x1b6402`); command `SyncCameraAcrossTools` (0xa8, name 21,
+  description 46, flags 2, vptr `0x1594dd0`, delegate `{self,0x1990,0x2512a0,0x20e900}` at +0x60,
+  seven 0x50 B tokens at +0x80, atexit `0x4b0`).
+- **Tokens:** `0x20540` reserves seven; token 0 through `0x210e00` is kind 1
+  `SendersConnectionType`, hint 1, value view `Tool` (EConnectionType row 1); the six inline pushes
+  are kind 3 `transX`/`transY`/`transZ`/`eulerX`/`eulerY`/`eulerZ`, with `+0x48` unwritten.
+- **Bytes:** **0x211 of 0x278 written, 0x67 holes** — pending link + `+0x19..+0x1b` in both
+  ConCmdBases, var `+0x6d..0x6f`/`+0x90..0x9f`/`+0xa8..0xaf`/`+0xc1..0xc7`, item `+0x21..0x27`/
+  `+0x4c..0x4f`, the 4-byte pad, command `+0x98..0x9f` and handler-owned `+0xa0..0xa7`. List links
+  written by `0x20d60`/`0x268b0` are registry state, not body stores.
+- **Fixture:** field-by-field values, both registration refusals, toggle/connection/axis/release
+  refusals, missing-hook fail-closed, sentinel sweep over the 0x67 holes, native pending +2, menu
+  +1, atexit +4, and a byte-identical stub re-run.
+- **Oracle:** `check_ctor_slot_510.py` — body/extent, 156 operand pins (every RIP operand, direct
+  call, indirect call and branch), 3 callee hashes, 14 literals, six EConnectionType strings, the
+  vtable/scratch slots and the 0x30-byte payload constant; **377 ELF + 80 native mutants rejected**;
+  both tamper modes exit 1.
+- **Counts:** coverage 570 -> **571/573**, open 3 -> **2**, atexit 1,700 -> **1,704**, pending 972 ->
+  **974**, menu 420 -> **421**; index-set digest
+  `186cd51f187a92b8739ab5256b184da6708c99b153265f427490e9723c3f8a5f`; CTest 681 -> **682/682**;
+  entry map 2,526 -> **2,558 constants -> 1,725 RVAs / 556 headers** (408 duplicates).
+- **Next action (batch 37):** 497 and 554 are the only open rows and both need family decomposition;
+  no other doc claim about slot 510 needed correction (E1400's "2,226 B debug page" is accurate;
+  the handler `0x20e900` is the debug-tool sync path, not gameplay). Checkpoint:
+  `docs/checkpoints/2026-11-07-startup-slot-510.md`. E1401.
+
+## 2026-11-07 — slot 567 (`0x235d0`, ConCmdManager cell + four console commands) landed as batch 35
+
+**State: green, uncommitted.** Build 0, **CTest 681/681**, coverage **570/573** with **3 open**,
+first gap **497 / `0x262a80`**, entry map 2,526 constants -> 1,710 RVAs / 555 headers, G1 OK
+(570/573), gap survey 570/573 / 113 gaps / 3 open, project index **104,173 folders**, full sweep
+**889 passed / 0 skipped / 0 failed** (exit 0, `local/build/b35/sweep.log`), path audit **OK**
+(`local/build/b35/audit_paths.log`), attribution audit **OK** (`local/build/b35/attribution.log`).
+
+- **Selection:** with 497 and 554 measured as multi-family bodies, 567 (`0x235d0`) is the bounded
+  next slot: 1,716 B, 347 instructions, 20 direct calls, 6 indirect calls, 17 branches, one canary.
+- **Scoping correction:** the four commands are **contiguous** after the single ConCmdManager cell
+  `0x2dfcbc8` — `0x2dfcbd0`, `0x2dfcc70`, `0x2dfcd10`, `0x2dfcdb0`, ending exactly at the pending-list
+  head `0x2dfce50`. The batch-34 note that each command sat behind its own head qword was wrong.
+- **Body:** 1,716 B (`0x6b4`), FDE `[0x235d0, 0x23c84)`, sha
+  `7c5ebcf2b6376bc8297aa55a1821667627bf8984e9c4f8b0b0eee3449b3b5ecc`, table word `0x2dd5f28`.
+  Zeroes the manager cell, records `__cxa_atexit(0x21060, cell)`, then builds and registers four
+  0xa0 B commands, each followed by `__cxa_atexit(0x4b0, command)` — five atexit records in all.
+- **Commands:** `executeCmd` (handler `0x22580`, flags 2), `getValue` (`0x225f0`, 2), `help`
+  (`0x22750`, 2), `core_unittests` (`0x22a40`, 0). Every command is a `ConCmdBase` (+0x00..+0x60)
+  plus a derived tail: vptr written as `0x1594d90` then `0x1594dd0`, borrowed name at `+0x20`,
+  description at `+0x40` (62/40/19/22 chars), delegate `{&cmd+0x60, 0x1990, 0x2512a0, handler}` at
+  `+0x60`, zeros at `+0x80`, `+0x90`. `executeCmd`/`getValue` set `+0x18 = 1` and call `0x20d80`
+  directly; `help`/`core_unittests` go through vtable `+0x10 = 0x20d60`, and `help` additionally runs
+  the `0x23380` pre-register callback plus the `0x1594e98+0x18` (`0x235c0`) scratch slot;
+  `core_unittests` uses `0x1594e78+0x18` (`0x23370`).
+- **Object:** `0x2dfcbc8..0x2dfce50` = 0x288 B. **0x21c written, 0x6c holes** — the pending link
+  (+0x08..+0x18), `+0x19..+0x1b` and `+0x98..+0xa0` of each command. The register callee writes the
+  pending link; that is registry state, not a body store.
+- **Fixture:** field-by-field values, the delegate self-rewrite, sentinel sweep over the 0x6c
+  holes, native pending-list registration (4 queued, all `registered == 1`), refusals for both
+  registration paths, missing-hook fail-closed, and byte-identical re-run under stub hooks.
+- **Oracle:** `check_ctor_slot_567.py` pins the body/extent, 89 operands, the three callee hashes,
+  the eight literals, the vtable/scratch slots and the stack-check tail; **211 ELF + 54 native
+  mutants rejected**; both tamper modes exit 1.
+- **Counts:** coverage 569 -> **570/573**, open 4 -> **3**, atexit 1,695 -> **1,700**, pending 968 ->
+  **972**, menu 420 unchanged; index-set digest
+  `3754378789a7e438309873401909e25c1bd1b0405950ee1ad67ca18d4b5b17f9`; CTest 680 -> **681/681**;
+  entry map 2,509 -> **2,526 constants -> 1,710 RVAs / 555 headers** (408 duplicates).
+- **Next action (batch 36):** slot 510 (`0x211340`, 2,226 B debug page) is the bounded next body;
+  497 (225 calls / 54 atexit / 87 releases) and 554 (872 releases / 436 atexit / 415 registrations)
+  still require decomposition first. Checkpoint: `docs/checkpoints/2026-11-07-startup-slot-567.md`.
+  E1400.
+
+## 2026-11-07 — slot 552 (`0x8c880`, eight app-info pages) landed as batch 34
+
+**State: green, uncommitted.** Build 0, **CTest 680/680**, coverage **569/573** with **4 open**,
+first gap **497 / `0x262a80`**, entry map 2,509 constants -> 1,703 RVAs / 554 headers, G1 OK
+(569/573), gap survey 569/573 / 113 gaps / 4 open (109 wired-uncommitted), project index
+**102,717 folders**, full sweep **888 passed / 0 skipped / 0 failed** (exit 0,
+`local/build/b34/sweep.log`), path audit **OK 4,110 paths** (`local/build/b34/audit_paths2.log`),
+attribution audit **OK** (`local/build/b34/attribution2.log`).
+
+- **Selection:** slot 552 (`0x8c880`, 3,479 B) is the next bounded body: 555 instructions, 15 calls,
+  one tail jump, **zero conditionals, zero indirect calls, no canary** — the whole block fits one
+  batch. `{497, 510, 554, 567}` remain open; 497 (225 calls / 54 atexit / 87 releases) and 554 (872
+  releases / 436 atexit / 415 registrations) stay deferred as multi-family bodies, 510 is a 2,226 B
+  debug page with 38 calls, 567 is 1,716 B with a stack guard.
+- **Scoping correction:** the earlier note that 552 calls `0x90050`/`0x170b0` is wrong — both are
+  callees of the *next* function (`0x8d620`). 552 calls only the page ctor `0x475c0` (x8) and
+  `__cxa_atexit` (`0xf8f390`, x7 plus the tail `jmp` at `0x8d612`).
+- **Body:** 3,479 B (`0xd97`), FDE `[0x8c880, 0x8d617)`, sha
+  `706ddfa9db1f9534cf94f82d41e87a3ddc8620bf75cbacfe50a8b44473d2a349`, table word `0x2dd4d80`
+  (index 552). Writes seven flag dwords `= 1`, seventeen 0x18 B zero records, then six class-A
+  pages (0x2e0 each: base 0x80 + twelve self-linked nodes at 0xb0 + 0x20 tail), one class-B page
+  (0xf0), one class-C page (0x98), and records eight atexit rows.
+- **Object:** `0x2ed1f48..0x2ed33e8` = 0x14a0 B. **0xec8 bytes written, 0x5d8 keep caller bytes**
+  (+0x1c..+0x20, four bytes per record, the 0x20 gap before the pages, the page-base
+  `+0x5c/+0x68/+0x78/+0x8c` gaps, each node's `+0x10..+0x20`, class-B `+0xb0..+0xb8`, class-C
+  `+0x0c..+0x10`).
+- **Types:** page base vptr `0x1595900`; class A `0x1594ca0` (dtor `0x1ce70`), B `0x1595b70`
+  (dtor `0x48790`), C `0x1597560` (dtor `0x8c360`). Names are borrowed views into `0xf9ecf0`:
+  `GameToRenderThread`, `GameToGPU`, `CPU_RenderToGPUToGame`, `RenderSingleFrameGPU`,
+  `RenderSingleFrameCPU`, `XPRTempData`, `MaterialParamHeap`, `VirtualMemoryGPU`.
+- **Fixture:** full-object value checks, sentinel sweep over the documented holes (0xec8/0x5d8),
+  fail-closed for a missing *and* a refusing page ctor, idempotent second run. Its first sentinel
+  check false-positived on ASLR pointer bytes equal to `0x5a`; it now asserts the sentinel only on
+  bytes the map marks unwritten (0 failures in 300 runs).
+- **Oracle:** `check_ctor_slot_552.py` pins body/callee/name/vtable hashes, 312 operands, 5 byte
+  pins and the eight atexit sites; **643 ELF + 54 native mutants rejected**; both tamper modes
+  exit 1.
+- **Counts:** coverage 568 -> **569/573**, open 5 -> **4**, atexit 1,687 -> **1,695**, pending 968
+  and menu 420 unchanged; index-set digest `7353daf482bbf1e49ad805d2a3504d6ff49afee4835aa0c731188dc9edb3b600`;
+  CTest 679 -> **680/680**.
+- **Batch-35 reconnaissance (slot 567 — scoped, not implemented):** `0x235d0..0x23c84` is 1,716 B
+  (sha `7c5ebcf2b6376bc8297aa55a1821667627bf8984e9c4f8b0b0eee3449b3b5ecc`), 413 instructions,
+  24 branch sites, four indirect calls and the canary `0x15fe518` at `rsp+0xc0`. It builds four
+  0xa0 B console commands at `0x2dfcbd0`, `0x2dfcc70`, `0x2dfcd10`, `0x2dfcdb0`, contiguous after
+  the single manager cell `0x2dfcbc8` and ending at the pending-list head `0x2dfce50` (there is no
+  per-command head qword; that part of the batch-34 note was wrong): name view at `+0x20`
+  (`executeCmd`, `getValue`, `help`, `core_unittests`), description view at `+0x40` (62/40/19/22
+  chars), delegate at `+0x60` with the self-rewrite, vector `+0x80` zeroed, `+0x90` zero, then
+  `0x20d80(cmd, *head)`, `0x18 = 1`, two `0xf590` releases and `atexit(0x4b0)`. Vtprs are
+  `0x1594d90` (executeCmd, help) and `0x1594dd0` (getValue, core_unittests); `help` additionally
+  runs an optional `0x23380(&token, cmd)` callback and the scratch `0x1594e98+0x18`. The
+  `[0x2dfcbc8]` zero store is already modelled (E1070); the four constructions, the callbacks and
+  the canary epilogue are **not**. This is scoping evidence only — no 567 code, fixture or oracle
+  exists yet.
+- **Next action (batch 35):** lift slot 567 (`0x235d0`, 1,716 B, 17 calls / 5 atexit / stack guard)
+  and slot 510 (`0x211340`, 2,226 B debug page) as separate bounded modules with their own
+  fixtures and oracles; keep 497 and 554 deferred with measured evidence. Checkpoint:
+  `docs/checkpoints/2026-11-07-startup-slot-552.md`. E1399.
+
+## 2026-11-07 — slot 505 (`0x236030`, table copy + 226-step bounds) landed as batch 33
+
+**State: green, uncommitted.** Build 0, **CTest 679/679**, coverage **568/573** with **5 open**,
+first gap **497 / `0x262a80`**, entry map 2,490 constants -> 1,691 RVAs / 553 headers, G1 OK
+(568/573), gap survey 568/573 / 113 gaps / 5 open, project index **101,263 folders**, full sweep
+**887 passed / 0 skipped / 0 failed** (exit 0, `local/build/b33/sweep.log`), path audit **OK 4,110
+paths** (`local/build/b33/audit_paths.log`), attribution audit **OK** (`local/build/b33/attribution.log`).
+
+- **Selection:** slot 497 (`0x262a80`, 9,164 B) is deferred: 1,749 instructions, 225 calls, 54
+  atexit, 87 `0xf590` releases, seven functor slot-3 fixups, seven conditionals, 142 RIP targets,
+  four bespoke shape families and the `0x8d650` prelude/config record. Slot 510 (`0x211340`, 2,226 B)
+  is a 377-instruction debug-page body with 38 calls, four atexit and eight conditionals. Slot 505
+  (`0x236030`, 1,476 B) is the bounded fallback: 199 instructions, two calls, no atexit, no menu row,
+  no canary, one loop branch.
+- **Body:** 1,476 B (`0x5c4`), sha `b2d267ef8390855bbfb668cd8a8e5d7cacf60dae9e7e81d4f7c786443c9d8033`,
+  table word `0x2dd6118`; trailing `nop` at `0x2365f4`. Copies 2,704 bytes from host source
+  `0xfc0580` in 84 32-byte loads/stores plus a 16-byte xmm tail, writes qword
+  `0x3f5415c8be50f81a` at table `+0xa90`, copies the 24-byte seed `0x2ee3ca0` to table `+0xa98`,
+  and runs exactly 226 calls to `0x1621b0` at stride `0xc`.
+- **Helpers:** `0x1621b0` (87 B, sha `58179eefd816f131c46c70c5f3da52cb4f2253f8ec3495a5be59ec1294915023`)
+  is six ordered VMINSS/VMAXSS operations (min x/y/z, max x/y/z) with second-operand NaN and
+  equality semantics; `0x162970` (8 B, sha
+  `2dfb9b38c67fee3a4978fa36d36f6254f2c119bbb43de0149c66cca30089795e`) is
+  `lea rax,[0x2ee3ca0]; ret`. The seed cell is BSS; its only image writer is slot 526 `0x163a40`,
+  later than 505, so production copies zeroes. `Slot505Hooks::seed` injects a non-zero record for
+  fixtures.
+- **Object:** table `0x2ee9820` 0xa98 B (226 x vec3) + bounds `0x2eea2b8` 0x18 B = 0xab0 B. Every
+  byte is written; there are no unwritten object bytes. The final vec3 is source float 675 plus
+  immediate dwords `0xbe50f81a` / `0x3f5415c8` (the qword's low/high halves).
+- **Source contract:** the 2,704-byte table is not embedded. A host supplies it from the documented
+  asset-only import; `StartupState` carries a zero stand-in (`slot505_source`) so the construction
+  path has a valid source. The oracle pins the original source SHA
+  `f060faa67715256fec5d1141b90bbbaaa589b5cb4aec3777e12779117f85a0ab`.
+- **Counts moved:** coverage 567 -> **568**, open 6 -> **5**, first gap unchanged
+  **497/`0x262a80`**; atexit **1,687** unchanged, pending **968** unchanged, menu **420** unchanged;
+  index-set `baf16cb664dd5c68e3e872ee0523686500fdb72966e0ccb017e92a502eb6c169`; entry map 2,478 ->
+  **2,490** constants (1,682 -> **1,691** RVAs, 551 -> **553** headers, 403 duplicates); CTest 678 ->
+  **679**; project index 101,260 -> **101,263**.
+- **Oracle:** `check_ctor_slot_505.py` pins the 1,476 B body, both callee hashes, 358 operand pins
+  (84 source/table loads, 84 table stores, both tail stores, seed copy, loop, calls), the source SHA,
+  and the BSS seed; **405 ELF + 47 native mutants rejected**; `--tamper elf` and `--tamper native`
+  exit 1.
+- **Honesty:** no original RVA is executed. The source table is host-supplied, not embedded; the
+  seed is zero BSS at this point; no atexit/menu/command effect exists. No boot, audio, save/load,
+  Metal validation or forbidden-runtime claim.
+- **Next action (batch 34):** the open set is `{497, 510, 552, 554, 567}`. Slot 552 (`0x8c880`,
+  3,479 B, 561 insns) is the chosen next target: fully straight-line (0 conditional branches, 0
+  indirect calls/jumps, no stack guard), 15 direct calls to three already-modelled callees
+  (`0x475c0` x8, `0xf8f390` atexit x7, `0x90050` x1, `0x170b0` x1), 216 RIP targets and 7 atexit
+  records. Scoping disassembly is `local/build/b34/slot552.asm`; the body rewrites the global block
+  at `0x2ed1f48..` in long vtable/`vpshufd` runs. It is **not started**, so no slot is partial.
+
+## 2026-11-07 — slot 524 (`0x16a810`, `screenshot`) + helper `0x16a380` landed as batch 32
+
+**State: green, uncommitted.** Build 0, **CTest 678/678**, coverage **567/573** with **6 open**,
+first gap **497 / `0x262a80`**, entry map 2,478 constants -> 1,682 RVAs / 551 headers, G1 OK
+(567/573), gap survey 567/573 / 113 gaps / 6 open, path audit OK 4,110 paths, project index **101,260
+folders**, full sweep **886 passed / 0 skipped / 0 failed** (exit 0, `local/build/sweep524.log`).
+
+- **Selection:** batch 31 rejected slot 524 because of the unmodelled 544 B helper `0x16a380`. This
+  batch models that helper first-class (`vector_append_16a380.{hpp,cpp}`) and then the slot; nothing
+  is deferred. The helper has exactly two callers (`0x16a27e` in the never-invoked scratch
+  `0x16a1f0`, and `0x16a994` in slot 524).
+- **Body:** 727 B, sha `efb3dbda…165dd3`, table word `0x2dd6080`, stack-guarded (`0x15fe518` at
+  `[rsp+0xe0]`, `jne 0x16aae1` at `0x16aad0`), trailing `nop`. Cell `0x2ee3ce0` (`atexit 0x166f20`,
+  46 B) and command `0x2ee3ce8`.
+- **Command:** `screenshot` (10, `0xfaba58`), description 55 (`0xfaba63`), flags 2, vptr
+  `0x1594dd0`, delegate `{self,0x1990,0,0x169be0}` (self rewritten to `&command+0x60`), vector zeroed
+  and **`+0x98` not written**, `0x20540(vec,2)`, register `0x20d60`, scratch vtable `0x1598780`,
+  `+0x18` = one-byte `ret` `0x16a5d0`, atexit `0x4b0`.
+- **Tokens:** token 0 kind 1 `resolution` (10, `0xfabc04`), key 0 -> helper writes kind, name, empty
+  `0xf180` view, key at `+0x48`, and label `Off`. Token 1 kind 4 `filename` (8, `0xfabc0f`) inline
+  push, empty view normalized to the `0xf730` static (`0x2dd9f78`); its **`+0x48` dword is never
+  written**. Token gaps `+0x04..+0x07` / `+0x4c..+0x4f` are sentinel-checked.
+- **Helper:** 544 B, sha `3bece5e4…71f3be`. Inline append or `0x20640` contract; lazy four-row table
+  `0x2ee3da0` (stride `0x18`, guard byte `0x2ee3e00`, labels `Off`/`4x`/`9x` + sentinel
+  `EVirtualResolutionMode`); fallback `0x10a90("%d", 2)` uses the **literal 2**, so its text is
+  `"2"` and is unreachable from slot 524. Canary `0x15fe518`, `jne 0x16a59a` at `0x16a58b`.
+- **Counts moved:** coverage 566 -> **567**, open 7 -> **6**, first gap unchanged
+  **497/`0x262a80`**, atexit 1,685 -> **1,687**, pending 967 -> **968**, menu 420 unchanged,
+  index-set `5a0f678b…5346cc`, entry map 2,425 -> **2,478** constants (1,654 -> **1,682** RVAs,
+  549 -> **551** headers, 400 duplicates), CTest 677 -> **678**.
+- **Oracle:** `check_ctor_slot_524.py` pins the 727 B body + 544 B helper hashes, 143 operand pins,
+  19 callee hashes and 12 string/blob pins; **371 ELF + 77 native mutants rejected**; both tamper modes
+  exit 1. The shared `l2_slot_check.py` gained an additive optional `helper_header` text so a slot and
+  its companion helper can be pinned in one spec; slot 530 still passes.
+- **Honesty:** every dtor/handler/vtable/`ret` is an identity pin, never executed. `0x20540` is an
+  identity reserve (fixture owns the token array); `0x20640` is a host contract that fails closed
+  when forced without one. The unwritten token-1 `+0x48`, command `+0x98`, token gaps, scratch
+  `+0x00..+0x1f` and table row gaps are sentinel-verified. No boot/audio/save/Metal claim.
+
+## 2026-11-07 — slot 530 (`0x149f00`, the Resources debug page) landed as batch 31
+
+**State: green, uncommitted.** Build 0, **CTest 677/677**, coverage **566/573** with **7 open**,
+first gap **497 / `0x262a80`**, entry map 2,425 constants -> 1,654 RVAs / 549 headers, G1 OK
+(566/573), path audit OK 4,110, project index **101,258 folders**, sweep **885 passed / 0 skipped /
+0 failed** (exit 0, `local/build/sweep530b.log`).
+
+- **Selection:** slot 524 (`0x16a810`, 727 B) was rejected because its body calls the unmodelled
+  544 B helper `0x16a380` (vector insert / `SharedStr` copy). Slot 530 (3,009 B) uses only
+  first-class contracts and was taken.
+- **Body:** 3,009 B, sha `7b94f30c…f11d4`, table word `0x2dd6050`. Stack-guarded; trailing `nop`.
+  Cell `0x2ee2d00` + two partially written 0x18 B zero cells (`+0x04..+0x07` never stored).
+- **Variables:** five bools at `0x2ee2d38`/`e00`/`ec8`/`f90`/`3058` (stride 0xc8, tag `0x15985b8`,
+  value/default 0, atexit `0x20b0`); ranged int `0x2ee3120` `res_maxLoadingMemoryMiB` (23) through
+  `0xc580`, 0..`0x7fffffff`, flags 1, caller tag **`0x15985d8`** (same four slots as `0x15944a0`),
+  value/default `0x1e`, atexit `0x18a60`.
+- **Command:** `0x2ee31f8` `res_resetLoadingStats` (21), description 19, flags 2, vptr `0x1594dd0`,
+  delegate `{self,0x1990,0,0x144320}`, vector zeroed, **`+0x98` not written**, `0x20d60`,
+  atexit `0x4b0`.
+- **Menu:** group `0x2ee3298` (`Systems` -> `Resources`, flags `0x30`) plus seven toggles at
+  `0x2ee3340 + 0xa8*i` (`Show Loading Info`, `Show Resource Stats`, `Reset Loading Stats`,
+  `Max Loading Memory MiBs`, `Show SyncBuild Warnings`, `Print HighLevel Loads to TTY`,
+  `Print All File Loads to TTY`), all `Resources`/`0x30`/range 1.0–10.0. The `0x268b0` root-list
+  path does not write `item.registered`; only the parent path does.
+- **Atexit:** sixteen rows in body order (`0x1442f0`, five `0x20b0`, `0x18a60`, `0x4b0`, seven
+  `0x272d0`). Pending 960 -> **967**, menu 412 -> **420**.
+- **Oracle:** `check_ctor_slot_530.py` pins 3,009 B hash, 24 callee hashes, 160 RIP/object + 69
+  call + 41 byte pins and 17 strings; **661 ELF + 91 native mutants rejected**; both tamper modes
+  exit 1.
+- **Counts moved:** coverage 565 -> **566**, open 8 -> **7**, first gap unchanged at
+  **497/`0x262a80`**, atexit 1,669 -> **1,685**, pending 960 -> **967**, menu 412 -> **420**,
+  index-set `246f8bc5…60ff`, entry map 2,390 -> **2,425** constants (1,638 -> **1,654** RVAs,
+  548 -> **549** headers), CTest 676 -> **677**.
+- **Honesty:** all destructors, handler tags and functor bodies are identity pins, never executed.
+  The two zero cells, command `+0x98` and functor padding are sentinel-verified as untouched. The
+  `0xc580` argument-tag alias is accepted only because its four slot bodies are byte-pinned equal to
+  `0x15944a0`'s. No new helper abstraction was introduced.
+
+## 2026-11-07 — slot 556 (`0x4ccb0`, four app-info entries + `sendEmail`) landed as batch 30
+
+**State: green, uncommitted.** Build 0, **CTest 676/676**, coverage **565/573** with **8 open**,
+first gap **497 / `0x262a80`**, entry map 2,390 constants -> 1,638 RVAs / 548 headers, G1 OK
+(565/573), path audit OK 4,110, project index **101,255 folders**, sweep **884 passed / 0 skipped / 0 failed**
+(exit 0, `local/build/sweep556.log`).
+
+- **Body:** 1,300 B, sha `f23d9fed…84953`, table word `0x2dd5f80`. It zeroes singleton
+  `0x2ea8978` and registers `__cxa_atexit(0x4a660, &cell, 0x1604218)`, then builds four 0x50-byte
+  `lane_m5` entries at `0x2ea8988` / `0x2ea89d8` / `0x2ea8a28` / `0x2ea8a78`:
+  `PingAllConnections` (18, handler `0x4b650`), `SendEngineDispatchCmd` (21, `0x4b670`),
+  `SendConCommand` (14, `0x4b720`), `RequestListOfConCommands` (24, `0x4b870`). The four entries
+  reuse the existing `0x4b560` / `0x4b660` sequence and push in body order.
+- **Command:** 0xa0 B at `0x2ea8ac8`, name `sendEmail` (9), description 51, flags 2, vptr
+  `0x1594dd0`, tail `{self, 0x1990, 0, 0x4b980}`, vector `+0x80/+0x88/+0x90 = 0`; **`+0x98` is not
+  written**. Registration is vtable `0x1594dc0 + 0x20 = 0x1594de0 -> 0x20d60`; there is no
+  `0x20540` reserve and no token push. One command, no menu rows.
+- **Atexit:** six records in body order: `0x4a660` singleton, four `0x4b660` entries, `0x4b0`
+  command. Pending commands 959 -> **960**; menu stays **412**.
+- **Oracle:** `check_ctor_slot_556.py` pins 1,300 B hash, 8 callee hashes, 37 RIP/object pins,
+  23 calls and 6 strings; **91 mutants rejected**; both tamper modes exit 1.
+- **Counts moved:** coverage 564 -> **565**, open 9 -> **8**, first gap unchanged at
+  **497/`0x262a80`**, atexit 1,663 -> **1,669**, pending 959 -> **960**, menu 412 unchanged,
+  index-set `960369a5…79646`, entry map 2,376 -> **2,390** constants (1,633 -> **1,638** RVAs,
+  547 -> **548** headers), CTest 675 -> **676**.
+- **Honesty:** `0x4a660`, the four handler bodies, `0x4cca0` and `0x4b980` are identity tags; only
+  the one-byte `0x4b650` is also pinned as a `ret`. The fixture poisons command `+0x98` and verifies
+  it is preserved. No new helper abstraction was introduced.
+
+## 2026-11-07 — slot 568 (`0x207e0`, `LoadCmdsFromFile`) landed as batch 29
+
+**State: green, uncommitted.** Build 0, **CTest 675/675**, coverage **564/573** with **9 open**,
+first gap **497 / `0x262a80`**, entry map 2,376 constants -> 1,633 RVAs / 547 headers, G1 OK
+(564/573), path audit OK 4,110, sweep **883 passed / 0 skipped / 0 failed** (exit 0,
+`local/build/sweep568.log`).
+
+- **Body:** 782 B, sha `95b7a07e…4719b`, table word `0x2dd5f20`. One 0xa0-byte command at
+  `0x2dfca88`: `LoadCmdsFromFile` (16), description 49, flags 2, vptr `0x1594dd0`, tail
+  `{self, 0x1990, 0x2512a0, 0x1fe80}`; vector at `+0x80`.
+- **Two inline tokens:** `0x20540(vec, 2)` reserves; both pushes take the inline branch, so the
+  `0x20640` grow path is pinned but not taken. Token 0 is `{kind 4, "file"}` and token 1 is
+  `{kind 0, "inline", +0x48 = 0}`; both empty views come from `0xf180`, token 0 is normalized
+  through the `0xf730` static (`0x2dd9f78`). Token 0's `+0x48` is **not written** by the body.
+- **Registration/cleanup:** command vtable `+0x10` = `0x20d60` queues once; `0x1594d60 + 0x18` =
+  `0x207d0` is a one-byte `ret` (recorded, never executed); description then name are released;
+  one `__cxa_atexit(0x4b0)`. No menu or app-info rows.
+- **Oracle:** `check_ctor_slot_568.py` pins the 782 B hash, 10 callees, 13 object/rip pins,
+  15 calls and 4 strings; **52 mutants rejected**; both tamper modes exit 1.
+- **Counts moved:** coverage 563 -> **564**, open 10 -> **9**, first gap stays
+  **497/`0x262a80`**, atexit 1,662 -> **1,663**, pending 958 -> **959**, menu 412 unchanged,
+  index-set `ffc15426…808ce`, entry map 2,368 -> **2,376** constants (1,630 -> **1,633** RVAs,
+  546 -> **547** headers), project index 101,251 -> **101,253**, CTest 674 -> **675**.
+- **Repaired, not routed around:** the name is 16 bytes, not 17; registration precedes the no-op
+  vcall; the vtable target is at `vptr + 0x10`; and the first token's unwritten `+0x48` is
+  pre-filled with `0xa5` in the fixture and verified preserved.
+
+## 2026-11-07 — slot 468 (`0x3c3a90`) landed with the scripted-entry helper `0x3c2a00`
+
+**State: green, uncommitted.** Build 0, **CTest 674/674**, coverage **563/573** with **10 open**,
+first gap **497 / `0x262a80`**, entry map 2,368 constants -> 1,630 RVAs / 546 headers, G1 OK
+(563/573), path audit OK 4,110, sweep **882 passed / 0 skipped / 0 failed** (exit 0,
+`local/build/sweep468.log`).
+
+- **The dependency is first-class.** `0x3c2a00` (398 B, sha `3e00391a…a79e59`) is
+  `native/core/scripted_entry_3c2a00.{hpp,cpp}`, with its own fixture and 27-mutant byte oracle.
+  It copies three 0x20-byte descriptors, applies the `flag != 0 -> self = &descriptor` rule, copies
+  the 0x60 name with an atomic ctl increment, pushes on `0x2ef6400`, and optionally upserts through
+  `0x3c0840` without overwriting a non-null mapping.
+- **Body:** 4,772 B, sha `26e0067a…1c7d82`. Three app-info delegates
+  (`RequestAutomationCommands` 25 / `0x3c0200`, `LoadAutomationPlanRemote` 24 / `0x3c0220`,
+  `SetAutomationIndex` 18 / `0x3c0240`); five scripted entries (`wait`, `conCommand`, `print`,
+  `waitForUser`, `waitForResourceLoading`); ten commands (`automate_userdone`, `automate`,
+  `automate_go`, `automate_pause`, `automate_rewind`, `automate_clear`, `automate_loadstring`,
+  `automate_loadfile`, `automate_throwerror`, `writetofile`). Eighteen atexit rows in body order
+  (3 x `0x4b660`, 5 x `0x3c15e0`, 10 x `0x4b0`); ten registrations; no menu rows.
+- **Rewind token:** `0x20540(entry+0x80, 1)`, inline {kind 0, `"pause"`, empty view at +0x28,
+  byte +0x48 = 1}; the successful reserve takes the inline branch, so `0x20640` is pinned but not
+  claimed as exercised. The 0x50-byte token lives in caller-owned storage as a documented host
+  substitution; the field stores are exact.
+- **Oracle:** `check_ctor_slot_468.py` pins the body hash, 11 callees, 22 object/rip pins, 34 calls
+  and 34 strings; **73 mutants rejected**, both tamper modes exit 1. `check_scripted_entry_3c2a00.py`
+  rejects 27 mutants, both tamper modes exit 1.
+- **Counts moved:** coverage 562 -> **563**, open 11 -> **10**, first gap 468/`0x3c3a90` ->
+  **497/`0x262a80`**, atexit 1,644 -> **1,662**, pending 948 -> **958**, menu 412 (unchanged),
+  index-set `cb0faa7a…c563`, entry map 2,359 -> **2,368** constants, project index 101,247 ->
+  **101,251**, CTest 672 -> **674**.
+- **Repaired, not routed around:** the command-run static assertion was 0xa00 for ten 0xa0 commands
+  (correct total object run 0xa00, command run 0x640); the entry list is push-front; the scripted
+  name carries a ctl counter; the first `automate_userdone` description is 161 bytes; and the
+  checker's `%rsp` token pins use SIB encodings.
+
+## 2026-11-07 — slot 462 (`0x3e2730`) landed with the `0x6af60` / `0x6b0f0` functor-command pair
+
+**State: green, uncommitted.** Build 0, **CTest 672/672**, coverage **562/573** with **11 open**,
+first gap **468 / `0x3c3a90`**, entry map 2,359 constants -> 1,626 RVAs / 544 headers, G1 OK
+(562/573), path audit OK 4,110, sweep **880 passed / 0 skipped / 0 failed** (exit 0,
+`local/build/sweep462.log`).
+
+- **The dependency is first-class and reachable.** Slot 462 calls `0x6af60` unconditionally at
+  `0x3e2c45`; `0x6af60` (397 B, sha `2a30b19b…b8d878`) calls `0x6b0f0` (352 B, sha
+  `62da759b…d3c9cb`) at `0x6b093`. Both are `native/core/concmd_functor_6af60.{hpp,cpp}`, each
+  pinned by `check_concmd_functor_6af60.py` (2 body hashes, 17 imm + 5 call pins, 30 mutants). The
+  five type-erased calls are a host contract; the stores and both canaries are native.
+- **Body:** 15 objects — zero cell `0x2ef7420`; views `Presentation` and `Clear Active Point of
+  Interest`; commands `activatePOI`, `clearPOI`, `poiClearErrorMessages`, `poiGroup`, `poi`; the
+  0xc8 bool `showPoiDescription` with final vptr **`0x1594218`**; string holder `renderErrorMsgs`;
+  the 0xd0 functor command at `0x2ef76a0`; toggles `Show Description` / `Show Render Target`, the
+  `Clear Error Messages` command item and the `Shadow Boss Jump` group. Fifteen atexit rows,
+  **seven** registrations, **four** menu items, two static views.
+- **Oracle:** `check_ctor_slot_462.py` pins the body hash/extent, 79 operand pins, the 53-call
+  sequence and every rodata string; **221 ELF + 86 native mutants rejected**; both tamper modes
+  exit 1. Both new fixture suites pass.
+- **Counts moved:** coverage 561 -> **562**, open 12 -> **11**, first gap 462/`0x3e2730` ->
+  **468/`0x3c3a90`**, atexit 1,629 -> **1,644**, pending 941 -> **948**, menu 408 -> **412**,
+  index-set `7b8731be…bdd907`, entry map 2,351 -> **2,359** constants, project index 101,242 ->
+  **101,247**, CTest 670 -> **672**.
+- **Repaired, not routed around:** `poiGroup` is 8 bytes (first draft had 7); the 0x82-byte `poi`
+  literal had to be one source literal for the native scan; the slot checker's `callees` named a
+  private helper and raised `KeyError`; the first gap is 468 because 463 was already registered;
+  `startup_ctors`' explicit `expect[]` needed 462; and `source_order` follows source definitions,
+  not the call order inside `init_slot462`.
+
+## 2026-11-07 — slot 454 (`0x483e40`) landed on a first-class RB erase (`0x482a90`)
+
+**State: green, uncommitted.** Build 0, **CTest 670/670**, coverage **561/573** with **12 open**,
+first gap **462 / `0x3e2730`**, entry map 2,351 constants -> 1,622 RVAs / 542 headers, G1 OK
+(561/573), path audit OK 4,110, sweep **878 passed / 0 skipped / 0 failed** (exit 0,
+`local/build/sweep454.log`).
+
+- **The erase is first-class, and its call site is dead.** `0x482a90` (1,201 B, sha
+  `c04855e7…d679703`) is `_Rb_tree_rebalance_for_erase` with nil sentinels: node `+0` left, `+8`
+  right, `+0x10` parent, `+0x18` colour (1 = black), `+0x19` nil; header `+0` leftmost, `+8` root,
+  `+0x10` rightmost; tree `+8` header, `+0x10` count. It is `native/core/rb_tree_482a90.{hpp,cpp}`,
+  own fixture and oracle. **Reachability fact:** `0x482960` compares the header's left link with
+  itself at `0x48298b` (`49 8b 5d 00` / `49 3b 5d 00`, both decoders agree), so `je 0x482a3b` is
+  always taken and the only erase call site `0x482a28` is unreachable. `rb_clear_482960` models the
+  taken `0x483240` + reset path, `rb_erase_all_loop` models the hidden loop, and the header records
+  this instead of assuming the erase is on the clear path.
+- **Body:** `0x2ef85d8` 0xd8-byte ranged variable (`network_LocalPlayerId`, vptr `0x1594c08`, value
+  at `+0xd0`, default `-1`, functor vptr `0x1595660`, `atexit(0x18a60)`); `0x2ef86b0` / `0x2ef8778`
+  0xc8-byte bools (`network_Interpolation` 1, `network_ShowObjectBandwidth` 0; vptr `0x15940b0`,
+  value at `+0xc0`, `+0xb0 = 0xc2a0`, `atexit(0x20b0)` x2); four 0x38-byte `Client:` records at
+  `0x2ef8840` through `0xa81700` with one array `atexit(0x482920)`; two 0x38-header trees at
+  `0x2ef8920`/`0x2ef8938` and a 0x1a8-header tree at `0x2ef8970`; the 0x20-byte
+  `SServerObjectProperties` view at `0x2ef8950`. Eight atexit records total; **three**
+  registrations, no menu items.
+- **Oracle:** `check_ctor_slot_454.py` pins the full 32-call sequence and re-reads every string from
+  rodata; 50 pins; **125 ELF + 58 native mutants rejected**; both tamper modes exit 1.
+  `check_rb_tree_482a90.py` pins the guard bytes, the dead call site and the taken path; 12 ELF
+  mutants rejected; both tamper modes exit 1.
+- **Counts moved:** coverage 560 -> **561**, open 13 -> **12**, first gap 454/`0x483e40` ->
+  **462/`0x3e2730`**, atexit 1,621 -> **1,629**, pending 938 -> **941**, menu 408 (unchanged),
+  index-set `7bac7f8e…0f065`, entry map 2,336 -> **2,351** constants, project index 101,238 ->
+  **101,242**.
+- **Repaired, not routed around:** the new types collided with the existing `RbNode`/`RbTree`/
+  `RbHooks` (renamed `RbErase*`); the 0xd8 object packed its byte fields (explicit gaps added); the
+  RB fixture's in-order check was actually post-order (fixture bug, fixed); and the slot's
+  `--tamper-native` replaced only one of two header occurrences and failed open (now replaces all
+  and exits 1).
+
+## 2026-11-07 — slot 495 (`0x268ee0`) landed; the `0xa38960` blob reader lifted first
+
+**State: green, uncommitted.** Build 0, **CTest 668/668**, coverage **560/573** with **13 open**, the
+cliff stays at **454 / `0x483e40`** (still blocked on the RB erase `0x482a90`; 454 sorts before 495,
+so the first gap cannot move), entry map 2,336 constants -> 1,610 RVAs / 540 headers, G1 OK
+(560/573), path audit OK 4,110.
+
+- **The unmodelled dependency is gone.** `0xa38960` (436 B, sha `1c62b18d…`) plus its validator
+  `0xa39eb0` (288 B, `96b5e707…`) and accumulator `0xa39fd0` (240 B, `50a54c41…`) are first-class
+  code: `native/core/blob_parser_a38960.{hpp,cpp}`, own CMake target and fixture, own byte oracle
+  `tools/lift/check_blob_parser_a38960.py`. Pins decoded from the bytes: `tag = kind<<28 | count`
+  (0 element -> `c += count`; 1 leaf -> `b += 1, a += count`; 2 group -> recurse then
+  `b = 1 + sub.b*count + b`, `a += sub.a*count`, `c += count*sub.c`; 3 end and `0xbeefbeef` stop);
+  the validator's status starts `{1,1}` (parser's `movw $0x101`) and a group recurses with `{1,0}`;
+  all three accumulator passes start `{a=0,b=1,c=0}` via `movabs $0x100000000`.
+- **Body:** one 0xc0-byte console **VARIABLE** `0x2eeebb0` (`network_AllowCrossPlatformPlay`, 30 B,
+  empty description, vptr `0x15940b0`, `+0xb0 = 0xc2a0`, `+0x60 = 0x2eeec70`, register `0x20d60`,
+  `atexit(0x20b0)`); the parsed record `0x2eeeca8` (valid 1, a/size `0x20`, bits 2, bytes 1, total
+  `0x21` from the blob `{0x10000020, 0xbeefbeef}` at `0x1604934`, `atexit(0x209d80)`); twelve
+  `0x48`-byte `NET_ERROR_*` items at `0x2eeecd8 + 0x48*i`, each `0xf590` + `atexit(0x268e20)`.
+  Fourteen atexit records total. **No delegate and no toggle**, so the menu count does not move.
+- **Port contracts (fail closed, before the store):** depth > 64; a stream past the caller's dword
+  count (the original reads unbounded); > 4096 dwords; an allocator hook without a release hook;
+  arena exhaustion. The first 4-byte refcount is allocated and stored at `+0x20` *before* the
+  validity test and is always released after the payload copy (`jmp 0x170c0`).
+- **Oracle:** `check_ctor_slot_495.py` re-derives the name/description and all twelve item strings
+  from rodata, the object addresses, the length immediates and the three helpers; 43 operand pins;
+  **88 ELF + 51 native mutants rejected**; both tamper modes exit 1. The parser checker adds 19 pins
+  and **39 ELF + 31 native mutants**; it is `no_table` because it is a shared callee.
+- **Counts moved:** coverage 559 -> **560**, `+14` -> `+13`, atexit 1607 -> **1621**, menu 408
+  (unchanged), pending 937 -> **938**, first gap `454/0x483e40` (unchanged), index-set
+  `cb0d6fda…bf384`, console-var and fctor checkers 560, entry map 2,327 -> **2,336** constants,
+  survey 560/573 with 13 open, G1 OK 560/573.
+- **Repaired, not routed around:** the slot checker's Python reference port was unbounded
+  (`IndexError` on `{0x20000002,0x10000001,0xbeefbeef}`); the parser's `--tamper-native` mutated a
+  comment occurrence instead of the constant (now re-runs `check_native`); `source_order` was not the
+  real call order; and `test_startup_ctors.cpp` still skipped 495 in its expected list — the full
+  suite caught that one.
+- **Verification:** build 0, **CTest 668/668**, **sweep 876 passed / 0 skipped / 0 failed**
+  (`SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`, exit 0,
+  `local/build/sweep495b.log`); 88 ELF + 51 native and 39 ELF + 31 native mutants rejected.
+
+## 2026-11-07 — slot 452 (`0x498640`) landed: four cp10 commands and one toggle
+
+**State: green, uncommitted.** Build 0, **CTest 666/666**, coverage **559/573** with **14 open**, the
+cliff moved to **454 / `0x483e40`** (still blocked on the RB erase `0x482a90`), entry map 2,327
+constants -> 1,603 RVAs / 538 headers, G1 OK (559/573), path audit OK 4,110.
+
+- **The four register-indirect calls are resolved, not blocked.** Each is `leaq 0x1594dc0,%rax;
+  movq 0x20(%rax),%r12; ... callq *%r12`, and the RELATIVE relocation at `0x1594de0` holds `0x20d60`
+  (`concmd_register`) — the same helper the slot's direct calls use. `%r12` is loaded **once** (group 0)
+  and reused by all four groups. Decode trap: one `4c 8b 60 20` load and four `41 ff d4` calls.
+- **Body:** node `0x2ef8bf0` <- `new(0x48)` via `0x17070` (three self links, bytes `+0x18/+0x19 = 1`),
+  `atexit(0x497610)`; cell `0x2ef8c08 = 0`, `atexit(0x493190)`; four 0xa0-byte console COMMANDS at
+  `0x2ef8c10 + 0xa0*i` (`cp10_cutsceneEvent` 18/127, `cp10_setAreaLoaderState` 23/60,
+  `cp10_setUIAreaLoaderState` 25/71, `cp10_ResetPhysicsCameraCut` 26/30; handler tags
+  `0x497320/0x497520/0x497560/0x4975a0`), each exactly the slot-306 shape (`0x20af0` flags 2, delegate
+  `{self, 0x1990, 0, handler}`, register, two inert `0xf590`, `atexit(0x4b0)`); one toggle at
+  `0x2ef8e90` via `0x26ea0` (`Shared` / `ResetPhysicsCameraCut`, target command 3, flags `0x30`),
+  `atexit(0x272d0)`. Seven body records, in that order.
+- **Canary trap:** the guard compare's `jne` at `0x498afc` is a **short** jump `75 0f`, not `0f 85`.
+- **Fixture traps:** `family_toggle_item_26ea0` raises the menu root's lazy guard (`0x27280`) on a fresh
+  registry *before* the item's own `0x272d0`, so the isolated fixture sees 8 log rows for 7 body records
+  (in the full startup the guard is already done); cross-TU string-literal pointers are not comparable,
+  so the fixture asserts view contents with `memcmp`.
+- **Oracle:** `check_ctor_slot_452.py` re-derives the four names/descriptions from rodata (the 127-byte
+  first description ends `<eventName> <cutIndex> <time>`), the object addresses, the handler tags and
+  the `0x20d60` register slot (vtable slots at `VTABLE+0x10/0x20/0x28`); 70 operand pins;
+  **142 ELF + 48 native mutants rejected**; `--tamper` and `--tamper-native` exit 1.
+- **Counts moved:** coverage 558 -> **559**, `+15` -> `+14`, atexit 1600 -> **1607**, menu 407 -> **408**,
+  pending 933 -> **937**, first gap `452/0x498640` -> `454/0x483e40` (coverage test, `check_ctor_slots`,
+  `check_console_var_ctors` token), index-set `18140504…8d35d3`, fctor rows 559.
+
+- **Verification:** build 0, **CTest 666/666**, **sweep 874 passed / 0 skipped / 0 failed**
+  (`SOTC_NATIVE_BUILD=local/build/orch-r22 tools/lift/run_all_checkers.sh`, exit 0,
+  `local/build/sweep452d.log`); 142 ELF + 48 native mutants rejected. Fix upstream of the sweep:
+  `check_console_var_ctors.py` carries **two** first-gap tokens (`_index()` and `_rva()`); both
+  move to 454, and the sweep must run with `SOTC_NATIVE_BUILD` set or 23 checkers report
+  environmental "not built in" failures.
+
+## 2026-11-07 — slot 537 (`0x1324c0`) landed: 40 f32→f16 conversions
+
+**State: green, uncommitted.** Build 0, **CTest 665/665**, coverage **558/573** with **15 open**, cliff
+unchanged at **452 / `0x498640`**, entry map 2,321 constants → 1,600 RVAs / 537 headers, G1 OK
+(558/573, 83 frontier rows, 41 site-provable), path audit OK 4,110.
+
+- **Shape:** an 8-byte word at `0x2ee12e0` is zeroed and registered with
+  `__cxa_atexit(0x131f00, word, 0x1604218)`, then 40 groups `call 0x157e90; movw %ax, 0x2ee12f0 + 2*i`.
+  The scheduler issues group *i*'s store after group *i+1*'s load, so the store order is still
+  `i = 0..39` (decoded, not assumed). 29 inputs are rip-relative float words, **11 are `vxorps`
+  zeros** — do not read the inputs as `0xfa7718 + 4*i`.
+- **`0x157e90` is a correct round-half-to-even f32→f16 converter, not a truncating one.** Dispatch is
+  `e - 0x70`: `<= 0` subnormal (flush below `e = 0x66`, round-half-even at subnormal spacing above it),
+  `== 0x8f` means `e == 0xff` (inf, or a NaN payload `(mant >> 13) | (payload == 0)`), otherwise
+  `d = mant + bit13 + 0xfff` where the carry into bit 23 bumps the exponent to `e - 0x6f` and drops the
+  payload, and `exp >= 0x1f` saturates to `0x7c00`.
+- **Two earlier claims are withdrawn** (they were in the 532-era triage note): the helper does **not**
+  truncate, and 65520.0f (`0x477ff000`) does **not** return 65504 — its bit 13 sets the carry, so it
+  saturates to `0x7c00`. The `cmp $0x8f` is against `e - 0x70` (i.e. `e == 0xff`), not `e == 143`.
+  Discovered by running the tie vectors through the port before writing the fixture.
+- **The checker is a second, independent port.** `check_ctor_slot_537.py` decodes the body
+  structurally (40 calls to `0x157e90`, 40 stores to `0x2ee12f0 + 2*i`, 29 loads + 11 zero vectors in
+  provenance order), reads the float words from the ELF, recomputes all 40 halves in Python and
+  compares them with the fixture's `kSlot537Halves`. 121 pins; **240 ELF + 32 native mutants
+  rejected**; `--tamper` and `--tamper-native` both exit 1.
+- **Fixture traps hit:** the first version asserted 33 distinct halves — that number came from the
+  *wrong* earlier input list (40 words at stride 4); the real table has **30**. The oracle also caught
+  a store pin of 8 B that is really 7 (`66 89 05` + disp32) and an RVA regex that assumed 4 hex digits.
+- **Count pins that had to move together:** `test_startup_ctor_coverage.cpp`
+  (`slots.size() == 558`, `slots.size() + 15 == kOriginalCtorCount`, atexit `1600`),
+  `check_ctor_slots.py` (`DEBUG_PAGE_BATCH_18`, digest `01fdbe15…87334e1`, 15 unregistered),
+  `check_console_var_ctors.py` (558 and `+ 15`), `check_fctor_slots_296_297_300.py` (558 rows).
+  `g1_evidence_pack.py` parses the `+ 15` line, so a missed edit there fails the pack too.
+
+```sh
+cmake --build local/build/orch-r22 -j 12
+ctest --test-dir local/build/orch-r22 -j 12          # 665/665
+python3 -I tools/lift/check_ctor_slot_537.py         # 121 pins, 240 + 32 mutants rejected
+python3 -I tools/lift/check_ctor_slots.py            # 558 pairs, 15 unregistered
+```
+
+**Full checker sweep: 872 passed, 0 failed** (`local/build/sweep3_am.log` 834, `sweep3_nz.log` 38).
+
+Checkpoint: [2026-11-07-startup-slot-537](docs/checkpoints/2026-11-07-startup-slot-537.md), E1388.
+
+## 2026-11-07 — slot 532 (`0x143f50`) landed: 21 borrowed views
+
+**State: green, uncommitted.** Build 0, **CTest 664/664**, coverage **557/573** with **16 open**, cliff
+unchanged at **452 / `0x498640`**, entry map 2,318 constants → 1,598 RVAs / 536 headers, G1 OK (83
+frontier rows, 41 site-provable), path audit OK 4,110.
+
+- **Slot 532 is the cleanest shape in the survey**: 832 B, one straight line, no stack guard and no
+  conditional branch. It builds **21 borrowed `SharedStr` views** at `0x2ee2a58 + 0x20*i` — each group
+  is `lea object; lea literal; xor esi,esi; call 0xf2f0` then `__cxa_atexit(0xf7b0, object,
+  0x1604218)` — and the 21st record is the body's **tail `jmp __cxa_atexit`**.
+- **The literals are interior pointers into debug strings, and their windows overlap.** The first
+  fixture version asserted disjoint windows and failed on real data (entry 3's window runs into entry
+  4). The assertion now checks ascending order and measured lengths only; the header carries all 21
+  windows byte for byte (hex escapes split with `""` so no escape swallows the next byte) and the
+  fixture asserts `strlen` against the pinned length for every one.
+- **Checker lesson:** `CHECKER532=0` in one run was `tail` masking the exit status. Unpiped, the
+  checker was failing because group 1 starts `0x34` B after group 0 (not `0x26`): group 0 lacks the
+  three-register prologue. Fixed, and all 87 pins (86 body operands + the one-past-the-body boundary byte) verify.
+- **The lib hashes through the program headers**, so a body digest must come from `Elf().read(...)`,
+  not a raw file slice — the two differ (`4dea7700…` vs `90319c52…`) and only the former satisfies
+  `body_hash`.
+- **Correction recorded:** `kSlot532LastObject` is a literal constant, not an expression; the fixture
+  asserts the `Object0 + 20 * Stride` arithmetic separately, because the native-constant parser only
+  accepts literals.
+
+```sh
+cmake --build local/build/orch-r22 -j 12
+ctest --test-dir local/build/orch-r22 -j 12          # 664/664
+python3 -I tools/lift/check_ctor_slot_532.py         # 86 pins, 149 + 61 mutants
+python3 -I tools/lift/check_ctor_slots.py            # 557 pairs, 16 unregistered
+```
+
+**Full checker sweep: 871 passed, 0 failed** (`local/build/sweep2_am.log` 833, `sweep2_nz.log` 38).
+
+Checkpoint: [2026-11-07-startup-slot-532](docs/checkpoints/2026-11-07-startup-slot-532.md), E1387.
+Next ranked open slot: **454 / `0x483e40`** (blocked on the 1,201 B RB erase `0x482a90` chain), then
+**524 / `0x16a810`** (needs `0x20540` / `0x20640` / `0x16a380`) and **568 / `0x207e0`**.
+
+## 2026-11-07 — slot 446 re-pin, suite green, slot 570 (`0x16d80`) landed
+
+**State: green, uncommitted (workers do not commit; the integrator does).** Build 0, **CTest 663/663**,
+entry map 2,314 constants → 1,597 RVAs / 535 headers, survey 556/573 with 17 open, G1 OK (83 frontier
+rows, 41 site-provable), path audit OK 4,110. Full checker sweep is chunked and was still running at
+checkpoint time (`local/build/sweep_am.log`, `local/build/sweep_nz.log`); `check_ctor_slot_570`,
+`check_ctor_slots`, `check_entry_map`, `check_g1_evidence_pack` all pass individually.
+
+- **Slot 446 needed no model work — only its count pins were stale.** Verified first
+  (`test_ctor_slot_446` OK, `check_ctor_slot_446` OK on the 2,334 B body `ad744dda…`, 210 pins), then
+  moved pending 927→932, menu 404→406, atexit 1563→1573. The suite was **662/662 green** before any new
+  slot work started.
+- **Slot 570 / `0x16d80` (740 B) implemented and registered**: `native/core/ctor_slot_570_16d80.{hpp,cpp}`,
+  `test_ctor_slot_570`, `tools/lift/check_ctor_slot_570.py` (50 operand pins; 149 ELF + 61 native
+  mutants rejected; `--tamper elf`/`--tamper native` exit 1). Coverage **555 → 556/573**; the cliff is
+  unchanged at **452 / `0x498640`** because 570 sits above it. Atexit pins are now pending 933 /
+  menu 407 / atexit 1578.
+- **Two faults found in verification, both in my own fixture, not the model:** a `u32`/`u64` field was
+  compared against the `u8` poison value, and the `jne` at `0x1704d` is the short encoding
+  `75 0f` (target `0x1705e`), not `0f 85`.
+- **Carry-forward observation:** the shared menu shape `0x268b0` records the registry *root* destructor
+  (`0x27280`) on first use, between the bool and the item, so a "five atexit records" expectation is six
+  records in a fresh registry. `DebugMenuItem.registered` stays 0, matching the slot-446 fixture.
+- **Checker sweep: 868 passed, 0 failed after fixups** (`local/build/sweep_am.log` 830 ok / `sweep_nz.log`
+  38 ok). It surfaced exactly two stale count pins, both from moving coverage 555 → 556:
+  `check_console_var_ctors.py` (`slots.size() == 555`, `+ 18 == kOriginalCtorCount`) and
+  `check_fctor_slots_296_297_300.py` (`len(rows) == 555`, now 556). Both are fixed and re-verified.
+  Caveat: `check_fctor_slots_296_297_300.py` consumes no argv at all, so `--tamper elf|native` is a
+  no-op there and its exit 0 is **not** evidence of fail-closed behaviour; `check_console_var_ctors.py`
+  does support both tampers and exits 1 under each.
+- **A fifth stale count pin surfaced and was fixed:** `check_console_var_ctors.py`'s `COVERAGE_TOKENS`
+  still said `slots.size() == 555` and `slots.size() + 18 == kOriginalCtorCount`; now **556** and `+ 17`,
+  and it passes with `--tamper elf`/`--tamper native` exiting 1. No other `555`/`+ 18` pin remains in
+  `tools/lift/*.py` or `native/tests/*.cpp`.
+- **Next open slots:** survey rank 1 is now **454 / `0x483e40`**, but E1384 records it blocked on the RB
+  erase `0x482a90` — re-check that before restarting it. Rank 2 is **495 / `0x268ee0`** (one unmodelled
+  helper), then **537 / `0x1324c0`**.
+
+```sh
+cmake --build local/build/orch-r22 -j 12
+ctest --test-dir local/build/orch-r22 -j 12          # 663/663
+python3 -I tools/lift/check_ctor_slot_570.py
+python3 -I tools/lift/check_ctor_slots.py
+python3 -I tools/lift/gen_entry_map.py && python3 -I tools/lift/check_entry_map.py
+python3 -I tools/lift/survey_startup_gaps.py --write-doc
+python3 -I tools/lift/g1_evidence_pack.py --write && python3 -I tools/lift/check_g1_evidence_pack.py
+python3 -I scripts/audit_publish_paths.py --all
+python3 scripts/project_index.py
+```
+
+Checkpoint: [2026-11-07-startup-slot-570](docs/checkpoints/2026-11-07-startup-slot-570.md), E1386.
 
 ## 2026-11-01 22:10 CST (orchestrator c1982b) — wave 1 integrated; slot 329 claimed
 
@@ -7,6 +1591,7 @@
 - **Stale docs fixed:** `docs/CSDR_COMPRESSED.md` carries a supersession banner. `local/re/csdr_trailer_probe.py` still has the old tag `0x0000000134534452` (private, unpublished).
 - **Claim:** `CPU-01-STARTUP-SLOT-329` (`0x829e90`, 4,082 B, helper pair `0x8298d0`/`0x829b30`) is claimed by the orchestrator's next worker. A peer integrator also commits to `main`; check `git log` before starting.
 - **Slot 329 DONE (E1083):** registered, coverage **455/573**, cliff **335 / `0x7edf10`** (118 remain; slot 335 files are in the tree from a peer, not mine). CTest 538/538; `gen_entry_map.py` must be rerun after any slot header change.
+- **Oodle prerequisites DONE (E1087-E1089):** decoder-memory cells, type routing (Kraken `0x8c1e60`, Mermaid `0x8db8a0`; corrects E1075), constants and a 55-function map pinned by `check_oodle_prereqs_newlz.py`. Clean-room caveat: the worker read code `CODEC_DECISIONS` marks off-limits for an implementer; owner decides. Startup survey: `docs/STARTUP_GAP_SURVEY.md` (113 open gaps, 4 batches; 448/507/539/545 modelled but unwired).
 
 ## 2026-11-02 — COMPLETE HANDOFF (orchestration session end)
 
@@ -7411,3 +8996,75 @@ The rounds that follow the archive are in chronological order.
   `local/re/evidence/parallel-foundations-integration/`.
 - Reopen log: `local/checkpoints/root-20261020-reopen-console.log`.
 
+
+### 2026-11-02 (orchestrator c1982b) — frontier target models DONE (E1100)
+Worker modelled the four withdrawn-site targets; new `native/core/frontier_*` files, `native/tests/test_frontier_target_models.cpp`, `tools/lift/check_frontier_target_models.py`. No rows re-added. `check_g1_evidence_pack.py` stale until startup lane (465 registered) lands; regenerate then. Startup worker `ac2369610367ca47a` still running. Next: verify full build/ctest/checkers after it lands.
+
+### 2026-11-02 (orchestrator c1982b) — startup batch 2 integrated (E1098)
+Coverage 460->465/573; red default build fixed (explicit `hashed_names`). Orchestrator re-ran default build (exit 0) and ctest (545/545). Worker reports run_all_checkers 753/0, publish audit OK. Slot 518 pending (static-float tail); 430/504/366/411/555/409/414/494/418 refused for unmodelled callees. Nothing committed — integrator must commit. Record: `docs/checkpoints/2026-11-02-startup-batch-2.md`.
+
+### 2026-11-02 (orchestrator c1982b) — startup batch 3 integrated (E1101-E1103)
+Coverage 465->471/573, cliff 336 (0x7ec4c0) unchanged, 102 remain. Orchestrator re-ran default build (clean) and ctest (551/551); worker reports run_all_checkers 759/0. Refused for unmodelled helpers: 464, 506, 493, 390, 566, 398, 454, 392, 524, 510. Nothing committed — integrator must commit all uncommitted work (batches 2 and 3, frontier models). Record: `docs/checkpoints/2026-11-02-startup-batch-3.md`.
+
+### 2026-11-02 (orchestrator c1982b) — startup batch 4 integrated (E1104-E1106)
+Coverage 471->476/573, cliff 336 unchanged, 97 remain. Orchestrator re-ran default build (clean), ctest 560/560, publish audit OK; worker reports run_all_checkers 764/0. Helper-callee worker (0x26db0/0xc580/0x6aa00) still running. Nothing committed. Record: `docs/checkpoints/2026-11-02-startup-batch-4.md`.
+
+### 2026-11-02 (orchestrator c1982b) — helper callee models DONE (E1110-E1115)
+New `native/core/helper_*` + `sotc_helper_callees` lib, 4 checkers (all mutants rejected), ctest 4/4. Helpers already existed; the gap was functor-tag admission. Slots 430/504/555 now wireable (check `HelperRefusal::none`); 366/411 need only the bool adapter. Not wired yet — waits for startup batch 5 (owns startup_ctors.*). Record: `docs/checkpoints/2026-11-02-helper-callee-models.md`.
+
+### 2026-11-02 (orchestrator c1982b) — startup batch 5 integrated (E1120-E1122)
+Coverage 476->477/573 (slot 437), 96 remain, cliff 336 unchanged. Worker: default build clean, ctest 561/561, run_all_checkers 769/0. `l4_slot_lib.py` stale-overlay bug and `bool_page_lib.py --tamper native` fixed. Remaining M-tier slots blocked only on helpers now modelled; batch 6 wires them. Record: `docs/checkpoints/2026-11-02-startup-batch-5.md`.
+
+### 2026-11-02 (orchestrator c1982b) — startup batch 6 integrated (E1130-E1144)
+Coverage 477->491/573, 82 remain, cliff 336 unchanged. Orchestrator re-ran default build (clean), ctest 575/575, publish audit OK; worker reports run_all_checkers 783/0. UNCOMMITTED: batches 2-6, frontier models, helper callee models. Record: `docs/checkpoints/2026-11-02-startup-batch-6.md`.
+
+### 2026-11-02 (orchestrator c1982b) — startup batch 7 integrated (E1150-E1156)
+Coverage 491->497/573, cliff moved to 337 (0x7e81d0), 76 remain. Orchestrator re-ran default build (clean), ctest 581/581, publish audit OK; worker run_all_checkers 790/0. UNCOMMITTED: batches 2-7, frontier models, helper models (HEAD still 6ef42d20). Record: `docs/checkpoints/2026-11-02-startup-batch-7.md`.
+
+### 2026-11-02 (orchestrator c1982b) — startup batch 8 integrated (E1160-E1166)
+Coverage 497->503/573, cliff now 339 (0x7e2fc0), 70 remain. Orchestrator re-ran default build (clean), ctest 587/587, publish audit OK; worker run_all_checkers 796/0. UNCOMMITTED: batches 2-8, frontier models, helper models (HEAD 6ef42d20). Survey still lists 336/337 IN_FLIGHT (name-matching quirk; row table authoritative). Record: `docs/checkpoints/2026-11-02-startup-batch-8.md`.
+
+### 2026-11-02 (orchestrator c1982b) — startup batch 9 integrated (E1170-E1178)
+Coverage 503->511/573, cliff 340 (0x7de7e0), 62 remain. Orchestrator re-ran default build (clean), ctest 595/595, publish audit OK; worker run_all_checkers 804/0. UNCOMMITTED: batches 2-9, frontier + helper models (HEAD 6ef42d20). Record: `docs/checkpoints/2026-11-02-startup-batch-9.md`.
+
+### 2026-11-02 (orchestrator c1982b) — helper models 2 DONE (E1180-E1183)
+`native/core/helper_620e10_local_int_var.*` + test + checker; slot 401 now wireable. Correction: six of the seven "helper-blocked" slots are actually blocked by slot-level shapes, not helpers. Wiring waits for batch 10 (owns startup_ctors.*). Record: `docs/checkpoints/2026-11-02-helper-callee-models-2.md`.
+
+### 2026-11-02 (orchestrator c1982b) — startup batch 10 integrated (E1190-E1194)
+Coverage 511->516/573, cliff 352 (0x7a2390), 57 remain. Indirect calls in 340/342/388/480 were relocation-fixed direct calls to 0x20d60. Orchestrator re-ran default build (clean), ctest 602/602, publish audit OK; worker run_all_checkers 811/0. UNCOMMITTED: batches 2-10, frontier + helper models (HEAD 6ef42d20). Record: `docs/checkpoints/2026-11-02-startup-batch-10.md`.
+
+### 2026-11-02 (orchestrator c1982b) — startup batch 11 integrated (E1200-E1204)
+Coverage 516->521/573, cliff 358 (0x786f50), 52 remain. Repo-resident generator `tools/lift/startup_gen/`. Orchestrator re-ran default build (clean), ctest 607/607, publish audit OK; worker run_all_checkers 816/0. UNCOMMITTED: batches 2-11, frontier + helper models (HEAD 6ef42d20) — stage helper_620e10 files together with slot files. Record: `docs/checkpoints/2026-11-02-startup-batch-11.md`.
+
+### 2026-11-02 (orchestrator c1982b) — helper models 3 DONE (E1220-E1226)
+New `native/core/helper_{8d650,f8f630,56b4b0,a81700}_*`, tests, checkers. 497/513 unblocked callee-side (need host alloc contract); 422 still needs 0x274730; 446 blocked by 0x3be2d0/0x3c0840. Worker's full build hit batch-12 in-progress `test_ctor_slot_418.cpp` (transient). Record: `docs/checkpoints/2026-11-02-helper-callee-models-3.md`.
+
+### 2026-11-02 (orchestrator c1982b) — startup batch 12 integrated (E1210-E1218)
+Coverage 521->527/573, cliff 370 (0x720b50), 46 remain. Generator hard-errors on unaccounted calls. Orchestrator re-ran default build (clean), ctest 617/617, publish audit OK. UNCOMMITTED: batches 2-12, frontier + helper models 1-3 (HEAD 6ef42d20). Review: widened `is_known_float_arg_functor`. Record: `docs/checkpoints/2026-11-02-startup-batch-12.md`.
+
+### 2026-11-02 (orchestrator c1982b) — startup batch 13 integrated (E1230-E1235)
+Coverage 527->531/573, cliff 390 (0x691c50), 42 remain. Orchestrator re-ran default build (clean), ctest 621/621, publish audit OK; worker run_all_checkers 830/0. 508 needs host-supplied runtime float inputs; 513 uses malloc stand-in. UNCOMMITTED: batches 2-13, frontier + helper models 1-3 (HEAD 6ef42d20). Record: `docs/checkpoints/2026-11-02-startup-batch-13.md`.
+
+### 2026-11-02 (orchestrator c1982b) — startup batch 14 integrated (E1240-E1245)
+Coverage 531->537/573, cliff 408 (0x5c7f50), 36 remain. Orchestrator re-ran default build (clean), ctest 627/627, publish audit OK; worker run_all_checkers 836/0. Late-release rows implemented but unexercised. UNCOMMITTED: batches 2-14, frontier + helper models 1-3 (HEAD 6ef42d20). Record: `docs/checkpoints/2026-11-02-startup-batch-14.md`.
+
+### 2026-11-02 (orchestrator c1982b) — helper models 4 DONE (E1250-E1257)
+Worker-reported ctest 633/633 and audit OK; orchestrator re-ran ctest (pass). New checkers not yet in `run_all_checkers.sh`. Next: startup batch 15 wires 408, 422, 427, 451, 473, 493, 498, 534, 566, 454, 497, 501, 503, 511. Record: `docs/checkpoints/2026-11-02-helper-callee-models-4.md`.
+
+### 2026-11-02 (orchestrator c1982b) — startup batch 15 integrated (E1260-E1264) — READ THE RISK
+Coverage 537->541/573, cliff 408, 32 remain. Orchestrator re-ran default build (clean), ctest 637/637, publish audit OK. **RISK:** a worker mistakenly ran `git checkout native/core/startup_ctors.cpp` (uncommitted state reverted to HEAD's 460 rows) and rebuilt it from a scratch backup + 20 re-inserted rows (pre-statements/menu flags inferred). Pinned totals and all tests pass; review the file against slot headers. Also: workers must NEVER run git checkout/restore. UNCOMMITTED: batches 2-15 and all models (HEAD 6ef42d20); the whole tree is one accident from loss — commit soon. Tarball of the tree: scratchpad `worktree-backup-b15.tgz`. Record: `docs/checkpoints/2026-11-02-startup-batch-15.md`.
+
+### 2026-11-02 (orchestrator c1982b) — startup_ctors.cpp audit CLEAN (E1270-E1274)
+The batch-15 reconstruction risk is resolved: 20 re-inserted rows verified against slot headers, generator logic and standalone replays; no discrepancy. Open suggestion: pointer-identity asserts in `test_startup_ctors.cpp`. Record: `docs/checkpoints/2026-11-02-startup-ctors-audit.md`.
+
+- 2026-11-02 orchestrator: helper-f CPU-01-SLOT408-PREREQS integrated (E1280-E1287). Seven leaf-dtor/holder helper models + ELF-tie checkers; orchestrator re-run: default build clean, ctest 644/644, publish-path audit OK (4110). Nothing registered, nothing committed (HEAD 6ef42d20). Next exact action: extend `tools/lift/startup_gen/` per section 3 of docs/checkpoints/2026-11-02-slot408-prereqs.md, then regenerate slot 408; slot 454 blocked on RB-tree erase model (0x482a90).
+
+- 2026-11-03 orchestrator: CPU-01-AOT-CFG-SCALE-01-BATCH16 integrated (E1300-E1307). Slots 408, 473, 498 wired; coverage 544/573, 29 open, first 424 (0x551140). Orchestrator re-run: ctest 647/647, publish audit OK (4110). Worker-reported run_all_checkers 856/0. 451/427/534/566 open; 454 blocked on RB erase 0x482a90. Not committed (HEAD 6ef42d20). Next: add `dwr`/`crit`/`hold` row kinds to tools/lift/startup_gen, wire 451. See docs/checkpoints/2026-11-02-startup-batch-16.md.
+
+- 2026-11-03 orchestrator: CPU-01-AOT-CFG-SCALE-01-BATCH17 integrated (E1320-E1327). Slots 451, 427, 534 wired; coverage 547/573, 26 open. Orchestrator re-run: ctest 650/650, publish audit OK (4110). Worker-reported run_all_checkers 859/0. 566 analysed (0xd0 B object vs 0xd8 B ConCmdRangedVar, external cell at obj-8); 424 table-driven model feasible (19 call events, 2088 straight-line stores) but needs a store-replay tracker with vector-instruction support; 454 blocked on RB erase. docs/G1_EVIDENCE.md prose is stale ("451 of 573 rows") and needs a human pass. Not committed (HEAD 6ef42d20).
+
+- 2026-11-03 orchestrator: CPU-01-AOT-CFG-SCALE-01-BATCH18 integrated (E1340-E1345). Slots 566, 424 wired (424 = 2088 ELF-tied stores via store_table + store_bytes_replay); coverage 549/573, 24 open, cliff 428 (0x52ec10; needs helpers 0xa59620, 0xa42960). Orchestrator re-run: ctest 653/653, publish audit OK (4110). Worker-reported run_all_checkers 861/0. G1_EVIDENCE.md now generator-owned. 454 blocked on RB erase 0x482a90. Simplest next: 570, 445, 501, 494. Not committed (HEAD 6ef42d20).
+
+- 2026-11-03 orchestrator: CPU-01-AOT-CFG-SCALE-01-BATCH19 integrated (E1360-E1367). Slots 428, 429 wired + helpers 0xa59620, 0xa42960; coverage 551/573, 22 open, cliff 445 (0x4cfe80). Orchestrator re-run: ctest 657/657, publish audit OK (4110). Worker-reported run_all_checkers 865/0. **PRINCIPAL DECISION NEEDED (E1364):** slot 428's pool holds four 256-char credential-like strings (ELF 0x1013d51/0x1013e66/0x1013f88/0x101409c); NOT copied into repo, native pool is 256 x 'X' (checker ties real bytes by SHA-256), so slot 428's pool is not byte-exact. Triaged, not attempted: 445 (79 hash->dword stores row kind + holder dtors 0x4cb9e0/0x4cba00), 570 (replay decoder lacks xchg), 501/497 (empty-view string var row), 494 (~6 allocator-builder helpers). 454 blocked on RB erase. Not committed (HEAD 6ef42d20).
+
+- 2026-11-03 orchestrator: CPU-01-AOT-CFG-SCALE-01-BATCH20 integrated (E1380-E1385). Slots 445, 501, 494 wired; coverage 554/573, 19 open, cliff 446 (0x4c92a0; RB-tree with allocation 0x3be2d0/0x3c0840). Orchestrator re-run: ctest 660/660, publish audit OK (4110). Worker-reported run_all_checkers 868/0. 570 (xchg row in both replay decoders) and 497 (0x8d650 prelude + 4 row shapes) triaged. Next-blocker table: checkpoint section 6 (nearest 495 needs 0xa38960; 537 needs 0x157e90). 454 blocked on RB erase 0x482a90. Slot 428 credential-like string decision still pending (E1364). Not committed (HEAD 6ef42d20).

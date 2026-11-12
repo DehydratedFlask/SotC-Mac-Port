@@ -17,18 +17,35 @@
 // `tools/lift/check_vtable_resolved_entries.py` re-verifies exactly those plus the entry-map record;
 // it cannot and does not test dispatch.
 //
-// These are entries, not implementations: every one of the 37 distinct targets has a native body
-// model. Measured split (E1066): 41 site-provable rows, 50 table-level rows. The 50 inherited a
-// table-level tie from `indirect_frontier.classify`, whose `rip_global_for` fallback scans *past*
-// the nearest definition and can attach a table load the call does not use;
+// These are entries, not implementations: every one of the 32 distinct targets has a native body
+// model. Measured split (E1095): 41 site-provable rows, 42 table-level rows (83 in all). The 42
+// inherited a table-level tie from `indirect_frontier.classify`, whose `rip_global_for` fallback scans
+// *past* the nearest definition and can attach a table load the call does not use;
 // `docs/INDIRECT_FRONTIER.md` ("Evidence grades") defines both grades and gives the counts.
 //
 // The bounded store-to-load forwarding pass (`tools/lift/store_to_load_forwarding.py`, 2026-11-01)
-// was then run over all 91 rows and promoted **none** of the 50: 40 have no store to the load
-// location anywhere in their own function, 9 reach a store that is not a single reaching definition
-// in a straight-line region, and 1 loads through an indexed address. No row's grade or value
-// changed as a result. `tools/lift/check_evidence_grades.py` re-derives the split from the pinned
-// ELF and this header, and fails when `docs/INDIRECT_FRONTIER.md` drifts.
+// promoted none of the table-level rows, and it exposed a value error in nine of them (E1095). For a
+// vptr-relative call (`movq (%base),%rax; call *disp(%rax)`) the register holds the object's vptr,
+// which every constructor/destructor in this image stores as `lea TABLE(%rip); add $0x10`, i.e.
+// `TABLE + 0x10` - the Itanium address point, two slots above the symbol start. The call therefore
+// reads `TABLE + 0x10 + disp`, but the fallback tie recorded `TABLE + disp` (the older `lea` plus the
+// displacement). The nine rows were audited from ELF bytes by `tools/lift/check_frontier_vptr_
+// correction.py`, which re-derives per row from the image and the disassembly the call, the vptr
+// store (`lea TABLE; add $0x10; mov %reg,(%X)`), the reload that feeds the call register, and the
+// qword and RELA at the address the call reads. That nothing overwrites `(%X)` between the store and
+// the call is a hand argument over callee write sets (checkpoint 2026-11-01-frontier-fallback-
+// correction), NOT something the checker enforces; it is why the rows below stay table-level:
+//
+//   * one row (`0x113c5`) is CORRECTED IN PLACE: it now reads `0x1595b60 + 0x28 -> 0x13d20`, a
+//     target that already has a body model; it stays `table-level` (the grade machinery re-derives
+//     grades mechanically and that derivation still ends at "call between store and load");
+//   * eight rows are WITHDRAWN: their real targets (`0x47860`, `0x31900`, `0x318f0`, `0x31520`) have
+//     no body model, and a target without a fixture and checker stays out of the table. The
+//     recorded read addresses and real targets live in `kCorrectedVptrReads` below, which is audit
+//     data and NOT a dispatch table: a native consumer must never resolve a call from it.
+//
+// Targets whose only rows were withdrawn (`0x488d0`, `0x13d60`, `0x318b0`, `0x31870`, `0x31310`)
+// remain real vtable entries with their own body models; they simply have no call site in this table.
 #pragma once
 
 #include <cstddef>
@@ -36,9 +53,6 @@
 
 namespace sotc {
 
-inline constexpr std::uint64_t kResolvedVtableTarget_318b0Rva = 0x318b0;
-inline constexpr std::uint64_t kResolvedVtableTarget_31870Rva = 0x31870;
-inline constexpr std::uint64_t kResolvedVtableTarget_31310Rva = 0x31310;
 inline constexpr std::uint64_t kResolvedVtableTarget_4b0Rva = 0x4b0;
 inline constexpr std::uint64_t kResolvedVtableTarget_22a60Rva = 0x22a60;
 inline constexpr std::uint64_t kResolvedVtableTarget_187c0Rva = 0x187c0;
@@ -62,9 +76,7 @@ inline constexpr std::uint64_t kResolvedVtableTarget_e16a00Rva = 0xe16a00;
 
 // Vtable-closure sweep (2026-11-01): the remaining slots of the tables already recorded above.
 inline constexpr std::uint64_t kResolvedVtableTarget_13d50Rva = 0x13d50;
-inline constexpr std::uint64_t kResolvedVtableTarget_13d60Rva = 0x13d60;
 inline constexpr std::uint64_t kResolvedVtableTarget_30e50Rva = 0x30e50;
-inline constexpr std::uint64_t kResolvedVtableTarget_488d0Rva = 0x488d0;
 inline constexpr std::uint64_t kResolvedVtableTarget_c2c0Rva = 0xc2c0;
 inline constexpr std::uint64_t kResolvedVtableTarget_e19cb0Rva = 0xe19cb0;
 inline constexpr std::uint64_t kResolvedVtableTarget_e19f70Rva = 0xe19f70;
@@ -83,7 +95,6 @@ inline constexpr std::uint64_t kResolvedVtable_15949a0 = 0x15949a0;
 inline constexpr std::uint64_t kResolvedVtable_1594ae8 = 0x1594ae8;
 inline constexpr std::uint64_t kResolvedVtable_1594dc0 = 0x1594dc0;
 inline constexpr std::uint64_t kResolvedVtable_15955c0 = 0x15955c0;
-inline constexpr std::uint64_t kResolvedVtable_15953f8 = 0x15953f8;
 inline constexpr std::uint64_t kResolvedVtable_15d1d80 = 0x15d1d80;
 inline constexpr std::uint64_t kResolvedVtable_15ed2a0 = 0x15ed2a0;
 inline constexpr std::uint64_t kResolvedVtable_15e2d60 = 0x15e2d60;
@@ -112,21 +123,13 @@ struct ResolvedVtableCallSite {
 // Sorted by `site`. The trailing comment on each row is its evidence grade: `site-provable` means the
 // call site alone forces the target, `table-level` means only the table slot is tied (file header).
 inline constexpr ResolvedVtableCallSite kResolvedVtableCallSites[] = {
-    {0x113c5, kResolvedVtable_1595b60, 0x18, kResolvedVtableTarget_488d0Rva},  // table-level
-    {0x113d6, kResolvedVtable_1595b60, 0x50, kResolvedVtableTarget_13d60Rva},  // table-level
+    {0x113c5, kResolvedVtable_1595b60, 0x28, kResolvedVtableTarget_13d20Rva},  // table-level (E1095: was 0x18 -> 0x488d0)
     {0x11452, kResolvedVtable_1594ae8, 0x28, kResolvedVtableTarget_13d20Rva},  // site-provable
-    {0x11462, kResolvedVtable_1594ae8, 0x50, kResolvedVtableTarget_13d60Rva},  // table-level
     {0x1149d, kResolvedVtable_1594ae8, 0x40, kResolvedVtableTarget_13d50Rva},  // table-level
     {0x1254d, kResolvedVtable_15949a0, 0x88, kResolvedVtableTarget_187c0Rva},  // table-level
     {0x13620, kResolvedVtable_1594ae8, 0x28, kResolvedVtableTarget_13d20Rva},  // site-provable
     {0x28471, kResolvedVtable_1594dc0, 0x20, kResolvedVtableTarget_20d60Rva},  // site-provable
     {0x30f56, kResolvedVtable_1595320, 0x10, kResolvedVtableTarget_30e50Rva},  // table-level
-    {0x312ce, kResolvedVtable_15953f8, 0xa8, kResolvedVtableTarget_318b0Rva},  // table-level
-    {0x312de, kResolvedVtable_15953f8, 0xa0, kResolvedVtableTarget_31870Rva},  // table-level
-    {0x312f0, kResolvedVtable_15953f8, 0x18, kResolvedVtableTarget_31310Rva},  // table-level
-    {0x3133e, kResolvedVtable_15953f8, 0xa8, kResolvedVtableTarget_318b0Rva},  // table-level
-    {0x3134e, kResolvedVtable_15953f8, 0xa0, kResolvedVtableTarget_31870Rva},  // table-level
-    {0x31360, kResolvedVtable_15953f8, 0x18, kResolvedVtableTarget_31310Rva},  // table-level
     {0x35165, kResolvedVtable_15955c0, 0x8, kResolvedVtableTarget_358c0Rva},  // table-level
     {0x465eb, kResolvedVtable_15949a0, 0x58, kResolvedVtableTarget_c2c0Rva},  // table-level
     {0x47571, kResolvedVtable_1594dc0, 0x20, kResolvedVtableTarget_20d60Rva},  // site-provable
@@ -207,6 +210,47 @@ inline constexpr ResolvedVtableCallSite kResolvedVtableCallSites[] = {
 
 inline constexpr std::size_t kResolvedVtableCallSiteCount =
     sizeof(kResolvedVtableCallSites) / sizeof(kResolvedVtableCallSites[0]);
+
+// Audit record for the nine rows whose recorded `(vtable, slot)` was not the address the call reads
+// (E1095). AUDIT DATA, NOT A DISPATCH TABLE: do not resolve a call from it.
+//
+// Every site is `movq (%base),%rax; call *disp(%rax)` where the single reaching store of `(%base)` is
+// `lea TABLE(%rip); add $0x10`, so the call reads `read_address = TABLE + 0x10 + disp` and the old
+// tie `TABLE + disp` (= `old_vtable + old_slot`) is not read by that call. `real_target` is the
+// pinned image's qword at `read_address` (one type-8 RELA, FDE start). `row_kept` says whether the
+// row in `kResolvedVtableCallSites` now carries the corrected pair; it is false when the real target
+// has no body model (a target without a fixture and checker stays out of the table).
+//
+// `tools/lift/check_frontier_vptr_correction.py` re-derives every field from ELF bytes and carries
+// one mutation probe per row. The values are literals on purpose: no `k...Rva` constant is declared
+// for a target that has no model, so `docs/entry_map.json` claims nothing for it.
+struct CorrectedVptrRead {
+    std::uint64_t site;         // guest address of the indirect call
+    std::uint64_t old_vtable;   // table the fallback tie recorded
+    std::uint32_t old_slot;     // call displacement, recorded as if relative to the table start
+    std::uint64_t old_target;   // qword at old_vtable + old_slot
+    std::uint64_t read_address; // old_vtable + 0x10 + old_slot, the address the call reads
+    std::uint64_t real_target;  // qword at read_address
+    bool row_kept;              // the table row now carries read_address / real_target
+};
+
+inline constexpr CorrectedVptrRead kCorrectedVptrReads[] = {
+    {0x113c5, 0x1595b60, 0x18, 0x488d0, 0x1595b88, 0x13d20, true},
+    {0x113d6, 0x1595b60, 0x50, 0x13d60, 0x1595bc0, 0x47860, false},
+    {0x11462, 0x1594ae8, 0x50, 0x13d60, 0x1594b48, 0x47860, false},
+    {0x312ce, 0x15953f8, 0xa8, 0x318b0, 0x15954b0, 0x31900, false},
+    {0x312de, 0x15953f8, 0xa0, 0x31870, 0x15954a8, 0x318f0, false},
+    {0x312f0, 0x15953f8, 0x18, 0x31310, 0x1595420, 0x31520, false},
+    {0x3133e, 0x15953f8, 0xa8, 0x318b0, 0x15954b0, 0x31900, false},
+    {0x3134e, 0x15953f8, 0xa0, 0x31870, 0x15954a8, 0x318f0, false},
+    {0x31360, 0x15953f8, 0x18, 0x31310, 0x1595420, 0x31520, false},
+};
+
+inline constexpr std::size_t kCorrectedVptrReadCount =
+    sizeof(kCorrectedVptrReads) / sizeof(kCorrectedVptrReads[0]);
+
+// Returns the audit record for `site`, or nullptr when the site was not one of the nine.
+[[nodiscard]] const CorrectedVptrRead* find_corrected_vptr_read(std::uint64_t site) noexcept;
 
 // Returns the row for `site`, or nullptr when the site is not statically resolved.
 [[nodiscard]] const ResolvedVtableCallSite* find_resolved_vtable_call_site(

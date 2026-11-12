@@ -241,6 +241,76 @@ struct ProcessCoreClientTests {
         await #expect(throws: (any Error).self) { _ = try await bareClient.coverage() }
     }
 
+    /// The two transports must agree on every code. For each golden wire name, the status the child
+    /// transport delivers through a real pipe is exactly what the in-process transport derives from
+    /// the same number (`Status(code:)`), including codes at the edge of uint32.
+    @Test func childTransportAgreesWithInProcessMappingForEveryGoldenCode() async throws {
+        let subsystemRows = CoreWireGolden.cases.enumerated().map { index, wire in
+            "{\"name\":\"s\(index)\",\"status\":\"\(wire.subsystem)\",\"detail\":\"\"}"
+        }.joined(separator: ",")
+        let archiveRows = CoreWireGolden.cases.enumerated().map { index, wire in
+            "{\"name\":\"a\(index)\",\"status\":\"\(wire.archive)\",\"size_bytes\":\(index)}"
+        }.joined(separator: ",")
+        let coverage = """
+        {"id":__ID__,"schema":"sotc.core.coverage.v1","abi":65536,"engine_implemented":false,"subsystems":[\(subsystemRows)]}
+        """
+        let validation = """
+        {"id":__ID__,"schema":"sotc.core.validate.v1","ok":false,"error":3,"error_name":"SOTC_ERR_ASSETS_NOT_READY","assets_ready":false,"engine_ready":false,"start_would_succeed":false,"archives":[\(archiveRows)],"detail":""}
+        """
+        let fake = try makeProtocolFake(coverage: coverage, validate: validation)
+        defer { fake.remove() }
+        let client = try ProcessCoreClient(coreURL: fake.executable)
+        defer { client.shutdown() }
+
+        let report = try await client.coverage()
+        #expect(report.subsystems.count == CoreWireGolden.cases.count)
+        for (row, wire) in zip(report.subsystems, CoreWireGolden.cases) {
+            #expect(row.status == CoreSubsystem.Status(code: wire.code), "subsystem code \(wire.code)")
+        }
+
+        let checked = try await client.validate(
+            assetsDirectory: URL(filePath: "/tmp/good-assets", directoryHint: .isDirectory)
+        )
+        #expect(checked.archives.count == CoreWireGolden.cases.count)
+        for (row, wire) in zip(checked.archives, CoreWireGolden.cases) {
+            #expect(row.status == CoreArchiveCheck.Status(code: wire.code), "archive code \(wire.code)")
+        }
+        // The out-of-range rows must be counted as problems exactly as the in-process value would be.
+        #expect(checked.problemCount == CoreWireGolden.cases.count - 1)
+        #expect(report.subsystems.last?.status == .unknown(UInt32.max))
+    }
+
+    /// Mutation-style negatives over the real pipe: every non-canonical or malformed status text makes
+    /// the whole answer a `.internalError` malformed-answer failure instead of becoming some status.
+    @Test(arguments: [
+        "unknown", "unknown:", "unknown:+7", "unknown:007", "unknown:-1", "unknown:4294967296", "unknown:4294967303",
+        "unknown:1", "unknown:0", "unknown: 7", "UNKNOWN:7",
+    ])
+    func malformedStatusTextIsRejectedOverTheChildTransport(statusText: String) async throws {
+        let coverage = """
+        {"id":__ID__,"schema":"sotc.core.coverage.v1","abi":65536,"engine_implemented":false,"subsystems":[{"name":"x","status":"\(statusText)","detail":""}]}
+        """
+        let validation = """
+        {"id":__ID__,"schema":"sotc.core.validate.v1","ok":true,"error":0,"error_name":"SOTC_OK","assets_ready":false,"engine_ready":false,"start_would_succeed":false,"archives":[{"name":"x","status":"\(statusText)","size_bytes":0}],"detail":""}
+        """
+        let fake = try makeProtocolFake(coverage: coverage, validate: validation)
+        defer { fake.remove() }
+        let client = try ProcessCoreClient(coreURL: fake.executable)
+        defer { client.shutdown() }
+
+        let coverageFailure = try #require(await expectFailure { _ = try await client.coverage() })
+        #expect(coverageFailure.code == .internalError)
+        #expect(coverageFailure.message.contains("malformed answer"))
+
+        let validateFailure = try #require(await expectFailure {
+            _ = try await client.validate(
+                assetsDirectory: URL(filePath: "/tmp/good-assets", directoryHint: .isDirectory)
+            )
+        })
+        #expect(validateFailure.code == .internalError)
+        #expect(validateFailure.message.contains("malformed answer"))
+    }
+
     @Test func concurrentStatusAndCoverageRequestsKeepResponsesPaired() async throws {
         let fake = try makeProtocolFake(slowResponses: true)
         defer { fake.remove() }

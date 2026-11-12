@@ -24,7 +24,8 @@
 // NOT modelled: the two singleton owners (their allocation lives in 0x533100/0x2569d0
 // and cannot be ordered against Init statically), the bodies of 0x1bde30/0x21cd0/0xb10/
 // 0xbb0, the 0x1594060 slot-3 target beyond "bare ret", and any effect on Init's result.
-// G1 PARTIAL — fixture-level model only, nothing executed against the game.
+// E1426: the runtime executes this body with real 0x1beeb0/0x21cd0 containers; the two
+// singleton owners remain host-owned. G1 PARTIAL — no game boot and no original RVA execution.
 #pragma once
 
 #include <cstddef>

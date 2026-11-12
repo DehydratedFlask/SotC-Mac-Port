@@ -51,6 +51,14 @@ bool init_debug_menu_item_27050(DebugMenuItem& item, const SharedStr& label, con
     return true;
 }
 
+bool init_debug_menu_item_27120(DebugMenuItem& item, const SharedStr& label, const ConCmdBase& target,
+                                std::uint32_t flags, float range_min, float range_max) noexcept {
+    construct_common(item, label, target.name, &target, flags);   // text = [target + 0x20 .. 0x40)
+    item.range_min = range_min;   // [0x98] = xmm0 (0x27120)
+    item.range_max = range_max;   // [0x9c] = xmm1 (0x27120)
+    return true;
+}
+
 bool init_debug_menu_item_26ea0(DebugMenuItem& item, const SharedStr& label, const SharedStr& text,
                                 const DebugMenuTarget& target, std::uint32_t flags) noexcept {
     // The two `call [vptr + 0x18/0x30]` run unlifted code for any class but the known one.

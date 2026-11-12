@@ -6,8 +6,14 @@
 // dispatch through another table at run time. `docs/INDIRECT_FRONTIER.md` "Evidence grades" has the
 // definitions and the counts.
 //
+// CORRECTION (E1095): the call site once recorded for this slot, `0x113c5`, does NOT read it. It
+// reloads an object vptr stored as `lea 0x1595b60(%rip); add $0x10`, so `call *0x18(%rax)` reads
+// `0x1595b60 + 0x10 + 0x18 = 0x1595b88`, which holds `0x13d20`. The table row for `0x113c5` now
+// carries `(0x1595b60, 0x28, 0x13d20)`; no row names `0x488d0` any more. This model stays as a record
+// of the function. The slot fact below is still true of the image: the qword at `0x1595b60 + 0x18`
+// is `0x488d0`. See `kCorrectedVptrReads` and `tools/lift/check_frontier_vptr_correction.py`.
+//
 // Evidence:
-//   * `0x113c5` is `call *0x18(%rax)` with `%rax` loaded from the RIP-relative table `0x1595b60`;
 //   * the qword at `0x1595b60 + 0x18` in the pinned image is `0x488d0`;
 //   * the dynamic relocation table has one type-8 row at `0x1595b78` with addend `0x488d0`;
 //   * `0x488d0` is an FDE function start with length `0x1c`.

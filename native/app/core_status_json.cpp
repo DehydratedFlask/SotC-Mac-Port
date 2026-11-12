@@ -215,6 +215,26 @@ std::string format_stop(const StopSnapshot& snapshot) {
     return out;
 }
 
+std::string subsystem_status_name(std::uint32_t status) {
+    switch (status) {
+        case 0: return "not_implemented";
+        case 1: return "partial";
+        case 2: return "implemented";
+        case 3: return "not_linked";
+        default: return "unknown:" + std::to_string(status);
+    }
+}
+
+std::string archive_status_name(std::uint32_t status) {
+    switch (status) {
+        case 0: return "ok";
+        case 1: return "missing";
+        case 2: return "unreadable";
+        case 3: return "bad_magic";
+        default: return "unknown:" + std::to_string(status);
+    }
+}
+
 std::string with_request_id(std::string_view line, std::int64_t id) {
     if (line.empty() || line.front() != '{') {
         return std::string(line);

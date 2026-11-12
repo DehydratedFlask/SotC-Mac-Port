@@ -54,8 +54,8 @@ def main() -> int:
 
     header = HEADER.read_text()
     EXPECTED = header_rows(header)
-    require(len(EXPECTED) == 91, f"expected 91 rows, found {len(EXPECTED)}")
-    require(len({row[3] for row in EXPECTED}) == 37, "expected 37 distinct targets")
+    require(len(EXPECTED) == 83, f"expected 83 rows, found {len(EXPECTED)}")
+    require(len({row[3] for row in EXPECTED}) == 32, "expected 32 distinct targets")
     entry_map = json.loads(ENTRY_MAP.read_text())["entries"]
 
     fde_starts = None
@@ -103,9 +103,7 @@ def main() -> int:
         "kResolvedVtableTarget_e16a00Rva = 0xe16a00",
         "kResolvedVtableTarget_e24900Rva = 0xe24900",
         "kResolvedVtableTarget_13d50Rva = 0x13d50",
-        "kResolvedVtableTarget_13d60Rva = 0x13d60",
         "kResolvedVtableTarget_30e50Rva = 0x30e50",
-        "kResolvedVtableTarget_488d0Rva = 0x488d0",
         "kResolvedVtableTarget_c2c0Rva = 0xc2c0",
         "kResolvedVtableTarget_e19cb0Rva = 0xe19cb0",
         "kResolvedVtableTarget_e19f70Rva = 0xe19f70",
@@ -125,6 +123,11 @@ def main() -> int:
         "kResolvedVtable_2dd09b0 = 0x2dd09b0",
     ):
         require(needle in header, f"header constant missing: {needle}")
+    # E1095: the withdrawn targets must not come back as table constants (a model is not a row).
+    for withdrawn in ("13d60", "488d0", "318b0", "31870", "31310"):
+        require(f"kResolvedVtableTarget_{withdrawn}Rva" not in header,
+                f"withdrawn target {withdrawn} is back in the table header")
+    require("kResolvedVtable_15953f8" not in header, "withdrawn base 0x15953f8 is back in the header")
     require("kResolvedVtableCallSiteCount" in header, "count constant missing")
     require("vtable_resolved_entries.cpp" in CMAKE.read_text(), "cmake source")
     require("test_vtable_resolved_entries" in CMAKE.read_text(), "cmake test")

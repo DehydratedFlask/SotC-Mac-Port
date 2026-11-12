@@ -1,0 +1,232 @@
+// sotc_init_window - native arm64 executable that runs the recovered startup Init window and
+// reports the observed checkpoint as one JSON object. This is the runtime entry; the fixture
+// tests remain separate. The 275-entry input-table fixture is private user data supplied with
+// --fixture or SOTC_INPUTTABLE_NAMES_FIXTURE.
+#include <cstdio>
+#include <cstring>
+#include <string>
+
+#include "core/init_window_runtime.hpp"
+
+namespace {
+
+void usage(const char* program) {
+    std::fprintf(stderr,
+                 "usage: %s [--fixture <path>]\n"
+                 "  Runs 0x531d60..0x532b0c through the native Init slice, then requires the\n"
+                 "  0x532c1c registry checkpoint (275 entries).\n",
+                 program);
+}
+
+void print_json_string(const char* text) {
+    std::putchar('"');
+    for (const unsigned char* p = reinterpret_cast<const unsigned char*>(text); *p != 0; ++p) {
+        switch (*p) {
+            case '"': std::fputs("\\\"", stdout); break;
+            case '\\': std::fputs("\\\\", stdout); break;
+            case '\n': std::fputs("\\n", stdout); break;
+            case '\r': std::fputs("\\r", stdout); break;
+            case '\t': std::fputs("\\t", stdout); break;
+            default:
+                if (*p < 0x20) {
+                    std::printf("\\u%04x", static_cast<unsigned>(*p));
+                } else {
+                    std::putchar(*p);
+                }
+                break;
+        }
+    }
+    std::putchar('"');
+}
+
+void print_post_calls(const sotc::InitWindowRuntimeResult& r) {
+    std::printf("\"post_call_count\":%d,\"post_calls_executed\":%d,"
+                "\"post_calls_blocked\":%d,\"post_calls_complete\":%s,\"post_calls\":[",
+                r.post_call_count, r.post_calls_executed, r.post_calls_blocked,
+                r.post_calls_blocked == 0 ? "true" : "false");
+    for (int i = 0; i < r.post_call_count; ++i) {
+        const sotc::InitPostCallRecord& c = r.post_calls[i];
+        if (i != 0) std::putchar(',');
+        std::printf("{\"callee\":\"0x%llx\",\"caller\":\"%s\",\"state\":\"%s\",",
+                    static_cast<unsigned long long>(c.callee_rva), c.caller,
+                    c.executed ? "executed_native" : "blocked");
+        std::printf("\"args\":[");
+        for (std::uint8_t a = 0; a < c.arg_count; ++a) {
+            if (a != 0) std::putchar(',');
+            std::printf("\"0x%llx\"", static_cast<unsigned long long>(c.args[a]));
+        }
+        std::printf("],\"return\":");
+        if (c.has_return) {
+            std::printf("\"0x%llx\"", static_cast<unsigned long long>(c.return_value));
+        } else {
+            std::fputs(c.executed ? "\"void\"" : "\"none\"", stdout);
+        }
+        std::fputs(",\"blocker\":", stdout);
+        if (c.blocker != nullptr) {
+            print_json_string(c.blocker);
+        } else {
+            std::fputs("null", stdout);
+        }
+        std::fputs(",\"detail\":", stdout);
+        print_json_string(c.detail);
+        std::putchar('}');
+    }
+    std::putchar(']');
+}
+
+}  // namespace
+
+int main(int argc, char** argv) {
+    const char* fixture = nullptr;
+    for (int i = 1; i < argc; ++i) {
+        if (std::strcmp(argv[i], "--fixture") == 0) {
+            if (i + 1 >= argc) {
+                usage(argv[0]);
+                return 2;
+            }
+            fixture = argv[++i];
+        } else if (std::strcmp(argv[i], "--help") == 0 || std::strcmp(argv[i], "-h") == 0) {
+            usage(argv[0]);
+            return 0;
+        } else {
+            usage(argv[0]);
+            return 2;
+        }
+    }
+
+    const sotc::InitWindowRuntimeResult r = sotc::run_init_window_runtime(fixture);
+    std::printf(
+        "{\"schema\":\"sotc.init_window.v5\",\"ok\":%s,\"entry_rva\":\"0x531d60\","
+        "\"window_end_rva\":\"0x532b0c\",\"checkpoint_rva\":\"0x532c1c\","
+        "\"entry_units\":%d,\"entry_base_calls\":%d,\"early\":%s,\"tail\":%s,\"ctor\":%s,"
+        "\"base\":%s,\"post_base\":%s,\"continue_e\":%s,\"registry_tail\":%s,"
+        "\"registry_body\":%s,\"registry_body_units\":%d,\"registry_entries\":%u,"
+        "\"registry_status\":%u,\"remainder\":%s,\"boss_flag_after\":%u,"
+        "\"post_chain_complete\":%s,\"post_chain_blocked\":\"%s\","
+        "\"post_1290\":{\"native\":%s,\"a\":%s,\"b\":%s,\"a_count\":%d,\"b_count\":%d,"
+        "\"vcall\":%d},"
+        "\"post_56dcb0\":{\"native\":%s,\"calls\":%d,\"blocked\":%d,\"a5cd90\":%d,\"946880\":%d,"
+        "\"a5d990\":%d,\"560b60\":%d,\"desc0\":\"0x%llx\",\"desc1\":\"0x%llx\"},"
+        "\"post_946880\":{\"native\":%s,\"status\":%d,\"took_9469f0\":%s,"
+        "\"inner_ok\":%s,\"inner_calls\":%d,\"lock\":%u},"
+        "\"post_5d5410\":{\"native\":%s,\"8be60\":%d,\"8f520\":%d,\"8f1d0\":%d,"
+        "\"blocked\":%d,\"reason\":\"%s\",\"owner\":\"0x%llx\","
+        "\"obj_a_04\":\"0x%x\",\"obj_a_0c\":\"0x%x\",\"obj_b_04\":\"0x%x\","
+        "\"obj_b_0c\":\"0x%x\",\"state\":[\"0x%llx\",\"0x%llx\",\"0x%llx\","
+        "\"0x%llx\",\"0x%llx\",\"0x%llx\",\"0x%llx\",\"0x%llx\",\"0x%llx\"]},"
+        "\"post_56dca0\":{\"native\":%s,\"bytes\":1,\"calls\":%d},"
+        "\"post_5c64c0\":{\"native\":%s,\"blocked\":%d,\"bss_a\":\"0x%08x\",\"bss_b\":\"0x%08x\","
+        "\"bss_c\":\"0x%08x\",\"cell\":\"0x%llx\",\"calls\":%d,\"tail\":%s},"
+        "\"post_96f20\":{\"native\":%s,\"value\":\"0x%llx\",\"alloc_bytes\":%llu,\"callee\":\"0x97a50\",\"callee_host\":true},"
+        "\"post_560b60\":{\"native\":%s,\"calls\":%d,\"allocs\":%d,\"object\":\"0x%llx\",\"b0\":\"0x%llx\",\"b1\":\"0x%llx\",\"b2\":\"0x%llx\",\"prev_cleanup\":%s,\"global28\":%u},"
+        "\"post_a5cd90\":{\"native\":%s,\"calls\":%d,\"allocs\":%d,\"field69c8\":%u,\"field08\":%u,\"resource\":\"0x%llx\",\"ready\":%s,\"flag18\":%u,\"flag20\":%u,\"a4f8\":\"0x%llx\",\"byte0\":%u,\"once\":%d,\"user_id\":%d,\"log\":%d,\"trap\":%d},"
+        "\"post_7f7220\":{\"native\":%s,\"blocked\":%d,\"branch\":%s,\"sets\":%d,\"mode0\":%d,"
+        "\"str0\":\"0x%llx\",\"mode1\":%d,\"str1\":\"0x%llx\"},"
+        "\"post_7f6f90\":{\"native\":%s,\"blocked\":%d,\"entries0\":%d,\"index0\":%d,\"rest0\":%d,\"bytes0\":%d,\"fopen0\":%s,\"entries1\":%d,\"index1\":%d,\"rest1\":%d,\"bytes1\":%d,\"fopen1\":%s},"
+        "\"post_56db70\":{\"native\":%s,\"bytes\":1,\"calls\":%d},"
+        "\"post_5b3d00\":{\"native\":%s,\"bytes\":1,\"calls\":%d},"
+        "\"post_5b3cf0\":{\"native\":%s,\"bytes\":1,\"calls\":%d},"
+        "\"post_56fad0\":{\"native\":%s,\"bytes\":1,\"calls\":%d},"
+        "\"post_f90310\":{\"host_service\":%s,\"calls\":%d,\"provider\":\"splash_hide\"},"
+        "\"post_base_sites\":[\"0x56dcb0\",\"0x56dca0\",\"0x5c64c0\",\"0x1290\",\"0x56db70\",\"0x5b3d00\",\"0x5b3cf0\",\"0x7f7220\",\"0x56fad0\",\"0xf90310\"],"
+        "\"executed_bodies\":[\"0x499f80\",\"0xa473b0\",\"0xa54920\",\"0x54b250\"],"
+        "\"executed_body_calls\":{\"0x499f80\":%d,\"0xa473b0\":%d,\"0xa54920\":%d,\"0x54b250\":%d},"
+        "\"executed_body_ok\":{\"0x499f80\":%s,\"0xa473b0\":%s,\"0xa54920\":%s,\"0x54b250\":%s},"
+        "\"body_499f80_committed\":%s,\"body_499f80_object_live\":%s,"
+        "\"body_499f80_buffer_a\":%s,\"body_499f80_buffer_b\":%s,"
+        "\"body_499f80_cleanup_failures\":%d,\"body_499f80_stage\":\"%s\","
+        "\"capture_step\":%d,\"capture_video_0d\":%u,\"capture_video_a007\":%u,"
+        "\"savedata_refusal\":%d,\"savedata_counters\":%d,\"savedata_items\":%d,"
+        "\"stat_engine_calls\":%d,\"stat_engine_arg2\":%u,"
+        "\"stub_hooks\":[],\"stub_calls\":{},"
+        "\"contract_boundaries\":\"0x499f80, 0x56dcb0, 0x5c64c0, 0x1290, 0x7f7220 and the nested 0x5d5410 chain execute native bodies at their Init sites; 0x5d5410's 0x8be60/0x8f520/0x8f1d0 callees and their 0x865xxx/0x87cxxx setters are native; the 0x8be60 0x12820 allocator and 0x87f3e0->0xf906d0 platform tail are explicit host contracts, and the 0x8f628/0x8f276 stack-check traps are pinned but never called; 0x56db70/0x5b3d00/0x5b3cf0/0x56fad0 execute their one-byte-ret native equivalents; 0x56dcb0's four helpers, 0x5c64c0's eight helpers, 0x7f7220's query hook, 0x7f6f90's four-call fallback, 0x499f80's 0x12820/0x12af0 allocator dispatch, 0x54b250's engine 0xa56560 and the capture platform services are explicit host contracts; 0xf90310 is a PLT/Sony splash-hide host service, not a lifted game body; 0x1290's singleton owners are host-owned while its list/vector inserts are native\","
+        "\"first_failed_stage\":\"%s\",",
+        r.ok ? "true" : "false", r.entry_units, r.entry_base_calls,
+        r.early_ok ? "true" : "false", r.tail_ok ? "true" : "false",
+        r.ctor_ok ? "true" : "false", r.base_ok ? "true" : "false",
+        r.post_base_ok ? "true" : "false", r.continue_e_ok ? "true" : "false",
+        r.registry_tail_ok ? "true" : "false", r.registry_body_ok ? "true" : "false",
+        r.registry_body_units, r.registry_entries, r.registry_status,
+        r.remainder_ok ? "true" : "false", r.boss_flag_after,
+        r.post_chain_complete ? "true" : "false", r.post_chain_blocked,
+        r.post_1290_ok ? "true" : "false", r.post_1290_a ? "true" : "false",
+        r.post_1290_b ? "true" : "false", r.post_1290_a_count, r.post_1290_b_count,
+        r.post_1290_vcall,
+        r.post_56dcb0_ok ? "true" : "false", r.post_56dcb0_calls, r.post_56dcb0_blocked,
+        r.post_56dcb0_a5cd90, r.post_56dcb0_946880, r.post_56dcb0_a5d990,
+        r.post_56dcb0_560b60, static_cast<unsigned long long>(r.post_56dcb0_desc0),
+        static_cast<unsigned long long>(r.post_56dcb0_desc1),
+        r.post_946880_ok ? "true" : "false", r.post_946880_status,
+        r.post_946880_took_9469f0 ? "true" : "false",
+        r.post_946880_inner_ok ? "true" : "false", r.post_946880_inner_calls,
+        r.post_946880_lock,
+        r.post_5d5410_ok ? "true" : "false", r.post_5d5410_8be60, r.post_5d5410_8f520,
+        r.post_5d5410_8f1d0, r.post_5d5410_blocked, r.post_5d5410_blocked_reason,
+        static_cast<unsigned long long>(r.post_5d5410_owner), r.post_5d5410_obj_a_04,
+        r.post_5d5410_obj_a_0c, r.post_5d5410_obj_b_04, r.post_5d5410_obj_b_0c,
+        static_cast<unsigned long long>(r.post_5d5410_state[0]),
+        static_cast<unsigned long long>(r.post_5d5410_state[1]),
+        static_cast<unsigned long long>(r.post_5d5410_state[2]),
+        static_cast<unsigned long long>(r.post_5d5410_state[3]),
+        static_cast<unsigned long long>(r.post_5d5410_state[4]),
+        static_cast<unsigned long long>(r.post_5d5410_state[5]),
+        static_cast<unsigned long long>(r.post_5d5410_state[6]),
+        static_cast<unsigned long long>(r.post_5d5410_state[7]),
+        static_cast<unsigned long long>(r.post_5d5410_state[8]),
+        r.entry_ret_nop_calls == 1 ? "true" : "false", r.entry_ret_nop_calls,
+        r.post_5c64c0_ok ? "true" : "false", r.post_5c64c0_blocked, r.post_5c64c0_bss_a_hash,
+        r.post_5c64c0_bss_b_hash, r.post_5c64c0_bss_c_hash,
+        static_cast<unsigned long long>(r.post_5c64c0_cell), r.post_5c64c0_calls,
+        r.post_5c64c0_tail ? "true" : "false",
+        r.post_96f20_ok ? "true" : "false",
+        static_cast<unsigned long long>(r.post_96f20_value),
+        static_cast<unsigned long long>(r.post_96f20_alloc_bytes),
+        r.post_560b60_ok ? "true" : "false", r.post_560b60_calls,
+        r.post_560b60_alloc_calls,
+        static_cast<unsigned long long>(r.post_560b60_object),
+        static_cast<unsigned long long>(r.post_560b60_buffer0),
+        static_cast<unsigned long long>(r.post_560b60_buffer1),
+        static_cast<unsigned long long>(r.post_560b60_buffer2),
+        r.post_560b60_previous_cleanup ? "true" : "false", r.post_560b60_global28,
+        r.post_a5cd90_ok ? "true" : "false", r.post_a5cd90_calls,
+        r.post_a5cd90_allocs, r.post_a5cd90_field69c8, r.post_a5cd90_field08,
+        static_cast<unsigned long long>(r.post_a5cd90_resource),
+        r.post_a5cd90_ready ? "true" : "false", r.post_a5cd90_flag18,
+        r.post_a5cd90_flag20,
+        static_cast<unsigned long long>(r.post_a5cd90_object_a4f8),
+        r.post_a5cd90_byte0, r.post_a5cd90_once, r.post_a5cd90_user_id,
+        r.post_a5cd90_log, r.post_a5cd90_trap,
+        r.post_7f7220_ok ? "true" : "false", r.post_7f7220_blocked,
+        r.post_7f7220_branch ? "true" : "false",
+        r.post_7f7220_sets, r.post_7f7220_mode0,
+        static_cast<unsigned long long>(r.post_7f7220_str0), r.post_7f7220_mode1,
+        static_cast<unsigned long long>(r.post_7f7220_str1),
+        r.post_7f6f90_ok ? "true" : "false", r.post_7f6f90_blocked,
+        r.post_7f6f90_entries[0], r.post_7f6f90_index0[0], r.post_7f6f90_rest0[0],
+        static_cast<int>(r.post_7f6f90_bytes[0]),
+        r.post_7f6f90_fopen[0] ? "true" : "false",
+        r.post_7f6f90_entries[1], r.post_7f6f90_index0[1], r.post_7f6f90_rest0[1],
+        static_cast<int>(r.post_7f6f90_bytes[1]),
+        r.post_7f6f90_fopen[1] ? "true" : "false",
+        r.post_56db70_ok ? "true" : "false", r.post_56db70_calls,
+        r.post_5b3d00_ok ? "true" : "false", r.post_5b3d00_calls,
+        r.post_5b3cf0_ok ? "true" : "false", r.post_5b3cf0_calls,
+        r.post_56fad0_ok ? "true" : "false", r.post_56fad0_calls,
+        r.post_f90310_ok ? "true" : "false", r.post_f90310_calls,
+        r.body_499f80_calls, r.capture_body_calls, r.savedata_body_calls,
+        r.stat_query_body_calls,
+        r.body_499f80_ok ? "true" : "false", r.capture_body_ok ? "true" : "false",
+        r.savedata_body_ok ? "true" : "false", r.stat_query_body_ok ? "true" : "false",
+        r.body_499f80_committed ? "true" : "false",
+        r.body_499f80_object_live ? "true" : "false",
+        r.body_499f80_buffer_a ? "true" : "false",
+        r.body_499f80_buffer_b ? "true" : "false",
+        r.body_499f80_cleanup_failures, r.body_499f80_stage,
+        r.capture_step, r.capture_video_0d, r.capture_video_a007,
+        r.savedata_refusal, r.savedata_counters, r.savedata_items,
+        r.stat_engine_calls, r.stat_engine_arg2,
+        r.ok ? "" : (r.first_failed_stage[0] ? r.first_failed_stage : "unknown"));
+    print_post_calls(r);
+    std::fputs("}\n", stdout);
+    return r.ok ? 0 : 3;
+}

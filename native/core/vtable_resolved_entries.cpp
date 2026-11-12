@@ -11,6 +11,15 @@ const ResolvedVtableCallSite* find_resolved_vtable_call_site(std::uint64_t site)
     return nullptr;
 }
 
+const CorrectedVptrRead* find_corrected_vptr_read(std::uint64_t site) noexcept {
+    for (std::size_t index = 0; index < kCorrectedVptrReadCount; ++index) {
+        if (kCorrectedVptrReads[index].site == site) {
+            return &kCorrectedVptrReads[index];
+        }
+    }
+    return nullptr;
+}
+
 std::size_t resolved_vtable_target_count() noexcept {
     std::uint64_t sorted[kResolvedVtableCallSiteCount];
     std::size_t count = 0;

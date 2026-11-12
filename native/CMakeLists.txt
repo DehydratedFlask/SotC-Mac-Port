@@ -64,8 +64,19 @@ add_library(sotc_core STATIC
   core/appmain_init_registry_slice.cpp
   core/init_531d60_trivial_leaves.cpp
   core/init_1290.cpp
+  core/init_post_bodies.cpp
+  core/init_7f6f90_body.cpp
+  core/init_96f20_body.cpp
+  core/init_560b60_body.cpp
+  core/init_a5d990_body.cpp
+  core/init_a5cd90_body.cpp
+  core/init_946880_body.cpp
+  core/init_5d5410_body.cpp
   core/init_531d60_entry_gaps.cpp
+  core/init_window_runtime.cpp
   core/stat_query_54b250.cpp
+  core/savedata_stats_a54920.cpp
+  core/savedata_family.cpp
   core/insert_1beeb0.cpp
   core/insert_1bde30.cpp
   core/shared_release_f590.cpp
@@ -1916,6 +1927,14 @@ add_executable(test_stat_query_54b250 tests/test_stat_query_54b250.cpp)
 target_link_libraries(test_stat_query_54b250 sotc_core)
 add_test(NAME stat_query_54b250 COMMAND test_stat_query_54b250)
 
+add_executable(test_savedata_stats_a54920 tests/test_savedata_stats_a54920.cpp)
+target_link_libraries(test_savedata_stats_a54920 sotc_core)
+add_test(NAME savedata_stats_a54920 COMMAND test_savedata_stats_a54920)
+
+add_executable(test_savedata_family tests/test_savedata_family.cpp)
+target_link_libraries(test_savedata_family sotc_core)
+add_test(NAME savedata_family COMMAND test_savedata_family)
+
 add_executable(test_init_531d60_entry_gaps tests/test_init_531d60_entry_gaps.cpp)
 target_link_libraries(test_init_531d60_entry_gaps sotc_core)
 add_test(NAME init_531d60_entry_gaps COMMAND test_init_531d60_entry_gaps)
@@ -1923,6 +1942,14 @@ add_test(NAME init_531d60_entry_gaps COMMAND test_init_531d60_entry_gaps)
 add_executable(test_init_1290 tests/test_init_1290.cpp)
 target_link_libraries(test_init_1290 sotc_core)
 add_test(NAME init_1290 COMMAND test_init_1290)
+
+add_executable(test_init_a5d990_body tests/test_init_a5d990_body.cpp)
+target_link_libraries(test_init_a5d990_body sotc_core)
+add_test(NAME init_a5d990_body COMMAND test_init_a5d990_body)
+
+add_executable(test_init_post_bodies tests/test_init_post_bodies.cpp)
+target_link_libraries(test_init_post_bodies sotc_core)
+add_test(NAME init_post_bodies COMMAND test_init_post_bodies)
 
 add_executable(test_owner_dtor_1bdae0 tests/test_owner_dtor_1bdae0.cpp)
 target_link_libraries(test_owner_dtor_1bdae0 sotc_core)
@@ -2171,6 +2198,12 @@ add_library(soc_core_status_json STATIC app/core_status_json.cpp)
 target_include_directories(soc_core_status_json PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/app)
 
 add_executable(soc_game_core app/soc_game_core_main.cpp)
+
+add_executable(sotc_init_window app/sotc_init_window_main.cpp)
+target_link_libraries(sotc_init_window PRIVATE sotc_core)
+add_test(NAME init_window_runtime COMMAND sotc_init_window)
+set_tests_properties(init_window_runtime PROPERTIES
+  ENVIRONMENT "SOTC_INPUTTABLE_NAMES_FIXTURE=${CMAKE_SOURCE_DIR}/../local/fixtures/inputtable_551140_names.bin")
 set_target_properties(soc_game_core PROPERTIES OUTPUT_NAME SoCGameCore)
 target_link_libraries(soc_game_core PRIVATE soc_core_status_json sotc_api sotc_core)
 
@@ -2849,3 +2882,747 @@ target_sources(sotc_core PRIVATE core/ctor_slot_536_1342d0.cpp)
 add_executable(test_ctor_slot_536 tests/test_ctor_slot_536.cpp)
 target_link_libraries(test_ctor_slot_536 sotc_core)
 add_test(NAME ctor_slot_536 COMMAND test_ctor_slot_536)
+
+# CPU-01-STARTUP-BATCH-DEBUG-PAGE-01 (batch 2): slot 374 is the batch's one-variable + 0x26ea0-toggle
+# shape preceded by ONE leading `{name, fnv1a(name)}` record (core/debug_page_var_item HashedNameRow).
+target_sources(sotc_core PRIVATE core/ctor_slot_374_701230.cpp)
+add_executable(test_ctor_slot_374 tests/test_ctor_slot_374.cpp)
+target_link_libraries(test_ctor_slot_374 sotc_core)
+add_test(NAME ctor_slot_374 COMMAND test_ctor_slot_374)
+
+# CPU-01-AOT-CFG-SCALE-01 (frontier audit E1095 follow-up, E1100): body models of the real targets of
+# the eight withdrawn vptr-skew sites: 0x47860 (spin-locked qword store), 0x31900 (Fios op poll),
+# 0x318f0 (op succeeded), 0x31520 (wait + FHCloseSync) and the 0x319c0 wait that 0x31520 reaches.
+# FIXTURE_VERIFIED only; tools/lift/check_frontier_target_models.py pins the ELF facts.
+add_library(sotc_frontier_targets STATIC
+  core/frontier_47860_locked_store.cpp
+  core/frontier_31900_fios_poll.cpp
+  core/frontier_318f0_fios_succeeded.cpp
+  core/frontier_31520_fios_close.cpp
+  core/frontier_319c0_fios_wait.cpp)
+target_link_libraries(sotc_frontier_targets PUBLIC sotc_core)
+add_executable(test_frontier_target_models tests/test_frontier_target_models.cpp)
+target_link_libraries(test_frontier_target_models PRIVATE sotc_frontier_targets sotc_vtable_15953f8_fios)
+add_test(NAME frontier_target_models COMMAND test_frontier_target_models)
+
+# CPU-01-STARTUP-BATCH-DEBUG-PAGE-01 (batch 3): slot 518 is a one-variable data row plus a bounded static-float
+# tail (the 8.5f cache-derived spacing cells at 0x2ee66c0..0x2ee66ec).
+target_sources(sotc_core PRIVATE core/ctor_slot_518_1a57d0.cpp)
+add_executable(test_ctor_slot_518 tests/test_ctor_slot_518.cpp)
+target_link_libraries(test_ctor_slot_518 sotc_core)
+add_test(NAME ctor_slot_518 COMMAND test_ctor_slot_518)
+
+# CPU-01-STARTUP-BATCH-DEBUG-PAGE-01 (batch 3): bool debug-page slots 410 / 362 / 477 / 423 / 449 (bool variables in
+# the shared init_bool_var_static order, plus {name, fnv1a(name)} records at 362 / 423 and two 0x26ea0 toggles at 449).
+target_sources(sotc_core PRIVATE
+  core/ctor_slot_410_5ac580.cpp
+  core/ctor_slot_362_76b8d0.cpp
+  core/ctor_slot_477_3270d0.cpp
+  core/ctor_slot_423_55f080.cpp
+  core/ctor_slot_449_4b0200.cpp)
+add_executable(test_ctor_slot_410 tests/test_ctor_slot_410.cpp)
+target_link_libraries(test_ctor_slot_410 sotc_core)
+add_test(NAME ctor_slot_410 COMMAND test_ctor_slot_410)
+add_executable(test_ctor_slot_362 tests/test_ctor_slot_362.cpp)
+target_link_libraries(test_ctor_slot_362 sotc_core)
+add_test(NAME ctor_slot_362 COMMAND test_ctor_slot_362)
+add_executable(test_ctor_slot_477 tests/test_ctor_slot_477.cpp)
+target_link_libraries(test_ctor_slot_477 sotc_core)
+add_test(NAME ctor_slot_477 COMMAND test_ctor_slot_477)
+add_executable(test_ctor_slot_423 tests/test_ctor_slot_423.cpp)
+target_link_libraries(test_ctor_slot_423 sotc_core)
+add_test(NAME ctor_slot_423 COMMAND test_ctor_slot_423)
+add_executable(test_ctor_slot_449 tests/test_ctor_slot_449.cpp)
+target_link_libraries(test_ctor_slot_449 sotc_core)
+add_test(NAME ctor_slot_449 COMMAND test_ctor_slot_449)
+
+# CPU-01-HELPER-CALLEE-MODELS-01: family-admitting wrappers for the startup helper callees 0xc580 (ranged int),
+# 0x3a980 (unbounded int), 0x6aa00 / 0xc300 (float) and a class-aware front end for the 0x26db0 named item. The tag
+# tables are ELF-derived (37 int / 68 float functor class tables); tools/lift/check_helper_*.py pin them.
+# FIXTURE_VERIFIED + STATIC_ANALYSIS_VERIFIED only; no original RVA is executed.
+# The wrappers live in sotc_core (batch 6 startup slots 430 / 504 / 555 call them); sotc_helper_callees is kept as
+# an INTERFACE alias so the helper tests keep their link line.
+target_sources(sotc_core PRIVATE
+  core/helper_functor_tags.cpp
+  core/helper_c580_ranged_int.cpp
+  core/helper_3a980_unbounded_int.cpp
+  core/helper_6aa00_unbounded_float.cpp
+  core/helper_26db0_named_item.cpp
+  core/helper_int_var_sites.cpp
+  core/helper_7ec160_enum_var.cpp
+  core/helper_233ec0_unbounded_int_twin.cpp)
+add_library(sotc_helper_callees INTERFACE)
+target_link_libraries(sotc_helper_callees INTERFACE sotc_core)
+add_executable(test_helper_c580 tests/test_helper_c580.cpp)
+target_link_libraries(test_helper_c580 PRIVATE sotc_helper_callees)
+add_test(NAME helper_c580 COMMAND test_helper_c580)
+add_executable(test_helper_7ec160 tests/test_helper_7ec160.cpp)
+target_link_libraries(test_helper_7ec160 PRIVATE sotc_helper_callees)
+add_test(NAME helper_7ec160 COMMAND test_helper_7ec160)
+add_executable(test_helper_233ec0 tests/test_helper_233ec0.cpp)
+target_link_libraries(test_helper_233ec0 PRIVATE sotc_helper_callees)
+add_test(NAME helper_233ec0 COMMAND test_helper_233ec0)
+add_executable(test_helper_3a980 tests/test_helper_3a980.cpp)
+target_link_libraries(test_helper_3a980 PRIVATE sotc_helper_callees)
+add_test(NAME helper_3a980 COMMAND test_helper_3a980)
+add_executable(test_helper_6aa00 tests/test_helper_6aa00.cpp)
+target_link_libraries(test_helper_6aa00 PRIVATE sotc_helper_callees)
+add_test(NAME helper_6aa00 COMMAND test_helper_6aa00)
+add_executable(test_helper_26db0 tests/test_helper_26db0.cpp)
+target_link_libraries(test_helper_26db0 PRIVATE sotc_helper_callees)
+add_test(NAME helper_26db0 COMMAND test_helper_26db0)
+
+# CPU-01-STARTUP-BATCH-DEBUG-PAGE-01 (batch 4): debug-page slots 338 (nine bool variables), 368 (three bool variables,
+# three 0x26ea0 toggles, 18 literal static-cell stores), 443 / 512 (two bool variables, a 0x26c10 group and two toggles)
+# and 550 (one bool variable, two toggles, one 0x30-byte name holder).
+target_sources(sotc_core PRIVATE
+  core/ctor_slot_338_7e6c90.cpp
+  core/ctor_slot_368_73df50.cpp
+  core/ctor_slot_443_4de370.cpp
+  core/ctor_slot_512_1d5e80.cpp
+  core/ctor_slot_550_91290.cpp)
+add_executable(test_ctor_slot_338 tests/test_ctor_slot_338.cpp)
+target_link_libraries(test_ctor_slot_338 sotc_core)
+add_test(NAME ctor_slot_338 COMMAND test_ctor_slot_338)
+add_executable(test_ctor_slot_368 tests/test_ctor_slot_368.cpp)
+target_link_libraries(test_ctor_slot_368 sotc_core)
+add_test(NAME ctor_slot_368 COMMAND test_ctor_slot_368)
+add_executable(test_ctor_slot_443 tests/test_ctor_slot_443.cpp)
+target_link_libraries(test_ctor_slot_443 sotc_core)
+add_test(NAME ctor_slot_443 COMMAND test_ctor_slot_443)
+add_executable(test_ctor_slot_512 tests/test_ctor_slot_512.cpp)
+target_link_libraries(test_ctor_slot_512 sotc_core)
+add_test(NAME ctor_slot_512 COMMAND test_ctor_slot_512)
+add_executable(test_ctor_slot_550 tests/test_ctor_slot_550.cpp)
+target_link_libraries(test_ctor_slot_550 sotc_core)
+add_test(NAME ctor_slot_550 COMMAND test_ctor_slot_550)
+
+# CPU-01-STARTUP-BATCH-DEBUG-PAGE-01 (batch 5): debug-page slot 437 (three bool variables and a 16-element array of
+# 0xf2f0 borrowed string views registered through four NULL-argument __cxa_atexit chunk destructors).
+target_sources(sotc_core PRIVATE
+  core/ctor_slot_437_5070c0.cpp)
+add_executable(test_ctor_slot_437 tests/test_ctor_slot_437.cpp)
+target_link_libraries(test_ctor_slot_437 sotc_core)
+add_test(NAME ctor_slot_437 COMMAND test_ctor_slot_437)
+
+# CPU-01-STARTUP-BATCH-DEBUG-PAGE-01 (batch 6): debug-page slots 366 and 411 (two bool variables and two 0x26db0 named
+# toggles each; the bool class admits the functor tag and the named item takes slot3/slot6 of the same class).
+target_sources(sotc_core PRIVATE
+  core/ctor_slot_366_744ac0.cpp
+  core/ctor_slot_411_591710.cpp
+  core/ctor_slot_430_529df0.cpp
+  core/ctor_slot_504_23f4d0.cpp
+  core/ctor_slot_555_527f0.cpp
+  core/ctor_slot_397_64d760.cpp
+  core/ctor_slot_442_4e3760.cpp
+  core/ctor_slot_450_4af4b0.cpp
+  core/ctor_slot_453_48ac10.cpp
+  core/ctor_slot_460_41c340.cpp
+  core/ctor_slot_464_3db070.cpp
+  core/ctor_slot_514_1c4c50.cpp
+  core/ctor_slot_455_47bfa0.cpp
+  core/ctor_slot_488_2ba5d0.cpp
+  core/ctor_slot_369_734190.cpp
+  core/ctor_slot_420_56f6e0.cpp
+  core/ctor_slot_336_7ec4c0.cpp
+  core/ctor_slot_506_2340b0.cpp
+  core/ctor_slot_392_681690.cpp
+  core/ctor_slot_396_650f20.cpp
+  core/ctor_slot_337_7e81d0.cpp
+  core/ctor_slot_444_4d3f10.cpp
+  core/ctor_slot_521_17bf50.cpp
+  core/ctor_slot_400_62b100.cpp
+  core/ctor_slot_474_344850.cpp
+  core/ctor_slot_351_7ae220.cpp
+  core/ctor_slot_339_7e2fc0.cpp
+  core/ctor_slot_395_65af60.cpp
+  core/ctor_slot_380_6d71f0.cpp
+  core/ctor_slot_375_6f1c20.cpp
+  core/ctor_slot_382_6c8600.cpp
+  core/ctor_slot_360_7806f0.cpp
+  core/ctor_slot_373_7081e0.cpp
+  core/ctor_slot_354_79e180.cpp
+  core/ctor_slot_340_7de7e0.cpp
+  core/name_cell_23fd00.cpp
+  core/ctor_slot_342_7d8e10.cpp
+  core/ctor_slot_349_7bde50.cpp
+  core/ctor_slot_388_6a8c60.cpp
+  core/ctor_slot_480_30daf0.cpp
+  core/ctor_slot_352_7a2390.cpp
+  core/ctor_slot_401_621530.cpp
+  core/ctor_slot_398_63cf60.cpp
+  core/ctor_slot_363_751c70.cpp
+  core/ctor_slot_367_740980.cpp
+  core/ctor_slot_358_786f50.cpp
+  core/ctor_slot_391_68ebc0.cpp
+  core/ctor_slot_381_6cd5b0.cpp
+  core/ctor_slot_561_3ac00.cpp
+  core/ctor_slot_399_632ca0.cpp
+  core/ctor_slot_418_572a10.cpp
+  core/ctor_slot_370_720b50.cpp
+  core/ctor_slot_469_394a20.cpp
+  core/ctor_slot_513_1d0770.cpp
+  core/ctor_slot_508_2241e0.cpp
+  core/ctor_slot_390_691c50.cpp
+  core/ctor_slot_402_610430.cpp
+  core/ctor_slot_572_1a20.cpp
+  core/ctor_slot_493_277560.cpp
+  core/ctor_slot_422_56b980.cpp
+  core/ctor_slot_511_1d90c0.cpp
+  core/ctor_slot_503_247f00.cpp
+  core/ctor_slot_571_c780.cpp)
+add_executable(test_ctor_slot_366 tests/test_ctor_slot_366.cpp)
+target_link_libraries(test_ctor_slot_366 sotc_core)
+add_test(NAME ctor_slot_366 COMMAND test_ctor_slot_366)
+add_executable(test_ctor_slot_411 tests/test_ctor_slot_411.cpp)
+target_link_libraries(test_ctor_slot_411 sotc_core)
+add_test(NAME ctor_slot_411 COMMAND test_ctor_slot_411)
+add_executable(test_ctor_slot_430 tests/test_ctor_slot_430.cpp)
+target_link_libraries(test_ctor_slot_430 sotc_core)
+add_test(NAME ctor_slot_430 COMMAND test_ctor_slot_430)
+add_executable(test_ctor_slot_504 tests/test_ctor_slot_504.cpp)
+target_link_libraries(test_ctor_slot_504 sotc_core)
+add_test(NAME ctor_slot_504 COMMAND test_ctor_slot_504)
+add_executable(test_ctor_slot_555 tests/test_ctor_slot_555.cpp)
+target_link_libraries(test_ctor_slot_555 sotc_core)
+add_test(NAME ctor_slot_555 COMMAND test_ctor_slot_555)
+add_executable(test_ctor_slot_397 tests/test_ctor_slot_397.cpp)
+target_link_libraries(test_ctor_slot_397 sotc_core)
+add_test(NAME ctor_slot_397 COMMAND test_ctor_slot_397)
+add_executable(test_ctor_slot_442 tests/test_ctor_slot_442.cpp)
+target_link_libraries(test_ctor_slot_442 sotc_core)
+add_test(NAME ctor_slot_442 COMMAND test_ctor_slot_442)
+add_executable(test_ctor_slot_450 tests/test_ctor_slot_450.cpp)
+target_link_libraries(test_ctor_slot_450 sotc_core)
+add_test(NAME ctor_slot_450 COMMAND test_ctor_slot_450)
+add_executable(test_ctor_slot_453 tests/test_ctor_slot_453.cpp)
+target_link_libraries(test_ctor_slot_453 sotc_core)
+add_test(NAME ctor_slot_453 COMMAND test_ctor_slot_453)
+add_executable(test_ctor_slot_460 tests/test_ctor_slot_460.cpp)
+target_link_libraries(test_ctor_slot_460 sotc_core)
+add_test(NAME ctor_slot_460 COMMAND test_ctor_slot_460)
+add_executable(test_ctor_slot_464 tests/test_ctor_slot_464.cpp)
+target_link_libraries(test_ctor_slot_464 sotc_core)
+add_test(NAME ctor_slot_464 COMMAND test_ctor_slot_464)
+add_executable(test_ctor_slot_514 tests/test_ctor_slot_514.cpp)
+target_link_libraries(test_ctor_slot_514 sotc_core)
+add_test(NAME ctor_slot_514 COMMAND test_ctor_slot_514)
+add_executable(test_ctor_slot_455 tests/test_ctor_slot_455.cpp)
+target_link_libraries(test_ctor_slot_455 sotc_core)
+add_test(NAME ctor_slot_455 COMMAND test_ctor_slot_455)
+add_executable(test_ctor_slot_488 tests/test_ctor_slot_488.cpp)
+target_link_libraries(test_ctor_slot_488 sotc_core)
+add_test(NAME ctor_slot_488 COMMAND test_ctor_slot_488)
+add_executable(test_ctor_slot_369 tests/test_ctor_slot_369.cpp)
+target_link_libraries(test_ctor_slot_369 sotc_core)
+add_test(NAME ctor_slot_369 COMMAND test_ctor_slot_369)
+add_executable(test_ctor_slot_420 tests/test_ctor_slot_420.cpp)
+target_link_libraries(test_ctor_slot_420 sotc_core)
+add_test(NAME ctor_slot_420 COMMAND test_ctor_slot_420)
+add_executable(test_ctor_slot_336 tests/test_ctor_slot_336.cpp)
+target_link_libraries(test_ctor_slot_336 sotc_core)
+add_test(NAME ctor_slot_336 COMMAND test_ctor_slot_336)
+add_executable(test_ctor_slot_506 tests/test_ctor_slot_506.cpp)
+target_link_libraries(test_ctor_slot_506 sotc_core)
+add_test(NAME ctor_slot_506 COMMAND test_ctor_slot_506)
+add_executable(test_ctor_slot_392 tests/test_ctor_slot_392.cpp)
+target_link_libraries(test_ctor_slot_392 sotc_core)
+add_test(NAME ctor_slot_392 COMMAND test_ctor_slot_392)
+add_executable(test_ctor_slot_396 tests/test_ctor_slot_396.cpp)
+target_link_libraries(test_ctor_slot_396 sotc_core)
+add_test(NAME ctor_slot_396 COMMAND test_ctor_slot_396)
+add_executable(test_ctor_slot_337 tests/test_ctor_slot_337.cpp)
+target_link_libraries(test_ctor_slot_337 sotc_core)
+add_test(NAME ctor_slot_337 COMMAND test_ctor_slot_337)
+add_executable(test_ctor_slot_444 tests/test_ctor_slot_444.cpp)
+target_link_libraries(test_ctor_slot_444 sotc_core)
+add_test(NAME ctor_slot_444 COMMAND test_ctor_slot_444)
+add_executable(test_ctor_slot_521 tests/test_ctor_slot_521.cpp)
+target_link_libraries(test_ctor_slot_521 sotc_core)
+add_test(NAME ctor_slot_521 COMMAND test_ctor_slot_521)
+add_executable(test_ctor_slot_400 tests/test_ctor_slot_400.cpp)
+target_link_libraries(test_ctor_slot_400 sotc_core)
+add_test(NAME ctor_slot_400 COMMAND test_ctor_slot_400)
+add_executable(test_ctor_slot_474 tests/test_ctor_slot_474.cpp)
+target_link_libraries(test_ctor_slot_474 sotc_core)
+add_test(NAME ctor_slot_474 COMMAND test_ctor_slot_474)
+add_executable(test_ctor_slot_351 tests/test_ctor_slot_351.cpp)
+target_link_libraries(test_ctor_slot_351 sotc_core)
+add_test(NAME ctor_slot_351 COMMAND test_ctor_slot_351)
+add_executable(test_ctor_slot_339 tests/test_ctor_slot_339.cpp)
+target_link_libraries(test_ctor_slot_339 sotc_core)
+add_test(NAME ctor_slot_339 COMMAND test_ctor_slot_339)
+add_executable(test_ctor_slot_395 tests/test_ctor_slot_395.cpp)
+target_link_libraries(test_ctor_slot_395 sotc_core)
+add_test(NAME ctor_slot_395 COMMAND test_ctor_slot_395)
+add_executable(test_ctor_slot_380 tests/test_ctor_slot_380.cpp)
+target_link_libraries(test_ctor_slot_380 sotc_core)
+add_test(NAME ctor_slot_380 COMMAND test_ctor_slot_380)
+add_executable(test_ctor_slot_375 tests/test_ctor_slot_375.cpp)
+target_link_libraries(test_ctor_slot_375 sotc_core)
+add_test(NAME ctor_slot_375 COMMAND test_ctor_slot_375)
+add_executable(test_ctor_slot_382 tests/test_ctor_slot_382.cpp)
+target_link_libraries(test_ctor_slot_382 sotc_core)
+add_test(NAME ctor_slot_382 COMMAND test_ctor_slot_382)
+add_executable(test_ctor_slot_360 tests/test_ctor_slot_360.cpp)
+target_link_libraries(test_ctor_slot_360 sotc_core)
+add_test(NAME ctor_slot_360 COMMAND test_ctor_slot_360)
+add_executable(test_ctor_slot_373 tests/test_ctor_slot_373.cpp)
+target_link_libraries(test_ctor_slot_373 sotc_core)
+add_test(NAME ctor_slot_373 COMMAND test_ctor_slot_373)
+add_executable(test_ctor_slot_354 tests/test_ctor_slot_354.cpp)
+target_link_libraries(test_ctor_slot_354 sotc_core)
+add_test(NAME ctor_slot_354 COMMAND test_ctor_slot_354)
+add_executable(test_ctor_slot_340 tests/test_ctor_slot_340.cpp)
+target_link_libraries(test_ctor_slot_340 sotc_core)
+add_test(NAME ctor_slot_340 COMMAND test_ctor_slot_340)
+add_executable(test_name_cell_23fd00 tests/test_name_cell_23fd00.cpp)
+target_link_libraries(test_name_cell_23fd00 sotc_core)
+add_test(NAME name_cell_23fd00 COMMAND test_name_cell_23fd00)
+add_executable(test_ctor_slot_342 tests/test_ctor_slot_342.cpp)
+target_link_libraries(test_ctor_slot_342 sotc_core)
+add_test(NAME ctor_slot_342 COMMAND test_ctor_slot_342)
+add_executable(test_ctor_slot_349 tests/test_ctor_slot_349.cpp)
+target_link_libraries(test_ctor_slot_349 sotc_core)
+add_test(NAME ctor_slot_349 COMMAND test_ctor_slot_349)
+add_executable(test_ctor_slot_352 tests/test_ctor_slot_352.cpp)
+target_link_libraries(test_ctor_slot_352 sotc_core)
+add_test(NAME ctor_slot_352 COMMAND test_ctor_slot_352)
+add_executable(test_ctor_slot_401 tests/test_ctor_slot_401.cpp)
+target_link_libraries(test_ctor_slot_401 sotc_core)
+add_test(NAME ctor_slot_401 COMMAND test_ctor_slot_401)
+add_executable(test_ctor_slot_398 tests/test_ctor_slot_398.cpp)
+target_link_libraries(test_ctor_slot_398 sotc_core)
+add_test(NAME ctor_slot_398 COMMAND test_ctor_slot_398)
+add_executable(test_ctor_slot_363 tests/test_ctor_slot_363.cpp)
+target_link_libraries(test_ctor_slot_363 sotc_core)
+add_test(NAME ctor_slot_363 COMMAND test_ctor_slot_363)
+add_executable(test_ctor_slot_367 tests/test_ctor_slot_367.cpp)
+target_link_libraries(test_ctor_slot_367 sotc_core)
+add_test(NAME ctor_slot_367 COMMAND test_ctor_slot_367)
+add_executable(test_ctor_slot_358 tests/test_ctor_slot_358.cpp)
+target_link_libraries(test_ctor_slot_358 sotc_core)
+add_test(NAME ctor_slot_358 COMMAND test_ctor_slot_358)
+add_executable(test_ctor_slot_391 tests/test_ctor_slot_391.cpp)
+target_link_libraries(test_ctor_slot_391 sotc_core)
+add_test(NAME ctor_slot_391 COMMAND test_ctor_slot_391)
+add_executable(test_ctor_slot_381 tests/test_ctor_slot_381.cpp)
+target_link_libraries(test_ctor_slot_381 sotc_core)
+add_test(NAME ctor_slot_381 COMMAND test_ctor_slot_381)
+add_executable(test_ctor_slot_561 tests/test_ctor_slot_561.cpp)
+target_link_libraries(test_ctor_slot_561 sotc_core)
+add_test(NAME ctor_slot_561 COMMAND test_ctor_slot_561)
+add_executable(test_ctor_slot_399 tests/test_ctor_slot_399.cpp)
+target_link_libraries(test_ctor_slot_399 sotc_core)
+add_test(NAME ctor_slot_399 COMMAND test_ctor_slot_399)
+add_executable(test_ctor_slot_418 tests/test_ctor_slot_418.cpp)
+target_link_libraries(test_ctor_slot_418 sotc_core)
+add_test(NAME ctor_slot_418 COMMAND test_ctor_slot_418)
+add_executable(test_ctor_slot_370 tests/test_ctor_slot_370.cpp)
+target_link_libraries(test_ctor_slot_370 sotc_core)
+add_test(NAME ctor_slot_370 COMMAND test_ctor_slot_370)
+add_executable(test_ctor_slot_469 tests/test_ctor_slot_469.cpp)
+target_link_libraries(test_ctor_slot_469 sotc_core)
+add_test(NAME ctor_slot_469 COMMAND test_ctor_slot_469)
+add_executable(test_ctor_slot_513 tests/test_ctor_slot_513.cpp)
+target_link_libraries(test_ctor_slot_513 sotc_core)
+add_test(NAME ctor_slot_513 COMMAND test_ctor_slot_513)
+add_executable(test_ctor_slot_508 tests/test_ctor_slot_508.cpp)
+target_link_libraries(test_ctor_slot_508 sotc_core)
+add_test(NAME ctor_slot_508 COMMAND test_ctor_slot_508)
+add_executable(test_ctor_slot_390 tests/test_ctor_slot_390.cpp)
+target_link_libraries(test_ctor_slot_390 sotc_core)
+add_test(NAME ctor_slot_390 COMMAND test_ctor_slot_390)
+add_executable(test_ctor_slot_402 tests/test_ctor_slot_402.cpp)
+target_link_libraries(test_ctor_slot_402 sotc_core)
+add_test(NAME ctor_slot_402 COMMAND test_ctor_slot_402)
+add_executable(test_ctor_slot_572 tests/test_ctor_slot_572.cpp)
+target_link_libraries(test_ctor_slot_572 sotc_core)
+add_test(NAME ctor_slot_572 COMMAND test_ctor_slot_572)
+add_executable(test_ctor_slot_493 tests/test_ctor_slot_493.cpp)
+target_link_libraries(test_ctor_slot_493 sotc_core)
+add_test(NAME ctor_slot_493 COMMAND test_ctor_slot_493)
+add_executable(test_ctor_slot_422 tests/test_ctor_slot_422.cpp)
+target_link_libraries(test_ctor_slot_422 sotc_core)
+add_test(NAME ctor_slot_422 COMMAND test_ctor_slot_422)
+add_executable(test_ctor_slot_511 tests/test_ctor_slot_511.cpp)
+target_link_libraries(test_ctor_slot_511 sotc_core)
+add_test(NAME ctor_slot_511 COMMAND test_ctor_slot_511)
+add_executable(test_ctor_slot_503 tests/test_ctor_slot_503.cpp)
+target_link_libraries(test_ctor_slot_503 sotc_core)
+add_test(NAME ctor_slot_503 COMMAND test_ctor_slot_503)
+add_executable(test_ctor_slot_571 tests/test_ctor_slot_571.cpp)
+target_link_libraries(test_ctor_slot_571 sotc_core)
+add_test(NAME ctor_slot_571 COMMAND test_ctor_slot_571)
+add_executable(test_ctor_slot_388 tests/test_ctor_slot_388.cpp)
+target_link_libraries(test_ctor_slot_388 sotc_core)
+add_test(NAME ctor_slot_388 COMMAND test_ctor_slot_388)
+add_executable(test_ctor_slot_480 tests/test_ctor_slot_480.cpp)
+target_link_libraries(test_ctor_slot_480 sotc_core)
+add_test(NAME ctor_slot_480 COMMAND test_ctor_slot_480)
+
+# CPU-01-HELPER-CALLEE-MODELS-02 (helper-c): the local ranged-int variable wrapper family (0x620e10 / 0x6211d0 for startup slot 401, and 24
+# byte-identical twins). Table-driven; tools/lift/check_helper_620e10.py pins every row. FIXTURE_VERIFIED + STATIC_ANALYSIS_VERIFIED only.
+target_sources(sotc_core PRIVATE core/helper_620e10_local_int_var.cpp)
+add_executable(test_helper_620e10 tests/test_helper_620e10.cpp)
+target_link_libraries(test_helper_620e10 PRIVATE sotc_helper_callees)
+add_test(NAME helper_620e10 COMMAND test_helper_620e10)
+
+# CPU-01-HELPER-CALLEE-MODELS-03 (helper-d): bounded models of the callees that blocked batch 11 (0x8d650 store-one leaf, 0xf8f630 libc strncpy
+# import contract, 0x56b4b0 node-reference builder, 0xa81700 named-record registrar with its two-vector push / reserve). Each is byte-pinned by
+# tools/lift/check_helper_<rva>.py. FIXTURE_VERIFIED + STATIC_ANALYSIS_VERIFIED only; no startup slot is registered by these targets.
+target_sources(sotc_core PRIVATE core/helper_8d650_store_one.cpp core/helper_f8f630_strncpy.cpp core/helper_56b4b0_node_ref.cpp core/helper_a81700_named_record.cpp)
+target_sources(sotc_core PRIVATE core/startup_row_kinds.cpp)   # CPU-01-STARTUP-BATCH-14: empty-tree header and node-reference rows of the generated startup slots
+add_executable(test_helper_8d650 tests/test_helper_8d650.cpp)
+target_link_libraries(test_helper_8d650 PRIVATE sotc_helper_callees)
+add_test(NAME helper_8d650 COMMAND test_helper_8d650)
+add_executable(test_helper_f8f630 tests/test_helper_f8f630.cpp)
+target_link_libraries(test_helper_f8f630 PRIVATE sotc_helper_callees)
+add_test(NAME helper_f8f630 COMMAND test_helper_f8f630)
+add_executable(test_helper_56b4b0 tests/test_helper_56b4b0.cpp)
+target_link_libraries(test_helper_56b4b0 PRIVATE sotc_helper_callees)
+add_test(NAME helper_56b4b0 COMMAND test_helper_56b4b0)
+add_executable(test_helper_a81700 tests/test_helper_a81700.cpp)
+target_link_libraries(test_helper_a81700 PRIVATE sotc_helper_callees)
+add_test(NAME helper_a81700 COMMAND test_helper_a81700)
+
+# CPU-01-HELPER-CALLEE-MODELS-04 (helper-e): bounded models of the callees that block the remaining startup constructor slots.
+# 0x1580a0 perspective builder (startup slot 408, the cliff; tanf is an explicit host hook). Each model is byte-pinned by
+# tools/lift/check_helper_<rva>.py. FIXTURE_VERIFIED + STATIC_ANALYSIS_VERIFIED only; no startup slot is registered by these targets.
+target_sources(sotc_core PRIVATE core/helper_1580a0_perspective.cpp)
+add_executable(test_helper_1580a0 tests/test_helper_1580a0.cpp)
+target_link_libraries(test_helper_1580a0 PRIVATE sotc_helper_callees)
+add_test(NAME helper_1580a0 COMMAND test_helper_1580a0)
+# 0x274730 out-of-line bool console-variable constructor (startup slots 422 / 427 / 473 / 493) and the 143-table bool functor family it admits.
+target_sources(sotc_core PRIVATE core/helper_bool_functor_tags.cpp core/helper_274730_bool_var.cpp)
+add_executable(test_helper_274730 tests/test_helper_274730.cpp)
+target_link_libraries(test_helper_274730 PRIVATE sotc_helper_callees)
+add_test(NAME helper_274730 COMMAND test_helper_274730)
+# 0x49ca60 / 0x49cc60 dword ranged console-variable constructors (startup slot 451), same body as the native float twin 0xc300.
+target_sources(sotc_core PRIVATE core/helper_49ca60_ranged_dword_var.cpp)
+add_executable(test_helper_49ca60 tests/test_helper_49ca60.cpp)
+target_link_libraries(test_helper_49ca60 PRIVATE sotc_helper_callees)
+add_test(NAME helper_49ca60 COMMAND test_helper_49ca60)
+# 0x140b00 / 0x25ab0 unbounded-int constructor twins (startup slots 534 / 566): the 0x3a980 body with a private class pair.
+target_sources(sotc_core PRIVATE core/helper_140b00_unbounded_int_twin.cpp)
+add_executable(test_helper_140b00 tests/test_helper_140b00.cpp)
+target_link_libraries(test_helper_140b00 PRIVATE sotc_helper_callees)
+add_test(NAME helper_140b00 COMMAND test_helper_140b00)
+# 0x1f220 ring-header leaf (startup slot 473, object 0x2ef2ba8).
+target_sources(sotc_core PRIVATE core/helper_1f220_ring_header.cpp)
+add_executable(test_helper_1f220 tests/test_helper_1f220.cpp)
+target_link_libraries(test_helper_1f220 PRIVATE sotc_helper_callees)
+add_test(NAME helper_1f220 COMMAND test_helper_1f220)
+# Startup slot 498 member-hash getters (48 x `mov eax, imm ; ret`) and the 24 records the slot builds from them.
+target_sources(sotc_core PRIVATE core/helper_498_member_hashes.cpp)
+add_executable(test_helper_498 tests/test_helper_498.cpp)
+target_link_libraries(test_helper_498 PRIVATE sotc_helper_callees)
+add_test(NAME helper_498 COMMAND test_helper_498)
+# CPU-01-SLOT408-PREREQS: leaf destructor / holder models for the open startup slots 408, 427, 451, 473, 534, 566.
+# Each is tied to the ELF by tools/lift/check_helper_<rva>.py. FIXTURE_VERIFIED + STATIC_ANALYSIS_VERIFIED only; no startup slot is registered.
+target_sources(sotc_core PRIVATE core/helper_8ef00_holder_dtor.cpp)
+add_executable(test_helper_8ef00 tests/test_helper_8ef00.cpp)
+target_link_libraries(test_helper_8ef00 PRIVATE sotc_helper_callees)
+add_test(NAME helper_8ef00 COMMAND test_helper_8ef00)
+target_sources(sotc_core PRIVATE core/helper_534580_cell_dtors.cpp)
+add_executable(test_helper_534580 tests/test_helper_534580.cpp)
+target_link_libraries(test_helper_534580 PRIVATE sotc_helper_callees)
+add_test(NAME helper_534580 COMMAND test_helper_534580)
+target_sources(sotc_core PRIVATE core/helper_499e90_slot451_dtors.cpp)
+add_executable(test_helper_499e90 tests/test_helper_499e90.cpp)
+target_link_libraries(test_helper_499e90 PRIVATE sotc_helper_callees)
+add_test(NAME helper_499e90 COMMAND test_helper_499e90)
+target_sources(sotc_core PRIVATE core/helper_498b20_ranged_var_dtors.cpp)
+add_executable(test_helper_498b20 tests/test_helper_498b20.cpp)
+target_link_libraries(test_helper_498b20 PRIVATE sotc_helper_callees)
+add_test(NAME helper_498b20 COMMAND test_helper_498b20)
+target_sources(sotc_core PRIVATE core/helper_354470_ring_dtor.cpp)
+add_executable(test_helper_354470 tests/test_helper_354470.cpp)
+target_link_libraries(test_helper_354470 PRIVATE sotc_helper_callees)
+add_test(NAME helper_354470 COMMAND test_helper_354470)
+# Startup slot 408 vector destructors 0x5b5530 / 0x5b55c0 / 0x5c7c00 (objects 0x2fda980 / 0x2fda9a0 / 0x2ff2af0).
+target_sources(sotc_core PRIVATE core/helper_5b5530_vector_dtors.cpp)
+add_executable(test_helper_5b5530 tests/test_helper_5b5530.cpp)
+target_link_libraries(test_helper_5b5530 PRIVATE sotc_helper_callees)
+add_test(NAME helper_5b5530 COMMAND test_helper_5b5530)
+# 0xf7b0 SharedStr dtor: byte-identical twin of the shared release 0xf590 (startup slots 309 / 316 / 454).
+target_sources(sotc_core PRIVATE core/helper_f7b0_shared_release_twin.cpp)
+add_executable(test_helper_f7b0 tests/test_helper_f7b0.cpp)
+target_link_libraries(test_helper_f7b0 PRIVATE sotc_helper_callees)
+add_test(NAME helper_f7b0 COMMAND test_helper_f7b0)
+target_sources(sotc_core PRIVATE core/ctor_slot_408_5c7f50.cpp)
+add_executable(test_ctor_slot_408 tests/test_ctor_slot_408.cpp)
+target_link_libraries(test_ctor_slot_408 sotc_core)
+add_test(NAME ctor_slot_408 COMMAND test_ctor_slot_408)
+target_sources(sotc_core PRIVATE core/ctor_slot_473_355a00.cpp)
+add_executable(test_ctor_slot_473 tests/test_ctor_slot_473.cpp)
+target_link_libraries(test_ctor_slot_473 sotc_core)
+add_test(NAME ctor_slot_473 COMMAND test_ctor_slot_473)
+target_sources(sotc_core PRIVATE core/ctor_slot_498_252ae0.cpp)
+add_executable(test_ctor_slot_498 tests/test_ctor_slot_498.cpp)
+target_link_libraries(test_ctor_slot_498 sotc_core)
+add_test(NAME ctor_slot_498 COMMAND test_ctor_slot_498)
+target_sources(sotc_core PRIVATE core/helper_49ca60_dword_var_site.cpp)
+target_sources(sotc_core PRIVATE core/ctor_slot_451_49d230.cpp)
+add_executable(test_ctor_slot_451 tests/test_ctor_slot_451.cpp)
+target_link_libraries(test_ctor_slot_451 sotc_core)
+add_test(NAME ctor_slot_451 COMMAND test_ctor_slot_451)
+target_sources(sotc_core PRIVATE core/ctor_slot_427_5388f0.cpp)
+add_executable(test_ctor_slot_427 tests/test_ctor_slot_427.cpp)
+target_link_libraries(test_ctor_slot_427 sotc_core)
+add_test(NAME ctor_slot_427 COMMAND test_ctor_slot_427)
+target_sources(sotc_core PRIVATE core/helper_140b00_twin_site.cpp)
+target_sources(sotc_core PRIVATE core/ctor_slot_534_1418d0.cpp)
+add_executable(test_ctor_slot_534 tests/test_ctor_slot_534.cpp)
+target_link_libraries(test_ctor_slot_534 sotc_core)
+add_test(NAME ctor_slot_534 COMMAND test_ctor_slot_534)
+target_sources(sotc_core PRIVATE core/ctor_slot_566_25de0.cpp)
+add_executable(test_ctor_slot_566 tests/test_ctor_slot_566.cpp)
+target_link_libraries(test_ctor_slot_566 sotc_core)
+add_test(NAME ctor_slot_566 COMMAND test_ctor_slot_566)
+target_sources(sotc_core PRIVATE core/store_table.cpp)
+add_executable(test_store_table tests/test_store_table.cpp)
+target_link_libraries(test_store_table sotc_core)
+add_test(NAME store_table COMMAND test_store_table)
+target_sources(sotc_core PRIVATE core/ctor_slot_424_551140.cpp)
+add_executable(test_ctor_slot_424 tests/test_ctor_slot_424.cpp)
+target_link_libraries(test_ctor_slot_424 sotc_core)
+add_test(NAME ctor_slot_424 COMMAND test_ctor_slot_424)
+
+# CPU-01-AOT-CFG-SCALE-01-BATCH19: bounded models of the callees that block startup slot 428 (0x52ec10).
+# 0xa59620 id + string entry constructor with the doubling pointer-vector push (37 call sites in slot 428). Byte-pinned by
+# tools/lift/check_helper_a59620.py. FIXTURE_VERIFIED + STATIC_ANALYSIS_VERIFIED only.
+target_sources(sotc_core PRIVATE core/helper_a59620_id_entry.cpp)
+add_executable(test_helper_a59620 tests/test_helper_a59620.cpp)
+target_link_libraries(test_helper_a59620 PRIVATE sotc_helper_callees)
+add_test(NAME helper_a59620 COMMAND test_helper_a59620)
+
+# CPU-01-AOT-CFG-SCALE-01-BATCH19: availability entry constructor 0xa42960 (formatted-name bool var, V2 doubling push)
+target_sources(sotc_core PRIVATE core/helper_a42960_avail_entry.cpp)
+add_executable(test_helper_a42960 tests/test_helper_a42960.cpp)
+target_link_libraries(test_helper_a42960 PRIVATE sotc_helper_callees)
+add_test(NAME helper_a42960 COMMAND test_helper_a42960)
+target_sources(sotc_core PRIVATE core/ctor_slot_428_52ec10.cpp)
+add_executable(test_ctor_slot_428 tests/test_ctor_slot_428.cpp)
+target_link_libraries(test_ctor_slot_428 sotc_core)
+add_test(NAME ctor_slot_428 COMMAND test_ctor_slot_428)
+target_sources(sotc_core PRIVATE core/ctor_slot_429_52e2b0.cpp)
+add_executable(test_ctor_slot_429 tests/test_ctor_slot_429.cpp)
+target_link_libraries(test_ctor_slot_429 sotc_core)
+add_test(NAME ctor_slot_429 COMMAND test_ctor_slot_429)
+target_sources(sotc_core PRIVATE core/ctor_slot_445_4cfe80.cpp)
+add_executable(test_ctor_slot_445 tests/test_ctor_slot_445.cpp)
+target_link_libraries(test_ctor_slot_445 sotc_core)
+add_test(NAME ctor_slot_445 COMMAND test_ctor_slot_445)
+target_sources(sotc_core PRIVATE core/hash_store_table.cpp)
+target_sources(sotc_core PRIVATE core/ctor_slot_501_24db80.cpp)
+add_executable(test_ctor_slot_501 tests/test_ctor_slot_501.cpp)
+target_link_libraries(test_ctor_slot_501 sotc_core)
+add_test(NAME ctor_slot_501 COMMAND test_ctor_slot_501)
+target_sources(sotc_core PRIVATE core/ctor_slot_494_26f7c0.cpp)
+add_executable(test_ctor_slot_494 tests/test_ctor_slot_494.cpp)
+target_link_libraries(test_ctor_slot_494 sotc_core)
+add_test(NAME ctor_slot_494 COMMAND test_ctor_slot_494)
+
+target_sources(sotc_core PRIVATE core/ctor_slot_570_16d80.cpp)
+add_executable(test_ctor_slot_570 tests/test_ctor_slot_570.cpp)
+target_link_libraries(test_ctor_slot_570 sotc_core)
+add_test(NAME ctor_slot_570 COMMAND test_ctor_slot_570)
+
+target_sources(sotc_core PRIVATE core/ctor_slot_532_143f50.cpp)
+add_executable(test_ctor_slot_532 tests/test_ctor_slot_532.cpp)
+target_link_libraries(test_ctor_slot_532 sotc_core)
+add_test(NAME ctor_slot_532 COMMAND test_ctor_slot_532)
+
+target_sources(sotc_core PRIVATE core/ctor_slot_537_1324c0.cpp)
+add_executable(test_ctor_slot_537 tests/test_ctor_slot_537.cpp)
+target_link_libraries(test_ctor_slot_537 sotc_core)
+add_test(NAME ctor_slot_537 COMMAND test_ctor_slot_537)
+
+target_sources(sotc_core PRIVATE core/ctor_slot_452_498640.cpp)
+add_executable(test_ctor_slot_452 tests/test_ctor_slot_452.cpp)
+target_link_libraries(test_ctor_slot_452 sotc_core)
+add_test(NAME ctor_slot_452 COMMAND test_ctor_slot_452)
+
+target_sources(sotc_core PRIVATE core/blob_parser_a38960.cpp core/ctor_slot_495_268ee0.cpp)
+add_executable(test_blob_parser_a38960 tests/test_blob_parser_a38960.cpp)
+target_link_libraries(test_blob_parser_a38960 sotc_core)
+add_test(NAME blob_parser_a38960 COMMAND test_blob_parser_a38960)
+add_executable(test_ctor_slot_495 tests/test_ctor_slot_495.cpp)
+target_link_libraries(test_ctor_slot_495 sotc_core)
+add_test(NAME ctor_slot_495 COMMAND test_ctor_slot_495)
+
+# CPU-01-AOT-CFG-SCALE-01-BATCH26 (slot 454): first-class RB erase 0x482a90 + network debug page
+target_sources(sotc_core PRIVATE core/rb_tree_482a90.cpp core/ctor_slot_454_483e40.cpp)
+add_executable(test_rb_tree_482a90 tests/test_rb_tree_482a90.cpp)
+target_link_libraries(test_rb_tree_482a90 sotc_core)
+add_test(NAME rb_tree_482a90 COMMAND test_rb_tree_482a90)
+add_executable(test_ctor_slot_454 tests/test_ctor_slot_454.cpp)
+target_link_libraries(test_ctor_slot_454 sotc_core)
+add_test(NAME ctor_slot_454 COMMAND test_ctor_slot_454)
+
+# CPU-01-STARTUP-SLOT-468: scripted-entry helper 0x3c2a00 + the automation command page
+target_sources(sotc_core PRIVATE core/scripted_entry_3c2a00.cpp core/ctor_slot_468_3c3a90.cpp)
+add_executable(test_scripted_entry_3c2a00 tests/test_scripted_entry_3c2a00.cpp)
+target_link_libraries(test_scripted_entry_3c2a00 sotc_core)
+add_test(NAME scripted_entry_3c2a00 COMMAND test_scripted_entry_3c2a00)
+add_executable(test_ctor_slot_468 tests/test_ctor_slot_468.cpp)
+target_link_libraries(test_ctor_slot_468 sotc_core)
+add_test(NAME ctor_slot_468 COMMAND test_ctor_slot_468)
+
+# CPU-01-AOT-CFG-SCALE-01-BATCH29 (slot 568): LoadCmdsFromFile command with two tokens
+target_sources(sotc_core PRIVATE core/ctor_slot_568_207e0.cpp)
+add_executable(test_ctor_slot_568 tests/test_ctor_slot_568.cpp)
+target_link_libraries(test_ctor_slot_568 sotc_core)
+add_test(NAME ctor_slot_568 COMMAND test_ctor_slot_568)
+
+# CPU-01-AOT-CFG-SCALE-01-BATCH30 (slot 556): four app-info entries + sendEmail command
+target_sources(sotc_core PRIVATE core/ctor_slot_556_4ccb0.cpp)
+add_executable(test_ctor_slot_556 tests/test_ctor_slot_556.cpp)
+target_link_libraries(test_ctor_slot_556 sotc_core)
+add_test(NAME ctor_slot_556 COMMAND test_ctor_slot_556)
+
+# CPU-01-AOT-CFG-SCALE-01-BATCH31 (slot 530): Resources page (5 bools, ranged int, command, 8 menu items)
+target_sources(sotc_core PRIVATE core/ctor_slot_530_149f00.cpp)
+add_executable(test_ctor_slot_530 tests/test_ctor_slot_530.cpp)
+target_link_libraries(test_ctor_slot_530 sotc_core)
+add_test(NAME ctor_slot_530 COMMAND test_ctor_slot_530)
+
+target_sources(sotc_core PRIVATE core/vector_append_16a380.cpp core/ctor_slot_524_16a810.cpp)
+add_executable(test_ctor_slot_524 tests/test_ctor_slot_524.cpp)
+target_link_libraries(test_ctor_slot_524 sotc_core)
+add_test(NAME ctor_slot_524 COMMAND test_ctor_slot_524)
+
+# CPU-01-STARTUP-SLOT-505 (slot 505): 2,704-byte table copy + 226-step bounds min/max (0x1621b0/0x162970).
+target_sources(sotc_core PRIVATE core/bounds_minmax_1621b0.cpp core/ctor_slot_505_236030.cpp)
+add_executable(test_ctor_slot_505 tests/test_ctor_slot_505.cpp)
+target_link_libraries(test_ctor_slot_505 sotc_core)
+add_test(NAME ctor_slot_505 COMMAND test_ctor_slot_505)
+target_sources(sotc_core PRIVATE core/ctor_slot_552_8c880.cpp)
+add_executable(test_ctor_slot_552 tests/test_ctor_slot_552.cpp)
+target_link_libraries(test_ctor_slot_552 sotc_core)
+add_test(NAME ctor_slot_552 COMMAND test_ctor_slot_552)
+
+# CPU-01-STARTUP-SLOT-567 (slot 567): manager cell + four console commands + five atexit records.
+target_sources(sotc_core PRIVATE core/ctor_slot_567_235d0.cpp)
+add_executable(test_ctor_slot_567 tests/test_ctor_slot_567.cpp)
+target_link_libraries(test_ctor_slot_567 sotc_core)
+add_test(NAME ctor_slot_567 COMMAND test_ctor_slot_567)
+
+# CPU-01-STARTUP-SLOT-510 (slot 510): property cell + FollowGameCamera bool var + Debug Game
+# toggle + pose constants + SyncCameraAcrossTools with seven tokens; four atexit records.
+target_sources(sotc_core PRIVATE core/ctor_slot_497_262a80.cpp)
+target_sources(sotc_core PRIVATE core/ctor_slot_510_211340.cpp)
+add_executable(test_ctor_slot_510 tests/test_ctor_slot_510.cpp)
+target_link_libraries(test_ctor_slot_510 sotc_core)
+add_test(NAME ctor_slot_510 COMMAND test_ctor_slot_510)
+
+add_executable(test_ctor_slot_497 tests/test_ctor_slot_497.cpp)
+target_link_libraries(test_ctor_slot_497 sotc_core)
+add_test(NAME ctor_slot_497 COMMAND test_ctor_slot_497)
+
+# CPU-01-AOT-CFG-SCALE-01-BATCH27 (slot 462): functor command 0x6af60 / 0x6b0f0 + presentation page
+target_sources(sotc_core PRIVATE core/concmd_functor_6af60.cpp core/ctor_slot_462_3e2730.cpp)
+add_executable(test_concmd_functor_6af60 tests/test_concmd_functor_6af60.cpp)
+target_link_libraries(test_concmd_functor_6af60 sotc_core)
+add_test(NAME concmd_functor_6af60 COMMAND test_concmd_functor_6af60)
+add_executable(test_ctor_slot_462 tests/test_ctor_slot_462.cpp)
+target_link_libraries(test_ctor_slot_462 sotc_core)
+add_test(NAME ctor_slot_462 COMMAND test_ctor_slot_462)
+
+# CPU-01-AOT-CFG-SCALE-01-BATCH21 (slot 446): red-black named registry 0x3be2d0 / 0x3c0840 / 0x3c31b0 / 0x3c3710 / 0x3c3470 / 0x3c3930
+target_sources(sotc_core PRIVATE core/rb_registry_3be2d0.cpp)
+add_executable(test_rb_registry_3be2d0 tests/test_rb_registry_3be2d0.cpp)
+target_link_libraries(test_rb_registry_3be2d0 sotc_core)
+add_test(NAME rb_registry_3be2d0 COMMAND test_rb_registry_3be2d0)
+target_sources(sotc_core PRIVATE core/ctor_slot_446_4c92a0.cpp)
+add_executable(test_ctor_slot_446 tests/test_ctor_slot_446.cpp)
+target_link_libraries(test_ctor_slot_446 sotc_core)
+add_test(NAME ctor_slot_446 COMMAND test_ctor_slot_446)
+
+# CPU-01-STARTUP-SLOT-554-BATCH-01: page header (0x53fc0, 187 stores) + first eight variables.
+target_sources(sotc_core PRIVATE core/ctor_slot_554_6efe0.cpp)
+add_executable(test_ctor_slot_554 tests/test_ctor_slot_554.cpp)
+target_link_libraries(test_ctor_slot_554 sotc_core)
+add_test(NAME ctor_slot_554 COMMAND test_ctor_slot_554)
+
+# CPU-01-STARTUP-SLOT-554-BATCH-02A: five 0xc0-byte bool variables (0x6f793..0x6fc29).
+target_sources(sotc_core PRIVATE core/ctor_slot_554_2a_6f793.cpp)
+add_executable(test_ctor_slot_554_batch2a tests/test_ctor_slot_554_batch2a.cpp)
+target_link_libraries(test_ctor_slot_554_batch2a sotc_core)
+add_test(NAME ctor_slot_554_batch2a COMMAND test_ctor_slot_554_batch2a)
+
+# CPU-01-STARTUP-SLOT-554-BATCH-02B: 0x6abb0 occluder-debug wrapper + seven bools (0x6fc29..0x7036d).
+target_sources(sotc_core PRIVATE core/ctor_slot_554_2b_6fc29.cpp)
+add_executable(test_ctor_slot_554_batch2b tests/test_ctor_slot_554_batch2b.cpp)
+target_link_libraries(test_ctor_slot_554_batch2b sotc_core)
+add_test(NAME ctor_slot_554_batch2b COMMAND test_ctor_slot_554_batch2b)
+
+# CPU-01-STARTUP-SLOT-554-BATCH-02B-CONT: remaining 23 objects (0x7036d..0x718bb).
+target_sources(sotc_core PRIVATE core/ctor_slot_554_2b_cont_7036d.cpp)
+add_executable(test_ctor_slot_554_batch2b_cont tests/test_ctor_slot_554_batch2b_cont.cpp)
+target_link_libraries(test_ctor_slot_554_batch2b_cont sotc_core)
+add_test(NAME ctor_slot_554_batch2b_cont COMMAND test_ctor_slot_554_batch2b_cont)
+
+# CPU-01-STARTUP-SLOT-554-BATCH-03: 36 objects (0x718bb..0x739e8).
+target_sources(sotc_core PRIVATE core/ctor_slot_554_batch3_718bb.cpp)
+add_executable(test_ctor_slot_554_batch3 tests/test_ctor_slot_554_batch3.cpp)
+target_link_libraries(test_ctor_slot_554_batch3 sotc_core)
+add_test(NAME ctor_slot_554_batch3 COMMAND test_ctor_slot_554_batch3)
+
+# CPU-01-STARTUP-SLOT-554-BATCH-04: 36 objects (0x739e8..0x75d22).
+target_sources(sotc_core PRIVATE core/ctor_slot_554_batch4_739e8.cpp)
+add_executable(test_ctor_slot_554_batch4 tests/test_ctor_slot_554_batch4.cpp)
+target_link_libraries(test_ctor_slot_554_batch4 sotc_core)
+add_test(NAME ctor_slot_554_batch4 COMMAND test_ctor_slot_554_batch4)
+
+# CPU-01-STARTUP-SLOT-554-BATCH-05: 36 objects (0x75d22..0x781c5).
+target_sources(sotc_core PRIVATE core/ctor_slot_554_batch5_75d22.cpp)
+add_executable(test_ctor_slot_554_batch5 tests/test_ctor_slot_554_batch5.cpp)
+target_link_libraries(test_ctor_slot_554_batch5 sotc_core)
+add_test(NAME ctor_slot_554_batch5 COMMAND test_ctor_slot_554_batch5)
+
+# CPU-01-STARTUP-SLOT-554-BATCH-06: 36 objects (0x781c5..0x7a68c).
+target_sources(sotc_core PRIVATE core/ctor_slot_554_batch6_781c5.cpp)
+add_executable(test_ctor_slot_554_batch6 tests/test_ctor_slot_554_batch6.cpp)
+target_link_libraries(test_ctor_slot_554_batch6 sotc_core)
+add_test(NAME ctor_slot_554_batch6 COMMAND test_ctor_slot_554_batch6)
+
+# CPU-01-STARTUP-SLOT-554-BATCH-07: 36 objects (0x7a68c..0x7cb5b).
+target_sources(sotc_core PRIVATE core/ctor_slot_554_batch7_7a68c.cpp)
+add_executable(test_ctor_slot_554_batch7 tests/test_ctor_slot_554_batch7.cpp)
+target_link_libraries(test_ctor_slot_554_batch7 sotc_core)
+add_test(NAME ctor_slot_554_batch7 COMMAND test_ctor_slot_554_batch7)
+
+target_sources(sotc_core PRIVATE core/ctor_slot_554_batch8_7cb5b.cpp)
+add_executable(test_ctor_slot_554_batch8 tests/test_ctor_slot_554_batch8.cpp)
+target_link_libraries(test_ctor_slot_554_batch8 sotc_core)
+add_test(NAME ctor_slot_554_batch8 COMMAND test_ctor_slot_554_batch8)
+
+# CPU-01-STARTUP-SLOT-554-BATCH-09: 36 objects (0x7f098..0x8160c).
+target_sources(sotc_core PRIVATE core/ctor_slot_554_batch9_7f098.cpp)
+add_executable(test_ctor_slot_554_batch9 tests/test_ctor_slot_554_batch9.cpp)
+target_link_libraries(test_ctor_slot_554_batch9 sotc_core)
+add_test(NAME ctor_slot_554_batch9 COMMAND test_ctor_slot_554_batch9)
+
+# CPU-01-STARTUP-SLOT-554-BATCH-10: 36 objects (0x8160c..0x83ad1).
+target_sources(sotc_core PRIVATE core/ctor_slot_554_batch10_8160c.cpp)
+add_executable(test_ctor_slot_554_batch10 tests/test_ctor_slot_554_batch10.cpp)
+target_link_libraries(test_ctor_slot_554_batch10 sotc_core)
+add_test(NAME ctor_slot_554_batch10 COMMAND test_ctor_slot_554_batch10)
+
+# CPU-01-STARTUP-SLOT-554-BATCH-11: 36 objects (0x83ad1..0x86052).
+target_sources(sotc_core PRIVATE core/ctor_slot_554_batch11_83ad1.cpp)
+add_executable(test_ctor_slot_554_batch11 tests/test_ctor_slot_554_batch11.cpp)
+target_link_libraries(test_ctor_slot_554_batch11 sotc_core)
+add_test(NAME ctor_slot_554_batch11 COMMAND test_ctor_slot_554_batch11)
+
+# CPU-01-STARTUP-SLOT-554-BATCH-12: 36 objects; body (0x86052..0x8849d).
+target_sources(sotc_core PRIVATE core/ctor_slot_554_batch12_86052.cpp)
+add_executable(test_ctor_slot_554_batch12 tests/test_ctor_slot_554_batch12.cpp)
+target_link_libraries(test_ctor_slot_554_batch12 sotc_core)
+add_test(NAME ctor_slot_554_batch12 COMMAND test_ctor_slot_554_batch12)
+target_sources(sotc_core PRIVATE core/ctor_slot_554_batch13_8849d.cpp)
+add_executable(test_ctor_slot_554_batch13 tests/test_ctor_slot_554_batch13.cpp)
+target_link_libraries(test_ctor_slot_554_batch13 sotc_core)
+add_test(NAME ctor_slot_554_batch13 COMMAND test_ctor_slot_554_batch13)

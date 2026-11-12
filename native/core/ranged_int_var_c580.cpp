@@ -7,8 +7,11 @@ namespace sotc {
 bool init_ranged_int_var_c580(ConCmdRangedVar& var, const SharedStr& name, void* value_ref, std::int32_t min_value,
                               std::int32_t max_value, std::uint32_t flags, const RangedVarArgs& args,
                               const SharedStr& description) noexcept {
-    // The functor tag selects code through `call [tag + 8]`; only the two lifted tags are accepted.
-    if (args.fn_vptr != kRangedIntArgFnVtbl && args.fn_vptr != kRangedIntFnVtbl) return false;
+    // The functor tag selects code through `call [tag + 8]`; only the lifted tags are accepted.
+    if (args.fn_vptr != kRangedIntArgFnVtbl && args.fn_vptr != kRangedIntArgFnVtblResources &&
+        args.fn_vptr != kRangedIntFnVtbl) {
+        return false;
+    }
 
     // 0xc5b6: call 0x20af0(this, name, description, flags)
     init_concmd_base_20af0(var.base, name, description, flags);

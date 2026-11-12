@@ -1,5 +1,11 @@
 // Two resolved slots on vtable `0x15953f8`: `+0xa0 -> 0x31870` and `+0xa8 -> 0x318b0`.
 //
+// CORRECTION (E1095): the table rows for the call sites once recorded for these slots (`0x312ce`,
+// `0x3133e` for `+0xa8`; `0x312de`, `0x3134e` for `+0xa0`) were withdrawn. Those calls read the
+// object's vptr (`0x15953f8 + 0x10`), so they reach `0x15954b0 -> 0x31900` and `0x15954a8 -> 0x318f0`.
+// The slot facts below are still true of the image (the qwords at `0x15953f8 + 0xa8` / `+ 0xa0` are
+// `0x318b0` / `0x31870`); what is withdrawn is the claim that those calls dispatch to them.
+//
 // Both are file-handle read entry points, and the call targets name the imported service:
 //
 //   0x31870 (55 B): *(u64*)(this+0x54) = 0xFFFFFFFF00000004;
@@ -12,6 +18,12 @@
 // (see `local/validation/registry-analysis-agent/plt_map.json`), so the service name here is not a
 // guess. What the marker at `+0x54` and the counter at `+0x10` mean beyond "written by the caller"
 // is not modelled; the read is supplied as a hook so a host can bind it to our own Fios layer.
+//
+// NOTE (E1100): `0x31900` (`frontier_31900_fios_poll`) shows what the fields really are. `+0x50` is the
+// `SceFiosOp` handle that `sceFiosFHReadv` / `sceFiosFHPreadv` return (the poll feeds it to
+// `sceFiosOpIsDone` / `GetError` / `GetActualCount` / `Delete`), so the cell and constant below named
+// "status" hold an op handle, and `+0x54 = 0xFFFFFFFF00000004` is state dword 4 (a data transfer)
+// plus an actual-count dword of -1. Names in this header are kept for compatibility.
 #pragma once
 
 #include <cstddef>

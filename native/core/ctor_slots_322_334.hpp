@@ -280,6 +280,10 @@ inline constexpr std::uint64_t kUnboundedIntFnTable = 0x15944a0;          // +0x
 inline constexpr std::uint64_t kUnboundedIntFnTableB = 0x15ce8c0;         // second lifted table (slot 334's argument)
 inline constexpr std::uint64_t kUnboundedIntFnTableSlot486 = 0x15a2248;   // four slots byte-pinned in lane M4
 inline constexpr std::uint64_t kUnboundedIntFnTableSlot489 = 0x159fae0;   // four slots byte-pinned in lane M4
+// 0xa54920's caller argument functor: its four slot words are 0xc720 / 0xc740 / 0xc760 / 0xc770
+// (verified from the pinned ELF in tools/lift/check_fsavedata_stats_a54920.py), so the same
+// unbounded-int worker admits it without running an unknown slot.
+inline constexpr std::uint64_t kUnboundedIntFnTableSavedata = 0x15d1d80;
 inline constexpr std::uint32_t kUnboundedIntSlot3Result = 1;              // 0xbf70: mov eax,1; ret
 inline constexpr std::uint32_t kUnboundedIntSlot6Result = 2;              // 0xbfc0: mov eax,2; ret
 

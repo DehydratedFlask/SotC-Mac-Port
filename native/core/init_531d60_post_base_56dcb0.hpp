@@ -3,13 +3,13 @@
 //   // stop before next call 0x56dca0 @ 0x531df9 (already a ret-nop in E406 remainder)
 //
 // Always-on after E446 post-base 0x499f80 call-site. Prefer over full 0x56dcb0
-// body (126 B; stack-chk cell 0x15fe518; nested 0xa5cd90/0x946880/0xa5d990/
+// body (132 B; stack-chk cell 0x15fe518; nested 0xa5cd90/0x946880/0xa5d990/
 // 0x560b60) and over deepen 0x499f80 / 0x140d90 / 0x14c2f0 / 0x6a5370.
 // Prefer over 0x5c64c0 (later Init continue). Prefer over empty-path
 // migrate/non-null.
 //
-// Claimed: call-site control flow pin only.
-// NOT modelled: body of 0x56dcb0. PR #5 cite-only.
+// Claimed: call-site wrapper. The 132 B body is native in init_post_bodies.cpp; the runtime
+// supplies its four helper hooks and executes it here (E1426). A null hook is call-site-only.
 #pragma once
 
 #include <cstddef>

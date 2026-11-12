@@ -4,7 +4,8 @@
 // After E521 `vcall18_532a17` end @ `0x532a1a`. Prep `0x532a1a..0x532a62` (72 B:
 // descriptor-2 stack setup for name `0x2efd9f8`, vtable `0x15c8d98` on rbx) NOT
 // modelled as pinned units in `continue_e`; this u1 runs prep + the ctor call.
-// NOT modelled: 0xa54920 body; post-call vcall @ `0x532a72`. G1 PARTIAL.
+// The runtime supplies the native `0xa54920` model through the hook; this fragment
+// does not inline the body. NOT modelled here: post-call vcall @ `0x532a72`. G1 PARTIAL.
 #pragma once
 
 #include <cstddef>

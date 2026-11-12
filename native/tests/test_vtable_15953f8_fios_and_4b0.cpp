@@ -109,21 +109,21 @@ bool deallocate(void*, std::uint32_t tag) {
 struct WaitTrace {
     int waits = 0;
     int reads = 0;
-    int plain = 0;
-    int mode_one = 0;
+    int succeeded = 0;
+    int close = 0;
     int finish = 0;
     int pending_rounds = 0;
 };
 WaitTrace g_wait;
 
-bool sub_init_done(void*) { return false; }
+bool poll_direct_pending(void*) { return false; }
 void wait_op(std::uint32_t) { ++g_wait.waits; }
-bool positioned_read(void*) {
+bool poll_virtual(void*) {
     ++g_wait.reads;
     return g_wait.reads > g_wait.pending_rounds;   // completes after the configured rounds
 }
-void plain_read(void*) { ++g_wait.plain; }
-void mode_one(void*) { ++g_wait.mode_one; }
+void succeeded(void*) { ++g_wait.succeeded; }
+void close_handle(void*) { ++g_wait.close; }
 void finish(void*) { ++g_wait.finish; }
 
 void test_fios_wait_loop_teardown() {
@@ -137,18 +137,18 @@ void test_fios_wait_loop_teardown() {
     cells.op_handle = &op_handle;
     cells.mode = &mode;
     Vtable15953f8Slot18_31310Hooks hooks{};
-    hooks.sub_init = sub_init_done;
+    hooks.poll_direct = poll_direct_pending;
     hooks.wait = wait_op;
-    hooks.positioned_read = positioned_read;
-    hooks.plain_read = plain_read;
-    hooks.mode_one = mode_one;
+    hooks.poll_virtual = poll_virtual;
+    hooks.succeeded = succeeded;
+    hooks.close = close_handle;
     hooks.finish = finish;
     const auto result = vtable_15953f8_slot18_31310(cells, hooks);
     check("wait teardown ok", result.ok);
     check("wait teardown vtable", vtable == reinterpret_cast<void*>(0x1595408));
     check("wait teardown waits", result.waits == 3 && g_wait.waits == 3);
-    check("wait teardown reads", result.plain_read_called && g_wait.plain == 1);
-    check("wait teardown mode", result.mode_one_called && g_wait.mode_one == 1);
+    check("wait teardown succeeded", result.succeeded_called && g_wait.succeeded == 1);
+    check("wait teardown close", result.close_called && g_wait.close == 1);
     check("wait teardown finish", result.finish_called && g_wait.finish == 1);
     check("wait teardown free", result.freed && result.free_tag == 1);
 

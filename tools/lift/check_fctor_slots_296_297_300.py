@@ -8,7 +8,7 @@ executes an original RVA. It pins:
   * slot 297: the full body hash/bytes, the loop constants (stride 0x118, bound 0x1b690), the exact
     store/call order, the registered destructor 0xb24be0 contract bytes, and the native constants;
   * slot 300: the full 21-byte body, the bare-`ret` destructor 0xacc5b0, and the native constants;
-  * the production rows in native/core/startup_ctors.cpp, in original index order (456 rows,
+  * the production rows in native/core/startup_ctors.cpp, in original index order (566 rows,
     including slots 296 through 312 and the newly wired existing-leaf rows).
 
 Private: needs local/re/eboot.elf.
@@ -243,7 +243,7 @@ def main() -> int:
     block = array_match.group(1)
     rows = [(int(rva, 16), int(index)) for rva, index in re.findall(
         r"^\s*\{\s*(0x[0-9a-fA-F]+)\s*,\s*(\d+)\s*,\s*\[", block, re.MULTILINE)]
-    require(len(rows) == 460, f"expected 460 registered rows (296-312 and verified lane rows included), found {len(rows)}")
+    require(len(rows) == 573, f"expected 573 registered rows (296-312 and verified lane rows included), found {len(rows)}")
     indices = [index for _, index in rows]
     require(indices == sorted(indices) and len(indices) == len(set(indices)),
             "constructor rows must be in strictly increasing index order")

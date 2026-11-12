@@ -11,6 +11,13 @@
 //   467  0x3ca110   537    107   one bounded float variable + one 0x27050 slider item
 //   379  0x6d8d20   512    105   one bounded float variable + one 0x26ea0 toggle item
 //   536  0x1342d0   659    124   two bounded float variables, no item
+//   374  0x701230   537    110   one `{name, fnv1a(name)}` record, then one bounded float variable
+//                                 + one 0x26ea0 toggle item
+//
+// Slot 374 is the only OPEN gap whose statement sequence is this template's: it is the four-body
+// shape with ONE extra leading record (`[cell] = name; cell->hash = 0x52a990(name)`, the `NameHashCell`
+// shape core/hashed_name_ctors already models for 0x669450/0x842450/0x7dace0/0x6dde20). Modelling
+// that record as a data row is why it joins the batch; nothing else about its body changes.
 //
 // Every one of the four bodies is, in this order and with no other statement:
 //   1. prologue `push rbp; mov rsp,rbp; push r15/r14/r13/r12/rbx; and rsp,-0x20; sub rsp,0xe0`;
@@ -44,12 +51,15 @@
 //   * 0x27050 slider item            core/debug_menu_item init_debug_menu_item_27050
 //   * 0x26ea0 toggle item            core/debug_menu_item init_debug_menu_item_26ea0
 //   * 0x268b0 menu registration      core/debug_menu_item register_debug_menu_item_268b0
+//   * 0x52a990 name hash (slot 374)  core/hashed_name_ctors NameHashCell + core/fnv_cstr_161fb0
 //   * __cxa_atexit                   core/concmd_base StartupAtexitLog (destructors recorded, never run)
+
 // The only hook is the __stack_chk_guard source: it is the toolchain's runtime secret, so a host that
 // does not supply it gets `canary_checked == false` instead of a silent pass.
 //
-// The three caller argument-functor tags this batch introduces (0x15cda18 at 361, 0x15b0e90 at 467,
-// 0x15981a0 at 536) are PROVEN EQUIVALENT to the already-lifted float tag: their four .data.rel.ro
+// The five caller argument-functor tags this batch carries are PROVEN EQUIVALENT to the already-lifted
+// float tag: 0x15cda18 (361), 0x15b0e90 (467), 0x15981a0 (536) and 0x15cccf0 (374) are new here, and
+// 0x15cc898 (379) was already proven by lane M6 (core/lane_m6_shapes). Each tag's four .data.rel.ro
 // slots resolve to the same bodies 0xc4a0 (copy) / 0xc4c0 (clone) / 0xc4e0 (move) / 0xc4f0 (bare-ret
 // destroy), which the per-slot checkers pin. The constructor reads the caller tag only to select those
 // bodies and never stores it (the object receives the class tag from the copy/clone bodies), so the
@@ -57,8 +67,8 @@
 //
 // The debug-menu gate of the float class is read from the pinned relocations, not from a hook:
 // 0x15942b0 + 0x18 -> 0xbba0 (`mov eax,1; ret`) and 0x15942b0 + 0x30 -> 0xbbf0 (`mov eax,3; ret`), so
-// the 0x26ea0 narrowing `slot3 == 1 && slot6 == 3` HOLDS and slot 379's toggle carries the {0.1, 0.5}
-// range (the 0x27050 slider sites pass their range explicitly and read no gate).
+// the 0x26ea0 narrowing `slot3 == 1 && slot6 == 3` HOLDS and the toggles of slots 379 and 374 carry the
+// {0.1, 0.5} range (the 0x27050 slider sites pass their range explicitly and read no gate).
 //
 // Fail-visible contracts (reported through `blocked` / `ok == false`, never a silent pass): a script
 // larger than the object stand-ins or with an out-of-range item target (`shape`, before any write); an
@@ -78,6 +88,7 @@
 #include "concmd_vars.hpp"
 #include "ctor_shapes_343_356.hpp"   // FloatVarResult / MenuSiteResult (the shared site results)
 #include "debug_menu_item.hpp"
+#include "hashed_name_ctors.hpp"    // NameHashCell (slot 374's leading {name, hash} record)
 
 namespace sotc::debug_page {
 
@@ -97,6 +108,7 @@ inline constexpr std::uint64_t kSliderItemCtorRva = 0x27050;    // item row (exp
 inline constexpr std::uint64_t kToggleItemCtorRva = 0x26ea0;    // item row (gate-derived range)
 inline constexpr std::uint64_t kMenuItemRegisterRva = 0x268b0;  // the ctor's tail call
 inline constexpr std::uint64_t kMenuItemDtorRva = 0x272d0;      // __cxa_atexit rdi of an item row
+inline constexpr std::uint64_t kNameHashCallRva = 0x52a990;     // `mov esi,0x811c9dc5; jmp 0x161fb0`
 inline constexpr std::uint64_t kStackChkFailRva = 0xf8f3a0;
 inline constexpr std::uint64_t kStackGuardCellRva = 0x15fe518;  // GOT cell of __stack_chk_guard
 inline constexpr std::uint64_t kDsoHandleRva = 0x1604218;
@@ -115,20 +127,36 @@ inline constexpr std::uint32_t kVarFlags = 1;      // r9d of every 0xc300 site
 inline constexpr std::uint32_t kItemFlags = 0x30;  // r8d of every 0x27050 / 0x26ea0 site
 inline constexpr std::uint32_t kCanaryFrameOffset = 0xc0;
 
-// The largest script this batch claims: slot 536 has two variable rows and no item, 361/467/379 have
-// one variable row and one item. A larger script is refused at stage `shape`, before any write.
+// The largest script this batch claims: slot 536 has two variable rows and no item, 361/467/379/374
+// have one variable row and one item. A larger script is refused at stage `shape`, before any write.
 inline constexpr std::size_t kMaxScriptVars = 2;
 inline constexpr std::size_t kMaxScriptItems = 1;
+inline constexpr std::size_t kMaxScriptHashedNames = 1;
 
 // ---- the caller argument-functor tags introduced by this batch -----------------------------------
 inline constexpr std::uint64_t kArgFnVtblSlot361 = 0x15cda18;
 inline constexpr std::uint64_t kArgFnVtblSlot467 = 0x15b0e90;
 inline constexpr std::uint64_t kArgFnVtblSlot379 = 0x15cc898;
 inline constexpr std::uint64_t kArgFnVtblSlot536 = 0x15981a0;
+inline constexpr std::uint64_t kArgFnVtblSlot374 = 0x15cccf0;
+// Batch 3: slot 518's tag. It is the lane-M6 tag core/lane_m6_shapes already named kFloatSiteTag_518; its four
+// relocation slots are the float bodies 0xc4a0/0xc4c0/0xc4e0/0xc4f0 (tools/lift/check_ctor_slot_518.py).
+inline constexpr std::uint64_t kArgFnVtblSlot518 = 0x1598a50;
 
-// True for the four tags above, whose four relocations are the float bodies 0xc4a0/0xc4c0/0xc4e0/0xc4f0
+// True for the six tags above, whose four relocations are the float bodies 0xc4a0/0xc4c0/0xc4e0/0xc4f0
 // (checker-pinned). The shared 0xc300 model's own accept list is checked separately.
 [[nodiscard]] bool is_batch_float_site_tag(std::uint64_t tag) noexcept;
+
+// ---- one leading `{name, fnv1a(name)}` record (slot 374 only) ------------------------------------
+// The record is the core/hashed_name_ctors NameHashCell shape: `[cell] = name` then
+// `cell->hash = fnv_cstr_52a990(name)`. It is written before the first variable row and cannot fail.
+struct HashedNameRow {
+    std::uint64_t cell_rva;         // identity only; the stand-in lives in the slot's object struct
+    const char* name;               // NUL-terminated literal the hash walks
+    std::uint32_t name_len;         // pinned length of that literal (identity)
+    std::uint64_t pointer_site_rva; // the `mov [cell], name` (identity)
+    std::uint64_t hash_site_rva;    // the `callq 0x52a990` (identity)
+};
 
 // ---- one variable row (one complete 0xc300 static-initialiser block) -----------------------------
 struct FloatVarRow {
@@ -167,7 +195,7 @@ struct MenuRow {
     std::uint64_t atexit_site_rva; // the `callq __cxa_atexit` (identity)
 };
 
-// ---- the per-slot script: everything that differs between the four bodies ------------------------
+// ---- the per-slot script: everything that differs between the five bodies -------------------------
 struct Script {
     std::uint64_t slot_rva;         // identity: the constructor-table word
     std::size_t body_size;          // FDE address_range
@@ -180,12 +208,14 @@ struct Script {
     std::uint64_t canary_branch_target_rva;  // where it lands (the __stack_chk_fail call)
     std::span<const FloatVarRow> vars;
     std::span<const MenuRow> items;          // at most one in this batch
+    std::span<const HashedNameRow> hashed_names;   // at most one; written before every variable row
 };
 
 // The native stand-ins, in script order. The slot's aggregate owns the storage at the original strides.
 struct Objects {
     std::span<ConCmdRangedVar> vars;
     std::span<DebugMenuItem> items;
+    std::span<NameHashCell> hashed_names{};
 };
 
 enum class Stage : std::uint8_t {
@@ -216,6 +246,7 @@ struct Result {
     std::uint32_t blocked_index = 0;      // the row the stage belongs to (0 when global)
     std::uint32_t vars_built = 0;
     std::uint32_t items_built = 0;
+    std::uint32_t hashed_names_built = 0; // slot 374's leading records (0 for the other four)
     std::uint32_t atexit_records = 0;     // this body's records, in body order
     std::uint32_t functors_destroyed = 0; // `callq *0x18(%rax)` sites that reached the bare ret
     std::array<FloatVarResult, kMaxScriptVars> vars{};

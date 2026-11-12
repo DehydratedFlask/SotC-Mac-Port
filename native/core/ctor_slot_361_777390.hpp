@@ -100,7 +100,8 @@ inline constexpr debug_page::Script kSlot361Script = {
     kSlot361FunctorSites, kSlot361TableIndex, kSlot361CanaryFrameOffset, kSlot361BranchRva,
     kSlot361BranchTargetRva,
     std::span<const debug_page::FloatVarRow>(kSlot361Vars),
-    std::span<const debug_page::MenuRow>(kSlot361Items)};
+    std::span<const debug_page::MenuRow>(kSlot361Items),
+    std::span<const debug_page::HashedNameRow>()};  // no leading {name, hash} record (slot 374 only)
 
 // Runs original constructor 361 natively through the batch model. The original is unconditional, so the
 // first failing step stops the fragment and `blocked` names it.

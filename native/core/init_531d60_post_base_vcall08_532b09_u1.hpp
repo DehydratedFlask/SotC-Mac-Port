@@ -1,4 +1,6 @@
-// NOT modelled: vtable load semantics; callee body beyond lifted 0x54b250 wrapper. G1 PARTIAL.
+// The runtime supplies a `stat_engine`, so the lifted 0x54b250 wrapper executes; its
+// un-lifted engine 0xa56560 remains an explicit host contract.
+// NOT modelled: vtable load semantics; 0xa56560 engine body. G1 PARTIAL.
 #pragma once
 #include "stat_query_54b250.hpp"
 #include <cstddef>

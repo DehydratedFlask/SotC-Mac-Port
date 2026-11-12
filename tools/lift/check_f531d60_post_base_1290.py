@@ -2,7 +2,7 @@
 """ELF-tie Init 0x531d60 continue call-site for 0x1290.
 
 Private: needs local/re/eboot.elf. Pins 5 B fragment after 0x5c64c0.
-Does NOT claim body of 0x1290 or later Init continues.
+Pins the call-site; E1426 executes the native 0x1290 body. Later continues stay separate.
 """
 
 from __future__ import annotations
@@ -61,13 +61,13 @@ def main() -> int:
 
     nh = NATIVE.read_text()
     require("init_531d60_post_base_1290" in nh, "API")
-    require("NOT modelled" in nh, "omission")
+    require("real init_1290 body" in nh and "E1426" in nh, "E1426 native body claim")
     require("post_base_1290" in SLICE.read_text() or "PostBase1290" in SLICE.read_text(), "wire")
 
     print(
         f"OK check_f531d60_post_base_1290: frag={FRAG_SHA256[:12]}…; "
         f"call {TARGET:#x}; end={END:#x}; "
-        f"1290_body/56db70/5c64c0_body/56dcb0_body/499f80_body/140d90_body/14c2f0/6a5370 NOT claimed"
+        f"1290 body native (E1426); 56db70/5c64c0_body/56dcb0_body/499f80_body/140d90_body/14c2f0/6a5370 NOT claimed"
     )
     return 0
 

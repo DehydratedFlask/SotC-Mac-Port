@@ -145,6 +145,7 @@ struct Slot414Hooks {
                                                      const StartupAtexitLog& log) noexcept;
 
 // ----------------------------------------------------------------------------------------------- 494
+// Superseded in the startup run (batch 20) by core/ctor_slot_494_26f7c0.hpp, which lifts the two builders; this hook-based identity model is kept.
 inline constexpr std::uint64_t kSlot494Rva = 0x26f7c0;
 inline constexpr std::uint32_t kSlot494Size = 84;
 inline constexpr std::uint64_t kSlot494Obj0Rva = 0x2eef038;

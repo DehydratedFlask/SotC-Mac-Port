@@ -1,0 +1,138 @@
+#!/usr/bin/env python3
+"""ELF byte-oracle for startup constructor slot 514 (RVA 0x1c4c50, 739 bytes), batch 6 debug page.
+
+Two bool console variables `_CameraPrintJumpCuts` (value 0, object 0x2ee68d8) and `broadcastActiveCameraToGameConnection` (value 1, object 0x2ee69a0), functor tag 0x1598f50,
+built back to back, then two 0x26db0 debug-menu toggles under the parent path `Camera` (items 0x2ee6a68, 0x2ee6b10).
+
+Offline only: reads the pinned private ELF (local/re/eboot.elf), never loads, relocates or executes an original RVA. The inherited M6 driver runs a fail-closed mutation self-test;
+--tamper [elf|native] are explicit rejection probes.
+"""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bool_page_lib as bp  # noqa: E402
+
+SPEC = {
+    "slot": 514,
+    "base": 0x1c4c50,
+    "size": 739,
+    "body_sha256": "9ffe136f8530d295518775cdb9934fa43b86fb37c20bb46e5c3c82899954483d",
+    "pad": "90909090909090909090909090",
+    "callees": ['concmd_base_ctor', 'concmd_register', 'bool_dtor', 'release_f590', 'bool_fn_copy', 'bool_fn_clone', 'bool_fn_move', 'bool_fn_destroy', 'bool_slot3', 'bool_slot6', 'menu_toggle_from_var_ctor', 'menu_item_dtor'],
+    "bool_tags": [0x1598f50],
+    "float_tags": [],
+    "strings": [
+        (0xfb3fa0, b'_CameraPrintJumpCuts'),
+        (0xfb3fb5, b'broadcastActiveCameraToGameConnection'),
+        (0xfb3fdb, b'Camera'),
+        (0xfb404c, b''),
+    ],
+    "lengths": [
+        ('_CameraPrintJumpCuts', 0x1c4cb1, "48c7459814000000"),
+        ('broadcastActiveCameraToGameConnection', 0x1c4daf, "48c7459825000000"),
+        ('Camera', 0x1c4e92, "48c745b806000000"),
+        ('Camera', 0x1c4ee0, "48c745b806000000"),
+        ('_CameraPrintJumpCuts', 0x1c4cb1, "48c7459814000000"),
+        ('broadcastActiveCameraToGameConnection', 0x1c4daf, "48c7459825000000"),
+        ('Camera', 0x1c4e92, "48c745b806000000"),
+        ('Camera', 0x1c4ee0, "48c745b806000000"),
+    ],
+    "pins": [
+        ("rip", 0x1c4c61, 7, 3, 0x15fe518),
+        ("rip", 0x1c4c68, 7, 3, 0x1594208),
+        ("rip", 0x1c4c6f, 7, 3, 0x2ee68d8),
+        ("rip", 0x1c4c76, 7, 3, 0xfb3fa0),
+        ("rip", 0x1c4c7d, 7, 3, 0xfb404c),
+        ("imm", 0x1c4c90, "b901000000"),
+        ("imm", 0x1c4c9b, "4983c410"),
+        ("imm", 0x1c4cb1, "48c7459814000000"),
+        ("rip", 0x1c4cc3, 7, 3, 0x2ee68d8),
+        ("imm", 0x1c4cca, "48c745c800000000"),
+        ("call", 0x1c4cd2, 0x20af0),
+        ("rip", 0x1c4cd7, 7, 3, 0x15940a0),
+        ("rip", 0x1c4ce1, 7, 3, 0x2ee6998),
+        ("rip", 0x1c4cec, 7, 3, 0x1598f50),
+        ("imm", 0x1c4cf3, "4983c510"),
+        ("rip", 0x1c4cf7, 7, 3, 0x2ee68d8),
+        ("rip", 0x1c4cfe, 7, 3, 0x2ee6938),
+        ("rip", 0x1c4d05, 10, 2, 0x2ee6941),
+        ("imm", 0x1c4d05, "c705321cd20200000000"),
+        ("rip", 0x1c4d0f, 8, 4, 0x2ee6948),
+        ("rip", 0x1c4d17, 11, 3, 0x2ee6978),
+        ("imm", 0x1c4d17, "48c705561cd20200000000"),
+        ("rip", 0x1c4d22, 7, 3, 0x2ee6988),
+        ("rip", 0x1c4d29, 11, 3, 0x2ee6990),
+        ("imm", 0x1c4d29, "48c7055c1cd20200000000"),
+        ("call", 0x1c4d34, 0xf590),
+        ("rip", 0x1c4d3c, 7, 3, 0x2ee68d8),
+        ("rip", 0x1c4d43, 7, 2, 0x2ee6998),
+        ("imm", 0x1c4d43, "c6054e1cd20200"),
+        ("rip", 0x1c4d4a, 7, 2, 0x2ee6940),
+        ("imm", 0x1c4d4a, "c605ef1bd20200"),
+        ("call", 0x1c4d51, 0x20d60),
+        ("call", 0x1c4d59, 0xf590),
+        ("rip", 0x1c4d5e, 7, 3, 0x20b0),
+        ("rip", 0x1c4d65, 7, 3, 0x1604218),
+        ("call", 0x1c4d6f, 0xf8f390),
+        ("rip", 0x1c4d74, 7, 3, 0xfb404c),
+        ("rip", 0x1c4d83, 7, 3, 0xfb3fb5),
+        ("rip", 0x1c4d8a, 7, 3, 0x2ee69a0),
+        ("imm", 0x1c4d95, "b901000000"),
+        ("rip", 0x1c4d9a, 7, 3, 0x2ee69a0),
+        ("imm", 0x1c4daf, "48c7459825000000"),
+        ("imm", 0x1c4dc1, "48c745c800000000"),
+        ("call", 0x1c4dcc, 0x20af0),
+        ("rip", 0x1c4dd4, 7, 3, 0x2ee6a60),
+        ("rip", 0x1c4ddf, 7, 3, 0x1598f50),
+        ("rip", 0x1c4de6, 7, 3, 0x2ee69a0),
+        ("rip", 0x1c4ded, 7, 3, 0x2ee6a00),
+        ("rip", 0x1c4df4, 10, 2, 0x2ee6a09),
+        ("imm", 0x1c4df4, "c7050b1cd20200000000"),
+        ("rip", 0x1c4dfe, 8, 4, 0x2ee6a10),
+        ("rip", 0x1c4e06, 11, 3, 0x2ee6a40),
+        ("imm", 0x1c4e06, "48c7052f1cd20200000000"),
+        ("rip", 0x1c4e11, 7, 3, 0x2ee6a50),
+        ("rip", 0x1c4e18, 11, 3, 0x2ee6a58),
+        ("imm", 0x1c4e18, "48c705351cd20200000000"),
+        ("call", 0x1c4e23, 0xf590),
+        ("rip", 0x1c4e2b, 7, 3, 0x2ee69a0),
+        ("rip", 0x1c4e32, 7, 2, 0x2ee6a60),
+        ("imm", 0x1c4e32, "c605271cd20201"),
+        ("rip", 0x1c4e39, 7, 2, 0x2ee6a08),
+        ("imm", 0x1c4e39, "c605c81bd20201"),
+        ("call", 0x1c4e40, 0x20d60),
+        ("call", 0x1c4e48, 0xf590),
+        ("rip", 0x1c4e4d, 7, 3, 0x1604218),
+        ("rip", 0x1c4e54, 7, 3, 0x20b0),
+        ("call", 0x1c4e61, 0xf8f390),
+        ("rip", 0x1c4e66, 7, 3, 0x2ee6a68),
+        ("rip", 0x1c4e71, 7, 3, 0xfb3fdb),
+        ("imm", 0x1c4e7c, "b930000000"),
+        ("rip", 0x1c4e81, 7, 3, 0x2ee68d8),
+        ("imm", 0x1c4e92, "48c745b806000000"),
+        ("call", 0x1c4e9f, 0x26db0),
+        ("call", 0x1c4ea7, 0xf590),
+        ("rip", 0x1c4eac, 7, 3, 0x272d0),
+        ("call", 0x1c4ebc, 0xf8f390),
+        ("rip", 0x1c4ec1, 7, 3, 0x2ee6b10),
+        ("imm", 0x1c4ed0, "b930000000"),
+        ("rip", 0x1c4ed5, 7, 3, 0x2ee69a0),
+        ("imm", 0x1c4ee0, "48c745b806000000"),
+        ("call", 0x1c4ef3, 0x26db0),
+        ("call", 0x1c4efb, 0xf590),
+        ("call", 0x1c4f09, 0xf8f390),
+        ("rip", 0x1c4f0e, 7, 3, 0x15fe518),
+        ("call", 0x1c4f2d, 0xf8f3a0),
+    ],
+    "m6_extras": ['bp_atexit_imports', 'bp_object_vtables'],
+    "native": {'header': 'native/core/ctor_slot_514_1c4c50.hpp', 'source': 'native/core/ctor_slot_514_1c4c50.cpp', 'test': 'native/tests/test_ctor_slot_514.cpp', 'consts': {'kSlot514Rva': 1854544, 'kSlot514Size': 739, 'kSlot514FnTag': 22646608, 'kSlot514Var0NameLength': 20, 'kSlot514Var1NameLength': 37, 'kSlot514ParentLength': 6},
+        'header_tokens': ['kSlot514Var0Rva = 0x2ee68d8', 'kSlot514Item0Rva = 0x2ee6a68', 'kSlot514Var1Rva = 0x2ee69a0', 'kSlot514Item1Rva = 0x2ee6b10', 'kSlot514Var0Name[] = "_CameraPrintJumpCuts"', 'kSlot514Var1Name[] = "broadcastActiveCameraToGameConnection"', 'kSlot514Parent[] = "Camera"', 'IDENTITY TAGS'], 'source_order': ['lane_m6::init_bool_var_literal(objects.var0, kSlot514Var0Name, kSlot514Var0NameLength, "", 0, kSlot514FnTag,', 'lane_m6::init_bool_var_literal(objects.var1, kSlot514Var1Name, kSlot514Var1NameLength, "", 0, kSlot514FnTag,', 'init_toggle_site_26db0(objects.item0, objects.var0, kSlot514Parent, concmd, menu)', 'init_toggle_site_26db0(objects.item1, objects.var1, kSlot514Parent, concmd, menu)'], 'test_tokens': ['kSlot514Rva == 0x1c4c50 && kSlot514Size == 739', 'section_alone()', 'section_failures()', 'CHECK(creg.atexit_log.size() == 5);', 'CHECK(!r.ok']},
+}
+
+
+if __name__ == "__main__":
+    raise SystemExit(bp.main(SPEC, '2 bool variables (tag 0x1598f50, values 0/1) + two 0x26db0 toggles under `Camera`'))

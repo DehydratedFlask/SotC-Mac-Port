@@ -96,7 +96,8 @@ inline constexpr debug_page::Script kSlot467Script = {
     kSlot467FunctorSites, kSlot467TableIndex, kSlot467CanaryFrameOffset, kSlot467BranchRva,
     kSlot467BranchTargetRva,
     std::span<const debug_page::FloatVarRow>(kSlot467Vars),
-    std::span<const debug_page::MenuRow>(kSlot467Items)};
+    std::span<const debug_page::MenuRow>(kSlot467Items),
+    std::span<const debug_page::HashedNameRow>()};  // no leading {name, hash} record (slot 374 only)
 
 [[nodiscard]] debug_page::Result init_slot467_3ca110(Slot467Objects& objects, ConCmdRegistry& concmd,
                                                      DebugMenuRegistry& menu,

@@ -5,6 +5,8 @@
 
 #include <cstring>
 
+#include "fnv_cstr_161fb0.hpp"
+
 namespace sotc::debug_page {
 
 namespace {
@@ -26,7 +28,9 @@ DebugMenuTarget float_menu_target(const ConCmdRangedVar& var) noexcept {
 
 bool script_fits(const Script& script, const Objects& objects) noexcept {
     if (script.vars.size() > kMaxScriptVars || script.items.size() > kMaxScriptItems) return false;
+    if (script.hashed_names.size() > kMaxScriptHashedNames) return false;
     if (script.vars.size() > objects.vars.size() || script.items.size() > objects.items.size()) return false;
+    if (script.hashed_names.size() > objects.hashed_names.size()) return false;
     for (const MenuRow& row : script.items) {
         if (row.target_var >= script.vars.size()) return false;
     }
@@ -133,7 +137,7 @@ Stage build_item(const MenuRow& row, DebugMenuItem& item, const ConCmdRangedVar&
 
 bool is_batch_float_site_tag(std::uint64_t tag) noexcept {
     return tag == kArgFnVtblSlot361 || tag == kArgFnVtblSlot467 || tag == kArgFnVtblSlot379 ||
-           tag == kArgFnVtblSlot536;
+           tag == kArgFnVtblSlot536 || tag == kArgFnVtblSlot374 || tag == kArgFnVtblSlot518;
 }
 
 const char* stage_name(Stage stage) noexcept {
@@ -165,6 +169,15 @@ Result init_debug_page(const Script& script, const Objects& objects, ConCmdRegis
     // Prologue: `guard <- *[0x15fe518]` stored at [rsp+0xc0]. The epilogue re-reads the cell and
     // compares; a mismatch takes `jne <__stack_chk_fail>`.
     const std::uint64_t guard_entry = hooks.stack_guard != nullptr ? *hooks.stack_guard : 0;
+
+    // Slot 374 only: the leading `{name, fnv1a(name)}` record, written before the first variable row.
+    for (std::size_t index = 0; index < script.hashed_names.size(); ++index) {
+        const HashedNameRow& row = script.hashed_names[index];
+        NameHashCell& cell = objects.hashed_names[index];
+        cell.name = row.name;                              // `mov [cell], name`
+        cell.hash = fnv_cstr_52a990(row.name);             // `callq 0x52a990` then `mov [cell+8], eax`
+        ++out.hashed_names_built;
+    }
 
     for (std::size_t index = 0; index < script.vars.size(); ++index) {
         out.blocked_index = static_cast<std::uint32_t>(index);

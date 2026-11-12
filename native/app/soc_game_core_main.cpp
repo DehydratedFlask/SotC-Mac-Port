@@ -201,28 +201,15 @@ soc::status_json::CtorSnapshot make_ctor_snapshot(const sotc_ctor_prefix& prefix
     return ctor;
 }
 
-// An unrecognised code must stay representable. The in-process transport maps any code to
-// `CoreSubsystem.Status.unknown(N)`, so the child transport has to carry the number too; emitting a
-// bare "unknown" made ProcessCoreClient reject an answer the in-process client accepts.
-std::string subsystem_status_name(std::uint32_t status) {
-    switch (status) {
-        case SOTC_SUBSYSTEM_NOT_IMPLEMENTED: return "not_implemented";
-        case SOTC_SUBSYSTEM_PARTIAL: return "partial";
-        case SOTC_SUBSYSTEM_IMPLEMENTED: return "implemented";
-        case SOTC_SUBSYSTEM_NOT_LINKED: return "not_linked";
-        default: return "unknown:" + std::to_string(status);
-    }
-}
-
-std::string archive_status_name(std::uint32_t status) {
-    switch (status) {
-        case SOTC_ARCHIVE_OK: return "ok";
-        case SOTC_ARCHIVE_MISSING: return "missing";
-        case SOTC_ARCHIVE_UNREADABLE: return "unreadable";
-        case SOTC_ARCHIVE_BAD_MAGIC: return "bad_magic";
-        default: return "unknown:" + std::to_string(status);
-    }
-}
+// The numeric values below are the wire contract with `soc::status_json::{subsystem,archive}_status_name`
+// (native/app/core_status_json.cpp, which cannot include the ABI header). Pin them to the header here
+// so a renumbered ABI constant fails the build instead of silently relabelling a status on the wire.
+static_assert(SOTC_SUBSYSTEM_NOT_IMPLEMENTED == 0 && SOTC_SUBSYSTEM_PARTIAL == 1 &&
+                  SOTC_SUBSYSTEM_IMPLEMENTED == 2 && SOTC_SUBSYSTEM_NOT_LINKED == 3,
+              "subsystem status wire names are keyed by these ABI values");
+static_assert(SOTC_ARCHIVE_OK == 0 && SOTC_ARCHIVE_MISSING == 1 && SOTC_ARCHIVE_UNREADABLE == 2 &&
+                  SOTC_ARCHIVE_BAD_MAGIC == 3,
+              "archive status wire names are keyed by these ABI values");
 
 // ---- process session ---------------------------------------------------------------------------
 
@@ -268,7 +255,7 @@ int handle_coverage(const Emit& emit) {
     for (std::uint32_t i = 0; i < report.subsystem_count && i < SOTC_SUBSYSTEM_COUNT; ++i) {
         soc::status_json::CoverageRowSnapshot row;
         row.name = report.subsystems[i].name;
-        row.status = subsystem_status_name(report.subsystems[i].status);
+        row.status = soc::status_json::subsystem_status_name(report.subsystems[i].status);
         row.detail = report.subsystems[i].detail;
         snapshot.subsystems.push_back(std::move(row));
     }
@@ -304,7 +291,7 @@ int handle_validate(Session& session, const std::string& dir, const Emit& emit) 
         for (std::uint32_t i = 0; i < SOTC_ARCHIVE_COUNT; ++i) {
             soc::status_json::ArchiveSnapshot row;
             row.name = result.archives[i].name;
-            row.status = archive_status_name(result.archives[i].status);
+            row.status = soc::status_json::archive_status_name(result.archives[i].status);
             row.size_bytes = result.archives[i].size_bytes;
             snapshot.archives.push_back(std::move(row));
         }

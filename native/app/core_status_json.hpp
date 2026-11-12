@@ -52,7 +52,7 @@ struct StatusSnapshot {
 
 struct CoverageRowSnapshot {
     std::string name;
-    std::string status;  // not_implemented | partial | implemented | not_linked
+    std::string status;  // subsystem_status_name(): not_implemented | partial | implemented | not_linked | unknown:<N>
     std::string detail;
 };
 
@@ -64,7 +64,7 @@ struct CoverageSnapshot {
 
 struct ArchiveSnapshot {
     std::string name;
-    std::string status;  // ok | missing | unreadable | bad_magic | unknown
+    std::string status;  // archive_status_name(): ok | missing | unreadable | bad_magic | unknown:<N>
     std::uint64_t size_bytes = 0;
 };
 
@@ -90,6 +90,15 @@ struct StopSnapshot {
     std::uint32_t error = 0;
     std::string error_name;
 };
+
+// Wire names for the ABI's numeric subsystem / archive statuses. Codes 0..3 have fixed names; any
+// other value is emitted as the lossless, canonical `unknown:<N>` where `<N>` is the code in plain
+// decimal (no sign, no leading zeros, full uint32 range), because the in-process transport maps the
+// same code to `.unknown(N)` and the child transport must carry it. A bare `unknown` is never emitted:
+// it would drop the number. The Swift `ProcessCoreClient` accepts exactly this grammar and nothing else.
+// The mapping of 0..3 to the ABI constants is pinned by static_asserts in soc_game_core_main.cpp.
+std::string subsystem_status_name(std::uint32_t status);
+std::string archive_status_name(std::uint32_t status);
 
 // RFC 8259 string contents: `"` and `\` escaped, C0 controls as \b \f \n \r \t or \u00XX.
 // Bytes >= 0x20 are copied through (the ABI text is UTF-8/ASCII in practice).

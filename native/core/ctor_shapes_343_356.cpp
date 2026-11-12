@@ -2,6 +2,7 @@
 
 #include <cstring>
 
+#include "helper_functor_tags.hpp"
 #include "init_sub_3be930.hpp"
 
 namespace sotc {
@@ -16,7 +17,20 @@ constexpr std::uint64_t kBareRetDestroyFunctors[] = {
     kFloatArgFnVtbl_350,          // 0x15ce260
     kFloatArgFnVtbl_353B,         // 0x15ce1c0
     kUnboundedFloatInitialFnVtbl, // 0x1596878 (the functor class 0x6aa00 stores first)
-    kFloatArgFnVtblSlot364        // 0x15cd240 (slot-364 caller; its destroy slot is byte-pinned bare-ret)
+    kFloatArgFnVtblSlot364,       // 0x15cd240 (slot-364 caller; its destroy slot is byte-pinned bare-ret)
+    kFloatArgFnVtblSlot392,       // 0x15cc618 (slot-392 caller; byte-pinned to the four float bodies)
+    kFloatArgFnVtblSlot396,       // 0x15cc568 (slot-396 caller; byte-pinned to the four float bodies)
+    kFloatArgFnVtblSlot351,       // 0x15ce240 (slot-351 caller; byte-pinned to the four float bodies)
+    kFloatArgFnVtblSlot395,       // 0x15cc5a8 (slot-395 caller; byte-pinned to the four float bodies)
+    kFloatArgFnVtblSlot380,       // 0x15cc878 (slot-380 caller; byte-pinned to the four float bodies)
+    kFloatArgFnVtblSlot375,       // 0x15cc9f8 (slot-375 caller; byte-pinned to the four float bodies)
+    kFloatArgFnVtblSlot382,       // 0x15cc7f8 (slot-382 caller; byte-pinned to the four float bodies)
+    kFloatArgFnVtblSlot360,       // 0x15cdf18 (slot-360 caller; byte-pinned to the four float bodies)
+    kFloatArgFnVtblSlot354,       // 0x15ce0b8 (slot-354 caller; byte-pinned to the four float bodies)
+    kFloatArgFnVtblSlot349,       // 0x15ce2b8 (slot-349 caller; byte-pinned to the four float bodies)
+    kFloatArgFnVtblSlot480,       // 0x15a66b8 (slot-480 caller; byte-pinned to the four float bodies)
+    kFloatArgFnVtblSlot352,       // 0x15ce1e0 (slot-352 caller; byte-pinned to the four float bodies)
+    kFloatArgFnVtblSlot367        // 0x15cd1e0 (slot-367 caller; byte-pinned to the four float bodies)
 };
 
 // 0xc300 / 0x6aa00 tail: the argument copy and the functor clone/copy/copy/copy/swap sequence. Every
@@ -47,7 +61,10 @@ bool is_known_float_arg_functor(std::uint64_t vtbl) noexcept {
     for (const std::uint64_t v : kBareRetDestroyFunctors) {
         if (v == vtbl) return true;
     }
-    return false;
+    // Startup batch 12: the whole float functor family (68 tables whose four slots are exactly the lifted float bodies 0xc4a0 / 0xc4c0 / 0xc4e0 /
+    // 0xc4f0; tools/lift/check_helper_6aa00.py recomputes the set from the relocation table in both directions) is interchangeable with the
+    // hand-read tags above, so a new slot no longer needs a private whitelist entry.
+    return is_float_functor_tag(vtbl);
 }
 
 bool init_bounded_float_var_c300(ConCmdRangedVar& var, const SharedStr& name, void* value_ref, float min_value,

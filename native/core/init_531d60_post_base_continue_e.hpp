@@ -58,10 +58,14 @@
 // 0x54b250, nine RIP-relative lea targets, one vmovq target, the mov [rax],r12b
 // stamp site.
 //
-// NOT modelled: 0xa54920 body (contract/hook with visible status); 0x54b250
-// body; the three provably-ret vcall bodies (0x538200, 0x5388c0); the value
-// held by 0x32f79a8 (addressed in batch D); r13/r12b provenance; the descriptor
-// field semantics beyond address pinning; any game save-data side-effect.
+// Caller hooks: this fragment takes 0xa54920/0x54b250 as hooks. The runtime
+// (`init_window_runtime.cpp`) now supplies the native `savedata_stats_a54920`
+// model for all three calls and the native `stat_query_54b250` wrapper, so the
+// bodies execute there; the fragment itself does not inline them. Still NOT
+// modelled here: `0xa56560` (stat engine, host contract), the three provably-ret
+// vcall bodies (0x538200, 0x5388c0), the value held by 0x32f79a8 (batch D),
+// r13/r12b provenance, descriptor semantics beyond address pinning, and any
+// game save-data side-effect.
 //
 // G1 PARTIAL — 0xa54920 is a hook/contract, nothing ran against the game.
 #pragma once

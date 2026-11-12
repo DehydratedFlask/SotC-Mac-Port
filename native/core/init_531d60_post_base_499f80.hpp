@@ -4,12 +4,16 @@
 //   // stop before next call 0x56dcb0 @ 0x531df4
 //
 // Always-on after successful Base Initialize return (which includes completed
-// measured 0x533100 body + post-vslot 0x357f0). When `body_globals` is non-null,
-// also runs the lifted 193 B body via `run_init_499f80_body` (E1034). Otherwise
-// only the call-site + optional `call_499f80` hook (E446).
+// measured 0x533100 body + post-vslot 0x357f0). The runtime
+// (`init_window_runtime.cpp`) supplies `body_globals` plus the explicit allocator
+// and CritSec hooks, so the measured Init path executes the lifted 193 B body via
+// `run_init_499f80_body` (E1034). Without them only the call-site + optional
+// `call_499f80` hook (E446) run.
 //
-// Claimed: call-site control flow + arg pin (rdi = self+0x3c70).
-// NOT modelled: 0x56dcb0 / subsequent Init leaves already covered by E406 remainder.
+// Claimed: call-site control flow + arg pin (rdi = self+0x3c70); the runtime executes
+// and reports the body's committed object and buffers.
+// The subsequent 0x56dcb0/0x5c64c0/0x1290/0x7f7220 bodies are native in init_post_bodies and
+// are executed by the runtime (E1426); the E406 ret-nops remain separate one-byte targets.
 #pragma once
 
 #include <cstddef>

@@ -122,9 +122,13 @@ def _slot545_read_native(spec):
 
 def _slot545_check_native(spec, texts):
     _base_check_native(spec, texts)
-    for path in ("startup_h", "startup_cpp"):
-        require("init_slot545_b2ec0" not in texts[path] and "kSlot545Rva" not in texts[path],
-                f"slot 545 remains absent from {path}")
+    # Registered by the startup batch 2 (2026-11-02): the row must exist and use the
+    # native adapter with the documented empty-cookie host input.
+    require("{0xb2ec0, 545," in texts["startup_cpp"].replace("0x0b2ec0", "0xb2ec0"),
+            "slot 545 row is registered in startup_cpp")
+    require("init_slot545_b2ec0(s.slot545, &s.concmd.atexit_log, kNoCookie, kNoCookie)"
+            in texts["startup_cpp"], "slot 545 row calls the native adapter with kNoCookie")
+    require("Slot545State slot545" in texts["startup_h"], "slot 545 state lives in StartupState")
 
 
 lib.base.read_native = _slot545_read_native
@@ -228,5 +232,5 @@ if __name__ == "__main__":
     raise SystemExit(lib.main(
         SPEC,
         "slot-545 matrix/static-state writes, one atexit identity, and two conditional tag-2 release stages; "
-        "native model only, no startup registration or game-runtime claim",
+        "native model registered in the startup table (batch 2), no game-runtime claim",
     ))

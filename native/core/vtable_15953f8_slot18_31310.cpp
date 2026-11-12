@@ -16,7 +16,7 @@ Vtable15953f8Slot18_31310Result vtable_15953f8_slot18_31310(
         reinterpret_cast<void*>(static_cast<std::uintptr_t>(kVtable15953f8Slot18InstalledTable));
     *cells.vtable_field = out.vtable_written;
 
-    bool finished = hooks.sub_init != nullptr && hooks.sub_init(cells.self);
+    bool finished = hooks.poll_direct != nullptr && hooks.poll_direct(cells.self);
     while (!finished) {
         if (out.waits >= kVtable15953f8Slot18MaxWaits) {
             // The retail loop would spin forever; report it rather than reproducing the hang.
@@ -27,19 +27,19 @@ Vtable15953f8Slot18_31310Result vtable_15953f8_slot18_31310(
             hooks.wait(*cells.op_handle);
         }
         ++out.waits;
-        finished = hooks.positioned_read != nullptr && hooks.positioned_read(cells.self);
+        finished = hooks.poll_virtual != nullptr && hooks.poll_virtual(cells.self);
     }
 
-    if (hooks.plain_read != nullptr) {
-        hooks.plain_read(cells.self);
+    if (hooks.succeeded != nullptr) {
+        hooks.succeeded(cells.self);
     }
-    out.plain_read_called = true;
+    out.succeeded_called = true;
 
     if (*cells.mode == kVtable15953f8Slot18ModeOne) {
-        if (hooks.mode_one != nullptr) {
-            hooks.mode_one(cells.self);
+        if (hooks.close != nullptr) {
+            hooks.close(cells.self);
         }
-        out.mode_one_called = true;
+        out.close_called = true;
     }
 
     if (hooks.finish != nullptr) {

@@ -3,7 +3,8 @@
 //
 // After E537 `mov_rsp4b8_rcx_532ada_u1` end @ `0x532ae2`. Block-3 descriptor prep
 // (vmovq through mov [rsp+0x4B8],rcx) NOT modelled as pinned units in `continue_e`;
-// this u1 runs the ctor call only. NOT modelled: 0xa54920 body; post-call vcall
+// this u1 runs the ctor call only; the runtime supplies the native `0xa54920` model.
+// NOT modelled here: post-call vcall
 // @ `0x532af2`. G1 PARTIAL.
 #pragma once
 

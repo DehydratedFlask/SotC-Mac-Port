@@ -2,8 +2,8 @@
 """ELF-tie Init 0x531d60 continue call-site for 0xf90310.
 
 Private: needs local/re/eboot.elf. Pins 5 B fragment after 0x56fad0.
-Target 0xf90310 is splash-hide PLT (jmp [GOT]). Does NOT claim PLT/Sony body
-or following ymm Init continues / helper bodies.
+Target 0xf90310 is splash-hide PLT (jmp [GOT]); E1426 calls the named host service.
+The Sony body and following ymm continues / helper bodies stay separate.
 """
 
 from __future__ import annotations
@@ -59,14 +59,14 @@ def main() -> int:
 
     nh = NATIVE.read_text()
     require("init_531d60_post_base_f90310" in nh, "API")
-    require("NOT modelled" in nh, "omission")
+    require("Sony PLT body is not lifted" in nh and "E1426" in nh, "E1426 host-body claim")
     st = SLICE.read_text()
     require("post_base_f90310" in st or "PostBaseF90310" in st, "wire")
 
     print(
         f"OK check_f531d60_post_base_f90310: frag={FRAG_SHA256[:12]}…; "
-        f"call {TARGET:#x} (splash-hide PLT; body NOT claimed); end={END:#x}; "
-        f"f90310_plt_body/ymm_continue/7f7220_body/1290_body/5c64c0_body/56dcb0_body/"
+        f"call {TARGET:#x} (splash-hide PLT; named host service E1426); end={END:#x}; "
+        f"Sony PLT body/ymm_continue/7f7220_body/1290_body/5c64c0_body/56dcb0_body/"
         f"499f80_body/140d90_body/14c2f0/6a5370 NOT claimed"
     )
     return 0

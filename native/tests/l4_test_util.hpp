@@ -69,6 +69,25 @@ inline void check_bool_common(const ConCmdBoolVar& v, std::uint64_t fn_tag, std:
     CHECK(empty_view(v.base.description));
 }
 
+// Batch 3: a bool variable whose description is an arbitrary borrowed view (empty or not).
+inline void check_bool_with_description(const ConCmdBoolVar& v, std::uint64_t fn_tag, std::uint8_t value,
+                                        const char* description, std::size_t description_length) {
+    CHECK(v.base.vptr == kBoolVarFinalVptr);
+    CHECK(v.value_ref == &v.value);
+    for (std::uint8_t byte : v.zero69) CHECK(byte == 0);
+    for (std::uint8_t byte : v.zero70) CHECK(byte == 0);
+    CHECK(v.fn_payload == 0 && v.fn_aux == 0 && v.fn_vptr == fn_tag);
+    CHECK(v.base.registered == 1 && v.base.flags == 1);
+    CHECK(v.value == value && v.default_value == value);
+    check_untouched(v, {{0x00, 8}, {0x08, 0x10}, {0x18, 1}, {0x1c, 4}, {0x20, 0x40}, {0x60, 8}, {0x68, 1},
+                        {0x69, 4}, {0x70, 0x20}, {0xa0, 8}, {0xb0, 8}, {0xb8, 8}, {0xc0, 1}});
+    if (description_length == 0) {
+        CHECK(empty_view(v.base.description));
+    } else {
+        CHECK(same_view(v.base.description, description, description_length));
+    }
+}
+
 inline void check_float_common(const ConCmdRangedVar& v, bool bounded, std::uint32_t lo_bits, std::uint32_t hi_bits,
                                std::uint32_t default_bits) {
     CHECK(v.base.vptr == kRangedFloatFinalVptr);                  // 0x15942b0

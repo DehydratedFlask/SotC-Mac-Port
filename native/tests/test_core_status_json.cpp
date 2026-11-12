@@ -1,8 +1,10 @@
 // Byte-level tests for the SoCGameCore JSON formatter (native/app/core_status_json.*).
 // These pin exact protocol lines so the executable's output cannot drift silently.
 #include <cstdio>
+#include <cstdint>
 #include <cstdlib>
 #include <string>
+#include <vector>
 
 #include "core_status_json.hpp"
 
@@ -156,6 +158,79 @@ void test_request_id_prefix() {
 
 }  // namespace
 
+// Wire names for the numeric ABI statuses (APP-01-CORE-ABI-01 follow-up). The golden table below is
+// duplicated byte for byte in launcher/Tests/LauncherCoreTests/CoreWireStatusTests.swift; the Swift
+// side proves the child transport decodes each of these to the same value the in-process transport
+// derives from the number, so a change to either side fails one of the two tests.
+struct WireCase {
+    std::uint32_t code;
+    const char* subsystem;
+    const char* archive;
+};
+
+const std::vector<WireCase>& wire_cases() {
+    static const std::vector<WireCase> cases = {
+        {0, "not_implemented", "ok"},
+        {1, "partial", "missing"},
+        {2, "implemented", "unreadable"},
+        {3, "not_linked", "bad_magic"},
+        {4, "unknown:4", "unknown:4"},
+        {7, "unknown:7", "unknown:7"},
+        {9, "unknown:9", "unknown:9"},
+        {10, "unknown:10", "unknown:10"},
+        {99, "unknown:99", "unknown:99"},
+        {255, "unknown:255", "unknown:255"},
+        {65536, "unknown:65536", "unknown:65536"},
+        {2147483648u, "unknown:2147483648", "unknown:2147483648"},
+        {4294967294u, "unknown:4294967294", "unknown:4294967294"},
+        {4294967295u, "unknown:4294967295", "unknown:4294967295"},
+    };
+    return cases;
+}
+
+void test_status_wire_names() {
+    using soc::status_json::archive_status_name;
+    using soc::status_json::subsystem_status_name;
+    for (const WireCase& wire : wire_cases()) {
+        CHECK_JSON(subsystem_status_name(wire.code), wire.subsystem);
+        CHECK_JSON(archive_status_name(wire.code), wire.archive);
+    }
+    // The number is never dropped: a bare "unknown" would make the child transport lossy.
+    for (std::uint32_t code : {4u, 99u, 4294967295u}) {
+        CHECK(subsystem_status_name(code) != "unknown");
+        CHECK(archive_status_name(code) != "unknown");
+    }
+    // Grammar sweep: every code outside 0..3 is exactly `unknown:` + canonical decimal (no sign,
+    // no leading zeros, no padding), and every code inside 0..3 never uses the unknown form.
+    auto canonical = [](std::uint32_t code, const std::string& name) {
+        return name == "unknown:" + std::to_string(code);
+    };
+    for (std::uint32_t code = 0; code < 3000; ++code) {
+        const bool known = code <= 3;
+        CHECK(canonical(code, soc::status_json::subsystem_status_name(code)) == !known);
+        CHECK(canonical(code, soc::status_json::archive_status_name(code)) == !known);
+    }
+    for (std::uint32_t code = 4294967000u; code != 0; ++code) {  // wraps through uint32 max to 0
+        CHECK(canonical(code, soc::status_json::subsystem_status_name(code)) == (code > 3));
+    }
+}
+
+void test_unknown_status_in_lines() {
+    using namespace soc::status_json;
+    CoverageSnapshot coverage;
+    coverage.abi = 65536;
+    coverage.subsystems.push_back({"future", subsystem_status_name(7), "d"});
+    CHECK_JSON(format_coverage(coverage),
+               "{\"schema\":\"sotc.core.coverage.v1\",\"abi\":65536,\"engine_implemented\":false,"
+               "\"subsystems\":[{\"name\":\"future\",\"status\":\"unknown:7\",\"detail\":\"d\"}]}");
+
+    ValidateSnapshot validate;
+    validate.archives.push_back({"cachedFiles.psarc", archive_status_name(4294967295u), 12});
+    const std::string line = format_validate(validate);
+    CHECK(line.find("\"status\":\"unknown:4294967295\",\"size_bytes\":12") != std::string::npos);
+    CHECK(line.find("\"status\":\"unknown\"") == std::string::npos);
+}
+
 int main() {
     test_escape();
     test_status_full();
@@ -164,6 +239,8 @@ int main() {
     test_validate();
     test_start_and_stop();
     test_request_id_prefix();
+    test_status_wire_names();
+    test_unknown_status_in_lines();
     std::puts("core_status_json: all protocol lines pinned");
     return 0;
 }

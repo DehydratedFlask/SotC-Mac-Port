@@ -16,9 +16,10 @@
 // byte[+0x78] = 1, dword[+0x74] = *max; ymm[+0x80] = 0; [+0xc0] = class; [+0xb0] = 0; [+0xc8] = 0;
 // then the argument copy at +0x80 and the four-step functor install (clone, copy, copy, copy, swap aux,
 // bare-ret destroy), which the caller's functor tag selects. Only the lifted tags are accepted: the
-// caller's tags 0x15d1d80 (slot 308) and the class tag 0x15944a0 itself, whose four slots are the same
-// four bodies (0xc720..0xc770). Any other tag would run an unread clone slot: the model refuses with
-// `false` and writes nothing.
+// caller's tags 0x15d1d80 (slot 308) and 0x15985d8 (slot 530, whose four slots are exactly
+// 0xc720 / 0xc740 / 0xc760 / 0xc770) and the class tag 0x15944a0 itself, whose four slots are the
+// same four bodies. Any other tag would run an unread clone slot: the model refuses with `false`
+// and writes nothing.
 //
 // The final class (installed by the CALLER after this returns: `[this] = 0x1594bf8 + 0x10`) is
 // 0x1594c08; its virtual slots 3 and 6 are `mov eax,1; ret` (0xbf70) and `mov eax,2; ret` (0xbfc0) and
@@ -40,6 +41,7 @@ inline constexpr std::uint64_t kRangedIntMidVptr = 0x15941a0;       // 0x1594190
 inline constexpr std::uint64_t kRangedIntFinalVptr = 0x1594c08;     // 0x1594bf8 + 0x10 (stored by the caller)
 inline constexpr std::uint64_t kRangedIntFnVtbl = 0x15944a0;        // functor class tag
 inline constexpr std::uint64_t kRangedIntArgFnVtbl = 0x15d1d80; // slot 308's caller functor tag
+inline constexpr std::uint64_t kRangedIntArgFnVtblResources = 0x15985d8;  // slot 530 (same four slots)
 inline constexpr std::uint64_t kRangedIntDtorRva = 0x18a60;         // class slot 0 (atexit target)
 inline constexpr std::uint64_t kRangedIntSlot3Rva = 0xbf70;         // mov eax,1; ret
 inline constexpr std::uint64_t kRangedIntSlot6Rva = 0xbfc0;         // mov eax,2; ret
