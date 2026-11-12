@@ -1962,4 +1962,4 @@ static constexpr GuestEntry kGuestEntryTable[] = {
     {0x00000332f650ULL, GuestEntryKind::ImageData, GuestEntryCallable::NotCallable},
     {0x00000334ac18ULL, GuestEntryKind::ImageData, GuestEntryCallable::NotCallable},
 };
-static constexpr GuestIndirectSummary kGuestIndirectSummary = {105u, 499u, 180u, 319u};
+static constexpr GuestIndirectSummary kGuestIndirectSummary = {105u, 499u, 222u, 277u};

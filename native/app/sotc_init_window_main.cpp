@@ -7,6 +7,7 @@
 #include <string>
 
 #include "core/guest_entry_table.hpp"
+#include "core/guest_thunks.hpp"
 #include "core/init_window_runtime.hpp"
 
 namespace {
@@ -62,6 +63,53 @@ void print_entry_map() {
                     entry ? sotc::guest_entry_kind_name(entry->kind) : "unknown");
     }
     std::fputs("}},", stdout);
+}
+
+struct ThunkProbe {
+    bool ok;
+    int calls;
+    unsigned setter_value;
+    unsigned register_flag;
+    int hook_calls;
+};
+
+int g_thunk_hook_calls = 0;
+
+void thunk_register_hook(void*, void*) {
+    ++g_thunk_hook_calls;
+}
+
+ThunkProbe run_guest_thunk_probes() {
+    ThunkProbe p{};
+    p.calls = 0;
+    alignas(8) unsigned char setter[0x40] = {};
+    const std::uint64_t setter_args[6] = {reinterpret_cast<std::uint64_t>(setter), 0x2a, 0, 0, 0, 0};
+    std::uint64_t result = 0;
+    const bool setter_called = sotc::guest_thunk_invoke(0x13d20, setter_args, &result);
+    std::memcpy(&p.setter_value, setter + 0x1c, sizeof(p.setter_value));
+    if (setter_called) ++p.calls;
+
+    alignas(8) unsigned char command[0x40] = {};
+    const std::uint64_t command_args[6] = {reinterpret_cast<std::uint64_t>(command), 0, 0, 0, 0, 0};
+    g_thunk_hook_calls = 0;
+    sotc::guest_set_concmd_register_hook(thunk_register_hook);
+    const bool first_called = sotc::guest_thunk_invoke(0x20d60, command_args, &result);
+    if (first_called) ++p.calls;
+    const bool second_called = sotc::guest_thunk_invoke(0x20d60, command_args, &result);
+    if (second_called) ++p.calls;
+    sotc::guest_set_concmd_register_hook(nullptr);
+    p.register_flag = command[0x18];
+    p.hook_calls = g_thunk_hook_calls;
+    p.ok = setter_called && p.setter_value == 0x2a && first_called && second_called &&
+           p.register_flag == 1 && p.hook_calls == 1 && sotc::guest_thunk_count() == 2;
+    return p;
+}
+
+void print_guest_thunks(const ThunkProbe& p) {
+    std::printf("\"guest_thunks\":{\"registered\":%zu,\"calls\":%d,\"setter_value\":%u,"
+                "\"register_flag\":%u,\"hook_calls\":%d,\"ok\":%s},",
+                sotc::guest_thunk_count(), p.calls, p.setter_value, p.register_flag, p.hook_calls,
+                p.ok ? "true" : "false");
 }
 
 void print_post_calls(const sotc::InitWindowRuntimeResult& r) {
@@ -136,6 +184,7 @@ int main(int argc, char** argv) {
     }
 
     const sotc::InitWindowRuntimeResult r = sotc::run_init_window_runtime(fixture);
+    const ThunkProbe thunks = run_guest_thunk_probes();
     std::printf(
         "{\"schema\":\"sotc.init_window.v5\",\"ok\":%s,\"entry_rva\":\"0x531d60\","
         "\"window_end_rva\":\"0x532b0c\",\"checkpoint_rva\":\"0x532c1c\","
@@ -268,7 +317,8 @@ int main(int argc, char** argv) {
         r.stat_engine_calls, r.stat_engine_arg2,
         r.ok ? "" : (r.first_failed_stage[0] ? r.first_failed_stage : "unknown"));
     print_entry_map();
+    print_guest_thunks(thunks);
     print_post_calls(r);
     std::fputs("}\n", stdout);
-    return r.ok ? 0 : 3;
+    return (r.ok && thunks.ok) ? 0 : 3;
 }

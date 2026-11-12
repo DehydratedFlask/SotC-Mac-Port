@@ -61,8 +61,8 @@ int main() {
     const GuestIndirectSummary& indirect = guest_entry_indirect();
     CHECK(indirect.functions == 105);
     CHECK(indirect.sites == 499);
-    CHECK(indirect.resolved == 180);
-    CHECK(indirect.blocked == 319);
+    CHECK(indirect.resolved == 222);
+    CHECK(indirect.blocked == 277);
 
     CHECK(guest_entry_kind_name(GuestEntryKind::FunctionStart)[0] == 'f');
     CHECK(guest_entry_callable_name(GuestEntryCallable::RetailEntry)[0] == 'r');

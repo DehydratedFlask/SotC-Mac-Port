@@ -13,6 +13,7 @@ Prints SKIP (exit 0) when the private ELF is absent, like the other private-imag
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -31,6 +32,24 @@ def die(message: str) -> None:
 
 def artifacts_match(data: dict, inc: str, stored_json: str, stored_inc: str) -> bool:
     return stored_json == data and stored_inc == inc
+
+
+def native_thunk_claims_ok(data: dict) -> bool:
+    """Re-derive the thunk bodies from the pinned ELF and check the C++ registry rows."""
+    block = data.get("native_thunks", {})
+    thunks = block.get("thunks", [])
+    if block.get("count") != 2 or len(thunks) != 2:
+        return False
+    source = (ROOT / "native/core/guest_thunks.cpp").read_text()
+    elf = ec.Elf()
+    for thunk in thunks:
+        rva = int(thunk["rva"], 16)
+        if f"0x{rva:x}ULL" not in source or thunk["name"] not in source:
+            return False
+        body = elf.raw(rva, thunk["size"])
+        if hashlib.sha256(body).hexdigest() != thunk["sha256"]:
+            return False
+    return True
 
 
 def main(argv: list[str]) -> int:
@@ -59,6 +78,19 @@ def main(argv: list[str]) -> int:
     indirect = data["indirect"]
     if indirect and indirect["resolved"] + indirect["blocked"] != indirect["sites"]:
         die("indirect resolution counts do not sum to the site count")
+    if indirect:
+        if indirect.get("analysis") != "cfg_forward":
+            die("indirect analysis is not the CFG dataflow")
+        sites = {record["site"] for record in indirect["sites_detail"]}
+        if len(sites) != indirect["sites"]:
+            die("indirect site records are not unique")
+        for record in indirect["sites_detail"]:
+            if record["status"] == "blocked" and not record.get("reason"):
+                die(f"blocked site {record['site']} has no reason")
+            if record["status"] == "resolved" and not record.get("target"):
+                die(f"resolved site {record['site']} has no target")
+    if not native_thunk_claims_ok(data):
+        die("native thunk registry or pinned body hash mismatch")
 
     if "--mutate" in argv:
         bad_inc = inc.replace("GuestEntryKind::FunctionStart, GuestEntryCallable::RetailEntry",
@@ -71,7 +103,11 @@ def main(argv: list[str]) -> int:
             die("tampered table row was not detected")
         if artifacts_match(data, inc, tampered, inc):
             die("tampered total was not detected")
-        print("OK mutation probe: tampered row and tampered total both detected")
+        bad_thunk = json.loads(json.dumps(data))
+        bad_thunk["native_thunks"]["thunks"][0]["sha256"] = "0" * 64
+        if native_thunk_claims_ok(bad_thunk):
+            die("tampered native-thunk body hash was not detected")
+        print("OK mutation probe: tampered row, total and thunk hash all detected")
 
     closure = data["closure"]
     print(f"OK check_entry_closure: entries={totals['entries']} start={totals['function_start']} "

@@ -1,3 +1,59 @@
+## 2026-11-13 — Retail-ABI thunks and CFG-resolved indirect frontier (CPU-01-AOT-CFG-CALLABLE-01, continued)
+
+**State: green.** Continuation of `426ffbb1` on branch `cursor/init-hash-551140-6aa93e8`. Init-lift is
+untouched and unchanged: **46,876 / 46,881 B**, **108,325 B** native, only the `0x2170` contract
+(`0x5ba041`) and the S4.2 geometry block (`0x7f8664..0x7f87d8`, gated on `0x3288478`/`0x3288480`).
+
+**Card:** the roadmap defines no new id after `CPU-01-AOT-CFG-CALLABLE-01`; its own next-gap wording
+is "Native ABI thunk bodies are the next gap", and `ENTRY_MAP.md` item 3 still owns the remaining
+indirect frontier. This pass therefore continues the same card and closes both halves rather than
+inventing a successor id.
+
+- **The map is now callable, not only classified.** `native/core/guest_thunks.{hpp,cpp}` hosts two
+  real SysV entries behind `GuestRetailFn` and invokes them through a function pointer:
+  `0x20d60` (`concmd_lazy_register`, 26 B, sha256 `f4463b3b…84b403`) and `0x13d20`
+  (`slot_1c_setter`, 4 B, sha256 `71ce06d0…35fbf3c`). Observed, not inferred: the setter makes
+  object `+0x1c = 0x2a`; the ConCmd entry flips object `+0x18` to 1, fires the registration hook
+  exactly once, and the second call is a no-op. The runtime reports
+  `guest_thunks={registered:2,calls:3,setter_value:42,register_flag:1,hook_calls:1,ok:true}` and
+  exits 0 only when the fixture's predicate also holds. `0x20d60`'s tail `0x20d80` is a host
+  contract: its map insert needs the live manager pointer from BSS global `0x2dfcbc8`. The 14
+  one-byte `ret` targets are **not** registered — a C thunk cannot leave `rax` untouched, and
+  returning 0 would invent a result.
+- **The indirect frontier is re-derived from a real CFG.** `entry_closure.py` now builds each
+  frontier function's basic blocks, runs a forward dataflow to a fixed point, meets predecessors at
+  block entries, clobbers caller-saved registers at calls (stack slots survive), and resolves a site
+  only when the meet proves an absolute base (or a stack spill) and the slot holds an exact FDE
+  start. **Resolved 180 → 222 of 499 sites; blocked 319 → 277.** Of the old blocked
+  `stack_block_boundary` group, 25 now resolve and the other 84 are stack objects whose vtables
+  are built at run time. Reason classes: **85** `base_stack_object` (one came from the old
+  block-boundary group), **42**
+  `base_addq_writes`, **138** object-field `object_load`, **9** `unresolved_base`, 1
+  `stack_slot_not_entry`, 2 `unreachable_block`, 68 distinct strings. Resolved kinds: 217
+  `vtable_slot`, 5 `register`. All 499 sites keep function/site RVA/operand/status and either a
+  target or a verbatim reason.
+- **Real bugs found and fixed in the new analysis:** (1) `lea` was evaluated as a memory load, so
+  the vtable base became its first slot (`0x1594060` → `0x19a0`) and nothing resolved; (2) the
+  fallthrough edge used `last+1` instead of the next instruction address, making most blocks
+  unreachable and dropping the site census from 499 to 175; (3) `testq`/`cmpq` invalidated their
+  destination, losing six bases. The reachable-block gap also exposed two sites in CFG-unreachable
+  code (`0x885eab`, `0x885ece`); they are now recorded with `unreachable_block` so the total stays
+  499.
+- **Checker:** re-derives the table, every site and the two native thunk body hashes from the pinned
+  ELF, asserts the CFG analysis tag, unique sites and resolved/blocked sums, and its mutation probe
+  now detects a tampered table row, total **and** thunk hash.
+- **Verification:** build **0**; full CTest **706/706** (new `guest_thunks` fixture); checker
+  `OK ... indirect=222/499` with mutation probe; sweep **915/0/0**; `sotc_init_window` exit **0**,
+  stderr **0 B**, `ok=true`; entry map unchanged at 3,052 → 1,957 / 584 / 462; project index
+  **114,667**; checkpoint
+  `docs/checkpoints/2026-11-13-native-thunks-cfg-indirect-frontier.md`.
+- **Not claimed:** 277 sites remain blocked with exact reasons, no native game code runs, and cold
+  boot, audio, save/reload and Metal validation stay **NOT RUN**. G1 stays **PARTIAL**.
+
+**Next exact action:** lift `0x20d80`'s manager-map insert enough to drop the `0x20d60` hook, or give
+thunk bodies to more `retail_entry` starts with provable host-free semantics. Do not re-open `0x2170`
+or the `0x7f8664` geometry block.
+
 ## 2026-11-13 — Callable entry shapes and the indirect frontier (CPU-01-AOT-CFG-CALLABLE-01)
 
 **State: green.** Continuation of `62f10629` on branch `cursor/init-hash-551140-6aa93e8`. Init-lift is

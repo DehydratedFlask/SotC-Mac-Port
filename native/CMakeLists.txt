@@ -12,6 +12,7 @@ endif()
 add_library(sotc_core STATIC
   core/math_constants.cpp
   core/guest_entry_table.cpp
+  core/guest_thunks.cpp
   core/guarded_dd91b0.cpp
   core/guarded_dd7e30.cpp
   core/guarded_dd4210.cpp
@@ -1956,6 +1957,10 @@ add_test(NAME init_5b9f90_slices COMMAND test_init_5b9f90_slices)
 add_executable(test_guest_entry_table tests/test_guest_entry_table.cpp)
 target_link_libraries(test_guest_entry_table sotc_core)
 add_test(NAME guest_entry_table COMMAND test_guest_entry_table)
+
+add_executable(test_guest_thunks tests/test_guest_thunks.cpp)
+target_link_libraries(test_guest_thunks sotc_core)
+add_test(NAME guest_thunks COMMAND test_guest_thunks)
 
 add_executable(test_init_post_bodies tests/test_init_post_bodies.cpp)
 target_link_libraries(test_init_post_bodies sotc_core)

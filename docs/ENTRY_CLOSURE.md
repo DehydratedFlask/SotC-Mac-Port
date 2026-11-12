@@ -64,89 +64,119 @@ The **10** thunks are real aliases, not bodies:
 The `ret_stub` rows are the one-byte `ret` functions already executed on the Init path
 (`0x56dca0`, `0x56db70`, `0x5b3d00`, `0x5b3cf0`, `0x56fad0` are among them).
 
+## Native retail-ABI thunks
+
+**2** entries are hosted as real SysV callables in
+`native/core/guest_thunks.cpp`; the fixture and the runtime invoke them through the registry
+and assert the observed effects:
+
+| RVA | Name | Args | Body | Observed |
+| --- | --- | ---: | --- | --- |
+| `0x20d60` | `concmd_lazy_register` | 1 | 26 B, sha256 `f4463b3b78853849…` | object byte +0x18 flips once; hook fires once; second call is a no-op |
+| `0x13d20` | `slot_1c_setter` | 2 | 4 B, sha256 `71ce06d0aa5b8a12…` | dword at object+0x1c becomes the rsi argument |
+
+`0x20d60` reproduces the flag test and store, then reports the manager map insert through a
+host hook: the insert body (`0x20d80`) needs the live manager pointer from the BSS global
+`0x2dfcbc8`, which the host does not have. The 14 one-byte `ret` targets are **not**
+registered: a C thunk cannot leave `rax` untouched as the retail stub does, and returning 0
+would invent a result.
+
 ## Indirect frontier of the Init closure
 
 The `0x531d60` closure contains **105** functions with at least one
-indirect call/jump: **499 sites**. **180 are resolved** to an exact
-pinned target and **319 are blocked** with a recorded reason.
+indirect call/jump: **499 sites**. **222 are resolved** to an exact
+pinned target and **277 are blocked** with a recorded reason.
 
 | Resolution | Count | Meaning |
 | --- | ---: | --- |
-| `vtable_slot` | **180** | same-block absolute base, slot contents land on an FDE start |
+| `register` | **5** | CFG state proves the register is an FDE start |
+| `vtable_slot` | **217** | CFG state proves an absolute base; slot contents are an FDE start |
+
+The analysis is a forward dataflow over each function's basic-block CFG: block entries
+carry the meet of their predecessors, calls clobber caller-saved registers but not stack
+slots, and a value survives a join only when every reaching path defined the same value.
 
 | Blocking reason | Sites | Verbatim meaning |
 | --- | ---: | --- |
-| `stack_block_boundary` | **109** | stack block boundary |
-| `block_boundary` | **45** | block boundary |
-| `addq_writes_rax` | **16** | addq writes rax |
-| `addq_writes_rcx` | **13** | addq writes rcx |
-| `object_load:(%rdi)` | **11** | object load:(%rdi) |
-| `not_file_backed` | **10** | not file backed |
-| `addq_writes_rdx` | **9** | addq writes rdx |
-| `object_load:(%rbx)` | **9** | object load:(%rbx) |
-| `stack_call_clobbers` | **9** | stack call clobbers |
-| `object_load:0xc0(%rbx)` | **8** | object load:0xc0(%rbx) |
-| `object_load:0x40(%r13)` | **6** | object load:0x40(%r13) |
-| `call_clobbers` | **5** | call clobbers |
-| `object_load:0x40(%rax)` | **5** | object load:0x40(%rax) |
-| `object_load:0x48(%r14)` | **4** | object load:0x48(%r14) |
-| `addq_writes_rdi` | **3** | addq writes rdi |
-| `object_load:0x40(%rcx)` | **3** | object load:0x40(%rcx) |
-| `addq_writes_rbx` | **2** | addq writes rbx |
-| `object_load:(%r14)` | **2** | object load:(%r14) |
-| `object_load:(%rax)` | **2** | object load:(%rax) |
-| `object_load:0x20(%rax)` | **2** | object load:0x20(%rax) |
-| `object_load:0x40(%r14)` | **2** | object load:0x40(%r14) |
-| `object_load:0x40(%r15)` | **2** | object load:0x40(%r15) |
-| `object_load:0x40(%rsi)` | **2** | object load:0x40(%rsi) |
-| `object_load:0x48(%r12)` | **2** | object load:0x48(%r12) |
-| `object_load:0x48(%r15)` | **2** | object load:0x48(%r15) |
-| `object_load:0xb0(%rbx)` | **2** | object load:0xb0(%rbx) |
-| `addq_writes_rsi` | **1** | addq writes rsi |
-| `branch_clobbers` | **1** | branch clobbers |
-| `no_reaching_definition` | **1** | no reaching definition |
-| `object_load:(%r13)` | **1** | object load:(%r13) |
-| `object_load:(%rsi)` | **1** | object load:(%rsi) |
-| `object_load:0x10(%rcx,%rax,8)` | **1** | object load:0x10(%rcx,%rax,8) |
-| `object_load:0x108(%r15)` | **1** | object load:0x108(%r15) |
-| `object_load:0x118(%rbx)` | **1** | object load:0x118(%rbx) |
-| `object_load:0x140(%rbx)` | **1** | object load:0x140(%rbx) |
-| `object_load:0x1a8(%r15)` | **1** | object load:0x1a8(%r15) |
-| `object_load:0x208(%rbx)` | **1** | object load:0x208(%rbx) |
-| `object_load:0x2d0(%rbx)` | **1** | object load:0x2d0(%rbx) |
-| `object_load:0x398(%rbx)` | **1** | object load:0x398(%rbx) |
-| `object_load:0x40(%r9)` | **1** | object load:0x40(%r9) |
-| `object_load:0x460(%rbx)` | **1** | object load:0x460(%rbx) |
-| `object_load:0x50(%rax)` | **1** | object load:0x50(%rax) |
-| `object_load:0x528(%rbx)` | **1** | object load:0x528(%rbx) |
-| `object_load:0x600(%rbx)` | **1** | object load:0x600(%rbx) |
-| `object_load:0x68(%r15)` | **1** | object load:0x68(%r15) |
-| `object_load:0x6c8(%rbx)` | **1** | object load:0x6c8(%rbx) |
-| `object_load:0x790(%rbx)` | **1** | object load:0x790(%rbx) |
-| `object_load:0x7a0(%rbx)` | **1** | object load:0x7a0(%rbx) |
-| `object_load:0x858(%rbx)` | **1** | object load:0x858(%rbx) |
-| `object_load:0x88(%r13)` | **1** | object load:0x88(%r13) |
-| `object_load:0x920(%rbx)` | **1** | object load:0x920(%rbx) |
-| `object_load:0x9e8(%rbx)` | **1** | object load:0x9e8(%rbx) |
-| `object_load:0xac0(%rbx)` | **1** | object load:0xac0(%rbx) |
-| `object_load:0xb0(%rsi)` | **1** | object load:0xb0(%rsi) |
-| `object_load:0xb98(%rbx)` | **1** | object load:0xb98(%rbx) |
-| `object_load:0xc0(%rsi)` | **1** | object load:0xc0(%rsi) |
-| `object_load:0xc70(%rbx)` | **1** | object load:0xc70(%rbx) |
-| `object_load:0xd48(%rbx)` | **1** | object load:0xd48(%rbx) |
-| `object_load:0xe10(%rbx)` | **1** | object load:0xe10(%rbx) |
-| `object_load:0xee8(%rbx)` | **1** | object load:0xee8(%rbx) |
+| `base_stack_object` | **85** | base is the address of a stack object whose vtable is built at run time |
+| `base_addq_writes` | **42** | base register is written by add/sub with an unproven operand |
+| `base_object_load:(%rdi)` | **24** | base is loaded from object memory: `(%rdi)` |
+| `base_object_load:(%rbx)` | **13** | base is loaded from object memory: `(%rbx)` |
+| `unresolved_base` | **9** | no reaching definition for the base register |
+| `base_object_load:0xc0(%rbx)` | **8** | base is loaded from object memory: `0xc0(%rbx)` |
+| `base_object_load:(%r14)` | **7** | base is loaded from object memory: `(%r14)` |
+| `base_object_load:0x40(%r13)` | **6** | base is loaded from object memory: `0x40(%r13)` |
+| `base_object_load:0x40(%rax)` | **5** | base is loaded from object memory: `0x40(%rax)` |
+| `base_object_load:0x48(%r14)` | **4** | base is loaded from object memory: `0x48(%r14)` |
+| `base_object_load:(%r13)` | **3** | base is loaded from object memory: `(%r13)` |
+| `base_object_load:(%rax)` | **3** | base is loaded from object memory: `(%rax)` |
+| `base_object_load:0x40(%rcx)` | **3** | base is loaded from object memory: `0x40(%rcx)` |
+| `base_object_load:0x48(%rbx)` | **3** | base is loaded from object memory: `0x48(%rbx)` |
+| `base_object_load:(%rsi)` | **2** | base is loaded from object memory: `(%rsi)` |
+| `base_object_load:0x40(%r14)` | **2** | base is loaded from object memory: `0x40(%r14)` |
+| `base_object_load:0x40(%r15)` | **2** | base is loaded from object memory: `0x40(%r15)` |
+| `base_object_load:0x40(%rsi)` | **2** | base is loaded from object memory: `0x40(%rsi)` |
+| `base_object_load:0x48(%r12)` | **2** | base is loaded from object memory: `0x48(%r12)` |
+| `base_object_load:0x48(%r15)` | **2** | base is loaded from object memory: `0x48(%r15)` |
+| `base_object_load:0xb0(%rbx)` | **2** | base is loaded from object memory: `0xb0(%rbx)` |
+| `unreachable_block` | **2** | the CFG proves the containing block unreachable from the entry |
+| `base_object_load:(%r12)` | **1** | base is loaded from object memory: `(%r12)` |
+| `base_object_load:(%rax,%r15,8)` | **1** | base is loaded from object memory: `(%rax,%r15,8)` |
+| `base_object_load:0x108(%r15)` | **1** | base is loaded from object memory: `0x108(%r15)` |
+| `base_object_load:0x118(%rbx)` | **1** | base is loaded from object memory: `0x118(%rbx)` |
+| `base_object_load:0x140(%rbx)` | **1** | base is loaded from object memory: `0x140(%rbx)` |
+| `base_object_load:0x18(%rax)` | **1** | base is loaded from object memory: `0x18(%rax)` |
+| `base_object_load:0x1a8(%r15)` | **1** | base is loaded from object memory: `0x1a8(%r15)` |
+| `base_object_load:0x20(%rax)` | **1** | base is loaded from object memory: `0x20(%rax)` |
+| `base_object_load:0x208(%rbx)` | **1** | base is loaded from object memory: `0x208(%rbx)` |
+| `base_object_load:0x2921a05(%rip)` | **1** | base is loaded from object memory: `0x2921a05(%rip)` |
+| `base_object_load:0x29cb992(%rip)` | **1** | base is loaded from object memory: `0x29cb992(%rip)` |
+| `base_object_load:0x29cb9b7(%rip)` | **1** | base is loaded from object memory: `0x29cb9b7(%rip)` |
+| `base_object_load:0x29cb9eb(%rip)` | **1** | base is loaded from object memory: `0x29cb9eb(%rip)` |
+| `base_object_load:0x29cba31(%rip)` | **1** | base is loaded from object memory: `0x29cba31(%rip)` |
+| `base_object_load:0x2d0(%rbx)` | **1** | base is loaded from object memory: `0x2d0(%rbx)` |
+| `base_object_load:0x2de7e4f(%rip)` | **1** | base is loaded from object memory: `0x2de7e4f(%rip)` |
+| `base_object_load:0x2de7e75(%rip)` | **1** | base is loaded from object memory: `0x2de7e75(%rip)` |
+| `base_object_load:0x2de8140(%rip)` | **1** | base is loaded from object memory: `0x2de8140(%rip)` |
+| `base_object_load:0x2de814a(%rip)` | **1** | base is loaded from object memory: `0x2de814a(%rip)` |
+| `base_object_load:0x2de9170(%rip)` | **1** | base is loaded from object memory: `0x2de9170(%rip)` |
+| `base_object_load:0x2de917a(%rip)` | **1** | base is loaded from object memory: `0x2de917a(%rip)` |
+| `base_object_load:0x2de91d6(%rip)` | **1** | base is loaded from object memory: `0x2de91d6(%rip)` |
+| `base_object_load:0x398(%rbx)` | **1** | base is loaded from object memory: `0x398(%rbx)` |
+| `base_object_load:0x40(%r9)` | **1** | base is loaded from object memory: `0x40(%r9)` |
+| `base_object_load:0x460(%rbx)` | **1** | base is loaded from object memory: `0x460(%rbx)` |
+| `base_object_load:0x48(%rax)` | **1** | base is loaded from object memory: `0x48(%rax)` |
+| `base_object_load:0x50(%rax)` | **1** | base is loaded from object memory: `0x50(%rax)` |
+| `base_object_load:0x528(%rbx)` | **1** | base is loaded from object memory: `0x528(%rbx)` |
+| `base_object_load:0x600(%rbx)` | **1** | base is loaded from object memory: `0x600(%rbx)` |
+| `base_object_load:0x68(%r15)` | **1** | base is loaded from object memory: `0x68(%r15)` |
+| `base_object_load:0x6c8(%rbx)` | **1** | base is loaded from object memory: `0x6c8(%rbx)` |
+| `base_object_load:0x790(%rbx)` | **1** | base is loaded from object memory: `0x790(%rbx)` |
+| `base_object_load:0x7a0(%rbx)` | **1** | base is loaded from object memory: `0x7a0(%rbx)` |
+| `base_object_load:0x858(%rbx)` | **1** | base is loaded from object memory: `0x858(%rbx)` |
+| `base_object_load:0x88(%r13)` | **1** | base is loaded from object memory: `0x88(%r13)` |
+| `base_object_load:0x920(%rbx)` | **1** | base is loaded from object memory: `0x920(%rbx)` |
+| `base_object_load:0x9e8(%rbx)` | **1** | base is loaded from object memory: `0x9e8(%rbx)` |
+| `base_object_load:0xac0(%rbx)` | **1** | base is loaded from object memory: `0xac0(%rbx)` |
+| `base_object_load:0xb0(%rsi)` | **1** | base is loaded from object memory: `0xb0(%rsi)` |
+| `base_object_load:0xb98(%rbx)` | **1** | base is loaded from object memory: `0xb98(%rbx)` |
+| `base_object_load:0xc0(%rsi)` | **1** | base is loaded from object memory: `0xc0(%rsi)` |
+| `base_object_load:0xc70(%rbx)` | **1** | base is loaded from object memory: `0xc70(%rbx)` |
+| `base_object_load:0xd48(%rbx)` | **1** | base is loaded from object memory: `0xd48(%rbx)` |
+| `base_object_load:0xe10(%rbx)` | **1** | base is loaded from object memory: `0xe10(%rbx)` |
+| `base_object_load:0xee8(%rbx)` | **1** | base is loaded from object memory: `0xee8(%rbx)` |
+| `stack_slot_not_entry` | **1** | the stack spill does not hold an FDE start |
 
 Every site (function, site RVA, operand, status, target or reason) is listed in
 `entry_closure.json` under `indirect.sites_detail`; nothing is guessed. A resolution
-requires a same-basic-block definition of the base register, an absolute address, and
-slot contents that are an exact FDE start.
+requires the CFG meet to prove an absolute base (or a stack spill) and the slot contents
+to be an exact FDE start.
 
 ## What this changes
 
 - `ENTRY_MAP.md`'s open item 2 (address → callable retail-ABI entry) is answered at the shape
-  level: every start is a retail entry, a jmp thunk or a ret stub, with prologue and alignment
-  evidence. It is still not a native ABI thunk: a caller needs a matching native signature.
+  level for every start, and two entries now have real SysV thunk bodies invoked through the
+  runtime. The rest still need a matching native signature and host state.
 - Open item 3 (indirect targets) is measured and partially resolved; every remaining site is
   enumerated with its blocking reason instead of being left as a count.
 - The native runtime exposes `guest_entry_callable(rva)` and the indirect summary from the

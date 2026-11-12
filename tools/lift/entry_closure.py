@@ -14,9 +14,12 @@ Three questions are answered per address and per indirect site:
    (`frame_pointer` / `frame_less` / `leaf`), a direct or GOT `jmp` thunk, or a one-byte `ret` stub.
    The prologue's static stack delta is measured (`8*pushes + sub rsp`) so alignment before calls is
    `aligned`, `misaligned`, `dynamic` (`and rsp,-16`) or `n/a` for leaves.
-3. Indirect sites in the `0x531d60` closure: the operand form and, where a same-block definition
-   proves an absolute base, the pinned target (vtable/const slot, global pointer or register). Every
-   other site is recorded with its exact offset and a verbatim blocking reason.
+3. Indirect sites in the `0x531d60` closure: a forward dataflow over each function's basic-block
+   CFG meets predecessors, proves an absolute base (or a stack spill) where every reaching path
+   agrees, and reads the pinned target from the slot. Every other site keeps its exact offset and a
+   verbatim blocking reason.
+4. The two retail-ABI entries hosted by `native/core/guest_thunks.cpp`, with the pinned body hash
+   the checker re-derives.
 
 The generated `native/core/guest_entry_table.inc` carries (rva, kind, callable) rows plus the
 indirect summary; `docs/entry_closure.json` carries every site and every resolution/block reason;
@@ -33,6 +36,7 @@ Usage: entry_closure.py [--check]
 from __future__ import annotations
 
 import bisect
+import hashlib
 import json
 import re
 import struct
@@ -61,6 +65,8 @@ PLT_END = 0xF91740
 CLOSURE_SEED = "0x531d60"
 MAX_PROLOGUE = 18
 SCAN_WINDOW = 128
+# Retail-ABI thunks implemented in native/core/guest_thunks.cpp: (RVA, name, argument count).
+NATIVE_THUNKS = [(0x20D60, "concmd_lazy_register", 1), (0x13D20, "slot_1c_setter", 2)]
 
 KIND_ORDER = ("function_start", "function_interior", "plt", "executable_data", "image_data",
               "outside_image")
@@ -324,14 +330,268 @@ def op_form(operands: str) -> tuple[str, str | None, int, str]:
     return "other", None, 0, code
 
 
+CALLER_SAVED = {"rax", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11"}
+
+
+def _new_state() -> dict:
+    return {"regs": {}, "slots": {}, "delta": 0, "rbp_base": None, "origins": {}}
+
+
+def _copy_state(s: dict) -> dict:
+    return {"regs": dict(s["regs"]), "slots": dict(s["slots"]), "delta": s["delta"],
+            "rbp_base": s["rbp_base"], "origins": dict(s["origins"])}
+
+
+def _merge_states(a: dict | None, b: dict | None) -> dict | None:
+    """Meet of two block-entry states: a value survives only when every path agrees on it."""
+    if a is None:
+        return _copy_state(b) if b is not None else None
+    if b is None:
+        return _copy_state(a)
+    out = _new_state()
+    if a["delta"] == b["delta"]:
+        out["delta"] = a["delta"]
+    else:
+        out["delta"] = None
+        out["origins"]["__delta__"] = "stack_delta_join"
+    out["rbp_base"] = a["rbp_base"] if a["rbp_base"] == b["rbp_base"] else None
+    for name, value in a["regs"].items():
+        if value is not None and b["regs"].get(name) == value:
+            out["regs"][name] = value
+    for offset, value in a["slots"].items():
+        if value is not None and b["slots"].get(offset) == value:
+            out["slots"][offset] = value
+    for name, origin in a["origins"].items():
+        if name not in out["regs"] and b["origins"].get(name) == origin:
+            out["origins"][name] = origin
+    if "__delta__" not in out["origins"] and b["origins"].get("__delta__"):
+        out["origins"]["__delta__"] = b["origins"]["__delta__"]
+    return out
+
+
+def _stack_key(base: str, disp: int, st: dict) -> int | None:
+    if base == "rsp":
+        return None if st["delta"] is None else st["delta"] + disp
+    if base == "rbp":
+        return None if st["rbp_base"] is None else st["rbp_base"] + disp
+    return None
+
+
+def _eval_source(src: str, st: dict, ins: dict[int, tuple[str, str]], window: list[int],
+                 position: dict[int, int], idx: int, e: "Elf", width: int) -> int | None:
+    if src.startswith("$0x"):
+        try:
+            return int(src[1:], 16)
+        except ValueError:
+            return None
+    if src.startswith("$"):
+        return None
+    if src.startswith("%"):
+        return st["regs"].get(reg(src))
+    if "(%rip)" in src:
+        ea = absolute_operand(ins, window, idx)
+        if ea is None:
+            return None
+        if width == 32:
+            return ea
+        try:
+            return e.u64(ea)
+        except Exception:
+            return None
+    mem = re.match(r"^(-?0x[0-9a-f]+)?\(%([a-z0-9]+)\)$", src)
+    if mem is None:
+        return None
+    disp = int(mem.group(1), 16) if mem.group(1) else 0
+    base = reg(mem.group(2))
+    key = _stack_key(base, disp, st)
+    if key is not None:
+        return st["slots"].get(key)
+    base_value = st["regs"].get(base)
+    if base_value is None:
+        return None
+    try:
+        return e.u64(base_value + disp)
+    except Exception:
+        return None
+
+
+def _invalidate(st: dict, name: str, origin: str) -> None:
+    st["regs"].pop(name, None)
+    st["origins"][name] = origin
+
+
+def _transfer(addr: int, mnemonic: str, operands: str, st: dict,
+              ins: dict[int, tuple[str, str]], window: list[int],
+              position: dict[int, int], e: "Elf") -> None:
+    idx = position[addr]
+    src, dst = split_ops(operands)
+    if mnemonic in ("pushq", "push"):
+        value = _eval_source(src, st, ins, window, position, idx, e, 64)
+        st["delta"] = None if st["delta"] is None else st["delta"] - 8
+        if st["delta"] is not None and value is not None:
+            st["slots"][st["delta"]] = value
+        return
+    if mnemonic in ("popq", "pop"):
+        key = _stack_key("rsp", 0, st)
+        value = st["slots"].get(key) if key is not None else None
+        st["delta"] = None if st["delta"] is None else st["delta"] + 8
+        if dst.startswith("%"):
+            name = reg(dst)
+            if value is None:
+                _invalidate(st, name, "pop_unknown")
+            else:
+                st["regs"][name] = value
+        return
+    if mnemonic in ("call", "callq"):
+        for name in CALLER_SAVED:
+            _invalidate(st, name, "call_clobber")
+        return
+    if mnemonic in BRANCHES:
+        return
+    if mnemonic in ("subq", "sub") and dst == "%rsp" and src.startswith("$0x"):
+        if st["delta"] is not None:
+            st["delta"] -= int(src[1:], 16)
+        return
+    if mnemonic in ("addq", "add") and dst == "%rsp" and src.startswith("$0x"):
+        if st["delta"] is not None:
+            st["delta"] += int(src[1:], 16)
+        return
+    if mnemonic == "movq" and src == "%rsp" and dst == "%rbp":
+        st["rbp_base"] = st["delta"]
+        st["regs"].pop("rbp", None)
+        st["origins"]["rbp"] = "frame_pointer"
+        return
+    if mnemonic == "movq" and src == "%rbp" and dst == "%rsp":
+        if st["delta"] is not None and st["rbp_base"] is not None:
+            st["delta"] = st["rbp_base"]
+        else:
+            st["delta"] = None
+        return
+    if mnemonic in ("movq", "movl", "mov", "movabsq", "leaq", "lea"):
+        width = 32 if mnemonic in ("movl",) else 64
+        if mnemonic in ("leaq", "lea") and "(%rip)" in src:
+            # lea yields the address itself, not the qword stored there.
+            value = absolute_operand(ins, window, idx)
+        elif mnemonic in ("leaq", "lea") and src.startswith("$0x"):
+            value = int(src[1:], 16)
+        elif mnemonic in ("leaq", "lea") and "(%rsp)" in src or mnemonic in ("leaq", "lea") and "(%rbp)" in src:
+            value = None
+        else:
+            value = _eval_source(src, st, ins, window, position, idx, e, width)
+        if dst.startswith("%"):
+            name = reg(dst)
+            if value is None:
+                origin = "stack_address" if "(%rsp)" in src or "(%rbp)" in src else (
+                    ("object_load:" + src) if "(" in src else mnemonic + "_source")
+                _invalidate(st, name, origin)
+            else:
+                st["regs"][name] = value & 0xFFFFFFFF if mnemonic in ("movl",) else value
+                st["origins"].pop(name, None)
+            return
+        mem_dst = re.match(r"^(-?0x[0-9a-f]+)?\(%([a-z0-9]+)\)$", dst)
+        if mem_dst is not None:
+            disp = int(mem_dst.group(1), 16) if mem_dst.group(1) else 0
+            key = _stack_key(reg(mem_dst.group(2)), disp, st)
+            if key is not None:
+                if value is None:
+                    st["slots"].pop(key, None)
+                else:
+                    st["slots"][key] = value & 0xFFFFFFFF if mnemonic in ("movl",) else value
+        return
+    if mnemonic.startswith(("test", "cmp", "bt", "ucomi", "comi", "ptest")):
+        return
+    if mnemonic in ("xorq", "xorl", "xor") and src == dst and src.startswith("%"):
+        st["regs"][reg(src)] = 0
+        st["origins"].pop(reg(src), None)
+        return
+    if mnemonic in ("addq", "subq", "add", "sub") and dst.startswith("%"):
+        name = reg(dst)
+        value = st["regs"].get(name)
+        addend = _eval_source(src, st, ins, window, position, idx, e, 64) if src.startswith("%") else (
+            int(src[1:], 16) if src.startswith("$0x") else None)
+        if value is not None and addend is not None:
+            st["regs"][name] = value + addend if mnemonic.startswith("add") else value - addend
+        else:
+            _invalidate(st, name, mnemonic + "_writes")
+        return
+    if dst.startswith("%"):
+        _invalidate(st, reg(dst), mnemonic + "_writes")
+
+
+def _cfg_blocks(window: list[int], ins: dict[int, tuple[str, str]]) -> tuple[list[list[int]], dict[int, int]]:
+    position = {a: i for i, a in enumerate(window)}
+    leaders = {window[0]}
+    for k, a in enumerate(window):
+        mnemonic, operands = ins[a]
+        if mnemonic in BRANCHES:
+            if k + 1 < len(window):
+                leaders.add(window[k + 1])
+            if mnemonic not in ("ret", "retq"):
+                match = re.match(r"^(0x[0-9a-f]+)", operands)
+                if match is not None and int(match.group(1), 16) in position:
+                    leaders.add(int(match.group(1), 16))
+    ordered = sorted(leaders)
+    starts = {a: i for i, a in enumerate(ordered)}
+    blocks: list[list[int]] = [[] for _ in ordered]
+    block_of: dict[int, int] = {}
+    for a in window:
+        k = bisect.bisect_right(ordered, a) - 1
+        blocks[k].append(a)
+        block_of[a] = k
+    return blocks, block_of
+
+
+def _successors(block: list[int], blocks_by_start: dict[int, int],
+                ins: dict[int, tuple[str, str]], window: list[int],
+                position: dict[int, int]) -> list[int]:
+    last = block[-1]
+    mnemonic, operands = ins[last]
+    out: list[int] = []
+    fallthrough = None
+    at = position[last]
+    nxt = window[at + 1] if at + 1 < len(window) else None
+    # fallthrough exists only when the next address is the start of the next block
+    for start, index in blocks_by_start.items():
+        if start == nxt:
+            fallthrough = index
+            break
+    if mnemonic in ("ret", "retq"):
+        return []
+    if mnemonic in ("jmp", "jmpq"):
+        match = re.match(r"^(0x[0-9a-f]+)", operands)
+        if match is not None:
+            target = int(match.group(1), 16)
+            if target in blocks_by_start:
+                out.append(blocks_by_start[target])
+        return out
+    if mnemonic in BRANCHES:
+        match = re.match(r"^(0x[0-9a-f]+)", operands)
+        if match is not None:
+            target = int(match.group(1), 16)
+            if target in blocks_by_start:
+                out.append(blocks_by_start[target])
+        if fallthrough is not None:
+            out.append(fallthrough)
+        return out
+    if fallthrough is not None:
+        out.append(fallthrough)
+    return out
+
+
 def analyze_indirect(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int],
                      functions: list[tuple[int, int, int]], starts: list[int]) -> dict:
-    """Resolve every indirect site in the closure frontier, or record why it cannot be resolved."""
+    """Resolve indirect sites with forward dataflow over each function's basic-block CFG.
+
+    Each block entry carries the meet of its predecessors: absolute register values and stack-slot
+    spills survive only when every reaching path defined the same value. Calls clobber caller-saved
+    registers but not stack slots (a callee cannot write its caller's frame). Sites whose base is
+    still unknown keep the verbatim reason recorded at the join or load that lost it.
+    """
     site_records = []
     reason_counts: dict[str, int] = {}
     resolved_counts: dict[str, int] = {}
 
-    def read_qword(addr: int) -> tuple[int | None, str | None]:
+    def read_qword(addr: int | None) -> tuple[int | None, str | None]:
         if addr is None:
             return None, "no_absolute_address"
         try:
@@ -344,165 +604,136 @@ def analyze_indirect(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int],
         if not window or window[0] != start:
             continue
         position = {a: i for i, a in enumerate(window)}
-        leaders = {start}
-        for k, a in enumerate(window):
-            mnemonic, operands = ins[a]
-            if mnemonic in BRANCHES:
-                match = re.match(r"^(0x[0-9a-f]+)", operands)
-                if match is not None and int(match.group(1), 16) in position:
-                    leaders.add(int(match.group(1), 16))
-                if k + 1 < len(window):
-                    leaders.add(window[k + 1])
+        blocks, block_of = _cfg_blocks(window, ins)
+        by_start = {block[0]: i for i, block in enumerate(blocks)}
+        entry_states: list[dict | None] = [None] * len(blocks)
+        entry_states[block_of[start]] = _new_state()
+        changed = True
+        passes = 0
+        while changed and passes < 32:
+            changed = False
+            passes += 1
+            for index, block in enumerate(blocks):
+                state = entry_states[index]
+                if state is None:
+                    continue
+                current = _copy_state(state)
+                for addr in block[:-1]:
+                    _transfer(addr, ins[addr][0], ins[addr][1], current, ins, window, position, e)
+                last = block[-1]
+                _transfer(last, ins[last][0], ins[last][1], current, ins, window, position, e)
+                for succ in _successors(block, by_start, ins, window, position):
+                    merged = _merge_states(entry_states[succ], current)
+                    if merged is not None and entry_states[succ] != merged:
+                        entry_states[succ] = merged
+                        changed = True
+        if passes >= 32:
+            die(f"CFG dataflow did not converge in function {fn:#x}")
 
-        def boundary(idx: int) -> bool:
-            return window[idx] in leaders and window[idx] != start
-
-        def value_of(regname: str, idx: int, depth: int = 0) -> tuple[int | None, str | None]:
-            if depth > 3:
-                return None, "register_copy_chain"
-            cur = reg(regname)
-            k = idx - 1
-            while k >= 0:
-                if boundary(k):
-                    return None, "block_boundary"
-                mnemonic, operands = ins[window[k]]
-                if mnemonic in ("call", "callq"):
-                    return None, "call_clobbers"
-                if mnemonic in BRANCHES:
-                    return None, "branch_clobbers"
-                src, dst = split_ops(operands)
-                if dst.startswith("%") and reg(dst) == cur:
-                    if mnemonic in ("testq", "cmpq", "testl", "cmpl", "pushq", "push"):
-                        k -= 1
-                        continue
-                    if mnemonic in ("movq", "movl", "movabsq", "leaq", "mov"):
-                        if src.startswith("$0x"):
-                            return int(src[1:], 16), None
-                        if "(%rip)" in src:
-                            ea = absolute_operand(ins, window, k)
-                            if ea is None:
-                                return None, "rip_operand_unresolved"
-                            if mnemonic == "leaq":
-                                return ea, None
+        for index, block in enumerate(blocks):
+            state = entry_states[index]
+            if state is None:
+                continue
+            current = _copy_state(state)
+            for addr in block:
+                mnemonic, operands = ins[addr]
+                if mnemonic in ("call", "callq", "jmp", "jmpq") and operands.strip().startswith("*"):
+                    form, base, disp, detail = op_form(operands)
+                    record = {"function": f"0x{fn:x}", "site": f"0x{addr:x}", "mnemonic": mnemonic,
+                              "operand": detail, "form": form, "status": "blocked", "target": None,
+                              "reason": None, "evidence": None}
+                    target = None
+                    kind = None
+                    if form == "other":
+                        record["reason"] = "unsupported_operand_form"
+                    elif form == "indexed_table":
+                        record["reason"] = "indexed_jump_table_index_not_bounded"
+                    elif form == "rip":
+                        match = re.search(r"#\s*(0x[0-9a-f]+)", operands)
+                        if match is None:
+                            record["reason"] = "rip_operand_without_address"
+                        else:
+                            ea = int(match.group(1), 16)
                             value, why = read_qword(ea)
-                            return (value, None) if why is None else (None, why)
-                        stack = re.match(r"^(-?0x[0-9a-f]+)\(%(rsp|rbp)\)$", src)
-                        if stack:
-                            return stack_value(int(stack.group(1), 16), stack.group(2), k, depth + 1)
-                        if src.startswith("%"):
-                            cur = reg(src)
-                            k -= 1
-                            continue
-                        return None, "object_load:" + src
-                    if mnemonic in ("addq", "subq") and src.startswith("$0x"):
-                        value, why = value_of(cur, k, depth + 1)
-                        if value is None:
-                            return None, why
-                        delta = int(src[1:], 16)
-                        return (value + delta if mnemonic == "addq" else value - delta), None
-                    if mnemonic in ("xorq", "xorl", "popq", "andq", "orq", "shlq", "shrq"):
-                        return None, mnemonic + "_clobbers"
-                    return None, mnemonic + "_writes_" + cur
-                k -= 1
-            return None, "no_reaching_definition"
+                            if value is None:
+                                record["reason"] = "global_" + why
+                                record["evidence"] = f"global 0x{ea:x}"
+                            elif value == 0:
+                                record["reason"] = "zero_initialized_global"
+                                record["evidence"] = f"global 0x{ea:x}"
+                            elif value in starts:
+                                target, kind = value, "global_pointer"
+                                record["evidence"] = f"global 0x{ea:x} -> 0x{value:x}"
+                            else:
+                                record["reason"] = "global_holds_non_entry"
+                                record["evidence"] = f"global 0x{ea:x} -> 0x{value:x}"
+                    else:
+                        if form == "slot" and base in ("rsp", "rbp"):
+                            frame = _stack_key(base, disp, current)
+                            spilled = current["slots"].get(frame) if frame is not None else None
+                            if spilled is not None and spilled in starts:
+                                target, kind = spilled, "stack_slot"
+                                record["evidence"] = f"stack 0x{frame:x} -> 0x{spilled:x}"
+                            else:
+                                record["reason"] = "stack_slot_not_entry"
+                                record["evidence"] = f"stack {disp:#x}(%{base})"
+                            value = None
+                        else:
+                            value = current["regs"].get(base) if base is not None else None
+                        if value is not None:
+                            if form == "register":
+                                if value in starts:
+                                    target, kind = value, "register"
+                                    record["evidence"] = f"{base} = 0x{value:x}"
+                                else:
+                                    record["reason"] = "register_value_not_entry"
+                                    record["evidence"] = f"{base} = 0x{value:x}"
+                            else:
+                                slot = value + disp
+                                slot_value, why = read_qword(slot)
+                                if slot_value is None:
+                                    record["reason"] = "slot_" + why
+                                    record["evidence"] = f"slot 0x{slot:x}"
+                                elif slot_value in starts:
+                                    target, kind = slot_value, "vtable_slot"
+                                    record["evidence"] = f"base 0x{value:x} slot 0x{disp:x} -> 0x{slot_value:x}"
+                                elif slot_value == 0:
+                                    record["reason"] = "slot_holds_zero"
+                                    record["evidence"] = f"slot 0x{slot:x}"
+                                else:
+                                    record["reason"] = "slot_holds_non_entry"
+                                    record["evidence"] = f"slot 0x{slot:x} -> 0x{slot_value:x}"
+                        elif record["reason"] is None:
+                            origin = current["origins"].get(base) if base is not None else None
+                            if origin is None:
+                                record["reason"] = "unresolved_base"
+                            elif origin == "stack_address":
+                                record["reason"] = "base_stack_object"
+                            else:
+                                record["reason"] = "base_" + origin
+                            if origin is not None:
+                                record["evidence"] = f"{base}: {origin}"
+                    if target is not None:
+                        record.update(status="resolved", target=f"0x{target:x}", kind=kind)
+                        resolved_counts[kind] = resolved_counts.get(kind, 0) + 1
+                    else:
+                        reason_counts[record["reason"]] = reason_counts.get(record["reason"], 0) + 1
+                    site_records.append(record)
+                _transfer(addr, mnemonic, operands, current, ins, window, position, e)
 
-        def stack_value(disp: int, base: str, idx: int, depth: int) -> tuple[int | None, str | None]:
-            k = idx - 1
-            while k >= 0:
-                if boundary(k):
-                    return None, "stack_block_boundary"
-                mnemonic, operands = ins[window[k]]
-                if mnemonic in BRANCHES:
-                    return None, "stack_no_definition"
-                src, dst = split_ops(operands)
-                match = re.match(r"^(-?0x[0-9a-f]+)\(%(rsp|rbp)\)$", dst)
-                if match and int(match.group(1), 16) == disp and match.group(2) == base:
-                    if mnemonic not in ("movq", "movl"):
-                        return None, "stack_store_form:" + mnemonic
-                    if src.startswith("$0x"):
-                        return int(src[1:], 16), None
-                    if src.startswith("%"):
-                        value, why = value_of(src, k, depth + 1)
-                        return (value, None) if value is not None else (None, "stack_" + (why or "unknown"))
-                    if "(%rip)" in src:
-                        ea = absolute_operand(ins, window, k)
-                        if ea is None:
-                            return None, "stack_rip_unresolved"
-                        if mnemonic == "movl":
-                            return ea, None
-                        value, why = read_qword(ea)
-                        return (value, None) if why is None else (None, "stack_" + why)
-                    return None, "stack_store_form:" + src
-                k -= 1
-            return None, "stack_no_definition"
-
-        for idx, a in enumerate(window):
-            mnemonic, operands = ins[a]
-            if mnemonic not in ("call", "callq", "jmp", "jmpq"):
+        recorded_here = {int(r["site"], 16) for r in site_records
+                         if r["function"] == f"0x{fn:x}"}
+        for addr in window:
+            if addr in recorded_here:
                 continue
-            if not operands.strip().startswith("*"):
-                continue
-            form, base, disp, detail = op_form(operands)
-            record = {"function": f"0x{fn:x}", "site": f"0x{a:x}", "mnemonic": mnemonic,
-                      "operand": detail, "form": form, "status": "blocked", "target": None,
-                      "reason": None, "evidence": None}
-            target = None
-            kind = None
-            if form == "other":
-                record["reason"] = "unsupported_operand_form"
-            elif form == "indexed_table":
-                record["reason"] = "indexed_jump_table_index_not_bounded"
-            elif form == "rip":
-                match = re.search(r"#\s*(0x[0-9a-f]+)", operands)
-                if match is None:
-                    record["reason"] = "rip_operand_without_address"
-                else:
-                    ea = int(match.group(1), 16)
-                    value, why = read_qword(ea)
-                    if value is None:
-                        record["reason"] = "global_" + why
-                        record["evidence"] = f"global 0x{ea:x}"
-                    elif value == 0:
-                        record["reason"] = "zero_initialized_global"
-                        record["evidence"] = f"global 0x{ea:x}"
-                    elif value in starts:
-                        target, kind = value, "global_pointer"
-                        record["evidence"] = f"global 0x{ea:x} -> 0x{value:x}"
-                    else:
-                        record["reason"] = "global_holds_non_entry"
-                        record["evidence"] = f"global 0x{ea:x} -> 0x{value:x}"
-            else:
-                value, why = value_of(base, idx)
-                if value is None:
-                    record["reason"] = why or "unresolved_base"
-                elif form == "register":
-                    if value in starts:
-                        target, kind = value, "register"
-                        record["evidence"] = f"{base} = 0x{value:x}"
-                    else:
-                        record["reason"] = "register_value_not_entry"
-                        record["evidence"] = f"{base} = 0x{value:x}"
-                else:
-                    addr = value + disp
-                    value2, why2 = read_qword(addr)
-                    if value2 is None:
-                        record["reason"] = "slot_" + why2
-                        record["evidence"] = f"slot 0x{addr:x}"
-                    elif value2 in starts:
-                        target, kind = value2, "vtable_slot"
-                        record["evidence"] = f"base 0x{value:x} slot 0x{disp:x} -> 0x{value2:x}"
-                    elif value2 == 0:
-                        record["reason"] = "slot_holds_zero"
-                        record["evidence"] = f"slot 0x{addr:x}"
-                    else:
-                        record["reason"] = "slot_holds_non_entry"
-                        record["evidence"] = f"slot 0x{addr:x} -> 0x{value2:x}"
-            if target is not None:
-                record.update(status="resolved", target=f"0x{target:x}", kind=kind)
-                resolved_counts[kind] = resolved_counts.get(kind, 0) + 1
-            else:
-                reason_counts[record["reason"]] = reason_counts.get(record["reason"], 0) + 1
-            site_records.append(record)
+            mnemonic, operands = ins[addr]
+            if mnemonic in ("call", "callq", "jmp", "jmpq") and operands.strip().startswith("*"):
+                form, _base, _disp, detail = op_form(operands)
+                record = {"function": f"0x{fn:x}", "site": f"0x{addr:x}", "mnemonic": mnemonic,
+                          "operand": detail, "form": form, "status": "blocked", "target": None,
+                          "reason": "unreachable_block", "evidence": None}
+                reason_counts["unreachable_block"] = reason_counts.get("unreachable_block", 0) + 1
+                site_records.append(record)
 
     site_records.sort(key=lambda r: int(r["site"], 16))
     return {
@@ -510,6 +741,7 @@ def analyze_indirect(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int],
         "sites": len(site_records),
         "resolved": sum(resolved_counts.values()),
         "blocked": len(site_records) - sum(resolved_counts.values()),
+        "analysis": "cfg_forward",
         "resolved_kinds": dict(sorted(resolved_counts.items())),
         "blocked_reasons": dict(sorted(reason_counts.items(), key=lambda kv: (-kv[1], kv[0]))),
         "sites_detail": site_records,
@@ -616,6 +848,14 @@ def build() -> tuple[dict, str]:
     stub_rows = [f"0x{rva:x}" for rva in sorted(start_set)
                  if shapes[rva]["callable"] == "ret_stub"]
 
+    native_thunks = []
+    for rva, name, arg_count in NATIVE_THUNKS:
+        kind, _fn, size = classify(rva, fdes, starts, segments)
+        if kind != "function_start" or not size:
+            die(f"native thunk {rva:#x} is not an FDE start")
+        native_thunks.append({"rva": f"0x{rva:x}", "name": name, "args": arg_count,
+                              "size": size, "sha256": hashlib.sha256(e.raw(rva, size)).hexdigest()})
+
     data = {
         "schema": "sotc-entry-closure/2",
         "inputs": {
@@ -637,6 +877,7 @@ def build() -> tuple[dict, str]:
         "target_named": dict({"entries": target_entries}, **target_named),
         "closure": closure,
         "indirect": indirect,
+        "native_thunks": {"count": len(native_thunks), "thunks": native_thunks},
         "samples": samples,
         "interior": interior,
     }
@@ -741,6 +982,30 @@ def render_doc(data: dict) -> str:
         "The `ret_stub` rows are the one-byte `ret` functions already executed on the Init path",
         "(`0x56dca0`, `0x56db70`, `0x5b3d00`, `0x5b3cf0`, `0x56fad0` are among them).",
         "",
+        "## Native retail-ABI thunks",
+        "",
+        f"**{data['native_thunks']['count']}** entries are hosted as real SysV callables in",
+        "`native/core/guest_thunks.cpp`; the fixture and the runtime invoke them through the registry",
+        "and assert the observed effects:",
+        "",
+        "| RVA | Name | Args | Body | Observed |",
+        "| --- | --- | ---: | --- | --- |",
+    ]
+    for thunk in data["native_thunks"]["thunks"]:
+        if thunk["name"] == "concmd_lazy_register":
+            observed = "object byte +0x18 flips once; hook fires once; second call is a no-op"
+        else:
+            observed = "dword at object+0x1c becomes the rsi argument"
+        lines.append(f"| `{thunk['rva']}` | `{thunk['name']}` | {thunk['args']} | "
+                     f"{thunk['size']} B, sha256 `{thunk['sha256'][:16]}…` | {observed} |")
+    lines += [
+        "",
+        "`0x20d60` reproduces the flag test and store, then reports the manager map insert through a",
+        "host hook: the insert body (`0x20d80`) needs the live manager pointer from the BSS global",
+        "`0x2dfcbc8`, which the host does not have. The 14 one-byte `ret` targets are **not**",
+        "registered: a C thunk cannot leave `rax` untouched as the retail stub does, and returning 0",
+        "would invent a result.",
+        "",
         "## Indirect frontier of the Init closure",
         "",
     ]
@@ -753,21 +1018,45 @@ def render_doc(data: dict) -> str:
             "| Resolution | Count | Meaning |",
             "| --- | ---: | --- |",
         ]
+        resolution_text = {
+            "register": "CFG state proves the register is an FDE start",
+            "vtable_slot": "CFG state proves an absolute base; slot contents are an FDE start",
+            "stack_slot": "a stack spill holds an FDE start",
+            "global_pointer": "a file-backed global points at an FDE start",
+        }
         for kind, count in indirect["resolved_kinds"].items():
-            lines.append(f"| `{kind}` | **{count}** | same-block absolute base, slot contents land on an FDE start |")
+            lines.append(f"| `{kind}` | **{count}** | {resolution_text.get(kind, kind)} |")
         lines += [
+            "",
+            "The analysis is a forward dataflow over each function's basic-block CFG: block entries",
+            "carry the meet of their predecessors, calls clobber caller-saved registers but not stack",
+            "slots, and a value survives a join only when every reaching path defined the same value.",
             "",
             "| Blocking reason | Sites | Verbatim meaning |",
             "| --- | ---: | --- |",
         ]
         for reason, count in indirect["blocked_reasons"].items():
-            lines.append(f"| `{reason}` | **{count}** | {reason.replace('_', ' ')} |")
+            if reason == "base_stack_object":
+                text = "base is the address of a stack object whose vtable is built at run time"
+            elif reason == "base_addq_writes":
+                text = "base register is written by add/sub with an unproven operand"
+            elif reason == "unresolved_base":
+                text = "no reaching definition for the base register"
+            elif reason.startswith("base_object_load:"):
+                text = "base is loaded from object memory: `" + reason.split(":", 1)[1] + "`"
+            elif reason == "stack_slot_not_entry":
+                text = "the stack spill does not hold an FDE start"
+            elif reason == "unreachable_block":
+                text = "the CFG proves the containing block unreachable from the entry"
+            else:
+                text = reason.replace("_", " ")
+            lines.append(f"| `{reason}` | **{count}** | {text} |")
         lines += [
             "",
             "Every site (function, site RVA, operand, status, target or reason) is listed in",
             "`entry_closure.json` under `indirect.sites_detail`; nothing is guessed. A resolution",
-            "requires a same-basic-block definition of the base register, an absolute address, and",
-            "slot contents that are an exact FDE start.",
+            "requires the CFG meet to prove an absolute base (or a stack spill) and the slot contents",
+            "to be an exact FDE start.",
         ]
     else:
         lines.append("The private closure census was not present, so the indirect frontier was not measured.")
@@ -776,8 +1065,8 @@ def render_doc(data: dict) -> str:
         "## What this changes",
         "",
         "- `ENTRY_MAP.md`'s open item 2 (address → callable retail-ABI entry) is answered at the shape",
-        "  level: every start is a retail entry, a jmp thunk or a ret stub, with prologue and alignment",
-        "  evidence. It is still not a native ABI thunk: a caller needs a matching native signature.",
+        "  level for every start, and two entries now have real SysV thunk bodies invoked through the",
+        "  runtime. The rest still need a matching native signature and host state.",
         "- Open item 3 (indirect targets) is measured and partially resolved; every remaining site is",
         "  enumerated with its blocking reason instead of being left as a count.",
         "- The native runtime exposes `guest_entry_callable(rva)` and the indirect summary from the",

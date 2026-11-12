@@ -221,9 +221,10 @@ of the 608 functions in the `0x531d60` closure (23.2 %) have a native entry**, w
 remaining callee-closure gap. The native runtime answers `guest_entry_find(rva)` from a generated
 table. The successor pass then decoded every function start and the closure's indirect frontier: of
 830 starts, **786 are normal retail entries, 10 are jmp thunks and 34 are one-byte ret stubs**, with
-prologue/alignment evidence; of **499 indirect sites in 105 frontier functions, 180 now resolve** to
-exact FDE starts and 319 are blocked with verbatim reasons. Native ABI thunk bodies are the next
-gap. Full CTest **705/705**, G1 **PARTIAL**.
+prologue/alignment evidence. A CFG forward dataflow then re-resolved the frontier: of **499 indirect
+sites in 105 functions, 222 resolve** to exact FDE starts and 277 are blocked with verbatim reasons,
+and two entries (`0x20d60`, `0x13d20`) now have real SysV thunk bodies invoked by the fixture and
+the runtime. Genome-wide thunk bodies remain the next gap. Full CTest **705/705**, G1 **PARTIAL**.
 Slot **23** (`0xe71990`) is registered via a **private fixture**; consumer/string necessity
 remains unresolved (G1 caveat). Operating plan lives in [HANDOFF](HANDOFF.md) only. Prefer
 session-sized code + checker acceptance over characterization-only docs churn.
