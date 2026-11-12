@@ -68,6 +68,7 @@ add_library(sotc_core STATIC
   core/init_7f6f90_body.cpp
   core/init_96f20_body.cpp
   core/init_560b60_body.cpp
+  core/init_5b9f90_slices.cpp
   core/init_a5d990_body.cpp
   core/init_a5cd90_body.cpp
   core/init_946880_body.cpp
@@ -1946,6 +1947,10 @@ add_test(NAME init_1290 COMMAND test_init_1290)
 add_executable(test_init_a5d990_body tests/test_init_a5d990_body.cpp)
 target_link_libraries(test_init_a5d990_body sotc_core)
 add_test(NAME init_a5d990_body COMMAND test_init_a5d990_body)
+
+add_executable(test_init_5b9f90_slices tests/test_init_5b9f90_slices.cpp)
+target_link_libraries(test_init_5b9f90_slices sotc_core)
+add_test(NAME init_5b9f90_slices COMMAND test_init_5b9f90_slices)
 
 add_executable(test_init_post_bodies tests/test_init_post_bodies.cpp)
 target_link_libraries(test_init_post_bodies sotc_core)

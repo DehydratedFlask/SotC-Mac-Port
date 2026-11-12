@@ -171,6 +171,12 @@ Init5c64c0BodyResult run_init_5c64c0_body(const Init5c64c0BodyHooks& hooks) noex
     {
         const InitPostCallOutcome o = hooks.call_5b9f90();
         add_call(out.call_log, 0x5b9f90, "0x5c64c0", nullptr, 0, o);
+        // A partially lifted body reports the sub-slices it did execute. They are real executed
+        // native records; the body's own record stays blocked.
+        for (std::size_t i = 0; i < o.subrecord_count; ++i) {
+            if (out.call_log.count >= kInitPostCallMax) break;
+            out.call_log.records[out.call_log.count++] = o.subrecords[i];
+        }
         ++out.calls_5b9f90;
         if (!o.executed) ++out.calls_blocked;
     }

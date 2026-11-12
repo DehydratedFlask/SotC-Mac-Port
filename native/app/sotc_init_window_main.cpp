@@ -40,6 +40,13 @@ void print_json_string(const char* text) {
 }
 
 void print_post_calls(const sotc::InitWindowRuntimeResult& r) {
+    std::printf("\"post_5b9f90\":{\"native\":%s,\"slices\":%d,\"groups\":%d,\"commands\":%d,"
+                "\"registered\":%d,\"contracts\":%d,\"resume\":\"0x%llx\",\"complete\":%s},",
+                r.post_5b9f90_ok ? "true" : "false", r.post_5b9f90_slices,
+                r.post_5b9f90_groups, r.post_5b9f90_commands, r.post_5b9f90_registered,
+                r.post_5b9f90_contracts,
+                static_cast<unsigned long long>(r.post_5b9f90_resume_rva),
+                r.post_5b9f90_complete ? "true" : "false");
     std::printf("\"post_call_count\":%d,\"post_calls_executed\":%d,"
                 "\"post_calls_blocked\":%d,\"post_calls_complete\":%s,\"post_calls\":[",
                 r.post_call_count, r.post_calls_executed, r.post_calls_blocked,

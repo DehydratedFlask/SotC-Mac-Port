@@ -5,6 +5,12 @@ Statuses: `READY`, `ACTIVE`, `BLOCKED`, `WAITING_FOR_DEPENDENCY`, `WAITING_FOR_O
 `UNKNOWN`, `NEEDS_PRINCIPAL`. No native game implementation exists.
 Gates and test evidence take precedence over a status label. Integrator owns this file.
 
+## Active orchestration — 2026-11-13 (Init `0x5b9f90` slice map + first executed slices)
+
+| ID | Bounded output | Depends on | Status / owner | Failed tries |
+|---|---|---|---|---|
+| CPU-01-INIT-5B9F90-SLICES-01 | Decompose the 46,881 B `0x5b9f90` page builder at its rare callees and its single loop nest into a committed slice map (S0–S9 + the six S3 pages, with callees per slice), execute at least one previously unlifted sub-slice in the real Init run, record honestly which slices are contracts/blocked and why, keep `post_calls_complete=false`, and pin every executed tuple with a fixture and an ELF checker | E1432; `local/re/eboot.elf`; `init_5b9f90_slices.*`; `init_post_call_trace.hpp`; `init_post_bodies.cpp`; `init_window_runtime.*`; `slice_5b9f90.py`; `check_init_5b9f90_slices.py` | PASSED / ARTIFACT_VERIFIED / Buffy (S0 + S3.1/S3.2 executed: 3 groups / 32 command items / 35 registrations / 70 releases / 2 contracts / **5,412 of 46,881 B**; `post_calls_executed` **16 → 19**, blocked 1, `post_calls_complete=false`, resume `0x5bb4be`; 275 entries/status 0/boss `0xA7`; full CTest **704/704**; sweep **914/0/0**; entry map **3,027 constants → 1,942 RVAs / 584 headers**; G1 **PARTIAL**) | 0 |
+
 ## Active orchestration — 2026-11-12 (Init `0xa5d990` body + crash repair)
 
 | ID | Bounded output | Depends on | Status / owner | Failed tries |

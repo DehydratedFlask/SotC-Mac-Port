@@ -17,6 +17,7 @@
 #include "init_1290.hpp"
 #include "init_499f80_body.hpp"
 #include "init_a5cd90_body.hpp"
+#include "init_5b9f90_slices.hpp"
 #include "init_a5d990_body.hpp"
 #include "init_946880_body.hpp"
 #include "init_5d5410_body.hpp"
@@ -165,6 +166,16 @@ struct HostPostBodies {
     int menu_inserts_a5d990 = 0;
     InitA5d990Hooks hooks_a5d990{};
     InitA5d990Result result_a5d990{};
+
+    // 0x5b9f90 slice state. The body registers into the process-wide root list ([0x2dfd4b8] is null
+    // on startup), so this registry keeps the root path. The canary cell stands in for the stack
+    // slot the body fills from [0x15fe518]; the two page builders are named host contracts.
+    DebugMenuRegistry menu_5b9f90{};
+    StartupAtexitLog atexit_5b9f90{};
+    std::array<DebugMenuItem, 40> items_5b9f90{};
+    std::uint64_t canary_5b9f90 = 0;
+    Init5b9f90Hooks hooks_5b9f90{};
+    Init5b9f90Result result_5b9f90{};
 
     // 0x946880/0x9469f0 host state. The service block is a stand-in for 0x32950a8; the
     // record name is host-owned and the six service helpers are explicit contracts.
@@ -1082,10 +1093,39 @@ void run_56_body() {
     if (g_boot != nullptr) g_boot->post.result_56 = run_init_56dcb0_body(g_boot->post.hooks_56);
 }
 
-InitPostCallOutcome hook_5c_a() {
-    return post_blocked("body_not_lifted",
-                        "0x5b9f90 body absent: 46881 B/7685 insns; first nested call "
-                        "0x26c10 at 0x5ba02c; no lifted extent for this menu/UI builder");
+bool hook_5b9f90_release(void*, const SharedStr&) noexcept {
+    // Every view in these slices is a borrowed literal, so 0xf590 has nothing to free; the host
+    // records the observation.
+    return true;
+}
+InitPostCallOutcome hook_5b9f90_page_builder(void*, std::uint64_t rva, const char* name) noexcept {
+    char detail[kInitPostCallDetailBytes];
+    std::snprintf(detail, sizeof detail,
+                  "0x%llx page builder \"%s\": named host contract, callee body not lifted",
+                  static_cast<unsigned long long>(rva), name != nullptr ? name : "?");
+    return post_executed(detail);
+}
+InitPostCallOutcome hook_5c_a() noexcept {
+    if (g_boot == nullptr) return post_blocked("runtime_missing", "0x5b9f90: no runtime state");
+    auto& p = g_boot->post;
+    p.result_5b9f90 = run_init_5b9f90_slices(p.hooks_5b9f90);
+    const auto& r = p.result_5b9f90;
+    char detail[kInitPostCallDetailBytes];
+    std::snprintf(detail, sizeof detail,
+                  "native 0x5b9f90 slices S0/S3.1/S3.2 (5412 of 46881 B): groups=%d commands=%d "
+                  "registered=%d releases=%d contracts=%d canary=%d resume=0x%llx remaining=%zu B",
+                  r.groups, r.commands, r.registered, r.releases, r.contracts,
+                  r.canary_stored ? 1 : 0,                   static_cast<unsigned long long>(r.resume_rva),
+                  static_cast<std::size_t>(kInit5b9f90Size - kInit5b9f90ExecutedBytes));
+    InitPostCallOutcome o;  // the body's own record stays blocked: 41,469 B are unlifted
+    if (!r.ok) {
+        o = post_blocked(r.blocked != nullptr ? r.blocked : "slice_failed", detail);
+    } else {
+        o = post_blocked("body_partially_lifted", detail);
+    }
+    o.subrecords = r.records.data();
+    o.subrecord_count = static_cast<std::uint8_t>(r.record_count);
+    return o;
 }
 InitPostCallOutcome host_97a50(std::uint32_t a0, std::uint32_t a1, std::uint32_t a2,
                                std::uint32_t a3, std::uint32_t a4, std::uint32_t a5,
@@ -1596,6 +1636,18 @@ void configure_post(HostPostBodies& p) {
     p.hooks_a5d990.destroy_item = hook_a5d990_destroy;
     p.hooks_a5d990.host = &p.result_a5d990;
 
+    p.menu_5b9f90.parent.parent = nullptr;   // [0x2dfd4b8] is null on the startup path
+    p.menu_5b9f90.parent.insert = nullptr;
+    p.hooks_5b9f90.host = &p.result_5b9f90;
+    p.hooks_5b9f90.menu = &p.menu_5b9f90;
+    p.hooks_5b9f90.atexit = &p.atexit_5b9f90;
+    p.hooks_5b9f90.canary_cell = &p.canary_5b9f90;
+    p.hooks_5b9f90.canary_token = 0x5B9F90CA11ULL;
+    p.hooks_5b9f90.item_storage = p.items_5b9f90.data();
+    p.hooks_5b9f90.item_capacity = p.items_5b9f90.size();
+    p.hooks_5b9f90.release_view = hook_5b9f90_release;
+    p.hooks_5b9f90.page_builder = hook_5b9f90_page_builder;
+
     p.allocation_96.clear();
     p.result_96 = Init96f20Result{};
 
@@ -2036,6 +2088,16 @@ InitWindowRuntimeResult run_init_window_runtime(const char* fixture_path) noexce
     for (std::size_t i = 0; i < 9; ++i) {
         std::memcpy(&out.post_5d5410_state[i], r5d.state.data() + i * 8, sizeof(std::uint64_t));
     }
+
+    const auto& r5b = boot.post.result_5b9f90;
+    out.post_5b9f90_ok = r5b.ok;
+    out.post_5b9f90_slices = r5b.executed_slices;
+    out.post_5b9f90_groups = r5b.groups;
+    out.post_5b9f90_commands = r5b.commands;
+    out.post_5b9f90_registered = r5b.registered;
+    out.post_5b9f90_contracts = r5b.contracts;
+    out.post_5b9f90_resume_rva = r5b.resume_rva;
+    out.post_5b9f90_complete = r5b.complete;
 
     const auto& r5c = boot.post.result_5c;
     out.post_5c64c0_ok = r5c.ok && full.post_base_5c64c0.call_5c64c0_count == 1;

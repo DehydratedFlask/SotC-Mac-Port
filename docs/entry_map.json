@@ -9916,6 +9916,12 @@
         "header": "native/core/vslot_40_533100_miss.hpp"
       }
     ],
+    "0x2170": [
+      {
+        "constant": "kInit5b9f90PageBuilderShadowMisc",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
     "0x2196f0": [
       {
         "constant": "kSlot509",
@@ -12876,6 +12882,18 @@
       {
         "constant": "kInit5c64c0Cell",
         "header": "native/core/init_post_bodies.hpp"
+      }
+    ],
+    "0x2fed5b8": [
+      {
+        "constant": "kInit5b9f90BossJumpTarget",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x2fed6f8": [
+      {
+        "constant": "kInit5b9f90BossOutroJumpTarget",
+        "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
     "0x30015c8": [
@@ -18276,6 +18294,42 @@
         "header": "native/core/helper_5b5530_vector_dtors.hpp"
       }
     ],
+    "0x5b9f90": [
+      {
+        "constant": "kInit5b9f90",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x5bb4be": [
+      {
+        "constant": "kInit5b9f90Resume",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x5c1d50": [
+      {
+        "constant": "kInit5b9f90LoopHead",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x5c1e5b": [
+      {
+        "constant": "kInit5b9f90LoopTail",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x5c56aa": [
+      {
+        "constant": "kInit5b9f90SingleRet",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x5c56b1": [
+      {
+        "constant": "kInit5b9f90End",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
     "0x5c64c0": [
       {
         "constant": "kInit531d60PostBase5c64c0Target",
@@ -18308,6 +18362,12 @@
       {
         "constant": "kSlot408PerspectiveCall",
         "header": "native/core/helper_1580a0_perspective.hpp"
+      }
+    ],
+    "0x5cf140": [
+      {
+        "constant": "kInit5b9f90PageBuilderSecond",
+        "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
     "0x5d41c0": [
@@ -23011,9 +23071,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 3017,
-    "distinct_rvas": 1932,
+    "constants": 3027,
+    "distinct_rvas": 1942,
     "duplicate_rvas": 455,
-    "headers": 583
+    "headers": 584
   }
 }

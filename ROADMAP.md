@@ -176,6 +176,18 @@ registers them and destroys them through a caller-owned `0x272d0` hook. The run 
 **16 executed / 1 blocked** post-calls with 275 registry entries and status 0; only
 `0x5b9f90` (46,881 B) remains, so `post_calls_complete=false` still holds and G1 stays
 **PARTIAL**. Full CTest **703/703**; two new ELF checkers pin both bodies.
+The remaining blocker was then decomposed instead of attempted whole. `0x5b9f90`
+(`0x5b9f90..0x5c56b1`, 46,881 B) has exactly one `ret` and one backward branch: it is a
+straight-line debug-menu page tree of 1,136 direct calls over 25 callees, 491 of them the
+already-modelled menu constructors. It is now mapped into S0–S9 at its four rare callees and its
+one loop nest, with S3 split into six pages, and the map is committed
+(`docs/5B9F90_SLICES.md`, `docs/5b9f90_slices.json`). **5,412 B execute natively**: S0 (canary +
+group "Shadow" under "CP10") and S3.1/S3.2 ("Shadow Boss Jump" and "Shadow Boss Outro Jump",
+groups plus 32 command items, targets `0x2fed5b8`/`0x2fed6f8`, commands `"0".."15"`). The two
+intervening page builders `0x2170`/`0x5cf140` are named host contracts and are not counted. The
+run reports **19 executed / 1 blocked** post-calls (from 16/1) with `post_calls_complete=false`,
+resume offset `0x5bb4be` and 41,469 B still refused; 275 entries/status 0. Full CTest
+**704/704**, sweep **914/0/0**, G1 **PARTIAL**.
 Slot **23** (`0xe71990`) is registered via a **private fixture**; consumer/string necessity
 remains unresolved (G1 caveat). Operating plan lives in [HANDOFF](HANDOFF.md) only. Prefer
 session-sized code + checker acceptance over characterization-only docs churn.

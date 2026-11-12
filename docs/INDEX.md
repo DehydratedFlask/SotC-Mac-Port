@@ -9,6 +9,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 |---|---|
 | [TASKS](TASKS.md) | Dependency-ordered task register and detailed work packets; integrator |
 | [EVIDENCE](EVIDENCE.md) | Verified artifact/source/tool facts and unresolved questions; integrator |
+| [Init `0x5b9f90` slice map + executed S0/S3.1/S3.2 (2026-11-13)](checkpoints/2026-11-13-init-5b9f90-slices.md) | E1433; decomposes the 46,881 B page builder into S0–S9 + six S3 pages and executes 5,412 B natively (**19 executed / 1 blocked**, from 16/1); `post_calls_complete=false`, resume `0x5bb4be` |
 | [Init crash repair + `0xa5d990` body (2026-11-12)](checkpoints/2026-11-12-init-a5cd90-crash-a5d990-body.md) | E1432; fixes the `0xa5cd90` config-RVA dereference that made the handover tree segfault (701/702) and executes the 2,709 B `0xa5d990` body (**16 executed / 1 blocked**); `0x5b9f90` remains |
 | [Init blockers: `0x96f20` + `0x560b60` bodies (2026-11-10)](checkpoints/2026-11-10-init-blockers-96f20-560b60.md) | E1431; executes both post-call bodies natively (**14 executed / 3 blocked**, from 12/5), pinned hashes/ranges and a checker per body; `0x97a50` remains a host allocation contract |
 | [Init `0x7f6f90` staffroll body (2026-11-10)](checkpoints/2026-11-10-init-7f6f90.md) | E1430; native `0x7f6f90` fallback body with pinned range/hash, call sites and checker; G1 stays PARTIAL |
