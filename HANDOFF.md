@@ -1,3 +1,54 @@
+## 2026-11-13 — `0x5b9f90` S3 complete: six pages execute (9,274 of 46,881 B)
+
+**State: green.** Continuation of commit `d39985c2` on branch `cursor/init-hash-551140-6aa93e8`.
+Resumed exactly at the recorded `0x5bb4be` (S3.3 "Shadow Cheat") and executed the rest of S3.
+
+- **Executed natively now:** S0 (`0x5b9f90..0x5ba041`, 177 B) and all six S3 pages
+  (`0x5ba04b..0x5bc3d4`, 9,097 B): S3.1 2,663 B, S3.2 2,572 B, **S3.3 2,160 B**, **S3.4 1,609 B**,
+  **S3.5 80 B**, **S3.6 13 B**. Totals **9,274 B (19.8 %), 7 groups, 60 menu items
+  (37 commands, 8 toggles, 4 float ranges, 4 named bool variables, 6 page groups), 60 menu
+  registrations + 4 ConCmd registrations, 106 view releases, 23 destroys, 2 contracts**.
+- **New item kinds in the executed model:** `0x26ea0` toggles bound to the measured bool-variable
+  identity (slot3 = 1, slot6 = 0) over host bool stand-ins for the eight unlifted global variables
+  (`0x3265a20`, `0x324c408`, `0x3265ae8`, `0x2fed798`, `0x2fed0b8`, `0x2fed298`, `0x2fed338`,
+  `0x325dd78`); `0x27050` float ranges with the measured `0.01f`/`0.1f` pair (`0x12662fc`/
+  `0x1266300`) at all four sites; and the four S3.4 guarded bool variables built through the real
+  `0x20af0` base ctor, the bool-class stores (vptr `0x1594348`, functor `0x15cb1d8`),
+  `__cxa_atexit(0xacf0)` and `0x20d60` registration, then the `0x26db0` item. Guard bytes
+  `0x2fed8f8`/`0x2fed9c0`/`0x2feda88`/`0x2fedb50` and the variable storage are host-owned.
+- **Byte-pinned:** 53 item tuples in `tools/lift/check_init_5b9f90_slices.py` (32 boss commands +
+  5 game-mode commands, 8 toggles, 4 float ranges, 4 bool-variable blocks), the six page groups and
+  the 9,274 B executed extent. The checker also rejects a wrong caption/command/target literal, a
+  missing `0x30` flags store, a wrong float literal or a missing guard/atexit pair.
+- **Contracts, not bodies (unchanged status, now precisely measured):**
+  - `0x2170` ("Shadow Misc"): body ≥ **28,288 B** (`0x2170..0x9000` scanned, no `ret`), 825 direct
+    calls in that window (170 `0x26ea0`, 50 `0x27050`, 18 `0x26b60`, 254 `0x272d0`); its extent and
+    page decomposition are not closed, so S1 stays `contract`.
+  - `0x5cf140` ("Shadow Credits"): body **5,526 B** (`0x5cf140..0x5d06d6`, single `ret`
+    `0x5d06d6`), 932 instructions, 132 direct calls, no backward branch. Every callee has a native
+    model (`0x26c10`, `0x26f90`, `0x26b60`, `0x20af0`/`0x20d60`, `0x26db0`, `0xc300`, `0x27120`,
+    `0x272d0`, `0xf590`), but its 33 tuples are not recovered: the linear scanner loses the
+    stack-slot views and the xmm pairs of the ten `0xc300`/`0x27120` blocks, so no byte-pinned table
+    exists and S2 stays `contract` rather than a guessed slice.
+- **Observed run:** `ok=true`, `post_chain_complete=true`, `post_call_count=24`,
+  **`post_calls_executed=23`** (19 → 23, +4 for the new slice records), `post_calls_blocked=1`,
+  **`post_calls_complete=false`**, `post_5b9f90={slices:7,groups:7,commands:37,toggles:8,floats:4,
+  named_vars:4,registered:60,releases:106,destroys:23,contracts:2,resume:"0x5bc3d4",
+  complete:false}`, exit 0, boss `0xA7`, stderr 0 B.
+- **Resume offset: `0x5bc3d4`** (S4, the `0x5dbf40` + `0x7f8930` pair). Still blocked: S4–S9
+  (37,607 B) and the two page builders (5 B of call sites, bodies not lifted).
+- **Verification:** build **0**; full CTest **704/704**; checker
+  `check_init_5b9f90_slices.py` **OK** (`executed=9274B items=53`); sweep
+  **914 passed / 0 skipped / 0 failed**, exit 0; entry map **3,028 constants → 1,942 RVAs / 584
+  headers (455 duplicates)**; project index **114,663**; publish audit `--all` **0**; attribution
+  **OK**. Checkpoint `docs/checkpoints/2026-11-13-init-5b9f90-s3-complete.md`.
+- **Not claimed:** cold boot, audio, save/reload, Metal validation; `post_calls_complete=false`.
+  G1 **PARTIAL**.
+
+**Next exact action:** lift S4 (`0x5bc3d4..0x5bc3de`, the `0x5dbf40` + `0x7f8930` pair) or close the
+`0x2170` extent with an FDE/longer scan and model it as its own page body. Do not claim the body
+until all ten slices execute.
+
 ## 2026-11-13 — `0x5b9f90` sliced; S0 + two boss pages execute (5,412 of 46,881 B)
 
 **State: green.** `0x5b9f90` was the one blocked post-call and is a 46,881 B debug-menu page

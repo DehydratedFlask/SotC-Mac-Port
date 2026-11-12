@@ -159,13 +159,18 @@ struct InitWindowRuntimeResult {
     int post_56fad0_calls = 0;
     bool post_f90310_ok = false;
     int post_f90310_calls = 0;
-    // 0x5b9f90 slices: S0 and the two boss pages execute natively; the body record itself stays
-    // blocked, so `complete` is false and `resume_rva` names the first unlifted page.
+    // 0x5b9f90 slices: S0 and all six S3 pages execute natively; the body record itself stays
+    // blocked, so `complete` is false and `resume_rva` names the first unlifted slice (S4).
     bool post_5b9f90_ok = false;
     int post_5b9f90_slices = 0;
     int post_5b9f90_groups = 0;
     int post_5b9f90_commands = 0;
+    int post_5b9f90_toggles = 0;
+    int post_5b9f90_floats = 0;
+    int post_5b9f90_named_vars = 0;
     int post_5b9f90_registered = 0;
+    int post_5b9f90_releases = 0;
+    int post_5b9f90_destroys = 0;
     int post_5b9f90_contracts = 0;
     std::uint64_t post_5b9f90_resume_rva = 0;
     bool post_5b9f90_complete = false;

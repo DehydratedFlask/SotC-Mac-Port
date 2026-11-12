@@ -171,8 +171,13 @@ struct HostPostBodies {
     // on startup), so this registry keeps the root path. The canary cell stands in for the stack
     // slot the body fills from [0x15fe518]; the two page builders are named host contracts.
     DebugMenuRegistry menu_5b9f90{};
+    ConCmdRegistry registry_5b9f90{};
     StartupAtexitLog atexit_5b9f90{};
-    std::array<DebugMenuItem, 40> items_5b9f90{};
+    std::array<DebugMenuItem, 64> items_5b9f90{};
+    std::array<ConCmdBoolVar, 8> vars_5b9f90{};
+    std::array<bool, 8> var_values_5b9f90{};
+    std::array<bool, 8> var_guards_5b9f90{};
+    std::array<bool, 8> toggle_values_5b9f90{};
     std::uint64_t canary_5b9f90 = 0;
     Init5b9f90Hooks hooks_5b9f90{};
     Init5b9f90Result result_5b9f90{};
@@ -1112,12 +1117,15 @@ InitPostCallOutcome hook_5c_a() noexcept {
     const auto& r = p.result_5b9f90;
     char detail[kInitPostCallDetailBytes];
     std::snprintf(detail, sizeof detail,
-                  "native 0x5b9f90 slices S0/S3.1/S3.2 (5412 of 46881 B): groups=%d commands=%d "
-                  "registered=%d releases=%d contracts=%d canary=%d resume=0x%llx remaining=%zu B",
-                  r.groups, r.commands, r.registered, r.releases, r.contracts,
+                  "native 0x5b9f90 slices S0/S3.1..S3.6 (%zu of 46881 B): groups=%d commands=%d "
+                  "toggles=%d floats=%d named_vars=%d registered=%d releases=%d destroys=%d "
+                  "contracts=%d canary=%d resume=0x%llx remaining=%zu B",
+                  static_cast<std::size_t>(kInit5b9f90ExecutedBytes), r.groups, r.commands,
+                  r.toggles, r.float_items, r.named_vars, r.registered, r.releases, r.destroys,
+                  r.contracts,
                   r.canary_stored ? 1 : 0,                   static_cast<unsigned long long>(r.resume_rva),
                   static_cast<std::size_t>(kInit5b9f90Size - kInit5b9f90ExecutedBytes));
-    InitPostCallOutcome o;  // the body's own record stays blocked: 41,469 B are unlifted
+    InitPostCallOutcome o;  // the body's own record stays blocked: 37,607 B are unlifted
     if (!r.ok) {
         o = post_blocked(r.blocked != nullptr ? r.blocked : "slice_failed", detail);
     } else {
@@ -1641,6 +1649,14 @@ void configure_post(HostPostBodies& p) {
     p.hooks_5b9f90.host = &p.result_5b9f90;
     p.hooks_5b9f90.menu = &p.menu_5b9f90;
     p.hooks_5b9f90.atexit = &p.atexit_5b9f90;
+    p.hooks_5b9f90.registry = &p.registry_5b9f90;
+    p.hooks_5b9f90.toggle_value_storage = p.toggle_values_5b9f90.data();
+    p.hooks_5b9f90.toggle_value_capacity = p.toggle_values_5b9f90.size();
+    p.hooks_5b9f90.var_storage = p.vars_5b9f90.data();
+    p.hooks_5b9f90.var_capacity = p.vars_5b9f90.size();
+    p.hooks_5b9f90.var_value_storage = p.var_values_5b9f90.data();
+    p.hooks_5b9f90.var_guard_storage = p.var_guards_5b9f90.data();
+    p.hooks_5b9f90.var_guard_capacity = p.var_guards_5b9f90.size();
     p.hooks_5b9f90.canary_cell = &p.canary_5b9f90;
     p.hooks_5b9f90.canary_token = 0x5B9F90CA11ULL;
     p.hooks_5b9f90.item_storage = p.items_5b9f90.data();
@@ -2094,7 +2110,12 @@ InitWindowRuntimeResult run_init_window_runtime(const char* fixture_path) noexce
     out.post_5b9f90_slices = r5b.executed_slices;
     out.post_5b9f90_groups = r5b.groups;
     out.post_5b9f90_commands = r5b.commands;
+    out.post_5b9f90_toggles = r5b.toggles;
+    out.post_5b9f90_floats = r5b.float_items;
+    out.post_5b9f90_named_vars = r5b.named_vars;
     out.post_5b9f90_registered = r5b.registered;
+    out.post_5b9f90_releases = r5b.releases;
+    out.post_5b9f90_destroys = r5b.destroys;
     out.post_5b9f90_contracts = r5b.contracts;
     out.post_5b9f90_resume_rva = r5b.resume_rva;
     out.post_5b9f90_complete = r5b.complete;

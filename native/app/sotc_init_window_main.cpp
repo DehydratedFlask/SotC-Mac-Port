@@ -41,10 +41,13 @@ void print_json_string(const char* text) {
 
 void print_post_calls(const sotc::InitWindowRuntimeResult& r) {
     std::printf("\"post_5b9f90\":{\"native\":%s,\"slices\":%d,\"groups\":%d,\"commands\":%d,"
-                "\"registered\":%d,\"contracts\":%d,\"resume\":\"0x%llx\",\"complete\":%s},",
+                "\"toggles\":%d,\"floats\":%d,\"named_vars\":%d,\"registered\":%d,"
+                "\"releases\":%d,\"destroys\":%d,\"contracts\":%d,\"resume\":\"0x%llx\","
+                "\"complete\":%s},",
                 r.post_5b9f90_ok ? "true" : "false", r.post_5b9f90_slices,
-                r.post_5b9f90_groups, r.post_5b9f90_commands, r.post_5b9f90_registered,
-                r.post_5b9f90_contracts,
+                r.post_5b9f90_groups, r.post_5b9f90_commands, r.post_5b9f90_toggles,
+                r.post_5b9f90_floats, r.post_5b9f90_named_vars, r.post_5b9f90_registered,
+                r.post_5b9f90_releases, r.post_5b9f90_destroys, r.post_5b9f90_contracts,
                 static_cast<unsigned long long>(r.post_5b9f90_resume_rva),
                 r.post_5b9f90_complete ? "true" : "false");
     std::printf("\"post_call_count\":%d,\"post_calls_executed\":%d,"

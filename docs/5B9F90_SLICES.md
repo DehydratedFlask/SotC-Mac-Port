@@ -30,14 +30,14 @@ straight-line item clusters (view write, constructor at 0x26c10/0x26b60/0x26f90/
 | slice | status | reason |
 |---|---|---|
 | S0 | executed | frame canary + group "Shadow" under "CP10" (native 0x26c10/0x268b0/0xf590) |
-| S1 | contract | 0x2170 "Shadow Misc" page builder; callee body not lifted |
-| S2 | contract | 0x5cf140 page builder; callee body not lifted |
+| S1 | contract | 0x2170 "Shadow Misc" page builder: body >= 28,288 B (no `ret` before 0x9000), 825 calls; extent not closed |
+| S2 | contract | 0x5cf140 page builder: body 5,526 B, single `ret` at 0x5d06d6, 132 calls, no backward branch; all call targets have native models, but the linear scanner cannot recover its stack-slot views/constant pairs, so its 33 tuples are not extracted |
 | S3.1 | executed | "Shadow Boss Jump" group + 16 command items |
 | S3.2 | executed | "Shadow Boss Outro Jump" group + 16 command items |
-| S3.3 | blocked | "Shadow Cheat": 5 items recovered, not lifted; execution resumes here |
-| S3.4 | blocked | "Shadow Trophy": no command items; other item kinds pending |
-| S3.5 | blocked | "Shadow Render": page header only |
-| S3.6 | blocked | "MLAA" |
+| S3.3 | executed | "Shadow Cheat": 8 toggles, 5 commands, 4 float ranges, 18 destroys |
+| S3.4 | executed | "Shadow Trophy": 4 guarded bool variables + named items, 5 destroys |
+| S3.5 | executed | "Shadow Render": group header |
+| S3.6 | executed | "MLAA": group header |
 | S4 | blocked | 0x5dbf40 + 0x7f8930 callee bodies not lifted |
 | S5 | blocked | "Stereo 3D" / "Dynamic 3D" / wormhole pages: extraction pending |
 | S6 | blocked | 0x5c94b0 + 0xb25840 callee bodies not lifted |
@@ -45,8 +45,8 @@ straight-line item clusters (view write, constructor at 0x26c10/0x26b60/0x26f90/
 | S8 | blocked | the single loop nest (33 iterations over the 0x2dcaa90 table) |
 | S9 | blocked | "Performance" / "Transparency" / "Texture" / "Fullscreen Effects Tweaks" |
 
-Resume offset for the next agent: `0x5bb4be` (the "Shadow Cheat" page).
-Executed extent: 5,412 of 46,881 B (11.5 %); `post_calls_complete` stays false.
+Resume offset for the next agent: `0x5bc3d4` (S4, the 0x5dbf40 + 0x7f8930 pair).
+Executed extent: 9,274 of 46,881 B (19.8 %); `post_calls_complete` stays false.
 
 ## Callees per slice
 

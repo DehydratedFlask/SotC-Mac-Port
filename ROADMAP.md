@@ -188,6 +188,16 @@ intervening page builders `0x2170`/`0x5cf140` are named host contracts and are n
 run reports **19 executed / 1 blocked** post-calls (from 16/1) with `post_calls_complete=false`,
 resume offset `0x5bb4be` and 41,469 B still refused; 275 entries/status 0. Full CTest
 **704/704**, sweep **914/0/0**, G1 **PARTIAL**.
+S3 was then finished from that exact resume point. `0x5bb4be..0x5bc3d4` (9,097 B) is now also
+native: "Shadow Cheat" (8 toggles, 5 game-mode commands, 4 float ranges with the measured
+0.01f/0.1f pair), "Shadow Trophy" (4 guarded bool variables built through `0x20af0`, the bool-class
+stores, `__cxa_atexit(0xacf0)` and `0x26db0`) and the "Shadow Render"/"MLAA" groups, plus the
+23 `0x272d0` destroys. All six S3 pages execute, so the measured extent is **9,274 of 46,881 B
+(19.8 %)**, 60 menu items and 106 releases; the run reports **23 executed / 1 blocked** post-calls
+with `post_calls_complete=false` and resume `0x5bc3d4` (S4). The two page builders stay contracts:
+`0x2170` is ≥ 28,288 B with no `ret` before `0x9000`, and `0x5cf140` (5,526 B, single `ret`) is
+liftable but needs a pre-call view/constant tracer before its 33 tuples can be byte-pinned. Full
+CTest **704/704**, G1 **PARTIAL**.
 Slot **23** (`0xe71990`) is registered via a **private fixture**; consumer/string necessity
 remains unresolved (G1 caveat). Operating plan lives in [HANDOFF](HANDOFF.md) only. Prefer
 session-sized code + checker acceptance over characterization-only docs churn.
