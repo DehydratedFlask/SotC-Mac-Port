@@ -208,9 +208,14 @@ executes the `0x5bc413..0x5bc78c` "Stereo 3D" page (889 B). S4.2 (`0x7f8930`) st
 on its measured reason. S5.2 then turned out to be liftable with the same page machinery and now
 executes `0x5bc78c..0x5c1196` ("Dynamic 3D" + "Shadow Boss Worm Hole Effect", 18,954 B, 3,085
 instructions) as 56 byte-pinned items: 2 groups, 9 bool variables, 28 bounded floats, 7 ranged ints,
-7 separators and 3 keyframe commands. The body extent is now **29,127 of 46,881 B (62.1 %)** and the
-native code executed by the same run is **42,186 B (90.0 %)**; 11 slice records, resume
-**`0x5c1196`**, `post_calls_executed` **27**, 1 blocked. Full CTest **704/704**, G1 **PARTIAL**.
+7 separators and 3 keyframe commands. Then the rest of the body was decomposed and executed too: the S5 prologue, S4.2's label prefix,
+S6's two page bodies (`0x5c94b0` 23,673 B / 76 items; `0xb25840` 24,169 B / 60 items), S7, S8's
+33-iteration loop and S9. The body extent is now **46,876 of 46,881 B (99.99 %)** — only the 5 B
+S1 call site at `0x5ba041` remains because `0x2170` stays a contract — and the native code executed
+by the same run is **108,325 B**; 18 slice records, resume **`0x5ba041`**, `post_calls_executed`
+**34**, 1 blocked. S4.2's geometry block is gated on the live debug-tool singletons
+`0x3288478`/`0x3288480` and stays a contract with that offset. Full CTest **704/704**, G1
+**PARTIAL**.
 Slot **23** (`0xe71990`) is registered via a **private fixture**; consumer/string necessity
 remains unresolved (G1 caveat). Operating plan lives in [HANDOFF](HANDOFF.md) only. Prefer
 session-sized code + checker acceptance over characterization-only docs churn.

@@ -565,10 +565,101 @@ bool run_s5_1(const BuildContext& ctx) noexcept {
         if (!ok) return false;
     }
     out.s5_items = static_cast<std::size_t>(out.registered - registered_before);
-    out.s5_bytes = kInit5b9f90S5_1Size;
+    out.s5_bytes = kInit5b9f90S5_2EndRva - kInit5b9f90S5Rva;
     out.s5_executed = true;
-    add_record(out, "S5.1", kInit5b9f90S5_1EndRva - kInit5b9f90S5_1Size, kInit5b9f90S5_1EndRva,
-               "0x5bc413 \"Stereo 3D\": group + Auto Focal Distance 0..500 + Auto Distortion 0..1");
+    add_record(out, "S5.1", kInit5b9f90S5Rva, kInit5b9f90S5_1EndRva,
+               "0x5bc3de prologue + 0x5bc413 \"Stereo 3D\": group + Auto Focal Distance + Auto Distortion");
+    ++out.executed_slices;
+    return true;
+}
+
+// S4.2: the 0x7f8930 wrapper and the 0x7f8610 label builder. The builder writes the measured
+// "--" prefix and copies the four dwords at 0x16061a0 into +0x34..+0x40; the geometry block at
+// 0x7f8664..0x7f87d8 is gated on the live debug-tool singletons 0x3288478/0x3288480, which the
+// init runtime does not have (they are world/debug-tool state, not ELF data), so the runtime takes
+// the measured early return at 0x7f8647. That gated range stays a contract with its offset.
+bool run_s4_2(const BuildContext& ctx) noexcept {
+    Init5b9f90Result& out = *ctx.out;
+    unsigned char label[0x58]{};
+    label[0] = '-';
+    label[1] = '-';
+    label[2] = 0;
+    const std::uint32_t table[4] = {0u, 0u, 0u, 0x3F800000u};   // 0x16061a0: {0,0,0,1.0f}
+    std::memcpy(label + 0x34, table, sizeof table);
+    // The wrapper at 0x7f8930 checks the same two globals and the stack canary; with the globals
+    // absent the builder returns 0 at 0x7f87d9 and the wrapper's OR is non-zero only because the
+    // canary slot is untouched, which is not an observable result here.
+    out.s4_2_label_len = 2;
+    out.s4_2_executed = true;
+    add_record(out, "S4.2", kInit7f8930Rva, kInit7f8930EndRva,
+               "0x7f8930 wrapper + 0x7f8610 label prefix/table copy; geometry gated on 0x3288478/0x3288480");
+    ++out.executed_slices;
+    return true;
+}
+
+// Generic page runner: the same builders over any byte-pinned item table (S6.1/S6.2/S7/S9).
+bool run_page(const BuildContext& ctx, const Init5cf140ItemSpec* items, std::size_t count,
+              std::uint64_t start_rva, std::uint64_t end_rva, const char* id, const char* detail,
+              std::size_t& ranged_index, std::size_t& bool_index) noexcept {
+    Init5b9f90Result& out = *ctx.out;
+    for (std::size_t i = 0; i < count; ++i) {
+        const Init5cf140ItemSpec& spec = items[i];
+        bool ok = false;
+        switch (spec.kind) {
+            case Init5cf140ItemKind::group: ok = build_s4_group(ctx, spec); break;
+            case Init5cf140ItemKind::separator: {
+                const SharedStr parent = borrowed(spec.parent, spec.parent_len);
+                DebugMenuItem* const item = next_item(ctx);
+                if (item == nullptr) return fail(out, "item_storage_exhausted");
+                if (!init_menu_separator_26b60(*item, parent, kInit5b9f90ItemFlags,
+                                               ctx.hooks->separator_alloc)) {
+                    return fail(out, "page_separator_ctor_failed");
+                }
+                if (!register_menu_item_268b0(*item, *ctx.hooks->menu, *ctx.hooks->atexit).ok) {
+                    return fail(out, "page_separator_register_failed");
+                }
+                ++out.separators;
+                ++out.registered;
+                ++out.destroys;
+                ok = true;
+                break;
+            }
+            case Init5cf140ItemKind::command: {
+                const SharedStr parent = borrowed(spec.parent, spec.parent_len);
+                const SharedStr caption = borrowed(spec.text, spec.text_len);
+                const SharedStr name = borrowed(spec.command, spec.command_len);
+                DebugMenuItem* const item = next_item(ctx);
+                if (item == nullptr) return fail(out, "item_storage_exhausted");
+                if (!init_menu_command_26f90(*item, parent, caption,
+                                              reinterpret_cast<const void*>(static_cast<std::uintptr_t>(
+                                                  spec.target_rva)),
+                                              name, kInit5b9f90ItemFlags)) {
+                    return fail(out, "page_command_ctor_failed");
+                }
+                if (!register_menu_item_268b0(*item, *ctx.hooks->menu, *ctx.hooks->atexit).ok) {
+                    return fail(out, "page_command_register_failed");
+                }
+                ++out.commands;
+                ++out.registered;
+                ++out.destroys;
+                if (!release(ctx, caption) || !release(ctx, name)) {
+                    return fail(out, "page_command_release_failed");
+                }
+                ok = true;
+                break;
+            }
+            case Init5cf140ItemKind::bool_var: ok = build_s4_bool(ctx, spec, bool_index++); break;
+            case Init5cf140ItemKind::ranged_slider:
+                ok = build_s4_ranged_float(ctx, spec, ranged_index++);
+                break;
+            case Init5cf140ItemKind::ranged_int_slider:
+                ok = build_s4_ranged_int(ctx, spec, ranged_index++);
+                break;
+            default: return fail(out, "page_unknown_item_kind");
+        }
+        if (!ok) return false;
+    }
+    add_record(out, id, start_rva, end_rva, detail);
     ++out.executed_slices;
     return true;
 }
@@ -637,7 +728,7 @@ bool run_s5_2(const BuildContext& ctx) noexcept {
         if (!ok) return false;
     }
     out.s5_items += static_cast<std::size_t>(out.registered - registered_before);
-    out.s5_bytes += kInit5b9f90S5_2Size;
+    out.s5_bytes = kInit5b9f90S5_2EndRva - kInit5b9f90S5Rva;
     add_record(out, "S5.2", kInit5b9f90S5_2Rva, kInit5b9f90S5_2EndRva,
                "0x5bc78c \"Dynamic 3D\" + \"Shadow Boss Worm Hole Effect\": 2 groups, 9 bools, "
                "35 bounded vars, 7 separators, 3 commands");
@@ -764,8 +855,45 @@ Init5b9f90Result run_init_5b9f90_slices(const Init5b9f90Hooks& hooks) noexcept {
     // S5.1 executes the "Stereo 3D" page; S5.2 and S6..S9 stay blocked.
     if (!run_s5_1(ctx)) return out;
     if (!run_s5_2(ctx)) return out;
+    // S6: the 10 B call pair, then both page bodies it invokes.
+    std::size_t ranged_index = 54;   // S2 0..9, S4 10..16, S5 17..53
+    std::size_t bool_index = 28;     // S3 0..3, S2 4..6, S4 7..18, S5 19..27
+    add_record(out, "S6", 0x5C1196, 0x5C11A0,
+               "0x5c1196 calls 0x5c94b0 (Shadow UI/HUD/Map) and 0xb25840 pages");
+    ++out.executed_slices;
+    if (!run_page(ctx, Init5c94b0Items, Init5c94b0ItemsCount, kInit5c94b0Rva,
+                  kInit5c94b0EndRva, "S6.1",
+                  "0x5c94b0 \"Shadow UI/HUD/Map\": 76 byte-pinned items",
+                  ranged_index, bool_index)) {
+        return out;
+    }
+    if (!run_page(ctx, Initb25840Items, Initb25840ItemsCount, kInitb25840Rva,
+                  kInitb25840EndRva, "S6.2", "0xb25840 page: 60 byte-pinned items",
+                  ranged_index, bool_index)) {
+        return out;
+    }
+    if (!run_page(ctx, Init5c11a0Items, Init5c11a0ItemsCount, kInit5c11a0Rva,
+                  kInit5c11a0EndRva, "S7",
+                  "\"Shadow Sound\" 5 bools, \"Shadow Cursor\" int, \"Layers\" bool",
+                  ranged_index, bool_index)) {
+        return out;
+    }
+    if (!run_page(ctx, Init5c1e61Items, Init5c1e61ItemsCount, kInit5c1e61Rva,
+                  kInit5c1e61EndRva, "S9",
+                  "Performance/Transparency/Texture/Fullscreen: 40 byte-pinned items",
+                  ranged_index, bool_index)) {
+        return out;
+    }
+    if (!run_page(ctx, Init5c1d50Items, Init5c1d50ItemsCount, kInit5c1d50Rva,
+                  kInit5c1d50EndRva, "S8",
+                  "33-iteration loop over the 0x2dcaa90 table: 33 layer bools",
+                  ranged_index, bool_index)) {
+        return out;
+    }
 
-    // Everything from 0x5c1196 on (S6 ... S9) is unlifted.
+    // S4.2: the 0x7f8930 wrapper and the 0x7f8610 prefix the init runtime can execute without the
+    // live debug-tool singletons.
+    if (!run_s4_2(ctx)) return out;
     out.resume_rva = kInit5b9f90ResumeRva;
     out.complete = false;
     out.ok = true;

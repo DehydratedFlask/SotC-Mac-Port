@@ -58,15 +58,15 @@ struct Fixture {
     DebugMenuRegistry menu{};
     ConCmdRegistry registry{};
     StartupAtexitLog atexit{};
-    std::array<DebugMenuItem, 192> items{};
+    std::array<DebugMenuItem, 512> items{};
     std::array<bool, 8> toggle_values{};
-    std::array<ConCmdBoolVar, 32> vars{};
-    std::array<bool, 32> var_values{};
-    std::array<bool, 32> var_guards{};
-    std::array<ConCmdRangedVar, 64> ranged{};
-    std::array<float, 64> ranged_values{};
-    std::array<std::int32_t, 64> ranged_int_values{};
-    std::array<bool, 64> ranged_guards{};
+    std::array<ConCmdBoolVar, 128> vars{};
+    std::array<bool, 128> var_values{};
+    std::array<bool, 128> var_guards{};
+    std::array<ConCmdRangedVar, 256> ranged{};
+    std::array<float, 256> ranged_values{};
+    std::array<std::int32_t, 256> ranged_int_values{};
+    std::array<bool, 256> ranged_guards{};
     std::uint64_t canary = 0;
     Init5b9f90Hooks hooks{};
 
@@ -156,33 +156,33 @@ int main() {
         CHECK(!r.complete);
         CHECK(r.blocked == nullptr);
         CHECK(r.resume_rva == kInit5b9f90ResumeRva);
-        CHECK(kInit5b9f90ResumeRva == 0x5C1196);
-        CHECK(r.groups == 12);   // + S5.2 Dynamic 3D + wormhole group
+        CHECK(kInit5b9f90ResumeRva == 0x5BA041);
+        CHECK(r.groups == 26);   // + S5.2 Dynamic 3D + wormhole group
         CHECK(r.commands == 41);   // + 3 S5.2 keyframe commands   // 37 S3 + the S2 credits-level command
         CHECK(r.toggles == 8);
         CHECK(r.float_items == 4);
-        CHECK(r.named_vars == 28);   // + 9 S5.2 bool variables   // 7 (S3.4/S2) + 12 S4.1 bool variables
-        CHECK(r.separators == 13);   // + 7 S5.2 separators
-        CHECK(r.sliders == 45);   // + 28 S5.2 floats      // 10 S2 + 5 S4.1 + 2 S5.1
-        CHECK(r.int_sliders == 9);   // + 7 S5.2 0xc580 ints   // S4.1 0xc580
+        CHECK(r.named_vars == 116);   // + 9 S5.2 bool variables   // 7 (S3.4/S2) + 12 S4.1 bool variables
+        CHECK(r.separators == 29);   // + 7 S5.2 separators
+        CHECK(r.sliders == 132);   // + 28 S5.2 floats      // 10 S2 + 5 S4.1 + 2 S5.1
+        CHECK(r.int_sliders == 23);   // + 7 S5.2 0xc580 ints   // S4.1 0xc580
         CHECK(r.s2_executed);
         CHECK(r.s2_items == 21);
         CHECK(r.s4_executed);
         CHECK(r.s4_items == 20);   // group + 7 sliders + 12 bool items
         CHECK(r.s4_bytes == kInit5dbf40Size);
-        CHECK(r.registered == 160);   // 81 + 20 S4.1 + 3 S5.1 items
+        CHECK(r.registered == 379);   // 81 + 20 S4.1 + 3 S5.1 items
         CHECK(r.contracts == 2);     // S1 0x2170 + S4.2 0x7f8930
-        CHECK(r.releases == 279);
-        CHECK(r.destroys == 120);
-        CHECK(r.executed_slices == 11);
+        CHECK(r.releases == 671);
+        CHECK(r.destroys == 339);
+        CHECK(r.executed_slices == 18);
         CHECK(r.s5_executed);
         CHECK(r.s5_items == 59);
-        CHECK(r.s5_bytes == kInit5b9f90S5_1Size + kInit5b9f90S5_2Size);
+        CHECK(r.s5_bytes == kInit5b9f90S5_2EndRva - kInit5b9f90S5Rva);
         CHECK(r.canary_stored);
-        CHECK(r.items_used == 160);
+        CHECK(r.items_used == 379);
         CHECK(f.items[0].kind == 1);   // the storage the root list points into
         CHECK(f.canary == f.hooks.canary_token);
-        CHECK(r.record_count == 11);
+        CHECK(r.record_count == 18);
         CHECK(r.records[0].callee_rva == kInit5b9f90Rva);
         CHECK(r.records[1].callee_rva == kInit5cf140Rva);
         CHECK(r.records[2].callee_rva == 0x5BA04B);
@@ -192,16 +192,23 @@ int main() {
         CHECK(r.records[6].callee_rva == 0x5BC377);
         CHECK(r.records[7].callee_rva == 0x5BC3C7);
         CHECK(r.records[8].callee_rva == kInit5dbf40Rva);
-        CHECK(r.records[9].callee_rva == 0x5BC413);
+        CHECK(r.records[9].callee_rva == kInit5b9f90S5Rva);
         CHECK(r.records[10].callee_rva == kInit5b9f90S5_2Rva);
+        CHECK(r.records[11].callee_rva == 0x5C1196);
+        CHECK(r.records[12].callee_rva == kInit5c94b0Rva);
+        CHECK(r.records[13].callee_rva == kInitb25840Rva);
+        CHECK(r.records[14].callee_rva == kInit5c11a0Rva);
+        CHECK(r.records[15].callee_rva == kInit5c1e61Rva);
+        CHECK(r.records[16].callee_rva == kInit5c1d50Rva);
+        CHECK(r.s4_2_executed && r.s4_2_label_len == 2);
         for (std::size_t i = 0; i < r.record_count; ++i) {
             CHECK(r.records[i].executed);
             CHECK(r.records[i].caller != nullptr && std::strcmp(r.records[i].caller, "0x5b9f90") == 0);
             CHECK(std::strstr(r.records[i].detail, "slice S") != nullptr);
         }
-        CHECK(f.menu.root.count == 160);
+        CHECK(f.menu.root.count == 379);
         // root + 17 + S4.1 (19) + S5.1 (2)
-        CHECK(f.atexit.size() == 82);
+        CHECK(f.atexit.size() == 271);
 
         // 2. root-list shape: S0, S3.1, S3.2.
         check_item(*root_at(f.menu, 0), 1, "CP10", "Shadow", "Shadow", 0);

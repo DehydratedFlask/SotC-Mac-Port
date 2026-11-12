@@ -1,7 +1,7 @@
 {
- "executed_bytes": 29127,
- "total_executed_bytes": 42186,
- "resume_rva": 6033814,
+ "executed_bytes": 46876,
+ "total_executed_bytes": 108325,
+ "resume_rva": 6004801,
  "body": {
   "rva": 6004624,
   "end_rva": 6051505,

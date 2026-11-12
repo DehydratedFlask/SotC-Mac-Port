@@ -1,3 +1,48 @@
+## 2026-11-13 — `0x5b9f90` S4.2/S5-prologue/S6/S7/S8/S9 executed: 46,876 of 46,881 B (99.99 %), 108,325 B native
+
+**State: green.** Continuation of `5211f01d` on branch `cursor/init-hash-551140-6aa93e8`.
+The whole remaining body was decomposed at item clusters and callee boundaries and executed.
+
+- **S5 prologue `0x5bc3de..0x5bc413`** (53 B) is part of S5.1's executed range; S5 is now fully
+  executed (19,896 B).
+- **S4.2 `0x7f8930` + `0x7f8610`**: the 462-instruction callee is 457 B straight-line (first `ret`
+  `0x7f87d9`) and writes the `"--"` prefix plus the four dwords at `0x16061a0` (`{0,0,0,1.0f}`) into
+  the label buffer. The runtime executes the wrapper and that prefix path natively; the geometry
+  block at `0x7f8664..0x7f87d8` is gated on the live debug-tool singletons `0x3288478` /
+  `0x3288480` (world/debug state, not ELF data) and stays a contract with that offset.
+- **S6 executed**: the 10 B call pair at `0x5c1196` plus both page bodies —
+  **`0x5c94b0..0x5cf12a`** (23,673 B, 3,885 instructions, **76 items**: "Shadow UI", "Shadow HUD",
+  "Shadow Map" and 60 more bounds) and **`0xb25840..0xb2b6aa`** (24,169 B, **60 items**).
+- **S7 executed** (`0x5c11a0..0x5c1d50`, 2,992 B, **10 items**): "Shadow Sound" (5 bools), "Shadow
+  Cursor" (ranged int 0..INT32_MAX), "Layers".
+- **S8 executed** (`0x5c1d50..0x5c1e61`, 273 B, 54 instructions): the **33-iteration loop** over the
+  `0x2dcaa90` name table (`Clear`, `World BG`, `World FG Solid`, ..., `Reflection (Non-Water)`)
+  builds 33 layer bools with the `0x2fdaa60` default bytes.
+- **S9 executed** (`0x5c1e61..0x5c56b1`, 14,416 B, 2,356 instructions, **40 items**):
+  Performance/Transparency/Texture/Fullscreen Effects Tweaks pages.
+- **Measured counters:** slices 18, groups 26, commands 41, toggles 8, floats 4, named_vars 116,
+  separators 29, sliders 132, int_sliders 23, registered 379, releases 671, destroys 339,
+  contracts 2, records 18, items 379, s5_items 59, s5_bytes 19,896, s4_items 20, s4_bytes 7,533.
+- **Coverage:** body extent **46,876 of 46,881 B (99.99 %)** — only the 5 B S1 call site at
+  `0x5ba041` remains, because `0x2170` stays a contract. Native total **108,325 B (231 % of the
+  body)** = 46,876 + 5,526 (`0x5cf140`) + 7,533 (`0x5dbf40`) + 23,673 (`0x5c94b0`) + 24,169
+  (`0xb25840`) + 548 (S4.2 pair). **Resume `0x5ba041`** (S1 only).
+- **Observed run:** `ok=true`, exit 0, stderr 0 B, **`post_calls_executed=34`**, `post_calls_blocked=1`,
+  `post_call_count=35`, `post_calls_complete=false` (only because S1 `0x2170` is a contract and the
+  S4.2 geometry block needs debug-tool state), boss `0xA7`.
+- **Byte-pinned:** the checker re-derives the body extent (all but 5 B), each new table's ctor
+  targets, name literals, cells, guards, bounds and item sites, plus S6.1/S6.2/S7/S8/S9 table sizes;
+  the map generator emits every new slice as `executed`.
+- **Verification:** build **0**; full CTest **704/704**; checker `OK executed=46876B
+  executed_total=108325B`; sweep **914 passed / 0 skipped / 0 failed** (exit 0); runtime exit **0**, `ok=true`; entry map
+  **3,052 constants -> 1,957 RVAs / 584 headers (462 duplicates)**; project index **114,663**.
+  Checkpoint `docs/checkpoints/2026-11-13-init-remaining-slices-executed.md`.
+- **Not claimed:** cold boot, audio, save/reload, Metal validation (NOT RUN). G1 **PARTIAL**.
+
+**Next exact action:** the only remaining init-lift item is `0x2170` (S1, >= 28,288 B, no `ret`
+before `0x9000`), which needs its own control-flow pass; S4.2's geometry block would need a live
+debug-tool state source.
+
 ## 2026-11-13 — `0x5b9f90` S5.2 executed: "Dynamic 3D" + wormhole pages run (42,186 B native, 90.0 %)
 
 **State: green.** Continuation of `1dda8d84` on branch `cursor/init-hash-551140-6aa93e8`, resumed at

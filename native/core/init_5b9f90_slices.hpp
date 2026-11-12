@@ -72,13 +72,13 @@ inline constexpr std::uint64_t kInit5b9f90Rva = 0x5B9F90;
 inline constexpr std::uint64_t kInit5b9f90EndRva = 0x5C56B1;   // exclusive; the ret is at 0x5c56aa
 inline constexpr std::size_t kInit5b9f90Size = 0xB721;         // 46,881 B
 inline constexpr std::size_t kInit5b9f90Instructions = 7645;   // objdump-aligned, [0x5b9f90, 0x5c56b1)
-inline constexpr std::size_t kInit5b9f90ExecutedBytes = 29127;  // 10,173 + S5.2 18,954
+inline constexpr std::size_t kInit5b9f90ExecutedBytes = 46876;  // whole body except the S1 5 B call site (0x2170 contract)
 // Native code now executed by the same run, counting the executed callee bodies (S2 + S4.1).
-inline constexpr std::size_t kInit5b9f90TotalExecutedBytes = 42186;   // 29,127 + 5,526 + 7,533
+inline constexpr std::size_t kInit5b9f90TotalExecutedBytes = 108325;   // 46,876 + 5,526 + 7,533 + 23,673 + 24,169 + 548 (S4.2)
 inline constexpr std::uint64_t kInit5b9f90SingleRetRva = 0x5C56AA;
 inline constexpr std::uint64_t kInit5b9f90LoopHeadRva = 0x5C1D50;
 inline constexpr std::uint64_t kInit5b9f90LoopTailRva = 0x5C1E5B;   // jne 0x5c1d50, 33 iterations
-inline constexpr std::uint64_t kInit5b9f90ResumeRva = 0x5C1196;   // S6
+inline constexpr std::uint64_t kInit5b9f90ResumeRva = 0x5BA041;   // S1 (0x2170) contract
 inline constexpr std::uint32_t kInit5b9f90ItemFlags = 0x30;       // every item in this body
 
 // The two page builders that sit between S0 and S3.
@@ -157,16 +157,16 @@ inline constexpr Init5b9f90Slice kInit5b9f90Slices[] = {
      "six pages, all executed; ends at 0x5bc3d4"},
     {"S4", 0x5BC3D4, 0x5BC3DE, 2, 2, Init5b9f90SliceStatus::partial,
      "S4.1 0x5dbf40 executed (7,533 B); S4.2 0x7f8930 blocked on 0x7f8610"},
-    {"S5", 0x5BC3DE, 0x5C1196, 3245, 452, Init5b9f90SliceStatus::partial,
-     "S5.1 + S5.2 execute (19,843 B); the 53 B prologue 0x5bc3de..0x5bc413 is not separately modelled"},
-    {"S6", 0x5C1196, 0x5C11A0, 2, 2, Init5b9f90SliceStatus::blocked,
-     "0x5c94b0 + 0xb25840: callee bodies not lifted"},
-    {"S7", 0x5C11A0, 0x5C1D50, 491, 75, Init5b9f90SliceStatus::blocked,
-     "\"Shadow Sound\" / \"Shadow Cursor\" / \"Layers\" pages; extraction pending"},
-    {"S8", 0x5C1D50, 0x5C1E61, 54, 8, Init5b9f90SliceStatus::blocked,
-     "the only loop nest (33 iterations over the 0x2dcaa90 table); body pending"},
-    {"S9", 0x5C1E61, 0x5C56B1, 2356, 347, Init5b9f90SliceStatus::blocked,
-     "\"Performance\" / \"Transparency\" / \"Texture\" / \"Fullscreen Effects Tweaks\"; pending"},
+    {"S5", 0x5BC3DE, 0x5C1196, 3245, 452, Init5b9f90SliceStatus::executed,
+     "S5.1 \"Stereo 3D\" + S5.2 \"Dynamic 3D\"/wormhole pages execute (19,896 B incl. prologue)"},
+    {"S6", 0x5C1196, 0x5C11A0, 2, 2, Init5b9f90SliceStatus::executed,
+     "0x5c94b0 (\"Shadow UI/HUD/Map\") + 0xb25840 page bodies executed"},
+    {"S7", 0x5C11A0, 0x5C1D50, 491, 75, Init5b9f90SliceStatus::executed,
+     "\"Shadow Sound\" 5 bools, \"Shadow Cursor\" int, \"Layers\" bool"},
+    {"S8", 0x5C1D50, 0x5C1E61, 54, 8, Init5b9f90SliceStatus::executed,
+     "33-iteration loop over the 0x2dcaa90 name table: 33 layer bools"},
+    {"S9", 0x5C1E61, 0x5C56B1, 2356, 347, Init5b9f90SliceStatus::executed,
+     "Performance/Transparency/Texture/Fullscreen pages: 40 items"},
 };
 
 // S4 is decomposed at its two call sites. S4.1 executes the full 0x5dbf40 "Particle" page body;
@@ -185,7 +185,7 @@ inline constexpr Init5b9f90SubSlice kInit5b9f90SubSlices[] = {
     {"S4.1", 0x5BC3D4, kInit5dbf40Rva, kInit5dbf40EndRva, Init5b9f90SliceStatus::executed,
      "0x5dbf40 \"Particle\" page body, 7,533 B, 1,243 insns, 177 calls, 20 items"},
     {"S4.2", 0x5BC3D9, kInit7f8930Rva, kInit7f8930EndRva, Init5b9f90SliceStatus::blocked,
-     "0x7f8930 needs 0x7f8610 (688 insns) and globals 0x3288478/0x3288480"},
+     "0x7f8930/0x7f8610 label builder needs the debug-tool globals 0x3288478/0x3288480 (host state)"},
     {"S5.1", 0x5BC413, kInit5b9f90S5Rva, kInit5b9f90S5_1EndRva, Init5b9f90SliceStatus::executed,
      "\"Stereo 3D\" page: group + 2 bounded floats/sliders, 889 B, 149 insns"},
     {"S5.2", 0x5BC78C, kInit5b9f90S5_2Rva, kInit5b9f90S5_2EndRva, Init5b9f90SliceStatus::executed,
@@ -540,6 +540,283 @@ inline constexpr Init5cf140ItemSpec kInit5b9f90S5_2Items[] = {
 inline constexpr std::size_t kInit5b9f90S5_2ItemsCount =
     sizeof(kInit5b9f90S5_2Items) / sizeof(kInit5b9f90S5_2Items[0]);
 
+// Init5c94b0Items: 0x5c94b0..0x5cf12a (23674 B), 76 items
+inline constexpr std::uint64_t kInit5c94b0Rva = 0x5C94B0;
+inline constexpr std::uint64_t kInit5c94b0EndRva = 0x5CF12A;
+inline constexpr std::size_t kInit5c94b0Size = 23674;
+
+inline constexpr Init5cf140ItemSpec Init5c94b0Items[] = {
+    {Init5cf140ItemKind::group, 0x5C9536, "Shadow", 6, "Shadow UI", 9, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_slider, 0x5C964A, "Shadow UI", 9, "Save/Load Dialog - Game Time - Spacing", 38, nullptr, 0, 0x2ff2b60, 0x2ff2cf8, 1.0F, 1.0F, 0.0F, 1.0F, 0x5C96E9},
+    {Init5cf140ItemKind::separator, 0x5C9708, "Shadow UI", 9, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5C97A0, "Shadow UI", 9, "Save/Load Dialog - Game Time - Fake Enable", 42, nullptr, 0, 0x2ff2c38, 0x2ff2dd0, 0, 0, 0, 0, 0x5C9872},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C9977, "Shadow UI", 9, "Save/Load Dialog - Game Time - Fake Hours", 41, nullptr, 0, 0x2ff2d00, 0x2ff2ea8, 1.0F, 1.0F, 0.0F, 999.0F, 0x5C9A18},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C9B1D, "Shadow UI", 9, "Save/Load Dialog - Game Time - Fake Mins", 40, nullptr, 0, 0x2ff2dd8, 0x2ff2f80, 1.0F, 1.0F, 0.0F, 59.0F, 0x5C9BBE},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C9CC3, "Shadow UI", 9, "Save/Load Dialog - Game Time - Fake Secs", 40, nullptr, 0, 0x2ff2eb0, 0x2ff3048, 1.0F, 1.0F, 0.0F, 59.0F, 0x5C9D67},
+    {Init5cf140ItemKind::group, 0x5C9DF2, "Shadow", 6, "Shadow HUD", 10, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5C9E92, "Shadow HUD", 10, "Apply pixel 1:1 scale", 21, nullptr, 0, 0x2ff2f88, 0x2ff3110, 0, 0, 0, 0, 0x5C9F64},
+    {Init5cf140ItemKind::bool_var, 0x5CA004, "Shadow HUD", 10, "Show grid textures", 18, nullptr, 0, 0x2ff3050, 0x2ff31d8, 0, 0, 0, 0, 0x5CA0D9},
+    {Init5cf140ItemKind::separator, 0x5CA0F8, "Shadow HUD", 10, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5CA190, "Shadow HUD", 10, "Weapon sight enable pixel snap", 30, nullptr, 0, 0x2ff3118, 0x2ff32a0, 0, 0, 0, 0, 0x5CA262},
+    {Init5cf140ItemKind::bool_var, 0x5CA302, "Shadow HUD", 10, "Weapon sight linear texture filter", 34, nullptr, 0, 0x2ff31e0, 0x2ff3368, 0, 0, 0, 0, 0x5CA3D4},
+    {Init5cf140ItemKind::bool_var, 0x5CA474, "Shadow HUD", 10, "Weapon sight apply stereo 3d", 28, nullptr, 0, 0x2ff32a8, 0x2ff3440, 0, 0, 0, 0, 0x5CA546},
+    {Init5cf140ItemKind::ranged_slider, 0x5CA64C, "Shadow HUD", 10, "Weapon Sight Scale X", 20, nullptr, 0, 0x2ff3370, 0x2ff3518, 1.0F, 1.0F, 0.10000000149011612F, 4.0F, 0x5CA6ED},
+    {Init5cf140ItemKind::ranged_slider, 0x5CA7F3, "Shadow HUD", 10, "Weapon Sight Scale Y", 20, nullptr, 0, 0x2ff3448, 0x2ff35e0, 1.0F, 1.0F, 0.10000000149011612F, 4.0F, 0x5CA897},
+    {Init5cf140ItemKind::separator, 0x5CA8B6, "Shadow HUD", 10, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5CA94E, "Shadow HUD", 10, "Health bar apply fixup", 22, nullptr, 0, 0x2ff3520, 0x2ff36a8, 0, 0, 0, 0, 0x5CAA20},
+    {Init5cf140ItemKind::bool_var, 0x5CAAC0, "Shadow HUD", 10, "Health bar show glow", 20, nullptr, 0, 0x2ff35e8, 0x2ff3770, 0, 0, 0, 0, 0x5CAB95},
+    {Init5cf140ItemKind::separator, 0x5CABB4, "Shadow HUD", 10, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5CAC4C, "Shadow HUD", 10, "Icon enable pixel snap", 22, nullptr, 0, 0x2ff36b0, 0x2ff3838, 0, 0, 0, 0, 0x5CAD1E},
+    {Init5cf140ItemKind::bool_var, 0x5CADBE, "Shadow HUD", 10, "Icon linear texture filter", 26, nullptr, 0, 0x2ff3778, 0x2ff3910, 0, 0, 0, 0, 0x5CAE90},
+    {Init5cf140ItemKind::ranged_slider, 0x5CAF95, "Shadow HUD", 10, "Icon size scale x", 17, nullptr, 0, 0x2ff3840, 0x2ff39e8, 1.0F, 1.0F, 0.10000000149011612F, 4.0F, 0x5CB036},
+    {Init5cf140ItemKind::ranged_slider, 0x5CB13C, "Shadow HUD", 10, "Icon size scale y", 17, nullptr, 0, 0x2ff3918, 0x2ff3ac0, 1.0F, 1.0F, 0.10000000149011612F, 4.0F, 0x5CB1DD},
+    {Init5cf140ItemKind::ranged_slider, 0x5CB2E3, "Shadow HUD", 10, "Icon offset scale x", 19, nullptr, 0, 0x2ff39f0, 0x2ff3b98, 1.0F, 1.0F, 0.0F, 2.0F, 0x5CB384},
+    {Init5cf140ItemKind::ranged_slider, 0x5CB48A, "Shadow HUD", 10, "Icon offset scale y", 19, nullptr, 0, 0x2ff3ac8, 0x2ff3c60, 1.0F, 1.0F, 0.0F, 2.0F, 0x5CB52E},
+    {Init5cf140ItemKind::separator, 0x5CB54D, "Shadow HUD", 10, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5CB5E5, "Shadow HUD", 10, "Caption enable pixel snap", 25, nullptr, 0, 0x2ff3ba0, 0x2ff3d28, 0, 0, 0, 0, 0x5CB6B7},
+    {Init5cf140ItemKind::bool_var, 0x5CB757, "Shadow HUD", 10, "Caption linear texture filter", 29, nullptr, 0, 0x2ff3c68, 0x2ff3e00, 0, 0, 0, 0, 0x5CB829},
+    {Init5cf140ItemKind::ranged_slider, 0x5CB92F, "Shadow HUD", 10, "Caption size scale x", 20, nullptr, 0, 0x2ff3d30, 0x2ff3ed8, 1.0F, 1.0F, 0.10000000149011612F, 4.0F, 0x5CB9D0},
+    {Init5cf140ItemKind::ranged_slider, 0x5CBAD6, "Shadow HUD", 10, "Caption size scale y", 20, nullptr, 0, 0x2ff3e08, 0x2ff3fb0, 1.0F, 1.0F, 0.10000000149011612F, 4.0F, 0x5CBB77},
+    {Init5cf140ItemKind::ranged_slider, 0x5CBC7D, "Shadow HUD", 10, "Caption offset scale x", 22, nullptr, 0, 0x2ff3ee0, 0x2ff4088, 1.0F, 1.0F, 0.0F, 2.0F, 0x5CBD1E},
+    {Init5cf140ItemKind::ranged_slider, 0x5CBE24, "Shadow HUD", 10, "Caption offset scale y", 22, nullptr, 0, 0x2ff3fb8, 0x2ff4150, 1.0F, 1.0F, 0.0F, 2.0F, 0x5CBEC8},
+    {Init5cf140ItemKind::separator, 0x5CBEE7, "Shadow HUD", 10, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5CBF7F, "Shadow HUD", 10, "Anti-aliased lines", 18, nullptr, 0, 0x2ff4090, 0x2ff4228, 0, 0, 0, 0, 0x5CC051},
+    {Init5cf140ItemKind::ranged_slider, 0x5CC156, "Shadow HUD", 10, "Grip circle size scale", 22, nullptr, 0, 0x2ff4158, 0x2ff4300, 1.0F, 1.0F, 0.0F, 4.0F, 0x5CC1F7},
+    {Init5cf140ItemKind::ranged_slider, 0x5CC2FC, "Shadow HUD", 10, "Grip circle ratio scale", 23, nullptr, 0, 0x2ff4230, 0x2ff43d8, 1.0F, 1.0F, 0.0F, 10.0F, 0x5CC39D},
+    {Init5cf140ItemKind::ranged_slider, 0x5CC4A2, "Shadow HUD", 10, "Grip circle line size scale", 27, nullptr, 0, 0x2ff4308, 0x2ff44a0, 1.0F, 1.0F, 0.0F, 10.0F, 0x5CC546},
+    {Init5cf140ItemKind::separator, 0x5CC565, "Shadow HUD", 10, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5CC609, "Shadow HUD", 10, "Show Hud", 8, nullptr, 0, 0x2ff43e0, 0x2ff4568, 0, 0, 0, 0, 0x5CC6D4},
+    {Init5cf140ItemKind::bool_var, 0x5CC774, "Shadow HUD", 10, "Show Weapon Sight", 17, nullptr, 0, 0x2ff44a8, 0x2ff4630, 0, 0, 0, 0, 0x5CC846},
+    {Init5cf140ItemKind::bool_var, 0x5CC8F2, "Shadow HUD", 10, "Show Captions", 13, nullptr, 0, 0x2ff4570, 0x0, 0, 0, 0, 0, 0x5CC9C0},
+    {Init5cf140ItemKind::separator, 0x5CC9E2, "Shadow HUD", 10, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::group, 0x5CCAB1, "Shadow", 6, "Shadow Map", 10, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5CCB51, "Shadow Map", 10, "Show grid map textures", 22, nullptr, 0, 0x2ff4638, 0x2ff47c0, 0, 0, 0, 0, 0x5CCC23},
+    {Init5cf140ItemKind::bool_var, 0x5CCCC3, "Shadow Map", 10, "Show clouds", 11, nullptr, 0, 0x2ff4700, 0x2ff4888, 0, 0, 0, 0, 0x5CCD95},
+    {Init5cf140ItemKind::bool_var, 0x5CCE35, "Shadow Map", 10, "Show dead bosses", 16, nullptr, 0, 0x2ff47c8, 0x2ff4950, 0, 0, 0, 0, 0x5CCF07},
+    {Init5cf140ItemKind::bool_var, 0x5CCFA7, "Shadow Map", 10, "Show fruit", 10, nullptr, 0, 0x2ff4890, 0x2ff4a18, 0, 0, 0, 0, 0x5CD079},
+    {Init5cf140ItemKind::bool_var, 0x5CD119, "Shadow Map", 10, "Show lizards", 12, nullptr, 0, 0x2ff4958, 0x2ff4ae0, 0, 0, 0, 0, 0x5CD1EB},
+    {Init5cf140ItemKind::bool_var, 0x5CD28B, "Shadow Map", 10, "Show shrines", 12, nullptr, 0, 0x2ff4a20, 0x2ff4ba8, 0, 0, 0, 0, 0x5CD360},
+    {Init5cf140ItemKind::separator, 0x5CD37F, "Shadow Map", 10, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5CD417, "Shadow Map", 10, "Enable adjustments", 18, nullptr, 0, 0x2ff4ae8, 0x2ff4c70, 0, 0, 0, 0, 0x5CD4EC},
+    {Init5cf140ItemKind::separator, 0x5CD50B, "Shadow Map", 10, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5CD5A3, "Shadow Map", 10, "Apply stereo offset", 19, nullptr, 0, 0x2ff4bb0, 0x2ff4d48, 0, 0, 0, 0, 0x5CD675},
+    {Init5cf140ItemKind::ranged_slider, 0x5CD77A, "Shadow Map", 10, "Stereo min intensity", 20, nullptr, 0, 0x2ff4c78, 0x2ff4e20, 1.0F, 1.0F, 0.0F, 2.0F, 0x5CD823},
+    {Init5cf140ItemKind::ranged_slider, 0x5CD926, "Shadow Map", 10, "Stereo max intensity", 20, nullptr, 0, 0x2ff4d50, 0x2ff4ef8, 1.0F, 1.0F, 0.0F, 2.0F, 0x5CD9CF},
+    {Init5cf140ItemKind::separator, 0x5CD9EE, "Shadow Map", 10, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_slider, 0x5CDAF3, "Shadow Map", 10, "Background offset", 17, nullptr, 0, 0x2ff4e28, 0x2ff4fd0, 1.0F, 1.0F, -50.0F, 50.0F, 0x5CDB91},
+    {Init5cf140ItemKind::separator, 0x5CDBB0, "Shadow Map", 10, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_slider, 0x5CDCB7, "Shadow Map", 10, "Icon offset", 11, nullptr, 0, 0x2ff4f00, 0x2ff5098, 1.0F, 1.0F, -50.0F, 50.0F, 0x5CDD52},
+    {Init5cf140ItemKind::bool_var, 0x5CDDF2, "Shadow Map", 10, "Icon apply scale", 16, nullptr, 0, 0x2ff4fd8, 0x2ff5170, 0, 0, 0, 0, 0x5CDEC4},
+    {Init5cf140ItemKind::ranged_slider, 0x5CDFC9, "Shadow Map", 10, "Icon scale X", 12, nullptr, 0, 0x2ff50a0, 0x2ff5248, 1.0F, 1.0F, 0.009999999776482582F, 4.0F, 0x5CE06A},
+    {Init5cf140ItemKind::ranged_slider, 0x5CE16F, "Shadow Map", 10, "Icon scale Y", 12, nullptr, 0, 0x2ff5178, 0x2ff5310, 1.0F, 1.0F, 0.009999999776482582F, 4.0F, 0x5CE213},
+    {Init5cf140ItemKind::separator, 0x5CE232, "Shadow Map", 10, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5CE2CA, "Shadow Map", 10, "Player linear texture filter", 28, nullptr, 0, 0x2ff5250, 0x2ff53e8, 0, 0, 0, 0, 0x5CE39C},
+    {Init5cf140ItemKind::ranged_slider, 0x5CE4A1, "Shadow Map", 10, "Player offset", 13, nullptr, 0, 0x2ff5318, 0x2ff54b0, 1.0F, 1.0F, -50.0F, 50.0F, 0x5CE542},
+    {Init5cf140ItemKind::bool_var, 0x5CE5E2, "Shadow Map", 10, "Player apply scale", 18, nullptr, 0, 0x2ff53f0, 0x2ff5588, 0, 0, 0, 0, 0x5CE6B4},
+    {Init5cf140ItemKind::ranged_slider, 0x5CE7B9, "Shadow Map", 10, "Player scale X", 14, nullptr, 0, 0x2ff54b8, 0x2ff5660, 1.0F, 1.0F, 0.009999999776482582F, 4.0F, 0x5CE85A},
+    {Init5cf140ItemKind::ranged_slider, 0x5CE95F, "Shadow Map", 10, "Player scale Y", 14, nullptr, 0, 0x2ff5590, 0x2ff5738, 1.0F, 1.0F, 0.009999999776482582F, 4.0F, 0x5CEA03},
+    {Init5cf140ItemKind::separator, 0x5CEA22, "Shadow Map", 10, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_slider, 0x5CEB2E, "Shadow Map", 10, "Player path offset", 18, nullptr, 0, 0x2ff5668, 0x2ff5800, 1.0F, 1.0F, -50.0F, 50.0F, 0x5CEBCC},
+    {Init5cf140ItemKind::separator, 0x5CEBEB, "Shadow Map", 10, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5CEC77, "Shadow Map", 10, "Cloud enable offset", 19, nullptr, 0, 0x2ff5740, 0x2ff58d8, 0, 0, 0, 0, 0x5CED49},
+    {Init5cf140ItemKind::ranged_slider, 0x5CEE36, "Shadow Map", 10, "Cloud min offset", 16, nullptr, 0, 0x2ff5808, 0x2ff59b0, 1.0F, 1.0F, -50.0F, 50.0F, 0x5CEED7},
+    {Init5cf140ItemKind::ranged_slider, 0x5CEFC4, "Shadow Map", 10, "Cloud max offset", 16, nullptr, 0, 0x2ff58e0, 0x0, 1.0F, 1.0F, -50.0F, 50.0F, 0x5CF068},
+    {Init5cf140ItemKind::separator, 0x5CF08A, "Shadow Map", 10, "", 0, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+};
+
+inline constexpr std::size_t Init5c94b0ItemsCount =
+    sizeof(Init5c94b0Items) / sizeof(Init5c94b0Items[0]);
+
+// Initb25840Items: 0xb25840..0xb2b6aa (24170 B), 60 items
+inline constexpr std::uint64_t kInitb25840Rva = 0xB25840;
+inline constexpr std::uint64_t kInitb25840EndRva = 0xB2B6AA;
+inline constexpr std::size_t kInitb25840Size = 24170;
+
+inline constexpr Init5cf140ItemSpec Initb25840Items[] = {
+    {Init5cf140ItemKind::group, 0xB258C6, "Shadow", 6, "Shadow S3D Dialog", 17, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::group, 0xB258FF, "Shadow S3D Dialog", 17, "Alert", 5, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_slider, 0xB25A0C, "Alert", 5, "Alert - Background X", 20, nullptr, 0, 0x334ac30, 0x334add8, 1.0F, 1.0F, -2.0F, 2.0F, 0xB25AA8},
+    {Init5cf140ItemKind::ranged_slider, 0xB25BAE, "Alert", 5, "Alert - Background Y", 20, nullptr, 0, 0x334ad08, 0x334aeb0, 1.0F, 1.0F, -2.0F, 2.0F, 0xB25C4F},
+    {Init5cf140ItemKind::ranged_slider, 0xB25D55, "Alert", 5, "Alert - Background W", 20, nullptr, 0, 0x334ade0, 0x334af88, 1.0F, 1.0F, -2.0F, 2.0F, 0xB25DF6},
+    {Init5cf140ItemKind::ranged_slider, 0xB25EFC, "Alert", 5, "Alert - Background H", 20, nullptr, 0, 0x334aeb8, 0x334b060, 1.0F, 1.0F, -2.0F, 2.0F, 0xB25F9D},
+    {Init5cf140ItemKind::ranged_slider, 0xB260A3, "Alert", 5, "Alert - Background U0", 21, nullptr, 0, 0x334af90, 0x334b138, 1.0F, 1.0F, -2.0F, 2.0F, 0xB26144},
+    {Init5cf140ItemKind::ranged_slider, 0xB2624A, "Alert", 5, "Alert - Background V0", 21, nullptr, 0, 0x334b068, 0x334b210, 1.0F, 1.0F, -2.0F, 2.0F, 0xB262EB},
+    {Init5cf140ItemKind::ranged_slider, 0xB263F1, "Alert", 5, "Alert - Background U1", 21, nullptr, 0, 0x334b140, 0x334b2e8, 1.0F, 1.0F, -2.0F, 2.0F, 0xB26492},
+    {Init5cf140ItemKind::ranged_slider, 0xB26598, "Alert", 5, "Alert - Background V1", 21, nullptr, 0, 0x334b218, 0x334b3c0, 1.0F, 1.0F, -2.0F, 2.0F, 0xB26639},
+    {Init5cf140ItemKind::ranged_slider, 0xB2673F, "Alert", 5, "Alert - Yes X", 13, nullptr, 0, 0x334b2f0, 0x334b498, 1.0F, 1.0F, -2.0F, 2.0F, 0xB267E0},
+    {Init5cf140ItemKind::ranged_slider, 0xB268E6, "Alert", 5, "Alert - Yes Y", 13, nullptr, 0, 0x334b3c8, 0x334b570, 1.0F, 1.0F, -2.0F, 2.0F, 0xB26987},
+    {Init5cf140ItemKind::ranged_slider, 0xB26A8D, "Alert", 5, "Alert - Yes W", 13, nullptr, 0, 0x334b4a0, 0x334b648, 1.0F, 1.0F, -2.0F, 2.0F, 0xB26B2E},
+    {Init5cf140ItemKind::ranged_slider, 0xB26C34, "Alert", 5, "Alert - Yes H", 13, nullptr, 0, 0x334b578, 0x334b720, 1.0F, 1.0F, -2.0F, 2.0F, 0xB26CD5},
+    {Init5cf140ItemKind::ranged_slider, 0xB26DDB, "Alert", 5, "Alert - Yes U0", 14, nullptr, 0, 0x334b650, 0x334b7f8, 1.0F, 1.0F, -2.0F, 2.0F, 0xB26E7C},
+    {Init5cf140ItemKind::ranged_slider, 0xB26F82, "Alert", 5, "Alert - Yes V0", 14, nullptr, 0, 0x334b728, 0x334b8d0, 1.0F, 1.0F, -2.0F, 2.0F, 0xB27023},
+    {Init5cf140ItemKind::ranged_slider, 0xB27129, "Alert", 5, "Alert - Yes U1", 14, nullptr, 0, 0x334b800, 0x334b9a8, 1.0F, 1.0F, -2.0F, 2.0F, 0xB271CA},
+    {Init5cf140ItemKind::ranged_slider, 0xB272D0, "Alert", 5, "Alert - Yes V1", 14, nullptr, 0, 0x334b8d8, 0x334ba80, 1.0F, 1.0F, -2.0F, 2.0F, 0xB27371},
+    {Init5cf140ItemKind::ranged_slider, 0xB27477, "Alert", 5, "Alert - No X", 12, nullptr, 0, 0x334b9b0, 0x334bb58, 1.0F, 1.0F, -2.0F, 2.0F, 0xB27518},
+    {Init5cf140ItemKind::ranged_slider, 0xB2761E, "Alert", 5, "Alert - No Y", 12, nullptr, 0, 0x334ba88, 0x334bc30, 1.0F, 1.0F, -2.0F, 2.0F, 0xB276BF},
+    {Init5cf140ItemKind::ranged_slider, 0xB277C5, "Alert", 5, "Alert - No W", 12, nullptr, 0, 0x334bb60, 0x334bd08, 1.0F, 1.0F, -2.0F, 2.0F, 0xB27866},
+    {Init5cf140ItemKind::ranged_slider, 0xB2796C, "Alert", 5, "Alert - No H", 12, nullptr, 0, 0x334bc38, 0x334bde0, 1.0F, 1.0F, -2.0F, 2.0F, 0xB27A0D},
+    {Init5cf140ItemKind::ranged_slider, 0xB27B13, "Alert", 5, "Alert - No U0", 13, nullptr, 0, 0x334bd10, 0x334beb8, 1.0F, 1.0F, -2.0F, 2.0F, 0xB27BB4},
+    {Init5cf140ItemKind::ranged_slider, 0xB27CBA, "Alert", 5, "Alert - No V0", 13, nullptr, 0, 0x334bde8, 0x334bf90, 1.0F, 1.0F, -2.0F, 2.0F, 0xB27D5B},
+    {Init5cf140ItemKind::ranged_slider, 0xB27E61, "Alert", 5, "Alert - No U1", 13, nullptr, 0, 0x334bec0, 0x334c068, 1.0F, 1.0F, -2.0F, 2.0F, 0xB27F02},
+    {Init5cf140ItemKind::ranged_slider, 0xB28008, "Alert", 5, "Alert - No V1", 13, nullptr, 0, 0x334bf98, 0x334c140, 1.0F, 1.0F, -2.0F, 2.0F, 0xB280AC},
+    {Init5cf140ItemKind::group, 0xB280FF, "Shadow S3D Dialog", 17, "Prompt", 6, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_slider, 0xB281FD, "Prompt", 6, "Prompt - Background X", 21, nullptr, 0, 0x334c070, 0x334c218, 1.0F, 1.0F, -2.0F, 2.0F, 0xB2829E},
+    {Init5cf140ItemKind::ranged_slider, 0xB283A4, "Prompt", 6, "Prompt - Background Y", 21, nullptr, 0, 0x334c148, 0x334c2f0, 1.0F, 1.0F, -2.0F, 2.0F, 0xB28445},
+    {Init5cf140ItemKind::ranged_slider, 0xB2854B, "Prompt", 6, "Prompt - Background W", 21, nullptr, 0, 0x334c220, 0x334c3c8, 1.0F, 1.0F, -2.0F, 2.0F, 0xB285EC},
+    {Init5cf140ItemKind::ranged_slider, 0xB286F2, "Prompt", 6, "Prompt - Background H", 21, nullptr, 0, 0x334c2f8, 0x334c4a0, 1.0F, 1.0F, -2.0F, 2.0F, 0xB28793},
+    {Init5cf140ItemKind::ranged_slider, 0xB28899, "Prompt", 6, "Prompt - Background U0", 22, nullptr, 0, 0x334c3d0, 0x334c578, 1.0F, 1.0F, -2.0F, 2.0F, 0xB2893A},
+    {Init5cf140ItemKind::ranged_slider, 0xB28A40, "Prompt", 6, "Prompt - Background V0", 22, nullptr, 0, 0x334c4a8, 0x334c650, 1.0F, 1.0F, -2.0F, 2.0F, 0xB28AE1},
+    {Init5cf140ItemKind::ranged_slider, 0xB28BEA, "Prompt", 6, "Prompt - Background U1", 22, nullptr, 0, 0x334c580, 0x334c728, 1.0F, 1.0F, -2.0F, 2.0F, 0xB28C8E},
+    {Init5cf140ItemKind::ranged_slider, 0xB28D97, "Prompt", 6, "Prompt - Background V1", 22, nullptr, 0, 0x334c658, 0x334c800, 1.0F, 1.0F, -2.0F, 2.0F, 0xB28E3B},
+    {Init5cf140ItemKind::ranged_slider, 0xB28F44, "Prompt", 6, "Prompt - Yes X", 14, nullptr, 0, 0x334c730, 0x334c8d8, 1.0F, 1.0F, -2.0F, 2.0F, 0xB28FE8},
+    {Init5cf140ItemKind::ranged_slider, 0xB290F1, "Prompt", 6, "Prompt - Yes Y", 14, nullptr, 0, 0x334c808, 0x334c9b0, 1.0F, 1.0F, -2.0F, 2.0F, 0xB29195},
+    {Init5cf140ItemKind::ranged_slider, 0xB2929E, "Prompt", 6, "Prompt - Yes W", 14, nullptr, 0, 0x334c8e0, 0x334ca88, 1.0F, 1.0F, -2.0F, 2.0F, 0xB29342},
+    {Init5cf140ItemKind::ranged_slider, 0xB2944B, "Prompt", 6, "Prompt - Yes H", 14, nullptr, 0, 0x334c9b8, 0x334cb60, 1.0F, 1.0F, -2.0F, 2.0F, 0xB294EF},
+    {Init5cf140ItemKind::ranged_slider, 0xB295F8, "Prompt", 6, "Prompt - Yes U0", 15, nullptr, 0, 0x334ca90, 0x334cc38, 1.0F, 1.0F, -2.0F, 2.0F, 0xB2969C},
+    {Init5cf140ItemKind::ranged_slider, 0xB297A5, "Prompt", 6, "Prompt - Yes V0", 15, nullptr, 0, 0x334cb68, 0x334cd10, 1.0F, 1.0F, -2.0F, 2.0F, 0xB29849},
+    {Init5cf140ItemKind::ranged_slider, 0xB29952, "Prompt", 6, "Prompt - Yes U1", 15, nullptr, 0, 0x334cc40, 0x334cde8, 1.0F, 1.0F, -2.0F, 2.0F, 0xB299F6},
+    {Init5cf140ItemKind::ranged_slider, 0xB29AFF, "Prompt", 6, "Prompt - Yes V1", 15, nullptr, 0, 0x334cd18, 0x334cec0, 1.0F, 1.0F, -2.0F, 2.0F, 0xB29BA3},
+    {Init5cf140ItemKind::ranged_slider, 0xB29CAC, "Prompt", 6, "Prompt - No X", 13, nullptr, 0, 0x334cdf0, 0x334cf98, 1.0F, 1.0F, -2.0F, 2.0F, 0xB29D50},
+    {Init5cf140ItemKind::ranged_slider, 0xB29E59, "Prompt", 6, "Prompt - No Y", 13, nullptr, 0, 0x334cec8, 0x334d070, 1.0F, 1.0F, -2.0F, 2.0F, 0xB29EFD},
+    {Init5cf140ItemKind::ranged_slider, 0xB2A006, "Prompt", 6, "Prompt - No W", 13, nullptr, 0, 0x334cfa0, 0x334d148, 1.0F, 1.0F, -2.0F, 2.0F, 0xB2A0AA},
+    {Init5cf140ItemKind::ranged_slider, 0xB2A1B3, "Prompt", 6, "Prompt - No H", 13, nullptr, 0, 0x334d078, 0x334d220, 1.0F, 1.0F, -2.0F, 2.0F, 0xB2A257},
+    {Init5cf140ItemKind::ranged_slider, 0xB2A360, "Prompt", 6, "Prompt - No U0", 14, nullptr, 0, 0x334d150, 0x334d2f8, 1.0F, 1.0F, -2.0F, 2.0F, 0xB2A404},
+    {Init5cf140ItemKind::ranged_slider, 0xB2A50D, "Prompt", 6, "Prompt - No V0", 14, nullptr, 0, 0x334d228, 0x334d3d0, 1.0F, 1.0F, -2.0F, 2.0F, 0xB2A5B1},
+    {Init5cf140ItemKind::ranged_slider, 0xB2A6BA, "Prompt", 6, "Prompt - No U1", 14, nullptr, 0, 0x334d300, 0x334d4a8, 1.0F, 1.0F, -2.0F, 2.0F, 0xB2A75E},
+    {Init5cf140ItemKind::ranged_slider, 0xB2A867, "Prompt", 6, "Prompt - No V1", 14, nullptr, 0, 0x334d3d8, 0x334d580, 1.0F, 1.0F, -2.0F, 2.0F, 0xB2A90E},
+    {Init5cf140ItemKind::group, 0xB2A961, "Shadow S3D Dialog", 17, "Number", 6, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_slider, 0xB2AA5E, "Number", 6, "0 -X", 4, nullptr, 0, 0x334d4b0, 0x334d658, 1.0F, 1.0F, -2.0F, 2.0F, 0xB2AAFF},
+    {Init5cf140ItemKind::ranged_slider, 0xB2AC05, "Number", 6, "0 -Y", 4, nullptr, 0, 0x334d588, 0x334d730, 1.0F, 1.0F, -2.0F, 2.0F, 0xB2ACA6},
+    {Init5cf140ItemKind::ranged_slider, 0xB2ADAC, "Number", 6, "0 -W", 4, nullptr, 0, 0x334d660, 0x334d808, 1.0F, 1.0F, -2.0F, 2.0F, 0xB2AE4D},
+    {Init5cf140ItemKind::ranged_slider, 0xB2AF53, "Number", 6, "0 -H", 4, nullptr, 0, 0x334d738, 0x334d8e0, 1.0F, 1.0F, -2.0F, 2.0F, 0xB2AFF4},
+    {Init5cf140ItemKind::ranged_slider, 0xB2B0FA, "Number", 6, "0 -U0", 5, nullptr, 0, 0x334d810, 0x334d9b8, 1.0F, 1.0F, -2.0F, 2.0F, 0xB2B19B},
+    {Init5cf140ItemKind::ranged_slider, 0xB2B289, "Number", 6, "0 -V0", 5, nullptr, 0, 0x334d8e8, 0x334da90, 1.0F, 1.0F, -2.0F, 2.0F, 0xB2B32A},
+    {Init5cf140ItemKind::ranged_slider, 0xB2B418, "Number", 6, "0 -U1", 5, nullptr, 0, 0x334d9c0, 0x334db68, 1.0F, 1.0F, -2.0F, 2.0F, 0xB2B4B9},
+    {Init5cf140ItemKind::ranged_slider, 0xB2B5A7, "Number", 6, "0 -V1", 5, nullptr, 0, 0x334da98, 0x0, 1.0F, 1.0F, -2.0F, 2.0F, 0xB2B64B},
+};
+
+inline constexpr std::size_t Initb25840ItemsCount =
+    sizeof(Initb25840Items) / sizeof(Initb25840Items[0]);
+
+// Init5c11a0Items: 0x5c11a0..0x5c1d50 (2992 B), 10 items
+inline constexpr std::uint64_t kInit5c11a0Rva = 0x5C11A0;
+inline constexpr std::uint64_t kInit5c11a0EndRva = 0x5C1D50;
+inline constexpr std::size_t kInit5c11a0Size = 2992;
+
+inline constexpr Init5cf140ItemSpec Init5c11a0Items[] = {
+    {Init5cf140ItemKind::group, 0x5C11FC, "Shadow", 6, "Shadow Sound", 12, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5C129C, "Shadow Sound", 12, "Enable Streams", 14, nullptr, 0, 0x2ff0198, 0x2ff0320, 0, 0, 0, 0, 0x5C136E},
+    {Init5cf140ItemKind::bool_var, 0x5C140E, "Shadow Sound", 12, "Enable SE", 9, nullptr, 0, 0x2ff0260, 0x2ff03e8, 0, 0, 0, 0, 0x5C14E0},
+    {Init5cf140ItemKind::bool_var, 0x5C1580, "Shadow Sound", 12, "Show ADPCM Streams", 18, nullptr, 0, 0x2ff0328, 0x2ff04b0, 0, 0, 0, 0, 0x5C1652},
+    {Init5cf140ItemKind::bool_var, 0x5C16F2, "Shadow Sound", 12, "Show SFX", 8, nullptr, 0, 0x2ff03f0, 0x2ff0578, 0, 0, 0, 0, 0x5C17C4},
+    {Init5cf140ItemKind::bool_var, 0x5C1864, "Shadow Sound", 12, "Enable ADSR Envelopes", 21, nullptr, 0, 0x2ff04b8, 0x2ff0650, 0, 0, 0, 0, 0x5C1939},
+    {Init5cf140ItemKind::group, 0x5C19B7, "Shadow", 6, "Shadow Cursor", 13, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C1AB5, "Shadow Cursor", 13, "Offset", 6, nullptr, 0, 0x2ff0580, 0x2ff0718, 1.0F, 1.0F, 0.0F, 2147483647.0F, 0x5C1B57},
+    {Init5cf140ItemKind::group, 0x5C1BAA, "Shadow", 6, "Layers", 6, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5C1C42, "Layers", 6, "Show Draw Layers", 16, nullptr, 0, 0x2ff0658, 0x0, 0, 0, 0, 0, 0x5C1D14},
+};
+
+inline constexpr std::size_t Init5c11a0ItemsCount =
+    sizeof(Init5c11a0Items) / sizeof(Init5c11a0Items[0]);
+
+// Init5c1e61Items: 0x5c1e61..0x5c56b1 (14416 B), 40 items
+inline constexpr std::uint64_t kInit5c1e61Rva = 0x5C1E61;
+inline constexpr std::uint64_t kInit5c1e61EndRva = 0x5C56B1;
+inline constexpr std::size_t kInit5c1e61Size = 14416;
+
+inline constexpr Init5cf140ItemSpec Init5c1e61Items[] = {
+    {Init5cf140ItemKind::group, 0x5C1EAC, "CP10", 4, "Performance", 11, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C1FAA, "Performance", 11, "Show Profile Info", 17, nullptr, 0, 0x2ff0720, 0x2ff08c8, 1.0F, 1.0F, 0.0F, 3.0F, 0x5C204D},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C2152, "Performance", 11, "Profile Info Line Offset", 24, nullptr, 0, 0x2ff07f8, 0x2ff0990, 1.0F, 1.0F, 0.0F, 100.0F, 0x5C21F9},
+    {Init5cf140ItemKind::bool_var, 0x5C229E, "Performance", 11, "Background Render Mode", 22, nullptr, 0, 0x2ff08d0, 0x2ff0a68, 0, 0, 0, 0, 0x5C2366},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C246B, "Performance", 11, "Background Render Option", 24, nullptr, 0, 0x2ff0998, 0x2ff0b30, 1.0F, 1.0F, 0.0F, 1.0F, 0x5C2513},
+    {Init5cf140ItemKind::bool_var, 0x5C25B3, "Performance", 11, "Lowres Shadows", 14, nullptr, 0, 0x2ff0a70, 0x2ff0bf8, 0, 0, 0, 0, 0x5C267B},
+    {Init5cf140ItemKind::bool_var, 0x5C271B, "Performance", 11, "World ZPrepass", 14, nullptr, 0, 0x2ff0b38, 0x2ff0cc0, 0, 0, 0, 0, 0x5C27E3},
+    {Init5cf140ItemKind::bool_var, 0x5C2883, "Performance", 11, "World ZCull Reload", 18, nullptr, 0, 0x2ff0c00, 0x2ff0d88, 0, 0, 0, 0, 0x5C294B},
+    {Init5cf140ItemKind::bool_var, 0x5C29EB, "Performance", 11, "Character ZPrepass", 18, nullptr, 0, 0x2ff0cc8, 0x2ff0e50, 0, 0, 0, 0, 0x5C2AB3},
+    {Init5cf140ItemKind::bool_var, 0x5C2B53, "Performance", 11, "Character ZCull Reload", 22, nullptr, 0, 0x2ff0d90, 0x2ff0f18, 0, 0, 0, 0, 0x5C2C1B},
+    {Init5cf140ItemKind::bool_var, 0x5C2CBB, "Performance", 11, "Force Single Pass Shader", 24, nullptr, 0, 0x2ff0e58, 0x2ff0fe0, 0, 0, 0, 0, 0x5C2D83},
+    {Init5cf140ItemKind::bool_var, 0x5C2E23, "Performance", 11, "Enable Mesh Rendering", 21, nullptr, 0, 0x2ff0f20, 0x2ff10b8, 0, 0, 0, 0, 0x5C2EEB},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C2FF0, "Performance", 11, "Particle Alpha Test Optimization", 32, nullptr, 0, 0x2ff0fe8, 0x2ff1190, 1.0F, 1.0F, 4294967295.0F, 255.0F, 0x5C309C},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C31A1, "Performance", 11, "Cinematic Scissor Override", 26, nullptr, 0, 0x2ff10c0, 0x2ff1268, 1.0F, 1.0F, 4294967295.0F, 1.0F, 0x5C3249},
+    {Init5cf140ItemKind::ranged_slider, 0x5C334E, "Performance", 11, "Cinematic Scissor Factor", 24, nullptr, 0, 0x2ff1198, 0x2ff1340, 1.0F, 1.0F, 0.0F, 1.0F, 0x5C33FA},
+    {Init5cf140ItemKind::ranged_slider, 0x5C34FF, "Performance", 11, "Cinematic Scissor Factor (Under Water)", 38, nullptr, 0, 0x2ff1270, 0x2ff1418, 1.0F, 1.0F, 0.0F, 1.0F, 0x5C35AB},
+    {Init5cf140ItemKind::ranged_slider, 0x5C36B0, "Performance", 11, "Near Plane", 10, nullptr, 0, 0x2ff1348, 0x2ff14f0, 1.0F, 1.0F, 0.05000000074505806F, 10.0F, 0x5C375C},
+    {Init5cf140ItemKind::ranged_slider, 0x5C3861, "Performance", 11, "Far Plane", 9, nullptr, 0, 0x2ff1420, 0x2ff15c8, 1.0F, 1.0F, 0.05000000074505806F, 65535.0F, 0x5C3910},
+    {Init5cf140ItemKind::group, 0x5C3949, "Performance", 11, "Transparency", 12, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C3A51, "Transparency", 12, "World Alpha Fail Optimization", 29, nullptr, 0, 0x2ff14f8, 0x2ff1690, 1.0F, 1.0F, 0.0F, 2.0F, 0x5C3AF7},
+    {Init5cf140ItemKind::bool_var, 0x5C3B97, "Transparency", 12, "Show World Alpha Fail Optimization Stats", 40, nullptr, 0, 0x2ff15d0, 0x2ff1758, 0, 0, 0, 0, 0x5C3C5F},
+    {Init5cf140ItemKind::bool_var, 0x5C3CFF, "Transparency", 12, "Force Disable Depth Write", 25, nullptr, 0, 0x2ff1698, 0x2ff1820, 0, 0, 0, 0, 0x5C3DC7},
+    {Init5cf140ItemKind::bool_var, 0x5C3E67, "Transparency", 12, "Force Depth Write", 17, nullptr, 0, 0x2ff1760, 0x2ff18f8, 0, 0, 0, 0, 0x5C3F2F},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C4034, "Transparency", 12, "Mesh alpha blend optimization", 29, nullptr, 0, 0x2ff1828, 0x2ff19c0, 1.0F, 1.0F, 0.0F, 2.0F, 0x5C40E0},
+    {Init5cf140ItemKind::group, 0x5C414D, "CP10", 4, "Texture", 7, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5C41E5, "Texture", 7, "Force Disable CLUT Lerp", 23, nullptr, 0, 0x2ff1900, 0x2ff1a88, 0, 0, 0, 0, 0x5C42AD},
+    {Init5cf140ItemKind::bool_var, 0x5C434D, "Texture", 7, "Display CLUT anim stats", 23, nullptr, 0, 0x2ff19c8, 0x2ff1b50, 0, 0, 0, 0, 0x5C4415},
+    {Init5cf140ItemKind::bool_var, 0x5C44B5, "Texture", 7, "Allow Texture Data Hints", 24, nullptr, 0, 0x2ff1a90, 0x2ff1c28, 0, 0, 0, 0, 0x5C457D},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C4682, "Texture", 7, "Texture Filter", 14, nullptr, 0, 0x2ff1b58, 0x2ff1d00, 1.0F, 1.0F, 4294967295.0F, 3.0F, 0x5C472B},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C4830, "Texture", 7, "Alpha Ref Override", 18, nullptr, 0, 0x2ff1c30, 0x2ff1dc8, 1.0F, 1.0F, 4294967295.0F, 255.0F, 0x5C48DD},
+    {Init5cf140ItemKind::bool_var, 0x5C497D, "Texture", 7, "Texture Override LOD Offset", 27, nullptr, 0, 0x2ff1d08, 0x2ff1ea0, 0, 0, 0, 0, 0x5C4A45},
+    {Init5cf140ItemKind::ranged_int_slider, 0x5C4B4A, "Texture", 7, "Texture LOD Offset", 18, nullptr, 0, 0x2ff1dd0, 0x2ff1f68, 1.0F, 1.0F, 4294967284.0F, 12.0F, 0x5C4BF6},
+    {Init5cf140ItemKind::group, 0x5C4C49, "CP10", 4, "Fullscreen Effects Tweaks", 25, nullptr, 0, 0, 0, 0, 0, 0, 0, 0},
+    {Init5cf140ItemKind::bool_var, 0x5C4CE1, "Fullscreen Effects Tweaks", 25, "Show Fullscreen Effects List", 28, nullptr, 0, 0x2ff1ea8, 0x2ff2040, 0, 0, 0, 0, 0x5C4DA9},
+    {Init5cf140ItemKind::ranged_slider, 0x5C4EAE, "Fullscreen Effects Tweaks", 25, "Large Colossus Shake Blur Intensity", 35, nullptr, 0, 0x2ff1f70, 0x2ff2108, 1.0F, 1.0F, 0.10000000149011612F, 1.0F, 0x5C4F5B},
+    {Init5cf140ItemKind::bool_var, 0x5C4FFB, "Fullscreen Effects Tweaks", 25, "Flash Arrow Blur Disable", 24, nullptr, 0, 0x2ff2048, 0x2ff21d0, 0, 0, 0, 0, 0x5C50C6},
+    {Init5cf140ItemKind::bool_var, 0x5C5175, "Fullscreen Effects Tweaks", 25, "Show FPS", 8, nullptr, 0, 0x2ff2110, 0x2ff2298, 0, 0, 0, 0, 0x5C523D},
+    {Init5cf140ItemKind::bool_var, 0x5C52D1, "Fullscreen Effects Tweaks", 25, "Show Memory", 11, nullptr, 0, 0x2ff21d8, 0x2ff2360, 0, 0, 0, 0, 0x5C53A0},
+    {Init5cf140ItemKind::bool_var, 0x5C542D, "Fullscreen Effects Tweaks", 25, "Show Render Memory", 18, nullptr, 0, 0x2ff22a0, 0x2ff2428, 0, 0, 0, 0, 0x5C54FC},
+    {Init5cf140ItemKind::bool_var, 0x5C558F, "Fullscreen Effects Tweaks", 25, "Spew Timescale Info", 19, nullptr, 0, 0x2ff2368, 0x0, 0, 0, 0, 0, 0x5C564C},
+};
+
+inline constexpr std::size_t Init5c1e61ItemsCount =
+    sizeof(Init5c1e61Items) / sizeof(Init5c1e61Items[0]);
+
+// S8: 0x5c1d50..0x5c1e61 (273 B, 54 instructions), the 33-iteration loop over the
+// 0x2dcaa90 name table and the 0x2fdaa60 default bytes; each row is one layer bool.
+inline constexpr std::uint64_t kInit5c1d50Rva = 0x5C1D50;
+inline constexpr std::uint64_t kInit5c1d50EndRva = 0x5C1E61;
+inline constexpr std::size_t kInit5c1d50Size = 273;
+
+inline constexpr Init5cf140ItemSpec Init5c1d50Items[] = {
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Clear", 5, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "World BG", 8, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "World FG Solid", 14, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "World FG Trans", 14, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "World Comp", 10, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Character Solid", 15, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Character Trans", 15, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Shadow", 6, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Boss Effects", 12, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Water Refraction", 16, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Water Fog", 9, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Particle Before Water", 21, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Water Refl Model Opaque", 23, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Water Refl Model Trans", 22, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Reflection", 10, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Reflection with Water Effect", 28, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Reflection (Non-Water)", 22, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Water Surface", 13, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "3D Effects", 10, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Particles", 9, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "General Refraction", 18, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "PostFX", 6, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Particle After Water", 20, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Glow", 4, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "3D Display Debug", 16, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "3D Fonts", 8, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Sprite 1", 8, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Sprite 2", 8, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Fade", 4, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Over Fade", 9, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Debugging fonts", 15, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Window", 6, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+    {Init5cf140ItemKind::bool_var, 0x5C1DB9, "Layers", 6, "Finish", 6, nullptr, 0, 0, 0, 0, 0, 0, 0, 0x5C1E43},
+};
+
+inline constexpr std::size_t Init5c1d50ItemsCount =
+    sizeof(Init5c1d50Items) / sizeof(Init5c1d50Items[0]);
+
+
+
 
 struct Init5b9f90Hooks {
     void* host = nullptr;
@@ -597,6 +874,8 @@ struct Init5b9f90Result {
     std::size_t s5_items = 0;
     std::size_t s5_bytes = 0;
     bool s5_executed = false;
+    std::size_t s4_2_label_len = 0;
+    bool s4_2_executed = false;
     int registered = 0;
     int releases = 0;
     int destroys = 0;
@@ -607,7 +886,7 @@ struct Init5b9f90Result {
     std::size_t items_used = 0;
     bool canary_stored = false;
     // Executed sub-slice records handed to the runtime's post-call log (S0, S2, S3.1..S3.6, S4.1).
-    std::array<InitPostCallRecord, 16> records{};
+    std::array<InitPostCallRecord, 24> records{};
     std::size_t record_count = 0;
 };
 

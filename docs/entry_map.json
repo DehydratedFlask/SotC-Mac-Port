@@ -5136,13 +5136,37 @@
         "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
-    "0x5c1196": [
+    "0x5c1d50": [
       {
-        "constant": "kInit5b9f90Resume",
+        "constant": "kInit5b9f90LoopHead",
         "header": "native/core/init_5b9f90_slices.hpp"
       },
       {
-        "constant": "kInit5b9f90S5_2End",
+        "constant": "kInit5c11a0End",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      },
+      {
+        "constant": "kInit5c1d50",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x5c1e61": [
+      {
+        "constant": "kInit5c1d50End",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      },
+      {
+        "constant": "kInit5c1e61",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x5c56b1": [
+      {
+        "constant": "kInit5b9f90End",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      },
+      {
+        "constant": "kInit5c1e61End",
         "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
@@ -18358,6 +18382,12 @@
         "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
+    "0x5ba041": [
+      {
+        "constant": "kInit5b9f90Resume",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
     "0x5bc3de": [
       {
         "constant": "kInit5b9f90S5",
@@ -18376,11 +18406,13 @@
     ],
     "0x5c1196": [
       {
-        "constant": "kInit5b9f90Resume",
-        "header": "native/core/init_5b9f90_slices.hpp"
-      },
-      {
         "constant": "kInit5b9f90S5_2End",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x5c11a0": [
+      {
+        "constant": "kInit5c11a0",
         "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
@@ -18388,11 +18420,29 @@
       {
         "constant": "kInit5b9f90LoopHead",
         "header": "native/core/init_5b9f90_slices.hpp"
+      },
+      {
+        "constant": "kInit5c11a0End",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      },
+      {
+        "constant": "kInit5c1d50",
+        "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
     "0x5c1e5b": [
       {
         "constant": "kInit5b9f90LoopTail",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x5c1e61": [
+      {
+        "constant": "kInit5c1d50End",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      },
+      {
+        "constant": "kInit5c1e61",
         "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
@@ -18405,6 +18455,10 @@
     "0x5c56b1": [
       {
         "constant": "kInit5b9f90End",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      },
+      {
+        "constant": "kInit5c1e61End",
         "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
@@ -18440,6 +18494,18 @@
       {
         "constant": "kSlot408PerspectiveCall",
         "header": "native/core/helper_1580a0_perspective.hpp"
+      }
+    ],
+    "0x5c94b0": [
+      {
+        "constant": "kInit5c94b0",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0x5cf12a": [
+      {
+        "constant": "kInit5c94b0End",
+        "header": "native/core/init_5b9f90_slices.hpp"
       }
     ],
     "0x5cf140": [
@@ -21358,6 +21424,18 @@
         "header": "native/core/ctor_slot_297_b25470.hpp"
       }
     ],
+    "0xb25840": [
+      {
+        "constant": "kInitb25840",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
+    "0xb2b6aa": [
+      {
+        "constant": "kInitb25840End",
+        "header": "native/core/init_5b9f90_slices.hpp"
+      }
+    ],
     "0xb2b6b0": [
       {
         "constant": "kSlot296Thunk",
@@ -23205,9 +23283,9 @@
   ],
   "schema": "sotc-entry-map/1",
   "totals": {
-    "constants": 3042,
-    "distinct_rvas": 1950,
-    "duplicate_rvas": 460,
+    "constants": 3052,
+    "distinct_rvas": 1957,
+    "duplicate_rvas": 462,
     "headers": 584
   }
 }

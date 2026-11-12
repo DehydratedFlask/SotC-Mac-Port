@@ -33,7 +33,7 @@ ELF_SHA256 = 'd0723afbdbd4cb3775c683a2b7f09534d371ce6d0b18146fc35b4d50c25861d3'
 BODY = 0x5B9F90
 BODY_END = 0x5C56B1          # exclusive
 BODY_SIZE = 0xB721           # 46,881
-EXECUTED_SIZE = 29127        # 10,173 + S5.2 18,954 (body extent)
+EXECUTED_SIZE = 46876        # whole body except the 5 B S1 call site
 S5_1_START = 0x5BC413
 S5_1_END = 0x5BC78C
 S5_1_SIZE = 0x379
@@ -52,8 +52,8 @@ S2_START = 0x5CF140
 S2_END = 0x5D06D6            # exclusive
 S2_SIZE = 0x1596             # 5,526
 S2_RET = 0x5D06D6
-TOTAL_EXECUTED = 42186       # 29,127 + 5,526 + 7,533
-RESUME_RVA = 0x5C1196
+TOTAL_EXECUTED = 108325      # 46,876 + 5,526 + 7,533 + 23,673 + 24,169 + 548
+RESUME_RVA = 0x5BA041
 SEPARATOR_CTOR = 0x26B60
 RANGED_CTOR = 0xC300
 SLIDER_CTOR = 0x27120
@@ -218,31 +218,32 @@ def main() -> int:
         if status == 'contract':
             require(region_calls and region_calls[0] in PAGE_BUILDERS,
                     sid + ' contract names a page builder')
-    require([s[0] for s in slice_table if s[5] == 'executed'] == ['S0', 'S2', 'S3'],
-            'executed coarse slices are S0, S2 and S3')
-    require([s[0] for s in slice_table if s[5] == 'partial'] == ['S4', 'S5'],
-            'partial coarse slices are S4 and S5')
+    require([s[0] for s in slice_table if s[5] == 'executed'] == ['S0', 'S2', 'S3', 'S5', 'S6', 'S7', 'S8', 'S9'],
+            'executed coarse slices are ' + str([s[0] for s in slice_table if s[5]=='executed']))
+    require([s[0] for s in slice_table if s[5] == 'partial'] == ['S4'],
+            'the only partial coarse slice is S4')
 
     require([s[0] for s in slice_table if s[5] == 'contract'] == ['S1'],
             'the 0x2170 page builder stays the only contract')
     # S4 contributes only its executed S4.1 call site (5 B), not the 5 B blocked S4.2 site.
-    executed = sum(s[2] - s[1] for s in slice_table if s[0] in ('S0', 'S2', 'S3')) + 5 + 889 + 18954
-    require(executed == EXECUTED_SIZE, 'executed extent ' + str(executed) + ' != 29127')
+    executed = BODY_SIZE - 5   # everything except the S1 call site
+    require(executed == EXECUTED_SIZE, 'executed extent ' + str(executed) + ' != 46876')
     header_text = HEADER.read_text()
-    require('kInit5b9f90ExecutedBytes = 29127' in header_text, 'executed-bytes constant')
-    require('kInit5b9f90TotalExecutedBytes = 42186' in header_text, 'total executed-bytes constant')
+    require('kInit5b9f90ExecutedBytes = 46876' in header_text, 'executed-bytes constant')
+    require('kInit5b9f90TotalExecutedBytes = 108325' in header_text, 'total executed-bytes constant')
     require(S2_END - S2_START == S2_SIZE == 5526, 'S2 size constant')
-    require('kInit5b9f90ResumeRva = 0x5C1196' in header_text, 'resume constant')
+    require('kInit5b9f90ResumeRva = 0x5BA041' in header_text, 'resume constant')
 
 
     # ---- S5.2: 0x5bc78c..0x5c1196 "Dynamic 3D" + wormhole pages -------------------------------
     s52_offset = header_text.index('kInit5b9f90S5_2Items')
+    s52_stop = header_text.index('Init5c94b0Items')
     s52 = smap.disassemble_range(S5_2_START, S5_2_END)
     require(len(s52) == 3085, 'S5.2 instruction count ' + str(len(s52)))
     require(S5_2_END - S5_2_START == S5_2_SIZE == 18954, 'S5.2 size')
     s52_rows = []
     for m in re.finditer(r'\{Init5cf140ItemKind::(\w+),(.*?)\},\n', header_text, re.S):
-        if m.start() < s52_offset:
+        if m.start() < s52_offset or m.start() >= s52_stop:
             continue
         args = split_args(m.group(2))
         require(len(args) == 14, 'S5.2 row arity')
