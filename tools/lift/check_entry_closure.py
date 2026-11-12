@@ -30,25 +30,67 @@ def die(message: str) -> None:
     raise SystemExit(1)
 
 
-def artifacts_match(data: dict, inc: str, stored_json: str, stored_inc: str) -> bool:
-    return stored_json == data and stored_inc == inc
+def artifacts_match(data: dict, inc: str, thunk_inc: str, stored_json: str,
+                    stored_inc: str, stored_thunk_inc: str) -> bool:
+    return (stored_json == data and stored_inc == inc and
+            stored_thunk_inc == thunk_inc)
 
 
-def native_thunk_claims_ok(data: dict) -> bool:
-    """Re-derive the thunk bodies from the pinned ELF and check the C++ registry rows."""
+def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
+    """Re-derive every registered thunk body and the dispatch slot from the pinned ELF."""
     block = data.get("native_thunks", {})
     thunks = block.get("thunks", [])
-    if block.get("count") != 2 or len(thunks) != 2:
+    if block.get("count") != 81 or len(thunks) != 81:
         return False
     source = (ROOT / "native/core/guest_thunks.cpp").read_text()
     elf = ec.Elf()
+    fdes = ec.parse_fdes(elf)
+    starts = [start for start, _ in fdes]
+    segments = ec.parse_segments()
+    custom = 0
     for thunk in thunks:
         rva = int(thunk["rva"], 16)
-        if f"0x{rva:x}ULL" not in source or thunk["name"] not in source:
+        kind, fn_start, size = ec.classify(rva, fdes, starts, segments)
+        if kind != "function_start" or fn_start != rva or size != thunk["size"]:
             return False
         body = elf.raw(rva, thunk["size"])
         if hashlib.sha256(body).hexdigest() != thunk["sha256"]:
             return False
+        if thunk.get("custom"):
+            custom += 1
+            if f"0x{rva:x}ULL, \"{thunk['name']}\"" not in source:
+                return False
+        elif f"0x{rva:x}ULL, \"{thunk['name']}\"" not in thunk_inc:
+            return False
+    if custom != 1:
+        return False
+    if block.get("blocked") is None or len(block["blocked"]) != 35:
+        return False
+    for entry in block["blocked"]:
+        if not entry.get("reason"):
+            return False
+        rva = int(entry["rva"], 16)
+        if ec.classify(rva, fdes, starts, segments)[0] not in ("function_start", "plt"):
+            return False
+
+    dispatch = block.get("dispatch", {})
+    site = int(dispatch.get("site", "0x0"), 16)
+    target = int(dispatch.get("target", "0x0"), 16)
+    vtable = int(dispatch.get("vtable", "0x0"), 16)
+    slot = int(dispatch.get("slot", "0x0"), 16)
+    if elf.u64(vtable + slot) != target:
+        return False
+    if hashlib.sha256(elf.raw(vtable, 0x28)).hexdigest() != dispatch.get("vtable_sha256"):
+        return False
+    record = next((r for r in data["indirect"]["sites_detail"] if r["site"] == dispatch["site"]),
+                  None)
+    if record is None or record["status"] != "resolved" or record["target"] != dispatch["target"]:
+        return False
+    if record["function"] != dispatch["function"] or record["operand"] != f"*0x{slot:x}(%rax)":
+        return False
+    instruction = elf.raw(site, 3)
+    if instruction[0] != 0xFF or instruction[1] != 0x50 or instruction[2] != slot:
+        return False
     return True
 
 
@@ -56,13 +98,16 @@ def main(argv: list[str]) -> int:
     if not (ROOT / "local/re/eboot.elf").exists():
         print("SKIP check_entry_closure: private ELF absent")
         return 0
-    data, inc = ec.build()
+    data, inc, thunk_inc = ec.build()
     stored_json = json.loads(ec.OUT_JSON.read_text())
     stored_inc = ec.OUT_INC.read_text()
-    if not artifacts_match(data, inc, stored_json, stored_inc):
+    stored_thunk_inc = ec.OUT_THUNK_INC.read_text()
+    if not artifacts_match(data, inc, thunk_inc, stored_json, stored_inc, stored_thunk_inc):
         if stored_json != data:
             die("docs/entry_closure.json is stale; rerun tools/lift/entry_closure.py")
-        die("native/core/guest_entry_table.inc is stale; rerun tools/lift/entry_closure.py")
+        if stored_inc != inc:
+            die("native/core/guest_entry_table.inc is stale; rerun tools/lift/entry_closure.py")
+        die("native/core/guest_thunk_table.inc is stale; rerun tools/lift/entry_closure.py")
 
     totals = data["totals"]
     if sum(totals[k] for k in ec.KIND_ORDER) != totals["entries"]:
@@ -89,8 +134,8 @@ def main(argv: list[str]) -> int:
                 die(f"blocked site {record['site']} has no reason")
             if record["status"] == "resolved" and not record.get("target"):
                 die(f"resolved site {record['site']} has no target")
-    if not native_thunk_claims_ok(data):
-        die("native thunk registry or pinned body hash mismatch")
+    if not native_thunk_claims_ok(data, thunk_inc):
+        die("native thunk registry, dispatch slot or pinned body hash mismatch")
 
     if "--mutate" in argv:
         bad_inc = inc.replace("GuestEntryKind::FunctionStart, GuestEntryCallable::RetailEntry",
@@ -99,15 +144,19 @@ def main(argv: list[str]) -> int:
         tampered["indirect"]["resolved"] += 1
         if bad_inc == inc:
             die("mutation seed did not change the table")
-        if artifacts_match(data, inc, data, bad_inc):
+        if artifacts_match(data, inc, thunk_inc, data, bad_inc, thunk_inc):
             die("tampered table row was not detected")
-        if artifacts_match(data, inc, tampered, inc):
+        if artifacts_match(data, inc, thunk_inc, tampered, inc, thunk_inc):
             die("tampered total was not detected")
         bad_thunk = json.loads(json.dumps(data))
         bad_thunk["native_thunks"]["thunks"][0]["sha256"] = "0" * 64
-        if native_thunk_claims_ok(bad_thunk):
+        if native_thunk_claims_ok(bad_thunk, thunk_inc):
             die("tampered native-thunk body hash was not detected")
-        print("OK mutation probe: tampered row, total and thunk hash all detected")
+        bad_dispatch = json.loads(json.dumps(data))
+        bad_dispatch["native_thunks"]["dispatch"]["target"] = "0x1234"
+        if native_thunk_claims_ok(bad_dispatch, thunk_inc):
+            die("tampered dispatch target was not detected")
+        print("OK mutation probe: row, total, thunk hash and dispatch target all detected")
 
     closure = data["closure"]
     print(f"OK check_entry_closure: entries={totals['entries']} start={totals['function_start']} "
@@ -118,6 +167,7 @@ def main(argv: list[str]) -> int:
           f"stubs={callable_counts['ret_stub']} "
           f"indirect={indirect['resolved'] if indirect else '?'}/"
           f"{indirect['sites'] if indirect else '?'} "
+          f"native_thunks={data['native_thunks']['count']} "
           f"closure={closure['with_native_entry'] if closure else '?'}/"
           f"{closure['functions'] if closure else '?'}")
     return 0

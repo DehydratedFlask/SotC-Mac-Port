@@ -56,6 +56,7 @@ ENTRY_MAP = ROOT / "docs/entry_map.json"
 OUT_JSON = ROOT / "docs/entry_closure.json"
 OUT_DOC = ROOT / "docs/ENTRY_CLOSURE.md"
 OUT_INC = ROOT / "native/core/guest_entry_table.inc"
+OUT_THUNK_INC = ROOT / "native/core/guest_thunk_table.inc"
 CLOSURE_JSON = ROOT / "local/validation/aot-cfg/closure_531d60.json"
 ELF_PATH = ROOT / "local/re/eboot.elf"
 OBJDUMP = "/usr/bin/objdump"
@@ -66,7 +67,8 @@ CLOSURE_SEED = "0x531d60"
 MAX_PROLOGUE = 18
 SCAN_WINDOW = 128
 # Retail-ABI thunks implemented in native/core/guest_thunks.cpp: (RVA, name, argument count).
-NATIVE_THUNKS = [(0x20D60, "concmd_lazy_register", 1), (0x13D20, "slot_1c_setter", 2)]
+PREVIOUS_TARGETS = (0x19F0, 0x25AA0, 0x2BDD0, 0x20D60, 0x528D90, 0x529150, 0x5296C0,
+                    0xC2F0, 0x529A80, 0x538520, 0x538850, 0x538200, 0x5388C0, 0xC4F0, 0xC770)
 
 KIND_ORDER = ("function_start", "function_interior", "plt", "executable_data", "image_data",
               "outside_image")
@@ -748,6 +750,299 @@ def analyze_indirect(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int],
     }
 
 
+# ---------------------------------------------------------------- native thunks
+
+def _exact_body(ins: dict[int, tuple[str, str]], window: list[int], start: int,
+                size: int) -> list[tuple[int, str, str]]:
+    body = []
+    at = window.index(start) if start in window else -1
+    if at < 0:
+        return body
+    end = start + size
+    k = at
+    while k < len(window) and window[k] < end:
+        body.append((window[k], ins[window[k]][0], ins[window[k]][1]))
+        k += 1
+    return body
+
+
+def _rax_live_after(ins: dict[int, tuple[str, str]], window: list[int],
+                    sites: set[int]) -> dict[int, bool]:
+    """True when rax is read on some path after the instruction before being redefined.
+
+    `ret` counts as a read (the caller may consume the return), so a value merely passed through
+    to the function's own caller is not treated as dead.
+    """
+    blocks, _ = _cfg_blocks(window, ins)
+    by_start = {block[0]: i for i, block in enumerate(blocks)}
+    position = {a: i for i, a in enumerate(window)}
+    successors = [_successors(block, by_start, ins, window, position) for block in blocks]
+    live_in = [False] * len(window)
+    live_out: dict[int, bool] = {a: False for a in window}
+
+    def rax_use_def(mnemonic: str, operands: str) -> tuple[bool, bool]:
+        def has_rax(text: str) -> bool:
+            return re.search(r"%(?:r|e)?ax\b|%al\b", text) is not None
+        src, dst = split_ops(operands)
+        use = False
+        define = False
+        if mnemonic in ("ret", "retq"):
+            use = True
+        if mnemonic in ("call", "callq"):
+            if has_rax(src):
+                use = True
+            return use, True
+        if mnemonic.startswith(("cmp", "test")):
+            return (has_rax(src) or has_rax(dst)), False
+        if has_rax(src):
+            use = True
+        if dst.startswith("%"):
+            define = has_rax(dst)
+        elif has_rax(dst):
+            use = True
+        if mnemonic.startswith("pop") and has_rax(dst):
+            use, define = False, True
+        if mnemonic.startswith("push") and has_rax(src):
+            use = True
+        return use, define
+
+    changed = True
+    while changed:
+        changed = False
+        for bi in range(len(blocks) - 1, -1, -1):
+            out = any(live_in[position[window[s]]] for s in successors[bi])
+            for addr in reversed(blocks[bi]):
+                i = position[addr]
+                live_out[addr] = out
+                use, define = rax_use_def(ins[addr][0], ins[addr][1])
+                new = use or (out and not define)
+                if live_in[i] != new:
+                    live_in[i] = new
+                    changed = True
+                out = new
+    return {site: live_out[site] for site in sites}
+
+
+def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int],
+                        kinds: dict[int, tuple[str, int | None, int | None]],
+                        fde_sizes: dict[int, int], start_set: set[int],
+                        indirect: dict | None) -> tuple[list[dict], list[dict], dict, bytes]:
+    """Register only entries whose complete FDE body is one of the exact host-free patterns."""
+    sites_by_target: dict[int, list[dict]] = {}
+    live: dict[tuple[int, int], bool] = {}
+    if indirect:
+        by_function: dict[int, list[dict]] = {}
+        for record in indirect["sites_detail"]:
+            if record["status"] != "resolved":
+                continue
+            by_function.setdefault(int(record["function"], 16), []).append(record)
+            sites_by_target.setdefault(int(record["target"], 16), []).append(record)
+        for fn, records in by_function.items():
+            size = fde_sizes.get(fn, 0)
+            if not size:
+                continue
+            window = [a for a in addrs if fn <= a < fn + size]
+            if not window or window[0] != fn:
+                continue
+            result = _rax_live_after(ins, window, {int(r["site"], 16) for r in records})
+            for record in records:
+                live[(fn, int(record["site"], 16))] = result[int(record["site"], 16)]
+
+    rows: list[dict] = []
+    blocked: list[dict] = []
+    # One-byte `ret` entries can be reached as vtable targets without appearing in the entry map,
+    # so the candidate set is the mapped starts plus every resolved target.
+    stub_candidates = set(start_set) | set(sites_by_target)
+    stubs = sorted(rva for rva in stub_candidates
+                   if fde_sizes.get(rva) == 1 and e.raw(rva, 1) == b"\xc3")
+
+    def add(rva: int, name: str, kind: str, args: int, effect: str, fields: dict) -> None:
+        size = int(fde_sizes.get(rva, 0) or 0)
+        rows.append({"rva": f"0x{rva:x}", "name": name, "kind": kind, "args": args,
+                     "size": size, "sha256": hashlib.sha256(e.raw(rva, size)).hexdigest(),
+                     "effect": effect, **fields})
+
+    for rva in sorted(stubs):
+        sites = sites_by_target.get(rva, [])
+        if not sites:
+            blocked.append({"rva": f"0x{rva:x}", "symbol": None,
+                            "reason": "no_mapped_call_site_to_prove_return_unused"})
+            continue
+        if any(live[(int(s["function"], 16), int(s["site"], 16))] for s in sites):
+            when = [s["site"] for s in sites
+                    if live[(int(s["function"], 16), int(s["site"], 16))]]
+            blocked.append({"rva": f"0x{rva:x}", "symbol": None,
+                            "reason": "return_value_read_at_" + ",".join(when)})
+            continue
+        add(rva, "retail_void_stub", "void_noop", 0,
+            f"no effect; rax unused at all {len(sites)} resolved call sites",
+            {"call_sites": len(sites), "rax_live_sites": []})
+
+    for rva in sorted(start_set):
+        size = int(kinds[rva][2] or 0)
+        if size == 0 or size > 32:
+            continue
+        window = [a for a in addrs if rva <= a < rva + size]
+        body = _exact_body(ins, window, rva, size)
+        if len(body) < 2 or body[-1][1] not in ("ret", "retq"):
+            continue
+        mnemonics = [insn[1] for insn in body]
+        src, dst = split_ops(body[0][2])
+        if mnemonics == ["ret"] or mnemonics == ["retq"]:
+            continue
+        if len(body) == 2 and mnemonics[0] == "movl" and src.startswith("$0x") and dst == "%eax":
+            imm = int(src[1:], 16)
+            add(rva, f"const_u32_{rva:x}", "const_u32", 0,
+                f"returns the pinned zero-extended immediate 0x{imm:x}", {"immediate": f"0x{imm:x}"})
+            continue
+        if len(body) == 2 and mnemonics[0] == "xorl" and src == "%eax" and dst == "%eax":
+            add(rva, "zero_u32", "zero_u32", 0, "returns 0", {"immediate": "0x0"})
+            continue
+        if len(body) == 2 and mnemonics[0] == "movl" and src == "%esi":
+            match = re.match(r"^(-?0x[0-9a-f]+)\(%rdi\)$", dst)
+            if match:
+                offset = int(match.group(1), 16)
+                sites = sites_by_target.get(rva, [])
+                if not sites:
+                    blocked.append({"rva": f"0x{rva:x}", "symbol": None,
+                                    "reason": "setter_return_value_caller_owned_no_call_site"})
+                elif any(live[(int(s["function"], 16), int(s["site"], 16))] for s in sites):
+                    blocked.append({"rva": f"0x{rva:x}", "symbol": None,
+                                    "reason": "setter_return_value_read_at_call_site"})
+                else:
+                    add(rva, f"set_u32_{rva:x}", "set_u32", 2,
+                        f"stores the low 32 bits of rsi at object+0x{offset:x}; rax unused at "
+                        f"all {len(sites)} resolved call sites",
+                        {"offset": f"0x{offset:x}", "call_sites": len(sites), "rax_live_sites": []})
+                continue
+        if len(body) == 2 and mnemonics[0] == "movb" and src == "%sil":
+            match = re.match(r"^(-?0x[0-9a-f]+)\(%rdi\)$", dst)
+            if match:
+                blocked.append({"rva": f"0x{rva:x}", "symbol": None,
+                                "reason": "byte_setter_return_value_caller_owned_no_liveness_evidence"})
+                continue
+        # 20 B vtable-pair constructor: copy rsi+0x10 into rdi+0x10 and a pinned constant into rdi+0x20.
+        if len(body) == 5 and mnemonics[4] in ("ret", "retq") and mnemonics[0] in ("movq", "leaq"):
+            ops = [split_ops(x[2]) for x in body]
+            ok = False
+            const = None
+            if (mnemonics[0] == "movq" and ops[0] == ("0x10(%rsi)", "%rax")
+                    and mnemonics[1] == "leaq" and ops[1][1] == "%rcx"
+                    and mnemonics[2] == "movq" and ops[2] == ("%rax", "0x10(%rdi)")
+                    and mnemonics[3] == "movq" and ops[3] == ("%rcx", "0x20(%rdi)")):
+                ok = True
+                const = absolute_operand(ins, window, 1)
+            elif (mnemonics[0] == "leaq" and ops[0][1] == "%rax"
+                    and mnemonics[1] == "movq" and ops[1] == ("%rax", "0x20(%rdi)")
+                    and mnemonics[2] == "movq" and ops[2] == ("0x10(%rsi)", "%rax")
+                    and mnemonics[3] == "movq" and ops[3] == ("%rax", "0x10(%rdi)")):
+                ok = True
+                const = absolute_operand(ins, window, 0)
+            if ok and const is not None:
+                add(rva, f"vtable_pair_{rva:x}", "vtable_pair_ctor", 2,
+                    f"stores rsi+0x10 at object+0x10 and constant 0x{const:x} at object+0x20; "
+                    f"returns rsi+0x10", {"copy_offset": "0x10", "const_offset": "0x20",
+                                          "constant": f"0x{const:x}"})
+                continue
+
+    # The ConCmd lazy registration has a host hook for the unmodelled map insert.
+    add(0x20D60, "concmd_lazy_register", "concmd_lazy_register", 1,
+        "flips object+0x18 once and reports the 0x20d80 map insert through a host hook",
+        {"custom": True})
+
+    blocked += [
+        {"rva": "0x20d80", "symbol": None,
+         "reason": "needs_live_manager_pointer_from_bss_0x2dfcbc8"},
+        {"rva": "0x9844b0", "symbol": None,
+         "reason": "tail_jump_needs_unmodelled_callee_and_rodata_leaq"},
+    ]
+    blocked.sort(key=lambda item: int(item["rva"], 16))
+    rows.sort(key=lambda row: int(row["rva"], 16))
+
+    base = 0x1594DC0
+    slot = 0x20
+    target = e.u64(base + slot)
+    if target != 0x20D60:
+        die(f"dispatch vtable slot {base + slot:#x} holds {target:#x}, not 0x20d60")
+    dispatch_bytes = e.raw(base, 0x28)
+    dispatch = {"site": "0x28471", "function": "0x27990", "vtable": f"0x{base:x}",
+                "slot": f"0x{slot:x}", "target": f"0x{target:x}",
+                "vtable_sha256": hashlib.sha256(dispatch_bytes).hexdigest()}
+    return rows, blocked, dispatch, dispatch_bytes
+
+
+def _render_thunk_inc(rows: list[dict], dispatch: dict, dispatch_bytes: bytes) -> str:
+    lines = [
+        "// Generated by tools/lift/entry_closure.py; do not edit.",
+        "// Exact host-free leaf bodies from the pinned ELF (sha256 d0723afb...5861d3).",
+    ]
+    for row in rows:
+        if row.get("custom"):
+            continue
+        rva = int(row["rva"], 16)
+        fn = f"thunk_{rva:x}_{row['kind']}"
+        lines.append(f"static std::uint64_t {fn}(std::uint64_t a0, std::uint64_t a1,")
+        lines.append("                                     std::uint64_t, std::uint64_t,")
+        lines.append("                                     std::uint64_t, std::uint64_t) {")
+        if row["kind"] == "void_noop":
+            lines.append(f"    // body: ret (0x{rva:x}); rax is unused at every resolved call site")
+            lines.append("    (void)a0; (void)a1;")
+            lines.append("    return 0;")
+        elif row["kind"] == "const_u32":
+            lines.append(f"    (void)a0; (void)a1;")
+            lines.append(f"    return {int(row['immediate'], 16)}ULL;")
+        elif row["kind"] == "zero_u32":
+            lines.append("    (void)a0; (void)a1;")
+            lines.append("    return 0;")
+        elif row["kind"] == "set_u32":
+            offset = int(row["offset"], 16)
+            lines.append("    if (a0 == 0) return 0;")
+            lines.append("    const std::uint32_t value = static_cast<std::uint32_t>(a1);")
+            lines.append(f"    std::memcpy(reinterpret_cast<void*>(a0 + 0x{offset:x}), &value, sizeof(value));")
+            lines.append("    return 0;")
+        elif row["kind"] == "vtable_pair_ctor":
+            const = int(row["constant"], 16)
+            lines.append("    if (a0 == 0 || a1 == 0) return 0;")
+            lines.append("    std::uint64_t copied = 0;")
+            lines.append("    std::memcpy(&copied, reinterpret_cast<const void*>(a1 + 0x10), sizeof(copied));")
+            lines.append("    std::memcpy(reinterpret_cast<void*>(a0 + 0x10), &copied, sizeof(copied));")
+            lines.append(f"    const std::uint64_t constant = 0x{const:x}ULL;")
+            lines.append("    std::memcpy(reinterpret_cast<void*>(a0 + 0x20), &constant, sizeof(constant));")
+            lines.append("    return copied;")
+        else:
+            lines.append("    (void)a0; (void)a1;")
+            lines.append("    return 0;")
+        lines.append("}")
+    lines.append("")
+    lines.append("static constexpr GuestThunk kGuestLeafThunks[] = {")
+    for row in rows:
+        if row.get("custom"):
+            continue
+        rva = int(row["rva"], 16)
+        fn = f"thunk_{rva:x}_{row['kind']}"
+        lines.append(f"    {{0x{rva:x}ULL, \"{row['name']}\", {fn}, {row['args']}}},")
+    lines.append("};")
+    lines.append("")
+    lines.append("// The 15 indirect targets the earlier pass resolved; the runtime invokes each one.")
+    lines.append("static constexpr std::uint64_t kGuestResolvedTargets[] = {")
+    for i in range(0, len(PREVIOUS_TARGETS), 5):
+        chunk = ", ".join(f"0x{rva:x}ULL" for rva in PREVIOUS_TARGETS[i:i + 5])
+        lines.append(f"    {chunk},")
+    lines.append("};")
+    lines.append("")
+    lines.append(f"static constexpr GuestDispatchSite kGuestDispatchSite = "
+                 f"{{0x{int(dispatch['site'], 16):x}ULL, 0x{int(dispatch['function'], 16):x}ULL, "
+                 f"0x{int(dispatch['target'], 16):x}ULL, 0x{int(dispatch['vtable'], 16):x}ULL, "
+                 f"0x{int(dispatch['slot'], 16):x}ULL}};")
+    lines.append("static constexpr std::uint8_t kGuestDispatchVtable[] = {")
+    for i in range(0, len(dispatch_bytes), 8):
+        chunk = ", ".join(f"0x{b:02x}" for b in dispatch_bytes[i:i + 8])
+        lines.append(f"    {chunk},")
+    lines.append("};")
+    lines.append("static constexpr std::size_t kGuestDispatchVtableSize = sizeof(kGuestDispatchVtable);")
+    return "\n".join(lines) + "\n"
+
+
 # ---------------------------------------------------------------- build
 
 def build() -> tuple[dict, str]:
@@ -816,6 +1111,8 @@ def build() -> tuple[dict, str]:
             callable_counts["not_callable"] += 1
 
     indirect = analyze_indirect(e, ins, addrs, frontier, starts) if frontier else None
+    thunk_rows, thunk_blocked, dispatch, dispatch_bytes = _plan_native_thunks(
+        e, ins, addrs, kinds, {s: size for s, size in fdes}, start_set, indirect)
 
     counts = {kind: 0 for kind in KIND_ORDER}
     samples: dict[str, list[dict]] = {kind: [] for kind in KIND_ORDER}
@@ -848,14 +1145,6 @@ def build() -> tuple[dict, str]:
     stub_rows = [f"0x{rva:x}" for rva in sorted(start_set)
                  if shapes[rva]["callable"] == "ret_stub"]
 
-    native_thunks = []
-    for rva, name, arg_count in NATIVE_THUNKS:
-        kind, _fn, size = classify(rva, fdes, starts, segments)
-        if kind != "function_start" or not size:
-            die(f"native thunk {rva:#x} is not an FDE start")
-        native_thunks.append({"rva": f"0x{rva:x}", "name": name, "args": arg_count,
-                              "size": size, "sha256": hashlib.sha256(e.raw(rva, size)).hexdigest()})
-
     data = {
         "schema": "sotc-entry-closure/2",
         "inputs": {
@@ -877,7 +1166,9 @@ def build() -> tuple[dict, str]:
         "target_named": dict({"entries": target_entries}, **target_named),
         "closure": closure,
         "indirect": indirect,
-        "native_thunks": {"count": len(native_thunks), "thunks": native_thunks},
+        "native_thunks": {"count": len(thunk_rows), "thunks": thunk_rows,
+                          "blocked": thunk_blocked, "dispatch": dispatch,
+                          "previous_targets": [f"0x{rva:x}" for rva in PREVIOUS_TARGETS]},
         "samples": samples,
         "interior": interior,
     }
@@ -900,7 +1191,7 @@ def build() -> tuple[dict, str]:
         lines.append("static constexpr GuestIndirectSummary kGuestIndirectSummary = "
                      f"{{{indirect['functions']}u, {indirect['sites']}u, "
                      f"{indirect['resolved']}u, {indirect['blocked']}u}};")
-    return data, "\n".join(lines) + "\n"
+    return data, "\n".join(lines) + "\n", _render_thunk_inc(thunk_rows, dispatch, dispatch_bytes)
 
 
 # ---------------------------------------------------------------- doc
@@ -984,27 +1275,61 @@ def render_doc(data: dict) -> str:
         "",
         "## Native retail-ABI thunks",
         "",
-        f"**{data['native_thunks']['count']}** entries are hosted as real SysV callables in",
-        "`native/core/guest_thunks.cpp`; the fixture and the runtime invoke them through the registry",
-        "and assert the observed effects:",
+        f"**{data['native_thunks']['count']}** entries are hosted as real SysV callables: the generated",
+        "`native/core/guest_thunk_table.inc` plus the custom `0x20d60` body. The runtime and",
+        "`test_guest_thunks` invoke them through the registry and assert the observed object delta or",
+        "return value:",
         "",
-        "| RVA | Name | Args | Body | Observed |",
-        "| --- | --- | ---: | --- | --- |",
+        "| Kind | Count | Registered only when | Observed effect |",
+        "| --- | ---: | --- | --- |",
     ]
+    thunk_kinds: dict[str, int] = {}
     for thunk in data["native_thunks"]["thunks"]:
-        if thunk["name"] == "concmd_lazy_register":
-            observed = "object byte +0x18 flips once; hook fires once; second call is a no-op"
+        thunk_kinds[thunk["kind"]] = thunk_kinds.get(thunk["kind"], 0) + 1
+    kind_proof = {
+        "void_noop": ("backward rax liveness proves every resolved caller ignores the return",
+                      "no effect; registered only for dead-return stubs"),
+        "const_u32": ("the whole body is `movl $imm,%eax; retq`", "returns the pinned immediate"),
+        "zero_u32": ("the whole body is `xorl %eax,%eax; retq`", "returns 0"),
+        "set_u32": ("whole body is one store + ret; return dead at every known site",
+                    "stores rsi at object+offset"),
+        "vtable_pair_ctor": ("whole body is two stores + ret, constant from a RIP `lea`",
+                             "copies rsi+0x10 and installs the pinned address"),
+        "concmd_lazy_register": ("flag test/store reproduced; map insert is a host hook",
+                                 "flag flips once, hook fires once, second call no-op"),
+    }
+    for kind, count in sorted(thunk_kinds.items()):
+        proof, effect = kind_proof.get(kind, ("exact leaf body", kind))
+        lines.append(f"| `{kind}` | **{count}** | {proof} | {effect} |")
+    previous = ["0x19f0", "0x25aa0", "0x2bdd0", "0x20d60", "0x528d90", "0x529150",
+                "0x5296c0", "0xc2f0", "0x529a80", "0x538520", "0x538850", "0x538200",
+                "0x5388c0", "0xc4f0", "0xc770"]
+    states = {thunk["rva"]: thunk["kind"] for thunk in data["native_thunks"]["thunks"]}
+    lines += ["", "The 15 RVAs the earlier pass resolved are all accounted for:", ""]
+    for rva in previous:
+        if rva in states:
+            lines.append(f"- `{rva}` — registered as `{states[rva]}` (invoked by the fixture/runtime).")
         else:
-            observed = "dword at object+0x1c becomes the rsi argument"
-        lines.append(f"| `{thunk['rva']}` | `{thunk['name']}` | {thunk['args']} | "
-                     f"{thunk['size']} B, sha256 `{thunk['sha256'][:16]}…` | {observed} |")
+            entry = next((x for x in data["native_thunks"]["blocked"] if x["rva"] == rva), None)
+            lines.append(f"- `{rva}` — NOT registered: {entry['reason'] if entry else 'missing'}.")
     lines += [
         "",
-        "`0x20d60` reproduces the flag test and store, then reports the manager map insert through a",
-        "host hook: the insert body (`0x20d80`) needs the live manager pointer from the BSS global",
-        "`0x2dfcbc8`, which the host does not have. The 14 one-byte `ret` targets are **not**",
-        "registered: a C thunk cannot leave `rax` untouched as the retail stub does, and returning 0",
-        "would invent a result.",
+        f"The **{len(data['native_thunks']['blocked'])}** entries that stay non-callable keep their exact",
+        "RVA and reason in `entry_closure.json` under `native_thunks.blocked` (29 one-byte `ret`",
+        "entries have no mapped call site to prove the return unused, three byte setters have no",
+        "liveness evidence, one setter is caller-owned, `0x20d80` needs the live manager pointer, and",
+        "`0x9844b0` tail-jumps into an unmodelled callee).",
+        "",
+        "## Dispatch through a resolved indirect site",
+        "",
+    ]
+    dispatch = data["native_thunks"]["dispatch"]
+    lines += [
+        f"Site `{dispatch['site']}` in `{dispatch['function']}` calls `*0x{int(dispatch['slot'], 16):x}(%rax)`.",
+        f"The host vtable image at `{dispatch['vtable']}` (sha256 `{dispatch['vtable_sha256'][:16]}…`)",
+        f"holds `{dispatch['target']}` at that slot. `guest_dispatch_slot` reads the slot from that host",
+        "image and invokes the native body; the runtime and fixture observe object `+0x18 = 1` and one",
+        "hook call (second dispatch is a no-op), not merely the lookup result.",
         "",
         "## Indirect frontier of the Init closure",
         "",
@@ -1065,8 +1390,8 @@ def render_doc(data: dict) -> str:
         "## What this changes",
         "",
         "- `ENTRY_MAP.md`'s open item 2 (address → callable retail-ABI entry) is answered at the shape",
-        "  level for every start, and two entries now have real SysV thunk bodies invoked through the",
-        "  runtime. The rest still need a matching native signature and host state.",
+        f"  level for every start, and **{data['native_thunks']['count']}** entries now have real SysV",
+        "  thunk bodies; one indirect site executes through the host vtable image end to end.",
         "- Open item 3 (indirect targets) is measured and partially resolved; every remaining site is",
         "  enumerated with its blocking reason instead of being left as a count.",
         "- The native runtime exposes `guest_entry_callable(rva)` and the indirect summary from the",
@@ -1075,10 +1400,10 @@ def render_doc(data: dict) -> str:
         "## Limits",
         "",
         "- FDE-derived function universe; a function without unwind data is invisible.",
-        "- Provenance is a linear same-block backward scan (max 70 instructions, max 3 register hops).",
-        "  A definition behind a branch, call or block boundary is deliberately treated as unknown.",
-        "- `retail_entry` proves the ELF shape, not a native callable signature; no thunk bodies are",
-        "  generated and no target is inferred from a vtable's name or from a runtime object type.",
+        "- Provenance is the forward basic-block CFG dataflow described above; a value merged from",
+        "  unequal paths, loaded from object memory or built on a stack object stays unknown.",
+        "- Thunk registration covers only complete leaf bodies with an exact host-free pattern. The",
+        "  other retail entries still need a native signature, host state or a larger lifted body.",
         "",
     ]
     return "\n".join(lines)
@@ -1086,11 +1411,12 @@ def render_doc(data: dict) -> str:
 
 def main(argv: list[str]) -> int:
     check_only = "--check" in argv
-    data, inc = build()
+    data, inc, thunk_inc = build()
     if not check_only:
         OUT_JSON.write_text(json.dumps(data, indent=1) + "\n")
         OUT_DOC.write_text(render_doc(data))
         OUT_INC.write_text(inc)
+        OUT_THUNK_INC.write_text(thunk_inc)
     totals = data["totals"]
     closure = data["closure"]
     indirect = data["indirect"]

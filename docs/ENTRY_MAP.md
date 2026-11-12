@@ -45,9 +45,12 @@ call dispatcher needs before lifted code can call lifted code by guest address.
    functions in the `0x531d60` closure have an exact native entry (23.2 %).
 2. ~~**ABI shape.**~~ Done 2026-11-13 (`CPU-01-AOT-CFG-CALLABLE-01`): every function start is
    classified from its decoded entry as `retail_entry` (786), `jmp_thunk` (10) or `ret_stub` (34),
-   with prologue frame and call-alignment evidence. Two entries now have real SysV thunk bodies
-   (`0x20d60`, `0x13d20`) invoked through the runtime with observed results; the rest still need a
-   native signature and host state.
+   with prologue frame and call-alignment evidence. **81** entries now have real SysV bodies
+   (16 noop, 28 constants, 4 zero, 1 setter, 31 vtable-pair ctors, 1 custom), all re-derived from
+   complete FDE bodies; the 14 one-byte stubs are registered only after per-site `rax` liveness,
+   and the 35 that remain non-callable keep exact RVA and verbatim reason. One CFG-resolved site
+   (`0x28471` -> vtable `0x1594dc0` slot `0x20` -> `0x20d60`) executes through the host vtable image
+   and asserts the invocation result. The rest still need a native signature and host state.
 3. ~~**Indirect targets.**~~ Measured and partially resolved 2026-11-13: the `0x531d60` closure has
    **105 frontier functions containing 499 indirect sites** (not 105 sites). A forward basic-block
    CFG now resolves **222** to exact FDE starts and leaves **277 blocked** with a verbatim reason

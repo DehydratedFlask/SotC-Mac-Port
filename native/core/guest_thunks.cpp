@@ -1,7 +1,11 @@
 #include "core/guest_thunks.hpp"
 
+#include <cstring>
+
 namespace sotc {
 namespace {
+
+#include "core/guest_thunk_table.inc"
 
 GuestConCmdRegisterHook g_concmd_hook = nullptr;
 
@@ -16,17 +20,8 @@ std::uint64_t thunk_concmd_lazy_register(std::uint64_t self, std::uint64_t, std:
     return 0;
 }
 
-// 0x13d20: `movl %esi,0x1c(%rdi); ret` (4 B leaf).
-std::uint64_t thunk_slot_1c_setter(std::uint64_t self, std::uint64_t value, std::uint64_t,
-                                   std::uint64_t, std::uint64_t, std::uint64_t) {
-    if (self == 0) return 0;
-    *reinterpret_cast<std::uint32_t*>(self + 0x1c) = static_cast<std::uint32_t>(value);
-    return 0;
-}
-
-constexpr GuestThunk kGuestThunks[] = {
+constexpr GuestThunk kCustomThunks[] = {
     {0x20d60ULL, "concmd_lazy_register", thunk_concmd_lazy_register, 1},
-    {0x13d20ULL, "slot_1c_setter", thunk_slot_1c_setter, 2},
 };
 
 }  // namespace
@@ -36,14 +31,18 @@ void guest_set_concmd_register_hook(GuestConCmdRegisterHook hook) noexcept {
 }
 
 const GuestThunk* guest_thunk_find(std::uint64_t rva) noexcept {
-    for (const GuestThunk& thunk : kGuestThunks) {
+    for (const GuestThunk& thunk : kGuestLeafThunks) {
+        if (thunk.rva == rva) return &thunk;
+    }
+    for (const GuestThunk& thunk : kCustomThunks) {
         if (thunk.rva == rva) return &thunk;
     }
     return nullptr;
 }
 
 std::size_t guest_thunk_count() noexcept {
-    return sizeof(kGuestThunks) / sizeof(kGuestThunks[0]);
+    return sizeof(kGuestLeafThunks) / sizeof(kGuestLeafThunks[0]) +
+           sizeof(kCustomThunks) / sizeof(kCustomThunks[0]);
 }
 
 bool guest_thunk_invoke(std::uint64_t rva, const std::uint64_t* args,
@@ -57,6 +56,30 @@ bool guest_thunk_invoke(std::uint64_t rva, const std::uint64_t* args,
     const std::uint64_t value = thunk->fn(a[0], a[1], a[2], a[3], a[4], a[5]);
     if (result != nullptr) *result = value;
     return true;
+}
+
+const GuestDispatchSite& guest_dispatch_site() noexcept {
+    return kGuestDispatchSite;
+}
+
+const std::uint64_t* guest_resolved_targets(std::size_t* count) noexcept {
+    if (count != nullptr) *count = sizeof(kGuestResolvedTargets) / sizeof(kGuestResolvedTargets[0]);
+    return kGuestResolvedTargets;
+}
+
+const std::uint8_t* guest_dispatch_vtable(std::size_t* size) noexcept {
+    if (size != nullptr) *size = kGuestDispatchVtableSize;
+    return kGuestDispatchVtable;
+}
+
+bool guest_dispatch_slot(const std::uint8_t* vtable, std::size_t vtable_size,
+                         std::size_t slot_offset, const std::uint64_t* args,
+                         std::uint64_t* result, std::uint64_t* target_rva) noexcept {
+    if (vtable == nullptr || slot_offset + sizeof(std::uint64_t) > vtable_size) return false;
+    std::uint64_t target = 0;
+    std::memcpy(&target, vtable + slot_offset, sizeof(target));
+    if (target_rva != nullptr) *target_rva = target;
+    return guest_thunk_invoke(target, args, result);
 }
 
 }  // namespace sotc

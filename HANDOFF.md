@@ -1,3 +1,56 @@
+## 2026-11-13 — 81 native bodies, all 15 resolved targets, and a dispatch that runs (CPU-01-AOT-CFG-CALLABLE-01, continued)
+
+**State: green.** Continuation of `fa0b058a` on branch `cursor/init-hash-551140-6aa93e8`. Init-lift is
+untouched: **46,876 / 46,881 B**, **108,325 B** native; only the `0x2170` contract (`0x5ba041`) and
+the S4.2 geometry block (`0x7f8664..0x7f87d8`, gated on `0x3288478`/`0x3288480`) stay open.
+
+**Card:** the roadmap still names no successor id; its own next-gap wording is "Native ABI thunk
+bodies are the next gap", and `ENTRY_MAP.md` item 3 owns the remaining indirect frontier. This pass
+takes the card's half (1) literally and adds the CFG dispatch it implies.
+
+- **All 15 previously resolved targets are accounted for.** Backward `rax` liveness over the
+  frontier CFG (per-instruction `live_out`, not a block-exit guess) proves `rax` dead at every
+  resolved site of the 14 one-byte `retq` stubs, including the 47/12/1 sites that a block-exit-only
+  check had wrongly flagged. They are registered as exact `void_noop` bodies and invoked by both
+  the fixture and the runtime against a 0x40-byte `0xa5` canary; observed
+  `previous_targets={total:15,called:14,ok:true}`. `0x20d60` is the 15th and runs through the
+  dispatch path below. The blanket "a C thunk cannot leave rax caller-owned" refusal is withdrawn:
+  the return is provably unused per site, not assumed.
+- **Registered native surface 2 -> 81**, all planned by `entry_closure.py` from exact complete-FDE
+  bodies: 16 `void_noop`, 28 `const_u32`, 4 `zero_u32`, 1 `set_u32` (`0x13d20`, `+0x1c = 0x2a`), 31
+  `vtable_pair_ctor` (20 B: copy `rsi+0x10` to `rdi+0x10`, store a pinned RIP constant at
+  `rdi+0x20`, return `rsi+0x10`) and 1 custom `concmd_lazy_register`. The generated
+  `native/core/guest_thunk_table.inc` also carries the 15-target list, the dispatch site and the
+  host vtable image. **35 stay non-callable** with exact RVA and reason: 29
+  `no_mapped_call_site_to_prove_return_unused`, three
+  `byte_setter_return_value_caller_owned_no_liveness_evidence` (`0xa431e0`, `0xa52b70`,
+  `0xa599e0`), `0x147e10` `setter_return_value_caller_owned_no_call_site`, `0x20d80`
+  `needs_live_manager_pointer_from_bss_0x2dfcbc8`, `0x9844b0`
+  `tail_jump_needs_unmodelled_callee_and_rodata_leaq`. No image symbols exist (stripped image).
+- **A CFG-resolved indirect site executes end to end.** Site `0x28471` in `0x27990`
+  (`ff 50 20`, `callq *0x20(%rax)`) resolves to vtable `0x1594dc0`, slot `0x20`, target `0x20d60`.
+  `guest_dispatch_slot` reads the slot from the generated host image of that vtable (sha256
+  `62d5d277…3c899aa7`), finds the native entry and calls it; observed
+  `dispatch={site:0x28471,target:0x20d60,flag:1,hook_calls:1,ok:true}` — object `+0x18` flips, the
+  hook fires once, the second call is a no-op. It asserts the invocation result, not the table.
+- **Real bugs found and fixed:** the checker's dispatch byte test treated the ModRM `0x50` as
+  `0x50 + slot/8` and rejected the correct `ff 50 20`; the blocked list carried `0x147e10` twice
+  (36 instead of 35) — the new count guard surfaced it; and the generated table had duplicated the
+  custom `0x20d60` row, shadowing its body (custom rows are now excluded from the generated table).
+- **Checker:** `check_entry_closure.py` unpacks the 3-tuple, compares JSON + both includes exactly,
+  re-derives all 81 rows (FDE start, size, body sha256, generated/custom placement, registry
+  spelling), all 35 blocked RVAs and their reasons, and the dispatch (qword at `vtable+slot`, image
+  hash, resolved site record, instruction bytes). `--mutate` detected a tampered row, total, thunk
+  hash and dispatch target; an external JSON tamper was run (checker exit 1) and reverted.
+- **Verification:** build **0**; full CTest **706/706**; checker `OK ... native_thunks=81`,
+  mutation probe OK; `sotc_init_window` exit **0**, stderr **0 B**, `ok=true`; entry map regenerated
+  **1,957 / 584 / 462** (unchanged); `run_all_checkers.sh` **915 passed / 0 skipped / 0 failed**
+  (exit 0); project index **114,667**; publish-path audit `--all` exit 0; attribution audit OK.
+
+**Next exact action:** give bodies to the 29 unproven stubs once a caller mapping exists, or lift
+`0x20d80`'s manager-map insert to drop the `0x20d60` hook. Do not re-open `0x2170` or the
+`0x7f8664` geometry block.
+
 ## 2026-11-13 — Retail-ABI thunks and CFG-resolved indirect frontier (CPU-01-AOT-CFG-CALLABLE-01, continued)
 
 **State: green.** Continuation of `426ffbb1` on branch `cursor/init-hash-551140-6aa93e8`. Init-lift is

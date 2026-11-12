@@ -71,6 +71,13 @@ struct ThunkProbe {
     unsigned setter_value;
     unsigned register_flag;
     int hook_calls;
+    bool dispatch_ok;
+    bool previous_targets_ok;
+    int previous_targets_called;
+    unsigned long long dispatch_site;
+    unsigned long long dispatch_target;
+    unsigned dispatch_flag;
+    int dispatch_hook_calls;
 };
 
 int g_thunk_hook_calls = 0;
@@ -100,16 +107,63 @@ ThunkProbe run_guest_thunk_probes() {
     sotc::guest_set_concmd_register_hook(nullptr);
     p.register_flag = command[0x18];
     p.hook_calls = g_thunk_hook_calls;
+
+    // CFG-resolved site 0x28471: read slot 0x20 of the host vtable image, invoke 0x20d60.
+    const sotc::GuestDispatchSite& site = sotc::guest_dispatch_site();
+    std::size_t vtable_size = 0;
+    const std::uint8_t* vtable = sotc::guest_dispatch_vtable(&vtable_size);
+    alignas(8) unsigned char dispatch_object[0x40] = {};
+    const std::uint64_t dispatch_args[6] = {
+        reinterpret_cast<std::uint64_t>(dispatch_object), 0, 0, 0, 0, 0};
+    std::uint64_t dispatch_target = 0;
+    g_thunk_hook_calls = 0;
+    sotc::guest_set_concmd_register_hook(thunk_register_hook);
+    const bool dispatched = sotc::guest_dispatch_slot(
+        vtable, vtable_size, static_cast<std::size_t>(site.slot_offset), dispatch_args,
+        &result, &dispatch_target);
+    sotc::guest_set_concmd_register_hook(nullptr);
+    p.dispatch_ok = dispatched && dispatch_target == 0x20d60 && dispatch_object[0x18] == 1 &&
+                    g_thunk_hook_calls == 1 && site.site_rva == 0x28471 &&
+                    site.target_rva == 0x20d60 && site.slot_offset == 0x20;
+    p.dispatch_site = site.site_rva;
+    p.dispatch_target = dispatch_target;
+    p.dispatch_flag = dispatch_object[0x18];
+    p.dispatch_hook_calls = g_thunk_hook_calls;
+
+    // The 15 targets the previous pass resolved: the 14 one-byte stubs must leave a canary object
+    // unchanged; 0x20d60 is asserted by the dispatch block above.
+    std::size_t target_count = 0;
+    const std::uint64_t* targets = sotc::guest_resolved_targets(&target_count);
+    bool previous_ok = targets != nullptr && target_count == 15;
+    for (std::size_t i = 0; previous_ok && i < target_count; ++i) {
+        if (targets[i] == 0x20d60) continue;
+        alignas(8) unsigned char canary[0x40];
+        std::memset(canary, 0xa5, sizeof(canary));
+        const std::uint64_t canary_args[6] = {
+            reinterpret_cast<std::uint64_t>(canary), 0, 0, 0, 0, 0};
+        std::uint64_t canary_result = 1;
+        previous_ok = sotc::guest_thunk_invoke(targets[i], canary_args, &canary_result);
+        for (unsigned char byte : canary) previous_ok = previous_ok && byte == 0xa5;
+        if (previous_ok) ++p.previous_targets_called;
+    }
+    p.previous_targets_ok = previous_ok && p.previous_targets_called == 14;
+
     p.ok = setter_called && p.setter_value == 0x2a && first_called && second_called &&
-           p.register_flag == 1 && p.hook_calls == 1 && sotc::guest_thunk_count() == 2;
+           p.register_flag == 1 && p.hook_calls == 1 && p.dispatch_ok &&
+           p.previous_targets_ok && sotc::guest_thunk_count() == 81;
     return p;
 }
 
 void print_guest_thunks(const ThunkProbe& p) {
     std::printf("\"guest_thunks\":{\"registered\":%zu,\"calls\":%d,\"setter_value\":%u,"
-                "\"register_flag\":%u,\"hook_calls\":%d,\"ok\":%s},",
+                "\"register_flag\":%u,\"hook_calls\":%d,\"ok\":%s,"
+                "\"dispatch\":{\"site\":\"0x%llx\",\"target\":\"0x%llx\","
+                "\"flag\":%u,\"hook_calls\":%d,\"ok\":%s},"
+                "\"previous_targets\":{\"total\":15,\"called\":%d,\"ok\":%s}},",
                 sotc::guest_thunk_count(), p.calls, p.setter_value, p.register_flag, p.hook_calls,
-                p.ok ? "true" : "false");
+                p.ok ? "true" : "false", p.dispatch_site, p.dispatch_target, p.dispatch_flag,
+                p.dispatch_hook_calls, p.dispatch_ok ? "true" : "false",
+                p.previous_targets_called, p.previous_targets_ok ? "true" : "false");
 }
 
 void print_post_calls(const sotc::InitWindowRuntimeResult& r) {

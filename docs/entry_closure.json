@@ -5991,22 +5991,1100 @@
   ]
  },
  "native_thunks": {
-  "count": 2,
+  "count": 81,
   "thunks": [
    {
-    "rva": "0x20d60",
-    "name": "concmd_lazy_register",
-    "args": 1,
-    "size": 26,
-    "sha256": "f4463b3b78853849ab4eec851d22d17ecde2d207efd57918e0186412bd84b403"
+    "rva": "0x19f0",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 1 resolved call sites",
+    "call_sites": 1,
+    "rax_live_sites": []
+   },
+   {
+    "rva": "0xb890",
+    "name": "const_u32_b890",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0xb930",
+    "name": "zero_u32",
+    "kind": "zero_u32",
+    "args": 0,
+    "size": 3,
+    "sha256": "251447ee91a9067dcd6ab96703133f617565974cd6c4819021760c4688c91abf",
+    "effect": "returns 0",
+    "immediate": "0x0"
+   },
+   {
+    "rva": "0xbba0",
+    "name": "const_u32_bba0",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0xbbf0",
+    "name": "const_u32_bbf0",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "7adb2a5467d3718ab3b55c6851599af573d4fbeadcd90dd961cfd69d4f94cc9f",
+    "effect": "returns the pinned zero-extended immediate 0x3",
+    "immediate": "0x3"
+   },
+   {
+    "rva": "0xbf70",
+    "name": "const_u32_bf70",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0xbfc0",
+    "name": "const_u32_bfc0",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "7140f35dee6220b79b12aecc27acf5105bf3b77d1588e89fce345de7c16c72b7",
+    "effect": "returns the pinned zero-extended immediate 0x2",
+    "immediate": "0x2"
+   },
+   {
+    "rva": "0xc2a0",
+    "name": "vtable_pair_c2a0",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "b355d74a6edc25ac52cd52ef1de89719ec412b8ea6414e806f80cea7a60e5693",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x1594280 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x1594280"
+   },
+   {
+    "rva": "0xc2c0",
+    "name": "vtable_pair_c2c0",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "047e110aeff5fe3000666c334afa7c4e6c799a779125a7608c000e1eed1a7474",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x1594280 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x1594280"
+   },
+   {
+    "rva": "0xc2f0",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 2 resolved call sites",
+    "call_sites": 2,
+    "rax_live_sites": []
+   },
+   {
+    "rva": "0xc4a0",
+    "name": "vtable_pair_c4a0",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "0137c6226a7dcb380747d73f16a87fab37c63e9c2b8f67d0d1a8f875f2d44a08",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x1594318 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x1594318"
+   },
+   {
+    "rva": "0xc4c0",
+    "name": "vtable_pair_c4c0",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "5f93b13fd6577d64a7242762148d8d994a40ebd9480009297cce40f30caea597",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x1594318 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x1594318"
+   },
+   {
+    "rva": "0xc4f0",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 138 resolved call sites",
+    "call_sites": 138,
+    "rax_live_sites": []
+   },
+   {
+    "rva": "0xc720",
+    "name": "vtable_pair_c720",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "5b63116e7f29674de81acb2a9317619a1c1dcbdbc53f98785a3029c04aa7a914",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15944a0 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15944a0"
+   },
+   {
+    "rva": "0xc740",
+    "name": "vtable_pair_c740",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "3b5a8a9fd4b3e15b1f5f14f73127ac98c5becb3a88fd096f8ccfb2015e991593",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15944a0 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15944a0"
+   },
+   {
+    "rva": "0xc770",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 35 resolved call sites",
+    "call_sites": 35,
+    "rax_live_sites": []
    },
    {
     "rva": "0x13d20",
-    "name": "slot_1c_setter",
+    "name": "set_u32_13d20",
+    "kind": "set_u32",
     "args": 2,
     "size": 4,
-    "sha256": "71ce06d0aa5b8a12c09d86a62c9d2fd4f4d293dcd4e2ef33f188dad1835fbf3c"
+    "sha256": "71ce06d0aa5b8a12c09d86a62c9d2fd4f4d293dcd4e2ef33f188dad1835fbf3c",
+    "effect": "stores the low 32 bits of rsi at object+0x1c; rax unused at all 1 resolved call sites",
+    "offset": "0x1c",
+    "call_sites": 1,
+    "rax_live_sites": []
+   },
+   {
+    "rva": "0x13d50",
+    "name": "zero_u32",
+    "kind": "zero_u32",
+    "args": 0,
+    "size": 3,
+    "sha256": "251447ee91a9067dcd6ab96703133f617565974cd6c4819021760c4688c91abf",
+    "effect": "returns 0",
+    "immediate": "0x0"
+   },
+   {
+    "rva": "0x20d60",
+    "name": "concmd_lazy_register",
+    "kind": "concmd_lazy_register",
+    "args": 1,
+    "size": 26,
+    "sha256": "f4463b3b78853849ab4eec851d22d17ecde2d207efd57918e0186412bd84b403",
+    "effect": "flips object+0x18 once and reports the 0x20d80 map insert through a host hook",
+    "custom": true
+   },
+   {
+    "rva": "0x22ae0",
+    "name": "zero_u32",
+    "kind": "zero_u32",
+    "args": 0,
+    "size": 3,
+    "sha256": "251447ee91a9067dcd6ab96703133f617565974cd6c4819021760c4688c91abf",
+    "effect": "returns 0",
+    "immediate": "0x0"
+   },
+   {
+    "rva": "0x246a0",
+    "name": "const_u32_246a0",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0x24780",
+    "name": "const_u32_24780",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "e36623525b7c35b277173e56616b2d865cf6515aa2be1d12d6814ef725cecffb",
+    "effect": "returns the pinned zero-extended immediate 0x4",
+    "immediate": "0x4"
+   },
+   {
+    "rva": "0x25aa0",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 2 resolved call sites",
+    "call_sites": 2,
+    "rax_live_sites": []
+   },
+   {
+    "rva": "0x25c40",
+    "name": "vtable_pair_25c40",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "84fc1099379817b10d817ea8bc0bd5341eb00e148d29105784858670ef91e529",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x1595100 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x1595100"
+   },
+   {
+    "rva": "0x25c60",
+    "name": "vtable_pair_25c60",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "1ce359d9a094b8d66d7c8975cbc618e9baf073173ac66c3bcf3872302d9d0b04",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x1595100 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x1595100"
+   },
+   {
+    "rva": "0x2bdd0",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 1 resolved call sites",
+    "call_sites": 1,
+    "rax_live_sites": []
+   },
+   {
+    "rva": "0x2c000",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 1 resolved call sites",
+    "call_sites": 1,
+    "rax_live_sites": []
+   },
+   {
+    "rva": "0x2c180",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 1 resolved call sites",
+    "call_sites": 1,
+    "rax_live_sites": []
+   },
+   {
+    "rva": "0x358c0",
+    "name": "vtable_pair_358c0",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "17c50fadc05424b4d07f70ab3a53b2a9b0f263701c9bfb1d282165555a02bb3f",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15955c0 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15955c0"
+   },
+   {
+    "rva": "0x6e990",
+    "name": "vtable_pair_6e990",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "0ef2007ed35ae1f0fc5cc343ffc4841d9c59146ef5f52eff4c34a7510443e0de",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x1597348 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x1597348"
+   },
+   {
+    "rva": "0x6e9b0",
+    "name": "vtable_pair_6e9b0",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "742403aa74a7c74e31b1f04cd2088d86c05278f8e8ad5e8401040a8ceb440aa3",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x1597348 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x1597348"
+   },
+   {
+    "rva": "0x6eb80",
+    "name": "vtable_pair_6eb80",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "e134c3d77bd1d101b28598afb37af73ec0c21dd10886f9666e5b6a6c747cfb45",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15973e0 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15973e0"
+   },
+   {
+    "rva": "0x6eba0",
+    "name": "vtable_pair_6eba0",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "a87fbe5fdcf00265cebde039ec25aa2953e3ccdae7418c7a82c6b05268d37d5a",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15973e0 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15973e0"
+   },
+   {
+    "rva": "0x140c90",
+    "name": "vtable_pair_140c90",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "953bdaa4d771100c170bc9b480281cdbee80b3b728a9539d9daef2f6e93d1e9f",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15983c8 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15983c8"
+   },
+   {
+    "rva": "0x140cb0",
+    "name": "vtable_pair_140cb0",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "1096115572266827793e9ea41040d65ebb740dcddb53b3d42000a1a3ce78c6fd",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15983c8 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15983c8"
+   },
+   {
+    "rva": "0x2334c0",
+    "name": "const_u32_2334c0",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0x233510",
+    "name": "const_u32_233510",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0x49cc00",
+    "name": "vtable_pair_49cc00",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "5a53a9acc65b8464c661212f81eb2bc8498e60c81db963d35382b9b8862d0563",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15bfce8 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15bfce8"
+   },
+   {
+    "rva": "0x49cc20",
+    "name": "vtable_pair_49cc20",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "1b0a183a6009975d675831beba11993566d5939ea3a450305319c17158841dbf",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15bfce8 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15bfce8"
+   },
+   {
+    "rva": "0x49ce00",
+    "name": "vtable_pair_49ce00",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "98cd6ab5305711f0f43482e3289042eb1353293a1b7cec2a2c8dd0e414ed9814",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15bfd80 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15bfd80"
+   },
+   {
+    "rva": "0x49ce20",
+    "name": "vtable_pair_49ce20",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "03def06c6b69baf5e332a0dc72853559a9c65eb97c8808ca977b614aa3b1859f",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15bfd80 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15bfd80"
+   },
+   {
+    "rva": "0x528d90",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 2 resolved call sites",
+    "call_sites": 2,
+    "rax_live_sites": []
+   },
+   {
+    "rva": "0x529150",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 2 resolved call sites",
+    "call_sites": 2,
+    "rax_live_sites": []
+   },
+   {
+    "rva": "0x5296c0",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 2 resolved call sites",
+    "call_sites": 2,
+    "rax_live_sites": []
+   },
+   {
+    "rva": "0x529a80",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 2 resolved call sites",
+    "call_sites": 2,
+    "rax_live_sites": []
+   },
+   {
+    "rva": "0x538200",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 2 resolved call sites",
+    "call_sites": 2,
+    "rax_live_sites": []
+   },
+   {
+    "rva": "0x538520",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 6 resolved call sites",
+    "call_sites": 6,
+    "rax_live_sites": []
+   },
+   {
+    "rva": "0x538850",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 3 resolved call sites",
+    "call_sites": 3,
+    "rax_live_sites": []
+   },
+   {
+    "rva": "0x5388c0",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 1 resolved call sites",
+    "call_sites": 1,
+    "rax_live_sites": []
+   },
+   {
+    "rva": "0x54dc20",
+    "name": "const_u32_54dc20",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "9398bba9a4430e9ca3f4d8739f60f0e3a8740619de228c03ad812f14e31c03a7",
+    "effect": "returns the pinned zero-extended immediate 0x113",
+    "immediate": "0x113"
+   },
+   {
+    "rva": "0x7eb570",
+    "name": "const_u32_7eb570",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0x7eb7f0",
+    "name": "const_u32_7eb7f0",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0x8254c0",
+    "name": "const_u32_8254c0",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0x825510",
+    "name": "const_u32_825510",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0x825f40",
+    "name": "const_u32_825f40",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0x8261e0",
+    "name": "const_u32_8261e0",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0x829a70",
+    "name": "vtable_pair_829a70",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "cbc1c5f62b09159d4636f43602a1db1d9bf29fbca2b73f47e4ffda4118ca4c66",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15ceac8 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15ceac8"
+   },
+   {
+    "rva": "0x829a90",
+    "name": "vtable_pair_829a90",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "24eb1799606d34bb69fe5bf7b9dfe4a87fe56724f57e54abd7f3f429827d13b9",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15ceac8 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15ceac8"
+   },
+   {
+    "rva": "0x829ad0",
+    "name": "vtable_pair_829ad0",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "a10c86d59b79057fca22efa69d8c5982377af5aeeaf848c5c8e142a1b5f942b1",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15ceae8 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15ceae8"
+   },
+   {
+    "rva": "0x829af0",
+    "name": "vtable_pair_829af0",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "4a142c5be786c1f079a96e6c72f481b9a4154785b4034cd8d9464e2617d42f45",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15ceae8 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15ceae8"
+   },
+   {
+    "rva": "0xa31d90",
+    "name": "const_u32_a31d90",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0xa31f10",
+    "name": "const_u32_a31f10",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0xa32440",
+    "name": "vtable_pair_a32440",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "343211eff0e6f6a24d0fde1799dabeea6577cfcf32b9d65b93a23b58b894a69f",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15d1188 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15d1188"
+   },
+   {
+    "rva": "0xa32460",
+    "name": "vtable_pair_a32460",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "e1abbdfe1df2168c9b8c998976c2fac42840b3536e4c81e4c9b969c5a1576644",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15d1188 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15d1188"
+   },
+   {
+    "rva": "0xa4d490",
+    "name": "const_u32_a4d490",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0xa4d760",
+    "name": "const_u32_a4d760",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0xa4e190",
+    "name": "const_u32_a4e190",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0xa4e310",
+    "name": "const_u32_a4e310",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0xa4e830",
+    "name": "const_u32_a4e830",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0xa4e9b0",
+    "name": "const_u32_a4e9b0",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0xa60ea0",
+    "name": "const_u32_a60ea0",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0xa60ef0",
+    "name": "const_u32_a60ef0",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0xa61940",
+    "name": "const_u32_a61940",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0xa61990",
+    "name": "const_u32_a61990",
+    "kind": "const_u32",
+    "args": 0,
+    "size": 6,
+    "sha256": "2db31f4e09597946e56e859813bfdad7046d457c32332c3a882654d1e3ffdf67",
+    "effect": "returns the pinned zero-extended immediate 0x1",
+    "immediate": "0x1"
+   },
+   {
+    "rva": "0xa62440",
+    "name": "vtable_pair_a62440",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "619efe65e861dd2d06fdb1863b907b66ddfa2e80ee5b06556e328d3d535d2b2a",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15d1fa8 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15d1fa8"
+   },
+   {
+    "rva": "0xa62460",
+    "name": "vtable_pair_a62460",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "28802809bea6d5c9fbc0b9f6b503dac4d7e6dd6348ef94081dca3e47f92b05a2",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15d1fa8 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15d1fa8"
+   },
+   {
+    "rva": "0xa62800",
+    "name": "vtable_pair_a62800",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "7518b6f1099c471e3e458f8233611949766ab92e354df487f661cd513a245aaf",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15d2080 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15d2080"
+   },
+   {
+    "rva": "0xa62820",
+    "name": "vtable_pair_a62820",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "79ac4bbae4a4eff4e084959e60219a42d143838d3080774ff0c6180e73b12410",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15d2080 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15d2080"
+   },
+   {
+    "rva": "0xb0e1f0",
+    "name": "vtable_pair_b0e1f0",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "93065bdb89a418e3d5e9ef9803389ed60166b3a4f0a21036cd1f8ab851081d52",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15d5960 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15d5960"
+   },
+   {
+    "rva": "0xb0e210",
+    "name": "vtable_pair_b0e210",
+    "kind": "vtable_pair_ctor",
+    "args": 2,
+    "size": 20,
+    "sha256": "7b35df9f7a7dea016098a69f926902670b796a2010c86d8e35921a0766345e1e",
+    "effect": "stores rsi+0x10 at object+0x10 and constant 0x15d5960 at object+0x20; returns rsi+0x10",
+    "copy_offset": "0x10",
+    "const_offset": "0x20",
+    "constant": "0x15d5960"
+   },
+   {
+    "rva": "0xd7c4b0",
+    "name": "zero_u32",
+    "kind": "zero_u32",
+    "args": 0,
+    "size": 3,
+    "sha256": "251447ee91a9067dcd6ab96703133f617565974cd6c4819021760c4688c91abf",
+    "effect": "returns 0",
+    "immediate": "0x0"
    }
+  ],
+  "blocked": [
+   {
+    "rva": "0x207d0",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x20d80",
+    "symbol": null,
+    "reason": "needs_live_manager_pointer_from_bss_0x2dfcbc8"
+   },
+   {
+    "rva": "0x23370",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x235c0",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x25c90",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x41900",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x4a4a0",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0xa1cc0",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x140ce0",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x147e10",
+    "symbol": null,
+    "reason": "setter_return_value_caller_owned_no_call_site"
+   },
+   {
+    "rva": "0x16a5d0",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x2111d0",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x49cc50",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x49ce50",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x5388e0",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x56db70",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x56dca0",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x56fad0",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x5b3cf0",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x5b3d00",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x829ac0",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x829b20",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0x9844b0",
+    "symbol": null,
+    "reason": "tail_jump_needs_unmodelled_callee_and_rodata_leaq"
+   },
+   {
+    "rva": "0xa32490",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0xa40e20",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0xa431e0",
+    "symbol": null,
+    "reason": "byte_setter_return_value_caller_owned_no_liveness_evidence"
+   },
+   {
+    "rva": "0xa4f4c0",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0xa4feb0",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0xa50270",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0xa52b70",
+    "symbol": null,
+    "reason": "byte_setter_return_value_caller_owned_no_liveness_evidence"
+   },
+   {
+    "rva": "0xa599e0",
+    "symbol": null,
+    "reason": "byte_setter_return_value_caller_owned_no_liveness_evidence"
+   },
+   {
+    "rva": "0xa62490",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0xa62850",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0xacc5b0",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   },
+   {
+    "rva": "0xb0e240",
+    "symbol": null,
+    "reason": "no_mapped_call_site_to_prove_return_unused"
+   }
+  ],
+  "dispatch": {
+   "site": "0x28471",
+   "function": "0x27990",
+   "vtable": "0x1594dc0",
+   "slot": "0x20",
+   "target": "0x20d60",
+   "vtable_sha256": "62d5d2776fa8b3c005533e61eef04eea0e796469b49ef183a3e2093f3c899aa7"
+  },
+  "previous_targets": [
+   "0x19f0",
+   "0x25aa0",
+   "0x2bdd0",
+   "0x20d60",
+   "0x528d90",
+   "0x529150",
+   "0x5296c0",
+   "0xc2f0",
+   "0x529a80",
+   "0x538520",
+   "0x538850",
+   "0x538200",
+   "0x5388c0",
+   "0xc4f0",
+   "0xc770"
   ]
  },
  "samples": {

@@ -66,20 +66,51 @@ The `ret_stub` rows are the one-byte `ret` functions already executed on the Ini
 
 ## Native retail-ABI thunks
 
-**2** entries are hosted as real SysV callables in
-`native/core/guest_thunks.cpp`; the fixture and the runtime invoke them through the registry
-and assert the observed effects:
+**81** entries are hosted as real SysV callables: the generated
+`native/core/guest_thunk_table.inc` plus the custom `0x20d60` body. The runtime and
+`test_guest_thunks` invoke them through the registry and assert the observed object delta or
+return value:
 
-| RVA | Name | Args | Body | Observed |
-| --- | --- | ---: | --- | --- |
-| `0x20d60` | `concmd_lazy_register` | 1 | 26 B, sha256 `f4463b3b78853849…` | object byte +0x18 flips once; hook fires once; second call is a no-op |
-| `0x13d20` | `slot_1c_setter` | 2 | 4 B, sha256 `71ce06d0aa5b8a12…` | dword at object+0x1c becomes the rsi argument |
+| Kind | Count | Registered only when | Observed effect |
+| --- | ---: | --- | --- |
+| `concmd_lazy_register` | **1** | flag test/store reproduced; map insert is a host hook | flag flips once, hook fires once, second call no-op |
+| `const_u32` | **28** | the whole body is `movl $imm,%eax; retq` | returns the pinned immediate |
+| `set_u32` | **1** | whole body is one store + ret; return dead at every known site | stores rsi at object+offset |
+| `void_noop` | **16** | backward rax liveness proves every resolved caller ignores the return | no effect; registered only for dead-return stubs |
+| `vtable_pair_ctor` | **31** | whole body is two stores + ret, constant from a RIP `lea` | copies rsi+0x10 and installs the pinned address |
+| `zero_u32` | **4** | the whole body is `xorl %eax,%eax; retq` | returns 0 |
 
-`0x20d60` reproduces the flag test and store, then reports the manager map insert through a
-host hook: the insert body (`0x20d80`) needs the live manager pointer from the BSS global
-`0x2dfcbc8`, which the host does not have. The 14 one-byte `ret` targets are **not**
-registered: a C thunk cannot leave `rax` untouched as the retail stub does, and returning 0
-would invent a result.
+The 15 RVAs the earlier pass resolved are all accounted for:
+
+- `0x19f0` — registered as `void_noop` (invoked by the fixture/runtime).
+- `0x25aa0` — registered as `void_noop` (invoked by the fixture/runtime).
+- `0x2bdd0` — registered as `void_noop` (invoked by the fixture/runtime).
+- `0x20d60` — registered as `concmd_lazy_register` (invoked by the fixture/runtime).
+- `0x528d90` — registered as `void_noop` (invoked by the fixture/runtime).
+- `0x529150` — registered as `void_noop` (invoked by the fixture/runtime).
+- `0x5296c0` — registered as `void_noop` (invoked by the fixture/runtime).
+- `0xc2f0` — registered as `void_noop` (invoked by the fixture/runtime).
+- `0x529a80` — registered as `void_noop` (invoked by the fixture/runtime).
+- `0x538520` — registered as `void_noop` (invoked by the fixture/runtime).
+- `0x538850` — registered as `void_noop` (invoked by the fixture/runtime).
+- `0x538200` — registered as `void_noop` (invoked by the fixture/runtime).
+- `0x5388c0` — registered as `void_noop` (invoked by the fixture/runtime).
+- `0xc4f0` — registered as `void_noop` (invoked by the fixture/runtime).
+- `0xc770` — registered as `void_noop` (invoked by the fixture/runtime).
+
+The **35** entries that stay non-callable keep their exact
+RVA and reason in `entry_closure.json` under `native_thunks.blocked` (29 one-byte `ret`
+entries have no mapped call site to prove the return unused, three byte setters have no
+liveness evidence, one setter is caller-owned, `0x20d80` needs the live manager pointer, and
+`0x9844b0` tail-jumps into an unmodelled callee).
+
+## Dispatch through a resolved indirect site
+
+Site `0x28471` in `0x27990` calls `*0x20(%rax)`.
+The host vtable image at `0x1594dc0` (sha256 `62d5d2776fa8b3c0…`)
+holds `0x20d60` at that slot. `guest_dispatch_slot` reads the slot from that host
+image and invokes the native body; the runtime and fixture observe object `+0x18 = 1` and one
+hook call (second dispatch is a no-op), not merely the lookup result.
 
 ## Indirect frontier of the Init closure
 
@@ -175,8 +206,8 @@ to be an exact FDE start.
 ## What this changes
 
 - `ENTRY_MAP.md`'s open item 2 (address → callable retail-ABI entry) is answered at the shape
-  level for every start, and two entries now have real SysV thunk bodies invoked through the
-  runtime. The rest still need a matching native signature and host state.
+  level for every start, and **81** entries now have real SysV
+  thunk bodies; one indirect site executes through the host vtable image end to end.
 - Open item 3 (indirect targets) is measured and partially resolved; every remaining site is
   enumerated with its blocking reason instead of being left as a count.
 - The native runtime exposes `guest_entry_callable(rva)` and the indirect summary from the
@@ -185,7 +216,7 @@ to be an exact FDE start.
 ## Limits
 
 - FDE-derived function universe; a function without unwind data is invisible.
-- Provenance is a linear same-block backward scan (max 70 instructions, max 3 register hops).
-  A definition behind a branch, call or block boundary is deliberately treated as unknown.
-- `retail_entry` proves the ELF shape, not a native callable signature; no thunk bodies are
-  generated and no target is inferred from a vtable's name or from a runtime object type.
+- Provenance is the forward basic-block CFG dataflow described above; a value merged from
+  unequal paths, loaded from object memory or built on a stack object stays unknown.
+- Thunk registration covers only complete leaf bodies with an exact host-free pattern. The
+  other retail entries still need a native signature, host state or a larger lifted body.

@@ -12,7 +12,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `.graft` | 1 | Project folder; add a contract to docs/INDEX.md |
 | `Shadow of the Colossus` | 2 | Original user game inputs; read-only and private |
 | `docs` | 42 | Plans, task/evidence registries, checkpoint and escalation documentation |
-| `docs/checkpoints` | 1110 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs/checkpoints` | 1111 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/escalations` | 10 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/evidence` | 9 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/schemas` | 1 | Plans, task/evidence registries, checkpoint and escalation documentation |
@@ -35,13 +35,13 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/Tests/LauncherCoreTests` | 18 | Native Swift macOS launcher |
 | `launcher/Tests/LauncherNativeCoreTests` | 2 | Native Swift macOS launcher |
 | `local` | 14 | Private extracted assets, binary analysis, manifests, builds and evidence |
-| `logs` | 161 | Private command/build/install/extraction logs |
+| `logs` | 164 | Private command/build/install/extraction logs |
 | `native` | 2 | Native game implementation; verify module README and task ownership |
 | `native/api` | 4 | Native game implementation; verify module README and task ownership |
 | `native/api/standalone` | 1 | Native game implementation; verify module README and task ownership |
 | `native/api/tests` | 2 | Native game implementation; verify module README and task ownership |
 | `native/app` | 4 | Native game implementation; verify module README and task ownership |
-| `native/core` | 1902 | Native game implementation; verify module README and task ownership |
+| `native/core` | 1903 | Native game implementation; verify module README and task ownership |
 | `native/lanes` | 7 | Native game implementation; verify module README and task ownership |
 | `native/platform` | 18 | Native game implementation; verify module README and task ownership |
 | `native/tests` | 705 | Native game implementation; verify module README and task ownership |
