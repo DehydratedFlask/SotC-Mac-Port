@@ -1,3 +1,36 @@
+## 2026-11-13 — Candidate audit: no eligible 95th row (94/22 retained)
+
+**State: green.** Continuation of `33b26f9c` on `cursor/init-hash-551140-6aa93e8`. Init-lift is
+untouched: **46,876 / 46,881 B**, **108,325 B** native; `0x2170` (`0x5ba041`) and S4.2 geometry
+(`0x7f8664..0x7f87d8`) stay closed.
+
+**Audited, not registered.** The generator's bounded guard is exactly **116 rows = 94 registered +
+22 blocked**. None of the three helpers exposed by the `0x20d80` decode is in either list:
+
+- `0xf8f3d0` and `0xf8f3e0` are **FDE-less 6-byte PLT/GOT jumps** (guard acquire/release imports),
+  not candidate bodies and not callable native functions. They are reached at `0x20e90`/`0x20eb9`,
+  but the reached slot resolves through the GOT.
+- `0x42d30` is a genuine **0x21c FDE body** with a direct call at **`0x2138a`** from `0x211d0`
+  (`rdi=tree_node`, `rsi=parent`, `rdx=root`, `ecx=color`), but it has no entry-map name and is
+  outside the 116-row guard. Registering it would require a **117th candidate row** or widening the
+  candidate class, both forbidden by this task.
+
+No row was fabricated, no scan was widened, and the 22 blocked diagnoses plus the `0x9844b0` row
+are untouched. This is outcome (b) in the mission: a written per-candidate determination.
+
+**Counts:** 94 registered / 22 blocked, per-kind delta 0; guard **116**; unbounded 570 rejected.
+
+**Runtime:** unchanged and green: `registered=94`, `ok=true`,
+`concmd_registry={size:3,rotations:1,global:2,null_ok:true}`, `byte_setter=255`,
+`previous_targets=15/14/ok`, `printf_string_ok=true`; exit 0, stderr 0 B.
+
+**Verification:** build **0**; full CTest **706/706**; checker `native_thunks=94` with mutation;
+`run_all_checkers.sh` **915/0/0**; entry map **1,957 / 584 / 462**; project index **114,667**;
+publish-path audit exit 0; attribution OK.
+
+**Next exact action:** find a real caller plus caller-level `rax` liveness for one of the 22 stubs,
+or a body already inside the 116-row guard. Do not add a candidate row.
+
 ## 2026-11-13 — `0x20d80` null branch + RB rotations close the live gap (94 retained)
 
 **State: green.** Continuation of `a44f15a5` on `cursor/init-hash-551140-6aa93e8`. Init-lift is

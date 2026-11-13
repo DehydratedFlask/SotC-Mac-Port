@@ -233,6 +233,9 @@ instructions validate **3,002** direct sites. That adds `0xa1cc0` (caller `0x256
 setters, 2 setters, 31 vtable-pair ctors, 1 ConCmd lazy, 1 ConCmd registry insert, 1 printf custom).
 **The remaining ordered blockers are the 22 reference-audited one-byte stubs**: 19 relocated vtable
 slots with named addresses, one inert image reference and two with no image/relocation reference.
+A guard audit of the helpers exposed by the `0x20d80` decode found that `0xf8f3d0`/`0xf8f3e0` are
+FDE-less PLT/GOT import jumps and `0x42d30` is a real 0x21c FDE body (direct call `0x2138a`) but
+outside the bounded 116-row candidate set; none is eligible without a 117th row or a widened scan.
 They cannot be registered without a real caller or a widened scan, so the latest pass closed the
 last live gap inside `0x20d80` instead: its null branch at `0x20e7f` now appends through the global
 sentinel at `0x2dfce50` (guard `0x2dfce60`), and its `0x211d0`/`0x42d30` tree model now reproduces
