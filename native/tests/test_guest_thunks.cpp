@@ -134,41 +134,72 @@ int main() {
     CHECK(guest_thunk_invoke(0xa1cc0, full_scan_args, &result));
     for (unsigned char byte : full_scan_canary.bytes) CHECK(byte == 0x3c);
 
-    // 0x20d80 non-null path: case-insensitive set insert, duplicate rejection and container size.
+    // 0x20d80 non-null path: case-insensitive RB-set insert, duplicate rejection and container
+    // size. Alpha, Beta, Gamma is a right-right insertion and forces a rotation.
     alignas(8) unsigned char concmd_container[0x80] = {};
     alignas(8) unsigned char concmd_a[0x60];
     alignas(8) unsigned char concmd_b[0x60];
+    alignas(8) unsigned char concmd_c[0x60];
     alignas(8) unsigned char concmd_dup[0x60];
     std::memset(concmd_a, 0x11, sizeof(concmd_a));
     std::memset(concmd_b, 0x22, sizeof(concmd_b));
+    std::memset(concmd_c, 0x44, sizeof(concmd_c));
     std::memset(concmd_dup, 0x33, sizeof(concmd_dup));
     const char key_a[] = "Alpha";
     const char key_b[] = "Beta";
+    const char key_c[] = "Gamma";
     const char key_dup[] = "alpha";
     const std::uint64_t key_a_address = reinterpret_cast<std::uint64_t>(key_a);
     const std::uint64_t key_b_address = reinterpret_cast<std::uint64_t>(key_b);
+    const std::uint64_t key_c_address = reinterpret_cast<std::uint64_t>(key_c);
     const std::uint64_t key_dup_address = reinterpret_cast<std::uint64_t>(key_dup);
     std::memcpy(concmd_a + 0x20, &key_a_address, sizeof(key_a_address));
     std::memcpy(concmd_b + 0x20, &key_b_address, sizeof(key_b_address));
+    std::memcpy(concmd_c + 0x20, &key_c_address, sizeof(key_c_address));
     std::memcpy(concmd_dup + 0x20, &key_dup_address, sizeof(key_dup_address));
-    unsigned char concmd_before_a[0x60], concmd_before_b[0x60], concmd_before_dup[0x60];
+    unsigned char concmd_before_a[0x60], concmd_before_b[0x60], concmd_before_c[0x60], concmd_before_dup[0x60];
     std::memcpy(concmd_before_a, concmd_a, sizeof(concmd_before_a));
     std::memcpy(concmd_before_b, concmd_b, sizeof(concmd_before_b));
+    std::memcpy(concmd_before_c, concmd_c, sizeof(concmd_before_c));
     std::memcpy(concmd_before_dup, concmd_dup, sizeof(concmd_before_dup));
     const std::uint64_t concmd_a_args[2] = {reinterpret_cast<std::uint64_t>(concmd_a),
                                             reinterpret_cast<std::uint64_t>(concmd_container)};
     const std::uint64_t concmd_b_args[2] = {reinterpret_cast<std::uint64_t>(concmd_b),
                                             reinterpret_cast<std::uint64_t>(concmd_container)};
+    const std::uint64_t concmd_c_args[2] = {reinterpret_cast<std::uint64_t>(concmd_c),
+                                            reinterpret_cast<std::uint64_t>(concmd_container)};
     const std::uint64_t concmd_dup_args[2] = {reinterpret_cast<std::uint64_t>(concmd_dup),
                                               reinterpret_cast<std::uint64_t>(concmd_container)};
     CHECK(guest_thunk_invoke(0x20d80, concmd_a_args, &result));
     CHECK(guest_thunk_invoke(0x20d80, concmd_b_args, &result));
+    CHECK(guest_thunk_invoke(0x20d80, concmd_c_args, &result));
     CHECK(guest_thunk_invoke(0x20d80, concmd_dup_args, &result));
-    CHECK(guest_concmd_registered_count(concmd_container) == 2);
+    CHECK(guest_concmd_registered_count(concmd_container) == 3);
+    CHECK(guest_concmd_rotation_count(concmd_container) >= 1);
     CHECK(guest_concmd_root_node(concmd_container) != 0);
     CHECK(std::memcmp(concmd_before_a, concmd_a, sizeof(concmd_before_a)) == 0);
     CHECK(std::memcmp(concmd_before_b, concmd_b, sizeof(concmd_before_b)) == 0);
+    CHECK(std::memcmp(concmd_before_c, concmd_c, sizeof(concmd_before_c)) == 0);
     CHECK(std::memcmp(concmd_before_dup, concmd_dup, sizeof(concmd_before_dup)) == 0);
+
+    // Null container takes 0x20e7f: append both original nodes to the global sentinel list
+    // without reading a key. The second node links behind the first node's +0x8 link.
+    alignas(8) unsigned char concmd_null_a[0x40] = {};
+    alignas(8) unsigned char concmd_null_b[0x40] = {};
+    std::memset(concmd_null_a, 0x55, sizeof(concmd_null_a));
+    std::memset(concmd_null_b, 0x66, sizeof(concmd_null_b));
+    const std::uint64_t concmd_null_a_args[2] = {reinterpret_cast<std::uint64_t>(concmd_null_a), 0};
+    const std::uint64_t concmd_null_b_args[2] = {reinterpret_cast<std::uint64_t>(concmd_null_b), 0};
+    CHECK(guest_thunk_invoke(0x20d80, concmd_null_a_args, &result));
+    CHECK(guest_thunk_invoke(0x20d80, concmd_null_b_args, &result));
+    CHECK(guest_concmd_global_count() == 2);
+    std::uint64_t null_a_link = 0, null_a_prev = 0, null_b_prev = 0;
+    std::memcpy(&null_a_link, concmd_null_a + 0x8, sizeof(null_a_link));
+    std::memcpy(&null_a_prev, concmd_null_a + 0x10, sizeof(null_a_prev));
+    std::memcpy(&null_b_prev, concmd_null_b + 0x10, sizeof(null_b_prev));
+    CHECK(null_a_link == reinterpret_cast<std::uint64_t>(concmd_null_b + 0x8));
+    CHECK(null_b_prev == reinterpret_cast<std::uint64_t>(concmd_null_a + 0x8));
+    CHECK(null_a_prev != 0);
 
     // 0x9844b0 is a tail jump to imported printf with the pinned "%s" format. Its third
     // argument is forwarded as the string; both resolved indirect sites ignore the return.

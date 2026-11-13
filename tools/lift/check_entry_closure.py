@@ -117,7 +117,10 @@ def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
         if rva == 0x20D80:
             expected = {"container": "0x2dfcbc8", "tree_offset": "0x18", "size_offset": "0x28",
                         "lock_offset": "0x58", "inserter": "0x211d0", "comparator": "0xf8f500",
-                        "comparator_import": "strcasecmp", "value_offset": "0x40"}
+                        "comparator_import": "strcasecmp", "value_offset": "0x40",
+                        "tree_color_offset": "0x18", "null_branch": "0x20e7f",
+                        "global_sentinel": "0x2dfce50", "global_tail": "0x2dfce58",
+                        "global_guard": "0x2dfce60"}
             for key, value in expected.items():
                 if thunk.get(key) != value:
                     return False

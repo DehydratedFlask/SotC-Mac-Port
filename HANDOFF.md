@@ -1,3 +1,48 @@
+## 2026-11-13 — `0x20d80` null branch + RB rotations close the live gap (94 retained)
+
+**State: green.** Continuation of `a44f15a5` on `cursor/init-hash-551140-6aa93e8`. Init-lift is
+untouched: **46,876 / 46,881 B**, **108,325 B** native; `0x2170` (`0x5ba041`) and S4.2 geometry
+(`0x7f8664..0x7f87d8`) stay closed.
+
+**Why this branch.** The top ordered blockers are the **22 reference-audited one-byte stubs** (19
+relocated vtable slots, one inert image reference, two without image/relocation references). None
+has a decodable body or a real call site that can be registered without widening the candidate scan
+or inventing evidence. The pass therefore closed the one live gap left inside the already-registered
+`0x20d80`. Counts stay **94 / 22**; per-kind delta is **0**.
+
+**Null branch (decoded at `0x20e7f`).** Guard byte `0x2dfce60`; init calls `0xf8f3d0`/`0xf8f3e0`;
+self-referential sentinel at `0x2dfce50`/`0x2dfce58`; append writes tail to `node+0x10`, sentinel
+to `node+0x8`, updates `0x2dfce58`, and writes the new link through the old tail. It never reads
+`node+0x20`, so it does not compare keys or reject duplicates. The native `append_global` mirrors
+all four stores and counts the global list.
+
+**RB path.** `0x211d0` allocates the 0x48 B tree node; `0x42d30` uses left `+0x0`, right `+0x8`,
+parent `+0x10` and color `+0x18`. The model now uses those fields and performs the standard
+red-black insert fixup, counting each rotation. `Alpha`, `Beta`, `Gamma` is right-right and forces
+one rotation; the following `alpha` duplicate leaves size, root, rotations and node bytes untouched.
+
+**Observed runtime effect:**
+`concmd_registry={size:3,rotations:1,global:2,null_ok:true,ok:true}`, `byte_setter=255`,
+`previous_targets=15/14/ok`, `printf_string_ok=true`, `registered=94`; exit **0**, stderr **0 B**.
+The null scenario invokes `0x20d80` twice with container `0` and key-less nodes, then asserts the
+exact `+0x8`/`+0x10` links and global count 2. This remains a contract-level native model, not
+original x86 execution.
+
+**Row evidence.** `0x20d80`: `direct_call_sites=3` (`0x21166`, `0x23770`, `0x238d9`), `indirect=0`,
+`call_sites=3`, `rax_live_sites=[]`; new fields `null_branch=0x20e7f`, `global_sentinel=0x2dfce50`,
+`global_tail=0x2dfce58`, `global_guard=0x2dfce60`, `tree_color_offset=0x18`; unchanged body hash
+`f59869f13c36fe90ed647d1a642006ec48be8676d992175fd959a97346cc41fb`.
+
+**Counts.** 94 (23 noop / 28 const / 4 zero / 3 set_u8 / 2 set_u32 / 31 ctor / 1 ConCmd lazy /
+1 ConCmd registry / 1 printf); 22 blocked; guard **116**; unbounded 570 rejected.
+
+**Verification.** Build **0**; full CTest **706/706**; checker `native_thunks=94` with mutation;
+runtime exit 0 / stderr 0 B; `run_all_checkers.sh` **915/0/0**; entry map **1,957 / 584 / 462**;
+project index **114,667**; publish-path audit exit 0; attribution OK.
+
+**Next exact action:** resolve one of the 22 reference-audited stubs through a real relocated-slot
+call with caller-level `rax` liveness. Do not widen the scan or invent a site.
+
 ## 2026-11-13 — The ConCmd registry insert: 93 -> 94 native bodies (CPU-01-AOT-CFG-CALLABLE-01, continued)
 
 **State: green.** Continuation of `310432a5` on `cursor/init-hash-551140-6aa93e8`. Init-lift is

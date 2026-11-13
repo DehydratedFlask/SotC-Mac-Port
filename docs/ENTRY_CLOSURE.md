@@ -74,7 +74,7 @@ return value:
 | Kind | Count | Registered only when | Observed effect |
 | --- | ---: | --- | --- |
 | `concmd_lazy_register` | **1** | flag test/store reproduced; map insert is a host hook | flag flips once, hook fires once, second call no-op |
-| `concmd_registry_insert` | **1** | non-null path: strcasecmp tree walk, duplicate rejection, 0x211d0 insert | container size at +0x28 increments once; tree node +0x40 holds the node |
+| `concmd_registry_insert` | **1** | non-null RB path: strcasecmp walk, duplicate rejection, 0x211d0 insert; null path appends to global 0x2dfce50 | container size at +0x28 increments once; rotations observed; tree node +0x40 holds the node; null nodes link through +0x8/+0x10 |
 | `const_u32` | **28** | the whole body is `movl $imm,%eax; retq` | returns the pinned immediate |
 | `printf_string` | **1** | tail jump to imported printf with pinned `%s`; two resolved sites ignore rax | forwards argument 3 to printf; a host hook observes the string |
 | `set_u32` | **2** | whole body is one store + ret; return dead at every mapped site | stores rsi at object+offset |

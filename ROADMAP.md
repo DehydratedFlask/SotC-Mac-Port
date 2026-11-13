@@ -230,11 +230,15 @@ pass widened the evidence to direct calls, and the follow-up scans the **full FD
 **55,790 ranges / 15,839,273 B**, **898** candidate caller bodies and **231,649** decoded
 instructions validate **3,002** direct sites. That adds `0xa1cc0` (caller `0x256c38` in
 `0x2569d0`), so **94 entries now have native bodies** (23 noop, 28 constants, 4 zero, 3 byte
-setters, 2 setters, 31 vtable-pair ctors, 1 ConCmd lazy, 1 ConCmd registry insert, 1 printf custom);
-22 keep exact RVAs and measured reasons. `0x20d80` now models the decoded non-null set insert:
-`strcasecmp` tree walk, duplicate rejection, tree-node `+0x40` value and container size `+0x28`.
-The printf row is `0x9844b0`, whose PLT resolves to NID `hcuQgD53UxM` and whose format is `%s`.
-Nineteen of the remaining 22 stubs are relocated vtable slots with named addresses. A CFG-resolved site (`0x28471` -> vtable `0x1594dc0` slot `0x20`)
+setters, 2 setters, 31 vtable-pair ctors, 1 ConCmd lazy, 1 ConCmd registry insert, 1 printf custom).
+**The remaining ordered blockers are the 22 reference-audited one-byte stubs**: 19 relocated vtable
+slots with named addresses, one inert image reference and two with no image/relocation reference.
+They cannot be registered without a real caller or a widened scan, so the latest pass closed the
+last live gap inside `0x20d80` instead: its null branch at `0x20e7f` now appends through the global
+sentinel at `0x2dfce50` (guard `0x2dfce60`), and its `0x211d0`/`0x42d30` tree model now reproduces
+the `+0x10` parent, `+0x18` color and RB rotation contract. `Alpha`, `Beta`, `Gamma` forces one
+rotation at runtime; duplicate `alpha` still changes nothing. The printf row is `0x9844b0`, whose
+PLT resolves to NID `hcuQgD53UxM` and whose format is `%s`. A CFG-resolved site (`0x28471` -> vtable `0x1594dc0` slot `0x20`)
 executes through the host vtable image and asserts the invocation result (flag + one hook).
 Genome-wide thunk bodies remain the next gap. Full CTest **706/706**, G1 **PARTIAL**.
 Slot **23** (`0xe71990`) is registered via a **private fixture**; consumer/string necessity

@@ -974,20 +974,30 @@ def _printf_string_contract(e: Elf, ins: dict[int, tuple[str, str]], addrs: list
 
 def _concmd_registry_contract(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int],
                              rva: int, size: int) -> dict:
-    """Validate the decoded non-null set-insert shape and its measured callees."""
+    """Validate the decoded set-insert shape, its callees and the null/global branch."""
     if size != 0x188:
         die(f"ConCmd registry insert {rva:#x} size {size:#x} != 0x188")
     for site, target, what in ((0x20DE2, 0x3B390, "lock"),
                                (0x20E1A, 0xF8F500, "strcasecmp"),
                                (0x20E4C, 0xF8F500, "strcasecmp"),
                                (0x20E61, 0x211D0, "tree insert"),
-                               (0x20E71, 0x3B3C0, "unlock")):
+                               (0x20E71, 0x3B3C0, "unlock"),
+                               (0x20E90, 0xF8F3D0, "global init"),
+                               (0x20EB9, 0xF8F3E0, "global init guard")):
         actual = e.call(site)
         if actual != target:
             die(f"ConCmd registry insert {rva:#x} {what} at {site:#x} calls {actual:#x}")
+    for site, text in ((0x20E7F, "movb"), (0x20E99, "leaq"), (0x20EA0, "leaq"),
+                       (0x20EB1, "vmovdqu"), (0x20EBE, "movq"), (0x20EC5, "leaq"),
+                       (0x20ED8, "movq"), (0x20EDF, "movq")):
+        if site not in ins or ins[site][0].split()[0] != text:
+            die(f"ConCmd registry insert null branch site {site:#x} is not {text}")
     return {"container": "0x2dfcbc8", "tree_offset": "0x18", "size_offset": "0x28",
             "lock_offset": "0x58", "inserter": "0x211d0", "comparator": "0xf8f500",
-            "comparator_import": "strcasecmp", "value_offset": "0x40"}
+            "comparator_import": "strcasecmp", "value_offset": "0x40",
+            "tree_color_offset": "0x18", "null_branch": "0x20e7f",
+            "global_sentinel": "0x2dfce50", "global_tail": "0x2dfce58",
+            "global_guard": "0x2dfce60"}
 
 
 def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int],
@@ -1187,9 +1197,10 @@ def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int
         contract = _concmd_registry_contract(e, ins, addrs, concmd_rva,
                                              int(fde_sizes.get(concmd_rva, 0) or 0))
         add(concmd_rva, "concmd_registry_insert", "concmd_registry_insert", 2,
-            "non-null path locks container+0x58, walks the +0x18 tree with strcasecmp on "
+            "non-null path locks container+0x58, walks the +0x18 RB tree with strcasecmp on "
             "node+0x20 keys, rejects an equal key, otherwise inserts through 0x211d0 and writes "
-            "the node pointer at tree-node+0x40; rax unused at all three direct sites",
+            "the node pointer at tree-node+0x40; null path appends at global 0x2dfce50 via the "
+            "0x20e7f branch; rax unused at all three direct sites",
             {**contract, "call_sites": len(concmd_sites), "direct_call_sites": len(concmd_sites),
              "indirect_call_sites": 0, "rax_live_sites": [], "custom": True})
     elif concmd_sites:
@@ -1571,8 +1582,8 @@ def render_doc(data: dict) -> str:
                              "copies rsi+0x10 and installs the pinned address"),
         "concmd_lazy_register": ("flag test/store reproduced; map insert is a host hook",
                                  "flag flips once, hook fires once, second call no-op"),
-        "concmd_registry_insert": ("non-null path: strcasecmp tree walk, duplicate rejection, 0x211d0 insert",
-                                   "container size at +0x28 increments once; tree node +0x40 holds the node"),
+        "concmd_registry_insert": ("non-null RB path: strcasecmp walk, duplicate rejection, 0x211d0 insert; null path appends to global 0x2dfce50",
+                                   "container size at +0x28 increments once; rotations observed; tree node +0x40 holds the node; null nodes link through +0x8/+0x10"),
         "printf_string": ("tail jump to imported printf with pinned `%s`; two resolved sites ignore rax",
                           "forwards argument 3 to printf; a host hook observes the string"),
     }
