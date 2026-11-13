@@ -339,6 +339,13 @@ static std::uint64_t thunk_147e10_set_u32(std::uint64_t a0, std::uint64_t a1,
     std::memcpy(reinterpret_cast<void*>(a0 + 0x40), &value, sizeof(value));
     return 0;
 }
+static std::uint64_t thunk_16a5d0_void_noop(std::uint64_t a0, std::uint64_t a1,
+                                     std::uint64_t, std::uint64_t,
+                                     std::uint64_t, std::uint64_t) {
+    // body: ret (0x16a5d0); rax is unused at every resolved call site
+    (void)a0; (void)a1;
+    return 0;
+}
 static std::uint64_t thunk_2334c0_const_u32(std::uint64_t a0, std::uint64_t a1,
                                      std::uint64_t, std::uint64_t,
                                      std::uint64_t, std::uint64_t) {
@@ -805,6 +812,7 @@ static constexpr GuestThunk kGuestLeafThunks[] = {
     {0x140c90ULL, "vtable_pair_140c90", thunk_140c90_vtable_pair_ctor, 2},
     {0x140cb0ULL, "vtable_pair_140cb0", thunk_140cb0_vtable_pair_ctor, 2},
     {0x147e10ULL, "set_u32_147e10", thunk_147e10_set_u32, 2},
+    {0x16a5d0ULL, "retail_void_stub", thunk_16a5d0_void_noop, 0},
     {0x2334c0ULL, "const_u32_2334c0", thunk_2334c0_const_u32, 0},
     {0x233510ULL, "const_u32_233510", thunk_233510_const_u32, 0},
     {0x49cc00ULL, "vtable_pair_49cc00", thunk_49cc00_vtable_pair_ctor, 2},

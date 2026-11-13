@@ -5991,7 +5991,7 @@
   ]
  },
  "native_thunks": {
-  "count": 98,
+  "count": 99,
   "thunks": [
    {
     "rva": "0x19f0",
@@ -6518,6 +6518,19 @@
     "call_sites": 1,
     "direct_call_sites": 1,
     "indirect_call_sites": 0,
+    "rax_live_sites": []
+   },
+   {
+    "rva": "0x16a5d0",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 1 resolved call sites",
+    "call_sites": 1,
+    "direct_call_sites": 0,
+    "indirect_call_sites": 1,
     "rax_live_sites": []
    },
    {
@@ -7193,22 +7206,6 @@
     ],
     "relocation_slots": [
      "0x15983e0"
-    ],
-    "reference_resolution": "relative_relocation_function_pointer_slot"
-   },
-   {
-    "rva": "0x16a5d0",
-    "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x1598798",
-    "direct_call_sites": 0,
-    "indirect_call_sites": 0,
-    "call_sites": 0,
-    "image_qword_references": 1,
-    "image_qword_reference_sites": [
-     "0x1598798"
-    ],
-    "relocation_slots": [
-     "0x1598798"
     ],
     "reference_resolution": "relative_relocation_function_pointer_slot"
    },

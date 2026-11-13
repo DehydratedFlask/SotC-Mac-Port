@@ -45,7 +45,7 @@ std::uint64_t load64(const Object& object, std::size_t offset) {
 }  // namespace
 
 int main() {
-    CHECK(guest_thunk_count() == 98);
+    CHECK(guest_thunk_count() == 99);
     CHECK(guest_thunk_find(0x20d60) != nullptr);
     CHECK(guest_thunk_find(0x13d20) != nullptr);
     CHECK(guest_thunk_find(0xc4f0) != nullptr);
@@ -221,6 +221,16 @@ int main() {
     CHECK(guest_thunk_invoke(0x235c0, slot4_args, &result));
     CHECK(result == 0);
     for (unsigned char byte : slot4_canary.bytes) CHECK(byte == 0x77);
+
+    // 0x16a5d0 is the one-byte ret at vtable 0x1598780 slot +0x18, called at 0x16aa97. Its body
+    // must leave the caller's canary untouched.
+    Object slot5_canary{};
+    std::memset(slot5_canary.bytes, 0x99, sizeof(slot5_canary.bytes));
+    const std::uint64_t slot5_args[6] = {
+        reinterpret_cast<std::uint64_t>(&slot5_canary), 0, 0, 0, 0, 0};
+    CHECK(guest_thunk_invoke(0x16a5d0, slot5_args, &result));
+    CHECK(result == 0);
+    for (unsigned char byte : slot5_canary.bytes) CHECK(byte == 0x99);
 
     // Null container takes 0x20e7f: append both original nodes to the global sentinel list
     // without reading a key. The second node links behind the first node's +0x8 link.

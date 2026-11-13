@@ -12,7 +12,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `.graft` | 1 | Project folder; add a contract to docs/INDEX.md |
 | `Shadow of the Colossus` | 2 | Original user game inputs; read-only and private |
 | `docs` | 42 | Plans, task/evidence registries, checkpoint and escalation documentation |
-| `docs/checkpoints` | 1121 | Plans, task/evidence registries, checkpoint and escalation documentation |
+| `docs/checkpoints` | 1122 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/escalations` | 10 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/evidence` | 9 | Plans, task/evidence registries, checkpoint and escalation documentation |
 | `docs/schemas` | 1 | Plans, task/evidence registries, checkpoint and escalation documentation |
@@ -35,7 +35,7 @@ Private game/analysis/log paths are summarized here; Graft indexes source symbol
 | `launcher/Tests/LauncherCoreTests` | 18 | Native Swift macOS launcher |
 | `launcher/Tests/LauncherNativeCoreTests` | 2 | Native Swift macOS launcher |
 | `local` | 14 | Private extracted assets, binary analysis, manifests, builds and evidence |
-| `logs` | 236 | Private command/build/install/extraction logs |
+| `logs` | 251 | Private command/build/install/extraction logs |
 | `native` | 2 | Native game implementation; verify module README and task ownership |
 | `native/api` | 4 | Native game implementation; verify module README and task ownership |
 | `native/api/standalone` | 1 | Native game implementation; verify module README and task ownership |

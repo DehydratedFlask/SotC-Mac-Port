@@ -1,3 +1,42 @@
+## 2026-11-13 — 99 native bodies: `0x16a5d0` through vtable `0x1598780+0x18`
+
+**State: green.** Continuation of `9c666337` on `cursor/init-hash-551140-6aa93e8`. Init-lift is
+untouched: **46,876 / 46,881 B**, **108,325 B** native; `0x2170` (`0x5ba041`) and S4.2 geometry
+(`0x7f8664..0x7f87d8`) stay closed.
+
+**Registry 98 -> 99; blocked 18 -> 17; guard 116 unchanged.** `0x16a5d0` was blocked only as
+`no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x1598798`. Its caller
+is already in a mapped FDE: `0x16a810` (`kSlot524`, size `0x2d7`) materializes vtable base
+`0x1598780` at `0x16a8d4`, spills it at `0x16a8db`, reloads it at `0x16aa81`, and dispatches through
+`*0x18(%rbx)` at `0x16aa97`; `0x1598780+0x18` is `0x1598798`, whose qword is `0x16a5d0`. `rax` is
+dead at `0x16aa97` (`_rax_live_after` false over the full `0x2d7` window).
+
+**Why this row.** Its complete base/spill/reload/dispatch chain is local to one mapped FDE and was
+re-decoded directly. `0x2111d0` in `0x211340` also has a partially documented scratch slot but its
+base path was not proven complete in this pass, so it was not substituted.
+
+**Row.** `retail_void_stub`, kind `void_noop`, size 1, body `c3`, sha256
+`ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e`; `direct_call_sites=0`,
+`indirect_call_sites=1`, `call_sites=1`, `rax_live_sites=[]`. The entry map names it
+`kSlot524ScratchVcall`.
+
+**Runtime.** The harness invokes `0x16a5d0` directly with a 0x99 canary; the body's own `retq`
+leaves every byte unchanged and returns 0. `slot5_stub_ok=true`, `registered=99`, and every prior
+effect still passes: `slot_stub_ok=true`, `slot2_stub_ok=true`, `slot3_stub_ok=true`,
+`slot4_stub_ok=true`, `concmd_registry={size:3,rotations:1,global:2,null_ok:true,ok:true}`,
+`byte_setter=255`, `previous_targets=15/14/ok`, `printf_string_ok=true`; exit 0, stderr 0 B.
+
+**Counts.** 99 = 28 noop / 28 const / 4 zero / 3 set_u8 / 2 set_u32 / 31 ctor / 1 ConCmd lazy /
+1 ConCmd registry / 1 printf. Blocked **17** (14 relocated slots, one inert image reference, two
+without image/relocation reference). Guard **116** = 99 + 17; unbounded 570 rejected.
+
+**Verification.** Build **0**; full CTest **706/706**; checker `native_thunks=99` with mutation;
+`run_all_checkers.sh` **915/0/0**; entry map **1,957 / 584 / 462**; project index **114,667**;
+publish-path audit exit 0; attribution OK.
+
+**Next exact action:** decode a complete caller chain for another relocated slot; `0x2111d0`
+(`0x159abd8`) is the most promising partially documented candidate. Do not add a candidate row.
+
 ## 2026-11-13 — 98 native bodies: `0x235c0` through vtable `0x1594e98+0x18`
 
 **State: green.** Continuation of `063bbc2a` on `cursor/init-hash-551140-6aa93e8`. Init-lift is

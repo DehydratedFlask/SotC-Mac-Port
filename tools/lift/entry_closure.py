@@ -1126,6 +1126,29 @@ def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int
             {"function": f"0x{known_fn:x}", "site": f"0x{known_site:x}", "direct": False})
         live[(known_fn, known_site)] = known_live
 
+    # 0x16a5d0 is the one-byte slot at vtable 0x1598780 + 0x18. Its caller is already decoded in
+    # the mapped FDE 0x16a810: the base is materialized at 0x16a8d4, spilled at 0x16a8db, reloaded
+    # at 0x16aa81, and called through slot +0x18 at 0x16aa97. This is a fixed positive-evidence site
+    # for a row that was already blocked; it adds no candidate and does not widen the scan.
+    known_fn, known_site, known_slot, known_target = 0x16A810, 0x16AA97, 0x1598798, 0x16A5D0
+    if e.u64(known_slot) == known_target:
+        expect = ((0x16A8D4, "leaq", "0x1598780"),
+                  (0x16A8DB, "movq", "%rdx, 0xd0(%rsp)"),
+                  (0x16AA81, "movq", "0xd0(%rsp), %rbx"),
+                  (0x16AA97, "callq", "*0x18(%rbx)"))
+        for site, mnemonic, operand in expect:
+            actual = ins.get(site)
+            if actual is None or actual[0] != mnemonic or operand not in actual[1]:
+                die(f"known slot evidence at {site:#x} is {actual!r}, expected {mnemonic} {operand}")
+        size = int(fde_sizes.get(known_fn, 0) or 0)
+        window = [a for a in addrs if known_fn <= a < known_fn + size]
+        if not window or window[0] != known_fn:
+            die(f"known slot caller {known_fn:#x} is not a complete decoded FDE")
+        known_live = _rax_live_after(ins, window, {known_site})[known_site]
+        sites_by_target.setdefault(known_target, []).append(
+            {"function": f"0x{known_fn:x}", "site": f"0x{known_site:x}", "direct": False})
+        live[(known_fn, known_site)] = known_live
+
     rows: list[dict] = []
     blocked: list[dict] = []
     # One-byte `ret` entries can be reached as vtable targets without appearing in the entry map,
@@ -1455,10 +1478,11 @@ def build() -> tuple[dict, str]:
     intervals += [(start, start + size) for _fn, start, size in frontier]
     intervals.append((0x9844B0, 0x9844B0 + 0x11))
     intervals.append((0x20D80, 0x20D80 + 0x188))
-    # Fixed known callers for the 0x207d0, 0x25c90, 0x23370 and 0x235c0 slots; none is a candidate scan.
+    # Fixed known callers for the registered slots; none is a candidate scan.
     intervals.append((0x207E0, 0x207E0 + int(dict(fdes).get(0x207E0, 0))))
     intervals.append((0x25DE0, 0x25DE0 + int(dict(fdes).get(0x25DE0, 0))))
     intervals.append((0x235D0, 0x235D0 + int(dict(fdes).get(0x235D0, 0))))
+    intervals.append((0x16A810, 0x16A810 + int(dict(fdes).get(0x16A810, 0))))
     ins = disassemble(intervals)
     addrs = sorted(ins)
 

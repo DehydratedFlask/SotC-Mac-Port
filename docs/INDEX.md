@@ -9,6 +9,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 |---|---|
 | [TASKS](TASKS.md) | Dependency-ordered task register and detailed work packets; integrator |
 | [EVIDENCE](EVIDENCE.md) | Verified artifact/source/tool facts and unresolved questions; integrator |
+| [99 bodies: `0x16a5d0` vtable slot (2026-11-13)](checkpoints/2026-11-13-vtable-slot-16a5d0-99.md) | E1454; vtable `0x1598780+0x18` -> `0x16a5d0`; caller `0x16a810` sites `0x16a8d4`/`0x16a8db`/`0x16aa81`/`0x16aa97`; one indirect site, `rax` dead; runtime canary `slot5_stub_ok`; **98/18 -> 99/17**, guard 116; ctest 706/706 |
 | [98 bodies: `0x235c0` vtable slot (2026-11-13)](checkpoints/2026-11-13-vtable-slot-235c0-98.md) | E1453; vtable `0x1594e98+0x18` -> `0x235c0`; caller `0x235d0` sites `0x23947`/`0x2397d`/`0x23a74`/`0x23a84`; one indirect site, `rax` dead; runtime canary `slot4_stub_ok`; **97/19 -> 98/18**, guard 116; ctest 706/706 |
 | [97 bodies: `0x23370` vtable slot (2026-11-13)](checkpoints/2026-11-13-vtable-slot-23370-97.md) | E1452; vtable `0x1594e78+0x18` -> `0x23370`; caller `0x235d0` sites `0x23aea`/`0x23b0b`/`0x23c1e`/`0x23c2e`; one indirect site, `rax` dead; runtime canary `slot3_stub_ok`; **96/20 -> 97/19**, guard 116; ctest 706/706 |
 | [96 bodies: `0x25c90` vtable slot (2026-11-13)](checkpoints/2026-11-13-vtable-slot-25c90-96.md) | E1451; vtable `0x1595100+0x18` -> `0x25c90`; caller `0x25de0` sites `0x2612a`/`0x2614c`/`0x2618e`/`0x26199`; one indirect site, `rax` dead; runtime canary `slot2_stub_ok`; **95/21 -> 96/20**, guard 116; ctest 706/706 |

@@ -229,19 +229,18 @@ runtime. The next pass withdrew the blanket "caller-owned rax" refusal: backward
 pass widened the evidence to direct calls, and the follow-up scans the **full FDE range set**:
 **55,790 ranges / 15,839,273 B**, **898** candidate caller bodies and **231,649** decoded
 instructions validate **3,002** direct sites. That adds `0xa1cc0` (caller `0x256c38` in
-`0x2569d0`), so **98 entries now have native bodies** (27 noop, 28 constants, 4 zero, 3 byte
+`0x2569d0`), so **99 entries now have native bodies** (28 noop, 28 constants, 4 zero, 3 byte
 setters, 2 setters, 31 vtable-pair ctors, 1 ConCmd lazy, 1 ConCmd registry insert, 1 printf custom).
-**The remaining ordered blockers are the 18 reference-audited one-byte stubs**: 15 relocated vtable
+**The remaining ordered blockers are the 17 reference-audited one-byte stubs**: 14 relocated vtable
 slots with named addresses, one inert image reference and two with no image/relocation reference.
 A guard audit of the helpers exposed by the `0x20d80` decode found that `0xf8f3d0`/`0xf8f3e0` are
 FDE-less PLT/GOT import jumps and `0x42d30` is a real 0x21c FDE body (direct call `0x2138a`) but
 outside the bounded 116-row candidate set; none is eligible without a 117th row or a widened scan.
 They cannot be registered without a real caller or a widened scan. The latest registration retired
-`0x235c0` through the decoded vtable base `0x1594e98` (`0x23947` materialize, `0x2397d` spill,
-`0x23a74` reload, `0x23a84` `*0x18(%rax)`) in the mapped `0x235d0` FDE, giving one indirect site
-and dead `rax`; the previous registrations retired `0x23370` through base `0x1594e78`, `0x25c90`
-through base `0x1595100`, and `0x207d0` through base `0x1594d60`. The `0x235d0` decode is now fully
-retired. The null branch
+`0x16a5d0` through the decoded vtable base `0x1598780` (`0x16a8d4` materialize, `0x16a8db` spill,
+`0x16aa81` reload, `0x16aa97` `*0x18(%rbx)`) in the mapped `0x16a810` FDE, giving one indirect site
+and dead `rax`; previous registrations retired `0x235c0`, `0x23370`, `0x25c90` and `0x207d0`
+through their own decoded bases. The `0x235d0` decode is fully retired. The null branch
 of `0x20d80` at `0x20e7f` appends through the global
 sentinel at `0x2dfce50` (guard `0x2dfce60`), and its `0x211d0`/`0x42d30` tree model now reproduces
 the `+0x10` parent, `+0x18` color and RB rotation contract. `Alpha`, `Beta`, `Gamma` forces one
