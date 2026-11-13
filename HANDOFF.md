@@ -1,3 +1,38 @@
+## 2026-11-13 — The ConCmd registry insert: 93 -> 94 native bodies (CPU-01-AOT-CFG-CALLABLE-01, continued)
+
+**State: green.** Continuation of `310432a5` on `cursor/init-hash-551140-6aa93e8`. Init-lift is
+untouched: **46,876 / 46,881 B**, **108,325 B** native; `0x2170` (`0x5ba041`) and S4.2 geometry
+(`0x7f8664..0x7f87d8`) stay closed.
+
+**Gap closed:** `0x20d80` now has a native non-null-path model with an observed container effect,
+instead of a host-state blocker.
+
+- **Decoded contract.** `rsi` is the container (`+0x18` root, `+0x28` size, `+0x58` lock), `rdi` is
+  the new node (`+0x20` key). `0x20d80` locks through `0x3b390`, walks the tree with `0xf8f500`
+  (NID `AV6ipCNa4Rw` = `strcasecmp`), rejects an equal key, inserts through `0x211d0`, and stores
+  the original node at tree-node `+0x40`; `0x3b3c0` unlocks.
+- **Native model.** `concmd_registry_insert` uses a host mutex and a deterministic `strcasecmp`
+  binary search tree, copies the node value words, updates `container+0x18`/`+0x28`, and rejects
+  duplicates. This is a contract-level model of the decoded non-null path; RB rotations and the
+  `0x211d0` allocator/fixup internals are not claimed. The null branch at `0x20e7f` is decoded but
+  not modelled.
+- **Runtime effect.** Seeded container: insert `"Alpha"`, `"Beta"`, then duplicate `"alpha"`.
+  Observed `size 2`, non-null root, all node buffers byte-identical, exit 0, stderr 0 B, alongside
+  unchanged `byte_setter=255` and `previous_targets=15/14/ok`.
+- **Row.** `0x20d80`: `direct_call_sites=3` (`0x21166`, `0x23770`, `0x238d9`), `indirect=0`,
+  `call_sites=3`, `rax_live_sites=[]`; body hash
+  `f59869f13c36fe90ed647d1a642006ec48be8676d992175fd959a97346cc41fb`.
+- **Counts.** Surface **93 -> 94**; blocked **23 -> 22**. `concmd_registry_insert` 1; all other
+  kinds unchanged. Candidate guard **116** rows (94 + 22); rejected unbounded variant 570.
+- **Verification.** Build **0**; full CTest **706/706**; checker `native_thunks=94` with mutation;
+  runtime exit **0**, stderr **0 B**, `concmd_registry={size:2,ok:true}`, `byte_setter=255`,
+  `previous_targets=15/14/ok`; `run_all_checkers.sh` **915 passed / 0 skipped / 0 failed**;
+  project index **114,667**; publish-path audit exit 0; attribution OK.
+
+**Next exact action:** resolve a call through one of the 22 remaining relocated slots with
+caller-level liveness; `0x9844b0` and `0x20d80` are now closed. Do not re-open `0x2170` or
+`0x7f8664`.
+
 ## 2026-11-13 — Liveness fix, reference audit, 93 native bodies (CPU-01-AOT-CFG-CALLABLE-01, continued)
 
 **State: green.** Continuation of `6e321630` on `cursor/init-hash-551140-6aa93e8`. Init-lift is

@@ -972,6 +972,24 @@ def _printf_string_contract(e: Elf, ins: dict[int, tuple[str, str]], addrs: list
             "argument_index": 2}
 
 
+def _concmd_registry_contract(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int],
+                             rva: int, size: int) -> dict:
+    """Validate the decoded non-null set-insert shape and its measured callees."""
+    if size != 0x188:
+        die(f"ConCmd registry insert {rva:#x} size {size:#x} != 0x188")
+    for site, target, what in ((0x20DE2, 0x3B390, "lock"),
+                               (0x20E1A, 0xF8F500, "strcasecmp"),
+                               (0x20E4C, 0xF8F500, "strcasecmp"),
+                               (0x20E61, 0x211D0, "tree insert"),
+                               (0x20E71, 0x3B3C0, "unlock")):
+        actual = e.call(site)
+        if actual != target:
+            die(f"ConCmd registry insert {rva:#x} {what} at {site:#x} calls {actual:#x}")
+    return {"container": "0x2dfcbc8", "tree_offset": "0x18", "size_offset": "0x28",
+            "lock_offset": "0x58", "inserter": "0x211d0", "comparator": "0xf8f500",
+            "comparator_import": "strcasecmp", "value_offset": "0x40"}
+
+
 def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int],
                         kinds: dict[int, tuple[str, int | None, int | None]],
                         fde_sizes: dict[int, int], start_set: set[int],
@@ -1161,26 +1179,35 @@ def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int
                         "reason": "printf_wrapper_has_no_resolved_indirect_site",
                         "direct_call_sites": 0, "indirect_call_sites": 0, "call_sites": 0})
 
+    # 0x20d80 is the non-null ConCmd set insert: case-insensitive tree by strcasecmp.
+    concmd_rva = 0x20D80
+    concmd_sites = sites_by_target.get(concmd_rva, [])
+    if concmd_sites and not any(live[(int(s["function"], 16), int(s["site"], 16))]
+                                for s in concmd_sites):
+        contract = _concmd_registry_contract(e, ins, addrs, concmd_rva,
+                                             int(fde_sizes.get(concmd_rva, 0) or 0))
+        add(concmd_rva, "concmd_registry_insert", "concmd_registry_insert", 2,
+            "non-null path locks container+0x58, walks the +0x18 tree with strcasecmp on "
+            "node+0x20 keys, rejects an equal key, otherwise inserts through 0x211d0 and writes "
+            "the node pointer at tree-node+0x40; rax unused at all three direct sites",
+            {**contract, "call_sites": len(concmd_sites), "direct_call_sites": len(concmd_sites),
+             "indirect_call_sites": 0, "rax_live_sites": [], "custom": True})
+    elif concmd_sites:
+        when = [s["site"] for s in concmd_sites
+                if live[(int(s["function"], 16), int(s["site"], 16))]]
+        blocked.append({"rva": "0x20d80", "symbol": None,
+                        "reason": "concmd_registry_return_read_at_" + ",".join(when),
+                        "direct_call_sites": len(concmd_sites), "indirect_call_sites": 0,
+                        "call_sites": len(concmd_sites), "rax_live_sites": when})
+    else:
+        blocked.append({"rva": "0x20d80", "symbol": None,
+                        "reason": "concmd_registry_has_no_validated_direct_site",
+                        "direct_call_sites": 0, "indirect_call_sites": 0, "call_sites": 0})
+
     # The ConCmd lazy registration has a host hook for the unmodelled map insert.
     add(0x20D60, "concmd_lazy_register", "concmd_lazy_register", 1,
         "flips object+0x18 once and reports the 0x20d80 map insert through a host hook",
         {"custom": True})
-
-    blocked += [
-        {"rva": "0x20d80", "symbol": None,
-         "reason": "non_null_path_needs_container_at_bss_0x2dfcbc8_with_tree_0x18_and_lock_0x58; "
-                   "node_inserter_0x211d0_and_comparator_0xf8f500_unmodelled; "
-                   "slot_is_cleared_at_0x23612_before_the_first_call",
-         "direct_call_sites": direct_count(0x20D80),
-         "indirect_call_sites": indirect_count(0x20D80),
-         "call_sites": direct_count(0x20D80) + indirect_count(0x20D80),
-         "image_qword_references": len(image_qword_reference_sites(e, 0x20D80)),
-         "image_qword_reference_sites": [f"0x{s:x}" for s in image_qword_reference_sites(e, 0x20D80)],
-         "relocation_slots": [f"0x{s:x}" for s in relative_relocation_slots(e, 0x20D80)],
-         "reference_resolution": "direct_call_sites_with_live_bss_container",
-         "missing_host_state": ["bss_0x2dfcbc8", "container_tree_0x18", "container_lock_0x58"],
-         "unmodelled_callees": ["0x211d0", "0xf8f500"]},
-    ]
     blocked.sort(key=lambda item: int(item["rva"], 16))
     rows.sort(key=lambda row: int(row["rva"], 16))
 
@@ -1324,6 +1351,7 @@ def build() -> tuple[dict, str]:
                  ((rva, kinds[rva][2]) for rva in start_set)]
     intervals += [(start, start + size) for _fn, start, size in frontier]
     intervals.append((0x9844B0, 0x9844B0 + 0x11))
+    intervals.append((0x20D80, 0x20D80 + 0x188))
     ins = disassemble(intervals)
     addrs = sorted(ins)
 
@@ -1520,7 +1548,7 @@ def render_doc(data: dict) -> str:
         "## Native retail-ABI thunks",
         "",
         f"**{data['native_thunks']['count']}** entries are hosted as real SysV callables: the generated",
-        "`native/core/guest_thunk_table.inc` plus the custom `0x20d60` and `0x9844b0` bodies. The runtime and",
+        "`native/core/guest_thunk_table.inc` plus the custom `0x20d60`, `0x20d80` and `0x9844b0` bodies. The runtime and",
         "`test_guest_thunks` invoke them through the registry and assert the observed object delta or",
         "return value:",
         "",
@@ -1543,6 +1571,8 @@ def render_doc(data: dict) -> str:
                              "copies rsi+0x10 and installs the pinned address"),
         "concmd_lazy_register": ("flag test/store reproduced; map insert is a host hook",
                                  "flag flips once, hook fires once, second call no-op"),
+        "concmd_registry_insert": ("non-null path: strcasecmp tree walk, duplicate rejection, 0x211d0 insert",
+                                   "container size at +0x28 increments once; tree node +0x40 holds the node"),
         "printf_string": ("tail jump to imported printf with pinned `%s`; two resolved sites ignore rax",
                           "forwards argument 3 to printf; a host hook observes the string"),
     }

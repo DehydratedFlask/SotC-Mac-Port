@@ -12,12 +12,12 @@
 //   - `set_u32`        `movl %esi,disp(%rdi); retq`; exact store, return ignored at every known site.
 //   - `vtable_pair_ctor` 20 B `mov rsi+0x10 -> rdi+0x10`, pinned address -> `rdi+0x20`, returns
 //                      `rsi+0x10`; exact for a host-supplied object.
-// Two custom bodies. `0x20d60` reproduces the `+0x18` flag test/store and reports its manager-map
-// insert through a host hook: the insert (`0x20d80`) needs the live manager pointer from BSS global
-// `0x2dfcbc8`, which the host does not have. `0x9844b0` tail-jumps to imported printf with the
-// pinned `%s` format and forwards argument 3; a host hook observes that string. Entries whose
-// complete body is not a proved leaf keep an exact RVA and reason in `docs/entry_closure.json`
-// under `native_thunks.blocked`.
+// Three custom bodies. `0x20d60` reproduces the `+0x18` flag test/store and reports its manager-map
+// insert through a host hook. `0x20d80` models the non-null ConCmd set insert: strcasecmp on
+// node+0x20 keys, duplicate rejection, tree node at +0x40 and container size at +0x28. `0x9844b0`
+// tail-jumps to imported printf with the pinned `%s` format and forwards argument 3; a host hook
+// observes that string. Entries whose complete body is not a proved leaf keep an exact RVA and
+// reason in `docs/entry_closure.json` under `native_thunks.blocked`.
 
 #pragma once
 
@@ -51,6 +51,11 @@ using GuestPrintfHook = void (*)(const char* text);
 
 void guest_set_concmd_register_hook(GuestConCmdRegisterHook hook) noexcept;
 void guest_set_printf_hook(GuestPrintfHook hook) noexcept;
+
+// Observation helpers for the modelled 0x20d80 ConCmd set insert. The container is the
+// caller-supplied object at 0x2dfcbc8 shape: +0x18 root, +0x28 size, +0x58 lock.
+std::uint64_t guest_concmd_root_node(const void* container) noexcept;
+std::size_t guest_concmd_registered_count(const void* container) noexcept;
 const GuestThunk* guest_thunk_find(std::uint64_t rva) noexcept;
 std::size_t guest_thunk_count() noexcept;
 

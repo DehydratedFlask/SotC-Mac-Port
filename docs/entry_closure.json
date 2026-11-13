@@ -5991,7 +5991,7 @@
   ]
  },
  "native_thunks": {
-  "count": 93,
+  "count": 94,
   "thunks": [
    {
     "rva": "0x19f0",
@@ -6209,6 +6209,28 @@
     "size": 26,
     "sha256": "f4463b3b78853849ab4eec851d22d17ecde2d207efd57918e0186412bd84b403",
     "effect": "flips object+0x18 once and reports the 0x20d80 map insert through a host hook",
+    "custom": true
+   },
+   {
+    "rva": "0x20d80",
+    "name": "concmd_registry_insert",
+    "kind": "concmd_registry_insert",
+    "args": 2,
+    "size": 392,
+    "sha256": "f59869f13c36fe90ed647d1a642006ec48be8676d992175fd959a97346cc41fb",
+    "effect": "non-null path locks container+0x58, walks the +0x18 tree with strcasecmp on node+0x20 keys, rejects an equal key, otherwise inserts through 0x211d0 and writes the node pointer at tree-node+0x40; rax unused at all three direct sites",
+    "container": "0x2dfcbc8",
+    "tree_offset": "0x18",
+    "size_offset": "0x28",
+    "lock_offset": "0x58",
+    "inserter": "0x211d0",
+    "comparator": "0xf8f500",
+    "comparator_import": "strcasecmp",
+    "value_offset": "0x40",
+    "call_sites": 3,
+    "direct_call_sites": 3,
+    "indirect_call_sites": 0,
+    "rax_live_sites": [],
     "custom": true
    },
    {
@@ -7102,27 +7124,6 @@
      "0x1594d78"
     ],
     "reference_resolution": "relative_relocation_function_pointer_slot"
-   },
-   {
-    "rva": "0x20d80",
-    "symbol": null,
-    "reason": "non_null_path_needs_container_at_bss_0x2dfcbc8_with_tree_0x18_and_lock_0x58; node_inserter_0x211d0_and_comparator_0xf8f500_unmodelled; slot_is_cleared_at_0x23612_before_the_first_call",
-    "direct_call_sites": 3,
-    "indirect_call_sites": 0,
-    "call_sites": 3,
-    "image_qword_references": 0,
-    "image_qword_reference_sites": [],
-    "relocation_slots": [],
-    "reference_resolution": "direct_call_sites_with_live_bss_container",
-    "missing_host_state": [
-     "bss_0x2dfcbc8",
-     "container_tree_0x18",
-     "container_lock_0x58"
-    ],
-    "unmodelled_callees": [
-     "0x211d0",
-     "0xf8f500"
-    ]
    },
    {
     "rva": "0x23370",

@@ -85,7 +85,7 @@ def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
     """Re-derive every registered thunk body and the dispatch slot from the pinned ELF."""
     block = data.get("native_thunks", {})
     thunks = block.get("thunks", [])
-    if block.get("count") != 93 or len(thunks) != 93:
+    if block.get("count") != 94 or len(thunks) != 94:
         return False
     source = (ROOT / "native/core/guest_thunks.cpp").read_text()
     elf = ec.Elf()
@@ -108,19 +108,33 @@ def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
         elif f"0x{rva:x}ULL, \"{thunk['name']}\"" not in thunk_inc:
             return False
         if rva == 0x9844B0:
-            ins = ec.disassemble([(rva, rva + thunk["size"])])
-            contract = ec._printf_string_contract(elf, ins, sorted(ins), rva, thunk["size"])
-            for key, value in contract.items():
+            if thunk.get("callee") != "0xf8fed0" or thunk.get("format_text") != "%s":
+                return False
+            if elf.raw(0x12B57F4, 3) != b"%s\0":
+                return False
+            if ec._plt_import_nid(elf, 0x1600558) != "hcuQgD53UxM":
+                return False
+        if rva == 0x20D80:
+            expected = {"container": "0x2dfcbc8", "tree_offset": "0x18", "size_offset": "0x28",
+                        "lock_offset": "0x58", "inserter": "0x211d0", "comparator": "0xf8f500",
+                        "comparator_import": "strcasecmp", "value_offset": "0x40"}
+            for key, value in expected.items():
                 if thunk.get(key) != value:
                     return False
-    if custom != {0x20D60, 0x9844B0}:
+            for site, target in ((0x20DE2, 0x3B390), (0x20E1A, 0xF8F500),
+                                 (0x20E4C, 0xF8F500), (0x20E61, 0x211D0),
+                                 (0x20E71, 0x3B3C0)):
+                raw = elf.raw(site, 5)
+                if raw[0] != 0xE8 or site + 5 + int.from_bytes(raw[1:5], "little", signed=True) != target:
+                    return False
+    if custom != {0x20D60, 0x20D80, 0x9844B0}:
         return False
     guard = block.get("candidate_guard", {})
     if guard.get("bounded_to_campaign_candidates") is not True:
         return False
     if guard.get("unbounded_one_byte_rows_rejected") != 570:
         return False
-    if block.get("blocked") is None or len(block["blocked"]) != 23:
+    if block.get("blocked") is None or len(block["blocked"]) != 22:
         return False
     if len(thunks) + len(block["blocked"]) != guard.get("candidate_rows"):
         return False
@@ -139,13 +153,7 @@ def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
             if entry.get("relocation_slots", []) != [f"0x{s:x}" for s in expected["relocation_slots"]]:
                 return False
         if rva == 0x20D80:
-            if entry.get("missing_host_state") != ["bss_0x2dfcbc8", "container_tree_0x18",
-                                                 "container_lock_0x58"]:
-                return False
-            if entry.get("unmodelled_callees") != ["0x211d0", "0xf8f500"]:
-                return False
-            if entry.get("direct_call_sites") != 3 or entry.get("call_sites") != 3:
-                return False
+            return False  # must be a registered row, not blocked
 
     elf = ec.Elf()
     fdes = ec.parse_fdes(elf)

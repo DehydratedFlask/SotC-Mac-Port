@@ -229,12 +229,12 @@ runtime. The next pass withdrew the blanket "caller-owned rax" refusal: backward
 pass widened the evidence to direct calls, and the follow-up scans the **full FDE range set**:
 **55,790 ranges / 15,839,273 B**, **898** candidate caller bodies and **231,649** decoded
 instructions validate **3,002** direct sites. That adds `0xa1cc0` (caller `0x256c38` in
-`0x2569d0`), so **93 entries now have native bodies** (23 noop, 28 constants, 4 zero, 3 byte
-setters, 2 setters, 31 vtable-pair ctors, 1 ConCmd custom, 1 printf custom); 23 keep exact RVAs and
-measured reasons. The printf row is `0x9844b0`, whose PLT resolves to NID `hcuQgD53UxM` and whose
-format is `%s`; the liveness fix that made its two sites dead also removed a successor-index bug
-from the prior solver. Nineteen of the remaining 22 stubs are relocated vtable slots with named
-addresses, not raw qword data. A CFG-resolved site (`0x28471` -> vtable `0x1594dc0` slot `0x20`)
+`0x2569d0`), so **94 entries now have native bodies** (23 noop, 28 constants, 4 zero, 3 byte
+setters, 2 setters, 31 vtable-pair ctors, 1 ConCmd lazy, 1 ConCmd registry insert, 1 printf custom);
+22 keep exact RVAs and measured reasons. `0x20d80` now models the decoded non-null set insert:
+`strcasecmp` tree walk, duplicate rejection, tree-node `+0x40` value and container size `+0x28`.
+The printf row is `0x9844b0`, whose PLT resolves to NID `hcuQgD53UxM` and whose format is `%s`.
+Nineteen of the remaining 22 stubs are relocated vtable slots with named addresses. A CFG-resolved site (`0x28471` -> vtable `0x1594dc0` slot `0x20`)
 executes through the host vtable image and asserts the invocation result (flag + one hook).
 Genome-wide thunk bodies remain the next gap. Full CTest **706/706**, G1 **PARTIAL**.
 Slot **23** (`0xe71990`) is registered via a **private fixture**; consumer/string necessity

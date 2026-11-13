@@ -77,6 +77,8 @@ struct ThunkProbe {
     unsigned byte_setter_value;
     bool full_scan_stub_ok;
     bool printf_string_ok;
+    bool concmd_registry_ok;
+    unsigned concmd_registered;
     unsigned long long dispatch_site;
     unsigned long long dispatch_target;
     unsigned dispatch_flag;
@@ -179,6 +181,49 @@ ThunkProbe run_guest_thunk_probes() {
     p.full_scan_stub_ok = sotc::guest_thunk_invoke(0xa1cc0, full_args, &full_result);
     for (unsigned char byte : full_canary) p.full_scan_stub_ok = p.full_scan_stub_ok && byte == 0x3c;
 
+    // 0x20d80: seed a non-null container, insert two case-distinct keys, then reject a duplicate
+    // case-insensitively. The native model mirrors the decoded root/size/value effects.
+    alignas(8) unsigned char concmd_container[0x80] = {};
+    alignas(8) unsigned char concmd_node_a[0x60];
+    alignas(8) unsigned char concmd_node_b[0x60];
+    alignas(8) unsigned char concmd_node_dup[0x60];
+    std::memset(concmd_node_a, 0x11, sizeof(concmd_node_a));
+    std::memset(concmd_node_b, 0x22, sizeof(concmd_node_b));
+    std::memset(concmd_node_dup, 0x33, sizeof(concmd_node_dup));
+    const char concmd_key_a[] = "Alpha";
+    const char concmd_key_b[] = "Beta";
+    const char concmd_key_dup[] = "alpha";
+    const std::uint64_t key_a = reinterpret_cast<std::uint64_t>(concmd_key_a);
+    const std::uint64_t key_b = reinterpret_cast<std::uint64_t>(concmd_key_b);
+    const std::uint64_t key_dup = reinterpret_cast<std::uint64_t>(concmd_key_dup);
+    std::memcpy(concmd_node_a + 0x20, &key_a, sizeof(key_a));
+    std::memcpy(concmd_node_b + 0x20, &key_b, sizeof(key_b));
+    std::memcpy(concmd_node_dup + 0x20, &key_dup, sizeof(key_dup));
+    unsigned char concmd_before_a[0x60], concmd_before_b[0x60], concmd_before_dup[0x60];
+    std::memcpy(concmd_before_a, concmd_node_a, sizeof(concmd_before_a));
+    std::memcpy(concmd_before_b, concmd_node_b, sizeof(concmd_before_b));
+    std::memcpy(concmd_before_dup, concmd_node_dup, sizeof(concmd_before_dup));
+    const std::uint64_t concmd_a[2] = {reinterpret_cast<std::uint64_t>(concmd_node_a),
+                                        reinterpret_cast<std::uint64_t>(concmd_container)};
+    const std::uint64_t concmd_b[2] = {reinterpret_cast<std::uint64_t>(concmd_node_b),
+                                        reinterpret_cast<std::uint64_t>(concmd_container)};
+    const std::uint64_t concmd_dup[2] = {reinterpret_cast<std::uint64_t>(concmd_node_dup),
+                                          reinterpret_cast<std::uint64_t>(concmd_container)};
+    std::uint64_t concmd_result = 0;
+    p.concmd_registry_ok = sotc::guest_thunk_invoke(0x20d80, concmd_a, &concmd_result) &&
+                            sotc::guest_thunk_invoke(0x20d80, concmd_b, &concmd_result) &&
+                            sotc::guest_thunk_invoke(0x20d80, concmd_dup, &concmd_result) &&
+                            sotc::guest_concmd_registered_count(concmd_container) == 2 &&
+                            sotc::guest_concmd_root_node(concmd_container) != 0;
+    p.concmd_registry_ok = p.concmd_registry_ok &&
+        std::memcmp(concmd_before_a, concmd_node_a, sizeof(concmd_before_a)) == 0 &&
+        std::memcmp(concmd_before_b, concmd_node_b, sizeof(concmd_before_b)) == 0 &&
+        std::memcmp(concmd_before_dup, concmd_node_dup, sizeof(concmd_before_dup)) == 0;
+    std::uint64_t concmd_size = 0;
+    std::memcpy(&concmd_size, concmd_container + 0x28, sizeof(concmd_size));
+    p.concmd_registry_ok = p.concmd_registry_ok && concmd_size == 2;
+    p.concmd_registered = static_cast<unsigned>(concmd_size);
+
     // 0x9844b0 forwards its third argument to imported printf through the pinned "%s" format.
     static const char printf_message[] = "retail-printf";
     const std::uint64_t printf_args[6] = {0, 0,
@@ -194,7 +239,7 @@ ThunkProbe run_guest_thunk_probes() {
     p.ok = setter_called && p.setter_value == 0x2a && first_called && second_called &&
            p.register_flag == 1 && p.hook_calls == 1 && p.dispatch_ok &&
            p.previous_targets_ok && byte_ok && p.full_scan_stub_ok && p.printf_string_ok &&
-           sotc::guest_thunk_count() == 93;
+           p.concmd_registry_ok && sotc::guest_thunk_count() == 94;
     return p;
 }
 
@@ -205,13 +250,14 @@ void print_guest_thunks(const ThunkProbe& p) {
                 "\"flag\":%u,\"hook_calls\":%d,\"ok\":%s},"
                 "\"previous_targets\":{\"total\":15,\"called\":%d,\"ok\":%s},"
                 "\"byte_setter\":%u,\"full_scan_stub_ok\":%s,"
-                "\"printf_string_ok\":%s},",
+                "\"printf_string_ok\":%s,\"concmd_registry\":{\"size\":%u,\"ok\":%s}},",
                 sotc::guest_thunk_count(), p.calls, p.setter_value, p.register_flag, p.hook_calls,
                 p.ok ? "true" : "false", p.dispatch_site, p.dispatch_target, p.dispatch_flag,
                 p.dispatch_hook_calls, p.dispatch_ok ? "true" : "false",
                 p.previous_targets_called, p.previous_targets_ok ? "true" : "false",
                 p.byte_setter_value, p.full_scan_stub_ok ? "true" : "false",
-                p.printf_string_ok ? "true" : "false");
+                p.printf_string_ok ? "true" : "false", p.concmd_registered,
+                p.concmd_registry_ok ? "true" : "false");
 }
 
 void print_post_calls(const sotc::InitWindowRuntimeResult& r) {

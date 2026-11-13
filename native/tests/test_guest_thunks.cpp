@@ -45,7 +45,7 @@ std::uint64_t load64(const Object& object, std::size_t offset) {
 }  // namespace
 
 int main() {
-    CHECK(guest_thunk_count() == 93);
+    CHECK(guest_thunk_count() == 94);
     CHECK(guest_thunk_find(0x20d60) != nullptr);
     CHECK(guest_thunk_find(0x13d20) != nullptr);
     CHECK(guest_thunk_find(0xc4f0) != nullptr);
@@ -133,6 +133,42 @@ int main() {
         reinterpret_cast<std::uint64_t>(&full_scan_canary), 0, 0, 0, 0, 0};
     CHECK(guest_thunk_invoke(0xa1cc0, full_scan_args, &result));
     for (unsigned char byte : full_scan_canary.bytes) CHECK(byte == 0x3c);
+
+    // 0x20d80 non-null path: case-insensitive set insert, duplicate rejection and container size.
+    alignas(8) unsigned char concmd_container[0x80] = {};
+    alignas(8) unsigned char concmd_a[0x60];
+    alignas(8) unsigned char concmd_b[0x60];
+    alignas(8) unsigned char concmd_dup[0x60];
+    std::memset(concmd_a, 0x11, sizeof(concmd_a));
+    std::memset(concmd_b, 0x22, sizeof(concmd_b));
+    std::memset(concmd_dup, 0x33, sizeof(concmd_dup));
+    const char key_a[] = "Alpha";
+    const char key_b[] = "Beta";
+    const char key_dup[] = "alpha";
+    const std::uint64_t key_a_address = reinterpret_cast<std::uint64_t>(key_a);
+    const std::uint64_t key_b_address = reinterpret_cast<std::uint64_t>(key_b);
+    const std::uint64_t key_dup_address = reinterpret_cast<std::uint64_t>(key_dup);
+    std::memcpy(concmd_a + 0x20, &key_a_address, sizeof(key_a_address));
+    std::memcpy(concmd_b + 0x20, &key_b_address, sizeof(key_b_address));
+    std::memcpy(concmd_dup + 0x20, &key_dup_address, sizeof(key_dup_address));
+    unsigned char concmd_before_a[0x60], concmd_before_b[0x60], concmd_before_dup[0x60];
+    std::memcpy(concmd_before_a, concmd_a, sizeof(concmd_before_a));
+    std::memcpy(concmd_before_b, concmd_b, sizeof(concmd_before_b));
+    std::memcpy(concmd_before_dup, concmd_dup, sizeof(concmd_before_dup));
+    const std::uint64_t concmd_a_args[2] = {reinterpret_cast<std::uint64_t>(concmd_a),
+                                            reinterpret_cast<std::uint64_t>(concmd_container)};
+    const std::uint64_t concmd_b_args[2] = {reinterpret_cast<std::uint64_t>(concmd_b),
+                                            reinterpret_cast<std::uint64_t>(concmd_container)};
+    const std::uint64_t concmd_dup_args[2] = {reinterpret_cast<std::uint64_t>(concmd_dup),
+                                              reinterpret_cast<std::uint64_t>(concmd_container)};
+    CHECK(guest_thunk_invoke(0x20d80, concmd_a_args, &result));
+    CHECK(guest_thunk_invoke(0x20d80, concmd_b_args, &result));
+    CHECK(guest_thunk_invoke(0x20d80, concmd_dup_args, &result));
+    CHECK(guest_concmd_registered_count(concmd_container) == 2);
+    CHECK(guest_concmd_root_node(concmd_container) != 0);
+    CHECK(std::memcmp(concmd_before_a, concmd_a, sizeof(concmd_before_a)) == 0);
+    CHECK(std::memcmp(concmd_before_b, concmd_b, sizeof(concmd_before_b)) == 0);
+    CHECK(std::memcmp(concmd_before_dup, concmd_dup, sizeof(concmd_before_dup)) == 0);
 
     // 0x9844b0 is a tail jump to imported printf with the pinned "%s" format. Its third
     // argument is forwarded as the string; both resolved indirect sites ignore the return.
