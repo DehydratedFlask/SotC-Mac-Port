@@ -40,7 +40,7 @@ std::uint64_t load64(const Object& object, std::size_t offset) {
 }  // namespace
 
 int main() {
-    CHECK(guest_thunk_count() == 81);
+    CHECK(guest_thunk_count() == 91);
     CHECK(guest_thunk_find(0x20d60) != nullptr);
     CHECK(guest_thunk_find(0x13d20) != nullptr);
     CHECK(guest_thunk_find(0xc4f0) != nullptr);
@@ -129,9 +129,20 @@ int main() {
     const std::uint64_t unknown_args[6] = {0, 0, 0, 0, 0, 0};
     CHECK(!guest_thunk_invoke(0x12345678, unknown_args, &result));
 
-    std::printf("OK test_guest_thunks: thunks=%zu stubs=%d setter=0x%x const=0x%llx ctor_copy=0x%llx "
+    // A direct-call-only byte setter: 0xa431e0 writes sil at object+0x51 and leaves the
+    // neighboring bytes alone. Its only mapped caller proves rax dead after the call.
+    Object byte_canary{};
+    std::memset(byte_canary.bytes, 0x5a, sizeof(byte_canary.bytes));
+    const std::uint64_t byte_args[2] = {reinterpret_cast<std::uint64_t>(&byte_canary), 0x1ff};
+    CHECK(guest_thunk_invoke(0xa431e0, byte_args, &result));
+    CHECK(result == 0);
+    CHECK(byte_canary.bytes[0x51] == 0xff);
+    CHECK(byte_canary.bytes[0x50] == 0x5a && byte_canary.bytes[0x52] == 0x5a);
+
+    std::printf("OK test_guest_thunks: thunks=%zu stubs=%d setter=0x%x byte=0x%x const=0x%llx ctor_copy=0x%llx "
                 "ctor_const=0x%llx dispatch=0x%llx flag=%u hooks=%d\n",
                 guest_thunk_count(), stubs_called, load32(setter, 0x1c),
+                byte_canary.bytes[0x51],
                 static_cast<unsigned long long>(1),
                 static_cast<unsigned long long>(load64(dst, 0x10)),
                 static_cast<unsigned long long>(load64(dst, 0x20)),

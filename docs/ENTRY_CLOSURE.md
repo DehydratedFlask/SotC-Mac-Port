@@ -66,7 +66,7 @@ The `ret_stub` rows are the one-byte `ret` functions already executed on the Ini
 
 ## Native retail-ABI thunks
 
-**81** entries are hosted as real SysV callables: the generated
+**91** entries are hosted as real SysV callables: the generated
 `native/core/guest_thunk_table.inc` plus the custom `0x20d60` body. The runtime and
 `test_guest_thunks` invoke them through the registry and assert the observed object delta or
 return value:
@@ -75,8 +75,9 @@ return value:
 | --- | ---: | --- | --- |
 | `concmd_lazy_register` | **1** | flag test/store reproduced; map insert is a host hook | flag flips once, hook fires once, second call no-op |
 | `const_u32` | **28** | the whole body is `movl $imm,%eax; retq` | returns the pinned immediate |
-| `set_u32` | **1** | whole body is one store + ret; return dead at every known site | stores rsi at object+offset |
-| `void_noop` | **16** | backward rax liveness proves every resolved caller ignores the return | no effect; registered only for dead-return stubs |
+| `set_u32` | **2** | whole body is one store + ret; return dead at every mapped site | stores rsi at object+offset |
+| `set_u8` | **3** | whole body is `movb %sil,disp(%rdi); retq`; direct/indirect return dead | stores the low byte of rsi at object+offset |
+| `void_noop` | **22** | backward rax liveness proves every resolved caller ignores the return | no effect; registered only for dead-return stubs |
 | `vtable_pair_ctor` | **31** | whole body is two stores + ret, constant from a RIP `lea` | copies rsi+0x10 and installs the pinned address |
 | `zero_u32` | **4** | the whole body is `xorl %eax,%eax; retq` | returns 0 |
 
@@ -98,11 +99,18 @@ The 15 RVAs the earlier pass resolved are all accounted for:
 - `0xc4f0` — registered as `void_noop` (invoked by the fixture/runtime).
 - `0xc770` — registered as `void_noop` (invoked by the fixture/runtime).
 
-The **35** entries that stay non-callable keep their exact
-RVA and reason in `entry_closure.json` under `native_thunks.blocked` (29 one-byte `ret`
-entries have no mapped call site to prove the return unused, three byte setters have no
-liveness evidence, one setter is caller-owned, `0x20d80` needs the live manager pointer, and
-`0x9844b0` tail-jumps into an unmodelled callee).
+The **25** entries that stay non-callable keep their exact
+RVA and reason in `entry_closure.json` under `native_thunks.blocked`:
+
+- `needs_live_manager_pointer_from_bss_0x2dfcbc8` — **1**
+- `no_mapped_call_site_to_prove_return_unused` — **23**
+- `tail_jump_needs_unmodelled_callee_and_rodata_leaq` — **1**
+
+Direct-call evidence is now part of the plan too: full FDE bodies of all 830 mapped function
+starts are decoded, every direct `call rel32` to a mapped start is collected, and the same
+`rax` liveness runs over the caller's full body. This adds 13 sites and registers six more
+stubs plus all three byte setters and the `0x147e10` setter; entries with no mapped caller
+stay blocked rather than being assumed safe.
 
 ## Dispatch through a resolved indirect site
 
@@ -206,7 +214,7 @@ to be an exact FDE start.
 ## What this changes
 
 - `ENTRY_MAP.md`'s open item 2 (address → callable retail-ABI entry) is answered at the shape
-  level for every start, and **81** entries now have real SysV
+  level for every start, and **91** entries now have real SysV
   thunk bodies; one indirect site executes through the host vtable image end to end.
 - Open item 3 (indirect targets) is measured and partially resolved; every remaining site is
   enumerated with its blocking reason instead of being left as a count.

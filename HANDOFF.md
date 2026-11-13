@@ -1,3 +1,41 @@
+## 2026-11-13 — Direct-call liveness: 81 -> 91 native bodies (CPU-01-AOT-CFG-CALLABLE-01, continued)
+
+**State: green.** Continuation of `9b88fab8` on branch `cursor/init-hash-551140-6aa93e8`. Init-lift
+is untouched: **46,876 / 46,881 B**, **108,325 B** native; `0x2170` (`0x5ba041`) and the S4.2
+geometry block `0x7f8664..0x7f87d8` stay closed.
+
+**Card:** the roadmap still names no successor id. The previous pass proved `rax` unused only at
+*indirect* call sites; this pass widens the evidence to direct calls and closes ten more bodies.
+
+- **Direct-call evidence.** `entry_closure.py` now decodes the complete FDE body of all **830**
+  mapped function starts (**150,453** instructions), collects every direct `call rel32` to a mapped
+  start, and runs the same backward `rax` liveness over the caller's full body. The first scan
+  returned 0 callers because LLVM's operand annotation (`0x… <PT_LOAD#0+…>`) was not accepted; that
+  real bug was fixed, yielding **13 direct sites to 11 targets**, all with `rax` dead.
+- **Registered surface 81 -> 91.** Six stubs gain bodies (`0x4a4a0`, `0x56db70`, `0x56dca0`,
+  `0x56fad0`, `0x5b3cf0`, `0x5b3d00`), the setter `0x147e10` (`+0x40`), and the three byte setters
+  `0xa431e0` (`+0x51`), `0xa52b70` (`+0x1`), `0xa599e0` (`+0x29`). Composition: **22 noop, 28
+  constants, 4 zero, 3 `set_u8`, 2 `set_u32`, 31 vtable-pair ctors, 1 custom**.
+- **25 remain non-callable**: 23 `no_mapped_call_site_to_prove_return_unused`,
+  `0x20d80` `needs_live_manager_pointer_from_bss_0x2dfcbc8` (its 3 direct callers all prove `rax`
+  dead, but the 392 B body's non-null path needs the live manager cell, so it is not registered),
+  and `0x9844b0` `tail_jump_needs_unmodelled_callee_and_rodata_leaq`.
+- **Observed effect:** the fixture and runtime invoke `0xa431e0` with `rsi=0x1ff` and a `0x5a`
+  canary, asserting `+0x51=0xff` with `+0x50`/`+0x52` untouched. Runtime:
+  `guest_thunks={registered:91,...,previous_targets:{total:15,called:14,ok:true},byte_setter:255}`,
+  exit 0, stderr 0 B, dispatch unchanged (flag 1, hook 1).
+- **Checker:** independently decodes the 830 full bodies, re-derives every direct-call count and
+  `rax` liveness list, all 91 body hashes, 25 blocked reasons and the dispatch slot; `--mutate` also
+  tampers a direct-call count.
+- **Verification:** build **0**; full CTest **706/706**; checker `native_thunks=91` with mutation
+  probe; entry map **1,957 / 584 / 462**; runtime exit **0**, stderr **0 B**;
+  `run_all_checkers.sh` **915 passed / 0 skipped / 0 failed** (exit 0); project index **114,667**;
+  publish-path audit `--all` exit 0; attribution audit OK; external JSON tamper exit 1 and restored.
+
+**Next exact action:** either model the non-null `0x20d80` manager path to drop the last ConCmd
+hook, or hunt callers of the 23 remaining stubs in the 54,960 unmapped FDE ranges. Do not re-open
+`0x2170` or the `0x7f8664` geometry block.
+
 ## 2026-11-13 — 81 native bodies, all 15 resolved targets, and a dispatch that runs (CPU-01-AOT-CFG-CALLABLE-01, continued)
 
 **State: green.** Continuation of `fa0b058a` on branch `cursor/init-hash-551140-6aa93e8`. Init-lift is

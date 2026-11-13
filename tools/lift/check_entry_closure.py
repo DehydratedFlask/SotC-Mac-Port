@@ -13,7 +13,9 @@ Prints SKIP (exit 0) when the private ELF is absent, like the other private-imag
 
 from __future__ import annotations
 
+import bisect
 import hashlib
+from functools import lru_cache
 import json
 import sys
 from pathlib import Path
@@ -36,11 +38,57 @@ def artifacts_match(data: dict, inc: str, thunk_inc: str, stored_json: str,
             stored_thunk_inc == thunk_inc)
 
 
+@lru_cache(maxsize=1)
+def direct_call_evidence() -> dict[int, dict]:
+    """Re-derive direct `call rel32` sites and their rax liveness from the pinned ELF."""
+    elf = ec.Elf()
+    fdes = ec.parse_fdes(elf)
+    starts = [start for start, _ in fdes]
+    sizes = dict(fdes)
+    segments = ec.parse_segments()
+    entries = json.loads(ec.ENTRY_MAP.read_text())["entries"]
+    mapped = {int(k, 16) for k in entries}
+    start_set = {rva for rva in mapped if ec.classify(rva, fdes, starts, segments)[0] == "function_start"}
+    ins = ec.disassemble([(rva, rva + sizes[rva]) for rva in start_set if sizes.get(rva)])
+    addrs = sorted(ins)
+    caller_starts = sorted(start_set)
+    by_target: dict[int, list[tuple[int, int]]] = {}
+    for site in addrs:
+        mnemonic, operands = ins[site]
+        if mnemonic not in ("call", "callq"):
+            continue
+        match = __import__("re").match(r"^(0x[0-9a-f]+)(?: <[^>]*>)?$", operands.strip())
+        if match is None:
+            continue
+        target = int(match.group(1), 16)
+        if target not in start_set:
+            continue
+        k = bisect.bisect_right(caller_starts, site) - 1
+        if k < 0:
+            continue
+        fn = caller_starts[k]
+        if not (fn <= site < fn + sizes.get(fn, 0)):
+            continue
+        by_target.setdefault(target, []).append((fn, site))
+    out: dict[int, dict] = {}
+    for target, sites in by_target.items():
+        by_caller: dict[int, set[int]] = {}
+        for fn, site in sites:
+            by_caller.setdefault(fn, set()).add(site)
+        live_sites = []
+        for fn, fn_sites in by_caller.items():
+            window = [a for a in addrs if fn <= a < fn + sizes.get(fn, 0)]
+            result = ec._rax_live_after(ins, window, fn_sites)
+            live_sites += [f"0x{site:x}" for site in fn_sites if result[site]]
+        out[target] = {"count": len(sites), "live": sorted(live_sites)}
+    return out
+
+
 def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
     """Re-derive every registered thunk body and the dispatch slot from the pinned ELF."""
     block = data.get("native_thunks", {})
     thunks = block.get("thunks", [])
-    if block.get("count") != 81 or len(thunks) != 81:
+    if block.get("count") != 91 or len(thunks) != 91:
         return False
     source = (ROOT / "native/core/guest_thunks.cpp").read_text()
     elf = ec.Elf()
@@ -64,13 +112,26 @@ def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
             return False
     if custom != 1:
         return False
-    if block.get("blocked") is None or len(block["blocked"]) != 35:
+    if block.get("blocked") is None or len(block["blocked"]) != 25:
         return False
     for entry in block["blocked"]:
         if not entry.get("reason"):
             return False
         rva = int(entry["rva"], 16)
         if ec.classify(rva, fdes, starts, segments)[0] not in ("function_start", "plt"):
+            return False
+
+    direct = direct_call_evidence()
+    for thunk in thunks:
+        if "direct_call_sites" not in thunk:
+            continue
+        rva = int(thunk["rva"], 16)
+        evidence = direct.get(rva, {"count": 0, "live": []})
+        if thunk["direct_call_sites"] != evidence["count"]:
+            return False
+        if thunk.get("rax_live_sites") != evidence["live"]:
+            return False
+        if evidence["live"]:
             return False
 
     dispatch = block.get("dispatch", {})
@@ -152,11 +213,20 @@ def main(argv: list[str]) -> int:
         bad_thunk["native_thunks"]["thunks"][0]["sha256"] = "0" * 64
         if native_thunk_claims_ok(bad_thunk, thunk_inc):
             die("tampered native-thunk body hash was not detected")
+        bad_direct = json.loads(json.dumps(data))
+        for row in bad_direct["native_thunks"]["thunks"]:
+            if row.get("direct_call_sites"):
+                row["direct_call_sites"] = 0
+                break
+        else:
+            die("no row carries direct-call evidence to mutate")
+        if native_thunk_claims_ok(bad_direct, thunk_inc):
+            die("tampered direct-call count was not detected")
         bad_dispatch = json.loads(json.dumps(data))
         bad_dispatch["native_thunks"]["dispatch"]["target"] = "0x1234"
         if native_thunk_claims_ok(bad_dispatch, thunk_inc):
             die("tampered dispatch target was not detected")
-        print("OK mutation probe: row, total, thunk hash and dispatch target all detected")
+        print("OK mutation probe: row, total, thunk hash, direct count and dispatch target detected")
 
     closure = data["closure"]
     print(f"OK check_entry_closure: entries={totals['entries']} start={totals['function_start']} "

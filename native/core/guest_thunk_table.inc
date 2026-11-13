@@ -223,6 +223,13 @@ static std::uint64_t thunk_358c0_vtable_pair_ctor(std::uint64_t a0, std::uint64_
     std::memcpy(reinterpret_cast<void*>(a0 + 0x20), &constant, sizeof(constant));
     return copied;
 }
+static std::uint64_t thunk_4a4a0_void_noop(std::uint64_t a0, std::uint64_t a1,
+                                     std::uint64_t, std::uint64_t,
+                                     std::uint64_t, std::uint64_t) {
+    // body: ret (0x4a4a0); rax is unused at every resolved call site
+    (void)a0; (void)a1;
+    return 0;
+}
 static std::uint64_t thunk_6e990_vtable_pair_ctor(std::uint64_t a0, std::uint64_t a1,
                                      std::uint64_t, std::uint64_t,
                                      std::uint64_t, std::uint64_t) {
@@ -288,6 +295,14 @@ static std::uint64_t thunk_140cb0_vtable_pair_ctor(std::uint64_t a0, std::uint64
     const std::uint64_t constant = 0x15983c8ULL;
     std::memcpy(reinterpret_cast<void*>(a0 + 0x20), &constant, sizeof(constant));
     return copied;
+}
+static std::uint64_t thunk_147e10_set_u32(std::uint64_t a0, std::uint64_t a1,
+                                     std::uint64_t, std::uint64_t,
+                                     std::uint64_t, std::uint64_t) {
+    if (a0 == 0) return 0;
+    const std::uint32_t value = static_cast<std::uint32_t>(a1);
+    std::memcpy(reinterpret_cast<void*>(a0 + 0x40), &value, sizeof(value));
+    return 0;
 }
 static std::uint64_t thunk_2334c0_const_u32(std::uint64_t a0, std::uint64_t a1,
                                      std::uint64_t, std::uint64_t,
@@ -407,6 +422,41 @@ static std::uint64_t thunk_54dc20_const_u32(std::uint64_t a0, std::uint64_t a1,
     (void)a0; (void)a1;
     return 275ULL;
 }
+static std::uint64_t thunk_56db70_void_noop(std::uint64_t a0, std::uint64_t a1,
+                                     std::uint64_t, std::uint64_t,
+                                     std::uint64_t, std::uint64_t) {
+    // body: ret (0x56db70); rax is unused at every resolved call site
+    (void)a0; (void)a1;
+    return 0;
+}
+static std::uint64_t thunk_56dca0_void_noop(std::uint64_t a0, std::uint64_t a1,
+                                     std::uint64_t, std::uint64_t,
+                                     std::uint64_t, std::uint64_t) {
+    // body: ret (0x56dca0); rax is unused at every resolved call site
+    (void)a0; (void)a1;
+    return 0;
+}
+static std::uint64_t thunk_56fad0_void_noop(std::uint64_t a0, std::uint64_t a1,
+                                     std::uint64_t, std::uint64_t,
+                                     std::uint64_t, std::uint64_t) {
+    // body: ret (0x56fad0); rax is unused at every resolved call site
+    (void)a0; (void)a1;
+    return 0;
+}
+static std::uint64_t thunk_5b3cf0_void_noop(std::uint64_t a0, std::uint64_t a1,
+                                     std::uint64_t, std::uint64_t,
+                                     std::uint64_t, std::uint64_t) {
+    // body: ret (0x5b3cf0); rax is unused at every resolved call site
+    (void)a0; (void)a1;
+    return 0;
+}
+static std::uint64_t thunk_5b3d00_void_noop(std::uint64_t a0, std::uint64_t a1,
+                                     std::uint64_t, std::uint64_t,
+                                     std::uint64_t, std::uint64_t) {
+    // body: ret (0x5b3d00); rax is unused at every resolved call site
+    (void)a0; (void)a1;
+    return 0;
+}
 static std::uint64_t thunk_7eb570_const_u32(std::uint64_t a0, std::uint64_t a1,
                                      std::uint64_t, std::uint64_t,
                                      std::uint64_t, std::uint64_t) {
@@ -521,6 +571,14 @@ static std::uint64_t thunk_a32460_vtable_pair_ctor(std::uint64_t a0, std::uint64
     std::memcpy(reinterpret_cast<void*>(a0 + 0x20), &constant, sizeof(constant));
     return copied;
 }
+static std::uint64_t thunk_a431e0_set_u8(std::uint64_t a0, std::uint64_t a1,
+                                     std::uint64_t, std::uint64_t,
+                                     std::uint64_t, std::uint64_t) {
+    if (a0 == 0) return 0;
+    const std::uint8_t value = static_cast<std::uint8_t>(a1);
+    std::memcpy(reinterpret_cast<void*>(a0 + 0x51), &value, sizeof(value));
+    return 0;
+}
 static std::uint64_t thunk_a4d490_const_u32(std::uint64_t a0, std::uint64_t a1,
                                      std::uint64_t, std::uint64_t,
                                      std::uint64_t, std::uint64_t) {
@@ -556,6 +614,22 @@ static std::uint64_t thunk_a4e9b0_const_u32(std::uint64_t a0, std::uint64_t a1,
                                      std::uint64_t, std::uint64_t) {
     (void)a0; (void)a1;
     return 1ULL;
+}
+static std::uint64_t thunk_a52b70_set_u8(std::uint64_t a0, std::uint64_t a1,
+                                     std::uint64_t, std::uint64_t,
+                                     std::uint64_t, std::uint64_t) {
+    if (a0 == 0) return 0;
+    const std::uint8_t value = static_cast<std::uint8_t>(a1);
+    std::memcpy(reinterpret_cast<void*>(a0 + 0x1), &value, sizeof(value));
+    return 0;
+}
+static std::uint64_t thunk_a599e0_set_u8(std::uint64_t a0, std::uint64_t a1,
+                                     std::uint64_t, std::uint64_t,
+                                     std::uint64_t, std::uint64_t) {
+    if (a0 == 0) return 0;
+    const std::uint8_t value = static_cast<std::uint8_t>(a1);
+    std::memcpy(reinterpret_cast<void*>(a0 + 0x29), &value, sizeof(value));
+    return 0;
 }
 static std::uint64_t thunk_a60ea0_const_u32(std::uint64_t a0, std::uint64_t a1,
                                      std::uint64_t, std::uint64_t,
@@ -683,12 +757,14 @@ static constexpr GuestThunk kGuestLeafThunks[] = {
     {0x2c000ULL, "retail_void_stub", thunk_2c000_void_noop, 0},
     {0x2c180ULL, "retail_void_stub", thunk_2c180_void_noop, 0},
     {0x358c0ULL, "vtable_pair_358c0", thunk_358c0_vtable_pair_ctor, 2},
+    {0x4a4a0ULL, "retail_void_stub", thunk_4a4a0_void_noop, 0},
     {0x6e990ULL, "vtable_pair_6e990", thunk_6e990_vtable_pair_ctor, 2},
     {0x6e9b0ULL, "vtable_pair_6e9b0", thunk_6e9b0_vtable_pair_ctor, 2},
     {0x6eb80ULL, "vtable_pair_6eb80", thunk_6eb80_vtable_pair_ctor, 2},
     {0x6eba0ULL, "vtable_pair_6eba0", thunk_6eba0_vtable_pair_ctor, 2},
     {0x140c90ULL, "vtable_pair_140c90", thunk_140c90_vtable_pair_ctor, 2},
     {0x140cb0ULL, "vtable_pair_140cb0", thunk_140cb0_vtable_pair_ctor, 2},
+    {0x147e10ULL, "set_u32_147e10", thunk_147e10_set_u32, 2},
     {0x2334c0ULL, "const_u32_2334c0", thunk_2334c0_const_u32, 0},
     {0x233510ULL, "const_u32_233510", thunk_233510_const_u32, 0},
     {0x49cc00ULL, "vtable_pair_49cc00", thunk_49cc00_vtable_pair_ctor, 2},
@@ -704,6 +780,11 @@ static constexpr GuestThunk kGuestLeafThunks[] = {
     {0x538850ULL, "retail_void_stub", thunk_538850_void_noop, 0},
     {0x5388c0ULL, "retail_void_stub", thunk_5388c0_void_noop, 0},
     {0x54dc20ULL, "const_u32_54dc20", thunk_54dc20_const_u32, 0},
+    {0x56db70ULL, "retail_void_stub", thunk_56db70_void_noop, 0},
+    {0x56dca0ULL, "retail_void_stub", thunk_56dca0_void_noop, 0},
+    {0x56fad0ULL, "retail_void_stub", thunk_56fad0_void_noop, 0},
+    {0x5b3cf0ULL, "retail_void_stub", thunk_5b3cf0_void_noop, 0},
+    {0x5b3d00ULL, "retail_void_stub", thunk_5b3d00_void_noop, 0},
     {0x7eb570ULL, "const_u32_7eb570", thunk_7eb570_const_u32, 0},
     {0x7eb7f0ULL, "const_u32_7eb7f0", thunk_7eb7f0_const_u32, 0},
     {0x8254c0ULL, "const_u32_8254c0", thunk_8254c0_const_u32, 0},
@@ -718,12 +799,15 @@ static constexpr GuestThunk kGuestLeafThunks[] = {
     {0xa31f10ULL, "const_u32_a31f10", thunk_a31f10_const_u32, 0},
     {0xa32440ULL, "vtable_pair_a32440", thunk_a32440_vtable_pair_ctor, 2},
     {0xa32460ULL, "vtable_pair_a32460", thunk_a32460_vtable_pair_ctor, 2},
+    {0xa431e0ULL, "set_u8_a431e0", thunk_a431e0_set_u8, 2},
     {0xa4d490ULL, "const_u32_a4d490", thunk_a4d490_const_u32, 0},
     {0xa4d760ULL, "const_u32_a4d760", thunk_a4d760_const_u32, 0},
     {0xa4e190ULL, "const_u32_a4e190", thunk_a4e190_const_u32, 0},
     {0xa4e310ULL, "const_u32_a4e310", thunk_a4e310_const_u32, 0},
     {0xa4e830ULL, "const_u32_a4e830", thunk_a4e830_const_u32, 0},
     {0xa4e9b0ULL, "const_u32_a4e9b0", thunk_a4e9b0_const_u32, 0},
+    {0xa52b70ULL, "set_u8_a52b70", thunk_a52b70_set_u8, 2},
+    {0xa599e0ULL, "set_u8_a599e0", thunk_a599e0_set_u8, 2},
     {0xa60ea0ULL, "const_u32_a60ea0", thunk_a60ea0_const_u32, 0},
     {0xa60ef0ULL, "const_u32_a60ef0", thunk_a60ef0_const_u32, 0},
     {0xa61940ULL, "const_u32_a61940", thunk_a61940_const_u32, 0},

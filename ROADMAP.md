@@ -225,11 +225,13 @@ prologue/alignment evidence. A CFG forward dataflow then re-resolved the frontie
 sites in 105 functions, 222 resolve** to exact FDE starts and 277 are blocked with verbatim reasons,
 and two entries (`0x20d60`, `0x13d20`) have real SysV thunk bodies invoked by the fixture and the
 runtime. The next pass withdrew the blanket "caller-owned rax" refusal: backward liveness proves
-`rax` dead at every resolved site of all 14 one-byte stubs, so **81 entries now have native bodies**
-(16 noop, 28 constants, 4 zero, 1 setter, 31 vtable-pair ctors, 1 custom); 35 keep exact RVAs and
-verbatim reasons. A CFG-resolved site (`0x28471` -> vtable `0x1594dc0` slot `0x20`) executes through
-the host vtable image and asserts the invocation result (flag + one hook). Genome-wide thunk bodies
-remain the next gap. Full CTest **706/706**, G1 **PARTIAL**.
+`rax` dead at every resolved site of all 14 one-byte stubs, giving **81 native bodies**. A following
+pass widened the evidence to direct calls across all 830 mapped full function bodies: **13 direct
+sites to 11 targets** add six stubs and four setters, so **91 entries now have native bodies**
+(22 noop, 28 constants, 4 zero, 3 byte setters, 2 setters, 31 vtable-pair ctors, 1 custom); 25 keep
+exact RVAs and verbatim reasons. A CFG-resolved site (`0x28471` -> vtable `0x1594dc0` slot `0x20`)
+executes through the host vtable image and asserts the invocation result (flag + one hook).
+Genome-wide thunk bodies remain the next gap. Full CTest **706/706**, G1 **PARTIAL**.
 Slot **23** (`0xe71990`) is registered via a **private fixture**; consumer/string necessity
 remains unresolved (G1 caveat). Operating plan lives in [HANDOFF](HANDOFF.md) only. Prefer
 session-sized code + checker acceptance over characterization-only docs churn.

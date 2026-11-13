@@ -848,6 +848,41 @@ def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int
             for record in records:
                 live[(fn, int(record["site"], 16))] = result[int(record["site"], 16)]
 
+    # Direct `call rel32` sites across every mapped function body. These are not part of the
+    # indirect frontier, but they are equally valid liveness evidence for the target's return.
+    caller_starts = sorted(start_set)
+    direct_by_target: dict[int, list[tuple[int, int]]] = {}
+    for site in addrs:
+        mnemonic, operands = ins[site]
+        if mnemonic not in ("call", "callq"):
+            continue
+        match = re.match(r"^(0x[0-9a-f]+)(?: <[^>]*>)?$", operands.strip())
+        if match is None:
+            continue
+        target = int(match.group(1), 16)
+        if target not in start_set:
+            continue
+        k = bisect.bisect_right(caller_starts, site) - 1
+        if k < 0:
+            continue
+        fn = caller_starts[k]
+        if not (fn <= site < fn + fde_sizes.get(fn, 0)):
+            continue
+        direct_by_target.setdefault(target, []).append((fn, site))
+    by_caller: dict[int, set[int]] = {}
+    for fn_sites in direct_by_target.values():
+        for fn, site in fn_sites:
+            by_caller.setdefault(fn, set()).add(site)
+    for fn, sites in by_caller.items():
+        window = [a for a in addrs if fn <= a < fn + fde_sizes.get(fn, 0)]
+        result = _rax_live_after(ins, window, sites)
+        for site in sites:
+            live[(fn, site)] = result[site]
+    for target, fn_sites in direct_by_target.items():
+        for fn, site in fn_sites:
+            sites_by_target.setdefault(target, []).append(
+                {"function": f"0x{fn:x}", "site": f"0x{site:x}", "direct": True})
+
     rows: list[dict] = []
     blocked: list[dict] = []
     # One-byte `ret` entries can be reached as vtable targets without appearing in the entry map,
@@ -861,6 +896,9 @@ def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int
         rows.append({"rva": f"0x{rva:x}", "name": name, "kind": kind, "args": args,
                      "size": size, "sha256": hashlib.sha256(e.raw(rva, size)).hexdigest(),
                      "effect": effect, **fields})
+
+    def direct_count(rva: int) -> int:
+        return sum(1 for s in sites_by_target.get(rva, []) if s.get("direct"))
 
     for rva in sorted(stubs):
         sites = sites_by_target.get(rva, [])
@@ -876,7 +914,8 @@ def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int
             continue
         add(rva, "retail_void_stub", "void_noop", 0,
             f"no effect; rax unused at all {len(sites)} resolved call sites",
-            {"call_sites": len(sites), "rax_live_sites": []})
+            {"call_sites": len(sites), "direct_call_sites": direct_count(rva),
+             "rax_live_sites": []})
 
     for rva in sorted(start_set):
         size = int(kinds[rva][2] or 0)
@@ -913,13 +952,28 @@ def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int
                     add(rva, f"set_u32_{rva:x}", "set_u32", 2,
                         f"stores the low 32 bits of rsi at object+0x{offset:x}; rax unused at "
                         f"all {len(sites)} resolved call sites",
-                        {"offset": f"0x{offset:x}", "call_sites": len(sites), "rax_live_sites": []})
+                        {"offset": f"0x{offset:x}", "call_sites": len(sites),
+                         "direct_call_sites": direct_count(rva), "rax_live_sites": []})
                 continue
         if len(body) == 2 and mnemonics[0] == "movb" and src == "%sil":
             match = re.match(r"^(-?0x[0-9a-f]+)\(%rdi\)$", dst)
             if match:
-                blocked.append({"rva": f"0x{rva:x}", "symbol": None,
-                                "reason": "byte_setter_return_value_caller_owned_no_liveness_evidence"})
+                offset = int(match.group(1), 16)
+                sites = sites_by_target.get(rva, [])
+                if not sites:
+                    blocked.append({"rva": f"0x{rva:x}", "symbol": None,
+                                    "reason": "byte_setter_return_value_caller_owned_no_call_site"})
+                elif any(live[(int(s["function"], 16), int(s["site"], 16))] for s in sites):
+                    when = [s["site"] for s in sites
+                            if live[(int(s["function"], 16), int(s["site"], 16))]]
+                    blocked.append({"rva": f"0x{rva:x}", "symbol": None,
+                                    "reason": "byte_setter_return_value_read_at_" + ",".join(when)})
+                else:
+                    add(rva, f"set_u8_{rva:x}", "set_u8", 2,
+                        f"stores the low 8 bits of rsi at object+0x{offset:x}; rax unused at "
+                        f"all {len(sites)} mapped call sites",
+                        {"offset": f"0x{offset:x}", "call_sites": len(sites),
+                         "direct_call_sites": direct_count(rva), "rax_live_sites": []})
                 continue
         # 20 B vtable-pair constructor: copy rsi+0x10 into rdi+0x10 and a pinned constant into rdi+0x20.
         if len(body) == 5 and mnemonics[4] in ("ret", "retq") and mnemonics[0] in ("movq", "leaq"):
@@ -998,6 +1052,12 @@ def _render_thunk_inc(rows: list[dict], dispatch: dict, dispatch_bytes: bytes) -
             offset = int(row["offset"], 16)
             lines.append("    if (a0 == 0) return 0;")
             lines.append("    const std::uint32_t value = static_cast<std::uint32_t>(a1);")
+            lines.append(f"    std::memcpy(reinterpret_cast<void*>(a0 + 0x{offset:x}), &value, sizeof(value));")
+            lines.append("    return 0;")
+        elif row["kind"] == "set_u8":
+            offset = int(row["offset"], 16)
+            lines.append("    if (a0 == 0) return 0;")
+            lines.append("    const std::uint8_t value = static_cast<std::uint8_t>(a1);")
             lines.append(f"    std::memcpy(reinterpret_cast<void*>(a0 + 0x{offset:x}), &value, sizeof(value));")
             lines.append("    return 0;")
         elif row["kind"] == "vtable_pair_ctor":
@@ -1089,7 +1149,9 @@ def build() -> tuple[dict, str]:
                 die(f"frontier function {fn:#x} is not an FDE start")
             frontier.append((fn, fdes[k][0], fdes[k][1]))
 
-    intervals = [(rva, rva + min(SCAN_WINDOW, size)) for rva, size in
+    # Full bodies are decoded so direct calls anywhere in a mapped function can be found; the
+    # callable-shape reader still looks only at the entry window.
+    intervals = [(rva, rva + size) for rva, size in
                  ((rva, kinds[rva][2]) for rva in start_set)]
     intervals += [(start, start + size) for _fn, start, size in frontier]
     ins = disassemble(intervals)
@@ -1291,8 +1353,10 @@ def render_doc(data: dict) -> str:
                       "no effect; registered only for dead-return stubs"),
         "const_u32": ("the whole body is `movl $imm,%eax; retq`", "returns the pinned immediate"),
         "zero_u32": ("the whole body is `xorl %eax,%eax; retq`", "returns 0"),
-        "set_u32": ("whole body is one store + ret; return dead at every known site",
+        "set_u32": ("whole body is one store + ret; return dead at every mapped site",
                     "stores rsi at object+offset"),
+        "set_u8": ("whole body is `movb %sil,disp(%rdi); retq`; direct/indirect return dead",
+                   "stores the low byte of rsi at object+offset"),
         "vtable_pair_ctor": ("whole body is two stores + ret, constant from a RIP `lea`",
                              "copies rsi+0x10 and installs the pinned address"),
         "concmd_lazy_register": ("flag test/store reproduced; map insert is a host hook",
@@ -1315,10 +1379,20 @@ def render_doc(data: dict) -> str:
     lines += [
         "",
         f"The **{len(data['native_thunks']['blocked'])}** entries that stay non-callable keep their exact",
-        "RVA and reason in `entry_closure.json` under `native_thunks.blocked` (29 one-byte `ret`",
-        "entries have no mapped call site to prove the return unused, three byte setters have no",
-        "liveness evidence, one setter is caller-owned, `0x20d80` needs the live manager pointer, and",
-        "`0x9844b0` tail-jumps into an unmodelled callee).",
+        "RVA and reason in `entry_closure.json` under `native_thunks.blocked`:",
+        "",
+    ]
+    for reason, count in sorted({item["reason"]: sum(1 for x in data["native_thunks"]["blocked"]
+                                                     if x["reason"] == item["reason"])
+                                  for item in data["native_thunks"]["blocked"]}.items()):
+        lines.append(f"- `{reason}` — **{count}**")
+    lines += [
+        "",
+        "Direct-call evidence is now part of the plan too: full FDE bodies of all 830 mapped function",
+        "starts are decoded, every direct `call rel32` to a mapped start is collected, and the same",
+        "`rax` liveness runs over the caller's full body. This adds 13 sites and registers six more",
+        "stubs plus all three byte setters and the `0x147e10` setter; entries with no mapped caller",
+        "stay blocked rather than being assumed safe.",
         "",
         "## Dispatch through a resolved indirect site",
         "",
