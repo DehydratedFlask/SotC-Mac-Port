@@ -38,57 +38,19 @@ def artifacts_match(data: dict, inc: str, thunk_inc: str, stored_json: str,
             stored_thunk_inc == thunk_inc)
 
 
-@lru_cache(maxsize=1)
-def direct_call_evidence() -> dict[int, dict]:
-    """Re-derive direct `call rel32` sites and their rax liveness from the pinned ELF."""
+@lru_cache(maxsize=8)
+def direct_call_evidence(targets: tuple[int, ...]) -> dict:
+    """Re-derive full-FDE direct calls and liveness for the wanted targets."""
     elf = ec.Elf()
     fdes = ec.parse_fdes(elf)
-    starts = [start for start, _ in fdes]
-    sizes = dict(fdes)
-    segments = ec.parse_segments()
-    entries = json.loads(ec.ENTRY_MAP.read_text())["entries"]
-    mapped = {int(k, 16) for k in entries}
-    start_set = {rva for rva in mapped if ec.classify(rva, fdes, starts, segments)[0] == "function_start"}
-    ins = ec.disassemble([(rva, rva + sizes[rva]) for rva in start_set if sizes.get(rva)])
-    addrs = sorted(ins)
-    caller_starts = sorted(start_set)
-    by_target: dict[int, list[tuple[int, int]]] = {}
-    for site in addrs:
-        mnemonic, operands = ins[site]
-        if mnemonic not in ("call", "callq"):
-            continue
-        match = __import__("re").match(r"^(0x[0-9a-f]+)(?: <[^>]*>)?$", operands.strip())
-        if match is None:
-            continue
-        target = int(match.group(1), 16)
-        if target not in start_set:
-            continue
-        k = bisect.bisect_right(caller_starts, site) - 1
-        if k < 0:
-            continue
-        fn = caller_starts[k]
-        if not (fn <= site < fn + sizes.get(fn, 0)):
-            continue
-        by_target.setdefault(target, []).append((fn, site))
-    out: dict[int, dict] = {}
-    for target, sites in by_target.items():
-        by_caller: dict[int, set[int]] = {}
-        for fn, site in sites:
-            by_caller.setdefault(fn, set()).add(site)
-        live_sites = []
-        for fn, fn_sites in by_caller.items():
-            window = [a for a in addrs if fn <= a < fn + sizes.get(fn, 0)]
-            result = ec._rax_live_after(ins, window, fn_sites)
-            live_sites += [f"0x{site:x}" for site in fn_sites if result[site]]
-        out[target] = {"count": len(sites), "live": sorted(live_sites)}
-    return out
+    return ec._scan_full_fde_direct_calls(elf, fdes, set(targets))
 
 
 def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
     """Re-derive every registered thunk body and the dispatch slot from the pinned ELF."""
     block = data.get("native_thunks", {})
     thunks = block.get("thunks", [])
-    if block.get("count") != 91 or len(thunks) != 91:
+    if block.get("count") != 92 or len(thunks) != 92:
         return False
     source = (ROOT / "native/core/guest_thunks.cpp").read_text()
     elf = ec.Elf()
@@ -112,7 +74,7 @@ def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
             return False
     if custom != 1:
         return False
-    if block.get("blocked") is None or len(block["blocked"]) != 25:
+    if block.get("blocked") is None or len(block["blocked"]) != 24:
         return False
     for entry in block["blocked"]:
         if not entry.get("reason"):
@@ -121,18 +83,50 @@ def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
         if ec.classify(rva, fdes, starts, segments)[0] not in ("function_start", "plt"):
             return False
 
-    direct = direct_call_evidence()
-    for thunk in thunks:
-        if "direct_call_sites" not in thunk:
+    elf = ec.Elf()
+    fdes = ec.parse_fdes(elf)
+    sizes = dict(fdes)
+    starts = [start for start, _ in fdes]
+    segments = ec.parse_segments()
+    entries = json.loads(ec.ENTRY_MAP.read_text())["entries"]
+    mapped = {int(key, 16) for key in entries}
+    start_set = {rva for rva in mapped
+                 if ec.classify(rva, fdes, starts, segments)[0] == "function_start"}
+    small = {rva for rva in start_set if sizes.get(rva, 0) in (1, 4, 5)}
+    resolved = {int(record["target"], 16) for record in data["indirect"]["sites_detail"]
+                if record["status"] == "resolved"}
+    target_set = tuple(sorted(small | resolved | {0x20D80, 0x9844B0}))
+    scan = direct_call_evidence(target_set)
+    if block.get("scan") != scan["summary"]:
+        return False
+    direct_sites: dict[int, list[dict]] = {}
+    for entry in scan["sites"]:
+        direct_sites.setdefault(int(entry["target"]), []).append(entry)
+    indirect_sites: dict[int, int] = {}
+    for record in data["indirect"]["sites_detail"]:
+        if record["status"] == "resolved":
+            target = int(record["target"], 16)
+            indirect_sites[target] = indirect_sites.get(target, 0) + 1
+    for thunk in list(thunks) + list(block["blocked"]):
+        if "call_sites" not in thunk:
             continue
         rva = int(thunk["rva"], 16)
-        evidence = direct.get(rva, {"count": 0, "live": []})
-        if thunk["direct_call_sites"] != evidence["count"]:
+        sites = direct_sites.get(rva, [])
+        live = sorted(f"0x{int(site['site']):x}" for site in sites if site["live"])
+        expected_indirect = indirect_sites.get(rva, 0)
+        if thunk["direct_call_sites"] != len(sites):
             return False
-        if thunk.get("rax_live_sites") != evidence["live"]:
+        if thunk.get("indirect_call_sites", 0) != expected_indirect:
             return False
-        if evidence["live"]:
+        if thunk["call_sites"] != len(sites) + expected_indirect:
             return False
+        if "rax_live_sites" in thunk and thunk["rax_live_sites"] != live:
+            return False
+        if live:
+            return False
+        if "image_qword_references" in thunk:
+            if thunk["image_qword_references"] != ec.qword_reference_count(rva):
+                return False
 
     dispatch = block.get("dispatch", {})
     site = int(dispatch.get("site", "0x0"), 16)
@@ -222,11 +216,16 @@ def main(argv: list[str]) -> int:
             die("no row carries direct-call evidence to mutate")
         if native_thunk_claims_ok(bad_direct, thunk_inc):
             die("tampered direct-call count was not detected")
+        bad_scan = json.loads(json.dumps(data))
+        bad_scan["native_thunks"]["scan"]["validated_sites"] += 1
+        if native_thunk_claims_ok(bad_scan, thunk_inc):
+            die("tampered full-FDE scan summary was not detected")
         bad_dispatch = json.loads(json.dumps(data))
         bad_dispatch["native_thunks"]["dispatch"]["target"] = "0x1234"
         if native_thunk_claims_ok(bad_dispatch, thunk_inc):
             die("tampered dispatch target was not detected")
-        print("OK mutation probe: row, total, thunk hash, direct count and dispatch target detected")
+        print("OK mutation probe: row, total, thunk hash, direct count, scan summary and "
+                  "dispatch target detected")
 
     closure = data["closure"]
     print(f"OK check_entry_closure: entries={totals['entries']} start={totals['function_start']} "

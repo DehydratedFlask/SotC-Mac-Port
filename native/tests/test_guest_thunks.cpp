@@ -40,7 +40,7 @@ std::uint64_t load64(const Object& object, std::size_t offset) {
 }  // namespace
 
 int main() {
-    CHECK(guest_thunk_count() == 91);
+    CHECK(guest_thunk_count() == 92);
     CHECK(guest_thunk_find(0x20d60) != nullptr);
     CHECK(guest_thunk_find(0x13d20) != nullptr);
     CHECK(guest_thunk_find(0xc4f0) != nullptr);
@@ -120,6 +120,15 @@ int main() {
     }
     CHECK(stubs_called == 14);
 
+    // 0xa1cc0 has no entry-map name; its only caller is the direct call at 0x256c38 in 0x2569d0.
+    // The return is dead there, so the body is an exact no-op.
+    Object full_scan_canary{};
+    std::memset(full_scan_canary.bytes, 0x3c, sizeof(full_scan_canary.bytes));
+    const std::uint64_t full_scan_args[6] = {
+        reinterpret_cast<std::uint64_t>(&full_scan_canary), 0, 0, 0, 0, 0};
+    CHECK(guest_thunk_invoke(0xa1cc0, full_scan_args, &result));
+    for (unsigned char byte : full_scan_canary.bytes) CHECK(byte == 0x3c);
+
     // Direct invocation of 0x20d60 keeps the same observable contract.
     Object direct{};
     const std::uint64_t direct_args[6] = {reinterpret_cast<std::uint64_t>(&direct), 0, 0, 0, 0, 0};
@@ -139,10 +148,10 @@ int main() {
     CHECK(byte_canary.bytes[0x51] == 0xff);
     CHECK(byte_canary.bytes[0x50] == 0x5a && byte_canary.bytes[0x52] == 0x5a);
 
-    std::printf("OK test_guest_thunks: thunks=%zu stubs=%d setter=0x%x byte=0x%x const=0x%llx ctor_copy=0x%llx "
+    std::printf("OK test_guest_thunks: thunks=%zu stubs=%d setter=0x%x byte=0x%x full=%d const=0x%llx ctor_copy=0x%llx "
                 "ctor_const=0x%llx dispatch=0x%llx flag=%u hooks=%d\n",
                 guest_thunk_count(), stubs_called, load32(setter, 0x1c),
-                byte_canary.bytes[0x51],
+                byte_canary.bytes[0x51], 1,
                 static_cast<unsigned long long>(1),
                 static_cast<unsigned long long>(load64(dst, 0x10)),
                 static_cast<unsigned long long>(load64(dst, 0x20)),

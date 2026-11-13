@@ -823,10 +823,79 @@ def _rax_live_after(ins: dict[int, tuple[str, str]], window: list[int],
     return {site: live_out[site] for site in sites}
 
 
+def qword_reference_count(rva: int) -> int:
+    """Occurrences of the 8-byte little-endian address anywhere in the pinned image file."""
+    raw = ELF_PATH.read_bytes()
+    needle = struct.pack("<Q", rva)
+    count = 0
+    pos = 0
+    while True:
+        at = raw.find(needle, pos)
+        if at < 0:
+            return count
+        count += 1
+        pos = at + 1
+
+
+def _scan_full_fde_direct_calls(e: Elf, fdes: list[tuple[int, int]],
+                                targets: set[int]) -> dict:
+    """Find direct `call rel32` sites over every FDE range, not only mapped starts.
+
+    A raw byte scan narrows the candidates; every candidate caller body is then decoded from its
+    FDE range and the site is accepted only when the decoded instruction is a direct call to the
+    wanted target. Liveness runs over that complete caller body.
+    """
+    starts = [start for start, _ in fdes]
+    sizes = dict(fdes)
+    candidates: dict[int, list[tuple[int, int]]] = {}
+    raw_candidates = 0
+    for start, size in fdes:
+        blob = e.raw(start, size)
+        pos = 0
+        while True:
+            at = blob.find(b"\xe8", pos, len(blob) - 4)
+            if at < 0:
+                break
+            target = start + at + 5 + struct.unpack_from("<i", blob, at + 1)[0]
+            if target in targets:
+                raw_candidates += 1
+                candidates.setdefault(start, []).append((start + at, target))
+            pos = at + 1
+    sites: list[dict] = []
+    decoded_instructions = 0
+    if candidates:
+        ins = disassemble([(fn, fn + sizes[fn]) for fn in candidates])
+        decoded_instructions = len(ins)
+        decoded_addrs = sorted(ins)
+        for fn, raw_sites in sorted(candidates.items()):
+            wanted = {site for site, _ in raw_sites}
+            lo = bisect.bisect_left(decoded_addrs, fn)
+            hi = bisect.bisect_left(decoded_addrs, fn + sizes[fn])
+            window = decoded_addrs[lo:hi]
+            result = _rax_live_after(ins, window, wanted)
+            for site, target in raw_sites:
+                decoded = ins.get(site)
+                if decoded is None or decoded[0] not in ("call", "callq"):
+                    continue
+                match = re.match(r"^(0x[0-9a-f]+)(?: <[^>]*>)?$", decoded[1].strip())
+                if match is None or int(match.group(1), 16) != target:
+                    continue
+                sites.append({"target": target, "function": fn, "site": site,
+                              "live": result[site]})
+    return {
+        "summary": {"fde_ranges": len(fdes), "bytes": sum(sizes.values()),
+                    "raw_candidates": raw_candidates, "candidate_callers": len(candidates),
+                    "decoded_instructions": decoded_instructions,
+                    "validated_sites": len(sites),
+                    "targets_with_sites": len({s["target"] for s in sites})},
+        "sites": sites,
+    }
+
+
 def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int],
                         kinds: dict[int, tuple[str, int | None, int | None]],
                         fde_sizes: dict[int, int], start_set: set[int],
-                        indirect: dict | None) -> tuple[list[dict], list[dict], dict, bytes]:
+                        indirect: dict | None, direct_scan: dict) -> tuple[list[dict], list[dict], dict, bytes]:
     """Register only entries whose complete FDE body is one of the exact host-free patterns."""
     sites_by_target: dict[int, list[dict]] = {}
     live: dict[tuple[int, int], bool] = {}
@@ -848,40 +917,14 @@ def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int
             for record in records:
                 live[(fn, int(record["site"], 16))] = result[int(record["site"], 16)]
 
-    # Direct `call rel32` sites across every mapped function body. These are not part of the
-    # indirect frontier, but they are equally valid liveness evidence for the target's return.
-    caller_starts = sorted(start_set)
-    direct_by_target: dict[int, list[tuple[int, int]]] = {}
-    for site in addrs:
-        mnemonic, operands = ins[site]
-        if mnemonic not in ("call", "callq"):
-            continue
-        match = re.match(r"^(0x[0-9a-f]+)(?: <[^>]*>)?$", operands.strip())
-        if match is None:
-            continue
-        target = int(match.group(1), 16)
-        if target not in start_set:
-            continue
-        k = bisect.bisect_right(caller_starts, site) - 1
-        if k < 0:
-            continue
-        fn = caller_starts[k]
-        if not (fn <= site < fn + fde_sizes.get(fn, 0)):
-            continue
-        direct_by_target.setdefault(target, []).append((fn, site))
-    by_caller: dict[int, set[int]] = {}
-    for fn_sites in direct_by_target.values():
-        for fn, site in fn_sites:
-            by_caller.setdefault(fn, set()).add(site)
-    for fn, sites in by_caller.items():
-        window = [a for a in addrs if fn <= a < fn + fde_sizes.get(fn, 0)]
-        result = _rax_live_after(ins, window, sites)
-        for site in sites:
-            live[(fn, site)] = result[site]
-    for target, fn_sites in direct_by_target.items():
-        for fn, site in fn_sites:
-            sites_by_target.setdefault(target, []).append(
-                {"function": f"0x{fn:x}", "site": f"0x{site:x}", "direct": True})
+    # Direct `call rel32` sites from the full-FDE scan. These are not part of the indirect
+    # frontier, but they are equally valid liveness evidence for the target's return.
+    for entry in direct_scan["sites"]:
+        fn = int(entry["function"])
+        site = int(entry["site"])
+        live[(fn, site)] = entry["live"]
+        sites_by_target.setdefault(int(entry["target"]), []).append(
+            {"function": f"0x{fn:x}", "site": f"0x{site:x}", "direct": True})
 
     rows: list[dict] = []
     blocked: list[dict] = []
@@ -900,11 +943,19 @@ def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int
     def direct_count(rva: int) -> int:
         return sum(1 for s in sites_by_target.get(rva, []) if s.get("direct"))
 
+    def indirect_count(rva: int) -> int:
+        return sum(1 for s in sites_by_target.get(rva, []) if not s.get("direct"))
+
     for rva in sorted(stubs):
         sites = sites_by_target.get(rva, [])
         if not sites:
-            blocked.append({"rva": f"0x{rva:x}", "symbol": None,
-                            "reason": "no_mapped_call_site_to_prove_return_unused"})
+            qrefs = qword_reference_count(rva)
+            reason = "no_direct_call_in_55790_fdes_no_resolved_indirect_target"
+            if qrefs:
+                reason += f"_qword_refs_{qrefs}"
+            blocked.append({"rva": f"0x{rva:x}", "symbol": None, "reason": reason,
+                            "direct_call_sites": 0, "indirect_call_sites": 0,
+                            "call_sites": 0, "image_qword_references": qrefs})
             continue
         if any(live[(int(s["function"], 16), int(s["site"], 16))] for s in sites):
             when = [s["site"] for s in sites
@@ -915,7 +966,7 @@ def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int
         add(rva, "retail_void_stub", "void_noop", 0,
             f"no effect; rax unused at all {len(sites)} resolved call sites",
             {"call_sites": len(sites), "direct_call_sites": direct_count(rva),
-             "rax_live_sites": []})
+             "indirect_call_sites": indirect_count(rva), "rax_live_sites": []})
 
     for rva in sorted(start_set):
         size = int(kinds[rva][2] or 0)
@@ -953,7 +1004,8 @@ def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int
                         f"stores the low 32 bits of rsi at object+0x{offset:x}; rax unused at "
                         f"all {len(sites)} resolved call sites",
                         {"offset": f"0x{offset:x}", "call_sites": len(sites),
-                         "direct_call_sites": direct_count(rva), "rax_live_sites": []})
+                         "direct_call_sites": direct_count(rva),
+                         "indirect_call_sites": indirect_count(rva), "rax_live_sites": []})
                 continue
         if len(body) == 2 and mnemonics[0] == "movb" and src == "%sil":
             match = re.match(r"^(-?0x[0-9a-f]+)\(%rdi\)$", dst)
@@ -973,7 +1025,8 @@ def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int
                         f"stores the low 8 bits of rsi at object+0x{offset:x}; rax unused at "
                         f"all {len(sites)} mapped call sites",
                         {"offset": f"0x{offset:x}", "call_sites": len(sites),
-                         "direct_call_sites": direct_count(rva), "rax_live_sites": []})
+                         "direct_call_sites": direct_count(rva),
+                         "indirect_call_sites": indirect_count(rva), "rax_live_sites": []})
                 continue
         # 20 B vtable-pair constructor: copy rsi+0x10 into rdi+0x10 and a pinned constant into rdi+0x20.
         if len(body) == 5 and mnemonics[4] in ("ret", "retq") and mnemonics[0] in ("movq", "leaq"):
@@ -1006,9 +1059,17 @@ def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int
 
     blocked += [
         {"rva": "0x20d80", "symbol": None,
-         "reason": "needs_live_manager_pointer_from_bss_0x2dfcbc8"},
+         "reason": "needs_live_manager_pointer_from_bss_0x2dfcbc8",
+         "direct_call_sites": direct_count(0x20D80),
+         "indirect_call_sites": indirect_count(0x20D80),
+         "call_sites": direct_count(0x20D80) + indirect_count(0x20D80),
+         "image_qword_references": qword_reference_count(0x20D80)},
         {"rva": "0x9844b0", "symbol": None,
-         "reason": "tail_jump_needs_unmodelled_callee_and_rodata_leaq"},
+         "reason": "tail_jump_needs_unmodelled_callee_and_rodata_leaq",
+         "direct_call_sites": direct_count(0x9844B0),
+         "indirect_call_sites": indirect_count(0x9844B0),
+         "call_sites": direct_count(0x9844B0) + indirect_count(0x9844B0),
+         "image_qword_references": qword_reference_count(0x9844B0)},
     ]
     blocked.sort(key=lambda item: int(item["rva"], 16))
     rows.sort(key=lambda row: int(row["rva"], 16))
@@ -1149,9 +1210,7 @@ def build() -> tuple[dict, str]:
                 die(f"frontier function {fn:#x} is not an FDE start")
             frontier.append((fn, fdes[k][0], fdes[k][1]))
 
-    # Full bodies are decoded so direct calls anywhere in a mapped function can be found; the
-    # callable-shape reader still looks only at the entry window.
-    intervals = [(rva, rva + size) for rva, size in
+    intervals = [(rva, rva + min(SCAN_WINDOW, size)) for rva, size in
                  ((rva, kinds[rva][2]) for rva in start_set)]
     intervals += [(start, start + size) for _fn, start, size in frontier]
     ins = disassemble(intervals)
@@ -1173,8 +1232,16 @@ def build() -> tuple[dict, str]:
             callable_counts["not_callable"] += 1
 
     indirect = analyze_indirect(e, ins, addrs, frontier, starts) if frontier else None
+    resolved_targets = ({int(record["target"], 16) for record in indirect["sites_detail"]
+                         if record["status"] == "resolved"} if indirect else set())
+    sizes_all = dict(fdes)
+    small_starts = {rva for rva in start_set
+                    if sizes_all.get(rva, 0) in (1, 4, 5)}
+    direct_scan = _scan_full_fde_direct_calls(
+        e, fdes, small_starts | resolved_targets | {0x20D80, 0x9844B0})
+
     thunk_rows, thunk_blocked, dispatch, dispatch_bytes = _plan_native_thunks(
-        e, ins, addrs, kinds, {s: size for s, size in fdes}, start_set, indirect)
+        e, ins, addrs, kinds, {s: size for s, size in fdes}, start_set, indirect, direct_scan)
 
     counts = {kind: 0 for kind in KIND_ORDER}
     samples: dict[str, list[dict]] = {kind: [] for kind in KIND_ORDER}
@@ -1230,6 +1297,7 @@ def build() -> tuple[dict, str]:
         "indirect": indirect,
         "native_thunks": {"count": len(thunk_rows), "thunks": thunk_rows,
                           "blocked": thunk_blocked, "dispatch": dispatch,
+                          "scan": direct_scan["summary"],
                           "previous_targets": [f"0x{rva:x}" for rva in PREVIOUS_TARGETS]},
         "samples": samples,
         "interior": interior,
@@ -1388,11 +1456,14 @@ def render_doc(data: dict) -> str:
         lines.append(f"- `{reason}` — **{count}**")
     lines += [
         "",
-        "Direct-call evidence is now part of the plan too: full FDE bodies of all 830 mapped function",
-        "starts are decoded, every direct `call rel32` to a mapped start is collected, and the same",
-        "`rax` liveness runs over the caller's full body. This adds 13 sites and registers six more",
-        "stubs plus all three byte setters and the `0x147e10` setter; entries with no mapped caller",
-        "stay blocked rather than being assumed safe.",
+        "The direct-call scan now covers the **full FDE-derived code range**, not only mapped starts:",
+        f"**{data['native_thunks']['scan']['fde_ranges']:,}** ranges / "
+        f"**{data['native_thunks']['scan']['bytes']:,} B** are scanned for `call rel32`, "
+        f"**{data['native_thunks']['scan']['raw_candidates']:,}** candidate sites are found, and the",
+        f"**{data['native_thunks']['scan']['candidate_callers']:,}** candidate caller bodies",
+        f"(**{data['native_thunks']['scan']['decoded_instructions']:,}** instructions) are decoded and",
+        "validated. This registers `0xa1cc0` from its only caller, the direct call at `0x256c38` in",
+        "`0x2569d0`; entries with no validated caller keep a measured blocker.",
         "",
         "## Dispatch through a resolved indirect site",
         "",

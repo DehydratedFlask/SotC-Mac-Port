@@ -75,6 +75,7 @@ struct ThunkProbe {
     bool previous_targets_ok;
     int previous_targets_called;
     unsigned byte_setter_value;
+    bool full_scan_stub_ok;
     unsigned long long dispatch_site;
     unsigned long long dispatch_target;
     unsigned dispatch_flag;
@@ -162,9 +163,20 @@ ThunkProbe run_guest_thunk_probes() {
     p.byte_setter_value = byte_canary[0x51];
     p.previous_targets_ok = p.previous_targets_ok && byte_ok;
 
+    // 0xa1cc0 is not in the entry map; its one mapped caller is 0x256c38 in 0x2569d0 and the
+    // return is dead there. Invoke through the registry and require a byte-identical canary.
+    alignas(8) unsigned char full_canary[0x40];
+    std::memset(full_canary, 0x3c, sizeof(full_canary));
+    const std::uint64_t full_args[6] = {
+        reinterpret_cast<std::uint64_t>(full_canary), 0, 0, 0, 0, 0};
+    std::uint64_t full_result = 1;
+    p.full_scan_stub_ok = sotc::guest_thunk_invoke(0xa1cc0, full_args, &full_result);
+    for (unsigned char byte : full_canary) p.full_scan_stub_ok = p.full_scan_stub_ok && byte == 0x3c;
+
     p.ok = setter_called && p.setter_value == 0x2a && first_called && second_called &&
            p.register_flag == 1 && p.hook_calls == 1 && p.dispatch_ok &&
-           p.previous_targets_ok && byte_ok && sotc::guest_thunk_count() == 91;
+           p.previous_targets_ok && byte_ok && p.full_scan_stub_ok &&
+           sotc::guest_thunk_count() == 92;
     return p;
 }
 
@@ -174,12 +186,12 @@ void print_guest_thunks(const ThunkProbe& p) {
                 "\"dispatch\":{\"site\":\"0x%llx\",\"target\":\"0x%llx\","
                 "\"flag\":%u,\"hook_calls\":%d,\"ok\":%s},"
                 "\"previous_targets\":{\"total\":15,\"called\":%d,\"ok\":%s},"
-                "\"byte_setter\":%u},",
+                "\"byte_setter\":%u,\"full_scan_stub_ok\":%s},",
                 sotc::guest_thunk_count(), p.calls, p.setter_value, p.register_flag, p.hook_calls,
                 p.ok ? "true" : "false", p.dispatch_site, p.dispatch_target, p.dispatch_flag,
                 p.dispatch_hook_calls, p.dispatch_ok ? "true" : "false",
                 p.previous_targets_called, p.previous_targets_ok ? "true" : "false",
-                p.byte_setter_value);
+                p.byte_setter_value, p.full_scan_stub_ok ? "true" : "false");
 }
 
 void print_post_calls(const sotc::InitWindowRuntimeResult& r) {

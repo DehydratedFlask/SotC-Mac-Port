@@ -1,3 +1,45 @@
+## 2026-11-13 — Full-FDE direct-call scan: 91 -> 92 native bodies (CPU-01-AOT-CFG-CALLABLE-01, continued)
+
+**State: green.** Continuation of `19f5e83c` on branch `cursor/init-hash-551140-6aa93e8`. Init-lift is
+untouched: **46,876 / 46,881 B**, **108,325 B** native; `0x2170` (`0x5ba041`) and S4.2 geometry
+(`0x7f8664..0x7f87d8`) stay closed.
+
+**Card:** no successor id is defined. This pass closes the evidence-scope gap the last checkpoint
+named: the 23 stubs blocked as "no mapped call site" had only been measured over the 830 mapped
+starts.
+
+- **Full-FDE scan.** Every **55,790** `.eh_frame_hdr` range / **15,839,273 B** is scanned for direct
+  `call rel32` candidates (image-mapped, not raw file offsets), then the **898** candidate caller
+  bodies are decoded in full (**231,649** instructions) and the site instruction is validated.
+  Measured **3,002** validated sites over **19** targets. The scanner is bounded to the campaign
+  candidates: mapped 1/4/5-byte starts, resolved indirect targets and `0x20d80`/`0x9844b0`.
+  An unbounded one-byte scan was tried and rejected: it inflated to 570 rows / 109 blocked with
+  unrelated stubs.
+- **New body: `0xa1cc0`.** One direct caller, `0x256c38` in `0x2569d0`, with `rax` dead across the
+  complete `0x2569d0` body. Registered as `void_noop`; surface **91 -> 92** (23 noop / 28 const /
+  4 zero / 3 `set_u8` / 2 `set_u32` / 31 ctor / 1 custom).
+- **Blocked 24, each with a measured reason.** Twenty-two one-byte stubs have **no validated direct
+  call in 55,790 FDEs** and no resolved indirect target; each carries `image_qword_references`
+  (0 for `0x5388e0`/`0xacc5b0`, 1 for `0x41900`, 4 for `0x25c90`, 2 for the rest). `0x20d80` has
+  **3 direct sites** (`0x21166` in `0x210b0`; `0x23770`/`0x238d9` in `0x235d0`), all `rax`-dead,
+  but its non-null path needs BSS `0x2dfcbc8`. `0x9844b0` has 2 resolved indirect sites and remains
+  `tail_jump_needs_unmodelled_callee_and_rodata_leaq`.
+- **Observed:** runtime and fixture invoke `0xa1cc0` against a `0x3c` canary; observed
+  `full_scan_stub_ok=true`, `byte_setter=255`, `previous_targets={total:15,called:14,ok:true}`,
+  `dispatch.ok=true`, exit 0, stderr 0 B.
+- **Checker:** re-derives the same full-FDE scan and requires the scan summary, every
+  `direct_call_sites`/`indirect_call_sites`/`call_sites`/`rax_live_sites`, every
+  `image_qword_references`, all 92 body hashes and the dispatch slot to match. Mutation adds
+  direct-count and scan-summary tampering.
+- **Verification:** build **0**; full CTest **706/706**; checker `native_thunks=92`; entry map
+  **1,957 / 584 / 462**; runtime exit **0**, stderr **0 B**; `run_all_checkers.sh` **915 passed /
+  0 skipped / 0 failed** (exit 0); project index **114,667**; publish-path audit `--all` exit 0;
+  attribution audit OK; external direct-count tamper exit 1 and restored.
+
+**Next exact action:** model the non-null `0x20d80` manager path (drop the last ConCmd hook), then
+work the 22 stubs from their measured image references instead of re-scanning calls. Do not re-open
+`0x2170` or `0x7f8664`.
+
 ## 2026-11-13 — Direct-call liveness: 81 -> 91 native bodies (CPU-01-AOT-CFG-CALLABLE-01, continued)
 
 **State: green.** Continuation of `9b88fab8` on branch `cursor/init-hash-551140-6aa93e8`. Init-lift

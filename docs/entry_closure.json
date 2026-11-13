@@ -5991,7 +5991,7 @@
   ]
  },
  "native_thunks": {
-  "count": 91,
+  "count": 92,
   "thunks": [
    {
     "rva": "0x19f0",
@@ -6003,6 +6003,7 @@
     "effect": "no effect; rax unused at all 1 resolved call sites",
     "call_sites": 1,
     "direct_call_sites": 0,
+    "indirect_call_sites": 1,
     "rax_live_sites": []
    },
    {
@@ -6099,6 +6100,7 @@
     "effect": "no effect; rax unused at all 2 resolved call sites",
     "call_sites": 2,
     "direct_call_sites": 0,
+    "indirect_call_sites": 2,
     "rax_live_sites": []
    },
    {
@@ -6135,6 +6137,7 @@
     "effect": "no effect; rax unused at all 138 resolved call sites",
     "call_sites": 138,
     "direct_call_sites": 0,
+    "indirect_call_sites": 138,
     "rax_live_sites": []
    },
    {
@@ -6171,6 +6174,7 @@
     "effect": "no effect; rax unused at all 35 resolved call sites",
     "call_sites": 35,
     "direct_call_sites": 0,
+    "indirect_call_sites": 35,
     "rax_live_sites": []
    },
    {
@@ -6184,6 +6188,7 @@
     "offset": "0x1c",
     "call_sites": 1,
     "direct_call_sites": 0,
+    "indirect_call_sites": 1,
     "rax_live_sites": []
    },
    {
@@ -6246,6 +6251,7 @@
     "effect": "no effect; rax unused at all 2 resolved call sites",
     "call_sites": 2,
     "direct_call_sites": 0,
+    "indirect_call_sites": 2,
     "rax_live_sites": []
    },
    {
@@ -6282,6 +6288,7 @@
     "effect": "no effect; rax unused at all 1 resolved call sites",
     "call_sites": 1,
     "direct_call_sites": 0,
+    "indirect_call_sites": 1,
     "rax_live_sites": []
    },
    {
@@ -6294,6 +6301,7 @@
     "effect": "no effect; rax unused at all 1 resolved call sites",
     "call_sites": 1,
     "direct_call_sites": 0,
+    "indirect_call_sites": 1,
     "rax_live_sites": []
    },
    {
@@ -6306,6 +6314,7 @@
     "effect": "no effect; rax unused at all 1 resolved call sites",
     "call_sites": 1,
     "direct_call_sites": 0,
+    "indirect_call_sites": 1,
     "rax_live_sites": []
    },
    {
@@ -6330,6 +6339,7 @@
     "effect": "no effect; rax unused at all 1 resolved call sites",
     "call_sites": 1,
     "direct_call_sites": 1,
+    "indirect_call_sites": 0,
     "rax_live_sites": []
    },
    {
@@ -6381,6 +6391,19 @@
     "constant": "0x15973e0"
    },
    {
+    "rva": "0xa1cc0",
+    "name": "retail_void_stub",
+    "kind": "void_noop",
+    "args": 0,
+    "size": 1,
+    "sha256": "ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e",
+    "effect": "no effect; rax unused at all 1 resolved call sites",
+    "call_sites": 1,
+    "direct_call_sites": 1,
+    "indirect_call_sites": 0,
+    "rax_live_sites": []
+   },
+   {
     "rva": "0x140c90",
     "name": "vtable_pair_140c90",
     "kind": "vtable_pair_ctor",
@@ -6415,6 +6438,7 @@
     "offset": "0x40",
     "call_sites": 1,
     "direct_call_sites": 1,
+    "indirect_call_sites": 0,
     "rax_live_sites": []
    },
    {
@@ -6495,6 +6519,7 @@
     "effect": "no effect; rax unused at all 2 resolved call sites",
     "call_sites": 2,
     "direct_call_sites": 0,
+    "indirect_call_sites": 2,
     "rax_live_sites": []
    },
    {
@@ -6507,6 +6532,7 @@
     "effect": "no effect; rax unused at all 2 resolved call sites",
     "call_sites": 2,
     "direct_call_sites": 0,
+    "indirect_call_sites": 2,
     "rax_live_sites": []
    },
    {
@@ -6519,6 +6545,7 @@
     "effect": "no effect; rax unused at all 2 resolved call sites",
     "call_sites": 2,
     "direct_call_sites": 0,
+    "indirect_call_sites": 2,
     "rax_live_sites": []
    },
    {
@@ -6531,6 +6558,7 @@
     "effect": "no effect; rax unused at all 2 resolved call sites",
     "call_sites": 2,
     "direct_call_sites": 0,
+    "indirect_call_sites": 2,
     "rax_live_sites": []
    },
    {
@@ -6543,6 +6571,7 @@
     "effect": "no effect; rax unused at all 2 resolved call sites",
     "call_sites": 2,
     "direct_call_sites": 0,
+    "indirect_call_sites": 2,
     "rax_live_sites": []
    },
    {
@@ -6555,6 +6584,7 @@
     "effect": "no effect; rax unused at all 6 resolved call sites",
     "call_sites": 6,
     "direct_call_sites": 0,
+    "indirect_call_sites": 6,
     "rax_live_sites": []
    },
    {
@@ -6567,6 +6597,7 @@
     "effect": "no effect; rax unused at all 3 resolved call sites",
     "call_sites": 3,
     "direct_call_sites": 0,
+    "indirect_call_sites": 3,
     "rax_live_sites": []
    },
    {
@@ -6579,6 +6610,7 @@
     "effect": "no effect; rax unused at all 1 resolved call sites",
     "call_sites": 1,
     "direct_call_sites": 0,
+    "indirect_call_sites": 1,
     "rax_live_sites": []
    },
    {
@@ -6601,6 +6633,7 @@
     "effect": "no effect; rax unused at all 1 resolved call sites",
     "call_sites": 1,
     "direct_call_sites": 1,
+    "indirect_call_sites": 0,
     "rax_live_sites": []
    },
    {
@@ -6613,6 +6646,7 @@
     "effect": "no effect; rax unused at all 1 resolved call sites",
     "call_sites": 1,
     "direct_call_sites": 1,
+    "indirect_call_sites": 0,
     "rax_live_sites": []
    },
    {
@@ -6625,6 +6659,7 @@
     "effect": "no effect; rax unused at all 1 resolved call sites",
     "call_sites": 1,
     "direct_call_sites": 1,
+    "indirect_call_sites": 0,
     "rax_live_sites": []
    },
    {
@@ -6637,6 +6672,7 @@
     "effect": "no effect; rax unused at all 1 resolved call sites",
     "call_sites": 1,
     "direct_call_sites": 1,
+    "indirect_call_sites": 0,
     "rax_live_sites": []
    },
    {
@@ -6649,6 +6685,7 @@
     "effect": "no effect; rax unused at all 1 resolved call sites",
     "call_sites": 1,
     "direct_call_sites": 1,
+    "indirect_call_sites": 0,
     "rax_live_sites": []
    },
    {
@@ -6814,6 +6851,7 @@
     "offset": "0x51",
     "call_sites": 1,
     "direct_call_sites": 1,
+    "indirect_call_sites": 0,
     "rax_live_sites": []
    },
    {
@@ -6887,6 +6925,7 @@
     "offset": "0x1",
     "call_sites": 1,
     "direct_call_sites": 1,
+    "indirect_call_sites": 0,
     "rax_live_sites": []
    },
    {
@@ -6900,6 +6939,7 @@
     "offset": "0x29",
     "call_sites": 1,
     "direct_call_sites": 1,
+    "indirect_call_sites": 0,
     "rax_live_sites": []
    },
    {
@@ -7029,127 +7069,218 @@
    {
     "rva": "0x207d0",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    },
    {
     "rva": "0x20d80",
     "symbol": null,
-    "reason": "needs_live_manager_pointer_from_bss_0x2dfcbc8"
+    "reason": "needs_live_manager_pointer_from_bss_0x2dfcbc8",
+    "direct_call_sites": 3,
+    "indirect_call_sites": 0,
+    "call_sites": 3,
+    "image_qword_references": 0
    },
    {
     "rva": "0x23370",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    },
    {
     "rva": "0x235c0",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    },
    {
     "rva": "0x25c90",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_4",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 4
    },
    {
     "rva": "0x41900",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
-   },
-   {
-    "rva": "0xa1cc0",
-    "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_1",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 1
    },
    {
     "rva": "0x140ce0",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    },
    {
     "rva": "0x16a5d0",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    },
    {
     "rva": "0x2111d0",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    },
    {
     "rva": "0x49cc50",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    },
    {
     "rva": "0x49ce50",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    },
    {
     "rva": "0x5388e0",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 0
    },
    {
     "rva": "0x829ac0",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    },
    {
     "rva": "0x829b20",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    },
    {
     "rva": "0x9844b0",
     "symbol": null,
-    "reason": "tail_jump_needs_unmodelled_callee_and_rodata_leaq"
+    "reason": "tail_jump_needs_unmodelled_callee_and_rodata_leaq",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 2,
+    "call_sites": 2,
+    "image_qword_references": 2
    },
    {
     "rva": "0xa32490",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    },
    {
     "rva": "0xa40e20",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    },
    {
     "rva": "0xa4f4c0",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    },
    {
     "rva": "0xa4feb0",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    },
    {
     "rva": "0xa50270",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    },
    {
     "rva": "0xa62490",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    },
    {
     "rva": "0xa62850",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    },
    {
     "rva": "0xacc5b0",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 0
    },
    {
     "rva": "0xb0e240",
     "symbol": null,
-    "reason": "no_mapped_call_site_to_prove_return_unused"
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "direct_call_sites": 0,
+    "indirect_call_sites": 0,
+    "call_sites": 0,
+    "image_qword_references": 2
    }
   ],
   "dispatch": {
@@ -7159,6 +7290,15 @@
    "slot": "0x20",
    "target": "0x20d60",
    "vtable_sha256": "62d5d2776fa8b3c005533e61eef04eea0e796469b49ef183a3e2093f3c899aa7"
+  },
+  "scan": {
+   "fde_ranges": 55790,
+   "bytes": 15839273,
+   "raw_candidates": 3002,
+   "candidate_callers": 898,
+   "decoded_instructions": 231649,
+   "validated_sites": 3002,
+   "targets_with_sites": 19
   },
   "previous_targets": [
    "0x19f0",
