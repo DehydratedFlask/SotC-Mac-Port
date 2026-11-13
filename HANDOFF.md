@@ -1,3 +1,42 @@
+## 2026-11-13 — 96 native bodies: `0x25c90` through vtable `0x1595100+0x18`
+
+**State: green.** Continuation of `63cf096b` on `cursor/init-hash-551140-6aa93e8`. Init-lift is
+untouched: **46,876 / 46,881 B**, **108,325 B** native; `0x2170` (`0x5ba041`) and S4.2 geometry
+(`0x7f8664..0x7f87d8`) stay closed.
+
+**Registry 95 -> 96; blocked 21 -> 20; guard 116 unchanged.** `0x25c90` was blocked only as
+`no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x1595118`. Its caller
+is already in a mapped FDE: `0x25de0` (`kSlot566`, size `0x4aa`) materializes vtable base
+`0x1595100` at `0x2612a`, spills it at `0x2614c`, reloads it at `0x2618e`, and dispatches through
+`*0x18(%rax)` at `0x26199`; `0x1595100+0x18` is `0x1595118`, whose qword is `0x25c90`. `rax` is
+dead at `0x26199` (`_rax_live_after` false over the full `0x4aa` window; `0x2619c` overwrites it).
+The constructor at `0x25ab0` also installs the same base in the member at `+0xc0`
+(`0x25aec`/`0x25b16`).
+
+**Row.** `retail_void_stub`, kind `void_noop`, size 1, body `c3`, sha256
+`ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e`; `direct_call_sites=0`,
+`indirect_call_sites=1`, `call_sites=1`, `rax_live_sites=[]`. The entry map names it
+`kUnboundedIntTwinBSeedDestroy`.
+
+**Runtime.** The harness invokes `0x25c90` directly with a 0x5a canary; the body's own `retq`
+leaves every byte unchanged and returns 0. `slot2_stub_ok=true`, `registered=96`, and every prior
+effect still passes: `slot_stub_ok=true`,
+`concmd_registry={size:3,rotations:1,global:2,null_ok:true,ok:true}`, `byte_setter=255`,
+`previous_targets=15/14/ok`, `printf_string_ok=true`; exit 0, stderr 0 B.
+
+**Counts.** 96 = 25 noop / 28 const / 4 zero / 3 set_u8 / 2 set_u32 / 31 ctor / 1 ConCmd lazy /
+1 ConCmd registry / 1 printf. Blocked **20** (17 relocated slots, one inert image reference, two
+without image/relocation reference). Guard **116** = 96 + 20; unbounded 570 rejected.
+
+**Verification.** Build **0**; full CTest **706/706**; checker `native_thunks=96` with mutation
+(including a new second-slot probe); `run_all_checkers.sh` **915/0/0**; entry map
+**1,957 / 584 / 462**; project index **114,667**; publish-path audit exit 0; attribution OK.
+
+**Next exact action:** apply the same fixed-caller method to another relocated slot whose vtable
+base is materialized in a mapped FDE and whose `rax` is dead at the call. `0x23370` (`0x1594e90`)
+and `0x235c0` (`0x1594eb0`) are the nearest named slots but still need their own decoded dispatch.
+Do not add a candidate row.
+
 ## 2026-11-13 — 95 native bodies: `0x207d0` through vtable `0x1594d60+0x18`
 
 **State: green.** Continuation of `342ea69b` on `cursor/init-hash-551140-6aa93e8`. Init-lift is

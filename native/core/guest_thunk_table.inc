@@ -198,6 +198,13 @@ static std::uint64_t thunk_25c60_vtable_pair_ctor(std::uint64_t a0, std::uint64_
     std::memcpy(reinterpret_cast<void*>(a0 + 0x20), &constant, sizeof(constant));
     return copied;
 }
+static std::uint64_t thunk_25c90_void_noop(std::uint64_t a0, std::uint64_t a1,
+                                     std::uint64_t, std::uint64_t,
+                                     std::uint64_t, std::uint64_t) {
+    // body: ret (0x25c90); rax is unused at every resolved call site
+    (void)a0; (void)a1;
+    return 0;
+}
 static std::uint64_t thunk_2bdd0_void_noop(std::uint64_t a0, std::uint64_t a1,
                                      std::uint64_t, std::uint64_t,
                                      std::uint64_t, std::uint64_t) {
@@ -768,6 +775,7 @@ static constexpr GuestThunk kGuestLeafThunks[] = {
     {0x25aa0ULL, "retail_void_stub", thunk_25aa0_void_noop, 0},
     {0x25c40ULL, "vtable_pair_25c40", thunk_25c40_vtable_pair_ctor, 2},
     {0x25c60ULL, "vtable_pair_25c60", thunk_25c60_vtable_pair_ctor, 2},
+    {0x25c90ULL, "retail_void_stub", thunk_25c90_void_noop, 0},
     {0x2bdd0ULL, "retail_void_stub", thunk_2bdd0_void_noop, 0},
     {0x2c000ULL, "retail_void_stub", thunk_2c000_void_noop, 0},
     {0x2c180ULL, "retail_void_stub", thunk_2c180_void_noop, 0},
