@@ -229,15 +229,17 @@ runtime. The next pass withdrew the blanket "caller-owned rax" refusal: backward
 pass widened the evidence to direct calls, and the follow-up scans the **full FDE range set**:
 **55,790 ranges / 15,839,273 B**, **898** candidate caller bodies and **231,649** decoded
 instructions validate **3,002** direct sites. That adds `0xa1cc0` (caller `0x256c38` in
-`0x2569d0`), so **94 entries now have native bodies** (23 noop, 28 constants, 4 zero, 3 byte
+`0x2569d0`), so **95 entries now have native bodies** (24 noop, 28 constants, 4 zero, 3 byte
 setters, 2 setters, 31 vtable-pair ctors, 1 ConCmd lazy, 1 ConCmd registry insert, 1 printf custom).
-**The remaining ordered blockers are the 22 reference-audited one-byte stubs**: 19 relocated vtable
+**The remaining ordered blockers are the 21 reference-audited one-byte stubs**: 18 relocated vtable
 slots with named addresses, one inert image reference and two with no image/relocation reference.
 A guard audit of the helpers exposed by the `0x20d80` decode found that `0xf8f3d0`/`0xf8f3e0` are
 FDE-less PLT/GOT import jumps and `0x42d30` is a real 0x21c FDE body (direct call `0x2138a`) but
 outside the bounded 116-row candidate set; none is eligible without a 117th row or a widened scan.
-They cannot be registered without a real caller or a widened scan, so the latest pass closed the
-last live gap inside `0x20d80` instead: its null branch at `0x20e7f` now appends through the global
+They cannot be registered without a real caller or a widened scan. The latest registration retired
+`0x207d0` through the decoded vtable base `0x1594d60` (`0x20883` materialize, `0x2088a` spill,
+`0x20a88` reload, `0x20a9e` `*0x18(%rbx)`), giving one indirect site and dead `rax`; the null branch
+of `0x20d80` at `0x20e7f` appends through the global
 sentinel at `0x2dfce50` (guard `0x2dfce60`), and its `0x211d0`/`0x42d30` tree model now reproduces
 the `+0x10` parent, `+0x18` color and RB rotation contract. `Alpha`, `Beta`, `Gamma` forces one
 rotation at runtime; duplicate `alpha` still changes nothing. The printf row is `0x9844b0`, whose

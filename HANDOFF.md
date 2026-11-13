@@ -1,3 +1,38 @@
+## 2026-11-13 — 95 native bodies: `0x207d0` through vtable `0x1594d60+0x18`
+
+**State: green.** Continuation of `342ea69b` on `cursor/init-hash-551140-6aa93e8`. Init-lift is
+untouched: **46,876 / 46,881 B**, **108,325 B** native; `0x2170` (`0x5ba041`) and S4.2 geometry
+(`0x7f8664..0x7f87d8`) stay closed.
+
+**Registry 94 -> 95; blocked 22 -> 21; guard 116 unchanged.** `0x207d0` was blocked only as
+`no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x1594d78`. Its caller
+is already in a mapped FDE: `0x207e0` (size `0x30e`) materializes vtable base `0x1594d60` at
+`0x20883`, spills it at `0x2088a`, reloads it at `0x20a88`, and dispatches through
+`*0x18(%rbx)` at `0x20a9e`; `0x1594d60+0x18` is `0x1594d78`, whose qword is `0x207d0`. `rax` is
+dead at `0x20a9e` (`_rax_live_after` false over the full 160-instruction window).
+
+**Row.** `retail_void_stub`, kind `void_noop`, size 1, body `c3`, sha256
+`ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e`; `direct_call_sites=0`,
+`indirect_call_sites=1`, `call_sites=1`, `rax_live_sites=[]`.
+
+**Runtime.** The harness invokes `0x207d0` directly with a 0xa5 canary; the body's own `retq`
+leaves every byte unchanged and returns 0. `slot_stub_ok=true`, `registered=95`, and every prior
+effect still passes: `concmd_registry={size:3,rotations:1,global:2,null_ok:true,ok:true}`,
+`byte_setter=255`, `previous_targets=15/14/ok`, `printf_string_ok=true`; exit 0, stderr 0 B.
+
+**Counts.** 95 = 24 noop / 28 const / 4 zero / 3 set_u8 / 2 set_u32 / 31 ctor / 1 ConCmd lazy /
+1 ConCmd registry / 1 printf. Blocked **21** (18 relocated slots, one inert image reference, two
+without image/relocation reference). Guard **116** = 95 + 21; unbounded 570 rejected. The prompt's
+"95 / 22 with guard 116" is 117 rows and is arithmetically impossible without adding a candidate
+row, so the missing candidate was retired from blocked, not duplicated.
+
+**Verification.** Build **0**; full CTest **706/706**; checker `native_thunks=95` with mutation;
+`run_all_checkers.sh` **915/0/0**; entry map **1,957 / 584 / 462**; project index **114,667**;
+publish-path audit exit 0; attribution OK.
+
+**Next exact action:** apply the same fixed-caller method to another relocated slot whose vtable
+base is materialized in a mapped FDE and whose `rax` is dead at the call. Do not add a candidate row.
+
 ## 2026-11-13 — Candidate audit: no eligible 95th row (94/22 retained)
 
 **State: green.** Continuation of `33b26f9c` on `cursor/init-hash-551140-6aa93e8`. Init-lift is

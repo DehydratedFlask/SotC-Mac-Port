@@ -81,11 +81,35 @@ def indirect_liveness(targets: tuple[int, ...]) -> dict[int, tuple[list[str], li
     return result
 
 
+def known_concmd_slot_site() -> tuple[int, str, bool] | None:
+    """Re-decode the one fixed 0x207d0 vtable caller from the pinned ELF."""
+    elf = ec.Elf()
+    fdes = ec.parse_fdes(elf)
+    fn, site, slot, target = 0x207E0, 0x20A9E, 0x1594D78, 0x207D0
+    size = dict(fdes).get(fn, 0)
+    if not size or elf.u64(slot) != target or elf.raw(target, 1) != b"\xc3":
+        return None
+    ins = ec.disassemble([(fn, fn + size)])
+    expect = ((0x20883, "leaq", "0x1594d60"),
+              (0x2088a, "movq", "%rdx, 0xd0(%rsp)"),
+              (0x20a88, "movq", "0xd0(%rsp), %rbx"),
+              (0x20a9e, "callq", "*0x18(%rbx)"))
+    for addr, mnemonic, operand in expect:
+        actual = ins.get(addr)
+        if actual is None or actual[0] != mnemonic or operand not in actual[1]:
+            return None
+    window = [a for a in sorted(ins) if fn <= a < fn + size]
+    if not window or window[0] != fn:
+        return None
+    live = ec._rax_live_after(ins, window, {site})
+    return target, f"0x{site:x}", live[site]
+
+
 def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
     """Re-derive every registered thunk body and the dispatch slot from the pinned ELF."""
     block = data.get("native_thunks", {})
     thunks = block.get("thunks", [])
-    if block.get("count") != 94 or len(thunks) != 94:
+    if block.get("count") != 95 or len(thunks) != 95:
         return False
     source = (ROOT / "native/core/guest_thunks.cpp").read_text()
     elf = ec.Elf()
@@ -137,7 +161,9 @@ def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
         return False
     if guard.get("unbounded_one_byte_rows_rejected") != 570:
         return False
-    if block.get("blocked") is None or len(block["blocked"]) != 22:
+    if block.get("blocked") is None or len(block["blocked"]) != 21:
+        return False
+    if any(int(entry["rva"], 16) == 0x207D0 for entry in block["blocked"]):
         return False
     if len(thunks) + len(block["blocked"]) != guard.get("candidate_rows"):
         return False
@@ -184,6 +210,16 @@ def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
             indirect_sites[target] = indirect_sites.get(target, 0) + 1
     evidence_targets = tuple(sorted({int(t["rva"], 16) for t in thunks + block["blocked"]}))
     indirect_live = indirect_liveness(evidence_targets)
+    known = known_concmd_slot_site()
+    if known is not None:
+        known_target, known_site, known_is_live = known
+        indirect_sites[known_target] = indirect_sites.get(known_target, 0) + 1
+        sites, live_sites = indirect_live.get(known_target, ([], []))
+        if known_site not in sites:
+            sites.append(known_site)
+        if known_is_live:
+            live_sites.append(known_site)
+        indirect_live[known_target] = (sites, live_sites)
     for thunk in list(thunks) + list(block["blocked"]):
         if "call_sites" not in thunk:
             continue

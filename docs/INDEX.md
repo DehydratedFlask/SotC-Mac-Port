@@ -9,6 +9,7 @@ Workspace: `/Volumes/Extra/SoC Mac Native`. Start with [HANDOFF](../HANDOFF.md),
 |---|---|
 | [TASKS](TASKS.md) | Dependency-ordered task register and detailed work packets; integrator |
 | [EVIDENCE](EVIDENCE.md) | Verified artifact/source/tool facts and unresolved questions; integrator |
+| [95 bodies: `0x207d0` vtable slot (2026-11-13)](checkpoints/2026-11-13-vtable-slot-207d0-95.md) | E1450; vtable `0x1594d60+0x18` -> `0x207d0`; caller `0x207e0` sites `0x20883`/`0x2088a`/`0x20a88`/`0x20a9e`; one indirect site, `rax` dead; runtime canary; **94/22 -> 95/21**, guard 116; ctest 706/706 |
 | [Candidate audit: no eligible 95th row (2026-11-13)](checkpoints/2026-11-13-candidate-audit-94.md) | E1449; guard 116 = 94 + 22; `0xf8f3d0`/`0xf8f3e0` FDE-less PLT imports; `0x42d30` real 0x21c body but outside guard; no row registered; **94/22** retained; ctest 706/706 |
 | [`0x20d80` null branch + RB rotations (2026-11-13)](checkpoints/2026-11-13-concmd-null-rb-94.md) | E1448; remaining 22 are reference-audited stubs; null global sentinel `0x2dfce50`, guard `0x2dfce60`; `Alpha/Beta/Gamma` forces one RB rotation, `alpha` rejected; `size:3,rotations:1,global:2,null_ok:true`; **94/22** retained; ctest 706/706 |
 | [ConCmd registry insert: 94 native bodies (2026-11-13)](checkpoints/2026-11-13-concmd-registry-94.md) | E1447; `0x20d80` non-null path modelled as `strcasecmp` set insert; runtime seeds container, inserts `Alpha`/`Beta`, rejects `alpha`, size 2; direct sites `0x21166`/`0x23770`/`0x238d9`; **93 -> 94** bodies, **23 -> 22** blocked; ctest 706/706 |
