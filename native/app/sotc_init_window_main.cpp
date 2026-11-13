@@ -76,6 +76,7 @@ struct ThunkProbe {
     int previous_targets_called;
     unsigned byte_setter_value;
     bool full_scan_stub_ok;
+    bool printf_string_ok;
     unsigned long long dispatch_site;
     unsigned long long dispatch_target;
     unsigned dispatch_flag;
@@ -83,9 +84,14 @@ struct ThunkProbe {
 };
 
 int g_thunk_hook_calls = 0;
+char g_printf_text[64] = {};
 
 void thunk_register_hook(void*, void*) {
     ++g_thunk_hook_calls;
+}
+
+void thunk_printf_hook(const char* text) {
+    std::snprintf(g_printf_text, sizeof(g_printf_text), "%s", text != nullptr ? text : "");
 }
 
 ThunkProbe run_guest_thunk_probes() {
@@ -173,10 +179,22 @@ ThunkProbe run_guest_thunk_probes() {
     p.full_scan_stub_ok = sotc::guest_thunk_invoke(0xa1cc0, full_args, &full_result);
     for (unsigned char byte : full_canary) p.full_scan_stub_ok = p.full_scan_stub_ok && byte == 0x3c;
 
+    // 0x9844b0 forwards its third argument to imported printf through the pinned "%s" format.
+    static const char printf_message[] = "retail-printf";
+    const std::uint64_t printf_args[6] = {0, 0,
+        reinterpret_cast<std::uint64_t>(printf_message), 0, 0, 0};
+    std::uint64_t printf_result = 1;
+    g_printf_text[0] = 0;
+    sotc::guest_set_printf_hook(thunk_printf_hook);
+    p.printf_string_ok = sotc::guest_thunk_invoke(0x9844b0, printf_args, &printf_result) &&
+                         std::strcmp(g_printf_text, printf_message) == 0 &&
+                         printf_result == std::strlen(printf_message);
+    sotc::guest_set_printf_hook(nullptr);
+
     p.ok = setter_called && p.setter_value == 0x2a && first_called && second_called &&
            p.register_flag == 1 && p.hook_calls == 1 && p.dispatch_ok &&
-           p.previous_targets_ok && byte_ok && p.full_scan_stub_ok &&
-           sotc::guest_thunk_count() == 92;
+           p.previous_targets_ok && byte_ok && p.full_scan_stub_ok && p.printf_string_ok &&
+           sotc::guest_thunk_count() == 93;
     return p;
 }
 
@@ -186,12 +204,14 @@ void print_guest_thunks(const ThunkProbe& p) {
                 "\"dispatch\":{\"site\":\"0x%llx\",\"target\":\"0x%llx\","
                 "\"flag\":%u,\"hook_calls\":%d,\"ok\":%s},"
                 "\"previous_targets\":{\"total\":15,\"called\":%d,\"ok\":%s},"
-                "\"byte_setter\":%u,\"full_scan_stub_ok\":%s},",
+                "\"byte_setter\":%u,\"full_scan_stub_ok\":%s,"
+                "\"printf_string_ok\":%s},",
                 sotc::guest_thunk_count(), p.calls, p.setter_value, p.register_flag, p.hook_calls,
                 p.ok ? "true" : "false", p.dispatch_site, p.dispatch_target, p.dispatch_flag,
                 p.dispatch_hook_calls, p.dispatch_ok ? "true" : "false",
                 p.previous_targets_called, p.previous_targets_ok ? "true" : "false",
-                p.byte_setter_value, p.full_scan_stub_ok ? "true" : "false");
+                p.byte_setter_value, p.full_scan_stub_ok ? "true" : "false",
+                p.printf_string_ok ? "true" : "false");
 }
 
 void print_post_calls(const sotc::InitWindowRuntimeResult& r) {

@@ -45,11 +45,11 @@ call dispatcher needs before lifted code can call lifted code by guest address.
    functions in the `0x531d60` closure have an exact native entry (23.2 %).
 2. ~~**ABI shape.**~~ Done 2026-11-13 (`CPU-01-AOT-CFG-CALLABLE-01`): every function start is
    classified from its decoded entry as `retail_entry` (786), `jmp_thunk` (10) or `ret_stub` (34),
-   with prologue frame and call-alignment evidence. **92** entries now have real SysV bodies
-   (23 noop, 28 constants, 4 zero, 3 byte setters, 2 setters, 31 vtable-pair ctors, 1 custom), all
+   with prologue frame and call-alignment evidence. **93** entries now have real SysV bodies
+   (23 noop, 28 constants, 4 zero, 3 byte setters, 2 setters, 31 vtable-pair ctors, 1 ConCmd custom, 1 printf custom), all
    re-derived from complete FDE bodies; stubs are registered only after per-site `rax` liveness
-   over indirect and full-FDE direct callers, and the 24 that remain non-callable keep exact RVA,
-   measured image references and a specific blocker. One CFG-resolved site
+   over indirect and full-FDE direct callers, and the 23 that remain non-callable keep exact RVA,
+   measured relocation-slot/image references and a specific blocker. One CFG-resolved site
    (`0x28471` -> vtable `0x1594dc0` slot `0x20` -> `0x20d60`) executes through the host vtable image
    and asserts the invocation result. The rest still need a native signature and host state.
 3. ~~**Indirect targets.**~~ Measured and partially resolved 2026-11-13: the `0x531d60` closure has

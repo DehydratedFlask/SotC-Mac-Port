@@ -12,10 +12,12 @@
 //   - `set_u32`        `movl %esi,disp(%rdi); retq`; exact store, return ignored at every known site.
 //   - `vtable_pair_ctor` 20 B `mov rsi+0x10 -> rdi+0x10`, pinned address -> `rdi+0x20`, returns
 //                      `rsi+0x10`; exact for a host-supplied object.
-// One custom body, `0x20d60`, reproduces the `+0x18` flag test/store and reports its manager-map
+// Two custom bodies. `0x20d60` reproduces the `+0x18` flag test/store and reports its manager-map
 // insert through a host hook: the insert (`0x20d80`) needs the live manager pointer from BSS global
-// `0x2dfcbc8`, which the host does not have. Entries whose complete body is not a proved leaf keep
-// an exact RVA and reason in `docs/entry_closure.json` under `native_thunks.blocked`.
+// `0x2dfcbc8`, which the host does not have. `0x9844b0` tail-jumps to imported printf with the
+// pinned `%s` format and forwards argument 3; a host hook observes that string. Entries whose
+// complete body is not a proved leaf keep an exact RVA and reason in `docs/entry_closure.json`
+// under `native_thunks.blocked`.
 
 #pragma once
 
@@ -45,8 +47,10 @@ struct GuestDispatchSite {
 };
 
 using GuestConCmdRegisterHook = void (*)(void* object, void* manager);
+using GuestPrintfHook = void (*)(const char* text);
 
 void guest_set_concmd_register_hook(GuestConCmdRegisterHook hook) noexcept;
+void guest_set_printf_hook(GuestPrintfHook hook) noexcept;
 const GuestThunk* guest_thunk_find(std::uint64_t rva) noexcept;
 std::size_t guest_thunk_count() noexcept;
 

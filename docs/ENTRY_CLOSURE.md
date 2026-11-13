@@ -66,8 +66,8 @@ The `ret_stub` rows are the one-byte `ret` functions already executed on the Ini
 
 ## Native retail-ABI thunks
 
-**92** entries are hosted as real SysV callables: the generated
-`native/core/guest_thunk_table.inc` plus the custom `0x20d60` body. The runtime and
+**93** entries are hosted as real SysV callables: the generated
+`native/core/guest_thunk_table.inc` plus the custom `0x20d60` and `0x9844b0` bodies. The runtime and
 `test_guest_thunks` invoke them through the registry and assert the observed object delta or
 return value:
 
@@ -75,6 +75,7 @@ return value:
 | --- | ---: | --- | --- |
 | `concmd_lazy_register` | **1** | flag test/store reproduced; map insert is a host hook | flag flips once, hook fires once, second call no-op |
 | `const_u32` | **28** | the whole body is `movl $imm,%eax; retq` | returns the pinned immediate |
+| `printf_string` | **1** | tail jump to imported printf with pinned `%s`; two resolved sites ignore rax | forwards argument 3 to printf; a host hook observes the string |
 | `set_u32` | **2** | whole body is one store + ret; return dead at every mapped site | stores rsi at object+offset |
 | `set_u8` | **3** | whole body is `movb %sil,disp(%rdi); retq`; direct/indirect return dead | stores the low byte of rsi at object+offset |
 | `void_noop` | **23** | backward rax liveness proves every resolved caller ignores the return | no effect; registered only for dead-return stubs |
@@ -99,15 +100,31 @@ The 15 RVAs the earlier pass resolved are all accounted for:
 - `0xc4f0` — registered as `void_noop` (invoked by the fixture/runtime).
 - `0xc770` — registered as `void_noop` (invoked by the fixture/runtime).
 
-The **24** entries that stay non-callable keep their exact
+The **23** entries that stay non-callable keep their exact
 RVA and reason in `entry_closure.json` under `native_thunks.blocked`:
 
-- `needs_live_manager_pointer_from_bss_0x2dfcbc8` — **1**
-- `no_direct_call_in_55790_fdes_no_resolved_indirect_target` — **2**
-- `no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_1` — **1**
-- `no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2` — **18**
-- `no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_4` — **1**
-- `tail_jump_needs_unmodelled_callee_and_rodata_leaq` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; no occurrence in any file-backed load segment and no RELATIVE slot` — **2**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x1594d78` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x1594e90` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x1594eb0` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x1595118` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15983e0` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x1598798` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x159abd8` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15bfd00` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15bfd98` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15ceae0` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15ceb00` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15d11a0` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15d16e0` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15d1b90` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15d1c48` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15d1ce0` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15d1fc0` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15d2098` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15d5978` — **1**
+- `no_direct_call_in_55790_fdes_no_resolved_indirect_target; unaligned bytes at 0x29b2bef` — **1**
+- `non_null_path_needs_container_at_bss_0x2dfcbc8_with_tree_0x18_and_lock_0x58; node_inserter_0x211d0_and_comparator_0xf8f500_unmodelled; slot_is_cleared_at_0x23612_before_the_first_call` — **1**
 
 The direct-call scan now covers the **full FDE-derived code range**, not only mapped starts:
 **55,790** ranges / **15,839,273 B** are scanned for `call rel32`, **3,002** candidate sites are found, and the
@@ -218,7 +235,7 @@ to be an exact FDE start.
 ## What this changes
 
 - `ENTRY_MAP.md`'s open item 2 (address → callable retail-ABI entry) is answered at the shape
-  level for every start, and **92** entries now have real SysV
+  level for every start, and **93** entries now have real SysV
   thunk bodies; one indirect site executes through the host vtable image end to end.
 - Open item 3 (indirect targets) is measured and partially resolved; every remaining site is
   enumerated with its blocking reason instead of being left as a count.

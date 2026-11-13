@@ -5991,7 +5991,7 @@
   ]
  },
  "native_thunks": {
-  "count": 92,
+  "count": 93,
   "thunks": [
    {
     "rva": "0x19f0",
@@ -6797,6 +6797,27 @@
     "constant": "0x15ceae8"
    },
    {
+    "rva": "0x9844b0",
+    "name": "retail_printf_string",
+    "kind": "printf_string",
+    "args": 3,
+    "size": 17,
+    "sha256": "7ab53f494bd749fd74ad9f0ab64431f7dc8de31c4b4be9459865d17dc71c0ade",
+    "effect": "tail-jumps to imported printf (NID hcuQgD53UxM) with the pinned %s format at 0x12b57f4 and forwards argument 3 (rdx) as the string; rax unused at both resolved indirect sites",
+    "callee": "0xf8fed0",
+    "got_slot": "0x1600558",
+    "import_nid": "hcuQgD53UxM",
+    "import_name": "printf",
+    "format": "0x12b57f4",
+    "format_text": "%s",
+    "argument_index": 2,
+    "call_sites": 2,
+    "direct_call_sites": 0,
+    "indirect_call_sites": 2,
+    "rax_live_sites": [],
+    "custom": true
+   },
+   {
     "rva": "0xa31d90",
     "name": "const_u32_a31d90",
     "kind": "const_u32",
@@ -7069,218 +7090,366 @@
    {
     "rva": "0x207d0",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x1594d78",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x1594d78"
+    ],
+    "relocation_slots": [
+     "0x1594d78"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0x20d80",
     "symbol": null,
-    "reason": "needs_live_manager_pointer_from_bss_0x2dfcbc8",
+    "reason": "non_null_path_needs_container_at_bss_0x2dfcbc8_with_tree_0x18_and_lock_0x58; node_inserter_0x211d0_and_comparator_0xf8f500_unmodelled; slot_is_cleared_at_0x23612_before_the_first_call",
     "direct_call_sites": 3,
     "indirect_call_sites": 0,
     "call_sites": 3,
-    "image_qword_references": 0
+    "image_qword_references": 0,
+    "image_qword_reference_sites": [],
+    "relocation_slots": [],
+    "reference_resolution": "direct_call_sites_with_live_bss_container",
+    "missing_host_state": [
+     "bss_0x2dfcbc8",
+     "container_tree_0x18",
+     "container_lock_0x58"
+    ],
+    "unmodelled_callees": [
+     "0x211d0",
+     "0xf8f500"
+    ]
    },
    {
     "rva": "0x23370",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x1594e90",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x1594e90"
+    ],
+    "relocation_slots": [
+     "0x1594e90"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0x235c0",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x1594eb0",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x1594eb0"
+    ],
+    "relocation_slots": [
+     "0x1594eb0"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0x25c90",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_4",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x1595118",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 4
+    "image_qword_references": 2,
+    "image_qword_reference_sites": [
+     "0x1595118",
+     "0x24e49e1"
+    ],
+    "relocation_slots": [
+     "0x1595118"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0x41900",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_1",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; unaligned bytes at 0x29b2bef",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 1
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x29b2bef"
+    ],
+    "relocation_slots": [],
+    "reference_resolution": "inert_unaligned_image_bytes"
    },
    {
     "rva": "0x140ce0",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15983e0",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x15983e0"
+    ],
+    "relocation_slots": [
+     "0x15983e0"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0x16a5d0",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x1598798",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x1598798"
+    ],
+    "relocation_slots": [
+     "0x1598798"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0x2111d0",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x159abd8",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x159abd8"
+    ],
+    "relocation_slots": [
+     "0x159abd8"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0x49cc50",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15bfd00",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x15bfd00"
+    ],
+    "relocation_slots": [
+     "0x15bfd00"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0x49ce50",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15bfd98",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x15bfd98"
+    ],
+    "relocation_slots": [
+     "0x15bfd98"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0x5388e0",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; no occurrence in any file-backed load segment and no RELATIVE slot",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 0
+    "image_qword_references": 0,
+    "image_qword_reference_sites": [],
+    "relocation_slots": [],
+    "reference_resolution": "no_image_or_relocation_reference"
    },
    {
     "rva": "0x829ac0",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15ceae0",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x15ceae0"
+    ],
+    "relocation_slots": [
+     "0x15ceae0"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0x829b20",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15ceb00",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
-   },
-   {
-    "rva": "0x9844b0",
-    "symbol": null,
-    "reason": "tail_jump_needs_unmodelled_callee_and_rodata_leaq",
-    "direct_call_sites": 0,
-    "indirect_call_sites": 2,
-    "call_sites": 2,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x15ceb00"
+    ],
+    "relocation_slots": [
+     "0x15ceb00"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0xa32490",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15d11a0",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x15d11a0"
+    ],
+    "relocation_slots": [
+     "0x15d11a0"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0xa40e20",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15d16e0",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x15d16e0"
+    ],
+    "relocation_slots": [
+     "0x15d16e0"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0xa4f4c0",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15d1b90",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x15d1b90"
+    ],
+    "relocation_slots": [
+     "0x15d1b90"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0xa4feb0",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15d1c48",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x15d1c48"
+    ],
+    "relocation_slots": [
+     "0x15d1c48"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0xa50270",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15d1ce0",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x15d1ce0"
+    ],
+    "relocation_slots": [
+     "0x15d1ce0"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0xa62490",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15d1fc0",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x15d1fc0"
+    ],
+    "relocation_slots": [
+     "0x15d1fc0"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0xa62850",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15d2098",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x15d2098"
+    ],
+    "relocation_slots": [
+     "0x15d2098"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    },
    {
     "rva": "0xacc5b0",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; no occurrence in any file-backed load segment and no RELATIVE slot",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 0
+    "image_qword_references": 0,
+    "image_qword_reference_sites": [],
+    "relocation_slots": [],
+    "reference_resolution": "no_image_or_relocation_reference"
    },
    {
     "rva": "0xb0e240",
     "symbol": null,
-    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target_qword_refs_2",
+    "reason": "no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x15d5978",
     "direct_call_sites": 0,
     "indirect_call_sites": 0,
     "call_sites": 0,
-    "image_qword_references": 2
+    "image_qword_references": 1,
+    "image_qword_reference_sites": [
+     "0x15d5978"
+    ],
+    "relocation_slots": [
+     "0x15d5978"
+    ],
+    "reference_resolution": "relative_relocation_function_pointer_slot"
    }
   ],
   "dispatch": {
@@ -7299,6 +7468,11 @@
    "decoded_instructions": 231649,
    "validated_sites": 3002,
    "targets_with_sites": 19
+  },
+  "candidate_guard": {
+   "bounded_to_campaign_candidates": true,
+   "candidate_rows": 116,
+   "unbounded_one_byte_rows_rejected": 570
   },
   "previous_targets": [
    "0x19f0",

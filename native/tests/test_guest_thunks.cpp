@@ -15,6 +15,11 @@ namespace {
 
 int g_hook_calls = 0;
 void* g_hook_object = nullptr;
+char g_printf_text[64] = {};
+
+void printf_hook(const char* text) {
+    std::snprintf(g_printf_text, sizeof(g_printf_text), "%s", text != nullptr ? text : "");
+}
 
 void register_hook(void* object, void*) {
     ++g_hook_calls;
@@ -40,7 +45,7 @@ std::uint64_t load64(const Object& object, std::size_t offset) {
 }  // namespace
 
 int main() {
-    CHECK(guest_thunk_count() == 92);
+    CHECK(guest_thunk_count() == 93);
     CHECK(guest_thunk_find(0x20d60) != nullptr);
     CHECK(guest_thunk_find(0x13d20) != nullptr);
     CHECK(guest_thunk_find(0xc4f0) != nullptr);
@@ -128,6 +133,18 @@ int main() {
         reinterpret_cast<std::uint64_t>(&full_scan_canary), 0, 0, 0, 0, 0};
     CHECK(guest_thunk_invoke(0xa1cc0, full_scan_args, &result));
     for (unsigned char byte : full_scan_canary.bytes) CHECK(byte == 0x3c);
+
+    // 0x9844b0 is a tail jump to imported printf with the pinned "%s" format. Its third
+    // argument is forwarded as the string; both resolved indirect sites ignore the return.
+    g_printf_text[0] = 0;
+    guest_set_printf_hook(printf_hook);
+    const char* printf_message = "retail-printf";
+    const std::uint64_t printf_args[3] = {0, 0,
+        reinterpret_cast<std::uint64_t>(printf_message)};
+    CHECK(guest_thunk_invoke(0x9844b0, printf_args, &result));
+    CHECK(std::strcmp(g_printf_text, printf_message) == 0);
+    CHECK(result == std::strlen(printf_message));
+    guest_set_printf_hook(nullptr);
 
     // Direct invocation of 0x20d60 keeps the same observable contract.
     Object direct{};

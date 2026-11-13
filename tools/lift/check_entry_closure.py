@@ -46,18 +46,53 @@ def direct_call_evidence(targets: tuple[int, ...]) -> dict:
     return ec._scan_full_fde_direct_calls(elf, fdes, set(targets))
 
 
+@lru_cache(maxsize=4)
+def indirect_liveness(targets: tuple[int, ...]) -> dict[int, tuple[list[str], list[str]]]:
+    """Re-derive rax liveness at every resolved indirect site for the wanted targets."""
+    data = json.loads(ec.OUT_JSON.read_text())["indirect"]["sites_detail"]
+    wanted = set(targets)
+    by_function: dict[int, list[dict]] = {}
+    for record in data:
+        if record["status"] == "resolved" and int(record["target"], 16) in wanted:
+            by_function.setdefault(int(record["function"], 16), []).append(record)
+    elf = ec.Elf()
+    fdes = ec.parse_fdes(elf)
+    sizes = dict(fdes)
+    intervals = [(fn, fn + sizes[fn]) for fn in by_function if sizes.get(fn, 0)]
+    if not intervals:
+        return {}
+    all_ins = ec.disassemble(intervals)
+    result: dict[int, tuple[list[str], list[str]]] = {}
+    for fn, records in by_function.items():
+        size = sizes.get(fn, 0)
+        if not size:
+            continue
+        window = [a for a in sorted(all_ins) if fn <= a < fn + size]
+        if not window or window[0] != fn:
+            continue
+        live = ec._rax_live_after(all_ins, window, {int(r["site"], 16) for r in records})
+        for record in records:
+            target = int(record["target"], 16)
+            sites, live_sites = result.setdefault(target, ([], []))
+            if record["site"] not in sites:
+                sites.append(record["site"])
+            if live[int(record["site"], 16)]:
+                live_sites.append(record["site"])
+    return result
+
+
 def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
     """Re-derive every registered thunk body and the dispatch slot from the pinned ELF."""
     block = data.get("native_thunks", {})
     thunks = block.get("thunks", [])
-    if block.get("count") != 92 or len(thunks) != 92:
+    if block.get("count") != 93 or len(thunks) != 93:
         return False
     source = (ROOT / "native/core/guest_thunks.cpp").read_text()
     elf = ec.Elf()
     fdes = ec.parse_fdes(elf)
     starts = [start for start, _ in fdes]
     segments = ec.parse_segments()
-    custom = 0
+    custom: set[int] = set()
     for thunk in thunks:
         rva = int(thunk["rva"], 16)
         kind, fn_start, size = ec.classify(rva, fdes, starts, segments)
@@ -67,14 +102,27 @@ def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
         if hashlib.sha256(body).hexdigest() != thunk["sha256"]:
             return False
         if thunk.get("custom"):
-            custom += 1
+            custom.add(rva)
             if f"0x{rva:x}ULL, \"{thunk['name']}\"" not in source:
                 return False
         elif f"0x{rva:x}ULL, \"{thunk['name']}\"" not in thunk_inc:
             return False
-    if custom != 1:
+        if rva == 0x9844B0:
+            ins = ec.disassemble([(rva, rva + thunk["size"])])
+            contract = ec._printf_string_contract(elf, ins, sorted(ins), rva, thunk["size"])
+            for key, value in contract.items():
+                if thunk.get(key) != value:
+                    return False
+    if custom != {0x20D60, 0x9844B0}:
         return False
-    if block.get("blocked") is None or len(block["blocked"]) != 24:
+    guard = block.get("candidate_guard", {})
+    if guard.get("bounded_to_campaign_candidates") is not True:
+        return False
+    if guard.get("unbounded_one_byte_rows_rejected") != 570:
+        return False
+    if block.get("blocked") is None or len(block["blocked"]) != 23:
+        return False
+    if len(thunks) + len(block["blocked"]) != guard.get("candidate_rows"):
         return False
     for entry in block["blocked"]:
         if not entry.get("reason"):
@@ -82,6 +130,22 @@ def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
         rva = int(entry["rva"], 16)
         if ec.classify(rva, fdes, starts, segments)[0] not in ("function_start", "plt"):
             return False
+        if "reference_resolution" in entry and rva != 0x20D80:
+            expected = ec.classify_image_reference(elf, rva)
+            if entry["reference_resolution"] != expected["resolution"]:
+                return False
+            if entry.get("image_qword_reference_sites", []) != [f"0x{s:x}" for s in expected["image_sites"]]:
+                return False
+            if entry.get("relocation_slots", []) != [f"0x{s:x}" for s in expected["relocation_slots"]]:
+                return False
+        if rva == 0x20D80:
+            if entry.get("missing_host_state") != ["bss_0x2dfcbc8", "container_tree_0x18",
+                                                 "container_lock_0x58"]:
+                return False
+            if entry.get("unmodelled_callees") != ["0x211d0", "0xf8f500"]:
+                return False
+            if entry.get("direct_call_sites") != 3 or entry.get("call_sites") != 3:
+                return False
 
     elf = ec.Elf()
     fdes = ec.parse_fdes(elf)
@@ -107,12 +171,15 @@ def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
         if record["status"] == "resolved":
             target = int(record["target"], 16)
             indirect_sites[target] = indirect_sites.get(target, 0) + 1
+    evidence_targets = tuple(sorted({int(t["rva"], 16) for t in thunks + block["blocked"]}))
+    indirect_live = indirect_liveness(evidence_targets)
     for thunk in list(thunks) + list(block["blocked"]):
         if "call_sites" not in thunk:
             continue
         rva = int(thunk["rva"], 16)
         sites = direct_sites.get(rva, [])
-        live = sorted(f"0x{int(site['site']):x}" for site in sites if site["live"])
+        live = sorted({f"0x{int(site['site']):x}" for site in sites if site["live"]} |
+                      set(indirect_live.get(rva, ([], []))[1]))
         expected_indirect = indirect_sites.get(rva, 0)
         if thunk["direct_call_sites"] != len(sites):
             return False
@@ -125,7 +192,12 @@ def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
         if live:
             return False
         if "image_qword_references" in thunk:
-            if thunk["image_qword_references"] != ec.qword_reference_count(rva):
+            expected_image = ec.classify_image_reference(elf, rva)
+            if thunk["image_qword_references"] != len(expected_image["image_sites"]):
+                return False
+            if thunk.get("image_qword_reference_sites", []) != [f"0x{s:x}" for s in expected_image["image_sites"]]:
+                return False
+            if thunk.get("relocation_slots", []) != [f"0x{s:x}" for s in expected_image["relocation_slots"]]:
                 return False
 
     dispatch = block.get("dispatch", {})
@@ -224,8 +296,21 @@ def main(argv: list[str]) -> int:
         bad_dispatch["native_thunks"]["dispatch"]["target"] = "0x1234"
         if native_thunk_claims_ok(bad_dispatch, thunk_inc):
             die("tampered dispatch target was not detected")
-        print("OK mutation probe: row, total, thunk hash, direct count, scan summary and "
-                  "dispatch target detected")
+        bad_reference = json.loads(json.dumps(data))
+        for entry in bad_reference["native_thunks"]["blocked"]:
+            if "reference_resolution" in entry:
+                entry["reference_resolution"] = "hand_edited"
+                break
+        else:
+            die("no blocked row carries reference evidence to mutate")
+        if native_thunk_claims_ok(bad_reference, thunk_inc):
+            die("tampered reference resolution was not detected")
+        bad_guard = json.loads(json.dumps(data))
+        bad_guard["native_thunks"]["candidate_guard"]["candidate_rows"] += 1
+        if native_thunk_claims_ok(bad_guard, thunk_inc):
+            die("tampered candidate-set guard was not detected")
+        print("OK mutation probe: row, total, thunk hash, direct count, scan summary, "
+                  "dispatch target, reference resolution and candidate guard detected")
 
     closure = data["closure"]
     print(f"OK check_entry_closure: entries={totals['entries']} start={totals['function_start']} "

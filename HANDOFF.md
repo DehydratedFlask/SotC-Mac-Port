@@ -1,3 +1,46 @@
+## 2026-11-13 — Liveness fix, reference audit, 93 native bodies (CPU-01-AOT-CFG-CALLABLE-01, continued)
+
+**State: green.** Continuation of `6e321630` on `cursor/init-hash-551140-6aa93e8`. Init-lift is
+untouched: **46,876 / 46,881 B**, **108,325 B** native; `0x2170` (`0x5ba041`) and S4.2 geometry
+(`0x7f8664..0x7f87d8`) stay closed.
+
+**Gaps closed:** the liveness solver's successor lookup, the raw-file mis-measurement of qword
+references, the `0x9844b0` printf wrapper, and the per-stub reference diagnosis.
+
+- **Liveness bug fixed.** `_rax_live_after` indexed successor **block indices** into the address
+  window (`window[s]`) instead of `blocks[s][0]`. That made `0x984e95` look live even though
+  `0x984e97` overwrites `rax` immediately after the call. All rows were re-derived after the fix;
+  none of the 23 existing `void_noop` rows was withdrawn.
+- **Reference audit.** `image_qword_references` now scans only file-backed load segments, with
+  RELATIVE slots listed separately. Nineteen of the 22 stubs are relocated vtable/function-pointer
+  slots at named addresses (`0x1594d78`, `0x1594e90`, `0x1594eb0`, `0x1595118`, `0x15983e0`,
+  `0x1598798`, `0x159abd8`, `0x15bfd00`, `0x15bfd98`, `0x15ceae0`, `0x15ceb00`, `0x15d11a0`,
+  `0x15d16e0`, `0x15d1b90`, `0x15d1c48`, `0x15d1ce0`, `0x15d1fc0`, `0x15d2098`, `0x15d5978`;
+  `0x25c90` also has inert bytes at `0x24e49e1`). `0x41900` is inert unaligned data at `0x29b2bef`;
+  `0x5388e0` and `0xacc5b0` have no image or relocation reference. No slot has a resolved call
+  site, so all 22 stay blocked with the slot address and counts instead of a generic qword count.
+- **New body `0x9844b0`.** Exact `leaq %s; xor eax; mov rdx,rsi; jmp printf@plt`. The GOT slot
+  `0x1600558` resolves to NID `hcuQgD53UxM` (printf), format `0x12b57f4 = "%s"`, and argument 3
+  (`rdx`) is forwarded. Resolved indirect sites `0x98461a` in `0x9844d0` and `0x984e95` in
+  `0x984700` both ignore `rax` after the fix. Registered as `printf_string`; runtime hook observes
+  `retail-printf`, fixture asserts the same.
+- **`0x20d80` stays blocked, named.** Direct sites `0x21166` in `0x210b0`, `0x23770`/`0x238d9` in
+  `0x235d0`, all `rax`-dead. Non-null path requires container `0x2dfcbc8` with tree `+0x18` and
+  lock `+0x58`, node inserter `0x211d0` and comparator `0xf8f500`; `0x23612` clears the slot
+  before the first call. JSON carries the missing host state and unmodelled callees.
+- **Counts.** Surface **92 -> 93**; blocked **24 -> 23**. `printf_string` 1; all other kinds
+  unchanged. Candidate guard **116 rows** (93 + 23); rejected unbounded variant remains 570.
+- **Verification.** Build **0**; full CTest **706/706**; checker `native_thunks=93` with mutation
+  (row, total, hash, direct count, scan, dispatch, reference resolution, candidate guard);
+  `run_all_checkers.sh` **915 passed / 0 skipped / 0 failed**; project index **114,667**;
+  publish-path audit exit 0; attribution OK; runtime exit **0**, stderr **0 B**,
+  `printf_string_ok=true`, `byte_setter=255`, `previous_targets` unchanged. External
+  `reference_resolution` tamper exits 1 and is restored.
+
+**Next exact action:** resolve a call through one of the named relocated slots (e.g. vtable
+`0x1595100+0x18` → `0x25c90`) with caller-level liveness, then model the `0x20d80` container or
+leave it as the contract above. Do not re-open `0x2170` or `0x7f8664`.
+
 ## 2026-11-13 — Full-FDE direct-call scan: 91 -> 92 native bodies (CPU-01-AOT-CFG-CALLABLE-01, continued)
 
 **State: green.** Continuation of `19f5e83c` on branch `cursor/init-hash-551140-6aa93e8`. Init-lift is

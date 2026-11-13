@@ -50,6 +50,7 @@ ROOT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(ROOT / "scripts"))
 
+import ps4_dynlink as d  # noqa: E402
 from slot_pin_util import Elf  # noqa: E402
 
 ENTRY_MAP = ROOT / "docs/entry_map.json"
@@ -810,7 +811,7 @@ def _rax_live_after(ins: dict[int, tuple[str, str]], window: list[int],
     while changed:
         changed = False
         for bi in range(len(blocks) - 1, -1, -1):
-            out = any(live_in[position[window[s]]] for s in successors[bi])
+            out = any(live_in[position[blocks[s][0]]] for s in successors[bi])
             for addr in reversed(blocks[bi]):
                 i = position[addr]
                 live_out[addr] = out
@@ -823,18 +824,52 @@ def _rax_live_after(ins: dict[int, tuple[str, str]], window: list[int],
     return {site: live_out[site] for site in sites}
 
 
-def qword_reference_count(rva: int) -> int:
-    """Occurrences of the 8-byte little-endian address anywhere in the pinned image file."""
-    raw = ELF_PATH.read_bytes()
+def image_qword_reference_sites(e: Elf, rva: int) -> list[int]:
+    """Vaddrs of every file-backed image occurrence of `rva` as a little-endian qword.
+
+    The earlier counter searched the whole ELF file. That includes section/relocation bytes that
+    are never mapped, so it reported relocation addends as if they were image references. Scan only
+    the PT_LOAD/PT_SCE_RELRO file ranges and translate each hit back to a virtual address.
+    """
     needle = struct.pack("<Q", rva)
-    count = 0
-    pos = 0
-    while True:
-        at = raw.find(needle, pos)
-        if at < 0:
-            return count
-        count += 1
-        pos = at + 1
+    sites: set[int] = set()
+    for segment in e.img.loads:
+        lo = segment["offset"]
+        hi = lo + segment["filesz"]
+        pos = lo
+        while True:
+            at = e.img.elf.find(needle, pos, hi)
+            if at < 0:
+                break
+            sites.add(segment["vaddr"] + at - segment["offset"])
+            pos = at + 1
+    return sorted(sites)
+
+
+def relative_relocation_slots(e: Elf, rva: int) -> list[int]:
+    """Image slots whose RELATIVE relocation addend is exactly `rva`."""
+    return sorted(slot for slot, record in e.relocs.items()
+                  if record["type"] == 8 and record["addend"] == rva)
+
+
+def classify_image_reference(e: Elf, rva: int) -> dict:
+    """Name what the image/relocation evidence for an unresolved stub really is."""
+    image = image_qword_reference_sites(e, rva)
+    slots = relative_relocation_slots(e, rva)
+    if slots:
+        resolution = "relative_relocation_function_pointer_slot"
+        detail = "relocated slot at " + ",".join(f"0x{s:x}" for s in slots)
+    elif image and any(site % 8 for site in image):
+        resolution = "inert_unaligned_image_bytes"
+        detail = "unaligned bytes at " + ",".join(f"0x{s:x}" for s in image)
+    elif image:
+        resolution = "aligned_image_qword"
+        detail = "aligned qword at " + ",".join(f"0x{s:x}" for s in image)
+    else:
+        resolution = "no_image_or_relocation_reference"
+        detail = "no occurrence in any file-backed load segment and no RELATIVE slot"
+    return {"resolution": resolution, "detail": detail,
+            "image_sites": image, "relocation_slots": slots}
 
 
 def _scan_full_fde_direct_calls(e: Elf, fdes: list[tuple[int, int]],
@@ -890,6 +925,51 @@ def _scan_full_fde_direct_calls(e: Elf, fdes: list[tuple[int, int]],
                     "targets_with_sites": len({s["target"] for s in sites})},
         "sites": sites,
     }
+
+
+def _plt_import_nid(e: Elf, slot: int) -> str:
+    """NID of the imported function named by the dynamic relocation at GOT `slot`."""
+    parsed = d.parse(e.img.elf)
+    record = next((r for r in parsed["relocs"] if r["target"] == slot), None)
+    if record is None:
+        die(f"no relocation at GOT slot {slot:#x}")
+    return parsed["symbols"][record["symbol"]]["nid"]
+
+
+def _printf_string_contract(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int],
+                            rva: int, size: int) -> dict:
+    """Validate `leaq "%s"; xor eax,eax; mov rdx,rsi; jmp printf@plt` exactly."""
+    if size != 0x11:
+        die(f"printf wrapper {rva:#x} size {size:#x} != 0x11")
+    window = [a for a in addrs if rva <= a < rva + size]
+    if len(window) != 4:
+        die(f"printf wrapper {rva:#x} decodes to {len(window)} instructions, not 4")
+    mnemonics = [ins[a][0] for a in window]
+    if mnemonics != ["leaq", "xorl", "movq", "jmp"]:
+        die(f"printf wrapper {rva:#x} shape {mnemonics} is not leaq/xorl/movq/jmp")
+    leaq_src, leaq_dst = split_ops(ins[window[0]][1])
+    xorl_src, xorl_dst = split_ops(ins[window[1]][1])
+    mov_src, mov_dst = split_ops(ins[window[2]][1])
+    jmp_src, _ = split_ops(ins[window[3]][1])
+    if leaq_dst != "%rdi" or xorl_src != "%eax" or xorl_dst != "%eax":
+        die(f"printf wrapper {rva:#x} argument setup changed")
+    if (mov_src, mov_dst) != ("%rdx", "%rsi"):
+        die(f"printf wrapper {rva:#x} no longer forwards rdx to rsi")
+    format = absolute_operand(ins, window, 0)
+    if format is None or e.raw(format, 3) != b"%s\0":
+        die(f"printf wrapper {rva:#x} format is not the pinned %s string")
+    jump_match = re.match(r"^(0x[0-9a-f]+)", jmp_src)
+    if jump_match is None:
+        die(f"printf wrapper {rva:#x} has no direct PLT target")
+    jmp = int(jump_match.group(1), 16)
+    if jmp != 0xF8FED0:
+        die(f"printf wrapper {rva:#x} jumps to {jmp:#x}, not the printf PLT stub")
+    nid = _plt_import_nid(e, 0x1600558)
+    if nid != "hcuQgD53UxM":
+        die(f"printf PLT slot resolves to {nid}, not hcuQgD53UxM")
+    return {"callee": f"0x{jmp:x}", "got_slot": "0x1600558", "import_nid": nid,
+            "import_name": "printf", "format": f"0x{format:x}", "format_text": "%s",
+            "argument_index": 2}
 
 
 def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int],
@@ -949,13 +1029,16 @@ def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int
     for rva in sorted(stubs):
         sites = sites_by_target.get(rva, [])
         if not sites:
-            qrefs = qword_reference_count(rva)
-            reason = "no_direct_call_in_55790_fdes_no_resolved_indirect_target"
-            if qrefs:
-                reason += f"_qword_refs_{qrefs}"
+            reference = classify_image_reference(e, rva)
+            reason = ("no_direct_call_in_55790_fdes_no_resolved_indirect_target; "
+                      f"{reference['detail']}")
             blocked.append({"rva": f"0x{rva:x}", "symbol": None, "reason": reason,
                             "direct_call_sites": 0, "indirect_call_sites": 0,
-                            "call_sites": 0, "image_qword_references": qrefs})
+                            "call_sites": 0,
+                            "image_qword_references": len(reference["image_sites"]),
+                            "image_qword_reference_sites": [f"0x{s:x}" for s in reference["image_sites"]],
+                            "relocation_slots": [f"0x{s:x}" for s in reference["relocation_slots"]],
+                            "reference_resolution": reference["resolution"]})
             continue
         if any(live[(int(s["function"], 16), int(s["site"], 16))] for s in sites):
             when = [s["site"] for s in sites
@@ -1052,6 +1135,32 @@ def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int
                                           "constant": f"0x{const:x}"})
                 continue
 
+    # 0x9844b0 is a tail jump to imported printf with the pinned "%s" format. Both resolved
+    # indirect sites ignore rax; the host hook observes the forwarded string.
+    printf_rva = 0x9844B0
+    printf_sites = sites_by_target.get(printf_rva, [])
+    if printf_sites and not any(live[(int(s["function"], 16), int(s["site"], 16))]
+                                for s in printf_sites):
+        contract = _printf_string_contract(e, ins, addrs, printf_rva,
+                                           int(fde_sizes.get(printf_rva, 0) or 0))
+        add(printf_rva, "retail_printf_string", "printf_string", 3,
+            "tail-jumps to imported printf (NID hcuQgD53UxM) with the pinned %s format at "
+            "0x12b57f4 and forwards argument 3 (rdx) as the string; rax unused at both resolved "
+            "indirect sites",
+            {**contract, "call_sites": len(printf_sites), "direct_call_sites": 0,
+             "indirect_call_sites": len(printf_sites), "rax_live_sites": [], "custom": True})
+    elif printf_sites:
+        when = [s["site"] for s in printf_sites
+                if live[(int(s["function"], 16), int(s["site"], 16))]]
+        blocked.append({"rva": "0x9844b0", "symbol": None,
+                        "reason": "printf_wrapper_return_read_at_" + ",".join(when),
+                        "direct_call_sites": 0, "indirect_call_sites": len(printf_sites),
+                        "call_sites": len(printf_sites), "rax_live_sites": when})
+    else:
+        blocked.append({"rva": "0x9844b0", "symbol": None,
+                        "reason": "printf_wrapper_has_no_resolved_indirect_site",
+                        "direct_call_sites": 0, "indirect_call_sites": 0, "call_sites": 0})
+
     # The ConCmd lazy registration has a host hook for the unmodelled map insert.
     add(0x20D60, "concmd_lazy_register", "concmd_lazy_register", 1,
         "flips object+0x18 once and reports the 0x20d80 map insert through a host hook",
@@ -1059,17 +1168,18 @@ def _plan_native_thunks(e: Elf, ins: dict[int, tuple[str, str]], addrs: list[int
 
     blocked += [
         {"rva": "0x20d80", "symbol": None,
-         "reason": "needs_live_manager_pointer_from_bss_0x2dfcbc8",
+         "reason": "non_null_path_needs_container_at_bss_0x2dfcbc8_with_tree_0x18_and_lock_0x58; "
+                   "node_inserter_0x211d0_and_comparator_0xf8f500_unmodelled; "
+                   "slot_is_cleared_at_0x23612_before_the_first_call",
          "direct_call_sites": direct_count(0x20D80),
          "indirect_call_sites": indirect_count(0x20D80),
          "call_sites": direct_count(0x20D80) + indirect_count(0x20D80),
-         "image_qword_references": qword_reference_count(0x20D80)},
-        {"rva": "0x9844b0", "symbol": None,
-         "reason": "tail_jump_needs_unmodelled_callee_and_rodata_leaq",
-         "direct_call_sites": direct_count(0x9844B0),
-         "indirect_call_sites": indirect_count(0x9844B0),
-         "call_sites": direct_count(0x9844B0) + indirect_count(0x9844B0),
-         "image_qword_references": qword_reference_count(0x9844B0)},
+         "image_qword_references": len(image_qword_reference_sites(e, 0x20D80)),
+         "image_qword_reference_sites": [f"0x{s:x}" for s in image_qword_reference_sites(e, 0x20D80)],
+         "relocation_slots": [f"0x{s:x}" for s in relative_relocation_slots(e, 0x20D80)],
+         "reference_resolution": "direct_call_sites_with_live_bss_container",
+         "missing_host_state": ["bss_0x2dfcbc8", "container_tree_0x18", "container_lock_0x58"],
+         "unmodelled_callees": ["0x211d0", "0xf8f500"]},
     ]
     blocked.sort(key=lambda item: int(item["rva"], 16))
     rows.sort(key=lambda row: int(row["rva"], 16))
@@ -1213,6 +1323,7 @@ def build() -> tuple[dict, str]:
     intervals = [(rva, rva + min(SCAN_WINDOW, size)) for rva, size in
                  ((rva, kinds[rva][2]) for rva in start_set)]
     intervals += [(start, start + size) for _fn, start, size in frontier]
+    intervals.append((0x9844B0, 0x9844B0 + 0x11))
     ins = disassemble(intervals)
     addrs = sorted(ins)
 
@@ -1298,6 +1409,9 @@ def build() -> tuple[dict, str]:
         "native_thunks": {"count": len(thunk_rows), "thunks": thunk_rows,
                           "blocked": thunk_blocked, "dispatch": dispatch,
                           "scan": direct_scan["summary"],
+                          "candidate_guard": {"bounded_to_campaign_candidates": True,
+                                             "candidate_rows": len(thunk_rows) + len(thunk_blocked),
+                                             "unbounded_one_byte_rows_rejected": 570},
                           "previous_targets": [f"0x{rva:x}" for rva in PREVIOUS_TARGETS]},
         "samples": samples,
         "interior": interior,
@@ -1406,7 +1520,7 @@ def render_doc(data: dict) -> str:
         "## Native retail-ABI thunks",
         "",
         f"**{data['native_thunks']['count']}** entries are hosted as real SysV callables: the generated",
-        "`native/core/guest_thunk_table.inc` plus the custom `0x20d60` body. The runtime and",
+        "`native/core/guest_thunk_table.inc` plus the custom `0x20d60` and `0x9844b0` bodies. The runtime and",
         "`test_guest_thunks` invoke them through the registry and assert the observed object delta or",
         "return value:",
         "",
@@ -1429,6 +1543,8 @@ def render_doc(data: dict) -> str:
                              "copies rsi+0x10 and installs the pinned address"),
         "concmd_lazy_register": ("flag test/store reproduced; map insert is a host hook",
                                  "flag flips once, hook fires once, second call no-op"),
+        "printf_string": ("tail jump to imported printf with pinned `%s`; two resolved sites ignore rax",
+                          "forwards argument 3 to printf; a host hook observes the string"),
     }
     for kind, count in sorted(thunk_kinds.items()):
         proof, effect = kind_proof.get(kind, ("exact leaf body", kind))

@@ -1,5 +1,6 @@
 #include "core/guest_thunks.hpp"
 
+#include <cstdio>
 #include <cstring>
 
 namespace sotc {
@@ -8,6 +9,7 @@ namespace {
 #include "core/guest_thunk_table.inc"
 
 GuestConCmdRegisterHook g_concmd_hook = nullptr;
+GuestPrintfHook g_printf_hook = nullptr;
 
 // 0x20d60: `cmpb $0,0x18(%rdi); je +1; ret` then flag store, manager reload, jmp 0x20d80.
 std::uint64_t thunk_concmd_lazy_register(std::uint64_t self, std::uint64_t, std::uint64_t,
@@ -20,14 +22,31 @@ std::uint64_t thunk_concmd_lazy_register(std::uint64_t self, std::uint64_t, std:
     return 0;
 }
 
+// 0x9844b0: `lea "%s",%rdi; xor eax,eax; mov rdx,rsi; jmp printf@plt`.
+std::uint64_t thunk_printf_string(std::uint64_t, std::uint64_t, std::uint64_t text,
+                                  std::uint64_t, std::uint64_t, std::uint64_t) {
+    const char* message = reinterpret_cast<const char*>(text);
+    if (message == nullptr) return 0;
+    if (g_printf_hook != nullptr) {
+        g_printf_hook(message);
+        return std::strlen(message);
+    }
+    return static_cast<std::uint64_t>(std::printf("%s", message));
+}
+
 constexpr GuestThunk kCustomThunks[] = {
     {0x20d60ULL, "concmd_lazy_register", thunk_concmd_lazy_register, 1},
+    {0x9844b0ULL, "retail_printf_string", thunk_printf_string, 3},
 };
 
 }  // namespace
 
 void guest_set_concmd_register_hook(GuestConCmdRegisterHook hook) noexcept {
     g_concmd_hook = hook;
+}
+
+void guest_set_printf_hook(GuestPrintfHook hook) noexcept {
+    g_printf_hook = hook;
 }
 
 const GuestThunk* guest_thunk_find(std::uint64_t rva) noexcept {
