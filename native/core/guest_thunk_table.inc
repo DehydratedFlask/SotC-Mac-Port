@@ -157,6 +157,13 @@ static std::uint64_t thunk_22ae0_zero_u32(std::uint64_t a0, std::uint64_t a1,
     (void)a0; (void)a1;
     return 0;
 }
+static std::uint64_t thunk_23370_void_noop(std::uint64_t a0, std::uint64_t a1,
+                                     std::uint64_t, std::uint64_t,
+                                     std::uint64_t, std::uint64_t) {
+    // body: ret (0x23370); rax is unused at every resolved call site
+    (void)a0; (void)a1;
+    return 0;
+}
 static std::uint64_t thunk_246a0_const_u32(std::uint64_t a0, std::uint64_t a1,
                                      std::uint64_t, std::uint64_t,
                                      std::uint64_t, std::uint64_t) {
@@ -770,6 +777,7 @@ static constexpr GuestThunk kGuestLeafThunks[] = {
     {0x13d50ULL, "zero_u32", thunk_13d50_zero_u32, 0},
     {0x207d0ULL, "retail_void_stub", thunk_207d0_void_noop, 0},
     {0x22ae0ULL, "zero_u32", thunk_22ae0_zero_u32, 0},
+    {0x23370ULL, "retail_void_stub", thunk_23370_void_noop, 0},
     {0x246a0ULL, "const_u32_246a0", thunk_246a0_const_u32, 0},
     {0x24780ULL, "const_u32_24780", thunk_24780_const_u32, 0},
     {0x25aa0ULL, "retail_void_stub", thunk_25aa0_void_noop, 0},

@@ -1,3 +1,40 @@
+## 2026-11-13 — 97 native bodies: `0x23370` through vtable `0x1594e78+0x18`
+
+**State: green.** Continuation of `57a7b646` on `cursor/init-hash-551140-6aa93e8`. Init-lift is
+untouched: **46,876 / 46,881 B**, **108,325 B** native; `0x2170` (`0x5ba041`) and S4.2 geometry
+(`0x7f8664..0x7f87d8`) stay closed.
+
+**Registry 96 -> 97; blocked 20 -> 19; guard 116 unchanged.** `0x23370` was blocked only as
+`no_direct_call_in_55790_fdes_no_resolved_indirect_target; relocated slot at 0x1594e90`. Its caller
+is already in a mapped FDE: `0x235d0` (`kSlot567`, size `0x6b4`) materializes vtable base
+`0x1594e78` at `0x23aea`, spills it at `0x23b0b`, reloads it at `0x23c1e`, and dispatches through
+`*0x18(%rax)` at `0x23c2e`; `0x1594e78+0x18` is `0x1594e90`, whose qword is `0x23370`. `rax` is
+dead at `0x23c2e` (`_rax_live_after` false over the full `0x6b4` window).
+
+**Row.** `retail_void_stub`, kind `void_noop`, size 1, body `c3`, sha256
+`ae3f4619b0413d70d3004b9131c3752153074e45725be13b9a148978895e359e`; `direct_call_sites=0`,
+`indirect_call_sites=1`, `call_sites=1`, `rax_live_sites=[]`. The entry map names it
+`kSlot567UnitScratch`.
+
+**Runtime.** The harness invokes `0x23370` directly with a 0x3c canary; the body's own `retq`
+leaves every byte unchanged and returns 0. `slot3_stub_ok=true`, `registered=97`, and every prior
+effect still passes: `slot_stub_ok=true`, `slot2_stub_ok=true`,
+`concmd_registry={size:3,rotations:1,global:2,null_ok:true,ok:true}`, `byte_setter=255`,
+`previous_targets=15/14/ok`, `printf_string_ok=true`; exit 0, stderr 0 B.
+
+**Counts.** 97 = 26 noop / 28 const / 4 zero / 3 set_u8 / 2 set_u32 / 31 ctor / 1 ConCmd lazy /
+1 ConCmd registry / 1 printf. Blocked **19** (16 relocated slots, one inert image reference, two
+without image/relocation reference). Guard **116** = 97 + 19; unbounded 570 rejected. The sibling
+`0x235c0` (`0x1594eb0`) is the next candidate: its chain is already decoded at
+`0x23947`/`0x2397d`/`0x23a74`/`0x23a84`.
+
+**Verification.** Build **0**; full CTest **706/706**; checker `native_thunks=97` with mutation;
+`run_all_checkers.sh` **915/0/0**; entry map **1,957 / 584 / 462**; project index **114,667**;
+publish-path audit exit 0; attribution OK.
+
+**Next exact action:** retire the sibling `0x235c0` through its already decoded `0x235d0` chain and
+dead `rax`, keeping the 116-row guard. Do not add a candidate row.
+
 ## 2026-11-13 — 96 native bodies: `0x25c90` through vtable `0x1595100+0x18`
 
 **State: green.** Continuation of `63cf096b` on `cursor/init-hash-551140-6aa93e8`. Init-lift is
