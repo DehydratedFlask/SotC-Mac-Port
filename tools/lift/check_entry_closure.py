@@ -153,11 +153,35 @@ def known_unittests_slot_site() -> tuple[int, str, bool] | None:
     return target, f"0x{site:x}", live[site]
 
 
+def known_help_slot_site() -> tuple[int, str, bool] | None:
+    """Re-decode the one fixed 0x235c0 vtable caller from the pinned ELF."""
+    elf = ec.Elf()
+    fdes = ec.parse_fdes(elf)
+    fn, site, slot, target = 0x235D0, 0x23A84, 0x1594EB0, 0x235C0
+    size = dict(fdes).get(fn, 0)
+    if not size or elf.u64(slot) != target or elf.raw(target, 1) != b"\xc3":
+        return None
+    ins = ec.disassemble([(fn, fn + size)])
+    expect = ((0x23947, "leaq", "0x1594e98"),
+              (0x2397D, "movq", "%rsi, 0xb0(%rsp)"),
+              (0x23A74, "movq", "0xb0(%rsp), %rax"),
+              (0x23A84, "callq", "*0x18(%rax)"))
+    for addr, mnemonic, operand in expect:
+        actual = ins.get(addr)
+        if actual is None or actual[0] != mnemonic or operand not in actual[1]:
+            return None
+    window = [a for a in sorted(ins) if fn <= a < fn + size]
+    if not window or window[0] != fn:
+        return None
+    live = ec._rax_live_after(ins, window, {site})
+    return target, f"0x{site:x}", live[site]
+
+
 def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
     """Re-derive every registered thunk body and the dispatch slot from the pinned ELF."""
     block = data.get("native_thunks", {})
     thunks = block.get("thunks", [])
-    if block.get("count") != 97 or len(thunks) != 97:
+    if block.get("count") != 98 or len(thunks) != 98:
         return False
     source = (ROOT / "native/core/guest_thunks.cpp").read_text()
     elf = ec.Elf()
@@ -209,7 +233,7 @@ def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
         return False
     if guard.get("unbounded_one_byte_rows_rejected") != 570:
         return False
-    if block.get("blocked") is None or len(block["blocked"]) != 19:
+    if block.get("blocked") is None or len(block["blocked"]) != 18:
         return False
     if any(int(entry["rva"], 16) == 0x207D0 for entry in block["blocked"]):
         return False
@@ -258,7 +282,8 @@ def native_thunk_claims_ok(data: dict, thunk_inc: str) -> bool:
             indirect_sites[target] = indirect_sites.get(target, 0) + 1
     evidence_targets = tuple(sorted({int(t["rva"], 16) for t in thunks + block["blocked"]}))
     indirect_live = indirect_liveness(evidence_targets)
-    for known in (known_concmd_slot_site(), known_comm_slot_site(), known_unittests_slot_site()):
+    for known in (known_concmd_slot_site(), known_comm_slot_site(),
+                  known_unittests_slot_site(), known_help_slot_site()):
         if known is None:
             continue
         known_target, known_site, known_is_live = known
@@ -404,6 +429,16 @@ def main(argv: list[str]) -> int:
             die("0x23370 fixed vtable row is missing")
         if native_thunk_claims_ok(bad_unittests, thunk_inc):
             die("tampered 0x23370 indirect-call count was not detected")
+        bad_help = json.loads(json.dumps(data))
+        for row in bad_help["native_thunks"]["thunks"]:
+            if row["rva"] == "0x235c0":
+                row["indirect_call_sites"] = 0
+                row["call_sites"] = 0
+                break
+        else:
+            die("0x235c0 fixed vtable row is missing")
+        if native_thunk_claims_ok(bad_help, thunk_inc):
+            die("tampered 0x235c0 indirect-call count was not detected")
         bad_scan = json.loads(json.dumps(data))
         bad_scan["native_thunks"]["scan"]["validated_sites"] += 1
         if native_thunk_claims_ok(bad_scan, thunk_inc):

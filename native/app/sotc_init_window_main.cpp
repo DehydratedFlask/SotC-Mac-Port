@@ -79,6 +79,7 @@ struct ThunkProbe {
     bool slot_stub_ok;
     bool slot2_stub_ok;
     bool slot3_stub_ok;
+    bool slot4_stub_ok;
     bool printf_string_ok;
     bool concmd_registry_ok;
     unsigned concmd_registered;
@@ -295,6 +296,17 @@ ThunkProbe run_guest_thunk_probes() {
                       slot3_result == 0;
     for (unsigned char byte : slot3_canary) p.slot3_stub_ok = p.slot3_stub_ok && byte == 0x3c;
 
+    // 0x235c0 is the one-byte ret reached through vtable 0x1594e98 slot +0x18 at 0x23a84.
+    // Its own instruction has no side effect; a canary must stay byte-identical.
+    alignas(8) unsigned char slot4_canary[0x40];
+    std::memset(slot4_canary, 0x77, sizeof(slot4_canary));
+    const std::uint64_t slot4_args[6] = {
+        reinterpret_cast<std::uint64_t>(slot4_canary), 0, 0, 0, 0, 0};
+    std::uint64_t slot4_result = 1;
+    p.slot4_stub_ok = sotc::guest_thunk_invoke(0x235c0, slot4_args, &slot4_result) &&
+                      slot4_result == 0;
+    for (unsigned char byte : slot4_canary) p.slot4_stub_ok = p.slot4_stub_ok && byte == 0x77;
+
     // 0x9844b0 forwards its third argument to imported printf through the pinned "%s" format.
     static const char printf_message[] = "retail-printf";
     const std::uint64_t printf_args[6] = {0, 0,
@@ -310,8 +322,9 @@ ThunkProbe run_guest_thunk_probes() {
     p.ok = setter_called && p.setter_value == 0x2a && first_called && second_called &&
            p.register_flag == 1 && p.hook_calls == 1 && p.dispatch_ok &&
            p.previous_targets_ok && byte_ok && p.full_scan_stub_ok && p.slot_stub_ok &&
-           p.slot2_stub_ok && p.slot3_stub_ok && p.printf_string_ok && p.concmd_registry_ok &&
-           sotc::guest_thunk_count() == 97;
+           p.slot2_stub_ok && p.slot3_stub_ok && p.slot4_stub_ok &&
+           p.printf_string_ok && p.concmd_registry_ok &&
+           sotc::guest_thunk_count() == 98;
     return p;
 }
 
@@ -322,7 +335,7 @@ void print_guest_thunks(const ThunkProbe& p) {
                 "\"flag\":%u,\"hook_calls\":%d,\"ok\":%s},"
                 "\"previous_targets\":{\"total\":15,\"called\":%d,\"ok\":%s},"
                 "\"byte_setter\":%u,\"full_scan_stub_ok\":%s,\"slot_stub_ok\":%s,"
-                "\"slot2_stub_ok\":%s,\"slot3_stub_ok\":%s,"
+                "\"slot2_stub_ok\":%s,\"slot3_stub_ok\":%s,\"slot4_stub_ok\":%s,"
                 "\"printf_string_ok\":%s,\"concmd_registry\":{\"size\":%u,\"rotations\":%u,"
                 "\"global\":%u,\"null_ok\":%s,\"ok\":%s}},",
                 sotc::guest_thunk_count(), p.calls, p.setter_value, p.register_flag, p.hook_calls,
@@ -331,7 +344,7 @@ void print_guest_thunks(const ThunkProbe& p) {
                 p.previous_targets_called, p.previous_targets_ok ? "true" : "false",
                 p.byte_setter_value, p.full_scan_stub_ok ? "true" : "false",
                 p.slot_stub_ok ? "true" : "false", p.slot2_stub_ok ? "true" : "false",
-                p.slot3_stub_ok ? "true" : "false",
+                p.slot3_stub_ok ? "true" : "false", p.slot4_stub_ok ? "true" : "false",
                 p.printf_string_ok ? "true" : "false", p.concmd_registered,
                 p.concmd_rotations, p.concmd_global, p.concmd_null_ok ? "true" : "false",
                 p.concmd_registry_ok ? "true" : "false");
